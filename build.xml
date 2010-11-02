@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE version [
+  <!ENTITY build_version SYSTEM "version.xml">
+]>
+
+<project name="ProjectForge" default="dist" basedir=".">
+  &build_version;
+
+  <property environment="env" />
+	<property name="appId" value="ProjectForge 2010" />
+	<property name="version" value="3.4.1" />
+	<property name="m_doc.home" value="${env.M_DOC_HOME}" />
+	<property name="webproject" value="webapp" />
+	<property name="target" value="${webproject}/target" />
+	<property name="target.tmp" value="${target}/tmp" />
+	<property name="dist-src-dir" value="ProjectForge-src-${version}-${version.timestamp}" />
+	<property name="version.file" value="${webproject}/src/main/java/org/projectforge/Version.java" />
+	<tstamp>
+		<format property="NOW" pattern="yyyy-MM-dd_HH-mm" locale="en,UK" />
+	</tstamp>
+	<tstamp>
+		<format property="VERSION_NOW" pattern="yyyy-MM-dd HH:mm" locale="en,UK" />
+	</tstamp>
+	<tstamp>
+		<format property="VERSION_NOW_FC" pattern="yyyy-MM-dd_HH-mm" locale="en,UK" />
+	</tstamp>
+	<tstamp>
+		<format property="VERSION_DATE" pattern="yyyy-MM-dd" locale="en,UK" />
+	</tstamp>
+
+	<target name="pre-dist" depends="version-files">
+		<copy file="${version.file}" todir="${target.tmp}/WEB-INF/jsp/" />
+	</target>
+
+	<target name="dist" depends="doc,reporting-interfaces">
+		<delete dir="${target.tmp}" />
+		<mkdir dir="${target.tmp}" />
+		<unzip src="${target}/ProjectForge.war" dest="${target.tmp}" />
+		<copy todir="${target.tmp}/WEB-INF/classes/">
+			<fileset dir="${webproject}/src/main/resources/" casesensitive="yes">
+				<include name="i18nKeys.properties" />
+				<include name="imageDimensions.xml" />
+			</fileset>
+		</copy>
+		<copy overwrite="true" file="${webproject}/src/main/webapp/META-INF/context-hsqldb.xml" tofile="${target.tmp}/META-INF/context.xml" />
+		<mkdir dir="${target.tmp}/secure" />
+		<copy todir="${target.tmp}/secure">
+			<fileset dir="${target}" casesensitive="yes">
+				<include name="site/**" />
+			</fileset>
+			<fileset dir="." casesensitive="yes">
+				<include name="doc/**/*.html" />
+				<include name="doc/**/*.pdf" />
+				<include name="doc/images/*.gif" />
+				<include name="doc/images/*.jpg" />
+				<include name="doc/images/*.png" />
+			</fileset>
+			<fileset dir="." casesensitive="yes">
+				<include name="LICENSE.txt" />
+			</fileset>
+		</copy>
+		<copy todir="${target.tmp}/secure/doc">
+			<fileset dir="${m_doc.home}">
+				<include name="images/*.gif" />
+				<include name="images/*.jpg" />
+				<include name="images/*.png" />
+				<include name="images/navigation/*.gif" />
+				<include name="images/titleM_paper/*.pdf" />
+				<include name="images/titleM_paper/*.gif" />
+				<include name="css/*.css" />
+				<exclude name="images/titleM_paper/box_*.pdf" />
+			</fileset>
+		</copy>
+		<zip destfile="${target}/ProjectForge-${version}-${version.timestamp}.war">
+			<fileset dir="${target.tmp}" casesensitive="yes" />
+		</zip>
+		<copy overwrite="true" file="${webproject}/src/main/webapp/WEB-INF/web-force-SSL.xml" tofile="${target.tmp}/WEB-INF/web.xml" />
+		<delete file="${target.tmp}/WEB-INF/web-force-SSL.xml" />
+		<zip destfile="${target}/ProjectForge-force-SSL-${version}-${version.timestamp}.war">
+			<fileset dir="${target.tmp}" casesensitive="yes" />
+		</zip>
+		<zip destfile="${target}/ProjectForge_without_libs-${version}-${version.timestamp}.zip">
+			<fileset dir="${target.tmp}" casesensitive="yes">
+				<exclude name="WEB-INF/lib/**" />
+			</fileset>
+			<fileset dir="${target.tmp}" casesensitive="yes">
+				<include name="secure/**" />
+			</fileset>
+		</zip>
+	</target>
+
+	<target name="src-dist">
+		<delete dir="${target}/${dist-src-dir}" />
+		<mkdir dir="${target}/${dist-src-dir}" />
+    <copy todir="${target}/${dist-src-dir}">
+    	<fileset dir="." casesensitive="yes">
+        <include name="src/**/*.groovy" />
+        <include name="src/**/*.java" />
+        <include name="src/**/*.jflex" />
+        <include name="src/**/*.properties" />
+        <include name="src/main/resources/images/*.png" />
+        <include name="src/main/resources/keystore" />
+        <include name="src/main/resources/mail/*.html" />
+        <include name="src/main/resources/mail/*.txt" />
+        <include name="src/main/resources/wa/**/*.html" />
+        <include name="src/main/resources/wa/**/*.js" />
+        <include name="src/**/*.xml" />
+        <include name="src/**/*.xml.gz" />
+        <include name="src/**/*.xsl" />
+        <include name="src/main/webapp/**/favicon.ico" />
+        <include name="src/main/webapp/**/*.css" />
+        <include name="src/main/webapp/**/*.gif" />
+        <include name="src/main/webapp/**/*.html" />
+        <include name="src/main/webapp/**/*.js" />
+        <include name="src/main/webapp/**/*.jpg" />
+        <include name="src/main/webapp/**/*.jsp" />
+        <include name="src/main/webapp/**/*.png" />
+        <include name="src/main/webapp/**/*.scpt" />
+        <include name="src/main/webapp/**/*.swf" />
+        <include name="src/main/webapp/**/*.tld" />
+        <include name="src/main/webapp/**/*.ttf" />
+        <include name="version.xml" />
+        <include name="LICENSE.txt" />
+        <include name="doc/*.html" />
+        <include name="doc/*.pdf" />
+        <include name="doc/images/*.gif" />
+        <include name="doc/images/*.jpg" />
+        <include name="doc/images/*.png" />
+        <include name="pom-public.xml"/>
+      	<exclude name="src/**/ModifyJavaFileHeadersTest.java" />
+      </fileset>
+    </copy>
+    <move file="${target}/${dist-src-dir}/pom-public.xml" tofile="${target}/${dist-src-dir}/pom.xml" />
+		<zip destfile="${target}/${dist-src-dir}.zip" basedir="${target}" includes="${dist-src-dir}/**" />
+	</target>
+
+	<target name="version-files">
+		<echo>Creating file ${version.file} ...</echo>
+		<echo file="${version.file}" append="false">// automatically generated by build.xml for new releases
+      <![CDATA[
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project   ProjectForge
+//
+// Copyright 2001-2010, Kai Reinhard
+//           Dual-licensed.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge;
+
+public class Version
+{
+  public static final String APP_ID = "${appId}";
+
+  public static final String NUMBER = "${version}";
+
+  public static final String RELEASE_DATE = "${VERSION_DATE}";
+
+  public static final String RELEASE_TIMESTAMP = "${VERSION_NOW}";
+}
+]]>
+		</echo>
+		<echo>Creating file doc/version.dtd ...</echo>
+		<echo file="doc/version.dtd" append="false"><![CDATA[<?xml version="1.0" encoding="UTF-8" ?>
+<!ENTITY date "${VERSION_DATE}" >
+<!ENTITY timestamp "${VERSION_NOW}" >
+<!ENTITY version "${version}" >]]>
+</echo>
+		<echo>Creating file version.xml ...</echo>
+		<echo file="version.xml" append="false"><![CDATA[<?xml version="1.0" encoding="UTF-8" ?>
+<property name="version.date" value="${VERSION_DATE}"/>
+<property name="version.timestamp" value="${VERSION_NOW_FC}"/>]]>
+</echo>
+	</target>
+
+	<target name="reporting-interfaces">
+		<mkdir dir="${target}/resources" />
+		<zip destfile="${target}/resources/ProjectForgeReportingInterfaces-${version}.jar">
+			<fileset dir="${target}/classes" casesensitive="yes">
+				<include name="org/projectforge/reporting/*.class" />
+				<include name="org/projectforge/core/Priority.class" />
+				<include name="org/projectforge/fibu/kost/KostentraegerStatus.class" />
+				<include name="org/projectforge/fibu/kost/SHType.class" />
+				<include name="org/projectforge/fibu/KundeStatus.class" />
+				<include name="org/projectforge/fibu/ProjektStatus.class" />
+				<exclude name="org/projectforge/projectforge/reporting/*Impl.class" />
+			</fileset>
+		</zip>
+	</target>
+
+	<target name="test-release-info">
+		<echo>Version: ${version}
+        date: ${version.date}
+        timestamp: ${version.timestamp}
+      </echo>
+	</target>
+
+	<target name="doc">
+		<ant dir="doc" target="clean" />
+		<ant dir="doc">
+			<property name="base-url" value="." />
+			<property name="location" value="${env.PWD}/doc" />
+		</ant>
+	</target>
+
+</project>
