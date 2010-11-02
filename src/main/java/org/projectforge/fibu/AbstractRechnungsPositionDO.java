@@ -1,0 +1,401 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.fibu;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.Transient;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Store;
+import org.projectforge.common.CurrencyHelper;
+import org.projectforge.common.NumberHelper;
+import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.core.PFPersistancyBehavior;
+import org.projectforge.core.ShortDisplayNameCapable;
+import org.projectforge.fibu.kost.KostZuweisungDO;
+
+/**
+ * Repräsentiert eine Position innerhalb eine Rechnung.
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ */
+@MappedSuperclass
+public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implements ShortDisplayNameCapable
+{
+  private static final long serialVersionUID = 4132530394057069876L;
+
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractRechnungsPositionDO.class);
+
+  protected short number;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  protected String text;
+
+  protected BigDecimal menge;
+
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  protected BigDecimal einzelNetto;
+
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  protected BigDecimal vat;
+
+  @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
+  @IndexedEmbedded(depth = 1)
+  protected List<KostZuweisungDO> kostZuweisungen = null;
+
+  @Column
+  public short getNumber()
+  {
+    return number;
+  }
+
+  public AbstractRechnungsPositionDO setNumber(final short number)
+  {
+    this.number = number;
+    return this;
+  }
+
+  @Column(name = "menge")
+  public BigDecimal getMenge()
+  {
+    return menge;
+  }
+
+  public AbstractRechnungsPositionDO setMenge(final BigDecimal menge)
+  {
+    this.menge = menge;
+    return this;
+  }
+
+  @Column(name = "einzel_netto")
+  public BigDecimal getEinzelNetto()
+  {
+    return einzelNetto;
+  }
+
+  public AbstractRechnungsPositionDO setEinzelNetto(final BigDecimal einzelNetto)
+  {
+    this.einzelNetto = einzelNetto;
+    return this;
+  }
+
+  @Column
+  public BigDecimal getVat()
+  {
+    return vat;
+  }
+
+  public AbstractRechnungsPositionDO setVat(final BigDecimal vat)
+  {
+    if (vat != null) {
+      this.vat = vat.stripTrailingZeros();
+    } else {
+      this.vat = vat;
+    }
+    return this;
+  }
+
+  @Transient
+  public BigDecimal getNetSum()
+  {
+    if (this.menge != null) {
+      if (this.einzelNetto != null) {
+        return CurrencyHelper.multiply(this.menge, this.einzelNetto);
+      } else {
+        return BigDecimal.ZERO;
+      }
+    } else {
+      return this.einzelNetto != null ? this.einzelNetto : BigDecimal.ZERO;
+    }
+  }
+
+  @Transient
+  public BigDecimal getBruttoSum()
+  {
+    BigDecimal netSum = getNetSum();
+    if (vat != null) {
+      return netSum.add(CurrencyHelper.multiply(netSum, vat));
+    } else {
+      return netSum;
+    }
+  }
+
+  @Transient
+  public BigDecimal getVatAmount()
+  {
+    BigDecimal netSum = getNetSum();
+    if (vat != null) {
+      return CurrencyHelper.multiply(netSum, vat);
+    } else {
+      return BigDecimal.ZERO;
+    }
+  }
+
+  @Column(name = "s_text", length = 1000)
+  public String getText()
+  {
+    return text;
+  }
+
+  public AbstractRechnungsPositionDO setText(final String text)
+  {
+    this.text = text;
+    return this;
+  }
+
+  /**
+   * Get the position entries for this object.
+   */
+  @Transient
+  public abstract List<KostZuweisungDO> getKostZuweisungen();
+
+  public AbstractRechnungsPositionDO setKostZuweisungen(List<KostZuweisungDO> kostZuweisungen)
+  {
+    this.kostZuweisungen = kostZuweisungen;
+    return this;
+  }
+
+  /**
+   * @param idx Index of the cost assignment not index of collection.
+   * @return KostZuweisungDO with given index or null, if not exist.
+   */
+  public KostZuweisungDO getKostZuweisung(final int index)
+  {
+    if (kostZuweisungen == null) {
+      log.error("Can't get cost assignment with index " + index + " because no cost assignments given.");
+      return null;
+    }
+    for (final KostZuweisungDO zuweisung : kostZuweisungen) {
+      if (index == zuweisung.getIndex()) {
+        return zuweisung;
+      }
+    }
+    log.error("Can't found cost assignment with index " + index);
+    return null;
+  }
+
+  public AbstractRechnungsPositionDO addKostZuweisung(final KostZuweisungDO kostZuweisung)
+  {
+    ensureAndGetKostzuweisungen();
+    short index = 0;
+    for (final KostZuweisungDO zuweisung : kostZuweisungen) {
+      if (zuweisung.getIndex() >= index) {
+        index = zuweisung.getIndex();
+        index++;
+      }
+    }
+    kostZuweisung.setIndex(index);
+    setThis(kostZuweisung);
+    this.kostZuweisungen.add(kostZuweisung);
+    return this;
+  }
+
+  /**
+   * @return The total net sum of all assigned cost entries.
+   */
+  @Transient
+  public BigDecimal getKostZuweisungNetSum()
+  {
+    if (CollectionUtils.isEmpty(this.kostZuweisungen) == true) {
+      return BigDecimal.ZERO;
+    }
+    BigDecimal result = BigDecimal.ZERO;
+    for (final KostZuweisungDO zuweisung : this.kostZuweisungen) {
+      if (zuweisung.getNetto() != null) {
+        result.add(zuweisung.getNetto());
+      }
+    }
+    return result;
+  }
+
+  /**
+   * @return The total net sum of all assigned cost entries multiplied with the vat of this position.
+   */
+  @Transient
+  public BigDecimal getKostZuweisungGrossSum()
+  {
+    return CurrencyHelper.getGrossAmount(getKostZuweisungNetSum(), vat);
+  }
+
+  /**
+   * kostZuweisung.setEingangsrechnungsPosition(this);
+   * @param kostZuweisung
+   */
+  protected abstract void setThis(final KostZuweisungDO kostZuweisung);
+
+  protected abstract AbstractRechnungsPositionDO newInstance();
+
+  /**
+   * this.getEingangsrechnung()
+   */
+  @Transient
+  protected abstract AbstractRechnungDO< ? > getRechnung();
+
+  /**
+   * setEingangsrechnung(rechnung)
+   */
+  protected abstract AbstractRechnungsPositionDO setRechnung(final AbstractRechnungDO< ? > rechnung);
+
+  /**
+   * Does only work for not already persisted entries (meaning entries without an id / pk) and only the last entry of the list. Otherwise
+   * this method logs an error message and do nothing else.
+   * @param idx
+   * @see #isKostZuweisungDeletable(KostZuweisungDO)
+   */
+  public AbstractRechnungsPositionDO deleteKostZuweisung(final int idx)
+  {
+    final KostZuweisungDO zuweisung = getKostZuweisung(idx);
+    if (zuweisung == null) {
+      return this;
+    }
+    if (isKostZuweisungDeletable(zuweisung) == false) {
+      log
+          .error("Deleting of cost assignements which are already persisted (a id / pk already exists) or not are not the last entry is not supported. Do nothing.");
+      return this;
+    }
+    this.kostZuweisungen.remove(zuweisung);
+    return this;
+  }
+
+  /**
+   * Only the last entry of cost assignments is deletable if not already persisted (no id/pk given).
+   * @param zuweisung
+   * @return
+   */
+  public boolean isKostZuweisungDeletable(final KostZuweisungDO zuweisung)
+  {
+    if (zuweisung == null) {
+      return false;
+    }
+    if ((this instanceof EingangsrechnungsPositionDO && zuweisung.getEingangsrechnungsPositionId() != this.getId())
+        || this instanceof RechnungsPositionDO
+        && zuweisung.getRechnungsPositionId() != this.getId()) {
+      log.error("Oups, given cost assignment is not assigned to this invoice position.");
+      return false;
+    }
+    if (zuweisung.getId() != null) {
+      return false;
+    }
+    if (zuweisung.getIndex() + 1 < this.kostZuweisungen.size()) {
+      return false;
+    }
+    return true;
+  }
+
+  public List<KostZuweisungDO> ensureAndGetKostzuweisungen()
+  {
+    if (this.kostZuweisungen == null) {
+      setKostZuweisungen(new ArrayList<KostZuweisungDO>());
+    }
+    return getKostZuweisungen();
+  }
+
+  /**
+   * @return The net value as sum of all cost assignements.
+   */
+  @Transient
+  public BigDecimal getKostZuweisungsNetSum()
+  {
+    BigDecimal sum = BigDecimal.ZERO;
+    if (CollectionUtils.isNotEmpty(this.kostZuweisungen) == true) {
+      for (final KostZuweisungDO zuweisung : this.kostZuweisungen) {
+        sum = NumberHelper.add(sum, zuweisung.getNetto());
+      }
+    }
+    return sum;
+  }
+
+  @Transient
+  public BigDecimal getKostZuweisungNetFehlbetrag()
+  {
+    return getKostZuweisungsNetSum().subtract(getNetSum());
+  }
+
+  /**
+   * Clones this including cost assignments and order position (without id's).
+   * @return
+   */
+  public AbstractRechnungsPositionDO newClone()
+  {
+    final AbstractRechnungsPositionDO rechnungsPosition = newInstance();
+    rechnungsPosition.copyValuesFrom(this, "id", "kostZuweisungen");
+    if (this.getKostZuweisungen() != null) {
+      for (final KostZuweisungDO origKostZuweisung : this.getKostZuweisungen()) {
+        final KostZuweisungDO kostZuweisung = origKostZuweisung.newClone();
+        rechnungsPosition.addKostZuweisung(kostZuweisung);
+      }
+    }
+    return rechnungsPosition;
+  }
+
+  @Transient
+  public boolean isEmpty()
+  {
+    if (StringUtils.isBlank(text) == false) {
+      return false;
+    }
+    return (NumberHelper.isNotZero(einzelNetto) == false);
+  }
+
+  @Override
+  public boolean equals(Object o)
+  {
+    if (o instanceof AbstractRechnungsPositionDO) {
+      AbstractRechnungsPositionDO other = (AbstractRechnungsPositionDO) o;
+      if (ObjectUtils.equals(this.getNumber(), other.getNumber()) == false)
+        return false;
+      if (ObjectUtils.equals(this.getRechnung().getId(), other.getRechnung().getId()) == false)
+        return false;
+      return true;
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    HashCodeBuilder hcb = new HashCodeBuilder();
+    hcb.append(getNumber());
+    if (getRechnung() != null) {
+      hcb.append(getRechnung().getId());
+    }
+    return hcb.toHashCode();
+  }
+
+  @Transient
+  public String getShortDisplayName()
+  {
+    return String.valueOf(number);
+  }
+}

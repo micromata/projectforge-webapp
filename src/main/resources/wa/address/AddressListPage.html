@@ -1,0 +1,120 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<table>
+  <wicket:head>
+    <style type="text/css">
+#divZoom {
+	position: fixed;
+	left: 0px;
+	top: 50px;
+	width: 100%;
+	text-align: center;
+	line-height: 1.4em;
+	font-family: arial black, arial, helvetica, sans-serif;
+}
+
+.zoomText {
+	text-align: center;
+	/*background-color: #FFFFFF;*/
+	padding-left: 10px;
+	padding-right: 10px;
+}
+</style>
+    <script type="text/javascript">
+<!--
+// The colors to fade step by step:
+var zColor = new Array('#C0C0C0', '#A0A0A0', '#808080', '#606060', '#404040', '#202020', '#000000');
+var timeout1, timeout2;
+
+function zoom(text) {
+  this.obj = document.getElementById('divZoom');
+  this.css = this.obj.style;
+  this.css.color = zColor[0];
+  this.obj.innerHTML='<span class="zoomText">' + text + '</span>';
+  this.css.visibility = 'visible';
+  increaseFontSize(10);
+}
+
+function increaseFontSize(size)
+{
+  this.css.fontSize = size + "px";
+  size += 5;
+  if (size <= 90) {
+    timeout1 = window.setTimeout('increaseFontSize(' + size + ')', 20);
+  } else {
+    fadeFont(1);
+  }
+}
+
+function fadeFont(cnum) {
+  this.css.color = zColor[cnum];
+  cnum++;
+  if (cnum < zColor.length) {
+    timeout2 = window.setTimeout('fadeFont(' + cnum + ')', 50);
+  }
+}
+
+function hide() {
+  this.css.visibility = 'hidden';
+  if (timeout1) window.clearTimeout(timeout1);
+  if (timeout2) window.clearTimeout(timeout2);
+}
+
+function setOptionStatus() {
+  if ($("#filterTypeStandard").attr("checked") == true) {
+    $("#options").attr("style", "display: block;");
+  }
+}
+
+function hideOptions() {
+  $("#options").hide("normal");
+}
+
+function showOptions() {
+  $("#options").show("normal");
+}
+
+//  End -->
+</script>
+  </wicket:head>
+  <wicket:extend>
+    <wicket:fragment wicket:id="topFragment">
+      <div id="divZoom"></div>
+    </wicket:fragment>
+    <wicket:fragment wicket:id="phoneNumber">
+      <a wicket:id="directCallLink" href="/phoneCall?addressId=2&phoneType=privateMobile"
+        onmouseover="zoom('01234 56789'); return false;" onmouseout="hide()"> <img wicket:id="phoneImage" src="/images/phone.png" />&nbsp;<span
+        wicket:id="phoneNumber">[phone number]</span></a>
+      <a wicket:id="sendMessageLink" wicket:message="title:address.tooltip.writeSMS" href="sendSms?addressId=2&phoneType=privateMobile"> <img
+        src="images/sms.png" /></a>
+    </wicket:fragment>
+    <tr>
+      <td colspan="2">Direktwahl (link nur wenn konfiguriert), Tooltip for search field, last searches als favoriten im Searchfield, action buttons</td>
+    </tr>
+    <tr>
+      <th><wicket:message key="label.options" /></th>
+      <td><span wicket:id="filterType"><input type="radio" wicket:id="filter" id="filterTypeStandard" onclick="javascript:showOptions();" />
+      &nbsp; <wicket:message key="filter" /> <input type="radio" wicket:id="newest" onclick="javascript:hideOptions();submit();" /> &nbsp; <wicket:message
+        key="filter.newest" /> &nbsp; <input type="radio" wicket:id="myFavorites" onclick="javascript:hideOptions();submit();" /> &nbsp; <wicket:message
+        key="address.filter.myFavorites" /> &nbsp; <input type="radio" wicket:id="deleted" onclick="javascript:hideOptions();submit();" /> <wicket:message
+        key="deleted" />,</span> <span wicket:id="pageSize">[Page size setting]</span><br />
+      <div id="options" style="display: none;"><wicket:message key="address.addressStatus" />:&nbsp; <input type="checkbox"
+        wicket:id="uptodate"> <wicket:message key="address.addressStatus.uptodate" /> <input type="checkbox" wicket:id="outdated"> <wicket:message
+        key="address.addressStatus.outdated" /> <input type="checkbox" wicket:id="leaved"> <wicket:message key="address.addressStatus.leaved" />
+      <br />
+      <wicket:message key="address.contactStatus" />:&nbsp; <input type="checkbox" wicket:id="active"> <wicket:message
+        key="address.contactStatus.active" /> <input type="checkbox" wicket:id="nonActive"> <wicket:message
+        key="address.contactStatus.nonActive" /> <input type="checkbox" wicket:id="uninteresting"> <wicket:message
+        key="address.contactStatus.uninteresting" /> <input type="checkbox" wicket:id="personaIngrata"> <wicket:message
+        key="address.contactStatus.personaIngrata" /> <input type="checkbox" wicket:id="departed"> <wicket:message
+        key="address.contactStatus.departed" /></div>
+      </td>
+    </tr>
+  </wicket:extend>
+</table>
+</body>
+</html>

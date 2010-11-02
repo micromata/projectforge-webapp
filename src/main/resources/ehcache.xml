@@ -1,0 +1,33 @@
+<ehcache>
+  <defaultCache maxElementsInMemory="100" eternal="false" timeToIdleSeconds="600" timeToLiveSeconds="600" overflowToDisk="false" />
+  <cache name="de.micromata.common.hibernate.BasicUserDO" maxElementsInMemory="1000" />
+  <cache name="de.micromata.common.user.OrgUnitDO" maxElementsInMemory="1000" />
+  <cache name="de.micromata.common.user.OrgUnitTypeDO" maxElementsInMemory="1000" />
+  <cache name="de.micromata.common.user.OrgUnitTypeDO.roles" maxElementsInMemory="1000" />
+  <cache name="de.micromata.common.user.RoleDO" maxElementsInMemory="1000" />
+  <cache name="de.micromata.common.user.RoleDO.denyRoles" maxElementsInMemory="1000" />
+  <cache name="de.micromata.common.user.RoleDO.grantRoles" maxElementsInMemory="1000" />
+  <cache name="de.micromata.common.user.RoleDO.preConditions" maxElementsInMemory="1000" />
+  <cache name="de.micromata.hibernate.history.delta.PropertyDelta" maxElementsInMemory="1000" />
+  <cache name="de.micromata.hibernate.history.HistoryEntry" maxElementsInMemory="1000" />
+  <cache name="de.micromata.hibernate.history.HistoryEntry.delta" maxElementsInMemory="1000" />
+
+  <cache name="de.micromata.fibu.AuftragDO" maxElementsInMemory="1000" />
+  <cache name="de.micromata.fibu.RechnungDO" maxElementsInMemory="1000" />
+  <cache name="de.micromata.fibu.kost.Kost2ArtDO" maxElementsInMemory="50" />
+  <cache name="de.micromata.fibu.KundeDO" maxElementsInMemory="100" />
+  <cache name="de.micromata.fibu.ProjektDO" maxElementsInMemory="100" />
+  <cache name="de.micromata.projectforge.access.AccessEntryDO" maxElementsInMemory="100" />
+  <cache name="de.micromata.projectforge.access.GroupTaskAccessDO" maxElementsInMemory="100" />
+  <cache name="de.micromata.projectforge.address.AddressDO" maxElementsInMemory="1000" />
+  <cache name="de.micromata.projectforge.address.PersonalAddressDO" maxElementsInMemory="1000" />
+  <cache name="de.micromata.projectforge.book.BookDO" maxElementsInMemory="1000" />
+  <cache name="de.micromata.projectforge.task.TaskDO" maxElementsInMemory="1000" />
+  <cache name="de.micromata.projectforge.timesheet.TimesheetDO" maxElementsInMemory="1000" />
+  <cache name="de.micromata.projectforge.user.GroupDO" maxElementsInMemory="100" />
+  <cache name="de.micromata.projectforge.user.PFUserDO" maxElementsInMemory="100" />
+  <cache name="de.micromata.projectforge.user.UserPreferencesDO" maxElementsInMemory="100" />
+
+  <cache name="org.hibernate.cache.UpdateTimestampsCache" maxElementsInMemory="1000" />
+  <cache name="org.hibernate.cache.StandardQueryCache" maxElementsInMemory="1000" />
+</ehcache>

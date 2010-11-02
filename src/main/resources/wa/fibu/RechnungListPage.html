@@ -1,0 +1,38 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<table>
+  <wicket:extend>
+    <tr>
+      <th><wicket:message key="label.options" /></th>
+      <td colspan="3"><select wicket:id="year" onchange="javascript:submit();">
+        <option>[2001-2010]</option>
+      </select>&nbsp;<select wicket:id="month" onchange="javascript:submit();">
+        <option>[01-12]</option>
+      </select>&nbsp;<span wicket:id="filterType"><input type="radio" wicket:id="all" onclick="javascript:submit();" />&nbsp;<wicket:message
+        key="filter.all" />&nbsp;<input type="radio" wicket:id="unbezahlt" onclick="javascript:submit();" />&nbsp;<wicket:message
+        key="fibu.rechnung.filter.unbezahlt" />&nbsp;<input type="radio" wicket:id="ueberfaellig" onclick="javascript:submit();" />&nbsp;<wicket:message
+        key="fibu.rechnung.filter.ueberfaellig" />&nbsp;<input type="radio" wicket:id="deleted" onclick="javascript:submit();" /> <wicket:message
+        key="onlyDeleted" /></span>&nbsp;<input type="checkbox" wicket:id="showKostZuweisungStatus" onclick="javascript:submit();" /> <wicket:message
+        key="fibu.rechnung.showKostZuweisungstatus" /> <span wicket:id="pageSize">[Page size setting]</span></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="statistics" /></th>
+      <td><span wicket:id="brutto">[Brutto: 1,000,897.42 €]</span> <span wicket:id="netto">[Netto: 954,897.42 €]</span> <span wicket:id="offen"
+        style="color: blue;">[offen: 37.00 €],</span>&nbsp;<span wicket:id="ueberfaellig" style="color: red;">[überfällig: 531.18 €],</span>&nbsp;<span
+        wicket:id="skonto">[Skonto: 123,00 €]</span><br />
+      <wicket:message key="fibu.rechnung.zahlungsZiel" />:&nbsp;&#216;&nbsp;<span wicket:id="zahlungszielAverage">[23]</span>&nbsp;<wicket:message
+        key="days" />,&nbsp;<wicket:message key="fibu.rechnung.zahlungsZiel.actual" />:&nbsp;&#216;&nbsp;<span
+        wicket:id="tatsaechlichesZahlungzielAverage">[18]</span>&nbsp;<wicket:message key="days" />&nbsp;<span
+        style="font-size: x-small; color: white;">counter=<span wicket:id="counter">[121]</span>,&nbsp;counterBezahlt=<span
+        wicket:id="counterBezahlt">[109]</span></span></td>
+      <th><wicket:message key="export" /></th>
+      <td><a wicket:id="exportExcel"><img wicket:id="exportExcelImage" src="/images/page_white_excel.png" border="0" /></a></td>
+    </tr>
+  </wicket:extend>
+</table>
+</body>
+</html>

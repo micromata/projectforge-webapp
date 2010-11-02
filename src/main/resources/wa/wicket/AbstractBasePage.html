@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<title wicket:id="windowTitle">ProjectForge® 2010</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="apple-touch-icon" href="images/appleTouchIcon.png" />
+</head>
+<body onload="" wicket:id="body">
+<div id="container"><!-- left -->
+<div id="navigation" wicket:id="navigation"><span wicket:id="developmentsystem" style="font-weight: bold; font-size: 140%;">Developmentsystem!</span>
+<p style="text-align: left; margin-left: 4px;"><img wicket:id="logoImage" src="/secure/Logo" /></p>
+<div id="main-menu" wicket:id="mainMenu">[menu]</div>
+<p wicket:id="loggedInLabel" style="margin-top: 1em; margin-bottom: 1em;">[Logged in:<br />
+John Mustermann (john)]</p>
+<a wicket:id="sendFeedback"><img wicket:id="sendFeedBackImage" src="images/comment.png" title="Send feed back" border="0" /></a> <a
+  wicket:id="newsLink" href="secure/doc/News.html" target="_blank"><span wicket:id="versionLabel" style="color: grey;">[V. #.#.## 2009-...]</span></a></div>
+<!-- DIV #navigation END -->
+
+<div id="content">
+<div id="bookmarkIcon"><a href="#" onclick="javascript:showBookmark();"><img src="images/star_plus.png" wicket:id="image"
+  title="Bookmark this page" border="0" /></a></div>
+<div id="bookmark" wicket:id="bookmark">Hurzel</div>
+<div id="title" wicket:id="title">The page title</div>
+<wicket:child>
+  <h2>This is the content!</h2>
+</wicket:child></div>
+
+<!-- DIV content END -->
+<div id="footer"></div>
+</div>
+<!-- DIV container END -->
+<script type="text/javascript" charset="utf-8">
+    $(document).ready(function() {
+      initTooltips();
+    });
+</script>
+</body>
+</html>

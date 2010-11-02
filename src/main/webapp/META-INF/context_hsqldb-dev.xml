@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="" reloadable="false" debug="0" docBase="webapps" cookies="true">
+  <Resource name="jdbc/ProjectForgeDS" type="javax.sql.DataSource" auth="Container" driverClassName="org.hsqldb.jdbcDriver"
+    url="jdbc:hsqldb:${user.home}/ProjectForge/ProjectForgeTestDB" maxActive="100" maxIdle="30" maxWait="10000" username="sa" password="" />
+  <Parameter name="base.dir" value="${user.home}/ProjectForge" />
+  <Parameter name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect" />
+  <Parameter name="hibernate.schemaUpdate" value="true"  />
+  <Parameter name="development" value="true" />
+</Context>

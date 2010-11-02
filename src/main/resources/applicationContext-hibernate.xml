@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-lazy-init="false" default-autowire="no">
+  <!-- You may find the hibernate session factory and hibernate dialect in the main applicationContext-file.
+-->
+
+  <!-- shortcut to hibernate -->
+  <bean id="hibernate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+    <constructor-arg>
+      <ref bean="sessionFactory" />
+    </constructor-arg>
+    <property name="alwaysUseNewSession">
+      <value>false</value>
+    </property>
+    <property name="flushModeName">
+      <value>FLUSH_AUTO</value>
+    </property>
+    <property name="cacheQueries">
+      <value>true</value>
+    </property>
+  </bean>
+  <bean name="hibernateHistoryInterceptor" class="de.micromata.hibernate.history.HistoryInterceptor" lazy-init="false">
+    <constructor-arg>
+      <bean class="org.projectforge.core.HistoryUser" />
+    </constructor-arg>
+    <property name="delegateInterceptor">
+      <ref bean="hibernateSpringInterceptor" />
+    </property>
+    <property name="sessionFactoryBeanName">
+      <value>sessionFactory</value>
+    </property>
+  </bean>
+  <bean name="historyAdapter" class="de.micromata.hibernate.history.HistoryAdapter">
+    <property name="sessionFactory">
+      <ref bean="sessionFactory" />
+    </property>
+  </bean>
+  <bean name="hibernateSpringInterceptor" class="de.micromata.hibernate.spring.SpringInterceptor" lazy-init="false" autowire="no">
+    <property name="sessionFactoryBeanName">
+      <value>sessionFactory</value>
+    </property>
+    <property name="persistantClassBeanNames">
+      <props></props>
+    </property>
+  </bean>
+  <bean class="org.springframework.orm.hibernate3.HibernateTransactionManager" autowire="no" id="transactionManager">
+    <property name="sessionFactory">
+      <ref bean="sessionFactory" />
+    </property>
+  </bean>
+  <bean id="txTemplate" class="org.springframework.transaction.support.TransactionTemplate" autowire="no">
+    <property name="transactionManager" ref="transactionManager" />
+  </bean>
+  <bean id="txInterceptor" class="org.springframework.transaction.interceptor.TransactionInterceptor">
+    <property name="transactionAttributeSource">
+      <bean class="org.springframework.transaction.annotation.AnnotationTransactionAttributeSource"/>
+    </property>
+    <property name="transactionManager" ref="transactionManager" />
+  </bean>
+  <bean id="debugInterceptor" class="org.springframework.aop.interceptor.SimpleTraceInterceptor">
+    <property name="loggerName" value="trace" />
+  </bean>
+  <bean id="daoProxyCreator" class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+    <property name="beanNames">
+      <value>*Dao</value>
+    </property>
+    <property name="opaque" value="true" />
+    <property name="optimize" value="true" />
+    <property name="interceptorNames">
+      <list>
+        <value>debugInterceptor</value>
+        <value>txInterceptor</value>
+      </list>
+    </property>
+  </bean>
+</beans>

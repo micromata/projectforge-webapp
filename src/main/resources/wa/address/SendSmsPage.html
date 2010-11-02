@@ -1,0 +1,49 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<wicket:extend>
+  <div id="contentMenu"></div>
+  <form wicket:id="form" name="form">
+  <fieldset><legend><wicket:message key="label.data" /></legend>
+  <div wicket:id="feedback">[Validation errors]</div>
+  <div class="message" wicket:id="result">[Message send successfully at 2009/11/21 09:57 am.]</div>
+  <table class="form">
+    <tr>
+      <th><wicket:message key="address.sendSms.phoneNumber" /></th>
+      <td><input class="stdtext" wicket:id="phoneNumber" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="address.sendSms.message" /></th>
+      <td><textarea class="stdtext" wicket:id="message" name="message" style="height: 10ex;"
+        onKeyDown="textCounter(document.form.message,document.form.messageLength,160)"
+        onKeyUp="textCounter(document.form.message,document.form.messageLength,160)">[Message]</textarea><br />
+      <input readonly="readonly" type="text" name="messageLength" size="3" maxlength="3" value="160"> <wicket:message key="charactersLeft" /></td>
+    </tr>
+    <tr>
+      <th></th>
+      <td class="buttonpanel"><span wicket:id="reset">[reset]</span> <span wicket:id="send">[send]</span></td>
+    </tr>
+  </table>
+  </fieldset>
+  </form>
+
+  <script wicket:id="showSendQuestionDialog" type="text/javascript">
+    function showSendQuestionDialog() {
+      return window.confirm("Send...?");
+    }
+  </script>
+  <script type="text/javascript">
+    function textCounter(field,cntfield,maxlimit) {
+      if (field.value.length > maxlimit) // if too long...trim it!
+        field.value = field.value.substring(0, maxlimit);
+        // otherwise, update 'characters left' counter
+      else
+        cntfield.value = maxlimit - field.value.length;
+    }
+  </script>
+</wicket:extend>
+</body>
+</html>

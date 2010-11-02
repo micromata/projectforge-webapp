@@ -1,0 +1,82 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<table>
+  <wicket:extend>
+    <wicket:fragment wicket:id="topMenuFragment">
+      <span wicket:id="copyFromPredecessor">[copyFromPredecessor]</span>
+    </wicket:fragment>
+    <tr class="hRuler">
+      <td colspan="9"></td>
+    </tr>
+    <tr wicket:id="deletedCheckBoxRow">
+      <th><wicket:message key="onlyDeleted" /></th>
+      <td colspan="8"><input type="checkbox" wicket:id="deletedCheckBox" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="user" /></th>
+      <td colspan="8"><span wicket:id="user">[show and select user]</span>&nbsp;</td>
+    </tr>
+    <tr>
+      <th><wicket:message key="timesheet.startTime" /></th>
+      <td><span wicket:id="weekDate">[startDate]</span></td>
+      <th><wicket:message key="calendar.weekOfYearShortLabel"></wicket:message></th>
+      <td><span wicket:id="weekOfYear">[weakOfYear]</span></td>
+      <td colspan="5">&nbsp;</td>
+    </tr>
+    <wicket:container wicket:id="entries">
+      <tr class="hRuler">
+        <td colspan="9"></td>
+      </tr>
+      <tr>
+        <th><label for="priority"><wicket:message key="hr.planning.priority" /></label></th>
+        <th><label for="probability"><wicket:message key="hr.planning.probability" /></label></th>
+        <th><wicket:message key="hr.planning.unassignedHours" /> [<wicket:message key="calendar.unit.hour" />]</th>
+        <th><wicket:message key="calendar.day.monday" /> [<wicket:message key="calendar.unit.hour" />]</th>
+        <th><wicket:message key="calendar.day.tuesday" /> [<wicket:message key="calendar.unit.hour" />]</th>
+        <th><wicket:message key="calendar.day.wednesday" /> [<wicket:message key="calendar.unit.hour" />]</th>
+        <th><wicket:message key="calendar.day.thursday" /> [<wicket:message key="calendar.unit.hour" />]</th>
+        <th><wicket:message key="calendar.day.friday" /> [<wicket:message key="calendar.unit.hour" />]</th>
+        <th><wicket:message key="hr.planning.weekend" /> [<wicket:message key="calendar.unit.hour" />]</th>
+      </tr>
+      <tr>
+        <!-- PriorityChoice -->
+        <td><select wicket:id="priorityChoice">
+          <option>5</option>
+        </select></td>
+        <!-- ProbabilityChoice -->
+        <td><select wicket:id="probabilityChoice">
+          <option>50</option>
+        </select></td>
+        <td><input type="text" class="stdtext" wicket:id="unassignedHours" style="width: 40px" /></td>
+        <td><input type="text" class="stdtext" wicket:id="mondayHours" style="width: 40px" /></td>
+        <td><input type="text" class="stdtext" wicket:id="tuesdayHours" style="width: 40px" /></td>
+        <td><input type="text" class="stdtext" wicket:id="wednesdayHours" style="width: 40px" /></td>
+        <td><input type="text" class="stdtext" wicket:id="thursdayHours" style="width: 40px" /></td>
+        <td><input type="text" class="stdtext" wicket:id="fridayHours" style="width: 40px" /></td>
+        <td><input type="text" class="stdtext" wicket:id="weekendHours" style="width: 40px" /></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="status" />/<wicket:message key="fibu.projekt" /></th>
+        <td><select wicket:id="status" id="status">
+          <option>[leave]</option>
+        </select></td>
+        <td colspan="7"><span wicket:id="projekt">[show and select projekt]</span></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="hr.planning.description" />&nbsp;<img wicket:id="jiraSupportTooltipImage" src="images/help.png" border="0" /><br />
+        <br />
+        <a wicket:id="deleteUndeleteEntry"><img wicket:id="deleteUndeleteEntryImage" /></a> <a wicket:id="addEntry"><img
+          wicket:id="addEntryImage" /></a></th>
+        <td colspan="8"><textarea class="stdtext" wicket:id="description" style="height: 10ex;">[description]</textarea><span wicket:id="jiraIssues">[JIRA
+        issues]</span></td>
+      </tr>
+    </wicket:container>
+    <script wicket:id="showDeleteEntryQuestionDialog">[...]</script>
+  </wicket:extend>
+</table>
+</body>
+</html>

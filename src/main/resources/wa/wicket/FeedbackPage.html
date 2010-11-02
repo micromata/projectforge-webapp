@@ -1,0 +1,34 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+</head>
+
+<body>
+<wicket:extend>
+  <form wicket:id="form">
+  <div wicket:id="feedback">[Validation errors]</div>
+  <fieldset><legend><wicket:message key="feedback.send.title" /></legend>
+  <table class="form">
+    <wicket:child />
+    <tr>
+      <th><wicket:message key="feedback.receiver" /></th>
+      <td><span wicket:id="receiver">[admin@acme.org]</span></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="feedback.sender" /></th>
+      <td><span wicket:id="sender">[kai]</span></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="description" /></th>
+      <td><textarea class="stdtext" wicket:id="description" style="height: 20ex;">[Description]</textarea></td>
+    </tr>
+    <tr>
+      <td class="buttonpanel" colspan="2"><span wicket:id="cancel">[cancel]</span> <span wicket:id="send">[send]</span></td>
+    </tr>
+  </table>
+  </fieldset>
+  </form>
+</wicket:extend>
+</body>
+</html>

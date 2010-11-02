@@ -1,0 +1,53 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<wicket:extend>
+  <script wicket:id="showDeleteQuestionDialog" type="text/javascript">
+    function showDeleteQuestionDialog() {
+      return window.confirm("Delete...?");
+    }
+  </script>
+
+  <form wicket:id="form">
+  <div wicket:id="feedback">[Validation errors]</div>
+
+  <fieldset><legend><wicket:message key="label.data" /></legend>
+  <table class="form">
+    <wicket:child />
+    <tr>
+      <th></th>
+      <td class="buttonpanel" wicket:id="buttonCell" colspan="4"><span wicket:id="cancel">[cancel]</span> <span wicket:id="buttonPanel">[Place
+      for page specific buttons]</span> <span wicket:id="reset">[reset]</span> <span wicket:id="markAsDeleted">[mark as deleted]</span> <span
+        wicket:id="undelete">[undelete]</span> <span wicket:id="delete">[delete]</span> <span wicket:id="create">[create]</span> <span
+        wicket:id="update">[update]</span></td>
+    </tr>
+    <tr wicket:id="bottomRows">
+      <!-- Place here your content below the buttons. -->
+    </tr>
+  </table>
+  </fieldset>
+  </form>
+  <span wicket:id="bottomPanel"> <!-- Place here your content below the form and buttons. --> </span>
+  <fieldset><legend><wicket:message key="label.historyOfChanges" /></legend>
+  <table class="form" wicket:id="timeOfModifications">
+    <tr>
+      <th><wicket:message key="timeOfCreation" /></th>
+      <td><span wicket:id="timeOfCreation">[08.10.2009 13:27:02]</span></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="timeOfLastUpdate" /></th>
+      <td><span wicket:id="timeOfLastUpdate">[08.10.2009 13:27:02]</span></td>
+    </tr>
+  </table>
+  <table class="dataview" cellspacing="0" wicket:id="historyTable">
+    <tr>
+      <td>[history table]</td>
+    </tr>
+  </table>
+  </fieldset>
+</wicket:extend>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<html xmlns:j="jelly:core">
+<head>
+<style type="text/css">
+body {
+	font: bold 11px "Lucida Grande", Arial, Helvetica, sans-serif;
+}
+
+h1 {
+	font-size: 13px;
+}
+
+table {
+	border-width: 1px;
+	border-style: solid;
+	padding: 3px;
+}
+
+th {
+	background-color: #D9D9D9;
+	text-align: left;
+	vertical-align: top;
+}
+
+table.form tr td {
+	background-color: #F0F4FA;
+}
+
+table.history tr.even td {
+	background-color: #F0F4FA;
+}
+
+table.history tr.odd td {
+	background-color: #fff;
+}
+
+table.history tr th {
+	color: #363639;
+}
+</style>
+</head>
+<body>
+Hallo ${msg.toRealname},
+<br />
+der Auftrag #${auftrag.nummer} wurde ge&amp;auml;ndert bzw. angelegt.
+<br />
+<a href="${requestUrl}">${requestUrl}</a>
+<br />
+<table class="form">
+  <tr>
+    <th>Nummer</th>
+    <td>${auftrag.nummer}</td>
+    <th>Referenz</th>
+    <td colspan="3">${auftrag.referenz}</td>
+  </tr>
+  <tr>
+    <th>Nettosumme</th>
+    <td style="white-space: nowrap;">${nettoSumme}</td>
+    <th>Status</th>
+    <td colspan="3">${auftragsStatus}</td>
+  </tr>
+  <tr>
+    <th>Titel</th>
+    <td colspan="5">${auftrag.titel}</td>
+  </tr>
+  <tr>
+    <th>Projekt</th>
+    <td colspan="5">${projekt}</td>
+  </tr>
+  <tr>
+    <th>Kunde</th>
+    <td colspan="5">${kunde}</td>
+  </tr>
+  <tr>
+    <th>Angebotsdatum</th>
+    <td>${angebotsDatum}</td>
+    <th>Bindungsfrist</th>
+    <td>${bindungsFrist}</td>
+    <th>Beauftragungsdatum</th>
+    <td>${beauftragungsDatum}</td>
+  </tr>
+  <tr>
+    <th>Anprechpartner</th>
+    <td colspan="5">${contactPerson.fullname}</td>
+  </tr>
+  <tr>
+    <th>Bemerkung</th>
+    <td colspan="5">${bemerkung}</td>
+  </tr>
+  <tr>
+    <th>Beschreibung Status</th>
+    <td colspan="5">${statusBeschreibung}</td>
+  </tr>
+  <j:forEach var="position" items="${auftrag.positionen}">
+    <tr>
+      <th colspan="6">Position #${position.number}</th>
+    </tr>
+    <tr>
+      <th>Titel</th>
+      <td>${position.titel}</td>
+      <th>Art</th>
+      <td>${position.art}</td>
+      <th>Status</th>
+      <td>${position.status}</td>
+    </tr>
+    <tr>
+      <th>Nettosumme</th>
+      <td style="white-space: nowrap;">${nettoSumme}</td>
+      <th>Bemerkung</th>
+      <td colspan="3">${position.bemerkung}</td>
+    </tr>
+  </j:forEach>
+</table>
+
+<h1>Letzte &amp;Auml;nderungen</h1>
+<table class="history">
+  <tr>
+    <th>Zeitstempel</th>
+    <th>Benutzer</th>
+    <th>Aktion</th>
+    <th>Feld</th>
+    <th>Neuer Wert</th>
+    <th>Alter Wert</th>
+  </tr>
+  <j:forEach var="entry" items="${history}" indexVar="row">
+    <j:choose>
+      <j:when test="${row % 2 == 0}">
+        <j:set var="style" value="even" />
+      </j:when>
+      <j:otherwise>
+        <j:set var="style" value="odd" />
+      </j:otherwise>
+    </j:choose>
+    <tr class="${style}">
+      <td>${entry[0]}</td>
+      <td>${entry[1]}</td>
+      <td>${entry[2]}</td>
+      <td>${entry[3]}</td>
+      <td>${entry[4]}</td>
+      <td>${entry[5]}</td>
+    </tr>
+  </j:forEach>
+</table>
+<br />
+Viel Spa&amp;szlig; w&amp;uuml;nscht das
+<br />
+ProjectForge-Team.
+</body>
+</html>

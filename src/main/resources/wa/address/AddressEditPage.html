@@ -1,0 +1,76 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<table>
+  <wicket:extend>
+    <wicket:fragment wicket:id="bottomRowsFragment">
+      <tr class="hRuler">
+        <td colspan="4"></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="book.lending" /></th>
+        <td><span wicket:id="lendOutStatus">Kai Reinhard, 10.10.2010</span><span wicket:id="lendOutButton">[lend out]</span><span
+          wicket:id="returnBookButton">[return book]</span></td>
+        <th><wicket:message key="book.lendOutNote" /></th>
+        <td><input type="text" class="stdtext" wicket:id="lendOutComment" /></td>
+      </tr>
+    </wicket:fragment>
+    <tr>
+      <th><wicket:message key="task" /></th>
+      <td colspan="3" wicket:id="task">[task path]</td>
+    </tr>
+    <tr>
+      <th><wicket:message key="book.title" /></th>
+      <td colspan="3"><input type="text" class="stdtext" wicket:id="title" /></td>
+    </tr>
+    <tr class="hRuler">
+      <td colspan="4"></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="book.authors" /></th>
+      <td><input type="text" class="stdtext" wicket:id="authors" /></td>
+      <th><wicket:message key="book.signature" /></th>
+      <td><input type="text" class="stdtext" wicket:id="signature" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="book.keywords" /></th>
+      <td><input type="text" class="stdtext" wicket:id="keywords" /></td>
+      <th><wicket:message key="book.publisher" /></th>
+      <td><input type="text" class="stdtext" wicket:id="publisher" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="book.isbn" /></th>
+      <td><input type="text" class="stdtext" wicket:id="isbn" /></td>
+      <th><wicket:message key="book.editor" /></th>
+      <td><input type="text" class="stdtext" wicket:id="editor" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="status" /></th>
+      <td><select wicket:id="status" id="status">
+        <option>present</option>
+      </select></td>
+      <th><wicket:message key="book.yearOfPublishing" /></th>
+      <td><input type="text" class="stdtext" style="width: 4em;" wicket:id="yearOfPublishing" /></td>
+    </tr>
+    <tr class="hRuler">
+      <td colspan="4"></td>
+    </tr>
+
+    <tr>
+      <th colspan="2"><wicket:message key="book.abstract" /></th>
+      <th colspan="2"><wicket:message key="comment" /></th>
+    </tr>
+    <tr>
+      <td colspan="2"><textarea class="stdtext" wicket:id="abstract" style="height: 20ex;">[abstract]</textarea></td>
+      <td colspan="2"><textarea class="stdtext" wicket:id="comment" style="height: 20ex;">[comment]</textarea></td>
+    </tr>
+    <tr class="hRuler">
+      <td colspan="4"></td>
+    </tr>
+  </wicket:extend>
+</table>
+</body>
+</html>

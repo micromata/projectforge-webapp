@@ -1,0 +1,32 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<table>
+  <wicket:extend>
+    <tr>
+      <th><wicket:message key="fibu.kost2art.nummer" /></th>
+      <td><input size="2" maxlength="2" wicket:id="nummer" /></td>
+      <th><wicket:message key="fibu.fakturiert" /></th>
+      <td><input type="checkbox" wicket:id="fakturiertCheckBox" /></td>
+      <th><wicket:message key="fibu.kost2art.projektStandard" /></th>
+      <td><input type="checkbox" wicket:id="projektStandardCheckBox" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="fibu.kost2art.name" /></th>
+      <td colspan="5"><input type="text" class="stdtext" wicket:id="name" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="fibu.kost2art.workFraction" /></th>
+      <td colspan="5"><input type="text" wicket:id="workFraction" size="5" maxlength="5" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="description" /></th>
+      <td colspan="5"><textarea class="stdtext" wicket:id="description" style="height: 20ex;">[Description]</textarea></td>
+    </tr>
+  </wicket:extend>
+</table>
+</body>
+</html>

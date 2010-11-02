@@ -1,0 +1,126 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<table>
+  <wicket:extend>
+    <tr>
+      <th colspan="2">&nbsp;</th>
+      <td colspan="7"><input type="checkbox" wicket:id="showInactivePositionsCheckBox" /> <wicket:message
+        key="fibu.auftrag.showInactivePosition" /></td>
+    </tr>
+    <tr>
+      <th colspan="2"><wicket:message key="fibu.auftrag.nummer" /></th>
+      <td><input wicket:id="nummer" id="nummer" style="width: 4em;" /> <img wicket:id="nummerHelp" src="images/help.png" border="0" /></td>
+      <th><wicket:message key="fibu.common.reference" /></th>
+      <td colspan="3"><input wicket:id="referenz" id="referenz" class="stdtext" /></td>
+      <th><wicket:message key="fibu.auftrag.nettoSumme" /></th>
+      <td style="white-space: nowrap;"><span wicket:id="nettoSumme">[973.27 €]</span></td>
+    </tr>
+    <tr>
+      <th colspan="2"><label for="titel"><wicket:message key="fibu.auftrag.titel" /></label></th>
+      <td colspan="5"><input wicket:id="titel" id="titel" class="stdtext" /></td>
+      <th><wicket:message key="status" /></th>
+      <td><select wicket:id="status" id="status">
+        <option>beauftragt</option>
+      </select></td>
+    </tr>
+    <tr>
+      <th colspan="2"><wicket:message key="fibu.projekt" /></th>
+      <td colspan="5"><span wicket:id="projekt">[show and select projekt]</span></td>
+      <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+      <th colspan="2"><wicket:message key="fibu.kunde" /></th>
+      <td colspan="5"><span wicket:id="kunde">[show and select kunde]</span><img wicket:id="kundeHelp" src="images/help.png" /></td>
+      <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+      <th colspan="2"><label for="angebotsDatum"><wicket:message key="fibu.auftrag.datum" /></label></th>
+      <td><span wicket:id="angebotsDatum">[Angebotsdatum]</span></td>
+      <th><label for="bindungsFrist"><wicket:message key="fibu.auftrag.bindungsFrist" /></label></th>
+      <td><span wicket:id="bindungsFrist">[select bindungsFrist]</span></td>
+      <th><label for="beauftragungsDatum"><wicket:message key="fibu.auftrag.beauftragungsdatum" /></label></th>
+      <td><span wicket:id="beauftragungsDatum">[select beauftragungsDatum]</span></td>
+      <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr>
+      <th colspan="2"><wicket:message key="contactPerson" /></th>
+      <td colspan="5"><span wicket:id="contactPerson">[show and select contact person]</span></td>
+      <td colspan="2">&nbsp;</td>
+    </tr>
+    <wicket:container wicket:id="positions">
+      <tr class="hRuler">
+        <td colspan="9"></td>
+      </tr>
+      <wicket:container wicket:id="shortPositionView">
+        <tr>
+          <th style="color: 777777;"><wicket:message key="fibu.auftrag.position.short" /> #<span wicket:id="number" style="font-size: 140%;">[1]</span></th>
+          <th>&nbsp;</th>
+          <td colspan="7" style="color: 777777; font-style: italic;"><span wicket:id="shortText">[ACME web portal, finished, 37 pd, 7.000
+          €]</span></td>
+        </tr>
+      </wicket:container>
+      <wicket:container wicket:id="normalPositionView">
+        <tr>
+          <th><wicket:message key="fibu.auftrag.position.short" /> #<span wicket:id="number" style="font-size: 140%;">[1]</span></th>
+          <th><wicket:message key="fibu.auftrag.titel" /></th>
+          <td colspan="3"><input wicket:id="titel" class="stdtext" /></td>
+          <th><wicket:message key="projectmanagement.personDays" /></th>
+          <td><input wicket:id="personDays" size="5" /></td>
+          <th wicket:id="nettoSummeLabel">[net sum]</th>
+          <td style="white-space: nowrap;"><input class="stdtext" wicket:id="nettoSumme" style="width: 8em;" />&nbsp;<input type="checkbox"
+            wicket:id="vollstaendigFakturiert" id="vollstaendigFakturiert" /></td>
+        </tr>
+        <tr>
+          <th>&nbsp;</th>
+          <th><span wicket:id="invoicesLabel">[Invoices]</span></th>
+          <td colspan="3"><span wicket:id="invoices">[Invoices]</span></td>
+          <th><wicket:message key="fibu.auftrag.position.art" /></th>
+          <td><select wicket:id="art">
+            <option>[Festpreispaket]</option>
+          </select></td>
+          <th wicket:id="invoicedLabel">[net sum]</th>
+          <td wicket:id="invoicedSum" style="white-space: nowrap;">[127,000.00 €]</td>
+        </tr>
+        <tr>
+          <th>&nbsp;</th>
+          <th><label for="bemerkung"><wicket:message key="comment" /></label></th>
+          <td colspan="5"><textarea class="stdtext" wicket:id="bemerkung" id="bemerkung" style="height: 10ex;">[Bemerkungstext]</textarea></td>
+          <th wicket:id="statusLabel" style="vertical-align: top;">[status]</th>
+          <td style="vertical-align: top;"><select wicket:id="status">
+            <option>[beauftragt]</option>
+          </select></td>
+        </tr>
+        <tr>
+          <th>&nbsp;</th>
+          <th><wicket:message key="task" /></th>
+          <td colspan="5"><span wicket:id="task" id="task">[show and select task]</span></td>
+          <td colspan="2">&nbsp;</td>
+        </tr>
+      </wicket:container>
+      <tr>
+        <td colspan="9"><a wicket:id="addPosition"><img wicket:id="addPositionImage" /></a></td>
+      </tr>
+    </wicket:container>
+    <tr class="hRuler">
+      <td colspan="9"></td>
+    </tr>
+    <tr>
+      <th colspan="2"><label for="bemerkung"><wicket:message key="comment" /></label></th>
+      <td colspan="7"><textarea class="stdtext" wicket:id="bemerkung" id="bemerkung" style="height: 20ex;">[Bemerkungstext]</textarea></td>
+    </tr>
+    <tr>
+      <th colspan="2"><label for="statusBeschreibung"><wicket:message key="fibu.auftrag.statusBeschreibung" /></label></th>
+      <td colspan="7"><textarea class="stdtext" wicket:id="statusBeschreibung" id="statusBeschreibung" style="height: 10ex;">[Statusbeschreibung]</textarea></td>
+    </tr>
+    <tr>
+      <th colspan="2"><label for="sendEMailNotification"> <wicket:message key="label.sendEMailNotification" /></label></th>
+      <td colspan="7"><input type="checkbox" wicket:id="sendEMailNotification" id="sendEMailNotification" /></td>
+    </tr>
+  </wicket:extend>
+</table>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-lazy-init="true" default-autowire="no">
+  <bean id="propertyConfigurer"
+    class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="order">
+      <value>2</value>
+    </property>
+    <property name="locations">
+      <list>
+        <value>classpath:hibernate-mappings.properties</value>
+      </list>
+    </property>
+    <property name="ignoreResourceNotFound">
+      <value>true</value>
+    </property>
+  </bean>
+  <bean id="initTestDB"
+    class="org.projectforge.test.InitTestDB" />
+  <bean id="migrateFromV2"
+    class="org.projectforge.patches.MigrateFromV2" />
+  <!-- Sample database -->
+  <bean id="dataSource" class="de.micromata.jdbc.PropertyDataSource"
+    destroy-method="close">
+    <!-- p6spy for debugging -->
+    <property name="driverClassName">
+      <value>org.postgresql.Driver</value>
+    </property>
+    <property name="url">
+      <value>jdbc:postgresql://localhost:5432/projectforge</value>
+    </property>
+    <property name="username">
+      <value>projectforge</value>
+    </property>
+    <property name="password">
+      <value></value>
+    </property>
+    <property name="properties">
+      <props>
+      </props>
+    </property>
+    <property name="maxActive">
+      <value>5</value>
+    </property>
+    <property name="defaultAutoCommit">
+      <value>true</value>
+    </property>
+  </bean>
+  <!-- hibernate Session to DB -->
+  <bean id="sessionFactory"
+    class="de.micromata.hibernate.spring.AutoSessionFactoryBean">
+    <!--property name="mappingResources">
+      <value>${hibernate.mappings}</value>
+      </property-->
+    <!-- property name="initialXmlData">
+      <value>classpath:database-dump.xml</value>
+      </property-->
+    <!-- property name="dumpOnExit">
+      <value>false</value>
+      </property -->
+    <property name="hibernateProperties">
+      <props>
+        <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
+        <prop key="hibernate.query.substitutions"></prop><!-- Need to force empty despite Hibernate reference saying this is the default -->
+        <prop key="hibernate.cache.region_prefix"></prop><!-- Need to force empty. Hibernate reference says this is the default -->
+        <prop key="hibernate.show_sql">false</prop>
+        <prop key="hibernate.format_sql">false</prop>
+        <prop key="hibernate.use_outer_join">false</prop>
+        <prop key="hibernate.max_fetch_depth">3</prop>
+        <prop key="hibernate.default_batch_fetch_size">8</prop>
+        <prop key="hibernate.cglib.use_reflection_optimizer">true</prop>
+        <prop key="hibernate.cache.use_query_cache">true</prop>
+        <prop key="hibernate.cache.use_second_level_cache">true</prop>
+        <prop key="hibernate.cache.provider_class">
+          org.hibernate.cache.EhCacheProvider
+        </prop>
+        <prop key="hibernate.jdbc.batch_size">0</prop>
+      </props>
+    </property>
+    <property name="dataSource">
+      <ref bean="dataSource" />
+    </property>
+    <!-- never run a schema update on the database -->
+    <property name="schemaUpdate">
+      <value>false</value>
+    </property>
+    <!--  property name="entityInterceptor">
+      <ref bean="hibernateHistoryInterceptor" />
+      </property -->
+  </bean>
+  <!-- shortcut to hibernate -->
+  <bean id="hibernate"
+    class="org.springframework.orm.hibernate3.HibernateTemplate">
+    <constructor-arg>
+      <ref bean="sessionFactory" />
+    </constructor-arg>
+    <property name="alwaysUseNewSession">
+      <value>false</value>
+    </property>
+    <property name="checkWriteOperations" value="false" />
+  </bean>
+  <!--bean name="hibernateHistoryInterceptor" class="de.micromata.hibernate.history.HistoryInterceptor" lazy-init="false">
+    <constructor-arg>
+    <bean class="de.micromata.user.HistoryUser" />
+    </constructor-arg>
+    <property name="delegateInterceptor">
+    <ref bean="hibernateSpringInterceptor" />
+    </property>
+    <property name="sessionFactoryBeanName">
+    <value>sessionFactory</value>
+    </property>
+    </bean>
+    <bean name="historyAdapter" class="de.micromata.hibernate.history.HistoryAdapter"> 
+    <property name="sessionFactory">
+    <ref bean="sessionFactory" />
+    </property>
+    </bean-->
+</beans>

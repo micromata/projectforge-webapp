@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-lazy-init="false" default-autowire="byType">
+  <bean id="accessChecker" class="org.projectforge.access.AccessChecker" singleton="true" />
+  <bean id="addressExport" class="org.projectforge.address.AddressExport" singleton="true" />
+  <bean id="configuration" class="org.projectforge.core.Configuration" singleton="true">
+    <constructor-arg>
+      <value>${base.dir}</value>
+    </constructor-arg>
+  </bean>
+  <bean id="groovyExecutor" class="org.projectforge.scripting.GroovyExecutor" />
+  <bean id="historyAdapter" class="de.micromata.hibernate.history.HistoryAdapter" />
+  <bean id="pdfRenderer" class="org.projectforge.renderer.PdfRenderer" singleton="true">
+    <property name="fontResourceDir" value="fonts" />
+  </bean>
+  <bean id="hrPlanningExport" class="org.projectforge.humanresources.HRPlanningExport" />
+  <bean id="mebMailClient" class="org.projectforge.meb.MebMailClient" />
+  <bean id="sendMail" class="org.projectforge.mail.SendMail" singleton="true" />
+  <bean id="taskTree" class="org.projectforge.task.TaskTree" singleton="true">
+    <property name="expireTimeInHours">
+      <value>1</value>
+    </property>
+  </bean>
+  <bean id="userGroupCache" class="org.projectforge.user.UserGroupCache" singleton="true">
+    <property name="expireTimeInHours" value="12" />
+  </bean>
+  <bean id="xmlDump" class="org.projectforge.database.XmlDump" />
+
+  <!-- Daos (automatically initialized as singletons.) -->
+  <bean id="accessDao" class="org.projectforge.access.AccessDao" />
+  <bean id="addressDao" class="org.projectforge.address.AddressDao" />
+  <bean id="bookDao" class="org.projectforge.book.BookDao" />
+  <bean id="configurationDao" class="org.projectforge.core.ConfigurationDao" />
+  <bean id="contractDao" class="org.projectforge.orga.ContractDao" />
+  <bean id="databaseDao" class="org.projectforge.database.DatabaseDao" />
+  <bean id="databaseUpdateDao" class="org.projectforge.database.DatabaseUpdateDao" />
+  <bean id="ganttChartDao" class="org.projectforge.gantt.GanttChartDao" />
+  <bean id="groupDao" class="org.projectforge.user.GroupDao" />
+  <bean id="hrDao" class="org.projectforge.humanresources.HRDao" />
+  <bean id="hrPlanningDao" class="org.projectforge.humanresources.HRPlanningDao" />
+  <bean id="hrPlanningEntryDao" class="org.projectforge.humanresources.HRPlanningEntryDao" />
+  <bean id="initDatabaseDao" class="org.projectforge.database.InitDatabaseDao" />
+  <bean id="mebDao" class="org.projectforge.meb.MebDao" />
+  <bean id="personalAddressDao" class="org.projectforge.address.PersonalAddressDao" />
+  <bean id="postausgangDao" class="org.projectforge.orga.PostausgangDao" />
+  <bean id="posteingangDao" class="org.projectforge.orga.PosteingangDao" />
+  <bean id="scriptDao" class="org.projectforge.scripting.ScriptDao" />
+  <bean id="sendFeedback" class="org.projectforge.core.SendFeedback" />
+  <bean id="searchDao" class="org.projectforge.core.SearchDao" />
+  <bean id="systemDao" class="org.projectforge.core.SystemDao" />
+  <bean id="taskDao" class="org.projectforge.task.TaskDao" />
+  <bean id="timesheetDao" class="org.projectforge.timesheet.TimesheetDao" />
+  <bean id="timesheetExport" class="org.projectforge.timesheet.TimesheetExport" />
+  <bean id="userDao" class="org.projectforge.user.UserDao" />
+  <bean id="userPrefDao" class="org.projectforge.user.UserPrefDao" />
+  <bean id="userRightDao" class="org.projectforge.user.UserRightDao" />
+  <bean id="userXmlPreferencesCache" class="org.projectforge.user.UserXmlPreferencesCache" singleton="true">
+    <property name="expireTimeInMinutes">
+      <value>10</value>
+    </property>
+  </bean>
+  <bean id="userXmlPreferencesDao" class="org.projectforge.user.UserXmlPreferencesDao" />
+  <bean id="userXmlPreferencesMigrationDao" class="org.projectforge.user.UserXmlPreferencesMigrationDao" />
+
+  <!--  FiBu -->
+  <bean id="auftragDao" class="org.projectforge.fibu.AuftragDao" />
+  <bean id="buchungssatzDao" class="org.projectforge.fibu.kost.BuchungssatzDao" />
+  <bean id="bankAccountDao" class="org.projectforge.fibu.BankAccountDao" />
+  <bean id="eingangsrechnungDao" class="org.projectforge.fibu.EingangsrechnungDao" />
+  <bean id="employeeDao" class="org.projectforge.fibu.EmployeeDao" />
+  <bean id="employeeSalaryExportDao" class="org.projectforge.fibu.datev.EmployeeSalaryExportDao" />
+  <bean id="employeeSalaryDao" class="org.projectforge.fibu.EmployeeSalaryDao" />
+  <bean id="kontoDao" class="org.projectforge.fibu.KontoDao" />
+  <bean id="kost1Dao" class="org.projectforge.fibu.kost.Kost1Dao" />
+  <bean id="kost2Dao" class="org.projectforge.fibu.kost.Kost2Dao" />
+  <bean id="kost2ArtDao" class="org.projectforge.fibu.kost.Kost2ArtDao" />
+  <bean id="kostCache" class="org.projectforge.fibu.kost.KostCache" singleton="true" />
+  <bean id="kostZuweisungDao" class="org.projectforge.fibu.kost.KostZuweisungDao" />
+  <bean id="datevImportDao" class="org.projectforge.fibu.datev.DatevImportDao" />
+  <bean id="kundeDao" class="org.projectforge.fibu.KundeDao" />
+  <bean id="monthlyEmployeeReportDao" class="org.projectforge.fibu.MonthlyEmployeeReportDao" />
+  <bean id="projektDao" class="org.projectforge.fibu.ProjektDao" />
+  <bean id="rechnungCache" class="org.projectforge.fibu.RechnungCache" singleton="true" />
+  <bean id="rechnungDao" class="org.projectforge.fibu.RechnungDao">
+    <property name="defaultSteuersatz">
+      <value>0.19</value>
+    </property>
+  </bean>
+  <bean id="reportDao" class="org.projectforge.fibu.kost.reporting.ReportDao" />
+</beans>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- This files contains the definition of the timesheets in a meta language (like html). It will be rendered through jelly and
+  afterwards via timesheet-template-fo.xsl to xsl-fo. -->
+<template-fo systemDate="${systemDate}" title="${title}" createdLabel="${createdLabel}" loggedInUser="${loggedInUser.fullname}"
+  xmlns:j="jelly:core">
+  <h1-color>${title}</h1-color>
+  <table width="100%">
+    <table-column column-width="25mm" />
+    <table-column column-width="45mm" />
+    <table-column column-width="proportional-column-width(1)" />
+    <table-body>
+      <tr>
+        <th color="#999999">${timePeriodLabel}</th>
+        <td>${startTime} - ${stopTime}</td>
+        <td text-align="end">
+          <j:if test="${user != null}">
+            <span color="#999999" use-font="bold" end-indent="10mm">${userLabel}</span>
+            <workaround-space>__</workaround-space>
+            <span use-font="normal">${user}</span>
+          </j:if>
+          <span color="#999999" use-font="bold">
+            <workaround-space>____</workaround-space>
+            ${totalDurationLabel}
+          </span>
+          <workaround-space>__</workaround-space>
+          <span use-font="normal">
+            ${totalDuration}
+            <j:if test="${empty totalHours == false}">(${totalHours})</j:if>
+          </span>
+        </td>
+      </tr>
+      <j:if test="${task != null}">
+        <tr>
+          <th color="#999999">${taskLabel}</th>
+          <td number-columns-spanned="2">${task}</td>
+        </tr>
+      </j:if>
+      <j:if test="${empty searchString == false}">
+        <tr>
+          <th color="#999999">${searchStringLabel}</th>
+          <td number-columns-spanned="2">${searchString}</td>
+        </tr>
+      </j:if>
+      <j:if test="${deleted}">
+        <tr>
+          <th color="#999999">${optionsLabel}</th>
+          <td number-columns-spanned="2">
+            <j:if test="${deleted}">${deletedLabel}</j:if>
+          </td>
+        </tr>
+      </j:if>
+    </table-body>
+  </table>
+  <block margin-top="10pt" />
+  <table width="100%">
+    <j:if test="${user == null}">
+      <table-column column-width="35mm" />
+    </j:if>
+    <table-column column-width="6cm" />
+    <table-column column-width="25mm" />
+    <table-column column-width="13mm" />
+    <table-column column-width="proportional-column-width(1)" />
+    <table-header>
+      <tr border-bottom-line="true">
+        <j:if test="${user == null}">
+          <th>${userLabel}</th>
+        </j:if>
+        <th>${taskLabel}</th>
+        <th>${timePeriodLabel}</th>
+        <th>${durationLabel}</th>
+        <th>${descriptionLabel}</th>
+      </tr>
+    </table-header>
+    <table-body>
+      <j:forEach var="timesheet" items="${list}">
+        <tr even-odd="true" use-font="tiny">
+          <j:if test="${user == null}">
+            <td>${timesheet.cells[0]}</td>
+          </j:if>
+          <td>${timesheet.cells[1]}</td>
+          <td>${timesheet.cells[2]}</td>
+          <td text-align="end" space-after.optimum="5pt">${timesheet.cells[3]}</td>
+          <td>
+            ${timesheet.cells[4]}
+            <j:if test='${not empty timesheet.cells[5] and timesheet.cells[5] != ""}'>
+              <br />
+              ${locationLabel}: ${timesheet.cells[5]}
+            </j:if>
+          </td>
+        </tr>
+      </j:forEach>
+    </table-body>
+  </table>
+</template-fo>

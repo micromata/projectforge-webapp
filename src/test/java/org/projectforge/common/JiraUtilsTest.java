@@ -1,0 +1,91 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.common;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.projectforge.core.ConfigurationTest;
+import org.projectforge.jira.JiraUtils;
+
+
+public class JiraUtilsTest
+{
+  public static final String JIRA_BASE_URL = "https://jira.acme.com/jira/browse/";
+
+  @BeforeClass
+  public static void setUp()
+  {
+    ConfigurationTest.createTestConfiguration();
+  }
+  
+  @Test
+  public void parseJiraIssues()
+  {
+    check(new String[] { "P-0"}, JiraUtils.parseJiraIssues("P-0"));
+    check(new String[] { "PF-0"}, JiraUtils.parseJiraIssues("PF-0"));
+    check(new String[] { "PF-222"}, JiraUtils.parseJiraIssues("PF-222"));
+    check(new String[] { "PF-1"}, JiraUtils.parseJiraIssues("PF-1"));
+    check(new String[] { "PF-1"}, JiraUtils.parseJiraIssues("Worked on PF-1."));
+    check(new String[] { "PF1DF-1"}, JiraUtils.parseJiraIssues("Worked on PF1DF-1."));
+
+    check(new String[] { "PF-222", "PROJECT2-123"}, JiraUtils.parseJiraIssues("Worked on PF-222 and PROJECT2-123 and finished this work."));
+
+    assertNull(JiraUtils.parseJiraIssues("PF222"));
+    check(new String[] { "PF-222"}, JiraUtils.parseJiraIssues("1234PF-222"));
+  }
+
+  @Test
+  public void buildJiraIssueBrowseLinkUrl()
+  {
+    assertEquals(JIRA_BASE_URL + "PF-222", JiraUtils.buildJiraIssueBrowseLinkUrl("PF-222"));
+  }
+
+  @Test
+  public void buildJiraIssueLink()
+  {
+    assertEquals("<a href=\"" + JIRA_BASE_URL + "PF-222" + "\">PF-222</a>", JiraUtils.buildJiraIssueBrowseLink("PF-222"));
+  }
+
+  @Test
+  public void linkJiraIssues()
+  {
+    assertEquals(JiraUtils.buildJiraIssueBrowseLink("PF-222"), JiraUtils.linkJiraIssues("PF-222"));
+    assertEquals(" " + JiraUtils.buildJiraIssueBrowseLink("PF-222"), JiraUtils.linkJiraIssues(" PF-222"));
+    assertEquals(JiraUtils.buildJiraIssueBrowseLink("PF-222") + " ", JiraUtils.linkJiraIssues("PF-222 "));
+    assertEquals("Worked on " + JiraUtils.buildJiraIssueBrowseLink("PF-222") + ".", JiraUtils.linkJiraIssues("Worked on PF-222."));
+    assertEquals("Worked on " + JiraUtils.buildJiraIssueBrowseLink("PF-222") + " and " + JiraUtils.buildJiraIssueBrowseLink("PF-1") + ".",
+        JiraUtils.linkJiraIssues("Worked on PF-222 and PF-1."));
+  }
+
+  private void check(final String[] expected, final String[] array)
+  {
+    assertEquals(expected.length, array.length);
+    for (int i = 0; i < expected.length; i++) {
+      assertEquals(expected[i], array[i]);
+    }
+  }
+}

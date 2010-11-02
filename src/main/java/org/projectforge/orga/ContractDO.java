@@ -1,0 +1,352 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.orga;
+
+import java.sql.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.hibernate.search.annotations.DateBridge;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Resolution;
+import org.hibernate.search.annotations.Store;
+import org.projectforge.core.DefaultBaseDO;
+
+/**
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ */
+@Entity
+@Indexed
+@Table(name = "T_CONTRACT")
+public class ContractDO extends DefaultBaseDO
+{
+  private static final long serialVersionUID = -1399338188515793833L;
+
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  private Integer number;
+
+  @Field(index = Index.UN_TOKENIZED)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date date;
+
+  @Field(index = Index.UN_TOKENIZED)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date validFrom;
+
+  @Field(index = Index.UN_TOKENIZED)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date validUntil;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String title;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String coContractorA;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String contractPersonA;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String signerA;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String coContractorB;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String contractPersonB;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String signerB;
+
+  @Field(index = Index.UN_TOKENIZED)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date signingDate;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String type;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String status;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String text;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String reference;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String filing;
+
+  @Field(index = Index.UN_TOKENIZED)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date resubmissionOnDate;
+
+  @Field(index = Index.UN_TOKENIZED)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date dueDate;
+
+  /**
+   * consecutively numbered.
+   */
+  @Column(unique = true, nullable = true)
+  public Integer getNumber()
+  {
+    return number;
+  }
+
+  public ContractDO setNumber(final Integer number)
+  {
+    this.number = number;
+    return this;
+  }
+
+  @Column(name = "c_date")
+  public Date getDate()
+  {
+    return date;
+  }
+
+  public ContractDO setDate(Date date)
+  {
+    this.date = date;
+    return this;
+  }
+
+  /**
+   * @return Start of the validity period.
+   */
+  @Column(name = "valid_from")
+  public Date getValidFrom()
+  {
+    return validFrom;
+  }
+
+  public ContractDO setValidFrom(Date validFrom)
+  {
+    this.validFrom = validFrom;
+    return this;
+  }
+
+  /**
+   * @return End of the validity period.
+   */
+  @Column(name = "valid_until")
+  public Date getValidUntil()
+  {
+    return validUntil;
+  }
+
+  public ContractDO setValidUntil(Date validUntil)
+  {
+    this.validUntil = validUntil;
+    return this;
+  }
+
+  @Column(length = 1000)
+  public String getTitle()
+  {
+    return title;
+  }
+
+  public ContractDO setTitle(String title)
+  {
+    this.title = title;
+    return this;
+  }
+
+  /**
+   * Types (as free texts) are configurable in ProjectForge's config file.
+   */
+  @Column(length = 100)
+  public String getType()
+  {
+    return type;
+  }
+
+  public ContractDO setType(String type)
+  {
+    this.type = type;
+    return this;
+  }
+
+  @Column(length = 100)
+  public String getStatus()
+  {
+    return status;
+  }
+
+  public ContractDO setStatus(String status)
+  {
+    this.status = status;
+    return this;
+  }
+
+  @Column(length = 4000)
+  public String getText()
+  {
+    return text;
+  }
+
+  public ContractDO setText(String text)
+  {
+    this.text = text;
+    return this;
+  }
+
+  @Column(length = 1000)
+  public String getReference()
+  {
+    return reference;
+  }
+
+  public ContractDO setReference(String reference)
+  {
+    this.reference = reference;
+    return this;
+  }
+
+  @Column(name = "resubmission_on_date")
+  public Date getResubmissionOnDate()
+  {
+    return resubmissionOnDate;
+  }
+
+  public ContractDO setResubmissionOnDate(Date resubmissionOnDate)
+  {
+    this.resubmissionOnDate = resubmissionOnDate;
+    return this;
+  }
+
+  @Column(name = "due_date")
+  public Date getDueDate()
+  {
+    return dueDate;
+  }
+
+  public ContractDO setDueDate(Date dueDate)
+  {
+    this.dueDate = dueDate;
+    return this;
+  }
+
+  @Column(length = 1000)
+  public String getFiling()
+  {
+    return filing;
+  }
+
+  public ContractDO setFiling(String filing)
+  {
+    this.filing = filing;
+    return this;
+  }
+
+  @Column(length = 1000, name = "co_contractor_a")
+  public String getCoContractorA()
+  {
+    return coContractorA;
+  }
+
+  public ContractDO setCoContractorA(String coContractorA)
+  {
+    this.coContractorA = coContractorA;
+    return this;
+  }
+
+  @Column(length = 1000, name = "contract_person_a")
+  public String getContractPersonA()
+  {
+    return contractPersonA;
+  }
+
+  public ContractDO setContractPersonA(String contractPersonA)
+  {
+    this.contractPersonA = contractPersonA;
+    return this;
+  }
+
+  @Column(length = 1000, name = "signer_a")
+  public String getSignerA()
+  {
+    return signerA;
+  }
+
+  public ContractDO setSignerA(String signerA)
+  {
+    this.signerA = signerA;
+    return this;
+  }
+
+  @Column(length = 1000, name = "co_contractor_b")
+  public String getCoContractorB()
+  {
+    return coContractorB;
+  }
+
+  public ContractDO setCoContractorB(String coContractorB)
+  {
+    this.coContractorB = coContractorB;
+    return this;
+  }
+
+  @Column(length = 1000, name = "contract_person_b")
+  public String getContractPersonB()
+  {
+    return contractPersonB;
+  }
+
+  public ContractDO setContractPersonB(String contractPersonB)
+  {
+    this.contractPersonB = contractPersonB;
+    return this;
+  }
+
+  @Column(length = 1000, name = "signer_b")
+  public String getSignerB()
+  {
+    return signerB;
+  }
+
+  public ContractDO setSignerB(String signerB)
+  {
+    this.signerB = signerB;
+    return this;
+  }
+
+  @Column(name = "signing_date")
+  public Date getSigningDate()
+  {
+    return signingDate;
+  }
+
+  public ContractDO setSigningDate(Date signingDate)
+  {
+    this.signingDate = signingDate;
+    return this;
+  }
+}

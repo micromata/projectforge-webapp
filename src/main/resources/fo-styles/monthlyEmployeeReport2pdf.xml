@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- This files contains the definition of the timesheets in a meta language (like html). It will be rendered through jelly and
+  afterwards via timesheet-template-fo.xsl to xsl-fo. -->
+<template-fo systemDate="${systemDate}" title="${title}" createdLabel="${createdLabel}" loggedInUser="${loggedInUser.fullname}"
+  xmlns:j="jelly:core">
+  <h1-color>${title}</h1-color>
+  <table width="100%">
+    <table-column column-width="45mm" />
+    <table-column column-width="45mm" />
+    <table-column column-width="25mm" />
+    <table-column column-width="proportional-column-width(1)" />
+    <table-body>
+      <tr>
+        <th color="#999999">${employeeLabel}</th>
+        <td>${employee}</td>
+        <th color="#999999">${monthLabel}</th>
+        <td>${year}-${month}</td>
+      </tr>
+      <j:if test="${report.formattedUnbookedDays != null}">
+        <tr>
+          <th color="#990000">${unbookedWorkingDaysLabel}</th>
+          <td number-columns-spanned="3" color="#990000">${report.formattedUnbookedDays}</td>
+        </tr>
+      </j:if>
+      <tr>
+        <th color="#999999">${workingDaysLabel}</th>
+        <td>${workingDays}</td>
+        <th color="#999999">${kost1Label}</th>
+        <td>${kost1}</td>
+      </tr>
+    </table-body>
+  </table>
+  <block margin-top="10pt" />
+  <table width="100%">
+    <table-column column-width="22mm" />
+    <table-column column-width="proportional-column-width(1)" />
+    <table-column column-width="40mm" />
+    <table-column column-width="50mm" />
+    <j:forEach var="week" items="${report.weeks}">
+      <table-column column-width="14mm" />
+    </j:forEach>
+    <table-column column-width="16mm" />
+    <table-header>
+      <tr border-bottom-line="true">
+        <th>${kost2Label}</th>
+        <th>${kundeLabel}</th>
+        <th>${projektLabel}</th>
+        <th>${kost2ArtLabel}</th>
+        <j:forEach var="week" items="${report.weeks}">
+          <th text-align="center">${week.formattedFromDayOfMonth}.-${week.formattedToDayOfMonth}.</th>
+        </j:forEach>
+        <th>${sumLabel}</th>
+      </tr>
+    </table-header>
+    <table-body>
+      <!-- Kost2 entries. -->
+      <j:forEach var="entry" items="${report.kost2Rows}">
+        <tr even-odd="true" use-font="tiny">
+          <td>${entry.value.kost2.formattedNumber}</td>
+          <j:choose>
+            <j:when test="${entry.value.kost2.projekt != null}">
+              <td>
+                <j:if test="${entry.value.kost2.projekt.kunde != null}">${entry.value.kundename}</j:if>
+              </td>
+              <td>${entry.value.projektname}</td>
+              <td>${entry.value.kost2ArtName}</td>
+            </j:when>
+            <j:otherwise>
+              <td number-columns-spanned="3">${entry.value.kost2Description}</td>
+            </j:otherwise>
+          </j:choose>
+          <j:forEach var="week" items="${report.weeks}">
+            <td text-align="end">${week.kost2Entries[entry.value.kost2.id].formattedDuration}</td>
+          </j:forEach>
+          <td text-align="end">
+            <span use-font="bold">${report.kost2Durations[entry.value.kost2.id].formattedDuration}</span>
+          </td>
+        </tr>
+      </j:forEach>
+
+      <!-- Task entries (without kost2 information). -->
+      <j:forEach var="entry" items="${report.taskEntries}">
+        <tr>
+          <td number-columns-spanned="4">${entry.key}</td>
+          <j:forEach var="week" items="${report.weeks}">
+            <td text-align="end">${week.taskEntries[entry.value.id].formattedDuration}</td>
+          </j:forEach>
+          <td text-align="end">
+            <span use-font="bold">${report.taskDurations[entry.value.id].formattedDuration}</span>
+          </td>
+        </tr>
+      </j:forEach>
+      <tr>
+        <td number-columns-spanned="4" text-align="end">
+          <span color="#999999" use-font="bold">${totalSumLabel}</span>
+        </td>
+        <j:forEach var="week" items="${report.weeks}">
+          <td text-align="end">${week.formattedTotalDuration}</td>
+        </j:forEach>
+        <td text-align="end">
+          <span color="#FF0000" use-font="bold">${report.formattedTotalDuration}</span>
+        </td>
+      </tr>
+    </table-body>
+  </table>
+
+  <block margin-top="10pt" />
+  <table width="100%">
+    <table-column column-width="proportional-column-width(1)" />
+    <table-column column-width="20mm" />
+    <table-column column-width="proportional-column-width(1)" />
+    <table-header>
+      <tr>
+        <th border-bottom-line="true"></th>
+        <th></th>
+        <th border-bottom-line="true"></th>
+      </tr>
+    </table-header>
+    <table-body>
+      <tr>
+        <td>${signatureEmployeeLabel}</td>
+        <td></td>
+        <td>${signatureProjectLeaderLabel}</td>
+      </tr>
+    </table-body>
+  </table>
+
+</template-fo>

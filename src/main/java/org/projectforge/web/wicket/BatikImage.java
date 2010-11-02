@@ -1,0 +1,83 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.web.wicket;
+
+import org.apache.wicket.Resource;
+import org.apache.wicket.markup.html.image.Image;
+import org.apache.wicket.markup.html.image.resource.DynamicImageResource;
+import org.apache.wicket.protocol.http.WebResponse;
+import org.projectforge.renderer.BatikImageRenderer;
+import org.projectforge.renderer.ImageFormat;
+import org.w3c.dom.Document;
+
+public class BatikImage extends Image
+{
+  private static final long serialVersionUID = -167624996888880342L;
+
+  private int width;
+
+  private byte[] ba;
+  
+  private transient Document document;
+
+  public BatikImage(final String id, final Document document, final int width)
+  {
+    super(id);
+    this.document = document;
+    this.width = width;
+  }
+  
+  private byte[] getByteArray() {
+    if (ba == null) {
+      ba = BatikImageRenderer.getByteArray(document, width, ImageFormat.PNG);
+    }
+    return ba;
+  }
+
+  @SuppressWarnings("serial")
+  @Override
+  protected Resource getImageResource()
+  {
+    return new DynamicImageResource() {
+      @Override
+      protected byte[] getImageData()
+      {
+        return getByteArray();
+      }
+
+      @Override
+      protected void setHeaders(WebResponse response)
+      {
+        if (isCacheable()) {
+          super.setHeaders(response);
+        } else {
+          response.setHeader("Pragma", "no-cache");
+          response.setHeader("Cache-Control", "no-cache");
+          response.setDateHeader("Expires", 0);
+        }
+      }
+    };
+  }
+
+}

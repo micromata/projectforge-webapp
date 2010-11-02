@@ -1,0 +1,50 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.fibu;
+
+import static org.junit.Assert.assertEquals;
+
+import java.math.BigDecimal;
+
+import org.junit.Test;
+import org.projectforge.fibu.RechnungDO;
+import org.projectforge.fibu.RechnungsPositionDO;
+
+
+public class RechnungDOTest
+{
+  @Test
+  public void nettoBetrag()
+  {
+    final RechnungDO rechnung = new RechnungDO();
+    RechnungsPositionDO pos = new RechnungsPositionDO();
+    pos.setEinzelNetto(new BigDecimal(900));
+    rechnung.addPosition(pos);
+    pos = new RechnungsPositionDO();
+    pos.setMenge(new BigDecimal(7)).setEinzelNetto(new BigDecimal(900)).setVat(new BigDecimal("0.19"));
+    rechnung.addPosition(pos);
+    assertEquals(new BigDecimal("7200.00"), rechnung.getNetSum());
+    assertEquals(new BigDecimal("8397.00"), rechnung.getGrossSum());
+  }
+}

@@ -1,0 +1,636 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.projectforge</groupId>
+  <artifactId>ProjectForge</artifactId>
+  <packaging>war</packaging>
+  <version>3.4.1</version>
+  <name>ProjectForge</name>
+  <description>
+    ProjectForge is a multi user web application for collaborative team work. Organize time sheets, tasks, addresses, books etc. with project teams.
+  </description>
+  <url>http://www.projectforge.org</url>
+  <organization>
+    <name>Kai Reinhard</name>
+    <url>http://www.projectforge.org</url>
+  </organization>
+  <issueManagement>
+    <system>JIRA</system>
+    <url>https://www.projectforge.org/jira</url>
+  </issueManagement>
+  <ciManagement>
+    <system>continuum</system>
+    <url>(not yet public)</url>
+  </ciManagement>
+  <distributionManagement>
+    <repository>
+      <id>ProjectForge</id>
+      <name>ProjectForge M2</name>
+      <url>http://www.projectforge.org/nexus</url>
+    </repository>
+  </distributionManagement>
+  <scm>
+    <connection>(not yet available)</connection>
+    <developerConnection>(not yet available)</developerConnection>
+  </scm>
+  <developers>
+    <developer>
+      <id>kai</id>
+      <name>Kai Reinhard</name>
+      <email>k.reinhard@micromata.de</email>
+      <organization>Micromata GmbH</organization>
+      <organizationUrl>http://www.micromata.com</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+        <role>CEO</role>
+      </roles>
+      <timezone>-1</timezone>
+    </developer>
+    <developer>
+      <id>wolle</id>
+      <name>Wolfgang Jung</name>
+      <email>w.jung@micromata.de</email>
+      <organization>Micromata GmbH</organization>
+      <organizationUrl>http://www.micromata.com</organizationUrl>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>-1</timezone>
+    </developer>
+  </developers>
+  <licenses>
+    <license>
+      <name>Dual license</name>
+      <url>/LICENSE.txt</url>
+      <comments>All rights reserved.</comments>
+      <distribution>manual</distribution>
+    </license>
+  </licenses>
+  <repositories>
+    <repository>
+      <id>org.projectforge</id>
+      <name>ProjectForge</name>
+      <url>http://www.projectforge.org/nexus/content/repositories/ProjectForge</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>de.micromata</id>
+      <name>Micromata Labs</name>
+      <url>http://labs.micromata.de/nexus/content/repositories/snapshots</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>java.net</id>
+      <url>http://download.java.net/maven/1</url>
+      <layout>legacy</layout>
+    </repository>
+    <repository>
+      <id>repository.jboss.org</id>
+      <name>JBoss Maven Repository</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public</url>
+      <layout>default</layout>
+    </repository>
+    <repository>
+      <id>repository.codehaus.org</id>
+      <name>Codehaus Maven Repository</name>
+      <url>http://repository.codehaus.org</url>
+      <layout>default</layout>
+    </repository>
+    <repository>
+      <id>wicket-snaps</id>
+      <url>http://wicketstuff.org/maven/repository</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <id>maven2-repository.dev.java.net</id>
+      <name>Java.net Repository for Maven</name>
+      <url>http://download.java.net/maven/2/</url>
+      <layout>default</layout>
+    </repository>
+    <repository>
+      <id>repo1.maven.org</id>
+      <name>Maven repository</name>
+      <url>http://repo1.maven.org/maven2/</url>
+      <layout>default</layout>
+    </repository>
+  </repositories>
+  <dependencies>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+      <version>1.8.3</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>commons-dbcp</groupId>
+      <artifactId>commons-dbcp</artifactId>
+      <version>1.4</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>commons-digester</groupId>
+      <artifactId>commons-digester</artifactId>
+      <version>2.0</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <!--  Needed by ImageCropper. -->
+      <groupId>commons-fileupload</groupId>
+      <artifactId>commons-fileupload</artifactId>
+      <version>1.2.1</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <!--  Needed by PhoneCallAction.java -->
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+      <version>3.1</version> <!-- 4.0.1, but no maven repository found. -->
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>1.4</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <version>2.5</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>commons-collections</groupId>
+      <artifactId>commons-collections</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.4</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>commons-jelly</groupId>
+      <artifactId>commons-jelly</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>displaytag</groupId> <!-- Deprecated (only needed for Stripes list pages). -->
+      <artifactId>displaytag</artifactId>
+      <version>1.1.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.lowagie</groupId>
+          <artifactId>itext</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>dom4j</groupId>
+      <artifactId>dom4j</artifactId>
+      <version>1.6.1</version>
+    </dependency>
+    <dependency>
+      <groupId>hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>1.8.0.7</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28: 3.13.GA -->
+      <groupId>javassist</groupId>
+      <artifactId>javassist</artifactId>
+      <version>3.12.1.GA</version> <!-- Current: 3.13.GA -->
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <version>1.4.3</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.activation</groupId>
+          <artifactId>activation</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jsp-api</artifactId>
+      <version>2.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>jstl</artifactId>
+      <version>1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.5</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.16</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-?? -->
+      <groupId>net.sf.mpxj</groupId>
+      <artifactId>mpxj</artifactId>
+      <version>4.0.0</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-?? -->
+      <groupId>org.apache.lucene</groupId>
+      <artifactId>lucene-core</artifactId>
+      <version>2.9.2</version> <!-- 3.x not yet supported by hibernate-search. -->
+    </dependency>
+    <dependency>
+      <groupId>org.apache.wicket</groupId>
+      <artifactId>wicket</artifactId>
+      <version>${wicket.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.wicket</groupId>
+      <artifactId>wicket-extensions</artifactId>
+      <version>${wicket.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.wicket</groupId>
+      <artifactId>wicket-datetime</artifactId>
+      <version>${wicket.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.wicket</groupId>
+      <artifactId>wicket-spring</artifactId>
+      <version>${wicket.version}</version>
+      <!-- exclude spring framework that wicket pulls in -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-codec</artifactId>
+      <version>1.7</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.xmlgraphics</groupId>
+          <artifactId>xmlgraphics-commons</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>fop</artifactId>
+      <version>1.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.xmlgraphics</groupId>
+          <artifactId>xmlgraphics-commons</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>xmlgraphics-commons</artifactId>
+      <version>1.4</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <version>1.8.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency> <!-- No further versions planned -->
+      <groupId>de.micromata</groupId>
+      <artifactId>baseobjects</artifactId>
+      <version>1.3</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>de.micromata.genome.gwiki</groupId>
+      <artifactId>gwiki</artifactId>
+      <version>0.3.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>de.micromata.genome.gwiki</groupId>
+      <artifactId>gwiki-genome-dependencies</artifactId>
+      <version>0.3.1-SNAPSHOT</version>
+    </dependency>
+    <dependency> <!-- No further versions planned -->
+      <groupId>de.micromata</groupId>
+      <artifactId>hibernate-history</artifactId>
+      <version>3.4.13</version>
+      <exclusions>
+        <exclusion>
+          <groupId>xstream</groupId>
+          <artifactId>xstream</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency> <!-- No further versions planned -->
+      <groupId>de.micromata</groupId>
+      <artifactId>web-utils</artifactId>
+      <version>1.2.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>groovy</groupId>
+          <artifactId>groovy-all</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>struts</groupId>
+          <artifactId>struts</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>axis</groupId>
+          <artifactId>axis</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>hessian</groupId>
+          <artifactId>hessian</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>cglib</groupId>
+          <artifactId>cglib</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!--
+      dependency> <groupId>de.micromata.genome</groupId> <artifactId>genome-core</artifactId> <version>1.0.1</version> <exclusions> <exclusion>
+      <artifactId>jasperreports</artifactId> <groupId>jasperreports</groupId> </exclusion> </exclusions> </dependency
+    -->
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>net.sourceforge.stripes</groupId>
+      <artifactId>stripes</artifactId>
+      <version>1.5.3</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>jasperreports</groupId>
+      <artifactId>jasperreports</artifactId>
+      <version>3.1.3</version> <!-- 3.7.4!!! -->
+      <exclusions>
+        <exclusion>
+          <groupId>eclipse</groupId>
+          <artifactId>jdtcore</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>javax.xml</groupId>
+      <artifactId>jsr173</artifactId>
+      <version>1.0</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.7</version> <!-- 4.8.2, but no maven repository found. -->
+      <scope>test</scope>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-core</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>opensymphony</groupId>
+      <artifactId>sitemesh</artifactId>
+      <version>2.4.1</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>org.apache.poi</groupId>
+      <artifactId>poi</artifactId>
+      <version>3.6</version>
+      <type>jar</type>
+    </dependency>
+    <!--
+      dependency> <groupId>org.apache.poi</groupId> <artifactId>poi-ooxml</artifactId> <version>3.5-beta4</version> </dependency
+    -->
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy-all</artifactId>
+      <version>1.7.4</version>
+      <scope>compile</scope>
+    </dependency>
+    <!--
+      dependency> <groupId>org.codehaus.groovy.maven.runtime</groupId> <artifactId>gmaven-runtime-1.0</artifactId> <version>1.0-rc-4</version>
+      </dependency
+    -->
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <!-- see: http://repository.jboss.org/nexus/content/groups/public/org/hibernate/hibernate-core/ -->
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-core</artifactId>
+      <version>3.5.5-Final</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <!-- see: http://repository.jboss.org/nexus/content/groups/public/org/hibernate/hibernate-annotations/ -->
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-annotations</artifactId>
+      <version>3.5.5-Final</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <!-- see: http://repository.jboss.org/nexus/content/groups/public/org/hibernate/hibernate-search/ -->
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-search</artifactId>
+      <version>3.2.1.Final</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>org.quartz-scheduler</groupId>
+      <artifactId>quartz</artifactId>
+      <version>1.8.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-orm</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <!-- http://repo1.maven.org/maven2/taglibs/standard/ -->
+      <groupId>taglibs</groupId>
+      <artifactId>standard</artifactId>
+      <version>1.1.2</version> <!-- No maven repository for 1.2 found. -->
+    </dependency>
+    <dependency> <!-- Version check: 2010-08-28 -->
+      <groupId>com.thoughtworks.xstream</groupId>
+      <artifactId>xstream</artifactId>
+      <version>1.3.1</version>
+    </dependency>
+    <dependency>
+      <!-- Needed by xstream. -->
+      <groupId>xpp3</groupId>
+      <artifactId>xpp3</artifactId>
+      <version>1.1.2a</version>
+    </dependency>
+
+
+    <!-- JasperReport 1.3.1: -->
+    <dependency>
+      <groupId>com.lowagie</groupId>
+      <artifactId>itext</artifactId>
+      <version>2.1.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>jfree</groupId>
+      <artifactId>jcommon</artifactId>
+      <version>1.0.15</version>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>gnujaxp</groupId>
+          <artifactId>gnujaxp</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>jfree</groupId>
+      <artifactId>jfreechart</artifactId>
+      <version>1.0.13</version>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>gnujaxp</groupId>
+          <artifactId>gnujaxp</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>xerces</groupId>
+      <artifactId>xercesImpl</artifactId>
+      <version>2.8.1</version>
+    </dependency>
+  </dependencies>
+  <properties>
+    <wtpversion>1.5</wtpversion>
+    <downloadSources>true</downloadSources>
+    <spring.version>3.0.4.RELEASE</spring.version>
+    <wicket.version>1.4.10</wicket.version> <!-- Version check: 2010-08-28 -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <build>
+    <finalName>ProjectForge</finalName>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>keystore</include>
+          <include>**/*.properties</include>
+          <include>**/*.html</include>
+          <include>**/*.js</include>
+          <include>**/*.txt</include>
+          <include>**/*.xml</include>
+          <include>**/*.gz</include>
+          <include>**/*.xsl</include>
+          <include>**/*.gif</include>
+          <include>**/*.png</include>
+        </includes>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+          <encoding>utf-8</encoding>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.6</version>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.4.2</version>
+        <configuration>
+          <includes>
+            <include>**/*Test.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+      <!--
+        plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-surefire-plugin</artifactId> </plugin> <plugin>
+        <groupId>org.codehaus.groovy.maven</groupId> <artifactId>gmaven-plugin</artifactId> <executions> <execution> <goals>
+        <goal>generateStubs</goal> <goal>compile</goal> <goal>generateTestStubs</goal> <goal>testCompile</goal> </goals> </execution> </executions>
+        </plugin
+      -->
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <phase>compile</phase>
+            <configuration>
+              <tasks>
+                <taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc">
+                  <classpath refid="maven.compile.classpath" />
+                </taskdef>
+                <mkdir dir="${project.build.outputDirectory}" />
+                <groovyc destdir="${project.build.outputDirectory}" srcdir="${basedir}/src/main/groovy/" listfiles="true">
+                  <classpath refid="maven.compile.classpath" />
+                </groovyc>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+          <!--
+            execution> <id>test-compile</id> <phase>test-compile</phase> <configuration> <tasks> <taskdef name="groovyc"
+            classname="org.codehaus.groovy.ant.Groovyc"> <classpath refid="maven.compile.classpath" /> </taskdef> <mkdir
+            dir="${project.build.testOutputDirectory}" /> <groovyc destdir="${project.build.testOutputDirectory}" srcdir="${basedir}/src/test/groovy/"
+            listfiles="true"> <classpath refid="maven.test.classpath" /> </groovyc> </tasks> </configuration> <goals> <goal>run</goal> </goals>
+            </execution
+          -->
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <encoding>utf-8</encoding>
+          <charset>utf-8</charset>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+</project>

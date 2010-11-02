@@ -1,0 +1,50 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<wicket:extend>
+  <script>
+    function updateEvenOdd() {
+      $("tr:odd:not(.headers)").removeClass('even').addClass('odd');
+      $("tr:even:not(.headers)").removeClass('odd').addClass('even');
+    }
+  </script>
+
+  <div wicket:id="feedback">[Validation errors]</div>
+
+  <form wicket:id="form">
+  <fieldset><legend><wicket:message key="label.filterSettings" /></legend>
+  <table class="form">
+    <tr>
+      <th><wicket:message key="searchFilter" /></th>
+      <td><input wicket:id="searchString" class="stdtext" />&nbsp;<a wicket:id="handbuchVolltextsucheLink" href="#" target="_blank"><img
+        wicket:id="fulltextSearchTooltipImage" src="images/help.png" border="0" /></a></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="label.options" /></th>
+      <td><input type="checkbox" wicket:id="notOpenedCheckBox" /> <wicket:message key="task.status.notOpened" /> <input type="checkbox"
+        wicket:id="openedCheckBox" /> <wicket:message key="task.status.opened" /> <input type="checkbox" wicket:id="closedCheckBox" /> <wicket:message
+        key="task.status.closed" /> <input type="checkbox" wicket:id="deletedCheckBox" /> <wicket:message key="deleted" /> | <input type="checkbox"
+        wicket:id="ajaxSupportCheckBox" /> <wicket:message key="ajaxSupport" /><img wicket:id="ajaxSupportTooltipImage" src="images/help.png"
+        border="0" /></td>
+    </tr>
+    <tr>
+      <th></th>
+      <td class="buttonpanel" colspan="4"><span wicket:id="cancel">[cancel]</span> <span wicket:id="reset">[reset]</span> <span
+        wicket:id="listView">[list view]</span> <span wicket:id="search">[search]</span></td>
+    </tr>
+  </table>
+  </fieldset>
+  </form>
+
+  <table class="dataview" cellspacing="0" wicket:id="taskTree">
+    <tr>
+      <td>[taskTree]</td>
+    </tr>
+  </table>
+</wicket:extend>
+
+</body>
+</html>

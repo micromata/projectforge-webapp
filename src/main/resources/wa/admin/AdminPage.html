@@ -1,0 +1,66 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<wicket:extend>
+  <form wicket:id="form" name="form">
+  <fieldset><legend style="display: inline;"><wicket:message key="system.admin.group.title.systemChecksAndFunctionality" /></legend>
+  <table class="form">
+    <tr>
+      <td><span wicket:id="checkSystemIntegrity">[button]</span> <span wicket:id="checkI18nProperties">[button]</span> <span
+        wicket:id="refreshCaches">[button]</span> <span wicket:id="checkUnseenMebMails">[button]</span> <span wicket:id="importAllMebMails">[button]</span>
+      <br />
+      <span wicket:id="rereadConfiguration">[button]</span> <span wicket:id="exportConfiguration">[button]</span></td>
+    </tr>
+  </table>
+  </fieldset>
+  <fieldset><legend style="display: inline;"><wicket:message key="system.admin.group.title.databaseActions" /></legend>
+  <table class="form">
+    <tr>
+      <td><span wicket:id="updateUserPrefs">[button]</span> <span wicket:id="createMissingDatabaseIndices">[button]</span> <span wicket:id="dump">[button]</span>
+      <span wicket:id="schemaExport">[button]</span> <span wicket:id="fixDBHistoryEntries">[button]</span></td>
+    </tr>
+  </table>
+  </fieldset>
+  <fieldset><legend style="display: inline;"><wicket:message key="system.admin.group.title.databaseSearchIndices" /></legend>
+  <table class="form">
+    <tr>
+      <td><input type="text" class="stdtext" wicket:id="reindexNewestNEntries" style="width: 5em;" /> <wicket:message
+        key="system.admin.reindexNewestNEntries.newestEntriesAndOrFrom" /> <span wicket:id="reindexFromDate">[date]</span> <span wicket:id="reindex">[button]</span>
+      <wicket:message key="system.admin.reindexNewestNEntries.note" /></td>
+    </tr>
+  </table>
+  </fieldset>
+  <fieldset><legend style="display: inline;"><wicket:message key="system.admin.group.title.logEntries" /></legend>
+  <table class="form">
+    <tr>
+      <td><input type="text" class="stdtext" wicket:id="logEntries" style="width: 100%" /><span wicket:id="formattedLogEntries">[formatted
+      log entries]</span></td>
+    </tr>
+    <tr>
+      <td><span wicket:id="formatLogEntries">[button]</span></td>
+    </tr>
+  </table>
+  </fieldset>
+  <fieldset><legend style="display: inline;"><wicket:message key="system.admin.group.title.alertMessage" /></legend>
+  <table class="form">
+    <tr>
+      <td><input type="text" class="stdtext" wicket:id="alertMessage" style="width: 100%" /></td>
+    </tr>
+    <tr>
+      <td><wicket:message key="system.admin.alertMessage.copyAndPaste.title" /><br />
+      <b wicket:id="copyAndPasteText1">[copy text 1]</b><br />
+      <b><wicket:message key="system.admin.alertMessage.copyAndPaste.text2" /></b><br />
+      <b wicket:id="copyAndPasteText3">[copy text 3]</b></td>
+    </tr>
+    <tr>
+      <td><span wicket:id="setAlertMessage">[button]</span></td>
+    </tr>
+  </table>
+  </fieldset>
+  </form>
+</wicket:extend>
+</body>
+</html>

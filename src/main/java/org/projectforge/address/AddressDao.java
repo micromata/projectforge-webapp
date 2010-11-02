@@ -1,0 +1,551 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.address;
+
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import org.projectforge.access.AccessType;
+import org.projectforge.access.OperationType;
+import org.projectforge.common.DateHolder;
+import org.projectforge.common.NumberHelper;
+import org.projectforge.core.BaseDao;
+import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigurationParam;
+import org.projectforge.core.QueryFilter;
+import org.projectforge.task.TaskDO;
+import org.projectforge.task.TaskDao;
+
+/**
+ * 
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
+ */
+public class AddressDao extends BaseDao<AddressDO>
+{
+  private static final DateFormat V_CARD_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressDao.class);
+
+  private Configuration configuration;
+
+  private TaskDao taskDao;
+
+  public void setConfiguration(final Configuration configuration)
+  {
+    this.configuration = configuration;
+  }
+
+  public void setTaskDao(TaskDao taskDao)
+  {
+    this.taskDao = taskDao;
+  }
+
+  private PersonalAddressDao personalAddressDao;
+
+  public void setPersonalAddressDao(PersonalAddressDao personalAddressDao)
+  {
+    this.personalAddressDao = personalAddressDao;
+  }
+
+  public AddressDao()
+  {
+    super(AddressDO.class);
+  }
+
+  /**
+   * Addresses will be assigned to a default task.
+   */
+  public Integer getDefaultTaskId()
+  {
+    return configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES);
+  }
+
+  /**
+   * Get the newest address entries (by time of creation).
+   * @return
+   * @see #getNewestMax()
+   */
+  public List<AddressDO> getNewest(BaseSearchFilter filter)
+  {
+    QueryFilter queryFilter = new QueryFilter();
+    queryFilter.addOrder(Order.desc("created"));
+    if (filter.getMaxRows() > 0) {
+      queryFilter.setMaxResults(filter.getMaxRows());
+    }
+    return getList(queryFilter);
+  }
+
+  @Override
+  public List<AddressDO> getList(BaseSearchFilter filter)
+  {
+    AddressFilter myFilter = (AddressFilter) filter;
+    QueryFilter queryFilter = new QueryFilter(filter);
+    if (StringUtils.isBlank(filter.getSearchString()) == true) {
+      if (filter.isDeleted() == false) {
+        if (myFilter.isNewest() == true) {
+          return getNewest(filter);
+        }
+        if (myFilter.isMyFavorites() == true) {
+          // Show only favorites.
+          return personalAddressDao.getMyAddresses();
+        }
+        // First proceed contact status:
+        // Use filter only for non deleted books:
+        if (myFilter.isActive() == true
+            || myFilter.isNonActive() == true
+            || myFilter.isUninteresting() == true
+            || myFilter.isDeparted() == true
+            || myFilter.isPersonaIngrata() == true) {
+          Collection<ContactStatus> col = new ArrayList<ContactStatus>();
+          if (myFilter.isActive() == true) {
+            col.add(ContactStatus.ACTIVE);
+          }
+          if (myFilter.isNonActive() == true) {
+            col.add(ContactStatus.NON_ACTIVE);
+          }
+          if (myFilter.isUninteresting() == true) {
+            col.add(ContactStatus.UNINTERESTING);
+          }
+          if (myFilter.isDeparted() == true) {
+            col.add(ContactStatus.DEPARTED);
+          }
+          if (myFilter.isPersonaIngrata() == true) {
+            col.add(ContactStatus.PERSONA_INGRATA);
+          }
+          queryFilter.add(Restrictions.in("contactStatus", col));
+        }
+
+        // Proceed address status:
+        // Use filter only for non deleted books:
+        if (myFilter.isUptodate() == true || myFilter.isOutdated() == true || myFilter.isLeaved() == true) {
+          Collection<AddressStatus> col = new ArrayList<AddressStatus>();
+          if (myFilter.isUptodate() == true) {
+            col.add(AddressStatus.UPTODATE);
+          }
+          if (myFilter.isOutdated() == true) {
+            col.add(AddressStatus.OUTDATED);
+          }
+          if (myFilter.isLeaved() == true) {
+            col.add(AddressStatus.LEAVED);
+          }
+          queryFilter.add(Restrictions.in("addressStatus", col));
+        }
+      }
+    } else {
+      if (StringUtils.isNumeric(filter.getSearchString()) == true) {
+        filter.setSearchString("*" + filter.getSearchString() + "*");
+      }
+    }
+    queryFilter.addOrder(Order.asc("name"));
+    return getList(queryFilter);
+  }
+
+  @Override
+  protected void onSaveOrModify(AddressDO obj)
+  {
+    if (obj.getTaskId() == null) {
+      setTask(obj, getDefaultTaskId());
+    }
+  }
+
+  /**
+   * @param address
+   * @param taskId If null, then task will be set to null;
+   * @see BaseDao#getOrLoad(Integer)
+   */
+  public void setTask(final AddressDO address, Integer taskId)
+  {
+    TaskDO task = taskDao.getOrLoad(taskId);
+    address.setTask(task);
+  }
+
+  /**
+   * return Always true, no generic select access needed for address objects.
+   * @see org.projectforge.core.BaseDao#hasSelectAccess()
+   */
+  @Override
+  public boolean hasSelectAccess(boolean throwException)
+  {
+    return true;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
+   */
+  @Override
+  public boolean hasAccess(AddressDO obj, AddressDO oldObj, OperationType operationType, boolean throwException)
+  {
+    return accessChecker.hasPermission(obj.getTaskId(), AccessType.TASKS, operationType, throwException);
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#hasUpdateAccess(Object, Object)
+   */
+  @Override
+  public boolean hasUpdateAccess(AddressDO obj, AddressDO dbObj, boolean throwException)
+  {
+    Validate.notNull(dbObj);
+    Validate.notNull(obj);
+    Validate.notNull(dbObj.getTaskId());
+    Validate.notNull(obj.getTaskId());
+    if (accessChecker.hasPermission(obj.getTaskId(), AccessType.TASKS, OperationType.UPDATE, throwException) == false) {
+      return false;
+    }
+    if (dbObj.getTaskId().equals(obj.getTaskId()) == false) {
+      // User moves the object to another task:
+      if (accessChecker.hasPermission(obj.getTaskId(), AccessType.TASKS, OperationType.INSERT, throwException) == false) {
+        // Inserting of object under new task not allowed.
+        return false;
+      }
+      if (accessChecker.hasPermission(dbObj.getTaskId(), AccessType.TASKS, OperationType.DELETE, throwException) == false) {
+        // Deleting of object under old task not allowed.
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Get the birthdays of address entries.
+   * @param fromDate Search for birthdays from given date (ignoring the year).
+   * @param toDate Search for birthdays until given date (ignoring the year).
+   * @param max Maximum number of result entries.
+   * @param all If false, only the birthdays of favorites will be returned.
+   * @return The entries are ordered by date of year and name.
+   */
+  public Set<BirthdayAddress> getBirthdays(Date fromDate, Date toDate, int max, boolean all)
+  {
+    QueryFilter filter = new QueryFilter();
+    filter.add(Restrictions.isNotNull("birthday"));
+    List<AddressDO> list = getList(filter);
+    // Uses not Collections.sort because every comparison needs Calendar.getDayOfYear().
+    Set<BirthdayAddress> set = new TreeSet<BirthdayAddress>();
+    Set<Integer> favorites = getFavorites();
+    DateHolder from = new DateHolder(fromDate);
+    DateHolder to = new DateHolder(toDate);
+    DateHolder dh;
+    int fromMonth = from.getMonth();
+    int fromDayOfMonth = from.getDayOfMonth();
+    int toMonth = to.getMonth();
+    int toDayOfMonth = to.getDayOfMonth();
+    for (AddressDO address : list) {
+      if (all == false && favorites.contains(address.getId()) == false) {
+        // Address is not a favorite address, so ignore it.
+        continue;
+      }
+      dh = new DateHolder(address.getBirthday());
+      int month = dh.getMonth();
+      int dayOfMonth = dh.getDayOfMonth();
+      if ((month == fromMonth && dayOfMonth >= fromDayOfMonth)
+          || (month == toMonth && dayOfMonth <= toDayOfMonth)
+          || (fromMonth < toMonth && month > fromMonth && month < toMonth)
+          || // e. g. from June to August
+          (fromMonth > toMonth && (month > fromMonth || month < toMonth))) { // e. g. from December to January
+        BirthdayAddress ba = new BirthdayAddress(address);
+        if (favorites.contains(address.getId()) == true) {
+          ba.setFavorite(true);
+        }
+        set.add(ba);
+      }
+    }
+    return set;
+  }
+
+  public List<PersonalAddressDO> getFavoriteVCards()
+  {
+    final List<PersonalAddressDO> list = personalAddressDao.getList();
+    final List<PersonalAddressDO> result = new ArrayList<PersonalAddressDO>();
+    if (CollectionUtils.isNotEmpty(list) == true) {
+      for (PersonalAddressDO entry : list) {
+        if (entry.isFavoriteCard() == true) {
+          result.add(entry);
+        }
+      }
+    }
+    return result;
+  }
+
+  public Set<Integer> getFavorites()
+  {
+    final List<PersonalAddressDO> list = personalAddressDao.getList();
+    final Set<Integer> result = new HashSet<Integer>();
+    if (CollectionUtils.isNotEmpty(list) == true) {
+      for (PersonalAddressDO entry : list) {
+        if (entry.isFavoriteCard() == true) {
+          result.add(entry.getAddressId());
+        }
+      }
+    }
+    return result;
+  }
+
+  public void exportFavoriteVCards(Writer out, List<PersonalAddressDO> favorites)
+  {
+    log.info("Exporting personal AddressBook.");
+    PrintWriter pw = new PrintWriter(out);
+    for (PersonalAddressDO entry : favorites) {
+      if (entry.isFavoriteCard() == false) {
+        // Entry is not marks as vCard-Entry.
+        continue;
+      }
+      AddressDO a = entry.getAddress();
+      pw.println("BEGIN:VCARD");
+      pw.println("VERSION:3.0");
+      pw.print("N:");
+      out(pw, a.getName());
+      pw.print(';');
+      out(pw, a.getFirstName());
+      pw.print(";;");
+      out(pw, a.getTitle());
+      pw.println(";");
+      print(pw, "FN:", getFullName(a));
+      if (isGiven(a.getOrganization()) == true || isGiven(a.getDivision()) == true) {
+        pw.print("ORG:");
+        out(pw, a.getOrganization());
+        pw.print(';');
+        if (isGiven(a.getDivision()) == true) {
+          out(pw, a.getDivision());
+        }
+        pw.println();
+      }
+      print(pw, "TITLE:", a.getPositionText());
+      print(pw, "EMAIL;type=INTERNET;type=WORK;type=pref:", a.getEmail());
+      print(pw, "EMAIL;type=INTERNET;type=HOME;type=pref:", a.getPrivateEmail());
+      print(pw, "TEL;type=WORK;type=pref:", a.getBusinessPhone());
+      print(pw, "TEL;TYPE=CELL:", a.getMobilePhone());
+      print(pw, "TEL;type=WORK;type=FAX:", a.getFax());
+      print(pw, "TEL;TYPE=HOME:", a.getPrivatePhone());
+      print(pw, "TEL;TYPE=HOME;type=CELL:", a.getPrivateMobilePhone());
+
+      if (isGiven(a.getAddressText()) == true || isGiven(a.getCity()) == true || isGiven(a.getZipCode()) == true) {
+        pw.print("ADR;TYPE=WORK:;;");
+        out(pw, a.getAddressText());
+        pw.print(';');
+        out(pw, a.getCity());
+        pw.print(";;");
+        out(pw, a.getZipCode());
+        pw.print(';');
+        out(pw, a.getCountry());
+        pw.println();
+      }
+      if (isGiven(a.getPrivateAddressText()) == true || isGiven(a.getPrivateCity()) == true || isGiven(a.getPrivateZipCode()) == true) {
+        pw.print("ADR;TYPE=HOME:;;");
+        out(pw, a.getPrivateAddressText());
+        pw.print(';');
+        out(pw, a.getPrivateCity());
+        pw.print(";;");
+        out(pw, a.getPrivateZipCode());
+        pw.print(";");
+        pw.println();
+      }
+      print(pw, "URL;type=pref:", a.getWebsite());
+      if (a.getBirthday() != null) {
+        print(pw, "BDAY;value=date:", V_CARD_DATE_FORMAT.format(a.getBirthday()));
+      }
+      if (isGiven(a.getComment()) == true) {
+        print(pw, "NOTE:", a.getComment() + "\\nCLASS: WORK");
+      } else {
+        print(pw, "NOTE:", "CLASS: WORK");
+      }
+      // pw.println("TZ:+00:00");
+      pw.println("CATEGORIES:ProjectForge");
+      pw.print("UID:U");
+      pw.println(a.getId());
+      pw.println("END:VCARD");
+      pw.println();
+      // Unused: a.getState();
+    }
+    pw.flush();
+  }
+
+  /**
+   * Used by vCard export for field 'FN' (full name). Concatenates first name, last name and title.
+   * @return
+   */
+  public String getFullName(AddressDO a)
+  {
+    StringBuffer buf = new StringBuffer();
+    boolean space = false;
+    if (isGiven(a.getName()) == true) {
+      buf.append(a.getName());
+      space = true;
+    }
+    if (isGiven(a.getFirstName()) == true) {
+      if (space == true) {
+        buf.append(' ');
+      } else {
+        space = true;
+      }
+      buf.append(a.getFirstName());
+    }
+    if (isGiven(a.getTitle()) == true) {
+      if (space == true) {
+        buf.append(' ');
+      } else {
+        space = true;
+      }
+      buf.append(a.getTitle());
+    }
+    return buf.toString();
+  }
+
+  public List<PersonalAddressDO> getFavoritePhoneEntries()
+  {
+    final List<PersonalAddressDO> list = personalAddressDao.getList();
+    final List<PersonalAddressDO> result = new ArrayList<PersonalAddressDO>();
+    if (CollectionUtils.isNotEmpty(list) == true) {
+      for (PersonalAddressDO entry : list) {
+        if (entry.isFavoriteBusinessPhone() == true
+            || entry.isFavoriteFax() == true
+            || entry.isFavoriteMobilePhone() == true
+            || entry.isFavoritePrivatePhone() == true) {
+          result.add(entry);
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Throws UserException, if for example the phone list is empty.
+   */
+  public void exportFavoritePhoneList(Writer out, List<PersonalAddressDO> favorites)
+  {
+    log.info("Exporting phone list");
+    PrintWriter pw = new PrintWriter(out);
+    pw.println("\"Name\",\"Phone number\"");
+    for (PersonalAddressDO entry : favorites) {
+      AddressDO address = entry.getAddress();
+      String number = address.getBusinessPhone();
+      if (entry.isFavoriteBusinessPhone() == true && StringUtils.isNotBlank(number)) {
+        appendPhoneEntry(pw, address, "", number);
+      }
+      number = address.getFax();
+      if (entry.isFavoriteFax() == true && StringUtils.isNotBlank(number)) {
+        appendPhoneEntry(pw, address, "fax", number);
+      }
+      number = address.getMobilePhone();
+      if (entry.isFavoriteMobilePhone() == true && StringUtils.isNotBlank(number)) {
+        appendPhoneEntry(pw, address, "mobil", number);
+      }
+      number = address.getPrivateMobilePhone();
+      if (entry.isFavoritePrivateMobilePhone() == true && StringUtils.isNotBlank(number)) {
+        String str = StringUtils.isNotBlank(address.getMobilePhone()) == true ? "mobil privat" : "mobil";
+        appendPhoneEntry(pw, address, str, number);
+      }
+      number = address.getPrivatePhone();
+      if (entry.isFavoritePrivatePhone() == true && StringUtils.isNotBlank(number)) {
+        appendPhoneEntry(pw, address, "privat", number);
+      }
+    }
+    pw.flush();
+  }
+
+  private void print(PrintWriter pw, String key, String value)
+  {
+    if (isGiven(value) == false) {
+      return;
+    }
+    pw.print(key);
+    out(pw, value);
+    pw.println();
+  }
+
+  /**
+   * Simply calls StringUtils.defaultString(String) and replaces: "\r" -> "", "\n" -> "\\n", "," -> "\\,", ":" -> "\\:" and print the
+   * resulted string into given PrintWriter (without newline).
+   * @param str
+   * @see StringUtils#defaultString(String)
+   */
+  private void out(PrintWriter pw, String str)
+  {
+    String s = StringUtils.defaultString(str);
+    s = s.replaceAll("\r", "");
+    s = s.replaceAll("\n", "\\\\\n");
+    s = s.replaceAll(",", "\\,");
+    s = s.replaceAll(":", "\\:");
+    pw.print(s);
+  }
+
+  /**
+   * Simply call StringUtils.isNotBlank(String)
+   * @param str
+   * @return
+   * @see StringUtils#isNotBlank(String)
+   */
+  private boolean isGiven(String str)
+  {
+    return StringUtils.isNotBlank(str);
+  }
+
+  private void appendPhoneEntry(PrintWriter pw, AddressDO address, String suffix, String number)
+  {
+    if (isGiven(number) == false) {
+      // Do nothing, number is empty.
+      return;
+    }
+    final String no = NumberHelper
+        .extractPhonenumber(number, configuration.getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
+    final String name = address.getName();
+    pw.print("\"");
+    if (StringUtils.isNotEmpty(name)) {
+      pw.print(name);
+    }
+    final String firstName = address.getFirstName();
+    if (StringUtils.isNotBlank(firstName)) {
+      if (StringUtils.isNotBlank(name)) {
+        pw.print(", ");
+      }
+      pw.print(firstName);
+    }
+    if (StringUtils.isNotEmpty(suffix)) {
+      pw.print(' ');
+      pw.print(suffix);
+    }
+    pw.print("\",\"");
+    pw.println(no + "\"");
+  }
+
+  @Override
+  public AddressDO newInstance()
+  {
+    return new AddressDO();
+  }
+}

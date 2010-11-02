@@ -1,0 +1,98 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<wicket:extend>
+  <script type="text/javascript">
+   <!--
+    function selectAll() {
+      $(".dataview input[type='checkbox']").attr('checked', true); 
+    }
+    function deselectAll() {
+      $(".dataview input[type='checkbox']").attr('checked', false); 
+    }
+    function toggleExtendedFilter() {
+        checked = $("#useModificationFilter").attr('checked');
+        if (checked) {
+            hideExtendedFilter();
+        } else {
+            showExtendedFilter();
+        }
+      }
+    function showExtendedFilter() {
+      $("#extendedFilter").show("normal");
+      $("#useModificationFilter").attr('checked', true);
+    }
+    function hideExtendedFilter() {
+      $("#extendedFilter").hide("normal");
+      $("#useModificationFilter").attr('checked', false); 
+    }
+
+    // -->
+    </script>
+
+  <div wicket:id="feedback">[Validation errors]</div>
+
+  <form wicket:id="form">
+  <div wicket:id="topPanel">[Here you can add your own fragments.]</div>
+
+  <fieldset><legend><wicket:message key="label.filterSettings" /></legend>
+  <table class="form">
+    <wicket:container wicket:id="filter">
+      <tr wicket:id="searchFilterRow">
+        <th><wicket:message key="searchFilter" /></th>
+        <td wicket:id="searchCell"><input wicket:id="searchString" class="stdtext" />&nbsp;<a wicket:id="handbuchVolltextsucheLink" href="#"
+          target="_blank"><img wicket:id="fulltextSearchTooltipImage" src="images/help.png" border="0" /></a> <a href="#"
+          onclick="javascript:toggleExtendedFilter();" wicket:id="toggleExtendedFilter"><wicket:message key="filter.extendedSearch" /></a><br />
+        <span style="color: #666666;" wicket:id="modifiedSearchExpression">Modified expression for search: test*</span>
+        <div id="extendedFilter" wicket:id="extendedFilter">
+        <table>
+          <tr>
+            <th><wicket:message key="modifiedBy" /></th>
+            <td><span wicket:id="modifiedByUser">[show and select user]</span>&nbsp;<span style="font-size: x-small; color: white;"
+              wicket:id="modificationDatesAsUTC">[2001-09-30 22:00:00.0 UTC - 2001-10-31 22:59:59.999 UTC]</span></td>
+          </tr>
+          <tr>
+            <th><wicket:message key="timeOfLastUpdate" /></th>
+            <td><input type="checkbox" wicket:id="useModificationFilter" id="useModificationFilter" onchange="javascript:hideExtendedFilter();" /><span
+              wicket:id="startTimeOfLastModification">[21.11.2009 08:00]</span> <wicket:message key="oclock" />&nbsp;<wicket:message key="until" />
+            <span wicket:id="stopTimeOfLastModification">[21.11.2009 16:00]</span> <wicket:message key="oclock" /><select
+              wicket:id="modificationSince" onchange="javascript:submit();">
+              <option>Letzte Minute</option>
+              <option>Heute</option>
+            </select></td>
+          </tr>
+        </table>
+        </div>
+        </td>
+      </tr>
+      <wicket:child />
+    </wicket:container>
+    <tr>
+      <th></th>
+      <td class="buttonpanel" wicket:id="buttonCell" colspan="4"><span wicket:id="actionButtons">[cancel] [search]</span></td>
+    </tr>
+  </table>
+  </fieldset>
+  <table class="dataview" cellspacing="0" wicket:id="table">
+    <tr>
+      <td>[table]</td>
+    </tr>
+  </table>
+
+  <div class="hint" wicket:id="hintQuickSelect">[Quick select hint if in select mode.]</div>
+
+  <div wicket:id="bottomPanel">[Here you can add your own fragments.]</div>
+  </form>
+
+  <wicket:fragment wicket:id="pageSizeFragment">
+    <wicket:message key="label.pageSize" />
+    <select wicket:id="pageSize" onchange="javascript:submit();">
+      <option>50</option>
+    </select>
+  </wicket:fragment>
+</wicket:extend>
+</body>
+</html>

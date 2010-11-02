@@ -1,0 +1,60 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.database;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.projectforge.database.HibernateUtils;
+import org.projectforge.task.TaskDO;
+import org.projectforge.test.TestBase;
+
+public class HibernateUtilsTest extends TestBase
+{
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(HibernateUtilsTest.class);
+
+  @Test
+  public void propertyLengthTest()
+  {
+    Integer length = HibernateUtils.getPropertyLength("org.projectforge.task.TaskDO", "title");
+    assertEquals(new Integer(40), length);
+    length = HibernateUtils.getPropertyLength("org.projectforge.task.TaskDO", "shortDescription");
+    assertEquals(new Integer(255), length);
+    length = HibernateUtils.getPropertyLength(TaskDO.class, "shortDescription");
+    assertEquals(new Integer(255), length);
+    log.info("Following org.hibernate.MappingException is expected:");
+    length = HibernateUtils.getPropertyLength("org.projectforge.task.TaskDO", "unknown");
+    assertNull(length);
+    length = HibernateUtils.getPropertyLength("unknown", "name");
+    assertNull(length);
+  }
+
+  @BeforeClass
+  public static void setUp() throws Exception
+  {
+    init(false);
+  }
+}

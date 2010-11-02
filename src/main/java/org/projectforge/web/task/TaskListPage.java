@@ -1,0 +1,335 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.web.task;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.Component;
+import org.apache.wicket.PageParameters;
+import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.repeater.Item;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.DateHelper;
+import org.projectforge.common.NumberHelper;
+import org.projectforge.common.StringHelper;
+import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.fibu.kost.KostCache;
+import org.projectforge.task.TaskDO;
+import org.projectforge.task.TaskDao;
+import org.projectforge.task.TaskNode;
+import org.projectforge.task.TaskTree;
+import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.HtmlHelper;
+import org.projectforge.web.calendar.DateTimeFormatter;
+import org.projectforge.web.core.PriorityFormatter;
+import org.projectforge.web.user.UserFormatter;
+import org.projectforge.web.user.UserPropertyColumn;
+import org.projectforge.web.wicket.AbstractListPage;
+import org.projectforge.web.wicket.AttributeAppendModifier;
+import org.projectforge.web.wicket.CellItemListener;
+import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
+import org.projectforge.web.wicket.DatePropertyColumn;
+import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.ListPage;
+import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
+import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.ConsumptionBarPanel;
+
+/**
+ * This page is shown when the user searches in the task tree. The task will be displayed as list.
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ */
+@ListPage(editPage = TaskEditPage.class)
+public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO>
+{
+  private static final long serialVersionUID = -337660148607303435L;
+
+  @SpringBean(name = "taskDao")
+  private TaskDao taskDao;
+
+  @SpringBean(name = "userFormatter")
+  private UserFormatter userFormatter;
+
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
+
+  @SpringBean(name = "dateTimeFormatter")
+  private DateTimeFormatter dateTimeFormatter;
+
+  @SpringBean(name = "kostCache")
+  private KostCache kostCache;
+
+  @SpringBean(name = "priorityFormatter")
+  private PriorityFormatter priorityFormatter;
+
+  @SpringBean(name = "taskFormatter")
+  private TaskFormatter taskFormatter;
+
+  @SpringBean(name = "taskTree")
+  private TaskTree taskTree;
+
+  protected TaskTreePage taskTreePage; // Sibling page.
+
+  static String getCssStyle(final TaskDO task, final Integer preselectedTaskNode)
+  {
+    final StringBuffer cssStyle = getCssStyle(task.getId(), preselectedTaskNode, task.isDeleted());
+    if (cssStyle.length() > 0) {
+      return cssStyle.toString();
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * 
+   * @param parentComponent Needed for call parentComponent.getString(String) for i18n.
+   * @param componentId
+   * @param taskTree
+   * @param selectMode
+   * @param node
+   * @return
+   */
+  public static ConsumptionBarPanel getConsumptionBarPanel(final Component parentComponent, final String componentId,
+      final TaskTree taskTree, final boolean selectMode, final TaskNode node)
+  {
+    Integer maxHours = null;
+    Integer taskId = null;
+    boolean finished = false;
+    if (node != null) {
+      maxHours = node.getTask().getMaxHours();
+      taskId = node.getTaskId();
+      finished = node.isFinished();
+    }
+    final BigDecimal maxDays;
+    if (maxHours != null && maxHours.intValue() == 0) {
+      maxDays = null;
+    } else {
+      maxDays = NumberHelper.setDefaultScale(taskTree.getPersonDays(node));
+    }
+    BigDecimal usage = (node != null) ? new BigDecimal(node.getDuration(taskTree, true)).divide(DateHelper.SECONDS_PER_WORKING_DAY, 2,
+        BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO;
+    usage = NumberHelper.setDefaultScale(usage);
+    final ConsumptionBarPanel panel = new ConsumptionBarPanel(componentId, usage, maxDays, taskId, finished, parentComponent
+        .getString("projectmanagement.personDays.short"), selectMode == false);
+    return panel;
+  }
+
+  static String[] getKost2s(final List<Kost2DO> list)
+  {
+    if (list == null || list.size() == 0) {
+      return null;
+    }
+    final String[] kost2s = new String[list.size()];
+    for (int i = 0; i < kost2s.length; i++) {
+      final Kost2DO kost2 = list.get(i);
+      if (kost2.getProjekt() != null) {
+        kost2s[i] = kost2.getShortDisplayName() + " " + kost2.getKost2Art().getName();
+      } else {
+        kost2s[i] = kost2.getShortDisplayName() + " " + kost2.getDescription();
+      }
+    }
+    return kost2s;
+  }
+
+  static Label getKostLabel(final String componentId, final TaskTree taskTree, final TaskDO task)
+  {
+    final List<Kost2DO> list = taskTree.getKost2List(task.getId(), false);
+    final StringBuffer buf = new StringBuffer();
+    String[] kost2s = null;
+    if (list != null) {
+      if (list.size() == 1) {
+        buf.append(list.get(0).getShortDisplayName());
+      } else {
+        kost2s = getKost2s(list);
+        buf.append(HtmlHelper.escapeXml(StringHelper.getWildcardString(kost2s))).append("*");
+      }
+    }
+    final Label label = new Label(componentId, new Model<String>(buf.toString()));
+    if (kost2s != null) {
+      WicketUtils.addTooltip(label, StringHelper.listToString("<br/>", kost2s));
+    }
+    // label.setEscapeModelStrings(false);
+    return label;
+  }
+
+  static Label getPriorityLabel(final String componentId, final PriorityFormatter priorityFormatter, final TaskDO task)
+  {
+    final String formattedPriority = priorityFormatter.getFormattedPriority(task.getPriority());
+    final Label label = new Label(componentId, new Model<String>(formattedPriority));
+    label.setEscapeModelStrings(false);
+    return label;
+  }
+
+  static Label getStatusLabel(final String componentId, final TaskFormatter taskFormatter, final TaskDO task)
+  {
+    final String formattedStatus = taskFormatter.getFormattedTaskStatus(task.getStatus());
+    final Label label = new Label(componentId, new Model<String>(formattedStatus));
+    label.setEscapeModelStrings(false);
+    return label;
+  }
+
+  public TaskListPage(final PageParameters parameters)
+  {
+    super(parameters, "task");
+  }
+
+  public TaskListPage(final TaskTreePage taskTreePage, final PageParameters parameters)
+  {
+    super(parameters, taskTreePage.caller, taskTreePage.selectProperty, "task");
+    this.taskTreePage = taskTreePage;
+  }
+
+  @Override
+  protected boolean onSearchSubmit()
+  {
+    final boolean result = super.onSearchSubmit();
+    if (taskTreePage != null && result == false) {
+      // Sibling task tree page is given and no response page was set in super.onSearchSubmit().
+      if (StringUtils.isBlank(form.getSearchFilter().getSearchString()) == true
+          && form.getSearchFilter().isUseModificationFilter() == false) {
+        // OK, search string is empty and modification filter is unused, so redirect to tree view.
+        setResponsePage(taskTreePage);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @SuppressWarnings("serial")
+  @Override
+  protected void init()
+  {
+    final CellItemListener<TaskDO> cellItemListener = new CellItemListener<TaskDO>() {
+      public void populateItem(Item<ICellPopulator<TaskDO>> item, String componentId, IModel<TaskDO> rowModel)
+      {
+        final TaskDO task = rowModel.getObject();
+        final String cssStyle = TaskListPage.getCssStyle(task, (Integer) highlightedRowId);
+        if (cssStyle != null) {
+          item.add(new AttributeAppendModifier("style", new Model<String>(cssStyle)));
+        }
+      }
+    };
+    final List<IColumn<TaskDO>> columns = new ArrayList<IColumn<TaskDO>>();
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task")), "title", "title", cellItemListener) {
+      @Override
+      public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
+      {
+        final TaskDO task = rowModel.getObject();
+        StringBuffer buf = new StringBuffer();
+        taskFormatter.appendFormattedTask(buf, new WicketLocalizerAndUrlBuilder(getResponse()), task, false, true, false);
+        final Label formattedTaskLabel = new Label(ListSelectActionPanel.LABEL_ID, buf.toString());
+        formattedTaskLabel.setEscapeModelStrings(false);
+        if (isSelectMode() == false) {
+          item
+              .add(new ListSelectActionPanel(componentId, rowModel, TaskEditPage.class, task.getId(), TaskListPage.this, formattedTaskLabel));
+        } else {
+          item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, task.getId(), formattedTaskLabel));
+        }
+        cellItemListener.populateItem(item, componentId, rowModel);
+        addRowClick(item);
+      }
+    });
+    columns
+        .add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task.consumption")), null, "task", cellItemListener) {
+          @Override
+          public void populateItem(Item<ICellPopulator<TaskDO>> item, String componentId, final IModel<TaskDO> rowModel)
+          {
+            final TaskNode node = taskTree.getTaskNodeById(rowModel.getObject().getId());
+            item.add(getConsumptionBarPanel(TaskListPage.this, componentId, taskTree, isSelectMode(), node));
+            cellItemListener.populateItem(item, componentId, rowModel);
+          }
+        });
+    if (kostCache.isKost2EntriesExists() == true) {
+      columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("fibu.kost2"), "kost2", "kost2", cellItemListener) {
+        @Override
+        public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
+        {
+          final Label label = getKostLabel(componentId, taskTree, rowModel.getObject());
+          item.add(label);
+          cellItemListener.populateItem(item, componentId, rowModel);
+        }
+      });
+    }
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("shortDescription")), "shortDescription",
+        "shortDescription", cellItemListener));
+    if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
+      columns.add(new DatePropertyColumn<TaskDO>(dateTimeFormatter, getString("task.protectTimesheetsUntil.short"),
+          "protectTimesheetsUntil", "protectTimesheetsUntil", cellItemListener));
+    }
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task.reference")), "reference", "reference",
+        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("priority")), "priority", "priority",
+        cellItemListener) {
+      @Override
+      public void populateItem(Item<ICellPopulator<TaskDO>> item, String componentId, IModel<TaskDO> rowModel)
+      {
+        final Label label = getPriorityLabel(componentId, priorityFormatter, rowModel.getObject());
+        item.add(label);
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task.status")), "status", "status",
+        cellItemListener) {
+      @Override
+      public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
+      {
+        final Label label = getStatusLabel(componentId, taskFormatter, rowModel.getObject());
+        item.add(label);
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
+    final UserPropertyColumn<TaskDO> userPropertyColumn = new UserPropertyColumn<TaskDO>(getString("task.assignedUser"),
+        "responsibleUserId", "responsibleUserId", cellItemListener).withUserFormatter(userFormatter).setUserGroupCache(userGroupCache);
+    columns.add(userPropertyColumn);
+    dataTable = createDataTable(columns, "title", false);
+    form.add(dataTable);
+  }
+
+  @Override
+  protected TaskListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  {
+    return new TaskListForm(this);
+  }
+
+  @Override
+  protected TaskDao getBaseDao()
+  {
+    return taskDao;
+  }
+
+  @Override
+  protected IModel<TaskDO> getModel(TaskDO object)
+  {
+    return new DetachableDOModel<TaskDO, TaskDao>(object, getBaseDao());
+  }
+}

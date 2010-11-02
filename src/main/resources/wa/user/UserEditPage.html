@@ -1,0 +1,127 @@
+
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<table>
+  <wicket:extend>
+    <tr>
+      <th><wicket:message key="user.username" /></th>
+      <td><input class="stdtext" wicket:id="username" /></td>
+      <th><wicket:message key="user.jiraUsername" /></th>
+      <td><input class="stdtext" wicket:id="jiraUsername" />&nbsp;<img wicket:id="jiraUsernameHelpImage" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="email" /></th>
+      <td><input class="stdtext" wicket:id="email" /></td>
+      <th><wicket:message key="user.locale" /></th>
+      <td><select wicket:id="localeChoice">
+        <option>[Default (Browser)]</option>
+      </select></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="organization" /></th>
+      <td><input class="stdtext" wicket:id="organization" /></td>
+      <th><wicket:message key="timezone" /></th>
+      <td><span wicket:id="timezoneChoice">[choose time zone]</span></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="user.personalPhoneIdentifiers" /></th>
+      <td><input class="stdtext" wicket:id="personalPhoneIdentifiers" />&nbsp;<img wicket:id="personalPhoneIdentifiersHelpImage" /></td>
+      <td colspan="2">&nbsp;</td>
+    </tr>
+    <tr wicket:id="mebMobileNumbersRow">
+      <th><wicket:message key="user.personalMebMobileNumbers" /></th>
+      <td><input type="text" class="stdtext" wicket:id="personalMebMobileNumbers" />&nbsp;<img wicket:id="personalMebMobileNumbersHelpImage" /></td>
+      <td colspan="2"><wicket:message key="user.personalMebMobileNumbers.format" /></td>
+    </tr>
+    <tr class="hRuler">
+      <td colspan="4"></td>
+    </tr>
+
+    <tr>
+      <th><wicket:message key="firstName" /></th>
+      <td><input class="stdtext" wicket:id="firstname" /></td>
+
+      <th><wicket:message key="name" /></th>
+      <td><input class="stdtext" wicket:id="lastname" /></td>
+    </tr>
+
+    <tr>
+      <th><wicket:message key="password" /></th>
+      <td><input type="password" class="stdtext" wicket:id="password" /></td>
+      <th><wicket:message key="passwordRepeat" /></th>
+      <td><input type="password" class="stdtext" wicket:id="passwordRepeat" /></td>
+    </tr>
+    <tr class="hRuler">
+      <td colspan="4"></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="description" /></th>
+      <td colspan="3"><textarea class="stdtext" wicket:id="description" style="height: 10ex;">[Beschreibungstext]</textarea></td>
+    </tr>
+    <tr class="hRuler">
+      <td colspan="4"></td>
+    </tr>
+    <tr wicket:id="rightsRows">
+      <wicket:container wicket:id="rightsCols">
+        <th wicket:id="label">[Parameter]</th>
+        <td><input type="checkbox" wicket:id="checkbox" /><select wicket:id="valueChoice">
+          <option>[entry]</option>
+        </select></td>
+      </wicket:container>
+    </tr>
+    <tr class="hRuler">
+      <td colspan="4"></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="user.assignedGroups" /></th>
+      <td colspan="3">
+
+      <table style="width: 100%; margin: 0; padding: 0; border-collapse: collapse; border: none;">
+        <colgroup>
+          <col width="45%" />
+          <col width="10%" />
+          <col width="45%" />
+        </colgroup>
+        <tr>
+          <td style="padding: 0; border: none;"><wicket:message key="user.assignedGroups" /></td>
+          <td style="padding: 0; border: none;"></td>
+          <td style="padding: 0; border: none;"><wicket:message key="user.unassignedGroups" /></td>
+        </tr>
+        <tr>
+          <td style="padding: 0; border: none; width: 40%;"><select style="width: 100%;" name="valuesToUnassign" wicket:id="valuesToUnassign"
+            class="stdtext" multiple="multiple" size="15">
+            <option value="1234">ACME - Developers</option>
+          </select></td>
+          <td style="text-align: center; width: 20%;">
+          <p><a wicket:id="unassignButton" href="#"><img src="/images/button_assignToRight.png" wicket:id="buttonUnassignImage" /></a></p>
+          <p><a wicket:id="assignButton" href="#"><img src="/images/button_assignToLeft.png" wicket:id="buttonAssignImage" /></a></p>
+          </td>
+          <td style="padding: 0; border: none; width: 40%;"><select style="width: 100%;" name="valuesToAssign" wicket:id="valuesToAssign"
+            class="stdtext" multiple="multiple" size="15">
+            <option value="1234">ACME - Project managers</option>
+          </select></td>
+        </tr>
+      </table>
+
+      </td>
+    </tr>
+    <tr class="hRuler">
+      <td colspan="4"></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="login.lastLogin" /></th>
+      <td wicket:id="lastLogin">[09/16/10]</td>
+      <th><wicket:message key="login.loginFailures" /></th>
+      <td wicket:id="loginFailures">[0]</td>
+    </tr>
+    <tr class="hRuler">
+      <td colspan="4"></td>
+    </tr>
+  </wicket:extend>
+</table>
+</body>
+</html>

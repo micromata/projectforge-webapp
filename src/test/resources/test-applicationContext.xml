@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-lazy-init="true" default-autowire="no">
+  <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <property name="order">
+      <value>2</value>
+    </property>
+    <property name="locations">
+      <list>
+        <value>classpath:hibernate-mappings.properties</value>
+      </list>
+    </property>
+    <property name="ignoreResourceNotFound">
+      <value>true</value>
+    </property>
+  </bean>
+  <bean id="initTestDB" class="org.projectforge.test.InitTestDB" />
+  <!-- Sample database -->
+  <bean id="dataSource" class="org.projectforge.jdbc.PropertyDataSource" destroy-method="close">
+    <property name="driverClassName">
+      <value>org.hsqldb.jdbcDriver</value>
+    </property>
+    <property name="url">
+      <value>jdbc:hsqldb:${user.home}/tmp/ProjectForgeTestDB</value>
+    </property>
+    <property name="username">
+      <value>sa</value>
+    </property>
+    <property name="password">
+      <value></value>
+    </property>
+    <property name="properties">
+      <props>
+        <prop key="hsqldb.default_table_type">cached</prop>
+      </props>
+    </property>
+    <property name="maxActive">
+      <value>5</value>
+    </property>
+    <property name="defaultAutoCommit">
+      <value>true</value>
+    </property>
+  </bean>
+  <!-- hibernate Session to DB -->
+  <bean id="sessionFactory" class="de.micromata.hibernate.spring.AutoSessionFactoryBean">
+    <!--property name="mappingResources">
+      <value>${hibernate.mappings}</value>
+      </property-->
+    <!-- property name="initialXmlData">
+      <value>classpath:database-dump.xml</value>
+      </property-->
+    <!-- property name="dumpOnExit">
+      <value>false</value>
+      </property -->
+    <property name="hibernateProperties">
+      <props>
+        <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+        <prop key="hibernate.query.substitutions"></prop><!-- Need to force empty despite Hibernate reference saying this is the default -->
+        <prop key="hibernate.cache.region_prefix"></prop><!-- Need to force empty. Hibernate reference says this is the default -->
+        <prop key="hibernate.show_sql">false</prop>
+        <prop key="hibernate.format_sql">false</prop>
+        <prop key="hibernate.use_outer_join">true</prop>
+        <prop key="hibernate.max_fetch_depth">3</prop>
+        <prop key="hibernate.default_batch_fetch_size">8</prop>
+        <prop key="hibernate.cglib.use_reflection_optimizer">true</prop>
+        <prop key="hibernate.cache.use_query_cache">true</prop>
+        <prop key="hibernate.cache.use_second_level_cache">true</prop>
+        <prop key="hibernate.cache.provider_class">net.sf.ehcache.hibernate.SingletonEhCacheProvider</prop>
+        <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.SingletonEhCacheRegionFactory</prop>
+        <prop key="hibernate.search.default.directory_provider">org.hibernate.search.store.FSDirectoryProvider</prop>
+        <prop key="hibernate.search.default.indexBase">/tmp/ProjectForgeTests</prop><!-- If you change this, don't forget to change it in TestBase too! -->
+        <prop key="hibernate.jdbc.batch_size">0</prop>
+      </props>
+    </property>
+    <property name="dataSource">
+      <ref bean="dataSource" />
+    </property>
+    <!-- never run a schema update on the database -->
+    <property name="schemaUpdate">
+      <value>true</value>
+    </property>
+    <property name="entityInterceptor">
+      <ref bean="hibernateHistoryInterceptor" />
+    </property>
+  </bean>
+</beans>

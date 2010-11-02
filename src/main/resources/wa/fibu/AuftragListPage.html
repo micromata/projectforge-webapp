@@ -1,0 +1,32 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<table>
+  <wicket:extend>
+    <tr>
+      <th><wicket:message key="label.options" /></th>
+      <td><select wicket:id="year" onchange="javascript:submit();">
+        <option>2008-2009</option>
+      </select> <select wicket:id="listType" onchange="javascript:submit();">
+        <option>all</option>
+      </select> <span wicket:id="pageSize">[Page size setting]</span></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="fibu.auftrag.position.art" /></th>
+      <td><select wicket:id="auftragsPositionsArt" onchange="javascript:submit();">
+        <option>all</option>
+      </select></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="statistics" /></th>
+      <td><span wicket:id="netto">Netto: 1.087,06 € (16)</span><span wicket:id="akquise">; Akquise: 87,06 € (2)</span><span
+        wicket:id="beauftragt">; beauftragt: 87,06 € (2)</span><span wicket:id="fakturiert">; vollständig fakturiert: 87,06 € (2)</span><span
+        wicket:id="zufakturieren">; abgeschlossen, nicht fakturiert: 87,06 € (2)</span></td>
+    </tr>
+  </wicket:extend>
+</table>
+</body>
+</html>

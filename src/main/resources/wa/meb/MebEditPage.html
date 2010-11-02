@@ -1,0 +1,43 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<table>
+  <wicket:extend>
+    <tr>
+      <th><wicket:message key="date" /></th>
+      <td wicket:id="date">[Datum]</td>
+    </tr>
+    <tr>
+      <th><wicket:message key="meb.owner" /></th>
+      <td><span wicket:id="owner">[show and select owner]</span></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="meb.sender" /></th>
+      <td wicket:id="sender">[sender]</td>
+    </tr>
+    <tr>
+      <th><wicket:message key="status" /></th>
+      <td><select wicket:id="status">
+        <option>[Status list]</option>
+      </select></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="meb.message" /></th>
+      <td><textarea class="stdtext" wicket:id="message" id="message" style="height: 20ex;">[Message]</textarea></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="meb.actions" /></th>
+      <td><span wicket:id="createTimesheet">[create time sheet]</span> | JIRA: <span wicket:id="jiraProject">[JIRA project choice]</span> <select
+        wicket:id="issueType">
+        <option>[Issue types]</option>
+      </select> <input type="submit" wicket:id="createJiraIssue" /><!-- a target="_blank" wicket:id="jiraLink"
+        href="https://jira.acme.com/jira/secure/CreateIssueDetails!init.jspa?pid=10310&issuetype=3&priority=4&description=say+hello+world">[Create
+      JIRA issue]</a--></td>
+    </tr>
+  </wicket:extend>
+</table>
+</body>
+</html>

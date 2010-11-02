@@ -1,0 +1,224 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.web.fibu;
+
+import java.util.Date;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.wicket.PageParameters;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.access.OperationType;
+import org.projectforge.calendar.DayHolder;
+import org.projectforge.common.NumberHelper;
+import org.projectforge.common.StringHelper;
+import org.projectforge.fibu.AuftragDO;
+import org.projectforge.fibu.AuftragDao;
+import org.projectforge.fibu.AuftragsPositionDO;
+import org.projectforge.fibu.ProjektDO;
+import org.projectforge.fibu.ProjektDao;
+import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.web.wicket.AbstractBasePage;
+import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.EditPage;
+import org.projectforge.web.wicket.WicketUtils;
+
+
+@EditPage(defaultReturnPage = AuftragListPage.class)
+public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm, AuftragDao> implements ISelectCallerPage
+{
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AuftragEditPage.class);
+
+  private static final long serialVersionUID = -8192471994161712577L;
+
+  @SpringBean(name = "auftragDao")
+  private AuftragDao auftragDao;
+
+  @SpringBean(name = "projektDao")
+  private ProjektDao projektDao;
+
+  public AuftragEditPage(PageParameters parameters)
+  {
+    super(parameters, "fibu.auftrag");
+    init();
+    if (isNew() == true && getData().getContactPerson() == null) {
+      auftragDao.setContactPerson(getData(), getUser().getId());
+    }
+  }
+
+  @Override
+  protected AuftragDao getBaseDao()
+  {
+    return auftragDao;
+  }
+
+  @Override
+  protected AuftragEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, AuftragDO data)
+  {
+    return new AuftragEditForm(this, data);
+  }
+
+  /**
+   * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Integer)
+   */
+  public void select(String property, Object selectedValue)
+  {
+    if ("projektId".equals(property) == true) {
+      auftragDao.setProjekt(getData(), (Integer) selectedValue);
+      if (getData().getProjektId() != null && getData().getProjektId() >= 0 && getData().getKundeId() == null) {
+        if (StringUtils.isBlank(form.kundeSelectPanel.getKundeTextInput()) == true) {
+          // User has selected a project and the kunde is not set:
+          ProjektDO projekt = projektDao.getById(getData().getProjektId());
+          if (projekt != null) {
+            auftragDao.setKunde(getData(), projekt.getKundeId());
+          }
+        }
+      }
+    } else if ("kundeId".equals(property) == true) {
+      auftragDao.setKunde(getData(), (Integer) selectedValue);
+    } else if ("contactPersonId".equals(property) == true) {
+      auftragDao.setContactPerson(getData(), (Integer) selectedValue);
+      setSendEMailNotification();
+    } else if (StringHelper.isIn(property, "angebotsDatum", "bindungsFrist", "beauftragungsDatum") == true) {
+      final Date date = (Date) selectedValue;
+      final java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+      if ("angebotsDatum".equals(property) == true) {
+        getData().setAngebotsDatum(sqlDate);
+        form.angebotsDatumPanel.markModelAsChanged();
+      } else if ("bindungsFrist".equals(property) == true) {
+        getData().setBindungsFrist(sqlDate);
+        form.bindungsFristPanel.markModelAsChanged();
+      } else if ("beauftragungsDatum".equals(property) == true) {
+        getData().setBeauftragungsDatum(sqlDate);
+        form.beauftragungsDatumPanel.markModelAsChanged();
+      }
+    } else if (property.startsWith("taskId:") == true) {
+      final Short number = NumberHelper.parseShort(property.substring(property.indexOf(':') + 1));
+      final AuftragsPositionDO pos = getData().getPosition(number);
+      auftragDao.setTask(pos, (Integer) selectedValue);
+    } else {
+      log.error("Property '" + property + "' not supported for selection.");
+    }
+  }
+
+  private void setSendEMailNotification()
+  {
+    if (accessChecker.userEqualsToContextUser(getData().getContactPerson()) == true)
+      form.setSendEMailNotification(false);
+    else form.setSendEMailNotification(true);
+  }
+
+  /**
+   * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
+   */
+  public void unselect(String property)
+  {
+    if ("projektId".equals(property) == true) {
+      getData().setProjekt(null);
+    } else if ("kundeId".equals(property) == true) {
+      getData().setKunde(null);
+    } else if ("contactPersonId".equals(property) == true) {
+      getData().setContactPerson(null);
+      setSendEMailNotification();
+    } else if (property.startsWith("taskId:") == true) {
+      final Short number = NumberHelper.parseShort(property.substring(property.indexOf(':') + 1));
+      final AuftragsPositionDO pos = getData().getPosition(number);
+      pos.setTask(null);
+    } else {
+      log.error("Property '" + property + "' not supported for selection.");
+    }
+  }
+
+  /**
+   * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
+   */
+  public void cancelSelection(String property)
+  {
+    // Do nothing.
+  }
+
+  @Override
+  protected AbstractBasePage onSaveOrUpdate()
+  {
+    if (getData().getNummer() == null) {
+      getData().setNummer(auftragDao.getNextNumber(getData()));
+    }
+    if (getData().getKunde() != null) {
+      getData().setKundeText(null);
+    }
+    return null;
+  }
+
+  @Override
+  protected void onPreEdit()
+  {
+    if (getData().getId() == null) {
+      if (getData().getAngebotsDatum() == null) {
+        DayHolder today = new DayHolder();
+        getData().setAngebotsDatum(new java.sql.Date(today.getTimeInMillis()));
+      }
+      if (getData().getContactPersonId() == null && accessChecker.isUserMemberOfGroup(ProjectForgeGroup.PROJECT_MANAGER) == true) {
+        auftragDao.setContactPerson(getData(), getUser().getId());
+        form.setSendEMailNotification(false);
+      }
+    } else {
+      setSendEMailNotification();
+    }
+    getData().recalculate();
+  }
+
+  @Override
+  protected AbstractBasePage afterSave()
+  {
+    if (form.isSendEMailNotification() == false) {
+      return null;
+    }
+    sendNotificationIfRequired(OperationType.INSERT);
+    return null;
+  }
+
+  @Override
+  protected AbstractBasePage afterUpdate(boolean modified)
+  {
+    if (form.isSendEMailNotification() == false) {
+      return null;
+    }
+    if (modified == true) {
+      sendNotificationIfRequired(OperationType.UPDATE);
+    }
+    return null;
+  }
+
+  private void sendNotificationIfRequired(final OperationType operationType)
+  {
+    final String url = WicketUtils.getAbsoluteEditPageUrl(getRequest(), AuftragEditPage.class, getData().getId());
+    auftragDao.sendNotificationIfRequired(getData(), operationType, url);
+  }
+
+  @Override
+  protected Logger getLogger()
+  {
+    return log;
+  }
+}

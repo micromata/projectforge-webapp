@@ -1,0 +1,234 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.web.fibu;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.PageParameters;
+import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.repeater.Item;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.DateHelper;
+import org.projectforge.common.NumberHelper;
+import org.projectforge.core.CurrencyFormatter;
+import org.projectforge.fibu.AuftragsPositionVO;
+import org.projectforge.fibu.RechnungDO;
+import org.projectforge.fibu.RechnungDao;
+import org.projectforge.fibu.RechnungsStatistik;
+import org.projectforge.fibu.kost.KostZuweisungExport;
+import org.projectforge.web.wicket.AbstractBasePage;
+import org.projectforge.web.wicket.AbstractListPage;
+import org.projectforge.web.wicket.CellItemListener;
+import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
+import org.projectforge.web.wicket.CurrencyPropertyColumn;
+import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.DownloadUtils;
+import org.projectforge.web.wicket.ListPage;
+import org.projectforge.web.wicket.ListSelectActionPanel;
+
+@ListPage(editPage = RechnungEditPage.class)
+public class RechnungListPage extends AbstractListPage<RechnungListForm, RechnungDao, RechnungDO>
+{
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(RechnungListPage.class);
+
+  private static final long serialVersionUID = -8406452960003792763L;
+
+  @SpringBean(name = "rechnungDao")
+  private RechnungDao rechnungDao;
+
+  private RechnungsStatistik rechnungsStatistik;
+
+  RechnungsStatistik getRechnungsStatistik()
+  {
+    if (rechnungsStatistik == null) {
+      rechnungsStatistik = rechnungDao.buildStatistik(getList());
+    }
+    return rechnungsStatistik;
+  }
+
+  public RechnungListPage(PageParameters parameters)
+  {
+    super(parameters, "fibu.rechnung");
+    this.colspan = 4;
+  }
+
+  public RechnungListPage(final ISelectCallerPage caller, final String selectProperty)
+  {
+    super(caller, selectProperty, "fibu.rechnung");
+    this.colspan = 4;
+  }
+
+  /**
+   * Forces the statistics to be reloaded.
+   * @see org.projectforge.web.wicket.AbstractListPage#refresh()
+   */
+  @Override
+  public void refresh()
+  {
+    super.refresh();
+    this.rechnungsStatistik = null;
+  }
+
+  @SuppressWarnings("serial")
+  @Override
+  protected void init()
+  {
+    List<IColumn<RechnungDO>> columns = new ArrayList<IColumn<RechnungDO>>();
+
+    CellItemListener<RechnungDO> cellItemListener = new CellItemListener<RechnungDO>() {
+      public void populateItem(Item<ICellPopulator<RechnungDO>> item, String componentId, IModel<RechnungDO> rowModel)
+      {
+        final RechnungDO rechnung = rowModel.getObject();
+        if (rechnung.getStatus() == null) {
+          // Should not occur:
+          return;
+        }
+        final StringBuffer cssStyle = getCssStyle(rechnung.getId(), rechnung.isDeleted());
+        if (rechnung.isDeleted() == true) {
+          // Do nothing further
+        } else if (rechnung.isUeberfaellig() == true) {
+          cssStyle.append("color: red;");
+        } else if (rechnung.isBezahlt() == false) {
+          cssStyle.append("color: blue;");
+        }
+        if (cssStyle.length() > 0) {
+          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+        }
+      }
+    };
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("fibu.rechnung.nummer.short")), "nummer",
+        "nummer", cellItemListener) {
+      @SuppressWarnings("unchecked")
+      @Override
+      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      {
+        final RechnungDO rechnung = (RechnungDO) rowModel.getObject();
+        String nummer = String.valueOf(rechnung.getNummer());
+        if (form.getSearchFilter().isShowKostZuweisungStatus() == true) {
+          final BigDecimal fehlBetrag = rechnung.getKostZuweisungFehlbetrag();
+          if (NumberHelper.isNotZero(fehlBetrag) == true) {
+            nummer += " *** " + CurrencyFormatter.format(fehlBetrag) + " ***";
+          }
+        }
+        final Label nummerLabel = new Label(ListSelectActionPanel.LABEL_ID, nummer);
+        nummerLabel.setEscapeModelStrings(false);
+        item.add(new ListSelectActionPanel(componentId, rowModel, RechnungEditPage.class, rechnung.getId(), RechnungListPage.this,
+            nummerLabel));
+        cellItemListener.populateItem(item, componentId, rowModel);
+        addRowClick(item);
+      }
+    });
+    columns
+        .add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.kunde"), "kundeAsString", "kundeAsString", cellItemListener));
+    columns
+        .add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.projekt"), "projekt.name", "projekt.name", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.betreff"), "betreff", "betreff", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.datum.short"), "datum", "datum", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.faelligkeit.short"), "faelligkeit", "faelligkeit",
+        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.bezahlDatum.short"), "bezahlDatum", "bezahlDatum",
+        cellItemListener));
+    columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.common.netto"), "netSum", "netSum", cellItemListener));
+    columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.common.brutto"), "grossSum", "grossSum", cellItemListener));
+    // columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.rechnung.zahlBetrag.short"), "zahlBetrag", "zahlBetrag",
+    // cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("fibu.auftrag.auftraege")), null, null,
+        cellItemListener) {
+      @Override
+      public void populateItem(Item<ICellPopulator<RechnungDO>> item, String componentId, IModel<RechnungDO> rowModel)
+      {
+        final Set<AuftragsPositionVO> orderPositions = rowModel.getObject().getAuftragsPositionVOs();
+        if (CollectionUtils.isEmpty(orderPositions) == true) {
+          item.add(AbstractBasePage.createInvisibleDummyComponent(componentId));
+        } else {
+          final OrderPositionsPanel panel = new OrderPositionsPanel(componentId) {
+            protected void onBeforeRender()
+            {
+              super.onBeforeRender();
+              init(orderPositions);
+            };
+          };
+          item.add(panel);
+        }
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("comment")), "bemerkung", "bemerkung",
+        cellItemListener));
+    columns
+        .add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
+    dataTable = createDataTable(columns, "nummer", false);
+    form.add(dataTable);
+  }
+
+  void exportExcel()
+  {
+    refresh();
+    final List<RechnungDO> rechnungen = getList();
+    if (rechnungen == null || rechnungen.size() == 0) {
+      // Nothing to export.
+      form.addError("validation.error.nothingToExport");
+      return;
+    }
+    final String filename = "ProjectForge-"
+        + getString("fibu.common.debitor")
+        + "_"
+        + DateHelper.getDateAsFilenameSuffix(new Date())
+        + ".xls";
+    final byte[] xls = KostZuweisungExport.instance.exportRechnungen(rechnungen, getString("fibu.common.debitor"));
+    if (xls == null || xls.length == 0) {
+      log.error("Oups, xls has zero size. Filename: " + filename);
+      return;
+    }
+    DownloadUtils.setDownloadTarget(xls, filename);
+  }
+
+  @Override
+  protected RechnungListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  {
+    return new RechnungListForm(this);
+  }
+
+  @Override
+  protected RechnungDao getBaseDao()
+  {
+    return rechnungDao;
+  }
+
+  @Override
+  protected IModel<RechnungDO> getModel(RechnungDO object)
+  {
+    return new DetachableDOModel<RechnungDO, RechnungDao>(object, getBaseDao());
+  }
+}

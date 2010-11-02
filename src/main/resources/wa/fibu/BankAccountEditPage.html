@@ -1,0 +1,32 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<table>
+  <wicket:extend>
+    <tr>
+      <th><wicket:message key="finance.bankAccount.name" /></th>
+      <td><input class="stdtext" wicket:id="name" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="finance.bankAccount.number" /></th>
+      <td><input wicket:id="accountNumber" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="finance.bankAccount.bank" /></th>
+      <td><input class="stdtext" wicket:id="bank" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="finance.bankAccount.bankIdentificationCode" /></th>
+      <td><input wicket:id="bankIdentificationCode" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="description" /></th>
+      <td><textarea class="stdtext" wicket:id="description" style="height: 20ex;">[description]</textarea></td>
+    </tr>
+  </wicket:extend>
+</table>
+</body>
+</html>

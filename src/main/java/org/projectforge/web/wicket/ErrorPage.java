@@ -1,0 +1,225 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.web.wicket;
+
+import javax.servlet.ServletException;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.Component;
+import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.protocol.http.PageExpiredException;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.access.AccessException;
+import org.projectforge.common.ExceptionHelper;
+import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigurationParam;
+import org.projectforge.core.InternalErrorException;
+import org.projectforge.core.ProjectForgeException;
+import org.projectforge.core.SendFeedback;
+import org.projectforge.core.UserException;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.web.wicket.components.MaxLengthTextArea;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
+
+/**
+ * Standard error page should be shown in production mode.
+ * 
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
+ */
+public class ErrorPage extends AbstractSecuredPage
+{
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ErrorPage.class);
+
+  public static final String ONLY4NAMESPACE = "org.projectforge";
+
+  private ErrorPageData data;
+
+  @SpringBean(name = "sendFeedback")
+  private SendFeedback sendFeedback;
+
+  /**
+   * Get internationalized message inclusive the message params if exists.
+   * @param securedPage Needed for localization.
+   * @param exception
+   * @param doLog If true, then a log entry with level INFO will be produced.
+   * @return
+   */
+  public static String getExceptionMessage(AbstractSecuredPage securedPage, ProjectForgeException exception, boolean doLog)
+  {
+    // Feedbackpanel!
+    if (exception instanceof UserException) {
+      final UserException ex = (UserException) exception;
+      if (doLog == true) {
+        log.info(ex.toString() + ExceptionHelper.getFilteredStackTrace(ex, ONLY4NAMESPACE));
+      }
+      return securedPage.translateParams(ex.getI18nKey(), ex.getMsgParams(), ex.getParams());
+    } else if (exception instanceof InternalErrorException) {
+      final InternalErrorException ex = (InternalErrorException) exception;
+      if (doLog == true) {
+        log.info(ex.toString() + ExceptionHelper.getFilteredStackTrace(ex, ONLY4NAMESPACE));
+      }
+      return securedPage.translateParams(ex.getI18nKey(), ex.getMsgParams(), ex.getParams());
+    } else if (exception instanceof AccessException) {
+      final AccessException ex = (AccessException) exception;
+      if (doLog == true) {
+        log.info(ex.toString() + ExceptionHelper.getFilteredStackTrace(ex, ONLY4NAMESPACE));
+      }
+      if (ex.getParams() != null) {
+        return securedPage.getLocalizedMessage(ex.getI18nKey(), ex.getParams());
+      } else {
+        return securedPage.translateParams(ex.getI18nKey(), ex.getMessageArgs(), ex.getParams());
+      }
+    }
+    throw new UnsupportedOperationException("For developer: Please add unknown ProjectForgeException here!", exception);
+  }
+
+  @SuppressWarnings("serial")
+  public ErrorPage(final Throwable throwable)
+  {
+    super(null);
+    String msg = getString("errorpage.unknownError");
+    String messageNumber = null;
+    Throwable rootCause = null;
+    boolean showFeedback = true;
+    if (throwable != null) {
+      rootCause = ExceptionHelper.getRootCause(throwable);
+      if (rootCause instanceof ProjectForgeException) {
+        msg = getExceptionMessage(this, (ProjectForgeException) rootCause, true);
+      } else if (throwable instanceof ServletException) {
+        messageNumber = String.valueOf(System.currentTimeMillis());
+        log.error("Message #" + messageNumber + ": " + throwable.getMessage(), throwable);
+        if (rootCause != null) {
+          log.error("Message #" + messageNumber + " rootCause: " + rootCause.getMessage(), rootCause);
+        }
+        msg = getLocalizedMessage(UserException.I18N_KEY_PLEASE_CONTACT_DEVELOPER_TEAM, messageNumber);
+      } else if (throwable instanceof PageExpiredException) {
+        log.info("Page expired (session time out).");
+        showFeedback = false;
+        msg = getString("message.wicket.pageExpired");
+      } else {
+        messageNumber = String.valueOf(System.currentTimeMillis());
+        log.error("Message #" + messageNumber + ": " + throwable.getMessage(), throwable);
+        msg = getLocalizedMessage(UserException.I18N_KEY_PLEASE_CONTACT_DEVELOPER_TEAM, messageNumber);
+      }
+    }
+    final Label msgLabel = new Label("errorMessage", msg);
+    body.add(msgLabel);
+    data = new ErrorPageData();
+    final Form<ErrorPageData> form = new Form<ErrorPageData>("form");
+    final String receiver = Configuration.getInstance().getStringValue(ConfigurationParam.FEEDBACK_E_MAIL);
+    final boolean visible = showFeedback == true && messageNumber != null && StringUtils.isNotBlank(receiver);
+    form.setVisible(visible);
+    body.add(form);
+    data.setSender(PFUserContext.getUser().getFullname());
+    data.setReceiver(receiver);
+    data.setMessageNumber(messageNumber);
+    data.setMessage(throwable.getMessage());
+    data.setStackTrace(ExceptionHelper.printStackTrace(throwable));
+    if (rootCause != null) {
+      data.setRootCause(rootCause.getMessage());
+      data.setRootCauseStackTrace(ExceptionHelper.printStackTrace(rootCause));
+    }
+    final String subject = "ProjectForge-Error #" + data.getMessageNumber() + " from " + data.getSender();
+    data.setSubject(subject);
+    form.add(new Label("receiver", receiver));
+    form.add(new Label("sender", data.getSender()));
+    form.add(new Label("errorId", messageNumber));
+    final Component textareaField = new MaxLengthTextArea("description", new PropertyModel<String>(data, "description"), 4000);
+    form.add(textareaField);
+    textareaField.add(new FocusOnLoadBehavior());
+    final Button cancelButton = new Button("button", new Model<String>(getString("cancel"))) {
+      @Override
+      public final void onSubmit()
+      {
+        cancel();
+      }
+    };
+    cancelButton.setDefaultFormProcessing(false); // No validation of the form.
+    form.add(new SingleButtonPanel("cancel", cancelButton));
+    final Button sendButton = new Button("button", new Model<String>(getString("feedback.send.title"))) {
+      @Override
+      public final void onSubmit()
+      {
+        sendFeedback();
+      }
+    };
+    form.add(new SingleButtonPanel("send", sendButton));
+    form.setDefaultButton(sendButton);
+  }
+
+  private void cancel()
+  {
+    setResponsePage(WicketUtils.getDefaultPage());
+  }
+
+  private void sendFeedback()
+  {
+    log.info("Send feedback.");
+    boolean result = false;
+    try {
+      result = sendFeedback.send(data);
+    } catch (Throwable ex) {
+      log.error(ex.getMessage(), ex);
+      result = false;
+    }
+    final MessagePage messagePage = new MessagePage(new PageParameters());
+    if (result == true) {
+      messagePage.setMessage(getString("feedback.mailSendSuccessful"));
+    } else {
+      messagePage.setMessage(getString("mail.error.exception"));
+      messagePage.setWarning(true);
+    }
+    setResponsePage(messagePage);
+  }
+
+  @Override
+  protected String getTitle()
+  {
+    return getString("errorpage.title");
+  }
+
+  /**
+   * @see org.apache.wicket.Component#isVersioned()
+   */
+  @Override
+  public boolean isVersioned()
+  {
+    return false;
+  }
+
+  /**
+   * @see org.apache.wicket.Page#isErrorPage()
+   */
+  @Override
+  public boolean isErrorPage()
+  {
+    return true;
+  }
+}

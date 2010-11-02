@@ -1,0 +1,49 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<table>
+  <wicket:extend>
+    <wicket:fragment wicket:id="bottomRowsFragment">
+      <tr>
+        <th><wicket:message key="scripting.scriptBackup" /></th>
+        <td colspan="5"><span wicket:id="scriptBackup">[Back-up script]</span></td>
+      </tr>
+    </wicket:fragment>
+    <tr>
+      <th><wicket:message key="scripting.script.name" /></th>
+      <td colspan="5"><input class="stdtext" wicket:id="name" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="scripting.script.parameterName" /></th>
+      <td><input class="stdtext" style="width: 10em;" wicket:id="parameter1Name" /><select wicket:id="parameter1Type">
+        <option>[String]</option>
+      </select></td>
+      <td><input class="stdtext" style="width: 10em;" wicket:id="parameter2Name" /><select wicket:id="parameter2Type">
+        <option>[String]</option>
+      </select></td>
+      <td><input class="stdtext" style="width: 10em;" wicket:id="parameter3Name" /><select wicket:id="parameter3Type">
+        <option>[String]</option>
+      </select></td>
+      <td><input class="stdtext" style="width: 10em;" wicket:id="parameter4Name" /><select wicket:id="parameter4Type">
+        <option>[String]</option>
+      </select></td>
+      <td><input class="stdtext" style="width: 10em;" wicket:id="parameter5Name" /><select wicket:id="parameter5Type">
+        <option>[String]</option>
+      </select></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="description" /></th>
+      <td colspan="5"><textarea class="stdtext" wicket:id="description" style="height: 20ex;">[Description]</textarea></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="scripting.script" /><br />
+      (<wicket:message key="fieldNotHistorizable" />)</th>
+      <td colspan="5"><textarea class="stdtext" wicket:id="script" style="height: 60ex;">[Script]</textarea></td>
+    </tr>
+  </wicket:extend>
+</table>
+</body>
+</html>

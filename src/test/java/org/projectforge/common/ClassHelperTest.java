@@ -1,0 +1,54 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.common;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNull;
+
+import org.junit.Test;
+import org.projectforge.common.ClassHelper;
+
+
+public class ClassHelperTest
+{
+  @Test
+  public void testGetDefaultType()
+  {
+    assertEquals(false, ClassHelper.getDefaultType(Boolean.TYPE));
+    assertNull(ClassHelper.getDefaultType(Boolean.class));
+    assertEquals(0, ClassHelper.getDefaultType(Integer.TYPE));
+    assertNull(ClassHelper.getDefaultType(Integer.class));
+  }
+
+  @Test
+  public void testIsDefaultType()
+  {
+    assertTrue(ClassHelper.isDefaultType(Boolean.TYPE, null));
+    assertTrue(ClassHelper.isDefaultType(Boolean.TYPE, false));
+    assertTrue(ClassHelper.isDefaultType(Boolean.TYPE, Boolean.FALSE));
+    assertFalse(ClassHelper.isDefaultType(Boolean.TYPE, true));
+  }
+}

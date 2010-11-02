@@ -1,0 +1,8 @@
+<Context path="" reloadable="false" debug="0" docBase="webapps" cookies="false">
+  <Resource name="jdbc/ProjectForgeDS" type="javax.sql.DataSource" auth="Container" driverClassName="org.postgresql.Driver"
+    url="jdbc:postgresql://localhost:5432/projectforge" maxActive="100" maxIdle="30" maxWait="10000" username="projectforge" password="" />
+  <Parameter name="base.dir" value="${user.home}/ProjectForge" override="false" />
+  <Parameter name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" override="false" />
+  <Parameter name="hibernate.schemaUpdate" value="true" override="false" />
+  <Parameter name="development" value="true" override="false" />
+</Context>

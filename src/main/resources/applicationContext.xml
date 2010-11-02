@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans default-lazy-init="false" default-autowire="no">
+
+  <bean id="propertyConfigurer" class="org.springframework.web.context.support.ServletContextPropertyPlaceholderConfigurer">
+    <property name="locations">
+      <list>
+        <value>classpath:hibernate-mappings.properties</value>
+      </list>
+    </property>
+    <property name="ignoreResourceNotFound">
+      <value>true</value>
+    </property>
+  </bean>
+  <bean id="log4jInit" class="org.projectforge.core.Log4Jinitialization">
+    <property name="configLocations">
+      <list>
+        <value>/WEB-INF/classes/log4j.properties</value>
+      </list>
+    </property>
+    <property name="configProperties">
+      <props>
+        <prop key="logDir">${base.dir}/logs</prop>
+      </props>
+    </property>
+  </bean>
+  <!--bean id="debugging" class="de.micromata.printing.common.DebuggingWebAttribute" /-->
+  <!-- Sample database -->
+  <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+    <property name="jndiName" value="java:comp/env/jdbc/ProjectForgeDS" />
+  </bean>
+  <!-- hibernate Session to DB -->
+  <bean id="sessionFactory" class="de.micromata.hibernate.spring.AutoSessionFactoryBean">
+    <property name="initialXmlData">
+      <null />
+    </property>
+    <property name="hibernateProperties">
+      <props>
+        <prop key="hibernate.dialect">${hibernate.dialect}</prop>
+        <prop key="hibernate.query.substitutions"></prop><!-- Need to force empty despite Hibernate reference saying this is the default -->
+        <prop key="hibernate.cache.region_prefix"></prop><!-- Need to force empty. Hibernate reference says this is the default -->
+        <prop key="hibernate.show_sql">false</prop>
+        <prop key="hibernate.format_sql">false</prop>
+        <prop key="hibernate.use_outer_join">true</prop>
+        <prop key="hibernate.max_fetch_depth">3</prop>
+        <prop key="hibernate.generate_statistics">true</prop>
+        <prop key="hibernate.default_batch_fetch_size">16</prop>
+        <prop key="hibernate.bytecode.use_reflection_optimizer">true</prop>
+        <prop key="hibernate.cache.use_query_cache">true</prop>
+        <prop key="hibernate.cache.use_second_level_cache">true</prop>
+        <prop key="hibernate.cache.provider_class">net.sf.ehcache.hibernate.SingletonEhCacheProvider</prop>
+        <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.SingletonEhCacheRegionFactory</prop>
+        <prop key="hibernate.connection.driver_class">org.postgresql.Driver</prop> <!--  Overwritten by context.xml. -->
+        <prop key="hibernate.jdbc.batch_size">50</prop>
+        <prop key="hibernate.jdbc.fetch_size">200</prop>
+        <prop key="hibernate.search.default.directory_provider">org.hibernate.search.store.FSDirectoryProvider</prop>
+        <prop key="hibernate.search.default.indexBase">${base.dir}/hibernate-search</prop>
+        <prop key="hibernate.search.worker.batch_size">1000</prop>
+        <prop key="hibernate.search.default.optimizer.operation_limit.max">1000</prop>
+        <prop key="hibernate.search.default.optimizer.transaction_limit.max">100</prop>
+        <prop key="hibernate.search.worker.execution">sync</prop>
+        <prop key="hibernate.search.worker.buffer_queue.max">10</prop>
+      </props>
+    </property>
+    <property name="dataSource">
+      <ref bean="dataSource" />
+    </property>
+    <!-- never run a schema update on the database -->
+    <property name="schemaUpdate">
+      <value>${hibernate.schemaUpdate}</value>
+    </property>
+    <property name="entityInterceptor">
+      <ref bean="hibernateHistoryInterceptor" />
+    </property>
+    <property name="eventListeners">
+      <map>
+        <entry key="post-update" value-ref="luceneListener" />
+        <entry key="post-insert" value-ref="luceneListener" />
+        <entry key="post-delete" value-ref="luceneListener" />
+        <!--
+          entry key="post-collection-recreate" value-ref="luceneListener" /> <entry key="post-collection-remove" value-ref="luceneListener" /> <entry
+          key="post-collection-update" value-ref="luceneListener" /
+        -->
+      </map>
+    </property>
+  </bean>
+
+  <bean id="luceneListener" class="org.hibernate.search.event.FullTextIndexEventListener" />
+</beans>

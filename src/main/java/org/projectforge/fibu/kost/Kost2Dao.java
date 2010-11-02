@@ -1,0 +1,238 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.fibu.kost;
+
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import org.projectforge.core.BaseDao;
+import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.QueryFilter;
+import org.projectforge.core.UserException;
+import org.projectforge.fibu.ProjektDO;
+import org.projectforge.fibu.ProjektDao;
+import org.projectforge.fibu.ProjektStatus;
+import org.projectforge.user.UserRightId;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+
+@Transactional(readOnly = true, propagation = Propagation.SUPPORTS, isolation = Isolation.REPEATABLE_READ)
+public class Kost2Dao extends BaseDao<Kost2DO>
+{
+  public static final UserRightId USER_RIGHT_ID = UserRightId.FIBU_COST_UNIT;
+
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "projekt.name", "projekt.kunde.name", "nummer"};
+
+  private ProjektDao projektDao;
+
+  private Kost2ArtDao kost2ArtDao;
+
+  private KostCache kostCache;
+
+  public Kost2Dao()
+  {
+    super(Kost2DO.class);
+    userRightId = USER_RIGHT_ID;
+  }
+
+  public void setProjektDao(ProjektDao projektDao)
+  {
+    this.projektDao = projektDao;
+  }
+
+  public void setKost2ArtDao(Kost2ArtDao kost2ArtDao)
+  {
+    this.kost2ArtDao = kost2ArtDao;
+  }
+
+  public void setKostCache(KostCache kostCache)
+  {
+    this.kostCache = kostCache;
+  }
+
+  @Override
+  protected String[] getAdditionalSearchFields()
+  {
+    return ADDITIONAL_SEARCH_FIELDS;
+  }
+
+  /**
+   * @param kost2
+   * @param projektId If null, then projekt will be set to null;
+   * @see BaseDao#getOrLoad(Integer)
+   */
+  public void setProjekt(final Kost2DO kost2, Integer projektId)
+  {
+    ProjektDO projekt = projektDao.getOrLoad(projektId);
+    if (projekt != null) {
+      kost2.setProjekt(projekt);
+      kost2.setNummernkreis(projekt.getNummernkreis());
+      kost2.setBereich(projekt.getBereich());
+      kost2.setTeilbereich(projekt.getNummer());
+    }
+  }
+
+  /**
+   * @param kost2
+   * @param kost2ArtId If null, then kost2Art will be set to null;
+   * @see BaseDao#getOrLoad(Integer)
+   */
+  public void setKost2Art(final Kost2DO kost2, Integer kost2ArtId)
+  {
+    Kost2ArtDO kost2Art = kost2ArtDao.getOrLoad(kost2ArtId);
+    kost2.setKost2Art(kost2Art);
+  }
+
+  /**
+   * @param kostString Format ######## or #.###.##.## is supported.
+   * @see #getKost2(int, int, int, int)
+   */
+  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+  public Kost2DO getKost2(final String kostString)
+  {
+    final int[] kost = KostHelper.parseKostString(kostString);
+    if (kost == null) {
+      return null;
+    }
+    return getKost2(kost[0], kost[1], kost[2], kost[3]);
+  }
+
+  @SuppressWarnings("unchecked")
+  public Kost2DO getKost2(int nummernkreis, int bereich, int teilbereich, int kost2Art)
+  {
+    List<Kost2DO> list = getHibernateTemplate().find(
+        "from Kost2DO k where k.nummernkreis=? and k.bereich=? and k.teilbereich=? and k.kost2Art.id=?",
+        new Object[] { nummernkreis, bereich, teilbereich, kost2Art});
+    if (CollectionUtils.isEmpty(list) == true) {
+      return null;
+    }
+    return list.get(0);
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<Kost2DO> getActiveKost2(int nummernkreis, int bereich, int teilbereich)
+  {
+    List<Kost2DO> list = getHibernateTemplate()
+        .find(
+            "from Kost2DO k where k.nummernkreis=? and k.bereich=? and k.teilbereich=? and (k.kostentraegerStatus='ACTIVE' or k.kostentraegerStatus is null) order by k.kost2Art.id",
+            new Object[] { nummernkreis, bereich, teilbereich});
+    if (CollectionUtils.isEmpty(list) == true) {
+      return null;
+    }
+    return list;
+  }
+
+  /**
+   * @param projekt
+   * @see #getActiveKost2(int, int, int)
+   */
+  public List<Kost2DO> getActiveKost2(final ProjektDO projekt)
+  {
+    if (projekt == null) {
+      return null;
+    }
+    return getActiveKost2(projekt.getNummernkreis(), projekt.getBereich(), projekt.getTeilbereich());
+  }
+
+  @Override
+  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+  public List<Kost2DO> getList(BaseSearchFilter filter)
+  {
+    KostFilter myFilter = (KostFilter) filter;
+    QueryFilter queryFilter = new QueryFilter(filter);
+    queryFilter.createAlias("kost2Art", "art");
+    if (myFilter.isActive() == true) {
+      queryFilter.add(Restrictions.eq("kostentraegerStatus", KostentraegerStatus.ACTIVE));
+    } else if (myFilter.isNonActive() == true) {
+      queryFilter.add(Restrictions.eq("kostentraegerStatus", KostentraegerStatus.NONACTIVE));
+    } else if (myFilter.isEnded() == true) {
+      queryFilter.add(Restrictions.eq("kostentraegerStatus", KostentraegerStatus.ENDED));
+    } else if (myFilter.isNotEnded() == true) {
+      queryFilter.add(Restrictions.or(Restrictions.ne("kostentraegerStatus", ProjektStatus.ENDED), Restrictions.isNull("kostentraegerStatus")));
+    }
+    queryFilter.addOrder(Order.asc("nummernkreis")).addOrder(Order.asc("bereich")).addOrder(Order.asc("teilbereich")).addOrder(
+        Order.asc("art.id"));
+    return getList(queryFilter);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  protected void onSaveOrModify(Kost2DO obj)
+  {
+    if (obj.getProjektId() != null) {
+      // Projekt ist gegeben. Dann müssen auch die Ziffern stimmen:
+      ProjektDO projekt = projektDao.getById(obj.getProjektId()); // Bei Neuanlage ist Projekt nicht wirklich gebunden.
+      if (projekt.getNummernkreis() != obj.getNummernkreis()
+          || projekt.getBereich() != obj.getBereich()
+          || projekt.getNummer() != obj.getTeilbereich()) {
+        throw new UserException("Inkonsistenz bei Kost2: "
+            + obj.getNummernkreis()
+            + "."
+            + obj.getBereich()
+            + "."
+            + obj.getTeilbereich()
+            + " != "
+            + projekt.getNummernkreis()
+            + "."
+            + projekt.getBereich()
+            + "."
+            + projekt.getNummer()
+            + " (Projekt)");
+      }
+    } else if (obj.getNummernkreis() == 4 || obj.getNummernkreis() == 5) {
+      throw new UserException("fibu.kost2.error.projektNeededForNummernkreis");
+    }
+    List<Kost2DO> list = null;
+    String sql = "from Kost2DO k where k.nummernkreis = ? and k.bereich = ? and k.teilbereich = ? and k.kost2Art.id = ?";
+    if (obj.getId() == null) {
+      // New kost entry
+      list = getHibernateTemplate().find(sql,
+          new Object[] { obj.getNummernkreis(), obj.getBereich(), obj.getTeilbereich(), obj.getKost2ArtId()});
+    } else {
+      // kost entry already exists. Check maybe changed:
+      list = getHibernateTemplate().find(sql + " and pk <> ?",
+          new Object[] { obj.getNummernkreis(), obj.getBereich(), obj.getTeilbereich(), obj.getKost2ArtId(), obj.getId()});
+    }
+    if (CollectionUtils.isNotEmpty(list) == true) {
+      throw new UserException("Kollision mit vorhandenem Kostenträger.");
+    }
+  }
+
+  @Override
+  protected void afterSaveOrModify(Kost2DO kost2)
+  {
+    super.afterSaveOrModify(kost2);
+    kostCache.updateKost2(kost2);
+  }
+
+  @Override
+  public Kost2DO newInstance()
+  {
+    return new Kost2DO();
+  }
+}

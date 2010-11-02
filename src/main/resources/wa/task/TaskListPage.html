@@ -1,0 +1,29 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<table>
+  <wicket:extend>
+    <tr>
+      <th><wicket:message key="label.options" /></th>
+      <td><input type="checkbox" wicket:id="notOpenedCheckBox" onchange="javascript:submit();" /> <wicket:message key="task.status.notOpened" />
+      <input type="checkbox" wicket:id="openedCheckBox" onchange="javascript:submit();" /> <wicket:message key="task.status.opened" /> <input
+        type="checkbox" wicket:id="closedCheckBox" onchange="javascript:submit();" /> <wicket:message key="task.status.closed" /> <input
+        type="checkbox" wicket:id="deletedCheckBox" onchange="javascript:submit();" /> <wicket:message key="onlyDeleted" /> | <span wicket:id="pageSize">[Page
+      size setting]</span></td>
+    </tr>
+
+    <wicket:fragment wicket:id="bottomFragment">
+      <table class="dataview" cellspacing="0" wicket:id="dataTreeTable">
+        <tr>
+          <td>[table]</td>
+        </tr>
+      </table>
+    </wicket:fragment>
+  </wicket:extend>
+
+</table>
+</body>
+</html>
