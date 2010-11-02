@@ -1,0 +1,4 @@
+#Tue Dec 12 15:09:15 CET 2006
+classpath.helper/org.eclipse.jdt.launching.JRE_CONTAINER\:\:org.eclipse.jdt.internal.launching.macosx.MacOSXType\:\:JDK-1.5/owners=jst.java\:5.0
+classpath.helper/org.eclipse.jst.server.core.container\:\:org.eclipse.jst.server.tomcat.runtimeTarget\:\:Apache\ Tomcat\ v5.5/owners=jst.web\:2.4
+eclipse.preferences.version=1
