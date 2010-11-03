@@ -8,7 +8,7 @@
 
   <property environment="env" />
 	<property name="appId" value="ProjectForge 2010" />
-	<property name="version" value="3.4.1" />
+	<property name="version" value="3.4.2" />
 	<property name="m_doc.home" value="${env.M_DOC_HOME}" />
 	<property name="webproject" value="." />
 	<property name="target" value="${webproject}/target" />
@@ -172,6 +172,7 @@ public class Version
 </echo>
 		<echo>Creating file version.xml ...</echo>
 		<echo file="version.xml" append="false"><![CDATA[<?xml version="1.0" encoding="UTF-8" ?>
+<property name="appId" value="${appId}"/>
 <property name="version" value="${version}"/>
 <property name="version.date" value="${VERSION_DATE}"/>
 <property name="version.timestamp" value="${VERSION_NOW_FC}"/>]]>
