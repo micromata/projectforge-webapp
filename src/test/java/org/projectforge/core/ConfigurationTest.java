@@ -78,7 +78,7 @@ public class ConfigurationTest
       + "    <protocol>smtp</protocol>\n"
       + "    <charset>UTF-8</charset>\n"
       + "    <from>noreply</from>\n"
-      + "    <fromReal>ProjectForge 2010</fromReal>\n"
+      + "    <fromReal>ProjectForge</fromReal>\n"
       + "  </sendMail>\n"
       + "</config>");
 
