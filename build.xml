@@ -7,7 +7,8 @@
   &build_version;
 
   <property environment="env" />
-	<property name="appId" value="ProjectForge 2010" />
+	<property name="APP_ID" value="ProjectForge" />
+	<property name="appTitle" value="${APP_ID} 2010" />
 	<property name="version" value="3.4.2" />
 	<property name="m_doc.home" value="${env.M_DOC_HOME}" />
 	<property name="webproject" value="." />
@@ -153,7 +154,9 @@ package org.projectforge;
 
 public class Version
 {
-  public static final String APP_ID = "${appId}";
+  public static final String APP_ID = "${APP_ID}";
+
+  public static final String APP_TITLE = "${appTitle}";
 
   public static final String NUMBER = "${version}";
 
@@ -172,7 +175,8 @@ public class Version
 </echo>
 		<echo>Creating file version.xml ...</echo>
 		<echo file="version.xml" append="false"><![CDATA[<?xml version="1.0" encoding="UTF-8" ?>
-<property name="appId" value="${appId}"/>
+<property name="appId" value="${APP_ID}"/>
+<property name="appTitle" value="${appTitle}"/>
 <property name="version" value="${version}"/>
 <property name="version.date" value="${VERSION_DATE}"/>
 <property name="version.timestamp" value="${VERSION_NOW_FC}"/>]]>
