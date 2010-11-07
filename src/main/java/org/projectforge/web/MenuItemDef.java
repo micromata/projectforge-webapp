@@ -104,7 +104,7 @@ public enum MenuItemDef
   // Menu entries
   ACCESS_LIST("accessList", "access/AccessList.action", "lock.png"), // Visible for all.
   // *
-  ADDRESS_LIST("addressList", AddressListPage.class, "vcard.png"), // Visible for all.
+  ADDRESS_LIST("addressList", "address/addressList.action", "vcard.png"), // Visible for all.
   // *
   BANK_ACCOUNT_LIST("finance.bankAccounts", BankAccountListPage.class, "money.png",//
       FINANCE_GROUP, CONTROLLING_GROUP), //
