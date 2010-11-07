@@ -40,7 +40,7 @@ import org.projectforge.web.wicket.components.TooltipImage;
 
 
 /**
- * This panel show the actual user and buttons for select/unselect user.
+ * This panel shows the actual user and buttons for select/unselect user.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
