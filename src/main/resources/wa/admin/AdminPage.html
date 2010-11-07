@@ -5,6 +5,11 @@
 
 <body>
 <wicket:extend>
+  <script wicket:id="showDumpQuestionDialog" type="text/javascript">
+    function showDumpQuestionDialog() {
+      return window.confirm("Dump...?");
+    }
+  </script>
   <form wicket:id="form" name="form">
   <fieldset><legend style="display: inline;"><wicket:message key="system.admin.group.title.systemChecksAndFunctionality" /></legend>
   <table class="form">

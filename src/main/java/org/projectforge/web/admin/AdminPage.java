@@ -36,6 +36,8 @@ import java.util.TreeSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.Response;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.Configuration;
@@ -88,6 +90,11 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
     super(parameters);
     // Add simple upload form, which is hooked up to its feedback panel by
     // virtue of that panel being nested in the form.
+    final StringBuffer buf = new StringBuffer();
+    buf.append("function showDumpQuestionDialog() {\n").append("  return window.confirm('");
+    buf.append("Do you really want to dump the whole data-base?");
+    buf.append("');\n}\n");
+    body.add(new Label("showDumpQuestionDialog", buf.toString()).setEscapeModelStrings(false));
     form = new AdminForm(this);
     body.add(form);
     form.init();
@@ -251,9 +258,10 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
     final String ts = DateHelper.getTimestampAsFilenameSuffix(new Date());
     final String filename = "projectforgedump_" + ts + ".xml.gz";
     final Response response = getResponse();
+    ((WebResponse)response).setAttachmentHeader(filename);
     response.setContentType(DownloadUtils.getContentType(filename));
     xmlDump.dumpDatabase(filename, response.getOutputStream());
-  }
+}
 
   protected void reindex()
   {

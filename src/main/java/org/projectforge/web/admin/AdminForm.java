@@ -131,13 +131,14 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
         parentPage.createMissingDatabaseIndices();
       }
     };
-    new MyButtonPanel("dump", WicketApplication.isDevelopmentModus()) {
+    final MyButtonPanel dumpButtonPanel = new MyButtonPanel("dump", WicketApplication.isDevelopmentModus()) {
       @Override
       public void onSubmit()
       {
         parentPage.dump();
       }
     };
+    dumpButtonPanel.button.add(new SimpleAttributeModifier("onclick", "return showDumpQuestionDialog();"));
     new MyButtonPanel("schemaExport") {
       @Override
       public void onSubmit()
@@ -195,6 +196,8 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
   private abstract class MyButtonPanel implements Serializable
   {
     private static final long serialVersionUID = -7100891342667728950L;
+    
+    private Button button;
 
     private MyButtonPanel(final String i18nKey)
     {
@@ -214,7 +217,7 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
     @SuppressWarnings("serial")
     private MyButtonPanel(final String i18nKey, final String tooltip, final boolean visible)
     {
-      Button button = new Button("button", new Model<String>(getString("system.admin.button." + i18nKey))) {
+      button = new Button("button", new Model<String>(getString("system.admin.button." + i18nKey))) {
         @Override
         public final void onSubmit()
         {
