@@ -1,233 +1,44 @@
 /* ================ */ /* = Calendar css = */ /* ================ */
-#content table.calendar {
-  width: 100%;
-  height: 100%;
-  margin: 0px -2px -20px -2px;
-  border-collapse: collapse;
-  border: none;
-}
-
-#content table.calendar td {
-  width: 14% !important;
-  overflow: hidden;
-}
-
-#content table.calendar tr th {
-  background-color: #fff;
-  border: 1px solid #CFCFCF;
-}
-
-#content table.calendar tr.calendarhead th {
-  height: 29px;
-  background: #CCCCD1 url(../images/css_img/gradient_32.png) repeat-x top
-    left;
-  text-align: center;
-}
-
-/* Die Knoeppe über dem Kalender sind jetzt eine Liste, bitte in der JSP beachten...nachfolgendes Script macht sie schick*/
-#content table.calendar tr.calendarhead th ul.calendartools {
-  height: 20px;
-  overflow: hidden;
-  list-style-type: none;
-  margin: 0;
-}
-
-#content table.calendar tr.calendarhead th ul.calendartools li {
-  height: 20px;
-  margin: 0;
-  padding: 0px;
-  line-height: 20px;
-  float: left;
-  list-style-type: none;
-  background: #fff url(../images/css_img/centerInactive.png) repeat top
-    left;
-}
-
-#content table.calendar tr.calendarhead th ul.calendartools li a {
-  display: block;
-  margin: 0;
-}
-
-#content table.calendar tr.calendarhead th ul.calendartools li.left,#content table.calendar tr.calendarhead th ul.calendartools li.right
-  {
-  background: none;
-}
-
-#content table.calendar tr.calendarhead th ul.calendartools li.month a {
-  width: 150px;
-  padding: 0 10px;
-  text-align: center;
-  border-left: 1px solid #838383;
-}
-
-#content table.calendar tr.calendarhead th ul.calendartools li.month a:hover
-  {
-  background: #fff url(../images/css_img/centerActive.png) repeat top left
-    ;
-}
-
-#content table.calendar tr.calendarhead th ul.calendartools li.month a.deadlink
-  {
-  color: #333;
-  cursor: default;
-}
-
-#content table.calendar tr.calendarhead th ul.calendartools li.month a.deadlink:hover
-  {
-  background: #fff url(../images/css_img/centerInactive.png) repeat top
-    left;
-}
-
-#content table.calendar tr.calendarhead th ul.calendartools li.inner {
-  border-left: 1px solid #838383;
-  padding: 0 10px;
-}
-
-#content table.calendar tr.calendarhead th ul.calendartools li.inner:hover
-  {
-  background: #fff url(../images/css_img/centerActive.png) repeat top left
-    ;
-}
-
-#content table.calendar tr.calendarhead th ul.calendartools li.inner a {
-  margin: 0;
-  padding: 0;
-  border: none;
-}
-
-#content table.calendar tr.calendarhead th ul.calendartools li.inner a img
-  {
-  margin-top: 3px;
-  width: 14px;
-  height: auto;
-}
-
-#content table.calendar tr.calendarsubhead th {
-  height: 19px;
-  background: #E5E5E5 url(../images/css_img/gradient_32.png) repeat-x top
-    left;
-}
-
-#content table.calendar tr th.week,#content table.calendar tr.calendarsubhead th.week
-  {
-  width: 80px !important;
-  vertical-align: top;
-}
-
-#content form {
-  display: inline;
-}
-
-#content table.calendar tr th a {
-  
-}
-
-#content table.calendar tr th a:visited {
-  
-}
-
-#content table.calendar tr th a:active {
-  
-}
-
-#content table.calendar tr th a:hover {
-  
-}
-
-#content table.calendar tr th.week {
-  
-}
-
-#content table.calendar tr th.short {
-  
-}
-
-#content table.calendar tr td {
-  background-color: #fff;
-  color: #999;
-  border: 1px solid #CFCFCF;
-  vertical-align: top;
-}
-
-#content table.calendar tr td p {
-  display: inline;
-  clear: left;
-  float: left;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 80%;
-  overflow: hidden;
-  font-size: 9px;
-  color: red;
-}
-
-#content table.calendar tr td ul li {
-  display: inline;
-  float: left;
-  color: red
-}
-
-#content table.calendar tr td ul li a {
-  color: red;
-}
-
-#content table.calendar tr td.normal {
-  background-color: #ffffff;
-}
-
-#content table.calendar tr td.today {
-  background-color: #E4ECF7;
-}
-
-#content table.calendar td.non-working-day {
-  background-color: #FFDDE1;
-  font-weight: bold;
-  color: green;
-}
-
-#content table.calendar td.holiday-working-day {
-  font-weight: bold;
-  color: green;
-}
-
-#content table.calendar tr td.hover,#content table.calendar tr th.hover
-  {
-  background-color: #DDDDDD;
-}
-
-table.calendar td.sun-or-holiday a {
-  
-}
-
-table.calendar td.sun-or-holiday a:visited {
-  
-}
-
-table.calendar td.sun-or-holiday a:active {
-  
-}
-
-table.calendar td.sun-or-holiday a:hover {
-  
-}
-
-#content table.calendar td.other-month {
-  background-color: #ededed;
-}
-
-table.calendar td.other-month a {
-  color: #999;
-}
-
-table.calendar td.other-month a:visited {
-  color: #999;
-}
-
-table.calendar td.other-month a:active {
-  color: #999;
-}
-
-table.calendar td.other-month a:hover {
-  color: #999;
-}
+#content table.calendar{height:100%;margin:0px -2px -20px -2px;border-collapse:collapse;border:none;}
+#content table.calendar td{width:14% !important;overflow:hidden;}
+#content table.calendar tr th{background-color:#fff;border:1px solid #CFCFCF;}
+#content table.calendar tr.calendarhead th{height:29px;background:#CCCCD1 url(../images/css_img/gradient_32.png) repeat-x topleft;text-align:center;}
+#content table.calendar tr.calendarhead th ul.calendartools{height:20px;overflow:hidden;list-style-type:none;margin:0;}
+#content table.calendar tr.calendarhead th ul.calendartools li{height:20px;margin:0;padding:0px;line-height:20px;float:left;list-style-type:none;background:#fff url(../images/css_img/centerInactive.png) repeat top left;}
+#content table.calendar tr.calendarhead th ul.calendartools li a{display:block;margin:0;}
+#content table.calendar tr.calendarhead th ul.calendartools li.left,#content table.calendar tr.calendarhead th ul.calendartools li.right{background:none;}
+#content table.calendar tr.calendarhead th ul.calendartools li.month a{width:150px;padding:0 10px;text-align:center;border-left:1px solid #838383;}
+#content table.calendar tr.calendarhead th ul.calendartools li.month a:hover{background:#fff url(../images/css_img/centerActive.png) repeat top left;}
+#content table.calendar tr.calendarhead th ul.calendartools li.month a.deadlink{color:#333;cursor:default;}
+#content table.calendar tr.calendarhead th ul.calendartools li.month a.deadlink:hover{background:#fff url(../images/css_img/centerInactive.png) repeat top left;}
+#content table.calendar tr.calendarhead th ul.calendartools li.inner{border-left:1px solid #838383;padding:0 10px;}
+#content table.calendar tr.calendarhead th ul.calendartools li.inner:hover{background:#fff url(../images/css_img/centerActive.png) repeat top left;}
+#content table.calendar tr.calendarhead th ul.calendartools li.inner a{margin:0;padding:0;border:none;}
+#content table.calendar tr.calendarhead th ul.calendartools li.inner a img{margin-top:3px;width:14px;height:auto;}
+#content table.calendar tr.calendarsubhead th{height:19px;background:#E5E5E5 url(../images/css_img/gradient_32.png) repeat-x top left;}
+#content table.calendar tr th.week,#content table.calendar tr.calendarsubhead th.week{width:80px !important;vertical-align:top;}
+#content form{display:inline;}
+#content table.calendar tr th a{}
+#content table.calendar tr th a:visited{}
+#content table.calendar tr th a:active{}
+#content table.calendar tr th a:hover{}
+#content table.calendar tr th.week{}
+#content table.calendar tr th.short{}
+#content table.calendar tr td{background-color:#fff;color:#999;border:1px solid #CFCFCF;vertical-align:top;}
+#content table.calendar tr td p{display:inline;clear:left;float:left;margin:0;padding:0;width:100%;height:80%;overflow:hidden;font-size:9px;color:red;}
+#content table.calendar tr td ul li{display:inline;float:left;color:red}
+#content table.calendar tr td ul li a{color:red;}
+#content table.calendar tr td.normal{background-color:#ffffff;}
+#content table.calendar tr td.today{background-color:#E4ECF7;}
+#content table.calendar td.non-working-day{background-color:#FFDDE1;font-weight:bold;color:green;}
+#content table.calendar td.holiday-working-day{font-weight:bold;color:green;}
+#content table.calendar tr td.hover,#content table.calendar tr th.hover{background-color:#DDDDDD;}
+table.calendar td.sun-or-holiday a{}
+table.calendar td.sun-or-holiday a:visited{}
+table.calendar td.sun-or-holiday a:active{}
+table.calendar td.sun-or-holiday a:hover{}
+#content table.calendar td.other-month{background-color:#ededed;}
+table.calendar td.other-month a{color:#999;}
+table.calendar td.other-month a:visited{color:#999;}
+table.calendar td.other-month a:active{color:#999;}
+table.calendar td.other-month a:hover{color:#999;}

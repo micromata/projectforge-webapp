@@ -52,6 +52,7 @@
   <script src="<c:url value='/scripts/jquery.tooltip.min.js'/>" type="text/javascript" charset="utf-8"></script>
   <script src="<c:url value='/scripts/jquery.autocomplete.js'/>" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript" charset="utf-8">
+  /* <![CDATA[ */
     $(document).ready(function(){
       $(':text[readonly]').addClass("readOnly");
       $(':input[readonly]').addClass("readOnly");
@@ -73,22 +74,33 @@
         left: 5
       });
     });
+    /* ]]> */
 </script>
+<c:url var="htcp" value="/styles/"/>
+<c:if test='${fn:contains(htcp, ";")}'>
+    <c:set var="imagePath" value='${fn:substringBefore(htcp, ";")}' />
+ </c:if>
+<!--[if lte IE 6]>
+	<style type="text/css">
+		img { behavior: url(${htcp}iepngfix.htc) }
+	</style>
+<![endif]-->
+
+
   <decorator:head />
   </head>
   <c:if test="${actionBean.developmentSystem == true}">
-    <c:set var="devStyle" value='style="background-color: #eeaaaa;"' />
+    <c:set var="devStyle" value='' />
   </c:if>
   <body onload="<decorator:getProperty property='body.onload' />">
   <div id="container"><!-- left --> <c:url var="imagePath" value="/images/dtree/" /> <c:if test='${fn:contains(imagePath, ";")}'>
     <c:set var="imagePath" value='${fn:substringBefore(imagePath, ";")}' />
   </c:if>
-  <div id="navigation" ${devStyle}><c:if test="${actionBean.developmentSystem == true}">
-    <span style="font-weight: bold; font-size: 140%">Developmentsystem!</span>
-  </c:if>
+  <div id="navigation">
 
   <p style="text-align: left; margin-left: 4px;"><img src="<c:url value='/secure/Logo'/>" /></p>
   <script type="text/javascript">
+  /* <![CDATA[ */
       dtree = new dTree('dtree', '${imagePath}' );
       dtree.icon.root = "<c:url value='/images/dtree/micromata_icon.png' />";
       dtree.config.folderLinks = false;
@@ -120,6 +132,7 @@
       </c:forEach>
 
       document.write(dtree);
+      /* ]]> */
     </script> <!-- DIV .dtree END -->
   <p style="margin-top: 1em; margin-bottom: 1em;"><c:choose>
     <c:when test="${actionBean.context.loggedIn == true}">

@@ -116,8 +116,8 @@ public abstract class AbstractBasePage extends WebPage
     body.add(navigationContainer);
     final Label developmentsystemLabel = new Label("developmentsystem", "Developmentsystem!");
     navigationContainer.add(developmentsystemLabel);
-    if (getWicketApplication().isDevelopmentSystem() == true) {
-      navigationContainer.add(new SimpleAttributeModifier("style", WebConstants.CSS_BACKGROUND_COLOR_RED));
+    if (getWicketApplication().isDevelopmentSystem() == false) {
+      navigationContainer.add(new SimpleAttributeModifier("class","developersdevelopersdevelopers"));
     } else {
       developmentsystemLabel.setVisible(false);
     }
