@@ -13,13 +13,15 @@ package org.projectforge;
 
 public class Version
 {
-  public static final String APP_ID = "ProjectForge 2010";
+  public static final String APP_ID = "ProjectForge";
+
+  public static final String APP_TITLE = "ProjectForge 2010";
 
   public static final String NUMBER = "3.4.2";
 
-  public static final String RELEASE_DATE = "2010-11-03";
+  public static final String RELEASE_DATE = "2010-11-08";
 
-  public static final String RELEASE_TIMESTAMP = "2010-11-03 09:06";
+  public static final String RELEASE_TIMESTAMP = "2010-11-08 00:36";
 }
 
 		

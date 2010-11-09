@@ -2,7 +2,7 @@
 <images>
   <image path="accept.png" width="16" height="16"/>
   <image path="add.png" width="16" height="16"/>
-  <image path="appleTouchIcon.png" width="45" height="45"/>
+  <image path="appleTouchIcon.png" width="114" height="114"/>
   <image path="arrow-down.png" width="16" height="16"/>
   <image path="arrow_undo.png" width="16" height="16"/>
   <image path="asteriskOperatorPanel.png" width="137" height="76"/>

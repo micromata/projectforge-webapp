@@ -123,15 +123,19 @@
         <include name="src/main/webapp/**/*.tld" />
         <include name="src/main/webapp/**/*.ttf" />
         <include name="version.xml" />
-        <include name="LICENSE.txt" />
-        <include name="doc/*.html" />
-        <include name="doc/*.pdf" />
-        <include name="doc/images/*.gif" />
-        <include name="doc/images/*.jpg" />
-        <include name="doc/images/*.png" />
         <include name="pom-public.xml"/>
       	<exclude name="src/**/ModifyJavaFileHeadersTest.java" />
       </fileset>
+			<fileset dir="../../trunk" casesensitive="yes">
+				<include name="doc/**/*.html" />
+				<include name="doc/**/*.pdf" />
+				<include name="doc/images/*.gif" />
+				<include name="doc/images/*.jpg" />
+				<include name="doc/images/*.png" />
+			</fileset>
+			<fileset dir="../../trunk" casesensitive="yes">
+				<include name="LICENSE.txt" />
+			</fileset>
     </copy>
     <move file="${target}/${dist-src-dir}/pom-public.xml" tofile="${target}/${dist-src-dir}/pom.xml" />
 		<zip destfile="${target}/${dist-src-dir}.zip" basedir="${target}" includes="${dist-src-dir}/**" />
