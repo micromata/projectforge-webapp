@@ -58,6 +58,8 @@ import org.projectforge.fibu.kost.Kost2ArtDO;
 import org.projectforge.fibu.kost.Kost2ArtDao;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.Kost2Dao;
+import org.projectforge.fibu.kost.KostZuweisungDO;
+import org.projectforge.fibu.kost.KostZuweisungDao;
 import org.projectforge.fibu.kost.reporting.ReportGeneratorList;
 import org.projectforge.task.ScriptingTaskTree;
 import org.projectforge.task.TaskDO;
@@ -92,6 +94,8 @@ public class ScriptDao extends BaseDao<ScriptDO>
   private Kost2ArtDao kost2ArtDao;
 
   private Kost2Dao kost2Dao;
+
+  private KostZuweisungDao kostZuweisungDao;
 
   private KundeDao kundeDao;
 
@@ -175,6 +179,7 @@ public class ScriptDao extends BaseDao<ScriptDO>
     scriptVariables.put("kost1Dao", new Kost1ScriptingDao(kost1Dao));
     scriptVariables.put("kost2Dao", new ScriptingDao<Kost2DO>(kost2Dao));
     scriptVariables.put("kost2ArtDao", new ScriptingDao<Kost2ArtDO>(kost2ArtDao));
+    scriptVariables.put("kostZuweisungDao", new ScriptingDao<KostZuweisungDO>(kostZuweisungDao));
     scriptVariables.put("kundeDao", new ScriptingDao<KundeDO>(kundeDao));
     scriptVariables.put("projektDao", new ScriptingDao<ProjektDO>(projektDao));
     scriptVariables.put("rechnungDao", new ScriptingDao<RechnungDO>(rechnungDao));
@@ -236,6 +241,11 @@ public class ScriptDao extends BaseDao<ScriptDO>
   public void setKost2Dao(Kost2Dao kost2Dao)
   {
     this.kost2Dao = kost2Dao;
+  }
+  
+  public void setKostZuweisungDao(KostZuweisungDao kostZuweisungDao)
+  {
+    this.kostZuweisungDao = kostZuweisungDao;
   }
 
   public void setKundeDao(KundeDao kundeDao)
