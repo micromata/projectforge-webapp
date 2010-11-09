@@ -90,13 +90,15 @@
   <decorator:head />
   </head>
   <c:if test="${actionBean.developmentSystem == true}">
-    <c:set var="devStyle" value='' />
+    <c:set var="devStyle" value='style="background-color: #eeaaaa;"' />
   </c:if>
   <body onload="<decorator:getProperty property='body.onload' />">
   <div id="container"><!-- left --> <c:url var="imagePath" value="/images/dtree/" /> <c:if test='${fn:contains(imagePath, ";")}'>
     <c:set var="imagePath" value='${fn:substringBefore(imagePath, ";")}' />
   </c:if>
-  <div id="navigation">
+  <div id="navigation" ${devStyle}><c:if test="${actionBean.developmentSystem == true}">
+    <span style="font-weight: bold; font-size: 140%">Developmentsystem!</span>
+  </c:if>
 
   <p style="text-align: left; margin-left: 4px;"><img src="<c:url value='/secure/Logo'/>" /></p>
   <script type="text/javascript">
