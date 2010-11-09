@@ -173,7 +173,6 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
       this.jiraIssueType = recentJiraIssueType;
     }
     typeChoice.setNullValid(false);
-    typeChoice.setRequired(true);
     add(typeChoice);
 
     final AjaxButton createJiraIssueButton = new AjaxButton("createJiraIssue", new Model<String>(getString("meb.actions.createJIRAIssue"))) {
