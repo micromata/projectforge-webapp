@@ -44,7 +44,7 @@ public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditF
   public MyAccountEditPage(final PageParameters parameters)
   {
     super(parameters, "user.myAccount");
-    final PFUserDO loggedInUser = userDao.getById(PFUserContext.getUserId());
+    final PFUserDO loggedInUser = userDao.internalGetById(PFUserContext.getUserId());
     super.init(loggedInUser);
     this.showHistory = false;
   }
