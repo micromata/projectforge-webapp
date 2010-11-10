@@ -118,6 +118,11 @@
       <param-value>public, max-age=7200</param-value>
     </init-param>
   </filter>
+  <filter>
+    <filter-name>TutorialFilter</filter-name>
+    <filter-class>org.projectforge.web.doc.TutorialFilter</filter-class>
+  </filter>
+
   <!-- invocation of the filters -->
   <filter-mapping>
     <filter-name>LoginFilter</filter-name>
@@ -165,6 +170,11 @@
   <filter-mapping>
     <filter-name>sitemesh</filter-name>
     <url-pattern>*.action</url-pattern>
+  </filter-mapping>
+  <!-- For online tutorial with action links. -->
+  <filter-mapping>
+    <filter-name>TutorialFilter</filter-name>
+    <url-pattern>/doc/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>expire</filter-name>
@@ -339,9 +349,8 @@
   </security-constraint>
   <resource-ref>
     <description>Resourcename of the database to use</description>
-    <res-ref-name>java:comp/env/ProjectForgeDS</res-ref-name>
+    <res-ref-name>jdbc/ProjectForgeDS</res-ref-name>
     <res-type>javax.sql.DataSource</res-type>
     <res-auth>Container</res-auth>
-    <res-sharing-scope>Unshareable</res-sharing-scope>
   </resource-ref>
 </web-app>

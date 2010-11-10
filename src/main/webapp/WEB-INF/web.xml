@@ -118,6 +118,11 @@
       <param-value>public, max-age=7200</param-value>
     </init-param>
   </filter>
+  <filter>
+    <filter-name>TutorialFilter</filter-name>
+    <filter-class>org.projectforge.web.doc.TutorialFilter</filter-class>
+  </filter>
+
   <!-- invocation of the filters -->
   <filter-mapping>
     <filter-name>LoginFilter</filter-name>
@@ -165,6 +170,11 @@
   <filter-mapping>
     <filter-name>sitemesh</filter-name>
     <url-pattern>*.action</url-pattern>
+  </filter-mapping>
+  <!-- For online tutorial with action links. -->
+  <filter-mapping>
+    <filter-name>TutorialFilter</filter-name>
+    <url-pattern>/doc/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>expire</filter-name>
@@ -319,24 +329,13 @@
     <location>/error.jsp</location>
   </error-page>
   <!-- Uncomment the folloging security constraints to ensure, that login and pages under /secure and /wa are accessed via https -->
-  <!-- security-constraint>
-    <web-resource-collection>
-      <web-resource-name>Applikation</web-resource-name>
-      <url-pattern>/secure/*</url-pattern>
-    </web-resource-collection>
-    <user-data-constraint>
-      <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-    </user-data-constraint>
-  </security-constraint>
-  <security-constraint>
-    <web-resource-collection>
-      <web-resource-name>wicket.app</web-resource-name>
-      <url-pattern>/wa/*</url-pattern>
-    </web-resource-collection>
-    <user-data-constraint>
-      <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-    </user-data-constraint>
-  </security-constraint-->
+  <!--
+    security-constraint> <web-resource-collection> <web-resource-name>Applikation</web-resource-name> <url-pattern>/secure/*</url-pattern>
+    </web-resource-collection> <user-data-constraint> <transport-guarantee>CONFIDENTIAL</transport-guarantee> </user-data-constraint>
+    </security-constraint> <security-constraint> <web-resource-collection> <web-resource-name>wicket.app</web-resource-name>
+    <url-pattern>/wa/*</url-pattern> </web-resource-collection> <user-data-constraint> <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+    </user-data-constraint> </security-constraint
+  -->
   <resource-ref>
     <description>Resourcename of the database to use</description>
     <res-ref-name>jdbc/ProjectForgeDS</res-ref-name>
