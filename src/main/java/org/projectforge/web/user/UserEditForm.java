@@ -58,12 +58,14 @@ import org.projectforge.web.wicket.components.TooltipImage;
 
 public class UserEditForm extends UserBaseEditForm<UserEditPage>
 {
+  public static final String TUTORIAL_DEFAULT_PASSWORD = "test";
+
   private static final long serialVersionUID = 7872294377838461659L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserEditForm.class);
 
   private static final String MAGIC_PASSWORD = "******";
-
+  
   @SpringBean(name = "userRightDao")
   private UserRightDao userRightDao;
 
@@ -98,6 +100,10 @@ public class UserEditForm extends UserBaseEditForm<UserEditPage>
   protected void init()
   {
     super.init();
+    if (data != null && TUTORIAL_DEFAULT_PASSWORD.equals(data.getPassword()) == true) {
+      encryptedPassword = userDao.encryptPassword(TUTORIAL_DEFAULT_PASSWORD);
+      password = passwordRepeat = MAGIC_PASSWORD;
+    }
     add(new RequiredMaxLengthTextField("username", new PropertyModel<String>(getData(), "username")).add(new AbstractValidator<String>() {
       @Override
       protected void onValidate(IValidatable<String> validatable)
