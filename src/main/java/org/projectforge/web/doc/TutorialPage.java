@@ -31,6 +31,7 @@ import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
+import org.projectforge.web.user.UserEditForm;
 import org.projectforge.web.user.UserEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -100,7 +101,7 @@ public class TutorialPage extends AbstractSecuredPage
     userDO.setLastname(lastName);
     userDO.setFirstname(firstName);
     userDO.setDescription(description);
-    userDO.setPassword("test123");
+    userDO.setPassword(UserEditForm.TUTORIAL_DEFAULT_PASSWORD);
     return userDO;
   }
 
