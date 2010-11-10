@@ -65,6 +65,7 @@ import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.core.ConfigurationListPage;
 import org.projectforge.web.core.LoginFilter;
+import org.projectforge.web.doc.TutorialPage;
 import org.projectforge.web.fibu.AuftragEditPage;
 import org.projectforge.web.fibu.AuftragListPage;
 import org.projectforge.web.fibu.BankAccountListPage;
@@ -191,6 +192,8 @@ public class WicketApplication extends WebApplication
   private static final String BOOKMARK_TIMESHEET_LIST = "timesheetList";
 
   private static final String BOOKMARK_TIMESHEET_EDIT = "timesheetEdit";
+
+  private static final String BOOKMARK_TUTORIAL = "tutorial";
 
   private static final String BOOKMARK_USER_LIST = "userList";
 
@@ -359,6 +362,7 @@ public class WicketApplication extends WebApplication
     mountPage(BOOKMARK_TASK_LIST, TaskListPage.class);
     mountPage(BOOKMARK_TIMESHEET_LIST, TimesheetListPage.class);
     mountPage(BOOKMARK_TIMESHEET_EDIT, TimesheetEditPage.class);
+    mountPage(BOOKMARK_TUTORIAL, TutorialPage.class);
     mountPage(BOOKMARK_USER_LIST, UserListPage.class);
     mountPage(BOOKMARK_USER_PREF_LIST, UserPrefListPage.class);
     mountPage(BOOKMARK_VIEW_ADDRESS, AddressViewPage.class);

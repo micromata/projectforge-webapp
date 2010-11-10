@@ -60,6 +60,8 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
 {
   public static final String PARAMETER_KEY_ID = "id";
 
+  public static final String PARAMETER_KEY_DATA_PRESET = "__data";
+
   protected F form;
 
   protected List<DisplayHistoryEntry> historyEntries;
@@ -99,7 +101,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
     init(null);
   }
 
-  @SuppressWarnings("serial")
+  @SuppressWarnings( { "serial", "unchecked"})
   protected void init(O data)
   {
     final StringBuffer buf = new StringBuffer();
@@ -117,7 +119,10 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
         data = getBaseDao().getById(id);
       }
       if (data == null) {
-        data = getBaseDao().newInstance();
+        data = (O) getPageParameters().get(PARAMETER_KEY_DATA_PRESET);
+        if (data == null) {
+          data = getBaseDao().newInstance();
+        }
       }
     }
     form = newEditForm(this, data);
@@ -169,7 +174,6 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    @SuppressWarnings("unchecked")
     final IColumn<DisplayHistoryEntry>[] colArray = columns.toArray(new IColumn[columns.size()]);
     final IDataProvider<DisplayHistoryEntry> dataProvider = new ListDataProvider<DisplayHistoryEntry>(getHistory());
     final DataTable<DisplayHistoryEntry> dataTable = new DataTable<DisplayHistoryEntry>("historyTable", colArray, dataProvider, 100) {
