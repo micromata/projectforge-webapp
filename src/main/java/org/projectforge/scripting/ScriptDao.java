@@ -43,6 +43,8 @@ import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.EmployeeDao;
+import org.projectforge.fibu.EmployeeSalaryDO;
+import org.projectforge.fibu.EmployeeSalaryDao;
 import org.projectforge.fibu.EmployeeScriptingDao;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.KundeDao;
@@ -71,7 +73,6 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
 
-
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -89,6 +90,8 @@ public class ScriptDao extends BaseDao<ScriptDO>
 
   private EmployeeDao employeeDao;
 
+  private EmployeeSalaryDao employeeSalaryDao;
+
   private Kost1Dao kost1Dao;
 
   private Kost2ArtDao kost2ArtDao;
@@ -104,7 +107,7 @@ public class ScriptDao extends BaseDao<ScriptDO>
   private RechnungDao rechnungDao;
 
   private TaskDao taskDao;
-  
+
   private TaskTree taskTree;
 
   private TimesheetDao timesheetDao;
@@ -122,8 +125,7 @@ public class ScriptDao extends BaseDao<ScriptDO>
 
   /**
    * Copy old script as script backup if modified.
-   * @see org.projectforge.core.BaseDao#onChange(org.projectforge.core.ExtendedBaseDO,
-   *      org.projectforge.core.ExtendedBaseDO)
+   * @see org.projectforge.core.BaseDao#onChange(org.projectforge.core.ExtendedBaseDO, org.projectforge.core.ExtendedBaseDO)
    */
   @Override
   protected void onChange(final ScriptDO obj, final ScriptDO dbObj)
@@ -176,6 +178,7 @@ public class ScriptDao extends BaseDao<ScriptDO>
     scriptVariables.put("buchungssatzDao", new ScriptingDao<BuchungssatzDO>(buchungssatzDao));
     scriptVariables.put("eingangsrechnungDao", new ScriptingDao<EingangsrechnungDO>(eingangsrechnungDao));
     scriptVariables.put("employeeDao", new EmployeeScriptingDao(employeeDao));
+    scriptVariables.put("employeeSalaryDao", new ScriptingDao<EmployeeSalaryDO>(employeeSalaryDao));
     scriptVariables.put("kost1Dao", new Kost1ScriptingDao(kost1Dao));
     scriptVariables.put("kost2Dao", new ScriptingDao<Kost2DO>(kost2Dao));
     scriptVariables.put("kost2ArtDao", new ScriptingDao<Kost2ArtDO>(kost2ArtDao));
@@ -218,14 +221,19 @@ public class ScriptDao extends BaseDao<ScriptDO>
     this.eingangsrechnungDao = eingangsrechnungDao;
   }
 
+  public void setBuchungssatzDao(BuchungssatzDao buchungssatzDao)
+  {
+    this.buchungssatzDao = buchungssatzDao;
+  }
+
   public void setEmployeeDao(EmployeeDao employeeDao)
   {
     this.employeeDao = employeeDao;
   }
 
-  public void setBuchungssatzDao(BuchungssatzDao buchungssatzDao)
+  public void setEmployeeSalaryDao(EmployeeSalaryDao employeeSalaryDao)
   {
-    this.buchungssatzDao = buchungssatzDao;
+    this.employeeSalaryDao = employeeSalaryDao;
   }
 
   public void setKost1Dao(Kost1Dao kost1Dao)
@@ -242,7 +250,7 @@ public class ScriptDao extends BaseDao<ScriptDO>
   {
     this.kost2Dao = kost2Dao;
   }
-  
+
   public void setKostZuweisungDao(KostZuweisungDao kostZuweisungDao)
   {
     this.kostZuweisungDao = kostZuweisungDao;
@@ -272,7 +280,7 @@ public class ScriptDao extends BaseDao<ScriptDO>
   {
     this.taskDao = taskDao;
   }
-  
+
   public void setTaskTree(TaskTree taskTree)
   {
     this.taskTree = taskTree;
