@@ -88,6 +88,17 @@ public class UserGroupCache extends AbstractCache
     return getGroupMap().get(groupId);
   }
 
+  public GroupDO getGroup(final ProjectForgeGroup group)
+  {
+    checkRefresh();
+    for (final GroupDO g : groupMap.values()) {
+      if (group.equals(g.getName()) == true) {
+        return g;
+      }
+    }
+    return null;
+  }
+
   public String getGroupname(Integer groupId)
   {
     checkRefresh();
