@@ -60,12 +60,14 @@ public class UserEditForm extends UserBaseEditForm<UserEditPage>
 {
   public static final String TUTORIAL_DEFAULT_PASSWORD = "test";
 
+  public static final String TUTORIAL_ADD_GROUPS = "addGroups";
+
   private static final long serialVersionUID = 7872294377838461659L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserEditForm.class);
 
   private static final String MAGIC_PASSWORD = "******";
-  
+
   @SpringBean(name = "userRightDao")
   private UserRightDao userRightDao;
 
@@ -95,14 +97,18 @@ public class UserEditForm extends UserBaseEditForm<UserEditPage>
     super(parentPage, data);
   }
 
-  @SuppressWarnings("serial")
+  @SuppressWarnings( { "serial", "unchecked"})
   @Override
   protected void init()
   {
     super.init();
-    if (data != null && TUTORIAL_DEFAULT_PASSWORD.equals(data.getPassword()) == true) {
-      encryptedPassword = userDao.encryptPassword(TUTORIAL_DEFAULT_PASSWORD);
-      password = passwordRepeat = MAGIC_PASSWORD;
+    List<Integer> groupsToAdd = null;
+    if (data != null) {
+      if (TUTORIAL_DEFAULT_PASSWORD.equals(data.getPassword()) == true) {
+        encryptedPassword = userDao.encryptPassword(TUTORIAL_DEFAULT_PASSWORD);
+        password = passwordRepeat = MAGIC_PASSWORD;
+      }
+      groupsToAdd = (List<Integer>) getParentPage().getPageParameters().get(TUTORIAL_ADD_GROUPS);
     }
     add(new RequiredMaxLengthTextField("username", new PropertyModel<String>(getData(), "username")).add(new AbstractValidator<String>() {
       @Override
@@ -263,6 +269,9 @@ public class UserEditForm extends UserBaseEditForm<UserEditPage>
       fullList.add(new KeyValueBean<Integer, String>(group.getId(), group.getName()));
     }
     this.groups = new TwoListHelper<Integer, String>(fullList, assignedGroups);
+    if (groupsToAdd != null) {
+      groups.assign(groupsToAdd);
+    }
     this.groups.sortLists();
     valuesToAssignChoice = new ListMultipleChoice<Integer>("valuesToAssign");
     valuesToAssignChoice.setModel(new PropertyModel<Collection<Integer>>(this, "valuesToAssign"));
