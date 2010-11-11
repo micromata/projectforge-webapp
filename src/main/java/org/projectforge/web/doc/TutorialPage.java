@@ -23,14 +23,20 @@
 
 package org.projectforge.web.doc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.user.UserEditForm;
 import org.projectforge.web.user.UserEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -54,9 +60,12 @@ public class TutorialPage extends AbstractSecuredPage
   private String type;
 
   private String reference;
-  
-  @SpringBean(name="userDao")
+
+  @SpringBean(name = "userDao")
   private UserDao userDao;
+
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
 
   public TutorialPage(final PageParameters params)
   {
@@ -75,18 +84,19 @@ public class TutorialPage extends AbstractSecuredPage
     final String tutorialReference = "{tutorial-ref:" + reference + "}";
     final QueryFilter filter = new QueryFilter();
     filter.add(Restrictions.ilike("description", "%" + tutorialReference + "%"));
-    if (CollectionUtils.isNotEmpty(userDao.internalGetList(filter))==true) {
+    if (CollectionUtils.isNotEmpty(userDao.internalGetList(filter)) == true) {
       setResponsePage(new MessagePage("tutorial.objectAlreadyCreated"));
       return;
     }
     final PFUserDO user;
-    if ("Linda".equals(reference) == true) {
+    final PageParameters params = new PageParameters();
+    if ("linda".equals(reference) == true) {
       user = createUser("linda", "Evans", "Linda", "l.evans@javagurus.com", addTutorialReference("Project manager", tutorialReference));
+      params.put(UserEditForm.TUTORIAL_ADD_GROUPS, addGroups(user, ProjectForgeGroup.PROJECT_MANAGER));
     } else {
       setResponsePage(new MessagePage("tutorial.unknown"));
       return;
     }
-    final PageParameters params = new PageParameters();
     params.put(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, user);
     final UserEditPage userEditPage = new UserEditPage(params);
     setResponsePage(userEditPage);
@@ -103,6 +113,13 @@ public class TutorialPage extends AbstractSecuredPage
     userDO.setDescription(description);
     userDO.setPassword(UserEditForm.TUTORIAL_DEFAULT_PASSWORD);
     return userDO;
+  }
+  
+  private List<Integer> addGroups(final PFUserDO user, ProjectForgeGroup...groups) {
+    final List<Integer> groupsToAssign = new ArrayList<Integer>();
+    final GroupDO group = userGroupCache.getGroup(ProjectForgeGroup.PROJECT_MANAGER);
+    groupsToAssign.add(group.getId());
+    return groupsToAssign;
   }
 
   private String addTutorialReference(final String text, final String tutorialReference)
