@@ -24,10 +24,10 @@ table th{text-align:left;padding:2px 5px 3px 5px;}
 table td{text-align:left;padding:2px 5px 3px 5px;}
 #container{margin:0 0 auto 0;padding:0;height:100%;position:absolute;top:0px;width:100%;}
 #contentMenu{margin:0;padding:0 0 0 30px;height:29px;border-bottom:1px solid #000;}
-#navigation{float:left;padding:0;margin:0;border:none;width:179px;height:100%;overflow:hidden;}
+#navigation{float:left;padding:0;margin:0;border:none;width:190px;height:100%;overflow:auto;}
 #navigation *{}
 #menu{width:200px;margin:0;padding:0;}
-#content{margin:0 0 0 179px;padding:0;}
+#content{margin:0 0 0 193px;padding:0;}
 #footer{display:none;}
 #content fieldset{border:none;margin:0;padding:0;}
 #content form fieldset{margin:0;padding:20px 0 0 0;}
@@ -116,7 +116,7 @@ div.progress-overbooked{width:50px;height:8px;background-color:#ff0000;border-wi
 div.progress-overbooked div{height:8px;background-color:#ff8000;border-width:0px 1px 0px 0px;border-style:solid;border-color:black;}
 div.progress-overbooked-min{width:50px;height:8px;background-color:#ff0000;border-width:1px;border-style:solid;border-color:black;}
 div.progress-overbooked-min div{height:8px;background-color:#eeeeee;border-width:0px 1px 0px 0px;border-style:solid;border-color:black;}
-#bookmarkIcon{position:absolute;top:4px;left:183px;}
+#bookmarkIcon{position:absolute;top:4px;left:193px;}
 #bookmark{position:absolute;top:30px;left:183px;display:none;background-color:#FFFF99;padding:6px;margin:0px;border-width:1px;border-style:solid;border-color:black;}
 .errors{margin:20px;padding:10px;color:#EC4031;border:1px solid #EC4031;background-color:#F2EFB2;font-weight:bold;}
 .errors li{font-weight:normal;}
