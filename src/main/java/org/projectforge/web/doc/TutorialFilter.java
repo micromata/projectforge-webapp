@@ -26,6 +26,8 @@ package org.projectforge.web.doc;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -46,6 +48,8 @@ import org.projectforge.web.wicket.WicketUtils;
  */
 public class TutorialFilter implements Filter
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TutorialFilter.class);
+
   public void destroy()
   {
     // do nothing
@@ -67,10 +71,51 @@ public class TutorialFilter implements Filter
     final CharResponseWrapper wrapper = new CharResponseWrapper((HttpServletResponse) resp);
     chain.doFilter(req, wrapper);
     final CharArrayWriter caw = new CharArrayWriter();
-    final String tutorialUrl = ((HttpServletResponse)resp).encodeURL(WicketUtils.getAbsoluteUrl("/wa/tutorial"));
-    String html = wrapper.toString();
-    html = html.replace("{actionLink}", tutorialUrl);
-    caw.write(html);
+    final String tutorialUrl = ((HttpServletResponse) resp).encodeURL(WicketUtils.getAbsoluteUrl("/wa/tutorial"));
+    final String regexp = "(\\{actionLink\\|)([a-zA-Z0-9]*)\\|([a-zA-Z0-9]*)(\\})([a-zA-Z0-9 ]*)(\\{/actionLink\\})";
+    final Pattern p = Pattern.compile(regexp, Pattern.MULTILINE | Pattern.DOTALL); // Compiles regular expression into Pattern.
+    final Matcher m = p.matcher(wrapper.toString());
+    final StringBuffer buf = new StringBuffer();
+    // final String html = m.replaceAll(tutorialUrl + "/Hurzel");
+    try {
+      while (m.find() == true) {
+        int i = 2;
+        if (m.groupCount() != 6) {
+          buf.append("{actionLink syntax error: " + m.groupCount() + ".}");
+          continue;
+        }
+        // {actionLink|createUser|linda}create{/actionLink}
+        m.appendReplacement(buf, "<a target=\"tutorial\" href=\"");
+        buf.append(tutorialUrl);
+        final String type = m.group(i++); // createUser
+        if (type == null) {
+          buf.append("\">create</a>");
+          continue;
+        }
+        buf.append("?type=").append(type).append("&ref=");
+        final String ref = m.group(i++);
+        if (ref == null) {
+          buf.append("\">create</a>");
+          continue;
+        }
+        buf.append(ref).append("\">");
+        i++; // }
+        final String label = m.group(i++);
+        if (label == null) {
+          buf.append("\">create</a>");
+          continue;
+        }
+        buf.append(label);
+        buf.append("</a>");
+      }
+      m.appendTail(buf);
+    } catch (final Exception ex) {
+      log.error(ex.getMessage(), ex);
+    }
+
+    // html = html.replace("{actionLink}", tutorialUrl);
+    // <link url="{actionLink}?type=createUser&amp;ref=linda" target="tutorial">create</link>
+    caw.write(buf.toString());
     // caw.write(wrapper.toString().substring(0, wrapper.toString().indexOf("</body>") - 1));
     // caw.write("<p>\n<center>" + messages.getString("Visitor") + "<font color='red'>" + counter.getCounter() + "</font></center>");
     // caw.write("\n</body></html>");

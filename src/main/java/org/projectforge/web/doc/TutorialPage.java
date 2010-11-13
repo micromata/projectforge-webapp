@@ -32,11 +32,15 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.task.TaskDO;
+import org.projectforge.task.TaskDao;
+import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.task.TaskEditPage;
 import org.projectforge.web.user.UserEditForm;
 import org.projectforge.web.user.UserEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -57,6 +61,8 @@ public class TutorialPage extends AbstractSecuredPage
 
   private static final String TYPE_CREATE_USER = "createUser";
 
+  private static final String TYPE_CREATE_TASK = "createTask";
+
   private String type;
 
   private String reference;
@@ -67,6 +73,12 @@ public class TutorialPage extends AbstractSecuredPage
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
+  @SpringBean(name = "taskDao")
+  private TaskDao taskDao;
+
+  @SpringBean(name = "taskTree")
+  private TaskTree taskTree;
+
   public TutorialPage(final PageParameters params)
   {
     super(params);
@@ -74,6 +86,8 @@ public class TutorialPage extends AbstractSecuredPage
     reference = params.getString(KEY_REF);
     if (TYPE_CREATE_USER.equals(type) == true) {
       createUser();
+    } else if (TYPE_CREATE_TASK.equals(type) == true) {
+      createTask();
     } else {
       setResponsePage(new MessagePage("tutorial.unknown"));
     }
@@ -81,18 +95,22 @@ public class TutorialPage extends AbstractSecuredPage
 
   private void createUser()
   {
-    final String tutorialReference = "{tutorial-ref:" + reference + "}";
+    final String tutorialReference = getTutorialReference(reference);
     final QueryFilter filter = new QueryFilter();
     filter.add(Restrictions.ilike("description", "%" + tutorialReference + "%"));
     if (CollectionUtils.isNotEmpty(userDao.internalGetList(filter)) == true) {
       setResponsePage(new MessagePage("tutorial.objectAlreadyCreated"));
       return;
     }
-    final PFUserDO user;
     final PageParameters params = new PageParameters();
+    final PFUserDO user;
     if ("linda".equals(reference) == true) {
       user = createUser("linda", "Evans", "Linda", "l.evans@javagurus.com", addTutorialReference("Project manager", tutorialReference));
       params.put(UserEditForm.TUTORIAL_ADD_GROUPS, addGroups(user, ProjectForgeGroup.PROJECT_MANAGER));
+    } else if ("dave".equals(reference) == true) {
+      user = createUser("dave", "Jones", "Dave", "d.jones@javagurus.com", addTutorialReference("Developer", tutorialReference));
+    } else if ("betty".equals(reference) == true) {
+      user = createUser("betty", "Brown", "Betty", "b.brown@javagurus.com", addTutorialReference("Developer", tutorialReference));
     } else {
       setResponsePage(new MessagePage("tutorial.unknown"));
       return;
@@ -102,24 +120,9 @@ public class TutorialPage extends AbstractSecuredPage
     setResponsePage(userEditPage);
   }
 
-  private PFUserDO createUser(final String userName, final String lastName, final String firstName, final String email,
-      final String description)
+  private String getTutorialReference(final String reference)
   {
-    final PFUserDO userDO = new PFUserDO();
-    userDO.setUsername(userName);
-    userDO.setEmail(email);
-    userDO.setLastname(lastName);
-    userDO.setFirstname(firstName);
-    userDO.setDescription(description);
-    userDO.setPassword(UserEditForm.TUTORIAL_DEFAULT_PASSWORD);
-    return userDO;
-  }
-  
-  private List<Integer> addGroups(final PFUserDO user, ProjectForgeGroup...groups) {
-    final List<Integer> groupsToAssign = new ArrayList<Integer>();
-    final GroupDO group = userGroupCache.getGroup(ProjectForgeGroup.PROJECT_MANAGER);
-    groupsToAssign.add(group.getId());
-    return groupsToAssign;
+    return "{tutorial-ref:" + reference + "}";
   }
 
   private String addTutorialReference(final String text, final String tutorialReference)
@@ -129,6 +132,58 @@ public class TutorialPage extends AbstractSecuredPage
     } else {
       return text + "\n" + tutorialReference;
     }
+  }
+
+  private PFUserDO createUser(final String userName, final String lastName, final String firstName, final String email,
+      final String description)
+  {
+    final PFUserDO user = new PFUserDO();
+    user.setUsername(userName);
+    user.setEmail(email);
+    user.setLastname(lastName);
+    user.setFirstname(firstName);
+    user.setDescription(description);
+    user.setPassword(UserEditForm.TUTORIAL_DEFAULT_PASSWORD);
+    return user;
+  }
+
+  private List<Integer> addGroups(final PFUserDO user, ProjectForgeGroup... groups)
+  {
+    final List<Integer> groupsToAssign = new ArrayList<Integer>();
+    final GroupDO group = userGroupCache.getGroup(ProjectForgeGroup.PROJECT_MANAGER);
+    groupsToAssign.add(group.getId());
+    return groupsToAssign;
+  }
+
+  private void createTask()
+  {
+    final String tutorialReference = getTutorialReference(reference);
+    final QueryFilter filter = new QueryFilter();
+    filter.add(Restrictions.ilike("description", "%" + tutorialReference + "%"));
+    if (CollectionUtils.isNotEmpty(taskDao.internalGetList(filter)) == true) {
+      setResponsePage(new MessagePage("tutorial.objectAlreadyCreated"));
+      return;
+    }
+    final PageParameters params = new PageParameters();
+    final TaskDO task;
+    if ("JavaGurus".equals(reference) == true) {
+      task = createTask(taskTree.getRootTaskNode().getTask(), "Java Gurus inc.", tutorialReference);
+    } else {
+      setResponsePage(new MessagePage("tutorial.unknown"));
+      return;
+    }
+    params.put(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, task);
+    final TaskEditPage taskEditPage = new TaskEditPage(params);
+    setResponsePage(taskEditPage);
+  }
+
+  private TaskDO createTask(final TaskDO parentTask, final String title, final String description)
+  {
+    final TaskDO task = new TaskDO();
+    task.setParentTask(parentTask);
+    task.setTitle(title);
+    task.setDescription(description);
+    return task;
   }
 
   @Override
