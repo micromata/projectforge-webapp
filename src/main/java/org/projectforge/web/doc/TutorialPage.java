@@ -31,16 +31,19 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.criterion.Restrictions;
+import org.projectforge.core.BaseDao;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
+import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.task.TaskEditPage;
+import org.projectforge.web.user.GroupEditPage;
 import org.projectforge.web.user.UserEditForm;
 import org.projectforge.web.user.UserEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -55,9 +58,13 @@ import org.projectforge.web.wicket.MessagePage;
  */
 public class TutorialPage extends AbstractSecuredPage
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TutorialPage.class);
+
   private static final String KEY_TYPE = "type";
 
   private static final String KEY_REF = "ref";
+
+  private static final String TYPE_CREATE_GROUP = "createGroup";
 
   private static final String TYPE_CREATE_USER = "createUser";
 
@@ -66,6 +73,9 @@ public class TutorialPage extends AbstractSecuredPage
   private String type;
 
   private String reference;
+
+  @SpringBean(name = "groupDao")
+  private GroupDao groupDao;
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
@@ -86,20 +96,20 @@ public class TutorialPage extends AbstractSecuredPage
     reference = params.getString(KEY_REF);
     if (TYPE_CREATE_USER.equals(type) == true) {
       createUser();
+    } else if (TYPE_CREATE_GROUP.equals(type) == true) {
+      createGroup();
     } else if (TYPE_CREATE_TASK.equals(type) == true) {
       createTask();
     } else {
-      setResponsePage(new MessagePage("tutorial.unknown"));
+      log.warn("Unknown tutorial request: type=" + type);
+      setResponsePage(new MessagePage("tutorial.unknown").setWarning(true));
     }
   }
 
   private void createUser()
   {
     final String tutorialReference = getTutorialReference(reference);
-    final QueryFilter filter = new QueryFilter();
-    filter.add(Restrictions.ilike("description", "%" + tutorialReference + "%"));
-    if (CollectionUtils.isNotEmpty(userDao.internalGetList(filter)) == true) {
-      setResponsePage(new MessagePage("tutorial.objectAlreadyCreated"));
+    if (doesEntryAlreadyExist(userDao, tutorialReference) == true) {
       return;
     }
     final PageParameters params = new PageParameters();
@@ -112,7 +122,8 @@ public class TutorialPage extends AbstractSecuredPage
     } else if ("betty".equals(reference) == true) {
       user = createUser("betty", "Brown", "Betty", "b.brown@javagurus.com", addTutorialReference("Developer", tutorialReference));
     } else {
-      setResponsePage(new MessagePage("tutorial.unknown"));
+      log.warn("Unknown tutorial request: user=" + reference);
+      setResponsePage(new MessagePage("tutorial.unknown").setWarning(true));
       return;
     }
     params.put(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, user);
@@ -158,10 +169,7 @@ public class TutorialPage extends AbstractSecuredPage
   private void createTask()
   {
     final String tutorialReference = getTutorialReference(reference);
-    final QueryFilter filter = new QueryFilter();
-    filter.add(Restrictions.ilike("description", "%" + tutorialReference + "%"));
-    if (CollectionUtils.isNotEmpty(taskDao.internalGetList(filter)) == true) {
-      setResponsePage(new MessagePage("tutorial.objectAlreadyCreated"));
+    if (doesEntryAlreadyExist(taskDao, tutorialReference) == true) {
       return;
     }
     final PageParameters params = new PageParameters();
@@ -169,7 +177,8 @@ public class TutorialPage extends AbstractSecuredPage
     if ("JavaGurus".equals(reference) == true) {
       task = createTask(taskTree.getRootTaskNode().getTask(), "Java Gurus inc.", tutorialReference);
     } else {
-      setResponsePage(new MessagePage("tutorial.unknown"));
+      log.warn("Unknown tutorial request: task=" + reference);
+      setResponsePage(new MessagePage("tutorial.unknown").setWarning(true));
       return;
     }
     params.put(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, task);
@@ -184,6 +193,67 @@ public class TutorialPage extends AbstractSecuredPage
     task.setTitle(title);
     task.setDescription(description);
     return task;
+  }
+
+  private void createGroup()
+  {
+    final String tutorialReference = getTutorialReference(reference);
+    if (doesEntryAlreadyExist(groupDao, tutorialReference) == true) {
+      return;
+    }
+    final PageParameters params = new PageParameters();
+    final GroupDO group;
+    if ("JavaGurusEmployees".equals(reference) == true) {
+      group = createGroup("JavaGurus employees", "linda", "dave", "betty");
+    } else {
+      log.warn("Unknown tutorial request: group=" + reference);
+      setResponsePage(new MessagePage("tutorial.unknown").setWarning(true));
+      return;
+    }
+    if (group != null) {
+      group.setDescription(tutorialReference);
+      params.put(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, group);
+      final GroupEditPage groupEditPage = new GroupEditPage(params);
+      setResponsePage(groupEditPage);
+    }
+  }
+
+  private GroupDO createGroup(final String name, final String... usernames)
+  {
+    final GroupDO group = new GroupDO();
+    group.setName(name);
+    if (usernames != null) {
+      for (final String username : usernames) {
+        final PFUserDO user = (PFUserDO) getEntry(userDao, getTutorialReference(username));
+        if (user == null) {
+          log.warn("Unknown tutorial request (user for group=" + reference + " not found). user=" + username);
+          setResponsePage(new MessagePage("tutorial.unknown").setWarning(true));
+          return null;
+        }
+        group.addUser(user);
+      }
+    }
+    return group;
+  }
+
+  private boolean doesEntryAlreadyExist(final BaseDao< ? > dao, final String tutorialReference)
+  {
+    if (getEntry(dao, tutorialReference) != null) {
+      setResponsePage(new MessagePage("tutorial.objectAlreadyCreated", tutorialReference).setWarning(true));
+      return true;
+    }
+    return false;
+  }
+
+  private Object getEntry(final BaseDao< ? > dao, final String tutorialReference)
+  {
+    final QueryFilter filter = new QueryFilter();
+    filter.add(Restrictions.ilike("description", "%" + tutorialReference + "%"));
+    final List< ? > list = dao.internalGetList(filter);
+    if (CollectionUtils.isNotEmpty(dao.internalGetList(filter)) == true) {
+      return list.get(0);
+    }
+    return null;
   }
 
   @Override
