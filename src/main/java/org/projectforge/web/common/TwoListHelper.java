@@ -79,6 +79,15 @@ public class TwoListHelper<K, V extends Comparable<V>> implements Serializable
     this.assignedItems = assignedList;
   }
 
+  public List<K> getAssignedValues()
+  {
+    final List<K> result = new ArrayList<K>();
+    for (final KeyValueBean<K, V> entry : this.assignedItems) {
+      result.add(entry.getKey());
+    }
+    return result;
+  }
+
   /** Gets the actual list of unassigned values. */
   public List<KeyValueBean<K, V>> getUnassignedItems()
   {
@@ -189,7 +198,6 @@ public class TwoListHelper<K, V extends Comparable<V>> implements Serializable
     }
     sb.append("]");
   }
-
 
   public void sortLists()
   {
