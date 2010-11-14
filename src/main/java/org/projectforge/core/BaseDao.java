@@ -161,6 +161,11 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   protected boolean avoidNullIdCheckBeforeSave;
 
   /**
+   * Set this to true if you overload {@link #afterUpdate(ExtendedBaseDO, ExtendedBaseDO)} and you need the origin data base entryfterup.
+   */
+  protected boolean supportAfterUpdate = false;
+
+  /**
    * Get all declared hibernate search fields. These fields are defined over annotations in the database object class. The names are the
    * property names or, if defined the name declared in the annotation of a field. <br/>
    * The user can search in these fields explicit by typing e. g. authors:beck (<field>:<searchString>)
@@ -749,6 +754,14 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   }
 
   /**
+   * This method will be called after inserting. Does nothing at default.
+   * @param obj The inserted object
+   */
+  protected void afterSave(final O obj)
+  {
+  }
+
+  /**
    * This method will be called before inserting, updating, deleting or marking the data object as deleted. Does nothing at default.
    */
   protected void onSaveOrModify(final O obj)
@@ -756,7 +769,8 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   }
 
   /**
-   * This method will be called after updating. Does nothing at default.
+   * This method will be called after updating. Does nothing at default. PLEASE NOTE: If you overload this method don't forget to set
+   * {@link #supportAfterUpdate} to true, otherwise you won't get the origin data base object!
    * @param obj The modified object
    * @param dbObj The object from data base before modification.
    */
@@ -792,6 +806,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     log.info("New object added (" + id + "): " + obj.toString());
     prepareHibernateSearch(obj, OperationType.INSERT);
     afterSaveOrModify(obj);
+    afterSave(obj);
     return id;
   }
 
@@ -893,6 +908,13 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       checkUpdateAccess(obj, dbObj);
     }
     onChange(obj, dbObj);
+    final O dbObjBackup;
+    if (supportAfterUpdate == true) {
+      dbObjBackup = newInstance();
+      copyValues(dbObj, dbObjBackup);
+    } else {
+      dbObjBackup = null;
+    }
     // Copy all values of modified user to database object, ignore field 'deleted'.
     boolean result = copyValues(obj, dbObj, "deleted");
     if (result == true) {
@@ -906,7 +928,9 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     }
     prepareHibernateSearch(obj, OperationType.UPDATE);
     afterSaveOrModify(obj);
-    afterUpdate(obj, dbObj);
+    if (supportAfterUpdate == true) {
+      afterUpdate(obj, dbObjBackup);
+    }
     return result;
   }
 
