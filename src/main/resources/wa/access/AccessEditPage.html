@@ -1,0 +1,60 @@
+
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<table>
+  <wicket:extend>
+    <tr>
+      <th><wicket:message key="name" /></th>
+      <td><input class="stdtext" wicket:id="name" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="organization" /></th>
+      <td><input class="stdtext" wicket:id="organization" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="description" /></th>
+      <td colspan="3"><textarea class="stdtext" wicket:id="description" style="height: 10ex;">[Beschreibungstext]</textarea></td>
+    </tr>
+    <tr class="hRuler">
+      <td colspan="4"></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="group.assignedUsers" /></th>
+      <td colspan="3">
+
+      <table style="width: 100%; margin: 0; padding: 0; border-collapse: collapse; border: none;">
+        <colgroup>
+          <col width="45%" />
+          <col width="10%" />
+          <col width="45%" />
+        </colgroup>
+        <tr>
+          <td style="padding: 0; border: none;"><wicket:message key="group.assignedUsers" /></td>
+          <td style="padding: 0; border: none;"></td>
+          <td style="padding: 0; border: none;"><wicket:message key="group.unassignedUsers" /></td>
+        </tr>
+        <tr>
+          <td style="padding: 0; border: none; width: 40%;"><select style="width: 100%;" name="valuesToUnassign" wicket:id="valuesToUnassign"
+            class="stdtext" multiple="multiple" size="15">
+            <option value="1234">Dave</option>
+          </select></td>
+          <td style="text-align: center; width: 20%;">
+          <p><a wicket:id="unassignButton" href="#"><img src="/images/button_assignToRight.png" wicket:id="buttonUnassignImage" /></a></p>
+          <p><a wicket:id="assignButton" href="#"><img src="/images/button_assignToLeft.png" wicket:id="buttonAssignImage" /></a></p>
+          </td>
+          <td style="padding: 0; border: none; width: 40%;"><select style="width: 100%;" name="valuesToAssign" wicket:id="valuesToAssign"
+            class="stdtext" multiple="multiple" size="15">
+            <option value="1234">Linda</option>
+          </select></td>
+        </tr>
+      </table>
+      </td>
+    </tr>
+  </wicket:extend>
+</table>
+</body>
+</html>
