@@ -20,28 +20,37 @@
       <td><input type="checkbox" wicket:id="recursiveCheckBox" id="recursive" /></td>
     </tr>
     <tr class="hRuler">
-      <td colspan="4"></td>
+      <td colspan="2"></td>
     </tr>
     <tr>
-        <th><wicket:message key="access.accessTable" /></th>
-        <td>
-        <table>
-          <tr>
-            <th></th>
-            <th><wicket:message key="access.type.select" /></th>
-            <th><wicket:message key="access.type.insert" /></th>
-            <th><wicket:message key="access.type.update" /></th>
-            <th><wicket:message key="access.type.delete" /></th>
-          </tr>
-          <tr wicket:id="accessRows">
-            <th wicket:id="area">[time sheets]</th>
-            <td><input type="checkbox" wicket:id="selectCheckBox" /></td>
-            <td><input type="checkbox" wicket:id="insertCheckBox" /></td>
-            <td><input type="checkbox" wicket:id="updateCheckBox" /></td>
-            <td><input type="checkbox" wicket:id="deleteCheckBox" /></td>
-          </tr>
-        </table>
-        </td>
+      <th><wicket:message key="access.accessTable" /></th>
+      <td>
+      <table>
+        <tr>
+          <th></th>
+          <th><wicket:message key="access.type.select" /></th>
+          <th><wicket:message key="access.type.insert" /></th>
+          <th><wicket:message key="access.type.update" /></th>
+          <th><wicket:message key="access.type.delete" /></th>
+        </tr>
+        <tr wicket:id="accessRows">
+          <th wicket:id="area">[time sheets]</th>
+          <td><input type="checkbox" wicket:id="selectCheckBox" /></td>
+          <td><input type="checkbox" wicket:id="insertCheckBox" /></td>
+          <td><input type="checkbox" wicket:id="updateCheckBox" /></td>
+          <td><input type="checkbox" wicket:id="deleteCheckBox" /></td>
+        </tr>
+      </table>
+      </td>
+    </tr>
+    <tr><td colspan="2">&nbsp;</td></tr>
+    <tr>
+      <th><wicket:message key="access.templates" /></th>
+      <td><span wicket:id="clear">[clear]</span><span wicket:id="guest">[guest]</span><span wicket:id="employee">[employee]</span><span
+        wicket:id="leader">[leader]</span><span wicket:id="administrator">[administrator]</span></td>
+    </tr>
+    <tr class="hRuler">
+      <td colspan="2"></td>
     </tr>
   </wicket:extend>
 </table>

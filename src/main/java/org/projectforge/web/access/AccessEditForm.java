@@ -27,8 +27,10 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.access.AccessEntryDO;
 import org.projectforge.access.AccessType;
@@ -40,6 +42,7 @@ import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEditPage>
 {
@@ -55,6 +58,7 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
     this.colspan = 2;
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
@@ -66,16 +70,52 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
         "groupId");
     add(groupSelectPanel.setRequired(true));
     groupSelectPanel.init();
-    final Component recursiveLabel = new Label("recursive").setRenderBodyOnly(true);
+    final Component recursiveLabel = new Label("recursive", getString("recursive"));
     WicketUtils.addTooltip(recursiveLabel, getString("access.recursive.help"));
     add(recursiveLabel);
-    add(new CheckBox("recursiveCheckBox", new PropertyModel<Boolean>(data, "recursive")));
+    add(WicketUtils.addTooltip(new CheckBox("recursiveCheckBox", new PropertyModel<Boolean>(data, "recursive")), getString("access.recursive.help")));
     final RepeatingView rowRepeater = new RepeatingView("accessRows");
     add(rowRepeater);
     addAccessRow(rowRepeater, data.ensureAndGetAccessEntry(AccessType.TASK_ACCESS_MANAGEMENT));
     addAccessRow(rowRepeater, data.ensureAndGetAccessEntry(AccessType.TASKS));
     addAccessRow(rowRepeater, data.ensureAndGetAccessEntry(AccessType.TIMESHEETS));
     addAccessRow(rowRepeater, data.ensureAndGetAccessEntry(AccessType.OWN_TIMESHEETS));
+
+    add(new SingleButtonPanel("clear", new Button("button", new Model<String>(getString("access.templates.clear"))) {
+      @Override
+      public final void onSubmit()
+      {
+        parentPage.clear();
+      }
+    }));
+    add(new SingleButtonPanel("guest", new Button("button", new Model<String>(getString("access.templates.guest"))) {
+      @Override
+      public final void onSubmit()
+      {
+        parentPage.guest();
+      }
+    }));
+    add(new SingleButtonPanel("employee", new Button("button", new Model<String>(getString("access.templates.employee"))) {
+      @Override
+      public final void onSubmit()
+      {
+        parentPage.employee();
+      }
+    }));
+    add(new SingleButtonPanel("leader", new Button("button", new Model<String>(getString("access.templates.leader"))) {
+      @Override
+      public final void onSubmit()
+      {
+        parentPage.leader();
+      }
+    }));
+    add(new SingleButtonPanel("administrator", new Button("button", new Model<String>(getString("access.templates.administrator"))) {
+      @Override
+      public final void onSubmit()
+      {
+        parentPage.administrator();
+      }
+    }));
   }
 
   private void addAccessRow(final RepeatingView rowRepeater, final AccessEntryDO accessEntry)

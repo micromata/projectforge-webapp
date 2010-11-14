@@ -27,6 +27,8 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessDao;
+import org.projectforge.access.AccessEntryDO;
+import org.projectforge.access.AccessType;
 import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -46,6 +48,66 @@ public class AccessEditPage extends AbstractEditPage<GroupTaskAccessDO, AccessEd
   {
     super(parameters, "access");
     super.init();
+  }
+
+  public AccessEntryDO getTasksEntry()
+  {
+    return getData().ensureAndGetAccessEntry(AccessType.TASKS);
+  }
+
+  public AccessEntryDO getAccessManagementEntry()
+  {
+    return getData().ensureAndGetAccessEntry(AccessType.TASK_ACCESS_MANAGEMENT);
+  }
+
+  public AccessEntryDO getTimesheetsEntry()
+  {
+    return getData().ensureAndGetAccessEntry(AccessType.TIMESHEETS);
+  }
+
+  public AccessEntryDO getOwnTimesheetsEntry()
+  {
+    return getData().ensureAndGetAccessEntry(AccessType.OWN_TIMESHEETS);
+  }
+
+  protected void clear()
+  {
+    getAccessManagementEntry().setAccess(false, false, false, false);
+    getTasksEntry().setAccess(false, false, false, false);
+    getOwnTimesheetsEntry().setAccess(false, false, false, false);
+    getTimesheetsEntry().setAccess(false, false, false, false);
+  }
+
+  protected void guest()
+  {
+    getAccessManagementEntry().setAccess(false, false, false, false);
+    getTasksEntry().setAccess(true, false, false, false);
+    getOwnTimesheetsEntry().setAccess(false, false, false, false);
+    getTimesheetsEntry().setAccess(false, false, false, false);
+  }
+
+  protected void employee()
+  {
+    getAccessManagementEntry().setAccess(true, false, false, false);
+    getTasksEntry().setAccess(true, true, true, true);
+    getOwnTimesheetsEntry().setAccess(true, true, true, true);
+    getTimesheetsEntry().setAccess(true, false, false, false);
+  }
+
+  protected void leader()
+  {
+    getAccessManagementEntry().setAccess(true, false, false, false);
+    getTasksEntry().setAccess(true, true, true, true);
+    getOwnTimesheetsEntry().setAccess(true, true, true, true);
+    getTimesheetsEntry().setAccess(true, true, true, true);
+  }
+
+  protected void administrator()
+  {
+    getAccessManagementEntry().setAccess(true, true, true, true);
+    getTasksEntry().setAccess(true, true, true, true);
+    getOwnTimesheetsEntry().setAccess(true, true, true, true);
+    getTimesheetsEntry().setAccess(true, true, true, true);
   }
 
   public void cancelSelection(String property)
