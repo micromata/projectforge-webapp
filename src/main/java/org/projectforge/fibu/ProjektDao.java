@@ -72,6 +72,7 @@ public class ProjektDao extends BaseDao<ProjektDO>
   public ProjektDao()
   {
     super(ProjektDO.class);
+    this.supportAfterUpdate = true;
     userRightId = USER_RIGHT_ID;
     baseDaoReindexRegistry.registerDependent(KundeDO.class, this);
   }
