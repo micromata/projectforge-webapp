@@ -125,7 +125,13 @@ public class UpdateForm extends AbstractForm<UpdateForm, UpdatePage>
       item.add(new Label("version", StringUtils.isBlank(version) == true ? "???" : version
           + (updateScript.isExperimental() == true ? " (experimental!)" : "")));
       item.add(new Label("skipVersion", updateScript.isSkipVersion() == true ? "yes" : "no"));
-      item.add(new ExternalLink("downloadWar", UpdatePage.DOWNLOAD_BASE_URL + updateScript.getWarFile(), "download"));
+      final String downloadUrl;
+      if (updateScript.getWarFile().startsWith("http") == true) {
+        downloadUrl = updateScript.getWarFile();
+      } else {
+        downloadUrl = UpdatePage.DOWNLOAD_BASE_URL + updateScript.getWarFile();
+      }
+      item.add(new ExternalLink("downloadWar", downloadUrl, "download"));
       final Link<String> downloadScriptLink = new Link<String>("downloadScript") {
         @Override
         public void onClick()
