@@ -88,35 +88,35 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
       @Override
       public final void onSubmit()
       {
-        parentPage.clear();
+        data.clear();
       }
     }));
     add(new SingleButtonPanel("guest", new Button("button", new Model<String>(getString("access.templates.guest"))) {
       @Override
       public final void onSubmit()
       {
-        parentPage.guest();
+        data.guest();
       }
     }));
     add(new SingleButtonPanel("employee", new Button("button", new Model<String>(getString("access.templates.employee"))) {
       @Override
       public final void onSubmit()
       {
-        parentPage.employee();
+        data.employee();
       }
     }));
     add(new SingleButtonPanel("leader", new Button("button", new Model<String>(getString("access.templates.leader"))) {
       @Override
       public final void onSubmit()
       {
-        parentPage.leader();
+        data.leader();
       }
     }));
     add(new SingleButtonPanel("administrator", new Button("button", new Model<String>(getString("access.templates.administrator"))) {
       @Override
       public final void onSubmit()
       {
-        parentPage.administrator();
+        data.administrator();
       }
     }));
   }
