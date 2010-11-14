@@ -47,7 +47,6 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
-import org.projectforge.web.address.AddressListPage;
 import org.projectforge.web.admin.AdminPage;
 import org.projectforge.web.admin.SetupPage;
 import org.projectforge.web.admin.UpdatePage;
@@ -76,6 +75,7 @@ import org.projectforge.web.statistics.PersonalStatisticsPage;
 import org.projectforge.web.statistics.SystemStatisticsPage;
 import org.projectforge.web.task.TaskTreePage;
 import org.projectforge.web.timesheet.TimesheetListPage;
+import org.projectforge.web.user.GroupListPage;
 import org.projectforge.web.user.MyAccountEditPage;
 import org.projectforge.web.user.UserListPage;
 import org.projectforge.web.user.UserPrefListPage;
@@ -129,7 +129,7 @@ public enum MenuItemDef
   EMPLOYEE_SALARY_LIST("fibu.employeeSalaries", "fibu/EmployeeSalaryList.action", "money.png", //
       EmployeeSalaryDao.USER_RIGHT_ID, READONLY_READWRITE), //
   GANTT("gantt", GanttChartListPage.class, "gantt.png"), //
-  GROUP_LIST("groupList", "user/GroupList.action", "group.png"), // Visible for all.
+  GROUP_LIST("groupList", GroupListPage.class, "group.png"), // Visible for all.
   // *
   GWIKI("gwiki", GWikiContainerPage.class, "script_gear.png"), //
   // *
