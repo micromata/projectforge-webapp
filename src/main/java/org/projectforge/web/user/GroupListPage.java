@@ -30,13 +30,14 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.access.OperationType;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
-import org.projectforge.web.fibu.AuftragEditPage;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -45,8 +46,7 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
-
-@ListPage(editPage = AuftragEditPage.class)
+@ListPage(editPage = GroupEditPage.class)
 public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, GroupDO>
 {
   private static final long serialVersionUID = 3124148202828889250L;
@@ -88,14 +88,19 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
+        final boolean updateAccess = groupDao.hasAccess(null, null, OperationType.UPDATE, false);
         final GroupDO group = (GroupDO) rowModel.getObject();
-        if (isSelectMode() == false) {
-          throw new UnsupportedOperationException("Edit page not yet implemented");
-        } else {
+        if (isSelectMode() == true) {
           item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, group.getId(), group.getName()));
+          addRowClick(item);
+        } else if (updateAccess == true) {
+          item
+              .add(new ListSelectActionPanel(componentId, rowModel, GroupEditPage.class, group.getId(), GroupListPage.this, group.getName()));
+          addRowClick(item);
+        } else {
+          item.add(new Label(componentId, group.getName()));
         }
         cellItemListener.populateItem(item, componentId, rowModel);
-        addRowClick(item);
       }
     });
     columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("organization")), "organization", "organization",
