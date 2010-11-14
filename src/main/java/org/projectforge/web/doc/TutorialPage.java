@@ -31,6 +31,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.criterion.Restrictions;
+import org.projectforge.access.AccessDao;
+import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.task.TaskDO;
@@ -42,6 +44,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.access.AccessEditPage;
 import org.projectforge.web.task.TaskEditPage;
 import org.projectforge.web.user.GroupEditPage;
 import org.projectforge.web.user.UserEditForm;
@@ -64,15 +67,30 @@ public class TutorialPage extends AbstractSecuredPage
 
   private static final String KEY_REF = "ref";
 
+  private static final String TYPE_CREATE_ACCESS = "createAccess";
+
   private static final String TYPE_CREATE_GROUP = "createGroup";
 
   private static final String TYPE_CREATE_USER = "createUser";
 
   private static final String TYPE_CREATE_TASK = "createTask";
 
+  private static final String REF_TASK_JAVA_GURUS = "JavaGurus";
+
+  private static final String REF_TASK_ACME_WEBPORTAL = "ACME-WebPortal";
+
+  private static final String REF_GROUP_JAVA_GURUS = "JavaGurusEmployees";
+
+  private static final String REF_GROUP_ACME_WEBPORTAL = "ACME-WebPortal-Team";
+
+  private static final String ACCESS_TEMPLATE_EMPLOYEE = "employee";
+
   private String type;
 
   private String reference;
+
+  @SpringBean(name = "accessDao")
+  private AccessDao accessDao;
 
   @SpringBean(name = "groupDao")
   private GroupDao groupDao;
@@ -100,6 +118,8 @@ public class TutorialPage extends AbstractSecuredPage
       createGroup();
     } else if (TYPE_CREATE_TASK.equals(type) == true) {
       createTask();
+    } else if (TYPE_CREATE_ACCESS.equals(type) == true) {
+      createAccess();
     } else {
       log.warn("Unknown tutorial request: type=" + type);
       setResponsePage(new MessagePage("tutorial.unknown").setWarning(true));
@@ -174,9 +194,9 @@ public class TutorialPage extends AbstractSecuredPage
     }
     final PageParameters params = new PageParameters();
     final TaskDO task;
-    if ("JavaGurus".equals(reference) == true) {
+    if (REF_TASK_JAVA_GURUS.equals(reference) == true) {
       task = createTask(taskTree.getRootTaskNode().getTask(), "Java Gurus inc.", tutorialReference);
-    } else if ("ACME-WebPortal".equals(reference) == true) {
+    } else if (REF_TASK_ACME_WEBPORTAL.equals(reference) == true) {
       task = createTask(taskTree.getRootTaskNode().getTask(), "ACME web portal", tutorialReference);
     } else {
       log.warn("Unknown tutorial request: task=" + reference);
@@ -205,9 +225,9 @@ public class TutorialPage extends AbstractSecuredPage
     }
     final PageParameters params = new PageParameters();
     final GroupDO group;
-    if ("JavaGurusEmployees".equals(reference) == true) {
+    if (REF_GROUP_JAVA_GURUS.equals(reference) == true) {
       group = createGroup("JavaGurus employees", "linda", "dave", "betty");
-    } else if ("ACME-WebPortal-Team".equals(reference) == true) {
+    } else if (REF_GROUP_ACME_WEBPORTAL.equals(reference) == true) {
       group = createGroup("ACME web portal team", "linda", "dave", "betty");
     } else {
       log.warn("Unknown tutorial request: group=" + reference);
@@ -228,16 +248,55 @@ public class TutorialPage extends AbstractSecuredPage
     group.setName(name);
     if (usernames != null) {
       for (final String username : usernames) {
-        final PFUserDO user = (PFUserDO) getEntry(userDao, getTutorialReference(username));
+        final PFUserDO user = getRequiredUser(username);
         if (user == null) {
-          log.warn("Unknown tutorial request (user for group=" + reference + " not found). user=" + username);
-          setResponsePage(new MessagePage("tutorial.unknown").setWarning(true));
           return null;
         }
         group.addUser(user);
       }
     }
     return group;
+  }
+
+  private void createAccess()
+  {
+    final String tutorialReference = getTutorialReference(reference);
+    if (doesEntryAlreadyExist(accessDao, tutorialReference) == true) {
+      return;
+    }
+    final PageParameters params = new PageParameters();
+    final GroupTaskAccessDO access;
+    TaskDO task = null;
+    GroupDO group = null;
+    if ("JavaGurusEmployees".equals(reference) == true) {
+      access = createAccess(getRequiredTask(REF_TASK_JAVA_GURUS), getRequiredGroup(REF_TASK_JAVA_GURUS), ACCESS_TEMPLATE_EMPLOYEE,
+          tutorialReference);
+    } else if ("ACME-WebPortal".equals(reference) == true) {
+      access = createAccess(getRequiredTask(REF_TASK_ACME_WEBPORTAL), getRequiredGroup(REF_TASK_ACME_WEBPORTAL), ACCESS_TEMPLATE_EMPLOYEE,
+          tutorialReference);
+    } else {
+      log.warn("Unknown tutorial request: task=" + reference);
+      setResponsePage(new MessagePage("tutorial.unknown").setWarning(true));
+      return;
+    }
+    if (task == null || group == null) {
+      return;
+    }
+    params.put(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, access);
+    final AccessEditPage accessEditPage = new AccessEditPage(params);
+    setResponsePage(accessEditPage);
+  }
+
+  private GroupTaskAccessDO createAccess(final TaskDO task, final GroupDO group, final String template, final String description)
+  {
+    final GroupTaskAccessDO access = new GroupTaskAccessDO();
+    access.setTask(task);
+    access.setGroup(group);
+    if (ACCESS_TEMPLATE_EMPLOYEE.equals(template) == true) {
+      access.employee();
+    }
+    access.setDescription(description);
+    return access;
   }
 
   private boolean doesEntryAlreadyExist(final BaseDao< ? > dao, final String tutorialReference)
@@ -258,6 +317,33 @@ public class TutorialPage extends AbstractSecuredPage
       return list.get(0);
     }
     return null;
+  }
+
+  private GroupDO getRequiredGroup(final String reference)
+  {
+    final GroupDO group = (GroupDO) getEntry(groupDao, getTutorialReference(reference));
+    if (group == null) {
+      setResponsePage(new MessagePage("tutorial.expectedGroupNotFound", reference).setWarning(true));
+    }
+    return group;
+  }
+
+  private PFUserDO getRequiredUser(final String reference)
+  {
+    final PFUserDO user = (PFUserDO) getEntry(userDao, getTutorialReference(reference));
+    if (user == null) {
+      setResponsePage(new MessagePage("tutorial.expectedUserNotFound", reference).setWarning(true));
+    }
+    return user;
+  }
+
+  private TaskDO getRequiredTask(final String reference)
+  {
+    final TaskDO task = (TaskDO) getEntry(taskDao, getTutorialReference(reference));
+    if (task == null) {
+      setResponsePage(new MessagePage("tutorial.expectedTaskNotFound", reference).setWarning(true));
+    }
+    return task;
   }
 
   @Override
