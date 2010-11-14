@@ -23,15 +23,40 @@
 
 package org.projectforge.access;
 
+import org.projectforge.core.I18nEnum;
+
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
-public enum AccessType
+public enum AccessType implements I18nEnum
 {
   /** Needed by some hasAccess methods if only association with a group is checked. Used for constructor of UserException. */
-  GROUP,
+  GROUP("group"),
   /** Access right for select, insert, update, delete of tasks. */
-  TASKS, TASK_ACCESS_MANAGEMENT, TIMESHEETS, OWN_TIMESHEETS;
+  TASKS("tasks"), TASK_ACCESS_MANAGEMENT("accessManagement"), TIMESHEETS("timesheets"), OWN_TIMESHEETS("ownTimesheets");
+
+  private String key;
+
+  /**
+   * @return The key suffix will be used e. g. for i18n.
+   */
+  public String getKey()
+  {
+    return key;
+  }
+
+  /**
+   * @return The full i18n key including the i18n prefix "fibu.auftrag.status.".
+   */
+  public String getI18nKey()
+  {
+    return "access.type." + key;
+  }
+
+  AccessType(final String key)
+  {
+    this.key = key;
+  }
 }
