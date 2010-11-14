@@ -77,12 +77,9 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
       public void populateItem(Item<ICellPopulator<GroupTaskAccessDO>> item, String componentId, IModel<GroupTaskAccessDO> rowModel)
       {
         final GroupTaskAccessDO acces = rowModel.getObject();
-        String cellStyle = null;
-        if (acces.isDeleted() == true) {
-          cellStyle = "text-decoration: line-through;";
-        }
-        if (cellStyle != null) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cellStyle)));
+        final StringBuffer cssStyle = getCssStyle(acces.getId(), acces.isDeleted());
+        if (cssStyle.length() > 0) {
+          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
         }
       }
     };
