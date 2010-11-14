@@ -32,7 +32,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -44,6 +47,7 @@ import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.hibernate.collection.PersistentSet;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.ReflectionToString;
 import org.projectforge.database.HibernateUtils;
@@ -259,9 +263,23 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
               // dest was already null
             }
           } else if (srcFieldValue instanceof Collection) {
-            final Collection<Object> destColl = (Collection<Object>) destFieldValue;
+            Collection<Object> destColl = (Collection<Object>) destFieldValue;
             final Collection<Object> srcColl = (Collection<Object>) srcFieldValue;
             final Collection<Object> toRemove = new ArrayList<Object>();
+            if (srcColl != null && destColl == null) {
+              if (srcColl instanceof TreeSet) {
+                destColl = new TreeSet<Object>();
+              } else if (srcColl instanceof HashSet) {
+                destColl = new TreeSet<Object>();
+              } else if (srcColl instanceof List) {
+                destColl = new ArrayList<Object>();
+              } else if (srcColl instanceof PersistentSet) {
+                destColl = new HashSet<Object>();
+              } else {
+                log.error("Unsupported collection type: " + srcColl.getClass().getName());
+              }
+              field.set(dest, destColl);
+            }
             for (final Object o : destColl) {
               if (srcColl.contains(o) == false) {
                 toRemove.add(o);
@@ -299,7 +317,7 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
               }
             }
           } else if (srcFieldValue instanceof BaseDO) {
-            final Serializable srcFieldValueId = HibernateUtils.getIdentifier((BaseDO<?>)srcFieldValue);
+            final Serializable srcFieldValueId = HibernateUtils.getIdentifier((BaseDO< ? >) srcFieldValue);
             if (srcFieldValueId != null) {
               if (destFieldValue == null || ObjectUtils.equals(srcFieldValueId, ((BaseDO) destFieldValue).getId()) == false) {
                 field.set(dest, srcFieldValue);
