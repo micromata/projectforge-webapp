@@ -23,13 +23,14 @@
 
 package org.projectforge.user;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.Validate;
 import org.hibernate.FetchMode;
 import org.hibernate.LockMode;
@@ -59,7 +60,7 @@ public class GroupDao extends BaseDao<GroupDO>
       "assignedUsers.lastname"};
 
   private UserDao userDao;
-
+  
   public void setUserDao(UserDao userDao)
   {
     this.userDao = userDao;
@@ -68,6 +69,7 @@ public class GroupDao extends BaseDao<GroupDO>
   public GroupDao()
   {
     super(GroupDO.class);
+    this.supportAfterUpdate = true;
   }
 
   public QueryFilter getDefaultFilter()
@@ -86,79 +88,100 @@ public class GroupDao extends BaseDao<GroupDO>
   }
 
   /**
-   * Please note: Any existing assigned user in group object are ignored!
+   * Does a group with the given name already exists? Works also for existing users (if group name was modified).
+   * @param username
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public boolean doesGroupnameAlreadyExist(final GroupDO group)
+  {
+    Validate.notNull(group);
+    List<GroupDO> list = null;
+    if (group.getId() == null) {
+      // New group
+      list = getHibernateTemplate().find("from GroupDO g where g.name = ?", group.getName());
+    } else {
+      // group already exists. Check maybe changed name:
+      list = getHibernateTemplate().find("from GroupDO g where g.name = ? and pk <> ?",
+          new Object[] { group.getName(), group.getId()});
+    }
+    if (CollectionUtils.isNotEmpty(list) == true) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Please note: Any existing assigned user in group object is ignored!
    * @param group
    * @param assignedUserIds Full list of all users which have to assigned to this group.
    * @return
    */
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
-  public Serializable save(GroupDO group, Set<Integer> assignedUserIds) throws AccessException
+  public void setAssignedUsers(GroupDO group, Set<Integer> assignedUserIds) throws AccessException
   {
-    Set<PFUserDO> assignedUsers = new HashSet<PFUserDO>();
+    final Set<PFUserDO> assignedUsers = group.getAssignedUsers();
+    if (assignedUsers != null) {
+      final Iterator<PFUserDO> it = assignedUsers.iterator();
+      while (it.hasNext() == true) {
+        final PFUserDO user = it.next();
+        if (assignedUserIds.contains(user.getId()) == false) {
+          it.remove();
+        }
+      }
+    }
     for (Integer id : assignedUserIds) {
-      PFUserDO user = userDao.internalGetById(id);
+      final PFUserDO user = userDao.internalGetById(id);
       if (user == null) {
         throw new RuntimeException("User '" + id + "' not found. Could not add this unknown user to new group: " + group.getName());
       }
-      assignedUsers.add(user);
-    }
-    group.setAssignedUsers(assignedUsers);
-    return super.save(group);
-  }
-
-  @Override
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
-  public Serializable internalSave(GroupDO obj)
-  {
-    Serializable id = super.internalSave(obj);
-    if (id == null) {
-      log.error("Group not inserted (why?): " + obj);
-      return null;
-    }
-    GroupDO group = internalGetById(id);
-    Collection<GroupDO> groupList = new ArrayList<GroupDO>();
-    groupList.add(group);
-    if (group.getAssignedUsers() != null) {
-      // Create history entry of PFUserDO for all assigned users:
-      for (PFUserDO user : group.getAssignedUsers()) {
-        createHistoryEntry(user, null, groupList);
+      if (assignedUsers != null && assignedUsers.contains(user) == false) {
+        group.addUser(user);
       }
     }
-    return id;
   }
 
   /**
-   * Please note: Any existing assigned user in group object are ignored.
+   * Creates for every user an history entry if the user is part of this new group.
    * @param group
-   * @param assignedUserIds Full list of all users which have to assigned to this group.
-   * @throws AccessException
+   * @see org.projectforge.core.BaseDao#afterSave(org.projectforge.core.ExtendedBaseDO)
    */
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
-  public void update(GroupDO group, Set<Integer> assignedUserIds) throws AccessException
+  @Override
+  public void afterSave(final GroupDO group)
   {
-    GroupDO orig = internalGetById(group.getId());
-    Validate.notNull(orig);
-    Set<PFUserDO> origAssignedUsers = orig.getAssignedUsers();
+    final Collection<GroupDO> groupList = new ArrayList<GroupDO>();
+    groupList.add(group);
+    if (group.getAssignedUsers() != null) {
+      // Create history entry of PFUserDO for all assigned users:
+      for (final PFUserDO user : group.getAssignedUsers()) {
+        createHistoryEntry(user, null, groupList);
+      }
+    }
+  }
 
-    Set<PFUserDO> assignedUsers = new HashSet<PFUserDO>();
-    Collection<PFUserDO> assignedList = new ArrayList<PFUserDO>(); // List of new assigned users.
-    Collection<PFUserDO> unassignedList = new ArrayList<PFUserDO>(); // List of unassigned users.
-    for (Integer id : assignedUserIds) {
-      PFUserDO user = userDao.internalGetById(id);
-      Validate.notNull(user);
-      assignedUsers.add(user);
+  /**
+   * Creates for every user an history if the user is assigned or unassigned from this updated group.
+   * @param group
+   * @param dbGroup
+   * @see org.projectforge.core.BaseDao#afterUpdate(GroupDO, GroupDO)
+   */
+  @Override
+  protected void afterUpdate(final GroupDO group, final GroupDO dbGroup)
+  {
+    final Set<PFUserDO> origAssignedUsers = dbGroup.getAssignedUsers();
+    final Set<PFUserDO> assignedUsers = group.getAssignedUsers();
+    final Collection<PFUserDO> assignedList = new ArrayList<PFUserDO>(); // List of new assigned users.
+    final Collection<PFUserDO> unassignedList = new ArrayList<PFUserDO>(); // List of unassigned users.
+    for (final PFUserDO user : group.getAssignedUsers()) {
       if (origAssignedUsers.contains(user) == false) {
         assignedList.add(user);
       }
     }
-    for (PFUserDO user : origAssignedUsers) {
-      if (assignedUserIds.contains(user.getId()) == false) {
+    for (final PFUserDO user : dbGroup.getAssignedUsers()) {
+      if (assignedUsers.contains(user) == false) {
         unassignedList.add(user);
       }
     }
-    group.setAssignedUsers(assignedUsers);
-    super.update(group);
-    Collection<GroupDO> groupList = new ArrayList<GroupDO>();
+    final Collection<GroupDO> groupList = new ArrayList<GroupDO>();
     groupList.add(group);
     // Create history entry of PFUserDO for all new assigned users:
     for (PFUserDO user : assignedList) {
@@ -184,7 +207,7 @@ public class GroupDao extends BaseDao<GroupDO>
     final List<GroupDO> assignedGroups = new ArrayList<GroupDO>();
     if (groupIdsToAssign != null) {
       for (final Integer groupId : groupIdsToAssign) {
-        GroupDO group = (GroupDO) getHibernateTemplate().get(clazz, groupId, LockMode.UPGRADE);
+        GroupDO group = (GroupDO) getHibernateTemplate().get(clazz, groupId, LockMode.PESSIMISTIC_WRITE);
         Set<PFUserDO> assignedUsers = group.getAssignedUsers();
         if (assignedUsers == null) {
           assignedUsers = new HashSet<PFUserDO>();
@@ -203,7 +226,7 @@ public class GroupDao extends BaseDao<GroupDO>
     final List<GroupDO> unassignedGroups = new ArrayList<GroupDO>();
     if (groupIdsToUnassign != null) {
       for (final Integer groupId : groupIdsToUnassign) {
-        GroupDO group = (GroupDO) getHibernateTemplate().get(clazz, groupId, LockMode.UPGRADE);
+        GroupDO group = (GroupDO) getHibernateTemplate().get(clazz, groupId, LockMode.PESSIMISTIC_WRITE);
         Set<PFUserDO> assignedUsers = group.getAssignedUsers();
         if (assignedUsers != null && assignedUsers.contains(user) == true) {
           log.info("Unassigning user '" + user.getUsername() + "' from group '" + group.getName() + "'.");
