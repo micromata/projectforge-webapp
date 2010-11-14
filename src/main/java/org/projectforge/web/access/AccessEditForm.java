@@ -42,6 +42,7 @@ import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEditPage>
@@ -74,6 +75,8 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
     WicketUtils.addTooltip(recursiveLabel, getString("access.recursive.help"));
     add(recursiveLabel);
     add(WicketUtils.addTooltip(new CheckBox("recursiveCheckBox", new PropertyModel<Boolean>(data, "recursive")), getString("access.recursive.help")));
+    final MaxLengthTextArea descriptionArea = new MaxLengthTextArea("description", new PropertyModel<String>(data, "description"));
+    add(descriptionArea);
     final RepeatingView rowRepeater = new RepeatingView("accessRows");
     add(rowRepeater);
     addAccessRow(rowRepeater, data.ensureAndGetAccessEntry(AccessType.TASK_ACCESS_MANAGEMENT));

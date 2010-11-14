@@ -26,6 +26,7 @@ package org.projectforge.web.access;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -38,7 +39,10 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessDao;
 import org.projectforge.access.AccessEntryDO;
 import org.projectforge.access.GroupTaskAccessDO;
+import org.projectforge.jira.JiraUtils;
 import org.projectforge.task.TaskDO;
+import org.projectforge.timesheet.TimesheetDO;
+import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -134,6 +138,17 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
         item.add(accessTablePanel);
         accessTablePanel.init();
         cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
+    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(getString("description"), "description", "description",
+        cellItemListener) {
+      @Override
+      public void populateItem(Item<ICellPopulator<GroupTaskAccessDO>> item, String componentId, IModel<GroupTaskAccessDO> rowModel)
+      {
+        final GroupTaskAccessDO access = rowModel.getObject();
+        final Label label = new Label(componentId, StringUtils.abbreviate(access.getDescription(), 100));
+        cellItemListener.populateItem(item, componentId, rowModel);
+        item.add(label);
       }
     });
     dataTable = createDataTable(columns, "group.name", true);

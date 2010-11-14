@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -45,13 +46,15 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Cascade;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Store;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
-
 
 /**
  * Represents an access entry with the permissions of one group to one task. The persistent data object of GroupTaskAccess.
@@ -73,8 +76,11 @@ public class GroupTaskAccessDO extends DefaultBaseDO
 
   @IndexedEmbedded
   private TaskDO task;
-  
+
   private boolean recursive = true;
+
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String description;
 
   private Set<AccessEntryDO> accessEntries = null;
 
@@ -111,9 +117,9 @@ public class GroupTaskAccessDO extends DefaultBaseDO
    * Get the history entries for this object.
    * 
    */
-  @OneToMany(cascade = { CascadeType.ALL}, fetch = FetchType.EAGER)
+  @OneToMany(cascade = { CascadeType.ALL}, fetch = FetchType.EAGER, orphanRemoval = true)
   @JoinColumn(name = "group_task_access_fk")
-  @Cascade(value = { org.hibernate.annotations.CascadeType.DELETE_ORPHAN, org.hibernate.annotations.CascadeType.SAVE_UPDATE})
+  @Cascade(value = org.hibernate.annotations.CascadeType.SAVE_UPDATE)
   public Set<AccessEntryDO> getAccessEntries()
   {
     return this.accessEntries;
@@ -240,18 +246,30 @@ public class GroupTaskAccessDO extends DefaultBaseDO
   {
     return recursive;
   }
-  
+
   public void setRecursive(boolean recursive)
   {
     this.recursive = recursive;
   }
-  
+
+  @Column(name = "description", length = 4000)
+  public String getDescription()
+  {
+    return description;
+  }
+
+  public GroupTaskAccessDO setDescription(final String description)
+  {
+    this.description = description;
+    return this;
+  }
+
   /**
    * Copies all values from the given src object excluding the values created and modified. Null values will be excluded.
    * @param src
    */
   @Override
-  public boolean copyValuesFrom(BaseDO<? extends Serializable> source, String... ignoreFields)
+  public boolean copyValuesFrom(BaseDO< ? extends Serializable> source, String... ignoreFields)
   {
     boolean modified = super.copyValuesFrom(source, ignoreFields);
     GroupTaskAccessDO src = (GroupTaskAccessDO) source;
@@ -285,7 +303,7 @@ public class GroupTaskAccessDO extends DefaultBaseDO
     }
     return tos.toString();
   }
-  
+
   @SuppressWarnings("unchecked")
   @Transient
   public Set getHistorizableAttributes()
