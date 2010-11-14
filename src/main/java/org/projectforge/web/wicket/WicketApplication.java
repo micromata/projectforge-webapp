@@ -94,6 +94,7 @@ import org.projectforge.web.task.TaskListPage;
 import org.projectforge.web.task.TaskTreePage;
 import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.timesheet.TimesheetListPage;
+import org.projectforge.web.user.GroupListPage;
 import org.projectforge.web.user.MyAccountEditPage;
 import org.projectforge.web.user.UserListPage;
 import org.projectforge.web.user.UserPrefListPage;
@@ -144,6 +145,8 @@ public class WicketApplication extends WebApplication
   private static final String BOOKMARK_GANTT_EDIT = "ganttEdit";
 
   private static final String BOOKMARK_GANTT_LIST = "ganttList";
+
+  private static final String BOOKMARK_GROUP_LIST = "groupList";
 
   private static final String BOOKMARK_GWIKI_CONTAINER_PAGE = "gwikiContainer";
 
@@ -339,6 +342,7 @@ public class WicketApplication extends WebApplication
     mountPage(BOOKMARK_FEEDBACK_PAGE, FeedbackPage.class);
     mountPage(BOOKMARK_GANTT_EDIT, GanttChartEditPage.class);
     mountPage(BOOKMARK_GANTT_LIST, GanttChartListPage.class);
+    mountPage(BOOKMARK_GROUP_LIST, GroupListPage.class);
     mountPage(BOOKMARK_GWIKI_CONTAINER_PAGE, GWikiContainerPage.class);
     mountPage(BOOKMARK_KOST1_LIST, Kost1ListPage.class);
     mountPage(BOOKMARK_KOST2_LIST, Kost2ListPage.class);
