@@ -66,6 +66,14 @@ public class WebConstants
 
   public static final String IMAGE_COG = "cog.png";
 
+  public static final String IMAGE_DATABASE_DELETE = "database_delete.png";
+
+  public static final String IMAGE_DATABASE_INSERT = "database_insert.png";
+
+  public static final String IMAGE_DATABASE_SELECT = "database_select.png";
+
+  public static final String IMAGE_DATABASE_UPDATE = "database_update.png";
+
   public static final String IMAGE_DATE_SELECT = "button_selectDate.png";
 
   public static final String IMAGE_DATE_UNSELECT = "button_unselectDate.png";
