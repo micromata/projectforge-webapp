@@ -74,12 +74,9 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
       public void populateItem(Item<ICellPopulator<GroupDO>> item, String componentId, IModel<GroupDO> rowModel)
       {
         final GroupDO group = rowModel.getObject();
-        String cellStyle = null;
-        if (group.isDeleted() == true) {
-          cellStyle = "text-decoration: line-through;";
-        }
-        if (cellStyle != null) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cellStyle)));
+        final StringBuffer cssStyle = getCssStyle(group.getId(), group.isDeleted());
+        if (cssStyle.length() > 0) {
+          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
         }
       }
     };
