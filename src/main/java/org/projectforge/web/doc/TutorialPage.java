@@ -176,6 +176,8 @@ public class TutorialPage extends AbstractSecuredPage
     final TaskDO task;
     if ("JavaGurus".equals(reference) == true) {
       task = createTask(taskTree.getRootTaskNode().getTask(), "Java Gurus inc.", tutorialReference);
+    } else if ("ACME-WebPortal".equals(reference) == true) {
+      task = createTask(taskTree.getRootTaskNode().getTask(), "ACME web portal", tutorialReference);
     } else {
       log.warn("Unknown tutorial request: task=" + reference);
       setResponsePage(new MessagePage("tutorial.unknown").setWarning(true));
@@ -205,6 +207,8 @@ public class TutorialPage extends AbstractSecuredPage
     final GroupDO group;
     if ("JavaGurusEmployees".equals(reference) == true) {
       group = createGroup("JavaGurus employees", "linda", "dave", "betty");
+    } else if ("ACME-WebPortal-Team".equals(reference) == true) {
+      group = createGroup("ACME web portal team", "linda", "dave", "betty");
     } else {
       log.warn("Unknown tutorial request: group=" + reference);
       setResponsePage(new MessagePage("tutorial.unknown").setWarning(true));

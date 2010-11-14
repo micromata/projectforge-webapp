@@ -72,7 +72,7 @@ public class TutorialFilter implements Filter
     chain.doFilter(req, wrapper);
     final CharArrayWriter caw = new CharArrayWriter();
     final String tutorialUrl = ((HttpServletResponse) resp).encodeURL(WicketUtils.getAbsoluteUrl("/wa/tutorial"));
-    final String regexp = "(\\{actionLink\\|)([a-zA-Z0-9]*)\\|([a-zA-Z0-9]*)(\\})([a-zA-Z0-9 ]*)(\\{/actionLink\\})";
+    final String regexp = "(\\{actionLink\\|)([a-zA-Z0-9]*)\\|([a-zA-Z0-9_\\-]*)(\\})([^\\{]*)(\\{/actionLink\\})";
     final Pattern p = Pattern.compile(regexp, Pattern.MULTILINE | Pattern.DOTALL); // Compiles regular expression into Pattern.
     final Matcher m = p.matcher(wrapper.toString());
     final StringBuffer buf = new StringBuffer();
