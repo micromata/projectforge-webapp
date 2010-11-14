@@ -790,6 +790,24 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   }
 
   /**
+   * This method will be called after deleting. Does nothing at default.
+   * @param obj The deleted object.
+   * @param dbObj The object from data base before modification.
+   */
+  protected void afterDelete(final O obj)
+  {
+  }
+
+  /**
+   * This method will be called after undeleting. Does nothing at default.
+   * @param obj The deleted object.
+   * @param dbObj The object from data base before modification.
+   */
+  protected void afterUndelete(final O obj)
+  {
+  }
+
+  /**
    * This method is for internal use e. g. for updating objects without check access.
    * @param obj
    * @return the generated identifier.
@@ -976,6 +994,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     dbObj.setDeleted(true);
     dbObj.setLastUpdate();
     afterSaveOrModify(obj);
+    afterDelete(obj);
     getSession().flush();
     log.info("Object marked as deleted: " + dbObj.toString());
   }
@@ -1005,6 +1024,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     getHibernateTemplate().delete(dbObj);
     log.info("Object deleted: " + obj.toString());
     afterSaveOrModify(obj);
+    afterDelete(obj);
   }
 
   /**
@@ -1033,11 +1053,14 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     onSaveOrModify(obj);
     copyValues(obj, dbObj, "deleted"); // If user has made additional changes.
     dbObj.setDeleted(false);
+    obj.setDeleted(false);
     dbObj.setLastUpdate();
+    obj.setLastUpdate(dbObj.getLastUpdate());
     log.info("Object undeleted: " + dbObj.toString());
     afterSaveOrModify(obj);
+    afterUndelete(obj);
   }
-
+  
   /**
    * Checks the basic select access right. Overload this method if you class supports this right.
    * @return
