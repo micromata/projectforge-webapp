@@ -104,8 +104,9 @@ public class MessagePage extends AbstractSecuredPage
     this.message = message;
   }
 
-  public void setWarning(boolean warning)
+  public MessagePage setWarning(boolean warning)
   {
     this.warning = warning;
+    return this;
   }
 }
