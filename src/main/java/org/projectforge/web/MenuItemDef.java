@@ -47,6 +47,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
+import org.projectforge.web.access.AccessListPage;
 import org.projectforge.web.admin.AdminPage;
 import org.projectforge.web.admin.SetupPage;
 import org.projectforge.web.admin.UpdatePage;
@@ -102,7 +103,7 @@ public enum MenuItemDef
       FINANCE_GROUP, CONTROLLING_GROUP), //
 
   // Menu entries
-  ACCESS_LIST("accessList", "access/AccessList.action", "lock.png"), // Visible for all.
+  ACCESS_LIST("accessList", AccessListPage.class, "lock.png"), // Visible for all.
   // *
   ADDRESS_LIST("addressList", "address/AddressList.action", "vcard.png"), // Visible for all.
   // *
