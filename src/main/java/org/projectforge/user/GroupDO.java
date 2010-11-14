@@ -24,6 +24,7 @@
 package org.projectforge.user;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -122,6 +123,14 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public void setAssignedUsers(Set<PFUserDO> assignedUsers)
   {
     this.assignedUsers = assignedUsers;
+  }
+
+  public void addUser(final PFUserDO user)
+  {
+    if (this.assignedUsers == null) {
+      this.assignedUsers = new HashSet<PFUserDO>();
+    }
+    this.assignedUsers.add(user);
   }
 
   @Column(length = 1000)
