@@ -39,7 +39,6 @@ import org.projectforge.access.AccessDao;
 import org.projectforge.access.AccessEntryDO;
 import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.task.TaskDO;
-import org.projectforge.web.task.TaskEditPage;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -98,8 +97,9 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
         taskFormatter.appendFormattedTask(buf, new WicketLocalizerAndUrlBuilder(getResponse()), task, false, true, false);
         final Label formattedTaskLabel = new Label(ListSelectActionPanel.LABEL_ID, buf.toString());
         formattedTaskLabel.setEscapeModelStrings(false);
-        item
-            .add(new ListSelectActionPanel(componentId, rowModel, TaskEditPage.class, task.getId(), AccessListPage.this, formattedTaskLabel));
+        item.add(new ListSelectActionPanel(componentId, rowModel, AccessEditPage.class, task.getId(), AccessListPage.this,
+            formattedTaskLabel));
+        addRowClick(item);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
