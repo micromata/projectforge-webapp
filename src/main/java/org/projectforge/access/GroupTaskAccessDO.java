@@ -310,4 +310,80 @@ public class GroupTaskAccessDO extends DefaultBaseDO
   {
     return null;
   }
+
+  public AccessEntryDO ensureAndGetTasksEntry()
+  {
+    return ensureAndGetAccessEntry(AccessType.TASKS);
+  }
+
+  public AccessEntryDO ensureAndGetAccessManagementEntry()
+  {
+    return ensureAndGetAccessEntry(AccessType.TASK_ACCESS_MANAGEMENT);
+  }
+
+  public AccessEntryDO ensureAndGetTimesheetsEntry()
+  {
+    return ensureAndGetAccessEntry(AccessType.TIMESHEETS);
+  }
+
+  public AccessEntryDO ensureAndGetOwnTimesheetsEntry()
+  {
+    return ensureAndGetAccessEntry(AccessType.OWN_TIMESHEETS);
+  }
+
+  /**
+   * This template clears all access entries.
+   */
+  public void clear()
+  {
+    ensureAndGetAccessManagementEntry().setAccess(false, false, false, false);
+    ensureAndGetTasksEntry().setAccess(false, false, false, false);
+    ensureAndGetOwnTimesheetsEntry().setAccess(false, false, false, false);
+    ensureAndGetTimesheetsEntry().setAccess(false, false, false, false);
+  }
+
+  /**
+   * This template is used as default for guests (they have only read access to tasks).
+   */
+  public void guest()
+  {
+    ensureAndGetAccessManagementEntry().setAccess(false, false, false, false);
+    ensureAndGetTasksEntry().setAccess(true, false, false, false);
+    ensureAndGetOwnTimesheetsEntry().setAccess(false, false, false, false);
+    ensureAndGetTimesheetsEntry().setAccess(false, false, false, false);
+  }
+
+  /**
+   * This template is used as default for employees. The have read access to the access management, full access to tasks and own time sheets
+   * and only read-access to foreign time sheets.
+   */
+  public void employee()
+  {
+    ensureAndGetAccessManagementEntry().setAccess(true, false, false, false);
+    ensureAndGetTasksEntry().setAccess(true, true, true, true);
+    ensureAndGetOwnTimesheetsEntry().setAccess(true, true, true, true);
+    ensureAndGetTimesheetsEntry().setAccess(true, false, false, false);
+  }
+
+  /**
+   * This template is used as default for project managers. Same as employee but with full read-write-access to foreign time-sheets.
+   */
+  public void leader()
+  {
+    ensureAndGetAccessManagementEntry().setAccess(true, false, false, false);
+    ensureAndGetTasksEntry().setAccess(true, true, true, true);
+    ensureAndGetOwnTimesheetsEntry().setAccess(true, true, true, true);
+    ensureAndGetTimesheetsEntry().setAccess(true, true, true, true);
+  }
+
+  /**
+   * This template is used as default for admins. Full access to access management, task, own and foreign time-sheets.
+   */
+  public void administrator()
+  {
+    ensureAndGetAccessManagementEntry().setAccess(true, true, true, true);
+    ensureAndGetTasksEntry().setAccess(true, true, true, true);
+    ensureAndGetOwnTimesheetsEntry().setAccess(true, true, true, true);
+    ensureAndGetTimesheetsEntry().setAccess(true, true, true, true);
+  }
 }
