@@ -23,53 +23,66 @@
 
 package org.projectforge.web.access;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.user.GroupDO;
-import org.projectforge.user.GroupDao;
-import org.projectforge.web.wicket.AbstractBasePage;
+import org.projectforge.access.AccessDao;
+import org.projectforge.access.GroupTaskAccessDO;
+import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
 @EditPage(defaultReturnPage = AccessListPage.class)
-public class AccessEditPage extends AbstractEditPage<GroupDO, AccessEditForm, GroupDao>
+public class AccessEditPage extends AbstractEditPage<GroupTaskAccessDO, AccessEditForm, AccessDao> implements ISelectCallerPage
 {
   private static final long serialVersionUID = 4636922408954211544L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AccessEditPage.class);
 
-  @SpringBean(name = "groupDao")
-  private GroupDao groupDao;
+  @SpringBean(name = "accessDao")
+  private AccessDao accessDao;
 
   public AccessEditPage(final PageParameters parameters)
   {
-    super(parameters, "group");
+    super(parameters, "access");
     super.init();
   }
 
-  @Override
-  protected AbstractBasePage onSaveOrUpdate()
+  public void cancelSelection(String property)
   {
-    final Set<Integer> assignedGroupIds = new HashSet<Integer>();
-    for (Integer groupId : form.users.getAssignedValues()) {
-      assignedGroupIds.add(groupId);
+    // Do nothing.
+  }
+
+  public void select(String property, Object selectedValue)
+  {
+    if ("taskId".equals(property) == true) {
+      accessDao.setTask(getData(), (Integer) selectedValue);
+    } else if ("groupId".equals(property) == true) {
+      accessDao.setGroup(getData(), (Integer) selectedValue);
+    } else {
+      log.error("Property '" + property + "' not supported for selection.");
     }
-    groupDao.setAssignedUsers(getData(), assignedGroupIds);
-    return super.onSaveOrUpdate();
   }
 
-  @Override
-  protected GroupDao getBaseDao()
+  public void unselect(String property)
   {
-    return groupDao;
+    if ("taskId".equals(property) == true) {
+      getData().setTask(null);
+    } else if ("groupId".equals(property) == true) {
+      getData().setGroup(null);
+    } else {
+      log.error("Property '" + property + "' not supported for unselection.");
+    }
   }
 
   @Override
-  protected AccessEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, GroupDO data)
+  protected AccessDao getBaseDao()
+  {
+    return accessDao;
+  }
+
+  @Override
+  protected AccessEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, GroupTaskAccessDO data)
   {
     return new AccessEditForm(this, data);
   }

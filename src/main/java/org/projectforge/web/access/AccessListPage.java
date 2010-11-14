@@ -97,7 +97,7 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
         taskFormatter.appendFormattedTask(buf, new WicketLocalizerAndUrlBuilder(getResponse()), task, false, true, false);
         final Label formattedTaskLabel = new Label(ListSelectActionPanel.LABEL_ID, buf.toString());
         formattedTaskLabel.setEscapeModelStrings(false);
-        item.add(new ListSelectActionPanel(componentId, rowModel, AccessEditPage.class, task.getId(), AccessListPage.this,
+        item.add(new ListSelectActionPanel(componentId, rowModel, AccessEditPage.class, access.getId(), AccessListPage.this,
             formattedTaskLabel));
         addRowClick(item);
         cellItemListener.populateItem(item, componentId, rowModel);

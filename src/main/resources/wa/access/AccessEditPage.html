@@ -8,51 +8,40 @@
 <table>
   <wicket:extend>
     <tr>
-      <th><wicket:message key="name" /></th>
-      <td><input class="stdtext" wicket:id="name" /></td>
+      <th><label for="task"><wicket:message key="task" /></label></th>
+      <td><span wicket:id="task" id="task">[show and select task]</span></td>
     </tr>
     <tr>
-      <th><wicket:message key="organization" /></th>
-      <td><input class="stdtext" wicket:id="organization" /></td>
+      <th><label for="group"><wicket:message key="group" /></label></th>
+      <td><span wicket:id="group" id="task">[show and select group]</span></td>
     </tr>
     <tr>
-      <th><wicket:message key="description" /></th>
-      <td colspan="3"><textarea class="stdtext" wicket:id="description" style="height: 10ex;">[Beschreibungstext]</textarea></td>
+      <th><label for="recursive"><span wicket:id="recursive">[recursive]</span></label></th>
+      <td><input type="checkbox" wicket:id="recursiveCheckBox" id="recursive" /></td>
     </tr>
     <tr class="hRuler">
       <td colspan="4"></td>
     </tr>
     <tr>
-      <th><wicket:message key="group.assignedUsers" /></th>
-      <td colspan="3">
-
-      <table style="width: 100%; margin: 0; padding: 0; border-collapse: collapse; border: none;">
-        <colgroup>
-          <col width="45%" />
-          <col width="10%" />
-          <col width="45%" />
-        </colgroup>
-        <tr>
-          <td style="padding: 0; border: none;"><wicket:message key="group.assignedUsers" /></td>
-          <td style="padding: 0; border: none;"></td>
-          <td style="padding: 0; border: none;"><wicket:message key="group.unassignedUsers" /></td>
-        </tr>
-        <tr>
-          <td style="padding: 0; border: none; width: 40%;"><select style="width: 100%;" name="valuesToUnassign" wicket:id="valuesToUnassign"
-            class="stdtext" multiple="multiple" size="15">
-            <option value="1234">Dave</option>
-          </select></td>
-          <td style="text-align: center; width: 20%;">
-          <p><a wicket:id="unassignButton" href="#"><img src="/images/button_assignToRight.png" wicket:id="buttonUnassignImage" /></a></p>
-          <p><a wicket:id="assignButton" href="#"><img src="/images/button_assignToLeft.png" wicket:id="buttonAssignImage" /></a></p>
-          </td>
-          <td style="padding: 0; border: none; width: 40%;"><select style="width: 100%;" name="valuesToAssign" wicket:id="valuesToAssign"
-            class="stdtext" multiple="multiple" size="15">
-            <option value="1234">Linda</option>
-          </select></td>
-        </tr>
-      </table>
-      </td>
+        <th><wicket:message key="access.accessTable" /></th>
+        <td>
+        <table>
+          <tr>
+            <th></th>
+            <th><wicket:message key="access.type.select" /></th>
+            <th><wicket:message key="access.type.insert" /></th>
+            <th><wicket:message key="access.type.update" /></th>
+            <th><wicket:message key="access.type.delete" /></th>
+          </tr>
+          <tr wicket:id="accessRows">
+            <th wicket:id="area">[time sheets]</th>
+            <td><input type="checkbox" wicket:id="selectCheckBox" /></td>
+            <td><input type="checkbox" wicket:id="insertCheckBox" /></td>
+            <td><input type="checkbox" wicket:id="updateCheckBox" /></td>
+            <td><input type="checkbox" wicket:id="deleteCheckBox" /></td>
+          </tr>
+        </table>
+        </td>
     </tr>
   </wicket:extend>
 </table>

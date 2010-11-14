@@ -23,171 +23,70 @@
 
 package org.projectforge.web.access;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.ListMultipleChoice;
-import org.apache.wicket.markup.html.form.SubmitLink;
+import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.apache.wicket.validation.IValidatable;
-import org.apache.wicket.validation.validator.AbstractValidator;
-import org.projectforge.common.KeyValueBean;
+import org.projectforge.access.AccessEntryDO;
+import org.projectforge.access.AccessType;
+import org.projectforge.access.GroupTaskAccessDO;
+import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
-import org.projectforge.user.GroupDao;
-import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserDao;
 import org.projectforge.web.common.TwoListHelper;
+import org.projectforge.web.task.TaskSelectPanel;
+import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.components.MaxLengthTextArea;
-import org.projectforge.web.wicket.components.MaxLengthTextField;
-import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
-import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.web.wicket.WicketUtils;
 
-public class AccessEditForm extends AbstractEditForm<GroupDO, AccessEditPage>
+public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEditPage>
 {
-  private static final long serialVersionUID = 3044732844606748738L;
+  private static final long serialVersionUID = 1949792988059857771L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AccessEditForm.class);
 
-  @SpringBean(name = "groupDao")
-  private GroupDao groupDao;
-
-  @SpringBean(name = "userDao")
-  private UserDao userDao;
-
   TwoListHelper<Integer, String> users;
 
-  private List<Integer> valuesToAssign = new ArrayList<Integer>();
-
-  private List<Integer> valuesToUnassign = new ArrayList<Integer>();
-
-  private ListMultipleChoice<Integer> valuesToAssignChoice;
-
-  private ListMultipleChoice<Integer> valuesToUnassignChoice;
-
-  public AccessEditForm(final AccessEditPage parentPage, GroupDO data)
+  public AccessEditForm(final AccessEditPage parentPage, GroupTaskAccessDO data)
   {
     super(parentPage, data);
     this.colspan = 2;
   }
 
-  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     super.init();
-    List<Integer> usersToAdd = null;
-    add(new RequiredMaxLengthTextField("name", new PropertyModel<String>(getData(), "name")).add(new AbstractValidator<String>() {
-      @Override
-      protected void onValidate(IValidatable<String> validatable)
-      {
-        final String groupname = validatable.getValue();
-        if (groupname == null) {
-          return;
-        }
-        getData().setName(groupname);
-        if (groupDao.doesGroupnameAlreadyExist(getData()) == true) {
-          error(validatable);
-        }
-      }
-
-      @Override
-      protected String resourceKey()
-      {
-        return "group.error.groupnameAlreadyExists";
-      }
-    }));
-    add(new MaxLengthTextField("organization", new PropertyModel<String>(getData(), "organization")));
-    add(new MaxLengthTextArea("description", new PropertyModel<String>(getData(), "description")));
-
-    final SubmitLink unassignButton = new SubmitLink("unassignButton") {
-      public void onSubmit()
-      {
-        users.unassign(valuesToUnassign);
-        valuesToUnassign.clear();
-        refreshUsersLists();
-      };
-    };
-    add(unassignButton);
-    unassignButton.add(new TooltipImage("buttonUnassignImage", getResponse(), WebConstants.IMAGE_BUTTON_ASSIGN_TO_RIGHT,
-        getString("tooltip.unassign")));
-
-    final List<Integer> assignedUsers = new ArrayList<Integer>();
-    final Collection<PFUserDO> set = getData().getAssignedUsers();
-    if (set != null) {
-      for (final PFUserDO user : set) {
-        assignedUsers.add(user.getId());
-      }
-    }
-    final SubmitLink assignButton = new SubmitLink("assignButton") {
-      public void onSubmit()
-      {
-        users.assign(valuesToAssign);
-        valuesToAssign.clear();
-        refreshUsersLists();
-      };
-    };
-    add(assignButton);
-    assignButton.add(new TooltipImage("buttonAssignImage", getResponse(), WebConstants.IMAGE_BUTTON_ASSIGN_TO_LEFT,
-        getString("tooltip.assign")));
-    final List<KeyValueBean<Integer, String>> fullList = new ArrayList<KeyValueBean<Integer, String>>();
-    final List<PFUserDO> result = (List<PFUserDO>) userDao.getList(userDao.getDefaultFilter());
-    for (final PFUserDO user : result) {
-      fullList.add(new KeyValueBean<Integer, String>(user.getId(), user.getUsername()));
-    }
-    this.users = new TwoListHelper<Integer, String>(fullList, assignedUsers);
-    if (usersToAdd != null) {
-      users.assign(usersToAdd);
-    }
-    this.users.sortLists();
-    valuesToAssignChoice = new ListMultipleChoice<Integer>("valuesToAssign");
-    valuesToAssignChoice.setModel(new PropertyModel<Collection<Integer>>(this, "valuesToAssign"));
-    add(valuesToAssignChoice);
-    valuesToUnassignChoice = new ListMultipleChoice<Integer>("valuesToUnassign");
-    valuesToUnassignChoice.setModel(new PropertyModel<Collection<Integer>>(this, "valuesToUnassign"));
-    add(valuesToUnassignChoice);
-    refreshUsersLists();
+    final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("task", new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId");
+    add(taskSelectPanel.setRequired(true));
+    taskSelectPanel.init();
+    final GroupSelectPanel groupSelectPanel = new GroupSelectPanel("group", new PropertyModel<GroupDO>(data, "group"), parentPage,
+        "groupId");
+    add(groupSelectPanel.setRequired(true));
+    groupSelectPanel.init();
+    final Component recursiveLabel = new Label("recursive").setRenderBodyOnly(true);
+    WicketUtils.addTooltip(recursiveLabel, getString("access.recursive.help"));
+    add(recursiveLabel);
+    add(new CheckBox("recursiveCheckBox", new PropertyModel<Boolean>(data, "recursive")));
+    final RepeatingView rowRepeater = new RepeatingView("accessRows");
+    add(rowRepeater);
+    addAccessRow(rowRepeater, data.ensureAndGetAccessEntry(AccessType.TASK_ACCESS_MANAGEMENT));
+    addAccessRow(rowRepeater, data.ensureAndGetAccessEntry(AccessType.TASKS));
+    addAccessRow(rowRepeater, data.ensureAndGetAccessEntry(AccessType.TIMESHEETS));
+    addAccessRow(rowRepeater, data.ensureAndGetAccessEntry(AccessType.OWN_TIMESHEETS));
   }
 
-  private void refreshUsersLists()
+  private void addAccessRow(final RepeatingView rowRepeater, final AccessEntryDO accessEntry)
   {
-    final LabelValueChoiceRenderer<Integer> valuesToAssignChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-    for (final KeyValueBean<Integer, String> group : this.users.getUnassignedItems()) {
-      valuesToAssignChoiceRenderer.addValue(group.getKey(), group.getValue());
-    }
-    valuesToAssignChoice.setChoiceRenderer(valuesToAssignChoiceRenderer);
-    valuesToAssignChoice.setChoices(valuesToAssignChoiceRenderer.getValues());
-    final LabelValueChoiceRenderer<Integer> valuesToUnassignChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-    for (final KeyValueBean<Integer, String> group : this.users.getAssignedItems()) {
-      valuesToUnassignChoiceRenderer.addValue(group.getKey(), group.getValue());
-    }
-    valuesToUnassignChoice.setChoiceRenderer(valuesToUnassignChoiceRenderer);
-    valuesToUnassignChoice.setChoices(valuesToUnassignChoiceRenderer.getValues());
-  }
-
-  public List<Integer> getValuesToAssign()
-  {
-    return valuesToAssign;
-  }
-
-  public void setValuesToAssign(List<Integer> valuesToAssign)
-  {
-    this.valuesToAssign = valuesToAssign;
-  }
-
-  public List<Integer> getValuesToUnassign()
-  {
-    return valuesToUnassign;
-  }
-
-  public void setValuesToUnassign(List<Integer> valuesToUnassign)
-  {
-    this.valuesToUnassign = valuesToUnassign;
+    final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
+    rowRepeater.add(row);
+    row.add(new Label("area", getString(accessEntry.getAccessType().getI18nKey())));
+    row.add(new CheckBox("selectCheckBox", new PropertyModel<Boolean>(accessEntry, "accessSelect")));
+    row.add(new CheckBox("insertCheckBox", new PropertyModel<Boolean>(accessEntry, "accessInsert")));
+    row.add(new CheckBox("updateCheckBox", new PropertyModel<Boolean>(accessEntry, "accessUpdate")));
+    row.add(new CheckBox("deleteCheckBox", new PropertyModel<Boolean>(accessEntry, "accessDelete")));
   }
 
   @Override

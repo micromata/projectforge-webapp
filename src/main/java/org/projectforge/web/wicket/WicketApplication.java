@@ -55,6 +55,7 @@ import org.projectforge.core.CronSetup;
 import org.projectforge.core.ProjectForgeException;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.user.UserXmlPreferencesCache;
+import org.projectforge.web.access.AccessListPage;
 import org.projectforge.web.address.AddressListPage;
 import org.projectforge.web.address.AddressViewPage;
 import org.projectforge.web.address.SendSmsPage;
@@ -115,6 +116,8 @@ public class WicketApplication extends WebApplication
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(WicketApplication.class);
 
   public static final String RESOURCE_BUNDLE_NAME = "I18nResources";
+
+  private static final String BOOKMARK_ACCESS_LIST = "accessList";
 
   private static final String BOOKMARK_ADMIN = "admin";
 
@@ -327,6 +330,7 @@ public class WicketApplication extends WebApplication
     addComponentInstantiationListener(new SpringComponentInjector(this));
     // mountPage("login", LoginPage.class);
     mountPage(BOOKMARK_IMAGECROPPER, ImageCropperPage.class);
+    mountPage(BOOKMARK_ACCESS_LIST, AccessListPage.class);
     mountPage(BOOKMARK_ADMIN, AdminPage.class);
     mountPage(BOOKMARK_ADDRESS_LIST, AddressListPage.class);
     mountPage(BOOKMARK_ADDRESS_VIEW, AddressViewPage.class);
