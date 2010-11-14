@@ -26,6 +26,7 @@ package org.projectforge.access;
 import java.util.List;
 
 import org.apache.commons.lang.Validate;
+import org.hibernate.Hibernate;
 import org.projectforge.core.BaseDao;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
@@ -33,7 +34,6 @@ import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -184,6 +184,22 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
     }
     return true;
   }
+  
+  /**
+   * @see org.projectforge.core.BaseDao#prepareHibernateSearch(org.projectforge.core.ExtendedBaseDO, org.projectforge.access.OperationType)
+   */
+  @Override
+  protected void prepareHibernateSearch(final GroupTaskAccessDO obj, final OperationType operationType)
+  {
+    final TaskDO task = obj.getTask();
+    if (task != null && Hibernate.isInitialized(task) == false) {
+      obj.setTask(taskTree.getTaskById(task.getId()));
+    }
+    final GroupDO group = obj.getGroup();
+    if (group != null && Hibernate.isInitialized(group) == false) {
+      obj.setGroup(userGroupCache.getGroup(group.getId()));
+    }
+  }
 
   @Override
   protected void afterSaveOrModify(GroupTaskAccessDO obj)
@@ -193,10 +209,8 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
   }
 
   @Override
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
-  public boolean internalUpdate(GroupTaskAccessDO obj, boolean checkAccess)
+  protected void afterUpdate(GroupTaskAccessDO obj, GroupTaskAccessDO dbObj)
   {
-    super.internalUpdate(obj, checkAccess);
     List<AccessEntryDO> entries = obj.getOrderedEntries();
     StringBuffer buf = new StringBuffer();
     boolean first = true;
@@ -210,22 +224,17 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
           .append(",").append(entry.getAccessUpdate()).append(",").append(entry.getAccessDelete()).append("}");
     }
     createHistoryEntry(obj, obj.getId(), "entries", String.class, "", buf.toString());
-    return true;
   }
 
   @Override
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
-  public void markAsDeleted(GroupTaskAccessDO obj) throws AccessException
+  protected void afterDelete(GroupTaskAccessDO obj)
   {
-    super.markAsDeleted(obj);
     taskTree.removeGroupTaskAccess(obj);
   }
 
   @Override
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
-  public void undelete(GroupTaskAccessDO obj) throws AccessException
+  protected void afterUndelete(GroupTaskAccessDO obj)
   {
-    super.undelete(obj);
     taskTree.setGroupTaskAccess(obj);
   }
 
