@@ -49,7 +49,6 @@ import org.projectforge.fibu.EingangsrechnungsPositionDO;
 import org.projectforge.fibu.EmployeeSalaryDO;
 import org.projectforge.fibu.RechnungsPositionDO;
 
-
 /**
  * Rechnungen (Ein- und Ausgang) sowie Gehaltssonderzahlungen werden auf Kost1 und Kost2 aufgeteilt. Einer Rechnung können mehrere
  * KostZuweisungen zugeordnet sein. Die Summe aller Einzelkostzuweisung sollte dem Betrag der Rechnung/Gehaltszahlung entsprechen.
@@ -57,8 +56,10 @@ import org.projectforge.fibu.RechnungsPositionDO;
  */
 @Entity
 @Indexed
-@Table(name = "T_FIBU_KOST_ZUWEISUNG", uniqueConstraints = { @UniqueConstraint(columnNames = { "index", "rechnungs_pos_fk",
-    "eingangsrechnungs_pos_fk", "employee_salary_fk"})})
+@Table(name = "T_FIBU_KOST_ZUWEISUNG", uniqueConstraints = {
+    @UniqueConstraint(columnNames = { "index", "rechnungs_pos_fk", "kost1_fk", "kost2_fk"}),
+    @UniqueConstraint(columnNames = { "index", "eingangsrechnungs_pos_fk", "kost1_fk", "kost2_fk"}),
+    @UniqueConstraint(columnNames = { "index", "employee_salary_fk", "kost1_fk", "kost2_fk"})})
 public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCapable
 {
   private static final long serialVersionUID = 7680349296575044993L;
@@ -339,7 +340,7 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
   {
     return String.valueOf(index);
   }
-  
+
   /**
    * Clones this cost assignment (without id's).
    * @return
