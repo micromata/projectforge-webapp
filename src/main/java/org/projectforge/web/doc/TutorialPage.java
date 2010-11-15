@@ -33,6 +33,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.access.AccessDao;
 import org.projectforge.access.GroupTaskAccessDO;
+import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.task.TaskDO;
@@ -269,11 +270,13 @@ public class TutorialPage extends AbstractSecuredPage
     TaskDO task = null;
     GroupDO group = null;
     if ("JavaGurusEmployees".equals(reference) == true) {
-      access = createAccess(getRequiredTask(REF_TASK_JAVA_GURUS), getRequiredGroup(REF_TASK_JAVA_GURUS), ACCESS_TEMPLATE_EMPLOYEE,
-          tutorialReference);
+      task = getRequiredTask(REF_TASK_JAVA_GURUS);
+      group = getRequiredGroup(REF_GROUP_JAVA_GURUS);
+      access = createAccess(task, group, ACCESS_TEMPLATE_EMPLOYEE, tutorialReference);
     } else if ("ACME-WebPortal".equals(reference) == true) {
-      access = createAccess(getRequiredTask(REF_TASK_ACME_WEBPORTAL), getRequiredGroup(REF_TASK_ACME_WEBPORTAL), ACCESS_TEMPLATE_EMPLOYEE,
-          tutorialReference);
+      task = getRequiredTask(REF_TASK_ACME_WEBPORTAL);
+      group = getRequiredGroup(REF_GROUP_ACME_WEBPORTAL);
+      access = createAccess(task, group, ACCESS_TEMPLATE_EMPLOYEE, tutorialReference);
     } else {
       log.warn("Unknown tutorial request: task=" + reference);
       setResponsePage(new MessagePage("tutorial.unknown").setWarning(true));
@@ -301,20 +304,38 @@ public class TutorialPage extends AbstractSecuredPage
 
   private boolean doesEntryAlreadyExist(final BaseDao< ? > dao, final String tutorialReference)
   {
-    if (getEntry(dao, tutorialReference) != null) {
-      setResponsePage(new MessagePage("tutorial.objectAlreadyCreated", tutorialReference).setWarning(true));
+    final BaseDO< ? > obj = getEntry(dao, tutorialReference);
+    if (obj != null) {
+      if (obj instanceof PFUserDO) {
+        setResponsePage(new UserEditPage(createEditPageParameters(obj)));
+      } else if (obj instanceof GroupDO) {
+        setResponsePage(new GroupEditPage(createEditPageParameters(obj)));
+      } else if (obj instanceof TaskDO) {
+        setResponsePage(new TaskEditPage(createEditPageParameters(obj)));
+      } else if (obj instanceof GroupTaskAccessDO) {
+        setResponsePage(new AccessEditPage(createEditPageParameters(obj)));
+      } else {
+        setResponsePage(new MessagePage("tutorial.objectAlreadyCreated", tutorialReference).setWarning(true));
+      }
       return true;
     }
     return false;
   }
 
-  private Object getEntry(final BaseDao< ? > dao, final String tutorialReference)
+  private PageParameters createEditPageParameters(final BaseDO< ? > obj)
+  {
+    final PageParameters params = new PageParameters();
+    params.put(AbstractEditPage.PARAMETER_KEY_ID, obj.getId());
+    return params;
+  }
+
+  private BaseDO< ? > getEntry(final BaseDao< ? > dao, final String tutorialReference)
   {
     final QueryFilter filter = new QueryFilter();
     filter.add(Restrictions.ilike("description", "%" + tutorialReference + "%"));
     final List< ? > list = dao.internalGetList(filter);
     if (CollectionUtils.isNotEmpty(dao.internalGetList(filter)) == true) {
-      return list.get(0);
+      return (BaseDO< ? >) list.get(0);
     }
     return null;
   }
