@@ -71,10 +71,10 @@ public class GroupTaskAccessDO extends DefaultBaseDO
     invalidHistorizableProperties.add("accessEntries");
   }
 
-  @IndexedEmbedded
+  @IndexedEmbedded(depth = 1)
   private GroupDO group;
 
-  @IndexedEmbedded
+  @IndexedEmbedded(depth = 1)
   private TaskDO task;
 
   private boolean recursive = true;
@@ -86,7 +86,7 @@ public class GroupTaskAccessDO extends DefaultBaseDO
 
   /**
    * Returns the specified access.
-   * @param accessType TASKS_ACCESS, BUGS_ACCESS, ...
+   * @param accessType TASKS_ACCESS, ...
    * @return The specified access or null if not found.
    */
   @Transient
