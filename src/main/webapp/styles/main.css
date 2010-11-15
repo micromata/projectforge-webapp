@@ -44,7 +44,7 @@ table.form td .error{border:1px solid #6D6D6D;border-right-color:#DBDBDB;border-
 input[disabled],textarea[disabled]{background-color:silver;}
 table.form td select{padding:0;margin:2px;}
 #content table td.buttonpanel{padding:10px 10px 20px 0;}
-#content table td.buttonpanel input {float:right;}
+#content table td.buttonpanel input {}
 table.form td input.shorttext{width:150px;}
 table.form td input.stdtext{width:80%;}
 table.form td input.date{width:60px;}
