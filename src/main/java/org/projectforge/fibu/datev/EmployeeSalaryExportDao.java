@@ -30,7 +30,6 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -130,8 +129,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
         "fibu.employee.salary.bruttoMitAgAnteil", XlsContentProvider.LENGTH_CURRENCY), KORREKTUR("fibu.common.korrekturWert",
         XlsContentProvider.LENGTH_CURRENCY), SUMME("sum", XlsContentProvider.LENGTH_CURRENCY), BEZEICHNUNG("description",
         XlsContentProvider.LENGTH_EXTRA_LONG), DATUM("date", XlsContentProvider.LENGTH_DATE), KONTO("fibu.buchungssatz.konto", 14), GEGENKONTO(
-        "fibu.buchungssatz.gegenKonto", 14), KOST1_ID("fibu.kost1.id", 0), KOST2_ID("fibu.kost2.id", 0), SALARY_ID(
-        "fibu.employee.salary.id", 0), SQL("sql", 0);
+        "fibu.buchungssatz.gegenKonto", 14);
 
     final String theTitle;
 
@@ -139,7 +137,7 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
 
     final static ExcelColumn START = KOST1;
 
-    final static ExcelColumn END = SQL;
+    final static ExcelColumn END = GEGENKONTO;
 
     ExcelColumn(String theTitle, int width)
     {
@@ -247,9 +245,6 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
     sheetProvider.putFormat("KONTO", "#");
     sheetProvider.putFormat("GEGENKONTO", "#");
     sheetProvider.putFormat("DATUM", "dd.MM.yyyy");
-    sheetProvider.putFormat("KOST1_ID", "#");
-    sheetProvider.putFormat("KOST2_ID", "#");
-    sheetProvider.putFormat("SALARY_ID", "#");
     // inform provider of column widths
     for (int ci = 0; ci < colWidths.length; ++ci) {
       sheetProvider.putColWidth(ci, colWidths[ci]);
@@ -260,12 +255,8 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
     for (String title : colTitles) {
       headRow.addCell(i++, title);
     }
-    int index = 0;
-    int salaryId = -1;
+
     for (final EmployeeSalaryDO salary : list) {
-      if (salary.getId() != salaryId) {
-        index = 0;
-      }
       final PropertyMapping mapping = new PropertyMapping();
       final PFUserDO user = userGroupCache.getUser(salary.getEmployee().getUserId());
       Validate.isTrue(year == salary.getYear());
@@ -292,10 +283,9 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
         final BigDecimal betrag = CurrencyHelper.multiply(bruttoMitAGAnteil, new BigDecimal(entry.getMillis()).divide(totalDuration, 8,
             RoundingMode.HALF_UP));
         sum = sum.add(betrag);
-        BigDecimal endBetrag = betrag;
         if (--j == 0) {
           final BigDecimal korrektur = bruttoMitAGAnteil.subtract(sum);
-          endBetrag = betrag.add(korrektur);
+          mapping.add(ExcelColumn.BRUTTO_MIT_AG, betrag.add(korrektur));
           mapping.add(ExcelColumn.KORREKTUR, korrektur);
           if (NumberHelper.isEqual(sum.add(korrektur), bruttoMitAGAnteil) == true) {
             mapping.add(ExcelColumn.SUMME, bruttoMitAGAnteil);
@@ -303,34 +293,13 @@ public class EmployeeSalaryExportDao extends HibernateDaoSupport
             mapping.add(ExcelColumn.SUMME, "*** " + sum + " != " + bruttoMitAGAnteil);
           }
         } else {
+          mapping.add(ExcelColumn.BRUTTO_MIT_AG, betrag);
           mapping.add(ExcelColumn.KORREKTUR, "");
           mapping.add(ExcelColumn.SUMME, "");
         }
-        mapping.add(ExcelColumn.BRUTTO_MIT_AG, endBetrag);
         mapping.add(ExcelColumn.DATUM, buchungsdatum.getCalendar()); // Last day of month
         mapping.add(ExcelColumn.KONTO, KONTO); // constant.
         mapping.add(ExcelColumn.GEGENKONTO, GEGENKONTO); // constant.
-        mapping.add(ExcelColumn.KOST1_ID, kost1.getId());
-        mapping.add(ExcelColumn.KOST2_ID, kost2.getId());
-        mapping.add(ExcelColumn.SALARY_ID, salary.getId());
-        mapping
-            .add(
-                ExcelColumn.SQL,
-                "insert into t_fibu_kost_zuweisung (pk,created,last_update,deleted,index,employee_salary_fk,kost1_fk,kost2_fk,netto,comment) values(nextval('hibernate_sequence'),now(),now(),false,"
-                    + index++
-                    + ","
-                    + salary.getId()
-                    + ","
-                    + kost1.getId()
-                    + ","
-                    + kost2.getId()
-                    + ","
-                    + endBetrag
-                    + ",'Import script for " + sheetTitle + " produced by "
-                    + PFUserContext.getUser().getFullname()
-                    + ", "
-                    + DateHelper.formatIsoTimestamp(new Date())
-                    + "');");
         sheet.addRow(mapping.getMapping(), 0);
       }
       addEmployeeRow(employeeSheet, salary.getEmployee(), numberOfWorkingDays, totalDuration);
