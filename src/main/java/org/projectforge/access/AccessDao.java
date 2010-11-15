@@ -184,7 +184,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
     }
     return true;
   }
-  
+
   /**
    * @see org.projectforge.core.BaseDao#prepareHibernateSearch(org.projectforge.core.ExtendedBaseDO, org.projectforge.access.OperationType)
    */
@@ -193,11 +193,12 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
   {
     final TaskDO task = obj.getTask();
     if (task != null && Hibernate.isInitialized(task) == false) {
+      Hibernate.initialize(obj.getTask());
       obj.setTask(taskTree.getTaskById(task.getId()));
     }
     final GroupDO group = obj.getGroup();
-    if (group != null && Hibernate.isInitialized(group) == false) {
-      obj.setGroup(userGroupCache.getGroup(group.getId()));
+    if (group != null && Hibernate.isInitialized(group) == false){
+      obj.setGroup(userGroupCache.getGroup(obj.getGroupId()));
     }
   }
 
