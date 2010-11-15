@@ -49,15 +49,19 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.ExtendedBaseDO;
 import org.projectforge.core.IManualIndex;
+import org.projectforge.core.UserException;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.task.TaskTreePage;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
+import org.springframework.dao.DataIntegrityViolationException;
 
 public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends AbstractEditForm<O, ? >, D extends BaseDao<O>> extends
     AbstractSecuredPage
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractEditPage.class);
+
   public static final String PARAMETER_KEY_ID = "id";
 
   public static final String PARAMETER_KEY_DATA_PRESET = "__data";
@@ -335,7 +339,12 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
           setResponsePageAndHighlightedRow(page);
           return;
         }
-        getBaseDao().save(getData());
+        try {
+          getBaseDao().save(getData());
+        } catch (final DataIntegrityViolationException ex) {
+          log.error(ex.getMessage(), ex);
+          throw new UserException("exception.constraintViolation");
+        }
         page = afterSaveOrUpdate();
         if (page != null) {
           setResponsePageAndHighlightedRow(page);
@@ -381,7 +390,13 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
           setResponsePageAndHighlightedRow(page);
           return;
         }
-        boolean modified = getBaseDao().update(getData());
+        boolean modified = false;
+        try {
+          modified = getBaseDao().update(getData());
+        } catch (final DataIntegrityViolationException ex) {
+          log.error(ex.getMessage(), ex);
+          throw new UserException("exception.constraintViolation");
+        }
         page = afterSaveOrUpdate();
         if (page != null) {
           setResponsePageAndHighlightedRow(page);
