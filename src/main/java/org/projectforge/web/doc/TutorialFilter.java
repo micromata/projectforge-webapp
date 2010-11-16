@@ -98,7 +98,7 @@ public class TutorialFilter implements Filter
           buf.append("\">create</a>");
           continue;
         }
-        buf.append(ref).append("\">");
+        buf.append(ref).append("\"><img src=\"images/actionlink_add.png\" style=\"vertical-align:middle;\" />");
         i++; // }
         final String label = m.group(i++);
         if (label == null) {
