@@ -8,13 +8,13 @@
 
   <property environment="env" />
 	<property name="APP_ID" value="ProjectForge" />
-	<property name="appTitle" value="${APP_ID} 2010" />
-	<property name="version" value="3.4.2" />
+	<property name="APP_TITLE" value="${APP_ID} 2010" />
+	<property name="VERSION" value="3.4.2.1" />
 	<property name="m_doc.home" value="${env.M_DOC_HOME}" />
 	<property name="webproject" value="." />
 	<property name="target" value="${webproject}/target" />
 	<property name="target.tmp" value="${target}/tmp" />
-	<property name="dist-src-dir" value="ProjectForge-src-${version}-${version.timestamp}" />
+	<property name="dist-src-dir" value="ProjectForge-src-${VERSION}-${version.timestamp}" />
 	<property name="doc-dir" value="../../trunk/doc" />
 	<property name="standalone-dir" value="../../standalone/trunk" />
 	<property name="version.file" value="src/main/java/org/projectforge/Version.java" />
@@ -74,15 +74,15 @@
 				<exclude name="images/titleM_paper/box_*.pdf" />
 			</fileset>
 		</copy>
-		<zip destfile="${target}/ProjectForge-${version}-${version.timestamp}.war">
+		<zip destfile="${target}/ProjectForge-${VERSION}-${version.timestamp}.war">
 			<fileset dir="${target.tmp}" casesensitive="yes" />
 		</zip>
 		<copy overwrite="true" file="${webproject}/src/main/webapp/WEB-INF/web-force-SSL.xml" tofile="${target.tmp}/WEB-INF/web.xml" />
 		<delete file="${target.tmp}/WEB-INF/web-force-SSL.xml" />
-		<zip destfile="${target}/ProjectForge-force-SSL-${version}-${version.timestamp}.war">
+		<zip destfile="${target}/ProjectForge-force-SSL-${VERSION}-${version.timestamp}.war">
 			<fileset dir="${target.tmp}" casesensitive="yes" />
 		</zip>
-		<zip destfile="${target}/ProjectForge_without_libs-${version}-${version.timestamp}.zip">
+		<zip destfile="${target}/ProjectForge_without_libs-${VERSION}-${version.timestamp}.zip">
 			<fileset dir="${target.tmp}" casesensitive="yes">
 				<exclude name="WEB-INF/lib/**" />
 			</fileset>
@@ -160,9 +160,9 @@ public class Version
 {
   public static final String APP_ID = "${APP_ID}";
 
-  public static final String APP_TITLE = "${appTitle}";
+  public static final String APP_TITLE = "${APP_TITLE}";
 
-  public static final String NUMBER = "${version}";
+  public static final String NUMBER = "${VERSION}";
 
   public static final String RELEASE_DATE = "${VERSION_DATE}";
 
@@ -175,13 +175,13 @@ public class Version
 		<echo file="${doc-dir}/version.dtd" append="false"><![CDATA[<?xml version="1.0" encoding="UTF-8" ?>
 <!ENTITY date "${VERSION_DATE}" >
 <!ENTITY timestamp "${VERSION_NOW}" >
-<!ENTITY version "${version}" >]]>
+<!ENTITY version "${VERSION}" >]]>
 </echo>
 		<echo>Creating file version.xml ...</echo>
 		<echo file="version.xml" append="false"><![CDATA[<?xml version="1.0" encoding="UTF-8" ?>
 <property name="appId" value="${APP_ID}"/>
-<property name="appTitle" value="${appTitle}"/>
-<property name="version" value="${version}"/>
+<property name="appTitle" value="${APP_TITLE}"/>
+<property name="version" value="${VERSION}"/>
 <property name="version.date" value="${VERSION_DATE}"/>
 <property name="version.timestamp" value="${VERSION_NOW_FC}"/>]]>
 </echo>
@@ -190,7 +190,7 @@ public class Version
 
 	<target name="reporting-interfaces">
 		<mkdir dir="${target}/resources" />
-		<zip destfile="${target}/resources/ProjectForgeReportingInterfaces-${version}.jar">
+		<zip destfile="${target}/resources/ProjectForgeReportingInterfaces-${VERSION}.jar">
 			<fileset dir="${target}/classes" casesensitive="yes">
 				<include name="org/projectforge/reporting/*.class" />
 				<include name="org/projectforge/core/Priority.class" />
@@ -204,7 +204,7 @@ public class Version
 	</target>
 
 	<target name="test-release-info">
-		<echo>Version: ${version}
+		<echo>Version: ${VERSION}
         date: ${version.date}
         timestamp: ${version.timestamp}
       </echo>

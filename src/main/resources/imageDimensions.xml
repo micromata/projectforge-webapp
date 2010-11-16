@@ -8,6 +8,7 @@
   <image path="asteriskOperatorPanel.png" width="137" height="76"/>
   <image path="attach.png" width="16" height="16"/>
   <image path="background.gif" width="975" height="22"/>
+  <image path="blank.gif" width="1" height="1"/>
   <image path="book_add.png" width="16" height="16"/>
   <image path="book_delete.png" width="16" height="16"/>
   <image path="book_edit.png" width="16" height="16"/>
