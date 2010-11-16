@@ -174,7 +174,7 @@
   <!-- For online tutorial with action links. -->
   <filter-mapping>
     <filter-name>TutorialFilter</filter-name>
-    <url-pattern>/doc/*</url-pattern>
+    <url-pattern>/secure/doc/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>expire</filter-name>
