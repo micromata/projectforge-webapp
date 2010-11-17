@@ -9,7 +9,7 @@
   <property environment="env" />
 	<property name="APP_ID" value="ProjectForge" />
 	<property name="APP_TITLE" value="${APP_ID} 2010" />
-	<property name="VERSION" value="3.4.2.1" />
+	<property name="VERSION" value="3.4.3" />
 	<property name="m_doc.home" value="${env.M_DOC_HOME}" />
 	<property name="webproject" value="." />
 	<property name="target" value="${webproject}/target" />
@@ -113,6 +113,7 @@
         <include name="src/main/webapp/**/favicon.ico" />
         <include name="src/main/webapp/**/*.css" />
         <include name="src/main/webapp/**/*.gif" />
+        <include name="src/main/webapp/**/*.htc" />
         <include name="src/main/webapp/**/*.html" />
         <include name="src/main/webapp/**/*.js" />
         <include name="src/main/webapp/**/*.jpg" />
