@@ -1,9 +1,15 @@
 function rowClick(row) {
-	window.location.href = $(row).find("a:first").attr("href");
+	if (suppressRowClick != 'true') {
+	  window.location.href = $(row).find("a:first").attr("href");
+	}
+	suppressRowClick = 'false';
 }
 function rowCheckboxClick(row) {
 	cb = $(row).find("input[type='checkbox']");
 	cb.attr('checked', !cb.is(':checked'));
+}
+function suppressNextRowClick() {
+	suppressRowClick = 'true';
 }
 function preventBubble(e) {
 	if (!e)
@@ -32,6 +38,8 @@ function initTooltips() {
 function showBookmark() {
 	$("#bookmark").toggle("normal");
 }
+
+var suppressRowClick = 'false';
 
 // Begin: Functionality for DropDownMenu
 var timeout = 500;
