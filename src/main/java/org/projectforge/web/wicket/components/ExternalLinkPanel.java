@@ -35,9 +35,16 @@ public class ExternalLinkPanel extends Panel
 {
   private static final long serialVersionUID = -7477514367748357957L;
 
+  private ExternalLink link;
+
   public ExternalLinkPanel(final String id, final String href, final String label)
   {
     super(id);
-    add(new ExternalLink("link", href, label));
+    add(link = new ExternalLink("link", href, label));
+  }
+
+  public ExternalLink getLink()
+  {
+    return link;
   }
 }
