@@ -26,6 +26,7 @@ package org.projectforge.address;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.poi.hssf.util.HSSFColor;
@@ -115,7 +116,7 @@ public class AddressExport
    * (PF_Marketing) all addresses are exported, for others only those which are marked as personal favorites.
    * @throws IOException
    */
-  public byte[] export(List<PersonalAddressDO> origList)
+  public byte[] export(final List<AddressDO> origList, final Map<Integer, PersonalAddressDO> personalAddressMap)
   {
     log.info("Exporting address list.");
     ExportColumn[] columns = new ExportColumn[] { //
@@ -157,14 +158,14 @@ public class AddressExport
         new I18nExportColumn(Col.FINGERPRINT, "address.fingerprint", LENGTH_STD),
         new I18nExportColumn(Col.PUBLIC_KEY, "address.publicKey", LENGTH_EXTRA_LONG)};
 
-    final List<PersonalAddressDO> list = new ArrayList<PersonalAddressDO>();
-    for (PersonalAddressDO personalAddress : origList) {
+    final List<AddressDO> list = new ArrayList<AddressDO>();
+    for (final AddressDO address : origList) {
       if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.MARKETING_GROUP) == true) {
         // Add all addresses for users of finance group:
-        list.add(personalAddress);
-      } else if (personalAddress.isFavorite() == true)
+        list.add(address);
+      } else if (personalAddressMap.containsKey(address.getId()) == true)
         // For others only those which are personal:
-        list.add(personalAddress);
+        list.add(address);
     }
     if (CollectionUtils.isEmpty(list) == true) {
       return null;
@@ -188,9 +189,7 @@ public class AddressExport
     sheet.setColumns(columns);
 
     PropertyMapping mapping = new PropertyMapping();
-    for (PersonalAddressDO personalAddress : list) {
-      AddressDO address = personalAddress.getAddress();
-
+    for (final AddressDO address : list) {
       mapping.add(Col.NAME, address.getName());
       mapping.add(Col.FIRST_NAME, address.getFirstName());
       mapping

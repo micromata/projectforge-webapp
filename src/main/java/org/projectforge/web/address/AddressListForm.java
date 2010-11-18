@@ -23,10 +23,15 @@
 
 package org.projectforge.web.address;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
+import java.io.StringWriter;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.Component;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
@@ -38,22 +43,35 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
+import org.apache.wicket.util.io.IOUtils;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
+import org.projectforge.address.AddressExport;
 import org.projectforge.address.AddressFilter;
+import org.projectforge.address.PersonalAddressDO;
+import org.projectforge.common.DateHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 public class AddressListForm extends AbstractListForm<AddressListFilter, AddressListPage>
 {
+  private static final String APPLE_SCRIPT_DIR = "misc/";
+
+  private static final String APPLE_SCRIPT_FOR_ADDRESS_BOOK = "AddressBookRemoveNotesOfClassWork.scpt";
+
   private static final long serialVersionUID = 8124796579658957116L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressListForm.class);
 
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
+  
+  @SpringBean(name = "addressExport")
+  private AddressExport addressExport;
+
 
   @Override
   protected void init()
@@ -76,21 +94,100 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
     filterType.add(new Radio<String>("myFavorites", new Model<String>("myFavorites")));
     filterType.add(new Radio<String>("deleted", new Model<String>("deleted")));
     filterContainer.add(filterType);
-    
+
     @SuppressWarnings("serial")
-    final Button exportVCards = new Button("button", new Model<String>(getString("exportFavoriteVCards"))) {
+    final Button exportVCardsButton = new Button("button", new Model<String>(getString("address.book.vCardExport"))) {
       @Override
       public final void onSubmit()
       {
-       // getParentPage().onResetSubmit();
+        log.info("Exporting personal address book.");
+        final List<PersonalAddressDO> list = addressDao.getFavoriteVCards();
+        if (CollectionUtils.isEmpty(list) == true) {
+          addError("address.book.hasNoVCards");
+          return;
+        }
+        final String filename = "ProjectForge-PersonalAddressBook_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".vcf";
+        final StringWriter writer = new StringWriter();
+        addressDao.exportFavoriteVCards(writer, list);
+        getResponse().setCharacterEncoding("utf-8");
+        DownloadUtils.setDownloadTarget(writer.toString().getBytes(), filename);
       }
     };
-    exportVCards.setDefaultFormProcessing(false).add(new SimpleAttributeModifier("title", getString("address.book.vCardExport.tooltip")));
-    final SingleButtonPanel exportVCardsPanel = new SingleButtonPanel(getNewActionButtonChildId(), exportVCards);
+    exportVCardsButton.setDefaultFormProcessing(false).add(
+        new SimpleAttributeModifier("title", getString("address.book.vCardExport.tooltip")));
+    final SingleButtonPanel exportVCardsPanel = new SingleButtonPanel(getNewActionButtonChildId(), exportVCardsButton);
     prependActionButton(exportVCardsPanel);
 
-    // Export vCards, export, Telefonliste, Apple-Script
-}
+    @SuppressWarnings("serial")
+    final Button exportButton = new Button("button", new Model<String>(getString("address.book.export"))) {
+      @Override
+      public final void onSubmit()
+      {
+        log.info("Exporting address list.");
+        final List<AddressDO> list = parentPage.getList();
+        byte[] xls = addressExport.export(list, parentPage.personalAddressMap);
+        if (xls == null || xls.length == 0) {
+          addError("address.book.hasNoVCards");
+          return;
+        }
+        String filename = "ProjectForge-AddressExport_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
+        DownloadUtils.setDownloadTarget(xls, filename);
+      }
+    };
+    exportButton.setDefaultFormProcessing(false).add(new SimpleAttributeModifier("title", getString("address.book.export.tooltip")));
+    final SingleButtonPanel exportPanel = new SingleButtonPanel(getNewActionButtonChildId(), exportButton);
+    prependActionButton(exportPanel);
+
+    @SuppressWarnings("serial")
+    final Button exportPhoneListButton = new Button("button", new Model<String>(getString("address.book.exportFavoritePhoneList"))) {
+      @Override
+      public final void onSubmit()
+      {
+        log.info("Exporting phone list");
+        final List<PersonalAddressDO> list = addressDao.getFavoritePhoneEntries();
+        if (CollectionUtils.isEmpty(list) == true) {
+          addError("address.book.hasNoPhoneNumbers");
+          return;
+        }
+        final String filename = "ProjectForge-PersonalPhoneList_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".txt";
+        final StringWriter writer = new StringWriter();
+        addressDao.exportFavoritePhoneList(writer, list);
+        getResponse().setCharacterEncoding("utf-8");
+        DownloadUtils.setDownloadTarget(writer.toString().getBytes(), filename);
+      }
+    };
+    exportPhoneListButton.setDefaultFormProcessing(false).add(
+        new SimpleAttributeModifier("title", getString("address.book.exportFavoritePhoneList.tooltip")));
+    final SingleButtonPanel exportPhonelistPanel = new SingleButtonPanel(getNewActionButtonChildId(), exportPhoneListButton);
+    prependActionButton(exportPhonelistPanel);
+
+    @SuppressWarnings("serial")
+    final Button downloadAppleScriptButton = new Button("button", new Model<String>(getString("address.book.export.appleScript4Notes"))) {
+      @Override
+      public final void onSubmit()
+      {
+        // getParentPage().onResetSubmit();
+        byte[] content = null;
+        final String file = APPLE_SCRIPT_DIR + APPLE_SCRIPT_FOR_ADDRESS_BOOK;
+        try {
+          final ClassLoader cLoader = this.getClass().getClassLoader();
+          final InputStream is = cLoader.getResourceAsStream(file);
+          if (is == null) {
+            log.error("Could not find script in resource path: '" + file + "'.");
+          }
+          content = IOUtils.toByteArray(is);
+        } catch (final IOException ex) {
+          log.error("Could not load script '" + file + "'." + ex.getMessage(), ex);
+          throw new RuntimeException(ex);
+        }
+        DownloadUtils.setDownloadTarget(content, APPLE_SCRIPT_FOR_ADDRESS_BOOK);
+      }
+    };
+    downloadAppleScriptButton.setDefaultFormProcessing(false).add(
+        new SimpleAttributeModifier("title", getString("address.book.export.appleScript4Notes.tooltip")));
+    final SingleButtonPanel downloadAppleScriptPanel = new SingleButtonPanel(getNewActionButtonChildId(), downloadAppleScriptButton);
+    prependActionButton(downloadAppleScriptPanel);
+  }
 
   public AddressListForm(AddressListPage parentPage)
   {

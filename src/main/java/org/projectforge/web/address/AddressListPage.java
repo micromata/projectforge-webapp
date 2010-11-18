@@ -72,7 +72,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
   @SpringBean(name = "personalAddressDao")
   private PersonalAddressDao personalAddressDao;
 
-  private Map<Integer, PersonalAddressDO> personalAddressMap;
+  Map<Integer, PersonalAddressDO> personalAddressMap;
 
   public AddressListPage(PageParameters parameters)
   {
@@ -157,7 +157,10 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         item.add(view);
         boolean first = true;
         if (StringUtils.isNotBlank(address.getEmail()) == true) {
-          view.add(new ExternalLinkPanel(view.newChildId(), "mailto:" + address.getEmail(), address.getEmail()));
+          final ExternalLinkPanel mailToLinkPanel = new ExternalLinkPanel(view.newChildId(), "mailto:" + address.getEmail(), address
+              .getEmail());
+          mailToLinkPanel.getLink().add(new SimpleAttributeModifier("onclick", "javascript:suppressRowClick();"));
+          view.add(mailToLinkPanel);
           first = false;
         }
         if (StringUtils.isNotBlank(address.getPrivateEmail()) == true) {

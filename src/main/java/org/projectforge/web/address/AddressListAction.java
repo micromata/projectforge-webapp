@@ -159,7 +159,8 @@ public class AddressListAction extends BaseListActionBean<AddressListFilter, Add
   public Resolution export()
   {
     log.info("Exporting address list.");
-    List<PersonalAddressDO> l = getList();
+    throw new UnsupportedOperationException("Unsupported method.");
+    /*List<PersonalAddressDO> l = getList();
     if (l == null) {
       l = buildList();
     }
@@ -170,6 +171,7 @@ public class AddressListAction extends BaseListActionBean<AddressListFilter, Add
     }
     String filename = "ProjectForge-AddressExport_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
     return getDownloadResolution(filename, xls);
+    */
   }
 
   public Resolution exportFavoriteVCards()
