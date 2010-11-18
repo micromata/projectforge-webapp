@@ -105,6 +105,7 @@
         <include name="src/main/resources/keystore" />
         <include name="src/main/resources/mail/*.html" />
         <include name="src/main/resources/mail/*.txt" />
+        <include name="src/main/resources/misc/*.scpt" />
         <include name="src/main/resources/wa/**/*.html" />
         <include name="src/main/resources/wa/**/*.js" />
         <include name="src/**/*.xml" />
@@ -119,7 +120,6 @@
         <include name="src/main/webapp/**/*.jpg" />
         <include name="src/main/webapp/**/*.jsp" />
         <include name="src/main/webapp/**/*.png" />
-        <include name="src/main/webapp/**/*.scpt" />
         <include name="src/main/webapp/**/*.swf" />
         <include name="src/main/webapp/**/*.tld" />
         <include name="src/main/webapp/**/*.ttf" />

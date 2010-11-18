@@ -548,6 +548,7 @@
           <include>**/*.properties</include>
           <include>**/*.html</include>
           <include>**/*.js</include>
+          <include>misc/*.scpt</include>
           <include>**/*.txt</include>
           <include>**/*.xml</include>
           <include>**/*.gz</include>
