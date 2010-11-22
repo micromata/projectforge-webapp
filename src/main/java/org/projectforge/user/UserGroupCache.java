@@ -114,6 +114,18 @@ public class UserGroupCache extends AbstractCache
     checkRefresh();
     return getUserMap().get(userId);
   }
+  
+  public PFUserDO getUser(final String username) {
+    if (username == null) {
+      return null;
+    }
+    for (final PFUserDO user : getUserMap().values()) {
+      if (username.equals(user.getUsername()) == true) {
+        return user;
+      }
+    }
+    return null;
+  }
 
   /**
    * @return sll users (also deleted users).
