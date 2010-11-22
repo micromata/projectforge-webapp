@@ -277,10 +277,20 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
       {
         return userGroupCache.getUser(searchFilter.getModifiedByUserId());
       }
+
+      @Override
+      public void setObject(final PFUserDO object)
+      {
+        if (object == null) {
+          searchFilter.setModifiedByUserId(null);
+        } else {
+          searchFilter.setModifiedByUserId(object.getId());
+        }
+      }
     }, parentPage, "modifiedByUserId");
     extendedFilter.add(userSelectPanel);
     userSelectPanel.setDefaultFormProcessing(false);
-    userSelectPanel.init();
+    userSelectPanel.init().withAutoSubmit(true);
     extendedFilter.add(new CheckBox("useModificationFilter", new PropertyModel<Boolean>(searchFilter, "useModificationFilter")));
     startDateTimePanel = new DateTimePanel("startTimeOfLastModification", new PropertyModel<Date>(searchFilter,
         "startTimeOfLastModification"), (DateTimePanelSettings) DateTimePanelSettings.get().withCallerPage(parentPage).withSelectProperty(
