@@ -537,12 +537,17 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
   }
 
   /**
-   * If the derived class returns a text, the keyboard image right to the search field will be shown with the returned string as tool-tip.
+   * If the derived class returns a text, the keyboard image right to the search field will be shown with the returned string as tool-tip. <br/>
+   * If the derived class uses the store-recent-search-terms-functionality then a generic tool-tip about this functionality is used.<br/>
    * Otherwise the image is invisible (default).
    */
   protected String getHelpKeyboardImageTooltip()
   {
-    return null;
+    if (parentPage.isRecentSearchTermsStorage() == true) {
+      return getString("tooltip.autocomplete.recentSearchTerms");
+    } else {
+      return null;
+    }
   }
 
   /** This class uses the logger of the extended class. */
