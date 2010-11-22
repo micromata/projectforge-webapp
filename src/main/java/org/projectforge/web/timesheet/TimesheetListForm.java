@@ -50,7 +50,6 @@ import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.TooltipImage;
 
-
 public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, TimesheetListPage>
 {
   private static final long serialVersionUID = 3167681159669386691L;
@@ -164,10 +163,20 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
       {
         return userGroupCache.getUser(filter.getUserId());
       }
+
+      @Override
+      public void setObject(final PFUserDO object)
+      {
+        if (object == null) {
+          filter.setUserId(null);
+        } else {
+          filter.setUserId(object.getId());
+        }
+      }
     }, parentPage, "userId");
     filterContainer.add(userSelectPanel);
     userSelectPanel.setDefaultFormProcessing(false);
-    userSelectPanel.init();
+    userSelectPanel.init().withAutoSubmit(true);
 
     {
       final SubmitLink exportPDFButton = new SubmitLink("exportPDF") {
