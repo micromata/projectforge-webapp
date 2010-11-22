@@ -270,12 +270,6 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
   }
 
   @Override
-  protected String getHelpKeyboardImageTooltip()
-  {
-    return getString("tooltip.autocomplete.recentSearchTerms");
-  }
-
-  @Override
   protected AddressListFilter newSearchFilterInstance()
   {
     return new AddressListFilter();

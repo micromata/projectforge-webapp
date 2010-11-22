@@ -77,6 +77,12 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
   public AddressListPage(PageParameters parameters)
   {
     super(parameters, "address");
+  }
+  
+  @Override
+  protected void setup()
+  {
+    super.setup();
     this.recentSearchTermsUserPrefKey = "addressSearchTerms";
   }
 
