@@ -63,6 +63,13 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
   {
     super(parameters, "book");
   }
+  
+  @Override
+  protected void setup()
+  {
+    super.setup();
+    this.recentSearchTermsUserPrefKey = "bookSearchTerms";
+  }
 
   @SuppressWarnings("serial")
   @Override

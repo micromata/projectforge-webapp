@@ -101,6 +101,12 @@ public class BookListForm extends AbstractListForm<BookListFilter, BookListPage>
       }
 
       @Override
+      protected List<String> getRecentUserInputs()
+      {
+        return parentPage.getRecentSearchTermsQueue().getRecents();
+      }
+
+      @Override
       protected String formatLabel(final BookDO book)
       {
         return StringHelper.listToString("; ", book.getAuthors(), book.getTitle());
