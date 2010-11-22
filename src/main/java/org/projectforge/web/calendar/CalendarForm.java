@@ -234,7 +234,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       }
     };
     add(userSelectPanel);
-    userSelectPanel.init();
+    userSelectPanel.init().withAutoSubmit(true);
   }
 
   public CalendarForm(CalendarPage parentPage)
@@ -274,6 +274,10 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 
   public void setTimesheetsUser(PFUserDO user)
   {
-    getFilter().setUserId(user.getId());
+    if (user == null) {
+      getFilter().setUserId(null);
+    } else {
+      getFilter().setUserId(user.getId());
+    }
   }
 }
