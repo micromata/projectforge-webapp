@@ -29,7 +29,6 @@ import java.util.Map;
 
 import org.projectforge.common.AbstractCache;
 
-
 /**
  * Stores all user persistent objects such as filter settings, personal settings and persists them to the database.
  * 
@@ -50,6 +49,15 @@ public class UserXmlPreferencesCache extends AbstractCache
   }
 
   /**
+   * Put the entry for the current logged in user.
+   * @see org.projectforge.user.UserXmlPreferencesMap#putEntry(String, Object, boolean)
+   */
+  public void putEntry(String key, Object value, boolean persistent)
+  {
+    putEntry(PFUserContext.getUserId(), key, value, persistent);
+  }
+
+  /**
    * @see org.projectforge.user.UserXmlPreferencesMap#putEntry(String, Object, boolean)
    */
   public void putEntry(Integer userId, String key, Object value, boolean persistent)
@@ -57,6 +65,15 @@ public class UserXmlPreferencesCache extends AbstractCache
     UserXmlPreferencesMap data = ensureAndGetUserPreferencesData(userId);
     data.putEntry(key, value, persistent);
     checkRefresh(); // Should be called at the end of this method for considering changes inside this method.
+  }
+
+  /**
+   * Gets the entry for the current logged in user.
+   * @see #ensureAndGetUserPreferencesData(Integer)
+   */
+  public Object getEntry(final String key)
+  {
+    return getEntry(PFUserContext.getUserId(), key);
   }
 
   /**
