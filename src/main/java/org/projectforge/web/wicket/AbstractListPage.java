@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
@@ -39,8 +40,6 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
-import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.link.Link;
@@ -52,6 +51,7 @@ import org.apache.wicket.model.Model;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.MyBeanComparator;
+import org.projectforge.common.RecentQueue;
 import org.projectforge.common.ReflectionHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDO;
@@ -117,6 +117,13 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
   protected boolean storeFilter = true;
 
   private boolean massUpdateMode = false;
+  
+  /**
+   * Change this value if the recent search terms should be stored.
+   */
+  protected String recentSearchTermsUserPrefKey = null;
+
+  protected RecentQueue<String> recentSearchTermsQueue;
 
   /**
    * Change this value if the number of columns of your form table differ.
@@ -419,6 +426,7 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
   {
     list = null; // Force reload of list
     dataTable.setRowsPerPage(form.getPageSize());
+    addRecentSearchTerm();
   }
 
   @SuppressWarnings("unchecked")
@@ -653,6 +661,45 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
     } else {
       log.error("Property '" + property + "' not supported for selection in class " + getClass().getName() + ".");
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public RecentQueue<String> getRecentSearchTermsQueue()
+  {
+    if (recentSearchTermsQueue == null) {
+      recentSearchTermsQueue = (RecentQueue<String>) getUserPrefEntry(getStoreRecentSearchTermsId());
+    }
+    if (recentSearchTermsQueue == null) {
+      recentSearchTermsQueue = new RecentQueue<String>();
+      if (getStoreRecentSearchTermsId() != null) {
+        putUserPrefEntry(getStoreRecentSearchTermsId(), recentSearchTermsQueue, true);
+      }
+    }
+    return recentSearchTermsQueue;
+  }
+  
+  /**
+   * Adds the search string to the recent list, if filter is from type BaseSearchFilter and the search string is not blank and not from type
+   * id:4711.
+   * @param Filter The search filter.
+   */
+  protected void addRecentSearchTerm()
+  {
+    if (StringUtils.isNotBlank(form.searchFilter.getSearchString()) == true) {
+      String s = form.searchFilter.getSearchString();
+      if (s.startsWith("id:") == false || StringUtils.isNumeric(s.substring(3)) == false) {
+        // OK, search string is not from type id:4711
+        getRecentSearchTermsQueue().append(s);
+      }
+    }
+  }
+
+  /**
+   * @return The id of the user pref entry key for storing the recent search terms. If null then no recent search terms are stored.
+   */
+  protected String getStoreRecentSearchTermsId()
+  {
+    return recentSearchTermsUserPrefKey;
   }
 
   @SuppressWarnings("serial")
