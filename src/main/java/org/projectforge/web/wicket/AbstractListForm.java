@@ -63,7 +63,8 @@ import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.components.TooltipImage;
 
-public abstract class AbstractListForm<F extends BaseSearchFilter, P extends AbstractListPage< ? , ? , ? >> extends AbstractForm<F, P>
+public abstract class AbstractListForm<F extends BaseSearchFilter, P extends AbstractListPage< ? , ? , ? >> extends
+    AbstractSecuredForm<F, P>
 {
   private static final long serialVersionUID = 1304394324524767035L;
 
@@ -163,7 +164,14 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
     searchCell.add(handbuchVolltextsucheLink);
     handbuchVolltextsucheLink.add(new TooltipImage("fulltextSearchTooltipImage", getResponse(), WebConstants.IMAGE_HELP,
         getString("tooltip.lucene.link")));
-
+    final String helpKeyboardImageTooltip = getHelpKeyboardImageTooltip();
+    final Component helpKeyboardImage;
+    if (helpKeyboardImageTooltip != null) {
+      helpKeyboardImage = new TooltipImage("helpKeyboardImage", getResponse(), WebConstants.IMAGE_HELP_KEYBOARD, helpKeyboardImageTooltip);
+    } else {
+      helpKeyboardImage = new PresizedImage("helpKeyboardImage", getResponse(), WebConstants.IMAGE_HELP_KEYBOARD).setVisible(false);
+    }
+    searchCell.add(helpKeyboardImage);
     final Model<String> modifiedSearchExpressionModel = new Model<String>() {
       @Override
       public String getObject()
@@ -526,6 +534,15 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
   protected boolean isSearchFilterVisible()
   {
     return true;
+  }
+
+  /**
+   * If the derived class returns a text, the keyboard image right to the search field will be shown with the returned string as tool-tip.
+   * Otherwise the image is invisible (default).
+   */
+  protected String getHelpKeyboardImageTooltip()
+  {
+    return null;
   }
 
   /** This class uses the logger of the extended class. */

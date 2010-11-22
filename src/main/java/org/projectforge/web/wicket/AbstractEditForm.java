@@ -36,7 +36,7 @@ import org.projectforge.web.scripting.ScriptEditForm;
 import org.projectforge.web.timesheet.TimesheetEditForm;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
-public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends AbstractEditPage< ? , ? , ? >> extends AbstractForm<O, P>
+public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends AbstractEditPage< ? , ? , ? >> extends AbstractSecuredForm<O, P>
 {
   private static final long serialVersionUID = -6707610179583359099L;
 
