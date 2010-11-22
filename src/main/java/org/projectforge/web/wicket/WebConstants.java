@@ -116,6 +116,7 @@ public class WebConstants
 
   public static final String IMAGE_KUNDE_UNSELECT = "button_unselectCustomer.png";
 
+  @Deprecated
   public static final String IMAGE_MICROMATA_MENU_ICON = "micromata_icon.png";
 
   public static final String IMAGE_NEW = "new.png";

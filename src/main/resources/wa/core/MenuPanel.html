@@ -5,13 +5,46 @@
 
 <body>
 <wicket:panel>
-  <div style="color: grey; padding-left: 2px;"><img wicket:id="micromataIcon" src="/images/micromata_icon.png"
-    style="vertical-align: top; border: 0px;" width="13" height="14"> ProjectForge® 2010</div>
-  <ul class="main-menu" wicket:id="container">
-    <li wicket:id="repeater" class="menu-entry"><a wicket:id="link" class="nodeSel"><span wicket:id="imageRepeater"><img
-      wicket:id="treeNaviImage" src="/images/dtree/join.gif"></span><img wicket:id="treeImage" src="/images/dtree/join.gif"><img wicket:id="menuIcon"
-      src="/images/dtree/chart_organisation.png">&nbsp;<span wicket:id="name">[Menu entry]</span></a></li>
+  <ul id="nav">
+    <li wicket:id="menuEntries">[Menu entry]</li>
+    <li class="search">
+    <form action="search" method="get" accept-charset="utf-8"><input type="text" name="query" value="" id="query" /> <input id="submitquery"
+      type="submit" value="go" /> @MS: Search ist auch cool (bitte Feld einbauen).</form>
+    </li>
+    <wicket:remove>
+      <li class="first on" id="eins"><a href="includes/news.html" title="titel"><span>News</span></a>
+      <ul>
+        <li class="on"><a href="includes/news.html" title="titel"><span>Alle News</span></a></li>
+        <li><a href="includes/news.html" title="titel"><span>Solarenergie</span></a></li>
+        <li><a href="includes/news.html" title="titel"><span>Windkraft</span></a></li>
+        <li><a href="includes/news.html" title="titel"><span>Energiefrosch</span></a></li>
+        <li><a href="includes/news.html" title="titel"><span>Energiehandel</span></a></li>
+      </ul>
+      </li>
+      <li id="zwei" class="off"><a href="includes/wikicontent.html" title="Dokumentation"><span>Dokumentation</span></a>
+      <ul>
+        <li><a href="includes/wikicontent.html" title="Was kann Energiefrosch"><span>Was kann Energiefrosch</span></a></li>
+        <li><a href="includes/wikicontent.html" title="Energiefrosch Tutorials"><span>Energiefrosch Tutorials</span></a></li>
+        <li><a href="includes/wikicontent.html" title="Dokumentation"><span>Dokumentation</span></a></li>
+        <li><a href="includes/tabs.html" title="Dokumentation"><span>Tabs Examples</span></a></li>
+      </ul>
+      </li>
+      <li id="drei" class="off"><a href="#" title="titel"><span>Wind</span></a>
+      <ul>
+        <li><a href="#" title="titel"><span>Leistungsprognosen</span></a></li>
+        <li><a href="includes/anlagen.html" title="Anlagen"><span>Anlagen</span></a></li>
+      </ul>
+      </li>
+      <li id="vier" class="off"><a href="#" title="titel"><span>Solar</span></a>
+      <ul>
+        <li><a href="#" title="titel"><span>Leistungsprognosen</span></a></li>
+        <li><a href="#" title="titel"><span>Anlagen</span></a></li>
+      </ul>
+      </li>
+    </wicket:remove>
   </ul>
+
+
 </wicket:panel>
 </body>
 </html>

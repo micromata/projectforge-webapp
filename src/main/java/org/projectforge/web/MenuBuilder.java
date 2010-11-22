@@ -23,6 +23,7 @@
 
 package org.projectforge.web;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -45,8 +46,10 @@ import org.projectforge.user.UserRightValue;
 import org.projectforge.web.meb.MenuMebSuffixModel;
 import org.projectforge.web.wicket.WicketApplication;
 
-public class MenuBuilder
+public class MenuBuilder implements Serializable
 {
+  private static final long serialVersionUID = -924049082728488113L;
+
   public static final String NOT_YET_IMPLEMENTED = "Message.action?"
       + MessageAction.MSG_REQ_PARAM_NAME
       + "="

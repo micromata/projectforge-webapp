@@ -252,7 +252,7 @@ public abstract class BaseActionBean implements ActionBean
   {
     Menu menu = menuBuilder.buildMenu(getContext().getUser());
     getContext().putEntry(USER_PREF_MENU_KEY, menu, false); // Stripes menu
-    getContext().removeEntry(MenuPanel.USER_PREF_MENU_KEY); // Wicket menu
+    getContext().removeEntry(OldMenuPanel.USER_PREF_MENU_KEY); // Wicket menu
     return menu;
   }
 

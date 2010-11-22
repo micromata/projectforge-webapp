@@ -30,7 +30,6 @@ import java.util.Collection;
 import org.apache.wicket.model.IModel;
 import org.projectforge.web.wicket.WicketUtils;
 
-
 /**
  * Represents a single menu entry.
  */
@@ -60,7 +59,7 @@ public class MenuEntry implements Serializable
   protected IModel<String> htmlSuffix;
 
   protected MenuEntry parent;
-  
+
   protected boolean visible = true;
 
   public String getIcon()
@@ -121,6 +120,11 @@ public class MenuEntry implements Serializable
     }
     subMenuEntries.add(subMenuEntry);
     subMenuEntry.setParent(this);
+  }
+
+  public boolean hasSubMenuEntries()
+  {
+    return (this.subMenuEntries != null && subMenuEntries.size() > 0);
   }
 
   public boolean getHasSubMenuEntries()
@@ -187,7 +191,7 @@ public class MenuEntry implements Serializable
   {
     return visible;
   }
-  
+
   public void setVisible(boolean visible)
   {
     this.visible = visible;
