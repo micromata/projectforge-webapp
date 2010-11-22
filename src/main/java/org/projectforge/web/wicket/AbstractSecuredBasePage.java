@@ -97,6 +97,8 @@ public abstract class AbstractSecuredBasePage extends AbstractBasePage
   /**
    * Gets the stored user preference entry.
    * @param key
+   * @param expectedType Checks the type of the user pref entry (if found) and returns only this object if the object is from the expected
+   *          type, otherwise null is returned.
    * @return Return a persistent object with this key, if existing, or if not a volatile object with this key, if existing, otherwise null;
    * @see UserXmlPreferencesCache#getEntry(Integer, String)
    */
