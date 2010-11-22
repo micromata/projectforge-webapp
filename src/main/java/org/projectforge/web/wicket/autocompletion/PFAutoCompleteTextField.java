@@ -31,6 +31,8 @@ import org.apache.wicket.extensions.ajax.markup.html.autocomplete.IAutoCompleteR
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
+import org.projectforge.web.wicket.WicketUtils;
 
 public abstract class PFAutoCompleteTextField<T> extends TextField<T>
 {
@@ -40,6 +42,8 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   private PFAutoCompleteBehavior<T> behavior;
 
   private PFAutoCompleteSettings settings;
+
+  protected boolean providesTooltip;
 
   /**
    * Construct.
@@ -95,6 +99,19 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
     add(behavior);
   }
 
+  @SuppressWarnings("serial")
+  public PFAutoCompleteTextField<T> enableTooltips()
+  {
+    WicketUtils.addTooltip(this, new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return PFAutoCompleteTextField.this.getTooltip();
+      }
+    });
+    return this;
+  }
+
   /** {@inheritDoc} */
   @Override
   protected void onComponentTag(ComponentTag tag)
@@ -148,7 +165,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   }
 
   /**
-   * Overwrite this method if a title attribute for the input text field should be set.
+   * Overwrite this method if a title attribute for the input text field should be set. Don't forget to call {@link #enableTooltips()}.
    * @return Tool-tip of the object currently represented by the input field or null.
    */
   protected String getTooltip()
@@ -157,8 +174,8 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   }
 
   /**
-   * Callback method that should return a list over all possible assist choice objects. These objects will be passed to the renderer to
-   * generate output. Usually it is enough to return an iterator over strings.
+   * Callback method that should return a list of all possible assist choice objects. These objects will be passed to the renderer to
+   * generate output.
    * 
    * @see AutoCompleteBehavior#getChoices(String)
    * 
