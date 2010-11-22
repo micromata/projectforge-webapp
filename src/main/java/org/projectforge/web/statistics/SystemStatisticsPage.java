@@ -34,6 +34,7 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.NumberFormatter;
 import org.projectforge.database.HibernateUtils;
+import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.user.PFUserDO;
@@ -64,6 +65,7 @@ public class SystemStatisticsPage extends AbstractSecuredPage
     body.add(new Label("totalNumberOfTimesheetDurations", NumberHelper.getNumberFractionFormat(getLocale(), tatalPersonDays.scale())
         .format(tatalPersonDays)));
     body.add(new Label("totalNumberOfUsers", NumberFormatter.format(getTableCount(jdbc, PFUserDO.class))));
+    body.add(new Label("totalNumberOfTasks", NumberFormatter.format(getTableCount(jdbc, TaskDO.class))));
     int totalNumberOfHistoryEntries = getTableCount(jdbc, HistoryEntry.class) + getTableCount(jdbc, PropertyDelta.class);
     body.add(new Label("totalNumberOfHistoryEntries", NumberFormatter.format(totalNumberOfHistoryEntries)));
   }
