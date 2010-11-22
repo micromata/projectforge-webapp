@@ -76,6 +76,12 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
       }
 
       @Override
+      protected List<String> getRecentUserInputs()
+      {
+        return PFAutoCompleteTextField.this.getRecentUserInputs();
+      }
+
+      @Override
       protected String formatValue(T value)
       {
         return PFAutoCompleteTextField.this.formatValue(value);
@@ -100,13 +106,23 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
 
   /**
    * Override this callback method that for returning favorite entries to show, if the user double clicks the empty input field. These
-   * objects will be passed to the renderer to generate output. Usually it is enough to return an iterator over strings.
+   * objects will be passed to the renderer to generate output.
    * 
    * @see AutoCompleteBehavior#getChoices(String)
    * 
    * @return null, if no favorites to show.
    */
   protected List<T> getFavorites()
+  {
+    return null;
+  }
+
+  /**
+   * Override this callback method that for returning recent user inputs to show, if the user double clicks the empty input field.
+   * 
+   * @return null means: don't show recent user inputs.
+   */
+  protected List<String> getRecentUserInputs()
   {
     return null;
   }
@@ -167,7 +183,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    */
   public PFAutoCompleteTextField<T> withAutoSubmit(boolean autoSubmit)
   {
-     settings.withAutoSubmit(autoSubmit);
+    settings.withAutoSubmit(autoSubmit);
     return this;
   }
 
@@ -177,18 +193,19 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    */
   public PFAutoCompleteTextField<T> withFocus(boolean hasFocus)
   {
-     settings.withFocus(hasFocus);
+    settings.withFocus(hasFocus);
     return this;
   }
+
   /**
    * Fluent.
    * @see PFAutoCompleteSettings#withCacheLength(int)
    */
   public PFAutoCompleteTextField<T> withCacheLength(int cacheLength)
   {
-     settings.withCacheLength(cacheLength);
-     return this;
- }
+    settings.withCacheLength(cacheLength);
+    return this;
+  }
 
   /**
    * Fluent.
@@ -196,9 +213,9 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    */
   public PFAutoCompleteTextField<T> withDelay(int delay)
   {
-     settings.withDelay(delay);
-     return this;
-}
+    settings.withDelay(delay);
+    return this;
+  }
 
   /**
    * Fluent.
@@ -206,9 +223,9 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    */
   public PFAutoCompleteTextField<T> withMatchCase(boolean matchCase)
   {
-     settings.withMatchCase(matchCase);
-     return this;
-}
+    settings.withMatchCase(matchCase);
+    return this;
+  }
 
   /**
    * Fluent.
@@ -218,7 +235,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   {
     settings.withMatchContains(matchContains);
     return this;
-}
+  }
 
   /**
    * Fluent.
@@ -228,7 +245,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   {
     settings.withMatchSubset(matchSubset);
     return this;
-}
+  }
 
   /**
    * Fluent.
@@ -236,9 +253,9 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    */
   public PFAutoCompleteTextField<T> withMaxItemsToShow(int maxItemsToShow)
   {
-     settings.withMaxItemsToShow(maxItemsToShow);
-     return this;
-}
+    settings.withMaxItemsToShow(maxItemsToShow);
+    return this;
+  }
 
   /**
    * Fluent.
@@ -246,9 +263,9 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    */
   public PFAutoCompleteTextField<T> withMinChars(int minChars)
   {
-     settings.withMinChars(minChars);
-     return this;
- }
+    settings.withMinChars(minChars);
+    return this;
+  }
 
   /**
    * Fluent.
@@ -258,7 +275,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   {
     settings.withMustMatch(mustMatch);
     return this;
-}
+  }
 
   /**
    * Fluent.
@@ -268,7 +285,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   {
     settings.withScroll(scroll);
     return this;
-}
+  }
 
   /**
    * Fluent.
@@ -278,7 +295,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   {
     settings.withScrollHeight(scrollHeight);
     return this;
-}
+  }
 
   /**
    * Fluent.
@@ -288,7 +305,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   {
     settings.withSelectFirst(selectFirst);
     return this;
-}
+  }
 
   /**
    * Fluent.
@@ -296,9 +313,9 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    */
   public PFAutoCompleteTextField<T> withSelectOnly(boolean selectOnly)
   {
-     settings.withSelectOnly(selectOnly);
-     return this;
- }
+    settings.withSelectOnly(selectOnly);
+    return this;
+  }
 
   /**
    * Fluent.
@@ -306,9 +323,9 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    */
   public PFAutoCompleteTextField<T> withWidth(int width)
   {
-     settings.withWidth(width);
-     return this;
- }
+    settings.withWidth(width);
+    return this;
+  }
 
   /**
    * Fluent.

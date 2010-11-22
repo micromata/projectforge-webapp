@@ -30,7 +30,6 @@ import org.apache.wicket.RequestCycle;
 import org.apache.wicket.ResourceReference;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.extensions.ajax.markup.html.autocomplete.AutoCompleteBehavior;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.IAutoCompleteRenderer;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.resources.JavascriptResourceReference;
@@ -81,10 +80,15 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
       indicatorId = "'" + indicatorId + "'";
     }
     final StringBuffer buf = new StringBuffer();
+    buf.append("var favorite" + id + " = ");
     final List<T> favorites = getFavorites();
     final MyJsonBuilder builder = new MyJsonBuilder();
-    buf.append("var favorite" + id + " = ").append(builder.append(favorites, false).getAsString()).append(";").append("var z = $(\"#").append(id)
-        .append("\");\n").append("z.autocomplete(\"").append(getCallbackUrl()).append("\",{");
+    if (favorites != null) {
+      buf.append(builder.append(favorites, false).getAsString());
+    } else {
+      buf.append(builder.append(getRecentUserInputs()).getAsString());
+    }
+    buf.append(";").append("var z = $(\"#").append(id).append("\");\n").append("z.autocomplete(\"").append(getCallbackUrl()).append("\",{");
     boolean first = true;
     for (final String setting : getSettingsJS()) {
       if (first == true)
@@ -211,15 +215,18 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
   protected abstract List<T> getChoices(String input);
 
   /**
-   * Callback method that should return an iterator over all possible default choice objects to show, if the user double clicks the empty
-   * input field. These objects will be passed to the renderer to generate output. Usually it is enough to return an iterator over strings.
-   * 
-   * @see AutoCompleteBehavior#getChoices(String)
-   * 
-   * @param input current input
-   * @return iterator over all possible choice objects
+   * Callback method that should return a list of all possible default choice objects to show, if the user double clicks the empty input
+   * field. These objects will be passed to the renderer to generate output. Usually it is enough to return an iterator over strings.
    */
   protected abstract List<T> getFavorites();
+
+  /**
+   * Callback method that should return a list of all recent user inputs in the text input field. They will be shown, if the user double
+   * clicks the empty input field. These objects will be passed to the renderer to generate output. Usually it is enough to return an
+   * iterator over strings. <br/>
+   * Please note: Please, use only getFavorites() OR getRecentUserInputs()!
+   */
+  protected abstract List<String> getRecentUserInputs();
 
   /**
    * Used for formatting the values.
@@ -254,8 +261,13 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
     {
       if (settings.isLabelValue() == true) {
         final Object[] oa = new Object[2];
-        oa[0] = PFAutoCompleteBehavior.this.formatLabel((T) obj);
-        oa[1] = PFAutoCompleteBehavior.this.formatValue((T) obj);
+        if (obj instanceof String) {
+          oa[0] = obj;
+          oa[1] = obj;
+        } else {
+          oa[0] = PFAutoCompleteBehavior.this.formatLabel((T) obj);
+          oa[1] = PFAutoCompleteBehavior.this.formatValue((T) obj);
+        }
         return oa;
       } else {
         return obj;
