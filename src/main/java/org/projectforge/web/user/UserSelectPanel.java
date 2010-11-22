@@ -23,21 +23,25 @@
 
 package org.projectforge.web.user;
 
-import org.apache.wicket.markup.html.basic.Label;
+import java.util.List;
+import java.util.Locale;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
-import org.hibernate.Hibernate;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.convert.IConverter;
+import org.projectforge.common.RecentQueue;
+import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserFavorite;
-import org.projectforge.user.UserPrefArea;
+import org.projectforge.user.UserDao;
+import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.components.FavoritesChoicePanel;
+import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.TooltipImage;
-
 
 /**
  * This panel shows the actual user and buttons for select/unselect user.
@@ -48,7 +52,22 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
 {
   private static final long serialVersionUID = -7114401036341110814L;
 
+  private static final String USER_PREF_KEY_RECENT_USERS = "UserSelectPanel:recentUsers";
+
   private boolean defaultFormProcessing = false;
+
+  @SpringBean(name = "userDao")
+  private UserDao userDao;
+
+  @SpringBean(name = "userXmlPreferencesCache")
+  protected UserXmlPreferencesCache userXmlPreferencesCache;
+
+  private RecentQueue<String> recentUsers;
+
+  private PFAutoCompleteTextField<PFUserDO> userTextField;
+
+  // Only used for detecting changes:
+  private PFUserDO currentUser;
 
   /**
    * @param id
@@ -74,50 +93,104 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
   public UserSelectPanel init()
   {
     super.init();
-    final Label userAsStringLabel = new Label("userAsString", new Model<String>() {
+    userTextField = new PFAutoCompleteTextField<PFUserDO>("userField", getModel()) {
       @Override
-      public String getObject()
+      protected List<PFUserDO> getChoices(final String input)
       {
-        final PFUserDO user = getModelObject();
-        Hibernate.initialize(user);
-        if (user != null) {
-          return user.getFullname();
-        }
-        return "";
-      }
-    });
-    add(userAsStringLabel);
-    final SubmitLink selectButton = new SubmitLink("select") {
-      public void onSubmit()
-      {
-        setResponsePage(new UserListPage(caller, selectProperty));
-      };
-    };
-    selectButton.setDefaultFormProcessing(defaultFormProcessing);
-    add(selectButton);
-    selectButton.add(new TooltipImage("selectHelp", getResponse(), WebConstants.IMAGE_USER_SELECT, getString("tooltip.selectUser")));
-    final SubmitLink unselectButton = new SubmitLink("unselect") {
-      @Override
-      public void onSubmit()
-      {
-        caller.unselect(selectProperty);
+        final BaseSearchFilter filter = new BaseSearchFilter();
+        filter.setSearchFields("username", "firstname", "lastname", "email");
+        filter.setSearchString(input);
+        final List<PFUserDO> list = userDao.getList(filter);
+        return list;
       }
 
       @Override
-      public boolean isVisible()
+      protected List<String> getRecentUserInputs()
       {
-        return isRequired() == false && getModelObject() != null;
+        return getRecentUsers().getRecents();
+      }
+
+      @Override
+      protected String formatLabel(final PFUserDO user)
+      {
+        if (user == null) {
+          return "";
+        }
+        return formatUser(user);
+      }
+
+      @Override
+      protected String formatValue(final PFUserDO user)
+      {
+        if (user == null) {
+          return "";
+        }
+        return user.getUsername();
+      }
+
+      @Override
+      protected String getTooltip()
+      {
+        final PFUserDO user = getModel().getObject();
+        if (user == null) {
+          return null;
+        }
+        return user.getFullname() + ", " + user.getEmail();
+      }
+
+      @Override
+      protected void convertInput()
+      {
+        final PFUserDO user = (PFUserDO) getConverter(getType()).convertToObject(getInput(), getLocale());
+        setConvertedInput(user);
+        if (user != null && (currentUser == null || user.getId() != currentUser.getId())) {
+          getRecentUsers().append(formatUser(user));
+        }
+        currentUser = user;
+      }
+
+      @Override
+      public IConverter getConverter(final Class< ? > type)
+      {
+        return new IConverter() {
+          @Override
+          public Object convertToObject(final String value, final Locale locale)
+          {
+            if (StringUtils.isEmpty(value) == true) {
+              getModel().setObject(null);
+              return null;
+            }
+            final int ind = value.indexOf(" (");
+            final String username = ind >= 0 ? value.substring(0, ind) : value;
+            final PFUserDO user = userDao.getUserGroupCache().getUser(username);
+            if (user == null) {
+              error(getString("user.panel.error.usernameNotFound"));
+            }
+            getModel().setObject(user);
+            return user;
+          }
+
+          @Override
+          public String convertToString(final Object value, final Locale locale)
+          {
+            if (value == null) {
+              return "";
+            }
+            final PFUserDO user = (PFUserDO) value;
+            return user.getUsername();
+          }
+        };
       }
     };
-    unselectButton.setDefaultFormProcessing(defaultFormProcessing);
-    add(unselectButton);
-    unselectButton
-        .add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_USER_UNSELECT, getString("tooltip.unselectUser")));
+    currentUser = getModelObject();
+    userTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400);
+    add(userTextField);
     final SubmitLink selectMeButton = new SubmitLink("selectMe") {
       @Override
       public void onSubmit()
       {
         caller.select(selectProperty, PFUserContext.getUserId());
+        markTextFieldModelAsChanged();
       }
 
       @Override
@@ -131,51 +204,48 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
     add(selectMeButton);
     selectMeButton.setDefaultFormProcessing(defaultFormProcessing);
     selectMeButton.add(new TooltipImage("selectMeHelp", getResponse(), WebConstants.IMAGE_USER_SELECT_ME, getString("tooltip.selectMe")));
-    // DropDownChoice favorites
-    final FavoritesChoicePanel<PFUserDO, UserFavorite> favoritesPanel = new FavoritesChoicePanel<PFUserDO, UserFavorite>("favorites", UserPrefArea.USER_FAVORITE, tabIndex) {
-      @Override
-      protected void select(final UserFavorite favorite)
-      {
-        if (favorite.getUser() != null) {
-          UserSelectPanel.this.selectUser(favorite.getUser());
-        }
-      }
-
-      @Override
-      protected PFUserDO getCurrentObject()
-      {
-        return UserSelectPanel.this.getModelObject();
-      }
-
-      @Override
-      protected UserFavorite newFavoriteInstance(final PFUserDO currentObject)
-      {
-        final UserFavorite favorite = new UserFavorite();
-        favorite.setUser(currentObject);
-        return favorite;
-      }
-    };
-    add(favoritesPanel);
-    favoritesPanel.init();
-    if (showFavorites == false) {
-      favoritesPanel.setVisible(false);
-    }
     return this;
   }
 
-  /**
-   * Will be called if the user has chosen an entry of the user favorites drop down choice.
-   * @param user
-   */
-  protected void selectUser(final PFUserDO user)
+  private void markTextFieldModelAsChanged()
   {
-    setModelObject(user);
-    caller.select(selectProperty, user.getId());
+    userTextField.modelChanged();
+    final PFUserDO user = getModelObject();
+    if (user != null) {
+      getRecentUsers().append(formatUser(user));
+    }
+  }
+
+  public UserSelectPanel withAutoSubmit(final boolean autoSubmit)
+  {
+    userTextField.withAutoSubmit(autoSubmit);
+    return this;
   }
 
   @Override
   protected void convertInput()
   {
     setConvertedInput(getModelObject());
+  }
+
+  @SuppressWarnings("unchecked")
+  private RecentQueue<String> getRecentUsers()
+  {
+    if (this.recentUsers == null) {
+      this.recentUsers = (RecentQueue<String>) userXmlPreferencesCache.getEntry(USER_PREF_KEY_RECENT_USERS);
+    }
+    if (this.recentUsers == null) {
+      this.recentUsers = new RecentQueue<String>();
+      userXmlPreferencesCache.putEntry(USER_PREF_KEY_RECENT_USERS, this.recentUsers, true);
+    }
+    return this.recentUsers;
+  }
+
+  private String formatUser(final PFUserDO user)
+  {
+    if (user == null) {
+      return "";
+    }
+    return user.getUsername() + " (" + user.getFullname() + ", " + user.getEmail() + ")";
   }
 }
