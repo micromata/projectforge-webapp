@@ -77,6 +77,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
   public AddressListPage(PageParameters parameters)
   {
     super(parameters, "address");
+    this.recentSearchTermsUserPrefKey = "addressSearchTerms";
   }
 
   @Override
@@ -207,7 +208,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
     final Fragment fragment = new Fragment(view.newChildId(), "phoneNumber", this);
     view.add(fragment.setRenderBodyOnly(true));
     @SuppressWarnings("serial")
-    final Link<String> phoneCall = new Link<String>("directCallLink") {
+    final Link<String> phoneCallLink = new Link<String>("directCallLink") {
       @Override
       public void onClick()
       {
@@ -215,17 +216,17 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         throw new UnsupportedOperationException();
       }
     };
-    phoneCall.add(new SimpleAttributeModifier("onmouseover", "zoom('" + phoneNumber + "'); return false;"));
+    phoneCallLink.add(new SimpleAttributeModifier("onmouseover", "zoom('" + phoneNumber + "'); return false;"));
     final String tooltip = getString("address." + name + "Phone");
-    fragment.add(phoneCall.add(new SimpleAttributeModifier("title", tooltip)));
+    fragment.add(phoneCallLink.add(new SimpleAttributeModifier("title", tooltip)));
     final Label phoneNumberLabel = new Label("phoneNumber", phoneNumber);
     if (this.personalAddressMap.containsKey(addressId) == true) {
       phoneNumberLabel.add(new SimpleAttributeModifier("style", "color:red; font-weight:bold;"));
     } else {
       phoneNumberLabel.setRenderBodyOnly(true);
     }
-    phoneCall.add(phoneNumberLabel);
-    phoneCall.add(new PresizedImage("phoneImage", getResponse(), image));
+    phoneCallLink.add(phoneNumberLabel);
+    phoneCallLink.add(new PresizedImage("phoneImage", getResponse(), image));
     @SuppressWarnings("serial")
     final Link<String> sendMessage = new Link<String>("sendMessageLink") {
       @Override

@@ -68,10 +68,9 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
 
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
-  
+
   @SpringBean(name = "addressExport")
   private AddressExport addressExport;
-
 
   @Override
   protected void init()
@@ -224,15 +223,21 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
       {
         final AddressFilter filter = new AddressFilter();
         filter.setSearchString(input);
-        filter.setSearchFields("title", "authors");
+        filter.setSearchFields("name", "firstName", "organization");
         final List<AddressDO> list = addressDao.getList(filter);
         return list;
       }
 
       @Override
+      protected List<String> getRecentUserInputs()
+      {
+        return parentPage.getRecentSearchTermsQueue().getRecents();
+      }
+
+      @Override
       protected String formatLabel(final AddressDO address)
       {
-        return StringHelper.listToString("; ", address.getName(), address.getFirstName());
+        return StringHelper.listToString("; ", address.getName(), address.getFirstName(), address.getOrganization());
       }
 
       @Override
@@ -262,6 +267,12 @@ public class AddressListForm extends AbstractListForm<AddressListFilter, Address
     };
     searchField.withLabelValue(true).withMatchContains(true).withMinChars(2).withFocus(true).withAutoSubmit(true);
     return searchField;
+  }
+
+  @Override
+  protected String getHelpKeyboardImageTooltip()
+  {
+    return getString("tooltip.autocomplete.recentSearchTerms");
   }
 
   @Override
