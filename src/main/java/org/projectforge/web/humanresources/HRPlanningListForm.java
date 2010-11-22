@@ -36,6 +36,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.humanresources.HRPlanningEntryDO;
+import org.projectforge.humanresources.HRPlanningEntryDao;
 import org.projectforge.humanresources.HRPlanningFilter;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
@@ -66,6 +67,9 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
+  
+  @SpringBean(name = "hrPlanningEntryDao")
+  private HRPlanningEntryDao hrPlanningEntryDao;
 
   protected DatePanel startDate;
 
@@ -78,7 +82,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     super.init();
     final boolean hasFullAccess = parentPage.hasFullAccess();
     final HRPlanningFilter filter = getSearchFilter();
-    if (hasFullAccess == false) {
+    if (hrPlanningEntryDao.hasSelectAccess(false) == false) {
       filter.setUserId(getUser().getId());
     }
     startDate = new DatePanel("startDate", new PropertyModel<Date>(getSearchFilter(), "startTime"), DatePanelSettings.get().withCallerPage(
@@ -91,7 +95,6 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     filterContainer.add(stopDate);
     final WebMarkupContainer projektRow = new WebMarkupContainer("projektRow");
     filterContainer.add(projektRow);
-    if (hasFullAccess == true) {
       if (projektDao.hasSelectAccess(false) == true) {
         final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel("projekt", new Model<ProjektDO>() {
           @Override
@@ -105,16 +108,27 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
       } else {
         projektRow.add(createInvisibleDummyComponent("projekt"));
       }
+      if (hrPlanningEntryDao.hasSelectAccess(false) == true) {
       final UserSelectPanel userSelectPanel = new UserSelectPanel("user", new Model<PFUserDO>() {
         @Override
         public PFUserDO getObject()
         {
           return userGroupCache.getUser(filter.getUserId());
         }
+
+        @Override
+        public void setObject(final PFUserDO object)
+        {
+          if (object == null) {
+            filter.setUserId(null);
+          } else {
+            filter.setUserId(object.getId());
+          }
+        }
       }, parentPage, "userId");
       filterContainer.add(userSelectPanel);
       userSelectPanel.setDefaultFormProcessing(false); // No validation.
-      userSelectPanel.init();
+      userSelectPanel.init().withAutoSubmit(true);
     } else {
       projektRow.add(createInvisibleDummyComponent("projekt"));
       filterContainer.add(new Label("user", getUser().getFullname()));
