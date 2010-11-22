@@ -117,9 +117,9 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
   protected boolean storeFilter = true;
 
   private boolean massUpdateMode = false;
-  
+
   /**
-   * Change this value if the recent search terms should be stored.
+   * Change this value if the recent search terms should be stored. Should be set in setup-method of derived page class.
    */
   protected String recentSearchTermsUserPrefKey = null;
 
@@ -178,8 +178,16 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
     this.i18nPrefix = i18nPrefix;
     this.caller = caller;
     this.selectProperty = selectProperty;
+    setup();
     preInit();
     evaluatePageParameters(parameters);
+  }
+
+  /**
+   * Is called before the form is initialized in constructor. Overwrite this method if any variables etc. should be set before initialization.
+   */
+  protected void setup()
+  {
   }
 
   /**
@@ -667,17 +675,17 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
   public RecentQueue<String> getRecentSearchTermsQueue()
   {
     if (recentSearchTermsQueue == null) {
-      recentSearchTermsQueue = (RecentQueue<String>) getUserPrefEntry(getStoreRecentSearchTermsId());
+      recentSearchTermsQueue = (RecentQueue<String>) getUserPrefEntry(this.recentSearchTermsUserPrefKey);
     }
     if (recentSearchTermsQueue == null) {
       recentSearchTermsQueue = new RecentQueue<String>();
-      if (getStoreRecentSearchTermsId() != null) {
-        putUserPrefEntry(getStoreRecentSearchTermsId(), recentSearchTermsQueue, true);
+      if (isRecentSearchTermsStorage() == true) {
+        putUserPrefEntry(this.recentSearchTermsUserPrefKey, recentSearchTermsQueue, true);
       }
     }
     return recentSearchTermsQueue;
   }
-  
+
   /**
    * Adds the search string to the recent list, if filter is from type BaseSearchFilter and the search string is not blank and not from type
    * id:4711.
@@ -695,11 +703,11 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
   }
 
   /**
-   * @return The id of the user pref entry key for storing the recent search terms. If null then no recent search terms are stored.
+   * @return True, if the user-pref-key for storing the recent search terms is given, otherwise false.
    */
-  protected String getStoreRecentSearchTermsId()
+  public boolean isRecentSearchTermsStorage()
   {
-    return recentSearchTermsUserPrefKey;
+    return this.recentSearchTermsUserPrefKey != null;
   }
 
   @SuppressWarnings("serial")
