@@ -84,7 +84,7 @@ public class MenuEntryPanel extends Panel
     link.add(label);
     if (menuEntry.hasSubMenuEntries() == true) {
       final WebMarkupContainer ul = new WebMarkupContainer("subMenu");
-      add(ul);
+      li.add(ul);
       final RepeatingView menuRepeater = new RepeatingView("menuEntries");
       ul.add(menuRepeater);
       for (final MenuEntry subEntry : menuEntry.getSubMenuEntries()) {
@@ -94,7 +94,7 @@ public class MenuEntryPanel extends Panel
         entryPanel.init(subEntry);
       }
     } else {
-      add(new Label("subMenu").setVisible(false));
+      li.add(new Label("subMenu").setVisible(false));
     }
   }
 }
