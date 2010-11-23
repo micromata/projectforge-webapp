@@ -541,6 +541,11 @@ public class Configuration extends AbstractCache
     return telephoneSystemNumber;
   }
 
+  public boolean isTelephoneSystemUrlConfigured()
+  {
+    return StringUtils.isNotEmpty(this.telephoneSystemUrl);
+  }
+
   /**
    * Format "http://asterisk.acme.com/sms.php?number=#number&amp;text=#text".<br/>
    * #number will be replaced by the chosen mobile phone number and #text by the sms text (url encoded).
