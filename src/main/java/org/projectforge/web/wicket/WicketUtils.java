@@ -134,6 +134,9 @@ public class WicketUtils
    */
   public static String getUrl(final Response response, final String path, final boolean encodeUrl)
   {
+    if (path == null) {
+      return null;
+    }
     if (path.charAt(0) != '/') {
       // Do not touch relative path:
       return path;
