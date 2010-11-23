@@ -77,11 +77,32 @@ public class MenuEntryPanel extends Panel
     if (isSelected == true) {
       li.add(new SimpleAttributeModifier("class", isFirst == true ? "first selected" : "selected"));
     } else if (isFirst == true) {
-      li.add(new SimpleAttributeModifier("class", "first"));
+      li.add(new SimpleAttributeModifier("class", "first off"));
+    } else if (menuEntry.getParent() == null) {
+      // class="off" for unselected menu items on the first level:
+      li.add(new SimpleAttributeModifier("class", "off"));
     }
     li.add(link);
+    final Label suffixLabel;
+    if (menuEntry.getHtmlSuffix() != null) {
+      suffixLabel = new Label("suffix", menuEntry.getHtmlSuffix());
+      suffixLabel.setEscapeModelStrings(false);
+    } else {
+      suffixLabel = new Label("suffix");
+      suffixLabel.setVisible(false);
+    }
     final Label label = new Label("label", getString(menuEntry.getI18nKey()));
-    link.add(label);
+    label.setRenderBodyOnly(true);
+    if (menuEntry.getUrl() != null) {
+      link.add(label); // Show label with link.
+      link.add(suffixLabel);
+      li.add(new Label("label").setVisible(false));
+      li.add(new Label("suffix").setVisible(false));
+    } else {
+      link.setVisible(false); // Show only label (without link)
+      li.add(label);
+      li.add(suffixLabel);
+    }
     if (menuEntry.hasSubMenuEntries() == true) {
       final WebMarkupContainer ul = new WebMarkupContainer("subMenu");
       li.add(ul);

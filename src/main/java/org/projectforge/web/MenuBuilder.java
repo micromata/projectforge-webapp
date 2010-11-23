@@ -105,6 +105,11 @@ public class MenuBuilder implements Serializable
     menuCache.removeMenu(userId);
   }
 
+  public void refreshAllMenus()
+  {
+    menuCache.setExpired();
+  }
+
   private Node buildMenuTree(final PFUserDO user)
   {
     final Node root = new Node();
@@ -115,18 +120,10 @@ public class MenuBuilder implements Serializable
     } else {
       final Locale locale = PFUserContext.getLocale();
       final boolean isGerman = locale != null && locale.toString().startsWith("de") == true;
-      root.addSubMenu(user, MenuItemDef.TASK_TREE);
-      root.addSubMenu(user, MenuItemDef.TIMESHEET_LIST);
-      root.addSubMenu(user, MenuItemDef.CALENDAR);
-      if (configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS) != null) {
-        root.addSubMenu(user, MenuItemDef.BOOK_LIST);
-      }
-      if (configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES) != null) {
-        root.addSubMenu(user, MenuItemDef.ADDRESS_LIST);
-      }
-      if (StringUtils.isNotEmpty(configuration.getTelephoneSystemUrl()) == true) {
-        root.addSubMenu(user, MenuItemDef.PHONE_CALL);
-      }
+      final Node common = root.addSubMenu(user, MenuItemDef.COMMON);
+      common.addSubMenu(user, MenuItemDef.TASK_TREE);
+      common.addSubMenu(user, MenuItemDef.TIMESHEET_LIST);
+      common.addSubMenu(user, MenuItemDef.CALENDAR);
       final Node fibu = root.addSubMenu(user, MenuItemDef.FIBU);
       boolean projectMenuEntryExists = false;
       boolean orderBookMenuEntryExists = false;
@@ -200,8 +197,29 @@ public class MenuBuilder implements Serializable
         }
         projectMgmnt.addSubMenu(user, MenuItemDef.GANTT);
       }
+
+      final Node misc = root.addSubMenu(user, MenuItemDef.MISC);
+      if (configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS) != null) {
+        misc.addSubMenu(user, MenuItemDef.BOOK_LIST);
+      }
+      if (configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES) != null) {
+        misc.addSubMenu(user, MenuItemDef.ADDRESS_LIST);
+      }
+      if (StringUtils.isNotEmpty(configuration.getTelephoneSystemUrl()) == true) {
+        misc.addSubMenu(user, MenuItemDef.PHONE_CALL);
+      }
+      misc.addSubMenu(user, MenuItemDef.IMAGE_CROPPER);
+      if (configuration.isMebConfigured() == true) {
+        final Node meb = misc.addSubMenu(user, MenuItemDef.MEB);
+        if (meb != null) {
+          Model<String> htmlSuffixModel = new MenuMebSuffixModel();
+          meb.setHtmlSuffix(htmlSuffixModel);
+        }
+      }
+
       final Node doc = root.addSubMenu(user, MenuItemDef.DOCUMENTATION);
       if (doc != null) {
+        doc.addSubMenu(user, MenuItemDef.NEWS);
         doc.addSubMenu(user, MenuItemDef.PROJECTFORGE_DOC);
         doc.addSubMenu(user, MenuItemDef.USER_GUIDE);
         if (isGerman == true) {
@@ -218,15 +236,6 @@ public class MenuBuilder implements Serializable
           dev.addSubMenu(user, MenuItemDef.DEVELOPER_GUIDE);
           dev.addSubMenu(user, MenuItemDef.JAVA_DOC);
           dev.addSubMenu(user, MenuItemDef.TEST_REPORTS);
-        }
-      }
-      root.addSubMenu(user, MenuItemDef.NEWS);
-      root.addSubMenu(user, MenuItemDef.IMAGE_CROPPER);
-      if (configuration.isMebConfigured() == true) {
-        final Node meb = root.addSubMenu(user, MenuItemDef.MEB);
-        if (meb != null) {
-          Model<String> htmlSuffixModel = new MenuMebSuffixModel();
-          meb.setHtmlSuffix(htmlSuffixModel);
         }
       }
       if (WicketApplication.isDevelopmentModus() == true) {
@@ -309,6 +318,7 @@ public class MenuBuilder implements Serializable
       if (menuEntry == null) {
         continue;
       }
+      menuEntry.htmlSuffix = node.htmlSuffix;
       if (node.subMenues != null) {
         build(menu, menuEntry, node);
       }

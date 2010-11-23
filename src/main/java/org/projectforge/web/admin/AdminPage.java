@@ -49,6 +49,7 @@ import org.projectforge.database.XmlDump;
 import org.projectforge.meb.MebMailClient;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.user.UserXmlPreferencesMigrationDao;
+import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.DownloadUtils;
@@ -76,6 +77,9 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
 
   @SpringBean(name = "mebMailClient")
   private MebMailClient mebMailClient;
+  
+  @SpringBean(name = "menuBuilder")
+  private MenuBuilder menuBuilder;
 
   @SpringBean(name = "userXmlPreferencesCache")
   private UserXmlPreferencesCache userXmlPreferencesCache;
@@ -138,6 +142,8 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
     String refreshedCaches = systemDao.refreshCaches();
     userXmlPreferencesCache.forceReload();
     refreshedCaches += ", UserXmlPreferencesCache";
+    menuBuilder.refreshAllMenus();
+    refreshedCaches += ", MenuCache";
     setResponsePage(new MessagePage("administration.refreshCachesDone", refreshedCaches));
   }
 

@@ -88,6 +88,7 @@ public enum MenuItemDef
 {
   // Super menus
   ADMINISTRATION("administration", "bricks.png"), //
+  COMMON("common", "cog.png"), //
   // *
   DEVELOPER_DOC("developer", "cog.png"), //
   // *
@@ -96,6 +97,7 @@ public enum MenuItemDef
       FINANCE_GROUP, ORGA_TEAM, CONTROLLING_GROUP), //
   KOST("fibu.kost", "coins.png", //
       FINANCE_GROUP, ORGA_TEAM, CONTROLLING_GROUP), //
+  MISC("misc", "cog.png"), //
   ORGA("orga", "attach.png", //
       FINANCE_GROUP, CONTROLLING_GROUP, ORGA_TEAM), //
   PROJECT_MANAGEMENT("projectmanagement", "wand.png"), //
@@ -106,8 +108,8 @@ public enum MenuItemDef
   // Menu entries
   ACCESS_LIST("accessList", AccessListPage.class, "lock.png"), // Visible for all.
   // *
-  //ADDRESS_LIST("addressList", AddressListPage.class, "vcard.png"), // Visible for all.
-  ADDRESS_LIST("addressList", "address/AddressList.action", "vcard.png"), // Visible for all.
+  ADDRESS_LIST("addressList", AddressListPage.class, "vcard.png"), // Visible for all.
+  // ADDRESS_LIST("addressList", "address/AddressList.action", "vcard.png"), // Visible for all.
   // *
   BANK_ACCOUNT_LIST("finance.bankAccounts", BankAccountListPage.class, "money.png",//
       FINANCE_GROUP, CONTROLLING_GROUP), //
