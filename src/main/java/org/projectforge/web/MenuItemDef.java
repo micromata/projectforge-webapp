@@ -48,6 +48,7 @@ import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.web.access.AccessListPage;
+import org.projectforge.web.address.AddressListPage;
 import org.projectforge.web.admin.AdminPage;
 import org.projectforge.web.admin.SetupPage;
 import org.projectforge.web.admin.UpdatePage;
@@ -105,6 +106,7 @@ public enum MenuItemDef
   // Menu entries
   ACCESS_LIST("accessList", AccessListPage.class, "lock.png"), // Visible for all.
   // *
+  //ADDRESS_LIST("addressList", AddressListPage.class, "vcard.png"), // Visible for all.
   ADDRESS_LIST("addressList", "address/AddressList.action", "vcard.png"), // Visible for all.
   // *
   BANK_ACCOUNT_LIST("finance.bankAccounts", BankAccountListPage.class, "money.png",//

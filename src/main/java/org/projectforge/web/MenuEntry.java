@@ -27,30 +27,20 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.wicket.Page;
 import org.apache.wicket.model.IModel;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * Represents a single menu entry.
  */
-@Deprecated
 public class MenuEntry implements Serializable
 {
   private static final long serialVersionUID = 7961498640193169174L;
 
   protected Collection<MenuEntry> subMenuEntries;
 
-  protected String[] params;
-
   protected String url;
-
-  protected String label;
-
-  protected String icon;
-
-  protected String iconOpen;
-
-  protected boolean newWindow = false;
 
   protected boolean opened = false;
 
@@ -62,22 +52,54 @@ public class MenuEntry implements Serializable
 
   protected boolean visible = true;
 
-  public String getIcon()
+  protected MenuItemDef menuItemDef;
+
+  protected Menu menu;
+
+  public void setSelected()
   {
-    return icon;
+    menu.selectedMenu = this;
   }
 
+  public boolean isSelected()
+  {
+    if (this == menu.selectedMenu) {
+      return true;
+    }
+    if (subMenuEntries != null) {
+      for (final MenuEntry subMenuEntry : subMenuEntries) {
+        if (subMenuEntry.isSelected() == true) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public boolean isFirst()
+  {
+    return menu.isFirst(this);
+  }
+
+  public String getIcon()
+  {
+    return menuItemDef.getIcon();
+  }
+
+  @Deprecated
   public String getIconOpen()
   {
-    return iconOpen;
+    return menuItemDef.getIcon();
   }
 
   /** Number is needed for the tree menu implementation of http://www.destroydrop.com/javascripts/tree/. */
+  @Deprecated
   public short getOrderNumber()
   {
     return orderNumber;
   }
 
+  @Deprecated
   void setOrderNumber(short orederNumber)
   {
     this.orderNumber = orederNumber;
@@ -88,32 +110,37 @@ public class MenuEntry implements Serializable
     return parent;
   }
 
-  void setParent(MenuEntry parent)
+  void setParent(final MenuEntry parent)
   {
     this.parent = parent;
   }
 
+  /**
+   * Use #hasParent() instead.
+   */
+  @Deprecated
   public boolean getHasParent()
+  {
+    return hasParent();
+  }
+
+  public boolean hasParent()
   {
     return this.parent != null;
   }
 
-  public MenuEntry(final MenuItemDef menuItem)
+  public MenuEntry(final MenuItemDef menuItem, final Menu menu)
   {
-    this.label = menuItem.getI18nKey();
-    this.icon = menuItem.getIcon();
-    this.iconOpen = menuItem.getIcon();
-    this.newWindow = menuItem.isNewWindow();
-    this.params = menuItem.getParams();
+    this.menuItemDef = menuItem;
+    this.menu = menu;
     if (menuItem.isWicketPage() == true) {
-      this.url = WicketUtils.getBookmarkablePageUrl(menuItem.getPageClass(), params);
-
+      this.url = WicketUtils.getBookmarkablePageUrl(menuItem.getPageClass(), menuItem.getParams());
     } else {
       this.url = "secure/" + menuItem.getUrl();
     }
   }
 
-  public void addMenuEntry(MenuEntry subMenuEntry)
+  public void addMenuEntry(final MenuEntry subMenuEntry)
   {
     if (subMenuEntries == null) {
       subMenuEntries = new ArrayList<MenuEntry>();
@@ -127,6 +154,10 @@ public class MenuEntry implements Serializable
     return (this.subMenuEntries != null && subMenuEntries.size() > 0);
   }
 
+  /**
+   * Use {@link #hasSubMenuEntries()} instead.
+   */
+  @Deprecated
   public boolean getHasSubMenuEntries()
   {
     return (this.subMenuEntries != null && subMenuEntries.size() > 0);
@@ -143,7 +174,17 @@ public class MenuEntry implements Serializable
    */
   public boolean isNewWindow()
   {
-    return newWindow;
+    return menuItemDef.isNewWindow();
+  }
+
+  public boolean isWicketPage()
+  {
+    return menuItemDef.isWicketPage();
+  }
+
+  public Class< ? extends Page> getPageClass()
+  {
+    return menuItemDef.getPageClass();
   }
 
   /**
@@ -154,9 +195,19 @@ public class MenuEntry implements Serializable
     return subMenuEntries;
   }
 
+  /**
+   * Use {@link #getI18nKey()} instead.
+   * @return
+   */
+  @Deprecated
   public String getLabel()
   {
-    return label;
+    return getI18nKey();
+  }
+
+  public String getI18nKey()
+  {
+    return menuItemDef.getI18nKey();
   }
 
   /**
@@ -165,6 +216,11 @@ public class MenuEntry implements Serializable
   public String getUrl()
   {
     return url;
+  }
+
+  public String[] getParams()
+  {
+    return menuItemDef.getParams();
   }
 
   /**

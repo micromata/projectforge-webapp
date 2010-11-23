@@ -141,17 +141,6 @@ public class MenuBuilder implements Serializable
           orderBookMenuEntryExists = true;
           final Model<String> htmlSuffixModel = new MenuOrderBookSuffixModel();
           orderBook.setHtmlSuffix(htmlSuffixModel);
-          orderBook.setDTreeHtmlSuffix(new Model<String>() {
-            @Override
-            public String getObject()
-            {
-              final Integer counter = auftragDao.getAbgeschlossenNichtFakturiertAnzahl();
-              if (NumberHelper.greaterZero(counter) == false) {
-                return "";
-              }
-              return getNewCounterForAsMenuEntrySuffix(counter, "menu.fibu.orderbook.htmlSuffixTooltip");
-            }
-          });
         }
       }
       final Node kost = root.addSubMenu(user, MenuItemDef.KOST);
@@ -233,17 +222,6 @@ public class MenuBuilder implements Serializable
         if (meb != null) {
           Model<String> htmlSuffixModel = new MenuMebSuffixModel();
           meb.setHtmlSuffix(htmlSuffixModel);
-          meb.setDTreeHtmlSuffix(new Model<String>() {
-            @Override
-            public String getObject()
-            {
-              final int counter = mebDao.getRecentMEBEntries(null);
-              if (counter == 0) {
-                return "";
-              }
-              return MenuBuilder.getNewCounterForAsMenuEntrySuffix(counter);
-            }
-          });
         }
       }
       if (WicketApplication.isDevelopmentModus() == true) {
@@ -307,9 +285,6 @@ public class MenuBuilder implements Serializable
       }
       if (menuEntry == null) {
         continue;
-      }
-      if (node.dTreeHtmlSuffix != null) {
-        menuEntry.setHtmlSuffix(node.dTreeHtmlSuffix);
       }
       if (node.subMenues != null) {
         build(menu, menuEntry, node);
@@ -376,8 +351,6 @@ public class MenuBuilder implements Serializable
 
     Model<String> htmlSuffix;
 
-    Model<String> dTreeHtmlSuffix;
-
     boolean isLeaf = true;
 
     Node()
@@ -416,11 +389,6 @@ public class MenuBuilder implements Serializable
     void setHtmlSuffix(final Model<String> htmlSuffix)
     {
       this.htmlSuffix = htmlSuffix;
-    }
-
-    void setDTreeHtmlSuffix(final Model<String> dTreeHtmlSuffix)
-    {
-      this.dTreeHtmlSuffix = dTreeHtmlSuffix;
     }
 
     boolean isVisible()

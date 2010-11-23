@@ -23,11 +23,17 @@
 
 package org.projectforge.web.core;
 
+import org.apache.wicket.PageParameters;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.AbstractLink;
+import org.apache.wicket.markup.html.link.ExternalLink;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.web.MenuEntry;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -36,16 +42,47 @@ public class MenuEntryPanel extends Panel
 {
   private static final long serialVersionUID = -5842187160235305180L;
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MenuEntryPanel.class);
-
   public MenuEntryPanel(String id)
   {
     super(id);
   }
 
+  @SuppressWarnings("serial")
   public void init(final MenuEntry menuEntry)
   {
-    add(new Label("entry", getString(menuEntry.getLabel())));
+    final WebMarkupContainer li = new WebMarkupContainer("entry");
+    add(li);
+    final AbstractLink link;
+    if (menuEntry.isWicketPage() == true) {
+      link = new Link<String>("link") {
+        @Override
+        public void onClick()
+        {
+          if (menuEntry.getParams() == null) {
+            setResponsePage(menuEntry.getPageClass());
+          } else {
+            final PageParameters params = WicketUtils.getPageParameters(menuEntry.getParams());
+            setResponsePage(menuEntry.getPageClass(), params);
+          }
+          menuEntry.setSelected();
+        }
+      };
+    } else {
+      link = new ExternalLink("link", WicketUtils.getUrl(getResponse(), menuEntry.getUrl(), true));
+    }
+    if (menuEntry.isNewWindow() == true) {
+      link.add(new SimpleAttributeModifier("target", "_blank"));
+    }
+    final boolean isFirst = menuEntry.isFirst();
+    final boolean isSelected = menuEntry.isSelected();
+    if (isSelected == true) {
+      li.add(new SimpleAttributeModifier("class", isFirst == true ? "first selected" : "selected"));
+    } else if (isFirst == true) {
+      li.add(new SimpleAttributeModifier("class", "first"));
+    }
+    li.add(link);
+    final Label label = new Label("label", getString(menuEntry.getI18nKey()));
+    link.add(label);
     if (menuEntry.hasSubMenuEntries() == true) {
       final WebMarkupContainer ul = new WebMarkupContainer("subMenu");
       add(ul);
