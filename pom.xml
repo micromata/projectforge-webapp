@@ -3,7 +3,7 @@
   <groupId>org.projectforge</groupId>
   <artifactId>ProjectForge</artifactId>
   <packaging>war</packaging>
-  <version>3.4.3</version>
+  <version>3.4.3.1</version>
   <name>ProjectForge</name>
   <description>
     ProjectForge is a multi user web application for collaborative team work. Organize time sheets, tasks, addresses, books etc. with project teams.
@@ -321,6 +321,7 @@
     </dependency>
     <dependency>
       <groupId>de.micromata.genome.gwiki</groupId>
+      <!-- 0.4. -->
       <artifactId>gwiki</artifactId>
       <version>0.3.1-SNAPSHOT</version>
     </dependency>

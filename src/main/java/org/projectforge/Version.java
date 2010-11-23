@@ -17,11 +17,11 @@ public class Version
 
   public static final String APP_TITLE = "ProjectForge 2010";
 
-  public static final String NUMBER = "3.4.3";
+  public static final String NUMBER = "3.4.3.1";
 
-  public static final String RELEASE_DATE = "2010-11-17";
+  public static final String RELEASE_DATE = "2010-11-23";
 
-  public static final String RELEASE_TIMESTAMP = "2010-11-17 07:13";
+  public static final String RELEASE_TIMESTAMP = "2010-11-23 01:24";
 }
 
 		
