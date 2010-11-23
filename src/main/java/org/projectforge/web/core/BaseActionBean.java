@@ -43,6 +43,7 @@ import net.sourceforge.stripes.validation.ValidationErrors;
 import org.projectforge.Version;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -250,7 +251,11 @@ public abstract class BaseActionBean implements ActionBean
 
   protected Menu rebuildMenu()
   {
-    Menu menu = menuBuilder.buildMenu(getContext().getUser());
+    final PFUserDO user = getContext().getUser();
+    if (user != null) {
+      menuBuilder.expireMenu(user.getId());
+    }
+    Menu menu = menuBuilder.buildDTreeMenu(user);
     getContext().putEntry(USER_PREF_MENU_KEY, menu, false); // Stripes menu
     getContext().removeEntry(OldMenuPanel.USER_PREF_MENU_KEY); // Wicket menu
     return menu;

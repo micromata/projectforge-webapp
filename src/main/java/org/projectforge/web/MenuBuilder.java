@@ -32,7 +32,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.model.Model;
 import org.projectforge.access.AccessChecker;
-import org.projectforge.common.NumberHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.fibu.AuftragDao;
@@ -62,6 +61,8 @@ public class MenuBuilder implements Serializable
   private Configuration configuration;
 
   private MebDao mebDao;
+
+  private MenuCache menuCache = new MenuCache();
 
   public static String getNewCounterForAsMenuEntrySuffix(final int counter)
   {
@@ -99,7 +100,11 @@ public class MenuBuilder implements Serializable
     this.mebDao = mebDao;
   }
 
-  @SuppressWarnings("serial")
+  public void expireMenu(final Integer userId)
+  {
+    menuCache.removeMenu(userId);
+  }
+
   private Node buildMenuTree(final PFUserDO user)
   {
     final Node root = new Node();
@@ -233,6 +238,24 @@ public class MenuBuilder implements Serializable
     return root;
   }
 
+  public Menu getMenu(final PFUserDO user)
+  {
+    Menu menu = null;
+    if (user != null) {
+      menu = menuCache.getMenu(user.getId());
+      if (menu != null) {
+        return menu;
+      }
+    }
+    final Node root = buildMenuTree(user);
+    menu = new Menu();
+    build(menu, null, root);
+    if (user != null) {
+      menuCache.putMenu(user.getId(), menu);
+    }
+    return menu;
+  }
+
   public MenuTreeTable build(final PFUserDO user)
   {
     final Node root = buildMenuTree(user);
@@ -293,7 +316,7 @@ public class MenuBuilder implements Serializable
   }
 
   @Deprecated
-  public Menu buildMenu(PFUserDO user)
+  public Menu buildDTreeMenu(PFUserDO user)
   {
     final Node root = buildMenuTree(user);
     final Menu menu = new Menu();

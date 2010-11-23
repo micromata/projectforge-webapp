@@ -41,13 +41,15 @@ import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.target.basic.RedirectRequestTarget;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.Version;
 import org.projectforge.common.DateHelper;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.web.Menu;
+import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.core.MenuPanel;
 import org.projectforge.web.wicket.components.TooltipImage;
-
 
 /**
  * Do only derive from this page, if no login is required!
@@ -58,6 +60,9 @@ public abstract class AbstractBasePage extends WebPage
   protected WebMarkupContainer body;
 
   protected boolean alreadySubmitted = false;
+
+  @SpringBean(name = "menuBuilder")
+  private MenuBuilder menuBuilder;
 
   /**
    * Url with no or minimal set of parameters.
@@ -90,6 +95,8 @@ public abstract class AbstractBasePage extends WebPage
   public AbstractBasePage(final PageParameters parameters)
   {
     super(parameters);
+    final Menu menu = menuBuilder.getMenu(getUser());
+    menu.setSelectedMenu(this);
     add(new Label("windowTitle", new Model<String>() {
       @Override
       public String getObject()

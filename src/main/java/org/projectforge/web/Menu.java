@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.projectforge.web.wicket.AbstractBasePage;
+
 /**
  * Helper for the web menu. Use MenuTreeTable instead.
  */
@@ -38,6 +40,18 @@ public class Menu implements Serializable
   private Collection<MenuEntry> menuEntries = new ArrayList<MenuEntry>();
 
   protected MenuEntry selectedMenu;
+
+  public void setSelectedMenu(final AbstractBasePage page)
+  {
+    if (menuEntries != null) {
+      for (final MenuEntry entry : menuEntries) {
+        final MenuEntry found = entry.findMenu(page.getPageClass());
+        if (found != null) {
+          this.selectedMenu = found;
+        }
+      }
+    }
+  }
 
   public Collection<MenuEntry> getMenuEntries()
   {

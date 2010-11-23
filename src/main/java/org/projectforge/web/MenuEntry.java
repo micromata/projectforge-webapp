@@ -56,6 +56,22 @@ public class MenuEntry implements Serializable
 
   protected Menu menu;
 
+  public MenuEntry findMenu(final Class< ? extends Page> pageClass)
+  {
+    if (menuItemDef.getPageClass() != null && menuItemDef.getPageClass().isAssignableFrom(pageClass) == true) {
+      return this;
+    }
+    if (subMenuEntries != null) {
+      for (final MenuEntry subMenuEntry : subMenuEntries) {
+        final MenuEntry found = subMenuEntry.findMenu(pageClass);
+        if (found != null) {
+          return found;
+        }
+      }
+    }
+    return null;
+  }
+
   public void setSelected()
   {
     menu.selectedMenu = this;

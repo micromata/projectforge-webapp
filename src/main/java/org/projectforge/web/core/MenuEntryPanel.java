@@ -64,7 +64,6 @@ public class MenuEntryPanel extends Panel
             final PageParameters params = WicketUtils.getPageParameters(menuEntry.getParams());
             setResponsePage(menuEntry.getPageClass(), params);
           }
-          menuEntry.setSelected();
         }
       };
     } else {

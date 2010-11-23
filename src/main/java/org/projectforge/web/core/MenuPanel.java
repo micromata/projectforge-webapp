@@ -23,7 +23,6 @@
 
 package org.projectforge.web.core;
 
-import org.apache.wicket.markup.html.image.ContextImage;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -32,8 +31,6 @@ import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.MenuEntry;
 import org.projectforge.web.wicket.AbstractSecuredPage;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -85,7 +82,7 @@ public class MenuPanel extends Panel
     if (log.isDebugEnabled() == true) {
       log.debug("Build new menu.");
     }
-    menu = menuBuilder.buildMenu(PFUserContext.getUser());
+    menu = menuBuilder.getMenu(PFUserContext.getUser());
     if (securedPage != null) {
       securedPage.putUserPrefEntry(USER_PREF_MENU_KEY, menu, false);
     }
