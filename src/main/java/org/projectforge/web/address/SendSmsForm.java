@@ -50,6 +50,8 @@ public class SendSmsForm extends AbstractForm<SendSmsData, SendSmsPage>
 {
   private static final long serialVersionUID = -2138017238114715368L;
 
+  private static final String USER_PREF_KEY_RECENTS = "messagingReceivers";
+
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
 
@@ -142,11 +144,19 @@ public class SendSmsForm extends AbstractForm<SendSmsData, SendSmsPage>
   protected RecentQueue<String> getRecentSearchTermsQueue()
   {
     if (recentSearchTermsQueue == null) {
+      recentSearchTermsQueue = (RecentQueue<String>) parentPage.getUserPrefEntry(USER_PREF_KEY_RECENTS);
+    }
+    if (recentSearchTermsQueue == null) {
       recentSearchTermsQueue = (RecentQueue<String>) parentPage.getUserPrefEntry(this.getClass().getName() + ":recentSearchTerms");
+      if (recentSearchTermsQueue != null) {
+        // Old entries:
+        parentPage.putUserPrefEntry(USER_PREF_KEY_RECENTS, recentSearchTermsQueue, true);
+        parentPage.removeUserPrefEntry(this.getClass().getName() + ":recentSearchTerms");
+      }
     }
     if (recentSearchTermsQueue == null) {
       recentSearchTermsQueue = new RecentQueue<String>();
-      parentPage.putUserPrefEntry(this.getClass().getName() + ":recentSearchTerms", recentSearchTermsQueue, true);
+      parentPage.putUserPrefEntry(USER_PREF_KEY_RECENTS, recentSearchTermsQueue, true);
     }
     return recentSearchTermsQueue;
   }

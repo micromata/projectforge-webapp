@@ -36,6 +36,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
+import org.projectforge.address.PhoneType;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.Configuration;
@@ -104,11 +105,18 @@ public class SendSmsPage extends AbstractSecuredPage
       if (address == null)
         return;
       if (parameters.containsKey(PARAMETER_KEY_PHONE_TYPE) == true) {
-        str = parameters.getString(PARAMETER_KEY_PHONE_TYPE);
+        log.info(parameters.get(PARAMETER_KEY_PHONE_TYPE));
+        final Object type = parameters.get(PARAMETER_KEY_PHONE_TYPE);
+        final PhoneType phoneType;
+        if (type instanceof PhoneType) {
+          phoneType = (PhoneType)type;
+        } else {
+          phoneType = PhoneType.valueOf((String)type);
+        }
         String number = null;
-        if ("mobile".equals(str) == true) {
+        if (phoneType == PhoneType.MOBILE) {
           number = address.getMobilePhone();
-        } else if ("privateMobile".equals(str) == true) {
+        } else if (phoneType == PhoneType.PRIVATE_MOBILE) {
           number = address.getPrivateMobilePhone();
         }
         if (number != null) {

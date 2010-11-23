@@ -34,6 +34,7 @@ import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Fragment;
@@ -46,6 +47,7 @@ import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.address.PersonalAddressDao;
+import org.projectforge.address.PhoneType;
 import org.projectforge.core.Configuration;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -74,16 +76,22 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
 
   Map<Integer, PersonalAddressDO> personalAddressMap;
 
+  private boolean messagingSupported;
+
+  private boolean phoneCallSupported;
+
   public AddressListPage(PageParameters parameters)
   {
     super(parameters, "address");
   }
-  
+
   @Override
   protected void setup()
   {
     super.setup();
     this.recentSearchTermsUserPrefKey = "addressSearchTerms";
+    messagingSupported = Configuration.getInstance().isSmsConfigured() == true;
+    phoneCallSupported = Configuration.getInstance().isTelephoneSystemUrlConfigured() == true;
   }
 
   @Override
@@ -96,7 +104,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
   @Override
   protected void init()
   {
-    if (Configuration.getInstance().isSmsConfigured() == true) {
+    if (messagingSupported == true) {
       final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
         @Override
         public void onClick()
@@ -191,10 +199,11 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         final RepeatingView view = new RepeatingView(componentId);
         item.add(view);
         final Integer id = address.getId();
-        boolean first = addPhoneNumber(view, id, "business", address.getBusinessPhone(), false, WebConstants.IMAGE_PHONE, true);
-        first = addPhoneNumber(view, id, "mobile", address.getMobilePhone(), true, WebConstants.IMAGE_PHONE_MOBILE, first);
-        first = addPhoneNumber(view, id, "private", address.getPrivatePhone(), false, WebConstants.IMAGE_PHONE_HOME, first);
-        first = addPhoneNumber(view, id, "privateMobile", address.getPrivateMobilePhone(), true, WebConstants.IMAGE_PHONE_MOBILE, first);
+        boolean first = addPhoneNumber(view, id, PhoneType.BUSINESS, address.getBusinessPhone(), false, WebConstants.IMAGE_PHONE, true);
+        first = addPhoneNumber(view, id, PhoneType.MOBILE, address.getMobilePhone(), true, WebConstants.IMAGE_PHONE_MOBILE, first);
+        first = addPhoneNumber(view, id, PhoneType.PRIVATE, address.getPrivatePhone(), false, WebConstants.IMAGE_PHONE_HOME, first);
+        first = addPhoneNumber(view, id, PhoneType.PRIVATE_MOBILE, address.getPrivateMobilePhone(), true, WebConstants.IMAGE_PHONE_MOBILE,
+            first);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
@@ -202,7 +211,8 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
     form.add(dataTable);
   }
 
-  private boolean addPhoneNumber(final RepeatingView view, final Integer addressId, final String name, final String phoneNumber,
+  @SuppressWarnings("serial")
+  private boolean addPhoneNumber(final RepeatingView view, final Integer addressId, final PhoneType phoneType, final String phoneNumber,
       final boolean sendSms, final String image, final boolean first)
   {
     if (StringUtils.isBlank(phoneNumber) == true) {
@@ -213,38 +223,45 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
     }
     final Fragment fragment = new Fragment(view.newChildId(), "phoneNumber", this);
     view.add(fragment.setRenderBodyOnly(true));
-    @SuppressWarnings("serial")
-    final Link<String> phoneCallLink = new Link<String>("directCallLink") {
-      @Override
-      public void onClick()
-      {
-        // /secure/address/PhoneCall.action?addressId=2&phoneType=privateMobile
-        throw new UnsupportedOperationException();
-      }
-    };
-    phoneCallLink.add(new SimpleAttributeModifier("onmouseover", "zoom('" + phoneNumber + "'); return false;"));
-    final String tooltip = getString("address." + name + "Phone");
-    fragment.add(phoneCallLink.add(new SimpleAttributeModifier("title", tooltip)));
-    final Label phoneNumberLabel = new Label("phoneNumber", phoneNumber);
-    if (this.personalAddressMap.containsKey(addressId) == true) {
-      phoneNumberLabel.add(new SimpleAttributeModifier("style", "color:red; font-weight:bold;"));
+    final WebMarkupContainer linkOrSpan;
+    if (phoneCallSupported == true) {
+      linkOrSpan = new Link<String>("directCallLink") {
+        @Override
+        public void onClick()
+        {
+          final PageParameters params = new PageParameters();
+          params.put(PhoneCallPage.PARAMETER_KEY_ADDRESS_ID, addressId);
+          params.add(PhoneCallPage.PARAMETER_KEY_NUMBER, phoneNumber);
+          setResponsePage(new PhoneCallPage(params));
+        }
+      };
+      fragment.add(createInvisibleDummyComponent("phoneNumber"));
     } else {
-      phoneNumberLabel.setRenderBodyOnly(true);
+      linkOrSpan = new WebMarkupContainer("phoneNumber");
+      fragment.add(createInvisibleDummyComponent("directCallLink"));
     }
-    phoneCallLink.add(phoneNumberLabel);
-    phoneCallLink.add(new PresizedImage("phoneImage", getResponse(), image));
-    @SuppressWarnings("serial")
+    linkOrSpan.add(new SimpleAttributeModifier("onmouseover", "zoom('" + phoneNumber + "'); return false;"));
+    final String tooltip = getString(phoneType.getI18nKey());
+    fragment.add(linkOrSpan.add(new SimpleAttributeModifier("title", tooltip)));
+    final Label numberLabel = new Label("number", phoneNumber);
+    if (this.personalAddressMap.containsKey(addressId) == true) {
+      numberLabel.add(new SimpleAttributeModifier("style", "color:red; font-weight:bold;"));
+    } else {
+      numberLabel.setRenderBodyOnly(true);
+    }
+    linkOrSpan.add(numberLabel);
+    linkOrSpan.add(new PresizedImage("phoneImage", getResponse(), image));
     final Link<String> sendMessage = new Link<String>("sendMessageLink") {
       @Override
       public void onClick()
       {
         final PageParameters params = new PageParameters();
         params.put(SendSmsPage.PARAMETER_KEY_ADDRESS_ID, addressId);
-        params.put(SendSmsPage.PARAMETER_KEY_PHONE_TYPE, name);
+        params.put(SendSmsPage.PARAMETER_KEY_PHONE_TYPE, phoneType);
         setResponsePage(SendSmsPage.class, params);
       }
     };
-    if (sendSms == false || Configuration.getInstance().isSmsConfigured() == false) {
+    if (sendSms == false || messagingSupported == false) {
       sendMessage.setVisible(false);
     }
     fragment.add(sendMessage);
