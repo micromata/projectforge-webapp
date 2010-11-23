@@ -30,11 +30,6 @@ public enum FormOfAddress implements I18nEnum
 {
   MISTER("mister"), MISS("miss"), UNKNOWN("unknown");
 
-  /**
-   * List of all available values.
-   */
-  public static final FormOfAddress[] LIST = new FormOfAddress[] { MISTER, MISS, UNKNOWN};
-
   private String key;
 
   public static FormOfAddress get(String s)
@@ -50,15 +45,6 @@ public enum FormOfAddress implements I18nEnum
       return UNKNOWN;
     }
     throw new UnsupportedOperationException("Unknown Anrede" + ": '" + s + "'");
-  }
-
-  /**
-   * The key will be used e. g. for i18n.
-   * @return
-   */
-  public String getKey()
-  {
-    return key;
   }
 
   /**

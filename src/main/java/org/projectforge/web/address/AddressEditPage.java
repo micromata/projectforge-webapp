@@ -23,8 +23,6 @@
 
 package org.projectforge.web.address;
 
-import java.util.Date;
-
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;

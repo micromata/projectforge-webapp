@@ -23,22 +23,40 @@
 
 package org.projectforge.web.address;
 
-import org.apache.commons.lang.StringUtils;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.panel.Fragment;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
+import org.projectforge.address.AddressStatus;
+import org.projectforge.address.ContactStatus;
+import org.projectforge.address.FormOfAddress;
+import org.projectforge.address.PersonalAddressDO;
+import org.projectforge.address.PersonalAddressDao;
+import org.projectforge.common.DateHelper;
 import org.projectforge.web.common.OutputType;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
+import org.projectforge.web.wicket.PresizedImage;
+import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.components.DatePanel;
+import org.projectforge.web.wicket.components.DatePanelSettings;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
+import org.projectforge.web.wicket.components.TooltipImage;
 
 public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage>
 {
@@ -49,73 +67,155 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
 
+  @SpringBean(name = "personalAddressDao")
+  private PersonalAddressDao personalAddressDao;
+
   @SpringBean(name = "taskFormatter")
   private TaskFormatter taskFormatter;
 
-  private TextField<String> authorsField, signatureField, publisherField, editorField, yearOfPublishingField;
+  protected PersonalAddressDO personalAddress;
+
+  private TextField<String> businessPhoneField, faxField, mobilePhoneField, privatePhoneField, privateMobilePhoneField;
+
+  // private TextField<String> authorsField, signatureField, publisherField, editorField, yearOfPublishingField;
 
   public AddressEditForm(AddressEditPage parentPage, AddressDO data)
   {
     super(parentPage, data);
-    this.colspan = 4;
-    if (isNew() == true) {
+    this.colspan = 6;
+    if (isNew() == false) {
+      personalAddress = personalAddressDao.getByAddressId(getData().getId());
+    }
+    if (personalAddress == null) {
+      personalAddress = new PersonalAddressDO();
     }
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     super.init();
+    final String phoneListTooltip = getString("address.tooltip.phonelist");
     add(new Label("task", taskFormatter.getTaskPath(data.getTaskId(), true, OutputType.HTML)).setEscapeModelStrings(false));
-    final TextField<String> titleField = new RequiredMaxLengthTextField("title", new PropertyModel<String>(data, "title"));
-    titleField.add(new FocusOnLoadBehavior());
-    add(titleField);
-    add(new MaxLengthTextField("keywords", new PropertyModel<String>(data, "keywords")));
-    add(new MaxLengthTextField("isbn", new PropertyModel<String>(data, "isbn")));
-    add(signatureField = new MaxLengthTextField("signature", new PropertyModel<String>(data, "signature")));
-    add(publisherField = new MaxLengthTextField("publisher", new PropertyModel<String>(data, "publisher")));
-    add(editorField = new MaxLengthTextField("editor", new PropertyModel<String>(data, "editor")));
-    add(yearOfPublishingField = new MaxLengthTextField("yearOfPublishing", new PropertyModel<String>(data, "yearOfPublishing")));
-    add(authorsField = new MaxLengthTextField("authors", new PropertyModel<String>(data, "authors")));
-    add(new MaxLengthTextArea("abstract", new PropertyModel<String>(data, "abstractText")));
+    final TextField<String> nameField = new RequiredMaxLengthTextField("name", new PropertyModel<String>(data, "name"));
+    nameField.add(new FocusOnLoadBehavior());
+    add(nameField);
+    add(new RequiredMaxLengthTextField("firstName", new PropertyModel<String>(data, "firstName")));
+    add(new CheckBox("favoriteCard", new PropertyModel<Boolean>(personalAddress, "favoriteCard")));
+    add(new MaxLengthTextField("title", new PropertyModel<String>(data, "title")));
+    add(new TooltipImage("favoriteCardHelpImage", getResponse(), WebConstants.IMAGE_HELP, getString("address.tooltip.vCardList")));
+    add(businessPhoneField = new MaxLengthTextField("businessPhone", new PropertyModel<String>(data, "businessPhone")));
+    add(WicketUtils.addTooltip(new CheckBox("favoriteBusinessPhone", new PropertyModel<Boolean>(personalAddress, "favoriteBusinessPhone")),
+        phoneListTooltip));
+    add(new TooltipImage("favoriteBusinessPhoneHelpImage", getResponse(), WebConstants.IMAGE_HELP, phoneListTooltip));
+    add(faxField = new MaxLengthTextField("fax", new PropertyModel<String>(data, "fax")));
+    add(WicketUtils.addTooltip(new CheckBox("favoriteFax", new PropertyModel<Boolean>(personalAddress, "favoriteFax")), phoneListTooltip));
+    add(new TooltipImage("favoriteFaxHelpImage", getResponse(), WebConstants.IMAGE_HELP, phoneListTooltip));
+    add(new PFAutoCompleteTextField<String>("organization", new PropertyModel<String>(data, "organization")) {
+      @Override
+      protected List<String> getChoices(String input)
+      {
+        return parentPage.getBaseDao().getAutocompletion("organization", input);
+      }
+    }.withMatchContains(true).withMinChars(2));
+    add(mobilePhoneField = new MaxLengthTextField("mobilePhone", new PropertyModel<String>(data, "mobilePhone")));
+    add(WicketUtils.addTooltip(new CheckBox("favoriteMobilePhone", new PropertyModel<Boolean>(personalAddress, "favoriteMobilePhone")),
+        phoneListTooltip));
+    add(new TooltipImage("favoriteMobilePhoneHelpImage", getResponse(), WebConstants.IMAGE_HELP, phoneListTooltip));
+    add(new MaxLengthTextField("division", new PropertyModel<String>(data, "division")));
+    add(new MaxLengthTextField("positionText", new PropertyModel<String>(data, "positionText")));
+    add(new MaxLengthTextField("email", new PropertyModel<String>(data, "email")));
+    add(new MaxLengthTextField("website", new PropertyModel<String>(data, "website")));
+    add(new CheckBox("imageBroschure", new PropertyModel<Boolean>(data, "imageBroschure")));
+    add(new PFAutoCompleteTextField<String>("addressText", new PropertyModel<String>(data, "addressText")) {
+      @Override
+      protected List<String> getChoices(String input)
+      {
+        return parentPage.getBaseDao().getAutocompletion("addressText", input);
+      }
+    }.withMatchContains(true).withMinChars(2));
+    add(new PFAutoCompleteTextField<String>("postalAddressText", new PropertyModel<String>(data, "postalAddressText")) {
+      @Override
+      protected List<String> getChoices(String input)
+      {
+        return parentPage.getBaseDao().getAutocompletion("postalAddressText", input);
+      }
+    }.withMatchContains(true).withMinChars(2));
+    add(new MaxLengthTextField("zipCode", new PropertyModel<String>(data, "zipCode")));
+    add(new MaxLengthTextField("city", new PropertyModel<String>(data, "city")));
+    add(new MaxLengthTextField("postalZipCode", new PropertyModel<String>(data, "postalZipCode")));
+    add(new MaxLengthTextField("postalCity", new PropertyModel<String>(data, "postalCity")));
+    add(new MaxLengthTextField("country", new PropertyModel<String>(data, "country")));
+    add(new MaxLengthTextField("state", new PropertyModel<String>(data, "state")));
+    add(new MaxLengthTextField("postalCountry", new PropertyModel<String>(data, "postalCountry")));
+    add(new MaxLengthTextField("postalState", new PropertyModel<String>(data, "postalState")));
+    add(new MaxLengthTextField("privateAddressText", new PropertyModel<String>(data, "privateAddressText")));
+    add(privatePhoneField = new MaxLengthTextField("privatePhone", new PropertyModel<String>(data, "privatePhone")));
+    add(WicketUtils.addTooltip(new CheckBox("favoritePrivatePhone", new PropertyModel<Boolean>(personalAddress, "favoritePrivatePhone")),
+        phoneListTooltip));
+    add(new TooltipImage("favoritePrivatePhoneHelpImage", getResponse(), WebConstants.IMAGE_HELP, phoneListTooltip));
+    add(new MaxLengthTextField("privateZipCode", new PropertyModel<String>(data, "privateZipCode")));
+    add(new MaxLengthTextField("privateCity", new PropertyModel<String>(data, "privateCity")));
+    add(privateMobilePhoneField = new MaxLengthTextField("privateMobilePhone", new PropertyModel<String>(personalAddress, "favoritePrivateMobilePhone")));
+    add(WicketUtils.addTooltip(
+        new CheckBox("favoritePrivateMobilePhone", new PropertyModel<Boolean>(personalAddress, "favoritePrivateMobilePhone")), phoneListTooltip));
+    add(new TooltipImage("favoritePrivateMobilePhoneHelpImage", getResponse(), WebConstants.IMAGE_HELP, phoneListTooltip));
+    add(new MaxLengthTextField("privateCountry", new PropertyModel<String>(data, "privateCountry")));
+    add(new MaxLengthTextField("privateState", new PropertyModel<String>(data, "privateState")));
+    add(new MaxLengthTextField("privateEmail", new PropertyModel<String>(data, "privateEmail")));
+    add(new DatePanel("birthday", new PropertyModel<Date>(data, "birthday"), new DatePanelSettings().withTargetType(java.sql.Date.class)));
+    add(new Label("showBirthdayAsUTC", new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return DateHelper.formatAsUTC(data.getBirthday());
+      }
+    }));
+    add(new PresizedImage("cakeImage", getResponse(), WebConstants.IMAGE_BIRTHDAY));
     add(new MaxLengthTextArea("comment", new PropertyModel<String>(data, "comment")));
+    add(new MaxLengthTextArea("publicKey", new PropertyModel<String>(data, "publicKey")));
+    add(new MaxLengthTextArea("fingerprint", new PropertyModel<String>(data, "fingerprint")));
 
-    // DropDownChoice status
-    /*final LabelValueChoiceRenderer<AddressStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<AddressStatus>(this, AddressStatus.values());
+    // DropDownChoice form of address
+    final LabelValueChoiceRenderer<FormOfAddress> formChoiceRenderer = new LabelValueChoiceRenderer<FormOfAddress>(this, FormOfAddress
+        .values());
     @SuppressWarnings("unchecked")
-    final DropDownChoice statusChoice = new DropDownChoice("status", new PropertyModel(data, "status"), statusChoiceRenderer.getValues(),
-        statusChoiceRenderer);
-    statusChoice.setNullValid(false).setRequired(true);
-    add(statusChoice);*/
-  }
+    final DropDownChoice formChoice = new DropDownChoice("formOfAddress", new PropertyModel(data, "form"), formChoiceRenderer.getValues(),
+        formChoiceRenderer);
+    formChoice.setNullValid(false).setRequired(true);
+    add(formChoice);
 
-  @Override
-  protected void addBottomRows()
-  {
-    final Fragment bottomRowsFragment = new Fragment("bottomRows", "bottomRowsFragment", this);
-    bottomRowsFragment.setRenderBodyOnly(true);
-    add(bottomRowsFragment);
-    if (isNew() == true) {
-      bottomRowsFragment.setVisible(false);
-      return;
-    }
+    // DropDownChoice contactStatus
+    final LabelValueChoiceRenderer<ContactStatus> contactStatusChoiceRenderer = new LabelValueChoiceRenderer<ContactStatus>(this,
+        ContactStatus.values());
+    @SuppressWarnings("unchecked")
+    final DropDownChoice contactStatusChoice = new DropDownChoice("contactStatus", new PropertyModel(data, "contactStatus"),
+        contactStatusChoiceRenderer.getValues(), contactStatusChoiceRenderer);
+    contactStatusChoice.setNullValid(false).setRequired(true);
+    add(contactStatusChoice);
+
+    // DropDownChoice addressStatus
+    final LabelValueChoiceRenderer<AddressStatus> addressStatusChoiceRenderer = new LabelValueChoiceRenderer<AddressStatus>(this,
+        AddressStatus.values());
+    @SuppressWarnings("unchecked")
+    final DropDownChoice addressStatusChoice = new DropDownChoice("addressStatus", new PropertyModel(data, "addressStatus"),
+        addressStatusChoiceRenderer.getValues(), addressStatusChoiceRenderer);
+    addressStatusChoice.setNullValid(false).setRequired(true);
+    add(addressStatusChoice);
+
   }
 
   @Override
   protected void validation()
   {
-    signatureField.validate();
-    authorsField.validate();
-    publisherField.validate();
-    editorField.validate();
-    yearOfPublishingField.validate();
-    if (StringUtils.isBlank(authorsField.getConvertedInput())
-        && StringUtils.isBlank(publisherField.getConvertedInput())
-        && StringUtils.isBlank(editorField.getConvertedInput())
-        && StringUtils.isBlank(signatureField.getConvertedInput())
-        && StringUtils.isBlank(yearOfPublishingField.getConvertedInput())) {
-      addComponentError(authorsField, "address.error.toFewFields");
-    }
+    /*
+     * signatureField.validate(); authorsField.validate(); publisherField.validate(); editorField.validate();
+     * yearOfPublishingField.validate(); if (StringUtils.isBlank(authorsField.getConvertedInput()) &&
+     * StringUtils.isBlank(publisherField.getConvertedInput()) && StringUtils.isBlank(editorField.getConvertedInput()) &&
+     * StringUtils.isBlank(signatureField.getConvertedInput()) && StringUtils.isBlank(yearOfPublishingField.getConvertedInput())) {
+     * addComponentError(authorsField, "address.error.toFewFields"); }
+     */
   }
 
   @Override

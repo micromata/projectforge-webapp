@@ -6,70 +6,159 @@
 <body>
 <table>
   <wicket:extend>
-    <wicket:fragment wicket:id="bottomRowsFragment">
-      <tr class="hRuler">
-        <td colspan="4"></td>
+      <tr>
+        <td colspan="4" style="color: red; font-size: 20px;">ToDo:
+        <ul>
+          <li>Schutz vor versehentlichem Ändern des Namens</li>
+        </ul>
+        </td>
       </tr>
       <tr>
-        <th><wicket:message key="book.lending" /></th>
-        <td><span wicket:id="lendOutStatus">Kai Reinhard, 10.10.2010</span><span wicket:id="lendOutButton">[lend out]</span><span
-          wicket:id="returnBookButton">[return book]</span></td>
-        <th><wicket:message key="book.lendOutNote" /></th>
-        <td><input type="text" class="stdtext" wicket:id="lendOutComment" /></td>
+        <th><wicket:message key="task" /></th>
+        <td colspan="5"><span wicket:id="task">[task]</span></td>
       </tr>
-    </wicket:fragment>
-    <tr>
-      <th><wicket:message key="task" /></th>
-      <td colspan="3" wicket:id="task">[task path]</td>
-    </tr>
-    <tr>
-      <th><wicket:message key="book.title" /></th>
-      <td colspan="3"><input type="text" class="stdtext" wicket:id="title" /></td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="4"></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="book.authors" /></th>
-      <td><input type="text" class="stdtext" wicket:id="authors" /></td>
-      <th><wicket:message key="book.signature" /></th>
-      <td><input type="text" class="stdtext" wicket:id="signature" /></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="book.keywords" /></th>
-      <td><input type="text" class="stdtext" wicket:id="keywords" /></td>
-      <th><wicket:message key="book.publisher" /></th>
-      <td><input type="text" class="stdtext" wicket:id="publisher" /></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="book.isbn" /></th>
-      <td><input type="text" class="stdtext" wicket:id="isbn" /></td>
-      <th><wicket:message key="book.editor" /></th>
-      <td><input type="text" class="stdtext" wicket:id="editor" /></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="status" /></th>
-      <td><select wicket:id="status" id="status">
-        <option>present</option>
-      </select></td>
-      <th><wicket:message key="book.yearOfPublishing" /></th>
-      <td><input type="text" class="stdtext" style="width: 4em;" wicket:id="yearOfPublishing" /></td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="4"></td>
-    </tr>
+      <tr>
+        <th><wicket:message key="name" /> / <wicket:message key="address.form" /></th>
+        <td colspan="3"><input type="text" class="stdtext" wicket:id="name" style="width: 20em" tabindex="1" /> / <select wicket:id="formOfAddress"
+          style="width: 10em" tabindex="2">
+          <option>present</option>
+        </select><input type="checkbox" wicket:id="favoriteCard" /><img wicket:id="favoriteCardHelpImage" /></td>
+        <th><wicket:message key="address.businessPhone" /></th>
+        <td colspan="3"><input type="text" class="shorttext" wicket:id="businessPhone" tabindex="9" /> <input type="checkbox"
+          wicket:id="favoriteBusinessPhone" /><img wicket:id="favoriteBusinessPhoneHelpImage" /></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="firstName" /> / <wicket:message key="address.title" /></th>
+        <td colspan="3"><input type="text" class="stdtext" wicket:id="firstName" style="width: 20em" tabindex="3" /> / <input type="text"
+          class="stdtext" wicket:id="title" style="width: 10em;" tabindex="4" /></td>
+        <th><wicket:message key="address.fax" /></th>
+        <td colspan="3"><input type="text" class="shorttext" wicket:id="fax" tabindex="10" /> <input type="checkbox" wicket:id="favoriteFax" /><img
+          wicket:id="favoriteFaxHelpImage" /></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="organization" /></th>
+        <td colspan="3"><input type=text " class="stdtext" wicket:id="organization" tabindex="5" /></td>
+        <th><wicket:message key="address.mobilePhone" /></th>
+        <td colspan="3"><input type="text" class="shorttext" wicket:id="mobilePhone" tabindex="11" /> <input type="checkbox"
+          wicket:id="favoriteMobilePhone" /><img wicket:id="favoriteMobilePhoneHelpImage" /></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="address.division" /></th>
+        <td colspan="3"><input type="text" class="stdtext" wicket:id="division" tabindex="6" /></td>
+        <th><wicket:message key="address.positionText" /></th>
+        <td colspan="3"><input type="text" class="stdtext" wicket:id="positionText" tabindex="12" /></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="email" /></th>
+        <td colspan="3"><input type="text" class="stdtext" wicket:id="email" tabindex="7" /></td>
+        <th><wicket:message key="address.website" /></th>
+        <td colspan="3"><input type="text" class="stdtext" wicket:id="website" tabindex="13" /></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="address.contactStatus" /></th>
+        <td colspan="3"><select wicket:id="contactStatus" style="width: 10em" tabindex="8">
+          <option>active</option>
+        </select></td>
+        <th><wicket:message key="address.imageBroschure" /></th>
+        <td colspan="3"><input type="checkbox" wicket:id="imageBroschure" tabindex="14" /></td>
+      </tr>
+      <tr class="hRuler">
+        <td colspan="8"></td>
+      </tr>
 
-    <tr>
-      <th colspan="2"><wicket:message key="book.abstract" /></th>
-      <th colspan="2"><wicket:message key="comment" /></th>
-    </tr>
-    <tr>
-      <td colspan="2"><textarea class="stdtext" wicket:id="abstract" style="height: 20ex;">[abstract]</textarea></td>
-      <td colspan="2"><textarea class="stdtext" wicket:id="comment" style="height: 20ex;">[comment]</textarea></td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="4"></td>
-    </tr>
+      <tr>
+        <th><wicket:message key="address.addressStatus" /></th>
+        <td colspan="3"><select wicket:id="addressStatus" style="width: 10em" tabindex="15">
+          <option>leave</option>
+        </select></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="address.addressText" /></th>
+        <td colspan="3"><input type="text" class="stdtext" wicket:id="addressText" tabindex="16" /></td>
+        <th><wicket:message key="address.postalAddressText" /></th>
+        <td colspan="3"><input type="text" class="stdtext" wicket:id="postalAddressText" tabindex="21" /></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="address.zipCode" /> / <wicket:message key="address.city" /></th>
+        <td colspan="3"><input type="text" class="text" wicket:id="zipCode" size="5" tabindex="17" />&nbsp;<input type="text"
+          class="shorttext" wicket:id="city" tabindex="18" /></td>
+        <th><wicket:message key="address.zipCode" /> / <wicket:message key="address.city" /></th>
+        <td colspan="3"><input type="text" class="text" wicket:id="postalZipCode" size="5" tabindex="22" />&nbsp;<input type="text"
+          class="shorttext" wicket:id="postalCity" tabindex="23" /></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="address.country" /></th>
+        <td><input type="text" class="shorttext" wicket:id="country" tabindex="19" /></td>
+        <th><wicket:message key="address.state" /></th>
+        <td><input type="text" class="shorttext" wicket:id="state" tabindex="20" /></td>
+        <th><wicket:message key="address.country" /></th>
+        <td><input type="text" class="shorttext" wicket:id="postalCountry" tabindex="24" /></td>
+        <th><wicket:message key="address.state" /></th>
+        <td><input type="text" class="shorttext" wicket:id="postalState" tabindex="25" /></td>
+      </tr>
+      <tr class="hRuler">
+        <td colspan="8"></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="address.privateAddressText" /></th>
+        <td colspan="3"><input type="text" class="stdtext" wicket:id="privateAddressText" tabindex="26" /></td>
+        <th><wicket:message key="address.privatePhone" /></th>
+        <td colspan="3"><input type="text" class="shorttext" wicket:id="privatePhone" tabindex="31" /><input type="checkbox"
+          wicket:id="favoritePrivatePhone" /><img wicket:id="favoritePrivatePhoneHelpImage" /></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="address.zipCode" /> / <wicket:message key="address.city" /></th>
+        <td colspan="3"><input type="text" class="text" wicket:id="privateZipCode" size="5" tabindex="27" />&nbsp;<input type="text"
+          class="shorttext" wicket:id="privateCity" tabindex="28" /></td>
+        <th><wicket:message key="address.privateMobilePhone" /></th>
+        <td colspan="3"><input type="text" class="shorttext" wicket:id="privateMobilePhone" tabindex="32" /><input type="checkbox"
+          wicket:id="favoritePrivateMobilePhone" /><img wicket:id="favoritePrivateMobilePhoneHelpImage" /></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="address.country" /></th>
+        <td><input type="text" class="shorttext" wicket:id="privateCountry" tabindex="29" /></td>
+        <th><wicket:message key="address.state" /></th>
+        <td><input type="text" class="shorttext" wicket:id="privateState" tabindex="30" /></td>
+        <th><wicket:message key="address.privateEmail" /></th>
+        <td colspan="3"><input type="text" class="stdtext" wicket:id="privateEmail" tabindex="33" /></td>
+      </tr>
+      <tr class="hRuler">
+        <td colspan="8"></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="address.birthday" /></th>
+        <td colspan="7"><input type="text" class="date" wicket:id="birthday" tabindex="34" />&nbsp;<img wicket:id="cakeImage"
+          src="/images/cake.png" />&nbsp;<span wicket:id="showBirthdayAsUTC" style="font-size: x-small; color: white;">[1970-11-21 00:00]</span></td>
+      </tr>
+      <tr class="hRuler">
+        <td colspan="8"></td>
+      </tr>
+      <tr>
+        <th colspan="4"><wicket:message key="comment" /></th>
+        <th colspan="4"><wicket:message key="address.publicKey" /></th>
+      </tr>
+      <tr>
+        <td colspan="4"><textarea class="stdtext" wicket:id="comment" style="height: 20ex;" tabindex="35">[comment]</textarea></td>
+        <td colspan="4"><textarea class="stdtext" wicket:id="publicKey" style="height: 20ex;" tabindex="36">[public key]</textarea></td>
+      </tr>
+      <tr>
+        <th colspan="8"><wicket:message key="address.fingerprint" /></th>
+      </tr>
+      <tr>
+        <td colspan="8"><input type="text" class="stdtext" style="width: 100%;" wicket:id="fingerprint" tabindex="37" /></td>
+      </tr>
+      <script type="text/javascript">
+<!--
+$(document).ready(function(){
+$(":submit[name='update']").bind("click", function(e) {
+      if (document.forms[0].elements["address.name"].value == '${actionBean.address.name}' && document.forms[0].elements["address.firstName"].value == '${actionBean.address.firstName}') {
+        return true;
+      }
+      return window.confirm('<wicket:message key="address.question.changeName" /> (${actionBean.address.firstName}' + ' ' + '${actionBean.address.name})');
+    });
+    });
+    -->
+    </script>
   </wicket:extend>
 </table>
 </body>

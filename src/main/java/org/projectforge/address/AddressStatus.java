@@ -24,6 +24,7 @@
 package org.projectforge.address;
 
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.core.I18nEnum;
 
 /**
  * Status of address quality.<br/>
@@ -35,7 +36,7 @@ import org.apache.commons.lang.StringUtils;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public enum AddressStatus
+public enum AddressStatus implements I18nEnum
 {
   UPTODATE("uptodate"), OUTDATED("outdated"), LEAVED("leaved");
 
@@ -62,12 +63,11 @@ public enum AddressStatus
   }
 
   /**
-   * The key will be used e. g. for i18n.
-   * @return
+   * @return The full i18n key including the i18n prefix "fibu.auftrag.status.".
    */
-  public String getKey()
+  public String getI18nKey()
   {
-    return key;
+    return "address.addressStatus." + key;
   }
 
   AddressStatus(String key)

@@ -24,23 +24,22 @@
 package org.projectforge.address;
 
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.core.I18nEnum;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
- * <ul>
- * <li>ACTIVE - Contact is warm, working together, don't forget.</li>
- * <li>NON_ACTIVE - No current projects, maybe interesting later.</li>
- * <li>UNINTERESTING - Uninteresting for the company.</li>
- * <li>DEPARTED</li>
- * <li>PERSONA_INGRATA</li>
- * </ul>
+ *         <ul>
+ *         <li>ACTIVE - Contact is warm, working together, don't forget.</li>
+ *         <li>NON_ACTIVE - No current projects, maybe interesting later.</li>
+ *         <li>UNINTERESTING - Uninteresting for the company.</li>
+ *         <li>DEPARTED</li>
+ *         <li>PERSONA_INGRATA</li>
+ *         </ul>
  */
-public enum ContactStatus
+public enum ContactStatus implements I18nEnum
 {
   ACTIVE("active"), NON_ACTIVE("nonActive"), UNINTERESTING("uninteresting"), PERSONA_INGRATA("personaIngrata"), DEPARTED("departed");
-
-  public final static ContactStatus[] LIST = new ContactStatus[] { ACTIVE, NON_ACTIVE, UNINTERESTING, PERSONA_INGRATA, DEPARTED};
 
   private String key;
 
@@ -64,12 +63,11 @@ public enum ContactStatus
   }
 
   /**
-   * The key will be used e. g. for i18n.
-   * @return
+   * @return The full i18n key including the i18n prefix "fibu.auftrag.status.".
    */
-  public String getKey()
+  public String getI18nKey()
   {
-    return key;
+    return "address.contactStatus." + key;
   }
 
   ContactStatus(String key)

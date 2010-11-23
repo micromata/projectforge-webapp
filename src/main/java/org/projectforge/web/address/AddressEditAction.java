@@ -129,11 +129,11 @@ public class AddressEditAction extends BaseEditActionBean<AddressDao, AddressDO>
 
   public List<LabelValueBean<String, FormOfAddress>> getAddressFormList()
   {
-    FormOfAddress[] values = FormOfAddress.LIST;
+    FormOfAddress[] values = FormOfAddress.values();
     List<LabelValueBean<String, FormOfAddress>> list = new ArrayList<LabelValueBean<String, FormOfAddress>>();
     list.add(new LabelValueBean<String, FormOfAddress>(getLocalizedString("pleaseChoose"), null));
     for (FormOfAddress status : values) {
-      list.add(new LabelValueBean<String, FormOfAddress>(getLocalizedString("address.form." + status.getKey()), status));
+      list.add(new LabelValueBean<String, FormOfAddress>(getLocalizedString(status.getI18nKey()), status));
     }
     return list;
   }
@@ -143,17 +143,17 @@ public class AddressEditAction extends BaseEditActionBean<AddressDao, AddressDO>
     AddressStatus[] values = AddressStatus.LIST;
     List<LabelValueBean<String, AddressStatus>> list = new ArrayList<LabelValueBean<String, AddressStatus>>();
     for (AddressStatus status : values) {
-      list.add(new LabelValueBean<String, AddressStatus>(getLocalizedString("address.addressStatus." + status.getKey()), status));
+      list.add(new LabelValueBean<String, AddressStatus>(getLocalizedString(status.getI18nKey()), status));
     }
     return list;
   }
 
   public List<LabelValueBean<String, ContactStatus>> getContactStatusList()
   {
-    ContactStatus[] values = ContactStatus.LIST;
+    ContactStatus[] values = ContactStatus.values();
     List<LabelValueBean<String, ContactStatus>> list = new ArrayList<LabelValueBean<String, ContactStatus>>();
     for (ContactStatus status : values) {
-      list.add(new LabelValueBean<String, ContactStatus>(getLocalizedString("address.contactStatus." + status.getKey()), status));
+      list.add(new LabelValueBean<String, ContactStatus>(getLocalizedString(status.getI18nKey()), status));
     }
     return list;
   }
