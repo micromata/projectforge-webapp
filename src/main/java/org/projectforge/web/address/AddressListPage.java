@@ -174,7 +174,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         if (StringUtils.isNotBlank(address.getEmail()) == true) {
           final ExternalLinkPanel mailToLinkPanel = new ExternalLinkPanel(view.newChildId(), "mailto:" + address.getEmail(), address
               .getEmail());
-          mailToLinkPanel.getLink().add(new SimpleAttributeModifier("onclick", "javascript:suppressRowClick();"));
+          mailToLinkPanel.getLink().add(new SimpleAttributeModifier("onclick", "javascript:suppressNextRowClick();"));
           view.add(mailToLinkPanel);
           first = false;
         }
