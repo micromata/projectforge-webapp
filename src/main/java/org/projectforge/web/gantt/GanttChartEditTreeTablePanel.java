@@ -762,7 +762,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
   {
     final DatePanel startDatePanel = new DatePanel("startDate", new PropertyModel<Date>(ganttObject, "startDate"), DatePanelSettings.get()
         .withCallerPage(GanttChartEditTreeTablePanel.this).withSelectProperty("startDate:" + node.getHashId()));
-    addColumn(item, startDatePanel, null);
+    addColumn(item, startDatePanel, "white-space: nowrap;");
     startDatePanelMap.put(ganttObject.getId(), startDatePanel);
     new RejectSaveLinksFragment("rejectSaveStartDate", item, startDatePanel, task, task != null ? DateTimeFormatter.instance()
         .getFormattedDate(task.getStartDate()) : "") {
@@ -811,7 +811,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
   {
     final DatePanel endDatePanel = new DatePanel("endDate", new PropertyModel<Date>(ganttObject, "endDate"), DatePanelSettings.get()
         .withCallerPage(GanttChartEditTreeTablePanel.this).withSelectProperty("endDate:" + node.getHashId()));
-    addColumn(item, endDatePanel, null);
+    addColumn(item, endDatePanel, "white-space: nowrap;");
     endDatePanelMap.put(ganttObject.getId(), endDatePanel);
     new RejectSaveLinksFragment("rejectSaveEndDate", item, endDatePanel, task, task != null ? DateTimeFormatter.instance()
         .getFormattedDate(task.getEndDate()) : "") {
