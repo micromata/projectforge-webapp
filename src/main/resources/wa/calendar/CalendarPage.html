@@ -12,16 +12,17 @@
 	  height = ($(window).height() - $("#navigation").height() - $(".calendarhead").height() - $(".calendarsubhead").height() );
 	  
 	  if (typeof console != "undefined") {
+		  console.log( numberOfWeeks );
 		  console.log( $("#navigation").height() );
 		  console.log( $(".calendarhead").height() );
 		  console.log( $(".calendarsubhead").height() );		
 	  }
 	  
-	  
-	  
-	  
 	  rowHeight = (height / numberOfWeeks);
+	  //console.log( rowHeight );
 	  $(".calendar tr.row td").height(Math.floor(rowHeight));
+	  
+	  //console.log( $(".calendar tr.row td").height() );
   }
   
   $(document).ready(function(){
