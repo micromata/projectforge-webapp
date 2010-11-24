@@ -164,7 +164,7 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     add(new MaxLengthTextField("privateCountry", new PropertyModel<String>(data, "privateCountry")));
     add(new MaxLengthTextField("privateState", new PropertyModel<String>(data, "privateState")));
     add(new MaxLengthTextField("privateEmail", new PropertyModel<String>(data, "privateEmail")));
-    add(new DatePanel("birthday", new PropertyModel<Date>(data, "birthday"), new DatePanelSettings().withTargetType(java.sql.Date.class)));
+    add(new DatePanel("birthday", new PropertyModel<Date>(data, "birthday"), new DatePanelSettings().withTargetType(java.sql.Date.class).withTabIndex(34)));
     add(new Label("showBirthdayAsUTC", new Model<String>() {
       @Override
       public String getObject()
