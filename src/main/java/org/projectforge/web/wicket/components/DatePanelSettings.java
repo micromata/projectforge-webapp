@@ -53,6 +53,19 @@ public class DatePanelSettings implements Serializable
 
   protected Class< ? extends Date> targetType = Date.class;
 
+  protected Integer tabIndex;
+
+  /**
+   * Default is null.
+   * @param tabIndex Use tabIndex as html tab index of date field (if visible), hours and minutes.
+   * @return this
+   */
+  public DatePanelSettings withTabIndex(Integer tabIndex)
+  {
+    this.tabIndex = tabIndex;
+    return this;
+  }
+
   public static DatePanelSettings get()
   {
     return new DatePanelSettings();

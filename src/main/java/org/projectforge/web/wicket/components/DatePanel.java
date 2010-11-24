@@ -38,7 +38,6 @@ import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.converter.MyDateConverter;
 
-
 /**
  * Panel for date selection. Works for java.util.Date and java.sql.Date. For java.sql.Date don't forget to call the constructor with
  * targetType java.sql.Date.
@@ -108,6 +107,10 @@ public class DatePanel extends FormComponentPanel<Date>
     }
     selectDateButton.add(new TooltipImage("selectDateImage", getResponse(), WebConstants.IMAGE_DATE_SELECT, PFUserContext
         .getLocalizedString(i18nKey)));
+
+    if (settings.tabIndex != null) {
+      dateField.add(new SimpleAttributeModifier("tabindex", String.valueOf(settings.tabIndex)));
+    }
   }
 
   public void setFocus()
