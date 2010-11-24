@@ -254,11 +254,12 @@ public abstract class BaseActionBean implements ActionBean
     final PFUserDO user = getContext().getUser();
     if (user != null) {
       menuBuilder.expireMenu(user.getId());
-    }
+    }/*
     Menu menu = menuBuilder.buildDTreeMenu(user);
     getContext().putEntry(USER_PREF_MENU_KEY, menu, false); // Stripes menu
     getContext().removeEntry(OldMenuPanel.USER_PREF_MENU_KEY); // Wicket menu
-    return menu;
+    */
+    return null;
   }
 
   public void setAccessChecker(AccessChecker accessChecker)

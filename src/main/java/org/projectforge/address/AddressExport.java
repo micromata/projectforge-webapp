@@ -193,7 +193,7 @@ public class AddressExport
       mapping.add(Col.NAME, address.getName());
       mapping.add(Col.FIRST_NAME, address.getFirstName());
       mapping
-          .add(Col.FORM, address.getForm() != null ? PFUserContext.getLocalizedString("address.form." + address.getForm().getKey()) : "");
+          .add(Col.FORM, address.getForm() != null ? PFUserContext.getLocalizedString(address.getForm().getI18nKey()) : "");
       mapping.add(Col.TITLE, address.getTitle());
       mapping.add(Col.CONTACT_STATUS, address.getContactStatus());
       mapping.add(Col.ORGANIZATION, address.getOrganization());

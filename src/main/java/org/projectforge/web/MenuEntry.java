@@ -44,9 +44,13 @@ public class MenuEntry implements Serializable
 
   protected boolean opened = false;
 
-  protected short orderNumber;
+  protected IModel<Integer> newCounterModel;
 
-  protected IModel<String> htmlSuffix;
+  protected TotalNewCounterModel totalNewCounterModel;
+
+  protected boolean totalNewCounterModelEvaluated;
+
+  protected String newCounterTooltip;
 
   protected MenuEntry parent;
 
@@ -55,6 +59,33 @@ public class MenuEntry implements Serializable
   protected MenuItemDef menuItemDef;
 
   protected Menu menu;
+
+  public IModel<Integer> getNewCounterModel()
+  {
+    if (hasSubMenuEntries() == false) {
+      return newCounterModel;
+    }
+    if (totalNewCounterModelEvaluated == true) {
+      return totalNewCounterModel;
+    }
+    for (final MenuEntry subEntry : subMenuEntries) {
+      final IModel<Integer> subSumModel = subEntry.getNewCounterModel();
+      if (subSumModel == null) {
+        continue;
+      }
+      if (totalNewCounterModel == null) {
+        totalNewCounterModel = new TotalNewCounterModel();
+      }
+      totalNewCounterModel.add(subSumModel);
+    }
+    totalNewCounterModelEvaluated = true;
+    return totalNewCounterModel;
+  }
+  
+  public String getNewCounterTooltip()
+  {
+    return newCounterTooltip;
+  }
 
   public MenuEntry findMenu(final Class< ? extends Page> pageClass)
   {
@@ -102,25 +133,6 @@ public class MenuEntry implements Serializable
     return menuItemDef.getIcon();
   }
 
-  @Deprecated
-  public String getIconOpen()
-  {
-    return menuItemDef.getIcon();
-  }
-
-  /** Number is needed for the tree menu implementation of http://www.destroydrop.com/javascripts/tree/. */
-  @Deprecated
-  public short getOrderNumber()
-  {
-    return orderNumber;
-  }
-
-  @Deprecated
-  void setOrderNumber(short orederNumber)
-  {
-    this.orderNumber = orederNumber;
-  }
-
   public MenuEntry getParent()
   {
     return parent;
@@ -129,15 +141,6 @@ public class MenuEntry implements Serializable
   void setParent(final MenuEntry parent)
   {
     this.parent = parent;
-  }
-
-  /**
-   * Use #hasParent() instead.
-   */
-  @Deprecated
-  public boolean getHasParent()
-  {
-    return hasParent();
   }
 
   public boolean hasParent()
@@ -166,15 +169,6 @@ public class MenuEntry implements Serializable
   }
 
   public boolean hasSubMenuEntries()
-  {
-    return (this.subMenuEntries != null && subMenuEntries.size() > 0);
-  }
-
-  /**
-   * Use {@link #hasSubMenuEntries()} instead.
-   */
-  @Deprecated
-  public boolean getHasSubMenuEntries()
   {
     return (this.subMenuEntries != null && subMenuEntries.size() > 0);
   }
@@ -211,16 +205,6 @@ public class MenuEntry implements Serializable
     return subMenuEntries;
   }
 
-  /**
-   * Use {@link #getI18nKey()} instead.
-   * @return
-   */
-  @Deprecated
-  public String getLabel()
-  {
-    return getI18nKey();
-  }
-
   public String getI18nKey()
   {
     return menuItemDef.getI18nKey();
@@ -239,24 +223,9 @@ public class MenuEntry implements Serializable
     return menuItemDef.getParams();
   }
 
-  /**
-   * If not null then this html suffix will be shown direct after the menu entry. Used e. g. for displaying number of closed but not fully
-   * invoiced orders after order book menu entry.
-   * @return
-   */
-  public String getHtmlSuffixString()
+  public void setNewCounterModel(final IModel<Integer> newCounterModel)
   {
-    return htmlSuffix != null ? htmlSuffix.getObject() : "";
-  }
-
-  public IModel<String> getHtmlSuffix()
-  {
-    return htmlSuffix;
-  }
-
-  public void setHtmlSuffix(IModel<String> htmlSuffix)
-  {
-    this.htmlSuffix = htmlSuffix;
+    this.newCounterModel = newCounterModel;
   }
 
   public boolean isVisible()

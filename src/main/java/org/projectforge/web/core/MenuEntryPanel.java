@@ -32,6 +32,8 @@ import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.Model;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.web.MenuEntry;
 import org.projectforge.web.wicket.WicketUtils;
 
@@ -84,12 +86,32 @@ public class MenuEntryPanel extends Panel
     }
     li.add(link);
     final Label suffixLabel;
-    if (menuEntry.getHtmlSuffix() != null) {
-      suffixLabel = new Label("suffix", menuEntry.getHtmlSuffix());
-      suffixLabel.setEscapeModelStrings(false);
+    if (menuEntry.getNewCounterModel() != null) {
+      suffixLabel = new Label("suffix", new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          final Integer counter = menuEntry.getNewCounterModel().getObject();
+          if (NumberHelper.greaterZero(counter) == true) {
+            return String.valueOf(counter);
+          } else {
+            return "";
+          }
+        }
+      }) {
+        @Override
+        public boolean isVisible()
+        {
+          final Integer counter = menuEntry.getNewCounterModel().getObject();
+          return NumberHelper.greaterZero(counter) == true;
+        }
+      };
     } else {
       suffixLabel = new Label("suffix");
       suffixLabel.setVisible(false);
+    }
+    if (menuEntry.getNewCounterTooltip() != null) {
+      WicketUtils.addTooltip(suffixLabel, getString(menuEntry.getNewCounterTooltip()));
     }
     final Label label = new Label("label", getString(menuEntry.getI18nKey()));
     label.setRenderBodyOnly(true);

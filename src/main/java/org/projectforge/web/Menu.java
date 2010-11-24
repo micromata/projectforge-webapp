@@ -26,7 +26,6 @@ package org.projectforge.web;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.projectforge.web.wicket.AbstractBasePage;
 
@@ -77,31 +76,5 @@ public class Menu implements Serializable
       parent.addMenuEntry(menuEntry);
     }
     return menuEntry;
-  }
-
-  /**
-   * return all MenuEntries in flat format for dtree java script menu.
-   * @return
-   */
-  @Deprecated
-  public List<MenuEntry> getMenuEntries4dTree()
-  {
-    ArrayList<MenuEntry> list = new ArrayList<MenuEntry>();
-    for (MenuEntry entry : menuEntries) {
-      if (entry.isVisible() == true) {
-        addEntry(list, entry);
-      }
-    }
-    return list;
-  }
-
-  private void addEntry(List<MenuEntry> list, MenuEntry entry)
-  {
-    list.add(entry);
-    if (entry.getHasSubMenuEntries() == true) {
-      for (MenuEntry subEntry : entry.getSubMenuEntries()) {
-        addEntry(list, subEntry);
-      }
-    }
   }
 }

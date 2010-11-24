@@ -48,7 +48,6 @@ import org.projectforge.fibu.AuftragsStatus;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.wicket.WebConstants;
 
-
 /**
  * Tries to get all used i18n keys from the sources (java, html and jsp). As result a file is written which will be checked by
  * AdminAction.checkI18nProperties. Unused i18n keys should be detected.
@@ -58,7 +57,7 @@ import org.projectforge.web.wicket.WebConstants;
 public class GetI18nKeysTest
 {
   // TODO: I18nEnums
-  
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GetI18nKeysTest.class);
 
   private static final String PATH = "src/main/";
@@ -68,7 +67,7 @@ public class GetI18nKeysTest
   private static final String PATH_MONTHHOLDER = getPathForClass(MonthHolder.class);
 
   private static final String PATH_FORM_OF_ADDRESS = getPathForClass(FormOfAddress.class);
-  
+
   private static final String PATH_MENU_ITEM_DEF = getPathForClass(MenuItemDef.class);
 
   private static final String PATH_AUFTRAG_FILTER = getPathForClass(AuftragFilter.class);
@@ -156,11 +155,7 @@ public class GetI18nKeysTest
         }
       } else if (file.getPath().endsWith(PATH_FORM_OF_ADDRESS) == true) {
         for (final FormOfAddress form : FormOfAddress.values()) {
-          add(i18nKeyUsage, "address.form." + form.getKey(), file);
-        }
-      } else if (file.getPath().endsWith(PATH_FORM_OF_ADDRESS) == true) {
-        for (final FormOfAddress form : FormOfAddress.values()) {
-          add(i18nKeyUsage, "fibu.auftrag.art." + form.getKey(), file);
+          add(i18nKeyUsage, form.getI18nKey(), file);
         }
       } else if (file.getPath().endsWith(PATH_AUFTRAG_FILTER) == true) {
         for (final String key : AuftragFilter.LIST) {

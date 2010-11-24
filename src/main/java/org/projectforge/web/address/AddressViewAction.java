@@ -79,7 +79,7 @@ public class AddressViewAction extends BaseActionBean
     Validate.notNull(id);
     address = addressDao.getById(id);
     if (address.getForm() != FormOfAddress.UNKNOWN) {
-      form = getLocalizedString("address.form." + address.getForm().getKey());
+      form = getLocalizedString(address.getForm().getI18nKey());
     } else {
       form = null;
     }

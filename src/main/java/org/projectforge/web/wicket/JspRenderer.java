@@ -39,7 +39,7 @@ import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebRequestCycle;
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
-import org.projectforge.web.core.OldMenuPanel;
+import org.projectforge.web.core.MenuPanel;
 import org.springframework.beans.BeanUtils;
 
 
@@ -90,8 +90,8 @@ public class JspRenderer
     page.setVersioned(false);
     page.add(component);
 
-    if (component instanceof OldMenuPanel) {
-      ((OldMenuPanel) component).init();
+    if (component instanceof MenuPanel) {
+      ((MenuPanel) component).init();
     }
     try {
       component.renderComponent();

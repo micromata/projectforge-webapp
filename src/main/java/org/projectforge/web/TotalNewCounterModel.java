@@ -23,40 +23,45 @@
 
 package org.projectforge.web;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
-import org.projectforge.fibu.AuftragDao;
 
-
-public class MenuOrderBookSuffixModel extends Model<String>
+/**
+ * For displaying the total number of new items as sum of all counters from the sub menu entries.
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
+ */
+public class TotalNewCounterModel extends Model<Integer>
 {
-  private static final long serialVersionUID = -8989618708152002379L;
+  private static final long serialVersionUID = -900845361698793144L;
 
-  @SpringBean(name="auftragDao")
-  private AuftragDao auftragDao;
+  private List<IModel<Integer>> models = new ArrayList<IModel<Integer>>();
+
+  public void add(final IModel<Integer> model)
+  {
+    models.add(model);
+  }
 
   @Override
-  public String getObject()
+  public Integer getObject()
   {
-    if (auftragDao == null) {
-      InjectorHolder.getInjector().inject(this);
+    if (models == null) {
+      return null;
     }
-    final Integer counter = getAuftragDao().getAbgeschlossenNichtFakturiertAnzahl();
-    if (NumberHelper.greaterZero(counter) == false) {
-      return "";
+    Integer totalCounter = 0;
+    for (final IModel<Integer> model : models) {
+      final Integer counter = model.getObject();
+      if (NumberHelper.greaterZero(counter) == true) {
+        totalCounter += counter;
+      }
     }
-    return MenuBuilder.getNewCounterForAsMenuEntrySuffix(counter, "menu.fibu.orderbook.htmlSuffixTooltip");
-  }
-
-  public void setAuftragDao(AuftragDao auftragDao)
-  {
-    this.auftragDao = auftragDao;
-  }
-
-  public AuftragDao getAuftragDao()
-  {
-    return auftragDao;
+    if (NumberHelper.greaterZero(totalCounter) == false) {
+      return null;
+    }
+    return totalCounter;
   }
 }

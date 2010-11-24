@@ -31,63 +31,31 @@ import java.util.Locale;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
-import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.datev.DatevImportDao;
-import org.projectforge.meb.MebDao;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
-import org.projectforge.web.meb.MenuMebSuffixModel;
 import org.projectforge.web.wicket.WicketApplication;
 
 public class MenuBuilder implements Serializable
 {
   private static final long serialVersionUID = -924049082728488113L;
 
-  public static final String NOT_YET_IMPLEMENTED = "Message.action?"
-      + MessageAction.MSG_REQ_PARAM_NAME
-      + "="
-      + MessageAction.MSG_NOT_YET_IMPLEMENTED;
-
+  @SpringBean(name = "accessChecker")
   private AccessChecker accessChecker;
 
-  private AuftragDao auftragDao;
-
+  @SpringBean(name = "configuration")
   private Configuration configuration;
-
-  private MebDao mebDao;
-
-  private MenuCache menuCache = new MenuCache();
-
-  public static String getNewCounterForAsMenuEntrySuffix(final int counter)
-  {
-    return getNewCounterForAsMenuEntrySuffix(counter, null);
-  }
-
-  public static String getNewCounterForAsMenuEntrySuffix(final int counter, final String tooltip)
-  {
-    final StringBuffer buf = new StringBuffer();
-    buf.append(" <span style=\"background-color:red; color:white; font-weight:bold;font-size:110%;\");");
-    if (tooltip != null) {
-      buf.append(" title=\"").append(PFUserContext.getLocalizedString(tooltip)).append("\"");
-    }
-    buf.append(">&nbsp;").append(counter).append("&nbsp;</span>");
-    return buf.toString();
-  }
 
   public void setAccessChecker(AccessChecker accessChecker)
   {
     this.accessChecker = accessChecker;
-  }
-
-  public void setAuftragDao(AuftragDao auftragDao)
-  {
-    this.auftragDao = auftragDao;
   }
 
   public void setConfiguration(Configuration configuration)
@@ -95,10 +63,7 @@ public class MenuBuilder implements Serializable
     this.configuration = configuration;
   }
 
-  public void setMebDao(MebDao mebDao)
-  {
-    this.mebDao = mebDao;
-  }
+  private MenuCache menuCache = new MenuCache();
 
   public void expireMenu(final Integer userId)
   {
@@ -141,8 +106,8 @@ public class MenuBuilder implements Serializable
         final Node orderBook = partlyReadwrite ? null : fibu.addSubMenu(user, MenuItemDef.ORDER_LIST);
         if (orderBook != null) {
           orderBookMenuEntryExists = true;
-          final Model<String> htmlSuffixModel = new MenuOrderBookSuffixModel();
-          orderBook.setHtmlSuffix(htmlSuffixModel);
+          orderBook.setNewCounterModel(new MenuNewCounterOrder());
+          orderBook.setNewCounterTooltip("menu.fibu.orderbook.htmlSuffixTooltip");
         }
       }
       final Node kost = root.addSubMenu(user, MenuItemDef.KOST);
@@ -212,8 +177,7 @@ public class MenuBuilder implements Serializable
       if (configuration.isMebConfigured() == true) {
         final Node meb = misc.addSubMenu(user, MenuItemDef.MEB);
         if (meb != null) {
-          Model<String> htmlSuffixModel = new MenuMebSuffixModel();
-          meb.setHtmlSuffix(htmlSuffixModel);
+          meb.setNewCounterModel(new MenuNewCounterMeb());
         }
       }
 
@@ -265,44 +229,6 @@ public class MenuBuilder implements Serializable
     return menu;
   }
 
-  public MenuTreeTable build(final PFUserDO user)
-  {
-    final Node root = buildMenuTree(user);
-    final MenuTreeTable menu = new MenuTreeTable();
-    build(menu, null, root, (short) 0);
-    return menu;
-  }
-
-  private short build(final MenuTreeTable menu, final MenuTreeTableNode parentTreeTableNode, final Node parent, short orderNumber)
-  {
-    for (final Node node : parent.subMenues) {
-      if (node.isVisible() == false) {
-        continue;
-      }
-      final MenuTreeTableNode treeTableNode = addNode(menu, parentTreeTableNode, node.def, orderNumber++);
-      if (treeTableNode == null) {
-        continue;
-      }
-      if (node.htmlSuffix != null) {
-        treeTableNode.setHtmlSuffix(node.htmlSuffix);
-      }
-      if (node.subMenues != null) {
-        orderNumber = build(menu, treeTableNode, node, orderNumber);
-      }
-    }
-    return orderNumber;
-  }
-
-  private MenuTreeTableNode addNode(final MenuTreeTable menu, final MenuTreeTableNode parent, final MenuItemDef menuItemDef,
-      final short orderNumber)
-  {
-    if (parent != null) {
-      return menu.addNode(parent, menuItemDef, orderNumber);
-    } else {
-      return menu.addNode(menuItemDef, orderNumber);
-    }
-  }
-
   private void build(final Menu menu, final MenuEntry parentEntry, final Node parent)
   {
     for (final Node node : parent.subMenues) {
@@ -318,25 +244,12 @@ public class MenuBuilder implements Serializable
       if (menuEntry == null) {
         continue;
       }
-      menuEntry.htmlSuffix = node.htmlSuffix;
+      menuEntry.newCounterModel = node.newCounterModel;
+      menuEntry.newCounterTooltip = node.newCounterTooltip;
       if (node.subMenues != null) {
         build(menu, menuEntry, node);
       }
     }
-  }
-
-  @Deprecated
-  public Menu buildDTreeMenu(PFUserDO user)
-  {
-    final Node root = buildMenuTree(user);
-    final Menu menu = new Menu();
-    build(menu, null, root);
-    // Order numbers are needed by the JavaScript menu:
-    short orderNumber = 1;
-    for (final MenuEntry menuEntry : menu.getMenuEntries()) {
-      orderNumber = setOrderNumber(menuEntry, orderNumber);
-    }
-    return menu;
   }
 
   private MenuEntry addMenuEntry(final Menu menu, final MenuItemDef menuItemDef)
@@ -351,17 +264,6 @@ public class MenuBuilder implements Serializable
     } else {
       return menu.addMenuEntry(parent, menuItemDef);
     }
-  }
-
-  private short setOrderNumber(MenuEntry menuEntry, short orderNumber)
-  {
-    menuEntry.setOrderNumber(orderNumber++);
-    if (menuEntry.getHasSubMenuEntries() == true) {
-      for (MenuEntry subMenuEntry : menuEntry.getSubMenuEntries()) {
-        orderNumber = setOrderNumber(subMenuEntry, orderNumber);
-      }
-    }
-    return orderNumber;
   }
 
   private MenuEntryConfig findMenuEntryConfig(final MenuItemDef menuItemDef)
@@ -382,7 +284,9 @@ public class MenuBuilder implements Serializable
 
     MenuItemDef def;
 
-    Model<String> htmlSuffix;
+    Model<Integer> newCounterModel;
+
+    String newCounterTooltip;
 
     boolean isLeaf = true;
 
@@ -419,9 +323,14 @@ public class MenuBuilder implements Serializable
       return subMenu;
     }
 
-    void setHtmlSuffix(final Model<String> htmlSuffix)
+    public void setNewCounterTooltip(String newCounterTooltip)
     {
-      this.htmlSuffix = htmlSuffix;
+      this.newCounterTooltip = newCounterTooltip;
+    }
+
+    void setNewCounterModel(Model<Integer> newCounterModel)
+    {
+      this.newCounterModel = newCounterModel;
     }
 
     boolean isVisible()

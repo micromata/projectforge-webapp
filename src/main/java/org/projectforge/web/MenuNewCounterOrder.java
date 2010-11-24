@@ -21,36 +21,31 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.meb;
+package org.projectforge.web;
 
 import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.meb.MebDao;
-import org.projectforge.web.MenuBuilder;
+import org.projectforge.fibu.AuftragDao;
 
-public class MenuMebSuffixModel extends Model<String>
+public class MenuNewCounterOrder extends Model<Integer>
 {
-  private static final long serialVersionUID = 6890654355525850696L;
+  private static final long serialVersionUID = -2101644474960685808L;
 
-  @SpringBean(name = "mebDao")
-  private MebDao mebDao;
+  @SpringBean(name = "auftragDao")
+  private AuftragDao auftragDao;
 
   @Override
-  public String getObject()
+  public Integer getObject()
   {
-    if (mebDao == null) {
+    if (auftragDao == null) {
       InjectorHolder.getInjector().inject(this);
     }
-    final int counter = mebDao.getRecentMEBEntries(null);
-    if (counter == 0) {
-      return "";
-    }
-    return MenuBuilder.getNewCounterForAsMenuEntrySuffix(counter);
+    return auftragDao.getAbgeschlossenNichtFakturiertAnzahl();
   }
 
-  public void setMebDao(MebDao mebDao)
+  public void setAuftragDao(AuftragDao auftragDao)
   {
-    this.mebDao = mebDao;
+    this.auftragDao = auftragDao;
   }
 }

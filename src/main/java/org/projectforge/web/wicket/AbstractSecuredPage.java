@@ -32,7 +32,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.projectforge.web.core.BaseActionBean;
-import org.projectforge.web.core.OldMenuPanel;
+import org.projectforge.web.core.MenuPanel;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 /** All pages with required login should be derived from this page. */
@@ -106,7 +106,7 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
 
   public void resetMenu()
   {
-    removeUserPrefEntry(OldMenuPanel.USER_PREF_MENU_KEY); // Wicket menu
+    //removeUserPrefEntry(MenuPanel.USER_PREF_MENU_KEY); // Wicket menu
     removeUserPrefEntry(BaseActionBean.USER_PREF_MENU_KEY); // Stripes menu
   }
 
