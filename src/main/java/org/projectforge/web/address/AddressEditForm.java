@@ -30,18 +30,19 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
-import org.projectforge.address.AddressDao;
 import org.projectforge.address.AddressStatus;
 import org.projectforge.address.ContactStatus;
 import org.projectforge.address.FormOfAddress;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.common.DateHelper;
+import org.projectforge.common.StringHelper;
 import org.projectforge.web.common.OutputType;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.wicket.AbstractEditForm;
@@ -64,9 +65,6 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressEditForm.class);
 
-  @SpringBean(name = "addressDao")
-  private AddressDao addressDao;
-
   @SpringBean(name = "personalAddressDao")
   private PersonalAddressDao personalAddressDao;
 
@@ -75,9 +73,9 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
 
   protected PersonalAddressDO personalAddress;
 
-  private TextField<String> businessPhoneField, faxField, mobilePhoneField, privatePhoneField, privateMobilePhoneField;
+  private TextField<String> firstNameField, businessPhoneField, faxField, mobilePhoneField, privatePhoneField, privateMobilePhoneField;
 
-  // private TextField<String> authorsField, signatureField, publisherField, editorField, yearOfPublishingField;
+  private DropDownChoice<FormOfAddress> formChoice;
 
   public AddressEditForm(AddressEditPage parentPage, AddressDO data)
   {
@@ -91,7 +89,7 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     }
   }
 
-  @SuppressWarnings("serial")
+  @SuppressWarnings( { "serial", "unchecked"})
   @Override
   protected void init()
   {
@@ -99,9 +97,11 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     final String phoneListTooltip = getString("address.tooltip.phonelist");
     add(new Label("task", taskFormatter.getTaskPath(data.getTaskId(), true, OutputType.HTML)).setEscapeModelStrings(false));
     final TextField<String> nameField = new RequiredMaxLengthTextField("name", new PropertyModel<String>(data, "name"));
-    nameField.add(new FocusOnLoadBehavior());
+    if (isNew() == true) {
+      nameField.add(new FocusOnLoadBehavior());
+    }
     add(nameField);
-    add(new RequiredMaxLengthTextField("firstName", new PropertyModel<String>(data, "firstName")));
+    add(firstNameField = new MaxLengthTextField("firstName", new PropertyModel<String>(data, "firstName")));
     add(new CheckBox("favoriteCard", new PropertyModel<Boolean>(personalAddress, "favoriteCard")));
     add(new MaxLengthTextField("title", new PropertyModel<String>(data, "title")));
     add(new TooltipImage("favoriteCardHelpImage", getResponse(), WebConstants.IMAGE_HELP, getString("address.tooltip.vCardList")));
@@ -157,14 +157,15 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     add(new TooltipImage("favoritePrivatePhoneHelpImage", getResponse(), WebConstants.IMAGE_HELP, phoneListTooltip));
     add(new MaxLengthTextField("privateZipCode", new PropertyModel<String>(data, "privateZipCode")));
     add(new MaxLengthTextField("privateCity", new PropertyModel<String>(data, "privateCity")));
-    add(privateMobilePhoneField = new MaxLengthTextField("privateMobilePhone", new PropertyModel<String>(personalAddress, "favoritePrivateMobilePhone")));
-    add(WicketUtils.addTooltip(
-        new CheckBox("favoritePrivateMobilePhone", new PropertyModel<Boolean>(personalAddress, "favoritePrivateMobilePhone")), phoneListTooltip));
+    add(privateMobilePhoneField = new MaxLengthTextField("privateMobilePhone", new PropertyModel<String>(data, "privateMobilePhone")));
+    add(WicketUtils.addTooltip(new CheckBox("favoritePrivateMobilePhone", new PropertyModel<Boolean>(personalAddress,
+        "favoritePrivateMobilePhone")), phoneListTooltip));
     add(new TooltipImage("favoritePrivateMobilePhoneHelpImage", getResponse(), WebConstants.IMAGE_HELP, phoneListTooltip));
     add(new MaxLengthTextField("privateCountry", new PropertyModel<String>(data, "privateCountry")));
     add(new MaxLengthTextField("privateState", new PropertyModel<String>(data, "privateState")));
     add(new MaxLengthTextField("privateEmail", new PropertyModel<String>(data, "privateEmail")));
-    add(new DatePanel("birthday", new PropertyModel<Date>(data, "birthday"), new DatePanelSettings().withTargetType(java.sql.Date.class).withTabIndex(34)));
+    add(new DatePanel("birthday", new PropertyModel<Date>(data, "birthday"), new DatePanelSettings().withTargetType(java.sql.Date.class)
+        .withTabIndex(34)));
     add(new Label("showBirthdayAsUTC", new Model<String>() {
       @Override
       public String getObject()
@@ -173,23 +174,24 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
       }
     }));
     add(new PresizedImage("cakeImage", getResponse(), WebConstants.IMAGE_BIRTHDAY));
-    add(new MaxLengthTextArea("comment", new PropertyModel<String>(data, "comment")));
+    final MaxLengthTextArea commentTextField = new MaxLengthTextArea("comment", new PropertyModel<String>(data, "comment"));
+    add(commentTextField);
+    if (isNew() == false) {
+      commentTextField.add(new FocusOnLoadBehavior());
+    }
     add(new MaxLengthTextArea("publicKey", new PropertyModel<String>(data, "publicKey")));
-    add(new MaxLengthTextArea("fingerprint", new PropertyModel<String>(data, "fingerprint")));
+    add(new MaxLengthTextField("fingerprint", new PropertyModel<String>(data, "fingerprint")));
 
     // DropDownChoice form of address
     final LabelValueChoiceRenderer<FormOfAddress> formChoiceRenderer = new LabelValueChoiceRenderer<FormOfAddress>(this, FormOfAddress
         .values());
-    @SuppressWarnings("unchecked")
-    final DropDownChoice formChoice = new DropDownChoice("formOfAddress", new PropertyModel(data, "form"), formChoiceRenderer.getValues(),
-        formChoiceRenderer);
+    formChoice = new DropDownChoice("formOfAddress", new PropertyModel(data, "form"), formChoiceRenderer.getValues(), formChoiceRenderer);
     formChoice.setNullValid(false).setRequired(true);
     add(formChoice);
 
     // DropDownChoice contactStatus
     final LabelValueChoiceRenderer<ContactStatus> contactStatusChoiceRenderer = new LabelValueChoiceRenderer<ContactStatus>(this,
         ContactStatus.values());
-    @SuppressWarnings("unchecked")
     final DropDownChoice contactStatusChoice = new DropDownChoice("contactStatus", new PropertyModel(data, "contactStatus"),
         contactStatusChoiceRenderer.getValues(), contactStatusChoiceRenderer);
     contactStatusChoice.setNullValid(false).setRequired(true);
@@ -198,24 +200,32 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     // DropDownChoice addressStatus
     final LabelValueChoiceRenderer<AddressStatus> addressStatusChoiceRenderer = new LabelValueChoiceRenderer<AddressStatus>(this,
         AddressStatus.values());
-    @SuppressWarnings("unchecked")
     final DropDownChoice addressStatusChoice = new DropDownChoice("addressStatus", new PropertyModel(data, "addressStatus"),
         addressStatusChoiceRenderer.getValues(), addressStatusChoiceRenderer);
     addressStatusChoice.setNullValid(false).setRequired(true);
     add(addressStatusChoice);
-
   }
 
   @Override
   protected void validation()
   {
-    /*
-     * signatureField.validate(); authorsField.validate(); publisherField.validate(); editorField.validate();
-     * yearOfPublishingField.validate(); if (StringUtils.isBlank(authorsField.getConvertedInput()) &&
-     * StringUtils.isBlank(publisherField.getConvertedInput()) && StringUtils.isBlank(editorField.getConvertedInput()) &&
-     * StringUtils.isBlank(signatureField.getConvertedInput()) && StringUtils.isBlank(yearOfPublishingField.getConvertedInput())) {
-     * addComponentError(authorsField, "address.error.toFewFields"); }
-     */
+    businessPhoneField.validate();
+    faxField.validate();
+    mobilePhoneField.validate();
+    privatePhoneField.validate();
+    privateMobilePhoneField.validate();
+    validatePhoneNumber(businessPhoneField);
+    validatePhoneNumber(faxField);
+    validatePhoneNumber(mobilePhoneField);
+    validatePhoneNumber(privatePhoneField);
+    validatePhoneNumber(privateMobilePhoneField);
+  }
+
+  private void validatePhoneNumber(final FormComponent<String> component)
+  {
+    if (StringHelper.checkPhoneNumberFormat(component.getConvertedInput()) == false) {
+      addComponentError(component, "address.error.phone.invalidFormat");
+    }
   }
 
   @Override

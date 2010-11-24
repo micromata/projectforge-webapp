@@ -25,15 +25,18 @@ package org.projectforge.web.address;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
-import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.address.PersonalAddressDO;
+import org.projectforge.address.PersonalAddressDao;
+import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
 @EditPage(defaultReturnPage = AddressListPage.class)
-public class AddressEditPage extends AbstractEditPage<AddressDO, AddressEditForm, AddressDao> implements ISelectCallerPage
+public class AddressEditPage extends AbstractEditPage<AddressDO, AddressEditForm, AddressDao>
 {
   private static final long serialVersionUID = 7091721062661400435L;
 
@@ -42,40 +45,36 @@ public class AddressEditPage extends AbstractEditPage<AddressDO, AddressEditForm
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
 
+  @SpringBean(name = "personalAddressDao")
+  private PersonalAddressDao personalAddressDao;
+
   public AddressEditPage(PageParameters parameters)
   {
     super(parameters, "address");
     init();
+    final StringBuffer buf = new StringBuffer();
+    buf.append("$(document).ready(function() {\n").append("  $(\":submit[name='update:button']\").bind('click', function(e) {\n")//
+    .append("alert('Hurzel');\n")
+        .append("    if (document.forms[0].elements['name'].value == '").append(getData().getName()).append(
+            "' && document.forms[0].elements['firstName'].value == '").append(getData().getFirstName()).append("') {\n")//
+        .append("      return true;\n") //
+        .append("    }\n") //
+        .append("    return window.confirm('").append(
+            getLocalizedMessage("address.question.changeName", getData().getFirstName(), getData().getName())).append("');\n") //
+        .append("     });\n") //
+        .append("}\n");
+    form.add(new Label("nameProtection", buf.toString()).setEscapeModelStrings(false));
   }
 
-  /**
-   * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Integer)
-   */
-  public void select(String property, Object selectedValue)
+  @Override
+  protected AbstractBasePage afterSaveOrUpdate()
   {
-    if ("lendOutById".equals(property) == true) {
-    } else {
-      log.error("Property '" + property + "' not supported for selection.");
-    }
-  }
-
-  /**
-   * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
-   */
-  public void unselect(String property)
-  {
-    if ("lendOutById".equals(property) == true) {
-    } else {
-      log.error("Property '" + property + "' not supported for selection.");
-    }
-  }
-
-  /**
-   * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
-   */
-  public void cancelSelection(String property)
-  {
-    // Do nothing.
+    final AddressDO address = addressDao.getOrLoad(getData().getId());
+    final PersonalAddressDO personalAddress = form.personalAddress;
+    personalAddress.setAddress(address);
+    personalAddressDao.setOwner(personalAddress, getUserId()); // Set current logged in user as owner.
+    personalAddressDao.saveOrUpdate(personalAddress);
+    return null;
   }
 
   @Override

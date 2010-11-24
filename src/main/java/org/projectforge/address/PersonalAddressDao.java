@@ -56,12 +56,12 @@ public class PersonalAddressDao extends HibernateDaoSupport
   private AccessChecker accessChecker;
 
   private UserDao userDao;
-  
+
   public void setAccessChecker(AccessChecker accessChecker)
   {
     this.accessChecker = accessChecker;
   }
-  
+
   public void setUserDao(UserDao userDao)
   {
     this.userDao = userDao;
@@ -123,7 +123,8 @@ public class PersonalAddressDao extends HibernateDaoSupport
         && (obj.isFavoriteBusinessPhone() == false)
         && (obj.isFavoriteMobilePhone() == false)
         && (obj.isFavoriteFax() == false)
-        && (obj.isFavoritePrivatePhone() == false);
+        && (obj.isFavoritePrivatePhone() == false)
+        && (obj.isFavoritePrivateMobilePhone() == false);
   }
 
   /**
@@ -134,7 +135,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
   {
     PersonalAddressDO dbObj = null;
     if (obj.getId() != null) {
-      dbObj = (PersonalAddressDO) getHibernateTemplate().load(PersonalAddressDO.class, obj.getId(), LockMode.UPGRADE);
+      dbObj = (PersonalAddressDO) getHibernateTemplate().load(PersonalAddressDO.class, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     }
     if (dbObj == null) {
       dbObj = getByAddressId(obj.getAddressId());

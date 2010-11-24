@@ -28,7 +28,7 @@ import org.projectforge.core.I18nEnum;
 
 public enum FormOfAddress implements I18nEnum
 {
-  MISTER("mister"), MISS("miss"), UNKNOWN("unknown");
+  MISTER("mister"), MISS("miss"), COMPANY("company"), MISC("misc"), UNKNOWN("unknown");
 
   private String key;
 
@@ -41,6 +41,10 @@ public enum FormOfAddress implements I18nEnum
       return MISTER;
     } else if ("MISS".equals(s) == true) {
       return MISS;
+    } else if ("COMPANY".equals(s) == true) {
+      return COMPANY;
+    } else if ("MISC".equals(s) == true) {
+      return MISC;
     } else if ("UNKNOWN".equals(s) == true) {
       return UNKNOWN;
     }

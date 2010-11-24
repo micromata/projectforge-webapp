@@ -27,7 +27,7 @@ import org.projectforge.core.I18nEnum;
 
 public enum PhoneType implements I18nEnum
 {
-  BUSINESS("business"), MOBILE("mobile"), PRIVATE("private"), PRIVATE_MOBILE("privateMobile");
+  BUSINESS("business"), FAX("fax"), MOBILE("mobile"), PRIVATE("private"), PRIVATE_MOBILE("privateMobile");
 
   private String key;
 
