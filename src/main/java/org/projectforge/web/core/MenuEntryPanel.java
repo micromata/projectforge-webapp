@@ -114,7 +114,7 @@ public class MenuEntryPanel extends Panel
       WicketUtils.addTooltip(suffixLabel, getString(menuEntry.getNewCounterTooltip()));
     }
     final Label label = new Label("label", getString(menuEntry.getI18nKey()));
-    label.setRenderBodyOnly(true);
+   
     if (menuEntry.getUrl() != null) {
       link.add(label); // Show label with link.
       link.add(suffixLabel);

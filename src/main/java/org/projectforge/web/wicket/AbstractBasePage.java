@@ -136,7 +136,7 @@ public abstract class AbstractBasePage extends WebPage
         if (user == null) {
           return getString("notLoggedIn");
         }
-        return getString("loggedInUserInfo") + ":" + "<br/>" + escapeHtml(user.getUserDisplayname());
+        return getString("loggedInUserInfo") +" <strong>"+ escapeHtml(user.getUserDisplayname() ) + "</strong>";
       }
     };
     navigationContainer.add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false));
@@ -152,9 +152,7 @@ public abstract class AbstractBasePage extends WebPage
       };
     };
     navigationContainer.add(sendFeedbackLink);
-    sendFeedbackLink.add(new TooltipImage("sendFeedBackImage", getResponse(), WebConstants.IMAGE_FEEDBACK,
-        getString("feedback.link.tooltip")));
-
+    
     final MenuPanel menuPanel = new MenuPanel("mainMenu");
     navigationContainer.add(menuPanel);
     menuPanel.init();

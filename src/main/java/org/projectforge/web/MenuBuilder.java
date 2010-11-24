@@ -181,27 +181,27 @@ public class MenuBuilder implements Serializable
         }
       }
 
-      final Node doc = root.addSubMenu(user, MenuItemDef.DOCUMENTATION);
-      if (doc != null) {
-        doc.addSubMenu(user, MenuItemDef.NEWS);
-        doc.addSubMenu(user, MenuItemDef.PROJECTFORGE_DOC);
-        doc.addSubMenu(user, MenuItemDef.USER_GUIDE);
-        if (isGerman == true) {
-          doc.addSubMenu(user, MenuItemDef.FAQ_DE);
-        } else {
-          doc.addSubMenu(user, MenuItemDef.FAQ);
-        }
-        doc.addSubMenu(user, MenuItemDef.LICENSE);
-        doc.addSubMenu(user, MenuItemDef.PROJECT_DOC);
-        doc.addSubMenu(user, MenuItemDef.ADMIN_LOGBUCH);
-        final Node dev = doc.addSubMenu(user, MenuItemDef.DEVELOPER_DOC);
-        if (dev != null) {
-          dev.addSubMenu(user, MenuItemDef.ADMIN_GUIDE);
-          dev.addSubMenu(user, MenuItemDef.DEVELOPER_GUIDE);
-          dev.addSubMenu(user, MenuItemDef.JAVA_DOC);
-          dev.addSubMenu(user, MenuItemDef.TEST_REPORTS);
-        }
-      }
+//      final Node doc = root.addSubMenu(user, MenuItemDef.DOCUMENTATION);
+//      if (false) {
+//        doc.addSubMenu(user, MenuItemDef.NEWS);
+//        doc.addSubMenu(user, MenuItemDef.PROJECTFORGE_DOC);
+//        doc.addSubMenu(user, MenuItemDef.USER_GUIDE);
+//        if (isGerman == true) {
+//          doc.addSubMenu(user, MenuItemDef.FAQ_DE);
+//        } else {
+//          doc.addSubMenu(user, MenuItemDef.FAQ);
+//        }
+//        doc.addSubMenu(user, MenuItemDef.LICENSE);
+//        doc.addSubMenu(user, MenuItemDef.PROJECT_DOC);
+//        doc.addSubMenu(user, MenuItemDef.ADMIN_LOGBUCH);
+//        final Node dev = doc.addSubMenu(user, MenuItemDef.DEVELOPER_DOC);
+//        if (dev != null) {
+//          dev.addSubMenu(user, MenuItemDef.ADMIN_GUIDE);
+//          dev.addSubMenu(user, MenuItemDef.DEVELOPER_GUIDE);
+//          dev.addSubMenu(user, MenuItemDef.JAVA_DOC);
+//          dev.addSubMenu(user, MenuItemDef.TEST_REPORTS);
+//        }
+//      }
       if (WicketApplication.isDevelopmentModus() == true) {
         root.addSubMenu(user, MenuItemDef.GWIKI);
       }

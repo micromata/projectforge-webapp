@@ -107,7 +107,7 @@ public class CalendarDayItem extends WebMarkupContainer
       }
     };
     add(addTimesheetLink);
-    final Label addLabel = new PlainLabel("addLabel", "(+)");
+    final Label addLabel = new PlainLabel("addLabel", "!");
     addTimesheetLink.add(addLabel);
     if (isSelectMode() == true) {
       addTimesheetLink.setVisible(false);

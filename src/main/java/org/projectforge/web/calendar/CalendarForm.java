@@ -66,8 +66,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       }
     };
     add(previousMonthButton);
-    previousMonthButton.add(new TooltipImage("previousMonthImage", getResponse(), WebConstants.IMAGE_CALENDAR_PREVIOUS_MONTH,
-        getString("calendar.tooltip.selectPrevious")));
+ //   previousMonthButton.add(new TooltipImage("previousMonthImage", getResponse(), WebConstants.IMAGE_CALENDAR_PREVIOUS_MONTH,
+  //      getString("calendar.tooltip.selectPrevious")));
     @SuppressWarnings("unchecked")
     final Link< ? > nextMonthButton = new Link("nextMonth") {
       @Override
@@ -77,8 +77,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       }
     };
     add(nextMonthButton);
-    nextMonthButton.add(new TooltipImage("nextMonthImage", getResponse(), WebConstants.IMAGE_CALENDAR_NEXT_MONTH,
-        getString("calendar.tooltip.selectNext")));
+//    nextMonthButton.add(new TooltipImage("nextMonthImage", getResponse(), WebConstants.IMAGE_CALENDAR_NEXT_MONTH,
+  //      getString("calendar.tooltip.selectNext")));
     @SuppressWarnings("unchecked")
     final Model monthLabelModel = new Model<String>() {
       @Override
@@ -126,7 +126,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       }
     };
     add(cancelButton);
-    cancelButton.add(new PresizedImage("cancelImage", getResponse(), WebConstants.IMAGE_BUTTON_CANCEL));
+  //  cancelButton.add(new PresizedImage("cancelImage", getResponse(), WebConstants.IMAGE_BUTTON_CANCEL));
     if (isSelectMode() == false) {
       cancelButton.setVisible(false);
     }
@@ -161,9 +161,9 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       }
     };
     add(showBirthdaysButton);
-    showBirthdaysButton.add(new TooltipImage("showBirthdaysImage", getResponse(), WebConstants.IMAGE_BIRTHDAY,
-        getString("tooltip.showBirthdays")));
-    @SuppressWarnings("unchecked")
+ //   showBirthdaysButton.add(new TooltipImage("showBirthdaysImage", getResponse(), WebConstants.IMAGE_BIRTHDAY,
+  //      getString("tooltip.showBirthdays")));
+  //  @SuppressWarnings("unchecked")
     final Link< ? > hideBirthdaysButton = new Link("hideBirthdays") {
       @Override
       public void onClick()
@@ -207,8 +207,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       }
     };
     add(showTimesheetsButton);
-    showTimesheetsButton.add(new PresizedImage("showTimesheetsImage", getResponse(), WebConstants.IMAGE_CLOCK));
-    @SuppressWarnings("unchecked")
+   // showTimesheetsButton.add(new PresizedImage("showTimesheetsImage", getResponse(), WebConstants.IMAGE_CLOCK));
+   // @SuppressWarnings("unchecked")
     final Link< ? > hideTimesheetsButton = new Link("hideTimesheets") {
       @Override
       public void onClick()
@@ -223,7 +223,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       }
     };
     add(hideTimesheetsButton);
-    hideTimesheetsButton.add(new PresizedImage("hideTimesheetsImage", getResponse(), WebConstants.IMAGE_CLOCK_DELETE));
+   // hideTimesheetsButton.add(new PresizedImage("hideTimesheetsImage", getResponse(), WebConstants.IMAGE_CLOCK_DELETE));
 
     UserSelectPanel userSelectPanel = new UserSelectPanel("timesheetsUser", new PropertyModel<PFUserDO>(this, "timesheetsUser"),
         parentPage, "userId") {

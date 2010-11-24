@@ -12,19 +12,47 @@
 </head>
 <body onload="" wicket:id="body">
 <div id="container"><!-- left -->
-<div id="navigation" wicket:id="navigation"><span wicket:id="developmentsystem" style="font-weight: bold; font-size: 140%;">Developmentsystem!</span>
-<p style="text-align: left; margin-left: 4px;"><img wicket:id="logoImage" src="/secure/Logo" /></p>
-<div id="main-menu" wicket:id="mainMenu">[menu]</div>
-<p class="loggedInLabel"  wicket:id="loggedInLabel" style="margin-top: 1em; margin-bottom: 1em; width:100px; overflow:hidden;">[Logged in:<br />
-John Mustermann (john)]</p>
-<a wicket:id="sendFeedback"><img wicket:id="sendFeedBackImage" src="images/comment.png" title="Send feed back" border="0" /></a> <a
-  wicket:id="newsLink" href="secure/doc/News.html" target="_blank"><span wicket:id="versionLabel" style="color: grey;">[V. #.#.## 2009-...]</span></a></div>
-<!-- DIV #navigation END -->
+<div id="navigation" class="clearfix">
+
+	<wicket:container wicket:id="navigation">
+		<div class="headermeta">
+			<div class="development" wicket:id="developmentsystem">Developmentsystem!</div>
+			
+			<ul class="info">
+				<li class="loggedInLabel"  wicket:id="loggedInLabel">[Logged in: John Mustermann (john)]</li>
+				
+				<li>
+					<a class="version" wicket:id="newsLink" href="secure/doc/News.html" target="_blank">
+						<span wicket:id="versionLabel">[V. #.#.## 2009-...]</span>
+					</a>
+				</li>
+				<li>
+					<a wicket:id="sendFeedback" class="embatssymbols" title="Send Feedback"> 2</a>
+				</li> 
+				<li>
+					<a href="http://www.dynamicsitesolutions.com/javascript/add-bookmark-script" class="embatssymbols" title="i18n: Schreib mir ein Markenbuch"> S</a>
+				</li>
+			</ul>
+		</div><!-- .headermeta END -->
+		
+		<img id="logo" wicket:id="logoImage" src="/secure/Logo" />
+		<div id="main-menu" wicket:id="mainMenu">[menu]</div>
+	</wicket:container>
+	<div style="display:none;"><!-- obsolete.... -->
+					<div id="bookmarkIcon">
+					<a href="#" onclick="javascript:showBookmark();">
+						<img src="images/star_plus.png" wicket:id="image" title="Bookmark this page" border="0" />
+					</a>
+				</div>
+			
+					<div id="bookmark" wicket:id="bookmark">Hurzel</div>
+	</div>
+</div> <!-- DIV #navigation END -->
 
 <div id="content">
-<div id="bookmarkIcon"><a href="#" onclick="javascript:showBookmark();"><img src="images/star_plus.png" wicket:id="image"
-  title="Bookmark this page" border="0" /></a></div>
-<div id="bookmark" wicket:id="bookmark">Hurzel</div>
+
+
+
 <div id="title" wicket:id="title">The page title</div>
 <wicket:child>
   <h2>This is the content!</h2>
