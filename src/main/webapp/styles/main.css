@@ -31,6 +31,7 @@ textarea,input {
 
 body {
 	line-height: 1;
+	min-width:990px;
 }
 
 ul {
@@ -71,6 +72,7 @@ Conversion to a Desktop Font is forbidden,if you need .ttf or .otf Fonts,or a co
 please contact me.
 You are allowed to embed the fonts via css and expose them to the internet,until you leave this comment untouched.
 */
+
 @font-face {
 	font-family: 'Embats';
 	src: url('embats-webfont.eot');
@@ -115,6 +117,12 @@ You are allowed to embed the fonts via css and expose them to the internet,until
 	-moz-box-shadow: inset 0 0 10px #D9DFE1;
 	-webkit-box-shadow: inset 0 0 10px #D9DFE1;
 	box-shadow: inset 0 0 10px #D9DFE1;
+}
+
+.gradienttopdown {
+	background:#F0F5F7;
+	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#F0F5F7),color-stop(1,#D9DFE1));
+	background: -moz-linear-gradient(top,#F0F5F7,#D9DFE1);
 }
 
 
@@ -205,15 +213,17 @@ body * {
 	background:#5C6970;
 }
 
-.headermeta .loggedinlabel {
+.headermeta ul.info li.loggedinlabel {
 	color:#fff;
 	margin-right:5em;
+	float:right;
 }
 
 .headermeta ul.info {
-	position:absolute;
-	top:0.5em;
-	left:1em;
+	position: relative;
+	top: -1.5em;
+	left: 0;
+	width:100%;
 }
 .headermeta ul.info li {
 	float:left;
@@ -301,7 +311,7 @@ ul#nav li a, ul#nav li span.parent {
 }
 
 ul#nav li span.parent {
-	font-size: 1.5em;
+	font-size: 1.3em;
 }
 
 ul#nav li a:hover, ul#nav li span.parent:hover, ul#nav li span.parent.active {
@@ -324,7 +334,7 @@ ul#nav li ul{
 	border: 1px solid #FBDE2D;
 	border-bottom: none;
 	position:absolute;
-	top: 2.4em;
+	top: 2.1em;
 }
 
 ul#nav li ul li {
@@ -356,7 +366,33 @@ ul#nav li:hover ul {
 #content {
 	margin: 0;
 	padding: 0;
-	height: 100%;
+	/*height: 100%;*/
+}
+
+#footer {
+	
+	border-top: 1px solid #5C6970;
+	text-align:center;
+	color:#5C6970;
+}
+
+
+#footer p {
+	padding: 1em 1em 0.5em 1em;
+}
+
+#footer p a:visited{
+	color: #C71E38;
+	text-decoration:none;
+}
+
+#footer p a:link {
+	color: #951C1E;
+	text-decoration:none;
+	
+}
+#footer p a:hover {
+	text-decoration:underline;
 }
 
 #content .metacontent {
