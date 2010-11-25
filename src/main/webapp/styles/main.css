@@ -400,18 +400,24 @@ ul#nav li:hover ul {
 	padding: 10.6em 0 1em 0;
 }
 
+.loginpage form.loginform fieldset {
+	margin:0;
+	
+}
+
 .loginpage #navigation {
 	display: none;
 }
 
 .loginform label {
 	display: block;
-	margin: 1em 0 0.5em 0;
+	margin: 1em 0 0 0;
 }
 
 .loginform input.full {
 	width: 100%;
 	font-size: 1.4em;
+	margin: 0 0 0.5em;
 }
 
 .loginform .stay {
@@ -478,8 +484,9 @@ div.form input.stdtext {
 }
 
 fieldset.buttons, fieldset {
-	border: 1px solid #D9DFE1;
-	padding: 0 0 1em 1em;
+	border:none;
+	border-top: 1px solid #D9DFE1;
+	padding: 3em 1em 1em 1em;
 	vertical-align: top;
 	background-color:#F0F5F7;
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #F0F5F7), color-stop(0.6, #fff) );
@@ -505,13 +512,14 @@ fieldset.buttons {
 
 fieldset legend {
 	position:absolute;
+	top: -3em;
 	padding: 1em 0;
 	margin: 0 0 0 -1em;
-	display: none;
-	height:2em;
-	min-width:10em;
-	width:100%;
-	text-indent:1em;
+	display: inline;
+	height: 2em;
+	min-width: 10em;
+	width: 100%;
+	text-indent: 1em;
 }
 
 *:first-child+html fieldset legend{
@@ -537,7 +545,7 @@ fieldset.filter legend {
 
 
 
-fieldset div {
+fieldset.visible div {
 	margin: 4em 0 0 0;
 }
 

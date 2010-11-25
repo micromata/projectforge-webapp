@@ -14,6 +14,7 @@
   <link rel="apple-touch-icon" href='<c:url value="/images/appleTouchIcon.png"/>' />
   <script type="text/javascript" src="<c:url value='/scripts/dtree.js'/>"></script>
   <script type="text/javascript">
+  /* <![CDATA[ */
   function submitEvent (event) {
     document.getElementsByName("eventKey")[0].value = event;
     return document.forms[0].submit();
@@ -45,7 +46,7 @@
   function showDeleteQuestionDialog() {
     return window.confirm("<fmt:message key='question.markAsDeletedQuestion'/>");
   }
-  
+  /* ]]> */
 </script>
   <script src="<c:url value='/scripts/jquery-1.3.2.min.js'/>" type="text/javascript" charset="utf-8"></script>
   <script src="<c:url value='/scripts/jquery.dimensions.min.js'/>" type="text/javascript" charset="utf-8"></script>
@@ -74,35 +75,25 @@
         left: 5
       });
     });
+  
     /* ]]> */
 </script>
-<c:url var="htcp" value="/styles/"/>
-<c:if test='${fn:contains(htcp, ";")}'>
-    <c:set var="imagePath" value='${fn:substringBefore(htcp, ";")}' />
- </c:if>
-<!--[if lte IE 6]>
-	<style type="text/css">
-		img { behavior: url(${htcp}iepngfix.htc) }
-	</style>
-<![endif]-->
-
-
   <decorator:head />
   </head>
   <c:if test="${actionBean.developmentSystem == true}">
     <c:set var="devStyle" value='style="background-color: #eeaaaa;"' />
   </c:if>
-  <body onload="<decorator:getProperty property='body.onload' />">
+  <body onload="<decorator:getProperty property='body.onload' />" class="nüschte <decorator:getProperty property='body.class' />">
   <div id="container"><!-- left --> <c:url var="imagePath" value="/images/dtree/" /> <c:if test='${fn:contains(imagePath, ";")}'>
     <c:set var="imagePath" value='${fn:substringBefore(imagePath, ";")}' />
   </c:if>
-  <div id="navigation" ${devStyle}><c:if test="${actionBean.developmentSystem == true}">
+  <div id="navigation" ${devStyle}>
+  	<div class="navcontainer clearfix" >
+  <c:if test="${actionBean.developmentSystem == true}">
     <span style="font-weight: bold; font-size: 140%">Developmentsystem!</span>
   </c:if>
-
-  <p style="text-align: left; margin-left: 4px;"><img src="<c:url value='/secure/Logo'/>" /></p>
+	<div id="mainmenu">
   <script type="text/javascript">
-  /* <![CDATA[ */
       dtree = new dTree('dtree', '${imagePath}' );
       dtree.icon.root = "<c:url value='/images/dtree/micromata_icon.png' />";
       dtree.config.folderLinks = false;
@@ -134,9 +125,11 @@
       </c:forEach>
 
       document.write(dtree);
-      /* ]]> */
     </script> <!-- DIV .dtree END -->
-  <p style="margin-top: 1em; margin-bottom: 1em;"><c:choose>
+    
+    </div>
+    <div style="display:none"> <!--TODO: Noch aufräumen-->
+  <p><c:choose>
     <c:when test="${actionBean.context.loggedIn == true}">
       <fmt:message key="loggedInUserInfo" />:<br />
       ${actionBean.context.user.userDisplayname}
@@ -146,12 +139,19 @@
     </c:otherwise>
   </c:choose></p>
   <a href='<c:url value="/wa/feedback" />'><pf:image src="/images/comment.png" tooltip="feedback.link.tooltip" /></a> <a href="<c:url value='/secure/doc/News.html' />" target="_blank"><span style="color: grey;">V.&nbsp;${actionBean.appVersion},&nbsp;${actionBean.appReleaseTimestamp}</span></a>
+  
+  </div>
+  
+  </div>
   </div>
   <!-- DIV #navigation END -->
 
-  <div id="content"><c:if test="${actionBean.context.loggedIn == true && not empty actionBean.context.alertMessage}">
-    <div style="color: red; font-size: large; line-height: 25px; font-weight: bold; margin: 3px;">${actionBean.context.alertMessage}</div>
-  </c:if> <decorator:body /></div>
+  <div id="content">
+  	<c:if test="${actionBean.context.loggedIn == true && not empty actionBean.context.alertMessage}">
+    		<div style="color: red; font-size: large; line-height: 25px; font-weight: bold; margin: 3px;">${actionBean.context.alertMessage}</div>
+  	</c:if> 
+  	<decorator:body />
+  </div>
   <!-- DIV content END -->
   <div id="footer"></div>
   </div>
