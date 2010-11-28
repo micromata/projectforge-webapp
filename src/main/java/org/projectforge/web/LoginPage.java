@@ -102,7 +102,7 @@ public class LoginPage extends AbstractBasePage
   /** Logs the user out by invalidating the session. */
   private void logout()
   {
-    final PFUserDO user = getUser();
+    final PFUserDO user = ((MySession) getSession()).getUser();
     if (user != null) {
       userXmlPreferencesCache.flushToDB(user.getId());
       userXmlPreferencesCache.clear(user.getId());
@@ -137,7 +137,8 @@ public class LoginPage extends AbstractBasePage
               + loggedInUser.getUsername()
               + ":"
               + userDao.getStayLoggedInKey(user.getId()));
-          UserFilter.addCookie(((WebResponse) getResponse()).getHttpServletResponse(), cookie);
+          UserFilter.addCookie(((WebRequest) getRequest()).getHttpServletRequest(), ((WebResponse) getResponse()).getHttpServletResponse(),
+              cookie);
         }
         login(user);
         if (targetUrlAfterLogin != null) {
