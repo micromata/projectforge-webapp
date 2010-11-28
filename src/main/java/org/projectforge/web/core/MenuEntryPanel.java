@@ -28,8 +28,8 @@ import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
@@ -56,18 +56,12 @@ public class MenuEntryPanel extends Panel
     add(li);
     final AbstractLink link;
     if (menuEntry.isWicketPage() == true) {
-      link = new Link<String>("link") {
-        @Override
-        public void onClick()
-        {
-          if (menuEntry.getParams() == null) {
-            setResponsePage(menuEntry.getPageClass());
-          } else {
-            final PageParameters params = WicketUtils.getPageParameters(menuEntry.getParams());
-            setResponsePage(menuEntry.getPageClass(), params);
-          }
-        }
-      };
+      if (menuEntry.getParams() == null) {
+        link = new BookmarkablePageLink<String>("link", menuEntry.getPageClass());
+      } else {
+        final PageParameters params = WicketUtils.getPageParameters(menuEntry.getParams());
+        link = new BookmarkablePageLink<String>("link", menuEntry.getPageClass(), params);
+      }
     } else {
       link = new ExternalLink("link", WicketUtils.getUrl(getResponse(), menuEntry.getUrl(), true));
     }
@@ -114,7 +108,7 @@ public class MenuEntryPanel extends Panel
       WicketUtils.addTooltip(suffixLabel, getString(menuEntry.getNewCounterTooltip()));
     }
     final Label label = new Label("label", getString(menuEntry.getI18nKey()));
-   
+
     if (menuEntry.getUrl() != null) {
       link.add(label); // Show label with link.
       link.add(suffixLabel);
