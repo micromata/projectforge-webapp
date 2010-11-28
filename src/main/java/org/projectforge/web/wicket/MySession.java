@@ -102,7 +102,7 @@ public class MySession extends WebSession
     }
     ContextHolder.setUserInfo(null);
     super.clear();
-    super.invalidate();
+    // super.invalidate(); Don't use this, otherwise first login is ignored.
   }
 
   public void put(final String name, final Object value)
