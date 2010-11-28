@@ -1,0 +1,26 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<wicket:extend>
+  <form wicket:id="form" class="loginform">
+  <fieldset><legend><wicket:message key="login.title" /></legend>
+  <div wicket:id="feedback">[Validation errors]</div>
+
+  <h3><wicket:message key="login.welcome" /></h3>
+  <div class="clearfix"><label for="username"><wicket:message key="username" /></label> <input type="text" class="text full"
+    wicket:id="username" id="username" /></div>
+  <div class="clearfix"><label for="loginpasswd"><wicket:message key="password" /></label> <input id="loginpasswd" type="password"
+    class="text full" wicket:id="password" /></div>
+  <div class="stay"><input type="checkbox" wicket:id="stayLoggedIn" value="true" />&nbsp;<wicket:message key="login.stayLoggedIn" /> <a
+    href="/doc/Handbuch.html#label_stay-logged-in"><img wicket:message="title:login.stayLoggedIn.tooltip" src="images/help.png" /></a></div>
+    <div class="clearfix" wicket:id="messageOfTheDay">[Have a lot of fun!]</div>
+  </fieldset>
+
+  <fieldset class="buttons"><span wicket:id="login">[login]</span></fieldset>
+  </form>
+</wicket:extend>
+</body>
+</html>
