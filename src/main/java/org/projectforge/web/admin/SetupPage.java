@@ -23,11 +23,9 @@
 
 package org.projectforge.web.admin;
 
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
+import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDao;
@@ -35,13 +33,10 @@ import org.projectforge.core.ConfigurationParam;
 import org.projectforge.core.UserException;
 import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.web.UserFilter;
 import org.projectforge.web.wicket.AbstractSecuredPage;
-import org.projectforge.web.wicket.LoginPage;
 import org.projectforge.web.wicket.MessagePage;
 import org.projectforge.web.wicket.MySession;
-
-import de.micromata.user.ContextHolder;
-import de.micromata.user.UserInfo;
 
 public class SetupPage extends AbstractSecuredPage
 {
@@ -68,7 +63,7 @@ public class SetupPage extends AbstractSecuredPage
   {
     log.info("Finishing the set-up...");
     checkAccess();
-    UserInfo adminUser = null;
+    PFUserDO adminUser = null;
     final String message;
     if (form.getSetupMode() == SetupTarget.TEST_DATA) {
       adminUser = initDatabaseDao.initializeEmptyDatabaseWithTestData(form.getEncryptedPassword(), form.getTimeZone());
@@ -77,11 +72,8 @@ public class SetupPage extends AbstractSecuredPage
       adminUser = initDatabaseDao.initializeEmptyDatabase(form.getEncryptedPassword(), form.getTimeZone());
       message = "administration.setup.message.emptyDatabase";
     }
-    final ServletWebRequest req = (ServletWebRequest) this.getRequest(); // "this" is a WebPage
-    final HttpSession httpSession = req.getHttpServletRequest().getSession();
-    LoginPage.login((MySession) getSession(), httpSession, (PFUserDO) adminUser);
-    ContextHolder.setUserInfo(adminUser);
-    resetMenu();
+    ((MySession) getSession()).login(adminUser);
+    UserFilter.login(((WebRequest) getRequest()).getHttpServletRequest(), adminUser);
     configurationDao.checkAndUpdateDatabaseEntries();
     if (form.getTimeZone() != null) {
       final ConfigurationDO configurationDO = getConfigurationDO(ConfigurationParam.DEFAULT_TIMEZONE);
