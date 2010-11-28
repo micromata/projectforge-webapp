@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -45,22 +46,44 @@ public class AddressViewPage extends AbstractSecuredPage
 
   private AddressDO address;
 
-  @SuppressWarnings("serial")
   public AddressViewPage(final PageParameters parameters)
   {
+    this(parameters, null);
+  }
+
+  @SuppressWarnings("serial")
+  public AddressViewPage(final PageParameters parameters, final AbstractSecuredPage returnToPage)
+  {
     super(parameters);
+    this.returnToPage = returnToPage;
     if (parameters.containsKey(AbstractEditPage.PARAMETER_KEY_ID) == true) {
       final Integer addressId = parameters.getInt(AbstractEditPage.PARAMETER_KEY_ID);
       address = addressDao.getById(addressId);
     } else {
       address = new AddressDO();
     }
-    contentMenuEntries.add(new ContentMenuEntryPanel(getNewContentMenuChildId(), new ExternalLink("link", "javascript:history.back()"), getString("back")));
+    final AbstractLink link;
+    if (this.returnToPage != null) {
+      link = new Link<String>("link") {
+        @Override
+        public void onClick()
+        {
+          setResponsePage(returnToPage);
+        }
+      };
+    } else {
+      link = new ExternalLink("link", "javascript:history.back()");
+    }
+    contentMenuEntries.add(new ContentMenuEntryPanel(getNewContentMenuChildId(), link, getString("back")));
     contentMenuEntries.add(new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
       @Override
       public void onClick()
       {
-        setResponsePage(AddressEditPage.class, (PageParameters)new PageParameters().put(AbstractEditPage.PARAMETER_KEY_ID, address.getId()));
+        final PageParameters params = new PageParameters();
+        params.put(AbstractEditPage.PARAMETER_KEY_ID, address.getId());
+        final AddressEditPage addressEditPage = new AddressEditPage(params);
+        addressEditPage.setReturnToPage(AddressViewPage.this);
+        setResponsePage(addressEditPage);
       };
     }, getString("update")));
 

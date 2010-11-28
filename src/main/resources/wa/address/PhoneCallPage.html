@@ -16,21 +16,26 @@
       <td><input class="stdtext" wicket:id="phoneNumber" /><img wicket:id="numberHelp" src="keyboard.png" /></td>
     </tr>
     <tr>
+      <th><wicket:message key="address.myCurrentPhoneId" /></th>
+      <td><select wicket:id="myCurrentPhoneId" style="width: 10em">
+        <option>[42]</option>
+      </select><img wicket:id="myCurrentPhoneIdHelp" src="keyboard.png" /></td>
+    </tr>
+    <tr wicket:id="addressNameRow">
+      <th><wicket:message key="name" />:</th>
+      <td style="font-weight: bold;"><a wicket:id="addressViewLink"><span wicket:id="label">[Kai Reinhard]</span></a></td>
+    </tr>
+    <tr wicket:id="phoneNumberRepeater">
+      <th wicket:id="label">[business phone:]</th>
+      <td><a wicket:id="callNumberLink"><span wicket:id="number">[+49 1234 56789]</span></a></td>
+    </tr>
+    <tr>
       <th></th>
       <td class="buttonpanel"><span wicket:id="call">[call]</span></td>
     </tr>
   </table>
   </fieldset>
   </form>
-
-  <script type="text/javascript">
-  function callNumber(addressId, phoneType) {
-	  document.getElementsByName("addressId")[0].value = addressId;
-	  document.getElementsByName("phoneType")[0].value = phoneType;
-	  document.getElementsByName("callNow")[0].value = "true";
-	  return document.forms[0].submit();
-	}
-  </script>
 </wicket:extend>
 </body>
 </html>

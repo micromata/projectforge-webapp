@@ -40,7 +40,6 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
-import org.projectforge.web.URLHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 
@@ -83,7 +82,7 @@ public class PhoneCallPage extends AbstractSecuredPage
   protected PageParameters getBookmarkPageExtendedParameters()
   {
     final PageParameters pageParameters = new PageParameters();
-    pageParameters.put(PARAMETER_KEY_NUMBER, getData().getPhoneNumber());
+    pageParameters.put(PARAMETER_KEY_NUMBER, form.getPhoneNumber());
     return pageParameters;
   }
 
@@ -95,20 +94,22 @@ public class PhoneCallPage extends AbstractSecuredPage
       if (addressId == null)
         return;
       final AddressDO address = addressDao.getById(addressId);
-      if (address == null)
+      if (address == null) {
         return;
+      }
+      form.address = address;
     }
     if (parameters.containsKey(PARAMETER_KEY_NUMBER) == true) {
       final String number = parameters.getString(PARAMETER_KEY_NUMBER);
       if (StringUtils.isNotBlank(number) == true) {
-        getData().setPhoneNumber(extractPhonenumber(number));
+        form.setPhoneNumber(extractPhonenumber(number));
       }
     }
   }
 
   protected void send()
   {
-    final String number = NumberHelper.extractPhonenumber(getData().getPhoneNumber(), configuration
+    final String number = NumberHelper.extractPhonenumber(form.getPhoneNumber(), configuration
         .getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
     if (StringUtils.isBlank(configuration.getSmsUrl()) == true) {
       log.error("Servlet url for sending sms not configured. SMS not supported.");
@@ -118,7 +119,7 @@ public class PhoneCallPage extends AbstractSecuredPage
     final HttpClient client = new HttpClient();
     String url = this.configuration.getSmsUrl();
     url = StringUtils.replaceOnce(url, "#number", number);
-    url = StringUtils.replaceOnce(url, "#message", URLHelper.encode(getData().getMessage()));
+    //url = StringUtils.replaceOnce(url, "#message", URLHelper.encode(getData().getMessage()));
     final GetMethod method = new GetMethod(url);
     String errorKey = null;
     result = "";
@@ -202,11 +203,6 @@ public class PhoneCallPage extends AbstractSecuredPage
   {
     super.onAfterRender();
     result = null;
-  }
-
-  private SendSmsData getData()
-  {
-    return form.data;
   }
 
   @Override
