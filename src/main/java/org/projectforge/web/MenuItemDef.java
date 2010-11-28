@@ -81,149 +81,145 @@ import org.projectforge.web.user.GroupListPage;
 import org.projectforge.web.user.MyAccountEditPage;
 import org.projectforge.web.user.UserListPage;
 import org.projectforge.web.user.UserPrefListPage;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketApplication;
 
 public enum MenuItemDef
 {
   // Super menus
-  ADMINISTRATION("administration", "bricks.png"), //
-  COMMON("common", "cog.png"), //
+  ADMINISTRATION("administration"), //
+  COMMON("common"), //
   // *
-  DEVELOPER_DOC("developer", "cog.png"), //
+  DEVELOPER_DOC("developer"), //
   // *
-  DOCUMENTATION("documentation", "information.png"), //
-  FIBU("fibu", "chart_line.png", //
+  DOCUMENTATION("documentation"), //
+  FIBU("fibu", //
       FINANCE_GROUP, ORGA_TEAM, CONTROLLING_GROUP), //
-  KOST("fibu.kost", "coins.png", //
+  KOST("fibu.kost", //
       FINANCE_GROUP, ORGA_TEAM, CONTROLLING_GROUP), //
-  MISC("misc", "cog.png"), //
-  ORGA("orga", "attach.png", //
+  MISC("misc"), //
+  ORGA("orga", //
       FINANCE_GROUP, CONTROLLING_GROUP, ORGA_TEAM), //
-  PROJECT_MANAGEMENT("projectmanagement", "wand.png"), //
+  PROJECT_MANAGEMENT("projectmanagement"), //
   // *
-  REPORTING("reporting", "chart_line.png", //
+  REPORTING("reporting", //
       FINANCE_GROUP, CONTROLLING_GROUP), //
 
   // Menu entries
-  ACCESS_LIST("accessList", AccessListPage.class, "lock.png"), // Visible for all.
+  ACCESS_LIST("accessList", AccessListPage.class), // Visible for all.
   // *
-  ADDRESS_LIST("addressList", AddressListPage.class, "vcard.png"), // Visible for all.
-  // ADDRESS_LIST("addressList", "address/AddressList.action", "vcard.png"), // Visible for all.
+  ADDRESS_LIST("addressList", AddressListPage.class), // Visible for all.
+  // ADDRESS_LIST("addressList", "address/AddressList.action"), // Visible for all.
   // *
-  BANK_ACCOUNT_LIST("finance.bankAccounts", BankAccountListPage.class, "money.png",//
+  BANK_ACCOUNT_LIST("finance.bankAccounts", BankAccountListPage.class,//
       FINANCE_GROUP, CONTROLLING_GROUP), //
-  BOOK_LIST("bookList", BookListPage.class, "book_open.png"), // Visible for all.
+  BOOK_LIST("bookList", BookListPage.class), // Visible for all.
   // *
-  BUCHUNG_SATZ_LIST("fibu.buchungssaetze", "fibu/BuchungssatzList.action", "script.png", //
+  BUCHUNG_SATZ_LIST("fibu.buchungssaetze", "fibu/BuchungssatzList.action", //
       FINANCE_GROUP, CONTROLLING_GROUP), //
-  CALENDAR("calendar", CalendarPage.class, "calendar.png"), // Visible for all.
+  CALENDAR("calendar", CalendarPage.class), // Visible for all.
   // *
-  CHANGE_PASSWORD("changePassword", "user/ChangePassword.action", "key.png"), // Visible for all.
+  CHANGE_PASSWORD("changePassword", "user/ChangePassword.action"), // Visible for all.
   // *
-  CONFIGURATION("configuration", ConfigurationListPage.class, "cog.png", //
+  CONFIGURATION("configuration", ConfigurationListPage.class, //
       ADMIN_GROUP), //
-  CONTRACTS("contracts", ContractListPage.class, "script.png", //
+  CONTRACTS("contracts", ContractListPage.class, //
       ContractDao.USER_RIGHT_ID, READONLY_READWRITE), //
-  DATEV_IMPORT("fibu.datevImport", "fibu/datevImport.action", "database_refresh.png", //
+  DATEV_IMPORT("fibu.datevImport", "fibu/datevImport.action", //
       DatevImportDao.USER_RIGHT_ID, UserRightValue.TRUE), //
-  EINGANGS_RECHNUNG_LIST("fibu.eingangsrechnungen", EingangsrechnungListPage.class, "cart.png", //
+  EINGANGS_RECHNUNG_LIST("fibu.eingangsrechnungen", EingangsrechnungListPage.class, //
       EingangsrechnungDao.USER_RIGHT_ID, READONLY_READWRITE), //
-  EMPLOYEE_LIST("fibu.employees", "fibu/EmployeeList.action", "user.png", //
+  EMPLOYEE_LIST("fibu.employees", "fibu/EmployeeList.action", //
       FINANCE_GROUP, CONTROLLING_GROUP), //
-  EMPLOYEE_SALARY_LIST("fibu.employeeSalaries", "fibu/EmployeeSalaryList.action", "money.png", //
+  EMPLOYEE_SALARY_LIST("fibu.employeeSalaries", "fibu/EmployeeSalaryList.action", //
       EmployeeSalaryDao.USER_RIGHT_ID, READONLY_READWRITE), //
-  GANTT("gantt", GanttChartListPage.class, "gantt.png"), //
-  GROUP_LIST("groupList", GroupListPage.class, "group.png"), // Visible for all.
+  GANTT("gantt", GanttChartListPage.class), //
+  GROUP_LIST("groupList", GroupListPage.class), // Visible for all.
   // *
-  GWIKI("gwiki", GWikiContainerPage.class, "script_gear.png"), //
+  GWIKI("gwiki", GWikiContainerPage.class), //
   // *
-  HR_PLANNING_LIST("hrPlanningList", HRPlanningListPage.class, "group.png"), //
-  HR_VIEW("hrList", HRListPage.class, "group.png", //
+  HR_PLANNING_LIST("hrPlanningList", HRPlanningListPage.class), //
+  HR_VIEW("hrList", HRListPage.class, //
       HRPlanningDao.USER_RIGHT_ID, READONLY_READWRITE), //
 
-  IMAGE_CROPPER("imageCropper", ImageCropperPage.class, "images.png", new String[] { ImageCropperPage.PARAM_SHOW_UPLOAD_BUTTON, "false",
+  IMAGE_CROPPER("imageCropper", ImageCropperPage.class, new String[] { ImageCropperPage.PARAM_SHOW_UPLOAD_BUTTON, "false",
       ImageCropperPage.PARAM_ENABLE_WHITEBOARD_FILTER, "true"}), //
   // *
-  KONTO_LIST("fibu.konten", "fibu/KontoList.action", "money.png", //
+  KONTO_LIST("fibu.konten", "fibu/KontoList.action", //
       FINANCE_GROUP, CONTROLLING_GROUP), //
-  KOST_ZUWEISUNG_LIST("fibu.kostZuweisungen", "fibu/KostZuweisungList.action", "coins.png", //
+  KOST_ZUWEISUNG_LIST("fibu.kostZuweisungen", "fibu/KostZuweisungList.action", //
       FINANCE_GROUP, CONTROLLING_GROUP), //
-  KOST1_LIST("fibu.kost1", Kost1ListPage.class, "coins.png", //
+  KOST1_LIST("fibu.kost1", Kost1ListPage.class, //
       Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE), //
-  KOST2_LIST("fibu.kost2", Kost2ListPage.class, "coins.png", //
+  KOST2_LIST("fibu.kost2", Kost2ListPage.class, //
       Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE), //
-  KOST2_ART_LIST("fibu.kost2arten", Kost2ArtListPage.class, "kost2art.png", //
+  KOST2_ART_LIST("fibu.kost2arten", Kost2ArtListPage.class, //
       Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE), //
-  LOGIN("login", "Login.action", "door_in.png"), //
   // *
-  LOGOUT("logout", "Login.action?logout=true", "door_out.png"), //
-  // *
-  KUNDE_LIST("fibu.kunden", "fibu/KundeList.action", "customer.png", //
+  KUNDE_LIST("fibu.kunden", "fibu/KundeList.action", //
       FINANCE_GROUP, CONTROLLING_GROUP), //
-  MEB("meb", MebListPage.class, "meb.png"), //
-  MONTHLY_EMPLOYEE_REPORT("monthlyEmployeeReport", "fibu/MonthlyEmployeeReport.action", "report_user.png"), //
+  MEB("meb", MebListPage.class), //
+  MONTHLY_EMPLOYEE_REPORT("monthlyEmployeeReport", "fibu/MonthlyEmployeeReport.action"), //
   // *
-  MY_ACCOUNT("myAccount", MyAccountEditPage.class, "brick.png"), //
+  MY_ACCOUNT("myAccount", MyAccountEditPage.class), //
   // *
-  MY_PREFERENCES("myPreferences", UserPrefListPage.class, "brick.png"), //
+  MY_PREFERENCES("myPreferences", UserPrefListPage.class), //
   // *
-  ORDER_LIST("fibu.orderbook", AuftragListPage.class, "report_magnify.png", //
+  ORDER_LIST("fibu.orderbook", AuftragListPage.class, //
       AuftragDao.USER_RIGHT_ID, READONLY_PARTLYREADWRITE_READWRITE), //
-  PHONE_CALL("phoneCall", "address/PhoneCall.action", "telephone.png"), //
+  PHONE_CALL("phoneCall", "address/PhoneCall.action"), //
   // *
-  PERSONAL_STATISTICS("personalStatistics", PersonalStatisticsPage.class, "chart_line.png"), //
+  PERSONAL_STATISTICS("personalStatistics", PersonalStatisticsPage.class), //
   // *
-  POSTAUSGANG_LIST("orga.postausgang", PostausgangListPage.class, "mail_out.png", //
+  POSTAUSGANG_LIST("orga.postausgang", PostausgangListPage.class, //
       PostausgangDao.USER_RIGHT_ID, READONLY_READWRITE), //
-  POSTEINGANG_LIST("orga.posteingang", PosteingangListPage.class, "mail_open.png", //
+  POSTEINGANG_LIST("orga.posteingang", PosteingangListPage.class, //
       PosteingangDao.USER_RIGHT_ID, READONLY_READWRITE), //
-  PROJEKT_LIST("fibu.projekte", ProjektListPage.class, "projekt.png", //
+  PROJEKT_LIST("fibu.projekte", ProjektListPage.class, //
       ProjektDao.USER_RIGHT_ID, READONLY_READWRITE), //
-  RECHNUNG_LIST("fibu.rechnungen", RechnungListPage.class, "calculator.png", //
+  RECHNUNG_LIST("fibu.rechnungen", RechnungListPage.class, //
       RechnungDao.USER_RIGHT_ID, READONLY_READWRITE), //
-  REPORT_OBJECTIVES("fibu.reporting.reportObjectives", "fibu/ReportObjectives.action", "chart_line.png", //
+  REPORT_OBJECTIVES("fibu.reporting.reportObjectives", "fibu/ReportObjectives.action", //
       FINANCE_GROUP, CONTROLLING_GROUP), //
-  REPORT_SCRIPTING("fibu.reporting.reportScripting", "fibu/ReportScripting.action", "chart_line.png", //
+  REPORT_SCRIPTING("fibu.reporting.reportScripting", "fibu/ReportScripting.action", //
       FINANCE_GROUP, CONTROLLING_GROUP), //
-  SCRIPT_LIST("fibu.scripting", ScriptListPage.class, "chart_line.png", //
+  SCRIPT_LIST("fibu.scripting", ScriptListPage.class, //
       FINANCE_GROUP, CONTROLLING_GROUP), //
-  SEARCH("search", "Search.action?reset=true", "zoom.png"), //
-  SYSTEM("system", AdminPage.class, "cog.png", ADMIN_GROUP), //
+  SEARCH("search", "Search.action?reset=true"), //
+  SYSTEM("system", AdminPage.class, ADMIN_GROUP), //
   // *
-  SYSTEM_FIRST_LOGIN_SETUP_PAGE("system.firstLoginSetup", SetupPage.class, "cog.png"), //
-  SYSTEM_STATISTICS("systemStatistics", SystemStatisticsPage.class, "chart_line.png"), //
-  SYSTEM_UPDATE("systemUpdate", UpdatePage.class, "cog.png", //
+  SYSTEM_FIRST_LOGIN_SETUP_PAGE("system.firstLoginSetup", SetupPage.class), //
+  SYSTEM_STATISTICS("systemStatistics", SystemStatisticsPage.class), //
+  SYSTEM_UPDATE("systemUpdate", UpdatePage.class, //
       ADMIN_GROUP), //
-  TASK_TREE("taskTree", TaskTreePage.class, "chart_organisation.png"), //
+  TASK_TREE("taskTree", TaskTreePage.class), //
   // *
-  TIMESHEET_LIST("timesheetList", TimesheetListPage.class, "clock.png"), //
+  TIMESHEET_LIST("timesheetList", TimesheetListPage.class), //
   // *
-  USER_LIST("userList", UserListPage.class, "user.png"), //
+  USER_LIST("userList", UserListPage.class), //
   // *
 
   // Documentation
-  PROJECTFORGE_DOC("doc.projectforge", "doc/ProjectForge.html", "projectforge.png", true), //
-  USER_GUIDE("userGuide", "doc/Handbuch.html", "report_user.png", true), //
+  PROJECTFORGE_DOC("doc.projectforge", "doc/ProjectForge.html", true), //
+  USER_GUIDE("userGuide", "doc/Handbuch.html", true), //
   // *
-  FAQ("faq", "doc/FAQ.html", WebConstants.IMAGE_HELP, true), //
-  FAQ_DE("faq", "doc/FAQ_de.html", WebConstants.IMAGE_HELP, true), //
+  FAQ("faq", "doc/FAQ.html", true), //
+  FAQ_DE("faq", "doc/FAQ_de.html", true), //
   // *
-  LICENSE("license", "LICENSE.txt", "script_lightning.png", true), //
+  LICENSE("license", "LICENSE.txt", true), //
   // *
-  PROJECT_DOC("projectDocumentation", "site/index.html", "page.gif", true), //
+  PROJECT_DOC("projectDocumentation", "site/index.html", true), //
   // *
-  ADMIN_LOGBUCH("adminLogbuch", "doc/AdminLogbuch.html", "keyboard.png", true), //
+  ADMIN_LOGBUCH("adminLogbuch", "doc/AdminLogbuch.html", true), //
   // *
-  ADMIN_GUIDE("adminGuide", "doc/AdministrationGuide.html", "report_disk.png", true), //
+  ADMIN_GUIDE("adminGuide", "doc/AdministrationGuide.html", true), //
   // *
-  DEVELOPER_GUIDE("developerGuide", "doc/DeveloperGuide.html", "page_white_cup.png", true), //
+  DEVELOPER_GUIDE("developerGuide", "doc/DeveloperGuide.html", true), //
   // *
-  JAVA_DOC("javaDoc", "site/apidocs/index.html", "cup.png", true), //
+  JAVA_DOC("javaDoc", "site/apidocs/index.html", true), //
   // *
-  TEST_REPORTS("testReports", "site/surefire-report.html", "server_chart.png", true), //
+  TEST_REPORTS("testReports", "site/surefire-report.html", true), //
   // *
-  NEWS("news", "doc/News.html", "newspaper.png", true);
+  NEWS("news", "doc/News.html", true);
   // *
 
   private String id;
@@ -234,8 +230,6 @@ public enum MenuItemDef
 
   private String[] params;
 
-  private String icon;
-
   private boolean newWindow;
 
   private ProjectForgeGroup[] visibleForGroups;
@@ -244,71 +238,64 @@ public enum MenuItemDef
 
   private UserRightValue[] requiredRightValues;
 
-  MenuItemDef(final String id, final Class< ? extends Page> pageClass, final String icon, final UserRightId requiredRightId,
+  MenuItemDef(final String id, final Class< ? extends Page> pageClass, final UserRightId requiredRightId,
       final UserRightValue... requiredRightValues)
   {
-    this(id, pageClass, icon, null, requiredRightId, requiredRightValues);
+    this(id, pageClass, null, requiredRightId, requiredRightValues);
   }
 
-  MenuItemDef(final String id, final Class< ? extends Page> pageClass, final String icon, final String[] params,
-      final UserRightId requiredRightId, final UserRightValue... requiredRightValues)
+  MenuItemDef(final String id, final Class< ? extends Page> pageClass, final String[] params, final UserRightId requiredRightId,
+      final UserRightValue... requiredRightValues)
   {
     this.id = id;
     this.pageClass = pageClass;
-    this.icon = icon;
     this.params = params;
     this.requiredRightId = requiredRightId;
     this.requiredRightValues = requiredRightValues;
   }
 
-  MenuItemDef(final String id, final Class< ? extends Page> pageClass, final String icon, final ProjectForgeGroup... visibleForGroups)
+  MenuItemDef(final String id, final Class< ? extends Page> pageClass, final ProjectForgeGroup... visibleForGroups)
   {
-    this(id, pageClass, icon, null, visibleForGroups);
+    this(id, pageClass, null, visibleForGroups);
   }
 
-  MenuItemDef(final String id, final Class< ? extends Page> pageClass, final String icon, final String[] params,
-      final ProjectForgeGroup... visibleForGroups)
+  MenuItemDef(final String id, final Class< ? extends Page> pageClass, final String[] params, final ProjectForgeGroup... visibleForGroups)
   {
     this.id = id;
     this.pageClass = pageClass;
-    this.icon = icon;
     this.params = params;
     this.visibleForGroups = visibleForGroups;
   }
 
-  MenuItemDef(final String id, final String url, final String icon, final ProjectForgeGroup... visibleForGroups)
+  MenuItemDef(final String id, final String url, final ProjectForgeGroup... visibleForGroups)
   {
-    this(id, url, icon, false, visibleForGroups);
+    this(id, url, false, visibleForGroups);
   }
 
-  MenuItemDef(final String id, final String url, final String icon, boolean newWindow, final ProjectForgeGroup... visibleForGroups)
+  MenuItemDef(final String id, final String url, boolean newWindow, final ProjectForgeGroup... visibleForGroups)
   {
     this.id = id;
     this.url = url;
-    this.icon = icon;
     this.newWindow = newWindow;
     this.visibleForGroups = visibleForGroups;
   }
 
-  MenuItemDef(final String id, final String icon, final ProjectForgeGroup... visibleForGroups)
+  MenuItemDef(final String id, final ProjectForgeGroup... visibleForGroups)
   {
     this.id = id;
-    this.icon = icon;
     this.visibleForGroups = visibleForGroups;
   }
 
-  MenuItemDef(final String id, final String url, final String icon, final UserRightId requiredRightId,
-      final UserRightValue... requiredRightValues)
+  MenuItemDef(final String id, final String url, final UserRightId requiredRightId, final UserRightValue... requiredRightValues)
   {
-    this(id, url, icon, false, requiredRightId, requiredRightValues);
+    this(id, url, false, requiredRightId, requiredRightValues);
   }
 
-  MenuItemDef(final String id, final String url, final String icon, boolean newWindow, final UserRightId requiredRightId,
+  MenuItemDef(final String id, final String url, boolean newWindow, final UserRightId requiredRightId,
       final UserRightValue... requiredRightValues)
   {
     this.id = id;
     this.url = url;
-    this.icon = icon;
     this.newWindow = newWindow;
     this.requiredRightId = requiredRightId;
     this.requiredRightValues = requiredRightValues;
@@ -356,14 +343,6 @@ public enum MenuItemDef
       this.url = WicketApplication.getBookmarkableMountPath(this.pageClass);
     }
     return url;
-  }
-
-  /**
-   * @return The icon name (excluding the path).
-   */
-  public String getIcon()
-  {
-    return icon;
   }
 
   public String[] getParams()

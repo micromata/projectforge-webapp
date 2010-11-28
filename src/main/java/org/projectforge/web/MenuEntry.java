@@ -128,11 +128,6 @@ public class MenuEntry implements Serializable
     return menu.isFirst(this);
   }
 
-  public String getIcon()
-  {
-    return menuItemDef.getIcon();
-  }
-
   public MenuEntry getParent()
   {
     return parent;

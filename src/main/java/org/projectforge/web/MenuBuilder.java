@@ -26,7 +26,6 @@ package org.projectforge.web;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -36,7 +35,6 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.fibu.datev.DatevImportDao;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserRightId;
@@ -79,135 +77,135 @@ public class MenuBuilder implements Serializable
   {
     final Node root = new Node();
     if (user == null) {
-      root.addSubMenu(user, MenuItemDef.LOGIN);
-    } else if (LoginAction.FIRST_PSEUDO_SETUP_USER.equals(user.getUsername()) == true) {
-      root.addSubMenu(user, MenuItemDef.SYSTEM_FIRST_LOGIN_SETUP_PAGE);
-    } else {
-      final Locale locale = PFUserContext.getLocale();
-      final boolean isGerman = locale != null && locale.toString().startsWith("de") == true;
-      final Node common = root.addSubMenu(user, MenuItemDef.COMMON);
-      common.addSubMenu(user, MenuItemDef.TASK_TREE);
-      common.addSubMenu(user, MenuItemDef.TIMESHEET_LIST);
-      common.addSubMenu(user, MenuItemDef.CALENDAR);
-      final Node fibu = root.addSubMenu(user, MenuItemDef.FIBU);
-      boolean projectMenuEntryExists = false;
-      boolean orderBookMenuEntryExists = false;
-      if (fibu != null) {
-        fibu.addSubMenu(user, MenuItemDef.RECHNUNG_LIST);
-        fibu.addSubMenu(user, MenuItemDef.EINGANGS_RECHNUNG_LIST);
-        fibu.addSubMenu(user, MenuItemDef.BANK_ACCOUNT_LIST);
-        fibu.addSubMenu(user, MenuItemDef.KUNDE_LIST);
-        if (fibu.addSubMenu(user, MenuItemDef.PROJEKT_LIST) != null) {
-          projectMenuEntryExists = true;
-        }
-        fibu.addSubMenu(user, MenuItemDef.EMPLOYEE_LIST);
-        fibu.addSubMenu(user, MenuItemDef.EMPLOYEE_SALARY_LIST);
-        boolean partlyReadwrite = accessChecker.hasRight(UserRightId.PM_ORDER_BOOK, UserRightValue.PARTLYREADWRITE);
-        final Node orderBook = partlyReadwrite ? null : fibu.addSubMenu(user, MenuItemDef.ORDER_LIST);
-        if (orderBook != null) {
-          orderBookMenuEntryExists = true;
-          orderBook.setNewCounterModel(new MenuNewCounterOrder());
-          orderBook.setNewCounterTooltip("menu.fibu.orderbook.htmlSuffixTooltip");
-        }
-      }
-      final Node kost = root.addSubMenu(user, MenuItemDef.KOST);
-      if (kost != null) {
-        kost.addSubMenu(user, MenuItemDef.KONTO_LIST);
-        kost.addSubMenu(user, MenuItemDef.KOST1_LIST);
-        kost.addSubMenu(user, MenuItemDef.KOST2_LIST);
-        kost.addSubMenu(user, MenuItemDef.KOST2_ART_LIST);
-      }
-      final Node reporting = root.addSubMenu(user, MenuItemDef.REPORTING);
-      if (reporting != null) {
-        reporting.addSubMenu(user, MenuItemDef.BUCHUNG_SATZ_LIST);
-        reporting.addSubMenu(user, MenuItemDef.REPORT_OBJECTIVES);
-        reporting.addSubMenu(user, MenuItemDef.REPORT_SCRIPTING);
-        reporting.addSubMenu(user, MenuItemDef.SCRIPT_LIST);
-        if (DatevImportDao.hasRight(accessChecker) == true) {
-          reporting.addSubMenu(user, MenuItemDef.DATEV_IMPORT);
-        }
-      }
-      final Node orga = root.addSubMenu(user, MenuItemDef.ORGA);
-      if (orga != null) {
-        orga.addSubMenu(user, MenuItemDef.POSTEINGANG_LIST);
-        orga.addSubMenu(user, MenuItemDef.POSTAUSGANG_LIST);
-        if (CollectionUtils.isNotEmpty(configuration.getContractTypes()) == true) {
-          orga.addSubMenu(user, MenuItemDef.CONTRACTS);
-        }
-      }
-      final Node admin = root.addSubMenu(user, MenuItemDef.ADMINISTRATION);
-      if (admin != null) {
-        admin.addSubMenu(user, MenuItemDef.MY_ACCOUNT);
-        admin.addSubMenu(user, MenuItemDef.MY_PREFERENCES);
-        admin.addSubMenu(user, MenuItemDef.CHANGE_PASSWORD);
-        admin.addSubMenu(user, MenuItemDef.USER_LIST);
-        admin.addSubMenu(user, MenuItemDef.GROUP_LIST);
-        admin.addSubMenu(user, MenuItemDef.ACCESS_LIST);
-        admin.addSubMenu(user, MenuItemDef.SYSTEM);
-        admin.addSubMenu(user, MenuItemDef.SYSTEM_UPDATE);
-        admin.addSubMenu(user, MenuItemDef.SYSTEM_STATISTICS);
-        admin.addSubMenu(user, MenuItemDef.CONFIGURATION);
-      }
-      final Node projectMgmnt = root.addSubMenu(user, MenuItemDef.PROJECT_MANAGEMENT);
-      if (projectMgmnt != null) {
-        projectMgmnt.addSubMenu(user, MenuItemDef.MONTHLY_EMPLOYEE_REPORT);
-        projectMgmnt.addSubMenu(user, MenuItemDef.PERSONAL_STATISTICS);
-        projectMgmnt.addSubMenu(user, MenuItemDef.HR_VIEW);
-        projectMgmnt.addSubMenu(user, MenuItemDef.HR_PLANNING_LIST);
-        if (projectMenuEntryExists == false) {
-          projectMgmnt.addSubMenu(user, MenuItemDef.PROJEKT_LIST);
-        }
-        if (orderBookMenuEntryExists == false) {
-          projectMgmnt.addSubMenu(user, MenuItemDef.ORDER_LIST);
-        }
-        projectMgmnt.addSubMenu(user, MenuItemDef.GANTT);
-      }
-
-      final Node misc = root.addSubMenu(user, MenuItemDef.MISC);
-      if (configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS) != null) {
-        misc.addSubMenu(user, MenuItemDef.BOOK_LIST);
-      }
-      if (configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES) != null) {
-        misc.addSubMenu(user, MenuItemDef.ADDRESS_LIST);
-      }
-      if (StringUtils.isNotEmpty(configuration.getTelephoneSystemUrl()) == true) {
-        misc.addSubMenu(user, MenuItemDef.PHONE_CALL);
-      }
-      misc.addSubMenu(user, MenuItemDef.IMAGE_CROPPER);
-      if (configuration.isMebConfigured() == true) {
-        final Node meb = misc.addSubMenu(user, MenuItemDef.MEB);
-        if (meb != null) {
-          meb.setNewCounterModel(new MenuNewCounterMeb());
-        }
-      }
-
-//      final Node doc = root.addSubMenu(user, MenuItemDef.DOCUMENTATION);
-//      if (false) {
-//        doc.addSubMenu(user, MenuItemDef.NEWS);
-//        doc.addSubMenu(user, MenuItemDef.PROJECTFORGE_DOC);
-//        doc.addSubMenu(user, MenuItemDef.USER_GUIDE);
-//        if (isGerman == true) {
-//          doc.addSubMenu(user, MenuItemDef.FAQ_DE);
-//        } else {
-//          doc.addSubMenu(user, MenuItemDef.FAQ);
-//        }
-//        doc.addSubMenu(user, MenuItemDef.LICENSE);
-//        doc.addSubMenu(user, MenuItemDef.PROJECT_DOC);
-//        doc.addSubMenu(user, MenuItemDef.ADMIN_LOGBUCH);
-//        final Node dev = doc.addSubMenu(user, MenuItemDef.DEVELOPER_DOC);
-//        if (dev != null) {
-//          dev.addSubMenu(user, MenuItemDef.ADMIN_GUIDE);
-//          dev.addSubMenu(user, MenuItemDef.DEVELOPER_GUIDE);
-//          dev.addSubMenu(user, MenuItemDef.JAVA_DOC);
-//          dev.addSubMenu(user, MenuItemDef.TEST_REPORTS);
-//        }
-//      }
-      if (WicketApplication.isDevelopmentModus() == true) {
-        root.addSubMenu(user, MenuItemDef.GWIKI);
-      }
-      root.addSubMenu(user, MenuItemDef.SEARCH);
-      root.addSubMenu(user, MenuItemDef.LOGOUT);
+      return root;
     }
+    if (LoginPage.FIRST_PSEUDO_SETUP_USER.equals(user.getUsername()) == true) {
+      root.addSubMenu(user, MenuItemDef.SYSTEM_FIRST_LOGIN_SETUP_PAGE);
+      return root;
+    }
+    //final Locale locale = PFUserContext.getLocale();
+    //final boolean isGerman = locale != null && locale.toString().startsWith("de") == true;
+    final Node common = root.addSubMenu(user, MenuItemDef.COMMON);
+    common.addSubMenu(user, MenuItemDef.TASK_TREE);
+    common.addSubMenu(user, MenuItemDef.TIMESHEET_LIST);
+    common.addSubMenu(user, MenuItemDef.CALENDAR);
+    final Node fibu = root.addSubMenu(user, MenuItemDef.FIBU);
+    boolean projectMenuEntryExists = false;
+    boolean orderBookMenuEntryExists = false;
+    if (fibu != null) {
+      fibu.addSubMenu(user, MenuItemDef.RECHNUNG_LIST);
+      fibu.addSubMenu(user, MenuItemDef.EINGANGS_RECHNUNG_LIST);
+      fibu.addSubMenu(user, MenuItemDef.BANK_ACCOUNT_LIST);
+      fibu.addSubMenu(user, MenuItemDef.KUNDE_LIST);
+      if (fibu.addSubMenu(user, MenuItemDef.PROJEKT_LIST) != null) {
+        projectMenuEntryExists = true;
+      }
+      fibu.addSubMenu(user, MenuItemDef.EMPLOYEE_LIST);
+      fibu.addSubMenu(user, MenuItemDef.EMPLOYEE_SALARY_LIST);
+      boolean partlyReadwrite = accessChecker.hasRight(UserRightId.PM_ORDER_BOOK, UserRightValue.PARTLYREADWRITE);
+      final Node orderBook = partlyReadwrite ? null : fibu.addSubMenu(user, MenuItemDef.ORDER_LIST);
+      if (orderBook != null) {
+        orderBookMenuEntryExists = true;
+        orderBook.setNewCounterModel(new MenuNewCounterOrder());
+        orderBook.setNewCounterTooltip("menu.fibu.orderbook.htmlSuffixTooltip");
+      }
+    }
+    final Node kost = root.addSubMenu(user, MenuItemDef.KOST);
+    if (kost != null) {
+      kost.addSubMenu(user, MenuItemDef.KONTO_LIST);
+      kost.addSubMenu(user, MenuItemDef.KOST1_LIST);
+      kost.addSubMenu(user, MenuItemDef.KOST2_LIST);
+      kost.addSubMenu(user, MenuItemDef.KOST2_ART_LIST);
+    }
+    final Node reporting = root.addSubMenu(user, MenuItemDef.REPORTING);
+    if (reporting != null) {
+      reporting.addSubMenu(user, MenuItemDef.BUCHUNG_SATZ_LIST);
+      reporting.addSubMenu(user, MenuItemDef.REPORT_OBJECTIVES);
+      reporting.addSubMenu(user, MenuItemDef.REPORT_SCRIPTING);
+      reporting.addSubMenu(user, MenuItemDef.SCRIPT_LIST);
+      if (DatevImportDao.hasRight(accessChecker) == true) {
+        reporting.addSubMenu(user, MenuItemDef.DATEV_IMPORT);
+      }
+    }
+    final Node orga = root.addSubMenu(user, MenuItemDef.ORGA);
+    if (orga != null) {
+      orga.addSubMenu(user, MenuItemDef.POSTEINGANG_LIST);
+      orga.addSubMenu(user, MenuItemDef.POSTAUSGANG_LIST);
+      if (CollectionUtils.isNotEmpty(configuration.getContractTypes()) == true) {
+        orga.addSubMenu(user, MenuItemDef.CONTRACTS);
+      }
+    }
+    final Node admin = root.addSubMenu(user, MenuItemDef.ADMINISTRATION);
+    if (admin != null) {
+      admin.addSubMenu(user, MenuItemDef.MY_ACCOUNT);
+      admin.addSubMenu(user, MenuItemDef.MY_PREFERENCES);
+      admin.addSubMenu(user, MenuItemDef.CHANGE_PASSWORD);
+      admin.addSubMenu(user, MenuItemDef.USER_LIST);
+      admin.addSubMenu(user, MenuItemDef.GROUP_LIST);
+      admin.addSubMenu(user, MenuItemDef.ACCESS_LIST);
+      admin.addSubMenu(user, MenuItemDef.SYSTEM);
+      admin.addSubMenu(user, MenuItemDef.SYSTEM_UPDATE);
+      admin.addSubMenu(user, MenuItemDef.SYSTEM_STATISTICS);
+      admin.addSubMenu(user, MenuItemDef.CONFIGURATION);
+    }
+    final Node projectMgmnt = root.addSubMenu(user, MenuItemDef.PROJECT_MANAGEMENT);
+    if (projectMgmnt != null) {
+      projectMgmnt.addSubMenu(user, MenuItemDef.MONTHLY_EMPLOYEE_REPORT);
+      projectMgmnt.addSubMenu(user, MenuItemDef.PERSONAL_STATISTICS);
+      projectMgmnt.addSubMenu(user, MenuItemDef.HR_VIEW);
+      projectMgmnt.addSubMenu(user, MenuItemDef.HR_PLANNING_LIST);
+      if (projectMenuEntryExists == false) {
+        projectMgmnt.addSubMenu(user, MenuItemDef.PROJEKT_LIST);
+      }
+      if (orderBookMenuEntryExists == false) {
+        projectMgmnt.addSubMenu(user, MenuItemDef.ORDER_LIST);
+      }
+      projectMgmnt.addSubMenu(user, MenuItemDef.GANTT);
+    }
+
+    final Node misc = root.addSubMenu(user, MenuItemDef.MISC);
+    if (configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS) != null) {
+      misc.addSubMenu(user, MenuItemDef.BOOK_LIST);
+    }
+    if (configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES) != null) {
+      misc.addSubMenu(user, MenuItemDef.ADDRESS_LIST);
+    }
+    if (StringUtils.isNotEmpty(configuration.getTelephoneSystemUrl()) == true) {
+      misc.addSubMenu(user, MenuItemDef.PHONE_CALL);
+    }
+    misc.addSubMenu(user, MenuItemDef.IMAGE_CROPPER);
+    if (configuration.isMebConfigured() == true) {
+      final Node meb = misc.addSubMenu(user, MenuItemDef.MEB);
+      if (meb != null) {
+        meb.setNewCounterModel(new MenuNewCounterMeb());
+      }
+    }
+
+    // final Node doc = root.addSubMenu(user, MenuItemDef.DOCUMENTATION);
+    // if (false) {
+    // doc.addSubMenu(user, MenuItemDef.NEWS);
+    // doc.addSubMenu(user, MenuItemDef.PROJECTFORGE_DOC);
+    // doc.addSubMenu(user, MenuItemDef.USER_GUIDE);
+    // if (isGerman == true) {
+    // doc.addSubMenu(user, MenuItemDef.FAQ_DE);
+    // } else {
+    // doc.addSubMenu(user, MenuItemDef.FAQ);
+    // }
+    // doc.addSubMenu(user, MenuItemDef.LICENSE);
+    // doc.addSubMenu(user, MenuItemDef.PROJECT_DOC);
+    // doc.addSubMenu(user, MenuItemDef.ADMIN_LOGBUCH);
+    // final Node dev = doc.addSubMenu(user, MenuItemDef.DEVELOPER_DOC);
+    // if (dev != null) {
+    // dev.addSubMenu(user, MenuItemDef.ADMIN_GUIDE);
+    // dev.addSubMenu(user, MenuItemDef.DEVELOPER_GUIDE);
+    // dev.addSubMenu(user, MenuItemDef.JAVA_DOC);
+    // dev.addSubMenu(user, MenuItemDef.TEST_REPORTS);
+    // }
+    // }
+    if (WicketApplication.isDevelopmentModus() == true) {
+      root.addSubMenu(user, MenuItemDef.GWIKI);
+    }
+    root.addSubMenu(user, MenuItemDef.SEARCH);
     return root;
   }
 
@@ -231,6 +229,10 @@ public class MenuBuilder implements Serializable
 
   private void build(final Menu menu, final MenuEntry parentEntry, final Node parent)
   {
+    if (parent.subMenues == null) {
+      // Only if user is not logged in.
+      return;
+    }
     for (final Node node : parent.subMenues) {
       if (node.isVisible() == false) {
         continue;
