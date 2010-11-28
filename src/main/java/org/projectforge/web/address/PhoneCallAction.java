@@ -470,7 +470,7 @@ public class PhoneCallAction extends ExtendedActionBean
    */
   public Resolution cancel()
   {
-    return new ForwardResolution(AddressListAction.class);
+    return new ForwardResolution("null");
   }
 
   protected Resolution getInputPage()
