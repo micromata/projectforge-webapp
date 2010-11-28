@@ -34,7 +34,6 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
-import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.admin.SetupPage;
 import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.MySession;
@@ -54,9 +53,6 @@ public class LoginPage extends AbstractBasePage
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
-  @SpringBean(name = "userXmlPreferencesCache")
-  private UserXmlPreferencesCache userXmlPreferencesCache;
-
   private LoginForm form;
 
   String targetUrlAfterLogin;
@@ -69,24 +65,20 @@ public class LoginPage extends AbstractBasePage
   public LoginPage(final PageParameters parameters)
   {
     super(parameters);
-    if (parameters.containsKey(REQUEST_PARAM_LOGOUT) == true) {
-      logout();
-    } else {
-      final PFUserDO user = ((MySession) getSession()).getUser();
-      if (user != null) {
-        setResponsePage(WicketUtils.getDefaultPage());
-        return;
-      }
-      if (initDatabaseDao.isEmpty() == true) {
-        final PFUserDO pseudoUser = new PFUserDO();
-        pseudoUser.setUsername(FIRST_PSEUDO_SETUP_USER);
-        pseudoUser.setId(-1);
-        login(pseudoUser);
-        setResponsePage(new SetupPage(new PageParameters()));
-        return;
-      }
-      targetUrlAfterLogin = UserFilter.getTargetUrlAfterLogin(((WebRequest) getRequest()).getHttpServletRequest());
+    final PFUserDO user = ((MySession) getSession()).getUser();
+    if (user != null) {
+      setResponsePage(WicketUtils.getDefaultPage());
+      return;
     }
+    if (initDatabaseDao.isEmpty() == true) {
+      final PFUserDO pseudoUser = new PFUserDO();
+      pseudoUser.setUsername(FIRST_PSEUDO_SETUP_USER);
+      pseudoUser.setId(-1);
+      login(pseudoUser);
+      setResponsePage(new SetupPage(new PageParameters()));
+      return;
+    }
+    targetUrlAfterLogin = UserFilter.getTargetUrlAfterLogin(((WebRequest) getRequest()).getHttpServletRequest());
     form = new LoginForm(this);
     body.add(new SimpleAttributeModifier("class", "loginpage"));
     body.add(form);
@@ -97,24 +89,6 @@ public class LoginPage extends AbstractBasePage
   {
     ((MySession) getSession()).login(user);
     UserFilter.login(((WebRequest) getRequest()).getHttpServletRequest(), user);
-  }
-
-  /** Logs the user out by invalidating the session. */
-  private void logout()
-  {
-    final PFUserDO user = ((MySession) getSession()).getUser();
-    if (user != null) {
-      userXmlPreferencesCache.flushToDB(user.getId());
-      userXmlPreferencesCache.clear(user.getId());
-    }
-    ((MySession) getSession()).logout();
-    final Cookie stayLoggedInCookie = UserFilter.getStayLoggedInCookie(((WebRequest) getRequest()).getHttpServletRequest());
-    if (stayLoggedInCookie != null) {
-      stayLoggedInCookie.setMaxAge(0);
-      stayLoggedInCookie.setValue("");
-      stayLoggedInCookie.setPath("/");
-      ((WebResponse) getResponse()).addCookie(stayLoggedInCookie);
-    }
   }
 
   protected void checkLogin()
