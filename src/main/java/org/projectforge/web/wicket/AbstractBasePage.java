@@ -37,6 +37,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.ContextImage;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.Model;
@@ -45,6 +46,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.Version;
 import org.projectforge.common.DateHelper;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.web.LoginPage;
 import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.core.LogoServlet;
@@ -132,14 +134,22 @@ public abstract class AbstractBasePage extends WebPage
     final Model<String> loggedInLabelModel = new Model<String>() {
       public String getObject()
       {
-        PFUserDO user = getUser();
+        final PFUserDO user = getUser();
         if (user == null) {
           return getString("notLoggedIn");
         }
-        return getString("loggedInUserInfo") +" <strong>"+ escapeHtml(user.getUserDisplayname() ) + "</strong>";
+        return getString("loggedInUserInfo") + " <strong>" + escapeHtml(user.getUserDisplayname()) + "</strong> |";
       }
     };
-    navigationContainer.add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false));
+    navigationContainer.add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false).setRenderBodyOnly(false));
+    final PageParameters params = new PageParameters();
+    params.add(LoginPage.REQUEST_PARAM_LOGOUT, "true");
+    final BookmarkablePageLink<String> logoutLink = new BookmarkablePageLink<String>("logoutLink", LoginPage.class, params);
+    navigationContainer.add(logoutLink);
+    if (getUser() == null) {
+      logoutLink.setVisible(false);
+    }
+    logoutLink.add(new Label("logoutLabel", getString("menu.logout")).setRenderBodyOnly(true));
     final ExternalLink newsLink = new ExternalLink("newsLink", getUrl("/secure/doc/News.html"));
     navigationContainer.add(newsLink);
     newsLink.add(new Label("versionLabel", "V.&nbsp;" + getAppVersion() + ",&nbsp;" + getAppReleaseTimestamp())
@@ -152,7 +162,7 @@ public abstract class AbstractBasePage extends WebPage
       };
     };
     navigationContainer.add(sendFeedbackLink);
-    
+
     final MenuPanel menuPanel = new MenuPanel("mainMenu");
     navigationContainer.add(menuPanel);
     menuPanel.init();
