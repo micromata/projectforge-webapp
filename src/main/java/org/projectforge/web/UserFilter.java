@@ -163,6 +163,7 @@ public class UserFilter implements Filter
           if (user != null && log.isDebugEnabled() == true) {
             log.debug("User's stay logged-in cookie found: " + request.getRequestURI());
           }
+          UserFilter.login(request, user);
         }
         if (user != null) {
           PFUserContext.setUser(user);
