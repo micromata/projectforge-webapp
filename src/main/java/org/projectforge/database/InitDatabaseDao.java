@@ -43,8 +43,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import de.micromata.user.UserInfo;
-
 /**
  * For initialization of a new ProjectForge system.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -98,7 +96,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
    * If the database is empty (user list is empty) then a admin user and ProjectForge root task will be created.
    * @return
    */
-  public UserInfo initializeEmptyDatabase(final String encryptedAdminPassword, final TimeZone adminUserTimezone)
+  public PFUserDO initializeEmptyDatabase(final String encryptedAdminPassword, final TimeZone adminUserTimezone)
   {
     log.fatal("User wants to initialize database.");
     if (isEmpty() == false) {
@@ -148,7 +146,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     groupDao.internalSave(group);
   }
 
-  public UserInfo initializeEmptyDatabaseWithTestData(final String encryptedAdminPassword, final TimeZone adminUserTimezone)
+  public PFUserDO initializeEmptyDatabaseWithTestData(final String encryptedAdminPassword, final TimeZone adminUserTimezone)
   {
     log.fatal("User wants to initialize database with test data.");
     if (isEmpty() == false) {
