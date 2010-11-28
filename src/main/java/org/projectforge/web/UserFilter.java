@@ -103,12 +103,16 @@ public class UserFilter implements Filter
     return null;
   }
 
-  static void addCookie(final HttpServletResponse response, final Cookie stayLoggedInCookie)
+  static void addCookie(final HttpServletRequest request, final HttpServletResponse response, final Cookie stayLoggedInCookie)
   {
     stayLoggedInCookie.setMaxAge(COOKIE_MAX_AGE);
     stayLoggedInCookie.setPath("/");
-    // TODO: Doesn't work under http!
-    stayLoggedInCookie.setSecure(true);
+    if (request.isSecure() == true) {
+      log.debug("Set secure cookie");
+      stayLoggedInCookie.setSecure(true);
+    } else {
+      log.debug("Set unsecure cookie");
+    }
     response.addCookie(stayLoggedInCookie); // Refresh cookie.
   }
 
@@ -248,7 +252,7 @@ public class UserFilter implements Filter
         log.warn("Invalid cookie found (stay-logged-in key, maybe renewed and/or user password changed): " + value);
         return null;
       }
-      addCookie(response, stayLoggedInCookie);
+      addCookie(request, response, stayLoggedInCookie);
       log.info("User successfully logged in using stay-logged-in method: " + user.getDisplayUsername());
       return user;
     }
