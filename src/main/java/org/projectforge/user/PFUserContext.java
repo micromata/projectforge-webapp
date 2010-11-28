@@ -52,6 +52,10 @@ public class PFUserContext
   {
     return (PFUserDO) ContextHolder.getUserInfo();
   }
+  
+  public final static void setUser(final PFUserDO user) {
+    ContextHolder.setUserInfo(user);
+  }
 
   /**
    * @return The user id of the ContextHolder if exists.
