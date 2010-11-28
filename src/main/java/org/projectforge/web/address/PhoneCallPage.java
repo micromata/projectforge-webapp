@@ -119,7 +119,7 @@ public class PhoneCallPage extends AbstractSecuredPage
     final HttpClient client = new HttpClient();
     String url = this.configuration.getSmsUrl();
     url = StringUtils.replaceOnce(url, "#number", number);
-    //url = StringUtils.replaceOnce(url, "#message", URLHelper.encode(getData().getMessage()));
+    // url = StringUtils.replaceOnce(url, "#message", URLHelper.encode(getData().getMessage()));
     final GetMethod method = new GetMethod(url);
     String errorKey = null;
     result = "";
@@ -164,6 +164,11 @@ public class PhoneCallPage extends AbstractSecuredPage
       return result.substring(configuration.getTelephoneSystemNumber().length());
     }
     return result;
+  }
+
+  void call()
+  {
+
   }
 
   private void callNow()

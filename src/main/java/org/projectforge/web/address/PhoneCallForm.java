@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -63,6 +62,7 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
   private static final long serialVersionUID = -2138017238114715368L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PhoneCallForm.class);
+
   private static final String USER_PREF_KEY_RECENTS = "phoneCalls";
 
   @SpringBean(name = "addressDao")
@@ -206,16 +206,21 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
         return buf.toString();
       }
     }));
-    final Button sendButton = new Button("button", new Model<String>(getString("address.directCall.call"))) {
+    final Button callButton = new Button("button", new Model<String>(getString("address.directCall.call"))) {
       @Override
       public final void onSubmit()
       {
-        parentPage.send();
+        parentPage.call();
       }
     };
-    sendButton.add(new SimpleAttributeModifier("onclick", "return showSendQuestionDialog();"));
-    add(new SingleButtonPanel("call", sendButton));
-    setDefaultButton(sendButton);
+    add(new SingleButtonPanel("call", callButton));
+    setDefaultButton(callButton);
+    final String url = configuration.getTelephoneSystemOperatorPanelUrl();
+    final Label showOperatorPanel = new Label("telephoneSystemOperatorPanel", url != null ? url : "");
+    if (url == null) {
+      showOperatorPanel.setVisible(false);
+    }
+    add(showOperatorPanel.setEscapeModelStrings(false));
   }
 
   @Override
