@@ -34,6 +34,7 @@ import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 
+import de.micromata.user.ContextHolder;
 
 public class MySession extends WebSession
 {
@@ -43,10 +44,10 @@ public class MySession extends WebSession
 
   private PFUserDO user;
 
-  public MySession(Request req)
+  public MySession(final Request request)
   {
-    super(req);
-    setLocale(PFUserContext.getLocale(req.getLocale()));
+    super(request);
+    setLocale(PFUserContext.getLocale(request.getLocale()));
     ClientInfo info = getClientInfo();
     if (info instanceof WebClientInfo) {
       ((WebClientInfo) info).getProperties().setTimeZone(PFUserContext.getTimeZone());
@@ -80,6 +81,28 @@ public class MySession extends WebSession
   public synchronized TimeZone getTimeZone()
   {
     return user != null ? user.getTimeZoneObject() : Configuration.getInstance().getDefaultTimeZone();
+  }
+
+  public void login(final PFUserDO user)
+  {
+    if (user == null) {
+      log.warn("Oups, no user given to log in.");
+      return;
+    }
+    this.user = user;
+    log.info("User logged in: " + user.getShortDisplayName());
+    PFUserContext.setUser(user);
+  }
+
+  public void logout()
+  {
+    if (user != null) {
+      log.info("User logged out: " + user.getShortDisplayName());
+      user = null;
+    }
+    ContextHolder.setUserInfo(null);
+    super.clear();
+    super.invalidate();
   }
 
   public void put(final String name, final Object value)
