@@ -12,42 +12,33 @@
 </head>
 <body onload="" wicket:id="body">
 <div id="container"><!-- left -->
-<div id="navigation" class="clearfix">
+<div id="navigation" class="clearfix"><wicket:container wicket:id="navigation">
+  <div class="headermeta">
+  <div class="development" wicket:id="developmentsystem">Developmentsystem!</div>
 
-	<wicket:container wicket:id="navigation">
-		<div class="headermeta">
-			<div class="development" wicket:id="developmentsystem">Developmentsystem!</div>
-			
-			<ul class="info">
-				<li class="loggedInLabel"  wicket:id="loggedInLabel">[Logged in: John Mustermann (john)]</li>
-				
-				<li>
-					<a class="version" wicket:id="newsLink" href="secure/doc/News.html" target="_blank">
-						<span wicket:id="versionLabel">[V. #.#.## 2009-...]</span>
-					</a>
-				</li>
-				<li>
-					<a wicket:id="sendFeedback" class="embatssymbols" title="Send Feedback"> 2</a>
-				</li> 
-				<li>
-					<a href="http://www.dynamicsitesolutions.com/javascript/add-bookmark-script" class="embatssymbols" title="i18n: Schreib mir ein Markenbuch"> S</a>
-				</li>
-			</ul>
-		</div><!-- .headermeta END -->
-		
-		<img id="logo" wicket:id="logoImage" src="/secure/Logo" />
-		<div id="main-menu" wicket:id="mainMenu">[menu]</div>
-	</wicket:container>
-	<div style="display:none;"><!-- obsolete.... -->
-					<div id="bookmarkIcon">
-					<a href="#" onclick="javascript:showBookmark();">
-						<img src="images/star_plus.png" wicket:id="image" title="Bookmark this page" border="0" />
-					</a>
-				</div>
-			
-					<div id="bookmark" wicket:id="bookmark">Hurzel</div>
-	</div>
-</div> <!-- DIV #navigation END -->
+  <ul class="info">
+    <li class="loggedInLabel"><span wicket:id="loggedInLabel">[Logged in: John Mustermann (john)]</span><a wicket:id="logoutLink"
+      href="/login?logout=true"><span wicket:id="logoutLabel">[Logout]</span></a></li>
+    <li><a class="version" wicket:id="newsLink" href="secure/doc/News.html" target="_blank"> <span wicket:id="versionLabel">[V. #.#.##
+    2009-...]</span> </a></li>
+    <li><a wicket:id="sendFeedback" class="embatssymbols" title="Send Feedback"> 2</a></li>
+    <li><a href="http://www.dynamicsitesolutions.com/javascript/add-bookmark-script" class="embatssymbols"
+      title="i18n: Schreib mir ein Markenbuch"> S</a></li>
+  </ul>
+  </div>
+  <!-- .headermeta END -->
+
+  <img id="logo" wicket:id="logoImage" src="/secure/Logo" />
+  <div id="main-menu" wicket:id="mainMenu">[menu]</div>
+</wicket:container>
+<div style="display: none;"><!-- obsolete.... -->
+<div id="bookmarkIcon"><a href="#" onclick="javascript:showBookmark();"> <img src="images/star_plus.png" wicket:id="image"
+  title="Bookmark this page" border="0" /> </a></div>
+
+<div id="bookmark" wicket:id="bookmark">Hurzel</div>
+</div>
+</div>
+<!-- DIV #navigation END -->
 
 <div id="content">
 
@@ -60,7 +51,9 @@
 
 <!-- DIV content END -->
 <div id="footer" class="gradienttopdown">
-<p class="padding"><a href="lalalalalonglonglilong" title="zur Dokumentation" >Dokumentation</a> | <a href="lalalalalonglonglilong" title="zur Hilfe" >Hilfe</a> | Copyright 2001-2010 Kai Reinhard | Lizenz: <a href="https://projectforge.org/pf-en/License" title="Gnu Public License"> GPL</a></p>
+<p class="padding"><a href="lalalalalonglonglilong" title="zur Dokumentation">Dokumentation</a> | <a href="lalalalalonglonglilong"
+  title="zur Hilfe">Hilfe</a> | Copyright 2001-2010 Kai Reinhard | Lizenz: <a href="https://projectforge.org/pf-en/License" title="Gnu Public License">
+GPL</a></p>
 </div>
 </div>
 <!-- DIV container END -->
