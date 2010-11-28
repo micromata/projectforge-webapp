@@ -54,7 +54,10 @@ import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.CronSetup;
 import org.projectforge.core.ProjectForgeException;
 import org.projectforge.database.HibernateUtils;
+import org.projectforge.user.UserDao;
 import org.projectforge.user.UserXmlPreferencesCache;
+import org.projectforge.web.LoginPage;
+import org.projectforge.web.UserFilter;
 import org.projectforge.web.access.AccessListPage;
 import org.projectforge.web.address.AddressListPage;
 import org.projectforge.web.address.AddressViewPage;
@@ -65,7 +68,6 @@ import org.projectforge.web.admin.UpdatePage;
 import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.core.ConfigurationListPage;
-import org.projectforge.web.core.LoginFilter;
 import org.projectforge.web.doc.TutorialPage;
 import org.projectforge.web.fibu.AuftragEditPage;
 import org.projectforge.web.fibu.AuftragListPage;
@@ -133,15 +135,15 @@ public class WicketApplication extends WebApplication
 
   private static final String BOOKMARK_BOOK_LIST = "bookList";
 
-  private static final String BOOKMARK_CALENDAR_PAGE = "calendarPage";
+  private static final String BOOKMARK_CALENDAR_PAGE = "calendar";
 
-  private static final String BOOKMARK_CONFIGURATION_PAGE = "configurationPage";
+  private static final String BOOKMARK_CONFIGURATION_PAGE = "configuration";
 
   private static final String BOOKMARK_CONTRACT_LIST = "contractList";
 
   private static final String BOOKMARK_EINGANGS_RECHNUNG_LIST = "eingangsRechnungList";
 
-  private static final String BOOKMARK_ERROR_PAGE = "errorPage";
+  private static final String BOOKMARK_ERROR_PAGE = "error";
 
   private static final String BOOKMARK_FEEDBACK_PAGE = "feedback";
 
@@ -164,6 +166,8 @@ public class WicketApplication extends WebApplication
   private static final String BOOKMARK_KOST2_LIST = "kost2List";
 
   private static final String BOOKMARK_KOST2ART_LIST = "kost2ArtList";
+
+  public static final String BOOKMARK_LOGIN = "login";
 
   private static final String BOOKMARK_MEB_LIST = "mebList";
 
@@ -226,6 +230,9 @@ public class WicketApplication extends WebApplication
   @SpringBean(name = "cronSetup")
   private CronSetup cronSetup;
 
+  @SpringBean(name = "userDao")
+  private UserDao userDao;
+
   /**
    * At application start the flag developmentModus is perhaps not already set. If possible please use isDevelopmentSystem() instead.
    * @return
@@ -263,6 +270,11 @@ public class WicketApplication extends WebApplication
   public void setCronSetup(CronSetup cronSetup)
   {
     this.cronSetup = cronSetup;
+  }
+  
+  public void setUserDao(UserDao userDao)
+  {
+    this.userDao = userDao;
   }
 
   /**
@@ -351,6 +363,7 @@ public class WicketApplication extends WebApplication
     mountPage(BOOKMARK_KOST1_LIST, Kost1ListPage.class);
     mountPage(BOOKMARK_KOST2_LIST, Kost2ListPage.class);
     mountPage(BOOKMARK_KOST2ART_LIST, Kost2ArtListPage.class);
+    mountPage(BOOKMARK_LOGIN, LoginPage.class);
     mountPage(BOOKMARK_PROJEKT_LIST, ProjektListPage.class);
     mountPage(BOOKMARK_RECHNUNG_LIST, RechnungListPage.class);
     mountPage(BOOKMARK_MEB_LIST, MebListPage.class);
@@ -397,7 +410,7 @@ public class WicketApplication extends WebApplication
     }
     configuration.setConfigurationDao(configurationDao);
     WicketUtils.setContextPath(contextPath);
-    LoginFilter.setServletContextPath(contextPath);
+    UserFilter.initialize(userDao, contextPath);
     if (this.wicketApplicationFilter != null) {
       this.wicketApplicationFilter.setApplication(this);
     } else {
@@ -437,7 +450,7 @@ public class WicketApplication extends WebApplication
   }
 
   @Override
-  public Session newSession(Request request, Response response)
+  public Session newSession(final Request request, final Response response)
   {
     return new MySession(request);
   }
