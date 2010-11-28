@@ -535,7 +535,7 @@
     <wtpversion>1.5</wtpversion>
     <downloadSources>true</downloadSources>
     <spring.version>3.0.4.RELEASE</spring.version>
-    <wicket.version>1.4.10</wicket.version> <!-- Version check: 2010-08-28 -->
+    <wicket.version>1.4.13</wicket.version> <!-- Version check: 2010-11-26 -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <build>
