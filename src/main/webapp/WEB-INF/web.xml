@@ -72,12 +72,8 @@
     </init-param>
   </filter>
   <filter>
-    <filter-name>LoginFilter</filter-name>
-    <filter-class>de.micromata.web.FilterToBeanProxy</filter-class>
-    <init-param>
-      <param-name>filterBean</param-name>
-      <param-value>loginFilter</param-value>
-    </init-param>
+    <filter-name>UserFilter</filter-name>
+    <filter-class>org.projectforge.web.UserFilter</filter-class>
   </filter>
   <filter>
     <filter-name>HibernateFilter</filter-name>
@@ -125,11 +121,11 @@
 
   <!-- invocation of the filters -->
   <filter-mapping>
-    <filter-name>LoginFilter</filter-name>
+    <filter-name>UserFilter</filter-name>
     <url-pattern>/secure/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
-    <filter-name>LoginFilter</filter-name>
+    <filter-name>UserFilter</filter-name>
     <url-pattern>/wa/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
@@ -174,7 +170,7 @@
   <!-- For online tutorial with action links. -->
   <filter-mapping>
     <filter-name>TutorialFilter</filter-name>
-    <url-pattern>/secure/doc/*</url-pattern>
+    <url-pattern>/doc/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>expire</filter-name>
