@@ -90,7 +90,7 @@ public class UserFilter implements Filter
     return (String) request.getParameter(SESSION_KEY_TARGET_URL);
   }
 
-  static Cookie getStayLoggedInCookie(final HttpServletRequest request)
+  public static Cookie getStayLoggedInCookie(final HttpServletRequest request)
   {
     final Cookie[] cookies = request.getCookies();
     if (cookies != null) {
