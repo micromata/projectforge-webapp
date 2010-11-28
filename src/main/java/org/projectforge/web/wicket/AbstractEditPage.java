@@ -89,11 +89,6 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
   @SpringBean(name = "dateTimeFormatter")
   protected DateTimeFormatter dateTimeFormatter;
 
-  /**
-   * If set then return after save, update or cancel to this page. If not given then return to given list page.
-   */
-  protected AbstractSecuredPage returnToPage;
-
   public AbstractEditPage(final PageParameters parameters, final String i18nPrefix)
   {
     super(parameters);
@@ -604,16 +599,6 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
   protected String[] getBookmarkableSelectProperties()
   {
     return null;
-  }
-
-  /**
-   * If set then return after save, update or cancel to this page. If not given then return to given list page. As an alternative you can
-   * set the returnToPage as page parameter.
-   * @param returnToPage
-   */
-  public void setReturnToPage(AbstractSecuredPage returnToPage)
-  {
-    this.returnToPage = returnToPage;
   }
 
   protected abstract D getBaseDao();
