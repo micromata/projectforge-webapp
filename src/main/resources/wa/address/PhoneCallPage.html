@@ -9,7 +9,7 @@
   <form wicket:id="form" name="form">
   <fieldset><legend><wicket:message key="label.data" /></legend>
   <div wicket:id="feedback">[Validation errors]</div>
-  <div class="message" wicket:id="result">[Message send successfully at 2009/11/21 09:57 am.]</div>
+  <div class="message" wicket:id="result">[Phone call successfully initiated at 2009/11/21 09:57 am.]</div>
   <table class="form">
     <tr>
       <th><wicket:message key="address.phoneCall.number" /></th>
@@ -33,8 +33,11 @@
       <th></th>
       <td class="buttonpanel"><span wicket:id="call">[call]</span></td>
     </tr>
-    <tr>
-      <td colspan="2" wicket:id="telephoneSystemOperatorPanel"><wicket:remove>
+    <tr class="hRuler">
+      <td colspan="2"></td>
+    </tr>
+    <tr wicket:id="telephoneSystemOperatorPanel">
+      <td colspan="2" wicket:id="content"><wicket:remove>
         <a onclick="openNewWindow('http://192.168.76.25/', 'asterisk', 'scrollbars=no,resizable=yes,width=800,height=800')" href="#"><img
           src="images/asteriskOperatorPanel.png" title="Asterisk Operator Panel - Nur im Intranet verfügbar." /></a>
       </wicket:remove></td>

@@ -215,12 +215,15 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
     };
     add(new SingleButtonPanel("call", callButton));
     setDefaultButton(callButton);
+    final WebMarkupContainer showOperatorPanel = new WebMarkupContainer("telephoneSystemOperatorPanel");
+    add(showOperatorPanel);
     final String url = configuration.getTelephoneSystemOperatorPanelUrl();
-    final Label showOperatorPanel = new Label("telephoneSystemOperatorPanel", url != null ? url : "");
     if (url == null) {
       showOperatorPanel.setVisible(false);
+    } else {
+      final Label content = new Label("content", url);
+      showOperatorPanel.add(content.setEscapeModelStrings(false));
     }
-    add(showOperatorPanel.setEscapeModelStrings(false));
   }
 
   @Override
