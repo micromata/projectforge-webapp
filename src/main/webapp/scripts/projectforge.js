@@ -79,6 +79,12 @@ function mcancelclosetime() {
 	}
 }
 
+function openNewWindow(theURL, winName, features) { //v2.0
+    var w = window.open(theURL, winName, features);
+    w.focus();
+}
+
+
 // close layer when click-out
 document.onclick = mclose;
 //End: Functionality for DropDownMenu
