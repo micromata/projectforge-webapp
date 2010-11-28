@@ -31,8 +31,6 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
-import org.projectforge.web.core.BaseActionBean;
-import org.projectforge.web.core.MenuPanel;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 /** All pages with required login should be derived from this page. */
@@ -102,12 +100,6 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     dropDownMenu.add(dropDownMenuRepeater);
     dropDownMenu.setVisible(false);
     contentMenuArea.add(dropDownMenu);
-  }
-
-  public void resetMenu()
-  {
-    //removeUserPrefEntry(MenuPanel.USER_PREF_MENU_KEY); // Wicket menu
-    removeUserPrefEntry(BaseActionBean.USER_PREF_MENU_KEY); // Stripes menu
   }
 
   protected void addContentMenuEntry(final ContentMenuEntryPanel panel)
