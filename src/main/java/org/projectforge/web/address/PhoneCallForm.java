@@ -110,6 +110,16 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
   {
     this.myCurrentPhoneId = myCurrentPhoneId;
   }
+  
+  public AddressDO getAddress()
+  {
+    return address;
+  }
+  
+  public void setAddress(AddressDO address)
+  {
+    this.address = address;
+  }
 
   @Override
   @SuppressWarnings("serial")

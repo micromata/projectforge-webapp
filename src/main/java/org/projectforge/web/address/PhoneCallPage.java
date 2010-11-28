@@ -49,6 +49,8 @@ public class PhoneCallPage extends AbstractSecuredPage
 
   public final static String PARAMETER_KEY_NUMBER = "number";
 
+  private static final String SEPARATOR = " | ";
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PhoneCallPage.class);
 
   @SpringBean(name = "addressDao")
@@ -154,6 +156,61 @@ public class PhoneCallPage extends AbstractSecuredPage
     }
   }
 
+  /**
+   * For special phone numbers: id:# or # | name.
+   * @return true, if the phone number was successfully processed.
+   */
+  private boolean processPhoneNumber()
+  {
+    final String phoneNumber = form.getPhoneNumber();
+    if (StringUtils.isNotEmpty(phoneNumber) == true) {
+      if (phoneNumber.startsWith("id:") == true && phoneNumber.length() > 3) {
+        Integer id = NumberHelper.parseInteger(phoneNumber.substring(3));
+        if (id != null) {
+          form.setPhoneNumber("");
+          final AddressDO address = addressDao.getById(id);
+          if (address != null) {
+            form.setAddress(address);
+            if (StringUtils.isNotEmpty(address.getBusinessPhone()) == true) {
+              setPhoneNumber(address.getBusinessPhone(), true);
+            } else if (StringUtils.isNotEmpty(address.getMobilePhone()) == true) {
+              setPhoneNumber(address.getMobilePhone(), true);
+            }
+          }
+        }
+        return true;
+      } else if (phoneNumber.indexOf(SEPARATOR) >= 0) {
+        final int pos = phoneNumber.indexOf(SEPARATOR);
+        final String rest = phoneNumber.substring(pos + SEPARATOR.length());
+        final int numberPos = rest.indexOf('#');
+        form.setPhoneNumber(phoneNumber.substring(0, pos));
+        if (numberPos > 0) {
+          Integer id = NumberHelper.parseInteger(rest.substring(numberPos + 1));
+          if (id != null) {
+            final AddressDO address = addressDao.getById(id);
+            if (address != null) {
+              form.setAddress(address);
+            }
+          } else {
+            form.setAddress(null);
+          }
+        } else {
+          form.setAddress(null);
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public void setPhoneNumber(String phoneNumber, boolean extract)
+  {
+    if (extract == true) {
+      phoneNumber = extractPhonenumber(phoneNumber);
+    }
+    form.setPhoneNumber(phoneNumber);
+  }
+
   private String extractPhonenumber(String number)
   {
     final String result = NumberHelper.extractPhonenumber(number, configuration
@@ -168,7 +225,12 @@ public class PhoneCallPage extends AbstractSecuredPage
 
   void call()
   {
-
+    boolean extracted = processPhoneNumber();
+    if (extracted == true) {
+      return;
+    }
+    form.setPhoneNumber(extractPhonenumber(form.getPhoneNumber()));
+    callNow();
   }
 
   private void callNow()
