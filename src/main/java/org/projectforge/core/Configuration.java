@@ -117,6 +117,8 @@ public class Configuration extends AbstractCache
   private String telephoneSystemUrl = null;
 
   private String telephoneSystemNumber = null;
+  
+  private String telephoneSystemOperatorPanelUrl = null;
 
   private String smsUrl = null;
 
@@ -544,6 +546,11 @@ public class Configuration extends AbstractCache
   public boolean isTelephoneSystemUrlConfigured()
   {
     return StringUtils.isNotEmpty(this.telephoneSystemUrl);
+  }
+  
+  public String getTelephoneSystemOperatorPanelUrl()
+  {
+    return telephoneSystemOperatorPanelUrl;
   }
 
   /**
