@@ -27,6 +27,8 @@ import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.servlet.http.Cookie;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
@@ -37,18 +39,21 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.ContextImage;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.protocol.http.WebRequest;
+import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.request.target.basic.RedirectRequestTarget;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.Version;
 import org.projectforge.common.DateHelper;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
+import org.projectforge.web.UserFilter;
 import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.core.MenuPanel;
 import org.projectforge.web.wicket.components.TooltipImage;
@@ -65,6 +70,9 @@ public abstract class AbstractBasePage extends WebPage
 
   @SpringBean(name = "menuBuilder")
   private MenuBuilder menuBuilder;
+
+  @SpringBean(name = "userXmlPreferencesCache")
+  private UserXmlPreferencesCache userXmlPreferencesCache;
 
   /**
    * Url with no or minimal set of parameters.
@@ -144,7 +152,13 @@ public abstract class AbstractBasePage extends WebPage
     navigationContainer.add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false).setRenderBodyOnly(false));
     final PageParameters params = new PageParameters();
     params.add(LoginPage.REQUEST_PARAM_LOGOUT, "true");
-    final BookmarkablePageLink<String> logoutLink = new BookmarkablePageLink<String>("logoutLink", LoginPage.class, params);
+    final Link<String> logoutLink = new Link<String>("logoutLink") {
+      public void onClick()
+      {
+        logout();
+        setResponsePage(LoginPage.class);
+      };
+    };
     navigationContainer.add(logoutLink);
     if (getUser() == null) {
       logoutLink.setVisible(false);
@@ -391,5 +405,23 @@ public abstract class AbstractBasePage extends WebPage
       return getString(key);
     }
     return MessageFormat.format(getString(key), params);
+  }
+
+  /** Logs the user out by invalidating the session. */
+  private void logout()
+  {
+    final PFUserDO user = ((MySession) getSession()).getUser();
+    if (user != null) {
+      userXmlPreferencesCache.flushToDB(user.getId());
+      userXmlPreferencesCache.clear(user.getId());
+    }
+    ((MySession) getSession()).logout();
+    final Cookie stayLoggedInCookie = UserFilter.getStayLoggedInCookie(((WebRequest) getRequest()).getHttpServletRequest());
+    if (stayLoggedInCookie != null) {
+      stayLoggedInCookie.setMaxAge(0);
+      stayLoggedInCookie.setValue("");
+      stayLoggedInCookie.setPath("/");
+      ((WebResponse) getResponse()).addCookie(stayLoggedInCookie);
+    }
   }
 }
