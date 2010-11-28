@@ -48,7 +48,7 @@ public class MySession extends WebSession
   {
     super(request);
     setLocale(PFUserContext.getLocale(request.getLocale()));
-    ClientInfo info = getClientInfo();
+    final ClientInfo info = getClientInfo();
     if (info instanceof WebClientInfo) {
       ((WebClientInfo) info).getProperties().setTimeZone(PFUserContext.getTimeZone());
     } else {
