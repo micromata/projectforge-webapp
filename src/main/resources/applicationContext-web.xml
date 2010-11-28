@@ -22,21 +22,6 @@
   </bean>
   <bean id="htmlHelper" class="org.projectforge.web.HtmlHelper" singleton="true" />
   <bean id="kundeFormatter" class="org.projectforge.fibu.KundeFormatter" singleton="true" />
-  <bean id="loginChecker" class="org.projectforge.web.core.LoginChecker" singleton="true" />
-  <bean id="loginFilter" class="org.projectforge.web.core.LoginFilter" singleton="true">
-    <property name="loginUrl">
-      <value>/secure/Login.action</value>
-    </property>
-    <property name="loginFailedUrl">
-      <value>/secure/Login.action?login_error=1</value>
-    </property>
-    <property name="sessionTimeoutUrl">
-      <value>/secure/Login.action?timeout=1</value>
-    </property>
-    <property name="loginCheckUrl">
-      <value>/secure/Login.action</value>
-    </property>
-  </bean>
   <bean id="menuBuilder" class="org.projectforge.web.MenuBuilder" singleton="true" />
   <bean id="priorityFormatter" class="org.projectforge.web.core.PriorityFormatter" singleton="true" />
   <bean id="projektFormatter" class="org.projectforge.fibu.ProjektFormatter" singleton="true" />
