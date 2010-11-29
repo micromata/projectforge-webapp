@@ -49,6 +49,7 @@ import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.web.access.AccessListPage;
 import org.projectforge.web.address.AddressListPage;
+import org.projectforge.web.address.PhoneCallPage;
 import org.projectforge.web.admin.AdminPage;
 import org.projectforge.web.admin.SetupPage;
 import org.projectforge.web.admin.UpdatePage;
@@ -166,7 +167,7 @@ public enum MenuItemDef
   // *
   ORDER_LIST("fibu.orderbook", AuftragListPage.class, //
       AuftragDao.USER_RIGHT_ID, READONLY_PARTLYREADWRITE_READWRITE), //
-  PHONE_CALL("phoneCall", "address/PhoneCall.action"), //
+  PHONE_CALL("phoneCall", PhoneCallPage.class), //
   // *
   PERSONAL_STATISTICS("personalStatistics", PersonalStatisticsPage.class), //
   // *
