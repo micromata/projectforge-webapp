@@ -193,7 +193,7 @@ public class UserFilter implements Filter
   {
     final String requestUri = request.getRequestURI();
     final String queryString = request.getQueryString();
-    if (requestUri.contains(LOGIN_URL) == true || queryString.contains("body:form::IFormSubmitListener") == true) {
+    if (requestUri.contains(LOGIN_URL) == true || (queryString != null && queryString.contains("body:form::IFormSubmitListener") == true)) {
       // For unactivated cookies: the login form posts (action link) to /wa;sessionid=.... with queryString
       // ...body:form::IFormSubmitListener...
       // This is no security problem because the MyAuthorizationStrategy throws an exception if the user tries to call a secure page without
