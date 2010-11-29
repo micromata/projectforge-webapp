@@ -419,7 +419,7 @@ public abstract class AbstractBasePage extends WebPage
     final Cookie stayLoggedInCookie = UserFilter.getStayLoggedInCookie(((WebRequest) getRequest()).getHttpServletRequest());
     if (stayLoggedInCookie != null) {
       stayLoggedInCookie.setMaxAge(0);
-      stayLoggedInCookie.setValue("");
+      stayLoggedInCookie.setValue(null);
       stayLoggedInCookie.setPath("/");
       ((WebResponse) getResponse()).addCookie(stayLoggedInCookie);
     }
