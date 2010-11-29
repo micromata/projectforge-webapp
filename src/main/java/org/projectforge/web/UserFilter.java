@@ -193,7 +193,11 @@ public class UserFilter implements Filter
   {
     final String requestUri = request.getRequestURI();
     final String queryString = request.getQueryString();
-    if (requestUri.contains(LOGIN_URL) == true) {
+    if (requestUri.contains(LOGIN_URL) == true || queryString.contains("body:form::IFormSubmitListener") == true) {
+      // For unactivated cookies: the login form posts (action link) to /wa;sessionid=.... with queryString
+      // ...body:form::IFormSubmitListener...
+      // This is no security problem because the MyAuthorizationStrategy throws an exception if the user tries to call a secure page without
+      // login.
       // Don't redirect to login page after successful login!
       return false;
     } else {
@@ -206,7 +210,7 @@ public class UserFilter implements Filter
         targetUrlAfterLogin = requestUri;
       }
       final StringBuffer buf = new StringBuffer();
-      buf.append(response.encodeRedirectURL(request.getContextPath())).append(LOGIN_URL);
+      buf.append(response.encodeRedirectURL(request.getContextPath() + LOGIN_URL));
       if (targetUrlAfterLogin != null) {
         final String contextPath = request.getContextPath();
         if (StringUtils.isNotEmpty(contextPath) == true && targetUrlAfterLogin.startsWith(contextPath) == true) {
