@@ -65,8 +65,10 @@ public class LoginPage extends AbstractBasePage
   public LoginPage(final PageParameters parameters)
   {
     super(parameters);
-    final PFUserDO user = ((MySession) getSession()).getUser();
-    if (user != null) {
+    final PFUserDO wicketSessionUser = ((MySession) getSession()).getUser();
+    final PFUserDO sessionUser = UserFilter.getUser(((WebRequest)getRequest()).getHttpServletRequest());
+    // Sometimes the wicket session user is given but the http session user is lost (re-login required).
+    if (wicketSessionUser != null && sessionUser != null && wicketSessionUser.getId() == sessionUser.getId()) {
       setResponsePage(WicketUtils.getDefaultPage());
       return;
     }

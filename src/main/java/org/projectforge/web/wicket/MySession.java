@@ -90,7 +90,7 @@ public class MySession extends WebSession
       return;
     }
     this.user = user;
-    log.info("User logged in: " + user.getShortDisplayName());
+    log.debug("User logged in: " + user.getShortDisplayName());
     PFUserContext.setUser(user);
   }
 

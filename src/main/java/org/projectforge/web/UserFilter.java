@@ -121,6 +121,11 @@ public class UserFilter implements Filter
     request.getSession().setAttribute(SESSION_KEY_USER, user);
   }
 
+  public static PFUserDO getUser(final HttpServletRequest request)
+  {
+    return (PFUserDO) request.getSession().getAttribute(SESSION_KEY_USER);
+  }
+
   public void destroy()
   {
     // do nothing
