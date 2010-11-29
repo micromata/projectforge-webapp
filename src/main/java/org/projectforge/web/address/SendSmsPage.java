@@ -165,7 +165,7 @@ public class SendSmsPage extends AbstractSecuredPage
       } else if (response.startsWith("3") == true) {
         errorKey = "address.sendSms.sendMessage.result.messageToLarge";
       } else {
-        result = getString("address.sendSms.sendMessage.result.unknownError");
+        errorKey = getString("address.sendSms.sendMessage.result.unknownError");
       }
     } catch (HttpException ex) {
       errorKey = "Call failed. Please contact administrator.";
