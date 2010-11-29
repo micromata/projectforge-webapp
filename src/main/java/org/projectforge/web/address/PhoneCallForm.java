@@ -24,6 +24,7 @@
 package org.projectforge.web.address;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -84,6 +85,8 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
 
   private String myCurrentPhoneId;
 
+  Date lastSuccessfulPhoneCall;
+
   private RecentQueue<String> recentSearchTermsQueue;
 
   public PhoneCallForm(final PhoneCallPage parentPage)
@@ -103,19 +106,25 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
 
   public String getMyCurrentPhoneId()
   {
+    if (myCurrentPhoneId == null) {
+      myCurrentPhoneId = parentPage.getRecentMyPhoneId();
+    }
     return myCurrentPhoneId;
   }
 
   public void setMyCurrentPhoneId(String myCurrentPhoneId)
   {
     this.myCurrentPhoneId = myCurrentPhoneId;
+    if (this.myCurrentPhoneId != null) {
+      parentPage.setRecentMyPhoneId(this.myCurrentPhoneId);
+    }
   }
-  
+
   public AddressDO getAddress()
   {
     return address;
   }
-  
+
   public void setAddress(AddressDO address)
   {
     this.address = address;

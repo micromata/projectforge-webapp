@@ -37,6 +37,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.common.RecentQueue;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
@@ -51,6 +52,10 @@ public class PhoneCallPage extends AbstractSecuredPage
 
   private static final String SEPARATOR = " | ";
 
+  private static final String USER_PREF_KEY_MY_RECENT_PHONE_ID = "PhoneCall:recentPhoneId";
+
+  private static final String USER_PREF_KEY_RECENT_CALLS = "PhoneCall:recentCalls";
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PhoneCallPage.class);
 
   @SpringBean(name = "addressDao")
@@ -62,6 +67,8 @@ public class PhoneCallPage extends AbstractSecuredPage
   private PhoneCallForm form;
 
   private String result;
+
+  private RecentQueue<String> recentSearchTermsQueue;
 
   @SuppressWarnings("serial")
   public PhoneCallPage(PageParameters parameters)
@@ -106,53 +113,6 @@ public class PhoneCallPage extends AbstractSecuredPage
       if (StringUtils.isNotBlank(number) == true) {
         form.setPhoneNumber(extractPhonenumber(number));
       }
-    }
-  }
-
-  protected void send()
-  {
-    final String number = NumberHelper.extractPhonenumber(form.getPhoneNumber(), configuration
-        .getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
-    if (StringUtils.isBlank(configuration.getSmsUrl()) == true) {
-      log.error("Servlet url for sending sms not configured. SMS not supported.");
-      return;
-    }
-    log.info("User sends message to destination number: '" + StringHelper.hideStringEnding(number, 'x', 3));
-    final HttpClient client = new HttpClient();
-    String url = this.configuration.getSmsUrl();
-    url = StringUtils.replaceOnce(url, "#number", number);
-    // url = StringUtils.replaceOnce(url, "#message", URLHelper.encode(getData().getMessage()));
-    final GetMethod method = new GetMethod(url);
-    String errorKey = null;
-    result = "";
-    try {
-      client.executeMethod(method);
-      String response = method.getResponseBodyAsString();
-      if (response == null) {
-        errorKey = getString("address.sendSms.sendMessage.result.unknownError");
-      } else if (response.startsWith("0") == true) {
-        result = getLocalizedMessage("address.sendSms.sendMessage.result.successful", number, DateTimeFormatter.instance()
-            .getFormattedDateTime(new Date()));
-      } else if (response.startsWith("1") == true) {
-        errorKey = "address.sendSms.sendMessage.result.messageMissed";
-      } else if (response.startsWith("2") == true) {
-        errorKey = "address.sendSms.sendMessage.result.wrongOrMissingNumber";
-      } else if (response.startsWith("3") == true) {
-        errorKey = "address.sendSms.sendMessage.result.messageToLarge";
-      } else {
-        result = getString("address.sendSms.sendMessage.result.unknownError");
-      }
-    } catch (HttpException ex) {
-      errorKey = "Call failed. Please contact administrator.";
-      log.fatal(errorKey + ": " + this.configuration.getSmsUrl() + StringHelper.hideStringEnding(String.valueOf(number), 'x', 3));
-      throw new RuntimeException(ex);
-    } catch (IOException ex) {
-      errorKey = "Call failed. Please contact administrator.";
-      log.fatal(errorKey + ": " + this.configuration.getSmsUrl() + StringHelper.hideStringEnding(String.valueOf(number), 'x', 3));
-      throw new RuntimeException(ex);
-    }
-    if (errorKey != null) {
-      form.addError(errorKey);
     }
   }
 
@@ -239,30 +199,83 @@ public class PhoneCallPage extends AbstractSecuredPage
       log.error("Telephone system url not configured. Phone calls not supported.");
       return;
     }
-    /*
-     * log.info("User initiates direct call from phone with id '" + myCurrentPhoneId + "' to destination numer: " +
-     * StringHelper.hideStringEnding(getPhoneNumber(), 'x', 3)); resultStatus = null; final StringBuffer buf = new StringBuffer();
-     * buf.append(this.phoneNumber).append(SEPARATOR); if (getAddress() != null && StringHelper.isIn(this.phoneNumber,
-     * extractPhonenumber(address.getBusinessPhone()), extractPhonenumber(address.getMobilePhone()),
-     * extractPhonenumber(address.getPrivatePhone()), extractPhonenumber(address .getPrivateMobilePhone())) == true) {
-     * buf.append(this.address.getFirstName()).append(" ").append(this.address.getName()); if
-     * (this.phoneNumber.equals(extractPhonenumber(address.getMobilePhone())) == true) {
-     * buf.append(", ").append(getLocalizedString("address.phone.mobile")); } else if
-     * (this.phoneNumber.equals(extractPhonenumber(address.getPrivatePhone())) == true) {
-     * buf.append(", ").append(getLocalizedString("address.phone.private")); } buf.append(" #").append(this.address.getId()); } else {
-     * buf.append("???"); } getRecentSearchTermsQueue().append(buf.toString()); final HttpClient client = new HttpClient(); String url =
-     * this.configuration.getTelephoneSystemUrl(); url = StringUtils.replaceOnce(url, "#source", this.myCurrentPhoneId); url =
-     * StringUtils.replaceOnce(url, "#target", this.phoneNumber); final String urlProtected = StringHelper.hideStringEnding(url, 'x', 3);
-     * final GetMethod method = new GetMethod(url); try { this.lastSuccessfulPhoneCall = new Date(); client.executeMethod(method);
-     * resultStatus = method.getResponseBodyAsString(); if ("0".equals(resultStatus) == true) { resultStatus =
-     * getLocalizedString("address.phoneCall.result.successful"); } else if ("1".equals(resultStatus) == true) { resultStatus =
-     * getLocalizedString("address.phoneCall.result.callingError"); } else if ("2".equals(resultStatus) == true) { resultStatus =
-     * getLocalizedString("address.phoneCall.result.wrongSourceNumber"); } else if ("3".equals(resultStatus) == true) { resultStatus =
-     * getLocalizedString("address.phoneCall.result.wrongDestinationNumber"); } } catch (HttpException ex) { resultStatus =
-     * "Call failed. Please contact administrator."; log.fatal(resultStatus + ": " + urlProtected); throw new RuntimeException(ex); } catch
-     * (IOException ex) { resultStatus = "Call failed. Please contact administrator."; log.fatal(resultStatus + ": " + urlProtected); throw
-     * new RuntimeException(ex); }
-     */
+    log.info("User initiates direct call from phone with id '"
+        + form.getMyCurrentPhoneId()
+        + "' to destination numer: "
+        + StringHelper.hideStringEnding(form.getPhoneNumber(), 'x', 3));
+    result = null;
+    final StringBuffer buf = new StringBuffer();
+    buf.append(form.getPhoneNumber()).append(SEPARATOR);
+    final AddressDO address = form.getAddress();
+    if (address != null
+        && StringHelper.isIn(form.getPhoneNumber(), extractPhonenumber(address.getBusinessPhone()), extractPhonenumber(address
+            .getMobilePhone()), extractPhonenumber(address.getPrivatePhone()), extractPhonenumber(address.getPrivateMobilePhone())) == true) {
+      buf.append(address.getFirstName()).append(" ").append(address.getName());
+      if (form.getPhoneNumber().equals(extractPhonenumber(address.getMobilePhone())) == true) {
+        buf.append(", ").append(getString("address.phone.mobile"));
+      } else if (form.getPhoneNumber().equals(extractPhonenumber(address.getPrivatePhone())) == true) {
+        buf.append(", ").append(getString("address.phone.private"));
+      }
+      buf.append(" #").append(address.getId());
+    } else {
+      buf.append("???");
+    }
+    getRecentSearchTermsQueue().append(buf.toString());
+    final HttpClient client = new HttpClient();
+    String url = this.configuration.getTelephoneSystemUrl();
+    url = StringUtils.replaceOnce(url, "#source", form.getMyCurrentPhoneId());
+    url = StringUtils.replaceOnce(url, "#target", form.getPhoneNumber());
+    final String urlProtected = StringHelper.hideStringEnding(url, 'x', 3);
+    final GetMethod method = new GetMethod(url);
+    String errorKey = null;
+     try {
+    form.lastSuccessfulPhoneCall = new Date();
+    client.executeMethod(method);
+    final String resultStatus = method.getResponseBodyAsString();
+    if ("0".equals(resultStatus) == true) {
+      result = DateTimeFormatter.instance().getFormattedDateTime(new Date()) + ": " + getString("address.phoneCall.result.successful");
+    } else if ("2".equals(resultStatus) == true) {
+      errorKey = "address.phoneCall.result.wrongSourceNumber";
+    } else if ("3".equals(resultStatus) == true) {
+      errorKey = "address.phoneCall.result.wrongDestinationNumber";
+    } else {
+      errorKey = "address.phoneCall.result.callingError";
+    }
+    } catch (HttpException ex) {
+      result = "Call failed. Please contact administrator.";
+      log.fatal(result + ": " + urlProtected);
+      throw new RuntimeException(ex);
+    } catch (IOException ex) {
+      result = "Call failed. Please contact administrator.";
+      log.fatal(result + ": " + urlProtected);
+      throw new RuntimeException(ex);
+    }
+    if (errorKey != null) {
+      form.addError(errorKey);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected RecentQueue<String> getRecentSearchTermsQueue()
+  {
+    if (recentSearchTermsQueue == null) {
+      recentSearchTermsQueue = (RecentQueue<String>) getUserPrefEntry(USER_PREF_KEY_RECENT_CALLS);
+    }
+    if (recentSearchTermsQueue == null) {
+      recentSearchTermsQueue = new RecentQueue<String>();
+      putUserPrefEntry(USER_PREF_KEY_RECENT_CALLS, recentSearchTermsQueue, true);
+    }
+    return recentSearchTermsQueue;
+  }
+
+  protected String getRecentMyPhoneId()
+  {
+    return (String) getUserPrefEntry(USER_PREF_KEY_MY_RECENT_PHONE_ID);
+  }
+
+  protected void setRecentMyPhoneId(final String myPhoneId)
+  {
+    putUserPrefEntry(USER_PREF_KEY_MY_RECENT_PHONE_ID, myPhoneId, true);
   }
 
   @Override
