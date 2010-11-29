@@ -182,7 +182,18 @@ public class PhoneCallPage extends AbstractSecuredPage
     }
     return result;
   }
-
+  
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
+    form.setPhoneNumber(form.numberTextField.getRawInput());
+    processPhoneNumber();
+    form.refresh();
+    form.numberTextField.setModelObject(new AddressDO().setName(form.getPhoneNumber()));
+    form.numberTextField.modelChanged();
+  }
+  
   void call()
   {
     boolean extracted = processPhoneNumber();

@@ -23,9 +23,10 @@
 
 package org.projectforge.web.address;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
@@ -39,6 +40,7 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.convert.IConverter;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
 import org.projectforge.address.AddressDO;
@@ -49,7 +51,6 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.Configuration;
-import org.projectforge.core.ConfigurationParam;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -79,7 +80,11 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
 
   protected AddressDO address;
 
+  protected AddressFilter addressFilter = new AddressFilter();
+
   private RepeatingView phoneNumbersRepeatingView;
+
+  protected PFAutoCompleteTextField<AddressDO> numberTextField;
 
   private WebMarkupContainer addressNameRow;
 
@@ -133,40 +138,82 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
   }
 
   @Override
-  @SuppressWarnings("serial")
+  @SuppressWarnings( { "serial", "unchecked"})
   protected void init()
   {
     super.init();
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    final PFAutoCompleteTextField<String> numberTextField = new PFAutoCompleteTextField<String>("phoneNumber", new PropertyModel<String>(
-        this, "phoneNumber")) {
+    numberTextField = new PFAutoCompleteTextField<AddressDO>("phoneNumber", new Model() {
       @Override
-      protected List<String> getChoices(String input)
+      public Serializable getObject()
       {
-        final AddressFilter addressFilter = new AddressFilter();
-        addressFilter.setSearchString(input);
-        final List<String> list = new ArrayList<String>();
-        for (final AddressDO address : addressDao.getList(addressFilter)) {
-          buildAutocompleteEntry(list, address, PhoneType.BUSINESS, address.getBusinessPhone());
-          buildAutocompleteEntry(list, address, PhoneType.MOBILE, address.getMobilePhone());
-          buildAutocompleteEntry(list, address, PhoneType.PRIVATE, address.getPrivatePhone());
-          buildAutocompleteEntry(list, address, PhoneType.PRIVATE_MOBILE, address.getPrivateMobilePhone());
-        }
-        return list;
+        // Pseudo object for storing search string (title field is used for this foreign purpose).
+        return new AddressDO().setName(addressFilter.getSearchString());
       }
 
       @Override
-      protected List<String> getFavorites()
+      public void setObject(final Serializable object)
       {
-        return getRecentSearchTermsQueue().getRecents();
+        if (object != null) {
+          if (object instanceof String) {
+            addressFilter.setSearchString((String) object);
+          }
+        } else {
+          addressFilter.setSearchString("");
+        }
+      }
+    }) {
+      @Override
+      protected List<AddressDO> getChoices(String input)
+      {
+        addressFilter.setSearchString(input);
+        addressFilter.setSearchFields("name", "firstName", "organization");
+        return addressDao.getList(addressFilter);
+      }
+
+      @Override
+      protected List<String> getRecentUserInputs()
+      {
+        return parentPage.getRecentSearchTermsQueue().getRecents();
+      }
+
+      @Override
+      protected String formatLabel(final AddressDO address)
+      {
+        return StringHelper.listToString(", ", address.getName(), address.getFirstName(), address.getOrganization());
+      }
+
+      @Override
+      protected String formatValue(final AddressDO address)
+      {
+        return "id:" + address.getId();
+      }
+
+      @Override
+      public IConverter getConverter(Class< ? > type)
+      {
+        return new IConverter() {
+          @Override
+          public Object convertToObject(final String value, final Locale locale)
+          {
+            addressFilter.setSearchString(value);
+            return null;
+          }
+
+          @Override
+          public String convertToString(final Object value, final Locale locale)
+          {
+            return addressFilter.getSearchString();
+          }
+        };
       }
     };
-    numberTextField.withMatchContains(true).withMinChars(2).withFocus(true).setRequired(true);
-    numberTextField.add(new AbstractValidator<String>() {
+    numberTextField.withLabelValue(true).withMatchContains(true).withMinChars(2).withFocus(true).withAutoSubmit(true);
+    numberTextField.add(new AbstractValidator() {
       @Override
-      protected void onValidate(IValidatable<String> validatable)
+      protected void onValidate(IValidatable validatable)
       {
-        final String value = validatable.getValue();
+        final String value = (String) validatable.getValue();
         if (StringUtils.containsOnly(value, "0123456789+-/() ") == false) {
           error(validatable);
         }
@@ -191,7 +238,6 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
         myCurrentPhoneIdChoiceRenderer.addValue(id, id);
       }
     }
-    @SuppressWarnings("unchecked")
     final DropDownChoice myCurrentPhoneIdChoice = new DropDownChoice("myCurrentPhoneId", new PropertyModel(this, "myCurrentPhoneId"),
         myCurrentPhoneIdChoiceRenderer.getValues(), myCurrentPhoneIdChoiceRenderer);
     myCurrentPhoneIdChoice.setNullValid(false).setRequired(true);
@@ -260,12 +306,11 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
       final Label content = new Label("content", url);
       showOperatorPanel.add(content.setEscapeModelStrings(false));
     }
+    refresh();
   }
 
-  @Override
-  public void onBeforeRender()
+  protected void refresh()
   {
-    super.onBeforeRender();
     if (phoneNumbersRepeatingView == null) {
       phoneNumbersRepeatingView = new RepeatingView("phoneNumberRepeater");
       add(phoneNumbersRepeatingView);
@@ -294,6 +339,8 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
       @Override
       public void onClick()
       {
+        PhoneCallForm.this.phoneNumber = phoneNumber;
+        numberTextField.modelChanged();
       }
     };
     item.add(link);
@@ -305,15 +352,6 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
   {
     return StringHelper.listToString(", ", NumberHelper.extractPhonenumber(number, countryPrefix) + ": " + address.getName(), address
         .getFirstName(), getString(phoneType.getI18nKey()), address.getOrganization());
-  }
-
-  private void buildAutocompleteEntry(final List<String> list, final AddressDO address, final PhoneType phoneType, final String number)
-  {
-    if (StringUtils.isBlank(number) == true) {
-      return;
-    }
-    list.add(getPhoneNumberAndPerson(address, phoneType, number, configuration
-        .getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX)));
   }
 
   @SuppressWarnings("unchecked")

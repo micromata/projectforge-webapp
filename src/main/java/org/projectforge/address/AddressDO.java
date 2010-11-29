@@ -437,9 +437,10 @@ public class AddressDO extends DefaultBaseDO
     return name;
   }
 
-  public void setName(String name)
+  public AddressDO setName(String name)
   {
     this.name = name;
+    return this;
   }
 
   @Enumerated(EnumType.STRING)
@@ -616,9 +617,10 @@ public class AddressDO extends DefaultBaseDO
     return title;
   }
 
-  public void setTitle(String title)
+  public AddressDO setTitle(String title)
   {
     this.title = title;
+    return this;
   }
 
   /**
