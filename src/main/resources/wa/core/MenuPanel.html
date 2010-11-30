@@ -5,51 +5,62 @@
 
 <body>
 <wicket:panel>
-  <ul id="nav">
-    <li wicket:id="menuEntries">[Menu entry]</li>
-    <!-- li class="search">
-    	<form action="search" method="get" accept-charset="utf-8"><input type="text" name="query" value="" id="query" /> 
-    	<input id="submitquery" type="submit" value="go" /></form>
-    </li-->
-    <wicket:remove>
-    <!-- den ersten li mit class="first" kennzeichnen, dann kann ich auch dummen browsern diesen eintrag gesondert referenzieren.  -->
-      <li class="first on" id="eins"><a href="includes/news.html" title="titel"><span>News</span></a>
-      <ul>
-      	<!-- class="on" für den pfad (liste deren kind-li on ist) und für das kind -->
-        <li class="on"><a href="includes/news.html" title="titel"><span>Alle News</span></a></li>
-        <li><a href="includes/news.html" title="titel"><span>Solarenergie</span></a></li>
-        <li><a href="includes/news.html" title="titel"><span>Windkraft</span></a></li>
-        <li><a href="includes/news.html" title="titel"><span>Energiefrosch</span></a></li>
-        <li><a href="includes/news.html" title="titel"><span>Energiehandel</span></a></li>
-      </ul>
-      </li>
-      <!-- class="off" setzen wir trotz scheinbarer redundanz bei den obersten li, das spart css und es verstehen auch entwickler, die kennen ja nur an und aus. :) -->
-      <!-- 	die ids für die position können erst einmal weggelassen werden.
-      		
-      		 -->
-      <li id="zwei" class="off"><a href="includes/wikicontent.html" title="Dokumentation"><span>Dokumentation</span></a>
-      <ul>
-        <li><a href="includes/wikicontent.html" title="Was kann Energiefrosch"><span>Was kann Energiefrosch</span></a></li>
-        <li><a href="includes/wikicontent.html" title="Energiefrosch Tutorials"><span>Energiefrosch Tutorials</span></a></li>
-        <li><a href="includes/wikicontent.html" title="Dokumentation"><span>Dokumentation</span></a></li>
-        <li><a href="includes/tabs.html" title="Dokumentation"><span>Tabs Examples</span></a></li>
-      </ul>
-      </li>
-      <li id="drei" class="off"><a href="#" title="titel"><span>Wind</span></a>
-      <ul>
-        <li><a href="#" title="titel"><span>Leistungsprognosen</span></a></li>
-        <li><a href="includes/anlagen.html" title="Anlagen"><span>Anlagen</span></a></li>
-      </ul>
-      </li>
-      <li id="vier" class="off"><a href="#" title="titel"><span>Solar</span></a>
-      <ul>
-        <li><a href="#" title="titel"><span>Leistungsprognosen</span></a></li>
-        <li><a href="#" title="titel"><span>Anlagen</span></a></li>
-      </ul>
-      </li>
-    </wicket:remove>
-  </ul>
 
+<ul id="personal">
+	<li class=""><a href="" title="" >Kalender</a></li>
+	<li class=""><a href="" title="" >Monatsbericht</a></li>
+	<li class=""><a href="" title="" >Personalplanung</a></li>
+</ul>
+
+<ul id="normal">
+	<li>
+		<a><span>Hauptmenü</span></a>
+		<ul id="nav">
+		    <li wicket:id="menuEntries">[Menu entry]</li>
+	    <!-- li class="search">
+	    	<form action="search" method="get" accept-charset="utf-8"><input type="text" name="query" value="" id="query" /> 
+	    	<input id="submitquery" type="submit" value="go" /></form>
+	    </li-->
+		    <wicket:remove>
+		    <!-- den ersten li mit class="first" kennzeichnen, dann kann ich auch dummen browsern diesen eintrag gesondert referenzieren.  -->
+		      <li class="first on" id="eins"><a href="includes/news.html" title="titel"><span>News</span></a>
+		      <ul>
+		      	<!-- class="on" für den pfad (liste deren kind-li on ist) und für das kind -->
+		        <li class="on"><a href="includes/news.html" title="titel"><span>Alle News</span></a></li>
+		        <li><a href="includes/news.html" title="titel"><span>Solarenergie</span></a></li>
+		        <li><a href="includes/news.html" title="titel"><span>Windkraft</span></a></li>
+		        <li><a href="includes/news.html" title="titel"><span>Energiefrosch</span></a></li>
+		        <li><a href="includes/news.html" title="titel"><span>Energiehandel</span></a></li>
+		      </ul>
+		      </li>
+		      <!-- class="off" setzen wir trotz scheinbarer redundanz bei den obersten li, das spart css und es verstehen auch entwickler, die kennen ja nur an und aus. :) -->
+		      <!-- 	die ids für die position können erst einmal weggelassen werden.
+		      		
+		      		 -->
+		      <li id="zwei" class="off"><a href="includes/wikicontent.html" title="Dokumentation"><span>Dokumentation</span></a>
+		      <ul>
+		        <li><a href="includes/wikicontent.html" title="Was kann Energiefrosch"><span>Was kann Energiefrosch</span></a></li>
+		        <li><a href="includes/wikicontent.html" title="Energiefrosch Tutorials"><span>Energiefrosch Tutorials</span></a></li>
+		        <li><a href="includes/wikicontent.html" title="Dokumentation"><span>Dokumentation</span></a></li>
+		        <li><a href="includes/tabs.html" title="Dokumentation"><span>Tabs Examples</span></a></li>
+		      </ul>
+		      </li>
+		      <li id="drei" class="off"><a href="#" title="titel"><span>Wind</span></a>
+		      <ul>
+		        <li><a href="#" title="titel"><span>Leistungsprognosen</span></a></li>
+		        <li><a href="includes/anlagen.html" title="Anlagen"><span>Anlagen</span></a></li>
+		      </ul>
+		      </li>
+		      <li id="vier" class="off"><a href="#" title="titel"><span>Solar</span></a>
+		      <ul>
+		        <li><a href="#" title="titel"><span>Leistungsprognosen</span></a></li>
+		        <li><a href="#" title="titel"><span>Anlagen</span></a></li>
+		      </ul>
+		      </li>
+		    </wicket:remove>
+	  	</ul>
+	</li>
+</ul><!-- #normal END -->
 
 </wicket:panel>
 </body>
