@@ -140,8 +140,8 @@ You are allowed to embed the fonts via css and expose them to the internet,until
 }
 
 /* ===================================================================================================================== */
-	/* = helpers = */
-	/* ===================================================================================================================== */
+/* = helpers = */
+/* ===================================================================================================================== */
 .clearfix:after {
 	content: ".";
 	display: block;
@@ -151,8 +151,8 @@ You are allowed to embed the fonts via css and expose them to the internet,until
 }
 
 /* ===================================================================================================================== */
-	/* = typographical settings,please take care = */
-	/* ===================================================================================================================== */
+/* = typographical settings,please take care = */
+/* ===================================================================================================================== */
 body {
 	font-size: 62.5%; /* reset body basesize to 10px */
 }
@@ -315,9 +315,9 @@ ul#nav li span.parent {
 }
 
 ul#nav li a:hover, ul#nav li span.parent:hover, ul#nav li span.parent.active {
-	color: #2E373C;/*
+	color: #2E373C;
 	background: #CEE6B0;
-	border-color: #A9D887;*/
+	border-color: #A9D887;
 	cursor: pointer;
 	-moz-box-shadow: inset 0 0 10px #BBC1C3;
 	-webkit-box-shadow: inset 0 0 10px #BBC1C3;
@@ -804,16 +804,14 @@ fieldset.buttons input:hover.submit,fieldset.buttons a:hover.submit {
 fieldset.buttons input.reset {
 	/*filter:progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#00FF00',EndColorStr='#000000',GradientType=0);*/
 	background: -moz-linear-gradient(top, #FBEDED, #E11D1C);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #FBEDED),
-		color-stop(1.0, #E11D1C) );
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #FBEDED),color-stop(1.0, #E11D1C) );
 	border-color: #E11D1C;
 }
 
 /* der rote button und buttonlink mouseover*/
 fieldset.buttons input:hover.reset,fieldset.buttons a:hover.reset {
 	background: -moz-linear-gradient(top, #FBEDED, #E11D1C 60%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #FBEDED),
-		color-stop(0.6, #E11D1C) );
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #FBEDED),color-stop(0.6, #E11D1C) );
 	text-decoration: none;
 }
 
@@ -890,14 +888,6 @@ table.dataview tbody tr.odd td,table.dataview tbody tr.odd th {
 	border-bottom: none;
 }
 
-/*added (by tim) for forecast dataviews */
-table.dataview tbody tr td.timeFrameColumn {
-	text-align: center;
-}
-
-table.dataview tbody tr td.nomPowerColumn {
-	text-align: right;
-}
 
 /* the ruler */
 table.dataview tbody tr:hover td,table.dataview tbody tr:hover th,table.dataview tbody tr.over td,table tbody tr.over th
