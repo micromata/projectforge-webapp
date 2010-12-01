@@ -7,6 +7,55 @@
 
 	<title>untitled</title>
 	<link rel="stylesheet" href="main.css" type="text/css" media="screen" title="no title" charset="utf-8"/>
+	<script src="../scripts/jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../scripts/jquery-ui-1-2.8.2.custom/js/jquery-ui-1.8.2.custom.min.js" type="text/javascript" charset="utf-8"></script>
+	<link rel="stylesheet" href="../scripts/jquery-ui-1-2.8.2.custom/css/custom-theme/jquery-ui-.custom.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+	
+	<script type="text/javascript" charset="utf-8">
+	/* <![CDATA[ */
+	// TODO: Markus Schwarz Optimize it. 
+		
+		// statt document.ready...
+		$(function() {
+			
+				// hier verknüpfe ich die listen und konfiguriere die sortable-funktion.
+				$( "#personal, #nav ul" ).sortable({
+					connectWith: ".sortablenav",
+					placeholder: "ui-state-highlight",
+					helper: 'clone'
+				}).disableSelection();
+				
+				
+				$("#normal .main a").click(function(){
+					// Ein Klick auf das Hauptmenü öffnet...ein weiterer schließt das Hauptmenü
+					$(this).parent(".main").toggleClass("active");
+					
+					// wenn nach dem tooglen das hauptmenü offen ist..
+					if($(".main").hasClass("active")){
+						// sortable wird angeschalten...
+						$( "#personal, #nav ul" ).sortable("enable");
+						// gleichzeitig wird der blaue rand um das persönliche menü geklebt
+						$("ul#personal").addClass("dotted");
+					// ansonsten..
+					} else {
+						// sortable deaktivieren
+						$( "#personal, #nav ul" ).sortable("disable");
+						//serialize den shice
+						s = $( "#personal, #nav ul" ).sortable("toArray");
+						alert( s[1] );
+						// blauer rand wech...
+						$("ul#personal").removeClass("dotted");
+						
+					}
+				})
+				
+				
+				
+				
+				
+			});
+	/* ]]> */
+	</script>
 	
 </head>
 
@@ -14,22 +63,22 @@
 
 	<div id="main-menu">
 
-	<ul id="personal">
+	<ul id="personal" class="sortablenav">
 		<li class=""><a title="" href="../">Kalender</a></li>
 		<li class=""><a title="" href="../">Monatsbericht</a></li>
 		<li class=""><a title="" href="../">Personalplanung</a></li>
 	</ul>
 
 	<ul id="normal">
-		<li>
-			<a><span>Hauptmenü</span></a>
-			<ul id="nav">
-
+		<li class="main" class="sortablenav">
+			<a class="parent"><span>Hauptmenü</span></a>
+			
+			<ul id="nav" class="boxshadow lightgradient roundcorners">
 	  <li class="first selected">
+		
+	  	<span class="label parent shaded">Allgemein</span>
 
-	  	<span class="label parent ">Allgemein</span>
-
-	  	<ul class="boxshadow">
+	  	<ul>
 
 	  <li>
 	  	<a href="taskTree">
@@ -66,9 +115,9 @@
 
 	  <li class="off">
 
-	  	<span class="label parent ">Fibu</span>
+	  	<span class="label parent shaded">Fibu</span>
 
-	  	<ul class="boxshadow">
+	  	<ul>
 
 	  <li>
 	  	<a href="rechnungList">
@@ -135,9 +184,9 @@
 
 	  <li class="off">
 
-	  	<span class="label parent ">Kost</span>
+	  	<span class="label parent shaded">Kost</span>
 
-	  	<ul class="boxshadow">
+	  	<ul>
 
 	  <li>
 	  	<a href="secure/fibu/KontoList.action">
@@ -181,12 +230,11 @@
 
 	  	</ul>
 	  </li>
-
 	  <li class="off">
 
-	  	<span class="label parent ">Reporting</span>
+	  	<span class="label parent shaded">Reporting</span>
 
-	  	<ul class="boxshadow">
+	  	<ul>
 
 	  <li>
 	  	<a href="secure/fibu/BuchungssatzList.action">
@@ -230,12 +278,14 @@
 
 	  	</ul>
 	  </li>
+	   	<li class="full"><strong>TIP: </strong> Kopiere die von Dir häufig benutzen Seiten nach oben in Dein persönliches Menü, damit Du sie von jedem Rechner den ersten Klick aufrufen kannst. </li>
+	
 
 	  <li class="off">
 
-	  	<span class="label parent ">Organisation</span>
+	  	<span class="label parent shaded">Organisation</span>
 
-	  	<ul class="boxshadow">
+	  	<ul>
 
 	  <li>
 	  	<a href="posteingangList">
@@ -262,9 +312,9 @@
 
 	  <li class="off">
 
-	  	<span class="label parent ">Administration</span>
+	  	<span class="label parent shaded">Administration</span>
 
-	  	<ul class="boxshadow">
+	  	<ul>
 
 	  <li>
 	  	<a href="myAccount">
@@ -371,9 +421,9 @@
 
 	  <li class="off">
 
-	  	<span class="label parent ">Projektmanagement</span>
+	  	<span class="label parent shaded">Projektmanagement</span>
 
-	  	<ul class="boxshadow">
+	  	<ul>
 
 	  <li>
 	  	<a href="secure/fibu/MonthlyEmployeeReport.action">
@@ -440,14 +490,13 @@
 
 	  <li class="off">
 
-	  	<span class="label parent ">Verschiedenes</span>
+	  	<span class="label parent shaded">Verschiedenes</span>
 
-	  	<ul class="boxshadow">
+	  	<ul>
 
 	  <li>
 	  	<a href="imageCropper/showUploadButton/false/enableWhiteboardFilter/true">
 	  		<span class="label">ImageCropper</span>
-
 	  	</a>
 
 
@@ -467,15 +516,15 @@
 
 	  </li>
 
-		    <!-- li class="search">
-		    	<form action="search" method="get" accept-charset="utf-8"><input type="text" name="query" value="" id="query" /> 
-		    	<input id="submitquery" type="submit" value="go" /></form>
-		    </li-->
+		<li class="full"><strong>TIP:</strong> Du kannst die Links auch einfach in Deine Bookmarkleiste ziehen und dann die Seite direkt aus dem frisch geöffneten Browserfenster aufrufen. Allerdings kann das nicht global in Projectforge gespeichert werden. Du kannst Links in der Bookmarkleiste übrigens mit der Tastenkombination <span title="Dritte Taste von unten Links, die mit dem angefressenen Apfel oder Teppichklopfer drauf :)" class="key">cmd</span> + <span title="Wer das nicht versteht, bitte Thomas oder Jan fragen." class="key">Position in der Bookmarkleiste (z.B. 1) öffnen.</span></li>
 
 		  	</ul>
 		</li>
 	</ul><!-- #normal END -->
-
+	<div class="clearfix">&nbsp;</div>
 	</div>
+	
+	<h1>Serialize den Shice</h1>
+	<textarea name="serialitzkowitsch" rows="8" cols="40"></textarea>
 </body>
 </html>

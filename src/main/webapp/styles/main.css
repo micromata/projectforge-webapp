@@ -125,6 +125,13 @@ You are allowed to embed the fonts via css and expose them to the internet,until
 	background: -moz-linear-gradient(top,#F0F5F7,#D9DFE1);
 }
 
+.lightgradient {
+	background-color:#F0F5F7;
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #F0F5F7), color-stop(0.6, #fff) );
+	background: -moz-linear-gradient(top, #F0F5F7, #fff 40%);
+	filter:progid:DXImageTransform.Microsoft.Gradient(endColorstr='#ffffff', startColorstr='#F0F5F7', gradientType='0');
+}
+
 
 .roundcorners {
 	-moz-border-radius: 1em;
@@ -138,6 +145,23 @@ You are allowed to embed the fonts via css and expose them to the internet,until
 	-webkit-text-shadow: -0.5px -0.5px 0px #8994A0, 0.5px 0.5px 0px #fff;
 	color: #5C6970;
 }
+
+span.key {
+	padding: 0.1em;
+	-moz-border-radius: 0.2em;
+	-webkit-border-radius: 0.2em;
+	border-radius: 0.2em;
+	border: 1px solid #D9DFE1;
+	white-space: nowrap;
+	cursor:pointer;
+}
+
+.dotted{
+	outline: 2px dotted #65A1EE;
+}
+
+
+
 
 /* ===================================================================================================================== */
 /* = helpers = */
@@ -178,7 +202,6 @@ body * {
 	border-bottom: 1px solid #D9DFE1;
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #fff), color-stop(0.6, #F0F5F7) );
 	background: -moz-linear-gradient(top, #fff, #F0F5F7 40%);
-
 }
 
 #navigation .navcontainer {
@@ -189,7 +212,7 @@ body * {
 
 /* contents of #navigation */
 #mainmenu {
-	
+
 }
 
 
@@ -270,33 +293,34 @@ body * {
 	display:none;
 }
 
-ul#nav {
-	height:4em;
+ul#personal {
+	min-height:3em;
+	min-width:50em;
 	float:left;
-	width:100%;
-	border-bottom: 1px solid #BBC1C3;
-	border-top: 1px solid #BBC1C3;
 }
 
-ul#nav li{
+ul#normal {
+	float:right;
+}
+
+
+
+ul#personal li, 
+ul#normal li{
 	float: left;
 	display: block;
 	margin: 0.5em 0 0 0;
-	position: relative;
 }
 
-ul#nav li.first {
-	margin-left:1em;
+ul#personal li.first {
+	margin-left: 1em;
 }
 
-ul#nav li span.parent:after {
-	content: " U";
-	font-family:Embats;
-}
-
-ul#nav li a, ul#nav li span.parent {
+ul#personal li a,
+ul#normal li a.parent,
+ul#personal .ui-state-highlight {
 	white-space: nowrap;
-	font-size: 0.8em;
+	font-size: 1.3em;
 	color: #5C6970;
 	background: #F0F5F7;
 	padding: 0.1em 0.5em 0.3em;
@@ -309,57 +333,100 @@ ul#nav li a, ul#nav li span.parent {
 	display: block;
 	float: left;
 }
-
-ul#nav li span.parent {
-	font-size: 1.3em;
+/* the placeholder  */
+ul#personal .ui-state-highlight { 
+	height: 1em;
+	min-width: 6em;
+	content:"sdfgsd";
+	margin-top:0.5em;
 }
 
-ul#nav li a:hover, ul#nav li span.parent:hover, ul#nav li span.parent.active {
+ul#normal li span.parent {
+	display:block;
+	float:none;
+	padding: 1em  0 0.5em 0;
+	border-bottom: 1px solid #BBC1C3;
+	font-size:1.4em;
+}
+
+ul#personal li a:hover, 
+ul#personal li span.parent:hover, 
+ul#normal li a:hover  {
 	color: #2E373C;
-	background: #CEE6B0;
-	border-color: #A9D887;
 	cursor: pointer;
 	-moz-box-shadow: inset 0 0 10px #BBC1C3;
 	-webkit-box-shadow: inset 0 0 10px #BBC1C3;
 	box-shadow: inset 0 0 10px #BBC1C3;
 }
 
-ul#nav li ul{
-	display:none;
-	color: #AC9100;
+ul#normal  ul#nav{
+	width:80em;
 	z-index:99999;
-	background: #FDF4CA;
-	padding: 0;
-	margin: 0 0 0 1.3em;
-	border: 1px solid #FBDE2D;
-	border-bottom: none;
 	position:absolute;
-	top: 2.1em;
+	right:1em;
+	top:3em;
+	padding:0 1em 1em 1em;
+	border: 1px solid #D9DFE1;
+	display:none;
 }
 
-ul#nav li ul li {
+
+ul#normal li.active ul#nav {
+	display:block;
+}
+
+ul#normal li ul li ul {
+	position:relative;
+}
+
+ul#normal li ul li {
 	margin:0;
 	display:block;
+	width: 19em;
+	padding: 0.5em;
+	float:left;
+}
+ul#normal li ul li.full {
 	float:none;
-	border-bottom: 1px solid #FBDE2D;
-	border-top: 1px solid #fff;
+	clear:left;
+	width:79em;
+	color:#8994A0;
+	line-height:1.5em;
 }
 
-ul#nav li ul li a{
-	border:none;
-	background:transparent;
+ul#normal li ul li.full strong {
+	font-weight:bold;
+}
+
+ul#normal li ul li ul {
+	width:19em;
+	border :none;
+	margin:0;
+	padding:0;
+}
+
+ul#normal li.main>a>span:after {
+	content: " U";
+	font-size-adjust: 0.75;
+	top:0.1em;
+	position:relative;
+	font-family: embats;
+}
+
+ul#normal li.active>a>span:after {
+	content: " E";
+	font-size-adjust: 0.75;
+	top:0.1em;
+	position:relative;
+	font-family: embats;
+}
+
+ul#normal li ul li ul li {
 	float:none;
-	font-size:1.3em;
+	padding:0.5em 0;
 }
 
-ul#nav li ul li a:hover {
-	-moz-box-shadow: none;
-	-webkit-box-shadow: none;
-	box-shadow: none;
-}
-
-
-ul#nav li:hover ul {
+ul#normal li.active ul {
 	display:block;
 }
 
