@@ -37,6 +37,8 @@ import org.projectforge.web.wicket.AbstractSecuredPage;
  */
 public class MenuPanel extends Panel
 {
+  private static final long serialVersionUID = -7858806882044188339L;
+
   private static final String USER_PREF_MENU_KEY = "usersMenu";
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MenuPanel.class);
