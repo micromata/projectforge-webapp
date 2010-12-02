@@ -41,8 +41,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
-import org.apache.wicket.validation.IValidatable;
-import org.apache.wicket.validation.validator.AbstractValidator;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.AddressFilter;
@@ -61,7 +59,7 @@ import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.components.TooltipImage;
 
-public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
+public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
 {
   private static final long serialVersionUID = -2138017238114715368L;
 
@@ -79,8 +77,6 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
   private UserDao userDao;
 
   protected AddressDO address;
-
-  protected AddressFilter addressFilter = new AddressFilter();
 
   private RepeatingView phoneNumbersRepeatingView;
 
@@ -148,7 +144,7 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
       public Serializable getObject()
       {
         // Pseudo object for storing search string (title field is used for this foreign purpose).
-        return new AddressDO().setName(addressFilter.getSearchString());
+        return new AddressDO().setName(phoneNumber);
       }
 
       @Override
@@ -156,16 +152,17 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
       {
         if (object != null) {
           if (object instanceof String) {
-            addressFilter.setSearchString((String) object);
+            phoneNumber = (String) object;
           }
         } else {
-          addressFilter.setSearchString("");
+          phoneNumber = "";
         }
       }
     }) {
       @Override
       protected List<AddressDO> getChoices(String input)
       {
+        final AddressFilter addressFilter = new AddressFilter();
         addressFilter.setSearchString(input);
         addressFilter.setSearchFields("name", "firstName", "organization");
         return addressDao.getList(addressFilter);
@@ -174,7 +171,7 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
       @Override
       protected List<String> getRecentUserInputs()
       {
-        return parentPage.getRecentSearchTermsQueue().getRecents();
+        return parentPage.getRecentCallsQueue().getRecents();
       }
 
       @Override
@@ -196,35 +193,19 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
           @Override
           public Object convertToObject(final String value, final Locale locale)
           {
-            addressFilter.setSearchString(value);
-            return null;
+            phoneNumber = value;
+            return new AddressDO().setName(phoneNumber);
           }
 
           @Override
           public String convertToString(final Object value, final Locale locale)
           {
-            return addressFilter.getSearchString();
+            return phoneNumber;
           }
         };
       }
     };
     numberTextField.withLabelValue(true).withMatchContains(true).withMinChars(2).withFocus(true).withAutoSubmit(true);
-    numberTextField.add(new AbstractValidator() {
-      @Override
-      protected void onValidate(IValidatable validatable)
-      {
-        final String value = (String) validatable.getValue();
-        if (StringUtils.containsOnly(value, "0123456789+-/() ") == false) {
-          error(validatable);
-        }
-      }
-
-      @Override
-      protected String resourceKey()
-      {
-        return "address.phoneCall.number.invalid";
-      }
-    });
     add(numberTextField);
     add(new TooltipImage("numberHelp", getResponse(), WebConstants.IMAGE_HELP_KEYBOARD, getString("address.directCall.number.tooltip")));
 
@@ -339,8 +320,10 @@ public class PhoneCallForm extends AbstractForm<PhoneCallData, PhoneCallPage>
       @Override
       public void onClick()
       {
-        PhoneCallForm.this.phoneNumber = phoneNumber;
+        setPhoneNumber(parentPage.extractPhonenumber(phoneNumber));
+        numberTextField.setModelObject(new AddressDO().setName(getPhoneNumber()));
         numberTextField.modelChanged();
+        parentPage.call();
       }
     };
     item.add(link);

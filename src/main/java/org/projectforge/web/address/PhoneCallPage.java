@@ -68,7 +68,7 @@ public class PhoneCallPage extends AbstractSecuredPage
 
   private String result;
 
-  private RecentQueue<String> recentSearchTermsQueue;
+  private RecentQueue<String> recentCallsQueue;
 
   @SuppressWarnings("serial")
   public PhoneCallPage(PageParameters parameters)
@@ -171,7 +171,7 @@ public class PhoneCallPage extends AbstractSecuredPage
     form.setPhoneNumber(phoneNumber);
   }
 
-  private String extractPhonenumber(String number)
+  String extractPhonenumber(String number)
   {
     final String result = NumberHelper.extractPhonenumber(number, configuration
         .getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
@@ -182,22 +182,28 @@ public class PhoneCallPage extends AbstractSecuredPage
     }
     return result;
   }
-  
+
   @Override
   protected void onBeforeRender()
   {
     super.onBeforeRender();
-    form.setPhoneNumber(form.numberTextField.getRawInput());
+    final String rawInput = form.numberTextField.getRawInput();
+    if (StringUtils.isNotEmpty(rawInput) == true) {
+      form.setPhoneNumber(rawInput);
+    }
     processPhoneNumber();
-    form.refresh();
-    form.numberTextField.setModelObject(new AddressDO().setName(form.getPhoneNumber()));
     form.numberTextField.modelChanged();
+    form.refresh();
   }
-  
+
   void call()
   {
     boolean extracted = processPhoneNumber();
     if (extracted == true) {
+      return;
+    }
+    if (StringUtils.containsOnly(form.getPhoneNumber(), "0123456789+-/() ") == false) {
+      form.addError("address.phoneCall.number.invalid");
       return;
     }
     form.setPhoneNumber(extractPhonenumber(form.getPhoneNumber()));
@@ -231,7 +237,6 @@ public class PhoneCallPage extends AbstractSecuredPage
     } else {
       buf.append("???");
     }
-    getRecentSearchTermsQueue().append(buf.toString());
     final HttpClient client = new HttpClient();
     String url = this.configuration.getTelephoneSystemUrl();
     url = StringUtils.replaceOnce(url, "#source", form.getMyCurrentPhoneId());
@@ -239,19 +244,20 @@ public class PhoneCallPage extends AbstractSecuredPage
     final String urlProtected = StringHelper.hideStringEnding(url, 'x', 3);
     final GetMethod method = new GetMethod(url);
     String errorKey = null;
-     try {
-    form.lastSuccessfulPhoneCall = new Date();
-    client.executeMethod(method);
-    final String resultStatus = method.getResponseBodyAsString();
-    if ("0".equals(resultStatus) == true) {
-      result = DateTimeFormatter.instance().getFormattedDateTime(new Date()) + ": " + getString("address.phoneCall.result.successful");
-    } else if ("2".equals(resultStatus) == true) {
-      errorKey = "address.phoneCall.result.wrongSourceNumber";
-    } else if ("3".equals(resultStatus) == true) {
-      errorKey = "address.phoneCall.result.wrongDestinationNumber";
-    } else {
-      errorKey = "address.phoneCall.result.callingError";
-    }
+    try {
+      form.lastSuccessfulPhoneCall = new Date();
+      client.executeMethod(method);
+      final String resultStatus =method.getResponseBodyAsString();
+      if ("0".equals(resultStatus) == true) {
+        result = DateTimeFormatter.instance().getFormattedDateTime(new Date()) + ": " + getString("address.phoneCall.result.successful");
+        getRecentCallsQueue().append(buf.toString());
+      } else if ("2".equals(resultStatus) == true) {
+        errorKey = "address.phoneCall.result.wrongSourceNumber";
+      } else if ("3".equals(resultStatus) == true) {
+        errorKey = "address.phoneCall.result.wrongDestinationNumber";
+      } else {
+        errorKey = "address.phoneCall.result.callingError";
+      }
     } catch (HttpException ex) {
       result = "Call failed. Please contact administrator.";
       log.fatal(result + ": " + urlProtected);
@@ -260,23 +266,23 @@ public class PhoneCallPage extends AbstractSecuredPage
       result = "Call failed. Please contact administrator.";
       log.fatal(result + ": " + urlProtected);
       throw new RuntimeException(ex);
-    }
+  }
     if (errorKey != null) {
       form.addError(errorKey);
     }
   }
 
   @SuppressWarnings("unchecked")
-  protected RecentQueue<String> getRecentSearchTermsQueue()
+  protected RecentQueue<String> getRecentCallsQueue()
   {
-    if (recentSearchTermsQueue == null) {
-      recentSearchTermsQueue = (RecentQueue<String>) getUserPrefEntry(USER_PREF_KEY_RECENT_CALLS);
+    if (recentCallsQueue == null) {
+      recentCallsQueue = (RecentQueue<String>) getUserPrefEntry(USER_PREF_KEY_RECENT_CALLS);
     }
-    if (recentSearchTermsQueue == null) {
-      recentSearchTermsQueue = new RecentQueue<String>();
-      putUserPrefEntry(USER_PREF_KEY_RECENT_CALLS, recentSearchTermsQueue, true);
+    if (recentCallsQueue == null) {
+      recentCallsQueue = new RecentQueue<String>();
+      putUserPrefEntry(USER_PREF_KEY_RECENT_CALLS, recentCallsQueue, true);
     }
-    return recentSearchTermsQueue;
+    return recentCallsQueue;
   }
 
   protected String getRecentMyPhoneId()
