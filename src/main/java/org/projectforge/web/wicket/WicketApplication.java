@@ -61,6 +61,7 @@ import org.projectforge.web.UserFilter;
 import org.projectforge.web.access.AccessListPage;
 import org.projectforge.web.address.AddressListPage;
 import org.projectforge.web.address.AddressViewPage;
+import org.projectforge.web.address.PhoneCallPage;
 import org.projectforge.web.address.SendSmsPage;
 import org.projectforge.web.admin.AdminPage;
 import org.projectforge.web.admin.SetupPage;
@@ -174,6 +175,8 @@ public class WicketApplication extends WebApplication
   private static final String BOOKMARK_MY_ACCOUNT = "myAccount";
 
   private static final String BOOKMARK_PERSONAL_STATISTICS = "personalStatistics";
+
+  private static final String BOOKMARK_PHONE_CALL = "phoneCall";
 
   private static final String BOOKMARK_POSTAUSGANG_LIST = "postausgangList";
 
@@ -369,6 +372,7 @@ public class WicketApplication extends WebApplication
     mountPage(BOOKMARK_MEB_LIST, MebListPage.class);
     mountPage(BOOKMARK_MY_ACCOUNT, MyAccountEditPage.class);
     mountPage(BOOKMARK_PERSONAL_STATISTICS, PersonalStatisticsPage.class);
+    mountPage(BOOKMARK_PHONE_CALL, PhoneCallPage.class);
     mountPage(BOOKMARK_POSTAUSGANG_LIST, PostausgangListPage.class);
     mountPage(BOOKMARK_POSTEINGANG_LIST, PosteingangListPage.class);
     mountPage(BOOKMARK_HR_PLANNING_LIST, HRPlanningListPage.class);
