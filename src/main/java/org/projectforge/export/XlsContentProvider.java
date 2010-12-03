@@ -190,7 +190,6 @@ public class XlsContentProvider implements ContentProvider
 
   /**
    * 
-   * @see de.micromata.excel.exp.ContentProvider#setValue(org.apache.poi.hssf.usermodel.HSSFCell, java.lang.Object)
    */
   public void setValue(ExportCell cell, Object value, String property)
   {
