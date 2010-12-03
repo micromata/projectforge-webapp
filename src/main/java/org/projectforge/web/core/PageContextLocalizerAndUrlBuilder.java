@@ -23,46 +23,44 @@
 
 package org.projectforge.web.core;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.PageContext;
 
-import net.sourceforge.stripes.util.UrlBuilder;
-
-import org.apache.commons.lang.Validate;
 import org.projectforge.user.PFUserContext;
 
-
 /**
- *
+ * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @Deprecated
 public class PageContextLocalizerAndUrlBuilder implements LocalizerAndUrlBuilder
 {
-  private PageContext pageContext;
-  
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PageContextLocalizerAndUrlBuilder.class);
+
+  // private PageContext pageContext;
+
   public PageContextLocalizerAndUrlBuilder(PageContext pageContext)
   {
-    this.pageContext = pageContext;
+    // this.pageContext = pageContext;
   }
 
   public String buildUrl(String url)
   {
-    Validate.notNull(pageContext);
-    Validate.notNull(url);
-    HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
-    HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
-    String contextPath = request.getContextPath();
-
-    // Append the context path, but only if the user didn't already
-    if (url.startsWith("/") == true && "/".equals(contextPath) == false && url.contains(contextPath + "/") == false) {
-      url = contextPath + url;
-    }
-    // Add all the parameters and reset the href attribute; pass to false here because
-    // the HtmlTagSupport will HtmlEncode the ampersands for us
-    UrlBuilder builder = new UrlBuilder(PFUserContext.getLocale(), url, false);
-    return response.encodeURL(builder.toString());
+    log.error("Not yet supported!");
+    return url;
+    // Validate.notNull(pageContext);
+    // Validate.notNull(url);
+    // HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
+    // HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
+    // String contextPath = request.getContextPath();
+    //
+    // // Append the context path, but only if the user didn't already
+    // if (url.startsWith("/") == true && "/".equals(contextPath) == false && url.contains(contextPath + "/") == false) {
+    // url = contextPath + url;
+    // }
+    // // Add all the parameters and reset the href attribute; pass to false here because
+    // // the HtmlTagSupport will HtmlEncode the ampersands for us
+    // UrlBuilder builder = new UrlBuilder(PFUserContext.getLocale(), url, false);
+    // return response.encodeURL(builder.toString());
   }
 
   public String getLocalizedMessage(String messageKey, Object... params)
