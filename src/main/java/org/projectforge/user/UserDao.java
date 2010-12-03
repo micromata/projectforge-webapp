@@ -61,7 +61,7 @@ public class UserDao extends BaseDao<PFUserDO>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserDao.class);
 
-  private static final String MESSAGE_KEY_USER_NOT_AUTHENTICATED = "user.changePassword.error.notAuthenticated";
+  private static final String MESSAGE_KEY_OLD_PASSWORD_WRONG = "user.changePassword.error.oldPasswordWrong";
 
   static final String MESSAGE_KEY_PASSWORD_QUALITY_CHECK_FAILED = "user.changePassword.error.passwordQualityCheckFailed";
 
@@ -312,7 +312,7 @@ public class UserDao extends BaseDao<PFUserDO>
     oldPassword = newPassword = "";
     user = getUser(user.getUsername(), encryptedOldPassword);
     if (user == null) {
-      return MESSAGE_KEY_USER_NOT_AUTHENTICATED;
+      return MESSAGE_KEY_OLD_PASSWORD_WRONG;
     }
     user.setPassword(encryptedNewPassword);
     user.setStayLoggedInKey(createStayLoggedInKey());
