@@ -1,0 +1,24 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<table>
+  <wicket:extend>
+    <tr>
+      <th><wicket:message key="fibu.konto.nummer" /></th>
+      <td><input wicket:id="nummer" size="8" maxlength="8" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="fibu.konto.bezeichnung" /></th>
+      <td><input class="stdtext" wicket:id="identifier" /></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="description" /></th>
+      <td><textarea class="stdtext" wicket:id="description" style="height: 20ex;">[description]</textarea></td>
+    </tr>
+  </wicket:extend>
+</table>
+</body>
+</html>
