@@ -49,7 +49,7 @@ import org.projectforge.user.UserPrefArea;
 import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefEntryDO;
 import org.projectforge.web.fibu.Kost2DropDownChoice;
-import org.projectforge.web.fibu.KundeSelectPanel;
+import org.projectforge.web.fibu.CustomerSelectPanel;
 import org.projectforge.web.fibu.ProjektSelectPanel;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
@@ -261,7 +261,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           }
           valueField = projektSelectPanel;
         } else if (KundeDO.class.isAssignableFrom(param.getType()) == true) {
-          final KundeSelectPanel kundeSelectPanel = new KundeSelectPanel("valueField", new PropertyModel<KundeDO>(param, "valueAsObject"),
+          final CustomerSelectPanel kundeSelectPanel = new CustomerSelectPanel("valueField", new PropertyModel<KundeDO>(param, "valueAsObject"),
               null, parentPage, param.getParameter());
           if (data.getArea() == UserPrefArea.KUNDE_FAVORITE) {
             kundeSelectPanel.setShowFavorites(false);
