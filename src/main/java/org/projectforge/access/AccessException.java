@@ -32,9 +32,8 @@ import org.projectforge.core.ProjectForgeException;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-
-import de.micromata.user.ContextHolder;
 
 /**
  * This class will be thrown by AccessChecker, if no access is given for the demanded action by an user.
@@ -77,7 +76,7 @@ public class AccessException extends ProjectForgeException
 
   public AccessException(AccessType accessType, OperationType operationType)
   {
-    PFUserDO user = (PFUserDO) ContextHolder.getUserInfo();
+    final PFUserDO user = PFUserContext.getUser();
     this.user = user;
     this.accessType = accessType;
     this.operationType = operationType;
@@ -87,7 +86,7 @@ public class AccessException extends ProjectForgeException
 
   public AccessException(Integer taskId, AccessType accessType, OperationType operationType)
   {
-    PFUserDO user = (PFUserDO) ContextHolder.getUserInfo();
+    final PFUserDO user = PFUserContext.getUser();
     this.user = user;
     this.taskId = taskId;
     this.accessType = accessType;

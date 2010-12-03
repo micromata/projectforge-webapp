@@ -35,14 +35,13 @@ import org.hibernate.LockMode;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
 import org.projectforge.core.BaseDao;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import de.micromata.user.ContextHolder;
 
 /**
  * 
@@ -96,7 +95,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
     Validate.notNull(obj);
     Validate.notNull(obj.getOwnerId());
     Validate.notNull(obj.getAddressId());
-    final PFUserDO owner = (PFUserDO) ContextHolder.getUserInfo();
+    final PFUserDO owner = PFUserContext.getUser();
     if (owner == null || owner.getId().equals(obj.getOwnerId()) == false) {
       throw new AccessException("address.accessException.userIsNotOwnerOfPersonalAddress");
     }
@@ -168,7 +167,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public PersonalAddressDO getByAddressId(Integer addressId)
   {
-    PFUserDO owner = (PFUserDO) ContextHolder.getUserInfo();
+    final PFUserDO owner = PFUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
     List<PersonalAddressDO> list = getHibernateTemplate().find(
@@ -197,7 +196,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<PersonalAddressDO> getList()
   {
-    PFUserDO owner = (PFUserDO) ContextHolder.getUserInfo();
+    final PFUserDO owner = PFUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
     List<PersonalAddressDO> list = getHibernateTemplate().find(
@@ -215,7 +214,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public Map<Integer, PersonalAddressDO> getPersonalAddressByAddressId()
   {
-    PFUserDO owner = (PFUserDO) ContextHolder.getUserInfo();
+    final PFUserDO owner = PFUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
     List<PersonalAddressDO> list = getHibernateTemplate().find(
@@ -237,7 +236,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<AddressDO> getMyAddresses()
   {
-    PFUserDO owner = (PFUserDO) ContextHolder.getUserInfo();
+    final PFUserDO owner = PFUserContext.getUser();
     Validate.notNull(owner);
     Validate.notNull(owner.getId());
     List<PersonalAddressDO> list = getHibernateTemplate().find(

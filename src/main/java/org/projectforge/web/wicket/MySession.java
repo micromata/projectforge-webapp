@@ -34,8 +34,6 @@ import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 
-import de.micromata.user.ContextHolder;
-
 public class MySession extends WebSession
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MySession.class);
@@ -100,7 +98,7 @@ public class MySession extends WebSession
       log.info("User logged out: " + user.getShortDisplayName());
       user = null;
     }
-    ContextHolder.setUserInfo(null);
+    PFUserContext.setUser(null);
     super.clear();
     super.invalidate();
   }

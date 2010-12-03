@@ -33,9 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.web.UserFilter;
 import org.projectforge.web.core.ResponseUtils;
-
-import de.micromata.user.LogonFilter;
 
 /**
  * Servlet Funktion: Download der Daten als Image (croppedimage) Wird benötigt um Bild auf lokalem Rechner zu speichern. Dieses Servlet wird
@@ -52,7 +51,7 @@ public class DownloadImageFile extends HttpServlet
   protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
   {
     log.debug("Start doPost");
-    final PFUserDO user = (PFUserDO) request.getSession().getAttribute(LogonFilter.USER_ATTRIBUTE);
+    final PFUserDO user = UserFilter.getUser(request);
     if (user == null) {
       log.warn("Calling of UploadImageFileTemp without logged in user.");
       return;

@@ -41,8 +41,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.thoughtworks.xstream.XStream;
 
-import de.micromata.user.ContextHolder;
-
 /**
  * Stores all user persistent objects such as filter settings, personal settings and persists them to the database.
  * 
@@ -110,7 +108,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
   public void checkAccess(Integer userId)
   {
     Validate.notNull(userId);
-    PFUserDO user = (PFUserDO) ContextHolder.getUserInfo();
+    final PFUserDO user = PFUserContext.getUser();
     if (ObjectUtils.equals(userId, user.getId()) == false) {
       accessChecker.checkIsUserMemberOfAdminGroup();
     }

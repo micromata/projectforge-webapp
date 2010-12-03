@@ -33,11 +33,10 @@ import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import de.micromata.user.ContextHolder;
 
 /**
  * 
@@ -139,7 +138,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
     Validate.notNull(obj);
     boolean result = accessChecker.isUserMemberOfAdminGroup();
     if (result == false && obj.isDeleted() == false) {
-      PFUserDO user = (PFUserDO) ContextHolder.getUserInfo();
+      final PFUserDO user = PFUserContext.getUser();
       Validate.notNull(user);
       result = userGroupCache.isUserMemberOfGroup(user.getId(), obj.getGroupId());
     }

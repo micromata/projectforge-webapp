@@ -68,6 +68,7 @@ import org.projectforge.common.DateHolder;
 import org.projectforge.common.StringHelper;
 import org.projectforge.database.DatabaseDao;
 import org.projectforge.lucene.PFAnalyzer;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRightId;
@@ -84,7 +85,6 @@ import de.micromata.hibernate.history.HistoryAdapter;
 import de.micromata.hibernate.history.HistoryEntry;
 import de.micromata.hibernate.history.HistoryUserRetriever;
 import de.micromata.hibernate.history.delta.PropertyDelta;
-import de.micromata.user.ContextHolder;
 
 /**
  * 
@@ -1255,7 +1255,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   protected void createHistoryEntry(Object entity, Number id, String property, Class< ? > valueClass, Object oldValue, Object newValue)
   {
     accessChecker.checkDemoUser();
-    final PFUserDO contextUser = ((PFUserDO) ContextHolder.getUserInfo());
+    final PFUserDO contextUser = PFUserContext.getUser();
     final String userPk = contextUser != null ? contextUser.getId().toString() : null;
     if (userPk == null) {
       log.warn("No user found for creating history entry.");

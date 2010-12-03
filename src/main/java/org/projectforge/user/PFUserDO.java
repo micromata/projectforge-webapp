@@ -58,8 +58,6 @@ import org.projectforge.core.Configuration;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.ShortDisplayNameCapable;
 
-import de.micromata.user.UserInfo;
-
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -68,7 +66,7 @@ import de.micromata.user.UserInfo;
 @Entity
 @Indexed
 @Table(name = "T_PF_USER", uniqueConstraints = { @UniqueConstraint(columnNames = { "username"})})
-public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable, UserInfo
+public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PFUserDO.class);
 

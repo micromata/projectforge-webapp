@@ -50,8 +50,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import de.micromata.user.ContextHolder;
-
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -399,7 +397,7 @@ public class UserDao extends BaseDao<PFUserDO>
   public void updateMyAccount(PFUserDO user)
   {
     accessChecker.checkDemoUser();
-    final PFUserDO contextUser = ((PFUserDO) ContextHolder.getUserInfo());
+    final PFUserDO contextUser = PFUserContext.getUser();
     Validate.isTrue(user.getId().equals(contextUser.getId()) == true);
     PFUserDO dbUser = (PFUserDO) getHibernateTemplate().load(clazz, user.getId(), LockMode.PESSIMISTIC_WRITE);
     if (copyValues(user, dbUser, "deleted", "password", "lastLogin", "loginFailures", "orgUnit", "role", "username", "stayLoggedInKey", "rights") == true) {

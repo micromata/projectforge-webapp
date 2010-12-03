@@ -40,8 +40,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.projectforge.user.PFUserDO;
-
-import de.micromata.user.LogonFilter;
+import org.projectforge.web.UserFilter;
 
 /**
  * Servlet Funktion: Temporärer Upload eines Images in das Verzeichnis tempimages. Wird benötigt um Bild vom lokalen Rechner über den Server
@@ -62,7 +61,7 @@ public class UploadImageFileTemporary extends HttpServlet
   protected void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
   {
     log.debug("Start doPost");
-    final PFUserDO user = (PFUserDO) request.getSession().getAttribute(LogonFilter.USER_ATTRIBUTE);
+    final PFUserDO user = UserFilter.getUser(request);
     if (user == null) {
       log.warn("Calling of UploadImageFileTemp without logged in user.");
       return;

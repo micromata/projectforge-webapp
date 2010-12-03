@@ -26,6 +26,7 @@ package org.projectforge.core;
 import java.util.Locale;
 
 import org.hibernate.Session;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 
 import de.micromata.hibernate.history.HistoryEntry;
@@ -33,7 +34,6 @@ import de.micromata.hibernate.history.HistoryUserRetriever;
 import de.micromata.hibernate.history.delta.PropertyDelta;
 import de.micromata.hibernate.history.web.HistoryTable;
 import de.micromata.hibernate.history.web.HistoryTag;
-import de.micromata.user.ContextHolder;
 
 /**
  * @author wolle
@@ -73,7 +73,7 @@ public class HistoryUser implements HistoryUserRetriever
    */
   public String getPrincipal()
   {
-    PFUserDO user = (PFUserDO)ContextHolder.getUserInfo();
+    final PFUserDO user = PFUserContext.getUser();
     if (user == null) {
       return null;
     }

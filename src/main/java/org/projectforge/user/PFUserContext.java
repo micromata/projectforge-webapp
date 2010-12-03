@@ -31,11 +31,8 @@ import java.util.TimeZone;
 import org.apache.commons.lang.ObjectUtils;
 import org.projectforge.core.Configuration;
 
-import de.micromata.user.ContextHolder;
-
 /**
- * Helper methods for ContextHolder.
- * @see ContextHolder
+ * ThreadLocal context.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class PFUserContext
@@ -44,21 +41,30 @@ public class PFUserContext
 
   public static final String BUNDLE_NAME = "I18nResources";
 
+  private static ThreadLocal<PFUserDO> context = new ThreadLocal<PFUserDO>();
+
   /**
-   * @return The user of the ContextHolder if exists.
-   * @see ContextHolder#getUserInfo()
+   * @return The user of ThreadLocal if exists.
    */
   public final static PFUserDO getUser()
   {
-    return (PFUserDO) ContextHolder.getUserInfo();
+    return context.get();
   }
-  
-  public final static void setUser(final PFUserDO user) {
-    ContextHolder.setUserInfo(user);
+
+  public final static void setUser(final PFUserDO user)
+  {
+    if (log.isDebugEnabled() == true) {
+      log.debug("setUserInfo: " + user != null ? user.getDisplayUsername() : "null" + ", was: " + context.get() != null ? context.get()
+          .getDisplayUsername() : "null");
+    }
+    context.set(user);
+    if (log.isDebugEnabled() == true) {
+      log.debug("user is now: " + context.get() != null ? context.get().getDisplayUsername() : "null");
+    }
   }
 
   /**
-   * @return The user id of the ContextHolder if exists.
+   * @return The user id of the ThreadLocal user if exists.
    * @see #getUser()
    */
   public final static Integer getUserId()

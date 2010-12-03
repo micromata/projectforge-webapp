@@ -51,8 +51,6 @@ import org.projectforge.web.meb.SMSReceiverServlet;
 import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketUtils;
 
-import de.micromata.user.UserInfo;
-
 /**
  * Ensures that an user is logged in and put the user id, locale and ip to the logging mdc.<br/>
  * Ignores login for: /ProjectForge/wa/resources/* with the suffixes: *.js, *.css, *.gif, *.png. <br/>
@@ -271,10 +269,10 @@ public class UserFilter implements Filter
 
   /**
    * @param request
-   * @param info
+   * @param user
    * @return
    */
-  protected HttpServletRequest decorateWithLocale(HttpServletRequest request, UserInfo info)
+  protected HttpServletRequest decorateWithLocale(HttpServletRequest request, final PFUserDO user)
   {
     final Locale locale = PFUserContext.getLocale(request.getLocale());
     request = new HttpServletRequestWrapper(request) {

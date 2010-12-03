@@ -45,8 +45,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import de.micromata.user.ContextHolder;
-
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -302,7 +300,7 @@ public class GroupDao extends BaseDao<GroupDO>
     Validate.notNull(obj);
     boolean result = accessChecker.isUserMemberOfAdminGroup();
     if (result == false && obj.isDeleted() == false) {
-      PFUserDO user = (PFUserDO) ContextHolder.getUserInfo();
+      final PFUserDO user = PFUserContext.getUser();
       Validate.notNull(user);
       result = userGroupCache.isUserMemberOfGroup(user.getId(), obj.getId());
     }

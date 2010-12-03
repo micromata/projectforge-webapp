@@ -40,8 +40,6 @@ import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.user.UserRights;
 
-import de.micromata.user.ContextHolder;
-
 /**
  * This class contains some helper methods for evaluation of user and group access'.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -65,7 +63,7 @@ public class AccessChecker
   public boolean hasPermission(final Integer taskId, final AccessType accessType, final OperationType operationType,
       final boolean throwException)
   {
-    final PFUserDO user = (PFUserDO) ContextHolder.getUserInfo();
+    final PFUserDO user = PFUserContext.getUser();
     Validate.notNull(user);
     if (userGroupCache.isUserMemberOfAdminGroup(user.getId()) == true) {
       // A user group "Admin" has always access.
@@ -159,7 +157,7 @@ public class AccessChecker
   }
 
   /**
-   * Checks if the user of the ContextHolder (logged in user) is member at least of one of the given groups.
+   * Checks if the user of the PFUserContext (logged in user) is member at least of one of the given groups.
    * 
    * @param groups
    * @see #isUserMemberOfGroup(boolean, ProjectForgeGroup...)
@@ -170,7 +168,7 @@ public class AccessChecker
   }
 
   /**
-   * Checks if the user of the ContextHolder (logged in user) is member at least of one of the given groups.
+   * Checks if the user of the PFUserContext (logged in user) is member at least of one of the given groups.
    * 
    * @param throwException default false.
    * @param groups
@@ -179,7 +177,7 @@ public class AccessChecker
   public boolean isUserMemberOfGroup(boolean throwException, ProjectForgeGroup... groups)
   {
     Validate.notNull(groups);
-    final PFUserDO user = (PFUserDO) ContextHolder.getUserInfo();
+    final PFUserDO user = PFUserContext.getUser();
     if (user == null) {
       // Before user is logged in.
       if (throwException == true) {
@@ -235,14 +233,14 @@ public class AccessChecker
   }
 
   /**
-   * Gets the user from the ContextHolder and compares the both user.
+   * Gets the user from the PFUserContext and compares the both user.
    * @param user
    * @return
    * @see AccessChecker#userEquals(PFUserDO, PFUserDO)
    */
   public boolean userEqualsToContextUser(final PFUserDO user)
   {
-    return userEquals((PFUserDO) ContextHolder.getUserInfo(), user);
+    return userEquals(PFUserContext.getUser(), user);
   }
 
   /**
@@ -257,7 +255,7 @@ public class AccessChecker
       // No groups found.
       return false;
     }
-    Collection<Integer> currentUserGroups = userGroupCache.getUserGroups((PFUserDO) ContextHolder.getUserInfo());
+    Collection<Integer> currentUserGroups = userGroupCache.getUserGroups(PFUserContext.getUser());
     if (currentUserGroups == null) {
       // User has now associated groups.
       return false;
@@ -285,7 +283,7 @@ public class AccessChecker
     Validate.notNull(right);
     boolean result;
     if (right instanceof UserRightAccessCheck< ? >) {
-      final PFUserDO user = (PFUserDO) ContextHolder.getUserInfo();
+      final PFUserDO user = PFUserContext.getUser();
       Validate.notNull(user);
       switch (operationType) {
         case SELECT:
@@ -417,7 +415,7 @@ public class AccessChecker
    */
   public boolean hasRight(final UserRightId rightId, final boolean throwException, final UserRightValue... values)
   {
-    final PFUserDO user = (PFUserDO) ContextHolder.getUserInfo();
+    final PFUserDO user = PFUserContext.getUser();
     Validate.notNull(user);
     Validate.notNull(values);
     final UserRightDO rightDO = user.getRight(rightId);
@@ -486,7 +484,7 @@ public class AccessChecker
     final UserRight right = userRights.getRight(rightId);
     Validate.notNull(right);
     if (right instanceof UserRightAccessCheck< ? >) {
-      final PFUserDO user = (PFUserDO) ContextHolder.getUserInfo();
+      final PFUserDO user = PFUserContext.getUser();
       Validate.notNull(user);
       if (((UserRightAccessCheck) right).hasHistoryAccess(obj) == true) {
         return true;
@@ -525,7 +523,7 @@ public class AccessChecker
 
   public boolean isDemoUser()
   {
-    final PFUserDO user = (PFUserDO) ContextHolder.getUserInfo();
+    final PFUserDO user = PFUserContext.getUser();
     if (user == null) {
       return false;
     }
