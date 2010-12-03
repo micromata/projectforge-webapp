@@ -29,7 +29,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
-import org.projectforge.web.core.SpringContext;
+import org.projectforge.web.filter.SpringContext;
 
 /**
  * TaskPathBridge for hibernate search to search in the parent task titles.
