@@ -27,9 +27,8 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.util.Locale;
 
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-
-import de.micromata.user.ContextHolder;
 
 public class TestHelper
 {
@@ -37,7 +36,7 @@ public class TestHelper
   {
     final PFUserDO user = new PFUserDO();
     user.setLocale(locale);
-    ContextHolder.setUserInfo(user);
+    PFUserContext.setUser(user);
   }
 
   public static void setDeclaredField(final Object obj, final String fieldName, final Object value)
@@ -61,7 +60,7 @@ public class TestHelper
     }
   }
 
-  public static void setDeclaredStaticField(final Class<?> clazz, final String fieldName, final Object value)
+  public static void setDeclaredStaticField(final Class< ? > clazz, final String fieldName, final Object value)
   {
     Field field;
     try {

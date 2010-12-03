@@ -29,10 +29,8 @@ import java.math.BigDecimal;
 import java.util.Locale;
 
 import org.junit.Test;
-import org.projectforge.common.NumberHelper;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-
-import de.micromata.user.ContextHolder;
 
 public class NumberHelperTest
 {
@@ -147,7 +145,7 @@ public class NumberHelperTest
   {
     PFUserDO user = new PFUserDO();
     user.setLocale(Locale.UK);
-    ContextHolder.setUserInfo(user);
+    PFUserContext.setUser(user);
     assertEquals("0 bytes", NumberHelper.formatBytes(0));
     assertEquals("1023 bytes", NumberHelper.formatBytes(1023));
     assertEquals("1 kb", NumberHelper.formatBytes(1024));

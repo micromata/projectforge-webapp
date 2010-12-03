@@ -35,10 +35,9 @@ import java.util.TimeZone;
 import org.apache.wicket.util.convert.ConversionException;
 import org.junit.Test;
 import org.projectforge.common.DateHelper;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.wicket.converter.MyDateConverter;
-
-import de.micromata.user.ContextHolder;
 
 public class MyDateConverterTest
 {
@@ -111,7 +110,7 @@ public class MyDateConverterTest
     PFUserDO user = new PFUserDO();
     user.setTimeZone(DateHelper.EUROPE_BERLIN);
     user.setLocale(Locale.GERMAN);
-    ContextHolder.setUserInfo(user);
+    PFUserContext.setUser(user);
     Date testDate = createDate(1970, 10, 21, 0, 0, 0, 0, DateHelper.EUROPE_BERLIN);
     assertEquals("21.11.70", conv.convertToString(testDate, Locale.GERMAN));
     user.setLocale(Locale.ENGLISH);
@@ -131,7 +130,7 @@ public class MyDateConverterTest
 
     PFUserDO user = new PFUserDO();
     user.setTimeZone(timeZone);
-    ContextHolder.setUserInfo(user);
+    PFUserContext.setUser(user);
     Date testDate = createDate(1970, 9, 21, 0, 0, 0, 0, timeZone);
     Date date = (Date) conv.convertToObject("21.10.1970", Locale.GERMAN);
     assertDates(testDate, date);
@@ -193,7 +192,7 @@ public class MyDateConverterTest
     MyDateConverter conv = new MyDateConverter();
     PFUserDO user = new PFUserDO();
     user.setTimeZone(timeZone);
-    ContextHolder.setUserInfo(user);
+    PFUserContext.setUser(user);
     Date testDate = createDate(1970, 9, 21, 0, 0, 0, 0, timeZone);
     Date date = (Date) conv.convertToObject("10/21/1970", Locale.ENGLISH);
     assertDates(testDate, date);

@@ -47,6 +47,7 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.core.SimpleHistoryEntry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
@@ -60,7 +61,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import de.micromata.hibernate.history.HistoryEntry;
 import de.micromata.hibernate.history.HistoryEntryType;
 import de.micromata.hibernate.history.delta.PropertyDelta;
-import de.micromata.user.ContextHolder;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -165,7 +165,7 @@ public class TestBase
 
   protected static void clearDatabase()
   {
-    ContextHolder.setUserInfo(ADMIN_USER); // Logon admin user.
+    PFUserContext.setUser(ADMIN_USER); // Logon admin user.
     TransactionTemplate transactionTemplate = configuration.getBean("txTemplate", TransactionTemplate.class);
     final HibernateTemplate hibernateTemplate = configuration.getBean("hibernate", HibernateTemplate.class);
     transactionTemplate.execute(new TransactionCallback() {
@@ -242,18 +242,18 @@ public class TestBase
     if (user == null) {
       fail("User not found: " + username);
     }
-    ContextHolder.setUserInfo(user);
+    PFUserContext.setUser(user);
     return user;
   }
 
   protected void logon(PFUserDO user)
   {
-    ContextHolder.setUserInfo(user);
+    PFUserContext.setUser(user);
   }
 
   protected void logoff()
   {
-    ContextHolder.setUserInfo(null);
+    PFUserContext.setUser(null);
   }
 
   /**
