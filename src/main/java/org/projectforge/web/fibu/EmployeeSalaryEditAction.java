@@ -23,135 +23,107 @@
 
 package org.projectforge.web.fibu;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-
-import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.action.StrictBinding;
-import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.EnumeratedTypeConverter;
-import net.sourceforge.stripes.validation.IntegerTypeConverter;
-import net.sourceforge.stripes.validation.Validate;
-import net.sourceforge.stripes.validation.ValidateNestedProperties;
-
-import org.apache.log4j.Logger;
-import org.projectforge.common.DateHelper;
-import org.projectforge.common.LabelValueBean;
-import org.projectforge.core.Constants;
-import org.projectforge.fibu.EmployeeSalaryDO;
-import org.projectforge.fibu.EmployeeSalaryDao;
-import org.projectforge.fibu.EmployeeSalaryType;
-import org.projectforge.web.core.BaseAction;
-import org.projectforge.web.core.BaseEditAction;
-import org.projectforge.web.core.BaseEditActionBean;
-import org.projectforge.web.core.Select;
-import org.projectforge.web.stripes.CurrencyTypeConverter;
 
 
-@StrictBinding
-@UrlBinding("/secure/fibu/EmployeeSalaryEdit.action")
-@BaseAction(jspUrl = "/WEB-INF/jsp/fibu/employeeSalaryEdit.jsp")
-@BaseEditAction(listAction = EmployeeSalaryListAction.class)
-public class EmployeeSalaryEditAction extends BaseEditActionBean<EmployeeSalaryDao, EmployeeSalaryDO>
+public class EmployeeSalaryEditAction //extends BaseEditActionBean<EmployeeSalaryDao, EmployeeSalaryDO>
 {
-  private static final Logger log = Logger.getLogger(EmployeeSalaryEditAction.class);
-
-  private EmployeeSalaryEditRecentEntry recent;
-
-  public void setEmployeeSalaryDao(EmployeeSalaryDao employeeSalaryDao)
-  {
-    this.baseDao = employeeSalaryDao;
-  }
-
-  public List<LabelValueBean<String, Integer>> getMonthList()
-  {
-    return DateHelper.getMonthList();
-  }
-
-  public List<LabelValueBean<String, EmployeeSalaryType>> getTypeList()
-  {
-    List<LabelValueBean<String, EmployeeSalaryType>> list = new ArrayList<LabelValueBean<String, EmployeeSalaryType>>();
-    for (EmployeeSalaryType type : EmployeeSalaryType.values()) {
-      list.add(new LabelValueBean<String, EmployeeSalaryType>(getLocalizedString("fibu.employee.salary.type." + type.getKey()), type));
-    }
-    return list;
-  }
-
-  @Override
-  protected void onPreEdit()
-  {
-    if (getData().getId() == null) {
-      recent = getRecent();
-      getData().setYear(recent.getYear());
-      getData().setMonth(recent.getMonth());
-    }
-  }
-
-  private EmployeeSalaryEditRecentEntry getRecent()
-  {
-    if (recent == null) {
-      recent = (EmployeeSalaryEditRecentEntry) getContext().getEntry(EmployeeSalaryEditRecentEntry.class.getName());
-    }
-    if (recent == null) {
-      recent = new EmployeeSalaryEditRecentEntry();
-      Calendar cal = DateHelper.getCalendar();
-      recent.setYear(cal.get(Calendar.YEAR));
-      recent.setMonth(cal.get(Calendar.MONTH));
-      getContext().putEntry(EmployeeSalaryEditRecentEntry.class.getName(), recent, true);
-    }
-    return recent;
-  }
-
-  @Override
-  protected Resolution afterSaveOrUpdate()
-  {
-    recent = getRecent();
-    if (getData().getYear() != null) {
-      recent.setYear(getData().getYear());
-    }
-    if (getData().getMonth() != null) {
-      recent.setMonth(getData().getMonth());
-    }
-    return null;
-  }
-
-  @ValidateNestedProperties( { @Validate(field = "id"), @Validate(field = "type", converter = EnumeratedTypeConverter.class),
-      @Validate(field = "year", minvalue = 1900, maxvalue = 2100, converter = IntegerTypeConverter.class),
-      @Validate(field = "month", minvalue = 0, maxvalue = 11, converter = IntegerTypeConverter.class),
-      @Validate(field = "bruttoMitAgAnteil", required = true, converter = CurrencyTypeConverter.class),
-      @Validate(field = "comment", maxlength = Constants.COMMENT_LENGTH)})
-  public EmployeeSalaryDO getEmployeeSalary()
-  {
-    return getData();
-  }
-
-  public void setEmployeeSalary(EmployeeSalaryDO data)
-  {
-    setData(data);
-  }
-
-  @Validate(required = true)
-  @Select(selectAction = EmployeeListAction.class)
-  public Integer getEmployeeId()
-  {
-    return getData().getEmployeeId();
-  }
-
-  public void setEmployeeId(Integer employeeId)
-  {
-    baseDao.setEmployee(getData(), employeeId);
-  }
-
-  @Override
-  protected Logger getLogger()
-  {
-    return log;
-  }
-
-  @Override
-  protected EmployeeSalaryDO createDataInstance()
-  {
-    return new EmployeeSalaryDO();
-  }
+//  private static final Logger log = Logger.getLogger(EmployeeSalaryEditAction.class);
+//
+//  private EmployeeSalaryEditRecentEntry recent;
+//
+//  public void setEmployeeSalaryDao(EmployeeSalaryDao employeeSalaryDao)
+//  {
+//    this.baseDao = employeeSalaryDao;
+//  }
+//
+//  public List<LabelValueBean<String, Integer>> getMonthList()
+//  {
+//    return DateHelper.getMonthList();
+//  }
+//
+//  public List<LabelValueBean<String, EmployeeSalaryType>> getTypeList()
+//  {
+//    List<LabelValueBean<String, EmployeeSalaryType>> list = new ArrayList<LabelValueBean<String, EmployeeSalaryType>>();
+//    for (EmployeeSalaryType type : EmployeeSalaryType.values()) {
+//      list.add(new LabelValueBean<String, EmployeeSalaryType>(getLocalizedString("fibu.employee.salary.type." + type.getKey()), type));
+//    }
+//    return list;
+//  }
+//
+//  @Override
+//  protected void onPreEdit()
+//  {
+//    if (getData().getId() == null) {
+//      recent = getRecent();
+//      getData().setYear(recent.getYear());
+//      getData().setMonth(recent.getMonth());
+//    }
+//  }
+//
+//  private EmployeeSalaryEditRecentEntry getRecent()
+//  {
+//    if (recent == null) {
+//      recent = (EmployeeSalaryEditRecentEntry) getContext().getEntry(EmployeeSalaryEditRecentEntry.class.getName());
+//    }
+//    if (recent == null) {
+//      recent = new EmployeeSalaryEditRecentEntry();
+//      Calendar cal = DateHelper.getCalendar();
+//      recent.setYear(cal.get(Calendar.YEAR));
+//      recent.setMonth(cal.get(Calendar.MONTH));
+//      getContext().putEntry(EmployeeSalaryEditRecentEntry.class.getName(), recent, true);
+//    }
+//    return recent;
+//  }
+//
+//  @Override
+//  protected Resolution afterSaveOrUpdate()
+//  {
+//    recent = getRecent();
+//    if (getData().getYear() != null) {
+//      recent.setYear(getData().getYear());
+//    }
+//    if (getData().getMonth() != null) {
+//      recent.setMonth(getData().getMonth());
+//    }
+//    return null;
+//  }
+//
+//  @ValidateNestedProperties( { @Validate(field = "id"), @Validate(field = "type", converter = EnumeratedTypeConverter.class),
+//      @Validate(field = "year", minvalue = 1900, maxvalue = 2100, converter = IntegerTypeConverter.class),
+//      @Validate(field = "month", minvalue = 0, maxvalue = 11, converter = IntegerTypeConverter.class),
+//      @Validate(field = "bruttoMitAgAnteil", required = true, converter = CurrencyTypeConverter.class),
+//      @Validate(field = "comment", maxlength = Constants.COMMENT_LENGTH)})
+//  public EmployeeSalaryDO getEmployeeSalary()
+//  {
+//    return getData();
+//  }
+//
+//  public void setEmployeeSalary(EmployeeSalaryDO data)
+//  {
+//    setData(data);
+//  }
+//
+//  @Validate(required = true)
+//  @Select(selectAction = EmployeeListAction.class)
+//  public Integer getEmployeeId()
+//  {
+//    return getData().getEmployeeId();
+//  }
+//
+//  public void setEmployeeId(Integer employeeId)
+//  {
+//    baseDao.setEmployee(getData(), employeeId);
+//  }
+//
+//  @Override
+//  protected Logger getLogger()
+//  {
+//    return log;
+//  }
+//
+//  @Override
+//  protected EmployeeSalaryDO createDataInstance()
+//  {
+//    return new EmployeeSalaryDO();
+//  }
 }

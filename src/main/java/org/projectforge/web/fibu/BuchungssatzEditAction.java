@@ -23,97 +23,83 @@
 
 package org.projectforge.web.fibu;
 
-import net.sourceforge.stripes.action.UrlBinding;
-import net.sourceforge.stripes.validation.Validate;
-import net.sourceforge.stripes.validation.ValidateNestedProperties;
-
-import org.apache.log4j.Logger;
-import org.projectforge.common.StringHelper;
-import org.projectforge.fibu.kost.BuchungssatzDO;
-import org.projectforge.fibu.kost.BuchungssatzDao;
-import org.projectforge.web.core.BaseAction;
-import org.projectforge.web.core.BaseEditAction;
-import org.projectforge.web.core.BaseEditActionBean;
 
 
 /**
  */
-@UrlBinding("/secure/fibu/BuchungssatzEdit.action")
-@BaseAction(jspUrl = "/WEB-INF/jsp/fibu/buchungssatzEdit.jsp")
-@BaseEditAction(listAction = BuchungssatzListAction.class)
-public class BuchungssatzEditAction extends BaseEditActionBean<BuchungssatzDao, BuchungssatzDO>
+public class BuchungssatzEditAction// extends BaseEditActionBean<BuchungssatzDao, BuchungssatzDO>
 {
-  private static final Logger log = Logger.getLogger(BuchungssatzEditAction.class);
-
-  public void setBuchungssatzDao(BuchungssatzDao buchungssatzDao)
-  {
-    this.baseDao = buchungssatzDao;
-  }
-  
-  public String getSatznr() {
-    if (getData().getSatznr() == null) {
-      return "";
-    }
-    return getData().formatSatzNr();
-  }
-  public String getMonth()
-  {
-    if (getData().getMonth() == null) {
-      return "";
-    }
-    return StringHelper.format2DigitNumber(getData().getMonth() + 1);
-  }
-  
-  public String getKost1() {
-    if (getData().getKost1() == null) {
-      return "";
-    }
-    return getData().getKost1().getShortDisplayName();
-  }
-  
-  public String getKost2() {
-    if (getData().getKost2() == null) {
-      return "";
-    }
-    return getData().getKost2().getShortDisplayName();
-  }
-  
-  public Integer getKonto()
-  {
-    if (getData().getKonto() == null) {
-      return null;
-    }
-    return getData().getKonto().getNummer();
-  }
-
-  public Integer getGegenKonto()
-  {
-    if (getData().getGegenKonto() == null) {
-      return null;
-    }
-    return getData().getGegenKonto().getNummer();
-  }
-
-  @ValidateNestedProperties( { @Validate(field = "comment", maxlength = 4000)})
-  public BuchungssatzDO getBuchungssatz()
-  {
-    return getData();
-  }
-
-  public void setBuchungssatz(BuchungssatzDO data)
-  {
-    setData(data);
-  }
-
-  @Override
-  protected Logger getLogger()
-  {
-    return log;
-  }
-
-  @Override
-  protected BuchungssatzDO createDataInstance()
-  {
-    return new BuchungssatzDO();
-  }
+//  private static final Logger log = Logger.getLogger(BuchungssatzEditAction.class);
+//
+//  public void setBuchungssatzDao(BuchungssatzDao buchungssatzDao)
+//  {
+//    this.baseDao = buchungssatzDao;
+//  }
+//  
+//  public String getSatznr() {
+//    if (getData().getSatznr() == null) {
+//      return "";
+//    }
+//    return getData().formatSatzNr();
+//  }
+//  public String getMonth()
+//  {
+//    if (getData().getMonth() == null) {
+//      return "";
+//    }
+//    return StringHelper.format2DigitNumber(getData().getMonth() + 1);
+//  }
+//  
+//  public String getKost1() {
+//    if (getData().getKost1() == null) {
+//      return "";
+//    }
+//    return getData().getKost1().getShortDisplayName();
+//  }
+//  
+//  public String getKost2() {
+//    if (getData().getKost2() == null) {
+//      return "";
+//    }
+//    return getData().getKost2().getShortDisplayName();
+//  }
+//  
+//  public Integer getKonto()
+//  {
+//    if (getData().getKonto() == null) {
+//      return null;
+//    }
+//    return getData().getKonto().getNummer();
+//  }
+//
+//  public Integer getGegenKonto()
+//  {
+//    if (getData().getGegenKonto() == null) {
+//      return null;
+//    }
+//    return getData().getGegenKonto().getNummer();
+//  }
+//
+//  @ValidateNestedProperties( { @Validate(field = "comment", maxlength = 4000)})
+//  public BuchungssatzDO getBuchungssatz()
+//  {
+//    return getData();
+//  }
+//
+//  public void setBuchungssatz(BuchungssatzDO data)
+//  {
+//    setData(data);
+//  }
+//
+//  @Override
+//  protected Logger getLogger()
+//  {
+//    return log;
+//  }
+//
+//  @Override
+//  protected BuchungssatzDO createDataInstance()
+//  {
+//    return new BuchungssatzDO();
+//  }
 }

@@ -23,62 +23,49 @@
 
 package org.projectforge.web.fibu;
 
-import net.sourceforge.stripes.action.UrlBinding;
-
-import org.apache.log4j.Logger;
-import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.fibu.EmployeeDO;
-import org.projectforge.fibu.EmployeeDao;
-import org.projectforge.fibu.EmployeeFilter;
-import org.projectforge.web.core.BaseAction;
-import org.projectforge.web.core.BaseListActionBean;
 
 
-/**
- */
-@UrlBinding("/secure/fibu/EmployeeList.action")
-@BaseAction(jspUrl = "/WEB-INF/jsp/fibu/employeeList.jsp")
-public class EmployeeListAction extends BaseListActionBean<BaseSearchFilter, EmployeeDao, EmployeeDO>
+public class EmployeeListAction// extends BaseListActionBean<BaseSearchFilter, EmployeeDao, EmployeeDO>
 {
-  private static final Logger log = Logger.getLogger(EmployeeListAction.class);
-
-  public void setEmployeeDao(EmployeeDao employeeDao)
-  {
-    this.baseDao = employeeDao;
-  }
-  
-  /**
-   * Quick select support.
-   * @see org.projectforge.web.core.BaseListActionBean#getSingleEntryValue()
-   */
-  @Override
-  protected String getSingleEntryValue()
-  {
-    if (getList().size() == 1) {
-      return String.valueOf(getList().get(0).getId()); // return the pk.
-    }
-    return null;
-  }
-
-  /**
-   * @return always true.
-   * @see org.projectforge.web.core.BaseListActionBean#isShowResultInstantly()
-   */
-  @Override
-  protected boolean isShowResultInstantly()
-  {
-    return true;
-  }
-
-  @Override
-  protected BaseSearchFilter createFilterInstance()
-  {
-    return new EmployeeFilter();
-  }
-
-  @Override
-  protected Logger getLogger()
-  {
-    return log;
-  }
+//  private static final Logger log = Logger.getLogger(EmployeeListAction.class);
+//
+//  public void setEmployeeDao(EmployeeDao employeeDao)
+//  {
+//    this.baseDao = employeeDao;
+//  }
+//  
+//  /**
+//   * Quick select support.
+//   * @see org.projectforge.web.core.BaseListActionBean#getSingleEntryValue()
+//   */
+//  @Override
+//  protected String getSingleEntryValue()
+//  {
+//    if (getList().size() == 1) {
+//      return String.valueOf(getList().get(0).getId()); // return the pk.
+//    }
+//    return null;
+//  }
+//
+//  /**
+//   * @return always true.
+//   * @see org.projectforge.web.core.BaseListActionBean#isShowResultInstantly()
+//   */
+//  @Override
+//  protected boolean isShowResultInstantly()
+//  {
+//    return true;
+//  }
+//
+//  @Override
+//  protected BaseSearchFilter createFilterInstance()
+//  {
+//    return new EmployeeFilter();
+//  }
+//
+//  @Override
+//  protected Logger getLogger()
+//  {
+//    return log;
+//  }
 }
