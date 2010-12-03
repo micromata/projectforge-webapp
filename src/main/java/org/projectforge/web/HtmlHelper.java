@@ -26,16 +26,11 @@ package org.projectforge.web;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.PageContext;
-
-import net.sourceforge.stripes.util.UrlBuilder;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.web.core.LocalizerAndUrlBuilder;
 import org.projectforge.web.core.PageContextLocalizerAndUrlBuilder;
 
@@ -54,30 +49,6 @@ public class HtmlHelper
   public static final String escapeXml(String str)
   {
     return StringEscapeUtils.escapeXml(str);
-  }
-
-  /**
-   * Builds the url via UrlBuilder and HttpServletResponse.encoderUrl(String).
-   * @param pageContext
-   * @param url
-   * @return
-   */
-  public String buildUrl(PageContext pageContext, String url)
-  {
-    Validate.notNull(pageContext);
-    Validate.notNull(url);
-    HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
-    HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
-    String contextPath = request.getContextPath();
-
-    // Append the context path, but only if the user didn't already
-    if (url.startsWith("/") == true && "/".equals(contextPath) == false && url.contains(contextPath + "/") == false) {
-      url = contextPath + url;
-    }
-    // Add all the parameters and reset the href attribute; pass to false here because
-    // the HtmlTagSupport will HtmlEncode the ampersands for us
-    UrlBuilder builder = new UrlBuilder(PFUserContext.getLocale(), url, false);
-    return response.encodeURL(builder.toString());
   }
 
   /**
@@ -178,7 +149,6 @@ public class HtmlHelper
    * @param height If less than zero, than this attribute will be ignored.
    * @param tooltip If null, than this attribute will be ignored.
    * @param align If null, than this attribute will be ignored.
-   * @see #buildUrl(PageContext, String)
    */
   public HtmlHelper appendImageTag(PageContext pageContext, StringBuffer buf, String src, String width, String height, String tooltip,
       HtmlAlignment align)
@@ -204,7 +174,6 @@ public class HtmlHelper
    * @param height If less than zero, than this attribute will be ignored.
    * @param tooltip If null, than this attribute will be ignored.
    * @param align If null, than this attribute will be ignored.
-   * @see #buildUrl(PageContext, String)
    */
   public HtmlHelper appendImageTag(LocalizerAndUrlBuilder locUrlBuilder, StringBuffer buf, String src, String width, String height,
       String tooltip, HtmlAlignment align)
@@ -235,7 +204,6 @@ public class HtmlHelper
    * @param buf
    * @param href Will be modified via buildUrl.
    * @return
-   * @see #buildUrl(PageContext, String)
    */
   public HtmlHelper appendAncorStartTag(PageContext pageContext, StringBuffer buf, String href)
   {
@@ -248,7 +216,6 @@ public class HtmlHelper
    * @param buf
    * @param href Will be modified via buildUrl.
    * @return
-   * @see #buildUrl(PageContext, String)
    */
   public HtmlHelper appendAncorStartTag(LocalizerAndUrlBuilder locUrlBuilder, StringBuffer buf, String href)
   {
