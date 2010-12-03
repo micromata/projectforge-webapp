@@ -62,6 +62,7 @@ import org.projectforge.web.fibu.EingangsrechnungListPage;
 import org.projectforge.web.fibu.Kost1ListPage;
 import org.projectforge.web.fibu.Kost2ArtListPage;
 import org.projectforge.web.fibu.Kost2ListPage;
+import org.projectforge.web.fibu.CustomerListPage;
 import org.projectforge.web.fibu.ProjektListPage;
 import org.projectforge.web.fibu.RechnungListPage;
 import org.projectforge.web.gantt.GanttChartListPage;
@@ -78,6 +79,7 @@ import org.projectforge.web.statistics.PersonalStatisticsPage;
 import org.projectforge.web.statistics.SystemStatisticsPage;
 import org.projectforge.web.task.TaskTreePage;
 import org.projectforge.web.timesheet.TimesheetListPage;
+import org.projectforge.web.user.ChangePasswordPage;
 import org.projectforge.web.user.GroupListPage;
 import org.projectforge.web.user.MyAccountEditPage;
 import org.projectforge.web.user.UserListPage;
@@ -119,7 +121,7 @@ public enum MenuItemDef
       FINANCE_GROUP, CONTROLLING_GROUP), //
   CALENDAR("calendar", CalendarPage.class), // Visible for all.
   // *
-  CHANGE_PASSWORD("changePassword", "user/ChangePassword.action"), // Visible for all.
+  CHANGE_PASSWORD("changePassword", ChangePasswordPage.class), // Visible for all.
   // *
   CONFIGURATION("configuration", ConfigurationListPage.class, //
       ADMIN_GROUP), //
@@ -156,7 +158,7 @@ public enum MenuItemDef
   KOST2_ART_LIST("fibu.kost2arten", Kost2ArtListPage.class, //
       Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE), //
   // *
-  KUNDE_LIST("fibu.kunden", "fibu/KundeList.action", //
+  KUNDE_LIST("fibu.kunden", CustomerListPage.class, //
       FINANCE_GROUP, CONTROLLING_GROUP), //
   MEB("meb", MebListPage.class), //
   MONTHLY_EMPLOYEE_REPORT("monthlyEmployeeReport", "fibu/MonthlyEmployeeReport.action"), //
