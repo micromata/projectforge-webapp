@@ -23,8 +23,6 @@
 
 package org.projectforge.web.core;
 
-import java.util.ResourceBundle;
-
 import javax.servlet.jsp.PageContext;
 
 import org.projectforge.core.Priority;
@@ -50,8 +48,7 @@ public class PriorityFormatter
     buf.append("<span");
     htmlHelper.attribute(buf, "class", "priority_" + priority.getKey());
     buf.append(">");
-    ResourceBundle resourceBundle = BaseActionBean.getResourceBundle(PFUserContext.getLocale());
-    buf.append(resourceBundle.getString("priority." + priority.getKey()));
+    buf.append(PFUserContext.getLocalizedString("priority." + priority.getKey()));
     buf.append("</span>");
     return buf.toString();
   }
