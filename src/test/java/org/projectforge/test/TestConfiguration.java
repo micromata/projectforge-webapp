@@ -36,8 +36,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 
-import de.micromata.common.hibernate.EnumHelper;
-
 /**
  * Only needed for test configuration
  */
@@ -169,7 +167,6 @@ public class TestConfiguration
   protected void initCtx() throws BeansException
   {
     if (ctx == null) {
-      EnumHelper.DISABLED = true;
       log.info("Initializing context");
       try {
         // Build spring context
