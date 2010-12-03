@@ -23,41 +23,33 @@
 
 package org.projectforge.web.fibu;
 
-import net.sourceforge.stripes.action.UrlBinding;
-
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.model.PropertyModel;
 import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.fibu.KontoDO;
-import org.projectforge.fibu.KontoDao;
-import org.projectforge.web.core.BaseAction;
-import org.projectforge.web.core.BaseListActionBean;
+import org.projectforge.web.wicket.AbstractListForm;
 
 
-/**
- */
-@UrlBinding("/secure/fibu/KontoList.action")
-@BaseAction(jspUrl = "/WEB-INF/jsp/fibu/kontoList.jsp")
-public class KontoListAction extends BaseListActionBean<BaseSearchFilter, KontoDao, KontoDO>
+public class CustomerListForm extends AbstractListForm<BaseSearchFilter, CustomerListPage>
 {
-  private static final Logger log = Logger.getLogger(KontoListAction.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CustomerListForm.class);
 
-  public void setKontoDao(KontoDao kontoDao)
-  {
-    this.baseDao = kontoDao;
-  }
-
-  /**
-   * @return always true.
-   * @see org.projectforge.web.core.BaseListActionBean#isShowResultInstantly()
-   */
-  @Override
-  protected boolean isShowResultInstantly()
-  {
-    return true;
-  }
+  private static final long serialVersionUID = -5969136444233092172L;
 
   @Override
-  protected BaseSearchFilter createFilterInstance()
+  protected void init()
+  {
+    super.init();
+    filterContainer.add(new CheckBox("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted")));
+  }
+
+  public CustomerListForm(CustomerListPage parentPage)
+  {
+    super(parentPage);
+  }
+
+  @Override
+  protected BaseSearchFilter newSearchFilterInstance()
   {
     return new BaseSearchFilter();
   }

@@ -48,7 +48,7 @@ import org.projectforge.web.wicket.components.TooltipImage;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class KundeSelectPanel extends AbstractSelectPanel<KundeDO>
+public class CustomerSelectPanel extends AbstractSelectPanel<KundeDO>
 {
   private static final long serialVersionUID = 5452693296383142460L;
 
@@ -66,7 +66,7 @@ public class KundeSelectPanel extends AbstractSelectPanel<KundeDO>
    * @param caller
    * @param selectProperty
    */
-  public KundeSelectPanel(final String id, final IModel<KundeDO> model, final PropertyModel<String> kundeText,
+  public CustomerSelectPanel(final String id, final IModel<KundeDO> model, final PropertyModel<String> kundeText,
       final ISelectCallerPage caller, final String selectProperty)
   {
     super(id, model, caller, selectProperty);
@@ -74,7 +74,7 @@ public class KundeSelectPanel extends AbstractSelectPanel<KundeDO>
   }
 
   @SuppressWarnings("serial")
-  public KundeSelectPanel init()
+  public CustomerSelectPanel init()
   {
     super.init();
     if (kundeText != null) {
@@ -82,8 +82,8 @@ public class KundeSelectPanel extends AbstractSelectPanel<KundeDO>
         @Override
         public boolean isVisible()
         {
-          return (KundeSelectPanel.this.getModelObject() == null || NumberHelper
-              .greaterZero(KundeSelectPanel.this.getModelObject().getId()) == false);
+          return (CustomerSelectPanel.this.getModelObject() == null || NumberHelper
+              .greaterZero(CustomerSelectPanel.this.getModelObject().getId()) == false);
         }
       };
       add(kundeTextField);
@@ -103,7 +103,7 @@ public class KundeSelectPanel extends AbstractSelectPanel<KundeDO>
     final SubmitLink selectButton = new SubmitLink("select") {
       public void onSubmit()
       {
-        setResponsePage(new KundeListPage(caller, selectProperty));
+        setResponsePage(new CustomerListPage(caller, selectProperty));
       };
     };
     selectButton.setDefaultFormProcessing(false);
@@ -119,7 +119,7 @@ public class KundeSelectPanel extends AbstractSelectPanel<KundeDO>
       @Override
       public boolean isVisible()
       {
-        return KundeSelectPanel.this.getModelObject() != null;
+        return CustomerSelectPanel.this.getModelObject() != null;
       }
     };
     unselectButton.setDefaultFormProcessing(false);
@@ -133,14 +133,14 @@ public class KundeSelectPanel extends AbstractSelectPanel<KundeDO>
       protected void select(final KundeFavorite favorite)
       {
         if (favorite.getKunde() != null) {
-          KundeSelectPanel.this.selectKunde(favorite.getKunde());
+          CustomerSelectPanel.this.selectKunde(favorite.getKunde());
         }
       }
 
       @Override
       protected KundeDO getCurrentObject()
       {
-        return KundeSelectPanel.this.getModelObject();
+        return CustomerSelectPanel.this.getModelObject();
       }
 
       @Override

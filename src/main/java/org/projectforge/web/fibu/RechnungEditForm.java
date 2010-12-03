@@ -93,7 +93,7 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
         parentPage, "projektId");
     add(projektSelectPanel);
     projektSelectPanel.init();
-    final KundeSelectPanel kundeSelectPanel = new KundeSelectPanel("selectKunde", new PropertyModel<KundeDO>(data, "kunde"),
+    final CustomerSelectPanel kundeSelectPanel = new CustomerSelectPanel("selectKunde", new PropertyModel<KundeDO>(data, "kunde"),
         new PropertyModel<String>(data, "kundeText"), parentPage, "kundeId");
     add(kundeSelectPanel);
     kundeSelectPanel.init();

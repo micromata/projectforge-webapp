@@ -102,7 +102,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
 
   protected RepeatingView positionsRepeater;
 
-  protected KundeSelectPanel kundeSelectPanel;
+  protected CustomerSelectPanel kundeSelectPanel;
 
   private boolean showInactivePositions = false;
 
@@ -206,7 +206,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         parentPage, "projektId");
     add(projektSelectPanel);
     projektSelectPanel.init();
-    kundeSelectPanel = new KundeSelectPanel("kunde", new PropertyModel<KundeDO>(data, "kunde"),
+    kundeSelectPanel = new CustomerSelectPanel("kunde", new PropertyModel<KundeDO>(data, "kunde"),
         new PropertyModel<String>(data, "kundeText"), parentPage, "kundeId");
     add(kundeSelectPanel);
     kundeSelectPanel.init();

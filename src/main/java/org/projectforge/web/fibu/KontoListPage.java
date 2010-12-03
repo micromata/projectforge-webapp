@@ -34,10 +34,8 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.fibu.KundeDO;
-import org.projectforge.fibu.KundeDao;
-import org.projectforge.fibu.KundeStatus;
-import org.projectforge.fibu.ProjektDO;
+import org.projectforge.fibu.KontoDO;
+import org.projectforge.fibu.KontoDao;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -46,96 +44,87 @@ import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 
-@ListPage(editPage = AuftragEditPage.class)
-public class KundeListPage extends AbstractListPage<KundeListForm, KundeDao, KundeDO>
+@ListPage(editPage = KontoEditPage.class)
+public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, KontoDO>
 {
   private static final long serialVersionUID = -8406452960003792763L;
 
-  @SpringBean(name = "kundeDao")
-  private KundeDao kundeDao;
+  @SpringBean(name = "kontoDao")
+  private KontoDao kontoDao;
 
-  public KundeListPage(PageParameters parameters)
+  public KontoListPage(PageParameters parameters)
   {
-    super(parameters, "fibu.kunde");
+    super(parameters, "fibu.konto");
   }
 
-  public KundeListPage(final ISelectCallerPage caller, final String selectProperty)
+  public KontoListPage(final ISelectCallerPage caller, final String selectProperty)
   {
-    super(caller, selectProperty, "fibu.kunde");
+    super(caller, selectProperty, "fibu.konto");
   }
 
   @SuppressWarnings("serial")
   @Override
   protected void init()
   {
-    List<IColumn<KundeDO>> columns = new ArrayList<IColumn<KundeDO>>();
+    List<IColumn<KontoDO>> columns = new ArrayList<IColumn<KontoDO>>();
 
-    CellItemListener<KundeDO> cellItemListener = new CellItemListener<KundeDO>() {
-      public void populateItem(Item<ICellPopulator<KundeDO>> item, String componentId, IModel<KundeDO> rowModel)
+    CellItemListener<KontoDO> cellItemListener = new CellItemListener<KontoDO>() {
+      public void populateItem(Item<ICellPopulator<KontoDO>> item, String componentId, IModel<KontoDO> rowModel)
       {
-        final KundeDO kunde = rowModel.getObject();
-        if (kunde.getStatus() == null) {
-          // Should not occur:
-          return;
-        }
+        final KontoDO konto = rowModel.getObject();
         String cellStyle = "";
-        if (kunde.isDeleted() == true || kunde.getStatus().isIn(KundeStatus.ENDED) == true) {
+        if (konto.isDeleted() == true) {
           cellStyle = "text-decoration: line-through;";
         }
         item.add(new AttributeModifier("style", true, new Model<String>(cellStyle)));
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("fibu.kunde.nummer")), "kost", "kost",
+    columns.add(new CellItemListenerPropertyColumn<KontoDO>(new Model<String>(getString("fibu.konto.nummer")), "nummer", "nummer",
         cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
-        KundeDO kunde = (KundeDO) rowModel.getObject();
+        KontoDO konto = (KontoDO) rowModel.getObject();
         if (isSelectMode() == false) {
-          throw new UnsupportedOperationException("Edit page not yet implemented");
+          item.add(new ListSelectActionPanel(componentId, rowModel, KontoEditPage.class, konto.getId(), KontoListPage.this, String
+              .valueOf(konto.getNummer())));
         } else {
           item
-              .add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, kunde.getId(), String.valueOf(kunde.getKost())));
+              .add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, konto.getId(), String.valueOf(konto.getNummer())));
         }
         cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("fibu.kunde.identifier")), "identifier",
-        "identifier", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("fibu.kunde.name")), "name", "name",
+    columns.add(new CellItemListenerPropertyColumn<KontoDO>(new Model<String>(getString("fibu.konto.bezeichnung")), "bezeichnung",
+        "bezeichnung", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<KontoDO>(new Model<String>(getString("description")), "description", "description",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("fibu.kunde.division")), "division",
-        "division", cellItemListener));
-    columns
-        .add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("description")), "description", "description",
-        cellItemListener));
-    dataTable = createDataTable(columns, "kost", true);
+    dataTable = createDataTable(columns, "nummer", true);
     form.add(dataTable);
   }
 
   @Override
-  protected KundeListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected KontoListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
   {
-    return new KundeListForm(this);
+    return new KontoListForm(this);
   }
 
   @Override
-  protected KundeDao getBaseDao()
+  protected KontoDao getBaseDao()
   {
-    return kundeDao;
+    return kontoDao;
   }
 
   @Override
-  protected IModel<KundeDO> getModel(KundeDO object)
+  protected IModel<KontoDO> getModel(KontoDO object)
   {
-    return new DetachableDOModel<KundeDO, KundeDao>(object, getBaseDao());
+    return new DetachableDOModel<KontoDO, KontoDao>(object, getBaseDao());
   }
 
-  protected KundeDao getKundeDao()
+  protected KontoDao getKontoDao()
   {
-    return kundeDao;
+    return kontoDao;
   }
 }

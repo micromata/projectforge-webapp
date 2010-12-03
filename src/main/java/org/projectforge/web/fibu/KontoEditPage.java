@@ -26,38 +26,38 @@ package org.projectforge.web.fibu;
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.fibu.kost.Kost1DO;
-import org.projectforge.fibu.kost.Kost1Dao;
+import org.projectforge.fibu.KontoDO;
+import org.projectforge.fibu.KontoDao;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
 
-@EditPage(defaultReturnPage = Kost1ListPage.class)
-public class Kost1EditPage extends AbstractEditPage<Kost1DO, Kost1EditForm, Kost1Dao>
+@EditPage(defaultReturnPage = KontoListPage.class)
+public class KontoEditPage extends AbstractEditPage<KontoDO, KontoEditForm, KontoDao>
 {
-  private static final long serialVersionUID = 1029345943027440760L;
+  private static final long serialVersionUID = 8763884579951937296L;
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Kost1EditPage.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(KontoEditPage.class);
 
-  @SpringBean(name = "kost1Dao")
-  private Kost1Dao kost1Dao;
+  @SpringBean(name = "kontoDao")
+  private KontoDao kontoDao;
 
-  public Kost1EditPage(PageParameters parameters)
+  public KontoEditPage(PageParameters parameters)
   {
-    super(parameters, "fibu.kost1");
+    super(parameters, "fibu.konto");
     init();
   }
 
   @Override
-  protected Kost1Dao getBaseDao()
+  protected KontoDao getBaseDao()
   {
-    return kost1Dao;
+    return kontoDao;
   }
 
   @Override
-  protected Kost1EditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, Kost1DO data)
+  protected KontoEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, KontoDO data)
   {
-    return new Kost1EditForm(this, data);
+    return new KontoEditForm(this, data);
   }
 
   @Override

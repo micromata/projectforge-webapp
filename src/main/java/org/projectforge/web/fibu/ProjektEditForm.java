@@ -86,7 +86,7 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
         return new IntegerConverter(2);
       }
     });
-    final KundeSelectPanel kundeSelectPanel = new KundeSelectPanel("kunde", new PropertyModel<KundeDO>(data, "kunde"), null, parentPage,
+    final CustomerSelectPanel kundeSelectPanel = new CustomerSelectPanel("kunde", new PropertyModel<KundeDO>(data, "kunde"), null, parentPage,
         "kundeId");
     add(kundeSelectPanel);
     kundeSelectPanel.init();

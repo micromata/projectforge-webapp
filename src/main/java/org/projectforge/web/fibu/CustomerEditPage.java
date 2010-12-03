@@ -24,34 +24,40 @@
 package org.projectforge.web.fibu;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.CheckBox;
-import org.apache.wicket.model.PropertyModel;
-import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.web.wicket.AbstractListForm;
+import org.apache.wicket.PageParameters;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.KundeDao;
+import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.EditPage;
 
 
-public class KundeListForm extends AbstractListForm<BaseSearchFilter, KundeListPage>
+@EditPage(defaultReturnPage = CustomerListPage.class)
+public class CustomerEditPage extends AbstractEditPage<KundeDO, CustomerEditForm, KundeDao>
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(KundeListForm.class);
+  private static final long serialVersionUID = 8763884579951937296L;
 
-  private static final long serialVersionUID = -5969136444233092172L;
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CustomerEditPage.class);
 
-  @Override
-  protected void init()
+  @SpringBean(name = "kundeDao")
+  private KundeDao kundeDao;
+
+  public CustomerEditPage(PageParameters parameters)
   {
-    super.init();
-    filterContainer.add(new CheckBox("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted")));
-  }
-
-  public KundeListForm(KundeListPage parentPage)
-  {
-    super(parentPage);
+    super(parameters, "fibu.kunde");
+    init();
   }
 
   @Override
-  protected BaseSearchFilter newSearchFilterInstance()
+  protected KundeDao getBaseDao()
   {
-    return new BaseSearchFilter();
+    return kundeDao;
+  }
+
+  @Override
+  protected CustomerEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, KundeDO data)
+  {
+    return new CustomerEditForm(this, data);
   }
 
   @Override
