@@ -607,14 +607,4 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   {
     return getShortDisplayName();
   }
-
-  /**
-   * @throws UnsupportedOperationException
-   * @see de.micromata.user.UserInfo#hasNamedRight(java.lang.String, java.lang.Object, java.lang.Object)
-   */
-  @Transient
-  public boolean hasNamedRight(String right, Object arg1, Object arg2)
-  {
-    throw new UnsupportedOperationException();
-  }
 }
