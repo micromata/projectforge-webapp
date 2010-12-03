@@ -23,8 +23,6 @@
 
 package org.projectforge.web.user;
 
-import net.sourceforge.stripes.validation.Validate;
-
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -73,7 +71,6 @@ public class MyAccountEditForm extends UserBaseEditForm<MyAccountEditPage>
    * invalid.
    * @return
    */
-  @Validate
   public boolean isInvalidateAllStayLoggedInSessions()
   {
     return invalidateAllStayLoggedInSessions;
