@@ -48,8 +48,6 @@ public class SimpleClassFactory<T> implements ClassFactory<T>
 
   /**
    * return a new instance of the class given in the constructor.
-   * 
-   * @see de.micromata.excel.imp.ClassFactory#newInstance(org.apache.poi.hssf.usermodel.HSSFRow)
    */
   public T newInstance(HSSFRow row) throws InstantiationException, IllegalAccessException
   {
