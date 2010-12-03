@@ -23,8 +23,9 @@
 
 package org.projectforge.fibu;
 
+import org.projectforge.core.I18nEnum;
 
-public enum KundeStatus
+public enum KundeStatus implements I18nEnum
 {
 
   /** Kunde befindet sich noch in der Akquisephase. */
@@ -33,7 +34,7 @@ public enum KundeStatus
   NONACTIVE("nonactive"), /** Die Zusammenarbeit mit dem Kunden ist beendet. Eine erneute Zusammenarbeit ist unwahrscheinlich. */
   ENDED("ended"), /** Der Kunde ist insolvent, umfirmiert etc. */
   NONEXISTENT("nonexistent");
-  
+
   public static final KundeStatus[] LIST = new KundeStatus[] { ACQUISISTION, ACTIVE, NONACTIVE, ENDED, NONEXISTENT};
 
   private String key;
@@ -47,12 +48,18 @@ public enum KundeStatus
     return key;
   }
 
+  public String getI18nKey()
+  {
+    return "fibu.kunde.status." + key;
+  };
+
   KundeStatus(String key)
   {
     this.key = key;
   }
-  
-  public boolean isIn(KundeStatus... status) {
+
+  public boolean isIn(KundeStatus... status)
+  {
     for (KundeStatus st : status) {
       if (this == st) {
         return true;
