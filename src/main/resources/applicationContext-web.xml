@@ -2,9 +2,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans default-lazy-init="false" default-autowire="byType">
   <!-- Web -->
-  <bean id="dateColumnDecorator" class="org.projectforge.web.calendar.DateColumnDecorator" singleton="true" />
   <bean id="dateTimeFormatter" class="org.projectforge.web.calendar.DateTimeFormatter" singleton="true" />
-  <bean id="dateTimeColumnDecorator" class="org.projectforge.web.calendar.DateTimeColumnDecorator" singleton="true" />
   <bean id="formatterFactory" class="org.projectforge.renderer.custom.FormatterFactory">
     <!-- PDF Renderer Formatter -->
     <property name="formatters">
@@ -26,12 +24,7 @@
   <bean id="priorityFormatter" class="org.projectforge.web.core.PriorityFormatter" singleton="true" />
   <bean id="projektFormatter" class="org.projectforge.fibu.ProjektFormatter" singleton="true" />
   <bean id="sessionStorage" class="org.projectforge.web.core.SessionStorage" singleton="true" />
-  <bean id="taskColumnDecorator" class="org.projectforge.web.task.TaskColumnDecorator" singleton="true" />
   <bean id="taskFormatter" class="org.projectforge.web.task.TaskFormatter" singleton="true" />
-  <bean id="textColumnDecorator" class="org.projectforge.web.displaytag.TextColumnDecorator" singleton="true" />
-  <bean id="timeColumnDecorator" class="org.projectforge.web.calendar.TimeColumnDecorator" singleton="true" />
-  <bean id="timePeriodColumnDecorator" class="org.projectforge.web.calendar.TimePeriodColumnDecorator" singleton="true" />
-  <bean id="userColumnDecorator" class="org.projectforge.web.user.UserColumnDecorator" singleton="true" />
   <bean id="userFormatter" class="org.projectforge.web.user.UserFormatter" singleton="true" />
   <bean id="wicketApplicationFilter" class="org.projectforge.web.wicket.WicketApplicationFilter" />
 
