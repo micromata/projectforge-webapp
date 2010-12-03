@@ -73,7 +73,9 @@ import org.projectforge.web.doc.TutorialPage;
 import org.projectforge.web.fibu.AuftragEditPage;
 import org.projectforge.web.fibu.AuftragListPage;
 import org.projectforge.web.fibu.BankAccountListPage;
+import org.projectforge.web.fibu.CustomerListPage;
 import org.projectforge.web.fibu.EingangsrechnungListPage;
+import org.projectforge.web.fibu.KontoListPage;
 import org.projectforge.web.fibu.Kost1ListPage;
 import org.projectforge.web.fibu.Kost2ArtListPage;
 import org.projectforge.web.fibu.Kost2ListPage;
@@ -98,6 +100,7 @@ import org.projectforge.web.task.TaskListPage;
 import org.projectforge.web.task.TaskTreePage;
 import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.timesheet.TimesheetListPage;
+import org.projectforge.web.user.ChangePasswordPage;
 import org.projectforge.web.user.GroupListPage;
 import org.projectforge.web.user.MyAccountEditPage;
 import org.projectforge.web.user.UserListPage;
@@ -138,9 +141,13 @@ public class WicketApplication extends WebApplication
 
   private static final String BOOKMARK_CALENDAR_PAGE = "calendar";
 
+  private static final String BOOKMARK_CHANGE_PASSWORD = "changePassword";
+
   private static final String BOOKMARK_CONFIGURATION_PAGE = "configuration";
 
   private static final String BOOKMARK_CONTRACT_LIST = "contractList";
+
+  private static final String BOOKMARK_CUSTOMER_LIST = "customerList";
 
   private static final String BOOKMARK_EINGANGS_RECHNUNG_LIST = "eingangsRechnungList";
 
@@ -162,6 +169,7 @@ public class WicketApplication extends WebApplication
 
   private static final String BOOKMARK_IMAGECROPPER = "imageCropper";
 
+  private static final String BOOKMARK_KONTO_LIST = "kontoList";
   private static final String BOOKMARK_KOST1_LIST = "kost1List";
 
   private static final String BOOKMARK_KOST2_LIST = "kost2List";
@@ -354,8 +362,10 @@ public class WicketApplication extends WebApplication
     mountPage(BOOKMARK_BANK_ACCOUNT_LIST, BankAccountListPage.class);
     mountPage(BOOKMARK_BOOK_LIST, BookListPage.class);
     mountPage(BOOKMARK_CALENDAR_PAGE, CalendarPage.class);
+    mountPage(BOOKMARK_CHANGE_PASSWORD, ChangePasswordPage.class);
     mountPage(BOOKMARK_CONFIGURATION_PAGE, ConfigurationListPage.class);
     mountPage(BOOKMARK_CONTRACT_LIST, ContractListPage.class);
+    mountPage(BOOKMARK_CUSTOMER_LIST, CustomerListPage.class);
     mountPage(BOOKMARK_EINGANGS_RECHNUNG_LIST, EingangsrechnungListPage.class);
     mountPage(BOOKMARK_ERROR_PAGE, ErrorPage.class);
     mountPage(BOOKMARK_FEEDBACK_PAGE, FeedbackPage.class);
@@ -363,6 +373,7 @@ public class WicketApplication extends WebApplication
     mountPage(BOOKMARK_GANTT_LIST, GanttChartListPage.class);
     mountPage(BOOKMARK_GROUP_LIST, GroupListPage.class);
     mountPage(BOOKMARK_GWIKI_CONTAINER_PAGE, GWikiContainerPage.class);
+    mountPage(BOOKMARK_KONTO_LIST, KontoListPage.class);
     mountPage(BOOKMARK_KOST1_LIST, Kost1ListPage.class);
     mountPage(BOOKMARK_KOST2_LIST, Kost2ListPage.class);
     mountPage(BOOKMARK_KOST2ART_LIST, Kost2ArtListPage.class);
