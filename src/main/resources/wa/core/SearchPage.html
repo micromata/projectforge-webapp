@@ -1,0 +1,45 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<form wicket:id="form">
+<div wicket:id="feedback">[Validation errors]</div>
+
+<fieldset><legend><wicket:message key="label.filterSettings" /></legend>
+<table class="form">
+  <tr>
+    <th><wicket:message key="timePeriod" /></th>
+    <td><span wicket:id="startDate">[startDate]</span> - <span wicket:id="stopDate">[stopDate]</span>&nbsp;&nbsp;&nbsp; <select
+      wicket:id="lastDays" onchange="javascript:submit();">
+      <option>[choose time period]</option>
+    </select> <span style="font-size: x-small; color: white;" wicket:id="datesAsUTC">[2001-09-30 22:00:00.0 UTC - 2001-10-31 22:59:59.999 UTC]</span></td>
+    <th><wicket:message key="search.area" /></th>
+    <td><select wicket:id="area" onchange="javascript:submit();">
+      <option>[All]</option>
+    </select></td>
+  </tr>
+  <tr>
+    <!-- th><wicket:message key="search.history" /></th>
+        <td><wicket:message key="message.notYetImplemented" /></td-->
+    <th><wicket:message key="modifiedBy" /></th>
+    <td><span wicket:id="modifiedByUser">[modified by]</span></td>
+    <th><wicket:message key="label.pageSize" /></th>
+    <td><select wicket:id="pageSize" onchange="javascript:submit();">
+      <option>50</option>
+    </select></td>
+  </tr>
+  <tr>
+    <th><wicket:message key="task" /></th>
+    <td colspan="3"><span wicket:id="task">[Task]</span></td>
+  </tr>
+  <tr>
+    <th></th>
+    <td class="buttonpanel" wicket:id="buttonCell" colspan="3"><span wicket:id="reset">[reset]</span> <span wicket:id="search">[search]</span></td>
+  </tr>
+</table>
+</fieldset>
+</form>
+</body>
+</html>
