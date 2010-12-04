@@ -69,6 +69,7 @@ import org.projectforge.web.admin.UpdatePage;
 import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.core.ConfigurationListPage;
+import org.projectforge.web.core.SearchPage;
 import org.projectforge.web.doc.TutorialPage;
 import org.projectforge.web.fibu.AuftragEditPage;
 import org.projectforge.web.fibu.AuftragListPage;
@@ -170,6 +171,7 @@ public class WicketApplication extends WebApplication
   private static final String BOOKMARK_IMAGECROPPER = "imageCropper";
 
   private static final String BOOKMARK_KONTO_LIST = "kontoList";
+
   private static final String BOOKMARK_KOST1_LIST = "kost1List";
 
   private static final String BOOKMARK_KOST2_LIST = "kost2List";
@@ -195,6 +197,8 @@ public class WicketApplication extends WebApplication
   private static final String BOOKMARK_RECHNUNG_LIST = "rechnungList";
 
   private static final String BOOKMARK_SCRIPT_LIST = "scriptList";
+
+  private static final String BOOKMARK_SEARCH_PAGE = "search";
 
   private static final String BOOKMARK_SEND_SMS = "sendSms";
 
@@ -282,7 +286,7 @@ public class WicketApplication extends WebApplication
   {
     this.cronSetup = cronSetup;
   }
-  
+
   public void setUserDao(UserDao userDao)
   {
     this.userDao = userDao;
@@ -389,6 +393,7 @@ public class WicketApplication extends WebApplication
     mountPage(BOOKMARK_HR_PLANNING_LIST, HRPlanningListPage.class);
     mountPage(BOOKMARK_HR_LIST, HRListPage.class);
     mountPage(BOOKMARK_SCRIPT_LIST, ScriptListPage.class);
+    mountPage(BOOKMARK_SEARCH_PAGE, SearchPage.class);
     mountPage(BOOKMARK_SEND_SMS, SendSmsPage.class);
     mountPage(BOOKMARK_SETUP_PAGE, SetupPage.class);
     mountPage(BOOKMARK_SYSTEM_STATISTICS, SystemStatisticsPage.class);
