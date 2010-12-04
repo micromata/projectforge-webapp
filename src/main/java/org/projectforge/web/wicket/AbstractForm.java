@@ -149,6 +149,14 @@ public abstract class AbstractForm<F, P extends AbstractBasePage> extends Form<F
     component.error(getString(msgKey));
   }
 
+  public String getLocalizedMessage(String key, Object... params)
+  {
+    if (params == null) {
+      return getString(key);
+    }
+    return MessageFormat.format(getString(key), params);
+  }
+
   /**
    * @see AbstractBasePage#escapeHtml(String)
    */
