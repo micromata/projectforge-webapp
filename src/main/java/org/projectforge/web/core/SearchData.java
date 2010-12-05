@@ -26,8 +26,11 @@ package org.projectforge.web.core;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.xml.stream.XmlObject;
 
+@XmlObject(alias = "config")
 public class SearchData implements Serializable
 {
   private static final long serialVersionUID = 2056162179686892853L;
@@ -40,7 +43,11 @@ public class SearchData implements Serializable
 
   private PFUserDO modifiedByUser;
 
+  private TaskDO task;
+
   private String area;
+
+  private int pageSize;
 
   public Date getModifiedStartDate()
   {
@@ -92,6 +99,16 @@ public class SearchData implements Serializable
     this.modifiedByUser = modifiedByUser;
   }
 
+  public TaskDO getTask()
+  {
+    return task;
+  }
+
+  public void setTask(TaskDO task)
+  {
+    this.task = task;
+  }
+
   public String getArea()
   {
     return area;
@@ -100,5 +117,15 @@ public class SearchData implements Serializable
   public void setArea(String area)
   {
     this.area = area;
+  }
+
+  public int getPageSize()
+  {
+    return pageSize;
+  }
+
+  public void setPageSize(int pageSize)
+  {
+    this.pageSize = pageSize;
   }
 }
