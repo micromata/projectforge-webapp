@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -45,6 +46,7 @@ import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.CompoundPropertyModel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -108,6 +110,22 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
   private SingleButtonPanel nextButtonPanel;
 
   protected WebMarkupContainer filterContainer;
+
+  public static DropDownChoice<Integer> getPageSizeDropDownChoice(final String id, final Locale locale, final IModel<Integer> model,
+      final int minValue, final int maxValue)
+  {
+    final LabelValueChoiceRenderer<Integer> pageSizeChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
+    final NumberFormat nf = NumberFormat.getInstance(locale);
+    for (final int size : new int[] { 5, 10, 25, 50, 100, 200, 500, 1000}) {
+      if (size >= minValue && size <= maxValue) {
+        pageSizeChoiceRenderer.addValue(size, nf.format(size));
+      }
+    }
+    final DropDownChoice<Integer> pageSizeChoice = new DropDownChoice<Integer>("pageSize", model, pageSizeChoiceRenderer.getValues(),
+        pageSizeChoiceRenderer);
+    pageSizeChoice.setNullValid(false);
+    return pageSizeChoice;
+  }
 
   public AbstractListForm(P parentPage)
   {
@@ -192,18 +210,7 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
     pageSizeFragment = new Fragment("pageSize", "pageSizeFragment", this);
     filterContainer.add(pageSizeFragment);
 
-    // DropDownChoice pageSize
-    final LabelValueChoiceRenderer<Integer> pageSizeChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-    final NumberFormat nf = NumberFormat.getInstance(getLocale());
-    pageSizeChoiceRenderer.addValue(25, "25");
-    pageSizeChoiceRenderer.addValue(50, "50");
-    pageSizeChoiceRenderer.addValue(100, "100");
-    pageSizeChoiceRenderer.addValue(200, "200");
-    pageSizeChoiceRenderer.addValue(500, "500");
-    pageSizeChoiceRenderer.addValue(1000, nf.format(1000));
-    final DropDownChoice pageSizeChoice = new DropDownChoice("pageSize", new PropertyModel(this, "pageSize"), pageSizeChoiceRenderer
-        .getValues(), pageSizeChoiceRenderer);
-    pageSizeChoice.setNullValid(false);
+    final DropDownChoice pageSizeChoice = getPageSizeDropDownChoice("pageSize", getLocale(), new PropertyModel<Integer>(this, "pageSize"), 25, 1000);
     pageSizeFragment.add(pageSizeChoice);
     final WebMarkupContainer buttonCell = new WebMarkupContainer("buttonCell") {
       public boolean isTransparentResolver()
