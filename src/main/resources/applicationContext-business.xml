@@ -13,6 +13,7 @@
   <bean id="pdfRenderer" class="org.projectforge.renderer.PdfRenderer" singleton="true">
     <property name="fontResourceDir" value="fonts" />
   </bean>
+  <bean id="daoRegistry" class="org.projectforge.registry.DaoRegistry" singleton="true" />
   <bean id="hrPlanningExport" class="org.projectforge.humanresources.HRPlanningExport" />
   <bean id="mebMailClient" class="org.projectforge.meb.MebMailClient" />
   <bean id="sendMail" class="org.projectforge.mail.SendMail" singleton="true" />
