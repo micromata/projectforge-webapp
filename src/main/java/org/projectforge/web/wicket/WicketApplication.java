@@ -54,6 +54,7 @@ import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.CronSetup;
 import org.projectforge.core.ProjectForgeException;
 import org.projectforge.database.HibernateUtils;
+import org.projectforge.registry.DaoRegistry;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.LoginPage;
@@ -245,6 +246,9 @@ public class WicketApplication extends WebApplication
   @SpringBean(name = "cronSetup")
   private CronSetup cronSetup;
 
+  @SpringBean(name = "daoRegistry")
+  private DaoRegistry daoRegistry;
+
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
@@ -285,6 +289,11 @@ public class WicketApplication extends WebApplication
   public void setCronSetup(CronSetup cronSetup)
   {
     this.cronSetup = cronSetup;
+  }
+  
+  public void setDaoRegistry(DaoRegistry daoRegistry)
+  {
+    this.daoRegistry = daoRegistry;
   }
 
   public void setUserDao(UserDao userDao)
@@ -436,6 +445,7 @@ public class WicketApplication extends WebApplication
     } else {
       throw new RuntimeException("this.wicketApplicationFilter is null");
     }
+    daoRegistry.init();
     getResourceSettings().setLocalizer(new GWikiLocalizer("edit/StandardI18n"));
     log.info("Default TimeZone is: " + TimeZone.getDefault());
     log.info("user.timezone is: " + System.getProperty("user.timezone"));
