@@ -142,45 +142,6 @@ public class SearchDao extends HibernateDaoSupport
     return result;
   }
 
-  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public boolean hasUserAccess(SearchArea area)
-  {
-    if (area == SearchArea.ALL) {
-      return true;
-    } else if (area == SearchArea.ACCESS) {
-      return accessDao.hasHistoryAccess(false);
-    } else if (area == SearchArea.ADDRESS) {
-      return addressDao.hasHistoryAccess(false);
-    } else if (area == SearchArea.BOOK) {
-      return bookDao.hasHistoryAccess(false);
-    } else if (area == SearchArea.GROUP) {
-      return groupDao.hasHistoryAccess(false);
-    } else if (area == SearchArea.BUCHUNGSSATZ) {
-      return buchungssatzDao.hasHistoryAccess(false);
-    } else if (area == SearchArea.KOST1) {
-      return kost1Dao.hasHistoryAccess(false);
-    } else if (area == SearchArea.KOST2) {
-      return kost2Dao.hasHistoryAccess(false);
-    } else if (area == SearchArea.KOST2ART) {
-      return kost2ArtDao.hasHistoryAccess(false);
-    } else if (area == SearchArea.KONTO) {
-      return kontoDao.hasHistoryAccess(false);
-    } else if (area == SearchArea.KUNDE) {
-      return kundeDao.hasHistoryAccess(false);
-    } else if (area == SearchArea.PROJEKT) {
-      return projektDao.hasHistoryAccess(false);
-    } else if (area == SearchArea.RECHNUNG) {
-      return rechnungDao.hasHistoryAccess(false);
-    } else if (area == SearchArea.TASK) {
-      return taskDao.hasHistoryAccess(false);
-    } else if (area == SearchArea.TIMESHEET) {
-      return timesheetDao.hasHistoryAccess(false);
-    } else if (area == SearchArea.USER) {
-      return userDao.hasHistoryAccess(false);
-    }
-    throw new UnsupportedOperationException("SearchArea not supported: " + area);
-  }
-
   private void addList(List<List<SearchResultData>> lists, List<SearchResultData> list, SearchFilter filter, SearchArea area)
   {
     if ((filter.getArea() == SearchArea.ALL || filter.getArea() == area) && list != null && list.size() > 0) {
