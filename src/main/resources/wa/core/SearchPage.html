@@ -4,6 +4,7 @@
 </head>
 
 <body>
+<wicket:extend>
 <form wicket:id="form">
 <div wicket:id="feedback">[Validation errors]</div>
 
@@ -36,10 +37,11 @@
   </tr>
   <tr>
     <th></th>
-    <td class="buttonpanel" wicket:id="buttonCell" colspan="3"><span wicket:id="reset">[reset]</span> <span wicket:id="search">[search]</span></td>
+    <td class="buttonpanel" colspan="3"><span wicket:id="reset">[reset]</span> <span wicket:id="search">[search]</span></td>
   </tr>
 </table>
 </fieldset>
 </form>
+</wicket:extend>
 </body>
 </html>
