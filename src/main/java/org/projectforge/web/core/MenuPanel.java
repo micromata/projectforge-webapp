@@ -23,6 +23,8 @@
 
 package org.projectforge.web.core;
 
+import org.apache.wicket.markup.html.CSSPackageResource;
+import org.apache.wicket.markup.html.JavascriptPackageResource;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -51,11 +53,16 @@ public class MenuPanel extends Panel
   public MenuPanel(String id)
   {
     super(id);
+    add(CSSPackageResource.getHeaderContribution("scripts/jquery-ui-1-2.8.2.custom/css/custom-theme/jquery-ui-.custom.css"));
+    add(JavascriptPackageResource.getHeaderContribution("scripts/jquery-ui-1-2.8.2.custom/js/jquery-ui-1.8.2.custom.min.js"));
+    add(JavascriptPackageResource.getHeaderContribution("scripts/menu.js"));
+    // should be included in jqueryui, uncomment if something is missing
+    // add(JavascriptPackageResource.getHeaderContribution("scripts/jquery.dimensions.min.js"));
   }
 
   public void init()
   {
-    final RepeatingView menuRepeater = new RepeatingView("menuEntries");
+    /*final RepeatingView menuRepeater = new RepeatingView("menuEntries");
     add(menuRepeater);
 
     getMenu();
@@ -64,7 +71,7 @@ public class MenuPanel extends Panel
       entryPanel.setRenderBodyOnly(true);
       menuRepeater.add(entryPanel);
       entryPanel.init(entry);
-    }
+    }*/
   }
 
   private Menu getMenu()
