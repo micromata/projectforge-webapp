@@ -105,7 +105,7 @@ public class MenuPanel extends Panel
             + "{"
             + generateCallbackScript("wicketAjaxGet('"
                 + getCallbackUrl()
-                + "&favoritesMenu=' + $('#personal, #nav ul').sortable('toArray')")
+                + "&favoriteMenuEntries=' + $('#personal, #nav ul').sortable('toArray')")
             + "return false;}"
             + "}";
         tag.put("onclick", javascript);
@@ -114,11 +114,13 @@ public class MenuPanel extends Panel
       @Override
       protected void respond(final AjaxRequestTarget target)
       {
+        // Callback with favorite menu entries:
         final RequestCycle requestCycle = RequestCycle.get();
-        final String favoritesMenu = requestCycle.getRequest().getParameter("favoritesMenu");
+        final String favoritesMenu = requestCycle.getRequest().getParameter("favoriteMenuEntries");
         if (getPage() instanceof AbstractSecuredPage) {
           final AbstractSecuredPage securedPage = ((AbstractSecuredPage) getPage());
           getMenu().setFavoriteMenuEntries(favoritesMenu);
+          // Store the favorite menu entries in the user's preference (persisted).
           securedPage.putUserPrefEntry(USER_PREF_FAVORITE_MENU_ENTRIES_KEY, favoritesMenu, true);
         }
       }
