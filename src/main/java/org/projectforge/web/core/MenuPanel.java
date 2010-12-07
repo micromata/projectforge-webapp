@@ -34,7 +34,9 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
@@ -76,14 +78,20 @@ public class MenuPanel extends Panel
     getMenu();
     for (final MenuEntry menuArea : menu.getMenuEntries()) {
       if (menuArea.getSubMenuEntries() == null) {
+        log.error("Oups: menu without sub menus not supported: " + menuArea.getId());
         continue;
       }
       final WebMarkupContainer menuAreaContainer = new WebMarkupContainer(menuAreaRepeater.newChildId());
       menuAreaRepeater.add(menuAreaContainer);
       menuAreaContainer.add(new Label("areaTitle", getString(menuArea.getI18nKey())));
+      final Label areaSuffixLabel = getSuffixLabel(menuArea);
+      menuAreaContainer.add(areaSuffixLabel);
       final RepeatingView menuEntryRepeater = new RepeatingView("menuEntryRepeater");
       menuAreaContainer.add(menuEntryRepeater);
       for (final MenuEntry menuEntry : menuArea.getSubMenuEntries()) {
+        if (menuEntry.getSubMenuEntries() != null) {
+          log.error("Oups: sub sub menus not supported: " + menuArea.getId() + " has child menus which are ignored.");
+        }
         final WebMarkupContainer li = new WebMarkupContainer(menuEntryRepeater.newChildId());
         menuEntryRepeater.add(li);
         li.add(new SimpleAttributeModifier("id", menuEntry.getId()));
@@ -106,8 +114,44 @@ public class MenuPanel extends Panel
         }
         li.add(link);
         link.add(new Label("label", getString(menuEntry.getI18nKey())));
+        final Label menuSuffixLabel = getSuffixLabel(menuEntry);
+        link.add(menuSuffixLabel);
       }
     }
+  }
+
+  @SuppressWarnings("serial")
+  private Label getSuffixLabel(final MenuEntry menuEntry)
+  {
+    final Label suffixLabel;
+    if (menuEntry.getNewCounterModel() != null) {
+      suffixLabel = new Label("suffix", new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          final Integer counter = menuEntry.getNewCounterModel().getObject();
+          if (NumberHelper.greaterZero(counter) == true) {
+            return String.valueOf(counter);
+          } else {
+            return "";
+          }
+        }
+      }) {
+        @Override
+        public boolean isVisible()
+        {
+          final Integer counter = menuEntry.getNewCounterModel().getObject();
+          return NumberHelper.greaterZero(counter) == true;
+        }
+      };
+    } else {
+      suffixLabel = new Label("suffix");
+      suffixLabel.setVisible(false);
+    }
+    if (menuEntry.getNewCounterTooltip() != null) {
+      WicketUtils.addTooltip(suffixLabel, getString(menuEntry.getNewCounterTooltip()));
+    }
+    return suffixLabel;
   }
 
   private Menu getMenu()

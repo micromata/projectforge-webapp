@@ -17,9 +17,11 @@
   <ul id="normal">
     <li class="main sortablenav"><a class="parent"> <wicket:message key="menu.main.title" /> </a>
     <ul id="nav" class="boxshadow lightgradient roundcorners">
-      <li class="first selected" wicket:id="menuAreaRepeater"><span wicket:id="areaTitle" class="label parent shaded">[Project management]</span>
+      <li class="first selected" wicket:id="menuAreaRepeater"><span wicket:id="areaTitle" class="label parent shaded">[Project management]</span><span
+        class="counter suffix shaded" wicket:id="suffix">[5]</span>
       <ul>
-        <li wicket:id="menuEntryRepeater" id="[menuEntryId]"><a wicket:id="link" href="taskTree"> <span wicket:id="label" class="label">[Task tree]</span> </a></li>
+        <li wicket:id="menuEntryRepeater" id="[menuEntryId]"><a wicket:id="link" href="taskTree"> <span wicket:id="label" class="label">[Task
+        tree]</span><span class="counter suffix shaded" wicket:id="suffix">[5]</span> </a></li>
       </ul>
       </li>
     </ul>
