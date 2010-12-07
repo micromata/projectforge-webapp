@@ -77,29 +77,31 @@ public class MenuPanel extends Panel
 
     getMenu();
     int counter = 0;
-    for (final MenuEntry menuArea : menu.getMenuEntries()) {
-      if (menuArea.getSubMenuEntries() == null) {
-        log.error("Oups: menu without sub menus not supported: " + menuArea.getId());
+    for (final MenuEntry menuAreaEntry : menu.getMenuEntries()) {
+      if (menuAreaEntry.getSubMenuEntries() == null) {
+        log.error("Oups: menu without sub menus not supported: " + menuAreaEntry.getId());
         continue;
       }
+      // Now we add a new menu area (title with sub menus):
       final WebMarkupContainer menuAreaContainer = new WebMarkupContainer(menuAreaRepeater.newChildId());
       menuAreaRepeater.add(menuAreaContainer);
-      final WebMarkupContainer li = new WebMarkupContainer("li");
-      menuAreaContainer.add(li);
-      li.add(new Label("areaTitle", getString(menuArea.getI18nKey())));
-      final Label areaSuffixLabel = getSuffixLabel(menuArea);
-      li.add(areaSuffixLabel);
+      final WebMarkupContainer menuAreaItem = new WebMarkupContainer("menuArea");
+      menuAreaContainer.add(menuAreaItem);
+      menuAreaItem.add(new Label("areaTitle", getString(menuAreaEntry.getI18nKey())));
+      final Label areaSuffixLabel = getSuffixLabel(menuAreaEntry);
+      menuAreaItem.add(areaSuffixLabel);
       final RepeatingView menuEntryRepeater = new RepeatingView("menuEntryRepeater");
-      li.add(menuEntryRepeater);
-      for (final MenuEntry menuEntry : menuArea.getSubMenuEntries()) {
+      menuAreaItem.add(menuEntryRepeater);
+      for (final MenuEntry menuEntry : menuAreaEntry.getSubMenuEntries()) {
         if (menuEntry.getSubMenuEntries() != null) {
-          log.error("Oups: sub sub menus not supported: " + menuArea.getId() + " has child menus which are ignored.");
+          log.error("Oups: sub sub menus not supported: " + menuAreaEntry.getId() + " has child menus which are ignored.");
         }
-        final WebMarkupContainer subLi = new WebMarkupContainer(menuEntryRepeater.newChildId());
-        menuEntryRepeater.add(subLi);
-        subLi.add(new SimpleAttributeModifier("id", menuEntry.getId()));
+        // Now we add the next menu entry to the area:
+        final WebMarkupContainer menuEntryLi = new WebMarkupContainer(menuEntryRepeater.newChildId());
+        menuEntryRepeater.add(menuEntryLi);
+        menuEntryLi.add(new SimpleAttributeModifier("id", menuEntry.getId()));
         if (menuEntry.isFirst() == true) {
-          subLi.add(new SimpleAttributeModifier("class", "first"));
+          menuEntryLi.add(new SimpleAttributeModifier("class", "first"));
         }
         final AbstractLink link;
         if (menuEntry.isWicketPage() == true) {
@@ -115,7 +117,7 @@ public class MenuPanel extends Panel
         if (menuEntry.isNewWindow() == true) {
           link.add(new SimpleAttributeModifier("target", "_blank"));
         }
-        subLi.add(link);
+        menuEntryLi.add(link);
         link.add(new Label("label", getString(menuEntry.getI18nKey())));
         final Label menuSuffixLabel = getSuffixLabel(menuEntry);
         link.add(menuSuffixLabel);
@@ -128,9 +130,10 @@ public class MenuPanel extends Panel
         menuAreaContainer.add(new Label("tipRow", "invisible").setVisible(false));
       }
     }
+    // Now we append the second tip row at the bottom of the menu (independant from the number of menu areas):
     final WebMarkupContainer container = new WebMarkupContainer(menuAreaRepeater.newChildId());
     menuAreaRepeater.add(container);
-    final WebMarkupContainer li = new WebMarkupContainer("li");
+    final WebMarkupContainer li = new WebMarkupContainer("menuArea");
     container.add(li.setVisible(false));
     final WebMarkupContainer tipRow = new WebMarkupContainer("tipRow");
     container.add(tipRow);
