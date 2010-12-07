@@ -24,7 +24,11 @@
 package org.projectforge.web.core;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.RequestCycle;
+import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.CSSPackageResource;
 import org.apache.wicket.markup.html.JavascriptPackageResource;
 import org.apache.wicket.markup.html.WebMarkupContainer;
@@ -70,23 +74,68 @@ public class MenuPanel extends Panel
     // add(JavascriptPackageResource.getHeaderContribution("scripts/jquery.dimensions.min.js"));
   }
 
+  @SuppressWarnings("serial")
   public void init()
   {
     getMenu();
 
+    final WebMarkupContainer mainMenuContainer = new WebMarkupContainer("mainMenu");
+    add(mainMenuContainer);
+    mainMenuContainer.add(new AbstractDefaultAjaxBehavior() {
+      @Override
+      protected void onComponentTag(final ComponentTag tag)
+      {
+        super.onComponentTag(tag);
+        final String javascript = // One click opens the main menu and and the next click closes the main menu
+        "$('#normal .main').toggleClass('active');"
+        // If the main menu is open after toggling...
+            + "if($('.main').hasClass('active')){"
+            // enable sortable...
+            + "$('#personal, #nav ul').sortable('enable');"
+            // and add blue border around the personal menu...
+            + "$('ul#personal').addClass('dotted');"
+            // main menu is now closed...
+            + "} else {"
+            // disable sortable....
+            + "$('#personal, #nav ul').sortable('disable');"
+            // Call back serialized menu...
+            + "{"
+            + generateCallbackScript("wicketAjaxGet('" + getCallbackUrl() + "&favoritesMenu=' + $('#personal, #nav ul').sortable('toArray')")
+            + "return false;}"
+            // remove the blue border around the personal menu
+            + "  $('ul#personal').removeClass('dotted');"
+            + "}";
+        tag.put("onclick", javascript);
+      }
+
+      @Override
+      protected void respond(final AjaxRequestTarget target)
+      {
+        final RequestCycle requestCycle = RequestCycle.get();
+        final String favoritesMenu = requestCycle.getRequest().getParameter("favoritesMenu");
+        log.info("FavoritesMenu: " + favoritesMenu);
+      }
+    });
+
     // Favorite menu:
     final RepeatingView favoriteMenuEntryRepeater = new RepeatingView("favoriteMenuEntryRepeater");
-    add(favoriteMenuEntryRepeater);
+    mainMenuContainer.add(favoriteMenuEntryRepeater);
+    boolean isFirst = true;
     for (final MenuEntry favoriteMenuEntry : menu.getFavoriteMenuEntries()) {
       final WebMarkupContainer favoriteMenuEntryContainer = new WebMarkupContainer(favoriteMenuEntryRepeater.newChildId());
       favoriteMenuEntryRepeater.add(favoriteMenuEntryContainer);
+      favoriteMenuEntryContainer.add(new SimpleAttributeModifier("id", favoriteMenuEntry.getId()));
+      if (isFirst == true) {
+        // favoriteMenuEntryContainer.add(new SimpleAttributeModifier("class", "first"));
+        isFirst = false;
+      }
       final AbstractLink link = getMenuEntryLink(favoriteMenuEntry);
       favoriteMenuEntryContainer.add(link);
     }
 
     // Main menu:
     final RepeatingView menuAreaRepeater = new RepeatingView("menuAreaRepeater");
-    add(menuAreaRepeater);
+    mainMenuContainer.add(menuAreaRepeater);
 
     int counter = 0;
     for (final MenuEntry menuAreaEntry : menu.getMenuEntries()) {
@@ -99,6 +148,9 @@ public class MenuPanel extends Panel
       menuAreaRepeater.add(menuAreaContainer);
       final WebMarkupContainer menuAreaItem = new WebMarkupContainer("menuArea");
       menuAreaContainer.add(menuAreaItem);
+      if (menuAreaEntry.isFirst() == true) {
+        menuAreaItem.add(new SimpleAttributeModifier("class", "first"));
+      }
       menuAreaItem.add(new Label("areaTitle", getString(menuAreaEntry.getI18nKey())));
       final Label areaSuffixLabel = getSuffixLabel(menuAreaEntry);
       menuAreaItem.add(areaSuffixLabel);
@@ -112,9 +164,6 @@ public class MenuPanel extends Panel
         final WebMarkupContainer menuEntryLi = new WebMarkupContainer(menuEntryRepeater.newChildId());
         menuEntryRepeater.add(menuEntryLi);
         menuEntryLi.add(new SimpleAttributeModifier("id", menuEntry.getId()));
-        if (menuEntry.isFirst() == true) {
-          menuEntryLi.add(new SimpleAttributeModifier("class", "first"));
-        }
         final AbstractLink link = getMenuEntryLink(menuEntry);
         menuEntryLi.add(link);
       }
@@ -152,7 +201,7 @@ public class MenuPanel extends Panel
     if (menuEntry.isNewWindow() == true) {
       link.add(new SimpleAttributeModifier("target", "_blank"));
     }
-    link.add(new Label("label", getString(menuEntry.getI18nKey())));
+    link.add(new Label("label", getString(menuEntry.getI18nKey())).setRenderBodyOnly(true));
     final Label menuSuffixLabel = getSuffixLabel(menuEntry);
     link.add(menuSuffixLabel);
     return link;
