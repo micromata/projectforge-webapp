@@ -116,14 +116,7 @@ public abstract class AbstractBasePage extends WebPage
     }));
     add(CSSPackageResource.getHeaderContribution("styles/main.css"));
     add(CSSPackageResource.getHeaderContribution("styles/calendar.css"));
-    add(CSSPackageResource.getHeaderContribution("scripts/jquery-ui-1-2.8.2.custom/css/custom-theme/jquery-ui-.custom.css"));
-    // upgraded to 1.4.2
     add(JavascriptPackageResource.getHeaderContribution("scripts/jquery-1.4.2.min.js"));
-    // new
-    add(JavascriptPackageResource.getHeaderContribution("scripts/jquery-ui-1-2.8.2.custom/js/jquery-ui-1.8.2.custom.min.js"));
-    // should be included in jqueryui, uncomment if something is missing
-    // add(JavascriptPackageResource.getHeaderContribution("scripts/jquery.dimensions.min.js"));
-    
     add(JavascriptPackageResource.getHeaderContribution("scripts/jquery.tooltip.min.js"));
     add(JavascriptPackageResource.getHeaderContribution("scripts/projectforge.js"));
     add(WicketUtils.headerContributorForFavicon(getUrl("/favicon.ico")));
@@ -420,6 +413,7 @@ public abstract class AbstractBasePage extends WebPage
     if (user != null) {
       userXmlPreferencesCache.flushToDB(user.getId());
       userXmlPreferencesCache.clear(user.getId());
+      menuBuilder.expireMenu(user.getId());
     }
     ((MySession) getSession()).logout();
     final Cookie stayLoggedInCookie = UserFilter.getStayLoggedInCookie(((WebRequest) getRequest()).getHttpServletRequest());
