@@ -26,6 +26,7 @@ package org.projectforge.web;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.projectforge.web.wicket.AbstractBasePage;
 
@@ -39,6 +40,8 @@ public class Menu implements Serializable
   private Collection<MenuEntry> menuEntries = new ArrayList<MenuEntry>();
 
   protected MenuEntry selectedMenu;
+
+  protected List<MenuEntry> favoriteMenuEntries;
 
   public void setSelectedMenu(final AbstractBasePage page)
   {
@@ -55,6 +58,22 @@ public class Menu implements Serializable
   public Collection<MenuEntry> getMenuEntries()
   {
     return menuEntries;
+  }
+
+  public List<MenuEntry> getFavoriteMenuEntries()
+  {
+    synchronized (this) {
+      if (this.favoriteMenuEntries == null || this.favoriteMenuEntries.size() == 0) {
+        this.favoriteMenuEntries = new ArrayList<MenuEntry>();
+        addFavoriteMenuEntry(MenuItemDef.TASK_TREE);
+        addFavoriteMenuEntry(MenuItemDef.CALENDAR);
+        addFavoriteMenuEntry(MenuItemDef.ADDRESS_LIST);
+        addFavoriteMenuEntry(MenuItemDef.BOOK_LIST);
+        addFavoriteMenuEntry(MenuItemDef.PHONE_CALL);
+        addFavoriteMenuEntry(MenuItemDef.MEB);
+      }
+      return this.favoriteMenuEntries;
+    }
   }
 
   public boolean isFirst(final MenuEntry entry)
@@ -76,5 +95,41 @@ public class Menu implements Serializable
       parent.addMenuEntry(menuEntry);
     }
     return menuEntry;
+  }
+
+  private MenuEntry getMenuEntry(final MenuItemDef menuItemDef)
+  {
+    for (final MenuEntry menuEntry : getMenuEntries()) {
+      final MenuEntry result = getMenuEntry(menuEntry, menuItemDef);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
+  }
+
+  private MenuEntry getMenuEntry(final MenuEntry parent, final MenuItemDef menuItemDef)
+  {
+    if (parent.menuItemDef == menuItemDef) {
+      return parent;
+    }
+    if (parent.hasSubMenuEntries() == true) {
+      for (final MenuEntry subMenuEntry : parent.getSubMenuEntries()) {
+        final MenuEntry result = getMenuEntry(subMenuEntry, menuItemDef);
+        if (result != null) {
+          return result;
+        }
+      }
+    }
+    return null;
+  }
+
+  private void addFavoriteMenuEntry(final MenuItemDef menuItemDef)
+  {
+    final MenuEntry menuEntry = getMenuEntry(menuItemDef);
+    if (menuEntry == null) {
+      return;
+    }
+    this.favoriteMenuEntries.add(menuEntry);
   }
 }

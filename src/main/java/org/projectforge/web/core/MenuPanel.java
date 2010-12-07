@@ -72,10 +72,22 @@ public class MenuPanel extends Panel
 
   public void init()
   {
+    getMenu();
+
+    // Favorite menu:
+    final RepeatingView favoriteMenuEntryRepeater = new RepeatingView("favoriteMenuEntryRepeater");
+    add(favoriteMenuEntryRepeater);
+    for (final MenuEntry favoriteMenuEntry : menu.getFavoriteMenuEntries()) {
+      final WebMarkupContainer favoriteMenuEntryContainer = new WebMarkupContainer(favoriteMenuEntryRepeater.newChildId());
+      favoriteMenuEntryRepeater.add(favoriteMenuEntryContainer);
+      final AbstractLink link = getMenuEntryLink(favoriteMenuEntry);
+      favoriteMenuEntryContainer.add(link);
+    }
+
+    // Main menu:
     final RepeatingView menuAreaRepeater = new RepeatingView("menuAreaRepeater");
     add(menuAreaRepeater);
 
-    getMenu();
     int counter = 0;
     for (final MenuEntry menuAreaEntry : menu.getMenuEntries()) {
       if (menuAreaEntry.getSubMenuEntries() == null) {
@@ -103,24 +115,8 @@ public class MenuPanel extends Panel
         if (menuEntry.isFirst() == true) {
           menuEntryLi.add(new SimpleAttributeModifier("class", "first"));
         }
-        final AbstractLink link;
-        if (menuEntry.isWicketPage() == true) {
-          if (menuEntry.getParams() == null) {
-            link = new BookmarkablePageLink<String>("link", menuEntry.getPageClass());
-          } else {
-            final PageParameters params = WicketUtils.getPageParameters(menuEntry.getParams());
-            link = new BookmarkablePageLink<String>("link", menuEntry.getPageClass(), params);
-          }
-        } else {
-          link = new ExternalLink("link", WicketUtils.getUrl(getResponse(), menuEntry.getUrl(), true));
-        }
-        if (menuEntry.isNewWindow() == true) {
-          link.add(new SimpleAttributeModifier("target", "_blank"));
-        }
+        final AbstractLink link = getMenuEntryLink(menuEntry);
         menuEntryLi.add(link);
-        link.add(new Label("label", getString(menuEntry.getI18nKey())));
-        final Label menuSuffixLabel = getSuffixLabel(menuEntry);
-        link.add(menuSuffixLabel);
       }
       if (counter++ == 3) {
         final WebMarkupContainer tipRow = new WebMarkupContainer("tipRow");
@@ -138,6 +134,28 @@ public class MenuPanel extends Panel
     final WebMarkupContainer tipRow = new WebMarkupContainer("tipRow");
     container.add(tipRow);
     tipRow.add(new Label("tip", getString("menu.main.tip2")).setEscapeModelStrings(false));
+  }
+
+  private AbstractLink getMenuEntryLink(final MenuEntry menuEntry)
+  {
+    final AbstractLink link;
+    if (menuEntry.isWicketPage() == true) {
+      if (menuEntry.getParams() == null) {
+        link = new BookmarkablePageLink<String>("link", menuEntry.getPageClass());
+      } else {
+        final PageParameters params = WicketUtils.getPageParameters(menuEntry.getParams());
+        link = new BookmarkablePageLink<String>("link", menuEntry.getPageClass(), params);
+      }
+    } else {
+      link = new ExternalLink("link", WicketUtils.getUrl(getResponse(), menuEntry.getUrl(), true));
+    }
+    if (menuEntry.isNewWindow() == true) {
+      link.add(new SimpleAttributeModifier("target", "_blank"));
+    }
+    link.add(new Label("label", getString(menuEntry.getI18nKey())));
+    final Label menuSuffixLabel = getSuffixLabel(menuEntry);
+    link.add(menuSuffixLabel);
+    return link;
   }
 
   @SuppressWarnings("serial")
