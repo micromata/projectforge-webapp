@@ -23,8 +23,15 @@
 
 package org.projectforge.web.core;
 
+import org.apache.wicket.PageParameters;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.CSSPackageResource;
 import org.apache.wicket.markup.html.JavascriptPackageResource;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.AbstractLink;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -33,6 +40,7 @@ import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.MenuEntry;
 import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -62,16 +70,44 @@ public class MenuPanel extends Panel
 
   public void init()
   {
-    /*final RepeatingView menuRepeater = new RepeatingView("menuEntries");
-    add(menuRepeater);
+    final RepeatingView menuAreaRepeater = new RepeatingView("menuAreaRepeater");
+    add(menuAreaRepeater);
 
     getMenu();
-    for (final MenuEntry entry : menu.getMenuEntries()) {
-      final MenuEntryPanel entryPanel = new MenuEntryPanel(menuRepeater.newChildId());
-      entryPanel.setRenderBodyOnly(true);
-      menuRepeater.add(entryPanel);
-      entryPanel.init(entry);
-    }*/
+    for (final MenuEntry menuArea : menu.getMenuEntries()) {
+      if (menuArea.getSubMenuEntries() == null) {
+        continue;
+      }
+      final WebMarkupContainer menuAreaContainer = new WebMarkupContainer(menuAreaRepeater.newChildId());
+      menuAreaRepeater.add(menuAreaContainer);
+      menuAreaContainer.add(new Label("areaTitle", getString(menuArea.getI18nKey())));
+      final RepeatingView menuEntryRepeater = new RepeatingView("menuEntryRepeater");
+      menuAreaContainer.add(menuEntryRepeater);
+      for (final MenuEntry menuEntry : menuArea.getSubMenuEntries()) {
+        final WebMarkupContainer li = new WebMarkupContainer(menuEntryRepeater.newChildId());
+        menuEntryRepeater.add(li);
+        li.add(new SimpleAttributeModifier("id", menuEntry.getId()));
+        if (menuEntry.isFirst() == true) {
+          li.add(new SimpleAttributeModifier("class", "first"));
+        }
+        final AbstractLink link;
+        if (menuEntry.isWicketPage() == true) {
+          if (menuEntry.getParams() == null) {
+            link = new BookmarkablePageLink<String>("link", menuEntry.getPageClass());
+          } else {
+            final PageParameters params = WicketUtils.getPageParameters(menuEntry.getParams());
+            link = new BookmarkablePageLink<String>("link", menuEntry.getPageClass(), params);
+          }
+        } else {
+          link = new ExternalLink("link", WicketUtils.getUrl(getResponse(), menuEntry.getUrl(), true));
+        }
+        if (menuEntry.isNewWindow() == true) {
+          link.add(new SimpleAttributeModifier("target", "_blank"));
+        }
+        li.add(link);
+        link.add(new Label("label", getString(menuEntry.getI18nKey())));
+      }
+    }
   }
 
   private Menu getMenu()

@@ -15,13 +15,11 @@
   </ul>
 
   <ul id="normal">
-    <li class="main sortablenav"><a class="parent"> <span>Hauptmenü</span> </a>
+    <li class="main sortablenav"><a class="parent"> <wicket:message key="menu.main.title" /> </a>
     <ul id="nav" class="boxshadow lightgradient roundcorners">
-      <li class="first selected"><span class="label parent shaded">Allgemein</span>
+      <li class="first selected" wicket:id="menuAreaRepeater"><span wicket:id="areaTitle" class="label parent shaded">[Project management]</span>
       <ul>
-        <li><a href="taskTree"> <span class="label">Aufgaben</span> </a></li>
-        <li><a href="timesheetList"> <span class="label">Zeitberichte</span> </a></li>
-        <li class="selected"><a href="calendar"> <span class="label">Kalender</span> </a></li>
+        <li wicket:id="menuEntryRepeater" id="[menuEntryId]"><a wicket:id="link" href="taskTree"> <span wicket:id="label" class="label">[Task tree]</span> </a></li>
       </ul>
       </li>
     </ul>
