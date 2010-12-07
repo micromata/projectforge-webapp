@@ -79,9 +79,8 @@ public class MenuPanel extends Panel
   {
     getMenu();
 
-    final WebMarkupContainer mainMenuContainer = new WebMarkupContainer("mainMenu");
-    add(mainMenuContainer);
-    mainMenuContainer.add(new AbstractDefaultAjaxBehavior() {
+    final WebMarkupContainer mainMenuLink = new WebMarkupContainer("mainMenuLink");
+    mainMenuLink.add(new AbstractDefaultAjaxBehavior() {
       @Override
       protected void onComponentTag(final ComponentTag tag)
       {
@@ -98,12 +97,14 @@ public class MenuPanel extends Panel
             + "} else {"
             // disable sortable....
             + "$('#personal, #nav ul').sortable('disable');"
-            // Call back serialized menu...
-            + "{"
-            + generateCallbackScript("wicketAjaxGet('" + getCallbackUrl() + "&favoritesMenu=' + $('#personal, #nav ul').sortable('toArray')")
-            + "return false;}"
             // remove the blue border around the personal menu
             + "  $('ul#personal').removeClass('dotted');"
+            // Call back serialized menu...
+            + "{"
+            + generateCallbackScript("wicketAjaxGet('"
+                + getCallbackUrl()
+                + "&favoritesMenu=' + $('#personal, #nav ul').sortable('toArray')")
+            + "return false;}"
             + "}";
         tag.put("onclick", javascript);
       }
@@ -116,10 +117,11 @@ public class MenuPanel extends Panel
         log.info("FavoritesMenu: " + favoritesMenu);
       }
     });
-
+    add(mainMenuLink);
+    
     // Favorite menu:
     final RepeatingView favoriteMenuEntryRepeater = new RepeatingView("favoriteMenuEntryRepeater");
-    mainMenuContainer.add(favoriteMenuEntryRepeater);
+    add(favoriteMenuEntryRepeater);
     boolean isFirst = true;
     for (final MenuEntry favoriteMenuEntry : menu.getFavoriteMenuEntries()) {
       final WebMarkupContainer favoriteMenuEntryContainer = new WebMarkupContainer(favoriteMenuEntryRepeater.newChildId());
@@ -135,7 +137,7 @@ public class MenuPanel extends Panel
 
     // Main menu:
     final RepeatingView menuAreaRepeater = new RepeatingView("menuAreaRepeater");
-    mainMenuContainer.add(menuAreaRepeater);
+    add(menuAreaRepeater);
 
     int counter = 0;
     for (final MenuEntry menuAreaEntry : menu.getMenuEntries()) {
