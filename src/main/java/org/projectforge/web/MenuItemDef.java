@@ -97,7 +97,6 @@ public enum MenuItemDef
       FINANCE_GROUP, ORGA_TEAM, CONTROLLING_GROUP), //
   KOST("fibu.kost", //
       FINANCE_GROUP, ORGA_TEAM, CONTROLLING_GROUP), //
-  MISC("misc"), //
   ORGA("orga", //
       FINANCE_GROUP, CONTROLLING_GROUP, ORGA_TEAM), //
   PROJECT_MANAGEMENT("projectmanagement"), //

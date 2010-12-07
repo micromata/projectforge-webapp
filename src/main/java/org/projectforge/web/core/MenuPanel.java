@@ -76,6 +76,7 @@ public class MenuPanel extends Panel
     add(menuAreaRepeater);
 
     getMenu();
+    int counter = 0;
     for (final MenuEntry menuArea : menu.getMenuEntries()) {
       if (menuArea.getSubMenuEntries() == null) {
         log.error("Oups: menu without sub menus not supported: " + menuArea.getId());
@@ -83,20 +84,22 @@ public class MenuPanel extends Panel
       }
       final WebMarkupContainer menuAreaContainer = new WebMarkupContainer(menuAreaRepeater.newChildId());
       menuAreaRepeater.add(menuAreaContainer);
-      menuAreaContainer.add(new Label("areaTitle", getString(menuArea.getI18nKey())));
+      final WebMarkupContainer li = new WebMarkupContainer("li");
+      menuAreaContainer.add(li);
+      li.add(new Label("areaTitle", getString(menuArea.getI18nKey())));
       final Label areaSuffixLabel = getSuffixLabel(menuArea);
-      menuAreaContainer.add(areaSuffixLabel);
+      li.add(areaSuffixLabel);
       final RepeatingView menuEntryRepeater = new RepeatingView("menuEntryRepeater");
-      menuAreaContainer.add(menuEntryRepeater);
+      li.add(menuEntryRepeater);
       for (final MenuEntry menuEntry : menuArea.getSubMenuEntries()) {
         if (menuEntry.getSubMenuEntries() != null) {
           log.error("Oups: sub sub menus not supported: " + menuArea.getId() + " has child menus which are ignored.");
         }
-        final WebMarkupContainer li = new WebMarkupContainer(menuEntryRepeater.newChildId());
-        menuEntryRepeater.add(li);
-        li.add(new SimpleAttributeModifier("id", menuEntry.getId()));
+        final WebMarkupContainer subLi = new WebMarkupContainer(menuEntryRepeater.newChildId());
+        menuEntryRepeater.add(subLi);
+        subLi.add(new SimpleAttributeModifier("id", menuEntry.getId()));
         if (menuEntry.isFirst() == true) {
-          li.add(new SimpleAttributeModifier("class", "first"));
+          subLi.add(new SimpleAttributeModifier("class", "first"));
         }
         final AbstractLink link;
         if (menuEntry.isWicketPage() == true) {
@@ -112,12 +115,26 @@ public class MenuPanel extends Panel
         if (menuEntry.isNewWindow() == true) {
           link.add(new SimpleAttributeModifier("target", "_blank"));
         }
-        li.add(link);
+        subLi.add(link);
         link.add(new Label("label", getString(menuEntry.getI18nKey())));
         final Label menuSuffixLabel = getSuffixLabel(menuEntry);
         link.add(menuSuffixLabel);
       }
+      if (counter++ == 3) {
+        final WebMarkupContainer tipRow = new WebMarkupContainer("tipRow");
+        menuAreaContainer.add(tipRow);
+        tipRow.add(new Label("tip", getString("menu.main.tip1")).setEscapeModelStrings(false));
+      } else {
+        menuAreaContainer.add(new Label("tipRow", "invisible").setVisible(false));
+      }
     }
+    final WebMarkupContainer container = new WebMarkupContainer(menuAreaRepeater.newChildId());
+    menuAreaRepeater.add(container);
+    final WebMarkupContainer li = new WebMarkupContainer("li");
+    container.add(li.setVisible(false));
+    final WebMarkupContainer tipRow = new WebMarkupContainer("tipRow");
+    container.add(tipRow);
+    tipRow.add(new Label("tip", getString("menu.main.tip2")).setEscapeModelStrings(false));
   }
 
   @SuppressWarnings("serial")

@@ -92,6 +92,26 @@ public class MenuBuilder implements Serializable
     common.addSubMenu(user, MenuItemDef.TIMESHEET_LIST);
     common.addSubMenu(user, MenuItemDef.CALENDAR);
     common.addSubMenu(user, MenuItemDef.SEARCH);
+    if (configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS) != null) {
+      common.addSubMenu(user, MenuItemDef.BOOK_LIST);
+    }
+    if (configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES) != null) {
+      common.addSubMenu(user, MenuItemDef.ADDRESS_LIST);
+    }
+    if (StringUtils.isNotEmpty(configuration.getTelephoneSystemUrl()) == true) {
+      common.addSubMenu(user, MenuItemDef.PHONE_CALL);
+    }
+    common.addSubMenu(user, MenuItemDef.IMAGE_CROPPER);
+    if (configuration.isMebConfigured() == true) {
+      final Node meb = common.addSubMenu(user, MenuItemDef.MEB);
+      if (meb != null) {
+        meb.setNewCounterModel(new MenuNewCounterMeb());
+      }
+    }
+    if (WicketApplication.isDevelopmentModus() == true) {
+      common.addSubMenu(user, MenuItemDef.GWIKI);
+    }
+
     final Node fibu = root.addSubMenu(user, MenuItemDef.FIBU);
     boolean projectMenuEntryExists = false;
     boolean orderBookMenuEntryExists = false;
@@ -164,27 +184,6 @@ public class MenuBuilder implements Serializable
         projectMgmnt.addSubMenu(user, MenuItemDef.ORDER_LIST);
       }
       projectMgmnt.addSubMenu(user, MenuItemDef.GANTT);
-    }
-
-    final Node misc = root.addSubMenu(user, MenuItemDef.MISC);
-    if (configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS) != null) {
-      misc.addSubMenu(user, MenuItemDef.BOOK_LIST);
-    }
-    if (configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES) != null) {
-      misc.addSubMenu(user, MenuItemDef.ADDRESS_LIST);
-    }
-    if (StringUtils.isNotEmpty(configuration.getTelephoneSystemUrl()) == true) {
-      misc.addSubMenu(user, MenuItemDef.PHONE_CALL);
-    }
-    misc.addSubMenu(user, MenuItemDef.IMAGE_CROPPER);
-    if (configuration.isMebConfigured() == true) {
-      final Node meb = misc.addSubMenu(user, MenuItemDef.MEB);
-      if (meb != null) {
-        meb.setNewCounterModel(new MenuNewCounterMeb());
-      }
-    }
-    if (WicketApplication.isDevelopmentModus() == true) {
-      misc.addSubMenu(user, MenuItemDef.GWIKI);
     }
 
     final Node doc = root.addSubMenu(user, MenuItemDef.DOCUMENTATION);
