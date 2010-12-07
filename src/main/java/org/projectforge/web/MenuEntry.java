@@ -81,7 +81,7 @@ public class MenuEntry implements Serializable
     totalNewCounterModelEvaluated = true;
     return totalNewCounterModel;
   }
-  
+
   public String getNewCounterTooltip()
   {
     return newCounterTooltip;
@@ -231,5 +231,10 @@ public class MenuEntry implements Serializable
   public void setVisible(boolean visible)
   {
     this.visible = visible;
+  }
+
+  public String getId()
+  {
+    return menuItemDef.name();
   }
 }
