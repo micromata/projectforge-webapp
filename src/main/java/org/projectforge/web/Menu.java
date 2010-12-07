@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.projectforge.web.wicket.AbstractBasePage;
 
@@ -58,6 +59,26 @@ public class Menu implements Serializable
   public Collection<MenuEntry> getMenuEntries()
   {
     return menuEntries;
+  }
+
+  /**
+   * @param favoritesString coma separated list of MenuItemDefs.
+   */
+  public void setFavoriteMenuEntries(final String favoritesString)
+  {
+    this.favoriteMenuEntries = new ArrayList<MenuEntry>();
+    if (favoritesString == null) {
+      return;
+    }
+    final StringTokenizer tokenizer = new StringTokenizer(favoritesString, ",");
+    while (tokenizer.hasMoreTokens() == true) {
+      final String token = tokenizer.nextToken();
+      final MenuItemDef menuItemDef = MenuItemDef.valueOf(token);
+      if (menuItemDef == null) {
+        continue;
+      }
+      addFavoriteMenuEntry(menuItemDef);
+    }
   }
 
   public List<MenuEntry> getFavoriteMenuEntries()

@@ -57,6 +57,8 @@ public class MenuPanel extends Panel
 
   private static final String USER_PREF_MENU_KEY = "usersMenu";
 
+  private static final String USER_PREF_FAVORITE_MENU_ENTRIES_KEY = "usersFavoriteMenuEntries";
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MenuPanel.class);
 
   @SpringBean(name = "menuBuilder")
@@ -114,11 +116,15 @@ public class MenuPanel extends Panel
       {
         final RequestCycle requestCycle = RequestCycle.get();
         final String favoritesMenu = requestCycle.getRequest().getParameter("favoritesMenu");
-        log.info("FavoritesMenu: " + favoritesMenu);
+        if (getPage() instanceof AbstractSecuredPage) {
+          final AbstractSecuredPage securedPage = ((AbstractSecuredPage) getPage());
+          getMenu().setFavoriteMenuEntries(favoritesMenu);
+          securedPage.putUserPrefEntry(USER_PREF_FAVORITE_MENU_ENTRIES_KEY, favoritesMenu, true);
+        }
       }
     });
     add(mainMenuLink);
-    
+
     // Favorite menu:
     final RepeatingView favoriteMenuEntryRepeater = new RepeatingView("favoriteMenuEntryRepeater");
     add(favoriteMenuEntryRepeater);
@@ -262,6 +268,7 @@ public class MenuPanel extends Panel
     }
     menu = menuBuilder.getMenu(PFUserContext.getUser());
     if (securedPage != null) {
+      menu.setFavoriteMenuEntries((String)securedPage.getUserPrefEntry(USER_PREF_FAVORITE_MENU_ENTRIES_KEY));
       securedPage.putUserPrefEntry(USER_PREF_MENU_KEY, menu, false);
     }
     return menu;
