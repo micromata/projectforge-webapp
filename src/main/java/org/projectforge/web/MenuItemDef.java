@@ -92,8 +92,6 @@ public enum MenuItemDef
   ADMINISTRATION("administration"), //
   COMMON("common"), //
   // *
-  DEVELOPER_DOC("developer"), //
-  // *
   DOCUMENTATION("documentation"), //
   FIBU("fibu", //
       FINANCE_GROUP, ORGA_TEAM, CONTROLLING_GROUP), //
