@@ -37,7 +37,7 @@ public class MenuBuilderTest extends TestBase
       + "\n"
       + "<menu-entry>\n"
       + "  <sub-menu>\n"
-      + "    <menu-entry id='DEVELOPER_DOC' visible='false' />\n"
+      + "    <menu-entry id='IMAGE_CROPPER' visible='false' />\n"
       + "  </sub-menu>\n"
       + "</menu-entry>\n");
 
@@ -49,6 +49,6 @@ public class MenuBuilderTest extends TestBase
     final MenuEntryConfig root = (MenuEntryConfig) reader.read(xml);
     MenuEntryConfig menu = root.getChildren().get(0);
     assertFalse(menu.isVisible());
-    assertEquals(MenuItemDef.DEVELOPER_DOC, menu.getMenuItemDef());
+    assertEquals(MenuItemDef.IMAGE_CROPPER, menu.getMenuItemDef());
   }
 }
