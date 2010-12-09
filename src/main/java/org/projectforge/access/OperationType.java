@@ -23,12 +23,13 @@
 
 package org.projectforge.access;
 
+import org.projectforge.core.I18nEnum;
 
 /**
  * Represents the available operation types as enum.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public enum OperationType
+public enum OperationType implements I18nEnum
 {
   SELECT("select"), INSERT("insert"), UPDATE("update"), DELETE("delete");
 
@@ -47,8 +48,17 @@ public enum OperationType
   {
     this.key = key;
   }
-  
-  public boolean isIn(OperationType... type) {
+
+  /**
+   * @return The full i18n key including the i18n prefix "fibu.auftrag.status.".
+   */
+  public String getI18nKey()
+  {
+    return "access.type." + key;
+  }
+
+  public boolean isIn(OperationType... type)
+  {
     for (OperationType t : type) {
       if (this == t) {
         return true;

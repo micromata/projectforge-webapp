@@ -113,10 +113,10 @@ public class AccessException extends ProjectForgeException
       result[0] = taskId;
     }
     if (accessType != null) {
-      result[1] = bundle.getString("access.type." + accessType);
+      result[1] = bundle.getString(accessType.getI18nKey());
     }
     if (operationType != null) {
-      result[2] = bundle.getString("access.type." + operationType);
+      result[2] = bundle.getString(operationType.getI18nKey());
     }
     return result;
   }
@@ -134,10 +134,10 @@ public class AccessException extends ProjectForgeException
       result[0] = new MessageParam(taskId);
     }
     if (accessType != null) {
-      result[1] = new MessageParam("access.type." + accessType, MessageParamType.I18N_KEY);
+      result[1] = new MessageParam(accessType.getI18nKey(), MessageParamType.I18N_KEY);
     }
     if (operationType != null) {
-      result[2] = new MessageParam("access.type." + operationType, MessageParamType.I18N_KEY);
+      result[2] = new MessageParam(operationType.getI18nKey(), MessageParamType.I18N_KEY);
     }
     return result;
   }
