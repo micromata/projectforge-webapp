@@ -27,6 +27,7 @@ import java.text.ParseException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.meb.MebJobExecutor;
 import org.projectforge.meb.MebPollingJob;
 import org.quartz.CronTrigger;
@@ -46,6 +47,8 @@ public class CronSetup
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CronSetup.class);
 
   private Scheduler scheduler;
+
+  private DatabaseUpdateDao databaseUpdateDao;
 
   private HibernateSearchReindexer hibernateSearchReindexer;
 
@@ -75,7 +78,8 @@ public class CronSetup
         mebJobExecutor = null; // MEB is not configured.
       }
       // run every hour at *:00: 0 0 * * * ?
-      createCron("hourlyJob", CronHourlyJob.class, "0 0 * * * ?", cfg.getCronExpressionHourlyJob());
+      createCron("hourlyJob", CronHourlyJob.class, "0 0 * * * ?", cfg.getCronExpressionHourlyJob(), "databaseUpdateDao",
+          databaseUpdateDao);
       // run every morning at 2 AM (UTC): 0 0 2 * * ?
       createCron("nightlyJob", CronNightlyJob.class, "0 0 2 * * ?", cfg.getCronExpressionNightlyJob(), "hibernateSearchReindexer",
           hibernateSearchReindexer, "mebJobExecutor", mebJobExecutor);
@@ -133,6 +137,16 @@ public class CronSetup
       return;
     }
     log.info("Cron job '" + name + "' successfully configured: " + cronEx);
+  }
+
+  public void setDatabaseUpdateDao(DatabaseUpdateDao databaseUpdateDao)
+  {
+    this.databaseUpdateDao = databaseUpdateDao;
+  }
+
+  public void setHibernateSearchReindexer(HibernateSearchReindexer hibernateSearchReindexer)
+  {
+    this.hibernateSearchReindexer = hibernateSearchReindexer;
   }
 
   public void setMebJobExecutor(final MebJobExecutor mebJobExecutor)
