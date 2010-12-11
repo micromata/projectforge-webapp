@@ -809,7 +809,7 @@ public class Configuration extends AbstractCache
 
   /**
    * For overwriting the default settings.<br/>
-   * Format for nightly at 2 AM (UTC) is (see Quartz documentation for further information) "0 0 2 * * ?"
+   * Format for nightly at 2:30 AM (UTC) is (see Quartz documentation for further information) "0 30 2 * * ?"
    */
   public String getCronExpressionNightlyJob()
   {
