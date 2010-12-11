@@ -155,6 +155,8 @@ public class Configuration extends AbstractCache
 
   private String keystorePassphrase;
 
+  private String cronExpressionHourlyJob;
+
   private String cronExpressionNightlyJob;
 
   private String cronExpressionMebPollingJob;
@@ -797,7 +799,16 @@ public class Configuration extends AbstractCache
   }
 
   /**
-   * For overwriting the settings of applicationContext-web.xml.<br/>
+   * For overwriting the default settings.<br/>
+   * Format for hourly *:00 is (see Quartz documentation for further information) "0 0 * * * ?"
+   */
+  public String getCronExpressionHourlyJob()
+  {
+    return cronExpressionHourlyJob;
+  }
+
+  /**
+   * For overwriting the default settings.<br/>
    * Format for nightly at 2 AM (UTC) is (see Quartz documentation for further information) "0 0 2 * * ?"
    */
   public String getCronExpressionNightlyJob()
@@ -807,7 +818,7 @@ public class Configuration extends AbstractCache
 
   /**
    * For overwriting the settings of applicationContext-web.xml.<br/>
-   * Format for every 10 minutes is (see Quartz documentation for further information) "0 0/10 * * * ?"
+   * Format for every 10 minutes (5, 15, 25, ...) is (see Quartz documentation for further information) "0 5/10 * * * ?"
    */
   public String getCronExpressionMebPollingJob()
   {
