@@ -515,7 +515,7 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
   @Override
   protected ISortableDataProvider<TimesheetDO> createSortableDataProvider(final String sortProperty, final boolean ascending)
   {
-    return new SortableDOProvider(sortProperty, ascending) {
+    return new ListPageSortableDataProvider(sortProperty, ascending) {
       @Override
       protected Comparator<TimesheetDO> getComparator(final String sortProperty, final boolean ascending)
       {
