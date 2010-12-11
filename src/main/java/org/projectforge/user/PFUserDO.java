@@ -255,7 +255,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return (new ReflectionToStringBuilder(this) {
       protected boolean accept(java.lang.reflect.Field f)
       {
-        return super.accept(f) && !f.getName().equals("password");
+        return super.accept(f) && !"password".equals(f.getName()) && !"stayLoggedInKey".equals(f.getName());
       }
     }).toString();
   }
