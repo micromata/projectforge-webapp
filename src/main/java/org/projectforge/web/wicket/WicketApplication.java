@@ -86,7 +86,6 @@ import org.projectforge.web.fibu.RechnungListPage;
 import org.projectforge.web.gantt.GanttChartEditPage;
 import org.projectforge.web.gantt.GanttChartListPage;
 import org.projectforge.web.gwiki.GWikiContainerPage;
-import org.projectforge.web.gwiki.GWikiLocalizer;
 import org.projectforge.web.humanresources.HRListPage;
 import org.projectforge.web.humanresources.HRPlanningListPage;
 import org.projectforge.web.imagecropper.ImageCropperPage;
@@ -290,7 +289,7 @@ public class WicketApplication extends WebApplication
   {
     this.cronSetup = cronSetup;
   }
-  
+
   public void setDaoRegistry(DaoRegistry daoRegistry)
   {
     this.daoRegistry = daoRegistry;
@@ -446,7 +445,7 @@ public class WicketApplication extends WebApplication
       throw new RuntimeException("this.wicketApplicationFilter is null");
     }
     daoRegistry.init();
-    getResourceSettings().setLocalizer(new GWikiLocalizer("edit/StandardI18n"));
+    getResourceSettings().setLocalizer(new MyLocalizer("edit/StandardI18n"));
     log.info("Default TimeZone is: " + TimeZone.getDefault());
     log.info("user.timezone is: " + System.getProperty("user.timezone"));
     cronSetup.initialize();
