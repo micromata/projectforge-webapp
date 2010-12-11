@@ -1,0 +1,128 @@
+.taskStatus_opened {
+	color: #518732;
+}
+
+.taskStatus_closed {
+	color: #386773;
+}
+
+.priority_least {
+	
+}
+
+.priority_low {
+	
+}
+
+.priority_middle {
+	
+}
+
+.priority_high {
+	color: red;
+	font-weight: bold;
+}
+
+.priority_highest {
+	background-color: red;
+	color: white;
+	font-weight: bold;
+}
+
+.tp_collision {
+	color: #EC4031;
+}
+
+div.progress-none {
+	width: 50px;
+	height: 8px;
+	background-color: #eeeeee;
+	border-width: 1px;
+	border-style: solid;
+	border-color: #aaaaaa;
+}
+
+div.progress-done {
+	width: 50px;
+	height: 8px;
+	background-color: #eeeeee;
+	border-width: 1px;
+	border-style: solid;
+	border-color: black;
+}
+
+div.progress-done div {
+	height: 8px;
+	background-color: #099900;
+	border-width: 0px 1px 0px 0px;
+	border-style: solid;
+	border-color: black;
+}
+
+div.progress-80 {
+	width: 50px;
+	height: 8px;
+	background-color: #eeeeee;
+	border-width: 1px;
+	border-style: solid;
+	border-color: black;
+}
+
+div.progress-80 div {
+	height: 8px;
+	background-color: #ffff00;
+	border-width: 0px 1px 0px 0px;
+	border-style: solid;
+	border-color: black;
+}
+
+div.progress-90 {
+	width: 50px;
+	height: 8px;
+	background-color: #eeeeee;
+	border-width: 1px;
+	border-style: solid;
+	border-color: black;
+}
+
+div.progress-90 div {
+	height: 8px;
+	background-color: #ff8000;
+	border-width: 0px 1px 0px 0px;
+	border-style: solid;
+	border-color: black;
+}
+
+div.progress-overbooked {
+	width: 50px;
+	height: 8px;
+	background-color: #ff0000;
+	border-width: 1px;
+	border-style: solid;
+	border-color: black;
+}
+
+div.progress-overbooked div {
+	height: 8px;
+	background-color: #ff8000;
+	border-width: 0px 1px 0px 0px;
+	border-style: solid;
+	border-color: black;
+}
+
+div.progress-overbooked-min {
+	width: 50px;
+	height: 8px;
+	background-color: #ff0000;
+	border-width: 1px;
+	border-style: solid;
+	border-color: black;
+}
+
+div.progress-overbooked-min div {
+	height: 8px;
+	background-color: #eeeeee;
+	border-width: 0px 1px 0px 0px;
+	border-style: solid;
+	border-color: black;
+}
