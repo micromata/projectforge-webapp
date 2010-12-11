@@ -28,9 +28,9 @@ import org.projectforge.database.DatabaseDao;
 import org.projectforge.mail.Mail;
 import org.projectforge.mail.SendMail;
 
-public class HibernateSearchReindexJob
+public class HibernateSearchReindexer
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(HibernateSearchReindexJob.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(HibernateSearchReindexer.class);
 
   private static final String ERROR_MSG = "Error while re-indexing data base: found lock files while re-indexing data-base. "
       + "Try to run re-index manually in the web administration menu and if occured again, "
