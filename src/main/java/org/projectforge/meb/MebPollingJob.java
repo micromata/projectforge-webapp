@@ -23,7 +23,7 @@
 
 package org.projectforge.meb;
 
-import org.quartz.Job;
+import org.projectforge.core.AbstractCronJob;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
@@ -32,16 +32,15 @@ import org.quartz.JobExecutionException;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class MebPollingJob implements Job
+public class MebPollingJob extends AbstractCronJob
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MebPollingJob.class);
 
-  private MebJob mebJob;
-
+  private MebJobExecutor mebJob;
 
   public void execute(final JobExecutionContext context) throws JobExecutionException
   {
-    //log.info("MEB polling job started.");
+    // log.info("MEB polling job started.");
     if (mebJob == null) {
       wire(context);
     }
@@ -50,20 +49,11 @@ public class MebPollingJob implements Job
     } catch (final Throwable ex) {
       log.error("While executing hibernate search re-index job: " + ex.getMessage(), ex);
     }
-    //log.info("MEB polling job finished.");
+    // log.info("MEB polling job finished.");
   }
 
-  private void wire(final JobExecutionContext context)
+  protected void wire(final JobExecutionContext context)
   {
-    mebJob = (MebJob) wire(context, "mebJob");
-  }
-
-  private Object wire(final JobExecutionContext context, final String key)
-  {
-    final Object result = context.getMergedJobDataMap().get(key);
-    if (result == null) {
-      log.error("Mis-configuration of scheduler in applicationContext-web.xml: '" + key + "' is not availabe.");
-    }
-    return result;
+    mebJob = (MebJobExecutor) wire(context, "mebJob");
   }
 }
