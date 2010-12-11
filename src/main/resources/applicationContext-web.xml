@@ -30,6 +30,6 @@
 
   <!-- Scheduling -->
   <bean id="cronSetup" class="org.projectforge.core.CronSetup" />
-  <bean id="hibernateSearchReindexJob" class="org.projectforge.core.HibernateSearchReindexJob" />
-  <bean id="mebJob" class="org.projectforge.meb.MebJob" />
+  <bean id="hibernateSearchReindexer" class="org.projectforge.core.HibernateSearchReindexer" />
+  <bean id="mebJobExecutor" class="org.projectforge.meb.MebJobExecutor" />
 </beans>
