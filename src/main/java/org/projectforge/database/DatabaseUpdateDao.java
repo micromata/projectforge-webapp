@@ -315,6 +315,15 @@ public class DatabaseUpdateDao
   public int fixDBHistoryEntries()
   {
     accessCheck();
+    return internalFixDBHistoryEntries();
+  }
+
+  /**
+   * Without access checking.
+   * @see #fixDBHistoryEntries()
+   */
+  public int internalFixDBHistoryEntries()
+  {
     log.info("Fix all wrong history entries.");
     final int counter[] = new int[1];
     counter[0] = 0;
