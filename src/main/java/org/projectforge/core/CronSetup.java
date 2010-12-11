@@ -80,8 +80,8 @@ public class CronSetup
       // run every hour at *:00: 0 0 * * * ?
       createCron("hourlyJob", CronHourlyJob.class, "0 0 * * * ?", cfg.getCronExpressionHourlyJob(), "databaseUpdateDao",
           databaseUpdateDao);
-      // run every morning at 2 AM (UTC): 0 0 2 * * ?
-      createCron("nightlyJob", CronNightlyJob.class, "0 0 2 * * ?", cfg.getCronExpressionNightlyJob(), "hibernateSearchReindexer",
+      // run every morning at 2 AM (UTC): 0 30 2 * * ?
+      createCron("nightlyJob", CronNightlyJob.class, "0 30 2 * * ?", cfg.getCronExpressionNightlyJob(), "hibernateSearchReindexer",
           hibernateSearchReindexer, "mebJobExecutor", mebJobExecutor);
       if (mebJobExecutor != null) {
         // run every 10 minutes (5, 15, 25, ...): 0 5/10 * * * ?
