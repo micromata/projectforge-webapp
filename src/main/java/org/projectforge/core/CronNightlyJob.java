@@ -23,9 +23,7 @@
 
 package org.projectforge.core;
 
-import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.meb.MebJob;
-import org.quartz.Job;
+import org.projectforge.meb.MebJobExecutor;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
@@ -34,53 +32,38 @@ import org.quartz.JobExecutionException;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class CronNightlyJob implements Job
+public class CronNightlyJob extends AbstractCronJob
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CronNightlyJob.class);
 
-  private HibernateSearchReindexJob hibernateSearchReindexJob;
+  private HibernateSearchReindexer hibernateSearchReindexer;
 
-  private MebJob mebJob;
-  
-  private DatabaseUpdateDao databaseUpdateDao; 
+  private MebJobExecutor mebJobExecutor;
 
   public void execute(final JobExecutionContext context) throws JobExecutionException
   {
     log.info("Nightly job started.");
-    if (hibernateSearchReindexJob == null || mebJob == null) {
+    if (hibernateSearchReindexer == null) {
       wire(context);
     }
     try {
-      hibernateSearchReindexJob.execute();
+      hibernateSearchReindexer.execute();
     } catch (final Throwable ex) {
       log.error("While executing hibernate search re-index job: " + ex.getMessage(), ex);
     }
-    try {
-      databaseUpdateDao.fixDBHistoryEntries();
-    } catch (final Throwable ex) {
-      log.error("While executing fix job for data base history entries: " + ex.getMessage(), ex);
-    }
-    try {
-      mebJob.execute(true);
-    } catch (final Throwable ex) {
-      log.error("While executing MEB job: " + ex.getMessage(), ex);
+    if (mebJobExecutor != null) {
+      try {
+        mebJobExecutor.execute(true);
+      } catch (final Throwable ex) {
+        log.error("While executing MEB job: " + ex.getMessage(), ex);
+      }
     }
     log.info("Nightly job job finished.");
   }
 
-  private void wire(final JobExecutionContext context)
+  protected void wire(final JobExecutionContext context)
   {
-    hibernateSearchReindexJob = (HibernateSearchReindexJob) wire(context, "hibernateSearchReindexJob");
-    databaseUpdateDao = (DatabaseUpdateDao) wire(context, "databaseUpdateDao");
-    mebJob = (MebJob) wire(context, "mebJob");
-  }
-
-  private Object wire(final JobExecutionContext context, final String key)
-  {
-    final Object result = context.getMergedJobDataMap().get(key);
-    if (result == null) {
-      log.error("Mis-configuration of scheduler in applicationContext-web.xml: '" + key + "' is not availabe.");
-    }
-    return result;
+    hibernateSearchReindexer = (HibernateSearchReindexer) wire(context, "hibernateSearchReindexer");
+    mebJobExecutor = (MebJobExecutor) wire(context, "mebJobExecutor");
   }
 }

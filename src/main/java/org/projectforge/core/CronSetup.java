@@ -27,7 +27,7 @@ import java.text.ParseException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.projectforge.meb.MebJob;
+import org.projectforge.meb.MebJobExecutor;
 import org.projectforge.meb.MebPollingJob;
 import org.quartz.CronTrigger;
 import org.quartz.JobDataMap;
@@ -45,40 +45,45 @@ public class CronSetup
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CronSetup.class);
 
-  private HibernateSearchReindexJob hibernateSearchReindexJob;
-
   private Scheduler scheduler;
 
-  private MebJob mebJob;
+  private HibernateSearchReindexer hibernateSearchReindexer;
 
-  private boolean initialized = false;
+  private MebJobExecutor mebJobExecutor;
 
   /**
    * Should be called at the start-up time of the application.<br/>
    * Initializes and starts the scheduler.
    */
-  public synchronized void initialize()
+  public void initialize()
   {
-    if (initialized == true) {
-      return;
-    }
-    initialized = true;
-    try {
-      // Grab the Scheduler instance from the Factory
-      scheduler = StdSchedulerFactory.getDefaultScheduler();
-      // and start it off
-      scheduler.start();
+    synchronized (this) {
+      if (scheduler != null) {
+        return;
+      }
+      try {
+        // Grab the Scheduler instance from the Factory
+        scheduler = StdSchedulerFactory.getDefaultScheduler();
+        // and start it off
+        scheduler.start();
 
-    } catch (SchedulerException ex) {
-      log.error(ex.getMessage(), ex);
-    }
-    final Configuration cfg = Configuration.getInstance();
-    // run every morning at 2 AM (UTC): 0 0 2 * * ?
-    createCron("nightlyJob", CronNightlyJob.class, "0 0 2 * * ?", cfg.getCronExpressionNightlyJob(), "hibernateSearchReindexJob",
-        hibernateSearchReindexJob, "mebJob", mebJob);
-    if (cfg.isMebMailAccountConfigured() == true) {
-      // run every 10 minutes (5, 15, 25, ...): 0 5/10 * * * ?
-      createCron("mebPollingJob", MebPollingJob.class, "0 5/10 * * * ?", cfg.getCronExpressionMebPollingJob(), "mebJob", mebJob);
+      } catch (SchedulerException ex) {
+        log.error(ex.getMessage(), ex);
+      }
+      final Configuration cfg = Configuration.getInstance();
+      if (cfg.isMebMailAccountConfigured() == false) {
+        mebJobExecutor = null; // MEB is not configured.
+      }
+      // run every hour at *:00: 0 0 * * * ?
+      createCron("hourlyJob", CronHourlyJob.class, "0 0 * * * ?", cfg.getCronExpressionHourlyJob());
+      // run every morning at 2 AM (UTC): 0 0 2 * * ?
+      createCron("nightlyJob", CronNightlyJob.class, "0 0 2 * * ?", cfg.getCronExpressionNightlyJob(), "hibernateSearchReindexer",
+          hibernateSearchReindexer, "mebJobExecutor", mebJobExecutor);
+      if (mebJobExecutor != null) {
+        // run every 10 minutes (5, 15, 25, ...): 0 5/10 * * * ?
+        createCron("mebPollingJob", MebPollingJob.class, "0 5/10 * * * ?", cfg.getCronExpressionMebPollingJob(), "mebJobExecutor",
+            mebJobExecutor);
+      }
     }
   }
 
@@ -94,8 +99,8 @@ public class CronSetup
     }
   }
 
-  private void createCron(final String name, final Class< ? > jobClass, final String cronDefaultExpression,
-      final String cronExpression, final Object... params)
+  private void createCron(final String name, final Class< ? > jobClass, final String cronDefaultExpression, final String cronExpression,
+      final Object... params)
   {
     // Define job instance (group = "default")
     final JobDetail job = new JobDetail(name, "default", jobClass);
@@ -130,13 +135,8 @@ public class CronSetup
     log.info("Cron job '" + name + "' successfully configured: " + cronEx);
   }
 
-  public void setHibernateSearchReindexJob(HibernateSearchReindexJob hibernateSearchReindexJob)
+  public void setMebJobExecutor(final MebJobExecutor mebJobExecutor)
   {
-    this.hibernateSearchReindexJob = hibernateSearchReindexJob;
-  }
-
-  public void setMebJob(MebJob mebJob)
-  {
-    this.mebJob = mebJob;
+    this.mebJobExecutor = mebJobExecutor;
   }
 }
