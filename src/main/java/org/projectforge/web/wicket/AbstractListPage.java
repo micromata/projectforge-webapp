@@ -24,10 +24,7 @@
 package org.projectforge.web.wicket;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -38,8 +35,6 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
-import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
-import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.link.Link;
@@ -50,7 +45,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.DateHolder;
-import org.projectforge.common.MyBeanComparator;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.common.ReflectionHelper;
 import org.projectforge.common.StringHelper;
@@ -184,7 +178,8 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
   }
 
   /**
-   * Is called before the form is initialized in constructor. Overwrite this method if any variables etc. should be set before initialization.
+   * Is called before the form is initialized in constructor. Overwrite this method if any variables etc. should be set before
+   * initialization.
    */
   protected void setup()
   {
@@ -548,7 +543,7 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
    */
   protected ISortableDataProvider<O> createSortableDataProvider(final String sortProperty, final boolean ascending)
   {
-    return new SortableDOProvider(sortProperty, ascending);
+    return new ListPageSortableDataProvider(sortProperty, ascending);
   }
 
   /**
@@ -710,59 +705,25 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
     return this.recentSearchTermsUserPrefKey != null;
   }
 
-  @SuppressWarnings("serial")
-  public class SortableDOProvider extends SortableDataProvider<O>
+  public class ListPageSortableDataProvider extends MySortableDataProvider<O>
   {
-    /**
-     * @param property If null then no sort will be supported.
-     * @param ascending
-     */
-    public SortableDOProvider(final String property, final boolean ascending)
+    private static final long serialVersionUID = 6940805267003006161L;
+
+    public ListPageSortableDataProvider(final String property, final boolean ascending)
     {
-      // set default sort
-      if (property != null) {
-        setSort(property, ascending);
-      } else {
-        setSort("NOSORT", ascending);
-      }
+      super(property, ascending);
     }
 
-    /**
-     * @see org.apache.wicket.markup.repeater.data.IDataProvider#iterator(int, int)
-     */
-    public Iterator<O> iterator(int first, int count)
+    @Override
+    public List<O> getList()
     {
-      SortParam sp = getSort();
-      List<O> list = getList();
-      if (list == null) {
-        return null;
-      }
-      if ("NOSORT".equals(sp.getProperty()) == false) {
-        Comparator<O> comp = getComparator(sp.getProperty(), sp.isAscending());
-        Collections.sort(list, comp);
-      }
-      return list.subList(first, first + count).iterator();
+      return AbstractListPage.this.getList();
     }
 
-    protected Comparator<O> getComparator(final String sortProperty, final boolean ascending)
+    @Override
+    protected IModel<O> getModel(O object)
     {
-      return new MyBeanComparator<O>(sortProperty, ascending);
-    }
-
-    /**
-     * @see org.apache.wicket.markup.repeater.data.IDataProvider#size()
-     */
-    public int size()
-    {
-      return getList() != null ? getList().size() : 0;
-    }
-
-    /**
-     * @see org.apache.wicket.markup.repeater.data.IDataProvider#model(java.lang.Object)
-     */
-    public IModel<O> model(O object)
-    {
-      return getModel(object);
+      return AbstractListPage.this.getModel(object);
     }
   }
 }
