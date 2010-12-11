@@ -26,17 +26,21 @@ package org.projectforge.meb;
 import org.projectforge.core.Configuration;
 
 /**
- * Can be called nightly for getting all MEB mails from the configured mail server for checking any missing MEB message. If no MEB mail
+ * Can be called nightly or every 10 minutes for getting all or only recent MEB mails from the configured mail server for checking any missing MEB message. If no MEB mail
  * account is configured, the job does nothing.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class MebJob
+public class MebJobExecutor
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MebJob.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MebJobExecutor.class);
 
   private MebMailClient mebMailClient;
 
+  /**
+   * This algorithm avoids multiple entries.
+   * @param importAllMails If false then only recent e-mails will be imported, otherwise all e-mails will be checked for import.
+   */
   public void execute(final boolean importAllMails)
   {
     if (mebMailClient == null) {
