@@ -5,43 +5,69 @@
 
 <body>
 <wicket:extend>
-<form wicket:id="form">
-<div wicket:id="feedback">[Validation errors]</div>
+  <form wicket:id="form">
+  <div wicket:id="feedback">[Validation errors]</div>
 
-<fieldset><legend><wicket:message key="label.filterSettings" /></legend>
-<table class="form">
-  <tr>
-    <th><wicket:message key="timePeriod" /></th>
-    <td><span wicket:id="startDate">[startDate]</span> - <span wicket:id="stopDate">[stopDate]</span>&nbsp;&nbsp;&nbsp; <select
-      wicket:id="lastDays" onchange="javascript:submit();">
-      <option>[choose time period]</option>
-    </select> <span style="font-size: x-small; color: white;" wicket:id="datesAsUTC">[2001-09-30 22:00:00.0 UTC - 2001-10-31 22:59:59.999 UTC]</span></td>
-    <th><wicket:message key="search.area" /></th>
-    <td><select wicket:id="area" onchange="javascript:submit();">
-      <option>[All]</option>
-    </select></td>
-  </tr>
-  <tr>
-    <!-- th><wicket:message key="search.history" /></th>
+  <fieldset><legend><wicket:message key="label.filterSettings" /></legend>
+  <table class="form">
+    <tr>
+      <th><wicket:message key="timePeriod" /></th>
+      <td><span wicket:id="startDate">[startDate]</span> - <span wicket:id="stopDate">[stopDate]</span>&nbsp;&nbsp;&nbsp; <select
+        wicket:id="lastDays" onchange="javascript:submit();">
+        <option>[choose time period]</option>
+      </select> <span style="font-size: x-small; color: white;" wicket:id="datesAsUTC">[2001-09-30 22:00:00.0 UTC - 2001-10-31 22:59:59.999 UTC]</span></td>
+      <th><wicket:message key="search.area" /></th>
+      <td><select wicket:id="area" onchange="javascript:submit();">
+        <option>[All]</option>
+      </select></td>
+    </tr>
+    <tr>
+      <!-- th><wicket:message key="search.history" /></th>
         <td><wicket:message key="message.notYetImplemented" /></td-->
-    <th><wicket:message key="modifiedBy" /></th>
-    <td><span wicket:id="modifiedByUser">[modified by]</span></td>
-    <th><wicket:message key="label.pageSize" /></th>
-    <td><select wicket:id="pageSize" onchange="javascript:submit();">
-      <option>50</option>
-    </select></td>
-  </tr>
-  <tr>
-    <th><wicket:message key="task" /></th>
-    <td colspan="3"><span wicket:id="task">[Task]</span></td>
-  </tr>
-  <tr>
-    <th></th>
-    <td class="buttonpanel" colspan="3"><span wicket:id="reset">[reset]</span> <span wicket:id="search">[search]</span></td>
-  </tr>
-</table>
-</fieldset>
-</form>
+      <th><wicket:message key="modifiedBy" /></th>
+      <td><span wicket:id="modifiedByUser">[modified by]</span></td>
+      <th><wicket:message key="label.pageSize" /></th>
+      <td><select wicket:id="pageSize" onchange="javascript:submit();">
+        <option>50</option>
+      </select></td>
+    </tr>
+    <tr>
+      <th><wicket:message key="task" /></th>
+      <td colspan="3"><span wicket:id="task">[Task]</span></td>
+    </tr>
+    <tr>
+      <th></th>
+      <td class="buttonpanel" colspan="3"><span wicket:id="reset">[reset]</span> <span wicket:id="search">[search]</span></td>
+    </tr>
+  </table>
+  </fieldset>
+  </form>
+
+  <h3>ToDo:</h3>
+  <ul>
+    <li>Take td style from *ListPages (at minimum line-through for deleted).</li>
+    <li>Head row</li>
+    <li>Check box modified time period</li>
+  </ul>
+  <fieldset><legend><wicket:message key="label.resultset" /></legend> <wicket:container wicket:id="areaRepeater">
+    <h3 wicket:id="areaTitle">[Time sheets]</h3>
+    <table class="dataview" cellspacing="0" wicket:id="dataTable">
+      <tbody>
+        <tr>
+          <th>[modified]</th>
+          <th>[name]</th>
+          <th>[first name]</th>
+        </tr>
+        <tr>
+          <td>2010-12-11 08:52</td>
+          <td>[Reinhard]</td>
+          <td>[Kai]</td>
+        </tr>
+      </tbody>
+    </table>
+    <a href="#">[More entries]</a>
+  </wicket:container></fieldset>
+
 </wicket:extend>
 </body>
 </html>

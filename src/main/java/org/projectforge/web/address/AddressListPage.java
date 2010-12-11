@@ -101,20 +101,8 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
   }
 
   @SuppressWarnings("serial")
-  @Override
-  protected void init()
+  public List<IColumn<AddressDO>> createColumns()
   {
-    if (messagingSupported == true) {
-      final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
-        @Override
-        public void onClick()
-        {
-          setResponsePage(SendSmsPage.class, new PageParameters());
-        };
-      }, getString("address.tooltip.writeSMS"));
-      addContentMenuEntry(menuEntry);
-    }
-    personalAddressMap = personalAddressDao.getPersonalAddressByAddressId();
     final List<IColumn<AddressDO>> columns = new ArrayList<IColumn<AddressDO>>();
     final CellItemListener<AddressDO> cellItemListener = new CellItemListener<AddressDO>() {
       public void populateItem(Item<ICellPopulator<AddressDO>> item, String componentId, IModel<AddressDO> rowModel)
@@ -207,6 +195,25 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
+    return columns;
+  }
+
+  @SuppressWarnings("serial")
+  @Override
+  protected void init()
+  {
+    if (messagingSupported == true) {
+      final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+        @Override
+        public void onClick()
+        {
+          setResponsePage(SendSmsPage.class, new PageParameters());
+        };
+      }, getString("address.tooltip.writeSMS"));
+      addContentMenuEntry(menuEntry);
+    }
+    personalAddressMap = personalAddressDao.getPersonalAddressByAddressId();
+    final List<IColumn<AddressDO>> columns = createColumns();
     dataTable = createDataTable(columns, null, true);
     form.add(dataTable);
   }
