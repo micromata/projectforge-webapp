@@ -36,16 +36,16 @@ public class MebPollingJob extends AbstractCronJob
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MebPollingJob.class);
 
-  private MebJobExecutor mebJob;
+  private MebJobExecutor mebJobExecutor;
 
   public void execute(final JobExecutionContext context) throws JobExecutionException
   {
     // log.info("MEB polling job started.");
-    if (mebJob == null) {
+    if (mebJobExecutor == null) {
       wire(context);
     }
     try {
-      mebJob.execute(false);
+      mebJobExecutor.execute(false);
     } catch (final Throwable ex) {
       log.error("While executing hibernate search re-index job: " + ex.getMessage(), ex);
     }
@@ -54,6 +54,6 @@ public class MebPollingJob extends AbstractCronJob
 
   protected void wire(final JobExecutionContext context)
   {
-    mebJob = (MebJobExecutor) wire(context, "mebJob");
+    mebJobExecutor = (MebJobExecutor) wire(context, "mebJobExecutor");
   }
 }
