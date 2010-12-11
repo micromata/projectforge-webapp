@@ -116,6 +116,7 @@ public abstract class AbstractBasePage extends WebPage
     }));
     add(CSSPackageResource.getHeaderContribution("styles/main.css"));
     add(CSSPackageResource.getHeaderContribution("styles/calendar.css"));
+    add(CSSPackageResource.getHeaderContribution("styles/projectforge.css"));
     add(JavascriptPackageResource.getHeaderContribution("scripts/jquery-1.4.2.min.js"));
     add(JavascriptPackageResource.getHeaderContribution("scripts/jquery.tooltip.min.js"));
     add(JavascriptPackageResource.getHeaderContribution("scripts/projectforge.js"));
