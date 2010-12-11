@@ -49,7 +49,7 @@ public class CronHourlyJob extends AbstractCronJob
       return;
     }
     try {
-      final int numberOfFixedEntries = databaseUpdateDao.fixDBHistoryEntries();
+      final int numberOfFixedEntries = databaseUpdateDao.internalFixDBHistoryEntries();
       if (numberOfFixedEntries > 0) {
         log.info("Data-base-fix-history-entries job finished successfully: " + numberOfFixedEntries + " entries fixed.");
       }
