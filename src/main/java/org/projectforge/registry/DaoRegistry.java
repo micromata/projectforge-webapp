@@ -126,22 +126,22 @@ public class DaoRegistry
       log.error("DaoRegistry is already initialized!");
       return;
     }
-    register(ADDRESS, addressDao).setListPageColumnsCreatorClass(AddressListPage.class);
-    register(TIMESHEET, timesheetDao);
-    register(TASK, taskDao);
-    register(BOOK, bookDao);
-    register(RECHNUNG, rechnungDao, "fibu.rechnung");
-    register(EINGANGSRECHNUNG, eingangsrechnungDao, "fibu.eingangsrechnung");
-    register(USER, userDao);
-    register(GROUP, groupDao);
-    register(ACCESS, accessDao);
-    register(BUCHUNGSSATZ, buchungssatzDao, "fibu.buchungssatz");
-    register(KOST1, kost1Dao, "fibu.kost1");
-    register(KOST2, kost2Dao, "fibu.kost2");
-    register(KOST2_ART, kost2ArtDao, "fibu.kost2art");
-    register(KONTO, kontoDao, "fibu.konto");
-    register(KUNDE, kundeDao, "fibu.kunde");
-    register(PROJEKT, projektDao, "fibu.projekt");
+    register(ADDRESS, AddressDao.class, addressDao).setListPageColumnsCreatorClass(AddressListPage.class);
+    register(TIMESHEET, TimesheetDao.class, timesheetDao);
+    register(TASK, TaskDao.class, taskDao);
+    register(BOOK, BookDao.class, bookDao);
+    register(RECHNUNG, RechnungDao.class, rechnungDao, "fibu.rechnung");
+    register(EINGANGSRECHNUNG, EingangsrechnungDao.class, eingangsrechnungDao, "fibu.eingangsrechnung");
+    register(USER, UserDao.class, userDao);
+    register(GROUP, GroupDao.class, groupDao);
+    register(ACCESS, AccessDao.class, accessDao);
+    register(BUCHUNGSSATZ, BuchungssatzDao.class, buchungssatzDao, "fibu.buchungssatz");
+    register(KOST1, Kost1Dao.class, kost1Dao, "fibu.kost1");
+    register(KOST2, Kost2Dao.class, kost2Dao, "fibu.kost2");
+    register(KOST2_ART, Kost2ArtDao.class, kost2ArtDao, "fibu.kost2art");
+    register(KONTO, KontoDao.class, kontoDao, "fibu.konto");
+    register(KUNDE, KundeDao.class, kundeDao, "fibu.kunde");
+    register(PROJEKT, ProjektDao.class, projektDao, "fibu.projekt");
     initialized = true;
   }
 
@@ -149,19 +149,20 @@ public class DaoRegistry
   {
   }
 
-  private RegistryEntry register(final String id, final BaseDao< ? > dao)
+  private RegistryEntry register(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > dao)
   {
-    return register(id, dao, null);
+    return register(id, daoClassType, dao, null);
   }
 
-  private RegistryEntry register(final String id, final BaseDao< ? > dao, final String i18nPrefix)
+  private RegistryEntry register(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > dao,
+      final String i18nPrefix)
   {
     if (dao == null) {
       log.error("Dao for '" + id + "' is null! Ignoring dao in registry.");
       return new RegistryEntry(null, null, null); // Create dummy.
     }
     final Registry registry = Registry.instance();
-    final RegistryEntry entry = new RegistryEntry(id, dao, i18nPrefix);
+    final RegistryEntry entry = new RegistryEntry(id, daoClassType, dao, i18nPrefix);
     registry.register(id, entry);
     return entry;
   }
