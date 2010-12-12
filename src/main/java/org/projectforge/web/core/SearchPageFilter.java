@@ -23,15 +23,15 @@
 
 package org.projectforge.web.core;
 
-import java.io.Serializable;
 import java.util.Date;
 
+import org.projectforge.core.SearchFilter;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.xml.stream.XmlObject;
 
 @XmlObject(alias = "config")
-public class SearchData implements Serializable
+public class SearchPageFilter extends SearchFilter
 {
   private static final long serialVersionUID = 2056162179686892853L;
 
