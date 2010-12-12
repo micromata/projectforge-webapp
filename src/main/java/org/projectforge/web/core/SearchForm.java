@@ -48,7 +48,7 @@ import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
-public class SearchForm extends AbstractSecuredForm<SearchData, SearchPage>
+public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage>
 {
   private static final long serialVersionUID = 2638309407446431727L;
 
@@ -58,12 +58,12 @@ public class SearchForm extends AbstractSecuredForm<SearchData, SearchPage>
 
   private TaskSelectPanel taskSelectPanel;
 
-  SearchData data;
+  SearchPageFilter filter;
 
   public SearchForm(final SearchPage parentPage)
   {
     super(parentPage);
-    data = new SearchData();
+    filter = new SearchPageFilter();
   }
 
   @Override
@@ -72,26 +72,26 @@ public class SearchForm extends AbstractSecuredForm<SearchData, SearchPage>
   {
     super.init();
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    startDatePanel = new DatePanel("startDate", new PropertyModel<Date>(data, "modifiedStartDate"), DatePanelSettings.get().withCallerPage(
+    startDatePanel = new DatePanel("startDate", new PropertyModel<Date>(filter, "modifiedStartDate"), DatePanelSettings.get().withCallerPage(
         parentPage).withSelectPeriodMode(true));
     add(startDatePanel);
-    stopDatePanel = new DatePanel("stopDate", new PropertyModel<Date>(data, "modifiedStopDate"), DatePanelSettings.get().withCallerPage(
+    stopDatePanel = new DatePanel("stopDate", new PropertyModel<Date>(filter, "modifiedStopDate"), DatePanelSettings.get().withCallerPage(
         parentPage).withSelectPeriodMode(true));
     add(stopDatePanel);
     add(new Label("datesAsUTC", new Model<String>() {
       @Override
       public String getObject()
       {
-        return WicketUtils.getUTCDates(data.getModifiedStartDate(), data.getModifiedStopDate());
+        return WicketUtils.getUTCDates(filter.getModifiedStartDate(), filter.getModifiedStopDate());
       }
     }));
 
-    final UserSelectPanel userSelectPanel = new UserSelectPanel("modifiedByUser", new PropertyModel<PFUserDO>(data, "modifiedByUser"),
+    final UserSelectPanel userSelectPanel = new UserSelectPanel("modifiedByUser", new PropertyModel<PFUserDO>(filter, "modifiedByUser"),
         parentPage, "userId");
     add(userSelectPanel);
     userSelectPanel.init().withAutoSubmit(true);
 
-    taskSelectPanel = new TaskSelectPanel("task", new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId");
+    taskSelectPanel = new TaskSelectPanel("task", new PropertyModel<TaskDO>(filter, "task"), parentPage, "taskId");
     add(taskSelectPanel);
     taskSelectPanel.setEnableLinks(true);
     taskSelectPanel.init();
@@ -104,7 +104,7 @@ public class SearchForm extends AbstractSecuredForm<SearchData, SearchPage>
       for (final int days : new int[] { 3, 7, 14, 30, 60, 90}) {
         lastDaysChoiceRenderer.addValue(days, getLocalizedMessage("search.lastDays", days));
       }
-      final DropDownChoice<Integer> lastDaysChoice = new DropDownChoice<Integer>("lastDays", new PropertyModel<Integer>(data, "lastDays"),
+      final DropDownChoice<Integer> lastDaysChoice = new DropDownChoice<Integer>("lastDays", new PropertyModel<Integer>(filter, "lastDays"),
           lastDaysChoiceRenderer.getValues(), lastDaysChoiceRenderer) {
         @Override
         protected void onSelectionChanged(final Integer newSelection)
@@ -114,11 +114,11 @@ public class SearchForm extends AbstractSecuredForm<SearchData, SearchPage>
           }
           final DateHolder dh = new DateHolder(new Date(), DatePrecision.MILLISECOND);
           dh.setEndOfDay();
-          data.setModifiedStopDate(dh.getDate());
+          filter.setModifiedStopDate(dh.getDate());
           dh.setBeginOfDay();
           dh.add(Calendar.DAY_OF_YEAR, -newSelection);
-          data.setModifiedStartDate(dh.getDate());
-          data.setLastDays(-1);
+          filter.setModifiedStartDate(dh.getDate());
+          filter.setLastDays(-1);
         }
 
         @Override
@@ -140,7 +140,7 @@ public class SearchForm extends AbstractSecuredForm<SearchData, SearchPage>
           areaChoiceRenderer.addValue(entry.getId(), getString(entry.getI18nTitleHeading()));
         }
       }
-      final DropDownChoice<String> areaChoice = new DropDownChoice<String>("area", new PropertyModel<String>(data, "area"),
+      final DropDownChoice<String> areaChoice = new DropDownChoice<String>("area", new PropertyModel<String>(filter, "area"),
           areaChoiceRenderer.getValues(), areaChoiceRenderer) {
         @Override
         protected void onSelectionChanged(final String newSelection)
@@ -161,7 +161,7 @@ public class SearchForm extends AbstractSecuredForm<SearchData, SearchPage>
     {
       // DropDownChoice pageSize
       final DropDownChoice<Integer> pageSizeChoice = AbstractListForm.getPageSizeDropDownChoice("pageSize", getLocale(),
-          new PropertyModel<Integer>(data, "pageSize"), 0, 100);
+          new PropertyModel<Integer>(filter, "pageSize"), 0, 100);
       add(pageSizeChoice);
     }
     final Button searchButton = new Button("button", new Model<String>(getString("search"))) {

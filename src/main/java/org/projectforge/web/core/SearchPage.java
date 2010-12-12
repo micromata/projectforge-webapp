@@ -38,7 +38,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.core.SearchDao;
-import org.projectforge.core.SearchFilter;
 import org.projectforge.core.SearchResultData;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
@@ -77,13 +76,12 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     areaRepeater = new RepeatingView("areaRepeater");
     body.add(areaRepeater);
     for (final RegistryEntry registryEntry : Registry.instance().getOrderedList()) {
-      final SearchFilter filter = new SearchFilter();
-      final List<SearchResultData> searchResult = searchDao.getHistoryEntries(filter, registryEntry.getDOClass(), registryEntry.getDao());
+      final List<SearchResultData> searchResult = searchDao.getHistoryEntries(form.filter, registryEntry.getDOClass(), registryEntry.getDao());
       if (CollectionUtils.isEmpty(searchResult) == true) {
         continue;
       }
       final List list = new ArrayList();
-      int counter = form.data.getPageSize();
+      int counter = form.filter.getPageSize();
       for (final SearchResultData data : searchResult) {
         list.add(data.getDataObject());
         if (--counter <= 0) {
@@ -115,7 +113,7 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
           {
             return new Model((Serializable) object);
           }
-        }, form.data.getPageSize());
+        }, form.filter.getPageSize());
         areaContainer.add(dataTable);
       }
     }
