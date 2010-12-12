@@ -63,8 +63,9 @@ public class SearchDao extends HibernateDaoSupport
   private UserGroupCache userGroupCache;
 
   @SuppressWarnings("unchecked")
-  public List<SearchResultData> getHistoryEntries(Session session, SearchFilter filter, Class clazz, BaseDao baseDao)
+  public List<SearchResultData> getHistoryEntries(final SearchFilter filter, final Class clazz, final BaseDao baseDao)
   {
+    final Session session = getSession();
     if (filter == null || filter.getMaxRows() == null) {
       log.info("Filter or rows in filter is null (may be Search as redirect after login): " + filter);
       return null;
