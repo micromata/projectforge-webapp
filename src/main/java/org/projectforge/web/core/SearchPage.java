@@ -43,6 +43,8 @@ import org.projectforge.core.SearchDao;
 import org.projectforge.core.SearchResultData;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
+import org.projectforge.task.TaskDO;
+import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -64,6 +66,9 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
+
+  @SpringBean(name = "taskTree")
+  private TaskTree taskTree;
 
   public SearchPage(PageParameters parameters)
   {
@@ -131,9 +136,10 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
   public void select(final String property, final Object selectedValue)
   {
     if ("taskId".equals(property) == true) {
-      // form.setTask((Integer) selectedValue);
+      final TaskDO task = taskTree.getTaskById((Integer) selectedValue);
+      form.filter.setTask(task);
     } else if ("userId".equals(property) == true) {
-      final PFUserDO user = userGroupCache.getUser((Integer)selectedValue);
+      final PFUserDO user = userGroupCache.getUser((Integer) selectedValue);
       form.filter.setModifiedByUser(user);
     } else if ("startDate".equals(property) == true) {
       if (selectedValue instanceof Date) {
@@ -171,7 +177,7 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
   public void unselect(final String property)
   {
     if ("taskId".equals(property) == true) {
-      // getData().setTaskId(null);
+      form.filter.setTask(null);
     } else {
       log.error("Property '" + property + "' not supported for unselection.");
     }

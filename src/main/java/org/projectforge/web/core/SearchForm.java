@@ -119,8 +119,8 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
           dh.add(Calendar.DAY_OF_YEAR, -newSelection);
           filter.setModifiedStartTime(dh.getDate());
           filter.setLastDays(-1);
-          modifiedStartDatePanel.modelChanged();
-          modifiedStopDatePanel.modelChanged();
+          modifiedStartDatePanel.markModelAsChanged();
+          modifiedStopDatePanel.markModelAsChanged();
           parentPage.refresh();
         }
 
