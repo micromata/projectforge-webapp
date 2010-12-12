@@ -81,7 +81,7 @@ public class Registry
   {
     return map.get(id);
   }
-  
+
   public List<RegistryEntry> getOrderedList()
   {
     return orderedList;

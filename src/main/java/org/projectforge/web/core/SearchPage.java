@@ -23,6 +23,7 @@
 
 package org.projectforge.web.core;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.apache.wicket.PageParameters;
@@ -32,18 +33,17 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.core.ExtendedBaseDO;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
-import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.MySortableDataProvider;
 
@@ -75,10 +75,10 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     final WebMarkupContainer areaContainer = new WebMarkupContainer(areaRepeater.newChildId());
     areaRepeater.add(areaContainer);
     final RegistryEntry registryEntry = Registry.instance().getEntry(DaoRegistry.ADDRESS);
-    final BaseDao< ? > dao = registryEntry.getDao();
+    final BaseDao< ? > dao = registryEntry.getProxyDao();
     areaContainer.add(new Label("areaTitle", getString(registryEntry.getI18nTitleHeading())));
-    final IListPageColumnsCreator< ? > listPageColumnsCreator = (IListPageColumnsCreator< ? >) BeanHelper.newInstance(registryEntry
-        .getListPageColumnsCreatorClass());
+    final Class< ? extends IListPageColumnsCreator< ? >> clazz = registryEntry.getListPageColumnsCreatorClass();
+    final IListPageColumnsCreator< ? > listPageColumnsCreator = clazz == null ? null : (IListPageColumnsCreator< ? >) BeanHelper.newInstance(clazz);
     if (listPageColumnsCreator == null) {
       log.warn("RegistryEntry '" + registryEntry.getId() + "' doesn't have an IListPageColumnsCreator (can't display search results).");
       final WebMarkupContainer dataTable = new WebMarkupContainer("dataTable");
@@ -97,7 +97,7 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
         @Override
         protected IModel getModel(Object object)
         {
-          return new DetachableDOModel((ExtendedBaseDO< ? extends Integer>) object, dao);
+          return new Model((Serializable)object);
         }
       }, form.data.getPageSize());
       areaContainer.add(dataTable);
