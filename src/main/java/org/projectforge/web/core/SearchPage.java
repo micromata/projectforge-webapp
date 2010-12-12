@@ -34,7 +34,6 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.core.BaseDao;
@@ -87,7 +86,7 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     } else {
       final List< ? > columns = listPageColumnsCreator.createColumns();
       @SuppressWarnings("unchecked")
-      final DataTable<AddressDO> dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", false) {
+      final DataTable dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", false) {
         @Override
         public List getList()
         {
