@@ -24,6 +24,7 @@
 package org.projectforge.registry;
 
 import org.apache.wicket.proxy.LazyInitProxyFactory;
+import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.web.core.SearchForm;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
@@ -32,24 +33,24 @@ import org.projectforge.web.wicket.IListPageColumnsCreator;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class RegistryEntry 
+public class RegistryEntry
 {
   private String id;
 
   private String i18nPrefix;
 
   private BaseDao< ? > dao;
-  
-  private Class<? extends BaseDao<?>> daoClassType;
+
+  private Class< ? extends BaseDao< ? >> daoClassType;
 
   private Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass;
 
-  public RegistryEntry(final String id, final Class<? extends BaseDao<?>> daoClassType, final BaseDao< ? > dao)
+  public RegistryEntry(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > dao)
   {
     this(id, daoClassType, dao, null);
   }
 
-  public RegistryEntry(final String id, final Class<? extends BaseDao<?>> daoClassType, final BaseDao< ? > dao, final String i18nPrefix)
+  public RegistryEntry(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > dao, final String i18nPrefix)
   {
     this.id = id;
     this.daoClassType = daoClassType;
@@ -73,6 +74,11 @@ public class RegistryEntry
     return id;
   }
 
+  public Class< ? extends BaseDO< ? >> getDOClass()
+  {
+    return dao.getDOClass();
+  }
+
   public BaseDao< ? > getDao()
   {
     return dao;
@@ -80,7 +86,7 @@ public class RegistryEntry
 
   public BaseDao< ? > getProxyDao()
   {
-    return (BaseDao<?>)LazyInitProxyFactory.createProxy(daoClassType, new DaoLocator(id));
+    return (BaseDao< ? >) LazyInitProxyFactory.createProxy(daoClassType, new DaoLocator(id));
   }
 
   /**
