@@ -38,7 +38,6 @@ import org.projectforge.address.AddressDao;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -73,33 +72,35 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     body.add(areaRepeater);
     final WebMarkupContainer areaContainer = new WebMarkupContainer(areaRepeater.newChildId());
     areaRepeater.add(areaContainer);
-    final RegistryEntry registryEntry = Registry.instance().getEntry(DaoRegistry.ADDRESS);
-    final BaseDao< ? > dao = registryEntry.getProxyDao();
-    areaContainer.add(new Label("areaTitle", getString(registryEntry.getI18nTitleHeading())));
-    final Class< ? extends IListPageColumnsCreator< ? >> clazz = registryEntry.getListPageColumnsCreatorClass();
-    final IListPageColumnsCreator< ? > listPageColumnsCreator = clazz == null ? null : (IListPageColumnsCreator< ? >) BeanHelper.newInstance(clazz);
-    if (listPageColumnsCreator == null) {
-      log.warn("RegistryEntry '" + registryEntry.getId() + "' doesn't have an IListPageColumnsCreator (can't display search results).");
-      final WebMarkupContainer dataTable = new WebMarkupContainer("dataTable");
-      dataTable.setVisible(false);
-      areaContainer.add(dataTable);
-    } else {
-      final List< ? > columns = listPageColumnsCreator.createColumns();
-      @SuppressWarnings("unchecked")
-      final DataTable dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", false) {
-        @Override
-        public List getList()
-        {
-          return ((AddressDao) dao).getNewest(new BaseSearchFilter());
-        }
+    for (final RegistryEntry registryEntry : Registry.instance().getOrderedList()) {
+      final BaseDao< ? > dao = registryEntry.getProxyDao();
+      areaContainer.add(new Label("areaTitle", getString(registryEntry.getI18nTitleHeading())));
+      final Class< ? extends IListPageColumnsCreator< ? >> clazz = registryEntry.getListPageColumnsCreatorClass();
+      final IListPageColumnsCreator< ? > listPageColumnsCreator = clazz == null ? null : (IListPageColumnsCreator< ? >) BeanHelper
+          .newInstance(clazz);
+      if (listPageColumnsCreator == null) {
+        log.warn("RegistryEntry '" + registryEntry.getId() + "' doesn't have an IListPageColumnsCreator (can't display search results).");
+        final WebMarkupContainer dataTable = new WebMarkupContainer("dataTable");
+        dataTable.setVisible(false);
+        areaContainer.add(dataTable);
+      } else {
+        final List< ? > columns = listPageColumnsCreator.createColumns();
+        @SuppressWarnings("unchecked")
+        final DataTable dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", false) {
+          @Override
+          public List getList()
+          {
+            return ((AddressDao) dao).getNewest(new BaseSearchFilter());
+          }
 
-        @Override
-        protected IModel getModel(Object object)
-        {
-          return new Model((Serializable)object);
-        }
-      }, form.data.getPageSize());
-      areaContainer.add(dataTable);
+          @Override
+          protected IModel getModel(Object object)
+          {
+            return new Model((Serializable) object);
+          }
+        }, form.data.getPageSize());
+        areaContainer.add(dataTable);
+      }
     }
   }
 
