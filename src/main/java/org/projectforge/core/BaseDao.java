@@ -277,6 +277,11 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     this.clazz = clazz;
   }
 
+  public Class<O> getDOClass()
+  {
+    return this.clazz;
+  }
+
   public abstract O newInstance();
 
   /**
@@ -1060,7 +1065,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     afterSaveOrModify(obj);
     afterUndelete(obj);
   }
-  
+
   /**
    * Checks the basic select access right. Overload this method if you class supports this right.
    * @return
