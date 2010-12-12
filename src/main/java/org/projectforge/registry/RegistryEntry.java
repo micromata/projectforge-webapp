@@ -25,6 +25,7 @@ package org.projectforge.registry;
 
 import org.projectforge.core.BaseDao;
 import org.projectforge.web.core.SearchForm;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -38,6 +39,8 @@ public class RegistryEntry
 
   private BaseDao< ? > dao;
 
+  private Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass;
+
   public RegistryEntry(final String id, final BaseDao< ? > dao)
   {
     this(id, dao, null);
@@ -48,6 +51,17 @@ public class RegistryEntry
     this.id = id;
     this.dao = dao;
     this.i18nPrefix = (i18nPrefix != null) ? i18nPrefix : id;
+  }
+
+  public RegistryEntry setListPageColumnsCreatorClass(Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass)
+  {
+    this.listPageColumnsCreatorClass = listPageColumnsCreatorClass;
+    return this;
+  }
+
+  public Class< ? extends IListPageColumnsCreator< ? >> getListPageColumnsCreatorClass()
+  {
+    return listPageColumnsCreatorClass;
   }
 
   public String getId()
@@ -67,5 +81,10 @@ public class RegistryEntry
   public String getI18nPrefix()
   {
     return i18nPrefix;
+  }
+
+  public String getI18nTitleHeading()
+  {
+    return i18nPrefix + ".title.heading";
   }
 }

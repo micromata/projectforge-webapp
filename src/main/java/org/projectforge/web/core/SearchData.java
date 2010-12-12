@@ -121,7 +121,11 @@ public class SearchData implements Serializable
 
   public int getPageSize()
   {
-    return pageSize;
+    if (pageSize > 0) {
+      return pageSize;
+    } else {
+      return 5;
+    }
   }
 
   public void setPageSize(int pageSize)

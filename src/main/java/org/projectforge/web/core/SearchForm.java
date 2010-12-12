@@ -137,7 +137,7 @@ public class SearchForm extends AbstractSecuredForm<SearchData, SearchPage>
       areaChoiceRenderer.addValue("ALL", getString("filter.all"));
       for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
         if (entry.getDao().hasHistoryAccess(false) == true) {
-          areaChoiceRenderer.addValue(entry.getId(), getString(entry.getI18nPrefix() + ".title.heading"));
+          areaChoiceRenderer.addValue(entry.getId(), getString(entry.getI18nTitleHeading()));
         }
       }
       final DropDownChoice<String> areaChoice = new DropDownChoice<String>("area", new PropertyModel<String>(data, "area"),

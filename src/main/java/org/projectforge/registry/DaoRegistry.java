@@ -40,6 +40,7 @@ import org.projectforge.task.TaskDao;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.UserDao;
+import org.projectforge.web.address.AddressListPage;
 
 /**
  * Helper object which stores all dao objects and put them into the registry.
@@ -49,7 +50,7 @@ import org.projectforge.user.UserDao;
 public class DaoRegistry
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DaoRegistry.class);
-  
+
   private static boolean initialized = false;
 
   public static final String PROJEKT = "projekt";
@@ -125,7 +126,7 @@ public class DaoRegistry
       log.error("DaoRegistry is already initialized!");
       return;
     }
-    register(ADDRESS, addressDao);
+    register(ADDRESS, addressDao).setListPageColumnsCreatorClass(AddressListPage.class);
     register(TIMESHEET, timesheetDao);
     register(TASK, taskDao);
     register(BOOK, bookDao);
@@ -148,19 +149,21 @@ public class DaoRegistry
   {
   }
 
-  private void register(final String id, final BaseDao< ? > dao)
+  private RegistryEntry register(final String id, final BaseDao< ? > dao)
   {
-    register(id, dao, null);
+    return register(id, dao, null);
   }
 
-  private void register(final String id, final BaseDao< ? > dao, final String i18nPrefix)
+  private RegistryEntry register(final String id, final BaseDao< ? > dao, final String i18nPrefix)
   {
     if (dao == null) {
       log.error("Dao for '" + id + "' is null! Ignoring dao in registry.");
-      return;
+      return new RegistryEntry(null, null, null); // Create dummy.
     }
     final Registry registry = Registry.instance();
-    registry.register(id, new RegistryEntry(id, dao, i18nPrefix));
+    final RegistryEntry entry = new RegistryEntry(id, dao, i18nPrefix);
+    registry.register(id, entry);
+    return entry;
   }
 
   public void setAccessDao(AccessDao accessDao)

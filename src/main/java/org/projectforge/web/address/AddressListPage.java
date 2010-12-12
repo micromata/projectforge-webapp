@@ -55,6 +55,7 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.PresizedImage;
@@ -64,7 +65,7 @@ import org.projectforge.web.wicket.components.ExternalLinkPanel;
 import org.projectforge.web.wicket.components.ImageLinkPanel;
 
 @ListPage(editPage = AddressEditPage.class)
-public class AddressListPage extends AbstractListPage<AddressListForm, AddressDao, AddressDO>
+public class AddressListPage extends AbstractListPage<AddressListForm, AddressDao, AddressDO> implements IListPageColumnsCreator<AddressDO>
 {
   private static final long serialVersionUID = 5168079498385464639L;
 
@@ -79,6 +80,11 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
   private boolean messagingSupported;
 
   private boolean phoneCallSupported;
+
+  public AddressListPage()
+  {
+    this(new PageParameters());
+  }
 
   public AddressListPage(PageParameters parameters)
   {
