@@ -70,9 +70,9 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     }
     areaRepeater = new RepeatingView("areaRepeater");
     body.add(areaRepeater);
-    final WebMarkupContainer areaContainer = new WebMarkupContainer(areaRepeater.newChildId());
-    areaRepeater.add(areaContainer);
     for (final RegistryEntry registryEntry : Registry.instance().getOrderedList()) {
+      final WebMarkupContainer areaContainer = new WebMarkupContainer(areaRepeater.newChildId());
+      areaRepeater.add(areaContainer);
       final BaseDao< ? > dao = registryEntry.getProxyDao();
       areaContainer.add(new Label("areaTitle", getString(registryEntry.getI18nTitleHeading())));
       final Class< ? extends IListPageColumnsCreator< ? >> clazz = registryEntry.getListPageColumnsCreatorClass();
