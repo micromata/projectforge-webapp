@@ -46,8 +46,6 @@ public class SearchFilter implements Serializable
 
   private Integer maxRows;
 
-  private SearchArea area = SearchArea.ALL;
-
   public void reset()
   {
     modifiedByUserId = PFUserContext.getUser().getId();
@@ -138,16 +136,6 @@ public class SearchFilter implements Serializable
     this.maxRows = maxRows;
   }
 
-  public SearchArea getArea()
-  {
-    return area;
-  }
-
-  public void setArea(SearchArea area)
-  {
-    this.area = area;
-  }
-
   @Override
   public String toString()
   {
@@ -157,7 +145,6 @@ public class SearchFilter implements Serializable
       sb.append("from", DateHelper.formatAsUTC(timePeriod.getFromDate()));
       sb.append("to", DateHelper.formatAsUTC(timePeriod.getToDate()));
     }
-    sb.append("area", getArea());
     return sb.toString();
   }
 }
