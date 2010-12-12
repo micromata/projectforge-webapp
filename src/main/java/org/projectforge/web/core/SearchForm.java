@@ -52,9 +52,9 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
 {
   private static final long serialVersionUID = 2638309407446431727L;
 
-  protected DatePanel startDatePanel;
+  protected DatePanel modifiedStartDatePanel;
 
-  protected DatePanel stopDatePanel;
+  protected DatePanel modifiedStopDatePanel;
 
   private TaskSelectPanel taskSelectPanel;
 
@@ -72,17 +72,17 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
   {
     super.init();
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    startDatePanel = new DatePanel("startDate", new PropertyModel<Date>(filter, "modifiedStartDate"), DatePanelSettings.get().withCallerPage(
+    modifiedStartDatePanel = new DatePanel("startDate", new PropertyModel<Date>(filter, "modifiedStartTime"), DatePanelSettings.get().withCallerPage(
         parentPage).withSelectPeriodMode(true));
-    add(startDatePanel);
-    stopDatePanel = new DatePanel("stopDate", new PropertyModel<Date>(filter, "modifiedStopDate"), DatePanelSettings.get().withCallerPage(
+    add(modifiedStartDatePanel);
+    modifiedStopDatePanel = new DatePanel("stopDate", new PropertyModel<Date>(filter, "modifiedStopTime"), DatePanelSettings.get().withCallerPage(
         parentPage).withSelectPeriodMode(true));
-    add(stopDatePanel);
+    add(modifiedStopDatePanel);
     add(new Label("datesAsUTC", new Model<String>() {
       @Override
       public String getObject()
       {
-        return WicketUtils.getUTCDates(filter.getModifiedStartDate(), filter.getModifiedStopDate());
+        return WicketUtils.getUTCDates(filter.getModifiedStartTime(), filter.getModifiedStopTime());
       }
     }));
 
@@ -114,11 +114,14 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
           }
           final DateHolder dh = new DateHolder(new Date(), DatePrecision.MILLISECOND);
           dh.setEndOfDay();
-          filter.setModifiedStopDate(dh.getDate());
+          filter.setModifiedStopTime(dh.getDate());
           dh.setBeginOfDay();
           dh.add(Calendar.DAY_OF_YEAR, -newSelection);
-          filter.setModifiedStartDate(dh.getDate());
+          filter.setModifiedStartTime(dh.getDate());
           filter.setLastDays(-1);
+          modifiedStartDatePanel.modelChanged();
+          modifiedStopDatePanel.modelChanged();
+          parentPage.refresh();
         }
 
         @Override
@@ -160,8 +163,8 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
     }
     {
       // DropDownChoice pageSize
-      final DropDownChoice<Integer> pageSizeChoice = AbstractListForm.getPageSizeDropDownChoice("pageSize", getLocale(),
-          new PropertyModel<Integer>(filter, "pageSize"), 0, 100);
+      final DropDownChoice<Integer> pageSizeChoice = AbstractListForm.getPageSizeDropDownChoice("maxRows", getLocale(),
+          new PropertyModel<Integer>(filter, "maxRows"), 0, 100);
       add(pageSizeChoice);
     }
     final Button searchButton = new Button("button", new Model<String>(getString("search"))) {

@@ -25,6 +25,7 @@ package org.projectforge.web.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.wicket.PageParameters;
@@ -36,11 +37,14 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.core.SearchDao;
 import org.projectforge.core.SearchResultData;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
@@ -58,6 +62,9 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
   @SpringBean(name = "searchDao")
   private SearchDao searchDao;
 
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
+
   public SearchPage(PageParameters parameters)
   {
     super(parameters);
@@ -67,7 +74,7 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     refresh();
   }
 
-  @SuppressWarnings({ "serial", "unchecked"})
+  @SuppressWarnings( { "serial", "unchecked"})
   void refresh()
   {
     if (areaRepeater != null) {
@@ -76,17 +83,14 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     areaRepeater = new RepeatingView("areaRepeater");
     body.add(areaRepeater);
     for (final RegistryEntry registryEntry : Registry.instance().getOrderedList()) {
-      final List<SearchResultData> searchResult = searchDao.getHistoryEntries(form.filter, registryEntry.getDOClass(), registryEntry.getDao());
+      final List<SearchResultData> searchResult = searchDao.getHistoryEntries(form.filter, registryEntry.getDOClass(), registryEntry
+          .getDao());
       if (CollectionUtils.isEmpty(searchResult) == true) {
         continue;
       }
       final List list = new ArrayList();
-      int counter = form.filter.getPageSize();
       for (final SearchResultData data : searchResult) {
         list.add(data.getDataObject());
-        if (--counter <= 0) {
-          break;
-        }
       }
       final WebMarkupContainer areaContainer = new WebMarkupContainer(areaRepeater.newChildId());
       areaRepeater.add(areaContainer);
@@ -113,7 +117,7 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
           {
             return new Model((Serializable) object);
           }
-        }, form.filter.getPageSize());
+        }, form.filter.getMaxRows());
         areaContainer.add(dataTable);
       }
     }
@@ -128,6 +132,37 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
   {
     if ("taskId".equals(property) == true) {
       // form.setTask((Integer) selectedValue);
+    } else if ("userId".equals(property) == true) {
+      final PFUserDO user = userGroupCache.getUser((Integer)selectedValue);
+      form.filter.setModifiedByUser(user);
+    } else if ("startDate".equals(property) == true) {
+      if (selectedValue instanceof Date) {
+        // Date selected.
+        final Date date = (Date) selectedValue;
+        form.filter.setModifiedStartTime(date);
+      } else if (selectedValue instanceof TimePeriod) {
+        // Period selected.
+        final TimePeriod timePeriod = (TimePeriod) selectedValue;
+        form.filter.setModifiedStartTime(timePeriod.getFromDate());
+        form.filter.setModifiedStopTime(timePeriod.getToDate());
+        form.modifiedStopDatePanel.markModelAsChanged();
+      }
+      form.modifiedStartDatePanel.markModelAsChanged();
+      refresh();
+    } else if ("stopDate".equals(property) == true) {
+      if (selectedValue instanceof Date) {
+        // Date selected.
+        final Date date = (Date) selectedValue;
+        form.filter.setModifiedStopTime(date);
+      } else if (selectedValue instanceof TimePeriod) {
+        // Period selected.
+        final TimePeriod timePeriod = (TimePeriod) selectedValue;
+        form.filter.setModifiedStartTime(timePeriod.getFromDate());
+        form.filter.setModifiedStopTime(timePeriod.getToDate());
+        form.modifiedStartDatePanel.markModelAsChanged();
+      }
+      form.modifiedStopDatePanel.markModelAsChanged();
+      refresh();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }

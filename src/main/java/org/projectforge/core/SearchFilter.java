@@ -27,103 +27,88 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
-import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
-import org.projectforge.user.PFUserContext;
-
+import org.projectforge.task.TaskDO;
+import org.projectforge.user.PFUserDO;
 
 public class SearchFilter implements Serializable
 {
   private static final long serialVersionUID = 5850672386075331163L;
 
-  private TimePeriod timePeriod;
+  private String searchString;
 
-  private Integer modifiedByUserId;
+  private Date modifiedStartTime, modifiedStopTime;
 
-  private Integer taskId;
+  private PFUserDO modifiedByUser;
+
+  private TaskDO task;
 
   private Integer maxRows;
-
-  public void reset()
-  {
-    modifiedByUserId = PFUserContext.getUser().getId();
-    DateHolder dh = new DateHolder(new Date(), DatePrecision.MILLISECOND, PFUserContext.getLocale());
-    dh.setEndOfDay();
-    if (timePeriod == null) {
-      timePeriod = new TimePeriod();
-    }
-    timePeriod.setToDate(dh.getDate());
-    dh.setBeginOfDay();
-    timePeriod.setFromDate(dh.getDate());
-    maxRows = 10;
-  }
 
   /**
    * @return the startTime
    */
-  public Date getStartTime()
+  public Date getModifiedStartTime()
   {
-    return getTimePeriod().getFromDate();
+    return this.modifiedStartTime;
   }
 
   /**
-   * @param startTime the startTime to set
+   * @param modifiedStartTime the startTime to set
    */
-  public void setStartTime(Date startTime)
+  public void setModifiedStartTime(Date modifiedStartTime)
   {
-    getTimePeriod().setFromDate(startTime);
+    final DateHolder dh = new DateHolder(modifiedStartTime, DatePrecision.MILLISECOND);
+    dh.setBeginOfDay();
+    this.modifiedStartTime = dh.getDate();
   }
 
   /**
    * @return the stopTime
    */
-  public Date getStopTime()
+  public Date getModifiedStopTime()
   {
-    return getTimePeriod().getToDate();
+    return this.modifiedStopTime;
   }
 
   /**
-   * @param stopTime the stopTime to set
+   * @param modifiedStopTime the stopTime to set
    */
-  public void setStopTime(Date stopTime)
+  public void setModifiedStopTime(Date modifiedStopTime)
   {
-    DateHolder dh = new DateHolder(stopTime, DatePrecision.MILLISECOND, PFUserContext.getLocale());
+    final DateHolder dh = new DateHolder(modifiedStopTime, DatePrecision.MILLISECOND);
     dh.setEndOfDay();
-    getTimePeriod().setToDate(dh.getDate());
-  }
-
-  private TimePeriod getTimePeriod()
-  {
-    if (timePeriod == null) {
-      timePeriod = new TimePeriod();
-    }
-    return timePeriod;
+    this.modifiedStopTime = dh.getDate();
   }
 
   /**
-   * The user who has done the represented modification if available.
-   * @return
+   * The user who has done the modifications.
    */
+  public PFUserDO getModifiedByUser()
+  {
+    return modifiedByUser;
+  }
+
   public Integer getModifiedByUserId()
   {
-    return modifiedByUserId;
+    return modifiedByUser != null ? modifiedByUser.getId() : null;
   }
 
-  public void setModifiedByUserId(Integer modifiedByUserId)
+  public void setModifiedByUser(final PFUserDO modifiedByUser)
   {
-    this.modifiedByUserId = modifiedByUserId;
+    this.modifiedByUser = modifiedByUser;
   }
 
-  public Integer getTaskId()
+  public TaskDO getTask()
   {
-    return taskId;
+    return task;
   }
 
-  public void setTaskId(Integer taskId)
+  public void setTask(TaskDO task)
   {
-    this.taskId = taskId;
+    this.task = task;
   }
 
   public Integer getMaxRows()
@@ -136,14 +121,26 @@ public class SearchFilter implements Serializable
     this.maxRows = maxRows;
   }
 
+  public String getSearchString()
+  {
+    return searchString;
+  }
+
+  public void setSearchString(String searchString)
+  {
+    this.searchString = searchString;
+  }
+
   @Override
   public String toString()
   {
     ToStringBuilder sb = new ToStringBuilder(this);
     sb.append("user", getModifiedByUserId());
-    if (timePeriod != null) {
-      sb.append("from", DateHelper.formatAsUTC(timePeriod.getFromDate()));
-      sb.append("to", DateHelper.formatAsUTC(timePeriod.getToDate()));
+    if (modifiedStartTime != null) {
+      sb.append("modifiedStartTime", DateHelper.formatAsUTC(modifiedStartTime));
+    }
+    if (modifiedStopTime != null) {
+      sb.append("modifiedStopTime", DateHelper.formatAsUTC(modifiedStopTime));
     }
     return sb.toString();
   }

@@ -79,12 +79,12 @@ public class SearchDao extends HibernateDaoSupport
     String className = ClassUtils.getShortClassName(clazz);
     Criteria crit = session.createCriteria(HistoryEntry.class);
     crit.add(Restrictions.eq("className", className));
-    if (filter.getStartTime() != null && filter.getStopTime() != null) {
-      crit.add(Restrictions.between("timestamp", filter.getStartTime(), filter.getStopTime()));
-    } else if (filter.getStartTime() != null) {
-      crit.add(Restrictions.ge("timestamp", filter.getStartTime()));
-    } else if (filter.getStopTime() != null) {
-      crit.add(Restrictions.le("timestamp", filter.getStopTime()));
+    if (filter.getModifiedStartTime() != null && filter.getModifiedStopTime() != null) {
+      crit.add(Restrictions.between("timestamp", filter.getModifiedStartTime(), filter.getModifiedStopTime()));
+    } else if (filter.getModifiedStartTime() != null) {
+      crit.add(Restrictions.ge("timestamp", filter.getModifiedStartTime()));
+    } else if (filter.getModifiedStopTime() != null) {
+      crit.add(Restrictions.le("timestamp", filter.getModifiedStopTime()));
     }
     if (filter.getModifiedByUserId() != null) {
       crit = crit.add(Restrictions.eq("userName", filter.getModifiedByUserId().toString()));
@@ -106,8 +106,8 @@ public class SearchDao extends HibernateDaoSupport
     }
     crit = session.createCriteria(clazz);
     crit.add(Restrictions.in("id", ids));
-    if (filter.getTaskId() != null && (clazz.equals(TimesheetDO.class) == true)) {
-      TaskNode node = taskTree.getTaskNodeById(filter.getTaskId());
+    if (filter.getTask() != null && (clazz.equals(TimesheetDO.class) == true)) {
+      TaskNode node = taskTree.getTaskNodeById(filter.getTask().getId());
       List<Integer> taskIds = node.getDescendantIds();
       taskIds.add(node.getId());
       crit.add(Restrictions.in("task.id", taskIds));
