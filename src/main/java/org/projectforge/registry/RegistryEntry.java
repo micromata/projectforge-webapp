@@ -84,6 +84,10 @@ public class RegistryEntry
     return dao;
   }
 
+  /**
+   * Creates a proxy via LazyInitProxyFactory. Use-full if needed in Wicket components. Avoids Wicket serialization of the dao.
+   * @return
+   */
   public BaseDao< ? > getProxyDao()
   {
     return (BaseDao< ? >) LazyInitProxyFactory.createProxy(daoClassType, new DaoLocator(id));
