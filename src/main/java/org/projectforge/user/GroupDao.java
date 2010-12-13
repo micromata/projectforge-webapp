@@ -58,7 +58,7 @@ public class GroupDao extends BaseDao<GroupDO>
       "assignedUsers.lastname"};
 
   private UserDao userDao;
-  
+
   public void setUserDao(UserDao userDao)
   {
     this.userDao = userDao;
@@ -100,8 +100,7 @@ public class GroupDao extends BaseDao<GroupDO>
       list = getHibernateTemplate().find("from GroupDO g where g.name = ?", group.getName());
     } else {
       // group already exists. Check maybe changed name:
-      list = getHibernateTemplate().find("from GroupDO g where g.name = ? and pk <> ?",
-          new Object[] { group.getName(), group.getId()});
+      list = getHibernateTemplate().find("from GroupDO g where g.name = ? and pk <> ?", new Object[] { group.getName(), group.getId()});
     }
     if (CollectionUtils.isNotEmpty(list) == true) {
       return true;
@@ -298,7 +297,8 @@ public class GroupDao extends BaseDao<GroupDO>
   public boolean hasSelectAccess(GroupDO obj, boolean throwException)
   {
     Validate.notNull(obj);
-    boolean result = accessChecker.isUserMemberOfAdminGroup();
+    boolean result = accessChecker.isUserMemberOfAdminGroup()
+        || accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
     if (result == false && obj.isDeleted() == false) {
       final PFUserDO user = PFUserContext.getUser();
       Validate.notNull(user);
