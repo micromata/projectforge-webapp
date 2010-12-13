@@ -116,7 +116,7 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
   {
     final LabelValueChoiceRenderer<Integer> pageSizeChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
     final NumberFormat nf = NumberFormat.getInstance(locale);
-    for (final int size : new int[] { 5, 10, 25, 50, 100, 200, 500, 1000}) {
+    for (final int size : new int[] { 3, 5, 10, 25, 50, 100, 200, 500, 1000}) {
       if (size >= minValue && size <= maxValue) {
         pageSizeChoiceRenderer.addValue(size, nf.format(size));
       }
