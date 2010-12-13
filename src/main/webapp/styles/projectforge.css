@@ -130,12 +130,14 @@ div.progress-overbooked-min div {
 /* Zoom of phone numbers. */
 #divZoom {
 	position: fixed;
+	z-index: 10;
 	left: 0px;
 	top: 50px;
 	width: 100%;
 	text-align: center;
 	line-height: 1.4em;
 	font-family: arial black, arial, helvetica, sans-serif;
+	font-weight: bold;
 }
 
 .zoomText {
