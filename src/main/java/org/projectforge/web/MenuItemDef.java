@@ -56,13 +56,14 @@ import org.projectforge.web.admin.UpdatePage;
 import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.core.ConfigurationListPage;
+import org.projectforge.web.core.SearchPage;
 import org.projectforge.web.fibu.AuftragListPage;
 import org.projectforge.web.fibu.BankAccountListPage;
+import org.projectforge.web.fibu.CustomerListPage;
 import org.projectforge.web.fibu.EingangsrechnungListPage;
 import org.projectforge.web.fibu.Kost1ListPage;
 import org.projectforge.web.fibu.Kost2ArtListPage;
 import org.projectforge.web.fibu.Kost2ListPage;
-import org.projectforge.web.fibu.CustomerListPage;
 import org.projectforge.web.fibu.ProjektListPage;
 import org.projectforge.web.fibu.RechnungListPage;
 import org.projectforge.web.gantt.GanttChartListPage;
@@ -108,7 +109,6 @@ public enum MenuItemDef
   ACCESS_LIST("accessList", AccessListPage.class), // Visible for all.
   // *
   ADDRESS_LIST("addressList", AddressListPage.class), // Visible for all.
-  // ADDRESS_LIST("addressList", "address/AddressList.action"), // Visible for all.
   // *
   BANK_ACCOUNT_LIST("finance.bankAccounts", BankAccountListPage.class,//
       FINANCE_GROUP, CONTROLLING_GROUP), //
@@ -184,7 +184,7 @@ public enum MenuItemDef
       FINANCE_GROUP, CONTROLLING_GROUP), //
   SCRIPT_LIST("fibu.scripting", ScriptListPage.class, //
       FINANCE_GROUP, CONTROLLING_GROUP), //
-  SEARCH("search", "Search.action?reset=true"), //
+  SEARCH("search", SearchPage.class), //
   SYSTEM("system", AdminPage.class, ADMIN_GROUP), //
   // *
   SYSTEM_FIRST_LOGIN_SETUP_PAGE("system.firstLoginSetup", SetupPage.class), //
