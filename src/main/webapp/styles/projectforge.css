@@ -126,3 +126,21 @@ div.progress-overbooked-min div {
 	border-style: solid;
 	border-color: black;
 }
+
+/* Zoom of phone numbers. */
+#divZoom {
+	position: fixed;
+	left: 0px;
+	top: 50px;
+	width: 100%;
+	text-align: center;
+	line-height: 1.4em;
+	font-family: arial black, arial, helvetica, sans-serif;
+}
+
+.zoomText {
+	text-align: center;
+	/*background-color: #FFFFFF;*/
+	padding-left: 10px;
+	padding-right: 10px;
+}
