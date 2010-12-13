@@ -286,36 +286,33 @@ body * {
 .versionlabel {
 	
 }
-
 /* contents of #navigation */
 #logo {
 	float:right;
 	display:none;
 }
-
 ul#personal {
-	min-height:3em;
+	min-height:2em;
 	min-width:50em;
-	float:left;
+	float: left;
+	clear: both;
+	position:relative;
+	padding:0.5em;
 }
-
 ul#normal {
 	float:right;
+	position:relative;
+	padding:0.5em;
 }
-
-
-
 ul#personal li, 
 ul#normal li{
 	float: left;
 	display: block;
-	margin: 0.5em 0 0 0;
+	margin: 0;
 }
-
 ul#personal li.first {
 	margin-left: 1em;
 }
-
 ul#personal li a,
 ul#normal li a.parent,
 ul#personal .ui-state-highlight {
@@ -333,12 +330,19 @@ ul#personal .ui-state-highlight {
 	display: block;
 	float: left;
 }
+
+ul#personal li a:hover,
+ul#normal li a:hover {
+	cursor:pointer;
+}
+
+
+
+
 /* the placeholder  */
 ul#personal .ui-state-highlight { 
 	height: 1em;
-	min-width: 6em;
-	content:"sdfgsd";
-	margin-top:0.5em;
+	min-width: 5em;
 }
 
 ul#normal li span.parent {
@@ -351,7 +355,7 @@ ul#normal li span.parent {
 
 ul#personal li a:hover, 
 ul#personal li span.parent:hover, 
-ul#normal li a:hover  {
+ul#normal>li>a:hover  {
 	color: #2E373C;
 	cursor: pointer;
 	-moz-box-shadow: inset 0 0 10px #BBC1C3;
@@ -363,8 +367,8 @@ ul#normal  ul#nav{
 	width:80em;
 	z-index:99999;
 	position:absolute;
-	right:1em;
-	top:3em;
+	right: 0.5em;
+    top: 2.7em;
 	padding:0 1em 1em 1em;
 	border: 1px solid #D9DFE1;
 	display:none;
@@ -386,6 +390,20 @@ ul#normal li ul li {
 	padding: 0.5em;
 	float:left;
 }
+
+ul#normal li ul li a:visited,
+ul#normal li ul li a {
+	color: #2274AC;
+	text-decoration:none
+}
+
+ul#normal li ul li a:hover {
+	color: #00B1EB;
+	background:transparent;
+	shadow:none;
+	text-decoration: underline;
+}
+
 ul#normal li ul li.full {
 	float:none;
 	clear:left;
@@ -618,7 +636,7 @@ fieldset legend {
 	top: -3em;
 	padding: 1em 0;
 	margin: 0 0 0 -1em;
-	display: inline;
+	display: none;
 	height: 2em;
 	min-width: 10em;
 	width: 100%;

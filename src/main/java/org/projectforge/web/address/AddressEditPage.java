@@ -25,7 +25,6 @@ package org.projectforge.web.address;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
@@ -52,18 +51,6 @@ public class AddressEditPage extends AbstractEditPage<AddressDO, AddressEditForm
   {
     super(parameters, "address");
     init();
-    final StringBuffer buf = new StringBuffer();
-    buf.append("$(document).ready(function() {\n").append("  $(\":submit[name='update:button']\").bind('click', function(e) {\n")//
-    .append("alert('Hurzel');\n")
-        .append("    if (document.forms[0].elements['name'].value == '").append(getData().getName()).append(
-            "' && document.forms[0].elements['firstName'].value == '").append(getData().getFirstName()).append("') {\n")//
-        .append("      return true;\n") //
-        .append("    }\n") //
-        .append("    return window.confirm('").append(
-            getLocalizedMessage("address.question.changeName", getData().getFirstName(), getData().getName())).append("');\n") //
-        .append("     });\n") //
-        .append("}\n");
-    form.add(new Label("nameProtection", buf.toString()).setEscapeModelStrings(false));
   }
 
   @Override
