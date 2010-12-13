@@ -142,6 +142,7 @@ public class SearchFilter implements Serializable
     if (modifiedStopTime != null) {
       sb.append("modifiedStopTime", DateHelper.formatAsUTC(modifiedStopTime));
     }
+    sb.append("maxRows", getMaxRows());
     return sb.toString();
   }
 }

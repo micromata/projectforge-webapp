@@ -65,6 +65,13 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
     super(parentPage);
     filter = new SearchPageFilter();
   }
+  
+  @Override
+  protected void onSubmit()
+  {
+    super.onSubmit();
+    parentPage.refresh();
+  }
 
   @Override
   @SuppressWarnings("serial")
@@ -72,11 +79,11 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
   {
     super.init();
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    modifiedStartDatePanel = new DatePanel("startDate", new PropertyModel<Date>(filter, "modifiedStartTime"), DatePanelSettings.get().withCallerPage(
-        parentPage).withSelectPeriodMode(true));
+    modifiedStartDatePanel = new DatePanel("startDate", new PropertyModel<Date>(filter, "modifiedStartTime"), DatePanelSettings.get()
+        .withCallerPage(parentPage).withSelectPeriodMode(true));
     add(modifiedStartDatePanel);
-    modifiedStopDatePanel = new DatePanel("stopDate", new PropertyModel<Date>(filter, "modifiedStopTime"), DatePanelSettings.get().withCallerPage(
-        parentPage).withSelectPeriodMode(true));
+    modifiedStopDatePanel = new DatePanel("stopDate", new PropertyModel<Date>(filter, "modifiedStopTime"), DatePanelSettings.get()
+        .withCallerPage(parentPage).withSelectPeriodMode(true));
     add(modifiedStopDatePanel);
     add(new Label("datesAsUTC", new Model<String>() {
       @Override
@@ -104,8 +111,8 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
       for (final int days : new int[] { 3, 7, 14, 30, 60, 90}) {
         lastDaysChoiceRenderer.addValue(days, getLocalizedMessage("search.lastDays", days));
       }
-      final DropDownChoice<Integer> lastDaysChoice = new DropDownChoice<Integer>("lastDays", new PropertyModel<Integer>(filter, "lastDays"),
-          lastDaysChoiceRenderer.getValues(), lastDaysChoiceRenderer) {
+      final DropDownChoice<Integer> lastDaysChoice = new DropDownChoice<Integer>("lastDays",
+          new PropertyModel<Integer>(filter, "lastDays"), lastDaysChoiceRenderer.getValues(), lastDaysChoiceRenderer) {
         @Override
         protected void onSelectionChanged(final Integer newSelection)
         {
@@ -118,7 +125,7 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
           dh.setBeginOfDay();
           dh.add(Calendar.DAY_OF_YEAR, -newSelection);
           filter.setModifiedStartTime(dh.getDate());
-          filter.setLastDays(-1);
+          filter.setLastDays(null);
           modifiedStartDatePanel.markModelAsChanged();
           modifiedStopDatePanel.markModelAsChanged();
           parentPage.refresh();
@@ -175,6 +182,7 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
       }
     };
     add(new SingleButtonPanel("search", searchButton));
+    setDefaultButton(searchButton);
 
     final Button resetButton = new Button("button", new Model<String>(getString("reset"))) {
       @Override

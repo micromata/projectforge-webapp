@@ -31,16 +31,16 @@ public class SearchPageFilter extends SearchFilter
 {
   private static final long serialVersionUID = 2056162179686892853L;
 
-  private int lastDays;
+  private Integer lastDays;
 
   private String area;
 
-  public int getLastDays()
+  public Integer getLastDays()
   {
     return lastDays;
   }
 
-  public void setLastDays(int lastDays)
+  public void setLastDays(Integer lastDays)
   {
     this.lastDays = lastDays;
   }

@@ -138,9 +138,11 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     if ("taskId".equals(property) == true) {
       final TaskDO task = taskTree.getTaskById((Integer) selectedValue);
       form.filter.setTask(task);
+      refresh();
     } else if ("userId".equals(property) == true) {
       final PFUserDO user = userGroupCache.getUser((Integer) selectedValue);
       form.filter.setModifiedByUser(user);
+      refresh();
     } else if ("startDate".equals(property) == true) {
       if (selectedValue instanceof Date) {
         // Date selected.
