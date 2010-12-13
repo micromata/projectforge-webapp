@@ -65,7 +65,7 @@ public class Registry
     Validate.notNull(entry);
     map.put(id, entry);
     int idx = orderedList.indexOf(existingEntry);
-    if (idx <= 0) {
+    if (idx < 0) {
       log.error("Registry entry '" + existingEntry.getId() + "' not found. Appending the given entry to the list.");
       orderedList.add(entry);
     } else if (insertBefore == true) {
@@ -73,7 +73,6 @@ public class Registry
     } else {
       orderedList.add(idx + 1, entry);
     }
-    orderedList.add(entry);
     return this;
   }
 

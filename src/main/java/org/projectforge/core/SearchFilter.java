@@ -45,7 +45,7 @@ public class SearchFilter implements Serializable
 
   private TaskDO task;
 
-  private Integer maxRows;
+  private Integer maxRows = 3;
 
   /**
    * @return the startTime

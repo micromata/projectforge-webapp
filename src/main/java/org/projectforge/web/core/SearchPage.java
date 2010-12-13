@@ -31,6 +31,7 @@ import java.util.List;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
+import org.apache.wicket.markup.html.JavascriptPackageResource;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.RepeatingView;
@@ -73,6 +74,7 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
   public SearchPage(PageParameters parameters)
   {
     super(parameters);
+    add(JavascriptPackageResource.getHeaderContribution("scripts/zoom.js"));
     form = new SearchForm(this);
     body.add(form);
     form.init();
@@ -88,6 +90,13 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     areaRepeater = new RepeatingView("areaRepeater");
     body.add(areaRepeater);
     for (final RegistryEntry registryEntry : Registry.instance().getOrderedList()) {
+      final Class< ? extends IListPageColumnsCreator< ? >> clazz = registryEntry.getListPageColumnsCreatorClass();
+      final IListPageColumnsCreator< ? > listPageColumnsCreator = clazz == null ? null : (IListPageColumnsCreator< ? >) BeanHelper
+          .newInstance(clazz);
+      if (listPageColumnsCreator == null) {
+        log.warn("RegistryEntry '" + registryEntry.getId() + "' doesn't have an IListPageColumnsCreator (can't display search results).");
+        continue;
+      }
       final List<SearchResultData> searchResult = searchDao.getHistoryEntries(form.filter, registryEntry.getDOClass(), registryEntry
           .getDao());
       if (CollectionUtils.isEmpty(searchResult) == true) {
@@ -100,31 +109,21 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
       final WebMarkupContainer areaContainer = new WebMarkupContainer(areaRepeater.newChildId());
       areaRepeater.add(areaContainer);
       areaContainer.add(new Label("areaTitle", getString(registryEntry.getI18nTitleHeading())));
-      final Class< ? extends IListPageColumnsCreator< ? >> clazz = registryEntry.getListPageColumnsCreatorClass();
-      final IListPageColumnsCreator< ? > listPageColumnsCreator = clazz == null ? null : (IListPageColumnsCreator< ? >) BeanHelper
-          .newInstance(clazz);
-      if (listPageColumnsCreator == null) {
-        log.warn("RegistryEntry '" + registryEntry.getId() + "' doesn't have an IListPageColumnsCreator (can't display search results).");
-        final WebMarkupContainer dataTable = new WebMarkupContainer("dataTable");
-        dataTable.setVisible(false);
-        areaContainer.add(dataTable);
-      } else {
-        final List< ? > columns = listPageColumnsCreator.createColumns();
-        final DataTable dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", false) {
-          @Override
-          public List getList()
-          {
-            return list;
-          }
+      final List< ? > columns = listPageColumnsCreator.createColumns();
+      final DataTable dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", false) {
+        @Override
+        public List getList()
+        {
+          return list;
+        }
 
-          @Override
-          protected IModel getModel(Object object)
-          {
-            return new Model((Serializable) object);
-          }
-        }, form.filter.getMaxRows());
-        areaContainer.add(dataTable);
-      }
+        @Override
+        protected IModel getModel(Object object)
+        {
+          return new Model((Serializable) object);
+        }
+      }, form.filter.getMaxRows());
+      areaContainer.add(dataTable);
     }
   }
 

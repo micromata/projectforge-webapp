@@ -34,6 +34,7 @@ import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.html.JavascriptPackageResource;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
@@ -89,6 +90,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
   public AddressListPage(PageParameters parameters)
   {
     super(parameters, "address");
+    add(JavascriptPackageResource.getHeaderContribution("scripts/zoom.js"));
   }
 
   @Override

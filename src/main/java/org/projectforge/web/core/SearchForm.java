@@ -171,7 +171,7 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
     {
       // DropDownChoice pageSize
       final DropDownChoice<Integer> pageSizeChoice = AbstractListForm.getPageSizeDropDownChoice("maxRows", getLocale(),
-          new PropertyModel<Integer>(filter, "maxRows"), 0, 100);
+          new PropertyModel<Integer>(filter, "maxRows"), 3, 100);
       add(pageSizeChoice);
     }
     final Button searchButton = new Button("button", new Model<String>(getString("search"))) {

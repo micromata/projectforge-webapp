@@ -6,64 +6,8 @@
 <body>
 <table>
   <wicket:head>
-    <style type="text/css">
-#divZoom {
-	position: fixed;
-	left: 0px;
-	top: 50px;
-	width: 100%;
-	text-align: center;
-	line-height: 1.4em;
-	font-family: arial black, arial, helvetica, sans-serif;
-}
-
-.zoomText {
-	text-align: center;
-	/*background-color: #FFFFFF;*/
-	padding-left: 10px;
-	padding-right: 10px;
-}
-</style>
     <script type="text/javascript">
 <!--
-// The colors to fade step by step:
-var zColor = new Array('#C0C0C0', '#A0A0A0', '#808080', '#606060', '#404040', '#202020', '#000000');
-var timeout1, timeout2;
-
-function zoom(text) {
-  this.obj = document.getElementById('divZoom');
-  this.css = this.obj.style;
-  this.css.color = zColor[0];
-  this.obj.innerHTML='<span class="zoomText">' + text + '</span>';
-  this.css.visibility = 'visible';
-  increaseFontSize(10);
-}
-
-function increaseFontSize(size)
-{
-  this.css.fontSize = size + "px";
-  size += 5;
-  if (size <= 90) {
-    timeout1 = window.setTimeout('increaseFontSize(' + size + ')', 20);
-  } else {
-    fadeFont(1);
-  }
-}
-
-function fadeFont(cnum) {
-  this.css.color = zColor[cnum];
-  cnum++;
-  if (cnum < zColor.length) {
-    timeout2 = window.setTimeout('fadeFont(' + cnum + ')', 50);
-  }
-}
-
-function hide() {
-  this.css.visibility = 'hidden';
-  if (timeout1) window.clearTimeout(timeout1);
-  if (timeout2) window.clearTimeout(timeout2);
-}
-
 function setOptionStatus() {
   if ($("#filterTypeStandard").attr("checked") == true) {
     $("#options").attr("style", "display: block;");
