@@ -103,8 +103,15 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
         continue;
       }
       final List list = new ArrayList();
+      boolean hasMore = false;
       for (final SearchResultData data : searchResult) {
-        list.add(data.getDataObject());
+        if (data.getDataObject() != null) {
+          list.add(data.getDataObject());
+        } else {
+          // Empty entry means: more entries found.
+          hasMore = true;
+          break;
+        }
       }
       final WebMarkupContainer areaContainer = new WebMarkupContainer(areaRepeater.newChildId());
       areaRepeater.add(areaContainer);
@@ -124,6 +131,11 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
         }
       }, form.filter.getMaxRows());
       areaContainer.add(dataTable);
+      if (hasMore == true) {
+        areaContainer.add(new WebMarkupContainer("hasMoreEntries"));
+      } else {
+        areaContainer.add(new Label("hasMoreEntries", "[invisible]").setVisible(false));
+      }
     }
   }
 

@@ -66,7 +66,7 @@ public class SearchDao extends HibernateDaoSupport
   public List<SearchResultData> getHistoryEntries(final SearchFilter filter, final Class clazz, final BaseDao baseDao)
   {
     final Session session = getSession();
-    if (filter == null || filter.getMaxRows() == null) {
+    if (filter == null) {
       log.info("Filter or rows in filter is null (may be Search as redirect after login): " + filter);
       return null;
     }
@@ -92,6 +92,8 @@ public class SearchDao extends HibernateDaoSupport
     crit = crit.setCacheable(true);
     crit.setCacheRegion("historyItemCache");
     crit.addOrder(Order.desc("timestamp"));
+    int maxRows = filter.getMaxRows() != null ? filter.getMaxRows() : 3;
+    crit.setMaxResults(maxRows + 1); // Get one more entry to evaluate wether more entries does exist or not.
     List<SearchResultData> result = new ArrayList<SearchResultData>();
     List<HistoryEntry> historyList = crit.list();
     if (historyList.size() == 0) {
@@ -143,7 +145,7 @@ public class SearchDao extends HibernateDaoSupport
       data.historyEntry = entry;
       data.propertyChanges = baseDao.convert(entry, session);
       result.add(data);
-      if (++counter >= filter.getMaxRows()) {
+      if (++counter > maxRows) {
         result.add(new SearchResultData()); // Add null entry for gui for displaying 'more entries'.
         break;
       }
