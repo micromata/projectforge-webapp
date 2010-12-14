@@ -147,9 +147,6 @@ public class UserFilter implements Filter
       MDC.put("session", request.getSession().getId());
       if (ignoreFilterFor(request) == true) {
         // Ignore the filter for this request:
-        if (user != null) {
-          PFUserContext.setUser(user);
-        }
         if (log.isDebugEnabled() == true) {
           log.debug("Ignore: " + request.getRequestURI());
         }
@@ -163,10 +160,12 @@ public class UserFilter implements Filter
           }
         } else {
           user = checkStayLoggedIn(request, response);
-          if (user != null && log.isDebugEnabled() == true) {
-            log.debug("User's stay logged-in cookie found: " + request.getRequestURI());
+          if (user != null) {
+            if (log.isDebugEnabled() == true) {
+              log.debug("User's stay logged-in cookie found: " + request.getRequestURI());
+            }
+            UserFilter.login(request, user);
           }
-          UserFilter.login(request, user);
         }
         if (user != null) {
           PFUserContext.setUser(user);
@@ -176,11 +175,13 @@ public class UserFilter implements Filter
           // Redirect was done.
           return;
         } else {
+          PFUserContext.setUser(new PFUserDO().setClientLocale(request.getLocale()));
           // No redirect, so process with the chain (loginPage is already the request).
           chain.doFilter(request, response);
         }
       }
     } finally {
+      PFUserContext.setUser(null);
       MDC.remove("ip");
       MDC.remove("session");
       if (user != null) {
