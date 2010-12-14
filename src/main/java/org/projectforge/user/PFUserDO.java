@@ -106,7 +106,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private int loginFailures;
 
-  private Locale locale = Locale.GERMANY;
+  private Locale locale;
 
   private boolean minorChange = false;
 
@@ -332,9 +332,10 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return clientLocale;
   }
 
-  public void setClientLocale(Locale clientLocale)
+  public PFUserDO setClientLocale(Locale clientLocale)
   {
     this.clientLocale = clientLocale;
+    return this;
   }
 
   /**
