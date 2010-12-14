@@ -291,21 +291,28 @@ body * {
 	float:right;
 	display:none;
 }
-ul#personal {
+ul#personal,
+ul#trash {
 	min-height:2em;
 	min-width:50em;
 	float: left;
 	clear: both;
 	position:relative;
 	padding:0.5em;
+	z-index:99999;
 }
+
+ul#trash li {display:none}
+
+
 ul#normal {
 	float:right;
 	position:relative;
 	padding:0.5em;
 }
 ul#personal li, 
-ul#normal li{
+ul#normal li,
+ul#trash li{
 	float: left;
 	display: block;
 	margin: 0;
@@ -337,6 +344,13 @@ ul#normal li a:hover {
 }
 
 
+ul#trash {
+	outline: 2px solid red;
+	min-width:2em;
+	width:2em;
+	float: left;
+}
+
 
 
 /* the placeholder  */
@@ -365,7 +379,7 @@ ul#normal>li>a:hover  {
 
 ul#normal  ul#nav{
 	width:80em;
-	z-index:99999;
+	z-index:88888;
 	position:absolute;
 	right: 0.5em;
     top: 2.7em;
