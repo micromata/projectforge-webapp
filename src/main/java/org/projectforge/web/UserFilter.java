@@ -175,7 +175,6 @@ public class UserFilter implements Filter
           // Redirect was done.
           return;
         } else {
-          PFUserContext.setUser(new PFUserDO().setClientLocale(request.getLocale()));
           // No redirect, so process with the chain (loginPage is already the request).
           chain.doFilter(request, response);
         }
