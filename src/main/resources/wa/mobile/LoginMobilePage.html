@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+</head>
+
+<body>
+
+<div id="topbar">
+<div id="title">ProjectForge</div>
+<div id="rightbutton"><a href="menu.html">Login</a></div>
+</div>
+<div id="content"><wicket:extend>
+  <span class="graytitle"><wicket:message key="login.welcome" /></span>
+  <form wicket:id="form" class="loginform">
+  <ul class="pageitem">
+    <li class="smallfield"><span class="name"><wicket:message key="username" /></span><input wicket:message="placeholder:username" type="text"
+      wicket:id="username" /></li>
+    <li class="smallfield"><span class="name"><wicket:message key="password" /></span><input wicket:message="password" type="password" /></li>
+    <li class="checkbox"><span class="name">Angemeldet bleiben</span><input name="checkbox" type="checkbox" /></li>
+    <li class="button"><input name="login" type="submit" value="Login" /></li>
+  </ul>
+  </form>
+  <ul class="pageitem">
+    <li class="textbox"><span class="header">Wichtige Meldung:</span>
+    <p>Am Dienstag zwischen 8:00 und 10:00 finden Wartungsarbeiten statt. ProjectForge steht in dieser Zeit leider nicht zur Verf&uuml;gung.</p>
+    </li>
+  </ul>
+</wicket:extend></div>
+</body>
+</html>
