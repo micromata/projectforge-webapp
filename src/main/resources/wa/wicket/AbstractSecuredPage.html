@@ -6,17 +6,28 @@
 
 <body>
 <wicket:extend>
+	<script type="text/javascript" charset="utf-8">
+	/* <![CDATA[ */
+		$(function() {
+			$( ".buttonset" ).buttonset();
+			});
+	/* ]]> */
+	</script>
+	
+	
   <div wicket:id="alertMessage" class="alert">[This is an alert message!]</div>
   
-  <div class="menu clearfix" id="contentMenu" wicket:id="contentMenuArea"><span wicket:id="menu">[menu entries]</span>
-  <ul class="dropdown-menu top-right" wicket:id="dropDownMenu">
-    <li onmouseover="mopen('m1')" onmouseout="mclosetime()"><img src="images/cog.png" wicket:id="cogImage" />
-    	<img src="images/arrow-down.png" wicket:id="arrowDownImage" />
-    	<ul id="m1" onmouseover="mcancelclosetime()">
-      		<li wicket:id="menu"><a wicket:id="menuEntry"><span wicket:id="label">[action]</span></a></li>
-    	</ul>
-    </li>
-  </ul>
+  <div class="menu clearfix" id="contentMenu" wicket:id="contentMenuArea">
+  	<span wicket:id="menu">[menu entries]</span>
+  	
+	<ul class="dropdown-menu top-right" wicket:id="dropDownMenu">
+		<li onmouseover="mopen('m1')" onmouseout="mclosetime()"><img src="images/cog.png" wicket:id="cogImage" />
+			<img src="images/arrow-down.png" wicket:id="arrowDownImage" />
+				<ul id="m1" onmouseover="mcancelclosetime()">
+					<li wicket:id="menu"><a wicket:id="menuEntry"><span wicket:id="label">[action]</span></a></li>
+				</ul>
+		</li>
+	</ul>
   </div>
   <wicket:child>
     <h2>This is the content!</h2>

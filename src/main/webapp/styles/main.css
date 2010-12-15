@@ -139,6 +139,12 @@ You are allowed to embed the fonts via css and expose them to the internet,until
 	border-radius: 1em;
 }
 
+.rounded {
+	-moz-border-radius: 0.2em;
+	-webkit-border-radius: 0.2em;
+	border-radius: 0.2em;
+}
+
 
 .shaded, fieldset legend, .projecttree dt a span, .projecttree dd a span {
 	text-shadow: -0.5px -0.5px 0px #8994A0, 0.5px 0.5px 0px #fff;
@@ -234,6 +240,7 @@ body * {
 .headermeta {
 	height:2em;
 	background:#5C6970;
+	overflow:hidden;
 }
 
 .headermeta ul.info li.loggedinlabel {
@@ -287,8 +294,12 @@ body * {
 	
 }
 /* contents of #navigation */
+
+div#main-menu{
+	clear:both;
+}
 #logo {
-	float:right;
+	
 	display:none;
 }
 ul#personal,
@@ -311,8 +322,7 @@ ul#normal {
 	padding:0.5em;
 }
 ul#personal li, 
-ul#normal li,
-ul#trash li{
+ul#normal li{
 	float: left;
 	display: block;
 	margin: 0;
@@ -475,6 +485,10 @@ ul#normal li.active ul {
 	color:#5C6970;
 }
 
+.loginpage #footer {
+	display:none;
+}
+
 
 #footer p {
 	padding: 1em 1em 0.5em 1em;
@@ -599,6 +613,11 @@ table.form tr td,table.form tr th {
 	padding:0.2em;
 }
 
+table.filter tr td,table.filter tr th {
+	padding:0.2em;
+	vertical-align: middle;
+}
+
 .form label.block {
 	width: 20em;
 	display: block;
@@ -606,8 +625,13 @@ table.form tr td,table.form tr th {
 }
 
 .form .stdtext {
-	float: left;
-	width: 200px;
+	width: 20em;
+	border: 1px solid #D9DFE1;
+    padding: 0.4em;
+}
+
+.form label.big {
+	font-size:1.4em;
 }
 
 .form hr {
@@ -697,24 +721,24 @@ fieldset.buttons p {
 
 
 /* ==================== */
-/* = volkswagen krams = */
+/* = formbuilder krams = */
 /* ==================== */
 
-form input.error {
+form.newform input.error {
 	color: #E20B2C;
 }
 
-form label.error {
+form.newform label.error {
 	color: #E20B2C;
 	border:none;
 }
-form p,
-input[type="text"],
-input[type="password"],
-textarea,
-select,
-label, 
-div.file {
+form.newform p,
+.newform input[type="text"],
+.newform input[type="password"],
+.newform textarea,
+.newform select,
+.newform label, 
+.newform div.file {
 	padding: 0;
 	margin: 0.5em 1em 0 -0.2em;
 	display: inline-block;
@@ -733,7 +757,7 @@ div.file {
 
 
 
-.form label.inline {
+.form.newform label.inline {
 	width:auto;
 }
 
@@ -744,13 +768,14 @@ div.file {
 }
 
 select {
+	
 }
 
-input[type="text"],
-input[type="password"],
-textarea, 
-select, 
-.file{
+.newform input[type="text"],
+.newform input[type="password"],
+.newformtextarea, 
+.newformselect, 
+.newform .file{
 	border-color:#D9DFE1;
 	background:#fff;
 	-moz-border-radius:0.2em;
@@ -759,53 +784,52 @@ select,
 	zoom:1;
 }
 
-input[type="checkbox"],
-input[type="radio"] {
+.newform input[type="checkbox"],
+.newform input[type="radio"] {
 	vertical-align:center;
 	margin:0 0.5em 0 0;
 	padding:0;
 	float:left;
 }
 
-label span {float:left; cursor: hand; cursor:pointer;}
+.newform label span {float:left; cursor: hand; cursor:pointer;}
 
 input[type="text"]:focus,
-input[type="password"]:focus,
-.text:focus, 
-.password:focus, 
-textarea:focus, 
-select:focus, 
-.file:focus{
+.newform input[type="password"]:focus,
+.newform .password:focus, 
+.newform textarea:focus, 
+.newform select:focus, 
+.newform .file:focus{
 	outline:2px solid #A9D887;
 }
 
 input[type="text"].error:focus,
-input[type="passwort"].error:focus,
-textarea.error:focus,
-select.error:focus {
+.newform input[type="passwort"].error:focus,
+.newform textarea.error:focus,
+.newform select.error:focus {
 	outline:2px solid #E11D1C;
 }
 
-label.clear,
-input.clear {
+.newform label.clear,
+.newform input.clear {
 	clear:left;
 }
 
-.last {
+.newform .last {
 	margin-right:0;
 }
 
-* html .last {
+* html .newform .last {
 	    zoom: 1;
 	overflow:auto;
 }
 
-*:first-child+html {
+*:first-child+html .newform .last{
 	zoom: 1;
 	overflow:auto;
 }
 
-.last:after {
+.newform .last:after {
 	content: ".";
 	display: block;
 	height: 0;
@@ -817,32 +841,32 @@ input.clear {
 /* = set the width of ALL elements  = */
 /* ================================== */
 
-.double	{ width: 39em; }
-.putdouble	{ margin-left: 39.8em; }
-*:first-child+html select.double{width:39.2em;}
+.newform .double	{ width: 39em; }
+.newform .putdouble	{ margin-left: 39.8em; }
+*:first-child+html .newform select.double{width:39.2em;}
 
-.onehalf { width: 29em; }
-.putonehalf { margin-left: 29.8em; }
-*:first-child+html select.onehalf{width:29.2em;}
+.newform .onehalf { width: 29em; }
+.newform .putonehalf { margin-left: 29.8em; }
+*:first-child+html .newform select.onehalf{width:29.2em;}
 
-.full { width: 19em;}
-.putfull { margin-left: 19.8em; }
-*:first-child+html select.full{width:19.2em;}
+.newform .full { width: 19em;}
+.newform .putfull { margin-left: 19.8em; }
+*:first-child+html .newform select.full{width:19.2em;}
 
-.threequart { width: 14em; }
-.putthreequart { margin-left: 14.8em; }
-*:first-child+html select.threequart{width:14.2em;}
+.newform .threequart { width: 14em; }
+.newform .putthreequart { margin-left: 14.8em; }
+*:first-child+html .newform select.threequart{width:14.2em;}
 
-.half { width: 9em; }
-.puthalf { margin-left: 9.8em; }
-*:first-child+html select.half{width:9.2em}
+.newform .half { width: 9em; }
+.newform .puthalf { margin-left: 9.8em; }
+*:first-child+html .newform select.half{width:9.2em}
 
-.quart { width: 4em; }
-.putquart { margin-left: 3.8em; }
-*:first-child+html select.quart{width:4.2em;}
+.newform .quart { width: 4em; }
+.newform .putquart { margin-left: 3.8em; }
+*:first-child+html .newform select.quart{width:4.2em;}
 
 /* ==================== */
-/* = volkswagen krams = */
+/* = formbuilder krams = */
 /* ==================== */
 
 
@@ -851,7 +875,11 @@ input.clear {
 
 
 /* der graue button */
-fieldset.buttons input,input.button,a.button,div.visible a.button {
+fieldset.buttons input,
+input.button,
+a.button,
+div.visible a.button, 
+.buttonpanel input{
 	-moz-border-radius: 0.3em;
 	-webkit-border-radius: 0.3em;
 	border-radius: 0.3em;
@@ -865,29 +893,28 @@ fieldset.buttons input,input.button,a.button,div.visible a.button {
 	color: #fff;
 	line-height: 1.7em;
 	display: block;
-	float: right;
+	float: left; 
 	margin: 0 0 0 1em;
 }
 
 /* der graue button/buttonlink bei mouseover */
-.buttons input:hover,a:hover.button,a.button:hover {
+.buttons input:hover,
+a:hover.button,
+a.button:hover,
+.buttonpanel input:hover {
 	background: -moz-linear-gradient(top, #D9DFE1, #8994A0 60%);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #D9DFE1),
-		color-stop(0.6, #8994A0) );
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #D9DFE1), color-stop(0.6, #8994A0) );
 	cursor: pointer;
 	test-decoration: none;
 }
 
-fieldset.buttons input.next:after {
-	content: ">";
-}
+
 
 /* der grüne Button/Buttonlink */
 fieldset.buttons input.submit,input.submit,div.visible a.submit,fieldset.visible a.submit,fieldset.buttons a.submit
 	{
 	background: -moz-linear-gradient(top, #A9D887, #009C0E);
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #A9D887),
-		color-stop(1.0, #009C0E) );
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #A9D887), color-stop(1.0, #009C0E) );
 	border-color: #009C0E;
 }
 
@@ -1189,16 +1216,16 @@ th.wicket_orderNone,th.wicket_orderUp ;th.wicket_orderDown {
 
 /* Drop down menu */
 ul.top-right {
-	position: absolute;
-	top: 3px;
-	right: 10px;
+
 	z-index: 30;
 }
 
 ul.dropdown-menu {
 	margin: 0;
 	padding: 0;
-	font-size: 80%;
+	float:right;
+	width: 10em;
+	
 }
 
 ul.top-right>li {
@@ -1231,11 +1258,11 @@ ul.top-right ul {
 
 ul.dropdown-menu ul {
 	position: absolute;
-	visibility: hidden;
 	margin: 0;
 	padding: 0;
 	background: #E8E8E8;
 	border: 1px solid #555555;
+	z-index: 4000;
 }
 
 ul.dropdown-menu ul li a {

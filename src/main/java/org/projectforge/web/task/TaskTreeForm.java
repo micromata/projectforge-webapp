@@ -24,6 +24,7 @@
 package org.projectforge.web.task;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.TextField;
@@ -105,6 +106,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
         getParentPage().onSearchSubmit();
       }
     };
+    
     searchButtonPanel = new SingleButtonPanel("search", searchButton);
     add(searchButtonPanel);
     final Button resetButton = new Button("button", new Model<String>(getString("reset"))) {
@@ -124,6 +126,8 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
         getParentPage().onListViewSubmit();
       }
     };
+    
+    
     listViewButtonPanel = new SingleButtonPanel("listView", listViewButton);
     add(listViewButtonPanel);
     final Button cancelButton = new Button("button", new Model<String>(getString("cancel"))) {

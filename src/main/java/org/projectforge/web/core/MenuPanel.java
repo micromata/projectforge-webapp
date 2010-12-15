@@ -69,7 +69,7 @@ public class MenuPanel extends Panel
   public MenuPanel(String id)
   {
     super(id);
-    add(CSSPackageResource.getHeaderContribution("scripts/jquery-ui-1-2.8.2.custom/css/custom-theme/jquery-ui-.custom.css"));
+    add(CSSPackageResource.getHeaderContribution("scripts/jquery-ui-1-2.8.2.custom/css/custom-theme/jquery-ui-1.8.7.custom.css"));
     add(JavascriptPackageResource.getHeaderContribution("scripts/jquery-ui-1-2.8.2.custom/js/jquery-ui-1.8.2.custom.min.js"));
     add(JavascriptPackageResource.getHeaderContribution("scripts/menu.js"));
     // should be included in jqueryui, uncomment if something is missing

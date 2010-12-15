@@ -7,13 +7,13 @@ $(function() {
     helper: 'clone'
   }).disableSelection();
   
-//  $("#trash").droppable({
-//		accept: "#personal > li",
-//		activeClass: "ui-state-highlight",
-//		drop: function( event, ui ) {
-//			ui.item.remove;
-//		}
-//  });
+  $("#trash").droppable({
+		accept: "#personal > li",
+		activeClass: "ui-state-highlight",
+		drop: function( event, ui ) {
+			ui.item.remove;
+		}
+  });
 
   $( "#personal, #trash").sortable({
     placeholder: "ui-state-highlight",
