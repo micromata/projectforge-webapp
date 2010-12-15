@@ -27,6 +27,7 @@ import javax.servlet.http.Cookie;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.request.target.basic.RedirectRequestTarget;
@@ -66,7 +67,7 @@ public class LoginPage extends AbstractBasePage
   {
     super(parameters);
     final PFUserDO wicketSessionUser = ((MySession) getSession()).getUser();
-    final PFUserDO sessionUser = UserFilter.getUser(((WebRequest)getRequest()).getHttpServletRequest());
+    final PFUserDO sessionUser = UserFilter.getUser(((WebRequest) getRequest()).getHttpServletRequest());
     // Sometimes the wicket session user is given but the http session user is lost (re-login required).
     if (wicketSessionUser != null && sessionUser != null && wicketSessionUser.getId() == sessionUser.getId()) {
       setResponsePage(WicketUtils.getDefaultPage());
@@ -87,16 +88,21 @@ public class LoginPage extends AbstractBasePage
     form.init();
   }
 
-  private void login(final PFUserDO user)
+  public static void internalLogin(final WebPage page, final PFUserDO user)
   {
-    ((MySession) getSession()).login(user);
-    UserFilter.login(((WebRequest) getRequest()).getHttpServletRequest(), user);
+    ((MySession) page.getSession()).login(user);
+    UserFilter.login(((WebRequest) page.getRequest()).getHttpServletRequest(), user);
   }
 
-  protected void checkLogin()
+  private void login(final PFUserDO user)
   {
-    final String encryptedPassword = userDao.encryptPassword(form.getPassword());
-    final String username = form.getUsername();
+    internalLogin(this, user);
+  }
+
+  public static void internalCheckLogin(final WebPage page, final UserDao userDao, final String username, final String password,
+      final boolean userWantsToStayLoggedIn, final String targetUrlAfterLogin)
+  {
+    final String encryptedPassword = userDao.encryptPassword(password);
     final PFUserDO user = userDao.authenticateUser(username, encryptedPassword);
     if (user != null) {
       log.info("User with valid username/password: " + username + "/" + encryptedPassword);
@@ -105,7 +111,6 @@ public class LoginPage extends AbstractBasePage
         return;
       } else {
         log.info("User successfully logged in: " + user.getDisplayUsername());
-        final boolean userWantsToStayLoggedIn = form.isStayLoggedIn();
         if (userWantsToStayLoggedIn == true) {
           final PFUserDO loggedInUser = userDao.internalGetById(user.getId());
           final Cookie cookie = new Cookie("stayLoggedIn", loggedInUser.getId()
@@ -113,14 +118,14 @@ public class LoginPage extends AbstractBasePage
               + loggedInUser.getUsername()
               + ":"
               + userDao.getStayLoggedInKey(user.getId()));
-          UserFilter.addCookie(((WebRequest) getRequest()).getHttpServletRequest(), ((WebResponse) getResponse()).getHttpServletResponse(),
-              cookie);
+          UserFilter.addCookie(((WebRequest) page.getRequest()).getHttpServletRequest(), ((WebResponse) page.getResponse())
+              .getHttpServletResponse(), cookie);
         }
-        login(user);
+        internalLogin(page, user);
         if (targetUrlAfterLogin != null) {
-          getRequestCycle().setRequestTarget(new RedirectRequestTarget(targetUrlAfterLogin));
+          page.getRequestCycle().setRequestTarget(new RedirectRequestTarget(targetUrlAfterLogin));
         } else {
-          setResponsePage(WicketUtils.getDefaultPage());
+          page.setResponsePage(WicketUtils.getDefaultPage());
         }
         return;
       }
@@ -128,6 +133,11 @@ public class LoginPage extends AbstractBasePage
       log.info("User login failed: " + username + "/" + encryptedPassword);
     }
     return;
+  }
+
+  protected void checkLogin()
+  {
+    internalCheckLogin(this, userDao, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), targetUrlAfterLogin);
   }
 
   @Override
