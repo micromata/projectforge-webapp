@@ -83,7 +83,7 @@ public class UserFilter implements Filter
     IGNORE_PREFIX = contextPath + '/' + WicketUtils.WICKET_APPLICATION_PATH + "resources";
   }
 
-  static String getTargetUrlAfterLogin(final HttpServletRequest request)
+  public static String getTargetUrlAfterLogin(final HttpServletRequest request)
   {
     return (String) request.getParameter(SESSION_KEY_TARGET_URL);
   }
@@ -101,7 +101,7 @@ public class UserFilter implements Filter
     return null;
   }
 
-  static void addCookie(final HttpServletRequest request, final HttpServletResponse response, final Cookie stayLoggedInCookie)
+  public static void addCookie(final HttpServletRequest request, final HttpServletResponse response, final Cookie stayLoggedInCookie)
   {
     stayLoggedInCookie.setMaxAge(COOKIE_MAX_AGE);
     stayLoggedInCookie.setPath("/");
