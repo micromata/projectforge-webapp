@@ -5,14 +5,14 @@
     <param-name>contextConfigLocation</param-name>
     <param-value>/WEB-INF/classes/applicationContext*.xml</param-value>
   </context-param>
-  <filter>
+  <!-- filter>
     <filter-name>WicketSessionFilter</filter-name>
     <filter-class>org.apache.wicket.protocol.http.servlet.WicketSessionFilter</filter-class>
     <init-param>
       <param-name>filterName</param-name>
       <param-value>wicket.app</param-value>
     </init-param>
-  </filter>
+  </filter-->
   <filter>
     <filter-name>WicketApplicationFilter</filter-name>
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
@@ -87,13 +87,13 @@
     <filter-name>HibernateFilter</filter-name>
     <url-pattern>/wa/*</url-pattern>
   </filter-mapping>
-  <filter-mapping>
+  <!-- filter-mapping>
     <filter-name>WicketSessionFilter</filter-name>
     <url-pattern>/*</url-pattern>
-  </filter-mapping>
+  </filter-mapping-->
   <filter-mapping>
     <filter-name>WicketApplicationFilter</filter-name>
-    <url-pattern>/*</url-pattern>
+    <url-pattern>/wa/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>wicket.app</filter-name>
