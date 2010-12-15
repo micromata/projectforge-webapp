@@ -23,6 +23,8 @@
 
 package org.projectforge.web.wicket;
 
+import org.apache.wicket.behavior.SimpleAttributeModifier;
+
 public class WebConstants
 {
   public static final String FILE_IMAGE_DIMENSIONS = "imageDimensions.xml";
@@ -185,4 +187,10 @@ public class WebConstants
    * Used as class attribute for input fields.
    */
   public static final String CSS_INPUT_STDTEXT = "stdtext";
+
+  public static final SimpleAttributeModifier BUTTON_CLASS_NOBUTTON = new SimpleAttributeModifier("class", "nobutton");
+
+  public static final SimpleAttributeModifier BUTTON_CLASS_RESET = new SimpleAttributeModifier("class", "reset");
+
+  public static final SimpleAttributeModifier BUTTON_CLASS_DEFAULT = new SimpleAttributeModifier("class", "submit");
 }
