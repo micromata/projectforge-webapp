@@ -31,12 +31,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.PredicateUtils;
 import org.apache.commons.lang.ClassUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.task.TaskNode;
@@ -91,19 +90,22 @@ public class SearchDao extends HibernateDaoSupport
     }
     crit = crit.setCacheable(true);
     crit.setCacheRegion("historyItemCache");
-    crit.addOrder(Order.desc("timestamp"));
+    crit.setProjection(Projections.distinct(Projections.property("id")));
+    crit.addOrder(Order.desc("id"));
     int maxRows = filter.getMaxRows() != null ? filter.getMaxRows() : 3;
     crit.setMaxResults(maxRows + 1); // Get one more entry to evaluate wether more entries does exist or not.
-    List<SearchResultData> result = new ArrayList<SearchResultData>();
-    List<HistoryEntry> historyList = crit.list();
+    final List<Integer> historyIds = crit.list();
+    final List<SearchResultData> result = new ArrayList<SearchResultData>();
+    crit = session.createCriteria(HistoryEntry.class);
+    crit.add(Restrictions.in("id", historyIds));
+    crit.addOrder(Order.desc("id"));
+    final List<HistoryEntry> historyList = crit.list();
     if (historyList.size() == 0) {
       return result;
     }
-    HistoryEntry[] history = (HistoryEntry[]) CollectionUtils.select(historyList, PredicateUtils.uniquePredicate()).toArray(
-        new HistoryEntry[0]);
     // Now get all ids, referred in the history entries (and store all history entries in a map for faster access):
     Set<Integer> ids = new HashSet<Integer>();
-    for (HistoryEntry entry : history) {
+    for (HistoryEntry entry : historyList) {
       ids.add(entry.getEntityId());
     }
     crit = session.createCriteria(clazz);
@@ -130,7 +132,7 @@ public class SearchDao extends HibernateDaoSupport
     }
     int counter = 0;
     // Now put the stuff together:
-    for (HistoryEntry entry : history) {
+    for (HistoryEntry entry : historyList) {
       ExtendedBaseDO<Integer> obj = map.get(entry.getEntityId());
       if (obj == null) {
         // No access (see above).
