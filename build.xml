@@ -62,7 +62,7 @@
 				<include name="LICENSE.txt" />
 			</fileset>
 		</copy>
-		<copy todir="${target.tmp}/secure/doc">
+		<copy todir="${target.tmp}/doc">
 			<fileset dir="${m_doc.home}">
 				<include name="images/*.gif" />
 				<include name="images/*.jpg" />
@@ -113,6 +113,7 @@
         <include name="src/**/*.xsl" />
         <include name="src/main/webapp/**/favicon.ico" />
         <include name="src/main/webapp/**/*.css" />
+        <include name="src/main/webapp/**/*.eot" />
         <include name="src/main/webapp/**/*.gif" />
         <include name="src/main/webapp/**/*.htc" />
         <include name="src/main/webapp/**/*.html" />
@@ -121,6 +122,7 @@
         <include name="src/main/webapp/**/*.jsp" />
         <include name="src/main/webapp/**/*.png" />
         <include name="src/main/webapp/**/*.swf" />
+        <include name="src/main/webapp/**/*.svg" />
         <include name="src/main/webapp/**/*.tld" />
         <include name="src/main/webapp/**/*.ttf" />
         <include name="version.xml" />
