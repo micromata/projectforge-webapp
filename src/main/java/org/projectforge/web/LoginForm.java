@@ -61,7 +61,7 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
   {
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     add(new CheckBox("stayLoggedIn", new PropertyModel<Boolean>(this, "stayLoggedIn")));
-    add(new TextField<String>("username", new PropertyModel<String>(this, "username")).add(new FocusOnLoadBehavior()));
+    add(new TextField<String>("username", new PropertyModel<String>(this, "username")).setMarkupId("username").add(new FocusOnLoadBehavior()));
     add(new PasswordTextField("password", new PropertyModel<String>(this, "password")).setResetPassword(true).setRequired(true));
     final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
     final Label messageOfTheDayLabel = new Label("messageOfTheDay", messageOfTheDay);

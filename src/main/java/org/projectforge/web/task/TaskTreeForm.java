@@ -107,6 +107,8 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
       }
     };
     
+    searchButton.add(new SimpleAttributeModifier("class", "submit"));
+    
     searchButtonPanel = new SingleButtonPanel("search", searchButton);
     add(searchButtonPanel);
     final Button resetButton = new Button("button", new Model<String>(getString("reset"))) {
@@ -116,7 +118,9 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
         getParentPage().onResetSubmit();
       }
     };
+    resetButton.add( new SimpleAttributeModifier("class", "reset"));
     resetButton.setDefaultFormProcessing(false);
+    
     resetButtonPanel = new SingleButtonPanel("reset", resetButton);
     add(resetButtonPanel);
     final Button listViewButton = new Button("button", new Model<String>(getString("listView"))) {
@@ -127,9 +131,10 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
       }
     };
     
-    
+    listViewButton.add(new SimpleAttributeModifier("class", "nobutton"));
     listViewButtonPanel = new SingleButtonPanel("listView", listViewButton);
-    add(listViewButtonPanel);
+    
+    
     final Button cancelButton = new Button("button", new Model<String>(getString("cancel"))) {
       @Override
       public final void onSubmit()
@@ -138,8 +143,10 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
       }
     };
     cancelButton.setDefaultFormProcessing(false);
+    cancelButton.add(new SimpleAttributeModifier("class", "cancel"));
     cancelButtonPanel = new SingleButtonPanel("cancel", cancelButton);
     add(cancelButtonPanel);
+    add(listViewButtonPanel);
     setDefaultButton(searchButton);
     setComponentsVisibility();
   }

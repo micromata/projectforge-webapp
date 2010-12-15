@@ -32,6 +32,7 @@ textarea,input {
 body {
 	line-height: 1;
 	min-width:990px;
+	color: #555;
 }
 
 ul {
@@ -551,7 +552,15 @@ ul#normal li.active ul {
 
 .loginpage form.loginform fieldset {
 	margin:0;
-	
+}
+
+
+.loginpage form.loginform h3{
+	font-size: 1.4em;
+	color: #8994A0;
+	margin:0 0 1em 0;
+	text-transform:  uppercase;
+	letter-spacing: 0.05em;
 }
 
 .loginpage #navigation {
@@ -560,13 +569,16 @@ ul#normal li.active ul {
 
 .loginform label {
 	display: block;
-	margin: 1em 0 0 0;
+    font-size: 1.3em;
+    line-height: 1.5em;
+    margin: 0.5em 0 0;
 }
 
-.loginform input.full {
+.loginform input.full, .loginform input.text  {
 	width: 100%;
 	font-size: 1.4em;
 	margin: 0 0 0.5em;
+	border: 1px solid #D9DFE1;
 }
 
 .loginform .stay {
@@ -795,18 +807,18 @@ select {
 .newform label span {float:left; cursor: hand; cursor:pointer;}
 
 input[type="text"]:focus,
-.newform input[type="password"]:focus,
-.newform .password:focus, 
-.newform textarea:focus, 
-.newform select:focus, 
-.newform .file:focus{
+input[type="password"]:focus,
+.password:focus, 
+textarea:focus, 
+select:focus, 
+.file:focus{
 	outline:2px solid #A9D887;
 }
 
 input[type="text"].error:focus,
-.newform input[type="passwort"].error:focus,
-.newform textarea.error:focus,
-.newform select.error:focus {
+input[type="passwort"].error:focus,
+textarea.error:focus,
+select.error:focus {
 	outline:2px solid #E11D1C;
 }
 
@@ -897,6 +909,10 @@ div.visible a.button,
 	margin: 0 0 0 1em;
 }
 
+.loginpage fieldset.buttons input {
+	float:right;
+}
+
 /* der graue button/buttonlink bei mouseover */
 .buttons input:hover,
 a:hover.button,
@@ -911,7 +927,11 @@ a.button:hover,
 
 
 /* der grüne Button/Buttonlink */
-fieldset.buttons input.submit,input.submit,div.visible a.submit,fieldset.visible a.submit,fieldset.buttons a.submit
+fieldset.buttons input.submit,
+input.submit,
+div.visible a.submit,
+fieldset.visible a.submit,
+fieldset.buttons a.submit
 	{
 	background: -moz-linear-gradient(top, #A9D887, #009C0E);
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #A9D887), color-stop(1.0, #009C0E) );
@@ -919,7 +939,9 @@ fieldset.buttons input.submit,input.submit,div.visible a.submit,fieldset.visible
 }
 
 /* der grüne Button/Buttonlink mouseover */
-fieldset.buttons input:hover.submit,fieldset.buttons a:hover.submit {
+fieldset.buttons input:hover.submit,
+fieldset.buttons a:hover.submit ,
+input.submit:hover{
 	background: -moz-linear-gradient(top, #A9D887, #009C0E 60%);
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #A9D887),
 		color-stop(0.6, #009C0E) );
@@ -927,7 +949,8 @@ fieldset.buttons input:hover.submit,fieldset.buttons a:hover.submit {
 }
 
 /* der rote button und buttonlink */
-fieldset.buttons input.reset {
+fieldset.buttons input.reset,
+input.reset {
 	/*filter:progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#00FF00',EndColorStr='#000000',GradientType=0);*/
 	background: -moz-linear-gradient(top, #FBEDED, #E11D1C);
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #FBEDED),color-stop(1.0, #E11D1C) );
@@ -935,11 +958,33 @@ fieldset.buttons input.reset {
 }
 
 /* der rote button und buttonlink mouseover*/
-fieldset.buttons input:hover.reset,fieldset.buttons a:hover.reset {
+fieldset.buttons input:hover.reset,
+fieldset.buttons a:hover.reset,
+input.reset:hover {
 	background: -moz-linear-gradient(top, #FBEDED, #E11D1C 60%);
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #FBEDED),color-stop(0.6, #E11D1C) );
 	text-decoration: none;
 }
+
+input.nobutton {
+	border:none;
+	padding: 0.3em 0.6em; 
+	background:transparent;
+	-webkit-box-shadow:none;
+	-moz-box-shadow:none;
+	box-shadow:none;
+	color: #2274AC;
+	text-decoration:underline;
+	
+}
+
+input.nobutton:hover {
+	background:transparent;
+	border:none;
+	color: #00B1EB;
+	cursor: pointer;
+}	
+
 
 /* ================================================================================================================================== */
 	/* = tables for the data... = */

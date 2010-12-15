@@ -16,7 +16,7 @@
 
   <form wicket:id="form">
   <fieldset><legend><wicket:message key="label.filterSettings" /></legend>
-  <table class="form filter">
+  <table class="form filter" style="width:100%">
     <tr>
      
      	<td>
@@ -41,11 +41,13 @@
 	      		<img wicket:id="ajaxSupportTooltipImage" src="images/help.png" border="0" />
 	      	</div><!-- "buttonset" END -->
 		</td>
-		
+		<td>
+			<span wicket:id="listView">[list view]</span>
+		</td>
 	    <td class="buttonpanel">
 			<span wicket:id="cancel">[cancel]</span>
 			<span wicket:id="reset">[reset]</span> 
-			<span wicket:id="listView">[list view]</span>
+			
 			<span wicket:id="search">[search]</span>
 		</td>
     </tr>
