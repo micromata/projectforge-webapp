@@ -107,7 +107,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
       }
     };
     
-    searchButton.add(new SimpleAttributeModifier("class", "submit"));
+    searchButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     
     searchButtonPanel = new SingleButtonPanel("search", searchButton);
     add(searchButtonPanel);
@@ -118,7 +118,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
         getParentPage().onResetSubmit();
       }
     };
-    resetButton.add( new SimpleAttributeModifier("class", "reset"));
+    resetButton.add(WebConstants.BUTTON_CLASS_RESET);
     resetButton.setDefaultFormProcessing(false);
     
     resetButtonPanel = new SingleButtonPanel("reset", resetButton);
@@ -131,7 +131,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
       }
     };
     
-    listViewButton.add(new SimpleAttributeModifier("class", "nobutton"));
+    listViewButton.add(WebConstants.BUTTON_CLASS_NOBUTTON);
     listViewButtonPanel = new SingleButtonPanel("listView", listViewButton);
     
     
