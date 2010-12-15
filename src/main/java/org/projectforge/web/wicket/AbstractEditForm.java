@@ -105,6 +105,7 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
         parentPage.update();
       }
     };
+    updateButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     updateButtonPanel = new SingleButtonPanel("update", updateButton);
     add(updateButtonPanel);
     createButton = new Button("button", new Model<String>(getString("create"))) {
@@ -114,6 +115,7 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
         parentPage.create();
       }
     };
+    createButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     createButtonPanel = new SingleButtonPanel("create", createButton);
     add(createButtonPanel);
     cancelButton = new Button("button", new Model<String>(getString("cancel"))) {
@@ -123,6 +125,7 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
         parentPage.cancel();
       }
     };
+    cancelButton.add(WebConstants.BUTTON_CLASS_CANCEL);
     cancelButton.setDefaultFormProcessing(false); // No validation of the
     final SingleButtonPanel cancelButtonPanel = new SingleButtonPanel("cancel", cancelButton);
     add(cancelButtonPanel);
@@ -133,6 +136,7 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
         parentPage.undelete();
       }
     };
+    undeleteButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     undeleteButtonPanel = new SingleButtonPanel("undelete", undeleteButton);
     add(undeleteButtonPanel);
     final Button markAsDeletedButton = new Button("button", new Model<String>(getString("markAsDeleted"))) {
