@@ -42,6 +42,7 @@ import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.AbstractSecuredForm;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
@@ -181,6 +182,7 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
         parentPage.refresh();
       }
     };
+    searchButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     add(new SingleButtonPanel("search", searchButton));
     setDefaultButton(searchButton);
 
@@ -191,6 +193,7 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
         parentPage.refresh();
       }
     };
+    resetButton.add(WebConstants.BUTTON_CLASS_RESET);
     add(new SingleButtonPanel("reset", resetButton));
   }
 }

@@ -276,6 +276,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
         parentPage.call();
       }
     };
+    callButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     add(new SingleButtonPanel("call", callButton));
     setDefaultButton(callButton);
     final WebMarkupContainer showOperatorPanel = new WebMarkupContainer("telephoneSystemOperatorPanel");
