@@ -245,6 +245,7 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
         getParentPage().onResetSubmit();
       }
     };
+    resetButton.add(WebConstants.BUTTON_CLASS_RESET);
     resetButton.setDefaultFormProcessing(false);
     resetButtonPanel = new SingleButtonPanel(getNewActionButtonChildId(), resetButton);
     addActionButton(resetButtonPanel);
@@ -266,6 +267,7 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
         getParentPage().onSearchSubmit();
       }
     };
+    searchButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     searchButtonPanel = new SingleButtonPanel(getNewActionButtonChildId(), searchButton);
     addActionButton(searchButtonPanel);
 
