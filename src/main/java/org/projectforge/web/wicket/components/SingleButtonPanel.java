@@ -35,10 +35,13 @@ import org.apache.wicket.markup.html.panel.Panel;
 public class SingleButtonPanel extends Panel
 {
   private static final long serialVersionUID = -3241045253014479836L;
+  
+  private Button button;
 
   public SingleButtonPanel(final String id, final Button button)
   {
     super(id);
+    this.button = button;
     setRenderBodyOnly(true);
     add(button);
   }
@@ -46,8 +49,14 @@ public class SingleButtonPanel extends Panel
   public SingleButtonPanel(final String id, final Button button, final String tooltip)
   {
     super(id);
+    this.button = button;
     setRenderBodyOnly(true);
     add(button);
     button.add(new SimpleAttributeModifier("title", tooltip));
+  }
+  
+  public Button getButton()
+  {
+    return button;
   }
 }
