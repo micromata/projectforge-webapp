@@ -54,4 +54,9 @@ public class SearchPageFilter extends SearchFilter
   {
     this.area = area;
   }
+  
+  public void setMaxRows(Integer maxRows)
+  {
+    super.setMaxRows(maxRows != null ? maxRows : 3);
+  }
 }

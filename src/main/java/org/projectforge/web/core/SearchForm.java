@@ -78,17 +78,17 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
     final TextField<String> searchField = new TextField<String>("searchString", new PropertyModel<String>(filter, "searchString"));
     searchField.add(new FocusOnLoadBehavior());
     add(searchField);
-    modifiedStartDatePanel = new DatePanel("startDate", new PropertyModel<Date>(filter, "modifiedStartTime"), DatePanelSettings.get()
+    modifiedStartDatePanel = new DatePanel("startDate", new PropertyModel<Date>(filter, "startTimeOfLastModification"), DatePanelSettings.get()
         .withCallerPage(parentPage).withSelectPeriodMode(true));
     add(modifiedStartDatePanel);
-    modifiedStopDatePanel = new DatePanel("stopDate", new PropertyModel<Date>(filter, "modifiedStopTime"), DatePanelSettings.get()
+    modifiedStopDatePanel = new DatePanel("stopDate", new PropertyModel<Date>(filter, "stopTimeOfLastModification"), DatePanelSettings.get()
         .withCallerPage(parentPage).withSelectPeriodMode(true));
     add(modifiedStopDatePanel);
     add(new Label("datesAsUTC", new Model<String>() {
       @Override
       public String getObject()
       {
-        return WicketUtils.getUTCDates(filter.getModifiedStartTime(), filter.getModifiedStopTime());
+        return WicketUtils.getUTCDates(filter.getStartTimeOfLastModification(), filter.getStopTimeOfLastModification());
       }
     }));
 
@@ -120,10 +120,10 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
           }
           final DateHolder dh = new DateHolder(new Date(), DatePrecision.MILLISECOND);
           dh.setEndOfDay();
-          filter.setModifiedStopTime(dh.getDate());
+          filter.setStopTimeOfLastModification(dh.getDate());
           dh.setBeginOfDay();
           dh.add(Calendar.DAY_OF_YEAR, -newSelection);
-          filter.setModifiedStartTime(dh.getDate());
+          filter.setStartTimeOfLastModification(dh.getDate());
           filter.setLastDays(null);
           modifiedStartDatePanel.markModelAsChanged();
           modifiedStopDatePanel.markModelAsChanged();

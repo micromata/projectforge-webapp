@@ -174,17 +174,17 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
       form.filter.setTask(task);
     } else if ("userId".equals(property) == true) {
       final PFUserDO user = userGroupCache.getUser((Integer) selectedValue);
-      form.filter.setModifiedByUser(user);
+      form.filter.setModifiedByUserId(user != null ? user.getId() : null);
     } else if ("startDate".equals(property) == true) {
       if (selectedValue instanceof Date) {
         // Date selected.
         final Date date = (Date) selectedValue;
-        form.filter.setModifiedStartTime(date);
+        form.filter.setStartTimeOfLastModification(date);
       } else if (selectedValue instanceof TimePeriod) {
         // Period selected.
         final TimePeriod timePeriod = (TimePeriod) selectedValue;
-        form.filter.setModifiedStartTime(timePeriod.getFromDate());
-        form.filter.setModifiedStopTime(timePeriod.getToDate());
+        form.filter.setStartTimeOfLastModification(timePeriod.getFromDate());
+        form.filter.setStopTimeOfLastModification(timePeriod.getToDate());
         form.modifiedStopDatePanel.markModelAsChanged();
       }
       form.modifiedStartDatePanel.markModelAsChanged();
@@ -192,12 +192,12 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
       if (selectedValue instanceof Date) {
         // Date selected.
         final Date date = (Date) selectedValue;
-        form.filter.setModifiedStopTime(date);
+        form.filter.setStopTimeOfLastModification(date);
       } else if (selectedValue instanceof TimePeriod) {
         // Period selected.
         final TimePeriod timePeriod = (TimePeriod) selectedValue;
-        form.filter.setModifiedStartTime(timePeriod.getFromDate());
-        form.filter.setModifiedStopTime(timePeriod.getToDate());
+        form.filter.setStartTimeOfLastModification(timePeriod.getFromDate());
+        form.filter.setStopTimeOfLastModification(timePeriod.getToDate());
         form.modifiedStartDatePanel.markModelAsChanged();
       }
       form.modifiedStopDatePanel.markModelAsChanged();

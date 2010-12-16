@@ -23,83 +23,47 @@
 
 package org.projectforge.core;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
 
-public class SearchFilter implements Serializable
+public class SearchFilter extends BaseSearchFilter
 {
   private static final long serialVersionUID = 5850672386075331163L;
 
-  private String searchString;
-
-  private Date modifiedStartTime, modifiedStopTime;
+  private TaskDO task;
 
   private PFUserDO modifiedByUser;
 
-  private TaskDO task;
-
-  private Integer maxRows = 3;
-
-  /**
-   * @return the startTime
-   */
-  public Date getModifiedStartTime()
+  @Override
+  public void setStartTimeOfLastModification(final Date startTimeOfLastModification)
   {
-    return this.modifiedStartTime;
-  }
-
-  /**
-   * @param modifiedStartTime the startTime to set
-   */
-  public void setModifiedStartTime(Date modifiedStartTime)
-  {
-    final DateHolder dh = new DateHolder(modifiedStartTime, DatePrecision.MILLISECOND);
+    final DateHolder dh = new DateHolder(startTimeOfLastModification, DatePrecision.MILLISECOND);
     dh.setBeginOfDay();
-    this.modifiedStartTime = dh.getDate();
+    super.setStartTimeOfLastModification(dh.getDate());
   }
 
-  /**
-   * @return the stopTime
-   */
-  public Date getModifiedStopTime()
+  @Override
+  public void setStopTimeOfLastModification(final Date stopTimeOfLastModification)
   {
-    return this.modifiedStopTime;
-  }
-
-  /**
-   * @param modifiedStopTime the stopTime to set
-   */
-  public void setModifiedStopTime(Date modifiedStopTime)
-  {
-    final DateHolder dh = new DateHolder(modifiedStopTime, DatePrecision.MILLISECOND);
+    final DateHolder dh = new DateHolder(stopTimeOfLastModification, DatePrecision.MILLISECOND);
     dh.setEndOfDay();
-    this.modifiedStopTime = dh.getDate();
+    super.setStopTimeOfLastModification(dh.getDate());
   }
 
-  /**
-   * The user who has done the modifications.
-   */
   public PFUserDO getModifiedByUser()
   {
     return modifiedByUser;
   }
 
-  public Integer getModifiedByUserId()
-  {
-    return modifiedByUser != null ? modifiedByUser.getId() : null;
-  }
-
-  public void setModifiedByUser(final PFUserDO modifiedByUser)
+  public void setModifiedByUser(PFUserDO modifiedByUser)
   {
     this.modifiedByUser = modifiedByUser;
+    this.modifiedByUserId = modifiedByUser != null ? modifiedByUser.getId() : null;
   }
 
   public TaskDO getTask()
@@ -112,58 +76,25 @@ public class SearchFilter implements Serializable
     this.task = task;
   }
 
-  public Integer getMaxRows()
-  {
-    return maxRows;
-  }
-
-  public void setMaxRows(Integer maxRows)
-  {
-    this.maxRows = maxRows;
-  }
-
-  public String getSearchString()
-  {
-    return searchString;
-  }
-
-  public void setSearchString(String searchString)
-  {
-    this.searchString = searchString;
-  }
-
   /**
    * @return true, if no field for search is set (ignores task).
    */
   public boolean isEmpty()
   {
     return StringUtils.isEmpty(searchString) == true
-        && modifiedByUser == null
-        && modifiedStartTime == null
-        && modifiedStopTime == null;
+        && modifiedByUserId == null
+        && startTimeOfLastModification == null
+        && stopTimeOfLastModification == null;
   }
 
   public void reset()
   {
+    super.reset();
     this.searchString = "";
-    this.modifiedByUser = null;
-    this.modifiedStartTime = null;
-    this.modifiedStopTime = null;
+    this.useModificationFilter = false;
+    this.modifiedByUserId = null;
+    this.startTimeOfLastModification = null;
+    this.stopTimeOfLastModification = null;
     this.task = null;
-  }
-
-  @Override
-  public String toString()
-  {
-    ToStringBuilder sb = new ToStringBuilder(this);
-    sb.append("user", getModifiedByUserId());
-    if (modifiedStartTime != null) {
-      sb.append("modifiedStartTime", DateHelper.formatAsUTC(modifiedStartTime));
-    }
-    if (modifiedStopTime != null) {
-      sb.append("modifiedStopTime", DateHelper.formatAsUTC(modifiedStopTime));
-    }
-    sb.append("maxRows", getMaxRows());
-    return sb.toString();
   }
 }
