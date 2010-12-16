@@ -13,6 +13,10 @@
   <fieldset><legend><wicket:message key="label.filterSettings" /></legend>
   <table class="form">
     <tr>
+      <th><wicket:message key="searchFilter" /></th>
+      <td colspan="3"><input wicket:id="searchString" class="stdtext" /></td>
+    </tr>
+    <tr>
       <th><wicket:message key="filter.lastModified" /></th>
       <td><span wicket:id="startDate">[startDate]</span> - <span wicket:id="stopDate">[stopDate]</span>&nbsp;&nbsp;&nbsp; <select
         wicket:id="lastDays" onchange="javascript:submit();">
