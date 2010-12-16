@@ -249,6 +249,12 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
     super.updateButtonVisibility();
     setDefaultButton(redrawButton);
   }
+  
+  @Override
+  protected void markDefaultButtons()
+  {
+    redrawButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+  }
 
   /**
    * @return the exportFormat

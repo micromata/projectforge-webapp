@@ -36,6 +36,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.JavascriptPackageResource;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Fragment;
@@ -109,7 +110,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
   }
 
   @SuppressWarnings("serial")
-  public List<IColumn<AddressDO>> createColumns()
+  public List<IColumn<AddressDO>> createColumns(final WebPage returnToPage)
   {
     final List<IColumn<AddressDO>> columns = new ArrayList<IColumn<AddressDO>>();
     final CellItemListener<AddressDO> cellItemListener = new CellItemListener<AddressDO>() {
@@ -136,7 +137,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         final AddressDO address = (AddressDO) rowModel.getObject();
         final RepeatingView view = new RepeatingView(componentId);
         item.add(view);
-        view.add(new ListSelectActionPanel(view.newChildId(), rowModel, AddressEditPage.class, address.getId(), AddressListPage.this,
+        view.add(new ListSelectActionPanel(view.newChildId(), rowModel, AddressEditPage.class, address.getId(), returnToPage,
             DateTimeFormatter.instance().getFormattedDate(address.getLastUpdate())));
         view.add(new ImageLinkPanel(view.newChildId(), getResponse(), WebConstants.IMAGE_PRINTER, getString("printView")) {
 
@@ -221,7 +222,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
       addContentMenuEntry(menuEntry);
     }
     personalAddressMap = personalAddressDao.getPersonalAddressByAddressId();
-    final List<IColumn<AddressDO>> columns = createColumns();
+    final List<IColumn<AddressDO>> columns = createColumns(this);
     dataTable = createDataTable(columns, null, true);
     form.add(dataTable);
   }

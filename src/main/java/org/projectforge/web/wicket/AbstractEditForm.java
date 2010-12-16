@@ -36,7 +36,8 @@ import org.projectforge.web.scripting.ScriptEditForm;
 import org.projectforge.web.timesheet.TimesheetEditForm;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
-public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends AbstractEditPage< ? , ? , ? >> extends AbstractSecuredForm<O, P>
+public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends AbstractEditPage< ? , ? , ? >> extends
+    AbstractSecuredForm<O, P>
 {
   private static final long serialVersionUID = -6707610179583359099L;
 
@@ -48,13 +49,13 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
 
   protected WebMarkupContainer bottomRows;
 
-  private Button cancelButton;
+  protected Button cancelButton;
 
-  private Button createButton;
+  protected Button createButton;
 
   protected SingleButtonPanel createButtonPanel;
 
-  private Button updateButton;
+  protected Button updateButton;
 
   protected SingleButtonPanel updateButtonPanel;
 
@@ -62,7 +63,7 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
 
   protected SingleButtonPanel markAsDeletedButtonPanel;
 
-  private Button undeleteButton;
+  protected Button undeleteButton;
 
   protected SingleButtonPanel undeleteButtonPanel;
 
@@ -105,7 +106,6 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
         parentPage.update();
       }
     };
-    updateButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     updateButtonPanel = new SingleButtonPanel("update", updateButton);
     add(updateButtonPanel);
     createButton = new Button("button", new Model<String>(getString("create"))) {
@@ -115,7 +115,6 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
         parentPage.create();
       }
     };
-    createButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     createButtonPanel = new SingleButtonPanel("create", createButton);
     add(createButtonPanel);
     cancelButton = new Button("button", new Model<String>(getString("cancel"))) {
@@ -136,7 +135,6 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
         parentPage.undelete();
       }
     };
-    undeleteButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     undeleteButtonPanel = new SingleButtonPanel("undelete", undeleteButton);
     add(undeleteButtonPanel);
     final Button markAsDeletedButton = new Button("button", new Model<String>(getString("markAsDeleted"))) {
@@ -170,6 +168,7 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
     final SingleButtonPanel resetButtonPanel = new SingleButtonPanel("reset", resetButton);
     resetButtonPanel.setVisible(false);
     add(resetButtonPanel);
+    markDefaultButtons();
     updateButtonVisibility();
 
     addBottomRows();
@@ -221,6 +220,16 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
         }
       }
     }
+  }
+
+  /**
+   * Set the style class for the default buttons. Overwrite this, if you have a different default button than create, update or undelete (don't call super!).
+   */
+  protected void markDefaultButtons()
+  {
+    createButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    updateButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    undeleteButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
   }
 
   /**
