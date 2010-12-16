@@ -115,12 +115,17 @@ public class AddressDao extends BaseDao<AddressDO>
   @Override
   public List<AddressDO> getList(BaseSearchFilter filter)
   {
-    AddressFilter myFilter = (AddressFilter) filter;
-    QueryFilter queryFilter = new QueryFilter(filter);
-    if (StringUtils.isBlank(filter.getSearchString()) == true) {
-      if (filter.isDeleted() == false) {
+    final AddressFilter myFilter;
+    if (filter instanceof AddressFilter) {
+      myFilter = (AddressFilter) filter;
+    } else {
+      myFilter = new AddressFilter(filter);
+    }
+    QueryFilter queryFilter = new QueryFilter(myFilter);
+    if (StringUtils.isBlank(myFilter.getSearchString()) == true) {
+      if (myFilter.isDeleted() == false) {
         if (myFilter.isNewest() == true) {
-          return getNewest(filter);
+          return getNewest(myFilter);
         }
         if (myFilter.isMyFavorites() == true) {
           // Show only favorites.
@@ -170,7 +175,7 @@ public class AddressDao extends BaseDao<AddressDO>
       }
     } else {
       if (StringUtils.isNumeric(filter.getSearchString()) == true) {
-        filter.setSearchString("*" + filter.getSearchString() + "*");
+        myFilter.setSearchString("*" + myFilter.getSearchString() + "*");
       }
     }
     queryFilter.addOrder(Order.asc("name"));
