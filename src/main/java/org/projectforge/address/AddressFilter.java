@@ -27,7 +27,6 @@ import java.io.Serializable;
 
 import org.projectforge.core.BaseSearchFilter;
 
-
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -62,6 +61,16 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
   private boolean newest;
 
   private String listType = "filter";
+
+  public AddressFilter()
+  {
+  }
+
+  public AddressFilter(BaseSearchFilter filter)
+  {
+    super(filter);
+    outdated = leaved = nonActive = uninteresting = personaIngrata = departed = true;
+  }
 
   public boolean isUptodate()
   {
