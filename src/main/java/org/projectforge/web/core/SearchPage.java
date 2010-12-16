@@ -71,6 +71,8 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
 
+  private boolean refreshed = false;
+
   public SearchPage(PageParameters parameters)
   {
     super(parameters);
@@ -78,17 +80,38 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     form = new SearchForm(this);
     body.add(form);
     form.init();
+  }
+  
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
     refresh();
+  }
+  
+  @Override
+  protected void onAfterRender()
+  {
+    super.onAfterRender();
+    refreshed = false;
   }
 
   @SuppressWarnings( { "serial", "unchecked"})
   void refresh()
   {
+    if (refreshed == true) {
+      // Do nothing (called twice).
+      return;
+    }
+    refreshed = true;
     if (areaRepeater != null) {
       body.remove(areaRepeater);
     }
     areaRepeater = new RepeatingView("areaRepeater");
     body.add(areaRepeater);
+    if (form.filter.isEmpty() == true) {
+      return;
+    }
     for (final RegistryEntry registryEntry : Registry.instance().getOrderedList()) {
       final Class< ? extends IListPageColumnsCreator< ? >> clazz = registryEntry.getListPageColumnsCreatorClass();
       final IListPageColumnsCreator< ? > listPageColumnsCreator = clazz == null ? null : (IListPageColumnsCreator< ? >) BeanHelper
@@ -116,7 +139,7 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
       final WebMarkupContainer areaContainer = new WebMarkupContainer(areaRepeater.newChildId());
       areaRepeater.add(areaContainer);
       areaContainer.add(new Label("areaTitle", getString(registryEntry.getI18nTitleHeading())));
-      final List< ? > columns = listPageColumnsCreator.createColumns();
+      final List< ? > columns = listPageColumnsCreator.createColumns(this);
       final DataTable dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", false) {
         @Override
         public List getList()
@@ -149,11 +172,9 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     if ("taskId".equals(property) == true) {
       final TaskDO task = taskTree.getTaskById((Integer) selectedValue);
       form.filter.setTask(task);
-      refresh();
     } else if ("userId".equals(property) == true) {
       final PFUserDO user = userGroupCache.getUser((Integer) selectedValue);
       form.filter.setModifiedByUser(user);
-      refresh();
     } else if ("startDate".equals(property) == true) {
       if (selectedValue instanceof Date) {
         // Date selected.
@@ -167,7 +188,6 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
         form.modifiedStopDatePanel.markModelAsChanged();
       }
       form.modifiedStartDatePanel.markModelAsChanged();
-      refresh();
     } else if ("stopDate".equals(property) == true) {
       if (selectedValue instanceof Date) {
         // Date selected.
@@ -181,7 +201,6 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
         form.modifiedStartDatePanel.markModelAsChanged();
       }
       form.modifiedStopDatePanel.markModelAsChanged();
-      refresh();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }

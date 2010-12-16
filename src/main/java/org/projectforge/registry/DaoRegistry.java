@@ -164,6 +164,7 @@ public class DaoRegistry
     final Registry registry = Registry.instance();
     final RegistryEntry entry = new RegistryEntry(id, daoClassType, dao, i18nPrefix);
     registry.register(id, entry);
+    log.info("Dao '" + id + "' registerd.");
     return entry;
   }
 

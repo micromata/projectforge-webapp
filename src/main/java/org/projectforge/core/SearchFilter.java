@@ -26,6 +26,7 @@ package org.projectforge.core;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
@@ -129,6 +130,26 @@ public class SearchFilter implements Serializable
   public void setSearchString(String searchString)
   {
     this.searchString = searchString;
+  }
+
+  /**
+   * @return true, if no field for search is set (ignores task).
+   */
+  public boolean isEmpty()
+  {
+    return StringUtils.isEmpty(searchString) == true
+        && modifiedByUser == null
+        && modifiedStartTime == null
+        && modifiedStopTime == null;
+  }
+
+  public void reset()
+  {
+    this.searchString = "";
+    this.modifiedByUser = null;
+    this.modifiedStartTime = null;
+    this.modifiedStopTime = null;
+    this.task = null;
   }
 
   @Override

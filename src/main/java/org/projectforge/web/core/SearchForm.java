@@ -29,6 +29,7 @@ import java.util.Date;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -42,6 +43,7 @@ import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.AbstractSecuredForm;
+import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
@@ -60,7 +62,7 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
   private TaskSelectPanel taskSelectPanel;
 
   SearchPageFilter filter;
-
+  
   public SearchForm(final SearchPage parentPage)
   {
     super(parentPage);
@@ -68,18 +70,14 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
   }
   
   @Override
-  protected void onSubmit()
-  {
-    super.onSubmit();
-    parentPage.refresh();
-  }
-
-  @Override
   @SuppressWarnings("serial")
   protected void init()
   {
     super.init();
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
+    final TextField<String> searchField = new TextField<String>("searchString", new PropertyModel<String>(filter, "searchString"));
+    searchField.add(new FocusOnLoadBehavior());
+    add(searchField);
     modifiedStartDatePanel = new DatePanel("startDate", new PropertyModel<Date>(filter, "modifiedStartTime"), DatePanelSettings.get()
         .withCallerPage(parentPage).withSelectPeriodMode(true));
     add(modifiedStartDatePanel);
@@ -129,7 +127,6 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
           filter.setLastDays(null);
           modifiedStartDatePanel.markModelAsChanged();
           modifiedStopDatePanel.markModelAsChanged();
-          parentPage.refresh();
         }
 
         @Override
@@ -154,12 +151,6 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
       final DropDownChoice<String> areaChoice = new DropDownChoice<String>("area", new PropertyModel<String>(filter, "area"),
           areaChoiceRenderer.getValues(), areaChoiceRenderer) {
         @Override
-        protected void onSelectionChanged(final String newSelection)
-        {
-          parentPage.refresh();
-        }
-
-        @Override
         protected boolean wantOnSelectionChangedNotifications()
         {
           return true;
@@ -175,22 +166,17 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
           new PropertyModel<Integer>(filter, "maxRows"), 3, 100);
       add(pageSizeChoice);
     }
-    final Button searchButton = new Button("button", new Model<String>(getString("search"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.refresh();
-      }
-    };
+    final Button searchButton = new Button("button", new Model<String>(getString("search")));
     searchButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     add(new SingleButtonPanel("search", searchButton));
     setDefaultButton(searchButton);
 
     final Button resetButton = new Button("button", new Model<String>(getString("reset"))) {
       @Override
-      public final void onSubmit()
+      public void onSubmit()
       {
-        parentPage.refresh();
+        super.onSubmit();
+        filter.reset();
       }
     };
     resetButton.add(WebConstants.BUTTON_CLASS_RESET);
