@@ -24,13 +24,13 @@
 package org.projectforge.web.wicket;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.projectforge.common.ReflectionHelper;
 import org.projectforge.web.fibu.ISelectCallerPage;
-
 
 /**
  * Panel for selecting list page entries for editing and selecting for callers.
@@ -92,8 +92,8 @@ public class ListSelectActionPanel extends Panel
    * @param params Pairs of params (key, value).
    * @see WicketUtils#getPageParameters(String[])
    */
-  public ListSelectActionPanel(final String id, final IModel< ? > model, final Class< ? extends AbstractSecuredPage> editClass,
-      final Integer objectId, final AbstractSecuredPage returnToPage, final String label, final String... params)
+  public ListSelectActionPanel(final String id, final IModel< ? > model, final Class< ? extends WebPage> editClass, final Integer objectId,
+      final WebPage returnToPage, final String label, final String... params)
   {
     this(id, model, editClass, objectId, returnToPage, new Label(LABEL_ID, label), params);
   }
@@ -108,8 +108,8 @@ public class ListSelectActionPanel extends Panel
    * @param params Pairs of params (key, value).
    * @see WicketUtils#getPageParameters(String[])
    */
-  public ListSelectActionPanel(final String id, final IModel< ? > model, final Class< ? extends AbstractSecuredPage> editPageClass,
-      final Integer objectId, final AbstractSecuredPage returnToPage, final Label label, final String... params)
+  public ListSelectActionPanel(final String id, final IModel< ? > model, final Class< ? extends WebPage> editPageClass,
+      final Integer objectId, final WebPage returnToPage, final Label label, final String... params)
   {
     super(id, model);
     @SuppressWarnings("unchecked")
@@ -120,8 +120,8 @@ public class ListSelectActionPanel extends Panel
         if (objectId != null) {
           pageParams.add(AbstractEditPage.PARAMETER_KEY_ID, String.valueOf(objectId));
         }
-        final AbstractSecuredPage editPage = (AbstractSecuredPage) ReflectionHelper
-            .newInstance(editPageClass, PageParameters.class, pageParams);
+        final AbstractSecuredPage editPage = (AbstractSecuredPage) ReflectionHelper.newInstance(editPageClass, PageParameters.class,
+            pageParams);
         if (editPage instanceof AbstractEditPage) {
           ((AbstractEditPage< ? , ? , ? >) editPage).setReturnToPage(returnToPage);
         }

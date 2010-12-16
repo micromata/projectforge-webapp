@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
@@ -53,7 +54,7 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
   /**
    * If set then return after save, update or cancel to this page. If not given then return to given list page.
    */
-  protected AbstractSecuredPage returnToPage;
+  protected WebPage returnToPage;
 
   /**
    * List to create drop down menu in the desired order before creating the RepeatingView.
@@ -112,7 +113,7 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
    * set the returnToPage as a page parameter (if supported by the derived page).
    * @param returnToPage
    */
-  public AbstractSecuredPage setReturnToPage(AbstractSecuredPage returnToPage)
+  public AbstractSecuredPage setReturnToPage(WebPage returnToPage)
   {
     this.returnToPage = returnToPage;
     return this;

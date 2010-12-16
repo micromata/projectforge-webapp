@@ -26,6 +26,7 @@ package org.projectforge.web.wicket;
 import java.util.List;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.projectforge.core.BaseDO;
 
 /**
@@ -35,5 +36,5 @@ import org.projectforge.core.BaseDO;
  */
 public interface IListPageColumnsCreator<O extends BaseDO< ? >>
 {
-  public List<IColumn<O>> createColumns();
+  public List<IColumn<O>> createColumns(final WebPage returnToPage);
 }
