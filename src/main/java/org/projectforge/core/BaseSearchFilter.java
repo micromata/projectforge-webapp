@@ -58,6 +58,22 @@ public class BaseSearchFilter implements Serializable
 
   private transient String[] searchFields;
 
+  public BaseSearchFilter()
+  {
+  }
+
+  public BaseSearchFilter(final BaseSearchFilter filter)
+  {
+    this.searchString = filter.searchString;
+    this.deleted = filter.deleted;
+    this.ignoreDeleted = filter.ignoreDeleted;
+    this.maxRows = filter.maxRows;
+    this.useModificationFilter = filter.useModificationFilter;
+    this.modifiedByUserId = filter.modifiedByUserId;
+    this.startTimeOfLastModification = filter.startTimeOfLastModification;
+    this.stopTimeOfLastModification = filter.stopTimeOfLastModification;
+  }
+
   public void reset()
   {
     deleted = false;
