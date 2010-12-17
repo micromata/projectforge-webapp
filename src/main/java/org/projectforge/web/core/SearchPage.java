@@ -40,11 +40,14 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.BeanHelper;
+import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.SearchDao;
 import org.projectforge.core.SearchResultData;
+import org.projectforge.database.StatisticsCache;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.task.TaskDO;
+import org.projectforge.task.TaskDependentFilter;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
@@ -58,6 +61,8 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SearchPage.class);
 
+  private static final int MAXIMUM_ENTRIES_WITHOUT_FILTER_SETTINGS = 10000;
+
   private SearchForm form;
 
   private RepeatingView areaRepeater;
@@ -65,11 +70,14 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
   @SpringBean(name = "searchDao")
   private SearchDao searchDao;
 
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
+  @SpringBean(name = "statisticsCache")
+  private StatisticsCache statisticsCache;
 
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
+
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
 
   private boolean refreshed = false;
 
@@ -81,14 +89,14 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     body.add(form);
     form.init();
   }
-  
+
   @Override
   protected void onBeforeRender()
   {
     super.onBeforeRender();
     refresh();
   }
-  
+
   @Override
   protected void onAfterRender()
   {
@@ -115,13 +123,30 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     for (final RegistryEntry registryEntry : Registry.instance().getOrderedList()) {
       final Class< ? extends IListPageColumnsCreator< ? >> clazz = registryEntry.getListPageColumnsCreatorClass();
       final IListPageColumnsCreator< ? > listPageColumnsCreator = clazz == null ? null : (IListPageColumnsCreator< ? >) BeanHelper
-          .newInstance(clazz);
+          .newInstance(clazz, PageParameters.class, new PageParameters());
       if (listPageColumnsCreator == null) {
-        log.warn("RegistryEntry '" + registryEntry.getId() + "' doesn't have an IListPageColumnsCreator (can't display search results).");
         continue;
       }
-      final List<SearchResultData> searchResult = searchDao.getHistoryEntries(form.filter, registryEntry.getDOClass(), registryEntry
-          .getDao());
+      final Integer number = statisticsCache.getNumberOfEntities(registryEntry.getDOClass());
+      final Class< ? extends BaseSearchFilter> registeredFilterClass = registryEntry.getSearchFilterClass();
+      final boolean isTaskDependentFilter = registeredFilterClass != null
+          && TaskDependentFilter.class.isAssignableFrom(registeredFilterClass);
+      if (number > MAXIMUM_ENTRIES_WITHOUT_FILTER_SETTINGS
+          && (form.filter.getSearchString() == null || form.filter.getSearchString().length() < 3)
+          && (isTaskDependentFilter == false || form.filter.getTask() == null)
+          && form.filter.getStartTimeOfLastModification() == null
+          && form.filter.getStopTimeOfLastModification() == null) {
+        // Don't search to large tables if to less filter settings are given.
+        continue;
+      }
+      final BaseSearchFilter filter;
+      if (isTaskDependentFilter == true) {
+        filter = (BaseSearchFilter) BeanHelper.newInstance(registeredFilterClass, new Class< ? >[] { BaseSearchFilter.class}, form.filter);
+        ((TaskDependentFilter)filter).setTaskId(form.filter.getTaskId());
+      } else {
+        filter = form.filter;
+      }
+      final List<SearchResultData> searchResult = searchDao.getEntries(filter, registryEntry.getDOClass(), registryEntry.getDao());
       if (CollectionUtils.isEmpty(searchResult) == true) {
         continue;
       }

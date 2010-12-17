@@ -53,6 +53,10 @@ import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage>
 {
+  private static final String USER_PREF_KEY_FILTER = "Search:Filter";
+  
+  private static final int MAGIC_NUMBER_LAST_DAYS_FOR_WITHOUT_TIME_SETTINGS = 42;
+
   private static final long serialVersionUID = 2638309407446431727L;
 
   protected DatePanel modifiedStartDatePanel;
@@ -62,13 +66,17 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
   private TaskSelectPanel taskSelectPanel;
 
   SearchPageFilter filter;
-  
+
   public SearchForm(final SearchPage parentPage)
   {
     super(parentPage);
-    filter = new SearchPageFilter();
+    filter = (SearchPageFilter) getParentPage().getUserPrefEntry(SearchPageFilter.class, USER_PREF_KEY_FILTER);
+    if (filter == null) {
+      filter = new SearchPageFilter();
+      getParentPage().putUserPrefEntry(USER_PREF_KEY_FILTER, filter, true);
+    }
   }
-  
+
   @Override
   @SuppressWarnings("serial")
   protected void init()
@@ -78,11 +86,11 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
     final TextField<String> searchField = new TextField<String>("searchString", new PropertyModel<String>(filter, "searchString"));
     searchField.add(new FocusOnLoadBehavior());
     add(searchField);
-    modifiedStartDatePanel = new DatePanel("startDate", new PropertyModel<Date>(filter, "startTimeOfLastModification"), DatePanelSettings.get()
-        .withCallerPage(parentPage).withSelectPeriodMode(true));
+    modifiedStartDatePanel = new DatePanel("startDate", new PropertyModel<Date>(filter, "startTimeOfLastModification"), DatePanelSettings
+        .get().withCallerPage(parentPage).withSelectPeriodMode(true));
     add(modifiedStartDatePanel);
-    modifiedStopDatePanel = new DatePanel("stopDate", new PropertyModel<Date>(filter, "stopTimeOfLastModification"), DatePanelSettings.get()
-        .withCallerPage(parentPage).withSelectPeriodMode(true));
+    modifiedStopDatePanel = new DatePanel("stopDate", new PropertyModel<Date>(filter, "stopTimeOfLastModification"), DatePanelSettings
+        .get().withCallerPage(parentPage).withSelectPeriodMode(true));
     add(modifiedStopDatePanel);
     add(new Label("datesAsUTC", new Model<String>() {
       @Override
@@ -105,6 +113,7 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
     {
       // DropDownChoice: time period
       final LabelValueChoiceRenderer<Integer> lastDaysChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
+      lastDaysChoiceRenderer.addValue(MAGIC_NUMBER_LAST_DAYS_FOR_WITHOUT_TIME_SETTINGS, getString("search.withoutTimePeriod"));
       lastDaysChoiceRenderer.addValue(0, getString("search.today"));
       lastDaysChoiceRenderer.addValue(1, getString("search.lastDay"));
       for (final int days : new int[] { 3, 7, 14, 30, 60, 90}) {
@@ -116,6 +125,14 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
         protected void onSelectionChanged(final Integer newSelection)
         {
           if (newSelection == null) {
+            return;
+          }
+          if (newSelection == MAGIC_NUMBER_LAST_DAYS_FOR_WITHOUT_TIME_SETTINGS) { // Magic number for
+            filter.setStartTimeOfLastModification(null);
+            filter.setStopTimeOfLastModification(null);
+            modifiedStartDatePanel.markModelAsChanged();
+            modifiedStopDatePanel.markModelAsChanged();
+            filter.setLastDays(null);
             return;
           }
           final DateHolder dh = new DateHolder(new Date(), DatePrecision.MILLISECOND);
