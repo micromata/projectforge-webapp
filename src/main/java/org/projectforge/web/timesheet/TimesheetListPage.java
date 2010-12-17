@@ -34,6 +34,7 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -68,17 +69,18 @@ import org.projectforge.web.task.TaskPropertyColumn;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
-import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DownloadUtils;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.components.CheckBoxPanel;
 
 @ListPage(editPage = TimesheetEditPage.class)
-public class TimesheetListPage extends AbstractListPage<TimesheetListForm, TimesheetDao, TimesheetDO>
+public class TimesheetListPage extends AbstractListPage<TimesheetListForm, TimesheetDao, TimesheetDO> implements
+    IListPageColumnsCreator<TimesheetDO>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TimesheetListPage.class);
 
@@ -190,10 +192,15 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
 
   protected void createDataTable()
   {
-    final List<IColumn<TimesheetDO>> columns = createDataTable(this, isMassUpdateMode(), form.getSearchFilter().isLongFormat(),
+    final List<IColumn<TimesheetDO>> columns = createColumns(this, isMassUpdateMode(), form.getSearchFilter().isLongFormat(),
         taskFormatter, taskTree, kostCache, userFormatter, dateTimeFormatter);
     dataTable = createDataTable(columns, "startTime", false);
     form.add(dataTable);
+  }
+
+  public List<IColumn<TimesheetDO>> createColumns(final WebPage returnToPage)
+  {
+    return createColumns(returnToPage, false, false, taskFormatter, taskTree, kostCache, userFormatter, dateTimeFormatter);
   }
 
   /**
@@ -202,7 +209,7 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
    * @param isMassUpdateMode
    */
   @SuppressWarnings("serial")
-  protected static final List<IColumn<TimesheetDO>> createDataTable(final AbstractSecuredPage page, final boolean isMassUpdateMode,
+  protected static final List<IColumn<TimesheetDO>> createColumns(final WebPage page, final boolean isMassUpdateMode,
       final boolean longFormat, final TaskFormatter taskFormatter, final TaskTree taskTree, final KostCache kostCache,
       final UserFormatter userFormatter, final DateTimeFormatter dateTimeFormatter)
   {
