@@ -52,6 +52,7 @@ import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -152,6 +153,7 @@ public class ScriptExecuteForm extends AbstractForm<ScriptDO, ScriptExecutePage>
         parentPage.cancel();
       }
     };
+    backButton.add(WebConstants.BUTTON_CLASS_CANCEL);
     backButton.setDefaultFormProcessing(false);
     final SingleButtonPanel backButtonPanel = new SingleButtonPanel("back", backButton);
     add(backButtonPanel);
@@ -162,6 +164,7 @@ public class ScriptExecuteForm extends AbstractForm<ScriptDO, ScriptExecutePage>
         parentPage.execute();
       }
     };
+    executeButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     setDefaultButton(executeButton);
     final SingleButtonPanel executeButtonPanel = new SingleButtonPanel("execute", executeButton);
     add(executeButtonPanel);
