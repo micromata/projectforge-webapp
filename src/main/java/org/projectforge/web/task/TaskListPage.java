@@ -32,6 +32,7 @@ import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -59,6 +60,7 @@ import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DatePropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
@@ -70,7 +72,7 @@ import org.projectforge.web.wicket.components.ConsumptionBarPanel;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @ListPage(editPage = TaskEditPage.class)
-public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO>
+public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO> implements IListPageColumnsCreator<TaskDO>
 {
   private static final long serialVersionUID = -337660148607303435L;
 
@@ -224,10 +226,9 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
     }
     return false;
   }
-
+  
   @SuppressWarnings("serial")
-  @Override
-  protected void init()
+  public List<IColumn<TaskDO>> createColumns(final WebPage returnToPage)
   {
     final CellItemListener<TaskDO> cellItemListener = new CellItemListener<TaskDO>() {
       public void populateItem(Item<ICellPopulator<TaskDO>> item, String componentId, IModel<TaskDO> rowModel)
@@ -251,7 +252,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
         formattedTaskLabel.setEscapeModelStrings(false);
         if (isSelectMode() == false) {
           item
-              .add(new ListSelectActionPanel(componentId, rowModel, TaskEditPage.class, task.getId(), TaskListPage.this, formattedTaskLabel));
+              .add(new ListSelectActionPanel(componentId, rowModel, TaskEditPage.class, task.getId(), returnToPage, formattedTaskLabel));
         } else {
           item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, task.getId(), formattedTaskLabel));
         }
@@ -311,7 +312,13 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
     final UserPropertyColumn<TaskDO> userPropertyColumn = new UserPropertyColumn<TaskDO>(getString("task.assignedUser"),
         "responsibleUserId", "responsibleUserId", cellItemListener).withUserFormatter(userFormatter).setUserGroupCache(userGroupCache);
     columns.add(userPropertyColumn);
-    dataTable = createDataTable(columns, "title", false);
+    return columns;
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this), "title", false);
     form.add(dataTable);
   }
 
