@@ -102,7 +102,7 @@ public class AddressDao extends BaseDao<AddressDO>
    * @return
    * @see #getNewestMax()
    */
-  public List<AddressDO> getNewest(BaseSearchFilter filter)
+  public List<AddressDO> getNewest(final BaseSearchFilter filter)
   {
     QueryFilter queryFilter = new QueryFilter();
     queryFilter.addOrder(Order.desc("created"));
@@ -113,7 +113,7 @@ public class AddressDao extends BaseDao<AddressDO>
   }
 
   @Override
-  public List<AddressDO> getList(BaseSearchFilter filter)
+  public List<AddressDO> getList(final BaseSearchFilter filter)
   {
     final AddressFilter myFilter;
     if (filter instanceof AddressFilter) {
@@ -121,7 +121,7 @@ public class AddressDao extends BaseDao<AddressDO>
     } else {
       myFilter = new AddressFilter(filter);
     }
-    QueryFilter queryFilter = new QueryFilter(myFilter);
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
     if (StringUtils.isBlank(myFilter.getSearchString()) == true) {
       if (myFilter.isDeleted() == false) {
         if (myFilter.isNewest() == true) {

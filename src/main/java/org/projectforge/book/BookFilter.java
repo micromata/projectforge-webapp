@@ -43,6 +43,16 @@ public class BookFilter extends BaseSearchFilter implements Serializable
 
   private boolean disposed = false;
 
+  public BookFilter()
+  {
+  }
+
+  public BookFilter(final BaseSearchFilter filter)
+  {
+    super(filter);
+    missed = disposed = true;
+  }
+
   public boolean isPresent()
   {
     return present;

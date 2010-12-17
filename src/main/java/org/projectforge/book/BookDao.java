@@ -101,9 +101,14 @@ public class BookDao extends BaseDao<BookDO>
   @Override
   public List<BookDO> getList(BaseSearchFilter filter)
   {
-    BookFilter myFilter = (BookFilter) filter;
-    QueryFilter queryFilter = new QueryFilter(filter);
-    if (StringUtils.isBlank(filter.getSearchString()) == true) {
+    final BookFilter myFilter;
+    if (filter instanceof BookFilter) {
+      myFilter = (BookFilter) filter;
+    } else {
+      myFilter = new BookFilter(filter);
+    }
+    QueryFilter queryFilter = new QueryFilter(myFilter);
+    if (StringUtils.isBlank(myFilter.getSearchString()) == true) {
       Collection<BookStatus> col = null;
       if (myFilter.isPresent() == true || myFilter.isMissed() == true || myFilter.isDisposed() == true) {
         col = new ArrayList<BookStatus>();
@@ -120,12 +125,12 @@ public class BookDao extends BaseDao<BookDO>
           col.add(BookStatus.DISPOSED);
         }
       }
-      filter.setIgnoreDeleted(false);
+      myFilter.setIgnoreDeleted(false);
       if (col != null) {
         Criterion inCrit = Restrictions.in("status", col);
-        if (filter.isDeleted() == true) {
+        if (myFilter.isDeleted() == true) {
           queryFilter.add(Restrictions.or(inCrit, Restrictions.eq("deleted", true)));
-          filter.setIgnoreDeleted(true);
+          myFilter.setIgnoreDeleted(true);
         } else {
           queryFilter.add(inCrit);
         }

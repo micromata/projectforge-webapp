@@ -66,7 +66,7 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
   {
   }
 
-  public AddressFilter(BaseSearchFilter filter)
+  public AddressFilter(final BaseSearchFilter filter)
   {
     super(filter);
     outdated = leaved = nonActive = uninteresting = personaIngrata = departed = true;
