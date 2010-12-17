@@ -240,16 +240,21 @@ public class TaskDao extends BaseDao<TaskDO>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<TaskDO> getList(BaseSearchFilter filter) throws AccessException
   {
-    final TaskFilter taskFilter = (TaskFilter) filter;
-    final QueryFilter queryFilter = new QueryFilter(filter);
+    final TaskFilter myFilter;
+    if (filter instanceof TaskFilter) {
+      myFilter = (TaskFilter) filter;
+    } else {
+      myFilter = new TaskFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
     Collection<TaskStatus> col = new ArrayList<TaskStatus>(4);
-    if (taskFilter.isNotOpened() == true) {
+    if (myFilter.isNotOpened() == true) {
       col.add(TaskStatus.N);
     }
-    if (taskFilter.isOpened() == true) {
+    if (myFilter.isOpened() == true) {
       col.add(TaskStatus.O);
     }
-    if (taskFilter.isClosed() == true) {
+    if (myFilter.isClosed() == true) {
       col.add(TaskStatus.C);
     }
     if (col.size() > 0) {
@@ -260,7 +265,7 @@ public class TaskDao extends BaseDao<TaskDO>
     }
     queryFilter.addOrder(Order.asc("title"));
     if (log.isDebugEnabled() == true) {
-      log.debug(taskFilter.toString());
+      log.debug(myFilter.toString());
     }
     return getList(queryFilter);
   }
