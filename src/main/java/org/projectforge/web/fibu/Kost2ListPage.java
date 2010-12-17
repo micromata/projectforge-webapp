@@ -31,6 +31,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -54,12 +55,13 @@ import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.DownloadUtils;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
 
 @ListPage(editPage = Kost2EditPage.class)
-public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kost2DO>
+public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kost2DO> implements IListPageColumnsCreator<Kost2DO>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Kost2ListPage.class);
 
@@ -88,10 +90,9 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
 
   @SuppressWarnings("serial")
   @Override
-  protected void init()
+  public List<IColumn<Kost2DO>> createColumns(final WebPage returnToPage)
   {
-    List<IColumn<Kost2DO>> columns = new ArrayList<IColumn<Kost2DO>>();
-
+    final List<IColumn<Kost2DO>> columns = new ArrayList<IColumn<Kost2DO>>();
     CellItemListener<Kost2DO> cellItemListener = new CellItemListener<Kost2DO>() {
       public void populateItem(Item<ICellPopulator<Kost2DO>> item, String componentId, IModel<Kost2DO> rowModel)
       {
@@ -110,8 +111,8 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
       {
         final Kost2DO kost2 = (Kost2DO) rowModel.getObject();
         if (isSelectMode() == false) {
-          item.add(new ListSelectActionPanel(componentId, rowModel, Kost2EditPage.class, kost2.getId(), Kost2ListPage.this, String
-              .valueOf(kost2.getFormattedNumber())));
+          item.add(new ListSelectActionPanel(componentId, rowModel, Kost2EditPage.class, kost2.getId(), returnToPage, String.valueOf(kost2
+              .getFormattedNumber())));
           cellItemListener.populateItem(item, componentId, rowModel);
         } else {
           item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, kost2.getId(), String.valueOf(kost2
@@ -151,7 +152,13 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
         cellItemListener));
     columns
         .add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("comment")), "comment", "comment", cellItemListener));
-    dataTable = createDataTable(columns, "formattedNumber", true);
+    return columns;
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this), "formattedNumber", true);
     form.add(dataTable);
   }
 

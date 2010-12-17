@@ -83,11 +83,6 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
 
   private boolean phoneCallSupported;
 
-  public AddressListPage()
-  {
-    this(new PageParameters());
-  }
-
   public AddressListPage(PageParameters parameters)
   {
     super(parameters, "address");

@@ -31,6 +31,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -45,6 +46,7 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.WebConstants;
@@ -52,7 +54,8 @@ import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
 import org.projectforge.web.wicket.components.SingleImagePanel;
 
 @ListPage(editPage = AccessEditPage.class)
-public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, GroupTaskAccessDO>
+public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, GroupTaskAccessDO> implements
+    IListPageColumnsCreator<GroupTaskAccessDO>
 {
   private static final long serialVersionUID = 7017404582337466883L;
 
@@ -69,10 +72,9 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
 
   @SuppressWarnings("serial")
   @Override
-  protected void init()
+  public List<IColumn<GroupTaskAccessDO>> createColumns(final WebPage returnToPage)
   {
     final List<IColumn<GroupTaskAccessDO>> columns = new ArrayList<IColumn<GroupTaskAccessDO>>();
-
     final CellItemListener<GroupTaskAccessDO> cellItemListener = new CellItemListener<GroupTaskAccessDO>() {
       public void populateItem(Item<ICellPopulator<GroupTaskAccessDO>> item, String componentId, IModel<GroupTaskAccessDO> rowModel)
       {
@@ -95,8 +97,7 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
         taskFormatter.appendFormattedTask(buf, new WicketLocalizerAndUrlBuilder(getResponse()), task, false, true, false);
         final Label formattedTaskLabel = new Label(ListSelectActionPanel.LABEL_ID, buf.toString());
         formattedTaskLabel.setEscapeModelStrings(false);
-        item.add(new ListSelectActionPanel(componentId, rowModel, AccessEditPage.class, access.getId(), AccessListPage.this,
-            formattedTaskLabel));
+        item.add(new ListSelectActionPanel(componentId, rowModel, AccessEditPage.class, access.getId(), returnToPage, formattedTaskLabel));
         addRowClick(item);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
@@ -145,7 +146,13 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
         item.add(label);
       }
     });
-    dataTable = createDataTable(columns, "group.name", true);
+    return columns;
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this), "group.name", true);
     form.add(dataTable);
   }
 

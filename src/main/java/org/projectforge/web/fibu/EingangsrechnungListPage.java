@@ -33,6 +33,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -51,12 +52,13 @@ import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.CurrencyPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.DownloadUtils;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
-
 @ListPage(editPage = EingangsrechnungEditPage.class)
-public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungListForm, EingangsrechnungDao, EingangsrechnungDO>
+public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungListForm, EingangsrechnungDao, EingangsrechnungDO> implements
+    IListPageColumnsCreator<EingangsrechnungDO>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EingangsrechnungListPage.class);
 
@@ -100,10 +102,9 @@ public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungL
 
   @SuppressWarnings("serial")
   @Override
-  protected void init()
+  public List<IColumn<EingangsrechnungDO>> createColumns(final WebPage returnToPage)
   {
-    List<IColumn<EingangsrechnungDO>> columns = new ArrayList<IColumn<EingangsrechnungDO>>();
-
+   final List<IColumn<EingangsrechnungDO>> columns = new ArrayList<IColumn<EingangsrechnungDO>>();
     CellItemListener<EingangsrechnungDO> cellItemListener = new CellItemListener<EingangsrechnungDO>() {
       public void populateItem(Item<ICellPopulator<EingangsrechnungDO>> item, String componentId, IModel<EingangsrechnungDO> rowModel)
       {
@@ -137,8 +138,8 @@ public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungL
         }
         final Label kreditorLabel = new Label(ListSelectActionPanel.LABEL_ID, kreditor);
         kreditorLabel.setEscapeModelStrings(false);
-        item.add(new ListSelectActionPanel(componentId, rowModel, EingangsrechnungEditPage.class, eingangsrechnung.getId(),
-            EingangsrechnungListPage.this, kreditorLabel));
+        item.add(new ListSelectActionPanel(componentId, rowModel, EingangsrechnungEditPage.class, eingangsrechnung.getId(), returnToPage,
+            kreditorLabel));
         cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);
       }
@@ -157,7 +158,13 @@ public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungL
     columns.add(new CurrencyPropertyColumn<EingangsrechnungDO>(getString("fibu.common.brutto"), "grossSum", "grossSum", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(new Model<String>(getString("comment")), "bemerkung", "bemerkung",
         cellItemListener));
-    dataTable = createDataTable(columns, "datum", false);
+    return columns;
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this), "datum", false);
     form.add(dataTable);
   }
 
@@ -170,7 +177,11 @@ public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungL
       form.addError("validation.error.nothingToExport");
       return;
     }
-    final String filename = "ProjectForge-" + getString("fibu.common.creditor") + "_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
+    final String filename = "ProjectForge-"
+        + getString("fibu.common.creditor")
+        + "_"
+        + DateHelper.getDateAsFilenameSuffix(new Date())
+        + ".xls";
     final byte[] xls = KostZuweisungExport.instance.exportRechnungen(rechnungen, getString("fibu.common.creditor"));
     if (xls == null || xls.length == 0) {
       log.error("Oups, xls has zero size. Filename: " + filename);

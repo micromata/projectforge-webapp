@@ -30,6 +30,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -48,11 +49,12 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 @ListPage(editPage = ProjektEditPage.class)
-public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDao, ProjektDO>
+public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDao, ProjektDO> implements IListPageColumnsCreator<ProjektDO>
 {
   private static final long serialVersionUID = -8406452960003792763L;
 
@@ -68,7 +70,7 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
   @SpringBean(name = "taskFormatter")
   private TaskFormatter taskFormatter;
 
-  public ProjektListPage(PageParameters parameters)
+  public ProjektListPage(final PageParameters parameters)
   {
     super(parameters, "fibu.projekt");
   }
@@ -80,10 +82,9 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
 
   @SuppressWarnings("serial")
   @Override
-  protected void init()
+  public List<IColumn<ProjektDO>> createColumns(final WebPage returnToPage)
   {
-    List<IColumn<ProjektDO>> columns = new ArrayList<IColumn<ProjektDO>>();
-
+    final List<IColumn<ProjektDO>> columns = new ArrayList<IColumn<ProjektDO>>();
     CellItemListener<ProjektDO> cellItemListener = new CellItemListener<ProjektDO>() {
       public void populateItem(Item<ICellPopulator<ProjektDO>> item, String componentId, IModel<ProjektDO> rowModel)
       {
@@ -106,7 +107,7 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
       {
         final ProjektDO projekt = (ProjektDO) rowModel.getObject();
         if (isSelectMode() == false) {
-          item.add(new ListSelectActionPanel(componentId, rowModel, ProjektEditPage.class, projekt.getId(), ProjektListPage.this, String
+          item.add(new ListSelectActionPanel(componentId, rowModel, ProjektEditPage.class, projekt.getId(), returnToPage, String
               .valueOf(projekt.getKost())));
         } else {
           item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, projekt.getId(), String.valueOf(projekt
@@ -165,7 +166,13 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
     });
     columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("description")), "description", "description",
         cellItemListener));
-    dataTable = createDataTable(columns, "kost", true);
+    return columns;
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this), "kost", true);
     form.add(dataTable);
   }
 

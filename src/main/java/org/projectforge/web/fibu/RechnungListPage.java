@@ -34,6 +34,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -54,11 +55,13 @@ import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.CurrencyPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.DownloadUtils;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 @ListPage(editPage = RechnungEditPage.class)
-public class RechnungListPage extends AbstractListPage<RechnungListForm, RechnungDao, RechnungDO>
+public class RechnungListPage extends AbstractListPage<RechnungListForm, RechnungDao, RechnungDO> implements
+    IListPageColumnsCreator<RechnungDO>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(RechnungListPage.class);
 
@@ -102,10 +105,9 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
 
   @SuppressWarnings("serial")
   @Override
-  protected void init()
+  public List<IColumn<RechnungDO>> createColumns(final WebPage returnToPage)
   {
-    List<IColumn<RechnungDO>> columns = new ArrayList<IColumn<RechnungDO>>();
-
+    final List<IColumn<RechnungDO>> columns = new ArrayList<IColumn<RechnungDO>>();
     CellItemListener<RechnungDO> cellItemListener = new CellItemListener<RechnungDO>() {
       public void populateItem(Item<ICellPopulator<RechnungDO>> item, String componentId, IModel<RechnungDO> rowModel)
       {
@@ -143,8 +145,7 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
         }
         final Label nummerLabel = new Label(ListSelectActionPanel.LABEL_ID, nummer);
         nummerLabel.setEscapeModelStrings(false);
-        item.add(new ListSelectActionPanel(componentId, rowModel, RechnungEditPage.class, rechnung.getId(), RechnungListPage.this,
-            nummerLabel));
+        item.add(new ListSelectActionPanel(componentId, rowModel, RechnungEditPage.class, rechnung.getId(), returnToPage, nummerLabel));
         cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);
       }
@@ -188,7 +189,13 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
         cellItemListener));
     columns
         .add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
-    dataTable = createDataTable(columns, "nummer", false);
+    return columns;
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this), "nummer", false);
     form.add(dataTable);
   }
 

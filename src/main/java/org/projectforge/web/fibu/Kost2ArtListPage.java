@@ -30,6 +30,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -41,30 +42,31 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.SingleImagePanel;
 
 @ListPage(editPage = Kost2ArtEditPage.class)
-public class Kost2ArtListPage extends AbstractListPage<Kost2ArtListForm, Kost2ArtDao, Kost2ArtDO>
+public class Kost2ArtListPage extends AbstractListPage<Kost2ArtListForm, Kost2ArtDao, Kost2ArtDO> implements
+    IListPageColumnsCreator<Kost2ArtDO>
 {
   private static final long serialVersionUID = -202443770217040251L;
 
   @SpringBean(name = "kost2ArtDao")
   private Kost2ArtDao kost2ArtDao;
 
-  public Kost2ArtListPage(PageParameters parameters)
+  public Kost2ArtListPage(final PageParameters parameters)
   {
     super(parameters, "fibu.kost2art");
   }
 
   @SuppressWarnings("serial")
   @Override
-  protected void init()
+  public List<IColumn<Kost2ArtDO>> createColumns(final WebPage returnToPage)
   {
-    List<IColumn<Kost2ArtDO>> columns = new ArrayList<IColumn<Kost2ArtDO>>();
-
+    final List<IColumn<Kost2ArtDO>> columns = new ArrayList<IColumn<Kost2ArtDO>>();
     CellItemListener<Kost2ArtDO> cellItemListener = new CellItemListener<Kost2ArtDO>() {
       public void populateItem(Item<ICellPopulator<Kost2ArtDO>> item, String componentId, IModel<Kost2ArtDO> rowModel)
       {
@@ -75,21 +77,20 @@ public class Kost2ArtListPage extends AbstractListPage<Kost2ArtListForm, Kost2Ar
         }
       }
     };
-    columns
-        .add(new CellItemListenerPropertyColumn<Kost2ArtDO>(new Model<String>(getString("fibu.kost2art.nummer")), "id", "id", cellItemListener) {
-          @SuppressWarnings("unchecked")
-          @Override
-          public void populateItem(final Item item, final String componentId, final IModel rowModel)
-          {
-            final Kost2ArtDO kost2Art = (Kost2ArtDO) rowModel.getObject();
-            item.add(new ListSelectActionPanel(componentId, rowModel, Kost2ArtEditPage.class, kost2Art.getId(), Kost2ArtListPage.this,
-                StringHelper.format2DigitNumber(kost2Art.getId())));
-            cellItemListener.populateItem(item, componentId, rowModel);
-            addRowClick(item);
-          }
-        });
-    columns.add(new CellItemListenerPropertyColumn<Kost2ArtDO>(new Model<String>(getString("name")), "name", "name",
-        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<Kost2ArtDO>(new Model<String>(getString("fibu.kost2art.nummer")), "id", "id",
+        cellItemListener) {
+      @SuppressWarnings("unchecked")
+      @Override
+      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      {
+        final Kost2ArtDO kost2Art = (Kost2ArtDO) rowModel.getObject();
+        item.add(new ListSelectActionPanel(componentId, rowModel, Kost2ArtEditPage.class, kost2Art.getId(), returnToPage, StringHelper
+            .format2DigitNumber(kost2Art.getId())));
+        cellItemListener.populateItem(item, componentId, rowModel);
+        addRowClick(item);
+      }
+    });
+    columns.add(new CellItemListenerPropertyColumn<Kost2ArtDO>(new Model<String>(getString("name")), "name", "name", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<Kost2ArtDO>(new Model<String>(getString("fibu.fakturiert")), "fakturiert", "fakturiert",
         cellItemListener) {
       @Override
@@ -104,25 +105,31 @@ public class Kost2ArtListPage extends AbstractListPage<Kost2ArtListForm, Kost2Ar
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<Kost2ArtDO>(new Model<String>(getString("fibu.kost2art.workFraction")), "workFraction", "workFraction",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<Kost2ArtDO>(new Model<String>(getString("fibu.kost2art.projektStandard")), "projektStandard", "projektStandard",
-        cellItemListener) {
-          @Override
-          public void populateItem(Item<ICellPopulator<Kost2ArtDO>> item, String componentId, IModel<Kost2ArtDO> rowModel)
-          {
-            final Kost2ArtDO kost2Art = (Kost2ArtDO) rowModel.getObject();
-            if (kost2Art.isProjektStandard() == true) {
-              item.add(SingleImagePanel.createPresizedImage(componentId, WebConstants.IMAGE_ACCEPT));
-            } else {
-              item.add(createInvisibleDummyComponent(componentId));
-            }
-            cellItemListener.populateItem(item, componentId, rowModel);
-          }
-        });
+    columns.add(new CellItemListenerPropertyColumn<Kost2ArtDO>(new Model<String>(getString("fibu.kost2art.workFraction")), "workFraction",
+        "workFraction", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<Kost2ArtDO>(new Model<String>(getString("fibu.kost2art.projektStandard")),
+        "projektStandard", "projektStandard", cellItemListener) {
+      @Override
+      public void populateItem(Item<ICellPopulator<Kost2ArtDO>> item, String componentId, IModel<Kost2ArtDO> rowModel)
+      {
+        final Kost2ArtDO kost2Art = (Kost2ArtDO) rowModel.getObject();
+        if (kost2Art.isProjektStandard() == true) {
+          item.add(SingleImagePanel.createPresizedImage(componentId, WebConstants.IMAGE_ACCEPT));
+        } else {
+          item.add(createInvisibleDummyComponent(componentId));
+        }
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
     columns.add(new CellItemListenerPropertyColumn<Kost2ArtDO>(new Model<String>(getString("description")), "description", "description",
         cellItemListener));
-    dataTable = createDataTable(columns, "id", true);
+    return columns;
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this), "id", true);
     form.add(dataTable);
   }
 

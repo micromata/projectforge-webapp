@@ -39,7 +39,6 @@ import org.projectforge.fibu.EingangsrechnungsPositionDO;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
-
 @EditPage(defaultReturnPage = EingangsrechnungListPage.class)
 public class EingangsrechnungEditPage extends AbstractEditPage<EingangsrechnungDO, EingangsrechnungEditForm, EingangsrechnungDao> implements
     ISelectCallerPage
@@ -93,7 +92,7 @@ public class EingangsrechnungEditPage extends AbstractEditPage<EingangsrechnungD
     if (positionen != null) {
       rechnung.setPositionen(new ArrayList<EingangsrechnungsPositionDO>());
       for (final EingangsrechnungsPositionDO origPosition : positionen) {
-        final EingangsrechnungsPositionDO position = (EingangsrechnungsPositionDO)origPosition.newClone();
+        final EingangsrechnungsPositionDO position = (EingangsrechnungsPositionDO) origPosition.newClone();
         rechnung.addPosition(position);
       }
     }

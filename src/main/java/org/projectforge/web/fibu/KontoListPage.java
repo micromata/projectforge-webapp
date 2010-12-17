@@ -30,6 +30,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -40,19 +41,19 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
-
 @ListPage(editPage = KontoEditPage.class)
-public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, KontoDO>
+public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, KontoDO> implements IListPageColumnsCreator<KontoDO>
 {
   private static final long serialVersionUID = -8406452960003792763L;
 
   @SpringBean(name = "kontoDao")
   private KontoDao kontoDao;
 
-  public KontoListPage(PageParameters parameters)
+  public KontoListPage(final PageParameters parameters)
   {
     super(parameters, "fibu.konto");
   }
@@ -64,10 +65,9 @@ public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, Kon
 
   @SuppressWarnings("serial")
   @Override
-  protected void init()
+  public List<IColumn<KontoDO>> createColumns(final WebPage returnToPage)
   {
-    List<IColumn<KontoDO>> columns = new ArrayList<IColumn<KontoDO>>();
-
+    final List<IColumn<KontoDO>> columns = new ArrayList<IColumn<KontoDO>>();
     CellItemListener<KontoDO> cellItemListener = new CellItemListener<KontoDO>() {
       public void populateItem(Item<ICellPopulator<KontoDO>> item, String componentId, IModel<KontoDO> rowModel)
       {
@@ -87,11 +87,11 @@ public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, Kon
       {
         KontoDO konto = (KontoDO) rowModel.getObject();
         if (isSelectMode() == false) {
-          item.add(new ListSelectActionPanel(componentId, rowModel, KontoEditPage.class, konto.getId(), KontoListPage.this, String
-              .valueOf(konto.getNummer())));
+          item.add(new ListSelectActionPanel(componentId, rowModel, KontoEditPage.class, konto.getId(), returnToPage, String.valueOf(konto
+              .getNummer())));
         } else {
-          item
-              .add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, konto.getId(), String.valueOf(konto.getNummer())));
+          item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, konto.getId(), String
+              .valueOf(konto.getNummer())));
         }
         cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);
@@ -101,7 +101,13 @@ public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, Kon
         "bezeichnung", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<KontoDO>(new Model<String>(getString("description")), "description", "description",
         cellItemListener));
-    dataTable = createDataTable(columns, "nummer", true);
+    return columns;
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this), "nummer", true);
     form.add(dataTable);
   }
 

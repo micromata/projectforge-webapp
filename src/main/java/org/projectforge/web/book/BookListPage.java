@@ -31,6 +31,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -45,11 +46,12 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 @ListPage(editPage = BookEditPage.class)
-public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO>
+public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO> implements IListPageColumnsCreator<BookDO>
 {
   private static final long serialVersionUID = 7227240465661485515L;
 
@@ -63,7 +65,7 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
   {
     super(parameters, "book");
   }
-  
+
   @Override
   protected void setup()
   {
@@ -72,8 +74,7 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
   }
 
   @SuppressWarnings("serial")
-  @Override
-  protected void init()
+  public List<IColumn<BookDO>> createColumns(final WebPage returnToPage)
   {
     final List<IColumn<BookDO>> columns = new ArrayList<IColumn<BookDO>>();
     final CellItemListener<BookDO> cellItemListener = new CellItemListener<BookDO>() {
@@ -93,8 +94,8 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
           public void populateItem(final Item item, final String componentId, final IModel rowModel)
           {
             final BookDO book = (BookDO) rowModel.getObject();
-            item.add(new ListSelectActionPanel(componentId, rowModel, BookEditPage.class, book.getId(), BookListPage.this,
-                DateTimeFormatter.instance().getFormattedDate(book.getCreated())));
+            item.add(new ListSelectActionPanel(componentId, rowModel, BookEditPage.class, book.getId(), returnToPage, DateTimeFormatter
+                .instance().getFormattedDate(book.getCreated())));
             addRowClick(item);
             cellItemListener.populateItem(item, componentId, rowModel);
           }
@@ -132,7 +133,13 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    dataTable = createDataTable(columns, "created", false);
+    return columns;
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this), "created", false);
     form.add(dataTable);
   }
 
