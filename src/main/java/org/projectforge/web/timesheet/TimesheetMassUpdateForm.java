@@ -43,6 +43,7 @@ import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -96,6 +97,7 @@ public class TimesheetMassUpdateForm extends AbstractForm<TimesheetDO, Timesheet
         getParentPage().onCancelSubmit();
       }
     };
+    cancelButton.add(WebConstants.BUTTON_CLASS_CANCEL);
     cancelButton.setDefaultFormProcessing(false);
     final SingleButtonPanel cancelButtonPanel = new SingleButtonPanel("cancel", cancelButton);
     add(cancelButtonPanel);
@@ -106,6 +108,7 @@ public class TimesheetMassUpdateForm extends AbstractForm<TimesheetDO, Timesheet
         getParentPage().onUpdateAllSubmit();
       }
     };
+    updateAllButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     updateAllButton.add(new SimpleAttributeModifier("onclick", "return showUpdateQuestionDialog()"));
     setDefaultButton(updateAllButton);
     final SingleButtonPanel updateAllButtonPanel = new SingleButtonPanel("updateAll", updateAllButton);

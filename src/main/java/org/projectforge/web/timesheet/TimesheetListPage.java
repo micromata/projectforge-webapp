@@ -230,7 +230,10 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
         }
       }
     };
-    if (page instanceof TimesheetListPage) {
+    if (page instanceof TimesheetMassUpdatePage) {
+      columns.add(new UserPropertyColumn<TimesheetDO>(page.getString("timesheet.user"), getSortable("user.fullname", sortable), "user",
+          cellItemListener).withUserFormatter(userFormatter));
+    } else {
       // Show first column not for TimesheetMassUpdatePage!
       if (isMassUpdateMode == true) {
         columns.add(new CellItemListenerPropertyColumn<TimesheetDO>("", null, "selected", cellItemListener) {
@@ -261,9 +264,6 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
           }
         }.withUserFormatter(userFormatter));
       }
-    } else {
-      columns.add(new UserPropertyColumn<TimesheetDO>(page.getString("timesheet.user"), getSortable("user.fullname", sortable), "user",
-          cellItemListener).withUserFormatter(userFormatter));
     }
     if (kostCache.isKost2EntriesExists() == true) {
       columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(page.getString("fibu.kunde")), getSortable(
