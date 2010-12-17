@@ -163,8 +163,13 @@ public class Kost2Dao extends BaseDao<Kost2DO>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<Kost2DO> getList(BaseSearchFilter filter)
   {
-    KostFilter myFilter = (KostFilter) filter;
-    QueryFilter queryFilter = new QueryFilter(filter);
+    final KostFilter myFilter;
+    if (filter instanceof KostFilter) {
+      myFilter = (KostFilter) filter;
+    } else {
+      myFilter = new KostFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
     queryFilter.createAlias("kost2Art", "art");
     if (myFilter.isActive() == true) {
       queryFilter.add(Restrictions.eq("kostentraegerStatus", KostentraegerStatus.ACTIVE));

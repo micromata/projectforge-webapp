@@ -51,6 +51,15 @@ public class KostFilter extends BaseSearchFilter implements Serializable
 
   public static final String[] LIST = { FILTER_ALL, FILTER_ACTIVE, FILTER_NON_ACTIVE, FILTER_NOT_ENDED, FILTER_ENDED};
 
+  public KostFilter()
+  {
+  }
+
+  public KostFilter(final BaseSearchFilter filter)
+  {
+    super(filter);
+  }
+
   public boolean isShowAll()
   {
     return FILTER_ALL.equals(listType);

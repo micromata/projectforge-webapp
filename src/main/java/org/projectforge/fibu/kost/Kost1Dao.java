@@ -117,10 +117,15 @@ public class Kost1Dao extends BaseDao<Kost1DO>
 
   @Override
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public List<Kost1DO> getList(BaseSearchFilter filter)
+  public List<Kost1DO> getList(final BaseSearchFilter filter)
   {
-    KostFilter myFilter = (KostFilter) filter;
-    QueryFilter queryFilter = new QueryFilter(filter);
+    final KostFilter myFilter;
+    if (filter instanceof KostFilter) {
+      myFilter = (KostFilter) filter;
+    } else {
+      myFilter = new KostFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
     if (myFilter.isActive() == true) {
       queryFilter.add(Restrictions.eq("kostentraegerStatus", KostentraegerStatus.ACTIVE));
     } else if (myFilter.isNonActive() == true) {
