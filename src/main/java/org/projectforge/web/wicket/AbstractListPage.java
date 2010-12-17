@@ -705,6 +705,17 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
     return this.recentSearchTermsUserPrefKey != null;
   }
 
+  /**
+   * Tiny helper method.
+   * @param propertyName
+   * @param sortable
+   * @return return sortable ? propertyName : null;
+   */
+  protected static String getSortable(final String propertyName, final boolean sortable)
+  {
+    return sortable ? propertyName : null;
+  }
+
   public class ListPageSortableDataProvider extends MySortableDataProvider<O>
   {
     private static final long serialVersionUID = 6940805267003006161L;
