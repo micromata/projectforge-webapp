@@ -26,6 +26,7 @@ package org.projectforge.registry;
 import org.apache.wicket.proxy.LazyInitProxyFactory;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.web.core.SearchForm;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 
@@ -40,6 +41,8 @@ public class RegistryEntry
   private String i18nPrefix;
 
   private BaseDao< ? > dao;
+
+  private Class<? extends BaseSearchFilter> searchFilterClass;
 
   private Class< ? extends BaseDao< ? >> daoClassType;
 
@@ -67,6 +70,20 @@ public class RegistryEntry
   public Class< ? extends IListPageColumnsCreator< ? >> getListPageColumnsCreatorClass()
   {
     return listPageColumnsCreatorClass;
+  }
+
+  public RegistryEntry setSearchFilterClass(final Class<? extends BaseSearchFilter> searchFilterClass)
+  {
+    this.searchFilterClass = searchFilterClass;
+    return this;
+  }
+
+  /**
+   * @return The dao specific filter or null if not registered.
+   */
+  public final Class<? extends BaseSearchFilter> getSearchFilterClass()
+  {
+    return this.searchFilterClass;
   }
 
   public String getId()

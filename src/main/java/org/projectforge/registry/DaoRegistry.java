@@ -40,7 +40,20 @@ import org.projectforge.task.TaskDao;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.UserDao;
+import org.projectforge.web.access.AccessListPage;
 import org.projectforge.web.address.AddressListPage;
+import org.projectforge.web.book.BookListPage;
+import org.projectforge.web.fibu.EingangsrechnungListPage;
+import org.projectforge.web.fibu.KontoListPage;
+import org.projectforge.web.fibu.Kost1ListPage;
+import org.projectforge.web.fibu.Kost2ArtListPage;
+import org.projectforge.web.fibu.Kost2ListPage;
+import org.projectforge.web.fibu.ProjektListPage;
+import org.projectforge.web.fibu.RechnungListPage;
+import org.projectforge.web.task.TaskListPage;
+import org.projectforge.web.timesheet.TimesheetListPage;
+import org.projectforge.web.user.GroupListPage;
+import org.projectforge.web.user.UserListPage;
 
 /**
  * Helper object which stores all dao objects and put them into the registry.
@@ -127,21 +140,23 @@ public class DaoRegistry
       return;
     }
     register(ADDRESS, AddressDao.class, addressDao).setListPageColumnsCreatorClass(AddressListPage.class);
-    register(TIMESHEET, TimesheetDao.class, timesheetDao);
-    register(TASK, TaskDao.class, taskDao);
-    register(BOOK, BookDao.class, bookDao);
-    register(RECHNUNG, RechnungDao.class, rechnungDao, "fibu.rechnung");
-    register(EINGANGSRECHNUNG, EingangsrechnungDao.class, eingangsrechnungDao, "fibu.eingangsrechnung");
-    register(USER, UserDao.class, userDao);
-    register(GROUP, GroupDao.class, groupDao);
-    register(ACCESS, AccessDao.class, accessDao);
-    register(BUCHUNGSSATZ, BuchungssatzDao.class, buchungssatzDao, "fibu.buchungssatz");
-    register(KOST1, Kost1Dao.class, kost1Dao, "fibu.kost1");
-    register(KOST2, Kost2Dao.class, kost2Dao, "fibu.kost2");
-    register(KOST2_ART, Kost2ArtDao.class, kost2ArtDao, "fibu.kost2art");
-    register(KONTO, KontoDao.class, kontoDao, "fibu.konto");
-    register(KUNDE, KundeDao.class, kundeDao, "fibu.kunde");
-    register(PROJEKT, ProjektDao.class, projektDao, "fibu.projekt");
+    register(TIMESHEET, TimesheetDao.class, timesheetDao).setListPageColumnsCreatorClass(TimesheetListPage.class);
+    register(TASK, TaskDao.class, taskDao).setListPageColumnsCreatorClass(TaskListPage.class);
+    register(BOOK, BookDao.class, bookDao).setListPageColumnsCreatorClass(BookListPage.class);
+    register(RECHNUNG, RechnungDao.class, rechnungDao, "fibu.rechnung").setListPageColumnsCreatorClass(RechnungListPage.class);
+    register(EINGANGSRECHNUNG, EingangsrechnungDao.class, eingangsrechnungDao, "fibu.eingangsrechnung").setListPageColumnsCreatorClass(
+        EingangsrechnungListPage.class);
+    register(USER, UserDao.class, userDao).setListPageColumnsCreatorClass(UserListPage.class);
+    register(GROUP, GroupDao.class, groupDao).setListPageColumnsCreatorClass(GroupListPage.class);
+    register(ACCESS, AccessDao.class, accessDao).setListPageColumnsCreatorClass(AccessListPage.class);
+    register(BUCHUNGSSATZ, BuchungssatzDao.class, buchungssatzDao, "fibu.buchungssatz");// TODO: .setListPageColumnsCreatorClass(
+    // BuchungssatzListPage.class);
+    register(KOST1, Kost1Dao.class, kost1Dao, "fibu.kost1").setListPageColumnsCreatorClass(Kost1ListPage.class);
+    register(KOST2, Kost2Dao.class, kost2Dao, "fibu.kost2").setListPageColumnsCreatorClass(Kost2ListPage.class);
+    register(KOST2_ART, Kost2ArtDao.class, kost2ArtDao, "fibu.kost2art").setListPageColumnsCreatorClass(Kost2ArtListPage.class);
+    register(KONTO, KontoDao.class, kontoDao, "fibu.konto").setListPageColumnsCreatorClass(KontoListPage.class);
+    register(KUNDE, KundeDao.class, kundeDao, "fibu.kunde");// TODO: .setListPageColumnsCreatorClass(KundeListPage.class);
+    register(PROJEKT, ProjektDao.class, projektDao, "fibu.projekt").setListPageColumnsCreatorClass(ProjektListPage.class);
     initialized = true;
   }
 
