@@ -170,8 +170,13 @@ public class ProjektDao extends BaseDao<ProjektDO>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<ProjektDO> getList(BaseSearchFilter filter)
   {
-    ProjektFilter myFilter = (ProjektFilter) filter;
-    QueryFilter queryFilter = new QueryFilter(filter);
+    final ProjektFilter myFilter;
+    if (filter instanceof ProjektFilter) {
+      myFilter = (ProjektFilter) filter;
+    } else {
+      myFilter = new ProjektFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
     if (myFilter.isEnded() == true) {
       queryFilter.add(Restrictions.eq("status", ProjektStatus.ENDED));
     } else if (myFilter.isNotEnded() == true) {

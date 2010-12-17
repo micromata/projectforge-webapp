@@ -121,10 +121,15 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
   }
 
   @Override
-  public List<EingangsrechnungDO> getList(BaseSearchFilter filter)
+  public List<EingangsrechnungDO> getList(final BaseSearchFilter filter)
   {
-    final RechnungFilter myFilter = (RechnungFilter) filter;
-    final QueryFilter queryFilter = new QueryFilter(filter);
+    final RechnungFilter myFilter;
+    if (filter instanceof RechnungFilter) {
+      myFilter = (RechnungFilter) filter;
+    } else {
+      myFilter = new RechnungFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
     if (myFilter.getYear() >= 0) {
       final Calendar cal = DateHelper.getUTCCalendar();
       cal.set(Calendar.YEAR, myFilter.getYear());

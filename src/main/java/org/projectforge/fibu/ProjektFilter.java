@@ -47,6 +47,15 @@ public class ProjektFilter extends BaseSearchFilter implements Serializable
 
   public static final String[] LIST = { FILTER_ALL, FILTER_NOT_ENDED, FILTER_ENDED};
 
+  public ProjektFilter()
+  {
+  }
+
+  public ProjektFilter(final BaseSearchFilter filter)
+  {
+    super(filter);
+  }
+
   public boolean isShowAll()
   {
     return FILTER_ALL.equals(listType);

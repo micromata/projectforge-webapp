@@ -51,6 +51,15 @@ public class RechnungFilter extends BaseSearchFilter implements Serializable
 
   private boolean showKostZuweisungStatus;
 
+  public RechnungFilter()
+  {
+  }
+
+  public RechnungFilter(final BaseSearchFilter filter)
+  {
+    super(filter);
+  }
+
   /**
    * Zeige Fehlbeträge in der Liste.
    */
