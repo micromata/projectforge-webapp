@@ -29,23 +29,80 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.Validate;
+import org.apache.wicket.markup.html.WebPage;
 import org.projectforge.core.BaseDao;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.Registry;
+import org.projectforge.web.LoginPage;
+import org.projectforge.web.access.AccessEditPage;
 import org.projectforge.web.access.AccessListPage;
+import org.projectforge.web.address.AddressEditPage;
 import org.projectforge.web.address.AddressListPage;
+import org.projectforge.web.address.AddressViewPage;
+import org.projectforge.web.address.PhoneCallPage;
+import org.projectforge.web.address.SendSmsPage;
+import org.projectforge.web.admin.AdminPage;
+import org.projectforge.web.admin.SetupPage;
+import org.projectforge.web.admin.UpdatePage;
+import org.projectforge.web.book.BookEditPage;
 import org.projectforge.web.book.BookListPage;
+import org.projectforge.web.calendar.CalendarPage;
+import org.projectforge.web.core.ConfigurationListPage;
+import org.projectforge.web.core.SearchPage;
+import org.projectforge.web.doc.TutorialPage;
+import org.projectforge.web.fibu.AuftragEditPage;
+import org.projectforge.web.fibu.AuftragListPage;
+import org.projectforge.web.fibu.BankAccountEditPage;
+import org.projectforge.web.fibu.BankAccountListPage;
+import org.projectforge.web.fibu.EingangsrechnungEditPage;
 import org.projectforge.web.fibu.EingangsrechnungListPage;
+import org.projectforge.web.fibu.KontoEditPage;
 import org.projectforge.web.fibu.KontoListPage;
+import org.projectforge.web.fibu.Kost1EditPage;
 import org.projectforge.web.fibu.Kost1ListPage;
+import org.projectforge.web.fibu.Kost2ArtEditPage;
 import org.projectforge.web.fibu.Kost2ArtListPage;
+import org.projectforge.web.fibu.Kost2EditPage;
 import org.projectforge.web.fibu.Kost2ListPage;
+import org.projectforge.web.fibu.ProjektEditPage;
 import org.projectforge.web.fibu.ProjektListPage;
+import org.projectforge.web.fibu.RechnungEditPage;
 import org.projectforge.web.fibu.RechnungListPage;
+import org.projectforge.web.gantt.GanttChartEditPage;
+import org.projectforge.web.gantt.GanttChartListPage;
+import org.projectforge.web.gwiki.GWikiContainerPage;
+import org.projectforge.web.humanresources.HRListPage;
+import org.projectforge.web.humanresources.HRPlanningEditPage;
+import org.projectforge.web.humanresources.HRPlanningListPage;
+import org.projectforge.web.imagecropper.ImageCropperPage;
+import org.projectforge.web.meb.MebEditPage;
+import org.projectforge.web.meb.MebListPage;
+import org.projectforge.web.orga.ContractEditPage;
+import org.projectforge.web.orga.ContractListPage;
+import org.projectforge.web.orga.PostausgangEditPage;
+import org.projectforge.web.orga.PostausgangListPage;
+import org.projectforge.web.orga.PosteingangEditPage;
+import org.projectforge.web.orga.PosteingangListPage;
+import org.projectforge.web.scripting.ScriptEditPage;
+import org.projectforge.web.scripting.ScriptListPage;
+import org.projectforge.web.statistics.PersonalStatisticsPage;
+import org.projectforge.web.statistics.SystemStatisticsPage;
+import org.projectforge.web.task.TaskEditPage;
 import org.projectforge.web.task.TaskListPage;
+import org.projectforge.web.task.TaskTreePage;
+import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.timesheet.TimesheetListPage;
+import org.projectforge.web.user.ChangePasswordPage;
+import org.projectforge.web.user.GroupEditPage;
 import org.projectforge.web.user.GroupListPage;
+import org.projectforge.web.user.MyAccountEditPage;
+import org.projectforge.web.user.UserEditPage;
 import org.projectforge.web.user.UserListPage;
+import org.projectforge.web.user.UserPrefEditPage;
+import org.projectforge.web.user.UserPrefListPage;
+import org.projectforge.web.wicket.ErrorPage;
+import org.projectforge.web.wicket.FeedbackPage;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 
 /**
  * Registry for dao's. Here you can register additional daos and plugins (extensions of ProjectForge).
@@ -54,6 +111,8 @@ import org.projectforge.web.user.UserListPage;
  */
 public class WebRegistry
 {
+  public static final String BOOKMARK_LOGIN = "login";
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(WebRegistry.class);
 
   private static final WebRegistry instance = new WebRegistry();
@@ -61,6 +120,8 @@ public class WebRegistry
   private Map<String, WebRegistryEntry> map = new HashMap<String, WebRegistryEntry>();
 
   private List<WebRegistryEntry> orderedList = new ArrayList<WebRegistryEntry>();
+
+  private Map<String, Class< ? extends WebPage>> mountPages = new HashMap<String, Class<? extends WebPage>>();
 
   public static WebRegistry instance()
   {
@@ -74,6 +135,15 @@ public class WebRegistry
   public WebRegistryEntry register(final String id)
   {
     return register(new WebRegistryEntry(id));
+  }
+
+  /**
+   * Creates a new WebRegistryEntry and registers it. Id must be found in {@link Registry}.
+   * @param id
+   */
+  public WebRegistryEntry register(final String id, final Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass)
+  {
+    return register(new WebRegistryEntry(id, listPageColumnsCreatorClass));
   }
 
   public WebRegistryEntry register(final WebRegistryEntry entry)
@@ -91,6 +161,16 @@ public class WebRegistry
   public WebRegistryEntry register(final String id, final boolean insertBefore, final WebRegistryEntry entry)
   {
     return register(new WebRegistryEntry(id), insertBefore, entry);
+  }
+
+  /**
+   * Creates a new WebRegistryEntry and registers it. Id must be found in {@link Registry}.
+   * @param id
+   */
+  public WebRegistryEntry register(final String id, final Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass,
+      final boolean insertBefore, final WebRegistryEntry entry)
+  {
+    return register(new WebRegistryEntry(id, listPageColumnsCreatorClass), insertBefore, entry);
   }
 
   public WebRegistryEntry register(final WebRegistryEntry existingEntry, final boolean insertBefore, final WebRegistryEntry entry)
@@ -126,27 +206,92 @@ public class WebRegistry
     return entry != null ? entry.getDao() : null;
   }
 
+  public WebRegistry addMountPage(final String mountPage, final Class< ? extends WebPage> pageClass)
+  {
+    this.mountPages.put(mountPage, pageClass);
+    return this;
+  }
+
+  public WebRegistry addMountPages(final String mountPageBasename, final Class< ? extends WebPage> pageListClass,
+      final Class< ? extends WebPage> pageEditClass)
+  {
+    addMountPage(mountPageBasename + "List", pageListClass);
+    addMountPage(mountPageBasename + "Edit", pageEditClass);
+    return this;
+  }
+
+  public Map<String, Class< ? extends WebPage>> getMountPages()
+  {
+    return mountPages;
+  }
+
   private WebRegistry()
   {
-    register(DaoRegistry.ADDRESS).setListPageColumnsCreatorClass(AddressListPage.class);
-    register(DaoRegistry.TIMESHEET).setListPageColumnsCreatorClass(TimesheetListPage.class);
-    register(DaoRegistry.TASK).setListPageColumnsCreatorClass(TaskListPage.class);
-    register(DaoRegistry.BOOK).setListPageColumnsCreatorClass(BookListPage.class);
-    register(DaoRegistry.RECHNUNG).setListPageColumnsCreatorClass(RechnungListPage.class);
-    register(DaoRegistry.EINGANGSRECHNUNG).setListPageColumnsCreatorClass(
-        EingangsrechnungListPage.class);
-    register(DaoRegistry.USER).setListPageColumnsCreatorClass(UserListPage.class);
-    register(DaoRegistry.GROUP).setListPageColumnsCreatorClass(GroupListPage.class);
-    register(DaoRegistry.ACCESS).setListPageColumnsCreatorClass(AccessListPage.class);
-    register(DaoRegistry.BUCHUNGSSATZ);// TODO: .setListPageColumnsCreatorClass(
-    // BuchungssatzListPage.class);
-    register(DaoRegistry.KOST1).setListPageColumnsCreatorClass(Kost1ListPage.class);
-    register(DaoRegistry.KOST2).setListPageColumnsCreatorClass(Kost2ListPage.class);
-    register(DaoRegistry.KOST2_ART).setListPageColumnsCreatorClass(Kost2ArtListPage.class);
-    register(DaoRegistry.KONTO).setListPageColumnsCreatorClass(KontoListPage.class);
-    register(DaoRegistry.KUNDE);// TODO: .setListPageColumnsCreatorClass(KundeListPage.class);
-    register(DaoRegistry.PROJEKT).setListPageColumnsCreatorClass(ProjektListPage.class);
-    // register(DaoRegistry.ORDERBOOK).setListPageColumnsCreatorClass(AuftragListPage.class);
+    register(DaoRegistry.ADDRESS, AddressListPage.class);
+    addMountPages(DaoRegistry.ADDRESS, AddressListPage.class, AddressEditPage.class);
+    addMountPage(DaoRegistry.ADDRESS + "View", AddressViewPage.class);
+    register(DaoRegistry.TIMESHEET, TimesheetListPage.class);
+    addMountPages(DaoRegistry.TIMESHEET, TimesheetListPage.class, TimesheetEditPage.class);
+    register(DaoRegistry.TASK, TaskListPage.class);
+    addMountPages(DaoRegistry.TASK, TaskListPage.class, TaskEditPage.class);
+    register(DaoRegistry.BOOK, BookListPage.class);
+    addMountPages(DaoRegistry.BOOK, BookListPage.class, BookEditPage.class);
+    register(DaoRegistry.RECHNUNG, RechnungListPage.class);
+    addMountPages(DaoRegistry.RECHNUNG, RechnungListPage.class, RechnungEditPage.class);
+    register(DaoRegistry.EINGANGSRECHNUNG, EingangsrechnungListPage.class);
+    addMountPages(DaoRegistry.EINGANGSRECHNUNG, EingangsrechnungListPage.class, EingangsrechnungEditPage.class);
+    register(DaoRegistry.USER, UserListPage.class);
+    addMountPages(DaoRegistry.USER, UserListPage.class, UserEditPage.class);
+    register(DaoRegistry.GROUP, GroupListPage.class);
+    addMountPages(DaoRegistry.GROUP, GroupListPage.class, GroupEditPage.class);
+    register(DaoRegistry.ACCESS, AccessListPage.class);
+    addMountPages(DaoRegistry.ACCESS, AccessListPage.class, AccessEditPage.class);
+    register(DaoRegistry.BUCHUNGSSATZ);// TODO: , BuchungssatzListPage.class);
+    // addMountPages(DaoRegistry.Buchungssatz, BuchungssatzListPage.class, BuchungssatzEditPage.class);
+    register(DaoRegistry.KOST1, Kost1ListPage.class);
+    addMountPages(DaoRegistry.KOST1, Kost1ListPage.class, Kost1EditPage.class);
+    register(DaoRegistry.KOST2, Kost2ListPage.class);
+    addMountPages(DaoRegistry.KOST2, Kost2ListPage.class, Kost2EditPage.class);
+    register(DaoRegistry.KOST2_ART, Kost2ArtListPage.class);
+    addMountPages(DaoRegistry.KOST2_ART, Kost2ArtListPage.class, Kost2ArtEditPage.class);
+    register(DaoRegistry.KONTO, KontoListPage.class);
+    addMountPages(DaoRegistry.KONTO, KontoListPage.class, KontoEditPage.class);
+    register(DaoRegistry.KUNDE);// TODO: , KundeListPage.class);
+    // addMountPages(DaoRegistry.KUNDE, KundeListPage.class, KundeEditPage.class);
+    register(DaoRegistry.PROJEKT, ProjektListPage.class);
+    addMountPages(DaoRegistry.PROJEKT, ProjektListPage.class, ProjektEditPage.class);
+    // register(DaoRegistry.ORDERBOOK, AuftragListPage.class);
+    addMountPages(DaoRegistry.ORDERBOOK, AuftragListPage.class, AuftragEditPage.class);
 
+    addMountPages("bankAccount", BankAccountListPage.class, BankAccountEditPage.class);
+    addMountPages("contract", ContractListPage.class, ContractEditPage.class);
+    addMountPages("ganttChart", GanttChartListPage.class, GanttChartEditPage.class);
+    addMountPages("hrPlanning", HRPlanningListPage.class, HRPlanningEditPage.class);
+    addMountPage("hrList", HRListPage.class);
+    addMountPages("meb", MebListPage.class, MebEditPage.class);
+    addMountPages("postausgang", PostausgangListPage.class, PostausgangEditPage.class);
+    addMountPages("posteingangList", PosteingangListPage.class, PosteingangEditPage.class);
+    addMountPages("script", ScriptListPage.class, ScriptEditPage.class);
+    addMountPages("userPref", UserPrefListPage.class, UserPrefEditPage.class);
+
+    addMountPage("admin", AdminPage.class);
+    addMountPage("imageCropper", ImageCropperPage.class);
+    addMountPage("calendar", CalendarPage.class);
+    addMountPage("changePassword", ChangePasswordPage.class);
+    addMountPage("configuration", ConfigurationListPage.class);
+    addMountPage("error", ErrorPage.class);
+    addMountPage("feedback", FeedbackPage.class);
+    addMountPage("gwikiContainer", GWikiContainerPage.class);
+    addMountPage(BOOKMARK_LOGIN, LoginPage.class);
+    addMountPage("myAccount", MyAccountEditPage.class);
+    addMountPage("personalStatistics", PersonalStatisticsPage.class);
+    addMountPage("phoneCall", PhoneCallPage.class);
+    addMountPage("search", SearchPage.class);
+    addMountPage("sendSms", SendSmsPage.class);
+    addMountPage("setup", SetupPage.class);
+    addMountPage("systemStatistics", SystemStatisticsPage.class);
+    addMountPage("systemUpdate", UpdatePage.class);
+    addMountPage("taskTree", TaskTreePage.class);
+    addMountPage("tutorial", TutorialPage.class);
   }
 }

@@ -54,9 +54,9 @@ public class DaoRegistry
 
   private static boolean initialized = false;
 
-  public static final String PROJEKT = "projekt";
+  public static final String PROJEKT = "project";
 
-  public static final String KUNDE = "kunde";
+  public static final String KUNDE = "customer";
 
   public static final String ORDERBOOK = "orderBook";
 

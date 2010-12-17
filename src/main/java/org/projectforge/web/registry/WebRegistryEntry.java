@@ -38,6 +38,8 @@ import org.projectforge.web.wicket.IListPageColumnsCreator;
  */
 public class WebRegistryEntry
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(WebRegistryEntry.class);
+
   private RegistryEntry registryEntry;
 
   private Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass;
@@ -51,6 +53,20 @@ public class WebRegistryEntry
     Validate.notNull(id);
     registryEntry = Registry.instance().getEntry(id);
     Validate.notNull(registryEntry);
+  }
+
+  /**
+   * Id must be found in {@link Registry}.
+   * @param id
+   */
+  public WebRegistryEntry(final String id, final Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass)
+  {
+    Validate.notNull(id);
+    registryEntry = Registry.instance().getEntry(id);
+    this.listPageColumnsCreatorClass = listPageColumnsCreatorClass;
+    if (registryEntry == null) {
+      log.error("Object with id '" + id + "' isn't registered in Registry!");
+    }
   }
 
   public WebRegistryEntry(final RegistryEntry registryEntry)
