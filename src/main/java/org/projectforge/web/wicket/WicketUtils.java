@@ -688,7 +688,7 @@ public class WicketUtils
         || ContextImage.class.isAssignableFrom(component.getClass()) == true) {
       return component;
     }
-    component.add(new SimpleAttributeModifier("style", "font-style: italic;"));
+    component.add(new AttributeAppendModifier("class", " hastooltip")); // TODO: KAI humm, perhaps it's better to add that space per default?
     return component;
   }
 

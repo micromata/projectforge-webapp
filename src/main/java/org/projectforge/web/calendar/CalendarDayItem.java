@@ -69,7 +69,7 @@ public class CalendarDayItem extends WebMarkupContainer
   {
     String cssClass;
     if (day.isToday() == true) {
-      cssClass = "today";
+			cssClass = "today";
     } else if (day.isMarker() == true) {
       cssClass = "other-month";
     } else if (day.isWorkingDay() == false) {
@@ -125,8 +125,8 @@ public class CalendarDayItem extends WebMarkupContainer
       };
     };
     add(selectDayButton);
-    selectDayButton.add(new PlainLabel("dayOfMonth", String.valueOf(day.getDayOfMonth())));
-    final Label dayOfMonthLabel = new PlainLabel("dayOfMonth", String.valueOf(day.getDayOfMonth()));
+    selectDayButton.add(new Label("dayOfMonth", String.valueOf(day.getDayOfMonth())));
+    final Label dayOfMonthLabel = new Label("dayOfMonth", String.valueOf(day.getDayOfMonth()));
     add(dayOfMonthLabel);
     if (isSelectMode() == true) {
       dayOfMonthLabel.setVisible(false);
@@ -267,7 +267,7 @@ public class CalendarDayItem extends WebMarkupContainer
       }
     };
     displayBreak.add(timePeriodLink);
-    final String timePeriodString = getFormattedTimeOfDay(timesheet.getStartTime()) + "-" + getFormattedTimeOfDay(timesheet.getStopTime());
+    final String timePeriodString = getFormattedTimeOfDay(timesheet.getStartTime()) + " - " + getFormattedTimeOfDay(timesheet.getStopTime());
     timePeriodLink.add(new PlainLabel("timePeriod", timePeriodString));
     final Label timePeriodLabel = new PlainLabel("timePeriod", timePeriodString);
     displayBreak.add(timePeriodLabel);
@@ -358,9 +358,9 @@ public class CalendarDayItem extends WebMarkupContainer
     }
     final Label label = new Label("birthday", buf.toString());
     if (birthdayAddress.isFavorite() == true) {
-      label.add(new SimpleAttributeModifier("style", "color: green; font-weight: bold;"));
+      label.add(new SimpleAttributeModifier("class", "birthday favourite"));
     } else {
-      label.add(new SimpleAttributeModifier("style", "color: black; font-weight: normal;"));
+      label.add(new SimpleAttributeModifier("class", "birthday employee"));
     }
     label.setEscapeModelStrings(false);
     item.add(label);

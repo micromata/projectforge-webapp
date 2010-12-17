@@ -152,30 +152,56 @@ float: left;
 margin: 0;
 padding: 0;
 width: 100%;
-max-height: 80%;
 overflow: hidden;
-font-size: 9px;
-color: red;
+
 }
 
-#content table.calendar tr td p span.calendartimesheet,
-#content table.calendar tr td span.holiday {
+
+#content table.calendar tr td span.holiday,
+#content table.calendar tr td span.calendartimesheet,
+#content table.calendar tr td span.birthday {
 	white-space: nowrap;
-	font-size: 0.8em;
-	color: #5C6970;
-	background: #F0F5F7;
+/*	font-size: 0.8em;*/
 	padding: 0.1em 0.5em;
 	margin: 0.2em;
 	-moz-border-radius: 0.7em;
 	-webkit-border-radius: 0.7em;
 	border-radius: 0.7em;
-	border: 1px solid #D9DFE1;
 	text-decoration: none;
 	display: block;
-	
+}
+#content table.calendar tr td span.calendartimesheet {
+	font-size:1em;
+	background: #BBC1C3;
+	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#E8E8E8),color-stop(1,#BBC1C3));
+	background: -moz-linear-gradient(top,#E8E8E8,#BBC1C3);
+	color: #5C6970;
+	border: 1px solid #D9DFE1;
 }
 
-#content table.calendar tr td p span.calendartimesheet a,
+#content table.calendar tr td span.holiday{
+	background: #E8E5D5;
+	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#E8E5D5),color-stop(1,#CCC1A1));
+	background: -moz-linear-gradient(top,#E8E5D5,#CCC1A1);
+	color: #AE9962;
+	border: 1px solid #AE9962;
+}
+
+#content table.calendar tr td span.birthday{
+	background: #E8E5D5;
+	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#C71E38),color-stop(1,#951C1E));
+	background: -moz-linear-gradient(top,#C71E38,#951C1E);
+	color: #660E11;
+	border: 1px solid #660E11; /*TODO: Find more humane colour */
+}
+
+#content table.calendar tr td span.birthday:before{
+	content: "3 ";	
+	font-family: EmbatsSymbols;
+
+}
+
+#content table.calendar tr td span.calendartimesheet a,
 #content table.calendar tr td span.holiday a{
 	text-decoration: none;
 }
@@ -183,25 +209,43 @@ color: red;
 
 #content table.calendar tr td p span.calendartimesheet a.time,
 #content table.calendar tr td p span.calendartimesheet a.entry {
-	
-
-	color:red;
+	color: #2274AC;
 }
-#content table.calendar tr td p span.calendartimesheet a.time.start {color:lime; font-weight:bold;}
-#content table.calendar tr td p span.calendartimesheet a.time.stop {color:maroon; font-weight:bold;}
+
+#content table.calendar tr td p span.calendartimesheet a.entry:after {
+	content: "4";
+	font-family:EmbatsSymbols; 
+}
+#content table.calendar tr td p span.calendartimesheet a.time.start {color: #00B1EB; }
+#content table.calendar tr td p span.calendartimesheet a.time.stop {color: #00B1EB; }
+
+
+#content table.calendar tr td p span.calendartimesheet a.time.start:before {
+	content: "t";
+	font-family:Embats; 
+}
+#content table.calendar tr td p span.calendartimesheet a.time.stop:after{
+	content: "q";
+	font-family:Embats; 
+}
+#content table.calendar tr td p span.calendartimesheet a.time.break:before {
+	content: "q";
+	font-family:Embats; 
+}
+#content table.calendar tr td p span.calendartimesheet a.time.break:after{
+	content: "t";
+	font-family:Embats; 
+}
+
 
 #content table.calendar tr td span.duration {
-	float:right;
+	top: 0.5em;
+	left: 30%;
+	position: relative;
+	vertical-align: top;
 }
 
-#content table.calendar tr td span.holiday {
-	color: #AE9962;
-	background: #E8E5D5;
-	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#E8E5D5),color-stop(1,#CCC1A1));
-	background: -moz-linear-gradient(top,#E8E5D5,#CCC1A1);
-	border-color: #AE9962;
-	font-weight: normal;
-}
+
 
 
 
@@ -219,7 +263,7 @@ color: red;
 background-color: #ffffff;
 }
 #content table.calendar tr td.today {
-background-color: #DBECDA;
+background-color: #D6EAF5;
 }
 #content table.calendar td.non-working-day {
 background-color: #EFF8BF;
@@ -230,9 +274,9 @@ color: #84A300;
 #content table.calendar td.non-working-day.hover{
 	background-color: #D7F33D;
 }
-#content table.calendar td.holiday-working-day {
+#content table.calendar td.holiday-working-day .day {
 font-weight: bold;
-color: green;
+color: #AE9962;
 }
 #content table.calendar tr td.hover,#content table.calendar tr th.hover {
 background-color: #F0F5F7;
