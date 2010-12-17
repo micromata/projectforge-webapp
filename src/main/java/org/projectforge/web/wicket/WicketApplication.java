@@ -37,6 +37,7 @@ import org.apache.wicket.Request;
 import org.apache.wicket.RequestCycle;
 import org.apache.wicket.Response;
 import org.apache.wicket.Session;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebRequestCycle;
@@ -57,55 +58,9 @@ import org.projectforge.database.HibernateUtils;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserXmlPreferencesCache;
-import org.projectforge.web.LoginPage;
 import org.projectforge.web.UserFilter;
-import org.projectforge.web.access.AccessListPage;
-import org.projectforge.web.address.AddressListPage;
-import org.projectforge.web.address.AddressViewPage;
-import org.projectforge.web.address.PhoneCallPage;
-import org.projectforge.web.address.SendSmsPage;
-import org.projectforge.web.admin.AdminPage;
-import org.projectforge.web.admin.SetupPage;
-import org.projectforge.web.admin.UpdatePage;
-import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
-import org.projectforge.web.core.ConfigurationListPage;
-import org.projectforge.web.core.SearchPage;
-import org.projectforge.web.doc.TutorialPage;
-import org.projectforge.web.fibu.AuftragEditPage;
-import org.projectforge.web.fibu.AuftragListPage;
-import org.projectforge.web.fibu.BankAccountListPage;
-import org.projectforge.web.fibu.CustomerListPage;
-import org.projectforge.web.fibu.EingangsrechnungListPage;
-import org.projectforge.web.fibu.KontoListPage;
-import org.projectforge.web.fibu.Kost1ListPage;
-import org.projectforge.web.fibu.Kost2ArtListPage;
-import org.projectforge.web.fibu.Kost2ListPage;
-import org.projectforge.web.fibu.ProjektListPage;
-import org.projectforge.web.fibu.RechnungListPage;
-import org.projectforge.web.gantt.GanttChartEditPage;
-import org.projectforge.web.gantt.GanttChartListPage;
-import org.projectforge.web.gwiki.GWikiContainerPage;
-import org.projectforge.web.humanresources.HRListPage;
-import org.projectforge.web.humanresources.HRPlanningListPage;
-import org.projectforge.web.imagecropper.ImageCropperPage;
-import org.projectforge.web.meb.MebListPage;
-import org.projectforge.web.orga.ContractListPage;
-import org.projectforge.web.orga.PostausgangListPage;
-import org.projectforge.web.orga.PosteingangListPage;
-import org.projectforge.web.scripting.ScriptListPage;
-import org.projectforge.web.statistics.PersonalStatisticsPage;
-import org.projectforge.web.statistics.SystemStatisticsPage;
-import org.projectforge.web.task.TaskEditPage;
-import org.projectforge.web.task.TaskListPage;
-import org.projectforge.web.task.TaskTreePage;
-import org.projectforge.web.timesheet.TimesheetEditPage;
-import org.projectforge.web.timesheet.TimesheetListPage;
-import org.projectforge.web.user.ChangePasswordPage;
-import org.projectforge.web.user.GroupListPage;
-import org.projectforge.web.user.MyAccountEditPage;
-import org.projectforge.web.user.UserListPage;
-import org.projectforge.web.user.UserPrefListPage;
+import org.projectforge.web.registry.WebRegistry;
 import org.projectforge.web.wicket.converter.MyDateConverter;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -123,108 +78,6 @@ public class WicketApplication extends WebApplication
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(WicketApplication.class);
 
   public static final String RESOURCE_BUNDLE_NAME = "I18nResources";
-
-  private static final String BOOKMARK_ACCESS_LIST = "accessList";
-
-  private static final String BOOKMARK_ADMIN = "admin";
-
-  private static final String BOOKMARK_ADDRESS_LIST = "addressList";
-
-  private static final String BOOKMARK_ADDRESS_VIEW = "addressView";
-
-  private static final String BOOKMARK_AUFTRAG_EDIT = "editAuftrag";
-
-  private static final String BOOKMARK_AUFTRAG_LIST = "auftragList";
-
-  private static final String BOOKMARK_BANK_ACCOUNT_LIST = "bankAccountList";
-
-  private static final String BOOKMARK_BOOK_LIST = "bookList";
-
-  private static final String BOOKMARK_CALENDAR_PAGE = "calendar";
-
-  private static final String BOOKMARK_CHANGE_PASSWORD = "changePassword";
-
-  private static final String BOOKMARK_CONFIGURATION_PAGE = "configuration";
-
-  private static final String BOOKMARK_CONTRACT_LIST = "contractList";
-
-  private static final String BOOKMARK_CUSTOMER_LIST = "customerList";
-
-  private static final String BOOKMARK_EINGANGS_RECHNUNG_LIST = "eingangsRechnungList";
-
-  private static final String BOOKMARK_ERROR_PAGE = "error";
-
-  private static final String BOOKMARK_FEEDBACK_PAGE = "feedback";
-
-  private static final String BOOKMARK_GANTT_EDIT = "ganttEdit";
-
-  private static final String BOOKMARK_GANTT_LIST = "ganttList";
-
-  private static final String BOOKMARK_GROUP_LIST = "groupList";
-
-  private static final String BOOKMARK_GWIKI_CONTAINER_PAGE = "gwikiContainer";
-
-  private static final String BOOKMARK_HR_PLANNING_LIST = "hrPlanningList";
-
-  private static final String BOOKMARK_HR_LIST = "hrList";
-
-  private static final String BOOKMARK_IMAGECROPPER = "imageCropper";
-
-  private static final String BOOKMARK_KONTO_LIST = "kontoList";
-
-  private static final String BOOKMARK_KOST1_LIST = "kost1List";
-
-  private static final String BOOKMARK_KOST2_LIST = "kost2List";
-
-  private static final String BOOKMARK_KOST2ART_LIST = "kost2ArtList";
-
-  public static final String BOOKMARK_LOGIN = "login";
-
-  private static final String BOOKMARK_MEB_LIST = "mebList";
-
-  private static final String BOOKMARK_MY_ACCOUNT = "myAccount";
-
-  private static final String BOOKMARK_PERSONAL_STATISTICS = "personalStatistics";
-
-  private static final String BOOKMARK_PHONE_CALL = "phoneCall";
-
-  private static final String BOOKMARK_POSTAUSGANG_LIST = "postausgangList";
-
-  private static final String BOOKMARK_POSTEINGANG_LIST = "posteingangList";
-
-  private static final String BOOKMARK_PROJEKT_LIST = "projektList";
-
-  private static final String BOOKMARK_RECHNUNG_LIST = "rechnungList";
-
-  private static final String BOOKMARK_SCRIPT_LIST = "scriptList";
-
-  private static final String BOOKMARK_SEARCH_PAGE = "search";
-
-  private static final String BOOKMARK_SEND_SMS = "sendSms";
-
-  private static final String BOOKMARK_SETUP_PAGE = "setup";
-
-  private static final String BOOKMARK_SYSTEM_STATISTICS = "systemStatistics";
-
-  private static final String BOOKMARK_SYSTEM_UPDATE = "systemUpdate";
-
-  private static final String BOOKMARK_TASK_EDIT = "taskEdit";
-
-  private static final String BOOKMARK_TASK_TREE = "taskTree";
-
-  private static final String BOOKMARK_TASK_LIST = "taskList";
-
-  private static final String BOOKMARK_TIMESHEET_LIST = "timesheetList";
-
-  private static final String BOOKMARK_TIMESHEET_EDIT = "timesheetEdit";
-
-  private static final String BOOKMARK_TUTORIAL = "tutorial";
-
-  private static final String BOOKMARK_USER_LIST = "userList";
-
-  private static final String BOOKMARK_USER_PREF_LIST = "userPrefList";
-
-  private static final String BOOKMARK_VIEW_ADDRESS = "viewAddress";
 
   private static Boolean developmentModus;
 
@@ -363,58 +216,6 @@ public class WicketApplication extends WebApplication
     getApplicationSettings().setPageExpiredErrorPage(PageExpiredPage.class); // Don't show expired page.
     getSessionSettings().setMaxPageMaps(20); // Map up to 20 pages per session (default is 5).
     addComponentInstantiationListener(new SpringComponentInjector(this));
-    // mountPage("login", LoginPage.class);
-    mountPage(BOOKMARK_IMAGECROPPER, ImageCropperPage.class);
-    mountPage(BOOKMARK_ACCESS_LIST, AccessListPage.class);
-    mountPage(BOOKMARK_ADMIN, AdminPage.class);
-    mountPage(BOOKMARK_ADDRESS_LIST, AddressListPage.class);
-    mountPage(BOOKMARK_ADDRESS_VIEW, AddressViewPage.class);
-    mountPage(BOOKMARK_AUFTRAG_LIST, AuftragListPage.class);
-    mountPage(BOOKMARK_AUFTRAG_EDIT, AuftragEditPage.class);
-    mountPage(BOOKMARK_BANK_ACCOUNT_LIST, BankAccountListPage.class);
-    mountPage(BOOKMARK_BOOK_LIST, BookListPage.class);
-    mountPage(BOOKMARK_CALENDAR_PAGE, CalendarPage.class);
-    mountPage(BOOKMARK_CHANGE_PASSWORD, ChangePasswordPage.class);
-    mountPage(BOOKMARK_CONFIGURATION_PAGE, ConfigurationListPage.class);
-    mountPage(BOOKMARK_CONTRACT_LIST, ContractListPage.class);
-    mountPage(BOOKMARK_CUSTOMER_LIST, CustomerListPage.class);
-    mountPage(BOOKMARK_EINGANGS_RECHNUNG_LIST, EingangsrechnungListPage.class);
-    mountPage(BOOKMARK_ERROR_PAGE, ErrorPage.class);
-    mountPage(BOOKMARK_FEEDBACK_PAGE, FeedbackPage.class);
-    mountPage(BOOKMARK_GANTT_EDIT, GanttChartEditPage.class);
-    mountPage(BOOKMARK_GANTT_LIST, GanttChartListPage.class);
-    mountPage(BOOKMARK_GROUP_LIST, GroupListPage.class);
-    mountPage(BOOKMARK_GWIKI_CONTAINER_PAGE, GWikiContainerPage.class);
-    mountPage(BOOKMARK_KONTO_LIST, KontoListPage.class);
-    mountPage(BOOKMARK_KOST1_LIST, Kost1ListPage.class);
-    mountPage(BOOKMARK_KOST2_LIST, Kost2ListPage.class);
-    mountPage(BOOKMARK_KOST2ART_LIST, Kost2ArtListPage.class);
-    mountPage(BOOKMARK_LOGIN, LoginPage.class);
-    mountPage(BOOKMARK_PROJEKT_LIST, ProjektListPage.class);
-    mountPage(BOOKMARK_RECHNUNG_LIST, RechnungListPage.class);
-    mountPage(BOOKMARK_MEB_LIST, MebListPage.class);
-    mountPage(BOOKMARK_MY_ACCOUNT, MyAccountEditPage.class);
-    mountPage(BOOKMARK_PERSONAL_STATISTICS, PersonalStatisticsPage.class);
-    mountPage(BOOKMARK_PHONE_CALL, PhoneCallPage.class);
-    mountPage(BOOKMARK_POSTAUSGANG_LIST, PostausgangListPage.class);
-    mountPage(BOOKMARK_POSTEINGANG_LIST, PosteingangListPage.class);
-    mountPage(BOOKMARK_HR_PLANNING_LIST, HRPlanningListPage.class);
-    mountPage(BOOKMARK_HR_LIST, HRListPage.class);
-    mountPage(BOOKMARK_SCRIPT_LIST, ScriptListPage.class);
-    mountPage(BOOKMARK_SEARCH_PAGE, SearchPage.class);
-    mountPage(BOOKMARK_SEND_SMS, SendSmsPage.class);
-    mountPage(BOOKMARK_SETUP_PAGE, SetupPage.class);
-    mountPage(BOOKMARK_SYSTEM_STATISTICS, SystemStatisticsPage.class);
-    mountPage(BOOKMARK_SYSTEM_UPDATE, UpdatePage.class);
-    mountPage(BOOKMARK_TASK_EDIT, TaskEditPage.class);
-    mountPage(BOOKMARK_TASK_TREE, TaskTreePage.class);
-    mountPage(BOOKMARK_TASK_LIST, TaskListPage.class);
-    mountPage(BOOKMARK_TIMESHEET_LIST, TimesheetListPage.class);
-    mountPage(BOOKMARK_TIMESHEET_EDIT, TimesheetEditPage.class);
-    mountPage(BOOKMARK_TUTORIAL, TutorialPage.class);
-    mountPage(BOOKMARK_USER_LIST, UserListPage.class);
-    mountPage(BOOKMARK_USER_PREF_LIST, UserPrefListPage.class);
-    mountPage(BOOKMARK_VIEW_ADDRESS, AddressViewPage.class);
     getApplicationSettings().setInternalErrorPage(ErrorPage.class);
 
     final WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
@@ -445,6 +246,9 @@ public class WicketApplication extends WebApplication
       throw new RuntimeException("this.wicketApplicationFilter is null");
     }
     daoRegistry.init();
+    for (Map.Entry<String, Class< ? extends WebPage>> mountPage : WebRegistry.instance().getMountPages().entrySet()) {
+      mountPage(mountPage.getKey(), mountPage.getValue());
+    }
     getResourceSettings().setLocalizer(new MyLocalizer("edit/StandardI18n"));
     log.info("Default TimeZone is: " + TimeZone.getDefault());
     log.info("user.timezone is: " + System.getProperty("user.timezone"));
