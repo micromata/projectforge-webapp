@@ -46,6 +46,16 @@ public class NumberFormatter
    * Uses the scale of the BigDecimal. Uses the PFUserContext locale.
    * @param value
    */
+  public static String format(final long value)
+  {
+    final NumberFormat format = NumberFormat.getNumberInstance(PFUserContext.getLocale());
+    return format.format(value);
+  }
+
+  /**
+   * Uses the scale of the BigDecimal. Uses the PFUserContext locale.
+   * @param value
+   */
   public static String format(final BigDecimal value)
   {
     if (value == null) {
