@@ -30,6 +30,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -43,18 +44,19 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 @ListPage(editPage = GroupEditPage.class)
-public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, GroupDO>
+public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, GroupDO> implements IListPageColumnsCreator<GroupDO>
 {
   private static final long serialVersionUID = 3124148202828889250L;
 
   @SpringBean(name = "groupDao")
   private GroupDao groupDao;
 
-  public GroupListPage(PageParameters parameters)
+  public GroupListPage(final PageParameters parameters)
   {
     super(parameters, "group");
   }
@@ -66,10 +68,9 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
 
   @SuppressWarnings("serial")
   @Override
-  protected void init()
+  public List<IColumn<GroupDO>> createColumns(final WebPage returnToPage)
   {
     final List<IColumn<GroupDO>> columns = new ArrayList<IColumn<GroupDO>>();
-
     final CellItemListener<GroupDO> cellItemListener = new CellItemListener<GroupDO>() {
       public void populateItem(Item<ICellPopulator<GroupDO>> item, String componentId, IModel<GroupDO> rowModel)
       {
@@ -91,8 +92,7 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
           item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, group.getId(), group.getName()));
           addRowClick(item);
         } else if (updateAccess == true) {
-          item
-              .add(new ListSelectActionPanel(componentId, rowModel, GroupEditPage.class, group.getId(), GroupListPage.this, group.getName()));
+          item.add(new ListSelectActionPanel(componentId, rowModel, GroupEditPage.class, group.getId(), returnToPage, group.getName()));
           addRowClick(item);
         } else {
           item.add(new Label(componentId, group.getName()));
@@ -106,7 +106,13 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("group.assignedUsers")), "usernames", "usernames",
         cellItemListener));
-    dataTable = createDataTable(columns, "name", true);
+    return columns;
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this), "name", true);
     form.add(dataTable);
   }
 

@@ -31,6 +31,7 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -46,18 +47,19 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 @ListPage(editPage = UserEditPage.class)
-public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUserDO>
+public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUserDO> implements IListPageColumnsCreator<PFUserDO>
 {
   private static final long serialVersionUID = 4408701323868106520L;
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
-  public UserListPage(PageParameters parameters)
+  public UserListPage(final PageParameters parameters)
   {
     super(parameters, "user");
   }
@@ -69,11 +71,10 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
 
   @SuppressWarnings("serial")
   @Override
-  protected void init()
+  public List<IColumn<PFUserDO>> createColumns(final WebPage returnToPage)
   {
     final boolean updateAccess = userDao.hasAccess(null, null, OperationType.UPDATE, false);
-    List<IColumn<PFUserDO>> columns = new ArrayList<IColumn<PFUserDO>>();
-
+    final List<IColumn<PFUserDO>> columns = new ArrayList<IColumn<PFUserDO>>();
     final CellItemListener<PFUserDO> cellItemListener = new CellItemListener<PFUserDO>() {
       public void populateItem(Item<ICellPopulator<PFUserDO>> item, String componentId, IModel<PFUserDO> rowModel)
       {
@@ -94,8 +95,7 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
           item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, user.getId(), user.getUsername()));
           addRowClick(item);
         } else if (updateAccess == true) {
-          item
-              .add(new ListSelectActionPanel(componentId, rowModel, UserEditPage.class, user.getId(), UserListPage.this, user.getUsername()));
+          item.add(new ListSelectActionPanel(componentId, rowModel, UserEditPage.class, user.getId(), returnToPage, user.getUsername()));
           addRowClick(item);
         } else {
           item.add(new Label(componentId, user.getUsername()));
@@ -152,7 +152,13 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
         }
       });
     }
-    dataTable = createDataTable(columns, "username", true);
+    return columns;
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this), "username", true);
     form.add(dataTable);
   }
 
