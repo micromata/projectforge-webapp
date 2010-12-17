@@ -48,7 +48,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.meb.SMSReceiverServlet;
-import org.projectforge.web.wicket.WicketApplication;
+import org.projectforge.web.registry.WebRegistry;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -74,7 +74,7 @@ public class UserFilter implements Filter
 
   private static UserDao userDao;
 
-  private final static String LOGIN_URL = "/wa/" + WicketApplication.BOOKMARK_LOGIN;
+  private final static String LOGIN_URL = "/wa/" + WebRegistry.BOOKMARK_LOGIN;
 
   public static void initialize(final UserDao userDao, final String contextPath)
   {
