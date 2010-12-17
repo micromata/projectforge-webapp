@@ -82,7 +82,7 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<ProjektDO>> createColumns(final WebPage returnToPage)
+  public List<IColumn<ProjektDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<ProjektDO>> columns = new ArrayList<IColumn<ProjektDO>>();
     CellItemListener<ProjektDO> cellItemListener = new CellItemListener<ProjektDO>() {
@@ -99,8 +99,8 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.projekt.nummer")), "kost", "kost",
-        cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.projekt.nummer")), getSortable("kost",
+        sortable), "kost", cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
@@ -117,18 +117,18 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
         addRowClick(item);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.projekt.identifier")), "identifier",
-        "identifier", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.kunde.name")), "kunde.name", "kunde.name",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.projekt.name")), "name", "name",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.kunde.division")), "kunde.division",
-        "kunde.division", cellItemListener));
-    columns.add(new TaskPropertyColumn<ProjektDO>(this, getString("task"), "task.title", "task", cellItemListener)
+    columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.projekt.identifier")), getSortable(
+        "identifier", sortable), "identifier", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.kunde.name")), getSortable("kunde.name",
+        sortable), "kunde.name", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.projekt.name")), getSortable("name",
+        sortable), "name", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.kunde.division")), getSortable(
+        "kunde.division", sortable), "kunde.division", cellItemListener));
+    columns.add(new TaskPropertyColumn<ProjektDO>(this, getString("task"), getSortable("task.title", sortable), "task", cellItemListener)
         .withTaskFormatter(taskFormatter));
-    columns
-        .add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("status")), getSortable("status", sortable),
+        "status", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.projekt.projektManagerGroup")), null,
         "projektManagerGroup", cellItemListener) {
       @SuppressWarnings("unchecked")
@@ -164,15 +164,15 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("description")), "description", "description",
-        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("description")), getSortable("description",
+        sortable), "description", cellItemListener));
     return columns;
   }
 
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this), "kost", true);
+    dataTable = createDataTable(createColumns(this, true), "kost", true);
     form.add(dataTable);
   }
 

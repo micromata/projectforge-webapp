@@ -90,7 +90,7 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<Kost2DO>> createColumns(final WebPage returnToPage)
+  public List<IColumn<Kost2DO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<Kost2DO>> columns = new ArrayList<IColumn<Kost2DO>>();
     CellItemListener<Kost2DO> cellItemListener = new CellItemListener<Kost2DO>() {
@@ -103,8 +103,8 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("fibu.kost2")), "formattedNumber",
-        "formattedNumber", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("fibu.kost2")), getSortable("formattedNumber",
+        sortable), "formattedNumber", cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
@@ -122,10 +122,10 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
         addRowClick(item);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("fibu.kost2.art")), "kost2Art.name",
-        "kost2Art.name", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("fibu.fakturiert")), "kost2Art.fakturiert",
-        "kost2Art.fakturiert", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("fibu.kost2.art")), getSortable("kost2Art.name",
+        sortable), "kost2Art.name", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("fibu.fakturiert")), getSortable(
+        "kost2Art.fakturiert", sortable), "kost2Art.fakturiert", cellItemListener) {
       @Override
       public void populateItem(Item<ICellPopulator<Kost2DO>> item, String componentId, IModel<Kost2DO> rowModel)
       {
@@ -140,25 +140,25 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("fibu.kost2.workFraction")), "workFraction",
-        "workFraction", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("fibu.kunde")), "projekt.kunde.name",
-        "projekt.kunde.name", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("fibu.projekt")), "projekt.name", "projekt.name",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("status")), "kostentraegerStatus",
-        "kostentraegerStatus", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("description")), "description", "description",
-        cellItemListener));
-    columns
-        .add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("comment")), "comment", "comment", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("fibu.kost2.workFraction")), getSortable(
+        "workFraction", sortable), "workFraction", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("fibu.kunde")), getSortable("projekt.kunde.name",
+        sortable), "projekt.kunde.name", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("fibu.projekt")), getSortable("projekt.name",
+        sortable), "projekt.name", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("status")), getSortable("kostentraegerStatus",
+        sortable), "kostentraegerStatus", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("description")), getSortable("description",
+        sortable), "description", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("comment")), getSortable("comment", sortable),
+        "comment", cellItemListener));
     return columns;
   }
 
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this), "formattedNumber", true);
+    dataTable = createDataTable(createColumns(this, true), "formattedNumber", true);
     form.add(dataTable);
   }
 

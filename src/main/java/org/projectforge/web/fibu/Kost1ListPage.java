@@ -78,7 +78,7 @@ public class Kost1ListPage extends AbstractListPage<Kost1ListForm, Kost1Dao, Kos
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<Kost1DO>> createColumns(final WebPage returnToPage)
+  public List<IColumn<Kost1DO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<Kost1DO>> columns = new ArrayList<IColumn<Kost1DO>>();
     CellItemListener<Kost1DO> cellItemListener = new CellItemListener<Kost1DO>() {
@@ -91,7 +91,7 @@ public class Kost1ListPage extends AbstractListPage<Kost1ListForm, Kost1Dao, Kos
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<Kost1DO>(new Model<String>(getString("fibu.kost1")), "formattedNumber",
+    columns.add(new CellItemListenerPropertyColumn<Kost1DO>(new Model<String>(getString("fibu.kost1")), getSortable("formattedNumber", sortable),
         "formattedNumber", cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
@@ -110,9 +110,9 @@ public class Kost1ListPage extends AbstractListPage<Kost1ListForm, Kost1Dao, Kos
         addRowClick(item);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<Kost1DO>(new Model<String>(getString("description")), "description", "description",
+    columns.add(new CellItemListenerPropertyColumn<Kost1DO>(new Model<String>(getString("description")), getSortable("description", sortable), "description",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<Kost1DO>(new Model<String>(getString("status")), "kostentraegerStatus",
+    columns.add(new CellItemListenerPropertyColumn<Kost1DO>(new Model<String>(getString("status")), getSortable("kostentraegerStatus", sortable),
         "kostentraegerStatus", cellItemListener));
     return columns;
   }
@@ -120,7 +120,7 @@ public class Kost1ListPage extends AbstractListPage<Kost1ListForm, Kost1Dao, Kos
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this), "formattedNumber", true);
+    dataTable = createDataTable(createColumns(this, true), "formattedNumber", true);
     form.add(dataTable);
   }
 

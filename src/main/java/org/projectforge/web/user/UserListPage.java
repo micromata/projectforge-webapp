@@ -71,7 +71,7 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<PFUserDO>> createColumns(final WebPage returnToPage)
+  public List<IColumn<PFUserDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final boolean updateAccess = userDao.hasAccess(null, null, OperationType.UPDATE, false);
     final List<IColumn<PFUserDO>> columns = new ArrayList<IColumn<PFUserDO>>();
@@ -85,7 +85,7 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("user.username"), "username", "username", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("user.username"), getSortable("username", sortable), "username", cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
@@ -103,11 +103,11 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("name"), "lastname", "lastname", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("firstName"), "firstname", "firstname", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("user.personalPhoneIdentifiers"), "personalPhoneIdentifiers",
+    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("name"), getSortable("lastname", sortable), "lastname", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("firstName"), getSortable("firstname", sortable), "firstname", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("user.personalPhoneIdentifiers"), getSortable("personalPhoneIdentifiers", sortable),
         "personalPhoneIdentifiers", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("description"), "description", "description", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("description"), getSortable("description", sortable), "description", cellItemListener));
     if (updateAccess == true) {
       // Show these columns only for admin users:
       columns.add(new AbstractColumn<PFUserDO>(new Model<String>(getString("user.assignedGroups"))) {
@@ -158,7 +158,7 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this), "username", true);
+    dataTable = createDataTable(createColumns(this, true), "username", true);
     form.add(dataTable);
   }
 

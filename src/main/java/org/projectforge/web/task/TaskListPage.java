@@ -226,9 +226,9 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
     }
     return false;
   }
-  
+
   @SuppressWarnings("serial")
-  public List<IColumn<TaskDO>> createColumns(final WebPage returnToPage)
+  public List<IColumn<TaskDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final CellItemListener<TaskDO> cellItemListener = new CellItemListener<TaskDO>() {
       public void populateItem(Item<ICellPopulator<TaskDO>> item, String componentId, IModel<TaskDO> rowModel)
@@ -241,7 +241,8 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
       }
     };
     final List<IColumn<TaskDO>> columns = new ArrayList<IColumn<TaskDO>>();
-    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task")), "title", "title", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task")), getSortable("title", sortable), "title",
+        cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
       {
@@ -251,8 +252,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
         final Label formattedTaskLabel = new Label(ListSelectActionPanel.LABEL_ID, buf.toString());
         formattedTaskLabel.setEscapeModelStrings(false);
         if (isSelectMode() == false) {
-          item
-              .add(new ListSelectActionPanel(componentId, rowModel, TaskEditPage.class, task.getId(), returnToPage, formattedTaskLabel));
+          item.add(new ListSelectActionPanel(componentId, rowModel, TaskEditPage.class, task.getId(), returnToPage, formattedTaskLabel));
         } else {
           item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, task.getId(), formattedTaskLabel));
         }
@@ -271,7 +271,8 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
           }
         });
     if (kostCache.isKost2EntriesExists() == true) {
-      columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("fibu.kost2"), "kost2", "kost2", cellItemListener) {
+      columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("fibu.kost2"), getSortable("kost2", sortable), "kost2",
+          cellItemListener) {
         @Override
         public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
         {
@@ -281,16 +282,16 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
         }
       });
     }
-    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("shortDescription")), "shortDescription",
-        "shortDescription", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("shortDescription")), getSortable(
+        "shortDescription", sortable), "shortDescription", cellItemListener));
     if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
-      columns.add(new DatePropertyColumn<TaskDO>(dateTimeFormatter, getString("task.protectTimesheetsUntil.short"),
-          "protectTimesheetsUntil", "protectTimesheetsUntil", cellItemListener));
+      columns.add(new DatePropertyColumn<TaskDO>(dateTimeFormatter, getString("task.protectTimesheetsUntil.short"), getSortable(
+          "protectTimesheetsUntil", sortable), "protectTimesheetsUntil", cellItemListener));
     }
-    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task.reference")), "reference", "reference",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("priority")), "priority", "priority",
-        cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task.reference")), getSortable("reference",
+        sortable), "reference", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("priority")), getSortable("priority", sortable),
+        "priority", cellItemListener) {
       @Override
       public void populateItem(Item<ICellPopulator<TaskDO>> item, String componentId, IModel<TaskDO> rowModel)
       {
@@ -299,8 +300,8 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task.status")), "status", "status",
-        cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task.status")), getSortable("status", sortable),
+        "status", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
       {
@@ -309,8 +310,9 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    final UserPropertyColumn<TaskDO> userPropertyColumn = new UserPropertyColumn<TaskDO>(getString("task.assignedUser"),
-        "responsibleUserId", "responsibleUserId", cellItemListener).withUserFormatter(userFormatter).setUserGroupCache(userGroupCache);
+    final UserPropertyColumn<TaskDO> userPropertyColumn = new UserPropertyColumn<TaskDO>(getString("task.assignedUser"), getSortable(
+        "responsibleUserId", sortable), "responsibleUserId", cellItemListener).withUserFormatter(userFormatter).setUserGroupCache(
+        userGroupCache);
     columns.add(userPropertyColumn);
     return columns;
   }
@@ -318,7 +320,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this), "title", false);
+    dataTable = createDataTable(createColumns(this, true), "title", false);
     form.add(dataTable);
   }
 

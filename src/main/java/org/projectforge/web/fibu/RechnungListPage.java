@@ -105,7 +105,7 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<RechnungDO>> createColumns(final WebPage returnToPage)
+  public List<IColumn<RechnungDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<RechnungDO>> columns = new ArrayList<IColumn<RechnungDO>>();
     CellItemListener<RechnungDO> cellItemListener = new CellItemListener<RechnungDO>() {
@@ -129,8 +129,8 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("fibu.rechnung.nummer.short")), "nummer",
-        "nummer", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("fibu.rechnung.nummer.short")), getSortable(
+        "nummer", sortable), "nummer", cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
@@ -150,19 +150,19 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
         addRowClick(item);
       }
     });
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.kunde"), getSortable("kundeAsString", sortable),
+        "kundeAsString", cellItemListener));
     columns
-        .add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.kunde"), "kundeAsString", "kundeAsString", cellItemListener));
-    columns
-        .add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.projekt"), "projekt.name", "projekt.name", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.betreff"), "betreff", "betreff", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.datum.short"), "datum", "datum", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.faelligkeit.short"), "faelligkeit", "faelligkeit",
+        .add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.projekt"), getSortable("projekt.name", sortable), "projekt.name", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.betreff"), getSortable("betreff", sortable), "betreff", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.datum.short"), getSortable("betreff", sortable), "datum", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.faelligkeit.short"), getSortable("faelligkeit", sortable), "faelligkeit",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.bezahlDatum.short"), "bezahlDatum", "bezahlDatum",
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.bezahlDatum.short"), getSortable("bezahlDatum", sortable), "bezahlDatum",
         cellItemListener));
-    columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.common.netto"), "netSum", "netSum", cellItemListener));
-    columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.common.brutto"), "grossSum", "grossSum", cellItemListener));
-    // columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.rechnung.zahlBetrag.short"), "zahlBetrag", "zahlBetrag",
+    columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.common.netto"), getSortable("netSum", sortable), "netSum", cellItemListener));
+    columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.common.brutto"), getSortable("grossSum", sortable), "grossSum", cellItemListener));
+    // columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.rechnung.zahlBetrag.short"), getSortable("zahlBetrag", sortable), "zahlBetrag",
     // cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("fibu.auftrag.auftraege")), null, null,
         cellItemListener) {
@@ -185,17 +185,17 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("comment")), "bemerkung", "bemerkung",
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("comment")), getSortable("bemerkung", sortable), "bemerkung",
         cellItemListener));
     columns
-        .add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
+        .add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("status")), getSortable("status", sortable), "status", cellItemListener));
     return columns;
   }
 
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this), "nummer", false);
+    dataTable = createDataTable(createColumns(this, true), "nummer", false);
     form.add(dataTable);
   }
 

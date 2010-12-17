@@ -102,9 +102,9 @@ public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungL
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<EingangsrechnungDO>> createColumns(final WebPage returnToPage)
+  public List<IColumn<EingangsrechnungDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-   final List<IColumn<EingangsrechnungDO>> columns = new ArrayList<IColumn<EingangsrechnungDO>>();
+    final List<IColumn<EingangsrechnungDO>> columns = new ArrayList<IColumn<EingangsrechnungDO>>();
     CellItemListener<EingangsrechnungDO> cellItemListener = new CellItemListener<EingangsrechnungDO>() {
       public void populateItem(Item<ICellPopulator<EingangsrechnungDO>> item, String componentId, IModel<EingangsrechnungDO> rowModel)
       {
@@ -122,8 +122,8 @@ public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungL
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(new Model<String>(getString("fibu.common.creditor")), "kreditor",
-        "kreditor", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(new Model<String>(getString("fibu.common.creditor")), getSortable(
+        "kreditor", sortable), "kreditor", cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
@@ -144,27 +144,29 @@ public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungL
         addRowClick(item);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(getString("fibu.common.reference"), "referenz", "referenz",
+    columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(getString("fibu.common.reference"),
+        getSortable("referenz", sortable), "referenz", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(getString("fibu.rechnung.betreff"),
+        getSortable("betreff", sortable), "betreff", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(getString("fibu.rechnung.datum.short"), getSortable("datum",
+        sortable), "datum", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(getString("fibu.rechnung.faelligkeit.short"), getSortable(
+        "faelligkeit", sortable), "faelligkeit", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(getString("fibu.rechnung.bezahlDatum.short"), getSortable(
+        "bezahlDatum", sortable), "bezahlDatum", cellItemListener));
+    columns.add(new CurrencyPropertyColumn<EingangsrechnungDO>(getString("fibu.common.netto"), getSortable("netSum", sortable), "netSum",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(getString("fibu.rechnung.betreff"), "betreff", "betreff",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(getString("fibu.rechnung.datum.short"), "datum", "datum",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(getString("fibu.rechnung.faelligkeit.short"), "faelligkeit",
-        "faelligkeit", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(getString("fibu.rechnung.bezahlDatum.short"), "bezahlDatum",
-        "bezahlDatum", cellItemListener));
-    columns.add(new CurrencyPropertyColumn<EingangsrechnungDO>(getString("fibu.common.netto"), "netSum", "netSum", cellItemListener));
-    columns.add(new CurrencyPropertyColumn<EingangsrechnungDO>(getString("fibu.common.brutto"), "grossSum", "grossSum", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(new Model<String>(getString("comment")), "bemerkung", "bemerkung",
-        cellItemListener));
+    columns.add(new CurrencyPropertyColumn<EingangsrechnungDO>(getString("fibu.common.brutto"), getSortable("grossSum", sortable),
+        "grossSum", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(new Model<String>(getString("comment")), getSortable("bemerkung",
+        sortable), "bemerkung", cellItemListener));
     return columns;
   }
 
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this), "datum", false);
+    dataTable = createDataTable(createColumns(this, true), "datum", false);
     form.add(dataTable);
   }
 

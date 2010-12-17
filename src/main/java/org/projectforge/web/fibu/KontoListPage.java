@@ -65,7 +65,7 @@ public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, Kon
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<KontoDO>> createColumns(final WebPage returnToPage)
+  public List<IColumn<KontoDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<KontoDO>> columns = new ArrayList<IColumn<KontoDO>>();
     CellItemListener<KontoDO> cellItemListener = new CellItemListener<KontoDO>() {
@@ -79,8 +79,8 @@ public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, Kon
         item.add(new AttributeModifier("style", true, new Model<String>(cellStyle)));
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<KontoDO>(new Model<String>(getString("fibu.konto.nummer")), "nummer", "nummer",
-        cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<KontoDO>(new Model<String>(getString("fibu.konto.nummer")), getSortable("nummer",
+        sortable), "nummer", cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
@@ -97,17 +97,17 @@ public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, Kon
         addRowClick(item);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<KontoDO>(new Model<String>(getString("fibu.konto.bezeichnung")), "bezeichnung",
-        "bezeichnung", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<KontoDO>(new Model<String>(getString("description")), "description", "description",
-        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<KontoDO>(new Model<String>(getString("fibu.konto.bezeichnung")), getSortable(
+        "bezeichnung", sortable), "bezeichnung", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<KontoDO>(new Model<String>(getString("description")), getSortable("description",
+        sortable), "description", cellItemListener));
     return columns;
   }
 
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this), "nummer", true);
+    dataTable = createDataTable(createColumns(this, true), "nummer", true);
     form.add(dataTable);
   }
 

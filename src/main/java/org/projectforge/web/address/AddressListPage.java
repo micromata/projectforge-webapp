@@ -105,7 +105,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
   }
 
   @SuppressWarnings("serial")
-  public List<IColumn<AddressDO>> createColumns(final WebPage returnToPage)
+  public List<IColumn<AddressDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<AddressDO>> columns = new ArrayList<IColumn<AddressDO>>();
     final CellItemListener<AddressDO> cellItemListener = new CellItemListener<AddressDO>() {
@@ -123,7 +123,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("modified")), "lastUpdate", "lastUpdate",
+    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("modified")), getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
@@ -149,10 +149,10 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("name")), "name", "name", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("firstName")), "firstName", "firstName",
+    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("name")), getSortable("name", sortable), "name", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("firstName")), getSortable("firstName", sortable), "firstName",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("organization")), "organization", "organization",
+    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("organization")), getSortable("organization", sortable), "organization",
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("email")), null, "email", cellItemListener) {
       @SuppressWarnings("unchecked")
@@ -217,7 +217,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
       addContentMenuEntry(menuEntry);
     }
     personalAddressMap = personalAddressDao.getPersonalAddressByAddressId();
-    final List<IColumn<AddressDO>> columns = createColumns(this);
+    final List<IColumn<AddressDO>> columns = createColumns(this, true);
     dataTable = createDataTable(columns, null, true);
     form.add(dataTable);
   }

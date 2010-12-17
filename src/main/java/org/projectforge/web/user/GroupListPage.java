@@ -68,7 +68,7 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<GroupDO>> createColumns(final WebPage returnToPage)
+  public List<IColumn<GroupDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<GroupDO>> columns = new ArrayList<IColumn<GroupDO>>();
     final CellItemListener<GroupDO> cellItemListener = new CellItemListener<GroupDO>() {
@@ -81,7 +81,7 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("name")), "name", "name", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("name")), getSortable("name", sortable), "name", cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
@@ -100,11 +100,11 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("organization")), "organization", "organization",
+    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("organization")), getSortable("organization", sortable), "organization",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("description")), "description", "description",
+    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("description")), getSortable("description", sortable), "description",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("group.assignedUsers")), "usernames", "usernames",
+    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("group.assignedUsers")), getSortable("usernames", sortable), "usernames",
         cellItemListener));
     return columns;
   }
@@ -112,7 +112,7 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this), "name", true);
+    dataTable = createDataTable(createColumns(this, true), "name", true);
     form.add(dataTable);
   }
 

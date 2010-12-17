@@ -192,15 +192,15 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
 
   protected void createDataTable()
   {
-    final List<IColumn<TimesheetDO>> columns = createColumns(this, isMassUpdateMode(), form.getSearchFilter().isLongFormat(),
+    final List<IColumn<TimesheetDO>> columns = createColumns(this, !isMassUpdateMode(), isMassUpdateMode(), form.getSearchFilter().isLongFormat(),
         taskFormatter, taskTree, kostCache, userFormatter, dateTimeFormatter);
     dataTable = createDataTable(columns, "startTime", false);
     form.add(dataTable);
   }
 
-  public List<IColumn<TimesheetDO>> createColumns(final WebPage returnToPage)
+  public List<IColumn<TimesheetDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    return createColumns(returnToPage, false, false, taskFormatter, taskTree, kostCache, userFormatter, dateTimeFormatter);
+    return createColumns(returnToPage, sortable, false, false, taskFormatter, taskTree, kostCache, userFormatter, dateTimeFormatter);
   }
 
   /**
@@ -209,9 +209,9 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
    * @param isMassUpdateMode
    */
   @SuppressWarnings("serial")
-  protected static final List<IColumn<TimesheetDO>> createColumns(final WebPage page, final boolean isMassUpdateMode,
-      final boolean longFormat, final TaskFormatter taskFormatter, final TaskTree taskTree, final KostCache kostCache,
-      final UserFormatter userFormatter, final DateTimeFormatter dateTimeFormatter)
+  protected static final List<IColumn<TimesheetDO>> createColumns(final WebPage page, final boolean sortable,
+      final boolean isMassUpdateMode, final boolean longFormat, final TaskFormatter taskFormatter, final TaskTree taskTree,
+      final KostCache kostCache, final UserFormatter userFormatter, final DateTimeFormatter dateTimeFormatter)
   {
     final List<IColumn<TimesheetDO>> columns = new ArrayList<IColumn<TimesheetDO>>();
     final CellItemListener<TimesheetDO> cellItemListener = new CellItemListener<TimesheetDO>() {
@@ -245,10 +245,11 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
             addRowClick(item, isMassUpdateMode);
           }
         });
-        columns.add(new UserPropertyColumn<TimesheetDO>(page.getString("timesheet.user"), isMassUpdateMode ? null : "user.fullname",
-            "user", cellItemListener).withUserFormatter(userFormatter));
+        columns.add(new UserPropertyColumn<TimesheetDO>(page.getString("timesheet.user"), getSortable("user.fullname", sortable), "user",
+            cellItemListener).withUserFormatter(userFormatter));
       } else {
-        columns.add(new UserPropertyColumn<TimesheetDO>(page.getString("timesheet.user"), "user.fullname", "user", cellItemListener) {
+        columns.add(new UserPropertyColumn<TimesheetDO>(page.getString("timesheet.user"), getSortable("user.fullname", sortable), "user",
+            cellItemListener) {
           @Override
           public void populateItem(final Item<ICellPopulator<TimesheetDO>> item, final String componentId,
               final IModel<TimesheetDO> rowModel)
@@ -261,25 +262,25 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
         }.withUserFormatter(userFormatter));
       }
     } else {
-      columns.add(new UserPropertyColumn<TimesheetDO>(page.getString("timesheet.user"), "user.fullname", "user", cellItemListener)
-          .withUserFormatter(userFormatter));
+      columns.add(new UserPropertyColumn<TimesheetDO>(page.getString("timesheet.user"), getSortable("user.fullname", sortable), "user",
+          cellItemListener).withUserFormatter(userFormatter));
     }
     if (kostCache.isKost2EntriesExists() == true) {
-      columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(page.getString("fibu.kunde")), isMassUpdateMode ? null
-          : "kost2.projekt.kunde.name", "kost2.projekt.kunde.name", cellItemListener));
-      columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(page.getString("fibu.projekt")),
-          isMassUpdateMode ? null : "kost2.projekt.name", "kost2.projekt.name", cellItemListener));
+      columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(page.getString("fibu.kunde")), getSortable(
+          "kost2.projekt.kunde.name", sortable), "kost2.projekt.kunde.name", cellItemListener));
+      columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(page.getString("fibu.projekt")), getSortable(
+          "kost2.projekt.name", sortable), "kost2.projekt.name", cellItemListener));
     }
-    columns.add(new TaskPropertyColumn<TimesheetDO>(page, page.getString("task"), isMassUpdateMode ? null : "task.title", "task",
+    columns.add(new TaskPropertyColumn<TimesheetDO>(page, page.getString("task"), getSortable("task.title", sortable), "task",
         cellItemListener).withTaskFormatter(taskFormatter).withTaskTree(taskTree));
     if (kostCache.isKost2EntriesExists() == true) {
-      columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("fibu.kost2"), isMassUpdateMode ? null
-          : "kost2.shortDisplayName", "kost2.shortDisplayName", cellItemListener));
+      columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("fibu.kost2"), getSortable("kost2.shortDisplayName",
+          sortable), "kost2.shortDisplayName", cellItemListener));
     }
-    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("calendar.weekOfYearShortLabel"), isMassUpdateMode ? null
-        : "formattedWeekOfYear", "formattedWeekOfYear", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("calendar.dayOfWeekShortLabel"), isMassUpdateMode ? null
-        : "startTime", "startTime", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("calendar.weekOfYearShortLabel"), getSortable(
+        "formattedWeekOfYear", sortable), "formattedWeekOfYear", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("calendar.dayOfWeekShortLabel"), getSortable("startTime",
+        sortable), "startTime", cellItemListener) {
       @Override
       public void populateItem(Item<ICellPopulator<TimesheetDO>> item, String componentId, IModel<TimesheetDO> rowModel)
       {
@@ -289,7 +290,7 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
         item.add(label);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("timePeriod"), isMassUpdateMode ? null : "startTime",
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("timePeriod"), getSortable("startTime", sortable),
         "timePeriod", cellItemListener) {
       @Override
       public void populateItem(Item<ICellPopulator<TimesheetDO>> item, String componentId, IModel<TimesheetDO> rowModel)
@@ -301,7 +302,7 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
         item.add(label);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("timesheet.duration"), isMassUpdateMode ? null : "duration",
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("timesheet.duration"), getSortable("duration", sortable),
         "duration", cellItemListener) {
       @Override
       public void populateItem(Item<ICellPopulator<TimesheetDO>> item, String componentId, IModel<TimesheetDO> rowModel)
@@ -313,10 +314,10 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
         item.add(label);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("timesheet.location"), isMassUpdateMode ? null : "location",
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("timesheet.location"), getSortable("location", sortable),
         "location", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("description"), "shortDescription", "shortDescription",
-        cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("description"), getSortable("shortDescription", sortable),
+        "shortDescription", cellItemListener) {
       @Override
       public void populateItem(Item<ICellPopulator<TimesheetDO>> item, String componentId, IModel<TimesheetDO> rowModel)
       {

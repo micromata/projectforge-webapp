@@ -74,7 +74,7 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
   }
 
   @SuppressWarnings("serial")
-  public List<IColumn<BookDO>> createColumns(final WebPage returnToPage)
+  public List<IColumn<BookDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<BookDO>> columns = new ArrayList<IColumn<BookDO>>();
     final CellItemListener<BookDO> cellItemListener = new CellItemListener<BookDO>() {
@@ -87,32 +87,33 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
         }
       }
     };
-    columns
-        .add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("created")), "created", "created", cellItemListener) {
-          @SuppressWarnings("unchecked")
-          @Override
-          public void populateItem(final Item item, final String componentId, final IModel rowModel)
-          {
-            final BookDO book = (BookDO) rowModel.getObject();
-            item.add(new ListSelectActionPanel(componentId, rowModel, BookEditPage.class, book.getId(), returnToPage, DateTimeFormatter
-                .instance().getFormattedDate(book.getCreated())));
-            addRowClick(item);
-            cellItemListener.populateItem(item, componentId, rowModel);
-          }
-        });
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.yearOfPublishing.short")), "yearOfPublishing",
-        "yearOfPublishing", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.signature")), "signature4Sort", "signature",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.authors")), "authors", "authors",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.title")), "title", "title", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.keywords")), "keywords", "keywords",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.authors")), "authors", "authors",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.lendOutBy")), "authors", "authors",
-        cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("created")), getSortable("created", sortable),
+        "created", cellItemListener) {
+      @SuppressWarnings("unchecked")
+      @Override
+      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      {
+        final BookDO book = (BookDO) rowModel.getObject();
+        item.add(new ListSelectActionPanel(componentId, rowModel, BookEditPage.class, book.getId(), returnToPage, DateTimeFormatter
+            .instance().getFormattedDate(book.getCreated())));
+        addRowClick(item);
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
+    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.yearOfPublishing.short")), getSortable(
+        "yearOfPublishing", sortable), "yearOfPublishing", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.signature")), getSortable("signature4Sort",
+        sortable), "signature", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.authors")), getSortable("authors", sortable),
+        "authors", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.title")), getSortable("title", sortable),
+        "title", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.keywords")),
+        getSortable("keywords", sortable), "keywords", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.authors")), getSortable("authors", sortable),
+        "authors", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.lendOutBy")),
+        getSortable("authors", sortable), "authors", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<BookDO>> item, final String componentId, final IModel<BookDO> rowModel)
       {
@@ -139,7 +140,7 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this), "created", false);
+    dataTable = createDataTable(createColumns(this, true), "created", false);
     form.add(dataTable);
   }
 

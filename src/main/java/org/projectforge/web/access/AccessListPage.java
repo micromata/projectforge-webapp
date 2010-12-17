@@ -72,7 +72,7 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
 
   @SuppressWarnings("serial")
   @Override
-  public List<IColumn<GroupTaskAccessDO>> createColumns(final WebPage returnToPage)
+  public List<IColumn<GroupTaskAccessDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<GroupTaskAccessDO>> columns = new ArrayList<IColumn<GroupTaskAccessDO>>();
     final CellItemListener<GroupTaskAccessDO> cellItemListener = new CellItemListener<GroupTaskAccessDO>() {
@@ -85,7 +85,7 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("name")), "name", "name",
+    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("name")), getSortable("name", sortable), "name",
         cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
@@ -102,9 +102,9 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("group")), "group.name", "group.name",
+    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("group")), getSortable("group.name", sortable), "group.name",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("recursive")), "recursive", "recursive",
+    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("recursive")), getSortable("recursive", sortable), "recursive",
         cellItemListener) {
       @Override
       public void populateItem(Item<ICellPopulator<GroupTaskAccessDO>> item, String componentId, IModel<GroupTaskAccessDO> rowModel)
@@ -135,7 +135,7 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(getString("description"), "description", "description",
+    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(getString("description"), getSortable("description", sortable), "description",
         cellItemListener) {
       @Override
       public void populateItem(Item<ICellPopulator<GroupTaskAccessDO>> item, String componentId, IModel<GroupTaskAccessDO> rowModel)
@@ -152,7 +152,7 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this), "group.name", true);
+    dataTable = createDataTable(createColumns(this, true), "group.name", true);
     form.add(dataTable);
   }
 
