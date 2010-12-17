@@ -52,7 +52,6 @@ import org.projectforge.core.QueryFilter;
 import org.projectforge.core.UserException;
 import org.projectforge.database.SQLHelper;
 import org.projectforge.fibu.kost.KostZuweisungDO;
-import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -268,7 +267,7 @@ public class RechnungDao extends BaseDao<RechnungDO>
   public List<RechnungDO> getList(final BaseSearchFilter filter)
   {
     final RechnungFilter myFilter;
-    if (filter instanceof TimesheetFilter) {
+    if (filter instanceof RechnungFilter) {
       myFilter = (RechnungFilter) filter;
     } else {
       myFilter = new RechnungFilter(filter);

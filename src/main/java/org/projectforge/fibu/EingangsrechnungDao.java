@@ -25,7 +25,6 @@ package org.projectforge.fibu;
 
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -33,8 +32,6 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
-import org.projectforge.common.DateHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.DisplayHistoryEntry;
@@ -130,27 +127,7 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
       myFilter = new RechnungFilter(filter);
     }
     final QueryFilter queryFilter = new QueryFilter(myFilter);
-    if (myFilter.getYear() >= 0) {
-      final Calendar cal = DateHelper.getUTCCalendar();
-      cal.set(Calendar.YEAR, myFilter.getYear());
-      java.sql.Date lo = null;
-      java.sql.Date hi = null;
-      if (myFilter.getMonth() >= 0) {
-        cal.set(Calendar.MONTH, myFilter.getMonth());
-        cal.set(Calendar.DAY_OF_MONTH, 1);
-        lo = new java.sql.Date(cal.getTimeInMillis());
-        int lastDayOfMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
-        cal.set(Calendar.DAY_OF_MONTH, lastDayOfMonth);
-        hi = new java.sql.Date(cal.getTimeInMillis());
-      } else {
-        cal.set(Calendar.DAY_OF_YEAR, 1);
-        lo = new java.sql.Date(cal.getTimeInMillis());
-        int lastDayOfYear = cal.getActualMaximum(Calendar.DAY_OF_YEAR);
-        cal.set(Calendar.DAY_OF_YEAR, lastDayOfYear);
-        hi = new java.sql.Date(cal.getTimeInMillis());
-      }
-      queryFilter.add(Restrictions.between("datum", lo, hi));
-    }
+    queryFilter.setYearAndMonth("datum", myFilter.getYear(), myFilter.getMonth());
     queryFilter.addOrder(Order.desc("datum"));
     queryFilter.addOrder(Order.desc("kreditor"));
     final List<EingangsrechnungDO> list = getList(queryFilter);
