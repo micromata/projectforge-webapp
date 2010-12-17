@@ -39,9 +39,18 @@ public class SearchFilter extends BaseSearchFilter
 
   private PFUserDO modifiedByUser;
 
+  public SearchFilter()
+  {
+    this.maxRows = 3;
+  }
+
   @Override
   public void setStartTimeOfLastModification(final Date startTimeOfLastModification)
   {
+    if (startTimeOfLastModification == null) {
+      super.setStartTimeOfLastModification(null);
+      return;
+    }
     final DateHolder dh = new DateHolder(startTimeOfLastModification, DatePrecision.MILLISECOND);
     dh.setBeginOfDay();
     super.setStartTimeOfLastModification(dh.getDate());
@@ -50,6 +59,10 @@ public class SearchFilter extends BaseSearchFilter
   @Override
   public void setStopTimeOfLastModification(final Date stopTimeOfLastModification)
   {
+    if (stopTimeOfLastModification == null) {
+      super.setStopTimeOfLastModification(null);
+      return;
+    }
     final DateHolder dh = new DateHolder(stopTimeOfLastModification, DatePrecision.MILLISECOND);
     dh.setEndOfDay();
     super.setStopTimeOfLastModification(dh.getDate());
@@ -69,6 +82,11 @@ public class SearchFilter extends BaseSearchFilter
   public TaskDO getTask()
   {
     return task;
+  }
+
+  public Integer getTaskId()
+  {
+    return task != null ? task.getId() : null;
   }
 
   public void setTask(TaskDO task)

@@ -40,7 +40,7 @@ public class SearchDao extends HibernateDaoSupport
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SearchDao.class);
 
   @SuppressWarnings("unchecked")
-  public List<SearchResultData> getHistoryEntries(final SearchFilter filter, final Class clazz, final BaseDao baseDao)
+  public List<SearchResultData> getEntries(final BaseSearchFilter filter, final Class clazz, final BaseDao baseDao)
   {
     if (filter == null) {
       log.info("Filter or rows in filter is null (may be Search as redirect after login): " + filter);
