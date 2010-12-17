@@ -27,6 +27,7 @@ import org.projectforge.access.AccessDao;
 import org.projectforge.address.AddressDao;
 import org.projectforge.book.BookDao;
 import org.projectforge.core.BaseDao;
+import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.KontoDao;
 import org.projectforge.fibu.KundeDao;
@@ -70,6 +71,8 @@ public class DaoRegistry
 
   public static final String KUNDE = "kunde";
 
+  public static final String ORDERBOOK = "orderBook";
+
   public static final String KONTO = "konto";
 
   public static final String KOST2_ART = "kost2Art";
@@ -101,6 +104,8 @@ public class DaoRegistry
   private AccessDao accessDao;
 
   private AddressDao addressDao;
+
+  private AuftragDao auftragDao;
 
   private BuchungssatzDao buchungssatzDao;
 
@@ -157,6 +162,7 @@ public class DaoRegistry
     register(KONTO, KontoDao.class, kontoDao, "fibu.konto").setListPageColumnsCreatorClass(KontoListPage.class);
     register(KUNDE, KundeDao.class, kundeDao, "fibu.kunde");// TODO: .setListPageColumnsCreatorClass(KundeListPage.class);
     register(PROJEKT, ProjektDao.class, projektDao, "fibu.projekt").setListPageColumnsCreatorClass(ProjektListPage.class);
+    //register(ORDERBOOK, AuftragDao.class, auftragDao, "fibu.projekt").setListPageColumnsCreatorClass(AuftragListPage.class);
     initialized = true;
   }
 
@@ -191,6 +197,11 @@ public class DaoRegistry
   public void setAddressDao(AddressDao addressDao)
   {
     this.addressDao = addressDao;
+  }
+
+  public void setAuftragDao(AuftragDao auftragDao)
+  {
+    this.auftragDao = auftragDao;
   }
 
   public void setBuchungssatzDao(BuchungssatzDao buchungssatzDao)

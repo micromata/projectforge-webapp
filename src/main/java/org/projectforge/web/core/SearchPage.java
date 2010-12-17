@@ -164,7 +164,7 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
       final WebMarkupContainer areaContainer = new WebMarkupContainer(areaRepeater.newChildId());
       areaRepeater.add(areaContainer);
       areaContainer.add(new Label("areaTitle", getString(registryEntry.getI18nTitleHeading())));
-      final List< ? > columns = listPageColumnsCreator.createColumns(this);
+      final List< ? > columns = listPageColumnsCreator.createColumns(this, false);
       final DataTable dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", false) {
         @Override
         public List getList()
