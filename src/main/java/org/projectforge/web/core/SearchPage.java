@@ -41,17 +41,18 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.NumberFormatter;
 import org.projectforge.core.SearchDao;
 import org.projectforge.core.SearchResultData;
 import org.projectforge.database.StatisticsCache;
-import org.projectforge.registry.Registry;
-import org.projectforge.registry.RegistryEntry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDependentFilter;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.registry.WebRegistry;
+import org.projectforge.web.registry.WebRegistryEntry;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.MySortableDataProvider;
@@ -79,7 +80,8 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
-  private boolean refreshed = false;
+  // Do not execute the search on the first call (due to performance issues):
+  private boolean refreshed = true;
 
   public SearchPage(PageParameters parameters)
   {
@@ -88,6 +90,9 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     form = new SearchForm(this);
     body.add(form);
     form.init();
+    areaRepeater = new RepeatingView("areaRepeater");
+    body.add(areaRepeater);
+    areaRepeater.setVisible(false);
   }
 
   @Override
@@ -120,7 +125,8 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     if (form.filter.isEmpty() == true) {
       return;
     }
-    for (final RegistryEntry registryEntry : Registry.instance().getOrderedList()) {
+    for (final WebRegistryEntry registryEntry : WebRegistry.instance().getOrderedList()) {
+      final long millis = System.currentTimeMillis();
       final Class< ? extends IListPageColumnsCreator< ? >> clazz = registryEntry.getListPageColumnsCreatorClass();
       final IListPageColumnsCreator< ? > listPageColumnsCreator = clazz == null ? null : (IListPageColumnsCreator< ? >) BeanHelper
           .newInstance(clazz, PageParameters.class, new PageParameters());
@@ -142,7 +148,7 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
       final BaseSearchFilter filter;
       if (isTaskDependentFilter == true) {
         filter = (BaseSearchFilter) BeanHelper.newInstance(registeredFilterClass, new Class< ? >[] { BaseSearchFilter.class}, form.filter);
-        ((TaskDependentFilter)filter).setTaskId(form.filter.getTaskId());
+        ((TaskDependentFilter) filter).setTaskId(form.filter.getTaskId());
       } else {
         filter = form.filter;
       }
@@ -163,7 +169,6 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
       }
       final WebMarkupContainer areaContainer = new WebMarkupContainer(areaRepeater.newChildId());
       areaRepeater.add(areaContainer);
-      areaContainer.add(new Label("areaTitle", getString(registryEntry.getI18nTitleHeading())));
       final List< ? > columns = listPageColumnsCreator.createColumns(this, false);
       final DataTable dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", false) {
         @Override
@@ -184,6 +189,8 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
       } else {
         areaContainer.add(new Label("hasMoreEntries", "[invisible]").setVisible(false));
       }
+      final long duration = System.currentTimeMillis() - millis;
+      areaContainer.add(new Label("areaTitle", getString(registryEntry.getI18nTitleHeading()) + " (" + NumberFormatter.format(duration) + " ms)"));
     }
   }
 
@@ -199,7 +206,7 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
       form.filter.setTask(task);
     } else if ("userId".equals(property) == true) {
       final PFUserDO user = userGroupCache.getUser((Integer) selectedValue);
-      form.filter.setModifiedByUserId(user != null ? user.getId() : null);
+      form.filter.setModifiedByUser(user);
     } else if ("startDate".equals(property) == true) {
       if (selectedValue instanceof Date) {
         // Date selected.
