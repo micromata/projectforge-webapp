@@ -234,6 +234,7 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
         getParentPage().onCancelSubmit();
       }
     };
+    cancelButton.add(WebConstants.BUTTON_CLASS_CANCEL);
     cancelButton.setDefaultFormProcessing(false);
     cancelButtonPanel = new SingleButtonPanel(getNewActionButtonChildId(), cancelButton);
     addActionButton(cancelButtonPanel);
@@ -257,6 +258,7 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
         getParentPage().onNextSubmit();
       }
     };
+    nextButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     nextButtonPanel = new SingleButtonPanel(getNewActionButtonChildId(), nextButton);
     addActionButton(nextButtonPanel);
 
