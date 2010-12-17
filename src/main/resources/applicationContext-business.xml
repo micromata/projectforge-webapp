@@ -17,13 +17,16 @@
   <bean id="hrPlanningExport" class="org.projectforge.humanresources.HRPlanningExport" />
   <bean id="mebMailClient" class="org.projectforge.meb.MebMailClient" />
   <bean id="sendMail" class="org.projectforge.mail.SendMail" singleton="true" />
+  <bean id="statisticsCache" class="org.projectforge.database.StatisticsCache" singleton="true">
+    <property name="expireTimeInHours" value="12" />
+  </bean>
   <bean id="taskTree" class="org.projectforge.task.TaskTree" singleton="true">
     <property name="expireTimeInHours">
       <value>1</value>
     </property>
   </bean>
   <bean id="userGroupCache" class="org.projectforge.user.UserGroupCache" singleton="true">
-    <property name="expireTimeInHours" value="12" />
+    <property name="expireTimeInHours" value="1" />
   </bean>
   <bean id="xmlDump" class="org.projectforge.database.XmlDump" />
 
