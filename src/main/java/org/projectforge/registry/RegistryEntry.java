@@ -23,12 +23,9 @@
 
 package org.projectforge.registry;
 
-import org.apache.wicket.proxy.LazyInitProxyFactory;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.web.core.SearchForm;
-import org.projectforge.web.wicket.IListPageColumnsCreator;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -42,11 +39,9 @@ public class RegistryEntry
 
   private BaseDao< ? > dao;
 
-  private Class<? extends BaseSearchFilter> searchFilterClass;
+  private Class< ? extends BaseSearchFilter> searchFilterClass;
 
   private Class< ? extends BaseDao< ? >> daoClassType;
-
-  private Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass;
 
   public RegistryEntry(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > dao)
   {
@@ -61,18 +56,7 @@ public class RegistryEntry
     this.i18nPrefix = (i18nPrefix != null) ? i18nPrefix : id;
   }
 
-  public RegistryEntry setListPageColumnsCreatorClass(Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass)
-  {
-    this.listPageColumnsCreatorClass = listPageColumnsCreatorClass;
-    return this;
-  }
-
-  public Class< ? extends IListPageColumnsCreator< ? >> getListPageColumnsCreatorClass()
-  {
-    return listPageColumnsCreatorClass;
-  }
-
-  public RegistryEntry setSearchFilterClass(final Class<? extends BaseSearchFilter> searchFilterClass)
+  public RegistryEntry setSearchFilterClass(final Class< ? extends BaseSearchFilter> searchFilterClass)
   {
     this.searchFilterClass = searchFilterClass;
     return this;
@@ -81,7 +65,7 @@ public class RegistryEntry
   /**
    * @return The dao specific filter or null if not registered.
    */
-  public final Class<? extends BaseSearchFilter> getSearchFilterClass()
+  public final Class< ? extends BaseSearchFilter> getSearchFilterClass()
   {
     return this.searchFilterClass;
   }
@@ -101,17 +85,13 @@ public class RegistryEntry
     return dao;
   }
 
-  /**
-   * Creates a proxy via LazyInitProxyFactory. Use-full if needed in Wicket components. Avoids Wicket serialization of the dao.
-   * @return
-   */
-  public BaseDao< ? > getProxyDao()
+  public Class< ? extends BaseDao< ? >> getDaoClassType()
   {
-    return (BaseDao< ? >) LazyInitProxyFactory.createProxy(daoClassType, new DaoLocator(id));
+    return daoClassType;
   }
 
   /**
-   * Is used e. g. by {@link SearchForm}: &lt;i18nPrefix&gt;.title.heading.
+   * Is used e. g. by {@link org.projectforge.web.core.SearchForm}: &lt;i18nPrefix&gt;.title.heading.
    * @return The prefix of the i18n keys to prepend, e. g. "fibu.kost1". If not especially, than the id will be used as prefix.
    */
   public String getI18nPrefix()
