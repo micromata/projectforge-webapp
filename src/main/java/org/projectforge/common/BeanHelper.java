@@ -181,6 +181,7 @@ public class BeanHelper
     } catch (SecurityException ex) {
       log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
     } catch (NoSuchMethodException ex) {
+      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
     }
     if (constructor == null) {
       try {
@@ -195,6 +196,42 @@ public class BeanHelper
     constructor.setAccessible(true);
     try {
       return constructor.newInstance();
+    } catch (IllegalArgumentException ex) {
+      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+    } catch (InstantiationException ex) {
+      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+    } catch (IllegalAccessException ex) {
+      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+    } catch (InvocationTargetException ex) {
+      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+    }
+    return null;
+  }
+
+  public static Object newInstance(final Class< ? > clazz, final Class< ? > paramType, final Object param)
+  {
+    return newInstance(clazz, new Class< ? >[] { paramType}, param);
+  }
+
+  public static Object newInstance(final Class< ? > clazz, final Class< ? > paramType1, final Class< ? > paramType2, final Object param1,
+      final Object param2)
+  {
+    return newInstance(clazz, new Class< ? >[] { paramType1, paramType2}, param1, param2);
+  }
+
+  public static Object newInstance(final Class< ? > clazz, final Class< ? >[] paramTypes, final Object... params)
+  {
+    Constructor< ? > constructor = null;
+    try {
+      constructor = clazz.getDeclaredConstructor(paramTypes);
+    } catch (SecurityException ex) {
+      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+    } catch (NoSuchMethodException ex) {
+      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+    }
+    constructor.setAccessible(true);
+    try {
+      return constructor.newInstance(params);
     } catch (IllegalArgumentException ex) {
       log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
     } catch (InstantiationException ex) {
