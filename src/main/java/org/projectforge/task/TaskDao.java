@@ -46,7 +46,6 @@ import org.projectforge.fibu.ProjektDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
-import org.projectforge.web.task.TaskFilter;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -21,20 +21,17 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.web.task;
+package org.projectforge.task;
 
 import org.apache.commons.lang.Validate;
 import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.task.TaskDO;
-import org.projectforge.task.TaskStatus;
+import org.projectforge.web.task.TaskTreeTableNode;
 import org.projectforge.web.tree.TreeTableFilter;
 import org.projectforge.web.tree.TreeTableNode;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-/**
- */
 @XStreamAlias("TaskFilter")
 public class TaskFilter extends BaseSearchFilter implements TreeTableFilter<TreeTableNode>
 {

@@ -26,6 +26,7 @@ package org.projectforge.web.task;
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.model.PropertyModel;
+import org.projectforge.task.TaskFilter;
 import org.projectforge.web.wicket.AbstractListForm;
 
 
