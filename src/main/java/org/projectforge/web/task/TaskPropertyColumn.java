@@ -25,6 +25,7 @@ package org.projectforge.web.task;
 
 import org.apache.commons.lang.Validate;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -33,11 +34,9 @@ import org.hibernate.Hibernate;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
-import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
-
 
 public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
 {
@@ -47,7 +46,7 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
 
   private TaskTree taskTree;
 
-  private AbstractSecuredPage parentPage;
+  private WebPage parentPage;
 
   /**
    * @param taskFormatter
@@ -56,7 +55,7 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
    * @param property Should be from type TaskDO or Integer for task id.
    * @param cellItemListener
    */
-  public TaskPropertyColumn(final AbstractSecuredPage parentPage, final String label, final String sortProperty, final String property,
+  public TaskPropertyColumn(final WebPage parentPage, final String label, final String sortProperty, final String property,
       final CellItemListener<T> cellItemListener)
   {
     super(new Model<String>(label), sortProperty, property, cellItemListener);
@@ -69,7 +68,7 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
    * @param sortProperty
    * @param property Should be from type TaskDO or Integer for task id.
    */
-  public TaskPropertyColumn(final AbstractSecuredPage parentPage, final String label, final String sortProperty, final String property)
+  public TaskPropertyColumn(final WebPage parentPage, final String label, final String sortProperty, final String property)
   {
     this(parentPage, label, sortProperty, property, null);
   }
