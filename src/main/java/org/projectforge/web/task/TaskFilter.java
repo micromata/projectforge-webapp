@@ -33,7 +33,6 @@ import org.projectforge.web.tree.TreeTableNode;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
-
 /**
  */
 @XStreamAlias("TaskFilter")
@@ -57,6 +56,15 @@ public class TaskFilter extends BaseSearchFilter implements TreeTableFilter<Tree
 
   @XStreamAsAttribute
   private boolean ajaxSupport = true;
+
+  public TaskFilter()
+  {
+  }
+
+  public TaskFilter(final BaseSearchFilter filter)
+  {
+    super(filter);
+  }
 
   public boolean isClosed()
   {
