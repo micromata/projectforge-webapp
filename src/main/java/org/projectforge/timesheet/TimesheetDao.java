@@ -239,7 +239,12 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<TimesheetDO> getList(BaseSearchFilter filter) throws AccessException
   {
-    final TimesheetFilter myFilter = (TimesheetFilter) filter;
+    final TimesheetFilter myFilter;
+    if (filter instanceof TimesheetFilter) {
+      myFilter = (TimesheetFilter) filter;
+    } else {
+      myFilter = new TimesheetFilter(filter);
+    }
     if (myFilter.getStopTime() != null) {
       DateHolder date = new DateHolder(myFilter.getStopTime());
       date.setEndOfDay();

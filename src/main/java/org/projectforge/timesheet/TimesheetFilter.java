@@ -29,14 +29,14 @@ import java.util.Date;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.OrderDirection;
-
+import org.projectforge.task.TaskDependentFilter;
 
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class TimesheetFilter extends BaseSearchFilter implements Serializable
+public class TimesheetFilter extends BaseSearchFilter implements Serializable, TaskDependentFilter
 {
   private static final long serialVersionUID = -1449906331186225597L;
 
@@ -53,6 +53,15 @@ public class TimesheetFilter extends BaseSearchFilter implements Serializable
   private boolean recursive = true;
 
   private OrderDirection orderType = OrderDirection.DESC;
+
+  public TimesheetFilter()
+  {
+  }
+
+  public TimesheetFilter(final BaseSearchFilter filter)
+  {
+    super(filter);
+  }
 
   public Integer getTaskId()
   {
