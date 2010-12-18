@@ -75,7 +75,7 @@ public class GetImageDimensionsTest
       for (final File file : files) {
         final Image image = Toolkit.getDefaultToolkit().getImage(file.getAbsolutePath());
         final ImageIcon icon = new ImageIcon(image);
-        final String filename = file.getAbsolutePath().substring(absolutePath.length() + 1);
+        final String filename = file.getAbsolutePath().substring(absolutePath.length());
         final ImageDimension dimension = new ImageDimension(filename, icon.getIconWidth(), icon.getIconHeight());
         dimensions.add(dimension);
       }
