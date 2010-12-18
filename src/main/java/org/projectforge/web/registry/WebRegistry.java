@@ -77,6 +77,8 @@ import org.projectforge.web.humanresources.HRPlanningListPage;
 import org.projectforge.web.imagecropper.ImageCropperPage;
 import org.projectforge.web.meb.MebEditPage;
 import org.projectforge.web.meb.MebListPage;
+import org.projectforge.web.mobile.LoginMobilePage;
+import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.orga.ContractEditPage;
 import org.projectforge.web.orga.ContractListPage;
 import org.projectforge.web.orga.PostausgangEditPage;
@@ -113,6 +115,10 @@ public class WebRegistry
 {
   public static final String BOOKMARK_LOGIN = "login";
 
+  private static final String BOOKMARK_MOBILE_PREFIX = "m-";
+
+  public static final String BOOKMARK_MOBILE_LOGIN = BOOKMARK_MOBILE_PREFIX + BOOKMARK_LOGIN;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(WebRegistry.class);
 
   private static final WebRegistry instance = new WebRegistry();
@@ -121,7 +127,7 @@ public class WebRegistry
 
   private List<WebRegistryEntry> orderedList = new ArrayList<WebRegistryEntry>();
 
-  private Map<String, Class< ? extends WebPage>> mountPages = new HashMap<String, Class<? extends WebPage>>();
+  private Map<String, Class< ? extends WebPage>> mountPages = new HashMap<String, Class< ? extends WebPage>>();
 
   public static WebRegistry instance()
   {
@@ -293,5 +299,8 @@ public class WebRegistry
     addMountPage("systemUpdate", UpdatePage.class);
     addMountPage("taskTree", TaskTreePage.class);
     addMountPage("tutorial", TutorialPage.class);
+
+    addMountPage(BOOKMARK_MOBILE_LOGIN, LoginMobilePage.class);
+    addMountPage(BOOKMARK_MOBILE_PREFIX + "menu", MenuMobilePage.class);
   }
 }
