@@ -31,9 +31,9 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesCache;
 
 /** All pages with required login should be derived from this page. */
-public abstract class AbstractSecuredBaseMobilePage extends AbstractBaseMobilePage
+public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractSecuredBaseMobilePage.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractSecuredMobilePage.class);
 
   @SpringBean(name = "userXmlPreferencesCache")
   protected UserXmlPreferencesCache userXmlPreferencesCache;
@@ -41,7 +41,7 @@ public abstract class AbstractSecuredBaseMobilePage extends AbstractBaseMobilePa
   @SpringBean(name = "accessChecker")
   protected AccessChecker accessChecker;
 
-  public AbstractSecuredBaseMobilePage(final PageParameters parameters)
+  public AbstractSecuredMobilePage(final PageParameters parameters)
   {
     super(parameters);
   }

@@ -30,6 +30,9 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.CSSPackageResource;
 import org.apache.wicket.markup.html.JavascriptPackageResource;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.model.Model;
+import org.projectforge.Version;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.MySession;
@@ -40,21 +43,40 @@ import org.projectforge.web.wicket.WicketUtils;
  * Do only derive from this page, if no login is required!
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public abstract class AbstractBaseMobilePage extends WebPage
+public abstract class AbstractMobilePage extends WebPage
 {
   /**
    * Constructor that is invoked when page is invoked without a session.
    * 
    * @param parameters Page parameters
    */
-  public AbstractBaseMobilePage(final PageParameters parameters)
+  @SuppressWarnings("serial")
+  public AbstractMobilePage(final PageParameters parameters)
   {
     super(parameters);
     add(CSSPackageResource.getHeaderContribution("mobile/css/style.css"));
     add(JavascriptPackageResource.getHeaderContribution("mobile/javascript/functions.js"));
     add(WicketUtils.headerContributorForFavicon(getUrl("/favicon.ico")));
+    add(new Label("windowTitle", new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return getWindowTitle();
+      }
+    }));
+    final Model<String> loggedInLabelModel = new Model<String>() {
+      public String getObject()
+      {
+        final PFUserDO user = getUser();
+        if (user == null) {
+          return getString("notLoggedIn");
+        }
+        return getString("loggedInUserInfo") + " <strong>" + escapeHtml(user.getUserDisplayname()) + "</strong> |";
+      }
+    };
+    add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false).setRenderBodyOnly(false).setVisible(getUser() != null));
     if (getWicketApplication().isDevelopmentSystem() == true) {
-      //navigationContainer.add(new SimpleAttributeModifier("style", WebConstants.CSS_BACKGROUND_COLOR_RED));
+      // navigationContainer.add(new SimpleAttributeModifier("style", WebConstants.CSS_BACKGROUND_COLOR_RED));
     } else {
     }
   }
@@ -126,5 +148,10 @@ public abstract class AbstractBaseMobilePage extends WebPage
   public String getUrl(final String path, final boolean encodeUrl)
   {
     return WicketUtils.getUrl(getResponse(), path, encodeUrl);
+  }
+
+  protected String getWindowTitle()
+  {
+    return Version.APP_ID + " - " + getTitle();
   }
 }

@@ -23,28 +23,18 @@
 
 package org.projectforge.web.mobile;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.core.Configuration;
-import org.projectforge.core.ConfigurationParam;
-import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
-public class LoginMobileForm extends AbstractForm<LoginMobileForm, LoginMobilePage>
+public class LoginMobileForm extends AbstractMobileForm<LoginMobileForm, LoginMobilePage>
 {
   private static final long serialVersionUID = 563729268811279098L;
-
-  @SpringBean(name = "configuration")
-  private Configuration configuration;
 
   private boolean stayLoggedIn;
 
@@ -58,13 +48,9 @@ public class LoginMobileForm extends AbstractForm<LoginMobileForm, LoginMobilePa
   @SuppressWarnings("serial")
   protected void init()
   {
-    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     add(new CheckBox("stayLoggedIn", new PropertyModel<Boolean>(this, "stayLoggedIn")));
     add(new TextField<String>("username", new PropertyModel<String>(this, "username")).add(new FocusOnLoadBehavior()));
     add(new PasswordTextField("password", new PropertyModel<String>(this, "password")).setResetPassword(true).setRequired(true));
-    final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
-    final Label messageOfTheDayLabel = new Label("messageOfTheDay", messageOfTheDay);
-    add(messageOfTheDayLabel.setVisible(StringUtils.isNotBlank(messageOfTheDay)));
     final Button loginButton = new Button("button", new Model<String>(getString("login"))) {
       @Override
       public final void onSubmit()

@@ -23,19 +23,27 @@
 
 package org.projectforge.web.mobile;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigurationParam;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.UserFilter;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketUtils;
 
-public class LoginMobilePage extends AbstractBasePage
+public class LoginMobilePage extends AbstractMobilePage
 {
+  @SpringBean(name = "configuration")
+  private Configuration configuration;
+
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
@@ -52,20 +60,32 @@ public class LoginMobilePage extends AbstractBasePage
   {
     super(parameters);
     final PFUserDO wicketSessionUser = ((MySession) getSession()).getUser();
-    final PFUserDO sessionUser = UserFilter.getUser(((WebRequest)getRequest()).getHttpServletRequest());
+    final PFUserDO sessionUser = UserFilter.getUser(((WebRequest) getRequest()).getHttpServletRequest());
     // Sometimes the wicket session user is given but the http session user is lost (re-login required).
     if (wicketSessionUser != null && sessionUser != null && wicketSessionUser.getId() == sessionUser.getId()) {
-      setResponsePage(WicketUtils.getDefaultPage());
+      setResponsePage(WicketUtils.getDefaultMobilePage());
       return;
     }
     targetUrlAfterLogin = UserFilter.getTargetUrlAfterLogin(((WebRequest) getRequest()).getHttpServletRequest());
     form = new LoginMobileForm(this);
+    add(form);
     form.init();
+    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
+    final WebMarkupContainer messageOfTheDayArea = new WebMarkupContainer("messageOfTheDayArea");
+    add(messageOfTheDayArea);
+    final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
+    if (StringUtils.isBlank(messageOfTheDay) == true) {
+      messageOfTheDayArea.setVisible(false);
+    } else {
+      final Label messageOfTheDayLabel = new Label("messageOfTheDay", messageOfTheDay);
+      messageOfTheDayArea.add(messageOfTheDayLabel.setVisible(StringUtils.isNotBlank(messageOfTheDay)));
+    }
   }
 
   protected void checkLogin()
   {
-    LoginPage.internalCheckLogin(this, userDao, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), targetUrlAfterLogin);
+    LoginPage.internalCheckLogin(this, userDao, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), WicketUtils
+        .getDefaultMobilePage(), targetUrlAfterLogin);
   }
 
   @Override
