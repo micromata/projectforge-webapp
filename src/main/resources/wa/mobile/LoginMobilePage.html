@@ -8,23 +8,24 @@
 <body>
 
 <div id="topbar">
-<div id="title">ProjectForge</div>
-<div id="rightbutton"><a href="menu.html">Login</a></div>
+<div id="title">ProjectForge - Login</div>
 </div>
 <div id="content"><wicket:extend>
+  <div wicket:id="feedback">[feedback]</div>
   <span class="graytitle"><wicket:message key="login.welcome" /></span>
   <form wicket:id="form" class="loginform">
   <ul class="pageitem">
-    <li class="smallfield"><span class="name"><wicket:message key="username" /></span><input wicket:message="placeholder:username" type="text"
-      wicket:id="username" /></li>
-    <li class="smallfield"><span class="name"><wicket:message key="password" /></span><input wicket:message="password" type="password" /></li>
-    <li class="checkbox"><span class="name">Angemeldet bleiben</span><input name="checkbox" type="checkbox" /></li>
-    <li class="button"><input name="login" type="submit" value="Login" /></li>
+    <li class="smallfield"><span class="name"><wicket:message key="username" /></span><input wicket:id="username"
+      wicket:message="placeholder:username" type="text" /></li>
+    <li class="smallfield"><span class="name"><wicket:message key="password" /></span><input wicket:id="password"
+      wicket:message="placeholder:password" type="password" /></li>
+    <li class="checkbox"><span class="name"><wicket:message key="login.stayLoggedIn" /></span><input wicket:id="stayLoggedIn" type="checkbox" /></li>
+    <li class="button"><input wicket:id="login" type="submit" /></li>
   </ul>
   </form>
-  <ul class="pageitem">
-    <li class="textbox"><span class="header">Wichtige Meldung:</span>
-    <p>Am Dienstag zwischen 8:00 und 10:00 finden Wartungsarbeiten statt. ProjectForge steht in dieser Zeit leider nicht zur Verf&uuml;gung.</p>
+  <ul wicket:id="messageOfTheDayArea" class="pageitem">
+    <li class="textbox">
+    <p wicket:id="messageOfTheDay">[Have a lot of fun!]</p>
     </li>
   </ul>
 </wicket:extend></div>

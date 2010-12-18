@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta content="yes" name="apple-mobile-web-app-capable" />
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+</head>
+
+<body>
+
+<div id="topbar">
+<div id="title">ProjectForge - Menu</div>
+</div>
+<div id="content"><wicket:extend>
+  <wicket:container wicket:id="menu">
+    <wicket:remove>
+      <ul class="pageitem">
+        <li class="menu"><a href="addressList.html"> <img title="Description" src="thumbs/contacts.png" /> <span class="name">Adressenliste</span>
+        <span class="comment"></span> <span class="arrow"></span> </a></li>
+        <li class="menu"><a href="page.html"> <img title="Description" src="thumbs/clock.png" /> <span class="name">Zeitberichte</span> <span
+          class="comment"></span> <span class="arrow"></span> </a></li>
+        <li class="menu"><a href="page.html"> <img title="Description" src="thumbs/calendar.png" /> <span class="name">Kalender</span> <span
+          class="comment"></span> <span class="arrow"></span> </a></li>
+        <li class="menu"><a href="page.html"> <img title="Description" src="thumbs/settings.png" /> <span class="name">Einstellungen</span>
+        <span class="comment"></span> <span class="arrow"></span> </a></li>
+        <li class="menu"><a href="login.html"> <img title="Description" src="thumbs/start.png" /> <span class="name">Abmelden</span> <span
+          class="comment"></span> <span class="arrow"></span> </a></li>
+      </ul>
+    </wicket:remove>
+  </wicket:container>
+</wicket:extend></div>
+</body>
+</html>
