@@ -5,48 +5,52 @@
 
 <body>
 <wicket:extend>
-  <form wicket:id="form">
+  <form wicket:id="form" class="filter newform clearfix">
   <div wicket:id="feedback">[Validation errors]</div>
   <div>
   <div id="divZoom"></div>
   </div>
-  <fieldset><legend><wicket:message key="label.filterSettings" /></legend>
-  <table class="form">
-    <tr>
-      <th><wicket:message key="searchFilter" /></th>
-      <td colspan="3"><input wicket:id="searchString" class="stdtext" /></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="filter.lastModified" /></th>
-      <td><span wicket:id="startDate">[startDate]</span> - <span wicket:id="stopDate">[stopDate]</span>&nbsp;&nbsp;&nbsp; <select
-        wicket:id="lastDays" onchange="javascript:submit();">
+  	
+  	
+  
+  
+      <label for="searchfilter" class="clear full title"><wicket:message key="searchFilter" /></label>
+      <input id="searchfilter" wicket:id="searchString" class="text double title" />
+      <label class="clear double putfull"><wicket:container wicket:id="datesAsUTC">[2001-09-30 22:00:00.0 UTC - 2001-10-31 22:59:59.999 UTC]</wicket:container></label>
+      <label for="lastmodified" class="clear full"><wicket:message key="filter.lastModified" /></label>
+      <span wicket:id="startDate">[startDate]</span> <label class="quart center" > bis </label> <span wicket:id="stopDate">[stopDate]</span>
+      <label for="lastdays" class="quart">Range</label>
+      <select id="lastdays" class="half clear" wicket:id="lastDays" onchange="javascript:submit();">
         <option>[choose time period]</option>
-      </select> <span style="font-size: x-small; color: white;" wicket:id="datesAsUTC">[2001-09-30 22:00:00.0 UTC - 2001-10-31 22:59:59.999 UTC]</span></td>
-      <th><wicket:message key="search.area" /></th>
-      <td><select wicket:id="area" onchange="javascript:submit();">
+      </select> 
+      
+      
+      
+      <label class="full clear"><wicket:message key="search.area" /></label>
+      <select  class="double" wicket:id="area" onchange="javascript:submit();">
         <option>[All]</option>
-      </select></td>
-    </tr>
-    <tr>
-      <!-- th><wicket:message key="search.history" /></th>
+      </select>
+      
+      <!-- th><wicket:message key="search.history" />
         <td><wicket:message key="message.notYetImplemented" /></td-->
-      <th><wicket:message key="modifiedBy" /></th>
-      <td><span wicket:id="modifiedByUser">[modified by]</span></td>
-      <th><wicket:message key="label.pageSize" /></th>
-      <td><select wicket:id="pageSize" onchange="javascript:submit();">
+        
+      <label for="modifiedBy" class="clear full"><wicket:message key="modifiedBy" /></label>
+      
+      <span wicket:id="modifiedByUser">[modified by]</span>
+      
+      <label for="pageSize" class="clear full"><wicket:message key="label.pageSize" /></label>
+      
+      <select wicket:id="pageSize" onchange="javascript:submit();" id="pageSize" >
         <option>50</option>
-      </select></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="task" /></th>
-      <td colspan="3"><span wicket:id="task">[Task]</span></td>
-    </tr>
-    <tr>
-      <th></th>
-      <td class="buttonpanel" colspan="3"><span wicket:id="reset">[reset]</span> <span wicket:id="search">[search]</span></td>
-    </tr>
-  </table>
-  </fieldset>
+      </select>
+      <label class="clear full"><wicket:message key="task" /></label>
+      <span wicket:id="task">[Task]</span>
+
+	<fieldset class="buttons roundcorners boxshadow">
+		<span wicket:id="search">[search]</span>
+		<span wicket:id="reset">[reset]</span>
+	</fieldset>
+
   </form>
 
   <p>ToDo:

@@ -128,7 +128,7 @@ public class CustomerSelectPanel extends AbstractSelectPanel<KundeDO>
         getString("fibu.tooltip.unselectKunde")));
     // DropDownChoice favorites
     final FavoritesChoicePanel<KundeDO, KundeFavorite> favoritesPanel = new FavoritesChoicePanel<KundeDO, KundeFavorite>("favorites",
-        UserPrefArea.KUNDE_FAVORITE, tabIndex) {
+        UserPrefArea.KUNDE_FAVORITE, tabIndex, "half select") {
       @Override
       protected void select(final KundeFavorite favorite)
       {

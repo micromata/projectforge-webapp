@@ -190,7 +190,7 @@ public class WebConstants
    */
   public static final String CSS_INPUT_STDTEXT = "stdtext";
 
-  public static final SimpleAttributeModifier BUTTON_CLASS_CANCEL = new SimpleAttributeModifier("class", "reset");
+  public static final SimpleAttributeModifier BUTTON_CLASS_CANCEL = new SimpleAttributeModifier("class", "button");
 
   public static final SimpleAttributeModifier BUTTON_CLASS_NOBUTTON = new SimpleAttributeModifier("class", "nobutton");
 

@@ -112,7 +112,7 @@ public class ProjektSelectPanel extends AbstractSelectPanel<ProjektDO>
         getString("fibu.tooltip.unselectProjekt")));
     // DropDownChoice favorites
     final FavoritesChoicePanel<ProjektDO, ProjektFavorite> favoritesPanel = new FavoritesChoicePanel<ProjektDO, ProjektFavorite>("favorites",
-        UserPrefArea.PROJEKT_FAVORITE, tabIndex) {
+        UserPrefArea.PROJEKT_FAVORITE, tabIndex, "select half") {
       @Override
       protected void select(final ProjektFavorite favorite)
       {

@@ -34,6 +34,7 @@ import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefDao;
 import org.projectforge.web.user.UserPrefEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.AttributeAppendModifier;
 
 /**
  * Combo box for showing and selecting favorites quickly.
@@ -56,6 +57,8 @@ public abstract class FavoritesChoicePanel<T, F> extends FormComponentPanel<Stri
   private DropDownChoice<String> choice;
 
   private Integer tabIndex;
+  
+  private String cssClass;
 
   private UserPrefArea userPrefArea;
 
@@ -68,14 +71,15 @@ public abstract class FavoritesChoicePanel<T, F> extends FormComponentPanel<Stri
 
   public FavoritesChoicePanel(final String componentId, final UserPrefArea userPrefArea)
   {
-    this(componentId, userPrefArea, null);
+    this(componentId, userPrefArea, null, null);
   }
 
-  public FavoritesChoicePanel(final String componentId, final UserPrefArea userPrefArea, final Integer tabIndex)
+  public FavoritesChoicePanel(final String componentId, final UserPrefArea userPrefArea, final Integer tabIndex, final String cssClass)
   {
     super(componentId);
     this.userPrefArea = userPrefArea;
     this.tabIndex = tabIndex;
+    this.cssClass = cssClass;
     setModel(new PropertyModel<String>(this, "dummy"));
   }
 
@@ -126,6 +130,10 @@ public abstract class FavoritesChoicePanel<T, F> extends FormComponentPanel<Stri
     choice.setNullValid(true);
     if (tabIndex != null) {
       choice.add(new SimpleAttributeModifier("tabindex", String.valueOf(tabIndex)));
+    }
+    
+    if(cssClass != null){
+    	choice.add(new AttributeAppendModifier("class", cssClass));
     }
     add(choice);
     return choice;

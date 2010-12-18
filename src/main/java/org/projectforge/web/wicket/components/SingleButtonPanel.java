@@ -55,6 +55,16 @@ public class SingleButtonPanel extends Panel
     button.add(new SimpleAttributeModifier("title", tooltip));
   }
   
+  public SingleButtonPanel(final String id, final Button button, final String tooltip, final String classname) {
+	  	super(id);
+	    this.button = button;
+	    setRenderBodyOnly(true);
+	    add(button);
+	    button.add(new SimpleAttributeModifier("title", tooltip));
+	    button.add(new SimpleAttributeModifier("class", classname));
+  }
+  
+  
   public Button getButton()
   {
     return button;

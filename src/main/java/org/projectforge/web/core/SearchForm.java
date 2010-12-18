@@ -43,6 +43,7 @@ import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.AbstractSecuredForm;
+import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
@@ -85,6 +86,7 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     final TextField<String> searchField = new TextField<String>("searchString", new PropertyModel<String>(filter, "searchString"));
     searchField.add(new FocusOnLoadBehavior());
+    searchField.add(new AttributeAppendModifier("type", "text"));
     add(searchField);
     modifiedStartDatePanel = new DatePanel("startDate", new PropertyModel<Date>(filter, "startTimeOfLastModification"), DatePanelSettings
         .get().withCallerPage(parentPage).withSelectPeriodMode(true));

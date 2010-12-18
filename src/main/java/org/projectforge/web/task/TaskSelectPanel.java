@@ -122,7 +122,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
         .add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_TASK_UNSELECT, getString("tooltip.unselectTask")));
     // DropDownChoice favorites
     final FavoritesChoicePanel<TaskDO, TaskFavorite> favoritesPanel = new FavoritesChoicePanel<TaskDO, TaskFavorite>("favorites",
-        UserPrefArea.TASK_FAVORITE, tabIndex) {
+        UserPrefArea.TASK_FAVORITE, tabIndex, "full text") {
       @Override
       protected void select(final TaskFavorite favorite)
       {
