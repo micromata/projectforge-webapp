@@ -37,145 +37,147 @@ public class WebConstants
   public static final String PARAMETER_USER_ID = "uid";
 
   public static final String PARAMETER_DATE = "date";
+  
+  private static final String DIR = "/images/";
 
-  public static final String IMAGE_ACCEPT = "accept.png";
+  public static final String IMAGE_ACCEPT = DIR + "accept.png";
 
-  public static final String IMAGE_ADD = "add.png";
+  public static final String IMAGE_ADD = DIR + "add.png";
 
-  public static final String IMAGE_ARROW_DOWN = "arrow-down.png";
+  public static final String IMAGE_ARROW_DOWN = DIR + "arrow-down.png";
 
-  public static final String IMAGE_BIRTHDAY = "cake.png";
+  public static final String IMAGE_BIRTHDAY = DIR + "cake.png";
 
-  public static final String IMAGE_BIRTHDAY_DELETE = "cake_delete.png";
+  public static final String IMAGE_BIRTHDAY_DELETE = DIR + "cake_delete.png";
 
-  public static final String IMAGE_BULLET_STAR = "bullet_star.png";
+  public static final String IMAGE_BULLET_STAR = DIR + "bullet_star.png";
 
-  public static final String IMAGE_BUTTON_ASSIGN_TO_LEFT = "button_assignToLeft.png";
+  public static final String IMAGE_BUTTON_ASSIGN_TO_LEFT = DIR + "button_assignToLeft.png";
 
-  public static final String IMAGE_BUTTON_ASSIGN_TO_RIGHT = "button_assignToRight.png";
+  public static final String IMAGE_BUTTON_ASSIGN_TO_RIGHT = DIR + "button_assignToRight.png";
 
-  public static final String IMAGE_BUTTON_CANCEL = "button_cancel.png";
+  public static final String IMAGE_BUTTON_CANCEL = DIR + "button_cancel.png";
 
-  public static final String IMAGE_CALENDAR_NEXT_MONTH = "css_img/rightInactive.png";
+  public static final String IMAGE_CALENDAR_NEXT_MONTH = DIR + "css_img/rightInactive.png";
 
-  public static final String IMAGE_CALENDAR_PREVIOUS_MONTH = "css_img/leftInactive.png";
+  public static final String IMAGE_CALENDAR_PREVIOUS_MONTH = DIR + "css_img/leftInactive.png";
 
-  public static final String IMAGE_CALENDAR_SELECT_WEEK = "button_calendar_week.png";
+  public static final String IMAGE_CALENDAR_SELECT_WEEK = DIR + "button_calendar_week.png";
 
-  public static final String IMAGE_CLOCK = "clock.png";
+  public static final String IMAGE_CLOCK = DIR + "clock.png";
 
-  public static final String IMAGE_CLOCK_DELETE = "clock_delete.png";
+  public static final String IMAGE_CLOCK_DELETE = DIR + "clock_delete.png";
 
-  public static final String IMAGE_COG = "cog.png";
+  public static final String IMAGE_COG = DIR + "cog.png";
 
-  public static final String IMAGE_DATABASE_DELETE = "database_delete.png";
+  public static final String IMAGE_DATABASE_DELETE = DIR + "database_delete.png";
 
-  public static final String IMAGE_DATABASE_INSERT = "database_insert.png";
+  public static final String IMAGE_DATABASE_INSERT = DIR + "database_insert.png";
 
-  public static final String IMAGE_DATABASE_SELECT = "database_select.png";
+  public static final String IMAGE_DATABASE_SELECT = DIR + "database_select.png";
 
-  public static final String IMAGE_DATABASE_UPDATE = "database_update.png";
+  public static final String IMAGE_DATABASE_UPDATE = DIR + "database_update.png";
 
-  public static final String IMAGE_DATE_SELECT = "button_selectDate.png";
+  public static final String IMAGE_DATE_SELECT = DIR + "button_selectDate.png";
 
-  public static final String IMAGE_DATE_UNSELECT = "button_unselectDate.png";
+  public static final String IMAGE_DATE_UNSELECT = DIR + "button_unselectDate.png";
 
-  public static final String IMAGE_DELETE = "trash.png";
+  public static final String IMAGE_DELETE = DIR + "trash.png";
 
-  public static final String IMAGE_DENY = "deny.png";
+  public static final String IMAGE_DENY = DIR + "deny.png";
 
-  public static final String IMAGE_EDIT = "pencil.png";
+  public static final String IMAGE_EDIT = DIR + "pencil.png";
 
-  public static final String IMAGE_EXCLAMATION = "exclamation.png";
+  public static final String IMAGE_EXCLAMATION = DIR + "exclamation.png";
 
-  public static final String IMAGE_EYE = "eye.png";
+  public static final String IMAGE_EYE = DIR + "eye.png";
 
-  public static final String IMAGE_EXPORT_EXCEL = "page_white_excel.png";
+  public static final String IMAGE_EXPORT_EXCEL = DIR + "page_white_excel.png";
 
-  public static final String IMAGE_EXPORT_PDF = "page_white_acrobat.png";
+  public static final String IMAGE_EXPORT_PDF = DIR + "page_white_acrobat.png";
 
-  public static final String IMAGE_FEEDBACK = "comment.png";
+  public static final String IMAGE_FEEDBACK = DIR + "comment.png";
 
-  public static final String IMAGE_FIND = "find.png";
+  public static final String IMAGE_FIND = DIR + "find.png";
 
-  public static final String IMAGE_GANTT = "gantt.png";
+  public static final String IMAGE_GANTT = DIR + "gantt.png";
 
-  public static final String IMAGE_GROUP_SELECT = "button_selectGroup.png";
+  public static final String IMAGE_GROUP_SELECT = DIR + "button_selectGroup.png";
 
-  public static final String IMAGE_GROUP_UNSELECT = "button_unselectGroup.png";
+  public static final String IMAGE_GROUP_UNSELECT = DIR + "button_unselectGroup.png";
 
-  public static final String IMAGE_HELP = "help.png";
+  public static final String IMAGE_HELP = DIR + "help.png";
 
-  public static final String IMAGE_HELP_KEYBOARD = "keyboard.png";
+  public static final String IMAGE_HELP_KEYBOARD = DIR + "keyboard.png";
 
-  public static final String IMAGE_INFO = "information.png";
+  public static final String IMAGE_INFO = DIR + "information.png";
 
-  public static final String IMAGE_KOST2_SELECT = "coins_add.png";
+  public static final String IMAGE_KOST2_SELECT = DIR + "coins_add.png";
 
-  public static final String IMAGE_KOST2_UNSELECT = "coins_delete.png";
+  public static final String IMAGE_KOST2_UNSELECT = DIR + "coins_delete.png";
 
-  public static final String IMAGE_KUNDE_SELECT = "button_selectCustomer.png";
+  public static final String IMAGE_KUNDE_SELECT = DIR + "button_selectCustomer.png";
 
-  public static final String IMAGE_KUNDE_UNSELECT = "button_unselectCustomer.png";
+  public static final String IMAGE_KUNDE_UNSELECT = DIR + "button_unselectCustomer.png";
 
   @Deprecated
-  public static final String IMAGE_MICROMATA_MENU_ICON = "micromata_icon.png";
+  public static final String IMAGE_MICROMATA_MENU_ICON = DIR + "micromata_icon.png";
 
-  public static final String IMAGE_NEW = "new.png";
+  public static final String IMAGE_NEW = DIR + "new.png";
 
-  public static final String IMAGE_PAGE_COPY = "page_copy.png";
+  public static final String IMAGE_PAGE_COPY = DIR + "page_copy.png";
 
-  public static final String IMAGE_PAGE_PASTE = "page_paste.png";
+  public static final String IMAGE_PAGE_PASTE = DIR + "page_paste.png";
 
-  public static final String IMAGE_PHONE = "telephone.png";
+  public static final String IMAGE_PHONE = DIR + "telephone.png";
 
-  public static final String IMAGE_PHONE_MOBILE = "phone.png";
+  public static final String IMAGE_PHONE_MOBILE = DIR + "phone.png";
 
-  public static final String IMAGE_PHONE_HOME = "house.png";
+  public static final String IMAGE_PHONE_HOME = DIR + "house.png";
 
-  public static final String IMAGE_PROJEKT_SELECT = "button_selectProjekt.png";
+  public static final String IMAGE_PROJEKT_SELECT = DIR + "button_selectProjekt.png";
 
-  public static final String IMAGE_PROJEKT_UNSELECT = "button_unselectProjekt.png";
+  public static final String IMAGE_PROJEKT_UNSELECT = DIR + "button_unselectProjekt.png";
 
-  public static final String IMAGE_PRINTER = "printer.png";
+  public static final String IMAGE_PRINTER = DIR + "printer.png";
 
-  public static final String IMAGE_QUICKSELECT_CURRENT_MONTH = "button_calendar_month.png";
+  public static final String IMAGE_QUICKSELECT_CURRENT_MONTH = DIR + "button_calendar_month.png";
 
-  public static final String IMAGE_QUICKSELECT_CURRENT_WEEK = "button_calendar_week.png";
+  public static final String IMAGE_QUICKSELECT_CURRENT_WEEK = DIR + "button_calendar_week.png";
 
-  public static final String IMAGE_QUICKSELECT_FOLLOWING_MONTH = "button_next_month.png";
+  public static final String IMAGE_QUICKSELECT_FOLLOWING_MONTH = DIR + "button_next_month.png";
 
-  public static final String IMAGE_QUICKSELECT_FOLLOWING_WEEK = "button_next_week.png";
+  public static final String IMAGE_QUICKSELECT_FOLLOWING_WEEK = DIR + "button_next_week.png";
 
-  public static final String IMAGE_QUICKSELECT_PREVIOUS_MONTH = "button_previous_month.png";
+  public static final String IMAGE_QUICKSELECT_PREVIOUS_MONTH = DIR + "button_previous_month.png";
 
-  public static final String IMAGE_QUICKSELECT_PREVIOUS_WEEK = "button_previous_week.png";
+  public static final String IMAGE_QUICKSELECT_PREVIOUS_WEEK = DIR + "button_previous_week.png";
 
-  public static final String IMAGE_STAR_PLUS = "star_plus.png";
+  public static final String IMAGE_STAR_PLUS = DIR + "star_plus.png";
 
-  public static final String IMAGE_TABLE_ROW_ADD = "table_row_insert.png";
+  public static final String IMAGE_TABLE_ROW_ADD = DIR + "table_row_insert.png";
 
-  public static final String IMAGE_TASK_SELECT = "button_selectTask.png";
+  public static final String IMAGE_TASK_SELECT = DIR + "button_selectTask.png";
 
-  public static final String IMAGE_TASK_UNSELECT = "button_unselectTask.png";
+  public static final String IMAGE_TASK_UNSELECT = DIR + "button_unselectTask.png";
 
-  public static final String IMAGE_UNDELETE = "arrow_undo.png";
+  public static final String IMAGE_UNDELETE = DIR + "arrow_undo.png";
 
-  public static final String IMAGE_USER_SELECT = "button_selectUser.png";
+  public static final String IMAGE_USER_SELECT = DIR + "button_selectUser.png";
 
-  public static final String IMAGE_USER_SELECT_ME = "button_selectMe.png";
+  public static final String IMAGE_USER_SELECT_ME = DIR + "button_selectMe.png";
 
-  public static final String IMAGE_USER_UNSELECT = "button_unselectUser.png";
+  public static final String IMAGE_USER_UNSELECT = DIR + "button_unselectUser.png";
 
-  public static final String IMAGE_SPACER = "spacer.gif";
+  public static final String IMAGE_SPACER = DIR + "spacer.gif";
 
-  public static final String IMAGE_TREE_ICON_LEAF = "leaf.gif";
+  public static final String IMAGE_TREE_ICON_LEAF = DIR + "leaf.gif";
 
-  public static final String IMAGE_TREE_ICON_FOLDER = "folder.gif";
+  public static final String IMAGE_TREE_ICON_FOLDER = DIR + "folder.gif";
 
-  public static final String IMAGE_TREE_ICON_FOLDER_OPEN = "folder_open.gif";
+  public static final String IMAGE_TREE_ICON_FOLDER_OPEN = DIR + "folder_open.gif";
 
-  public static final String IMAGE_TREE_ICON_EXPLOSION = "explosion.gif";
+  public static final String IMAGE_TREE_ICON_EXPLOSION = DIR + "explosion.gif";
 
   public static final int IMAGE_TREE_ICON_HEIGHT = 15;
 
