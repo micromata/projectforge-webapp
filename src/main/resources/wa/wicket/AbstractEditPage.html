@@ -11,25 +11,31 @@
     }
   </script>
 
-  <form wicket:id="form">
+  <form wicket:id="form" >
   <div wicket:id="feedback">[Validation errors]</div>
 
-  <fieldset><legend><wicket:message key="label.data" /></legend>
-  <table class="form">
-    <wicket:child />
-    <tr>
-      <th></th>
-      <td class="buttonpanel" wicket:id="buttonCell" colspan="4"><span wicket:id="cancel">[cancel]</span> <span wicket:id="buttonPanel">[Place
-      for page specific buttons]</span> <span wicket:id="reset">[reset]</span> <span wicket:id="markAsDeleted">[mark as deleted]</span> <span
-        wicket:id="undelete">[undelete]</span> <span wicket:id="delete">[delete]</span> <span wicket:id="create">[create]</span> <span
-        wicket:id="update">[update]</span></td>
-    </tr>
-    <tr wicket:id="bottomRows">
+  <fieldset>
+  	<legend><wicket:message key="label.data" /></legend>
+  
+    	<wicket:child />
+    
+   </fieldset>
+   <fieldset class="buttons" wicket:id="buttonCell">
+      	<span wicket:id="cancel">[cancel]</span>
+      	<span wicket:id="buttonPanel">[Place for page specific buttons]</span>
+		<span wicket:id="reset">[reset]</span>
+		<span wicket:id="markAsDeleted">[mark as deleted]</span>
+		<span wicket:id="undelete">[undelete]</span>
+		<span wicket:id="delete">[delete]</span>
+		<span wicket:id="create">[create]</span>
+		<span wicket:id="update">[update]</span>
+	
+    </fieldset>
+    <fieldset wicket:id="bottomRows">
       <!-- Place here your content below the buttons. -->
-    </tr>
-  </table>
-  </fieldset>
+    </fieldset>
   </form>
+
   <span wicket:id="bottomPanel"> <!-- Place here your content below the form and buttons. --> </span>
   <fieldset><legend><wicket:message key="label.historyOfChanges" /></legend>
   <table class="form" wicket:id="timeOfModifications">

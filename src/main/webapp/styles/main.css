@@ -574,6 +574,8 @@ ul#normal li.active ul {
     margin: 0.5em 0 0;
 }
 
+
+
 .loginform input.full, .loginform input.text  {
 	width: 100%;
 	font-size: 1.4em;
@@ -654,7 +656,7 @@ div.form input.stdtext {
 	width: 200px;
 }
 
-fieldset.buttons, fieldset {
+fieldset.buttons, fieldset, div.buttons {
 	border:none;
 	border-top: 1px solid #D9DFE1;
 	padding: 3em 1em 1em 1em;
@@ -755,7 +757,7 @@ form.newform p,
 	margin: 0.5em 1em 0 -0.2em;
 	display: inline-block;
 	float:left;
-	border: 0.1em solid transparent;
+	border: 0.1em solid transparent; /*colour em later...*/
 	min-height: 1.4em;
 	line-height: 1.4em;
 	font-size: 1em;
@@ -773,7 +775,16 @@ form.newform p,
 	width:auto;
 }
 
+.newform label.bold {
+	font-weight:b old;
+}
 
+form.newform {
+	width:60em;
+	background:red;
+	display:block;
+	margin: 0 auto;
+}
 
 .clear {
 	width:9em;
@@ -785,8 +796,8 @@ select {
 
 .newform input[type="text"],
 .newform input[type="password"],
-.newformtextarea, 
-.newformselect, 
+.newform textarea, 
+.newform select, 
 .newform .file{
 	border-color:#D9DFE1;
 	background:#fff;
@@ -887,7 +898,7 @@ select.error:focus {
 
 
 /* der graue button */
-fieldset.buttons input,
+.buttons input,
 input.button,
 a.button,
 div.visible a.button, 
@@ -927,11 +938,11 @@ a.button:hover,
 
 
 /* der grüne Button/Buttonlink */
-fieldset.buttons input.submit,
+.buttons input.submit,
 input.submit,
 div.visible a.submit,
 fieldset.visible a.submit,
-fieldset.buttons a.submit
+.buttons a.submit
 	{
 	background: -moz-linear-gradient(top, #A9D887, #009C0E);
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #A9D887), color-stop(1.0, #009C0E) );
@@ -939,8 +950,8 @@ fieldset.buttons a.submit
 }
 
 /* der grüne Button/Buttonlink mouseover */
-fieldset.buttons input:hover.submit,
-fieldset.buttons a:hover.submit ,
+.buttons input:hover.submit,
+.buttons a:hover.submit ,
 input.submit:hover{
 	background: -moz-linear-gradient(top, #A9D887, #009C0E 60%);
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #A9D887),
@@ -949,7 +960,7 @@ input.submit:hover{
 }
 
 /* der rote button und buttonlink */
-fieldset.buttons input.reset,
+.buttons input.reset,
 input.reset {
 	/*filter:progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#00FF00',EndColorStr='#000000',GradientType=0);*/
 	background: -moz-linear-gradient(top, #FBEDED, #E11D1C);
@@ -958,8 +969,8 @@ input.reset {
 }
 
 /* der rote button und buttonlink mouseover*/
-fieldset.buttons input:hover.reset,
-fieldset.buttons a:hover.reset,
+.buttons input:hover.reset,
+.buttons a:hover.reset,
 input.reset:hover {
 	background: -moz-linear-gradient(top, #FBEDED, #E11D1C 60%);
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #FBEDED),color-stop(0.6, #E11D1C) );

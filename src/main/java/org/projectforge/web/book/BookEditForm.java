@@ -25,6 +25,7 @@ package org.projectforge.web.book;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -40,6 +41,7 @@ import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.common.OutputType;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
@@ -64,6 +66,7 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
   public BookEditForm(BookEditPage parentPage, BookDO data)
   {
     super(parentPage, data);
+
     this.colspan = 4;
     if (isNew() == true) {
       data.setStatus(BookStatus.PRESENT);
@@ -72,7 +75,7 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
       bookDao.setTask(getData(), bookDao.getDefaultTaskId());
     }
   }
-
+  
   @Override
   protected void init()
   {
@@ -132,6 +135,8 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
         parentPage.lendOut();
       }
     };
+    
+    lendOutButton.add(new SimpleAttributeModifier("class","submit "));
     final SingleButtonPanel lendOutButtonPanel = new SingleButtonPanel("lendOutButton", lendOutButton);
     bottomRowsFragment.add(lendOutButtonPanel);
 
@@ -143,6 +148,7 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
         parentPage.returnBook();
       }
     };
+    returnBookButton.add(new SimpleAttributeModifier("class","reset"));
     final SingleButtonPanel returnBookButtonPanel = new SingleButtonPanel("returnBookButton", returnBookButton);
     bottomRowsFragment.add(returnBookButtonPanel);
     if (getData().getLendOutById() == null) {

@@ -4,73 +4,60 @@
 </head>
 
 <body>
-<table>
   <wicket:extend>
+  <div class="newform clearfix">
+  
     <wicket:fragment wicket:id="bottomRowsFragment">
-      <tr class="hRuler">
-        <td colspan="4"></td>
-      </tr>
-      <tr>
-        <th><wicket:message key="book.lending" /></th>
-        <td><span wicket:id="lendOutStatus">Kai Reinhard, 10.10.2010</span><span wicket:id="lendOutButton">[lend out]</span><span
-          wicket:id="returnBookButton">[return book]</span></td>
-        <th><wicket:message key="book.lendOutNote" /></th>
-        <td><input type="text" class="stdtext" wicket:id="lendOutComment" /></td>
-      </tr>
+       
+       <div class="buttons clearfix">
+       		<p>
+       			<strong><wicket:message key="book.lending" /></strong> <span wicket:id="lendOutStatus">Kai Reinhard, 10.10.2010</span>
+       		</p>
+       		<span wicket:id="lendOutButton">[lend out]</span>
+       		<span wicket:id="returnBookButton">[return book]</span>
+       </div>
+       <wicket:message key="book.lendOutNote" />
+       <input type="text" class="stdtext" wicket:id="lendOutComment" />
     </wicket:fragment>
-    <tr>
-      <th><wicket:message key="task" /></th>
-      <td colspan="3" wicket:id="task">[task path]</td>
-    </tr>
-    <tr>
-      <th><wicket:message key="book.title" /></th>
-      <td colspan="3"><input type="text" class="stdtext" wicket:id="title" /></td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="4"></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="book.authors" /></th>
-      <td><input type="text" class="stdtext" wicket:id="authors" /></td>
-      <th><wicket:message key="book.signature" /></th>
-      <td><input type="text" class="stdtext" wicket:id="signature" /></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="book.keywords" /></th>
-      <td><input type="text" class="stdtext" wicket:id="keywords" /></td>
-      <th><wicket:message key="book.publisher" /></th>
-      <td><input type="text" class="stdtext" wicket:id="publisher" /></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="book.isbn" /></th>
-      <td><input type="text" class="stdtext" wicket:id="isbn" /></td>
-      <th><wicket:message key="book.editor" /></th>
-      <td><input type="text" class="stdtext" wicket:id="editor" /></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="status" /></th>
-      <td><select wicket:id="status" id="status">
-        <option>present</option>
-      </select></td>
-      <th><wicket:message key="book.yearOfPublishing" /></th>
-      <td><input type="text" class="stdtext" style="width: 4em;" wicket:id="yearOfPublishing" /></td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="4"></td>
-    </tr>
+    
+		<label for="task" class="half clear"><wicket:message key="task" /></label>
+	    <label id="task" class="double bold"><span wicket:id="task">[task path]</span></label>
+	
+	    <label class="half clear" for="title"><wicket:message key="book.title" /></label>
+	    <input id="title" type="text" class="text double" wicket:id="title" />
+	   
+	   	<label class="half clear"  for="authors"><wicket:message key="book.authors" /></label>
+	    <input id="authors" type="text" class="text double"  wicket:id="authors" />
+	    
+	    <label  class="half clear" for="signature"><wicket:message key="book.signature" /></label>
+	    <input id="signature" type="text" class="text half" wicket:id="signature" />
+	    
+	    <label  class="half" for="keywords"><wicket:message key="book.keywords" /></label>
+		<input id="keywords" type="text" class="text full" wicket:id="keywords" />
+		
+		<label class="half clear" for="punisher"><wicket:message key="book.publisher" /></label>
+	    <input id="punisher" type="text" class="text full" wicket:id="publisher" />
+	    
+	    <label class="half"  for="isbn"><wicket:message key="book.isbn" /></label>
+	    <input id="isbn" type="text" class="text half" wicket:id="isbn" />
+	    
+	    <label  class="half clear" for="editor"><wicket:message key="book.editor" /></label>
+	    <input id="editor" type="text" class="text full" wicket:id="editor" />
+	    
+	    <label class="half"  for="status"><wicket:message key="status" /></label>
+	    <select wicket:id="status" id="status" class="select half">
+	        <option>present</option>
+	    </select>
 
-    <tr>
-      <th colspan="2"><wicket:message key="book.abstract" /></th>
-      <th colspan="2"><wicket:message key="comment" /></th>
-    </tr>
-    <tr>
-      <td colspan="2"><textarea class="stdtext" wicket:id="abstract" style="height: 20ex;">[abstract]</textarea></td>
-      <td colspan="2"><textarea class="stdtext" wicket:id="comment" style="height: 20ex;">[comment]</textarea></td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="4"></td>
-    </tr>
-  </wicket:extend>
-</table>
+	    <label class="half clear putonehalf"  for="yearOfPublishing"><wicket:message key="book.yearOfPublishing" /></label>
+	    <input id="yearOfPublishing" type="text" class="text half"  wicket:id="yearOfPublishing" />
+	      
+		<label class="half clear" for="abstract"><wicket:message key="book.abstract" /></label>
+		<textarea id="abstract" class="textarea clear double" wicket:id="abstract">[abstract]</textarea>
+		
+		<label class="clear half"  for="comment"><wicket:message key="comment" /></label>
+	    <textarea id="comment" class="textarea double" wicket:id="comment">[comment]</textarea>
+  </div>
+	</wicket:extend>
 </body>
 </html>

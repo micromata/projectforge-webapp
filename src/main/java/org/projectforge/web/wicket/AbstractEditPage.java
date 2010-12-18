@@ -125,6 +125,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
       }
     }
     form = newEditForm(this, data);
+    
     body.add(form);
     form.init();
     if (form.isNew() == true) {

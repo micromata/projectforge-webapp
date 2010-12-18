@@ -32,6 +32,7 @@ import org.projectforge.book.BookDO;
 import org.projectforge.book.BookDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.EditPage;
 
 @EditPage(defaultReturnPage = BookListPage.class)
@@ -47,9 +48,10 @@ public class BookEditPage extends AbstractEditPage<BookDO, BookEditForm, BookDao
   public BookEditPage(PageParameters parameters)
   {
     super(parameters, "book");
+    super.form.add(new AttributeAppendModifier("class","newform"));
     init();
   }
-
+ 
   protected void lendOut()
   {
     getData().setLendOutDate(new Date());
