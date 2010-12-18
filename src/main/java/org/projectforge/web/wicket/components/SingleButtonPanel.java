@@ -26,7 +26,6 @@ package org.projectforge.web.wicket.components;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.projectforge.web.wicket.AttributeAppendModifier;
 
 /**
  * Panel for using as single button (needed for css decoration).
