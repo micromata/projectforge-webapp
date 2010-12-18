@@ -43,7 +43,6 @@ import org.projectforge.xml.stream.AliasMap;
 import org.projectforge.xml.stream.XmlHelper;
 import org.projectforge.xml.stream.XmlObjectWriter;
 
-
 /**
  * Creates a dimenstion file for setting the html markup attributes width and size for images. It generates a dimension file which is read
  * by PresizedImage. Test case should be executed every time after modifying dimensions of web app images or adding new images.
@@ -54,7 +53,9 @@ public class GetImageDimensionsTest
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GetImageDimensionsTest.class);
 
-  private static final String PATH = "src/main/webapp/images";
+  private static final String PATH = "src/main/webapp/";
+
+  private static final String[] SUB_DIRS = { "images", "mobile/images", "mobile/thumbs"};
 
   private static final String DIMENSION_FILE = "src/main/resources/" + WebConstants.FILE_IMAGE_DIMENSIONS;
 
@@ -64,17 +65,20 @@ public class GetImageDimensionsTest
   public void doit() throws IOException
   {
     log.info("Create dimension file of all webapp images.");
-    @SuppressWarnings("unchecked")
-    final Collection<File> files = FileUtils.listFiles(new File(PATH), IMAGE_SUFFIXES, true);
-    final File absolutePathFile = new File(PATH);
-    final String absolutePath = absolutePathFile.getAbsolutePath();
     final List<ImageDimension> dimensions = new ArrayList<ImageDimension>();
-    for (final File file : files) {
-      final Image image = Toolkit.getDefaultToolkit().getImage(file.getAbsolutePath());
-      final ImageIcon icon = new ImageIcon(image);
-      final String filename = file.getAbsolutePath().substring(absolutePath.length() + 1);
-      final ImageDimension dimension = new ImageDimension(filename, icon.getIconWidth(), icon.getIconHeight());
-      dimensions.add(dimension);
+    for (final String subDir : SUB_DIRS) {
+      final String path = PATH + subDir;
+      @SuppressWarnings("unchecked")
+      final Collection<File> files = FileUtils.listFiles(new File(path), IMAGE_SUFFIXES, true);
+      final File absolutePathFile = new File(PATH);
+      final String absolutePath = absolutePathFile.getAbsolutePath();
+      for (final File file : files) {
+        final Image image = Toolkit.getDefaultToolkit().getImage(file.getAbsolutePath());
+        final ImageIcon icon = new ImageIcon(image);
+        final String filename = file.getAbsolutePath().substring(absolutePath.length() + 1);
+        final ImageDimension dimension = new ImageDimension(filename, icon.getIconWidth(), icon.getIconHeight());
+        dimensions.add(dimension);
+      }
     }
     final FileWriter writer = new FileWriter(DIMENSION_FILE);
     final XmlObjectWriter xmlWriter = new XmlObjectWriter();
