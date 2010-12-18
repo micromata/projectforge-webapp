@@ -65,6 +65,8 @@ import org.projectforge.core.Configuration;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.mobile.AbstractMobilePage;
+import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.TooltipImage;
 
@@ -120,9 +122,9 @@ public class WicketUtils
    * @param subpath
    * @return
    */
-  public static String getImageUrl(final Response response, final String subpath)
+  public static String getImageUrl(final Response response, final String path)
   {
-    return getUrl(response, "/images/" + subpath, true);
+    return getUrl(response, path, true);
   }
 
   /**
@@ -286,6 +288,14 @@ public class WicketUtils
   public static Class< ? extends AbstractSecuredPage> getDefaultPage()
   {
     return CalendarPage.class;
+  }
+
+  /**
+   * @return MenuMobilePage.class.
+   */
+  public static Class< ? extends AbstractMobilePage> getDefaultMobilePage()
+  {
+    return MenuMobilePage.class;
   }
 
   /**
@@ -688,7 +698,8 @@ public class WicketUtils
         || ContextImage.class.isAssignableFrom(component.getClass()) == true) {
       return component;
     }
-    component.add(new AttributeAppendModifier("class", " hastooltip")); // TODO: KAI humm, perhaps it's better to add that space per default?
+    component.add(new AttributeAppendModifier("class", " hastooltip")); // TODO: KAI humm, perhaps it's better to add that space per
+    // default?
     return component;
   }
 
