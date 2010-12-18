@@ -48,10 +48,10 @@ public class BookEditPage extends AbstractEditPage<BookDO, BookEditForm, BookDao
   public BookEditPage(PageParameters parameters)
   {
     super(parameters, "book");
-    super.form.add(new AttributeAppendModifier("class","newform"));
     init();
+    form.add(new AttributeAppendModifier("class", "newform"));
   }
- 
+
   protected void lendOut()
   {
     getData().setLendOutDate(new Date());
