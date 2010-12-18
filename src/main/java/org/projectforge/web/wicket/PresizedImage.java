@@ -79,12 +79,12 @@ public class PresizedImage extends ContextImage
    * @param request
    * @param relativePath path relative to web apps image dir.
    */
-  public PresizedImage(final String id, final Response response, final String relativePath)
+  public PresizedImage(final String id, final Response response, final String path)
   {
-    super(id, WicketUtils.getImageUrl(response, relativePath));
-    Dimension dimension = registry.get(relativePath);
+    super(id, WicketUtils.getImageUrl(response, path));
+    Dimension dimension = registry.get(path);
     if (dimension == null) {
-      log.error("Image " + relativePath + " not found (please update image dimension file via GetImageDimensionsTest).");
+      log.error("Image " + path + " not found (please update image dimension file via GetImageDimensionsTest).");
     } else {
       add(new SimpleAttributeModifier("height", String.valueOf(dimension.height)));
       add(new SimpleAttributeModifier("width", String.valueOf(dimension.width)));
