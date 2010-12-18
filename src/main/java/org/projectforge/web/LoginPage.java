@@ -100,7 +100,7 @@ public class LoginPage extends AbstractBasePage
   }
 
   public static void internalCheckLogin(final WebPage page, final UserDao userDao, final String username, final String password,
-      final boolean userWantsToStayLoggedIn, final String targetUrlAfterLogin)
+      final boolean userWantsToStayLoggedIn, final Class<? extends WebPage> defaultPage, final String targetUrlAfterLogin)
   {
     final String encryptedPassword = userDao.encryptPassword(password);
     final PFUserDO user = userDao.authenticateUser(username, encryptedPassword);
@@ -125,7 +125,7 @@ public class LoginPage extends AbstractBasePage
         if (targetUrlAfterLogin != null) {
           page.getRequestCycle().setRequestTarget(new RedirectRequestTarget(targetUrlAfterLogin));
         } else {
-          page.setResponsePage(WicketUtils.getDefaultPage());
+          page.setResponsePage(defaultPage);
         }
         return;
       }
@@ -137,7 +137,7 @@ public class LoginPage extends AbstractBasePage
 
   protected void checkLogin()
   {
-    internalCheckLogin(this, userDao, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), targetUrlAfterLogin);
+    internalCheckLogin(this, userDao, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), WicketUtils.getDefaultPage(), targetUrlAfterLogin);
   }
 
   @Override

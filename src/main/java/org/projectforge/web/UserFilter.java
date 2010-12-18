@@ -76,6 +76,8 @@ public class UserFilter implements Filter
 
   private final static String LOGIN_URL = "/wa/" + WebRegistry.BOOKMARK_LOGIN;
 
+  private final static String MOBILE_LOGIN_URL = "/wa/" + WebRegistry.BOOKMARK_MOBILE_LOGIN;
+
   public static void initialize(final UserDao userDao, final String contextPath)
   {
     UserFilter.userDao = userDao;
@@ -196,7 +198,9 @@ public class UserFilter implements Filter
   {
     final String requestUri = request.getRequestURI();
     final String queryString = request.getQueryString();
-    if (requestUri.contains(LOGIN_URL) == true || (queryString != null && queryString.contains("body:form::IFormSubmitListener") == true)) {
+    if (requestUri.contains(LOGIN_URL) == true
+        || requestUri.contains(MOBILE_LOGIN_URL) == true
+        || (queryString != null && (queryString.contains("body:form::IFormSubmitListener") == true || queryString.contains("wicket:interface") == true))) {
       // For unactivated cookies: the login form posts (action link) to /wa;sessionid=.... with queryString
       // ...body:form::IFormSubmitListener...
       // This is no security problem because the MyAuthorizationStrategy throws an exception if the user tries to call a secure page without
