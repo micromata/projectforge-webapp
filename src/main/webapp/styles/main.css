@@ -674,6 +674,12 @@ fieldset.buttons, fieldset, div.buttons {
 	
 }
 
+.newform.filter fieldset.buttons{
+	float:right;
+	border: 1px solid #BBC1C3;
+	padding-left:0;
+}
+
 fieldset.float{
 	float: left;
 
@@ -746,6 +752,31 @@ form.newform label.error {
 	color: #E20B2C;
 	border:none;
 }
+
+form.newform .datepanel,
+form.newform .userselect{
+		
+	display:block;
+	float:left;
+	position:relative;
+}
+
+form.newform .datepanel a {
+	position:absolute;
+	opacity: 0.5;
+-moz-opacity: 0.5;
+filter:alpha(opacity=50);
+    position: absolute;
+    right: 1.2em;
+    top: 0.4em;
+}
+
+form.newform .datepanel a:hover {
+	opacity: 1;
+-moz-opacity: 1;
+filter:alpha(opacity=1);
+}
+
 form.newform p,
 .newform input[type="text"],
 .newform input[type="password"],
@@ -767,6 +798,27 @@ form.newform p,
 	-ms-box-sizing: content-box;
 }
 
+form.newform p,
+.newform input[type="text"].title,
+.newform input[type="password"].title,
+.newform textarea.title,
+.newform select.title,
+.newform label.title {
+	padding: 0;
+	margin: 0.25em 0.5em 0 -0.2em;
+	display: inline-block;
+	float:left;
+	border-width: 0.1em;
+	border-style: solid;
+	min-height: 1.4em;
+	line-height: 1.4em;
+	font-size: 2em;
+	-moz-box-sizing: content-box;
+	-webkit-box-sizing: content-box;
+	box-sizing: content-box;
+	-ms-box-sizing: content-box;
+}
+
 
 
 
@@ -776,15 +828,33 @@ form.newform p,
 }
 
 .newform label.bold {
-	font-weight:b old;
+	font-weight:bold;
 }
 
-form.newform {
+.newform label.center {
+	text-align:center;
+}
+
+.newform div.tasktree{
+	float: left;
+}
+
+#content form.newform {
 	width:60em;
-	background:red;
+	
 	display:block;
 	margin: 0 auto;
+	padding: 1em 0 0 1em;
 }
+
+#content form.newform.filter {
+	width:auto;
+	
+	display:block;
+	margin:0;
+}
+
+
 
 .clear {
 	width:9em;
@@ -805,6 +875,7 @@ select {
 	-webkit-border-radius:0.2em;
 	border-radius:0.2em;
 	zoom:1;
+	color:#555;
 }
 
 .newform input[type="checkbox"],
@@ -865,6 +936,7 @@ select.error:focus {
 /* ================================== */
 
 .newform .double	{ width: 39em; }
+.newform .double.title	{ width: 19.4em; font-size:2em }
 .newform .putdouble	{ margin-left: 39.8em; }
 *:first-child+html .newform select.double{width:39.2em;}
 
@@ -873,6 +945,7 @@ select.error:focus {
 *:first-child+html .newform select.onehalf{width:29.2em;}
 
 .newform .full { width: 19em;}
+.newform .full.title { width: 9.5em; font-size:2em;}
 .newform .putfull { margin-left: 19.8em; }
 *:first-child+html .newform select.full{width:19.2em;}
 
@@ -898,7 +971,8 @@ select.error:focus {
 
 
 /* der graue button */
-.buttons input,
+.buttons input[type=button],
+.buttons input[type=submit],
 input.button,
 a.button,
 div.visible a.button, 
@@ -916,7 +990,7 @@ div.visible a.button,
 	color: #fff;
 	line-height: 1.7em;
 	display: block;
-	float: left; 
+	float: right; 
 	margin: 0 0 0 1em;
 }
 
@@ -925,7 +999,7 @@ div.visible a.button,
 }
 
 /* der graue button/buttonlink bei mouseover */
-.buttons input:hover,
+.buttons input[type=submit]:hover,
 a:hover.button,
 a.button:hover,
 .buttonpanel input:hover {
@@ -950,7 +1024,7 @@ fieldset.visible a.submit,
 }
 
 /* der grüne Button/Buttonlink mouseover */
-.buttons input:hover.submit,
+.buttons input[type=submit]:hover.submit,
 .buttons a:hover.submit ,
 input.submit:hover{
 	background: -moz-linear-gradient(top, #A9D887, #009C0E 60%);
