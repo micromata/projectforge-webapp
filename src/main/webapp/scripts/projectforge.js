@@ -1,6 +1,10 @@
+function showConfirmDialog(text) {
+	return window.confirm(text);
+}
+
 function rowClick(row) {
 	if (suppressRowClick != 'true') {
-	  window.location.href = $(row).find("a:first").attr("href");
+		window.location.href = $(row).find("a:first").attr("href");
 	}
 	suppressRowClick = 'false';
 }
@@ -79,12 +83,11 @@ function mcancelclosetime() {
 	}
 }
 
-function openNewWindow(theURL, winName, features) { //v2.0
-    var w = window.open(theURL, winName, features);
-    w.focus();
+function openNewWindow(theURL, winName, features) { // v2.0
+	var w = window.open(theURL, winName, features);
+	w.focus();
 }
-
 
 // close layer when click-out
 document.onclick = mclose;
-//End: Functionality for DropDownMenu
+// End: Functionality for DropDownMenu
