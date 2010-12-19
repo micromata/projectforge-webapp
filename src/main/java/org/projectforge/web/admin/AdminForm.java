@@ -196,15 +196,19 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
     final WebMarkupContainer forDevelopers = new WebMarkupContainer("forDevelopers");
     add(forDevelopers);
     if (WicketApplication.isDevelopmentModus() == true) {
-      final Button button = new Button("button", new Model<String>("createTestBooks")) {
+      final Button button = new Button("button", new Model<String>("create test books")) {
         @Override
         public final void onSubmit()
         {
           parentPage.createTestBooks();
         }
       };
-      button.add(WicketUtils.javaScriptConfirmDialogOnClick(getLocalizedMessage("system.admin.development.testObjectsCreationQuestion", AdminPage.NUMBER_OF_TEST_OBJECTS_TO_CREATE, "BookDO")));
+      button.add(WicketUtils.javaScriptConfirmDialogOnClick(getLocalizedMessage("system.admin.development.testObjectsCreationQuestion",
+          AdminPage.NUMBER_OF_TEST_OBJECTS_TO_CREATE, "BookDO")));
       final SingleButtonPanel buttonPanel = new SingleButtonPanel("createTestBooks", button);
+      if (Configuration.getInstance().isBookManagementConfigured() == false) {
+        buttonPanel.setVisible(false);
+      }
       forDevelopers.add(buttonPanel);
     } else {
       forDevelopers.setVisible(true);
