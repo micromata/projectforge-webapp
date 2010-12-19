@@ -47,7 +47,6 @@ import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
 
-
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
@@ -112,9 +111,10 @@ public class BookDO extends DefaultBaseDO
     return publisher;
   }
 
-  public void setPublisher(String publisher)
+  public BookDO setPublisher(String publisher)
   {
     this.publisher = publisher;
+    return this;
   }
 
   @Column(length = 255)
@@ -123,9 +123,10 @@ public class BookDO extends DefaultBaseDO
     return editor;
   }
 
-  public void setEditor(String editor)
+  public BookDO setEditor(String editor)
   {
     this.editor = editor;
+    return this;
   }
 
   @Column(length = 1000)
@@ -134,9 +135,10 @@ public class BookDO extends DefaultBaseDO
     return authors;
   }
 
-  public void setAuthors(String authors)
+  public BookDO setAuthors(String authors)
   {
     this.authors = authors;
+    return this;
   }
 
   @Column(length = 1000)
@@ -145,9 +147,10 @@ public class BookDO extends DefaultBaseDO
     return comment;
   }
 
-  public void setComment(String comment)
+  public BookDO setComment(String comment)
   {
     this.comment = comment;
+    return this;
   }
 
   @Column(length = 255)
@@ -156,9 +159,10 @@ public class BookDO extends DefaultBaseDO
     return isbn;
   }
 
-  public void setIsbn(String isbn)
+  public BookDO setIsbn(String isbn)
   {
     this.isbn = isbn;
+    return this;
   }
 
   @Column(length = 255, unique = true)
@@ -167,9 +171,10 @@ public class BookDO extends DefaultBaseDO
     return signature;
   }
 
-  public void setSignature(String signature)
+  public BookDO setSignature(String signature)
   {
     this.signature = signature;
+    return this;
   }
 
   /**
@@ -211,9 +216,10 @@ public class BookDO extends DefaultBaseDO
     return lendOutBy;
   }
 
-  public void setLendOutBy(PFUserDO lendOutBy)
+  public BookDO setLendOutBy(PFUserDO lendOutBy)
   {
     this.lendOutBy = lendOutBy;
+    return this;
   }
 
   @Transient
@@ -230,9 +236,10 @@ public class BookDO extends DefaultBaseDO
     return lendOutDate;
   }
 
-  public void setLendOutDate(Date lendOutDate)
+  public BookDO setLendOutDate(Date lendOutDate)
   {
     this.lendOutDate = lendOutDate;
+    return this;
   }
 
   @Column(name = "lend_out_comment", length = 1024)
@@ -241,9 +248,10 @@ public class BookDO extends DefaultBaseDO
     return lendOutComment;
   }
 
-  public void setLendOutComment(String lendOutComment)
+  public BookDO setLendOutComment(String lendOutComment)
   {
     this.lendOutComment = lendOutComment;
+    return this;
   }
 
   @Column(length = 1024)
@@ -252,9 +260,10 @@ public class BookDO extends DefaultBaseDO
     return keywords;
   }
 
-  public void setKeywords(String keywords)
+  public BookDO setKeywords(String keywords)
   {
     this.keywords = keywords;
+    return this;
   }
 
   @Column(name = "abstract_text", length = 4000)
@@ -263,9 +272,10 @@ public class BookDO extends DefaultBaseDO
     return abstractText;
   }
 
-  public void setAbstractText(String abstractText)
+  public BookDO setAbstractText(String abstractText)
   {
     this.abstractText = abstractText;
+    return this;
   }
 
   /**
@@ -279,9 +289,10 @@ public class BookDO extends DefaultBaseDO
     return task;
   }
 
-  public void setTask(TaskDO task)
+  public BookDO setTask(TaskDO task)
   {
     this.task = task;
+    return this;
   }
 
   @Transient
@@ -310,9 +321,10 @@ public class BookDO extends DefaultBaseDO
     return yearOfPublishing;
   }
 
-  public void setYearOfPublishing(String yearOfPublishing)
+  public BookDO setYearOfPublishing(String yearOfPublishing)
   {
     this.yearOfPublishing = yearOfPublishing;
+    return this;
   }
 
   @Enumerated(EnumType.STRING)
@@ -322,8 +334,9 @@ public class BookDO extends DefaultBaseDO
     return status;
   }
 
-  public void setStatus(BookStatus status)
+  public BookDO setStatus(BookStatus status)
   {
     this.status = status;
+    return this;
   }
 }
