@@ -36,6 +36,7 @@ import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.admin.SetupPage;
+import org.projectforge.web.mobile.LoginMobilePage;
 import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketUtils;
@@ -66,7 +67,11 @@ public class LoginPage extends AbstractBasePage
   public LoginPage(final PageParameters parameters)
   {
     super(parameters);
-    final PFUserDO wicketSessionUser = ((MySession) getSession()).getUser();
+    if (getMySession().isMobileUserAgent() == true) {
+      setResponsePage(LoginMobilePage.class);
+      return;
+    }
+    final PFUserDO wicketSessionUser = getMySession().getUser();
     final PFUserDO sessionUser = UserFilter.getUser(((WebRequest) getRequest()).getHttpServletRequest());
     // Sometimes the wicket session user is given but the http session user is lost (re-login required).
     if (wicketSessionUser != null && sessionUser != null && wicketSessionUser.getId() == sessionUser.getId()) {
@@ -100,7 +105,7 @@ public class LoginPage extends AbstractBasePage
   }
 
   public static void internalCheckLogin(final WebPage page, final UserDao userDao, final String username, final String password,
-      final boolean userWantsToStayLoggedIn, final Class<? extends WebPage> defaultPage, final String targetUrlAfterLogin)
+      final boolean userWantsToStayLoggedIn, final Class< ? extends WebPage> defaultPage, final String targetUrlAfterLogin)
   {
     final String encryptedPassword = userDao.encryptPassword(password);
     final PFUserDO user = userDao.authenticateUser(username, encryptedPassword);
@@ -137,7 +142,8 @@ public class LoginPage extends AbstractBasePage
 
   protected void checkLogin()
   {
-    internalCheckLogin(this, userDao, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), WicketUtils.getDefaultPage(), targetUrlAfterLogin);
+    internalCheckLogin(this, userDao, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), WicketUtils.getDefaultPage(),
+        targetUrlAfterLogin);
   }
 
   @Override
