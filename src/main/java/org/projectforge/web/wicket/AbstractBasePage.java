@@ -27,8 +27,6 @@ import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import javax.servlet.http.Cookie;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
@@ -53,7 +51,6 @@ import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
-import org.projectforge.web.UserFilter;
 import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.core.MenuPanel;
 import org.projectforge.web.wicket.components.TooltipImage;
@@ -407,22 +404,13 @@ public abstract class AbstractBasePage extends WebPage
     return MessageFormat.format(getString(key), params);
   }
 
-  /** Logs the user out by invalidating the session. */
+  /**
+   * Logs the user out by invalidating the session.
+   * @see LoginPage#logout(MySession, WebRequest, WebResponse, UserXmlPreferencesCache, MenuBuilder)
+   */
   private void logout()
   {
-    final PFUserDO user = ((MySession) getSession()).getUser();
-    if (user != null) {
-      userXmlPreferencesCache.flushToDB(user.getId());
-      userXmlPreferencesCache.clear(user.getId());
-      menuBuilder.expireMenu(user.getId());
-    }
-    ((MySession) getSession()).logout();
-    final Cookie stayLoggedInCookie = UserFilter.getStayLoggedInCookie(((WebRequest) getRequest()).getHttpServletRequest());
-    if (stayLoggedInCookie != null) {
-      stayLoggedInCookie.setMaxAge(0);
-      stayLoggedInCookie.setValue(null);
-      stayLoggedInCookie.setPath("/");
-      ((WebResponse) getResponse()).addCookie(stayLoggedInCookie);
-    }
+    LoginPage
+        .logout((MySession) getSession(), (WebRequest) getRequest(), (WebResponse) getResponse(), userXmlPreferencesCache, menuBuilder);
   }
 }
