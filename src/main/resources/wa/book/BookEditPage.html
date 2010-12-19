@@ -10,11 +10,10 @@
 	    <wicket:fragment wicket:id="bottomRowsFragment">
 	    <fieldset class="buttons">
 	       		<p>
-	       			<strong><wicket:message key="book.lending" /></strong> <span wicket:id="lendOutStatus">Kai Reinhard, 10.10.2010</span>
+	       			<strong><wicket:message key="book.lending" /></strong> <wicket:container wicket:id="lendOutStatus">Kai Reinhard, 10.10.2010</wicket:container>
 	       		</p>
-	       		<span wicket:id="lendOutButton">[lend out]</span>
-	       		<!--@kai wäre es hier bei den Buttons und anderen elementen, die ohnehin render-body-only true haben, nicht schlauer einfach einen wicket:container zu nehmen? dann ist dem layouter immer klar, dass das element nicht im html auftaucht. -->
-	       		<span wicket:id="returnBookButton">[return book]</span>
+	       		<wicket:container wicket:id="lendOutButton">[lend out]</wicket:container>
+	       		<wicket:container wicket:id="returnBookButton">[return book]</wicket:container>
 	      
 	       <label for="lendoutnote" class="half clear"><wicket:message key="book.lendOutNote" /></label>
 	       <input class="text double" type="text" wicket:id="lendOutComment" />
