@@ -29,7 +29,6 @@ import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 public class LoginMobileForm extends AbstractMobileForm<LoginMobileForm, LoginMobilePage>
@@ -49,7 +48,7 @@ public class LoginMobileForm extends AbstractMobileForm<LoginMobileForm, LoginMo
   protected void init()
   {
     add(new CheckBox("stayLoggedIn", new PropertyModel<Boolean>(this, "stayLoggedIn")));
-    add(new TextField<String>("username", new PropertyModel<String>(this, "username")).add(new FocusOnLoadBehavior()));
+    add(new TextField<String>("username", new PropertyModel<String>(this, "username")));
     add(new PasswordTextField("password", new PropertyModel<String>(this, "password")).setResetPassword(true).setRequired(true));
     final Button loginButton = new Button("button", new Model<String>(getString("login"))) {
       @Override
