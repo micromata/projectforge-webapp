@@ -34,7 +34,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.core.Configuration;
-import org.projectforge.core.ConfigurationParam;
 import org.projectforge.fibu.datev.DatevImportDao;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
@@ -92,10 +91,10 @@ public class MenuBuilder implements Serializable
     common.addSubMenu(user, MenuItemDef.TIMESHEET_LIST);
     common.addSubMenu(user, MenuItemDef.CALENDAR);
     common.addSubMenu(user, MenuItemDef.SEARCH);
-    if (configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS) != null) {
+    if (configuration.isBookManagementConfigured() == true) {
       common.addSubMenu(user, MenuItemDef.BOOK_LIST);
     }
-    if (configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES) != null) {
+    if (configuration.isAddressManagementConfigured() == true) {
       common.addSubMenu(user, MenuItemDef.ADDRESS_LIST);
     }
     if (StringUtils.isNotEmpty(configuration.getTelephoneSystemUrl()) == true) {
