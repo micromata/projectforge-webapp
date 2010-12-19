@@ -117,7 +117,7 @@ public class Configuration extends AbstractCache
   private String telephoneSystemUrl = null;
 
   private String telephoneSystemNumber = null;
-  
+
   private String telephoneSystemOperatorPanelUrl = null;
 
   private String smsUrl = null;
@@ -549,7 +549,7 @@ public class Configuration extends AbstractCache
   {
     return StringUtils.isNotEmpty(this.telephoneSystemUrl);
   }
-  
+
   public String getTelephoneSystemOperatorPanelUrl()
   {
     return telephoneSystemOperatorPanelUrl;
@@ -888,6 +888,16 @@ public class Configuration extends AbstractCache
       return task.getId();
     }
     return null;
+  }
+
+  public boolean isAddressManagementConfigured()
+  {
+    return getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES) != null;
+  }
+
+  public boolean isBookManagementConfigured()
+  {
+    return getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS) != null;
   }
 
   private Object getValue(final ConfigurationParam parameter)
