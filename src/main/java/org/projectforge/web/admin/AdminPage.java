@@ -67,7 +67,7 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AdminPage.class);
 
   public static final String I18N_PROPERTIES_BASENAME = "I18nResources";
-  
+
   static final int NUMBER_OF_TEST_OBJECTS_TO_CREATE = 100;
 
   @SpringBean(name = "bookDao")
@@ -399,12 +399,23 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
     accessChecker.checkDemoUser();
     final TaskDO task = taskTree.getTaskById(Configuration.getInstance().getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS));
     final List<BookDO> list = new ArrayList<BookDO>();
-    for (int i = 0; i < NUMBER_OF_TEST_OBJECTS_TO_CREATE; i++) {
-      list.add(new BookDO().setTitle("title" + i).setAbstractText("abstractText" + i).setAuthors("authors" + i).setComment(
-          "comment" + i).setEditor("editor" + i).setIsbn("isbn" + i).setKeywords("keywords" + i).setPublisher("publisher" + i)
-          .setSignature("signature" + i).setStatus(BookStatus.PRESENT).setTask(task).setYearOfPublishing("2001"));
+    int number = 1;
+    while (databaseUpdateDao.queryForInt("select count(*) from t_book where title like 'title." + number + ".%'") > 0) {
+      number++;
+    }
+    for (int i = 1; i <= NUMBER_OF_TEST_OBJECTS_TO_CREATE; i++) {
+      list.add(new BookDO().setTitle(get("title", number, i)).setAbstractText(get("abstractText", number, i)).setAuthors(
+          get("authors", number, i)).setComment(get("comment", number, i)).setEditor(get("editor", number, i)).setIsbn(
+          get("isbn", number, i)).setKeywords(get("keywords", number, i)).setPublisher(get("publisher", number, i)).setSignature(
+          get("signature", number, i)).setStatus(BookStatus.PRESENT).setTask(task).setYearOfPublishing("2001"));
     }
     bookDao.save(list);
-    setResponsePage(new MessagePage("system.admin.development.testObjectsCreated", String.valueOf(NUMBER_OF_TEST_OBJECTS_TO_CREATE), "BookDO"));
+    setResponsePage(new MessagePage("system.admin.development.testObjectsCreated", String.valueOf(NUMBER_OF_TEST_OBJECTS_TO_CREATE),
+        "BookDO"));
+  }
+
+  private String get(final String basename, final int number, final int counter)
+  {
+    return basename + "." + number + "." + counter;
   }
 }
