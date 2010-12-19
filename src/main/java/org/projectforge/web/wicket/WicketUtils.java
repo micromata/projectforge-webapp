@@ -843,4 +843,10 @@ public class WicketUtils
   {
     setResponsePage(component, (Component) callerPage);
   }
+
+  public static SimpleAttributeModifier javaScriptConfirmDialogOnClick(final String message)
+  {
+    final String escapedText = message.replace("'", "\'");
+    return new SimpleAttributeModifier("onclick", "javascript:return showConfirmDialog('" + escapedText + "');");
+  }
 }
