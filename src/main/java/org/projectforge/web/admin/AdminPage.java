@@ -67,6 +67,8 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AdminPage.class);
 
   public static final String I18N_PROPERTIES_BASENAME = "I18nResources";
+  
+  static final int NUMBER_OF_TEST_OBJECTS_TO_CREATE = 100;
 
   @SpringBean(name = "bookDao")
   private BookDao bookDao;
@@ -397,13 +399,12 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
     accessChecker.checkDemoUser();
     final TaskDO task = taskTree.getTaskById(Configuration.getInstance().getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS));
     final List<BookDO> list = new ArrayList<BookDO>();
-    final int number = 100;
-    for (int i = 0; i < number; i++) {
+    for (int i = 0; i < NUMBER_OF_TEST_OBJECTS_TO_CREATE; i++) {
       list.add(new BookDO().setTitle("title" + i).setAbstractText("abstractText" + i).setAuthors("authors" + i).setComment(
           "comment" + i).setEditor("editor" + i).setIsbn("isbn" + i).setKeywords("keywords" + i).setPublisher("publisher" + i)
           .setSignature("signature" + i).setStatus(BookStatus.PRESENT).setTask(task).setYearOfPublishing("2001"));
     }
     bookDao.save(list);
-    setResponsePage(new MessagePage("system.admin.development.testObjectsCreated", String.valueOf(number), "BookDO"));
+    setResponsePage(new MessagePage("system.admin.development.testObjectsCreated", String.valueOf(NUMBER_OF_TEST_OBJECTS_TO_CREATE), "BookDO"));
   }
 }

@@ -203,7 +203,7 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
           parentPage.createTestBooks();
         }
       };
-      button.add(WicketUtils.javaScriptConfirmDialogOnClick("Do you really want to create test books in the data-base?"));
+      button.add(WicketUtils.javaScriptConfirmDialogOnClick(getLocalizedMessage("system.admin.development.testObjectsCreationQuestion", AdminPage.NUMBER_OF_TEST_OBJECTS_TO_CREATE, "BookDO")));
       final SingleButtonPanel buttonPanel = new SingleButtonPanel("createTestBooks", button);
       forDevelopers.add(buttonPanel);
     } else {
