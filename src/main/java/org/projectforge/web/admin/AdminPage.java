@@ -36,17 +36,22 @@ import java.util.TreeSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.Response;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.book.BookDO;
+import org.projectforge.book.BookDao;
+import org.projectforge.book.BookStatus;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigurationParam;
 import org.projectforge.core.ReindexSettings;
 import org.projectforge.core.SystemDao;
 import org.projectforge.database.DatabaseDao;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.XmlDump;
 import org.projectforge.meb.MebMailClient;
+import org.projectforge.task.TaskDO;
+import org.projectforge.task.TaskTree;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.user.UserXmlPreferencesMigrationDao;
 import org.projectforge.web.MenuBuilder;
@@ -63,6 +68,9 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
 
   public static final String I18N_PROPERTIES_BASENAME = "I18nResources";
 
+  @SpringBean(name = "bookDao")
+  private BookDao bookDao;
+
   @SpringBean(name = "xmlDump")
   private XmlDump xmlDump;
 
@@ -77,9 +85,12 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
 
   @SpringBean(name = "mebMailClient")
   private MebMailClient mebMailClient;
-  
+
   @SpringBean(name = "menuBuilder")
   private MenuBuilder menuBuilder;
+
+  @SpringBean(name = "taskTree")
+  private TaskTree taskTree;
 
   @SpringBean(name = "userXmlPreferencesCache")
   private UserXmlPreferencesCache userXmlPreferencesCache;
@@ -92,13 +103,6 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   public AdminPage(PageParameters parameters)
   {
     super(parameters);
-    // Add simple upload form, which is hooked up to its feedback panel by
-    // virtue of that panel being nested in the form.
-    final StringBuffer buf = new StringBuffer();
-    buf.append("function showDumpQuestionDialog() {\n").append("  return window.confirm('");
-    buf.append("Do you really want to dump the whole data-base?");
-    buf.append("');\n}\n");
-    body.add(new Label("showDumpQuestionDialog", buf.toString()).setEscapeModelStrings(false));
     form = new AdminForm(this);
     body.add(form);
     form.init();
@@ -264,10 +268,10 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
     final String ts = DateHelper.getTimestampAsFilenameSuffix(new Date());
     final String filename = "projectforgedump_" + ts + ".xml.gz";
     final Response response = getResponse();
-    ((WebResponse)response).setAttachmentHeader(filename);
+    ((WebResponse) response).setAttachmentHeader(filename);
     response.setContentType(DownloadUtils.getContentType(filename));
     xmlDump.dumpDatabase(filename, response.getOutputStream());
-}
+  }
 
   protected void reindex()
   {
@@ -385,5 +389,21 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   {
     accessChecker.checkIsUserMemberOfAdminGroup();
     accessChecker.checkDemoUser();
+  }
+
+  public void createTestBooks()
+  {
+    accessChecker.checkIsUserMemberOfAdminGroup();
+    accessChecker.checkDemoUser();
+    final TaskDO task = taskTree.getTaskById(Configuration.getInstance().getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS));
+    final List<BookDO> list = new ArrayList<BookDO>();
+    final int number = 100;
+    for (int i = 0; i < number; i++) {
+      list.add(new BookDO().setTitle("title" + i).setAbstractText("abstractText" + i).setAuthors("authors" + i).setComment(
+          "comment" + i).setEditor("editor" + i).setIsbn("isbn" + i).setKeywords("keywords" + i).setPublisher("publisher" + i)
+          .setSignature("signature" + i).setStatus(BookStatus.PRESENT).setTask(task).setYearOfPublishing("2001"));
+    }
+    bookDao.save(list);
+    setResponsePage(new MessagePage("system.admin.development.testObjectsCreated", String.valueOf(number), "BookDO"));
   }
 }

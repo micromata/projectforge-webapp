@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.model.Model;
@@ -36,6 +37,7 @@ import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WicketApplication;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
@@ -138,7 +140,7 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
         parentPage.dump();
       }
     };
-    dumpButtonPanel.button.add(new SimpleAttributeModifier("onclick", "return showDumpQuestionDialog();"));
+    dumpButtonPanel.button.add(WicketUtils.javaScriptConfirmDialogOnClick("Do you really want to dump the whole data-base?"));
     new MyButtonPanel("schemaExport") {
       @Override
       public void onSubmit()
@@ -191,12 +193,28 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
     };
     add(new Label("copyAndPasteText1", PFUserContext.getLocalizedMessage("system.admin.alertMessage.copyAndPaste.text1", Version.NUMBER)));
     add(new Label("copyAndPasteText3", PFUserContext.getLocalizedMessage("system.admin.alertMessage.copyAndPaste.text3", Version.NUMBER)));
+    final WebMarkupContainer forDevelopers = new WebMarkupContainer("forDevelopers");
+    add(forDevelopers);
+    if (WicketApplication.isDevelopmentModus() == true) {
+      final Button button = new Button("button", new Model<String>("createTestBooks")) {
+        @Override
+        public final void onSubmit()
+        {
+          parentPage.createTestBooks();
+        }
+      };
+      button.add(WicketUtils.javaScriptConfirmDialogOnClick("Do you really want to create test books in the data-base?"));
+      final SingleButtonPanel buttonPanel = new SingleButtonPanel("createTestBooks", button);
+      forDevelopers.add(buttonPanel);
+    } else {
+      forDevelopers.setVisible(true);
+    }
   }
 
   private abstract class MyButtonPanel implements Serializable
   {
     private static final long serialVersionUID = -7100891342667728950L;
-    
+
     private Button button;
 
     private MyButtonPanel(final String i18nKey)
