@@ -33,6 +33,7 @@ import org.apache.wicket.request.ClientInfo;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.web.UserAgentDevice;
 
 public class MySession extends WebSession
 {
@@ -42,6 +43,14 @@ public class MySession extends WebSession
 
   private PFUserDO user;
 
+  private String userAgent;
+
+  private UserAgentDevice userAgentDevice = UserAgentDevice.UNKNOWN;
+
+  private boolean mobileUserAgent;
+
+  private boolean ignoreMobileUserAgent;
+
   public MySession(final Request request)
   {
     super(request);
@@ -49,6 +58,9 @@ public class MySession extends WebSession
     final ClientInfo info = getClientInfo();
     if (info instanceof WebClientInfo) {
       ((WebClientInfo) info).getProperties().setTimeZone(PFUserContext.getTimeZone());
+      userAgent = ((WebClientInfo) info).getUserAgent();
+      userAgentDevice = UserAgentDevice.getUserAgentDevice(userAgent);
+      mobileUserAgent = userAgentDevice.isMobile();
     } else {
       log.error("Oups, ClientInfo is not from type WebClientInfo: " + info);
     }
@@ -79,6 +91,36 @@ public class MySession extends WebSession
   public synchronized TimeZone getTimeZone()
   {
     return user != null ? user.getTimeZoneObject() : Configuration.getInstance().getDefaultTimeZone();
+  }
+
+  public String getUserAgent()
+  {
+    return userAgent;
+  }
+
+  /**
+   * @return true, if the user agent is a mobile agent and ignoreMobileUserAgent isn't set, otherwise false.
+   */
+  public boolean isMobileUserAgent()
+  {
+    if (ignoreMobileUserAgent == true) {
+      return false;
+    }
+    return mobileUserAgent;
+  }
+
+  /**
+   * The user wants to ignore the mobile agent and wants to get the PC version (normal web version).
+   * @return
+   */
+  public boolean isIgnoreMobileUserAgent()
+  {
+    return ignoreMobileUserAgent;
+  }
+
+  public void setIgnoreMobileUserAgent(final boolean ignoreMobileUserAgent)
+  {
+    this.ignoreMobileUserAgent = ignoreMobileUserAgent;
   }
 
   public void login(final PFUserDO user)
