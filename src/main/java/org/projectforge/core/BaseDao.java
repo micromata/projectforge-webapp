@@ -41,7 +41,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.PredicateUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ClassUtils;
-import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
@@ -65,14 +64,12 @@ import org.projectforge.access.AccessException;
 import org.projectforge.access.OperationType;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.common.DateHolder;
-import org.projectforge.common.StringHelper;
 import org.projectforge.database.DatabaseDao;
 import org.projectforge.lucene.PFAnalyzer;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRightId;
-import org.projectforge.web.core.JsonBuilder;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
@@ -1316,158 +1313,6 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     query.setString(1, "%" + StringUtils.lowerCase(searchString) + "%");
     final List<String> list = query.list();
     return list;
-  }
-
-  /**
-   * Uses hibernate search.
-   * @param searchString The user's input ("q"). If words are separated by spaces, then an AND search will be started.
-   * @param getId If true, the object id will also returned.
-   * @return Json object.
-   * @see #buildJsonRows(boolean, List)
-   */
-  @SuppressWarnings("unchecked")
-  public String getAutocompletion(String searchString, boolean getId, String... properties)
-  {
-    if (StringUtils.isBlank(searchString) == true) {
-      return "";
-    }
-    BaseSearchFilter filter = new BaseSearchFilter();
-    filter.setSearchString(searchString);
-    List<O> result = getList(new QueryFilter(filter));
-    List<Object> list = new ArrayList();
-    for (O obj : result) {
-      Object[] entry = new Object[properties.length];
-      for (int i = 0; i < properties.length; i++) {
-        entry[i] = BeanHelper.getNestedProperty(obj, properties[i]);
-      }
-      list.add(entry);
-    }
-    return buildJsonRows(getId, list);
-  }
-
-  /**
-   * WARNING: The access checking is not done for every result entry! If the user has general select access, he can see ALL entries!
-   * @param searchString The user's input ("q"). If words are separated by spaces, then an AND search will be started.
-   * @param contains If true, then like "%&lt;searchString&gt;%" will be used, otherwise "&lt;searchString&gt;%"
-   * @param getId If true, the object id will also returned.
-   * @param properties All properties to return and for search.
-   * @return Json object.
-   * @see #buildJsonRows(boolean, List)
-   */
-  @SuppressWarnings("unchecked")
-  public String getAutocompletion(String searchString, boolean contains, boolean getId, String... properties)
-  {
-    if (StringUtils.isBlank(searchString) == true) {
-      return "";
-    }
-    checkSelectAccess();
-    String exp;
-    if (contains == true) {
-      String str = searchString;
-      if (searchString.contains(" ") == true) {
-        str = searchString.substring(0, str.indexOf(' '));
-      }
-      exp = "%" + StringUtils.lowerCase(str) + '%';
-    } else {
-      exp = StringUtils.lowerCase(searchString) + '%';
-    }
-    StringBuffer buf = new StringBuffer();
-    buf.append("select distinct ");
-    if (getId == true) {
-      buf.append("id,");
-    }
-    buf.append(StringHelper.listToString(",", properties));
-    buf.append(" from ").append(clazz.getSimpleName()).append(" t where deleted=false and (");
-    buf.append(StringHelper.listToExpressions(" or ", "lower(t.", ") like ?", properties));
-    buf.append(") order by t.").append(properties[0]);
-    Query query = getSession().createQuery(buf.toString());
-    for (int i = 0; i < properties.length; i++) {
-      query.setString(i, exp);
-    }
-    List< ? > list = query.list();
-    if (CollectionUtils.isNotEmpty(list) == true && contains == true && searchString.contains(" ") == true) {
-      // Reduce result to AND match:
-      String[] tokens = StringUtils.split(searchString, ' ');
-      if (list.get(0) instanceof Object[]) {
-        List<Object[]> result = new ArrayList<Object[]>();
-        for (Object[] objs : (List<Object[]>) list) { // for all result object arrays:
-          boolean matchAll = true;
-          for (String token : tokens) { // Every token has to match:
-            boolean matchToken = false;
-            for (Object obj : objs) { // Check every field of the object array:
-              String value = String.valueOf(obj).toLowerCase();
-              if (StringUtils.contains(value, token) == true) {
-                matchToken = true; // Minimum one match required.
-                break;
-              }
-            }
-            if (matchToken == false) { // Current token does not match.
-              matchAll = false; // -> Whole entry does not match.
-              break;
-            }
-          }
-          if (matchAll == true) {
-            result.add(objs);
-          }
-        }
-        list = result;
-      } else {
-        List<Object> result = new ArrayList<Object>();
-        for (Object obj : list) { // for all result object arrays:
-          for (String token : tokens) { // Every token has to match:
-            String value = String.valueOf(obj).toLowerCase();
-            if (StringUtils.contains(value, token) == true) {
-              result.add(obj);
-              break;
-            }
-          }
-        }
-        list = result;
-      }
-    }
-    return buildJsonRows(getId, list);
-  }
-
-  /**
-   * Deprecated: Use JsonBuilder instead.
-   * @see JsonBuilder#buildToStringRows(Collection, boolean)
-   */
-  @Deprecated
-  public static String buildJsonRows(boolean getId, Collection< ? > col)
-  {
-    StringBuffer buf = new StringBuffer();
-    // Format: [["1.1", "1.2", ...],["2.1", "2.2", ...]]
-    buf.append("[\n");
-    boolean firstRow = true;
-    for (Object os : col) {
-      if (firstRow == true)
-        firstRow = false;
-      else buf.append(",\n");
-      buf.append(" ["); // begin row
-      if (os instanceof Object[]) { // Multiple properties
-        Object[] oa = (Object[]) os;
-        boolean firstCell = true;
-        for (Object obj : oa) {
-          if (firstCell == true) {
-            firstCell = false;
-            buf.append("\"");
-            if (getId == true) {
-              buf.append("id:");
-            }
-          } else {
-            buf.append(",\"");
-          }
-          // " must be quoted as \":
-          buf.append(StringUtils.replace(ObjectUtils.toString(obj), "\"", "\\\"")).append("\"");
-        }
-      } else { // Only one property
-        // " must be quoted as \":
-        buf.append("\"").append(StringUtils.replace(ObjectUtils.toString(os), "\"", "\\\"")).append("\"");
-      }
-      buf.append("]"); // end row
-    }
-    buf.append("]"); // end data
-    return buf.toString();
   }
 
   /**
