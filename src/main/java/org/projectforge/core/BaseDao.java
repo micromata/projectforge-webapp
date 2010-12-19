@@ -725,6 +725,21 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   }
 
   /**
+   * Call save(O) for every object in the given list.
+   * @param objects
+   * @return the generated identifier.
+   * @throws AccessException
+   */
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+  public void save(List<O> objects) throws AccessException
+  {
+    Validate.notNull(objects);
+    for (final O obj : objects) {
+      save(obj);
+    }
+  }
+
+  /**
    * 
    * @param obj
    * @return the generated identifier.
