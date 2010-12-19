@@ -24,9 +24,17 @@
 package org.projectforge.web.mobile;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.protocol.http.WebRequest;
+import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.Configuration;
+import org.projectforge.web.LoginPage;
+import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.address.AddressListPage;
+import org.projectforge.web.calendar.CalendarPage;
+import org.projectforge.web.timesheet.TimesheetListPage;
+import org.projectforge.web.user.MyAccountEditPage;
+import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.PresizedImage;
 
 public class MenuMobilePage extends AbstractSecuredMobilePage
@@ -34,6 +42,10 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
   @SpringBean(name = "configuration")
   private Configuration configuration;
 
+  @SpringBean(name = "menuBuilder")
+  private MenuBuilder menuBuilder;
+
+  @SuppressWarnings("serial")
   public MenuMobilePage(final PageParameters parameters)
   {
     super(parameters);
@@ -42,13 +54,28 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
     final String optimized = getString("mobile.optimized");
     PresizedImage image;
     if (configuration.isAddressManagementConfigured() == true) {
-      image = new PresizedImage("image", getResponse(), MobileWebConstants.THUMB_IMAGE_ADDRESS_BOOK);
+      image = new PresizedImage("image", getResponse(), MobileWebConstants.THUMB_IMAGE_CONTACTS);
       pageItemPanel.add(new PageItemEntryMenuPanel(pageItemPanel.newChildId(), AddressListPage.class, image,
           getString("address.title.heading"), null));
     }
-    image = new PresizedImage("image", getResponse(), MobileWebConstants.THUMB_IMAGE_ADDRESS_BOOK);
-    pageItemPanel.add(new PageItemEntryMenuPanel(pageItemPanel.newChildId(), AddressListPage.class, image,
-        getString("address.title.heading"), optimized));
+    image = new PresizedImage("image", getResponse(), MobileWebConstants.THUMB_IMAGE_CLOCK);
+    pageItemPanel.add(new PageItemEntryMenuPanel(pageItemPanel.newChildId(), TimesheetListPage.class, image,
+        getString("timesheet.title.heading"), null));
+    image = new PresizedImage("image", getResponse(), MobileWebConstants.THUMB_IMAGE_CALENDAR);
+    pageItemPanel.add(new PageItemEntryMenuPanel(pageItemPanel.newChildId(), CalendarPage.class, image, getString("calendar.title"), null));
+    image = new PresizedImage("image", getResponse(), MobileWebConstants.THUMB_IMAGE_SETTINGS);
+    pageItemPanel.add(new PageItemEntryMenuPanel(pageItemPanel.newChildId(), MyAccountEditPage.class, image, getString("menu.myAccount"),
+        null));
+    image = new PresizedImage("image", getResponse(), MobileWebConstants.THUMB_IMAGE_START);
+    pageItemPanel.add(new PageItemEntryMenuPanel(pageItemPanel.newChildId(), image, getString("menu.logout"), optimized) {
+      @Override
+      protected void onClick()
+      {
+        LoginPage
+        .logout((MySession) getSession(), (WebRequest) getRequest(), (WebResponse) getResponse(), userXmlPreferencesCache, menuBuilder);
+        setResponsePage(LoginMobilePage.class);
+      }
+    });
   }
 
   @Override

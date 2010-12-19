@@ -23,10 +23,14 @@
 
 package org.projectforge.web.mobile;
 
+import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.ContextImage;
+import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.link.Link;
+import org.projectforge.web.LoginPage;
 
 /**
  * Menu entry of a pageItem area.
@@ -37,12 +41,33 @@ public class PageItemEntryMenuPanel extends PageItemEntryPanel
 {
   private static final long serialVersionUID = -7707209103924086843L;
 
+  @SuppressWarnings("serial")
+  public PageItemEntryMenuPanel(final String id, final ContextImage image, final String name, final String comment)
+  {
+    super(id);
+    final PageParameters params = new PageParameters();
+    params.add(LoginPage.REQUEST_PARAM_LOGOUT, "true");
+    final Link<String> link = new Link<String>("link") {
+      public void onClick()
+      {
+        PageItemEntryMenuPanel.this.onClick();
+      };
+    };
+    add(link);
+    init(link, image, name, comment);
+  }
+
   public PageItemEntryMenuPanel(final String id, final Class< ? extends WebPage> pageClass, final ContextImage image, final String name,
       final String comment)
   {
     super(id);
     final BookmarkablePageLink<String> link = new BookmarkablePageLink<String>("link", pageClass);
     add(link);
+    init(link, image, name, comment);
+  }
+
+  private void init(final AbstractLink link, final ContextImage image, final String name, final String comment)
+  {
     if (image == null) {
       link.add(new Label("image", "[invisible]").setVisible(false));
     } else {
@@ -54,5 +79,9 @@ public class PageItemEntryMenuPanel extends PageItemEntryPanel
     } else {
       link.add(new Label("comment", comment));
     }
+  }
+
+  protected void onClick()
+  {
   }
 }
