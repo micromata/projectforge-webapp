@@ -24,20 +24,28 @@
 package org.projectforge.web.mobile;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.core.Configuration;
 import org.projectforge.web.address.AddressListPage;
 import org.projectforge.web.wicket.PresizedImage;
 
 public class MenuMobilePage extends AbstractSecuredMobilePage
 {
+  @SpringBean(name = "configuration")
+  private Configuration configuration;
+
   public MenuMobilePage(final PageParameters parameters)
   {
     super(parameters);
     final PageItemPanel pageItemPanel = new PageItemPanel("menu");
     add(pageItemPanel);
     final String optimized = getString("mobile.optimized");
-    PresizedImage image = new PresizedImage("image", getResponse(), MobileWebConstants.THUMB_IMAGE_ADDRESS_BOOK);
-    pageItemPanel.add(new PageItemEntryMenuPanel(pageItemPanel.newChildId(), AddressListPage.class, image,
-        getString("address.title.heading"), null));
+    PresizedImage image;
+    if (configuration.isAddressManagementConfigured() == true) {
+      image = new PresizedImage("image", getResponse(), MobileWebConstants.THUMB_IMAGE_ADDRESS_BOOK);
+      pageItemPanel.add(new PageItemEntryMenuPanel(pageItemPanel.newChildId(), AddressListPage.class, image,
+          getString("address.title.heading"), null));
+    }
     image = new PresizedImage("image", getResponse(), MobileWebConstants.THUMB_IMAGE_ADDRESS_BOOK);
     pageItemPanel.add(new PageItemEntryMenuPanel(pageItemPanel.newChildId(), AddressListPage.class, image,
         getString("address.title.heading"), optimized));
