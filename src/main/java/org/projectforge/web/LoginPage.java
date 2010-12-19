@@ -35,6 +35,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
+import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.admin.SetupPage;
 import org.projectforge.web.mobile.LoginMobilePage;
 import org.projectforge.web.wicket.AbstractBasePage;
@@ -58,6 +59,25 @@ public class LoginPage extends AbstractBasePage
   private LoginForm form;
 
   String targetUrlAfterLogin;
+
+  public static void logout(final MySession mySession, final WebRequest request, final WebResponse response,
+      final UserXmlPreferencesCache userXmlPreferencesCache, final MenuBuilder menuBuilder)
+  {
+    final PFUserDO user = mySession.getUser();
+    if (user != null) {
+      userXmlPreferencesCache.flushToDB(user.getId());
+      userXmlPreferencesCache.clear(user.getId());
+      menuBuilder.expireMenu(user.getId());
+    }
+    mySession.logout();
+    final Cookie stayLoggedInCookie = UserFilter.getStayLoggedInCookie(request.getHttpServletRequest());
+    if (stayLoggedInCookie != null) {
+      stayLoggedInCookie.setMaxAge(0);
+      stayLoggedInCookie.setValue(null);
+      stayLoggedInCookie.setPath("/");
+      response.addCookie(stayLoggedInCookie);
+    }
+  }
 
   @Override
   protected void thisIsAnUnsecuredPage()
