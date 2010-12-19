@@ -109,7 +109,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
     super(id, model);
     this.treeTable = treeTable;
     @SuppressWarnings("unchecked")
-    BookmarkablePageLink< ? > bookmarkablePagelink = new BookmarkablePageLink("select", editClass);
+    final BookmarkablePageLink< ? > bookmarkablePagelink = new BookmarkablePageLink("select", editClass);
     bookmarkablePagelink.setParameter(AbstractEditPage.PARAMETER_KEY_ID, objectId);
     this.link = bookmarkablePagelink;
     add(link);
@@ -127,7 +127,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
     super(id, model);
     this.treeTable = treeTable;
     @SuppressWarnings("unchecked")
-    Link< ? > selectLink = new Link("select") {
+    final Link< ? > selectLink = new Link("select") {
       public void onClick()
       {
         // Do nothing
