@@ -155,7 +155,8 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
       }
     };
     deleteButton.add(new SimpleAttributeModifier("onclick", "return showDeleteQuestionDialog();"));
-    deleteButtonPanel = new SingleButtonPanel("delete", deleteButton, "reset");
+    deleteButtonPanel = new SingleButtonPanel("delete", deleteButton);
+    deleteButton.add(WebConstants.BUTTON_CLASS_RESET);
     deleteButton.setDefaultFormProcessing(false);
     add(deleteButtonPanel);
     final Button resetButton = new Button("button", new Model<String>(getString("reset"))) {
@@ -227,6 +228,7 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
    */
   protected void markDefaultButtons()
   {
+    createButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     updateButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     undeleteButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     deleteButtonPanel.add(WebConstants.BUTTON_CLASS_RESET);
