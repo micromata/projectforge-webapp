@@ -61,6 +61,7 @@ import org.projectforge.web.fibu.AuftragListPage;
 import org.projectforge.web.fibu.BankAccountListPage;
 import org.projectforge.web.fibu.CustomerListPage;
 import org.projectforge.web.fibu.EingangsrechnungListPage;
+import org.projectforge.web.fibu.EmployeeListPage;
 import org.projectforge.web.fibu.Kost1ListPage;
 import org.projectforge.web.fibu.Kost2ArtListPage;
 import org.projectforge.web.fibu.Kost2ListPage;
@@ -128,7 +129,7 @@ public enum MenuItemDef
       DatevImportDao.USER_RIGHT_ID, UserRightValue.TRUE), //
   EINGANGS_RECHNUNG_LIST("fibu.eingangsrechnungen", EingangsrechnungListPage.class, //
       EingangsrechnungDao.USER_RIGHT_ID, READONLY_READWRITE), //
-  EMPLOYEE_LIST("fibu.employees", "fibu/EmployeeList.action", //
+  EMPLOYEE_LIST("fibu.employees", EmployeeListPage.class, //
       FINANCE_GROUP, CONTROLLING_GROUP), //
   EMPLOYEE_SALARY_LIST("fibu.employeeSalaries", "fibu/EmployeeSalaryList.action", //
       EmployeeSalaryDao.USER_RIGHT_ID, READONLY_READWRITE), //
