@@ -34,6 +34,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.CalendarPage;
+import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.converter.MyDateConverter;
@@ -69,6 +70,7 @@ public class DatePanel extends FormComponentPanel<Date>
     final MyDateConverter dateConverter = new MyDateConverter(settings.targetType, "S-");
     dateField = new DateTextField("dateField", new PropertyModel<Date>(this, "date"), dateConverter);
     dateField.add(new SimpleAttributeModifier("size", "10"));
+    dateField.add(new AttributeAppendModifier("class", "half text"));
     add(dateField);
     /*
      * @SuppressWarnings("serial") final DatePicker datePicker = new DatePicker() { @Override protected boolean enableMonthYearSelection() {

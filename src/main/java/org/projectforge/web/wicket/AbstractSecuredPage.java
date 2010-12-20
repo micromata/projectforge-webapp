@@ -100,8 +100,8 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     contentMenu.setRenderBodyOnly(true);
     contentMenuArea.add(contentMenu);
     dropDownMenu = new WebMarkupContainer("dropDownMenu");
-    dropDownMenu.add(new PresizedImage("cogImage", getResponse(), WebConstants.IMAGE_COG));
-    dropDownMenu.add(new PresizedImage("arrowDownImage", getResponse(), WebConstants.IMAGE_ARROW_DOWN));
+    //1dropDownMenu.add(new PresizedImage("cogImage", getResponse(), WebConstants.IMAGE_COG));
+    //dropDownMenu.add(new PresizedImage("arrowDownImage", getResponse(), WebConstants.IMAGE_ARROW_DOWN));
     dropDownMenuRepeater = new MyRepeatingView("menu");
     dropDownMenu.add(dropDownMenuRepeater);
     dropDownMenu.setVisible(false);

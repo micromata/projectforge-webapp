@@ -19,7 +19,7 @@
 	       <input class="text double" type="text" wicket:id="lendOutComment" />
 	       </fieldset>
 	    </wicket:fragment>
-    
+    <fieldset>
 		<label for="task" class="half clear"><wicket:message key="task" /></label>
 	    <label id="task" class="double bold"><span wicket:id="task">[task path]</span></label>
 	
@@ -53,10 +53,11 @@
 	    <input id="yearOfPublishing" type="text" class="text half"  wicket:id="yearOfPublishing" />
 	      
 		<label class="half clear" for="abstract"><wicket:message key="book.abstract" /></label>
-		<textarea id="abstract" class="textarea clear double" wicket:id="abstract">[abstract]</textarea>
+		<textarea id="abstract" class="textarea  double" wicket:id="abstract">[abstract]</textarea>
 		
 		<label class="clear half"  for="comment"><wicket:message key="comment" /></label>
 	    <textarea id="comment" class="textarea double" wicket:id="comment">[comment]</textarea>
+	    </fieldset>
   </div>
 	</wicket:extend>
 </body>

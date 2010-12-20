@@ -173,7 +173,7 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
         return DateHelper.formatAsUTC(data.getBirthday());
       }
     }));
-    add(new PresizedImage("cakeImage", getResponse(), WebConstants.IMAGE_BIRTHDAY));
+    //add(new PresizedImage("cakeImage", getResponse(), WebConstants.IMAGE_BIRTHDAY));
     final MaxLengthTextArea commentTextField = new MaxLengthTextArea("comment", new PropertyModel<String>(data, "comment"));
     add(commentTextField);
     if (isNew() == false) {

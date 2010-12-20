@@ -40,7 +40,7 @@ public class ContentMenuEntryPanel extends Panel
   public ContentMenuEntryPanel(final String id, final AbstractLink link, final String label)
   {
     super(id);
-    add(new SimpleAttributeModifier("class", "buttonizeL"));
+    add(new SimpleAttributeModifier("class", "buttonized"));
     add(link);
     final Label labelComp = new Label("label", label);
     labelComp.setRenderBodyOnly(true);

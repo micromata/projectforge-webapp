@@ -6,118 +6,157 @@
 <body>
   <wicket:extend>
     <span class="newform">
-    <wicket:message key="task" />
-    <span wicket:id="task">[task]</span>
-    <fieldset>
     
-    <label class="clear half"><wicket:message key="name" /> / <wicket:message key="address.form" /></label>
-     <wicket:message key="firstName" /> / <wicket:message key="address.title" />
-      <input type="text" class="text full" wicket:id="firstName" /> / 
-      <input type="text" class="text full" wicket:id="title" />
-      
-      
-      <input type="text" class="text full" wicket:id="name" style="width: 20em" /> / 
-      <select wicket:id="formOfAddress" style="width: 10em">
-        <option>present</option>
-      </select>
-      
-      <input type="checkbox" wicket:id="favoriteCard" />
-      <img wicket:id="favoriteCardHelpImage" />
-      <wicket:message key="address.phoneType.business" />
-      
-      <input type="text" class="text quart" wicket:id="businessPhone" /> 
-      <input type="checkbox" wicket:id="favoriteBusinessPhone" /><img wicket:id="favoriteBusinessPhoneHelpImage" />
-
-     
-      <label class="clear half" for="fax"><wicket:message key="address.phoneType.fax" /></label>
-      <input type="text" class="text quart" wicket:id="fax" /> 
-      <input type="checkbox" wicket:id="favoriteFax" />
-      <img wicket:id="favoriteFaxHelpImage" />
-      
-      <wicket:message key="organization" />
-      <input type=text " class="stdtext" wicket:id="organization" />
-      <wicket:message key="address.phoneType.mobile" />
-      <input type="text" class="text quart" wicket:id="mobilePhone" /> 
-      <input type="checkbox" wicket:id="favoriteMobilePhone" /><img wicket:id="favoriteMobilePhoneHelpImage" />
-      
-      <wicket:message key="address.division" />
-      <input type="text" class="stdtext" wicket:id="division" />
-      <wicket:message key="address.positionText" />
-      <input type="text" class="stdtext" wicket:id="positionText" />
-
-      <wicket:message key="email" />
-      <input type="text" class="stdtext" wicket:id="email" />
-      
-      <wicket:message key="address.website" />
-      <input type="text" class="stdtext" wicket:id="website" />
-
-      <wicket:message key="address.contactStatus" />
-      <select wicket:id="contactStatus">
-        <option>active</option>
-      </select>
-      <wicket:message key="address.imageBroschure" />
-      <input type="checkbox" wicket:id="imageBroschure" />
-
-      <wicket:message key="address.addressStatus" />
-      <select wicket:id="addressStatus" style="width: 10em">
-        <option>leave</option>
-      </select>
-      
-      <wicket:message key="address.addressText" />
-      <input type="text" class="stdtext" wicket:id="addressText" />
-      
-      <wicket:message key="address.postalAddressText" />
-      <input type="text" class="stdtext" wicket:id="postalAddressText" />
-
-      <wicket:message key="address.zipCode" /> / <wicket:message key="address.city" />
-      <input type="text" class="text" wicket:id="zipCode" size="5" />
-      <input type="text" class="text quart" wicket:id="city" />
-      
-      <wicket:message key="address.zipCode" /> / <wicket:message key="address.city" />
-	<input type="text" class="text" wicket:id="postalZipCode" size="5" />
-      <input type="text" class="text quart" wicket:id="postalCity" />
-      
-      <wicket:message key="address.country" />
-      <input type="text" class="text quart" wicket:id="country" />
-      <wicket:message key="address.state" />
-      <input type="text" class="text quart" wicket:id="state" />
-      <wicket:message key="address.country" />
-      <input type="text" class="text quart" wicket:id="postalCountry" />
-      <wicket:message key="address.state" />
-      <input type="text" class="text quart" wicket:id="postalState" />
-      <wicket:message key="address.privateAddressText" />
-      <input type="text" class="stdtext" wicket:id="privateAddressText" />
-      <wicket:message key="address.phoneType.private" />
-      <input type="text" class="text quart" wicket:id="privatePhone" />
-      <input type="checkbox" wicket:id="favoritePrivatePhone" /><img wicket:id="favoritePrivatePhoneHelpImage" />
-      
-      <wicket:message key="address.zipCode" /> / <wicket:message key="address.city" />
-      <input type="text" class="text" wicket:id="privateZipCode" size="5" />
-      <input type="text" class="text quart" wicket:id="privateCity" />
-      <wicket:message key="address.phoneType.privateMobile" />
-      <input type="text" class="text quart" wicket:id="privateMobilePhone" />
-      <input type="checkbox" wicket:id="favoritePrivateMobilePhone" /><img wicket:id="favoritePrivateMobilePhoneHelpImage" />
-
-      <wicket:message key="address.country" />
-      <input type="text" class="text quart" wicket:id="privateCountry" />
-      <wicket:message key="address.state" />
-      <input type="text" class="text quart" wicket:id="privateState" />
-      <wicket:message key="address.privateEmail" />
-      <input type="text" class="stdtext" wicket:id="privateEmail" />
     
-   
-      <wicket:message key="address.birthday" />
-      <span wicket:id="birthday">[birth day]</span>&nbsp;<img wicket:id="cakeImage" src="/images/cake.png" />
-      <span wicket:id="showBirthdayAsUTC" style="font-size: x-small; color: white;">[1970-11-21 00:00]</span>
-      
-      <wicket:message key="comment" />
-      <wicket:message key="address.publicKey" />
-      <textarea class="stdtext" wicket:id="comment" style="height: 20ex;">[comment]</textarea>
-      <textarea class="stdtext" wicket:id="publicKey" style="height: 20ex;">[public key]</textarea>
-      <wicket:message key="address.fingerprint" />
-      
-      <input type="text" class="stdtext" style="width: 100%;" wicket:id="fingerprint" />
-    </fieldset>
+
+	<fieldset class="float boxshadow roundcorners">
+		<h3>Persönliche Daten</h3>
+		<!-- @kai: ich würde hier eine Person anlegen und Adressen hinzufügbar gestalten, ebenso wie telfon, email etc. die kriegen dann ein flag (geschäflich, fax, mobile, etc) -->
+		<label class="clear half"><wicket:message key="task" /></label>
+    	<label><span wicket:id="task">[task]</span></label>
+	
+		<label class="clear half"><wicket:message key="address.form" /></label>
+		<select class="select threequart" wicket:id="formOfAddress">                 
+		  <option>present</option>                                             
+		</select>
+		<label><input type="checkbox" wicket:id="favoriteCard" /><img wicket:id="favoriteCardHelpImage" /></label>
+		
+		<label class="clear half"><wicket:message key="address.title" /></label>
+	    <input type="text" class="text full strong" wicket:id="title" />
+		
+		<label class="clear half"><wicket:message key="firstName" /></label>
+		<input type="text" class="text full strong" wicket:id="firstName" /> 
+	
+	    <label class="clear half"><wicket:message key="name" /></label>
+		<input type="text" class="text full strong" wicket:id="name" />
+		
+		<label class="clear half"><wicket:message key="address.division" /></label>
+		<input type="text" class="text full" wicket:id="division" />
+	
+		<label class="clear half"><wicket:message key="address.positionText" /></label>
+		<input type="text" class="text full" wicket:id="positionText" />
+	
+		<label class="clear half"><wicket:message key="email" /></label>
+		<input type="text" class="text full" wicket:id="email" />
+	
+		<label class="clear half"><wicket:message key="address.website" /></label>
+		<input type="text" class="text full" wicket:id="website" />
+	
+		<label class="clear half"><wicket:message key="address.contactStatus" /></label>
+		<select wicket:id="contactStatus" class="select full">
+			<option>active</option>
+		</select>
+		
+		<label class="clear half"><wicket:message key="address.birthday" /></label>
+		<span wicket:id="birthday">[birth day]</span>
+		<label class="clear full"><span wicket:id="showBirthdayAsUTC">[1970-11-21 00:00]</span></label>
+		
+		<label class="clear puthalf full"><input type="checkbox" wicket:id="imageBroschure" /><wicket:message key="address.imageBroschure" /></label>
+		
+		<label class="clear onehalf"><wicket:message key="comment" /></label>
+		<textarea class="textarea clear onehalf" wicket:id="comment" >[comment]</textarea>
+		
+		<label class="clear onehalf"><wicket:message key="address.publicKey" /></label>
+		<textarea class="textarea clear onehalf" wicket:id="publicKey">[public key]</textarea>
+		
+		<label class="clear onehalf"><wicket:message key="address.fingerprint" /></label>
+		<input type="text" class="clear text onehalf" wicket:id="fingerprint" />
+		
+	</fieldset>
+
+	<fieldset class="float boxshadow roundcorners">
+		<h3>Kontakt Geschäftlich</h3>
+		<h4>Status</h4>
+		<label class="half clear"><wicket:message key="organization" /></label>
+		<input type="text" class="text full" wicket:id="organization" />
+		<label class="clear half"><wicket:message key="address.addressStatus" /></label>
+		<select wicket:id="addressStatus" class="select full">
+			<option>leave</option>
+		</select>
+		
+		
+		<h4>Firmenadresse</h4>
+		
+		<label class="clear half"><wicket:message key="address.addressText" /></label>
+		<input type="text" class="text full" wicket:id="addressText" />
+		
+		<label class="clear half"><wicket:message key="address.zipCode" />/<wicket:message key="address.city" /></label>
+		<input type="text" class="text quart" wicket:id="zipCode" size="5" />
+		<input type="text" class="text threequart" wicket:id="city" />
+		<label class="clear half"><wicket:message key="address.country" /></label>
+		<input type="text" class="text full" wicket:id="country" />
+		
+		<label class="clear half"><wicket:message key="address.state" /></label>
+		<input type="text" class="text full" wicket:id="state" />
+		
+		<h4>Postadresse</h4>
+		
+		<label class="clear half"><wicket:message key="address.postalAddressText" /></label>
+		<input type="text" class="text full" wicket:id="postalAddressText" />
+		
+		<label class="clear half"><wicket:message key="address.zipCode" />/<wicket:message key="address.city" /></label>
+		<input type="text" class="text quart" wicket:id="postalZipCode" size="5" />
+		<input type="text" class="text threequart" wicket:id="postalCity" />
+		
+		<label class="clear half"><wicket:message key="address.country" /></label>
+		<input type="text" class="text full" wicket:id="postalCountry" />
+	
+	
+		<label class="clear half"><wicket:message key="address.state" /></label>
+		<input type="text" class="text full" wicket:id="postalState" />
+		
+		<h4>Telefon</h4>
+		<label class="clear half"><wicket:message key="address.phoneType.business" /></label>
+		<input type="text" class="text threequart" wicket:id="businessPhone" />
+		<label><input type="checkbox" wicket:id="favoriteBusinessPhone" /><img wicket:id="favoriteBusinessPhoneHelpImage" /></label>
+	     
+		<label class="clear half" for="fax"><wicket:message key="address.phoneType.fax" /></label>
+		<input type="text" class="text threequart" wicket:id="fax" /> 
+		<label><input type="checkbox" wicket:id="favoriteFax" /><img wicket:id="favoriteFaxHelpImage" /></label>
+		
+		<label class="clear half"><wicket:message key="address.phoneType.mobile" /></label>
+		<input type="text" class="text threequart" wicket:id="mobilePhone" /> 
+	    <label><input type="checkbox" wicket:id="favoriteMobilePhone" /><img wicket:id="favoriteMobilePhoneHelpImage" /></label>
+	</fieldset>
+	
+	<fieldset class="float boxshadow roundcorners">
+		<h3>Kontakt Privat</h3>
+		
+		<h4>Adresse</h4>
+		<label class="clear half"><wicket:message key="address.privateAddressText" /></label>
+		<input type="text" class="text full" wicket:id="privateAddressText" />
+		
+		<label class="clear half"><wicket:message key="address.zipCode" />/<wicket:message key="address.city" /></label>
+		<input type="text" class="text quart" wicket:id="privateZipCode" size="5" /><input type="text" class="text threequart" wicket:id="privateCity" />
+		
+		<label class="clear half"><wicket:message key="address.state" /></label>
+		<input type="text" class="text full" wicket:id="privateState" />
+		
+		<label class="clear half"><wicket:message key="address.country" /></label>
+		<input type="text" class="text full" wicket:id="privateCountry" />
+	
+		<h4>Telefon</h4>	
+		<label class="clear half"><wicket:message key="address.phoneType.privateMobile" /></label>
+		<input type="text" class="text threequart" wicket:id="privateMobilePhone" />
+		<label><input type="checkbox" wicket:id="favoritePrivatePhone" /><img wicket:id="favoritePrivatePhoneHelpImage" /></label>
+		
+		<label class="clear half"><wicket:message key="address.phoneType.private" /></label>
+		<input type="text" class="text threequart" wicket:id="privatePhone" />
+		<label><input type="checkbox" wicket:id="favoritePrivateMobilePhone" /><img wicket:id="favoritePrivateMobilePhoneHelpImage" /></label>
+		
+		<h4>Online</h4>
+		<label class="clear half"><wicket:message key="address.privateEmail" /></label>
+		<input type="text" class="text full" wicket:id="privateEmail" />
+		
+		
+		
+		
+		
+		
+		
+		
+	
+	</fieldset>
     </span>
   </wicket:extend>
 </body>

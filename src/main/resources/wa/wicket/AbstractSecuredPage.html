@@ -10,7 +10,15 @@
 	/* <![CDATA[ */
 		$(function() {
 			$( ".buttonset" ).buttonset();
-			});
+					//$( ".toolbarbutton" ).button();
+					
+					$( ".toolbarbutton" ).button({
+			            icons: {
+			            	 primary: "ui-icon-circle-plus"
+			            }
+			        })
+		});
+	
 	/* ]]> */
 	</script>
 	
@@ -20,14 +28,9 @@
   <div class="menu clearfix" id="contentMenu" wicket:id="contentMenuArea">
   	<span wicket:id="menu">[menu entries]</span>
   	
-	<ul class="dropdown-menu top-right" wicket:id="dropDownMenu">
-		<li onmouseover="mopen('m1')" onmouseout="mclosetime()"><img src="images/cog.png" wicket:id="cogImage" />
-			<img src="images/arrow-down.png" wicket:id="arrowDownImage" />
-				<ul id="m1" onmouseover="mcancelclosetime()">
-					<li wicket:id="menu"><a wicket:id="menuEntry"><span wicket:id="label">[action]</span></a></li>
-				</ul>
-		</li>
-	</ul>
+	<wicket:container wicket:id="dropDownMenu">
+					<wicket:container wicket:id="menu"><a class="toolbarbutton" wicket:id="menuEntry"><wicket:container wicket:id="label">[action]</wicket:container></a></wicket:container>
+	</wicket:container>
   </div>
   <wicket:child>
     <h2>This is the content!</h2>

@@ -6,53 +6,77 @@
 <body>
 <wicket:extend>
   <script wicket:id="showDeleteQuestionDialog" type="text/javascript">
-    function showDeleteQuestionDialog() {
+   function showDeleteQuestionDialog() {
       return window.confirm("Delete...?");
     }
   </script>
-
-  <form wicket:id="form" >
-  <div wicket:id="feedback">[Validation errors]</div>
-
-  <fieldset>
-  	<legend><wicket:message key="label.data" /></legend>
   
-    	<wicket:child />
-    
-   </fieldset>
-   <fieldset class="buttons" wicket:id="buttonCell">
-	<span wicket:id="update">[update]</span>
-	<span wicket:id="create">[create]</span>
-	<span wicket:id="delete">[delete]</span>
-	<span wicket:id="undelete">[undelete]</span>
-	<span wicket:id="markAsDeleted">[mark as deleted]</span>
-	<span wicket:id="reset">[reset]</span>
-	<span wicket:id="buttonPanel">[Place for page specific buttons]</span>
-	<span wicket:id="cancel">[cancel]</span>		
-    </fieldset>
-    <fieldset wicket:id="bottomRows">
-      <!-- Place here your content below the buttons. -->
-    </fieldset>
-  </form>
 
-  <span wicket:id="bottomPanel"> <!-- Place here your content below the form and buttons. --> </span>
-  <fieldset><legend><wicket:message key="label.historyOfChanges" /></legend>
-  <table class="form" wicket:id="timeOfModifications">
-    <tr>
-      <th><wicket:message key="timeOfCreation" /></th>
-      <td><span wicket:id="timeOfCreation">[08.10.2009 13:27:02]</span></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="timeOfLastUpdate" /></th>
-      <td><span wicket:id="timeOfLastUpdate">[08.10.2009 13:27:02]</span></td>
-    </tr>
-  </table>
-  <table class="dataview" cellspacing="0" wicket:id="historyTable">
-    <tr>
-      <td>[history table]</td>
-    </tr>
-  </table>
-  </fieldset>
+  
+<!--  <script>-->
+<!--	$(function() {-->
+<!--		$("#tabs").tabs();-->
+<!--	});-->
+<!--	</script>-->
+
+<div id="tabs">
+<!--@kai: wenn du oben das script und die liste hier wieder einkommentierst, haben wir tabs. teste mal.	<ul>-->
+<!--		<li><a href="#edit">i18n Bearbeiten</a></li>-->
+<!--		<li><a href="#history">i18n History</a></li>-->
+<!--	</ul>-->
+	
+	<div id="edit">
+		
+		  <form wicket:id="form" class="form">
+		  <div wicket:id="feedback">[Validation errors]</div>
+		
+		 
+		  <div class="clearfix">
+		   <wicket:child />
+		    </div>
+		 
+		   
+		   <fieldset class="buttons" wicket:id="buttonCell">
+			<span wicket:id="update">[update]</span>
+			<span wicket:id="create">[create]</span>
+			<span wicket:id="delete">[delete]</span>
+			<span wicket:id="undelete">[undelete]</span>
+			<span wicket:id="markAsDeleted">[mark as deleted]</span>
+			<span wicket:id="reset">[reset]</span>
+			<span wicket:id="buttonPanel">[Place for page specific buttons]</span>
+			<span wicket:id="cancel">[cancel]</span>		
+		    </fieldset>
+		   
+		    <fieldset wicket:id="bottomRows">
+		      <!-- Place here your content below the buttons. -->
+		    </fieldset>
+		  
+		  </form>
+	</div><!-- edit END -->
+
+	<div id="history">
+
+		  <span wicket:id="bottomPanel"> <!-- Place here your content below the form and buttons. --> </span>
+		  
+		  <h3><wicket:message key="label.historyOfChanges" /></h3>
+		  
+		  <dl class="horizontal clearfix" wicket:id="timeOfModifications">
+		      <dt><wicket:message key="timeOfCreation" /></dt>
+		      <dd><wicket:container wicket:id="timeOfCreation">[08.10.2009 13:27:02]</wicket:container></dd>
+		     <dt><wicket:message key="timeOfLastUpdate" /></dt>
+		     <dd><wicket:container wicket:id="timeOfLastUpdate">[08.10.2009 13:27:02]</wicket:container></dd>
+		  </dl>
+		  
+		  <table class="dataview" cellspacing="0" wicket:id="historyTable">
+		    <tr>
+		      <td>[history table]</td>
+		    </tr>
+		  </table>
+
+	</div><!-- history END -->
+	
+</div><!-- tabs END -->
+
 </wicket:extend>
 </body>
 </html>
