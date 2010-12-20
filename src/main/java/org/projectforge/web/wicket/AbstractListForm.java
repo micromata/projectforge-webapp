@@ -210,7 +210,8 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
     pageSizeFragment = new Fragment("pageSize", "pageSizeFragment", this);
     filterContainer.add(pageSizeFragment);
 
-    final DropDownChoice pageSizeChoice = getPageSizeDropDownChoice("pageSize", getLocale(), new PropertyModel<Integer>(this, "pageSize"), 25, 1000);
+    final DropDownChoice pageSizeChoice = getPageSizeDropDownChoice("pageSize", getLocale(), new PropertyModel<Integer>(this, "pageSize"),
+        25, 1000);
     pageSizeFragment.add(pageSizeChoice);
     final WebMarkupContainer buttonCell = new WebMarkupContainer("buttonCell") {
       public boolean isTransparentResolver()
@@ -462,16 +463,21 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
       if (getParentPage().isStoreFilter() == true) {
         Object filter = getParentPage().getUserPrefEntry(this.getClass().getName() + ":Filter");
         if (filter != null) {
-          try {
-            this.searchFilter = (F) filter;
-          } catch (ClassCastException ex) {
-            // Probably a new software release results in an incompability of old and new filter format.
-            getLogger().info(
-                "Could not restore filter from user prefs: (old) filter type "
-                    + filter.getClass().getName()
-                    + " is not assignable to (new) filter type "
-                    + newSearchFilterInstance().getClass().getName()
-                    + " (OK, probably new software release).");
+          if (filter.getClass().equals(newSearchFilterInstance().getClass()) == true) {
+            try {
+              this.searchFilter = (F) filter;
+            } catch (ClassCastException ex) {
+              // No output needed, info message follows:
+            }
+            if (this.searchFilter == null) {
+              // Probably a new software release results in an incompability of old and new filter format.
+              getLogger().info(
+                  "Could not restore filter from user prefs: (old) filter type "
+                      + filter.getClass().getName()
+                      + " is not assignable to (new) filter type "
+                      + newSearchFilterInstance().getClass().getName()
+                      + " (OK, probably new software release).");
+            }
           }
         }
       }
