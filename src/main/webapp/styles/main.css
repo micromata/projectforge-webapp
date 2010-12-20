@@ -246,8 +246,14 @@ body * {
 
 .headermeta ul.info li.loggedinlabel {
 	color:#fff;
-	margin-right:5em;
+	margin-right:1em;
 	float:right;
+}
+
+.headermeta ul.info li.loggedInLabel a {
+	float:none;
+	margin: 0 0 0 0.5em;
+	color: #FFD300;
 }
 
 .headermeta ul.info {
@@ -265,6 +271,8 @@ body * {
 	float:left;
 	margin: 0 0 0 1em;
 }
+
+ 
 
 .headermeta ul.info li strong {
 	font-weight:bold;
@@ -473,6 +481,15 @@ ul#normal li.active ul {
 	display:block;
 }
 
+/* The actions for the main content panel */
+
+#contentMenu {
+	background:aqua;
+	padding: 1em;
+	vertical-align: baseline;
+}
+
+
 #content {
 	margin: 0;
 	padding: 0;
@@ -656,17 +673,22 @@ div.form input.stdtext {
 	width: 200px;
 }
 
+div.third {
+	width:25%;
+	float: left;
+}
+
 fieldset.buttons, fieldset, div.buttons {
 	border:none;
 	border-top: 1px solid #D9DFE1;
-	padding: 3em 1em 1em 1em;
+	padding: 0 1em 1em 1em;
 	vertical-align: top;
 	background-color:#F0F5F7;
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #F0F5F7), color-stop(0.6, #fff) );
 	background: -moz-linear-gradient(top, #F0F5F7, #fff 40%);
-	filter:progid:DXImageTransform.Microsoft.Gradient(endColorstr='#ffffff', startColorstr='#F0F5F7', gradientType='0');
-	display:block;
-	position:relative;
+	filter: progid:DXImageTransform.Microsoft.Gradient(endColorstr='#ffffff', startColorstr='#F0F5F7', gradientType='0');
+	display: block;
+	position: relative;
 	min-height: 2em;
 	-moz-box-sizing: content-box;
 	-webkit-box-sizing: content-box;
@@ -682,6 +704,9 @@ fieldset.buttons, fieldset, div.buttons {
 
 fieldset.float{
 	float: left;
+	border: 1px solid #BBC1C3;
+	padding: 0 0 1em 1em;
+	min-height:55em;
 
 }
 
@@ -798,7 +823,7 @@ form.newform p,
 	-ms-box-sizing: content-box;
 }
 
-form.newform p,
+form.newform p.title,
 .newform input[type="text"].title,
 .newform input[type="password"].title,
 .newform textarea.title,
@@ -817,6 +842,15 @@ form.newform p,
 	-webkit-box-sizing: content-box;
 	box-sizing: content-box;
 	-ms-box-sizing: content-box;
+}
+
+form.newform p.strong,
+.newform input[type="text"].strong,
+.newform input[type="password"].strong,
+.newform textarea.strong,
+.newform select.strong,
+.newform label.strong {
+	font-weight:bold;
 }
 
 
@@ -841,7 +875,6 @@ form.newform p,
 
 #content form.newform {
 	width:60em;
-	
 	display:block;
 	margin: 0 auto;
 	padding: 1em 0 0 1em;
@@ -857,7 +890,8 @@ form.newform p,
 
 
 .clear {
-	width:9em;
+/*	width:9em;*/
+clear:both;
 }
 
 select {
@@ -1097,11 +1131,28 @@ table.dataview thead tr td,table.dataview thead tr th {
 	border: 4px solid #fff;
 	border-top: 1px solid #d9dfe1;
 	border-bottom: 1px solid #d9dfe1;
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #F0F5F7),
-		color-stop(1, #D9DFE1) );
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #F0F5F7), color-stop(1, #D9DFE1) );
 	background: -moz-linear-gradient(top, #F0F5F7, #D9DFE1);
 	border-bottom-color: #8994A0;
 	font-size: 1.2em;
+}
+
+table.dataview thead tr td:first-child,
+table.dataview thead tr th:first-child,
+table.dataview tbody tr td:first-child,
+table.dataview tbody tr th:first-child ,
+table.dataview tfoot tr td:first-child,
+table.dataview tfoot tr th:first-child  {
+	border-left:none; 
+}
+
+table.dataview thead tr td:last-child,
+table.dataview thead tr th:last-child,
+table.dataview tbody tr td:last-child,
+table.dataview tbody tr th:last-child,
+table.dataview tfoot tr td:last-child,
+table.dataview tfoot tr th:last-child {
+	border-right:none; 
 }
 
 table.dataview thead tr td.tableform {
@@ -1223,20 +1274,26 @@ table.dataview tbody tr td.motivate {
 }
 
 /* The Tablesorters */
-th.wicket_orderNone,th.wicket_orderUp ;th.wicket_orderDown {
+table.dataview thead th.wicket_orderNone, 
+table.dataview thead th.wicket_orderUp, 
+table.dataview thead th.wicket_orderDown {
 	vertical-align: middle;
+	white-space: nowrap;
+	padding-right:2em;
+	text-align:center;
 }
 
-.wicket_orderNone a,.wicket_orderUp a,.wicket_orderDown a {
+.wicket_orderNone a, .wicket_orderUp a, .wicket_orderDown a {
 	white-space: nowrap;
 	text-decoration: none;
+	color: #5C6970;
+	position:relative;
+	width:100%;
 }
 
 .wicket_orderNone a:hover,.wicket_orderUp a:hover,.wicket_orderDown a:hover
 	{
 	text-decoration: none;
-	vertical-align: middle;
-	white-space: nowrap;
 	text-shadow: #DBECDA 0px 0px 1px;
 	-moz-text-shadow: #DBECDA 0px 0px 1px;
 	-webkit-text-shadow: #DBECDA 0px 0px 1px;
@@ -1244,26 +1301,33 @@ th.wicket_orderNone,th.wicket_orderUp ;th.wicket_orderDown {
 
 .wicket_orderNone a span:after {
 	font-weight: normal;
-	font-size: 1.2em;
+	font-size: 1.4em;
 	font-family: embats;
 	content: ' L';
-	vertical-align: middle;
+	top: -0.2em;
+	right:-1.2em;
+	position:absolute;
+
 }
 
 .wicket_orderUp a span:after {
 	font-weight: normal;
-	font-size: 1.2em;
+	font-size: 1.4em;
 	font-family: embats;
 	content: ' D';
-	vertical-align: middle;
+	top: -0.2em;
+	right:-1.2em;
+	position:absolute;
 }
 
 .wicket_orderDown a span:after {
 	font-weight: normal;
-	font-size: 1.2em;
+	font-size: 1.4em;
 	font-family: embats;
 	content: ' J';
-	vertical-align: middle;
+	top: -0.2em;
+	right:-1.2em;
+	position:absolute;
 }
 
 /* Tooltips */
@@ -1295,7 +1359,58 @@ th.wicket_orderNone,th.wicket_orderUp ;th.wicket_orderDown {
 	margin: 0;
 }
 
+/* Headings */
+
+h1 {
+	font-size:2em;
+	margin: 1em 0;
+}
+
+h2 {
+font-size:1.6em;
+	font-weight:bold;
+	margin: 1em 0;
+	clear:left;
+}
+
+h3 {
+	font-size:1.4em;
+	font-weight:bold;
+	margin: 1em 0;
+	clear:left;
+}
+
+h4 {
+	font-size:1.2em;
+	margin: 1em 0;
+	padding: 1em 0 .2em 0;
+	border-bottom: 1px solid #D9DFE1;
+	clear:left;
+	font-weight:bold;
+}
+
+dl.horizontal {
+	font-size:1.2em;
+}
+
+dl.horizontal dd {
+	float: left;
+	display:block;
+	margin: 0 0 0.5em 0;
+}
+
+dl.horizontal dt{
+	clear:left;
+	float:left;
+	font-weight:bold;
+	width:18em;
+	margin: 0 0 0.5em 0;
+}
+
+
+
 /* Autocomplete */
+
 .ac_results {
 	padding: 0px;
 	border: 1px solid WindowFrame;
@@ -1344,68 +1459,4 @@ th.wicket_orderNone,th.wicket_orderUp ;th.wicket_orderDown {
 	color: HighlightText;
 }
 
-/* Drop down menu */
-ul.top-right {
 
-	z-index: 30;
-}
-
-ul.dropdown-menu {
-	margin: 0;
-	padding: 0;
-	float:right;
-	width: 10em;
-	
-}
-
-ul.top-right>li {
-	margin: 0 1px 0 0;
-	padding: 4px 10px;
-}
-
-ul.dropdown-menu>li {
-	list-style: none;
-	color: #FFF;
-	text-align: center;
-}
-
-ul.dropdown-menu li a {
-	display: block;
-	text-decoration: none;
-	color: #555555;
-	text-decoration: none;
-}
-
-ul.dropdown-menu li a:hover {
-	display: block;
-	background: #FFFFFF;
-}
-
-ul.top-right ul {
-	position: absolute;
-	right: 0px;
-}
-
-ul.dropdown-menu ul {
-	position: absolute;
-	margin: 0;
-	padding: 0;
-	background: #E8E8E8;
-	border: 1px solid #555555;
-	z-index: 4000;
-}
-
-ul.dropdown-menu ul li a {
-	position: relative;
-	display: block;
-	margin: 0;
-	padding: 5px 10px;
-	width: auto;
-	white-space: nowrap;
-	text-align: left;
-	background: #E8E8E8;
-}
-
-ul.dropdown-menu ul li a:hover {
-	background: #FFFFFF;
-}
