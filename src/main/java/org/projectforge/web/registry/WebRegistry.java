@@ -56,6 +56,8 @@ import org.projectforge.web.fibu.BankAccountEditPage;
 import org.projectforge.web.fibu.BankAccountListPage;
 import org.projectforge.web.fibu.EingangsrechnungEditPage;
 import org.projectforge.web.fibu.EingangsrechnungListPage;
+import org.projectforge.web.fibu.EmployeeEditPage;
+import org.projectforge.web.fibu.EmployeeListPage;
 import org.projectforge.web.fibu.KontoEditPage;
 import org.projectforge.web.fibu.KontoListPage;
 import org.projectforge.web.fibu.Kost1EditPage;
@@ -271,6 +273,7 @@ public class WebRegistry
 
     addMountPages("bankAccount", BankAccountListPage.class, BankAccountEditPage.class);
     addMountPages("contract", ContractListPage.class, ContractEditPage.class);
+    addMountPages("employee", EmployeeListPage.class, EmployeeEditPage.class);
     addMountPages("ganttChart", GanttChartListPage.class, GanttChartEditPage.class);
     addMountPages("hrPlanning", HRPlanningListPage.class, HRPlanningEditPage.class);
     addMountPage("hrList", HRListPage.class);
