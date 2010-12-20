@@ -27,7 +27,6 @@ import java.io.Serializable;
 
 import org.projectforge.core.BaseSearchFilter;
 
-
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -40,6 +39,15 @@ public class EmployeeSalaryFilter extends BaseSearchFilter implements Serializab
   protected int year;
 
   protected int month;
+
+  public EmployeeSalaryFilter()
+  {
+  }
+
+  public EmployeeSalaryFilter(final BaseSearchFilter filter)
+  {
+    super(filter);
+  }
 
   /**
    * Year of salaries to filter. "<= 0" means showing all years.

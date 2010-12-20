@@ -26,8 +26,8 @@ package org.projectforge.fibu;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
@@ -73,12 +73,17 @@ public class EmployeeSalaryDao extends BaseDao<EmployeeSalaryDO>
   @Override
   public List<EmployeeSalaryDO> getList(BaseSearchFilter filter)
   {
-    EmployeeSalaryFilter myFilter = (EmployeeSalaryFilter) filter;
-    QueryFilter queryFilter = new QueryFilter(filter);
+    final EmployeeSalaryFilter myFilter;
+    if (filter instanceof EmployeeSalaryFilter) {
+      myFilter = (EmployeeSalaryFilter) filter;
+    } else {
+      myFilter = new EmployeeSalaryFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
     if (myFilter.getYear() >= 0) {
-      queryFilter.add(Expression.eq("year", myFilter.getYear()));
+      queryFilter.add(Restrictions.eq("year", myFilter.getYear()));
       if (myFilter.getMonth() >= 0) {
-        queryFilter.add(Expression.eq("month", myFilter.getMonth()));
+        queryFilter.add(Restrictions.eq("month", myFilter.getMonth()));
       }
     }
     queryFilter.addOrder(Order.desc("year")).addOrder(Order.desc("month"));

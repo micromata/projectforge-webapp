@@ -23,12 +23,22 @@
 
 package org.projectforge.fibu;
 
-public enum EmployeeStatus
+import org.projectforge.core.I18nEnum;
+
+public enum EmployeeStatus implements I18nEnum
 {
   FEST_ANGESTELLTER("festAngestellter"), BEFRISTET_ANGESTELLTER("befristetAngestellter"), FREELANCER("freelancer"), AUSHILFE("aushilfe"), STUDENTISCHE_HILFSKRAFT(
       "studentischeHilfskraft"), STUD_ABSCHLUSSARBEIT("studentischeAbschlussarbeit"), PRAKTIKANT("praktikant"), AZUBI("azubi");
 
   private String key;
+
+  /**
+   * @return The full i18n key including the i18n prefix "fibu.auftrag.status.".
+   */
+  public String getI18nKey()
+  {
+    return "fibu.employee.status." + key;
+  }
 
   /**
    * The key will be used e. g. for i18n.

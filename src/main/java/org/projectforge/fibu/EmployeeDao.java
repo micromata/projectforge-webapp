@@ -133,8 +133,13 @@ public class EmployeeDao extends BaseDao<EmployeeDO>
   @Override
   public List<EmployeeDO> getList(final BaseSearchFilter filter)
   {
-    final EmployeeFilter myFilter = (EmployeeFilter) filter;
-    QueryFilter queryFilter = new QueryFilter(filter);
+    final EmployeeFilter myFilter;
+    if (filter instanceof EmployeeFilter) {
+      myFilter = (EmployeeFilter) filter;
+    } else {
+      myFilter = new EmployeeFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
     final List<EmployeeDO> list = getList(queryFilter);
     final Date now = new Date();
     if (myFilter.isShowOnlyActiveEntries() == true) {

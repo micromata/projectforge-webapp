@@ -47,7 +47,6 @@ import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.user.PFUserDO;
 
-
 /**
  * Repräsentiert einen Mitarbeiter. Ein Mitarbeiter ist einem ProjectForge-Benutzer zugeordnet und enthält buchhalterische Angaben.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -57,10 +56,6 @@ import org.projectforge.user.PFUserDO;
 @Table(name = "t_fibu_employee")
 public class EmployeeDO extends DefaultBaseDO
 {
-  public static final int POSITION_LENGTH = 255;
-
-  public static final int ABTEILUNG_LENGTH = 255;
-
   private static final long serialVersionUID = -1208597049289694757L;
 
   @IndexedEmbedded(depth = 1)
@@ -201,12 +196,12 @@ public class EmployeeDO extends DefaultBaseDO
     this.austrittsDatum = austrittsDatum;
   }
 
-  @Column(name = "position_text", length = POSITION_LENGTH)
+  @Column(name = "position_text", length = 244)
   public String getPosition()
   {
     return position;
   }
-  
+
   public void setPosition(String position)
   {
     this.position = position;
@@ -218,12 +213,12 @@ public class EmployeeDO extends DefaultBaseDO
     return comment;
   }
 
-  @Column(length = ABTEILUNG_LENGTH)
+  @Column(length = 255)
   public String getAbteilung()
   {
     return abteilung;
   }
-  
+
   public void setAbteilung(String abteilung)
   {
     this.abteilung = abteilung;

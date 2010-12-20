@@ -42,6 +42,15 @@ public class EmployeeFilter extends BaseSearchFilter implements Serializable
 
   private boolean showOnlyActiveEntries;
 
+  public EmployeeFilter()
+  {
+  }
+
+  public EmployeeFilter(final BaseSearchFilter filter)
+  {
+    super(filter);
+  }
+
   public boolean isShowOnlyActiveEntries()
   {
     return showOnlyActiveEntries;
