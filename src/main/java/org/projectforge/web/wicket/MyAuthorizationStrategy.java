@@ -26,6 +26,9 @@ package org.projectforge.web.wicket;
 import org.apache.wicket.Component;
 import org.apache.wicket.authorization.Action;
 import org.apache.wicket.authorization.IAuthorizationStrategy;
+import org.apache.wicket.markup.html.WebPage;
+import org.projectforge.web.LoginPage;
+import org.projectforge.web.mobile.LoginMobilePage;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -42,7 +45,10 @@ public class MyAuthorizationStrategy implements IAuthorizationStrategy// , IUnau
 
   public <T extends Component> boolean isInstantiationAuthorized(Class<T> componentClass)
   {
-    if (AbstractSecuredPage.class.isAssignableFrom(componentClass) == true) {
+    if (WebPage.class.isAssignableFrom(componentClass) == true) {
+      if (componentClass.equals(LoginPage.class) == true || componentClass.equals(LoginMobilePage.class) == true) {
+        return true;
+      }
       boolean isAuthenticated = MySession.get().isAuthenticated();
       if (isAuthenticated == false) {
         log.fatal("This should not occur, because LoginFilter should avoid this!");
