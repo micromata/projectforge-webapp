@@ -200,11 +200,11 @@ public class UserFilter implements Filter
     final String queryString = request.getQueryString();
     if (requestUri.contains(LOGIN_URL) == true
         || requestUri.contains(MOBILE_LOGIN_URL) == true
-        || (queryString != null && (queryString.contains("body:form::IFormSubmitListener") == true || queryString.contains("wicket:interface") == true))) {
-      // For unactivated cookies: the login form posts (action link) to /wa;sessionid=.... with queryString
-      // ...body:form::IFormSubmitListener...
-      // This is no security problem because the MyAuthorizationStrategy throws an exception if the user tries to call a secure page without
-      // login.
+        || (requestUri.endsWith("/wa/") == true && queryString != null && (queryString.startsWith("wicket:interface=") == true && queryString.contains("form::IFormSubmitListener") == true && queryString.endsWith("&loginpage=true") == true))) {
+          // For unactivated cookies: the login form posts (action link) to /wa;sessionid=.... with queryString
+          // ...body:form::IFormSubmitListener...
+          // This is no security problem because the MyAuthorizationStrategy throws an exception if the user tries to call a secure page without
+          // login.
       // Don't redirect to login page after successful login!
       return false;
     } else {

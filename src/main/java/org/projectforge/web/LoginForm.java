@@ -24,6 +24,7 @@
 package org.projectforge.web;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -61,7 +62,8 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
   {
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     add(new CheckBox("stayLoggedIn", new PropertyModel<Boolean>(this, "stayLoggedIn")));
-    add(new TextField<String>("username", new PropertyModel<String>(this, "username")).setMarkupId("username").add(new FocusOnLoadBehavior()));
+    add(new TextField<String>("username", new PropertyModel<String>(this, "username")).setMarkupId("username").add(
+        new FocusOnLoadBehavior()));
     add(new PasswordTextField("password", new PropertyModel<String>(this, "password")).setResetPassword(true).setRequired(true));
     final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
     final Label messageOfTheDayLabel = new Label("messageOfTheDay", messageOfTheDay);
@@ -76,6 +78,18 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
     setDefaultButton(loginButton);
     final SingleButtonPanel loginButtonPanel = new SingleButtonPanel("login", loginButton);
     add(loginButtonPanel);
+  }
+
+  /**
+   * Need this for marking login page submit as login page submit (no redirect required). See UserFilter.redirectToLoginPage.
+   * @see org.apache.wicket.markup.html.form.Form#onComponentTag(org.apache.wicket.markup.ComponentTag)
+   */
+  @Override
+  protected void onComponentTag(ComponentTag tag)
+  {
+    super.onComponentTag(tag);
+    final String action = tag.getAttribute("action");
+    tag.put("action", action + "&loginpage=true");
   }
 
   public String getUsername()
