@@ -15,15 +15,14 @@
 <wicket:extend>
   <div class="searchbox">
   <form wicket:id="form">
-  <fieldset><input id="search" wicket:id="searchField" placeholder="Suche" type="text" /><input id="submit" wicket:id="searchButton" type="hidden" /></fieldset>
+  <fieldset><input id="search" wicket:id="searchField" placeholder="Suche" type="text" /><input id="submit" wicket:id="searchButton"
+    type="hidden" /></fieldset>
   </form>
   </div>
-  <div id="content"><span class="graytitle">Adressliste</span>
-  <ul class="pageitem">
-    <li class="menu"><a href="addressEdit.html"> <span class="name">Kai Reinhard</span> <span class="comment">Micromata GmbH, Kassel</span> <span
-      class="arrow"></span> </a></li>
-    <li class="menu"><a href="addressEdit.html"> <span class="name">Markus Schwarz</span> <span class="comment">Micromata GmbH, Kassel</span>
-    <span class="arrow"></span> </a></li>
+  <div id="content">
+  <ul class="pageitem" wicket:id="resultList">
+    <wicket:container wicket:id="addressRepeater">
+    </wicket:container>
   </ul>
   </div>
 </wicket:extend>

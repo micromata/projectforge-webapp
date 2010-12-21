@@ -23,6 +23,7 @@
 
 package org.projectforge.web.address;
 
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
@@ -34,7 +35,7 @@ public class AddressListMobileForm extends AbstractMobileForm<AddressListMobileF
 {
   private static final long serialVersionUID = -4341937420376832550L;
 
-  private AddressFilter filter;
+  AddressFilter filter;
 
   public AddressListMobileForm(final AddressListMobilePage parentPage)
   {
@@ -45,7 +46,8 @@ public class AddressListMobileForm extends AbstractMobileForm<AddressListMobileF
   protected void init()
   {
     filter = new AddressFilter();
-    add(new TextField<String>("searchField", new PropertyModel<String>(filter, "searchString")));
+    add(new TextField<String>("searchField", new PropertyModel<String>(filter, "searchString")).add(new SimpleAttributeModifier(
+        "placeholder", getString("search"))));
     final Button searchButton = new Button("searchButton", new Model<String>(getString("search"))) {
       @Override
       public final void onSubmit()
