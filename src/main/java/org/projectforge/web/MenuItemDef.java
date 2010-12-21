@@ -62,6 +62,7 @@ import org.projectforge.web.fibu.BankAccountListPage;
 import org.projectforge.web.fibu.CustomerListPage;
 import org.projectforge.web.fibu.EingangsrechnungListPage;
 import org.projectforge.web.fibu.EmployeeListPage;
+import org.projectforge.web.fibu.KontoListPage;
 import org.projectforge.web.fibu.Kost1ListPage;
 import org.projectforge.web.fibu.Kost2ArtListPage;
 import org.projectforge.web.fibu.Kost2ListPage;
@@ -145,7 +146,7 @@ public enum MenuItemDef
   IMAGE_CROPPER("imageCropper", ImageCropperPage.class, new String[] { ImageCropperPage.PARAM_SHOW_UPLOAD_BUTTON, "false",
       ImageCropperPage.PARAM_ENABLE_WHITEBOARD_FILTER, "true"}), //
   // *
-  KONTO_LIST("fibu.konten", "fibu/KontoList.action", //
+  KONTO_LIST("fibu.konten", KontoListPage.class, //
       FINANCE_GROUP, CONTROLLING_GROUP), //
   KOST_ZUWEISUNG_LIST("fibu.kostZuweisungen", "fibu/KostZuweisungList.action", //
       FINANCE_GROUP, CONTROLLING_GROUP), //
