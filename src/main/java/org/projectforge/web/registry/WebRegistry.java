@@ -37,7 +37,9 @@ import org.projectforge.web.LoginPage;
 import org.projectforge.web.access.AccessEditPage;
 import org.projectforge.web.access.AccessListPage;
 import org.projectforge.web.address.AddressEditPage;
+import org.projectforge.web.address.AddressListMobilePage;
 import org.projectforge.web.address.AddressListPage;
+import org.projectforge.web.address.AddressViewMobilePage;
 import org.projectforge.web.address.AddressViewPage;
 import org.projectforge.web.address.PhoneCallPage;
 import org.projectforge.web.address.SendSmsPage;
@@ -58,6 +60,8 @@ import org.projectforge.web.fibu.EingangsrechnungEditPage;
 import org.projectforge.web.fibu.EingangsrechnungListPage;
 import org.projectforge.web.fibu.EmployeeEditPage;
 import org.projectforge.web.fibu.EmployeeListPage;
+import org.projectforge.web.fibu.EmployeeSalaryEditPage;
+import org.projectforge.web.fibu.EmployeeSalaryListPage;
 import org.projectforge.web.fibu.KontoEditPage;
 import org.projectforge.web.fibu.KontoListPage;
 import org.projectforge.web.fibu.Kost1EditPage;
@@ -274,6 +278,7 @@ public class WebRegistry
     addMountPages("bankAccount", BankAccountListPage.class, BankAccountEditPage.class);
     addMountPages("contract", ContractListPage.class, ContractEditPage.class);
     addMountPages("employee", EmployeeListPage.class, EmployeeEditPage.class);
+    addMountPages("employeeSalary", EmployeeSalaryListPage.class, EmployeeSalaryEditPage.class);
     addMountPages("ganttChart", GanttChartListPage.class, GanttChartEditPage.class);
     addMountPages("hrPlanning", HRPlanningListPage.class, HRPlanningEditPage.class);
     addMountPage("hrList", HRListPage.class);
@@ -305,5 +310,7 @@ public class WebRegistry
 
     addMountPage(BOOKMARK_MOBILE_LOGIN, LoginMobilePage.class);
     addMountPage(BOOKMARK_MOBILE_PREFIX + "menu", MenuMobilePage.class);
+    addMountPage(BOOKMARK_MOBILE_PREFIX + "addressList", AddressListMobilePage.class);
+    addMountPage(BOOKMARK_MOBILE_PREFIX + "addressView", AddressViewMobilePage.class);
   }
 }
