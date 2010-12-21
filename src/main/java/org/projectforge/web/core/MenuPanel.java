@@ -45,7 +45,9 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.MenuEntry;
+import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -131,6 +133,14 @@ public class MenuPanel extends Panel
     final RepeatingView favoriteMenuEntryRepeater = new RepeatingView("favoriteMenuEntryRepeater");
     add(favoriteMenuEntryRepeater);
     boolean isFirst = true;
+    if (((MySession) getSession()).isMobileUserAgent() == true) {
+      final WebMarkupContainer favoriteMenuEntryContainer = new WebMarkupContainer(favoriteMenuEntryRepeater.newChildId());
+      favoriteMenuEntryRepeater.add(favoriteMenuEntryContainer);
+      favoriteMenuEntryContainer.add(new SimpleAttributeModifier("id", "m-menu"));
+      favoriteMenuEntryContainer.add(new BookmarkablePageLink<String>("link", MenuMobilePage.class).add(
+          new Label("label", getString("menu.mobileMenu")).setRenderBodyOnly(true)).add(getSuffixLabel(null)));
+      isFirst = false;
+    }
     for (final MenuEntry favoriteMenuEntry : menu.getFavoriteMenuEntries()) {
       final WebMarkupContainer favoriteMenuEntryContainer = new WebMarkupContainer(favoriteMenuEntryRepeater.newChildId());
       favoriteMenuEntryRepeater.add(favoriteMenuEntryContainer);
@@ -221,7 +231,7 @@ public class MenuPanel extends Panel
   private Label getSuffixLabel(final MenuEntry menuEntry)
   {
     final Label suffixLabel;
-    if (menuEntry.getNewCounterModel() != null) {
+    if (menuEntry != null && menuEntry.getNewCounterModel() != null) {
       suffixLabel = new Label("suffix", new Model<String>() {
         @Override
         public String getObject()
@@ -245,7 +255,7 @@ public class MenuPanel extends Panel
       suffixLabel = new Label("suffix");
       suffixLabel.setVisible(false);
     }
-    if (menuEntry.getNewCounterTooltip() != null) {
+    if (menuEntry != null && menuEntry.getNewCounterTooltip() != null) {
       WicketUtils.addTooltip(suffixLabel, getString(menuEntry.getNewCounterTooltip()));
     }
     return suffixLabel;
@@ -270,7 +280,7 @@ public class MenuPanel extends Panel
     }
     menu = menuBuilder.getMenu(PFUserContext.getUser());
     if (securedPage != null) {
-      menu.setFavoriteMenuEntries((String)securedPage.getUserPrefEntry(USER_PREF_FAVORITE_MENU_ENTRIES_KEY));
+      menu.setFavoriteMenuEntries((String) securedPage.getUserPrefEntry(USER_PREF_FAVORITE_MENU_ENTRIES_KEY));
       securedPage.putUserPrefEntry(USER_PREF_MENU_KEY, menu, false);
     }
     return menu;
