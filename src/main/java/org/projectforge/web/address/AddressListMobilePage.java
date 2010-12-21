@@ -34,6 +34,7 @@ import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.web.mobile.AbstractSecuredMobilePage;
 import org.projectforge.web.mobile.PageItemEntryMenuPanel;
+import org.projectforge.web.wicket.AbstractEditPage;
 import org.springframework.util.CollectionUtils;
 
 public class AddressListMobilePage extends AbstractSecuredMobilePage
@@ -81,7 +82,9 @@ public class AddressListMobilePage extends AbstractSecuredMobilePage
 
     int counter = 0;
     for (final AddressDO address : list) {
-      addressRepeater.add(new PageItemEntryMenuPanel(addressRepeater.newChildId(), AddressViewMobilePage.class, null, address
+      final PageParameters params = new PageParameters();
+      params.put(AbstractEditPage.PARAMETER_KEY_ID, address.getId());
+      addressRepeater.add(new PageItemEntryMenuPanel(addressRepeater.newChildId(), AddressViewMobilePage.class, params, null, address
           .getFirstName()
           + " "
           + address.getName(), address.getOrganization()));
