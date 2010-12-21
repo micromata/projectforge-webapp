@@ -396,6 +396,14 @@ ul#normal>li>a:hover  {
 	box-shadow: inset 0 0 10px #BBC1C3;
 }
 
+ul#personal li a span.remover {
+		color: red;
+		    float: right;
+		    font-family: Embats;
+		    font-size-adjust: 0.9;
+		    padding: 0 0 0 0.3em;
+	}
+
 ul#normal  ul#nav{
 	width:80em;
 	z-index:88888;
@@ -578,6 +586,7 @@ ul#normal li.active ul {
 	margin:0 0 1em 0;
 	text-transform:  uppercase;
 	letter-spacing: 0.05em;
+	font-weight: normal;
 }
 
 .loginpage #navigation {

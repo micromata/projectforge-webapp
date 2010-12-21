@@ -10,7 +10,9 @@
 	<script src="../scripts/jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="../scripts/jquery-ui-1-2.8.2.custom/js/jquery-ui-1.8.2.custom.min.js" type="text/javascript" charset="utf-8"></script>
 	<link rel="stylesheet" href="../scripts/jquery-ui-1-2.8.2.custom/css/custom-theme/jquery-ui-1.8.7.custom.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+	<style type="text/css" media="screen">
 	
+	</style>
 	<script type="text/javascript" charset="utf-8">
 	/* <![CDATA[ */
 		
@@ -26,9 +28,18 @@
 				}).disableSelection();
 				
 				$( "#personal" ).sortable({
-					placeholder: "ui-state-highlight",
+					placeholder: "ui-state-highlight"
 				}).disableSelection();
 				
+				
+				// @kai: Das ist neu, beim Laden muss man natürlich das Sortable disablen...
+				$( "#personal, #nav ul" ).sortable("disable");
+				
+				// @kai:  dies aktiviert die remover
+				$('.remover').live('click', function() {
+				  	$(this).parents("li").remove();
+					return false;
+				});
 				
 				$("#normal .main a").click(function(){
 					// Ein Klick auf das Hauptmenü öffnet...ein weiterer schließt das Hauptmenü
@@ -40,11 +51,15 @@
 						$( "#personal, #nav ul" ).sortable("enable");
 						// gleichzeitig wird der blaue rand um das persönliche menü geklebt
 						$("ul#personal").addClass("dotted");
+						//@kai: das ist neu und macht die kreuze
+						$("ul#personal li a").prepend( '<span class="remover"> 2 </span>');
+						$("#remover")
 					// ansonsten..
 					} else {
 						// sortable deaktivieren
 						$( "#personal, #nav ul" ).sortable("disable");
-						// @kai: hier deine magic
+						//@kai: klar, die müssen auch wieder weg.
+						$(".remover").remove();
 						//serialize den shice
 						s = $( "#personal, #nav ul" ).sortable("toArray");
 						$("#serialitzkowitsch").val(s);
@@ -81,13 +96,7 @@
 				</a>
 				
 				<ul id="nav" class="boxshadow lightgradient roundcorners">
-						<li class="first">
-							<ul id="trash">
-								<li style="display:block; float:left; border: 2px dashed red">
-									<span class="embatssymbols" style="font-size:10em; color:red;"> 9 </span>
-								</li>
-							</ul>
-						</li>
+					
 						<li class="selected">
 							
 							<span class="label parent shaded">Allgemein</span>
