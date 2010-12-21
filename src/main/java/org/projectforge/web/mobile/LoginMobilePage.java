@@ -25,6 +25,7 @@ package org.projectforge.web.mobile;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -69,13 +70,13 @@ public class LoginMobilePage extends AbstractMobilePage
     // Sometimes the wicket session user is given but the http session user is lost (re-login required).
     if (wicketSessionUser != null && sessionUser != null && wicketSessionUser.getId() == sessionUser.getId()) {
       final Integer userId = sessionUser.getId();
-      final RecentMobilePageInfo pageInfo = (RecentMobilePageInfo)userXmlPreferencesCache.getEntry(userId, AbstractSecuredMobilePage.USER_PREF_RECENT_PAGE);
+      final RecentMobilePageInfo pageInfo = (RecentMobilePageInfo) userXmlPreferencesCache.getEntry(userId,
+          AbstractSecuredMobilePage.USER_PREF_RECENT_PAGE);
       if (pageInfo != null && pageInfo.getPageClass() != null) {
-        setResponsePage((Class)pageInfo.getPageClass(), pageInfo.restorePageParameters());
+        throw new RestartResponseException((Class) pageInfo.getPageClass(), pageInfo.restorePageParameters());
       } else {
-        setResponsePage(WicketUtils.getDefaultMobilePage());
+        throw new RestartResponseException(WicketUtils.getDefaultMobilePage());
       }
-      return;
     }
     targetUrlAfterLogin = UserFilter.getTargetUrlAfterLogin(((WebRequest) getRequest()).getHttpServletRequest());
     form = new LoginMobileForm(this);
