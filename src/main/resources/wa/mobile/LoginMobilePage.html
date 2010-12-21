@@ -10,7 +10,8 @@
 <div id="topbar">
 <div id="title">ProjectForge - Login</div>
 </div>
-<div id="content"><wicket:extend>
+<wicket:extend>
+  <div id="content">
   <div wicket:id="feedback">[feedback]</div>
   <span class="graytitle"><wicket:message key="login.welcome" /></span>
   <form wicket:id="form" class="loginform">
@@ -28,6 +29,7 @@
     <p wicket:id="messageOfTheDay">[Have a lot of fun!]</p>
     </li>
   </ul>
-</wicket:extend></div>
+  </div>
+</wicket:extend>
 </body>
 </html>
