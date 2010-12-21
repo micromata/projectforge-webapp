@@ -146,3 +146,69 @@ div.progress-overbooked-min div {
 	padding-left: 10px;
 	padding-right: 10px;
 }
+
+/* Drop down menu */
+ul.top-right {
+	position: absolute;
+	top: 3px;
+	right: 10px;
+	z-index: 30;
+}
+
+ul.dropdown-menu {
+	margin: 0;
+	padding: 0;
+	font-size: 80%;
+}
+
+ul.top-right>li {
+	margin: 0 1px 0 0;
+	padding: 4px 10px;
+}
+
+ul.dropdown-menu>li {
+	list-style: none;
+	color: #FFF;
+	text-align: center;
+}
+
+ul.dropdown-menu li a {
+	display: block;
+	text-decoration: none;
+	color: #555555;
+	text-decoration: none;
+}
+
+ul.dropdown-menu li a:hover {
+	display: block;
+	background: #FFFFFF;
+}
+
+ul.top-right ul {
+	position: absolute;
+	right: 0px;
+}
+
+ul.dropdown-menu ul {
+	position: absolute;
+	visibility: hidden;
+	margin: 0;
+	padding: 0;
+	background: #E8E8E8;
+	border: 1px solid #555555;
+}
+
+ul.dropdown-menu ul li a {
+	position: relative;
+	display: block;
+	margin: 0;
+	padding: 5px 10px;
+	width: auto;
+	white-space: nowrap;
+	text-align: left;
+	background: #E8E8E8;
+}
+
+ul.dropdown-menu ul li a:hover {
+	background: #FFFFFF;
+}
