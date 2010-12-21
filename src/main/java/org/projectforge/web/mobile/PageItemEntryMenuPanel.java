@@ -66,6 +66,15 @@ public class PageItemEntryMenuPanel extends PageItemEntryPanel
     init(link, image, name, comment);
   }
 
+  public PageItemEntryMenuPanel(final String id, final Class< ? extends WebPage> pageClass, final PageParameters params, final ContextImage image, final String name,
+      final String comment)
+  {
+    super(id);
+    final BookmarkablePageLink<String> link = new BookmarkablePageLink<String>("link", pageClass, params);
+    add(link);
+    init(link, image, name, comment);
+  }
+
   private void init(final AbstractLink link, final ContextImage image, final String name, final String comment)
   {
     if (image == null) {

@@ -34,6 +34,7 @@ import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
+import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.UserFilter;
 import org.projectforge.web.wicket.MySession;
@@ -47,6 +48,9 @@ public class LoginMobilePage extends AbstractMobilePage
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
+  @SpringBean(name = "userXmlPreferencesCache")
+  protected UserXmlPreferencesCache userXmlPreferencesCache;
+
   private LoginMobileForm form;
 
   String targetUrlAfterLogin;
@@ -56,6 +60,7 @@ public class LoginMobilePage extends AbstractMobilePage
   {
   }
 
+  @SuppressWarnings("unchecked")
   public LoginMobilePage(final PageParameters parameters)
   {
     super(parameters);
@@ -63,7 +68,13 @@ public class LoginMobilePage extends AbstractMobilePage
     final PFUserDO sessionUser = UserFilter.getUser(((WebRequest) getRequest()).getHttpServletRequest());
     // Sometimes the wicket session user is given but the http session user is lost (re-login required).
     if (wicketSessionUser != null && sessionUser != null && wicketSessionUser.getId() == sessionUser.getId()) {
-      setResponsePage(WicketUtils.getDefaultMobilePage());
+      final Integer userId = sessionUser.getId();
+      final RecentMobilePageInfo pageInfo = (RecentMobilePageInfo)userXmlPreferencesCache.getEntry(userId, AbstractSecuredMobilePage.USER_PREF_RECENT_PAGE);
+      if (pageInfo != null && pageInfo.getPageClass() != null) {
+        setResponsePage((Class)pageInfo.getPageClass(), pageInfo.restorePageParameters());
+      } else {
+        setResponsePage(WicketUtils.getDefaultMobilePage());
+      }
       return;
     }
     targetUrlAfterLogin = UserFilter.getTargetUrlAfterLogin(((WebRequest) getRequest()).getHttpServletRequest());

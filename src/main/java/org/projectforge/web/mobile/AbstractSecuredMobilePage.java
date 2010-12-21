@@ -35,6 +35,8 @@ public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractSecuredMobilePage.class);
 
+  static final String USER_PREF_RECENT_PAGE = "recentMobilePage";
+
   @SpringBean(name = "userXmlPreferencesCache")
   protected UserXmlPreferencesCache userXmlPreferencesCache;
 
@@ -44,6 +46,7 @@ public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
   public AbstractSecuredMobilePage(final PageParameters parameters)
   {
     super(parameters);
+    putUserPrefEntry(USER_PREF_RECENT_PAGE, new RecentMobilePageInfo(this), true);
   }
 
   /**
