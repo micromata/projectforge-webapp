@@ -97,10 +97,15 @@ public class MenuPanel extends Panel
             + "$('#personal, #nav ul').sortable('enable');"
             // and add blue border around the personal menu...
             + "$('ul#personal').addClass('dotted');"
+            // Add the crosses for removing menu entries:
+            + "$('ul#personal li a').prepend('<span class=\"remover\"> 2 </span>');"
+            + "$('#remover')"
             // main menu is now closed...
             + "} else {"
             // disable sortable....
             + "$('#personal, #nav ul').sortable('disable');"
+            // Remove the removers (crosses for removing menu entries):
+            + "$('.remover').remove();"
             // remove the blue border around the personal menu
             + "  $('ul#personal').removeClass('dotted');"
             // Call back serialized menu...
