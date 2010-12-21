@@ -4,11 +4,11 @@
 </head>
 
 <body>
-<table>
-  <wicket:extend>
-    <wicket:fragment wicket:id="buttonFragment">
-      <span wicket:id="preview">[preview]</span>
-    </wicket:fragment>
+<wicket:extend>
+  <wicket:fragment wicket:id="buttonFragment">
+    <span wicket:id="preview">[preview]</span>
+  </wicket:fragment>
+  <table class="oldform">
     <tr>
       <th><wicket:message key="administration.configuration.parameter" /></th>
       <td><span wicket:id="parameter" id="parameter">[parameter name]</span></td>
@@ -26,7 +26,7 @@
       <th>&nbsp;</th>
       <td><span wicket:id="previewLabel">[preview]</span></td>
     </tr>
+  </table>
   </wicket:extend>
-</table>
 </body>
 </html>
