@@ -33,6 +33,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
+import org.projectforge.web.wicket.components.MyRepeatingView;
 
 /** All pages with required login should be derived from this page. */
 public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
@@ -100,8 +101,8 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     contentMenu.setRenderBodyOnly(true);
     contentMenuArea.add(contentMenu);
     dropDownMenu = new WebMarkupContainer("dropDownMenu");
-    //1dropDownMenu.add(new PresizedImage("cogImage", getResponse(), WebConstants.IMAGE_COG));
-    //dropDownMenu.add(new PresizedImage("arrowDownImage", getResponse(), WebConstants.IMAGE_ARROW_DOWN));
+    // 1dropDownMenu.add(new PresizedImage("cogImage", getResponse(), WebConstants.IMAGE_COG));
+    // dropDownMenu.add(new PresizedImage("arrowDownImage", getResponse(), WebConstants.IMAGE_ARROW_DOWN));
     dropDownMenuRepeater = new MyRepeatingView("menu");
     dropDownMenu.add(dropDownMenuRepeater);
     dropDownMenu.setVisible(false);
@@ -159,35 +160,5 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
       dropDownMenuRendered = true;
     }
     super.onBeforeRender();
-  }
-
-  /**
-   * This repeating view is only visible if any child was added.
-   * @author Kai Reinhard (k.reinhard@micromata.de)
-   * 
-   */
-  protected class MyRepeatingView extends RepeatingView
-  {
-    private static final long serialVersionUID = 1534625043282794990L;
-
-    boolean hasChilds = false;
-
-    public MyRepeatingView(final String id)
-    {
-      super(id);
-    }
-
-    @Override
-    public String newChildId()
-    {
-      hasChilds = true;
-      return super.newChildId();
-    }
-
-    @Override
-    public boolean isVisible()
-    {
-      return hasChilds;
-    }
   }
 }
