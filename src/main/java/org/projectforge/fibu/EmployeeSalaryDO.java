@@ -45,7 +45,6 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.core.Constants;
 import org.projectforge.core.DefaultBaseDO;
 
-
 /**
  * Das monatliche Gehalt eines festangestellten Mitarbeiters.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -129,6 +128,12 @@ public class EmployeeSalaryDO extends DefaultBaseDO
   public String getFormattedMonth()
   {
     return StringHelper.format2DigitNumber(month + 1);
+  }
+
+  @Transient
+  public String getFormattedYearAndMonth()
+  {
+    return String.valueOf(year) + "-" + StringHelper.format2DigitNumber(month + 1);
   }
 
   /**
