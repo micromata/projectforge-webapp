@@ -4,11 +4,11 @@
 </head>
 
 <body>
-<table>
-  <wicket:extend>
-    <wicket:fragment wicket:id="buttonFragment">
-      <span wicket:id="clone">[clone]</span>
-    </wicket:fragment>
+<wicket:extend>
+  <wicket:fragment wicket:id="buttonFragment">
+    <span wicket:id="clone">[clone]</span>
+  </wicket:fragment>
+  <table class="oldform">
     <tr>
       <th>&nbsp;</th>
       <td colspan="9"><input type="checkbox" wicket:id="showTextAreasCheckBox" /> <wicket:message key="fibu.rechnung.showTextAreas" /> <input
@@ -101,7 +101,7 @@
           <tr>
             <th style="color: 777777;"><wicket:message key="fibu.kost1" /></th>
             <th style="color: 777777;"><wicket:message key="fibu.kost2" /></th>
-            <th  style="color: 777777; text-align: right;"><wicket:message key="fibu.common.netto" /></th>
+            <th style="color: 777777; text-align: right;"><wicket:message key="fibu.common.netto" /></th>
             <th>&nbsp;</th>
           </tr>
           <tr style="vertical-align: top;" wicket:id="kostZuweisungen">
@@ -139,7 +139,7 @@
         wicket:id="utcDatum">[21.11.70 00:00]</span>,&nbsp;<wicket:message key="fibu.rechnung.faelligkeit" />:&nbsp;<span wicket:id="utcFaelligkeit">[30.11.70
       00:00]</span>,&nbsp;<wicket:message key="fibu.rechnung.bezahlDatum" />:&nbsp;<span wicket:id="utcBezahlDatum">[30.11.70 00:00]</span></span></td>
     </tr>
-  </wicket:extend>
-</table>
+  </table>
+</wicket:extend>
 </body>
 </html>

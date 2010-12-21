@@ -4,14 +4,14 @@
 </head>
 
 <body>
-<table>
-  <wicket:extend>
-    <wicket:fragment wicket:id="bottomRowsFragment">
-      <tr>
-        <th><wicket:message key="scripting.scriptBackup" /></th>
-        <td colspan="5"><span wicket:id="scriptBackup">[Back-up script]</span></td>
-      </tr>
-    </wicket:fragment>
+<wicket:extend>
+  <wicket:fragment wicket:id="bottomRowsFragment">
+    <tr>
+      <th><wicket:message key="scripting.scriptBackup" /></th>
+      <td colspan="5"><span wicket:id="scriptBackup">[Back-up script]</span></td>
+    </tr>
+  </wicket:fragment>
+  <table class="oldform">
     <tr>
       <th><wicket:message key="scripting.script.name" /></th>
       <td colspan="5"><input class="stdtext" wicket:id="name" /></td>
@@ -43,7 +43,7 @@
       (<wicket:message key="fieldNotHistorizable" />)</th>
       <td colspan="5"><textarea class="stdtext" wicket:id="script" style="height: 60ex;">[Script]</textarea></td>
     </tr>
-  </wicket:extend>
-</table>
+  </table>
+</wicket:extend>
 </body>
 </html>

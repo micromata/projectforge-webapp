@@ -13,15 +13,15 @@
 </head>
 
 <body>
-<table>
-  <wicket:extend>
-    <wicket:fragment wicket:id="buttonFragment">
-      <span wicket:id="clone">[clone]</span>
-    </wicket:fragment>
-    <wicket:fragment wicket:id="selectRecentSheet">
-      <a href="#" wicket:id="selectRecent"><img src="images/row_pointer.png" border="0" /></a>
-      <span wicket:id="label">4711</span>
-    </wicket:fragment>
+<wicket:extend>
+  <wicket:fragment wicket:id="buttonFragment">
+    <span wicket:id="clone">[clone]</span>
+  </wicket:fragment>
+  <wicket:fragment wicket:id="selectRecentSheet">
+    <a href="#" wicket:id="selectRecent"><img src="images/row_pointer.png" border="0" /></a>
+    <span wicket:id="label">4711</span>
+  </wicket:fragment>
+  <table class="oldform">
     <tr>
       <th><label for="task"><wicket:message key="task" /></label></th>
       <td colspan="3"><span wicket:id="task" id="task">[show and select task]</span></td>
@@ -81,7 +81,7 @@
       <th></th>
       <td><input type="checkbox" wicket:id="saveAsTemplate" tabindex="12" /><wicket:message key="user.pref.saveAsTemplate" /></td>
     </tr>
-  </wicket:extend>
-</table>
+  </table>
+</wicket:extend>
 </body>
 </html>

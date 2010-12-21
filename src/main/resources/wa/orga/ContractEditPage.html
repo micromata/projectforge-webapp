@@ -4,8 +4,8 @@
 </head>
 
 <body>
-<table>
-  <wicket:extend>
+<wicket:extend>
+  <table class="oldform">
     <tr>
       <th><wicket:message key="legalAffaires.contract.number" /></th>
       <td>C-<input wicket:id="number" size="6" maxlength="8" />&nbsp;<img wicket:id="numberHelp" src="images/help.png" /></td>
@@ -69,7 +69,7 @@
       <td colspan="4"><textarea class="stdtext" wicket:id="text" style="height: 20ex;">[text]</textarea><span wicket:id="jiraIssues">[Linked
       JIRA issues]</span></td>
     </tr>
-  </wicket:extend>
-</table>
+  </table>
+</wicket:extend>
 </body>
 </html>

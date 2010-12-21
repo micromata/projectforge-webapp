@@ -4,8 +4,8 @@
 </head>
 
 <body>
-<table>
-  <wicket:extend>
+<wicket:extend>
+  <table class="oldform">
     <wicket:fragment wicket:id="topMenuFragment">
       <span wicket:id="copyFromPredecessor">[copyFromPredecessor]</span>
     </wicket:fragment>
@@ -71,12 +71,12 @@
         <br />
         <a wicket:id="deleteUndeleteEntry"><img wicket:id="deleteUndeleteEntryImage" /></a> <a wicket:id="addEntry"><img
           wicket:id="addEntryImage" /></a></th>
-        <td colspan="8"><textarea class="stdtext" wicket:id="description" style="height: 10ex;">[description]</textarea><span wicket:id="jiraIssues">[JIRA
-        issues]</span></td>
+        <td colspan="8"><textarea class="stdtext" wicket:id="description" style="height: 10ex;">[description]</textarea><span
+          wicket:id="jiraIssues">[JIRA issues]</span></td>
       </tr>
     </wicket:container>
     <script wicket:id="showDeleteEntryQuestionDialog">[...]</script>
-  </wicket:extend>
-</table>
+  </table>
+</wicket:extend>
 </body>
 </html>
