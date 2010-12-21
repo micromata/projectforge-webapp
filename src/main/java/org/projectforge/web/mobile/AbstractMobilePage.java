@@ -26,11 +26,14 @@ package org.projectforge.web.mobile;
 import java.text.MessageFormat;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.CSSPackageResource;
 import org.apache.wicket.markup.html.JavascriptPackageResource;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.projectforge.Version;
 import org.projectforge.user.PFUserDO;
@@ -38,6 +41,7 @@ import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.MyRepeatingView;
 
 /**
  * Do only derive from this page, if no login is required!
@@ -45,6 +49,10 @@ import org.projectforge.web.wicket.WicketUtils;
  */
 public abstract class AbstractMobilePage extends WebPage
 {
+  protected RepeatingView leftnavRepeater;
+
+  protected WebMarkupContainer leftnavContainer;
+
   /**
    * Constructor that is invoked when page is invoked without a session.
    * 
@@ -57,6 +65,9 @@ public abstract class AbstractMobilePage extends WebPage
     add(CSSPackageResource.getHeaderContribution("mobile/css/style.css"));
     add(JavascriptPackageResource.getHeaderContribution("mobile/javascript/functions.js"));
     add(WicketUtils.headerContributorForFavicon(getUrl("/favicon.ico")));
+    add(leftnavContainer = new WebMarkupContainer("leftnav"));
+    leftnavContainer.add(leftnavRepeater = new MyRepeatingView("leftnavRepeater"));
+    leftnavContainer.setVisible(false);
     add(new Label("windowTitle", new Model<String>() {
       @Override
       public String getObject()
@@ -71,7 +82,7 @@ public abstract class AbstractMobilePage extends WebPage
         if (user == null) {
           return getString("notLoggedIn");
         }
-        return getString("loggedInUserInfo") + " <strong>" + escapeHtml(user.getUserDisplayname()) + "</strong> |";
+        return "<strong>" + escapeHtml(user.getFullname()) + "</strong> |";
       }
     };
     add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false).setRenderBodyOnly(false).setVisible(getUser() != null));
@@ -79,6 +90,12 @@ public abstract class AbstractMobilePage extends WebPage
       // navigationContainer.add(new SimpleAttributeModifier("style", WebConstants.CSS_BACKGROUND_COLOR_RED));
     } else {
     }
+  }
+
+  protected void addLeftnavComponent(final Component component)
+  {
+    leftnavRepeater.add(component);
+    leftnavContainer.setVisible(true);
   }
 
   public MySession getMySession()

@@ -30,7 +30,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.Configuration;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuBuilder;
-import org.projectforge.web.address.AddressListPage;
+import org.projectforge.web.address.AddressListMobilePage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.timesheet.TimesheetListPage;
 import org.projectforge.web.user.MyAccountEditPage;
@@ -55,7 +55,7 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
     PresizedImage image;
     if (configuration.isAddressManagementConfigured() == true) {
       image = new PresizedImage("image", getResponse(), MobileWebConstants.THUMB_IMAGE_CONTACTS);
-      pageItemPanel.add(new PageItemEntryMenuPanel(pageItemPanel.newChildId(), AddressListPage.class, image,
+      pageItemPanel.add(new PageItemEntryMenuPanel(pageItemPanel.newChildId(), AddressListMobilePage.class, image,
           getString("address.title.heading"), null));
     }
     image = new PresizedImage("image", getResponse(), MobileWebConstants.THUMB_IMAGE_CLOCK);

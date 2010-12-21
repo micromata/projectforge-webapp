@@ -25,7 +25,11 @@ package org.projectforge.web.mobile;
 
 public class MobileWebConstants
 {
+  private static final String IMAGES = "/mobile/images/";
+
   private static final String THUMBS = "/mobile/thumbs/";
+
+  public static final String IMAGE_HOME = IMAGES + "home.png";
 
   public static final String THUMB_IMAGE_CALENDAR = THUMBS + "calendar.png";
 
