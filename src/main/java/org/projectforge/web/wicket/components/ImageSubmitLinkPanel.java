@@ -57,13 +57,13 @@ public abstract class ImageSubmitLinkPanel extends Panel
   public ImageSubmitLinkPanel(final String id, final Response response, final String relativeImagePath)
   {
     this(id, null);
-    add(new PresizedImage("image", getResponse(), relativeImagePath));
+    submitLink. add(new PresizedImage("image", getResponse(), relativeImagePath));
   }
 
   public ImageSubmitLinkPanel(final String id, final Response response, final Form< ? > form, final String relativeImagePath)
   {
     this(id, form);
-    add(new PresizedImage("image", getResponse(), relativeImagePath));
+    submitLink.add(new PresizedImage("image", getResponse(), relativeImagePath));
   }
 
   public ImageSubmitLinkPanel(final String id, final Response response, final String relativeImagePath, final String tooltip)

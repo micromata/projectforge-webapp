@@ -56,7 +56,7 @@ public abstract class ImageLinkPanel extends Panel
   public ImageLinkPanel(final String id, final Response response, final String relativeImagePath)
   {
     this(id);
-    add(new PresizedImage("image", getResponse(), relativeImagePath));
+    link.add(new PresizedImage("image", getResponse(), relativeImagePath));
   }
 
   public ImageLinkPanel(final String id, final Response response, final String relativeImagePath, final String tooltip)
