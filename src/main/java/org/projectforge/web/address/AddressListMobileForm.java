@@ -33,6 +33,10 @@ import org.projectforge.web.mobile.AbstractMobileForm;
 
 public class AddressListMobileForm extends AbstractMobileForm<AddressListMobileForm, AddressListMobilePage>
 {
+  private static final String USER_PREF_KEY_FILTER = "mobileAddressFilter";
+
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressListMobileForm.class);
+
   private static final long serialVersionUID = -4341937420376832550L;
 
   AddressFilter filter;
@@ -40,12 +44,21 @@ public class AddressListMobileForm extends AbstractMobileForm<AddressListMobileF
   public AddressListMobileForm(final AddressListMobilePage parentPage)
   {
     super(parentPage);
+    filter = new AddressFilter();
+    try {
+      filter = (AddressFilter) parentPage.getUserPrefEntry(USER_PREF_KEY_FILTER);
+    } catch (final ClassCastException ex) {
+      log.info("Could not restore filter from user prefs (OK, probably new software release).");
+    }
+    if (filter == null) {
+      filter = new AddressFilter();
+      parentPage.putUserPrefEntry(USER_PREF_KEY_FILTER, filter, true);
+    }
   }
 
   @SuppressWarnings("serial")
   protected void init()
   {
-    filter = new AddressFilter();
     add(new TextField<String>("searchField", new PropertyModel<String>(filter, "searchString")).add(new SimpleAttributeModifier(
         "placeholder", getString("search"))));
     final Button searchButton = new Button("searchButton", new Model<String>(getString("search"))) {
@@ -57,5 +70,4 @@ public class AddressListMobileForm extends AbstractMobileForm<AddressListMobileF
     };
     add(searchButton);
   }
-
 }

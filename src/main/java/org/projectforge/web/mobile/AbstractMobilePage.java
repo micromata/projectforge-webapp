@@ -26,6 +26,7 @@ package org.projectforge.web.mobile;
 import java.text.MessageFormat;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.wicket.Application;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.CSSPackageResource;
@@ -41,6 +42,7 @@ import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.ImageBookmarkablePageLinkPanel;
 import org.projectforge.web.wicket.components.MyRepeatingView;
 
 /**
@@ -52,6 +54,13 @@ public abstract class AbstractMobilePage extends WebPage
   protected RepeatingView leftnavRepeater;
 
   protected WebMarkupContainer leftnavContainer;
+
+  // iWebKit doesn't work completely with wicket tags such as wicket:panel etc.
+  private static boolean stripTags;
+
+  static {
+    stripTags = Application.get().getMarkupSettings().getStripWicketTags();
+  }
 
   /**
    * Constructor that is invoked when page is invoked without a session.
@@ -67,7 +76,8 @@ public abstract class AbstractMobilePage extends WebPage
     add(WicketUtils.headerContributorForFavicon(getUrl("/favicon.ico")));
     add(leftnavContainer = new WebMarkupContainer("leftnav"));
     leftnavContainer.add(leftnavRepeater = new MyRepeatingView("leftnavRepeater"));
-    leftnavContainer.setVisible(false);
+    leftnavRepeater.add(new ImageBookmarkablePageLinkPanel(leftnavRepeater.newChildId(), MenuMobilePage.class, getResponse(),
+        MobileWebConstants.IMAGE_HOME));
     add(new Label("windowTitle", new Model<String>() {
       @Override
       public String getObject()
@@ -89,6 +99,24 @@ public abstract class AbstractMobilePage extends WebPage
     if (getWicketApplication().isDevelopmentSystem() == true) {
       // navigationContainer.add(new SimpleAttributeModifier("style", WebConstants.CSS_BACKGROUND_COLOR_RED));
     } else {
+    }
+  }
+
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
+    if (stripTags == false) {
+      Application.get().getMarkupSettings().setStripWicketTags(true);
+    }
+  }
+
+  @Override
+  protected void onAfterRender()
+  {
+    super.onAfterRender();
+    if (stripTags == false) {
+      Application.get().getMarkupSettings().setStripWicketTags(false);
     }
   }
 

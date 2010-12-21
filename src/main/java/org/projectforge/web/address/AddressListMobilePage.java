@@ -25,6 +25,7 @@ package org.projectforge.web.address;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.repeater.RepeatingView;
@@ -32,10 +33,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.web.mobile.AbstractSecuredMobilePage;
-import org.projectforge.web.mobile.MenuMobilePage;
-import org.projectforge.web.mobile.MobileWebConstants;
 import org.projectforge.web.mobile.PageItemEntryMenuPanel;
-import org.projectforge.web.wicket.components.ImageBookmarkablePageLinkPanel;
 import org.springframework.util.CollectionUtils;
 
 public class AddressListMobilePage extends AbstractSecuredMobilePage
@@ -56,14 +54,12 @@ public class AddressListMobilePage extends AbstractSecuredMobilePage
   public AddressListMobilePage(final PageParameters parameters)
   {
     super(parameters);
-    leftnavRepeater.add(new ImageBookmarkablePageLinkPanel(leftnavRepeater.newChildId(), MenuMobilePage.class, getResponse(),
-        MobileWebConstants.IMAGE_HOME));
-    leftnavContainer.setVisible(true);
     form = new AddressListMobileForm(this);
     add(form);
     form.init();
     add(resultList = new WebMarkupContainer("resultList"));
     resultList.setVisible(false);
+    search();
   }
 
   protected void search()
@@ -71,7 +67,11 @@ public class AddressListMobilePage extends AbstractSecuredMobilePage
     if (addressRepeater != null) {
       resultList.remove(addressRepeater);
     }
-    list = addressDao.getList(form.filter);
+    if (StringUtils.isBlank(form.filter.getSearchString()) == true) {
+      list = null;
+    } else {
+      list = addressDao.getList(form.filter);
+    }
     if (CollectionUtils.isEmpty(list) == true) {
       resultList.setVisible(false);
       return;
@@ -81,7 +81,7 @@ public class AddressListMobilePage extends AbstractSecuredMobilePage
 
     int counter = 0;
     for (final AddressDO address : list) {
-      addressRepeater.add(new PageItemEntryMenuPanel(addressRepeater.newChildId(), AddressListMobilePage.class, null, address
+      addressRepeater.add(new PageItemEntryMenuPanel(addressRepeater.newChildId(), AddressViewMobilePage.class, null, address
           .getFirstName()
           + " "
           + address.getName(), address.getOrganization()));
