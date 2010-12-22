@@ -45,6 +45,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.DateHolder;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.common.ReflectionHelper;
 import org.projectforge.common.StringHelper;
@@ -287,7 +288,7 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
         @Override
         public void onClick()
         {
-          onNewEntryClick(null);
+          redirectToEditPage(null);
         };
       }, getString("add"));
       addContentMenuEntry(newItemMenuEntry);
@@ -347,7 +348,7 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
    * @return The edit page (response page). The return value has no effect. It's only useful for derived class methods which calls
    *         super.onNewClick();
    */
-  protected AbstractEditPage< ? , ? , ? > onNewEntryClick(PageParameters params)
+  protected AbstractEditPage< ? , ? , ? > redirectToEditPage(PageParameters params)
   {
     if (params == null) {
       params = new PageParameters();
@@ -374,10 +375,21 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
       getList();
       if (list != null && list.size() == 1) {
         // Quick select:
-        O obj = list.get(0);
+        final O obj = list.get(0);
         caller.select(selectProperty, ((BaseDO<Integer>) obj).getId());
         WicketUtils.setResponsePage(this, caller);
         return true;
+      }
+    } else {
+      final String searchString = form.searchFilter.getSearchString();
+      if (searchString != null && searchString.matches("id:[0-9]+") == true) {
+        final Integer id = NumberHelper.parseInteger(searchString.substring(3));
+        if (id != null) {
+          final PageParameters pageParams = new PageParameters();
+          pageParams.add(AbstractEditPage.PARAMETER_KEY_ID, String.valueOf(id));
+          redirectToEditPage(pageParams);
+          return true;
+        }
       }
     }
     return false;

@@ -453,7 +453,7 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
       stopDateTimePanel.markModelAsChanged();
       modificationSince = null;
     }
-    getParentPage().refresh();
+    getParentPage().onSearchSubmit();
   }
 
   @SuppressWarnings("unchecked")
