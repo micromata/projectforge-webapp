@@ -13,15 +13,15 @@
     </tr>
     <tr>
       <th colspan="2"><wicket:message key="fibu.auftrag.nummer" /></th>
-      <td><input wicket:id="nummer" id="nummer" style="width: 4em;" /> <img wicket:id="nummerHelp" src="images/help.png" border="0" /></td>
+      <td><input type="text" wicket:id="nummer" id="nummer" style="width: 4em;" /> <img wicket:id="nummerHelp" src="images/help.png" border="0" /></td>
       <th><wicket:message key="fibu.common.reference" /></th>
-      <td colspan="3"><input wicket:id="referenz" id="referenz" class="stdtext" /></td>
+      <td colspan="3"><input type="text" wicket:id="referenz" id="referenz" class="stdtext" /></td>
       <th><wicket:message key="fibu.auftrag.nettoSumme" /></th>
       <td style="white-space: nowrap;"><span wicket:id="nettoSumme">[973.27 €]</span></td>
     </tr>
     <tr>
       <th colspan="2"><label for="titel"><wicket:message key="fibu.auftrag.titel" /></label></th>
-      <td colspan="5"><input wicket:id="titel" id="titel" class="stdtext" /></td>
+      <td colspan="5"><input type="text" wicket:id="titel" id="titel" class="stdtext" /></td>
       <th><wicket:message key="status" /></th>
       <td><select wicket:id="status" id="status">
         <option>beauftragt</option>
@@ -67,11 +67,11 @@
         <tr>
           <th><wicket:message key="fibu.auftrag.position.short" /> #<span wicket:id="number" style="font-size: 140%;">[1]</span></th>
           <th><wicket:message key="fibu.auftrag.titel" /></th>
-          <td colspan="3"><input wicket:id="titel" class="stdtext" /></td>
+          <td colspan="3"><input type="text" wicket:id="titel" class="stdtext" /></td>
           <th><wicket:message key="projectmanagement.personDays" /></th>
-          <td><input wicket:id="personDays" size="5" /></td>
+          <td><input type="text" wicket:id="personDays" size="5" /></td>
           <th wicket:id="nettoSummeLabel">[net sum]</th>
-          <td style="white-space: nowrap;"><input class="stdtext" wicket:id="nettoSumme" style="width: 8em;" />&nbsp;<input type="checkbox"
+          <td style="white-space: nowrap;"><input type="text" class="stdtext" wicket:id="nettoSumme" style="width: 8em;" />&nbsp;<input type="checkbox"
             wicket:id="vollstaendigFakturiert" id="vollstaendigFakturiert" /></td>
         </tr>
         <tr>

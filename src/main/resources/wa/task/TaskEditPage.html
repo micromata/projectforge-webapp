@@ -15,9 +15,9 @@
     </tr>
     <tr>
       <th><label for="title"><wicket:message key="task.title" /></label></th>
-      <td colspan="3"><input wicket:id="title" class="stdtext" id="title" /></td>
+      <td colspan="3"><input type="text" wicket:id="title" class="stdtext" id="title" /></td>
       <th><label for="reference"><wicket:message key="task.reference" /></label></th>
-      <td><input wicket:id="reference" id="reference" class="stdtext" /></td>
+      <td><input type="text" wicket:id="reference" id="reference" class="stdtext" /></td>
     </tr>
     <tr>
       <th><label for="status"><wicket:message key="status" /></label></th>
@@ -32,7 +32,7 @@
     <tr>
       <th><label for="shortDescription"><wicket:message key="shortDescription" /></label>&nbsp;<img wicket:id="jiraSupportTooltipImage1"
         src="images/info.png" border="0" /></th>
-      <td colspan="5"><input wicket:id="shortDescription" id="shortDescription" class="stdtext" /><span wicket:id="jiraIssues1">[Linked
+      <td colspan="5"><input type="text" wicket:id="shortDescription" id="shortDescription" class="stdtext" /><span wicket:id="jiraIssues1">[Linked
       JIRA issues]</span></td>
     </tr>
     <tr>
@@ -48,7 +48,7 @@
       <th><label for="responsibleUser"><wicket:message key="task.assignedUser" /></label></th>
       <td colspan="3"><span wicket:id="responsibleUser" id="responsibleUser">[show and select responsibleUser]</span></td>
       <th><label for="maxHours"><wicket:message key="task.maxHours" /></label></th>
-      <td><input wicket:id="maxHours" id="maxHours" class="stdtext" style="width: 5em;" /> <img src="images/exclamation.png"
+      <td><input type="text" wicket:id="maxHours" id="maxHours" class="stdtext" style="width: 5em;" /> <img src="images/exclamation.png"
         wicket:id="maxHoursExclamation" /></td>
     </tr>
     <tr>
@@ -61,7 +61,7 @@
     </tr>
     <tr>
       <th><wicket:message key="fibu.kost2" /></th>
-      <td style="white-space: nowrap;" colspan="3"><span wicket:id="projektKost">[5.123.07.*]</span> <input class="stdtext"
+      <td style="white-space: nowrap;" colspan="3"><span wicket:id="projektKost">[5.123.07.*]</span> <input type="text" class="stdtext"
         wicket:id="kost2BlackWhiteList" style="width: 50%;" /><span wicket:id="kost2">[show and select kost2]</span> <select
         wicket:id="kost2ListType">
         <option>[White list]</option>
@@ -77,13 +77,13 @@
         <option>[milestone]</option>
       </select></td>
       <th><label for="progress"><wicket:message key="task.progress" /> [%]</label></th>
-      <td colspan="3"><input class="stdtext" wicket:id="progress" id="progress" style="width: 5em;" /></td>
+      <td colspan="3"><input type="text" class="stdtext" wicket:id="progress" id="progress" style="width: 5em;" /></td>
     </tr>
     <tr>
       <th><wicket:message key="gantt.startDate" /></th>
       <td><span wicket:id="startDate">[Start date]</span></td>
       <th><wicket:message key="gantt.duration" /></th>
-      <td style="white-space: nowrap;"><input wicket:id="duration" class="stdtext" style="width: 5em;" />&nbsp;<wicket:message key="days" /></td>
+      <td style="white-space: nowrap;"><input type="text" wicket:id="duration" class="stdtext" style="width: 5em;" />&nbsp;<wicket:message key="days" /></td>
       <th><wicket:message key="gantt.endDate" /></th>
       <td><span wicket:id="endDate">[End date]</span></td>
     </tr>
@@ -97,7 +97,7 @@
         <option>[EB]</option>
       </select></td>
       <th><wicket:message key="gantt.predecessorOffset" /></th>
-      <td colspan="3" style="white-space: nowrap;"><input wicket:id="ganttPredecessorOffset" class="stdtext" style="width: 5em;" />&nbsp;<wicket:message
+      <td colspan="3" style="white-space: nowrap;"><input type="text" wicket:id="ganttPredecessorOffset" class="stdtext" style="width: 5em;" />&nbsp;<wicket:message
         key="days" /></td>
     </tr>
     <tr class="hRuler">
