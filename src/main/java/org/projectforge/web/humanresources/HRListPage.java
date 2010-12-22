@@ -282,7 +282,7 @@ public class HRListPage extends AbstractListPage<HRListForm, HRDao, HRViewUserDa
    * @see org.projectforge.web.wicket.AbstractListPage#onNewEntryClick(org.apache.wicket.PageParameters)
    */
   @Override
-  protected AbstractEditPage< ? , ? , ? > onNewEntryClick(PageParameters params)
+  protected AbstractEditPage< ? , ? , ? > redirectToEditPage(PageParameters params)
   {
     if (params == null) {
       params = new PageParameters();
@@ -290,7 +290,7 @@ public class HRListPage extends AbstractListPage<HRListForm, HRDao, HRViewUserDa
     if (weekMillis != null) {
       params.add(WebConstants.PARAMETER_DATE, String.valueOf(weekMillis));
     }
-    final AbstractEditPage< ? , ? , ? > editPage = super.onNewEntryClick(params);
+    final AbstractEditPage< ? , ? , ? > editPage = super.redirectToEditPage(params);
     return editPage;
   }
 
