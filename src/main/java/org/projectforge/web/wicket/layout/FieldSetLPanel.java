@@ -32,9 +32,9 @@ import org.apache.wicket.markup.repeater.RepeatingView;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class GroupPanel extends Panel
+public class FieldSetLPanel extends Panel
 {
-  private static final long serialVersionUID = -8760386387270114082L;
+  private static final long serialVersionUID = 5436255594609615176L;
 
   /**
    * The markup wicket id of the heading label.
@@ -43,40 +43,40 @@ public class GroupPanel extends Panel
 
   private Label headingLabel;
 
-  private RepeatingView entriesRepeater;
+  private RepeatingView groupRepeater;
 
-  public GroupPanel(final String id)
+  public FieldSetLPanel(final String id)
   {
     super(id);
   }
 
-  public GroupPanel(final String id, final String heading)
+  public FieldSetLPanel(final String id, final String heading)
   {
     this(id);
     setHeading(heading);
   }
 
-  public GroupPanel add(final AbstractLayoutPanel layoutPanel)
+  public FieldSetLPanel add(final GroupLPanel groupPanel)
   {
-    entriesRepeater.add(layoutPanel);
+    groupRepeater.add(groupPanel);
     return this;
   }
 
   public String newChildId()
   {
-    if (entriesRepeater == null) {
+    if (groupRepeater == null) {
       init();
     }
-    return entriesRepeater.newChildId();
+    return groupRepeater.newChildId();
   }
 
   /**
    * Should only be called manually if no children are added to this field set. Otherwise it'll be initialized at the first call of
    * newChildId().
    */
-  public GroupPanel init()
+  public FieldSetLPanel init()
   {
-    if (entriesRepeater != null) {
+    if (groupRepeater != null) {
       return this;
     }
     if (this.headingLabel != null) {
@@ -84,8 +84,8 @@ public class GroupPanel extends Panel
     } else {
       add(new Label(HEADING_ID, "[invisible]").setVisible(false));
     }
-    entriesRepeater = new RepeatingView("entriesRepeater");
-    add(entriesRepeater);
+    groupRepeater = new RepeatingView("groupRepeater");
+    add(groupRepeater);
     return this;
   }
 

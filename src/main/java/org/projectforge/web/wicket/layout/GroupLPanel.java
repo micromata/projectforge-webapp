@@ -23,7 +23,8 @@
 
 package org.projectforge.web.wicket.layout;
 
-import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 
 /**
@@ -31,52 +32,70 @@ import org.apache.wicket.markup.repeater.RepeatingView;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class RepeaterPanel extends AbstractLayoutPanel
+public class GroupLPanel extends Panel
 {
   private static final long serialVersionUID = -8760386387270114082L;
 
-  private RepeatingView repeater;
-
-  private Component component;
-
   /**
-   * Label as component of a group panel.
+   * The markup wicket id of the heading label.
    */
-  public static final String LABEL_ID = "label";
+  public static final String HEADING_ID = "heading";
 
-  public RepeaterPanel(final String id, final LayoutLength length)
+  private Label headingLabel;
+
+  private RepeatingView entriesRepeater;
+
+  public GroupLPanel(final String id)
   {
-    super(id, length);
-    repeater = new RepeatingView("repeater");
-    add(repeater);
+    super(id);
   }
 
-  public RepeaterPanel add(final Component component)
+  public GroupLPanel(final String id, final String heading)
   {
-    if (this.component == null) {
-      this.component = component;
-    }
-    repeater.add(component);
+    this(id);
+    setHeading(heading);
+  }
+
+  public GroupLPanel add(final AbstractLPanel layoutPanel)
+  {
+    entriesRepeater.add(layoutPanel);
     return this;
   }
 
   public String newChildId()
   {
-    return repeater.newChildId();
+    if (entriesRepeater == null) {
+      init();
+    }
+    return entriesRepeater.newChildId();
   }
 
   /**
-   * This component is the first added component at default. You can set another component with this method.
-   * @param component
+   * Should only be called manually if no children are added to this field set. Otherwise it'll be initialized at the first call of
+   * newChildId().
    */
-  public void setClassModifierComponent(final Component component)
+  public GroupLPanel init()
   {
-    this.component = component;
+    if (entriesRepeater != null) {
+      return this;
+    }
+    if (this.headingLabel != null) {
+      add(this.headingLabel);
+    } else {
+      add(new Label(HEADING_ID, "[invisible]").setVisible(false));
+    }
+    entriesRepeater = new RepeatingView("entriesRepeater");
+    add(entriesRepeater);
+    return this;
   }
 
-  @Override
-  protected Component getClassModifierComponent()
+  public void setHeading(final Label headingLabel)
   {
-    return component;
+    this.headingLabel = headingLabel;
+  }
+
+  public void setHeading(final String heading)
+  {
+    this.headingLabel = new Label(HEADING_ID, heading);
   }
 }

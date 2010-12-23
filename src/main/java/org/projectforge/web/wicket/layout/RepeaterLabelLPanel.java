@@ -24,52 +24,63 @@
 package org.projectforge.web.wicket.layout;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
-import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.repeater.RepeatingView;
 
 /**
- * Represents a field set panel. A form or page can contain multiple field sets.
+ * Represents a panel / repeating view (enclosed in label).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class LabelPanel extends AbstractLayoutPanel
+public class RepeaterLabelLPanel extends AbstractLPanel
 {
   private static final long serialVersionUID = -8760386387270114082L;
 
+  private RepeatingView repeater;
+
+  private Component component;
+
   /**
-   * Wicket id.
+   * Label as component of a group panel.
    */
   public static final String LABEL_ID = "label";
 
-  private Label label;
-
-  public LabelPanel(final String id, final LayoutLength length, final String label)
-  {
-    this(id, length, new Label(LABEL_ID, label));
+  public RepeaterLabelLPanel(final String id) {
+    this(id, null);
   }
 
-  public LabelPanel(final String id, final LayoutLength length, final Label label)
+  public RepeaterLabelLPanel(final String id, final LayoutLength length)
   {
     super(id, length);
-    this.label = label;
-    add(label);
+    repeater = new RepeatingView("repeater");
+    super.add(repeater);
+  }
+
+  public RepeaterLabelLPanel add(final Component component)
+  {
+    if (this.component == null) {
+      this.component = component;
+    }
+    repeater.add(component);
+    return this;
+  }
+
+  public String newChildId()
+  {
+    return repeater.newChildId();
+  }
+
+  /**
+   * This component is the first added component at default. You can set another component with this method.
+   * @param component
+   */
+  public void setClassModifierComponent(final Component component)
+  {
+    this.component = component;
   }
 
   @Override
   protected Component getClassModifierComponent()
   {
-    return label;
-  }
-
-  public LabelPanel setLabelFor(final Component component)
-  {
-    if (component instanceof ComponentWrapper) {
-      label.add(new SimpleAttributeModifier("for", ((ComponentWrapper)component).getWrappedComponent().getMarkupId()));
-      ((ComponentWrapper) component).getWrappedComponent().setOutputMarkupId(true);
-    } else {
-      label.add(new SimpleAttributeModifier("for", component.getMarkupId()));
-      component.setOutputMarkupId(true);
-    }
-    return this;
+    return component;
   }
 }

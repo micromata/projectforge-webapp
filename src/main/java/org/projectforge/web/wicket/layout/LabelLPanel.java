@@ -24,35 +24,52 @@
 package org.projectforge.web.wicket.layout;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.markup.html.basic.Label;
 
 /**
  * Represents a field set panel. A form or page can contain multiple field sets.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class DropDownChoicePanel extends AbstractLayoutPanel
+public class LabelLPanel extends AbstractLPanel
 {
-  private static final long serialVersionUID = 5771712946605166500L;
+  private static final long serialVersionUID = -8760386387270114082L;
 
   /**
    * Wicket id.
    */
-  public static final String SELECT_ID = "select";
+  public static final String LABEL_ID = "label";
 
-  private DropDownChoice< ? > dropDownChoice;
+  private Label label;
 
-  public DropDownChoicePanel(final String id, final LayoutLength length, final DropDownChoice< ? > dropDownChoice)
+  public LabelLPanel(final String id, final LayoutLength length, final String label)
+  {
+    this(id, length, new Label(LABEL_ID, label));
+  }
+
+  public LabelLPanel(final String id, final LayoutLength length, final Label label)
   {
     super(id, length);
-    this.dropDownChoice = dropDownChoice;
-    this.classAttributeAppender = "select";
-    add(dropDownChoice);
+    this.label = label;
+    add(label);
   }
 
   @Override
   protected Component getClassModifierComponent()
   {
-    return dropDownChoice;
+    return label;
+  }
+
+  public LabelLPanel setLabelFor(final Component component)
+  {
+    if (component instanceof ComponentWrapper) {
+      label.add(new SimpleAttributeModifier("for", ((ComponentWrapper)component).getWrappedComponent().getMarkupId()));
+      ((ComponentWrapper) component).getWrappedComponent().setOutputMarkupId(true);
+    } else {
+      label.add(new SimpleAttributeModifier("for", component.getMarkupId()));
+      component.setOutputMarkupId(true);
+    }
+    return this;
   }
 }

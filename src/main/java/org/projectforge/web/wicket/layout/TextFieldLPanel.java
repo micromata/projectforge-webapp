@@ -32,7 +32,7 @@ import org.projectforge.web.wicket.FocusOnLoadBehavior;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class TextFieldPanel extends AbstractLayoutPanel
+public class TextFieldLPanel extends AbstractLPanel
 {
   private static final long serialVersionUID = 5771712946605166500L;
 
@@ -43,7 +43,7 @@ public class TextFieldPanel extends AbstractLayoutPanel
 
   private TextField< ? > textField;
 
-  public TextFieldPanel(final String id, final LayoutLength length, final TextField< ? > textField)
+  public TextFieldLPanel(final String id, final LayoutLength length, final TextField< ? > textField)
   {
     super(id, length);
     this.textField = textField;
@@ -51,19 +51,19 @@ public class TextFieldPanel extends AbstractLayoutPanel
     add(textField);
   }
 
-  public TextFieldPanel setStrong()
+  public TextFieldLPanel setStrong()
   {
     this.classAttributeAppender = "text strong";
     return this;
   }
 
-  public TextFieldPanel setRequired()
+  public TextFieldLPanel setRequired()
   {
     textField.setRequired(true);
     return this;
   }
 
-  public TextFieldPanel setFocus()
+  public TextFieldLPanel setFocus()
   {
     textField.add(new FocusOnLoadBehavior());
     return this;

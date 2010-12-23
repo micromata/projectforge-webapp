@@ -26,13 +26,14 @@ package org.projectforge.web.wicket.layout;
 import org.apache.wicket.Component;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.projectforge.common.StringHelper;
 
 /**
  * Represents a entry of a group panel. This can be a label, text field or other form components.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public abstract class AbstractLayoutPanel extends Panel implements ComponentWrapper
+public abstract class AbstractLPanel extends Panel implements ComponentWrapper
 {
   private static final long serialVersionUID = -6769384502876947092L;
 
@@ -46,10 +47,26 @@ public abstract class AbstractLayoutPanel extends Panel implements ComponentWrap
 
   protected String classAttributeAppender;
 
-  public AbstractLayoutPanel(final String id, final LayoutLength length)
+  public AbstractLPanel(final String id)
+  {
+    super(id);
+  }
+
+  public AbstractLPanel(final String id, final LayoutLength length)
   {
     super(id);
     this.length = length;
+  }
+
+  /**
+   * @param length
+   * @return this for chaining.
+   */
+  public AbstractLPanel setLength(LayoutLength length)
+  {
+    this.length = length;
+    return this;
+
   }
 
   /**
@@ -60,13 +77,21 @@ public abstract class AbstractLayoutPanel extends Panel implements ComponentWrap
     return breakBefore;
   }
 
-  public AbstractLayoutPanel setBreakBefore()
+  /**
+   * @return this for chaining.
+   */
+  public AbstractLPanel setBreakBefore()
   {
     this.breakBefore = true;
     return this;
   }
 
-  public AbstractLayoutPanel setBreakBefore(final boolean breakBefore)
+  /**
+   * 
+   * @param breakBefore
+   * @return this for chaining.
+   */
+  public AbstractLPanel setBreakBefore(final boolean breakBefore)
   {
     this.breakBefore = breakBefore;
     return this;
@@ -80,7 +105,11 @@ public abstract class AbstractLayoutPanel extends Panel implements ComponentWrap
     return indent;
   }
 
-  public AbstractLayoutPanel setIndent(final LayoutLength indent)
+  /**
+   * @param indent
+   * @return this for chaining.
+   */
+  public AbstractLPanel setIndent(final LayoutLength indent)
   {
     this.indent = indent;
     return this;
@@ -94,7 +123,10 @@ public abstract class AbstractLayoutPanel extends Panel implements ComponentWrap
       return;
     }
     rendered = true;
-    getClassModifierComponent().add(getClassAttributeModifier());
+    final SimpleAttributeModifier classAttributeModifier = getClassAttributeModifier();
+    if (classAttributeModifier != null) {
+      getClassModifierComponent().add(classAttributeModifier);
+    }
   }
 
   @Override
@@ -118,16 +150,24 @@ public abstract class AbstractLayoutPanel extends Panel implements ComponentWrap
   private SimpleAttributeModifier getClassAttributeModifier()
   {
     final StringBuffer buf = new StringBuffer();
+    boolean first = true;
     if (breakBefore == true) {
-      buf.append(LayoutConstants.CLASS_BREAK_BEFORE).append(" ");
+      first = StringHelper.append(buf, first, LayoutConstants.CLASS_BREAK_BEFORE, " ");
     }
     if (indent != null) {
-      buf.append("put").append(indent.getClassAttrValue()).append(" ");
+      first = StringHelper.append(buf, first, "put", " ");
+      buf.append(indent.getClassAttrValue());
     }
-    buf.append(length.getClassAttrValue());
+    if (length != null) {
+      first = StringHelper.append(buf, first, length.getClassAttrValue(), " ");
+    }
     if (this.classAttributeAppender != null) {
-      buf.append(" ").append(this.classAttributeAppender);
+      first = StringHelper.append(buf, first, this.classAttributeAppender, " ");
     }
-    return new SimpleAttributeModifier("class", buf.toString());
+    if (first == false) {
+      return new SimpleAttributeModifier("class", buf.toString());
+    } else {
+      return null;
+    }
   }
 }
