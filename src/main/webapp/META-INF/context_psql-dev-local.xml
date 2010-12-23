@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <Context path="" reloadable="false" debug="0" docBase="webapps" cookies="false">
   <Resource name="jdbc/ProjectForgeDS" type="javax.sql.DataSource" auth="Container" driverClassName="org.postgresql.Driver"
     url="jdbc:postgresql://localhost:5432/projectforge" maxActive="100" maxIdle="30" maxWait="10000" username="projectforge" password="" />
