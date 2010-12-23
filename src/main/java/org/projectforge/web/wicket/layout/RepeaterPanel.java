@@ -34,8 +34,10 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 public class RepeaterPanel extends AbstractLayoutPanel
 {
   private static final long serialVersionUID = -8760386387270114082L;
-  
+
   private RepeatingView repeater;
+
+  private Component component;
 
   /**
    * Label as component of a group panel.
@@ -48,10 +50,33 @@ public class RepeaterPanel extends AbstractLayoutPanel
     repeater = new RepeatingView("repeater");
     add(repeater);
   }
-  
+
+  public RepeaterPanel add(final Component component)
+  {
+    if (this.component == null) {
+      this.component = component;
+    }
+    repeater.add(component);
+    return this;
+  }
+
+  public String newChildId()
+  {
+    return repeater.newChildId();
+  }
+
+  /**
+   * This component is the first added component at default. You can set another component with this method.
+   * @param component
+   */
+  public void setClassModifierComponent(final Component component)
+  {
+    this.component = component;
+  }
+
   @Override
   protected Component getClassModifierComponent()
   {
-    return null;
+    return component;
   }
 }

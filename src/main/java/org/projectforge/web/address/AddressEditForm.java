@@ -26,7 +26,9 @@ package org.projectforge.web.address;
 import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
 import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
 import static org.projectforge.web.wicket.layout.LayoutLength.ONEHALF;
+import static org.projectforge.web.wicket.layout.LayoutLength.THREEQUART;
 import static org.projectforge.web.wicket.layout.TextFieldPanel.INPUT_ID;
+import static org.projectforge.web.wicket.layout.DropDownChoicePanel.SELECT_ID;
 
 import java.util.Date;
 import java.util.List;
@@ -62,6 +64,7 @@ import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.web.wicket.layout.DropDownChoicePanel;
 import org.projectforge.web.wicket.layout.FieldSetPanel;
 import org.projectforge.web.wicket.layout.GroupPanel;
 import org.projectforge.web.wicket.layout.LabelPanel;
@@ -120,19 +123,21 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     fieldSetRepeater.add(fieldSetPanel);
     GroupPanel groupPanel = new GroupPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
+
     // add(new Label("task", taskFormatter.getTaskPath(data.getTaskId(), true, OutputType.HTML)).setEscapeModelStrings(false));
     LabelPanel testField = new LabelPanel(groupPanel.newChildId(), ONEHALF, "Anrede, Checkbox und Hilfe für Favorit");
     groupPanel.add(new LabelPanel(groupPanel.newChildId(), HALF, getString("address.form")).setLabelFor(testField).setBreakBefore());
+    groupPanel.add(testField);
+
     {
       // DropDownChoice form of address
-      // final LabelValueChoiceRenderer<FormOfAddress> formChoiceRenderer = new LabelValueChoiceRenderer<FormOfAddress>(this, FormOfAddress
-      // .values());
-      // formChoice = new DropDownChoice("formOfAddress", new PropertyModel(data, "form"), formChoiceRenderer.getValues(),
-      // formChoiceRenderer);
-      // formChoice.setNullValid(false).setRequired(true);
-      // add(formChoice);
+      final LabelValueChoiceRenderer<FormOfAddress> formChoiceRenderer = new LabelValueChoiceRenderer<FormOfAddress>(this, FormOfAddress
+          .values());
+      formChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "form"), formChoiceRenderer.getValues(), formChoiceRenderer);
+      formChoice.setNullValid(false).setRequired(true);
+      groupPanel.add(new LabelPanel(groupPanel.newChildId(), HALF, getString("address.form")).setLabelFor(formChoice).setBreakBefore());
+      groupPanel.add(new DropDownChoicePanel(groupPanel.newChildId(), THREEQUART, formChoice));
     }
-    groupPanel.add(testField);
 
     addMaxLengthTextField(groupPanel, "title", "address.title", FULL).setStrong();
     addMaxLengthTextField(groupPanel, "firstName", "firstName", ONEHALF).setStrong();
@@ -221,13 +226,6 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     }
     add(new MaxLengthTextArea("publicKey", new PropertyModel<String>(data, "publicKey")));
     add(new MaxLengthTextField("fingerprint", new PropertyModel<String>(data, "fingerprint")));
-
-    // DropDownChoice form of address
-    final LabelValueChoiceRenderer<FormOfAddress> formChoiceRenderer = new LabelValueChoiceRenderer<FormOfAddress>(this, FormOfAddress
-        .values());
-    formChoice = new DropDownChoice("formOfAddress", new PropertyModel(data, "form"), formChoiceRenderer.getValues(), formChoiceRenderer);
-    formChoice.setNullValid(false).setRequired(true);
-    add(formChoice);
 
     // DropDownChoice contactStatus
     final LabelValueChoiceRenderer<ContactStatus> contactStatusChoiceRenderer = new LabelValueChoiceRenderer<ContactStatus>(this,
