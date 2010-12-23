@@ -81,7 +81,7 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
     super.init();
     add(new Label("task", taskFormatter.getTaskPath(data.getTaskId(), true, OutputType.HTML)).setEscapeModelStrings(false));
     final TextField<String> titleField = new RequiredMaxLengthTextField("title", new PropertyModel<String>(data, "title"));
-    titleField.add(new FocusOnLoadBehavior());
+    titleField.add(new FocusOnLoadBehavior()).setOutputMarkupId(false);
     add(titleField);
     add(new MaxLengthTextField("keywords", new PropertyModel<String>(data, "keywords")));
     add(new MaxLengthTextField("isbn", new PropertyModel<String>(data, "isbn")));
