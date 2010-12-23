@@ -45,7 +45,7 @@ public class StringHelper
    * Usage: final StringBuffer buf = new StringBuffer();<br/>
    * boolean first = true;<br/>
    * if (...) {<br/>
-   * StringHelper.append(buf, first, "Hurzel", ", ");<br/>
+   * first = StringHelper.append(buf, first, "Hurzel", ", ");<br/>
    * <br/>
    * first = StringBuffer.append(buf, first, myString, ", ");<br/>
    * @param buf
