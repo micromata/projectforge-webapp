@@ -5,6 +5,7 @@
 
 <body>
   <wicket:extend>
+  <!-- wicket:fragment wicket:id="formOfAddressFragment"></wicket:fragment-->
     <span class="newform">
     
     
@@ -21,26 +22,6 @@
 		</select>
 		<label><input type="checkbox" wicket:id="favoriteCard" /><img wicket:id="favoriteCardHelpImage" /></label>
 		
-		<label class="clear half"><wicket:message key="address.title" /></label>
-	    <input type="text" class="text full strong" wicket:id="title" />
-		
-		<label class="clear half"><wicket:message key="firstName" /></label>
-		<input type="text" class="text full strong" wicket:id="firstName" /> 
-	
-	    <label class="clear half"><wicket:message key="name" /></label>
-		<input type="text" class="text full strong" wicket:id="name" />
-		
-		<label class="clear half"><wicket:message key="address.division" /></label>
-		<input type="text" class="text full" wicket:id="division" />
-	
-		<label class="clear half"><wicket:message key="address.positionText" /></label>
-		<input type="text" class="text full" wicket:id="positionText" />
-	
-		<label class="clear half"><wicket:message key="email" /></label>
-		<input type="text" class="text full" wicket:id="email" />
-	
-		<label class="clear half"><wicket:message key="address.website" /></label>
-		<input type="text" class="text full" wicket:id="website" />
 	
 		<label class="clear half"><wicket:message key="address.contactStatus" /></label>
 		<select wicket:id="contactStatus" class="select full">
@@ -84,7 +65,7 @@
 		<input type="text" class="text quart" wicket:id="zipCode" size="5" />
 		<input type="text" class="text threequart" wicket:id="city" />
 		<label class="clear half"><wicket:message key="address.country" /></label>
-		<input type="text" class="text full" wicket:id="country" />
+		<input type="text" class="text onehalf" wicket:id="country" />
 		
 		<label class="clear half"><wicket:message key="address.state" /></label>
 		<input type="text" class="text full" wicket:id="state" />
@@ -149,14 +130,10 @@
 		<input type="text" class="text full" wicket:id="privateEmail" />
 		
 		
-		
-		
-		
-		
-		
-		
-	
 	</fieldset>
+  <wicket:container wicket:id="fieldSetRepeater">[The field sets.]</wicket:container>   
+    
+
     </span>
   </wicket:extend>
 </body>
