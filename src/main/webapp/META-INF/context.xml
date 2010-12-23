@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
- <!-- stripWicketTargets: Strip Wicket targets also in development mode. -->
+<!-- stripWicketTargets: Strip Wicket targets also in development mode. -->
 <!-- Context path="" reloadable="false" debug="0">
   <Resource name="jdbc/ProjectForgeDS" type="javax.sql.DataSource" auth="Container" driverClassName="org.postgresql.Driver"
     url="jdbc:postgresql://localhost:5432/projectforge" maxActive="100" maxIdle="30" maxWait="10000" username="projectforge" password="" />
