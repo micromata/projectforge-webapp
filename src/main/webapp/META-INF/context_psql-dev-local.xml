@@ -5,4 +5,6 @@
   <Parameter name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" override="false" />
   <Parameter name="hibernate.schemaUpdate" value="true" override="false" />
   <Parameter name="development" value="true" override="false" />
+  <!-- stripWicketTargets: Strip Wicket targets also in development mode. -->
+  <Parameter name="stripWicketTargets" value="true" override="false" />
 </Context>
