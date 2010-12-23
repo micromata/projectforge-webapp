@@ -23,12 +23,12 @@
 
 package org.projectforge.web.address;
 
+import static org.projectforge.web.wicket.layout.DropDownChoiceLPanel.SELECT_ID;
 import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
 import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
 import static org.projectforge.web.wicket.layout.LayoutLength.ONEHALF;
 import static org.projectforge.web.wicket.layout.LayoutLength.THREEQUART;
-import static org.projectforge.web.wicket.layout.TextFieldPanel.INPUT_ID;
-import static org.projectforge.web.wicket.layout.DropDownChoicePanel.SELECT_ID;
+import static org.projectforge.web.wicket.layout.TextFieldLPanel.INPUT_ID;
 
 import java.util.Date;
 import java.util.List;
@@ -55,6 +55,7 @@ import org.projectforge.web.common.OutputType;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
+import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
@@ -64,12 +65,15 @@ import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.TooltipImage;
-import org.projectforge.web.wicket.layout.DropDownChoicePanel;
-import org.projectforge.web.wicket.layout.FieldSetPanel;
-import org.projectforge.web.wicket.layout.GroupPanel;
-import org.projectforge.web.wicket.layout.LabelPanel;
+import org.projectforge.web.wicket.layout.CheckBoxLPanel;
+import org.projectforge.web.wicket.layout.DropDownChoiceLPanel;
+import org.projectforge.web.wicket.layout.FieldSetLPanel;
+import org.projectforge.web.wicket.layout.GroupLPanel;
+import org.projectforge.web.wicket.layout.ImageLPanel;
+import org.projectforge.web.wicket.layout.LabelLPanel;
 import org.projectforge.web.wicket.layout.LayoutLength;
-import org.projectforge.web.wicket.layout.TextFieldPanel;
+import org.projectforge.web.wicket.layout.RepeaterLabelLPanel;
+import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
 public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage>
 {
@@ -101,12 +105,12 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     }
   }
 
-  protected TextFieldPanel addMaxLengthTextField(final GroupPanel groupPanel, final String property, final String labelKey,
+  protected TextFieldLPanel addMaxLengthTextField(final GroupLPanel groupPanel, final String property, final String labelKey,
       final LayoutLength length)
   {
     final MaxLengthTextField textField = new MaxLengthTextField(INPUT_ID, new PropertyModel<String>(data, property));
-    groupPanel.add(new LabelPanel(groupPanel.newChildId(), HALF, getString(labelKey)).setLabelFor(textField).setBreakBefore());
-    final TextFieldPanel textFieldPanel = new TextFieldPanel(groupPanel.newChildId(), length, textField);
+    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString(labelKey)).setLabelFor(textField).setBreakBefore());
+    final TextFieldLPanel textFieldPanel = new TextFieldLPanel(groupPanel.newChildId(), length, textField);
     groupPanel.add(textFieldPanel);
     return textFieldPanel;
   }
@@ -119,29 +123,29 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
 
     final RepeatingView fieldSetRepeater = new RepeatingView("fieldSetRepeater");
     add(fieldSetRepeater);
-    FieldSetPanel fieldSetPanel = new FieldSetPanel(fieldSetRepeater.newChildId(), getString("address.heading.personalData"));
+    FieldSetLPanel fieldSetPanel = new FieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.personalData"));
     fieldSetRepeater.add(fieldSetPanel);
-    GroupPanel groupPanel = new GroupPanel(fieldSetPanel.newChildId());
+    GroupLPanel groupPanel = new GroupLPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
 
     // add(new Label("task", taskFormatter.getTaskPath(data.getTaskId(), true, OutputType.HTML)).setEscapeModelStrings(false));
-    LabelPanel testField = new LabelPanel(groupPanel.newChildId(), ONEHALF, "Anrede, Checkbox und Hilfe für Favorit");
-    groupPanel.add(new LabelPanel(groupPanel.newChildId(), HALF, getString("address.form")).setLabelFor(testField).setBreakBefore());
-    groupPanel.add(testField);
-
     {
       // DropDownChoice form of address
       final LabelValueChoiceRenderer<FormOfAddress> formChoiceRenderer = new LabelValueChoiceRenderer<FormOfAddress>(this, FormOfAddress
           .values());
       formChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "form"), formChoiceRenderer.getValues(), formChoiceRenderer);
       formChoice.setNullValid(false).setRequired(true);
-      groupPanel.add(new LabelPanel(groupPanel.newChildId(), HALF, getString("address.form")).setLabelFor(formChoice).setBreakBefore());
-      groupPanel.add(new DropDownChoicePanel(groupPanel.newChildId(), THREEQUART, formChoice));
+      groupPanel.add(new DropDownChoiceLPanel(groupPanel.newChildId(), THREEQUART, formChoice));
     }
+    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.form")).setLabelFor(formChoice).setBreakBefore());
+    final RepeaterLabelLPanel repeaterPanel = new RepeaterLabelLPanel(groupPanel.newChildId());
+    groupPanel.add(repeaterPanel);
+    repeaterPanel.add(new CheckBoxLPanel(repeaterPanel.newChildId(), personalAddress, "favoriteCard"));
+    repeaterPanel.add(new ImageLPanel(repeaterPanel.newChildId(), ImageDef.HELP, getString("address.tooltip.vCardList")));
 
     addMaxLengthTextField(groupPanel, "title", "address.title", FULL).setStrong();
     addMaxLengthTextField(groupPanel, "firstName", "firstName", ONEHALF).setStrong();
-    final TextFieldPanel nameTextFieldPanel = addMaxLengthTextField(groupPanel, "name", "name", ONEHALF).setStrong().setRequired();
+    final TextFieldLPanel nameTextFieldPanel = addMaxLengthTextField(groupPanel, "name", "name", ONEHALF).setStrong().setRequired();
     if (isNew() == true) {
       nameTextFieldPanel.setFocus();
     }
@@ -152,9 +156,6 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
 
     final String phoneListTooltip = getString("address.tooltip.phonelist");
     add(new Label("task", taskFormatter.getTaskPath(data.getTaskId(), true, OutputType.HTML)).setEscapeModelStrings(false));
-    add(new CheckBox("favoriteCard", new PropertyModel<Boolean>(personalAddress, "favoriteCard")));
-    // add(new MaxLengthTextField("title", new PropertyModel<String>(data, "title")));
-    add(new TooltipImage("favoriteCardHelpImage", getResponse(), WebConstants.IMAGE_HELP, getString("address.tooltip.vCardList")));
     add(businessPhoneField = new MaxLengthTextField("businessPhone", new PropertyModel<String>(data, "businessPhone")));
     add(WicketUtils.addTooltip(new CheckBox("favoriteBusinessPhone", new PropertyModel<Boolean>(personalAddress, "favoriteBusinessPhone")),
         phoneListTooltip));
