@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+ <!-- stripWicketTargets: Strip Wicket targets also in development mode. -->
 <!-- Context path="" reloadable="false" debug="0">
   <Resource name="jdbc/ProjectForgeDS" type="javax.sql.DataSource" auth="Container" driverClassName="org.postgresql.Driver"
     url="jdbc:postgresql://localhost:5432/projectforge" maxActive="100" maxIdle="30" maxWait="10000" username="projectforge" password="" />
@@ -6,6 +7,7 @@
   <Parameter name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" override="false" />
   <Parameter name="hibernate.schemaUpdate" value="true" override="false" />
   <Parameter name="development" value="true" override="false" />
+  <Parameter name="stripWicketTargets" value="true" override="false" />
 </Context-->
 <Context path="" reloadable="false" debug="0" docBase="webapps" cookies="false">
   <Resource name="jdbc/ProjectForgeDS" type="javax.sql.DataSource" auth="Container" driverClassName="org.hsqldb.jdbcDriver"
@@ -14,4 +16,5 @@
   <Parameter name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect" />
   <Parameter name="hibernate.schemaUpdate" value="true" />
   <Parameter name="development" value="true" />
+  <Parameter name="stripWicketTargets" value="true" override="false" />
 </Context>

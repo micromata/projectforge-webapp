@@ -81,6 +81,8 @@ public class WicketApplication extends WebApplication
 
   private static Boolean developmentModus;
 
+  private static Boolean stripWicketTags;
+
   private static String alertMessage;
 
   private static Map<Class< ? extends Page>, String> mountedPages = new HashMap<Class< ? extends Page>, String>();
@@ -249,6 +251,10 @@ public class WicketApplication extends WebApplication
     for (Map.Entry<String, Class< ? extends WebPage>> mountPage : WebRegistry.instance().getMountPages().entrySet()) {
       mountPage(mountPage.getKey(), mountPage.getValue());
     }
+    if (isDevelopmentSystem() == true && isStripWicketTags() == true) {
+      log.info("Strip Wicket tags also in development mode at default (see context.xml).");
+      Application.get().getMarkupSettings().setStripWicketTags(true);
+    }
     getResourceSettings().setLocalizer(new MyLocalizer("edit/StandardI18n"));
     log.info("Default TimeZone is: " + TimeZone.getDefault());
     log.info("user.timezone is: " + System.getProperty("user.timezone"));
@@ -272,6 +278,15 @@ public class WicketApplication extends WebApplication
       developmentModus = "true".equals(value);
     }
     return developmentModus;
+  }
+
+  public boolean isStripWicketTags()
+  {
+    if (stripWicketTags == null) {
+      final String value = getServletContext().getInitParameter("stripWicketTargets");
+      stripWicketTags = "true".equals(value);
+    }
+    return stripWicketTags;
   }
 
   /**
