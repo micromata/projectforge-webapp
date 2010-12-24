@@ -62,6 +62,7 @@ import org.projectforge.web.fibu.BankAccountListPage;
 import org.projectforge.web.fibu.CustomerListPage;
 import org.projectforge.web.fibu.EingangsrechnungListPage;
 import org.projectforge.web.fibu.EmployeeListPage;
+import org.projectforge.web.fibu.EmployeeSalaryListPage;
 import org.projectforge.web.fibu.KontoListPage;
 import org.projectforge.web.fibu.Kost1ListPage;
 import org.projectforge.web.fibu.Kost2ArtListPage;
@@ -132,7 +133,7 @@ public enum MenuItemDef
       EingangsrechnungDao.USER_RIGHT_ID, READONLY_READWRITE), //
   EMPLOYEE_LIST("fibu.employees", EmployeeListPage.class, //
       FINANCE_GROUP, CONTROLLING_GROUP), //
-  EMPLOYEE_SALARY_LIST("fibu.employeeSalaries", "fibu/EmployeeSalaryList.action", //
+  EMPLOYEE_SALARY_LIST("fibu.employeeSalaries", EmployeeSalaryListPage.class, //
       EmployeeSalaryDao.USER_RIGHT_ID, READONLY_READWRITE), //
   GANTT("gantt", GanttChartListPage.class), //
   GROUP_LIST("groupList", GroupListPage.class), // Visible for all.
