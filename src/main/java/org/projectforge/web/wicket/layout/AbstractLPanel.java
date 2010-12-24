@@ -145,6 +145,15 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper
   {
     return getClassModifierComponent().getMarkupId();
   }
+  
+  /**
+   * Sets style="..." for the wrapped component.
+   * @param css
+   */
+  public AbstractLPanel setStyle(final String css) {
+    getClassModifierComponent().add(new SimpleAttributeModifier("style", css));
+    return this;
+  }
 
   /**
    * The length, break before and intend will be added as class attribute to this component.
