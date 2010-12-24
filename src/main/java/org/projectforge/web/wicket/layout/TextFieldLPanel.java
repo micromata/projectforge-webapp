@@ -25,7 +25,9 @@ package org.projectforge.web.wicket.layout;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
+import org.projectforge.web.wicket.components.MaxLengthTextField;
 
 /**
  * Represents a field set panel. A form or page can contain multiple field sets.
@@ -42,6 +44,11 @@ public class TextFieldLPanel extends AbstractLPanel
   public static final String INPUT_ID = "input";
 
   private TextField< ? > textField;
+
+  public TextFieldLPanel(final String id, final LayoutLength length, final Object dataObject, final String property)
+  {
+    this(id, length, new MaxLengthTextField(INPUT_ID, new PropertyModel<String>(dataObject, property)));
+  }
 
   public TextFieldLPanel(final String id, final LayoutLength length, final TextField< ? > textField)
   {

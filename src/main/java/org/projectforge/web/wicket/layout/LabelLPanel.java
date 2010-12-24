@@ -45,7 +45,23 @@ public class LabelLPanel extends AbstractLPanel
 
   public LabelLPanel(final String id, final LayoutLength length, final String label)
   {
+    this(id, length, label, null, false);
+  }
+
+  public LabelLPanel(final String id, final LayoutLength length, final String label, final Component labelFor)
+  {
+    this(id, length, label, labelFor, false);
+  }
+
+  public LabelLPanel(final String id, final LayoutLength length, final String label, final Component labelFor, final boolean breakBefore)
+  {
     this(id, length, new Label(LABEL_ID, label));
+    if (labelFor != null) {
+      setLabelFor(labelFor);
+    }
+    if (breakBefore == true) {
+      setBreakBefore();
+    }
   }
 
   public LabelLPanel(final String id, final LayoutLength length, final Label label)
@@ -64,7 +80,7 @@ public class LabelLPanel extends AbstractLPanel
   public LabelLPanel setLabelFor(final Component component)
   {
     if (component instanceof ComponentWrapper) {
-      label.add(new SimpleAttributeModifier("for", ((ComponentWrapper)component).getWrappedComponent().getMarkupId()));
+      label.add(new SimpleAttributeModifier("for", ((ComponentWrapper) component).getWrappedComponent().getMarkupId()));
       ((ComponentWrapper) component).getWrappedComponent().setOutputMarkupId(true);
     } else {
       label.add(new SimpleAttributeModifier("for", component.getMarkupId()));
