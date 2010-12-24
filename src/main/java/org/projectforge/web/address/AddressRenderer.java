@@ -36,7 +36,7 @@ import static org.projectforge.web.wicket.layout.TextFieldLPanel.INPUT_ID;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
@@ -84,7 +84,7 @@ public class AddressRenderer extends AbstractRenderer
 
   private TextField<String> businessPhoneField, faxField, mobilePhoneField, privatePhoneField, privateMobilePhoneField;
 
-  public AddressRenderer(final WebMarkupContainer container, final LayoutContext layoutContext, final AddressDao addressDao,
+  public AddressRenderer(final MarkupContainer container, final LayoutContext layoutContext, final AddressDao addressDao,
       final AddressDO data, final PersonalAddressDO personalAddress)
   {
     super(container, layoutContext);
@@ -99,7 +99,7 @@ public class AddressRenderer extends AbstractRenderer
   {
     final RepeatingView fieldSetRepeater = new RepeatingView("fieldSetRepeater");
     add(fieldSetRepeater);
-    FieldSetLPanel fieldSetPanel = new FieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.personalData"));
+    FieldSetLPanel fieldSetPanel = createFieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.personalData"));
     fieldSetRepeater.add(fieldSetPanel);
     GroupLPanel groupPanel = new GroupLPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
@@ -162,7 +162,7 @@ public class AddressRenderer extends AbstractRenderer
     groupPanel.addMaxLengthTextField(data, "fingerprint", "address.fingerprint", DOUBLE).setBreakBefore();
 
     // *** Business Contact ***
-    fieldSetPanel = new FieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.businessContact"));
+    fieldSetPanel = createFieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.businessContact"));
     fieldSetRepeater.add(fieldSetPanel);
     groupPanel = new GroupLPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
@@ -203,7 +203,7 @@ public class AddressRenderer extends AbstractRenderer
     mobilePhoneField = addPhoneNumber(groupPanel, "mobilePhone", "address.phoneType.mobile", "favoriteMobilePhone", phoneListTooltip);
 
     // *** Private Contact ***
-    fieldSetPanel = new FieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.privateContact"));
+    fieldSetPanel = createFieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.privateContact"));
     fieldSetRepeater.add(fieldSetPanel);
 
     // *** Private Contact: address

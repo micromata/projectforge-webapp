@@ -47,7 +47,6 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
   public AddressEditForm(AddressEditPage parentPage, AddressDO data)
   {
     super(parentPage, data);
-    this.colspan = 6;
     personalAddress = null;
     if (isNew() == false) {
       personalAddress = personalAddressDao.getByAddressId(getData().getId());
