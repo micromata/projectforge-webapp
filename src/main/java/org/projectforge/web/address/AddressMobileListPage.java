@@ -35,6 +35,7 @@ import org.projectforge.address.AddressDao;
 import org.projectforge.web.mobile.AbstractSecuredMobilePage;
 import org.projectforge.web.mobile.PageItemEntryMenuPanel;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.components.LabelBookmarkablePageLinkPanel;
 import org.springframework.util.CollectionUtils;
 
 public class AddressMobileListPage extends AbstractSecuredMobilePage
@@ -92,6 +93,12 @@ public class AddressMobileListPage extends AbstractSecuredMobilePage
         break;
       }
     }
+  }
+
+  @Override
+  protected void addRightButton()
+  {
+    add(new LabelBookmarkablePageLinkPanel(RIGHT_BUTTON_ID, AddressMobileViewPage.class, " + "));
   }
 
   @Override

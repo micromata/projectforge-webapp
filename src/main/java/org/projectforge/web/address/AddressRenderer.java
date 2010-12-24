@@ -105,7 +105,9 @@ public class AddressRenderer extends AbstractRenderer
     fieldSetPanel.add(groupPanel);
 
     // add(new Label("task", taskFormatter.getTaskPath(data.getTaskId(), true, OutputType.HTML)).setEscapeModelStrings(false));
-    {
+    if (isReadonly() == true) {
+
+    } else {
       // DropDownChoice form of address
       final LabelValueChoiceRenderer<FormOfAddress> formChoiceRenderer = new LabelValueChoiceRenderer<FormOfAddress>(container,
           FormOfAddress.values());

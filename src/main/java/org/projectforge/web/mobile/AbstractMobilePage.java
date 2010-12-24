@@ -51,9 +51,11 @@ import org.projectforge.web.wicket.components.MyRepeatingView;
  */
 public abstract class AbstractMobilePage extends WebPage
 {
-  protected RepeatingView leftnavRepeater;
+  protected final static String RIGHT_BUTTON_ID = "rightButton";
 
-  protected WebMarkupContainer leftnavContainer;
+  protected RepeatingView leftNavigationRepeater;
+
+  protected WebMarkupContainer leftNavigationContainer, rightButtonContainer;
 
   // iWebKit doesn't work completely with wicket tags such as wicket:panel etc.
   private static boolean stripTags;
@@ -79,9 +81,9 @@ public abstract class AbstractMobilePage extends WebPage
     add(CSSPackageResource.getHeaderContribution("mobile/css/style.css"));
     add(JavascriptPackageResource.getHeaderContribution("mobile/javascript/functions.js"));
     add(WicketUtils.headerContributorForFavicon(getUrl("/favicon.ico")));
-    add(leftnavContainer = new WebMarkupContainer("leftnav"));
-    leftnavContainer.add(leftnavRepeater = new MyRepeatingView("leftnavRepeater"));
-    leftnavRepeater.add(new ImageBookmarkablePageLinkPanel(leftnavRepeater.newChildId(), MenuMobilePage.class, getResponse(),
+    add(leftNavigationContainer = new WebMarkupContainer("leftNavigation"));
+    leftNavigationContainer.add(leftNavigationRepeater = new MyRepeatingView("leftNavigationRepeater"));
+    leftNavigationRepeater.add(new ImageBookmarkablePageLinkPanel(leftNavigationRepeater.newChildId(), MenuMobilePage.class, getResponse(),
         MobileWebConstants.IMAGE_HOME));
     add(new Label("windowTitle", new Model<String>() {
       @Override
@@ -90,6 +92,7 @@ public abstract class AbstractMobilePage extends WebPage
         return getWindowTitle();
       }
     }));
+    addRightButton();
     final Model<String> loggedInLabelModel = new Model<String>() {
       public String getObject()
       {
@@ -127,8 +130,8 @@ public abstract class AbstractMobilePage extends WebPage
 
   protected void addLeftnavComponent(final Component component)
   {
-    leftnavRepeater.add(component);
-    leftnavContainer.setVisible(true);
+    leftNavigationRepeater.add(component);
+    leftNavigationContainer.setVisible(true);
   }
 
   public MySession getMySession()
@@ -203,5 +206,13 @@ public abstract class AbstractMobilePage extends WebPage
   protected String getWindowTitle()
   {
     return Version.APP_ID + " - " + getTitle();
+  }
+
+  /**
+   * Adds invisible component as default.
+   */
+  protected void addRightButton()
+  {
+    add(new Label(RIGHT_BUTTON_ID, "[invisible]").setVisible(false));
   }
 }

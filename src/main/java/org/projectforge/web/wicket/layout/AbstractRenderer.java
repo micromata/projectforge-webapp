@@ -88,4 +88,19 @@ public abstract class AbstractRenderer implements Serializable
   {
     return container.getString(i18nKey);
   }
+
+  protected boolean isNew()
+  {
+    return layoutContext.isNew();
+  }
+
+  protected boolean isMobile()
+  {
+    return layoutContext.isMobile();
+  }
+
+  protected boolean isReadonly()
+  {
+    return layoutContext.isReadonly();
+  }
 }

@@ -63,7 +63,8 @@ public class AddressMobileViewPage extends AbstractSecuredMobilePage
       setResponsePage(AddressMobileListPage.class);
       return;
     }
-    leftnavRepeater.add(new LabelBookmarkablePageLinkPanel(leftnavRepeater.newChildId(), AddressMobileListPage.class, getString("list")));
+    leftNavigationRepeater.add(new LabelBookmarkablePageLinkPanel(leftNavigationRepeater.newChildId(), AddressMobileListPage.class,
+        getString("list")));
 
     final boolean isNew = false;
     personalAddress = null;
@@ -75,8 +76,8 @@ public class AddressMobileViewPage extends AbstractSecuredMobilePage
     }
     renderer = new AddressRenderer(this, new LayoutContext(true, false, isNew), addressDao, address, personalAddress);
     renderer.add();
-}
-
+  }
+  
   @Override
   protected String getTitle()
   {

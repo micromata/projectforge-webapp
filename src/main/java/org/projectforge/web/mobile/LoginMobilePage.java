@@ -82,7 +82,7 @@ public class LoginMobilePage extends AbstractMobilePage
     form = new LoginMobileForm(this);
     add(form);
     form.init();
-    leftnavContainer.setVisible(false);
+    leftNavigationContainer.setVisible(false);
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     final WebMarkupContainer messageOfTheDayArea = new WebMarkupContainer("messageOfTheDayArea");
     add(messageOfTheDayArea);

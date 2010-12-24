@@ -49,7 +49,7 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
   public MenuMobilePage(final PageParameters parameters)
   {
     super(parameters);
-    leftnavContainer.setVisible(false);
+    leftNavigationContainer.setVisible(false);
     final PageItemPanel pageItemPanel = new PageItemPanel("menu");
     add(pageItemPanel);
     final String optimized = getString("mobile.optimized");
