@@ -37,14 +37,14 @@ import org.projectforge.web.mobile.PageItemEntryMenuPanel;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.springframework.util.CollectionUtils;
 
-public class AddressListMobilePage extends AbstractSecuredMobilePage
+public class AddressMobileListPage extends AbstractSecuredMobilePage
 {
   protected static final int MAX_ROWS = 50;
 
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
 
-  private AddressListMobileForm form;
+  private AddressMobileListForm form;
 
   private List<AddressDO> list;
 
@@ -52,10 +52,10 @@ public class AddressListMobilePage extends AbstractSecuredMobilePage
 
   private RepeatingView addressRepeater;
 
-  public AddressListMobilePage(final PageParameters parameters)
+  public AddressMobileListPage(final PageParameters parameters)
   {
     super(parameters);
-    form = new AddressListMobileForm(this);
+    form = new AddressMobileListForm(this);
     add(form);
     form.init();
     add(resultList = new WebMarkupContainer("resultList"));
@@ -84,7 +84,7 @@ public class AddressListMobilePage extends AbstractSecuredMobilePage
     for (final AddressDO address : list) {
       final PageParameters params = new PageParameters();
       params.put(AbstractEditPage.PARAMETER_KEY_ID, address.getId());
-      addressRepeater.add(new PageItemEntryMenuPanel(addressRepeater.newChildId(), AddressViewMobilePage.class, params, null, address
+      addressRepeater.add(new PageItemEntryMenuPanel(addressRepeater.newChildId(), AddressMobileViewPage.class, params, null, address
           .getFirstName()
           + " "
           + address.getName(), address.getOrganization()));

@@ -24,25 +24,34 @@
 package org.projectforge.web.address;
 
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
+import org.projectforge.address.PersonalAddressDO;
+import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.web.mobile.AbstractSecuredMobilePage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.components.LabelBookmarkablePageLinkPanel;
+import org.projectforge.web.wicket.layout.LayoutContext;
 
-public class AddressViewMobilePage extends AbstractSecuredMobilePage
+public class AddressMobileViewPage extends AbstractSecuredMobilePage
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressViewMobilePage.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressMobileViewPage.class);
 
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
 
+  @SpringBean(name = "personalAddressDao")
+  private PersonalAddressDao personalAddressDao;
+
+  protected AddressRenderer renderer;
+
+  protected PersonalAddressDO personalAddress;
+
   private AddressDO address;
 
-  public AddressViewMobilePage(final PageParameters parameters)
+  public AddressMobileViewPage(final PageParameters parameters)
   {
     super(parameters);
     final Integer id = getPageParameters().getAsInteger(AbstractEditPage.PARAMETER_KEY_ID);
@@ -51,12 +60,21 @@ public class AddressViewMobilePage extends AbstractSecuredMobilePage
     }
     if (address == null) {
       log.error("Oups, address with id " + id + " not found.");
-      setResponsePage(AddressListMobilePage.class);
+      setResponsePage(AddressMobileListPage.class);
       return;
     }
-    leftnavRepeater.add(new LabelBookmarkablePageLinkPanel(leftnavRepeater.newChildId(), AddressListMobilePage.class, getString("list")));
-    add(new Label("name", address.getTitle() + " " + address.getFirstName() + " " + address.getName()));
-  }
+    leftnavRepeater.add(new LabelBookmarkablePageLinkPanel(leftnavRepeater.newChildId(), AddressMobileListPage.class, getString("list")));
+
+    personalAddress = null;
+    //if (isNew() == false) {
+      personalAddress = personalAddressDao.getByAddressId(address.getId());
+    //}
+    if (personalAddress == null) {
+      personalAddress = new PersonalAddressDO();
+    }
+    renderer = new AddressRenderer(this, new LayoutContext(true, false, true), addressDao, address, personalAddress);
+    renderer.add();
+}
 
   @Override
   protected String getTitle()

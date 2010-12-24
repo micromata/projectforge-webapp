@@ -31,17 +31,17 @@ import org.apache.wicket.model.PropertyModel;
 import org.projectforge.address.AddressFilter;
 import org.projectforge.web.mobile.AbstractMobileForm;
 
-public class AddressListMobileForm extends AbstractMobileForm<AddressListMobileForm, AddressListMobilePage>
+public class AddressMobileListForm extends AbstractMobileForm<AddressMobileListForm, AddressMobileListPage>
 {
   private static final String USER_PREF_KEY_FILTER = "mobileAddressFilter";
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressListMobileForm.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressMobileListForm.class);
 
   private static final long serialVersionUID = -4341937420376832550L;
 
   AddressFilter filter;
 
-  public AddressListMobileForm(final AddressListMobilePage parentPage)
+  public AddressMobileListForm(final AddressMobileListPage parentPage)
   {
     super(parentPage);
     filter = new AddressFilter();
