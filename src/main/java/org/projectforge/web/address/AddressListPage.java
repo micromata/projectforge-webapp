@@ -112,10 +112,11 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
       public void populateItem(Item<ICellPopulator<AddressDO>> item, String componentId, IModel<AddressDO> rowModel)
       {
         final AddressDO address = rowModel.getObject();
+        final PersonalAddressDO personalAddress = personalAddressMap.get(address.getId());
         final StringBuffer cssStyle = getCssStyle(address.getId(), address.isDeleted());
         if (address.isDeleted() == true) {
           // Do nothing further
-        } else if (personalAddressMap.containsKey(address.getId()) == true) {
+        } else if (personalAddress != null && personalAddress.isFavoriteCard() == true) {
           cssStyle.append("color: red;");
         }
         if (cssStyle.length() > 0) {
@@ -123,8 +124,8 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("modified")), getSortable("lastUpdate", sortable), "lastUpdate",
-        cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("modified")),
+        getSortable("lastUpdate", sortable), "lastUpdate", cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
@@ -149,11 +150,12 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("name")), getSortable("name", sortable), "name", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("firstName")), getSortable("firstName", sortable), "firstName",
+    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("name")), getSortable("name", sortable), "name",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("organization")), getSortable("organization", sortable), "organization",
-        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("firstName")),
+        getSortable("firstName", sortable), "firstName", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("organization")), getSortable("organization",
+        sortable), "organization", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("email")), null, "email", cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
@@ -188,14 +190,18 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
         final AddressDO address = (AddressDO) rowModel.getObject();
+        final PersonalAddressDO personalAddress = personalAddressMap.get(address.getId());
         final RepeatingView view = new RepeatingView(componentId);
         item.add(view);
         final Integer id = address.getId();
-        boolean first = addPhoneNumber(view, id, PhoneType.BUSINESS, address.getBusinessPhone(), false, WebConstants.IMAGE_PHONE, true);
-        first = addPhoneNumber(view, id, PhoneType.MOBILE, address.getMobilePhone(), true, WebConstants.IMAGE_PHONE_MOBILE, first);
-        first = addPhoneNumber(view, id, PhoneType.PRIVATE, address.getPrivatePhone(), false, WebConstants.IMAGE_PHONE_HOME, first);
-        first = addPhoneNumber(view, id, PhoneType.PRIVATE_MOBILE, address.getPrivateMobilePhone(), true, WebConstants.IMAGE_PHONE_MOBILE,
-            first);
+        boolean first = addPhoneNumber(view, id, PhoneType.BUSINESS, address.getBusinessPhone(),
+            (personalAddress != null && personalAddress.isFavoriteBusinessPhone() == true), false, WebConstants.IMAGE_PHONE, true);
+        first = addPhoneNumber(view, id, PhoneType.MOBILE, address.getMobilePhone(), (personalAddress != null && personalAddress
+            .isFavoriteMobilePhone() == true), true, WebConstants.IMAGE_PHONE_MOBILE, first);
+        first = addPhoneNumber(view, id, PhoneType.PRIVATE, address.getPrivatePhone(), (personalAddress != null && personalAddress
+            .isFavoritePrivatePhone() == true), false, WebConstants.IMAGE_PHONE_HOME, first);
+        first = addPhoneNumber(view, id, PhoneType.PRIVATE_MOBILE, address.getPrivateMobilePhone(),
+            (personalAddress != null && personalAddress.isFavoritePrivateMobilePhone() == true), true, WebConstants.IMAGE_PHONE_MOBILE, first);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
@@ -224,7 +230,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
 
   @SuppressWarnings("serial")
   private boolean addPhoneNumber(final RepeatingView view, final Integer addressId, final PhoneType phoneType, final String phoneNumber,
-      final boolean sendSms, final String image, final boolean first)
+      final boolean favoriteNumber, final boolean sendSms, final String image, final boolean first)
   {
     if (StringUtils.isBlank(phoneNumber) == true) {
       return first;
@@ -255,7 +261,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
     final String tooltip = getString(phoneType.getI18nKey());
     fragment.add(linkOrSpan.add(new SimpleAttributeModifier("title", tooltip)));
     final Label numberLabel = new Label("number", phoneNumber);
-    if (this.personalAddressMap.containsKey(addressId) == true) {
+    if (favoriteNumber == true) {
       numberLabel.add(new SimpleAttributeModifier("style", "color:red; font-weight:bold;"));
     } else {
       numberLabel.setRenderBodyOnly(true);
