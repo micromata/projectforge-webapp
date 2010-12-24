@@ -5,44 +5,14 @@
 
 <body>
   <wicket:extend>
-  <!-- wicket:fragment wicket:id="formOfAddressFragment"></wicket:fragment-->
     <span class="newform">
     
+  <wicket:container wicket:id="fieldSetRepeater">[The field sets.]</wicket:container>   
     
-
-	<fieldset class="float boxshadow roundcorners">
-		<h3>Persönliche Daten</h3>
-		<!-- @kai: ich würde hier eine Person anlegen und Adressen hinzufügbar gestalten, ebenso wie telfon, email etc. die kriegen dann ein flag (geschäflich, fax, mobile, etc) -->
-		<label class="clear half"><wicket:message key="task" /></label>
-    	<label><span wicket:id="task">[task]</span></label>
-	
-		<label class="clear half"><wicket:message key="address.contactStatus" /></label>
-		<select wicket:id="contactStatus" class="select full">
-			<option>active</option>
-		</select>
-		
-		<label class="clear half"><wicket:message key="address.birthday" /></label>
-		<span wicket:id="birthday">[birth day]</span>
-		<label class="clear full"><span wicket:id="showBirthdayAsUTC">[1970-11-21 00:00]</span></label>
-		
-		<label class="clear puthalf full"><input type="checkbox" wicket:id="imageBroschure" /><wicket:message key="address.imageBroschure" /></label>
-		
-		<label class="clear onehalf"><wicket:message key="comment" /></label>
-		<textarea class="textarea clear onehalf" wicket:id="comment" >[comment]</textarea>
-		
-		<label class="clear onehalf"><wicket:message key="address.publicKey" /></label>
-		<textarea class="textarea clear onehalf" wicket:id="publicKey">[public key]</textarea>
-		
-		<label class="clear onehalf"><wicket:message key="address.fingerprint" /></label>
-		<input type="text" class="clear text onehalf" wicket:id="fingerprint" />
-		
-	</fieldset>
 
 	<fieldset class="float boxshadow roundcorners">
 		<h3>Kontakt Geschäftlich</h3>
 		<h4>Status</h4>
-		<label class="half clear"><wicket:message key="organization" /></label>
-		<input type="text" class="text full" wicket:id="organization" />
 		<label class="clear half"><wicket:message key="address.addressStatus" /></label>
 		<select wicket:id="addressStatus" class="select full">
 			<option>leave</option>
@@ -124,7 +94,6 @@
 		
 		
 	</fieldset>
-  <wicket:container wicket:id="fieldSetRepeater">[The field sets.]</wicket:container>   
     
 
     </span>
