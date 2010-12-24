@@ -55,6 +55,12 @@ public abstract class AbstractRenderer implements Serializable
       return new FieldSetLPanel(id, heading);
     }
   }
+
+  public GroupLPanel createGroupLPanel(final String id)
+  {
+    return createGroupLPanel(id, null);
+  }
+
   public GroupLPanel createGroupLPanel(final String id, final String heading)
   {
     if (layoutContext.isMobile() == true) {

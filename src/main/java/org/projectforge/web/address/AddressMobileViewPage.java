@@ -65,14 +65,15 @@ public class AddressMobileViewPage extends AbstractSecuredMobilePage
     }
     leftnavRepeater.add(new LabelBookmarkablePageLinkPanel(leftnavRepeater.newChildId(), AddressMobileListPage.class, getString("list")));
 
+    final boolean isNew = false;
     personalAddress = null;
-    //if (isNew() == false) {
+    if (isNew == false) {
       personalAddress = personalAddressDao.getByAddressId(address.getId());
-    //}
+    }
     if (personalAddress == null) {
       personalAddress = new PersonalAddressDO();
     }
-    renderer = new AddressRenderer(this, new LayoutContext(true, false, true), addressDao, address, personalAddress);
+    renderer = new AddressRenderer(this, new LayoutContext(true, false, isNew), addressDao, address, personalAddress);
     renderer.add();
 }
 

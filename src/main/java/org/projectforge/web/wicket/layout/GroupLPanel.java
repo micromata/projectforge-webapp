@@ -55,15 +55,16 @@ public class GroupLPanel extends Panel
   public GroupLPanel(final String id, final String heading)
   {
     this(id);
-    setHeading(heading);
+    if (heading != null) {
+      setHeading(heading);
+    }
   }
 
   public TextFieldLPanel addMaxLengthTextField(final Object dataObject, final String property, final String labelKey,
       final LayoutLength length)
   {
     final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), length, dataObject, property);
-    add(new LabelLPanel(newChildId(), HALF, getString(labelKey)).setLabelFor(textFieldPanel.getTextField())
-        .setBreakBefore());
+    add(new LabelLPanel(newChildId(), HALF, getString(labelKey)).setLabelFor(textFieldPanel.getTextField()).setBreakBefore());
     add(textFieldPanel);
     return textFieldPanel;
   }
@@ -72,8 +73,7 @@ public class GroupLPanel extends Panel
       final LayoutLength length)
   {
     final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), length, dataObject, property);
-    add(new LabelLPanel(newChildId(), HALF, getString(labelKey)).setLabelFor(textAreaPanel.getTextArea())
-        .setBreakBefore());
+    add(new LabelLPanel(newChildId(), HALF, getString(labelKey)).setLabelFor(textAreaPanel.getTextArea()).setBreakBefore());
     add(textAreaPanel);
     return textAreaPanel;
   }
@@ -122,7 +122,9 @@ public class GroupLPanel extends Panel
    */
   public GroupLPanel setHeading(final String heading)
   {
-    this.headingLabel = new Label(HEADING_ID, heading);
+    if (heading != null) {
+      this.headingLabel = new Label(HEADING_ID, heading);
+    }
     return this;
   }
 }

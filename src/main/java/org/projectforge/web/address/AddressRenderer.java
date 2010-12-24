@@ -101,7 +101,7 @@ public class AddressRenderer extends AbstractRenderer
     add(fieldSetRepeater);
     FieldSetLPanel fieldSetPanel = createFieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.personalData"));
     fieldSetRepeater.add(fieldSetPanel);
-    GroupLPanel groupPanel = new GroupLPanel(fieldSetPanel.newChildId());
+    GroupLPanel groupPanel = createGroupLPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
 
     // add(new Label("task", taskFormatter.getTaskPath(data.getTaskId(), true, OutputType.HTML)).setEscapeModelStrings(false));
@@ -126,10 +126,6 @@ public class AddressRenderer extends AbstractRenderer
     if (layoutContext.isNew() == true) {
       nameTextFieldPanel.setFocus();
     }
-    groupPanel.addMaxLengthTextField(data, "division", "address.division", ONEHALF);
-    groupPanel.addMaxLengthTextField(data, "positionText", "address.positionText", ONEHALF);
-    groupPanel.addMaxLengthTextField(data, "email", "email", ONEHALF);
-    groupPanel.addMaxLengthTextField(data, "website", "address.website", ONEHALF);
     {
       // DropDownChoice contactStatus
       final LabelValueChoiceRenderer<ContactStatus> contactStatusChoiceRenderer = new LabelValueChoiceRenderer<ContactStatus>(container,
@@ -164,7 +160,7 @@ public class AddressRenderer extends AbstractRenderer
     // *** Business Contact ***
     fieldSetPanel = createFieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.businessContact"));
     fieldSetRepeater.add(fieldSetPanel);
-    groupPanel = new GroupLPanel(fieldSetPanel.newChildId());
+    groupPanel = createGroupLPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
     {
       final PFAutoCompleteTextField<String> organizationField = new PFAutoCompleteTextField<String>(INPUT_ID, new PropertyModel<String>(
@@ -178,6 +174,8 @@ public class AddressRenderer extends AbstractRenderer
       groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("organization"), organizationField, true));
       groupPanel.add(new TextFieldLPanel(groupPanel.newChildId(), ONEHALF, organizationField));
     }
+    groupPanel.addMaxLengthTextField(data, "division", "address.division", ONEHALF);
+    groupPanel.addMaxLengthTextField(data, "positionText", "address.positionText", ONEHALF);
     {
       // DropDownChoice addressStatus
       final LabelValueChoiceRenderer<AddressStatus> addressStatusChoiceRenderer = new LabelValueChoiceRenderer<AddressStatus>(container,
@@ -188,6 +186,8 @@ public class AddressRenderer extends AbstractRenderer
       groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.addressStatus"), addressStatusChoice, true));
       groupPanel.add(new DropDownChoiceLPanel(groupPanel.newChildId(), THREEQUART, addressStatusChoice));
     }
+    groupPanel.addMaxLengthTextField(data, "email", "email", ONEHALF);
+    groupPanel.addMaxLengthTextField(data, "website", "address.website", ONEHALF);
 
     // *** Business Contact: Business address, postal address
     addAddress(fieldSetPanel, "address.heading.businessAddress", "addressText", "zipCode", "city", "country", "state");
@@ -195,7 +195,7 @@ public class AddressRenderer extends AbstractRenderer
         "postalState");
 
     // *** Business Contact: Phone
-    groupPanel = new GroupLPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
+    groupPanel = createGroupLPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
     fieldSetPanel.add(groupPanel);
     final String phoneListTooltip = getString("address.tooltip.phonelist");
     businessPhoneField = addPhoneNumber(groupPanel, "businessPhone", "address.phone", "favoriteBusinessPhone", phoneListTooltip);
@@ -205,25 +205,26 @@ public class AddressRenderer extends AbstractRenderer
     // *** Private Contact ***
     fieldSetPanel = createFieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.privateContact"));
     fieldSetRepeater.add(fieldSetPanel);
+    groupPanel = createGroupLPanel(fieldSetPanel.newChildId());
+    fieldSetPanel.add(groupPanel);
+    groupPanel.addMaxLengthTextField(data, "privateEmail", "email", ONEHALF);
 
     // *** Private Contact: address
     addAddress(fieldSetPanel, "address.heading.privateAddress", "privateAddressText", "privateZipCode", "privateCity", "privateCountry",
         "privateState");
 
     // *** Private Contact: Phone
-    groupPanel = new GroupLPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
+    groupPanel = createGroupLPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
     fieldSetPanel.add(groupPanel);
     privatePhoneField = addPhoneNumber(groupPanel, "privatePhone", "address.phone", "favoritePrivatePhone", phoneListTooltip);
     privateMobilePhoneField = addPhoneNumber(groupPanel, "privateMobilePhone", "address.phoneType.mobile", "favoritePrivateMobilePhone",
         phoneListTooltip);
-
-    groupPanel.addMaxLengthTextField(data, "privateEmail", "email", ONEHALF);
   }
 
   protected void addAddress(final FieldSetLPanel fieldSetPanel, final String heading, final String addressTextProperty,
       final String zipCodeProperty, final String cityProperty, final String countryProperty, final String stateProperty)
   {
-    final GroupLPanel groupPanel = new GroupLPanel(fieldSetPanel.newChildId()).setHeading(getString(heading));
+    final GroupLPanel groupPanel = createGroupLPanel(fieldSetPanel.newChildId()).setHeading(getString(heading));
     fieldSetPanel.add(groupPanel);
     {
       @SuppressWarnings("serial")
@@ -243,8 +244,12 @@ public class AddressRenderer extends AbstractRenderer
         zipCodeFieldPanel, true));
     groupPanel.add(zipCodeFieldPanel);
     groupPanel.add(new TextFieldLPanel(groupPanel.newChildId(), FULL, data, cityProperty));
-    groupPanel.addMaxLengthTextField(data, countryProperty, "address.country", ONEHALF);
-    groupPanel.addMaxLengthTextField(data, stateProperty, "address.state", ONEHALF);
+
+    final TextFieldLPanel countryTextFieldPanel = new TextFieldLPanel(groupPanel.newChildId(), THREEQUART, data, countryProperty);
+    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.country") + "/" + getString("address.state"),
+        countryTextFieldPanel, true));
+    groupPanel.add(countryTextFieldPanel);
+    groupPanel.add(new TextFieldLPanel(groupPanel.newChildId(), THREEQUART, data, stateProperty));
   }
 
   private TextField<String> addPhoneNumber(final GroupLPanel groupPanel, final String property, final String labelKey,
