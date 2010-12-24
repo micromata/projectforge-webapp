@@ -172,7 +172,7 @@ public class AddressRenderer extends AbstractRenderer
         }
       }.withMatchContains(true).withMinChars(2);
       groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("organization"), organizationField, true));
-      groupPanel.add(new TextFieldLPanel(groupPanel.newChildId(), ONEHALF, organizationField));
+      groupPanel.add(new TextFieldLPanel(groupPanel.newChildId(), ONEHALF, organizationField).setStrong());
     }
     groupPanel.addMaxLengthTextField(data, "division", "address.division", ONEHALF);
     groupPanel.addMaxLengthTextField(data, "positionText", "address.positionText", ONEHALF);
@@ -186,7 +186,7 @@ public class AddressRenderer extends AbstractRenderer
       groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.addressStatus"), addressStatusChoice, true));
       groupPanel.add(new DropDownChoiceLPanel(groupPanel.newChildId(), THREEQUART, addressStatusChoice));
     }
-    groupPanel.addMaxLengthTextField(data, "email", "email", ONEHALF);
+    groupPanel.addMaxLengthTextField(data, "email", "email", ONEHALF).setStrong();
     groupPanel.addMaxLengthTextField(data, "website", "address.website", ONEHALF);
 
     // *** Business Contact: Business address, postal address
@@ -207,7 +207,7 @@ public class AddressRenderer extends AbstractRenderer
     fieldSetRepeater.add(fieldSetPanel);
     groupPanel = createGroupLPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
-    groupPanel.addMaxLengthTextField(data, "privateEmail", "email", ONEHALF);
+    groupPanel.addMaxLengthTextField(data, "privateEmail", "email", ONEHALF).setStrong();
 
     // *** Private Contact: address
     addAddress(fieldSetPanel, "address.heading.privateAddress", "privateAddressText", "privateZipCode", "privateCity", "privateCountry",
