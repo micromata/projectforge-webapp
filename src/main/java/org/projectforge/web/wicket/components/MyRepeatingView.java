@@ -26,7 +26,7 @@ package org.projectforge.web.wicket.components;
 import org.apache.wicket.markup.repeater.RepeatingView;
 
 /**
- * This repeating view is only visible if any child was added.
+ * This repeating view is only visible if any child was added (detected by calling newChildId()).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
