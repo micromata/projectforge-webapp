@@ -27,6 +27,7 @@ import org.apache.wicket.Component;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.projectforge.common.StringHelper;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * Represents a entry of a group panel. This can be a label, text field or other form components.
@@ -112,6 +113,16 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper
   public AbstractLPanel setIndent(final LayoutLength indent)
   {
     this.indent = indent;
+    return this;
+  }
+
+  /**
+   * @param tooltip
+   * @return this for chaining.
+   */
+  public AbstractLPanel setTooltip(final String tooltip)
+  {
+    WicketUtils.addTooltip(getWrappedComponent(), tooltip);
     return this;
   }
 

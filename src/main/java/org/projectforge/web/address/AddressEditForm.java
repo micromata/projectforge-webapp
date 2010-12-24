@@ -29,6 +29,7 @@ import static org.projectforge.web.wicket.layout.LayoutLength.DOUBLE;
 import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
 import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
 import static org.projectforge.web.wicket.layout.LayoutLength.ONEHALF;
+import static org.projectforge.web.wicket.layout.LayoutLength.QUART;
 import static org.projectforge.web.wicket.layout.LayoutLength.THREEQUART;
 import static org.projectforge.web.wicket.layout.TextFieldLPanel.INPUT_ID;
 
@@ -36,7 +37,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
@@ -54,14 +54,11 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.ImageDef;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.components.MaxLengthTextField;
-import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.layout.CheckBoxLPanel;
 import org.projectforge.web.wicket.layout.DateFieldLPanel;
 import org.projectforge.web.wicket.layout.DropDownChoiceLPanel;
@@ -124,8 +121,9 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
       groupPanel.add(new DropDownChoiceLPanel(groupPanel.newChildId(), THREEQUART, formChoice));
       final RepeaterLabelLPanel repeaterPanel = new RepeaterLabelLPanel(groupPanel.newChildId());
       groupPanel.add(repeaterPanel);
-      repeaterPanel.add(new CheckBoxLPanel(repeaterPanel.newChildId(), personalAddress, "favoriteCard"));
-      repeaterPanel.add(new ImageLPanel(repeaterPanel.newChildId(), ImageDef.HELP, getString("address.tooltip.vCardList")));
+      final String tooltip = getString("address.tooltip.vCardList");
+      repeaterPanel.add(new CheckBoxLPanel(repeaterPanel.newChildId(), personalAddress, "favoriteCard").setTooltip(tooltip));
+      repeaterPanel.add(new ImageLPanel(repeaterPanel.newChildId(), ImageDef.HELP, tooltip));
     }
 
     groupPanel.addMaxLengthTextField(data, "title", "address.title", FULL).setStrong();
@@ -145,12 +143,12 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
       final DropDownChoice contactStatusChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "contactStatus"),
           contactStatusChoiceRenderer.getValues(), contactStatusChoiceRenderer);
       contactStatusChoice.setNullValid(false).setRequired(true);
-      groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.contactStatus"), contactStatusChoice,true));
+      groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.contactStatus"), contactStatusChoice, true));
       groupPanel.add(new DropDownChoiceLPanel(groupPanel.newChildId(), THREEQUART, contactStatusChoice));
     }
     final DatePanel birthdayPanel = new DatePanel(DATE_FIELD_ID, new PropertyModel<Date>(data, "birthday"), new DatePanelSettings()
         .withTargetType(java.sql.Date.class));
-    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.birthday"),birthdayPanel.getDateField(), true));
+    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.birthday"), birthdayPanel.getDateField(), true));
     groupPanel.add(new DateFieldLPanel(groupPanel.newChildId(), HALF, birthdayPanel));
     WicketUtils.addTooltip(birthdayPanel.getDateField(), new Model<String>() {
       @Override
@@ -174,73 +172,98 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     fieldSetRepeater.add(fieldSetPanel);
     groupPanel = new GroupLPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
-    final PFAutoCompleteTextField<String> organizationField = new PFAutoCompleteTextField<String>(INPUT_ID, new PropertyModel<String>(data, "organization")) {
-      @Override
-      protected List<String> getChoices(String input)
-      {
-        return parentPage.getBaseDao().getAutocompletion("organization", input);
-      }
-    }.withMatchContains(true).withMinChars(2);
-    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("organization"), organizationField, true));
-    groupPanel.add(new TextFieldLPanel(groupPanel.newChildId(), ONEHALF, organizationField));
+    {
+      final PFAutoCompleteTextField<String> organizationField = new PFAutoCompleteTextField<String>(INPUT_ID, new PropertyModel<String>(
+          data, "organization")) {
+        @Override
+        protected List<String> getChoices(String input)
+        {
+          return parentPage.getBaseDao().getAutocompletion("organization", input);
+        }
+      }.withMatchContains(true).withMinChars(2);
+      groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("organization"), organizationField, true));
+      groupPanel.add(new TextFieldLPanel(groupPanel.newChildId(), ONEHALF, organizationField));
+    }
+    {
+      // DropDownChoice addressStatus
+      final LabelValueChoiceRenderer<AddressStatus> addressStatusChoiceRenderer = new LabelValueChoiceRenderer<AddressStatus>(this,
+          AddressStatus.values());
+      final DropDownChoice addressStatusChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "addressStatus"),
+          addressStatusChoiceRenderer.getValues(), addressStatusChoiceRenderer);
+      addressStatusChoice.setNullValid(false).setRequired(true);
+      groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.addressStatus"), addressStatusChoice, true));
+      groupPanel.add(new DropDownChoiceLPanel(groupPanel.newChildId(), THREEQUART, addressStatusChoice));
+    }
 
+    // *** Business Contact: Business address, postal address
+    addAddress(fieldSetPanel, "address.heading.businessAddress", "addressText", "zipCode", "city", "country", "state");
+    addAddress(fieldSetPanel, "address.heading.postalAddress", "postalAddressText", "postalZipCode", "postalCity", "postalCountry",
+        "postalState");
+
+    // *** Business Contact: Phone
+    groupPanel = new GroupLPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
+    fieldSetPanel.add(groupPanel);
     final String phoneListTooltip = getString("address.tooltip.phonelist");
-    // add(new Label("task", taskFormatter.getTaskPath(data.getTaskId(), true, OutputType.HTML)).setEscapeModelStrings(false));
-    add(businessPhoneField = new MaxLengthTextField("businessPhone", new PropertyModel<String>(data, "businessPhone")));
-    add(WicketUtils.addTooltip(new CheckBox("favoriteBusinessPhone", new PropertyModel<Boolean>(personalAddress, "favoriteBusinessPhone")),
-        phoneListTooltip));
-    add(new TooltipImage("favoriteBusinessPhoneHelpImage", getResponse(), WebConstants.IMAGE_HELP, phoneListTooltip));
-    add(faxField = new MaxLengthTextField("fax", new PropertyModel<String>(data, "fax")));
-    add(WicketUtils.addTooltip(new CheckBox("favoriteFax", new PropertyModel<Boolean>(personalAddress, "favoriteFax")), phoneListTooltip));
-    add(new TooltipImage("favoriteFaxHelpImage", getResponse(), WebConstants.IMAGE_HELP, phoneListTooltip));
-    add(mobilePhoneField = new MaxLengthTextField("mobilePhone", new PropertyModel<String>(data, "mobilePhone")));
-    add(WicketUtils.addTooltip(new CheckBox("favoriteMobilePhone", new PropertyModel<Boolean>(personalAddress, "favoriteMobilePhone")),
-        phoneListTooltip));
-    add(new TooltipImage("favoriteMobilePhoneHelpImage", getResponse(), WebConstants.IMAGE_HELP, phoneListTooltip));
-    add(new PFAutoCompleteTextField<String>("addressText", new PropertyModel<String>(data, "addressText")) {
-      @Override
-      protected List<String> getChoices(String input)
-      {
-        return parentPage.getBaseDao().getAutocompletion("addressText", input);
-      }
-    }.withMatchContains(true).withMinChars(2));
-    add(new PFAutoCompleteTextField<String>("postalAddressText", new PropertyModel<String>(data, "postalAddressText")) {
-      @Override
-      protected List<String> getChoices(String input)
-      {
-        return parentPage.getBaseDao().getAutocompletion("postalAddressText", input);
-      }
-    }.withMatchContains(true).withMinChars(2));
-    add(new MaxLengthTextField("zipCode", new PropertyModel<String>(data, "zipCode")));
-    add(new MaxLengthTextField("city", new PropertyModel<String>(data, "city")));
-    add(new MaxLengthTextField("postalZipCode", new PropertyModel<String>(data, "postalZipCode")));
-    add(new MaxLengthTextField("postalCity", new PropertyModel<String>(data, "postalCity")));
-    add(new MaxLengthTextField("country", new PropertyModel<String>(data, "country")));
-    add(new MaxLengthTextField("state", new PropertyModel<String>(data, "state")));
-    add(new MaxLengthTextField("postalCountry", new PropertyModel<String>(data, "postalCountry")));
-    add(new MaxLengthTextField("postalState", new PropertyModel<String>(data, "postalState")));
-    add(new MaxLengthTextField("privateAddressText", new PropertyModel<String>(data, "privateAddressText")));
-    add(privatePhoneField = new MaxLengthTextField("privatePhone", new PropertyModel<String>(data, "privatePhone")));
-    add(WicketUtils.addTooltip(new CheckBox("favoritePrivatePhone", new PropertyModel<Boolean>(personalAddress, "favoritePrivatePhone")),
-        phoneListTooltip));
-    add(new TooltipImage("favoritePrivatePhoneHelpImage", getResponse(), WebConstants.IMAGE_HELP, phoneListTooltip));
-    add(new MaxLengthTextField("privateZipCode", new PropertyModel<String>(data, "privateZipCode")));
-    add(new MaxLengthTextField("privateCity", new PropertyModel<String>(data, "privateCity")));
-    add(privateMobilePhoneField = new MaxLengthTextField("privateMobilePhone", new PropertyModel<String>(data, "privateMobilePhone")));
-    add(WicketUtils.addTooltip(new CheckBox("favoritePrivateMobilePhone", new PropertyModel<Boolean>(personalAddress,
-        "favoritePrivateMobilePhone")), phoneListTooltip));
-    add(new TooltipImage("favoritePrivateMobilePhoneHelpImage", getResponse(), WebConstants.IMAGE_HELP, phoneListTooltip));
-    add(new MaxLengthTextField("privateCountry", new PropertyModel<String>(data, "privateCountry")));
-    add(new MaxLengthTextField("privateState", new PropertyModel<String>(data, "privateState")));
-    add(new MaxLengthTextField("privateEmail", new PropertyModel<String>(data, "privateEmail")));
+    businessPhoneField = addPhoneNumber(groupPanel, "businessPhone", "address.phone", "favoriteBusinessPhone", phoneListTooltip);
+    faxField = addPhoneNumber(groupPanel, "fax", "address.phoneType.fax", "favoriteFax", phoneListTooltip);
+    mobilePhoneField = addPhoneNumber(groupPanel, "mobilePhone", "address.phoneType.mobile", "favoriteMobilePhone", phoneListTooltip);
 
-    // DropDownChoice addressStatus
-    final LabelValueChoiceRenderer<AddressStatus> addressStatusChoiceRenderer = new LabelValueChoiceRenderer<AddressStatus>(this,
-        AddressStatus.values());
-    final DropDownChoice addressStatusChoice = new DropDownChoice("addressStatus", new PropertyModel(data, "addressStatus"),
-        addressStatusChoiceRenderer.getValues(), addressStatusChoiceRenderer);
-    addressStatusChoice.setNullValid(false).setRequired(true);
-    add(addressStatusChoice);
+    // *** Private Contact ***
+    fieldSetPanel = new FieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.privateContact"));
+    fieldSetRepeater.add(fieldSetPanel);
+
+    // *** Private Contact: address
+    addAddress(fieldSetPanel, "address.heading.privateAddress", "privateAddressText", "privateZipCode", "privateCity", "privateCountry",
+        "privateState");
+
+    // *** Private Contact: Phone
+    groupPanel = new GroupLPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
+    fieldSetPanel.add(groupPanel);
+    privatePhoneField = addPhoneNumber(groupPanel, "privatePhone", "address.phone", "favoritePrivatePhone", phoneListTooltip);
+    privateMobilePhoneField = addPhoneNumber(groupPanel, "privateMobilePhone", "address.phoneType.mobile", "favoritePrivateMobilePhone",
+        phoneListTooltip);
+
+    groupPanel.addMaxLengthTextField(data, "privateEmail", "email", ONEHALF);
+  }
+
+  protected void addAddress(final FieldSetLPanel fieldSetPanel, final String heading, final String addressTextProperty,
+      final String zipCodeProperty, final String cityProperty, final String countryProperty, final String stateProperty)
+  {
+    final GroupLPanel groupPanel = new GroupLPanel(fieldSetPanel.newChildId()).setHeading(getString(heading));
+    fieldSetPanel.add(groupPanel);
+    {
+      @SuppressWarnings("serial")
+      final PFAutoCompleteTextField<String> addressTextField = new PFAutoCompleteTextField<String>(INPUT_ID, new PropertyModel<String>(
+          data, addressTextProperty)) {
+        @Override
+        protected List<String> getChoices(String input)
+        {
+          return parentPage.getBaseDao().getAutocompletion(addressTextProperty, input);
+        }
+      }.withMatchContains(true).withMinChars(2);
+      groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.addressText"), addressTextField, true));
+      groupPanel.add(new TextFieldLPanel(groupPanel.newChildId(), ONEHALF, addressTextField));
+    }
+    final TextFieldLPanel zipCodeFieldPanel = new TextFieldLPanel(groupPanel.newChildId(), QUART, data, zipCodeProperty);
+    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.zipCode") + "/" + getString("address.city"),
+        zipCodeFieldPanel, true));
+    groupPanel.add(zipCodeFieldPanel);
+    groupPanel.add(new TextFieldLPanel(groupPanel.newChildId(), FULL, data, cityProperty));
+    groupPanel.addMaxLengthTextField(data, countryProperty, "address.country", ONEHALF);
+    groupPanel.addMaxLengthTextField(data, stateProperty, "address.state", ONEHALF);
+  }
+
+  private TextField<String> addPhoneNumber(final GroupLPanel groupPanel, final String property, final String labelKey,
+      final String favoriteProperty, final String phoneListTooltip)
+  {
+    final TextFieldLPanel phoneFieldPanel = groupPanel.addMaxLengthTextField(data, property, labelKey, THREEQUART);
+    @SuppressWarnings("unchecked")
+    final TextField<String> phoneField = (TextField<String>) phoneFieldPanel.getTextField();
+    final RepeaterLabelLPanel repeaterPanel = new RepeaterLabelLPanel(groupPanel.newChildId());
+    groupPanel.add(repeaterPanel);
+    repeaterPanel.add(new CheckBoxLPanel(repeaterPanel.newChildId(), personalAddress, favoriteProperty).setTooltip(phoneListTooltip));
+    repeaterPanel.add(new ImageLPanel(repeaterPanel.newChildId(), ImageDef.HELP, phoneListTooltip));
+    return phoneField;
   }
 
   @Override

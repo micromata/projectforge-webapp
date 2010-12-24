@@ -116,8 +116,13 @@ public class GroupLPanel extends Panel
     this.headingLabel = headingLabel;
   }
 
-  public void setHeading(final String heading)
+  /**
+   * @param heading
+   * @return this for chaining.
+   */
+  public GroupLPanel setHeading(final String heading)
   {
     this.headingLabel = new Label(HEADING_ID, heading);
+    return this;
   }
 }
