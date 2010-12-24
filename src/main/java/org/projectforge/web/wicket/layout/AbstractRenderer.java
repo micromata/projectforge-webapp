@@ -26,7 +26,7 @@ package org.projectforge.web.wicket.layout;
 import java.io.Serializable;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.MarkupContainer;
 
 /**
  * Base class for renderers of data objects. This renderer can be re-used by different pages (mobile pages as well as read-only or edit form
@@ -40,9 +40,31 @@ public abstract class AbstractRenderer implements Serializable
 
   protected LayoutContext layoutContext;
 
-  protected WebMarkupContainer container;
+  protected MarkupContainer container;
 
-  public AbstractRenderer(final WebMarkupContainer container, final LayoutContext layoutContext)
+  /**
+   * Creates a FieldSetLPanel (for normal or mobile version) depending on the layout context.
+   * @param id
+   * @param heading
+   */
+  public FieldSetLPanel createFieldSetLPanel(final String id, final String heading)
+  {
+    if (layoutContext.isMobile() == true) {
+      return new FieldSetMobileLPanel(id, heading);
+    } else {
+      return new FieldSetLPanel(id, heading);
+    }
+  }
+  public GroupLPanel createGroupLPanel(final String id, final String heading)
+  {
+    if (layoutContext.isMobile() == true) {
+      return new GroupMobileLPanel(id, heading);
+    } else {
+      return new GroupLPanel(id, heading);
+    }
+  }
+
+  public AbstractRenderer(final MarkupContainer container, final LayoutContext layoutContext)
   {
     this.layoutContext = layoutContext;
     this.container = container;

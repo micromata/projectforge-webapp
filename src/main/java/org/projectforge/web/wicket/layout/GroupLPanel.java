@@ -30,7 +30,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 
 /**
- * Represents a field set panel. A form or page can contain multiple field sets.
+ * Represents a group panel. A field set, form or page can contain multiple group panels. A group panel groups fields.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */

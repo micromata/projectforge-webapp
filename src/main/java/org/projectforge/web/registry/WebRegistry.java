@@ -37,9 +37,9 @@ import org.projectforge.web.LoginPage;
 import org.projectforge.web.access.AccessEditPage;
 import org.projectforge.web.access.AccessListPage;
 import org.projectforge.web.address.AddressEditPage;
-import org.projectforge.web.address.AddressListMobilePage;
+import org.projectforge.web.address.AddressMobileListPage;
 import org.projectforge.web.address.AddressListPage;
-import org.projectforge.web.address.AddressViewMobilePage;
+import org.projectforge.web.address.AddressMobileViewPage;
 import org.projectforge.web.address.AddressViewPage;
 import org.projectforge.web.address.PhoneCallPage;
 import org.projectforge.web.address.SendSmsPage;
@@ -310,7 +310,7 @@ public class WebRegistry
 
     addMountPage(BOOKMARK_MOBILE_LOGIN, LoginMobilePage.class);
     addMountPage(BOOKMARK_MOBILE_PREFIX + "menu", MenuMobilePage.class);
-    addMountPage(BOOKMARK_MOBILE_PREFIX + "addressList", AddressListMobilePage.class);
-    addMountPage(BOOKMARK_MOBILE_PREFIX + "addressView", AddressViewMobilePage.class);
+    addMountPage(BOOKMARK_MOBILE_PREFIX + "addressList", AddressMobileListPage.class);
+    addMountPage(BOOKMARK_MOBILE_PREFIX + "addressView", AddressMobileViewPage.class);
   }
 }

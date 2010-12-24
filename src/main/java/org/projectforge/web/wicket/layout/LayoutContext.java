@@ -45,6 +45,13 @@ public class LayoutContext implements Serializable
 
   private boolean newObject;
 
+  public LayoutContext(final boolean mobile, final boolean readonly, final boolean newObject)
+  {
+    this.mobile = mobile;
+    this.readonly = readonly;
+    this.newObject = newObject;
+  }
+
   /**
    * Sets the mobile flag automatically from MySession.
    * @see MySession#isMobileUserAgent()
