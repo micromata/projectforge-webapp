@@ -58,6 +58,11 @@ import org.projectforge.web.wicket.WicketUtils;
  */
 public class UserFilter implements Filter
 {
+  /**
+   * Set after stay-logged-in functionality (used by MenuMobilePage).
+   */
+  public static String USER_ATTR_STAY_LOGGED_IN = "stayLoggedIn";
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserFilter.class);
 
   private final static String SESSION_KEY_USER = "UserFilter.user";
@@ -166,6 +171,7 @@ public class UserFilter implements Filter
             if (log.isDebugEnabled() == true) {
               log.debug("User's stay logged-in cookie found: " + request.getRequestURI());
             }
+            user.setAttribute(USER_ATTR_STAY_LOGGED_IN, true); // Used by MenuMobilePage.
             UserFilter.login(request, user);
           }
         }
