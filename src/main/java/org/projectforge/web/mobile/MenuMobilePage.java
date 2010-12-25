@@ -24,12 +24,14 @@
 package org.projectforge.web.mobile;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.Configuration;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuBuilder;
+import org.projectforge.web.UserFilter;
 import org.projectforge.web.address.AddressMobileListPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.timesheet.TimesheetListPage;
@@ -39,6 +41,7 @@ import org.projectforge.web.wicket.PresizedImage;
 
 public class MenuMobilePage extends AbstractSecuredMobilePage
 {
+
   @SpringBean(name = "configuration")
   private Configuration configuration;
 
@@ -50,10 +53,18 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
     this(new PageParameters());
   }
 
-  @SuppressWarnings("serial")
+  @SuppressWarnings({ "serial", "unchecked"})
   public MenuMobilePage(final PageParameters parameters)
   {
     super(parameters);
+    if (getUser().getAttribute(UserFilter.USER_ATTR_STAY_LOGGED_IN) != null) {
+      getUser().removeAttribute(UserFilter.USER_ATTR_STAY_LOGGED_IN);
+      final RecentMobilePageInfo pageInfo = (RecentMobilePageInfo) userXmlPreferencesCache.getEntry(getUserId(),
+          AbstractSecuredMobilePage.USER_PREF_RECENT_PAGE);
+      if (pageInfo != null && pageInfo.getPageClass() != null) {
+        throw new RestartResponseException((Class) pageInfo.getPageClass(), pageInfo.restorePageParameters());
+      }
+    }
     leftNavigationContainer.setVisible(false);
     final PageItemPanel pageItemPanel = new PageItemPanel("menu");
     add(pageItemPanel);

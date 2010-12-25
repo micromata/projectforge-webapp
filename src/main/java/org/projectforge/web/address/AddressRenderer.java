@@ -54,6 +54,7 @@ import org.projectforge.common.BeanHelper;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
+import org.projectforge.web.mobile.PhonePanel;
 import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
@@ -183,9 +184,17 @@ public class AddressRenderer extends AbstractRenderer
     final String phoneListTooltip = getString("address.tooltip.phonelist");
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
     fieldSetPanel.add(groupPanel);
-    businessPhoneField = addPhoneNumber(groupPanel, "businessPhone", "address.phone", "favoriteBusinessPhone", phoneListTooltip);
-    faxField = addPhoneNumber(groupPanel, "fax", "address.phoneType.fax", "favoriteFax", phoneListTooltip);
-    mobilePhoneField = addPhoneNumber(groupPanel, "mobilePhone", "address.phoneType.mobile", "favoriteMobilePhone", phoneListTooltip);
+    if (isMobile() == true) {
+      final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
+      groupPanel.add(labelValueTablePanel);
+      addPhoneNumber(labelValueTablePanel, "address.phone", data.getBusinessPhone());
+      addPhoneNumber(labelValueTablePanel, "address.phoneType.fax", data.getFax());
+      addPhoneNumber(labelValueTablePanel, "address.phoneType.mobile", data.getMobilePhone());
+    } else {
+      businessPhoneField = addPhoneNumber(groupPanel, "businessPhone", "address.phone", "favoriteBusinessPhone", phoneListTooltip);
+      faxField = addPhoneNumber(groupPanel, "fax", "address.phoneType.fax", "favoriteFax", phoneListTooltip);
+      mobilePhoneField = addPhoneNumber(groupPanel, "mobilePhone", "address.phoneType.mobile", "favoriteMobilePhone", phoneListTooltip);
+    }
   }
 
   /**
@@ -423,6 +432,12 @@ public class AddressRenderer extends AbstractRenderer
       groupPanel.add(countryTextFieldPanel);
       groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), THREEQUART, data, stateProperty));
     }
+  }
+
+  private void addPhoneNumber(final LabelValueTableLPanel labelValueTablePanel, final String labelKey, final String number)
+  {
+    final PhonePanel valueContainer = new PhonePanel(LabelValueTableLPanel.WICKET_ID_VALUE, number);
+    addLabelValueRow(labelValueTablePanel, getString(labelKey), valueContainer);
   }
 
   private TextField<String> addPhoneNumber(final GroupLPanel groupPanel, final String property, final String labelKey,

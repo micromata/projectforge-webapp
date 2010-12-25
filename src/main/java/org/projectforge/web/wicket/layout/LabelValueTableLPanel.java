@@ -35,6 +35,8 @@ import org.apache.wicket.markup.repeater.RepeatingView;
  */
 public class LabelValueTableLPanel extends AbstractLPanel
 {
+  public static final String WICKET_ID_VALUE = "value";
+
   private static final long serialVersionUID = 1232385200034295638L;
 
   private RepeatingView rowRepeater;
@@ -49,13 +51,21 @@ public class LabelValueTableLPanel extends AbstractLPanel
     super.add(rowRepeater);
   }
 
-
   public LabelValueTableLPanel add(final String label, final String value)
   {
     final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
     rowRepeater.add(row);
     row.add(new Label("label", label));
-    row.add(new Label("value", value));
+    row.add(new Label(WICKET_ID_VALUE, value));
+    return this;
+  }
+
+  public LabelValueTableLPanel add(final String label, final WebMarkupContainer value)
+  {
+    final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
+    rowRepeater.add(row);
+    row.add(new Label("label", label));
+    row.add(value);
     return this;
   }
 

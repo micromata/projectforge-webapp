@@ -24,9 +24,12 @@
     <li class="button"><input wicket:id="login" type="submit" /></li>
   </ul>
   </form>
-  <ul wicket:id="messageOfTheDayArea" class="pageitem">
-    <li class="textbox">
+  <ul class="pageitem">
+    <li class="textbox" wicket:id="messageOfTheDayItem">
     <p wicket:id="messageOfTheDay">[Have a lot of fun!]</p>
+    </li>
+    <li class="textbox">
+    <p style="color: grey;"><wicket:message key="mobile.loginPageInfo" /></p>
     </li>
   </ul>
   </div>

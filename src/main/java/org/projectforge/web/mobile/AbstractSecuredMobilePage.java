@@ -29,6 +29,7 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.core.MessageParam;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesCache;
+import org.projectforge.web.UserFilter;
 
 /** All pages with required login should be derived from this page. */
 public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
@@ -51,7 +52,9 @@ public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
   public AbstractSecuredMobilePage(final PageParameters parameters)
   {
     super(parameters);
-    putUserPrefEntry(USER_PREF_RECENT_PAGE, new RecentMobilePageInfo(this), true);
+    if (getUser().getAttribute(UserFilter.USER_ATTR_STAY_LOGGED_IN) == null) {
+      putUserPrefEntry(USER_PREF_RECENT_PAGE, new RecentMobilePageInfo(this), true);
+    }
   }
 
   /**

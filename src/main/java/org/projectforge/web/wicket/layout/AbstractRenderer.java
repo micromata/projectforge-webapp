@@ -28,6 +28,7 @@ import java.io.Serializable;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.TextField;
@@ -120,6 +121,15 @@ public abstract class AbstractRenderer implements Serializable
     if (StringUtils.isNotBlank(value) == true) {
       labelValueTablePanel.add(label, value);
     }
+  }
+
+  /**
+   * Adds a new row to the given label-value-table.
+   * @param labelValueTablePanel
+   */
+  public void addLabelValueRow(final LabelValueTableLPanel labelValueTablePanel, final String label, final WebMarkupContainer value)
+  {
+    labelValueTablePanel.add(label, value);
   }
 
   public DropDownChoiceLPanel createDropDownChoicePanel(final String id, final LayoutLength length, final DropDownChoice< ? > dropDownChoice)

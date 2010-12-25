@@ -84,7 +84,7 @@ public class LoginMobilePage extends AbstractMobilePage
     form.init();
     leftNavigationContainer.setVisible(false);
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    final WebMarkupContainer messageOfTheDayArea = new WebMarkupContainer("messageOfTheDayArea");
+    final WebMarkupContainer messageOfTheDayArea = new WebMarkupContainer("messageOfTheDayItem");
     add(messageOfTheDayArea);
     final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
     if (StringUtils.isBlank(messageOfTheDay) == true) {
