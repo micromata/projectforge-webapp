@@ -36,6 +36,7 @@ import static org.projectforge.web.wicket.layout.TextFieldLPanel.INPUT_ID;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -245,11 +246,18 @@ public class AddressRenderer extends AbstractRenderer
       });
     }
 
-    // add(new CheckBox("imageBroschure", new PropertyModel<Boolean>(data, "imageBroschure")));
-    final TextAreaLPanel commentTextAreaPanel = groupPanel.addMaxLengthTextArea(data, "comment", "comment", DOUBLE);
-    commentTextAreaPanel.setBreakBefore().setStyle("height: 30ex;");
-    if (layoutContext.isNew() == false) {
-      commentTextAreaPanel.setFocus();
+    if (isMobile() == true) {
+      if (StringUtils.isNotBlank(data.getComment()) == true) {
+        groupPanel.add(createLabelValueHeadingPanel(groupPanel.newChildId(), getString("comment")));
+        groupPanel.add(createValuePanel(groupPanel.newChildId(), data.getComment()));
+      }
+    } else {
+      // add(new CheckBox("imageBroschure", new PropertyModel<Boolean>(data, "imageBroschure")));
+      final TextAreaLPanel commentTextAreaPanel = groupPanel.addMaxLengthTextArea(data, "comment", "comment", DOUBLE);
+      commentTextAreaPanel.setBreakBefore().setStyle("height: 30ex;");
+      if (layoutContext.isNew() == false) {
+        commentTextAreaPanel.setFocus();
+      }
     }
   }
 
@@ -261,8 +269,19 @@ public class AddressRenderer extends AbstractRenderer
   {
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
-    groupPanel.addMaxLengthTextArea(data, "publicKey", "address.publicKey", DOUBLE).setBreakBefore();
-    groupPanel.addMaxLengthTextField(data, "fingerprint", "address.fingerprint", DOUBLE).setBreakBefore();
+    if (isMobile() == true) {
+      if (StringUtils.isNotBlank(data.getPublicKey()) == true) {
+        groupPanel.add(createLabelValueHeadingPanel(groupPanel.newChildId(), getString("address.publicKey")));
+        groupPanel.add(createValuePanel(groupPanel.newChildId(), StringUtils.abbreviate(data.getPublicKey(), 20)));
+      }
+      if (StringUtils.isNotBlank(data.getFingerprint()) == true) {
+        groupPanel.add(createLabelValueHeadingPanel(groupPanel.newChildId(), getString("address.fingerprint")));
+        groupPanel.add(createValuePanel(groupPanel.newChildId(), data.getFingerprint()));
+      }
+    } else {
+      groupPanel.addMaxLengthTextArea(data, "publicKey", "address.publicKey", DOUBLE).setBreakBefore();
+      groupPanel.addMaxLengthTextField(data, "fingerprint", "address.fingerprint", DOUBLE).setBreakBefore();
+    }
   }
 
   /**

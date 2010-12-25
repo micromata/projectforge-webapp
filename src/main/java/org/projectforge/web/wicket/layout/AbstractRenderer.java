@@ -96,8 +96,21 @@ public abstract class AbstractRenderer implements Serializable
     return new LabelValueTableLPanel(id);
   }
 
-  public DropDownChoiceLPanel createDropDownChoicePanel(final String id, final LayoutLength length,
-      final DropDownChoice< ? > dropDownChoice)
+  public LabelLPanel createLabelValueHeadingPanel(final String id, final String label)
+  {
+    if (isMobile() == true) {
+      return new LabelValueHeadingMobileLPanel(id, label);
+    } else {
+      return new LabelValueHeadingLPanel(id, label);
+    }
+  }
+
+  public LabelLPanel createValuePanel(final String id, final String value)
+  {
+    return new ValueLPanel(id, value);
+  }
+
+  public DropDownChoiceLPanel createDropDownChoicePanel(final String id, final LayoutLength length, final DropDownChoice< ? > dropDownChoice)
   {
     return new DropDownChoiceLPanel(id, length, dropDownChoice);
   }
@@ -137,7 +150,7 @@ public abstract class AbstractRenderer implements Serializable
     return new TextFieldLPanel(id, length, dataObject, property);
   }
 
-  public TextFieldLPanel createTextFieldPanel(final String id, final LayoutLength length, final TextField<?> textField)
+  public TextFieldLPanel createTextFieldPanel(final String id, final LayoutLength length, final TextField< ? > textField)
   {
     return new TextFieldLPanel(id, length, textField);
   }

@@ -1,4 +1,23 @@
 table tr td,table tr th {
-	text-align: left;
-	vertical-align: top;
+	vertical-align: baseline;
+}
+
+table tr th {
+	padding-left: 0pt;
+	margin-left: 0pt; text-align : right;
+	font-weight: bold;
+	font-size: 0.9em;
+	color: #3f5c84;
+	text-align: right;
+}
+
+table tr td {
+	font-weight: bold;
+}
+
+h4 {
+	margin: 0pt; font-weight : bold;
+	font-size: 0.9em;
+	color: #3f5c84;
+	font-weight: bold;
 }
