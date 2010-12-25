@@ -363,6 +363,13 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
       attributeMap.put(key, value);
     }
   }
+  
+  public void removeAttribute(String key) {
+    if (attributeMap == null) {
+      return;
+    }
+    attributeMap.remove(key);
+  }
 
   /**
    * @return Returns the username.
