@@ -62,6 +62,15 @@ public enum ContactStatus implements I18nEnum
     throw new UnsupportedOperationException("Unknown ContactStatus: '" + s + "'");
   }
 
+  public boolean isIn(final ContactStatus... status) {
+    for (final ContactStatus st : status) {
+      if (this == st) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * @return The full i18n key including the i18n prefix "fibu.auftrag.status.".
    */
