@@ -45,12 +45,18 @@ public class TextFieldLPanel extends AbstractLPanel
 
   private TextField< ? > textField;
 
-  public TextFieldLPanel(final String id, final LayoutLength length, final Object dataObject, final String property)
+  /**
+   * @see AbstractRenderer#createTextFieldLPanel(String, LayoutLength, Object, String)
+   */
+  TextFieldLPanel(final String id, final LayoutLength length, final Object dataObject, final String property)
   {
     this(id, length, new MaxLengthTextField(INPUT_ID, new PropertyModel<String>(dataObject, property)));
   }
 
-  public TextFieldLPanel(final String id, final LayoutLength length, final TextField< ? > textField)
+  /**
+   * @see AbstractRenderer#createTextFieldLPanel(String, LayoutLength, TextField)
+   */
+  TextFieldLPanel(final String id, final LayoutLength length, final TextField< ? > textField)
   {
     super(id, length);
     this.textField = textField;

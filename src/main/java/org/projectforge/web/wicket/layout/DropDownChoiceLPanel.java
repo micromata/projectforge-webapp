@@ -42,7 +42,10 @@ public class DropDownChoiceLPanel extends AbstractLPanel
 
   private DropDownChoice< ? > dropDownChoice;
 
-  public DropDownChoiceLPanel(final String id, final LayoutLength length, final DropDownChoice< ? > dropDownChoice)
+  /**
+   * @see AbstractRenderer#createDropDownChoiceLPanel(String, LayoutLength, DropDownChoice)
+   */
+  DropDownChoiceLPanel(final String id, final LayoutLength length, final DropDownChoice< ? > dropDownChoice)
   {
     super(id, length);
     this.dropDownChoice = dropDownChoice;

@@ -32,7 +32,10 @@ public class FieldSetMobileLPanel extends FieldSetLPanel
 {
   private static final long serialVersionUID = -4126362330312626485L;
 
-  public FieldSetMobileLPanel(final String id, final String heading)
+  /**
+   * @see AbstractRenderer#createFieldSetLPanel(String, String)
+   */
+  FieldSetMobileLPanel(final String id, final String heading)
   {
     super(id, heading);
   }

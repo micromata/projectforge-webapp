@@ -45,6 +45,11 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
   @SpringBean(name = "menuBuilder")
   private MenuBuilder menuBuilder;
 
+  public MenuMobilePage()
+  {
+    this(new PageParameters());
+  }
+
   @SuppressWarnings("serial")
   public MenuMobilePage(final PageParameters parameters)
   {
@@ -72,8 +77,8 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
       @Override
       protected void onClick()
       {
-        LoginPage
-        .logout((MySession) getSession(), (WebRequest) getRequest(), (WebResponse) getResponse(), userXmlPreferencesCache, menuBuilder);
+        LoginPage.logout((MySession) getSession(), (WebRequest) getRequest(), (WebResponse) getResponse(), userXmlPreferencesCache,
+            menuBuilder);
         setResponsePage(LoginMobilePage.class);
       }
     });

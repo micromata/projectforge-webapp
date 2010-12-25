@@ -42,7 +42,10 @@ public class DateFieldLPanel extends AbstractLPanel
 
   private DatePanel datePanel;
 
-  public DateFieldLPanel(final String id, final LayoutLength length, final DatePanel datePanel)
+  /**
+   * @see AbstractRenderer#createDateFieldLPanel(String, LayoutLength, DatePanel)
+   */
+  DateFieldLPanel(final String id, final LayoutLength length, final DatePanel datePanel)
   {
     super(id, length);
     this.datePanel = datePanel;
@@ -67,7 +70,7 @@ public class DateFieldLPanel extends AbstractLPanel
     datePanel.setFocus();
     return this;
   }
-  
+
   public DatePanel getDatePanel()
   {
     return datePanel;

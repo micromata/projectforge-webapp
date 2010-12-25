@@ -45,12 +45,12 @@ public class TextAreaLPanel extends AbstractLPanel
 
   private TextArea< ? > textArea;
 
-  public TextAreaLPanel(final String id, final LayoutLength length, final Object dataObject, final String property)
+  TextAreaLPanel(final String id, final LayoutLength length, final Object dataObject, final String property)
   {
     this(id, length, new MaxLengthTextArea(TEXT_AREA_ID, new PropertyModel<String>(dataObject, property)));
   }
 
-  public TextAreaLPanel(final String id, final LayoutLength length, final TextArea< ? > textArea)
+  TextAreaLPanel(final String id, final LayoutLength length, final TextArea< ? > textArea)
   {
     super(id, length);
     this.textArea = textArea;

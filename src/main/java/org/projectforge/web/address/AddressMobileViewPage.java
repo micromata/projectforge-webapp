@@ -74,7 +74,7 @@ public class AddressMobileViewPage extends AbstractSecuredMobilePage
     if (personalAddress == null) {
       personalAddress = new PersonalAddressDO();
     }
-    renderer = new AddressRenderer(this, new LayoutContext(true, false, isNew), addressDao, address, personalAddress);
+    renderer = new AddressRenderer(this, new LayoutContext(true, true, isNew), addressDao, address, personalAddress);
     renderer.add();
   }
   

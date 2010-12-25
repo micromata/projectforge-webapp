@@ -45,19 +45,19 @@ public class ImageLPanel extends AbstractLPanel
 
   private ContextImage image;
 
-  public ImageLPanel(final String id, final ImageDef imageDef)
+  ImageLPanel(final String id, final ImageDef imageDef)
   {
     super(id, null);
     addImage(new PresizedImage(IMAGE_ID, getResponse(), imageDef.getPath()));
   }
 
-  public ImageLPanel(final String id, final ImageDef imageDef, final String tooltip)
+  ImageLPanel(final String id, final ImageDef imageDef, final String tooltip)
   {
     super(id, null);
     addImage(new TooltipImage(IMAGE_ID, getResponse(), imageDef.getPath(), tooltip));
   }
 
-  public ImageLPanel(final String id, final ContextImage image)
+  ImageLPanel(final String id, final ContextImage image)
   {
     super(id, null);
     this.classAttributeAppender = "select";

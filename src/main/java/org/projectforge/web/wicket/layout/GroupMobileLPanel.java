@@ -23,7 +23,6 @@
 
 package org.projectforge.web.wicket.layout;
 
-
 /**
  * Represents a mobile group panel. A field set, form or page can contain multiple group panels. A group panel groups fields.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -33,12 +32,18 @@ public class GroupMobileLPanel extends GroupLPanel
 {
   private static final long serialVersionUID = -280050296848404710L;
 
-  public GroupMobileLPanel(final String id)
+  /**
+   * @see AbstractRenderer#createGroupLPanel(String)
+   */
+  GroupMobileLPanel(final String id)
   {
     super(id);
   }
 
-  public GroupMobileLPanel(final String id, final String heading)
+  /**
+   * @see AbstractRenderer#createGroupLPanel(String, String)
+   */
+  GroupMobileLPanel(final String id, final String heading)
   {
     super(id, heading);
   }

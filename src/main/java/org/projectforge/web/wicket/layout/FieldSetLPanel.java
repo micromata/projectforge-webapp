@@ -45,12 +45,18 @@ public class FieldSetLPanel extends Panel
 
   private RepeatingView groupRepeater;
 
-  public FieldSetLPanel(final String id)
+  /**
+   * @see AbstractRenderer#createFieldSetLPanel(String)
+   */
+  FieldSetLPanel(final String id)
   {
     super(id);
   }
 
-  public FieldSetLPanel(final String id, final String heading)
+  /**
+   * @see AbstractRenderer#createFieldSetLPanel(String, String)
+   */
+  FieldSetLPanel(final String id, final String heading)
   {
     this(id);
     setHeading(heading);

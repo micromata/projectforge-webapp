@@ -43,17 +43,22 @@ public class LabelLPanel extends AbstractLPanel
 
   private Label label;
 
-  public LabelLPanel(final String id, final LayoutLength length, final String label)
+  LabelLPanel(final String id, final LayoutLength length, final String label)
   {
     this(id, length, label, null, false);
   }
 
-  public LabelLPanel(final String id, final LayoutLength length, final String label, final Component labelFor)
+  LabelLPanel(final String id, final LayoutLength length, final String label, final boolean breakBefore)
+  {
+    this(id, length, label, null, breakBefore);
+  }
+
+  LabelLPanel(final String id, final LayoutLength length, final String label, final Component labelFor)
   {
     this(id, length, label, labelFor, false);
   }
 
-  public LabelLPanel(final String id, final LayoutLength length, final String label, final Component labelFor, final boolean breakBefore)
+  LabelLPanel(final String id, final LayoutLength length, final String label, final Component labelFor, final boolean breakBefore)
   {
     this(id, length, new Label(LABEL_ID, label));
     if (labelFor != null) {
@@ -64,7 +69,7 @@ public class LabelLPanel extends AbstractLPanel
     }
   }
 
-  public LabelLPanel(final String id, final LayoutLength length, final Label label)
+  LabelLPanel(final String id, final LayoutLength length, final Label label)
   {
     super(id, length);
     this.label = label;

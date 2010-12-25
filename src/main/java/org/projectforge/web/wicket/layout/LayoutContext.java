@@ -25,9 +25,7 @@ package org.projectforge.web.wicket.layout;
 
 import java.io.Serializable;
 
-import org.apache.wicket.Session;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.MySession;
 
 /**
  * The layout context contains information important for the render process. Has a page to be rendered as a read-only page or as a mobile
@@ -53,18 +51,11 @@ public class LayoutContext implements Serializable
   }
 
   /**
-   * Sets the mobile flag automatically from MySession.
-   * @see MySession#isMobileUserAgent()
-   * @see Session#get()
+   * Mobile is false because AbstractEditForm is not a mobile form.
+   * @param form
    */
-  public LayoutContext()
-  {
-    mobile = ((MySession) Session.get()).isMobileUserAgent();
-  }
-
   public LayoutContext(final AbstractEditForm< ? , ? > form)
   {
-    this();
     newObject = form.isNew();
   }
 

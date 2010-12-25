@@ -47,12 +47,12 @@ public class GroupLPanel extends Panel
 
   private RepeatingView entriesRepeater;
 
-  public GroupLPanel(final String id)
+  GroupLPanel(final String id)
   {
     super(id);
   }
 
-  public GroupLPanel(final String id, final String heading)
+  GroupLPanel(final String id, final String heading)
   {
     this(id);
     if (heading != null) {

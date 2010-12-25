@@ -43,12 +43,18 @@ public class CheckBoxLPanel extends AbstractLPanel
 
   private CheckBox checkBox;
 
-  public CheckBoxLPanel(final String id, final Object dataObject, final String property)
+  /**
+   * @see AbstractRenderer#createCheckBoxLPanel(String, Object, String)
+   */
+  CheckBoxLPanel(final String id, final Object dataObject, final String property)
   {
     this(id, new CheckBox(CHECKBOX_ID, new PropertyModel<Boolean>(dataObject, property)));
   }
 
-  public CheckBoxLPanel(final String id, final CheckBox checkBox)
+  /**
+   * @see AbstractRenderer#createCheckBoxLPanel(String, CheckBox)
+   */
+  CheckBoxLPanel(final String id, final CheckBox checkBox)
   {
     super(id, null);
     this.checkBox = checkBox;

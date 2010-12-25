@@ -58,13 +58,8 @@ import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.layout.AbstractRenderer;
-import org.projectforge.web.wicket.layout.CheckBoxLPanel;
-import org.projectforge.web.wicket.layout.DateFieldLPanel;
-import org.projectforge.web.wicket.layout.DropDownChoiceLPanel;
 import org.projectforge.web.wicket.layout.FieldSetLPanel;
 import org.projectforge.web.wicket.layout.GroupLPanel;
-import org.projectforge.web.wicket.layout.ImageLPanel;
-import org.projectforge.web.wicket.layout.LabelLPanel;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.RepeaterLabelLPanel;
 import org.projectforge.web.wicket.layout.TextAreaLPanel;
@@ -99,27 +94,32 @@ public class AddressRenderer extends AbstractRenderer
   {
     final RepeatingView fieldSetRepeater = new RepeatingView("fieldSetRepeater");
     add(fieldSetRepeater);
-    FieldSetLPanel fieldSetPanel = createFieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.personalData"));
+    final String title = StringHelper.listToString(" ", data.getTitle(), data.getFirstName(), data.getName());
+    FieldSetLPanel fieldSetPanel = createFieldSetLPanel(fieldSetRepeater.newChildId(), isMobile() && isReadonly() ? title : getString("address.heading.personalData"));
     fieldSetRepeater.add(fieldSetPanel);
     GroupLPanel groupPanel = createGroupLPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
 
     // add(new Label("task", taskFormatter.getTaskPath(data.getTaskId(), true, OutputType.HTML)).setEscapeModelStrings(false));
     if (isReadonly() == true) {
-
+      final FormOfAddress form = data.getForm();
+      if (form != null && form.isIn(FormOfAddress.MISTER, FormOfAddress.MISS, FormOfAddress.COMPANY) == true) {
+        groupPanel.add(createLabelLPanel(groupPanel.newChildId(), FULL, getString(form.getI18nKey()), true));
+      }
+      groupPanel.add(createLabelLPanel(groupPanel.newChildId(), FULL, title, true));
     } else {
       // DropDownChoice form of address
       final LabelValueChoiceRenderer<FormOfAddress> formChoiceRenderer = new LabelValueChoiceRenderer<FormOfAddress>(container,
           FormOfAddress.values());
       formChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "form"), formChoiceRenderer.getValues(), formChoiceRenderer);
       formChoice.setNullValid(false).setRequired(true);
-      groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.form"), formChoice, true));
-      groupPanel.add(new DropDownChoiceLPanel(groupPanel.newChildId(), THREEQUART, formChoice));
-      final RepeaterLabelLPanel repeaterPanel = new RepeaterLabelLPanel(groupPanel.newChildId());
+      groupPanel.add(createLabelLPanel(groupPanel.newChildId(), HALF, getString("address.form"), formChoice, true));
+      groupPanel.add(createDropDownChoiceLPanel(groupPanel.newChildId(), THREEQUART, formChoice));
+      final RepeaterLabelLPanel repeaterPanel = createRepeaterLabelLPanel(groupPanel.newChildId());
       groupPanel.add(repeaterPanel);
       final String tooltip = getString("address.tooltip.vCardList");
-      repeaterPanel.add(new CheckBoxLPanel(repeaterPanel.newChildId(), personalAddress, "favoriteCard").setTooltip(tooltip));
-      repeaterPanel.add(new ImageLPanel(repeaterPanel.newChildId(), ImageDef.HELP, tooltip));
+      repeaterPanel.add(createCheckBoxLPanel(repeaterPanel.newChildId(), personalAddress, "favoriteCard").setTooltip(tooltip));
+      repeaterPanel.add(createImageLPanel(repeaterPanel.newChildId(), ImageDef.HELP, tooltip));
     }
 
     groupPanel.addMaxLengthTextField(data, "title", "address.title", FULL).setStrong();
@@ -135,13 +135,13 @@ public class AddressRenderer extends AbstractRenderer
       final DropDownChoice contactStatusChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "contactStatus"),
           contactStatusChoiceRenderer.getValues(), contactStatusChoiceRenderer);
       contactStatusChoice.setNullValid(false).setRequired(true);
-      groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.contactStatus"), contactStatusChoice, true));
-      groupPanel.add(new DropDownChoiceLPanel(groupPanel.newChildId(), THREEQUART, contactStatusChoice));
+      groupPanel.add(createLabelLPanel(groupPanel.newChildId(), HALF, getString("address.contactStatus"), contactStatusChoice, true));
+      groupPanel.add(createDropDownChoiceLPanel(groupPanel.newChildId(), THREEQUART, contactStatusChoice));
     }
     final DatePanel birthdayPanel = new DatePanel(DATE_FIELD_ID, new PropertyModel<Date>(data, "birthday"), new DatePanelSettings()
         .withTargetType(java.sql.Date.class));
-    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.birthday"), birthdayPanel.getDateField(), true));
-    groupPanel.add(new DateFieldLPanel(groupPanel.newChildId(), HALF, birthdayPanel));
+    groupPanel.add(createLabelLPanel(groupPanel.newChildId(), HALF, getString("address.birthday"), birthdayPanel.getDateField(), true));
+    groupPanel.add(createDateFieldLPanel(groupPanel.newChildId(), HALF, birthdayPanel));
     WicketUtils.addTooltip(birthdayPanel.getDateField(), new Model<String>() {
       @Override
       public String getObject()
@@ -173,8 +173,8 @@ public class AddressRenderer extends AbstractRenderer
           return addressDao.getAutocompletion("organization", input);
         }
       }.withMatchContains(true).withMinChars(2);
-      groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("organization"), organizationField, true));
-      groupPanel.add(new TextFieldLPanel(groupPanel.newChildId(), ONEHALF, organizationField).setStrong());
+      groupPanel.add(createLabelLPanel(groupPanel.newChildId(), HALF, getString("organization"), organizationField, true));
+      groupPanel.add(createTextFieldLPanel(groupPanel.newChildId(), ONEHALF, organizationField).setStrong());
     }
     groupPanel.addMaxLengthTextField(data, "division", "address.division", ONEHALF);
     groupPanel.addMaxLengthTextField(data, "positionText", "address.positionText", ONEHALF);
@@ -185,8 +185,8 @@ public class AddressRenderer extends AbstractRenderer
       final DropDownChoice addressStatusChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "addressStatus"),
           addressStatusChoiceRenderer.getValues(), addressStatusChoiceRenderer);
       addressStatusChoice.setNullValid(false).setRequired(true);
-      groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.addressStatus"), addressStatusChoice, true));
-      groupPanel.add(new DropDownChoiceLPanel(groupPanel.newChildId(), THREEQUART, addressStatusChoice));
+      groupPanel.add(createLabelLPanel(groupPanel.newChildId(), HALF, getString("address.addressStatus"), addressStatusChoice, true));
+      groupPanel.add(createDropDownChoiceLPanel(groupPanel.newChildId(), THREEQUART, addressStatusChoice));
     }
     groupPanel.addMaxLengthTextField(data, "email", "email", ONEHALF).setStrong();
     groupPanel.addMaxLengthTextField(data, "website", "address.website", ONEHALF);
@@ -238,20 +238,20 @@ public class AddressRenderer extends AbstractRenderer
           return addressDao.getAutocompletion(addressTextProperty, input);
         }
       }.withMatchContains(true).withMinChars(2);
-      groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.addressText"), addressTextField, true));
-      groupPanel.add(new TextFieldLPanel(groupPanel.newChildId(), ONEHALF, addressTextField));
+      groupPanel.add(createLabelLPanel(groupPanel.newChildId(), HALF, getString("address.addressText"), addressTextField, true));
+      groupPanel.add(createTextFieldLPanel(groupPanel.newChildId(), ONEHALF, addressTextField));
     }
-    final TextFieldLPanel zipCodeFieldPanel = new TextFieldLPanel(groupPanel.newChildId(), QUART, data, zipCodeProperty);
-    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.zipCode") + "/" + getString("address.city"),
+    final TextFieldLPanel zipCodeFieldPanel = createTextFieldLPanel(groupPanel.newChildId(), QUART, data, zipCodeProperty);
+    groupPanel.add(createLabelLPanel(groupPanel.newChildId(), HALF, getString("address.zipCode") + "/" + getString("address.city"),
         zipCodeFieldPanel, true));
     groupPanel.add(zipCodeFieldPanel);
-    groupPanel.add(new TextFieldLPanel(groupPanel.newChildId(), FULL, data, cityProperty));
+    groupPanel.add(createTextFieldLPanel(groupPanel.newChildId(), FULL, data, cityProperty));
 
-    final TextFieldLPanel countryTextFieldPanel = new TextFieldLPanel(groupPanel.newChildId(), THREEQUART, data, countryProperty);
-    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, getString("address.country") + "/" + getString("address.state"),
+    final TextFieldLPanel countryTextFieldPanel = createTextFieldLPanel(groupPanel.newChildId(), THREEQUART, data, countryProperty);
+    groupPanel.add(createLabelLPanel(groupPanel.newChildId(), HALF, getString("address.country") + "/" + getString("address.state"),
         countryTextFieldPanel, true));
     groupPanel.add(countryTextFieldPanel);
-    groupPanel.add(new TextFieldLPanel(groupPanel.newChildId(), THREEQUART, data, stateProperty));
+    groupPanel.add(createTextFieldLPanel(groupPanel.newChildId(), THREEQUART, data, stateProperty));
   }
 
   private TextField<String> addPhoneNumber(final GroupLPanel groupPanel, final String property, final String labelKey,
@@ -260,10 +260,10 @@ public class AddressRenderer extends AbstractRenderer
     final TextFieldLPanel phoneFieldPanel = groupPanel.addMaxLengthTextField(data, property, labelKey, THREEQUART);
     @SuppressWarnings("unchecked")
     final TextField<String> phoneField = (TextField<String>) phoneFieldPanel.getTextField();
-    final RepeaterLabelLPanel repeaterPanel = new RepeaterLabelLPanel(groupPanel.newChildId());
+    final RepeaterLabelLPanel repeaterPanel = createRepeaterLabelLPanel(groupPanel.newChildId());
     groupPanel.add(repeaterPanel);
-    repeaterPanel.add(new CheckBoxLPanel(repeaterPanel.newChildId(), personalAddress, favoriteProperty).setTooltip(phoneListTooltip));
-    repeaterPanel.add(new ImageLPanel(repeaterPanel.newChildId(), ImageDef.HELP, phoneListTooltip));
+    repeaterPanel.add(createCheckBoxLPanel(repeaterPanel.newChildId(), personalAddress, favoriteProperty).setTooltip(phoneListTooltip));
+    repeaterPanel.add(createImageLPanel(repeaterPanel.newChildId(), ImageDef.HELP, phoneListTooltip));
     return phoneField;
   }
 
