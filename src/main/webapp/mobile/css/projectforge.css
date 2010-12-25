@@ -1,0 +1,4 @@
+table tr td,table tr th {
+	text-align: left;
+	vertical-align: top;
+}
