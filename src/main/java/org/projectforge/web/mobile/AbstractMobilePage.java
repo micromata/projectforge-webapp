@@ -64,6 +64,11 @@ public abstract class AbstractMobilePage extends WebPage
     stripTags = Application.get().getMarkupSettings().getStripWicketTags();
   }
 
+  public AbstractMobilePage()
+  {
+    this(new PageParameters());
+  }
+
   /**
    * Constructor that is invoked when page is invoked without a session.
    * 

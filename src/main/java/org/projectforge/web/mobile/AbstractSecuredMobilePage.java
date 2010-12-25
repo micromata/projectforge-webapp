@@ -43,6 +43,11 @@ public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
   @SpringBean(name = "accessChecker")
   protected AccessChecker accessChecker;
 
+  public AbstractSecuredMobilePage()
+  {
+    this(new PageParameters());
+  }
+
   public AbstractSecuredMobilePage(final PageParameters parameters)
   {
     super(parameters);

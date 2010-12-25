@@ -36,6 +36,8 @@ public class FieldSetLPanel extends Panel
 {
   private static final long serialVersionUID = 5436255594609615176L;
 
+  private boolean hasChildren;
+
   /**
    * The markup wicket id of the heading label.
    */
@@ -64,8 +66,14 @@ public class FieldSetLPanel extends Panel
 
   public FieldSetLPanel add(final GroupLPanel groupPanel)
   {
+    hasChildren = true;
     groupRepeater.add(groupPanel);
     return this;
+  }
+
+  public boolean hasChildren()
+  {
+    return hasChildren;
   }
 
   public String newChildId()

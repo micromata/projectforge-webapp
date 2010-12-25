@@ -50,6 +50,7 @@ import org.projectforge.address.AddressStatus;
 import org.projectforge.address.ContactStatus;
 import org.projectforge.address.FormOfAddress;
 import org.projectforge.address.PersonalAddressDO;
+import org.projectforge.common.BeanHelper;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
@@ -98,14 +99,25 @@ public class AddressRenderer extends AbstractRenderer
     add(fieldSetRepeater);
 
     final String title = StringHelper.listToString(" ", data.getTitle(), data.getFirstName(), data.getName());
-    FieldSetLPanel fieldSetPanel = createFieldSetPanel(fieldSetRepeater.newChildId(), isNew() == false ? title
-        : getString("address.heading.personalData"));
-    fieldSetRepeater.add(fieldSetPanel);
-    addPersonalData(fieldSetPanel, title);
-    addPublicKeyAndFingerprint(fieldSetPanel);
+    FieldSetLPanel fieldSetPanel;
+    if (isMobile() == true) {
+
+    } else {
+      fieldSetPanel = createFieldSetPanel(fieldSetRepeater.newChildId(), isNew() == false ? title
+          : getString("address.heading.personalData"));
+      fieldSetRepeater.add(fieldSetPanel);
+      addPersonalData(fieldSetPanel, title);
+      addPublicKeyAndFingerprint(fieldSetPanel);
+    }
 
     // *** Business Contact ***
-    fieldSetPanel = createFieldSetPanel(fieldSetRepeater.newChildId(), getString("address.heading.businessContact"));
+    final String businessContactTitle;
+    if (isMobile() == true) {
+      businessContactTitle = title;
+    } else {
+      businessContactTitle = getString("address.heading.businessContact");
+    }
+    fieldSetPanel = createFieldSetPanel(fieldSetRepeater.newChildId(), businessContactTitle);
     fieldSetRepeater.add(fieldSetPanel);
 
     addBusinessData(fieldSetPanel);
@@ -114,12 +126,17 @@ public class AddressRenderer extends AbstractRenderer
     addBusinessPhones(fieldSetPanel);
 
     // *** Private Contact ***
-    fieldSetPanel = createFieldSetPanel(fieldSetRepeater.newChildId(), getString("address.heading.privateContact"));
+    fieldSetPanel = createFieldSetPanel(fieldSetRepeater.newChildId(), getString("address.heading.privateContact")).init();
     fieldSetRepeater.add(fieldSetPanel);
     addPrivateEMail(fieldSetPanel);
 
     addPrivateAddress(fieldSetPanel);
     addPrivatePhones(fieldSetPanel);
+
+    if (isMobile() == true) {
+      addPersonalData(fieldSetPanel, title);
+      addPublicKeyAndFingerprint(fieldSetPanel);
+    }
   }
 
   /**
@@ -128,7 +145,9 @@ public class AddressRenderer extends AbstractRenderer
    */
   public void addBusinesAddress(final FieldSetLPanel fieldSetPanel)
   {
-    addAddress(fieldSetPanel, "address.heading.businessAddress", "addressText", "zipCode", "city", "country", "state");
+    if (isReadonly() == false || data.hasDefaultAddress() == true) {
+      addAddress(fieldSetPanel, "address.heading.businessAddress", "addressText", "zipCode", "city", "country", "state");
+    }
   }
 
   /**
@@ -137,8 +156,10 @@ public class AddressRenderer extends AbstractRenderer
    */
   public void addPostalAddress(final FieldSetLPanel fieldSetPanel)
   {
-    addAddress(fieldSetPanel, "address.heading.postalAddress", "postalAddressText", "postalZipCode", "postalCity", "postalCountry",
-        "postalState");
+    if (isReadonly() == false || data.hasPostalAddress() == true) {
+      addAddress(fieldSetPanel, "address.heading.postalAddress", "postalAddressText", "postalZipCode", "postalCity", "postalCountry",
+          "postalState");
+    }
   }
 
   /**
@@ -147,8 +168,10 @@ public class AddressRenderer extends AbstractRenderer
    */
   public void addPrivateAddress(final FieldSetLPanel fieldSetPanel)
   {
-    addAddress(fieldSetPanel, "address.heading.privateAddress", "privateAddressText", "privateZipCode", "privateCity", "privateCountry",
-        "privateState");
+    if (isReadonly() == false || data.hasPrivateAddress() == true) {
+      addAddress(fieldSetPanel, "address.heading.privateAddress", "privateAddressText", "privateZipCode", "privateCity", "privateCountry",
+          "privateState");
+    }
   }
 
   /**
@@ -219,10 +242,11 @@ public class AddressRenderer extends AbstractRenderer
       groupPanel.add(labelValueTablePanel);
       final ContactStatus contactStatus = data.getContactStatus();
       if (contactStatus != null) {
-        labelValueTablePanel.add(getString("address.contactStatus"), getString(contactStatus.getI18nKey()));
+        addLabelValueRow(labelValueTablePanel, getString("address.contactStatus"), getString(contactStatus.getI18nKey()));
       }
       if (data.getBirthday() != null) {
-        labelValueTablePanel.add(getString("address.birthday"), DateTimeFormatter.instance().getFormattedDate(data.getBirthday()));
+        addLabelValueRow(labelValueTablePanel, getString("address.birthday"), DateTimeFormatter.instance().getFormattedDate(
+            data.getBirthday()));
       }
     } else {
       // DropDownChoice contactStatus
@@ -268,19 +292,22 @@ public class AddressRenderer extends AbstractRenderer
   public void addPublicKeyAndFingerprint(final FieldSetLPanel fieldSetPanel)
   {
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId());
-    fieldSetPanel.add(groupPanel);
     if (isMobile() == true) {
       if (StringUtils.isNotBlank(data.getPublicKey()) == true) {
         groupPanel.add(createLabelValueHeadingPanel(groupPanel.newChildId(), getString("address.publicKey")));
         groupPanel.add(createValuePanel(groupPanel.newChildId(), StringUtils.abbreviate(data.getPublicKey(), 20)));
       }
       if (StringUtils.isNotBlank(data.getFingerprint()) == true) {
-        groupPanel.add(createLabelValueHeadingPanel(groupPanel.newChildId(), getString("address.fingerprint")));
-        groupPanel.add(createValuePanel(groupPanel.newChildId(), data.getFingerprint()));
+        final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
+        groupPanel.add(labelValueTablePanel);
+        labelValueTablePanel.add(getString("address.fingerprint"), data.getFingerprint());
       }
     } else {
       groupPanel.addMaxLengthTextArea(data, "publicKey", "address.publicKey", DOUBLE).setBreakBefore();
       groupPanel.addMaxLengthTextField(data, "fingerprint", "address.fingerprint", DOUBLE).setBreakBefore();
+    }
+    if (groupPanel.hasChildren() == true) {
+      fieldSetPanel.add(groupPanel);
     }
   }
 
@@ -292,8 +319,12 @@ public class AddressRenderer extends AbstractRenderer
   public void addBusinessData(final FieldSetLPanel fieldSetPanel)
   {
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId());
-    fieldSetPanel.add(groupPanel);
-    {
+    LabelValueTableLPanel labelValueTablePanel = null; // Only used for mobile devices.
+    if (isMobile()) {
+      labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
+      groupPanel.add(labelValueTablePanel);
+      addLabelValueRow(labelValueTablePanel, getString("organization"), data.getOrganization());
+    } else {
       final PFAutoCompleteTextField<String> organizationField = new PFAutoCompleteTextField<String>(INPUT_ID, new PropertyModel<String>(
           data, "organization")) {
         @Override
@@ -305,9 +336,18 @@ public class AddressRenderer extends AbstractRenderer
       groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("organization"), organizationField, true));
       groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), ONEHALF, organizationField).setStrong());
     }
-    groupPanel.addMaxLengthTextField(data, "division", "address.division", ONEHALF);
-    groupPanel.addMaxLengthTextField(data, "positionText", "address.positionText", ONEHALF);
-    {
+    if (isMobile() == true) {
+      addLabelValueRow(labelValueTablePanel, getString("address.division"), data.getDivision());
+      addLabelValueRow(labelValueTablePanel, getString("address.positionText"), data.getPositionText());
+      final AddressStatus addressStatus = data.getAddressStatus();
+      if (addressStatus != null) {
+        addLabelValueRow(labelValueTablePanel, getString("address.addressStatus"), getString(addressStatus.getI18nKey()));
+      }
+      addLabelValueRow(labelValueTablePanel, getString("email"), data.getEmail());
+      addLabelValueRow(labelValueTablePanel, getString("address.website"), data.getWebsite());
+    } else {
+      groupPanel.addMaxLengthTextField(data, "division", "address.division", ONEHALF);
+      groupPanel.addMaxLengthTextField(data, "positionText", "address.positionText", ONEHALF);
       // DropDownChoice addressStatus
       final LabelValueChoiceRenderer<AddressStatus> addressStatusChoiceRenderer = new LabelValueChoiceRenderer<AddressStatus>(container,
           AddressStatus.values());
@@ -316,9 +356,13 @@ public class AddressRenderer extends AbstractRenderer
       addressStatusChoice.setNullValid(false).setRequired(true);
       groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.addressStatus"), addressStatusChoice, true));
       groupPanel.add(createDropDownChoicePanel(groupPanel.newChildId(), THREEQUART, addressStatusChoice));
+
+      groupPanel.addMaxLengthTextField(data, "email", "email", ONEHALF).setStrong();
+      groupPanel.addMaxLengthTextField(data, "website", "address.website", ONEHALF);
     }
-    groupPanel.addMaxLengthTextField(data, "email", "email", ONEHALF).setStrong();
-    groupPanel.addMaxLengthTextField(data, "website", "address.website", ONEHALF);
+    if (groupPanel.hasChildren() == true) {
+      fieldSetPanel.add(groupPanel);
+    }
   }
 
   /**
@@ -335,9 +379,27 @@ public class AddressRenderer extends AbstractRenderer
   protected void addAddress(final FieldSetLPanel fieldSetPanel, final String heading, final String addressTextProperty,
       final String zipCodeProperty, final String cityProperty, final String countryProperty, final String stateProperty)
   {
+    final String addressText, zipCode, city, country, state;
+    if (isReadonly() == true) {
+      addressText = (String) BeanHelper.getProperty(data, addressTextProperty);
+      zipCode = (String) BeanHelper.getProperty(data, zipCodeProperty);
+      city = (String) BeanHelper.getProperty(data, cityProperty);
+      country = (String) BeanHelper.getProperty(data, countryProperty);
+      state = (String) BeanHelper.getProperty(data, stateProperty);
+    } else {
+      addressText = zipCode = city = country = state = null;
+    }
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId()).setHeading(getString(heading));
     fieldSetPanel.add(groupPanel);
-    {
+    LabelValueTableLPanel labelValueTablePanel = null; // Only used for mobile pages.
+    if (isMobile() == true) {
+      labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
+      groupPanel.add(labelValueTablePanel);
+      addLabelValueRow(labelValueTablePanel, getString("address.addressText"), addressText);
+      addLabelValueRow(labelValueTablePanel, getString("address.city"), zipCode + " " + city);
+      addLabelValueRow(labelValueTablePanel, getString("address.country"), country);
+      addLabelValueRow(labelValueTablePanel, getString("address.state"), state);
+    } else {
       @SuppressWarnings("serial")
       final PFAutoCompleteTextField<String> addressTextField = new PFAutoCompleteTextField<String>(INPUT_ID, new PropertyModel<String>(
           data, addressTextProperty)) {
@@ -349,18 +411,18 @@ public class AddressRenderer extends AbstractRenderer
       }.withMatchContains(true).withMinChars(2);
       groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.addressText"), addressTextField, true));
       groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), ONEHALF, addressTextField));
-    }
-    final TextFieldLPanel zipCodeFieldPanel = createTextFieldPanel(groupPanel.newChildId(), QUART, data, zipCodeProperty);
-    groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.zipCode") + "/" + getString("address.city"),
-        zipCodeFieldPanel, true));
-    groupPanel.add(zipCodeFieldPanel);
-    groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), FULL, data, cityProperty));
+      final TextFieldLPanel zipCodeFieldPanel = createTextFieldPanel(groupPanel.newChildId(), QUART, data, zipCodeProperty);
+      groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.zipCode") + "/" + getString("address.city"),
+          zipCodeFieldPanel, true));
+      groupPanel.add(zipCodeFieldPanel);
+      groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), FULL, data, cityProperty));
 
-    final TextFieldLPanel countryTextFieldPanel = createTextFieldPanel(groupPanel.newChildId(), THREEQUART, data, countryProperty);
-    groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.country") + "/" + getString("address.state"),
-        countryTextFieldPanel, true));
-    groupPanel.add(countryTextFieldPanel);
-    groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), THREEQUART, data, stateProperty));
+      final TextFieldLPanel countryTextFieldPanel = createTextFieldPanel(groupPanel.newChildId(), THREEQUART, data, countryProperty);
+      groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.country") + "/" + getString("address.state"),
+          countryTextFieldPanel, true));
+      groupPanel.add(countryTextFieldPanel);
+      groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), THREEQUART, data, stateProperty));
+    }
   }
 
   private TextField<String> addPhoneNumber(final GroupLPanel groupPanel, final String property, final String labelKey,

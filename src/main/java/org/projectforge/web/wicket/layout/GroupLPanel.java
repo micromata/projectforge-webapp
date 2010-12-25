@@ -46,6 +46,8 @@ public class GroupLPanel extends Panel
   private Label headingLabel;
 
   private RepeatingView entriesRepeater;
+  
+  private boolean hasChildren;
 
   GroupLPanel(final String id)
   {
@@ -80,8 +82,14 @@ public class GroupLPanel extends Panel
 
   public GroupLPanel add(final AbstractLPanel layoutPanel)
   {
+    hasChildren = true;
     entriesRepeater.add(layoutPanel);
     return this;
+  }
+  
+  public boolean hasChildren()
+  {
+    return hasChildren;
   }
 
   public String newChildId()

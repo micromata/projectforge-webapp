@@ -25,6 +25,7 @@ package org.projectforge.web.wicket.layout;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -108,6 +109,17 @@ public abstract class AbstractRenderer implements Serializable
   public LabelLPanel createValuePanel(final String id, final String value)
   {
     return new ValueLPanel(id, value);
+  }
+
+  /**
+   * Adds a new row to the given label-value-table only if value isn't blank. If the given value is blank nothing will be done.
+   * @param labelValueTablePanel
+   */
+  public void addLabelValueRow(final LabelValueTableLPanel labelValueTablePanel, final String label, final String value)
+  {
+    if (StringUtils.isNotBlank(value) == true) {
+      labelValueTablePanel.add(label, value);
+    }
   }
 
   public DropDownChoiceLPanel createDropDownChoicePanel(final String id, final LayoutLength length, final DropDownChoice< ? > dropDownChoice)
