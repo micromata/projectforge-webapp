@@ -51,6 +51,16 @@ public enum FormOfAddress implements I18nEnum
     throw new UnsupportedOperationException("Unknown Anrede" + ": '" + s + "'");
   }
 
+  public boolean isIn(final FormOfAddress... forms)
+  {
+    for (FormOfAddress form : forms) {
+      if (this == form) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * @return The full i18n key including the i18n prefix "fibu.auftrag.status.".
    */
