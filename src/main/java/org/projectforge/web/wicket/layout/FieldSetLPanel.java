@@ -54,7 +54,7 @@ public class FieldSetLPanel extends Panel
   }
 
   /**
-   * @see AbstractRenderer#createFieldSetLPanel(String, String)
+   * @see AbstractRenderer#createFieldSetPanel(String, String)
    */
   FieldSetLPanel(final String id, final String heading)
   {

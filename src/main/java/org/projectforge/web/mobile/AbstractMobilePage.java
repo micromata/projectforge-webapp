@@ -74,6 +74,7 @@ public abstract class AbstractMobilePage extends WebPage
   {
     super(parameters);
     add(CSSPackageResource.getHeaderContribution("mobile/css/style.css"));
+    add(CSSPackageResource.getHeaderContribution("mobile/css/projectforge.css"));
     add(JavascriptPackageResource.getHeaderContribution("mobile/javascript/functions.js"));
     add(WicketUtils.headerContributorForFavicon(getUrl("/favicon.ico")));
     add(leftNavigationContainer = new WebMarkupContainer("leftNavigation"));

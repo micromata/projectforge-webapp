@@ -46,7 +46,7 @@ public class TextFieldLPanel extends AbstractLPanel
   private TextField< ? > textField;
 
   /**
-   * @see AbstractRenderer#createTextFieldLPanel(String, LayoutLength, Object, String)
+   * @see AbstractRenderer#createTextFieldPanel(String, LayoutLength, Object, String)
    */
   TextFieldLPanel(final String id, final LayoutLength length, final Object dataObject, final String property)
   {
@@ -54,7 +54,7 @@ public class TextFieldLPanel extends AbstractLPanel
   }
 
   /**
-   * @see AbstractRenderer#createTextFieldLPanel(String, LayoutLength, TextField)
+   * @see AbstractRenderer#createTextFieldPanel(String, LayoutLength, TextField)
    */
   TextFieldLPanel(final String id, final LayoutLength length, final TextField< ? > textField)
   {

@@ -52,7 +52,7 @@ public abstract class AbstractRenderer implements Serializable
    * @param id
    * @param heading
    */
-  public FieldSetLPanel createFieldSetLPanel(final String id, final String heading)
+  public FieldSetLPanel createFieldSetPanel(final String id, final String heading)
   {
     if (layoutContext.isMobile() == true) {
       return new FieldSetMobileLPanel(id, heading);
@@ -61,12 +61,12 @@ public abstract class AbstractRenderer implements Serializable
     }
   }
 
-  public GroupLPanel createGroupLPanel(final String id)
+  public GroupLPanel createGroupPanel(final String id)
   {
-    return createGroupLPanel(id, null);
+    return createGroupPanel(id, null);
   }
 
-  public GroupLPanel createGroupLPanel(final String id, final String heading)
+  public GroupLPanel createGroupPanel(final String id, final String heading)
   {
     if (layoutContext.isMobile() == true) {
       return new GroupMobileLPanel(id, heading);
@@ -75,64 +75,69 @@ public abstract class AbstractRenderer implements Serializable
     }
   }
 
-  public LabelLPanel createLabelLPanel(final String id, final LayoutLength length, final String label)
+  public LabelLPanel createLabelPanel(final String id, final LayoutLength length, final String label)
   {
     return new LabelLPanel(id, length, label);
   }
 
-  public LabelLPanel createLabelLPanel(final String id, final LayoutLength length, final String label, final boolean breakBefore)
+  public LabelLPanel createLabelPanel(final String id, final LayoutLength length, final String label, final boolean breakBefore)
   {
     return new LabelLPanel(id, length, label, breakBefore);
   }
 
-  public LabelLPanel createLabelLPanel(final String id, final LayoutLength length, final String label, final Component labelFor,
+  public LabelLPanel createLabelPanel(final String id, final LayoutLength length, final String label, final Component labelFor,
       final boolean breakBefore)
   {
     return new LabelLPanel(id, length, label, labelFor, breakBefore);
   }
 
-  public DropDownChoiceLPanel createDropDownChoiceLPanel(final String id, final LayoutLength length,
+  public LabelValueTableLPanel createLabelValueTablePanel(final String id)
+  {
+    return new LabelValueTableLPanel(id);
+  }
+
+  public DropDownChoiceLPanel createDropDownChoicePanel(final String id, final LayoutLength length,
       final DropDownChoice< ? > dropDownChoice)
   {
     return new DropDownChoiceLPanel(id, length, dropDownChoice);
   }
 
-  public CheckBoxLPanel createCheckBoxLPanel(final String id, final CheckBox checkBox)
+  public CheckBoxLPanel createCheckBoxPanel(final String id, final CheckBox checkBox)
   {
     return new CheckBoxLPanel(id, checkBox);
   }
 
-  public CheckBoxLPanel createCheckBoxLPanel(final String id, final Object dataObject, final String property)
+  public CheckBoxLPanel createCheckBoxPanel(final String id, final Object dataObject, final String property)
   {
     return new CheckBoxLPanel(id, dataObject, property);
   }
 
-  public DateFieldLPanel createDateFieldLPanel(final String id, final LayoutLength length, final DatePanel datePanel)
+  public DateFieldLPanel createDateFieldPanel(final String id, final LayoutLength length, final DatePanel datePanel)
   {
     return new DateFieldLPanel(id, length, datePanel);
   }
 
-  public ImageLPanel createImageLPanel(final String id, final ImageDef imageDef, final String tooltip)
+  public ImageLPanel createImagePanel(final String id, final ImageDef imageDef, final String tooltip)
   {
     return new ImageLPanel(id, imageDef, tooltip);
   }
 
-  public RepeaterLabelLPanel createRepeaterLabelLPanel(final String id, final LayoutLength length)
+  public RepeaterLabelLPanel createRepeaterLabelPanel(final String id, final LayoutLength length)
   {
     return new RepeaterLabelLPanel(id, length);
   }
 
-  public RepeaterLabelLPanel createRepeaterLabelLPanel(final String id)
+  public RepeaterLabelLPanel createRepeaterLabelPanel(final String id)
   {
     return new RepeaterLabelLPanel(id);
   }
 
-  public TextFieldLPanel createTextFieldLPanel(final String id, final LayoutLength length, final Object dataObject, final String property)
+  public TextFieldLPanel createTextFieldPanel(final String id, final LayoutLength length, final Object dataObject, final String property)
   {
     return new TextFieldLPanel(id, length, dataObject, property);
   }
 
-  public TextFieldLPanel createTextFieldLPanel(final String id, final LayoutLength length, final TextField<?> textField)
+  public TextFieldLPanel createTextFieldPanel(final String id, final LayoutLength length, final TextField<?> textField)
   {
     return new TextFieldLPanel(id, length, textField);
   }

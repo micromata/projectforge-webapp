@@ -44,7 +44,7 @@ public class CheckBoxLPanel extends AbstractLPanel
   private CheckBox checkBox;
 
   /**
-   * @see AbstractRenderer#createCheckBoxLPanel(String, Object, String)
+   * @see AbstractRenderer#createCheckBoxPanel(String, Object, String)
    */
   CheckBoxLPanel(final String id, final Object dataObject, final String property)
   {
@@ -52,7 +52,7 @@ public class CheckBoxLPanel extends AbstractLPanel
   }
 
   /**
-   * @see AbstractRenderer#createCheckBoxLPanel(String, CheckBox)
+   * @see AbstractRenderer#createCheckBoxPanel(String, CheckBox)
    */
   CheckBoxLPanel(final String id, final CheckBox checkBox)
   {

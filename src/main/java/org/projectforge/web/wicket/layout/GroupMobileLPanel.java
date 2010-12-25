@@ -33,7 +33,7 @@ public class GroupMobileLPanel extends GroupLPanel
   private static final long serialVersionUID = -280050296848404710L;
 
   /**
-   * @see AbstractRenderer#createGroupLPanel(String)
+   * @see AbstractRenderer#createGroupPanel(String)
    */
   GroupMobileLPanel(final String id)
   {
@@ -41,7 +41,7 @@ public class GroupMobileLPanel extends GroupLPanel
   }
 
   /**
-   * @see AbstractRenderer#createGroupLPanel(String, String)
+   * @see AbstractRenderer#createGroupPanel(String, String)
    */
   GroupMobileLPanel(final String id, final String heading)
   {

@@ -44,7 +44,7 @@ public class LabelMobileLPanel extends AbstractLPanel
   private Label label;
 
   /**
-   * @see AbstractRenderer#createLabelLPanel(String, LayoutLength, String)
+   * @see AbstractRenderer#createLabelPanel(String, LayoutLength, String)
    */
   LabelMobileLPanel(final String id, final LayoutLength length, final String label)
   {
@@ -52,7 +52,7 @@ public class LabelMobileLPanel extends AbstractLPanel
   }
 
   /**
-   * @see AbstractRenderer#createLabelLPanel(String, LayoutLength, String, boolean)
+   * @see AbstractRenderer#createLabelPanel(String, LayoutLength, String, boolean)
    */
   LabelMobileLPanel(final String id, final LayoutLength length, final String label, final boolean breakBefore)
   {
@@ -68,7 +68,7 @@ public class LabelMobileLPanel extends AbstractLPanel
   }
 
   /**
-   * @see AbstractRenderer#createLabelLPanel(String, LayoutLength, String, Component, boolean)
+   * @see AbstractRenderer#createLabelPanel(String, LayoutLength, String, Component, boolean)
    */
   LabelMobileLPanel(final String id, final LayoutLength length, final String label, final Component labelFor, final boolean breakBefore)
   {
