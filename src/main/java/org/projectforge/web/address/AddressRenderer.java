@@ -88,15 +88,102 @@ public class AddressRenderer extends AbstractRenderer
     this.personalAddress = personalAddress;
   }
 
-  @SuppressWarnings( { "serial", "unchecked"})
   @Override
   public void add()
   {
     final RepeatingView fieldSetRepeater = new RepeatingView("fieldSetRepeater");
     add(fieldSetRepeater);
+
     final String title = StringHelper.listToString(" ", data.getTitle(), data.getFirstName(), data.getName());
-    FieldSetLPanel fieldSetPanel = createFieldSetLPanel(fieldSetRepeater.newChildId(), isMobile() && isReadonly() ? title : getString("address.heading.personalData"));
+    FieldSetLPanel fieldSetPanel = createFieldSetLPanel(fieldSetRepeater.newChildId(), isMobile() && isReadonly() ? title
+        : getString("address.heading.personalData"));
     fieldSetRepeater.add(fieldSetPanel);
+    addPersonalData(fieldSetPanel, title);
+    addPublicKeyAndFingerprint(fieldSetPanel);
+
+    // *** Business Contact ***
+    fieldSetPanel = createFieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.businessContact"));
+    fieldSetRepeater.add(fieldSetPanel);
+
+    addBusinessData(fieldSetPanel);
+    addBusinesAddress(fieldSetPanel);
+    addPostalAddress(fieldSetPanel);
+    addBusinessPhones(fieldSetPanel);
+
+    // *** Private Contact ***
+    fieldSetPanel = createFieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.privateContact"));
+    fieldSetRepeater.add(fieldSetPanel);
+    addPrivateEMail(fieldSetPanel);
+
+    addPrivateAddress(fieldSetPanel);
+    addPrivatePhones(fieldSetPanel);
+  }
+
+  /**
+   * Adds the fields of business address: address, zip, city, country, state.
+   * @param fieldSetPanel
+   */
+  public void addBusinesAddress(final FieldSetLPanel fieldSetPanel)
+  {
+    addAddress(fieldSetPanel, "address.heading.businessAddress", "addressText", "zipCode", "city", "country", "state");
+  }
+
+  /**
+   * Adds the fields of postal address: address, zip, city, country, state.
+   * @param fieldSetPanel
+   */
+  public void addPostalAddress(final FieldSetLPanel fieldSetPanel)
+  {
+    addAddress(fieldSetPanel, "address.heading.postalAddress", "postalAddressText", "postalZipCode", "postalCity", "postalCountry",
+        "postalState");
+  }
+
+  /**
+   * Adds the fields of private address: address, zip, city, country, state.
+   * @param fieldSetPanel
+   */
+  public void addPrivateAddress(final FieldSetLPanel fieldSetPanel)
+  {
+    addAddress(fieldSetPanel, "address.heading.privateAddress", "privateAddressText", "privateZipCode", "privateCity", "privateCountry",
+        "privateState");
+  }
+
+  /**
+   * Adds the fields of business phones: business, fax, mobile.
+   * @param fieldSetPanel
+   */
+  public void addBusinessPhones(final FieldSetLPanel fieldSetPanel)
+  {
+    final String phoneListTooltip = getString("address.tooltip.phonelist");
+    final GroupLPanel groupPanel = createGroupLPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
+    fieldSetPanel.add(groupPanel);
+    businessPhoneField = addPhoneNumber(groupPanel, "businessPhone", "address.phone", "favoriteBusinessPhone", phoneListTooltip);
+    faxField = addPhoneNumber(groupPanel, "fax", "address.phoneType.fax", "favoriteFax", phoneListTooltip);
+    mobilePhoneField = addPhoneNumber(groupPanel, "mobilePhone", "address.phoneType.mobile", "favoriteMobilePhone", phoneListTooltip);
+  }
+
+  /**
+   * Adds the fields of private phones: phone, mobile.
+   * @param fieldSetPanel
+   */
+  public void addPrivatePhones(final FieldSetLPanel fieldSetPanel)
+  {
+    final String phoneListTooltip = getString("address.tooltip.phonelist");
+    final GroupLPanel groupPanel = createGroupLPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
+    fieldSetPanel.add(groupPanel);
+    privatePhoneField = addPhoneNumber(groupPanel, "privatePhone", "address.phone", "favoritePrivatePhone", phoneListTooltip);
+    privateMobilePhoneField = addPhoneNumber(groupPanel, "privateMobilePhone", "address.phoneType.mobile", "favoritePrivateMobilePhone",
+        phoneListTooltip);
+  }
+
+  /**
+   * Adds the fields form, name, first name, contact status, birthday, comment
+   * @param fieldSetPanel
+   * @param title
+   */
+  @SuppressWarnings( { "unchecked", "serial"})
+  public void addPersonalData(final FieldSetLPanel fieldSetPanel, final String title)
+  {
     GroupLPanel groupPanel = createGroupLPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
 
@@ -156,13 +243,28 @@ public class AddressRenderer extends AbstractRenderer
     if (layoutContext.isNew() == false) {
       commentTextAreaPanel.setFocus();
     }
+  }
+
+  /**
+   * Adds the fields: publicKey, fingerPrint
+   * @param fieldSetPanel
+   */
+  public void addPublicKeyAndFingerprint(final FieldSetLPanel fieldSetPanel)
+  {
+    final GroupLPanel groupPanel = createGroupLPanel(fieldSetPanel.newChildId());
+    fieldSetPanel.add(groupPanel);
     groupPanel.addMaxLengthTextArea(data, "publicKey", "address.publicKey", DOUBLE).setBreakBefore();
     groupPanel.addMaxLengthTextField(data, "fingerprint", "address.fingerprint", DOUBLE).setBreakBefore();
+  }
 
-    // *** Business Contact ***
-    fieldSetPanel = createFieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.businessContact"));
-    fieldSetRepeater.add(fieldSetPanel);
-    groupPanel = createGroupLPanel(fieldSetPanel.newChildId());
+  /**
+   * Adds the fields: organization, division, position, address status, e-mail and web-site.
+   * @param fieldSetPanel
+   */
+  @SuppressWarnings( { "serial", "unchecked"})
+  public void addBusinessData(final FieldSetLPanel fieldSetPanel)
+  {
+    final GroupLPanel groupPanel = createGroupLPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
     {
       final PFAutoCompleteTextField<String> organizationField = new PFAutoCompleteTextField<String>(INPUT_ID, new PropertyModel<String>(
@@ -190,37 +292,17 @@ public class AddressRenderer extends AbstractRenderer
     }
     groupPanel.addMaxLengthTextField(data, "email", "email", ONEHALF).setStrong();
     groupPanel.addMaxLengthTextField(data, "website", "address.website", ONEHALF);
+  }
 
-    // *** Business Contact: Business address, postal address
-    addAddress(fieldSetPanel, "address.heading.businessAddress", "addressText", "zipCode", "city", "country", "state");
-    addAddress(fieldSetPanel, "address.heading.postalAddress", "postalAddressText", "postalZipCode", "postalCity", "postalCountry",
-        "postalState");
-
-    // *** Business Contact: Phone
-    groupPanel = createGroupLPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
-    fieldSetPanel.add(groupPanel);
-    final String phoneListTooltip = getString("address.tooltip.phonelist");
-    businessPhoneField = addPhoneNumber(groupPanel, "businessPhone", "address.phone", "favoriteBusinessPhone", phoneListTooltip);
-    faxField = addPhoneNumber(groupPanel, "fax", "address.phoneType.fax", "favoriteFax", phoneListTooltip);
-    mobilePhoneField = addPhoneNumber(groupPanel, "mobilePhone", "address.phoneType.mobile", "favoriteMobilePhone", phoneListTooltip);
-
-    // *** Private Contact ***
-    fieldSetPanel = createFieldSetLPanel(fieldSetRepeater.newChildId(), getString("address.heading.privateContact"));
-    fieldSetRepeater.add(fieldSetPanel);
-    groupPanel = createGroupLPanel(fieldSetPanel.newChildId());
+  /**
+   * Adds the fields: private e-mail.
+   * @param fieldSetPanel
+   */
+  public void addPrivateEMail(final FieldSetLPanel fieldSetPanel)
+  {
+    final GroupLPanel groupPanel = createGroupLPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
     groupPanel.addMaxLengthTextField(data, "privateEmail", "email", ONEHALF).setStrong();
-
-    // *** Private Contact: address
-    addAddress(fieldSetPanel, "address.heading.privateAddress", "privateAddressText", "privateZipCode", "privateCity", "privateCountry",
-        "privateState");
-
-    // *** Private Contact: Phone
-    groupPanel = createGroupLPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
-    fieldSetPanel.add(groupPanel);
-    privatePhoneField = addPhoneNumber(groupPanel, "privatePhone", "address.phone", "favoritePrivatePhone", phoneListTooltip);
-    privateMobilePhoneField = addPhoneNumber(groupPanel, "privateMobilePhone", "address.phoneType.mobile", "favoritePrivateMobilePhone",
-        phoneListTooltip);
   }
 
   protected void addAddress(final FieldSetLPanel fieldSetPanel, final String heading, final String addressTextProperty,
