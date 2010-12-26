@@ -2,9 +2,9 @@
 /* = reset browser defaults,greetings to eric meyer | don't touch this,edit after this section = */
 /* ===================================================================================================================== */
 
-* {
-		-webkit-touch-callout: none;
-}
+/** {*/
+/*		-webkit-touch-callout: none;*/
+/*}*/
 
 html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td
 	{
@@ -145,9 +145,9 @@ You are allowed to embed the fonts via css and expose them to the internet,until
 }
 
 .rounded {
-	-moz-border-radius: 0.2em;
-	-webkit-border-radius: 0.2em;
-	border-radius: 0.2em;
+	-moz-border-radius: 0.3em;
+	-webkit-border-radius: 0.3em;
+	border-radius: 0.3em;
 }
 
 
@@ -244,7 +244,9 @@ body * {
 
 .headermeta {
 	height:2em;
-	background:#5C6970;
+	background:#8994A0;
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0.0, #8994A0), color-stop(0.6, #5C6970) );
+	background: -moz-linear-gradient(top, #8994A0, #5C6970 60%);
 	overflow:hidden;
 }
 
@@ -262,7 +264,7 @@ body * {
 
 .headermeta ul.info {
 	position: relative;
-	top: -1.5em;
+	top: .4em;
 	left: 0;
 	width:100%;
 }
@@ -496,10 +498,19 @@ ul#normal li.active ul {
 /* The actions for the main content panel */
 
 #contentMenu {
-	background:aqua;
 	padding: 1em;
-	vertical-align: baseline;
 }
+
+#contentMenu .toolbarbutton{
+	font-weight:bold;
+	text-decoration:none;
+	display:block;
+	float:left;
+	margin:0 1em 0 0;
+	padding:1em;
+}
+
+
 
 
 #content {
@@ -513,6 +524,7 @@ ul#normal li.active ul {
 	border-top: 1px solid #5C6970;
 	text-align:center;
 	color:#5C6970;
+	display:none;
 }
 
 .loginpage #footer {
@@ -630,13 +642,13 @@ ul#normal li.active ul {
 .feedbackPanel {
 	color:#E11D1C;
 	background: #FBEDED;
-	height:2em;
+	min-height:2em;
 	padding: 0.5em 0.3em 0.3em 1em;
-	margin: 0 0 1em 0;
-	-moz-border-radius: 1.3em;
-	-webkit-border-radius: 1.3em;
-	border-radius: 1.3em;
+	margin: 0;
+
 }
+
+
 
 li.feedbackPanelERROR{
 	margin: 0.3em 0.5em 0.5em  3em;
@@ -781,18 +793,49 @@ fieldset.buttons p {
 /* = formbuilder krams = */
 /* ==================== */
 
-form.newform input.error {
-	color: #E20B2C;
+span.invisibleerrormarker {
+	position:relative;
+	display:block;
+	float:left;
 }
 
-form.newform label.error {
+
+span.invisibleerrormarker div.validationMsg {
+	background:none repeat scroll 0 0 #FFFFFF;
+	border:1px solid #E11D1C;
+	color:#E11D1C;
+	display:block;
+	left:100%;
+	line-height:1.4em;
+	padding: 0 1em 0 0;
+	position:absolute;
+	z-index:8888;
+	top:0.5em;
+	white-space:nowrap;
+	width:auto;
+	color:#E11D1C;
+}
+
+
+span.invisibleerrormarker div.validationMsg:before {
+	content: "t";
+	font-family:Embats;
+	font-size-adjust: 0.7;
+		
+}
+form.newform input.error,
+span.invisibleerrormarker input{
+	color: #E20B2C;
+}
+/* TODO:kai label sollte vielleicht im invisibleerrormarker eingeschlossen werden?  */
+form.newform label.error,
+form.newform span.invisibleerrormarker label {
 	color: #E20B2C;
 	border:none;
 }
 
 form.newform .datepanel,
 form.newform .userselect{
-		
 	display:block;
 	float:left;
 	position:relative;
@@ -922,6 +965,16 @@ select {
 	border-radius:0.2em;
 	zoom:1;
 	color:#555;
+}
+
+
+.newform span.invisibleerrormarker input[type="text"],
+.newform span.invisibleerrormarker input[type="password"],
+.newform span.invisibleerrormarker textarea, 
+.newform span.invisibleerrormarker select, 
+.newform span.invisibleerrormarker .file {
+	
+	border-color: #E11D1C;
 }
 
 .newform input[type="checkbox"],

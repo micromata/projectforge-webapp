@@ -160,10 +160,10 @@ overflow: hidden;
 #content table.calendar tr td span.holiday,
 #content table.calendar tr td span.calendartimesheet,
 #content table.calendar tr td span.birthday {
-	white-space: nowrap;
+/*white-space: nowrap;
 /*	font-size: 0.8em;*/
 	padding: 0.1em 0.5em;
-	margin: 0.2em;
+	margin: 0 0.1em 0.1em 0.1em;
 	-moz-border-radius: 0.7em;
 	-webkit-border-radius: 0.7em;
 	border-radius: 0.7em;
@@ -175,66 +175,123 @@ overflow: hidden;
 	background: #BBC1C3;
 	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#E8E8E8),color-stop(1,#BBC1C3));
 	background: -moz-linear-gradient(top,#E8E8E8,#BBC1C3);
-	color: #5C6970;
-	border: 1px solid #D9DFE1;
+	color: #7E8283;
+	border: 1px solid #7E8283;
 }
 
-#content table.calendar tr td span.holiday{
+#content table.calendar tr td span.holiday,
+#content table.calendar tr td span.birthday{
 	background: #E8E5D5;
 	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#E8E5D5),color-stop(1,#CCC1A1));
 	background: -moz-linear-gradient(top,#E8E5D5,#CCC1A1);
-	color: #AE9962;
+	color: #6E613E;
 	border: 1px solid #AE9962;
+	position:relative;
 }
 
-#content table.calendar tr td span.birthday{
-	background: #E8E5D5;
-	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#C71E38),color-stop(1,#951C1E));
-	background: -moz-linear-gradient(top,#C71E38,#951C1E);
-	color: #660E11;
-	border: 1px solid #660E11; /*TODO: Find more humane colour */
+#content table.calendar tr td span.employee{
+	font-weight:normal;
+	background: #AAF7FA;
+	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#AAF7FA),color-stop(1,#7FB9BB));
+	background: -moz-linear-gradient(center top , #AAF7FA, #7FB9BB);
+	color: #4B6D6E;
+	border: 1px solid #659394;
+	padding-left:2.5em;
 }
 
-#content table.calendar tr td span.birthday:before{
+#content table.calendar tr td span.favourite{
+	font-weight:normal;
+	background: #F758FA;
+	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#F758FA),color-stop(1,#B942BB));
+	background: -moz-linear-gradient(center top , #F758FA, #B942BB);
+	color: #6D276E;
+	border: 1px solid #933494;
+	padding-left:2.5em;
+}
+
+
+#content table.calendar tr td span.employee:before ,
+#content table.calendar tr td span.favourite:before{
 	content: "3 ";	
 	font-family: EmbatsSymbols;
-
+	position: absolute;
+	left: 0.5em;
+	font-size-adjust: 1;
+	overflow:hidden;
 }
+
+
+
 
 #content table.calendar tr td span.calendartimesheet a,
 #content table.calendar tr td span.holiday a{
 	text-decoration: none;
+	font-weight: normal;
+	position: relative;
 }
 
 
 #content table.calendar tr td p span.calendartimesheet a.time,
 #content table.calendar tr td p span.calendartimesheet a.entry {
 	color: #2274AC;
+	font-weight: normal;
+	position: relative;
+	
+}
+
+#content table.calendar tr td p span.calendartimesheet a.entry {
+ padding-right:1.25em;
 }
 
 #content table.calendar tr td p span.calendartimesheet a.entry:after {
 	content: "4";
 	font-family:EmbatsSymbols; 
+	position: absolute;
+	right: 0em;
+	top: -0.2em;
+	font-size-adjust: 1;
+	overflow: hidden;
 }
-#content table.calendar tr td p span.calendartimesheet a.time.start {color: #00B1EB; }
-#content table.calendar tr td p span.calendartimesheet a.time.stop {color: #00B1EB; }
+#content table.calendar tr td p span.calendartimesheet a.time.start {color: #00B1EB; padding-left:1em;}
+#content table.calendar tr td p span.calendartimesheet a.time.stop {color: #00B1EB;  padding-right:1em;}
+#content table.calendar tr td p span.calendartimesheet a.time.break {padding-left:1em; padding-right:1em;}
 
 
 #content table.calendar tr td p span.calendartimesheet a.time.start:before {
 	content: "t";
-	font-family:Embats; 
+	font-family: Embats; 
+		position: absolute;
+	left: 0em;
+	top: -0.4em;
+	font-size-adjust: 1;
+	overflow:hidden;
 }
 #content table.calendar tr td p span.calendartimesheet a.time.stop:after{
 	content: "q";
-	font-family:Embats; 
+	font-family: Embats; 
+	position: absolute;
+	right: 0em;
+	top: -0.4em;
+	font-size-adjust: 1;
+	overflow: hidden;
 }
 #content table.calendar tr td p span.calendartimesheet a.time.break:before {
 	content: "q";
-	font-family:Embats; 
+	font-family: Embats;
+	position: absolute;
+	left: -0.2em;
+	top: -0.4em;
+	font-size-adjust: 1;
+	overflow: hidden;
 }
 #content table.calendar tr td p span.calendartimesheet a.time.break:after{
 	content: "t";
-	font-family:Embats; 
+	font-family: Embats;
+	position: absolute;
+	right: -0.2em;
+	top: -0.4em;
+	font-size-adjust: 1;
+	overflow: hidden;
 }
 
 
@@ -265,6 +322,10 @@ background-color: #ffffff;
 #content table.calendar tr td.today {
 background-color: #D6EAF5;
 }
+#content table.calendar tr td.today:hover {
+background-color: #C0D2DB;
+}
+
 #content table.calendar td.non-working-day {
 background-color: #EFF8BF;
 font-weight: bold;
