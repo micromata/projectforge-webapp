@@ -125,7 +125,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
       }
     }
     form = newEditForm(this, data);
-    
+
     body.add(form);
     form.init();
     if (form.isNew() == true) {
@@ -542,10 +542,20 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
   @Override
   protected String getTitle()
   {
-    if (isNew() == true) {
-      return getString(i18nPrefix + ".title.add");
+    return getString(getTitleKey(i18nPrefix, isNew()));
+  }
+
+  /**
+   * @param i18nPrefix
+   * @param isNew
+   * @return i18nPrefix + ".title.add" if isNew is true or i18nPrefix + ".title.edit" otherwise.
+   */
+  public static String getTitleKey(final String i18nPrefix, final boolean isNew)
+  {
+    if (isNew == true) {
+      return i18nPrefix + ".title.add";
     } else {
-      return getString(i18nPrefix + ".title.edit");
+      return i18nPrefix + ".title.edit";
     }
   }
 
