@@ -54,7 +54,8 @@ import org.projectforge.common.BeanHelper;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
-import org.projectforge.web.mobile.PhonePanel;
+import org.projectforge.web.mobile.ActionLinkPanel;
+import org.projectforge.web.mobile.ActionLinkType;
 import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
@@ -187,9 +188,9 @@ public class AddressRenderer extends AbstractRenderer
     if (isMobile() == true) {
       final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
       groupPanel.add(labelValueTablePanel);
-      addPhoneNumber(labelValueTablePanel, "address.phone", data.getBusinessPhone());
-      addPhoneNumber(labelValueTablePanel, "address.phoneType.fax", data.getFax());
-      addPhoneNumber(labelValueTablePanel, "address.phoneType.mobile", data.getMobilePhone());
+      addPhoneNumber(labelValueTablePanel, "address.phone", data.getBusinessPhone(), false);
+      addPhoneNumber(labelValueTablePanel, "address.phoneType.fax", data.getFax(), false);
+      addPhoneNumber(labelValueTablePanel, "address.phoneType.mobile", data.getMobilePhone(), true);
     } else {
       businessPhoneField = addPhoneNumber(groupPanel, "businessPhone", "address.phone", "favoriteBusinessPhone", phoneListTooltip);
       faxField = addPhoneNumber(groupPanel, "fax", "address.phoneType.fax", "favoriteFax", phoneListTooltip);
@@ -206,9 +207,16 @@ public class AddressRenderer extends AbstractRenderer
     final String phoneListTooltip = getString("address.tooltip.phonelist");
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
     fieldSetPanel.add(groupPanel);
-    privatePhoneField = addPhoneNumber(groupPanel, "privatePhone", "address.phone", "favoritePrivatePhone", phoneListTooltip);
-    privateMobilePhoneField = addPhoneNumber(groupPanel, "privateMobilePhone", "address.phoneType.mobile", "favoritePrivateMobilePhone",
-        phoneListTooltip);
+    if (isMobile() == true) {
+      final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
+      groupPanel.add(labelValueTablePanel);
+      addPhoneNumber(labelValueTablePanel, "address.phone", data.getPrivatePhone(), false);
+      addPhoneNumber(labelValueTablePanel, "address.phoneType.mobile", data.getPrivateMobilePhone(), true);
+    } else {
+      privatePhoneField = addPhoneNumber(groupPanel, "privatePhone", "address.phone", "favoritePrivatePhone", phoneListTooltip);
+      privateMobilePhoneField = addPhoneNumber(groupPanel, "privateMobilePhone", "address.phoneType.mobile", "favoritePrivateMobilePhone",
+          phoneListTooltip);
+    }
   }
 
   /**
@@ -352,7 +360,8 @@ public class AddressRenderer extends AbstractRenderer
       if (addressStatus != null) {
         addLabelValueRow(labelValueTablePanel, getString("address.addressStatus"), getString(addressStatus.getI18nKey()));
       }
-      addLabelValueRow(labelValueTablePanel, getString("email"), data.getEmail());
+      addLabelValueRow(labelValueTablePanel, getString("email"), new ActionLinkPanel(LabelValueTableLPanel.WICKET_ID_VALUE,
+          ActionLinkType.MAIL, data.getEmail()));
       addLabelValueRow(labelValueTablePanel, getString("address.website"), data.getWebsite());
     } else {
       groupPanel.addMaxLengthTextField(data, "division", "address.division", ONEHALF);
@@ -381,8 +390,17 @@ public class AddressRenderer extends AbstractRenderer
   public void addPrivateEMail(final FieldSetLPanel fieldSetPanel)
   {
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId());
-    fieldSetPanel.add(groupPanel);
-    groupPanel.addMaxLengthTextField(data, "privateEmail", "email", ONEHALF).setStrong();
+    if (isReadonly() == true && isMobile() == true) {
+      final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
+      groupPanel.add(labelValueTablePanel);
+      addLabelValueRow(labelValueTablePanel, getString("email"), new ActionLinkPanel(LabelValueTableLPanel.WICKET_ID_VALUE,
+          ActionLinkType.MAIL, data.getPrivateEmail()));
+    } else {
+      groupPanel.addMaxLengthTextField(data, "privateEmail", "email", ONEHALF).setStrong();
+    }
+    if (groupPanel.hasChildren() == true) {
+      fieldSetPanel.add(groupPanel);
+    }
   }
 
   protected void addAddress(final FieldSetLPanel fieldSetPanel, final String heading, final String addressTextProperty,
@@ -434,9 +452,11 @@ public class AddressRenderer extends AbstractRenderer
     }
   }
 
-  private void addPhoneNumber(final LabelValueTableLPanel labelValueTablePanel, final String labelKey, final String number)
+  private void addPhoneNumber(final LabelValueTableLPanel labelValueTablePanel, final String labelKey, final String number,
+      final boolean isMobile)
   {
-    final PhonePanel valueContainer = new PhonePanel(LabelValueTableLPanel.WICKET_ID_VALUE, number);
+    final ActionLinkPanel valueContainer = new ActionLinkPanel(LabelValueTableLPanel.WICKET_ID_VALUE,
+        isMobile == true ? ActionLinkType.CALL_AND_SMS : ActionLinkType.CALL, number);
     addLabelValueRow(labelValueTablePanel, getString(labelKey), valueContainer);
   }
 

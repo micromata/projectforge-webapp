@@ -79,6 +79,16 @@ public class PresizedImage extends ContextImage
    * @param request
    * @param relativePath path relative to web apps image dir.
    */
+  public PresizedImage(final String id, final Response response, final ImageDef image)
+  {
+    this(id, response, image.getPath());
+  }
+
+  /**
+   * @param id
+   * @param request
+   * @param relativePath path relative to web apps image dir.
+   */
   public PresizedImage(final String id, final Response response, final String path)
   {
     super(id, WicketUtils.getImageUrl(response, path));
