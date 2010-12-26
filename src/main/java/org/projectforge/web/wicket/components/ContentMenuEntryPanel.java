@@ -23,7 +23,6 @@
 
 package org.projectforge.web.wicket.components;
 
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -40,7 +39,7 @@ public class ContentMenuEntryPanel extends Panel
   public ContentMenuEntryPanel(final String id, final AbstractLink link, final String label)
   {
     super(id);
-    super.setRenderBodyOnly(true);
+    setRenderBodyOnly(true);
     add(link);
     final Label labelComp = new Label("label", label);
     labelComp.setRenderBodyOnly(true);
