@@ -151,6 +151,11 @@ public class Menu implements Serializable
     if (menuEntry == null) {
       return;
     }
+    for (final MenuEntry entry : this.favoriteMenuEntries) {
+      if (entry.menuItemDef == menuItemDef) {
+        return;
+      }
+    }
     this.favoriteMenuEntries.add(menuEntry);
   }
 }
