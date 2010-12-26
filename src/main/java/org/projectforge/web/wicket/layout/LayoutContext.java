@@ -74,6 +74,11 @@ public class LayoutContext implements Serializable
     return mobile;
   }
 
+  public boolean isMobileReadonly()
+  {
+    return mobile == true && readonly == true;
+  }
+
   /**
    * @param mobile
    * @return this for chaining.

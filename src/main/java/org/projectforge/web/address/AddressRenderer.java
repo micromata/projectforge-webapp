@@ -101,8 +101,8 @@ public class AddressRenderer extends AbstractRenderer
 
     final String title = StringHelper.listToString(" ", data.getTitle(), data.getFirstName(), data.getName());
     FieldSetLPanel fieldSetPanel;
-    if (isMobile() == true) {
-
+    if (isMobileReadonly() == true) {
+      // Append at the end.
     } else {
       fieldSetPanel = createFieldSetPanel(fieldSetRepeater.newChildId(), isNew() == false ? title
           : getString("address.heading.personalData"));
@@ -113,7 +113,7 @@ public class AddressRenderer extends AbstractRenderer
 
     // *** Business Contact ***
     final String businessContactTitle;
-    if (isMobile() == true) {
+    if (isMobileReadonly() == true) {
       businessContactTitle = title;
     } else {
       businessContactTitle = getString("address.heading.businessContact");
@@ -134,7 +134,7 @@ public class AddressRenderer extends AbstractRenderer
     addPrivateAddress(fieldSetPanel);
     addPrivatePhones(fieldSetPanel);
 
-    if (isMobile() == true) {
+    if (isMobileReadonly() == true) {
       addPersonalData(fieldSetPanel, title);
       addPublicKeyAndFingerprint(fieldSetPanel);
     }
@@ -184,7 +184,7 @@ public class AddressRenderer extends AbstractRenderer
     final String phoneListTooltip = getString("address.tooltip.phonelist");
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
     fieldSetPanel.add(groupPanel);
-    if (isMobile() == true) {
+    if (isMobileReadonly() == true) {
       final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
       groupPanel.add(labelValueTablePanel);
       addPhoneNumber(labelValueTablePanel, "address.phone", data.getBusinessPhone(), false);
@@ -206,7 +206,7 @@ public class AddressRenderer extends AbstractRenderer
     final String phoneListTooltip = getString("address.tooltip.phonelist");
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
     fieldSetPanel.add(groupPanel);
-    if (isMobile() == true) {
+    if (isMobileReadonly() == true) {
       final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
       groupPanel.add(labelValueTablePanel);
       addPhoneNumber(labelValueTablePanel, "address.phone", data.getPrivatePhone(), false);
@@ -253,7 +253,7 @@ public class AddressRenderer extends AbstractRenderer
     }
 
     LabelValueTableLPanel labelValueTablePanel = null; // Only used for mobile pages.
-    if (isMobile() == true) {
+    if (isMobileReadonly() == true) {
       labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
       groupPanel.add(labelValueTablePanel);
       final ContactStatus contactStatus = data.getContactStatus();
@@ -286,7 +286,7 @@ public class AddressRenderer extends AbstractRenderer
       });
     }
 
-    if (isMobile() == true) {
+    if (isMobileReadonly() == true) {
       if (StringUtils.isNotBlank(data.getComment()) == true) {
         groupPanel.add(createLabelValueHeadingPanel(groupPanel.newChildId(), getString("comment")));
         groupPanel.add(createValuePanel(groupPanel.newChildId(), data.getComment()));
@@ -309,7 +309,7 @@ public class AddressRenderer extends AbstractRenderer
   {
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
-    if (isMobile() == true) {
+    if (isMobileReadonly() == true) {
       if (StringUtils.isNotBlank(data.getPublicKey()) == true) {
         groupPanel.add(createLabelValueHeadingPanel(groupPanel.newChildId(), getString("address.publicKey")));
         groupPanel.add(createValuePanel(groupPanel.newChildId(), StringUtils.abbreviate(data.getPublicKey(), 20)));
@@ -338,7 +338,7 @@ public class AddressRenderer extends AbstractRenderer
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
     LabelValueTableLPanel labelValueTablePanel = null; // Only used for mobile devices.
-    if (isMobile()) {
+    if (isMobileReadonly()) {
       labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
       groupPanel.add(labelValueTablePanel);
       addLabelValueRow(labelValueTablePanel, getString("organization"), data.getOrganization());
@@ -354,7 +354,7 @@ public class AddressRenderer extends AbstractRenderer
       groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("organization"), organizationField, true));
       groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), FULL, organizationField).setStrong());
     }
-    if (isMobile() == true) {
+    if (isMobileReadonly() == true) {
       addLabelValueRow(labelValueTablePanel, getString("address.division"), data.getDivision());
       addLabelValueRow(labelValueTablePanel, getString("address.positionText"), data.getPositionText());
       final AddressStatus addressStatus = data.getAddressStatus();
@@ -393,7 +393,7 @@ public class AddressRenderer extends AbstractRenderer
   {
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
-    if (isReadonly() == true && isMobile() == true) {
+    if (isMobileReadonly() == true) {
       final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
       groupPanel.add(labelValueTablePanel);
       addLabelValueRow(labelValueTablePanel, getString("email"), new ActionLinkPanel(LabelValueTableLPanel.WICKET_ID_VALUE,
@@ -422,7 +422,7 @@ public class AddressRenderer extends AbstractRenderer
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId()).setHeading(getString(heading));
     fieldSetPanel.add(groupPanel);
     LabelValueTableLPanel labelValueTablePanel = null; // Only used for mobile pages.
-    if (isMobile() == true) {
+    if (isMobileReadonly() == true) {
       labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
       groupPanel.add(labelValueTablePanel);
       addLabelValueRow(labelValueTablePanel, getString("address.addressText"), addressText);

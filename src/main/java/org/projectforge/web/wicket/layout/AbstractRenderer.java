@@ -206,6 +206,11 @@ public abstract class AbstractRenderer implements Serializable
     return layoutContext.isMobile();
   }
 
+  protected boolean isMobileReadonly()
+  {
+    return layoutContext.isMobileReadonly();
+  }
+
   protected boolean isReadonly()
   {
     return layoutContext.isReadonly();
