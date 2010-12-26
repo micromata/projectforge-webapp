@@ -295,7 +295,7 @@ public class AddressRenderer extends AbstractRenderer
     } else {
       // add(new CheckBox("imageBroschure", new PropertyModel<Boolean>(data, "imageBroschure")));
       final TextAreaLPanel commentTextAreaPanel = groupPanel.addMaxLengthTextArea(data, "comment", "comment", DOUBLE);
-      commentTextAreaPanel.setBreakBefore().setStyle("height: 30ex;");
+      commentTextAreaPanel.setBreakBefore().setStyle("height: 30em;");
       if (layoutContext.isNew() == false) {
         commentTextAreaPanel.setFocus();
       }

@@ -9,14 +9,8 @@
 	<script type="text/javascript" charset="utf-8">
 	/* <![CDATA[ */
 		$(function() {
-			$( ".buttonset" ).buttonset();
-					//$( ".toolbarbutton" ).button();
-					
-					$( ".toolbarbutton" ).button({
-			            icons: {
-			            	 primary: "ui-icon-circle-plus"
-			            }
-			        })
+			$( ".buttonset" ).buttonset();					
+			
 		});
 	
 	/* ]]> */
@@ -29,7 +23,9 @@
   	<span wicket:id="menu">[menu entries]</span>
   	
 	<wicket:container wicket:id="dropDownMenu">
-					<wicket:container wicket:id="menu"><a class="toolbarbutton" wicket:id="menuEntry"><wicket:container wicket:id="label">[action]</wicket:container></a></wicket:container>
+	<span style="float:right;">
+					<wicket:container wicket:id="menu"><a class="toolbarbutton rounded boxshadow gradienttopdown" wicket:id="menuEntry"><wicket:container wicket:id="label">[action]</wicket:container></a></wicket:container>
+					</span>
 	</wicket:container>
   </div>
   <wicket:child>

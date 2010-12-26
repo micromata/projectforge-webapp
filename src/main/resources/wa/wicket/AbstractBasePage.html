@@ -14,7 +14,7 @@
 <div id="container"><!-- left -->
 <div id="navigation" class="clearfix"><wicket:container wicket:id="navigation">
   <div class="headermeta">
-  <div class="development" wicket:id="developmentsystem">Developmentsystem!</div>
+  
 
   <ul class="info">
     <li class="loggedInLabel"><span wicket:id="loggedInLabel">[Logged in: John Mustermann (john)]</span><a wicket:id="logoutLink" href="/login?logout=true"><span wicket:id="logoutLabel">[Logout]</span></a></li>
@@ -24,6 +24,7 @@
     <li><a href="http://www.dynamicsitesolutions.com/javascript/add-bookmark-script" class="embatssymbols"
       title="i18n: Schreib mir ein Markenbuch"> S</a></li>
   </ul>
+  <div class="development" wicket:id="developmentsystem">Developmentsystem!</div>
   </div>
   <!-- .headermeta END -->
 
@@ -48,18 +49,13 @@
   <h2>This is the content!</h2>
 </wicket:child></div>
 
-<!-- DIV content END -->
-<div id="footer" class="gradienttopdown">
-<!-- TODO: i18n -->
-<p class="padding"><a href="Dokumentation" title="zur Dokumentation">Dokumentation</a> | <a href="Dokumentation"
-  title="zur Hilfe">Hilfe</a> | Copyright 2001-2010 Kai Reinhard | Lizenz: <a href="https://projectforge.org/pf-en/License" title="Gnu Public License">
-GPL</a></p>
-</div>
+
 </div>
 <!-- DIV container END -->
 <script type="text/javascript" charset="utf-8">
     $(document).ready(function() {
       initTooltips();
+      $(".validationMsg").delay(2000).hide("slow");
     });
 </script>
 </body>
