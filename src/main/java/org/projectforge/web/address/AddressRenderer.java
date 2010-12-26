@@ -25,7 +25,6 @@ package org.projectforge.web.address;
 
 import static org.projectforge.web.wicket.layout.DateFieldLPanel.DATE_FIELD_ID;
 import static org.projectforge.web.wicket.layout.DropDownChoiceLPanel.SELECT_ID;
-import static org.projectforge.web.wicket.layout.LayoutLength.DOUBLE;
 import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
 import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
 import static org.projectforge.web.wicket.layout.LayoutLength.ONEHALF;
@@ -245,9 +244,9 @@ public class AddressRenderer extends AbstractRenderer
       final String tooltip = getString("address.tooltip.vCardList");
       repeaterPanel.add(createCheckBoxPanel(repeaterPanel.newChildId(), personalAddress, "favoriteCard").setTooltip(tooltip));
       repeaterPanel.add(createImagePanel(repeaterPanel.newChildId(), ImageDef.HELP, tooltip));
-      groupPanel.addMaxLengthTextField(data, "title", "address.title", FULL).setStrong();
-      groupPanel.addMaxLengthTextField(data, "firstName", "firstName", ONEHALF).setStrong();
-      final TextFieldLPanel nameTextFieldPanel = groupPanel.addMaxLengthTextField(data, "name", "name", ONEHALF).setStrong().setRequired();
+      groupPanel.addMaxLengthTextField(data, "title", "address.title", THREEQUART).setStrong();
+      groupPanel.addMaxLengthTextField(data, "firstName", "firstName", FULL).setStrong();
+      final TextFieldLPanel nameTextFieldPanel = groupPanel.addMaxLengthTextField(data, "name", "name", FULL).setStrong().setRequired();
       if (isNew() == true) {
         nameTextFieldPanel.setFocus();
       }
@@ -294,8 +293,8 @@ public class AddressRenderer extends AbstractRenderer
       }
     } else {
       // add(new CheckBox("imageBroschure", new PropertyModel<Boolean>(data, "imageBroschure")));
-      final TextAreaLPanel commentTextAreaPanel = groupPanel.addMaxLengthTextArea(data, "comment", "comment", DOUBLE);
-      commentTextAreaPanel.setBreakBefore().setStyle("height: 30em;");
+      final TextAreaLPanel commentTextAreaPanel = groupPanel.addMaxLengthTextArea(data, "comment", "comment", ONEHALF);
+      commentTextAreaPanel.setBreakBefore().setStyle("height: 20em;");
       if (layoutContext.isNew() == false) {
         commentTextAreaPanel.setFocus();
       }
@@ -320,8 +319,8 @@ public class AddressRenderer extends AbstractRenderer
         labelValueTablePanel.add(getString("address.fingerprint"), data.getFingerprint());
       }
     } else {
-      groupPanel.addMaxLengthTextArea(data, "publicKey", "address.publicKey", DOUBLE).setBreakBefore();
-      groupPanel.addMaxLengthTextField(data, "fingerprint", "address.fingerprint", DOUBLE).setBreakBefore();
+      groupPanel.addMaxLengthTextArea(data, "publicKey", "address.publicKey", ONEHALF).setBreakBefore();
+      groupPanel.addMaxLengthTextField(data, "fingerprint", "address.fingerprint", ONEHALF).setBreakBefore();
     }
     if (groupPanel.hasChildren() == true) {
       fieldSetPanel.add(groupPanel);
@@ -351,7 +350,7 @@ public class AddressRenderer extends AbstractRenderer
         }
       }.withMatchContains(true).withMinChars(2);
       groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("organization"), organizationField, true));
-      groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), ONEHALF, organizationField).setStrong());
+      groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), FULL, organizationField).setStrong());
     }
     if (isMobile() == true) {
       addLabelValueRow(labelValueTablePanel, getString("address.division"), data.getDivision());
@@ -365,8 +364,8 @@ public class AddressRenderer extends AbstractRenderer
       addLabelValueRow(labelValueTablePanel, getString("address.website"), new ActionLinkPanel(LabelValueTableLPanel.WICKET_ID_VALUE,
           ActionLinkType.EXTERNAL_URL, data.getWebsite()));
     } else {
-      groupPanel.addMaxLengthTextField(data, "division", "address.division", ONEHALF);
-      groupPanel.addMaxLengthTextField(data, "positionText", "address.positionText", ONEHALF);
+      groupPanel.addMaxLengthTextField(data, "division", "address.division", FULL);
+      groupPanel.addMaxLengthTextField(data, "positionText", "address.positionText", FULL);
       // DropDownChoice addressStatus
       final LabelValueChoiceRenderer<AddressStatus> addressStatusChoiceRenderer = new LabelValueChoiceRenderer<AddressStatus>(container,
           AddressStatus.values());
@@ -376,8 +375,8 @@ public class AddressRenderer extends AbstractRenderer
       groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.addressStatus"), addressStatusChoice, true));
       groupPanel.add(createDropDownChoicePanel(groupPanel.newChildId(), THREEQUART, addressStatusChoice));
 
-      groupPanel.addMaxLengthTextField(data, "email", "email", ONEHALF).setStrong();
-      groupPanel.addMaxLengthTextField(data, "website", "address.website", ONEHALF);
+      groupPanel.addMaxLengthTextField(data, "email", "email", FULL).setStrong();
+      groupPanel.addMaxLengthTextField(data, "website", "address.website", FULL);
     }
     if (groupPanel.hasChildren() == true) {
       fieldSetPanel.add(groupPanel);
@@ -397,7 +396,7 @@ public class AddressRenderer extends AbstractRenderer
       addLabelValueRow(labelValueTablePanel, getString("email"), new ActionLinkPanel(LabelValueTableLPanel.WICKET_ID_VALUE,
           ActionLinkType.MAIL, data.getPrivateEmail()));
     } else {
-      groupPanel.addMaxLengthTextField(data, "privateEmail", "email", ONEHALF).setStrong();
+      groupPanel.addMaxLengthTextField(data, "privateEmail", "email", FULL).setStrong();
     }
     if (groupPanel.hasChildren() == true) {
       fieldSetPanel.add(groupPanel);
@@ -438,18 +437,18 @@ public class AddressRenderer extends AbstractRenderer
         }
       }.withMatchContains(true).withMinChars(2);
       groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.addressText"), addressTextField, true));
-      groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), ONEHALF, addressTextField));
+      groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), FULL, addressTextField));
       final TextFieldLPanel zipCodeFieldPanel = createTextFieldPanel(groupPanel.newChildId(), QUART, data, zipCodeProperty);
       groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.zipCode") + "/" + getString("address.city"),
           zipCodeFieldPanel, true));
       groupPanel.add(zipCodeFieldPanel);
-      groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), FULL, data, cityProperty));
+      groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), THREEQUART, data, cityProperty));
 
-      final TextFieldLPanel countryTextFieldPanel = createTextFieldPanel(groupPanel.newChildId(), THREEQUART, data, countryProperty);
+      final TextFieldLPanel countryTextFieldPanel = createTextFieldPanel(groupPanel.newChildId(), HALF, data, countryProperty);
       groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.country") + "/" + getString("address.state"),
           countryTextFieldPanel, true));
       groupPanel.add(countryTextFieldPanel);
-      groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), THREEQUART, data, stateProperty));
+      groupPanel.add(createTextFieldPanel(groupPanel.newChildId(), HALF, data, stateProperty));
     }
   }
 
