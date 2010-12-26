@@ -77,7 +77,18 @@ public class AddressMobileViewPage extends AbstractSecuredMobilePage
     renderer = new AddressRenderer(this, new LayoutContext(true, true, isNew), addressDao, address, personalAddress);
     renderer.add();
   }
-  
+
+  @Override
+  protected void addRightButton()
+  {
+    final Integer id = getPageParameters().getAsInteger(AbstractEditPage.PARAMETER_KEY_ID);
+    if (NumberHelper.greaterZero(id) == true) {
+      final PageParameters params = new PageParameters();
+      params.put(AbstractEditPage.PARAMETER_KEY_ID, id);
+      add(new LabelBookmarkablePageLinkPanel(RIGHT_BUTTON_ID, AddressMobileEditPage.class, getString("edit"), params));
+    }
+  }
+
   @Override
   protected String getTitle()
   {

@@ -23,87 +23,45 @@
 
 package org.projectforge.web.address;
 
-import java.util.List;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
-import org.projectforge.web.mobile.AbstractSecuredMobilePage;
-import org.projectforge.web.mobile.PageItemEntryMenuPanel;
-import org.projectforge.web.wicket.AbstractEditPage;
-import org.projectforge.web.wicket.components.LabelBookmarkablePageLinkPanel;
-import org.springframework.util.CollectionUtils;
+import org.projectforge.web.mobile.AbstractMobileListPage;
 
-public class AddressMobileListPage extends AbstractSecuredMobilePage
+public class AddressMobileListPage extends AbstractMobileListPage<AddressMobileListForm, AddressDao, AddressDO>
 {
-  protected static final int MAX_ROWS = 50;
+  private static final long serialVersionUID = -5138249821780619306L;
 
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
 
-  private AddressMobileListForm form;
-
-  private List<AddressDO> list;
-
-  private WebMarkupContainer resultList;
-
-  private RepeatingView addressRepeater;
-
   public AddressMobileListPage(final PageParameters parameters)
   {
-    super(parameters);
-    form = new AddressMobileListForm(this);
-    add(form);
-    form.init();
-    add(resultList = new WebMarkupContainer("resultList"));
-    resultList.setVisible(false);
-    search();
-  }
-
-  protected void search()
-  {
-    if (addressRepeater != null) {
-      resultList.remove(addressRepeater);
-    }
-    if (StringUtils.isBlank(form.filter.getSearchString()) == true) {
-      list = null;
-    } else {
-      list = addressDao.getList(form.filter);
-    }
-    if (CollectionUtils.isEmpty(list) == true) {
-      resultList.setVisible(false);
-      return;
-    }
-    resultList.setVisible(true);
-    resultList.add(addressRepeater = new RepeatingView("addressRepeater"));
-
-    int counter = 0;
-    for (final AddressDO address : list) {
-      final PageParameters params = new PageParameters();
-      params.put(AbstractEditPage.PARAMETER_KEY_ID, address.getId());
-      addressRepeater.add(new PageItemEntryMenuPanel(addressRepeater.newChildId(), AddressMobileViewPage.class, params, null, address
-          .getFirstName()
-          + " "
-          + address.getName(), address.getOrganization()));
-      if (++counter >= MAX_ROWS) {
-        break;
-      }
-    }
+    super("address", parameters);
   }
 
   @Override
-  protected void addRightButton()
+  protected AddressDao getBaseDao()
   {
-    add(new LabelBookmarkablePageLinkPanel(RIGHT_BUTTON_ID, AddressMobileViewPage.class, " + "));
+    return addressDao;
   }
 
   @Override
-  protected String getTitle()
+  protected AddressMobileListForm newListForm(AbstractMobileListPage< ? , ? , ? > parentPage)
   {
-    return getString("address.title.heading");
+    return new AddressMobileListForm(this);
+  }
+
+  @Override
+  protected String getEntryName(final AddressDO entry)
+  {
+    return entry.getFirstName() + " " + entry.getName();
+  }
+
+  @Override
+  protected String getEntryComment(AddressDO entry)
+  {
+    return entry.getOrganization();
   }
 }

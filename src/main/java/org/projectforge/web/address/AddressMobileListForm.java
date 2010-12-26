@@ -23,51 +23,21 @@
 
 package org.projectforge.web.address;
 
-import org.apache.wicket.behavior.SimpleAttributeModifier;
-import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
 import org.projectforge.address.AddressFilter;
-import org.projectforge.web.mobile.AbstractMobileForm;
+import org.projectforge.web.mobile.AbstractMobileListForm;
 
-public class AddressMobileListForm extends AbstractMobileForm<AddressMobileListForm, AddressMobileListPage>
+public class AddressMobileListForm extends AbstractMobileListForm<AddressFilter, AddressMobileListPage>
 {
-  private static final String USER_PREF_KEY_FILTER = "mobileAddressFilter";
-
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressMobileListForm.class);
-
   private static final long serialVersionUID = -4341937420376832550L;
-
-  AddressFilter filter;
 
   public AddressMobileListForm(final AddressMobileListPage parentPage)
   {
     super(parentPage);
-    filter = new AddressFilter();
-    try {
-      filter = (AddressFilter) parentPage.getUserPrefEntry(USER_PREF_KEY_FILTER);
-    } catch (final ClassCastException ex) {
-      log.info("Could not restore filter from user prefs (OK, probably new software release).");
-    }
-    if (filter == null) {
-      filter = new AddressFilter();
-      parentPage.putUserPrefEntry(USER_PREF_KEY_FILTER, filter, true);
-    }
   }
 
-  @SuppressWarnings("serial")
-  protected void init()
+  @Override
+  protected AddressFilter newFilter()
   {
-    add(new TextField<String>("searchField", new PropertyModel<String>(filter, "searchString")).add(new SimpleAttributeModifier(
-        "placeholder", getString("search"))));
-    final Button searchButton = new Button("searchButton", new Model<String>(getString("search"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.search();
-      }
-    };
-    add(searchButton);
+    return new AddressFilter();
   }
 }
