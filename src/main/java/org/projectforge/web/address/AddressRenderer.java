@@ -362,7 +362,8 @@ public class AddressRenderer extends AbstractRenderer
       }
       addLabelValueRow(labelValueTablePanel, getString("email"), new ActionLinkPanel(LabelValueTableLPanel.WICKET_ID_VALUE,
           ActionLinkType.MAIL, data.getEmail()));
-      addLabelValueRow(labelValueTablePanel, getString("address.website"), data.getWebsite());
+      addLabelValueRow(labelValueTablePanel, getString("address.website"), new ActionLinkPanel(LabelValueTableLPanel.WICKET_ID_VALUE,
+          ActionLinkType.EXTERNAL_URL, data.getWebsite()));
     } else {
       groupPanel.addMaxLengthTextField(data, "division", "address.division", ONEHALF);
       groupPanel.addMaxLengthTextField(data, "positionText", "address.positionText", ONEHALF);

@@ -30,5 +30,5 @@ package org.projectforge.web.mobile;
  */
 public enum ActionLinkType
 {
-  CALL, SMS, CALL_AND_SMS, MAIL;
+  CALL, SMS, CALL_AND_SMS, MAIL, EXTERNAL_URL;
 }

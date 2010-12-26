@@ -51,8 +51,17 @@ public class ActionLinkPanel extends Panel
     } else if (actionLinkType == ActionLinkType.CALL_AND_SMS) {
       add(getCallLink(value));
       add(getSmsLink(value));
-    } else {
+    } else if (actionLinkType == ActionLinkType.MAIL) {
       add(new ExternalLink("link", "mailto:" + value, value));
+      add(getInvisibleSmsLink());
+    } else {
+      final String url;
+      if (value != null && value.contains("://") == true) {
+        url = value;
+      } else {
+        url = "http://" + value;
+      }
+      add(new ExternalLink("link", url, value));
       add(getInvisibleSmsLink());
     }
   }
