@@ -127,7 +127,6 @@ public class MenuPanel extends Panel
         if (getPage() instanceof AbstractSecuredPage) {
           final AbstractSecuredPage securedPage = ((AbstractSecuredPage) getPage());
           getMenu().setFavoriteMenuEntries(favoritesMenu);
-          // TODO: avoid doublets...
           // Store the favorite menu entries in the user's preference (persisted).
           securedPage.putUserPrefEntry(USER_PREF_FAVORITE_MENU_ENTRIES_KEY, favoritesMenu, true);
         }
