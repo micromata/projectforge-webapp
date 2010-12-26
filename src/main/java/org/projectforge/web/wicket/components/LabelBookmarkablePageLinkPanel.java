@@ -23,6 +23,7 @@
 
 package org.projectforge.web.wicket.components;
 
+import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -46,9 +47,22 @@ public class LabelBookmarkablePageLinkPanel extends Panel
     add(link);
   }
 
+  private LabelBookmarkablePageLinkPanel(final String id, final Class< ? extends WebPage> pageClass, final PageParameters params)
+  {
+    super(id);
+    link = new BookmarkablePageLink<String>("link", pageClass, params);
+    add(link);
+  }
+
   public LabelBookmarkablePageLinkPanel(final String id, final Class< ? extends WebPage> pageClass, final String label)
   {
     this(id, pageClass);
+    link.add(new Label("label", label).setRenderBodyOnly(true));
+  }
+
+  public LabelBookmarkablePageLinkPanel(final String id, final Class< ? extends WebPage> pageClass, final String label, final PageParameters params)
+  {
+    this(id, pageClass, params);
     link.add(new Label("label", label).setRenderBodyOnly(true));
   }
 }
