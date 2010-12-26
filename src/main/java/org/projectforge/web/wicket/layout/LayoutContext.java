@@ -57,7 +57,7 @@ public class LayoutContext implements Serializable
    */
   public LayoutContext(final AbstractEditForm< ? , ? > form)
   {
-    newObject = form.isNew();
+    this.newObject = form.isNew();
   }
 
   /**
@@ -66,7 +66,8 @@ public class LayoutContext implements Serializable
    */
   public LayoutContext(final AbstractMobileEditForm< ? , ? > form)
   {
-    newObject = form.isNew();
+    this.newObject = form.isNew();
+    this.mobile = true;
   }
 
   public boolean isMobile()

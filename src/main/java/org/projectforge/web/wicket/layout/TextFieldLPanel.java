@@ -43,7 +43,7 @@ public class TextFieldLPanel extends AbstractLPanel
    */
   public static final String INPUT_ID = "input";
 
-  private TextField< ? > textField;
+  protected TextField< ? > textField;
 
   /**
    * @see AbstractRenderer#createTextFieldPanel(String, LayoutLength, Object, String)
@@ -62,6 +62,16 @@ public class TextFieldLPanel extends AbstractLPanel
     this.textField = textField;
     this.classAttributeAppender = "text";
     add(textField);
+  }
+
+  /**
+   * Only used by TextFieldMobileLPanel.
+   * @param id
+   * @param length
+   */
+  protected TextFieldLPanel(final String id, final LayoutLength length)
+  {
+    super(id, length);
   }
 
   public TextFieldLPanel setStrong()

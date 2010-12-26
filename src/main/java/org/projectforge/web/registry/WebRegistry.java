@@ -37,6 +37,7 @@ import org.projectforge.web.LoginPage;
 import org.projectforge.web.access.AccessEditPage;
 import org.projectforge.web.access.AccessListPage;
 import org.projectforge.web.address.AddressEditPage;
+import org.projectforge.web.address.AddressMobileEditPage;
 import org.projectforge.web.address.AddressMobileListPage;
 import org.projectforge.web.address.AddressListPage;
 import org.projectforge.web.address.AddressMobileViewPage;
@@ -308,9 +309,10 @@ public class WebRegistry
     addMountPage("taskTree", TaskTreePage.class);
     addMountPage("tutorial", TutorialPage.class);
 
+    addMountPages(BOOKMARK_MOBILE_PREFIX + "address", AddressMobileListPage.class, AddressMobileEditPage.class);
+
     addMountPage(BOOKMARK_MOBILE_LOGIN, LoginMobilePage.class);
     addMountPage(BOOKMARK_MOBILE_PREFIX + "menu", MenuMobilePage.class);
-    addMountPage(BOOKMARK_MOBILE_PREFIX + "addressList", AddressMobileListPage.class);
     addMountPage(BOOKMARK_MOBILE_PREFIX + "addressView", AddressMobileViewPage.class);
   }
 }
