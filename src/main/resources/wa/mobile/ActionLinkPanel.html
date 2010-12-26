@@ -6,9 +6,10 @@
 </head>
 
 <body>
-<h1>A link panel which instantiates a phone call on an iPhone.</h1>
+<h1>A link panel which instantiates a phone call on an iPhone as well as an sms or an e-mail.</h1>
 <wicket:panel>
-  <a href="tel:0123456789" wicket:id="link"></a>
+  <a href="tel:0123456789" wicket:id="link" class="noeffect">[0123456789]</a>
+  <a href="tel:0123456789" wicket:id="sms" class="noeffect"><img wicket:id="smsImage" /></a>
 </wicket:panel>
 </body>
 </html>
