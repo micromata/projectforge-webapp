@@ -25,6 +25,7 @@ package org.projectforge.web.mobile;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.basic.Label;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
@@ -74,6 +75,7 @@ public abstract class AbstractMobileEditPage<O extends AbstractBaseDO< ? >, F ex
 
     add(form);
     form.init();
+    add(new Label("title", getString(AbstractEditPage.getTitleKey(i18nPrefix, isNew()))));
   }
 
   /**

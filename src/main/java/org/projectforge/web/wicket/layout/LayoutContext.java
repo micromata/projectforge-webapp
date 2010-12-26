@@ -25,6 +25,7 @@ package org.projectforge.web.wicket.layout;
 
 import java.io.Serializable;
 
+import org.projectforge.web.mobile.AbstractMobileEditForm;
 import org.projectforge.web.wicket.AbstractEditForm;
 
 /**
@@ -55,6 +56,15 @@ public class LayoutContext implements Serializable
    * @param form
    */
   public LayoutContext(final AbstractEditForm< ? , ? > form)
+  {
+    newObject = form.isNew();
+  }
+
+  /**
+   * Mobile is false because AbstractEditForm is not a mobile form.
+   * @param form
+   */
+  public LayoutContext(final AbstractMobileEditForm< ? , ? > form)
   {
     newObject = form.isNew();
   }

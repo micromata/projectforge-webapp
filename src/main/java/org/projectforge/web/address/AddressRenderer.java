@@ -308,6 +308,7 @@ public class AddressRenderer extends AbstractRenderer
   public void addPublicKeyAndFingerprint(final FieldSetLPanel fieldSetPanel)
   {
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId());
+    fieldSetPanel.add(groupPanel);
     if (isMobile() == true) {
       if (StringUtils.isNotBlank(data.getPublicKey()) == true) {
         groupPanel.add(createLabelValueHeadingPanel(groupPanel.newChildId(), getString("address.publicKey")));
@@ -322,8 +323,8 @@ public class AddressRenderer extends AbstractRenderer
       groupPanel.addMaxLengthTextArea(data, "publicKey", "address.publicKey", ONEHALF).setBreakBefore();
       groupPanel.addMaxLengthTextField(data, "fingerprint", "address.fingerprint", ONEHALF).setBreakBefore();
     }
-    if (groupPanel.hasChildren() == true) {
-      fieldSetPanel.add(groupPanel);
+    if (groupPanel.hasChildren() == false) {
+      groupPanel.setVisible(false);
     }
   }
 
@@ -335,6 +336,7 @@ public class AddressRenderer extends AbstractRenderer
   public void addBusinessData(final FieldSetLPanel fieldSetPanel)
   {
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId());
+    fieldSetPanel.add(groupPanel);
     LabelValueTableLPanel labelValueTablePanel = null; // Only used for mobile devices.
     if (isMobile()) {
       labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
@@ -378,8 +380,8 @@ public class AddressRenderer extends AbstractRenderer
       groupPanel.addMaxLengthTextField(data, "email", "email", FULL).setStrong();
       groupPanel.addMaxLengthTextField(data, "website", "address.website", FULL);
     }
-    if (groupPanel.hasChildren() == true) {
-      fieldSetPanel.add(groupPanel);
+    if (groupPanel.hasChildren() == false) {
+      groupPanel.setVisible(false);
     }
   }
 
@@ -390,6 +392,7 @@ public class AddressRenderer extends AbstractRenderer
   public void addPrivateEMail(final FieldSetLPanel fieldSetPanel)
   {
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId());
+    fieldSetPanel.add(groupPanel);
     if (isReadonly() == true && isMobile() == true) {
       final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
       groupPanel.add(labelValueTablePanel);
@@ -398,8 +401,8 @@ public class AddressRenderer extends AbstractRenderer
     } else {
       groupPanel.addMaxLengthTextField(data, "privateEmail", "email", FULL).setStrong();
     }
-    if (groupPanel.hasChildren() == true) {
-      fieldSetPanel.add(groupPanel);
+    if (groupPanel.hasChildren() == false) {
+      groupPanel.setVisible(false);
     }
   }
 

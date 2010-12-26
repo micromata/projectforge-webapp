@@ -23,21 +23,41 @@
 
 package org.projectforge.web.address;
 
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
+import org.projectforge.address.PersonalAddressDO;
+import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.web.mobile.AbstractMobileEditForm;
+import org.projectforge.web.wicket.layout.LayoutContext;
 
 public class AddressMobileEditForm extends AbstractMobileEditForm<AddressDO, AddressMobileEditPage>
 {
   private static final long serialVersionUID = -8781593985402346929L;
 
+  @SpringBean(name = "personalAddressDao")
+  private PersonalAddressDao personalAddressDao;
+
+  protected AddressRenderer renderer;
+
+  protected PersonalAddressDO personalAddress;
+
   public AddressMobileEditForm(final AddressMobileEditPage parentPage)
   {
     super(parentPage);
+    personalAddress = null;
+    if (isNew() == false) {
+      personalAddress = personalAddressDao.getByAddressId(getData().getId());
+    }
+    if (personalAddress == null) {
+      personalAddress = new PersonalAddressDO();
+    }
+    renderer = new AddressRenderer(this, new LayoutContext(this), parentPage.getBaseDao(), data, personalAddress);
   }
-  
+
   @Override
   protected void init()
   {
     super.init();
+    renderer.add();
   }
 }

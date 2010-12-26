@@ -43,6 +43,11 @@ public abstract class AbstractMobileEditForm<O extends AbstractBaseDO< ? >, P ex
     return this.data;
   }
 
+  public boolean isNew()
+  {
+    return this.data == null || this.data.getId() == null;
+  }
+
   protected void init()
   {
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
