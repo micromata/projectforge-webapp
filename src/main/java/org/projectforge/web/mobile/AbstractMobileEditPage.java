@@ -42,9 +42,10 @@ public abstract class AbstractMobileEditPage<O extends AbstractBaseDO< ? >, F ex
 
   protected String i18nPrefix;
 
-  public AbstractMobileEditPage(final PageParameters parameters)
+  public AbstractMobileEditPage(final PageParameters parameters, final String i18nPrefix)
   {
     super(parameters);
+    this.i18nPrefix = i18nPrefix;
     leftNavigationRepeater.add(new LabelBookmarkablePageLinkPanel(leftNavigationRepeater.newChildId(), getListPageClass(),
         getString("list")));
   }

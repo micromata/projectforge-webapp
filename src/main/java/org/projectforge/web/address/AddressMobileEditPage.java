@@ -42,7 +42,7 @@ public class AddressMobileEditPage extends AbstractMobileEditPage<AddressDO, Add
 
   public AddressMobileEditPage(final PageParameters parameters)
   {
-    super(parameters);
+    super(parameters, "address");
     init();
   }
 
@@ -61,7 +61,7 @@ public class AddressMobileEditPage extends AbstractMobileEditPage<AddressDO, Add
   @Override
   protected AddressMobileEditForm newEditForm(AbstractMobileEditPage< ? , ? , ? > parentPage, AddressDO data)
   {
-    return new AddressMobileEditForm(this);
+    return new AddressMobileEditForm(this, data);
   }
 
   @Override

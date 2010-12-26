@@ -33,9 +33,10 @@ public abstract class AbstractMobileEditForm<O extends AbstractBaseDO< ? >, P ex
 
   protected O data;
 
-  public AbstractMobileEditForm(P parentPage)
+  public AbstractMobileEditForm(P parentPage, O data)
   {
     super(parentPage);
+    this.data = data;
   }
 
   public O getData()

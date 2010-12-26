@@ -41,9 +41,9 @@ public class AddressMobileEditForm extends AbstractMobileEditForm<AddressDO, Add
 
   protected PersonalAddressDO personalAddress;
 
-  public AddressMobileEditForm(final AddressMobileEditPage parentPage)
+  public AddressMobileEditForm(final AddressMobileEditPage parentPage, final AddressDO data)
   {
-    super(parentPage);
+    super(parentPage, data);
     personalAddress = null;
     if (isNew() == false) {
       personalAddress = personalAddressDao.getByAddressId(getData().getId());
