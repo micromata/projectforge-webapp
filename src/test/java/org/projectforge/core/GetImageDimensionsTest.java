@@ -55,7 +55,7 @@ public class GetImageDimensionsTest
 
   private static final String PATH = "src/main/webapp/";
 
-  private static final String[] SUB_DIRS = { "images", "mobile/images", "mobile/thumbs"};
+  private static final String[] SUB_DIRS = { "images", "mobile/jquery.mobile/images/"};
 
   private static final String DIMENSION_FILE = "src/main/resources/" + WebConstants.FILE_IMAGE_DIMENSIONS;
 
