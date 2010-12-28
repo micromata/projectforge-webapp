@@ -26,7 +26,6 @@ package org.projectforge.web.mobile;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.RestartResponseException;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.protocol.http.WebRequest;
@@ -79,19 +78,17 @@ public class LoginMobilePage extends AbstractMobilePage
       }
     }
     targetUrlAfterLogin = UserFilter.getTargetUrlAfterLogin(((WebRequest) getRequest()).getHttpServletRequest());
+    setNoBackButton();
     form = new LoginMobileForm(this);
     add(form);
     form.init();
     leftNavigationContainer.setVisible(false);
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    final WebMarkupContainer messageOfTheDayArea = new WebMarkupContainer("messageOfTheDayItem");
-    add(messageOfTheDayArea);
     final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
     if (StringUtils.isBlank(messageOfTheDay) == true) {
-      messageOfTheDayArea.setVisible(false);
+      add(new Label("messageOfTheDay", "[invisible]").setVisible(false));
     } else {
-      final Label messageOfTheDayLabel = new Label("messageOfTheDay", messageOfTheDay);
-      messageOfTheDayArea.add(messageOfTheDayLabel.setVisible(StringUtils.isNotBlank(messageOfTheDay)));
+      add(new Label("messageOfTheDay", messageOfTheDay));
     }
   }
 

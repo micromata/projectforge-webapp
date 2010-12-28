@@ -228,6 +228,7 @@ public class AddressRenderer extends AbstractRenderer
   {
     GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
+    String label;
 
     // add(new Label("task", taskFormatter.getTaskPath(data.getTaskId(), true, OutputType.HTML)).setEscapeModelStrings(false));
     if (isReadonly() == true) {
@@ -237,13 +238,18 @@ public class AddressRenderer extends AbstractRenderer
           FormOfAddress.values());
       formChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "form"), formChoiceRenderer.getValues(), formChoiceRenderer);
       formChoice.setNullValid(false).setRequired(true);
-      groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.form"), formChoice, true));
-      groupPanel.add(createDropDownChoicePanel(groupPanel.newChildId(), THREEQUART, formChoice));
+      label = getString("address.form");
+      if (isMobile() == false) {
+        groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, label, formChoice, true));
+      }
+      groupPanel.add(createDropDownChoicePanel(groupPanel.newChildId(), THREEQUART, formChoice).setLabel(label));
       final RepeaterLabelLPanel repeaterPanel = createRepeaterLabelPanel(groupPanel.newChildId());
       groupPanel.add(repeaterPanel);
-      final String tooltip = getString("address.tooltip.vCardList");
-      repeaterPanel.add(createCheckBoxPanel(repeaterPanel.newChildId(), personalAddress, "favoriteCard").setTooltip(tooltip));
-      repeaterPanel.add(createImagePanel(repeaterPanel.newChildId(), ImageDef.HELP, tooltip));
+      if (isMobile() == false) {
+        final String tooltip = getString("address.tooltip.vCardList");
+        repeaterPanel.add(createCheckBoxPanel(repeaterPanel.newChildId(), personalAddress, "favoriteCard").setTooltip(tooltip));
+        repeaterPanel.add(createImagePanel(repeaterPanel.newChildId(), ImageDef.HELP, tooltip));
+      }
       groupPanel.addMaxLengthTextField(data, "title", "address.title", THREEQUART).setStrong();
       groupPanel.addMaxLengthTextField(data, "firstName", "firstName", FULL).setStrong();
       final TextFieldLPanel nameTextFieldPanel = groupPanel.addMaxLengthTextField(data, "name", "name", FULL).setStrong().setRequired();
@@ -271,8 +277,11 @@ public class AddressRenderer extends AbstractRenderer
       final DropDownChoice contactStatusChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "contactStatus"),
           contactStatusChoiceRenderer.getValues(), contactStatusChoiceRenderer);
       contactStatusChoice.setNullValid(false).setRequired(true);
-      groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.contactStatus"), contactStatusChoice, true));
-      groupPanel.add(createDropDownChoicePanel(groupPanel.newChildId(), THREEQUART, contactStatusChoice));
+      label = getString("address.contactStatus");
+      if (isMobile() == false) {
+        groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, label, contactStatusChoice, true));
+      }
+      groupPanel.add(createDropDownChoicePanel(groupPanel.newChildId(), THREEQUART, contactStatusChoice).setLabel(label));
       final DatePanel birthdayPanel = new DatePanel(DATE_FIELD_ID, new PropertyModel<Date>(data, "birthday"), new DatePanelSettings()
           .withTargetType(java.sql.Date.class));
       groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.birthday"), birthdayPanel.getDateField(), true));
@@ -337,6 +346,7 @@ public class AddressRenderer extends AbstractRenderer
   {
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
+    String label;
     LabelValueTableLPanel labelValueTablePanel = null; // Only used for mobile devices.
     if (isMobileReadonly()) {
       labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
@@ -374,8 +384,11 @@ public class AddressRenderer extends AbstractRenderer
       final DropDownChoice addressStatusChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "addressStatus"),
           addressStatusChoiceRenderer.getValues(), addressStatusChoiceRenderer);
       addressStatusChoice.setNullValid(false).setRequired(true);
-      groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.addressStatus"), addressStatusChoice, true));
-      groupPanel.add(createDropDownChoicePanel(groupPanel.newChildId(), THREEQUART, addressStatusChoice));
+      label = getString("address.addressStatus");
+      if (isMobile() == false) {
+        groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, label, addressStatusChoice, true));
+      }
+      groupPanel.add(createDropDownChoicePanel(groupPanel.newChildId(), THREEQUART, addressStatusChoice).setLabel(label));
 
       groupPanel.addMaxLengthTextField(data, "email", "email", FULL).setStrong();
       groupPanel.addMaxLengthTextField(data, "website", "address.website", FULL);

@@ -66,7 +66,7 @@ public class TextFieldMobileLPanel extends TextFieldLPanel
     super(id, length);
     this.textField = textField;
     this.classAttributeAppender = "text";
-    add(item = new WebMarkupContainer("item"));
+    add(item);
     item.add(textField);
   }
 

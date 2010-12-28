@@ -29,11 +29,13 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.wicket.Application;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.CSSPackageResource;
 import org.apache.wicket.markup.html.JavascriptPackageResource;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.projectforge.Version;
@@ -53,6 +55,8 @@ public abstract class AbstractMobilePage extends WebPage
 {
   protected final static String RIGHT_BUTTON_ID = "rightButton";
 
+  protected WebMarkupContainer headerContainer;
+
   protected RepeatingView leftNavigationRepeater;
 
   protected WebMarkupContainer leftNavigationContainer, rightButtonContainer;
@@ -69,6 +73,11 @@ public abstract class AbstractMobilePage extends WebPage
     this(new PageParameters());
   }
 
+  protected void setNoBackButton()
+  {
+    headerContainer.add(new SimpleAttributeModifier("data-nobackbtn", "true"));
+  }
+
   /**
    * Constructor that is invoked when page is invoked without a session.
    * 
@@ -78,10 +87,16 @@ public abstract class AbstractMobilePage extends WebPage
   public AbstractMobilePage(final PageParameters parameters)
   {
     super(parameters);
-    add(CSSPackageResource.getHeaderContribution("mobile/css/style.css"));
+    // add(CSSPackageResource.getHeaderContribution("mobile/css/iWebKit.css"));
+    add(CSSPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery.mobile-1.0a2.min.css"));
+    // add(CSSPackageResource.getHeaderContribution("mobile/css/projectforge.css"));
     add(CSSPackageResource.getHeaderContribution("mobile/css/projectforge.css"));
-    add(JavascriptPackageResource.getHeaderContribution("mobile/javascript/functions.js"));
+    add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery-1.4.4.min.js"));
+    add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/myconfig.js"));
+    add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery.mobile-1.0a2.min.js"));
     add(WicketUtils.headerContributorForFavicon(getUrl("/favicon.ico")));
+    add(headerContainer = new WebMarkupContainer("header"));
+    headerContainer.add(new BookmarkablePageLink<String>("homeLink", MenuMobilePage.class));
     add(leftNavigationContainer = new WebMarkupContainer("leftNavigation"));
     leftNavigationContainer.add(leftNavigationRepeater = new MyRepeatingView("leftNavigationRepeater"));
     leftNavigationRepeater.add(new ImageBookmarkablePageLinkPanel(leftNavigationRepeater.newChildId(), MenuMobilePage.class, getResponse(),
@@ -101,7 +116,7 @@ public abstract class AbstractMobilePage extends WebPage
         if (user == null) {
           return getString("notLoggedIn");
         }
-        return "<strong>" + escapeHtml(user.getFullname()) + "</strong> |";
+        return "<strong>" + escapeHtml(user.getFullname()) + "</strong>";
       }
     };
     add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false).setRenderBodyOnly(false).setVisible(getUser() != null));

@@ -11,18 +11,24 @@
 
 <body>
 
-<div id="topbar">
-<div id="title">ProjectForge</div>
-<div id="leftnav" wicket:id="leftNavigation"><wicket:container wicket:id="leftNavigationRepeater">[left nav]</wicket:container></div>
-<div id="rightbutton" wicket:id="rightButton"></div>
+<div data-role="page"  data-theme="b">
+<div data-role="header" wicket:id="header">
+<h1><a wicket:id="homeLink" rel="external">ProjectForge</a></h1>
 </div>
-<wicket:child>
-  <div id="content">
-  <h2>This is the content!</h2>
-  </div>
-</wicket:child>
-<div id="footer"><span wicket:id="loggedInLabel">[Logged in: John Mustermann (john)]</span> <!-- Support iWebKit by sending us traffic; please keep this footer on your page, consider it a thank you for our work :-) -->
-<a class="noeffect" href="http://iwebkit.net">Powered by iWebKit</a></div>
+
+<div data-role="content">
+<wicket:container wicket:id="leftNavigation">
+  <wicket:container wicket:id="leftNavigationRepeater">[left nav]</wicket:container>
+</wicket:container><span wicket:id="rightButton">[right button]</span> <wicket:child>
+  This is the content!
+</wicket:child></div>
+<!-- /content -->
+
+<div data-role="footer">
+<h4><span wicket:id="loggedInLabel">[Logged in: John Mustermann (john)]</span></h4>
+</div>
+
+</div>
 
 </body>
 </html>

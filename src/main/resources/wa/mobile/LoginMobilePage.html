@@ -7,32 +7,33 @@
 
 <body>
 
-<div id="topbar">
-<div id="title">ProjectForge - Login</div>
-</div>
+<h1>Login page</h1>
 <wicket:extend>
-  <div id="content">
   <div wicket:id="feedback">[feedback]</div>
   <span class="graytitle"><wicket:message key="login.welcome" /></span>
   <form wicket:id="form" class="loginform">
-  <ul class="pageitem">
-    <li class="smallfield"><span class="name"><wicket:message key="username" /></span><input wicket:id="username"
-      wicket:message="placeholder:username" type="text" /></li>
-    <li class="smallfield"><span class="name"><wicket:message key="password" /></span><input wicket:id="password"
-      wicket:message="placeholder:password" type="password" /></li>
-    <li class="checkbox"><span class="name"><wicket:message key="login.stayLoggedIn" /></span><input wicket:id="stayLoggedIn" type="checkbox" /></li>
-    <li class="button"><input wicket:id="login" type="submit" /></li>
-  </ul>
+
+  <table>
+    <tbody>
+      <tr>
+        <td><label for="username"><wicket:message key="username" /></label></td>
+        <td><input id="username" wicket:id="username" wicket:message="placeholder:username" type="text" /></td>
+      </tr>
+      <tr>
+        <td><label for="password"><wicket:message key="password" /></label></td>
+        <td><input id="password" wicket:id="password" wicket:message="placeholder:password" type="password" /></td>
+      </tr>
+      <tr>
+        <td colspan="2"><input type="checkbox" id="stayLoggedIn" wicket:id="stayLoggedIn" class="custom" /> <label for="stayLoggedIn"><wicket:message
+          key="login.stayLoggedIn" /></label></td>
+      </tr>
+    </tbody>
+  </table>
+  <p><input wicket:id="login" type="submit" data-nobackbtn="true" /></p>
+
   </form>
-  <ul class="pageitem">
-    <li class="textbox" wicket:id="messageOfTheDayItem">
-    <p wicket:id="messageOfTheDay">[Have a lot of fun!]</p>
-    </li>
-    <li class="textbox">
-    <p style="color: grey;"><wicket:message key="mobile.loginPageInfo" /></p>
-    </li>
-  </ul>
-  </div>
+  <p wicket:id="messageOfTheDay">[Have a lot of fun!]</p>
+  <p style="color: grey;"><wicket:message key="mobile.loginPageInfo" /></p>
 </wicket:extend>
 </body>
 </html>

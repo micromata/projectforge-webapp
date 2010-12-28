@@ -134,7 +134,11 @@ public abstract class AbstractRenderer implements Serializable
 
   public DropDownChoiceLPanel createDropDownChoicePanel(final String id, final LayoutLength length, final DropDownChoice< ? > dropDownChoice)
   {
-    return new DropDownChoiceLPanel(id, length, dropDownChoice);
+    if (isMobile() == true) {
+      return new DropDownChoiceMobileLPanel(id, length, dropDownChoice);
+    } else {
+      return new DropDownChoiceLPanel(id, length, dropDownChoice);
+    }
   }
 
   public CheckBoxLPanel createCheckBoxPanel(final String id, final CheckBox checkBox)

@@ -58,7 +58,6 @@ public class LoginMobileForm extends AbstractMobileForm<LoginMobileForm, LoginMo
         parentPage.checkLogin();
       }
     };
-    setDefaultButton(loginButton);
     final SingleButtonPanel loginButtonPanel = new SingleButtonPanel("login", loginButton);
     add(loginButtonPanel);
   }

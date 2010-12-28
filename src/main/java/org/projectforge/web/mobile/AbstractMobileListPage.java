@@ -85,8 +85,7 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
     for (final O entry : list) {
       final PageParameters params = new PageParameters();
       params.put(AbstractEditPage.PARAMETER_KEY_ID, entry.getId());
-      resultRepeater.add(new PageItemEntryMenuPanel(resultRepeater.newChildId(), AddressMobileViewPage.class, params, null,
-          getEntryName(entry), getEntryComment(entry)));
+      resultRepeater.add(new ListViewItemPanel(resultRepeater.newChildId(), AddressMobileViewPage.class, params, getEntryName(entry)));
       if (++counter >= MAX_ROWS) {
         break;
       }

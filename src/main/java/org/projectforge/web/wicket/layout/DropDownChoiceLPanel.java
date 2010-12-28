@@ -40,7 +40,7 @@ public class DropDownChoiceLPanel extends AbstractLPanel
    */
   public static final String SELECT_ID = "select";
 
-  private DropDownChoice< ? > dropDownChoice;
+  protected DropDownChoice< ? > dropDownChoice;
 
   /**
    * @see AbstractRenderer#createDropDownChoicePanel(String, LayoutLength, DropDownChoice)
@@ -51,6 +51,26 @@ public class DropDownChoiceLPanel extends AbstractLPanel
     this.dropDownChoice = dropDownChoice;
     this.classAttributeAppender = "select";
     add(dropDownChoice);
+  }
+
+  /**
+   * Only used by DropDownChoiceMobileLPanel.
+   * @param id
+   * @param length
+   */
+  protected DropDownChoiceLPanel(final String id, final LayoutLength length)
+  {
+    super(id, length);
+  }
+
+  /**
+   * Does nothing.
+   * @param label
+   * @return
+   */
+  public DropDownChoiceLPanel setLabel(final String label)
+  {
+    return this;
   }
 
   @Override
