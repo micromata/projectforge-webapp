@@ -10,7 +10,10 @@
 <h1>An item of a list view</h1>
 <ul data-role="listview" data-inset="true" data-theme="c" data-dividertheme="b">
   <wicket:panel>
-    <wicket:container wicket:id="label">[label]</wicket:container><a wicket:id="link" rel="external"><wicket:container wicket:id="linkLabel">[link label]</wicket:container></a>
+    <wicket:container wicket:id="label">[label]</wicket:container>
+    <span wicket:id="comment" style="color: grey;">[comment]</span>
+    <a wicket:id="link" rel="external"><wicket:container wicket:id="linkLabel">[link label]</wicket:container><span wicket:id="linkComment"
+      style="color: grey;">[link comment]</span></a>
   </wicket:panel>
 </ul>
 </body>

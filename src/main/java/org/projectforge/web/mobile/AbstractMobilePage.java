@@ -34,7 +34,6 @@ import org.apache.wicket.markup.html.JavascriptPackageResource;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.model.Model;
 import org.projectforge.Version;
 import org.projectforge.user.PFUserDO;
@@ -89,7 +88,7 @@ public abstract class AbstractMobilePage extends WebPage
     add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery.mobile-1.0a2.min.js"));
     add(WicketUtils.headerContributorForFavicon(getUrl("/favicon.ico")));
     add(headerContainer = new WebMarkupContainer("header"));
-    headerContainer.add(new BookmarkablePageLink<String>("homeLink", MenuMobilePage.class));
+    headerContainer.add(MenuMobilePage.getHomeLink());
     add(new Label("windowTitle", new Model<String>() {
       @Override
       public String getObject()
@@ -101,11 +100,7 @@ public abstract class AbstractMobilePage extends WebPage
     final Model<String> loggedInLabelModel = new Model<String>() {
       public String getObject()
       {
-        final PFUserDO user = getUser();
-        if (user == null) {
-          return getString("notLoggedIn");
-        }
-        return "<strong>" + escapeHtml(user.getFullname()) + "</strong>";
+        return "<strong>" + escapeHtml(Version.APP_TITLE) + "</strong>";
       }
     };
     add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false).setRenderBodyOnly(false).setVisible(getUser() != null));

@@ -26,6 +26,7 @@ package org.projectforge.web.mobile;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebResponse;
@@ -39,12 +40,24 @@ import org.projectforge.web.wicket.MySession;
 
 public class MenuMobilePage extends AbstractSecuredMobilePage
 {
+  // Indicates that the menu mobile page should be shown directly instead of restoring last page after stay-logged-in.
+  private static final String PARAM_HOME_KEY = "home";
 
   @SpringBean(name = "configuration")
   private Configuration configuration;
 
   @SpringBean(name = "menuBuilder")
   private MenuBuilder menuBuilder;
+
+  /**
+   * Returns a link to this the menu mobile page. It should be shown directly instead of restoring last page after stay-logged-in .
+   */
+  public static BookmarkablePageLink<String> getHomeLink()
+  {
+    final PageParameters params = new PageParameters();
+    params.put(PARAM_HOME_KEY, true);
+    return new BookmarkablePageLink<String>("homeLink", MenuMobilePage.class, params);
+  }
 
   public MenuMobilePage()
   {
@@ -57,10 +70,12 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
     super(parameters);
     if (getUser().getAttribute(UserFilter.USER_ATTR_STAY_LOGGED_IN) != null) {
       getUser().removeAttribute(UserFilter.USER_ATTR_STAY_LOGGED_IN);
-      final RecentMobilePageInfo pageInfo = (RecentMobilePageInfo) userXmlPreferencesCache.getEntry(getUserId(),
-          AbstractSecuredMobilePage.USER_PREF_RECENT_PAGE);
-      if (pageInfo != null && pageInfo.getPageClass() != null) {
-        throw new RestartResponseException((Class) pageInfo.getPageClass(), pageInfo.restorePageParameters());
+      if (parameters.containsKey(PARAM_HOME_KEY) == false) {
+        final RecentMobilePageInfo pageInfo = (RecentMobilePageInfo) userXmlPreferencesCache.getEntry(getUserId(),
+            AbstractSecuredMobilePage.USER_PREF_RECENT_PAGE);
+        if (pageInfo != null && pageInfo.getPageClass() != null) {
+          throw new RestartResponseException((Class) pageInfo.getPageClass(), pageInfo.restorePageParameters());
+        }
       }
     }
     setNoBackButton();
@@ -78,7 +93,7 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
             menuBuilder);
         setResponsePage(LoginMobilePage.class);
       }
-      
+
     }, getString("menu.logout")) {
     });
     if (getMySession().isIOSDevice() == true) {

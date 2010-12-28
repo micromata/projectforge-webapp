@@ -84,13 +84,15 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
     for (final O entry : list) {
       final PageParameters params = new PageParameters();
       params.put(AbstractEditPage.PARAMETER_KEY_ID, entry.getId());
-      resultRepeater.add(new ListViewItemPanel(resultRepeater.newChildId(), AddressMobileViewPage.class, params, getEntryName(entry)));
+      final String comment = getEntryComment(entry);
+      resultRepeater.add(new ListViewItemPanel(resultRepeater.newChildId(), AddressMobileViewPage.class, params, getEntryName(entry),
+          StringUtils.isNotBlank(comment) ? ", " + getEntryComment(entry) : null));
       if (++counter >= MAX_ROWS) {
         break;
       }
     }
   }
-  
+
   @Override
   protected void onBeforeRender()
   {
