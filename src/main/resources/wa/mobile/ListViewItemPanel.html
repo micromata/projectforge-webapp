@@ -7,14 +7,11 @@
 
 <body>
 
-<div id="topbar">
-<div id="title">ProjectForge - PageItem</div>
-</div>
-<div id="content"><wicket:panel>
-  <ul class="pageitem">
-    <wicket:container wicket:id="repeater">
-    </wicket:container>
-  </ul>
-</wicket:panel></div>
+<h1>An item of a list view</h1>
+<ul data-role="listview" data-inset="true" data-theme="c" data-dividertheme="b">
+  <wicket:panel>
+    <wicket:container wicket:id="label">[label]</wicket:container><a wicket:id="link" data-nobackbtn="true"><wicket:container wicket:id="linkLabel">[link label]</wicket:container></a>
+  </wicket:panel>
+</ul>
 </body>
 </html>
