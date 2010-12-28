@@ -81,7 +81,7 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
     setNoBackButton();
     final ListViewPanel listViewPanel = new ListViewPanel("menu");
     add(listViewPanel);
-    listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), getString("menu.main.title")));
+    listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), getString("menu.main.title")).setListDivider());
     if (configuration.isAddressManagementConfigured() == true) {
       listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), AddressMobileListPage.class, getString("address.title.heading")));
     }

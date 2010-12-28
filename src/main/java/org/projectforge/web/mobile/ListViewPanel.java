@@ -51,7 +51,7 @@ public class ListViewPanel extends Panel
 
   public ListViewPanel add(final ListViewItemPanel entryPanel)
   {
-    repeater.add(entryPanel);
+    repeater.add(entryPanel.init());
     return this;
   }
 }

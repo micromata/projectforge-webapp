@@ -28,7 +28,6 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.core.BaseDO;
 import org.projectforge.web.address.AddressMobileEditPage;
 import org.projectforge.web.address.AddressMobileViewPage;
@@ -48,7 +47,7 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
 
   protected WebMarkupContainer resultList;
 
-  protected RepeatingView resultRepeater;
+  protected ListViewPanel listViewPanel;
 
   public AbstractMobileListPage(final String i18nKey, final PageParameters parameters)
   {
@@ -57,16 +56,16 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
     form = newListForm(this);
     add(form);
     form.init();
-    add(resultList = new WebMarkupContainer("resultList"));
-    resultList.setVisible(false);
+    add(listViewPanel = new ListViewPanel("listViewPage"));
+    listViewPanel.setVisible(false);
     setNoBackButton();
   }
 
   @SuppressWarnings("unchecked")
   protected void search()
   {
-    if (resultRepeater != null) {
-      resultList.remove(resultRepeater);
+    if (listViewPanel != null) {
+      remove(listViewPanel);
     }
     if (StringUtils.isBlank(form.filter.getSearchString()) == true) {
       list = null;
@@ -74,19 +73,22 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
       list = (List<O>) getBaseDao().getList(form.filter);
     }
     if (CollectionUtils.isEmpty(list) == true) {
-      resultList.setVisible(false);
+      listViewPanel.setVisible(false);
       return;
     }
-    resultList.setVisible(true);
-    resultList.add(resultRepeater = new RepeatingView("resultRepeater"));
+    listViewPanel.setVisible(true);
+    add(listViewPanel = new ListViewPanel("listViewPage"));
 
     int counter = 0;
     for (final O entry : list) {
       final PageParameters params = new PageParameters();
       params.put(AbstractEditPage.PARAMETER_KEY_ID, entry.getId());
       final String comment = getEntryComment(entry);
-      resultRepeater.add(new ListViewItemPanel(resultRepeater.newChildId(), AddressMobileViewPage.class, params, getEntryName(entry),
-          StringUtils.isNotBlank(comment) ? ", " + getEntryComment(entry) : null));
+      final ListViewItemPanel listItem = new ListViewItemPanel(listViewPanel.newChildId(), AddressMobileViewPage.class, params, getEntryName(entry));
+      if (StringUtils.isNotBlank(comment) ==true) {
+        listItem.setComment(", " + comment);
+      }
+      listViewPanel.add(listItem);
       if (++counter >= MAX_ROWS) {
         break;
       }

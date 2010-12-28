@@ -42,14 +42,15 @@ public class ListViewItemPanel extends Panel
 
   private static final long serialVersionUID = -3635473474541275092L;
 
+  private boolean listDivider;
+
+  private Link< ? > link;
+
+  private String label, comment;
+
   public ListViewItemPanel(final String id, final Class< ? extends WebPage> linkClass, final String label)
   {
-    this(id, new BookmarkablePageLink<String>(LINK_ID, linkClass), label, null);
-  }
-
-  public ListViewItemPanel(final String id, final Class< ? extends WebPage> linkClass, final String label, final String comment)
-  {
-    this(id, new BookmarkablePageLink<String>(LINK_ID, linkClass), label, comment);
+    this(id, new BookmarkablePageLink<String>(LINK_ID, linkClass), label);
   }
 
   public ListViewItemPanel(final String id, final Class< ? extends WebPage> linkClass, final PageParameters params, final String label)
@@ -57,29 +58,11 @@ public class ListViewItemPanel extends Panel
     this(id, new BookmarkablePageLink<String>(LINK_ID, linkClass, params), label);
   }
 
-  public ListViewItemPanel(final String id, final Class< ? extends WebPage> linkClass, final PageParameters params, final String label,
-      final String comment)
-  {
-    this(id, new BookmarkablePageLink<String>(LINK_ID, linkClass, params), label, comment);
-  }
-
   public ListViewItemPanel(final String id, final Link< ? > link, final String label)
   {
-    this(id, link, label, null);
-  }
-
-  public ListViewItemPanel(final String id, final Link< ? > link, final String label, final String comment)
-  {
     super(id);
-    add(new Label("label", "[invisible]").setVisible(false));
-    add(new Label("comment", "[invisible]").setVisible(false));
-    add(link);
-    link.add(new Label("linkLabel", label));
-    if (comment != null) {
-      link.add(new Label("linkComment", comment));
-    } else {
-      link.add(new Label("linkComment", "[invisible]").setVisible(false));
-    }
+    this.link = link;
+    this.label = label;
   }
 
   public ListViewItemPanel(final String id, final String label)
@@ -90,13 +73,46 @@ public class ListViewItemPanel extends Panel
   public ListViewItemPanel(final String id, final String label, final String comment)
   {
     super(id);
-    add(new SimpleAttributeModifier("data-role", "list-divider"));
-    add(new Label("label", label));
-    if (comment != null) {
-      add(new Label("comment", comment));
-    } else {
-      add(new Label("comment", "[invisible]").setVisible(false));
+    this.label = label;
+    this.comment = comment;
+  }
+
+  public ListViewItemPanel setListDivider()
+  {
+    this.listDivider = true;
+    return this;
+  }
+
+  public ListViewItemPanel setComment(String comment)
+  {
+    this.comment = comment;
+    return this;
+  }
+
+  public ListViewItemPanel init()
+  {
+    if (listDivider == true) {
+      add(new SimpleAttributeModifier("data-role", "list-divider"));
     }
-    add(new Label(LINK_ID, "[invisible]").setVisible(false));
+    if (link != null) {
+      add(new Label("label", "[invisible]").setVisible(false));
+      add(new Label("comment", "[invisible]").setVisible(false));
+      add(link);
+      link.add(new Label("linkLabel", label));
+      if (comment != null) {
+        link.add(new Label("linkComment", comment));
+      } else {
+        link.add(new Label("linkComment", "[invisible]").setVisible(false));
+      }
+    } else {
+      add(new Label("label", label));
+      if (comment != null) {
+        add(new Label("comment", comment));
+      } else {
+        add(new Label("comment", "[invisible]").setVisible(false));
+      }
+      add(new Label(LINK_ID, "[invisible]").setVisible(false));
+    }
+    return this;
   }
 }
