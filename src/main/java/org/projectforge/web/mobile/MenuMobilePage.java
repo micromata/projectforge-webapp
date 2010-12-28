@@ -25,6 +25,7 @@ package org.projectforge.web.mobile;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.RestartResponseException;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebResponse;
@@ -80,6 +81,11 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
       
     }, getString("menu.logout")) {
     });
+    if (getMySession().isIOSDevice() == true) {
+      add(new Label("iOSHint", getString("mobile.iOS.startScreenInfo")));
+    } else {
+      add(new Label("iOSHint", getString("mobile.others.startScreenInfo")));
+    }
   }
 
   @Override

@@ -31,8 +31,9 @@ import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.web.mobile.AbstractSecuredMobilePage;
+import org.projectforge.web.mobile.JQueryButtonPanel;
+import org.projectforge.web.mobile.JQueryButtonType;
 import org.projectforge.web.wicket.AbstractEditPage;
-import org.projectforge.web.wicket.components.LabelBookmarkablePageLinkPanel;
 import org.projectforge.web.wicket.layout.LayoutContext;
 
 public class AddressMobileViewPage extends AbstractSecuredMobilePage
@@ -83,7 +84,9 @@ public class AddressMobileViewPage extends AbstractSecuredMobilePage
     if (NumberHelper.greaterZero(id) == true) {
       final PageParameters params = new PageParameters();
       params.put(AbstractEditPage.PARAMETER_KEY_ID, id);
-      add(new LabelBookmarkablePageLinkPanel(TOP_RIGHT_BUTTON_ID, AddressMobileEditPage.class, getString("edit"), params));
+      headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.CHECK, AddressMobileEditPage.class, params, getString("edit")));
+    } else {
+      super.addTopRightButton();
     }
   }
 

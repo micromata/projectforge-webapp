@@ -97,6 +97,13 @@ public class MySession extends WebSession
   {
     return userAgent;
   }
+  
+  /**
+   * @return true, if the user agent device is an iPad, iPhone or iPod.
+   */
+  public boolean isIOSDevice() {
+    return this.userAgentDevice != null && this.userAgentDevice.isIn(UserAgentDevice.IPAD, UserAgentDevice.IPHONE, UserAgentDevice.IPOD);
+  }
 
   /**
    * @return true, if the user agent is a mobile agent and ignoreMobileUserAgent isn't set, otherwise false.

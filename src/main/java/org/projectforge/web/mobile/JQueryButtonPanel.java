@@ -56,6 +56,8 @@ public class JQueryButtonPanel extends Panel
     }
     if (type == JQueryButtonType.PLUS) {
       link.add(new SimpleAttributeModifier("data-icon", "plus"));
+    } else {
+      link.add(new SimpleAttributeModifier("data-icon", "check"));
     }
     link.add(new SimpleAttributeModifier("class", "ui-btn-right"));
     add(link);

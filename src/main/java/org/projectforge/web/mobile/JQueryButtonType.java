@@ -30,5 +30,5 @@ package org.projectforge.web.mobile;
  */
 public enum JQueryButtonType
 {
-  PLUS;
+  CHECK, PLUS;
 }
