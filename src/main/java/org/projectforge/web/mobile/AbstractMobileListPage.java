@@ -56,8 +56,6 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
     form = newListForm(this);
     add(form);
     form.init();
-    add(listViewPanel = new ListViewPanel("listViewPage"));
-    listViewPanel.setVisible(false);
     setNoBackButton();
   }
 
@@ -72,12 +70,11 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
     } else {
       list = (List<O>) getBaseDao().getList(form.filter);
     }
+    add(listViewPanel = new ListViewPanel("listViewPage"));
     if (CollectionUtils.isEmpty(list) == true) {
       listViewPanel.setVisible(false);
       return;
     }
-    listViewPanel.setVisible(true);
-    add(listViewPanel = new ListViewPanel("listViewPage"));
 
     int counter = 0;
     for (final O entry : list) {
