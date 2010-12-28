@@ -24,18 +24,34 @@
 package org.projectforge.web.mobile;
 
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.markup.repeater.RepeatingView;
 
 /**
- * li of an ul-Panel which is used for most content areas.
+ * ul-Panel used for most content areas.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class PageItemEntryPanel extends Panel
+public class ListViewPanel extends Panel
 {
-  private static final long serialVersionUID = -3635473474541275092L;
+  private static final long serialVersionUID = -5465667274834690310L;
 
-  public PageItemEntryPanel(final String id)
+  private RepeatingView repeater;
+
+  public ListViewPanel(final String id)
   {
     super(id);
+    repeater = new RepeatingView("itemRepeater");
+    add(repeater);
+  }
+
+  public String newChildId()
+  {
+    return repeater.newChildId();
+  }
+
+  public ListViewPanel add(final ListViewItemPanel entryPanel)
+  {
+    repeater.add(entryPanel);
+    return this;
   }
 }
