@@ -10,9 +10,8 @@
   <form wicket:id="form">
   <div data-role="fieldcontain"><input type="text" data-type="search" wicket:id="searchField" id="search" placeholder="Suche" rel="extern" /></div>
   </form>
-  <ul class="pageitem" wicket:id="resultList">
-    <wicket:container wicket:id="resultRepeater">
-    </wicket:container>
+  <ul data-role="listview" wicket:id="resultList">
+    <li wicket:id="resultRepeater">[entry]</li>
   </ul>
 </wicket:extend>
 </body>
