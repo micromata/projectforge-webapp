@@ -23,7 +23,6 @@
 
 package org.projectforge.web.wicket.layout;
 
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 
 /**
