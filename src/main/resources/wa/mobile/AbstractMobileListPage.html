@@ -7,18 +7,13 @@
 
 <body>
 <wicket:extend>
-  <div class="searchbox">
   <form wicket:id="form">
-  <fieldset><input id="search" wicket:id="searchField" placeholder="Suche" type="text" /><input id="submit" wicket:id="searchButton"
-    type="hidden" /></fieldset>
+  <div data-role="fieldcontain"><input type="text" data-type="search" wicket:id="searchField" id="search" placeholder="Suche" rel="extern" /></div>
   </form>
-  </div>
-  <div id="content">
   <ul class="pageitem" wicket:id="resultList">
     <wicket:container wicket:id="resultRepeater">
     </wicket:container>
   </ul>
-  </div>
 </wicket:extend>
 </body>
 </html>

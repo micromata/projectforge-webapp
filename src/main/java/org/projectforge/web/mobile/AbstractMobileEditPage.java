@@ -29,7 +29,6 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.web.wicket.AbstractEditPage;
-import org.projectforge.web.wicket.components.LabelBookmarkablePageLinkPanel;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -45,8 +44,6 @@ public abstract class AbstractMobileEditPage<O extends AbstractBaseDO< ? >, F ex
   {
     super(parameters);
     this.i18nPrefix = i18nPrefix;
-    leftNavigationRepeater.add(new LabelBookmarkablePageLinkPanel(leftNavigationRepeater.newChildId(), getListPageClass(),
-        getString("list")));
   }
 
   protected abstract Class< ? extends AbstractMobileListPage< ? , ? , ? >> getListPageClass();

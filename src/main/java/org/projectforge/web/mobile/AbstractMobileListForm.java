@@ -24,9 +24,7 @@
 package org.projectforge.web.mobile;
 
 import org.apache.wicket.behavior.SimpleAttributeModifier;
-import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.core.BaseSearchFilter;
 
@@ -55,19 +53,10 @@ public abstract class AbstractMobileListForm<F extends BaseSearchFilter, P exten
     }
   }
 
-  @SuppressWarnings("serial")
   protected void init()
   {
     add(new TextField<String>("searchField", new PropertyModel<String>(filter, "searchString")).add(new SimpleAttributeModifier(
         "placeholder", getString("search"))));
-    final Button searchButton = new Button("searchButton", new Model<String>(getString("search"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.search();
-      }
-    };
-    add(searchButton);
   }
 
   protected abstract F newFilter();

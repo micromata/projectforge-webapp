@@ -33,7 +33,6 @@ import org.projectforge.core.BaseDO;
 import org.projectforge.web.address.AddressMobileEditPage;
 import org.projectforge.web.address.AddressMobileViewPage;
 import org.projectforge.web.wicket.AbstractEditPage;
-import org.projectforge.web.wicket.components.LabelBookmarkablePageLinkPanel;
 import org.springframework.util.CollectionUtils;
 
 public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ? , ? >, D extends org.projectforge.core.IDao< ? >, O extends BaseDO< ? >>
@@ -60,7 +59,7 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
     form.init();
     add(resultList = new WebMarkupContainer("resultList"));
     resultList.setVisible(false);
-    search();
+    setNoBackButton();
   }
 
   @SuppressWarnings("unchecked")
@@ -91,6 +90,13 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
       }
     }
   }
+  
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
+    search();
+  }
 
   /**
    * @return The value to show in the list.
@@ -108,9 +114,9 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
   protected abstract D getBaseDao();
 
   @Override
-  protected void addRightButton()
+  protected void addTopRightButton()
   {
-    add(new LabelBookmarkablePageLinkPanel(RIGHT_BUTTON_ID, AddressMobileEditPage.class, " + "));
+    headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.PLUS, AddressMobileEditPage.class, getString("new")));
   }
 
   protected abstract F newListForm(AbstractMobileListPage< ? , ? , ? > parentPage);

@@ -27,7 +27,6 @@ import java.text.MessageFormat;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.wicket.Application;
-import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.CSSPackageResource;
@@ -36,7 +35,6 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.projectforge.Version;
 import org.projectforge.user.PFUserDO;
@@ -44,8 +42,6 @@ import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.components.ImageBookmarkablePageLinkPanel;
-import org.projectforge.web.wicket.components.MyRepeatingView;
 
 /**
  * Do only derive from this page, if no login is required!
@@ -53,13 +49,11 @@ import org.projectforge.web.wicket.components.MyRepeatingView;
  */
 public abstract class AbstractMobilePage extends WebPage
 {
-  protected final static String RIGHT_BUTTON_ID = "rightButton";
+  protected final static String TOP_RIGHT_BUTTON_ID = "topRightButton";
 
   protected WebMarkupContainer headerContainer;
 
-  protected RepeatingView leftNavigationRepeater;
-
-  protected WebMarkupContainer leftNavigationContainer, rightButtonContainer;
+  protected WebMarkupContainer rightButtonContainer;
 
   // iWebKit doesn't work completely with wicket tags such as wicket:panel etc.
   private static boolean stripTags;
@@ -97,10 +91,6 @@ public abstract class AbstractMobilePage extends WebPage
     add(WicketUtils.headerContributorForFavicon(getUrl("/favicon.ico")));
     add(headerContainer = new WebMarkupContainer("header"));
     headerContainer.add(new BookmarkablePageLink<String>("homeLink", MenuMobilePage.class));
-    add(leftNavigationContainer = new WebMarkupContainer("leftNavigation"));
-    leftNavigationContainer.add(leftNavigationRepeater = new MyRepeatingView("leftNavigationRepeater"));
-    leftNavigationRepeater.add(new ImageBookmarkablePageLinkPanel(leftNavigationRepeater.newChildId(), MenuMobilePage.class, getResponse(),
-        MobileWebConstants.IMAGE_HOME));
     add(new Label("windowTitle", new Model<String>() {
       @Override
       public String getObject()
@@ -108,7 +98,7 @@ public abstract class AbstractMobilePage extends WebPage
         return getWindowTitle();
       }
     }));
-    addRightButton();
+    addTopRightButton();
     final Model<String> loggedInLabelModel = new Model<String>() {
       public String getObject()
       {
@@ -142,12 +132,6 @@ public abstract class AbstractMobilePage extends WebPage
     if (stripTags == false) {
       Application.get().getMarkupSettings().setStripWicketTags(false);
     }
-  }
-
-  protected void addLeftnavComponent(final Component component)
-  {
-    leftNavigationRepeater.add(component);
-    leftNavigationContainer.setVisible(true);
   }
 
   public MySession getMySession()
@@ -227,8 +211,8 @@ public abstract class AbstractMobilePage extends WebPage
   /**
    * Adds invisible component as default.
    */
-  protected void addRightButton()
+  protected void addTopRightButton()
   {
-    add(new Label(RIGHT_BUTTON_ID, "[invisible]").setVisible(false));
+    headerContainer.add(new Label(TOP_RIGHT_BUTTON_ID, "[invisible]").setVisible(false));
   }
 }

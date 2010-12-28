@@ -63,7 +63,6 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
       }
     }
     setNoBackButton();
-    leftNavigationContainer.setVisible(false);
     final ListViewPanel listViewPanel = new ListViewPanel("menu");
     add(listViewPanel);
     listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), getString("menu.main.title")));

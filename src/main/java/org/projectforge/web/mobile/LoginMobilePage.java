@@ -82,7 +82,6 @@ public class LoginMobilePage extends AbstractMobilePage
     form = new LoginMobileForm(this);
     add(form);
     form.init();
-    leftNavigationContainer.setVisible(false);
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
     if (StringUtils.isBlank(messageOfTheDay) == true) {

@@ -11,15 +11,12 @@
 
 <body>
 
-<div data-role="page"  data-theme="b">
+<div data-role="page" data-theme="b">
 <div data-role="header" wicket:id="header">
 <h1><a wicket:id="homeLink" rel="external">ProjectForge</a></h1>
-</div>
+<wicket:container wicket:id="topRightButton">[invisible]</wicket:container></div>
 
-<div data-role="content">
-<wicket:container wicket:id="leftNavigation">
-  <wicket:container wicket:id="leftNavigationRepeater">[left nav]</wicket:container>
-</wicket:container><span wicket:id="rightButton">[right button]</span> <wicket:child>
+<div data-role="content"><wicket:child>
   This is the content!
 </wicket:child></div>
 <!-- /content -->

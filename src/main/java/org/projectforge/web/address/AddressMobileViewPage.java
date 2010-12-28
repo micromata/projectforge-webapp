@@ -63,8 +63,6 @@ public class AddressMobileViewPage extends AbstractSecuredMobilePage
       setResponsePage(AddressMobileListPage.class);
       return;
     }
-    leftNavigationRepeater.add(new LabelBookmarkablePageLinkPanel(leftNavigationRepeater.newChildId(), AddressMobileListPage.class,
-        getString("list")));
 
     final boolean isNew = false;
     personalAddress = null;
@@ -79,13 +77,13 @@ public class AddressMobileViewPage extends AbstractSecuredMobilePage
   }
 
   @Override
-  protected void addRightButton()
+  protected void addTopRightButton()
   {
     final Integer id = getPageParameters().getAsInteger(AbstractEditPage.PARAMETER_KEY_ID);
     if (NumberHelper.greaterZero(id) == true) {
       final PageParameters params = new PageParameters();
       params.put(AbstractEditPage.PARAMETER_KEY_ID, id);
-      add(new LabelBookmarkablePageLinkPanel(RIGHT_BUTTON_ID, AddressMobileEditPage.class, getString("edit"), params));
+      add(new LabelBookmarkablePageLinkPanel(TOP_RIGHT_BUTTON_ID, AddressMobileEditPage.class, getString("edit"), params));
     }
   }
 
