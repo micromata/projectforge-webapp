@@ -61,9 +61,6 @@ public abstract class AbstractMobilePage extends WebPage
   public AbstractMobilePage()
   {
     this(new PageParameters());
-    if (stripTags == null) {
-      stripTags = Application.get().getMarkupSettings().getStripWicketTags();
-    }
   }
 
   protected void setNoBackButton()
@@ -80,6 +77,9 @@ public abstract class AbstractMobilePage extends WebPage
   public AbstractMobilePage(final PageParameters parameters)
   {
     super(parameters);
+    if (stripTags == null) {
+      stripTags = Application.get().getMarkupSettings().getStripWicketTags();
+    }
     // add(CSSPackageResource.getHeaderContribution("mobile/css/iWebKit.css"));
     add(CSSPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery.mobile-1.0a2.min.css"));
     // add(CSSPackageResource.getHeaderContribution("mobile/css/projectforge.css"));
