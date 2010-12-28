@@ -56,15 +56,14 @@ public abstract class AbstractMobilePage extends WebPage
   protected WebMarkupContainer rightButtonContainer;
 
   // iWebKit doesn't work completely with wicket tags such as wicket:panel etc.
-  private static boolean stripTags;
-
-  static {
-    stripTags = Application.get().getMarkupSettings().getStripWicketTags();
-  }
+  private static Boolean stripTags;
 
   public AbstractMobilePage()
   {
     this(new PageParameters());
+    if (stripTags == null) {
+      stripTags = Application.get().getMarkupSettings().getStripWicketTags();
+    }
   }
 
   protected void setNoBackButton()
