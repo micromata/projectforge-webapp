@@ -46,8 +46,8 @@ public class ListViewItemPanel extends Panel
 
   private Link< ? > link;
 
-  private String label, comment;
-
+  private String label, comment, counter;
+  
   public ListViewItemPanel(final String id, final Class< ? extends WebPage> linkClass, final String label)
   {
     this(id, new BookmarkablePageLink<String>(LINK_ID, linkClass), label);
@@ -83,9 +83,15 @@ public class ListViewItemPanel extends Panel
     return this;
   }
 
-  public ListViewItemPanel setComment(String comment)
+  public ListViewItemPanel setComment(final String comment)
   {
     this.comment = comment;
+    return this;
+  }
+
+  public ListViewItemPanel setCounter(final String counter)
+  {
+    this.counter = counter;
     return this;
   }
 
@@ -112,6 +118,11 @@ public class ListViewItemPanel extends Panel
         add(new Label("comment", "[invisible]").setVisible(false));
       }
       add(new Label(LINK_ID, "[invisible]").setVisible(false));
+    }
+    if (counter != null) {
+      
+    } else {
+      add(new Label("counter", "[invisible]").setVisible(false));
     }
     return this;
   }

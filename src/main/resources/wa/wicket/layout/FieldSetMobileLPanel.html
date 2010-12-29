@@ -6,8 +6,10 @@
 <body>
 <h1>Represents a field set panel. A form or page can contain multiple field sets.</h1>
 <wicket:panel>
-  <span class="graytitle" wicket:id="heading">[heading]</span>
-  <wicket:container wicket:id="groupRepeater">[group panels]</wicket:container>
+  <ul data-role="listview">
+    <li data-role="list-divider" wicket:id="heading">[heading]</li>
+    <wicket:container wicket:id="groupRepeater">[group panels]</wicket:container>
+  </ul>
 </wicket:panel>
 </body>
 </html>

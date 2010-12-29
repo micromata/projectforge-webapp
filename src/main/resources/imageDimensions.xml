@@ -203,39 +203,14 @@
   <image path="/images/zoom.png" width="16" height="16"/>
   <image path="/images/zoom_in.png" width="16" height="16"/>
   <image path="/images/zoom_out.png" width="16" height="16"/>
-  <image path="/mobile/images/0stars.png" width="65" height="18"/>
-  <image path="/mobile/images/0starsborder.png" width="65" height="18"/>
-  <image path="/mobile/images/1stars.png" width="65" height="18"/>
-  <image path="/mobile/images/1starsborder.png" width="65" height="18"/>
-  <image path="/mobile/images/2stars.png" width="65" height="18"/>
-  <image path="/mobile/images/2starsborder.png" width="65" height="18"/>
-  <image path="/mobile/images/3stars.png" width="65" height="18"/>
-  <image path="/mobile/images/3starsborder.png" width="65" height="18"/>
-  <image path="/mobile/images/4stars.png" width="65" height="18"/>
-  <image path="/mobile/images/4starsborder.png" width="65" height="18"/>
-  <image path="/mobile/images/5stars.png" width="65" height="18"/>
-  <image path="/mobile/images/arrow.png" width="8" height="26"/>
-  <image path="/mobile/images/checkbox.png" width="94" height="54"/>
-  <image path="/mobile/images/home.png" width="20" height="20"/>
-  <image path="/mobile/images/navbutton.png" width="11" height="30"/>
-  <image path="/mobile/images/navbuttonblack.png" width="11" height="30"/>
-  <image path="/mobile/images/navbuttonblue.png" width="11" height="31"/>
-  <image path="/mobile/images/navleft.png" width="19" height="30"/>
-  <image path="/mobile/images/navleftblack.png" width="19" height="30"/>
-  <image path="/mobile/images/navlinkleft.png" width="19" height="30"/>
-  <image path="/mobile/images/navlinkleftblack.png" width="19" height="30"/>
-  <image path="/mobile/images/navlinkright.png" width="19" height="30"/>
-  <image path="/mobile/images/navlinkrightblack.png" width="19" height="30"/>
-  <image path="/mobile/images/navright.png" width="19" height="30"/>
-  <image path="/mobile/images/navrightblack.png" width="19" height="30"/>
-  <image path="/mobile/images/play.gif" width="10" height="20"/>
-  <image path="/mobile/images/radiobutton.png" width="21" height="13"/>
-  <image path="/mobile/images/searchfield.png" width="39" height="30"/>
-  <image path="/mobile/images/tributton.png" width="9" height="30"/>
-  <image path="/mobile/thumbs/calendar.png" width="31" height="32"/>
-  <image path="/mobile/thumbs/clock.png" width="31" height="32"/>
-  <image path="/mobile/thumbs/contacts.png" width="31" height="32"/>
-  <image path="/mobile/thumbs/help.png" width="32" height="32"/>
-  <image path="/mobile/thumbs/settings.png" width="31" height="32"/>
-  <image path="/mobile/thumbs/start.png" width="32" height="32"/>
+  <image path="/mobile/jquery.mobile/images/ajax-loader.png" width="35" height="35"/>
+  <image path="/mobile/jquery.mobile/images/form-check-off.png" width="20" height="20"/>
+  <image path="/mobile/jquery.mobile/images/form-check-on.png" width="20" height="20"/>
+  <image path="/mobile/jquery.mobile/images/form-radio-off.png" width="20" height="20"/>
+  <image path="/mobile/jquery.mobile/images/form-radio-on.png" width="20" height="20"/>
+  <image path="/mobile/jquery.mobile/images/icon-search-black.png" width="16" height="16"/>
+  <image path="/mobile/jquery.mobile/images/icons-18-black.png" width="560" height="20"/>
+  <image path="/mobile/jquery.mobile/images/icons-18-white.png" width="558" height="18"/>
+  <image path="/mobile/jquery.mobile/images/icons-36-black.png" width="1116" height="36"/>
+  <image path="/mobile/jquery.mobile/images/icons-36-white.png" width="1116" height="36"/>
 </images>

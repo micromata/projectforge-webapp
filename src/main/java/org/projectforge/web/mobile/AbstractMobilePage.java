@@ -82,7 +82,7 @@ public abstract class AbstractMobilePage extends WebPage
     // add(CSSPackageResource.getHeaderContribution("mobile/css/iWebKit.css"));
     add(CSSPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery.mobile-1.0a2.min.css"));
     // add(CSSPackageResource.getHeaderContribution("mobile/css/projectforge.css"));
-    add(CSSPackageResource.getHeaderContribution("mobile/css/projectforge.css"));
+    add(CSSPackageResource.getHeaderContribution("mobile/projectforge.css"));
     add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery-1.4.4.min.js"));
     add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/myconfig.js"));
     add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery.mobile-1.0a2.min.js"));
@@ -199,7 +199,7 @@ public abstract class AbstractMobilePage extends WebPage
 
   protected String getWindowTitle()
   {
-    return Version.APP_ID + " - " + getTitle();
+    return Version.APP_ID;
   }
 
   /**

@@ -52,7 +52,6 @@ import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.HibernateSearchPhoneNumberBridge;
 import org.projectforge.task.TaskDO;
 
-
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
@@ -429,6 +428,12 @@ public class AddressDO extends DefaultBaseDO
   public void setFirstName(String firstName)
   {
     this.firstName = firstName;
+  }
+
+  @Transient
+  public String getFullName()
+  {
+    return StringHelper.listToString(", ", name, firstName);
   }
 
   @Column(length = 255)

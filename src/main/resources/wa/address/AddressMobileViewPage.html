@@ -9,17 +9,33 @@
 
 <h1>Address view page</h1>
 <wicket:extend>
-  <div id="content">
-  <!-- ul data-role="listview">
-    <li data-role="list-divider">Friday, October 8, 2010 <span class="ui-li-count">2</span></li>
-    <li>
-    <h3><a href="index.html">Stephen Weber</a></h3>
-    <p><strong>You've been invited to a meeting at Filament Group in Boston, MA</strong></p>
-    <p>Hey Stephen, if you're available at 10am tomorrow, we've got a meeting with the jQuery team.</p>
-    <p class="ui-li-aside"><strong>6:24</strong>PM</p>
-    </li>
-  </ul-->
-  <wicket:container wicket:id="fieldSetRepeater">[The field sets.]</wicket:container></div>
+ <h3>Telefon</h3>
+  
+  <table>
+    <tbody>
+<tr>
+        <th>Telefon mobil</th>
+        <td>
+  <a href="tel:01701891142">+49 1701891142</a>
+  <a href="sms:01701891142" style="-webkit-touch-callout: none;">SMS</a>
+  <a href="mailto:k.reinhard@me.com">Mail to</a>
+</td>
+      </tr>
+      <tr>
+        <th>Telefon</th>
+        <td>
+  <a href="tel:+49 561 316793-21" class="noeffect">+49 561 316793-21</a>
+  
+</td>
+      </tr><tr>
+        <th>Fax</th>
+        <td>
+  <a href="tel:+49 561 316793-11" class="noeffect">+49 561 316793-11</a>
+  
+</td>
+      </tr>    </tbody>
+  </table>
+  <div id="content"><wicket:container wicket:id="fieldSetRepeater">[The field sets.]</wicket:container></div>
 </wicket:extend>
 </body>
 </html>

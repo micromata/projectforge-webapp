@@ -56,7 +56,7 @@ public class AddressMobileListPage extends AbstractMobileListPage<AddressMobileL
   @Override
   protected String getEntryName(final AddressDO entry)
   {
-    return entry.getFirstName() + " " + entry.getName();
+    return entry.getFullName();
   }
 
   @Override
