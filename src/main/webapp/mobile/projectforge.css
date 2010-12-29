@@ -1,0 +1,19 @@
+li.group th {
+	font-weight: normal;
+}
+
+li.group td {
+	font-weight: bold;
+}
+
+#searchfield.ui-br {
+	border-bottom: none;
+}
+
+#searchfield.ui-body {
+	position: relative;
+	padding: 0em 1px;
+	overflow: hidden;
+	display: block;
+	clear: both;
+}
