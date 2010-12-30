@@ -23,8 +23,11 @@
 
 package org.projectforge.web.wicket.layout;
 
+import org.projectforge.web.mobile.CollapsiblePanel;
+
 /**
- * Represents a field set panel. A form or page can contain multiple field sets.
+ * Represents a field set panel. A form or page can contain multiple field sets. This view for mobile devices is implemented with
+ * collapsible panels.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -32,11 +35,40 @@ public class FieldSetMobileLPanel extends FieldSetLPanel
 {
   private static final long serialVersionUID = -4126362330312626485L;
 
+  private CollapsiblePanel childPanel;
+
   /**
    * @see AbstractRenderer#createFieldSetPanel(String, String)
    */
   FieldSetMobileLPanel(final String id, final String heading)
   {
-    super(id, heading);
+    super(id);
+    childPanel = new CollapsiblePanel("collapsiblePanel", heading);
+    add(childPanel);
+  }
+
+  @Override
+  public FieldSetLPanel init()
+  {
+    return this;
+  }
+
+  @Override
+  public FieldSetLPanel add(final GroupLPanel groupPanel)
+  {
+    childPanel.add(groupPanel);
+    return this;
+  }
+
+  @Override
+  public boolean hasChildren()
+  {
+    return childPanel.hasChildren();
+  }
+
+  @Override
+  public String newChildId()
+  {
+    return childPanel.newChildId();
   }
 }

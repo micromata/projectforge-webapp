@@ -29,14 +29,11 @@ import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.address.PersonalAddressDao;
-import org.projectforge.common.NumberHelper;
-import org.projectforge.web.mobile.AbstractSecuredMobilePage;
-import org.projectforge.web.mobile.JQueryButtonPanel;
-import org.projectforge.web.mobile.JQueryButtonType;
-import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.mobile.AbstractMobileViewPage;
+import org.projectforge.web.wicket.layout.AbstractRenderer;
 import org.projectforge.web.wicket.layout.LayoutContext;
 
-public class AddressMobileViewPage extends AbstractSecuredMobilePage
+public class AddressMobileViewPage extends AbstractMobileViewPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressMobileViewPage.class);
 
@@ -46,53 +43,24 @@ public class AddressMobileViewPage extends AbstractSecuredMobilePage
   @SpringBean(name = "personalAddressDao")
   private PersonalAddressDao personalAddressDao;
 
-  protected AddressRenderer renderer;
-
-  protected PersonalAddressDO personalAddress;
-
-  private AddressDO address;
-
   public AddressMobileViewPage(final PageParameters parameters)
   {
-    super(parameters);
-    final Integer id = getPageParameters().getAsInteger(AbstractEditPage.PARAMETER_KEY_ID);
-    if (NumberHelper.greaterZero(id) == true) {
-      address = addressDao.getById(id);
-    }
-    if (address == null) {
-      log.error("Oups, address with id " + id + " not found.");
-      setResponsePage(AddressMobileListPage.class);
-      return;
-    }
+    super(parameters, AddressEditPage.class, "address");
+  }
 
-    final boolean isNew = false;
-    personalAddress = null;
-    if (isNew == false) {
-      personalAddress = personalAddressDao.getByAddressId(address.getId());
+  @Override
+  protected AbstractRenderer createRenderer(final LayoutContext layoutContext, final Integer objectId)
+  {
+    final AddressDO address = addressDao.getById(objectId);
+    if (address == null) {
+      log.error("Oups, address with id " + objectId + " not found.");
+      setResponsePage(AddressMobileListPage.class);
+      return null;
     }
+    PersonalAddressDO personalAddress = personalAddressDao.getByAddressId(address.getId());
     if (personalAddress == null) {
       personalAddress = new PersonalAddressDO();
     }
-    renderer = new AddressRenderer(this, new LayoutContext(true, true, isNew), addressDao, address, personalAddress);
-    renderer.add();
-  }
-
-  @Override
-  protected void addTopRightButton()
-  {
-    final Integer id = getPageParameters().getAsInteger(AbstractEditPage.PARAMETER_KEY_ID);
-    if (NumberHelper.greaterZero(id) == true) {
-      final PageParameters params = new PageParameters();
-      params.put(AbstractEditPage.PARAMETER_KEY_ID, id);
-      headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.CHECK, AddressMobileEditPage.class, params, getString("edit")));
-    } else {
-      super.addTopRightButton();
-    }
-  }
-
-  @Override
-  protected String getTitle()
-  {
-    return getString("address.title.heading");
+    return new AddressRenderer(this, layoutContext, addressDao, address, personalAddress);
   }
 }

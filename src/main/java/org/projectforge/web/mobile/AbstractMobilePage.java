@@ -57,6 +57,8 @@ public abstract class AbstractMobilePage extends WebPage
   // iWebKit doesn't work completely with wicket tags such as wicket:panel etc.
   private static Boolean stripTags;
 
+  private boolean rightButtonRendered;
+
   public AbstractMobilePage()
   {
     this(new PageParameters());
@@ -96,7 +98,6 @@ public abstract class AbstractMobilePage extends WebPage
         return getWindowTitle();
       }
     }));
-    addTopRightButton();
     final Model<String> loggedInLabelModel = new Model<String>() {
       public String getObject()
       {
@@ -114,6 +115,10 @@ public abstract class AbstractMobilePage extends WebPage
   protected void onBeforeRender()
   {
     super.onBeforeRender();
+    if (rightButtonRendered == false) {
+      rightButtonRendered = true;
+      addTopRightButton();
+    }
     if (stripTags == false) {
       Application.get().getMarkupSettings().setStripWicketTags(true);
     }

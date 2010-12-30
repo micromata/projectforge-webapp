@@ -116,19 +116,24 @@ public abstract class AbstractRenderer implements Serializable
    * Adds a new row to the given label-value-table only if value isn't blank. If the given value is blank nothing will be done.
    * @param labelValueTablePanel
    */
-  public void addLabelValueRow(final LabelValueTableLPanel labelValueTablePanel, final String label, final String value)
+  public void addLabelValueRow(final GroupLPanel groupPanel, final String label, final String value)
   {
-    if (StringUtils.isNotBlank(value) == true) {
-      labelValueTablePanel.add(label, value);
+    if (StringUtils.isBlank(value) == true) {
+      return;
     }
+    final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
+    groupPanel.add(labelValueTablePanel);
+    labelValueTablePanel.add(label, value);
   }
 
   /**
    * Adds a new row to the given label-value-table.
    * @param labelValueTablePanel
    */
-  public void addLabelValueRow(final LabelValueTableLPanel labelValueTablePanel, final String label, final WebMarkupContainer value)
+  public void addLabelValueRow(final GroupLPanel groupPanel, final String label, final WebMarkupContainer value)
   {
+    final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
+    groupPanel.add(labelValueTablePanel);
     labelValueTablePanel.add(label, value);
   }
 

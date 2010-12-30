@@ -1,9 +1,17 @@
-li.group th {
+table.data th {
 	font-weight: normal;
+	text-align: right;
+	padding-right: .5em;
 }
 
-li.group td {
+table.data td {
 	font-weight: bold;
+}
+
+div.ui-collapsible-contain div.ui-collapsible-contain div.content {
+	border: 1px solid #fff;
+	margin-left: -.6em;
+	padding: .2em;
 }
 
 #searchfield.ui-br {

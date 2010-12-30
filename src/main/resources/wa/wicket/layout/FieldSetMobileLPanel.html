@@ -4,12 +4,9 @@
 </head>
 
 <body>
-<h1>Represents a field set panel. A form or page can contain multiple field sets.</h1>
+<h1>Represents a field set panel. A form or page can contain multiple field sets. The mobile version is implemented with collapsible panels.</h1>
 <wicket:panel>
-  <ul data-role="listview">
-    <li data-role="list-divider" wicket:id="heading">[heading]</li>
-    <wicket:container wicket:id="groupRepeater">[group panels]</wicket:container>
-  </ul>
+  <wicket:container wicket:id="collapsiblePanel">[collapsible panel]</wicket:container>
 </wicket:panel>
 </body>
 </html>

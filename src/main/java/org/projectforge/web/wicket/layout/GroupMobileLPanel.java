@@ -23,6 +23,8 @@
 
 package org.projectforge.web.wicket.layout;
 
+import org.projectforge.web.mobile.CollapsiblePanel;
+import org.projectforge.web.mobile.ThemeType;
 
 /**
  * Represents a mobile group panel. A field set, form or page can contain multiple group panels. A group panel groups fields.
@@ -33,12 +35,20 @@ public class GroupMobileLPanel extends GroupLPanel
 {
   private static final long serialVersionUID = -280050296848404710L;
 
+  private CollapsiblePanel childPanel;
+
   /**
    * @see AbstractRenderer#createGroupPanel(String)
    */
   GroupMobileLPanel(final String id)
   {
-    super(id);
+    this(id, null);
+  }
+
+  @Override
+  public GroupMobileLPanel init()
+  {
+    return this;
   }
 
   /**
@@ -47,6 +57,37 @@ public class GroupMobileLPanel extends GroupLPanel
   GroupMobileLPanel(final String id, final String heading)
   {
     super(id, heading);
+    childPanel = new CollapsiblePanel("collapsiblePanel", heading);
+    add(childPanel);
+    childPanel.setTheme(ThemeType.C);
+  }
+
+  public GroupLPanel add(final AbstractLPanel layoutPanel)
+  {
+    childPanel.add(layoutPanel);
+    return this;
+  }
+
+  @Override
+  public boolean hasChildren()
+  {
+    return childPanel.hasChildren();
+  }
+
+  @Override
+  public String newChildId()
+  {
+    return childPanel.newChildId();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.layout.GroupLPanel#setHeading(java.lang.String)
+   */
+  @Override
+  public GroupMobileLPanel setHeading(final String heading)
+  {
+    childPanel.setHeadingLabel(heading);
+    return this;
   }
 
   public TextFieldLPanel addMaxLengthTextField(final Object dataObject, final String property, final String labelKey,

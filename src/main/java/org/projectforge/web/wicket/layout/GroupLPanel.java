@@ -43,7 +43,7 @@ public class GroupLPanel extends Panel
    */
   public static final String HEADING_ID = "heading";
 
-  private Label headingLabel;
+  protected Label headingLabel;
 
   private RepeatingView entriesRepeater;
   
@@ -119,9 +119,10 @@ public class GroupLPanel extends Panel
     return this;
   }
 
-  public void setHeading(final Label headingLabel)
+  public GroupLPanel setHeading(final Label headingLabel)
   {
     this.headingLabel = headingLabel;
+    return this;
   }
 
   /**
