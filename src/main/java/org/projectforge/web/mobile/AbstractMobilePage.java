@@ -27,6 +27,7 @@ import java.text.MessageFormat;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.wicket.Application;
+import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.CSSPackageResource;
@@ -49,6 +50,8 @@ import org.projectforge.web.wicket.WicketUtils;
 public abstract class AbstractMobilePage extends WebPage
 {
   protected final static String TOP_RIGHT_BUTTON_ID = "topRightButton";
+  
+  protected final static String TOP_CENTER_ID = "topCenter";
 
   protected WebMarkupContainer headerContainer;
 
@@ -90,7 +93,7 @@ public abstract class AbstractMobilePage extends WebPage
     add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery.mobile-1.0a2.min.js"));
     add(WicketUtils.headerContributorForFavicon(getUrl("/favicon.ico")));
     add(headerContainer = new WebMarkupContainer("header"));
-    headerContainer.add(MenuMobilePage.getHomeLink());
+    headerContainer.add(getTopCenter());
     add(new Label("windowTitle", new Model<String>() {
       @Override
       public String getObject()
@@ -109,6 +112,14 @@ public abstract class AbstractMobilePage extends WebPage
       // navigationContainer.add(new SimpleAttributeModifier("style", WebConstants.CSS_BACKGROUND_COLOR_RED));
     } else {
     }
+  }
+
+  /**
+   * @return Home link as default.
+   */
+  protected Component getTopCenter()
+  {
+    return MenuMobilePage.getHomeLink(this, TOP_CENTER_ID);
   }
 
   @Override

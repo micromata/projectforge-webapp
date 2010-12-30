@@ -23,20 +23,22 @@
 
 package org.projectforge.web.mobile;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.Version;
 import org.projectforge.core.Configuration;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.UserFilter;
 import org.projectforge.web.address.AddressMobileListPage;
 import org.projectforge.web.wicket.MySession;
+import org.projectforge.web.wicket.components.LabelBookmarkablePageLinkPanel;
 
 public class MenuMobilePage extends AbstractSecuredMobilePage
 {
@@ -52,11 +54,12 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
   /**
    * Returns a link to this the menu mobile page. It should be shown directly instead of restoring last page after stay-logged-in .
    */
-  public static BookmarkablePageLink<String> getHomeLink()
+  public static Component getHomeLink(final Component parent, final String id)
   {
     final PageParameters params = new PageParameters();
     params.put(PARAM_HOME_KEY, true);
-    return new BookmarkablePageLink<String>("homeLink", MenuMobilePage.class, params);
+    return new LabelBookmarkablePageLinkPanel(id, MenuMobilePage.class, parent.getString("mobile.home"), params).addLinkAttribute("rel",
+        "external");
   }
 
   public MenuMobilePage()
@@ -101,6 +104,12 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
     } else {
       add(new Label("iOSHint", getString("mobile.others.startScreenInfo")));
     }
+  }
+
+  @Override
+  protected Component getTopCenter()
+  {
+    return new Label(AbstractMobilePage.TOP_CENTER_ID, Version.APP_TITLE);
   }
 
   @Override

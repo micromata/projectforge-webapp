@@ -41,6 +41,8 @@ public class LabelValueTableLPanel extends AbstractLPanel
 
   private RepeatingView rowRepeater;
 
+  private boolean hasChildren;
+
   /**
    * @see AbstractRenderer#createRepeaterLabelPanel(String)
    */
@@ -51,8 +53,14 @@ public class LabelValueTableLPanel extends AbstractLPanel
     super.add(rowRepeater);
   }
 
+  public boolean hasChildren()
+  {
+    return hasChildren;
+  }
+
   public LabelValueTableLPanel add(final String label, final String value)
   {
+    hasChildren = true;
     final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
     rowRepeater.add(row);
     row.add(new Label("label", label));
@@ -62,6 +70,7 @@ public class LabelValueTableLPanel extends AbstractLPanel
 
   public LabelValueTableLPanel add(final String label, final WebMarkupContainer value)
   {
+    hasChildren = true;
     final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
     rowRepeater.add(row);
     row.add(new Label("label", label));

@@ -82,6 +82,16 @@ public class CollapsiblePanel extends Panel
     return this;
   }
 
+  /**
+   * Set collapsed at default.
+   * @return this for chaining.
+   */
+  public CollapsiblePanel setCollapsed()
+  {
+    mainContainer.add(new SimpleAttributeModifier("data-collapsed", "true"));
+    return this;
+  }
+
   public String newChildId()
   {
     return repeater.newChildId();

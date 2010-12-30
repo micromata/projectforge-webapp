@@ -24,6 +24,7 @@
 package org.projectforge.web.wicket.components;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -57,12 +58,25 @@ public class LabelBookmarkablePageLinkPanel extends Panel
   public LabelBookmarkablePageLinkPanel(final String id, final Class< ? extends WebPage> pageClass, final String label)
   {
     this(id, pageClass);
-    link.add(new Label("label", label).setRenderBodyOnly(true));
+    link.add(new Label("label", label));
   }
 
-  public LabelBookmarkablePageLinkPanel(final String id, final Class< ? extends WebPage> pageClass, final String label, final PageParameters params)
+  public LabelBookmarkablePageLinkPanel(final String id, final Class< ? extends WebPage> pageClass, final String label,
+      final PageParameters params)
   {
     this(id, pageClass, params);
-    link.add(new Label("label", label).setRenderBodyOnly(true));
+    link.add(new Label("label", label));
+  }
+
+  /**
+   * Sets a html attribute to the enclosed link.
+   * @param attribute
+   * @param label
+   * @return this for chaining.
+   */
+  public LabelBookmarkablePageLinkPanel addLinkAttribute(final String attribute, final String label)
+  {
+    link.add(new SimpleAttributeModifier(attribute, label));
+    return this;
   }
 }

@@ -89,6 +89,15 @@ public class GroupMobileLPanel extends GroupLPanel
     childPanel.setHeadingLabel(heading);
     return this;
   }
+  
+  /**
+   * @return this for chaining.
+   * @see CollapsiblePanel#setCollapsed()
+   */
+  public GroupMobileLPanel setCollapsed() {
+    childPanel.setCollapsed();
+    return this;
+  }
 
   public TextFieldLPanel addMaxLengthTextField(final Object dataObject, final String property, final String labelKey,
       final LayoutLength length)
