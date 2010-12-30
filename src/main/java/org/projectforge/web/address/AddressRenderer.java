@@ -186,9 +186,13 @@ public class AddressRenderer extends AbstractRenderer
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
     fieldSetPanel.add(groupPanel);
     if (isMobileReadonly() == true) {
-      addPhoneNumber(groupPanel, "address.phone", data.getBusinessPhone(), false);
-      addPhoneNumber(groupPanel, "address.phoneType.fax", data.getFax(), false);
-      addPhoneNumber(groupPanel, "address.phoneType.mobile", data.getMobilePhone(), true);
+      final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
+      addPhoneNumber(labelValueTablePanel, "address.phone", data.getBusinessPhone(), false);
+      addPhoneNumber(labelValueTablePanel, "address.phoneType.fax", data.getFax(), false);
+      addPhoneNumber(labelValueTablePanel, "address.phoneType.mobile", data.getMobilePhone(), true);
+      if (labelValueTablePanel != null && labelValueTablePanel.hasChildren() == true) {
+        groupPanel.add(labelValueTablePanel);
+      }
     } else {
       businessPhoneField = addPhoneNumber(groupPanel, "businessPhone", "address.phone", "favoriteBusinessPhone", phoneListTooltip);
       faxField = addPhoneNumber(groupPanel, "fax", "address.phoneType.fax", "favoriteFax", phoneListTooltip);
@@ -209,8 +213,12 @@ public class AddressRenderer extends AbstractRenderer
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
     fieldSetPanel.add(groupPanel);
     if (isMobileReadonly() == true) {
-      addPhoneNumber(groupPanel, "address.phone", data.getPrivatePhone(), false);
-      addPhoneNumber(groupPanel, "address.phoneType.mobile", data.getPrivateMobilePhone(), true);
+      final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
+      addPhoneNumber(labelValueTablePanel, "address.phone", data.getPrivatePhone(), false);
+      addPhoneNumber(labelValueTablePanel, "address.phoneType.mobile", data.getPrivateMobilePhone(), true);
+      if (labelValueTablePanel != null && labelValueTablePanel.hasChildren() == true) {
+        groupPanel.add(labelValueTablePanel);
+      }
     } else {
       privatePhoneField = addPhoneNumber(groupPanel, "privatePhone", "address.phone", "favoritePrivatePhone", phoneListTooltip);
       privateMobilePhoneField = addPhoneNumber(groupPanel, "privateMobilePhone", "address.phoneType.mobile", "favoritePrivateMobilePhone",
@@ -328,7 +336,7 @@ public class AddressRenderer extends AbstractRenderer
     fieldSetPanel.add(groupPanel);
     if (isMobileReadonly() == true) {
       groupPanel.setHeading(getString("address.publicKey"));
-      ((GroupMobileLPanel)groupPanel).setCollapsed();
+      ((GroupMobileLPanel) groupPanel).setCollapsed();
       if (StringUtils.isNotBlank(data.getFingerprint()) == true) {
         final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
         groupPanel.add(labelValueTablePanel);
@@ -495,13 +503,12 @@ public class AddressRenderer extends AbstractRenderer
     }
   }
 
-  private void addPhoneNumber(final GroupLPanel groupPanel, final String labelKey, final String number, final boolean isMobile)
+  private void addPhoneNumber(final LabelValueTableLPanel labelValueTablePanel, final String labelKey, final String number,
+      final boolean isMobile)
   {
     if (isMobileReadonly() == true && StringUtils.isBlank(number) == true) {
       return;
     }
-    final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
-    groupPanel.add(labelValueTablePanel);
     final ActionLinkPanel valueContainer = new ActionLinkPanel(LabelValueTableLPanel.WICKET_ID_VALUE,
         isMobile == true ? ActionLinkType.CALL_AND_SMS : ActionLinkType.CALL, number);
     addLabelValueRow(labelValueTablePanel, getString(labelKey), valueContainer);
