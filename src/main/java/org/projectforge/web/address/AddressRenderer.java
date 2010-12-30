@@ -123,17 +123,17 @@ public class AddressRenderer extends AbstractRenderer
     fieldSetRepeater.add(fieldSetPanel);
 
     addBusinessData(fieldSetPanel);
+    addBusinessPhones(fieldSetPanel);
     addBusinesAddress(fieldSetPanel);
     addPostalAddress(fieldSetPanel);
-    addBusinessPhones(fieldSetPanel);
 
     // *** Private Contact ***
     fieldSetPanel = createFieldSetPanel(fieldSetRepeater.newChildId(), getString("address.heading.privateContact")).init();
     fieldSetRepeater.add(fieldSetPanel);
     addPrivateEMail(fieldSetPanel);
 
-    addPrivateAddress(fieldSetPanel);
     addPrivatePhones(fieldSetPanel);
+    addPrivateAddress(fieldSetPanel);
 
     if (isMobileReadonly() == true) {
       addPersonalData(fieldSetPanel, title);

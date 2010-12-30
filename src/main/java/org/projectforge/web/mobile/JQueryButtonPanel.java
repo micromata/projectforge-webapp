@@ -39,6 +39,18 @@ public class JQueryButtonPanel extends Panel
 {
   private static final long serialVersionUID = 6460153798143225741L;
 
+  private Class< ? extends WebPage> pageClass;
+
+  private PageParameters params;
+
+  private JQueryButtonType type;
+
+  private boolean initialized;
+
+  private String label;
+
+  private boolean relExternal;
+
   public JQueryButtonPanel(final String id, final JQueryButtonType type, final Class< ? extends WebPage> pageClass, final String label)
   {
     this(id, type, pageClass, null, label);
@@ -48,19 +60,41 @@ public class JQueryButtonPanel extends Panel
       final PageParameters params, final String label)
   {
     super(id);
-    final BookmarkablePageLink<String> link;
-    if (params == null) {
-      link = new BookmarkablePageLink<String>("button", pageClass);
-    } else {
-      link = new BookmarkablePageLink<String>("button", pageClass, params);
+    this.pageClass = pageClass;
+    this.params = params;
+    this.type = type;
+    this.label = label;
+  }
+
+  public JQueryButtonPanel setRelExternal()
+  {
+    this.relExternal = true;
+    return this;
+  }
+
+  @Override
+  protected void onBeforeRender()
+  {
+    if (initialized == false) {
+      initialized = true;
+      final BookmarkablePageLink<String> link;
+      if (params == null) {
+        link = new BookmarkablePageLink<String>("button", pageClass);
+      } else {
+        link = new BookmarkablePageLink<String>("button", pageClass, params);
+      }
+      if (type == JQueryButtonType.PLUS) {
+        link.add(new SimpleAttributeModifier("data-icon", "plus"));
+      } else {
+        link.add(new SimpleAttributeModifier("data-icon", "check"));
+      }
+      link.add(new SimpleAttributeModifier("class", "ui-btn-right"));
+      add(link);
+      link.add(new Label("label", label));
+      if (this.relExternal == true) {
+        link.add(new SimpleAttributeModifier("rel", "external"));
+      }
     }
-    if (type == JQueryButtonType.PLUS) {
-      link.add(new SimpleAttributeModifier("data-icon", "plus"));
-    } else {
-      link.add(new SimpleAttributeModifier("data-icon", "check"));
-    }
-    link.add(new SimpleAttributeModifier("class", "ui-btn-right"));
-    add(link);
-    link.add(new Label("label", label));
+    super.onBeforeRender();
   }
 }

@@ -10,8 +10,9 @@ table.data td {
 
 div.ui-collapsible-contain div.ui-collapsible-contain div.content {
 	border: 1px solid #fff;
-	margin-left: -.6em;
-	padding: .2em;
+	margin-left: -1em;
+	margin-right: -.5em;
+	padding: .1em;
 }
 
 div.ui-collapsible-content h4 {

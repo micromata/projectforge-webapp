@@ -45,7 +45,7 @@ public class AddressMobileViewPage extends AbstractMobileViewPage
 
   public AddressMobileViewPage(final PageParameters parameters)
   {
-    super(parameters, AddressEditPage.class, "address");
+    super(parameters, AddressMobileEditPage.class, "address");
   }
 
   @Override
