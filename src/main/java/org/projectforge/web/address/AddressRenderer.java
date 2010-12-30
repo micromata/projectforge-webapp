@@ -183,7 +183,7 @@ public class AddressRenderer extends AbstractRenderer
   public void addBusinessPhones(final FieldSetLPanel fieldSetPanel)
   {
     final String phoneListTooltip = getString("address.tooltip.phonelist");
-    final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
+    final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phoneType.business"));
     fieldSetPanel.add(groupPanel);
     if (isMobileReadonly() == true) {
       final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
@@ -210,7 +210,7 @@ public class AddressRenderer extends AbstractRenderer
   public void addPrivatePhones(final FieldSetLPanel fieldSetPanel)
   {
     final String phoneListTooltip = getString("address.tooltip.phonelist");
-    final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phone"));
+    final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phoneType.private"));
     fieldSetPanel.add(groupPanel);
     if (isMobileReadonly() == true) {
       final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
@@ -433,6 +433,7 @@ public class AddressRenderer extends AbstractRenderer
     final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId());
     fieldSetPanel.add(groupPanel);
     if (isMobileReadonly() == true) {
+      groupPanel.setHeading(getString("address.privateEmail"));
       if (StringUtils.isNotBlank(data.getPrivateEmail()) == true) {
         final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
         groupPanel.add(labelValueTablePanel);
@@ -498,7 +499,7 @@ public class AddressRenderer extends AbstractRenderer
     if (labelValueTablePanel != null && labelValueTablePanel.hasChildren() == true) {
       groupPanel.add(labelValueTablePanel);
     }
-    if (groupPanel.hasChildren() == true) {
+    if (groupPanel.hasChildren() == false) {
       groupPanel.setVisible(false);
     }
   }
