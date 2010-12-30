@@ -23,6 +23,7 @@
 
 package org.projectforge.web.mobile;
 
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 
@@ -52,6 +53,17 @@ public class ListViewPanel extends Panel
   public ListViewPanel add(final ListViewItemPanel entryPanel)
   {
     repeater.add(entryPanel.init());
+    return this;
+  }
+
+  /**
+   * Adds a new entry with the text "more entries available" as information for the user, that not all entries are shown.
+   * @return this for chaining.
+   */
+  public ListViewPanel addMoreEntriesAvailable()
+  {
+    add((ListViewItemPanel)new ListViewItemPanel(newChildId(), getString("moreEntriesAvailable")).add(new SimpleAttributeModifier("class",
+        "moreEntriesAvailable")));
     return this;
   }
 }

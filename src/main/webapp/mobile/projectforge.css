@@ -30,3 +30,8 @@ div.ui-collapsible-content h4 {
 	display: block;
 	clear: both;
 }
+
+li.moreEntriesAvailable {
+	color: red;
+	font-style: italic;
+}

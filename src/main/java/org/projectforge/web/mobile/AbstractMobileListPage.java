@@ -90,6 +90,9 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
         break;
       }
     }
+    if (list.size() > MAX_ROWS) {
+      listViewPanel.addMoreEntriesAvailable();
+    }
   }
 
   @Override
