@@ -23,7 +23,6 @@
 
 package org.projectforge.web.address;
 
-import static org.projectforge.web.wicket.layout.DateFieldLPanel.DATE_FIELD_ID;
 import static org.projectforge.web.wicket.layout.DropDownChoiceLPanel.SELECT_ID;
 import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
 import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
@@ -32,7 +31,6 @@ import static org.projectforge.web.wicket.layout.LayoutLength.QUART;
 import static org.projectforge.web.wicket.layout.LayoutLength.THREEQUART;
 import static org.projectforge.web.wicket.layout.TextFieldLPanel.INPUT_ID;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -41,25 +39,18 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.repeater.RepeatingView;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.AddressStatus;
-import org.projectforge.address.ContactStatus;
 import org.projectforge.address.FormOfAddress;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.common.BeanHelper;
-import org.projectforge.common.DateHelper;
 import org.projectforge.common.StringHelper;
-import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.mobile.ActionLinkPanel;
 import org.projectforge.web.mobile.ActionLinkType;
 import org.projectforge.web.wicket.ImageDef;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
-import org.projectforge.web.wicket.components.DatePanel;
-import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.layout.AbstractRenderer;
 import org.projectforge.web.wicket.layout.FieldSetLPanel;
@@ -68,7 +59,6 @@ import org.projectforge.web.wicket.layout.GroupMobileLPanel;
 import org.projectforge.web.wicket.layout.LabelValueTableLPanel;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.RepeaterLabelLPanel;
-import org.projectforge.web.wicket.layout.TextAreaLPanel;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
 public class AddressRenderer extends AbstractRenderer
@@ -108,7 +98,7 @@ public class AddressRenderer extends AbstractRenderer
       fieldSetPanel = createFieldSetPanel(fieldSetRepeater.newChildId(), isNew() == false ? title
           : getString("address.heading.personalData"));
       fieldSetRepeater.add(fieldSetPanel);
-      addPersonalData(fieldSetPanel, title);
+      addPersonalData(title);
       addPublicKeyAndFingerprint(fieldSetPanel);
     }
 
@@ -135,7 +125,7 @@ public class AddressRenderer extends AbstractRenderer
     addPrivateAddress(fieldSetPanel);
 
     if (isMobileReadonly() == true) {
-      addPersonalData(fieldSetPanel, title);
+      addPersonalData(title);
       addPublicKeyAndFingerprint(fieldSetPanel);
     }
   }
@@ -234,95 +224,88 @@ public class AddressRenderer extends AbstractRenderer
    * @param title
    */
   @SuppressWarnings( { "unchecked", "serial"})
-  public void addPersonalData(final FieldSetLPanel fieldSetPanel, final String title)
+  public void addPersonalData(final String title)
   {
-    GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId());
-    fieldSetPanel.add(groupPanel);
-    String label;
-
+    doPanel.newGroupPanel();
     // add(new Label("task", taskFormatter.getTaskPath(data.getTaskId(), true, OutputType.HTML)).setEscapeModelStrings(false));
-    if (isReadonly() == true) {
-    } else {
+    {
       // DropDownChoice form of address
       final LabelValueChoiceRenderer<FormOfAddress> formChoiceRenderer = new LabelValueChoiceRenderer<FormOfAddress>(container,
           FormOfAddress.values());
       formChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "form"), formChoiceRenderer.getValues(), formChoiceRenderer);
       formChoice.setNullValid(false).setRequired(true);
-      label = getString("address.form");
-      if (isMobile() == false) {
-        groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, label, formChoice, true));
-      }
-      groupPanel.add(createDropDownChoicePanel(groupPanel.newChildId(), THREEQUART, formChoice).setLabel(label));
-      final RepeaterLabelLPanel repeaterPanel = createRepeaterLabelPanel(groupPanel.newChildId());
-      groupPanel.add(repeaterPanel);
-      if (isMobile() == false) {
-        final String tooltip = getString("address.tooltip.vCardList");
-        repeaterPanel.add(createCheckBoxPanel(repeaterPanel.newChildId(), personalAddress, "favoriteCard").setTooltip(tooltip));
-        repeaterPanel.add(createImagePanel(repeaterPanel.newChildId(), ImageDef.HELP, tooltip));
-      }
-      groupPanel.addMaxLengthTextField(data, "title", "address.title", THREEQUART).setStrong();
-      groupPanel.addMaxLengthTextField(data, "firstName", "firstName", FULL).setStrong();
-      final TextFieldLPanel nameTextFieldPanel = groupPanel.addMaxLengthTextField(data, "name", "name", FULL).setStrong().setRequired();
-      if (isNew() == true) {
-        nameTextFieldPanel.setFocus();
-      }
+      doPanel.addDropDownChoice(data, "form", getString("address.form"), THREEQUART, formChoice);
     }
-
-    final LabelValueTableLPanel labelValueTablePanel; // Only used for mobile pages.
-    if (isMobileReadonly() == true) {
-      labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
-      final ContactStatus contactStatus = data.getContactStatus();
-      if (contactStatus != null) {
-        addLabelValueRow(labelValueTablePanel, getString("address.contactStatus"), getString(contactStatus.getI18nKey()));
-      }
-      if (data.getBirthday() != null) {
-        addLabelValueRow(labelValueTablePanel, getString("address.birthday"), DateTimeFormatter.instance().getFormattedDate(
-            data.getBirthday()));
-      }
-    } else {
-      labelValueTablePanel = null; // Only used for mobile pages.
-      // DropDownChoice contactStatus
-      final LabelValueChoiceRenderer<ContactStatus> contactStatusChoiceRenderer = new LabelValueChoiceRenderer<ContactStatus>(container,
-          ContactStatus.values());
-      final DropDownChoice contactStatusChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "contactStatus"),
-          contactStatusChoiceRenderer.getValues(), contactStatusChoiceRenderer);
-      contactStatusChoice.setNullValid(false).setRequired(true);
-      label = getString("address.contactStatus");
-      if (isMobile() == false) {
-        groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, label, contactStatusChoice, true));
-      }
-      groupPanel.add(createDropDownChoicePanel(groupPanel.newChildId(), THREEQUART, contactStatusChoice).setLabel(label));
-      final DatePanel birthdayPanel = new DatePanel(DATE_FIELD_ID, new PropertyModel<Date>(data, "birthday"), new DatePanelSettings()
-          .withTargetType(java.sql.Date.class));
-      groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.birthday"), birthdayPanel.getDateField(), true));
-      groupPanel.add(createDateFieldPanel(groupPanel.newChildId(), HALF, birthdayPanel));
-      WicketUtils.addTooltip(birthdayPanel.getDateField(), new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          return DateHelper.formatAsUTC(data.getBirthday());
-        }
-      });
-    }
-    if (labelValueTablePanel != null && labelValueTablePanel.hasChildren() == true) {
-      groupPanel.add(labelValueTablePanel);
-    }
-    if (isMobileReadonly() == true) {
-      if (StringUtils.isNotBlank(data.getComment()) == true) {
-        groupPanel.add(createLabelValueHeadingPanel(groupPanel.newChildId(), getString("comment")));
-        groupPanel.add(createValuePanel(groupPanel.newChildId(), data.getComment()));
-      }
-    } else {
-      // add(new CheckBox("imageBroschure", new PropertyModel<Boolean>(data, "imageBroschure")));
-      final TextAreaLPanel commentTextAreaPanel = groupPanel.addMaxLengthTextArea(data, "comment", "comment", ONEHALF);
-      commentTextAreaPanel.setBreakBefore().setStyle("height: 20em;");
-      if (layoutContext.isNew() == false) {
-        commentTextAreaPanel.setFocus();
-      }
-    }
-    if (groupPanel.hasChildren() == false) {
-      groupPanel.setVisible(false);
-    }
+    // final RepeaterLabelLPanel repeaterPanel = createRepeaterLabelPanel(groupPanel.newChildId());
+    // groupPanel.add(repeaterPanel);
+    // if (isMobile() == false) {
+    // final String tooltip = getString("address.tooltip.vCardList");
+    // repeaterPanel.add(createCheckBoxPanel(repeaterPanel.newChildId(), personalAddress, "favoriteCard").setTooltip(tooltip));
+    // repeaterPanel.add(createImagePanel(repeaterPanel.newChildId(), ImageDef.HELP, tooltip));
+    // }
+    // doPanel.addMaxLengthTextField(data, "title", "address.title", THREEQUART).setStrong();
+    // doPanel.addMaxLengthTextField(data, "firstName", "firstName", FULL).setStrong();
+    // final IField nameTextField = doPanel.addMaxLengthTextField(data, "name", "name", FULL).setStrong().setRequired();
+    // if (isNew() == true) {
+    // nameTextField.setFocus();
+    // }
+    // }
+    //
+    // final LabelValueTableLPanel labelValueTablePanel; // Only used for mobile pages.
+    // if (isMobileReadonly() == true) {
+    // labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
+    // final ContactStatus contactStatus = data.getContactStatus();
+    // if (contactStatus != null) {
+    // addLabelValueRow(labelValueTablePanel, getString("address.contactStatus"), getString(contactStatus.getI18nKey()));
+    // }
+    // if (data.getBirthday() != null) {
+    // addLabelValueRow(labelValueTablePanel, getString("address.birthday"), DateTimeFormatter.instance().getFormattedDate(
+    // data.getBirthday()));
+    // }
+    // } else {
+    // labelValueTablePanel = null; // Only used for mobile pages.
+    // // DropDownChoice contactStatus
+    // final LabelValueChoiceRenderer<ContactStatus> contactStatusChoiceRenderer = new LabelValueChoiceRenderer<ContactStatus>(container,
+    // ContactStatus.values());
+    // final DropDownChoice contactStatusChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "contactStatus"),
+    // contactStatusChoiceRenderer.getValues(), contactStatusChoiceRenderer);
+    // contactStatusChoice.setNullValid(false).setRequired(true);
+    // label = getString("address.contactStatus");
+    // if (isMobile() == false) {
+    // groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, label, contactStatusChoice, true));
+    // }
+    // groupPanel.add(createDropDownChoicePanel(groupPanel.newChildId(), THREEQUART, contactStatusChoice).setLabel(label));
+    // final DatePanel birthdayPanel = new DatePanel(DATE_FIELD_ID, new PropertyModel<Date>(data, "birthday"), new DatePanelSettings()
+    // .withTargetType(java.sql.Date.class));
+    // groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, getString("address.birthday"), birthdayPanel.getDateField(), true));
+    // groupPanel.add(createDateFieldPanel(groupPanel.newChildId(), HALF, birthdayPanel));
+    // WicketUtils.addTooltip(birthdayPanel.getDateField(), new Model<String>() {
+    // @Override
+    // public String getObject()
+    // {
+    // return DateHelper.formatAsUTC(data.getBirthday());
+    // }
+    // });
+    // }
+    // if (labelValueTablePanel != null && labelValueTablePanel.hasChildren() == true) {
+    // groupPanel.add(labelValueTablePanel);
+    // }
+    // if (isMobileReadonly() == true) {
+    // if (StringUtils.isNotBlank(data.getComment()) == true) {
+    // groupPanel.add(createLabelValueHeadingPanel(groupPanel.newChildId(), getString("comment")));
+    // groupPanel.add(createValuePanel(groupPanel.newChildId(), data.getComment()));
+    // }
+    // } else {
+    // // add(new CheckBox("imageBroschure", new PropertyModel<Boolean>(data, "imageBroschure")));
+    // final TextAreaLPanel commentTextAreaPanel = groupPanel.addMaxLengthTextArea(data, "comment", "comment", ONEHALF);
+    // commentTextAreaPanel.setBreakBefore().setStyle("height: 20em;");
+    // if (layoutContext.isNew() == false) {
+    // commentTextAreaPanel.setFocus();
+    // }
+    // }
+    // if (groupPanel.hasChildren() == false) {
+    // groupPanel.setVisible(false);
+    // }
   }
 
   /**
@@ -430,7 +413,7 @@ public class AddressRenderer extends AbstractRenderer
   public void addPrivateEMail()
   {
     doPanel.newGroupPanel(isMobileReadonly() == true ? getString("address.privateEmail") : null);
-    doPanel.addMaxLengthTextField(data, "privateEmail", "email", FULL).setStrong();
+    doPanel.addMaxLengthTextField(data, "privateEmail", getString("email"), FULL).setStrong();
   }
 
   protected void addAddress(final FieldSetLPanel fieldSetPanel, final String heading, final String addressTextProperty,

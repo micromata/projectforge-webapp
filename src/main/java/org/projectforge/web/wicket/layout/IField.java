@@ -23,7 +23,6 @@
 
 package org.projectforge.web.wicket.layout;
 
-
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
@@ -35,4 +34,16 @@ public interface IField
    * @return this for chaining.
    */
   public IField setStrong();
+  
+  /**
+   * Sets the focus on this field (if supported).
+   * @return this for chaining.
+   */
+  public IField setFocus();
+
+  /**
+   * Sets the field as required (if supported).
+   * @return this for chaining.
+   */
+  public IField setRequired();
 }

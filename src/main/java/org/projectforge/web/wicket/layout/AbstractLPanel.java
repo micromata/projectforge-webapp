@@ -203,4 +203,26 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper, 
       return null;
     }
   }
+  
+  /**
+   * Does nothing at default.
+   * @return this for chaining.
+   * @see org.projectforge.web.wicket.layout.IField#setFocus()
+   */
+  @Override
+  public AbstractLPanel setFocus()
+  {
+    return this;
+  }
+
+  /**
+   * Does nothing at default.
+   * @return this for chaining.
+   * @see org.projectforge.web.wicket.layout.IField#setRequired()
+   */
+  @Override
+  public IField setRequired()
+  {
+    return null;
+  }
 }

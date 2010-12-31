@@ -74,6 +74,18 @@ public class ActionLinkPanel extends Panel implements IField
     add(new SimpleAttributeModifier("class", "strong"));
     return this;
   }
+  
+  @Override
+  public IField setFocus()
+  {
+    throw new UnsupportedOperationException();
+  }
+  
+  @Override
+  public IField setRequired()
+  {
+    throw new UnsupportedOperationException();
+  }
 
   private ExternalLink getCallLink(final String number)
   {

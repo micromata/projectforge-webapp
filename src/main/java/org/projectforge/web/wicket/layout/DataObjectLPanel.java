@@ -23,10 +23,15 @@
 
 package org.projectforge.web.wicket.layout;
 
+import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
+
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.common.BeanHelper;
+import org.projectforge.core.I18nEnum;
 import org.projectforge.web.mobile.ActionLinkPanel;
 import org.projectforge.web.mobile.ActionLinkType;
 
@@ -146,7 +151,7 @@ public class DataObjectLPanel extends Panel
   /**
    * @return the created field or a dummy IField if the field is e. g. empty in read-only mode.
    */
-  public IField addMaxLengthTextField(final Object data, final String property, final String labelI18nKey, final LayoutLength length,
+  public IField addMaxLengthTextField(final Object data, final String property, final String label, final LayoutLength length,
       final FieldType fieldType)
   {
     IField field;
@@ -156,12 +161,56 @@ public class DataObjectLPanel extends Panel
         field = new DummyField();
       } else {
         ensureLabelValueTablePanel();
-        field = new ActionLinkPanel(LabelValueTableLPanel.WICKET_ID_VALUE, ActionLinkType.MAIL, String.valueOf(value));
-        labelValueTablePanel.add(getString(labelI18nKey), (ActionLinkPanel) field);
+        if (fieldType == FieldType.E_MAIL) {
+          field = new LabelLPanel(LabelValueTableLPanel.WICKET_ID_VALUE, LayoutLength.HALF, String.valueOf(value));
+        } else {
+          field = new ActionLinkPanel(LabelValueTableLPanel.WICKET_ID_VALUE, ActionLinkType.MAIL, String.valueOf(value));
+        }
+        labelValueTablePanel.add(label, (WebMarkupContainer) field);
       }
     } else {
-      field = groupPanel.addMaxLengthTextField(data, property, labelI18nKey, length);
+      field = groupPanel.addMaxLengthTextField(data, property, label, length);
     }
+    return field;
+  }
+
+  /**
+   * If the value is type of I18Enum then the localized string is shown in read-only mode.
+   */
+  public IField addDropDownChoice(final Object data, final String property, final String label, final LayoutLength length,
+      final DropDownChoice< ? > dropDownChoice)
+  {
+    IField field;
+    if (layoutContext.isReadonly() == true) {
+      final Object value = BeanHelper.getNestedProperty(data, property);
+      if (isBlank(value) == true) {
+        field = new DummyField();
+      } else {
+        ensureLabelValueTablePanel();
+        groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, label, dropDownChoice, true));
+        final String displayValue;
+        if (value instanceof I18nEnum) {
+          displayValue = getString(((I18nEnum) value).getI18nKey());
+        } else {
+          displayValue = String.valueOf(value);
+        }
+        field = new LabelLPanel(LabelValueTableLPanel.WICKET_ID_VALUE, LayoutLength.HALF, displayValue);
+      }
+    } else {
+      if (layoutContext.isMobile() == true) {
+        field = new DropDownChoiceMobileLPanel(groupPanel.newChildId(), length, dropDownChoice);
+      } else {
+        field = new DropDownChoiceLPanel(groupPanel.newChildId(), length, dropDownChoice);
+      }
+      groupPanel.add(field);
+    }
+    // groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, label, formChoice, true));
+    // new LabelLPanel(id, length, label, labelFor, breakBefore);
+    // }
+    // groupPanel.add(createDropDownChoicePanel(groupPanel.newChildId(), THREEQUART, formChoice).setLabel(label));
+    //
+    //    
+
     return field;
   }
 

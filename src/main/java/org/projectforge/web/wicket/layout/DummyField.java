@@ -29,8 +29,21 @@ package org.projectforge.web.wicket.layout;
  */
 public class DummyField implements IField
 {
+  @Override
   public DummyField setStrong()
   {
     return this;
+  }
+  
+  @Override
+  public IField setFocus()
+  {
+    return null;
+  }
+  
+  @Override
+  public IField setRequired()
+  {
+    return null;
   }
 }

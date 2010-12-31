@@ -25,6 +25,7 @@ package org.projectforge.web.wicket.layout;
 
 import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
@@ -62,20 +63,20 @@ public class GroupLPanel extends Panel
     }
   }
 
-  public TextFieldLPanel addMaxLengthTextField(final Object dataObject, final String property, final String labelKey,
+  public TextFieldLPanel addMaxLengthTextField(final Object dataObject, final String property, final String label,
       final LayoutLength length)
   {
     final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), length, dataObject, property);
-    add(new LabelLPanel(newChildId(), HALF, getString(labelKey)).setLabelFor(textFieldPanel.getTextField()).setBreakBefore());
+    add(new LabelLPanel(newChildId(), HALF, label).setLabelFor(textFieldPanel.getTextField()).setBreakBefore());
     add(textFieldPanel);
     return textFieldPanel;
   }
 
-  public TextAreaLPanel addMaxLengthTextArea(final Object dataObject, final String property, final String labelKey,
+  public TextAreaLPanel addMaxLengthTextArea(final Object dataObject, final String property, final String label,
       final LayoutLength length)
   {
     final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), length, dataObject, property);
-    add(new LabelLPanel(newChildId(), HALF, getString(labelKey)).setLabelFor(textAreaPanel.getTextArea()).setBreakBefore());
+    add(new LabelLPanel(newChildId(), HALF, label).setLabelFor(textAreaPanel.getTextArea()).setBreakBefore());
     add(textAreaPanel);
     return textAreaPanel;
   }
@@ -86,7 +87,14 @@ public class GroupLPanel extends Panel
     entriesRepeater.add(layoutPanel);
     return this;
   }
-  
+
+  public GroupLPanel add(final IField field)
+  {
+    hasChildren = true;
+    entriesRepeater.add((Component)field);
+    return this;
+  }
+
   public boolean hasChildren()
   {
     return hasChildren;
