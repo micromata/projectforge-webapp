@@ -47,7 +47,7 @@ public abstract class AbstractRenderer implements Serializable
 
   protected LayoutContext layoutContext;
 
-  protected MainLPanel doPanel;
+  protected DataObjectLPanel doPanel;
 
   protected MarkupContainer container;
 
@@ -196,7 +196,7 @@ public abstract class AbstractRenderer implements Serializable
   public AbstractRenderer(final MarkupContainer container, final LayoutContext layoutContext)
   {
     this.layoutContext = layoutContext;
-    this.doPanel = new MainLPanel("fieldSetsPanel", layoutContext);
+    this.doPanel = new DataObjectLPanel("fieldSetsPanel", layoutContext);
     this.container = container;
     container.add(doPanel);
   }
