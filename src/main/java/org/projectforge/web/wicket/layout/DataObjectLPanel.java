@@ -162,9 +162,9 @@ public class DataObjectLPanel extends Panel
       } else {
         ensureLabelValueTablePanel();
         if (fieldType == FieldType.E_MAIL) {
-          field = new LabelLPanel(LabelValueTableLPanel.WICKET_ID_VALUE, LayoutLength.HALF, String.valueOf(value));
-        } else {
           field = new ActionLinkPanel(LabelValueTableLPanel.WICKET_ID_VALUE, ActionLinkType.MAIL, String.valueOf(value));
+        } else {
+          field = new LabelLPanel(LabelValueTableLPanel.WICKET_ID_VALUE, LayoutLength.HALF, String.valueOf(value));
         }
         labelValueTablePanel.add(label, (WebMarkupContainer) field);
       }
@@ -187,7 +187,6 @@ public class DataObjectLPanel extends Panel
         field = new DummyField();
       } else {
         ensureLabelValueTablePanel();
-        groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, label, dropDownChoice, true));
         final String displayValue;
         if (value instanceof I18nEnum) {
           displayValue = getString(((I18nEnum) value).getI18nKey());
@@ -195,6 +194,7 @@ public class DataObjectLPanel extends Panel
           displayValue = String.valueOf(value);
         }
         field = new LabelLPanel(LabelValueTableLPanel.WICKET_ID_VALUE, LayoutLength.HALF, displayValue);
+        labelValueTablePanel.add(label, (WebMarkupContainer) field);
       }
     } else {
       if (layoutContext.isMobile() == true) {
@@ -202,6 +202,7 @@ public class DataObjectLPanel extends Panel
       } else {
         field = new DropDownChoiceLPanel(groupPanel.newChildId(), length, dropDownChoice);
       }
+      groupPanel.add(new LabelLPanel(groupPanel.newChildId(), HALF, label, (AbstractLPanel) field, true));
       groupPanel.add(field);
     }
     // groupPanel.add(createLabelPanel(groupPanel.newChildId(), HALF, label, formChoice, true));
