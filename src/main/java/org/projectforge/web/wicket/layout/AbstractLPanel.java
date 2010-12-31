@@ -34,7 +34,7 @@ import org.projectforge.web.wicket.WicketUtils;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public abstract class AbstractLPanel extends Panel implements ComponentWrapper
+public abstract class AbstractLPanel extends Panel implements ComponentWrapper, IField
 {
   private static final long serialVersionUID = -6769384502876947092L;
 
@@ -45,6 +45,8 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper
   protected boolean breakBefore;
 
   private boolean rendered;
+
+  private boolean strong;
 
   protected String classAttributeAppender;
 
@@ -116,6 +118,13 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper
     return this;
   }
 
+  @Override
+  public AbstractLPanel setStrong()
+  {
+    this.strong = true;
+    return this;
+  }
+
   /**
    * @param tooltip
    * @return this for chaining.
@@ -145,12 +154,13 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper
   {
     return getClassModifierComponent().getMarkupId();
   }
-  
+
   /**
    * Sets style="..." for the wrapped component.
    * @param css
    */
-  public AbstractLPanel setStyle(final String css) {
+  public AbstractLPanel setStyle(final String css)
+  {
     getClassModifierComponent().add(new SimpleAttributeModifier("style", css));
     return this;
   }
@@ -183,6 +193,9 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper
     }
     if (this.classAttributeAppender != null) {
       first = StringHelper.append(buf, first, this.classAttributeAppender, " ");
+    }
+    if (this.strong == true) {
+      first = StringHelper.append(buf, first, "strong", " ");
     }
     if (first == false) {
       return new SimpleAttributeModifier("class", buf.toString());

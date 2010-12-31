@@ -34,7 +34,7 @@ import org.projectforge.web.wicket.components.MaxLengthTextField;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class TextFieldLPanel extends AbstractLPanel
+public class TextFieldLPanel extends AbstractLPanel implements IField
 {
   private static final long serialVersionUID = 5771712946605166500L;
 

@@ -24,18 +24,20 @@
 package org.projectforge.web.mobile;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.PresizedImage;
+import org.projectforge.web.wicket.layout.IField;
 
 /**
  * A link panel which instantiates a phone call on an iPhone as well as an sms or an e-mail.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class ActionLinkPanel extends Panel
+public class ActionLinkPanel extends Panel implements IField
 {
   private static final long serialVersionUID = -5497704312133705066L;
 
@@ -64,6 +66,13 @@ public class ActionLinkPanel extends Panel
       add(new ExternalLink("link", url, value));
       add(getInvisibleSmsLink());
     }
+  }
+  
+  @Override
+  public ActionLinkPanel setStrong()
+  {
+    add(new SimpleAttributeModifier("class", "strong"));
+    return this;
   }
 
   private ExternalLink getCallLink(final String number)

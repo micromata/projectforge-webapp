@@ -128,9 +128,8 @@ public class AddressRenderer extends AbstractRenderer
     addPostalAddress(fieldSetPanel);
 
     // *** Private Contact ***
-    fieldSetPanel = createFieldSetPanel(fieldSetRepeater.newChildId(), getString("address.heading.privateContact")).init();
-    fieldSetRepeater.add(fieldSetPanel);
-    addPrivateEMail(fieldSetPanel);
+    doPanel.newFieldSetPanel(getString("address.heading.privateContact"));
+    addPrivateEMail();
 
     addPrivatePhones(fieldSetPanel);
     addPrivateAddress(fieldSetPanel);
@@ -428,24 +427,10 @@ public class AddressRenderer extends AbstractRenderer
    * Adds the fields: private e-mail.
    * @param fieldSetPanel
    */
-  public void addPrivateEMail(final FieldSetLPanel fieldSetPanel)
+  public void addPrivateEMail()
   {
-    final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId());
-    fieldSetPanel.add(groupPanel);
-    if (isMobileReadonly() == true) {
-      groupPanel.setHeading(getString("address.privateEmail"));
-      if (StringUtils.isNotBlank(data.getPrivateEmail()) == true) {
-        final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
-        groupPanel.add(labelValueTablePanel);
-        addLabelValueRow(labelValueTablePanel, getString("email"), new ActionLinkPanel(LabelValueTableLPanel.WICKET_ID_VALUE,
-            ActionLinkType.MAIL, data.getPrivateEmail()));
-      }
-    } else {
-      groupPanel.addMaxLengthTextField(data, "privateEmail", "email", FULL).setStrong();
-    }
-    if (groupPanel.hasChildren() == false) {
-      groupPanel.setVisible(false);
-    }
+    doPanel.newGroupPanel(isMobileReadonly() == true ? getString("address.privateEmail") : null);
+    doPanel.addMaxLengthTextField(data, "privateEmail", "email", FULL).setStrong();
   }
 
   protected void addAddress(final FieldSetLPanel fieldSetPanel, final String heading, final String addressTextProperty,

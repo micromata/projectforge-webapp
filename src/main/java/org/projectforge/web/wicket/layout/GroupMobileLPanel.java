@@ -56,10 +56,13 @@ public class GroupMobileLPanel extends GroupLPanel
    */
   GroupMobileLPanel(final String id, final String heading)
   {
-    super(id, heading);
+    super(id);
     childPanel = new CollapsiblePanel("collapsiblePanel", heading);
     add(childPanel);
     childPanel.setTheme(ThemeType.C);
+    if (heading != null) {
+      setHeading(heading);
+    }
   }
 
   public GroupLPanel add(final AbstractLPanel layoutPanel)

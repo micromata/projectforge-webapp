@@ -47,6 +47,8 @@ public abstract class AbstractRenderer implements Serializable
 
   protected LayoutContext layoutContext;
 
+  protected MainLPanel doPanel;
+
   protected MarkupContainer container;
 
   /**
@@ -54,6 +56,7 @@ public abstract class AbstractRenderer implements Serializable
    * @param id
    * @param heading
    */
+  @Deprecated
   public FieldSetLPanel createFieldSetPanel(final String id, final String heading)
   {
     if (layoutContext.isMobile() == true) {
@@ -63,11 +66,13 @@ public abstract class AbstractRenderer implements Serializable
     }
   }
 
+  @Deprecated
   public GroupLPanel createGroupPanel(final String id)
   {
     return createGroupPanel(id, null);
   }
 
+  @Deprecated
   public GroupLPanel createGroupPanel(final String id, final String heading)
   {
     if (layoutContext.isMobile() == true) {
@@ -77,27 +82,32 @@ public abstract class AbstractRenderer implements Serializable
     }
   }
 
+  @Deprecated
   public LabelLPanel createLabelPanel(final String id, final LayoutLength length, final String label)
   {
     return new LabelLPanel(id, length, label);
   }
 
+  @Deprecated
   public LabelLPanel createLabelPanel(final String id, final LayoutLength length, final String label, final boolean breakBefore)
   {
     return new LabelLPanel(id, length, label, breakBefore);
   }
 
+  @Deprecated
   public LabelLPanel createLabelPanel(final String id, final LayoutLength length, final String label, final Component labelFor,
       final boolean breakBefore)
   {
     return new LabelLPanel(id, length, label, labelFor, breakBefore);
   }
 
+  @Deprecated
   public LabelValueTableLPanel createLabelValueTablePanel(final String id)
   {
     return new LabelValueTableLPanel(id);
   }
 
+  @Deprecated
   public LabelLPanel createLabelValueHeadingPanel(final String id, final String label)
   {
     if (isMobile() == true) {
@@ -107,6 +117,7 @@ public abstract class AbstractRenderer implements Serializable
     }
   }
 
+  @Deprecated
   public LabelLPanel createValuePanel(final String id, final String value)
   {
     return new ValueLPanel(id, value);
@@ -185,7 +196,9 @@ public abstract class AbstractRenderer implements Serializable
   public AbstractRenderer(final MarkupContainer container, final LayoutContext layoutContext)
   {
     this.layoutContext = layoutContext;
+    this.doPanel = new MainLPanel("fieldSetsPanel", layoutContext);
     this.container = container;
+    container.add(doPanel);
   }
 
   public abstract void add();
