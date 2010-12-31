@@ -37,7 +37,7 @@ import org.projectforge.web.mobile.ActionLinkType;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class MainLPanel extends Panel
+public class DataObjectLPanel extends Panel
 {
   private static final long serialVersionUID = 6302571306175282690L;
 
@@ -85,9 +85,6 @@ public class MainLPanel extends Panel
     } else {
       groupPanel = new GroupLPanel(id, heading);
     }
-    if (heading != null) {
-      groupPanel.setHeading(getString(heading));
-    }
     fieldSetPanel.add(groupPanel);
     return groupPanel;
   }
@@ -102,7 +99,7 @@ public class MainLPanel extends Panel
     return labelValueTablePanel;
   }
 
-  private MainLPanel closeFieldSetPanel()
+  private DataObjectLPanel closeFieldSetPanel()
   {
     closeGroupPanel();
     if (fieldSetPanel != null && fieldSetPanel.hasChildren() == false) {
@@ -112,7 +109,7 @@ public class MainLPanel extends Panel
     return this;
   }
 
-  private MainLPanel closeGroupPanel()
+  private DataObjectLPanel closeGroupPanel()
   {
     closeLabelValueTablePanel();
     if (groupPanel != null && groupPanel.hasChildren() == false) {
@@ -122,7 +119,7 @@ public class MainLPanel extends Panel
     return this;
   }
 
-  private MainLPanel closeLabelValueTablePanel()
+  private DataObjectLPanel closeLabelValueTablePanel()
   {
     if (labelValueTablePanel != null && labelValueTablePanel.hasChildren() == false) {
       labelValueTablePanel.setVisible(false);
@@ -182,7 +179,7 @@ public class MainLPanel extends Panel
    * @param container The parent container.
    * @param layoutContext The current used layout (ro/rw, mobile or desktop).
    */
-  public MainLPanel(final String id, final LayoutContext layoutContext)
+  public DataObjectLPanel(final String id, final LayoutContext layoutContext)
   {
     super(id);
     this.layoutContext = layoutContext;
