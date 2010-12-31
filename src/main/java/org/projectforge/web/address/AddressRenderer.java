@@ -243,8 +243,8 @@ public class AddressRenderer extends AbstractRenderer
     // repeaterPanel.add(createCheckBoxPanel(repeaterPanel.newChildId(), personalAddress, "favoriteCard").setTooltip(tooltip));
     // repeaterPanel.add(createImagePanel(repeaterPanel.newChildId(), ImageDef.HELP, tooltip));
     // }
-    // doPanel.addMaxLengthTextField(data, "title", "address.title", THREEQUART).setStrong();
-    // doPanel.addMaxLengthTextField(data, "firstName", "firstName", FULL).setStrong();
+    doPanel.addMaxLengthTextField(data, "title", getString("address.title"), THREEQUART).setStrong();
+    doPanel.addMaxLengthTextField(data, "firstName", getString("firstName"), FULL).setStrong();
     // final IField nameTextField = doPanel.addMaxLengthTextField(data, "name", "name", FULL).setStrong().setRequired();
     // if (isNew() == true) {
     // nameTextField.setFocus();
