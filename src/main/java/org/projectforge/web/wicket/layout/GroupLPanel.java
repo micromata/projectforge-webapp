@@ -61,13 +61,13 @@ public class GroupLPanel extends Panel
     }
   }
 
-  public TextFieldLPanel addMaxLengthTextField(final Object dataObject, final String property, final String label,
+  public TextFieldLPanel addTextField(final Object dataObject, final String property, final String label,
       final LayoutLength labelLength, final LayoutLength valueLength)
   {
-    return addMaxLengthTextField(dataObject, property, label, labelLength, valueLength, false);
+    return addTextField(dataObject, property, label, labelLength, valueLength, false);
   }
 
-  public TextFieldLPanel addMaxLengthTextField(final Object dataObject, final String property, final String label,
+  public TextFieldLPanel addTextField(final Object dataObject, final String property, final String label,
       final LayoutLength labelLength, final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextField)
   {
     final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), valueLength, dataObject, property);
@@ -79,7 +79,14 @@ public class GroupLPanel extends Panel
     return textFieldPanel;
   }
 
-  public TextAreaLPanel addMaxLengthTextArea(final Object dataObject, final String property, final String label,
+  public TextFieldLPanel addTextField(final Object dataObject, final String property, final LayoutLength valueLength)
+  {
+    final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), valueLength, dataObject, property);
+    add(textFieldPanel);
+    return textFieldPanel;
+  }
+
+  public TextAreaLPanel addTextArea(final Object dataObject, final String property, final String label,
       final LayoutLength labelLength, final LayoutLength valueLength)
   {
     final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), valueLength, dataObject, property);
@@ -88,7 +95,7 @@ public class GroupLPanel extends Panel
     return textAreaPanel;
   }
 
-  public TextAreaLPanel addMaxLengthTextArea(final Object dataObject, final String property, final String label,
+  public TextAreaLPanel addTextArea(final Object dataObject, final String property, final String label,
       final LayoutLength labelLength, final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextarea)
   {
     final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), valueLength, dataObject, property);
@@ -100,7 +107,7 @@ public class GroupLPanel extends Panel
     return textAreaPanel;
   }
 
-  public TextAreaLPanel addMaxLengthTextArea(final Object dataObject, final String property, final LayoutLength valueLength)
+  public TextAreaLPanel addTextArea(final Object dataObject, final String property, final LayoutLength valueLength)
   {
     final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), valueLength, dataObject, property);
     add(textAreaPanel);

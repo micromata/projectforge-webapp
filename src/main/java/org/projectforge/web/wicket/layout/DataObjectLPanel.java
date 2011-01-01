@@ -28,6 +28,7 @@ import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.common.BeanHelper;
@@ -147,6 +148,7 @@ public class DataObjectLPanel extends Panel
 
   public LabelLPanel addLabel(final String label, final LayoutLength labelLength)
   {
+    ensureGroupPanel();
     final LabelLPanel labelPanel;
     labelPanel = new LabelLPanel(groupPanel.newChildId(), labelLength, label);
     groupPanel.add(labelPanel);
@@ -156,50 +158,93 @@ public class DataObjectLPanel extends Panel
   /**
    * @return the created field.
    */
-  public IField addMaxLengthTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
+  public IField addTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength)
   {
-    return addMaxLengthTextField(data, property, label, labelLength, valueLength, null, false);
+    return addTextField(data, property, label, labelLength, valueLength, null, false);
   }
 
   /**
    * @return the created field.
    */
-  public IField addMaxLengthTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
+  public IField addTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextfield)
   {
-    return addMaxLengthTextField(data, property, label, labelLength, valueLength, null, newLineBetweenLabelAndTextfield);
+    return addTextField(data, property, label, labelLength, valueLength, null, newLineBetweenLabelAndTextfield);
   }
 
   /**
    * @return the created field or a dummy IField if the field is e. g. empty in read-only mode.
    */
-  public IField addMaxLengthTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
+  public IField addTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength, final FieldType fieldType, final boolean newLineBetweenLabelAndTextField)
   {
+    ensureGroupPanel();
     IField field;
     if (layoutContext.isReadonly() == true) {
-      final Object value = BeanHelper.getNestedProperty(data, property);
-      if (isBlank(value) == true) {
-        field = new DummyField();
-      } else {
-        ensureLabelValueTablePanel();
-        final String wicketId;
-        if (newLineBetweenLabelAndTextField == true) {
-          newLabelValueTablePanel();
-          wicketId = LabelValueTableLPanel.WICKET_ID_LABEL;
-        } else {
-          wicketId = LabelValueTableLPanel.WICKET_ID_VALUE;
-        }
-        if (fieldType == FieldType.E_MAIL) {
-          field = new ActionLinkPanel(wicketId, ActionLinkType.MAIL, String.valueOf(value));
-        } else {
-          field = new LabelLPanel(wicketId, labelLength, String.valueOf(value));
-        }
-        labelValueTablePanel.add(label, (WebMarkupContainer) field, newLineBetweenLabelAndTextField);
-      }
+      return addReadonlyTextField(data, property, label, labelLength, valueLength, fieldType, newLineBetweenLabelAndTextField);
     } else {
-      field = groupPanel.addMaxLengthTextField(data, property, label, labelLength, valueLength, newLineBetweenLabelAndTextField);
+      field = groupPanel.addTextField(data, property, label, labelLength, valueLength, newLineBetweenLabelAndTextField);
+    }
+    return field;
+  }
+
+  /**
+   * LabelValueTable not supported.
+   * @return the created field or a dummy IField if the field is e. g. empty in read-only mode.
+   */
+  public IField addTextField(final Object data, final String property, final LayoutLength valueLength)
+  {
+    final IField field = groupPanel.addTextField(data, property, valueLength);
+    return field;
+  }
+
+  public IField addReadonlyTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
+      final LayoutLength valueLength)
+  {
+    return addReadonlyTextField(data, property, label, labelLength, valueLength, null, false);
+  }
+
+  public IField addReadonlyTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
+      final LayoutLength valueLength, final FieldType fieldType, final boolean newLineBetweenLabelAndTextField)
+  {
+    ensureGroupPanel();
+    final Object value = BeanHelper.getNestedProperty(data, property);
+    if (isBlank(value) == true) {
+      return new DummyField();
+    }
+    return addReadonlyTextField(String.valueOf(value), label, labelLength, valueLength, fieldType, newLineBetweenLabelAndTextField);
+  }
+
+  public IField addReadonlyTextField(final String value, final String label, final LayoutLength labelLength, final LayoutLength valueLength)
+  {
+    return addReadonlyTextField(value, label, labelLength, valueLength, null, false);
+  }
+
+  public IField addReadonlyTextField(final String value, final String label, final LayoutLength labelLength,
+      final LayoutLength valueLength, final FieldType fieldType, final boolean newLineBetweenLabelAndTextField)
+  {
+    ensureGroupPanel();
+    IField field;
+    if (isBlank(value) == true) {
+      field = new DummyField();
+    } else {
+      ensureLabelValueTablePanel();
+      final String wicketId;
+      if (newLineBetweenLabelAndTextField == true) {
+        newLabelValueTablePanel();
+        wicketId = LabelValueTableLPanel.WICKET_ID_LABEL;
+      } else {
+        wicketId = LabelValueTableLPanel.WICKET_ID_VALUE;
+      }
+      if (fieldType == FieldType.E_MAIL) {
+        field = new ActionLinkPanel(wicketId, ActionLinkType.MAIL, value);
+      } else if (fieldType == FieldType.WEB_PAGE) {
+        field = new ActionLinkPanel(wicketId, ActionLinkType.EXTERNAL_URL, value);
+      } else {
+        field = new LabelLPanel(wicketId, labelLength, value);
+      }
+      labelValueTablePanel.add(label, (WebMarkupContainer) field, newLineBetweenLabelAndTextField);
     }
     return field;
   }
@@ -207,9 +252,10 @@ public class DataObjectLPanel extends Panel
   /**
    * @return the created field or a dummy IField if the field is e. g. empty in read-only mode.
    */
-  public IField addMaxLengthTextArea(final Object data, final String property, final String label, final LayoutLength labelLength,
+  public IField addTextArea(final Object data, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextarea)
   {
+    ensureGroupPanel();
     IField field;
     if (layoutContext.isReadonly() == true) {
       final Object value = BeanHelper.getNestedProperty(data, property);
@@ -235,7 +281,7 @@ public class DataObjectLPanel extends Panel
         field = labelValueTablePanel.add(label, labelPanel, newLineBetweenLabelAndTextarea);
       }
     } else {
-      field = groupPanel.addMaxLengthTextArea(data, property, label, labelLength, valueLength, newLineBetweenLabelAndTextarea);
+      field = groupPanel.addTextArea(data, property, label, labelLength, valueLength, newLineBetweenLabelAndTextarea);
     }
     return field;
   }
@@ -243,8 +289,9 @@ public class DataObjectLPanel extends Panel
   /**
    * @return the created field or a dummy IField if the field is e. g. empty in read-only mode.
    */
-  public IField addMaxLengthTextArea(final Object data, final String property, final LayoutLength valueLength)
+  public IField addTextArea(final Object data, final String property, final LayoutLength valueLength)
   {
+    ensureGroupPanel();
     IField field;
     if (layoutContext.isReadonly() == true) {
       final Object value = BeanHelper.getNestedProperty(data, property);
@@ -263,7 +310,7 @@ public class DataObjectLPanel extends Panel
         groupPanel.add(field);
       }
     } else {
-      field = groupPanel.addMaxLengthTextArea(data, property, valueLength);
+      field = groupPanel.addTextArea(data, property, valueLength);
     }
     return field;
   }
@@ -274,6 +321,7 @@ public class DataObjectLPanel extends Panel
   public IField addDropDownChoice(final Object data, final String property, final String label, final LayoutLength labelLength,
       final DropDownChoice< ? > dropDownChoice, final LayoutLength valueLength)
   {
+    ensureGroupPanel();
     IField field;
     if (layoutContext.isReadonly() == true) {
       final Object value = BeanHelper.getNestedProperty(data, property);
@@ -305,6 +353,7 @@ public class DataObjectLPanel extends Panel
   public IField addDateFieldPanel(final Object data, final String property, final String label, final LayoutLength labelLength,
       final DatePrecision precision, final LayoutLength valueLength)
   {
+    ensureGroupPanel();
     IField field;
     final Object value = BeanHelper.getNestedProperty(data, property);
     if (isBlank(value) == true) {
@@ -326,7 +375,18 @@ public class DataObjectLPanel extends Panel
   public IField addDateFieldPanel(final Object data, final String property, final String label, final LayoutLength labelLength,
       final DatePanel datePanel, final LayoutLength valueLength)
   {
-    IField field = new DateFieldLPanel(groupPanel.newChildId(), valueLength, datePanel);
+    ensureGroupPanel();
+    final IField field = new DateFieldLPanel(groupPanel.newChildId(), valueLength, datePanel);
+    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
+    groupPanel.add(field);
+    return field;
+  }
+
+  public IField addTextField(final String label, final LayoutLength labelLength, final TextField< ? > textField,
+      final LayoutLength valueLength)
+  {
+    ensureGroupPanel();
+    final IField field = new TextFieldLPanel(groupPanel.newChildId(), valueLength, textField);
     groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
     groupPanel.add(field);
     return field;
@@ -340,6 +400,7 @@ public class DataObjectLPanel extends Panel
    */
   public IField addCheckBox(final Object data, final String property)
   {
+    ensureGroupPanel();
     IField field;
     if (layoutContext.isReadonly() == true) {
       final Object value = BeanHelper.getNestedProperty(data, property);

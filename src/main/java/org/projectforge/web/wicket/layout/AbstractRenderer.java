@@ -127,6 +127,7 @@ public abstract class AbstractRenderer implements Serializable
    * Adds a new row to the given label-value-table only if value isn't blank. If the given value is blank nothing will be done.
    * @param labelValueTablePanel
    */
+  @Deprecated
   public void addLabelValueRow(final LabelValueTableLPanel labelValueTablePanel, final String label, final String value)
   {
     if (StringUtils.isBlank(value) == true) {
@@ -139,11 +140,13 @@ public abstract class AbstractRenderer implements Serializable
    * Adds a new row to the given label-value-table.
    * @param labelValueTablePanel
    */
+  @Deprecated
   public void addLabelValueRow(final LabelValueTableLPanel labelValueTablePanel, final String label, final WebMarkupContainer value)
   {
     labelValueTablePanel.add(label, value);
   }
 
+  @Deprecated
   public DropDownChoiceLPanel createDropDownChoicePanel(final String id, final LayoutLength length, final DropDownChoice< ? > dropDownChoice)
   {
     if (isMobile() == true) {
@@ -153,41 +156,49 @@ public abstract class AbstractRenderer implements Serializable
     }
   }
 
+  @Deprecated
   public CheckBoxLPanel createCheckBoxPanel(final String id, final CheckBox checkBox)
   {
     return new CheckBoxLPanel(id, checkBox);
   }
 
+  @Deprecated
   public CheckBoxLPanel createCheckBoxPanel(final String id, final Object dataObject, final String property)
   {
     return new CheckBoxLPanel(id, dataObject, property);
   }
 
+  @Deprecated
   public DateFieldLPanel createDateFieldPanel(final String id, final LayoutLength length, final DatePanel datePanel)
   {
     return new DateFieldLPanel(id, length, datePanel);
   }
 
+  @Deprecated
   public ImageLPanel createImagePanel(final String id, final ImageDef imageDef, final String tooltip)
   {
     return new ImageLPanel(id, imageDef, tooltip);
   }
 
+  @Deprecated
   public RepeaterLabelLPanel createRepeaterLabelPanel(final String id, final LayoutLength length)
   {
     return new RepeaterLabelLPanel(id, length);
   }
 
+  @Deprecated
   public RepeaterLabelLPanel createRepeaterLabelPanel(final String id)
   {
     return new RepeaterLabelLPanel(id);
   }
 
+  @Deprecated
   public TextFieldLPanel createTextFieldPanel(final String id, final LayoutLength length, final Object dataObject, final String property)
   {
     return new TextFieldLPanel(id, length, dataObject, property);
   }
 
+  @Deprecated
   public TextFieldLPanel createTextFieldPanel(final String id, final LayoutLength length, final TextField< ? > textField)
   {
     return new TextFieldLPanel(id, length, textField);
