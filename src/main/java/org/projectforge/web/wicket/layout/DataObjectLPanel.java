@@ -239,6 +239,10 @@ public class DataObjectLPanel extends Panel
       }
       if (fieldType == FieldType.E_MAIL) {
         field = new ActionLinkPanel(wicketId, ActionLinkType.MAIL, value);
+      } else if (fieldType == FieldType.PHONE_NO) {
+        field = new ActionLinkPanel(wicketId, ActionLinkType.CALL, value);
+      } else if (fieldType == FieldType.MOBILE_PHONE_NO) {
+        field = new ActionLinkPanel(wicketId, ActionLinkType.CALL_AND_SMS, value);
       } else if (fieldType == FieldType.WEB_PAGE) {
         field = new ActionLinkPanel(wicketId, ActionLinkType.EXTERNAL_URL, value);
       } else {

@@ -39,7 +39,6 @@ import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.address.AddressDO;
@@ -52,8 +51,6 @@ import org.projectforge.common.BeanHelper;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.common.StringHelper;
-import org.projectforge.web.mobile.ActionLinkPanel;
-import org.projectforge.web.mobile.ActionLinkType;
 import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
@@ -62,14 +59,10 @@ import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.layout.AbstractRenderer;
 import org.projectforge.web.wicket.layout.DateFieldLPanel;
-import org.projectforge.web.wicket.layout.FieldSetLPanel;
 import org.projectforge.web.wicket.layout.FieldType;
-import org.projectforge.web.wicket.layout.GroupLPanel;
 import org.projectforge.web.wicket.layout.GroupMobileLPanel;
 import org.projectforge.web.wicket.layout.IField;
-import org.projectforge.web.wicket.layout.LabelValueTableLPanel;
 import org.projectforge.web.wicket.layout.LayoutContext;
-import org.projectforge.web.wicket.layout.RepeaterLabelLPanel;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
 public class AddressRenderer extends AbstractRenderer
@@ -98,12 +91,8 @@ public class AddressRenderer extends AbstractRenderer
   @Override
   public void add()
   {
-    final RepeatingView fieldSetRepeater = new RepeatingView("fieldSetRepeater");
-    add(fieldSetRepeater);
-
     final String title = StringHelper.listToString(" ", data.getTitle(), data.getFirstName(), data.getName());
     doPanel.newFieldSetPanel(isNew() == false ? title : getString("address.heading.personalData"));
-    FieldSetLPanel fieldSetPanel;
     if (isMobileReadonly() == true) {
       // Append at the end.
     } else {
@@ -119,11 +108,9 @@ public class AddressRenderer extends AbstractRenderer
       businessContactTitle = getString("address.heading.businessContact");
     }
     doPanel.newFieldSetPanel(businessContactTitle);
-    fieldSetPanel = createFieldSetPanel(fieldSetRepeater.newChildId(), businessContactTitle);
-    fieldSetRepeater.add(fieldSetPanel);
 
     addBusinessData();
-    addBusinessPhones(fieldSetPanel);
+    addBusinessPhones();
     addBusinesAddress();
     addPostalAddress();
 
@@ -131,7 +118,7 @@ public class AddressRenderer extends AbstractRenderer
     doPanel.newFieldSetPanel(getString("address.heading.privateContact"));
     addPrivateEMail();
 
-    addPrivatePhones(fieldSetPanel);
+    addPrivatePhones();
     addPrivateAddress();
 
     if (isMobileReadonly() == true) {
@@ -177,53 +164,26 @@ public class AddressRenderer extends AbstractRenderer
    * Adds the fields of business phones: business, fax, mobile.
    * @param fieldSetPanel
    */
-  public void addBusinessPhones(final FieldSetLPanel fieldSetPanel)
+  public void addBusinessPhones()
   {
     final String phoneListTooltip = getString("address.tooltip.phonelist");
-    final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phoneType.business"));
-    fieldSetPanel.add(groupPanel);
-    if (isMobileReadonly() == true) {
-      final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
-      addPhoneNumber(labelValueTablePanel, "address.phone", data.getBusinessPhone(), false);
-      addPhoneNumber(labelValueTablePanel, "address.phoneType.fax", data.getFax(), false);
-      addPhoneNumber(labelValueTablePanel, "address.phoneType.mobile", data.getMobilePhone(), true);
-      if (labelValueTablePanel != null && labelValueTablePanel.hasChildren() == true) {
-        groupPanel.add(labelValueTablePanel);
-      }
-    } else {
-      businessPhoneField = addPhoneNumber(groupPanel, "businessPhone", "address.phone", "favoriteBusinessPhone", phoneListTooltip);
-      faxField = addPhoneNumber(groupPanel, "fax", "address.phoneType.fax", "favoriteFax", phoneListTooltip);
-      mobilePhoneField = addPhoneNumber(groupPanel, "mobilePhone", "address.phoneType.mobile", "favoriteMobilePhone", phoneListTooltip);
-    }
-    if (groupPanel.hasChildren() == false) {
-      groupPanel.setVisible(false);
-    }
+    doPanel.newGroupPanel(getString("address.phoneType.business"));
+    businessPhoneField = addPhoneNumber("businessPhone", "address.phone", "favoriteBusinessPhone", false, phoneListTooltip, true);
+    faxField = addPhoneNumber("fax", "address.phoneType.fax", "favoriteFax", false, phoneListTooltip, false);
+    mobilePhoneField = addPhoneNumber("mobilePhone", "address.phoneType.mobile", "favoriteMobilePhone", true, phoneListTooltip, false);
   }
 
   /**
    * Adds the fields of private phones: phone, mobile.
    * @param fieldSetPanel
    */
-  public void addPrivatePhones(final FieldSetLPanel fieldSetPanel)
+  public void addPrivatePhones()
   {
     final String phoneListTooltip = getString("address.tooltip.phonelist");
-    final GroupLPanel groupPanel = createGroupPanel(fieldSetPanel.newChildId()).setHeading(getString("address.phoneType.private"));
-    fieldSetPanel.add(groupPanel);
-    if (isMobileReadonly() == true) {
-      final LabelValueTableLPanel labelValueTablePanel = createLabelValueTablePanel(groupPanel.newChildId());
-      addPhoneNumber(labelValueTablePanel, "address.phone", data.getPrivatePhone(), false);
-      addPhoneNumber(labelValueTablePanel, "address.phoneType.mobile", data.getPrivateMobilePhone(), true);
-      if (labelValueTablePanel != null && labelValueTablePanel.hasChildren() == true) {
-        groupPanel.add(labelValueTablePanel);
-      }
-    } else {
-      privatePhoneField = addPhoneNumber(groupPanel, "privatePhone", "address.phone", "favoritePrivatePhone", phoneListTooltip);
-      privateMobilePhoneField = addPhoneNumber(groupPanel, "privateMobilePhone", "address.phoneType.mobile", "favoritePrivateMobilePhone",
-          phoneListTooltip);
-    }
-    if (groupPanel.hasChildren() == false) {
-      groupPanel.setVisible(false);
-    }
+    doPanel.newGroupPanel(getString("address.phoneType.private"));
+    privatePhoneField = addPhoneNumber("privatePhone", "address.phone", "favoritePrivatePhone", false, phoneListTooltip, true);
+    privateMobilePhoneField = addPhoneNumber("privateMobilePhone", "address.phoneType.mobile", "favoritePrivateMobilePhone", true,
+        phoneListTooltip, false);
   }
 
   /**
@@ -342,7 +302,7 @@ public class AddressRenderer extends AbstractRenderer
   public void addPrivateEMail()
   {
     doPanel.newGroupPanel(isMobileReadonly() == true ? getString("address.privateEmail") : null);
-    doPanel.addTextField(data, "privateEmail", getString("email"), HALF, FULL).setStrong();
+    doPanel.addTextField(data, "privateEmail", getString("email"), HALF, FULL, FieldType.E_MAIL, false).setStrong();
   }
 
   protected void addAddress(final String heading, final String addressTextProperty, final String zipCodeProperty,
@@ -379,28 +339,27 @@ public class AddressRenderer extends AbstractRenderer
     }
   }
 
-  private void addPhoneNumber(final LabelValueTableLPanel labelValueTablePanel, final String labelKey, final String number,
-      final boolean isMobile)
+  private TextField<String> addPhoneNumber(final String property, final String labelKey, final String favoriteProperty,
+      final boolean mobileNumber, final String phoneListTooltip, final boolean first)
   {
-    if (isMobileReadonly() == true && StringUtils.isBlank(number) == true) {
-      return;
+    if (isMobile() == false) {
+      final IField field = doPanel.addTextField(data, property, getString(labelKey), HALF, THREEQUART);
+      doPanel.addCheckBox(personalAddress, favoriteProperty).setTooltip(phoneListTooltip);
+      if (first == true) {
+        doPanel.addImage(ImageDef.HELP).setTooltip(phoneListTooltip);
+      }
+      @SuppressWarnings("unchecked")
+      final TextField<String> textField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
+      return textField;
+    } else {
+      final String number = (String) BeanHelper.getProperty(data, property);
+      if (isMobileReadonly() == true && StringUtils.isBlank(number) == true) {
+        return null;
+      }
+      doPanel.addTextField(data, property, getString(labelKey), HALF, FULL,
+          mobileNumber == true ? FieldType.MOBILE_PHONE_NO : FieldType.PHONE_NO, false).setStrong();
     }
-    final ActionLinkPanel valueContainer = new ActionLinkPanel(LabelValueTableLPanel.WICKET_ID_VALUE,
-        isMobile == true ? ActionLinkType.CALL_AND_SMS : ActionLinkType.CALL, number);
-    addLabelValueRow(labelValueTablePanel, getString(labelKey), valueContainer);
-  }
-
-  private TextField<String> addPhoneNumber(final GroupLPanel groupPanel, final String property, final String labelKey,
-      final String favoriteProperty, final String phoneListTooltip)
-  {
-    final TextFieldLPanel phoneFieldPanel = groupPanel.addTextField(data, property, labelKey, HALF, THREEQUART);
-    @SuppressWarnings("unchecked")
-    final TextField<String> phoneField = (TextField<String>) phoneFieldPanel.getTextField();
-    final RepeaterLabelLPanel repeaterPanel = createRepeaterLabelPanel(groupPanel.newChildId());
-    groupPanel.add(repeaterPanel);
-    repeaterPanel.add(createCheckBoxPanel(repeaterPanel.newChildId(), personalAddress, favoriteProperty).setTooltip(phoneListTooltip));
-    repeaterPanel.add(createImagePanel(repeaterPanel.newChildId(), ImageDef.HELP, phoneListTooltip));
-    return phoneField;
+    return null;
   }
 
   protected void validation()
