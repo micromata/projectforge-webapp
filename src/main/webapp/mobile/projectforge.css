@@ -4,6 +4,14 @@ table.data th {
 	padding-right: .5em;
 }
 
+table.data th.strong {
+	font-weight: bold;
+}
+
+table.data th.label-value-single-col {
+	text-align: left;
+}
+
 table.data td {
 	font-weight: bold;
 }

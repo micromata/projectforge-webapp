@@ -101,7 +101,7 @@ public class AddressRenderer extends AbstractRenderer
     add(fieldSetRepeater);
 
     final String title = StringHelper.listToString(" ", data.getTitle(), data.getFirstName(), data.getName());
-    doPanel.newFieldSetPanel(title);
+    doPanel.newFieldSetPanel(isNew() == false ? title : getString("address.heading.personalData"));
     FieldSetLPanel fieldSetPanel;
     if (isMobileReadonly() == true) {
       // Append at the end.
@@ -279,12 +279,10 @@ public class AddressRenderer extends AbstractRenderer
         }
       });
     }
-    if (isReadonly() == false || StringUtils.isNotBlank(data.getComment()) == true) {
-      doPanel.addLabel(getString("comment"), FULL).setBreakBefore();
-      final IField commentField = doPanel.addMaxLengthTextArea(data, "comment", ONEHALF).setCssStyle("height: 20em;");
-      if (layoutContext.isNew() == false) {
-        commentField.setFocus();
-      }
+    final IField commentField = doPanel.addMaxLengthTextArea(data, "comment", getString("comment"), HALF, ONEHALF, true).setCssStyle(
+        "height: 20em;");
+    if (layoutContext.isNew() == false) {
+      commentField.setFocus();
     }
   }
 
@@ -298,8 +296,8 @@ public class AddressRenderer extends AbstractRenderer
       final GroupMobileLPanel groupMobilePanel = (GroupMobileLPanel) doPanel.newGroupPanel(getString("address.publicKey"));
       groupMobilePanel.setCollapsed();
     }
-    doPanel.addMaxLengthTextField(data, "fingerprint", getString("address.fingerprint"), HALF, ONEHALF);
-    doPanel.addMaxLengthTextArea(data, "publicKey", getString("address.publicKey"), HALF, ONEHALF);
+    doPanel.addMaxLengthTextField(data, "fingerprint", getString("address.fingerprint"), HALF, ONEHALF, true);
+    doPanel.addMaxLengthTextArea(data, "publicKey", getString("address.publicKey"), HALF, ONEHALF, true);
   }
 
   /**

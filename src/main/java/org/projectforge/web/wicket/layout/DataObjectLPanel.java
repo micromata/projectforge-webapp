@@ -148,11 +148,7 @@ public class DataObjectLPanel extends Panel
   public LabelLPanel addLabel(final String label, final LayoutLength labelLength)
   {
     final LabelLPanel labelPanel;
-    if (layoutContext.isMobile() == true) {
-      labelPanel = new LabelValueHeadingMobileLPanel(groupPanel.newChildId(), label);
-    } else {
-      labelPanel = new LabelLPanel(groupPanel.newChildId(), labelLength, label);
-    }
+    labelPanel = new LabelLPanel(groupPanel.newChildId(), labelLength, label);
     groupPanel.add(labelPanel);
     return labelPanel;
   }
@@ -163,14 +159,23 @@ public class DataObjectLPanel extends Panel
   public IField addMaxLengthTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength)
   {
-    return addMaxLengthTextField(data, property, label, labelLength, valueLength, null);
+    return addMaxLengthTextField(data, property, label, labelLength, valueLength, null, false);
+  }
+
+  /**
+   * @return the created field.
+   */
+  public IField addMaxLengthTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
+      final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextfield)
+  {
+    return addMaxLengthTextField(data, property, label, labelLength, valueLength, null, newLineBetweenLabelAndTextfield);
   }
 
   /**
    * @return the created field or a dummy IField if the field is e. g. empty in read-only mode.
    */
   public IField addMaxLengthTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
-      final LayoutLength valueLength, final FieldType fieldType)
+      final LayoutLength valueLength, final FieldType fieldType, final boolean newLineBetweenLabelAndTextField)
   {
     IField field;
     if (layoutContext.isReadonly() == true) {
@@ -179,15 +184,22 @@ public class DataObjectLPanel extends Panel
         field = new DummyField();
       } else {
         ensureLabelValueTablePanel();
-        if (fieldType == FieldType.E_MAIL) {
-          field = new ActionLinkPanel(LabelValueTableLPanel.WICKET_ID_VALUE, ActionLinkType.MAIL, String.valueOf(value));
+        final String wicketId;
+        if (newLineBetweenLabelAndTextField == true) {
+          newLabelValueTablePanel();
+          wicketId = LabelValueTableLPanel.WICKET_ID_LABEL;
         } else {
-          field = new LabelLPanel(LabelValueTableLPanel.WICKET_ID_VALUE, labelLength, String.valueOf(value));
+          wicketId = LabelValueTableLPanel.WICKET_ID_VALUE;
         }
-        labelValueTablePanel.add(label, (WebMarkupContainer) field);
+        if (fieldType == FieldType.E_MAIL) {
+          field = new ActionLinkPanel(wicketId, ActionLinkType.MAIL, String.valueOf(value));
+        } else {
+          field = new LabelLPanel(wicketId, labelLength, String.valueOf(value));
+        }
+        labelValueTablePanel.add(label, (WebMarkupContainer) field, newLineBetweenLabelAndTextField);
       }
     } else {
-      field = groupPanel.addMaxLengthTextField(data, property, label, labelLength, valueLength);
+      field = groupPanel.addMaxLengthTextField(data, property, label, labelLength, valueLength, newLineBetweenLabelAndTextField);
     }
     return field;
   }
@@ -196,7 +208,7 @@ public class DataObjectLPanel extends Panel
    * @return the created field or a dummy IField if the field is e. g. empty in read-only mode.
    */
   public IField addMaxLengthTextArea(final Object data, final String property, final String label, final LayoutLength labelLength,
-      final LayoutLength valueLength)
+      final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextarea)
   {
     IField field;
     if (layoutContext.isReadonly() == true) {
@@ -211,13 +223,19 @@ public class DataObjectLPanel extends Panel
         } else {
           displayValue = HtmlHelper.formatText(String.valueOf(value), true);
         }
-        final LabelLPanel labelPanel = new LabelLPanel(LabelValueTableLPanel.WICKET_ID_VALUE, valueLength, displayValue);
+        final String wicketId;
+        if (newLineBetweenLabelAndTextarea == true) {
+          newLabelValueTablePanel();
+          wicketId = LabelValueTableLPanel.WICKET_ID_LABEL;
+        } else {
+          wicketId = LabelValueTableLPanel.WICKET_ID_VALUE;
+        }
+        final LabelLPanel labelPanel = new LabelLPanel(wicketId, valueLength, displayValue);
         labelPanel.getWrappedComponent().setEscapeModelStrings(false);
-        field = labelPanel;
-        labelValueTablePanel.add(label, (WebMarkupContainer) field);
+        field = labelValueTablePanel.add(label, labelPanel, newLineBetweenLabelAndTextarea);
       }
     } else {
-      field = groupPanel.addMaxLengthTextArea(data, property, label, labelLength, valueLength);
+      field = groupPanel.addMaxLengthTextArea(data, property, label, labelLength, valueLength, newLineBetweenLabelAndTextarea);
     }
     return field;
   }

@@ -24,6 +24,7 @@
 package org.projectforge.web.wicket.layout;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.RepeatingView;
@@ -36,6 +37,8 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 public class LabelValueTableLPanel extends AbstractLPanel
 {
   public static final String WICKET_ID_VALUE = "value";
+
+  public static final String WICKET_ID_LABEL = "label";
 
   private static final long serialVersionUID = 1232385200034295638L;
 
@@ -70,11 +73,25 @@ public class LabelValueTableLPanel extends AbstractLPanel
 
   public LabelValueTableLPanel add(final String label, final WebMarkupContainer value)
   {
+    return add(label, value, false);
+  }
+
+  public LabelValueTableLPanel add(final String label, final Component value, final boolean newLineBetweenLabelAndValue)
+  {
     hasChildren = true;
-    final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
+    WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
     rowRepeater.add(row);
-    row.add(new Label("label", label));
-    row.add(value);
+    if (newLineBetweenLabelAndValue == true) {
+      row.add(new Label("label", label).add(new SimpleAttributeModifier("class", "label-value-single-col")));
+      row.add(new Label(WICKET_ID_VALUE, ""));
+      row = new WebMarkupContainer(rowRepeater.newChildId());
+      rowRepeater.add(row);
+      row.add(value.add(new SimpleAttributeModifier("colspan", "2")).add(new SimpleAttributeModifier("class", "label-value-single-col strong")));
+      row.add(new Label(WICKET_ID_VALUE, "[invisible]").setVisible(false));
+    } else {
+      row.add(new Label("label", label));
+      row.add(value);
+    }
     return this;
   }
 

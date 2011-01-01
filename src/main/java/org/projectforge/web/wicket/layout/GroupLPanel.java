@@ -64,8 +64,17 @@ public class GroupLPanel extends Panel
   public TextFieldLPanel addMaxLengthTextField(final Object dataObject, final String property, final String label,
       final LayoutLength labelLength, final LayoutLength valueLength)
   {
+    return addMaxLengthTextField(dataObject, property, label, labelLength, valueLength, false);
+  }
+
+  public TextFieldLPanel addMaxLengthTextField(final Object dataObject, final String property, final String label,
+      final LayoutLength labelLength, final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextField)
+  {
     final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), valueLength, dataObject, property);
     add(new LabelLPanel(newChildId(), labelLength, label).setLabelFor(textFieldPanel.getTextField()).setBreakBefore());
+    if (newLineBetweenLabelAndTextField == true) {
+      textFieldPanel.setBreakBefore();
+    }
     add(textFieldPanel);
     return textFieldPanel;
   }
@@ -75,6 +84,18 @@ public class GroupLPanel extends Panel
   {
     final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), valueLength, dataObject, property);
     add(new LabelLPanel(newChildId(), labelLength, label).setLabelFor(textAreaPanel.getTextArea()).setBreakBefore());
+    add(textAreaPanel);
+    return textAreaPanel;
+  }
+
+  public TextAreaLPanel addMaxLengthTextArea(final Object dataObject, final String property, final String label,
+      final LayoutLength labelLength, final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextarea)
+  {
+    final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), valueLength, dataObject, property);
+    add(new LabelLPanel(newChildId(), labelLength, label).setLabelFor(textAreaPanel.getTextArea()).setBreakBefore());
+    if (newLineBetweenLabelAndTextarea == true) {
+      textAreaPanel.setBreakBefore();
+    }
     add(textAreaPanel);
     return textAreaPanel;
   }
