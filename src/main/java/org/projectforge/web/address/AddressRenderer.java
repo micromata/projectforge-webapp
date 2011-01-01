@@ -297,7 +297,8 @@ public class AddressRenderer extends AbstractRenderer
       groupMobilePanel.setCollapsed();
     }
     doPanel.addMaxLengthTextField(data, "fingerprint", getString("address.fingerprint"), HALF, ONEHALF, true);
-    doPanel.addMaxLengthTextArea(data, "publicKey", getString("address.publicKey"), HALF, ONEHALF, true);
+    doPanel.addMaxLengthTextArea(data, "publicKey", getString("address.publicKey"), HALF, ONEHALF, true).setCssStyle(
+    "height: 5em;");
   }
 
   /**
