@@ -3,7 +3,7 @@
 // Project ProjectForge Community Edition
 //         www.projectforge.org
 //
-// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)
+// Copyright (C) 2001-2011 Kai Reinhard (k.reinhard@me.com)
 //
 // ProjectForge is dual-licensed.
 //
@@ -70,7 +70,7 @@ public class ModifyJavaFileHeadersTest
             .append("// Project ProjectForge Community Edition\n") //
             .append("//         www.projectforge.org\n") //
             .append("//\n") //
-            .append("// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)\n") //
+            .append("// Copyright (C) 2001-2011 Kai Reinhard (k.reinhard@me.com)\n") //
             .append("//\n") //
             .append("// ProjectForge is dual-licensed.\n") //
             .append("//\n") //
