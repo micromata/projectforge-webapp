@@ -34,10 +34,11 @@ import org.apache.commons.lang.Validate;
 import org.projectforge.web.core.LocalizerAndUrlBuilder;
 import org.projectforge.web.core.PageContextLocalizerAndUrlBuilder;
 
-
 public class HtmlHelper
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(HtmlHelper.class);
+  
+  public static final int TAB_WIDTH = 8;
 
   public static final String IMAGE_INFO_ICON = "/images/information.png";
 
@@ -282,18 +283,29 @@ public class HtmlHelper
     }
     StringBuffer buf = new StringBuffer();
     boolean doubleSpace = false;
+    int col = 0;
     for (int i = 0; i < s.length(); i++) {
       char ch = s.charAt(i);
       if (ch == '\n') {
         buf.append("<br/>");
+        col = 0;
+      } else if (ch == '\r') {
+        // Do nothing
       } else if (ch == ' ') {
         if (doubleSpace == true) {
           buf.append("&nbsp;");
         } else {
           buf.append(' ');
         }
+      } else if (ch == '\t') {
+        do {
+          buf.append("&nbsp;");
+          ++col;
+        }
+        while(col % TAB_WIDTH > 0);
       } else {
         buf.append(ch);
+        ++col;
       }
       if (Character.isWhitespace(ch) == true) {
         doubleSpace = true;

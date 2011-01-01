@@ -28,24 +28,34 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.projectforge.web.HtmlHelper;
 
-
 public class HtmlHelperTest
 {
   @Test
   public void testAttribute()
   {
-    HtmlHelper htmlHelper = new HtmlHelper();
+    final HtmlHelper htmlHelper = new HtmlHelper();
     assertEquals(" hallo=\"test\"", htmlHelper.attribute("hallo", "test"));
   }
-  
+
   @Test
-  public void testAppendAncorOnClickSubmitEventStartTag() {
-    HtmlHelper htmlHelper = new HtmlHelper();
+  public void testAppendAncorOnClickSubmitEventStartTag()
+  {
+    final HtmlHelper htmlHelper = new HtmlHelper();
     StringBuffer buf = new StringBuffer();
     htmlHelper.appendAncorOnClickSubmitEventStartTag(buf, "submitEvent", "select.task");
-    assertEquals("<a href=\"#\" onclick=\"javascript:submitEvent('select.task')\">", buf.toString());    
+    assertEquals("<a href=\"#\" onclick=\"javascript:submitEvent('select.task')\">", buf.toString());
     buf = new StringBuffer();
     htmlHelper.appendAncorOnClickSubmitEventStartTag(buf, "submitSelectedEvent", "selectTask", "4");
-    assertEquals("<a href=\"#\" onclick=\"javascript:submitSelectedEvent('selectTask', '4')\">", buf.toString());    
+    assertEquals("<a href=\"#\" onclick=\"javascript:submitSelectedEvent('selectTask', '4')\">", buf.toString());
+  }
+
+  @Test
+  public void testFormatText()
+  {
+    assertEquals("", HtmlHelper.formatText(null, true));
+    assertEquals("", HtmlHelper.formatText("", true));
+    assertEquals("<br/>", HtmlHelper.formatText("\n", true));
+    assertEquals("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", HtmlHelper.formatText("\t ", true));
+    assertEquals("Name:&nbsp;&nbsp;&nbsp;Reinhard<br/>Vorname:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kai<br/>Test &nbsp;&nbsp;&nbsp;", HtmlHelper.formatText("Name:\tReinhard\r\nVorname:\tKai\nTest    ", true));
   }
 }
