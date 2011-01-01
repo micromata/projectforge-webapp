@@ -3,7 +3,7 @@
 // Project ProjectForge Community Edition
 //         www.projectforge.org
 //
-// Copyright (C) 2001-2010 Kai Reinhard (k.reinhard@me.com)
+// Copyright (C) 2001-2011 Kai Reinhard (k.reinhard@me.com)
 //
 // ProjectForge is dual-licensed.
 //
