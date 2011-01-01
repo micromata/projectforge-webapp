@@ -34,6 +34,12 @@ public interface IField
    * @return this for chaining.
    */
   public IField setStrong();
+ 
+  /**
+   * Sets the attribute style (if supported).
+   * @return this for chaining.
+   */
+  public IField setCssStyle(final String cssStyle);
   
   /**
    * Sets the focus on this field (if supported).
@@ -46,4 +52,10 @@ public interface IField
    * @return this for chaining.
    */
   public IField setRequired();
+  
+  /**
+   * Sets a tool-tip for this field (if supported).
+   * @return this for chaining.
+   */
+  public IField setTooltip(final String text);
 }

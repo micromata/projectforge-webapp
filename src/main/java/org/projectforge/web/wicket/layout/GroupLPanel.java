@@ -23,8 +23,6 @@
 
 package org.projectforge.web.wicket.layout;
 
-import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
-
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -47,7 +45,7 @@ public class GroupLPanel extends Panel
   protected Label headingLabel;
 
   private RepeatingView entriesRepeater;
-  
+
   private boolean hasChildren;
 
   GroupLPanel(final String id)
@@ -64,19 +62,26 @@ public class GroupLPanel extends Panel
   }
 
   public TextFieldLPanel addMaxLengthTextField(final Object dataObject, final String property, final String label,
-      final LayoutLength length)
+      final LayoutLength labelLength, final LayoutLength valueLength)
   {
-    final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), length, dataObject, property);
-    add(new LabelLPanel(newChildId(), HALF, label).setLabelFor(textFieldPanel.getTextField()).setBreakBefore());
+    final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), valueLength, dataObject, property);
+    add(new LabelLPanel(newChildId(), labelLength, label).setLabelFor(textFieldPanel.getTextField()).setBreakBefore());
     add(textFieldPanel);
     return textFieldPanel;
   }
 
   public TextAreaLPanel addMaxLengthTextArea(final Object dataObject, final String property, final String label,
-      final LayoutLength length)
+      final LayoutLength labelLength, final LayoutLength valueLength)
   {
-    final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), length, dataObject, property);
-    add(new LabelLPanel(newChildId(), HALF, label).setLabelFor(textAreaPanel.getTextArea()).setBreakBefore());
+    final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), valueLength, dataObject, property);
+    add(new LabelLPanel(newChildId(), labelLength, label).setLabelFor(textAreaPanel.getTextArea()).setBreakBefore());
+    add(textAreaPanel);
+    return textAreaPanel;
+  }
+
+  public TextAreaLPanel addMaxLengthTextArea(final Object dataObject, final String property, final LayoutLength valueLength)
+  {
+    final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), valueLength, dataObject, property);
     add(textAreaPanel);
     return textAreaPanel;
   }
@@ -91,7 +96,7 @@ public class GroupLPanel extends Panel
   public GroupLPanel add(final IField field)
   {
     hasChildren = true;
-    entriesRepeater.add((Component)field);
+    entriesRepeater.add((Component) field);
     return this;
   }
 

@@ -26,10 +26,12 @@ package org.projectforge.web.mobile;
 import org.apache.wicket.Component;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.PresizedImage;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.layout.IField;
 
 /**
@@ -41,20 +43,22 @@ public class ActionLinkPanel extends Panel implements IField
 {
   private static final long serialVersionUID = -5497704312133705066L;
 
+  private AbstractLink link1, link2;
+
   public ActionLinkPanel(final String id, final ActionLinkType actionLinkType, final String value)
   {
     super(id);
     if (actionLinkType == ActionLinkType.CALL) {
-      add(getCallLink(value));
+      add(link1 = getCallLink(value));
       add(getInvisibleSmsLink());
     } else if (actionLinkType == ActionLinkType.SMS) {
       add(new Label("link", "[invisible]").setVisible(false));
-      add(getSmsLink(value));
+      add(link2 = getSmsLink(value));
     } else if (actionLinkType == ActionLinkType.CALL_AND_SMS) {
-      add(getCallLink(value));
-      add(getSmsLink(value));
+      add(link1 = getCallLink(value));
+      add(link2 = getSmsLink(value));
     } else if (actionLinkType == ActionLinkType.MAIL) {
-      add(new ExternalLink("link", "mailto:" + value, value));
+      add(link1 = new ExternalLink("link", "mailto:" + value, value));
       add(getInvisibleSmsLink());
     } else {
       final String url;
@@ -63,11 +67,11 @@ public class ActionLinkPanel extends Panel implements IField
       } else {
         url = "http://" + value;
       }
-      add(new ExternalLink("link", url, value));
+      add(link1 = new ExternalLink("link", url, value));
       add(getInvisibleSmsLink());
     }
   }
-  
+
   @Override
   public ActionLinkPanel setStrong()
   {
@@ -76,15 +80,34 @@ public class ActionLinkPanel extends Panel implements IField
   }
   
   @Override
-  public IField setFocus()
+  public IField setCssStyle(final String cssStyle)
+  {
+    add(new SimpleAttributeModifier("style", cssStyle));
+    return this;
+  }
+
+  @Override
+  public ActionLinkPanel setFocus()
   {
     throw new UnsupportedOperationException();
   }
-  
+
   @Override
-  public IField setRequired()
+  public ActionLinkPanel setRequired()
   {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public ActionLinkPanel setTooltip(String text)
+  {
+    if (link1 != null) {
+      WicketUtils.addTooltip(link1, text);
+    }
+    if (link2 != null) {
+      WicketUtils.addTooltip(link2, text);
+    }
+    return this;
   }
 
   private ExternalLink getCallLink(final String number)

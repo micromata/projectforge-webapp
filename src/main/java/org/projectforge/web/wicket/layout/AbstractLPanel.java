@@ -124,11 +124,19 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper, 
     this.strong = true;
     return this;
   }
+  
+  @Override
+  public IField setCssStyle(String cssStyle)
+  {
+    getWrappedComponent().add(new SimpleAttributeModifier("style", cssStyle));
+    return this;
+  }
 
   /**
    * @param tooltip
    * @return this for chaining.
    */
+  @Override
   public AbstractLPanel setTooltip(final String tooltip)
   {
     WicketUtils.addTooltip(getWrappedComponent(), tooltip);
@@ -223,6 +231,6 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper, 
   @Override
   public IField setRequired()
   {
-    return null;
+    return this;
   }
 }

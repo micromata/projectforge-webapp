@@ -36,14 +36,26 @@ public class DummyField implements IField
   }
   
   @Override
+  public IField setCssStyle(final String cssStyle)
+  {
+    return this;
+  }
+  
+  @Override
   public IField setFocus()
   {
-    return null;
+    return this;
   }
   
   @Override
   public IField setRequired()
   {
-    return null;
+    return this;
+  }
+  
+  @Override
+  public IField setTooltip(final String text)
+  {
+    return this;
   }
 }

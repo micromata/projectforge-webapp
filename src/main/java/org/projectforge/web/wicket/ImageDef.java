@@ -31,7 +31,7 @@ package org.projectforge.web.wicket;
 public enum ImageDef
 {
 
-  ACCEPT(DIRS.MAIN + "accept.png"), HELP(DIRS.MAIN + "help.png"), //
+  ACCEPT(DIRS.MAIN + "accept.png"), DENY(DIRS.MAIN + "deny.png"), HELP(DIRS.MAIN + "help.png"), //
   SMS(DIRS.MAIN + "sms.png");
 
   // public static final String IMAGE_ADD = DIR + "add.png";

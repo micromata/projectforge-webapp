@@ -23,6 +23,7 @@
 
 package org.projectforge.web.wicket.layout;
 
+import org.apache.wicket.Component;
 import org.projectforge.web.mobile.CollapsiblePanel;
 import org.projectforge.web.mobile.ThemeType;
 
@@ -65,9 +66,17 @@ public class GroupMobileLPanel extends GroupLPanel
     }
   }
 
+  @Override
   public GroupLPanel add(final AbstractLPanel layoutPanel)
   {
     childPanel.add(layoutPanel);
+    return this;
+  }
+
+  @Override
+  public GroupLPanel add(final IField field)
+  {
+    childPanel.add((Component)field);
     return this;
   }
 
@@ -100,14 +109,5 @@ public class GroupMobileLPanel extends GroupLPanel
   public GroupMobileLPanel setCollapsed() {
     childPanel.setCollapsed();
     return this;
-  }
-
-  public TextFieldLPanel addMaxLengthTextField(final Object dataObject, final String property, final String labelKey,
-      final LayoutLength length)
-  {
-    final TextFieldMobileLPanel textFieldPanel = new TextFieldMobileLPanel(newChildId(), length, dataObject, property);
-    textFieldPanel.setLabel(getString(labelKey));
-    add(textFieldPanel);
-    return textFieldPanel;
   }
 }
