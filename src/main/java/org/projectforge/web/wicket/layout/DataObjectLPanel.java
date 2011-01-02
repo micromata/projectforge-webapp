@@ -184,7 +184,7 @@ public class DataObjectLPanel extends Panel
     if (layoutContext.isMobileReadonly() == true) {
       field = addReadonlyTextField(data, property, label, labelLength, valueLength, fieldType, newLineBetweenLabelAndTextField);
     } else {
-      field = groupPanel.addTextField(data, property, label, labelLength, valueLength, newLineBetweenLabelAndTextField);
+      field = groupPanel.addTextField(data, property, label, labelLength, valueLength, fieldType, newLineBetweenLabelAndTextField);
     }
     return field;
   }

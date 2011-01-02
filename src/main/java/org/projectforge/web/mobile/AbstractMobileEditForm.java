@@ -23,6 +23,8 @@
 
 package org.projectforge.web.mobile;
 
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.projectforge.core.AbstractBaseDO;
 
@@ -49,8 +51,22 @@ public abstract class AbstractMobileEditForm<O extends AbstractBaseDO< ? >, P ex
     return this.data == null || this.data.getId() == null;
   }
 
+  @SuppressWarnings("serial")
   protected void init()
   {
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
+    final SubmitLink submitButton = new SubmitLink("submitButton") {
+      @Override
+      public final void onSubmit()
+      {
+        parentPage.save();
+      }
+    };
+    add(submitButton);
+    if (isNew() == true) {
+      submitButton.add(new Label("label", getString("create")));
+    } else {
+      submitButton.add(new Label("label", getString("update")));
+    }
   }
 }

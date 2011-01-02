@@ -24,6 +24,7 @@
 package org.projectforge.web.wicket.layout;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
@@ -61,16 +62,29 @@ public class GroupLPanel extends Panel
     }
   }
 
-  public TextFieldLPanel addTextField(final Object dataObject, final String property, final String label,
-      final LayoutLength labelLength, final LayoutLength valueLength)
+  public TextFieldLPanel addTextField(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
+      final LayoutLength valueLength)
   {
-    return addTextField(dataObject, property, label, labelLength, valueLength, false);
+    return addTextField(dataObject, property, label, labelLength, valueLength, null, false);
   }
 
-  public TextFieldLPanel addTextField(final Object dataObject, final String property, final String label,
-      final LayoutLength labelLength, final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextField)
+  public TextFieldLPanel addTextField(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
+      final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextField)
+  {
+    return addTextField(dataObject, property, label, labelLength, valueLength, null, newLineBetweenLabelAndTextField);
+  }
+
+  public TextFieldLPanel addTextField(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
+      final LayoutLength valueLength, final FieldType fieldType, final boolean newLineBetweenLabelAndTextField)
   {
     final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), valueLength, dataObject, property);
+    if (fieldType == FieldType.E_MAIL) {
+      textFieldPanel.textField.add(new SimpleAttributeModifier("type", "email"));
+    } else if (fieldType == FieldType.MOBILE_PHONE_NO || fieldType == FieldType.PHONE_NO) {
+      textFieldPanel.textField.add(new SimpleAttributeModifier("type", "tel"));
+    } else if (fieldType == FieldType.WEB_PAGE) {
+      textFieldPanel.textField.add(new SimpleAttributeModifier("type", "url"));
+    }
     add(new LabelLPanel(newChildId(), labelLength, label).setLabelFor(textFieldPanel.getTextField()).setBreakBefore());
     if (newLineBetweenLabelAndTextField == true) {
       textFieldPanel.setBreakBefore();
@@ -86,8 +100,8 @@ public class GroupLPanel extends Panel
     return textFieldPanel;
   }
 
-  public TextAreaLPanel addTextArea(final Object dataObject, final String property, final String label,
-      final LayoutLength labelLength, final LayoutLength valueLength)
+  public TextAreaLPanel addTextArea(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
+      final LayoutLength valueLength)
   {
     final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), valueLength, dataObject, property);
     add(new LabelLPanel(newChildId(), labelLength, label).setLabelFor(textAreaPanel.getTextArea()).setBreakBefore());
@@ -95,8 +109,8 @@ public class GroupLPanel extends Panel
     return textAreaPanel;
   }
 
-  public TextAreaLPanel addTextArea(final Object dataObject, final String property, final String label,
-      final LayoutLength labelLength, final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextarea)
+  public TextAreaLPanel addTextArea(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
+      final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextarea)
   {
     final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), valueLength, dataObject, property);
     add(new LabelLPanel(newChildId(), labelLength, label).setLabelFor(textAreaPanel.getTextArea()).setBreakBefore());

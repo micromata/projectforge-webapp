@@ -76,6 +76,32 @@ public abstract class AbstractMobileEditPage<O extends AbstractBaseDO< ? >, F ex
   }
 
   /**
+   * User has clicked the submit button, so create or update the data object.
+   */
+  protected void save()
+  {
+    if (isNew() == true) {
+      create();
+    } else {
+      update();
+    }
+  }
+
+  /**
+   * User has clicked the save button for storing a new item.
+   */
+  private void create()
+  {
+  }
+
+  /**
+   * User has clicked the update button for updating an existing item.
+   */
+  private void update()
+  {
+  }
+
+  /**
    * @see AbstractEditPage#isNew
    */
   protected boolean isNew()
