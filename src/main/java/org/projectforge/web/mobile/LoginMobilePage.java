@@ -24,12 +24,14 @@
 package org.projectforge.web.mobile;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.Version;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.user.PFUserDO;
@@ -89,6 +91,12 @@ public class LoginMobilePage extends AbstractMobilePage
     } else {
       add(new Label("messageOfTheDay", messageOfTheDay));
     }
+  }
+
+  @Override
+  protected Component getTopCenter()
+  {
+    return new Label(AbstractMobilePage.TOP_CENTER_ID, Version.APP_TITLE);
   }
 
   protected void checkLogin()
