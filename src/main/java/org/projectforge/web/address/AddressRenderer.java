@@ -93,7 +93,7 @@ public class AddressRenderer extends AbstractRenderer
   {
     final String title = StringHelper.listToString(" ", data.getTitle(), data.getFirstName(), data.getName());
     doPanel.newFieldSetPanel(isNew() == false ? title : getString("address.heading.personalData"));
-    if (isMobileReadonly() == true) {
+    if (isMobile() == true) {
       // Append at the end.
     } else {
       addPersonalData(title);
@@ -102,7 +102,7 @@ public class AddressRenderer extends AbstractRenderer
 
     // *** Business Contact ***
     final String businessContactTitle;
-    if (isMobileReadonly() == true) {
+    if (isMobile() == true) {
       businessContactTitle = title;
     } else {
       businessContactTitle = getString("address.heading.businessContact");
@@ -121,7 +121,7 @@ public class AddressRenderer extends AbstractRenderer
     addPrivatePhones();
     addPrivateAddress();
 
-    if (isMobileReadonly() == true) {
+    if (isMobile() == true) {
       addPersonalData(title);
       addPublicKeyAndFingerprint();
     }
@@ -252,7 +252,7 @@ public class AddressRenderer extends AbstractRenderer
    */
   public void addPublicKeyAndFingerprint()
   {
-    if (isMobileReadonly() == true) {
+    if (isMobile() == true) {
       final GroupMobileLPanel groupMobilePanel = (GroupMobileLPanel) doPanel.newGroupPanel(getString("address.publicKey"));
       groupMobilePanel.setCollapsed();
     }
@@ -301,7 +301,7 @@ public class AddressRenderer extends AbstractRenderer
    */
   public void addPrivateEMail()
   {
-    doPanel.newGroupPanel(isMobileReadonly() == true ? getString("address.privateEmail") : null);
+    doPanel.newGroupPanel(isMobile() == true ? getString("address.privateEmail") : null);
     doPanel.addTextField(data, "privateEmail", getString("email"), HALF, FULL, FieldType.E_MAIL, false).setStrong();
   }
 
@@ -332,8 +332,13 @@ public class AddressRenderer extends AbstractRenderer
         }
       }.withMatchContains(true).withMinChars(2);
       doPanel.addTextField(getString("address.addressText"), HALF, addressTextField, FULL);
-      doPanel.addTextField(data, zipCodeProperty, getString("address.zipCode") + "/" + getString("address.city"), HALF, QUART);
-      doPanel.addTextField(data, cityProperty, THREEQUART);
+      if (isMobile() == true) {
+        doPanel.addTextField(data, zipCodeProperty, getString("address.zipCode"), HALF, QUART);
+        doPanel.addTextField(data, cityProperty, getString("address.city"), HALF, FULL);
+      } else {
+        doPanel.addTextField(data, zipCodeProperty, getString("address.zipCode") + "/" + getString("address.city"), HALF, QUART);
+        doPanel.addTextField(data, cityProperty, THREEQUART);
+      }
       doPanel.addTextField(data, countryProperty, getString("address.country") + "/" + getString("address.state"), HALF, HALF);
       doPanel.addTextField(data, stateProperty, HALF);
     }
