@@ -181,8 +181,22 @@ public class DataObjectLPanel extends Panel
   {
     ensureGroupPanel();
     IField field;
-    if (layoutContext.isReadonly() == true) {
-      return addReadonlyTextField(data, property, label, labelLength, valueLength, fieldType, newLineBetweenLabelAndTextField);
+    if (layoutContext.isMobile() == true) {
+      if (layoutContext.isReadonly() == true) {
+        return addReadonlyTextField(data, property, label, labelLength, valueLength, fieldType, newLineBetweenLabelAndTextField);
+      } else {
+        ensureLabelValueTablePanel();
+        final String wicketId;
+        if (newLineBetweenLabelAndTextField == true) {
+          newLabelValueTablePanel();
+          wicketId = LabelValueTableLPanel.WICKET_ID_LABEL;
+        } else {
+          wicketId = LabelValueTableLPanel.WICKET_ID_VALUE;
+        }
+        final TextFieldLPanel textFieldPanel = new TextFieldLPanel(wicketId, valueLength, data, property);
+        labelValueTablePanel.add(label, textFieldPanel, newLineBetweenLabelAndTextField);
+        field = textFieldPanel;
+      }
     } else {
       field = groupPanel.addTextField(data, property, label, labelLength, valueLength, newLineBetweenLabelAndTextField);
     }
@@ -261,60 +275,37 @@ public class DataObjectLPanel extends Panel
   {
     ensureGroupPanel();
     IField field;
-    if (layoutContext.isReadonly() == true) {
-      final Object value = BeanHelper.getNestedProperty(data, property);
-      if (isBlank(value) == true) {
-        field = new DummyField();
+    if (layoutContext.isMobile() == true) {
+      final String wicketId;
+      if (newLineBetweenLabelAndTextarea == true) {
+        newLabelValueTablePanel();
+        wicketId = LabelValueTableLPanel.WICKET_ID_LABEL;
       } else {
-        ensureLabelValueTablePanel();
+        wicketId = LabelValueTableLPanel.WICKET_ID_VALUE;
+      }
+      if (layoutContext.isReadonly() == true) {
+        final Object value = BeanHelper.getNestedProperty(data, property);
+        if (isBlank(value) == true) {
+          return new DummyField();
+        }
         final String displayValue;
         if (value instanceof String) {
           displayValue = HtmlHelper.formatText((String) value, true);
         } else {
           displayValue = HtmlHelper.formatText(String.valueOf(value), true);
         }
-        final String wicketId;
-        if (newLineBetweenLabelAndTextarea == true) {
-          newLabelValueTablePanel();
-          wicketId = LabelValueTableLPanel.WICKET_ID_LABEL;
-        } else {
-          wicketId = LabelValueTableLPanel.WICKET_ID_VALUE;
-        }
+        ensureLabelValueTablePanel();
         final LabelLPanel labelPanel = new LabelLPanel(wicketId, valueLength, displayValue);
         labelPanel.getWrappedComponent().setEscapeModelStrings(false);
         field = labelValueTablePanel.add(label, labelPanel, newLineBetweenLabelAndTextarea);
+      } else {
+        // read-write mobile text area:
+        ensureLabelValueTablePanel();
+        final TextAreaLPanel textAreaPanel = new TextAreaLPanel(wicketId, valueLength, data, property);
+        field = labelValueTablePanel.add(label, textAreaPanel, newLineBetweenLabelAndTextarea);
       }
     } else {
       field = groupPanel.addTextArea(data, property, label, labelLength, valueLength, newLineBetweenLabelAndTextarea);
-    }
-    return field;
-  }
-
-  /**
-   * @return the created field or a dummy IField if the field is e. g. empty in read-only mode.
-   */
-  public IField addTextArea(final Object data, final String property, final LayoutLength valueLength)
-  {
-    ensureGroupPanel();
-    IField field;
-    if (layoutContext.isReadonly() == true) {
-      final Object value = BeanHelper.getNestedProperty(data, property);
-      if (isBlank(value) == true) {
-        field = new DummyField();
-      } else {
-        final String displayValue;
-        if (value instanceof String) {
-          displayValue = HtmlHelper.formatText((String) value, true);
-        } else {
-          displayValue = HtmlHelper.formatText(String.valueOf(value), true);
-        }
-        final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), valueLength, displayValue);
-        labelPanel.getWrappedComponent().setEscapeModelStrings(false);
-        field = labelPanel;
-        groupPanel.add(field);
-      }
-    } else {
-      field = groupPanel.addTextArea(data, property, valueLength);
     }
     return field;
   }
@@ -327,11 +318,13 @@ public class DataObjectLPanel extends Panel
   {
     ensureGroupPanel();
     IField field;
-    if (layoutContext.isReadonly() == true) {
-      final Object value = BeanHelper.getNestedProperty(data, property);
-      if (isBlank(value) == true) {
-        field = new DummyField();
-      } else {
+    if (layoutContext.isMobile() == true) {
+      final String wicketId = LabelValueTableLPanel.WICKET_ID_VALUE;
+      if (layoutContext.isReadonly() == true) {
+        final Object value = BeanHelper.getNestedProperty(data, property);
+        if (isBlank(value) == true) {
+          return new DummyField();
+        }
         ensureLabelValueTablePanel();
         final String displayValue;
         if (value instanceof I18nEnum) {
@@ -340,14 +333,15 @@ public class DataObjectLPanel extends Panel
           displayValue = String.valueOf(value);
         }
         field = new LabelLPanel(LabelValueTableLPanel.WICKET_ID_VALUE, labelLength, displayValue);
-        labelValueTablePanel.add(label, (WebMarkupContainer) field);
+        field = labelValueTablePanel.add(label, (WebMarkupContainer) field);
+      } else {
+        // read-write mobile text area:
+        ensureLabelValueTablePanel();
+        final DropDownChoiceMobileLPanel dropDownChoicePanel = new DropDownChoiceMobileLPanel(wicketId, valueLength, dropDownChoice);
+        field = labelValueTablePanel.add(label, dropDownChoicePanel, false);
       }
     } else {
-      if (layoutContext.isMobile() == true) {
-        field = new DropDownChoiceMobileLPanel(groupPanel.newChildId(), valueLength, dropDownChoice);
-      } else {
-        field = new DropDownChoiceLPanel(groupPanel.newChildId(), valueLength, dropDownChoice);
-      }
+      field = new DropDownChoiceLPanel(groupPanel.newChildId(), valueLength, dropDownChoice);
       groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
       groupPanel.add(field);
     }
