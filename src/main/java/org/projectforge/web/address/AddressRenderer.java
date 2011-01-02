@@ -60,6 +60,7 @@ import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.layout.AbstractRenderer;
 import org.projectforge.web.wicket.layout.DateFieldLPanel;
 import org.projectforge.web.wicket.layout.FieldType;
+import org.projectforge.web.wicket.layout.GroupLPanel;
 import org.projectforge.web.wicket.layout.GroupMobileLPanel;
 import org.projectforge.web.wicket.layout.IField;
 import org.projectforge.web.wicket.layout.LayoutContext;
@@ -94,7 +95,11 @@ public class AddressRenderer extends AbstractRenderer
     final String title = StringHelper.listToString(" ", data.getTitle(), data.getFirstName(), data.getName());
     doPanel.newFieldSetPanel(isNew() == false ? title : getString("address.heading.personalData"));
     if (isMobile() == true) {
-      // Append at the end.
+      if (isReadonly() == true) {
+        // Append at the end.
+      } else {
+        addPersonalData(title);
+      }
     } else {
       addPersonalData(title);
       addPublicKeyAndFingerprint();
@@ -102,7 +107,7 @@ public class AddressRenderer extends AbstractRenderer
 
     // *** Business Contact ***
     final String businessContactTitle;
-    if (isMobile() == true) {
+    if (isMobileReadonly() == true) {
       businessContactTitle = title;
     } else {
       businessContactTitle = getString("address.heading.businessContact");
@@ -122,7 +127,9 @@ public class AddressRenderer extends AbstractRenderer
     addPrivateAddress();
 
     if (isMobile() == true) {
-      addPersonalData(title);
+      if (isReadonly() == true) {
+        addPersonalData(title);
+      }
       addPublicKeyAndFingerprint();
     }
   }
@@ -145,7 +152,11 @@ public class AddressRenderer extends AbstractRenderer
   public void addPostalAddress()
   {
     if (isReadonly() == false || data.hasPostalAddress() == true) {
-      addAddress("address.heading.postalAddress", "postalAddressText", "postalZipCode", "postalCity", "postalCountry", "postalState");
+      final GroupLPanel groupPanel = addAddress("address.heading.postalAddress", "postalAddressText", "postalZipCode", "postalCity",
+          "postalCountry", "postalState");
+      if (isMobile() == true && data.hasPostalAddress() == false) {
+        ((GroupMobileLPanel) groupPanel).setCollapsed();
+      }
     }
   }
 
@@ -305,7 +316,7 @@ public class AddressRenderer extends AbstractRenderer
     doPanel.addTextField(data, "privateEmail", getString("email"), HALF, FULL, FieldType.E_MAIL, false).setStrong();
   }
 
-  protected void addAddress(final String heading, final String addressTextProperty, final String zipCodeProperty,
+  protected GroupLPanel addAddress(final String heading, final String addressTextProperty, final String zipCodeProperty,
       final String cityProperty, final String countryProperty, final String stateProperty)
   {
     final String zipCode, city;
@@ -315,7 +326,7 @@ public class AddressRenderer extends AbstractRenderer
     } else {
       zipCode = city = null;
     }
-    doPanel.newGroupPanel(getString(heading));
+    final GroupLPanel groupPanel = doPanel.newGroupPanel(getString(heading));
     if (isMobileReadonly() == true) {
       doPanel.addReadonlyTextField(data, addressTextProperty, getString("address.addressText"), null, null);
       doPanel.addReadonlyTextField(zipCode + " " + city, getString("address.city"), null, null);
@@ -335,13 +346,16 @@ public class AddressRenderer extends AbstractRenderer
       if (isMobile() == true) {
         doPanel.addTextField(data, zipCodeProperty, getString("address.zipCode"), HALF, QUART);
         doPanel.addTextField(data, cityProperty, getString("address.city"), HALF, FULL);
+        doPanel.addTextField(data, countryProperty, getString("address.country"), HALF, FULL);
+        doPanel.addTextField(data, stateProperty, getString("address.state"), HALF, FULL);
       } else {
         doPanel.addTextField(data, zipCodeProperty, getString("address.zipCode") + "/" + getString("address.city"), HALF, QUART);
         doPanel.addTextField(data, cityProperty, THREEQUART);
+        doPanel.addTextField(data, countryProperty, getString("address.country") + "/" + getString("address.state"), HALF, HALF);
+        doPanel.addTextField(data, stateProperty, HALF);
       }
-      doPanel.addTextField(data, countryProperty, getString("address.country") + "/" + getString("address.state"), HALF, HALF);
-      doPanel.addTextField(data, stateProperty, HALF);
     }
+    return groupPanel;
   }
 
   private TextField<String> addPhoneNumber(final String property, final String labelKey, final String favoriteProperty,
