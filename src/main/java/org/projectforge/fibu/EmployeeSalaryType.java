@@ -23,7 +23,9 @@
 
 package org.projectforge.fibu;
 
-public enum EmployeeSalaryType
+import org.projectforge.core.I18nEnum;
+
+public enum EmployeeSalaryType implements I18nEnum
 {
   /** Monatliche Gehalt. */
   GEHALT("gehalt"),
@@ -60,5 +62,11 @@ public enum EmployeeSalaryType
       }
     }
     return false;
+  }
+
+  @Override
+  public String getI18nKey()
+  {
+    return "fibu.employee.salary.type." + key;
   }
 }

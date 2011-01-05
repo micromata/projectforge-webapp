@@ -37,7 +37,7 @@ public class AddressMobileEditForm extends AbstractMobileEditForm<AddressDO, Add
   @SpringBean(name = "personalAddressDao")
   private PersonalAddressDao personalAddressDao;
 
-  protected AddressRenderer renderer;
+  protected AddressFormRenderer renderer;
 
   protected PersonalAddressDO personalAddress;
 
@@ -51,7 +51,7 @@ public class AddressMobileEditForm extends AbstractMobileEditForm<AddressDO, Add
     if (personalAddress == null) {
       personalAddress = new PersonalAddressDO();
     }
-    renderer = new AddressRenderer(this, new LayoutContext(this), parentPage.getBaseDao(), data, personalAddress);
+    renderer = new AddressFormRenderer(this, new LayoutContext(this), parentPage.getBaseDao(), data, personalAddress);
   }
 
   @Override

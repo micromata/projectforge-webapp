@@ -25,20 +25,27 @@ package org.projectforge.web.mobile;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.WebPage;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractListPage;
+import org.projectforge.web.wicket.EditPageSupport;
+import org.projectforge.web.wicket.IEditPage;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public abstract class AbstractMobileEditPage<O extends AbstractBaseDO< ? >, F extends AbstractMobileEditForm< ? , ? >, D extends BaseDao<O>>
-    extends AbstractSecuredMobilePage
+public abstract class AbstractMobileEditPage<O extends AbstractBaseDO< ? >, F extends AbstractMobileEditForm<O, ? >, D extends BaseDao<O>>
+    extends AbstractSecuredMobilePage implements IEditPage<O, D>
 {
   protected F form;
 
   protected String i18nPrefix;
+
+  private EditPageSupport<O, D> editPageSupport;
 
   public AbstractMobileEditPage(final PageParameters parameters, final String i18nPrefix)
   {
@@ -73,6 +80,7 @@ public abstract class AbstractMobileEditPage<O extends AbstractBaseDO< ? >, F ex
     add(form);
     form.init();
     // add(new Label("title", getString(AbstractEditPage.getTitleKey(i18nPrefix, isNew()))));
+    this.editPageSupport = new EditPageSupport<O, D>(this, getBaseDao(), getData());
   }
 
   /**
@@ -90,26 +98,133 @@ public abstract class AbstractMobileEditPage<O extends AbstractBaseDO< ? >, F ex
   /**
    * User has clicked the save button for storing a new item.
    */
-  private void create()
+  protected void create()
   {
+    this.editPageSupport.create();
   }
 
   /**
    * User has clicked the update button for updating an existing item.
    */
-  private void update()
+  protected void update()
   {
+    this.editPageSupport.update();
+  }
+
+  protected void undelete()
+  {
+    this.editPageSupport.undelete();
+  }
+
+  protected void markAsDeleted()
+  {
+    this.editPageSupport.markAsDeleted();
+  }
+
+  protected void delete()
+  {
+    this.editPageSupport.delete();
+  }
+
+  @Override
+  public WebPage afterSave()
+  {
+    return null;
+  }
+
+  @Override
+  public WebPage afterSaveOrUpdate()
+  {
+    return null;
+  }
+
+  @Override
+  public WebPage afterUpdate(boolean modified)
+  {
+    return null;
+  }
+
+  @Override
+  public void clearIds()
+  {
+    getData().setId(null);
+  }
+
+  @Override
+  public boolean isAlreadySubmitted()
+  {
+    return this.alreadySubmitted;
+  }
+
+  @Override
+  public WebPage onDelete()
+  {
+    return null;
+  }
+
+  @Override
+  public WebPage onSaveOrUpdate()
+  {
+    return null;
+  }
+
+  @Override
+  public WebPage onUndelete()
+  {
+    return null;
+  }
+
+  @Override
+  public void setAlreadySubmitted(boolean alreadySubmitted)
+  {
+    this.alreadySubmitted = alreadySubmitted;
+  }
+
+  @Override
+  public void setResponsePage()
+  {
+    if (this.returnToPage != null) {
+      setResponsePageAndHighlightedRow(this.returnToPage);
+    } else {
+      final EditMobilePage ann = getClass().getAnnotation(EditMobilePage.class);
+      final Class< ? extends AbstractSecuredMobilePage> redirectPage;
+      if (ann != null && ann.defaultReturnPage() != null) {
+        redirectPage = getClass().getAnnotation(EditMobilePage.class).defaultReturnPage();
+      } else {
+        redirectPage = WicketUtils.getDefaultMobilePage();
+      }
+      final PageParameters params = new PageParameters();
+      params.put(AbstractListPage.PARAMETER_HIGHLIGHTED_ROW, getData().getId());
+      setResponsePage(redirectPage, params);
+    }
+  }
+
+  /**
+   * Does nothing (not yet supported). Is this use-ful on a mobile device?
+   * @see org.projectforge.web.wicket.IEditPage#setResponsePageAndHighlightedRow(org.apache.wicket.markup.html.WebPage)
+   */
+  @Override
+  public void setResponsePageAndHighlightedRow(WebPage page)
+  {
+  }
+
+  protected O getData()
+  {
+    if (form == null || form.getData() == null) {
+      getLogger().error("Data of form is null. Maybe you have forgotten to call AbstractEditPage.init() in constructor.");
+    }
+    return form.getData();
   }
 
   /**
    * @see AbstractEditPage#isNew
    */
-  protected boolean isNew()
+  public boolean isNew()
   {
     if (form == null) {
       getLogger().error("Data of form is null. Maybe you have forgotten to call AbstractEditPage.init() in constructor.");
     }
-    return (form.getData() == null || form.getData().getId() == null);
+    return (getData() == null || getData().getId() == null);
   }
 
   /**

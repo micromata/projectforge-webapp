@@ -54,7 +54,7 @@ public class AddressEditPage extends AbstractEditPage<AddressDO, AddressEditForm
   }
 
   @Override
-  protected AbstractBasePage afterSaveOrUpdate()
+  public AbstractBasePage afterSaveOrUpdate()
   {
     final AddressDO address = addressDao.getOrLoad(getData().getId());
     final PersonalAddressDO personalAddress = form.personalAddress;

@@ -27,7 +27,7 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.web.wicket.AbstractEditPage;
-import org.projectforge.web.wicket.layout.AbstractRenderer;
+import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
 import org.projectforge.web.wicket.layout.LayoutContext;
 
 public abstract class AbstractMobileViewPage extends AbstractSecuredMobilePage
@@ -47,7 +47,7 @@ public abstract class AbstractMobileViewPage extends AbstractSecuredMobilePage
     this.i18nPrefix = i18nPrefix;
     id = getPageParameters().getAsInteger(AbstractEditPage.PARAMETER_KEY_ID);
     if (NumberHelper.greaterZero(id) == true) {
-      final AbstractRenderer renderer = createRenderer(new LayoutContext(true, true, false), id);
+      final AbstractDOFormRenderer renderer = createRenderer(new LayoutContext(true, true, false), id);
       if (renderer != null) {
         renderer.add();
       }
@@ -56,7 +56,7 @@ public abstract class AbstractMobileViewPage extends AbstractSecuredMobilePage
     }
   }
 
-  protected abstract AbstractRenderer createRenderer(final LayoutContext layoutContext, final Integer objectId);
+  protected abstract AbstractDOFormRenderer createRenderer(final LayoutContext layoutContext, final Integer objectId);
 
   @Override
   protected void addTopRightButton()

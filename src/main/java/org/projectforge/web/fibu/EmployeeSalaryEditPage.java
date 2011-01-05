@@ -23,12 +23,9 @@
 
 package org.projectforge.web.fibu;
 
-import java.util.Date;
-
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.fibu.EmployeeSalaryDO;
 import org.projectforge.fibu.EmployeeSalaryDao;
@@ -36,7 +33,8 @@ import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
 @EditPage(defaultReturnPage = EmployeeSalaryListPage.class)
-public class EmployeeSalaryEditPage extends AbstractEditPage<EmployeeSalaryDO, EmployeeSalaryEditForm, EmployeeSalaryDao> implements ISelectCallerPage
+public class EmployeeSalaryEditPage extends AbstractEditPage<EmployeeSalaryDO, EmployeeSalaryEditForm, EmployeeSalaryDao> implements
+    ISelectCallerPage
 {
   private static final long serialVersionUID = -3899191243765232906L;
 
@@ -47,7 +45,7 @@ public class EmployeeSalaryEditPage extends AbstractEditPage<EmployeeSalaryDO, E
 
   public EmployeeSalaryEditPage(PageParameters parameters)
   {
-    super(parameters, "fibu.employeeSalary");
+    super(parameters, "fibu.employee.salary");
     init();
   }
 
@@ -56,44 +54,14 @@ public class EmployeeSalaryEditPage extends AbstractEditPage<EmployeeSalaryDO, E
    */
   public void select(final String property, final Object selectedValue)
   {
-    if ("eintrittsDatum".equals(property) == true) {
-      final Date date;
-      if (selectedValue instanceof String) {
-        final Long ms = NumberHelper.parseLong((String) selectedValue);
-        date = new Date(ms);
-      } else {
-        date = (Date) selectedValue;
-      }
-      final DayHolder dh = new DayHolder(date);
-   //   getData().setEintrittsDatum(dh.getDate());
-      form.eintrittsDatePanel.markModelAsChanged();
-    } else if ("eintrittsDatum".equals(property) == true) {
-      final Date date;
-      if (selectedValue instanceof String) {
-        final Long ms = NumberHelper.parseLong((String) selectedValue);
-        date = new Date(ms);
-      } else {
-        date = (Date) selectedValue;
-      }
-      final DayHolder dh = new DayHolder(date);
-   //   getData().setAustrittsDatum(dh.getDate());
-      form.austrittsDatePanel.markModelAsChanged();
-    } else if ("userId".equals(property) == true) {
+    if ("userId".equals(property) == true) {
       final Integer id;
       if (selectedValue instanceof String) {
         id = NumberHelper.parseInteger((String) selectedValue);
       } else {
         id = (Integer) selectedValue;
       }
-  //    getBaseDao().setUser(getData(), id);
-    } else if ("kost1Id".equals(property) == true) {
-      final Integer id;
-      if (selectedValue instanceof String) {
-        id = NumberHelper.parseInteger((String) selectedValue);
-      } else {
-        id = (Integer) selectedValue;
-      }
-  //    getBaseDao().setKost1(getData(), id);
+      employeeSalaryDao.setEmployee(getData(), id);
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }

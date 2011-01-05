@@ -24,12 +24,14 @@
 package org.projectforge.web.mobile;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.core.MessageParam;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.UserFilter;
+import org.projectforge.web.wicket.MySession;
 
 /** All pages with required login should be derived from this page. */
 public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
@@ -44,6 +46,11 @@ public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
   @SpringBean(name = "accessChecker")
   protected AccessChecker accessChecker;
 
+  /**
+   * If set then return after save, update or cancel to this page. If not given then return to given list page.
+   */
+  protected WebPage returnToPage;
+
   public AbstractSecuredMobilePage()
   {
     this(new PageParameters());
@@ -55,6 +62,17 @@ public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
     if (getUser().getAttribute(UserFilter.USER_ATTR_STAY_LOGGED_IN) == null) {
       putUserPrefEntry(USER_PREF_RECENT_PAGE, new RecentMobilePageInfo(this), true);
     }
+  }
+
+  /**
+   * If set then return after save, update or cancel to this page. If not given then return to given list page. As an alternative you can
+   * set the returnToPage as a page parameter (if supported by the derived page).
+   * @param returnToPage
+   */
+  public AbstractSecuredMobilePage setReturnToPage(WebPage returnToPage)
+  {
+    this.returnToPage = returnToPage;
+    return this;
   }
 
   /**

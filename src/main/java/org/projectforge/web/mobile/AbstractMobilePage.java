@@ -53,6 +53,8 @@ public abstract class AbstractMobilePage extends WebPage
   
   protected final static String TOP_CENTER_ID = "topCenter";
 
+  protected boolean alreadySubmitted = false;
+
   protected WebMarkupContainer headerContainer;
 
   protected WebMarkupContainer rightButtonContainer;
@@ -133,6 +135,7 @@ public abstract class AbstractMobilePage extends WebPage
     if (stripTags == false) {
       Application.get().getMarkupSettings().setStripWicketTags(true);
     }
+    alreadySubmitted = false;
   }
 
   @Override

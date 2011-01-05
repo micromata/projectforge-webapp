@@ -32,7 +32,6 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -41,12 +40,10 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.fibu.EmployeeSalaryDO;
 import org.projectforge.fibu.EmployeeSalaryDao;
 import org.projectforge.fibu.datev.EmployeeSalaryExportDao;
-import org.projectforge.timesheet.TimesheetDO;
-import org.projectforge.user.PFUserDO;
-import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
+import org.projectforge.web.wicket.CurrencyPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.ListPage;
@@ -67,7 +64,7 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
 
   public EmployeeSalaryListPage(PageParameters parameters)
   {
-    super(parameters, "fibu.employeeSalary");
+    super(parameters, "fibu.employee.salary");
   }
 
   public EmployeeSalaryListPage(final ISelectCallerPage caller, final String selectProperty)
@@ -84,10 +81,6 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
       public void populateItem(Item<ICellPopulator<EmployeeSalaryDO>> item, String componentId, IModel<EmployeeSalaryDO> rowModel)
       {
         final EmployeeSalaryDO employeeSalary = rowModel.getObject();
-//        if (employeeSalary.getStatus() == null) {
-//          // Should not occur:
-//          return;
-//        }
         String cellStyle = "";
         if (employeeSalary.isDeleted() == true) {
           cellStyle = "text-decoration: line-through;";
@@ -95,8 +88,8 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
         item.add(new AttributeModifier("style", true, new Model<String>(cellStyle)));
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("month")), getSortable("formattedYearAndMonth",
-        sortable), "formattedYearAndMonth", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("calendar.month")), getSortable(
+        "formattedYearAndMonth", sortable), "formattedYearAndMonth", cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
@@ -106,61 +99,23 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
           item.add(new ListSelectActionPanel(componentId, rowModel, EmployeeSalaryEditPage.class, employeeSalary.getId(), returnToPage,
               employeeSalary.getFormattedYearAndMonth()));
         } else {
-          item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, employeeSalary.getId(), employeeSalary.getFormattedYearAndMonth()));
+          item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, employeeSalary.getId(), employeeSalary
+              .getFormattedYearAndMonth()));
         }
         cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);
       }
     });
-    
-//    <fieldset><display:table class="dataTable" name="actionBean.list" export="false" id="row"
-//      requestURI="/secure/fibu/EmployeeSalaryList.action" defaultsort="1" pagesize="1000">
-//      <display:column sortable="true" sortProperty="month" title="${tName}">
-//        <stripes:link href="/secure/fibu/EmployeeSalaryEdit.action" event="preEdit">
-//          <stripes:param name="id" value="${row.id}" />
-//          <pf:image src="${pointerImage}" />
-//        </stripes:link>
-//        ${row.year}-${row.formattedMonth}
-//      </display:column>
-//      <display:column sortable="true" title="${tName}" property="employee.user.lastname" />
-//      <display:column sortable="true" title="${tFirstName}" property="employee.user.firstname" />
-//      <display:column sortable="true" title="${tType}" property="type" />
-//      <display:column sortable="true" title="${tBruttoMitAgAnteil}" property="bruttoMitAgAnteil" format="${currencyFormat}" style="text-align: right;${style}" />
-//      <display:column sortable="true" title="${tComment}" property="comment" />
-
-    
+    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("name")), getSortable(
+        "employee.user.lastname", sortable), "employee.user.lastname", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("firstName")), getSortable(
-        "user.firstname", sortable), "user.firstname", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("status")),
-        getSortable("status", sortable), "status", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("fibu.kost1")), getSortable(
-        "kost1.shortDisplayName", sortable), "kost1.shortDisplayName", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("address.positionText")), getSortable(
-        "position", sortable), "position", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("address.division")), getSortable(
-        "abteilung", sortable), "abteilung", cellItemListener));
-//    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("fibu.employeeSalary.eintrittsdatum")),
-//        getSortable("eintrittsDatum", sortable), "eintrittsDatum", cellItemListener) {
-////      @Override
-////      public void populateItem(final Item<ICellPopulator<EmployeeSalaryDO>> item, final String componentId,
-////          final IModel<EmployeeSalaryDO> rowModel)
-////      {
-////        final EmployeeSalaryDO employeeSalary = (EmployeeSalaryDO) rowModel.getObject();
-////        item.add(new Label(componentId, DateTimeFormatter.instance().getFormattedDate(employeeSalary.getEintrittsDatum())));
-////      }
-////    });
-////    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("fibu.employeeSalary.austrittsdatum")),
-////        getSortable("austrittsDatum", sortable), "austrittsDatum", cellItemListener) {
-////      @Override
-////      public void populateItem(final Item<ICellPopulator<EmployeeSalaryDO>> item, final String componentId,
-////          final IModel<EmployeeSalaryDO> rowModel)
-////      {
-////        final EmployeeSalaryDO employeeSalary = (EmployeeSalaryDO) rowModel.getObject();
-////        item.add(new Label(componentId, DateTimeFormatter.instance().getFormattedDate(employeeSalary.getAustrittsDatum())));
-////      }
-////    });
-//    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("comment")), getSortable("comment",
-//        sortable), "comment", cellItemListener));
+        "employee.user.firstname", sortable), "employee.user.firstname", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("fibu.employee.salary.type")),
+        getSortable("type", sortable), "type", cellItemListener));
+    columns.add(new CurrencyPropertyColumn<EmployeeSalaryDO>(getString("fibu.employee.salary.bruttoMitAgAnteil"), getSortable(
+        "bruttoMitAgAnteil", sortable), "bruttoMitAgAnteil", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("comment")), getSortable("comment",
+        sortable), "comment", cellItemListener));
     return columns;
   }
 
@@ -176,37 +131,20 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
       form.addError("validation.error.nothingToExport");
       return;
     }
-
-//    byte[] xls = employeeSalaryExportDao.export(l);
-//    if (xls == null || xls.length == 0) {
-//      return getInputPage();
-//    }
-//    String filename = "ProjectForge-EmployeeSalaries_"
-//        + DateHelper.formatMonth(form.getSearchFilter().getYear(), form.getSearchFilter().getMonth())
-//        + "_"
-//        + DateHelper.getDateAsFilenameSuffix(new Date())
-//        + ".xls";
-//
-//    final List<TimesheetDO> timeSheets = getList();
-//    if (timeSheets == null || timeSheets.size() == 0) {
-//      // Nothing to export.
-//      form.addError("validation.error.nothingToExport");
-//      return;
-//    }
-//    final String filename = "ProjectForge-TimesheetExport_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
-//    final byte[] xls = timesheetExport.export(timeSheets);
-//    if (xls == null || xls.length == 0) {
-//      log.error("Oups, xls has zero size. Filename: " + filename);
-//      return;
-//    }
-//    DownloadUtils.setDownloadTarget(xls, filename);
+    final String filename = "ProjectForge-EmployeeSalaries_"
+        + DateHelper.formatMonth(form.getSearchFilter().getYear(), form.getSearchFilter().getMonth())
+        + "_"
+        + DateHelper.getDateAsFilenameSuffix(new Date())
+        + ".xls";
+    final byte[] xls = employeeSalaryExportDao.export(list);
+    DownloadUtils.setDownloadTarget(xls, filename);
   }
 
   @Override
   protected void init()
   {
     final List<IColumn<EmployeeSalaryDO>> columns = createColumns(this, true);
-    dataTable = createDataTable(columns, "user.lastname", true);
+    dataTable = createDataTable(columns, "employee.user.lastname", true);
     form.add(dataTable);
   }
 

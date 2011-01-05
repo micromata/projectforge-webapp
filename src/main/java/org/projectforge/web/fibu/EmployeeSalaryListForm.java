@@ -24,11 +24,20 @@
 package org.projectforge.web.fibu;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.StringHelper;
+import org.projectforge.fibu.EmployeeSalaryDao;
 import org.projectforge.fibu.EmployeeSalaryFilter;
 import org.projectforge.web.wicket.AbstractListForm;
-
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.components.YearListCoiceRenderer;
 
 public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilter, EmployeeSalaryListPage>
 {
@@ -36,49 +45,82 @@ public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilte
 
   private static final long serialVersionUID = -5969136444233092172L;
 
+  @SpringBean(name = "employeeSalaryDao")
+  private EmployeeSalaryDao employeeSalaryDao;
+
   @Override
   protected void init()
   {
     super.init();
+    // DropDownChoice years
+    final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(employeeSalaryDao.getYears(), true);
+    @SuppressWarnings("unchecked")
+    final DropDownChoice yearChoice = new DropDownChoice("year", new PropertyModel(this, "year"), yearListChoiceRenderer.getYears(),
+        yearListChoiceRenderer);
+    yearChoice.setNullValid(false);
+    filterContainer.add(yearChoice);
+    // DropDownChoice months
+    final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
+    for (int i = 0; i <= 11; i++) {
+      monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
+    }
+    @SuppressWarnings("unchecked")
+    final DropDownChoice monthChoice = new DropDownChoice("month", new PropertyModel(this, "month"), monthChoiceRenderer.getValues(),
+        monthChoiceRenderer);
+    monthChoice.setNullValid(true);
+    monthChoice.setRequired(false);
+    filterContainer.add(monthChoice);
     filterContainer.add(new CheckBox("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted")));
-    filterContainer.add(new CheckBox("showOnlyActiveEntriesCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "showOnlyActiveEntries")));
-  }
+
+    @SuppressWarnings("serial")
+    final Button exportAsXlsButton = new Button("button", new Model<String>(getString("exportAsXls"))) {
+      @Override
+      public final void onSubmit()
+      {
+        if (getSearchFilter().getMonth() < 0 || getSearchFilter().getMonth() > 11) {
+          addError("fibu.employee.salary.error.monthNotGiven");
+          return;
+        }
+        parentPage.exportExcel();
+      }
+    };
+    exportAsXlsButton.setDefaultFormProcessing(false).add(
+        new SimpleAttributeModifier("title", getString("address.book.vCardExport.tooltip")));
+    final SingleButtonPanel exportVCardsPanel = new SingleButtonPanel(getNewActionButtonChildId(), exportAsXlsButton);
+    prependActionButton(exportVCardsPanel);
+}
 
   public EmployeeSalaryListForm(EmployeeSalaryListPage parentPage)
   {
     super(parentPage);
   }
 
-  @Override
-  protected void validation()
+  public Integer getYear()
   {
-//    if (form.getSearchFilter().getMonth() < 0 || form.getSearchFilter().getMonth() > 11) {
-//      addError("fibu.employee.salary.error.monthNotGiven");
-//      return getInputPage();
-  //  }
+    return getSearchFilter().getYear();
+  }
 
-  //    updateStopDate();
-//    if (getData().getDuration() < 60000) {
-//      // Duration is less than 60 seconds.
-//      addError("timesheet.error.zeroDuration");
-//    } else if (getData().getDuration() > TimesheetDao.MAXIMUM_DURATION) {
-//      addError("timesheet.error.maximumDurationExceeded");
-//    }
-//    if (kost2Row.isVisible() == false && getData().getKost2Id() == null) {
-//      // Kost2 is not available for current task.
-//      final TaskNode taskNode = taskTree.getTaskNodeById(getData().getTaskId());
-//      if (taskNode != null) {
-//        final List<Integer> descendents = taskNode.getDescendantIds();
-//        for (final Integer taskId : descendents) {
-//          if (CollectionUtils.isNotEmpty(taskTree.getKost2List(taskId)) == true) {
-//            // But Kost2 is available for sub task, so user should book his time sheet
-//            // on a sub task with kost2s.
-//            addError("timesheet.error.kost2NeededChooseSubTask");
-//            break;
-//          }
-//        }
-//      }
-//    }
+  public void setYear(final Integer year)
+  {
+    if (year == null) {
+      getSearchFilter().setYear(-1);
+    } else {
+      getSearchFilter().setYear(year);
+    }
+  }
+
+  public Integer getMonth()
+  {
+    return getSearchFilter().getMonth();
+  }
+
+  public void setMonth(final Integer month)
+  {
+    if (month == null) {
+      getSearchFilter().setMonth(-1);
+    } else {
+      getSearchFilter().setMonth(month);
+    }
   }
 
   @Override
