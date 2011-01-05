@@ -25,20 +25,23 @@ package org.projectforge.web.wicket;
 
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.projectforge.core.I18nEnum;
+import org.projectforge.user.PFUserContext;
 
 /**
  * Supports CellItemListener.
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 @SuppressWarnings("serial")
 public class CellItemListenerPropertyColumn<T> extends PropertyColumn<T>
 {
   protected CellItemListener<T> cellItemListener;
-  
+
   /**
    * @param displayModelString For creation of new Model<String>.
    * @param sortProperty
@@ -76,15 +79,23 @@ public class CellItemListenerPropertyColumn<T> extends PropertyColumn<T>
   }
 
   /**
-   * Call CellItemListener.
-   * @see org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item, java.lang.String, org.apache.wicket.model.IModel)
+   * Call CellItemListener. If a property model object is of type I18nEnum then the translation is automatically used.
+   * @see org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+   *      java.lang.String, org.apache.wicket.model.IModel)
    * @see CellItemListener#populateItem(Item, String, IModel)
    */
   @Override
   public void populateItem(final Item<ICellPopulator<T>> item, final String componentId, final IModel<T> rowModel)
   {
-    super.populateItem(item, componentId, rowModel);
-    if (cellItemListener != null)
+    final IModel< ? > propertyModel = createLabelModel(rowModel);
+    final Object object = propertyModel.getObject();
+    if (object != null && object instanceof I18nEnum) {
+      item.add(new Label(componentId, PFUserContext.getLocalizedString(((I18nEnum) object).getI18nKey())));
+    } else {
+      item.add(new Label(componentId, propertyModel));
+    }
+    if (cellItemListener != null) {
       cellItemListener.populateItem(item, componentId, rowModel);
+    }
   }
 }
