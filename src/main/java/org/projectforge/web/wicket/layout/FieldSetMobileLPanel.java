@@ -38,7 +38,7 @@ public class FieldSetMobileLPanel extends FieldSetLPanel
   private CollapsiblePanel childPanel;
 
   /**
-   * @see AbstractRenderer#createFieldSetPanel(String, String)
+   * @see AbstractDOFormRenderer#createFieldSetPanel(String, String)
    */
   FieldSetMobileLPanel(final String id, final String heading)
   {

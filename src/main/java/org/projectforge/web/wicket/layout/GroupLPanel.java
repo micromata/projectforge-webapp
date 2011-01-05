@@ -24,10 +24,10 @@
 package org.projectforge.web.wicket.layout;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.Model;
 
 /**
  * Represents a group panel. A field set, form or page can contain multiple group panels. A group panel groups fields.
@@ -74,21 +74,22 @@ public class GroupLPanel extends Panel
     return addTextField(dataObject, property, label, labelLength, valueLength, null, newLineBetweenLabelAndTextField);
   }
 
+  @SuppressWarnings("serial")
   public TextFieldLPanel addTextField(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength, final FieldType fieldType, final boolean newLineBetweenLabelAndTextField)
   {
     final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), valueLength, dataObject, property);
-    if (fieldType == FieldType.E_MAIL) {
-      textFieldPanel.textField.add(new SimpleAttributeModifier("type", "email"));
-    } else if (fieldType == FieldType.MOBILE_PHONE_NO || fieldType == FieldType.PHONE_NO) {
-      textFieldPanel.textField.add(new SimpleAttributeModifier("type", "tel"));
-    } else if (fieldType == FieldType.WEB_PAGE) {
-      textFieldPanel.textField.add(new SimpleAttributeModifier("type", "url"));
-    }
     add(new LabelLPanel(newChildId(), labelLength, label).setLabelFor(textFieldPanel.getTextField()).setBreakBefore());
     if (newLineBetweenLabelAndTextField == true) {
       textFieldPanel.setBreakBefore();
     }
+    textFieldPanel.getTextField().setLabel(new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return label;
+      }
+    });
     add(textFieldPanel);
     return textFieldPanel;
   }
@@ -100,15 +101,24 @@ public class GroupLPanel extends Panel
     return textFieldPanel;
   }
 
+  @SuppressWarnings("serial")
   public TextAreaLPanel addTextArea(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength)
   {
     final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), valueLength, dataObject, property);
     add(new LabelLPanel(newChildId(), labelLength, label).setLabelFor(textAreaPanel.getTextArea()).setBreakBefore());
+    textAreaPanel.getTextArea().setLabel(new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return label;
+      }
+    });
     add(textAreaPanel);
     return textAreaPanel;
   }
 
+  @SuppressWarnings("serial")
   public TextAreaLPanel addTextArea(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextarea)
   {
@@ -117,6 +127,13 @@ public class GroupLPanel extends Panel
     if (newLineBetweenLabelAndTextarea == true) {
       textAreaPanel.setBreakBefore();
     }
+    textAreaPanel.getTextArea().setLabel(new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return label;
+      }
+    });
     add(textAreaPanel);
     return textAreaPanel;
   }

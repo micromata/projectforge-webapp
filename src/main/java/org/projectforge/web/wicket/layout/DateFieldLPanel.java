@@ -43,7 +43,7 @@ public class DateFieldLPanel extends AbstractLPanel
   private DatePanel datePanel;
 
   /**
-   * @see AbstractRenderer#createDateFieldPanel(String, LayoutLength, DatePanel)
+   * @see AbstractDOFormRenderer#createDateFieldPanel(String, LayoutLength, DatePanel)
    */
   DateFieldLPanel(final String id, final LayoutLength length, final DatePanel datePanel)
   {

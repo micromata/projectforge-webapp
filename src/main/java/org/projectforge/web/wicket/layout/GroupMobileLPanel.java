@@ -24,6 +24,7 @@
 package org.projectforge.web.wicket.layout;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.projectforge.web.mobile.CollapsiblePanel;
 import org.projectforge.web.mobile.ThemeType;
 
@@ -39,7 +40,7 @@ public class GroupMobileLPanel extends GroupLPanel
   private CollapsiblePanel childPanel;
 
   /**
-   * @see AbstractRenderer#createGroupPanel(String)
+   * @see AbstractDOFormRenderer#createGroupPanel(String)
    */
   GroupMobileLPanel(final String id)
   {
@@ -53,7 +54,7 @@ public class GroupMobileLPanel extends GroupLPanel
   }
 
   /**
-   * @see AbstractRenderer#createGroupPanel(String, String)
+   * @see AbstractDOFormRenderer#createGroupPanel(String, String)
    */
   GroupMobileLPanel(final String id, final String heading)
   {
@@ -76,8 +77,24 @@ public class GroupMobileLPanel extends GroupLPanel
   @Override
   public GroupLPanel add(final IField field)
   {
-    childPanel.add((Component)field);
+    childPanel.add((Component) field);
     return this;
+  }
+
+  @Override
+  public TextFieldLPanel addTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
+      final LayoutLength valueLength, final FieldType fieldType, final boolean newLineBetweenLabelAndTextField)
+  {
+    final TextFieldLPanel textFieldPanel = super.addTextField(data, property, label, labelLength, valueLength, fieldType,
+        newLineBetweenLabelAndTextField);
+    if (fieldType == FieldType.E_MAIL) {
+      textFieldPanel.textField.add(new SimpleAttributeModifier("type", "email"));
+    } else if (fieldType == FieldType.MOBILE_PHONE_NO || fieldType == FieldType.PHONE_NO) {
+      textFieldPanel.textField.add(new SimpleAttributeModifier("type", "tel"));
+    } else if (fieldType == FieldType.WEB_PAGE) {
+      textFieldPanel.textField.add(new SimpleAttributeModifier("type", "url"));
+    }
+    return textFieldPanel;
   }
 
   @Override
@@ -101,12 +118,13 @@ public class GroupMobileLPanel extends GroupLPanel
     childPanel.setHeadingLabel(heading);
     return this;
   }
-  
+
   /**
    * @return this for chaining.
    * @see CollapsiblePanel#setCollapsed()
    */
-  public GroupMobileLPanel setCollapsed() {
+  public GroupMobileLPanel setCollapsed()
+  {
     childPanel.setCollapsed();
     return this;
   }

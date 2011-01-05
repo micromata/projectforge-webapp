@@ -124,7 +124,7 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper, 
     this.strong = true;
     return this;
   }
-  
+
   @Override
   public IField setCssStyle(String cssStyle)
   {
@@ -152,7 +152,7 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper, 
     }
     rendered = true;
     final SimpleAttributeModifier classAttributeModifier = getClassAttributeModifier();
-    if (classAttributeModifier != null) {
+    if (classAttributeModifier != null && getClassModifierComponent() != null) {
       getClassModifierComponent().add(classAttributeModifier);
     }
   }
@@ -160,7 +160,11 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper, 
   @Override
   public String getMarkupId()
   {
-    return getClassModifierComponent().getMarkupId();
+    if (getClassModifierComponent() != null) {
+      return getClassModifierComponent().getMarkupId();
+    } else {
+      return super.getMarkupId();
+    }
   }
 
   /**
@@ -169,7 +173,9 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper, 
    */
   public AbstractLPanel setStyle(final String css)
   {
-    getClassModifierComponent().add(new SimpleAttributeModifier("style", css));
+    if (getClassModifierComponent() != null) {
+      getClassModifierComponent().add(new SimpleAttributeModifier("style", css));
+    }
     return this;
   }
 
@@ -211,7 +217,7 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper, 
       return null;
     }
   }
-  
+
   /**
    * Does nothing at default.
    * @return this for chaining.

@@ -46,7 +46,7 @@ public class TextFieldLPanel extends AbstractLPanel implements IField
   protected TextField< ? > textField;
 
   /**
-   * @see AbstractRenderer#createTextFieldPanel(String, LayoutLength, Object, String)
+   * @see AbstractDOFormRenderer#createTextFieldPanel(String, LayoutLength, Object, String)
    */
   TextFieldLPanel(final String id, final LayoutLength length, final Object dataObject, final String property)
   {
@@ -54,7 +54,7 @@ public class TextFieldLPanel extends AbstractLPanel implements IField
   }
 
   /**
-   * @see AbstractRenderer#createTextFieldPanel(String, LayoutLength, TextField)
+   * @see AbstractDOFormRenderer#createTextFieldPanel(String, LayoutLength, TextField)
    */
   TextFieldLPanel(final String id, final LayoutLength length, final TextField< ? > textField)
   {

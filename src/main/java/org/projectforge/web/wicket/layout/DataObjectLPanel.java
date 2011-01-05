@@ -31,6 +31,7 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.Model;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.core.I18nEnum;
@@ -38,6 +39,7 @@ import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.mobile.ActionLinkPanel;
 import org.projectforge.web.mobile.ActionLinkType;
+import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.components.DatePanel;
 
@@ -292,6 +294,7 @@ public class DataObjectLPanel extends Panel
   /**
    * If the value is type of I18Enum then the localized string is shown in read-only mode.
    */
+  @SuppressWarnings("serial")
   public IField addDropDownChoice(final Object data, final String property, final String label, final LayoutLength labelLength,
       final DropDownChoice< ? > dropDownChoice, final LayoutLength valueLength)
   {
@@ -314,6 +317,13 @@ public class DataObjectLPanel extends Panel
     } else {
       field = new DropDownChoiceLPanel(groupPanel.newChildId(), valueLength, dropDownChoice);
       groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
+      ((DropDownChoiceLPanel) field).getDropDownChoice().setLabel(new Model<String>(){
+        @Override
+        public String getObject()
+        {
+          return label;
+        }
+      });
       groupPanel.add(field);
     }
     return field;
@@ -341,22 +351,56 @@ public class DataObjectLPanel extends Panel
     return field;
   }
 
+  @SuppressWarnings("serial")
   public IField addDateFieldPanel(final Object data, final String property, final String label, final LayoutLength labelLength,
       final DatePanel datePanel, final LayoutLength valueLength)
   {
     ensureGroupPanel();
     final IField field = new DateFieldLPanel(groupPanel.newChildId(), valueLength, datePanel);
     groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
+    ((DateFieldLPanel) field).getDatePanel().setLabel(new Model<String>(){
+      @Override
+      public String getObject()
+      {
+        return label;
+      }
+    });
     groupPanel.add(field);
     return field;
   }
 
+  @SuppressWarnings("serial")
+  public IField addSelectPanel(final String label, final LayoutLength labelLength, final AbstractSelectPanel< ? > selectPanel,
+      final LayoutLength valueLength)
+  {
+    ensureGroupPanel();
+    final IField field = new SelectLPanel(groupPanel.newChildId(), valueLength, selectPanel);
+    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
+    ((SelectLPanel)field).getSelectPanel().setLabel(new Model<String>(){
+      @Override
+      public String getObject()
+      {
+        return label;
+      }
+    });
+    groupPanel.add(field);
+    return field;
+  }
+
+  @SuppressWarnings("serial")
   public IField addTextField(final String label, final LayoutLength labelLength, final TextField< ? > textField,
       final LayoutLength valueLength)
   {
     ensureGroupPanel();
     final IField field = new TextFieldLPanel(groupPanel.newChildId(), valueLength, textField);
     groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
+    ((TextFieldLPanel) field).getTextField().setLabel(new Model<String>(){
+      @Override
+      public String getObject()
+      {
+        return label;
+      }
+    });
     groupPanel.add(field);
     return field;
   }

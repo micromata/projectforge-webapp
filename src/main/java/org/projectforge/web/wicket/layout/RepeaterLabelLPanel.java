@@ -45,7 +45,7 @@ public class RepeaterLabelLPanel extends AbstractLPanel
   public static final String LABEL_ID = "label";
 
   /**
-   * @see AbstractRenderer#createRepeaterLabelPanel(String)
+   * @see AbstractDOFormRenderer#createRepeaterLabelPanel(String)
    */
   RepeaterLabelLPanel(final String id)
   {
@@ -53,7 +53,7 @@ public class RepeaterLabelLPanel extends AbstractLPanel
   }
 
   /**
-   * @see AbstractRenderer#createRepeaterLabelPanel(String, LayoutLength)
+   * @see AbstractDOFormRenderer#createRepeaterLabelPanel(String, LayoutLength)
    */
   RepeaterLabelLPanel(final String id, final LayoutLength length)
   {

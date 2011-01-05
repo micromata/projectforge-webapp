@@ -51,7 +51,7 @@ public class TextFieldMobileLPanel extends TextFieldLPanel
   private WebMarkupContainer item = new WebMarkupContainer("item");
 
   /**
-   * @see AbstractRenderer#createTextFieldPanel(String, LayoutLength, Object, String)
+   * @see AbstractDOFormRenderer#createTextFieldPanel(String, LayoutLength, Object, String)
    */
   TextFieldMobileLPanel(final String id, final LayoutLength length, final Object dataObject, final String property)
   {
@@ -59,7 +59,7 @@ public class TextFieldMobileLPanel extends TextFieldLPanel
   }
 
   /**
-   * @see AbstractRenderer#createTextFieldPanel(String, LayoutLength, TextField)
+   * @see AbstractDOFormRenderer#createTextFieldPanel(String, LayoutLength, TextField)
    */
   TextFieldMobileLPanel(final String id, final LayoutLength length, final TextField< ? > textField)
   {
