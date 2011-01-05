@@ -8,7 +8,7 @@
 
   <property environment="env" />
 	<property name="APP_ID" value="ProjectForge" />
-	<property name="APP_TITLE" value="${APP_ID} 2010" />
+	<property name="APP_TITLE" value="${APP_ID} 2011" />
 	<property name="VERSION" value="3.4.3.1" />
 	<property name="m_doc.home" value="${env.M_DOC_HOME}" />
 	<property name="webproject" value="." />
@@ -152,7 +152,7 @@
 //
 // Project   ProjectForge
 //
-// Copyright 2001-2010, Kai Reinhard
+// Copyright 2001-2011, Kai Reinhard
 //           Dual-licensed.
 //
 /////////////////////////////////////////////////////////////////////////////
@@ -187,12 +187,12 @@ public class Version
 		<antcall target="version-files_">
 			<param name="version-base-dir" value="${standalone-dir}" />
 			<param name="version-app-id" value="${APP_ID} Server" />
-			<param name="version-app-title" value="${APP_ID} Server 2010" />
+			<param name="version-app-title" value="${APP_ID} Server 2011" />
 		</antcall>
 		<antcall target="version-files_">
 			<param name="version-base-dir" value="${webproject}" />
 			<param name="version-app-id" value="${APP_ID}" />
-			<param name="version-app-title" value="${APP_ID} 2010" />
+			<param name="version-app-title" value="${APP_ID} 2011" />
 		</antcall>
 		<echo>Creating file ${doc-dir}/version.dtd ...</echo>
 		<echo file="${doc-dir}/version.dtd" append="false"><![CDATA[<?xml version="1.0" encoding="UTF-8" ?>
