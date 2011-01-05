@@ -57,7 +57,7 @@ import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.layout.AbstractRenderer;
+import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
 import org.projectforge.web.wicket.layout.DateFieldLPanel;
 import org.projectforge.web.wicket.layout.FieldType;
 import org.projectforge.web.wicket.layout.GroupLPanel;
@@ -66,7 +66,7 @@ import org.projectforge.web.wicket.layout.IField;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
-public class AddressRenderer extends AbstractRenderer
+public class AddressFormRenderer extends AbstractDOFormRenderer
 {
   private static final long serialVersionUID = -9175062586210446142L;
 
@@ -80,7 +80,7 @@ public class AddressRenderer extends AbstractRenderer
 
   private TextField<String> businessPhoneField, faxField, mobilePhoneField, privatePhoneField, privateMobilePhoneField;
 
-  public AddressRenderer(final MarkupContainer container, final LayoutContext layoutContext, final AddressDao addressDao,
+  public AddressFormRenderer(final MarkupContainer container, final LayoutContext layoutContext, final AddressDao addressDao,
       final AddressDO data, final PersonalAddressDO personalAddress)
   {
     super(container, layoutContext);
