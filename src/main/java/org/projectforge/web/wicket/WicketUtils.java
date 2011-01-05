@@ -65,7 +65,7 @@ import org.projectforge.core.Configuration;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.fibu.ISelectCallerPage;
-import org.projectforge.web.mobile.AbstractMobilePage;
+import org.projectforge.web.mobile.AbstractSecuredMobilePage;
 import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.TooltipImage;
@@ -293,7 +293,7 @@ public class WicketUtils
   /**
    * @return MenuMobilePage.class.
    */
-  public static Class< ? extends AbstractMobilePage> getDefaultMobilePage()
+  public static Class< ? extends AbstractSecuredMobilePage> getDefaultMobilePage()
   {
     return MenuMobilePage.class;
   }
