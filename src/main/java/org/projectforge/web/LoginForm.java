@@ -38,6 +38,7 @@ import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 public class LoginForm extends AbstractForm<LoginForm, LoginPage>
@@ -76,6 +77,7 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
       }
     };
     setDefaultButton(loginButton);
+    loginButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     final SingleButtonPanel loginButtonPanel = new SingleButtonPanel("login", loginButton);
     add(loginButtonPanel);
   }
