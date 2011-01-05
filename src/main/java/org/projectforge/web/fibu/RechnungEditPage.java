@@ -73,7 +73,7 @@ public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditF
   }
 
   @Override
-  protected AbstractBasePage onSaveOrUpdate()
+  public AbstractBasePage onSaveOrUpdate()
   {
     if (isNew() == true && getData().getNummer() == null && getData().getTyp() != RechnungTyp.GUTSCHRIFTSANZEIGE_DURCH_KUNDEN) {
       getData().setNummer(rechnungDao.getNextNumber(getData()));
@@ -126,7 +126,6 @@ public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditF
     }
     form.refresh();
     form.cloneButtonPanel.setVisible(false);
-    form.updateButtonVisibility();
   }
 
   public void cancelSelection(String property)

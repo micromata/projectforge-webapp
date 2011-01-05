@@ -168,7 +168,7 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
   }
 
   @Override
-  protected void setResponsePage()
+  public void setResponsePage()
   {
     super.setResponsePage();
   }
@@ -265,7 +265,6 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
     timesheet.setId(null);
     getBaseDao().setUser(timesheet, getUser().getId());
     form.cloneButtonPanel.setVisible(false);
-    form.updateButtonVisibility();
   }
 
   /**
@@ -360,7 +359,7 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
   }
 
   @Override
-  protected AbstractBasePage onSaveOrUpdate()
+  public AbstractBasePage onSaveOrUpdate()
   {
     final TimesheetPrefData pref = getTimesheetPrefData();
     final TimesheetDO timesheet = getData();
@@ -373,7 +372,7 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
   }
   
   @Override
-  protected AbstractBasePage afterSaveOrUpdate()
+  public AbstractBasePage afterSaveOrUpdate()
   {
     if (form.saveAsTemplate == true) {
       final UserPrefEditPage userPrefEditPage = new UserPrefEditPage(UserPrefArea.TIMESHEET_TEMPLATE, getData());
