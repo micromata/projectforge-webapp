@@ -52,7 +52,7 @@ public class GroupEditPage extends AbstractEditPage<GroupDO, GroupEditForm, Grou
   }
 
   @Override
-  protected AbstractBasePage onSaveOrUpdate()
+  public AbstractBasePage onSaveOrUpdate()
   {
     final Set<Integer> assignedGroupIds = new HashSet<Integer>();
     for (Integer groupId : form.users.getAssignedValues()) {

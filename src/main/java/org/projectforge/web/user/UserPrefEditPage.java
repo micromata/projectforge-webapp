@@ -83,7 +83,7 @@ public class UserPrefEditPage extends AbstractEditPage<UserPrefDO, UserPrefEditF
   }
 
   @Override
-  protected void clearIds()
+  public void clearIds()
   {
     super.clearIds();
     for (final UserPrefEntryDO entry : form.getData().getUserPrefEntries()) {

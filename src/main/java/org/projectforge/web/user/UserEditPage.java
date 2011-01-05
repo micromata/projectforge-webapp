@@ -67,7 +67,7 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
   }
 
   @Override
-  protected AbstractBasePage onSaveOrUpdate()
+  public AbstractBasePage onSaveOrUpdate()
   {
     if (StringUtils.isNotEmpty(form.getEncryptedPassword()) == true) {
       getData().setPassword(form.getEncryptedPassword());
@@ -76,7 +76,7 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
   }
 
   @Override
-  protected AbstractBasePage afterSaveOrUpdate()
+  public AbstractBasePage afterSaveOrUpdate()
   {
     final Set<Integer> assignedGroupIds = new HashSet<Integer>();
     for (Integer groupId : form.groups.getValuesToAssign()) {

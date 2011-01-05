@@ -29,6 +29,7 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.common.RecentQueue;
@@ -68,8 +69,11 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
 
   // Only used for detecting changes:
   private PFUserDO currentUser;
+  
+  private String label;
 
   /**
+   * Label is assumed as "user" translation.
    * @param id
    * @param model
    * @param caller
@@ -77,7 +81,27 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
    */
   public UserSelectPanel(final String id, final IModel<PFUserDO> model, final ISelectCallerPage caller, final String selectProperty)
   {
+    this(id, model, null, caller, selectProperty);
+  }
+
+  /**
+   * @param id
+   * @param model
+   * @param label Only needed for validation messages (feed back).
+   * @param caller
+   * @param selectProperty
+   */
+
+  /**
+   * @param id
+   * @param model
+   * @param caller
+   * @param selectProperty
+   */
+  public UserSelectPanel(final String id, final IModel<PFUserDO> model, final String label, final ISelectCallerPage caller, final String selectProperty)
+  {
     super(id, model, caller, selectProperty);
+    this.label = label;
   }
 
   /**
@@ -125,7 +149,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
         if (user == null) {
           return "";
         }
-        return user.getUsername();
+        return user.getUsername() + ": " + user.getFullname();
       }
 
       @Override
@@ -160,7 +184,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
               getModel().setObject(null);
               return null;
             }
-            final int ind = value.indexOf(" (");
+            final int ind = value.indexOf(": ");
             final String username = ind >= 0 ? value.substring(0, ind) : value;
             final PFUserDO user = userDao.getUserGroupCache().getUser(username);
             if (user == null) {
@@ -184,6 +208,17 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
     };
     currentUser = getModelObject();
     userTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400);
+    userTextField.setLabel(new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        if (label != null) {
+          return label;
+        } else {
+          return getString("user");
+        }
+      }
+    });
     add(userTextField);
     final SubmitLink selectMeButton = new SubmitLink("selectMe") {
       @Override
