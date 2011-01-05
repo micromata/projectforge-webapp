@@ -128,7 +128,7 @@ public class HRPlanningEditPage extends AbstractEditPage<HRPlanningDO, HRPlannin
   }
 
   @Override
-  protected AbstractBasePage afterSaveOrUpdate()
+  public AbstractBasePage afterSaveOrUpdate()
   {
     putUserPrefEntry(SESSION_KEY_RECENT_WEEK, getData().getWeek().getTime(), true); // Store as recent date.
     return null;

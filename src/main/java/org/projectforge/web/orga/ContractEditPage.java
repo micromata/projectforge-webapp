@@ -57,7 +57,7 @@ public class ContractEditPage extends AbstractEditPage<ContractDO, ContractEditF
   }
   
   @Override
-  protected AbstractBasePage onSaveOrUpdate()
+  public AbstractBasePage onSaveOrUpdate()
   {
     if (isNew() == true && getData().getNumber() == null) {
       getData().setNumber(contractDao.getNextNumber(getData()));
