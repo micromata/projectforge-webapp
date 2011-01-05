@@ -98,7 +98,6 @@ public class EingangsrechnungEditPage extends AbstractEditPage<EingangsrechnungD
     }
     form.refresh();
     form.cloneButtonPanel.setVisible(false);
-    form.updateButtonVisibility();
   }
 
   public void cancelSelection(String property)

@@ -159,7 +159,7 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
   }
 
   @Override
-  protected AbstractBasePage onSaveOrUpdate()
+  public AbstractBasePage onSaveOrUpdate()
   {
     if (getData().getNummer() == null) {
       getData().setNummer(auftragDao.getNextNumber(getData()));
@@ -189,7 +189,7 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
   }
 
   @Override
-  protected AbstractBasePage afterSave()
+  public AbstractBasePage afterSave()
   {
     if (form.isSendEMailNotification() == false) {
       return null;
@@ -199,7 +199,7 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
   }
 
   @Override
-  protected AbstractBasePage afterUpdate(boolean modified)
+  public AbstractBasePage afterUpdate(boolean modified)
   {
     if (form.isSendEMailNotification() == false) {
       return null;

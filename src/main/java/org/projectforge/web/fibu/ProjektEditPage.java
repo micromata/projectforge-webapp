@@ -68,7 +68,7 @@ public class ProjektEditPage extends AbstractEditPage<ProjektDO, ProjektEditForm
   }
 
   @Override
-  protected AbstractBasePage afterSaveOrUpdate()
+  public AbstractBasePage afterSaveOrUpdate()
   {
     if (getData() != null && getData().getId() != null) {
       for (Kost2Art art : form.kost2Arts) {
