@@ -144,7 +144,7 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
   }
 
   @Override
-  protected AbstractBasePage onSaveOrUpdate()
+  public AbstractBasePage onSaveOrUpdate()
   {
     getSettings().setOpenNodes(ganttChartEditTreeTablePanel.getOpenNodes());
     getBaseDao().writeGanttObjects(getData(), ganttChartData.getRootObject());
