@@ -23,6 +23,7 @@
 
 package org.projectforge.web.wicket;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.FormComponentPanel;
 import org.apache.wicket.model.IModel;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -82,6 +83,15 @@ public abstract class AbstractSelectPanel<T> extends FormComponentPanel<T>
   {
     this.tabIndex = tabIndex;
     return this;
+  }
+
+  /**
+   * The length, break before and intend will be added as class attribute to this component.
+   * @return null if not overridden.
+   */
+  public Component getClassModifierComponent()
+  {
+    return null;
   }
 
   /**
