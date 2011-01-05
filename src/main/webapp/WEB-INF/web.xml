@@ -5,14 +5,10 @@
     <param-name>contextConfigLocation</param-name>
     <param-value>/WEB-INF/classes/applicationContext*.xml</param-value>
   </context-param>
-  <!-- filter>
-    <filter-name>WicketSessionFilter</filter-name>
-    <filter-class>org.apache.wicket.protocol.http.servlet.WicketSessionFilter</filter-class>
-    <init-param>
-      <param-name>filterName</param-name>
-      <param-value>wicket.app</param-value>
-    </init-param>
-  </filter-->
+  <!--
+    filter> <filter-name>WicketSessionFilter</filter-name> <filter-class>org.apache.wicket.protocol.http.servlet.WicketSessionFilter</filter-class>
+    <init-param> <param-name>filterName</param-name> <param-value>wicket.app</param-value> </init-param> </filter
+  -->
   <filter>
     <filter-name>WicketApplicationFilter</filter-name>
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
@@ -235,7 +231,8 @@
   </session-config>
   <!--This section defines what file to open first if none is specified -->
   <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
+    <!-- Does not work: -->
+    <welcome-file>wa/login</welcome-file>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
   <!--
@@ -244,7 +241,7 @@
   -->
   <error-page>
     <exception-type>java.lang.Throwable</exception-type>
-    <location>/error.jsp</location>
+    <location>/wa/error</location>
   </error-page>
   <!-- Uncomment the folloging security constraints to ensure, that login and pages under /secure and /wa are accessed via https -->
   <!--
