@@ -174,12 +174,19 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
 
     addBottomRows();
   }
+  
+  @Override
+  public void onBeforeRender()
+  {
+    updateButtonVisibility();
+    super.onBeforeRender();
+  }
 
   /**
    * Sets the visibility of buttons update, create and markAsDeleted in dependency of the isNew() function. Currently used by
    * TimesheetEdit's clone function for redraw the buttons correctly after clone.
    */
-  public void updateButtonVisibility()
+  protected void updateButtonVisibility()
   {
     @SuppressWarnings("unchecked")
     final BaseDao<O> baseDao = (BaseDao<O>) parentPage.getBaseDao();
