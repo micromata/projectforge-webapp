@@ -28,13 +28,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.Page;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.HeadersToolbar;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.OddEvenItem;
@@ -48,20 +48,15 @@ import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.ExtendedBaseDO;
-import org.projectforge.core.IManualIndex;
-import org.projectforge.core.UserException;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.task.TaskTreePage;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
-import org.springframework.dao.DataIntegrityViolationException;
 
 public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends AbstractEditForm<O, ? >, D extends BaseDao<O>> extends
-    AbstractSecuredPage
+    AbstractSecuredPage implements IEditPage<O, D>
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractEditPage.class);
-
   public static final String PARAMETER_KEY_ID = "id";
 
   public static final String PARAMETER_KEY_DATA_PRESET = "__data";
@@ -88,6 +83,8 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
 
   @SpringBean(name = "dateTimeFormatter")
   protected DateTimeFormatter dateTimeFormatter;
+  
+  private EditPageSupport<O, D> editPageSupport;
 
   public AbstractEditPage(final PageParameters parameters, final String i18nPrefix)
   {
@@ -204,6 +201,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
     onPreEdit();
     evaluatePageParameters(getPageParameters());
     addBottomPanel();
+    this.editPageSupport = new EditPageSupport<O, D>(this, getBaseDao(), getData());
   }
 
   @Override
@@ -232,7 +230,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
   /**
    * Will be called before the data object will be stored. Does nothing at default. Any return value is not yet supported.
    */
-  protected AbstractBasePage onSaveOrUpdate()
+  public AbstractBasePage onSaveOrUpdate()
   {
     // Do nothing at default
     return null;
@@ -243,7 +241,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
    * returns a resolution then a redirect to this resolution without calling the baseDao methods will done. <br/>
    * Here you can do validations with add(Global)Error or manipulate the data object before storing to the database etc.
    */
-  protected AbstractBasePage onDelete()
+  public AbstractBasePage onDelete()
   {
     // Do nothing at default
     return null;
@@ -254,7 +252,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
    * a resolution then a redirect to this resolution without calling the baseDao methods will done. <br/>
    * Here you can do validations with add(Global)Error or manipulate the data object before storing to the database etc.
    */
-  protected AbstractBasePage onUndelete()
+  public AbstractBasePage onUndelete()
   {
     // Do nothing at default
     return null;
@@ -264,7 +262,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
    * Will be called directly after storing the data object (insert, update, delete). If any page is returned then proceed a redirect to this
    * given page.
    */
-  protected AbstractBasePage afterSaveOrUpdate()
+  public AbstractBasePage afterSaveOrUpdate()
   {
     // Do nothing at default.
     return null;
@@ -273,7 +271,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
   /**
    * Will be called directly after storing the data object (insert). Any return value is not yet supported.
    */
-  protected AbstractBasePage afterSave()
+  public AbstractBasePage afterSave()
   {
     // Do nothing at default.
     return null;
@@ -285,78 +283,23 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
    *          returned to stripes controller.
    * @see BaseDao#update(ExtendedBaseDO)
    */
-  protected AbstractBasePage afterUpdate(boolean modified)
+  public AbstractBasePage afterUpdate(boolean modified)
   {
     // Do nothing at default.
     return null;
   }
 
   /**
-   * If user tried to add a new object and an error was occurred the edit page is shown again an any if of the object is cleared (set to
+   * If user tried to add a new object and an error was occurred the edit page is shown again and the object id is cleared (set to
    * null).
    */
-  protected void clearIds()
+  public void clearIds()
   {
-    form.getData().setId(null);
+    getData().setId(null);
   }
 
-  /**
-   * User has clicked the save button for storing a new item.
-   */
-  protected void create()
-  {
-    getLogger().debug("create: " + getData());
-    synchronized (getData()) {
-      if (alreadySubmitted == true) {
-        getLogger().info("Double click detection in create method. Do nothing.");
-      } else {
-        if (getData().getId() != null && getData() instanceof IManualIndex == false) {
-          // User has used the back button?
-          getLogger()
-              .info(
-                  "User has used the back button after inserting a new object? Try to load the object from the data base and show edit page again.");
-          O dbObj = getBaseDao().getById(getData().getId());
-          if (dbObj == null) {
-            // Error while trying to insert Object and user has used the back button?
-            getLogger()
-                .info(
-                    "User has used the back button after inserting a new object and a failure occured (because object with id not found in the data base)? Deleting the id and show the edit page again.");
-            clearIds();
-            return;
-          }
-          form.getData().copyValuesFrom(dbObj);
-          form.updateButtonVisibility();
-          setRedirect(true);
-          return;
-        }
-        alreadySubmitted = true;
-        AbstractBasePage page = onSaveOrUpdate();
-        if (page != null) {
-          setResponsePageAndHighlightedRow(page);
-          return;
-        }
-        try {
-          getBaseDao().save(getData());
-        } catch (final DataIntegrityViolationException ex) {
-          log.error(ex.getMessage(), ex);
-          throw new UserException("exception.constraintViolation");
-        }
-        page = afterSaveOrUpdate();
-        if (page != null) {
-          setResponsePageAndHighlightedRow(page);
-          return;
-        }
-        page = afterSave();
-        if (page != null) {
-          setResponsePageAndHighlightedRow(page);
-          return;
-        }
-      }
-      setResponsePage();
-    }
-  }
-
-  protected void setResponsePageAndHighlightedRow(final Page page)
+  @Override
+  public void setResponsePageAndHighlightedRow(final WebPage page)
   {
     if (page instanceof AbstractListPage< ? , ? , ? >) {
       // Force reload/refresh of calling AbstractListPage, otherwise the data object will not be updated.
@@ -370,105 +313,41 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
     setResponsePage(page);
   }
 
-  /**
-   * User has clicked the update button for updating an existing item.
-   */
-  protected void update()
-  {
-    getLogger().debug("update: " + getData());
-    synchronized (getData()) {
-      if (alreadySubmitted == true) {
-        getLogger().info("Double click detection in update method. Do nothing.");
-      } else {
-        alreadySubmitted = true;
-        AbstractBasePage page = onSaveOrUpdate();
-        if (page != null) {
-          setResponsePageAndHighlightedRow(page);
-          return;
-        }
-        boolean modified = false;
-        try {
-          modified = getBaseDao().update(getData());
-        } catch (final DataIntegrityViolationException ex) {
-          log.error(ex.getMessage(), ex);
-          throw new UserException("exception.constraintViolation");
-        }
-        page = afterSaveOrUpdate();
-        if (page != null) {
-          setResponsePageAndHighlightedRow(page);
-          return;
-        }
-        page = afterUpdate(modified);
-        if (page != null) {
-          setResponsePageAndHighlightedRow(page);
-          return;
-        }
-      }
-    }
-    setResponsePage();
-  }
-
   protected void cancel()
   {
     getLogger().debug("onCancel");
     setResponsePage();
   }
 
+  /**
+   * User has clicked the save button for storing a new item.
+   */
+  protected void create()
+  {
+    this.editPageSupport.create();
+  }
+
+  /**
+   * User has clicked the update button for updating an existing item.
+   */
+  protected void update()
+  {
+    this.editPageSupport.update();
+  }
+
   protected void undelete()
   {
-    getLogger().debug("Undelete object: " + getData());
-    synchronized (getData()) {
-      if (alreadySubmitted == true) {
-        getLogger().info("Double click detection in undelete method. Do nothing.");
-      } else {
-        alreadySubmitted = true;
-        final AbstractBasePage page = onUndelete();
-        if (page != null) {
-          setResponsePageAndHighlightedRow(page);
-          return;
-        }
-        getBaseDao().undelete(getData());
-      }
-    }
-    setResponsePage();
+    this.editPageSupport.undelete();
   }
 
   protected void markAsDeleted()
   {
-    getLogger().debug("Mark object as deleted: " + getData());
-    synchronized (getData()) {
-      if (alreadySubmitted == true) {
-        getLogger().info("Double click detection in markAsDeleted method. Do nothing.");
-      } else {
-        alreadySubmitted = true;
-        final AbstractBasePage page = onDelete();
-        if (page != null) {
-          setResponsePageAndHighlightedRow(page);
-          return;
-        }
-        getBaseDao().markAsDeleted(getData());
-        setResponsePage();
-      }
-    }
+    this.editPageSupport.markAsDeleted();
   }
 
   protected void delete()
   {
-    getLogger().debug("Delete object: " + getData());
-    synchronized (getData()) {
-      if (alreadySubmitted == true) {
-        getLogger().info("Double click detection in delete method. Do nothing.");
-      } else {
-        alreadySubmitted = true;
-        final AbstractBasePage page = onDelete();
-        if (page != null) {
-          setResponsePageAndHighlightedRow(page);
-          return;
-        }
-        getBaseDao().delete(getData());
-        setResponsePage();
-      }
-    }
+    this.editPageSupport.delete();
   }
 
   protected void reset()
@@ -479,9 +358,9 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
   }
 
   /**
-   * Sets the per annotation declared list page as response or if given the returnToPage.
+   * Sets the list page (declared as annotation) as response or, if given, the returnToPage.
    */
-  protected void setResponsePage()
+  public void setResponsePage()
   {
     if (this.returnToPage != null) {
       setResponsePageAndHighlightedRow(this.returnToPage);
@@ -515,12 +394,12 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
    * Checks weather the id of the data object is given or not.
    * @return true if the user wants to create a new data object or false for an already existing object.
    */
-  protected boolean isNew()
+  public boolean isNew()
   {
     if (form == null) {
       getLogger().error("Data of form is null. Maybe you have forgotten to call AbstractEditPage.init() in constructor.");
     }
-    return (form.getData() == null || form.getData().getId() == null);
+    return (getData() == null || getData().getId() == null);
   }
 
   /**
@@ -610,6 +489,18 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
   protected String[] getBookmarkableSelectProperties()
   {
     return null;
+  }
+  
+  @Override
+  public boolean isAlreadySubmitted()
+  {
+    return alreadySubmitted;
+  }
+  
+  @Override
+  public void setAlreadySubmitted(boolean alreadySubmitted)
+  {
+    this.alreadySubmitted = alreadySubmitted;
   }
 
   protected abstract D getBaseDao();
