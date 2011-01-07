@@ -34,44 +34,32 @@ import org.apache.commons.lang.StringUtils;
 import org.projectforge.Version;
 import org.projectforge.access.OperationType;
 import org.projectforge.address.AddressDO;
-import org.projectforge.address.AddressDao;
 import org.projectforge.common.LabelValueBean;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ScriptingDao;
 import org.projectforge.fibu.AuftragDO;
-import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.EingangsrechnungDO;
-import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.EmployeeDao;
 import org.projectforge.fibu.EmployeeSalaryDO;
-import org.projectforge.fibu.EmployeeSalaryDao;
 import org.projectforge.fibu.EmployeeScriptingDao;
 import org.projectforge.fibu.KundeDO;
-import org.projectforge.fibu.KundeDao;
 import org.projectforge.fibu.ProjektDO;
-import org.projectforge.fibu.ProjektDao;
 import org.projectforge.fibu.RechnungDO;
-import org.projectforge.fibu.RechnungDao;
 import org.projectforge.fibu.kost.BuchungssatzDO;
-import org.projectforge.fibu.kost.BuchungssatzDao;
 import org.projectforge.fibu.kost.Kost1Dao;
 import org.projectforge.fibu.kost.Kost1ScriptingDao;
 import org.projectforge.fibu.kost.Kost2ArtDO;
-import org.projectforge.fibu.kost.Kost2ArtDao;
 import org.projectforge.fibu.kost.Kost2DO;
-import org.projectforge.fibu.kost.Kost2Dao;
 import org.projectforge.fibu.kost.KostZuweisungDO;
-import org.projectforge.fibu.kost.KostZuweisungDao;
 import org.projectforge.fibu.kost.reporting.ReportGeneratorList;
+import org.projectforge.registry.DaoRegistry;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.ScriptingTaskTree;
 import org.projectforge.task.TaskDO;
-import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
-import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
-import org.projectforge.user.UserDao;
 
 /**
  * 
@@ -80,39 +68,9 @@ import org.projectforge.user.UserDao;
  */
 public class ScriptDao extends BaseDao<ScriptDO>
 {
-  private AddressDao addressDao;
-
-  private AuftragDao auftragDao;
-
-  private BuchungssatzDao buchungssatzDao;
-
-  private EingangsrechnungDao eingangsrechnungDao;
-
-  private EmployeeDao employeeDao;
-
-  private EmployeeSalaryDao employeeSalaryDao;
-
-  private Kost1Dao kost1Dao;
-
-  private Kost2ArtDao kost2ArtDao;
-
-  private Kost2Dao kost2Dao;
-
-  private KostZuweisungDao kostZuweisungDao;
-
-  private KundeDao kundeDao;
-
-  private ProjektDao projektDao;
-
-  private RechnungDao rechnungDao;
-
-  private TaskDao taskDao;
+  private Registry registry;
 
   private TaskTree taskTree;
-
-  private TimesheetDao timesheetDao;
-
-  private UserDao userDao;
 
   private GroovyExecutor groovyExecutor;
 
@@ -173,24 +131,25 @@ public class ScriptDao extends BaseDao<ScriptDO>
     scriptVariables.put("appId", Version.APP_ID);
     scriptVariables.put("appVersion", Version.NUMBER);
     scriptVariables.put("appRelease", Version.RELEASE_DATE);
-    scriptVariables.put("addressDao", new ScriptingDao<AddressDO>(addressDao));
-    scriptVariables.put("auftragDao", new ScriptingDao<AuftragDO>(auftragDao));
-    scriptVariables.put("buchungssatzDao", new ScriptingDao<BuchungssatzDO>(buchungssatzDao));
-    scriptVariables.put("eingangsrechnungDao", new ScriptingDao<EingangsrechnungDO>(eingangsrechnungDao));
-    scriptVariables.put("employeeDao", new EmployeeScriptingDao(employeeDao));
-    scriptVariables.put("employeeSalaryDao", new ScriptingDao<EmployeeSalaryDO>(employeeSalaryDao));
-    scriptVariables.put("kost1Dao", new Kost1ScriptingDao(kost1Dao));
-    scriptVariables.put("kost2Dao", new ScriptingDao<Kost2DO>(kost2Dao));
-    scriptVariables.put("kost2ArtDao", new ScriptingDao<Kost2ArtDO>(kost2ArtDao));
-    scriptVariables.put("kostZuweisungDao", new ScriptingDao<KostZuweisungDO>(kostZuweisungDao));
-    scriptVariables.put("kundeDao", new ScriptingDao<KundeDO>(kundeDao));
-    scriptVariables.put("projektDao", new ScriptingDao<ProjektDO>(projektDao));
-    scriptVariables.put("rechnungDao", new ScriptingDao<RechnungDO>(rechnungDao));
+    scriptVariables.put("addressDao", new ScriptingDao<AddressDO>(registry.getDao(DaoRegistry.ADDRESS)));
+    scriptVariables.put("auftragDao", new ScriptingDao<AuftragDO>(registry.getDao(DaoRegistry.ORDERBOOK)));
+    scriptVariables.put("bookDao", new ScriptingDao<BuchungssatzDO>(registry.getDao(DaoRegistry.BOOK)));
+    scriptVariables.put("buchungssatzDao", new ScriptingDao<BuchungssatzDO>(registry.getDao(DaoRegistry.BUCHUNGSSATZ)));
+    scriptVariables.put("eingangsrechnungDao", new ScriptingDao<EingangsrechnungDO>(registry.getDao(DaoRegistry.EINGANGSRECHNUNG)));
+    scriptVariables.put("employeeDao", new EmployeeScriptingDao((EmployeeDao) registry.getDao(DaoRegistry.EMPLOYEE)));
+    scriptVariables.put("employeeSalaryDao", new ScriptingDao<EmployeeSalaryDO>(registry.getDao(DaoRegistry.EMPLOYEE_SALARY)));
+    scriptVariables.put("kost1Dao", new Kost1ScriptingDao((Kost1Dao) registry.getDao(DaoRegistry.KOST1)));
+    scriptVariables.put("kost2Dao", new ScriptingDao<Kost2DO>(registry.getDao(DaoRegistry.KOST2)));
+    scriptVariables.put("kost2ArtDao", new ScriptingDao<Kost2ArtDO>(registry.getDao(DaoRegistry.KOST2_ART)));
+    scriptVariables.put("kostZuweisungDao", new ScriptingDao<KostZuweisungDO>(registry.getDao(DaoRegistry.KOST_ZUWEISUNG)));
+    scriptVariables.put("kundeDao", new ScriptingDao<KundeDO>(registry.getDao(DaoRegistry.KUNDE)));
+    scriptVariables.put("projektDao", new ScriptingDao<ProjektDO>(registry.getDao(DaoRegistry.PROJEKT)));
+    scriptVariables.put("rechnungDao", new ScriptingDao<RechnungDO>(registry.getDao(DaoRegistry.RECHNUNG)));
     scriptVariables.put("reportList", null);
-    scriptVariables.put("taskDao", new ScriptingDao<TaskDO>(taskDao));
+    scriptVariables.put("taskDao", new ScriptingDao<TaskDO>(registry.getDao(DaoRegistry.TASK)));
     scriptVariables.put("taskTree", new ScriptingTaskTree(taskTree));
-    scriptVariables.put("timesheetDao", new ScriptingDao<TimesheetDO>(timesheetDao));
-    scriptVariables.put("userDao", new ScriptingDao<PFUserDO>(userDao));
+    scriptVariables.put("timesheetDao", new ScriptingDao<TimesheetDO>(registry.getDao(DaoRegistry.TIMESHEET)));
+    scriptVariables.put("userDao", new ScriptingDao<PFUserDO>(registry.getDao(DaoRegistry.USER)));
     List<LabelValueBean<String, Class< ? >>> result = new ArrayList<LabelValueBean<String, Class< ? >>>();
     SortedSet<String> set = new TreeSet<String>();
     set.addAll(scriptVariables.keySet());
@@ -206,89 +165,14 @@ public class ScriptDao extends BaseDao<ScriptDO>
     return result;
   }
 
-  public void setAddressDao(AddressDao addressDao)
+  public void setRegistry(Registry registry)
   {
-    this.addressDao = addressDao;
-  }
-
-  public void setAuftragDao(AuftragDao auftragDao)
-  {
-    this.auftragDao = auftragDao;
-  }
-
-  public void setEingangsrechnungDao(EingangsrechnungDao eingangsrechnungDao)
-  {
-    this.eingangsrechnungDao = eingangsrechnungDao;
-  }
-
-  public void setBuchungssatzDao(BuchungssatzDao buchungssatzDao)
-  {
-    this.buchungssatzDao = buchungssatzDao;
-  }
-
-  public void setEmployeeDao(EmployeeDao employeeDao)
-  {
-    this.employeeDao = employeeDao;
-  }
-
-  public void setEmployeeSalaryDao(EmployeeSalaryDao employeeSalaryDao)
-  {
-    this.employeeSalaryDao = employeeSalaryDao;
-  }
-
-  public void setKost1Dao(Kost1Dao kost1Dao)
-  {
-    this.kost1Dao = kost1Dao;
-  }
-
-  public void setKost2ArtDao(Kost2ArtDao kost2ArtDao)
-  {
-    this.kost2ArtDao = kost2ArtDao;
-  }
-
-  public void setKost2Dao(Kost2Dao kost2Dao)
-  {
-    this.kost2Dao = kost2Dao;
-  }
-
-  public void setKostZuweisungDao(KostZuweisungDao kostZuweisungDao)
-  {
-    this.kostZuweisungDao = kostZuweisungDao;
-  }
-
-  public void setKundeDao(KundeDao kundeDao)
-  {
-    this.kundeDao = kundeDao;
-  }
-
-  public void setProjektDao(ProjektDao projektDao)
-  {
-    this.projektDao = projektDao;
-  }
-
-  public void setRechnungDao(RechnungDao rechnungDao)
-  {
-    this.rechnungDao = rechnungDao;
-  }
-
-  public void setUserDao(UserDao userDao)
-  {
-    this.userDao = userDao;
-  }
-
-  public void setTaskDao(TaskDao taskDao)
-  {
-    this.taskDao = taskDao;
+    this.registry = registry;
   }
 
   public void setTaskTree(TaskTree taskTree)
   {
     this.taskTree = taskTree;
-  }
-
-  public void setTimesheetDao(TimesheetDao timesheetDao)
-  {
-    this.timesheetDao = timesheetDao;
   }
 
   public void setGroovyExecutor(GroovyExecutor groovyExecutor)
