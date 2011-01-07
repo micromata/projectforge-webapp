@@ -165,8 +165,19 @@ public abstract class AbstractForm<F, P extends AbstractBasePage> extends Form<F
     return parentPage.escapeHtml(str);
   }
 
+  /**
+   * @see AbstractSecuredBasePage#getUser()
+   */
   protected PFUserDO getUser()
   {
     return this.parentPage.getUser();
+  }
+
+  /**
+   * @see AbstractSecuredBasePage#getUserId()
+   */
+  protected Integer getUserId()
+  {
+    return this.parentPage.getUserId();
   }
 }
