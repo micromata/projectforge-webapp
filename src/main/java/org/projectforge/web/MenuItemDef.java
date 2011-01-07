@@ -67,6 +67,7 @@ import org.projectforge.web.fibu.KontoListPage;
 import org.projectforge.web.fibu.Kost1ListPage;
 import org.projectforge.web.fibu.Kost2ArtListPage;
 import org.projectforge.web.fibu.Kost2ListPage;
+import org.projectforge.web.fibu.MonthlyEmployeeReportPage;
 import org.projectforge.web.fibu.ProjektListPage;
 import org.projectforge.web.fibu.RechnungListPage;
 import org.projectforge.web.gantt.GanttChartListPage;
@@ -78,6 +79,7 @@ import org.projectforge.web.meb.MebListPage;
 import org.projectforge.web.orga.ContractListPage;
 import org.projectforge.web.orga.PostausgangListPage;
 import org.projectforge.web.orga.PosteingangListPage;
+import org.projectforge.web.scripting.ReportScriptingPage;
 import org.projectforge.web.scripting.ScriptListPage;
 import org.projectforge.web.statistics.PersonalStatisticsPage;
 import org.projectforge.web.statistics.SystemStatisticsPage;
@@ -161,7 +163,7 @@ public enum MenuItemDef
   KUNDE_LIST("fibu.kunden", CustomerListPage.class, //
       FINANCE_GROUP, CONTROLLING_GROUP), //
   MEB("meb", MebListPage.class), //
-  MONTHLY_EMPLOYEE_REPORT("monthlyEmployeeReport", "fibu/MonthlyEmployeeReport.action"), //
+  MONTHLY_EMPLOYEE_REPORT("monthlyEmployeeReport", MonthlyEmployeeReportPage.class), //
   // *
   MY_ACCOUNT("myAccount", MyAccountEditPage.class), //
   // *
@@ -183,7 +185,7 @@ public enum MenuItemDef
       RechnungDao.USER_RIGHT_ID, READONLY_READWRITE), //
   REPORT_OBJECTIVES("fibu.reporting.reportObjectives", "fibu/ReportObjectives.action", //
       FINANCE_GROUP, CONTROLLING_GROUP), //
-  REPORT_SCRIPTING("fibu.reporting.reportScripting", "fibu/ReportScripting.action", //
+  REPORT_SCRIPTING("fibu.reporting.reportScripting", ReportScriptingPage.class, //
       FINANCE_GROUP, CONTROLLING_GROUP), //
   SCRIPT_LIST("fibu.scripting", ScriptListPage.class, //
       FINANCE_GROUP, CONTROLLING_GROUP), //
