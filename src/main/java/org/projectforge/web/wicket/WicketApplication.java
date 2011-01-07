@@ -213,7 +213,8 @@ public class WicketApplication extends WebApplication
     getSecuritySettings().setAuthorizationStrategy(authStrategy);
     // getSecuritySettings().setUnauthorizedComponentInstantiationListener(authStrategy);
     getResourceSettings().setResourceStreamLocator(new MyResourceStreamLocator());
-    getResourceSettings().addStringResourceLoader(new BundleStringResourceLoader(RESOURCE_BUNDLE_NAME));
+    // Prepend the resource bundle for overwriting some Wicket default localizations (such as StringValidator.*)
+    getResourceSettings().addStringResourceLoader(0, new BundleStringResourceLoader(RESOURCE_BUNDLE_NAME));
     getResourceSettings().setThrowExceptionOnMissingResource(false); // Don't throw MissingResourceException for missing i18n keys.
     getApplicationSettings().setPageExpiredErrorPage(PageExpiredPage.class); // Don't show expired page.
     getSessionSettings().setMaxPageMaps(20); // Map up to 20 pages per session (default is 5).
