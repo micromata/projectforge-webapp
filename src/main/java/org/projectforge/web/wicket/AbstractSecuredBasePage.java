@@ -55,6 +55,9 @@ public abstract class AbstractSecuredBasePage extends AbstractBasePage
     return getMySession().getUser();
   }
 
+  /**
+   * @see MySession#getUserId()
+   */
   protected Integer getUserId()
   {
     final PFUserDO user = getUser();
