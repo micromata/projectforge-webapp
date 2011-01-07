@@ -5,8 +5,9 @@
 
 <body>
 <wicket:extend>
+  <div wicket:id="feedback">[Validation errors]</div>
   <form wicket:id="form" name="form">
-  <fieldset><legend style="display: inline;"><wicket:message key="system.admin.group.title.systemChecksAndFunctionality" /></legend>
+  <fieldset><legend><wicket:message key="system.admin.group.title.systemChecksAndFunctionality" /></legend>
   <table class="form">
     <tr>
       <td><span wicket:id="checkSystemIntegrity">[button]</span> <span wicket:id="checkI18nProperties">[button]</span> <span
