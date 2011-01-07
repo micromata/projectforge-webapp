@@ -33,9 +33,10 @@ public class ScriptingDao<O extends ExtendedBaseDO< ? extends Serializable>>
 {
   private BaseDao<O> __baseDao;
 
-  public ScriptingDao(BaseDao<O> baseDao)
+  @SuppressWarnings("unchecked")
+  public ScriptingDao(BaseDao<?> baseDao)
   {
-    this.__baseDao = baseDao;
+    this.__baseDao = (BaseDao<O>)baseDao;
   }
 
   /**
