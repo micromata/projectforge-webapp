@@ -23,6 +23,8 @@
 
 package org.projectforge.web.wicket.components;
 
+import java.lang.reflect.Field;
+
 import org.apache.commons.lang.ClassUtils;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.model.IModel;
@@ -30,11 +32,10 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.validation.validator.StringValidator.MaximumLengthValidator;
 import org.projectforge.database.HibernateUtils;
 
-
 public class MaxLengthTextArea extends TextArea<String>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MaxLengthTextArea.class);
-  
+
   private static final long serialVersionUID = 1507157818607697767L;
 
   /**
@@ -63,10 +64,14 @@ public class MaxLengthTextArea extends TextArea<String>
   {
     super(id, model);
     if (ClassUtils.isAssignable(model.getClass(), PropertyModel.class)) {
-      final PropertyModel<?> propertyModel = (PropertyModel<?>)model;
-      final Integer dbMaxLength = HibernateUtils.getPropertyLength(propertyModel.getTarget().getClass().getName(), propertyModel.getPropertyField().getName());
-      if (dbMaxLength != null && dbMaxLength < maxLength) {
-        log.warn("Data base length of given property is less than given maxLength: " + model);
+      final PropertyModel< ? > propertyModel = (PropertyModel< ? >) model;
+      final Field propertyField = propertyModel.getPropertyField();
+      if (propertyField != null) {
+        final Integer dbMaxLength = HibernateUtils.getPropertyLength(propertyModel.getTarget().getClass().getName(), propertyField
+            .getName());
+        if (dbMaxLength != null && dbMaxLength < maxLength) {
+          log.warn("Data base length of given property is less than given maxLength: " + model);
+        }
       }
     }
     init(maxLength);
@@ -76,7 +81,7 @@ public class MaxLengthTextArea extends TextArea<String>
   {
     if (maxLength != null) {
       add(new MaximumLengthValidator(maxLength));
-      //add(new SimpleAttributeModifier("maxlength", String.valueOf(maxLength))); // Not supported by html textarea!
+      // add(new SimpleAttributeModifier("maxlength", String.valueOf(maxLength))); // Not supported by html textarea!
     }
   }
 }
