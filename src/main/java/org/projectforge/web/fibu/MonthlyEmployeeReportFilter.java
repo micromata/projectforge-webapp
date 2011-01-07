@@ -23,38 +23,48 @@
 
 package org.projectforge.web.fibu;
 
+import java.io.Serializable;
+
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.StringHelper;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 
-public class MonthlyEmployeeReportFilter
+public class MonthlyEmployeeReportFilter implements Serializable
 {
+  private static final long serialVersionUID = -3700442530651487472L;
+
   private int year;
 
   private int month;
 
-  private Integer userId;
+  private PFUserDO user;
 
-  public void init()
+  public void reset()
   {
     if (year <= 0 || month < 0) {
       DateHolder date = new DateHolder();
       year = date.getYear();
       month = date.getMonth();
     }
-    if (userId == null) {
-      userId = PFUserContext.getUser().getId();
+    if (user == null) {
+      user = PFUserContext.getUser();
     }
+  }
+
+  public PFUserDO getUser()
+  {
+    return user;
+  }
+
+  public void setUser(PFUserDO user)
+  {
+    this.user = user;
   }
 
   public Integer getUserId()
   {
-    return userId;
-  }
-
-  public void setUserId(Integer userId)
-  {
-    this.userId = userId;
+    return user != null ? user.getId() : null;
   }
 
   public int getYear()
@@ -76,7 +86,7 @@ public class MonthlyEmployeeReportFilter
   {
     this.month = month;
   }
-  
+
   public String getFormattedMonth()
   {
     return month >= 0 ? StringHelper.format2DigitNumber(month + 1) : "";
