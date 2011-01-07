@@ -387,11 +387,21 @@ public abstract class AbstractBasePage extends WebPage
   }
 
   /**
-   * Always returns null for unsecured page.
+   * Always returns null for unsecured page, otherwise the logged-in user.
    * @return null
    * @see AbstractSecuredPage#getUser()
    */
   protected PFUserDO getUser()
+  {
+    return null;
+  }
+
+  /**
+   * Always returns null for unsecured page, otherwise the id of the logged-in user.
+   * @return null
+   * @see AbstractSecuredPage#getUser()
+   */
+  protected Integer getUserId()
   {
     return null;
   }
