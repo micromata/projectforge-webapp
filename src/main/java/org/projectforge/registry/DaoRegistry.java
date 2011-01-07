@@ -29,6 +29,8 @@ import org.projectforge.book.BookDao;
 import org.projectforge.core.BaseDao;
 import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.EingangsrechnungDao;
+import org.projectforge.fibu.EmployeeDao;
+import org.projectforge.fibu.EmployeeSalaryDao;
 import org.projectforge.fibu.KontoDao;
 import org.projectforge.fibu.KundeDao;
 import org.projectforge.fibu.ProjektDao;
@@ -37,6 +39,7 @@ import org.projectforge.fibu.kost.BuchungssatzDao;
 import org.projectforge.fibu.kost.Kost1Dao;
 import org.projectforge.fibu.kost.Kost2ArtDao;
 import org.projectforge.fibu.kost.Kost2Dao;
+import org.projectforge.fibu.kost.KostZuweisungDao;
 import org.projectforge.task.TaskDao;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetFilter;
@@ -54,39 +57,49 @@ public class DaoRegistry
 
   private static boolean initialized = false;
 
-  public static final String PROJEKT = "project";
+  // *************************************************************************************************************
+  // *** Please do not forget to add the dao to the ScriptingDao if the dao should be available for scripting. ***
+  // *************************************************************************************************************
+
+  public static final String ACCESS = "access";
+
+  public static final String ADDRESS = "address";
+
+  public static final String BOOK = "book";
+
+  public static final String BUCHUNGSSATZ = "buchungssatz";
+
+  public static final String EINGANGSRECHNUNG = "eingangsrechnung";
+
+  public static final String EMPLOYEE = "employee";
+
+  public static final String EMPLOYEE_SALARY = "employeeSalary";
+
+  public static final String GROUP = "group";
+
+  public static final String KONTO = "konto";
+
+  public static final String KOST1 = "kost1";
+
+  public static final String KOST2 = "kost2";
+
+  public static final String KOST2_ART = "kost2Art";
+
+  public static final String KOST_ZUWEISUNG = "kostZuweisung";
 
   public static final String KUNDE = "customer";
 
   public static final String ORDERBOOK = "orderBook";
 
-  public static final String KONTO = "konto";
-
-  public static final String KOST2_ART = "kost2Art";
-
-  public static final String KOST2 = "kost2";
-
-  public static final String KOST1 = "kost1";
-
-  public static final String BUCHUNGSSATZ = "buchungssatz";
-
-  public static final String ACCESS = "access";
-
-  public static final String GROUP = "group";
-
-  public static final String USER = "user";
-
-  public static final String EINGANGSRECHNUNG = "eingangsrechnung";
+  public static final String PROJEKT = "project";
 
   public static final String RECHNUNG = "rechnung";
-
-  public static final String BOOK = "book";
 
   public static final String TASK = "task";
 
   public static final String TIMESHEET = "timesheet";
 
-  public static final String ADDRESS = "address";
+  public static final String USER = "user";
 
   private AccessDao accessDao;
 
@@ -100,6 +113,10 @@ public class DaoRegistry
 
   private EingangsrechnungDao eingangsrechnungDao;
 
+  private EmployeeDao employeeDao;
+
+  private EmployeeSalaryDao employeeSalaryDao;
+
   private GroupDao groupDao;
 
   private KontoDao kontoDao;
@@ -109,6 +126,8 @@ public class DaoRegistry
   private Kost2ArtDao kost2ArtDao;
 
   private Kost2Dao kost2Dao;
+
+  private KostZuweisungDao kostZuweisungDao;
 
   private KundeDao kundeDao;
 
@@ -144,10 +163,13 @@ public class DaoRegistry
     register(KOST1, Kost1Dao.class, kost1Dao, "fibu.kost1");
     register(KOST2, Kost2Dao.class, kost2Dao, "fibu.kost2");
     register(KOST2_ART, Kost2ArtDao.class, kost2ArtDao, "fibu.kost2art");
+    register(KOST_ZUWEISUNG, KostZuweisungDao.class, kostZuweisungDao, "fibu.");
     register(KONTO, KontoDao.class, kontoDao, "fibu.konto");
     register(KUNDE, KundeDao.class, kundeDao, "fibu.kunde");
     register(PROJEKT, ProjektDao.class, projektDao, "fibu.projekt");
     register(ORDERBOOK, AuftragDao.class, auftragDao, "fibu.auftrag");
+    register(EMPLOYEE, EmployeeDao.class, employeeDao, "fibu.employee");
+    register(EMPLOYEE_SALARY, EmployeeDao.class, employeeSalaryDao, "fibu.employee.saraly");
     initialized = true;
   }
 
@@ -199,6 +221,16 @@ public class DaoRegistry
     this.bookDao = bookDao;
   }
 
+  public void setEmployeeDao(EmployeeDao employeeDao)
+  {
+    this.employeeDao = employeeDao;
+  }
+
+  public void setEmployeeSalaryDao(EmployeeSalaryDao employeeSalaryDao)
+  {
+    this.employeeSalaryDao = employeeSalaryDao;
+  }
+
   public void setEingangsrechnungDao(EingangsrechnungDao eingangsrechnungDao)
   {
     this.eingangsrechnungDao = eingangsrechnungDao;
@@ -227,6 +259,11 @@ public class DaoRegistry
   public void setKost2Dao(Kost2Dao kost2Dao)
   {
     this.kost2Dao = kost2Dao;
+  }
+  
+  public void setKostZuweisungDao(KostZuweisungDao kostZuweisungDao)
+  {
+    this.kostZuweisungDao = kostZuweisungDao;
   }
 
   public void setKundeDao(KundeDao kundeDao)

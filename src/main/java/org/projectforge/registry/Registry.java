@@ -42,7 +42,9 @@ public class Registry
 
   private static final Registry instance = new Registry();
 
-  private Map<String, RegistryEntry> map = new HashMap<String, RegistryEntry>();
+  private Map<String, RegistryEntry> mapByName = new HashMap<String, RegistryEntry>();
+
+  private Map<Class< ? extends BaseDao< ? >>, RegistryEntry> mapByClass = new HashMap<Class< ? extends BaseDao< ? >>, RegistryEntry>();
 
   private List<RegistryEntry> orderedList = new ArrayList<RegistryEntry>();
 
@@ -54,7 +56,8 @@ public class Registry
   public Registry register(final String id, final RegistryEntry entry)
   {
     Validate.notNull(entry);
-    map.put(id, entry);
+    mapByName.put(id, entry);
+    mapByClass.put(entry.getDaoClassType(), entry);
     orderedList.add(entry);
     return this;
   }
@@ -63,7 +66,8 @@ public class Registry
   {
     Validate.notNull(existingEntry);
     Validate.notNull(entry);
-    map.put(id, entry);
+    mapByName.put(id, entry);
+    mapByClass.put(entry.getDaoClassType(), entry);
     int idx = orderedList.indexOf(existingEntry);
     if (idx < 0) {
       log.error("Registry entry '" + existingEntry.getId() + "' not found. Appending the given entry to the list.");
@@ -78,7 +82,12 @@ public class Registry
 
   public RegistryEntry getEntry(final String id)
   {
-    return map.get(id);
+    return mapByName.get(id);
+  }
+
+  public RegistryEntry getEntry(final Class< ? extends BaseDao< ? >> daoClass)
+  {
+    return mapByClass.get(daoClass);
   }
 
   public List<RegistryEntry> getOrderedList()
@@ -89,6 +98,12 @@ public class Registry
   public BaseDao< ? > getDao(final String id)
   {
     final RegistryEntry entry = getEntry(id);
+    return entry != null ? entry.getDao() : null;
+  }
+
+  public BaseDao< ? > getDao(final Class< ? extends BaseDao< ? >> daoClass)
+  {
+    final RegistryEntry entry = getEntry(daoClass);
     return entry != null ? entry.getDao() : null;
   }
 
