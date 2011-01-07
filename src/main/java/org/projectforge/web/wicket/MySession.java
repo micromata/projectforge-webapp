@@ -72,9 +72,20 @@ public class MySession extends WebSession
     return (MySession) Session.get();
   }
 
+  /**
+   * @return The logged-in user or null if no user is logged-in.
+   */
   public synchronized PFUserDO getUser()
   {
     return user;
+  }
+
+  /**
+   * @return The id of the logged-in user or null if no user is logged-in.
+   */
+  public synchronized Integer getUserId()
+  {
+    return user != null ? user.getId() : null;
   }
 
   public synchronized void setUser(PFUserDO user)
@@ -97,11 +108,12 @@ public class MySession extends WebSession
   {
     return userAgent;
   }
-  
+
   /**
    * @return true, if the user agent device is an iPad, iPhone or iPod.
    */
-  public boolean isIOSDevice() {
+  public boolean isIOSDevice()
+  {
     return this.userAgentDevice != null && this.userAgentDevice.isIn(UserAgentDevice.IPAD, UserAgentDevice.IPHONE, UserAgentDevice.IPOD);
   }
 
