@@ -23,12 +23,16 @@
 
 package org.projectforge.web.fibu;
 
+import java.util.Calendar;
+
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.fibu.EmployeeSalaryDO;
 import org.projectforge.fibu.EmployeeSalaryDao;
+import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
@@ -49,6 +53,48 @@ public class EmployeeSalaryEditPage extends AbstractEditPage<EmployeeSalaryDO, E
     init();
   }
 
+  private EmployeeSalaryEditRecentEntry recent;
+
+  
+  @Override
+  protected void onPreEdit()
+  {
+    super.onPreEdit();
+    if (getData().getId() == null) {
+      recent = getRecent();
+      getData().setYear(recent.getYear());
+      getData().setMonth(recent.getMonth());
+    }
+  }
+
+  private EmployeeSalaryEditRecentEntry getRecent()
+  {
+    if (recent == null) {
+      recent = (EmployeeSalaryEditRecentEntry) getUserPrefEntry(EmployeeSalaryEditRecentEntry.class.getName());
+    }
+    if (recent == null) {
+      recent = new EmployeeSalaryEditRecentEntry();
+      final Calendar cal = DateHelper.getCalendar();
+      recent.setYear(cal.get(Calendar.YEAR));
+      recent.setMonth(cal.get(Calendar.MONTH));
+      putUserPrefEntry(EmployeeSalaryEditRecentEntry.class.getName(), recent, true);
+    }
+    return recent;
+  }
+
+  @Override
+  public AbstractBasePage afterSaveOrUpdate()
+  {
+    recent = getRecent();
+    if (getData().getYear() != null) {
+      recent.setYear(getData().getYear());
+    }
+    if (getData().getMonth() != null) {
+      recent.setMonth(getData().getMonth());
+    }
+    return null;
+  }
+  
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Integer)
    */

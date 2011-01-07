@@ -36,7 +36,6 @@ public class EmployeeSalaryEditForm extends AbstractEditForm<EmployeeSalaryDO, E
 
   protected EmployeeSalaryFormRenderer renderer;
 
-
   public EmployeeSalaryEditForm(EmployeeSalaryEditPage parentPage, EmployeeSalaryDO data)
   {
     super(parentPage, data);
