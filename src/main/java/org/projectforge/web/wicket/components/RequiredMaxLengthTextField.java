@@ -23,38 +23,69 @@
 
 package org.projectforge.web.wicket.components;
 
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 
 /**
  * MaxLengthTextField with required-validation.
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 public class RequiredMaxLengthTextField extends MaxLengthTextField
 {
   private static final long serialVersionUID = 7610655476354134456L;
 
   /**
-   * @param id
-   * @param model
-   * @see MaxLengthTextField#MaxLengthTextField(String, PropertyModel)
+   * Use constructor with parent and/or label params instead.
    */
+  @Deprecated
   public RequiredMaxLengthTextField(final String id, final PropertyModel<String> model)
   {
-    super(id, model);
+    this(null, id, null, model);
+  }
+
+  /**
+   * @see MaxLengthTextField#MaxLengthTextField(WebMarkupContainer, String, String, PropertyModel)
+   */
+  public RequiredMaxLengthTextField(final String id, final String label, final IModel<String> model)
+  {
+    this(null, id, label, model);
+  }
+
+  /**
+   * @see MaxLengthTextField#MaxLengthTextField(WebMarkupContainer, String, String, PropertyModel)
+   */
+  public RequiredMaxLengthTextField(final WebMarkupContainer parent, final String id, final String label, final IModel<String> model)
+  {
+    super(parent, id, label, model);
     setRequired(true);
   }
 
   /**
-   * @param id
-   * @param model
-   * @param maxLength
-   * @see MaxLengthTextField#MaxLengthTextField(String, PropertyModel)
+   * @see MaxLengthTextField#MaxLengthTextField(WebMarkupContainer, String, String, PropertyModel)
    */
-  public RequiredMaxLengthTextField(final String id, final IModel<String> model, int maxLength)
+  public RequiredMaxLengthTextField(final String id, final String label, final IModel<String> model, final int maxLength)
   {
-    super(id, model, maxLength);
+    this(null, id, label, model, maxLength);
+  }
+
+  /**
+   * @see MaxLengthTextField#MaxLengthTextField(WebMarkupContainer, String, String, PropertyModel)
+   */
+  public RequiredMaxLengthTextField(final WebMarkupContainer parent, final String id, final String label, final IModel<String> model,
+      final int maxLength)
+  {
+    super(parent, id, label, model, maxLength);
     setRequired(true);
+  }
+
+  /**
+   * Use constructor with parent and/or label params instead.
+   */
+  @Deprecated
+  public RequiredMaxLengthTextField(final String id, final IModel<String> model, final int maxLength)
+  {
+    this(null, id, null, model, maxLength);
   }
 }
