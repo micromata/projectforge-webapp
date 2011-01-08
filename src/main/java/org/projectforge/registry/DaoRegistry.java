@@ -47,7 +47,10 @@ import org.projectforge.user.GroupDao;
 import org.projectforge.user.UserDao;
 
 /**
- * Helper object which stores all dao objects and put them into the registry.
+ * Helper object which stores all dao objects and put them into the registry. <br/>
+ * <b>Please note:</b><br/>
+ * All dao's are added automatically to the scripting engine! If you don't want so, please edit ScriptDao.
+ * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -57,19 +60,30 @@ public class DaoRegistry
 
   private static boolean initialized = false;
 
-  // *************************************************************************************************************
-  // *** Please do not forget to add the dao to the ScriptingDao if the dao should be available for scripting. ***
-  // *************************************************************************************************************
+  // *******************************************************************************
+  // *** Please note: All dao's are added automatically to the scripting engine! ***
+  // *** If you don't want so, please edit ScriptDao. ***
+  // *******************************************************************************
 
   public static final String ACCESS = "access";
+
+  public static final String ACCOUNT = "account";
+
+  public static final String ACCOUNTING_RECORD = "accountingRecord";
 
   public static final String ADDRESS = "address";
 
   public static final String BOOK = "book";
 
-  public static final String BUCHUNGSSATZ = "buchungssatz";
+  public static final String COST_ASSIGNMENT = "costAssignment";
 
-  public static final String EINGANGSRECHNUNG = "eingangsrechnung";
+  public static final String COST1 = "cost1";
+
+  public static final String COST2 = "cost2";
+
+  public static final String COST2_Type = "cost2Type";
+
+  public static final String CUSTOMER = "customer";
 
   public static final String EMPLOYEE = "employee";
 
@@ -77,23 +91,13 @@ public class DaoRegistry
 
   public static final String GROUP = "group";
 
-  public static final String KONTO = "konto";
-
-  public static final String KOST1 = "kost1";
-
-  public static final String KOST2 = "kost2";
-
-  public static final String KOST2_ART = "kost2Art";
-
-  public static final String KOST_ZUWEISUNG = "kostZuweisung";
-
-  public static final String KUNDE = "customer";
+  public static final String INCOMING_INVOICE = "incomingInvoice";
 
   public static final String ORDERBOOK = "orderBook";
 
-  public static final String PROJEKT = "project";
+  public static final String OUTGOING_INVOICE = "outgoingInvoice";
 
-  public static final String RECHNUNG = "rechnung";
+  public static final String PROJECT = "project";
 
   public static final String TASK = "task";
 
@@ -154,19 +158,19 @@ public class DaoRegistry
     register(TIMESHEET, TimesheetDao.class, timesheetDao).setSearchFilterClass(TimesheetFilter.class);
     register(TASK, TaskDao.class, taskDao);
     register(BOOK, BookDao.class, bookDao);
-    register(RECHNUNG, RechnungDao.class, rechnungDao, "fibu.rechnung");
-    register(EINGANGSRECHNUNG, EingangsrechnungDao.class, eingangsrechnungDao, "fibu.eingangsrechnung");
+    register(OUTGOING_INVOICE, RechnungDao.class, rechnungDao, "fibu.rechnung");
+    register(INCOMING_INVOICE, EingangsrechnungDao.class, eingangsrechnungDao, "fibu.eingangsrechnung");
     register(USER, UserDao.class, userDao);
     register(GROUP, GroupDao.class, groupDao);
     register(ACCESS, AccessDao.class, accessDao);
-    register(BUCHUNGSSATZ, BuchungssatzDao.class, buchungssatzDao, "fibu.buchungssatz");
-    register(KOST1, Kost1Dao.class, kost1Dao, "fibu.kost1");
-    register(KOST2, Kost2Dao.class, kost2Dao, "fibu.kost2");
-    register(KOST2_ART, Kost2ArtDao.class, kost2ArtDao, "fibu.kost2art");
-    register(KOST_ZUWEISUNG, KostZuweisungDao.class, kostZuweisungDao, "fibu.");
-    register(KONTO, KontoDao.class, kontoDao, "fibu.konto");
-    register(KUNDE, KundeDao.class, kundeDao, "fibu.kunde");
-    register(PROJEKT, ProjektDao.class, projektDao, "fibu.projekt");
+    register(ACCOUNTING_RECORD, BuchungssatzDao.class, buchungssatzDao, "fibu.buchungssatz");
+    register(COST1, Kost1Dao.class, kost1Dao, "fibu.kost1");
+    register(COST2, Kost2Dao.class, kost2Dao, "fibu.kost2");
+    register(COST2_Type, Kost2ArtDao.class, kost2ArtDao, "fibu.kost2art");
+    register(COST_ASSIGNMENT, KostZuweisungDao.class, kostZuweisungDao, "fibu.");
+    register(ACCOUNT, KontoDao.class, kontoDao, "fibu.konto");
+    register(CUSTOMER, KundeDao.class, kundeDao, "fibu.kunde");
+    register(PROJECT, ProjektDao.class, projektDao, "fibu.projekt");
     register(ORDERBOOK, AuftragDao.class, auftragDao, "fibu.auftrag");
     register(EMPLOYEE, EmployeeDao.class, employeeDao, "fibu.employee");
     register(EMPLOYEE_SALARY, EmployeeDao.class, employeeSalaryDao, "fibu.employee.saraly");
@@ -260,7 +264,7 @@ public class DaoRegistry
   {
     this.kost2Dao = kost2Dao;
   }
-  
+
   public void setKostZuweisungDao(KostZuweisungDao kostZuweisungDao)
   {
     this.kostZuweisungDao = kostZuweisungDao;

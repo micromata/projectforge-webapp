@@ -23,42 +23,25 @@
 
 package org.projectforge.scripting;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.Version;
 import org.projectforge.access.OperationType;
-import org.projectforge.address.AddressDO;
-import org.projectforge.common.LabelValueBean;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ScriptingDao;
-import org.projectforge.fibu.AuftragDO;
-import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EmployeeDao;
-import org.projectforge.fibu.EmployeeSalaryDO;
 import org.projectforge.fibu.EmployeeScriptingDao;
-import org.projectforge.fibu.KundeDO;
-import org.projectforge.fibu.ProjektDO;
-import org.projectforge.fibu.RechnungDO;
-import org.projectforge.fibu.kost.BuchungssatzDO;
 import org.projectforge.fibu.kost.Kost1Dao;
 import org.projectforge.fibu.kost.Kost1ScriptingDao;
-import org.projectforge.fibu.kost.Kost2ArtDO;
-import org.projectforge.fibu.kost.Kost2DO;
-import org.projectforge.fibu.kost.KostZuweisungDO;
 import org.projectforge.fibu.kost.reporting.ReportGeneratorList;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.Registry;
+import org.projectforge.registry.RegistryEntry;
 import org.projectforge.task.ScriptingTaskTree;
-import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
-import org.projectforge.timesheet.TimesheetDO;
-import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 
 /**
@@ -68,8 +51,6 @@ import org.projectforge.user.ProjectForgeGroup;
  */
 public class ScriptDao extends BaseDao<ScriptDO>
 {
-  private Registry registry;
-
   private TaskTree taskTree;
 
   private GroovyExecutor groovyExecutor;
@@ -115,7 +96,8 @@ public class ScriptDao extends BaseDao<ScriptDO>
     ReportGeneratorList reportGeneratorList = new ReportGeneratorList();
     final Map<String, Object> scriptVariables = new HashMap<String, Object>();
 
-    getScriptVariables(scriptVariables);
+    addScriptVariables(scriptVariables);
+    addAliasForDeprecatedScriptVariables(scriptVariables);
     scriptVariables.put("reportList", reportGeneratorList);
     if (parameters != null) {
       for (final ScriptParameter param : parameters) {
@@ -126,48 +108,47 @@ public class ScriptDao extends BaseDao<ScriptDO>
     return groovyResult;
   }
 
-  public List<LabelValueBean<String, Class< ? >>> getScriptVariables(final Map<String, Object> scriptVariables)
+  /**
+   * Adds all registered dao's and other variables, such as appId, appVersion and task-tree. These variables are available in Groovy scripts
+   * @param scriptVariables
+   */
+  @SuppressWarnings("unchecked")
+  public void addScriptVariables(final Map<String, Object> scriptVariables)
   {
     scriptVariables.put("appId", Version.APP_ID);
     scriptVariables.put("appVersion", Version.NUMBER);
     scriptVariables.put("appRelease", Version.RELEASE_DATE);
-    scriptVariables.put("addressDao", new ScriptingDao<AddressDO>(registry.getDao(DaoRegistry.ADDRESS)));
-    scriptVariables.put("auftragDao", new ScriptingDao<AuftragDO>(registry.getDao(DaoRegistry.ORDERBOOK)));
-    scriptVariables.put("bookDao", new ScriptingDao<BuchungssatzDO>(registry.getDao(DaoRegistry.BOOK)));
-    scriptVariables.put("buchungssatzDao", new ScriptingDao<BuchungssatzDO>(registry.getDao(DaoRegistry.BUCHUNGSSATZ)));
-    scriptVariables.put("eingangsrechnungDao", new ScriptingDao<EingangsrechnungDO>(registry.getDao(DaoRegistry.EINGANGSRECHNUNG)));
-    scriptVariables.put("employeeDao", new EmployeeScriptingDao((EmployeeDao) registry.getDao(DaoRegistry.EMPLOYEE)));
-    scriptVariables.put("employeeSalaryDao", new ScriptingDao<EmployeeSalaryDO>(registry.getDao(DaoRegistry.EMPLOYEE_SALARY)));
-    scriptVariables.put("kost1Dao", new Kost1ScriptingDao((Kost1Dao) registry.getDao(DaoRegistry.KOST1)));
-    scriptVariables.put("kost2Dao", new ScriptingDao<Kost2DO>(registry.getDao(DaoRegistry.KOST2)));
-    scriptVariables.put("kost2ArtDao", new ScriptingDao<Kost2ArtDO>(registry.getDao(DaoRegistry.KOST2_ART)));
-    scriptVariables.put("kostZuweisungDao", new ScriptingDao<KostZuweisungDO>(registry.getDao(DaoRegistry.KOST_ZUWEISUNG)));
-    scriptVariables.put("kundeDao", new ScriptingDao<KundeDO>(registry.getDao(DaoRegistry.KUNDE)));
-    scriptVariables.put("projektDao", new ScriptingDao<ProjektDO>(registry.getDao(DaoRegistry.PROJEKT)));
-    scriptVariables.put("rechnungDao", new ScriptingDao<RechnungDO>(registry.getDao(DaoRegistry.RECHNUNG)));
     scriptVariables.put("reportList", null);
-    scriptVariables.put("taskDao", new ScriptingDao<TaskDO>(registry.getDao(DaoRegistry.TASK)));
     scriptVariables.put("taskTree", new ScriptingTaskTree(taskTree));
-    scriptVariables.put("timesheetDao", new ScriptingDao<TimesheetDO>(registry.getDao(DaoRegistry.TIMESHEET)));
-    scriptVariables.put("userDao", new ScriptingDao<PFUserDO>(registry.getDao(DaoRegistry.USER)));
-    List<LabelValueBean<String, Class< ? >>> result = new ArrayList<LabelValueBean<String, Class< ? >>>();
-    SortedSet<String> set = new TreeSet<String>();
-    set.addAll(scriptVariables.keySet());
-    for (String key : set) {
-      Object obj = scriptVariables.get(key);
-      Class< ? > clazz = null;
-      if (obj != null) {
-        clazz = obj.getClass();
+    for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
+      final ScriptingDao scriptingDao;
+      if (DaoRegistry.EMPLOYEE.equals(entry.getId()) == true) {
+        scriptingDao = new EmployeeScriptingDao((EmployeeDao) entry.getDao());
+      } else if (DaoRegistry.COST1.equals(entry.getId()) == true) {
+        scriptingDao = new Kost1ScriptingDao((Kost1Dao) entry.getDao());
+      } else {
+        scriptingDao = new ScriptingDao(entry.getDao());
       }
-      LabelValueBean<String, Class< ? >> lv = new LabelValueBean<String, Class< ? >>(key, clazz);
-      result.add(lv);
+      scriptVariables.put(entry.getId() + "Dao", scriptingDao);
     }
-    return result;
   }
 
-  public void setRegistry(Registry registry)
+  /**
+   * Some dao's are renamed, this methods adds the old names as aliases. Please note: addScriptVariables(Map) should be called before!
+   * @param scriptVariables
+   */
+  public void addAliasForDeprecatedScriptVariables(final Map<String, Object> scriptVariables)
   {
-    this.registry = registry;
+    scriptVariables.put("auftragDao", scriptVariables.get(DaoRegistry.ORDERBOOK + "Dao"));
+    scriptVariables.put("buchungssatzDao", scriptVariables.get(DaoRegistry.ACCOUNTING_RECORD + "Dao"));
+    scriptVariables.put("eingangsrechnungDao", scriptVariables.get(DaoRegistry.INCOMING_INVOICE + "Dao"));
+    scriptVariables.put("kost1Dao", scriptVariables.get(DaoRegistry.COST1 + "Dao"));
+    scriptVariables.put("kost2ArtDao", scriptVariables.get(DaoRegistry.COST2_Type + "Dao"));
+    scriptVariables.put("kost2Dao", scriptVariables.get(DaoRegistry.COST2 + "Dao"));
+    scriptVariables.put("kostZuweisungDao", scriptVariables.get(DaoRegistry.COST_ASSIGNMENT + "Dao"));
+    scriptVariables.put("kundeDao", scriptVariables.get(DaoRegistry.CUSTOMER + "Dao"));
+    scriptVariables.put("projektDao", scriptVariables.get(DaoRegistry.PROJECT + "Dao"));
+    scriptVariables.put("rechnungDao", scriptVariables.get(DaoRegistry.OUTGOING_INVOICE + "Dao"));
   }
 
   public void setTaskTree(TaskTree taskTree)

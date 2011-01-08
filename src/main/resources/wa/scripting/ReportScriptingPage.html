@@ -36,6 +36,33 @@
   </table>
   </fieldset>
   </form>
+  <table wicket:id="exceptionContainer">
+    <tbody>
+      <tr wicket:id="linesRepeater">
+        <td style="text-align: right; font-size: smaller" wicket:id="lineNo">[1]</td>
+        <td style="font-size: smaller" wicket:id="line">[...]</td>
+      </tr>
+    </tbody>
+  </table>
+    <h3><wicket:message key="label.help" /></h3>
+    <table>
+      <tbody>
+        <tr>
+          <th>JavaDocApi:</th>
+          <td><wicket:link><a href="../doc/reporting-javadoc.html" target="_blank">JavaDoc</a></wicket:link></td>
+        </tr>
+        <tr>
+          <th>Available script variables</th>
+          <td wicket:id="availableScriptVariables"></td>
+        </tr>
+        <tr>
+          <th>Bwa-Zeilen als Parameter</th>
+          <td><c:forEach var="zeile" items="${actionBean.definedBwaZeilen}" varStatus="loop">
+            <c:if test="${loop.index > 0}">, </c:if>z${zeile.id}, ${zeile.key}</c:forEach><c:forEach var="value"
+            items="${actionBean.additionalBwaValues}">, ${value}</c:forEach></td>
+        </tr>
+      </tbody>
+    </table>
 </wicket:extend>
 </body>
 </html>
