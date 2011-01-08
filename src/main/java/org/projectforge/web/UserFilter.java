@@ -97,10 +97,15 @@ public class UserFilter implements Filter
 
   public static Cookie getStayLoggedInCookie(final HttpServletRequest request)
   {
+    return getCookie(request, COOKIE_NAME_FOR_STAY_LOGGED_IN);
+  }
+
+  public static Cookie getCookie(final HttpServletRequest request, final String name)
+  {
     final Cookie[] cookies = request.getCookies();
     if (cookies != null) {
       for (final Cookie cookie : cookies) {
-        if (COOKIE_NAME_FOR_STAY_LOGGED_IN.equals(cookie.getName()) == true) {
+        if (name.equals(cookie.getName()) == true) {
           return cookie;
         }
       }
@@ -108,7 +113,8 @@ public class UserFilter implements Filter
     return null;
   }
 
-  public static void addCookie(final HttpServletRequest request, final HttpServletResponse response, final Cookie stayLoggedInCookie)
+  public static void addStayLoggedInCookie(final HttpServletRequest request, final HttpServletResponse response,
+      final Cookie stayLoggedInCookie)
   {
     stayLoggedInCookie.setMaxAge(COOKIE_MAX_AGE);
     stayLoggedInCookie.setPath("/");
@@ -145,7 +151,24 @@ public class UserFilter implements Filter
   {
     HttpServletRequest request = (HttpServletRequest) req;
     if (log.isDebugEnabled() == true) {
-      log.debug("doFilter: " + request.getRequestURI());
+      log.debug("doFilter " + request.getRequestURI() + ": " + request.getSession().getId());
+      final Cookie[] cookies = request.getCookies();
+      if (cookies != null) {
+        for (final Cookie cookie : cookies) {
+          log.debug("Cookie "
+              + cookie.getName()
+              + ", path="
+              + cookie.getPath()
+              + ", value="
+              + cookie.getValue()
+              + ", secure="
+              + cookie.getVersion()
+              + ", maxAge="
+              + cookie.getMaxAge()
+              + ", domain="
+              + cookie.getDomain());
+        }
+      }
     }
     final HttpServletResponse response = (HttpServletResponse) resp;
     PFUserDO user = null;
@@ -195,7 +218,7 @@ public class UserFilter implements Filter
         MDC.remove("user");
       }
       if (log.isDebugEnabled() == true) {
-        log.debug("doFilter finished: " + request.getRequestURI());
+        log.debug("doFilter finished for " + request.getRequestURI() + ": " + request.getSession().getId());
       }
     }
   }
@@ -206,11 +229,12 @@ public class UserFilter implements Filter
     final String queryString = request.getQueryString();
     if (requestUri.contains(LOGIN_URL) == true
         || requestUri.contains(MOBILE_LOGIN_URL) == true
-        || (requestUri.endsWith("/wa/") == true && queryString != null && (queryString.startsWith("wicket:interface=") == true && queryString.contains("form::IFormSubmitListener") == true && queryString.endsWith("&loginpage=true") == true))) {
-          // For unactivated cookies: the login form posts (action link) to /wa;sessionid=.... with queryString
-          // ...body:form::IFormSubmitListener...
-          // This is no security problem because the MyAuthorizationStrategy throws an exception if the user tries to call a secure page without
-          // login.
+        || (requestUri.endsWith("/wa/") == true && queryString != null && (queryString.startsWith("wicket:interface=") == true
+            && queryString.contains("form::IFormSubmitListener") == true && queryString.endsWith("&loginpage=true") == true))) {
+      // For unactivated cookies: the login form posts (action link) to /wa;sessionid=.... with queryString
+      // ...body:form::IFormSubmitListener...
+      // This is no security problem because the MyAuthorizationStrategy throws an exception if the user tries to call a secure page without
+      // login.
       // Don't redirect to login page after successful login!
       return false;
     } else {
@@ -245,6 +269,18 @@ public class UserFilter implements Filter
    */
   private PFUserDO checkStayLoggedIn(final HttpServletRequest request, final HttpServletResponse response)
   {
+    final Cookie sessionIdCookie = getCookie(request, "JSESSIONID");
+    if (sessionIdCookie != null && sessionIdCookie.getSecure() == false && request.isSecure() == true) {
+      // Hack for developers: Safari (may-be also other browsers) don't update unsecure cookies for secure connections. This seems to be
+      // occurring
+      // if you use ProjectForge on localhost with http and https (e. g. for testing). You have to delete this cookie normally in your
+      // browser.
+      log.info("*** Unsecure JSESSIONID cookie found for a secure request. Please remove this cookie manually, if this message is displayed within your next request again.");
+      final Cookie cookie = new Cookie("JSESSIONID", "hurzel");
+      cookie.setMaxAge(0);
+      cookie.setPath(sessionIdCookie.getPath()); // Doesn't work for Safari: getPath() returns always null!
+      response.addCookie(cookie);
+    }
     final Cookie stayLoggedInCookie = getStayLoggedInCookie(request);
     if (stayLoggedInCookie != null) {
       final String value = stayLoggedInCookie.getValue();
@@ -270,7 +306,7 @@ public class UserFilter implements Filter
         log.warn("Invalid cookie found (stay-logged-in key, maybe renewed and/or user password changed): " + value);
         return null;
       }
-      addCookie(request, response, stayLoggedInCookie);
+      addStayLoggedInCookie(request, response, stayLoggedInCookie);
       log.info("User successfully logged in using stay-logged-in method: " + user.getDisplayUsername());
       return user;
     }
