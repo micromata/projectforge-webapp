@@ -43,20 +43,19 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.Response;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.FileHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.export.ExportJFreeChart;
 import org.projectforge.export.ExportWorkbook;
-import org.projectforge.export.JFreeChartImageType;
 import org.projectforge.fibu.kost.Bwa;
 import org.projectforge.fibu.kost.BwaZeileId;
 import org.projectforge.fibu.kost.reporting.Report;
@@ -71,6 +70,7 @@ import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.fibu.ReportScriptingStorage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.DownloadUtils;
+import org.projectforge.web.wicket.JFreeChartImage;
 
 public class ReportScriptingPage extends AbstractSecuredPage
 {
@@ -93,7 +93,11 @@ public class ReportScriptingPage extends AbstractSecuredPage
 
   private Component exceptionContainer;
 
-  private Map<String, Object> scriptVariables;
+  private Label availableScriptVariablesLabel, bwaZeilenVariablesLabel;
+
+  private WebMarkupContainer imageResultContainer;
+
+  private transient Map<String, Object> scriptVariables;
 
   public ReportScriptingPage(PageParameters parameters)
   {
@@ -102,10 +106,15 @@ public class ReportScriptingPage extends AbstractSecuredPage
     body.add(form);
     form.init();
     initScriptVariables();
+    body.add(imageResultContainer = (WebMarkupContainer) new WebMarkupContainer("imageResult").setVisible(false));
   }
 
   private void initScriptVariables()
   {
+    if (scriptVariables != null) {
+      // Already initialized.
+      return;
+    }
     scriptVariables = new HashMap<String, Object>();
     scriptVariables.put("reportStorage", null);
     scriptVariables.put("reportScriptingStorage", null);
@@ -117,7 +126,9 @@ public class ReportScriptingPage extends AbstractSecuredPage
     for (String key : set) {
       buf.append(", ").append(key);
     }
-    body.add(new Label("availableScriptVariables", buf.toString()));
+    if (availableScriptVariablesLabel == null) {
+      body.add(availableScriptVariablesLabel = new Label("availableScriptVariables", buf.toString()));
+    }
     scriptDao.addAliasForDeprecatedScriptVariables(scriptVariables);
     buf = new StringBuffer();
     boolean first = true;
@@ -132,7 +143,9 @@ public class ReportScriptingPage extends AbstractSecuredPage
     for (final String bwaValue : Bwa.getAdditionalValues()) {
       buf.append(", ").append(bwaValue);
     }
-    body.add(new Label("bwaZeilenVariables", buf.toString()));
+    if (bwaZeilenVariablesLabel == null) {
+      body.add(bwaZeilenVariablesLabel = new Label("bwaZeilenVariables", buf.toString()));
+    }
   }
 
   @Override
@@ -184,7 +197,9 @@ public class ReportScriptingPage extends AbstractSecuredPage
   {
     accessChecker.checkIsUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
     accessChecker.checkDemoUser();
+    imageResultContainer.setVisible(false);
     ReportGeneratorList reportGeneratorList = new ReportGeneratorList();
+    initScriptVariables();
     scriptVariables.put("reportStorage", getReportStorage());
     scriptVariables.put("reportScriptingStorage", getReportScriptingStorage());
     scriptVariables.put("reportList", reportGeneratorList);
@@ -326,21 +341,27 @@ public class ReportScriptingPage extends AbstractSecuredPage
       final JFreeChart chart = exportJFreeChart.getJFreeChart();
       final int width = exportJFreeChart.getWidth();
       final int height = exportJFreeChart.getHeight();
-      final StringBuffer buf = new StringBuffer();
-      buf.append("pf_chart_");
-      buf.append(DateHelper.getTimestampAsFilenameSuffix(now()));
-      final String filename = buf.toString();
-      final Response response = getResponse();
-      ((WebResponse) response).setAttachmentHeader(filename);
-      response.setContentType(DownloadUtils.getContentType(filename));
-      if (exportJFreeChart.getImageType() == JFreeChartImageType.PNG) {
-        ChartUtilities.writeChartAsPNG(response.getOutputStream(), chart, width, height);
-        buf.append(".png");
-      } else {
-        ChartUtilities.writeChartAsJPEG(response.getOutputStream(), chart, width, height);
-        buf.append(".jpg");
-      }
-      response.getOutputStream().flush();
+      // final StringBuffer buf = new StringBuffer();
+      // buf.append("pf_chart_");
+      // buf.append(DateHelper.getTimestampAsFilenameSuffix(now()));
+      // final Response response = getResponse();
+      // if (exportJFreeChart.getImageType() == JFreeChartImageType.PNG) {
+      // ChartUtilities.writeChartAsPNG(response.getOutputStream(), chart, width, height);
+      // buf.append(".png");
+      // } else {
+      // ChartUtilities.writeChartAsJPEG(response.getOutputStream(), chart, width, height);
+      // buf.append(".jpg");
+      // }
+      // final String filename = buf.toString();
+      final JFreeChartImage image = new JFreeChartImage("image", chart, exportJFreeChart.getImageType(), width, height);
+      image.add(new SimpleAttributeModifier("width", String.valueOf(width)));
+      image.add(new SimpleAttributeModifier("height", String.valueOf(height)));
+      imageResultContainer.removeAll();
+      imageResultContainer.add(image).setVisible(true);
+      // ((WebResponse) response).setAttachmentHeader(filename);
+      // response.setContentType(DownloadUtils.getContentType(filename));
+      // response.getOutputStream().flush();
+      // setRedirect(false);
     } catch (final Exception ex) {
       error(getLocalizedMessage("error", ex.getMessage()));
       log.error(ex.getMessage(), ex);

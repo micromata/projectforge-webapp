@@ -41,6 +41,7 @@ import org.projectforge.scripting.ScriptDO;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.fibu.ReportScriptingStorage;
 import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -103,9 +104,10 @@ public class ReportScriptingForm extends AbstractForm<ScriptDO, ReportScriptingP
     };
     executeButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     add(new SingleButtonPanel("execute", executeButton));
-    add(new MaxLengthTextArea(this, "groovyScript", getString("label.groovyScript"), new PropertyModel<String>(this, "groovyScript"), MAX_GROOVY_LENGTH));
+    add(new MaxLengthTextArea(this, "groovyScript", getString("label.groovyScript"), new PropertyModel<String>(this, "groovyScript"),
+        MAX_GROOVY_LENGTH).add(new FocusOnLoadBehavior()));
     add(groovyResultRow = new WebMarkupContainer("groovyResultRow"));
-    groovyResultRow.add(groovyResultLabel = (Label) new Label("groovyResultLabel").setEscapeModelStrings(false));
+    groovyResultRow.add(groovyResultLabel = (Label) new Label("groovyResult").setEscapeModelStrings(false));
   }
 
   @SuppressWarnings("serial")
@@ -121,9 +123,10 @@ public class ReportScriptingForm extends AbstractForm<ScriptDO, ReportScriptingP
         {
           final StringBuffer buf = new StringBuffer();
           buf.append(groovyResult.getResultAsHtmlString());
-          if (groovyResult.getResult() != null && StringUtils.isNotEmpty(groovyResult.getOutput()) == true)
+          if (groovyResult.getResult() != null && StringUtils.isNotEmpty(groovyResult.getOutput()) == true) {
             buf.append("<br/>\n");
-          buf.append(HtmlHelper.escapeXml(groovyResult.getOutput()));
+            buf.append(HtmlHelper.escapeXml(groovyResult.getOutput()));
+          }
           return buf.toString();
         }
       });
