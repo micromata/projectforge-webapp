@@ -7,8 +7,15 @@ $(function() {
 	}).disableSelection();
 
 	$("#personal").sortable( {
-		placeholder : "ui-state-highlight"
+		placeholder : "ui-state-highlight",
+		change: function(event, ui) {
+			$(".remover").remove();
+			$("ul#personal li a").prepend( '<span class="remover"> 2 </span>');
+			// @kai: call a function here to serialize and savePersonal();
+		}
 	}).disableSelection();
+	
+	
 
 	// @kai: Das ist neu, beim Laden muss man natürlich das Sortable disablen...
 	$("#personal, #nav ul").sortable("disable");
