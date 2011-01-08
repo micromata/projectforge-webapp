@@ -103,7 +103,7 @@ public class ReportScriptingForm extends AbstractForm<ScriptDO, ReportScriptingP
     };
     executeButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     add(new SingleButtonPanel("execute", executeButton));
-    add(new MaxLengthTextArea("groovyScript", new PropertyModel<String>(this, "groovyScript"), MAX_GROOVY_LENGTH));
+    add(new MaxLengthTextArea(this, "groovyScript", getString("label.groovyScript"), new PropertyModel<String>(this, "groovyScript"), MAX_GROOVY_LENGTH));
     add(groovyResultRow = new WebMarkupContainer("groovyResultRow"));
     groovyResultRow.add(groovyResultLabel = (Label) new Label("groovyResultLabel").setEscapeModelStrings(false));
   }
