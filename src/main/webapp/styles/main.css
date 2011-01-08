@@ -601,7 +601,6 @@ ul#normal li.active ul {
 	color: #8994A0;
 	margin:0 0 1em 0;
 	padding-top:1em;
-	/* @kai: wenn du schon das capitalizing entfernst, solltest du auch das letter-spacing enfernen :) aber ich würde beides lassens */
 	letter-spacing: 0.05em;
 	font-weight: normal;
 	text-transform: uppercase;
