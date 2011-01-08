@@ -25,32 +25,52 @@ package org.projectforge.web.scripting;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.Response;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.jfree.chart.ChartUtilities;
+import org.jfree.chart.JFreeChart;
+import org.projectforge.common.DateHelper;
 import org.projectforge.common.FileHelper;
-import org.projectforge.common.LabelValueBean;
 import org.projectforge.core.Configuration;
+import org.projectforge.export.ExportJFreeChart;
+import org.projectforge.export.ExportWorkbook;
+import org.projectforge.export.JFreeChartImageType;
+import org.projectforge.fibu.kost.Bwa;
+import org.projectforge.fibu.kost.BwaZeileId;
+import org.projectforge.fibu.kost.reporting.Report;
+import org.projectforge.fibu.kost.reporting.ReportGenerator;
+import org.projectforge.fibu.kost.reporting.ReportGeneratorList;
 import org.projectforge.fibu.kost.reporting.ReportStorage;
+import org.projectforge.scripting.GroovyExecutor;
 import org.projectforge.scripting.GroovyResult;
 import org.projectforge.scripting.ScriptDao;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.fibu.ReportScriptingStorage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.DownloadUtils;
 
 public class ReportScriptingPage extends AbstractSecuredPage
 {
@@ -63,6 +83,9 @@ public class ReportScriptingPage extends AbstractSecuredPage
 
   @SpringBean(name = "scriptDao")
   private ScriptDao scriptDao;
+
+  @SpringBean(name = "groovyExecutor")
+  private GroovyExecutor groovyExecutor;
 
   protected GroovyResult groovyResult;
 
@@ -89,15 +112,27 @@ public class ReportScriptingPage extends AbstractSecuredPage
     scriptDao.addScriptVariables(scriptVariables);
     final SortedSet<String> set = new TreeSet<String>();
     set.addAll(scriptVariables.keySet());
-    final StringBuffer buf = new StringBuffer();
+    StringBuffer buf = new StringBuffer();
     buf.append("scriptResult"); // first available variable.
     for (String key : set) {
       buf.append(", ").append(key);
     }
     body.add(new Label("availableScriptVariables", buf.toString()));
     scriptDao.addAliasForDeprecatedScriptVariables(scriptVariables);
-    // scriptResult<c:forEach var="variable" items="${actionBean.scriptVariables}">
-    // , ${variable.label}</c:forEach>
+    buf = new StringBuffer();
+    boolean first = true;
+    for (final BwaZeileId bwaZeileId : BwaZeileId.values()) {
+      if (first == true) {
+        first = false;
+      } else {
+        buf.append(", ");
+      }
+      buf.append('z').append(bwaZeileId.getId()).append(", ").append(bwaZeileId.getKey());
+    }
+    for (final String bwaValue : Bwa.getAdditionalValues()) {
+      buf.append(", ").append(bwaValue);
+    }
+    body.add(new Label("bwaZeilenVariables", buf.toString()));
   }
 
   @Override
@@ -147,33 +182,32 @@ public class ReportScriptingPage extends AbstractSecuredPage
 
   protected void execute()
   {
-    // accessChecker.checkIsUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
-    // accessChecker.checkDemoUser();
-    // final ReportGeneratorList reportGeneratorList = new ReportGeneratorList();
-    // getScriptVariables();
-    // scriptVariables.put("reportStorage", getReportStorage());
-    // scriptVariables.put("reportScriptingStorage", getStorage());
-    // scriptVariables.put("reportList", reportGeneratorList);
-    // if (StringUtils.isNotBlank(getStorage().getGroovyScript()) == true) {
-    // groovyResult = groovyExecutor.execute(getStorage().getGroovyScript(), scriptVariables);
-    // if (groovyResult.hasException() == true) {
-    // addError("groovyScript", "exception.groovyError", String.valueOf(groovyResult.getException()));
-    // return getInputPage();
-    // }
-    // if (groovyResult.hasResult() == true) {
-    // final Object result = groovyResult.getResult();
-    // if (result instanceof ExportWorkbook == true) {
-    // return excelExport();
-    // } else if (groovyResult.getResult() instanceof ReportGeneratorList == true) {
-    // reportGeneratorList = (ReportGeneratorList) groovyResult.getResult();
-    // return jasperReport(reportGeneratorList);
-    // } else if (result instanceof ExportJFreeChart) {
-    // return jFreeChartExport();
-    // }
-    // }
-    // } else if (getStorage().getJasperReport() != null) {
-    // return jasperReport();
-    // }
+    accessChecker.checkIsUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
+    accessChecker.checkDemoUser();
+    ReportGeneratorList reportGeneratorList = new ReportGeneratorList();
+    scriptVariables.put("reportStorage", getReportStorage());
+    scriptVariables.put("reportScriptingStorage", getReportScriptingStorage());
+    scriptVariables.put("reportList", reportGeneratorList);
+    if (StringUtils.isNotBlank(getReportScriptingStorage().getGroovyScript()) == true) {
+      groovyResult = groovyExecutor.execute(getReportScriptingStorage().getGroovyScript(), scriptVariables);
+      if (groovyResult.hasException() == true) {
+        error(getLocalizedMessage("exception.groovyError", String.valueOf(groovyResult.getException())));
+        return;
+      }
+      if (groovyResult.hasResult() == true) {
+        final Object result = groovyResult.getResult();
+        if (result instanceof ExportWorkbook == true) {
+          excelExport();
+        } else if (groovyResult.getResult() instanceof ReportGeneratorList == true) {
+          reportGeneratorList = (ReportGeneratorList) groovyResult.getResult();
+          jasperReport(reportGeneratorList);
+        } else if (result instanceof ExportJFreeChart) {
+          jFreeChartExport();
+        }
+      }
+    } else if (getReportScriptingStorage().getJasperReport() != null) {
+      jasperReport();
+    }
   }
 
   protected void upload()
@@ -213,111 +247,106 @@ public class ReportScriptingPage extends AbstractSecuredPage
     }
   }
 
-  //
-  // public boolean isException()
-  // {
-  // return this.groovyResult != null && this.groovyResult.hasException();
-  // }
-  //
-  // /**
-  // * Creates the reports for the entries.
-  // * @param reportGeneratorList
-  // * @return
-  // */
-  // private Resolution jasperReport(ReportGeneratorList reportGeneratorList)
-  // {
-  // if (CollectionUtils.isEmpty(reportGeneratorList.getReports()) == true) {
-  // addError("groovyScript", "fibu.reporting.jasper.error.reportListIsEmpty");
-  // return getInputPage();
-  // }
-  // Map<String, Object> parameters = new HashMap<String, Object>();
-  // ReportGenerator report = reportGeneratorList.getReports().get(0);
-  // Collection< ? > beanCollection = report.getBeanCollection();
-  // parameters = report.getParameters();
-  // return jasperReport(parameters, beanCollection);
-  // }
-  //
-  // /**
-  // * Default report from reportStorage. Uses the current report and puts the bwa values in parameter map.
-  // */
-  // private Resolution jasperReport()
-  // {
-  // if (getReportStorage() == null || getReportStorage().getRoot() == null || getReportStorage().getRoot().isLoad() == false) {
-  // addGlobalError("fibu.reporting.jasper.error.reportDataDoesNotExist");
-  // return getInputPage();
-  // }
-  // Map<String, Object> parameters = new HashMap<String, Object>();
-  // Report report = getReportStorage().getCurrentReport();
-  // Collection< ? > beanCollection = report.getBuchungssaetze();
-  // Bwa.putBwaWerte(parameters, report.getBwa());
-  // return jasperReport(parameters, beanCollection);
-  // }
-  //
-  // private Resolution jasperReport(Map<String, Object> parameters, Collection< ? > beanCollection)
-  // {
-  // JasperReport jasperReport = getStorage().getJasperReport();
-  // JasperPrint jp = null;
-  // try {
-  // jp = JasperFillManager.fillReport(jasperReport, parameters, new JRBeanCollectionDataSource(beanCollection));
-  // } catch (JRException ex) {
-  // addGlobalError("error", ex.getMessage());
-  // log.error(ex.getMessage(), ex);
-  // return getInputPage();
-  // }
-  // final JasperPrint jasperPrint = jp;
-  // return new Resolution() {
-  // public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception
-  // {
-  // StringBuffer buf = new StringBuffer();
-  // buf.append("pf_report_");
-  // buf.append(DateHelper.getTimestampAsFilenameSuffix(getContext().now())).append(".pdf");
-  // ResponseUtils.prepareDownload(buf.toString(), response, getContext().getServletContext(), true);
-  // JasperExportManager.exportReportToPdfStream(jasperPrint, response.getOutputStream());
-  // response.getOutputStream().flush();
-  // }
-  // };
-  // }
-  //
-  // private Resolution excelExport()
-  // {
-  // final ExportWorkbook workbook = (ExportWorkbook) groovyResult.getResult();
-  // return new Resolution() {
-  // public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception
-  // {
-  // StringBuffer buf = new StringBuffer();
-  // buf.append("pf_report_");
-  // buf.append(DateHelper.getTimestampAsFilenameSuffix(getContext().now())).append(".xls");
-  // ResponseUtils.prepareDownload(buf.toString(), response, getContext().getServletContext(), true);
-  // workbook.write(response.getOutputStream());
-  // response.getOutputStream().flush();
-  // }
-  // };
-  // }
-  //
-  // private Resolution jFreeChartExport()
-  // {
-  // final ExportJFreeChart exportJFreeChart = (ExportJFreeChart)groovyResult.getResult();
-  // final JFreeChart chart = exportJFreeChart.getJFreeChart();
-  // final int width = exportJFreeChart.getWidth();
-  // final int height = exportJFreeChart.getHeight();
-  // return new Resolution() {
-  // public void execute(HttpServletRequest request, HttpServletResponse response) throws Exception
-  // {
-  // StringBuffer buf = new StringBuffer();
-  // buf.append("pf_chart_");
-  // buf.append(DateHelper.getTimestampAsFilenameSuffix(getContext().now()));
-  // ResponseUtils.prepareDownload(buf.toString(), response, getContext().getServletContext(), true);
-  // if (exportJFreeChart.getImageType() == JFreeChartImageType.PNG) {
-  // ChartUtilities.writeChartAsPNG(response.getOutputStream(), chart, width, height);
-  // buf.append(".png");
-  // } else {
-  // ChartUtilities.writeChartAsJPEG(response.getOutputStream(), chart, width, height);
-  // buf.append(".jpg");
-  // }
-  // response.getOutputStream().flush();
-  // }
-  // };
-  // }
+  /**
+   * Creates the reports for the entries.
+   * @param reportGeneratorList
+   */
+  private void jasperReport(final ReportGeneratorList reportGeneratorList)
+  {
+    if (CollectionUtils.isEmpty(reportGeneratorList.getReports()) == true) {
+      error(getString("fibu.reporting.jasper.error.reportListIsEmpty"));
+      return;
+    }
+    final ReportGenerator report = reportGeneratorList.getReports().get(0);
+    final Collection< ? > beanCollection = report.getBeanCollection();
+    final Map<String, Object> parameters = report.getParameters();
+    jasperReport(parameters, beanCollection);
+  }
+
+  /**
+   * Default report from reportStorage. Uses the current report and puts the bwa values in parameter map.
+   */
+  private void jasperReport()
+  {
+    if (getReportStorage() == null || getReportStorage().getRoot() == null || getReportStorage().getRoot().isLoad() == false) {
+      error(getString("fibu.reporting.jasper.error.reportDataDoesNotExist"));
+      return;
+    }
+    final Map<String, Object> parameters = new HashMap<String, Object>();
+    final Report report = getReportStorage().getCurrentReport();
+    final Collection< ? > beanCollection = report.getBuchungssaetze();
+    Bwa.putBwaWerte(parameters, report.getBwa());
+    jasperReport(parameters, beanCollection);
+  }
+
+  private void jasperReport(Map<String, Object> parameters, Collection< ? > beanCollection)
+  {
+    try {
+      final JasperReport jasperReport = getReportScriptingStorage().getJasperReport();
+      final JasperPrint jp = JasperFillManager.fillReport(jasperReport, parameters, new JRBeanCollectionDataSource(beanCollection));
+      final JasperPrint jasperPrint = jp;
+      final StringBuffer buf = new StringBuffer();
+      buf.append("pf_report_");
+      buf.append(DateHelper.getTimestampAsFilenameSuffix(now())).append(".pdf");
+      final String filename = buf.toString();
+      final Response response = getResponse();
+      ((WebResponse) response).setAttachmentHeader(filename);
+      response.setContentType(DownloadUtils.getContentType(filename));
+      JasperExportManager.exportReportToPdfStream(jasperPrint, response.getOutputStream());
+      response.getOutputStream().flush();
+    } catch (final Exception ex) {
+      error(getLocalizedMessage("error", ex.getMessage()));
+      log.error(ex.getMessage(), ex);
+    }
+  }
+
+  private void excelExport()
+  {
+    try {
+      final ExportWorkbook workbook = (ExportWorkbook) groovyResult.getResult();
+      final StringBuffer buf = new StringBuffer();
+      buf.append("pf_report_");
+      buf.append(DateHelper.getTimestampAsFilenameSuffix(now())).append(".xls");
+      final String filename = buf.toString();
+      final Response response = getResponse();
+      ((WebResponse) response).setAttachmentHeader(filename);
+      response.setContentType(DownloadUtils.getContentType(filename));
+      workbook.write(response.getOutputStream());
+      response.getOutputStream().flush();
+    } catch (final Exception ex) {
+      error(getLocalizedMessage("error", ex.getMessage()));
+      log.error(ex.getMessage(), ex);
+    }
+  }
+
+  private void jFreeChartExport()
+  {
+    try {
+      final ExportJFreeChart exportJFreeChart = (ExportJFreeChart) groovyResult.getResult();
+      final JFreeChart chart = exportJFreeChart.getJFreeChart();
+      final int width = exportJFreeChart.getWidth();
+      final int height = exportJFreeChart.getHeight();
+      final StringBuffer buf = new StringBuffer();
+      buf.append("pf_chart_");
+      buf.append(DateHelper.getTimestampAsFilenameSuffix(now()));
+      final String filename = buf.toString();
+      final Response response = getResponse();
+      ((WebResponse) response).setAttachmentHeader(filename);
+      response.setContentType(DownloadUtils.getContentType(filename));
+      if (exportJFreeChart.getImageType() == JFreeChartImageType.PNG) {
+        ChartUtilities.writeChartAsPNG(response.getOutputStream(), chart, width, height);
+        buf.append(".png");
+      } else {
+        ChartUtilities.writeChartAsJPEG(response.getOutputStream(), chart, width, height);
+        buf.append(".jpg");
+      }
+      response.getOutputStream().flush();
+    } catch (final Exception ex) {
+      error(getLocalizedMessage("error", ex.getMessage()));
+      log.error(ex.getMessage(), ex);
+    }
+  }
+
   /**
    * TODO
    * @return
