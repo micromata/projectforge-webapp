@@ -42,12 +42,28 @@ import org.projectforge.web.core.LocalizerAndUrlBuilder;
 import org.projectforge.web.core.PageContextLocalizerAndUrlBuilder;
 import org.projectforge.web.wicket.WicketUtils;
 
-
 public class TaskFormatter extends AbstractFormatter
 {
   private TaskTree taskTree;
 
   private HtmlHelper htmlHelper;
+
+  private static TaskFormatter instance;
+
+  public static TaskFormatter instance()
+  {
+    return instance;
+  }
+
+  /**
+   * Please do not call this constructor (only for internal use).
+   */
+  public TaskFormatter()
+  {
+    if (instance == null) {
+      instance = this;
+    }
+  }
 
   public void setTaskTree(TaskTree taskTree)
   {
@@ -85,7 +101,7 @@ public class TaskFormatter extends AbstractFormatter
    * @param enableLinks If true, every task title is associated with a link to EditTask.
    * @param lineThroughDeletedTasks If true, deleted task will be visualized by line through.
    * @param ancestorTaskId If not null, the path will shown between taskId and ancestorTaskId. If mainTaskId is not an ancestor of taskId,
-   *                the whole path will be shown.
+   *          the whole path will be shown.
    */
   public String getTaskPath(PageContext pageContext, Integer taskId, Integer ancestorTaskId, boolean enableLinks,
       boolean lineThroughDeletedTasks)
@@ -99,7 +115,7 @@ public class TaskFormatter extends AbstractFormatter
    * @param enableLinks If true, every task title is associated with a link to EditTask.
    * @param lineThroughDeletedTasks If true, deleted task will be visualized by line through.
    * @param ancestorTaskId If not null, the path will shown between taskId and ancestorTaskId. If mainTaskId is not an ancestor of taskId,
-   *                the whole path will be shown.
+   *          the whole path will be shown.
    */
   public String getTaskPath(LocalizerAndUrlBuilder locUrlBuilder, Integer taskId, Integer ancestorTaskId, boolean enableLinks,
       boolean lineThroughDeletedTasks)
@@ -130,7 +146,7 @@ public class TaskFormatter extends AbstractFormatter
    * Formats path to root: "task1 -> task2 -> task3".
    * @param taskId
    * @param showCurrentTask if true also the given task by id will be added to the path, otherwise the path of the parent task will be
-   *                shown.
+   *          shown.
    * @param escapeHtml
    */
   public String getTaskPath(Integer taskId, boolean showCurrentTask, OutputType outputType)
@@ -143,7 +159,7 @@ public class TaskFormatter extends AbstractFormatter
    * @param taskId
    * @param ancestorTaskId
    * @param showCurrentTask if true also the given task by id will be added to the path, otherwise the path of the parent task will be
-   *                shown.
+   *          shown.
    * @param escapeHtml
    */
   public String getTaskPath(Integer taskId, Integer ancestorTaskId, boolean showCurrentTask, OutputType outputType)
@@ -220,7 +236,8 @@ public class TaskFormatter extends AbstractFormatter
       }
     }
     if (enableLink == true) {
-      htmlHelper.appendAncorStartTag(locUrlBuilder, buf, WicketUtils.getBookmarkablePageUrl(TaskEditPage.class, "id", String.valueOf(task.getId())));
+      htmlHelper.appendAncorStartTag(locUrlBuilder, buf, WicketUtils.getBookmarkablePageUrl(TaskEditPage.class, "id", String.valueOf(task
+          .getId())));
     }
     if (Hibernate.isInitialized(task) == false) {
       task = taskTree.getTaskById(task.getId());
@@ -244,8 +261,9 @@ public class TaskFormatter extends AbstractFormatter
       htmlHelper.appendAncorEndTag(buf);
     }
   }
-  
-  public String getFormattedTaskStatus(final TaskStatus status) {
+
+  public String getFormattedTaskStatus(final TaskStatus status)
+  {
     if (status == TaskStatus.N) {
       // Show 'not opened' as blank field:
       return "";
