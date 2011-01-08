@@ -143,7 +143,7 @@ public class LoginPage extends AbstractBasePage
               + loggedInUser.getUsername()
               + ":"
               + userDao.getStayLoggedInKey(user.getId()));
-          UserFilter.addCookie(((WebRequest) page.getRequest()).getHttpServletRequest(), ((WebResponse) page.getResponse())
+          UserFilter.addStayLoggedInCookie(((WebRequest) page.getRequest()).getHttpServletRequest(), ((WebResponse) page.getResponse())
               .getHttpServletResponse(), cookie);
         }
         internalLogin(page, user);
