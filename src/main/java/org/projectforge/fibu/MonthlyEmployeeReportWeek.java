@@ -23,6 +23,7 @@
 
 package org.projectforge.fibu;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,8 +39,10 @@ import org.projectforge.timesheet.TimesheetDO;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class MonthlyEmployeeReportWeek
+public class MonthlyEmployeeReportWeek implements Serializable
 {
+  private static final long serialVersionUID = 6075755848054540114L;
+
   private Date fromDate;
 
   private int fromDayOfMonth;

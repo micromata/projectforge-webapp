@@ -23,6 +23,7 @@
 
 package org.projectforge.fibu;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,15 +51,18 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.web.common.OutputType;
 import org.projectforge.web.task.TaskFormatter;
 
-
 /**
  * Repräsentiert einen Monatsbericht eines Mitarbeiters.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class MonthlyEmployeeReport
+public class MonthlyEmployeeReport implements Serializable
 {
-  public class Kost2Row
+  private static final long serialVersionUID = -4636357379552246075L;
+
+  public class Kost2Row implements Serializable
   {
+    private static final long serialVersionUID = -5379735557333691194L;
+
     public Kost2Row(Kost2DO kost2)
     {
       this.kost2 = kost2;
@@ -115,8 +119,6 @@ public class MonthlyEmployeeReport
 
     private Kost2DO kost2;
   }
-
-  private TaskFormatter taskFormatter;
 
   private int year;
 
@@ -265,7 +267,7 @@ public class MonthlyEmployeeReport
       if (MapUtils.isNotEmpty(week.getTaskEntries()) == true) {
         for (MonthlyEmployeeReportEntry entry : week.getTaskEntries().values()) {
           Validate.notNull(entry.getTask());
-          taskEntries.put(taskFormatter.getTaskPath(entry.getTask().getId(), true, OutputType.XML), entry.getTask());
+          taskEntries.put(TaskFormatter.instance().getTaskPath(entry.getTask().getId(), true, OutputType.XML), entry.getTask());
           MonthlyEmployeeReportEntry taskTotal = taskDurations.get(entry.getTask().getId());
           if (taskTotal == null) {
             taskTotal = new MonthlyEmployeeReportEntry(entry.getTask());
@@ -415,10 +417,5 @@ public class MonthlyEmployeeReport
   public BigDecimal getNumberOfWorkingDays()
   {
     return numberOfWorkingDays;
-  }
-
-  public void setTaskFormatter(TaskFormatter taskFormatter)
-  {
-    this.taskFormatter = taskFormatter;
   }
 }

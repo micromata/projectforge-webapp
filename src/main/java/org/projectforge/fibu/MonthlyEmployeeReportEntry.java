@@ -23,17 +23,20 @@
 
 package org.projectforge.fibu;
 
+import java.io.Serializable;
+
 import org.projectforge.fibu.kost.Kost2ArtDO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.task.TaskDO;
-
 
 /**
  * Repräsentiert einen Eintrag innerhalb eines Wochenberichts eines Mitarbeiters zu einem Kostenträger (Anzahl Stunden).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class MonthlyEmployeeReportEntry
+public class MonthlyEmployeeReportEntry implements Serializable
 {
+  private static final long serialVersionUID = 7290000602224467755L;
+
   private Kost2DO kost2;
 
   private TaskDO task;
@@ -72,7 +75,8 @@ public class MonthlyEmployeeReportEntry
   }
 
   /**
-   * If this entry has a kost2 with a working time fraction set or a kost2art with a working time fraction set then the fraction of millis will be returned.
+   * If this entry has a kost2 with a working time fraction set or a kost2art with a working time fraction set then the fraction of millis
+   * will be returned.
    */
   public long getWorkFractionMillis()
   {

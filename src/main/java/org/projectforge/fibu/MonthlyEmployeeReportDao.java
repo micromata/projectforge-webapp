@@ -26,16 +26,13 @@ package org.projectforge.fibu;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.Validate;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.task.TaskFormatter;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -43,15 +40,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
 public class MonthlyEmployeeReportDao extends HibernateDaoSupport
 {
-  private TaskFormatter taskFormatter;
-  
   private TimesheetDao timesheetDao;
 
   private EmployeeDao employeeDao;
-  
+
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public MonthlyEmployeeReport getReport(int year, int month, PFUserDO user) {
-    Validate.notNull(user);
+  public MonthlyEmployeeReport getReport(int year, int month, PFUserDO user)
+  {
+    if (user == null || year <= 0) {
+      return null;
+    }
     MonthlyEmployeeReport report = new MonthlyEmployeeReport(year, month);
     EmployeeDO employee = employeeDao.getByUserId(user.getId());
     if (employee != null) {
@@ -59,7 +57,6 @@ public class MonthlyEmployeeReportDao extends HibernateDaoSupport
     } else {
       report.setUser(user);
     }
-    report.setTaskFormatter(taskFormatter);
     report.init();
     TimesheetFilter filter = new TimesheetFilter();
     filter.setDeleted(false);
@@ -76,16 +73,11 @@ public class MonthlyEmployeeReportDao extends HibernateDaoSupport
     return report;
   }
 
-  public void setTaskFormatter(TaskFormatter taskFormatter)
-  {
-    this.taskFormatter = taskFormatter;
-  }
-  
   public void setTimesheetDao(TimesheetDao timesheetDao)
   {
     this.timesheetDao = timesheetDao;
   }
-  
+
   public void setEmployeeDao(EmployeeDao employeeDao)
   {
     this.employeeDao = employeeDao;

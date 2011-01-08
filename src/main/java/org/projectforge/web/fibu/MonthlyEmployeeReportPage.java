@@ -115,9 +115,9 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
     if (reportContainer != null) {
       body.remove(reportContainer);
     }
-    report = monthlyEmployeeReportDao.getReport(form.filter.getYear(), form.filter.getMonth(), form.filter.getUser());
     reportContainer = new WebMarkupContainer("report");
     body.add(reportContainer.setRenderBodyOnly(true));
+    report = monthlyEmployeeReportDao.getReport(form.filter.getYear(), form.filter.getMonth(), form.filter.getUser());
     if (report == null) {
       reportContainer.setVisible(false);
     } else {
