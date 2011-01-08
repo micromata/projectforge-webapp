@@ -33,7 +33,7 @@ public class GroovyResult implements Serializable
 {
   private static final long serialVersionUID = -4561647483563741849L;
 
-  private Object result;
+  private transient Object result;
 
   private Exception exception;
 
