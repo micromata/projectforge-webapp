@@ -23,38 +23,66 @@
 
 package org.projectforge.web.wicket;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
 import org.apache.wicket.Resource;
 import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.image.resource.DynamicImageResource;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.protocol.http.WebResponse;
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.projectforge.export.JFreeChartImageType;
 
 public class JFreeChartImage extends Image
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(JFreeChartImage.class);
+
   private static final long serialVersionUID = 7083627817914127250L;
 
   private int width;
 
   private int height;
 
+  private JFreeChartImageType imageType;
+
   public JFreeChartImage(final String id, final JFreeChart chart, final int width, final int height)
+  {
+    this(id, chart, null, width, height);
+  }
+
+  public JFreeChartImage(final String id, final JFreeChart chart, final JFreeChartImageType imageType, final int width, final int height)
   {
     super(id, new Model<JFreeChart>(chart));
     this.width = width;
     this.height = height;
+    this.imageType = imageType;
   }
 
   @SuppressWarnings("serial")
   @Override
   protected Resource getImageResource()
   {
-    return new DynamicImageResource() {
+    final String format = this.imageType == JFreeChartImageType.JPEG ? "jpg" : "png";
+    return new DynamicImageResource(format) {
       @Override
       protected byte[] getImageData()
       {
-        final JFreeChart chart = (JFreeChart) getDefaultModelObject();
-        return toImageData(chart.createBufferedImage(width, height));
+        try {
+          final JFreeChart chart = (JFreeChart) getDefaultModelObject();
+          final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+          if (imageType == JFreeChartImageType.JPEG) {
+            ChartUtilities.writeChartAsJPEG(baos, chart, width, height);
+          } else {
+            ChartUtilities.writeChartAsPNG(baos, chart, width, height);
+          }
+          final byte[] ba = baos.toByteArray();
+          return ba;
+        } catch (final IOException ex) {
+          log.error(ex.getMessage(), ex);
+          return null;
+        }
       }
 
       @Override
