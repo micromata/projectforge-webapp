@@ -24,13 +24,16 @@
 package org.projectforge.web.fibu;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.StringHelper;
+import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.fibu.kost.BuchungssatzDao;
+import org.projectforge.fibu.kost.Bwa;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
@@ -43,6 +46,8 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
 
   @SpringBean(name = "buchungssatzDao")
   private BuchungssatzDao buchungssatzDao;
+
+  private WebMarkupContainer businessAssessmentRow;
 
   @SuppressWarnings("serial")
   @Override
@@ -78,29 +83,38 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
     toMonthChoice.setNullValid(true);
     filterContainer.add(toMonthChoice);
 
+    filterContainer.add(businessAssessmentRow = new WebMarkupContainer("businessAssessmentRow") {
+      public boolean isVisible()
+      {
+        return parentPage.bwa != null;
+      };
+    });
     final Label summaryBusinessAssessmentLabel = new Label("summaryBusinessAssessment", new Model<String>() {
       @Override
       public String getObject()
       {
+        final Bwa bwa = parentPage.bwa;
+        if (bwa == null) {
+          return "";
+        }
         final StringBuffer buf = new StringBuffer();
-        buf.append(getString("fibu.businessAssessment.overallPerformance")).append(": ");
-        buf.append(getString("fibu.businessAssessment.merchandisePurchase")).append(": ");
-        buf.append(getString("fibu.businessAssessment.preliminaryResult")).append(": ");
+        buf.append(getString("fibu.businessAssessment.overallPerformance")).append(": ").append(CurrencyFormatter.format(bwa.getGesamtleistung().getBwaWert())).append(", ");
+        buf.append(getString("fibu.businessAssessment.merchandisePurchase")).append(": ").append(CurrencyFormatter.format(bwa.getMatWareneinkauf().getBwaWert())).append(", ");
+        buf.append(getString("fibu.businessAssessment.preliminaryResult")).append(": ").append(CurrencyFormatter.format(bwa.getVorlaeufigesErgebnis().getBwaWert()));
         return buf.toString();
-        // Gesamtleistung:&nbsp;<pf:currency value="${actionBean.bwa.gesamtleistung.bwaWert}" />,&nbsp;Mat./Wareneinkauf:&nbsp;<pf:currency
-        // value="${actionBean.bwa.matWareneinkauf.bwaWert}" />,&nbsp;Vorläufiges Ergebnis:&nbsp;<pf:currency
-        // value="${actionBean.bwa.vorlaeufigesErgebnis.bwaWert}" />
       }
     });
-    filterContainer.add(summaryBusinessAssessmentLabel);
+    businessAssessmentRow.add(summaryBusinessAssessmentLabel);
 
     final Label businessAssessmentLabel = new Label("businessAssessment", new Model<String>() {
       @Override
       public String getObject()
       {
-        final StringBuffer buf = new StringBuffer();
-        // bwa.toString()
-        return buf.toString();
+        final Bwa bwa = parentPage.bwa;
+        if (bwa == null) {
+          return "";
+        }
+        return bwa.toString();
       }
     });
     filterContainer.add(businessAssessmentLabel);

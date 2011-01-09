@@ -44,6 +44,14 @@ public class BuchungssatzFilter extends BaseSearchFilter implements Serializable
   private int fromMonth;
 
   private int toMonth;
+  
+  @Override
+  public void reset()
+  {
+    super.reset();
+    toMonth = fromMonth;
+    toYear = fromYear;
+  }
 
   /**
    * @param year

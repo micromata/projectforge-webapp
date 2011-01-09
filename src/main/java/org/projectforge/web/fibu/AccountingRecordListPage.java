@@ -26,6 +26,7 @@ package org.projectforge.web.fibu;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -39,8 +40,12 @@ import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.BuchungssatzDO;
 import org.projectforge.fibu.kost.BuchungssatzDao;
+import org.projectforge.fibu.kost.Bwa;
+import org.projectforge.fibu.kost.BwaZeile;
 import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.fibu.kost.reporting.Report;
+import org.projectforge.fibu.kost.reporting.ReportStorage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -49,20 +54,32 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.springframework.util.CollectionUtils;
 
 @ListPage(editPage = AccountingRecordEditPage.class)
 public class AccountingRecordListPage extends AbstractListPage<AccountingRecordListForm, BuchungssatzDao, BuchungssatzDO> implements
     IListPageColumnsCreator<BuchungssatzDO>
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AccountingRecordListPage.class);
+
   private static final long serialVersionUID = -34213362189153025L;
 
   @SpringBean(name = "buchungssatzDao")
   private BuchungssatzDao buchungssatzDao;
 
+  protected Bwa bwa;
+
+  private String reportId;
+
+  private Integer bwaZeileId;
+
+  private Report report;
+
   public AccountingRecordListPage(final PageParameters parameters)
   {
     super(parameters, "fibu.buchungssatz");
     // TODO: Don't show filter if called by ReportingObjectives page.
+    // Show only records of BWA-Zeile.
   }
 
   @Override
@@ -157,12 +174,9 @@ public class AccountingRecordListPage extends AbstractListPage<AccountingRecordL
         }
       }
     });
-    columns
-    .add(new CellItemListenerPropertyColumn<BuchungssatzDO>(getString("finance.accountingRecord.dc"), "sh", "sh", cellItemListener));
-    columns
-    .add(new CellItemListenerPropertyColumn<BuchungssatzDO>(getString("fibu.buchungssatz.text"), "text", "text", cellItemListener));
-    columns
-    .add(new CellItemListenerPropertyColumn<BuchungssatzDO>(getString("comment"), "comment", "comment", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<BuchungssatzDO>(getString("finance.accountingRecord.dc"), "sh", "sh", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<BuchungssatzDO>(getString("fibu.buchungssatz.text"), "text", "text", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<BuchungssatzDO>(getString("comment"), "comment", "comment", cellItemListener));
     return columns;
   }
 
@@ -189,10 +203,41 @@ public class AccountingRecordListPage extends AbstractListPage<AccountingRecordL
   public List<BuchungssatzDO> getList()
   {
     if (list == null) {
-      list = super.getList();
-      // buchungssatzDao.calculateInvoicedSum(list);
+      if (StringUtils.isNotEmpty(reportId) == true) {
+        // TODO: Support reportStorage.
+        final ReportStorage reportStorage = null;// getReportStorage();
+        if (reportStorage != null) {
+          report = reportStorage.findById(this.reportId);
+          if (report != null) {
+            if (this.bwaZeileId != null) {
+              BwaZeile zeile = report.getBwa().getZeile(bwaZeileId);
+              if (zeile != null) {
+                list = zeile.getBuchungssaetze();
+              } else {
+                log.info("BwaZeile " + bwaZeileId + " not found for report with id '" + reportId + "' in existing ReportStorage.");
+              }
+            } else {
+              list = report.getBuchungssaetze();
+            }
+          } else {
+            log.info("Report with id '" + reportId + "' not found in existing ReportStorage.");
+          }
+        } else {
+          log.info("Report with id '" + reportId + "' not found. ReportStorage does not exist.");
+        }
+      } else {
+        list = super.getList();
+      }
+      if (CollectionUtils.isEmpty(list) == true) {
+        this.bwa = null;
+      } else {
+        this.bwa = new Bwa();
+        this.bwa.setBuchungssaetze(list);
+      }
+      return list;
     }
     return list;
+
   }
 
   @Override
