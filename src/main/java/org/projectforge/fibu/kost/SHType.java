@@ -23,7 +23,36 @@
 
 package org.projectforge.fibu.kost;
 
-public enum SHType
+import org.projectforge.core.I18nEnum;
+
+/**
+ * Debit/credit (Soll/Haben)
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ *
+ */
+public enum SHType implements I18nEnum
 {
-  SOLL, HABEN;
+  SOLL("debit"), HABEN("credit");
+  private String key;
+
+  /**
+   * @return The key suffix will be used e. g. for i18n.
+   */
+  public String getKey()
+  {
+    return key;
+  }
+
+  /**
+   * @return The full i18n key including the i18n prefix "finance.accountingRecord.dc.".
+   */
+  public String getI18nKey()
+  {
+    return "finance.accountingRecord.dc." + key;
+  }
+
+  SHType(String key)
+  {
+    this.key = key;
+  }
 }
