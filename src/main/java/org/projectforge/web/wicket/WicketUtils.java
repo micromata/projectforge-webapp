@@ -698,8 +698,7 @@ public class WicketUtils
         || ContextImage.class.isAssignableFrom(component.getClass()) == true) {
       return component;
     }
-    component.add(new AttributeAppendModifier("class", " hastooltip")); // TODO: KAI humm, perhaps it's better to add that space per
-    // default?
+    component.add(new AttributeAppendModifier("class", "hastooltip"));
     return component;
   }
 
@@ -798,6 +797,18 @@ public class WicketUtils
     if (suppressStyleChange == false) {
       setStyleHasTooltip(component);
     }
+    return component;
+  }
+
+  /**
+   * Sets readonly="readonly" and "readOnly" as class.
+   * @param component
+   * @return This for chaining.
+   */
+  public static FormComponent<?> setReadonly(final FormComponent<?> component)
+  {
+    component.add(new AttributeAppendModifier("class", "readonly"));
+    component.add(new SimpleAttributeModifier("readonly", "readonly"));
     return component;
   }
 
