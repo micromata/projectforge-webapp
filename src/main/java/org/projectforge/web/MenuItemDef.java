@@ -57,6 +57,7 @@ import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.core.ConfigurationListPage;
 import org.projectforge.web.core.SearchPage;
+import org.projectforge.web.fibu.AccountingRecordListPage;
 import org.projectforge.web.fibu.AuftragListPage;
 import org.projectforge.web.fibu.BankAccountListPage;
 import org.projectforge.web.fibu.CustomerListPage;
@@ -119,7 +120,7 @@ public enum MenuItemDef
       FINANCE_GROUP, CONTROLLING_GROUP), //
   BOOK_LIST("bookList", BookListPage.class), // Visible for all.
   // *
-  BUCHUNG_SATZ_LIST("fibu.buchungssaetze", "fibu/BuchungssatzList.action", //
+  BUCHUNG_SATZ_LIST("fibu.buchungssaetze", AccountingRecordListPage.class, //
       FINANCE_GROUP, CONTROLLING_GROUP), //
   CALENDAR("calendar", CalendarPage.class), // Visible for all.
   // *
@@ -151,8 +152,8 @@ public enum MenuItemDef
   // *
   KONTO_LIST("fibu.konten", KontoListPage.class, //
       FINANCE_GROUP, CONTROLLING_GROUP), //
-  KOST_ZUWEISUNG_LIST("fibu.kostZuweisungen", "fibu/KostZuweisungList.action", //
-      FINANCE_GROUP, CONTROLLING_GROUP), //
+  // KOST_ZUWEISUNG_LIST("fibu.kostZuweisungen", "fibu/KostZuweisungList.action", //
+  //    FINANCE_GROUP, CONTROLLING_GROUP), //
   KOST1_LIST("fibu.kost1", Kost1ListPage.class, //
       Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE), //
   KOST2_LIST("fibu.kost2", Kost2ListPage.class, //
