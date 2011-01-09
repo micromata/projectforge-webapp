@@ -32,7 +32,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.core.CurrencyFormatter;
-
+import org.projectforge.web.wicket.components.PlainLabel;
 
 public class CurrencyPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
 {
@@ -56,17 +56,22 @@ public class CurrencyPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
     final BigDecimal value = (BigDecimal) BeanHelper.getProperty(rowModel.getObject(), getPropertyExpression());
     final Label label;
     if (this.suppressZeroValues == true && value != null && value.compareTo(BigDecimal.ZERO) == 0) {
-      label = new Label(componentId, "");
+      label = new PlainLabel(componentId, "");
     } else {
-      label = new Label(componentId, CurrencyFormatter.format(value));
+      label = new PlainLabel(componentId, CurrencyFormatter.format(value));
     }
     item.add(label);
     if (cellItemListener != null) {
       cellItemListener.populateItem(item, componentId, rowModel);
     }
-    item.add(new AttributeAppendModifier("style", new Model<String>("white-space: nowrap; text-align: right;")));
+    if (value != null && value.compareTo(BigDecimal.ZERO) < 0) {
+      // Negative value.
+      item.add(new AttributeAppendModifier("style", new Model<String>("white-space: nowrap; text-align: right; color: red;")));
+    } else {
+      item.add(new AttributeAppendModifier("style", new Model<String>("white-space: nowrap; text-align: right;")));
+    }
   }
-  
+
   public CurrencyPropertyColumn<T> setSuppressZeroValues(boolean supressZeroValues)
   {
     this.suppressZeroValues = supressZeroValues;
