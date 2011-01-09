@@ -31,6 +31,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.projectforge.common.ReflectionHelper;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.wicket.components.PlainLabel;
 
 /**
  * Panel for selecting list page entries for editing and selecting for callers.
@@ -54,7 +55,7 @@ public class ListSelectActionPanel extends Panel
   public ListSelectActionPanel(final String id, final IModel< ? > model, final ISelectCallerPage caller, final String selectProperty,
       final Integer objectId, final String label)
   {
-    this(id, model, caller, selectProperty, objectId, new Label(LABEL_ID, label));
+    this(id, model, caller, selectProperty, objectId, new PlainLabel(LABEL_ID, label));
   }
 
   /**
@@ -70,6 +71,7 @@ public class ListSelectActionPanel extends Panel
       final Integer objectId, final Label label)
   {
     super(id, model);
+    setRenderBodyOnly(true);
     @SuppressWarnings("unchecked")
     Link< ? > link = new Link("select") {
       public void onClick()
@@ -95,7 +97,7 @@ public class ListSelectActionPanel extends Panel
   public ListSelectActionPanel(final String id, final IModel< ? > model, final Class< ? extends WebPage> editClass, final Integer objectId,
       final WebPage returnToPage, final String label, final String... params)
   {
-    this(id, model, editClass, objectId, returnToPage, new Label(LABEL_ID, label), params);
+    this(id, model, editClass, objectId, returnToPage, new PlainLabel(LABEL_ID, label), params);
   }
 
   /**
@@ -112,6 +114,7 @@ public class ListSelectActionPanel extends Panel
       final Integer objectId, final WebPage returnToPage, final Label label, final String... params)
   {
     super(id, model);
+    setRenderBodyOnly(true);
     @SuppressWarnings("unchecked")
     Link< ? > link = new Link("select") {
       public void onClick()
