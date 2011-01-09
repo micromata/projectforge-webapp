@@ -24,6 +24,7 @@
 package org.projectforge.web.wicket;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -51,6 +52,7 @@ import org.projectforge.common.ReflectionHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.UserException;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
@@ -448,7 +450,17 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
   public List<O> getList()
   {
     if (list == null) {
-      list = (List<O>) getBaseDao().getList(form.getSearchFilter());
+      try {
+        list = (List<O>) getBaseDao().getList(form.getSearchFilter());
+      } catch (final Exception ex) {
+        if (ex instanceof UserException) {
+          final UserException userException = (UserException) ex;
+          error(getLocalizedMessage(userException.getI18nKey(), userException.getParams()));
+        } else {
+          log.error(ex.getMessage(), ex);
+        }
+        list = new ArrayList<O>();
+      }
     }
     return list;
   }
