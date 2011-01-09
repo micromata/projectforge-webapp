@@ -68,7 +68,7 @@ public class MenuPanel extends Panel
 
   private Menu menu;
 
-  private Label menuJavaScriptLabel;
+  private String menuJavaScriptLabelString;
 
   public MenuPanel(String id)
   {
@@ -87,20 +87,25 @@ public class MenuPanel extends Panel
 
     final WebMarkupContainer mainMenuLink = new WebMarkupContainer("mainMenuLink");
     add(mainMenuLink);
-    add(menuJavaScriptLabel = (Label) new Label("menuJavaScript").setEscapeModelStrings(false));
+    add(new Label("menuJavaScript", new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return menuJavaScriptLabelString;
+      }
+    }).setEscapeModelStrings(false));
 
     add(new AbstractDefaultAjaxBehavior() {
 
       @Override
       protected void onComponentTag(ComponentTag tag)
       {
-        final String javaScript = "function serialize(favoriteMenuEntries) {\n"
-            + generateCallbackScript("wicketAjaxGet('"
-                + getCallbackUrl()
-                + "&favoriteMenuEntries=' + favoriteMenuEntries")
-            + "return false;\n"
-            + "};\n";
-        menuJavaScriptLabel.setDefaultModel(new Model<String>(javaScript));
+        if (menuJavaScriptLabelString == null) {
+          menuJavaScriptLabelString = "function serialize(favoriteMenuEntries) {\n"
+              + generateCallbackScript("wicketAjaxGet('" + getCallbackUrl() + "&favoriteMenuEntries=' + favoriteMenuEntries")
+              + "return false;\n"
+              + "};\n";
+        }
         super.onComponentTag(tag);
       }
 
