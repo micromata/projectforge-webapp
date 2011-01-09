@@ -57,8 +57,8 @@ public class AttributeAppendModifier extends AbstractBehavior implements ICluste
   private final IModel< ? > replaceModel;
 
   /**
-   * Create a new attribute modifier with the given attribute name and value to append. If the attribute does already exist then the
-   * value will be appended.
+   * Create a new attribute modifier with the given attribute name and value to append. If the attribute does already exist then the value
+   * will be appended.
    * 
    * @param attribute The attribute name to replace the value for
    * @param value The value to append.
@@ -155,9 +155,9 @@ public class AttributeAppendModifier extends AbstractBehavior implements ICluste
         final String newValue = toStringOrNull(replacementValue);
         if (newValue != null) {
           if (prepend == true) {
-            attributes.put(attribute, newValue + currentValue);
+            attributes.put(attribute, newValue + " " + currentValue);
           } else {
-            attributes.put(attribute, currentValue + newValue);
+            attributes.put(attribute, currentValue + " " + newValue);
           }
         }
       } else {
