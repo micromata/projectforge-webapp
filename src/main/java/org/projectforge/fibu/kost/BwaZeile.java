@@ -23,6 +23,7 @@
 
 package org.projectforge.fibu.kost;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,8 +34,10 @@ import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.Priority;
 
 
-public class BwaZeile
+public class BwaZeile implements Serializable
 {
+  private static final long serialVersionUID = 6135255440593281254L;
+
   private Priority priority;
 
   private BwaZeileId bwaZeileId;

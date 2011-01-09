@@ -23,6 +23,7 @@
 
 package org.projectforge.fibu.kost;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
@@ -42,8 +43,10 @@ import org.projectforge.fibu.kost.reporting.Report;
 import org.projectforge.user.PFUserContext;
 
 
-public class Bwa
+public class Bwa implements Serializable
 {
+  private static final long serialVersionUID = 2627505616094143518L;
+
   private static final Logger log = Logger.getLogger(Bwa.class);
 
   private String title;
