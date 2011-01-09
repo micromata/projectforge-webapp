@@ -52,8 +52,9 @@
 						// gleichzeitig wird der blaue rand um das persönliche menü geklebt
 						$("ul#personal").addClass("dotted");
 						//@kai: das ist neu und macht die kreuze
+						$(".remover").remove();
 						$("ul#personal li a").prepend( '<span class="remover"> 2 </span>');
-						$("#remover")
+					
 					// ansonsten..
 					} else {
 						// sortable deaktivieren

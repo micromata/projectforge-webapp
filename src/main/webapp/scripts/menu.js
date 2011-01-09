@@ -11,10 +11,26 @@ $(function() {
 		change: function(event, ui) {
 			$(".remover").remove();
 			$("ul#personal li a").prepend( '<span class="remover"> 2 </span>');
-			// @kai: call a function here to serialize and savePersonal();
+			// @kai: call a function here to serialize and save the personal bar:
+			// z.B. savePersonal();
 		}
 	}).disableSelection();
 	
+	$( "#personal" ).bind( "sortreceive", function(event, ui) {
+		console.log("--");
+		$("ul#personal li").each(function(index){
+			console.log($(this).attr("id"));
+			if ( ui.item.attr("id") == $(this).attr("id")){
+				console.log( ui.item.attr("id") + "is a duplicate");
+				ui.item.remove();
+				
+			}	
+			
+			
+		});
+	
+		
+		});
 	
 
 	// @kai: Das ist neu, beim Laden muss man natürlich das Sortable disablen...
