@@ -36,6 +36,8 @@ import org.projectforge.web.wicket.AbstractBasePage;
  */
 public class Menu implements Serializable
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Menu.class);
+
   private static final long serialVersionUID = -4954464926815538198L;
 
   private Collection<MenuEntry> menuEntries = new ArrayList<MenuEntry>();
@@ -73,11 +75,15 @@ public class Menu implements Serializable
     final StringTokenizer tokenizer = new StringTokenizer(favoritesString, ",");
     while (tokenizer.hasMoreTokens() == true) {
       final String token = tokenizer.nextToken();
-      final MenuItemDef menuItemDef = MenuItemDef.valueOf(token);
-      if (menuItemDef == null) {
-        continue;
+      try {
+        final MenuItemDef menuItemDef = MenuItemDef.valueOf(token);
+        if (menuItemDef == null) {
+          continue;
+        }
+        addFavoriteMenuEntry(menuItemDef);
+      } catch (final Exception ex) {
+        log.info("Menu '" + token + "' not found: " + ex.getMessage(), ex);
       }
-      addFavoriteMenuEntry(menuItemDef);
     }
   }
 
