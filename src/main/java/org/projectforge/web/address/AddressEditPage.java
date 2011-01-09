@@ -30,12 +30,13 @@ import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.address.PersonalAddressDao;
+import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
 @EditPage(defaultReturnPage = AddressListPage.class)
-public class AddressEditPage extends AbstractEditPage<AddressDO, AddressEditForm, AddressDao>
+public class AddressEditPage extends AbstractAutoLayoutEditPage<AddressDO, AddressEditForm, AddressDao>
 {
   private static final long serialVersionUID = 7091721062661400435L;
 
