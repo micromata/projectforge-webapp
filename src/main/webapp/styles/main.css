@@ -313,10 +313,21 @@ body * {
 div#main-menu{
 	clear:both;
 }
-#logo {
-	
-	display:none;
+
+.logobg{
+	background:#fff;
+	border-bottom: 1px solid #D9DFE1;
+	padding:1em 2em;
+	text-align: right;
+	/*@kai: you can set a corporate color, if needed...*/
 }
+
+
+#logo {
+	border:none;	
+}
+
+
 ul#personal,
 ul#trash {
 	min-height:2em;
@@ -507,7 +518,8 @@ ul#normal li.active ul {
 	display:block;
 	float:left;
 	margin:0 1em 0 0;
-	padding:1em;
+	padding:0.5em 1em;
+	color:#5C6970;
 }
 
 
@@ -859,6 +871,13 @@ form.newform .datepanel a:hover {
 -moz-opacity: 1;
 filter:alpha(opacity=1);
 }
+table.oldform{
+width:100%;
+}
+.oldform tr td, .oldform tr th {
+	border-bottom: 1px solid #D9DFE1;
+	padding: 0.5em;
+}
 
 form.newform p,
 .newform input[type="text"],
@@ -1092,7 +1111,7 @@ div.visible a.button,
 	color: #fff;
 	line-height: 1.7em;
 	display: block;
-	float: right; 
+	float: left; 
 	margin: 0 0 0 1em;
 }
 
