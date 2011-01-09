@@ -26,6 +26,7 @@ package org.projectforge.web.wicket.components;
 import java.io.Serializable;
 
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 
 public class RequiredMinMaxNumberField<Z extends Comparable<Z> & Serializable> extends MinMaxNumberField<Z>
 {
@@ -36,9 +37,23 @@ public class RequiredMinMaxNumberField<Z extends Comparable<Z> & Serializable> e
    * @param model
    * @see org.apache.wicket.Component#Component(String, IModel)
    */
+  @Deprecated
   public RequiredMinMaxNumberField(final String id, final IModel<Z> model, Z minimum, Z maximum)
   {
     super(id, model, minimum, maximum);
+    setRequired(true);
+  }
+
+  /**
+   * @param id
+   * @param label Used for validation messages.
+   * @param model
+   * @see org.apache.wicket.Component#Component(String, IModel)
+   */
+  public RequiredMinMaxNumberField(final String id, final String label, final IModel<Z> model, Z minimum, Z maximum)
+  {
+    super(id, model, minimum, maximum);
+    setLabel(new Model<String>(label));
     setRequired(true);
   }
 }
