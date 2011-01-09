@@ -317,7 +317,7 @@ public class DataObjectLPanel extends Panel
     } else {
       field = new DropDownChoiceLPanel(groupPanel.newChildId(), valueLength, dropDownChoice);
       groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
-      ((DropDownChoiceLPanel) field).getDropDownChoice().setLabel(new Model<String>(){
+      ((DropDownChoiceLPanel) field).getDropDownChoice().setLabel(new Model<String>() {
         @Override
         public String getObject()
         {
@@ -358,7 +358,7 @@ public class DataObjectLPanel extends Panel
     ensureGroupPanel();
     final IField field = new DateFieldLPanel(groupPanel.newChildId(), valueLength, datePanel);
     groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
-    ((DateFieldLPanel) field).getDatePanel().setLabel(new Model<String>(){
+    ((DateFieldLPanel) field).getDatePanel().setLabel(new Model<String>() {
       @Override
       public String getObject()
       {
@@ -376,7 +376,7 @@ public class DataObjectLPanel extends Panel
     ensureGroupPanel();
     final IField field = new SelectLPanel(groupPanel.newChildId(), valueLength, selectPanel);
     groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
-    ((SelectLPanel)field).getSelectPanel().setLabel(new Model<String>(){
+    ((SelectLPanel) field).getSelectPanel().setLabel(new Model<String>() {
       @Override
       public String getObject()
       {
@@ -394,13 +394,26 @@ public class DataObjectLPanel extends Panel
     ensureGroupPanel();
     final IField field = new TextFieldLPanel(groupPanel.newChildId(), valueLength, textField);
     groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
-    ((TextFieldLPanel) field).getTextField().setLabel(new Model<String>(){
+    ((TextFieldLPanel) field).getTextField().setLabel(new Model<String>() {
       @Override
       public String getObject()
       {
         return label;
       }
     });
+    groupPanel.add(field);
+    return field;
+  }
+
+  /**
+   * @param textField
+   * @param valueLength
+   * @return
+   */
+  public IField addTextField(final TextField< ? > textField, final LayoutLength valueLength)
+  {
+    ensureGroupPanel();
+    final IField field = new TextFieldLPanel(groupPanel.newChildId(), valueLength, textField);
     groupPanel.add(field);
     return field;
   }

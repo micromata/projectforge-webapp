@@ -24,9 +24,11 @@
 package org.projectforge.web.wicket.layout;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.behavior.AbstractBehavior;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.projectforge.common.StringHelper;
+import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -151,7 +153,7 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper, 
       return;
     }
     rendered = true;
-    final SimpleAttributeModifier classAttributeModifier = getClassAttributeModifier();
+    final AbstractBehavior classAttributeModifier = getClassAttributeModifier();
     if (classAttributeModifier != null && getClassModifierComponent() != null) {
       getClassModifierComponent().add(classAttributeModifier);
     }
@@ -191,7 +193,7 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper, 
     return getClassModifierComponent();
   }
 
-  private SimpleAttributeModifier getClassAttributeModifier()
+  private AbstractBehavior getClassAttributeModifier()
   {
     final StringBuffer buf = new StringBuffer();
     boolean first = true;
@@ -212,7 +214,7 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper, 
       first = StringHelper.append(buf, first, "strong", " ");
     }
     if (first == false) {
-      return new SimpleAttributeModifier("class", buf.toString());
+      return new AttributeAppendModifier("class", buf.toString());
     } else {
       return null;
     }
