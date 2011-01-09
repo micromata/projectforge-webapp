@@ -1,3 +1,7 @@
+.newform input.readonly {
+	background-color: #d0d0d0;
+}
+
 .hastooltip {
 	font-style: italic;
 }
