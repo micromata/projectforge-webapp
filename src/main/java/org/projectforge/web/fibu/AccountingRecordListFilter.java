@@ -28,8 +28,8 @@ import org.projectforge.fibu.kost.BuchungssatzFilter;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 
-@XStreamAlias("BuchungssatzFilter")
-public class BuchungssatzListFilter extends BuchungssatzFilter
+@XStreamAlias("AccountingRecordFilter")
+public class AccountingRecordListFilter extends BuchungssatzFilter
 {
   private static final long serialVersionUID = 3146225447707325318L;
 
