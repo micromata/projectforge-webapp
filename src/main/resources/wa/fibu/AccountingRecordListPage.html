@@ -1,0 +1,33 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<table>
+  <wicket:extend>
+    <tr>
+      <th><wicket:message key="label.options" /></th>
+      <td colspan="3"><select wicket:id="fromYear">
+        <option>[2001-2010]</option>
+      </select> <select wicket:id="fromMonth">
+        <option>[01-12]</option>
+      </select> <wicket:message key="until" />&nbsp; <select wicket:id="toYear">
+        <option>[2001-2010]</option>
+      </select> <select wicket:id="toMonth">
+        <option>[01-12]</option>
+      </select> <span wicket:id="pageSize">[Page size setting]</span></td>
+    </tr>
+    <tr>
+      <th><a onclick="javascript:toggleBwa()" href="#"><wicket:message key="fibu.businessAssessment" /> <img src="images/zoom.png" border="0" /></a></th>
+      <td wicket:id="summaryBusinessAssessment"></td>
+    </tr>
+    <tr>
+      <td colspan="2">
+      <div id="bwa" style="display: none;"><pre wicket:id="businessAssessment">[table of business assessment]</pre></div>
+      </td>
+    </tr>
+  </wicket:extend>
+</table>
+</body>
+</html>
