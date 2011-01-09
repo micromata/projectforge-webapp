@@ -2,6 +2,10 @@ function showConfirmDialog(text) {
 	return window.confirm(text);
 }
 
+function toggle(component) {
+    $(component).toggle('slow');
+  }
+
 function rowClick(row) {
 	if (suppressRowClick != 'true') {
 		window.location.href = $(row).find("a:first").attr("href");
