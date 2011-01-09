@@ -68,6 +68,8 @@ public class MenuPanel extends Panel
 
   private Menu menu;
 
+  private Label menuJavaScriptLabel;
+
   public MenuPanel(String id)
   {
     super(id);
@@ -84,38 +86,22 @@ public class MenuPanel extends Panel
     getMenu();
 
     final WebMarkupContainer mainMenuLink = new WebMarkupContainer("mainMenuLink");
-    mainMenuLink.add(new AbstractDefaultAjaxBehavior() {
+    add(mainMenuLink);
+    add(menuJavaScriptLabel = (Label) new Label("menuJavaScript").setEscapeModelStrings(false));
+
+    add(new AbstractDefaultAjaxBehavior() {
+
       @Override
-      protected void onComponentTag(final ComponentTag tag)
+      protected void onComponentTag(ComponentTag tag)
       {
-        super.onComponentTag(tag);
-        final String javascript = // One click opens the main menu and and the next click closes the main menu
-        "$('#normal .main').toggleClass('active');"
-        // If the main menu is open after toggling...
-            + "if($('.main').hasClass('active')){"
-            // enable sortable...
-            + "$('#personal, #nav ul').sortable('enable');"
-            // and add blue border around the personal menu...
-            + "$('ul#personal').addClass('dotted');"
-            // Add the crosses for removing menu entries:
-            + "$('ul#personal li a').prepend('<span class=\"remover\"> 2 </span>');"
-            + "$('#remover')"
-            // main menu is now closed...
-            + "} else {"
-            // disable sortable....
-            + "$('#personal, #nav ul').sortable('disable');"
-            // Remove the removers (crosses for removing menu entries):
-            + "$('.remover').remove();"
-            // remove the blue border around the personal menu
-            + "  $('ul#personal').removeClass('dotted');"
-            // Call back serialized menu...
-            + "{"
+        final String javaScript = "function serialize(favoriteMenuEntries) {\n"
             + generateCallbackScript("wicketAjaxGet('"
                 + getCallbackUrl()
-                + "&favoriteMenuEntries=' + $('#personal, #nav ul').sortable('toArray')")
-            + "return false;}"
-            + "}";
-        tag.put("onclick", javascript);
+                + "&favoriteMenuEntries=' + favoriteMenuEntries")
+            + "return false;\n"
+            + "};\n";
+        menuJavaScriptLabel.setDefaultModel(new Model<String>(javaScript));
+        super.onComponentTag(tag);
       }
 
       @Override
@@ -124,6 +110,9 @@ public class MenuPanel extends Panel
         // Callback with favorite menu entries:
         final RequestCycle requestCycle = RequestCycle.get();
         final String favoritesMenu = requestCycle.getRequest().getParameter("favoriteMenuEntries");
+        if (log.isDebugEnabled() == true) {
+          log.debug(favoritesMenu);
+        }
         if (getPage() instanceof AbstractSecuredPage) {
           final AbstractSecuredPage securedPage = ((AbstractSecuredPage) getPage());
           getMenu().setFavoriteMenuEntries(favoritesMenu);
@@ -132,8 +121,6 @@ public class MenuPanel extends Panel
         }
       }
     });
-    add(mainMenuLink);
-
     // Favorite menu:
     final RepeatingView favoriteMenuEntryRepeater = new RepeatingView("favoriteMenuEntryRepeater");
     add(favoriteMenuEntryRepeater);
