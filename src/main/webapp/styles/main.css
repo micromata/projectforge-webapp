@@ -197,6 +197,11 @@ body * {
 		"Lucida", Verdana, "Bitstream Vera Sans", sans-serif;
 }
 
+body pre {
+	font-family: monospace;
+	font-size: 120%;
+}	
+
 #container {
 	width: 100%;
 	height: 100%;
