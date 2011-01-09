@@ -1,3 +1,7 @@
+.hastooltip {
+	font-style: italic;
+}
+
 .taskStatus_opened {
 	color: #518732;
 }
