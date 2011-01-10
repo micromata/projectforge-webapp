@@ -59,6 +59,20 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
     // settings);
   }
 
+  /**
+   * @param id
+   * @param label Label used for validation, calls setLabel(label).
+   * @param model
+   * @param type
+   * @param settings
+   */
+  public PFAutoCompleteTextField(final String id, final String label, final IModel<T> model)
+  {
+    this(id, model, PFAutoCompleteRenderer.INSTANCE, new PFAutoCompleteSettings());// , type, StringAutoCompleteRenderer.INSTANCE,
+    // settings);
+    setLabel(new Model<String>(label));
+  }
+
   public PFAutoCompleteTextField(final String id, final IModel<T> model, final IAutoCompleteRenderer<String> renderer,
       final PFAutoCompleteSettings settings)
   {
