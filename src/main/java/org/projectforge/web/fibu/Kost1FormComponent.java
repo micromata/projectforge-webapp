@@ -29,9 +29,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.apache.wicket.validation.IValidatable;
@@ -41,7 +39,6 @@ import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost1Dao;
 import org.projectforge.fibu.kost.KostFilter;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
-
 
 public class Kost1FormComponent extends PFAutoCompleteTextField<Kost1DO>
 {
@@ -99,17 +96,16 @@ public class Kost1FormComponent extends PFAutoCompleteTextField<Kost1DO>
       });
     }
     this.withLabelValue(true).withMatchContains(true).withMinChars(2).withWidth(200);
-    add(new AttributeModifier("title", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        final Kost1DO kost1 = getModelObject();
-        if (kost1 == null) {
-          return "";
-        }
-        return KostFormatter.format(kost1) + " - " + KostFormatter.formatToolTip(kost1);
-      }
-    }));
+    enableTooltips();
+  }
+
+  protected String getTooltip()
+  {
+    final Kost1DO kost1 = getModelObject();
+    if (kost1 == null) {
+      return "";
+    }
+    return KostFormatter.format(kost1) + " - " + KostFormatter.formatToolTip(kost1);
   }
 
   @Override

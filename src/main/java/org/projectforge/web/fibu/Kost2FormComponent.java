@@ -29,9 +29,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.apache.wicket.validation.IValidatable;
@@ -99,17 +97,16 @@ public class Kost2FormComponent extends PFAutoCompleteTextField<Kost2DO>
       });
     }
     this.withLabelValue(true).withMatchContains(true).withMinChars(2).withWidth(500);
-    add(new AttributeModifier("title", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        final Kost2DO kost2 = getModelObject();
-        if (kost2 == null) {
-          return "";
-        }
-        return KostFormatter.format(kost2) + " - " + KostFormatter.formatToolTip(kost2);
-      }
-    }));
+    enableTooltips();
+  }
+
+  protected String getTooltip()
+  {
+    final Kost2DO kost2 = getModelObject();
+    if (kost2 == null) {
+      return "";
+    }
+    return KostFormatter.format(kost2) + " - " + KostFormatter.formatToolTip(kost2);
   }
 
   @Override
