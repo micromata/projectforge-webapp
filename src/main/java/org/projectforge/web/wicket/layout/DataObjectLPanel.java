@@ -419,6 +419,19 @@ public class DataObjectLPanel extends Panel
   }
 
   /**
+   * @param label Only used for setLabel (needed by validation messages).
+   * @param textField
+   * @param valueLength
+   * @return
+   */
+  public IField addTextField(final String label, final TextField< ? > textField, final LayoutLength valueLength)
+  {
+    final IField field = addTextField(textField, valueLength);
+    textField.setLabel(new Model<String>(label));
+    return field;
+  }
+
+  /**
    * property must be of type boolean.
    * @param data
    * @param property
