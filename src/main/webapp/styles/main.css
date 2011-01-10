@@ -198,8 +198,7 @@ body * {
 }
 
 body pre {
-	font-family: monospace;
-	font-size: 120%;
+	font-family: Monaco, 'Lucida Console', 'Andale Mono', 'Courier New', Courier, monospace;
 }	
 
 #container {
