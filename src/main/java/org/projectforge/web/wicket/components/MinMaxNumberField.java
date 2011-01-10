@@ -29,11 +29,14 @@ import org.apache.commons.lang.ClassUtils;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.util.convert.IConverter;
 import org.apache.wicket.validation.validator.RangeValidator;
 
 public class MinMaxNumberField<Z extends Comparable<Z> & Serializable> extends TextField<Z>
 {
   private static final long serialVersionUID = 7967450478496603051L;
+
+  private IConverter converter;
 
   /**
    * @param id
@@ -44,7 +47,7 @@ public class MinMaxNumberField<Z extends Comparable<Z> & Serializable> extends T
   {
     super(id, model);
     add(new RangeValidator<Z>(minimum, maximum));
-    if (ClassUtils.isAssignable(minimum.getClass(),  Integer.class) == true) {
+    if (ClassUtils.isAssignable(minimum.getClass(), Integer.class) == true) {
       setMaxLength(Math.max(String.valueOf(minimum).length(), String.valueOf(maximum).length()));
     }
   }
@@ -56,5 +59,26 @@ public class MinMaxNumberField<Z extends Comparable<Z> & Serializable> extends T
   public void setMaxLength(int maxLength)
   {
     add(new SimpleAttributeModifier("maxlength", String.valueOf(maxLength)));
+  }
+
+  @Override
+  public IConverter getConverter(Class< ? > type)
+  {
+    if (converter != null) {
+      return converter;
+    } else {
+      return super.getConverter(type);
+    }
+  }
+
+  /**
+   * Setting a converter is more convenient instead of overriding method getConverter(Class).
+   * @param converter
+   * @return This for chaining.
+   */
+  public MinMaxNumberField<Z> setConverter(final IConverter converter)
+  {
+    this.converter = converter;
+    return this;
   }
 }

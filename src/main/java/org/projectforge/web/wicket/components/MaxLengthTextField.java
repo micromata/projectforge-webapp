@@ -32,6 +32,7 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.util.convert.IConverter;
 import org.apache.wicket.validation.validator.StringValidator.MaximumLengthValidator;
 import org.projectforge.database.HibernateUtils;
 
@@ -40,6 +41,8 @@ public class MaxLengthTextField extends TextField<String>
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MaxLengthTextField.class);
 
   private static final long serialVersionUID = -6577192527741433068L;
+
+  private IConverter converter;
 
   /**
    * Use constructor with parent and/or label params instead.
@@ -139,5 +142,26 @@ public class MaxLengthTextField extends TextField<String>
       add(new MaximumLengthValidator(maxLength));
       add(new SimpleAttributeModifier("maxlength", String.valueOf(maxLength)));
     }
+  }
+
+  @Override
+  public IConverter getConverter(Class< ? > type)
+  {
+    if (converter != null) {
+      return converter;
+    } else {
+      return super.getConverter(type);
+    }
+  }
+
+  /**
+   * Setting a converter is more convenient instead of overriding method getConverter(Class).
+   * @param converter
+   * @return This for chaining.
+   */
+  public MaxLengthTextField setConverter(final IConverter converter)
+  {
+    this.converter = converter;
+    return this;
   }
 }
