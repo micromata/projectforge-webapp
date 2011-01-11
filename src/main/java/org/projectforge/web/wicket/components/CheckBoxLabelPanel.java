@@ -41,18 +41,12 @@ public class CheckBoxLabelPanel extends Panel
 
   final CheckBox checkBox;
 
-  @SuppressWarnings("serial")
-  public CheckBoxLabelPanel(final String id, final IModel<Boolean> model, final String i18nKey)
+  public CheckBoxLabelPanel(final String id, final IModel<Boolean> model, final String label)
   {
     super(id);
     checkBox = new CheckBox("checkBox", model);
     add(checkBox.setOutputMarkupId(true));
-    final Model<String> labelModel = new Model<String>() {
-      public String getObject()
-      {
-        return getString(i18nKey);
-      };
-    };
+    final Model<String> labelModel = new Model<String>(label);
     checkBox.setLabel(labelModel);
     // I18n key must be implemented as Model not as String because in constructor (before adding this component to parent) a warning will be
     // logged for using getString(String).

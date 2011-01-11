@@ -67,7 +67,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
-  
+
   @SpringBean(name = "hrPlanningEntryDao")
   private HRPlanningEntryDao hrPlanningEntryDao;
 
@@ -95,20 +95,20 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     filterContainer.add(stopDate);
     final WebMarkupContainer projektRow = new WebMarkupContainer("projektRow");
     filterContainer.add(projektRow);
-      if (projektDao.hasSelectAccess(false) == true) {
-        final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel("projekt", new Model<ProjektDO>() {
-          @Override
-          public ProjektDO getObject()
-          {
-            return projektDao.getById(filter.getProjektId());
-          }
-        }, parentPage, "projektId");
-        projektRow.add(projektSelectPanel);
-        projektSelectPanel.init();
-      } else {
-        projektRow.add(createInvisibleDummyComponent("projekt"));
-      }
-      if (hrPlanningEntryDao.hasSelectAccess(false) == true) {
+    if (projektDao.hasSelectAccess(false) == true) {
+      final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel("projekt", new Model<ProjektDO>() {
+        @Override
+        public ProjektDO getObject()
+        {
+          return projektDao.getById(filter.getProjektId());
+        }
+      }, parentPage, "projektId");
+      projektRow.add(projektSelectPanel);
+      projektSelectPanel.init();
+    } else {
+      projektRow.add(createInvisibleDummyComponent("projekt"));
+    }
+    if (hrPlanningEntryDao.hasSelectAccess(false) == true) {
       final UserSelectPanel userSelectPanel = new UserSelectPanel("user", new Model<PFUserDO>() {
         @Override
         public PFUserDO getObject()
@@ -134,13 +134,13 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
       filterContainer.add(new Label("user", getUser().getFullname()));
     }
     filterContainer.add(new CheckBoxLabelPanel("groupEntriesCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "groupEntries"),
-        "hr.planning.filter.groupEntries").setSubmitOnChange());
+        getString("hr.planning.filter.groupEntries")).setSubmitOnChange());
     filterContainer.add(new CheckBoxLabelPanel("onlyMyProjectsCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "onlyMyProjects"),
-        "hr.planning.filter.onlyMyProjects").setSubmitOnChange().setVisible(hasFullAccess));
+        getString("hr.planning.filter.onlyMyProjects")).setSubmitOnChange().setVisible(hasFullAccess));
     filterContainer.add(new CheckBoxLabelPanel("longFormatCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "longFormat"),
-        "longFormat").setSubmitOnChange());
-    filterContainer.add(new CheckBoxLabelPanel("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted"), "onlyDeleted")
-        .setSubmitOnChange().setVisible(hasFullAccess));
+        getString("longFormat")).setSubmitOnChange());
+    filterContainer.add(new CheckBoxLabelPanel("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
+        getString("onlyDeleted")).setSubmitOnChange().setVisible(hasFullAccess));
     {
       final SubmitLink clearPeriodButton = new SubmitLink("clearPeriod") {
         public void onSubmit()
