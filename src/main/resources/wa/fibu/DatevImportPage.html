@@ -13,14 +13,17 @@
   <table class="oldform">
     <tr>
       <th><label for="uploadCell"><wicket:message key="fibu.datev.upload" /></label></th>
-      <td id="uploadCell"><input wicket:id="fileInput" id="upload" type="file" /> <span
-        wicket:id="upload">[upload]</span></td>
+      <td id="uploadCell"><input wicket:id="fileInput" id="upload" type="file" /></td>
     </tr>
     <tr>
       <th>&nbsp;</th>
       <td><wicket:container wicket:id="filterType">
         <wicket:container wicket:id="repeater">[radio buttons: all, modified and faulty]</wicket:container>
       </wicket:container></td>
+    </tr>
+    <tr>
+      <td colspan="2" class="buttons" style="direction: ltr;"><span wicket:id="importAccountList">[import account list]</span><span
+        wicket:id="importAccountingRecords">[accounting records]</span><span wicket:id="clearStorage">[clear storage]</span></td>
     </tr>
   </table>
   </fieldset>

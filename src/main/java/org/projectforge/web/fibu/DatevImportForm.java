@@ -31,6 +31,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.RadioButtonLabelPanel;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
@@ -69,14 +70,37 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
         getString("filter.faulty")).setSubmitOnChange());
     filterType.add(radioButtonRepeater);
 
-    final Button uploadButton = new Button("button", new Model<String>(getString("upload"))) {
+    final Button importAccountListButton = new Button("button", new Model<String>(getString("finance.datev.importAccountList"))) {
       @Override
       public final void onSubmit()
       {
-        parentPage.upload();
+        parentPage.importAccountList();
       }
     };
-    add(new SingleButtonPanel("upload", uploadButton));
+    add(new SingleButtonPanel("importAccountList", importAccountListButton));
+    final Button importAccountingRecordsButton = new Button("button", new Model<String>(getString("finance.datev.importAccountingRecords"))) {
+      @Override
+      public final void onSubmit()
+      {
+        parentPage.importAccountRecords();
+      }
+    };
+    add(new SingleButtonPanel("importAccountingRecords", importAccountingRecordsButton));
+    final Button clearStorageButton = new Button("button", new Model<String>(getString("finance.datev.clearStorage"))) {
+      @Override
+      public final void onSubmit()
+      {
+        parentPage.clear();
+      }
+    };
+    clearStorageButton.add(WebConstants.BUTTON_CLASS_RESET);
+    add(new SingleButtonPanel("clearStorage", clearStorageButton) {
+      @Override
+      public boolean isVisible()
+      {
+        return parentPage.storage != null;
+      }
+    });
 
     // final UserSelectPanel userSelectPanel = new UserSelectPanel("selectUser", new PropertyModel<PFUserDO>(filter, "user"), parentPage,
     // "user");
