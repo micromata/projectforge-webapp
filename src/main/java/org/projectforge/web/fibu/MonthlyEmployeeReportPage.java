@@ -62,7 +62,6 @@ import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.EditPage;
 import org.projectforge.web.wicket.WicketUtils;
 
-@EditPage(defaultReturnPage = EmployeeSalaryListPage.class)
 public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements ISelectCallerPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MonthlyEmployeeReportPage.class);
