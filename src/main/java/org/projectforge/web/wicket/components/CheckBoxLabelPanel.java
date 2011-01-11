@@ -46,15 +46,17 @@ public class CheckBoxLabelPanel extends Panel
   {
     super(id);
     checkBox = new CheckBox("checkBox", model);
-    add(checkBox);
-    // I18n key must be implemented as Model not as String because in constructor (before adding this component to parent) a warning will be
-    // logged for using getString(String).
-    add(new Label("label", new Model<String>() {
+    add(checkBox.setOutputMarkupId(true));
+    final Model<String> labelModel = new Model<String>() {
       public String getObject()
       {
         return getString(i18nKey);
       };
-    }));
+    };
+    checkBox.setLabel(labelModel);
+    // I18n key must be implemented as Model not as String because in constructor (before adding this component to parent) a warning will be
+    // logged for using getString(String).
+    add(new Label("label", labelModel).add(new SimpleAttributeModifier("for", checkBox.getMarkupId())));
     setRenderBodyOnly(true);
   }
 
