@@ -61,6 +61,7 @@ import org.projectforge.web.fibu.AccountingRecordListPage;
 import org.projectforge.web.fibu.AuftragListPage;
 import org.projectforge.web.fibu.BankAccountListPage;
 import org.projectforge.web.fibu.CustomerListPage;
+import org.projectforge.web.fibu.DatevImportPage;
 import org.projectforge.web.fibu.EingangsrechnungListPage;
 import org.projectforge.web.fibu.EmployeeListPage;
 import org.projectforge.web.fibu.EmployeeSalaryListPage;
@@ -130,7 +131,7 @@ public enum MenuItemDef
       ADMIN_GROUP), //
   CONTRACTS("contracts", ContractListPage.class, //
       ContractDao.USER_RIGHT_ID, READONLY_READWRITE), //
-  DATEV_IMPORT("fibu.datevImport", "fibu/datevImport.action", //
+  DATEV_IMPORT("fibu.datevImport", DatevImportPage.class, //
       DatevImportDao.USER_RIGHT_ID, UserRightValue.TRUE), //
   EINGANGS_RECHNUNG_LIST("fibu.eingangsrechnungen", EingangsrechnungListPage.class, //
       EingangsrechnungDao.USER_RIGHT_ID, READONLY_READWRITE), //
@@ -152,8 +153,6 @@ public enum MenuItemDef
   // *
   KONTO_LIST("fibu.konten", KontoListPage.class, //
       FINANCE_GROUP, CONTROLLING_GROUP), //
-  // KOST_ZUWEISUNG_LIST("fibu.kostZuweisungen", "fibu/KostZuweisungList.action", //
-  //    FINANCE_GROUP, CONTROLLING_GROUP), //
   KOST1_LIST("fibu.kost1", Kost1ListPage.class, //
       Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE), //
   KOST2_LIST("fibu.kost2", Kost2ListPage.class, //
