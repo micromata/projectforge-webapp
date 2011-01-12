@@ -40,7 +40,6 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.common.NumberHelper;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
@@ -86,6 +85,20 @@ public class MenuPanel extends Panel
     getMenu();
 
     final WebMarkupContainer mainMenuLink = new WebMarkupContainer("mainMenuLink");
+    final Label mainMenuSuffixLabel = new MenuSuffixLabel(new Model<Integer>() {
+      public Integer getObject()
+      {
+        int counter = 0;
+        for (MenuEntry menuEntry : menu.getMenuEntries()) {
+          if (menuEntry.getNewCounterModel() != null) {
+            counter += menuEntry.getNewCounterModel().getObject();
+          }
+        }
+        return counter;
+      };
+    });
+    mainMenuSuffixLabel.setVisible(false);
+    mainMenuLink.add(mainMenuSuffixLabel);
     add(mainMenuLink);
     add(new Label("menuJavaScript", new Model<String>() {
       @Override
@@ -135,7 +148,7 @@ public class MenuPanel extends Panel
       favoriteMenuEntryRepeater.add(favoriteMenuEntryContainer);
       favoriteMenuEntryContainer.add(new SimpleAttributeModifier("id", "m-menu"));
       favoriteMenuEntryContainer.add(new BookmarkablePageLink<String>("link", MenuMobilePage.class).add(
-          new Label("label", getString("menu.mobileMenu")).setRenderBodyOnly(true)).add(getSuffixLabel(null)));
+          new Label("label", getString("menu.mobileMenu")).setRenderBodyOnly(true)).add(getSuffixLabel((MenuEntry) null)));
       isFirst = false;
     }
     for (final MenuEntry favoriteMenuEntry : menu.getFavoriteMenuEntries()) {
@@ -224,30 +237,11 @@ public class MenuPanel extends Panel
     return link;
   }
 
-  @SuppressWarnings("serial")
   private Label getSuffixLabel(final MenuEntry menuEntry)
   {
     final Label suffixLabel;
     if (menuEntry != null && menuEntry.getNewCounterModel() != null) {
-      suffixLabel = new Label("suffix", new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          final Integer counter = menuEntry.getNewCounterModel().getObject();
-          if (NumberHelper.greaterZero(counter) == true) {
-            return String.valueOf(counter);
-          } else {
-            return "";
-          }
-        }
-      }) {
-        @Override
-        public boolean isVisible()
-        {
-          final Integer counter = menuEntry.getNewCounterModel().getObject();
-          return NumberHelper.greaterZero(counter) == true;
-        }
-      };
+      suffixLabel = new MenuSuffixLabel(menuEntry.getNewCounterModel());
     } else {
       suffixLabel = new Label("suffix");
       suffixLabel.setVisible(false);

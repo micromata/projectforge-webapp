@@ -23,14 +23,22 @@
 
 package org.projectforge.common;
 
+import org.projectforge.core.I18nEnum;
+
 
 /**
  */
-public enum ImportStatus
+public enum ImportStatus implements I18nEnum
 {
   NOT_RECONCILED("notReconciled"), RECONCILED("reconciled"), HAS_ERRORS("hasErrors"), IMPORTED("imported"), NOTHING_TODO("nothingToDo");
 
   private String key;
+
+  @Override
+  public String getI18nKey()
+  {
+    return "common.import.status.." + key;
+  }
 
   /**
    * The key will be used e. g. for i18n.
