@@ -231,3 +231,10 @@ ul.dropdown-menu ul li a {
 ul.dropdown-menu ul li a:hover {
 	background: #FFFFFF;
 }
+
+div.errors {
+	background: none repeat scroll 0 0 #FFFFFF;
+		border: 1px solid #E11D1C;
+	color: #E11D1C;
+	padding: 1em 1em 1em 1em;
+}
