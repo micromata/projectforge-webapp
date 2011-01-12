@@ -15,20 +15,8 @@ $(function() {
   }
   }).disableSelection();
 
-  $("#personal").bind("update", function(event, ui) {
-    console.log("--");
-    $("ul#personal li").each(function(index) {
-      console.log($(this).attr("id"));
-      if (ui.item.attr("id") == $(this).attr("id")) {
-        console.log(ui.item.attr("id") + "is a duplicate");
-        //ui.item.remove();
-        
-      }
-      
-      window.setTimeout( function(){
-    	  serialize(getMenuEntries());
-      }, 1000);
-    });
+  $("#personal li").click(function(){
+	  serialize(getMenuEntries());
   });
 
   // Disable sortable on load...
@@ -66,7 +54,7 @@ $(function() {
           $('.remover').remove();
           // remove the blue border around the personal menu
           $('ul#personal').removeClass('dotted');
-          serialize(getMenuEntries());
+          //serialize(getMenuEntries());
         }
       })
 });
