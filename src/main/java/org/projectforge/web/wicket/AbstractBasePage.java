@@ -136,7 +136,12 @@ public abstract class AbstractBasePage extends WebPage
     } else {
       developmentsystemLabel.setVisible(false);
     }
-    navigationContainer.add(new ContextImage("logoImage", LogoServlet.URL));
+    final String logoServlet = LogoServlet.getBaseUrl();
+    if (logoServlet != null) {
+      navigationContainer.add(new ContextImage("logoLeftImage", logoServlet));
+    } else {
+      navigationContainer.add(new Label("logoLeftImage", "[invisible]").setVisible(false));
+    }
     final Model<String> loggedInLabelModel = new Model<String>() {
       public String getObject()
       {
