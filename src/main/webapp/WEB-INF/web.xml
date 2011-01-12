@@ -195,7 +195,15 @@
 
   <servlet-mapping>
     <servlet-name>LogoServlet</servlet-name>
-    <url-pattern>/secure/Logo</url-pattern>
+    <url-pattern>/secure/Logo.png</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LogoServlet</servlet-name>
+    <url-pattern>/secure/Logo.jpg</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LogoServlet</servlet-name>
+    <url-pattern>/secure/Logo.gif</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>SMSReceiver</servlet-name>
