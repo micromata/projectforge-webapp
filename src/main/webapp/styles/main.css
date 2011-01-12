@@ -875,9 +875,11 @@ form.newform .datepanel a:hover {
 -moz-opacity: 1;
 filter:alpha(opacity=1);
 }
+
 table.oldform{
 width:100%;
 }
+
 .oldform tr td, .oldform tr th {
 	border-bottom: 1px solid #D9DFE1;
 	padding: 0.5em;

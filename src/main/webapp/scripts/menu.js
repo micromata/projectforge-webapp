@@ -15,14 +15,19 @@ $(function() {
   }
   }).disableSelection();
 
-  $("#personal").bind("sortreceive", function(event, ui) {
+  $("#personal").bind("update", function(event, ui) {
     console.log("--");
     $("ul#personal li").each(function(index) {
       console.log($(this).attr("id"));
       if (ui.item.attr("id") == $(this).attr("id")) {
         console.log(ui.item.attr("id") + "is a duplicate");
-        ui.item.remove();
+        //ui.item.remove();
+        
       }
+      
+      window.setTimeout( function(){
+    	  serialize(getMenuEntries());
+      }, 1000);
     });
   });
 
