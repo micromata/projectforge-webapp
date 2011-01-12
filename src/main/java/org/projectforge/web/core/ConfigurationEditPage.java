@@ -92,7 +92,7 @@ public class ConfigurationEditPage extends AbstractEditPage<ConfigurationDO, Con
       return;
     }
     if ("taskId".equals(property) == true) {
-      getData().setTaskId(null);
+      form.setTask((Integer)null);
     } else {
       log.error("Property '" + property + "' not supported for unselection.");
     }

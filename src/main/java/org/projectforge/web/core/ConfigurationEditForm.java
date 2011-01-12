@@ -163,6 +163,8 @@ public class ConfigurationEditForm extends AbstractEditForm<ConfigurationDO, Con
     this.task = task;
     if (task != null) {
       data.setTaskId(task.getId());
+    } else {
+      data.setTaskId(null);
     }
   }
 
