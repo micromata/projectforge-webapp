@@ -28,6 +28,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.ComponentTag;
@@ -53,7 +55,6 @@ import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.core.MenuPanel;
-import org.projectforge.web.wicket.components.TooltipImage;
 
 /**
  * Do only derive from this page, if no login is required!
@@ -178,15 +179,14 @@ public abstract class AbstractBasePage extends WebPage
     navigationContainer.add(menuPanel);
     menuPanel.init();
 
-    final TooltipImage starImage = new TooltipImage("image", getResponse(), WebConstants.IMAGE_STAR_PLUS, new Model<String>() {
-      @Override
+    final Component bookmarkLink = new Label("bookmarkLink", " S").add(new AttributeModifier("title", true, new Model<String>() {
       public String getObject()
       {
         return getString("tooltip.directPageLink") + ": " + bookmarkableUrl;
-      }
-    });
-    starImage.setVisible(isBookmarkLinkIconVisible());
-    body.add(starImage);
+      };
+    }));
+    bookmarkLink.setVisible(isBookmarkLinkIconVisible());
+    navigationContainer.add(bookmarkLink);
     final Label bookmarkLabel = new Label("bookmark", new Model<String>() {
       @Override
       public String getObject()
@@ -200,9 +200,9 @@ public abstract class AbstractBasePage extends WebPage
       }
     });
     bookmarkLabel.setEscapeModelStrings(false);
-    body.add(bookmarkLabel);
+    navigationContainer.add(bookmarkLabel);
     if (isBookmarkable() == false) {
-      starImage.setVisible(false);
+      bookmarkLink.setVisible(false);
       bookmarkLabel.setVisible(false);
     }
   }

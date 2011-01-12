@@ -14,30 +14,24 @@
 <div id="container"><!-- left -->
 <div id="navigation" class="clearfix"><wicket:container wicket:id="navigation">
   <div class="headermeta">
-  
+
 
   <ul class="info">
-    <li class="loggedInLabel"><span wicket:id="loggedInLabel">[Logged in: John Mustermann (john)]</span><a wicket:id="logoutLink" href="/login?logout=true"><span wicket:id="logoutLabel">[Logout]</span></a></li>
+    <li class="loggedInLabel"><span wicket:id="loggedInLabel">[Logged in: John Mustermann (john)]</span><a wicket:id="logoutLink"
+      href="/login?logout=true"><span wicket:id="logoutLabel">[Logout]</span></a></li>
     <li><a class="version" wicket:id="newsLink" href="secure/doc/News.html" target="_blank"> <span wicket:id="versionLabel">[V. #.#.##
     2009-...]</span> </a></li>
     <li><a wicket:id="sendFeedback" class="embatssymbols" title="Send Feedback"> 2</a></li>
-    <li><!-- @kai: hier bitte das BookmarkIcon hin --><a href="http://www.dynamicsitesolutions.com/javascript/add-bookmark-script" class="embatssymbols"
-      title="Bookmark this Page"> S</a></li>
+    <li><a href="javascript:toggle('#bookmark');" class="embatssymbols" wicket:id="bookmarkLink"> S</a></li>
   </ul>
   <div class="development" wicket:id="developmentsystem">Developmentsystem!</div>
   </div>
+  <div id="bookmark" wicket:id="bookmark" style="display: none;">Hurzel</div>
+
   <!-- .headermeta END -->
-<div class="logobg">
-  <img id="logo" wicket:id="logoImage" src="/secure/Logo" />
-  </div>
+  <div class="logobg"><img id="logo" wicket:id="logoImage" src="/secure/Logo" /></div>
   <div id="main-menu" wicket:id="mainMenu">[menu]</div>
-</wicket:container>
-<!-- @kai: mach doch bitte hieraus ein embat (siehe oben ) und verschiebe es mir dort hin wo jetzt der stern ist... -->
-<span id="bookmarkIcon"><a href="#" onclick="javascript:showBookmark();"> <img src="images/star_plus.png" wicket:id="image" title="Bookmark this page" border="0" /> </a></span>
-
-<div id="bookmark" wicket:id="bookmark">Hurzel</div>
-
-</div>
+</wicket:container></div>
 <!-- DIV #navigation END -->
 
 <div id="content">
