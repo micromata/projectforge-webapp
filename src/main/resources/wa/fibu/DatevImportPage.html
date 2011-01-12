@@ -60,19 +60,7 @@
         <td wicket:id="colRepeater"></td>
       </tr>
       <tr class="${trStyle}">
-        <td><a href="#"><c:if test="${sheet.status == 'RECONCILED'}">
-          <stripes:checkbox name="selectedItems[${element.index}]"></stripes:checkbox>
-        </c:if><c:choose>
-          <c:when test="${element.new}">
-            <pf:image src="/images/add.png" />
-          </c:when>
-          <c:when test="${element.modified}">
-            <pf:image src="/images/pencil.png" />
-          </c:when>
-          <c:otherwise>
-            <pf:image src="/images/page_white.png" />
-          </c:otherwise>
-        </c:choose></a></td>
+        <td wicket:id="firstCell"><input type="checkbox" wicket:id="selectItem" /> <img src="images/add.png" wicket:id="icon" /></td>
         <c:choose>
           <c:when test="${fn:contains(element.value.class.name, 'org.projectforge.fibu.KontoDO')}">
             <td style="white-space: nowrap; text-align: right;">${obj.nummer}</td>
