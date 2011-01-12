@@ -234,7 +234,14 @@ ul.dropdown-menu ul li a:hover {
 
 div.errors {
 	background: none repeat scroll 0 0 #FFFFFF;
-		border: 1px solid #E11D1C;
+	border: 1px solid #E11D1C;
 	color: #E11D1C;
+	padding: 1em 1em 1em 1em;
+}
+
+div.message {
+	background: none repeat scroll 0 0 #DDDDDD;
+	border: 1px solid #000000;
+	color: #000000;
 	padding: 1em 1em 1em 1em;
 }
