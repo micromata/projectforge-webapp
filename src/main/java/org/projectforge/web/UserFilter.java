@@ -350,7 +350,7 @@ public class UserFilter implements Filter
     if (uri.startsWith(IGNORE_PREFIX)
         && (uri.endsWith(".js") == true || uri.endsWith(".css") == true || uri.endsWith(".gif") == true || uri.endsWith(".png") == true)) {
       return true;
-    } else if (uri.startsWith(contextPath + "/" + LogoServlet.URL) == true
+    } else if (uri.startsWith(contextPath + "/" + LogoServlet.BASE_URL) == true
         || uri.startsWith(contextPath + "/" + SMSReceiverServlet.URL) == true) {
       return true;
     }
