@@ -211,7 +211,7 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
       }
       forDevelopers.add(buttonPanel);
     } else {
-      forDevelopers.setVisible(true);
+      forDevelopers.setVisible(false);
     }
   }
 
