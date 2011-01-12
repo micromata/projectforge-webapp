@@ -25,7 +25,6 @@ package org.projectforge.web.core;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,19 +32,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.lf5.util.StreamUtils;
+import org.apache.commons.lang.StringUtils;
 import org.projectforge.core.Configuration;
-import org.springframework.core.io.ClassPathResource;
-
+import org.projectforge.core.ConfigurationListener;
 
 /**
  * Servlet for displaying a customizable logo image (see config.xml).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class LogoServlet extends HttpServlet
+public class LogoServlet extends HttpServlet implements ConfigurationListener
 {
-  public static final String URL = "secure/Logo";
+  public static final String BASE_URL = "secure/Logo";
 
   private static final long serialVersionUID = 4091672008912713345L;
 
@@ -53,7 +51,26 @@ public class LogoServlet extends HttpServlet
 
   private static boolean initialized = false;
 
-  private static File LOGO_FILE;
+  private static File logoFile;
+
+  /**
+   * Extracts the servlet name Logo.png, Logo.jpg or Logo.gif. The extension is only needed for some browsers for detecting the correct logo
+   * file format.
+   * @return The servlet path or null, if no logo file is given.
+   */
+  public static String getBaseUrl()
+  {
+    final String filename = Configuration.getInstance().getLogoFile();
+    if (StringUtils.isEmpty(filename) == true) {
+      return null;
+    } else if (filename.endsWith(".png") == true) {
+      return BASE_URL + ".png";
+    } else if (filename.endsWith(".jpg") == true || filename.endsWith(".jpeg") == true) {
+      return BASE_URL + ".jpg";
+    } else {
+      return BASE_URL + ".gif";
+    }
+  }
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException
@@ -64,34 +81,42 @@ public class LogoServlet extends HttpServlet
       final String logo = Configuration.getInstance().getLogoFile();
       if (logo != null) {
         final String logoPath = Configuration.getInstance().getResourcePath() + "/images/" + logo;
-        final File logoFile = new File(logoPath);
-        if (logoFile.canRead() == true) {
-          LOGO_FILE = logoFile;
+        final File file = new File(logoPath);
+        if (file.canRead() == true) {
+          logoFile = file;
           log.info("Use configured logo: " + logoPath);
         } else {
           log.error("Configured logo not found: " + logoPath);
         }
       }
+      Configuration.getInstance().register(this);
       initialized = true;
     }
     byte[] bytes = null;
-    if (LOGO_FILE != null) {
+    if (logoFile != null) {
       try {
-        bytes = FileUtils.readFileToByteArray(LOGO_FILE);
+        bytes = FileUtils.readFileToByteArray(logoFile);
       } catch (final IOException ex) {
         log.error(ex.getMessage(), ex);
       }
       if (bytes == null) {
-        log.error("Error while reading logo file. Fall back to default logo.");
+        log.error("Error while reading logo file.");
       }
     }
     if (bytes == null) {
-      final ClassPathResource cpres = new ClassPathResource("images/default-logo.png");
-      final InputStream in = cpres.getInputStream();
-      bytes = StreamUtils.getBytes(in);
+      // final ClassPathResource cpres = new ClassPathResource("images/default-logo.png");
+      // final InputStream in = cpres.getInputStream();
+      // bytes = StreamUtils.getBytes(in);
+      bytes = new byte[0];
     }
     resp.setContentLength(bytes.length);
     resp.getOutputStream().write(bytes);
     resp.getOutputStream().flush();
+  }
+
+  @Override
+  public void afterRead()
+  {
+    initialized = false;
   }
 }
