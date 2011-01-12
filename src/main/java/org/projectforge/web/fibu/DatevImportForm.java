@@ -23,6 +23,12 @@
 
 package org.projectforge.web.fibu;
 
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.commons.collections.MapUtils;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
@@ -30,6 +36,10 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.lang.Bytes;
+import org.projectforge.common.ImportStorage;
+import org.projectforge.common.ImportedSheet;
+import org.projectforge.common.StringHelper;
+import org.projectforge.fibu.kost.Bwa;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.RadioButtonLabelPanel;
@@ -42,6 +52,20 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
   protected DatevImportFilter filter = new DatevImportFilter();
 
   protected FileUploadField fileUploadField;
+
+  protected WebMarkupContainer storageContainer;
+
+  protected WebMarkupContainer errorPropertiesTable;
+
+  protected RepeatingView sheetRepeatingView;
+
+  private Label bwaLabel, storageHeadingLabel;
+
+  private Map<String, Set<Object>> errorProperties;
+
+  private Bwa bwa;
+
+  protected ImportStorage< ? > storage;
 
   public DatevImportForm(final DatevImportPage parentPage)
   {
@@ -98,57 +122,77 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
       @Override
       public boolean isVisible()
       {
-        return parentPage.storage != null;
+        return storageContainer.isVisible();
       }
     });
 
-    // final UserSelectPanel userSelectPanel = new UserSelectPanel("selectUser", new PropertyModel<PFUserDO>(filter, "user"), parentPage,
-    // "user");
-    // userSelectPanel.setRequired(true);
-    // add(userSelectPanel);
-    // userSelectPanel.init();
-    // {
-    // // DropDownChoice months
-    // final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-    // for (int i = 0; i <= 11; i++) {
-    // monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
-    // }
-    // monthChoice = new DropDownChoice<Integer>("month", new PropertyModel<Integer>(filter, "month"), monthChoiceRenderer.getValues(),
-    // monthChoiceRenderer);
-    // monthChoice.setNullValid(false).setRequired(true);
-    // add(monthChoice);
-    // }
-    // yearChoice = new DropDownChoice<Integer>("year", new PropertyModel<Integer>(filter, "year"), new ArrayList<Integer>());
-    // yearChoice.setNullValid(false).setRequired(true);
-    // add(yearChoice);
-    //
-    // final RepeatingView actionButtonsView = new RepeatingView("actionButtons");
-    // add(actionButtonsView.setRenderBodyOnly(true));
-    // final Button resetButton = new Button("button", new Model<String>(getString("reset"))) {
-    // @Override
-    // public final void onSubmit()
-    // {
-    // filter.reset();
-    // yearChoice.modelChanged();
-    // monthChoice.modelChanged();
-    // }
-    // };
-    // resetButton.add(WebConstants.BUTTON_CLASS_RESET);
-    // resetButton.setDefaultFormProcessing(false);
-    // final SingleButtonPanel resetButtonPanel = new SingleButtonPanel(actionButtonsView.newChildId(), resetButton);
-    // actionButtonsView.add(resetButtonPanel);
-    // final Button exportAsPdfButton = new Button("button", new Model<String>(getString("exportAsPdf"))) {
-    // @Override
-    // public final void onSubmit()
-    // {
-    // parentPage.exportAsPdf();
-    // }
-    // };
-    // actionButtonsView.add(new SingleButtonPanel(actionButtonsView.newChildId(), exportAsPdfButton));
-    // final Button showButton = new Button("button", new Model<String>(getString("show")));
-    // showButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    // setDefaultButton(showButton);
-    // actionButtonsView.add(new SingleButtonPanel(actionButtonsView.newChildId(), showButton));
+    storageContainer = new WebMarkupContainer("storage");
+    refresh();
+    sheetRepeatingView = new RepeatingView("sheetRepeater");
+    storageContainer.add(sheetRepeatingView);
   }
 
+  protected void refresh()
+  {
+    if (storage == null) {
+      storageContainer.setVisible(false);
+      return;
+    }
+    storageContainer.setVisible(true);
+    if (bwaLabel != null) {
+      storageContainer.remove(bwaLabel);
+    }
+    if (errorPropertiesTable != null) {
+      storageContainer.remove(errorPropertiesTable);
+    }
+    if (storageHeadingLabel != null) {
+      storageContainer.remove(storageHeadingLabel);
+    }
+    storageContainer.add(new Label("storageHeading", "Import storage: " + storage != null ? storage.getFilename() : "")).setRenderBodyOnly(
+        true);
+
+    if (MapUtils.isNotEmpty(errorProperties) == true) {
+      storageContainer.add(errorPropertiesTable = new WebMarkupContainer("errorPropertiesTable"));
+      final RepeatingView errorPropertiesView = new RepeatingView("errorProperties");
+      storageContainer.add(errorPropertiesView);
+      for (final Map.Entry<String, Set<Object>> entry : errorProperties.entrySet()) {
+        final WebMarkupContainer entryContainer = new WebMarkupContainer(errorPropertiesView.newChildId());
+        errorPropertiesView.add(entryContainer);
+        final StringBuffer buf = new StringBuffer();
+        boolean first = true;
+        for (final Object value : entry.getValue()) {
+          first = StringHelper.append(buf, first, String.valueOf(value), ", ");
+        }
+        errorPropertiesView.add(new Label("propertyItems", buf.toString()));
+      }
+    } else if (bwa != null) {
+      storageContainer.add(bwaLabel = new Label("bwa", bwa.toString()));
+    }
+    if (bwaLabel == null) {
+      storageContainer.add(bwaLabel = new Label("bwa", "[invisible]")).setVisible(false);
+    }
+    if (errorPropertiesTable == null) {
+      storageContainer.add(errorPropertiesTable = new WebMarkupContainer("errorPropertiesTable")).setVisible(false);
+    }
+    if (storageHeadingLabel == null) {
+      storageContainer.add(storageHeadingLabel = new Label("storageHeading", "[invisible]")).setVisible(false);
+    }
+    sheetRepeatingView.removeAll();
+    if (storage.getSheets() != null) {
+      for (final ImportedSheet< ? > sheet : storage.getSheets()) {
+        addSheet(sheet);
+      }
+    }
+  }
+
+  protected void addSheet(final ImportedSheet< ? > sheet)
+  {
+    final WebMarkupContainer cont = new WebMarkupContainer(sheetRepeatingView.newChildId());
+    sheetRepeatingView.add(cont);
+    // sheetName">[Sheet_: ${sheet.name}&nbsp;<c:choose>
+    // <c:when test="${sheet.reconciled == true}">(<fmt:message key="common.import.status.${sheet.status.key}" />
+    // <c:if test="${sheet.numberOfCommittedElements >= 0}">: #${sheet.numberOfCommittedElements}</c:if>)</c:when>
+    // <c:otherwise>(<fmt:message key="common.import.status.notReconciled" />)</c:otherwise>
+    // </c:choose>
+  }
 }

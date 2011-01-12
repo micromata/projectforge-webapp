@@ -25,7 +25,6 @@ package org.projectforge.web.fibu;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
-import org.projectforge.common.ImportStorage;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -36,7 +35,6 @@ public class DatevImportPage extends AbstractSecuredPage
 
   private DatevImportForm form;
 
-  protected ImportStorage< ? > storage;
 
   public DatevImportPage(final PageParameters parameters)
   {

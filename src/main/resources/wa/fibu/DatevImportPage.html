@@ -22,11 +22,152 @@
       </wicket:container></td>
     </tr>
     <tr>
-      <td colspan="2" class="buttons" style="direction: ltr;"><span wicket:id="importAccountList">[import account list]</span><span
-        wicket:id="importAccountingRecords">[accounting records]</span><span wicket:id="clearStorage">[clear storage]</span></td>
+      <td colspan="2" class="buttons"><span wicket:id="importAccountList">[import account list]</span><span wicket:id="importAccountingRecords">[accounting
+      records]</span><span wicket:id="clearStorage">[clear storage]</span></td>
     </tr>
   </table>
   </fieldset>
+
+  <div wicket:id="storage">
+  <h1 wicket:id="storageHeading">[Import storage filename]</h1>
+  <div id="infolayer">
+  <table wicket:id="errorPropertiesTable">
+    <tr>
+      <th>Key</th>
+      <th>Error values</th>
+    </tr>
+    <tr wicket:id="errorProperties">
+      <td wicket:id="propertyKey">[${prop.key}]</td>
+      <td><span wicket:id="propertyItems">[forEach ${prop.value}: ${val}, ...] </span></td>
+    </tr>
+  </table>
+  <pre wicket:id="bwa">[${actionBean.bwa}]</pre></div>
+  <fieldset class="section" wicket:id="sheetRepeater"><legend wicket:id="sheetName">[Sheet_: ${sheet.name}&nbsp;<c:choose>
+    <c:when test="${sheet.reconciled == true}">(<fmt:message key="common.import.status.${sheet.status.key}" />
+      <c:if test="${sheet.numberOfCommittedElements >= 0}">: #${sheet.numberOfCommittedElements}</c:if>)</c:when>
+    <c:otherwise>(<fmt:message key="common.import.status.notReconciled" />)</c:otherwise>
+  </c:choose>]</legend> <c:choose>
+    <c:when test="${sheet.open}">
+      <a onclick="javascript:submitSelectedEvent('close', '${sheet.name}')" href="#"> <pf:image src="/images/zoom_out.png" /> </a>
+    </c:when>
+    <c:otherwise>
+      <a onclick="javascript:submitSelectedEvent('open', '${sheet.name}')" href="#"> <pf:image src="/images/zoom_in.png" /> </a>
+    </c:otherwise>
+  </c:choose> Total_=${sheet.totalNumberOfElements} <c:if test="${sheet.numberOfNewElements gt 0}">
+          | New_=<span style="color: red;">${sheet.numberOfNewElements}</span>
+  </c:if> <c:if test="${sheet.numberOfModifiedElements gt 0}">
+          | Modified_=<span style="color: red;">${sheet.numberOfModifiedElements}</span>
+  </c:if> <c:if test="${sheet.numberOfUnmodifiedElements gt 0}">
+          | Unmodified_=${sheet.numberOfUnmodifiedElements}
+        </c:if> <c:if test="${sheet.numberOfFaultyElements gt 0}">
+    <span style="color: red; font-weight: bold;"> | Faulty_=${sheet.numberOfFaultyElements}</span>
+  </c:if> <c:choose>
+    <c:when test="${sheet.reconciled == false or sheet.status == 'IMPORTED' or sheet.status == 'NOTHING_TODO' or sheet.status == 'HAS_ERRORS'}">
+      <a onclick="javascript:submitSelectedEvent('reconcile', '${sheet.name}')" href="#"> Verproben_ </a>
+    </c:when>
+    <c:when test="${sheet.reconciled == true}">
+      <a onclick="javascript:submitSelectedEvent('commit', '${sheet.name}')" href="#"> Commit_ </a>
+      <a onclick="javascript:submitSelectedEvent('selectAll', '${sheet.name}')" href="#"> Select all_ </a>
+      <a onclick="javascript:submitSelectedEvent('deselectAll', '${sheet.name}')" href="#"> Unselect all_ </a>
+      <c:if test="${actionBean.storageType eq 'BUCHUNGSSAETZE'}"></c:if>
+    </c:when>
+  </c:choose> <c:if test="${sheet.faulty == true}">
+    <a onclick="javascript:submitSelectedEvent('showErrorSummary', '${sheet.name}')" href="#"> show error summary_ </a>
+  </c:if> <c:if test="${actionBean.storageType eq 'BUCHUNGSSAETZE'}">
+    <a onclick="javascript:submitSelectedEvent('showBWA', '${sheet.name}')" href="#"> show BWA_ </a>
+  </c:if> <c:if test="${sheet.open}">
+          <%
+            /* Please regard search.jsp for changes and vice versa. */
+          %>
+          <table class="dataTable">
+      <tbody>
+        <c:set var="trStyle" value="even" />
+        <tr>
+          <th>&nbsp;</th>
+          <c:choose>
+            <c:when test="${actionBean.storageType eq 'KONTENPLAN'}">
+              <th><fmt:message key="fibu.konto.nummer" /></th>
+              <th><fmt:message key="fibu.konto.bezeichnung" /></th>
+            </c:when>
+            <c:when test="${actionBean.storageType eq 'BUCHUNGSSAETZE'}">
+              <th><!-- fmt:message key="fibu.buchungssatz.satznr" /--></th>
+              <th><fmt:message key="date" /></th>
+              <th><fmt:message key="fibu.common.betrag" /></th>
+              <th><fmt:message key="fibu.buchungssatz.text" /></th>
+              <th><fmt:message key="fibu.buchungssatz.konto" /></th>
+              <th><fmt:message key="fibu.buchungssatz.gegenKonto" /></th>
+              <th><fmt:message key="fibu.kost1" /></th>
+              <th><fmt:message key="fibu.kost2" /></th>
+            </c:when>
+          </c:choose>
+          <th><fmt:message key="modifications" /></th>
+          <th><fmt:message key="errors" /></th>
+        </tr>
+        <c:forEach var="element" items="${sheet.elements}">
+          <c:set var="obj" value="${element.value}" />
+          <c:set var="dbObj" value="${element.oldValue}" />
+          <c:if
+            test="${actionBean.listType eq 'all' or (actionBean.listType eq 'faulty' and element.faulty) or (actionBean.listType eq 'modified' and (element.new or element.modified or element.faulty))}">
+            <c:choose>
+              <c:when test="${trStyle eq 'even'}">
+                <c:set var="trStyle" value="odd" />
+              </c:when>
+              <c:otherwise>
+                <c:set var="trStyle" value="even" />
+              </c:otherwise>
+            </c:choose>
+            <c:set var="style">
+              <c:choose>
+                <c:when test="${element.faulty}">color: red;</c:when>
+                <c:when test="${dbObj != null and dbObj.deleted == true}">text-decoration: line-through;</c:when>
+                <c:otherwise></c:otherwise>
+              </c:choose>
+            </c:set>
+            <tr class="${trStyle}">
+              <td><a href="#"><c:if test="${sheet.status == 'RECONCILED'}">
+                <stripes:checkbox name="selectedItems[${element.index}]"></stripes:checkbox>
+              </c:if><c:choose>
+                <c:when test="${element.new}">
+                  <pf:image src="/images/add.png" />
+                </c:when>
+                <c:when test="${element.modified}">
+                  <pf:image src="/images/pencil.png" />
+                </c:when>
+                <c:otherwise>
+                  <pf:image src="/images/page_white.png" />
+                </c:otherwise>
+              </c:choose></a></td>
+              <c:choose>
+                <c:when test="${fn:contains(element.value.class.name, 'org.projectforge.fibu.KontoDO')}">
+                  <td style="white-space: nowrap; text-align: right;">${obj.nummer}</td>
+                  <td style="">${obj.bezeichnung}</td>
+                </c:when>
+                <c:otherwise>
+                  <td style="white-space: nowrap; text-align: right;">${obj.satznr}</td>
+                  <td style=""><pf:date date="${obj.datum}" type="date" /></td>
+                  <td style="white-space: nowrap; text-align: right;"><pf:currency value="${obj.betrag}" /></td>
+                  <td style="">${obj.text}</td>
+                  <td style=""><c:if test="${obj.konto != null}">${obj.konto.nummer}</c:if></td>
+                  <td style=""><c:if test="${obj.gegenKonto != null}">${obj.gegenKonto.nummer}</c:if></td>
+                  <td style=""><c:if test="${obj.kost1 != null}">${obj.kost1.shortDisplayName}</c:if></td>
+                  <td style=""><c:if test="${obj.kost2 != null}">${obj.kost2.shortDisplayName}</c:if></td>
+                </c:otherwise>
+              </c:choose>
+              <td style=""><c:if test="${dbObj != null}">
+                <c:forEach items="${element.propertyChanges}" var="delta">
+                          ${delta.propertyName}=<a title="${delta.oldValue}">${delta.newValue}</a>;
+                        </c:forEach>
+              </c:if>
+              <td><c:if test="${element.faulty}">
+                <span style="color: red; font-weight: bold;">${element.errorProperties}</span>
+              </c:if></td>
+            </tr>
+          </c:if>
+        </c:forEach>
+      </tbody>
+    </table>
+  </c:if></fieldset>
+  </div>
   </form>
 </wicket:extend>
 </body>
