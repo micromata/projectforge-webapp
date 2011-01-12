@@ -6,6 +6,17 @@
 	font-style: italic;
 }
 
+.counter {
+	font-size: 0.8em;
+	font-style: normal;
+	margin-left: 2px;
+	padding-left: 2px;
+	padding-right: 2px;
+	background-color: red;
+	color: white;
+	padding-left: 2px;
+}
+
 .taskStatus_opened {
 	color: #518732;
 }
@@ -138,7 +149,7 @@ div.progress-overbooked-min div {
 /* Zoom of phone numbers. */
 #divZoom {
 	position: fixed;
-	z-index: 10;
+	z-index: 99999;
 	left: 0px;
 	top: 50px;
 	width: 100%;
