@@ -11,11 +11,10 @@ $(function() {
     change : function(event, ui) {
       $(".remover").remove();
       $("ul#personal li a").prepend('<span class="remover"> 2 </span>');
-      serialize(getMenuEntries());
   }
   }).disableSelection();
 
-  $("#personal li").click(function(){
+  $("#personal li, #nav li").click(function(){
 	  serialize(getMenuEntries());
   });
 
@@ -29,8 +28,13 @@ $(function() {
   });
   
   function getMenuEntries() {
-    return $("#personal, #nav ul").sortable("toArray");
+    return ( $("#personal").sortable("toArray") );
   }
+  
+  $(window).unload(function() {
+	  serialize( getMenuEntries() );
+  });
+
 
   $("#normal .main a").click(function() {
       // One click opens the main menu and and the next click closes the
