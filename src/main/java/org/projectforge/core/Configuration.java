@@ -33,6 +33,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.security.KeyStore;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -93,6 +94,8 @@ public class Configuration extends AbstractCache
 
   private static transient Configuration instance;
 
+  private transient List<ConfigurationListener> listeners = new ArrayList<ConfigurationListener>();
+
   @XmlOmitField
   private String applicationHomeDir;
 
@@ -108,30 +111,30 @@ public class Configuration extends AbstractCache
   @XmlOmitField
   private Map<ConfigurationParam, Object> configurationParamMap;
 
-  private String resourceDir = "resources";
+  private String resourceDir;
 
   private JiraConfig jiraConfig;
 
-  private String jiraBrowseBaseUrl = null;
+  private String jiraBrowseBaseUrl;
 
-  private String telephoneSystemUrl = null;
+  private String telephoneSystemUrl;
 
-  private String telephoneSystemNumber = null;
+  private String telephoneSystemNumber;
 
-  private String telephoneSystemOperatorPanelUrl = null;
+  private String telephoneSystemOperatorPanelUrl;
 
-  private String smsUrl = null;
+  private String smsUrl;
 
   private String receiveSmsKey;
 
   private MailAccountConfig mebMailAccount = new MailAccountConfig();
 
-  private String currencySymbol = "€";
+  private String currencySymbol;
 
   @XmlField(asElement = true)
-  private Locale defaultLocale = Locale.ENGLISH;
+  private Locale defaultLocale;
 
-  private String excelDefaultPaperSize = "DINA4";
+  private String excelDefaultPaperSize;
 
   private List<ConfigureHoliday> holidays;
 
@@ -141,9 +144,9 @@ public class Configuration extends AbstractCache
 
   private transient File configFile;
 
-  private String workingDirectory = "work";
+  private String workingDirectory;
 
-  private String tempDirectory = "tmp";
+  private String tempDirectory;
 
   private String servletContextPath;
 
@@ -183,6 +186,35 @@ public class Configuration extends AbstractCache
     return instance != null;
   }
 
+  private void reset()
+  {
+    resourceDir = "resources";
+    jiraConfig = null;
+    jiraBrowseBaseUrl = null;
+    telephoneSystemUrl = null;
+    telephoneSystemNumber = null;
+    telephoneSystemOperatorPanelUrl = null;
+    smsUrl = null;
+    receiveSmsKey = null;
+    mebMailAccount = new MailAccountConfig();
+    currencySymbol = "€";
+    defaultLocale = Locale.ENGLISH;
+    excelDefaultPaperSize = "DINA4";
+    holidays = null;
+    contractTypes = null;
+    workingDirectory = "work";
+    tempDirectory = "tmp";
+    servletContextPath = null;
+    domain = null;
+    logoFile = null;
+    keystoreFile = null;
+    keystorePassphrase = null;
+    cronExpressionHourlyJob = null;
+    cronExpressionNightlyJob = null;
+    cronExpressionMebPollingJob = null;
+    menuConfig = null;
+  }
+
   protected Configuration()
   {
     super(TICKS_PER_HOUR);
@@ -218,11 +250,17 @@ public class Configuration extends AbstractCache
     instance = this;
   }
 
+  public void register(final ConfigurationListener listener)
+  {
+    listeners.add(listener);
+  }
+
   /**
    * Reads the configuration file (can be called after any modification of the config file).
    */
   public String readConfiguration()
   {
+    reset();
     configFile = new File(applicationHomeDir, "config.xml");
     String msg = "";
     if (configFile.canRead() == false) {
@@ -252,6 +290,9 @@ public class Configuration extends AbstractCache
           log.fatal(msg, ex);
         }
       }
+    }
+    for (final ConfigurationListener listener : listeners) {
+      listener.afterRead();
     }
     return msg;
   }
