@@ -340,7 +340,7 @@ ul#trash {
 	clear: both;
 	position:relative;
 	padding:0.5em;
-	z-index:99999;
+	z-index:99998;
 }
 
 ul#trash li {display:none}
@@ -828,7 +828,7 @@ span.invisibleerrormarker div.validationMsg {
 	line-height:1.4em;
 	padding: 0 1em 0 0;
 	position:absolute;
-	z-index:8888;
+	z-index:88888;
 	top:0.5em;
 	white-space:nowrap;
 	width:auto;
