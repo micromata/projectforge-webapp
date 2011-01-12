@@ -7,7 +7,7 @@
 <wicket:extend>
   <div wicket:id="feedback">[Validation errors]</div>
   <form wicket:id="form" name="form">
-  <fieldset><legend><wicket:message key="system.admin.group.title.systemChecksAndFunctionality" /></legend>
+  <h3><wicket:message key="system.admin.group.title.systemChecksAndFunctionality" /></h3>
   <table class="form">
     <tr>
       <td><span wicket:id="checkSystemIntegrity">[button]</span> <span wicket:id="checkI18nProperties">[button]</span> <span
@@ -16,16 +16,14 @@
       <span wicket:id="rereadConfiguration">[button]</span> <span wicket:id="exportConfiguration">[button]</span></td>
     </tr>
   </table>
-  </fieldset>
-  <fieldset><legend style="display: inline;"><wicket:message key="system.admin.group.title.databaseActions" /></legend>
+  <h3><wicket:message key="system.admin.group.title.databaseActions" /></h3>
   <table class="form">
     <tr>
       <td><span wicket:id="updateUserPrefs">[button]</span> <span wicket:id="createMissingDatabaseIndices">[button]</span> <span wicket:id="dump">[button]</span>
       <span wicket:id="schemaExport">[button]</span> <span wicket:id="fixDBHistoryEntries">[button]</span></td>
     </tr>
   </table>
-  </fieldset>
-  <fieldset><legend style="display: inline;"><wicket:message key="system.admin.group.title.databaseSearchIndices" /></legend>
+  <h3><wicket:message key="system.admin.group.title.databaseSearchIndices" /></h3>
   <table class="form">
     <tr>
       <td><input type="text" class="stdtext" wicket:id="reindexNewestNEntries" style="width: 5em;" /> <wicket:message
@@ -33,8 +31,7 @@
       <wicket:message key="system.admin.reindexNewestNEntries.note" /></td>
     </tr>
   </table>
-  </fieldset>
-  <fieldset><legend style="display: inline;"><wicket:message key="system.admin.group.title.logEntries" /></legend>
+  <h3><wicket:message key="system.admin.group.title.logEntries" /></h3>
   <table class="form">
     <tr>
       <td><input type="text" class="stdtext" wicket:id="logEntries" style="width: 100%" /><span wicket:id="formattedLogEntries">[formatted
@@ -44,8 +41,7 @@
       <td><span wicket:id="formatLogEntries">[button]</span></td>
     </tr>
   </table>
-  </fieldset>
-  <fieldset><legend style="display: inline;"><wicket:message key="system.admin.group.title.alertMessage" /></legend>
+  <h3><wicket:message key="system.admin.group.title.alertMessage" /></h3>
   <table class="form">
     <tr>
       <td><input type="text" class="stdtext" wicket:id="alertMessage" style="width: 100%" /></td>
@@ -60,7 +56,6 @@
       <td><span wicket:id="setAlertMessage">[button]</span></td>
     </tr>
   </table>
-  </fieldset>
   <wicket:container wicket:id="forDevelopers">
     <fieldset><legend style="display: inline;">For developers</legend>
     <table class="form">
