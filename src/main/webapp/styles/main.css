@@ -318,19 +318,21 @@ div#main-menu{
 	clear:both;
 }
 
-.logobg{
+.logo {
 	background:#fff;
 	border-bottom: 1px solid #D9DFE1;
 	padding:1em 2em;
-	text-align: right;
-	/*@kai: you can set a corporate color, if needed...*/
+  text-align:right;
 }
 
+#logo-left {
+	border:none;	
+	float:left;
+}
 
-#logo {
+#logo-right {
 	border:none;	
 }
-
 
 ul#personal,
 ul#trash {
