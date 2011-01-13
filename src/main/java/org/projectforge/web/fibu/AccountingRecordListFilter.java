@@ -23,6 +23,7 @@
 
 package org.projectforge.web.fibu;
 
+import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.fibu.kost.BuchungssatzFilter;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -30,5 +31,14 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("AccountingRecordFilter")
 public class AccountingRecordListFilter extends BuchungssatzFilter
 {
+  public AccountingRecordListFilter()
+  {
+  }
+
+  public AccountingRecordListFilter(final BaseSearchFilter filter)
+  {
+    super(filter);
+  }
+
   private static final long serialVersionUID = 3146225447707325318L;
 }
