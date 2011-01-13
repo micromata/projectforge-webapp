@@ -23,13 +23,17 @@
 
 package org.projectforge.core;
 
+import java.io.Serializable;
+
 /**
  * Logs errors, warnings and actions while executing algorithm.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class ActionLog
+public class ActionLog implements Serializable
 {
+  private static final long serialVersionUID = -4557854574067360656L;
+
   private int counterSuccess = 0;
 
   private int counterErrors = 0;
