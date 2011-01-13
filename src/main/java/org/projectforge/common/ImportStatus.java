@@ -37,7 +37,7 @@ public enum ImportStatus implements I18nEnum
   @Override
   public String getI18nKey()
   {
-    return "common.import.status.." + key;
+    return "common.import.status." + key;
   }
 
   /**
