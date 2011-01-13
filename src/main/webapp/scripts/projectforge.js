@@ -3,8 +3,8 @@ function showConfirmDialog(text) {
 }
 
 function toggle(component) {
-    $(component).toggle('slow');
-  }
+	$(component).toggle('slow');
+}
 
 function rowClick(row) {
 	if (suppressRowClick != 'true') {
