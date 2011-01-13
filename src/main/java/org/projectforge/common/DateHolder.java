@@ -361,6 +361,28 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
   }
 
   /**
+   * Sets the date to the beginning of the year (first day of year) and calls setBeginOfDay.
+   * @see #setBeginOfDay()
+   */
+  public DateHolder setBeginOfYear()
+  {
+    calendar.set(Calendar.MONTH, Calendar.JANUARY);
+    setBeginOfMonth();
+    return this;
+  }
+
+  /**
+   * Sets the date to the beginning of the year (first day of year) and calls setBeginOfDay.
+   * @see #setBeginOfDay()
+   */
+  public DateHolder setEndOfYear()
+  {
+    calendar.set(Calendar.MONTH, Calendar.DECEMBER);
+    setEndOfMonth();
+    return this;
+  }
+
+  /**
    * Sets the date to the beginning of the month (first day of month) and calls setBeginOfDay.
    * @see #setBeginOfDay()
    */
