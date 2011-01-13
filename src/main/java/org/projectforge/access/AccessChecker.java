@@ -545,6 +545,9 @@ public class AccessChecker
     return true;
   }
 
+  /**
+   * Throws an exception if the current logged-in user is a demo user.
+   */
   public void checkDemoUser()
   {
     if (isDemoUser() == true) {
