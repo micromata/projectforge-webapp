@@ -27,7 +27,6 @@ import java.io.Serializable;
 
 import org.projectforge.core.BaseSearchFilter;
 
-
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -44,7 +43,16 @@ public class BuchungssatzFilter extends BaseSearchFilter implements Serializable
   private int fromMonth;
 
   private int toMonth;
-  
+
+  public BuchungssatzFilter()
+  {
+  }
+
+  public BuchungssatzFilter(final BaseSearchFilter filter)
+  {
+    super(filter);
+  }
+
   @Override
   public void reset()
   {

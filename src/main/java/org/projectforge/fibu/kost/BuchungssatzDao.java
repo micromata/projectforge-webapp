@@ -118,7 +118,12 @@ public class BuchungssatzDao extends BaseDao<BuchungssatzDO>
   public List<BuchungssatzDO> getList(BaseSearchFilter filter)
   {
     accessChecker.checkIsUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
-    BuchungssatzFilter myFilter = (BuchungssatzFilter) filter;
+    final BuchungssatzFilter myFilter;
+    if (filter instanceof BuchungssatzFilter) {
+      myFilter = (BuchungssatzFilter) filter;
+    } else {
+      myFilter = new BuchungssatzFilter(filter);
+    }
     QueryFilter queryFilter = new QueryFilter(filter);
     if (validateTimeperiod(myFilter) == false) {
       throw new UserException("fibu.buchungssatz.error.invalidTimeperiod");
