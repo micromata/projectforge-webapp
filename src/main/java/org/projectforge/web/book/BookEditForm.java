@@ -127,7 +127,7 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
     bottomRowsFragment.add(new MaxLengthTextField("lendOutComment", new PropertyModel<String>(data, "lendOutComment")));
 
     @SuppressWarnings("serial")
-    final Button lendOutButton = new Button("button", new Model<String>(getString("lendOut"))) {
+    final Button lendOutButton = new Button("button", new Model<String>(getString("book.lendOut"))) {
       @Override
       public final void onSubmit()
       {
