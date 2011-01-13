@@ -30,9 +30,11 @@ package org.projectforge.web.wicket;
  */
 public enum ImageDef
 {
-
+  ADD("add.png"), //
   ACCEPT(DIRS.MAIN + "accept.png"), DENY(DIRS.MAIN + "deny.png"), //
+  EDIT(DIRS.MAIN + "pencil.png"), //
   HELP(DIRS.MAIN + "help.png"), //
+  PAGE(DIRS.MAIN + "page_white.png"), //
   SMS(DIRS.MAIN + "sms.png"), //
   ZOOM_IN(DIRS.MAIN + "zoom_in.png"), //
   ZOOM_OUT(DIRS.MAIN + "zoom_out.png");
