@@ -54,6 +54,7 @@ import org.projectforge.core.Configuration;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
+import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
@@ -201,8 +202,10 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         first = addPhoneNumber(view, id, PhoneType.PRIVATE, address.getPrivatePhone(), (personalAddress != null && personalAddress
             .isFavoritePrivatePhone() == true), false, WebConstants.IMAGE_PHONE_HOME, first);
         first = addPhoneNumber(view, id, PhoneType.PRIVATE_MOBILE, address.getPrivateMobilePhone(),
-            (personalAddress != null && personalAddress.isFavoritePrivateMobilePhone() == true), true, WebConstants.IMAGE_PHONE_MOBILE, first);
+            (personalAddress != null && personalAddress.isFavoritePrivateMobilePhone() == true), true, WebConstants.IMAGE_PHONE_MOBILE,
+            first);
         cellItemListener.populateItem(item, componentId, rowModel);
+        item.add(new AttributeAppendModifier("style", new Model<String>("white-space: nowrap;")));
       }
     });
     return columns;
