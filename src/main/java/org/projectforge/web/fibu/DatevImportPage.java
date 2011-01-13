@@ -23,8 +23,21 @@
 
 package org.projectforge.web.fibu;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.Validate;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.ImportedElement;
+import org.projectforge.common.ImportedSheet;
+import org.projectforge.core.ActionLog;
+import org.projectforge.fibu.datev.DatevImportDao;
+import org.projectforge.fibu.kost.BuchungssatzDO;
+import org.projectforge.fibu.kost.Bwa;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -33,8 +46,14 @@ public class DatevImportPage extends AbstractSecuredPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DatevImportPage.class);
 
+  @SpringBean(name = "datevImportDao")
+  private DatevImportDao datevImportDao;
+
+  static final String KEY_IMPORT_STORAGE = "ImportStorage";
+
   private DatevImportForm form;
 
+  private ActionLog actionLog = new ActionLog();
 
   public DatevImportPage(final PageParameters parameters)
   {
@@ -45,49 +64,6 @@ public class DatevImportPage extends AbstractSecuredPage
     form.init();
   }
 
-  // public Resolution execute()
-  // {
-  // checkAccess();
-  // onSubmit();
-  // if (getStorage() != null && StringUtils.isNotEmpty(selectedValue) == true) {
-  // if ("open".equals(eventKey) == true) {
-  // storage.setSheetOpen(selectedValue, true);
-  // } else if ("reconcile".equals(eventKey) == true) {
-  // return reconcile(selectedValue);
-  // } else if ("selectAll".equals(eventKey) == true) {
-  // ImportedSheet< ? > sheet = (ImportedSheet< ? >) storage.getNamedSheet(selectedValue);
-  // Validate.notNull(sheet);
-  // sheet.selectAll(true, "modified".equals(listType));
-  // updateSelectedItems();
-  // } else if ("deselectAll".equals(eventKey) == true) {
-  // ImportedSheet< ? > sheet = (ImportedSheet< ? >) storage.getNamedSheet(selectedValue);
-  // Validate.notNull(sheet);
-  // sheet.selectAll(false, false);
-  // updateSelectedItems();
-  // } else if ("deselectAll".equals(eventKey) == true) {
-  // return commit(selectedValue);
-  // } else if ("commit".equals(eventKey) == true) {
-  // return commit(selectedValue);
-  // } else if ("showErrorSummary".equals(eventKey) == true) {
-  // ImportedSheet< ? > sheet = (ImportedSheet< ? >) storage.getNamedSheet(selectedValue);
-  // Validate.notNull(sheet);
-  // errorProperties = sheet.getErrorProperties();
-  // } else if ("showBWA".equals(eventKey) == true) {
-  // ImportedSheet< ? > sheet = (ImportedSheet< ? >) storage.getNamedSheet(selectedValue);
-  // Validate.notNull(sheet);
-  // List<BuchungssatzDO> list = new ArrayList<BuchungssatzDO>();
-  // for (ImportedElement< ? > element : sheet.getElements()) {
-  // BuchungssatzDO satz = (BuchungssatzDO) element.getValue();
-  // list.add(satz);
-  // }
-  // this.bwa = new Bwa((Integer) sheet.getProperty("year"), (Integer) sheet.getProperty("month"));
-  // this.bwa.setBuchungssaetze(list);
-  // } else {
-  // storage.setSheetOpen(selectedValue, false);
-  // }
-  // }
-  // }
-  //
   /**
    * Clears imported storages if exists.
    * @return
@@ -96,112 +72,114 @@ public class DatevImportPage extends AbstractSecuredPage
   {
     checkAccess();
     log.info("clear called");
-    // onSubmit();
-    // getContext().removeEntry(KEY_IMPORT_STORAGE);
-    // storage = null;
+    form.storage = null;
+    removeUserPrefEntry(KEY_IMPORT_STORAGE);
   }
 
   protected void importAccountList()
   {
-    // final FileUpload fileUpload = form.fileUploadField.getFileUpload();
-    // if (fileUpload != null) {
-    // boolean delete = false;
-    // try {
-    // final InputStream is = fileUpload.getInputStream();
-    // final String clientFileName = fileUpload.getClientFileName();
-    // if (clientFileName.endsWith(".jrxml") == true) {
-    // delete = true;
-    // final JasperReport report = JasperCompileManager.compileReport(is);
-    // if (report != null) {
-    // getReportScriptingStorage().setJasperReport(report, clientFileName);
-    // }
-    // } else if (clientFileName.endsWith(".xls") == true) {
-    // StringBuffer buf = new StringBuffer();
-    // buf.append("report_").append(FileHelper.createSafeFilename(PFUserContext.getUser().getUsername(), 20)).append(".xls");
-    // File file = new File(configuration.getWorkingDirectory(), buf.toString());
-    // fileUpload.writeTo(file);
-    // getReportScriptingStorage().setFilename(clientFileName, file.getAbsolutePath());
-    // } else {
-    // log.error("File extension not supported: " + clientFileName);
-    // }
-    // } catch (Exception ex) {
-    // log.error(ex.getMessage(), ex);
-    // error("An error occurred (see log files for details): " + ex.getMessage());
-    // } finally {
-    // if (delete == true) {
-    // fileUpload.delete();
-    // }
-    // }
-    // }
-
-    // if (uploadFile == null) {
-    // return getInputPage();
-    // }
-    // checkAccess();
-    // onSubmit();
-    // try {
-    // final InputStream is = uploadFile.getInputStream();
-    // actionLog.reset();
-    // storage = datevImportDao.importKontenplan(is, uploadFile.getFileName(), actionLog);
-    // } catch (Exception ex) {
-    // addGlobalError("error", ex.getMessage());
-    // log.error(ex.getMessage(), ex);
-    // return clear();
-    // } finally {
-    // try {
-    // uploadFile.delete();
-    // } catch (IOException ex) {
-    // log.error(ex.getMessage(), ex);
-    // }
-    // }
-    // getContext().putEntry(KEY_IMPORT_STORAGE, storage, false);
+    checkAccess();
+    final FileUpload fileUpload = form.fileUploadField.getFileUpload();
+    if (fileUpload != null) {
+      boolean delete = false;
+      try {
+        final InputStream is = fileUpload.getInputStream();
+        actionLog.reset();
+        final String clientFileName = fileUpload.getClientFileName();
+        form.storage = datevImportDao.importKontenplan(is, clientFileName, actionLog);
+        putUserPrefEntry(KEY_IMPORT_STORAGE, form.storage, false);
+      } catch (Exception ex) {
+        log.error(ex.getMessage(), ex);
+        error("An error occurred (see log files for details): " + ex.getMessage());
+        clear();
+      } finally {
+        if (delete == true) {
+          fileUpload.delete();
+        }
+      }
+    }
   }
 
   protected void importAccountRecords()
   {
-    // if (uploadFile == null) {
-    // return getInputPage();
-    // }
-    // checkAccess();
-    // onSubmit();
-    // try {
-    // final InputStream is = uploadFile.getInputStream();
-    // actionLog.reset();
-    // storage = datevImportDao.importBuchungsdaten(is, uploadFile.getFileName(), actionLog);
-    // } catch (ExcelImportException ex) {
-    // throw new UserException("common.import.excel.error", ex.getMessage(), ex.getRow(), ex.getColumnname());
-    // } catch (Exception ex) {
-    // addGlobalError("error", ex.getMessage());
-    // log.error(ex.getMessage(), ex);
-    // return clear();
-    // } finally {
-    // try {
-    // uploadFile.delete();
-    // } catch (IOException ex) {
-    // log.error(ex.getMessage(), ex);
-    // }
-    // }
-    // getContext().putEntry(KEY_IMPORT_STORAGE, storage, false);
+    checkAccess();
+    final FileUpload fileUpload = form.fileUploadField.getFileUpload();
+    if (fileUpload != null) {
+      boolean delete = false;
+      try {
+        final InputStream is = fileUpload.getInputStream();
+        actionLog.reset();
+        final String clientFileName = fileUpload.getClientFileName();
+        form.storage = datevImportDao.importBuchungsdaten(is, clientFileName, actionLog);
+        putUserPrefEntry(KEY_IMPORT_STORAGE, form.storage, false);
+      } catch (Exception ex) {
+        log.error(ex.getMessage(), ex);
+        error("An error occurred (see log files for details): " + ex.getMessage());
+        clear();
+      } finally {
+        if (delete == true) {
+          fileUpload.delete();
+        }
+      }
+    }
   }
 
-  private void reconcile(String sheetName)
+  protected void reconcile(final String sheetName)
   {
     checkAccess();
-    // if (getStorage() == null) {
-    // log.error("Reconcile called without storage.");
-    // return getInputPage();
-    // }
-    // datevImportDao.reconcile(storage, sheetName);
+    if (form.storage == null) {
+      log.error("Reconcile called without storage.");
+      return;
+    }
+    datevImportDao.reconcile(form.storage, sheetName);
   }
 
-  private void commit(String sheetName)
+  protected void commit(final String sheetName)
   {
     checkAccess();
-    // if (getStorage() == null) {
-    // log.error("Commit called without storage.");
-    // return getInputPage();
-    // }
-    // datevImportDao.commit(storage, sheetName);
+    if (form.storage == null) {
+      log.error("Commit called without storage.");
+      return;
+    }
+    datevImportDao.commit(form.storage, sheetName);
+  }
+
+  protected void selectAll(final String sheetName)
+  {
+    checkAccess();
+    final ImportedSheet< ? > sheet = (ImportedSheet< ? >) form.storage.getNamedSheet(sheetName);
+    Validate.notNull(sheet);
+    sheet.selectAll(true, "modified".equals(form.filter.getListType()));
+    // updateSelectedItems();
+  }
+
+  protected void deselectAll(final String sheetName)
+  {
+    checkAccess();
+    final ImportedSheet< ? > sheet = (ImportedSheet< ? >) form.storage.getNamedSheet(sheetName);
+    Validate.notNull(sheet);
+    sheet.selectAll(false, false);
+    // updateSelectedItems();
+  }
+
+  protected void showErrorSummary(final String sheetName)
+  {
+    final ImportedSheet< ? > sheet = (ImportedSheet< ? >) form.storage.getNamedSheet(sheetName);
+    Validate.notNull(sheet);
+    form.errorProperties = sheet.getErrorProperties();
+  }
+
+  protected void showBWA(final String sheetName)
+  {
+    final ImportedSheet< ? > sheet = (ImportedSheet< ? >) form.storage.getNamedSheet(sheetName);
+    Validate.notNull(sheet);
+    final List<BuchungssatzDO> list = new ArrayList<BuchungssatzDO>();
+    for (ImportedElement< ? > element : sheet.getElements()) {
+      final BuchungssatzDO satz = (BuchungssatzDO) element.getValue();
+      list.add(satz);
+    }
+     form.bwa = new Bwa((Integer) sheet.getProperty("year"), (Integer) sheet.getProperty("month"));
+     form.bwa.setBuchungssaetze(list);
   }
 
   private void checkAccess()

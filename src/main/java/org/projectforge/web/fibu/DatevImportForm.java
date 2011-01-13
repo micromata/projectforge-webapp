@@ -28,10 +28,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.collections.MapUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.Component;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
@@ -44,16 +47,26 @@ import org.projectforge.common.ImportStorage;
 import org.projectforge.common.ImportedElement;
 import org.projectforge.common.ImportedSheet;
 import org.projectforge.common.StringHelper;
+import org.projectforge.core.CurrencyFormatter;
+import org.projectforge.fibu.KontoDO;
+import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.datev.DatevImportDao;
+import org.projectforge.fibu.kost.BuchungssatzDO;
 import org.projectforge.fibu.kost.Bwa;
+import org.projectforge.fibu.kost.Kost1DO;
+import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.PresizedImage;
 import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.PlainLabel;
 import org.projectforge.web.wicket.components.RadioButtonLabelPanel;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.springframework.util.CollectionUtils;
+
+import de.micromata.hibernate.history.delta.PropertyDelta;
 
 public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImportPage>
 {
@@ -71,11 +84,11 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
 
   private Label bwaLabel, storageHeadingLabel;
 
-  private Map<String, Set<Object>> errorProperties;
+  protected Map<String, Set<Object>> errorProperties;
 
-  private Bwa bwa;
+  protected Bwa bwa;
 
-  protected ImportStorage< ? > storage;
+  protected transient ImportStorage< ? > storage;
 
   public DatevImportForm(final DatevImportPage parentPage)
   {
@@ -84,7 +97,7 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
     setMultiPart(true);
     // Add one file input field
     add(fileUploadField = new FileUploadField("fileInput"));
-    setMaxSize(Bytes.megabytes(1));
+    setMaxSize(Bytes.megabytes(10));
   }
 
   @SuppressWarnings("serial")
@@ -92,7 +105,6 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
   protected void init()
   {
     super.init();
-
     final RadioGroup<String> filterType = new RadioGroup<String>("filterType", new PropertyModel<String>(filter, "listType"));
     add(filterType);
     final RepeatingView radioButtonRepeater = new RepeatingView("repeater");
@@ -137,13 +149,23 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
     });
 
     storageContainer = new WebMarkupContainer("storage");
-    refresh();
+    add(storageContainer);
     sheetRepeatingView = new RepeatingView("sheetRepeater");
     storageContainer.add(sheetRepeatingView);
   }
 
+  @Override
+  public void onBeforeRender()
+  {
+    refresh();
+    super.onBeforeRender();
+  }
+
   protected void refresh()
   {
+    if (storage == null) {
+      storage = (ImportStorage< ? >) parentPage.getUserPrefEntry(DatevImportPage.KEY_IMPORT_STORAGE);
+    }
     if (storage == null) {
       storageContainer.setVisible(false);
       return;
@@ -158,11 +180,12 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
     if (storageHeadingLabel != null) {
       storageContainer.remove(storageHeadingLabel);
     }
-    storageContainer.add(new Label("storageHeading", "Import storage: " + storage != null ? storage.getFilename() : "")).setRenderBodyOnly(
-        true);
+    storageContainer.add(
+        storageHeadingLabel = new Label("storageHeading", "Import storage: " + storage != null ? storage.getFilename() : ""))
+        .setRenderBodyOnly(true);
 
+    storageContainer.add(errorPropertiesTable = new WebMarkupContainer("errorPropertiesTable"));
     if (MapUtils.isNotEmpty(errorProperties) == true) {
-      storageContainer.add(errorPropertiesTable = new WebMarkupContainer("errorPropertiesTable"));
       final RepeatingView errorPropertiesView = new RepeatingView("errorProperties");
       storageContainer.add(errorPropertiesView);
       for (final Map.Entry<String, Set<Object>> entry : errorProperties.entrySet()) {
@@ -175,17 +198,19 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
         }
         errorPropertiesView.add(new Label("propertyItems", buf.toString()));
       }
-    } else if (bwa != null) {
-      storageContainer.add(bwaLabel = new Label("bwa", bwa.toString()));
+    } else {
+      errorPropertiesTable.setVisible(false);
     }
-    if (bwaLabel == null) {
-      storageContainer.add(bwaLabel = new Label("bwa", "[invisible]")).setVisible(false);
+    if (bwa != null) {
+      storageContainer.add(bwaLabel = new Label("bwa", bwa.toString()));
+    } else {
+      storageContainer.add(bwaLabel = (Label) new Label("bwa", "[invisible]").setVisible(false));
     }
     if (errorPropertiesTable == null) {
       storageContainer.add(errorPropertiesTable = new WebMarkupContainer("errorPropertiesTable")).setVisible(false);
     }
     if (storageHeadingLabel == null) {
-      storageContainer.add(storageHeadingLabel = new Label("storageHeading", "[invisible]")).setVisible(false);
+      storageContainer.add(storageHeadingLabel = (Label) new Label("storageHeading", "[invisible]").setVisible(false));
     }
     sheetRepeatingView.removeAll();
     if (storage.getSheets() != null) {
@@ -210,21 +235,23 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
     } else {
       buf.append(getString(ImportStatus.NOT_RECONCILED.getI18nKey()));
     }
-    cont.add(new SubmitLink("toggle") {
+    cont.add(new Label("sheetName", buf.toString()));
+    final SubmitLink toggleLink = new SubmitLink("toggle") {
       @Override
       public void onSubmit()
       {
         sheet.setOpen(!sheet.isOpen()); // Toggle open status.
       }
-    });
-    cont.add(new PresizedImage("zoomInImage", getResponse(), ImageDef.ZOOM_IN) {
+    };
+    cont.add(toggleLink);
+    toggleLink.add(new PresizedImage("zoomInImage", getResponse(), ImageDef.ZOOM_IN) {
       @Override
       public boolean isVisible()
       {
         return !sheet.isOpen();
       }
     });
-    cont.add(new PresizedImage("zoomOutImage", getResponse(), ImageDef.ZOOM_OUT) {
+    toggleLink.add(new PresizedImage("zoomOutImage", getResponse(), ImageDef.ZOOM_OUT) {
       @Override
       public boolean isVisible()
       {
@@ -233,7 +260,7 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
     });
     buf = new StringBuffer();
     buf.append("Total=").append(sheet.getTotalNumberOfElements()).append(" ");
-    if (sheet.getNumberOfNewElements() >= 0) {
+    if (sheet.getNumberOfNewElements() > 0) {
       buf.append(" | New=<span style=\"color: red;\">").append(sheet.getNumberOfNewElements()).append("</span>");
     }
     if (sheet.getNumberOfModifiedElements() > 0) {
@@ -243,24 +270,69 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
       buf.append(" | Unmodified=").append(sheet.getNumberOfUnmodifiedElements());
     }
     if (sheet.getNumberOfFaultyElements() > 0) {
-      buf.append(" | Modified=<span style=\"color: red; font-weight: bold;\">").append(sheet.getNumberOfFaultyElements()).append("</span>");
+      buf.append(" | Errors=<span style=\"color: red; font-weight: bold;\">").append(sheet.getNumberOfFaultyElements()).append("</span>");
     }
     cont.add(new PlainLabel("statistics", buf.toString()).setEscapeModelStrings(false));
+    final RepeatingView actionLinkRepeater = new RepeatingView("actionLinkRepeater");
+    cont.add(actionLinkRepeater);
     if (sheet.isReconciled() == false
         || sheet.getStatus().isIn(ImportStatus.IMPORTED, ImportStatus.NOTHING_TODO, ImportStatus.HAS_ERRORS) == true) {
-      // <a onclick="javascript:submitSelectedEvent('reconcile', '${sheet.name}')" href="#"> Verproben_ </a>
+      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+        @Override
+        public void onSubmit()
+        {
+          parentPage.reconcile(sheet.getName());
+        }
+      }, "reconcile");
     } else if (sheet.isReconciled() == true) {
-      // <a onclick="javascript:submitSelectedEvent('commit', '${sheet.name}')" href="#"> Commit_ </a>
-      // <a onclick="javascript:submitSelectedEvent('selectAll', '${sheet.name}')" href="#"> Select all_ </a>
-      // <a onclick="javascript:submitSelectedEvent('deselectAll', '${sheet.name}')" href="#"> Unselect all_ </a>
+      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+        @Override
+        public void onSubmit()
+        {
+          parentPage.commit(sheet.getName());
+        }
+      }, "commit");
+      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+        @Override
+        public void onSubmit()
+        {
+          parentPage.selectAll(sheet.getName());
+        }
+      }, "select all");
+      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+        @Override
+        public void onSubmit()
+        {
+          parentPage.deselectAll(sheet.getName());
+        }
+      }, "deselect all");
     }
     if (sheet.isFaulty() == true) {
-      // <a onclick="javascript:submitSelectedEvent('showErrorSummary', '${sheet.name}')" href="#"> show error summary_ </a>
+      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+        @Override
+        public void onSubmit()
+        {
+          parentPage.showErrorSummary(sheet.getName());
+        }
+      }, "show error summary");
     }
     if (getStorageType() == DatevImportDao.Type.BUCHUNGSSAETZE) {
-      // <a onclick="javascript:submitSelectedEvent('showBWA', '${sheet.name}')" href="#"> show BWA_ </a>
+      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+        @Override
+        public void onSubmit()
+        {
+          parentPage.showBWA(sheet.getName());
+        }
+      }, "show business assessment");
     }
     addSheetTable(sheet, cont);
+  }
+
+  private void addActionLink(final RepeatingView actionLinkRepeater, final SubmitLink link, final String label)
+  {
+    final WebMarkupContainer actionLinkContainer = new WebMarkupContainer(actionLinkRepeater.newChildId());
+    actionLinkRepeater.add(actionLinkContainer);
+    actionLinkContainer.add(link.add(new PlainLabel("label", label)));
   }
 
   private void addSheetTable(final ImportedSheet< ? > sheet, final WebMarkupContainer container)
@@ -272,24 +344,25 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
       table.setVisible(false);
       return;
     }
-    final RepeatingView colHeadRepeater = new RepeatingView("colHeadRepeater");
-    container.add(colHeadRepeater);
+    final RepeatingView headColRepeater = new RepeatingView("headColRepeater");
+    table.add(headColRepeater);
     if (getStorageType() == DatevImportDao.Type.KONTENPLAN) {
-      colHeadRepeater.add(new Label(colHeadRepeater.newChildId(), getString("fibu.konto.nummer")));
-      colHeadRepeater.add(new Label(colHeadRepeater.newChildId(), getString("fibu.konto.bezeichnung")));
+      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.konto.nummer")));
+      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.konto.bezeichnung")));
     } else {
-      colHeadRepeater.add(new Label(colHeadRepeater.newChildId(), getString("date")));
-      colHeadRepeater.add(new Label(colHeadRepeater.newChildId(), getString("fibu.common.betrag")));
-      colHeadRepeater.add(new Label(colHeadRepeater.newChildId(), getString("fibu.buchungssatz.text")));
-      colHeadRepeater.add(new Label(colHeadRepeater.newChildId(), getString("fibu.buchungssatz.konto")));
-      colHeadRepeater.add(new Label(colHeadRepeater.newChildId(), getString("fibu.buchungssatz.gegenKonto")));
-      colHeadRepeater.add(new Label(colHeadRepeater.newChildId(), getString("fibu.kost1")));
-      colHeadRepeater.add(new Label(colHeadRepeater.newChildId(), getString("fibu.kost2")));
+      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.buchungssatz.satznr")));
+      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("date")));
+      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.common.betrag")));
+      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.buchungssatz.text")));
+      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.buchungssatz.konto")));
+      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.buchungssatz.gegenKonto")));
+      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.kost1")));
+      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.kost2")));
     }
-    colHeadRepeater.add(new Label(colHeadRepeater.newChildId(), getString("modifications")));
-    colHeadRepeater.add(new Label(colHeadRepeater.newChildId(), getString("errors")));
+    headColRepeater.add(new Label(headColRepeater.newChildId(), getString("modifications")));
+    headColRepeater.add(new Label(headColRepeater.newChildId(), getString("errors")));
     final RepeatingView rowRepeater = new RepeatingView("rowRepeater");
-    container.add(rowRepeater);
+    table.add(rowRepeater);
     int col = 0;
     for (final Object rawElement : sheet.getElements()) {
       final ImportedElement< ? > element = (ImportedElement< ? >) rawElement;
@@ -306,6 +379,7 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
       final WebMarkupContainer rowContainer = new WebMarkupContainer(rowRepeater.newChildId());
       rowRepeater.add(rowContainer);
       rowContainer.add(new SimpleAttributeModifier("class", (col++ % 2 == 0) ? "even" : "odd"));
+      rowContainer.add(new SimpleAttributeModifier("onclick", "javascript:rowCheckboxClick(this);"));
       final String style;
       if (element.isFaulty() == true) {
         style = "color: red;";
@@ -314,9 +388,94 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
       } else {
         style = null;
       }
-      if (getStorageType() == DatevImportDao.Type.KONTENPLAN) {
-      } else {
+      final WebMarkupContainer firstCell = new WebMarkupContainer("firstCell");
+      if (style != null) {
+        firstCell.add(new SimpleAttributeModifier("style", style));
       }
+      rowContainer.add(firstCell);
+      final CheckBox checkBox = new CheckBox("selectItem", new PropertyModel<Boolean>(element, "selected"));
+      if (sheet.getStatus() != ImportStatus.RECONCILED) {
+        checkBox.setVisible(false);
+      }
+      firstCell.add(checkBox);
+      final ImageDef imageDef;
+      if (element.isNew() == true) {
+        imageDef = ImageDef.ADD;
+      } else if (element.isModified() == true) {
+        imageDef = ImageDef.EDIT;
+      } else {
+        imageDef = ImageDef.PAGE;
+      }
+      firstCell.add(new PresizedImage("icon", getResponse(), imageDef));
+
+      final RepeatingView cellRepeater = new RepeatingView("cellRepeater");
+      rowContainer.add(cellRepeater);
+      if (getStorageType() == DatevImportDao.Type.KONTENPLAN) {
+        final KontoDO konto = (KontoDO) element.getValue();
+        addCell(cellRepeater, konto.getNummer(), style + " white-space: nowrap; text-align: right;");
+        addCell(cellRepeater, konto.getBezeichnung(), style);
+      } else {
+        final BuchungssatzDO satz = (BuchungssatzDO) element.getValue();
+        addCell(cellRepeater, satz.getSatznr(), style + " white-space: nowrap; text-align: right;");
+        addCell(cellRepeater, DateTimeFormatter.instance().getFormattedDate(satz.getDatum()), style + " white-space: nowrap;");
+        addCell(cellRepeater, CurrencyFormatter.format(satz.getBetrag()), style + " white-space: nowrap; text-align: right;");
+        addCell(cellRepeater, satz.getText(), style);
+        addCell(cellRepeater, satz.getKonto() != null ? satz.getKonto().getNummer() : null, style);
+        addCell(cellRepeater, satz.getGegenKonto() != null ? satz.getGegenKonto().getNummer() : null, style);
+        final Kost1DO kost1 = satz.getKost1();
+        Component comp = addCell(cellRepeater, kost1 != null ? kost1.getShortDisplayName() : null, style);
+        if (kost1 != null) {
+          WicketUtils.addTooltip(comp, KostFormatter.formatToolTip(kost1));
+        }
+        final Kost2DO kost2 = satz.getKost2();
+        comp = addCell(cellRepeater, kost2 != null ? kost2.getShortDisplayName() : null, style);
+        if (kost2 != null) {
+          WicketUtils.addTooltip(comp, KostFormatter.formatToolTip(kost2));
+        }
+      }
+      if (element.getOldValue() != null && element.getPropertyChanges() != null) {
+        final StringBuffer buf = new StringBuffer();
+        boolean first = true;
+        for (final PropertyDelta delta : element.getPropertyChanges()) {
+          first = StringHelper.append(buf, first, delta.getPropertyName(), "; ");
+          buf.append("=").append(delta.getNewValue()).append(" [").append(delta.getOldValue()).append("]");
+        }
+        addCell(cellRepeater, buf.toString(), style);
+      } else {
+        addCell(cellRepeater, "", null);
+      }
+      if (element.isFaulty() == true) {
+        final StringBuffer buf = new StringBuffer();
+        if (element.getErrorProperties() != null) {
+          boolean first = true;
+          for (final Map.Entry<String, Object> entry : element.getErrorProperties().entrySet()) {
+            first = StringHelper.append(buf, first, entry.getKey(), ", ");
+            buf.append("=[").append(entry.getValue()).append("]");
+          }
+        }
+        addCell(cellRepeater, buf.toString(), " color: red; font-weight: bold;");
+      } else {
+        addCell(cellRepeater, "", null);
+      }
+    }
+  }
+
+  private Component addCell(final RepeatingView cellRepeater, final String value, final String style)
+  {
+    final Component comp;
+    cellRepeater.add(comp = new Label(cellRepeater.newChildId(), StringUtils.defaultString(value)));
+    if (style != null) {
+      comp.add(new SimpleAttributeModifier("style", style));
+    }
+    return comp;
+  }
+
+  private Component addCell(final RepeatingView cellRepeater, final Integer value, final String style)
+  {
+    if (value == null) {
+      return addCell(cellRepeater, "", style);
+    } else {
+      return addCell(cellRepeater, String.valueOf(value), style);
     }
   }
 
