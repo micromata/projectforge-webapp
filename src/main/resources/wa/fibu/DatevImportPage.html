@@ -9,7 +9,7 @@
   <div wicket:id="feedback">[Validation errors]</div>
 
   <form wicket:id="form">
-  <fieldset><legend style="display: inline;"><wicket:message key="upload" /></legend>
+  <h3><wicket:message key="upload" /></h3>
   <table class="oldform">
     <tr>
       <th><label for="uploadCell"><wicket:message key="fibu.datev.upload" /></label></th>
@@ -26,7 +26,6 @@
       records]</span><span wicket:id="clearStorage">[clear storage]</span></td>
     </tr>
   </table>
-  </fieldset>
 
   <div wicket:id="storage">
   <h1 wicket:id="storageHeading">[Import storage filename]</h1>
@@ -42,54 +41,26 @@
     </tr>
   </table>
   <pre wicket:id="bwa">[${actionBean.bwa}]</pre></div>
-  <fieldset class="section" wicket:id="sheetRepeater"><legend wicket:id="sheetName">[Sheet_: ${sheet.name} ...]</legend> <a
-    wicket:id="toggle"><img src="../images/zoom_in.png" wicket:id="zoomInImage" /><img src="../images/zoom_out.png" wicket:id="zoomOutImage" /></a>
-  <span wicket:id="statistics">[Total=...]</span> <a wicket:id="reconcileLink">[reconcile]</a> <a wicket:id="commitLink">[commit]</a> <a
-    wicket:id="selectAllLink">[select all]</a> <a wicket:id="deselectAllLink">[deselect all]</a> <a wicket:id="showErrorSummaryLink">[show error
-  summary]</a> <a wicket:id="showBWALink">[show BWA]</a>
-
-
-  <table class="dataTable" wicket:id="sheetTable" cellspacing="0">
-    <tbody>
-      <tr>
-        <th>&nbsp;</th>
-        <th wicket:id="headColRepeater"></th>
-      </tr>
-      <tr wicket:id="rowRepeater">
-        <td></td>
-        <td wicket:id="colRepeater"></td>
-      </tr>
-      <tr class="${trStyle}">
-        <td wicket:id="firstCell"><input type="checkbox" wicket:id="selectItem" /> <img src="images/add.png" wicket:id="icon" /></td>
-        <c:choose>
-          <c:when test="${fn:contains(element.value.class.name, 'org.projectforge.fibu.KontoDO')}">
-            <td style="white-space: nowrap; text-align: right;">${obj.nummer}</td>
-            <td style="">${obj.bezeichnung}</td>
-          </c:when>
-          <c:otherwise>
-            <td style="white-space: nowrap; text-align: right;">${obj.satznr}</td>
-            <td style=""><pf:date date="${obj.datum}" type="date" /></td>
-            <td style="white-space: nowrap; text-align: right;"><pf:currency value="${obj.betrag}" /></td>
-            <td style="">${obj.text}</td>
-            <td style=""><c:if test="${obj.konto != null}">${obj.konto.nummer}</c:if></td>
-            <td style=""><c:if test="${obj.gegenKonto != null}">${obj.gegenKonto.nummer}</c:if></td>
-            <td style=""><c:if test="${obj.kost1 != null}">${obj.kost1.shortDisplayName}</c:if></td>
-            <td style=""><c:if test="${obj.kost2 != null}">${obj.kost2.shortDisplayName}</c:if></td>
-          </c:otherwise>
-        </c:choose>
-        <td style=""><c:if test="${dbObj != null}">
-          <c:forEach items="${element.propertyChanges}" var="delta">
-                          ${delta.propertyName}=<a title="${delta.oldValue}">${delta.newValue}</a>;
-                        </c:forEach>
-        </c:if>
-        <td><c:if test="${element.faulty}">
-          <span style="color: red; font-weight: bold;">${element.errorProperties}</span>
-        </c:if></td>
-      </tr>
-    </tbody>
-  </table>
-  </fieldset>
-  </div>
+  <wicket:container wicket:id="sheetRepeater">
+    <h3 wicket:id="sheetName">[Sheet_: ${sheet.name} ...]</h3>
+    <a wicket:id="toggle"><img src="../images/zoom_in.png" wicket:id="zoomInImage" /><img src="../images/zoom_out.png" wicket:id="zoomOutImage" /></a>
+    <span wicket:id="statistics">[Total=...]</span>
+    <wicket:container wicket:id="actionLinkRepeater"> | <a wicket:id="actionLink"><span wicket:id="label">[reconcile,
+      commit, select all, deselect all, show error summory, show BWA]</span></a>
+    </wicket:container>
+    <table class="dataview" wicket:id="sheetTable" cellspacing="0">
+      <tbody>
+        <tr>
+          <th>&nbsp;</th>
+          <th wicket:id="headColRepeater"></th>
+        </tr>
+        <tr wicket:id="rowRepeater">
+          <td wicket:id="firstCell"><input type="checkbox" wicket:id="selectItem" /> <img src="images/add.png" wicket:id="icon" /></td>
+          <td wicket:id="cellRepeater">[cells]</td>
+        </tr>
+      </tbody>
+    </table>
+  </wicket:container></div>
   </form>
 </wicket:extend>
 </body>
