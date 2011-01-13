@@ -72,6 +72,7 @@ import org.projectforge.web.fibu.Kost2ListPage;
 import org.projectforge.web.fibu.MonthlyEmployeeReportPage;
 import org.projectforge.web.fibu.ProjektListPage;
 import org.projectforge.web.fibu.RechnungListPage;
+import org.projectforge.web.fibu.ReportObjectivesPage;
 import org.projectforge.web.gantt.GanttChartListPage;
 import org.projectforge.web.gwiki.GWikiContainerPage;
 import org.projectforge.web.humanresources.HRListPage;
@@ -183,7 +184,7 @@ public enum MenuItemDef
       ProjektDao.USER_RIGHT_ID, READONLY_READWRITE), //
   RECHNUNG_LIST("fibu.rechnungen", RechnungListPage.class, //
       RechnungDao.USER_RIGHT_ID, READONLY_READWRITE), //
-  REPORT_OBJECTIVES("fibu.reporting.reportObjectives", "fibu/ReportObjectives.action", //
+  REPORT_OBJECTIVES("fibu.reporting.reportObjectives", ReportObjectivesPage.class, //
       FINANCE_GROUP, CONTROLLING_GROUP), //
   REPORT_SCRIPTING("fibu.reporting.reportScripting", ReportScriptingPage.class, //
       FINANCE_GROUP, CONTROLLING_GROUP), //
