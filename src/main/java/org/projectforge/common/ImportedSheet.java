@@ -23,6 +23,7 @@
 
 package org.projectforge.common;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,8 +38,10 @@ import org.apache.commons.collections.CollectionUtils;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class ImportedSheet<T>
+public class ImportedSheet<T> implements Serializable
 {
+  private static final long serialVersionUID = 3643437932617400461L;
+
   private List<ImportedElement<T>> elements;
 
   private String name;

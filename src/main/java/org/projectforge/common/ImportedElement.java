@@ -23,6 +23,7 @@
 
 package org.projectforge.common;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -45,8 +46,10 @@ import de.micromata.hibernate.history.delta.SimplePropertyDelta;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class ImportedElement<T>
+public class ImportedElement<T> implements Serializable
 {
+  private static final long serialVersionUID = -3405918702811291053L;
+
   private T value;
 
   private T oldValue;
@@ -132,20 +135,30 @@ public class ImportedElement<T>
         Object ov;
         Object nv;
         if (origValue instanceof ShortDisplayNameCapable) {
-          ov = ((ShortDisplayNameCapable)origValue).getShortDisplayName();
+          ov = ((ShortDisplayNameCapable) origValue).getShortDisplayName();
         } else {
           ov = origValue;
         }
         if (newValue instanceof ShortDisplayNameCapable) {
-          nv = ((ShortDisplayNameCapable)newValue).getShortDisplayName();
+          nv = ((ShortDisplayNameCapable) newValue).getShortDisplayName();
         } else {
           nv = newValue;
         }
-        PropertyDelta delta = new SimplePropertyDelta(fieldname, method.getReturnType(), ov, nv);
+        PropertyDelta delta = new MySimplePropertyDelta(fieldname, method.getReturnType(), ov, nv);
         propertyDeltas.add(delta);
       }
     }
     return propertyDeltas;
+  }
+
+  private class MySimplePropertyDelta extends SimplePropertyDelta implements Serializable
+  {
+    private static final long serialVersionUID = -6828269529571580866L;
+
+    private MySimplePropertyDelta(final String propertyName, final Class< ? > propertyType, final Object oldValue, final Object newValue)
+    {
+      super(propertyName, propertyType, oldValue, newValue);
+    }
   }
 
   /**
@@ -235,8 +248,9 @@ public class ImportedElement<T>
     }
     errorProperties.put(key, value);
   }
-  
-  public void removeErrorProperty(String key) {
+
+  public void removeErrorProperty(String key)
+  {
     if (errorProperties != null) {
       errorProperties.remove(key);
     }
@@ -246,7 +260,7 @@ public class ImportedElement<T>
   {
     return errorProperties;
   }
-  
+
   /**
    * @param key
    * @return The error property if found, otherwise null.
