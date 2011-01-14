@@ -79,7 +79,7 @@ public class ReportStorage
   /** Set report only as open, if the report has child reports. */
   public void setOpen(boolean opened)
   {
-    if (currentReport.getHasChilds() == false) {
+    if (currentReport.hasChilds() == false) {
       log.info("Try to open a report without childs, ignoring this operation for " + currentReport.getId());
       return;
     }
