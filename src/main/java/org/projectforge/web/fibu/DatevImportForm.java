@@ -363,7 +363,7 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
     headColRepeater.add(new Label(headColRepeater.newChildId(), getString("errors")));
     final RepeatingView rowRepeater = new RepeatingView("rowRepeater");
     table.add(rowRepeater);
-    int col = 0;
+    int row = 0;
     for (final Object rawElement : sheet.getElements()) {
       final ImportedElement< ? > element = (ImportedElement< ? >) rawElement;
       final String listType = filter.getListType();
@@ -378,7 +378,7 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
       }
       final WebMarkupContainer rowContainer = new WebMarkupContainer(rowRepeater.newChildId());
       rowRepeater.add(rowContainer);
-      rowContainer.add(new SimpleAttributeModifier("class", (col++ % 2 == 0) ? "even" : "odd"));
+      rowContainer.add(new SimpleAttributeModifier("class", (row++ % 2 == 0) ? "even" : "odd"));
       rowContainer.add(new SimpleAttributeModifier("onclick", "javascript:rowCheckboxClick(this);"));
       final String style;
       if (element.isFaulty() == true) {
