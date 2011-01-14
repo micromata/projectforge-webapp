@@ -74,7 +74,10 @@ public class Menu implements Serializable
     }
     final StringTokenizer tokenizer = new StringTokenizer(favoritesString, ",");
     while (tokenizer.hasMoreTokens() == true) {
-      final String token = tokenizer.nextToken();
+      String token = tokenizer.nextToken();
+      if (token.startsWith("M_") == true) {
+        token = token.substring(2);
+      }
       try {
         final MenuItemDef menuItemDef = MenuItemDef.valueOf(token);
         if (menuItemDef == null) {
