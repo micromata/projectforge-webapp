@@ -202,7 +202,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
     List<PersonalAddressDO> list = getHibernateTemplate().find(
         "from "
             + PersonalAddressDO.class.getSimpleName()
-            + " t join fetch t.address where t.owner.id = ? order by t.address.name, t.address.firstName", owner.getId());
+            + " t join fetch t.address where t.owner.id = ? and t.address.deleted = false order by t.address.name, t.address.firstName", owner.getId());
     return list;
   }
 
@@ -242,7 +242,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
     List<PersonalAddressDO> list = getHibernateTemplate().find(
         "from "
             + PersonalAddressDO.class.getSimpleName()
-            + " t join fetch t.address where t.owner.id = ? order by t.address.name, t.address.firstName", owner.getId());
+            + " t join fetch t.address where t.owner.id = ? adn t.address.deleted = false order by t.address.name, t.address.firstName", owner.getId());
     List<AddressDO> result = new ArrayList<AddressDO>();
     for (PersonalAddressDO entry : list) {
       if (entry.isFavorite() == true) {
