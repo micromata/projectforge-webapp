@@ -225,40 +225,42 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
     for (String key : keys) {
       buf.append(key + "=" + props_de.getProperty(key) + "\n");
     }
-    buf.append("\n\nMaybe not defined but used (found in java, jsp or Wicket's html code):\n");
-    buf.append("----------------------------------------------------------------------\n");
-    keys = new ArrayList<String>();
-    for (final Object key : propsFound.keySet()) {
-      if (props.containsKey(key) == false && props_de.containsKey(key) == false && props.containsKey(key) == false) {
-        keys.add(String.valueOf(key) + "=" + propsFound.getProperty((String) key));
+    if (WicketApplication.isDevelopmentModus() == true) {
+      buf.append("\n\nMaybe not defined but used (found in java, jsp or Wicket's html code):\n");
+      buf.append("----------------------------------------------------------------------\n");
+      keys = new ArrayList<String>();
+      for (final Object key : propsFound.keySet()) {
+        if (props.containsKey(key) == false && props_de.containsKey(key) == false && props.containsKey(key) == false) {
+          keys.add(String.valueOf(key) + "=" + propsFound.getProperty((String) key));
+        }
       }
-    }
-    Collections.sort(keys);
-    for (String key : keys) {
-      buf.append(key + "\n");
-    }
-    buf.append("\n\nExperimental (in progress): Maybe unused (not found in java, jsp or Wicket's html code):\n");
-    buf.append("----------------------------------------------------------------------------------------\n");
-    final Set<String> all = new TreeSet<String>();
-    CollectionUtils.addAll(all, props.keys());
-    CollectionUtils.addAll(all, props_en.keys());
-    CollectionUtils.addAll(all, props_de.keys());
-    keys = new ArrayList<String>();
-    for (final String key : all) {
-      if (propsFound.containsKey(key) == false) {
-        keys.add(String.valueOf(key));
+      Collections.sort(keys);
+      for (String key : keys) {
+        buf.append(key + "\n");
       }
-    }
-    Collections.sort(keys);
-    for (String key : keys) {
-      String value = props_de.getProperty(key);
-      if (value == null) {
-        value = props_en.getProperty(key);
+      buf.append("\n\nExperimental (in progress): Maybe unused (not found in java, jsp or Wicket's html code):\n");
+      buf.append("----------------------------------------------------------------------------------------\n");
+      final Set<String> all = new TreeSet<String>();
+      CollectionUtils.addAll(all, props.keys());
+      CollectionUtils.addAll(all, props_en.keys());
+      CollectionUtils.addAll(all, props_de.keys());
+      keys = new ArrayList<String>();
+      for (final String key : all) {
+        if (propsFound.containsKey(key) == false) {
+          keys.add(String.valueOf(key));
+        }
       }
-      if (value == null) {
-        value = props.getProperty(key);
+      Collections.sort(keys);
+      for (String key : keys) {
+        String value = props_de.getProperty(key);
+        if (value == null) {
+          value = props_en.getProperty(key);
+        }
+        if (value == null) {
+          value = props.getProperty(key);
+        }
+        buf.append(key + "=" + value + "\n");
       }
-      buf.append(key + "=" + value + "\n");
     }
     final String result = buf.toString();
     final String filename = "projectforge_i18n_check" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".txt";
