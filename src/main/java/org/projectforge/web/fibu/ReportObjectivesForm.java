@@ -23,6 +23,12 @@
 
 package org.projectforge.web.fibu;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.wicket.Component;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -32,8 +38,13 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.common.DateHolder;
+import org.projectforge.common.NumberHelper;
+import org.projectforge.core.CurrencyFormatter;
+import org.projectforge.core.Priority;
+import org.projectforge.fibu.kost.BwaZeile;
 import org.projectforge.fibu.kost.reporting.Report;
 import org.projectforge.fibu.kost.reporting.ReportStorage;
+import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.PlainLabel;
@@ -48,6 +59,8 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
   protected FileUploadField fileUploadField;
 
   protected ReportObjectivesFilter filter;
+
+  protected Priority priority = Priority.HIGH;
 
   private WebMarkupContainer uploadContainer, filterSettingsContainer, storageContainer;
 
@@ -132,17 +145,83 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
       for (final Report ancestorReport : currentReport.getPath()) {
         final WebMarkupContainer actionLinkContainer = new WebMarkupContainer(actionLinkRepeater.newChildId());
         actionLinkRepeater.add(actionLinkContainer);
-        actionLinkContainer.add(new SubmitLink("actionLink") {
-          @Override
-          public void onSubmit()
-          {
-            reportStorage.setCurrentReport(ancestorReport.getId());
-          }
-        }.add(new PlainLabel("label", ancestorReport.getId())));
+        actionLinkContainer.add(createReportLink("actionLink", reportStorage, ancestorReport.getId()));
       }
     } else {
       storageContainer.add(new Label("path", "[invisible]").setVisible(false));
     }
+    storageContainer.add(new Label("reportObjectiveId", currentReport.getReportObjective().getId()));
+    final List<Report> childs = currentReport.getChilds();
+    final RepeatingView childHeadColRepeater = new RepeatingView("childHeadColRepeater");
+    storageContainer.add(childHeadColRepeater);
+    if (CollectionUtils.isNotEmpty(childs) == true) {
+      for (final Report childReport : childs) {
+        final WebMarkupContainer item = new WebMarkupContainer(childHeadColRepeater.newChildId());
+        childHeadColRepeater.add(item);
+        if (childReport.hasChilds() == true) {
+          item.add(createReportLink("actionLink", reportStorage, childReport.getId()));
+          item.add(new Label("childId", "[invisible]").setVisible(false));
+        } else {
+          item.add(new PlainLabel("childId", childReport.getId()));
+          item.add(new Label("openChildLink", "[invisible]").setVisible(false));
+        }
+      }
+    }
+    final RepeatingView rowRepeater = new RepeatingView("rowRepeater");
+    storageContainer.add(rowRepeater);
+    int row = 0;
+    for (final BwaZeile[] bwaZeilen : currentReport.getChildBwaArray(true)) {
+      if (priority.ordinal() < bwaZeilen[0].getPriority().ordinal()) {
+        continue;
+      }
+      final WebMarkupContainer rowContainer = new WebMarkupContainer(rowRepeater.newChildId());
+      rowRepeater.add(rowContainer);
+      rowContainer.add(new SimpleAttributeModifier("class", (row++ % 2 == 0) ? "even" : "odd"));
+      rowContainer.add(new Label("zeileNo", String.valueOf(bwaZeilen[0].getZeile())));
+      StringBuffer buf = new StringBuffer();
+      for (int i = 0; i < bwaZeilen[0].getIndent(); i++) {
+        buf.append("&nbsp;&nbsp;");
+      }
+      buf.append(HtmlHelper.escapeXml(bwaZeilen[0].getBezeichnung()));
+      rowContainer.add(new Label("description", buf.toString()).setEscapeModelStrings(false));
+      final RepeatingView cellRepeater = new RepeatingView("cellRepeater");
+      rowRepeater.add(cellRepeater);
+      int col = 0;
+      for (final BwaZeile bwaZeile : bwaZeilen) {
+        final WebMarkupContainer item = new WebMarkupContainer(cellRepeater.newChildId());
+        cellRepeater.add(item);
+        buf = new StringBuffer();
+        buf.append("text-align: right; white-space: nowrap;");
+        if (col == 0) {
+          buf.append(" font-weight: bold;");
+        }
+        if (bwaZeile.getBwaWert().compareTo(BigDecimal.ZERO) < 0) {
+          buf.append(" color: red;");
+        }
+        item.add(new SimpleAttributeModifier("style", buf.toString()));
+        item.add(new PlainLabel("bwaWert", NumberHelper.isNotZero(bwaZeile.getBwaWert()) == true ? CurrencyFormatter.format(bwaZeile
+            .getBwaWert()) : ""));
+        item.add(new SubmitLink("actionLink") {
+          @Override
+          public void onSubmit()
+          {
+            //reportStorage.setCurrentReport("");
+          }
+        });
+      }
+    }
+  }
+
+  @SuppressWarnings("serial")
+  private Component createReportLink(final String id, final ReportStorage reportStorage, final String reportId)
+  {
+    return new SubmitLink(id) {
+      @Override
+      public void onSubmit()
+      {
+        reportStorage.setCurrentReport(reportId);
+      }
+    }.add(new PlainLabel("label", reportId));
   }
 
   protected ReportObjectivesFilter getFilter()

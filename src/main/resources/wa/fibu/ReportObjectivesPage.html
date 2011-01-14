@@ -43,62 +43,19 @@
           <th>&nbsp;</th>
           <th></th>
           <th wicket:id="reportObjectiveId">[report objective id]</th>
-          <c:forEach var="child" items="${report.childs}">
-            <th><c:choose>
-              <c:when test="${child.hasChilds eq true}">
-                <a onclick="javascript:submitSelectedEvent('current', '${child.id}')" href="#">${child.id}</a>
-              </c:when>
-              <c:otherwise>${child.id}</c:otherwise>
-            </c:choose> <stripes:link href="/secure/fibu/BuchungssatzList.action">
-              <stripes:param name="reportId" value="${child.id}" />
-              <pf:image src="/images/attach.png" />
-            </stripes:link></th>
-          </c:forEach>
+          <th wicket:id="childHeadColRepeater"><a wicket:id="actionLink"><span wicket:id="label">[child.id (link to child objective)]</span></a>
+          <span wicket:id="childId">[child id]</span> <a wicket:id="showAccountingRecordsLink"> <img src="images/attach.png" /></a></th>
         </tr>
       </thead>
       <tbody>
-        <c:set var="style" value="even" />
-        <c:forEach var="zeile" items="${actionBean.childBwaTable}">
-          <c:if test="${zeile[0].priority.ordinal ge actionBean.priority.ordinal}">
-            <c:choose>
-              <c:when test="${style eq 'even'}">
-                <c:set var="style" value="odd" />
-              </c:when>
-              <c:otherwise>
-                <c:set var="style" value="even" />
-              </c:otherwise>
-            </c:choose>
-            <tr class="${style}">
-              <td><a href="#">${zeile[0].zeile}</a></td>
-              <td><c:forEach begin="0" end="${zeile[0].indent}">&nbsp;</c:forEach>${zeile[0].bezeichnung}</td>
-              <c:set var="col" value="0" />
-              <c:forEach var="entry" items="${zeile}">
-                <c:choose>
-                  <c:when test="${col == 0}">
-                    <c:set var="tdStyle" value="font-weight: bold;" />
-                  </c:when>
-                  <c:otherwise>
-                    <c:set var="tdStyle" value="" />
-                  </c:otherwise>
-                </c:choose>
-                <c:if test="${entry.bwaWert lt 0}">
-                  <c:set var="tdStyle" value="${tdStyle}color: red;" />
-                </c:if>
-                <c:set var="col" value="${col + 1}" />
-                <td style="text-align: right; white-space: nowrap;"><pf:currency value="${entry.bwaWert}" suppressOutputOfZeroAmount="true" /> <stripes:link
-                  href="/secure/fibu/BuchungssatzList.action">
-                  <stripes:param name="reportId" value="${entry.bwa.reference.id}" />
-                  <stripes:param name="bwaZeileId" value="${entry.zeile}" />
-                  <pf:image src="/images/attach.png" />
-                </stripes:link></td>
-              </c:forEach>
-            </tr>
-          </c:if>
-        </c:forEach>
+        <tr wicket:id="rowRepeater">
+          <td wicket:id="zeileNo">[zeile[0].zeile]</td>
+          <td wicket:id="description">[description]</td>
+          <td wicket:id="cellRepeater"><span wicket:id="bwaWert">[1.123,76 €]</span> <a wicket:id="actionLink"><img src="images/attach.png" /></a>
+          </td>
+        </tr>
       </tbody>
     </table>
-    </c:otherwise>
-    </c:choose>
   </wicket:container></form>
 </wicket:extend>
 </body>
