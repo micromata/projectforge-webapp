@@ -105,6 +105,9 @@ public class BookDO extends DefaultBaseDO
 
   private BookStatus status;
 
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  private BookType type;
+
   @Column(length = 255)
   public String getPublisher()
   {
@@ -337,6 +340,19 @@ public class BookDO extends DefaultBaseDO
   public BookDO setStatus(BookStatus status)
   {
     this.status = status;
+    return this;
+  }
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "book_type", length = 20, nullable = true)
+  public BookType getType()
+  {
+    return type;
+  }
+
+  public BookDO setType(BookType type)
+  {
+    this.type = type;
     return this;
   }
 }
