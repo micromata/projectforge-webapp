@@ -37,8 +37,6 @@ import org.projectforge.book.BookDO;
 import org.projectforge.book.BookDao;
 import org.projectforge.book.BookStatus;
 import org.projectforge.web.calendar.DateTimeFormatter;
-import org.projectforge.web.common.OutputType;
-import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.WebConstants;
@@ -56,9 +54,6 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
 
   @SpringBean(name = "bookDao")
   private BookDao bookDao;
-
-  @SpringBean(name = "taskFormatter")
-  private TaskFormatter taskFormatter;
 
   private TextField<String> authorsField, signatureField, publisherField, editorField, yearOfPublishingField;
 
@@ -79,7 +74,6 @@ public class BookEditForm extends AbstractEditForm<BookDO, BookEditPage>
   protected void init()
   {
     super.init();
-    add(new Label("task", taskFormatter.getTaskPath(data.getTaskId(), true, OutputType.HTML)).setEscapeModelStrings(false));
     final TextField<String> titleField = new RequiredMaxLengthTextField("title", new PropertyModel<String>(data, "title"));
     titleField.add(new FocusOnLoadBehavior()).setOutputMarkupId(false);
     add(titleField);
