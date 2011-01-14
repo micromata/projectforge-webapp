@@ -218,6 +218,7 @@ public class Configuration extends AbstractCache
   protected Configuration()
   {
     super(TICKS_PER_HOUR);
+    reset();
   }
 
   /**
