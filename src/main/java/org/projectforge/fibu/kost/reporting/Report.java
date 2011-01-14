@@ -177,14 +177,14 @@ public class Report
   public BwaZeile[][] getChildBwaArray(boolean prependThisReport)
   {
     if (bwaTable == null) {
-      if (prependThisReport == false && getHasChilds() == false) {
+      if (prependThisReport == false && hasChilds() == false) {
         return null;
       }
       bwaTable = new BwaTable();
       if (prependThisReport == true) {
         bwaTable.addBwa(this.getBwa());
       }
-      if (getHasChilds() == true) {
+      if (hasChilds() == true) {
         for (Report child : getChilds()) {
           bwaTable.addBwa(child.getBwa());
         }
@@ -215,7 +215,7 @@ public class Report
   /**
    * @see ReportObjective#hasChilds()
    */
-  public boolean getHasChilds()
+  public boolean hasChilds()
   {
     return reportObjective.getHasChilds();
   }
@@ -241,7 +241,7 @@ public class Report
     if (ObjectUtils.equals(this.reportObjective.getId(), id) == true) {
       return this;
     }
-    if (getHasChilds() == false) {
+    if (hasChilds() == false) {
       return null;
     }
     for (Report report : getChilds()) {
@@ -266,7 +266,7 @@ public class Report
    */
   public List<Report> getChilds()
   {
-    if (childReports == null && getHasChilds() == true) {
+    if (childReports == null && hasChilds() == true) {
       childReports = new ArrayList<Report>();
       for (ReportObjective child : reportObjective.getChildReportObjectives()) {
         Report report = new Report(child, this);
