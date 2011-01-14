@@ -40,9 +40,9 @@
     <table class="dataview">
       <thead>
         <tr>
-          <th><a href="#">&nbsp;</a></th>
+          <th>&nbsp;</th>
           <th></th>
-          <th>${report.reportObjective.id}</th>
+          <th wicket:id="reportObjectiveId">[report objective id]</th>
           <c:forEach var="child" items="${report.childs}">
             <th><c:choose>
               <c:when test="${child.hasChilds eq true}">
@@ -95,13 +95,6 @@
             </tr>
           </c:if>
         </c:forEach>
-      </tbody>
-    </table>
-    <table class="form">
-      <tbody>
-        <tr>
-          <td colspan="2" class="buttons" style="direction: ltr;"><stripes:submit name="clear" /></td>
-        </tr>
       </tbody>
     </table>
     </c:otherwise>
