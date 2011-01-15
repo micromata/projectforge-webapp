@@ -373,6 +373,7 @@ public class KostFormatter
     if (fromYear > 0) {
       buf.append(formatBuchungsmonat(fromYear, fromMonth));
       if (toYear > 0) {
+        buf.append(" - ");
         buf.append(formatBuchungsmonat(toYear, toMonth));
       }
     }
