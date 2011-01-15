@@ -26,7 +26,7 @@ package org.projectforge.fibu.kost;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.projectforge.common.LabelValueBean;
 
 /**
  * Speichert mehrere BWAs in einer Liste. Es kann eine Tabelle mit verschiedenen BWA-Spalten leicht erzeugt werden.
@@ -35,47 +35,20 @@ import org.apache.commons.collections.CollectionUtils;
  */
 public class BwaTable
 {
-  private List<Bwa> bwaList;
-
-  private BwaZeile[][] table;
+  private List<LabelValueBean<String, Bwa>> bwaList;
 
   public BwaTable()
   {
-    bwaList = new ArrayList<Bwa>();
+    bwaList = new ArrayList<LabelValueBean<String, Bwa>>();
   }
 
-  public void addBwa(Bwa bwa)
+  public List<LabelValueBean<String, Bwa>> getBwaList()
   {
-    bwaList.add(bwa);
+    return bwaList;
   }
 
-  /**
-   * Gibt alle BwaZeilen als Tabelle zurück. In einer Zeile (erster Index) befinden sich BwaZeilen mit gleicher Zeilennummer, in einer
-   * Spalte (2. Index) alle Werte der verschiedenen BWAs.
-   * @return
-   */
-  public BwaZeile[][] getArray()
+  public void addBwa(final String label, final Bwa bwa)
   {
-    if (this.table != null) {
-      return table;
-    }
-    if (CollectionUtils.isEmpty(bwaList) == true) {
-      return null;
-    }
-    Bwa firstBwa = bwaList.get(0);
-    int numberOfRows = firstBwa.getZeilen().size();
-    int numberOfCols = bwaList.size();
-    table = new BwaZeile[numberOfRows][numberOfCols];
-    int col = 0;
-    int row = 0;
-    for (Bwa bwa : bwaList) {
-      row = 0;
-      for (BwaZeile zeile : bwa.getZeilen()) {
-        table[row][col] = zeile;
-        row++;
-      }
-      col++;
-    }
-    return table;
+    bwaList.add(new LabelValueBean<String, Bwa>(label, bwa));
   }
 }
