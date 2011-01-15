@@ -72,6 +72,9 @@ text-decoration:none;
 	border-right: 1px solid #D9DFE1;
 }
 
+#content table.calendar tr.calendarhead th ul.calendartools li.month {
+  width: 20em;
+}
 
 #content table.calendar tr.calendarhead th ul.calendartools li.month a {
 		font-size:1.3em;
