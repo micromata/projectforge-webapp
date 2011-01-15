@@ -23,6 +23,7 @@
 
 package org.projectforge.fibu.kost.reporting;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -36,7 +37,6 @@ import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.BuchungssatzDO;
 import org.projectforge.fibu.kost.Bwa;
 import org.projectforge.fibu.kost.BwaTable;
-import org.projectforge.fibu.kost.BwaZeile;
 import org.projectforge.user.PFUserContext;
 
 /**
@@ -44,25 +44,27 @@ import org.projectforge.user.PFUserContext;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class Report
+public class Report implements Serializable
 {
-  private List<BuchungssatzDO> buchungssaetze;
+  private static final long serialVersionUID = -5359861335173843043L;
 
-  private Set<BuchungssatzDO> buchungssatzSet;
+  private transient List<BuchungssatzDO> buchungssaetze;
 
-  private ReportObjective reportObjective;
+  private transient Set<BuchungssatzDO> buchungssatzSet;
 
-  private List<Report> childReports;
+  private transient ReportObjective reportObjective;
 
-  private List<BuchungssatzDO> other;
+  private transient List<Report> childReports;
 
-  private List<BuchungssatzDO> duplicates;
+  private transient List<BuchungssatzDO> other;
+
+  private transient List<BuchungssatzDO> duplicates;
 
   private boolean showChilds;
 
-  private Bwa bwa;
+  private transient Bwa bwa;
 
-  private BwaTable bwaTable;
+  private transient BwaTable bwaTable;
 
   private int fromYear;
 
@@ -72,7 +74,7 @@ public class Report
 
   private int toMonth;
 
-  private Report parent;
+  private transient Report parent;
 
   public Report(ReportObjective reportObjective)
   {
@@ -173,7 +175,7 @@ public class Report
    * Creates an array with all Bwa's of the child reports.
    * @param prependThisReport If true then the Bwa of this report will be prepend as first column.
    */
-  public BwaZeile[][] getChildBwaArray(boolean prependThisReport)
+  public BwaTable getChildBwaTable(boolean prependThisReport)
   {
     if (bwaTable == null) {
       if (prependThisReport == false && hasChilds() == false) {
@@ -181,15 +183,15 @@ public class Report
       }
       bwaTable = new BwaTable();
       if (prependThisReport == true) {
-        bwaTable.addBwa(this.getBwa());
+        bwaTable.addBwa(this.getId(), this.getBwa());
       }
       if (hasChilds() == true) {
         for (Report child : getChilds()) {
-          bwaTable.addBwa(child.getBwa());
+          bwaTable.addBwa(child.getId(), child.getBwa());
         }
       }
     }
-    return bwaTable.getArray();
+    return bwaTable;
   }
 
   /**
@@ -361,12 +363,12 @@ public class Report
    */
   public void select(List<BuchungssatzDO> list)
   {
-    Predicate regExpPredicate = new Predicate() {
+    final Predicate regExpPredicate = new Predicate() {
       public boolean evaluate(Object obj)
       {
-        BuchungssatzDO satz = (BuchungssatzDO) obj;
-        String kost1 = KostFormatter.format(satz.getKost1());
-        String kost2 = KostFormatter.format(satz.getKost2());
+        final BuchungssatzDO satz = (BuchungssatzDO) obj;
+        final String kost1 = KostFormatter.format(satz.getKost1());
+        final String kost2 = KostFormatter.format(satz.getKost2());
 
         // 1st of all the Blacklists
         if (match(reportObjective.getKost1ExcludeRegExpList(), kost1, false) == true) {
@@ -376,19 +378,24 @@ public class Report
           return false;
         }
         // 2nd the whitelists
-        boolean kost1Match = match(reportObjective.getKost1IncludeRegExpList(), kost1, true);
-        boolean kost2Match = match(reportObjective.getKost2IncludeRegExpList(), kost2, true);
+        final boolean kost1Match = match(reportObjective.getKost1IncludeRegExpList(), kost1, true);
+        final boolean kost2Match = match(reportObjective.getKost2IncludeRegExpList(), kost2, true);
         return kost1Match == true && kost2Match == true;
       }
     };
     this.buchungssaetze = new ArrayList<BuchungssatzDO>();
     this.buchungssatzSet = new HashSet<BuchungssatzDO>();
+    this.bwa = null;
+    this.bwaTable = null;
+    this.childReports = null;
+    this.duplicates = null;
+    this.other = null;
     CollectionUtils.select(list, regExpPredicate, this.buchungssaetze);
-    for (BuchungssatzDO satz : this.buchungssaetze) {
+    for (final BuchungssatzDO satz : this.buchungssaetze) {
       this.buchungssatzSet.add(satz);
     }
   }
-
+  
   public boolean contains(BuchungssatzDO satz)
   {
     if (buchungssatzSet == null) {

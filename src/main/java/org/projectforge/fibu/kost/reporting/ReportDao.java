@@ -95,12 +95,12 @@ public class ReportDao extends HibernateDaoSupport
   public void loadReport(Report report)
   {
     accessChecker.checkIsUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
-    BuchungssatzFilter filter = new BuchungssatzFilter();
+    final BuchungssatzFilter filter = new BuchungssatzFilter();
     filter.setFromYear(report.getFromYear());
     filter.setFromMonth(report.getFromMonth());
     filter.setToYear(report.getToYear());
-    filter.setToMonth(report.getToYear());
-    List<BuchungssatzDO> list = buchungssatzDao.getList(filter);
+    filter.setToMonth(report.getToMonth());
+    final List<BuchungssatzDO> list = buchungssatzDao.getList(filter);
     report.select(list);
   }
 
