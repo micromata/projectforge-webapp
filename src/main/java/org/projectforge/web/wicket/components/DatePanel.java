@@ -54,6 +54,8 @@ public class DatePanel extends FormComponentPanel<Date>
 
   protected boolean modelMarkedAsChanged;
 
+  protected Boolean required;
+
   /**
    * @param id
    * @param model
@@ -70,6 +72,9 @@ public class DatePanel extends FormComponentPanel<Date>
     dateField = new DateTextField("dateField", new PropertyModel<Date>(this, "date"), dateConverter);
     dateField.add(new SimpleAttributeModifier("size", "10"));
     add(dateField);
+    if (settings.required == true) {
+      this.required = true;
+    }
     /*
      * @SuppressWarnings("serial") final DatePicker datePicker = new DatePicker() { @Override protected boolean enableMonthYearSelection() {
      * return true; } }; dateField.add(datePicker);
@@ -142,7 +147,11 @@ public class DatePanel extends FormComponentPanel<Date>
       dateField.modelChanged();
       modelMarkedAsChanged = false;
     }
-    dateField.setRequired(isRequired());
+    if (this.required != null) {
+      dateField.setRequired(this.required);
+    } else {
+      dateField.setRequired(isRequired());
+    }
     super.onBeforeRender();
   }
 
@@ -156,7 +165,7 @@ public class DatePanel extends FormComponentPanel<Date>
       super.updateModel();
     }
   }
-  
+
   public DateTextField getDateField()
   {
     return dateField;
