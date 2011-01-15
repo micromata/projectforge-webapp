@@ -103,9 +103,9 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
 
   private SingleButtonPanel cancelButtonPanel;
 
-  private SingleButtonPanel resetButtonPanel;
+  protected SingleButtonPanel resetButtonPanel;
 
-  private SingleButtonPanel searchButtonPanel;
+  protected SingleButtonPanel searchButtonPanel;
 
   private SingleButtonPanel nextButtonPanel;
 
@@ -522,7 +522,9 @@ public abstract class AbstractListForm<F extends BaseSearchFilter, P extends Abs
   public void setPageSize(Integer pageSize)
   {
     this.pageSize = pageSize;
-    getParentPage().putUserPrefEntry(this.getClass().getName() + ":pageSize", this.pageSize, true);
+    if (getParentPage().isStoreFilter() == true) {
+      getParentPage().putUserPrefEntry(this.getClass().getName() + ":pageSize", this.pageSize, true);
+    }
   }
 
   public Fragment getPageSizeFragment()
