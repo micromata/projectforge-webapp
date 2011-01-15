@@ -31,12 +31,12 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.book.BookDO;
 import org.projectforge.book.BookDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
-import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.EditPage;
 
 @EditPage(defaultReturnPage = BookListPage.class)
-public class BookEditPage extends AbstractEditPage<BookDO, BookEditForm, BookDao> implements ISelectCallerPage
+public class BookEditPage extends AbstractAutoLayoutEditPage<BookDO, BookEditForm, BookDao> implements ISelectCallerPage
 {
   private static final long serialVersionUID = 7091721062661400435L;
 
@@ -49,7 +49,6 @@ public class BookEditPage extends AbstractEditPage<BookDO, BookEditForm, BookDao
   {
     super(parameters, "book");
     init();
-    form.add(new AttributeAppendModifier("class", "newform"));
   }
 
   protected void lendOut()
