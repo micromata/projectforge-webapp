@@ -24,6 +24,7 @@
 package org.projectforge.web.fibu;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -36,6 +37,7 @@ import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.NumberHelper;
@@ -47,6 +49,8 @@ import org.projectforge.fibu.kost.reporting.ReportStorage;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.components.DatePanel;
+import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.PlainLabel;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
@@ -80,6 +84,7 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
   protected void init()
   {
     super.init();
+    filter = getFilter();
     add(uploadContainer = new WebMarkupContainer("uploadContainer"));
     uploadContainer.add(fileUploadField = new FileUploadField("fileInput"));
     final Button importReportObjectivesButton = new Button("button", new Model<String>(getString("import"))) {
@@ -90,7 +95,17 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
       }
     };
     uploadContainer.add(new SingleButtonPanel("importReportObjectives", importReportObjectivesButton));
-    add(filterSettingsContainer = new WebMarkupContainer("filterSettingsContainer"));
+    add(filterSettingsContainer = new WebMarkupContainer("filterSettings") {
+      @Override
+      public boolean isVisible()
+      {
+        return storageContainer != null && storageContainer.isVisible();
+      }
+    });
+
+    filterSettingsContainer.add(new DatePanel("fromDate", new PropertyModel<Date>(filter, "fromDate"), DatePanelSettings.get()));
+    filterSettingsContainer.add(new DatePanel("toDate", new PropertyModel<Date>(filter, "toDate"), DatePanelSettings.get()));
+
     final Button createReportButton = new Button("button", new Model<String>(getString("fibu.kost.reporting.createReport"))) {
       @Override
       public final void onSubmit()
@@ -140,8 +155,10 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
     final Report rootReport = reportStorage.getRoot();
     storageContainer.add(new Label("title", currentReport.getId() + " - " + currentReport.getTitle() + ": " + currentReport.getZeitraum()));
     if (currentReport != rootReport) {
+      final WebMarkupContainer pathContainer = new WebMarkupContainer("path");
+      storageContainer.add(pathContainer);
       final RepeatingView actionLinkRepeater = new RepeatingView("actionLinkRepeater");
-      storageContainer.add(actionLinkRepeater);
+      pathContainer.add(actionLinkRepeater);
       for (final Report ancestorReport : currentReport.getPath()) {
         final WebMarkupContainer actionLinkContainer = new WebMarkupContainer(actionLinkRepeater.newChildId());
         actionLinkRepeater.add(actionLinkContainer);
@@ -162,9 +179,16 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
           item.add(createReportLink("actionLink", reportStorage, childReport.getId()));
           item.add(new Label("childId", "[invisible]").setVisible(false));
         } else {
+          item.add(new Label("actionLink", "[invisible]").setVisible(false));
           item.add(new PlainLabel("childId", childReport.getId()));
-          item.add(new Label("openChildLink", "[invisible]").setVisible(false));
         }
+        item.add(new SubmitLink("showAccountingRecordsLink") {
+          @Override
+          public void onSubmit()
+          {
+            // reportStorage.setCurrentReport("");
+          }
+        });
       }
     }
     final RepeatingView rowRepeater = new RepeatingView("rowRepeater");
@@ -185,7 +209,7 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
       buf.append(HtmlHelper.escapeXml(bwaZeilen[0].getBezeichnung()));
       rowContainer.add(new Label("description", buf.toString()).setEscapeModelStrings(false));
       final RepeatingView cellRepeater = new RepeatingView("cellRepeater");
-      rowRepeater.add(cellRepeater);
+      rowContainer.add(cellRepeater);
       int col = 0;
       for (final BwaZeile bwaZeile : bwaZeilen) {
         final WebMarkupContainer item = new WebMarkupContainer(cellRepeater.newChildId());
@@ -201,11 +225,11 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
         item.add(new SimpleAttributeModifier("style", buf.toString()));
         item.add(new PlainLabel("bwaWert", NumberHelper.isNotZero(bwaZeile.getBwaWert()) == true ? CurrencyFormatter.format(bwaZeile
             .getBwaWert()) : ""));
-        item.add(new SubmitLink("actionLink") {
+        item.add(new SubmitLink("showAccountingRecordsLink") {
           @Override
           public void onSubmit()
           {
-            //reportStorage.setCurrentReport("");
+            // reportStorage.setCurrentReport("");
           }
         });
       }
@@ -219,7 +243,7 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
       @Override
       public void onSubmit()
       {
-        reportStorage.setCurrentReport(reportId);
+        parentPage.getReportStorage().setCurrentReport(reportId);
       }
     }.add(new PlainLabel("label", reportId));
   }
