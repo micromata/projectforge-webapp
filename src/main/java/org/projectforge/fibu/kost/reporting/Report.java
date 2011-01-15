@@ -39,7 +39,6 @@ import org.projectforge.fibu.kost.BwaTable;
 import org.projectforge.fibu.kost.BwaZeile;
 import org.projectforge.user.PFUserContext;
 
-
 /**
  * Ein Report enthält unterliegende Buchungssätze, die gemäß Zeitraum und zugehörigem ReportObjective selektiert werden.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -273,7 +272,7 @@ public class Report
         report.select(this.buchungssaetze);
         childReports.add(report);
       }
-      if (reportObjective.isSuppressOther() == false || reportObjective.isSuppressDuplicates() == false) {
+      if (this.buchungssaetze != null && (reportObjective.isSuppressOther() == false || reportObjective.isSuppressDuplicates() == false)) {
         for (BuchungssatzDO satz : this.buchungssaetze) {
           int n = 0;
           for (Report child : getChilds()) {
@@ -400,7 +399,8 @@ public class Report
 
   /**
    * In jedem regulärem Ausdruck werden alle Punkte gequoted und alle * durch ".*" ersetzt, bevor der Ausdruck durch
-   * {@link Pattern#compile(String)} kompiliert wird.<br/> Beispiele:
+   * {@link Pattern#compile(String)} kompiliert wird.<br/>
+   * Beispiele:
    * <ul>
    * <li>5.100.* -&gt; 5\.100\..*</li>
    * <li>*.10.* -&gt; .*\.10\..*</li>
