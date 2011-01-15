@@ -24,6 +24,8 @@
 package org.projectforge.web.mobile;
 
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.validation.AbstractFormValidator;
 
 public abstract class AbstractMobileForm<F, P extends AbstractMobilePage> extends Form<F>
 {
@@ -31,9 +33,38 @@ public abstract class AbstractMobileForm<F, P extends AbstractMobilePage> extend
 
   protected final P parentPage;
 
+  @SuppressWarnings("serial")
   public AbstractMobileForm(P parentPage)
   {
     super("form");
     this.parentPage = parentPage;
+    add(new AbstractFormValidator() {
+      public FormComponent< ? >[] getDependentFormComponents()
+      {
+        return getDependentFormValidationComponents();
+      }
+
+      public void validate(Form< ? > form)
+      {
+        validation();
+      }
+    });
+  }
+
+  /**
+   * Dependent form components which should be processed first before form validation.
+   * @return
+   */
+  public FormComponent< ? >[] getDependentFormValidationComponents()
+  {
+    return null;
+  }
+
+  /**
+   * Here you can add validation and errors manually.
+   */
+  protected void validation()
+  {
+    // Do nothing at default;
   }
 }

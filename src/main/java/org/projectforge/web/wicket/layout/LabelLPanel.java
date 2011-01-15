@@ -93,4 +93,20 @@ public class LabelLPanel extends AbstractLPanel
     }
     return this;
   }
+
+  public LabelLPanel setAlignment(final LayoutAlignment alignment)
+  {
+    final String align;
+    if (alignment == LayoutAlignment.RIGHT) {
+      align = "right";
+    } else if (alignment == LayoutAlignment.MIDDLE) {
+      align = "middle";
+    } else {
+      align = null;
+    }
+    if (align != null) {
+      label.add(new SimpleAttributeModifier("style", "text-align: " + align + ";"));
+    }
+    return this;
+  }
 }

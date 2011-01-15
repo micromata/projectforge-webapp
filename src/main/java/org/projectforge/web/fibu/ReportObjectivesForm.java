@@ -40,15 +40,19 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.common.DateHolder;
+import org.projectforge.common.LabelValueBean;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.Priority;
+import org.projectforge.fibu.kost.Bwa;
+import org.projectforge.fibu.kost.BwaTable;
 import org.projectforge.fibu.kost.BwaZeile;
 import org.projectforge.fibu.kost.reporting.Report;
 import org.projectforge.fibu.kost.reporting.ReportStorage;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.PlainLabel;
@@ -70,6 +74,8 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
 
   private Button clearButton;
 
+  private DatePanel fromDatePanel, toDatePanel;
+
   public ReportObjectivesForm(final ReportObjectivesPage parentPage)
   {
     super(parentPage);
@@ -77,6 +83,16 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
     setMultiPart(true);
     // Add one file input field
     setMaxSize(Bytes.megabytes(10));
+  }
+
+  @Override
+  protected void validation()
+  {
+    final Date fromDate = fromDatePanel.getConvertedInput();
+    final Date toDate = toDatePanel.getConvertedInput();
+    if (toDate != null && fromDate != null && fromDate.after(toDate) == true) {
+      addError("fibu.buchungssatz.error.invalidTimeperiod");
+    }
   }
 
   @SuppressWarnings("serial")
@@ -103,8 +119,12 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
       }
     });
 
-    filterSettingsContainer.add(new DatePanel("fromDate", new PropertyModel<Date>(filter, "fromDate"), DatePanelSettings.get()));
-    filterSettingsContainer.add(new DatePanel("toDate", new PropertyModel<Date>(filter, "toDate"), DatePanelSettings.get()));
+    final Label timePeriodLabel = new Label("timePeriodLabel", getString("timePeriod"));
+    filterSettingsContainer.add(timePeriodLabel);
+    filterSettingsContainer.add(fromDatePanel = new DatePanel("fromDate", new PropertyModel<Date>(filter, "fromDate"), DatePanelSettings
+        .get().withRequired(true)));
+    WicketUtils.setLabel(fromDatePanel, timePeriodLabel);
+    filterSettingsContainer.add(toDatePanel = new DatePanel("toDate", new PropertyModel<Date>(filter, "toDate"), DatePanelSettings.get()));
 
     final Button createReportButton = new Button("button", new Model<String>(getString("fibu.kost.reporting.createReport"))) {
       @Override
@@ -116,7 +136,7 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
     createReportButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     setDefaultButton(createReportButton);
     filterSettingsContainer.add(new SingleButtonPanel("createReport", createReportButton));
-    clearButton = new Button("button", new Model<String>(getString("clear"))) {
+    clearButton = new Button("button", new Model<String>(getString("fibu.kost.reporting.clearStorage"))) {
       @Override
       public final void onSubmit()
       {
@@ -164,13 +184,21 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
         actionLinkRepeater.add(actionLinkContainer);
         actionLinkContainer.add(createReportLink("actionLink", reportStorage, ancestorReport.getId()));
       }
+      pathContainer.add(new PlainLabel("reportId", currentReport.getId()));
     } else {
       storageContainer.add(new Label("path", "[invisible]").setVisible(false));
     }
-    storageContainer.add(new Label("reportObjectiveId", currentReport.getReportObjective().getId()));
+    storageContainer.add(new PlainLabel("reportObjectiveId", currentReport.getReportObjective().getId()));
     final List<Report> childs = currentReport.getChilds();
     final RepeatingView childHeadColRepeater = new RepeatingView("childHeadColRepeater");
     storageContainer.add(childHeadColRepeater);
+    storageContainer.add(new SubmitLink("showAccountingRecordsLink") {
+      @Override
+      public void onSubmit()
+      {
+        setResponsePage(new AccountingRecordListPage(AccountingRecordListPage.getPageParameters(currentReport.getId())));
+      }
+    });
     if (CollectionUtils.isNotEmpty(childs) == true) {
       for (final Report childReport : childs) {
         final WebMarkupContainer item = new WebMarkupContainer(childHeadColRepeater.newChildId());
@@ -186,7 +214,7 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
           @Override
           public void onSubmit()
           {
-            // reportStorage.setCurrentReport("");
+            setResponsePage(new AccountingRecordListPage(AccountingRecordListPage.getPageParameters(childReport.getId())));
           }
         });
       }
@@ -194,29 +222,36 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
     final RepeatingView rowRepeater = new RepeatingView("rowRepeater");
     storageContainer.add(rowRepeater);
     int row = 0;
-    for (final BwaZeile[] bwaZeilen : currentReport.getChildBwaArray(true)) {
-      if (priority.ordinal() < bwaZeilen[0].getPriority().ordinal()) {
+    final BwaTable bwaTable = currentReport.getChildBwaTable(true);
+    final Bwa firstBwa = bwaTable.getBwaList().get(0).getValue();
+    for (final BwaZeile firstBwaZeile : firstBwa.getZeilen()) { // First BWA for getting meta data of BWA.
+      if (priority.ordinal() > firstBwaZeile.getPriority().ordinal()) {
+        // Don't show all business assessment rows (priority is here a kind of verbose level).
         continue;
       }
       final WebMarkupContainer rowContainer = new WebMarkupContainer(rowRepeater.newChildId());
       rowRepeater.add(rowContainer);
       rowContainer.add(new SimpleAttributeModifier("class", (row++ % 2 == 0) ? "even" : "odd"));
-      rowContainer.add(new Label("zeileNo", String.valueOf(bwaZeilen[0].getZeile())));
+      rowContainer.add(new Label("zeileNo", String.valueOf(firstBwaZeile.getZeile())));
       StringBuffer buf = new StringBuffer();
-      for (int i = 0; i < bwaZeilen[0].getIndent(); i++) {
+      for (int i = 0; i < firstBwaZeile.getIndent(); i++) {
         buf.append("&nbsp;&nbsp;");
       }
-      buf.append(HtmlHelper.escapeXml(bwaZeilen[0].getBezeichnung()));
+      buf.append(HtmlHelper.escapeXml(firstBwaZeile.getBezeichnung()));
       rowContainer.add(new Label("description", buf.toString()).setEscapeModelStrings(false));
       final RepeatingView cellRepeater = new RepeatingView("cellRepeater");
       rowContainer.add(cellRepeater);
       int col = 0;
-      for (final BwaZeile bwaZeile : bwaZeilen) {
+      for (final LabelValueBean<String, Bwa> lv : bwaTable.getBwaList()) {
+        // So display the row for every BWA:
+        final String reportId = lv.getLabel();
+        final Bwa bwa = lv.getValue();
+        final BwaZeile bwaZeile = bwa.getZeile(firstBwaZeile.getBwaZeileId());
         final WebMarkupContainer item = new WebMarkupContainer(cellRepeater.newChildId());
         cellRepeater.add(item);
         buf = new StringBuffer();
         buf.append("text-align: right; white-space: nowrap;");
-        if (col == 0) {
+        if (col++ == 0) {
           buf.append(" font-weight: bold;");
         }
         if (bwaZeile.getBwaWert().compareTo(BigDecimal.ZERO) < 0) {
@@ -229,7 +264,7 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
           @Override
           public void onSubmit()
           {
-            // reportStorage.setCurrentReport("");
+            setResponsePage(new AccountingRecordListPage(AccountingRecordListPage.getPageParameters(reportId, bwaZeile.getZeile())));
           }
         });
       }

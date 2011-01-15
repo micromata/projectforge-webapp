@@ -150,11 +150,28 @@ public class DataObjectLPanel extends Panel
 
   public LabelLPanel addLabel(final String label, final LayoutLength labelLength)
   {
+    return addLabel(label, labelLength, null);
+  }
+
+  public LabelLPanel addLabel(final String label, final LayoutLength labelLength, final LayoutAlignment alignment)
+  {
     ensureGroupPanel();
     final LabelLPanel labelPanel;
     labelPanel = new LabelLPanel(groupPanel.newChildId(), labelLength, label);
     groupPanel.add(labelPanel);
+    if (alignment != null) {
+      labelPanel.setAlignment(alignment);
+    }
     return labelPanel;
+  }
+
+  public RepeatingViewLPanel addRepeater(final LayoutLength length)
+  {
+    ensureGroupPanel();
+    final RepeatingViewLPanel repeatingViewPanel;
+    repeatingViewPanel = new RepeatingViewLPanel(groupPanel.newChildId(), length);
+    groupPanel.add(repeatingViewPanel);
+    return repeatingViewPanel;
   }
 
   /**
@@ -198,6 +215,17 @@ public class DataObjectLPanel extends Panel
   public IField addTextField(final Object data, final String property, final LayoutLength valueLength)
   {
     final IField field = groupPanel.addTextField(data, property, valueLength);
+    return field;
+  }
+
+  /**
+   * @param label Only used for setLabel (needed by validation messages).
+   * @return the created field or a dummy IField if the field is e. g. empty in read-only mode.
+   */
+  public IField addTextField(final String label, final Object data, final String property, final LayoutLength valueLength)
+  {
+    final TextFieldLPanel field = groupPanel.addTextField(data, property, valueLength);
+    field.getTextField().setLabel(new Model<String>(label));
     return field;
   }
 

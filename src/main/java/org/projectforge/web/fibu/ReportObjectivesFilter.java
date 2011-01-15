@@ -26,6 +26,7 @@ package org.projectforge.web.fibu;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.projectforge.common.DateHolder;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -43,6 +44,10 @@ public class ReportObjectivesFilter implements Serializable
    */
   public void setFromDate(final Date from)
   {
+    if (from == null) {
+      this.from = null;
+      return;
+    }
     final DateHolder day = new DateHolder(from);
     day.setBeginOfMonth();
     this.from = day.getDate();
@@ -59,7 +64,11 @@ public class ReportObjectivesFilter implements Serializable
    */
   public void setToDate(final Date to)
   {
-    final DateHolder day = new DateHolder(from);
+    if (to == null) {
+      this.to = null;
+      return;
+    }
+    final DateHolder day = new DateHolder(to);
     day.setEndOfMonth();
     this.to = day.getDate();
   }
@@ -67,5 +76,11 @@ public class ReportObjectivesFilter implements Serializable
   public Date getToDate()
   {
     return to;
+  }
+
+  @Override
+  public String toString()
+  {
+    return new ToStringBuilder(this).append("from", from).append("to", to).toString();
   }
 }

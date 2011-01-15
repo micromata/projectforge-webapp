@@ -64,29 +64,64 @@ public class AccountingRecordListPage extends AbstractListPage<AccountingRecordL
 
   private static final long serialVersionUID = -34213362189153025L;
 
+  private static final String PARAM_KEY_REPORT_ID = "reportId";
+
+  private static final String PARAM_KEY_BWA_ZEILE_ID = "bwaZeileId";
+
   @SpringBean(name = "buchungssatzDao")
   private BuchungssatzDao buchungssatzDao;
 
   protected Bwa bwa;
 
-  private String reportId;
+  protected String reportId;
 
   private Integer bwaZeileId;
 
   private Report report;
 
+  /**
+   * Gets the page parameters for calling the list page only for displaying accounting records of the given report.
+   * @param reportId The id of the report of the ReportStorage of ReportObjectivesPage.
+   */
+  public static PageParameters getPageParameters(final String reportId)
+  {
+    return getPageParameters(reportId, null);
+  }
+
+  /**
+   * Gets the page parameters for calling the list page only for displaying accounting records of the given report.
+   * @param reportId The id of the report of the ReportStorage of ReportObjectivesPage.
+   * @param bwaZeileId Display only records concerning the given row of the business assessment.
+   */
+  public static PageParameters getPageParameters(final String reportId, final Integer bwaZeileId)
+  {
+    final PageParameters params = new PageParameters();
+    params.put(PARAM_KEY_REPORT_ID, reportId);
+    if (bwaZeileId != null) {
+      params.put(PARAM_KEY_BWA_ZEILE_ID, bwaZeileId);
+    }
+    return params;
+  }
+
   public AccountingRecordListPage(final PageParameters parameters)
   {
     super(parameters, "fibu.buchungssatz");
-    // TODO: Don't show filter if called by ReportingObjectives page.
-    // Show only records of BWA-Zeile.
+  }
+
+  @Override
+  protected void setup()
+  {
+    reportId = getPageParameters().getString(PARAM_KEY_REPORT_ID);
+    bwaZeileId = getPageParameters().getAsInteger(PARAM_KEY_BWA_ZEILE_ID);
+    if (reportId != null) {
+      storeFilter = false;
+    }
   }
 
   @Override
   protected void init()
   {
     final List<IColumn<BuchungssatzDO>> columns = createColumns(this, true);
-
     dataTable = createDataTable(columns, "formattedSatzNummer", true);
     form.add(dataTable);
   }
@@ -204,8 +239,7 @@ public class AccountingRecordListPage extends AbstractListPage<AccountingRecordL
   {
     if (list == null) {
       if (StringUtils.isNotEmpty(reportId) == true) {
-        // TODO: Support reportStorage.
-        final ReportStorage reportStorage = null;// getReportStorage();
+        final ReportStorage reportStorage = (ReportStorage) getUserPrefEntry(ReportObjectivesPage.KEY_REPORT_STORAGE);
         if (reportStorage != null) {
           report = reportStorage.findById(this.reportId);
           if (report != null) {

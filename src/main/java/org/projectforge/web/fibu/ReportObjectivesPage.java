@@ -40,7 +40,7 @@ public class ReportObjectivesPage extends AbstractSecuredPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ReportObjectivesPage.class);
 
-  private static final String KEY_REPORT_STORAGE = "ReportObjectivesPage:storage";
+  static final String KEY_REPORT_STORAGE = "ReportObjectivesPage:storage";
 
   @SpringBean(name = "reportDao")
   private ReportDao reportDao;
@@ -86,14 +86,24 @@ public class ReportObjectivesPage extends AbstractSecuredPage
   protected void createReport()
   {
     checkAccess();
-    log.info("load report.");
-    final Report report = getReportStorage().getRoot();
     final ReportObjectivesFilter filter = form.getFilter();
+    if (filter.getFromDate() == null) {
+      return;
+    }
+    log.info("load report: " + filter);
+    final ReportStorage storage = getReportStorage();
+    final Report report = storage.getRoot();
+    final String currentReportId = storage.getCurrentReport().getId(); // Store current report id.
     final DateHolder day = new DateHolder(filter.getFromDate());
     report.setFrom(day.getYear(), day.getMonth());
-    day.setDate(filter.getToDate());
+    if (filter.getToDate() != null) {
+      day.setDate(filter.getToDate());
+    } else {
+      day.setEndOfMonth();
+    }
     report.setTo(day.getYear(), day.getMonth());
     reportDao.loadReport(report);
+    storage.setCurrentReport(currentReportId); // Select previous current report.
   }
 
   protected void clear()

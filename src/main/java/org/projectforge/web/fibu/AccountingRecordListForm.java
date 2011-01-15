@@ -53,6 +53,9 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
   @Override
   protected void init()
   {
+    if (parentPage.reportId != null) {
+      setPageSize(1000);
+    }
     super.init();
     // DropDownChoice years
     final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(buchungssatzDao.getYears(), false);
@@ -98,9 +101,12 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
           return "";
         }
         final StringBuffer buf = new StringBuffer();
-        buf.append(getString("fibu.businessAssessment.overallPerformance")).append(": ").append(CurrencyFormatter.format(bwa.getGesamtleistung().getBwaWert())).append(", ");
-        buf.append(getString("fibu.businessAssessment.merchandisePurchase")).append(": ").append(CurrencyFormatter.format(bwa.getMatWareneinkauf().getBwaWert())).append(", ");
-        buf.append(getString("fibu.businessAssessment.preliminaryResult")).append(": ").append(CurrencyFormatter.format(bwa.getVorlaeufigesErgebnis().getBwaWert()));
+        buf.append(getString("fibu.businessAssessment.overallPerformance")).append(": ").append(
+            CurrencyFormatter.format(bwa.getGesamtleistung().getBwaWert())).append(", ");
+        buf.append(getString("fibu.businessAssessment.merchandisePurchase")).append(": ").append(
+            CurrencyFormatter.format(bwa.getMatWareneinkauf().getBwaWert())).append(", ");
+        buf.append(getString("fibu.businessAssessment.preliminaryResult")).append(": ").append(
+            CurrencyFormatter.format(bwa.getVorlaeufigesErgebnis().getBwaWert()));
         return buf.toString();
       }
     });
@@ -118,6 +124,24 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
       }
     });
     filterContainer.add(businessAssessmentLabel);
+  }
+  
+  @Override
+  protected void setComponentsVisibility()
+  {
+    super.setComponentsVisibility();
+    searchButtonPanel.setVisible(false);
+    resetButtonPanel.setVisible(false);
+  }
+
+  /**
+   * The filter is not visible if only a fixed list of accounting records of a record is displayed. 
+   * @see org.projectforge.web.wicket.AbstractListForm#isFilterVisible()
+   */
+  @Override
+  protected boolean isFilterVisible()
+  {
+    return (parentPage.reportId == null);
   }
 
   protected void refresh()
