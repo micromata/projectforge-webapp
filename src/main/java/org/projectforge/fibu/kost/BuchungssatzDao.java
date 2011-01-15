@@ -124,7 +124,7 @@ public class BuchungssatzDao extends BaseDao<BuchungssatzDO>
     } else {
       myFilter = new BuchungssatzFilter(filter);
     }
-    QueryFilter queryFilter = new QueryFilter(filter);
+    final QueryFilter queryFilter = new QueryFilter(filter);
     if (validateTimeperiod(myFilter) == false) {
       throw new UserException("fibu.buchungssatz.error.invalidTimeperiod");
     }
@@ -149,7 +149,7 @@ public class BuchungssatzDao extends BaseDao<BuchungssatzDO>
       queryFilter.add(Restrictions.eq("month", myFilter.getFromMonth()));
     }
     queryFilter.addOrder(Order.asc("year")).addOrder(Order.asc("month")).addOrder(Order.asc("satznr"));
-    List<BuchungssatzDO> list = getList(queryFilter);
+    final List<BuchungssatzDO> list = getList(queryFilter);
     return list;
   }
 
