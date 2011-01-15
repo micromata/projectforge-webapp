@@ -67,6 +67,7 @@ import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.mobile.AbstractSecuredMobilePage;
 import org.projectforge.web.mobile.MenuMobilePage;
+import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.TooltipImage;
 
@@ -805,7 +806,7 @@ public class WicketUtils
    * @param component
    * @return This for chaining.
    */
-  public static FormComponent<?> setReadonly(final FormComponent<?> component)
+  public static FormComponent< ? > setReadonly(final FormComponent< ? > component)
   {
     component.add(new AttributeAppendModifier("class", "readonly"));
     component.add(new SimpleAttributeModifier("readonly", "readonly"));
@@ -859,5 +860,16 @@ public class WicketUtils
   {
     final String escapedText = message.replace("'", "\'");
     return new SimpleAttributeModifier("onclick", "javascript:return showConfirmDialog('" + escapedText + "');");
+  }
+
+  @SuppressWarnings("unchecked")
+  public static void setLabel(final FormComponent component, final Label label)
+  {
+    final IModel<String> labelModel = (IModel<String>)label.getDefaultModel();
+    if (component instanceof DatePanel) {
+      ((DatePanel) component).getDateField().setLabel(labelModel);
+    } else {
+      component.setLabel(labelModel);
+    }
   }
 }
