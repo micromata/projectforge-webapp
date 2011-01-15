@@ -63,6 +63,13 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     super.init();
     renderer.add();
   }
+  
+  @Override
+  protected void validation()
+  {
+    super.validation();
+    renderer.validation();
+  }
 
   @Override
   protected Logger getLogger()

@@ -375,8 +375,13 @@ public class AddressFormRenderer extends AbstractDOFormRenderer
       if (isMobileReadonly() == true && StringUtils.isBlank(number) == true) {
         return null;
       }
-      doPanel.addTextField(data, property, getString(labelKey), HALF, FULL,
+      final IField field = doPanel.addTextField(data, property, getString(labelKey), HALF, FULL,
           mobileNumber == true ? FieldType.MOBILE_PHONE_NO : FieldType.PHONE_NO, false).setStrong();
+      if (isReadonly() == false) {
+        @SuppressWarnings("unchecked")
+        final TextField<String> textField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
+        return textField;
+      }
     }
     return null;
   }

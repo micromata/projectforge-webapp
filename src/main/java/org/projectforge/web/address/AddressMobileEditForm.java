@@ -60,4 +60,11 @@ public class AddressMobileEditForm extends AbstractMobileEditForm<AddressDO, Add
     super.init();
     renderer.add();
   }
+
+  @Override
+  protected void validation()
+  {
+    super.validation();
+    renderer.validation();
+  }
 }
