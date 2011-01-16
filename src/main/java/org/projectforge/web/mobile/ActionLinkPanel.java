@@ -33,6 +33,7 @@ import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.PresizedImage;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.layout.IField;
+import org.projectforge.web.wicket.layout.LayoutAlignment;
 
 /**
  * A link panel which instantiates a phone call on an iPhone as well as an sms or an e-mail.
@@ -70,6 +71,16 @@ public class ActionLinkPanel extends Panel implements IField
       add(link1 = new ExternalLink("link", url, value));
       add(getInvisibleSmsLink());
     }
+  }
+  
+  /**
+   * Does nothing (not yet implemented).
+   * @see org.projectforge.web.wicket.layout.IField#setAlignment(org.projectforge.web.wicket.layout.LayoutAlignment)
+   */
+  @Override
+  public IField setAlignment(LayoutAlignment aligment)
+  {
+    return this;
   }
 
   @Override
