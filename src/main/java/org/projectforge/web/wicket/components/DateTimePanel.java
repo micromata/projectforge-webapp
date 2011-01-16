@@ -28,6 +28,7 @@ import java.util.Date;
 
 import org.apache.commons.lang.ClassUtils;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.datetime.markup.html.form.DateTextField;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponentPanel;
 import org.apache.wicket.model.IModel;
@@ -35,7 +36,6 @@ import org.apache.wicket.model.PropertyModel;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.common.StringHelper;
-
 
 /**
  * Model for date and time of day components.
@@ -219,6 +219,21 @@ public class DateTimePanel extends FormComponentPanel<Date>
   {
     modelMarkedAsChanged = true;
     datePanel.markModelAsChanged();
+  }
+
+  public DatePanel getDatePanel()
+  {
+    return datePanel;
+  }
+  
+  public DateTextField getDateField()
+  {
+    return datePanel.getDateField();
+  }
+  
+  public void setFocus()
+  {
+    datePanel.setFocus();
   }
 
   @Override
