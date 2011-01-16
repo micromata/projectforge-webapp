@@ -87,23 +87,6 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
 //      toggleRecentSheets.setVisible(false);
 //    }
 //    add(toggleRecentSheets);
-//    locationTextField = new PFAutoCompleteMaxLengthTextField("location", new PropertyModel<String>(data, "location")) {
-//      @Override
-//      protected List<String> getChoices(String input)
-//      {
-//        return parentPage.getBaseDao().getLocationAutocompletion(input);
-//      }
-//
-//      @Override
-//      protected List<String> getFavorites()
-//      {
-//        return parentPage.getRecentLocations();
-//      }
-//    };
-//    locationTextField.withMatchContains(true).withMinChars(2).withFocus(true);
-//    add(locationTextField);
-//    descriptionArea = new MaxLengthTextArea("description", new PropertyModel<String>(data, "description"));
-//    add(descriptionArea);
 //    add(WicketUtils.getJIRASupportTooltipImage(getResponse(), this));
 //    add(new JiraIssuesPanel("jiraIssues", data.getDescription()));
 //    add(new CheckBox("saveAsTemplate", new PropertyModel<Boolean>(this, "saveAsTemplate")));

@@ -24,6 +24,7 @@
 package org.projectforge.web.timesheet;
 
 import static org.projectforge.web.wicket.layout.DropDownChoiceLPanel.SELECT_ID;
+import static org.projectforge.web.wicket.layout.LayoutLength.DOUBLE;
 import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
 import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
 import static org.projectforge.web.wicket.layout.SelectLPanel.WICKET_ID_SELECT_PANEL;
@@ -39,8 +40,10 @@ import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.hibernate.Hibernate;
+import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.fibu.kost.Kost2DO;
@@ -56,6 +59,7 @@ import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefDao;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.DateTimePanelSettings;
@@ -67,6 +71,7 @@ import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
 import org.projectforge.web.wicket.layout.LayoutAlignment;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.LayoutLength;
+import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
 public class TimesheetFormRenderer extends AbstractDOFormRenderer
 {
@@ -259,6 +264,23 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
           (DateTimePanelSettings) DateTimePanelSettings.get().withTabIndex(4).withSelectStartStopTime(true).withCallerPage(parentPage)
               .withTargetType(java.sql.Timestamp.class).withRequired(true), DatePrecision.MINUTE_15);
       repeatingView.add(startDateTimePanel);
+      WicketUtils.addTooltip(startDateTimePanel.getDateField(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          final StringBuffer buf = new StringBuffer();
+          if (data.getStartTime() != null) {
+            buf.append(DateHelper.TECHNICAL_ISO_UTC.get().format(data.getStartTime()));
+            if (data.getStopTime() != null) {
+              buf.append(" - ");
+            }
+          }
+          if (data.getStopTime() != null) {
+            buf.append(DateHelper.TECHNICAL_ISO_UTC.get().format(data.getStopTime()));
+          }
+          return buf.toString();
+        }
+      });
       repeatingView.add(new PlainLabel(repeatingView.newChildId(), getString("until")));
       // Stop time
       final DropDownChoicePanel<Integer> stopHourOfDayDropDownChoicePanel = new DropDownChoicePanel<Integer>(repeatingView.newChildId(),
@@ -276,20 +298,24 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       stopMinuteDropDownChoice.setNullValid(false);
       stopMinuteDropDownChoice.setRequired(true);
       repeatingView.add(stopMinuteDropDownChoicePanel);
-      // final Label datesAsUTCLabel = new DatesAsUTCLabel("datesAsUTC") {
-      // @Override
-      // public Date getStartTime()
-      // {
-      // return data.getStartTime();
-      // }
-      //
-      // @Override
-      // public Date getStopTime()
-      // {
-      // return data.getStopTime();
-      // }
-      // };
-      // add(datesAsUTCLabel);
+
+      locationTextField = new PFAutoCompleteMaxLengthTextField(TextFieldLPanel.INPUT_ID, new PropertyModel<String>(data, "location")) {
+        @Override
+        protected List<String> getChoices(String input)
+        {
+          return parentPage.getBaseDao().getLocationAutocompletion(input);
+        }
+
+        @Override
+        protected List<String> getFavorites()
+        {
+          return parentPage.getRecentLocations();
+        }
+      };
+      locationTextField.withMatchContains(true).withMinChars(2).withFocus(true);
+      doPanel.addTextField(getString("timesheet.location"), HALF, locationTextField, DOUBLE);
+      doPanel.addTextArea(data, "description", getString("description") + " (JIRA)", HALF, DOUBLE, false).setCssStyle("height: 20em;");
+
     }
   }
 
