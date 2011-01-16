@@ -53,4 +53,9 @@ public class DropDownChoicePanel<T> extends Panel
     dropDownChoice.setNullValid(nullValid);
     return this;
   }
+  
+  public DropDownChoice<T> getDropDownChoice()
+  {
+    return dropDownChoice;
+  }
 }
