@@ -862,6 +862,10 @@ form.newform .userselect{
 	position:relative;
 }
 
+.strong input[type="text"]{
+	font-weight:bold;
+}
+
 form.newform .datepanel a {
 	position:absolute;
 	opacity: 0.5;
@@ -893,6 +897,8 @@ form.newform p,
 .newform textarea,
 .newform select,
 .newform label, 
+.newform span, 
+.newform div, 
 .newform div.file {
 	padding: 0;
 	margin: 0.5em 1em 0 -0.2em;
@@ -952,10 +958,6 @@ form.newform p.strong,
 
 .newform label.center {
 	text-align:center;
-}
-
-.newform div.tasktree{
-	float: left;
 }
 
 #content form.newform {
