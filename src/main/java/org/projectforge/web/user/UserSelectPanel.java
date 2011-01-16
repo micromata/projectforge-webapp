@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -69,8 +71,10 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
 
   // Only used for detecting changes:
   private PFUserDO currentUser;
-  
+
   private String label;
+
+  private WebMarkupContainer spanContainer;
 
   /**
    * Label is assumed as "user" translation.
@@ -98,7 +102,8 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
    * @param caller
    * @param selectProperty
    */
-  public UserSelectPanel(final String id, final IModel<PFUserDO> model, final String label, final ISelectCallerPage caller, final String selectProperty)
+  public UserSelectPanel(final String id, final IModel<PFUserDO> model, final String label, final ISelectCallerPage caller,
+      final String selectProperty)
   {
     super(id, model, caller, selectProperty);
     this.label = label;
@@ -219,7 +224,9 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
         }
       }
     });
-    add(userTextField);
+    spanContainer = new WebMarkupContainer("span");
+    add(spanContainer);
+    spanContainer.add(userTextField);
     final SubmitLink selectMeButton = new SubmitLink("selectMe") {
       @Override
       public void onSubmit()
@@ -236,7 +243,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
         return user == null || user.getId().equals(PFUserContext.getUser().getId()) == false;
       }
     };
-    add(selectMeButton);
+    spanContainer.add(selectMeButton);
     selectMeButton.setDefaultFormProcessing(defaultFormProcessing);
     selectMeButton.add(new TooltipImage("selectMeHelp", getResponse(), WebConstants.IMAGE_USER_SELECT_ME, getString("tooltip.selectMe")));
     return this;
@@ -257,6 +264,12 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
     return this;
   }
 
+  @Override
+  public Component getClassModifierComponent()
+  {
+    return spanContainer;
+  }
+  
   @Override
   protected void convertInput()
   {
