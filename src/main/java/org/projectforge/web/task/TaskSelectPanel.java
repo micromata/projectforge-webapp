@@ -23,6 +23,8 @@
 
 package org.projectforge.web.task;
 
+import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.IModel;
@@ -59,6 +61,8 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
 
   private boolean showPath = true;
 
+  private WebMarkupContainer spanContainer;
+
   public TaskSelectPanel(final String id, final IModel<TaskDO> model, final ISelectCallerPage caller, final String selectProperty)
   {
     super(id, model, caller, selectProperty);
@@ -73,6 +77,8 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
   public TaskSelectPanel init()
   {
     super.init();
+    spanContainer = new WebMarkupContainer("span");
+    add(spanContainer);
     // Todo: replace taskAsString with Wicket mechanism
     final Label taskAsStringLabel = new Label("taskAsString", new Model<String>() {
       @Override
@@ -89,7 +95,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
       }
     });
     taskAsStringLabel.setEscapeModelStrings(false);
-    add(taskAsStringLabel);
+    spanContainer.add(taskAsStringLabel);
     final SubmitLink selectButton = new SubmitLink("select") {
       public void onSubmit()
       {
@@ -101,7 +107,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
       };
     };
     selectButton.setDefaultFormProcessing(false);
-    add(selectButton);
+    spanContainer.add(selectButton);
     selectButton.add(new TooltipImage("selectHelp", getResponse(), WebConstants.IMAGE_TASK_SELECT, getString("tooltip.selectTask")));
     final SubmitLink unselectButton = new SubmitLink("unselect") {
       @Override
@@ -117,7 +123,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
       }
     };
     unselectButton.setDefaultFormProcessing(false);
-    add(unselectButton);
+    spanContainer.add(unselectButton);
     unselectButton
         .add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_TASK_UNSELECT, getString("tooltip.unselectTask")));
     // DropDownChoice favorites
@@ -145,7 +151,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
         return favorite;
       }
     };
-    add(favoritesPanel);
+    spanContainer.add(favoritesPanel);
     favoritesPanel.init();
     if (showFavorites == false) {
       favoritesPanel.setVisible(false);
@@ -161,6 +167,12 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
   {
     setModelObject(task);
     caller.select(selectProperty, task.getId());
+  }
+
+  @Override
+  public Component getClassModifierComponent()
+  {
+    return spanContainer;
   }
 
   @Override
