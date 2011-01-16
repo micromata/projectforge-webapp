@@ -30,29 +30,35 @@ package org.projectforge.web.wicket.layout;
 public class DummyField implements IField
 {
   @Override
+  public IField setAlignment(LayoutAlignment aligment)
+  {
+    return this;
+  }
+
+  @Override
   public DummyField setStrong()
   {
     return this;
   }
-  
+
   @Override
   public IField setCssStyle(final String cssStyle)
   {
     return this;
   }
-  
+
   @Override
   public IField setFocus()
   {
     return this;
   }
-  
+
   @Override
   public IField setRequired()
   {
     return this;
   }
-  
+
   @Override
   public IField setTooltip(final String text)
   {

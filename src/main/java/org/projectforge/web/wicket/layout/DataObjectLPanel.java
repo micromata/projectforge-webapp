@@ -28,6 +28,7 @@ import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
@@ -42,6 +43,7 @@ import org.projectforge.web.mobile.ActionLinkType;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.components.DatePanel;
+import org.projectforge.web.wicket.components.DateTimePanel;
 
 /**
  * This panel contains one or more field sets and is a convenient class for rendering data objects as forms or read-only views for different
@@ -357,6 +359,46 @@ public class DataObjectLPanel extends Panel
     return field;
   }
 
+  /**
+   * If the value is type of I18Enum then the localized string is shown in read-only mode.
+   * @param data Only needed for read only output.
+   * @param property Only needed for read only output.
+   * @param label Only used of setLabel of form component.
+   * @see FormComponent#setLabel(org.apache.wicket.model.IModel)
+   */
+  @SuppressWarnings("serial")
+  public IField addDropDownChoice(final Object data, final String property, final String label, 
+      final DropDownChoice< ? > dropDownChoice, final LayoutLength valueLength)
+  {
+    ensureGroupPanel();
+    IField field;
+    if (layoutContext.isMobileReadonly() == true) {
+      final Object value = BeanHelper.getNestedProperty(data, property);
+      if (isBlank(value) == true) {
+        return new DummyField();
+      }
+      ensureLabelValueTablePanel();
+      final String displayValue;
+      if (value instanceof I18nEnum) {
+        displayValue = getString(((I18nEnum) value).getI18nKey());
+      } else {
+        displayValue = String.valueOf(value);
+      }
+      field = labelValueTablePanel.add("", displayValue);
+    } else {
+      field = new DropDownChoiceLPanel(groupPanel.newChildId(), valueLength, dropDownChoice);
+      ((DropDownChoiceLPanel) field).getDropDownChoice().setLabel(new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return label;
+        }
+      });
+      groupPanel.add(field);
+    }
+    return field;
+  }
+
   public IField addDateFieldPanel(final Object data, final String property, final String label, final LayoutLength labelLength,
       final DatePrecision precision, final LayoutLength valueLength)
   {
@@ -387,6 +429,24 @@ public class DataObjectLPanel extends Panel
     final IField field = new DateFieldLPanel(groupPanel.newChildId(), valueLength, datePanel);
     groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
     ((DateFieldLPanel) field).getDatePanel().setLabel(new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return label;
+      }
+    });
+    groupPanel.add(field);
+    return field;
+  }
+
+  @SuppressWarnings("serial")
+  public IField addDateTimePanel(final Object data, final String property, final String label, final LayoutLength labelLength,
+      final DateTimePanel dateTimePanel, final LayoutLength valueLength)
+  {
+    ensureGroupPanel();
+    final IField field = new DateTimeFieldLPanel(groupPanel.newChildId(), valueLength, dateTimePanel);
+    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
+    ((DateTimeFieldLPanel) field).getDatePanel().setLabel(new Model<String>() {
       @Override
       public String getObject()
       {

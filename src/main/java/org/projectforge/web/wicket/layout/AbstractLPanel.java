@@ -52,6 +52,8 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper, 
 
   protected String classAttributeAppender;
 
+  private LayoutAlignment alignment;
+
   public AbstractLPanel(final String id)
   {
     super(id);
@@ -71,7 +73,13 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper, 
   {
     this.length = length;
     return this;
+  }
 
+  @Override
+  public IField setAlignment(LayoutAlignment aligment)
+  {
+    this.alignment = aligment;
+    return this;
   }
 
   /**
@@ -157,12 +165,26 @@ public abstract class AbstractLPanel extends Panel implements ComponentWrapper, 
     if (classAttributeModifier != null && getClassModifierComponent() != null) {
       getClassModifierComponent().add(classAttributeModifier);
     }
+    final Component wrappedComponent = getWrappedComponent();
+    if (wrappedComponent != null) {
+      String align = null;
+      if (this.alignment != null) {
+        if (this.alignment == LayoutAlignment.MIDDLE) {
+          align = "middle";
+        } else if (this.alignment == LayoutAlignment.RIGHT) {
+          align = "right";
+        }
+      }
+      if (align != null) {
+        wrappedComponent.add(new AttributeAppendModifier("style", "text-align: " + align + ";"));
+      }
+    }
   }
 
   @Override
   public String getMarkupId()
   {
-    if (getClassModifierComponent() != null) {
+    if (getClassModifierComponent() != null && getClassModifierComponent() != this) {
       return getClassModifierComponent().getMarkupId();
     } else {
       return super.getMarkupId();

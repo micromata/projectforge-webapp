@@ -85,8 +85,11 @@ public class LabelLPanel extends AbstractLPanel
   public LabelLPanel setLabelFor(final Component component)
   {
     if (component instanceof ComponentWrapper) {
-      label.add(new SimpleAttributeModifier("for", ((ComponentWrapper) component).getWrappedComponent().getMarkupId()));
-      ((ComponentWrapper) component).getWrappedComponent().setOutputMarkupId(true);
+      final Component wrappedComponent = ((ComponentWrapper) component).getWrappedComponent();
+      if (wrappedComponent != null) {
+        label.add(new SimpleAttributeModifier("for", wrappedComponent.getMarkupId()));
+        wrappedComponent.setOutputMarkupId(true);
+      }
     } else {
       label.add(new SimpleAttributeModifier("for", component.getMarkupId()));
       component.setOutputMarkupId(true);
@@ -94,19 +97,9 @@ public class LabelLPanel extends AbstractLPanel
     return this;
   }
 
-  public LabelLPanel setAlignment(final LayoutAlignment alignment)
+  @Override
+  public Component getWrappedComponent()
   {
-    final String align;
-    if (alignment == LayoutAlignment.RIGHT) {
-      align = "right";
-    } else if (alignment == LayoutAlignment.MIDDLE) {
-      align = "middle";
-    } else {
-      align = null;
-    }
-    if (align != null) {
-      label.add(new SimpleAttributeModifier("style", "text-align: " + align + ";"));
-    }
-    return this;
+    return label;
   }
 }

@@ -73,6 +73,12 @@ public class DropDownChoiceLPanel extends AbstractLPanel
     return this;
   }
   
+  @Override
+  public Component getWrappedComponent()
+  {
+    return dropDownChoice;
+  }
+  
   public DropDownChoice< ? > getDropDownChoice()
   {
     return dropDownChoice;

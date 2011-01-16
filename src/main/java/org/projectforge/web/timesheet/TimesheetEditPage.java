@@ -53,13 +53,14 @@ import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.user.UserPrefEditPage;
+import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
 
 @EditPage(defaultReturnPage = TimesheetListPage.class)
-public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEditForm, TimesheetDao> implements ISelectCallerPage
+public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, TimesheetEditForm, TimesheetDao> implements ISelectCallerPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TimesheetEditPage.class);
 
@@ -122,7 +123,7 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
       final Long startTimeInMillis = parameters.getAsLong(PARAMETER_KEY_START_DATE_IN_MILLIS);
       final Long stopTimeInMillis = parameters.getAsLong(PARAMETER_KEY_STOP_DATE_IN_MILLIS);
       if (startTimeInMillis != null) {
-        form.startDateTimePanel.setDate(startTimeInMillis);
+        form.renderer.startDateTimePanel.setDate(startTimeInMillis);
         if (stopTimeInMillis == null) {
           getData().setStopTime(new Timestamp(startTimeInMillis)); // Default is time sheet with zero duration.
         }
@@ -130,7 +131,7 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
       if (stopTimeInMillis != null) {
         getData().setStopTime(new Timestamp(stopTimeInMillis));
         if (startTimeInMillis == null) {
-          form.startDateTimePanel.setDate(stopTimeInMillis); // Default is time sheet with zero duration.
+          form.renderer.startDateTimePanel.setDate(stopTimeInMillis); // Default is time sheet with zero duration.
         }
       }
       final String description = parameters.getString(PARAMETER_KEY_DESCRIPTION);
@@ -157,8 +158,8 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
       }
     }
 
-    form.addKost2Row();
-    form.addConsumptionBar();
+    //form.addKost2Row();
+    //form.addConsumptionBar();
   }
 
   @Override
@@ -264,7 +265,7 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
     log.info("Clone of time sheet chosen: " + timesheet);
     timesheet.setId(null);
     getBaseDao().setUser(timesheet, getUser().getId());
-    form.cloneButtonPanel.setVisible(false);
+    form.renderer.cloneButtonPanel.setVisible(false);
   }
 
   /**
@@ -280,17 +281,17 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
         id = (Integer) selectedValue;
       }
       getBaseDao().setTask(getData(), id);
-      form.refresh();
+      form.renderer.refresh();
     } else if ("date".equals(property) == true) {
       if (selectedValue instanceof TimePeriod) {
         final Date startDate = ((TimePeriod) selectedValue).getFromDate();
         final Date stopDate = ((TimePeriod) selectedValue).getToDate();
         if (startDate != null) {
           getData().setStartDate(startDate);
-          form.startDateTimePanel.markModelAsChanged();
+          form.renderer.startDateTimePanel.markModelAsChanged();
         } else if (stopDate != null) {
           getData().setStartDate(stopDate);
-          form.startDateTimePanel.markModelAsChanged();
+          form.renderer.startDateTimePanel.markModelAsChanged();
         }
         if (stopDate != null) {
           getData().setStopTime(new Timestamp(stopDate.getTime()));
@@ -308,10 +309,10 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
           date = (Date) selectedValue;
         }
         final DayHolder dh = new DayHolder(date);
-        final DateHolder startDateHolder = form.startDateTimePanel.getDateHolder();
+        final DateHolder startDateHolder = form.renderer.startDateTimePanel.getDateHolder();
         startDateHolder.setDay(dh.getCalendar());
         getData().setStartDate(startDateHolder.getDate());
-        form.startDateTimePanel.markModelAsChanged();
+        form.renderer.startDateTimePanel.markModelAsChanged();
       }
     } else if ("userId".equals(property) == true) {
       final Integer id;
@@ -341,10 +342,10 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
   {
     if ("taskId".equals(property) == true) {
       getData().setTask(null);
-      form.refresh();
+      form.renderer.refresh();
     } else if ("userId".equals(property) == true) {
       getData().setUser(null);
-      form.refresh();
+      form.renderer.refresh();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
