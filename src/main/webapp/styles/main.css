@@ -334,6 +334,7 @@ div#main-menu{
 	border:none;	
 }
 
+
 ul#personal,
 ul#trash {
 	min-height:2em;
@@ -362,6 +363,7 @@ ul#normal li{
 ul#personal li.first {
 	margin-left: 1em;
 }
+a#saver,
 ul#personal li a,
 ul#normal li a.parent,
 ul#personal .ui-state-highlight {
@@ -379,6 +381,18 @@ ul#personal .ui-state-highlight {
 	display: block;
 	float: left;
 }
+
+
+a#saver {
+	 font-size: 1.2em;
+    margin: 0.5em;
+	color: #fff;
+	background: #00B1EB;
+	border: 1px solid #2274AC;
+}
+
+a#saver:hover {cursor:pointer}
+
 
 ul#personal li a:hover,
 ul#normal li a:hover {

@@ -31,10 +31,11 @@ $(function() {
     return ( $("#personal").sortable("toArray") );
   }
   
-  $(window).unload(function() {
-	  serialize( getMenuEntries() );
-  });
-
+ 
+  
+  $('#saver').live('click', function() {
+	   serialize( getMenuEntries() );
+	  });
 
   $("#normal .main a").click(function() {
       // One click opens the main menu and and the next click closes the
@@ -46,18 +47,21 @@ $(function() {
           $('#personal, #nav ul').sortable('enable');
           // and add blue border around the personal menu...
           $('ul#personal').addClass('dotted');
+          $('#personal').after("<a id='saver'>Save Menu</a>");
           // Add the crosses for removing menu entries:
           $("ul#personal li a").prepend(
               '<span class="remover"> 2 </span>');
           $('#remover')
           // main menu is now closed...
         } else {
+        	$("#saver").remove();
           // disable sortable....
           $('#personal, #nav ul').sortable('disable');
           // Remove the removers (crosses for removing menu entries):
           $('.remover').remove();
           // remove the blue border around the personal menu
           $('ul#personal').removeClass('dotted');
+          
           //serialize(getMenuEntries());
         }
       })
