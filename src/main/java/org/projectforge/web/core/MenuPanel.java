@@ -193,7 +193,7 @@ public class MenuPanel extends Panel
         // Now we add the next menu entry to the area:
         final WebMarkupContainer menuEntryLi = new WebMarkupContainer(menuEntryRepeater.newChildId());
         menuEntryRepeater.add(menuEntryLi);
-        menuEntryLi.add(new SimpleAttributeModifier("id", menuEntry.getId()));
+        menuEntryLi.add(new SimpleAttributeModifier("id", "M_" + menuEntry.getId()));
         final AbstractLink link = getMenuEntryLink(menuEntry);
         menuEntryLi.add(link);
       }
