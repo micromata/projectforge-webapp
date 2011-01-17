@@ -683,6 +683,14 @@ ul#normal li.active ul {
 
 }
 
+#bookmark {
+	line-height: 1.5em;
+	background: #FAFCB5;
+	min-height:2em;
+	padding: 0.5em 0.3em 0.3em 1em;
+	margin: 0;
+
+}
 
 
 li.feedbackPanelERROR{
@@ -911,8 +919,6 @@ form.newform p,
 .newform textarea,
 .newform select,
 .newform label, 
-.newform span, 
-.newform div, 
 .newform div.file {
 	padding: 0;
 	margin: 0.5em 1em 0 -0.2em;
@@ -1291,7 +1297,7 @@ table.dataview tbody tr td,table.dataview tbody tr th {
 	color: #444;
 	padding: 0.6em;
 	border: 4px solid #fff;
-	background: transparent url('../img/tab.png') repeat-x 0% 90%;
+	/*background: transparent url('../img/tab.png') repeat-x 0% 90%;*/
 	font-size: 1.2em;
 }
 
