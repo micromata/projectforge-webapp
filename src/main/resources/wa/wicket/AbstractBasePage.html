@@ -17,14 +17,15 @@
 
 
   <ul class="info">
-    <li class="loggedInLabel"><wicket:link>
-      <a href="search"><wicket:message key="search" /></a>
-    </wicket:link> | <span wicket:id="loggedInLabel">[Logged in: John Mustermann (john)]</span><a wicket:id="logoutLink" href="/login?logout=true"><span
-      wicket:id="logoutLabel">[Logout]</span></a></li>
-    <li><a class="version" wicket:id="newsLink" href="secure/doc/News.html" target="_blank"> <span wicket:id="versionLabel">[V. #.#.##
+    <li class="loggedInLabel"><span wicket:id="loggedInLabel">[Logged in: John Mustermann (john)]</span><a wicket:id="logoutLink"
+      href="/login?logout=true"><span wicket:id="logoutLabel">[Logout]</span></a></li>
+    <li><a class="version" wicket:id="newsLink" href="secure/doc/News.html" target="_blank" wicket:message="title:menu.news"> <span wicket:id="versionLabel">[V. #.#.##
     2009-...]</span> </a></li>
     <li><a wicket:id="sendFeedback" class="embatssymbols" title="Send Feedback"> 2</a></li>
     <li><a href="javascript:toggle('#bookmark');" class="embatssymbols" wicket:id="bookmarkLink"> S</a></li>
+    <li><wicket:link>
+      <a href="search" class="embatssymbols" wicket:message="title:search"> j</a>
+    </wicket:link></li>
   </ul>
   <div class="development" wicket:id="developmentsystem">Developmentsystem!</div>
   </div>
