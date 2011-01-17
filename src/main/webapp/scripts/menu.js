@@ -14,10 +14,6 @@ $(function() {
   }
   }).disableSelection();
 
-  $("#personal li, #nav li").click(function(){
-	  serialize(getMenuEntries());
-  });
-
   // Disable sortable on load...
   $("#personal, #nav ul").sortable("disable");
 
