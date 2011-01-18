@@ -25,12 +25,13 @@ package org.projectforge.common;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.core.ConfigurationTest;
 import org.projectforge.jira.JiraUtils;
-
 
 public class JiraUtilsTest
 {
@@ -41,7 +42,7 @@ public class JiraUtilsTest
   {
     ConfigurationTest.createTestConfiguration();
   }
-  
+
   @Test
   public void parseJiraIssues()
   {
@@ -56,6 +57,20 @@ public class JiraUtilsTest
 
     assertNull(JiraUtils.parseJiraIssues("PF222"));
     check(new String[] { "PF-222"}, JiraUtils.parseJiraIssues("1234PF-222"));
+  }
+
+  @Test
+  public void hasJiraIssues()
+  {
+    assertTrue(JiraUtils.hasJiraIssues("P-0"));
+    assertTrue(JiraUtils.hasJiraIssues("PF-0"));
+    assertTrue(JiraUtils.hasJiraIssues("PF-222"));
+    assertTrue(JiraUtils.hasJiraIssues("PF-1"));
+    assertTrue(JiraUtils.hasJiraIssues("Worked on PF-1."));
+    assertTrue(JiraUtils.hasJiraIssues("Worked on PF1DF-1."));
+    assertTrue(JiraUtils.hasJiraIssues("Worked on PF-222 and PROJECT2-123 and finished this work."));
+    assertFalse(JiraUtils.hasJiraIssues("PF222"));
+    assertTrue(JiraUtils.hasJiraIssues("1234PF-222"));
   }
 
   @Test

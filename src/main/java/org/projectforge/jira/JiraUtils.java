@@ -31,9 +31,10 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.core.Configuration;
 
-
 public class JiraUtils
 {
+  private static final String PATTERN = "([A-Z][A-Z_0-9]*-[0-9]+)";
+
   /**
    * PROJECTFORGE-222 -> https://jira.acme.com/jira/browse/PROJECTFORGE-222.
    * @param jiraIssue
@@ -66,6 +67,13 @@ public class JiraUtils
       return null;
     }
     return parseJiraIssues(text);
+  }
+
+  public static boolean hasJiraIssues(final String text)
+  {
+    final Pattern p = Pattern.compile(PATTERN, Pattern.MULTILINE);
+    final Matcher m = p.matcher(text);
+    return m.find();
   }
 
   /**
@@ -105,7 +113,7 @@ public class JiraUtils
       return null;
     }
     List<String> list = null;
-    final Pattern p = Pattern.compile("([A-Z][A-Z_0-9]*-[0-9]+)", Pattern.MULTILINE);
+    final Pattern p = Pattern.compile(PATTERN, Pattern.MULTILINE);
     final Matcher m = p.matcher(text);
     while (m.find()) {
       if (list == null) {
