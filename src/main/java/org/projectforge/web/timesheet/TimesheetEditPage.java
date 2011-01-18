@@ -30,6 +30,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.log4j.Logger;
@@ -375,7 +376,7 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
   @Override
   public AbstractBasePage afterSaveOrUpdate()
   {
-    if (form.saveAsTemplate == true) {
+    if (BooleanUtils.isTrue(form.saveAsTemplate) == true) {
       final UserPrefEditPage userPrefEditPage = new UserPrefEditPage(UserPrefArea.TIMESHEET_TEMPLATE, getData());
       userPrefEditPage.setReturnToPage(this.returnToPage);
       return userPrefEditPage;

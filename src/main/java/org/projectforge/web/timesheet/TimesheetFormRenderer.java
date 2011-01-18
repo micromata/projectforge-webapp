@@ -46,7 +46,9 @@ import org.hibernate.Hibernate;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
+import org.projectforge.core.Configuration;
 import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.jira.JiraUtils;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
@@ -134,21 +136,21 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     } else if (data.getDuration() > TimesheetDao.MAXIMUM_DURATION) {
       startDateTimePanel.error("timesheet.error.maximumDurationExceeded");
     }
-    if (kost2Row.isVisible() == false && data.getKost2Id() == null) {
-      // Kost2 is not available for current task.
-      final TaskNode taskNode = taskTree.getTaskNodeById(data.getTaskId());
-      if (taskNode != null) {
-        final List<Integer> descendents = taskNode.getDescendantIds();
-        for (final Integer taskId : descendents) {
-          if (CollectionUtils.isNotEmpty(taskTree.getKost2List(taskId)) == true) {
-            // But Kost2 is available for sub task, so user should book his time sheet
-            // on a sub task with kost2s.
-            kost2Choice.error("timesheet.error.kost2NeededChooseSubTask");
-            break;
-          }
-        }
-      }
-    }
+//    if (kost2Row.isVisible() == false && data.getKost2Id() == null) {
+//      // Kost2 is not available for current task.
+//      final TaskNode taskNode = taskTree.getTaskNodeById(data.getTaskId());
+//      if (taskNode != null) {
+//        final List<Integer> descendents = taskNode.getDescendantIds();
+//        for (final Integer taskId : descendents) {
+//          if (CollectionUtils.isNotEmpty(taskTree.getKost2List(taskId)) == true) {
+//            // But Kost2 is available for sub task, so user should book his time sheet
+//            // on a sub task with kost2s.
+//            kost2Choice.error("timesheet.error.kost2NeededChooseSubTask");
+//            break;
+//          }
+//        }
+//      }
+//    }
   }
 
   protected void updateStopDate()
@@ -313,9 +315,20 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
         }
       };
       locationTextField.withMatchContains(true).withMinChars(2).withFocus(true);
+      WicketUtils.addTooltip(locationTextField, getString("tooltip.autocomplete.withDblClickFunction"));
       doPanel.addTextField(getString("timesheet.location"), HALF, locationTextField, DOUBLE);
-      doPanel.addTextArea(data, "description", getString("description") + " (JIRA)", HALF, DOUBLE, false).setCssStyle("height: 20em;");
-
+      final boolean jiraSupport = Configuration.getInstance().isJIRAConfigured();
+      final String jiraFootnoteMark = jiraSupport ? "*" : "";
+      doPanel.addTextArea(data, "description", getString("timesheet.description") + jiraFootnoteMark, HALF, DOUBLE, false).setCssStyle(
+          "height: 20em;");
+      if (jiraSupport == true && JiraUtils.hasJiraIssues(data.getDescription()) == true) {
+        doPanel.addLabel("", HALF).setBreakBefore();
+        doPanel.addJiraIssuesPanel(DOUBLE, data.getDescription());
+      }
+      if (jiraSupport == true) {
+        doPanel.addLabel("", HALF).setBreakBefore();
+        doPanel.addLabel("*) " + getString("tooltip.jiraSupport.field"), DOUBLE);
+      }
     }
   }
 

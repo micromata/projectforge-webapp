@@ -367,8 +367,8 @@ public class DataObjectLPanel extends Panel
    * @see FormComponent#setLabel(org.apache.wicket.model.IModel)
    */
   @SuppressWarnings("serial")
-  public IField addDropDownChoice(final Object data, final String property, final String label, 
-      final DropDownChoice< ? > dropDownChoice, final LayoutLength valueLength)
+  public IField addDropDownChoice(final Object data, final String property, final String label, final DropDownChoice< ? > dropDownChoice,
+      final LayoutLength valueLength)
   {
     ensureGroupPanel();
     IField field;
@@ -516,6 +516,13 @@ public class DataObjectLPanel extends Panel
   {
     final IField field = addTextField(textField, valueLength);
     textField.setLabel(new Model<String>(label));
+    return field;
+  }
+
+  public IField addJiraIssuesPanel(final LayoutLength length, final String text)
+  {
+    final IField field = new JiraIssuesLPanel(groupPanel.newChildId(), length, text);
+    groupPanel.add(field);
     return field;
   }
 

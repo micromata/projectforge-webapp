@@ -78,8 +78,6 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     super.init();
     renderer.add();
   }
-//    add(new TooltipImage("autocompleteDblClickHelpImage", getResponse(), WebConstants.IMAGE_HELP_KEYBOARD,
-//        getString("tooltip.autocomplete.withDblClickFunction")));
 //    addRecentSheetsTable();
 //    WebMarkupContainer toggleRecentSheets = new WebMarkupContainer("toggleRecentSheets");
 //    toggleRecentSheets.setRenderBodyOnly(true);
