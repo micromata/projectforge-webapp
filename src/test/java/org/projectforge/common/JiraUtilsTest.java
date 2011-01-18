@@ -46,6 +46,8 @@ public class JiraUtilsTest
   @Test
   public void parseJiraIssues()
   {
+    assertNull(JiraUtils.parseJiraIssues(null));
+    assertNull(JiraUtils.parseJiraIssues(""));
     check(new String[] { "P-0"}, JiraUtils.parseJiraIssues("P-0"));
     check(new String[] { "PF-0"}, JiraUtils.parseJiraIssues("PF-0"));
     check(new String[] { "PF-222"}, JiraUtils.parseJiraIssues("PF-222"));
@@ -62,6 +64,8 @@ public class JiraUtilsTest
   @Test
   public void hasJiraIssues()
   {
+    assertFalse(JiraUtils.hasJiraIssues(null));
+    assertFalse(JiraUtils.hasJiraIssues(""));
     assertTrue(JiraUtils.hasJiraIssues("P-0"));
     assertTrue(JiraUtils.hasJiraIssues("PF-0"));
     assertTrue(JiraUtils.hasJiraIssues("PF-222"));

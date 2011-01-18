@@ -71,6 +71,9 @@ public class JiraUtils
 
   public static boolean hasJiraIssues(final String text)
   {
+    if (StringUtils.isBlank(text)) {
+      return false;
+    }
     final Pattern p = Pattern.compile(PATTERN, Pattern.MULTILINE);
     final Matcher m = p.matcher(text);
     return m.find();
