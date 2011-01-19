@@ -36,7 +36,6 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.behavior.AbstractBehavior;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -101,9 +100,11 @@ import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.PlainLabel;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
+import org.projectforge.web.wicket.layout.LabelLPanel;
 import org.projectforge.web.wicket.layout.LayoutAlignment;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.LayoutLength;
+import org.projectforge.web.wicket.layout.ContainerLPanel;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
 public class TimesheetFormRenderer extends AbstractDOFormRenderer
@@ -144,7 +145,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
 
   protected Integer stopMinute;
 
-  protected Component consumptionBar;
+  protected ContainerLPanel consumptionBarPanel;
 
   protected Boolean saveAsTemplate;
 
@@ -289,13 +290,14 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     }
     {
       final String timePeriodLabel = getString("timePeriod");
-      doPanel.addLabel(timePeriodLabel, HALF).setBreakBefore();
+      final LabelLPanel label = doPanel.addLabel(timePeriodLabel, HALF);
       final RepeatingView repeatingView = doPanel.addRepeater(LayoutLength.DOUBLE).getRepeatingView();
       // Start time
       startDateTimePanel = new DateTimePanel(repeatingView.newChildId(), new PropertyModel<Date>(data, "startTime"),
           (DateTimePanelSettings) DateTimePanelSettings.get().withTabIndex(4).withSelectStartStopTime(true).withCallerPage(parentPage)
               .withTargetType(java.sql.Timestamp.class).withRequired(true), DatePrecision.MINUTE_15);
       repeatingView.add(startDateTimePanel);
+      label.setLabelFor(startDateTimePanel.getDateField()).setBreakBefore();
       WicketUtils.addTooltip(startDateTimePanel.getDateField(), new Model<String>() {
         @Override
         public String getObject()
@@ -331,22 +333,28 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       stopMinuteDropDownChoice.setRequired(true);
       repeatingView.add(stopMinuteDropDownChoicePanel);
     }
-    locationTextField = new PFAutoCompleteMaxLengthTextField(TextFieldLPanel.INPUT_ID, new PropertyModel<String>(data, "location")) {
-      @Override
-      protected List<String> getChoices(String input)
-      {
-        return parentPage.getBaseDao().getLocationAutocompletion(input);
-      }
+    {
+      final WebMarkupContainer dummy = (WebMarkupContainer) new WebMarkupContainer(ContainerLPanel.WICKET_ID).setVisible(false);
+      consumptionBarPanel = doPanel.addContainer(getString("task.consumption"), HALF, dummy, FULL);
+    }
+    {
+      locationTextField = new PFAutoCompleteMaxLengthTextField(TextFieldLPanel.INPUT_ID, new PropertyModel<String>(data, "location")) {
+        @Override
+        protected List<String> getChoices(String input)
+        {
+          return parentPage.getBaseDao().getLocationAutocompletion(input);
+        }
 
-      @Override
-      protected List<String> getFavorites()
-      {
-        return parentPage.getRecentLocations();
-      }
-    };
-    locationTextField.withMatchContains(true).withMinChars(2).withFocus(true);
-    WicketUtils.addTooltip(locationTextField, getString("tooltip.autocomplete.withDblClickFunction"));
-    doPanel.addTextField(getString("timesheet.location"), HALF, locationTextField, DOUBLE);
+        @Override
+        protected List<String> getFavorites()
+        {
+          return parentPage.getRecentLocations();
+        }
+      };
+      locationTextField.withMatchContains(true).withMinChars(2).withFocus(true);
+      WicketUtils.addTooltip(locationTextField, getString("tooltip.autocomplete.withDblClickFunction"));
+      doPanel.addTextField(getString("timesheet.location"), HALF, locationTextField, DOUBLE);
+    }
     final boolean jiraSupport = Configuration.getInstance().isJIRAConfigured();
     final String jiraFootnoteMark = jiraSupport ? "*" : "";
     doPanel.addTextArea(data, "description", getString("timesheet.description") + jiraFootnoteMark, HALF, DOUBLE, false).setCssStyle(
@@ -384,6 +392,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
 
   protected void refresh()
   {
+    addConsumptionBar();
     if (kost2Choice == null) {
       // Not yet initialized, no refresh needed.
       return;
@@ -392,7 +401,6 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = getKost2LabelValueChoiceRenderer();
     kost2Choice.setChoiceRenderer(kost2ChoiceRenderer);
     kost2Choice.setChoices(kost2ChoiceRenderer.getValues());
-    addConsumptionBar();
   }
 
   @SuppressWarnings("serial")
@@ -458,9 +466,6 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
 
   protected void addConsumptionBar()
   {
-    if (consumptionBar != null) {
-      doPanel.remove(consumptionBar);
-    }
     final Integer taskId = data.getTaskId();
     TaskNode node = taskId != null ? taskTree.getTaskNodeById(taskId) : null;
     if (node != null) {
@@ -469,11 +474,9 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
         node = personDaysNode;
       }
     }
-    final ConsumptionBarPanel consumptionBarPanel = TaskListPage.getConsumptionBarPanel(this.parentPage, "consumptionBar", taskTree, false,
-        node);
-    consumptionBarPanel.setRenderBodyOnly(true);
-    // TODO: add(consumptionBarPanel);
-    consumptionBar = consumptionBarPanel;
+    final ConsumptionBarPanel consumptionBar = TaskListPage.getConsumptionBarPanel(this.parentPage, ContainerLPanel.WICKET_ID, taskTree, false, node);
+    consumptionBar.setRenderBodyOnly(true);
+    consumptionBarPanel.replaceWithContainer(consumptionBar);
   }
 
   private LabelValueChoiceRenderer<Integer> getKost2LabelValueChoiceRenderer()

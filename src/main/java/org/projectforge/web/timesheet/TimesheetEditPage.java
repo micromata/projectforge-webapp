@@ -159,8 +159,8 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
       }
     }
 
-    //form.addKost2Row();
-    //form.addConsumptionBar();
+    form.renderer.addKost2Row();
+    form.renderer.addConsumptionBar();
   }
 
   @Override
