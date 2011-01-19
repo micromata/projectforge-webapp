@@ -57,14 +57,12 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
 
   protected SingleButtonPanel cloneButtonPanel;
 
-  protected Boolean saveAsTemplate;
-
   protected TimesheetFormRenderer renderer;
 
   public TimesheetEditForm(final TimesheetEditPage parentPage, final TimesheetDO data)
   {
     super(parentPage, data);
-    renderer = new TimesheetFormRenderer(parentPage, this, new LayoutContext(this), parentPage.getBaseDao(), data);
+    renderer = new TimesheetFormRenderer(parentPage, this, new LayoutContext(this), data);
     renderer.taskTree = taskTree;
     renderer.userGroupCache = userGroupCache;
     renderer.userPrefDao = userPrefDao;

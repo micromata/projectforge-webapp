@@ -91,10 +91,12 @@ import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
+import org.projectforge.web.wicket.components.CheckBoxPanel;
 import org.projectforge.web.wicket.components.ConsumptionBarPanel;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.DateTimePanelSettings;
 import org.projectforge.web.wicket.components.DropDownChoicePanel;
+import org.projectforge.web.wicket.components.LabelPanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.PlainLabel;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -109,8 +111,6 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
   private static final long serialVersionUID = -9175062586210446142L;
 
   protected TaskTree taskTree;
-
-  private final TimesheetDao timesheetDao;
 
   protected UserGroupCache userGroupCache;
 
@@ -146,16 +146,17 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
 
   protected Component consumptionBar;
 
+  protected Boolean saveAsTemplate;
+
   @SuppressWarnings("unused")
   private String templateName;
 
   public TimesheetFormRenderer(final TimesheetEditPage timesheetEditPage, final MarkupContainer container,
-      final LayoutContext layoutContext, final TimesheetDao timesheetDao, final TimesheetDO data)
+      final LayoutContext layoutContext, final TimesheetDO data)
   {
     super(container, layoutContext);
     this.parentPage = timesheetEditPage;
     this.data = data;
-    this.timesheetDao = timesheetDao;
   }
 
   protected void validation()
@@ -167,21 +168,21 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     } else if (data.getDuration() > TimesheetDao.MAXIMUM_DURATION) {
       startDateTimePanel.error("timesheet.error.maximumDurationExceeded");
     }
-    // if (kost2Row.isVisible() == false && data.getKost2Id() == null) {
-    // // Kost2 is not available for current task.
-    // final TaskNode taskNode = taskTree.getTaskNodeById(data.getTaskId());
-    // if (taskNode != null) {
-    // final List<Integer> descendents = taskNode.getDescendantIds();
-    // for (final Integer taskId : descendents) {
-    // if (CollectionUtils.isNotEmpty(taskTree.getKost2List(taskId)) == true) {
-    // // But Kost2 is available for sub task, so user should book his time sheet
-    // // on a sub task with kost2s.
-    // kost2Choice.error("timesheet.error.kost2NeededChooseSubTask");
-    // break;
-    // }
-    // }
-    // }
-    // }
+    if (kost2Row.isVisible() == false && data.getKost2Id() == null) {
+      // Kost2 is not available for current task.
+      final TaskNode taskNode = taskTree.getTaskNodeById(data.getTaskId());
+      if (taskNode != null) {
+        final List<Integer> descendents = taskNode.getDescendantIds();
+        for (final Integer taskId : descendents) {
+          if (CollectionUtils.isNotEmpty(taskTree.getKost2List(taskId)) == true) {
+            // But Kost2 is available for sub task, so user should book his time sheet
+            // on a sub task with kost2s.
+            kost2Choice.error("timesheet.error.kost2NeededChooseSubTask");
+            break;
+          }
+        }
+      }
+    }
   }
 
   protected void updateStopDate()
@@ -222,12 +223,11 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
           refresh(); // Task was changed. Therefore update the kost2 list.
         }
       };
-      add(taskSelectPanel);
       taskSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
       taskSelectPanel.setTabIndex(1);
+      doPanel.addSelectPanel(getString("task"), HALF, taskSelectPanel, LayoutLength.DOUBLE);
       taskSelectPanel.init();
       taskSelectPanel.setRequired(true);
-      doPanel.addSelectPanel(getString("task"), HALF, taskSelectPanel, LayoutLength.DOUBLE);
     }
     {
       PFUserDO user = data.getUser();
@@ -238,9 +238,8 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       final UserSelectPanel userSelectPanel = new UserSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<PFUserDO>(data, "user"),
           parentPage, "userId");
       userSelectPanel.setRequired(true);
-      add(userSelectPanel);
-      userSelectPanel.init();
       doPanel.addSelectPanel(getString("user"), HALF, userSelectPanel, FULL).setStrong();
+      userSelectPanel.init();
     }
     {
       // DropDownChoice templates
@@ -314,7 +313,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
           return buf.toString();
         }
       });
-      repeatingView.add(new PlainLabel(repeatingView.newChildId(), getString("until")));
+      repeatingView.add(new LabelPanel(repeatingView.newChildId(), getString("until")));
       // Stop time
       final DropDownChoicePanel<Integer> stopHourOfDayDropDownChoicePanel = new DropDownChoicePanel<Integer>(repeatingView.newChildId(),
           new PropertyModel<Integer>(this, "stopHourOfDay"), DateTimePanel.getHourOfDayRenderer().getValues(), DateTimePanel
@@ -323,7 +322,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       stopHourOfDayDropDownChoice.setNullValid(false);
       stopHourOfDayDropDownChoice.setRequired(true);
       repeatingView.add(stopHourOfDayDropDownChoicePanel);
-      repeatingView.add(new PlainLabel(repeatingView.newChildId(), " : "));
+      repeatingView.add(new LabelPanel(repeatingView.newChildId(), " : "));
       final DropDownChoicePanel<Integer> stopMinuteDropDownChoicePanel = new DropDownChoicePanel<Integer>(repeatingView.newChildId(),
           new PropertyModel<Integer>(this, "stopMinute"), DateTimePanel.getMinutesRenderer(DatePrecision.MINUTE_15).getValues(),
           DateTimePanel.getMinutesRenderer(DatePrecision.MINUTE_15));
@@ -356,19 +355,31 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       doPanel.addLabel("", HALF).setBreakBefore();
       doPanel.addJiraIssuesPanel(DOUBLE, data.getDescription());
     }
-    if (jiraSupport == true) {
+
+    {
+      // Save as template checkbox:
       doPanel.addLabel("", HALF).setBreakBefore();
-      doPanel.addLabel("*) " + getString("tooltip.jiraSupport.field"), DOUBLE);
+      final RepeatingView repeatingView = doPanel.addRepeater(LayoutLength.DOUBLE).getRepeatingView();
+      final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(repeatingView.newChildId(), new PropertyModel<Boolean>(this, "saveAsTemplate"));
+      final PlainLabel label = new PlainLabel(repeatingView.newChildId(), getString("user.pref.saveAsTemplate"));
+      WicketUtils.setLabel(checkBoxPanel.getCheckBox(), label);
+      repeatingView.add(label);
+      repeatingView.add(checkBoxPanel);
+    }
+
+    if (jiraSupport == true) {
+      // Add help text:
+      doPanel.addLabel("", HALF).setBreakBefore();
+      doPanel.addHelpLabel("*) " + getString("tooltip.jiraSupport.field"), DOUBLE);
     }
 
     // addRecentSheetsTable();
-    // WebMarkupContainer toggleRecentSheets = new WebMarkupContainer("toggleRecentSheets");
+    // final WebMarkupContainer toggleRecentSheets = new WebMarkupContainer("toggleRecentSheets");
     // toggleRecentSheets.setRenderBodyOnly(true);
     // if (isNew() == false) {
     // toggleRecentSheets.setVisible(false);
     // }
     // add(toggleRecentSheets);
-    // add(new CheckBox("saveAsTemplate", new PropertyModel<Boolean>(this, "saveAsTemplate")));
   }
 
   protected void refresh()
@@ -395,7 +406,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
         return CollectionUtils.isNotEmpty(kost2List);
       }
     };
-    add(kost2Row);
+    // TODO: add(kost2Row);
     final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = getKost2LabelValueChoiceRenderer();
     kost2Choice = createKost2ChoiceRenderer(parentPage.getBaseDao(), taskTree, kost2ChoiceRenderer, data, kost2List);
     kost2Choice.setRequired(true);
@@ -461,7 +472,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     final ConsumptionBarPanel consumptionBarPanel = TaskListPage.getConsumptionBarPanel(this.parentPage, "consumptionBar", taskTree, false,
         node);
     consumptionBarPanel.setRenderBodyOnly(true);
-    add(consumptionBarPanel);
+    // TODO: add(consumptionBarPanel);
     consumptionBar = consumptionBarPanel;
   }
 
@@ -496,10 +507,11 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
   private void addRecentSheetsTable()
   {
     if (isNew() == false) {
-      WebMarkupContainer invisible = new WebMarkupContainer("recentSheets");
-      invisible.setVisible(false);
-      add(invisible);
       return;
+      // WebMarkupContainer invisible = new WebMarkupContainer("recentSheets");
+      // invisible.setVisible(false);
+      // add(invisible);
+      // return;
     }
     final List<IColumn<TimesheetDO>> columns = new ArrayList<IColumn<TimesheetDO>>();
     final CellItemListener<TimesheetDO> cellItemListener = new CellItemListener<TimesheetDO>() {
@@ -600,7 +612,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     };
     final HeadersToolbar headersToolbar = new HeadersToolbar(dataTable, null);
     dataTable.addTopToolbar(headersToolbar);
-    add(dataTable);
+    // TODO: add(dataTable);
     if (isNew() == false) {
       dataTable.setVisible(false);
     }

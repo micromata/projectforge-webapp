@@ -376,7 +376,7 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
   @Override
   public AbstractBasePage afterSaveOrUpdate()
   {
-    if (BooleanUtils.isTrue(form.saveAsTemplate) == true) {
+    if (BooleanUtils.isTrue(form.renderer.saveAsTemplate) == true) {
       final UserPrefEditPage userPrefEditPage = new UserPrefEditPage(UserPrefArea.TIMESHEET_TEMPLATE, getData());
       userPrefEditPage.setReturnToPage(this.returnToPage);
       return userPrefEditPage;
