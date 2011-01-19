@@ -42,6 +42,7 @@ import org.projectforge.web.mobile.ActionLinkPanel;
 import org.projectforge.web.mobile.ActionLinkType;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.ImageDef;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DateTimePanel;
 
@@ -164,6 +165,16 @@ public class DataObjectLPanel extends Panel
     if (alignment != null) {
       labelPanel.setAlignment(alignment);
     }
+    return labelPanel;
+  }
+
+  public LabelLPanel addHelpLabel(final String label, final LayoutLength length)
+  {
+    ensureGroupPanel();
+    final LabelLPanel labelPanel;
+    labelPanel = new LabelLPanel(groupPanel.newChildId(), length, label);
+    labelPanel.getClassModifierComponent().add(WebConstants.HELP_CLASS);
+    groupPanel.add(labelPanel);
     return labelPanel;
   }
 
