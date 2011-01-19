@@ -175,7 +175,7 @@ public class BookFormRenderer extends AbstractDOFormRenderer
       repeatingView.add(lendOutButtonPanel);
 
       @SuppressWarnings("serial")
-      final Button returnBookButton = new Button("button", new Model<String>(getString("returnBook"))) {
+      final Button returnBookButton = new Button("button", new Model<String>(getString("book.returnBook"))) {
         @Override
         public final void onSubmit()
         {
