@@ -72,8 +72,6 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
   // Only used for detecting changes:
   private PFUserDO currentUser;
 
-  private String label;
-
   private WebMarkupContainer spanContainer;
 
   /**
@@ -102,26 +100,11 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
    * @param caller
    * @param selectProperty
    */
+  @SuppressWarnings("serial")
   public UserSelectPanel(final String id, final IModel<PFUserDO> model, final String label, final ISelectCallerPage caller,
       final String selectProperty)
   {
     super(id, model, caller, selectProperty);
-    this.label = label;
-  }
-
-  /**
-   * Should be called before init() method. If true, then the validation will be done after submitting.
-   * @param defaultFormProcessing
-   */
-  public void setDefaultFormProcessing(boolean defaultFormProcessing)
-  {
-    this.defaultFormProcessing = defaultFormProcessing;
-  }
-
-  @SuppressWarnings("serial")
-  public UserSelectPanel init()
-  {
-    super.init();
     userTextField = new PFAutoCompleteTextField<PFUserDO>("userField", getModel()) {
       @Override
       protected List<PFUserDO> getChoices(final String input)
@@ -224,6 +207,22 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
         }
       }
     });
+  }
+
+  /**
+   * Should be called before init() method. If true, then the validation will be done after submitting.
+   * @param defaultFormProcessing
+   */
+  public void setDefaultFormProcessing(boolean defaultFormProcessing)
+  {
+    this.defaultFormProcessing = defaultFormProcessing;
+  }
+
+  @SuppressWarnings("serial")
+  public UserSelectPanel init()
+  {
+    super.init();
+
     spanContainer = new WebMarkupContainer("span");
     add(spanContainer);
     spanContainer.add(userTextField);
@@ -269,7 +268,13 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
   {
     return spanContainer;
   }
-  
+
+  @Override
+  public Component getWrappedComponent()
+  {
+    return userTextField;
+  }
+
   @Override
   protected void convertInput()
   {
