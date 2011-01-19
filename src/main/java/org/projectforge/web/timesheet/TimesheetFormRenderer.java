@@ -29,6 +29,7 @@ import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
 import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
 import static org.projectforge.web.wicket.layout.SelectLPanel.WICKET_ID_SELECT_PANEL;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -37,16 +38,35 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
+import org.apache.wicket.behavior.AbstractBehavior;
+import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.HeadersToolbar;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.TextArea;
+import org.apache.wicket.markup.html.panel.Fragment;
+import org.apache.wicket.markup.repeater.Item;
+import org.apache.wicket.markup.repeater.OddEvenItem;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.markup.repeater.data.IDataProvider;
+import org.apache.wicket.markup.repeater.data.ListDataProvider;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.validator.AbstractValidator;
 import org.hibernate.Hibernate;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.core.Configuration;
+import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.jira.JiraUtils;
 import org.projectforge.task.TaskDO;
@@ -54,15 +74,24 @@ import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefDao;
+import org.projectforge.web.task.TaskFormatter;
+import org.projectforge.web.task.TaskListPage;
 import org.projectforge.web.task.TaskSelectPanel;
+import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserSelectPanel;
+import org.projectforge.web.wicket.AttributeAppendModifier;
+import org.projectforge.web.wicket.CellItemListener;
+import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
+import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
+import org.projectforge.web.wicket.components.ConsumptionBarPanel;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.DateTimePanelSettings;
 import org.projectforge.web.wicket.components.DropDownChoicePanel;
@@ -86,6 +115,8 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
   protected UserGroupCache userGroupCache;
 
   protected UserPrefDao userPrefDao;
+
+  protected UserFormatter userFormatter;
 
   private TimesheetDO data;
 
@@ -136,21 +167,21 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     } else if (data.getDuration() > TimesheetDao.MAXIMUM_DURATION) {
       startDateTimePanel.error("timesheet.error.maximumDurationExceeded");
     }
-//    if (kost2Row.isVisible() == false && data.getKost2Id() == null) {
-//      // Kost2 is not available for current task.
-//      final TaskNode taskNode = taskTree.getTaskNodeById(data.getTaskId());
-//      if (taskNode != null) {
-//        final List<Integer> descendents = taskNode.getDescendantIds();
-//        for (final Integer taskId : descendents) {
-//          if (CollectionUtils.isNotEmpty(taskTree.getKost2List(taskId)) == true) {
-//            // But Kost2 is available for sub task, so user should book his time sheet
-//            // on a sub task with kost2s.
-//            kost2Choice.error("timesheet.error.kost2NeededChooseSubTask");
-//            break;
-//          }
-//        }
-//      }
-//    }
+    // if (kost2Row.isVisible() == false && data.getKost2Id() == null) {
+    // // Kost2 is not available for current task.
+    // final TaskNode taskNode = taskTree.getTaskNodeById(data.getTaskId());
+    // if (taskNode != null) {
+    // final List<Integer> descendents = taskNode.getDescendantIds();
+    // for (final Integer taskId : descendents) {
+    // if (CollectionUtils.isNotEmpty(taskTree.getKost2List(taskId)) == true) {
+    // // But Kost2 is available for sub task, so user should book his time sheet
+    // // on a sub task with kost2s.
+    // kost2Choice.error("timesheet.error.kost2NeededChooseSubTask");
+    // break;
+    // }
+    // }
+    // }
+    // }
   }
 
   protected void updateStopDate()
@@ -300,36 +331,44 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       stopMinuteDropDownChoice.setNullValid(false);
       stopMinuteDropDownChoice.setRequired(true);
       repeatingView.add(stopMinuteDropDownChoicePanel);
-
-      locationTextField = new PFAutoCompleteMaxLengthTextField(TextFieldLPanel.INPUT_ID, new PropertyModel<String>(data, "location")) {
-        @Override
-        protected List<String> getChoices(String input)
-        {
-          return parentPage.getBaseDao().getLocationAutocompletion(input);
-        }
-
-        @Override
-        protected List<String> getFavorites()
-        {
-          return parentPage.getRecentLocations();
-        }
-      };
-      locationTextField.withMatchContains(true).withMinChars(2).withFocus(true);
-      WicketUtils.addTooltip(locationTextField, getString("tooltip.autocomplete.withDblClickFunction"));
-      doPanel.addTextField(getString("timesheet.location"), HALF, locationTextField, DOUBLE);
-      final boolean jiraSupport = Configuration.getInstance().isJIRAConfigured();
-      final String jiraFootnoteMark = jiraSupport ? "*" : "";
-      doPanel.addTextArea(data, "description", getString("timesheet.description") + jiraFootnoteMark, HALF, DOUBLE, false).setCssStyle(
-          "height: 20em;");
-      if (jiraSupport == true && JiraUtils.hasJiraIssues(data.getDescription()) == true) {
-        doPanel.addLabel("", HALF).setBreakBefore();
-        doPanel.addJiraIssuesPanel(DOUBLE, data.getDescription());
-      }
-      if (jiraSupport == true) {
-        doPanel.addLabel("", HALF).setBreakBefore();
-        doPanel.addLabel("*) " + getString("tooltip.jiraSupport.field"), DOUBLE);
-      }
     }
+    locationTextField = new PFAutoCompleteMaxLengthTextField(TextFieldLPanel.INPUT_ID, new PropertyModel<String>(data, "location")) {
+      @Override
+      protected List<String> getChoices(String input)
+      {
+        return parentPage.getBaseDao().getLocationAutocompletion(input);
+      }
+
+      @Override
+      protected List<String> getFavorites()
+      {
+        return parentPage.getRecentLocations();
+      }
+    };
+    locationTextField.withMatchContains(true).withMinChars(2).withFocus(true);
+    WicketUtils.addTooltip(locationTextField, getString("tooltip.autocomplete.withDblClickFunction"));
+    doPanel.addTextField(getString("timesheet.location"), HALF, locationTextField, DOUBLE);
+    final boolean jiraSupport = Configuration.getInstance().isJIRAConfigured();
+    final String jiraFootnoteMark = jiraSupport ? "*" : "";
+    doPanel.addTextArea(data, "description", getString("timesheet.description") + jiraFootnoteMark, HALF, DOUBLE, false).setCssStyle(
+        "height: 20em;");
+    if (jiraSupport == true && JiraUtils.hasJiraIssues(data.getDescription()) == true) {
+      doPanel.addLabel("", HALF).setBreakBefore();
+      doPanel.addJiraIssuesPanel(DOUBLE, data.getDescription());
+    }
+    if (jiraSupport == true) {
+      doPanel.addLabel("", HALF).setBreakBefore();
+      doPanel.addLabel("*) " + getString("tooltip.jiraSupport.field"), DOUBLE);
+    }
+
+    // addRecentSheetsTable();
+    // WebMarkupContainer toggleRecentSheets = new WebMarkupContainer("toggleRecentSheets");
+    // toggleRecentSheets.setRenderBodyOnly(true);
+    // if (isNew() == false) {
+    // toggleRecentSheets.setVisible(false);
+    // }
+    // add(toggleRecentSheets);
+    // add(new CheckBox("saveAsTemplate", new PropertyModel<Boolean>(this, "saveAsTemplate")));
   }
 
   protected void refresh()
@@ -338,11 +377,247 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       // Not yet initialized, no refresh needed.
       return;
     }
-    // kost2List = taskTree.getKost2List(data.getTaskId());
-    // final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = getKost2LabelValueChoiceRenderer();
-    // kost2Choice.setChoiceRenderer(kost2ChoiceRenderer);
-    // kost2Choice.setChoices(kost2ChoiceRenderer.getValues());
-    // remove(consumptionBar);
-    // addConsumptionBar();
+    kost2List = taskTree.getKost2List(data.getTaskId());
+    final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = getKost2LabelValueChoiceRenderer();
+    kost2Choice.setChoiceRenderer(kost2ChoiceRenderer);
+    kost2Choice.setChoices(kost2ChoiceRenderer.getValues());
+    addConsumptionBar();
+  }
+
+  @SuppressWarnings("serial")
+  protected void addKost2Row()
+  {
+    kost2List = taskTree.getKost2List(data.getTaskId());
+    kost2Row = new WebMarkupContainer("kost2Row") {
+      @Override
+      public boolean isVisible()
+      {
+        return CollectionUtils.isNotEmpty(kost2List);
+      }
+    };
+    add(kost2Row);
+    final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = getKost2LabelValueChoiceRenderer();
+    kost2Choice = createKost2ChoiceRenderer(parentPage.getBaseDao(), taskTree, kost2ChoiceRenderer, data, kost2List);
+    kost2Choice.setRequired(true);
+    kost2Row.add(kost2Choice);
+  }
+
+  @SuppressWarnings("serial")
+  protected static DropDownChoice<Integer> createKost2ChoiceRenderer(final TimesheetDao timesheetDao, final TaskTree taskTree,
+      final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer, final TimesheetDO data, final List<Kost2DO> kost2List)
+  {
+    final DropDownChoice<Integer> choice = new DropDownChoice<Integer>("kost2Id", new Model<Integer>() {
+      public Integer getObject()
+      {
+        return data.getKost2Id();
+      }
+
+      public void setObject(final Integer kost2Id)
+      {
+        if (kost2Id != null) {
+          timesheetDao.setKost2(data, kost2Id);
+        } else {
+          data.setKost2(null);
+        }
+      }
+    }, kost2ChoiceRenderer.getValues(), kost2ChoiceRenderer);
+    choice.setNullValid(true);
+    choice.add(new AbstractValidator<Integer>() {
+      @Override
+      protected void onValidate(IValidatable<Integer> validatable)
+      {
+        final Integer value = validatable.getValue();
+        if (value != null && value >= 0) {
+          return;
+        }
+        if (CollectionUtils.isNotEmpty(kost2List) == true) {
+          // Kost2 available but not selected.
+          error(validatable);
+        }
+      }
+
+      @Override
+      protected String resourceKey()
+      {
+        return "timesheet.error.kost2Required";
+      }
+    });
+    return choice;
+  }
+
+  protected void addConsumptionBar()
+  {
+    if (consumptionBar != null) {
+      doPanel.remove(consumptionBar);
+    }
+    final Integer taskId = data.getTaskId();
+    TaskNode node = taskId != null ? taskTree.getTaskNodeById(taskId) : null;
+    if (node != null) {
+      final TaskNode personDaysNode = taskTree.getPersonDaysNode(node);
+      if (personDaysNode != null) {
+        node = personDaysNode;
+      }
+    }
+    final ConsumptionBarPanel consumptionBarPanel = TaskListPage.getConsumptionBarPanel(this.parentPage, "consumptionBar", taskTree, false,
+        node);
+    consumptionBarPanel.setRenderBodyOnly(true);
+    add(consumptionBarPanel);
+    consumptionBar = consumptionBarPanel;
+  }
+
+  private LabelValueChoiceRenderer<Integer> getKost2LabelValueChoiceRenderer()
+  {
+    return getKost2LabelValueChoiceRenderer(parentPage.getBaseDao(), kost2List, data, kost2Choice);
+  }
+
+  protected static LabelValueChoiceRenderer<Integer> getKost2LabelValueChoiceRenderer(final TimesheetDao timesheetDao,
+      final List<Kost2DO> kost2List, final TimesheetDO data, final DropDownChoice<Integer> kost2Choice)
+  {
+    final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
+    if (kost2List != null && kost2List.size() == 1) {
+      // Es ist genau ein Eintrag. Deshalb selektieren wir diesen auch:
+      Integer kost2Id = kost2List.get(0).getId();
+      timesheetDao.setKost2(data, kost2Id);
+      if (kost2Choice != null) {
+        kost2Choice.modelChanged();
+      }
+    }
+    if (CollectionUtils.isEmpty(kost2List) == true) {
+      data.setKost2(null); // No kost2 list given, therefore set also kost2 to null.
+    } else {
+      for (Kost2DO kost2 : kost2List) {
+        kost2ChoiceRenderer.addValue(kost2.getId(), KostFormatter.formatForSelection(kost2));
+      }
+    }
+    return kost2ChoiceRenderer;
+  }
+
+  @SuppressWarnings( { "serial"})
+  private void addRecentSheetsTable()
+  {
+    if (isNew() == false) {
+      WebMarkupContainer invisible = new WebMarkupContainer("recentSheets");
+      invisible.setVisible(false);
+      add(invisible);
+      return;
+    }
+    final List<IColumn<TimesheetDO>> columns = new ArrayList<IColumn<TimesheetDO>>();
+    final CellItemListener<TimesheetDO> cellItemListener = new CellItemListener<TimesheetDO>() {
+      public void populateItem(Item<ICellPopulator<TimesheetDO>> item, String componentId, IModel<TimesheetDO> rowModel)
+      {
+        final TimesheetDO timesheet = rowModel.getObject();
+        final int rowIndex = ((Item< ? >) item.findParent(Item.class)).getIndex();
+        String cssStyle = null;
+        if (timesheet.isDeleted() == true) {
+          cssStyle = "text-decoration: line-through;";
+        } else if (rowIndex < TimesheetEditPage.SIZE_OF_FIRST_RECENT_BLOCK) {
+          cssStyle = "font-weight: bold; color:red;";
+        }
+
+        if (cssStyle != null) {
+          item.add(new AttributeAppendModifier("style", new Model<String>(cssStyle)));
+        }
+      }
+    };
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(getString("fibu.kost2"), null, "kost2.shortDisplayName", cellItemListener) {
+      @Override
+      public void populateItem(Item<ICellPopulator<TimesheetDO>> item, String componentId, IModel<TimesheetDO> rowModel)
+      {
+        final TimesheetDO timesheet = rowModel.getObject();
+        final Fragment fragment = new Fragment(componentId, "selectRecentSheet", parentPage);
+        item.add(fragment);
+        final SubmitLink link = new SubmitLink("selectRecent") {
+          public void onSubmit()
+          {
+            data.setLocation(timesheet.getLocation());
+            data.setDescription(timesheet.getDescription());
+            parentPage.getBaseDao().setTask(data, timesheet.getTaskId());
+            parentPage.getBaseDao().setUser(data, timesheet.getUserId());
+            parentPage.getBaseDao().setKost2(data, timesheet.getKost2Id());
+            kost2Choice.modelChanged();
+            locationTextField.modelChanged();
+            descriptionArea.modelChanged();
+            updateStopDate();
+            refresh();
+          };
+        };
+        fragment.add(link);
+        link.setDefaultFormProcessing(false);
+        fragment.add(new Label("label", new Model<String>() {
+          @Override
+          public String getObject()
+          {
+            final StringBuffer buf = new StringBuffer();
+            if (timesheet.getKost2() != null) {
+              buf.append(timesheet.getKost2().getShortDisplayName());
+            }
+            if (timesheet.getUserId() != null && timesheet.getUserId().equals(PFUserContext.getUserId()) == false) {
+              if (timesheet.getKost2() != null) {
+                buf.append(", ");
+              }
+              buf.append(userFormatter.getFormattedUser(timesheet.getUserId()));
+            }
+            return buf.toString();
+          }
+        }));
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(getString("fibu.kunde")), null,
+        "kost2.projekt.kunde.name", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(getString("fibu.projekt")), null, "kost2.projekt.name",
+        cellItemListener));
+    columns
+        .add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(getString("task")), null, "task.title", cellItemListener) {
+          @Override
+          public void populateItem(final Item<ICellPopulator<TimesheetDO>> item, final String componentId,
+              final IModel<TimesheetDO> rowModel)
+          {
+            final TaskDO task = rowModel.getObject().getTask();
+            StringBuffer buf = new StringBuffer();
+            TaskFormatter.instance().appendFormattedTask(buf, new WicketLocalizerAndUrlBuilder(parentPage.getResponse()), task, false,
+                true, false);
+            final Label formattedTaskLabel = new Label(componentId, buf.toString());
+            formattedTaskLabel.setEscapeModelStrings(false);
+            item.add(formattedTaskLabel);
+            cellItemListener.populateItem(item, componentId, rowModel);
+          }
+        });
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(getString("timesheet.location"), null, "location", cellItemListener) {
+
+    });
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(getString("timesheet.description"), null, "shortDescription",
+        cellItemListener));
+    @SuppressWarnings("unchecked")
+    final IColumn<TimesheetDO>[] colArray = columns.toArray(new IColumn[columns.size()]);
+    final IDataProvider<TimesheetDO> dataProvider = new ListDataProvider<TimesheetDO>(parentPage.getRecentTimesheets());
+    final DataTable<TimesheetDO> dataTable = new DataTable<TimesheetDO>("recentSheets", colArray, dataProvider, 100) {
+      @Override
+      protected Item<TimesheetDO> newRowItem(String id, int index, IModel<TimesheetDO> model)
+      {
+        return new OddEvenItem<TimesheetDO>(id, index, model);
+      }
+    };
+    final HeadersToolbar headersToolbar = new HeadersToolbar(dataTable, null);
+    dataTable.addTopToolbar(headersToolbar);
+    add(dataTable);
+    if (isNew() == false) {
+      dataTable.setVisible(false);
+    }
+    dataTable.add(new DataTableBehavior());
+  }
+
+  class DataTableBehavior extends AbstractBehavior implements IHeaderContributor
+  {
+    private static final long serialVersionUID = -3295144120585281383L;
+
+    public void renderHead(IHeaderResponse response)
+    {
+      final String initJS = "// Mache alle Zeilen von recentSheets klickbar\n"
+          + "  $(\".datatable td\").click( function() {\n"
+          + "    $(this).parent().find(\"a:first\").click();\n"
+          + "  });\n";
+      response.renderOnDomReadyJavascript(initJS);
+    }
   }
 }
