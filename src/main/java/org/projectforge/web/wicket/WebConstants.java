@@ -197,4 +197,6 @@ public class WebConstants
   public static final SimpleAttributeModifier BUTTON_CLASS_RESET = new SimpleAttributeModifier("class", "reset");
 
   public static final SimpleAttributeModifier BUTTON_CLASS_DEFAULT = new SimpleAttributeModifier("class", "submit");
+
+  public static final SimpleAttributeModifier HELP_CLASS = new SimpleAttributeModifier("class", "help");
 }
