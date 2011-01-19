@@ -120,8 +120,11 @@ public class MenuPanel extends Panel
               + generateCallbackScript("wicketAjaxGet('" + getCallbackUrl() + "&favoriteMenuEntries=' + favoriteMenuEntries")
               + "return false;\n"
               + "};\n"
-              + "function saveLabel() { return '"
+              + "function getSaveLabel() { return '"
               + getString("menu.saveFavorites")
+              + "'; }\n"
+              + "function getSaveMessage() { return '"
+              + getString("menu.saveFavoritesSuccessful")
               + "'; }";
         }
         super.onComponentTag(tag);
