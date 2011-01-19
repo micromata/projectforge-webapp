@@ -60,4 +60,9 @@ public class CheckBoxPanel extends Panel
     // Oups, ugly hack: Instead of preventing bubble fake a third click:
     checkBox.add(new SimpleAttributeModifier("onclick", "javascript:$(this).attr('checked', !cb.is(':checked'));"));
   }
+  
+  public CheckBox getCheckBox()
+  {
+    return checkBox;
+  }
 }
