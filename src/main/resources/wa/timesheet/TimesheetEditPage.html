@@ -1,0 +1,26 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<wicket:head>
+  <script type="text/javascript">
+   <!--
+    function toggleRecentSheets() {
+      $("#recentSheets").toggle("normal");
+    }
+    // -->
+  </script>
+</wicket:head>
+</head>
+
+<body>
+<wicket:extend>
+  <wicket:fragment wicket:id="buttonFragment">
+    <span wicket:id="clone">[clone]</span>
+  </wicket:fragment>
+  <wicket:fragment wicket:id="selectRecentSheet">
+    <a href="#" wicket:id="selectRecent"><img src="images/row_pointer.png" border="0" /></a>
+    <span wicket:id="label">4711</span>
+  </wicket:fragment>
+</wicket:extend>
+</body>
+</html>
