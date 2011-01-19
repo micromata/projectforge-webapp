@@ -43,7 +43,7 @@ $(function() {
           $('#personal, #nav ul').sortable('enable');
           // and add blue border around the personal menu...
           $('ul#personal').addClass('dotted');
-          $('#personal').after("<a id='saver'>Save Menu</a>");
+          $('#personal').after("<a id='saver'>" + saveLabel() + "</a>");
           // Add the crosses for removing menu entries:
           $("ul#personal li a").prepend(
               '<span class="remover"> 2 </span>');
