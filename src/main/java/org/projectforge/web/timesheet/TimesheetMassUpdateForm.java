@@ -135,13 +135,13 @@ public class TimesheetMassUpdateForm extends AbstractForm<TimesheetDO, Timesheet
     };
     add(kost2Row);
     final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = getKost2LabelValueChoiceRenderer();
-    //kost2Choice = TimesheetEditForm.createKost2ChoiceRenderer(timesheetDao, taskTree, kost2ChoiceRenderer, data, kost2List);
+    kost2Choice = TimesheetFormRenderer.createKost2ChoiceRenderer(timesheetDao, taskTree, kost2ChoiceRenderer, data, kost2List);
     kost2Row.add(kost2Choice);
   }
 
   private LabelValueChoiceRenderer<Integer> getKost2LabelValueChoiceRenderer()
   {
-    return null;//TimesheetEditForm.getKost2LabelValueChoiceRenderer(timesheetDao, kost2List, data, kost2Choice);
+    return TimesheetFormRenderer.getKost2LabelValueChoiceRenderer(timesheetDao, kost2List, data, kost2Choice);
   }
 
 }
