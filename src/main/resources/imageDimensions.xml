@@ -124,6 +124,7 @@
   <image path="/images/lock_delete.png" width="16" height="16"/>
   <image path="/images/lock_edit.png" width="16" height="16"/>
   <image path="/images/loginheader.png" width="330" height="108"/>
+  <image path="/images/logo-top-right.png" width="65" height="43"/>
   <image path="/images/mail_open.png" width="16" height="16"/>
   <image path="/images/mail_out.png" width="16" height="16"/>
   <image path="/images/meb.png" width="16" height="16"/>
