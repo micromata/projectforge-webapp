@@ -38,6 +38,7 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
@@ -90,8 +91,9 @@ public class MenuPanel extends Panel
       {
         int counter = 0;
         for (MenuEntry menuEntry : menu.getMenuEntries()) {
-          if (menuEntry.getNewCounterModel() != null) {
-            counter += menuEntry.getNewCounterModel().getObject();
+          final IModel<Integer> newCounterModel = menuEntry.getNewCounterModel();
+          if (newCounterModel != null && newCounterModel.getObject() != null) {
+            counter += newCounterModel.getObject();
           }
         }
         return counter;
