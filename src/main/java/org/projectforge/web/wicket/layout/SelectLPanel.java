@@ -71,4 +71,10 @@ public class SelectLPanel extends AbstractLPanel
   {
     return selectPanel.getClassModifierComponent();
   }
+  
+  @Override
+  public Component getWrappedComponent()
+  {
+    return selectPanel.getWrappedComponent();
+  }
 }

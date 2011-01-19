@@ -473,17 +473,30 @@ public class DataObjectLPanel extends Panel
       final LayoutLength valueLength)
   {
     ensureGroupPanel();
-    final IField field = new SelectLPanel(groupPanel.newChildId(), valueLength, selectPanel);
-    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
-    ((SelectLPanel) field).getSelectPanel().setLabel(new Model<String>() {
+    final SelectLPanel field = new SelectLPanel(groupPanel.newChildId(), valueLength, selectPanel);
+    final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true);
+    field.getSelectPanel().setLabel(new Model<String>() {
       @Override
       public String getObject()
       {
         return label;
       }
     });
+    groupPanel.add(labelPanel);
+    labelPanel.setLabelFor(field.getWrappedComponent());
     groupPanel.add(field);
     return field;
+  }
+
+  public ContainerLPanel addContainer(final String label, final LayoutLength labelLength, final WebMarkupContainer container,
+      final LayoutLength valueLength)
+  {
+    ensureGroupPanel();
+    final ContainerLPanel containerPanel = new ContainerLPanel(groupPanel.newChildId(), valueLength, container);
+    final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), labelLength, label, container, true);
+    groupPanel.add(labelPanel);
+    groupPanel.add(containerPanel);
+    return containerPanel;
   }
 
   @SuppressWarnings("serial")

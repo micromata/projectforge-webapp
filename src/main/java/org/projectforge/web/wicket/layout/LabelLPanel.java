@@ -84,6 +84,9 @@ public class LabelLPanel extends AbstractLPanel
 
   public LabelLPanel setLabelFor(final Component component)
   {
+    if (component == null) {
+      return this;
+    }
     if (component instanceof ComponentWrapper) {
       final Component wrappedComponent = ((ComponentWrapper) component).getWrappedComponent();
       if (wrappedComponent != null) {

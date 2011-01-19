@@ -95,6 +95,15 @@ public abstract class AbstractSelectPanel<T> extends FormComponentPanel<T>
   }
 
   /**
+   * Used for setting label for (see {@link WicketUtils#setLabel(org.apache.wicket.markup.html.form.FormComponent, org.apache.wicket.markup.html.basic.Label)}.
+   * @return null if not overridden.
+   */
+  public Component getWrappedComponent()
+  {
+    return null;
+  }
+
+  /**
    * @see org.apache.wicket.Component#onBeforeRender()
    * @throws RuntimeException if component is not initialized (forgotten call of init()).
    */
