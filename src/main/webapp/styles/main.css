@@ -343,7 +343,7 @@ ul#trash {
 	clear: both;
 	position:relative;
 	padding:0.5em;
-	z-index:99998;
+	z-index:100;
 }
 
 ul#trash li {display:none}
@@ -443,7 +443,7 @@ ul#personal li a span.remover {
 
 ul#normal  ul#nav{
 	width:80em;
-	z-index:88888;
+	z-index:20;
 	position:absolute;
 	right: 0.5em;
     top: 2.7em;
@@ -852,7 +852,7 @@ span.invisibleerrormarker div.validationMsg {
 	line-height:1.4em;
 	padding: 0 1em 0 0;
 	position:absolute;
-	z-index:88888;
+	z-index:20;
 	top:0.5em;
 	white-space:nowrap;
 	width:auto;
@@ -1451,7 +1451,7 @@ table.dataview thead th.wicket_orderDown {
 /* Tooltips */
 #tooltip {
 	position: absolute;
-	z-index: 3000;
+	z-index: 10;
 	border: 1px solid #F0F5F7;
 	background-color: #F0F5F7;
 	max-width: 20em;
