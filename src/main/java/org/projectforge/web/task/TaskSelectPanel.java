@@ -61,7 +61,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
 
   private boolean showPath = true;
 
-  private WebMarkupContainer spanContainer;
+  private WebMarkupContainer divContainer;
 
   public TaskSelectPanel(final String id, final IModel<TaskDO> model, final ISelectCallerPage caller, final String selectProperty)
   {
@@ -77,8 +77,8 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
   public TaskSelectPanel init()
   {
     super.init();
-    spanContainer = new WebMarkupContainer("span");
-    add(spanContainer);
+    divContainer = new WebMarkupContainer("div");
+    add(divContainer);
     // Todo: replace taskAsString with Wicket mechanism
     final Label taskAsStringLabel = new Label("taskAsString", new Model<String>() {
       @Override
@@ -95,7 +95,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
       }
     });
     taskAsStringLabel.setEscapeModelStrings(false);
-    spanContainer.add(taskAsStringLabel);
+    divContainer.add(taskAsStringLabel);
     final SubmitLink selectButton = new SubmitLink("select") {
       public void onSubmit()
       {
@@ -107,7 +107,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
       };
     };
     selectButton.setDefaultFormProcessing(false);
-    spanContainer.add(selectButton);
+    divContainer.add(selectButton);
     selectButton.add(new TooltipImage("selectHelp", getResponse(), WebConstants.IMAGE_TASK_SELECT, getString("tooltip.selectTask")));
     final SubmitLink unselectButton = new SubmitLink("unselect") {
       @Override
@@ -123,7 +123,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
       }
     };
     unselectButton.setDefaultFormProcessing(false);
-    spanContainer.add(unselectButton);
+    divContainer.add(unselectButton);
     unselectButton
         .add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_TASK_UNSELECT, getString("tooltip.unselectTask")));
     // DropDownChoice favorites
@@ -151,7 +151,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
         return favorite;
       }
     };
-    spanContainer.add(favoritesPanel);
+    divContainer.add(favoritesPanel);
     favoritesPanel.init();
     if (showFavorites == false) {
       favoritesPanel.setVisible(false);
@@ -172,7 +172,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
   @Override
   public Component getClassModifierComponent()
   {
-    return spanContainer;
+    return divContainer;
   }
 
   @Override
