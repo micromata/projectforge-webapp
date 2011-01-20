@@ -23,7 +23,6 @@
 
 package org.projectforge.web.timesheet;
 
-import static org.projectforge.web.wicket.layout.DropDownChoiceLPanel.SELECT_ID;
 import static org.projectforge.web.wicket.layout.LayoutLength.DOUBLE;
 import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
 import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
@@ -76,7 +75,6 @@ import org.projectforge.web.wicket.components.DropDownChoicePanel;
 import org.projectforge.web.wicket.components.LabelPanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.PlainLabel;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
 import org.projectforge.web.wicket.layout.ContainerLPanel;
 import org.projectforge.web.wicket.layout.DropDownChoiceLPanel;
@@ -115,8 +113,6 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
   protected Integer stopHourOfDay;
 
   protected DropDownChoice<Integer> stopMinuteDropDownChoice;
-
-  protected SingleButtonPanel cloneButtonPanel;
 
   protected Integer stopMinute;
 
@@ -353,16 +349,16 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       return;
     }
     final RepeatingView repeatingView = templatesPanel.getRepeatingView();
-    {
+    final String[] templateNames = userPrefDao.getPrefNames(UserPrefArea.TIMESHEET_TEMPLATE);
+    if (templateNames != null && templateNames.length > 0) {
       // DropDownChoice templates
       final String label = getString("user.pref.template.select");
-      final String[] templateNames = userPrefDao.getPrefNames(UserPrefArea.TIMESHEET_TEMPLATE);
       final LabelValueChoiceRenderer<String> templateNamesChoiceRenderer = new LabelValueChoiceRenderer<String>();
       templateNamesChoiceRenderer.addValue("", label);
       for (final String name : templateNames) {
         templateNamesChoiceRenderer.addValue(name, name);
       }
-      final DropDownChoice< String > templateNamesChoice = new DropDownChoice<String>(DropDownChoicePanel.WICKET_ID,
+      final DropDownChoice<String> templateNamesChoice = new DropDownChoice<String>(DropDownChoicePanel.WICKET_ID,
           new PropertyModel<String>(this, "templateName"), templateNamesChoiceRenderer.getValues(), templateNamesChoiceRenderer) {
         @Override
         protected boolean wantOnSelectionChangedNotifications()

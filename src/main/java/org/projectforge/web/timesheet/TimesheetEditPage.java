@@ -266,7 +266,7 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
     log.info("Clone of time sheet chosen: " + timesheet);
     timesheet.setId(null);
     getBaseDao().setUser(timesheet, getUser().getId());
-    form.renderer.cloneButtonPanel.setVisible(false);
+    form.cloneButtonPanel.setVisible(false);
   }
 
   /**

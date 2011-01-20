@@ -32,7 +32,7 @@ import org.apache.wicket.model.Model;
  */
 public class MenuSuffixLabel extends Label
 {
-  private int counter = -1;
+  private Integer counter;
 
   private IModel<Integer> counterModel;
 
@@ -57,10 +57,10 @@ public class MenuSuffixLabel extends Label
     if (counterModel == null) {
       return "";
     }
-    if (counter < 0) {
+    if (counter == null) {
       counter = counterModel.getObject();
     }
-    if (counter > 0) {
+    if (counter != null && counter > 0) {
       return String.valueOf(counter);
     } else {
       return "";
@@ -70,16 +70,16 @@ public class MenuSuffixLabel extends Label
   @Override
   protected void onBeforeRender()
   {
-    counter = -1; // Force recalculation.
+    counter = null; // Force recalculation.
     super.onBeforeRender();
   }
 
   @Override
   public boolean isVisible()
   {
-    if (counter < 0) {
+    if (counter == null) {
       getCounterValue();
     }
-    return counter > 0;
+    return counter != null && counter > 0;
   }
 }
