@@ -28,6 +28,7 @@ import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
 import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
 import static org.projectforge.web.wicket.layout.SelectLPanel.WICKET_ID_SELECT_PANEL;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -35,10 +36,28 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.MarkupContainer;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.behavior.AbstractBehavior;
+import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
+import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.HeadersToolbar;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.IHeaderContributor;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.TextArea;
+import org.apache.wicket.markup.html.panel.Fragment;
+import org.apache.wicket.markup.repeater.Item;
+import org.apache.wicket.markup.repeater.OddEvenItem;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.markup.repeater.data.IDataProvider;
+import org.apache.wicket.markup.repeater.data.ListDataProvider;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.validation.IValidatable;
@@ -56,15 +75,22 @@ import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefDao;
+import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.task.TaskListPage;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserSelectPanel;
+import org.projectforge.web.wicket.AttributeAppendModifier;
+import org.projectforge.web.wicket.CellItemListener;
+import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
+import org.projectforge.web.wicket.ImageDef;
+import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
 import org.projectforge.web.wicket.components.CheckBoxPanel;
@@ -72,6 +98,7 @@ import org.projectforge.web.wicket.components.ConsumptionBarPanel;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.DateTimePanelSettings;
 import org.projectforge.web.wicket.components.DropDownChoicePanel;
+import org.projectforge.web.wicket.components.ImageLinkPanel;
 import org.projectforge.web.wicket.components.LabelPanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.PlainLabel;
@@ -90,7 +117,11 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
 {
   private static final long serialVersionUID = -9175062586210446142L;
 
+  private static final String RECENT_TIME_SHEETS_MODAL_WINDOW_ID = "recentTimesheetsModalWindow";
+
   protected TaskTree taskTree;
+
+  protected TimesheetDao timesheetDao;
 
   protected UserGroupCache userGroupCache;
 
@@ -130,7 +161,11 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
 
   protected ContainerLPanel consumptionBarPanel;
 
+  private String templatesSearchString;
+
   protected Boolean saveAsTemplate;
+
+  protected ModalWindow recentTimesheetsModalWindow;
 
   @SuppressWarnings("unused")
   private String templateName;
@@ -336,6 +371,10 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       doPanel.addLabel("", HALF).setBreakBefore();
       doPanel.addHelpLabel("*) " + getString("tooltip.jiraSupport.field"), DOUBLE);
     }
+
+    recentTimesheetsModalWindow = new ModalWindow(RECENT_TIME_SHEETS_MODAL_WINDOW_ID);
+    add(recentTimesheetsModalWindow);
+
   }
 
   @SuppressWarnings("serial")
@@ -391,8 +430,18 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       };
       templateNamesChoice.setNullValid(true);
       repeatingView.add(new DropDownChoicePanel<String>(repeatingView.newChildId(), templateNamesChoice));
+      final AjaxLink< ? > link = new AjaxLink<Void>(ImageLinkPanel.LINK_WICKET_ID) {
+        @Override
+        public void onClick(AjaxRequestTarget target)
+        {
+          showRecentTimesheetsDialog(target);
+        }
+      };
+      final ImageLinkPanel imageLinkPanel = new ImageLinkPanel(repeatingView.newChildId(), link, parentPage.getResponse(), ImageDef.ZOOM
+          .getPath(), getString("timesheet.recent.select")) {
+      };
+      repeatingView.add(imageLinkPanel);
     }
-
   }
 
   protected void refresh()
@@ -481,6 +530,160 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
   private LabelValueChoiceRenderer<Integer> getKost2LabelValueChoiceRenderer()
   {
     return getKost2LabelValueChoiceRenderer(parentPage.getBaseDao(), cost2List, data, cost2Choice);
+  }
+
+  private void showRecentTimesheetsDialog(final AjaxRequestTarget target)
+  {
+    recentTimesheetsModalWindow.setInitialHeight(800);
+    recentTimesheetsModalWindow.setInitialWidth(1000);
+    recentTimesheetsModalWindow.setMinimalHeight(800);
+    recentTimesheetsModalWindow.setMinimalWidth(1000);
+
+    final Fragment content = new Fragment(recentTimesheetsModalWindow.getContentId(), "recentTimesheetsTable", parentPage);
+    addRecentSheetsTable(content);
+
+    recentTimesheetsModalWindow.setContent(content);
+
+    recentTimesheetsModalWindow.setWindowClosedCallback(new ModalWindow.WindowClosedCallback() {
+      private static final long serialVersionUID = 2633814101880954425L;
+
+      public void onClose(AjaxRequestTarget target)
+      {
+      }
+
+    });
+    recentTimesheetsModalWindow.setCloseButtonCallback(new ModalWindow.CloseButtonCallback() {
+      private static final long serialVersionUID = 6761625465164911336L;
+
+      public boolean onCloseButtonClicked(AjaxRequestTarget target)
+      {
+        return true;
+      }
+    });
+    recentTimesheetsModalWindow.show(target);
+  }
+
+  @SuppressWarnings( { "serial"})
+  private void addRecentSheetsTable(final WebMarkupContainer container)
+  {
+    final List<IColumn<TimesheetDO>> columns = new ArrayList<IColumn<TimesheetDO>>();
+    final CellItemListener<TimesheetDO> cellItemListener = new CellItemListener<TimesheetDO>() {
+      public void populateItem(Item<ICellPopulator<TimesheetDO>> item, String componentId, IModel<TimesheetDO> rowModel)
+      {
+        final TimesheetDO timesheet = rowModel.getObject();
+        final int rowIndex = ((Item< ? >) item.findParent(Item.class)).getIndex();
+        String cssStyle = null;
+        if (timesheet.isDeleted() == true) {
+          cssStyle = "text-decoration: line-through;";
+        } else if (rowIndex < TimesheetEditPage.SIZE_OF_FIRST_RECENT_BLOCK) {
+          cssStyle = "font-weight: bold; color:red;";
+        }
+
+        if (cssStyle != null) {
+          item.add(new AttributeAppendModifier("style", new Model<String>(cssStyle)));
+        }
+      }
+    };
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(getString("fibu.kost2"), null, "kost2.shortDisplayName", cellItemListener) {
+      @Override
+      public void populateItem(Item<ICellPopulator<TimesheetDO>> item, String componentId, IModel<TimesheetDO> rowModel)
+      {
+        final TimesheetDO timesheet = rowModel.getObject();
+        final Fragment fragment = new Fragment(componentId, "selectRecentSheet", parentPage);
+        item.add(fragment);
+        final SubmitLink link = new SubmitLink("selectRecent") {
+          public void onSubmit()
+          {
+            data.setLocation(timesheet.getLocation());
+            data.setDescription(timesheet.getDescription());
+            parentPage.getBaseDao().setTask(data, timesheet.getTaskId());
+            parentPage.getBaseDao().setUser(data, timesheet.getUserId());
+            parentPage.getBaseDao().setKost2(data, timesheet.getKost2Id());
+            cost2Choice.modelChanged();
+            locationTextField.modelChanged();
+            descriptionArea.modelChanged();
+            updateStopDate();
+            refresh();
+          };
+        };
+        fragment.add(link);
+        link.setDefaultFormProcessing(false);
+        fragment.add(new Label("label", new Model<String>() {
+          @Override
+          public String getObject()
+          {
+            final StringBuffer buf = new StringBuffer();
+            if (timesheet.getKost2() != null) {
+              buf.append(timesheet.getKost2().getShortDisplayName());
+            }
+            if (timesheet.getUserId() != null && timesheet.getUserId().equals(PFUserContext.getUserId()) == false) {
+              if (timesheet.getKost2() != null) {
+                buf.append(", ");
+              }
+              buf.append(userFormatter.getFormattedUser(timesheet.getUserId()));
+            }
+            return buf.toString();
+          }
+        }));
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(getString("fibu.kunde")), null,
+        "kost2.projekt.kunde.name", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(getString("fibu.projekt")), null, "kost2.projekt.name",
+        cellItemListener));
+    columns
+        .add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(getString("task")), null, "task.title", cellItemListener) {
+          @Override
+          public void populateItem(final Item<ICellPopulator<TimesheetDO>> item, final String componentId,
+              final IModel<TimesheetDO> rowModel)
+          {
+            final TaskDO task = rowModel.getObject().getTask();
+            StringBuffer buf = new StringBuffer();
+            TaskFormatter.instance().appendFormattedTask(buf, new WicketLocalizerAndUrlBuilder(parentPage.getResponse()), task, false,
+                true, false);
+            final Label formattedTaskLabel = new Label(componentId, buf.toString());
+            formattedTaskLabel.setEscapeModelStrings(false);
+            item.add(formattedTaskLabel);
+            cellItemListener.populateItem(item, componentId, rowModel);
+          }
+        });
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(getString("timesheet.location"), null, "location", cellItemListener) {
+
+    });
+    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(getString("timesheet.description"), null, "shortDescription",
+        cellItemListener));
+    @SuppressWarnings("unchecked")
+    final IColumn<TimesheetDO>[] colArray = columns.toArray(new IColumn[columns.size()]);
+    final IDataProvider<TimesheetDO> dataProvider = new ListDataProvider<TimesheetDO>(parentPage.getRecentTimesheets());
+    final DataTable<TimesheetDO> dataTable = new DataTable<TimesheetDO>("table", colArray, dataProvider, 100) {
+      @Override
+      protected Item<TimesheetDO> newRowItem(String id, int index, IModel<TimesheetDO> model)
+      {
+        return new OddEvenItem<TimesheetDO>(id, index, model);
+      }
+    };
+    final HeadersToolbar headersToolbar = new HeadersToolbar(dataTable, null);
+    dataTable.addTopToolbar(headersToolbar);
+    container.add(dataTable);
+    if (isNew() == false) {
+      dataTable.setVisible(false);
+    }
+    dataTable.add(new DataTableBehavior());
+  }
+
+  class DataTableBehavior extends AbstractBehavior implements IHeaderContributor
+  {
+    private static final long serialVersionUID = -3295144120585281383L;
+
+    public void renderHead(IHeaderResponse response)
+    {
+      final String initJS = "// Mache alle Zeilen von recentSheets klickbar\n"
+          + "  $(\".datatable td\").click( function() {\n"
+          + "    $(this).parent().find(\"a:first\").click();\n"
+          + "  });\n";
+      response.renderOnDomReadyJavascript(initJS);
+    }
   }
 
   protected static LabelValueChoiceRenderer<Integer> getKost2LabelValueChoiceRenderer(final TimesheetDao timesheetDao,

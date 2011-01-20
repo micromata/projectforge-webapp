@@ -30,6 +30,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
+import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefDao;
 import org.projectforge.web.user.UserFormatter;
@@ -45,6 +46,9 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
 
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
+
+  @SpringBean(name = "timesheetDao")
+  private TimesheetDao timesheetDao;
 
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
@@ -64,6 +68,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     super(parentPage, data);
     renderer = new TimesheetFormRenderer(parentPage, this, new LayoutContext(this), data);
     renderer.taskTree = taskTree;
+    renderer.timesheetDao = timesheetDao;
     renderer.userGroupCache = userGroupCache;
     renderer.userPrefDao = userPrefDao;
     renderer.userFormatter = userFormatter;
