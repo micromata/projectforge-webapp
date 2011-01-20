@@ -24,6 +24,7 @@
 package org.projectforge.web.wicket.components;
 
 import org.apache.wicket.Response;
+import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
@@ -38,13 +39,15 @@ public abstract class ImageLinkPanel extends Panel
 {
   private static final long serialVersionUID = 1333929048394636569L;
 
-  private Link<String> link;
+  public static final String LINK_WICKET_ID = "link";
+
+  private AbstractLink link;
 
   @SuppressWarnings("serial")
   private ImageLinkPanel(final String id)
   {
     super(id);
-    link = new Link<String>("link") {
+    link = new Link<Void>("link") {
       public void onClick()
       {
         ImageLinkPanel.this.onClick();
@@ -71,6 +74,15 @@ public abstract class ImageLinkPanel extends Panel
     link.add(new TooltipImage("image", getResponse(), relativeImagePath, tooltip));
   }
 
-  public abstract void onClick();
+  public ImageLinkPanel(final String id, final AbstractLink link, final Response response, final String relativeImagePath,
+      final String tooltip)
+  {
+    super(id);
+    add(link);
+    link.add(new TooltipImage("image", getResponse(), relativeImagePath, tooltip));
+  }
 
+  public void onClick()
+  {
+  };
 }
