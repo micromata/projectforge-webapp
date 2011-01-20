@@ -398,13 +398,15 @@ public class DataObjectLPanel extends Panel
       field = labelValueTablePanel.add("", displayValue);
     } else {
       field = new DropDownChoiceLPanel(groupPanel.newChildId(), valueLength, dropDownChoice);
-      ((DropDownChoiceLPanel) field).getDropDownChoice().setLabel(new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          return label;
-        }
-      });
+      if (dropDownChoice != null) {
+        dropDownChoice.setLabel(new Model<String>() {
+          @Override
+          public String getObject()
+          {
+            return label;
+          }
+        });
+      }
       groupPanel.add(field);
     }
     return field;
@@ -488,13 +490,20 @@ public class DataObjectLPanel extends Panel
     return field;
   }
 
+  public ContainerLPanel addContainer(final WebMarkupContainer container, final LayoutLength valueLength)
+  {
+    return addContainer(null, null, container, valueLength);
+  }
+
   public ContainerLPanel addContainer(final String label, final LayoutLength labelLength, final WebMarkupContainer container,
       final LayoutLength valueLength)
   {
     ensureGroupPanel();
     final ContainerLPanel containerPanel = new ContainerLPanel(groupPanel.newChildId(), valueLength, container);
-    final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), labelLength, label, container, true);
-    groupPanel.add(labelPanel);
+    if (label != null) {
+      final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), labelLength, label, container, true);
+      groupPanel.add(labelPanel);
+    }
     groupPanel.add(containerPanel);
     return containerPanel;
   }

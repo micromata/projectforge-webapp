@@ -39,21 +39,29 @@ import org.apache.wicket.model.IModel;
 @SuppressWarnings("serial")
 public class DropDownChoicePanel<T> extends Panel
 {
+  public static final String WICKET_ID = "dropDownChoice";
+
   private DropDownChoice<T> dropDownChoice;
 
-  public DropDownChoicePanel(final String id, final IModel<T> model, List<? extends T> values, IChoiceRenderer<T> renderer)
+  public DropDownChoicePanel(final String id, final IModel<T> model, List< ? extends T> values, final IChoiceRenderer<T> renderer)
+  {
+    this(id, new DropDownChoice<T>(WICKET_ID, model, values, renderer));
+  }
+
+  public DropDownChoicePanel(final String id, final DropDownChoice<T> dropDownChoice)
   {
     super(id);
-    dropDownChoice = new DropDownChoice<T>("dropDownChoice", model, values, renderer);
+    this.dropDownChoice = dropDownChoice;
     add(dropDownChoice);
     setRenderBodyOnly(true);
   }
-  
-  public DropDownChoicePanel<T> setNullValid(final boolean nullValid) {
+
+  public DropDownChoicePanel<T> setNullValid(final boolean nullValid)
+  {
     dropDownChoice.setNullValid(nullValid);
     return this;
   }
-  
+
   public DropDownChoice<T> getDropDownChoice()
   {
     return dropDownChoice;

@@ -24,6 +24,7 @@
 package org.projectforge.web.wicket.layout;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 
 /**
@@ -40,7 +41,7 @@ public class DropDownChoiceLPanel extends AbstractLPanel
    */
   public static final String SELECT_ID = "select";
 
-  protected DropDownChoice< ? > dropDownChoice;
+  protected Component dropDownChoice;
 
   /**
    * @see AbstractDOFormRenderer#createDropDownChoicePanel(String, LayoutLength, DropDownChoice)
@@ -50,7 +51,7 @@ public class DropDownChoiceLPanel extends AbstractLPanel
     super(id, length);
     this.dropDownChoice = dropDownChoice;
     this.classAttributeAppender = "select";
-    add(dropDownChoice);
+    replaceWithDropDownChoice(dropDownChoice);
   }
 
   /**
@@ -63,6 +64,19 @@ public class DropDownChoiceLPanel extends AbstractLPanel
     super(id, length);
   }
 
+  public DropDownChoiceLPanel replaceWithDropDownChoice(final DropDownChoice< ? > newDropDownChoice)
+  {
+    if (dropDownChoice != null) {
+      remove(dropDownChoice);
+    }
+    if (newDropDownChoice != null) {
+      add(this.dropDownChoice = newDropDownChoice);
+    } else {
+      add(this.dropDownChoice = new Label(SELECT_ID, "[invisible]").setRenderBodyOnly(true));
+    }
+    return this;
+  }
+
   /**
    * Does nothing.
    * @param label
@@ -72,16 +86,20 @@ public class DropDownChoiceLPanel extends AbstractLPanel
   {
     return this;
   }
-  
+
   @Override
   public Component getWrappedComponent()
   {
     return dropDownChoice;
   }
-  
+
   public DropDownChoice< ? > getDropDownChoice()
   {
-    return dropDownChoice;
+    if (dropDownChoice instanceof DropDownChoice< ? >) {
+      return (DropDownChoice< ? >) dropDownChoice;
+    } else {
+      return null;
+    }
   }
 
   @Override
