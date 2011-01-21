@@ -150,7 +150,7 @@ public class MenuEntry implements Serializable
     if (menuItem.isWicketPage() == true) {
       this.url = WicketUtils.getBookmarkablePageUrl(menuItem.getPageClass(), menuItem.getParams());
     } else if (menuItem.getUrl() != null) {
-      this.url = "secure/" + menuItem.getUrl();
+      this.url = "../secure/" + menuItem.getUrl();
     }
   }
 
