@@ -28,6 +28,9 @@
   <bean id="userGroupCache" class="org.projectforge.user.UserGroupCache" singleton="true">
     <property name="expireTimeInHours" value="1" />
   </bean>
+  <bean id="systemInfoCache" class="org.projectforge.core.SystemInfoCache" singleton="true">
+    <property name="expireTimeInHours" value="1" />
+  </bean>
   <bean id="xmlDump" class="org.projectforge.database.XmlDump" />
 
   <!-- Daos (automatically initialized as singletons.) -->

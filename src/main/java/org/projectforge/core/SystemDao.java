@@ -41,7 +41,6 @@ import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-
 /**
  * Provides some system routines.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -57,8 +56,10 @@ public class SystemDao extends HibernateDaoSupport
   private UserGroupCache userGroupCache;
 
   private KostCache kostCache;
-  
+
   private RechnungCache rechnungCache;
+
+  private SystemInfoCache systemInfoCache;
 
   public String exportSchema()
   {
@@ -152,7 +153,8 @@ public class SystemDao extends HibernateDaoSupport
     taskDao.getTaskTree().forceReload();
     kostCache.forceReload();
     rechnungCache.forceReload();
-    return "UserGroupCache, TaskTree, KostCache, RechnungCache";
+    systemInfoCache.forceReload();
+    return "UserGroupCache, TaskTree, KostCache, RechnungCache, SystemInfoCache";
   }
 
   public void setTaskDao(TaskDao taskDao)
@@ -169,9 +171,14 @@ public class SystemDao extends HibernateDaoSupport
   {
     this.kostCache = kostCache;
   }
-  
+
   public void setRechnungCache(RechnungCache rechnungCache)
   {
     this.rechnungCache = rechnungCache;
+  }
+
+  public void setSystemInfoCache(SystemInfoCache systemInfoCache)
+  {
+    this.systemInfoCache = systemInfoCache;
   }
 }
