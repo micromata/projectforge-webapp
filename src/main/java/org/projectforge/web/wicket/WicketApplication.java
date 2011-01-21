@@ -54,6 +54,7 @@ import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.CronSetup;
 import org.projectforge.core.ProjectForgeException;
+import org.projectforge.core.SystemInfoCache;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.user.UserDao;
@@ -106,6 +107,9 @@ public class WicketApplication extends WebApplication
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
+  @SpringBean(name = "systemInfoCache")
+  private SystemInfoCache systemInfoCache;
+
   /**
    * At application start the flag developmentModus is perhaps not already set. If possible please use isDevelopmentSystem() instead.
    * @return
@@ -153,6 +157,11 @@ public class WicketApplication extends WebApplication
   public void setUserDao(UserDao userDao)
   {
     this.userDao = userDao;
+  }
+  
+  public void setSystemInfoCache(SystemInfoCache systemInfoCache)
+  {
+    this.systemInfoCache = systemInfoCache;
   }
 
   /**
@@ -241,6 +250,7 @@ public class WicketApplication extends WebApplication
       configuration.setApplicationContext(ctx);
     }
     configuration.setConfigurationDao(configurationDao);
+    SystemInfoCache.internalInitialize(systemInfoCache);
     WicketUtils.setContextPath(contextPath);
     UserFilter.initialize(userDao, contextPath);
     if (this.wicketApplicationFilter != null) {
