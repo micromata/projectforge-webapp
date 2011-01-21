@@ -49,6 +49,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.convert.ConverterLocator;
 import org.apache.wicket.util.lang.Bytes;
+import org.projectforge.Version;
 import org.projectforge.common.ExceptionHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDao;
@@ -270,7 +271,7 @@ public class WicketApplication extends WebApplication
     log.info("Default TimeZone is: " + TimeZone.getDefault());
     log.info("user.timezone is: " + System.getProperty("user.timezone"));
     cronSetup.initialize();
-    log.fatal("Initialized.");
+    log.fatal(Version.APP_ID + " " + Version.NUMBER + " (" + Version.RELEASE_TIMESTAMP +  ") initialized.");
   }
 
   @Override
