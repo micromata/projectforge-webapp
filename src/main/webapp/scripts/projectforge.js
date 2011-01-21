@@ -8,7 +8,13 @@ function toggle(component) {
 
 function rowClick(row) {
 	if (suppressRowClick != 'true') {
-		window.location.href = $(row).find("a:first").attr("href");
+		link = $(row).find("a:first");
+		if ($(link).attr('onclick')) {
+			suppressNextRowClick();
+			$(link).click();
+		} else {
+			window.location.href = $(link).attr("href");
+		}
 	}
 	suppressRowClick = 'false';
 }
