@@ -161,8 +161,6 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
 
   protected ContainerLPanel consumptionBarPanel;
 
-  private String templatesSearchString;
-
   protected Boolean saveAsTemplate;
 
   protected ModalWindow recentTimesheetsModalWindow;
@@ -430,18 +428,18 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       };
       templateNamesChoice.setNullValid(true);
       repeatingView.add(new DropDownChoicePanel<String>(repeatingView.newChildId(), templateNamesChoice));
-      final AjaxLink< ? > link = new AjaxLink<Void>(ImageLinkPanel.LINK_WICKET_ID) {
-        @Override
-        public void onClick(AjaxRequestTarget target)
-        {
-          showRecentTimesheetsDialog(target);
-        }
-      };
-      final ImageLinkPanel imageLinkPanel = new ImageLinkPanel(repeatingView.newChildId(), link, parentPage.getResponse(), ImageDef.ZOOM
-          .getPath(), getString("timesheet.recent.select")) {
-      };
-      repeatingView.add(imageLinkPanel);
     }
+    final AjaxLink< ? > link = new AjaxLink<Void>(ImageLinkPanel.LINK_WICKET_ID) {
+      @Override
+      public void onClick(AjaxRequestTarget target)
+      {
+        showRecentTimesheetsDialog(target);
+      }
+    };
+    final ImageLinkPanel imageLinkPanel = new ImageLinkPanel(repeatingView.newChildId(), link, parentPage.getResponse(), ImageDef.ZOOM
+        .getPath(), getString("timesheet.recent.select")) {
+    };
+    repeatingView.add(imageLinkPanel);
   }
 
   protected void refresh()
