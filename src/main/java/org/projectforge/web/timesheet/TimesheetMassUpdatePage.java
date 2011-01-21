@@ -38,7 +38,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.MyBeanComparator;
-import org.projectforge.fibu.kost.KostCache;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
@@ -55,9 +54,6 @@ public class TimesheetMassUpdatePage extends AbstractSecuredPage implements ISel
 
   @SpringBean(name = "dateTimeFormatter")
   private DateTimeFormatter dateTimeFormatter;
-
-  @SpringBean(name = "kostCache")
-  private KostCache kostCache;
 
   @SpringBean(name = "taskFormatter")
   private TaskFormatter taskFormatter;
@@ -98,7 +94,7 @@ public class TimesheetMassUpdatePage extends AbstractSecuredPage implements ISel
     }
     body.add(form);
     form.init();
-    final List<IColumn<TimesheetDO>> columns = TimesheetListPage.createColumns(this, false, true, false, taskFormatter, taskTree, kostCache,
+    final List<IColumn<TimesheetDO>> columns = TimesheetListPage.createColumns(this, false, true, false, taskFormatter, taskTree,
         userFormatter, dateTimeFormatter);
     @SuppressWarnings("serial")
     final SortableDataProvider<TimesheetDO> sortableDataProvider = new SortableDataProvider<TimesheetDO>() {

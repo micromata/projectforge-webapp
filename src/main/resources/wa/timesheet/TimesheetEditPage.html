@@ -1,15 +1,6 @@
 <html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<wicket:head>
-  <script type="text/javascript">
-   <!--
-    function toggleRecentSheets() {
-      $("#recentSheets").toggle("normal");
-    }
-    // -->
-  </script>
-</wicket:head>
 </head>
 
 <body>
@@ -22,6 +13,7 @@
     <span wicket:id="label">4711</span>
   </wicket:fragment>
   <wicket:fragment wicket:id="recentTimesheetsTable">
+    <h3><wicket:message key="timesheet.recent.select" /></h3>
     <table class="dataview" cellspacing="0" wicket:id="table">
       <tr>
         <th>[Table of recent time sheets.]</th>
@@ -29,6 +21,10 @@
     </table>
   </wicket:fragment>
   <div wicket:id="recentTimesheetsModalWindow">[Table of recent time sheets as modal dialog.]</div>
+  <script type="text/javascript">
+   <!--
+   Wicket.Window.unloadConfirmation = false;    // -->
+  </script>
 </wicket:extend>
 </body>
 </html>

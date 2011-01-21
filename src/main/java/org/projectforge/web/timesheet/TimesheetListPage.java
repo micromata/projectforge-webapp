@@ -49,7 +49,7 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.FileHelper;
 import org.projectforge.common.MyBeanComparator;
-import org.projectforge.fibu.kost.KostCache;
+import org.projectforge.core.SystemInfoCache;
 import org.projectforge.jira.JiraUtils;
 import org.projectforge.renderer.PdfRenderer;
 import org.projectforge.renderer.custom.Formatter;
@@ -107,9 +107,6 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
 
   @SpringBean(name = "formatterFactory")
   private FormatterFactory formatterFactory;
-
-  @SpringBean(name = "kostCache")
-  private KostCache kostCache;
 
   @SpringBean(name = "pdfRenderer")
   private PdfRenderer pdfRenderer;
@@ -192,15 +189,15 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
 
   protected void createDataTable()
   {
-    final List<IColumn<TimesheetDO>> columns = createColumns(this, !isMassUpdateMode(), isMassUpdateMode(), form.getSearchFilter().isLongFormat(),
-        taskFormatter, taskTree, kostCache, userFormatter, dateTimeFormatter);
+    final List<IColumn<TimesheetDO>> columns = createColumns(this, !isMassUpdateMode(), isMassUpdateMode(), form.getSearchFilter()
+        .isLongFormat(), taskFormatter, taskTree, userFormatter, dateTimeFormatter);
     dataTable = createDataTable(columns, "startTime", false);
     form.add(dataTable);
   }
 
   public List<IColumn<TimesheetDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    return createColumns(returnToPage, sortable, false, false, taskFormatter, taskTree, kostCache, userFormatter, dateTimeFormatter);
+    return createColumns(returnToPage, sortable, false, false, taskFormatter, taskTree, userFormatter, dateTimeFormatter);
   }
 
   /**
@@ -211,7 +208,7 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
   @SuppressWarnings("serial")
   protected static final List<IColumn<TimesheetDO>> createColumns(final WebPage page, final boolean sortable,
       final boolean isMassUpdateMode, final boolean longFormat, final TaskFormatter taskFormatter, final TaskTree taskTree,
-      final KostCache kostCache, final UserFormatter userFormatter, final DateTimeFormatter dateTimeFormatter)
+      final UserFormatter userFormatter, final DateTimeFormatter dateTimeFormatter)
   {
     final List<IColumn<TimesheetDO>> columns = new ArrayList<IColumn<TimesheetDO>>();
     final CellItemListener<TimesheetDO> cellItemListener = new CellItemListener<TimesheetDO>() {
@@ -265,7 +262,8 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
         }.withUserFormatter(userFormatter));
       }
     }
-    if (kostCache.isKost2EntriesExists() == true) {
+    final SystemInfoCache systemInfoCache = SystemInfoCache.instance();
+    if (systemInfoCache.isCost2EntriesExists() == true) {
       columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(page.getString("fibu.kunde")), getSortable(
           "kost2.projekt.kunde.name", sortable), "kost2.projekt.kunde.name", cellItemListener));
       columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(page.getString("fibu.projekt")), getSortable(
@@ -273,7 +271,7 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
     }
     columns.add(new TaskPropertyColumn<TimesheetDO>(page, page.getString("task"), getSortable("task.title", sortable), "task",
         cellItemListener).withTaskFormatter(taskFormatter).withTaskTree(taskTree));
-    if (kostCache.isKost2EntriesExists() == true) {
+    if (systemInfoCache.isCost2EntriesExists() == true) {
       columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("fibu.kost2"), getSortable("kost2.shortDisplayName",
           sortable), "kost2.shortDisplayName", cellItemListener));
     }

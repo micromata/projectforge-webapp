@@ -49,7 +49,6 @@ import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.repeater.Item;
@@ -67,6 +66,7 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.core.Configuration;
+import org.projectforge.core.SystemInfoCache;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.jira.JiraUtils;
@@ -584,70 +584,85 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(getString("fibu.kost2"), null, "kost2.shortDisplayName", cellItemListener) {
-      @Override
-      public void populateItem(Item<ICellPopulator<TimesheetDO>> item, String componentId, IModel<TimesheetDO> rowModel)
-      {
-        final TimesheetDO timesheet = rowModel.getObject();
-        final Fragment fragment = new Fragment(componentId, "selectRecentSheet", parentPage);
-        item.add(fragment);
-        final SubmitLink link = new SubmitLink("selectRecent") {
-          public void onSubmit()
-          {
-            data.setLocation(timesheet.getLocation());
-            data.setDescription(timesheet.getDescription());
-            parentPage.getBaseDao().setTask(data, timesheet.getTaskId());
-            parentPage.getBaseDao().setUser(data, timesheet.getUserId());
-            parentPage.getBaseDao().setKost2(data, timesheet.getKost2Id());
-            cost2Choice.modelChanged();
-            locationTextField.modelChanged();
-            descriptionArea.modelChanged();
-            updateStopDate();
-            refresh();
-          };
-        };
-        fragment.add(link);
-        link.setDefaultFormProcessing(false);
-        fragment.add(new Label("label", new Model<String>() {
-          @Override
-          public String getObject()
-          {
-            final StringBuffer buf = new StringBuffer();
-            if (timesheet.getKost2() != null) {
-              buf.append(timesheet.getKost2().getShortDisplayName());
+    if (SystemInfoCache.instance().isCost2EntriesExists() == true) {
+      columns
+          .add(new CellItemListenerPropertyColumn<TimesheetDO>(getString("fibu.kost2"), null, "kost2.shortDisplayName", cellItemListener) {
+            @Override
+            public void populateItem(Item<ICellPopulator<TimesheetDO>> item, String componentId, IModel<TimesheetDO> rowModel)
+            {
+              final TimesheetDO timesheet = rowModel.getObject();
+              final Fragment fragment = new Fragment(componentId, "selectRecentSheet", parentPage);
+              item.add(fragment);
+              fragment.add(createRecentTimeSheetSelectionLink(timesheet));
+              fragment.add(new Label("label", new Model<String>() {
+                @Override
+                public String getObject()
+                {
+                  final StringBuffer buf = new StringBuffer();
+                  if (timesheet.getKost2() != null) {
+                    buf.append(timesheet.getKost2().getShortDisplayName());
+                  }
+                  if (timesheet.getUserId() != null && timesheet.getUserId().equals(PFUserContext.getUserId()) == false) {
+                    if (timesheet.getKost2() != null) {
+                      buf.append(", ");
+                    }
+                    buf.append(userFormatter.getFormattedUser(timesheet.getUserId()));
+                  }
+                  return buf.toString();
+                }
+              }));
+              item.add(new AttributeAppendModifier("style", new Model<String>("white-space: nowrap;")));
+              final Item< ? > row = ((Item< ? >) item.findParent(Item.class));
+              WicketUtils.addRowClick(row);
+              cellItemListener.populateItem(item, componentId, rowModel);
             }
-            if (timesheet.getUserId() != null && timesheet.getUserId().equals(PFUserContext.getUserId()) == false) {
-              if (timesheet.getKost2() != null) {
-                buf.append(", ");
-              }
-              buf.append(userFormatter.getFormattedUser(timesheet.getUserId()));
+          });
+      columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(getString("fibu.kunde")), null,
+          "kost2.projekt.kunde.name", cellItemListener));
+      columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(getString("fibu.projekt")), null, "kost2.projekt.name",
+          cellItemListener));
+      columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(getString("task")), null, "task.title",
+          cellItemListener) {
+        @Override
+        public void populateItem(final Item<ICellPopulator<TimesheetDO>> item, final String componentId, final IModel<TimesheetDO> rowModel)
+        {
+          final TaskDO task = rowModel.getObject().getTask();
+          StringBuffer buf = new StringBuffer();
+          TaskFormatter.instance().appendFormattedTask(buf, new WicketLocalizerAndUrlBuilder(parentPage.getResponse()), task, false, true,
+              false);
+          final Label formattedTaskLabel = new Label(componentId, buf.toString());
+          formattedTaskLabel.setEscapeModelStrings(false);
+          item.add(formattedTaskLabel);
+          final Item< ? > row = ((Item< ? >) item.findParent(Item.class));
+          WicketUtils.addRowClick(row);
+          cellItemListener.populateItem(item, componentId, rowModel);
+        }
+      });
+    } else {
+      columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(getString("task")), null, "task.title",
+          cellItemListener) {
+        @Override
+        public void populateItem(final Item<ICellPopulator<TimesheetDO>> item, final String componentId, final IModel<TimesheetDO> rowModel)
+        {
+          final TimesheetDO timesheet = rowModel.getObject();
+          final TaskDO task = rowModel.getObject().getTask();
+          final Fragment fragment = new Fragment(componentId, "selectRecentSheet", parentPage);
+          item.add(fragment);
+          fragment.add(createRecentTimeSheetSelectionLink(timesheet));
+          fragment.add(new Label("label", new Model<String>() {
+            @Override
+            public String getObject()
+            {
+              final StringBuffer buf = new StringBuffer();
+              TaskFormatter.instance().appendFormattedTask(buf, new WicketLocalizerAndUrlBuilder(parentPage.getResponse()), task, false,
+                  true, false);
+              return buf.toString();
             }
-            return buf.toString();
-          }
-        }));
-        cellItemListener.populateItem(item, componentId, rowModel);
-      }
-    });
-    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(getString("fibu.kunde")), null,
-        "kost2.projekt.kunde.name", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(getString("fibu.projekt")), null, "kost2.projekt.name",
-        cellItemListener));
-    columns
-        .add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(getString("task")), null, "task.title", cellItemListener) {
-          @Override
-          public void populateItem(final Item<ICellPopulator<TimesheetDO>> item, final String componentId,
-              final IModel<TimesheetDO> rowModel)
-          {
-            final TaskDO task = rowModel.getObject().getTask();
-            StringBuffer buf = new StringBuffer();
-            TaskFormatter.instance().appendFormattedTask(buf, new WicketLocalizerAndUrlBuilder(parentPage.getResponse()), task, false,
-                true, false);
-            final Label formattedTaskLabel = new Label(componentId, buf.toString());
-            formattedTaskLabel.setEscapeModelStrings(false);
-            item.add(formattedTaskLabel);
-            cellItemListener.populateItem(item, componentId, rowModel);
-          }
-        });
+          }).setEscapeModelStrings(false));
+          cellItemListener.populateItem(item, componentId, rowModel);
+        }
+      });
+    }
     columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(getString("timesheet.location"), null, "location", cellItemListener) {
 
     });
@@ -670,6 +685,31 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       dataTable.setVisible(false);
     }
     dataTable.add(new DataTableBehavior());
+  }
+
+  @SuppressWarnings("serial")
+  private AjaxLink<Void> createRecentTimeSheetSelectionLink(final TimesheetDO timesheet)
+  {
+    return new AjaxLink<Void>("selectRecent") {
+      @Override
+      public void onClick(final AjaxRequestTarget target)
+      {
+        if (target != null) {
+          data.setLocation(timesheet.getLocation());
+          data.setDescription(timesheet.getDescription());
+          parentPage.getBaseDao().setTask(data, timesheet.getTaskId());
+          parentPage.getBaseDao().setUser(data, timesheet.getUserId());
+          parentPage.getBaseDao().setKost2(data, timesheet.getKost2Id());
+          cost2Choice.modelChanged();
+          locationTextField.modelChanged();
+          descriptionArea.modelChanged();
+          // updateStopDate();
+          refresh();
+          recentTimesheetsModalWindow.close(target);
+          parentPage.setResponsePage(parentPage);
+        }
+      }
+    };
   }
 
   class DataTableBehavior extends AbstractBehavior implements IHeaderContributor
