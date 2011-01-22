@@ -99,9 +99,9 @@ import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.DateTimePanelSettings;
 import org.projectforge.web.wicket.components.DropDownChoicePanel;
 import org.projectforge.web.wicket.components.ImageLinkPanel;
+import org.projectforge.web.wicket.components.LabelForPanel;
 import org.projectforge.web.wicket.components.LabelPanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.components.PlainLabel;
 import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
 import org.projectforge.web.wicket.layout.ContainerLPanel;
 import org.projectforge.web.wicket.layout.DropDownChoiceLPanel;
@@ -358,10 +358,9 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       doPanel.addLabel("", HALF).setBreakBefore();
       final RepeatingView repeatingView = doPanel.addRepeater(LayoutLength.DOUBLE).getRepeatingView();
       final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(repeatingView.newChildId(), new PropertyModel<Boolean>(this, "saveAsTemplate"));
-      final PlainLabel label = new PlainLabel(repeatingView.newChildId(), getString("user.pref.saveAsTemplate"));
-      WicketUtils.setLabel(checkBoxPanel.getCheckBox(), label);
-      repeatingView.add(label);
       repeatingView.add(checkBoxPanel);
+      final LabelForPanel label = new LabelForPanel(repeatingView.newChildId(),checkBoxPanel.getCheckBox(), getString("user.pref.saveAsTemplate"));
+      repeatingView.add(label);
     }
 
     if (jiraSupport == true) {
