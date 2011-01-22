@@ -250,3 +250,12 @@ div.message {
 	color: #000000;
 	padding: 1em 1em 1em 1em;
 }
+
+div.alert {
+	background: none repeat scroll 0 0 #FFDDDD;
+	border: 1px solid #FF0000;
+	font-size: 1.5em;
+	font-weight: bold;
+	color: #FF0000;
+	padding: 1em 1em 1em 1em;
+}
