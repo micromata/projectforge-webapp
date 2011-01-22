@@ -37,6 +37,7 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.MonthlyEmployeeReport;
@@ -53,13 +54,13 @@ import org.projectforge.renderer.PdfRenderer;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.common.OutputType;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.timesheet.TimesheetListPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.DownloadUtils;
-import org.projectforge.web.wicket.EditPage;
 import org.projectforge.web.wicket.WicketUtils;
 
 public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements ISelectCallerPage
@@ -92,6 +93,9 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
   @SpringBean(name = "taskFormatter")
   private TaskFormatter taskFormatter;
 
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
+
   public MonthlyEmployeeReportPage(final PageParameters parameters)
   {
     super(parameters);
@@ -103,6 +107,9 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
     if (form.filter == null) {
       form.filter = new MonthlyEmployeeReportFilter();
       putUserPrefEntry(USER_PREF_KEY_FILTER, form.filter, true);
+    }
+    if (form.filter.getUser() == null) {
+      form.filter.setUser(getUser());
     }
     body.add(form);
     form.init();
@@ -221,7 +228,8 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
       for (final MonthlyEmployeeReportWeek week : report.getWeeks()) {
         colWeekRepeater.add(new Label(colWeekRepeater.newChildId(), week.getFormattedTotalDuration()));
       }
-      row.add(new Label("sum", report.getFormattedTotalDuration()).add(new SimpleAttributeModifier("style", "font-weight: bold; color:red; text-align: right;")));
+      row.add(new Label("sum", report.getFormattedTotalDuration()).add(new SimpleAttributeModifier("style",
+          "font-weight: bold; color:red; text-align: right;")));
     }
   }
 
@@ -331,22 +339,28 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
   @Override
   public void cancelSelection(String property)
   {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    log.error("cancelSelection not supported. Property was '" + property + "'.");
   }
 
   @Override
   public void select(String property, Object selectedValue)
   {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    if ("user".equals(property) == true) {
+      final Integer id;
+      if (selectedValue instanceof String) {
+        id = NumberHelper.parseInteger((String) selectedValue);
+      } else {
+        id = (Integer) selectedValue;
+      }
+      form.filter.setUser(userGroupCache.getUser(id));
+    } else {
+      log.error("Property '" + property + "' not supported for selection.");
+    }
   }
 
   @Override
   public void unselect(String property)
   {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException();
+    log.error("unselect not supported. Property was '" + property + "'.");
   }
-
 }
