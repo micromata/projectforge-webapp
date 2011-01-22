@@ -23,7 +23,6 @@
 
 package org.projectforge.book;
 
-import org.apache.commons.lang.StringUtils;
 import org.projectforge.core.I18nEnum;
 
 /**
@@ -41,23 +40,6 @@ public enum BookStatus implements I18nEnum
   PRESENT("present"), MISSED("missed"), DISPOSED("disposed"), UNKNOWN("unknown");
 
   private String key;
-
-  public static BookStatus get(String s)
-  {
-    if (StringUtils.isEmpty(s) == true) {
-      return null;
-    }
-    if ("MISSED".equals(s) == true) {
-      return MISSED;
-    } else if ("PRESENT".equals(s) == true) {
-      return PRESENT;
-    } else if ("DISPOSED".equals(s) == true) {
-      return DISPOSED;
-    } else if ("UNKNOWN".equals(s) == true) {
-      return UNKNOWN;
-    }
-    throw new UnsupportedOperationException("Unknown BookStatus: '" + s + "'");
-  }
 
   /**
    * @return The full i18n key including the i18n prefix "book.status.".
