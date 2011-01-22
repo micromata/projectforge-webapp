@@ -27,6 +27,7 @@ import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebResponse;
@@ -37,6 +38,7 @@ import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.UserFilter;
 import org.projectforge.web.address.AddressMobileListPage;
+import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.components.LabelBookmarkablePageLinkPanel;
 
@@ -88,6 +90,9 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
     if (configuration.isAddressManagementConfigured() == true) {
       listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), AddressMobileListPage.class, getString("address.title.heading")));
     }
+    listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), new BookmarkablePageLink<String>(ListViewItemPanel.LINK_ID,
+        CalendarPage.class), getString("menu.mobile.fullWebVersion")).setAsExternalLink());
+
     listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), new Link<String>(ListViewItemPanel.LINK_ID) {
       @Override
       public void onClick()

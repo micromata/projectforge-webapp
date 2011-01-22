@@ -47,7 +47,7 @@ public class ListViewItemPanel extends Panel
   private Link< ? > link;
 
   private String label, comment, counter;
-  
+
   public ListViewItemPanel(final String id, final Class< ? extends WebPage> linkClass, final String label)
   {
     this(id, new BookmarkablePageLink<String>(LINK_ID, linkClass), label);
@@ -95,6 +95,23 @@ public class ListViewItemPanel extends Panel
     return this;
   }
 
+  /**
+   * Sets a html attribute to the enclosed link.
+   * @param attribute
+   * @param label
+   * @return this for chaining.
+   */
+  public ListViewItemPanel addLinkAttribute(final String attribute, final String label)
+  {
+    link.add(new SimpleAttributeModifier(attribute, label));
+    return this;
+  }
+
+  public ListViewItemPanel setAsExternalLink()
+  {
+    return addLinkAttribute("rel", "external");
+  }
+
   public ListViewItemPanel init()
   {
     if (listDivider == true) {
@@ -120,7 +137,7 @@ public class ListViewItemPanel extends Panel
       add(new Label(LINK_ID, "[invisible]").setVisible(false));
     }
     if (counter != null) {
-      
+
     } else {
       add(new Label("counter", "[invisible]").setVisible(false));
     }
