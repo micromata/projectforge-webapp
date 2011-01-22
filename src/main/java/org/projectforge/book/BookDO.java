@@ -103,6 +103,7 @@ public class BookDO extends DefaultBaseDO
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String comment; // 4000;
 
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private BookStatus status;
 
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
