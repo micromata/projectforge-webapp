@@ -919,7 +919,7 @@ form.newform p,
 .newform textarea,
 .newform select,
 .newform label, 
-.newform div.repeater, 
+.newform div.group, 
 .newform div.tasktree, 
 .newform div.file {
 	padding: 0;
