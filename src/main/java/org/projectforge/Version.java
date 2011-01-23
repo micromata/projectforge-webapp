@@ -19,9 +19,9 @@ public class Version
 
   public static final String NUMBER = "3.5.0";
 
-  public static final String RELEASE_DATE = "2011-01-22";
+  public static final String RELEASE_DATE = "2011-01-23";
 
-  public static final String RELEASE_TIMESTAMP = "2011-01-22 02:30";
+  public static final String RELEASE_TIMESTAMP = "2011-01-23 08:32";
 }
 
 		
