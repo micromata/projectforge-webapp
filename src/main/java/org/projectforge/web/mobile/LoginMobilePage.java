@@ -89,7 +89,7 @@ public class LoginMobilePage extends AbstractMobilePage
     if (StringUtils.isBlank(messageOfTheDay) == true) {
       add(new Label("messageOfTheDay", "[invisible]").setVisible(false));
     } else {
-      add(new Label("messageOfTheDay", messageOfTheDay));
+      add(new Label("messageOfTheDay", messageOfTheDay).setEscapeModelStrings(false));
     }
   }
 

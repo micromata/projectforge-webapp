@@ -115,7 +115,7 @@ public class LoginPage extends AbstractBasePage
 
   public static void internalLogin(final WebPage page, final PFUserDO user)
   {
-    ((MySession) page.getSession()).login(user);
+    ((MySession) page.getSession()).login(user, page.getRequest());
     UserFilter.login(((WebRequest) page.getRequest()).getHttpServletRequest(), user);
   }
 
