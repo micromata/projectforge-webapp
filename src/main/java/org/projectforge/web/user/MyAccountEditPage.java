@@ -31,6 +31,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.MessagePage;
+import org.projectforge.web.wicket.MySession;
 
 public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditForm, UserDao>
 {
@@ -60,6 +61,7 @@ public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditF
     }
     getData().setPersonalPhoneIdentifiers(userDao.getNormalizedPersonalPhoneIdentifiers(getData()));
     userDao.updateMyAccount(getData());
+    ((MySession)getSession()).setLocale(getRequest());
     if (form.isInvalidateAllStayLoggedInSessions() == true) {
       userDao.renewStayLoggedInKey(getData().getId());
     }

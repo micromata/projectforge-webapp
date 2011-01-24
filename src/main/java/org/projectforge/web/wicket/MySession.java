@@ -54,7 +54,7 @@ public class MySession extends WebSession
   public MySession(final Request request)
   {
     super(request);
-    setLocale(PFUserContext.getLocale(request.getLocale()));
+    setLocale(request);
     final ClientInfo info = getClientInfo();
     if (info instanceof WebClientInfo) {
       ((WebClientInfo) info).getProperties().setTimeZone(PFUserContext.getTimeZone());
@@ -142,7 +142,7 @@ public class MySession extends WebSession
     this.ignoreMobileUserAgent = ignoreMobileUserAgent;
   }
 
-  public void login(final PFUserDO user)
+  public void login(final PFUserDO user, final Request request)
   {
     if (user == null) {
       log.warn("Oups, no user given to log in.");
@@ -151,6 +151,16 @@ public class MySession extends WebSession
     this.user = user;
     log.debug("User logged in: " + user.getShortDisplayName());
     PFUserContext.setUser(user);
+    setLocale(request);
+  }
+
+  /**
+   * Sets or updates the locale of the user's session. Takes the locale of the user account or if not given the locale of the given request.
+   * @param request
+   */
+  public void setLocale(final Request request)
+  {
+    setLocale(PFUserContext.getLocale(request.getLocale()));
   }
 
   public void logout()
