@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.projectforge.access.AccessChecker;
 import org.projectforge.common.AbstractCache;
 
 /**
@@ -41,18 +42,25 @@ public class UserXmlPreferencesCache extends AbstractCache
 
   private Map<Integer, UserXmlPreferencesMap> allPreferences = new HashMap<Integer, UserXmlPreferencesMap>();
 
-  UserXmlPreferencesDao userXmlPreferencesDao;
+  private UserXmlPreferencesDao userXmlPreferencesDao;
 
-  public void setUserXmlPreferencesDao(UserXmlPreferencesDao userXmlPreferencesDao)
+  private AccessChecker accessChecker;
+
+  public void setUserXmlPreferencesDao(final UserXmlPreferencesDao userXmlPreferencesDao)
   {
     this.userXmlPreferencesDao = userXmlPreferencesDao;
+  }
+
+  public void setAccessChecker(final AccessChecker accessChecker)
+  {
+    this.accessChecker = accessChecker;
   }
 
   /**
    * Put the entry for the current logged in user.
    * @see org.projectforge.user.UserXmlPreferencesMap#putEntry(String, Object, boolean)
    */
-  public void putEntry(String key, Object value, boolean persistent)
+  public void putEntry(final String key, final Object value, final boolean persistent)
   {
     putEntry(PFUserContext.getUserId(), key, value, persistent);
   }
@@ -60,10 +68,14 @@ public class UserXmlPreferencesCache extends AbstractCache
   /**
    * @see org.projectforge.user.UserXmlPreferencesMap#putEntry(String, Object, boolean)
    */
-  public void putEntry(Integer userId, String key, Object value, boolean persistent)
+  public void putEntry(final Integer userId, final String key, final Object value, final boolean persistent)
   {
-    UserXmlPreferencesMap data = ensureAndGetUserPreferencesData(userId);
-    data.putEntry(key, value, persistent);
+    final UserXmlPreferencesMap data = ensureAndGetUserPreferencesData(userId);
+    if (accessChecker.isDemoUser(userId) == true) {
+      data.putEntry(key, value, false);
+    } else {
+      data.putEntry(key, value, persistent);
+    }
     checkRefresh(); // Should be called at the end of this method for considering changes inside this method.
   }
 
@@ -79,9 +91,9 @@ public class UserXmlPreferencesCache extends AbstractCache
   /**
    * @see #ensureAndGetUserPreferencesData(Integer)
    */
-  public Object getEntry(Integer userId, String key)
+  public Object getEntry(final Integer userId, final String key)
   {
-    UserXmlPreferencesMap data = ensureAndGetUserPreferencesData(userId);
+    final UserXmlPreferencesMap data = ensureAndGetUserPreferencesData(userId);
     checkRefresh();
     return data.getEntry(key);
   }
@@ -89,9 +101,9 @@ public class UserXmlPreferencesCache extends AbstractCache
   /**
    * @see org.projectforge.user.UserXmlPreferencesMap#removeEntry(String)
    */
-  public Object removeEntry(Integer userId, String key)
+  public Object removeEntry(final Integer userId, final String key)
   {
-    UserXmlPreferencesMap data = getUserPreferencesData(userId);
+    final UserXmlPreferencesMap data = getUserPreferencesData(userId);
     if (data == null) {
       // Should only occur for the pseudo-first-login-user setting up the system.
       return null;
@@ -108,15 +120,15 @@ public class UserXmlPreferencesCache extends AbstractCache
     return null;
   }
 
-  public synchronized UserXmlPreferencesMap ensureAndGetUserPreferencesData(Integer userId)
+  public synchronized UserXmlPreferencesMap ensureAndGetUserPreferencesData(final Integer userId)
   {
     UserXmlPreferencesMap data = getUserPreferencesData(userId);
     if (data == null) {
       data = new UserXmlPreferencesMap();
       data.setUserId(userId);
       final List<UserXmlPreferencesDO> userPrefs = userXmlPreferencesDao.getUserPreferencesByUserId(userId);
-      for (UserXmlPreferencesDO userPref : userPrefs) {
-        Object value = userXmlPreferencesDao.deserialize(userPref, true);
+      for (final UserXmlPreferencesDO userPref : userPrefs) {
+        final Object value = userXmlPreferencesDao.deserialize(userPref, true);
         data.putEntry(userPref.getKey(), value, true);
       }
       this.allPreferences.put(userId, data);
@@ -124,12 +136,12 @@ public class UserXmlPreferencesCache extends AbstractCache
     return data;
   }
 
-  UserXmlPreferencesMap getUserPreferencesData(Integer userId)
+  UserXmlPreferencesMap getUserPreferencesData(final Integer userId)
   {
     return this.allPreferences.get(userId);
   }
 
-  void setUserPreferencesData(Integer userId, UserXmlPreferencesMap data)
+  void setUserPreferencesData(final Integer userId, final UserXmlPreferencesMap data)
   {
     this.allPreferences.put(userId, data);
   }
@@ -138,12 +150,12 @@ public class UserXmlPreferencesCache extends AbstractCache
    * Flushes the user settings to the database (independent from the expire mechanism). Should be used after the user's logout. If the user
    * data isn't modified, then nothing will be done.
    */
-  public void flushToDB(Integer userId)
+  public void flushToDB(final Integer userId)
   {
     flushToDB(userId, true);
   }
 
-  private synchronized void flushToDB(Integer userId, boolean checkAccess)
+  private synchronized void flushToDB(final Integer userId, final boolean checkAccess)
   {
     UserXmlPreferencesMap data = allPreferences.get(userId);
     if (data == null || data.isModified() == false) {
@@ -168,9 +180,9 @@ public class UserXmlPreferencesCache extends AbstractCache
    * Clear all volatile data (after logout). Forces refreshing of volatile data after re-login.
    * @param userId
    */
-  public void clear(Integer userId)
+  public void clear(final Integer userId)
   {
-    UserXmlPreferencesMap data = allPreferences.get(userId);
+    final UserXmlPreferencesMap data = allPreferences.get(userId);
     if (data == null) {
       return;
     }
