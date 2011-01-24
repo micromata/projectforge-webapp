@@ -68,7 +68,7 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
     add(new PasswordTextField("password", new PropertyModel<String>(this, "password")).setResetPassword(true).setRequired(true));
     final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
     final Label messageOfTheDayLabel = new Label("messageOfTheDay", messageOfTheDay);
-    add(messageOfTheDayLabel.setVisible(StringUtils.isNotBlank(messageOfTheDay)));
+    add(messageOfTheDayLabel.setEscapeModelStrings(true).setVisible(StringUtils.isNotBlank(messageOfTheDay)));
     final Button loginButton = new Button("button", new Model<String>(getString("login"))) {
       @Override
       public final void onSubmit()
