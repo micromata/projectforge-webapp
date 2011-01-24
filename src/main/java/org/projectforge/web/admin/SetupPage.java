@@ -72,7 +72,7 @@ public class SetupPage extends AbstractSecuredPage
       adminUser = initDatabaseDao.initializeEmptyDatabase(form.getEncryptedPassword(), form.getTimeZone());
       message = "administration.setup.message.emptyDatabase";
     }
-    ((MySession) getSession()).login(adminUser);
+    ((MySession) getSession()).login(adminUser, getRequest());
     UserFilter.login(((WebRequest) getRequest()).getHttpServletRequest(), adminUser);
     configurationDao.checkAndUpdateDatabaseEntries();
     if (form.getTimeZone() != null) {
