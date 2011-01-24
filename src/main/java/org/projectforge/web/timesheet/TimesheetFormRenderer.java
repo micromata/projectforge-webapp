@@ -185,7 +185,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     } else if (data.getDuration() > TimesheetDao.MAXIMUM_DURATION) {
       startDateTimePanel.error(getString("timesheet.error.maximumDurationExceeded"));
     }
-    if (isCost2Visible() == false && data.getKost2Id() == null) {
+    if (isCost2Visible() == true && data.getKost2Id() == null) {
       // Kost2 is not available for current task.
       final TaskNode taskNode = taskTree.getTaskNodeById(data.getTaskId());
       if (taskNode != null) {
@@ -252,7 +252,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       taskSelectPanel.init();
       taskSelectPanel.setRequired(true);
     }
-    {
+    if (isCost2Visible() == true) {
       final String label = getString("fibu.kost2");
       cost2ChoiceLabel = doPanel.addLabel(label, HALF);
       cost2ChoiceLabel.setBreakBefore();
@@ -359,7 +359,8 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       final RepeatingView repeatingView = doPanel.addRepeater(LayoutLength.DOUBLE).getRepeatingView();
       final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(repeatingView.newChildId(), new PropertyModel<Boolean>(this, "saveAsTemplate"));
       repeatingView.add(checkBoxPanel);
-      final LabelForPanel label = new LabelForPanel(repeatingView.newChildId(),checkBoxPanel.getCheckBox(), getString("user.pref.saveAsTemplate"));
+      final LabelForPanel label = new LabelForPanel(repeatingView.newChildId(), checkBoxPanel.getCheckBox(),
+          getString("user.pref.saveAsTemplate"));
       repeatingView.add(label);
     }
 
@@ -444,22 +445,28 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
   protected void refresh()
   {
     addConsumptionBar();
-    cost2List = taskTree.getKost2List(data.getTaskId());
-    final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = getKost2LabelValueChoiceRenderer();
-    cost2Choice.setChoiceRenderer(kost2ChoiceRenderer);
-    cost2Choice.setChoices(kost2ChoiceRenderer.getValues());
-    cost2ChoicePanel.replaceWithDropDownChoice(cost2Choice);
-    final boolean cost2Visible = isCost2Visible();
-    cost2ChoiceLabel.setVisible(cost2Visible);
-    cost2ChoicePanel.setVisible(cost2Visible);
+    if (cost2Choice != null) {
+      cost2List = taskTree.getKost2List(data.getTaskId());
+      final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = getKost2LabelValueChoiceRenderer();
+      cost2Choice.setChoiceRenderer(kost2ChoiceRenderer);
+      cost2Choice.setChoices(kost2ChoiceRenderer.getValues());
+      cost2ChoicePanel.replaceWithDropDownChoice(cost2Choice);
+      final boolean cost2Visible = isCost2Visible();
+      cost2ChoiceLabel.setVisible(cost2Visible);
+      cost2ChoicePanel.setVisible(cost2Visible);
+    }
   }
 
   protected void addKost2Row()
   {
+    if (isCost2Visible() == false) {
+      return;
+    }
     cost2List = taskTree.getKost2List(data.getTaskId());
     final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = getKost2LabelValueChoiceRenderer();
     cost2Choice = createKost2ChoiceRenderer(DropDownChoiceLPanel.SELECT_ID, parentPage.getBaseDao(), taskTree, kost2ChoiceRenderer, data,
         cost2List);
+    cost2Choice.setLabel(new Model<String>(getString("fibu.kost2")));
     cost2Choice.setRequired(true);
     cost2ChoicePanel.replaceWithDropDownChoice(cost2Choice);
   }
@@ -656,6 +663,8 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
               return buf.toString();
             }
           }).setEscapeModelStrings(false));
+          final Item< ? > row = ((Item< ? >) item.findParent(Item.class));
+          WicketUtils.addRowClick(row);
           cellItemListener.populateItem(item, componentId, rowModel);
         }
       });
@@ -697,7 +706,9 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
           parentPage.getBaseDao().setTask(data, timesheet.getTaskId());
           parentPage.getBaseDao().setUser(data, timesheet.getUserId());
           parentPage.getBaseDao().setKost2(data, timesheet.getKost2Id());
-          cost2Choice.modelChanged();
+          if (cost2Choice != null) {
+            cost2Choice.modelChanged();
+          }
           locationTextField.modelChanged();
           descriptionArea.modelChanged();
           // updateStopDate();
