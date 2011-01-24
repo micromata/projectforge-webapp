@@ -29,7 +29,8 @@ $(function() {
 
 	$('#saver').live('click', function() {
 		serialize(getMenuEntries());
-		alert(getSaveMessage());
+		$('#normal .main').removeClass('active');
+		hideMainMenu();
 	});
 
 	$("#normal .main a").click(function() {
@@ -38,24 +39,31 @@ $(function() {
 			$('#normal .main').toggleClass('active');
 			// If the main menu is open after toggling...
 			if ($('.main').hasClass('active')) {
-				// enable sortable...
-				$('#personal, #nav ul').sortable('enable');
-				// and add blue border around the personal menu...
-				$('ul#personal').addClass('dotted');
-				$('#personal').after("<a id='saver'>" + getSaveLabel() + "</a>");
-				// Add the crosses for removing menu entries:
-				$("ul#personal li a").prepend(
-						'<span class="remover"> 2 </span>');
-				$('#remover')
-				// main menu is now closed...
+				showMainMenu();
 			} else {
-				$("#saver").remove();
-				// disable sortable....
-				$('#personal, #nav ul').sortable('disable');
-				// Remove the removers (crosses for removing menu entries):
-				$('.remover').remove();
-				// remove the blue border around the personal menu
-				$('ul#personal').removeClass('dotted');
+				hideMainMenu();
 			}
 		})
+		
+	function showMainMenu() {
+		// enable sortable...
+		$('#personal, #nav ul').sortable('enable');
+		// and add blue border around the personal menu...
+		$('ul#personal').addClass('dotted');
+		$('#personal').after("<a id='saver'>" + getSaveLabel() + "</a>");
+		// Add the crosses for removing menu entries:
+		$("ul#personal li a").prepend('<span class="remover"> 2 </span>');
+		$('#remover')
+		// main menu is now closed...
+	}
+
+	function hideMainMenu() {
+		$("#saver").remove();
+		// disable sortable....
+		$('#personal, #nav ul').sortable('disable');
+		// Remove the removers (crosses for removing menu entries):
+		$('.remover').remove();
+		// remove the blue border around the personal menu
+		$('ul#personal').removeClass('dotted');
+	}
 });
