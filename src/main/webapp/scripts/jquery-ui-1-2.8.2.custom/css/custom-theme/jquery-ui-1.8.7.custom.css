@@ -428,6 +428,7 @@ input.ui-button { padding: .4em 1em; }
 .ui-buttonset { margin-right: 7px; }
 .ui-buttonset .ui-button { margin-left: 0; margin-right: -.3em; }
 .ui-buttonset .ui-state-active {
+    color: #000000;
 	background: url("images/ui-bg_glass_40_d9dfe1_1x400.png") repeat-x scroll 50% 50% #D9DFE1;
 	-webkit-box-shadow:0.1em 0.1em 0.2em #8994A0 inset,-0.1em -0.1em 0.1em #fff inset;
 	-moz-box-shadow:0.1em 0.1em 0.2em #8994A0 inset,-0.1em -0.1em 0.1em #fff inset; 
