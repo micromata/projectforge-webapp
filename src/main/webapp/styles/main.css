@@ -97,7 +97,7 @@ ul#personal li.first{margin-left:1em;}
 a#saver,
 ul#personal li a,
 ul#normal li a.parent,
-ul#personal .ui-state-highlight{white-space:nowrap;font-size:1.3em;color:#5C6970;background:#F0F5F7;padding:0.1em 0.5em 0.3em;margin:0 0 0 0.2em;-moz-border-radius:0.8em;-webkit-border-radius:0.8em;-ms-border-radius:0.8em;border-radius:0.8em;border:1px solid #D9DFE1;text-decoration:none;display:block;position:relative;float:left;}
+ul#personal .ui-state-highlight{white-space:nowrap;font-size:1.3em;color:#5C6970;background:#F0F5F7;padding:0.1em 1.0em 0.3em 0.5em;margin:0 0 0 0.2em;-moz-border-radius:0.8em;-webkit-border-radius:0.8em;-ms-border-radius:0.8em;border-radius:0.8em;border:1px solid #D9DFE1;text-decoration:none;display:block;position:relative;float:left;}
 a#saver{font-size:1.2em;margin:0.5em;color:#fff;background:#00B1EB;border:1px solid #2274AC;}
 a#saver:hover{cursor:pointer}
 ul#personal li a:hover,
