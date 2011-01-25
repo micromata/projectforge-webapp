@@ -194,7 +194,9 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
           if (CollectionUtils.isNotEmpty(taskTree.getKost2List(taskId)) == true) {
             // But Kost2 is available for sub task, so user should book his time sheet
             // on a sub task with kost2s.
-            cost2Choice.error(getString("timesheet.error.kost2NeededChooseSubTask"));
+            if (cost2Choice != null) {
+              cost2Choice.error(getString("timesheet.error.kost2NeededChooseSubTask"));
+            }
             break;
           }
         }
@@ -419,7 +421,9 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
               userPrefDao.fillFromUserPrefParameters(userPref, data);
             }
             templateName = "";
-            cost2Choice.modelChanged();
+            if (cost2Choice != null) {
+              cost2Choice.modelChanged();
+            }
             locationTextField.modelChanged();
             descriptionArea.modelChanged();
             refresh();
