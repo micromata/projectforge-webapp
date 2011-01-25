@@ -182,14 +182,6 @@ public class AddressDao extends BaseDao<AddressDO>
     return getList(queryFilter);
   }
 
-  @Override
-  protected void onSaveOrModify(AddressDO obj)
-  {
-    if (obj.getTaskId() == null) {
-      setTask(obj, getDefaultTaskId());
-    }
-  }
-
   /**
    * @param address
    * @param taskId If null, then task will be set to null;
@@ -211,12 +203,20 @@ public class AddressDao extends BaseDao<AddressDO>
     return true;
   }
 
+  private void beforeUpdateOrSave(final AddressDO address)
+  {
+    if (address != null && address.getTaskId() == null) {
+      setTask(address, getDefaultTaskId());
+    }
+  }
+
   /**
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
   public boolean hasAccess(AddressDO obj, AddressDO oldObj, OperationType operationType, boolean throwException)
   {
+    beforeUpdateOrSave(obj);
     return accessChecker.hasPermission(obj.getTaskId(), AccessType.TASKS, operationType, throwException);
   }
 
@@ -228,6 +228,7 @@ public class AddressDao extends BaseDao<AddressDO>
   {
     Validate.notNull(dbObj);
     Validate.notNull(obj);
+    beforeUpdateOrSave(obj);
     Validate.notNull(dbObj.getTaskId());
     Validate.notNull(obj.getTaskId());
     if (accessChecker.hasPermission(obj.getTaskId(), AccessType.TASKS, OperationType.UPDATE, throwException) == false) {
