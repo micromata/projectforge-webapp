@@ -199,6 +199,7 @@ public class UserFilter implements Filter
           }
         }
         if (user != null) {
+          MDC.put("user", user.getUsername());
           PFUserContext.setUser(user);
           request = decorateWithLocale(request, user);
           chain.doFilter(request, response);
