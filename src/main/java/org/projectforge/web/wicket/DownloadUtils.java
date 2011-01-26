@@ -43,6 +43,8 @@ public class DownloadUtils
   public static final String TYPE_SVG = "image/svg+xml";
 
   public static final String TYPE_TEXT = "text";
+  
+  public static final String TYPE_VCARD = "text/x-vcard";
 
   public static final String TYPE_XLS = "application/vnd.ms-excel";
 
@@ -101,6 +103,8 @@ public class DownloadUtils
       return TYPE_XLS;
     } else if (filename.endsWith(".txt") == true || filename.endsWith(".csv") == true) {
       return TYPE_TEXT;
+    } else if (filename.endsWith(".vcf") == true) {
+      return TYPE_VCARD;
     } else if (filename.endsWith(".mpx") == true) {
       return TYPE_MS_PROJECT;
     }
