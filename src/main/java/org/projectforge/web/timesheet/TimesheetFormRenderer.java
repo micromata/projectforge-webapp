@@ -185,7 +185,8 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     } else if (data.getDuration() > TimesheetDao.MAXIMUM_DURATION) {
       startDateTimePanel.error(getString("timesheet.error.maximumDurationExceeded"));
     }
-    if (doesCost2Exists() == true && data.getKost2Id() == null) {
+    if (cost2Choice != null && cost2Choice.getConvertedInput() == null) {
+      // cost2Choice is always != null (but may-be invisible) if cost2 entries does exist in the system.
       // Kost2 is not available for current task.
       final TaskNode taskNode = taskTree.getTaskNodeById(data.getTaskId());
       if (taskNode != null) {
@@ -194,7 +195,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
           if (CollectionUtils.isNotEmpty(taskTree.getKost2List(taskId)) == true) {
             // But Kost2 is available for sub task, so user should book his time sheet
             // on a sub task with kost2s.
-            if (cost2Choice != null) {
+            if (cost2Choice.isVisible()) {
               cost2Choice.error(getString("timesheet.error.kost2NeededChooseSubTask"));
             } else {
               container.error(getString("timesheet.error.kost2NeededChooseSubTask"));
@@ -204,11 +205,6 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
         }
       }
     }
-  }
-
-  private boolean doesCost2Exists()
-  {
-    return SystemInfoCache.instance().isCost2EntriesExists();
   }
 
   protected void updateStopDate()
@@ -256,7 +252,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       taskSelectPanel.init();
       taskSelectPanel.setRequired(true);
     }
-    if (doesCost2Exists() == true) {
+    if (SystemInfoCache.instance().isCost2EntriesExists() == true) {
       final String label = getString("fibu.kost2");
       cost2ChoiceLabel = doPanel.addLabel(label, HALF);
       cost2ChoiceLabel.setBreakBefore();
@@ -454,37 +450,41 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
   protected void refresh()
   {
     addConsumptionBar();
-    if (cost2ChoicePanel != null) {
+    if (cost2Choice != null) {
+      // cost2Choice does always exist if any cost2 entry does exist in the data-base (but is may be invisible).
       cost2List = taskTree.getKost2List(data.getTaskId());
-      final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = getKost2LabelValueChoiceRenderer();
-      cost2Choice.setChoiceRenderer(kost2ChoiceRenderer);
-      cost2Choice.setChoices(kost2ChoiceRenderer.getValues());
-      cost2ChoicePanel.replaceWithDropDownChoice(cost2Choice);
-      final boolean cost2Visible = CollectionUtils.isNotEmpty(cost2List);
-      cost2ChoiceLabel.setVisible(cost2Visible);
-      cost2ChoicePanel.setVisible(cost2Visible);
+      final LabelValueChoiceRenderer<Integer> cost2ChoiceRenderer = getCost2LabelValueChoiceRenderer();
+      cost2Choice.setChoiceRenderer(cost2ChoiceRenderer);
+      cost2Choice.setChoices(cost2ChoiceRenderer.getValues());
+      updateCost2ChoiceVisibility();
     }
   }
 
   protected void addCost2Row()
   {
-    if (doesCost2Exists() == false) {
+    if (cost2ChoicePanel == null) {
+      // There is no cost2 entry in the data-base, so cost2 row not needed.
       return;
     }
     cost2List = taskTree.getKost2List(data.getTaskId());
-    if (CollectionUtils.isEmpty(cost2List) == true) {
-      return;
-    }
-    final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = getKost2LabelValueChoiceRenderer();
-    cost2Choice = createKost2ChoiceRenderer(DropDownChoiceLPanel.SELECT_ID, parentPage.getBaseDao(), taskTree, kost2ChoiceRenderer, data,
+    final LabelValueChoiceRenderer<Integer> cost2ChoiceRenderer = getCost2LabelValueChoiceRenderer();
+    cost2Choice = createCost2ChoiceRenderer(DropDownChoiceLPanel.SELECT_ID, parentPage.getBaseDao(), taskTree, cost2ChoiceRenderer, data,
         cost2List);
     cost2Choice.setLabel(new Model<String>(getString("fibu.kost2")));
     cost2Choice.setRequired(true);
     cost2ChoicePanel.replaceWithDropDownChoice(cost2Choice);
+    updateCost2ChoiceVisibility();
+  }
+
+  private void updateCost2ChoiceVisibility()
+  {
+    final boolean cost2Visible = CollectionUtils.isNotEmpty(cost2List);
+    cost2ChoiceLabel.setVisible(cost2Visible);
+    cost2ChoicePanel.setVisible(cost2Visible);
   }
 
   @SuppressWarnings("serial")
-  protected static DropDownChoice<Integer> createKost2ChoiceRenderer(final String id, final TimesheetDao timesheetDao,
+  protected static DropDownChoice<Integer> createCost2ChoiceRenderer(final String id, final TimesheetDao timesheetDao,
       final TaskTree taskTree, final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer, final TimesheetDO data,
       final List<Kost2DO> kost2List)
   {
@@ -543,9 +543,9 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     consumptionBarPanel.replaceWithContainer(consumptionBar);
   }
 
-  private LabelValueChoiceRenderer<Integer> getKost2LabelValueChoiceRenderer()
+  private LabelValueChoiceRenderer<Integer> getCost2LabelValueChoiceRenderer()
   {
-    return getKost2LabelValueChoiceRenderer(parentPage.getBaseDao(), cost2List, data, cost2Choice);
+    return getCost2LabelValueChoiceRenderer(parentPage.getBaseDao(), cost2List, data, cost2Choice);
   }
 
   private void showRecentTimesheetsDialog(final AjaxRequestTarget target)
@@ -600,7 +600,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
         }
       }
     };
-    if (doesCost2Exists() == true) {
+    if (cost2Choice != null) { // Is maybe invisible but does always exist if cost2 entries does exist in the system.
       columns
           .add(new CellItemListenerPropertyColumn<TimesheetDO>(getString("fibu.kost2"), null, "kost2.shortDisplayName", cellItemListener) {
             @Override
@@ -746,13 +746,21 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     }
   }
 
-  protected static LabelValueChoiceRenderer<Integer> getKost2LabelValueChoiceRenderer(final TimesheetDao timesheetDao,
+  /**
+   * Used also by TimesheetMassUpdateForm.
+   * @param timesheetDao
+   * @param kost2List
+   * @param data
+   * @param kost2Choice
+   * @return
+   */
+  protected static LabelValueChoiceRenderer<Integer> getCost2LabelValueChoiceRenderer(final TimesheetDao timesheetDao,
       final List<Kost2DO> kost2List, final TimesheetDO data, final DropDownChoice<Integer> kost2Choice)
   {
     final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
     if (kost2List != null && kost2List.size() == 1) {
       // Es ist genau ein Eintrag. Deshalb selektieren wir diesen auch:
-      Integer kost2Id = kost2List.get(0).getId();
+      final Integer kost2Id = kost2List.get(0).getId();
       timesheetDao.setKost2(data, kost2Id);
       if (kost2Choice != null) {
         kost2Choice.modelChanged();
@@ -761,7 +769,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     if (CollectionUtils.isEmpty(kost2List) == true) {
       data.setKost2(null); // No kost2 list given, therefore set also kost2 to null.
     } else {
-      for (Kost2DO kost2 : kost2List) {
+      for (final Kost2DO kost2 : kost2List) {
         kost2ChoiceRenderer.addValue(kost2.getId(), KostFormatter.formatForSelection(kost2));
       }
     }
