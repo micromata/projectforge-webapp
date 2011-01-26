@@ -49,6 +49,7 @@ import org.projectforge.user.UserDao;
 import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.meb.SMSReceiverServlet;
 import org.projectforge.web.registry.WebRegistry;
+import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -276,8 +277,14 @@ public class UserFilter implements Filter
       // occurring
       // if you use ProjectForge on localhost with http and https (e. g. for testing). You have to delete this cookie normally in your
       // browser.
-      log.info("*** Unsecure JSESSIONID cookie found for a secure request. Please remove this cookie manually, if this message is displayed within your next request again.");
-      final Cookie cookie = new Cookie("JSESSIONID", "hurzel");
+      final String msg = "Unsecure JSESSIONID cookie found for a secure request. The user should remove this cookie manually, "
+          + "if this message is displayed at the next user's request again and stay-logged-in doesn't work properly for this user.";
+      if (WicketApplication.isDevelopmentModus() == true) {
+        log.info("*** " + msg);
+      } else {
+        log.info(msg);
+      }
+      final Cookie cookie = new Cookie("JSESSIONID", "to be deleted");
       cookie.setMaxAge(0);
       cookie.setPath(sessionIdCookie.getPath()); // Doesn't work for Safari: getPath() returns always null!
       response.addCookie(cookie);
