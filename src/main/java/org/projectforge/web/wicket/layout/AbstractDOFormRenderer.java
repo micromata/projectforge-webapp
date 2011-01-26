@@ -42,6 +42,9 @@ public abstract class AbstractDOFormRenderer implements Serializable
 
   protected DataObjectLPanel doPanel;
 
+  /**
+   * The parent container: the form for edit-able components or WebMarkupContainer for read-only views.
+   */
   protected MarkupContainer container;
 
   public AbstractDOFormRenderer(final MarkupContainer container, final LayoutContext layoutContext)
