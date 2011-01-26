@@ -59,9 +59,9 @@ import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
-
 @EditPage(defaultReturnPage = TimesheetListPage.class)
-public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, TimesheetEditForm, TimesheetDao> implements ISelectCallerPage
+public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, TimesheetEditForm, TimesheetDao> implements
+    ISelectCallerPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TimesheetEditPage.class);
 
@@ -208,12 +208,15 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
               t2.getTask() != null ? t2.getTask().getTitle() : null).toComparison();
         }
       });
-      int i = 0;
-      for (final TimesheetPrefEntry entry : data.getRecents()) {
-        TimesheetDO sheet = getRecentSheet(entry);
-        list.add(i, sheet);
-        if (i++ >= SIZE_OF_FIRST_RECENT_BLOCK) {
-          break;
+      // Don't show recent block for new users if all entries are already displayed.
+      if (data.getRecents().size() > SIZE_OF_FIRST_RECENT_BLOCK) {
+        int i = 0;
+        for (final TimesheetPrefEntry entry : data.getRecents()) {
+          TimesheetDO sheet = getRecentSheet(entry);
+          list.add(i, sheet);
+          if (i++ >= SIZE_OF_FIRST_RECENT_BLOCK) {
+            break;
+          }
         }
       }
     }
@@ -221,11 +224,11 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
   }
 
   /**
-   * Gets the recent locations as Json object.
+   * Gets the recent locations.
    */
   public List<String> getRecentLocations()
   {
-    TimesheetPrefData data = getTimesheetPrefData();
+    final TimesheetPrefData data = getTimesheetPrefData();
     if (data != null) {
       return data.getRecentLocations();
     }
@@ -361,8 +364,9 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
   }
 
   @Override
-  public AbstractBasePage onSaveOrUpdate()
+  public AbstractBasePage afterSaveOrUpdate()
   {
+    // Save time sheet as recent time sheet
     final TimesheetPrefData pref = getTimesheetPrefData();
     final TimesheetDO timesheet = getData();
     pref.appendRecentEntry(timesheet);
@@ -370,12 +374,7 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
     if (StringUtils.isNotBlank(timesheet.getLocation()) == true) {
       pref.appendRecentLocation(timesheet.getLocation());
     }
-    return null;
-  }
-  
-  @Override
-  public AbstractBasePage afterSaveOrUpdate()
-  {
+    // Does the user want to store this time sheet as template?
     if (BooleanUtils.isTrue(form.renderer.saveAsTemplate) == true) {
       final UserPrefEditPage userPrefEditPage = new UserPrefEditPage(UserPrefArea.TIMESHEET_TEMPLATE, getData());
       userPrefEditPage.setReturnToPage(this.returnToPage);
@@ -383,7 +382,7 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
     }
     return null;
   }
-  
+
   @Override
   protected void onBeforeRender()
   {
