@@ -234,10 +234,7 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
       // Gantt: duration
       durationField = new MinMaxNumberField<BigDecimal>(TextFieldLPanel.INPUT_ID, new PropertyModel<BigDecimal>(data, "duration"),
           BigDecimal.ZERO, TaskEditForm.MAX_DURATION_DAYS);
-      final String durationString = getString("gantt.duration");
-      final LabelLPanel label = doPanel.addLabel(durationString, HALF);
-      label.setLabelFor(durationField).setBreakBefore();
-      doPanel.addTextField(durationString, durationField, QUART);
+      doPanel.addTextField(getString("gantt.duration"), HALF, durationField, QUART);
     }
     {
       // Gantt: end date
