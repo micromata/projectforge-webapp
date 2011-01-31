@@ -514,6 +514,16 @@ public class WicketUtils
   }
 
   /**
+   * @param label
+   * @param unit
+   * @return label [<unit>] (label with appended unit in brackets).
+   */
+  public static String getLabelWithUnit(final String label, final String unit)
+  {
+    return label + " [" + unit + "]";
+  }
+
+  /**
    * Uses "jiraSupportTooltipImage" as component id.
    * @param response
    * @param parent
@@ -801,6 +811,12 @@ public class WicketUtils
     return component;
   }
 
+  public static Component setWarningTooltip(final Component component)
+  {
+    component.add(new AttributeAppendModifier("class", "warning"));
+    return component;
+  }
+
   /**
    * Sets readonly="readonly" and "readOnly" as class.
    * @param component
@@ -865,7 +881,7 @@ public class WicketUtils
   @SuppressWarnings("unchecked")
   public static void setLabel(final FormComponent component, final Label label)
   {
-    final IModel<String> labelModel = (IModel<String>)label.getDefaultModel();
+    final IModel<String> labelModel = (IModel<String>) label.getDefaultModel();
     if (component instanceof DatePanel) {
       ((DatePanel) component).getDateField().setLabel(labelModel);
     } else {
