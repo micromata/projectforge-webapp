@@ -26,7 +26,6 @@ package org.projectforge.web.wicket.components;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 
-
 /**
  * LabelForPanel is a label tag with for attribute.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -35,10 +34,17 @@ import org.apache.wicket.markup.html.panel.Panel;
 @SuppressWarnings("serial")
 public class LabelPanel extends Panel
 {
+  private Label label;
+
   public LabelPanel(final String id, final String text)
   {
     super(id);
-    final Label label = new Label("label", text);
+    label = new Label("label", text);
     add(label);
+  }
+
+  public Label getLabel()
+  {
+    return label;
   }
 }
