@@ -291,7 +291,7 @@ public class WebRegistry
     addMountPage("hrList", HRListPage.class);
     addMountPages("meb", MebListPage.class, MebEditPage.class);
     addMountPages("postausgang", PostausgangListPage.class, PostausgangEditPage.class);
-    addMountPages("posteingangList", PosteingangListPage.class, PosteingangEditPage.class);
+    addMountPages("posteingang", PosteingangListPage.class, PosteingangEditPage.class);
     addMountPages("script", ScriptListPage.class, ScriptEditPage.class);
     addMountPages("userPref", UserPrefListPage.class, UserPrefEditPage.class);
 
