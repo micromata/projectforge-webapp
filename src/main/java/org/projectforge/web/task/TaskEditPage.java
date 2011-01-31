@@ -40,12 +40,13 @@ import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.gantt.GanttChartEditPage;
 import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.timesheet.TimesheetListPage;
+import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @EditPage(defaultReturnPage = TaskTreePage.class)
-public class TaskEditPage extends AbstractEditPage<TaskDO, TaskEditForm, TaskDao> implements ISelectCallerPage
+public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditForm, TaskDao> implements ISelectCallerPage
 {
   private static final long serialVersionUID = 5176663429783524587L;
 
@@ -97,15 +98,15 @@ public class TaskEditPage extends AbstractEditPage<TaskDO, TaskEditForm, TaskDao
     } else if ("startDate".equals(property) == true) {
       final Date date = (Date) selectedValue;
       getData().setStartDate(date);
-      form.startDatePanel.markModelAsChanged();
+      form.renderer.startDatePanel.markModelAsChanged();
     } else if ("protectTimesheetsUntil".equals(property) == true) {
       final Date date = (Date) selectedValue;
       getData().setProtectTimesheetsUntil(date);
-      form.protectTimesheetsUntilPanel.markModelAsChanged();
+      form.renderer.protectTimesheetsUntilPanel.markModelAsChanged();
     } else if ("endDate".equals(property) == true) {
       final Date date = (Date) selectedValue;
       getData().setEndDate(date);
-      form.endDatePanel.markModelAsChanged();
+      form.renderer.endDatePanel.markModelAsChanged();
     } else if ("kost2Id".equals(property) == true) {
       final Integer kost2Id = (Integer) selectedValue;
       if (kost2Id != null) {
@@ -113,7 +114,7 @@ public class TaskEditPage extends AbstractEditPage<TaskDO, TaskEditForm, TaskDao
         if (kost2 != null) {
           final String newKost2String = TaskHelper.addKost2(taskTree, getData(), kost2);
           getData().setKost2BlackWhiteList(newKost2String);
-          form.kost2BlackWhiteTextField.modelChanged();
+          form.renderer.kost2BlackWhiteTextField.modelChanged();
         }
       }
     } else {
