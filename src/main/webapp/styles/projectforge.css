@@ -2,6 +2,10 @@
 	background-color: #d0d0d0;
 }
 
+.newform input.warning {
+	background-color: #ffdddd;
+}
+
 .hastooltip {
 	font-style: italic;
 }
