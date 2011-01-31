@@ -38,6 +38,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxLink;
+import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
 import org.apache.wicket.behavior.AbstractBehavior;
 import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -49,6 +50,7 @@ import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.repeater.Item;
@@ -247,7 +249,6 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
         }
       };
       taskSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
-      taskSelectPanel.setTabIndex(1);
       doPanel.addSelectPanel(getString("task"), HALF, taskSelectPanel, DOUBLE);
       taskSelectPanel.init();
       taskSelectPanel.setRequired(true);
@@ -282,7 +283,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       final RepeatingView repeatingView = doPanel.addRepeater(LayoutLength.DOUBLE).getRepeatingView();
       // Start time
       startDateTimePanel = new DateTimePanel(repeatingView.newChildId(), new PropertyModel<Date>(data, "startTime"),
-          (DateTimePanelSettings) DateTimePanelSettings.get().withTabIndex(4).withSelectStartStopTime(true).withCallerPage(parentPage)
+          (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withCallerPage(parentPage)
               .withTargetType(java.sql.Timestamp.class).withRequired(true), DatePrecision.MINUTE_15);
       repeatingView.add(startDateTimePanel);
       label.setLabelFor(startDateTimePanel.getDateField()).setBreakBefore();
@@ -705,12 +706,17 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     dataTable.add(new DataTableBehavior());
   }
 
+  /**
+   * Submit link is needed to submit former changed input fields on selection.
+   * @param timesheet
+   * @return
+   */
   @SuppressWarnings("serial")
-  private AjaxLink<Void> createRecentTimeSheetSelectionLink(final TimesheetDO timesheet)
+  private AjaxSubmitLink createRecentTimeSheetSelectionLink(final TimesheetDO timesheet)
   {
-    return new AjaxLink<Void>("selectRecent") {
+    return new AjaxSubmitLink("selectRecent") {
       @Override
-      public void onClick(final AjaxRequestTarget target)
+      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form)
       {
         if (target != null) {
           data.setLocation(timesheet.getLocation());
