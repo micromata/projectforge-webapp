@@ -37,6 +37,8 @@ import org.apache.wicket.model.IModel;
 public class TextFieldOrLabelPanel<T> extends Panel
 {
   private static final long serialVersionUID = -6923305015138423150L;
+  
+  final public static String INPUT_FIELD_WICKET_ID = "textfield";
 
   /**
    * @param id
@@ -50,7 +52,7 @@ public class TextFieldOrLabelPanel<T> extends Panel
     super(id, model);
     if (readonly == true) {
       add(new Label("label", model).setRenderBodyOnly(true));
-      add(new Label("text", "[invisible]").setVisible(false));
+      add(new Label(INPUT_FIELD_WICKET_ID, "[invisible]").setVisible(false));
     } else {
       add(textField);
       add(new Label("label", "[invisible]").setVisible(false));
