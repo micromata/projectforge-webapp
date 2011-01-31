@@ -33,12 +33,13 @@ import org.projectforge.orga.PostType;
 import org.projectforge.orga.PostausgangDO;
 import org.projectforge.orga.PostausgangDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
 
 @EditPage(defaultReturnPage = PostausgangListPage.class)
-public class PostausgangEditPage extends AbstractEditPage<PostausgangDO, PostausgangEditForm, PostausgangDao> implements ISelectCallerPage
+public class PostausgangEditPage extends AbstractAutoLayoutEditPage<PostausgangDO, PostausgangEditForm, PostausgangDao> implements ISelectCallerPage
 {
   private static final long serialVersionUID = 4375220914096256551L;
 
@@ -66,7 +67,7 @@ public class PostausgangEditPage extends AbstractEditPage<PostausgangDO, Postaus
       final Date date = (Date) selectedValue;
       final java.sql.Date sqlDate = new java.sql.Date(date.getTime());
       getData().setDatum(sqlDate);
-      form.datumPanel.markModelAsChanged();
+      form.renderer.datumPanel.markModelAsChanged();
     }
   }
 
