@@ -55,6 +55,9 @@ import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.core.MenuPanel;
+import org.projectforge.web.core.SearchPage;
+import org.projectforge.web.wicket.embats.EmbatsChar;
+import org.projectforge.web.wicket.embats.IconLinkPanel;
 
 /**
  * Do only derive from this page, if no login is required!
@@ -184,6 +187,8 @@ public abstract class AbstractBasePage extends WebPage
     navigationContainer.add(menuPanel);
     menuPanel.init();
 
+    final IconLinkPanel searchLink = new IconLinkPanel("searchIcon", EmbatsChar.LOUPE, SearchPage.class, getString("search"));
+    navigationContainer.add(searchLink);
     final Component bookmarkLink = new Label("bookmarkLink", " S").add(new AttributeModifier("title", true, new Model<String>() {
       public String getObject()
       {
