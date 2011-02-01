@@ -246,15 +246,6 @@ overflow: hidden;
  padding-right:1.25em;
 }
 
-#content table.calendar tr td p span.calendartimesheet a.entry:after {
-	content: "4";
-	font-family:EmbatsSymbols; 
-	position: absolute;
-	right: 0em;
-	top: -0.2em;
-	font-size-adjust: 1;
-	overflow: hidden;
-}
 #content table.calendar tr td p span.calendartimesheet a.time.start {color: #00B1EB; padding-left:1em;}
 #content table.calendar tr td p span.calendartimesheet a.time.stop {color: #00B1EB;  padding-right:1em;}
 #content table.calendar tr td p span.calendartimesheet a.time.break {padding-left:1em; padding-right:1em;}
