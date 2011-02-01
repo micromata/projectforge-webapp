@@ -184,19 +184,19 @@ overflow: hidden;
 
 #content table.calendar tr td span.holiday,
 #content table.calendar tr td span.birthday{
-	background: #E8E5D5;
-	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#E8E5D5),color-stop(1,#CCC1A1));
-	background: -moz-linear-gradient(top,#E8E5D5,#CCC1A1);
+	background: #FFFFFF;
+	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#FFFFFF),color-stop(1,#FFFFFF));
+	background: -moz-linear-gradient(top,#FFFFFF,#FFFFFF);
 	color: #6E613E;
 	border: 1px solid #AE9962;
 	position:relative;
 }
 
-#content table.calendar tr td span.employee{
+#content table.calendar tr td span.others{
 	font-weight:normal;
-	background: #AAF7FA;
-	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#AAF7FA),color-stop(1,#7FB9BB));
-	background: -moz-linear-gradient(center top , #AAF7FA, #7FB9BB);
+	background: #FFFFFF;
+	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#FFFFFF),color-stop(1,#FFFFFF));
+	background: -moz-linear-gradient(center top , #FFFFFF, #FFFFFF);
 	color: #4B6D6E;
 	border: 1px solid #659394;
 	padding-left:2.5em;
@@ -204,9 +204,9 @@ overflow: hidden;
 
 #content table.calendar tr td span.favourite{
 	font-weight:normal;
-	background: #F758FA;
-	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#F758FA),color-stop(1,#B942BB));
-	background: -moz-linear-gradient(center top , #F758FA, #B942BB);
+	background: #FFAAFF;
+	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#FFAAFF),color-stop(1,#FFFFFF));
+	background: -moz-linear-gradient(center top , #FFAAFF, #FFFFFF);
 	color: #6D276E;
 	border: 1px solid #933494;
 	padding-left:2.5em;
