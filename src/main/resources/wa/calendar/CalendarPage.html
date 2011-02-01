@@ -36,7 +36,7 @@
       <form wicket:id="form">
 		<div class="calendartoolcontainer">
 			<ul class="calendartools boxshadow">
-				<li class="left"><a class="embats shaded" wicket:id="previousMonth">t</a></li>
+				<li class="left"><wicket:container wicket:id="previousMonth">[shaded left arrow]</wicket:container></li>
         		<li class="month">
         			<a wicket:id="selectMonth">
         				<span wicket:id="monthSelectLabel">[July 2009]</span>
@@ -46,22 +46,19 @@
         			</a>
         		</li> 
         		<li class="today">
-        			<a href="#" wicket:id="showToday" style="font-size:1.6em" class="embatssymbols shaded">q</a>
+        			<wicket:container wicket:id="showToday">[pin]</wicket:container>
         		</li>
-        		<wicket:enclosure>
-        		<li class="cancel">
-        			<a href="#" wicket:id="cancel" class="embats">&quot;</a>
+        		<li class="cancel" wicket:id="cancelItem">
+        			<wicket:container wicket:id="cancel">[cross]</wicket:container>
         		</li>
-        		</wicket:enclosure>
         		<li class="right">
-        			<a href="#" class="embats shaded" wicket:id="nextMonth">q</a>
+        			<wicket:container wicket:id="nextMonth">[arrow right]</wicket:container>
         		</li>
 			</ul>
 		<div style="float:right">
 
 			<span wicket:id="monthDuration">[161:00h (01.05.2009 - 31.05.2009)]</span> | 
-			<a wicket:id="showTimesheets" class="shaded embats">%</a>
-			<a wicket:id="hideTimesheets" class="shaded embats">%</a>
+			<wicket:container wicket:id="toggleTimesheets">[clock]</wicket:container>
 			<span wicket:id="timesheetsUser">[show and select user]</span> |
 			<a wicket:id="showBirthdays">
 				<img src="/images/cake.png" wicket:id="showBirthdaysImage" border="0" />

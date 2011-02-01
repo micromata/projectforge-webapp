@@ -24,6 +24,7 @@
 package org.projectforge.web.calendar;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.Model;
@@ -39,6 +40,9 @@ import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.web.wicket.embats.EmbatsBaseChar;
+import org.projectforge.web.wicket.embats.EmbatsSymbolChar;
+import org.projectforge.web.wicket.embats.IconLinkPanel;
 
 public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 {
@@ -57,30 +61,25 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   protected void init()
   {
     super.init();
-    @SuppressWarnings("unchecked")
-    final Link< ? > previousMonthButton = new Link("previousMonth") {
+    final IconLinkPanel previousMonthButton = new IconLinkPanel("previousMonth", new Link<Void>(IconLinkPanel.LINK_WICKET_ID) {
       @Override
       public void onClick()
       {
         parentPage.goToPreviousMonth();
       }
-    };
-    WicketUtils.addTooltip(previousMonthButton, getString("calendar.tooltip.selectPrevious"), true);
+    }, EmbatsBaseChar.ARROW_LEFT, getString("calendar.tooltip.selectPrevious"));
+    previousMonthButton.appendCssClass("shaded");
     add(previousMonthButton);
-    // previousMonthButton.add(new TooltipImage("previousMonthImage", getResponse(), WebConstants.IMAGE_CALENDAR_PREVIOUS_MONTH,
-    // getString("calendar.tooltip.selectPrevious")));
-    @SuppressWarnings("unchecked")
-    final Link< ? > nextMonthButton = new Link("nextMonth") {
+
+    final IconLinkPanel nextMonthButton = new IconLinkPanel("nextMonth", new Link<Void>(IconLinkPanel.LINK_WICKET_ID) {
       @Override
       public void onClick()
       {
         parentPage.goToNextMonth();
       }
-    };
-    WicketUtils.addTooltip(nextMonthButton, getString("calendar.tooltip.selectNext"), true);
+    }, EmbatsBaseChar.ARROW_RIGHT, getString("calendar.tooltip.selectNext"));
+    nextMonthButton.appendCssClass("shaded");
     add(nextMonthButton);
-    // nextMonthButton.add(new TooltipImage("nextMonthImage", getResponse(), WebConstants.IMAGE_CALENDAR_NEXT_MONTH,
-    // getString("calendar.tooltip.selectNext")));
     @SuppressWarnings("unchecked")
     final Model monthLabelModel = new Model<String>() {
       @Override
@@ -111,29 +110,29 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       selectMonthButton.setVisible(false);
     }
 
-    @SuppressWarnings("unchecked")
-    final Link showTodayButton = new Link("showToday") {
+    final IconLinkPanel showTodayButton = new IconLinkPanel("showToday", new Link<Void>(IconLinkPanel.LINK_WICKET_ID) {
       @Override
       public void onClick()
       {
         parentPage.goToToday();
       }
-    };
-    WicketUtils.addTooltip(showTodayButton, getString("calendar.today"), true);
+    }, EmbatsSymbolChar.PIN, getString("calendar.today"));
+    showTodayButton.appendCssClass("shaded").setCssStyle("font-size:1.6em;");
     add(showTodayButton);
-    @SuppressWarnings("unchecked")
-    final Link< ? > cancelButton = new Link("cancel") {
-      @Override
-      public void onClick()
-      {
-        getParentPage().onCancel();
-      }
-    };
-    WicketUtils.addTooltip(cancelButton, getString("cancel"), true);
-    add(cancelButton);
-    // cancelButton.add(new PresizedImage("cancelImage", getResponse(), WebConstants.IMAGE_BUTTON_CANCEL));
+
+    final WebMarkupContainer cancelItem = new WebMarkupContainer("cancelItem");
+    add(cancelItem);
     if (isSelectMode() == false) {
-      cancelButton.setVisible(false);
+      cancelItem.setVisible(false);
+    } else {
+      final IconLinkPanel cancelButton = new IconLinkPanel("cancel", new Link<Void>(IconLinkPanel.LINK_WICKET_ID) {
+        @Override
+        public void onClick()
+        {
+          parentPage.onCancel();
+        }
+      }, EmbatsBaseChar.CROSS, getString("cancel"));
+      cancelItem.add(cancelButton.appendCssClass("shaded"));
     }
     add(new Label("monthDuration", new Model<String>() {
       @Override
@@ -197,42 +196,36 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   @SuppressWarnings("serial")
   private void showTimesheetFilterElements()
   {
-    @SuppressWarnings("unchecked")
-    final Link< ? > showTimesheetsButton = new Link("showTimesheets") {
+    final IconLinkPanel toggleTimesheetsButton = new IconLinkPanel("toggleTimesheets", new Link<Void>(IconLinkPanel.LINK_WICKET_ID) {
       @Override
       public void onClick()
       {
-        getFilter().setUserId(getUser().getId());
+        if (getFilter().getUserId() == null) {
+          getFilter().setUserId(getUser().getId());
+        } else {
+          getFilter().setUserId(null);
+        }
       }
-
+    }, EmbatsBaseChar.CLOCK, new Model<String>() {
+      public String getObject()
+      {
+        if (getFilter().getUserId() == null) {
+          return getString("calendar.tooltip.showTimesheeets");
+        } else {
+          return getString("calendar.tooltip.hideTimesheeets");
+        }
+      };
+    }) {
       @Override
       public boolean isVisible()
       {
-        return isOtherUsersAllowed() == false && getFilter().getUserId() == null;
+        return isOtherUsersAllowed() == false;
       }
     };
-    WicketUtils.addTooltip(showTimesheetsButton, getString("calendar.tooltip.showTimesheeets"), true);
-    add(showTimesheetsButton);
-    // showTimesheetsButton.add(new PresizedImage("showTimesheetsImage", getResponse(), WebConstants.IMAGE_CLOCK));
-    @SuppressWarnings("unchecked")
-    final Link< ? > hideTimesheetsButton = new Link("hideTimesheets") {
-      @Override
-      public void onClick()
-      {
-        getFilter().setUserId(null);
-      }
+    toggleTimesheetsButton.appendCssClass("shaded");
+    add(toggleTimesheetsButton);
 
-      @Override
-      public boolean isVisible()
-      {
-        return isOtherUsersAllowed() == false && getFilter().getUserId() != null;
-      }
-    };
-    WicketUtils.addTooltip(hideTimesheetsButton,getString( "calendar.tooltip.hideTimesheeets"), true);
-    add(hideTimesheetsButton);
-    // hideTimesheetsButton.add(new PresizedImage("hideTimesheetsImage", getResponse(), WebConstants.IMAGE_CLOCK_DELETE));
-
-    UserSelectPanel userSelectPanel = new UserSelectPanel("timesheetsUser", new PropertyModel<PFUserDO>(this, "timesheetsUser"),
+    final UserSelectPanel userSelectPanel = new UserSelectPanel("timesheetsUser", new PropertyModel<PFUserDO>(this, "timesheetsUser"),
         parentPage, "userId") {
       @Override
       public boolean isVisible()
