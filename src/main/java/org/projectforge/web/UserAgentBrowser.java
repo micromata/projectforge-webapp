@@ -23,16 +23,17 @@
 
 package org.projectforge.web;
 
-
 public enum UserAgentBrowser
 {
-  IE, MOZILLA, SAFARI, OPERA, FIREFOX, CHROME, UNKNOWN;
+  IE, MOZILLA, SAFARI, KONQUEROR, OPERA, FIREFOX, CHROME, OMNIWEB, ICAB, CAMINO, NETSCAPE, UNKNOWN;
 
-  /**
-   * @param userAgent The user agent string from the http request.
-   */
-  public static UserAgentBrowser getUserAgentBrowser(final String userAgent)
+  public boolean isIn(final UserAgentBrowser... browser)
   {
-    return UNKNOWN;
+    for (final UserAgentBrowser br : browser) {
+      if (this == br) {
+        return true;
+      }
+    }
+    return false;
   }
 }
