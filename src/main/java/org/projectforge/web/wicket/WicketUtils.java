@@ -775,8 +775,21 @@ public class WicketUtils
    */
   public static Component addTooltip(final Component component, final IModel<String> text)
   {
+    return addTooltip(component, text, false);
+  }
+
+  /**
+   * Adds a SimpleAttributeModifier("title", ...) to the given component. Does not modify the given tool tip text!
+   * @param component
+   * @param text
+   * @see #setStyleHasTooltip(Component)
+   */
+  public static Component addTooltip(final Component component, final IModel<String> text, final boolean suppressStyleChange)
+  {
     component.add(new AttributeModifier("title", true, text));
-    setStyleHasTooltip(component);
+    if (suppressStyleChange == false) {
+      setStyleHasTooltip(component);
+    }
     return component;
   }
 
