@@ -360,7 +360,7 @@ public class CalendarDayItem extends WebMarkupContainer
     if (birthdayAddress.isFavorite() == true) {
       label.add(new SimpleAttributeModifier("class", "birthday favourite"));
     } else {
-      label.add(new SimpleAttributeModifier("class", "birthday employee"));
+      label.add(new SimpleAttributeModifier("class", "birthday others"));
     }
     label.setEscapeModelStrings(false);
     item.add(label);
