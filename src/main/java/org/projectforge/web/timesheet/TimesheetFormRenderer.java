@@ -283,8 +283,8 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       final RepeatingView repeatingView = doPanel.addRepeater(LayoutLength.DOUBLE).getRepeatingView();
       // Start time
       startDateTimePanel = new DateTimePanel(repeatingView.newChildId(), new PropertyModel<Date>(data, "startTime"),
-          (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withCallerPage(parentPage)
-              .withTargetType(java.sql.Timestamp.class).withRequired(true), DatePrecision.MINUTE_15);
+          (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withCallerPage(parentPage).withTargetType(
+              java.sql.Timestamp.class).withRequired(true), DatePrecision.MINUTE_15);
       repeatingView.add(startDateTimePanel);
       label.setLabelFor(startDateTimePanel.getDateField()).setBreakBefore();
       WicketUtils.addTooltip(startDateTimePanel.getDateField(), new Model<String>() {
@@ -435,9 +435,9 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       templateNamesChoice.setNullValid(true);
       repeatingView.add(new DropDownChoicePanel<String>(repeatingView.newChildId(), templateNamesChoice));
     }
-    final AjaxLink< ? > link = new AjaxLink<Void>(ImageLinkPanel.LINK_WICKET_ID) {
+    final AjaxSubmitLink link = new AjaxSubmitLink(ImageLinkPanel.LINK_WICKET_ID) {
       @Override
-      public void onClick(AjaxRequestTarget target)
+      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form)
       {
         showRecentTimesheetsDialog(target);
       }
@@ -712,11 +712,11 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
    * @return
    */
   @SuppressWarnings("serial")
-  private AjaxSubmitLink createRecentTimeSheetSelectionLink(final TimesheetDO timesheet)
+  private AjaxLink<Void> createRecentTimeSheetSelectionLink(final TimesheetDO timesheet)
   {
-    return new AjaxSubmitLink("selectRecent") {
+    return new AjaxLink<Void>("selectRecent") {
       @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form)
+      public void onClick(AjaxRequestTarget target)
       {
         if (target != null) {
           data.setLocation(timesheet.getLocation());
