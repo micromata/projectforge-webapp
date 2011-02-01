@@ -37,11 +37,20 @@ public enum ImageDef
   PAGE(DIRS.MAIN + "page_white.png"), //
   SMS(DIRS.MAIN + "sms.png"), //
   SPEECH_BALLON(DIRS.MAIN + "comment.png"), //
-  STAR(DIRS.MAIN + "bullet_star.png"), //
+  STAR(DIRS.MAIN + "star_plus.png"), //
   ZOOM(DIRS.MAIN + "zoom.png"), //
   ZOOM_IN(DIRS.MAIN + "zoom_in.png"), //
-  ZOOM_OUT(DIRS.MAIN + "zoom_out.png");
+  ZOOM_OUT(DIRS.MAIN + "zoom_out.png"), //
+ 
+  EM_ARROW_LEFT(DIRS.MAIN + "embats-arrow-left.png"),//
+  EM_ARROW_RIGHT(DIRS.MAIN + "embats-arrow-right.png"),//
+  EM_CLOCK(DIRS.MAIN + "embats-clock.png"),//
+  EM_CROSS(DIRS.MAIN + "embats-cross.png"),//
+  EM_PIN(DIRS.MAIN + "embats-pin.png"),//
+  EM_PLUS(DIRS.MAIN + "embats-plus.png"),//
+  EM_STAR(DIRS.MAIN + "embats-star.png");//
 
+  
   // public static final String IMAGE_ADD = DIR + "add.png";
   //
   // public static final String IMAGE_ARROW_DOWN = DIR + "arrow-down.png";
