@@ -27,12 +27,11 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
-import org.projectforge.fibu.KostFormatter;
+import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.web.HtmlHelper;
-
 
 /**
  * For displaying timesheets in selectDate (calendar). Holds basic properties of TimesheetDO add some additional functionalities use-able
@@ -51,9 +50,9 @@ public class DisplayTimesheet implements Serializable
   private Date stopTime;
 
   private String description;
-  
+
   private String location;
-  
+
   private String taskPath;
 
   private TaskDO task;
@@ -136,20 +135,30 @@ public class DisplayTimesheet implements Serializable
       return (task != null && task.getTitle() != null) ? HtmlHelper.escapeXml(task.getTitle()) : "";
     }
     StringBuffer buf = new StringBuffer();
-    buf.append(HtmlHelper.escapeXml(KostFormatter.format(kost2))).append("<br/>");
     StringBuffer b2 = new StringBuffer();
-    if (kost2.getProjekt() != null) {
-      if (kost2.getProjekt().getKunde() != null) {
-        b2.append(kost2.getProjekt().getKunde().getName()).append(" - ");
+    final ProjektDO projekt = kost2.getProjekt();
+    if (projekt != null) {
+      // final KundeDO kunde = projekt.getKunde();
+      // if (kunde != null) {
+      // if (StringUtils.isNotBlank(kunde.getIdentifier()) == true) {
+      // b2.append(kunde.getIdentifier());
+      // } else {
+      // b2.append(kunde.getName());
+      // }
+      // b2.append(" - ");
+      // }
+      if (StringUtils.isNotBlank(projekt.getIdentifier()) == true) {
+        b2.append(projekt.getIdentifier());
+      } else {
+        b2.append(projekt.getName());
       }
-      b2.append(kost2.getProjekt().getName());
     } else {
       b2.append(kost2.getDescription());
     }
     buf.append(HtmlHelper.escapeXml(StringUtils.abbreviate(b2.toString(), 30)));
     return buf.toString();
   }
-  
+
   public String getToolTip()
   {
     StringBuffer buf = new StringBuffer();
