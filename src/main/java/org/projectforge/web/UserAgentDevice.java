@@ -67,7 +67,7 @@ public enum UserAgentDevice
 
   public boolean isIn(final UserAgentDevice... device)
   {
-    for (UserAgentDevice dev : device) {
+    for (final UserAgentDevice dev : device) {
       if (this == dev) {
         return true;
       }
