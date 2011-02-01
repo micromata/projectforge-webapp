@@ -27,6 +27,7 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
@@ -67,7 +68,7 @@ public class IconLinkPanel extends Panel
   {
     if (embatsSupported == true) {
       link.add(new Label("embatschar", embatsChar.getFontString()).setRenderBodyOnly(true));
-      link.add(new AttributeAppendModifier("class", "embatssymbols"));
+      link.add(new AttributeAppendModifier("class", embatsChar.getCssClass()));
       link.add(new Label(IMAGE_WICKET_ID, "invisible").setVisible(false));
       return true;
     } else {
@@ -158,6 +159,31 @@ public class IconLinkPanel extends Panel
     } else {
       link = new BookmarkablePageLink(LINK_WICKET_ID, pageClass);
     }
+    add(link);
+    if (addIcon(embatsChar) == false) {
+      addImage(embatsChar, tooltip);
+    }
+  }
+
+  public IconLinkPanel(final String id, final EmbatsChar embatsChar, final String href)
+  {
+    this(id, embatsChar, href, (IModel<String>) null);
+  }
+
+  public IconLinkPanel(final String id, final EmbatsChar embatsChar, final String href, final String tooltip)
+  {
+    this(id);
+    link = new ExternalLink(LINK_WICKET_ID, href);
+    add(link);
+    if (addIcon(embatsChar) == false) {
+      addImage(embatsChar, tooltip);
+    }
+  }
+
+  public IconLinkPanel(final String id, final EmbatsChar embatsChar, final String href, final IModel<String> tooltip)
+  {
+    this(id);
+    link = new ExternalLink(LINK_WICKET_ID, href);
     add(link);
     if (addIcon(embatsChar) == false) {
       addImage(embatsChar, tooltip);

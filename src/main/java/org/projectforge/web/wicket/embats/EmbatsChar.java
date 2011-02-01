@@ -26,31 +26,15 @@ package org.projectforge.web.wicket.embats;
 import org.projectforge.web.wicket.ImageDef;
 
 /**
- * Defines embats symbols with their fall-back images if the browser doesn't support embedded fonts.
+ * Interface for embats characters.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public enum EmbatsChar
+public interface EmbatsChar
 {
-  LOUPE("j", ImageDef.ZOOM);
+  public ImageDef getFallbackImage();
 
-  private String fontString;
-
-  private ImageDef fallbackImage;
-
-  public ImageDef getFallbackImage()
-  {
-    return fallbackImage;
-  }
-
-  public String getFontString()
-  {
-    return fontString;
-  }
-
-  private EmbatsChar(final String fontString, final ImageDef fallbackImage)
-  {
-    this.fontString = fontString;
-    this.fallbackImage = fallbackImage;
-  }
+  public String getFontString();
+  
+  public String getCssClass();
 }
