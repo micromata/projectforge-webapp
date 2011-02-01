@@ -28,8 +28,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.ComponentTag;
@@ -56,7 +54,7 @@ import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.core.MenuPanel;
 import org.projectforge.web.core.SearchPage;
-import org.projectforge.web.wicket.embats.EmbatsChar;
+import org.projectforge.web.wicket.embats.EmbatsSymbolChar;
 import org.projectforge.web.wicket.embats.IconLinkPanel;
 
 /**
@@ -174,27 +172,21 @@ public abstract class AbstractBasePage extends WebPage
     navigationContainer.add(newsLink);
     newsLink.add(new Label("versionLabel", "V.&nbsp;" + getAppVersion() + ",&nbsp;" + getAppReleaseTimestamp())
         .setEscapeModelStrings(false));
-    @SuppressWarnings("unchecked")
-    final Link< ? > sendFeedbackLink = new Link("sendFeedback") {
-      public void onClick()
-      {
-        setResponsePage(FeedbackPage.class);
-      };
-    };
-    navigationContainer.add(sendFeedbackLink);
-
     final MenuPanel menuPanel = new MenuPanel("mainMenu");
     navigationContainer.add(menuPanel);
     menuPanel.init();
 
-    final IconLinkPanel searchLink = new IconLinkPanel("searchIcon", EmbatsChar.LOUPE, SearchPage.class, getString("search"));
-    navigationContainer.add(searchLink);
-    final Component bookmarkLink = new Label("bookmarkLink", " S").add(new AttributeModifier("title", true, new Model<String>() {
-      public String getObject()
-      {
-        return getString("tooltip.directPageLink") + ": " + bookmarkableUrl;
-      };
-    }));
+    final IconLinkPanel sendFeedbackLink = new IconLinkPanel("sendFeedbackLink", EmbatsSymbolChar.SPEECH_BALLON, FeedbackPage.class,
+        getString("feedback.link.tooltip"));
+    navigationContainer.add(sendFeedbackLink);
+    final IconLinkPanel bookmarkLink = new IconLinkPanel("bookmarkLink", EmbatsSymbolChar.STAR, "javascript:toggle('#bookmark');",
+        new Model<String>() {
+          public String getObject()
+          {
+            return getString("tooltip.directPageLink") + ": " + bookmarkableUrl;
+          };
+        });
+    navigationContainer.add(bookmarkLink);
     bookmarkLink.setVisible(isBookmarkLinkIconVisible());
     navigationContainer.add(bookmarkLink);
     final Label bookmarkLabel = new Label("bookmark", new Model<String>() {
@@ -215,6 +207,8 @@ public abstract class AbstractBasePage extends WebPage
       bookmarkLink.setVisible(false);
       bookmarkLabel.setVisible(false);
     }
+    final IconLinkPanel searchLink = new IconLinkPanel("searchLink", EmbatsSymbolChar.LOUPE, SearchPage.class, getString("search"));
+    navigationContainer.add(searchLink);
   }
 
   /**
