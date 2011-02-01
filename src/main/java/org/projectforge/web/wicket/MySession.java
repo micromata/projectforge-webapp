@@ -33,7 +33,10 @@ import org.apache.wicket.request.ClientInfo;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.web.UserAgentBrowser;
+import org.projectforge.web.UserAgentDetection;
 import org.projectforge.web.UserAgentDevice;
+import org.projectforge.web.wicket.embats.EmbatsUtils;
 
 public class MySession extends WebSession
 {
@@ -46,10 +49,18 @@ public class MySession extends WebSession
   private String userAgent;
 
   private UserAgentDevice userAgentDevice = UserAgentDevice.UNKNOWN;
+  
+  private UserAgentBrowser userAgentBrowser = UserAgentBrowser.UNKNOWN;
+
+  private String userAgentBrowserVersion = null;
+
+  //private UserAgentOS userAgentOS = UserAgentOS.UNKNOWN;
 
   private boolean mobileUserAgent;
 
   private boolean ignoreMobileUserAgent;
+  
+  private boolean embatsSupported;
 
   public MySession(final Request request)
   {
@@ -60,7 +71,12 @@ public class MySession extends WebSession
       ((WebClientInfo) info).getProperties().setTimeZone(PFUserContext.getTimeZone());
       userAgent = ((WebClientInfo) info).getUserAgent();
       userAgentDevice = UserAgentDevice.getUserAgentDevice(userAgent);
+      //userAgentOS = UserAgentOS.getUserAgentOS(userAgent);
       mobileUserAgent = userAgentDevice.isMobile();
+      final UserAgentDetection userAgentDetection = UserAgentDetection.browserDetect(userAgent);
+      userAgentBrowser = userAgentDetection.getUserAgentBrowser();
+      userAgentBrowserVersion = userAgentDetection.getUserAgentBrowserVersion();
+      embatsSupported = EmbatsUtils.isEmbatsSupported(userAgentBrowser, userAgentBrowserVersion);
     } else {
       log.error("Oups, ClientInfo is not from type WebClientInfo: " + info);
     }
@@ -130,7 +146,7 @@ public class MySession extends WebSession
 
   public boolean isEmbatsSupported()
   {
-    return true;
+    return embatsSupported;
   }
 
   /**
