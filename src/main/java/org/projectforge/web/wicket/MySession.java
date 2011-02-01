@@ -128,6 +128,11 @@ public class MySession extends WebSession
     return mobileUserAgent;
   }
 
+  public boolean isEmbatsSupported()
+  {
+    return true;
+  }
+
   /**
    * The user wants to ignore the mobile agent and wants to get the PC version (normal web version).
    * @return
