@@ -47,7 +47,7 @@ public class EmbatsUtils
     } else if (browser == UserAgentBrowser.FIREFOX) {
       return version.compareTo("3.5") >= 0;
     } else if (browser == UserAgentBrowser.SAFARI) {
-      return version.compareTo("3.1") >= 0;
+      return version.compareTo("5.1") >= 0;
     } else if (browser == UserAgentBrowser.CHROME) {
       return version.compareTo("4") >= 0;
     } else if (browser == UserAgentBrowser.OPERA) {

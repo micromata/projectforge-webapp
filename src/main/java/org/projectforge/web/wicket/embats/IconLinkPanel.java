@@ -24,17 +24,17 @@
 package org.projectforge.web.wicket.embats;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.PresizedImage;
-import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * An image or embats icon as link with an href and with a tooltip.
@@ -77,34 +77,9 @@ public class IconLinkPanel extends Panel
     }
   }
 
-  private void addImage(final EmbatsChar embatsChar, final String tooltip)
+  private void addImage(final EmbatsChar embatsChar)
   {
-    if (tooltip != null) {
-      link.add(new PresizedImage(IMAGE_WICKET_ID, getResponse(), embatsChar.getFallbackImage()));
-    } else {
-      link.add(new TooltipImage(IMAGE_WICKET_ID, getResponse(), embatsChar.getFallbackImage(), tooltip));
-    }
-  }
-
-  private void addImage(final EmbatsChar embatsChar, final IModel<String> tooltip)
-  {
-    if (tooltip != null) {
-      link.add(new PresizedImage(IMAGE_WICKET_ID, getResponse(), embatsChar.getFallbackImage()));
-    } else {
-      link.add(new TooltipImage(IMAGE_WICKET_ID, getResponse(), embatsChar.getFallbackImage(), tooltip));
-    }
-  }
-
-  @SuppressWarnings("serial")
-  private void addLink()
-  {
-    link = new Link<Void>("link") {
-      public void onClick()
-      {
-        IconLinkPanel.this.onClick();
-      };
-    };
-    add(link);
+    link.add(new PresizedImage(IMAGE_WICKET_ID, getResponse(), embatsChar.getFallbackImage()));
   }
 
   public IconLinkPanel(final String id, final EmbatsChar embatsChar, final Class< ? > pageClass)
@@ -134,19 +109,16 @@ public class IconLinkPanel extends Panel
     }
     add(link);
     if (addIcon(embatsChar) == false) {
-      addImage(embatsChar, tooltip);
+      addImage(embatsChar);
+    }
+    if (tooltip != null) {
+      WicketUtils.addTooltip(link, tooltip, true);
     }
   }
 
-  @SuppressWarnings("unchecked")
   public IconLinkPanel(final String id, final EmbatsChar embatsChar, final Class< ? > pageClass, final IModel<String> tooltip)
   {
     this(id, embatsChar, pageClass, null, tooltip);
-    link = new BookmarkablePageLink(LINK_WICKET_ID, pageClass);
-    add(link);
-    if (addIcon(embatsChar) == false) {
-      addImage(embatsChar, tooltip);
-    }
   }
 
   @SuppressWarnings("unchecked")
@@ -161,7 +133,10 @@ public class IconLinkPanel extends Panel
     }
     add(link);
     if (addIcon(embatsChar) == false) {
-      addImage(embatsChar, tooltip);
+      addImage(embatsChar);
+    }
+    if (tooltip != null) {
+      WicketUtils.addTooltip(link, tooltip, true);
     }
   }
 
@@ -176,7 +151,10 @@ public class IconLinkPanel extends Panel
     link = new ExternalLink(LINK_WICKET_ID, href);
     add(link);
     if (addIcon(embatsChar) == false) {
-      addImage(embatsChar, tooltip);
+      addImage(embatsChar);
+    }
+    if (tooltip != null) {
+      WicketUtils.addTooltip(link, tooltip, true);
     }
   }
 
@@ -186,20 +164,54 @@ public class IconLinkPanel extends Panel
     link = new ExternalLink(LINK_WICKET_ID, href);
     add(link);
     if (addIcon(embatsChar) == false) {
-      addImage(embatsChar, tooltip);
+      addImage(embatsChar);
+    }
+    if (tooltip != null) {
+      WicketUtils.addTooltip(link, tooltip, true);
     }
   }
 
   public IconLinkPanel(final String id, final AbstractLink link, final EmbatsChar embatsChar, final String tooltip)
   {
     this(id);
-    addLink();
+    this.link = link;
+    add(link);
     if (addIcon(embatsChar) == false) {
-      addImage(embatsChar, tooltip);
+      addImage(embatsChar);
+    }
+    if (tooltip != null) {
+      WicketUtils.addTooltip(link, tooltip, true);
     }
   }
 
-  public void onClick()
+  public IconLinkPanel(final String id, final AbstractLink link, final EmbatsChar embatsChar, final IModel<String> tooltip)
   {
-  };
+    this(id);
+    this.link = link;
+    add(link);
+    if (addIcon(embatsChar) == false) {
+      addImage(embatsChar);
+    }
+    if (tooltip != null) {
+      WicketUtils.addTooltip(link, tooltip, true);
+    }
+  }
+
+  /**
+   * @param cssClass
+   * @return this for chaining.
+   */
+  public IconLinkPanel appendCssClass(final String cssClass) {
+    link.add(new AttributeAppendModifier("class", cssClass));
+    return this;
+  }
+  
+  /**
+   * @param cssClass
+   * @return this for chaining.
+   */
+  public IconLinkPanel setCssStyle(final String cssStyle) {
+    link.add(new SimpleAttributeModifier("style", cssStyle));
+    return this;
+  }
 }

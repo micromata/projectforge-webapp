@@ -32,7 +32,7 @@ import org.projectforge.web.wicket.ImageDef;
  */
 public enum EmbatsSymbolChar implements EmbatsChar
 {
-  LOUPE("j", ImageDef.ZOOM), SPEECH_BALLON("2", ImageDef.SPEECH_BALLON), STAR("S", ImageDef.STAR);
+  LOUPE("j", ImageDef.ZOOM), SPEECH_BALLON("2", ImageDef.SPEECH_BALLON), PIN("q", ImageDef.EM_PIN), STAR("S", ImageDef.EM_STAR);
 
   private String fontString;
 

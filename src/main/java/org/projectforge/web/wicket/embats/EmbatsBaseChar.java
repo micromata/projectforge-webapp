@@ -32,7 +32,8 @@ import org.projectforge.web.wicket.ImageDef;
  */
 public enum EmbatsBaseChar implements EmbatsChar
 {
-  ARROW_RIGHT("S", ImageDef.STAR);
+  ARROW_LEFT("t", ImageDef.EM_ARROW_LEFT), ARROW_RIGHT("q", ImageDef.EM_ARROW_RIGHT), CLOCK("%", ImageDef.EM_CLOCK), CROSS("\"",
+      ImageDef.EM_CROSS), PLUS("!", ImageDef.EM_PLUS);
 
   private String fontString;
 
