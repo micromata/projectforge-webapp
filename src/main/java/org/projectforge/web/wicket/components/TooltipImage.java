@@ -26,6 +26,7 @@ package org.projectforge.web.wicket.components;
 import org.apache.wicket.Response;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.model.IModel;
+import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.PresizedImage;
 import org.projectforge.web.wicket.WicketUtils;
 
@@ -40,9 +41,21 @@ public class TooltipImage extends PresizedImage
     WicketUtils.addTooltip(this, tooltip).add(new SimpleAttributeModifier("border", "0"));
   }
 
+  public TooltipImage(final String id, final Response response, final ImageDef imageDef, final String tooltip)
+  {
+    super(id, response, imageDef);
+    WicketUtils.addTooltip(this, tooltip).add(new SimpleAttributeModifier("border", "0"));
+  }
+
   public TooltipImage(final String id, final Response response, final String relativePath, final IModel<String> tooltip)
   {
     super(id, response, relativePath);
+    WicketUtils.addTooltip(this, tooltip).add(new SimpleAttributeModifier("border", "0"));
+  }
+
+  public TooltipImage(final String id, final Response response, final ImageDef imageDef, final IModel<String> tooltip)
+  {
+    super(id, response, imageDef);
     WicketUtils.addTooltip(this, tooltip).add(new SimpleAttributeModifier("border", "0"));
   }
 }
