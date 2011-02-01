@@ -36,6 +36,8 @@ public enum ImageDef
   HELP(DIRS.MAIN + "help.png"), //
   PAGE(DIRS.MAIN + "page_white.png"), //
   SMS(DIRS.MAIN + "sms.png"), //
+  SPEECH_BALLON(DIRS.MAIN + "comment.png"), //
+  STAR(DIRS.MAIN + "bullet_star.png"), //
   ZOOM(DIRS.MAIN + "zoom.png"), //
   ZOOM_IN(DIRS.MAIN + "zoom_in.png"), //
   ZOOM_OUT(DIRS.MAIN + "zoom_out.png");
