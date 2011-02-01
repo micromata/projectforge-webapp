@@ -287,33 +287,33 @@ select.error:focus{outline:2px solid #E11D1C;}
 input.button,
 a.button,
 div.visible a.button,
-.buttonpanel input{-moz-border-radius:0.3em;-webkit-border-radius:0.3em;border-radius:0.3em;padding:0.2em 0.5em;border:1px solid #8994A0;background:-moz-linear-gradient(top,#D9DFE1,#8994A0);background:-webkit-gradient(linear,left top,left bottom,color-stop(0.0,#D9DFE1),
+.buttonpanel input{-moz-border-radius:0.3em;-webkit-border-radius:0.3em;border-radius:0.3em;padding:0.2em 0.5em;border:1px solid #8994A0;background:#8994A0;background:-moz-linear-gradient(top,#D9DFE1,#8994A0);background:-webkit-gradient(linear,left top,left bottom,color-stop(0.0,#D9DFE1),
 color-stop(1.0,#8994A0) );-moz-box-shadow:0 0.2em 0.2em #D9DFE1;-webkit-box-shadow:0 0.2em 0.2em #D9DFE1;color:#fff;line-height:1.7em;display:block;float:left;margin:0 0 0 1em;}
 .loginpage fieldset.buttons input{float:right;}
 /* der graue button/buttonlink bei mouseover */
 .buttons input[type=submit]:hover,
 a:hover.button,
 a.button:hover,
-.buttonpanel input:hover{background:-moz-linear-gradient(top,#D9DFE1,#8994A0 60%);background:-webkit-gradient(linear,left top,left bottom,color-stop(0.0,#D9DFE1),color-stop(0.6,#8994A0) );cursor:pointer;test-decoration:none;}
+.buttonpanel input:hover{background:#8994A0;background:-moz-linear-gradient(top,#D9DFE1,#8994A0 60%);background:-webkit-gradient(linear,left top,left bottom,color-stop(0.0,#D9DFE1),color-stop(0.6,#8994A0) );cursor:pointer;test-decoration:none;}
 /* der grüne Button/Buttonlink */
 .buttons input.submit,
 input.submit,
 div.visible a.submit,
 fieldset.visible a.submit,
-.buttons a.submit{background:-moz-linear-gradient(top,#A9D887,#009C0E);background:-webkit-gradient(linear,left top,left bottom,color-stop(0.0,#A9D887),color-stop(1.0,#009C0E) );border-color:#009C0E;}
+.buttons a.submit{background:#009C0E;background:-moz-linear-gradient(top,#A9D887,#009C0E);background:-webkit-gradient(linear,left top,left bottom,color-stop(0.0,#A9D887),color-stop(1.0,#009C0E) );border-color:#009C0E;}
 /* der grüne Button/Buttonlink mouseover */
 .buttons input[type=submit]:hover.submit,
 .buttons a:hover.submit,
-input.submit:hover{background:-moz-linear-gradient(top,#A9D887,#009C0E 60%);background:-webkit-gradient(linear,left top,left bottom,color-stop(0.0,#A9D887),
+input.submit:hover{background:#009C0E;background:-moz-linear-gradient(top,#A9D887,#009C0E 60%);background:-webkit-gradient(linear,left top,left bottom,color-stop(0.0,#A9D887),
 color-stop(0.6,#009C0E) );text-decoration:none;}
 /* der rote button und buttonlink */
 .buttons input.reset,
 input.reset{/*filter:progid:DXImageTransform.Microsoft.Gradient(StartColorStr='#00FF00',EndColorStr='#000000',GradientType=0);*/
-background:-moz-linear-gradient(top,#FBEDED,#E11D1C);background:-webkit-gradient(linear,left top,left bottom,color-stop(0.0,#FBEDED),color-stop(1.0,#E11D1C) );border-color:#E11D1C;}
+background:#E11D1C;background:-moz-linear-gradient(top,#FBEDED,#E11D1C);background:-webkit-gradient(linear,left top,left bottom,color-stop(0.0,#FBEDED),color-stop(1.0,#E11D1C) );border-color:#E11D1C;»}
 /* der rote button und buttonlink mouseover*/
 .buttons input:hover.reset,
 .buttons a:hover.reset,
-input.reset:hover{background:-moz-linear-gradient(top,#FBEDED,#E11D1C 60%);background:-webkit-gradient(linear,left top,left bottom,color-stop(0.0,#FBEDED),color-stop(0.6,#E11D1C) );text-decoration:none;}
+input.reset:hover{background:#E11D1C;background:-moz-linear-gradient(top,#FBEDED,#E11D1C 60%);background:-webkit-gradient(linear,left top,left bottom,color-stop(0.0,#FBEDED),color-stop(0.6,#E11D1C) );text-decoration:none;}
 input.nobutton{border:none;padding:0.3em 0.6em;background:transparent;-webkit-box-shadow:none;-moz-box-shadow:none;box-shadow:none;color:#2274AC;text-decoration:underline;}
 input.nobutton:hover{background:transparent;border:none;color:#00B1EB;cursor:pointer;}
 /* ================================================================================================================================== */
