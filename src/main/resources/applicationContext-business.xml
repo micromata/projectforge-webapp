@@ -9,6 +9,7 @@
     </constructor-arg>
   </bean>
   <bean id="groovyExecutor" class="org.projectforge.scripting.GroovyExecutor" />
+  <bean id="updateChecker" class="org.projectforge.admin.UpdateChecker" />
   <bean id="historyAdapter" class="de.micromata.hibernate.history.HistoryAdapter" />
   <bean id="pdfRenderer" class="org.projectforge.renderer.PdfRenderer" singleton="true">
     <property name="fontResourceDir" value="fonts" />
