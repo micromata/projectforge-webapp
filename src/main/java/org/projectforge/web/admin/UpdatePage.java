@@ -149,13 +149,7 @@ public class UpdatePage extends AbstractSecuredPage
   protected void updateScriptStatus()
   {
     for (final UpdateScript updateScript : updateScripts) {
-      updateScript.setVisible(false);
       runPreCheck(updateScript);
-      if (form.isShowOldUpdateScripts() == true || updateScript.getPreCheckStatus() != UpdatePreCheckStatus.ALREADY_UPDATED) {
-        if (updateScript.isExperimental() == false || getWicketApplication().isDevelopmentSystem() == true) {
-          updateScript.setVisible(true);
-        }
-      }
     }
     form.updateScriptRows();
   }

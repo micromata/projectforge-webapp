@@ -26,14 +26,11 @@ package org.projectforge.web.admin;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
-import org.apache.wicket.markup.html.link.ExternalLink;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
@@ -116,32 +113,10 @@ public class UpdateForm extends AbstractForm<UpdateForm, UpdatePage>
       return;
     }
     for (final UpdateScript updateScript : updateScripts) {
-      if (updateScript.isVisible() == false) {
-        continue;
-      }
       final String version = updateScript.getVersion();
       final WebMarkupContainer item = new WebMarkupContainer(scriptRows.newChildId());
       scriptRows.add(item);
-      item.add(new Label("version", StringUtils.isBlank(version) == true ? "???" : version
-          + (updateScript.isExperimental() == true ? " (experimental!)" : "")));
-      item.add(new Label("skipVersion", updateScript.isSkipVersion() == true ? "yes" : "no"));
-      final String downloadUrl;
-      if (updateScript.getWarFile().startsWith("http") == true) {
-        downloadUrl = updateScript.getWarFile();
-      } else {
-        downloadUrl = UpdatePage.DOWNLOAD_BASE_URL + updateScript.getWarFile();
-      }
-      item.add(new ExternalLink("downloadWar", downloadUrl, "download"));
-      final Link<String> downloadScriptLink = new Link<String>("downloadScript") {
-        @Override
-        public void onClick()
-        {
-          parentPage.downloadUpdateScript(updateScript);
-        }
-      };
-      downloadScriptLink.add(new SimpleAttributeModifier("title", "You can use this script for own modifications and manual updates."));
-      item.add(downloadScriptLink);
-      downloadScriptLink.add(new Label("fileName", "update-script-" + version).setRenderBodyOnly(true));
+      item.add(new Label("version", StringUtils.isBlank(version) == true ? "???" : version));
       item.add(new Label("preCheckResult", new Model<String>() {
         @Override
         public String getObject()
