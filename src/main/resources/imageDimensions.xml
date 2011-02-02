@@ -98,6 +98,13 @@
   <image path="/images/deny.png" width="16" height="16"/>
   <image path="/images/door_in.png" width="16" height="16"/>
   <image path="/images/door_out.png" width="16" height="16"/>
+  <image path="/images/embats-arrow-left.png" width="16" height="16"/>
+  <image path="/images/embats-arrow-right.png" width="16" height="16"/>
+  <image path="/images/embats-clock.png" width="16" height="16"/>
+  <image path="/images/embats-cross.png" width="16" height="16"/>
+  <image path="/images/embats-pin.png" width="16" height="16"/>
+  <image path="/images/embats-plus.png" width="16" height="16"/>
+  <image path="/images/embats-star.png" width="16" height="16"/>
   <image path="/images/exclamation.png" width="16" height="16"/>
   <image path="/images/explosion.gif" width="19" height="15"/>
   <image path="/images/eye.png" width="16" height="16"/>
