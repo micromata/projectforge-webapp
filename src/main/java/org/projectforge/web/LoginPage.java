@@ -23,7 +23,11 @@
 
 package org.projectforge.web;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 import javax.servlet.http.Cookie;
+import javax.sql.DataSource;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
@@ -37,10 +41,14 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.admin.SetupPage;
+import org.projectforge.web.admin.UpdatePage;
 import org.projectforge.web.mobile.LoginMobilePage;
 import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketUtils;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 
 public class LoginPage extends AbstractBasePage
 {
@@ -55,6 +63,12 @@ public class LoginPage extends AbstractBasePage
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
+
+  /**
+   * Only needed if the data-base needs an update first (may-be the PFUserDO can't be read because of unmatching tables).
+   */
+  @SpringBean(name = "dataSource")
+  private DataSource dataSource;
 
   private LoginForm form;
 
@@ -124,11 +138,43 @@ public class LoginPage extends AbstractBasePage
     internalLogin(this, user);
   }
 
-  public static void internalCheckLogin(final WebPage page, final UserDao userDao, final String username, final String password,
-      final boolean userWantsToStayLoggedIn, final Class< ? extends WebPage> defaultPage, final String targetUrlAfterLogin)
+  public static void internalCheckLogin(final WebPage page, final UserDao userDao, final DataSource dataSource, final String username,
+      final String password, final boolean userWantsToStayLoggedIn, final Class< ? extends WebPage> defaultPage,
+      final String targetUrlAfterLogin)
   {
     final String encryptedPassword = userDao.encryptPassword(password);
-    final PFUserDO user = userDao.authenticateUser(username, encryptedPassword);
+    PFUserDO user = null;
+    if (UserFilter.isUpdateRequiredFirst() == true) {
+      final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+      try {
+        final PFUserDO resUser = new PFUserDO();
+        final String sql = "select pk, firstname, lastname from t_pf_user where username=? and password=? and deleted=false";
+        jdbc.query(sql, new Object[] { username, encryptedPassword}, new ResultSetExtractor() {
+          @Override
+          public Object extractData(final ResultSet rs) throws SQLException, DataAccessException
+          {
+            if (rs.next() == true) {
+              final int pk = rs.getInt("pk");
+              final String firstname = rs.getString("firstname");
+              final String lastname = rs.getString("lastname");
+              resUser.setId(pk);
+              resUser.setUsername(username).setFirstname(firstname).setLastname(lastname);
+            }
+            return null;
+          }
+        });
+        if (resUser.getUsername() != null) {
+          user = resUser;
+          internalLogin(page, user);
+          page.setResponsePage(UpdatePage.class);
+          return;
+        }
+      } catch (final Exception ex) {
+        log.error(ex.getMessage(), ex);
+      }
+    } else {
+      user = userDao.authenticateUser(username, encryptedPassword);
+    }
     if (user != null) {
       log.info("User with valid username/password: " + username + "/" + encryptedPassword);
       if (user.isDeleted() == true) {
@@ -162,8 +208,8 @@ public class LoginPage extends AbstractBasePage
 
   protected void checkLogin()
   {
-    internalCheckLogin(this, userDao, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), WicketUtils.getDefaultPage(),
-        targetUrlAfterLogin);
+    internalCheckLogin(this, userDao, dataSource, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), WicketUtils
+        .getDefaultPage(), targetUrlAfterLogin);
   }
 
   @Override

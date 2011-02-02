@@ -25,6 +25,7 @@ package org.projectforge.web;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -62,6 +63,11 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
   protected void init()
   {
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
+    final WebMarkupContainer administratorLoginNeeded = new WebMarkupContainer("administratorLoginNeeded");
+    add(administratorLoginNeeded);
+    if (UserFilter.isUpdateRequiredFirst() == false) {
+      administratorLoginNeeded.setVisible(false);
+    }
     add(new CheckBox("stayLoggedIn", new PropertyModel<Boolean>(this, "stayLoggedIn")));
     add(new TextField<String>("username", new PropertyModel<String>(this, "username")).setMarkupId("username").add(
         new FocusOnLoadBehavior()));
