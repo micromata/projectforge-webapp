@@ -442,6 +442,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
         showRecentTimesheetsDialog(target);
       }
     };
+    link.setDefaultFormProcessing(false);
     final ImageLinkPanel imageLinkPanel = new ImageLinkPanel(repeatingView.newChildId(), link, parentPage.getResponse(), ImageDef.ZOOM
         .getPath(), getString("timesheet.recent.select")) {
     };
