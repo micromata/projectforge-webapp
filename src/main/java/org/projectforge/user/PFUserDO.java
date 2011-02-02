@@ -382,10 +382,12 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   /**
    * @param username The username to set.
+   * @return this for chaining.
    */
-  public void setUsername(String username)
+  public PFUserDO setUsername(final String username)
   {
     this.username = username;
+    return this;
   }
 
   /**
@@ -433,11 +435,13 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   /**
    * @param firstname The firstname to set.
+   * @return this for chaining.
    */
-  public void setFirstname(String firstname)
+  public PFUserDO setFirstname(String firstname)
   {
     Validate.isTrue(firstname == null || firstname.length() <= 255, firstname);
     this.firstname = firstname;
+    return this;
   }
 
   /**
@@ -559,10 +563,12 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   /**
    * @param lastname The lastname to set.
+   * @return this for chaining.
    */
-  public void setLastname(String lastname)
+  public PFUserDO setLastname(String lastname)
   {
     this.lastname = lastname;
+    return this;
   }
 
   /**
