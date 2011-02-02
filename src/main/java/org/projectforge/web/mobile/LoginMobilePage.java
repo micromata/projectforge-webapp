@@ -23,6 +23,8 @@
 
 package org.projectforge.web.mobile;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
@@ -52,6 +54,12 @@ public class LoginMobilePage extends AbstractMobilePage
 
   @SpringBean(name = "userXmlPreferencesCache")
   protected UserXmlPreferencesCache userXmlPreferencesCache;
+
+  /**
+   * Only needed if the data-base needs an update first (may-be the PFUserDO can't be read because of unmatching tables).
+   */
+  @SpringBean(name = "dataSource")
+  private DataSource dataSource;
 
   private LoginMobileForm form;
 
@@ -101,7 +109,7 @@ public class LoginMobilePage extends AbstractMobilePage
 
   protected void checkLogin()
   {
-    LoginPage.internalCheckLogin(this, userDao, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), WicketUtils
+    LoginPage.internalCheckLogin(this, userDao, dataSource, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), WicketUtils
         .getDefaultMobilePage(), targetUrlAfterLogin);
   }
 
