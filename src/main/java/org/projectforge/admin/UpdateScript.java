@@ -42,21 +42,14 @@ public class UpdateScript implements Serializable
   @XmlField(asAttribute = true)
   private String version;
 
-  @XmlField(asAttribute = true, alias = "war-file")
-  private String warFile;
-
-  @XmlField(alias = "skip-version")
-  private boolean skipVersion;
-
-  private boolean experimental;
-
   @XmlField(alias = "pre-check", asCDATA = true)
   private String preCheck;
 
   @XmlField(asCDATA = true)
   private String script;
 
-  private transient boolean visible;
+  @XmlField
+  private String description;
 
   private transient UpdatePreCheckStatus preCheckStatus = UpdatePreCheckStatus.UNKNOWN;
 
@@ -74,33 +67,6 @@ public class UpdateScript implements Serializable
   public void setVersion(String version)
   {
     this.version = version;
-  }
-
-  /**
-   * Name of the war file matching the new version for download.
-   * @return
-   */
-  public String getWarFile()
-  {
-    return warFile;
-  }
-
-  public void setWarFile(String warFile)
-  {
-    this.warFile = warFile;
-  }
-
-  /**
-   * Is it possible to skip this version while installing update files of different versions at once?
-   */
-  public boolean isSkipVersion()
-  {
-    return skipVersion;
-  }
-
-  public void setSkipVersion(boolean skipVersion)
-  {
-    this.skipVersion = skipVersion;
   }
 
   /**
@@ -150,29 +116,6 @@ public class UpdateScript implements Serializable
     this.runningResult = runningResult;
   }
 
-  public boolean isVisible()
-  {
-    return visible;
-  }
-
-  public void setVisible(boolean visible)
-  {
-    this.visible = visible;
-  }
-
-  /**
-   * This flag indicates that this script is not visible for productive systems.
-   */
-  public boolean isExperimental()
-  {
-    return experimental;
-  }
-
-  public void setExperimental(boolean experimental)
-  {
-    this.experimental = experimental;
-  }
-
   public UpdatePreCheckStatus getPreCheckStatus()
   {
     return preCheckStatus;
@@ -191,6 +134,11 @@ public class UpdateScript implements Serializable
   public void setRunningStatus(UpdateRunningStatus runningStatus)
   {
     this.runningStatus = runningStatus;
+  }
+
+  public String getDescription()
+  {
+    return description;
   }
 
   @Override
