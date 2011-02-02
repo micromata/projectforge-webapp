@@ -80,6 +80,8 @@ public class UserFilter implements Filter
 
   private static UserDao userDao;
 
+  private static boolean updateRequiredFirst = false;
+
   private final static String LOGIN_URL = "/wa/" + WebRegistry.BOOKMARK_LOGIN;
 
   private final static String MOBILE_LOGIN_URL = "/wa/" + WebRegistry.BOOKMARK_MOBILE_LOGIN;
@@ -89,6 +91,16 @@ public class UserFilter implements Filter
     UserFilter.userDao = userDao;
     UserFilter.contextPath = contextPath;
     IGNORE_PREFIX = contextPath + '/' + WicketUtils.WICKET_APPLICATION_PATH + "resources";
+  }
+
+  public static void setUpdateRequiredFirst(final boolean value)
+  {
+    updateRequiredFirst = value;
+  }
+  
+  public static boolean isUpdateRequiredFirst()
+  {
+    return updateRequiredFirst;
   }
 
   public static String getTargetUrlAfterLogin(final HttpServletRequest request)
@@ -189,7 +201,8 @@ public class UserFilter implements Filter
           if (log.isDebugEnabled() == true) {
             log.debug("User found in session: " + request.getRequestURI());
           }
-        } else {
+        } else if (updateRequiredFirst == false) {
+          // Ignore stay-logged-in if redirect to update page is required.
           user = checkStayLoggedIn(request, response);
           if (user != null) {
             if (log.isDebugEnabled() == true) {
