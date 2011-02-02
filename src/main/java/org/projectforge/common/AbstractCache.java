@@ -40,11 +40,11 @@ public abstract class AbstractCache
 
   protected long expireTime = 60 * TICKS_PER_MINUTE;
 
-  private long timeOfLastRefresh = -1;
+  private transient long timeOfLastRefresh = -1;
 
-  private boolean isExpired = false;
+  private transient boolean isExpired = true;
 
-  private boolean refreshInProgress = false;
+  private transient boolean refreshInProgress = false;
 
   protected AbstractCache()
   {
