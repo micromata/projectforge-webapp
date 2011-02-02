@@ -50,14 +50,17 @@ import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.convert.ConverterLocator;
 import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.Version;
+import org.projectforge.admin.UpdateChecker;
 import org.projectforge.common.ExceptionHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.CronSetup;
 import org.projectforge.core.ProjectForgeException;
 import org.projectforge.core.SystemInfoCache;
+import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.registry.DaoRegistry;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.UserFilter;
@@ -104,6 +107,9 @@ public class WicketApplication extends WebApplication
 
   @SpringBean(name = "daoRegistry")
   private DaoRegistry daoRegistry;
+
+  @SpringBean(name = "updateChecker")
+  private UpdateChecker updateChecker;
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
@@ -155,11 +161,16 @@ public class WicketApplication extends WebApplication
     this.daoRegistry = daoRegistry;
   }
 
+  public void setUpdateChecker(UpdateChecker updateChecker)
+  {
+    this.updateChecker = updateChecker;
+  }
+
   public void setUserDao(UserDao userDao)
   {
     this.userDao = userDao;
   }
-  
+
   public void setSystemInfoCache(SystemInfoCache systemInfoCache)
   {
     this.systemInfoCache = systemInfoCache;
@@ -271,7 +282,14 @@ public class WicketApplication extends WebApplication
     log.info("Default TimeZone is: " + TimeZone.getDefault());
     log.info("user.timezone is: " + System.getProperty("user.timezone"));
     cronSetup.initialize();
-    log.fatal(Version.APP_ID + " " + Version.NUMBER + " (" + Version.RELEASE_TIMESTAMP +  ") initialized.");
+    log.fatal(Version.APP_ID + " " + Version.NUMBER + " (" + Version.RELEASE_TIMESTAMP + ") initialized.");
+
+    PFUserContext.setUser(DatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
+    if (updateChecker.isUpdated() == false) {
+      // Force redirection to update page:
+      UserFilter.setUpdateRequiredFirst(true);
+    }
+    PFUserContext.setUser(null);
   }
 
   @Override
