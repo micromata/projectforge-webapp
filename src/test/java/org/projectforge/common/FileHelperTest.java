@@ -26,8 +26,9 @@ package org.projectforge.common;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.projectforge.test.TestBase;
 
-public class FileHelperTest
+public class FileHelperTest extends TestBase
 {
   @Test
   public void createSafeFilename()
