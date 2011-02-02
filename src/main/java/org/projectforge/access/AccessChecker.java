@@ -538,7 +538,9 @@ public class AccessChecker
 
   public boolean isDemoUser(final PFUserDO user)
   {
-    Validate.notNull(user);
+    if (user == null) {
+      return false;
+    }
     if ("demo".equals(user.getUsername()) == false) {
       return false;
     }
