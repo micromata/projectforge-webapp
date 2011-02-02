@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <!-- This file is needed for updating any previous version of the data base. -->
+<projectforge-self-update>
+  <update version="3.5.0">
+    <description>Add column book_type to t_book.</description>
+    <pre-check><![CDATA[
+    if (dao.doesTableAttributeExist("t_book", "book_type") == true) {
+      // Update already done:
+      return UpdatePreCheckStatus.ALREADY_UPDATED;
+    }
+    return UpdatePreCheckStatus.OK;
+    ]]>
+    </pre-check>
+    <script><![CDATA[
+      dao.execute("ALTER TABLE t_book ADD COLUMN book_type VARCHAR(20)");
+      return UpdateRunningStatus.DONE;
+    ]]>
+    </script>
+  </update>
+  <update version="3.4.3">
+    <description>Add column description to t_group_task_access.</description>
+    <pre-check><![CDATA[
+    if (dao.doesTableAttributeExist("t_group_task_access", "description") == true) {
+      // Update already done:
+      return UpdatePreCheckStatus.ALREADY_UPDATED;
+    }
+    return UpdatePreCheckStatus.OK;
+    ]]>
+    </pre-check>
+    <script><![CDATA[
+      dao.execute("ALTER TABLE t_group_task_access ADD COLUMN description VARCHAR(4000)");
+      return UpdateRunningStatus.DONE;
+    ]]>
+    </script>
+  </update>
+  <update version="3.4.0">
+    <description>Alters table t_task and t_gantt_chart.</description>
+    <pre-check><![CDATA[
+    if (dao.doesTableAttributeExist("t_gantt_chart", "settings_as_xml") == true &&
+        dao.doesTableAttributeExist("t_task", "gantt_dep_type") == false) {
+      // Update already done:
+      return UpdatePreCheckStatus.ALREADY_UPDATED;
+    }
+    return UpdatePreCheckStatus.OK;
+    ]]>
+    </pre-check>
+    <script><![CDATA[
+    if (dao.doesTableAttributeExist("t_gantt_chart", "settings_as_xml") == false) {
+      if (dao.doesTableExist("t_gantt_chart") == true && dao.dropTable("t_gantt_chart") == false) {
+        throw new RuntimeException("Table t_gantt_chart is not empty! Aborting the update.");
+      }
+      Table table = new Table("t_gantt_chart")
+        .addAttribute(new TableAttribute("pk", TableAttributeType.INT, true).setPrimaryKey(true))
+        .addAttribute(new TableAttribute("created", TableAttributeType.TIMESTAMP))
+        .addAttribute(new TableAttribute("last_update", TableAttributeType.TIMESTAMP))
+        .addAttribute(new TableAttribute("deleted", TableAttributeType.BOOLEAN, true))
+        .addAttribute(new TableAttribute("name", TableAttributeType.VARCHAR, 1000))
+        .addAttribute(new TableAttribute("task_fk", TableAttributeType.INT).setForeignTable("t_task").setForeignAttribute("pk"))
+        .addAttribute(new TableAttribute("settings_as_xml", TableAttributeType.VARCHAR, 10000))
+        .addAttribute(new TableAttribute("style_as_xml", TableAttributeType.VARCHAR, 10000))
+        .addAttribute(new TableAttribute("gantt_objects_as_xml", TableAttributeType.VARCHAR, 10000))
+        .addAttribute(new TableAttribute("owner_fk", TableAttributeType.INT).setForeignTable("t_pf_user").setForeignAttribute("pk"))
+        .addAttribute(new TableAttribute("read_access", TableAttributeType.VARCHAR, 16))
+        .addAttribute(new TableAttribute("write_access", TableAttributeType.VARCHAR, 16));
+      dao.createTable(table);
+    }
+    if (dao.doesTableAttributeExist("t_task", "gantt_dep_type") == true) {
+      if (dao.getHibernateDialect() == HibernateDialect.HSQL) {
+        dao.execute("ALTER TABLE t_task ALTER COLUMN duration_days RENAME TO duration");
+        dao.execute("ALTER TABLE t_task ALTER COLUMN gantt_dep_day_offset RENAME TO gantt_predecessor_offset");
+        dao.execute("ALTER TABLE t_task ALTER COLUMN gantt_dep_on_task_fk RENAME TO gantt_predecessor_fk");
+      } else {
+        dao.execute("ALTER TABLE t_task RENAME COLUMN duration_days TO duration");
+        dao.execute("ALTER TABLE t_task RENAME COLUMN gantt_dep_day_offset TO gantt_predecessor_offset");
+        dao.execute("ALTER TABLE t_task RENAME COLUMN gantt_dep_on_task_fk TO gantt_predecessor_fk");
+      }
+      dao.addTableColumns("t_task", new TableAttribute("gantt_rel_type", TableAttributeType.VARCHAR, 15));
+      dao.execute("ALTER TABLE t_task DROP COLUMN gantt_dep_type"); // Not yet really used.
+    }
+    return UpdateRunningStatus.DONE;
+    ]]>
+    </script>
+  </update>
+  <update version="3.3.47">
+    <description>Alters table t_pf_user, t_imported_meb_entry, t_group_task_access and t_task. Adds table t_contract.</description>
+    <pre-check><![CDATA[
+    if (dao.doesTableAttributeExist("t_pf_user", "jira_username") == true &&
+        dao.doesTableAttributeExist("t_imported_meb_entry", "source") == true &&
+        dao.doesTableAttributeExist("t_group_task_access", "recursive") == true &&
+        dao.doesTableAttributeExist("t_task", "workpackage_code") == true &&
+        dao.doesTableAttributeExist("t_task", "start_date") == true &&
+        dao.doesTableExist("t_contract") == true) {
+      // Update already done:
+      return UpdatePreCheckStatus.ALREADY_UPDATED;
+    }
+    return UpdatePreCheckStatus.OK;
+    ]]>
+    </pre-check>
+    <script><![CDATA[
+    if (dao.doesTableAttributeExist("t_pf_user", "jira_username") == false) {
+      dao.addTableColumns("t_pf_user",
+        new TableAttribute("jira_username", TableAttributeType.VARCHAR, 100));
+    }
+    if (dao.doesTableAttributeExist("t_imported_meb_entry", "source") == false) {
+      dao.addTableColumns("t_imported_meb_entry",
+        new TableAttribute("source", TableAttributeType.VARCHAR, 10));
+    }
+    if (dao.doesTableAttributeExist("t_group_task_access", "recursive") == false) {
+      //TableAttribute attr = new TableAttribute("recursive", TableAttributeType.BOOLEAN, false);
+      //attr.setDefaultValue("true");
+      //dao.addTableColumns("t_group_task_access", attr);
+      // default value not supported in 3.3.46 and previous versions:
+      dao.execute("ALTER TABLE t_group_task_access ADD COLUMN recursive BOOLEAN DEFAULT true");
+      dao.execute("ALTER TABLE t_group_task_access ALTER COLUMN recursive SET NOT NULL");
+    }
+    if (dao.doesTableAttributeExist("t_task", "workpackage_code") == false) {
+      dao.addTableColumns("t_task",
+        new TableAttribute("workpackage_code", TableAttributeType.VARCHAR, 100),
+        new TableAttribute("gantt_type", TableAttributeType.VARCHAR, 10),
+        new TableAttribute("duration_days", TableAttributeType.DECIMAL, 10, 5),
+        new TableAttribute("gantt_dep_type", TableAttributeType.CHAR, 2),
+        new TableAttribute("gantt_dep_day_offset", TableAttributeType.INT),
+        new TableAttribute("gantt_dep_on_task_fk", TableAttributeType.INT).setForeignTable("t_task").setForeignAttribute("pk"));
+    }
+    if (dao.doesTableAttributeExist("t_task", "start_date") == false) {
+      if (dao.getHibernateDialect() == HibernateDialect.HSQL) {
+        dao.execute("ALTER TABLE t_task ALTER COLUMN resumption RENAME TO start_date");
+        dao.execute("ALTER TABLE t_task ALTER COLUMN deadline RENAME TO end_date");
+        dao.execute("ALTER TABLE t_task ALTER COLUMN name RENAME TO title");
+      } else {
+        dao.execute("ALTER TABLE t_task RENAME COLUMN resumption TO start_date");
+        dao.execute("ALTER TABLE t_task RENAME COLUMN deadline TO end_date");
+        dao.execute("ALTER TABLE t_task RENAME COLUMN name TO title");
+      }
+      dao.execute("ALTER TABLE t_task DROP COLUMN from_date"); // unused.
+      if (dao.getHibernateDialect() == HibernateDialect.PostgreSQL) {
+        dao.execute("ALTER TABLE t_task DROP CONSTRAINT t_task_parent_task_id_key");
+      }
+      dao.addUniqueConstraint("t_task", "t_task_parent_task_id_key", "parent_task_id", "title");
+    }
+    if (dao.doesTableExist("t_contract") == false) {
+      Table table = new Table("t_contract")
+        .addAttribute(new TableAttribute("pk", TableAttributeType.INT, true).setPrimaryKey(true))
+        .addAttribute(new TableAttribute("created", TableAttributeType.TIMESTAMP))
+        .addAttribute(new TableAttribute("last_update", TableAttributeType.TIMESTAMP))
+        .addAttribute(new TableAttribute("deleted", TableAttributeType.BOOLEAN, true))
+        .addAttribute(new TableAttribute("number", TableAttributeType.INT, true))
+        .addAttribute(new TableAttribute("c_date", TableAttributeType.DATE))
+        .addAttribute(new TableAttribute("valid_from", TableAttributeType.DATE))
+        .addAttribute(new TableAttribute("valid_until", TableAttributeType.DATE))
+        .addAttribute(new TableAttribute("title", TableAttributeType.VARCHAR, 1000))
+        .addAttribute(new TableAttribute("co_contractor_a", TableAttributeType.VARCHAR, 1000))
+        .addAttribute(new TableAttribute("contract_person_a", TableAttributeType.VARCHAR, 1000))
+        .addAttribute(new TableAttribute("signer_a", TableAttributeType.VARCHAR, 1000))
+        .addAttribute(new TableAttribute("co_contractor_b", TableAttributeType.VARCHAR, 1000))
+        .addAttribute(new TableAttribute("contract_person_b", TableAttributeType.VARCHAR, 1000))
+        .addAttribute(new TableAttribute("signer_b", TableAttributeType.VARCHAR, 1000))
+        .addAttribute(new TableAttribute("signing_date", TableAttributeType.DATE))
+        .addAttribute(new TableAttribute("type", TableAttributeType.VARCHAR, 100))
+        .addAttribute(new TableAttribute("status", TableAttributeType.VARCHAR, 100))
+        .addAttribute(new TableAttribute("text", TableAttributeType.VARCHAR, 4000))
+        .addAttribute(new TableAttribute("reference", TableAttributeType.VARCHAR, 1000))
+        .addAttribute(new TableAttribute("filing", TableAttributeType.VARCHAR, 1000))
+        .addAttribute(new TableAttribute("resubmission_on_date", TableAttributeType.DATE))
+        .addAttribute(new TableAttribute("due_date", TableAttributeType.DATE));
+      dao.createTable(table);
+      dao.addUniqueConstraint("t_contract", "t_contract_uniq", "number");
+    }
+    dao.createMissingIndices();
+    dao.dropIndex("idx_fk_t_task_kost2_id");
+    dao.dropIndex("idx_fk_t_task_old_kost2_id");
+    dao.dropIndex("idx_fk_t_task_old_projekt_id");
+    dao.dropIndex("idx_fk_t_task_projekt_id");
+    return UpdateRunningStatus.DONE;
+    ]]>
+    </script>
+  </update>
+  <update version="3.3.45">
+    <description>Adds table t_meb_entry and t_imported_meb_entry. Alters table t_pf_user.</description>
+    <pre-check><![CDATA[
+    if (dao.doesTableExist("t_meb_entry") == false || dao.doesTableAttributeExist("t_pf_user", "personal_meb_identifiers") == false) {
+      return UpdatePreCheckStatus.OK;
+    }
+    return UpdatePreCheckStatus.ALREADY_UPDATED;
+    ]]>
+    </pre-check>
+    <script><![CDATA[
+    if (dao.doesTableAttributeExist("t_pf_user", "personal_meb_identifiers") == false) {
+      dao.addTableColumns("t_pf_user",
+        new TableAttribute("personal_meb_identifiers", TableAttributeType.VARCHAR, 255));
+    }
+    if (dao.doesTableExist("t_meb_entry") == false) {
+      Table table = new Table("t_meb_entry")
+        .addAttribute(new TableAttribute("pk", TableAttributeType.INT, true).setPrimaryKey(true))
+        .addAttribute(new TableAttribute("created", TableAttributeType.TIMESTAMP))
+        .addAttribute(new TableAttribute("last_update", TableAttributeType.TIMESTAMP))
+        .addAttribute(new TableAttribute("deleted", TableAttributeType.BOOLEAN, true))
+        .addAttribute(new TableAttribute("sender", TableAttributeType.VARCHAR, 255).setNullable(false))
+        .addAttribute(new TableAttribute("title", TableAttributeType.VARCHAR, 255))
+        .addAttribute(new TableAttribute("message", TableAttributeType.VARCHAR, 4000))
+        .addAttribute(new TableAttribute("date", TableAttributeType.TIMESTAMP).setNullable(false))
+        .addAttribute(new TableAttribute("status", TableAttributeType.VARCHAR, 20).setNullable(false))
+        .addAttribute(new TableAttribute("owner_fk", TableAttributeType.INT).setForeignTable("t_pf_user").setForeignAttribute("pk"));
+      dao.createTable(table);
+    }
+    if (dao.doesTableExist("t_imported_meb_entry") == false) {
+      Table table = new Table("t_imported_meb_entry")
+        .addAttribute(new TableAttribute("pk", TableAttributeType.INT, true).setPrimaryKey(true))
+        .addAttribute(new TableAttribute("created", TableAttributeType.TIMESTAMP))
+        .addAttribute(new TableAttribute("last_update", TableAttributeType.TIMESTAMP))
+        .addAttribute(new TableAttribute("deleted", TableAttributeType.BOOLEAN, true))
+        .addAttribute(new TableAttribute("sender", TableAttributeType.VARCHAR, 255).setNullable(false))
+        .addAttribute(new TableAttribute("check_sum", TableAttributeType.VARCHAR, 255).setNullable(false))
+        .addAttribute(new TableAttribute("date", TableAttributeType.TIMESTAMP).setNullable(false));
+      dao.createTable(table);
+      dao.addUniqueConstraint("t_imported_meb_entry", "t_imported_meb_entry_uniq", "sender", "date", "check_sum");
+    }
+    dao.createMissingIndices();
+    return UpdateRunningStatus.DONE;
+    ]]>
+    </script>
+  </update>
+  <update version="3.3.44">
+    <description>Drops and re-creates table t_user_rigt (must be empty).</description>
+    <pre-check><![CDATA[
+    if (dao.doesTableExist("t_user_right") == false) {
+      return UpdatePreCheckStatus.OK;
+    }
+    if (dao.doesTableExist("t_user_right") == true && dao.doesTableAttributeExist("t_user_right", "created") == true) {
+      // Update already done:
+      return UpdatePreCheckStatus.ALREADY_UPDATED;
+    }
+    if (dao.isTableEmpty("t_user_right") == false) {
+      // Should not occur, because table was unused before this patch.
+      log.error("Table t_user_right is not empty (could not execute patch script)!");
+      return UpdatePreCheckStatus.FAILED;
+    }
+    return UpdatePreCheckStatus.OK;
+    ]]>
+    </pre-check>
+    <script><![CDATA[
+    if (dao.dropTable("t_user_right") == false) {
+      log.error("Table t_user_right is not empty! Aborting the update.");
+      return UpdateRunningStatus.FAILED;
+    }
+    log.info("t_user_right is empty or does not exist. (Re-) creating table t_user_right.");
+    final Table table = new Table("t_user_right")//
+      .addAttribute(new TableAttribute("pk", TableAttributeType.INT, true).setPrimaryKey(true))//
+      .addAttribute(new TableAttribute("created", TableAttributeType.TIMESTAMP)) //
+      .addAttribute(new TableAttribute("last_update", TableAttributeType.TIMESTAMP)) //
+      .addAttribute(new TableAttribute("deleted", TableAttributeType.BOOLEAN, true)) //
+      .addAttribute(new TableAttribute("right_id", TableAttributeType.VARCHAR, 40).setNullable(false)) //
+      .addAttribute(new TableAttribute("value", TableAttributeType.VARCHAR, 40)) //
+      .addAttribute(new TableAttribute("user_fk", TableAttributeType.INT).setForeignTable("t_pf_user").setForeignAttribute("pk").setNullable(false));
+    dao.createTable(table);
+    dao.addUniqueConstraint("t_user_right", "t_user_right_user_fk_key", "user_fk", "right_id");
+    dao.createMissingIndices();
+    return UpdateRunningStatus.DONE;
+    ]]>
+    </script>
+  </update>
+</projectforge-self-update>
