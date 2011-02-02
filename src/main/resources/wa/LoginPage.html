@@ -10,6 +10,11 @@
   <div wicket:id="feedback">[Validation errors]</div>
 
   <h3><wicket:message key="login.welcome" /></h3>
+  <div class="clearfix" wicket:id="administratorLoginNeeded">
+    <label style="color: red;">
+      <wicket:message key="login.adminLoginRequired" />
+    </label>
+    </div>
 	<div class="clearfix">
 		<label for="username">
 			<wicket:message key="username" />
