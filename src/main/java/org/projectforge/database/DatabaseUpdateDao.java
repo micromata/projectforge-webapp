@@ -33,6 +33,8 @@ import org.apache.commons.lang.StringUtils;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDO;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -58,6 +60,13 @@ public class DatabaseUpdateDao
 
   DatabaseSupport databaseSupport;
 
+  private static PFUserDO SYSTEM_ADMIN_PSEUDO_USER = new PFUserDO().setUsername("System admin user only for internal usage");
+
+  public static PFUserDO __internalGetSystemAdminPseudoUser()
+  {
+    return SYSTEM_ADMIN_PSEUDO_USER;
+  }
+
   private DatabaseSupport getDatabaseSupport()
   {
     if (databaseSupport == null) {
@@ -66,15 +75,19 @@ public class DatabaseUpdateDao
     return databaseSupport;
   }
 
-  private void accessCheck()
+  private void accessCheck(final boolean writeaccess)
   {
+    if (writeaccess == false && PFUserContext.getUser() == SYSTEM_ADMIN_PSEUDO_USER) {
+      // No access check for the system admin pseudo user.
+      return;
+    }
     accessChecker.checkIsUserMemberOfAdminGroup();
     accessChecker.checkDemoUser();
   }
 
   public boolean doesTableExist(final String table)
   {
-    accessCheck();
+    accessCheck(false);
     /*
      * try { final ResultSet resultSet = dataSource.getConnection().getMetaData().getTables(CATALOG, SCHEMA_PATTERN, table, new String[] {
      * TABLE_TYPE}); return resultSet.next(); } catch (final SQLException ex) { log.error(ex.getMessage(), ex); throw new
@@ -91,7 +104,7 @@ public class DatabaseUpdateDao
 
   public boolean doesTableAttributeExist(final String table, final String attribute)
   {
-    accessCheck();
+    accessCheck(false);
     final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
     try {
       jdbc.queryForInt("SELECT COUNT(" + attribute + ") FROM " + table);
@@ -103,7 +116,7 @@ public class DatabaseUpdateDao
 
   public boolean isTableEmpty(final String table)
   {
-    accessCheck();
+    accessCheck(false);
     final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
     try {
       return jdbc.queryForInt("SELECT COUNT(*) FROM " + table) == 0;
@@ -118,7 +131,7 @@ public class DatabaseUpdateDao
    */
   public boolean dropTable(final String table)
   {
-    accessCheck();
+    accessCheck(true);
     if (doesTableExist(table) == false) {
       // Table is already dropped or does not exist.
       return true;
@@ -140,7 +153,7 @@ public class DatabaseUpdateDao
    */
   public boolean dropTableAttribute(final String table, final String attribute)
   {
-    accessCheck();
+    accessCheck(true);
     execute("ALTER TABLE " + table + " DROP COLUMN " + attribute);
     return true;
   }
@@ -201,7 +214,7 @@ public class DatabaseUpdateDao
 
   public boolean createTable(final Table table)
   {
-    accessCheck();
+    accessCheck(true);
     final StringBuffer buf = new StringBuffer();
     buildCreateTableStatement(buf, table);
     execute(buf.toString());
@@ -272,7 +285,7 @@ public class DatabaseUpdateDao
 
   public boolean addUniqueConstraint(final String table, final String constraintName, final String... attributes)
   {
-    accessCheck();
+    accessCheck(true);
     final StringBuffer buf = new StringBuffer();
     buildAddUniqueConstraintStatement(buf, table, constraintName, attributes);
     execute(buf.toString());
@@ -285,7 +298,7 @@ public class DatabaseUpdateDao
    */
   public int createMissingIndices()
   {
-    accessCheck();
+    accessCheck(true);
     log.info("createMissingIndices called.");
     int counter = 0;
     // For user / time period search:
@@ -314,7 +327,7 @@ public class DatabaseUpdateDao
    */
   public int fixDBHistoryEntries()
   {
-    accessCheck();
+    accessCheck(true);
     return internalFixDBHistoryEntries();
   }
 
@@ -449,7 +462,7 @@ public class DatabaseUpdateDao
    */
   public boolean createIndex(final String name, final String table, final String attributes)
   {
-    accessCheck();
+    accessCheck(true);
     try {
       final String jdbcString = "CREATE INDEX " + name + " ON " + table + "(" + attributes + ");";
       final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
@@ -469,7 +482,7 @@ public class DatabaseUpdateDao
    */
   public boolean dropIndex(final String name)
   {
-    accessCheck();
+    accessCheck(true);
     try {
       execute("DROP INDEX " + name);
       return true;
@@ -497,7 +510,7 @@ public class DatabaseUpdateDao
    */
   public boolean execute(final String jdbcString, final boolean ignoreErrors)
   {
-    accessCheck();
+    accessCheck(true);
     final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
     log.info(jdbcString);
     if (ignoreErrors == true) {
@@ -515,7 +528,7 @@ public class DatabaseUpdateDao
 
   public int queryForInt(final String jdbcQuery)
   {
-    accessCheck();
+    accessCheck(false);
     final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
     log.info(jdbcQuery);
     return jdbc.queryForInt(jdbcQuery);
