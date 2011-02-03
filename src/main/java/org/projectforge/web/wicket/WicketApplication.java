@@ -50,7 +50,7 @@ import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.convert.ConverterLocator;
 import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.Version;
-import org.projectforge.admin.UpdateChecker;
+import org.projectforge.admin.SystemUpdater;
 import org.projectforge.common.ExceptionHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDao;
@@ -108,8 +108,8 @@ public class WicketApplication extends WebApplication
   @SpringBean(name = "daoRegistry")
   private DaoRegistry daoRegistry;
 
-  @SpringBean(name = "updateChecker")
-  private UpdateChecker updateChecker;
+  @SpringBean(name = "systemUpdater")
+  private SystemUpdater systemUpdater;
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
@@ -161,9 +161,9 @@ public class WicketApplication extends WebApplication
     this.daoRegistry = daoRegistry;
   }
 
-  public void setUpdateChecker(UpdateChecker updateChecker)
+  public void setSystemUpdater(SystemUpdater systemUpdater)
   {
-    this.updateChecker = updateChecker;
+    this.systemUpdater = systemUpdater;
   }
 
   public void setUserDao(UserDao userDao)
@@ -285,7 +285,7 @@ public class WicketApplication extends WebApplication
     log.fatal(Version.APP_ID + " " + Version.NUMBER + " (" + Version.RELEASE_TIMESTAMP + ") initialized.");
 
     PFUserContext.setUser(DatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
-    if (updateChecker.isUpdated() == false) {
+    if (systemUpdater.isUpdated() == false) {
       // Force redirection to update page:
       UserFilter.setUpdateRequiredFirst(true);
     }
