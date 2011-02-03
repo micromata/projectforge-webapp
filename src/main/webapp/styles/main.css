@@ -109,7 +109,7 @@ ul#normal li span.parent{display:block;float:none;padding:1em 0 0.5em 0;border-b
 ul#personal li a:hover,
 ul#personal li span.parent:hover,
 ul#normal>li>a:hover{color:#2E373C;cursor:pointer;-moz-box-shadow:inset 0 0 10px #BBC1C3;-webkit-box-shadow:inset 0 0 10px #BBC1C3;box-shadow:inset 0 0 10px #BBC1C3;}
-ul#personal li a span.remover{color:red;position:absolute;right:0;top:0;font-family:Embats;font-size-adjust:0.9;padding:0 0 0 0.3em;}
+ul#personal li a span.remover{color: red;font-family: Embats;padding: 0px 0.3em 0 0;}
 ul#normal ul#nav{width:80em;z-index:19;position:absolute;right:0.5em;top:2.7em;padding:0 1em 1em 1em;border:1px solid #D9DFE1;display:none;}
 ul#normal li.active ul#nav{display:block;}
 ul#normal li ul li ul{position:relative;}
