@@ -26,80 +26,51 @@ package org.projectforge.web.admin;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
-import org.apache.wicket.markup.html.form.upload.FileUploadField;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.util.lang.Bytes;
-import org.projectforge.Version;
 import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateScript;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
-public class UpdateForm extends AbstractForm<UpdateForm, UpdatePage>
+public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdatePage>
 {
   private static final long serialVersionUID = 2492737003121592489L;
-
-  protected FileUploadField fileUploadField;
 
   protected WebMarkupContainer scripts;
 
   public boolean showOldUpdateScripts;
 
-  public UpdateForm(final UpdatePage parentPage)
+  public SystemUpdateForm(final SystemUpdatePage parentPage)
   {
     super(parentPage);
-
-    // set this form to multipart mode (allways needed for uploads!)
-    setMultiPart(true);
-
-    // Add one file input field
-    add(fileUploadField = new FileUploadField("fileInput"));
-
-    // Set maximum size to 100K for demo purposes
-    setMaxSize(Bytes.kilobytes(100));
   }
 
   @SuppressWarnings("serial")
   protected void init()
   {
-    add(new Label("currentVersion", Version.NUMBER));
     scripts = new WebMarkupContainer("scripts");
     add(scripts);
     updateScriptRows();
     add(new CheckBox("showOldVersionUpdatesCheckBox", new PropertyModel<Boolean>(this, "showOldUpdateScripts")));
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    final Button uploadButton = new Button("button", new Model<String>(getString("upload"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.upload();
-      }
-    };
-    add(new SingleButtonPanel("upload", uploadButton));
     final Button refresh = new Button("button", new Model<String>("refresh")) {
       @Override
       public final void onSubmit()
       {
-        parentPage.updateScriptStatus();
+        parentPage.refresh();
       }
     };
     add(new SingleButtonPanel("refresh", refresh));
     setDefaultButton(refresh);
-    final Button checkForUpdate = new Button("button", new Model<String>("check for updates")) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.checkForUpdates();
-      }
-    };
-    add(new SingleButtonPanel("checkForUpdates", checkForUpdate));
   }
 
   @SuppressWarnings("serial")
@@ -108,7 +79,7 @@ public class UpdateForm extends AbstractForm<UpdateForm, UpdatePage>
     scripts.removeAll();
     final RepeatingView scriptRows = new RepeatingView("scriptRows");
     scripts.add(scriptRows);
-    final List<UpdateScript> updateScripts = parentPage.updateScripts;
+    final List<UpdateScript> updateScripts = parentPage.systemUpdater.getUpdateScripts();
     if (updateScripts == null) {
       return;
     }
@@ -117,6 +88,16 @@ public class UpdateForm extends AbstractForm<UpdateForm, UpdatePage>
       final WebMarkupContainer item = new WebMarkupContainer(scriptRows.newChildId());
       scriptRows.add(item);
       item.add(new Label("version", StringUtils.isBlank(version) == true ? "???" : version));
+      final Link<String> downloadScriptLink = new Link<String>("downloadScript") {
+        @Override
+        public void onClick()
+        {
+          parentPage.downloadUpdateScript(updateScript);
+        }
+      };
+      downloadScriptLink.add(new SimpleAttributeModifier("title", "You can use this script for own modifications and manual updates."));
+      item.add(downloadScriptLink);
+      downloadScriptLink.add(new Label("fileName", "update-script-" + version).setRenderBodyOnly(true));
       item.add(new Label("preCheckResult", new Model<String>() {
         @Override
         public String getObject()

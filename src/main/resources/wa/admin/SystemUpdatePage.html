@@ -13,18 +13,11 @@
       <th style="color: red;">Important notes:</th>
       <td>
       <ol>
-        <li style="color: red;">Please make a backup of your data base AND the installed ProjectForge version before running the scripts!</li>
-        <li style="color: red;">Your current ProjectForge installation is not runnable further more, after running the scripts!</li>
-        <li>If you can't start ProjectForge after re-installation (because the data base scheme does not match the current ProjectForge version),
-        please install the ProjectForge version matching your current version you have updated to (new version in the table below).</li>
+        <li style="color: red;">Please make a backup of your data base before running the scripts!</li>
         <li>Watch the ProjectForge log files for seeing the results of the update scripts.</li>
         <li>In productive installations it's recommended to disable the automatically schema update in the context.xml.</li>
       </ol>
       </td>
-    </tr>
-    <tr>
-      <th>Current installed version</th>
-      <td wicket:id="currentVersion">[3.3.43]</td>
     </tr>
     <tr>
       <th>Update-Scripts</th>
@@ -32,8 +25,6 @@
       <table border="1">
         <tr>
           <th title="The version to update to."><i>Version</i></th>
-          <th title="Can you skip this version while updating diffferent versions at once?"><i>Skip</i></th>
-          <th>Download war</th>
           <th>Update script</th>
           <th>Pre-check</th>
           <th>Result</th>
@@ -41,8 +32,6 @@
         <wicket:container wicket:id="scripts">
           <tr wicket:id="scriptRows">
             <td wicket:id="version">[3.3.44]</td>
-            <td wicket:id="skipVersion">[yes]</td>
-            <td><a wicket:id="downloadWar" href="http://www.projectforge.org/downloads/3.3.44/ProjectForge-3.3.44.zip">[ProjectForge-3.3.44.zip]</a></td>
             <td><a wicket:id="downloadScript"><span wicket:id="fileName">[update-script-3.3.44.xml]</span></a></td>
             <td wicket:id="preCheckResult">[--]</td>
             <td><span wicket:id="update">[run]</span></td>
@@ -58,15 +47,10 @@
     </tr>
     <tr>
       <th></th>
-      <td class="buttonpanel"><span wicket:id="refresh">[refresh]</span><span wicket:id="checkForUpdates">[check for updates]</span></td>
+      <td class="buttonpanel"><span wicket:id="refresh">[refresh]</span></td>
     </tr>
     <tr class="hRuler">
       <td colspan="2"></td>
-    </tr>
-    <tr>
-      <th><label for="upload"><wicket:message key="file" /></label></th>
-      <td><input wicket:id="fileInput" id="upload" type="file" /> <span wicket:id="upload">[upload]</span> (For manual proceeding, please try
-      "check for updates" first.)</td>
     </tr>
   </table>
   </fieldset>
