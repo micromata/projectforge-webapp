@@ -15,10 +15,11 @@
 
 
   <label for="searchfilter" class="clear full title"><wicket:message key="searchFilter" /></label> <input type="text" id="searchfilter"
-    wicket:id="searchString" class="text double title" /> <label class="clear double putfull"><wicket:container wicket:id="datesAsUTC">[2001-09-30 22:00:00.0 UTC - 2001-10-31 22:59:59.999 UTC]</wicket:container></label>
+    wicket:id="searchString" class="text double title" />
+  <label class="clear double putfull"><wicket:container wicket:id="datesAsUTC">[2001-09-30 22:00:00.0 UTC - 2001-10-31 22:59:59.999 UTC]</wicket:container></label>
   <label for="lastmodified" class="clear full"><wicket:message key="filter.lastModified" /></label> <span wicket:id="startDate">[startDate]</span> <label
     class="quart center"> bis </label> <span wicket:id="stopDate">[stopDate]</span> <label for="lastdays" class="quart">Range</label> <select
-    id="lastdays" class="half clear" wicket:id="lastDays" onchange="javascript:submit();">
+    id="lastdays" class="half" wicket:id="lastDays" onchange="javascript:submit();">
     <option>[choose time period]</option>
   </select> <label class="full clear"><wicket:message key="search.area" /></label> <select class="double" wicket:id="area" onchange="javascript:submit();">
     <option>[All]</option>
@@ -32,12 +33,6 @@
   <fieldset class="buttons roundcorners boxshadow"><span wicket:id="search">[search]</span> <span wicket:id="reset">[reset]</span></fieldset>
 
   </form>
-
-  <ul>
-    <li>TODO:</li>
-    <li>More entries: link to ListPage with predefined filter.</li>
-    <li>Checkbox for disabling search in large data base tables.</li>
-  </ul>
 
   <fieldset><legend><wicket:message key="label.resultset" /></legend> <wicket:container wicket:id="areaRepeater">
     <h2 wicket:id="areaTitle">[Time sheets]</h2>
