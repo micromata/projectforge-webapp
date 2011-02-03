@@ -8,38 +8,29 @@
   <form wicket:id="form" name="form">
   <fieldset><legend><wicket:message key="label.data" /></legend>
   <div wicket:id="feedback">[Validation errors]</div>
+  <h3 style="color: red;">Important notes</h3>
+  <ol style="margin-left: 3em;">
+    <li style="color: red; padding: .5em;">Please make a backup of your data base before running the scripts!</li>
+    <li style="padding: .5em;">Watch the ProjectForge log files for observing the results of the update scripts.</li>
+    <li style="padding: .5em;">In productive installations it's recommended to disable the automatically schema update in the context.xml.</li>
+    <li style="color: red; padding: .5em;">Please redeploy/restart your ProjectForge web application after updating the data-base.</li>
+  </ol>
+  <h3>Update scripts</h3>
   <table class="form">
     <tr>
-      <th style="color: red;">Important notes:</th>
-      <td>
-      <ol>
-        <li style="color: red;">Please make a backup of your data base before running the scripts!</li>
-        <li>Watch the ProjectForge log files for seeing the results of the update scripts.</li>
-        <li>In productive installations it's recommended to disable the automatically schema update in the context.xml.</li>
-      </ol>
-      </td>
+      <th title="The version to update to."><i>Version</i></th>
+      <th>Update script</th>
+      <th>Pre-check</th>
+      <th>Result</th>
     </tr>
-    <tr>
-      <th>Update-Scripts</th>
-      <td>
-      <table border="1">
-        <tr>
-          <th title="The version to update to."><i>Version</i></th>
-          <th>Update script</th>
-          <th>Pre-check</th>
-          <th>Result</th>
-        </tr>
-        <wicket:container wicket:id="scripts">
-          <tr wicket:id="scriptRows">
-            <td wicket:id="version">[3.3.44]</td>
-            <td><a wicket:id="downloadScript"><span wicket:id="fileName">[update-script-3.3.44.xml]</span></a></td>
-            <td wicket:id="preCheckResult">[--]</td>
-            <td><span wicket:id="update">[run]</span></td>
-          </tr>
-        </wicket:container>
-      </table>
-      </td>
-    </tr>
+    <wicket:container wicket:id="scripts">
+      <tr wicket:id="scriptRows">
+        <td wicket:id="version">[3.3.44]</td>
+        <td><a wicket:id="downloadScript"><span wicket:id="fileName">[update-script-3.3.44.xml]</span></a></td>
+        <td wicket:id="preCheckResult">[--]</td>
+        <td><span wicket:id="update">[run]</span></td>
+      </tr>
+    </wicket:container>
     <tr>
       <th>&nbsp;</th>
       <td><input wicket:id="showOldVersionUpdatesCheckBox" id="showOldVersionUpdatesCheckBox" type="checkbox" /> <label

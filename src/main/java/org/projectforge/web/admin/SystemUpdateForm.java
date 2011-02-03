@@ -84,6 +84,9 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
       return;
     }
     for (final UpdateScript updateScript : updateScripts) {
+      if (showOldUpdateScripts == false && updateScript.getPreCheckStatus() == UpdatePreCheckStatus.ALREADY_UPDATED) {
+        continue;
+      }
       final String version = updateScript.getVersion();
       final WebMarkupContainer item = new WebMarkupContainer(scriptRows.newChildId());
       scriptRows.add(item);

@@ -49,6 +49,7 @@ public class SystemUpdatePage extends AbstractSecuredPage
     form = new SystemUpdateForm(this);
     body.add(form);
     form.init();
+    refresh();
   }
 
   protected void downloadUpdateScript(final UpdateScript updateScript)
@@ -69,12 +70,14 @@ public class SystemUpdatePage extends AbstractSecuredPage
     accessChecker.checkIsUserMemberOfAdminGroup();
     accessChecker.checkDemoUser();
     systemUpdater.update(updateScript);
+    refresh();
   }
 
   protected void refresh()
   {
     accessChecker.checkIsUserMemberOfAdminGroup();
     systemUpdater.runAllPreChecks();
+    form.updateScriptRows();
   }
 
   @Override
