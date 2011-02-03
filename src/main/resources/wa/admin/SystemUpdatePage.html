@@ -16,12 +16,13 @@
     <li style="color: red; padding: .5em;">Please redeploy/restart your ProjectForge web application after updating the data-base.</li>
   </ol>
   <h3>Update scripts</h3>
-  <table class="form">
+  <table class="dataview">
     <tr>
       <th title="The version to update to."><i>Version</i></th>
       <th>Update script</th>
       <th>Pre-check</th>
       <th>Result</th>
+      <th>Description</th>
     </tr>
     <wicket:container wicket:id="scripts">
       <tr wicket:id="scriptRows">
@@ -29,6 +30,7 @@
         <td><a wicket:id="downloadScript"><span wicket:id="fileName">[update-script-3.3.44.xml]</span></a></td>
         <td wicket:id="preCheckResult">[--]</td>
         <td><span wicket:id="update">[run]</span></td>
+        <td wicket:id="description">[...]</td>
       </tr>
     </wicket:container>
     <tr>

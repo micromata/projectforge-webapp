@@ -91,6 +91,8 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
       final WebMarkupContainer item = new WebMarkupContainer(scriptRows.newChildId());
       scriptRows.add(item);
       item.add(new Label("version", StringUtils.isBlank(version) == true ? "???" : version));
+      final String description = updateScript.getDescription();
+      item.add(new Label("description", StringUtils.isBlank(description) == true ? "" : description));
       final Link<String> downloadScriptLink = new Link<String>("downloadScript") {
         @Override
         public void onClick()
