@@ -45,9 +45,9 @@ import org.projectforge.xml.stream.XmlObjectReader;
  * Checks wether the data-base is up-to-date or not.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class UpdateChecker
+public class SystemUpdater
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UpdateChecker.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SystemUpdater.class);
 
   private DatabaseUpdateDao databaseUpdateDao;
 
@@ -95,10 +95,7 @@ public class UpdateChecker
    */
   public boolean isUpdated()
   {
-    if (updateScripts == null) {
-      readUpdateFile();
-    }
-    final UpdateScript firstUpdateScript = updateScripts.get(0);
+    final UpdateScript firstUpdateScript = getUpdateScripts().get(0);
     runPreCheck(firstUpdateScript);
     final boolean result = firstUpdateScript.getPreCheckStatus() == UpdatePreCheckStatus.ALREADY_UPDATED;
     if (result == false) {
@@ -111,9 +108,19 @@ public class UpdateChecker
 
   public void runAllPreChecks()
   {
-    for (final UpdateScript updateScript : updateScripts) {
+    for (final UpdateScript updateScript : getUpdateScripts()) {
       runPreCheck(updateScript);
     }
+  }
+
+  public List<UpdateScript> getUpdateScripts()
+  {
+    synchronized (this) {
+      if (updateScripts == null) {
+        readUpdateFile();
+      }
+    }
+    return updateScripts;
   }
 
   protected void runPreCheck(final UpdateScript updateScript)
@@ -121,6 +128,23 @@ public class UpdateChecker
     final GroovyResult result = execute(updateScript.getPreCheck());
     updateScript.setPreCheckResult(result);
     updateScript.setPreCheckStatus(((UpdatePreCheckStatus) result.getResult()));
+  }
+
+  public void update(final UpdateScript updateScript)
+  {
+    log.info("Updating script " + updateScript.getVersion());
+    runPreCheck(updateScript);
+    if (UpdatePreCheckStatus.OK != updateScript.getPreCheckStatus()) {
+      log.error("Pre-check failed. Aborting.");
+      return;
+    }
+    final GroovyResult result = execute(updateScript.getScript());
+    updateScript.setRunningResult(result);
+    if (result != null) {
+      updateScript.setRunningStatus(((UpdateRunningStatus) result.getResult()));
+    }
+    runPreCheck(updateScript);
+    runAllPreChecks();
   }
 
   protected GroovyResult execute(final String script)
