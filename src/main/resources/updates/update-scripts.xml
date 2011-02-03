@@ -1,26 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- This file is needed for updating any previous version of the data base. -->
 <projectforge-self-update>
-  <update version="3.5.2">
-    <description>Adds table t_database_info.</description>
-    <pre-check><![CDATA[
-    if (dao.doesTableExist("t_database_info") == true) {
-      return UpdatePreCheckStatus.ALREADY_UPDATED;
-    }
-    return UpdatePreCheckStatus.OK;
-    ]]>
-    </pre-check>
-    <script><![CDATA[
-      Table table = new Table("t_database_info")
-        .addAttribute(new TableAttribute("version_number", TableAttributeType.VARCHAR, 10, false).setPrimaryKey(true))
-        .addAttribute(new TableAttribute("created", TableAttributeType.TIMESTAMP))
-        .addAttribute(new TableAttribute("last_update", TableAttributeType.TIMESTAMP))
-        .addAttribute(new TableAttribute("last_modify_by", TableAttributeType.VARCHAR, 100, true));
-      dao.createTable(table);
-      return UpdateRunningStatus.DONE;
-    ]]>
-    </script>
-  </update>
   <update version="3.5.0">
     <description>Adds column book_type to t_book.</description>
     <pre-check><![CDATA[
