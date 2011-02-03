@@ -46,7 +46,7 @@ import org.projectforge.web.address.PhoneCallPage;
 import org.projectforge.web.address.SendSmsPage;
 import org.projectforge.web.admin.AdminPage;
 import org.projectforge.web.admin.SetupPage;
-import org.projectforge.web.admin.UpdatePage;
+import org.projectforge.web.admin.SystemUpdatePage;
 import org.projectforge.web.book.BookEditPage;
 import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
@@ -313,7 +313,7 @@ public class WebRegistry
     addMountPage("sendSms", SendSmsPage.class);
     addMountPage("setup", SetupPage.class);
     addMountPage("systemStatistics", SystemStatisticsPage.class);
-    addMountPage("systemUpdate", UpdatePage.class);
+    addMountPage("systemUpdate", SystemUpdatePage.class);
     addMountPage("taskTree", TaskTreePage.class);
     addMountPage("tutorial", TutorialPage.class);
 

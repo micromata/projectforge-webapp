@@ -52,7 +52,7 @@ import org.projectforge.web.address.AddressListPage;
 import org.projectforge.web.address.PhoneCallPage;
 import org.projectforge.web.admin.AdminPage;
 import org.projectforge.web.admin.SetupPage;
-import org.projectforge.web.admin.UpdatePage;
+import org.projectforge.web.admin.SystemUpdatePage;
 import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.core.ConfigurationListPage;
@@ -195,7 +195,7 @@ public enum MenuItemDef
   // *
   SYSTEM_FIRST_LOGIN_SETUP_PAGE("system.firstLoginSetup", SetupPage.class), //
   SYSTEM_STATISTICS("systemStatistics", SystemStatisticsPage.class), //
-  SYSTEM_UPDATE("systemUpdate", UpdatePage.class, //
+  SYSTEM_UPDATE("systemUpdate", SystemUpdatePage.class, //
       ADMIN_GROUP), //
   TASK_TREE("taskTree", TaskTreePage.class), //
   // *

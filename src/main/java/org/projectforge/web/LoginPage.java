@@ -41,7 +41,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.admin.SetupPage;
-import org.projectforge.web.admin.UpdatePage;
+import org.projectforge.web.admin.SystemUpdatePage;
 import org.projectforge.web.mobile.LoginMobilePage;
 import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.MySession;
@@ -166,7 +166,7 @@ public class LoginPage extends AbstractBasePage
         if (resUser.getUsername() != null) {
           user = resUser;
           internalLogin(page, user);
-          page.setResponsePage(UpdatePage.class);
+          page.setResponsePage(SystemUpdatePage.class);
           return;
         }
       } catch (final Exception ex) {
