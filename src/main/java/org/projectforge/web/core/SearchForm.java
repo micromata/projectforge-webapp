@@ -35,8 +35,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
-import org.projectforge.registry.Registry;
-import org.projectforge.registry.RegistryEntry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.task.TaskSelectPanel;
@@ -156,27 +154,27 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
       lastDaysChoice.setRequired(false);
       add(lastDaysChoice);
     }
-    {
-      // DropDownChoice: area
-      final LabelValueChoiceRenderer<String> areaChoiceRenderer = new LabelValueChoiceRenderer<String>();
-      areaChoiceRenderer.addValue("ALL", getString("filter.all"));
-      for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
-        if (entry.getDao().hasHistoryAccess(false) == true) {
-          areaChoiceRenderer.addValue(entry.getId(), getString(entry.getI18nTitleHeading()));
-        }
-      }
-      final DropDownChoice<String> areaChoice = new DropDownChoice<String>("area", new PropertyModel<String>(filter, "area"),
-          areaChoiceRenderer.getValues(), areaChoiceRenderer) {
-        @Override
-        protected boolean wantOnSelectionChangedNotifications()
-        {
-          return true;
-        }
-      };
-      areaChoice.setNullValid(true);
-      areaChoice.setRequired(false);
-      add(areaChoice);
-    }
+    // {
+    // // DropDownChoice: area
+    // final LabelValueChoiceRenderer<String> areaChoiceRenderer = new LabelValueChoiceRenderer<String>();
+    // areaChoiceRenderer.addValue("ALL", getString("filter.all"));
+    // for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
+    // if (entry.getDao().hasHistoryAccess(false) == true) {
+    // areaChoiceRenderer.addValue(entry.getId(), getString(entry.getI18nTitleHeading()));
+    // }
+    // }
+    // final DropDownChoice<String> areaChoice = new DropDownChoice<String>("area", new PropertyModel<String>(filter, "area"),
+    // areaChoiceRenderer.getValues(), areaChoiceRenderer) {
+    // @Override
+    // protected boolean wantOnSelectionChangedNotifications()
+    // {
+    // return true;
+    // }
+    // };
+    // areaChoice.setNullValid(true);
+    // areaChoice.setRequired(false);
+    // add(areaChoice);
+    // }
     {
       // DropDownChoice pageSize
       final DropDownChoice<Integer> pageSizeChoice = AbstractListForm.getPageSizeDropDownChoice("maxRows", getLocale(),
