@@ -87,12 +87,12 @@ public abstract class AbstractMobilePage extends WebPage
       stripTags = Application.get().getMarkupSettings().getStripWicketTags();
     }
     // add(CSSPackageResource.getHeaderContribution("mobile/css/iWebKit.css"));
-    add(CSSPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery.mobile-1.0a2.min.css"));
+    add(CSSPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery.mobile-1.0a3.min.css"));
     // add(CSSPackageResource.getHeaderContribution("mobile/css/projectforge.css"));
     add(CSSPackageResource.getHeaderContribution("mobile/projectforge.css"));
-    add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery-1.4.4.min.js"));
+    add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery-1.5.min.js"));
     add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/myconfig.js"));
-    add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery.mobile-1.0a2.min.js"));
+    add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery.mobile-1.0a3.min.js"));
     add(WicketUtils.headerContributorForFavicon(getUrl("/favicon.ico")));
     add(headerContainer = new WebMarkupContainer("header"));
     headerContainer.add(getTopCenter());
