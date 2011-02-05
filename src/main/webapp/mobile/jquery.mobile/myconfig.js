@@ -1,4 +1,4 @@
 $(document).bind("mobileinit", function(){
-  $.mobile.ajaxFormsEnabled = false;
-  /*$.mobile.ajaxLinksEnabled = false;*/
+ /*	To much problems with path errors. Waiting until final release. */
+  $.mobile.ajaxEnabled = false;
 });
