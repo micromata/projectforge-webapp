@@ -120,7 +120,7 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
   @Override
   protected void addTopRightButton()
   {
-    headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.PLUS, AddressMobileEditPage.class, getString("new")));
+    headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.PLUS, AddressMobileEditPage.class, getString("new")).setRelDialog());
   }
 
   protected abstract F newListForm(AbstractMobileListPage< ? , ? , ? > parentPage);
