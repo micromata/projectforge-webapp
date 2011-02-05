@@ -3,7 +3,7 @@
   <groupId>org.projectforge</groupId>
   <artifactId>ProjectForge</artifactId>
   <packaging>war</packaging>
-  <version>3.5.1.1</version>
+  <version>3.5.2</version>
   <name>ProjectForge</name>
   <description>
     ProjectForge is a multi user web application for collaborative team work. Organize time sheets, tasks, addresses, books etc. with project teams.
@@ -18,8 +18,8 @@
     <url>https://www.projectforge.org/jira</url>
   </issueManagement>
   <ciManagement>
-    <system>continuum</system>
-    <url>(not yet public)</url>
+    <system>Bamboo</system>
+    <url>http://www.projectforge.org</url>
   </ciManagement>
   <distributionManagement>
     <repository>
@@ -29,8 +29,9 @@
     </repository>
   </distributionManagement>
   <scm>
-    <connection>(not yet available)</connection>
-    <developerConnection>(not yet available)</developerConnection>
+    <connection>scm:svn:https://pforge.svn.sourceforge.net/svnroot/pforge</connection>
+    <developerConnection>scm:svn:https://pforge.svn.sourceforge.net/svnroot/pforge</developerConnection>
+    <url>https://pforge.svn.sourceforge.net/svnroot/pforge</url>
   </scm>
   <developers>
     <developer>
@@ -43,6 +44,17 @@
         <role>architect</role>
         <role>developer</role>
         <role>CEO</role>
+      </roles>
+      <timezone>-1</timezone>
+    </developer>
+    <developer>
+      <id>markus</id>
+      <name>Markus Schwarz</name>
+      <email>m.schwarz@micromata.de</email>
+      <organization>Micromata GmbH</organization>
+      <organizationUrl>http://www.micromata.com</organizationUrl>
+      <roles>
+        <role>web designer</role>
       </roles>
       <timezone>-1</timezone>
     </developer>
@@ -499,6 +511,15 @@
         </includes>
       </resource>
     </resources>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.0-beta-3</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -514,6 +535,17 @@
         <version>2.6</version>
       </plugin>
       <plugin>
+        <artifactId>maven-site-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-descriptor</id>
+            <goals>
+              <goal>attach-descriptor</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.7.2</version>
         <configuration>
@@ -522,12 +554,6 @@
           </includes>
         </configuration>
       </plugin>
-      <!--
-        plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-surefire-plugin</artifactId> </plugin> <plugin>
-        <groupId>org.codehaus.groovy.maven</groupId> <artifactId>gmaven-plugin</artifactId> <executions> <execution> <goals>
-        <goal>generateStubs</goal> <goal>compile</goal> <goal>generateTestStubs</goal> <goal>testCompile</goal> </goals> </execution> </executions>
-        </plugin
-      -->
       <plugin>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>
@@ -575,6 +601,11 @@
           <encoding>utf-8</encoding>
           <charset>utf-8</charset>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>2.3.1</version>
       </plugin>
     </plugins>
   </reporting>
