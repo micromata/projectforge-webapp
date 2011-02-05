@@ -50,6 +50,8 @@ public class JQueryButtonPanel extends Panel
   private String label;
 
   private boolean relExternal;
+  
+  private boolean relDialog;
 
   public JQueryButtonPanel(final String id, final JQueryButtonType type, final Class< ? extends WebPage> pageClass, final String label)
   {
@@ -69,6 +71,12 @@ public class JQueryButtonPanel extends Panel
   public JQueryButtonPanel setRelExternal()
   {
     this.relExternal = true;
+    return this;
+  }
+
+  public JQueryButtonPanel setRelDialog()
+  {
+    this.relDialog = true;
     return this;
   }
 
@@ -93,6 +101,9 @@ public class JQueryButtonPanel extends Panel
       link.add(new Label("label", label));
       if (this.relExternal == true) {
         link.add(new SimpleAttributeModifier("rel", "external"));
+      }
+      if (this.relDialog == true) {
+        link.add(new SimpleAttributeModifier("data-rel", "dialog"));
       }
     }
     super.onBeforeRender();
