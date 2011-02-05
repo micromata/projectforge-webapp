@@ -55,8 +55,6 @@ public class InitDatabaseDao extends HibernateDaoSupport
 
   public static final String DEFAULT_ADMIN_USER = "admin";
 
-  public static final String DEFAULT_ADMIN_PASSWORD = "manage";
-
   private UserGroupCache userGroupCache;
 
   private GroupDao groupDao;
@@ -96,7 +94,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
    * If the database is empty (user list is empty) then a admin user and ProjectForge root task will be created.
    * @return
    */
-  public PFUserDO initializeEmptyDatabase(final String encryptedAdminPassword, final TimeZone adminUserTimezone)
+  public PFUserDO initializeEmptyDatabase(final String adminUsername, final String encryptedAdminPassword, final TimeZone adminUserTimezone)
   {
     log.fatal("User wants to initialize database.");
     if (isEmpty() == false) {
@@ -114,7 +112,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
 
     // Create Admin user
     PFUserDO admin = new PFUserDO();
-    admin.setUsername(DEFAULT_ADMIN_USER);
+    admin.setUsername(adminUsername);
     admin.setLastname("Administrator");
     admin.setPassword(encryptedAdminPassword);
     admin.setDescription("ProjectForge administrator");
@@ -124,9 +122,10 @@ public class InitDatabaseDao extends HibernateDaoSupport
     Set<PFUserDO> adminUsers = new HashSet<PFUserDO>();
     adminUsers.add(admin);
     addGroup(ProjectForgeGroup.ADMIN_GROUP, "Administrators of ProjectForge", adminUsers);
+    addGroup(ProjectForgeGroup.CONTROLLING_GROUP, "Users for having read access to the company's finances.", adminUsers);
     addGroup(ProjectForgeGroup.FINANCE_GROUP, "Finance and Accounting", adminUsers);
-    addGroup(ProjectForgeGroup.CONTROLLING_GROUP, "Users for having read access to the companies finances.", null);
     addGroup(ProjectForgeGroup.MARKETING_GROUP, "Marketing users can download all addresses in excel format.", null);
+    addGroup(ProjectForgeGroup.ORGA_TEAM, "The organization team has access to post in- and outbound, contracts etc..", adminUsers);
     addGroup(ProjectForgeGroup.PROJECT_MANAGER, "Project managers have access to assigned orders and resource planning.", null);
     addGroup(ProjectForgeGroup.PROJECT_ASSISTANT, "Project assistants have access to assigned orders.", null);
 
@@ -146,17 +145,18 @@ public class InitDatabaseDao extends HibernateDaoSupport
     groupDao.internalSave(group);
   }
 
-  public PFUserDO initializeEmptyDatabaseWithTestData(final String encryptedAdminPassword, final TimeZone adminUserTimezone)
+  public PFUserDO initializeEmptyDatabaseWithTestData(final String adminUsername, final String encryptedAdminPassword, final TimeZone adminUserTimezone)
   {
     log.fatal("User wants to initialize database with test data.");
     if (isEmpty() == false) {
       databaseNotEmpty();
     }
     xmlDump.restoreDatabaseFromClasspathResource("/data/init-test-data.xml.gz", "utf-8");
-    PFUserDO user = userDao.getInternalByName("admin");
+    PFUserDO user = userDao.getInternalByName(DEFAULT_ADMIN_USER);
     if (user == null) {
       log.error("Initialization of database failed. Perhaps caused by corrupted init-test-data.xml.gz.");
     } else {
+      user.setUsername(adminUsername);
       user.setPassword(encryptedAdminPassword);
       user.setTimeZone(adminUserTimezone);
       userDao.internalUpdate(user);

@@ -66,10 +66,10 @@ public class SetupPage extends AbstractSecuredPage
     PFUserDO adminUser = null;
     final String message;
     if (form.getSetupMode() == SetupTarget.TEST_DATA) {
-      adminUser = initDatabaseDao.initializeEmptyDatabaseWithTestData(form.getEncryptedPassword(), form.getTimeZone());
+      adminUser = initDatabaseDao.initializeEmptyDatabaseWithTestData(form.getAdminUsername(), form.getEncryptedPassword(), form.getTimeZone());
       message = "administration.setup.message.testdata";
     } else {
-      adminUser = initDatabaseDao.initializeEmptyDatabase(form.getEncryptedPassword(), form.getTimeZone());
+      adminUser = initDatabaseDao.initializeEmptyDatabase(form.getAdminUsername(), form.getEncryptedPassword(), form.getTimeZone());
       message = "administration.setup.message.emptyDatabase";
     }
     ((MySession) getSession()).login(adminUser, getRequest());
@@ -84,7 +84,7 @@ public class SetupPage extends AbstractSecuredPage
     }
     configure(ConfigurationParam.SYSTEM_ADMIN_E_MAIL, form.getSysopEMail());
     configure(ConfigurationParam.FEEDBACK_E_MAIL, form.getFeedbackEMail());
-    setResponsePage(new MessagePage(message, InitDatabaseDao.DEFAULT_ADMIN_USER));
+    setResponsePage(new MessagePage(message, adminUser.getUsername()));
     log.info("Set-up finished.");
   }
 

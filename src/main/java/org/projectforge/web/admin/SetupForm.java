@@ -37,11 +37,13 @@ import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.database.HibernateUtils;
+import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
+import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.components.TimeZonePanel;
 
@@ -59,6 +61,8 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
   private String sysopEMail;
 
   private String feedbackEMail;
+
+  private String adminUsername = InitDatabaseDao.DEFAULT_ADMIN_USER;
 
   @SuppressWarnings("unused")
   private String password;
@@ -83,6 +87,8 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
     final RadioChoice<SetupTarget> modeChoice = new RadioChoice<SetupTarget>("setupMode",
         new PropertyModel<SetupTarget>(this, "setupMode"), modeChoiceRenderer.getValues(), modeChoiceRenderer);
     add(modeChoice);
+    final RequiredMaxLengthTextField adminUsernameField = new RequiredMaxLengthTextField("adminUsername", new PropertyModel<String>(this, "adminUsername"));
+    add(adminUsernameField);
     final PasswordTextField passwordRepeatField = new PasswordTextField("passwordRepeat", new PropertyModel<String>(this, "passwordRepeat"));
     passwordRepeatField.setResetPassword(true).setRequired(true);
     add(passwordRepeatField);
@@ -159,5 +165,10 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
   public String getEncryptedPassword()
   {
     return encryptedPassword;
+  }
+  
+  public String getAdminUsername()
+  {
+    return adminUsername;
   }
 }
