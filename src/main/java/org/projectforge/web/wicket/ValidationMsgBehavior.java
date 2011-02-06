@@ -26,6 +26,7 @@ package org.projectforge.web.wicket;
 import org.apache.wicket.Component;
 import org.apache.wicket.behavior.AbstractBehavior;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.projectforge.web.HtmlHelper;
 
 /**
  * Validation message to show as html div element.
@@ -49,7 +50,7 @@ public class ValidationMsgBehavior extends AbstractBehavior
       } else {
         error = "Your input is invalid.";
       }
-      fc.getResponse().write("<div class=\"validationMsg\">" + error + "</div>");
+      fc.getResponse().write("<div class=\"validationMsg\">" + HtmlHelper.escapeXml(error) + "</div>");
     }
   }
 }
