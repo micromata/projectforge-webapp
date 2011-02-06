@@ -52,6 +52,7 @@ import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.core.ConfigurationListPage;
 import org.projectforge.web.core.SearchPage;
+import org.projectforge.web.doc.DocumentationPage;
 import org.projectforge.web.doc.TutorialPage;
 import org.projectforge.web.fibu.AccountingRecordEditPage;
 import org.projectforge.web.fibu.AccountingRecordListPage;
@@ -301,6 +302,7 @@ public class WebRegistry
     addMountPage("changePassword", ChangePasswordPage.class);
     addMountPage("configuration", ConfigurationListPage.class);
     addMountPage("datevImport", DatevImportPage.class);
+    addMountPage("doc", DocumentationPage.class);
     addMountPage("error", ErrorPage.class);
     addMountPage("feedback", FeedbackPage.class);
     addMountPage("gwikiContainer", GWikiContainerPage.class);
