@@ -135,7 +135,7 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
       parentTaskSelectPanel.setRequired(true);
     }
     doPanel.addTextField(data, "title", getString("task.title"), HALF, FULL).setStrong().setRequired().setFocus();
-    doPanel.addTextField(data, "reference", getString("task.reference"), HALF, FULL).setFocus();
+    doPanel.addTextField(data, "reference", getString("task.reference"), HALF, FULL);
     {
       // Status drop down box:
       final LabelValueChoiceRenderer<TaskStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<TaskStatus>(container, TaskStatus
