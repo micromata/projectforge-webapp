@@ -41,6 +41,7 @@ import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
@@ -131,15 +132,16 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
         ConfigurationDO.class, "stringValue")));
     add(new MaxLengthTextField("feedbackEMail", new PropertyModel<String>(this, "feedbackEMail"), HibernateUtils.getPropertyLength(
         ConfigurationDO.class, "stringValue")));
-    final Button refresh = new Button("button", new Model<String>("finish")) {
+    final Button finishButton = new Button("button", new Model<String>("finish")) {
       @Override
       public final void onSubmit()
       {
         parentPage.finishSetup();
       }
     };
-    add(new SingleButtonPanel("finish", refresh));
-    setDefaultButton(refresh);
+    finishButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    add(new SingleButtonPanel("finish", finishButton));
+    setDefaultButton(finishButton);
   }
 
   public SetupTarget getSetupMode()
