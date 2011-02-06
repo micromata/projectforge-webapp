@@ -33,7 +33,6 @@ import java.util.Collection;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.access.AccessException;
-import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.test.TestBase;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
@@ -73,7 +72,7 @@ public class InitDatabaseDaoTest extends TestBase
     assertNotNull(user);
     assertEquals(InitDatabaseDao.DEFAULT_ADMIN_USER, user.getUsername());
     Collection<Integer> col = userGroupCache.getUserGroups(user);
-    assertEquals(2, col.size());
+    assertEquals(4, col.size());
     assertTrue(userGroupCache.isUserMemberOfAdminGroup(user.getId()));
     assertTrue(userGroupCache.isUserMemberOfFinanceGroup(user.getId()));
 
