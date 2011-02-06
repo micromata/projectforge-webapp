@@ -37,7 +37,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.ContextImage;
-import org.apache.wicket.markup.html.link.ExternalLink;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.protocol.http.WebRequest;
@@ -54,6 +54,7 @@ import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.core.MenuPanel;
 import org.projectforge.web.core.SearchPage;
+import org.projectforge.web.doc.DocumentationPage;
 import org.projectforge.web.wicket.embats.EmbatsSymbolChar;
 import org.projectforge.web.wicket.embats.IconLinkPanel;
 
@@ -168,10 +169,10 @@ public abstract class AbstractBasePage extends WebPage
       logoutLink.setVisible(false);
     }
     logoutLink.add(new Label("logoutLabel", getString("menu.logout")).setRenderBodyOnly(true));
-    final ExternalLink newsLink = new ExternalLink("newsLink", getUrl("/secure/doc/News.html"));
-    navigationContainer.add(newsLink);
-    newsLink.add(new Label("versionLabel", "V.&nbsp;" + getAppVersion() + ",&nbsp;" + getAppReleaseTimestamp())
-        .setEscapeModelStrings(false));
+    final BookmarkablePageLink<Void> docLink = new BookmarkablePageLink<Void>("docLink", DocumentationPage.class);
+    navigationContainer.add(docLink);
+    docLink
+        .add(new Label("versionLabel", "V.&nbsp;" + getAppVersion() + ",&nbsp;" + getAppReleaseTimestamp()).setEscapeModelStrings(false));
     final MenuPanel menuPanel = new MenuPanel("mainMenu");
     navigationContainer.add(menuPanel);
     menuPanel.init();
