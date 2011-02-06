@@ -40,6 +40,8 @@ import org.projectforge.user.UserGroupCache;
 
 public class InitDatabaseDaoTest extends TestBase
 {
+  static final String DEFAULT_ADMIN_PASSWORD = "manage";
+
   private InitDatabaseDao initDatabaseDao;
 
   private UserGroupCache userGroupCache;
@@ -63,13 +65,13 @@ public class InitDatabaseDaoTest extends TestBase
   @Test
   public void initializeEmptyDatabase()
   {
-    final String encryptedPassword = userDao.encryptPassword(InitDatabaseDao.DEFAULT_ADMIN_PASSWORD);
+    final String encryptedPassword = userDao.encryptPassword(DEFAULT_ADMIN_PASSWORD);
     userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
     assertTrue(initDatabaseDao.isEmpty());
-    initDatabaseDao.initializeEmptyDatabase(encryptedPassword, null);
-    PFUserDO user = userDao.authenticateUser("admin", encryptedPassword);
+    initDatabaseDao.initializeEmptyDatabase(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword, null);
+    PFUserDO user = userDao.authenticateUser(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword);
     assertNotNull(user);
-    assertEquals("admin", user.getUsername());
+    assertEquals(InitDatabaseDao.DEFAULT_ADMIN_USER, user.getUsername());
     Collection<Integer> col = userGroupCache.getUserGroups(user);
     assertEquals(2, col.size());
     assertTrue(userGroupCache.isUserMemberOfAdminGroup(user.getId()));
@@ -77,7 +79,7 @@ public class InitDatabaseDaoTest extends TestBase
 
     boolean exception = false;
     try {
-      initDatabaseDao.initializeEmptyDatabase(encryptedPassword, null);
+      initDatabaseDao.initializeEmptyDatabase(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword, null);
       fail("AccessException expected.");
     } catch (AccessException ex) {
       exception = true;
@@ -87,7 +89,7 @@ public class InitDatabaseDaoTest extends TestBase
 
     exception = false;
     try {
-      initDatabaseDao.initializeEmptyDatabaseWithTestData(encryptedPassword, null);
+      initDatabaseDao.initializeEmptyDatabaseWithTestData(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword, null);
       fail("AccessException expected.");
     } catch (AccessException ex) {
       exception = true;
