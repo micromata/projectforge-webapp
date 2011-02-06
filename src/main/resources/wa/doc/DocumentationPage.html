@@ -1,0 +1,90 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<wicket:head>
+  <style type="text/css">
+<!--
+div.teaser-plain {
+	background: url(../images/doc/doc-teaser-plain.png) no-repeat;
+	width: 243px;
+	height: 287px;
+	border: 0px;
+}
+
+div.teaser-heading {
+	padding-top: 3em;
+  padding-right: 7.5em;
+  padding-left: 1.2em;
+  font-weight : bold;
+	font-size: 1.2em;
+	text-align: right;
+	font-weight: bold;
+}
+
+div.teaser-content {
+	padding-top: 8.0em;
+	padding-left: 2.0em;
+	width: 20em;
+}
+-->
+</style>
+    <script type="text/javascript">
+<!--
+function openDoc(url) {
+	var w = window.open(url, 'doc', '');
+  w.focus();
+}
+-->
+</script>
+</wicket:head>
+</head>
+
+<body>
+<wicket:extend>
+  <h1><wicket:message key="doc.general" /></h1>
+
+  <div style="float: left">
+  <div class="teaser-plain" onclick="javascript:openDoc('http://www.projectforge.org');" onMouseOver="style.cursor='pointer'">
+  <div class="teaser-heading">Release-News</div>
+  <div class="teaser-content">Deutsch, PDF, HTML ldfdsj flsdjf lsdjf ölsafj dsölfj dslöfj dsölfj dsölfjd sölfjds ölfdjs flödjs flödsj dfsldfj lödsfj sdlödfj löfj ls</div>
+  </div>
+  <div><img src="images/doc/doc-teaser-plain.png" /></div>
+  <div style="clear: left"><img src="images/doc/doc-teaser-plain.png" /></div>
+  </div>
+
+  <table>
+    <tr>
+      <td><img src="images/doc/doc-teaser-plain.png" /></td>
+      <td><img src="images/doc/pf_teaser-small.png" /></td>
+      <td><img src="images/doc/pf_teaser-small.png" /></td>
+      <td><img src="images/doc/pf_teaser-small.png" /></td>
+      <td><img src="images/doc/pf_teaser-license-small.png" /></td>
+    </tr>
+    <tr>
+      <th>News</th>
+      <th>ProjectForge tutorial</th>
+      <th>Userguide</th>
+      <th>FAQ (de/en)</th>
+      <th>License</th>
+    </tr>
+  </table>
+  <h1><wicket:message key="doc.devadmin" /></h1>
+  <table>
+    <tr>
+      <td><img src="images/doc/pf_teaser-small.png" /></td>
+      <td><img src="images/doc/pf_teaser-small.png" /></td>
+      <td><img src="images/doc/pf_teaser-small.png" /></td>
+      <td><img src="images/doc/pf_teaser-doc-small.png" /></td>
+      <td><img src="images/doc/pf_teaser-javadoc-small.png" /></td>
+    </tr>
+    <tr>
+      <th>Admin log book</th>
+      <th>Administration guide</th>
+      <th>Developer guide</th>
+      <th>Project doc</th>
+      <th>Java doc</th>
+    </tr>
+  </table>
+</wicket:extend>
+</body>
+</html>
