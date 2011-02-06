@@ -39,6 +39,9 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserRightDO;
+import org.projectforge.user.UserRightId;
+import org.projectforge.user.UserRightValue;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -117,6 +120,17 @@ public class InitDatabaseDao extends HibernateDaoSupport
     admin.setPassword(encryptedAdminPassword);
     admin.setDescription("ProjectForge administrator");
     admin.setTimeZone(adminUserTimezone);
+    admin.addRight(new UserRightDO(UserRightId.FIBU_AUSGANGSRECHNUNGEN, UserRightValue.READWRITE));
+    admin.addRight(new UserRightDO(UserRightId.FIBU_COST_UNIT, UserRightValue.READWRITE));
+    admin.addRight(new UserRightDO(UserRightId.FIBU_EINGANGSRECHNUNGEN, UserRightValue.READWRITE));
+    admin.addRight(new UserRightDO(UserRightId.FIBU_DATEV_IMPORT, UserRightValue.TRUE));
+    admin.addRight(new UserRightDO(UserRightId.FIBU_EMPLOYEE_SALARY, UserRightValue.READWRITE));
+    admin.addRight(new UserRightDO(UserRightId.ORGA_CONTRACTS, UserRightValue.READWRITE));
+    admin.addRight(new UserRightDO(UserRightId.ORGA_INCOMING_MAIL, UserRightValue.READWRITE));
+    admin.addRight(new UserRightDO(UserRightId.ORGA_OUTGOING_MAIL, UserRightValue.READWRITE));
+    admin.addRight(new UserRightDO(UserRightId.PM_PROJECT, UserRightValue.READWRITE));
+    admin.addRight(new UserRightDO(UserRightId.PM_ORDER_BOOK, UserRightValue.READWRITE));
+    admin.addRight(new UserRightDO(UserRightId.PM_HR_PLANNING, UserRightValue.READWRITE));
     userDao.internalSave(admin);
 
     Set<PFUserDO> adminUsers = new HashSet<PFUserDO>();
