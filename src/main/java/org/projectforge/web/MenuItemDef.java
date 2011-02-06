@@ -57,6 +57,7 @@ import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.core.ConfigurationListPage;
 import org.projectforge.web.core.SearchPage;
+import org.projectforge.web.doc.DocumentationPage;
 import org.projectforge.web.fibu.AccountingRecordListPage;
 import org.projectforge.web.fibu.AuftragListPage;
 import org.projectforge.web.fibu.BankAccountListPage;
@@ -101,7 +102,7 @@ public enum MenuItemDef
   ADMINISTRATION("administration"), //
   COMMON("common"), //
   // *
-  DOCUMENTATION("documentation"), //
+  DOCUMENTATION("documentation", DocumentationPage.class), //
   FIBU("fibu", //
       FINANCE_GROUP, ORGA_TEAM, CONTROLLING_GROUP), //
   KOST("fibu.kost", //
