@@ -26,35 +26,44 @@ package org.projectforge.web.doc;
 import java.util.Locale;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.WicketUtils;
 
 public class DocumentationPage extends AbstractSecuredPage
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DocumentationPage.class);
-
   public DocumentationPage(final PageParameters parameters)
   {
     super(parameters);
     final Locale locale = PFUserContext.getLocale();
     final boolean isGerman = locale != null && locale.toString().startsWith("de") == true;
-    // final Node doc = root.addSubMenu(user, MenuItemDef.DOCUMENTATION);
-    // doc.addSubMenu(user, MenuItemDef.NEWS);
-    // doc.addSubMenu(user, MenuItemDef.PROJECTFORGE_DOC);
-    // doc.addSubMenu(user, MenuItemDef.USER_GUIDE);
-    // if (isGerman == true) {
-    // doc.addSubMenu(user, MenuItemDef.FAQ_DE);
-    // } else {
-    // doc.addSubMenu(user, MenuItemDef.FAQ);
-    // }
-    // doc.addSubMenu(user, MenuItemDef.LICENSE);
-    // doc.addSubMenu(user, MenuItemDef.PROJECT_DOC);
-    // doc.addSubMenu(user, MenuItemDef.ADMIN_LOGBUCH);
-    // doc.addSubMenu(user, MenuItemDef.ADMIN_GUIDE);
-    // doc.addSubMenu(user, MenuItemDef.DEVELOPER_GUIDE);
-    // doc.addSubMenu(user, MenuItemDef.JAVA_DOC);
-    // doc.addSubMenu(user, MenuItemDef.TEST_REPORTS);
+    addDocLink("newsLink", "doc/News.html");
+    addDocLink("tutorialLink", "doc/ProjectForge.html");
+    addDocLink("handbookLink", "doc/Handbuch.html");
+    if (isGerman == true) {
+      addDocLink("faqLink", "doc/FAQ_de.html");
+    } else {
+      addDocLink("faqLink", "doc/FAQ.html");
+    }
+    addDocLink("licenseLink", "LICENSE.txt");
 
+    addDocLink("adminLogbuchLink", "doc/AdminLogbuch.html");
+    addDocLink("adminGuideLink", "doc/AdministrationGuide.html");
+    addDocLink("developerGuideLink", "doc/DeveloperGuide.html");
+    addDocLink("projectDocLink", "site/index.html");
+    addDocLink("javaDocLink", "site/apidocs/index.html");
+  }
+
+  private void addDocLink(final String id, final String url)
+  {
+    final WebMarkupContainer linkContainer = new WebMarkupContainer(id);
+    linkContainer.add(new SimpleAttributeModifier("onclick", "javascript:openDoc('"
+        + WicketUtils.getUrl(getResponse(), "/secure/" + url, true)
+        + "');"));
+    linkContainer.add(new SimpleAttributeModifier("onmouseover", "style.cursor='pointer'"));
+    body.add(linkContainer);
   }
 
   @Override

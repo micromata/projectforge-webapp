@@ -4,31 +4,59 @@
 <wicket:head>
   <style type="text/css">
 <!--
-div.teaser-plain {
-	background: url(../images/doc/doc-teaser-plain.png) no-repeat;
+div.teaser {
+	display: inline-block;
+	float: left;
+	line-height: 1.4em;
 	width: 243px;
 	height: 287px;
 	border: 0px;
+	float: left;
+	line-height: 1.4em;
+}
+
+div.teaser-plain {
+	background: url(../images/doc/doc-teaser-plain.png) no-repeat;
 }
 
 div.teaser-heading {
-	padding-top: 3em;
-  padding-right: 7.5em;
-  padding-left: 1.2em;
-  font-weight : bold;
+	position: absolute;
+	padding-top: 35px;
+	width: 150px;
+	font-weight: bold;
 	font-size: 1.2em;
 	text-align: right;
-	font-weight: bold;
 }
 
 div.teaser-content {
-	padding-top: 8.0em;
-	padding-left: 2.0em;
-	width: 20em;
+	position: absolute;
+	padding-top: 140px;
+	padding-left: 23px;
+	width: 200px;
+	height: 100px;
+	overflow: hidden;
+}
+
+div.teaser-languages {
+	position: absolute;
+	padding-top: 245px;
+	width: 220px;
+	text-align: right;
+}
+
+div.teaser-formats {
+	position: absolute;
+	padding-top: 243px;
+	padding-left: 22px;
+}
+
+h1.doc-heading {
+	padding-left: 0.5em;
+  margin-bottom: 0.5em;
 }
 -->
 </style>
-    <script type="text/javascript">
+  <script type="text/javascript">
 <!--
 function openDoc(url) {
 	var w = window.open(url, 'doc', '');
@@ -41,50 +69,76 @@ function openDoc(url) {
 
 <body>
 <wicket:extend>
-  <h1><wicket:message key="doc.general" /></h1>
+  <h1 class="doc-heading"><wicket:message key="doc.general" /></h1>
 
-  <div style="float: left">
-  <div class="teaser-plain" onclick="javascript:openDoc('http://www.projectforge.org');" onMouseOver="style.cursor='pointer'">
+  <div class="teaser teaser-plain" wicket:id="newsLink">
   <div class="teaser-heading">Release-News</div>
-  <div class="teaser-content">Deutsch, PDF, HTML ldfdsj flsdjf lsdjf ölsafj dsölfj dslöfj dsölfj dsölfjd sölfjds ölfdjs flödjs flödsj dfsldfj lödsfj sdlödfj löfj ls</div>
-  </div>
-  <div><img src="images/doc/doc-teaser-plain.png" /></div>
-  <div style="clear: left"><img src="images/doc/doc-teaser-plain.png" /></div>
+  <div class="teaser-content"><wicket:message key="doc.releaseNews.description" /></div>
+  <div class="teaser-formats"><img src="images/html.png" /></div>
+  <div class="teaser-languages"><img src="images/us_flag.png" /></div>
   </div>
 
-  <table>
-    <tr>
-      <td><img src="images/doc/doc-teaser-plain.png" /></td>
-      <td><img src="images/doc/pf_teaser-small.png" /></td>
-      <td><img src="images/doc/pf_teaser-small.png" /></td>
-      <td><img src="images/doc/pf_teaser-small.png" /></td>
-      <td><img src="images/doc/pf_teaser-license-small.png" /></td>
-    </tr>
-    <tr>
-      <th>News</th>
-      <th>ProjectForge tutorial</th>
-      <th>Userguide</th>
-      <th>FAQ (de/en)</th>
-      <th>License</th>
-    </tr>
-  </table>
-  <h1><wicket:message key="doc.devadmin" /></h1>
-  <table>
-    <tr>
-      <td><img src="images/doc/pf_teaser-small.png" /></td>
-      <td><img src="images/doc/pf_teaser-small.png" /></td>
-      <td><img src="images/doc/pf_teaser-small.png" /></td>
-      <td><img src="images/doc/pf_teaser-doc-small.png" /></td>
-      <td><img src="images/doc/pf_teaser-javadoc-small.png" /></td>
-    </tr>
-    <tr>
-      <th>Admin log book</th>
-      <th>Administration guide</th>
-      <th>Developer guide</th>
-      <th>Project doc</th>
-      <th>Java doc</th>
-    </tr>
-  </table>
+  <div class="teaser teaser-plain" wicket:id="tutorialLink">
+  <div class="teaser-heading">Tutorial</div>
+  <div class="teaser-content"><wicket:message key="doc.tutorial.description" /></div>
+  <div class="teaser-formats"><img src="images/html.png" /> <img src="images/page_white_acrobat.png" /></div>
+  <div class="teaser-languages"><img src="images/us_flag.png" /></div>
+  </div>
+
+  <div class="teaser teaser-plain" wicket:id="handbookLink">
+  <div class="teaser-heading"><wicket:message key="doc.handbook" /></div>
+  <div class="teaser-content"><wicket:message key="doc.handbook.description" /></div>
+  <div class="teaser-formats"><img src="images/html.png" /> <img src="images/page_white_acrobat.png" /></div>
+  <div class="teaser-languages"><img src="images/de_flag.png" /></div>
+  </div>
+
+  <div class="teaser teaser-plain" wicket:id="faqLink">
+  <div class="teaser-heading">FAQ</div>
+  <div class="teaser-content"><wicket:message key="doc.faq.description" /></div>
+  <div class="teaser-formats"><img src="images/html.png" /></div>
+  <div class="teaser-languages"><img src="images/us_flag.png" /> <img src="images/de_flag.png" /></div>
+  </div>
+
+  <div class="teaser" style="background: url(../images/doc/doc-teaser-license.png) no-repeat;" wicket:id="licenseLink">
+  <div class="teaser-content"><wicket:message key="doc.license.description" /></div>
+  <div class="teaser-formats"><img src="images/text_align_left.png" /></div>
+  <div class="teaser-languages"><img src="images/us_flag.png" /></div>
+  </div>
+
+  <h1 class="doc-heading" style="clear: left; padding-top: 3em;"><wicket:message key="doc.devadmin" /></h1>
+
+  <div class="teaser teaser-plain" wicket:id="adminLogbuchLink">
+  <div class="teaser-heading"><wicket:message key="doc.adminLogbook" /></div>
+  <div class="teaser-content"><wicket:message key="doc.adminLogbook.description" /></div>
+  <div class="teaser-formats"><img src="images/html.png" /></div>
+  <div class="teaser-languages"><img src="images/us_flag.png" /></div>
+  </div>
+
+  <div class="teaser teaser-plain" wicket:id="adminGuideLink">
+  <div class="teaser-heading"><wicket:message key="doc.adminGuide" /></div>
+  <div class="teaser-content"><wicket:message key="doc.adminGuide.description" /></div>
+  <div class="teaser-formats"><img src="images/html.png" /> <img src="images/page_white_acrobat.png" /></div>
+  <div class="teaser-languages"><img src="images/us_flag.png" /></div>
+  </div>
+
+  <div class="teaser teaser-plain" wicket:id="developerGuideLink">
+  <div class="teaser-heading"><wicket:message key="doc.developerGuide" /></div>
+  <div class="teaser-content"><wicket:message key="doc.developerGuide.description" /></div>
+  <div class="teaser-formats"><img src="images/html.png" /> <img src="images/page_white_acrobat.png" /></div>
+  <div class="teaser-languages"><img src="images/us_flag.png" /></div>
+  </div>
+
+  <div class="teaser" style="background: url(../images/doc/doc-teaser-project-doc.png) no-repeat;" wicket:id="projectDocLink">
+  <div class="teaser-content"><wicket:message key="doc.projectDoc.description" /></div>
+  <div class="teaser-formats"><img src="images/html.png" /></div>
+  <div class="teaser-languages"><img src="images/us_flag.png" /></div>
+  </div>
+
+  <div class="teaser" style="background: url(../images/doc/doc-teaser-javadoc.png) no-repeat;" wicket:id="javaDocLink">
+  <div class="teaser-content"><wicket:message key="doc.javaDoc.description" /></div>
+  <div class="teaser-formats"><img src="images/html.png" /></div>
+  <div class="teaser-languages"><img src="images/us_flag.png" /></div>
+  </div>
 </wicket:extend>
 </body>
 </html>
