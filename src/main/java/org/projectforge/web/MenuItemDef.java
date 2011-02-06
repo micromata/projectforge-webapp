@@ -202,32 +202,7 @@ public enum MenuItemDef
   // *
   TIMESHEET_LIST("timesheetList", TimesheetListPage.class), //
   // *
-  USER_LIST("userList", UserListPage.class), //
-  // *
-
-  // Documentation
-  PROJECTFORGE_DOC("doc.projectforge", "doc/ProjectForge.html", true), //
-  USER_GUIDE("userGuide", "doc/Handbuch.html", true), //
-  // *
-  FAQ("faq", "doc/FAQ.html", true), //
-  FAQ_DE("faq", "doc/FAQ_de.html", true), //
-  // *
-  LICENSE("license", "LICENSE.txt", true), //
-  // *
-  PROJECT_DOC("projectDocumentation", "site/index.html", true), //
-  // *
-  ADMIN_LOGBUCH("adminLogbuch", "doc/AdminLogbuch.html", true), //
-  // *
-  ADMIN_GUIDE("adminGuide", "doc/AdministrationGuide.html", true), //
-  // *
-  DEVELOPER_GUIDE("developerGuide", "doc/DeveloperGuide.html", true), //
-  // *
-  JAVA_DOC("javaDoc", "site/apidocs/index.html", true), //
-  // *
-  TEST_REPORTS("testReports", "site/surefire-report.html", true), //
-  // *
-  NEWS("news", "doc/News.html", true);
-  // *
+  USER_LIST("userList", UserListPage.class); //
 
   private String id;
 
