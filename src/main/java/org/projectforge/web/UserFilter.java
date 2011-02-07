@@ -43,6 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.MDC;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.common.StringHelper;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
@@ -74,9 +75,15 @@ public class UserFilter implements Filter
 
   private static final int COOKIE_MAX_AGE = 30 * 24 * 3600; // 30 days.
 
-  private static String IGNORE_PREFIX;
+  private static String IGNORE_PREFIX_WICKET;
 
-  private static String contextPath = "";
+  private static String IGNORE_PREFIX_DOC;
+
+  private static String IGNORE_PREFIX_SITE_DOC;
+
+  private static String IGNORE_PREFIX_LOGO;
+
+  private static String IGNORE_PREFIX_SMS_REVEIVE_SERVLET;
 
   private static UserDao userDao;
 
@@ -89,15 +96,18 @@ public class UserFilter implements Filter
   public static void initialize(final UserDao userDao, final String contextPath)
   {
     UserFilter.userDao = userDao;
-    UserFilter.contextPath = contextPath;
-    IGNORE_PREFIX = contextPath + '/' + WicketUtils.WICKET_APPLICATION_PATH + "resources";
+    IGNORE_PREFIX_WICKET = contextPath + '/' + WicketUtils.WICKET_APPLICATION_PATH + "resources";
+    IGNORE_PREFIX_DOC = contextPath + "/secure/doc";
+    IGNORE_PREFIX_SITE_DOC = contextPath + "/secure/site";
+    IGNORE_PREFIX_LOGO = contextPath + "/" + LogoServlet.BASE_URL;
+    IGNORE_PREFIX_SMS_REVEIVE_SERVLET = contextPath + "/" + SMSReceiverServlet.URL;
   }
 
   public static void setUpdateRequiredFirst(final boolean value)
   {
     updateRequiredFirst = value;
   }
-  
+
   public static boolean isUpdateRequiredFirst()
   {
     return updateRequiredFirst;
@@ -368,12 +378,19 @@ public class UserFilter implements Filter
     final HttpServletRequest hreq = (HttpServletRequest) req;
     final String uri = hreq.getRequestURI();
     // If you have an NPE you have probably forgotten to call setServletContext on applications start-up.
-    if (uri.startsWith(IGNORE_PREFIX)
-        && (uri.endsWith(".js") == true || uri.endsWith(".css") == true || uri.endsWith(".gif") == true || uri.endsWith(".png") == true)) {
-      return true;
-    } else if (uri.startsWith(contextPath + "/" + LogoServlet.BASE_URL) == true
-        || uri.startsWith(contextPath + "/" + SMSReceiverServlet.URL) == true) {
-      return true;
+    if (uri.contains("?") == false) {
+      // Paranoia setting. May-be there could be a vulnerability with request parameters.
+      if (uri.startsWith(IGNORE_PREFIX_WICKET) && StringHelper.endsWith(uri, ".js", ".css", ".gif", ".png") == true) {
+        // No access checking for Wicket resources.
+        return true;
+      } else if (StringHelper.startsWith(uri, IGNORE_PREFIX_DOC, IGNORE_PREFIX_SITE_DOC) == true && StringHelper.endsWith(uri, ".html", ".pdf", ".js", ".css", ".gif", ".png") == true) {
+        // No access checking for documentation (including site doc).
+        return true;
+      } else if (StringHelper.startsWith(uri, IGNORE_PREFIX_LOGO, IGNORE_PREFIX_SMS_REVEIVE_SERVLET) == true) {
+        // No access checking for logo and sms receiver servlet.
+        // The sms receiver servlet has its own authentification (key).
+        return true;
+      }
     }
     return false;
   }
