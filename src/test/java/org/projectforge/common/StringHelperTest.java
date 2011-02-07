@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
-import org.projectforge.common.StringHelper;
 
 public class StringHelperTest
 {
@@ -81,26 +80,38 @@ public class StringHelperTest
   @Test
   public void isIn()
   {
-    assertEquals(true, StringHelper.isIn("open", new String[] { "open", "close", "explore", "implore"}));
-    assertEquals(true, StringHelper.isIn("close", new String[] { "open", "close", "explore", "implore"}));
-    assertEquals(true, StringHelper.isIn("explore", new String[] { "open", "close", "explore", "implore"}));
-    assertEquals(true, StringHelper.isIn("implore", new String[] { "open", "close", "explore", "implore"}));
-    assertEquals(false, StringHelper.isIn("pen", new String[] { "open", "close", "explore", "implore"}));
-    assertEquals(false, StringHelper.isIn(null, new String[] { "open", "close", "explore", "implore"}));
+    assertTrue(StringHelper.isIn("open", new String[] { "open", "close", "explore", "implore"}));
+    assertTrue(StringHelper.isIn("close", new String[] { "open", "close", "explore", "implore"}));
+    assertTrue(StringHelper.isIn("explore", new String[] { "open", "close", "explore", "implore"}));
+    assertTrue(StringHelper.isIn("implore", new String[] { "open", "close", "explore", "implore"}));
+    assertFalse(StringHelper.isIn("pen", new String[] { "open", "close", "explore", "implore"}));
+    assertFalse(StringHelper.isIn(null, new String[] { "open", "close", "explore", "implore"}));
   }
+  
+  @Test
+  public void endsWith()
+  {
+    assertFalse(StringHelper.endsWith(null));
+    assertFalse(StringHelper.endsWith(null, ".gif"));
+    assertFalse(StringHelper.endsWith("icon.png", ".gif"));
+    assertTrue(StringHelper.endsWith("icon.gif", ".gif"));
+    assertTrue(StringHelper.endsWith("icon.png", ".gif", ".png"));
+    assertTrue(StringHelper.endsWith(".png", ".gif", ".png"));
+  }  
 
   @Test
   public void startsWith()
   {
-    assertEquals(true, StringHelper.startsWith("Hurzel", "Hu"));
-    assertEquals(false, StringHelper.startsWith(null, "Hu"));
-    assertEquals(false, StringHelper.startsWith(null, null));
+    assertTrue(StringHelper.startsWith("Hurzel", "Hu"));
+    assertFalse(StringHelper.startsWith(null, "Hu"));
+    assertFalse(StringHelper.startsWith(null, (String)null));
     try {
-      assertEquals(false, StringHelper.startsWith("Hurzel", null));
+      assertFalse(StringHelper.startsWith("Hurzel", (String)null));
       fail();
     } catch (NullPointerException ex) {
     }
-    assertEquals(false, StringHelper.startsWith("Hurzel", "foo"));
+    assertFalse(StringHelper.startsWith("Hurzel", "foo"));
+    assertTrue(StringHelper.startsWith("Hurzel", "Ha", "Hu"));
   }
 
   @Test

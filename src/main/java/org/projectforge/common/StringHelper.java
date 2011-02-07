@@ -95,6 +95,43 @@ public class StringHelper
   }
 
   /**
+   * Nullpointer save version of String.endsWith.
+   * @return True, if the given string ends with one of the given suffixes, otherwise false.
+   * @see String#endsWith(String)
+   */
+  public static boolean endsWith(final String str, final String... suffixes)
+  {
+    if (str == null || suffixes == null) {
+      return false;
+    }
+    for (final String suffix : suffixes) {
+      if (str.endsWith(suffix) == true) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Nullpointer save version of String.startsWith.
+   * @return True, if the given string starts with one of the given prefixes, otherwise false.
+   * @see String#startsWith(String)
+   */
+  public static boolean startsWith(final String str, final String... prefixes)
+  {
+    if (str == null || prefixes == null) {
+      return false;
+    }
+    for (final String prefix : prefixes) {
+      if (str.startsWith(prefix) == true) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+
+  /**
    * For example ["Micromata", "IT-Services", "Computer"] -> "Computer, IT-Services, Micromata".
    * @param list List of input strings.
    * @param delimiter The delimiter of the single string in output string.
@@ -238,22 +275,6 @@ public class StringHelper
       return "";
     }
     return date.toString();
-  }
-
-  /**
-   * Nullpointer save version of String.startsWith.
-   * @param string
-   * @param pattern
-   * @return false if string is null otherwise the result of string.startsWith(pattern)
-   * @see java.lang.String#startsWith(String)
-   */
-  public static boolean startsWith(final String string, final String pattern)
-  {
-    if (string == null) {
-      return false;
-    } else {
-      return string.startsWith(pattern);
-    }
   }
 
   /**
