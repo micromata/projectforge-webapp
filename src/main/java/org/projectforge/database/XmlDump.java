@@ -40,12 +40,11 @@ import java.util.zip.GZIPOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
+import org.projectforge.database.xstream.HibernateXmlConverter;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import de.micromata.hibernate.spring.HibernateXmlConverter;
 
 /**
  * 
