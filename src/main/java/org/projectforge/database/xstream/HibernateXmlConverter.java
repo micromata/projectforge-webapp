@@ -41,6 +41,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.metadata.ClassMetadata;
+import org.projectforge.user.PFUserDO;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -51,7 +52,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import com.thoughtworks.xstream.MarshallingStrategy;
 import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.converters.Converter;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -62,12 +62,10 @@ import de.micromata.hibernate.history.HistoryEntry;
 import de.micromata.hibernate.history.delta.PropertyDelta;
 import de.micromata.hibernate.spring.NullWriter;
 import de.micromata.hibernate.spring.ProxyIdRefMarshallingStrategy;
-import de.micromata.hibernate.spring.XStreamSavingConverter;
 
 /**
  * Hilfsklasse zum Laden und Speichern einer gesamten Hibernate-Datenbank im XML-Format. Zur Darstellung der Daten in XML wird XStream zur
- * Serialisierung eingesetzt. Alle Lazy-Objekte aus Hibernate werden vollständig initialisiert.
- * http://jira.codehaus.org/browse/XSTR-377
+ * Serialisierung eingesetzt. Alle Lazy-Objekte aus Hibernate werden vollständig initialisiert. http://jira.codehaus.org/browse/XSTR-377
  * 
  * @author Wolfgang Jung (w.jung@micromata.de)
  * 
@@ -100,7 +98,7 @@ public class HibernateXmlConverter
    */
   public void dumpDatabaseToXml(final Writer writer, final boolean includeHistory)
   {
-    dumpDatabaseToXml(writer, includeHistory, false);
+    dumpDatabaseToXml(writer, includeHistory, true);
   }
 
   /**
@@ -165,13 +163,14 @@ public class HibernateXmlConverter
   private void insertObjectsFromStream(final Reader reader, final Session session) throws HibernateException
   {
     log.debug("Loading DB from stream");
-    final XStream stream = new XStream(new DomDriver());
-    stream.setMode(XStream.ID_REFERENCES);
-    Converter save = new XStreamSavingConverter(session);
-    stream.registerConverter(save, 10);
-
+    final XStream xstream = new XStream(new DomDriver());
+    xstream.setMode(XStream.ID_REFERENCES);
+    final XStreamSavingConverter save = new XStreamSavingConverter(session);
+    xstream.registerConverter(save, 10);
     // alle Objekte Laden und speichern
-    stream.fromXML(reader);
+    xstream.fromXML(reader);
+    save.appendOrderedType(PFUserDO.class);
+    save.saveObjects();
   }
 
   /**

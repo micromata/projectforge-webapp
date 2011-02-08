@@ -153,7 +153,7 @@ public class XmlDump
       } else {
         writer = new OutputStreamWriter(out, "utf-8");
       }
-      converter.dumpDatabaseToXml(writer, false); // history=false, preserveIds=true
+      converter.dumpDatabaseToXml(writer, true); // history=false, preserveIds=true
     } catch (IOException ex) {
       log.error(ex.getMessage(), ex);
     } finally {
