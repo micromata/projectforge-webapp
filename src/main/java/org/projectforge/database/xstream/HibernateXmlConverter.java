@@ -26,13 +26,14 @@ package org.projectforge.database.xstream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import net.sf.cglib.proxy.Enhancer;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.PredicateUtils;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.EntityMode;
 import org.hibernate.FlushMode;
@@ -41,6 +42,17 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.metadata.ClassMetadata;
+import org.projectforge.fibu.AuftragDO;
+import org.projectforge.fibu.AuftragsPositionDO;
+import org.projectforge.fibu.EingangsrechnungDO;
+import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.ProjektDO;
+import org.projectforge.fibu.RechnungDO;
+import org.projectforge.fibu.kost.Kost1DO;
+import org.projectforge.fibu.kost.Kost2ArtDO;
+import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.task.TaskDO;
+import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate3.HibernateCallback;
@@ -143,11 +155,7 @@ public class HibernateXmlConverter
           Session session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
           session.setFlushMode(FlushMode.AUTO);
           insertObjectsFromStream(reader, session);
-          session.flush();
-          session.connection().commit();
         } catch (HibernateException ex) {
-          log.warn("Failed to load db " + ex, ex);
-        } catch (SQLException ex) {
           log.warn("Failed to load db " + ex, ex);
         }
         return null;
@@ -169,7 +177,8 @@ public class HibernateXmlConverter
     xstream.registerConverter(save, 10);
     // alle Objekte Laden und speichern
     xstream.fromXML(reader);
-    save.appendOrderedType(PFUserDO.class);
+    save.appendOrderedType(PFUserDO.class, TaskDO.class, GroupDO.class, KundeDO.class, ProjektDO.class, Kost1DO.class, Kost2ArtDO.class,
+        Kost2DO.class, AuftragDO.class, AuftragsPositionDO.class, RechnungDO.class, EingangsrechnungDO.class);
     save.saveObjects();
   }
 
@@ -191,6 +200,7 @@ public class HibernateXmlConverter
     session.flush();
     // Alles laden
     List< ? > list = session.createQuery("select o from java.lang.Object o").setReadOnly(true).list();
+    list = (List< ? >) CollectionUtils.select(list, PredicateUtils.uniquePredicate());
     for (Iterator< ? > it = list.iterator(); it.hasNext();) {
       Object obj = it.next();
       if (log.isDebugEnabled()) {
