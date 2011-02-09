@@ -145,6 +145,9 @@ public class XStreamSavingConverter implements Converter
         // Object null or already written. Skip this item.
         continue;
       }
+      if (session.contains(obj) == true) {
+        continue;
+      }
       try {
         // Persistente Klasse?
         if (allClassMetadata.get(obj.getClass().getName()) != null) {
