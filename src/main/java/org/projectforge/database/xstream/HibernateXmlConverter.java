@@ -26,7 +26,6 @@ package org.projectforge.database.xstream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -35,17 +34,21 @@ import net.sf.cglib.proxy.Enhancer;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.PredicateUtils;
+import org.hibernate.EmptyInterceptor;
 import org.hibernate.EntityMode;
+import org.hibernate.FlushMode;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.metadata.ClassMetadata;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate3.HibernateCallback;
-import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate3.HibernateTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.thoughtworks.xstream.MarshallingStrategy;
 import com.thoughtworks.xstream.XStream;
@@ -67,10 +70,25 @@ import de.micromata.hibernate.spring.ProxyIdRefMarshallingStrategy;
  * @author Wolfgang Jung (w.jung@micromata.de)
  * 
  */
-public class HibernateXmlConverter extends HibernateDaoSupport
+public class HibernateXmlConverter
 {
   /** The logger */
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(HibernateXmlConverter.class);
+
+  /** the wrapper to hibernate */
+  private HibernateTemplate hibernate;
+
+  /**
+   * Initialisierung der Hibernate-verbindung.
+   * 
+   * @param hibernate ein bereits initialisiertes HibernateTemplate
+   */
+  public void setHibernate(HibernateTemplate hibernate)
+  {
+    this.hibernate = new HibernateTemplate(hibernate.getSessionFactory());
+    this.hibernate.setAlwaysUseNewSession(false);
+    this.hibernate.setExposeNativeSession(true);
+  }
 
   /**
    * Schreibt alle Objekte der Datenbank in den angegebenen Writer.<br/>
@@ -92,10 +110,18 @@ public class HibernateXmlConverter extends HibernateDaoSupport
    */
   public void dumpDatabaseToXml(final Writer writer, final boolean includeHistory, final boolean preserveIds)
   {
-    getHibernateTemplate().execute(new HibernateCallback() {
-      public Object doInHibernate(Session session) throws HibernateException, SQLException
+    TransactionTemplate tx = new TransactionTemplate(new HibernateTransactionManager(hibernate.getSessionFactory()));
+    tx.execute(new TransactionCallback() {
+      public Object doInTransaction(final TransactionStatus status)
       {
-        writeObjects(writer, includeHistory, session, preserveIds);
+        hibernate.execute(new HibernateCallback() {
+          public Object doInHibernate(Session session) throws HibernateException
+          {
+            writeObjects(writer, includeHistory, session, preserveIds);
+            status.setRollbackOnly();
+            return null;
+          }
+        });
         return null;
       }
     });
@@ -106,20 +132,16 @@ public class HibernateXmlConverter extends HibernateDaoSupport
    * {@link net.sf.hibernate.Session#save(java.lang.Object)} gespeichert, so dass die Datenbank leer sein sollte.
    * @param reader Reader auf eine XML-Datei
    */
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
   public void fillDatabaseFromXml(final Reader reader, final XStreamSavingConverter xstreamSavingConverter)
   {
-    getHibernateTemplate().execute(new HibernateCallback() {
-      public Object doInHibernate(Session session) throws HibernateException, SQLException
-      {
-        try {
-          insertObjectsFromStream(reader, session, xstreamSavingConverter);
-        } catch (HibernateException ex) {
-          log.warn("Failed to load db " + ex, ex);
-        }
-        return null;
-      }
-    });
+    final SessionFactory sessionFactory = hibernate.getSessionFactory();
+    try {
+      final Session session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
+      session.setFlushMode(FlushMode.AUTO);
+      insertObjectsFromStream(reader, session, xstreamSavingConverter);
+    } catch (HibernateException ex) {
+      log.warn("Failed to load db " + ex, ex);
+    }
   }
 
   /**

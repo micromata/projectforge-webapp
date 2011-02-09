@@ -31,8 +31,8 @@ import java.util.TimeZone;
 
 import org.projectforge.access.AccessException;
 import org.projectforge.task.TaskDO;
-import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskStatus;
+import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
@@ -42,13 +42,17 @@ import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRightDO;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
+import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * For initialization of a new ProjectForge system.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class InitDatabaseDao
+@Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+public class InitDatabaseDao extends HibernateDaoSupport
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(InitDatabaseDao.class);
 
@@ -58,7 +62,7 @@ public class InitDatabaseDao
 
   private GroupDao groupDao;
 
-  private TaskDao taskDao;
+  private TaskTree taskTree;
 
   private XmlDump xmlDump;
 
@@ -79,9 +83,9 @@ public class InitDatabaseDao
     this.groupDao = groupDao;
   }
 
-  public void setTaskDao(TaskDao taskDao)
+  public void setTaskTree(TaskTree taskTree)
   {
-    this.taskDao = taskDao;
+    this.taskTree = taskTree;
   }
 
   public void setXmlDump(XmlDump xmlDump)
@@ -99,18 +103,18 @@ public class InitDatabaseDao
     if (isEmpty() == false) {
       databaseNotEmpty();
     }
-    final TaskDO task = new TaskDO();
+    TaskDO task = new TaskDO();
     task.setTitle("Root");
     task.setStatus(TaskStatus.N);
     task.setShortDescription("ProjectForge root task");
     task.setCreated();
     task.setLastUpdate();
-    final Serializable id = taskDao.internalSave(task);
+    Serializable id = getHibernateTemplate().save(task);
     log.info("New object added (" + id + "): " + task.toString());
     // Use of taskDao does not work with maven test case: Could not synchronize database state with session?
 
     // Create Admin user
-    final PFUserDO admin = new PFUserDO();
+    PFUserDO admin = new PFUserDO();
     admin.setUsername(adminUsername);
     admin.setLastname("Administrator");
     admin.setPassword(encryptedAdminPassword);
@@ -139,7 +143,7 @@ public class InitDatabaseDao
     addGroup(ProjectForgeGroup.PROJECT_MANAGER, "Project managers have access to assigned orders and resource planning.", null);
     addGroup(ProjectForgeGroup.PROJECT_ASSISTANT, "Project assistants have access to assigned orders.", null);
 
-    taskDao.getTaskTree().setExpired();
+    taskTree.setExpired();
     userGroupCache.setExpired();
 
     log.fatal("Empty database successfully initialized.");
@@ -155,15 +159,14 @@ public class InitDatabaseDao
     groupDao.internalSave(group);
   }
 
-  public PFUserDO initializeEmptyDatabaseWithTestData(final String adminUsername, final String encryptedAdminPassword,
-      final TimeZone adminUserTimezone)
+  public PFUserDO initializeEmptyDatabaseWithTestData(final String adminUsername, final String encryptedAdminPassword, final TimeZone adminUserTimezone)
   {
     log.fatal("User wants to initialize database with test data.");
     if (isEmpty() == false) {
       databaseNotEmpty();
     }
     xmlDump.restoreDatabaseFromClasspathResource("/data/init-test-data.xml.gz", "utf-8");
-    final PFUserDO user = userDao.getInternalByName(DEFAULT_ADMIN_USER);
+    PFUserDO user = userDao.getInternalByName(DEFAULT_ADMIN_USER);
     if (user == null) {
       log.error("Initialization of database failed. Perhaps caused by corrupted init-test-data.xml.gz.");
     } else {
@@ -173,7 +176,7 @@ public class InitDatabaseDao
       userDao.internalUpdate(user);
       log.fatal("Database successfully initialized with test data.");
     }
-    taskDao.getTaskTree().setExpired();
+    taskTree.setExpired();
     userGroupCache.setExpired();
     return user;
   }

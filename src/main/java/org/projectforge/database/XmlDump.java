@@ -41,8 +41,13 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
+import org.hibernate.EmptyInterceptor;
+import org.hibernate.FlushMode;
+import org.hibernate.LockOptions;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.projectforge.database.xstream.HibernateXmlConverter;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.fibu.AuftragDO;
@@ -56,8 +61,12 @@ import org.projectforge.fibu.kost.Kost2ArtDO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
+import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.springframework.orm.hibernate3.HibernateTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import de.micromata.hibernate.history.HistoryEntry;
 import de.micromata.hibernate.history.delta.CollectionPropertyDelta;
@@ -75,11 +84,38 @@ public class XmlDump
 
   private static final String XML_DUMP_FILENAME = System.getProperty("user.home") + "/tmp/database-dump.xml.gz";
 
-  private HibernateXmlConverter hibernateXmlConverter;
+  private HibernateTemplate hibernate;
 
-  public void setHibernateXmlConverter(HibernateXmlConverter hibernateXmlConverter)
+  protected TransactionTemplate tx;
+
+  private GroupDao groupDao;
+
+  public void setGroupDao(GroupDao groupDao)
   {
-    this.hibernateXmlConverter = hibernateXmlConverter;
+    this.groupDao = groupDao;
+  }
+
+  public HibernateTemplate getHibernate()
+  {
+    Validate.notNull(hibernate);
+    return hibernate;
+  }
+
+  public void setHibernate(HibernateTemplate hibernate)
+  {
+    this.hibernate = hibernate;
+    tx = new TransactionTemplate(new HibernateTransactionManager(hibernate.getSessionFactory()));
+  }
+
+  public TransactionTemplate getTx()
+  {
+    Validate.notNull(tx);
+    return tx;
+  }
+
+  public void setTx(TransactionTemplate tx)
+  {
+    this.tx = tx;
   }
 
   public void restoreDatabase()
@@ -97,6 +133,8 @@ public class XmlDump
 
   public void restoreDatabase(Reader reader)
   {
+    final HibernateXmlConverter converter = new HibernateXmlConverter();
+    converter.setHibernate(hibernate);
     final List<GroupDO> groups = new ArrayList<GroupDO>();
     final XStreamSavingConverter xstreamSavingConverter = new XStreamSavingConverter() {
       @Override
@@ -104,22 +142,6 @@ public class XmlDump
       {
         if (GroupDO.class.isAssignableFrom(obj.getClass())) {
           groups.add((GroupDO) obj);
-          // final GroupDO origGroup= (GroupDO)obj;
-          // final Set<PFUserDO> assignedUsers = origGroup.getAssignedUsers();
-          // if (assignedUsers == null || assignedUsers.size() == 0) {
-          // // Nothing to do manually.
-          // return null;
-          // }
-          // // No we've to initialize the set of assigned users.
-          // final Serializable id = session.save(origGroup);
-          // final GroupDO group = (GroupDO)session.get(GroupDO.class, id, LockOptions.READ);
-          // // Users are not added automatically (cascade doesn't work for, why?):
-          // for (final PFUserDO assignedUser : assignedUsers) {
-          // final PFUserDO dbUser = (PFUserDO)session.load(PFUserDO.class, assignedUser.getId());
-          // group.addUser(dbUser);
-          // }
-          // session.merge(group);
-          // return id;
         }
         return null;
       }
@@ -129,63 +151,29 @@ public class XmlDump
         Kost2ArtDO.class, Kost2DO.class, AuftragDO.class, AuftragsPositionDO.class, RechnungDO.class, EingangsrechnungDO.class,
         HistoryEntry.class);
     try {
-      hibernateXmlConverter.fillDatabaseFromXml(reader, xstreamSavingConverter);
+      converter.fillDatabaseFromXml(reader, xstreamSavingConverter);
     } catch (Exception ex) {
       log.error(ex.getMessage(), ex);
-     // throw new RuntimeException(ex);
+      throw new RuntimeException(ex);
     } finally {
       IOUtils.closeQuietly(reader);
     }
-    showNumberOfAssignedUsers("after import", groups);
     {
-//      final SessionFactory sessionFactory = hibernate.getSessionFactory();
-//      final Session session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
-//      session.setFlushMode(FlushMode.AUTO);
-//      for (final GroupDO origGroup : groups) {
-//        if (origGroup.getAssignedUsers() == null) {
-//          continue;
-//        }
-//        final GroupDO group = (GroupDO) session.get(GroupDO.class, origGroup.getId(), LockOptions.READ);
-//        // Users are not added automatically (cascade doesn't work for, why?):
-//        for (final PFUserDO assignedUser : origGroup.getAssignedUsers()) {
-//          final PFUserDO dbUser = (PFUserDO) session.load(PFUserDO.class, assignedUser.getId());
-//          group.addUser(dbUser);
-//        }
-//        session.merge(group);
-//      }
-//      session.close();
+      final SessionFactory sessionFactory = hibernate.getSessionFactory();
+      final Session session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
+      session.setFlushMode(FlushMode.AUTO);
+      for (final GroupDO origGroup : groups) {
+        if (origGroup.getAssignedUsers() == null) {
+          continue;
+        }
+        final GroupDO group = (GroupDO)session.load(GroupDO.class, origGroup.getId(), LockOptions.UPGRADE);
+        // Users are not added automatically (cascade doesn't work for, why?):
+        for (final PFUserDO assignedUser : origGroup.getAssignedUsers()) {
+          group.addUser(assignedUser);
+        }
+        groupDao.internalUpdate(group);
+      }
     }
-    showNumberOfAssignedUsers("after session.merge() fix", groups);
-//    {
-//      for (final GroupDO origGroup : groups) {
-//        if (origGroup.getAssignedUsers() == null) {
-//          continue;
-//        }
-//        final GroupDO group = groupDao.internalGetById(origGroup.getId());
-//        // Users are not added automatically (cascade doesn't work for, why?):
-//        for (final PFUserDO assignedUser : origGroup.getAssignedUsers()) {
-//          final PFUserDO dbUser = (PFUserDO) userDao.internalGetById(assignedUser.getId());
-//          group.addUser(dbUser);
-//        }
-//        groupDao.internalUpdate(group);
-//      }
-//    }
-//    showNumberOfAssignedUsers("after groupDao fix", groups);
-  }
-
-  private void showNumberOfAssignedUsers(final String text, final List<GroupDO> groups)
-  {
-//    final SessionFactory sessionFactory = hibernate.getSessionFactory();
-//    final Session session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
-//    session.setFlushMode(FlushMode.AUTO);
-//    for (final GroupDO origGroup : groups) {
-//      if (origGroup.getAssignedUsers() == null) {
-//        continue;
-//      }
-//      final GroupDO group = (GroupDO) session.get(GroupDO.class, origGroup.getId(), LockOptions.READ);
-//      log.info(text + ": Assigned users " + group.getAssignedUsers().size());
-//    }
-//    session.close();
   }
 
   public void restoreDatabaseFromClasspathResource(String path, String encoding)
@@ -219,6 +207,8 @@ public class XmlDump
    */
   public void dumpDatabase(String filename, OutputStream out)
   {
+    HibernateXmlConverter converter = new HibernateXmlConverter();
+    converter.setHibernate(hibernate);
     Writer writer = null;
     GZIPOutputStream gzipOut = null;
     try {
@@ -228,7 +218,7 @@ public class XmlDump
       } else {
         writer = new OutputStreamWriter(out, "utf-8");
       }
-      hibernateXmlConverter.dumpDatabaseToXml(writer, true); // history=false, preserveIds=true
+      converter.dumpDatabaseToXml(writer, true); // history=false, preserveIds=true
     } catch (IOException ex) {
       log.error(ex.getMessage(), ex);
     } finally {
