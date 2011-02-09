@@ -270,7 +270,7 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
               if (srcColl instanceof TreeSet) {
                 destColl = new TreeSet<Object>();
               } else if (srcColl instanceof HashSet) {
-                destColl = new TreeSet<Object>();
+                destColl = new HashSet<Object>();
               } else if (srcColl instanceof List) {
                 destColl = new ArrayList<Object>();
               } else if (srcColl instanceof PersistentSet) {
