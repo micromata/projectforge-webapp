@@ -42,18 +42,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.metadata.ClassMetadata;
-import org.projectforge.fibu.AuftragDO;
-import org.projectforge.fibu.AuftragsPositionDO;
-import org.projectforge.fibu.EingangsrechnungDO;
-import org.projectforge.fibu.KundeDO;
-import org.projectforge.fibu.ProjektDO;
-import org.projectforge.fibu.RechnungDO;
-import org.projectforge.fibu.kost.Kost1DO;
-import org.projectforge.fibu.kost.Kost2ArtDO;
-import org.projectforge.fibu.kost.Kost2DO;
-import org.projectforge.task.TaskDO;
-import org.projectforge.user.GroupDO;
-import org.projectforge.user.PFUserDO;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
@@ -144,7 +132,7 @@ public class HibernateXmlConverter
    * {@link net.sf.hibernate.Session#save(java.lang.Object)} gespeichert, so dass die Datenbank leer sein sollte.
    * @param reader Reader auf eine XML-Datei
    */
-  public void fillDatabaseFromXml(final Reader reader)
+  public void fillDatabaseFromXml(final Reader reader, final XStreamSavingConverter xstreamSavingConverter)
   {
     TransactionTemplate tx = new TransactionTemplate(new HibernateTransactionManager(hibernate.getSessionFactory()));
     tx.execute(new TransactionCallback() {
@@ -154,7 +142,7 @@ public class HibernateXmlConverter
         try {
           Session session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
           session.setFlushMode(FlushMode.AUTO);
-          insertObjectsFromStream(reader, session);
+          insertObjectsFromStream(reader, session, xstreamSavingConverter);
         } catch (HibernateException ex) {
           log.warn("Failed to load db " + ex, ex);
         }
@@ -168,18 +156,16 @@ public class HibernateXmlConverter
    * @param session
    * @throws HibernateException
    */
-  private void insertObjectsFromStream(final Reader reader, final Session session) throws HibernateException
+  private void insertObjectsFromStream(final Reader reader, final Session session, final XStreamSavingConverter xstreamSavingConverter) throws HibernateException
   {
     log.debug("Loading DB from stream");
     final XStream xstream = new XStream(new DomDriver());
     xstream.setMode(XStream.ID_REFERENCES);
-    final XStreamSavingConverter save = new XStreamSavingConverter(session);
-    xstream.registerConverter(save, 10);
+    xstreamSavingConverter.setSession(session);
+    xstream.registerConverter(xstreamSavingConverter, 10);
     // alle Objekte Laden und speichern
     xstream.fromXML(reader);
-    save.appendOrderedType(PFUserDO.class, TaskDO.class, GroupDO.class, KundeDO.class, ProjektDO.class, Kost1DO.class, Kost2ArtDO.class,
-        Kost2DO.class, AuftragDO.class, AuftragsPositionDO.class, RechnungDO.class, EingangsrechnungDO.class);
-    save.saveObjects();
+    xstreamSavingConverter.saveObjects();
   }
 
   /**

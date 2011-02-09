@@ -32,24 +32,44 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
 import org.projectforge.database.xstream.HibernateXmlConverter;
+import org.projectforge.database.xstream.XStreamSavingConverter;
+import org.projectforge.fibu.AuftragDO;
+import org.projectforge.fibu.AuftragsPositionDO;
+import org.projectforge.fibu.EingangsrechnungDO;
+import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.ProjektDO;
+import org.projectforge.fibu.RechnungDO;
+import org.projectforge.fibu.kost.Kost1DO;
+import org.projectforge.fibu.kost.Kost2ArtDO;
+import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.task.TaskDO;
+import org.projectforge.user.GroupDO;
+import org.projectforge.user.PFUserDO;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import de.micromata.hibernate.history.delta.CollectionPropertyDelta;
+import de.micromata.hibernate.history.delta.PropertyDelta;
+import de.micromata.hibernate.history.delta.SimplePropertyDelta;
+
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 public class XmlDump
 {
@@ -99,10 +119,36 @@ public class XmlDump
 
   public void restoreDatabase(Reader reader)
   {
-    HibernateXmlConverter converter = new HibernateXmlConverter();
+    final HibernateXmlConverter converter = new HibernateXmlConverter();
     converter.setHibernate(hibernate);
+    final XStreamSavingConverter xstreamSavingConverter = new XStreamSavingConverter() {
+      @Override
+      public Serializable onBeforeSave(final Session session, final Object obj)
+      {
+        if (GroupDO.class.isAssignableFrom(obj.getClass())) {
+          final GroupDO origGroup = (GroupDO)obj;
+          final Set<PFUserDO> assignedUsers = origGroup.getAssignedUsers();
+          if (assignedUsers == null || assignedUsers.size() == 0) {
+            // Nothing to do manually.
+            return null;
+          }
+          // No we've to initialize the set of assigned users.
+          final GroupDO group = new GroupDO();
+          group.copyValuesFrom(origGroup);
+          for (final PFUserDO assignedUser : assignedUsers) {
+            final PFUserDO dbUser = (PFUserDO)session.load(PFUserDO.class, assignedUser.getId());
+            group.addUser(dbUser);
+          }
+          return session.save(group);
+        }
+        return null;
+      }
+    };
+    xstreamSavingConverter.appendIgnoredObjects(PropertyDelta.class, SimplePropertyDelta.class, CollectionPropertyDelta.class);
+    xstreamSavingConverter.appendOrderedType(PFUserDO.class, GroupDO.class, TaskDO.class, KundeDO.class, ProjektDO.class, Kost1DO.class,
+        Kost2ArtDO.class, Kost2DO.class, AuftragDO.class, AuftragsPositionDO.class, RechnungDO.class, EingangsrechnungDO.class);
     try {
-      converter.fillDatabaseFromXml(reader);
+      converter.fillDatabaseFromXml(reader, xstreamSavingConverter);
     } catch (Exception ex) {
       log.error(ex.getMessage(), ex);
       throw new RuntimeException(ex);

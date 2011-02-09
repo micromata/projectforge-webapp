@@ -64,14 +64,20 @@ public class XStreamSavingConverter implements Converter
   // Store the objects in the given order and all the other object types which are not listed here afterwards.
   private final List<Class< ? >> orderOfSaving = new ArrayList<Class< ? >>();
 
-  private final Session session;
+  private final Set<Class< ? >> ignoreFromSaving = new HashSet<Class< ? >>();
 
-  private final Map<String, Object> allClassMetadata;
+  private Session session;
 
-  @SuppressWarnings("unchecked")
-  public XStreamSavingConverter(final Session session) throws HibernateException
+  private Map<String, Object> allClassMetadata;
+
+  public XStreamSavingConverter() throws HibernateException
   {
     defaultConv = new XStream().getConverterLookup();
+  }
+
+  @SuppressWarnings("unchecked")
+  public void setSession(final Session session)
+  {
     this.session = session;
     allClassMetadata = session.getSessionFactory().getAllClassMetadata();
   }
@@ -93,6 +99,16 @@ public class XStreamSavingConverter implements Converter
     return this;
   }
 
+  public XStreamSavingConverter appendIgnoredObjects(final Class< ? >... types)
+  {
+    if (types != null) {
+      for (final Class< ? > type : types) {
+        this.ignoreFromSaving.add(type);
+      }
+    }
+    return this;
+  }
+
   public void saveObjects()
   {
     for (final Class< ? > type : orderOfSaving) {
@@ -103,9 +119,19 @@ public class XStreamSavingConverter implements Converter
     }
   }
 
+  /**
+   * Will be called directly before an object will be saved.
+   * @param obj
+   * @return id of the inserted objects if saved manually inside this method or null if the object has to be saved by save method (default).
+   */
+  public Serializable onBeforeSave(final Session session, final Object obj)
+  {
+    return null;
+  }
+
   private void save(final Class< ? > type)
   {
-    if (writtenObjectTypes.contains(type) == true) {
+    if (ignoreFromSaving.contains(type) == true || writtenObjectTypes.contains(type) == true) {
       // Already written.
       return;
     }
@@ -125,7 +151,10 @@ public class XStreamSavingConverter implements Converter
           if (log.isDebugEnabled()) {
             log.debug("Try to write object " + obj);
           }
-          final Serializable id = session.save(obj);
+          Serializable id = onBeforeSave(session, obj);
+          if (id == null) {
+            id = session.save(obj);
+          }
           writtenObjects.add(obj);
           if (log.isDebugEnabled() == true) {
             log.debug("wrote object " + obj + " under id " + id);
