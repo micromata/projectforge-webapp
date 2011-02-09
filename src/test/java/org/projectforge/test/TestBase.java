@@ -196,6 +196,7 @@ public class TestBase
         deleteFrom(hibernateTemplate, "GroupTaskAccessDO");
         deleteAllDBObjects(hibernateTemplate, "ProjektDO"); // Before task
         deleteFrom(hibernateTemplate, "KundeDO");
+        deleteFrom(hibernateTemplate, "GanttChartDO"); // Before task
         deleteAllDBObjects(hibernateTemplate, "TaskDO");
         deleteAllDBObjects(hibernateTemplate, "MebEntryDO");
         deleteFrom(hibernateTemplate, "ImportedMebEntryDO");
