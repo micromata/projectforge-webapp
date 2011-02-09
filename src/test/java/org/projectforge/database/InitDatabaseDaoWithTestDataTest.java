@@ -25,6 +25,7 @@ package org.projectforge.database;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -43,7 +44,6 @@ import org.projectforge.task.TaskDao;
 import org.projectforge.test.TestBase;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
-
 
 public class InitDatabaseDaoWithTestDataTest extends TestBase
 {
@@ -91,27 +91,33 @@ public class InitDatabaseDaoWithTestDataTest extends TestBase
   @Test
   public void initializeEmptyDatabase()
   {
-    final String encryptedPassword = userDao.encryptPassword(InitDatabaseDaoTest.DEFAULT_ADMIN_PASSWORD);
+    final String encryptedPassword = userDao.encryptPassword("testpassword");
     userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
     assertTrue(initDatabaseDao.isEmpty());
-    initDatabaseDao.initializeEmptyDatabaseWithTestData(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword, null);
-    PFUserDO user = userDao.authenticateUser("admin", userDao.encryptPassword(InitDatabaseDaoTest.DEFAULT_ADMIN_PASSWORD));
-    assertNotNull(user);
-    assertEquals("admin", user.getUsername());
-    Collection<Integer> col = userGroupCache.getUserGroups(user);
+    initDatabaseDao.initializeEmptyDatabaseWithTestData("myadmin", encryptedPassword, null);
+    final PFUserDO initialAdminUser = userDao.authenticateUser("myadmin", encryptedPassword);
+    assertNotNull(initialAdminUser);
+    assertEquals("myadmin", initialAdminUser.getUsername());
+    final Collection<Integer> col = userGroupCache.getUserGroups(initialAdminUser);
     assertEquals(5, col.size());
-    assertTrue(userGroupCache.isUserMemberOfAdminGroup(user.getId()));
-    assertTrue(userGroupCache.isUserMemberOfFinanceGroup(user.getId()));
+    assertTrue(userGroupCache.isUserMemberOfAdminGroup(initialAdminUser.getId()));
+    assertTrue(userGroupCache.isUserMemberOfFinanceGroup(initialAdminUser.getId()));
 
-    List<AddressDO> addressList = addressDao.internalLoadAll();
-    assertEquals(1, addressList.size());
-    
-    List<BookDO> bookList = bookDao.internalLoadAll();
-    assertEquals(2, bookList.size());
-    
-    List<TaskDO> taskList = taskDao.internalLoadAll();
-    assertEquals(6, taskList.size());
-    
+    final List<PFUserDO> userList = userDao.internalLoadAll();
+    assertTrue(userList.size() > 0);
+    for (final PFUserDO user : userList) {
+      assertNull("For security reasons the stay-logged-in-key should be null.", user.getStayLoggedInKey());
+    }
+
+    final List<AddressDO> addressList = addressDao.internalLoadAll();
+    assertTrue(addressList.size() > 0);
+
+    final List<BookDO> bookList = bookDao.internalLoadAll();
+    assertTrue(bookList.size() > 2);
+
+    final List<TaskDO> taskList = taskDao.internalLoadAll();
+    assertTrue(taskList.size() > 10);
+
     boolean exception = false;
     try {
       initDatabaseDao.initializeEmptyDatabase(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword, null);
