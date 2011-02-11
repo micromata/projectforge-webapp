@@ -45,7 +45,6 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
@@ -117,9 +116,9 @@ public class GroupTaskAccessDO extends DefaultBaseDO
    * Get the history entries for this object.
    * 
    */
-  @OneToMany(cascade = { CascadeType.ALL}, fetch = FetchType.EAGER, orphanRemoval = true)
+  // CascadeType.ALL doesn't work for import InitDatabaseDaoWithTestDataTest (why?).
+  @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.REMOVE}, fetch = FetchType.EAGER, orphanRemoval = true)
   @JoinColumn(name = "group_task_access_fk")
-  @Cascade(value = org.hibernate.annotations.CascadeType.SAVE_UPDATE)
   public Set<AccessEntryDO> getAccessEntries()
   {
     return this.accessEntries;
@@ -161,7 +160,7 @@ public class GroupTaskAccessDO extends DefaultBaseDO
 
   // @Column(name = "group_id")
   @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE})
-  @JoinColumn(name = "group_id", nullable = false)
+  @JoinColumn(name = "group_id")
   public GroupDO getGroup()
   {
     return group;
@@ -175,7 +174,7 @@ public class GroupTaskAccessDO extends DefaultBaseDO
 
   // @Column(name = "task_id")
   @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE}, targetEntity = TaskDO.class)
-  @JoinColumn(name = "task_id", nullable = false)
+  @JoinColumn(name = "task_id")
   public TaskDO getTask()
   {
     return task;
