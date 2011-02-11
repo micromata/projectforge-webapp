@@ -46,7 +46,7 @@ public class AuftragsPositionVO implements Comparable<AuftragsPositionVO>, Seria
   private String auftragTitle;
 
   private AuftragsStatus auftragsStatus;
-  
+
   private BigDecimal auftragsPersonDays;
 
   private Integer taskId;
@@ -67,11 +67,13 @@ public class AuftragsPositionVO implements Comparable<AuftragsPositionVO>, Seria
   {
     final AuftragDO auftrag = auftragsPosition.getAuftrag();
     this.number = auftragsPosition.getNumber();
-    this.auftragId = auftrag.getId();
-    this.auftragNummer = auftrag.getNummer();
-    this.auftragTitle = auftrag.getTitel();
-    this.auftragsStatus = auftrag.getAuftragsStatus();
-    this.auftragsPersonDays = auftrag.getPersonDays();
+    if (auftrag != null) { // Should be always true.
+      this.auftragId = auftrag.getId();
+      this.auftragNummer = auftrag.getNummer();
+      this.auftragTitle = auftrag.getTitel();
+      this.auftragsStatus = auftrag.getAuftragsStatus();
+      this.auftragsPersonDays = auftrag.getPersonDays();
+    }
     this.taskId = auftragsPosition.getTaskId();
     this.art = auftragsPosition.getArt();
     this.status = auftragsPosition.getStatus();
@@ -136,7 +138,7 @@ public class AuftragsPositionVO implements Comparable<AuftragsPositionVO>, Seria
   {
     return auftragTitle;
   }
-  
+
   /**
    * @see AuftragDO#getAuftragsStatus()
    */
@@ -144,7 +146,7 @@ public class AuftragsPositionVO implements Comparable<AuftragsPositionVO>, Seria
   {
     return auftragsStatus;
   }
-  
+
   /**
    * @see AuftragDO#getPersonDays()
    */
