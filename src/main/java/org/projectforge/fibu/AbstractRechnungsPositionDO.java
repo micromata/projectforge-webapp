@@ -262,10 +262,20 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
   @Transient
   protected abstract AbstractRechnungDO< ? > getRechnung();
 
+  @Transient
+  public Integer getRechnungId()
+  {
+    if (getRechnung() == null) {
+      return null;
+    } else {
+      return getRechnung().getId();
+    }
+  }
+
   /**
    * setEingangsrechnung(rechnung)
    */
-  protected abstract AbstractRechnungsPositionDO setRechnung(final AbstractRechnungDO< ? > rechnung);
+  public abstract AbstractRechnungsPositionDO setRechnung(final AbstractRechnungDO< ? > rechnung);
 
   /**
    * Does only work for not already persisted entries (meaning entries without an id / pk) and only the last entry of the list. Otherwise
@@ -373,10 +383,12 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
   {
     if (o instanceof AbstractRechnungsPositionDO) {
       AbstractRechnungsPositionDO other = (AbstractRechnungsPositionDO) o;
-      if (ObjectUtils.equals(this.getNumber(), other.getNumber()) == false)
+      if (ObjectUtils.equals(this.getNumber(), other.getNumber()) == false) {
         return false;
-      if (ObjectUtils.equals(this.getRechnung().getId(), other.getRechnung().getId()) == false)
+      }
+      if (ObjectUtils.equals(this.getRechnungId(), other.getRechnungId()) == false) {
         return false;
+      }
       return true;
     }
     return false;
