@@ -41,7 +41,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.IndexColumn;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
@@ -55,7 +54,6 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.PFPersistancyBehavior;
 import org.projectforge.user.PFUserDO;
-
 
 /**
  * Repräsentiert einen Auftrag oder ein Angebot. Ein Angebot kann abgelehnt oder durch ein anderes ersetzt werden, muss also nicht zum
@@ -442,9 +440,7 @@ public class AuftragDO extends DefaultBaseDO
   /**
    * Get the position entries for this object.
    */
-  @OneToMany(cascade = { CascadeType.ALL}, fetch = FetchType.EAGER)
-  @JoinColumn(name = "auftrag_fk")
-  @Cascade(value = { org.hibernate.annotations.CascadeType.DELETE_ORPHAN, org.hibernate.annotations.CascadeType.SAVE_UPDATE})
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "auftrag")
   @IndexColumn(name = "number", base = 1)
   public List<AuftragsPositionDO> getPositionen()
   {
@@ -517,8 +513,7 @@ public class AuftragDO extends DefaultBaseDO
   }
 
   /**
-   * Sums all positions.
-   * Must be set in all positions before usage. The value is not calculated automatically!
+   * Sums all positions. Must be set in all positions before usage. The value is not calculated automatically!
    * @see AuftragDao#calculateInvoicedSum(java.util.Collection)
    */
   @Transient
@@ -536,7 +531,7 @@ public class AuftragDO extends DefaultBaseDO
     }
     return this.fakturiertSum;
   }
-  
+
   public AuftragDO setFakturiertSum(final BigDecimal fakturiertSum)
   {
     this.fakturiertSum = fakturiertSum;
