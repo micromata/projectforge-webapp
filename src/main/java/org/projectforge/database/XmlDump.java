@@ -40,6 +40,7 @@ import java.util.zip.GZIPOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.FlushMode;
@@ -48,6 +49,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.projectforge.access.AccessEntryDO;
 import org.projectforge.access.GroupTaskAccessDO;
+import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.database.xstream.HibernateXmlConverter;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.fibu.AbstractRechnungDO;
@@ -80,6 +82,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import de.micromata.hibernate.history.HistoryEntry;
+import de.micromata.hibernate.history.delta.AssociationPropertyDelta;
 import de.micromata.hibernate.history.delta.CollectionPropertyDelta;
 import de.micromata.hibernate.history.delta.PropertyDelta;
 import de.micromata.hibernate.history.delta.SimplePropertyDelta;
@@ -98,6 +101,13 @@ public class XmlDump
   private HibernateTemplate hibernate;
 
   protected TransactionTemplate tx;
+
+  /**
+   * These classes are stored automatically because they're dependent.
+   */
+  private Class< ? >[] embeddedClasses = new Class< ? >[] { UserRightDO.class, AuftragsPositionDO.class, EingangsrechnungsPositionDO.class,
+      RechnungsPositionDO.class, HistoryEntry.class, PropertyDelta.class, SimplePropertyDelta.class, AssociationPropertyDelta.class,
+      CollectionPropertyDelta.class};
 
   public HibernateTemplate getHibernate()
   {
@@ -122,10 +132,13 @@ public class XmlDump
     this.tx = tx;
   }
 
-  public void restoreDatabase()
+  /**
+   * @return Only for test cases.
+   */
+  public XStreamSavingConverter restoreDatabase()
   {
     try {
-      restoreDatabase(new InputStreamReader(new FileInputStream(XML_DUMP_FILENAME), "utf-8"));
+      return restoreDatabase(new InputStreamReader(new FileInputStream(XML_DUMP_FILENAME), "utf-8"));
     } catch (UnsupportedEncodingException ex) {
       log.error(ex.getMessage(), ex);
       throw new RuntimeException(ex);
@@ -135,41 +148,92 @@ public class XmlDump
     }
   }
 
-  public void restoreDatabase(Reader reader)
+  /**
+   * @param reader
+   * @return Only for test cases.
+   */
+  public XStreamSavingConverter restoreDatabase(Reader reader)
   {
     final XStreamSavingConverter xstreamSavingConverter = new XStreamSavingConverter() {
+
+      @Override
+      protected Serializable getOriginalIdentifierValue(final Object obj)
+      {
+        return HibernateUtils.getIdentifier(obj);
+      }
+
       @Override
       public Serializable onBeforeSave(final Session session, final Object obj)
       {
-        if (obj instanceof UserRightDO) {
-          ((UserRightDO) obj).setUser(null);
-        } else if (obj instanceof AbstractRechnungDO<?>) {
-          final AbstractRechnungDO<?> rechnung = (AbstractRechnungDO<?>) obj;
-          final Serializable id = session.save(rechnung);
+        if (obj instanceof PFUserDO) {
+          final PFUserDO user = (PFUserDO) obj;
+          Serializable id;
+          if (user.getRights() != null) {
+            for (final UserRightDO right : user.getRights()) {
+              right.setUser(null);
+              save(right);
+            }
+            id = save(user);
+            for (final UserRightDO right : user.getRights()) {
+              right.setUser(user);
+            }
+          } else {
+            id = save(user);
+          }
+          return id;
+        } else if (obj instanceof AbstractRechnungDO< ? >) {
+          final AbstractRechnungDO< ? > rechnung = (AbstractRechnungDO< ? >) obj;
           if (rechnung.getPositionen() != null) {
             for (final AbstractRechnungsPositionDO pos : rechnung.getPositionen()) {
-              save(pos);
               if (pos.getKostZuweisungen() != null) {
                 for (final KostZuweisungDO zuweisung : pos.getKostZuweisungen()) {
+                  zuweisung.setEingangsrechnungsPosition(null);
+                  zuweisung.setRechnungsPosition(null);
                   save(zuweisung);
                 }
               }
+              pos.setRechnung(null);
+              save(pos);
             }
           }
+          final Serializable id = save(rechnung);
           return id;
+        } else if (obj instanceof AuftragDO) {
+          final AuftragDO auftrag = (AuftragDO) obj;
+          if (auftrag.getPositionen() != null) {
+            for (final AuftragsPositionDO pos : auftrag.getPositionen()) {
+              pos.setAuftrag(null);
+              save(pos);
+            }
+          }
+          return save(auftrag);
+        } else if (obj instanceof HistoryEntry) {
+          final HistoryEntry entry = (HistoryEntry) obj;
+          final Integer origEntityId = entry.getEntityId();
+          final String entityClassname = entry.getClassName();
+          final Serializable newId = getNewId(entityClassname, origEntityId);
+          if (newId != null) {
+            try {
+              FieldUtils.writeField(entry, "entityId", (Integer) newId, true);
+            } catch (IllegalAccessException ex) {
+              log.error("Can't modify id of history entry. This results in a corrupted history: " + entry);
+              log.fatal("Exception encountered " + ex, ex);
+            }
+          } else {
+            log.error("Can't find mapping of old entity id. This results in a corrupted history: " + entry);
+          }
+          return save(entry);
         }
         return null;
       }
     };
     // UserRightDO is inserted on cascade while inserting PFUserDO.
-    xstreamSavingConverter.appendIgnoredObjects(UserRightDO.class, EingangsrechnungsPositionDO.class, HistoryEntry.class,
-        PropertyDelta.class, SimplePropertyDelta.class, CollectionPropertyDelta.class);
+    xstreamSavingConverter.appendIgnoredObjects(embeddedClasses);
     xstreamSavingConverter.appendOrderedType(PFUserDO.class, GroupDO.class, TaskDO.class, KundeDO.class, ProjektDO.class, Kost1DO.class,
-        Kost2ArtDO.class, Kost2DO.class, AuftragDO.class, AuftragsPositionDO.class, //
-        RechnungDO.class, RechnungsPositionDO.class, EingangsrechnungDO.class, //
-        EmployeeSalaryDO.class, KostZuweisungDO.class,//
+        Kost2ArtDO.class, Kost2DO.class, AuftragDO.class, //
+        RechnungDO.class, EingangsrechnungDO.class, EmployeeSalaryDO.class, KostZuweisungDO.class,//
         UserPrefEntryDO.class, UserPrefDO.class, //
-        GroupTaskAccessDO.class, AccessEntryDO.class);
+        AccessEntryDO.class, GroupTaskAccessDO.class);
     try {
       final SessionFactory sessionFactory = hibernate.getSessionFactory();
       final Session session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
@@ -190,22 +254,7 @@ public class XmlDump
     } finally {
       IOUtils.closeQuietly(reader);
     }
-    // {
-    // final SessionFactory sessionFactory = hibernate.getSessionFactory();
-    // final Session session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
-    // session.setFlushMode(FlushMode.AUTO);
-    // for (final GroupDO origGroup : groups) {
-    // if (origGroup.getAssignedUsers() == null) {
-    // continue;
-    // }
-    // final GroupDO group = (GroupDO)session.load(GroupDO.class, origGroup.getId(), LockOptions.UPGRADE);
-    // // Users are not added automatically (cascade doesn't work for, why?):
-    // for (final PFUserDO assignedUser : origGroup.getAssignedUsers()) {
-    // group.addUser(assignedUser);
-    // }
-    // groupDao.internalUpdate(group);
-    // }
-    // }
+    return xstreamSavingConverter;
   }
 
   public void restoreDatabaseFromClasspathResource(String path, String encoding)
@@ -239,8 +288,16 @@ public class XmlDump
    */
   public void dumpDatabase(String filename, OutputStream out)
   {
-    HibernateXmlConverter converter = new HibernateXmlConverter();
+    HibernateXmlConverter converter = new HibernateXmlConverter() {
+      @Override
+      protected void init(XStream xstream)
+      {
+        xstream.omitField(AbstractBaseDO.class, "minorChange");
+        xstream.omitField(AbstractBaseDO.class, "selected");
+      }
+    };
     converter.setHibernate(hibernate);
+    converter.appendIgnoredTopLevelObjects(embeddedClasses);
     Writer writer = null;
     GZIPOutputStream gzipOut = null;
     try {

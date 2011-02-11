@@ -24,11 +24,15 @@
 package org.projectforge.database;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 import org.hibernate.Hibernate;
 import org.hibernate.MappingException;
@@ -84,6 +88,31 @@ public class HibernateUtils
       return ((UserPrefEntryDO) obj).getId();
     }
     log.error("Couldn't get the identifier of the given object (Jassist/Hibernate-Bug: HHH-3502) for class: " + obj.getClass().getName());
+    return null;
+  }
+
+  public static Serializable getIdentifier(final Object obj)
+  {
+    if (obj instanceof BaseDO< ? >) {
+      return getIdentifier((BaseDO< ? >) obj);
+    }
+    for (final Field field : obj.getClass().getDeclaredFields()) {
+      if (field.isAnnotationPresent(Id.class) == true && field.isAnnotationPresent(GeneratedValue.class) == true) {
+        final boolean isAccessible = field.isAccessible();
+        try {
+          field.setAccessible(true);
+          final Object idObject = field.get(obj);
+          field.setAccessible(isAccessible);
+          if (idObject != null && Serializable.class.isAssignableFrom(idObject.getClass()) == true) {
+            return (Serializable) idObject;
+          }
+        } catch (IllegalArgumentException e) {
+          e.printStackTrace();
+        } catch (IllegalAccessException e) {
+          e.printStackTrace();
+        }
+      }
+    }
     return null;
   }
 
