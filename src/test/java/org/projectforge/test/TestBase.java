@@ -177,6 +177,7 @@ public class TestBase
         deleteFrom(hibernateTemplate, "AccessEntryDO");
         deleteFrom(hibernateTemplate, "PersonalAddressDO");
         deleteFrom(hibernateTemplate, "AddressDO");
+        deleteFrom(hibernateTemplate, "KostZuweisungDO");
         deleteFrom(hibernateTemplate, "RechnungsPositionDO"); // Before Autrag*DO
         deleteFrom(hibernateTemplate, "RechnungDO");
         deleteFrom(hibernateTemplate, "AuftragsPositionDO");
@@ -192,7 +193,6 @@ public class TestBase
         deleteFrom(hibernateTemplate, "Kost1DO");
         deleteFrom(hibernateTemplate, "Kost2DO");
         deleteFrom(hibernateTemplate, "Kost2ArtDO");
-        deleteFrom(hibernateTemplate, "KostZuweisungDO");
         deleteFrom(hibernateTemplate, "GroupTaskAccessDO");
         deleteAllDBObjects(hibernateTemplate, "ProjektDO"); // Before task
         deleteFrom(hibernateTemplate, "KundeDO");
