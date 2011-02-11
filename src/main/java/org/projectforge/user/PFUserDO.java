@@ -36,7 +36,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -47,7 +46,6 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
@@ -108,8 +106,6 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private Locale locale;
 
-  private boolean minorChange = false;
-
   private TimeZone timeZone;
 
   private Locale clientLocale;
@@ -124,17 +120,6 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   private String personalMebMobileNumbers;
 
   private Set<UserRightDO> rights = new HashSet<UserRightDO>();
-
-  @Transient
-  public boolean isMinorChange()
-  {
-    return minorChange;
-  }
-
-  public void setMinorChange(boolean value)
-  {
-    this.minorChange = value;
-  }
 
   @Transient
   public String getShortDisplayName()
@@ -363,8 +348,9 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
       attributeMap.put(key, value);
     }
   }
-  
-  public void removeAttribute(String key) {
+
+  public void removeAttribute(String key)
+  {
     if (attributeMap == null) {
       return;
     }
@@ -579,9 +565,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     this.loginFailures = loginFailures;
   }
 
-  @OneToMany(cascade = { CascadeType.ALL}, fetch = FetchType.EAGER, orphanRemoval = true)
-  @JoinColumn(name = "user_fk")
-  @Cascade(value = org.hibernate.annotations.CascadeType.SAVE_UPDATE)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
   public Set<UserRightDO> getRights()
   {
     return this.rights;
