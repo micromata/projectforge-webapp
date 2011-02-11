@@ -31,9 +31,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.ClassUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.projectforge.core.BaseDO;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.fibu.EingangsrechnungsPositionDO;
 
@@ -67,11 +67,27 @@ public class XStreamSavingConverter implements Converter
   // Store the objects in the given order and all the other object types which are not listed here afterwards.
   private final List<Class< ? >> orderOfSaving = new ArrayList<Class< ? >>();
 
+  // Ignore these objects from saving because the are saved implicit by their parent objects.
   private final Set<Class< ? >> ignoreFromSaving = new HashSet<Class< ? >>();
+
+  // This map contains the mapping between the id's of the given xml stream and the new id's given by Hibernate. This is needed for writing
+  // the history entries with the new id's.
+  private final Map<EntityIdTuple, Serializable> entityMapping = new HashMap<EntityIdTuple, Serializable>();
 
   private Session session;
 
-  private Integer highestId = 0;
+  private class EntityIdTuple
+  {
+    private EntityIdTuple(final String entityClassname, final Serializable id)
+    {
+      this.entityClassname = entityClassname;
+      this.id = id;
+    }
+
+    private String entityClassname;
+
+    private Serializable id;
+  };
 
   public XStreamSavingConverter() throws HibernateException
   {
@@ -81,11 +97,6 @@ public class XStreamSavingConverter implements Converter
   public void setSession(final Session session)
   {
     this.session = session;
-  }
-
-  public Integer getHighestId()
-  {
-    return highestId;
   }
 
   @SuppressWarnings("unchecked")
@@ -183,11 +194,60 @@ public class XStreamSavingConverter implements Converter
     }
   }
 
+  /**
+   * Should return the id value of the imported xml object (the origin id of the data-base the dump is from).
+   * @param The object with the origin id.
+   * @return null if not overridden.
+   */
+  protected Serializable getOriginalIdentifierValue(final Object obj)
+  {
+    return null;
+  }
+
   protected Serializable save(final Object obj)
   {
+    final Serializable oldId = getOriginalIdentifierValue(obj);
     final Serializable id = session.save(obj);
+    if (oldId != null) {
+      registerEntityMapping(obj.getClass(), oldId, id);
+    }
     writtenObjects.add(obj);
     return id;
+  }
+
+  private String getClassname(final Class< ? > cls)
+  {
+    return ClassUtils.getShortClassName(cls);
+  }
+
+  protected void registerEntityMapping(final Class< ? > entityClass, final Serializable oldId, final Serializable newId)
+  {
+    final EntityIdTuple tuple = new EntityIdTuple(getClassname(entityClass), oldId);
+    final Serializable registeredNewId = this.entityMapping.get(tuple);
+    if (registeredNewId != null && registeredNewId.equals(newId) == false) {
+      log.error("Oups, double entity mapping found for entity '"
+          + entityClass
+          + "' with old id="
+          + oldId
+          + " . New id "
+          + newId
+          + " ignored, using previous stored id "
+          + registeredNewId
+          + " instead.");
+    } else {
+      this.entityMapping.put(tuple, newId);
+    }
+  }
+
+  protected Serializable getNewId(final Class< ? > entityClass, final Serializable oldId)
+  {
+    return getNewId(getClassname(entityClass), oldId);
+  }
+
+  protected Serializable getNewId(final String entityClassname, final Serializable oldId)
+  {
+    final EntityIdTuple tuple = new EntityIdTuple(entityClassname, oldId);
+    return this.entityMapping.get(tuple);
   }
 
   public void marshal(Object arg0, HierarchicalStreamWriter arg1, MarshallingContext arg2)
@@ -223,11 +283,9 @@ public class XStreamSavingConverter implements Converter
     if (obj == null) {
       return;
     }
-    if (obj instanceof BaseDO< ? >) {
-      final Serializable id = ((BaseDO< ? >) obj).getId();
-      if (id instanceof Integer && (Integer) id > highestId) {
-        highestId = (Integer) id;
-      }
+    if (this.ignoreFromSaving.contains(obj.getClass()) == true) {
+      // Don't need this objects as "top level" objects in list. They're usually encapsulated.
+      return;
     }
     List<Object> list = this.allObjects.get(obj.getClass());
     if (list == null) {

@@ -26,8 +26,10 @@ package org.projectforge.database.xstream;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import net.sf.cglib.proxy.Enhancer;
 
@@ -72,6 +74,9 @@ public class HibernateXmlConverter
 
   /** the wrapper to hibernate */
   private HibernateTemplate hibernate;
+
+  // Ignore these objects listing in the top level list saving because the are saved implicit by their parent objects.
+  private final Set<Class< ? >> ignoreFromTopLevelListing = new HashSet<Class< ? >>();
 
   /**
    * Initialisierung der Hibernate-verbindung.
@@ -118,6 +123,16 @@ public class HibernateXmlConverter
         return null;
       }
     });
+  }
+
+  public HibernateXmlConverter appendIgnoredTopLevelObjects(final Class< ? >... types)
+  {
+    if (types != null) {
+      for (final Class< ? > type : types) {
+        this.ignoreFromTopLevelListing.add(type);
+      }
+    }
+    return this;
   }
 
   /**
@@ -167,7 +182,9 @@ public class HibernateXmlConverter
       if (log.isDebugEnabled()) {
         log.debug("loading evicted object " + obj);
       }
-      all.add(obj);
+      if (this.ignoreFromTopLevelListing.contains(targetClass) == false) {
+        all.add(obj);
+      }
     }
     // und schreiben
     try {
@@ -179,6 +196,14 @@ public class HibernateXmlConverter
     MarshallingStrategy marshallingStrategy = new ProxyIdRefMarshallingStrategy();
     stream.setMarshallingStrategy(marshallingStrategy);
     stream.marshal(all, new PrettyPrintWriter(writer));
+  }
+
+  /**
+   * Overload this method if you need further initializations before reading xml stream. Does nothing at default.
+   * @param xstream
+   */
+  protected void init(final XStream xstream)
+  {
   }
 
   /**
@@ -199,6 +224,7 @@ public class HibernateXmlConverter
     xstream.registerConverter(new HibernateProxyConverter(xstream.getMapper(), new PureJavaReflectionProvider(), xstream
         .getConverterLookup()), XStream.PRIORITY_VERY_HIGH);
     xstream.setMarshallingStrategy(new XStreamMarshallingStrategy(XStreamMarshallingStrategy.RELATIVE));
+    init(xstream);
     return xstream;
   }
 }
