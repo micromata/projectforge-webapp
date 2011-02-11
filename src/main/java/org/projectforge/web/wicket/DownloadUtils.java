@@ -30,11 +30,15 @@ public class DownloadUtils
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DownloadUtils.class);
 
+  // See e. g.: http://de.selfhtml.org/diverses/mimetypen.htm
+  
   public static final String TYPE_JPEG = "image/jpeg";
 
   public static final String TYPE_MS_PROJECT = "application/vnd.ms-project";
 
   public static final String TYPE_OCTET_STREAM = "application/octet-stream";
+
+  public static final String TYPE_GZIP = "application/gzip";
 
   public static final String TYPE_PDF = "application/pdf";
 
@@ -49,6 +53,8 @@ public class DownloadUtils
   public static final String TYPE_XLS = "application/vnd.ms-excel";
 
   public static final String TYPE_XML = "application/xml";
+
+  public static final String TYPE_ZIP = "application/zip";
 
   /**
    * Mime type etc. is done automatically.
@@ -93,18 +99,22 @@ public class DownloadUtils
       return TYPE_JPEG;
     } else if (filename.endsWith(".pdf") == true) {
       return TYPE_PDF;
-    } else if (filename.endsWith(".svg") == true) {
-      return TYPE_SVG;
-    } else if (filename.endsWith(".png") == true) {
-      return TYPE_PNG;
-    } else if (filename.endsWith(".xml") == true) {
-      return TYPE_XML;
+    } else if (filename.endsWith(".gz") == true) {
+      return TYPE_GZIP;
+    } else if (filename.endsWith(".zip") == true) {
+      return TYPE_ZIP;
     } else if (filename.endsWith(".xls") == true) {
       return TYPE_XLS;
     } else if (filename.endsWith(".txt") == true || filename.endsWith(".csv") == true) {
       return TYPE_TEXT;
     } else if (filename.endsWith(".vcf") == true) {
       return TYPE_VCARD;
+    } else if (filename.endsWith(".svg") == true) {
+      return TYPE_SVG;
+    } else if (filename.endsWith(".png") == true) {
+      return TYPE_PNG;
+    } else if (filename.endsWith(".xml") == true) {
+      return TYPE_XML;
     } else if (filename.endsWith(".mpx") == true) {
       return TYPE_MS_PROJECT;
     }
