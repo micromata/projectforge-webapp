@@ -24,7 +24,6 @@
 package org.projectforge.database.xstream;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -34,13 +33,10 @@ import net.sf.cglib.proxy.Enhancer;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.PredicateUtils;
-import org.hibernate.EmptyInterceptor;
 import org.hibernate.EntityMode;
-import org.hibernate.FlushMode;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.hibernate.metadata.ClassMetadata;
 import org.springframework.dao.DataAccessException;
 import org.springframework.orm.hibernate3.HibernateCallback;
@@ -54,7 +50,6 @@ import com.thoughtworks.xstream.MarshallingStrategy;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.reflection.PureJavaReflectionProvider;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
-import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
 
@@ -85,9 +80,7 @@ public class HibernateXmlConverter
    */
   public void setHibernate(HibernateTemplate hibernate)
   {
-    this.hibernate = new HibernateTemplate(hibernate.getSessionFactory());
-    this.hibernate.setAlwaysUseNewSession(false);
-    this.hibernate.setExposeNativeSession(true);
+    this.hibernate = hibernate;
   }
 
   /**
@@ -125,41 +118,6 @@ public class HibernateXmlConverter
         return null;
       }
     });
-  }
-
-  /**
-   * Füllt die Datenbank mit den in der XML-Datei angegebenen Objekte. Alle Objekte werden dabei mittels
-   * {@link net.sf.hibernate.Session#save(java.lang.Object)} gespeichert, so dass die Datenbank leer sein sollte.
-   * @param reader Reader auf eine XML-Datei
-   */
-  public void fillDatabaseFromXml(final Reader reader, final XStreamSavingConverter xstreamSavingConverter)
-  {
-    final SessionFactory sessionFactory = hibernate.getSessionFactory();
-    try {
-      final Session session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
-      session.setFlushMode(FlushMode.AUTO);
-      insertObjectsFromStream(reader, session, xstreamSavingConverter);
-    } catch (HibernateException ex) {
-      log.warn("Failed to load db " + ex, ex);
-    }
-  }
-
-  /**
-   * @param reader
-   * @param session
-   * @throws HibernateException
-   */
-  private void insertObjectsFromStream(final Reader reader, final Session session, final XStreamSavingConverter xstreamSavingConverter)
-      throws HibernateException
-  {
-    log.debug("Loading DB from stream");
-    final XStream xstream = new XStream(new DomDriver());
-    xstream.setMode(XStream.ID_REFERENCES);
-    xstreamSavingConverter.setSession(session);
-    xstream.registerConverter(xstreamSavingConverter, 10);
-    // alle Objekte Laden und speichern
-    xstream.fromXML(reader);
-    xstreamSavingConverter.saveObjects();
   }
 
   /**

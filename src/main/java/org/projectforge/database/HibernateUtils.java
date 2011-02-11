@@ -92,6 +92,11 @@ public class HibernateUtils
     return instance.configuration;
   }
 
+  public static boolean isEntity(final Class< ? > entity)
+  {
+    return instance.internalIsEntity(entity);
+  }
+
   public static String getDBTableName(final Class< ? > entity)
   {
     return instance.internalGetDBTableName(entity);
@@ -134,6 +139,12 @@ public class HibernateUtils
       return HibernateDialect.HSQL;
     }
     return HibernateDialect.UNKOWN;
+  }
+
+  private boolean internalIsEntity(final Class< ? > entity)
+  {
+    final String entityName = entity.getName();
+    return configuration.getClassMapping(entityName) != null;
   }
 
   private String internalGetDBTableName(final Class< ? > entity)

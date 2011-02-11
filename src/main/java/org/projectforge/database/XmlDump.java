@@ -35,8 +35,6 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -45,28 +43,41 @@ import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.FlushMode;
-import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.projectforge.access.AccessEntryDO;
+import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.database.xstream.HibernateXmlConverter;
 import org.projectforge.database.xstream.XStreamSavingConverter;
+import org.projectforge.fibu.AbstractRechnungDO;
+import org.projectforge.fibu.AbstractRechnungsPositionDO;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.EingangsrechnungDO;
+import org.projectforge.fibu.EingangsrechnungsPositionDO;
+import org.projectforge.fibu.EmployeeSalaryDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.RechnungDO;
+import org.projectforge.fibu.RechnungsPositionDO;
 import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost2ArtDO;
 import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.fibu.kost.KostZuweisungDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
-import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserPrefDO;
+import org.projectforge.user.UserPrefEntryDO;
+import org.projectforge.user.UserRightDO;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.HibernateTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import de.micromata.hibernate.history.HistoryEntry;
 import de.micromata.hibernate.history.delta.CollectionPropertyDelta;
@@ -87,13 +98,6 @@ public class XmlDump
   private HibernateTemplate hibernate;
 
   protected TransactionTemplate tx;
-
-  private GroupDao groupDao;
-
-  public void setGroupDao(GroupDao groupDao)
-  {
-    this.groupDao = groupDao;
-  }
 
   public HibernateTemplate getHibernate()
   {
@@ -133,47 +137,75 @@ public class XmlDump
 
   public void restoreDatabase(Reader reader)
   {
-    final HibernateXmlConverter converter = new HibernateXmlConverter();
-    converter.setHibernate(hibernate);
-    final List<GroupDO> groups = new ArrayList<GroupDO>();
     final XStreamSavingConverter xstreamSavingConverter = new XStreamSavingConverter() {
       @Override
       public Serializable onBeforeSave(final Session session, final Object obj)
       {
-        if (GroupDO.class.isAssignableFrom(obj.getClass())) {
-          groups.add((GroupDO) obj);
+        if (obj instanceof UserRightDO) {
+          ((UserRightDO) obj).setUser(null);
+        } else if (obj instanceof AbstractRechnungDO<?>) {
+          final AbstractRechnungDO<?> rechnung = (AbstractRechnungDO<?>) obj;
+          final Serializable id = session.save(rechnung);
+          if (rechnung.getPositionen() != null) {
+            for (final AbstractRechnungsPositionDO pos : rechnung.getPositionen()) {
+              save(pos);
+              if (pos.getKostZuweisungen() != null) {
+                for (final KostZuweisungDO zuweisung : pos.getKostZuweisungen()) {
+                  save(zuweisung);
+                }
+              }
+            }
+          }
+          return id;
         }
         return null;
       }
     };
-    xstreamSavingConverter.appendIgnoredObjects(PropertyDelta.class, SimplePropertyDelta.class, CollectionPropertyDelta.class);
+    // UserRightDO is inserted on cascade while inserting PFUserDO.
+    xstreamSavingConverter.appendIgnoredObjects(UserRightDO.class, EingangsrechnungsPositionDO.class, HistoryEntry.class,
+        PropertyDelta.class, SimplePropertyDelta.class, CollectionPropertyDelta.class);
     xstreamSavingConverter.appendOrderedType(PFUserDO.class, GroupDO.class, TaskDO.class, KundeDO.class, ProjektDO.class, Kost1DO.class,
-        Kost2ArtDO.class, Kost2DO.class, AuftragDO.class, AuftragsPositionDO.class, RechnungDO.class, EingangsrechnungDO.class,
-        HistoryEntry.class);
+        Kost2ArtDO.class, Kost2DO.class, AuftragDO.class, AuftragsPositionDO.class, //
+        RechnungDO.class, RechnungsPositionDO.class, EingangsrechnungDO.class, //
+        EmployeeSalaryDO.class, KostZuweisungDO.class,//
+        UserPrefEntryDO.class, UserPrefDO.class, //
+        GroupTaskAccessDO.class, AccessEntryDO.class);
     try {
-      converter.fillDatabaseFromXml(reader, xstreamSavingConverter);
+      final SessionFactory sessionFactory = hibernate.getSessionFactory();
+      final Session session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
+      session.setFlushMode(FlushMode.AUTO);
+      final Transaction transaction = session.beginTransaction();
+      final XStream xstream = new XStream(new DomDriver());
+      xstream.setMode(XStream.ID_REFERENCES);
+      xstreamSavingConverter.setSession(session);
+      xstream.registerConverter(xstreamSavingConverter, 10);
+      // alle Objekte Laden und speichern
+      xstream.fromXML(reader);
+
+      xstreamSavingConverter.saveObjects();
+      transaction.commit();
     } catch (Exception ex) {
       log.error(ex.getMessage(), ex);
       throw new RuntimeException(ex);
     } finally {
       IOUtils.closeQuietly(reader);
     }
-    {
-      final SessionFactory sessionFactory = hibernate.getSessionFactory();
-      final Session session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
-      session.setFlushMode(FlushMode.AUTO);
-      for (final GroupDO origGroup : groups) {
-        if (origGroup.getAssignedUsers() == null) {
-          continue;
-        }
-        final GroupDO group = (GroupDO)session.load(GroupDO.class, origGroup.getId(), LockOptions.UPGRADE);
-        // Users are not added automatically (cascade doesn't work for, why?):
-        for (final PFUserDO assignedUser : origGroup.getAssignedUsers()) {
-          group.addUser(assignedUser);
-        }
-        groupDao.internalUpdate(group);
-      }
-    }
+    // {
+    // final SessionFactory sessionFactory = hibernate.getSessionFactory();
+    // final Session session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
+    // session.setFlushMode(FlushMode.AUTO);
+    // for (final GroupDO origGroup : groups) {
+    // if (origGroup.getAssignedUsers() == null) {
+    // continue;
+    // }
+    // final GroupDO group = (GroupDO)session.load(GroupDO.class, origGroup.getId(), LockOptions.UPGRADE);
+    // // Users are not added automatically (cascade doesn't work for, why?):
+    // for (final PFUserDO assignedUser : origGroup.getAssignedUsers()) {
+    // group.addUser(assignedUser);
+    // }
+    // groupDao.internalUpdate(group);
+    // }
+    // }
   }
 
   public void restoreDatabaseFromClasspathResource(String path, String encoding)

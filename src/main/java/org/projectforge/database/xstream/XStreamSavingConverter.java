@@ -33,6 +33,9 @@ import java.util.Set;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.projectforge.core.BaseDO;
+import org.projectforge.database.HibernateUtils;
+import org.projectforge.fibu.EingangsrechnungsPositionDO;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
@@ -68,18 +71,21 @@ public class XStreamSavingConverter implements Converter
 
   private Session session;
 
-  private Map<String, Object> allClassMetadata;
+  private Integer highestId = 0;
 
   public XStreamSavingConverter() throws HibernateException
   {
     defaultConv = new XStream().getConverterLookup();
   }
 
-  @SuppressWarnings("unchecked")
   public void setSession(final Session session)
   {
     this.session = session;
-    allClassMetadata = session.getSessionFactory().getAllClassMetadata();
+  }
+
+  public Integer getHighestId()
+  {
+    return highestId;
   }
 
   @SuppressWarnings("unchecked")
@@ -136,11 +142,21 @@ public class XStreamSavingConverter implements Converter
       return;
     }
     writtenObjectTypes.add(type);
+    // Persistente Klasse?
+    if (HibernateUtils.isEntity(type) == false) {
+      return;
+    }
+    if (log.isDebugEnabled() == true) {
+      log.debug("Writing objects from type: " + type);
+    }
     final List<Object> list = allObjects.get(type);
     if (list == null) {
       return;
     }
     for (final Object obj : list) {
+      if (obj instanceof EingangsrechnungsPositionDO) {
+        log.info("Eingangsrechnungspositionen: " + obj);
+      }
       if (obj == null || writtenObjects.contains(obj) == true) {
         // Object null or already written. Skip this item.
         continue;
@@ -149,19 +165,15 @@ public class XStreamSavingConverter implements Converter
         continue;
       }
       try {
-        // Persistente Klasse?
-        if (allClassMetadata.get(obj.getClass().getName()) != null) {
-          if (log.isDebugEnabled()) {
-            log.debug("Try to write object " + obj);
-          }
-          Serializable id = onBeforeSave(session, obj);
-          if (id == null) {
-            id = session.save(obj);
-          }
-          writtenObjects.add(obj);
-          if (log.isDebugEnabled() == true) {
-            log.debug("wrote object " + obj + " under id " + id);
-          }
+        if (log.isDebugEnabled()) {
+          log.debug("Try to write object " + obj);
+        }
+        Serializable id = onBeforeSave(session, obj);
+        if (id == null) {
+          id = save(obj);
+        }
+        if (log.isDebugEnabled() == true) {
+          log.debug("wrote object " + obj + " under id " + id);
         }
       } catch (HibernateException ex) {
         log.fatal("Failed to write " + obj + " ex=" + ex, ex);
@@ -169,6 +181,13 @@ public class XStreamSavingConverter implements Converter
         log.fatal("Failed to write " + obj + " ex=" + ex, ex);
       }
     }
+  }
+
+  protected Serializable save(final Object obj)
+  {
+    final Serializable id = session.save(obj);
+    writtenObjects.add(obj);
+    return id;
   }
 
   public void marshal(Object arg0, HierarchicalStreamWriter arg1, MarshallingContext arg2)
@@ -203,6 +222,12 @@ public class XStreamSavingConverter implements Converter
   {
     if (obj == null) {
       return;
+    }
+    if (obj instanceof BaseDO< ? >) {
+      final Serializable id = ((BaseDO< ? >) obj).getId();
+      if (id instanceof Integer && (Integer) id > highestId) {
+        highestId = (Integer) id;
+      }
     }
     List<Object> list = this.allObjects.get(obj.getClass());
     if (list == null) {
