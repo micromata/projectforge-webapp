@@ -43,10 +43,12 @@ import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.EmployeeSalaryDO;
 import org.projectforge.fibu.EmployeeSalaryType;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.converter.CurrencyConverter;
 import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.SelectLPanel;
+import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
 public class EmployeeSalaryFormRenderer extends AbstractDOFormRenderer
 {
@@ -85,7 +87,9 @@ public class EmployeeSalaryFormRenderer extends AbstractDOFormRenderer
       monthChoice.setNullValid(false).setRequired(true);
       doPanel.addDropDownChoice(data, "month", getString("calendar.month"), HALF, monthChoice, HALF);
     }
-    doPanel.addTextField(data, "year", QUART);
+    final MinMaxNumberField<Integer> yearField = new MinMaxNumberField<Integer>(TextFieldLPanel.INPUT_ID,
+        new PropertyModel<Integer>(data, "year"), 1900, 2999);
+    doPanel.addTextField(getString("year"), yearField, QUART);
     {
       // DropDownChoice salary type
       final LabelValueChoiceRenderer<EmployeeSalaryType> typeStatusChoiceRenderer = new LabelValueChoiceRenderer<EmployeeSalaryType>(

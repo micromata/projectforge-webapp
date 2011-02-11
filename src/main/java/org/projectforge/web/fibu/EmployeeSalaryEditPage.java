@@ -32,6 +32,7 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.fibu.EmployeeSalaryDO;
 import org.projectforge.fibu.EmployeeSalaryDao;
+import org.projectforge.fibu.EmployeeSalaryType;
 import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -65,6 +66,7 @@ public class EmployeeSalaryEditPage extends AbstractAutoLayoutEditPage<EmployeeS
       recent = getRecent();
       getData().setYear(recent.getYear());
       getData().setMonth(recent.getMonth());
+      getData().setType(recent.getType());
     }
   }
 
@@ -78,6 +80,7 @@ public class EmployeeSalaryEditPage extends AbstractAutoLayoutEditPage<EmployeeS
       final Calendar cal = DateHelper.getCalendar();
       recent.setYear(cal.get(Calendar.YEAR));
       recent.setMonth(cal.get(Calendar.MONTH));
+      recent.setType(EmployeeSalaryType.GEHALT);
       putUserPrefEntry(EmployeeSalaryEditRecentEntry.class.getName(), recent, true);
     }
     return recent;
@@ -92,6 +95,9 @@ public class EmployeeSalaryEditPage extends AbstractAutoLayoutEditPage<EmployeeS
     }
     if (getData().getMonth() != null) {
       recent.setMonth(getData().getMonth());
+    }
+    if (getData().getType() != null) {
+      recent.setType(getData().getType());
     }
     return null;
   }

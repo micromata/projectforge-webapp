@@ -23,17 +23,25 @@
 
 package org.projectforge.web.fibu;
 
+import java.io.Serializable;
+
+import org.projectforge.fibu.EmployeeSalaryType;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Stores the last added salary entry. Year and month will be persisted for pre-filling on adding next entry.
  */
 @XStreamAlias("EmployeeSalaryEditRecentEntry")
-public class EmployeeSalaryEditRecentEntry
+public class EmployeeSalaryEditRecentEntry implements Serializable
 {
+  private static final long serialVersionUID = 5811156553895802033L;
+
   private int year;
 
   private int month;
+  
+  private EmployeeSalaryType type;
 
   public int getYear()
   {
@@ -53,5 +61,15 @@ public class EmployeeSalaryEditRecentEntry
   public void setMonth(int month)
   {
     this.month = month;
+  }
+  
+  public EmployeeSalaryType getType()
+  {
+    return type;
+  }
+  
+  public void setType(EmployeeSalaryType type)
+  {
+    this.type = type;
   }
 }
