@@ -70,7 +70,7 @@ public class OrderPositionsPanel extends Panel
       AuftragsPositionVO previousOrderPosition = null;
       while (it.hasNext() == true) {
         final AuftragsPositionVO orderPosition = it.next();
-        if (orderNumber != orderPosition.getAuftragNummer().intValue()) {
+        if (orderPosition.getAuftragNummer() != null && orderNumber != orderPosition.getAuftragNummer().intValue()) {
           orderNumber = orderPosition.getAuftragNummer();
           final WebMarkupContainer item = new WebMarkupContainer(positionsRepeater.newChildId());
           positionsRepeater.add(item);
