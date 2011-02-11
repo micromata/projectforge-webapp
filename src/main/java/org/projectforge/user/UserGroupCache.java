@@ -462,6 +462,10 @@ public class UserGroupCache extends AbstractCache
     List<UserRightDO> list = null;
     Integer userId = null;
     for (final UserRightDO right : rights) {
+      if (right.getUserId() == null) {
+        log.warn("Oups, userId = null: " + right);
+        continue;
+      }
       if (right.getUserId().equals(userId) == false) {
         list = new ArrayList<UserRightDO>();
         userId = right.getUserId();
