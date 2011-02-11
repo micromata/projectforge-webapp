@@ -15,13 +15,13 @@
       <th colspan="2"><wicket:message key="fibu.auftrag.nummer" /></th>
       <td><input type="text" wicket:id="nummer" id="nummer" style="width: 4em;" /> <img wicket:id="nummerHelp" src="images/help.png" border="0" /></td>
       <th><wicket:message key="fibu.common.reference" /></th>
-      <td colspan="3"><input type="text" wicket:id="referenz" id="referenz" class="stdtext" /></td>
+      <td colspan="3"><input type="text" style="width: 100%;" wicket:id="referenz" id="referenz" class="stdtext" /></td>
       <th><wicket:message key="fibu.auftrag.nettoSumme" /></th>
       <td style="white-space: nowrap;"><span wicket:id="nettoSumme">[973.27 €]</span></td>
     </tr>
     <tr>
       <th colspan="2"><label for="titel"><wicket:message key="fibu.auftrag.titel" /></label></th>
-      <td colspan="5"><input type="text" wicket:id="titel" id="titel" class="stdtext" /></td>
+      <td colspan="5"><input type="text" style="width: 100%;" wicket:id="titel" id="titel" class="stdtext" /></td>
       <th><wicket:message key="status" /></th>
       <td><select wicket:id="status" id="status">
         <option>beauftragt</option>
@@ -67,7 +67,7 @@
         <tr>
           <th><wicket:message key="fibu.auftrag.position.short" /> #<span wicket:id="number" style="font-size: 140%;">[1]</span></th>
           <th><wicket:message key="fibu.auftrag.titel" /></th>
-          <td colspan="3"><input type="text" wicket:id="titel" class="stdtext" /></td>
+          <td colspan="3"><input type="text" style="width: 100%;" wicket:id="titel" class="stdtext" /></td>
           <th><wicket:message key="projectmanagement.personDays" /></th>
           <td><input type="text" wicket:id="personDays" size="5" /></td>
           <th wicket:id="nettoSummeLabel">[net sum]</th>
@@ -88,7 +88,7 @@
         <tr>
           <th>&nbsp;</th>
           <th><label for="bemerkung"><wicket:message key="comment" /></label></th>
-          <td colspan="5"><textarea class="stdtext" wicket:id="bemerkung" id="bemerkung" style="height: 10ex;">[Bemerkungstext]</textarea></td>
+          <td colspan="5"><textarea class="stdtext" wicket:id="bemerkung" id="bemerkung" style="height: 10ex; width: 100%;">[Bemerkungstext]</textarea></td>
           <th wicket:id="statusLabel" style="vertical-align: top;">[status]</th>
           <td style="vertical-align: top;"><select wicket:id="status">
             <option>[beauftragt]</option>
@@ -110,11 +110,11 @@
     </tr>
     <tr>
       <th colspan="2"><label for="bemerkung"><wicket:message key="comment" /></label></th>
-      <td colspan="7"><textarea class="stdtext" wicket:id="bemerkung" id="bemerkung" style="height: 20ex;">[Bemerkungstext]</textarea></td>
+      <td colspan="7"><textarea class="stdtext" wicket:id="bemerkung" id="bemerkung" style="height: 20ex; width: 100%;">[Bemerkungstext]</textarea></td>
     </tr>
     <tr>
       <th colspan="2"><label for="statusBeschreibung"><wicket:message key="fibu.auftrag.statusBeschreibung" /></label></th>
-      <td colspan="7"><textarea class="stdtext" wicket:id="statusBeschreibung" id="statusBeschreibung" style="height: 10ex;">[Statusbeschreibung]</textarea></td>
+      <td colspan="7"><textarea class="stdtext" wicket:id="statusBeschreibung" id="statusBeschreibung" style="height: 10ex; width: 100%;">[Statusbeschreibung]</textarea></td>
     </tr>
     <tr>
       <th colspan="2"><label for="sendEMailNotification"> <wicket:message key="label.sendEMailNotification" /></label></th>
