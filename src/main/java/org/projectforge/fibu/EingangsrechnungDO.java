@@ -30,13 +30,11 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.IndexColumn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -87,16 +85,14 @@ public class EingangsrechnungDO extends AbstractRechnungDO<EingangsrechnungsPosi
     this.referenz = referenz;
   }
 
-  @OneToMany(cascade = { CascadeType.ALL}, fetch = FetchType.EAGER)
-  @Cascade(value = { org.hibernate.annotations.CascadeType.DELETE_ORPHAN, org.hibernate.annotations.CascadeType.SAVE_UPDATE})
-  @JoinColumn(name = "eingangsrechnung_fk")
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "eingangsrechnung")
   @IndexColumn(name = "number", base = 1)
   @Override
   public List<EingangsrechnungsPositionDO> getPositionen()
   {
     return this.positionen;
   }
-  
+
   /**
    * (this.status == EingangsrechnungStatus.BEZAHLT && this.bezahlDatum != null && this.zahlBetrag != null)
    */
