@@ -40,7 +40,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.IndexColumn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -188,10 +187,9 @@ public class RechnungDO extends AbstractRechnungDO<RechnungsPositionDO> implemen
     return (this.status == RechnungStatus.BEZAHLT && this.bezahlDatum != null && this.zahlBetrag != null);
   }
 
-  @OneToMany(cascade = { CascadeType.ALL}, fetch = FetchType.EAGER)
-  @JoinColumn(name = "rechnung_fk")
-  @Cascade(value = { org.hibernate.annotations.CascadeType.DELETE_ORPHAN, org.hibernate.annotations.CascadeType.SAVE_UPDATE})
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "rechnung")
   @IndexColumn(name = "number", base = 1)
+  @Override
   public List<RechnungsPositionDO> getPositionen()
   {
     return this.positionen;
