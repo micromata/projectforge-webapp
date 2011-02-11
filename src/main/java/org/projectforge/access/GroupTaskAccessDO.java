@@ -116,9 +116,8 @@ public class GroupTaskAccessDO extends DefaultBaseDO
    * Get the history entries for this object.
    * 
    */
-  // CascadeType.ALL doesn't work for import InitDatabaseDaoWithTestDataTest (why?).
-  @OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH, CascadeType.REMOVE}, fetch = FetchType.EAGER, orphanRemoval = true)
-  @JoinColumn(name = "group_task_access_fk")
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @JoinColumn(name = "group_task_access_fk", insertable = true, updatable = true)
   public Set<AccessEntryDO> getAccessEntries()
   {
     return this.accessEntries;
