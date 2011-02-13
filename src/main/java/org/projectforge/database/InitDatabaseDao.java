@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.projectforge.access.AccessException;
+import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskStatus;
 import org.projectforge.task.TaskTree;
@@ -168,7 +169,8 @@ public class InitDatabaseDao extends HibernateDaoSupport
     if (isEmpty() == false) {
       databaseNotEmpty();
     }
-    xmlDump.restoreDatabaseFromClasspathResource(TEST_DATA_BASE_DUMP_FILE, "utf-8");
+    final XStreamSavingConverter xstreamSavingConverter = xmlDump.restoreDatabaseFromClasspathResource(TEST_DATA_BASE_DUMP_FILE, "utf-8");
+    xmlDump.verifyDump(xstreamSavingConverter);
     PFUserDO user = userDao.getInternalByName(DEFAULT_ADMIN_USER);
     if (user == null) {
       log.error("Initialization of database failed. Perhaps caused by corrupted init-test-data.xml.gz.");
