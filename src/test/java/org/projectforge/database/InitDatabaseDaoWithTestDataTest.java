@@ -34,11 +34,15 @@ import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.projectforge.access.AccessDao;
 import org.projectforge.access.AccessException;
+import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.book.BookDO;
 import org.projectforge.book.BookDao;
+import org.projectforge.fibu.AuftragDO;
+import org.projectforge.fibu.AuftragDao;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.test.TestBase;
@@ -49,11 +53,15 @@ public class InitDatabaseDaoWithTestDataTest extends TestBase
 {
   private InitDatabaseDao initDatabaseDao;
 
+  private AccessDao accessDao;
+
   private AddressDao addressDao;
 
-  private TaskDao taskDao;
+  private AuftragDao auftragDao;
 
   private BookDao bookDao;
+
+  private TaskDao taskDao;
 
   private UserGroupCache userGroupCache;
 
@@ -62,9 +70,19 @@ public class InitDatabaseDaoWithTestDataTest extends TestBase
     this.initDatabaseDao = initDatabaseDao;
   }
 
+  public void setAccessDao(AccessDao accessDao)
+  {
+    this.accessDao = accessDao;
+  }
+
   public void setAddressDao(AddressDao addressDao)
   {
     this.addressDao = addressDao;
+  }
+
+  public void setAuftragDao(AuftragDao auftragDao)
+  {
+    this.auftragDao = auftragDao;
   }
 
   public void setTaskDao(TaskDao taskDao)
@@ -91,10 +109,11 @@ public class InitDatabaseDaoWithTestDataTest extends TestBase
   @Test
   public void initializeEmptyDatabase()
   {
-    final String encryptedPassword = userDao.encryptPassword("testpassword");
+    final String testPassword = "demo123";
+    final String encryptedPassword = userDao.encryptPassword(testPassword);
     userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
     assertTrue(initDatabaseDao.isEmpty());
-    initDatabaseDao.initializeEmptyDatabaseWithTestData("myadmin", encryptedPassword, null);
+    initDatabaseDao.initializeEmptyDatabaseWithTestData("myadmin", null, null);
     final PFUserDO initialAdminUser = userDao.authenticateUser("myadmin", encryptedPassword);
     assertNotNull(initialAdminUser);
     assertEquals("myadmin", initialAdminUser.getUsername());
@@ -107,6 +126,14 @@ public class InitDatabaseDaoWithTestDataTest extends TestBase
     assertTrue(userList.size() > 0);
     for (final PFUserDO user : userList) {
       assertNull("For security reasons the stay-logged-in-key should be null.", user.getStayLoggedInKey());
+      assertEquals("For security reasons each password should be '" + testPassword + "'.", encryptedPassword, user.getPassword());
+    }
+
+    final List<GroupTaskAccessDO> accessList = accessDao.internalLoadAll();
+    assertTrue(accessList.size() > 0);
+    for (final GroupTaskAccessDO access : accessList) {
+      assertNotNull("Access entries should be serialized.", access.getAccessEntries());
+      assertTrue("Access entries should be serialized.", access.getAccessEntries().size() > 0);
     }
 
     final List<AddressDO> addressList = addressDao.internalLoadAll();
@@ -117,6 +144,17 @@ public class InitDatabaseDaoWithTestDataTest extends TestBase
 
     final List<TaskDO> taskList = taskDao.internalLoadAll();
     assertTrue(taskList.size() > 10);
+
+    final List<AuftragDO> orderList = auftragDao.internalLoadAll();
+    AuftragDO order = null;
+    for (final AuftragDO ord : orderList) {
+      if (ord.getNummer() == 1) {
+        order = ord;
+        break;
+      }
+    }
+    assertNotNull("Order #1 not found.", order);
+    assertEquals("Order #1 must have 3 order positions.", 3, order.getPositionen().size());
 
     boolean exception = false;
     try {
