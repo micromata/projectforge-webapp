@@ -528,7 +528,7 @@ public class XmlDump
     Object val = null;
     final Method getter = BeanHelper.determineGetter(obj.getClass(), field.getName());
     final Method getter2 = BeanHelper.determineGetter(compareObj.getClass(), field.getName());
-    if (getter != null && getter.isAnnotationPresent(Transient.class) == false && getter2.isAnnotationPresent(Transient.class) == false) {
+    if (getter != null && getter.isAnnotationPresent(Transient.class) == false && getter2 != null && getter2.isAnnotationPresent(Transient.class) == false) {
       val = BeanHelper.invoke(obj, getter);
     }
     if (val == null) {
