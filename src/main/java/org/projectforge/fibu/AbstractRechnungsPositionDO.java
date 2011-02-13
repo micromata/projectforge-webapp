@@ -275,7 +275,7 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
   /**
    * setEingangsrechnung(rechnung)
    */
-  public abstract AbstractRechnungsPositionDO setRechnung(final AbstractRechnungDO< ? > rechnung);
+  protected abstract AbstractRechnungsPositionDO setRechnung(final AbstractRechnungDO< ? > rechnung);
 
   /**
    * Does only work for not already persisted entries (meaning entries without an id / pk) and only the last entry of the list. Otherwise
