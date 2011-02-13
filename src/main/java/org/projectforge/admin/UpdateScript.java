@@ -31,7 +31,7 @@ import org.projectforge.xml.stream.XmlField;
 import org.projectforge.xml.stream.XmlObject;
 
 /**
- * Represents a update script (groovy) de-serialized from an uploaded file.
+ * Represents a update script (groovy) de-serialized from an xml file.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @XmlObject(alias = "update")
