@@ -36,6 +36,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -168,18 +169,14 @@ public class XmlDump
       {
         if (obj instanceof PFUserDO) {
           final PFUserDO user = (PFUserDO) obj;
-          Serializable id;
-          if (user.getRights() != null) {
-            for (final UserRightDO right : user.getRights()) {
-              right.setUser(null);
+          final Set<UserRightDO> rights = user.getRights();
+          user.setRights(null); // Need to nullable rights first (otherwise insert fails).
+          final Serializable id = save(user);
+          user.setRights(rights);
+          if (rights != null) {
+            for (final UserRightDO right : rights) {
               save(right);
             }
-            id = save(user);
-            for (final UserRightDO right : user.getRights()) {
-              right.setUser(user);
-            }
-          } else {
-            id = save(user);
           }
           return id;
         } else if (obj instanceof AbstractRechnungDO< ? >) {
@@ -192,7 +189,7 @@ public class XmlDump
             for (final AbstractRechnungsPositionDO pos : positions) {
               if (pos.getKostZuweisungen() != null) {
                 final List<KostZuweisungDO> zuweisungen = pos.getKostZuweisungen();
-                pos.setKostZuweisungen(null);
+                pos.setKostZuweisungen(null); // Need to nullable first (otherwise insert fails).
                 save(pos);
                 pos.setKostZuweisungen(zuweisungen);
                 if (zuweisungen != null) {
@@ -207,7 +204,7 @@ public class XmlDump
         } else if (obj instanceof AuftragDO) {
           final AuftragDO auftrag = (AuftragDO) obj;
           final List<AuftragsPositionDO> positions = auftrag.getPositionen();
-          auftrag.setPositionen(null);
+          auftrag.setPositionen(null); // Need to nullable first (otherwise insert fails).
           final Serializable id = save(auftrag);
           auftrag.setPositionen(positions);
           if (positions != null) {
