@@ -77,8 +77,6 @@ import org.projectforge.user.UserPrefEntryDO;
 import org.projectforge.user.UserRightDO;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.orm.hibernate3.HibernateTemplate;
-import org.springframework.orm.hibernate3.HibernateTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -102,8 +100,6 @@ public class XmlDump
 
   private HibernateTemplate hibernate;
 
-  protected TransactionTemplate tx;
-
   /**
    * These classes are stored automatically because they're dependent.
    */
@@ -120,18 +116,6 @@ public class XmlDump
   public void setHibernate(HibernateTemplate hibernate)
   {
     this.hibernate = hibernate;
-    tx = new TransactionTemplate(new HibernateTransactionManager(hibernate.getSessionFactory()));
-  }
-
-  public TransactionTemplate getTx()
-  {
-    Validate.notNull(tx);
-    return tx;
-  }
-
-  public void setTx(TransactionTemplate tx)
-  {
-    this.tx = tx;
   }
 
   /**
@@ -263,7 +247,10 @@ public class XmlDump
     return xstreamSavingConverter;
   }
 
-  public void restoreDatabaseFromClasspathResource(String path, String encoding)
+  /**
+   * @return Only for test cases.
+   */
+  public XStreamSavingConverter restoreDatabaseFromClasspathResource(String path, String encoding)
   {
     ClassPathResource cpres = new ClassPathResource(path);
     Reader reader;
@@ -279,7 +266,7 @@ public class XmlDump
       log.error(ex.getMessage(), ex);
       throw new RuntimeException(ex);
     }
-    restoreDatabase(reader);
+    return restoreDatabase(reader);
   }
 
   public void dumpDatabase()
