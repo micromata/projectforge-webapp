@@ -39,15 +39,13 @@ function preventBubble(e) {
 }
 function initTooltips() {
 	// Enable all title attributes as tooltip:
-	// $(':*[title]').tooltip( {
-	// track : true,
-	// delay : 1000,
-	// showURL : false,
-	// opacity : 1,
-	// showBody : " - ",
-	// top : 5,
-	// left : 5
-	// });
+	$(':*[title]').tooltip( {
+		track : true,
+		delay : 0,
+		fade: 250,
+		showURL : false,
+		showBody : " - ",
+	});
 }
 function showBookmark() {
 	$("#bookmark").toggle("normal");

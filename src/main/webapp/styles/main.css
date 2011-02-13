@@ -369,7 +369,7 @@ table.dataview thead th.wicket_orderDown{vertical-align:middle;white-space:nowra
 /* Tooltips */
 #tooltip{position:absolute;z-index:17;border:1px solid #F0F5F7;background-color:#F0F5F7;max-width:20em;color:#8994A0;padding:5px;font-size:100%;line-height:1.8em;-moz-box-shadow:1px 1px 3px #8994A0;-webkit-box-shadow:1px 1px 3px #8994A0;box-shadow:1px 1px 3px #8994A0;background:#F0F5F7;background:-webkit-gradient(linear,left top,left bottom,color-stop(0.0,#fff),
 color-stop(0.6,#F0F5F7) );background:-moz-linear-gradient(top,#fff,#F0F5F7 40%);}
-#tooltip h3{margin:0;font-weight:normal;font-size:100%;}
+#tooltip h3{margin:0;font-weight:bold;font-size:100%;}
 #tooltip div{margin:0;}
 /* Headings */
 h1{font-size:2em;margin:1em 0;}
