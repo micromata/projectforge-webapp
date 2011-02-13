@@ -94,8 +94,10 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+import de.micromata.hibernate.history.HistoryEntry;
+
 /**
- * 
+ * Dumps and restores the data-base.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -336,20 +338,38 @@ public class XmlDump
           continue;
         }
         for (final Object obj : objects) {
-          if (obj instanceof AbstractBaseDO< ? > == false) {
+          if (HibernateUtils.isEntity(obj.getClass()) == false) {
             continue;
           }
-          final AbstractBaseDO< ? > baseDO = (AbstractBaseDO< ? >) obj;
-          // log.info("Testing object: " + baseDO);
-          final AbstractBaseDO< ? > databaseObject = (AbstractBaseDO< ? >) session.get(entityClass, baseDO.getId(), LockOptions.READ);
+          final Serializable id = HibernateUtils.getIdentifier(obj);
+          if (id == null) {
+            // Can't compare this object without identifier.
+            continue;
+          }
+          // log.info("Testing object: " + obj);
+          final Object databaseObject = session.get(entityClass, id, LockOptions.READ);
           Hibernate.initialize(databaseObject);
-          final boolean equals = equals(baseDO, databaseObject, true);
+          final boolean equals = equals(obj, databaseObject, true);
           if (equals == false) {
-            log.error("Object not sucessfully imported! xml object=[" + baseDO + "], data base=[" + databaseObject + "]");
+            log.error("Object not sucessfully imported! xml object=[" + obj + "], data base=[" + databaseObject + "]");
             hasError = true;
           }
           ++counter;
         }
+      }
+      for (final HistoryEntry historyEntry : xstreamSavingConverter.getHistoryEntries()) {
+        final Class<?> type = xstreamSavingConverter.getClassFromHistoryName(historyEntry.getClassName());
+        final Object o = session.get(type, historyEntry.getEntityId());
+        if (o == null) {
+          log.error("A corrupted history entry found (entity of class '"
+              + historyEntry.getClassName()
+              + "' with id + "
+              + historyEntry.getEntityId()
+              + " not found: "
+              + historyEntry);
+          hasError = true;
+        }
+        ++counter;
       }
       if (hasError == true) {
         log

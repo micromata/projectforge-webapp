@@ -80,24 +80,13 @@ public class XStreamSavingConverter implements Converter
 
   // This map contains the mapping between the id's of the given xml stream and the new id's given by Hibernate. This is needed for writing
   // the history entries with the new id's.
-  private final Map<EntityIdTuple, Serializable> entityMapping = new HashMap<EntityIdTuple, Serializable>();
+  private final Map<String, Serializable> entityMapping = new HashMap<String, Serializable>();
+
+  private List<HistoryEntry> historyEntries = new ArrayList<HistoryEntry>();
+
+  private Map<String, Class< ? >> historyClassMapping = new HashMap<String, Class< ? >>();
 
   private Session session;
-
-  private class EntityIdTuple
-  {
-    private EntityIdTuple(final String entityClassname, final Serializable id)
-    {
-      this.entityClassname = entityClassname;
-      this.id = id;
-    }
-
-    @SuppressWarnings("unused")
-    private String entityClassname;
-
-    @SuppressWarnings("unused")
-    private Serializable id;
-  };
 
   public XStreamSavingConverter() throws HibernateException
   {
@@ -116,6 +105,11 @@ public class XStreamSavingConverter implements Converter
   public Map<Class< ? >, List<Object>> getAllObjects()
   {
     return allObjects;
+  }
+
+  public List<HistoryEntry> getHistoryEntries()
+  {
+    return historyEntries;
   }
 
   @SuppressWarnings("unchecked")
@@ -148,13 +142,19 @@ public class XStreamSavingConverter implements Converter
   public void saveObjects()
   {
     for (final Class< ? > type : orderOfSaving) {
+      this.historyClassMapping.put(getClassname4History(type), type);
       save(type);
     }
     for (final Map.Entry<Class< ? >, List<Object>> entry : allObjects.entrySet()) {
       if (entry.getKey().equals(HistoryEntry.class) == true) {
         continue;
       }
-      save(entry.getKey());
+      final Class< ? > type = entry.getKey();
+      this.historyClassMapping.put(getClassname4History(type), type);
+      save(type);
+    }
+    for (final Class< ? > type : ignoreFromSaving) {
+      this.historyClassMapping.put(getClassname4History(type), type);
     }
     save(HistoryEntry.class);
   }
@@ -185,6 +185,7 @@ public class XStreamSavingConverter implements Converter
       for (final PropertyDelta deltaEntry : delta) {
         save(deltaEntry);
       }
+      this.historyEntries.add(entry);
       return id;
     }
     return null;
@@ -288,15 +289,19 @@ public class XStreamSavingConverter implements Converter
     return id;
   }
 
-  private String getClassname(final Class< ? > cls)
+  public Class< ? > getClassFromHistoryName(final String classname)
+  {
+    return this.historyClassMapping.get(classname);
+  }
+
+  private String getClassname4History(final Class< ? > cls)
   {
     return ClassUtils.getShortClassName(cls);
   }
 
   protected void registerEntityMapping(final Class< ? > entityClass, final Serializable oldId, final Serializable newId)
   {
-    final EntityIdTuple tuple = new EntityIdTuple(getClassname(entityClass), oldId);
-    final Serializable registeredNewId = this.entityMapping.get(tuple);
+    final Serializable registeredNewId = getNewId(entityClass, oldId);
     if (registeredNewId != null && registeredNewId.equals(newId) == false) {
       log.error("Oups, double entity mapping found for entity '"
           + entityClass
@@ -308,19 +313,18 @@ public class XStreamSavingConverter implements Converter
           + registeredNewId
           + " instead.");
     } else {
-      this.entityMapping.put(tuple, newId);
+      this.entityMapping.put(getClassname4History(entityClass) + oldId, newId);
     }
   }
 
   protected Serializable getNewId(final Class< ? > entityClass, final Serializable oldId)
   {
-    return getNewId(getClassname(entityClass), oldId);
+    return getNewId(getClassname4History(entityClass), oldId);
   }
 
   protected Serializable getNewId(final String entityClassname, final Serializable oldId)
   {
-    final EntityIdTuple tuple = new EntityIdTuple(entityClassname, oldId);
-    return this.entityMapping.get(tuple);
+    return this.entityMapping.get(entityClassname + oldId);
   }
 
   public void marshal(Object arg0, HierarchicalStreamWriter arg1, MarshallingContext arg2)
