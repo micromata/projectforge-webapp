@@ -56,10 +56,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class InitDatabaseDao extends HibernateDaoSupport
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(InitDatabaseDao.class);
-  
-  static final String TEST_DATA_BASE_DUMP_FILE= "/data/init-test-data.xml.gz";
+
+  static final String TEST_DATA_BASE_DUMP_FILE = "/data/init-test-data.xml.gz";
 
   public static final String DEFAULT_ADMIN_USER = "admin";
+
+  private DatabaseDao databaseDao;
 
   private UserGroupCache userGroupCache;
 
@@ -71,6 +73,11 @@ public class InitDatabaseDao extends HibernateDaoSupport
 
   private UserDao userDao;
 
+  public void setDatabaseDao(DatabaseDao databaseDao)
+  {
+    this.databaseDao = databaseDao;
+  }
+  
   public void setUserDao(UserDao userDao)
   {
     this.userDao = userDao;
@@ -184,6 +191,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
       userDao.internalUpdate(user);
       log.fatal("Database successfully initialized with test data.");
     }
+    databaseDao.rebuildDatabaseSearchIndices();
     taskTree.setExpired();
     userGroupCache.setExpired();
     return user;
