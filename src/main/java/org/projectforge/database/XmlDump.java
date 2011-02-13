@@ -35,6 +35,7 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -182,31 +183,39 @@ public class XmlDump
           }
           return id;
         } else if (obj instanceof AbstractRechnungDO< ? >) {
-          final AbstractRechnungDO< ? > rechnung = (AbstractRechnungDO< ? >) obj;
-          if (rechnung.getPositionen() != null) {
-            for (final AbstractRechnungsPositionDO pos : rechnung.getPositionen()) {
+          final AbstractRechnungDO< ? extends AbstractRechnungsPositionDO> rechnung = (AbstractRechnungDO< ? >) obj;
+          final List< ? extends AbstractRechnungsPositionDO> positions = rechnung.getPositionen();
+          rechnung.setPositionen(null); // Need to nullable positions first (otherwise insert fails).
+          final Serializable id = save(rechnung);
+          rechnung.internalSetPositionen(positions);
+          if (positions != null) {
+            for (final AbstractRechnungsPositionDO pos : positions) {
               if (pos.getKostZuweisungen() != null) {
-                for (final KostZuweisungDO zuweisung : pos.getKostZuweisungen()) {
-                  zuweisung.setEingangsrechnungsPosition(null);
-                  zuweisung.setRechnungsPosition(null);
-                  save(zuweisung);
+                final List<KostZuweisungDO> zuweisungen = pos.getKostZuweisungen();
+                pos.setKostZuweisungen(null);
+                save(pos);
+                pos.setKostZuweisungen(zuweisungen);
+                if (zuweisungen != null) {
+                  for (final KostZuweisungDO zuweisung : zuweisungen) {
+                    save(zuweisung);
+                  }
                 }
               }
-              pos.setRechnung(null);
-              save(pos);
             }
           }
-          final Serializable id = save(rechnung);
           return id;
         } else if (obj instanceof AuftragDO) {
           final AuftragDO auftrag = (AuftragDO) obj;
-          if (auftrag.getPositionen() != null) {
-            for (final AuftragsPositionDO pos : auftrag.getPositionen()) {
-              pos.setAuftrag(null);
+          final List<AuftragsPositionDO> positions = auftrag.getPositionen();
+          auftrag.setPositionen(null);
+          final Serializable id = save(auftrag);
+          auftrag.setPositionen(positions);
+          if (positions != null) {
+            for (final AuftragsPositionDO pos : positions) {
               save(pos);
             }
           }
-          return save(auftrag);
+          return id;
         } else if (obj instanceof HistoryEntry) {
           final HistoryEntry entry = (HistoryEntry) obj;
           final Integer origEntityId = entry.getEntityId();
