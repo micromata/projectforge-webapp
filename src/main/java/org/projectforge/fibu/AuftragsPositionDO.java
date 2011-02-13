@@ -219,6 +219,16 @@ public class AuftragsPositionDO extends DefaultBaseDO implements ShortDisplayNam
     return this;
   }
 
+  @Transient
+  public Integer getAuftragId()
+  {
+    if (getAuftrag() == null) {
+      return null;
+    } else {
+      return getAuftrag().getId();
+    }
+  }
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "task_fk", nullable = true)
   public TaskDO getTask()
@@ -281,10 +291,12 @@ public class AuftragsPositionDO extends DefaultBaseDO implements ShortDisplayNam
   {
     if (o instanceof AuftragsPositionDO) {
       AuftragsPositionDO other = (AuftragsPositionDO) o;
-      if (ObjectUtils.equals(this.getNumber(), other.getNumber()) == false)
+      if (ObjectUtils.equals(this.getNumber(), other.getNumber()) == false) {
         return false;
-      if (ObjectUtils.equals(this.getAuftrag().getId(), other.getAuftrag().getId()) == false)
+      }
+      if (ObjectUtils.equals(this.getAuftragId(), other.getAuftragId()) == false) {
         return false;
+      }
       return true;
     }
     return false;
