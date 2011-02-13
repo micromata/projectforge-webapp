@@ -159,7 +159,8 @@ public class InitDatabaseDao extends HibernateDaoSupport
     groupDao.internalSave(group);
   }
 
-  public PFUserDO initializeEmptyDatabaseWithTestData(final String adminUsername, final String encryptedAdminPassword, final TimeZone adminUserTimezone)
+  public PFUserDO initializeEmptyDatabaseWithTestData(final String adminUsername, final String encryptedAdminPassword,
+      final TimeZone adminUserTimezone)
   {
     log.fatal("User wants to initialize database with test data.");
     if (isEmpty() == false) {
@@ -171,7 +172,10 @@ public class InitDatabaseDao extends HibernateDaoSupport
       log.error("Initialization of database failed. Perhaps caused by corrupted init-test-data.xml.gz.");
     } else {
       user.setUsername(adminUsername);
-      user.setPassword(encryptedAdminPassword);
+      if (encryptedAdminPassword != null) {
+        // Should only null for test cases.
+        user.setPassword(encryptedAdminPassword);
+      }
       user.setTimeZone(adminUserTimezone);
       userDao.internalUpdate(user);
       log.fatal("Database successfully initialized with test data.");
