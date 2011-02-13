@@ -35,22 +35,36 @@ import java.io.Reader;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+import javax.persistence.Transient;
+
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ClassUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.FlushMode;
+import org.hibernate.Hibernate;
+import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.projectforge.access.AccessEntryDO;
 import org.projectforge.access.GroupTaskAccessDO;
+import org.projectforge.common.BeanHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.database.xstream.HibernateXmlConverter;
 import org.projectforge.database.xstream.XStreamSavingConverter;
@@ -224,9 +238,10 @@ public class XmlDump
         RechnungDO.class, EingangsrechnungDO.class, EmployeeSalaryDO.class, KostZuweisungDO.class,//
         UserPrefEntryDO.class, UserPrefDO.class, //
         AccessEntryDO.class, GroupTaskAccessDO.class);
+    Session session = null;
     try {
       final SessionFactory sessionFactory = hibernate.getSessionFactory();
-      final Session session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
+      session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
       session.setFlushMode(FlushMode.AUTO);
       final Transaction transaction = session.beginTransaction();
       final XStream xstream = new XStream(new DomDriver());
@@ -243,6 +258,9 @@ public class XmlDump
       throw new RuntimeException(ex);
     } finally {
       IOUtils.closeQuietly(reader);
+      if (session != null) {
+        session.close();
+      }
     }
     return xstreamSavingConverter;
   }
@@ -320,5 +338,223 @@ public class XmlDump
     } finally {
       IOUtils.closeQuietly(out);
     }
+  }
+
+  /**
+   * Verify the imported dump.
+   * @return Number of successfully compared objects or -1 if an error occurs (at least one object wasn't imported sucessfully).
+   */
+  public int verifyDump(final XStreamSavingConverter xstreamSavingConverter)
+  {
+    final SessionFactory sessionFactory = hibernate.getSessionFactory();
+    Session session = null;
+    try {
+      session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
+      session.setDefaultReadOnly(true);
+      int counter = 0;
+      for (final Map.Entry<Class< ? >, List<Object>> entry : xstreamSavingConverter.getAllObjects().entrySet()) {
+        final List<Object> objects = entry.getValue();
+        final Class< ? > entityClass = entry.getKey();
+        if (objects == null) {
+          continue;
+        }
+        for (final Object obj : objects) {
+          if (obj instanceof AbstractBaseDO< ? > == false) {
+            continue;
+          }
+          final AbstractBaseDO< ? > baseDO = (AbstractBaseDO< ? >) obj;
+          // log.info("Testing object: " + baseDO);
+          final AbstractBaseDO< ? > databaseObject = (AbstractBaseDO< ? >) session.get(entityClass, baseDO.getId(), LockOptions.READ);
+          Hibernate.initialize(databaseObject);
+          final boolean equals = equals(baseDO, databaseObject, true);
+          if (equals == false) {
+            log.error("Object not sucessfully imported! xml object=[" + baseDO + "], data base=[" + databaseObject + "]");
+            log.fatal("*********** A inconsistence in the import was found! This may result in a data loss or corrupted data! Please retry the import.");
+            return -1;
+          }
+          ++counter;
+        }
+      }
+      return counter;
+    } finally {
+      if (session != null) {
+        session.close();
+      }
+    }
+  }
+
+  /**
+   * @param o1
+   * @param o2
+   * @param logDifference If true than the difference is logged.
+   * @return True if the given objects are equal.
+   */
+  private boolean equals(final Object o1, final Object o2, final boolean logDifference)
+  {
+    if (o1 == null) {
+      final boolean equals = (o2 == null);
+      if (equals == false && logDifference == true) {
+        log.error("Value 1 is null and value 2 is " + o2);
+      }
+      return equals;
+    } else if (o2 == null) {
+      if (logDifference == true) {
+        log.error("Value 2 is null and value 1 is " + o1);
+      }
+      return false;
+    }
+    final Class< ? > cls1 = o1.getClass();
+    final Field[] fields = cls1.getDeclaredFields();
+    AccessibleObject.setAccessible(fields, true);
+    for (final Field field : fields) {
+      if (accept(field) == false) {
+        continue;
+      }
+      try {
+        final Object fieldValue1 = getValue(o1, o2, field);
+        final Object fieldValue2 = getValue(o2, o1, field);
+        if (field.getType().isPrimitive() == true) {
+          if (ObjectUtils.equals(fieldValue2, fieldValue1) == false) {
+            if (logDifference == true) {
+              log.error("Field '" + field.getName() + "': value 1 '" + fieldValue1 + "' is different from value 2 '" + fieldValue2 + "'.");
+            }
+            return false;
+          }
+          continue;
+        } else if (fieldValue1 == null) {
+          if (fieldValue2 != null) {
+            if (logDifference == true) {
+              log.error("Field '" + field.getName() + "': value 1 '" + fieldValue1 + "' is different from value 2 '" + fieldValue2 + "'.");
+            }
+            return false;
+          }
+        } else if (fieldValue2 == null) {
+          if (fieldValue1 != null) {
+            if (logDifference == true) {
+              log.error("Field '" + field.getName() + "': value 1 '" + fieldValue1 + "' is different from value 2 '" + fieldValue2 + "'.");
+            }
+            return false;
+          }
+        } else if (fieldValue1 instanceof Collection< ? >) {
+          final Collection< ? > col1 = (Collection< ? >) fieldValue1;
+          final Collection< ? > col2 = (Collection< ? >) fieldValue2;
+          if (col1.size() != col2.size()) {
+            if (logDifference == true) {
+              log.error("Field '"
+                  + field.getName()
+                  + "': colection's size '"
+                  + col1.size()
+                  + "' is different from collection's size '"
+                  + col2.size()
+                  + "'.");
+            }
+            return false;
+          }
+          if (equals(field, col1, col2, logDifference) == false || equals(field, col2, col1, logDifference) == false) {
+            return false;
+          }
+        } else if (HibernateUtils.isEntity(fieldValue1.getClass()) == true) {
+          if (fieldValue2 == null
+              || ObjectUtils.equals(HibernateUtils.getIdentifier(fieldValue1), HibernateUtils.getIdentifier(fieldValue2)) == false) {
+            if (logDifference == true) {
+              log.error("Field '"
+                  + field.getName()
+                  + "': Hibernate object id '"
+                  + HibernateUtils.getIdentifier(fieldValue1)
+                  + "' is different from id '"
+                  + HibernateUtils.getIdentifier(fieldValue2)
+                  + "'.");
+            }
+            return false;
+          }
+        } else if (fieldValue1 instanceof BigDecimal) {
+          if (fieldValue2 == null || ((BigDecimal) fieldValue1).compareTo((BigDecimal) fieldValue2) != 0) {
+            if (logDifference == true) {
+              log.error("Field '" + field.getName() + "': value 1 '" + fieldValue1 + "' is different from value 2 '" + fieldValue2 + "'.");
+            }
+            return false;
+          }
+        } else if (ObjectUtils.equals(fieldValue2, fieldValue1) == false) {
+          if (logDifference == true) {
+            log.error("Field '" + field.getName() + "': value 1 '" + fieldValue1 + "' is different from value 2 '" + fieldValue2 + "'.");
+          }
+          return false;
+        }
+      } catch (IllegalAccessException ex) {
+        throw new InternalError("Unexpected IllegalAccessException: " + ex.getMessage());
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Tests if every entry of col1 is found as equals entry in col2. You need to call this method twice with swapped params for being sure of
+   * equality!
+   * @param col1
+   * @param col2
+   * @return
+   */
+  private boolean equals(final Field field, final Collection< ? > col1, final Collection< ? > col2, final boolean logDifference)
+  {
+    for (final Object colVal1 : col1) {
+      boolean equals = false;
+      for (final Object colVal2 : col2) {
+        if (equals(colVal1, colVal2, false) == true) {
+          equals = true; // Equal object found.
+          break;
+        }
+      }
+      if (equals == false) {
+        if (logDifference == true) {
+          log.error("Field '" + field.getName() + "': value '" + colVal1 + "' not found in other collection.");
+        }
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * @param obj
+   * @param compareObj Only need for @Transient (because Javassist proxy doesn't have this annotion).
+   * @param field
+   * @return
+   * @throws IllegalArgumentException
+   * @throws IllegalAccessException
+   */
+  private Object getValue(final Object obj, final Object compareObj, final Field field) throws IllegalArgumentException,
+      IllegalAccessException
+  {
+    Object val = null;
+    final Method getter = BeanHelper.determineGetter(obj.getClass(), field.getName());
+    final Method getter2 = BeanHelper.determineGetter(compareObj.getClass(), field.getName());
+    if (getter != null && getter.isAnnotationPresent(Transient.class) == false && getter2.isAnnotationPresent(Transient.class) == false) {
+      val = BeanHelper.invoke(obj, getter);
+    }
+    if (val == null) {
+      val = field.get(obj);
+    }
+    return val;
+  }
+
+  /**
+   * @param field
+   * @return true, if the given field should be compared.
+   */
+  protected boolean accept(final Field field)
+  {
+    if (field.getName().indexOf(ClassUtils.INNER_CLASS_SEPARATOR_CHAR) != -1) {
+      // Reject field from inner class.
+      return false;
+    }
+    if (Modifier.isTransient(field.getModifiers()) == true) {
+      // transients.
+      return false;
+    }
+    if (Modifier.isStatic(field.getModifiers()) == true) {
+      // transients.
+      return false;
+    }
+    return true;
   }
 }
