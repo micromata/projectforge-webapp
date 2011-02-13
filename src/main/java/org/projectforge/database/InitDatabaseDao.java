@@ -55,6 +55,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class InitDatabaseDao extends HibernateDaoSupport
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(InitDatabaseDao.class);
+  
+  static final String TEST_DATA_BASE_DUMP_FILE= "/data/init-test-data.xml.gz";
 
   public static final String DEFAULT_ADMIN_USER = "admin";
 
@@ -166,7 +168,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     if (isEmpty() == false) {
       databaseNotEmpty();
     }
-    xmlDump.restoreDatabaseFromClasspathResource("/data/init-test-data.xml.gz", "utf-8");
+    xmlDump.restoreDatabaseFromClasspathResource(TEST_DATA_BASE_DUMP_FILE, "utf-8");
     PFUserDO user = userDao.getInternalByName(DEFAULT_ADMIN_USER);
     if (user == null) {
       log.error("Initialization of database failed. Perhaps caused by corrupted init-test-data.xml.gz.");
