@@ -579,7 +579,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public HistoryEntry[] internalGetHistoryEntries(final BaseDO< ? > obj)
   {
-    HistoryAdapter ad = new HistoryAdapter();
+    final HistoryAdapter ad = new HistoryAdapter();
     ad.setSessionFactory(getHibernateTemplate().getSessionFactory());
     return ad.getHistoryEntries(obj);
   }
@@ -597,10 +597,10 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       return EMPTY_HISTORY_ENTRIES;
     }
     @SuppressWarnings("unchecked")
-    List<DisplayHistoryEntry> result = (List<DisplayHistoryEntry>) getHibernateTemplate().execute(new HibernateCallback() {
+    final List<DisplayHistoryEntry> result = (List<DisplayHistoryEntry>) getHibernateTemplate().execute(new HibernateCallback() {
       public Object doInHibernate(Session session) throws HibernateException, SQLException
       {
-        HistoryEntry[] entries = getHistoryEntries(obj);
+        final HistoryEntry[] entries = getHistoryEntries(obj);
         if (entries == null) {
           return null;
         }
