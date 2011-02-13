@@ -25,6 +25,7 @@ package org.projectforge.common;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.TimeZone;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -45,15 +46,19 @@ public class ReflectionToString extends ReflectionToStringBuilder
   }
 
   @Override
-  public ToStringBuilder append(String fieldName, Object object)
+  public ToStringBuilder append(final String fieldName, final Object object)
   {
-    if (Hibernate.isInitialized(object) == false) {
-      if (BaseDO.class.isAssignableFrom(object.getClass()) == true) {
-        // Work around for Jassist bug:
-        final Serializable id = HibernateUtils.getIdentifier((BaseDO< ? >) object);
-        return super.append(fieldName, id != null ? id : "<id>");
+    if (object != null) {
+      if (Hibernate.isInitialized(object) == false) {
+        if (BaseDO.class.isAssignableFrom(object.getClass()) == true) {
+          // Work around for Jassist bug:
+          final Serializable id = HibernateUtils.getIdentifier((BaseDO< ? >) object);
+          return super.append(fieldName, id != null ? id : "<id>");
+        }
+        return super.append(fieldName, "LazyCollection");
+      } else if (object instanceof TimeZone) {
+        return super.append(fieldName, ((TimeZone)object).getID());
       }
-      return super.append(fieldName, "LazyCollection");
     }
     return super.append(fieldName, object);
   }
