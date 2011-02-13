@@ -290,6 +290,9 @@ public class XStreamSavingConverter implements Converter
     if (obj == null) {
       return;
     }
+    if (HibernateUtils.isEntity(obj.getClass()) == false) {
+      return;
+    }
     if (this.ignoreFromSaving.contains(obj.getClass()) == true) {
       // Don't need this objects as "top level" objects in list. They're usually encapsulated.
       return;
