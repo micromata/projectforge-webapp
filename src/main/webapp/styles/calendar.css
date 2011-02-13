@@ -182,6 +182,10 @@ overflow: hidden;
 	border: 1px solid #7E8283;
 }
 
+#content table.calendar tr td span.empty {
+	background: #FFFFFF;
+}
+
 #content table.calendar tr td span.holiday,
 #content table.calendar tr td span.birthday{
 	background: #FFFFFF;
