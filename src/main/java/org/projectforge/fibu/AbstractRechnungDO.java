@@ -45,7 +45,6 @@ import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.PFPersistancyBehavior;
 import org.projectforge.fibu.kost.KostZuweisungDO;
 
-
 @MappedSuperclass
 public abstract class AbstractRechnungDO<T extends AbstractRechnungsPositionDO> extends DefaultBaseDO
 {
@@ -251,6 +250,18 @@ public abstract class AbstractRechnungDO<T extends AbstractRechnungsPositionDO> 
   public AbstractRechnungDO<T> setPositionen(final List<T> positionen)
   {
     this.positionen = positionen;
+    return this;
+  }
+
+  /**
+   * Needed by XmlDump.
+   * @param positionen
+   * @return this for chaining.
+   */
+  @SuppressWarnings("unchecked")
+  public AbstractRechnungDO<T> internalSetPositionen(final List< ? extends AbstractRechnungsPositionDO> positionen)
+  {
+    this.positionen = (List<T>) positionen;
     return this;
   }
 
