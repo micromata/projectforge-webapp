@@ -84,8 +84,10 @@ public class XStreamSavingConverter implements Converter
       this.id = id;
     }
 
+    @SuppressWarnings("unused")
     private String entityClassname;
 
+    @SuppressWarnings("unused")
     private Serializable id;
   };
 
@@ -97,6 +99,11 @@ public class XStreamSavingConverter implements Converter
   public void setSession(final Session session)
   {
     this.session = session;
+  }
+
+  public Map<Class< ? >, List<Object>> getAllObjects()
+  {
+    return allObjects;
   }
 
   @SuppressWarnings("unchecked")
