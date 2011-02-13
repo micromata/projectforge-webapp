@@ -240,121 +240,122 @@ public abstract class AbstractBaseDO<I extends Serializable> implements Extended
     AccessibleObject.setAccessible(fields, true);
     boolean modified = false;
     for (final Field field : fields) {
-      if (ignoreFields != null && ArrayUtils.contains(ignoreFields, field.getName()) == false && accept(field)) {
-        try {
-          final Object srcFieldValue = field.get(src);
-          final Object destFieldValue = field.get(dest);
-          if (field.getType().isPrimitive() == true) {
-            if (ObjectUtils.equals(destFieldValue, srcFieldValue) == false) {
-              field.set(dest, srcFieldValue);
-              modified = true;
-            }
-            continue;
-          } else if (srcFieldValue == null) {
-            if (field.getType() == String.class) {
-              if (StringUtils.isNotEmpty((String) destFieldValue) == true) {
-                field.set(dest, null);
-                modified = true;
-              }
-            } else if (destFieldValue != null) {
-              field.set(dest, null);
-              modified = true;
-            } else {
-              // dest was already null
-            }
-          } else if (srcFieldValue instanceof Collection) {
-            Collection<Object> destColl = (Collection<Object>) destFieldValue;
-            final Collection<Object> srcColl = (Collection<Object>) srcFieldValue;
-            final Collection<Object> toRemove = new ArrayList<Object>();
-            if (srcColl != null && destColl == null) {
-              if (srcColl instanceof TreeSet) {
-                destColl = new TreeSet<Object>();
-              } else if (srcColl instanceof HashSet) {
-                destColl = new HashSet<Object>();
-              } else if (srcColl instanceof List) {
-                destColl = new ArrayList<Object>();
-              } else if (srcColl instanceof PersistentSet) {
-                destColl = new HashSet<Object>();
-              } else {
-                log.error("Unsupported collection type: " + srcColl.getClass().getName());
-              }
-              field.set(dest, destColl);
-            }
-            for (final Object o : destColl) {
-              if (srcColl.contains(o) == false) {
-                toRemove.add(o);
-              }
-            }
-            for (final Object o : toRemove) {
-              if (log.isDebugEnabled() == true) {
-                log.debug("Removing collection entry: " + o);
-              }
-              destColl.remove(o);
-              modified = true;
-            }
-            for (final Object srcEntry : srcColl) {
-              if (destColl.contains(srcEntry) == false) {
-                if (log.isDebugEnabled() == true) {
-                  log.debug("Adding new collection entry: " + srcEntry);
-                }
-                destColl.add(srcEntry);
-                modified = true;
-              } else if (srcEntry instanceof BaseDO) {
-                final PFPersistancyBehavior behavior = field.getAnnotation(PFPersistancyBehavior.class);
-                if (behavior != null && behavior.autoUpdateCollectionEntries() == true) {
-                  BaseDO destEntry = null;
-                  for (final Object entry : destColl) {
-                    if (entry.equals(srcEntry) == true) {
-                      destEntry = (BaseDO) entry;
-                      break;
-                    }
-                  }
-                  Validate.notNull(destEntry);
-                  if (destEntry.copyValuesFrom((BaseDO) srcEntry) == true) {
-                    modified = true;
-                  }
-                }
-              }
-            }
-          } else if (srcFieldValue instanceof BaseDO) {
-            final Serializable srcFieldValueId = HibernateUtils.getIdentifier((BaseDO< ? >) srcFieldValue);
-            if (srcFieldValueId != null) {
-              if (destFieldValue == null || ObjectUtils.equals(srcFieldValueId, ((BaseDO) destFieldValue).getId()) == false) {
-                field.set(dest, srcFieldValue);
-                modified = true;
-              }
-            } else {
-              log.error("Can't get id though can't copy the BaseDO (see error message above about HHH-3502).");
-            }
-          } else if (srcFieldValue instanceof java.sql.Date) {
-            if (destFieldValue == null) {
-              field.set(dest, srcFieldValue);
-              modified = true;
-            } else {
-              final DayHolder srcDay = new DayHolder((Date) srcFieldValue);
-              final DayHolder destDay = new DayHolder((Date) destFieldValue);
-              if (srcDay.isSameDay(destDay) == false) {
-                field.set(dest, srcDay.getSQLDate());
-                modified = true;
-              }
-            }
-          } else if (srcFieldValue instanceof Date) {
-            if (destFieldValue == null || ((Date) srcFieldValue).getTime() != ((Date) destFieldValue).getTime()) {
-              field.set(dest, srcFieldValue);
-              modified = true;
-            }
-          } else if (srcFieldValue instanceof BigDecimal) {
-            if (destFieldValue == null || ((BigDecimal) srcFieldValue).compareTo((BigDecimal) destFieldValue) != 0) {
-              field.set(dest, srcFieldValue);
-              modified = true;
-            }
-          } else if (ObjectUtils.equals(destFieldValue, srcFieldValue) == false) {
+      if ((ignoreFields != null && ArrayUtils.contains(ignoreFields, field.getName()) == true) || accept(field) == false) {
+        continue;
+      }
+      try {
+        final Object srcFieldValue = field.get(src);
+        final Object destFieldValue = field.get(dest);
+        if (field.getType().isPrimitive() == true) {
+          if (ObjectUtils.equals(destFieldValue, srcFieldValue) == false) {
             field.set(dest, srcFieldValue);
             modified = true;
           }
-        } catch (IllegalAccessException ex) {
-          throw new InternalError("Unexpected IllegalAccessException: " + ex.getMessage());
+          continue;
+        } else if (srcFieldValue == null) {
+          if (field.getType() == String.class) {
+            if (StringUtils.isNotEmpty((String) destFieldValue) == true) {
+              field.set(dest, null);
+              modified = true;
+            }
+          } else if (destFieldValue != null) {
+            field.set(dest, null);
+            modified = true;
+          } else {
+            // dest was already null
+          }
+        } else if (srcFieldValue instanceof Collection) {
+          Collection<Object> destColl = (Collection<Object>) destFieldValue;
+          final Collection<Object> srcColl = (Collection<Object>) srcFieldValue;
+          final Collection<Object> toRemove = new ArrayList<Object>();
+          if (srcColl != null && destColl == null) {
+            if (srcColl instanceof TreeSet) {
+              destColl = new TreeSet<Object>();
+            } else if (srcColl instanceof HashSet) {
+              destColl = new HashSet<Object>();
+            } else if (srcColl instanceof List) {
+              destColl = new ArrayList<Object>();
+            } else if (srcColl instanceof PersistentSet) {
+              destColl = new HashSet<Object>();
+            } else {
+              log.error("Unsupported collection type: " + srcColl.getClass().getName());
+            }
+            field.set(dest, destColl);
+          }
+          for (final Object o : destColl) {
+            if (srcColl.contains(o) == false) {
+              toRemove.add(o);
+            }
+          }
+          for (final Object o : toRemove) {
+            if (log.isDebugEnabled() == true) {
+              log.debug("Removing collection entry: " + o);
+            }
+            destColl.remove(o);
+            modified = true;
+          }
+          for (final Object srcEntry : srcColl) {
+            if (destColl.contains(srcEntry) == false) {
+              if (log.isDebugEnabled() == true) {
+                log.debug("Adding new collection entry: " + srcEntry);
+              }
+              destColl.add(srcEntry);
+              modified = true;
+            } else if (srcEntry instanceof BaseDO) {
+              final PFPersistancyBehavior behavior = field.getAnnotation(PFPersistancyBehavior.class);
+              if (behavior != null && behavior.autoUpdateCollectionEntries() == true) {
+                BaseDO destEntry = null;
+                for (final Object entry : destColl) {
+                  if (entry.equals(srcEntry) == true) {
+                    destEntry = (BaseDO) entry;
+                    break;
+                  }
+                }
+                Validate.notNull(destEntry);
+                if (destEntry.copyValuesFrom((BaseDO) srcEntry) == true) {
+                  modified = true;
+                }
+              }
+            }
+          }
+        } else if (srcFieldValue instanceof BaseDO) {
+          final Serializable srcFieldValueId = HibernateUtils.getIdentifier((BaseDO< ? >) srcFieldValue);
+          if (srcFieldValueId != null) {
+            if (destFieldValue == null || ObjectUtils.equals(srcFieldValueId, ((BaseDO) destFieldValue).getId()) == false) {
+              field.set(dest, srcFieldValue);
+              modified = true;
+            }
+          } else {
+            log.error("Can't get id though can't copy the BaseDO (see error message above about HHH-3502).");
+          }
+        } else if (srcFieldValue instanceof java.sql.Date) {
+          if (destFieldValue == null) {
+            field.set(dest, srcFieldValue);
+            modified = true;
+          } else {
+            final DayHolder srcDay = new DayHolder((Date) srcFieldValue);
+            final DayHolder destDay = new DayHolder((Date) destFieldValue);
+            if (srcDay.isSameDay(destDay) == false) {
+              field.set(dest, srcDay.getSQLDate());
+              modified = true;
+            }
+          }
+        } else if (srcFieldValue instanceof Date) {
+          if (destFieldValue == null || ((Date) srcFieldValue).getTime() != ((Date) destFieldValue).getTime()) {
+            field.set(dest, srcFieldValue);
+            modified = true;
+          }
+        } else if (srcFieldValue instanceof BigDecimal) {
+          if (destFieldValue == null || ((BigDecimal) srcFieldValue).compareTo((BigDecimal) destFieldValue) != 0) {
+            field.set(dest, srcFieldValue);
+            modified = true;
+          }
+        } else if (ObjectUtils.equals(destFieldValue, srcFieldValue) == false) {
+          field.set(dest, srcFieldValue);
+          modified = true;
         }
+      } catch (IllegalAccessException ex) {
+        throw new InternalError("Unexpected IllegalAccessException: " + ex.getMessage());
       }
     }
     final Class< ? > superClazz = srcClazz.getSuperclass();
