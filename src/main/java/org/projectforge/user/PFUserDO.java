@@ -565,7 +565,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     this.loginFailures = loginFailures;
   }
 
-  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "user")
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true, mappedBy = "user")
   public Set<UserRightDO> getRights()
   {
     return this.rights;
