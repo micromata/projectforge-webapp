@@ -55,7 +55,7 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
-  private SetupTarget setupMode = SetupTarget.EMPTY_DATABASE;
+  private SetupTarget setupMode = SetupTarget.TEST_DATA;
 
   private TimeZone timeZone = TimeZone.getDefault();
 
