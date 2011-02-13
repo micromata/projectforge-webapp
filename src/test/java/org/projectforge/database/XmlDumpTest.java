@@ -70,5 +70,6 @@ public class XmlDumpTest extends TestBase
     userDao.internalUpdate(user);
     log.info("The following import error from XmlDump are OK.");
     assertEquals("Error should be detected.", -counter, xmlDump.verifyDump(converter));
+    log.info("The previous import error from XmlDump are OK.");
   }
 }
