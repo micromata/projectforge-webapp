@@ -342,12 +342,13 @@ public class XmlDump
 
   /**
    * Verify the imported dump.
-   * @return Number of successfully compared objects or -1 if an error occurs (at least one object wasn't imported sucessfully).
+   * @return Number of checked objects. This number is negative if any error occurs (at least one object wasn't imported successfully).
    */
   public int verifyDump(final XStreamSavingConverter xstreamSavingConverter)
   {
     final SessionFactory sessionFactory = hibernate.getSessionFactory();
     Session session = null;
+    boolean hasError = false;
     try {
       session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
       session.setDefaultReadOnly(true);
@@ -369,11 +370,15 @@ public class XmlDump
           final boolean equals = equals(baseDO, databaseObject, true);
           if (equals == false) {
             log.error("Object not sucessfully imported! xml object=[" + baseDO + "], data base=[" + databaseObject + "]");
-            log.fatal("*********** A inconsistence in the import was found! This may result in a data loss or corrupted data! Please retry the import.");
-            return -1;
+            hasError = true;
           }
           ++counter;
         }
+      }
+      if (hasError == true) {
+        log
+            .fatal("*********** A inconsistency in the import was found! This may result in a data loss or corrupted data! Please retry the import.");
+        return -counter;
       }
       return counter;
     } finally {
@@ -528,7 +533,10 @@ public class XmlDump
     Object val = null;
     final Method getter = BeanHelper.determineGetter(obj.getClass(), field.getName());
     final Method getter2 = BeanHelper.determineGetter(compareObj.getClass(), field.getName());
-    if (getter != null && getter.isAnnotationPresent(Transient.class) == false && getter2 != null && getter2.isAnnotationPresent(Transient.class) == false) {
+    if (getter != null
+        && getter.isAnnotationPresent(Transient.class) == false
+        && getter2 != null
+        && getter2.isAnnotationPresent(Transient.class) == false) {
       val = BeanHelper.invoke(obj, getter);
     }
     if (val == null) {
@@ -545,6 +553,10 @@ public class XmlDump
   {
     if (field.getName().indexOf(ClassUtils.INNER_CLASS_SEPARATOR_CHAR) != -1) {
       // Reject field from inner class.
+      return false;
+    }
+    if (field.getName().equals("handler") == true) {
+      // Handler of Javassist proxy should be ignored.
       return false;
     }
     if (Modifier.isTransient(field.getModifiers()) == true) {

@@ -23,15 +23,19 @@
 
 package org.projectforge.database;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.test.TestBase;
+import org.projectforge.user.PFUserDO;
 
 public class XmlDumpTest extends TestBase
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(XmlDumpTest.class);
+
   private InitDatabaseDao initDatabaseDao;
 
   private XmlDump xmlDump;
@@ -59,6 +63,12 @@ public class XmlDumpTest extends TestBase
     final XStreamSavingConverter converter = xmlDump
         .restoreDatabaseFromClasspathResource(InitDatabaseDao.TEST_DATA_BASE_DUMP_FILE, "utf-8");
     final int counter = xmlDump.verifyDump(converter);
+    assertTrue("Import was not successful.", counter > 0);
     assertTrue("Minimum expected number of tested object to low: " + counter + " < 50.", counter >= 50);
+    final PFUserDO user = userDao.internalLoadAll().get(0);
+    user.setUsername("changed");
+    userDao.internalUpdate(user);
+    log.info("The following import error from XmlDump are OK.");
+    assertEquals("Error should be detected.", -counter, xmlDump.verifyDump(converter));
   }
 }
