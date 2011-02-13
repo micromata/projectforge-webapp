@@ -31,16 +31,14 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
-import org.hibernate.annotations.Cascade;
-import org.hibernate.annotations.IndexColumn;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.projectforge.fibu.kost.KostZuweisungDO;
-
 
 /**
  * Repräsentiert eine Position innerhalb eine Rechnung.
@@ -86,10 +84,9 @@ public class RechnungsPositionDO extends AbstractRechnungsPositionDO
     return this;
   }
 
-  @OneToMany(cascade = { CascadeType.ALL}, fetch = FetchType.LAZY)
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @JoinColumn(name = "rechnungs_pos_fk")
-  @Cascade(value = { org.hibernate.annotations.CascadeType.DELETE_ORPHAN, org.hibernate.annotations.CascadeType.SAVE_UPDATE})
-  @IndexColumn(name = "index", base = 0)
+  @OrderColumn(name = "index")
   public List<KostZuweisungDO> getKostZuweisungen()
   {
     return kostZuweisungen;
