@@ -26,13 +26,16 @@ package org.projectforge.web.admin;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.RadioChoice;
+import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
 import org.projectforge.core.ConfigurationDO;
@@ -73,10 +76,18 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
 
   private String encryptedPassword;
 
+  protected FileUploadField fileUploadField;
+  
+  protected String filename;
+
   public SetupForm(final SetupPage parentPage)
   {
     super(parentPage);
-
+    // set this form to multipart mode (always needed for uploads!)
+    setMultiPart(true);
+    // Add one file input field
+    add(fileUploadField = new FileUploadField("fileInput"));
+    setMaxSize(Bytes.megabytes(100));
   }
 
   @SuppressWarnings("serial")
@@ -142,6 +153,22 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
     finishButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     add(new SingleButtonPanel("finish", finishButton));
     setDefaultButton(finishButton);
+    add(new Label("filename", new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return fileUploadField.getFileUpload() != null ? fileUploadField.getFileUpload().getClientFileName() : "";
+      }
+    }));
+    final Button uploadButton = new Button("button", new Model<String>(getString("upload"))) {
+      @Override
+      public final void onSubmit()
+      {
+        parentPage.upload();
+      }
+    };
+    uploadButton.setDefaultFormProcessing(false);
+    add(new SingleButtonPanel("upload", uploadButton));
   }
 
   public SetupTarget getSetupMode()

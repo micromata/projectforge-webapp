@@ -6,14 +6,12 @@
 <body>
 <wicket:extend>
   <form wicket:id="form" name="form">
+  <h1><wicket:message key="administration.setup.heading" /></h1>
   <fieldset><legend><wicket:message key="label.data" /></legend>
   <div wicket:id="feedback">[Validation errors]</div>
   <table class="form">
     <tr>
-      <th colspan="3">Congratulations, you're nearly finished!</th>
-    </tr>
-    <tr>
-      <td colspan="3">Thank you for choosing ProjectForge.</td>
+      <td colspan="3"><wicket:message key="administration.setup.heading.subtitle" /></td>
     </tr>
     <tr class="hRuler">
       <td colspan="3"></td>
@@ -73,6 +71,14 @@
     <tr>
       <th></th>
       <td colspan="2" class="buttonpanel"><span wicket:id="finish">[finish]</span></td>
+    </tr>
+    <tr class="hRuler">
+      <td colspan="3"></td>
+    </tr>
+    <tr>
+      <th><label for="upload"><wicket:message key="administration.setup.dumpFile" /> (*.xml.gz)</label></th>
+      <td><label wicket:id="filename">[filename]</label><input wicket:id="fileInput" id="upload" type="file" /> <span wicket:id="upload">[upload]</span>
+      </td>
     </tr>
   </table>
   </fieldset>

@@ -23,16 +23,27 @@
 
 package org.projectforge.web.admin;
 
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.zip.GZIPInputStream;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.core.UserException;
+import org.projectforge.database.DatabaseDao;
 import org.projectforge.database.InitDatabaseDao;
+import org.projectforge.database.XmlDump;
+import org.projectforge.database.xstream.XStreamSavingConverter;
+import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.LoginPage;
 import org.projectforge.web.UserFilter;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.MessagePage;
@@ -47,6 +58,18 @@ public class SetupPage extends AbstractSecuredPage
 
   @SpringBean(name = "configurationDao")
   private ConfigurationDao configurationDao;
+
+  @SpringBean(name = "databaseDao")
+  private DatabaseDao databaseDao;
+
+  @SpringBean(name = "taskTree")
+  private TaskTree taskTree;
+
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
+
+  @SpringBean(name = "xmlDump")
+  private XmlDump xmlDump;
 
   private SetupForm form;
 
@@ -65,12 +88,13 @@ public class SetupPage extends AbstractSecuredPage
     checkAccess();
     PFUserDO adminUser = null;
     final String message;
-    if (form.getSetupMode() == SetupTarget.TEST_DATA) {
-      adminUser = initDatabaseDao.initializeEmptyDatabaseWithTestData(form.getAdminUsername(), form.getEncryptedPassword(), form.getTimeZone());
-      message = "administration.setup.message.testdata";
-    } else {
+    if (form.getSetupMode() == SetupTarget.EMPTY_DATABASE) {
       adminUser = initDatabaseDao.initializeEmptyDatabase(form.getAdminUsername(), form.getEncryptedPassword(), form.getTimeZone());
       message = "administration.setup.message.emptyDatabase";
+    } else {
+      adminUser = initDatabaseDao.initializeEmptyDatabaseWithTestData(form.getAdminUsername(), form.getEncryptedPassword(), form
+          .getTimeZone());
+      message = "administration.setup.message.testdata";
     }
     ((MySession) getSession()).login(adminUser, getRequest());
     UserFilter.login(((WebRequest) getRequest()).getHttpServletRequest(), adminUser);
@@ -106,6 +130,44 @@ public class SetupPage extends AbstractSecuredPage
     if (configurationDO != null) {
       configurationDO.setStringValue(value);
       configurationDao.update(configurationDO);
+    }
+  }
+
+  protected void upload()
+  {
+    checkAccess();
+    log.info("Uploading data-base dump file...");
+    final FileUpload fileUpload = form.fileUploadField.getFileUpload();
+    if (fileUpload == null) {
+      return;
+    }
+    try {
+      final String clientFileName = fileUpload.getClientFileName();
+      Reader reader = null;
+      if (clientFileName.endsWith(".xml.gz") == true) {
+        reader = new InputStreamReader(new GZIPInputStream(fileUpload.getInputStream()));
+      } else if (clientFileName.endsWith(".xml") == true) {
+        reader = new InputStreamReader(fileUpload.getInputStream());
+      } else {
+        log.info("Unsupported file suffix. Only *.xml and *.xml.gz is supported: " + clientFileName);
+        error(getString("administration.setup.error.uploadfile"));
+        return;
+      }
+      final XStreamSavingConverter converter = xmlDump.restoreDatabase(reader);
+      final int counter = xmlDump.verifyDump(converter);
+      configurationDao.checkAndUpdateDatabaseEntries();
+      databaseDao.rebuildDatabaseSearchIndices();
+      taskTree.setExpired();
+      userGroupCache.setExpired();
+      if (counter > 0) {
+        ((MySession) getSession()).logout();
+        setResponsePage(LoginPage.class);
+      } else {
+        error(getString("administration.setup.error.import"));
+      }
+    } catch (Exception ex) {
+      log.error(ex.getMessage(), ex);
+      error(getString("administration.setup.error.import"));
     }
   }
 
