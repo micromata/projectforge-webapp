@@ -45,11 +45,11 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
+import org.projectforge.common.ReflectionToString;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.Configuration;
@@ -237,7 +237,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
    */
   public String toString()
   {
-    return (new ReflectionToStringBuilder(this) {
+    return (new ReflectionToString(this) {
       protected boolean accept(java.lang.reflect.Field f)
       {
         return super.accept(f) && !"password".equals(f.getName()) && !"stayLoggedInKey".equals(f.getName());
