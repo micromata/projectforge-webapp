@@ -49,6 +49,8 @@ import org.projectforge.test.TestBase;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 
+import de.micromata.hibernate.history.HistoryEntry;
+
 public class InitDatabaseDaoWithTestDataTest extends TestBase
 {
   private InitDatabaseDao initDatabaseDao;
@@ -155,6 +157,10 @@ public class InitDatabaseDaoWithTestDataTest extends TestBase
     }
     assertNotNull("Order #1 not found.", order);
     assertEquals("Order #1 must have 3 order positions.", 3, order.getPositionen().size());
+
+    @SuppressWarnings("unchecked")
+    final List<HistoryEntry> list = hibernate.loadAll(HistoryEntry.class);
+    assertTrue("At least 10 history entries expected: " + list.size(), list.size() >= 10);
 
     boolean exception = false;
     try {
