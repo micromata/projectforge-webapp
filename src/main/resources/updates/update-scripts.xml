@@ -221,7 +221,7 @@
     </script>
   </update>
   <update version="3.3.44">
-    <description>Drops and re-creates table t_user_rigt (must be empty).</description>
+    <description>Drops and re-creates table t_user_right (must be empty).</description>
     <pre-check><![CDATA[
     if (dao.doesTableExist("t_user_right") == false) {
       return UpdatePreCheckStatus.OK;
