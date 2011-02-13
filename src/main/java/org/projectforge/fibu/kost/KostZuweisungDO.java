@@ -173,7 +173,7 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
     return kost2.getId();
   }
 
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "rechnungs_pos_fk", nullable = true)
   public RechnungsPositionDO getRechnungsPosition()
   {
