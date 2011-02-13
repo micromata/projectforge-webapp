@@ -53,7 +53,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.Validate;
-import org.apache.commons.lang.reflect.FieldUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.EmptyInterceptor;
 import org.hibernate.FlushMode;
@@ -95,12 +94,6 @@ import org.springframework.orm.hibernate3.HibernateTemplate;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
-import de.micromata.hibernate.history.HistoryEntry;
-import de.micromata.hibernate.history.delta.AssociationPropertyDelta;
-import de.micromata.hibernate.history.delta.CollectionPropertyDelta;
-import de.micromata.hibernate.history.delta.PropertyDelta;
-import de.micromata.hibernate.history.delta.SimplePropertyDelta;
-
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -118,8 +111,7 @@ public class XmlDump
    * These classes are stored automatically because they're dependent.
    */
   private Class< ? >[] embeddedClasses = new Class< ? >[] { UserRightDO.class, AuftragsPositionDO.class, EingangsrechnungsPositionDO.class,
-      RechnungsPositionDO.class, HistoryEntry.class, PropertyDelta.class, SimplePropertyDelta.class, AssociationPropertyDelta.class,
-      CollectionPropertyDelta.class};
+      RechnungsPositionDO.class};
 
   public HibernateTemplate getHibernate()
   {
@@ -211,24 +203,8 @@ public class XmlDump
             }
           }
           return id;
-        } else if (obj instanceof HistoryEntry) {
-          final HistoryEntry entry = (HistoryEntry) obj;
-          final Integer origEntityId = entry.getEntityId();
-          final String entityClassname = entry.getClassName();
-          final Serializable newId = getNewId(entityClassname, origEntityId);
-          if (newId != null) {
-            try {
-              FieldUtils.writeField(entry, "entityId", (Integer) newId, true);
-            } catch (IllegalAccessException ex) {
-              log.error("Can't modify id of history entry. This results in a corrupted history: " + entry);
-              log.fatal("Exception encountered " + ex, ex);
-            }
-          } else {
-            log.error("Can't find mapping of old entity id. This results in a corrupted history: " + entry);
-          }
-          return save(entry);
         }
-        return null;
+        return super.onBeforeSave(session, obj);
       }
     };
     // UserRightDO is inserted on cascade while inserting PFUserDO.
@@ -377,9 +353,12 @@ public class XmlDump
       }
       if (hasError == true) {
         log
-            .fatal("*********** A inconsistency in the import was found! This may result in a data loss or corrupted data! Please retry the import.");
+            .fatal("*********** A inconsistency in the import was found! This may result in a data loss or corrupted data! Please retry the import. "
+                + counter
+                + " entries checked.");
         return -counter;
       }
+      log.info("Data-base import successfully verified: " + counter + " entries checked.");
       return counter;
     } finally {
       if (session != null) {

@@ -24,6 +24,8 @@
 package org.projectforge.database.xstream;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,6 +46,12 @@ import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.UnmarshallingContext;
 import com.thoughtworks.xstream.io.HierarchicalStreamReader;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+
+import de.micromata.hibernate.history.HistoryEntry;
+import de.micromata.hibernate.history.delta.AssociationPropertyDelta;
+import de.micromata.hibernate.history.delta.CollectionPropertyDelta;
+import de.micromata.hibernate.history.delta.PropertyDelta;
+import de.micromata.hibernate.history.delta.SimplePropertyDelta;
 
 /**
  * Registers all read objects and saves them in the configurable order to the data base.
@@ -94,6 +102,10 @@ public class XStreamSavingConverter implements Converter
   public XStreamSavingConverter() throws HibernateException
   {
     defaultConv = new XStream().getConverterLookup();
+    this.ignoreFromSaving.add(PropertyDelta.class);
+    this.ignoreFromSaving.add(SimplePropertyDelta.class);
+    this.ignoreFromSaving.add(AssociationPropertyDelta.class);
+    this.ignoreFromSaving.add(CollectionPropertyDelta.class);
   }
 
   public void setSession(final Session session)
@@ -139,8 +151,12 @@ public class XStreamSavingConverter implements Converter
       save(type);
     }
     for (final Map.Entry<Class< ? >, List<Object>> entry : allObjects.entrySet()) {
+      if (entry.getKey().equals(HistoryEntry.class) == true) {
+        continue;
+      }
       save(entry.getKey());
     }
+    save(HistoryEntry.class);
   }
 
   /**
@@ -150,7 +166,57 @@ public class XStreamSavingConverter implements Converter
    */
   public Serializable onBeforeSave(final Session session, final Object obj)
   {
+    if (obj instanceof HistoryEntry) {
+      final HistoryEntry entry = (HistoryEntry) obj;
+      final Integer origEntityId = entry.getEntityId();
+      final String entityClassname = entry.getClassName();
+      final Serializable newId = getNewId(entityClassname, origEntityId);
+      final List<PropertyDelta> delta = entry.getDelta();
+      Serializable id = null;
+      if (newId != null) {
+        // No public access, so try this:
+        invokeHistorySetter(entry, "setEntityId", Integer.class, newId);
+      } else {
+        log.error("Can't find mapping of old entity id. This results in a corrupted history: " + entry);
+      }
+      invokeHistorySetter(entry, "setDelta", List.class, null);
+      id = save(entry);
+      invokeHistorySetter(entry, "setDelta", List.class, delta);
+      for (final PropertyDelta deltaEntry : delta) {
+        save(deltaEntry);
+      }
+      return id;
+    }
     return null;
+  }
+
+  /**
+   * These methods are not public.
+   * @param name
+   * @param value
+   */
+  private void invokeHistorySetter(final HistoryEntry entry, final String name, final Class< ? > parameterType, final Object value)
+  {
+    try {
+      final Method method = HistoryEntry.class.getDeclaredMethod(name, parameterType);
+      method.setAccessible(true);
+      method.invoke(entry, value);
+    } catch (IllegalArgumentException ex) {
+      log.error("Can't modify id of history entry. This results in a corrupted history: " + entry);
+      log.fatal("Exception encountered " + ex, ex);
+    } catch (IllegalAccessException ex) {
+      log.error("Can't modify id of history entry. This results in a corrupted history: " + entry);
+      log.fatal("Exception encountered " + ex, ex);
+    } catch (InvocationTargetException ex) {
+      log.error("Can't modify id of history entry. This results in a corrupted history: " + entry);
+      log.fatal("Exception encountered " + ex, ex);
+    } catch (SecurityException ex) {
+      log.error("Can't modify id of history entry. This results in a corrupted history: " + entry);
+      log.fatal("Exception encountered " + ex, ex);
+    } catch (NoSuchMethodException ex) {
+      log.error("Can't modify id of history entry. This results in a corrupted history: " + entry);
+      log.fatal("Exception encountered " + ex, ex);
+    }
   }
 
   private void save(final Class< ? > type)

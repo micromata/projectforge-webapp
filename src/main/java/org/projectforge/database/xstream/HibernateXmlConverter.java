@@ -56,7 +56,10 @@ import com.thoughtworks.xstream.io.xml.PrettyPrintWriter;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
 
 import de.micromata.hibernate.history.HistoryEntry;
+import de.micromata.hibernate.history.delta.AssociationPropertyDelta;
+import de.micromata.hibernate.history.delta.CollectionPropertyDelta;
 import de.micromata.hibernate.history.delta.PropertyDelta;
+import de.micromata.hibernate.history.delta.SimplePropertyDelta;
 import de.micromata.hibernate.spring.NullWriter;
 import de.micromata.hibernate.spring.ProxyIdRefMarshallingStrategy;
 
@@ -77,6 +80,14 @@ public class HibernateXmlConverter
 
   // Ignore these objects listing in the top level list saving because the are saved implicit by their parent objects.
   private final Set<Class< ? >> ignoreFromTopLevelListing = new HashSet<Class< ? >>();
+
+  public HibernateXmlConverter()
+  {
+    this.ignoreFromTopLevelListing.add(PropertyDelta.class);
+    this.ignoreFromTopLevelListing.add(SimplePropertyDelta.class);
+    this.ignoreFromTopLevelListing.add(AssociationPropertyDelta.class);
+    this.ignoreFromTopLevelListing.add(CollectionPropertyDelta.class);
+  }
 
   /**
    * Initialisierung der Hibernate-verbindung.
