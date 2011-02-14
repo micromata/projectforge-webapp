@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.test.TestBase;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserGroupCache;
 
 public class XmlDumpTest extends TestBase
 {
@@ -38,11 +39,18 @@ public class XmlDumpTest extends TestBase
 
   private InitDatabaseDao initDatabaseDao;
 
+  private UserGroupCache userGroupCache;
+
   private XmlDump xmlDump;
 
   public void setInitDatabaseDao(InitDatabaseDao initDatabaseDao)
   {
     this.initDatabaseDao = initDatabaseDao;
+  }
+
+  public void setUserGroupCache(UserGroupCache userGroupCache)
+  {
+    this.userGroupCache = userGroupCache;
   }
 
   public void setXmlDump(XmlDump xmlDump)
@@ -59,6 +67,7 @@ public class XmlDumpTest extends TestBase
   @Test
   public void verifyDump()
   {
+    userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
     assertTrue(initDatabaseDao.isEmpty());
     final XStreamSavingConverter converter = xmlDump
         .restoreDatabaseFromClasspathResource(InitDatabaseDao.TEST_DATA_BASE_DUMP_FILE, "utf-8");
