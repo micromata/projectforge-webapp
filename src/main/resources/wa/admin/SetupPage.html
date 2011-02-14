@@ -26,18 +26,23 @@
     <tr class="hRuler">
       <td colspan="3"></td>
     </tr>
+    <!-- tr>
+      <th><label wicket:id="organizationLabel">[Organization]</label></th>
+      <td><input type="text" class="stdtext" wicket:id="organization" /></td>
+      <td>&nbsp;</td>
+    </tr-->
     <tr>
-      <th><wicket:message key="username" /></th>
+      <th><label wicket:id="adminUsernameLabel">[admin user]</label></th>
       <td><input type="text" class="stdtext" wicket:id="adminUsername" /></td>
       <td>&nbsp;</td>
     </tr>
     <tr>
-      <th><wicket:message key="password" /></th>
+      <th><label wicket:id="passwordLabel">[password]</label></th>
       <td><input type="password" class="stdtext" wicket:id="password" /></td>
       <td>&nbsp;</td>
     </tr>
     <tr>
-      <th><wicket:message key="passwordRepeat" /></th>
+      <th><label wicket:id="passwordRepeatLabel">[password repeat]</label></th>
       <td><input type="password" class="stdtext" wicket:id="passwordRepeat" /></td>
       <td>&nbsp;</td>
     </tr>
@@ -53,7 +58,7 @@
       <td colspan="3"></td>
     </tr>
     <tr>
-      <th><wicket:message key="administration.configuration.param.systemAdministratorEMail" /></th>
+      <th><label wicket:id="sysopEMailLabel">[System admin e-mail]</label></th>
       <td><input type="text" class="stdtext" wicket:id="sysopEMail" /></td>
       <td><wicket:message key="administration.configuration.param.systemAdministratorEMail.description" /></td>
     </tr>
@@ -61,7 +66,7 @@
       <td colspan="3"></td>
     </tr>
     <tr>
-      <th><wicket:message key="administration.configuration.param.feedbackEMail" /></th>
+      <th><label wicket:id="feedbackEMailLabel">[Feed-back e-mail]</label></th>
       <td><input type="text" class="stdtext" wicket:id="feedbackEMail" /></td>
       <td><wicket:message key="administration.configuration.param.feedbackEMail.description" /></td>
     </tr>
