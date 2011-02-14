@@ -85,7 +85,7 @@ public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilte
       }
     };
     exportAsXlsButton.setDefaultFormProcessing(false).add(
-        new SimpleAttributeModifier("title", getString("address.book.vCardExport.tooltip")));
+        new SimpleAttributeModifier("title", getString("fibu.employee.salary.exportXls.tooltip")));
     final SingleButtonPanel exportVCardsPanel = new SingleButtonPanel(getNewActionButtonChildId(), exportAsXlsButton);
     prependActionButton(exportVCardsPanel);
 }
