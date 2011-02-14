@@ -32,6 +32,7 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.ConfigurationParam;
@@ -156,9 +157,16 @@ public class SetupPage extends AbstractSecuredPage
       final XStreamSavingConverter converter = xmlDump.restoreDatabase(reader);
       final int counter = xmlDump.verifyDump(converter);
       configurationDao.checkAndUpdateDatabaseEntries();
-      databaseDao.rebuildDatabaseSearchIndices();
+      Configuration.getInstance().setExpired();
       taskTree.setExpired();
       userGroupCache.setExpired();
+      new Thread() {
+        @Override
+        public void run()
+        {
+          databaseDao.rebuildDatabaseSearchIndices();
+        }
+      }.start();
       if (counter > 0) {
         ((MySession) getSession()).logout();
         setResponsePage(LoginPage.class);
