@@ -26,7 +26,6 @@ package org.projectforge.web.wicket.components;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
@@ -135,7 +134,7 @@ public class MaxLengthTextField extends TextField<String>
     if (label != null) {
       setLabel(new Model<String>(label));
       if (parent != null) {
-        parent.add(new Label(id + "Label", label));
+        parent.add(new LabelForPanel(id + "Label", this, label));
       }
     }
     if (maxLength != null) {
