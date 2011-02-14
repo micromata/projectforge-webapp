@@ -45,6 +45,7 @@ import org.projectforge.user.UserDao;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.components.LabelForPanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
@@ -68,6 +69,9 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
 
   private String adminUsername = InitDatabaseDao.DEFAULT_ADMIN_USER;
 
+//  @SuppressWarnings("unused")
+//  private String organization;
+
   @SuppressWarnings("unused")
   private String password;
 
@@ -77,7 +81,7 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
   private String encryptedPassword;
 
   protected FileUploadField fileUploadField;
-  
+
   protected String filename;
 
   public SetupForm(final SetupPage parentPage)
@@ -99,12 +103,24 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
     final RadioChoice<SetupTarget> modeChoice = new RadioChoice<SetupTarget>("setupMode",
         new PropertyModel<SetupTarget>(this, "setupMode"), modeChoiceRenderer.getValues(), modeChoiceRenderer);
     add(modeChoice);
-    final RequiredMaxLengthTextField adminUsernameField = new RequiredMaxLengthTextField("adminUsername", new PropertyModel<String>(this, "adminUsername"));
+    // final RequiredMaxLengthTextField organizationField = new RequiredMaxLengthTextField(this, "organization", getString("organization"),
+    // new PropertyModel<String>(this, "organization"), 100);
+    // add(organizationField);
+    final RequiredMaxLengthTextField adminUsernameField = new RequiredMaxLengthTextField(this, "adminUsername", getString("username"),
+        new PropertyModel<String>(this, "adminUsername"), 100);
     add(adminUsernameField);
+
+    String str = getString("passwordRepeat");
     final PasswordTextField passwordRepeatField = new PasswordTextField("passwordRepeat", new PropertyModel<String>(this, "passwordRepeat"));
+    passwordRepeatField.setLabel(new Model<String>(str));
     passwordRepeatField.setResetPassword(true).setRequired(true);
     add(passwordRepeatField);
+    final LabelForPanel passwordRepeatLabel = new LabelForPanel("passwordRepeatLabel", passwordRepeatField, str);
+    add(passwordRepeatLabel);
+
+    str = getString("password");
     final PasswordTextField passwordField = new PasswordTextField("password", new PropertyModel<String>(this, "password"));
+    passwordField.setLabel(new Model<String>(str));
     passwordField.setResetPassword(true).setRequired(true);
     passwordField.add(new AbstractValidator<String>() {
       private String errorMsgKey = null;
@@ -137,12 +153,14 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
     });
     add(passwordField);
     passwordField.add(new FocusOnLoadBehavior());
+    final LabelForPanel passwordLabel = new LabelForPanel("passwordLabel", passwordField, str);
+    add(passwordLabel);
 
     add(new TimeZonePanel("timezone", new PropertyModel<TimeZone>(this, "timeZone")));
-    add(new MaxLengthTextField("sysopEMail", new PropertyModel<String>(this, "sysopEMail"), HibernateUtils.getPropertyLength(
-        ConfigurationDO.class, "stringValue")));
-    add(new MaxLengthTextField("feedbackEMail", new PropertyModel<String>(this, "feedbackEMail"), HibernateUtils.getPropertyLength(
-        ConfigurationDO.class, "stringValue")));
+    add(new MaxLengthTextField(this, "sysopEMail", getString("administration.configuration.param.systemAdministratorEMail"),
+        new PropertyModel<String>(this, "sysopEMail"), HibernateUtils.getPropertyLength(ConfigurationDO.class, "stringValue")));
+    add(new MaxLengthTextField(this, "feedbackEMail", getString("administration.configuration.param.feedbackEMail"),
+        new PropertyModel<String>(this, "feedbackEMail"), HibernateUtils.getPropertyLength(ConfigurationDO.class, "stringValue")));
     final Button finishButton = new Button("button", new Model<String>("finish")) {
       @Override
       public final void onSubmit()
@@ -195,7 +213,7 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
   {
     return encryptedPassword;
   }
-  
+
   public String getAdminUsername()
   {
     return adminUsername;
