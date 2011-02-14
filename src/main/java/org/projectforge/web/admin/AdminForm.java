@@ -119,7 +119,7 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
         parentPage.exportConfiguration();
       }
     };
-    new MyButtonPanel("updateUserPrefs", false) { // Currently not visible
+    new MyButtonPanel("updateUserPrefs") {
       @Override
       public void onSubmit()
       {
@@ -133,7 +133,7 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
         parentPage.createMissingDatabaseIndices();
       }
     };
-    final MyButtonPanel dumpButtonPanel = new MyButtonPanel("dump", WicketApplication.isDevelopmentModus()) {
+    final MyButtonPanel dumpButtonPanel = new MyButtonPanel("dump") {
       @Override
       public void onSubmit()
       {
@@ -167,7 +167,8 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
         parentPage.reindex();
       }
     };
-    add(new MaxLengthTextField("logEntries", new PropertyModel<String>(this, "logEntries"), 10000));
+    add(new MaxLengthTextField(this, "logEntries", getString("system.admin.group.title.logEntries"), new PropertyModel<String>(this,
+        "logEntries"), 10000));
     add(new Label("formattedLogEntries", new Model<String>() {
       @Override
       public String getObject()
@@ -183,7 +184,8 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
       }
     };
     alertMessage = WicketApplication.getAlertMessage();
-    add(new MaxLengthTextField("alertMessage", new PropertyModel<String>(this, "alertMessage"), 1000));
+    add(new MaxLengthTextField(this, "alertMessage", getString("system.admin.group.title.alertMessage"), new PropertyModel<String>(this,
+        "alertMessage"), 1000));
     new MyButtonPanel("setAlertMessage") {
       @Override
       public void onSubmit()
