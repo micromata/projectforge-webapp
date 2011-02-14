@@ -9,7 +9,7 @@
   <property environment="env" />
 	<property name="APP_ID" value="ProjectForge" />
 	<property name="APP_TITLE" value="${APP_ID} 2011" />
-	<property name="VERSION" value="3.5.2" />
+	<property name="VERSION" value="3.5.3" />
 	<property name="m_doc.home" value="${env.M_DOC_HOME}" />
 	<property name="webproject" value="." />
 	<property name="target" value="${webproject}/target" />
@@ -69,6 +69,7 @@
 				<include name="images/*.png" />
 				<include name="images/navigation/*.gif" />
 				<include name="images/titleM_paper/*.pdf" />
+				<include name="images/titleM_paper/*.png" />
 				<include name="images/titleM_paper/*.gif" />
 				<include name="css/*.css" />
 				<exclude name="images/titleM_paper/box_*.pdf" />

@@ -95,7 +95,12 @@
   <image path="/images/database_refresh.png" width="16" height="16"/>
   <image path="/images/database_select.png" width="16" height="16"/>
   <image path="/images/database_update.png" width="16" height="16"/>
+  <image path="/images/de_flag.png" width="16" height="11"/>
   <image path="/images/deny.png" width="16" height="16"/>
+  <image path="/images/doc/doc-teaser-javadoc.png" width="243" height="286"/>
+  <image path="/images/doc/doc-teaser-license.png" width="243" height="286"/>
+  <image path="/images/doc/doc-teaser-plain.png" width="243" height="287"/>
+  <image path="/images/doc/doc-teaser-project-doc.png" width="243" height="286"/>
   <image path="/images/door_in.png" width="16" height="16"/>
   <image path="/images/door_out.png" width="16" height="16"/>
   <image path="/images/embats-arrow-left.png" width="16" height="16"/>
@@ -119,6 +124,7 @@
   <image path="/images/help.png" width="16" height="16"/>
   <image path="/images/holiday.png" width="16" height="16"/>
   <image path="/images/house.png" width="16" height="16"/>
+  <image path="/images/html.png" width="16" height="16"/>
   <image path="/images/images.png" width="16" height="16"/>
   <image path="/images/info.png" width="16" height="16"/>
   <image path="/images/information.png" width="16" height="16"/>
@@ -197,7 +203,9 @@
   <image path="/images/task_delete.png" width="16" height="16"/>
   <image path="/images/task_edit.png" width="16" height="16"/>
   <image path="/images/telephone.png" width="16" height="16"/>
+  <image path="/images/text_align_left.png" width="16" height="16"/>
   <image path="/images/trash.png" width="16" height="16"/>
+  <image path="/images/us_flag.png" width="16" height="11"/>
   <image path="/images/user.png" width="16" height="16"/>
   <image path="/images/user_add.png" width="16" height="16"/>
   <image path="/images/user_delete.png" width="16" height="16"/>
@@ -217,8 +225,8 @@
   <image path="/mobile/jquery.mobile/images/form-radio-off.png" width="20" height="20"/>
   <image path="/mobile/jquery.mobile/images/form-radio-on.png" width="20" height="20"/>
   <image path="/mobile/jquery.mobile/images/icon-search-black.png" width="16" height="16"/>
-  <image path="/mobile/jquery.mobile/images/icons-18-black.png" width="560" height="20"/>
-  <image path="/mobile/jquery.mobile/images/icons-18-white.png" width="558" height="18"/>
-  <image path="/mobile/jquery.mobile/images/icons-36-black.png" width="1116" height="36"/>
-  <image path="/mobile/jquery.mobile/images/icons-36-white.png" width="1116" height="36"/>
+  <image path="/mobile/jquery.mobile/images/icons-18-black.png" width="630" height="18"/>
+  <image path="/mobile/jquery.mobile/images/icons-18-white.png" width="630" height="18"/>
+  <image path="/mobile/jquery.mobile/images/icons-36-black.png" width="1260" height="36"/>
+  <image path="/mobile/jquery.mobile/images/icons-36-white.png" width="1260" height="36"/>
 </images>
