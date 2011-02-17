@@ -101,11 +101,8 @@
     </repository>
     <!-- needed to get medsea:mime-util:1.3.1 since it is required under that groupId by milton-servlet -->
     <repository>
-      <id>glassfish</id>
-      <url>http://maven.glassfish.org/content/groups/public/</url>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
+      <id>ettrema</id>
+      <url>http://www.ettrema.com/maven2/</url>
     </repository>
     <repository>
       <id>repository.jboss.org</id>
