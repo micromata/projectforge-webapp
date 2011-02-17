@@ -38,7 +38,7 @@ public enum BookType implements I18nEnum
   private String key;
 
   /**
-   * @return The full i18n key including the i18n prefix "book.status.".
+   * @return The full i18n key including the i18n prefix "book.type.".
    */
   public String getI18nKey()
   {
