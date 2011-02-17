@@ -89,9 +89,8 @@
       </snapshots>
     </repository>
     <repository>
-      <id>de.micromata</id>
-      <name>Micromata Labs</name>
-      <url>http://labs.micromata.de/nexus/content/repositories/snapshots</url>
+      <id>micromata_labs</id>
+      <url>http://labs.micromata.de/nexus/content/groups/public/</url>
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
@@ -99,6 +98,14 @@
     <repository>
       <id>java.net</id>
       <url>http://download.java.net/maven/1</url>
+    </repository>
+    <!-- needed to get medsea:mime-util:1.3.1 since it is required under that groupId by milton-servlet -->
+    <repository>
+      <id>glassfish</id>
+      <url>http://maven.glassfish.org/content/groups/public/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </repository>
     <repository>
       <id>repository.jboss.org</id>
