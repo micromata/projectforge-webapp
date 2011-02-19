@@ -51,6 +51,8 @@ public class MenuItemDef implements Serializable
 
   private boolean newWindow;
 
+  private boolean visible = true;
+
   private ProjectForgeGroup[] visibleForGroups;
 
   private UserRightId requiredRightId;
@@ -66,7 +68,17 @@ public class MenuItemDef implements Serializable
    */
   protected boolean isVisible(final MenuBuilderContext context)
   {
-    return true;
+    return visible;
+  }
+
+  public boolean isVisible()
+  {
+    return this.visible;
+  }
+
+  public void setVisible(final boolean visible)
+  {
+    this.visible = visible;
   }
 
   /**

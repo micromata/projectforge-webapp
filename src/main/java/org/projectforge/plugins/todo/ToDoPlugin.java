@@ -24,7 +24,8 @@
 package org.projectforge.plugins.todo;
 
 import org.projectforge.plugins.core.AbstractPlugin;
-import org.projectforge.web.registry.WebRegistry;
+import org.projectforge.web.MenuItemDef;
+import org.projectforge.web.MenuItemDefId;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -43,11 +44,13 @@ public class ToDoPlugin extends AbstractPlugin
     // Registry in config.xml.
     register(ID, ToDoDao.class, toDoDao, "plugins.todo");
     registerDataObject(ToDoDO.class);
-    final WebRegistry webRegistry = WebRegistry.instance();
-    webRegistry.register(ID, ToDoListPage.class);
-    webRegistry.addMountPages(ID, ToDoListPage.class, ToDoEditPage.class);
-    // Menu registration.
+    registerListPageColumnsCreator(ID, ToDoListPage.class);
+    addMountPages(ID, ToDoListPage.class, ToDoEditPage.class);
+
+    final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
+    registerMenuItem(new MenuItemDef(parentMenu, ID, 5, "plugins.todo.menu", ToDoListPage.class));
     // Updater.
+    // ScriptingDao
     addResourceBundle(RESOURCE_BUNDLE_NAME);
   }
 

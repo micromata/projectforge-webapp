@@ -25,19 +25,27 @@ package org.projectforge.web;
 
 public enum MenuItemDefId
 {
+  // Main menus in alphabetical order
+  ADMINISTRATION("administration"), //
+  COMMON("common"), //
+  COST("fibu.kost"), //
+  FIBU("fibu"), // 
+  MISC("misc"), //
+  ORGA("orga"), //
+  PROJECT_MANAGEMENT("projectmanagement"), //
+  REPORTING("reporting"), //
+
+  // Sub menus in alphabetical order:
   ACCESS_LIST("accessList"), //
   ACCOUNT_LIST("fibu.konten"), //
   ACCOUNTING_RECORD_LIST("fibu.buchungssaetze"), //
   ADDRESS_LIST("addressList"), //
-  ADMINISTRATION("administration"), //
   BANK_ACCOUNT_LIST("finance.bankAccounts"), //
   BOOK_LIST("bookList"), //
   CALENDAR("calendar"), //
   CHANGE_PASSWORD("changePassword"), //
-  COMMON("common"), //
   CONFIGURATION("configuration"), //
   CONTRACTS("contracts"), //
-  COST("fibu.kost"), //
   COST1_LIST("fibu.kost1"), //
   COST2_LIST("fibu.kost2"), //
   COST2_TYPE_LIST("fibu.kost2arten"), //
@@ -46,7 +54,6 @@ public enum MenuItemDefId
   DOCUMENTATION("documentation"), //
   EMPLOYEE_LIST("fibu.employees"), //
   EMPLOYEE_SALARY_LIST("fibu.employeeSalaries"), //
-  FIBU("fibu"), // 
   GANTT("gantt"), //
   GROUP_LIST("groupList"), //
   GWIKI("gwiki"), //
@@ -59,12 +66,9 @@ public enum MenuItemDefId
   MONTHLY_EMPLOYEE_REPORT("monthlyEmployeeReport"), //
   MY_ACCOUNT("myAccount"), //
   MY_PREFERENCES("myPreferences"), //
-  PROJECT_MANAGEMENT("projectmanagement"), //
   REPORT_OBJECTIVES("fibu.reporting.reportObjectives"), //
   REPORT_SCRIPTING("fibu.scripting"), //
-  REPORTING("reporting"), //
   ORDER_LIST("fibu.orderbook"), //
-  ORGA("orga"), //
   OUTBOX_LIST("orga.postausgang"), //
   OUTGOING_INVOICE_LIST("fibu.rechnungen"), //
   PERSONAL_STATISTICS("personalStatistics"), //

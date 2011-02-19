@@ -45,7 +45,7 @@ public class MenuEntryConfig
   private String url;
 
   @XmlField(alias = "id")
-  private MenuItemDef menuItemDef;
+  private String menuItemId;
 
   @XmlField(asAttribute = true)
   private String label;
@@ -64,9 +64,9 @@ public class MenuEntryConfig
   /**
    * @return The MenuItemDef if this menu entry is one of the ProjectForge pre-defined menu entries, otherwise null.
    */
-  public MenuItemDef getMenuItemDef()
+  public String getMenuItemId()
   {
-    return menuItemDef;
+    return menuItemId;
   }
 
   public String getUrl()
@@ -149,7 +149,7 @@ public class MenuEntryConfig
    */
   public MenuEntryConfig findMenuEntry(final MenuItemDef menuItemDef)
   {
-    if (this.menuItemDef == menuItemDef) {
+    if (menuItemDef != null && menuItemDef.getId() != null && menuItemDef.getId().equals(menuItemId) == true) {
       return this;
     }
     if (children == null) {

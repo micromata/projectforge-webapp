@@ -24,6 +24,7 @@
 package org.projectforge.plugins.core;
 
 import org.apache.commons.lang.Validate;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.settings.IResourceSettings;
 import org.hibernate.cfg.AnnotationConfiguration;
@@ -31,6 +32,11 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.plugins.todo.ToDoDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
+import org.projectforge.web.MenuItemDef;
+import org.projectforge.web.MenuItemDefId;
+import org.projectforge.web.MenuItemRegistry;
+import org.projectforge.web.registry.WebRegistry;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -63,11 +69,27 @@ public abstract class AbstractPlugin
         return;
       }
       initialized = true;
+      log.info("Initializing plugin: " + getClass());
       initialize();
     }
   }
 
   protected abstract void initialize();
+
+  protected MenuItemDef getMenuItemDef(final MenuItemDefId menuItemDefId)
+  {
+    return MenuItemRegistry.instance().get(menuItemDefId);
+  }
+
+  protected void getMenuItemDef(final String id)
+  {
+    MenuItemRegistry.instance().get(id);
+  }
+
+  protected void registerMenuItem(final MenuItemDef menuItemDef)
+  {
+    MenuItemRegistry.instance().register(menuItemDef);
+  }
 
   /**
    * 
@@ -105,6 +127,45 @@ public abstract class AbstractPlugin
   protected AbstractPlugin registerDataObject(final Class< ? > doClass)
   {
     annotationConfiguration.addAnnotatedClass(ToDoDO.class);
+    return this;
+  }
+
+  /**
+   * @param id
+   * @param listPageColumnsCreatorClass
+   * @return this for chaining.
+   * @see WebRegistry#register(String, Class)
+   */
+  protected AbstractPlugin registerListPageColumnsCreator(final String id,
+      final Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass)
+  {
+    WebRegistry.instance().register(id, listPageColumnsCreatorClass);
+    return this;
+  }
+
+  /**
+   * @param mountPage
+   * @param pageClass
+   * @return this for chaining.
+   * @see WebRegistry#addMountPages(String, Class)
+   */
+  protected AbstractPlugin addMountPages(final String mountPage, final Class< ? extends WebPage> pageClass)
+  {
+    WebRegistry.instance().addMountPage(mountPage, pageClass);
+    return this;
+  }
+
+  /**
+   * @param mountPageBasename
+   * @param pageListClass
+   * @param pageEditClass
+   * @return this for chaining.
+   * @see WebRegistry#addMountPages(String, Class, Class)
+   */
+  protected AbstractPlugin addMountPages(final String mountPageBasename, final Class< ? extends WebPage> pageListClass,
+      final Class< ? extends WebPage> pageEditClass)
+  {
+    WebRegistry.instance().addMountPages(mountPageBasename, pageListClass, pageEditClass);
     return this;
   }
 }

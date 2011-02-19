@@ -100,6 +100,12 @@ import org.projectforge.web.user.UserListPage;
 import org.projectforge.web.user.UserPrefListPage;
 import org.projectforge.web.wicket.WicketApplication;
 
+/**
+ * The menu is build from the menu items which are registered in this registry. The order of the menu entries is defined by the order number
+ * of the menu item definitions.
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
+ */
 public class MenuItemRegistry
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MenuItemRegistry.class);
@@ -144,10 +150,12 @@ public class MenuItemRegistry
   {
     final MenuEntryConfig root = configuration.getMenuConfig();
     if (root != null) {
-      final MenuEntryConfig entry = root.findMenuEntry(menuItemDef);
-      if (entry != null && entry.isVisible() == false) {
-        log.info("Ignoring menu entry (configured as invisible): " + menuItemDef.getId());
-        return null;
+      final MenuEntryConfig entry = root.findMenuEntry(menuItemDef); //
+      if (entry != null) {
+        if (entry.isVisible() != menuItemDef.isVisible()) {
+          log.info("Menu item's visibility changed by config.xml for item '" + menuItemDef.getId() + "'.");
+          menuItemDef.setVisible(entry.isVisible());
+        }
       }
     }
     registry.add(menuItemDef);
@@ -198,6 +206,7 @@ public class MenuItemRegistry
     final MenuItemDef reporting = reg.register(null, MenuItemDefId.REPORTING, 50, FINANCE_GROUP, CONTROLLING_GROUP);
     final MenuItemDef orga = reg.register(null, MenuItemDefId.ORGA, 60, FINANCE_GROUP, CONTROLLING_GROUP, ORGA_TEAM);
     final MenuItemDef admin = reg.register(null, MenuItemDefId.ADMINISTRATION, 70);
+    final MenuItemDef misc = reg.register(null, MenuItemDefId.MISC, 100);
 
     // Menu entries
     // COMMON
@@ -211,10 +220,8 @@ public class MenuItemRegistry
     if (StringUtils.isNotEmpty(configuration.getTelephoneSystemUrl()) == true) {
       reg.register(common, MenuItemDefId.PHONE_CALL, 40, PhoneCallPage.class);
     }
-    reg.register(common, MenuItemDefId.IMAGE_CROPPER, 50, ImageCropperPage.class, new String[] { ImageCropperPage.PARAM_SHOW_UPLOAD_BUTTON,
-        "false", ImageCropperPage.PARAM_ENABLE_WHITEBOARD_FILTER, "true"});
     if (configuration.isMebConfigured() == true) {
-      final MenuItemDef meb = new MenuItemDef(common, MenuItemDefId.MEB.getId(), 60, MenuItemDefId.MEB.getI18nKey(), MebListPage.class) {
+      final MenuItemDef meb = new MenuItemDef(common, MenuItemDefId.MEB.getId(), 50, MenuItemDefId.MEB.getI18nKey(), MebListPage.class) {
         @Override
         protected void afterMenuEntryCreation(final MenuEntry createdMenuEntry, final MenuBuilderContext context)
         {
@@ -223,13 +230,9 @@ public class MenuItemRegistry
       };
       reg.register(meb);
     }
-    if (WicketApplication.isDevelopmentModus() == true) {
-      reg.register(pm, MenuItemDefId.GWIKI, 70, GWikiContainerPage.class);
-    }
-    reg.register(common, MenuItemDefId.DOCUMENTATION, 100, DocumentationPage.class);
-    reg.register(common, MenuItemDefId.SEARCH, 200, SearchPage.class);
+    reg.register(common, MenuItemDefId.SEARCH, 100, SearchPage.class);
 
-    // // PROJECT_MANAGEMENT
+    // PROJECT_MANAGEMENT
     reg.register(pm, MenuItemDefId.TASK_TREE, 10, TaskTreePage.class);
     reg.register(pm, MenuItemDefId.TIMESHEET_LIST, 20, TimesheetListPage.class);
     reg.register(pm, MenuItemDefId.MONTHLY_EMPLOYEE_REPORT, 30, MonthlyEmployeeReportPage.class);
@@ -240,7 +243,7 @@ public class MenuItemRegistry
     // Order book 80 (if user isn't member of FIBU groups.
     // Projects 90 (if user isn't member of FIBU groups.
 
-    // // FIBU
+    // FIBU
     reg.register(fibu, MenuItemDefId.INCOMING_INVOICE_LIST, 10, RechnungListPage.class, RechnungDao.USER_RIGHT_ID, READONLY_READWRITE);
     reg.register(fibu, MenuItemDefId.OUTGOING_INVOICE_LIST, 20, EingangsrechnungListPage.class, EingangsrechnungDao.USER_RIGHT_ID,
         READONLY_READWRITE);
@@ -277,27 +280,27 @@ public class MenuItemRegistry
     };
     reg.register(orderBook);
 
-    // // COST
+    // COST
     reg.register(cost, MenuItemDefId.ACCOUNT_LIST, 10, KontoListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     reg.register(cost, MenuItemDefId.COST1_LIST, 20, Kost1ListPage.class, Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE);
     reg.register(cost, MenuItemDefId.COST2_LIST, 30, Kost2ListPage.class, Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE);
     reg.register(cost, MenuItemDefId.COST2_TYPE_LIST, 40, Kost2ArtListPage.class, Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE);
 
-    // // REPORTING
+    // REPORTING
     reg.register(reporting, MenuItemDefId.ACCOUNTING_RECORD_LIST, 10, AccountingRecordListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     reg.register(reporting, MenuItemDefId.REPORT_OBJECTIVES, 20, ReportObjectivesPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     reg.register(reporting, MenuItemDefId.REPORT_SCRIPTING, 30, ReportScriptingPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     reg.register(reporting, MenuItemDefId.SCRIPT_LIST, 40, ScriptListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     reg.register(reporting, MenuItemDefId.DATEV_IMPORT, 50, DatevImportPage.class, DatevImportDao.USER_RIGHT_ID, UserRightValue.TRUE);
 
-    // // ORGA
+    // ORGA
     reg.register(orga, MenuItemDefId.OUTBOX_LIST, 10, PostausgangListPage.class, PostausgangDao.USER_RIGHT_ID, READONLY_READWRITE);
     reg.register(orga, MenuItemDefId.INBOX_LIST, 20, PosteingangListPage.class, PosteingangDao.USER_RIGHT_ID, READONLY_READWRITE);
     if (CollectionUtils.isNotEmpty(configuration.getContractTypes()) == true) {
       reg.register(orga, MenuItemDefId.CONTRACTS, 30, ContractListPage.class, ContractDao.USER_RIGHT_ID, READONLY_READWRITE);
     }
 
-    // // ADMINISTRATION
+    // ADMINISTRATION
     reg.register(admin, MenuItemDefId.MY_ACCOUNT, 10, MyAccountEditPage.class);
     reg.register(admin, MenuItemDefId.MY_PREFERENCES, 20, UserPrefListPage.class);
     reg.register(admin, MenuItemDefId.CHANGE_PASSWORD, 30, ChangePasswordPage.class); // Visible for all.
@@ -308,7 +311,6 @@ public class MenuItemRegistry
     reg.register(admin, MenuItemDefId.SYSTEM_UPDATE, 80, SystemUpdatePage.class, ADMIN_GROUP);
     reg.register(admin, MenuItemDefId.SYSTEM_STATISTICS, 90, SystemStatisticsPage.class);
     reg.register(admin, MenuItemDefId.CONFIGURATION, 100, ConfigurationListPage.class, ADMIN_GROUP);
-
     final MenuItemDef firstLogin = new MenuItemDef(admin, MenuItemDefId.SYSTEM_FIRST_LOGIN_SETUP_PAGE.getId(), 200,
         MenuItemDefId.SYSTEM_FIRST_LOGIN_SETUP_PAGE.getI18nKey(), SetupPage.class) {
       @Override
@@ -318,5 +320,16 @@ public class MenuItemRegistry
       }
     };
     reg.register(firstLogin);
+
+    // MISC
+    final MenuItemDef imageCropper = new MenuItemDef(misc, MenuItemDefId.IMAGE_CROPPER.getId(), 100, MenuItemDefId.IMAGE_CROPPER
+        .getI18nKey(), ImageCropperPage.class, new String[] { ImageCropperPage.PARAM_SHOW_UPLOAD_BUTTON, "false",
+        ImageCropperPage.PARAM_ENABLE_WHITEBOARD_FILTER, "true"});
+    imageCropper.setVisible(false); // invisible at default (because it's only functioning with valid ssl certificate).
+    reg.register(imageCropper);
+    if (WicketApplication.isDevelopmentModus() == true) {
+      reg.register(misc, MenuItemDefId.GWIKI, 110, GWikiContainerPage.class);
+    }
+    reg.register(misc, MenuItemDefId.DOCUMENTATION, 200, DocumentationPage.class);
   }
 }
