@@ -49,6 +49,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.convert.ConverterLocator;
 import org.apache.wicket.util.lang.Bytes;
+import org.hibernate.cfg.AnnotationConfiguration;
 import org.projectforge.Version;
 import org.projectforge.admin.SystemUpdater;
 import org.projectforge.common.ExceptionHelper;
@@ -59,6 +60,7 @@ import org.projectforge.core.ProjectForgeException;
 import org.projectforge.core.SystemInfoCache;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.HibernateUtils;
+import org.projectforge.plugins.todo.ToDoPlugin;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserDao;
@@ -68,10 +70,10 @@ import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.registry.WebRegistry;
 import org.projectforge.web.wicket.converter.MyDateConverter;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.web.context.support.XmlWebApplicationContext;
 
 /**
  * Application object for your web application. If you want to run this application without deploying, run the Start class.
@@ -242,11 +244,12 @@ public class WicketApplication extends WebApplication
     addComponentInstantiationListener(new SpringComponentInjector(this));
     getApplicationSettings().setInternalErrorPage(ErrorPage.class);
 
-    final WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-    final ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(new String[] {}, webApplicationContext);
-    ctx.getBeanFactory().autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
-    final LocalSessionFactoryBean localSessionFactoryBean = (LocalSessionFactoryBean) ctx.getBean("&sessionFactory");
-    org.hibernate.cfg.Configuration hibernateConfiguration = localSessionFactoryBean.getConfiguration();
+    final XmlWebApplicationContext webApplicationContext = (XmlWebApplicationContext) WebApplicationContextUtils
+        .getWebApplicationContext(getServletContext());
+    final ConfigurableListableBeanFactory beanFactory = webApplicationContext.getBeanFactory();
+    beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
+    final LocalSessionFactoryBean localSessionFactoryBean = (LocalSessionFactoryBean) beanFactory.getBean("&sessionFactory");
+    final AnnotationConfiguration hibernateConfiguration = (AnnotationConfiguration) localSessionFactoryBean.getConfiguration();
     HibernateUtils.setConfiguration(hibernateConfiguration);
     final ServletContext servletContext = getServletContext();
     final String configContextPath = configuration.getServletContextPath();
@@ -258,8 +261,8 @@ public class WicketApplication extends WebApplication
       contextPath = configContextPath;
     }
     log.info("Using servlet context path: " + contextPath);
-    if (configuration.getApplicationContext() == null) {
-      configuration.setApplicationContext(ctx);
+    if (configuration.getBeanFactory() == null) {
+      configuration.setBeanFactory(beanFactory);
     }
     configuration.setConfigurationDao(configurationDao);
     SystemInfoCache.internalInitialize(systemInfoCache);
@@ -271,6 +274,16 @@ public class WicketApplication extends WebApplication
       throw new RuntimeException("this.wicketApplicationFilter is null");
     }
     daoRegistry.init();
+
+    // ToDo: Register plugins.
+    final ToDoPlugin plugin = new ToDoPlugin();
+    plugin.setAnnotationConfiguration(hibernateConfiguration);
+    plugin.setResourceSettings(getResourceSettings());
+    beanFactory.autowireBeanProperties(plugin, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
+    plugin.init();
+    
+    hibernateConfiguration.buildMappings();
+
     for (Map.Entry<String, Class< ? extends WebPage>> mountPage : WebRegistry.instance().getMountPages().entrySet()) {
       mountPage(mountPage.getKey(), mountPage.getValue());
     }
