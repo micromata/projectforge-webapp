@@ -29,8 +29,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.projectforge.web.wicket.AbstractBasePage;
-
 /**
  * Helper for the web menu. Use MenuTreeTable instead.
  */
@@ -40,27 +38,18 @@ public class Menu implements Serializable
 
   private static final long serialVersionUID = -4954464926815538198L;
 
-  private Collection<MenuEntry> menuEntries = new ArrayList<MenuEntry>();
-
-  protected MenuEntry selectedMenu;
+  private MenuEntry rootMenuEntry = new MenuEntry();
 
   protected List<MenuEntry> favoriteMenuEntries;
 
-  public void setSelectedMenu(final AbstractBasePage page)
-  {
-    if (menuEntries != null) {
-      for (final MenuEntry entry : menuEntries) {
-        final MenuEntry found = entry.findMenu(page.getPageClass());
-        if (found != null) {
-          this.selectedMenu = found;
-        }
-      }
-    }
-  }
-
   public Collection<MenuEntry> getMenuEntries()
   {
-    return menuEntries;
+    return rootMenuEntry.getSubMenuEntries();
+  }
+
+  public MenuEntry findById(final String id)
+  {
+    return rootMenuEntry.findById(id);
   }
 
   /**
@@ -79,7 +68,7 @@ public class Menu implements Serializable
         token = token.substring(2);
       }
       try {
-        final MenuItemDef menuItemDef = MenuItemDef.valueOf(token);
+        final MenuItemDef menuItemDef = MenuItemRegistry.instance().get(token);
         if (menuItemDef == null) {
           continue;
         }
@@ -95,12 +84,13 @@ public class Menu implements Serializable
     synchronized (this) {
       if (this.favoriteMenuEntries == null || this.favoriteMenuEntries.size() == 0) {
         this.favoriteMenuEntries = new ArrayList<MenuEntry>();
-        addFavoriteMenuEntry(MenuItemDef.TASK_TREE);
-        addFavoriteMenuEntry(MenuItemDef.CALENDAR);
-        addFavoriteMenuEntry(MenuItemDef.ADDRESS_LIST);
-        addFavoriteMenuEntry(MenuItemDef.BOOK_LIST);
-        addFavoriteMenuEntry(MenuItemDef.PHONE_CALL);
-        addFavoriteMenuEntry(MenuItemDef.MEB);
+        final MenuItemRegistry registry = MenuItemRegistry.instance();
+        addFavoriteMenuEntry(registry.get(MenuItemDefId.TASK_TREE));
+        addFavoriteMenuEntry(registry.get(MenuItemDefId.CALENDAR));
+        addFavoriteMenuEntry(registry.get(MenuItemDefId.ADDRESS_LIST));
+        addFavoriteMenuEntry(registry.get(MenuItemDefId.BOOK_LIST));
+        addFavoriteMenuEntry(registry.get(MenuItemDefId.PHONE_CALL));
+        addFavoriteMenuEntry(registry.get(MenuItemDefId.MEB));
       }
       return this.favoriteMenuEntries;
     }
@@ -108,27 +98,33 @@ public class Menu implements Serializable
 
   public boolean isFirst(final MenuEntry entry)
   {
-    return (menuEntries != null && menuEntries.size() > 0 && menuEntries.iterator().next() == entry);
+    return (rootMenuEntry.subMenuEntries != null && rootMenuEntry.subMenuEntries.size() > 0 && rootMenuEntry.subMenuEntries.iterator()
+        .next() == entry);
   }
 
-  public MenuEntry addMenuEntry(final MenuItemDef menuItemDef)
+  public void addMenuEntry(final MenuEntry menuEntry)
   {
-    return addMenuEntry(null, menuItemDef);
-  }
-
-  public MenuEntry addMenuEntry(final MenuEntry parent, final MenuItemDef menuItemDef)
-  {
-    final MenuEntry menuEntry = new MenuEntry(menuItemDef, this);
+    MenuEntry parent = menuEntry.getParent();
     if (parent == null) {
-      this.menuEntries.add(menuEntry);
-    } else {
-      parent.addMenuEntry(menuEntry);
+      final MenuItemDef parentItemDef = menuEntry.menuItemDef.getParent();
+      if (parentItemDef == null) {
+        parent = rootMenuEntry;
+      } else {
+        parent = getMenuEntry(parentItemDef);
+        if (parent == null) {
+          log.error("Oups, can't find parent menu item: " + parentItemDef.getId());
+          parent = rootMenuEntry;
+        }
+      }
     }
-    return menuEntry;
+    parent.addMenuEntry(menuEntry);
   }
 
   private MenuEntry getMenuEntry(final MenuItemDef menuItemDef)
   {
+    if (getMenuEntries() == null) {
+      return null;
+    }
     for (final MenuEntry menuEntry : getMenuEntries()) {
       final MenuEntry result = getMenuEntry(menuEntry, menuItemDef);
       if (result != null) {

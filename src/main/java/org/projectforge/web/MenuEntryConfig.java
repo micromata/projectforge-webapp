@@ -33,8 +33,8 @@ import org.projectforge.xml.stream.XmlObject;
 import org.projectforge.xml.stream.XmlOmitField;
 
 /**
- * Defining a new menu entry or modify the exisiting tree or configures an existing menu entry as invisible. Any access settings are not yet
- * available (planned if really needed by the community).
+ * Defining a new menu entry or modify the existing tree by config.xml or configures an existing menu entry as invisible. Any access
+ * settings are not yet available (planned if really needed by the community).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -143,7 +143,7 @@ public class MenuEntryConfig
   {
     return children;
   }
-  
+
   /**
    * Find a pre-defined ProjectForge menu entry.
    */
@@ -168,7 +168,7 @@ public class MenuEntryConfig
   {
     this.parent = parent;
   }
-  
+
   /**
    * Ensure that you have called setParents on the root element before, otherwise the parent field is always null.
    */

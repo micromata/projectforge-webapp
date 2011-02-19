@@ -24,8 +24,9 @@
 package org.projectforge.web;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.wicket.Page;
 import org.apache.wicket.model.IModel;
@@ -34,11 +35,13 @@ import org.projectforge.web.wicket.WicketUtils;
 /**
  * Represents a single menu entry.
  */
-public class MenuEntry implements Serializable
+public class MenuEntry implements Serializable, Comparable<MenuEntry>
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MenuEntry.class);
+
   private static final long serialVersionUID = 7961498640193169174L;
 
-  protected Collection<MenuEntry> subMenuEntries;
+  protected SortedSet<MenuEntry> subMenuEntries;
 
   protected String url;
 
@@ -54,7 +57,7 @@ public class MenuEntry implements Serializable
 
   protected MenuEntry parent;
 
-  protected boolean visible = true;
+  protected Boolean visible;
 
   protected MenuItemDef menuItemDef;
 
@@ -82,47 +85,19 @@ public class MenuEntry implements Serializable
     return totalNewCounterModel;
   }
 
+  public void setNewCounterTooltip(String newCounterTooltip)
+  {
+    this.newCounterTooltip = newCounterTooltip;
+  }
+
   public String getNewCounterTooltip()
   {
     return newCounterTooltip;
   }
 
-  public MenuEntry findMenu(final Class< ? extends Page> pageClass)
-  {
-    if (menuItemDef.getPageClass() != null && menuItemDef.getPageClass().isAssignableFrom(pageClass) == true) {
-      return this;
-    }
-    if (subMenuEntries != null) {
-      for (final MenuEntry subMenuEntry : subMenuEntries) {
-        final MenuEntry found = subMenuEntry.findMenu(pageClass);
-        if (found != null) {
-          return found;
-        }
-      }
-    }
-    return null;
-  }
-
-  public void setSelected()
-  {
-    menu.selectedMenu = this;
-  }
-
-  public boolean isSelected()
-  {
-    if (this == menu.selectedMenu) {
-      return true;
-    }
-    if (subMenuEntries != null) {
-      for (final MenuEntry subMenuEntry : subMenuEntries) {
-        if (subMenuEntry.isSelected() == true) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
+  /**
+   * Needed as marker for modified css.
+   */
   public boolean isFirst()
   {
     return menu.isFirst(this);
@@ -131,6 +106,20 @@ public class MenuEntry implements Serializable
   public MenuEntry getParent()
   {
     return parent;
+  }
+
+  /**
+   * @param menu Needed because MenuEntry is perhaps under construction and menu member isn't set yet.
+   * @param id
+   */
+  public void setParent(final Menu menu, final String id)
+  {
+    final MenuEntry parentEntry = menu.findById(id);
+    if (parentEntry == null) {
+      log.error("Oups, menu entry '" + id + "' not found (ignoring setParent(...) of : " + getId());
+    } else {
+      setParent(parentEntry);
+    }
   }
 
   void setParent(final MenuEntry parent)
@@ -143,10 +132,16 @@ public class MenuEntry implements Serializable
     return this.parent != null;
   }
 
-  public MenuEntry(final MenuItemDef menuItem, final Menu menu)
+  /**
+   * Root menu entry.
+   */
+  MenuEntry()
+  {
+  }
+
+  public MenuEntry(final MenuItemDef menuItem)
   {
     this.menuItemDef = menuItem;
-    this.menu = menu;
     if (menuItem.isWicketPage() == true) {
       this.url = WicketUtils.getBookmarkablePageUrl(menuItem.getPageClass(), menuItem.getParams());
     } else if (menuItem.getUrl() != null) {
@@ -154,13 +149,36 @@ public class MenuEntry implements Serializable
     }
   }
 
+  public void setMenu(final Menu menu)
+  {
+    this.menu = menu;
+    menu.addMenuEntry(this);
+  }
+
   public void addMenuEntry(final MenuEntry subMenuEntry)
   {
     if (subMenuEntries == null) {
-      subMenuEntries = new ArrayList<MenuEntry>();
+      subMenuEntries = new TreeSet<MenuEntry>();
     }
     subMenuEntries.add(subMenuEntry);
     subMenuEntry.setParent(this);
+  }
+
+  public MenuEntry findById(final String id)
+  {
+    if (menuItemDef != null && menuItemDef.getId().equals(id) == true) {
+      return this;
+    }
+    if (this.subMenuEntries == null) {
+      return null;
+    }
+    for (final MenuEntry subMenuEntry : this.subMenuEntries) {
+      final MenuEntry found = subMenuEntry.findById(id);
+      if (found != null) {
+        return found;
+      }
+    }
+    return null;
   }
 
   public boolean hasSubMenuEntries()
@@ -223,8 +241,31 @@ public class MenuEntry implements Serializable
     this.newCounterModel = newCounterModel;
   }
 
+  public boolean isLink()
+  {
+    return menuItemDef.isWicketPage() == true || menuItemDef.hasUrl() == true;
+  }
+
+  /**
+   * @return True or false if variable visible is set. True, if no sub menu entries exists in this entry has an link. If sub menu entries
+   *         does exist then it's visible if any of the sub menu entries is visible. The variable visible is set automatically after the
+   *         first call of this method.
+   */
   public boolean isVisible()
   {
+    if (visible != null) {
+      return visible;
+    }
+    if (subMenuEntries == null || subMenuEntries.size() == 0) {
+      visible = isLink();
+    } else {
+      for (final MenuEntry subMenuEntry : subMenuEntries) {
+        if (subMenuEntry.isVisible() == true) {
+          visible = true;
+          break;
+        }
+      }
+    }
     return visible;
   }
 
@@ -235,6 +276,17 @@ public class MenuEntry implements Serializable
 
   public String getId()
   {
-    return menuItemDef.name();
+    return menuItemDef.getId();
+  }
+
+  @Override
+  public int compareTo(final MenuEntry o)
+  {
+    if (menuItemDef.getOrderNumber() < o.menuItemDef.getOrderNumber()) {
+      return -1;
+    } else if (menuItemDef.getOrderNumber() > o.menuItemDef.getOrderNumber()) {
+      return 1;
+    }
+    return menuItemDef.getI18nKey().compareTo(menuItemDef.getI18nKey());
   }
 }
