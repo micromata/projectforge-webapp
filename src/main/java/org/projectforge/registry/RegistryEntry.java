@@ -29,6 +29,7 @@ import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.ScriptingDao;
 
 /**
+ * For registering a dao object and its scripting dao (optional).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -86,7 +87,7 @@ public class RegistryEntry
     this.scriptingDao = scriptingDao;
     return this;
   }
-  
+
   @SuppressWarnings("unchecked")
   public ScriptingDao< ? > getScriptingDao()
   {
