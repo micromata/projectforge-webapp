@@ -129,4 +129,16 @@ public class ConfigurationTest
     createTestConfiguration();
     assertEquals(exportXml, Configuration.getInstance().exportConfiguration());
   }
+
+  @Test
+  public void testPluginMainClasses()
+  {
+    final Configuration configuration = new Configuration();
+    configuration.pluginMainClasses = "\n org.projectforge.plugins.todo.ToDoPlugin,\n  org.projectforge.plugins.software.SoftwarePlugin\n org.projectforge.plugins.ical.ICalPlugin";
+    final String[] sa = configuration.getPluginMainClasses();
+    assertEquals(3, sa.length);
+    assertEquals("org.projectforge.plugins.todo.ToDoPlugin", sa[0]);
+    assertEquals("org.projectforge.plugins.software.SoftwarePlugin", sa[1]);
+    assertEquals("org.projectforge.plugins.ical.ICalPlugin", sa[2]);
+  }
 }
