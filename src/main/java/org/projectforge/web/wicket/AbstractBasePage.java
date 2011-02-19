@@ -49,7 +49,6 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.LoginPage;
-import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.core.MenuPanel;
@@ -105,8 +104,6 @@ public abstract class AbstractBasePage extends WebPage
   public AbstractBasePage(final PageParameters parameters)
   {
     super(parameters);
-    final Menu menu = menuBuilder.getMenu(getUser());
-    menu.setSelectedMenu(this);
     add(new Label("windowTitle", new Model<String>() {
       @Override
       public String getObject()
