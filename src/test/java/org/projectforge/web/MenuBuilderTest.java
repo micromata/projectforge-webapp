@@ -49,6 +49,6 @@ public class MenuBuilderTest extends TestBase
     final MenuEntryConfig root = (MenuEntryConfig) reader.read(xml);
     MenuEntryConfig menu = root.getChildren().get(0);
     assertFalse(menu.isVisible());
-    assertEquals(MenuItemDef.IMAGE_CROPPER, menu.getMenuItemDef());
+    assertEquals(MenuItemDefId.IMAGE_CROPPER, menu.getMenuItemDef());
   }
 }
