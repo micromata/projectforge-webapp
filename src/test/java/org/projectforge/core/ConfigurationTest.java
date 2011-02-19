@@ -91,7 +91,7 @@ public class ConfigurationTest
       return Configuration.getInstance();
     }
     TestConfiguration.initAsTestConfiguration();
-    Configuration.internalSetInstance(xml, TestConfiguration.getConfiguration().getApplicationContext());
+    Configuration.internalSetInstance(xml, TestConfiguration.getConfiguration().getApplicationContext().getBeanFactory());
     TestConfiguration.getConfiguration().autowire(Configuration.getInstance(), AutowireCapableBeanFactory.AUTOWIRE_BY_NAME);
     return Configuration.getInstance();
   }
