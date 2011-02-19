@@ -23,7 +23,9 @@
 
 package org.projectforge.web.wicket;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -281,7 +283,31 @@ public class WicketApplication extends WebApplication
     }
     daoRegistry.init();
 
+    final List<AbstractPlugin> pluginList = new ArrayList<AbstractPlugin>();
     for (final AbstractPlugin plugin : plugins) {
+      pluginList.add(plugin);
+    }
+    final String[] pluginMainClasses = configuration.getPluginMainClasses();
+    if (pluginMainClasses != null) {
+      for (final String pluginMainClassName : pluginMainClasses) {
+        try {
+          final Class< ? > pluginMainClass = Class.forName(pluginMainClassName);
+          try {
+            final AbstractPlugin plugin = (AbstractPlugin) pluginMainClass.newInstance();
+            pluginList.add(plugin);
+          } catch (final ClassCastException ex) {
+            log.error("Couldn't load plugin, class '" + pluginMainClassName + "' isn't of type AbstractPlugin.");
+          } catch (final InstantiationException ex) {
+            log.error("Couldn't load plugin, class '" + pluginMainClassName + "' can't be instantiated: " + ex);
+          } catch (final IllegalAccessException ex) {
+            log.error("Couldn't load plugin, class '" + pluginMainClassName + "' can't be instantiated: " + ex);
+          }
+        } catch (final ClassNotFoundException ex) {
+          log.error("Couldn't load plugin, class '" + pluginMainClassName + "' not found");
+        }
+      }
+    }
+    for (final AbstractPlugin plugin : pluginList) {
       plugin.setAnnotationConfiguration(hibernateConfiguration);
       plugin.setResourceSettings(getResourceSettings());
       beanFactory.autowireBeanProperties(plugin, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
