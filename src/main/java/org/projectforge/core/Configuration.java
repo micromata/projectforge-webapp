@@ -165,6 +165,11 @@ public class Configuration extends AbstractCache
 
   private MenuEntryConfig menuConfig;
 
+  /**
+   * Separated list of main classes (separated by white chars and or ',').
+   */
+  String pluginMainClasses;
+
   private transient SSLSocketFactory projectforgesSSLSocketFactory;
 
   private transient SSLSocketFactory usersSSLSocketFactory;
@@ -827,6 +832,16 @@ public class Configuration extends AbstractCache
   public void setConfigurationDao(final ConfigurationDao configurationDao)
   {
     this.configurationDao = configurationDao;
+  }
+
+  /**
+   * Here you can define a list of main classes of type AbstractPlugin. These classes will be initialized on startup. Multiple entries
+   * should be separated by white chars and/or ','.
+   * @return
+   */
+  public String[] getPluginMainClasses()
+  {
+    return StringUtils.split(pluginMainClasses, " \r\n\t,");
   }
 
   /**
