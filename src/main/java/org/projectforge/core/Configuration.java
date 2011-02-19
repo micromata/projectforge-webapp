@@ -73,8 +73,7 @@ import org.projectforge.xml.stream.XmlObject;
 import org.projectforge.xml.stream.XmlObjectReader;
 import org.projectforge.xml.stream.XmlObjectWriter;
 import org.projectforge.xml.stream.XmlOmitField;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
  * Configure ProjectForge via config.xml in the application's base dir. It's also provides the configuration of the parameters which are
@@ -103,7 +102,7 @@ public class Configuration extends AbstractCache
   private String applicationsResourcePath;
 
   @XmlOmitField
-  private ConfigurableApplicationContext applicationContext;
+  private ConfigurableListableBeanFactory beanFactory;
 
   @XmlOmitField
   private ConfigurationDao configurationDao;
@@ -368,13 +367,13 @@ public class Configuration extends AbstractCache
    * For test cases.
    * @param config
    */
-  static void internalSetInstance(final String config, final ClassPathXmlApplicationContext applicationContext)
+  static void internalSetInstance(final String config, final ConfigurableListableBeanFactory beanFactory)
   {
     final XmlObjectReader reader = getReader();
     final Configuration cfg = (Configuration) reader.read(config);
     instance = new Configuration();
     copyDeclaredFields(null, instance.getClass(), cfg, instance);
-    instance.setApplicationContext(applicationContext);
+    instance.setBeanFactory(beanFactory);
   }
 
   /**
@@ -815,14 +814,14 @@ public class Configuration extends AbstractCache
     return usersSSLSocketFactory;
   }
 
-  public ConfigurableApplicationContext getApplicationContext()
+  public ConfigurableListableBeanFactory getBeanFactory()
   {
-    return this.applicationContext;
+    return this.beanFactory;
   }
 
-  public void setApplicationContext(final ClassPathXmlApplicationContext applicationContext)
+  public void setBeanFactory(final ConfigurableListableBeanFactory beanFactory)
   {
-    this.applicationContext = applicationContext;
+    this.beanFactory = beanFactory;
   }
 
   public void setConfigurationDao(final ConfigurationDao configurationDao)
