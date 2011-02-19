@@ -23,6 +23,9 @@
 
 package org.projectforge.plugins.core;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.commons.lang.Validate;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
@@ -50,6 +53,8 @@ public abstract class AbstractPlugin
   private IResourceSettings resourceSettings;
 
   private boolean initialized;
+  
+  private static Set<Class<?>> initializedPlugins = new HashSet<Class<?>>();
 
   public void setAnnotationConfiguration(final AnnotationConfiguration annotationConfiguration)
   {
@@ -63,12 +68,13 @@ public abstract class AbstractPlugin
 
   public final void init()
   {
-    synchronized (this) {
-      if (initialized == true) {
+    synchronized (initializedPlugins) {
+      if (initializedPlugins.contains(this.getClass()) == true || initialized == true) {
         log.warn("Ignoring multiple initialization of plugin.");
         return;
       }
       initialized = true;
+      initializedPlugins.add(this.getClass());
       log.info("Initializing plugin: " + getClass());
       initialize();
     }

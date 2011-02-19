@@ -51,6 +51,7 @@ public class ToDoPlugin extends AbstractPlugin
     registerMenuItem(new MenuItemDef(parentMenu, ID, 5, "plugins.todo.menu", ToDoListPage.class));
     // Updater.
     // ScriptingDao
+    // UserRights.
     addResourceBundle(RESOURCE_BUNDLE_NAME);
   }
 
