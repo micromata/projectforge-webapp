@@ -32,10 +32,6 @@ import org.projectforge.Version;
 import org.projectforge.access.OperationType;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ScriptingDao;
-import org.projectforge.fibu.EmployeeDao;
-import org.projectforge.fibu.EmployeeScriptingDao;
-import org.projectforge.fibu.kost.Kost1Dao;
-import org.projectforge.fibu.kost.Kost1ScriptingDao;
 import org.projectforge.fibu.kost.reporting.ReportGeneratorList;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.Registry;
@@ -121,14 +117,7 @@ public class ScriptDao extends BaseDao<ScriptDO>
     scriptVariables.put("reportList", null);
     scriptVariables.put("taskTree", new ScriptingTaskTree(taskTree));
     for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
-      final ScriptingDao scriptingDao;
-      if (DaoRegistry.EMPLOYEE.equals(entry.getId()) == true) {
-        scriptingDao = new EmployeeScriptingDao((EmployeeDao) entry.getDao());
-      } else if (DaoRegistry.COST1.equals(entry.getId()) == true) {
-        scriptingDao = new Kost1ScriptingDao((Kost1Dao) entry.getDao());
-      } else {
-        scriptingDao = new ScriptingDao(entry.getDao());
-      }
+      final ScriptingDao scriptingDao = entry.getScriptingDao();
       scriptVariables.put(entry.getId() + "Dao", scriptingDao);
     }
   }
