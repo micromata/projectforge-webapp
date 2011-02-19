@@ -60,6 +60,7 @@ import org.projectforge.core.ProjectForgeException;
 import org.projectforge.core.SystemInfoCache;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.HibernateUtils;
+import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.todo.ToDoPlugin;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.user.PFUserContext;
@@ -93,6 +94,11 @@ public class WicketApplication extends WebApplication
   private static String alertMessage;
 
   private static Map<Class< ? extends Page>, String> mountedPages = new HashMap<Class< ? extends Page>, String>();
+
+  /**
+   * Defines some built-in plugins.
+   */
+  private AbstractPlugin[] plugins = new AbstractPlugin[] { new ToDoPlugin()};
 
   @SpringBean(name = "wicketApplicationFilter")
   private WicketApplicationFilter wicketApplicationFilter;
@@ -275,13 +281,13 @@ public class WicketApplication extends WebApplication
     }
     daoRegistry.init();
 
-    // ToDo: Register plugins.
-    final ToDoPlugin plugin = new ToDoPlugin();
-    plugin.setAnnotationConfiguration(hibernateConfiguration);
-    plugin.setResourceSettings(getResourceSettings());
-    beanFactory.autowireBeanProperties(plugin, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
-    plugin.init();
-    
+    for (final AbstractPlugin plugin : plugins) {
+      plugin.setAnnotationConfiguration(hibernateConfiguration);
+      plugin.setResourceSettings(getResourceSettings());
+      beanFactory.autowireBeanProperties(plugin, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
+      plugin.init();
+    }
+
     hibernateConfiguration.buildMappings();
 
     for (Map.Entry<String, Class< ? extends WebPage>> mountPage : WebRegistry.instance().getMountPages().entrySet()) {
