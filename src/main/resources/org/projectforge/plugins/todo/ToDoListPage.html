@@ -1,0 +1,20 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+	<wicket:extend>
+		<wicket:message key="label.options" />
+		<input type="checkbox" wicket:id="presentCheckbox" onchange="javascript:submit();"> 
+		<wicket:message key="book.status.present" />
+		<input type="checkbox" wicket:id="missedCheckBox" onchange="javascript:submit();"> 
+		<wicket:message key="book.status.missed" />
+		<input type="checkbox" wicket:id="disposedCheckBox" onchange="javascript:submit();"> 
+		<wicket:message key="book.status.disposed" />&nbsp; <input type="checkbox" wicket:id="deletedCheckBox" onchange="javascript:submit();"> 
+		<wicket:message key="deleted" />, 
+		<span wicket:id="pageSize">[Page size setting]</span>
+	</wicket:extend>
+</body>
+
+</html>
