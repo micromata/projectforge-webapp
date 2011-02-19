@@ -31,12 +31,14 @@ import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.EmployeeDao;
 import org.projectforge.fibu.EmployeeSalaryDao;
+import org.projectforge.fibu.EmployeeScriptingDao;
 import org.projectforge.fibu.KontoDao;
 import org.projectforge.fibu.KundeDao;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.fibu.RechnungDao;
 import org.projectforge.fibu.kost.BuchungssatzDao;
 import org.projectforge.fibu.kost.Kost1Dao;
+import org.projectforge.fibu.kost.Kost1ScriptingDao;
 import org.projectforge.fibu.kost.Kost2ArtDao;
 import org.projectforge.fibu.kost.Kost2Dao;
 import org.projectforge.fibu.kost.KostZuweisungDao;
@@ -58,7 +60,7 @@ public class DaoRegistry
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DaoRegistry.class);
 
-  private static boolean initialized = false;
+  private static DaoRegistry instance;
 
   // *******************************************************************************
   // *** Please note: All dao's are added automatically to the scripting engine! ***
@@ -150,7 +152,7 @@ public class DaoRegistry
    */
   public synchronized void init()
   {
-    if (initialized == true) {
+    if (instance != null) {
       log.error("DaoRegistry is already initialized!");
       return;
     }
@@ -164,7 +166,7 @@ public class DaoRegistry
     register(GROUP, GroupDao.class, groupDao);
     register(ACCESS, AccessDao.class, accessDao);
     register(ACCOUNTING_RECORD, BuchungssatzDao.class, buchungssatzDao, "fibu.buchungssatz");
-    register(COST1, Kost1Dao.class, kost1Dao, "fibu.kost1");
+    register(COST1, Kost1Dao.class, kost1Dao, "fibu.kost1").setScriptingDao(new Kost1ScriptingDao(kost1Dao));
     register(COST2, Kost2Dao.class, kost2Dao, "fibu.kost2");
     register(COST2_Type, Kost2ArtDao.class, kost2ArtDao, "fibu.kost2art");
     register(COST_ASSIGNMENT, KostZuweisungDao.class, kostZuweisungDao, "fibu.");
@@ -172,9 +174,9 @@ public class DaoRegistry
     register(CUSTOMER, KundeDao.class, kundeDao, "fibu.kunde");
     register(PROJECT, ProjektDao.class, projektDao, "fibu.projekt");
     register(ORDERBOOK, AuftragDao.class, auftragDao, "fibu.auftrag");
-    register(EMPLOYEE, EmployeeDao.class, employeeDao, "fibu.employee");
+    register(EMPLOYEE, EmployeeDao.class, employeeDao, "fibu.employee").setScriptingDao(new EmployeeScriptingDao(employeeDao));
     register(EMPLOYEE_SALARY, EmployeeDao.class, employeeSalaryDao, "fibu.employee.saraly");
-    initialized = true;
+    instance = this;
   }
 
   public DaoRegistry()
@@ -186,7 +188,15 @@ public class DaoRegistry
     return register(id, daoClassType, dao, null);
   }
 
-  private RegistryEntry register(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > dao,
+  /**
+   * Registers a new dao, which is available 
+   * @param id
+   * @param daoClassType
+   * @param dao
+   * @param i18nPrefix
+   * @return
+   */
+  public RegistryEntry register(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > dao,
       final String i18nPrefix)
   {
     if (dao == null) {
@@ -195,7 +205,7 @@ public class DaoRegistry
     }
     final Registry registry = Registry.instance();
     final RegistryEntry entry = new RegistryEntry(id, daoClassType, dao, i18nPrefix);
-    registry.register(id, entry);
+    registry.register(entry);
     log.info("Dao '" + id + "' registerd.");
     return entry;
   }

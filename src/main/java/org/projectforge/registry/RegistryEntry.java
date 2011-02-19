@@ -26,6 +26,7 @@ package org.projectforge.registry;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.ScriptingDao;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -39,15 +40,28 @@ public class RegistryEntry
 
   private BaseDao< ? > dao;
 
+  private ScriptingDao< ? > scriptingDao;
+
   private Class< ? extends BaseSearchFilter> searchFilterClass;
 
   private Class< ? extends BaseDao< ? >> daoClassType;
 
+  /**
+   * @param id
+   * @param daoClassType Needed because dao is a proxy or whatever object.
+   * @param dao
+   */
   public RegistryEntry(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > dao)
   {
     this(id, daoClassType, dao, null);
   }
 
+  /**
+   * @param id
+   * @param daoClassType Needed because dao is a proxy or whatever object.
+   * @param dao
+   * @param i18nPrefix
+   */
   public RegistryEntry(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > dao, final String i18nPrefix)
   {
     this.id = id;
@@ -60,6 +74,26 @@ public class RegistryEntry
   {
     this.searchFilterClass = searchFilterClass;
     return this;
+  }
+
+  /**
+   * Register an own ScriptingDao. If this method isn't call than the generic ScriptingDao is used.
+   * @param scriptingDao
+   * @return this for chaining.
+   */
+  public RegistryEntry setScriptingDao(final ScriptingDao< ? > scriptingDao)
+  {
+    this.scriptingDao = scriptingDao;
+    return this;
+  }
+  
+  @SuppressWarnings("unchecked")
+  public ScriptingDao< ? > getScriptingDao()
+  {
+    if (this.scriptingDao == null) {
+      this.scriptingDao = new ScriptingDao(this.dao);
+    }
+    return scriptingDao;
   }
 
   /**

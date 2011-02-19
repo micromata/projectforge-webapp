@@ -53,20 +53,20 @@ public class Registry
     return instance;
   }
 
-  public Registry register(final String id, final RegistryEntry entry)
+  public Registry register(final RegistryEntry entry)
   {
     Validate.notNull(entry);
-    mapByName.put(id, entry);
+    mapByName.put(entry.getId(), entry);
     mapByClass.put(entry.getDaoClassType(), entry);
     orderedList.add(entry);
     return this;
   }
 
-  public Registry register(final String id, final RegistryEntry existingEntry, final boolean insertBefore, final RegistryEntry entry)
+  public Registry register(final RegistryEntry existingEntry, final boolean insertBefore, final RegistryEntry entry)
   {
     Validate.notNull(existingEntry);
     Validate.notNull(entry);
-    mapByName.put(id, entry);
+    mapByName.put(entry.getId(), entry);
     mapByClass.put(entry.getDaoClassType(), entry);
     int idx = orderedList.indexOf(existingEntry);
     if (idx < 0) {
