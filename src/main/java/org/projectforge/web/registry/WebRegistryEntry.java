@@ -33,8 +33,8 @@ import org.projectforge.registry.RegistryEntry;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 
 /**
+ * Contains more information than a RegistryEntry. This is e. g. needed by general search page.
  * @author Kai Reinhard (k.reinhard@micromata.de)
- * 
  */
 public class WebRegistryEntry
 {

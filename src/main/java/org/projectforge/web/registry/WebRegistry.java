@@ -121,7 +121,7 @@ import org.projectforge.web.wicket.FeedbackPage;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 
 /**
- * Registry for dao's. Here you can register additional daos and plugins (extensions of ProjectForge).
+ * Registry for dao's. Here you can register additional daos and plugins (extensions of ProjectForge). This registry is used e. g. by the general SearchPage.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -160,6 +160,7 @@ public class WebRegistry
   /**
    * Creates a new WebRegistryEntry and registers it. Id must be found in {@link Registry}.
    * @param id
+   * @param listPageColumnsCreatorClass Needed by SearchPage.
    */
   public WebRegistryEntry register(final String id, final Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass)
   {
@@ -226,12 +227,25 @@ public class WebRegistry
     return entry != null ? entry.getDao() : null;
   }
 
+  /**
+   * Adds the page class as mount page.
+   * @param mountPage
+   * @param pageClass
+   * @return this for chaining.
+   */
   public WebRegistry addMountPage(final String mountPage, final Class< ? extends WebPage> pageClass)
   {
     this.mountPages.put(mountPage, pageClass);
     return this;
   }
 
+  /**
+   * Adds the both page classes as mount pages: mountPageBasename + "{List,Edit}.
+   * @param mountPageBasename
+   * @param pageListClass
+   * @param pageEditClass
+   * @return this for chaining.
+   */
   public WebRegistry addMountPages(final String mountPageBasename, final Class< ? extends WebPage> pageListClass,
       final Class< ? extends WebPage> pageEditClass)
   {
