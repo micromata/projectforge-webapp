@@ -36,7 +36,7 @@ import org.projectforge.core.Configuration;
 import org.projectforge.meb.MebDao;
 import org.projectforge.meb.MebEntryDO;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
  * Servlet which supports receiving SMS via http get:<br/>
@@ -98,8 +98,8 @@ public class SMSReceiverServlet extends HttpServlet
       response(resp, "Unsupported date format.");
       return;
     }
-    final ConfigurableApplicationContext ctx = Configuration.getInstance().getApplicationContext();
-    ctx.getBeanFactory().autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
+    final ConfigurableListableBeanFactory beanFactory = Configuration.getInstance().getBeanFactory();
+    beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
     MebEntryDO entry = new MebEntryDO();
     entry.setDate(date);
     entry.setSender(sender);
