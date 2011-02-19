@@ -3,7 +3,7 @@
   version="2.5">
   <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>/WEB-INF/classes/applicationContext*.xml</param-value>
+    <param-value>WEB-INF/classes/applicationContext*.xml,WEB-INF/classes/**/*Context.xml</param-value>
   </context-param>
   <!--
     filter> <filter-name>WicketSessionFilter</filter-name> <filter-class>org.apache.wicket.protocol.http.servlet.WicketSessionFilter</filter-class>
