@@ -46,6 +46,7 @@ import org.projectforge.core.Priority;
 import org.projectforge.fibu.AuftragFilter;
 import org.projectforge.fibu.AuftragsStatus;
 import org.projectforge.web.MenuItemDef;
+import org.projectforge.web.MenuItemDefId;
 import org.projectforge.web.wicket.WebConstants;
 
 /**
@@ -170,7 +171,7 @@ public class GetI18nKeysTest
           add(i18nKeyUsage, "priority." + priority.getKey(), file);
         }
       } else if (file.getPath().endsWith(PATH_MENU_ITEM_DEF) == true) {
-        for (final MenuItemDef menuItem : MenuItemDef.values()) {
+        for (final MenuItemDefId menuItem : MenuItemDefId.values()) {
           add(i18nKeyUsage, menuItem.getI18nKey(), file);
         }
       } else if (file.getName().endsWith("Page.java") == true
