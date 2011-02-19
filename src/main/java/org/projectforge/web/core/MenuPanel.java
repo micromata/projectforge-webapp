@@ -90,6 +90,9 @@ public class MenuPanel extends Panel
       public Integer getObject()
       {
         int counter = 0;
+        if (menu.getMenuEntries() == null) {
+          return counter;
+        }
         for (MenuEntry menuEntry : menu.getMenuEntries()) {
           final IModel<Integer> newCounterModel = menuEntry.getNewCounterModel();
           if (newCounterModel != null && newCounterModel.getObject() != null) {
@@ -176,41 +179,43 @@ public class MenuPanel extends Panel
     add(menuAreaRepeater);
 
     int counter = 0;
-    for (final MenuEntry menuAreaEntry : menu.getMenuEntries()) {
-      if (menuAreaEntry.getSubMenuEntries() == null) {
-        log.error("Oups: menu without sub menus not supported: " + menuAreaEntry.getId());
-        continue;
-      }
-      // Now we add a new menu area (title with sub menus):
-      final WebMarkupContainer menuAreaContainer = new WebMarkupContainer(menuAreaRepeater.newChildId());
-      menuAreaRepeater.add(menuAreaContainer);
-      final WebMarkupContainer menuAreaItem = new WebMarkupContainer("menuArea");
-      menuAreaContainer.add(menuAreaItem);
-      if (menuAreaEntry.isFirst() == true) {
-        menuAreaItem.add(new SimpleAttributeModifier("class", "first"));
-      }
-      menuAreaItem.add(new Label("areaTitle", getString(menuAreaEntry.getI18nKey())));
-      final Label areaSuffixLabel = getSuffixLabel(menuAreaEntry);
-      menuAreaItem.add(areaSuffixLabel);
-      final RepeatingView menuEntryRepeater = new RepeatingView("menuEntryRepeater");
-      menuAreaItem.add(menuEntryRepeater);
-      for (final MenuEntry menuEntry : menuAreaEntry.getSubMenuEntries()) {
-        if (menuEntry.getSubMenuEntries() != null) {
-          log.error("Oups: sub sub menus not supported: " + menuAreaEntry.getId() + " has child menus which are ignored.");
+    if (menu.getMenuEntries() != null) {
+      for (final MenuEntry menuAreaEntry : menu.getMenuEntries()) {
+        if (menuAreaEntry.getSubMenuEntries() == null) {
+          log.error("Oups: menu without sub menus not supported: " + menuAreaEntry.getId());
+          continue;
         }
-        // Now we add the next menu entry to the area:
-        final WebMarkupContainer menuEntryLi = new WebMarkupContainer(menuEntryRepeater.newChildId());
-        menuEntryRepeater.add(menuEntryLi);
-        menuEntryLi.add(new SimpleAttributeModifier("id", "M_" + menuEntry.getId()));
-        final AbstractLink link = getMenuEntryLink(menuEntry);
-        menuEntryLi.add(link);
-      }
-      if (counter++ == 3) {
-        final WebMarkupContainer tipRow = new WebMarkupContainer("tipRow");
-        menuAreaContainer.add(tipRow);
-        tipRow.add(new Label("tip", getString("menu.main.tip1")).setEscapeModelStrings(false));
-      } else {
-        menuAreaContainer.add(new Label("tipRow", "invisible").setVisible(false));
+        // Now we add a new menu area (title with sub menus):
+        final WebMarkupContainer menuAreaContainer = new WebMarkupContainer(menuAreaRepeater.newChildId());
+        menuAreaRepeater.add(menuAreaContainer);
+        final WebMarkupContainer menuAreaItem = new WebMarkupContainer("menuArea");
+        menuAreaContainer.add(menuAreaItem);
+        if (menuAreaEntry.isFirst() == true) {
+          menuAreaItem.add(new SimpleAttributeModifier("class", "first"));
+        }
+        menuAreaItem.add(new Label("areaTitle", getString(menuAreaEntry.getI18nKey())));
+        final Label areaSuffixLabel = getSuffixLabel(menuAreaEntry);
+        menuAreaItem.add(areaSuffixLabel);
+        final RepeatingView menuEntryRepeater = new RepeatingView("menuEntryRepeater");
+        menuAreaItem.add(menuEntryRepeater);
+        for (final MenuEntry menuEntry : menuAreaEntry.getSubMenuEntries()) {
+          if (menuEntry.getSubMenuEntries() != null) {
+            log.error("Oups: sub sub menus not supported: " + menuAreaEntry.getId() + " has child menus which are ignored.");
+          }
+          // Now we add the next menu entry to the area:
+          final WebMarkupContainer menuEntryLi = new WebMarkupContainer(menuEntryRepeater.newChildId());
+          menuEntryRepeater.add(menuEntryLi);
+          menuEntryLi.add(new SimpleAttributeModifier("id", "M_" + menuEntry.getId()));
+          final AbstractLink link = getMenuEntryLink(menuEntry);
+          menuEntryLi.add(link);
+        }
+        if (counter++ == 3) {
+          final WebMarkupContainer tipRow = new WebMarkupContainer("tipRow");
+          menuAreaContainer.add(tipRow);
+          tipRow.add(new Label("tip", getString("menu.main.tip1")).setEscapeModelStrings(false));
+        } else {
+          menuAreaContainer.add(new Label("tipRow", "invisible").setVisible(false));
+        }
       }
     }
     // Now we append the second tip row at the bottom of the menu (independant from the number of menu areas):
@@ -250,12 +255,12 @@ public class MenuPanel extends Panel
     final Label suffixLabel;
     if (menuEntry != null && menuEntry.getNewCounterModel() != null) {
       suffixLabel = new MenuSuffixLabel(menuEntry.getNewCounterModel());
+      if (menuEntry != null && menuEntry.getNewCounterTooltip() != null) {
+        WicketUtils.addTooltip(suffixLabel, getString(menuEntry.getNewCounterTooltip()));
+      }
     } else {
       suffixLabel = new Label("suffix");
       suffixLabel.setVisible(false);
-    }
-    if (menuEntry != null && menuEntry.getNewCounterTooltip() != null) {
-      WicketUtils.addTooltip(suffixLabel, getString(menuEntry.getNewCounterTooltip()));
     }
     return suffixLabel;
   }
