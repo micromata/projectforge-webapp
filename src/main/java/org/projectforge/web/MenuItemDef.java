@@ -68,7 +68,7 @@ public class MenuItemDef implements Serializable
   {
     return true;
   }
-  
+
   /**
    * @return null if not visible otherwise the created MenuEntry.
    */
@@ -101,6 +101,10 @@ public class MenuItemDef implements Serializable
    * @param context
    */
   protected void afterMenuEntryCreation(final MenuEntry createdMenuEntry, final MenuBuilderContext context)
+  {
+  }
+
+  public MenuItemDef()
   {
   }
 
@@ -170,14 +174,14 @@ public class MenuItemDef implements Serializable
     this.visibleForGroups = visibleForGroups;
   }
 
-  public MenuItemDef(final MenuItemDef parent, final String id, final int orderNumber, final String i18nKey, final String url, final UserRightId requiredRightId,
-      final UserRightValue... requiredRightValues)
+  public MenuItemDef(final MenuItemDef parent, final String id, final int orderNumber, final String i18nKey, final String url,
+      final UserRightId requiredRightId, final UserRightValue... requiredRightValues)
   {
     this(parent, id, orderNumber, i18nKey, url, false, requiredRightId, requiredRightValues);
   }
 
-  public MenuItemDef(final MenuItemDef parent, final String id, final int orderNumber, final String i18nKey, final String url, boolean newWindow,
-      final UserRightId requiredRightId, final UserRightValue... requiredRightValues)
+  public MenuItemDef(final MenuItemDef parent, final String id, final int orderNumber, final String i18nKey, final String url,
+      boolean newWindow, final UserRightId requiredRightId, final UserRightValue... requiredRightValues)
   {
     this.parent = parent;
     this.id = id;
@@ -204,7 +208,7 @@ public class MenuItemDef implements Serializable
   {
     return id;
   }
-  
+
   /**
    * Order number for sorting menu entries.
    * @return
@@ -300,7 +304,7 @@ public class MenuItemDef implements Serializable
     }
     return false;
   }
-  
+
   @Override
   public String toString()
   {

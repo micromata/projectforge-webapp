@@ -25,6 +25,7 @@ package org.projectforge.web;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.projectforge.test.TestBase;
@@ -38,6 +39,7 @@ public class MenuBuilderTest extends TestBase
       + "<menu-entry>\n"
       + "  <sub-menu>\n"
       + "    <menu-entry id='IMAGE_CROPPER' visible='false' />\n"
+      + "    <menu-entry id='PROJECT_MANAGEMENT' visible='true' />\n"
       + "  </sub-menu>\n"
       + "</menu-entry>\n");
 
@@ -47,8 +49,11 @@ public class MenuBuilderTest extends TestBase
     final XmlObjectReader reader = new XmlObjectReader();
     reader.initialize(MenuEntryConfig.class);
     final MenuEntryConfig root = (MenuEntryConfig) reader.read(xml);
-    MenuEntryConfig menu = root.getChildren().get(0);
-    assertFalse(menu.isVisible());
-    assertEquals(MenuItemDefId.IMAGE_CROPPER, menu.getMenuItemDef());
+    MenuEntryConfig menu0 = root.getChildren().get(0);
+    assertFalse(menu0.isVisible());
+    assertEquals(MenuItemDefId.IMAGE_CROPPER.getId(), menu0.getMenuItemDef().getId());
+    MenuEntryConfig menu1 = root.getChildren().get(1);
+    assertTrue(menu1.isVisible());
+    assertEquals(MenuItemDefId.PROJECT_MANAGEMENT.getId(), menu1.getMenuItemDef().getId());
   }
 }
