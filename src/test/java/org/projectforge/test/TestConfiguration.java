@@ -45,10 +45,10 @@ public class TestConfiguration
 
   private static final Logger log = Logger.getLogger(TestConfiguration.class);
 
-  private static final String[] TEST_CONTEXT_FILES = new String[] { "test-applicationContext.xml", "applicationContext-hibernate.xml",
+  private static final String[] TEST_CONTEXT_FILES = new String[] { "applicationContext-test.xml", "applicationContext-hibernate.xml",
       "applicationContext-business.xml"};
 
-  private static final String[] CMD_CONTEXT_FILES = new String[] { "cmd-applicationContext.xml", "applicationContext-hibernate.xml",
+  private static final String[] CMD_CONTEXT_FILES = new String[] { "cmd-applicationContext-main.xml", "applicationContext-hibernate.xml",
       "applicationContext-business.xml"};
 
   protected ClassPathXmlApplicationContext ctx = null;
@@ -191,6 +191,6 @@ public class TestConfiguration
       // Get a new HibernateTemplate each time
       ctx.getBeanFactory().autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
     }
-    Configuration.getInstance().setApplicationContext(ctx); // Application context need to be set.
+    Configuration.getInstance().setBeanFactory(ctx.getBeanFactory()); // Bean factory need to be set.
   }
 }
