@@ -31,7 +31,6 @@ import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.user.PFUserContext;
-import org.projectforge.user.PFUserDO;
 import org.projectforge.xml.stream.XmlConstants;
 
 public class DateConverter extends AbstractValueConverter<Date>
