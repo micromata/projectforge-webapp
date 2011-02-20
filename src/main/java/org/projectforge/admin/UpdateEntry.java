@@ -25,36 +25,25 @@ package org.projectforge.admin;
 
 import java.io.Serializable;
 
+import org.projectforge.Version;
 import org.projectforge.common.ReflectionToString;
-import org.projectforge.xml.stream.XmlField;
 
 /**
  * Represents a update entry (Groovy or Java).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public abstract class UpdateEntry implements Serializable
+public abstract class UpdateEntry implements Serializable, Comparable<UpdateEntry>
 {
   private static final long serialVersionUID = -8205244215928531249L;
-
-  @XmlField(asAttribute = true)
-  private String version;
-
-  @XmlField
-  private String description;
 
   protected transient UpdatePreCheckStatus preCheckStatus = UpdatePreCheckStatus.UNKNOWN;
 
   protected transient UpdateRunningStatus runningStatus = UpdateRunningStatus.UNKNOWN;
 
-  public String getVersion()
-  {
-    return version;
-  }
+  public abstract Version getVersion();
 
-  public void setVersion(String version)
-  {
-    this.version = version;
-  }
+  public abstract void setVersion(final Version version);
+
   public UpdatePreCheckStatus getPreCheckStatus()
   {
     return preCheckStatus;
@@ -75,15 +64,14 @@ public abstract class UpdateEntry implements Serializable
     this.runningStatus = runningStatus;
   }
 
-  public String getDescription()
-  {
-    return description;
-  }
-  
+  public abstract String getDescription();
+
+  public abstract void setDescription(final String description);
+
   public abstract UpdatePreCheckStatus runPreCheck();
 
   public abstract UpdateRunningStatus runUpdate();
-  
+
   public abstract String getPreCheckResult();
 
   public abstract String getRunningResult();
@@ -93,5 +81,16 @@ public abstract class UpdateEntry implements Serializable
   {
     final ReflectionToString tos = new ReflectionToString(this);
     return tos.toString();
+  }
+
+  /**
+   * Compares the versions of the both entries in descending order.
+   * @param o
+   * @return
+   */
+  @Override
+  public int compareTo(final UpdateEntry o)
+  {
+    return o.getVersion().compareTo(getVersion());
   }
 }

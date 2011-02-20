@@ -25,15 +25,12 @@ package org.projectforge.admin;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.io.IOUtils;
-import org.projectforge.common.StringHelper;
 import org.projectforge.core.UserException;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.scripting.GroovyExecutor;
@@ -54,7 +51,7 @@ public class SystemUpdater
   // Used for update scripts
   private GroovyExecutor groovyExecutor;
 
-  private List<UpdateEntry> updateEntries;
+  private SortedSet<UpdateEntry> updateEntries;
 
   private static SystemUpdater instance;
 
@@ -83,11 +80,10 @@ public class SystemUpdater
   {
     instance = this; // Used by scripts.
     final XmlObjectReader reader = new XmlObjectReader();
-    reader.initialize(UpdateScriptEntry.class);
     final AliasMap aliasMap = new AliasMap();
-    aliasMap.put(ArrayList.class, "projectforge-self-update");
+    aliasMap.put(TreeSet.class, "projectforge-self-update");
     reader.setAliasMap(aliasMap);
-    reader.initialize(UpdateScriptEntry.class);
+    reader.initialize(UpdateEntryScript.class);
     String xml = null;
     try {
       xml = IOUtils.toString(is);
@@ -95,14 +91,7 @@ public class SystemUpdater
       log.error(ex.getMessage(), ex);
       throw new UserException("Unsupported update script format (see log files for details).");
     }
-    updateEntries = (List<UpdateEntry>) reader.read(xml); // Read all scripts from xml.
-    Collections.sort(updateEntries, new Comparator<UpdateEntry>() {
-      public int compare(UpdateEntry o1, UpdateEntry o2)
-      {
-        // Newest version first (descendant order):
-        return StringHelper.compareTo(o2.getVersion(), o1.getVersion());
-      }
-    });
+    updateEntries = (SortedSet<UpdateEntry>) reader.read(xml); // Read all scripts from xml.
   }
 
   /**
@@ -111,7 +100,7 @@ public class SystemUpdater
    */
   public boolean isUpdated()
   {
-    final UpdateEntry firstUpdateEntry = getUpdateEntries().get(0);
+    final UpdateEntry firstUpdateEntry = getUpdateEntries().first();
     firstUpdateEntry.runPreCheck();
     final boolean result = firstUpdateEntry.getPreCheckStatus() == UpdatePreCheckStatus.ALREADY_UPDATED;
     if (result == false) {
@@ -132,7 +121,7 @@ public class SystemUpdater
     }
   }
 
-  public List<UpdateEntry> getUpdateEntries()
+  public SortedSet<UpdateEntry> getUpdateEntries()
   {
     synchronized (this) {
       if (updateEntries == null) {
@@ -158,7 +147,7 @@ public class SystemUpdater
    * @param updateScript
    * @return
    */
-  UpdatePreCheckStatus runPreCheck(final UpdateScriptEntry updateScript)
+  UpdatePreCheckStatus runPreCheck(final UpdateEntryScript updateScript)
   {
     final GroovyResult result = execute(updateScript.getPreCheck());
     updateScript.setPreCheckResult(result);
@@ -170,7 +159,7 @@ public class SystemUpdater
    * @param updateScript
    * @return
    */
-  UpdateRunningStatus runUpdate(final UpdateScriptEntry updateScript)
+  UpdateRunningStatus runUpdate(final UpdateEntryScript updateScript)
   {
     log.info("Updating script " + updateScript.getVersion());
     runPreCheck(updateScript);

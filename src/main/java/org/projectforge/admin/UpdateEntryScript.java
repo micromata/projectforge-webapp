@@ -23,6 +23,7 @@
 
 package org.projectforge.admin;
 
+import org.projectforge.Version;
 import org.projectforge.common.ReflectionToString;
 import org.projectforge.scripting.GroovyResult;
 import org.projectforge.xml.stream.XmlField;
@@ -33,19 +34,49 @@ import org.projectforge.xml.stream.XmlObject;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @XmlObject(alias = "update")
-public class UpdateScriptEntry extends UpdateEntry
+public class UpdateEntryScript extends UpdateEntry
 {
   private static final long serialVersionUID = -1783353746958368966L;
+
+  @XmlField
+  private Version version;
+
+  @XmlField
+  private String description;
 
   @XmlField(alias = "pre-check", asCDATA = true)
   private String preCheck;
 
   @XmlField(asCDATA = true)
   private String script;
-
+  
   private transient GroovyResult preCheckResult;
 
   private transient GroovyResult runningResult;
+  
+  @Override
+  public Version getVersion()
+  {
+    return version;
+  }
+  
+  @Override
+  public void setVersion(final Version version)
+  {
+    this.version = version;
+  }
+  
+  @Override
+  public String getDescription()
+  {
+    return this.description;
+  }
+  
+  @Override
+  public void setDescription(final String description)
+  {
+    this.description = description;
+  }
 
   /**
    * Groovy script containing pre-checks for a data base update. This script returns "OK" if the pre conditions are full-filled or an error
