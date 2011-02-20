@@ -113,7 +113,7 @@ public class DatabaseUpdateDaoTest extends TestBase
   public void buildAddTableColumn()
   {
     StringBuffer buf = new StringBuffer();
-    databaseUpdateDao.buildAddTableColumnsStatement(buf, "t_task", new TableAttribute("workpackage_code", TableAttributeType.VARCHAR, 100,
+    databaseUpdateDao.buildAddTableAttributesStatement(buf, "t_task", new TableAttribute("workpackage_code", TableAttributeType.VARCHAR, 100,
         false), new TableAttribute("user_fk", TableAttributeType.INT).setForeignTable("t_user").setForeignAttribute("pk"));
     assertEquals("ALTER TABLE t_task ADD COLUMN workpackage_code VARCHAR(100) NOT NULL;\n" //
         + "ALTER TABLE t_task ADD COLUMN user_fk INT;\n"
@@ -123,7 +123,7 @@ public class DatabaseUpdateDaoTest extends TestBase
   @Test
   public void createAndDropTableColumn()
   {
-    databaseUpdateDao.addTableColumns("t_task", new TableAttribute("test1", TableAttributeType.DATE), new TableAttribute("test2",
+    databaseUpdateDao.addTableAttributes("t_task", new TableAttribute("test1", TableAttributeType.DATE), new TableAttribute("test2",
         TableAttributeType.INT));
     assertTrue(databaseUpdateDao.doesTableAttributeExist("t_task", "test1"));
     assertTrue(databaseUpdateDao.doesTableAttributeExist("t_task", "test2"));
