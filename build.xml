@@ -17,7 +17,7 @@
 	<property name="dist-src-dir" value="ProjectForge-src-${VERSION}-${version.timestamp}" />
 	<property name="doc-dir" value="../../trunk/doc" />
 	<property name="standalone-dir" value="../../standalone/trunk" />
-	<property name="version.file" value="src/main/java/org/projectforge/Version.java" />
+	<property name="version.file" value="src/main/java/org/projectforge/AppVersion.java" />
 	<tstamp>
 		<format property="NOW" pattern="yyyy-MM-dd_HH-mm" locale="en,UK" />
 	</tstamp>
@@ -159,20 +159,21 @@
 
 package org.projectforge;
 
-public class Version
+public class AppVersion
 {
   public static final String APP_ID = "${version-app-id}";
 
   public static final String APP_TITLE = "${version-app-title}";
 
-  public static final String NUMBER = "${VERSION}";
+  public static final Version VERSION = new Version("${VERSION}");
+
+  public static final String NUMBER = VERSION.toString();
 
   public static final String RELEASE_DATE = "${VERSION_DATE}";
 
   public static final String RELEASE_TIMESTAMP = "${VERSION_NOW}";
 }
-]]>
-		</echo>
+]]></echo>
 		<echo>Creating file ${version-base-dir}/version.xml ...</echo>
 		<echo file="${version-base-dir}/version.xml" append="false"><![CDATA[<?xml version="1.0" encoding="UTF-8" ?>
 <property name="appId" value="${version-app-id}"/>
