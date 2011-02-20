@@ -23,10 +23,50 @@
 
 package org.projectforge.admin;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.projectforge.database.DatabaseUpdateDao;
+import org.projectforge.database.Table;
+import org.projectforge.database.TableAttribute;
+import org.projectforge.database.TableAttributeType;
+
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class DatabaseCoreUpdates
 {
-  
+  @SuppressWarnings("serial")
+  public static List<UpdateEntry> getUpdateEntries()
+  {
+    final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
+    list.add(new UpdateEntryImpl("3.5.4", "Adds table t_database_update.") {
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        return this.preCheckStatus = dao.doesTableExist("t_database_update") == true ? UpdatePreCheckStatus.ALREADY_UPDATED
+            : UpdatePreCheckStatus.OK;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        if (dao.doesTableExist("t_database_update") == true) {
+          return this.runningStatus = UpdateRunningStatus.DONE;
+        }
+        final Table table = new Table("t_database_update") //
+            .addAttribute(new TableAttribute("pk", TableAttributeType.INT, true).setPrimaryKey(true)) //
+            .addAttribute(new TableAttribute("update_date", TableAttributeType.TIMESTAMP)) //
+            .addAttribute(new TableAttribute("version", TableAttributeType.VARCHAR, 15)) //
+            .addAttribute(new TableAttribute("plugin", TableAttributeType.VARCHAR, 255)) //
+            .addAttribute(new TableAttribute("description", TableAttributeType.VARCHAR, 4000)) //
+            .addAttribute(new TableAttribute("last_update", TableAttributeType.TIMESTAMP));
+        dao.createTable(table);
+        return this.runningStatus = UpdateRunningStatus.DONE;
+      }
+    });
+    return list;
+  }
 }

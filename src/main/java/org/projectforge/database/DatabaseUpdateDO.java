@@ -46,7 +46,7 @@ public class DatabaseUpdateDO implements BaseDO<Integer>
 {
   private Integer id;
 
-  private Date date;
+  private Date updateDate;
 
   private Version version;
 
@@ -87,18 +87,19 @@ public class DatabaseUpdateDO implements BaseDO<Integer>
     return this;
   }
 
-  public Date getDate()
+  @Column(name = "update_date")
+  public Date getUpdateDate()
   {
-    return date;
+    return updateDate;
   }
 
   /**
    * @param date
    * @return this for chaining.
    */
-  public DatabaseUpdateDO setDate(final Date date)
+  public DatabaseUpdateDO setUpdateDate(final Date updateDate)
   {
-    this.date = date;
+    this.updateDate = updateDate;
     return this;
   }
 

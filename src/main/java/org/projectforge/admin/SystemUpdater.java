@@ -46,7 +46,7 @@ public class SystemUpdater
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SystemUpdater.class);
 
-  private DatabaseUpdateDao databaseUpdateDao;
+  DatabaseUpdateDao databaseUpdateDao;
 
   // Used for update scripts
   private GroovyExecutor groovyExecutor;
@@ -92,6 +92,7 @@ public class SystemUpdater
       throw new UserException("Unsupported update script format (see log files for details).");
     }
     updateEntries = (SortedSet<UpdateEntry>) reader.read(xml); // Read all scripts from xml.
+    updateEntries.addAll(DatabaseCoreUpdates.getUpdateEntries());
   }
 
   /**

@@ -38,6 +38,16 @@ public abstract class UpdateEntryImpl extends UpdateEntry
 
   private String description;
 
+  public UpdateEntryImpl()
+  {
+  }
+
+  public UpdateEntryImpl(final String versionString, final String description)
+  {
+    this.version = new Version(versionString);
+    this.description = description;
+  }
+
   @Override
   public Version getVersion()
   {
@@ -60,6 +70,18 @@ public abstract class UpdateEntryImpl extends UpdateEntry
   public void setDescription(final String description)
   {
     this.description = description;
+  }
+
+  @Override
+  public String getPreCheckResult()
+  {
+    return this.preCheckStatus != null ? this.preCheckStatus.toString() : "";
+  }
+
+  @Override
+  public String getRunningResult()
+  {
+    return this.runningStatus != null ? this.runningStatus.toString() : "";
   }
 
   @Override
