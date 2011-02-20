@@ -32,6 +32,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -342,6 +344,8 @@ public class XmlObjectReader
         @SuppressWarnings("unchecked")
         final Collection<Object> c = (Collection<Object>) value;
         col = c;
+      } else if (SortedSet.class.isAssignableFrom(clazz) == true) {
+        col = new TreeSet<Object>();
       } else if (Set.class.isAssignableFrom(clazz) == true) {
         col = new HashSet<Object>();
       } else {
