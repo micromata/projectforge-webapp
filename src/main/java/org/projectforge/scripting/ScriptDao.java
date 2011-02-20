@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.projectforge.Version;
+import org.projectforge.AppVersion;
 import org.projectforge.access.OperationType;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ScriptingDao;
@@ -111,9 +111,9 @@ public class ScriptDao extends BaseDao<ScriptDO>
   @SuppressWarnings("unchecked")
   public void addScriptVariables(final Map<String, Object> scriptVariables)
   {
-    scriptVariables.put("appId", Version.APP_ID);
-    scriptVariables.put("appVersion", Version.NUMBER);
-    scriptVariables.put("appRelease", Version.RELEASE_DATE);
+    scriptVariables.put("appId", AppVersion.APP_ID);
+    scriptVariables.put("appVersion", AppVersion.NUMBER);
+    scriptVariables.put("appRelease", AppVersion.RELEASE_DATE);
     scriptVariables.put("reportList", null);
     scriptVariables.put("taskTree", new ScriptingTaskTree(taskTree));
     for (final RegistryEntry entry : Registry.instance().getOrderedList()) {

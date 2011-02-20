@@ -47,7 +47,7 @@ import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 import org.apache.log4j.Logger;
-import org.projectforge.Version;
+import org.projectforge.AppVersion;
 import org.projectforge.core.Configuration;
 import org.projectforge.scripting.JellyExecutor;
 import org.projectforge.user.PFUserContext;
@@ -113,8 +113,8 @@ public class PdfRenderer
     data.put("createdLabel", bundle.getString("created"));
     data.put("loggedInUser", user);
     data.put("baseDir", configuration.getResourcePath());
-    data.put("appId", Version.APP_ID);
-    data.put("appVersion", Version.NUMBER);
+    data.put("appId", AppVersion.APP_ID);
+    data.put("appVersion", AppVersion.NUMBER);
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     log.info("stylesheet="
         + stylesheet

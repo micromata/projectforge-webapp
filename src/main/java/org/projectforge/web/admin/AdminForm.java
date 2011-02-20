@@ -32,7 +32,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.projectforge.Version;
+import org.projectforge.AppVersion;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.wicket.AbstractForm;
@@ -193,8 +193,8 @@ public class AdminForm extends AbstractForm<AdminForm, AdminPage>
         parentPage.setAlertMessage();
       }
     };
-    add(new Label("copyAndPasteText1", PFUserContext.getLocalizedMessage("system.admin.alertMessage.copyAndPaste.text1", Version.NUMBER)));
-    add(new Label("copyAndPasteText3", PFUserContext.getLocalizedMessage("system.admin.alertMessage.copyAndPaste.text3", Version.NUMBER)));
+    add(new Label("copyAndPasteText1", PFUserContext.getLocalizedMessage("system.admin.alertMessage.copyAndPaste.text1", AppVersion.NUMBER)));
+    add(new Label("copyAndPasteText3", PFUserContext.getLocalizedMessage("system.admin.alertMessage.copyAndPaste.text3", AppVersion.NUMBER)));
     final WebMarkupContainer forDevelopers = new WebMarkupContainer("forDevelopers");
     add(forDevelopers);
     if (WicketApplication.isDevelopmentModus() == true) {

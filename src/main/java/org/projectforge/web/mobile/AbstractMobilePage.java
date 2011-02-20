@@ -36,7 +36,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.Model;
-import org.projectforge.Version;
+import org.projectforge.AppVersion;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.MySession;
@@ -106,7 +106,7 @@ public abstract class AbstractMobilePage extends WebPage
     final Model<String> loggedInLabelModel = new Model<String>() {
       public String getObject()
       {
-        return "<strong>" + escapeHtml(Version.APP_TITLE) + "</strong>";
+        return "<strong>" + escapeHtml(AppVersion.APP_TITLE) + "</strong>";
       }
     };
     add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false).setRenderBodyOnly(false).setVisible(getUser() != null));
@@ -218,7 +218,7 @@ public abstract class AbstractMobilePage extends WebPage
 
   protected String getWindowTitle()
   {
-    return Version.APP_ID;
+    return AppVersion.APP_ID;
   }
 
   /**

@@ -33,7 +33,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.Version;
+import org.projectforge.AppVersion;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.user.PFUserDO;
@@ -104,7 +104,7 @@ public class LoginMobilePage extends AbstractMobilePage
   @Override
   protected Component getTopCenter()
   {
-    return new Label(AbstractMobilePage.TOP_CENTER_ID, Version.APP_TITLE);
+    return new Label(AbstractMobilePage.TOP_CENTER_ID, AppVersion.APP_TITLE);
   }
 
   protected void checkLogin()

@@ -32,7 +32,7 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.Version;
+import org.projectforge.AppVersion;
 import org.projectforge.core.Configuration;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuBuilder;
@@ -114,7 +114,7 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
   @Override
   protected Component getTopCenter()
   {
-    return new Label(AbstractMobilePage.TOP_CENTER_ID, Version.APP_TITLE);
+    return new Label(AbstractMobilePage.TOP_CENTER_ID, AppVersion.APP_TITLE);
   }
 
   @Override

@@ -23,7 +23,7 @@
 
 package org.projectforge.mail;
 
-import org.projectforge.Version;
+import org.projectforge.AppVersion;
 import org.projectforge.core.ConfigurationData;
 
 
@@ -45,7 +45,7 @@ public class SendMailConfig implements ConfigurationData
 
   private String from = "noreply";
 
-  private String fromReal = Version.APP_ID;
+  private String fromReal = AppVersion.APP_ID;
 
   /**
    * Default: smtp.
@@ -104,7 +104,7 @@ public class SendMailConfig implements ConfigurationData
 
   /**
    * Default is the application's id.
-   * @see Version#APP_ID
+   * @see AppVersion#APP_ID
    */
   public String getFromReal()
   {

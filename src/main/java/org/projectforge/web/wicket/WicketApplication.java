@@ -52,7 +52,7 @@ import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.convert.ConverterLocator;
 import org.apache.wicket.util.lang.Bytes;
 import org.hibernate.cfg.AnnotationConfiguration;
-import org.projectforge.Version;
+import org.projectforge.AppVersion;
 import org.projectforge.admin.SystemUpdater;
 import org.projectforge.common.ExceptionHelper;
 import org.projectforge.core.Configuration;
@@ -327,7 +327,7 @@ public class WicketApplication extends WebApplication
     log.info("Default TimeZone is: " + TimeZone.getDefault());
     log.info("user.timezone is: " + System.getProperty("user.timezone"));
     cronSetup.initialize();
-    log.fatal(Version.APP_ID + " " + Version.NUMBER + " (" + Version.RELEASE_TIMESTAMP + ") initialized.");
+    log.fatal(AppVersion.APP_ID + " " + AppVersion.NUMBER + " (" + AppVersion.RELEASE_TIMESTAMP + ") initialized.");
 
     PFUserContext.setUser(DatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
     if (systemUpdater.isUpdated() == false) {

@@ -31,7 +31,7 @@ import java.util.Map;
 import org.apache.commons.jelly.JellyContext;
 import org.apache.commons.jelly.JellyException;
 import org.apache.commons.jelly.XMLOutput;
-import org.projectforge.Version;
+import org.projectforge.AppVersion;
 import org.xml.sax.InputSource;
 
 
@@ -58,8 +58,8 @@ public class JellyExecutor
     for (Map.Entry<String, Object> entry : data.entrySet()) {
       context.setVariable(entry.getKey(), entry.getValue());
     }
-    context.setVariable("appId", Version.APP_ID);
-    context.setVariable("appVersion", Version.NUMBER);
+    context.setVariable("appId", AppVersion.APP_ID);
+    context.setVariable("appVersion", AppVersion.NUMBER);
     XMLOutput xmlOutput = XMLOutput.createXMLOutput(writer, false);
 
     InputSource src = new InputSource(is);

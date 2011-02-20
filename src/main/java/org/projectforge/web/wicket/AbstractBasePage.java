@@ -44,7 +44,7 @@ import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.request.target.basic.RedirectRequestTarget;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.Version;
+import org.projectforge.AppVersion;
 import org.projectforge.common.DateHelper;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesCache;
@@ -290,29 +290,29 @@ public abstract class AbstractBasePage extends WebPage
 
   /**
    * Gets the version of this Application.
-   * @see Version#NUMBER
+   * @see AppVersion#NUMBER
    */
   public final String getAppVersion()
   {
-    return Version.NUMBER;
+    return AppVersion.NUMBER;
   }
 
   /**
    * Gets the release date of this Application.
-   * @see Version#RELEASE_DATE
+   * @see AppVersion#RELEASE_DATE
    */
   public final String getAppReleaseDate()
   {
-    return Version.RELEASE_DATE;
+    return AppVersion.RELEASE_DATE;
   }
 
   /**
    * Gets the release date of this Application.
-   * @see Version#RELEASE_DATE
+   * @see AppVersion#RELEASE_DATE
    */
   public final String getAppReleaseTimestamp()
   {
-    return Version.RELEASE_TIMESTAMP;
+    return AppVersion.RELEASE_TIMESTAMP;
   }
 
   public MySession getMySession()
@@ -364,7 +364,7 @@ public abstract class AbstractBasePage extends WebPage
 
   protected String getWindowTitle()
   {
-    return Version.APP_ID + " - " + getTitle();
+    return AppVersion.APP_ID + " - " + getTitle();
   }
 
   /**
