@@ -23,7 +23,7 @@
 
 package org.projectforge.web.admin;
 
-import java.util.List;
+import java.util.SortedSet;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
@@ -36,9 +36,10 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.projectforge.Version;
 import org.projectforge.admin.UpdateEntry;
+import org.projectforge.admin.UpdateEntryScript;
 import org.projectforge.admin.UpdatePreCheckStatus;
-import org.projectforge.admin.UpdateScriptEntry;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -81,7 +82,7 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
     scripts.removeAll();
     final RepeatingView scriptRows = new RepeatingView("scriptRows");
     scripts.add(scriptRows);
-    final List<UpdateEntry> updateEntries = parentPage.systemUpdater.getUpdateEntries();
+    final SortedSet<UpdateEntry> updateEntries = parentPage.systemUpdater.getUpdateEntries();
     if (updateEntries == null) {
       return;
     }
@@ -89,11 +90,11 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
       if (showOldUpdateScripts == false && updateEntry.getPreCheckStatus() == UpdatePreCheckStatus.ALREADY_UPDATED) {
         continue;
       }
-      final UpdateScriptEntry updateScript = updateEntry instanceof UpdateScriptEntry ? (UpdateScriptEntry) updateEntry : null;
-      final String version = updateEntry.getVersion();
+      final UpdateEntryScript updateScript = updateEntry instanceof UpdateEntryScript ? (UpdateEntryScript) updateEntry : null;
+      final Version version = updateEntry.getVersion();
       final WebMarkupContainer item = new WebMarkupContainer(scriptRows.newChildId());
       scriptRows.add(item);
-      item.add(new Label("version", StringUtils.isBlank(version) == true ? "???" : version));
+      item.add(new Label("version", version.toString()));
       final String description = updateEntry.getDescription();
       item.add(new Label("description", StringUtils.isBlank(description) == true ? "" : description));
       final Link<String> downloadScriptLink = new Link<String>("downloadScript") {

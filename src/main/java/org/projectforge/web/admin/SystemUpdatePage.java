@@ -27,7 +27,7 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.admin.SystemUpdater;
 import org.projectforge.admin.UpdateEntry;
-import org.projectforge.admin.UpdateScriptEntry;
+import org.projectforge.admin.UpdateEntryScript;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.xml.stream.XmlHelper;
@@ -53,7 +53,7 @@ public class SystemUpdatePage extends AbstractSecuredPage
     refresh();
   }
 
-  protected void downloadUpdateScript(final UpdateScriptEntry updateScript)
+  protected void downloadUpdateScript(final UpdateEntryScript updateScript)
   {
     final String filename = "update-script-" + updateScript.getVersion() + ".xml";
     final XmlObjectWriter writer = new XmlObjectWriter();
