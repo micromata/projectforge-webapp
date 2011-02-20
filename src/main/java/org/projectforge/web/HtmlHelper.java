@@ -37,7 +37,7 @@ import org.projectforge.web.core.PageContextLocalizerAndUrlBuilder;
 public class HtmlHelper
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(HtmlHelper.class);
-  
+
   public static final int TAB_WIDTH = 8;
 
   public static final String IMAGE_INFO_ICON = "/images/information.png";
@@ -50,6 +50,30 @@ public class HtmlHelper
   public static final String escapeXml(String str)
   {
     return StringEscapeUtils.escapeXml(str);
+  }
+
+  /**
+   * Only xml characters will be escaped (for compatibility with fop rendering engine).
+   * @param str The string to convert.
+   * @param createLineBreaks If true then new lines will be replaced by newlines and &lt;br/&gt;
+   * @return
+   * @see StringEscapeUtils#escapeHtml(String)
+   */
+  public static final String escapeHtml(final String str, final boolean createLineBreaks)
+  {
+    if (str == null) {
+      return null;
+    }
+    final String result = StringEscapeUtils.escapeHtml(str);
+    if (createLineBreaks == false) {
+      return result;
+    } else {
+      if (result.contains("\r\n") == true) {
+        return StringUtils.replace(result, "\r\n", "<br/>\r\n");
+      } else {
+        return StringUtils.replace(result, "\n", "<br/>\n");
+      }
+    }
   }
 
   /**
@@ -301,8 +325,7 @@ public class HtmlHelper
         do {
           buf.append("&nbsp;");
           ++col;
-        }
-        while(col % TAB_WIDTH > 0);
+        } while (col % TAB_WIDTH > 0);
       } else {
         buf.append(ch);
         ++col;

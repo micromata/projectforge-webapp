@@ -24,6 +24,7 @@
 package org.projectforge.web;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 import org.projectforge.web.HtmlHelper;
@@ -56,6 +57,26 @@ public class HtmlHelperTest
     assertEquals("", HtmlHelper.formatText("", true));
     assertEquals("<br/>", HtmlHelper.formatText("\n", true));
     assertEquals("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;", HtmlHelper.formatText("\t ", true));
-    assertEquals("Name:&nbsp;&nbsp;&nbsp;Reinhard<br/>Vorname:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kai<br/>Test &nbsp;&nbsp;&nbsp;", HtmlHelper.formatText("Name:\tReinhard\r\nVorname:\tKai\nTest    ", true));
+    assertEquals(
+        "Name:&nbsp;&nbsp;&nbsp;Reinhard<br/>Vorname:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kai<br/>Test &nbsp;&nbsp;&nbsp;",
+        HtmlHelper.formatText("Name:\tReinhard\r\nVorname:\tKai\nTest    ", true));
+  }
+
+  @Test
+  public void escapeHtml()
+  {
+    assertNull(HtmlHelper.escapeHtml(null, true));
+    assertNull(HtmlHelper.escapeHtml(null, false));
+    assertEquals("", HtmlHelper.escapeHtml("", true));
+    assertEquals("", HtmlHelper.escapeHtml("", false));
+    assertEquals("St&eacute;phanie&lt;<br/>\n", HtmlHelper.escapeHtml("Stéphanie<\n", true));
+    assertEquals("St&eacute;phanie&lt;\n", HtmlHelper.escapeHtml("Stéphanie<\n", false));
+    assertEquals("St&eacute;phanie&lt;<br/>\nGermany", HtmlHelper.escapeHtml("Stéphanie<\nGermany", true));
+    assertEquals("St&eacute;phanie&lt;\nGermany", HtmlHelper.escapeHtml("Stéphanie<\nGermany", false));
+
+    assertEquals("St&eacute;phanie&lt;<br/>\r\n", HtmlHelper.escapeHtml("Stéphanie<\r\n", true));
+    assertEquals("St&eacute;phanie&lt;\r\n", HtmlHelper.escapeHtml("Stéphanie<\r\n", false));
+    assertEquals("Test\nSt&eacute;phanie&lt;<br/>\r\nGermany", HtmlHelper.escapeHtml("Test\nStéphanie<\r\nGermany", true));
+    assertEquals("St&eacute;phanie&lt;\r\nGermany", HtmlHelper.escapeHtml("Stéphanie<\r\nGermany", false));
   }
 }
