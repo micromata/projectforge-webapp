@@ -23,8 +23,6 @@
 
 package org.projectforge.admin;
 
-import java.io.Serializable;
-
 import org.projectforge.common.ReflectionToString;
 import org.projectforge.scripting.GroovyResult;
 import org.projectforge.xml.stream.XmlField;
@@ -35,12 +33,9 @@ import org.projectforge.xml.stream.XmlObject;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @XmlObject(alias = "update")
-public class UpdateScript implements Serializable
+public class UpdateScriptEntry extends UpdateEntry
 {
   private static final long serialVersionUID = -1783353746958368966L;
-
-  @XmlField(asAttribute = true)
-  private String version;
 
   @XmlField(alias = "pre-check", asCDATA = true)
   private String preCheck;
@@ -48,26 +43,9 @@ public class UpdateScript implements Serializable
   @XmlField(asCDATA = true)
   private String script;
 
-  @XmlField
-  private String description;
-
-  private transient UpdatePreCheckStatus preCheckStatus = UpdatePreCheckStatus.UNKNOWN;
-
   private transient GroovyResult preCheckResult;
 
-  private transient UpdateRunningStatus runningStatus = UpdateRunningStatus.UNKNOWN;
-
   private transient GroovyResult runningResult;
-
-  public String getVersion()
-  {
-    return version;
-  }
-
-  public void setVersion(String version)
-  {
-    this.version = version;
-  }
 
   /**
    * Groovy script containing pre-checks for a data base update. This script returns "OK" if the pre conditions are full-filled or an error
@@ -95,10 +73,11 @@ public class UpdateScript implements Serializable
   {
     this.script = script;
   }
-
-  public GroovyResult getPreCheckResult()
+  
+  @Override
+  public String getPreCheckResult()
   {
-    return preCheckResult;
+    return preCheckResult != null ? String.valueOf(preCheckResult.getResult()) : null;
   }
 
   public void setPreCheckResult(GroovyResult preCheckResult)
@@ -106,9 +85,9 @@ public class UpdateScript implements Serializable
     this.preCheckResult = preCheckResult;
   }
 
-  public GroovyResult getRunningResult()
+  public String getRunningResult()
   {
-    return runningResult;
+    return runningResult != null ? String.valueOf(runningResult.getResult()) : null;
   }
 
   public void setRunningResult(GroovyResult runningResult)
@@ -116,35 +95,24 @@ public class UpdateScript implements Serializable
     this.runningResult = runningResult;
   }
 
-  public UpdatePreCheckStatus getPreCheckStatus()
-  {
-    return preCheckStatus;
-  }
-
-  public void setPreCheckStatus(UpdatePreCheckStatus preCheckStatus)
-  {
-    this.preCheckStatus = preCheckStatus;
-  }
-
-  public UpdateRunningStatus getRunningStatus()
-  {
-    return runningStatus;
-  }
-
-  public void setRunningStatus(UpdateRunningStatus runningStatus)
-  {
-    this.runningStatus = runningStatus;
-  }
-
-  public String getDescription()
-  {
-    return description;
-  }
-
   @Override
   public String toString()
   {
     final ReflectionToString tos = new ReflectionToString(this);
     return tos.toString();
+  }
+
+  @Override
+  public UpdatePreCheckStatus runPreCheck()
+  {
+    this.preCheckStatus = SystemUpdater.instance().runPreCheck(this);
+    return this.preCheckStatus;
+  }
+
+  @Override
+  public UpdateRunningStatus runUpdate()
+  {
+    this.runningStatus = SystemUpdater.instance().runUpdate(this);
+    return this.runningStatus;
   }
 }
