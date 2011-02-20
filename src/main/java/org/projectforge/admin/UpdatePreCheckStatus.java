@@ -23,15 +23,21 @@
 
 package org.projectforge.admin;
 
-
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public enum UpdatePreCheckStatus
 {
-  UNKNOWN, OK, ALREADY_UPDATED, FAILED;
-  
-  public boolean isIn(final UpdatePreCheckStatus... status) {
+  UNKNOWN,
+  /** Ready for updating. */
+  OK,
+  /** Already updated, nothing to do. */
+  ALREADY_UPDATED,
+  /** Update failed. Oh no...*/
+  FAILED;
+
+  public boolean isIn(final UpdatePreCheckStatus... status)
+  {
     for (final UpdatePreCheckStatus st : status) {
       if (this == st) {
         return true;

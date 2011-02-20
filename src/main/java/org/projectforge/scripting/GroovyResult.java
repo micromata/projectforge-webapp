@@ -25,7 +25,6 @@ package org.projectforge.scripting;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang.StringUtils;
 import org.projectforge.web.HtmlHelper;
 
 
@@ -72,10 +71,7 @@ public class GroovyResult implements Serializable
     if (result == null) {
       return null;
     }
-    String esc = HtmlHelper.escapeXml(result.toString());
-    if (result instanceof String) {
-      return StringUtils.replace(esc, "\n", "<br/>\n");
-    }
+    final String esc = HtmlHelper.escapeHtml(result.toString(), true);
     return esc;
   }
 

@@ -118,7 +118,9 @@ public class ScriptDao extends BaseDao<ScriptDO>
     scriptVariables.put("taskTree", new ScriptingTaskTree(taskTree));
     for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
       final ScriptingDao scriptingDao = entry.getScriptingDao();
-      scriptVariables.put(entry.getId() + "Dao", scriptingDao);
+      if (scriptingDao != null) {
+        scriptVariables.put(entry.getId() + "Dao", scriptingDao);
+      }
     }
   }
 

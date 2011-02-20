@@ -51,10 +51,21 @@ public class SystemUpdater
 
   private DatabaseUpdateDao databaseUpdateDao;
 
+  // Used for update scripts
   private GroovyExecutor groovyExecutor;
 
-  private List<UpdateScript> updateScripts;
+  private List<UpdateEntry> updateEntries;
 
+  private static SystemUpdater instance;
+
+  static SystemUpdater instance()
+  {
+    return instance;
+  }
+
+  /**
+   * Reads the update-scripts.xml file.
+   */
   public void readUpdateFile()
   {
     final String filename = "updates/update-scripts.xml";
@@ -63,15 +74,20 @@ public class SystemUpdater
     readUpdateFile(is);
   }
 
+  /**
+   * Reads the update script file from the given input stream.
+   * @param is
+   */
   @SuppressWarnings("unchecked")
   public void readUpdateFile(final InputStream is)
   {
+    instance = this; // Used by scripts.
     final XmlObjectReader reader = new XmlObjectReader();
-    reader.initialize(UpdateScript.class);
+    reader.initialize(UpdateScriptEntry.class);
     final AliasMap aliasMap = new AliasMap();
     aliasMap.put(ArrayList.class, "projectforge-self-update");
     reader.setAliasMap(aliasMap);
-    reader.initialize(UpdateScript.class);
+    reader.initialize(UpdateScriptEntry.class);
     String xml = null;
     try {
       xml = IOUtils.toString(is);
@@ -79,9 +95,9 @@ public class SystemUpdater
       log.error(ex.getMessage(), ex);
       throw new UserException("Unsupported update script format (see log files for details).");
     }
-    updateScripts = (List<UpdateScript>) reader.read(xml); // Read all scripts from xml.
-    Collections.sort(updateScripts, new Comparator<UpdateScript>() {
-      public int compare(UpdateScript o1, UpdateScript o2)
+    updateEntries = (List<UpdateEntry>) reader.read(xml); // Read all scripts from xml.
+    Collections.sort(updateEntries, new Comparator<UpdateEntry>() {
+      public int compare(UpdateEntry o1, UpdateEntry o2)
       {
         // Newest version first (descendant order):
         return StringHelper.compareTo(o2.getVersion(), o1.getVersion());
@@ -90,64 +106,87 @@ public class SystemUpdater
   }
 
   /**
-   * Runs the pre-check test of the first scriptlet in the list.
+   * Runs the pre-check test of the first update entry in the list.
    * @return true if ALREADY_UPDATED, otherwise false.
    */
   public boolean isUpdated()
   {
-    final UpdateScript firstUpdateScript = getUpdateScripts().get(0);
-    runPreCheck(firstUpdateScript);
-    final boolean result = firstUpdateScript.getPreCheckStatus() == UpdatePreCheckStatus.ALREADY_UPDATED;
+    final UpdateEntry firstUpdateEntry = getUpdateEntries().get(0);
+    firstUpdateEntry.runPreCheck();
+    final boolean result = firstUpdateEntry.getPreCheckStatus() == UpdatePreCheckStatus.ALREADY_UPDATED;
     if (result == false) {
       log
           .warn("*** Please note: The data-base perhaps has to be updated first before running the ProjectForge web app. Please login as administrator. Status: "
-              + firstUpdateScript.getPreCheckStatus());
+              + firstUpdateEntry.getPreCheckStatus());
     }
     return result;
   }
 
+  /**
+   * Runs all the pre checks of all update entries.
+   */
   public void runAllPreChecks()
   {
-    for (final UpdateScript updateScript : getUpdateScripts()) {
-      runPreCheck(updateScript);
+    for (final UpdateEntry updateEntry : getUpdateEntries()) {
+      updateEntry.runPreCheck();
     }
   }
 
-  public List<UpdateScript> getUpdateScripts()
+  public List<UpdateEntry> getUpdateEntries()
   {
     synchronized (this) {
-      if (updateScripts == null) {
+      if (updateEntries == null) {
         readUpdateFile();
       }
     }
-    return updateScripts;
+    return updateEntries;
   }
 
-  protected void runPreCheck(final UpdateScript updateScript)
+  /**
+   * Runs the update method of the given update entry.
+   * @param updateScript
+   */
+  public void update(final UpdateEntry updateEntry)
+  {
+    updateEntry.runUpdate();
+    updateEntry.runPreCheck();
+    runAllPreChecks();
+  }
+
+  /**
+   * Method used by UpdateScriptEntry for executing the groovy stuff.
+   * @param updateScript
+   * @return
+   */
+  UpdatePreCheckStatus runPreCheck(final UpdateScriptEntry updateScript)
   {
     final GroovyResult result = execute(updateScript.getPreCheck());
     updateScript.setPreCheckResult(result);
-    updateScript.setPreCheckStatus(((UpdatePreCheckStatus) result.getResult()));
+    return (UpdatePreCheckStatus) result.getResult();
   }
 
-  public void update(final UpdateScript updateScript)
+  /**
+   * Method used by UpdateScriptEntry for executing the groovy stuff.
+   * @param updateScript
+   * @return
+   */
+  UpdateRunningStatus runUpdate(final UpdateScriptEntry updateScript)
   {
     log.info("Updating script " + updateScript.getVersion());
     runPreCheck(updateScript);
     if (UpdatePreCheckStatus.OK != updateScript.getPreCheckStatus()) {
       log.error("Pre-check failed. Aborting.");
-      return;
+      return UpdateRunningStatus.FAILED;
     }
     final GroovyResult result = execute(updateScript.getScript());
     updateScript.setRunningResult(result);
     if (result != null) {
-      updateScript.setRunningStatus(((UpdateRunningStatus) result.getResult()));
+      return (UpdateRunningStatus) result.getResult();
     }
-    runPreCheck(updateScript);
-    runAllPreChecks();
+    return UpdateRunningStatus.UNKNOWN;
   }
 
-  protected GroovyResult execute(final String script)
+  GroovyResult execute(final String script)
   {
     final Map<String, Object> scriptVariables = new HashMap<String, Object>();
     scriptVariables.put("dao", databaseUpdateDao);

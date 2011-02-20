@@ -43,6 +43,8 @@ public class RegistryEntry
 
   private ScriptingDao< ? > scriptingDao;
 
+  private boolean supressScriptingDao;
+
   private Class< ? extends BaseSearchFilter> searchFilterClass;
 
   private Class< ? extends BaseDao< ? >> daoClassType;
@@ -61,7 +63,7 @@ public class RegistryEntry
    * @param id
    * @param daoClassType Needed because dao is a proxy or whatever object.
    * @param dao
-   * @param i18nPrefix
+   * @param i18nPrefix The i18n prefix (if different to id) used e. g. by SearchForm (&lt;prefix&gt;.title.heading.
    */
   public RegistryEntry(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > dao, final String i18nPrefix)
   {
@@ -91,10 +93,25 @@ public class RegistryEntry
   @SuppressWarnings("unchecked")
   public ScriptingDao< ? > getScriptingDao()
   {
+    if (this.supressScriptingDao == true) {
+      return null;
+    }
     if (this.scriptingDao == null) {
       this.scriptingDao = new ScriptingDao(this.dao);
     }
     return scriptingDao;
+  }
+
+  /**
+   * If set to true then no scripting dao is used (e. g. for using in the scripting engine). At default a scripting dao is automatically
+   * available.
+   * @param supressScriptingDao
+   * @return this for chaining.
+   */
+  public RegistryEntry setSupressScriptingDao(final boolean supressScriptingDao)
+  {
+    this.supressScriptingDao = supressScriptingDao;
+    return this;
   }
 
   /**
@@ -127,7 +144,7 @@ public class RegistryEntry
 
   /**
    * Is used e. g. by {@link org.projectforge.web.core.SearchForm}: &lt;i18nPrefix&gt;.title.heading.
-   * @return The prefix of the i18n keys to prepend, e. g. "fibu.kost1". If not especially, than the id will be used as prefix.
+   * @return The prefix of the i18n keys to prepend, e. g. "fibu.kost1". If not given, than the id will be used as prefix.
    */
   public String getI18nPrefix()
   {

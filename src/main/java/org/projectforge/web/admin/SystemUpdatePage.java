@@ -26,7 +26,8 @@ package org.projectforge.web.admin;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.admin.SystemUpdater;
-import org.projectforge.admin.UpdateScript;
+import org.projectforge.admin.UpdateEntry;
+import org.projectforge.admin.UpdateScriptEntry;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.xml.stream.XmlHelper;
@@ -52,7 +53,7 @@ public class SystemUpdatePage extends AbstractSecuredPage
     refresh();
   }
 
-  protected void downloadUpdateScript(final UpdateScript updateScript)
+  protected void downloadUpdateScript(final UpdateScriptEntry updateScript)
   {
     final String filename = "update-script-" + updateScript.getVersion() + ".xml";
     final XmlObjectWriter writer = new XmlObjectWriter();
@@ -65,11 +66,11 @@ public class SystemUpdatePage extends AbstractSecuredPage
     DownloadUtils.setDownloadTarget(buf.toString().getBytes(), filename);
   }
 
-  protected void update(final UpdateScript updateScript)
+  protected void update(final UpdateEntry updateEntry)
   {
     accessChecker.checkIsUserMemberOfAdminGroup();
     accessChecker.checkDemoUser();
-    systemUpdater.update(updateScript);
+    systemUpdater.update(updateEntry);
     refresh();
   }
 
@@ -77,7 +78,7 @@ public class SystemUpdatePage extends AbstractSecuredPage
   {
     accessChecker.checkIsUserMemberOfAdminGroup();
     systemUpdater.runAllPreChecks();
-    form.updateScriptRows();
+    form.updateEntryRows();
   }
 
   @Override

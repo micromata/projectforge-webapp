@@ -31,7 +31,6 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.settings.IResourceSettings;
 import org.hibernate.cfg.AnnotationConfiguration;
-import org.projectforge.core.BaseDao;
 import org.projectforge.plugins.todo.ToDoDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
@@ -53,8 +52,8 @@ public abstract class AbstractPlugin
   private IResourceSettings resourceSettings;
 
   private boolean initialized;
-  
-  private static Set<Class<?>> initializedPlugins = new HashSet<Class<?>>();
+
+  private static Set<Class< ? >> initializedPlugins = new HashSet<Class< ? >>();
 
   public void setAnnotationConfiguration(final AnnotationConfiguration annotationConfiguration)
   {
@@ -109,20 +108,31 @@ public abstract class AbstractPlugin
   }
 
   /**
-   * Register dao and i18nPrefix for i18n.
-   * @param id
-   * @param daoClass
-   * @param dao
-   * @param i18nPrefix
-   * @return this for chaining.
+   * Registers the given entry.
+   * @param entry
+   * @return The registered registry entry for chaining.
+   * @see Registry#register(RegistryEntry)
    */
-  protected AbstractPlugin register(final String id, final Class< ? extends BaseDao< ? >> daoClass, final BaseDao< ? > dao,
-      final String i18nPrefix)
+  protected RegistryEntry register(final RegistryEntry entry)
   {
-    Validate.notNull(daoClass);
-    Validate.notNull(dao);
-    Registry.instance().register(new RegistryEntry(id, daoClass, dao, i18nPrefix));
-    return this;
+    Validate.notNull(entry);
+    Registry.instance().register(entry);
+    return entry;
+  }
+
+  /**
+   * Registers the given entry.
+   * @param existingEntry A previous added entry, at which the new entry should be inserted.
+   * @param insertBefore If true then the given entry will be added before the existing entry, otherwise after.
+   * @param entry The entry to register.
+   * @return The registered registry entry for chaining.
+   * @see Registry#register(RegistryEntry, boolean, RegistryEntry)
+   */
+  protected RegistryEntry register(final RegistryEntry existingEntry, final boolean insertBefore, final RegistryEntry entry)
+  {
+    Validate.notNull(entry);
+    Registry.instance().register(existingEntry, insertBefore, entry);
+    return entry;
   }
 
   /**

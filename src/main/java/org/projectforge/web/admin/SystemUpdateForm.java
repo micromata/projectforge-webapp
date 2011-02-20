@@ -36,8 +36,10 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.projectforge.admin.UpdateEntry;
 import org.projectforge.admin.UpdatePreCheckStatus;
-import org.projectforge.admin.UpdateScript;
+import org.projectforge.admin.UpdateScriptEntry;
+import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
@@ -59,7 +61,7 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
   {
     scripts = new WebMarkupContainer("scripts");
     add(scripts);
-    updateScriptRows();
+    updateEntryRows();
     add(new CheckBox("showOldVersionUpdatesCheckBox", new PropertyModel<Boolean>(this, "showOldUpdateScripts")));
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     final Button refresh = new Button("button", new Model<String>("refresh")) {
@@ -74,24 +76,25 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
   }
 
   @SuppressWarnings("serial")
-  protected void updateScriptRows()
+  protected void updateEntryRows()
   {
     scripts.removeAll();
     final RepeatingView scriptRows = new RepeatingView("scriptRows");
     scripts.add(scriptRows);
-    final List<UpdateScript> updateScripts = parentPage.systemUpdater.getUpdateScripts();
-    if (updateScripts == null) {
+    final List<UpdateEntry> updateEntries = parentPage.systemUpdater.getUpdateEntries();
+    if (updateEntries == null) {
       return;
     }
-    for (final UpdateScript updateScript : updateScripts) {
-      if (showOldUpdateScripts == false && updateScript.getPreCheckStatus() == UpdatePreCheckStatus.ALREADY_UPDATED) {
+    for (final UpdateEntry updateEntry : updateEntries) {
+      if (showOldUpdateScripts == false && updateEntry.getPreCheckStatus() == UpdatePreCheckStatus.ALREADY_UPDATED) {
         continue;
       }
-      final String version = updateScript.getVersion();
+      final UpdateScriptEntry updateScript = updateEntry instanceof UpdateScriptEntry ? (UpdateScriptEntry) updateEntry : null;
+      final String version = updateEntry.getVersion();
       final WebMarkupContainer item = new WebMarkupContainer(scriptRows.newChildId());
       scriptRows.add(item);
       item.add(new Label("version", StringUtils.isBlank(version) == true ? "???" : version));
-      final String description = updateScript.getDescription();
+      final String description = updateEntry.getDescription();
       item.add(new Label("description", StringUtils.isBlank(description) == true ? "" : description));
       final Link<String> downloadScriptLink = new Link<String>("downloadScript") {
         @Override
@@ -100,22 +103,27 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
           parentPage.downloadUpdateScript(updateScript);
         }
       };
-      downloadScriptLink.add(new SimpleAttributeModifier("title", "You can use this script for own modifications and manual updates."));
+      if (updateScript == null) {
+        downloadScriptLink.setVisible(false);
+      } else {
+        downloadScriptLink.add(new SimpleAttributeModifier("title", "You can use this script for own modifications and manual updates."));
+      }
       item.add(downloadScriptLink);
       downloadScriptLink.add(new Label("fileName", "update-script-" + version).setRenderBodyOnly(true));
       item.add(new Label("preCheckResult", new Model<String>() {
         @Override
         public String getObject()
         {
-          return updateScript.getPreCheckResult() != null ? updateScript.getPreCheckResult().getResultAsHtmlString() : "";
+          final String preCheckResult = updateEntry.getPreCheckResult();
+          return HtmlHelper.escapeHtml(preCheckResult, true);
         }
       }));
-      if (updateScript.getPreCheckStatus() == UpdatePreCheckStatus.OK) {
+      if (updateEntry.getPreCheckStatus() == UpdatePreCheckStatus.OK) {
         final Button updateButton = new Button("button", new Model<String>("update")) {
           @Override
           public final void onSubmit()
           {
-            parentPage.update(updateScript);
+            parentPage.update(updateEntry);
           }
         };
         item.add(new SingleButtonPanel("update", updateButton));
@@ -124,7 +132,8 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
           @Override
           public String getObject()
           {
-            return updateScript.getRunningResult() != null ? updateScript.getRunningResult().getResultAsHtmlString() : "";
+            final String runningResult = updateEntry.getRunningResult();
+            return HtmlHelper.escapeHtml(runningResult, true);
           }
         }));
       }

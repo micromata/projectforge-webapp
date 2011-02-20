@@ -53,6 +53,11 @@ public class Registry
     return instance;
   }
 
+  /**
+   * Registers the given entry and appends it to the ordered list of registry entries.
+   * @param entry The entry to register.
+   * @return this for chaining.
+   */
   public Registry register(final RegistryEntry entry)
   {
     Validate.notNull(entry);
@@ -62,6 +67,13 @@ public class Registry
     return this;
   }
 
+  /**
+   * Registers the given entry and inserts it to the ordered list of registry entries at the given position.
+   * @param existingEntry A previous added entry, at which the new entry should be inserted.
+   * @param insertBefore If true then the given entry will be added before the existing entry, otherwise after.
+   * @param entry The entry to register.
+   * @return this for chaining.
+   */
   public Registry register(final RegistryEntry existingEntry, final boolean insertBefore, final RegistryEntry entry)
   {
     Validate.notNull(existingEntry);
