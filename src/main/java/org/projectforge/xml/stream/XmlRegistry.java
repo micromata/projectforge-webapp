@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.projectforge.Version;
 import org.projectforge.xml.stream.converter.BigDecimalConverter;
 import org.projectforge.xml.stream.converter.BooleanConverter;
 import org.projectforge.xml.stream.converter.DateConverter;
@@ -42,6 +43,7 @@ import org.projectforge.xml.stream.converter.LocaleConverter;
 import org.projectforge.xml.stream.converter.LongConverter;
 import org.projectforge.xml.stream.converter.StringConverter;
 import org.projectforge.xml.stream.converter.TimeZoneConverter;
+import org.projectforge.xml.stream.converter.VersionConverter;
 
 /**
  * There is one singleton instance used for default mappings, aliases etc.
@@ -97,6 +99,7 @@ public class XmlRegistry
     internalRegisterTypeAsAttribute(long.class);
     internalRegisterTypeAsAttribute(TimeZone.class);
     internalRegisterTypeAsAttribute(Locale.class);
+    internalRegisterTypeAsAttribute(Version.class);
 
     internalRegisterAlias(BigDecimal.class, "decimal");
     internalRegisterAlias(Boolean.class, "boolean");
@@ -109,6 +112,7 @@ public class XmlRegistry
     internalRegisterAlias(long.class, "long");
     internalRegisterAlias(TimeZone.class, "timeZone");
     internalRegisterAlias(Locale.class, "locale");
+    internalRegisterAlias(Version.class, "version");
 
     IConverter< ? > conv = new BooleanConverter();
     internalRegisterConverter(Boolean.class, conv);
@@ -128,6 +132,7 @@ public class XmlRegistry
     internalRegisterConverter(String.class, new StringConverter());
     internalRegisterConverter(TimeZone.class, new TimeZoneConverter());
     internalRegisterConverter(Locale.class, new LocaleConverter());
+    internalRegisterConverter(Version.class, new VersionConverter());
   }
 
   public IConverter< ? > getConverter(Class< ? > clazz)
