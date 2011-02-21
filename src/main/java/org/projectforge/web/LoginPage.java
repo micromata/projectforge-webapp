@@ -38,6 +38,7 @@ import org.apache.wicket.request.target.basic.RedirectRequestTarget;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.admin.SetupPage;
@@ -148,7 +149,7 @@ public class LoginPage extends AbstractBasePage
       final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
       try {
         final PFUserDO resUser = new PFUserDO();
-        final String sql = "select pk, firstname, lastname from t_pf_user where username=? and password=? and deleted=false";
+        String sql = "select pk, firstname, lastname from t_pf_user where username=? and password=? and deleted=false";
         jdbc.query(sql, new Object[] { username, encryptedPassword}, new ResultSetExtractor() {
           @Override
           public Object extractData(final ResultSet rs) throws SQLException, DataAccessException
@@ -163,12 +164,23 @@ public class LoginPage extends AbstractBasePage
             return null;
           }
         });
-        if (resUser.getUsername() != null) {
-          user = resUser;
-          internalLogin(page, user);
-          page.setResponsePage(SystemUpdatePage.class);
+        if (resUser.getUsername() == null) {
+          log.info("Admin login for maintenance (data-base update) failed for user '" + username + "' (user/password not found).");
           return;
         }
+        sql = "select pk from t_group where name=?";
+        final int adminGroupId = jdbc.queryForInt(sql, new Object[] { ProjectForgeGroup.ADMIN_GROUP.getKey()});
+        sql = "select count(*) from t_group_user where group_id=? and user_id=?";
+        final int count = jdbc.queryForInt(sql, new Object[] { adminGroupId, resUser.getId()});
+        if (count != 1) {
+          log.info("Admin login for maintenance (data-base update) failed for user '" + username + "' (user not member of admin group).");
+          return;
+        }
+        user = resUser;
+        internalLogin(page, user);
+        page.setResponsePage(SystemUpdatePage.class);
+        log.info("Admin login for maintenance (data-base update) successful for user '" + username + "'.");
+        return;
       } catch (final Exception ex) {
         log.error(ex.getMessage(), ex);
       }
