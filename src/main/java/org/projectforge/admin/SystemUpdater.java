@@ -146,7 +146,7 @@ public class SystemUpdater
     updateEntry.runUpdate();
     if (databaseUpdateDao.doesTableExist(DatabaseUpdateDO.TABLE_NAME) == true) {
       databaseUpdateDao.insertInto(DatabaseUpdateDO.TABLE_NAME, new String[] { "update_date", "region_id", "version", "execution_result",
-          "executed_by", "description"}, new Object[] { new Date(), updateEntry.getRegionId(), String.valueOf(updateEntry.getVersion()),
+          "executed_by_user_fk", "description"}, new Object[] { new Date(), updateEntry.getRegionId(), String.valueOf(updateEntry.getVersion()),
           updateEntry.getRunningResult(), PFUserContext.getUserId(), updateEntry.getDescription()
       });
     } else {

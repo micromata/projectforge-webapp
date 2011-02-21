@@ -332,9 +332,8 @@ public class DatabaseUpdateDao
     buf.append(")");
     final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
     final String sql = buf.toString();
+    log.info(sql + "; values = " + StringHelper.listToString(", ", values));
     jdbc.update(sql, values);
-    log.info(sql + ". Values=" + StringHelper.listToString(", ", values));
-    jdbc.execute(sql);
   }
 
   /**
