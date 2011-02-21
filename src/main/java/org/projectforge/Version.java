@@ -23,6 +23,8 @@
 
 package org.projectforge;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -30,8 +32,10 @@ import org.apache.commons.lang.StringUtils;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class Version implements Comparable<Version>
+public class Version implements Comparable<Version>, Serializable
 {
+  private static final long serialVersionUID = 1446772593211999270L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Version.class);
 
   private int majorRelease, minorRelease, patchLevel, buildNumber;
