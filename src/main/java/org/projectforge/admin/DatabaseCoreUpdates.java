@@ -59,8 +59,8 @@ public class DatabaseCoreUpdates
           return this.runningStatus = UpdateRunningStatus.DONE;
         }
         final Table table = new Table(DatabaseUpdateDO.TABLE_NAME) //
-            .addAttribute(new TableAttribute("region_id", TableAttributeType.VARCHAR, 1000)) //
             .addAttribute(new TableAttribute("update_date", TableAttributeType.TIMESTAMP)) //
+            .addAttribute(new TableAttribute("region_id", TableAttributeType.VARCHAR, 1000)) //
             .addAttribute(new TableAttribute("version", TableAttributeType.VARCHAR, 15)) //
             .addAttribute(new TableAttribute("execution_result", TableAttributeType.VARCHAR, 1000)) //
             .addAttribute(
