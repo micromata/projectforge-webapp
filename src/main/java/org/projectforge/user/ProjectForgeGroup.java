@@ -41,12 +41,17 @@ public enum ProjectForgeGroup
   MARKETING_GROUP("PF_Marketing"), /** Orgateam users have access to Posteingang and Postausgang. */
   ORGA_TEAM("PF_Organization"), /** Users having access to the order book (for assigned orders). */
   PROJECT_ASSISTANT("PF_ProjectAssistant"), /**
-                                             * Users having access to all time sheets (without details) and order book (for assigned
-                                             * orders).
-                                             */
+   * Users having access to all time sheets (without details) and order book (for assigned
+   * orders).
+   */
   PROJECT_MANAGER("PF_ProjectManager");
 
   private String key;
+
+  public String getKey()
+  {
+    return key;
+  }
 
   public boolean equals(String groupName)
   {
