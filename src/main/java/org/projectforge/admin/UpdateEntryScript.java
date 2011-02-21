@@ -39,6 +39,9 @@ public class UpdateEntryScript extends UpdateEntry
   private static final long serialVersionUID = -1783353746958368966L;
 
   @XmlField
+  private String regionId;
+  
+  @XmlField
   private Version version;
 
   @XmlField
@@ -53,6 +56,17 @@ public class UpdateEntryScript extends UpdateEntry
   private transient GroovyResult preCheckResult;
 
   private transient GroovyResult runningResult;
+
+  @Override
+  public String getRegionId()
+  {
+    return this.regionId;
+  }
+  
+  public void setRegionId(String regionId)
+  {
+    this.regionId = regionId;
+  }
   
   @Override
   public Version getVersion()

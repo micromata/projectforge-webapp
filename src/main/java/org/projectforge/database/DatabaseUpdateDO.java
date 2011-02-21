@@ -23,18 +23,17 @@
 
 package org.projectforge.database;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.projectforge.Version;
-import org.projectforge.core.BaseDO;
+import org.projectforge.user.PFUserDO;
 
 /**
  * Represents data-base updates of ProjectForge core and plugins.
@@ -42,31 +41,33 @@ import org.projectforge.core.BaseDO;
  */
 @Entity
 @Table(name = "t_database_update")
-public class DatabaseUpdateDO implements BaseDO<Integer>
+public class DatabaseUpdateDO
 {
-  private Integer id;
+  public static final String TABLE_NAME = "t_database_update";
 
+  private String regionId;
+  
   private Date updateDate;
 
   private Version version;
 
-  private String plugin;
-
   private String description;
 
-  @Id
-  @GeneratedValue
-  @Column(name = "pk")
-  public Integer getId()
-  {
-    return id;
-  }
+  private String executionResult;
 
-  public void setId(Integer id)
-  {
-    this.id = (Integer) id;
-  }
+  private PFUserDO executedBy;
 
+  @Column(name = "region_id", length = 1000)
+  public String getRegionId()
+  {
+    return regionId;
+  }
+  
+  public void setRegionId(final String regionId)
+  {
+    this.regionId = regionId;
+  }
+  
   @Column(name = "version", length = 15)
   public String getVersionString()
   {
@@ -103,22 +104,6 @@ public class DatabaseUpdateDO implements BaseDO<Integer>
     return this;
   }
 
-  @Column(length = 255)
-  public String getPlugin()
-  {
-    return plugin;
-  }
-
-  /**
-   * @param plugin
-   * @return this for chaining.
-   */
-  public DatabaseUpdateDO setPlugin(final String plugin)
-  {
-    this.plugin = plugin;
-    return this;
-  }
-
   @Column(length = 4000)
   public String getDescription()
   {
@@ -135,42 +120,36 @@ public class DatabaseUpdateDO implements BaseDO<Integer>
     return this;
   }
 
-  /**
-   * @return Always false.
-   * @see org.projectforge.core.BaseDO#isMinorChange()
-   */
-  @Transient
-  @Override
-  public boolean isMinorChange()
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "executed_by_user_fk", nullable = false)
+  public PFUserDO getExecutedBy()
   {
-    return false;
+    return executedBy;
   }
 
   /**
-   * Throws UnsupportedOperationException.
-   * @see org.projectforge.core.BaseDO#setMinorChange(boolean)
+   * @param executedBy
+   * @return this for chaining.
    */
-  @Override
-  public void setMinorChange(boolean value)
+  public DatabaseUpdateDO setExecutedBy(final PFUserDO executedBy)
   {
-    throw new UnsupportedOperationException();
+    this.executedBy = executedBy;
+    return this;
   }
 
-  @Override
-  public boolean copyValuesFrom(BaseDO< ? extends Serializable> src, String... ignoreFields)
+  @Column(name = "execution_result", length = 1000)
+  public String getExecutionResult()
   {
-    throw new UnsupportedOperationException();
+    return executionResult;
   }
 
-  @Override
-  public Object getAttribute(String key)
+  /**
+   * @param executionResult
+   * @return this for chaining.
+   */
+  public DatabaseUpdateDO setExecutionResult(String executionResult)
   {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public void setAttribute(String key, Object value)
-  {
-    throw new UnsupportedOperationException();
+    this.executionResult = executionResult;
+    return this;
   }
 }

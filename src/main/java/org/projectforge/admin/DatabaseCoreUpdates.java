@@ -23,9 +23,11 @@
 
 package org.projectforge.admin;
 
+import static org.projectforge.admin.SystemUpdater.CORE_REGION_ID;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.projectforge.database.DatabaseUpdateDO;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.Table;
 import org.projectforge.database.TableAttribute;
@@ -40,7 +42,7 @@ public class DatabaseCoreUpdates
   public static List<UpdateEntry> getUpdateEntries()
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
-    list.add(new UpdateEntryImpl("3.5.4", "Adds table t_database_update.") {
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "3.5.4", "Adds table t_database_update.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
@@ -53,16 +55,17 @@ public class DatabaseCoreUpdates
       public UpdateRunningStatus runUpdate()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
-        if (dao.doesTableExist("t_database_update") == true) {
+        if (dao.doesTableExist(DatabaseUpdateDO.TABLE_NAME) == true) {
           return this.runningStatus = UpdateRunningStatus.DONE;
         }
-        final Table table = new Table("t_database_update") //
-            .addAttribute(new TableAttribute("pk", TableAttributeType.INT, true).setPrimaryKey(true)) //
+        final Table table = new Table(DatabaseUpdateDO.TABLE_NAME) //
+            .addAttribute(new TableAttribute("region_id", TableAttributeType.VARCHAR, 1000)) //
             .addAttribute(new TableAttribute("update_date", TableAttributeType.TIMESTAMP)) //
             .addAttribute(new TableAttribute("version", TableAttributeType.VARCHAR, 15)) //
-            .addAttribute(new TableAttribute("plugin", TableAttributeType.VARCHAR, 255)) //
-            .addAttribute(new TableAttribute("description", TableAttributeType.VARCHAR, 4000)) //
-            .addAttribute(new TableAttribute("last_update", TableAttributeType.TIMESTAMP));
+            .addAttribute(new TableAttribute("execution_result", TableAttributeType.VARCHAR, 1000)) //
+            .addAttribute(
+                new TableAttribute("executed_by_user_fk", TableAttributeType.INT).setForeignTable("t_pf_user").setForeignAttribute("pk")) //
+            .addAttribute(new TableAttribute("description", TableAttributeType.VARCHAR, 4000));
         dao.createTable(table);
         return this.runningStatus = UpdateRunningStatus.DONE;
       }

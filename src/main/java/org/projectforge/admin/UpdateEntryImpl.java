@@ -34,6 +34,8 @@ public abstract class UpdateEntryImpl extends UpdateEntry
 {
   private static final long serialVersionUID = -1178486631632477422L;
 
+  private String regionId;
+
   private Version version;
 
   private String description;
@@ -42,10 +44,22 @@ public abstract class UpdateEntryImpl extends UpdateEntry
   {
   }
 
-  public UpdateEntryImpl(final String versionString, final String description)
+  public UpdateEntryImpl(final String regionId, final String versionString, final String description)
   {
+    this.regionId = regionId;
     this.version = new Version(versionString);
     this.description = description;
+  }
+  
+  @Override
+  public String getRegionId()
+  {
+    return this.regionId;
+  }
+  
+  public void setRegionId(final String regionId)
+  {
+    this.regionId = regionId;
   }
 
   @Override

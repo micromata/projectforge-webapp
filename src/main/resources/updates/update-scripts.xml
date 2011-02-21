@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- This file is needed for updating any previous version of the data base. -->
 <projectforge-self-update>
-  <update version="3.5.0">
+  <update regionId="ProjectForge" version="3.5.0">
     <description>Adds column book_type to t_book.</description>
     <pre-check><![CDATA[
     if (dao.doesTableAttributeExist("t_book", "book_type") == true) {
@@ -17,7 +17,7 @@
     ]]>
     </script>
   </update>
-  <update version="3.4.3">
+  <update regionId="ProjectForge" version="3.4.3">
     <description>Adds column description to t_group_task_access.</description>
     <pre-check><![CDATA[
     if (dao.doesTableAttributeExist("t_group_task_access", "description") == true) {
@@ -33,7 +33,7 @@
     ]]>
     </script>
   </update>
-  <update version="3.4.0">
+  <update regionId="ProjectForge" version="3.4.0">
     <description>Alters table t_task and t_gantt_chart.</description>
     <pre-check><![CDATA[
     if (dao.doesTableAttributeExist("t_gantt_chart", "settings_as_xml") == true &&
@@ -81,7 +81,7 @@
     ]]>
     </script>
   </update>
-  <update version="3.3.47">
+  <update regionId="ProjectForge" version="3.3.47">
     <description>Alters table t_pf_user, t_imported_meb_entry, t_group_task_access and t_task. Adds table t_contract.</description>
     <pre-check><![CDATA[
     if (dao.doesTableAttributeExist("t_pf_user", "jira_username") == true &&
@@ -175,7 +175,7 @@
     ]]>
     </script>
   </update>
-  <update version="3.3.45">
+  <update regionId="ProjectForge" version="3.3.45">
     <description>Adds table t_meb_entry and t_imported_meb_entry. Alters table t_pf_user.</description>
     <pre-check><![CDATA[
     if (dao.doesTableExist("t_meb_entry") == false || dao.doesTableAttributeExist("t_pf_user", "personal_meb_identifiers") == false) {
@@ -220,7 +220,7 @@
     ]]>
     </script>
   </update>
-  <update version="3.3.44">
+  <update regionId="ProjectForge" version="3.3.44">
     <description>Drops and re-creates table t_user_right (must be empty).</description>
     <pre-check><![CDATA[
     if (dao.doesTableExist("t_user_right") == false) {

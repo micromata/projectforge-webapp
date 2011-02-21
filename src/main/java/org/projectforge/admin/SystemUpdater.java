@@ -25,6 +25,7 @@ package org.projectforge.admin;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
@@ -32,18 +33,22 @@ import java.util.TreeSet;
 
 import org.apache.commons.io.IOUtils;
 import org.projectforge.core.UserException;
+import org.projectforge.database.DatabaseUpdateDO;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.scripting.GroovyExecutor;
 import org.projectforge.scripting.GroovyResult;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.xml.stream.AliasMap;
 import org.projectforge.xml.stream.XmlObjectReader;
 
 /**
- * Checks wether the data-base is up-to-date or not.
+ * Checks whether the data-base is up-to-date or not.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class SystemUpdater
 {
+  public static final String CORE_REGION_ID = "ProjectForge";
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SystemUpdater.class);
 
   DatabaseUpdateDao databaseUpdateDao;
@@ -139,6 +144,14 @@ public class SystemUpdater
   public void update(final UpdateEntry updateEntry)
   {
     updateEntry.runUpdate();
+    if (databaseUpdateDao.doesTableExist(DatabaseUpdateDO.TABLE_NAME) == true) {
+      databaseUpdateDao.insertInto(DatabaseUpdateDO.TABLE_NAME, new String[] { "update_date", "region_id", "version", "execution_result",
+          "executed_by", "description"}, new Object[] { new Date(), updateEntry.getRegionId(), String.valueOf(updateEntry.getVersion()),
+          updateEntry.getRunningResult(), PFUserContext.getUserId(), updateEntry.getDescription()
+      });
+    } else {
+      log.info("Data base table '" + DatabaseUpdateDO.TABLE_NAME + "' doesn't (yet) exist. Can't register update (OK).");
+    }
     updateEntry.runPreCheck();
     runAllPreChecks();
   }

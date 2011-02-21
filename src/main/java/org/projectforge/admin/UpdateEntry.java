@@ -44,6 +44,11 @@ public abstract class UpdateEntry implements Serializable, Comparable<UpdateEntr
 
   public abstract void setVersion(final Version version);
 
+  /**
+   * Identifier of the software region: core for ProjectForge core or plugin identifier.
+   */
+  public abstract String getRegionId();
+
   public UpdatePreCheckStatus getPreCheckStatus()
   {
     return preCheckStatus;

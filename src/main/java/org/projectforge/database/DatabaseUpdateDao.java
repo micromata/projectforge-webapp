@@ -321,6 +321,22 @@ public class DatabaseUpdateDao
     return counter;
   }
 
+  public void insertInto(final String table, final String[] columns, final Object[] values)
+  {
+    final StringBuffer buf = new StringBuffer();
+    buf.append("insert into ").append(table).append(" (").append(StringHelper.listToString(",", columns)).append(") values (");
+    boolean first = true;
+    for (int i = 0; i < values.length; i++) {
+      first = StringHelper.append(buf, first, "?", ",");
+    }
+    buf.append(")");
+    final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+    final String sql = buf.toString();
+    jdbc.update(sql, values);
+    log.info(sql + ". Values=" + StringHelper.listToString(", ", values));
+    jdbc.execute(sql);
+  }
+
   /**
    * There is a bug for Hibernate history with Javassist: Sometimes the data base objects are serialized with the default toString() method
    * instead of using the plain id. This method fixes all wrong data base history entries.
