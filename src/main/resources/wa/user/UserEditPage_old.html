@@ -7,16 +7,6 @@
 <body>
 <wicket:extend>
   <table class="oldform">
-    <tr class="hRuler">
-      <td colspan="4"></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="description" /></th>
-      <td colspan="3"><textarea class="stdtext" wicket:id="description" style="height: 10ex;">[Beschreibungstext]</textarea></td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="4"></td>
-    </tr>
     <tr wicket:id="rightsRows">
       <wicket:container wicket:id="rightsCols">
         <th wicket:id="label">[Parameter]</th>
@@ -24,9 +14,6 @@
           <option>[entry]</option>
         </select></td>
       </wicket:container>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="4"></td>
     </tr>
     <tr>
       <th><wicket:message key="user.assignedGroups" /></th>
@@ -60,18 +47,6 @@
       </table>
 
       </td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="4"></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="login.lastLogin" /></th>
-      <td wicket:id="lastLogin">[09/16/10]</td>
-      <th><wicket:message key="login.loginFailures" /></th>
-      <td wicket:id="loginFailures">[0]</td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="4"></td>
     </tr>
   </table>
 </wicket:extend>

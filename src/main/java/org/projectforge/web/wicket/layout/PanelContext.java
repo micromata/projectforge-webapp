@@ -58,6 +58,17 @@ public class PanelContext implements Serializable
 
   private String cssStyle;
 
+  /**
+   * Should only be used for DropDownChoices.
+   * @param data
+   * @param property
+   */
+  public PanelContext(final Object data, final String property)
+  {
+    this.data = data;
+    this.property = property;
+  }
+
   public PanelContext(final Object data, final String property, final LayoutLength valueLength, final String label,
       final LayoutLength labelLength)
   {

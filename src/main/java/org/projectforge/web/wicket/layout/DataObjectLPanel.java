@@ -298,22 +298,31 @@ public class DataObjectLPanel extends Panel
   }
 
   /**
-   * @return the created field or a dummy IField if the field is e. g. empty in read-only mode.
+   * @deprecated Use {@link #addTextArea(PanelContext)}
    */
   public IField addTextArea(final Object data, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextarea)
+  {
+    return addTextArea(new PanelContext(data, property, valueLength, label, labelLength)
+        .setBreakBetweenLabelAndField(newLineBetweenLabelAndTextarea));
+  }
+
+  /**
+   * @return the created field or a dummy IField if the field is e. g. empty in read-only mode.
+   */
+  public IField addTextArea(final PanelContext ctx)
   {
     ensureGroupPanel();
     IField field;
     if (layoutContext.isMobileReadonly() == true) {
       final String wicketId;
-      if (newLineBetweenLabelAndTextarea == true) {
+      if (ctx.isBreakBetweenLabelAndField() == true) {
         newLabelValueTablePanel();
         wicketId = LabelValueTableLPanel.WICKET_ID_LABEL;
       } else {
         wicketId = LabelValueTableLPanel.WICKET_ID_VALUE;
       }
-      final Object value = BeanHelper.getNestedProperty(data, property);
+      final Object value = BeanHelper.getNestedProperty(ctx.getData(), ctx.getProperty());
       if (isBlank(value) == true) {
         return new DummyField();
       }
@@ -324,11 +333,11 @@ public class DataObjectLPanel extends Panel
         displayValue = HtmlHelper.formatText(String.valueOf(value), true);
       }
       ensureLabelValueTablePanel();
-      final LabelLPanel labelPanel = new LabelLPanel(wicketId, valueLength, displayValue);
+      final LabelLPanel labelPanel = new LabelLPanel(wicketId, ctx.getValueLength(), displayValue);
       labelPanel.getWrappedComponent().setEscapeModelStrings(false);
-      field = labelValueTablePanel.add(label, labelPanel, newLineBetweenLabelAndTextarea);
+      field = labelValueTablePanel.add(ctx.getLabel(), labelPanel, ctx.isBreakBetweenLabelAndField());
     } else {
-      field = groupPanel.addTextArea(data, property, label, labelLength, valueLength, newLineBetweenLabelAndTextarea);
+      field = groupPanel.addTextArea(ctx);
     }
     return field;
   }
@@ -610,7 +619,6 @@ public class DataObjectLPanel extends Panel
     groupPanel.addTextField(textField, ctx);
   }
 
-
   /**
    * @param textField
    * @param valueLength
@@ -622,7 +630,7 @@ public class DataObjectLPanel extends Panel
     groupPanel.addPasswordTextField(textField, ctx);
   }
 
-/**
+  /**
    * @param textField
    * @param valueLength
    * @return
@@ -663,19 +671,38 @@ public class DataObjectLPanel extends Panel
    */
   public IField addCheckBox(final Object data, final String property)
   {
+    return addCheckBox(new PanelContext(data, property));
+  }
+
+  /**
+   * property must be of type boolean.
+   * @param data
+   * @param property
+   * @return
+   */
+  public IField addCheckBox(final PanelContext ctx)
+  {
     ensureGroupPanel();
     IField field;
     if (layoutContext.isReadonly() == true) {
-      final Object value = BeanHelper.getNestedProperty(data, property);
+      final Object value = BeanHelper.getNestedProperty(ctx.getData(), ctx.getProperty());
       if (value != null && value instanceof Boolean && ((Boolean) value) == true) {
-        field = addImage(ImageDef.ACCEPT);
+        field = new ImageLPanel(groupPanel.newChildId(), ImageDef.ACCEPT);
       } else {
-        field = addImage(ImageDef.DENY);
+        field = new ImageLPanel(groupPanel.newChildId(), ImageDef.DENY);
       }
     } else {
-      field = new CheckBoxLPanel(groupPanel.newChildId(), data, property);
-      groupPanel.add(field);
+      field = new CheckBoxLPanel(groupPanel.newChildId(), ctx.getData(), ctx.getProperty());
     }
+    if (ctx.getLabelLength() != null) {
+      final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), ctx.getLabelLength(), ctx.getLabel(), (AbstractLPanel) field,
+          ctx.isBreakBefore());
+      ctx.internalSetLabelPanel(labelPanel);
+      groupPanel.add(labelPanel);
+      ((CheckBoxLPanel) field).getCheckBox().setLabel(new Model<String>(ctx.getLabel()));
+    }
+    groupPanel.add(field);
+    ctx.internalSetValueField(field);
     return field;
   }
 

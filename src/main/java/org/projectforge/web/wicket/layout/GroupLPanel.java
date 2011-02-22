@@ -206,6 +206,29 @@ public class GroupLPanel extends Panel
     return textAreaPanel;
   }
 
+  public TextAreaLPanel addTextArea(final PanelContext ctx)
+  {
+    final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), ctx.getValueLength(), ctx.getData(), ctx.getProperty());
+    if (ctx.getLabelLength() != null) {
+      final LabelLPanel labelPanel = new LabelLPanel(newChildId(), ctx.getLabelLength(), ctx.getLabel()).setLabelFor(textAreaPanel.getTextArea());
+      labelPanel.setBreakBefore();
+      ctx.internalSetLabelPanel(labelPanel);
+      add(labelPanel);
+    }
+    if (ctx.getCssStyle() != null) {
+      textAreaPanel.setCssStyle(ctx.getCssStyle());
+    }
+    if (ctx.getLabel() != null) {
+      textAreaPanel.getTextArea().setLabel(new Model<String>(ctx.getLabel()));
+    }
+    if (ctx.isBreakBetweenLabelAndField() == true) {
+      textAreaPanel.setBreakBefore();
+    }
+    ctx.internalSetValueField(textAreaPanel);
+    add(textAreaPanel);
+    return textAreaPanel;
+  }
+
   public GroupLPanel add(final AbstractLPanel layoutPanel)
   {
     hasChildren = true;
