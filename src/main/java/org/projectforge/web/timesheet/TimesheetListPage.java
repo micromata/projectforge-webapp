@@ -45,6 +45,8 @@ import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.Hibernate;
 import org.projectforge.calendar.TimePeriod;
+import org.projectforge.common.DateFormatType;
+import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.FileHelper;
@@ -283,7 +285,7 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
       public void populateItem(Item<ICellPopulator<TimesheetDO>> item, String componentId, IModel<TimesheetDO> rowModel)
       {
         final TimesheetDO timesheet = rowModel.getObject();
-        final Label label = new Label(componentId, dateTimeFormatter.getFormattedDate(timesheet.getStartTime(), "shortDayOfWeekFormat"));
+        final Label label = new Label(componentId, dateTimeFormatter.getFormattedDate(timesheet.getStartTime(), DateFormats.getFormatString(DateFormatType.DAY_OF_WEEK_SHORT)));
         cellItemListener.populateItem(item, componentId, rowModel);
         item.add(label);
       }

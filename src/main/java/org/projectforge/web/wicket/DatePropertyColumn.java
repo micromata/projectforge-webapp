@@ -31,6 +31,8 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.common.BeanHelper;
+import org.projectforge.common.DateFormatType;
+import org.projectforge.common.DateFormats;
 import org.projectforge.web.calendar.DateTimeFormatter;
 
 
@@ -45,7 +47,7 @@ public class DatePropertyColumn<T> extends CellItemListenerPropertyColumn<T>
   
   private DateTimeFormatter dateTimeFormatter;
   
-  private String datePattern = DateTimeFormatter.I18N_KEY_SHORT_DATE_FORMAT;
+  private String datePattern = DateFormats.getFormatString(DateFormatType.DATE_SHORT);
 
   public DatePropertyColumn(final DateTimeFormatter dateTimeFormatter, final String label, final String sortProperty, final String property, CellItemListener<T> cellItemListener)
   {

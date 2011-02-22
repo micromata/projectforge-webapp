@@ -28,6 +28,8 @@ import java.math.RoundingMode;
 import java.util.List;
 
 import org.apache.poi.hssf.util.HSSFColor;
+import org.projectforge.common.DateFormatType;
+import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHolder;
 import org.projectforge.export.CellFormat;
 import org.projectforge.export.ContentProvider;
@@ -182,8 +184,8 @@ public class TimesheetExport
       mapping.add(Col.TASK_TITLE, node.getTask().getTitle());
       mapping.add(Col.TASK_PATH, taskFormatter.getTaskPath(timesheet.getTaskId(), null, true, OutputType.PLAIN));
       mapping.add(Col.WEEK_OF_YEAR, timesheet.getFormattedWeekOfYear());
-      mapping.add(Col.DAY_OF_WEEK, dateTimeFormatter.getFormattedDate(timesheet.getStartTime(),
-          DateTimeFormatter.I18N_KEY_SHORT_DAY_OF_WEEK_FORMAT));
+      mapping.add(Col.DAY_OF_WEEK, dateTimeFormatter.getFormattedDate(timesheet.getStartTime(), DateFormats
+          .getFormatString(DateFormatType.DAY_OF_WEEK_SHORT)));
       final DateHolder startTime = new DateHolder(timesheet.getStartTime());
       final DateHolder stopTime = new DateHolder(timesheet.getStopTime());
       mapping.add(Col.START_TIME, startTime);

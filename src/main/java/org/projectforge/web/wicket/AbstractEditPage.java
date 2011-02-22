@@ -43,6 +43,8 @@ import org.apache.wicket.markup.repeater.data.ListDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.DateFormatType;
+import org.projectforge.common.DateFormats;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
@@ -83,7 +85,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
 
   @SpringBean(name = "dateTimeFormatter")
   protected DateTimeFormatter dateTimeFormatter;
-  
+
   private EditPageSupport<O, D> editPageSupport;
 
   public AbstractEditPage(final PageParameters parameters, final String i18nPrefix)
@@ -139,7 +141,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
     };
     final DatePropertyColumn<DisplayHistoryEntry> timestampColumn = new DatePropertyColumn<DisplayHistoryEntry>(dateTimeFormatter,
         getString("timestamp"), null, "timestamp", cellItemListener);
-    timestampColumn.setDatePattern(DateTimeFormatter.I18N_KEY_SHORT_TIMESTAMP_FORMAT_WITH_MINUTES);
+    timestampColumn.setDatePattern(DateFormats.getFormatString(DateFormatType.TIMESTAMP_SHORT_MINUTES));
     columns.add(timestampColumn);
     columns.add(new UserPropertyColumn<DisplayHistoryEntry>(getString("user"), null, "user", cellItemListener)
         .withUserFormatter(userFormatter));
@@ -290,8 +292,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
   }
 
   /**
-   * If user tried to add a new object and an error was occurred the edit page is shown again and the object id is cleared (set to
-   * null).
+   * If user tried to add a new object and an error was occurred the edit page is shown again and the object id is cleared (set to null).
    */
   public void clearIds()
   {
@@ -490,13 +491,13 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
   {
     return null;
   }
-  
+
   @Override
   public boolean isAlreadySubmitted()
   {
     return alreadySubmitted;
   }
-  
+
   @Override
   public void setAlreadySubmitted(boolean alreadySubmitted)
   {

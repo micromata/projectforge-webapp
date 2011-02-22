@@ -32,6 +32,8 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.calendar.MonthHolder;
+import org.projectforge.common.DateFormatType;
+import org.projectforge.common.DateFormats;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserGroupCache;
@@ -143,9 +145,11 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
         }
         return parentPage.getFormattedMonthDuration()
             + " ("
-            + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getBegin(), DateTimeFormatter.I18N_KEY_DATE_NONE_YEAR_FORMAT)
+            + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getBegin(),
+                DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))
             + "-"
-            + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getEnd(), DateTimeFormatter.I18N_KEY_DATE_NONE_YEAR_FORMAT)
+            + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getEnd(),
+                DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))
             + ")";
       }
     }));

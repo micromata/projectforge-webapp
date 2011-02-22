@@ -55,6 +55,8 @@ import org.projectforge.calendar.DayHolder;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.common.ClassHelper;
+import org.projectforge.common.DateFormatType;
+import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.NumberHelper;
@@ -692,7 +694,7 @@ public class WicketUtils
       final DayHolder day = new DayHolder();
       day.add(Calendar.DAY_OF_YEAR, i);
       datumChoiceRenderer.addValue(day.getSQLDate().getTime(), DateTimeFormatter.instance().getFormattedDate(day.getSQLDate(),
-          DateTimeFormatter.I18N_KEY_LONG_DATE_FORMAT));
+          DateFormats.getFormatString(DateFormatType.DATE)));
     }
     return datumChoiceRenderer;
   }

@@ -38,6 +38,8 @@ import org.projectforge.address.AddressDO;
 import org.projectforge.address.BirthdayAddress;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.calendar.TimePeriod;
+import org.projectforge.common.DateFormatType;
+import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.web.HtmlHelper;
@@ -47,7 +49,6 @@ import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.PlainLabel;
-
 
 public class CalendarDayItem extends WebMarkupContainer
 {
@@ -69,7 +70,7 @@ public class CalendarDayItem extends WebMarkupContainer
   {
     String cssClass;
     if (day.isToday() == true) {
-			cssClass = "today";
+      cssClass = "today";
     } else if (day.isMarker() == true) {
       cssClass = "other-month";
     } else if (day.isWorkingDay() == false) {
@@ -267,7 +268,9 @@ public class CalendarDayItem extends WebMarkupContainer
       }
     };
     displayBreak.add(timePeriodLink);
-    final String timePeriodString = getFormattedTimeOfDay(timesheet.getStartTime()) + " - " + getFormattedTimeOfDay(timesheet.getStopTime());
+    final String timePeriodString = getFormattedTimeOfDay(timesheet.getStartTime())
+        + " - "
+        + getFormattedTimeOfDay(timesheet.getStopTime());
     timePeriodLink.add(new PlainLabel("timePeriod", timePeriodString));
     final Label timePeriodLabel = new PlainLabel("timePeriod", timePeriodString);
     displayBreak.add(timePeriodLabel);
@@ -319,7 +322,7 @@ public class CalendarDayItem extends WebMarkupContainer
 
   private String getFormattedTimeOfDay(Date date)
   {
-    return DateTimeFormatter.instance().getFormattedDateTime(date, DateTimeFormatter.I18N_KEY_TIMEOFDAY_FORMAT);
+    return DateTimeFormatter.instance().getFormattedDateTime(date, DateFormats.getFormatString(DateFormatType.TIME_OF_DAY_MINUTES));
   }
 
   private void addBirthdays(final DayHolder day)
@@ -348,7 +351,7 @@ public class CalendarDayItem extends WebMarkupContainer
     AddressDO address = birthdayAddress.getAddress();
     if (birthdayAddress.getAge() > 0) {
       // Birthday is not visible for all users (age == 0).
-      buf.append(DateTimeFormatter.instance().getFormattedDate(address.getBirthday(), DateTimeFormatter.I18N_KEY_SHORT_DATE_FORMAT))
+      buf.append(DateTimeFormatter.instance().getFormattedDate(address.getBirthday(), DateFormats.getFormatString(DateFormatType.DATE_SHORT)))
           .append(" ");
     }
     buf.append(HtmlHelper.escapeXml(address.getFirstName())).append(" ").append(HtmlHelper.escapeXml(address.getName()));
