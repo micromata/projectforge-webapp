@@ -46,7 +46,7 @@ import org.projectforge.user.UserRights;
  */
 public class AccessChecker
 {
-  private static final String I18N_KEY_VIOLATION_USER_NOT_MEMBER_OF = "access.violation.userNotMemberOf";
+  public static final String I18N_KEY_VIOLATION_USER_NOT_MEMBER_OF = "access.violation.userNotMemberOf";
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AccessChecker.class);
 
