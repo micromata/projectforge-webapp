@@ -26,6 +26,7 @@ package org.projectforge.web.wicket.layout;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -470,10 +471,13 @@ public class DataObjectLPanel extends Panel
       groupPanel.add(labelPanel);
     }
     if (ctx.getLabel() != null) {
-      ((ListMultipleChoiceLPanel) field).getListMultipleChoice().setLabel(new Model<String>(ctx.getLabel()));
+      listMultipleChoice.setLabel(new Model<String>(ctx.getLabel()));
     }
     if (ctx.isBreakBetweenLabelAndField() == true) {
       ((ListMultipleChoiceLPanel) field).setBreakBefore();
+    }
+    if (ctx.getCssStyle() != null) {
+      listMultipleChoice.add(new SimpleAttributeModifier("style", ctx.getCssStyle()));
     }
     groupPanel.add(field);
     ctx.internalSetValueField(field);

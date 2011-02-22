@@ -344,9 +344,9 @@ public class UserFormRenderer extends AbstractDOFormRenderer
     valuesToUnassignChoice.setModel(new PropertyModel<Collection<Integer>>(this, "valuesToUnassign"));
 
     doPanel.addListMultipleChoice(valuesToUnassignChoice, new PanelContext(FULL, getString("user.assignedGroups"), labelLength)
-        .setBreakBetweenLabelAndField(true));
+        .setBreakBetweenLabelAndField(true).setCssStyle("width: 30em;"));
     doPanel.addListMultipleChoice(valuesToAssignChoice, new PanelContext(FULL, getString("user.unassignedGroups"), labelLength)
-        .setBreakBetweenLabelAndField(true));
+        .setBreakBetweenLabelAndField(true).setCssStyle("width: 30em;"));
 
     final RepeatingView repeatingView = doPanel.addRepeater(LayoutLength.ONEHALF).getRepeatingView();
     final SubmitLink unassignButton = new SubmitLink("unassignButton") {
