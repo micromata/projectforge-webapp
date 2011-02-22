@@ -23,11 +23,18 @@
 
 package org.projectforge.web.admin;
 
+import javax.sql.DataSource;
+
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.access.AccessChecker;
+import org.projectforge.access.AccessException;
 import org.projectforge.admin.SystemUpdater;
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.admin.UpdateEntryScript;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.web.LoginPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.xml.stream.XmlHelper;
@@ -41,6 +48,9 @@ public class SystemUpdatePage extends AbstractSecuredPage
 
   @SpringBean(name = "systemUpdater")
   protected SystemUpdater systemUpdater;
+
+  @SpringBean(name = "dataSource")
+  protected DataSource dataSource;
 
   private SystemUpdateForm form;
 
@@ -68,7 +78,7 @@ public class SystemUpdatePage extends AbstractSecuredPage
 
   protected void update(final UpdateEntry updateEntry)
   {
-    accessChecker.checkIsUserMemberOfAdminGroup();
+    checkAdminUser();
     accessChecker.checkDemoUser();
     systemUpdater.update(updateEntry);
     refresh();
@@ -76,9 +86,15 @@ public class SystemUpdatePage extends AbstractSecuredPage
 
   protected void refresh()
   {
-    accessChecker.checkIsUserMemberOfAdminGroup();
+    checkAdminUser();
     systemUpdater.runAllPreChecks();
     form.updateEntryRows();
+  }
+  
+  private void checkAdminUser() {
+    if (LoginPage.isAdminUser(PFUserContext.getUser(), dataSource) == false) {
+      throw new AccessException(AccessChecker.I18N_KEY_VIOLATION_USER_NOT_MEMBER_OF, ProjectForgeGroup.ADMIN_GROUP.getKey());
+    }
   }
 
   @Override
