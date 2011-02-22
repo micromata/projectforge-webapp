@@ -51,9 +51,9 @@ public class DateHolderTest
     cal.set(2008, Calendar.MARCH, 5, 0, 0, 0);
     cal.set(Calendar.MILLISECOND, 0);
     DateHolder date = new DateHolder(cal.getTime(), DateHelper.EUROPE_BERLIN);
-    assertEquals("2008-03-04 23:00:00.0", DateHelper.FOR_TESTCASE_OUTPUT_FORMATTER.get().format(date.getDate()));
+    assertEquals("2008-03-04 23:00:00.000", DateHelper.FOR_TESTCASE_OUTPUT_FORMATTER.get().format(date.getDate()));
     java.sql.Date sqlDate = date.getSQLDate();
-    assertEquals("2008-03-05 00:00:00.0", DateHelper.FOR_TESTCASE_OUTPUT_FORMATTER.get().format(sqlDate));
+    assertEquals("2008-03-05 00:00:00.000", DateHelper.FOR_TESTCASE_OUTPUT_FORMATTER.get().format(sqlDate));
     assertTrue(date.isSameDay(sqlDate) == true);
   }
 
@@ -64,9 +64,9 @@ public class DateHolderTest
     cal.set(2008, Calendar.MARCH, 5, 0, 0, 0);
     cal.set(Calendar.MILLISECOND, 0);
     DateHolder date = new DateHolder(cal.getTime(), DateHelper.EUROPE_BERLIN);
-    assertEquals("2008-03-04 23:00:00.0", DateHelper.FOR_TESTCASE_OUTPUT_FORMATTER.get().format(date.getDate()));
+    assertEquals("2008-03-04 23:00:00.000", DateHelper.FOR_TESTCASE_OUTPUT_FORMATTER.get().format(date.getDate()));
     java.sql.Date sqlDate = date.getSQLDate();
-    assertEquals("2008-03-05 00:00:00.0", DateHelper.FOR_TESTCASE_OUTPUT_FORMATTER.get().format(sqlDate));
+    assertEquals("2008-03-05 00:00:00.000", DateHelper.FOR_TESTCASE_OUTPUT_FORMATTER.get().format(sqlDate));
   }
 
   @Test
@@ -126,22 +126,22 @@ public class DateHolderTest
   public void ensurePrecision()
   {
     DateHolder dateHolder = new DateHolder(DatePrecision.DAY, DateHelper.UTC, Locale.GERMAN);
-    assertPrecision("1970-11-21 00:00:00.0", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 50, 23);
+    assertPrecision("1970-11-21 00:00:00.000", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 50, 23);
     dateHolder.setPrecision(DatePrecision.HOUR_OF_DAY);
-    assertPrecision("1970-11-21 04:00:00.0", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 50, 23);
+    assertPrecision("1970-11-21 04:00:00.000", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 50, 23);
     dateHolder.setPrecision(DatePrecision.MINUTE);
-    assertPrecision("1970-11-21 04:50:00.0", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 50, 23);
+    assertPrecision("1970-11-21 04:50:00.000", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 50, 23);
     dateHolder.setPrecision(DatePrecision.MINUTE_15);
-    assertPrecision("1970-11-21 04:00:00.0", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 00, 00);
-    assertPrecision("1970-11-21 04:00:00.0", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 14, 59);
-    assertPrecision("1970-11-21 04:15:00.0", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 15, 00);
-    assertPrecision("1970-11-21 04:15:00.0", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 29, 59);
-    assertPrecision("1970-11-21 04:30:00.0", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 30, 00);
-    assertPrecision("1970-11-21 04:30:00.0", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 44, 59);
-    assertPrecision("1970-11-21 04:45:00.0", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 45, 00);
-    assertPrecision("1970-11-21 04:45:00.0", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 59, 59);
+    assertPrecision("1970-11-21 04:00:00.000", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 00, 00);
+    assertPrecision("1970-11-21 04:00:00.000", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 14, 59);
+    assertPrecision("1970-11-21 04:15:00.000", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 15, 00);
+    assertPrecision("1970-11-21 04:15:00.000", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 29, 59);
+    assertPrecision("1970-11-21 04:30:00.000", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 30, 00);
+    assertPrecision("1970-11-21 04:30:00.000", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 44, 59);
+    assertPrecision("1970-11-21 04:45:00.000", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 45, 00);
+    assertPrecision("1970-11-21 04:45:00.000", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 59, 59);
     dateHolder.setPrecision(DatePrecision.SECOND);
-    assertPrecision("1970-11-21 04:50:23.0", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 50, 23);
+    assertPrecision("1970-11-21 04:50:23.000", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 50, 23);
   }
 
   private void assertPrecision(String expected, DateHolder dateHolder, int year, int month, int date, int hourOfDay, int minute, int second)
@@ -156,11 +156,11 @@ public class DateHolderTest
   {
     DateHolder dateHolder = new DateHolder(DatePrecision.DAY, DateHelper.UTC, Locale.GERMAN);
     dateHolder.setDate(1970, Calendar.NOVEMBER, 21, 4, 50, 23);
-    assertEquals("1970-11-21 00:00:00.0", DateHelper.getForTestCase(dateHolder.getDate()));
+    assertEquals("1970-11-21 00:00:00.000", DateHelper.getForTestCase(dateHolder.getDate()));
     dateHolder.setBeginOfMonth();
-    assertEquals("1970-11-01 00:00:00.0", DateHelper.getForTestCase(dateHolder.getDate()));
+    assertEquals("1970-11-01 00:00:00.000", DateHelper.getForTestCase(dateHolder.getDate()));
     dateHolder.setDate(1970, Calendar.NOVEMBER, 21, 4, 50, 23);
-    assertEquals("1970-11-21 00:00:00.0", DateHelper.getForTestCase(dateHolder.getDate()));
+    assertEquals("1970-11-21 00:00:00.000", DateHelper.getForTestCase(dateHolder.getDate()));
     dateHolder.setEndOfMonth();
     assertEquals("1970-11-30 23:59:59.999", DateHelper.getForTestCase(dateHolder.getDate()));
 
@@ -181,13 +181,13 @@ public class DateHolderTest
   {
     DateHolder dateHolder = new DateHolder(DatePrecision.DAY, DateHelper.UTC, Locale.GERMAN);
     dateHolder.setDate(1970, Calendar.NOVEMBER, 21, 4, 50, 23);
-    assertEquals("1970-11-21 00:00:00.0", DateHelper.getForTestCase(dateHolder.getDate()));
+    assertEquals("1970-11-21 00:00:00.000", DateHelper.getForTestCase(dateHolder.getDate()));
     dateHolder.setBeginOfWeek();
-    assertEquals("1970-11-16 00:00:00.0", DateHelper.getForTestCase(dateHolder.getDate()));
+    assertEquals("1970-11-16 00:00:00.000", DateHelper.getForTestCase(dateHolder.getDate()));
     dateHolder.setEndOfWeek();
     assertEquals("1970-11-22 23:59:59.999", DateHelper.getForTestCase(dateHolder.getDate()));
     dateHolder.setBeginOfWeek();
-    assertEquals("1970-11-16 00:00:00.0", DateHelper.getForTestCase(dateHolder.getDate()));
+    assertEquals("1970-11-16 00:00:00.000", DateHelper.getForTestCase(dateHolder.getDate()));
 
     dateHolder = new DateHolder(DatePrecision.DAY, DateHelper.UTC, Locale.GERMAN);
     dateHolder.setDate(1970, Calendar.NOVEMBER, 21, 4, 50, 23);
@@ -201,14 +201,14 @@ public class DateHolderTest
     DateHolder dateHolder = new DateHolder(DatePrecision.MINUTE, DateHelper.UTC, Locale.GERMAN);
     dateHolder.setDate(2010, Calendar.MAY, 21, 4, 50, 23); // Friday
     dateHolder.addWorkingDays(0);
-    assertEquals("2010-05-21 04:50:00.0", DateHelper.getForTestCase(dateHolder.getDate()));
+    assertEquals("2010-05-21 04:50:00.000", DateHelper.getForTestCase(dateHolder.getDate()));
     dateHolder.addWorkingDays(1); // Skip saturday, sunday and whit monday and weekend.
-    assertEquals("2010-05-25 04:50:00.0", DateHelper.getForTestCase(dateHolder.getDate()));
+    assertEquals("2010-05-25 04:50:00.000", DateHelper.getForTestCase(dateHolder.getDate()));
     dateHolder.addWorkingDays(-1); // Skip saturday, sunday and whit monday and weekend.
-    assertEquals("2010-05-21 04:50:00.0", DateHelper.getForTestCase(dateHolder.getDate()));
+    assertEquals("2010-05-21 04:50:00.000", DateHelper.getForTestCase(dateHolder.getDate()));
     dateHolder.addWorkingDays(1); // Skip saturday, sunday and whit monday and weekend.
     dateHolder.addWorkingDays(-6); // Skip saturday, sunday and whit monday and weekends.
-    assertEquals("2010-05-14 04:50:00.0", DateHelper.getForTestCase(dateHolder.getDate()));
+    assertEquals("2010-05-14 04:50:00.000", DateHelper.getForTestCase(dateHolder.getDate()));
   }
 
   private int daysBetween(final DateHolder date1, final DateHolder date2)
