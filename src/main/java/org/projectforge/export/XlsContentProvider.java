@@ -27,7 +27,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.lang.BooleanUtils;
@@ -38,9 +37,10 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
 import org.projectforge.calendar.DayHolder;
+import org.projectforge.common.DateFormatType;
+import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.xls.Formula;
 
 public class XlsContentProvider implements ContentProvider
@@ -103,14 +103,13 @@ public class XlsContentProvider implements ContentProvider
   {
     this.workbook = workbook;
     createFonts();
-    final ResourceBundle bundle = getResourceBundle();
-    defaultFormatMap.put(Date.class, new CellFormat(bundle.getString("excel.format.date.minute")));
-    defaultFormatMap.put(java.sql.Date.class, new CellFormat(bundle.getString("excel.format.date.day")));
+    defaultFormatMap.put(Date.class, new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_TIMESTAMP_MINUTES)));
+    defaultFormatMap.put(java.sql.Date.class, new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_DATE)));
     defaultFormatMap.put(Integer.class, new CellFormat("#,##0", CellStyle.ALIGN_RIGHT));
     defaultFormatMap.put(Number.class, new CellFormat("#,###.######", CellStyle.ALIGN_RIGHT));
     defaultFormatMap.put(DateHolder.class, new CellFormat("YYYY-MM-DD").setAutoDatePrecision(true)); // format unused.
-    defaultFormatMap.put(DayHolder.class, new CellFormat(bundle.getString("excel.format.date.day")));
-    defaultFormatMap.put(java.sql.Timestamp.class, new CellFormat(bundle.getString("excel.format.timestamp")));
+    defaultFormatMap.put(DayHolder.class, new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_DATE)));
+    defaultFormatMap.put(java.sql.Timestamp.class, new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_TIMESTAMP_MILLIS)));
   }
 
   public void updateSheetStyle(ExportSheet sheet)
@@ -248,16 +247,15 @@ public class XlsContentProvider implements ContentProvider
     if (value != null && DateHolder.class.isAssignableFrom(value.getClass()) == true && BooleanUtils.isTrue(format.getAutoDatePrecision()) == true) {
       // Find a format dependent on the precision:
       final DatePrecision precision = ((DateHolder) value).getPrecision();
-      final ResourceBundle bundle = getResourceBundle();
       if (precision == DatePrecision.DAY) {
-        return new CellFormat(bundle.getString("excel.format.date.day"));
+        return new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_DATE));
       } else if (precision == DatePrecision.SECOND) {
-        return new CellFormat(bundle.getString("excel.format.date.second"));
+        return new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_TIMESTAMP_SECONDS));
       } else if (precision == DatePrecision.MILLISECOND) {
-        return new CellFormat(bundle.getString("excel.format.date.millis"));
+        return new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_TIMESTAMP_MILLIS));
       } else {
         // HOUR_OF_DAY, MINUTE, MINUTE_15 or null
-        return new CellFormat(bundle.getString("excel.format.date.minute"));
+        return new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_TIMESTAMP_MINUTES));
       }
     }
     return format.clone();
@@ -322,10 +320,5 @@ public class XlsContentProvider implements ContentProvider
     FONT_RED_BOLD.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
 
     FONT_NORMAL = workbook.createFont();
-  }
-
-  private ResourceBundle getResourceBundle()
-  {
-    return PFUserContext.getResourceBundle(workbook.getLocale());
   }
 }
