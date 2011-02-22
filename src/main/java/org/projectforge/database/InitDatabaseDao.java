@@ -25,7 +25,6 @@ package org.projectforge.database;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -63,6 +62,8 @@ public class InitDatabaseDao extends HibernateDaoSupport
 
   private DatabaseDao databaseDao;
 
+  private DatabaseUpdateDao databaseUpdateDao;
+
   private UserGroupCache userGroupCache;
 
   private GroupDao groupDao;
@@ -77,7 +78,12 @@ public class InitDatabaseDao extends HibernateDaoSupport
   {
     this.databaseDao = databaseDao;
   }
-  
+
+  public void setDatabaseUpdateDao(DatabaseUpdateDao databaseUpdateDao)
+  {
+    this.databaseUpdateDao = databaseUpdateDao;
+  }
+
   public void setUserDao(UserDao userDao)
   {
     this.userDao = userDao;
@@ -184,7 +190,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     } else {
       user.setUsername(adminUsername);
       if (encryptedAdminPassword != null) {
-        // Should only null for test cases.
+        // Should only be null for test cases.
         user.setPassword(encryptedAdminPassword);
       }
       user.setTimeZone(adminUserTimezone);
@@ -199,12 +205,13 @@ public class InitDatabaseDao extends HibernateDaoSupport
 
   public boolean isEmpty()
   {
-    if (userGroupCache.getNumberOfUsers() == 0) {
-      // Additional check for safety:
-      final List<PFUserDO> users = userDao.internalLoadAll();
-      if (users == null || users.size() == 0) {
-        return true;
+    try {
+      if (userGroupCache.getNumberOfUsers() == 0) {
+        return databaseUpdateDao.internalDoesTableExist("t_user") == true;
       }
+    } catch (final Exception ex) {
+      // In the case, that user table is not readable.
+      return databaseUpdateDao.internalDoesTableExist("t_user") == true;
     }
     return false;
   }
