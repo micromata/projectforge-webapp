@@ -61,7 +61,7 @@ public class UserDao extends BaseDao<PFUserDO>
 
   private static final String MESSAGE_KEY_OLD_PASSWORD_WRONG = "user.changePassword.error.oldPasswordWrong";
 
-  static final String MESSAGE_KEY_PASSWORD_QUALITY_CHECK_FAILED = "user.changePassword.error.passwordQualityCheckFailed";
+  public static final String MESSAGE_KEY_PASSWORD_QUALITY_CHECK = "user.changePassword.error.passwordQualityCheck";
 
   public UserDao()
   {
@@ -362,7 +362,7 @@ public class UserDao extends BaseDao<PFUserDO>
     boolean letter = false;
     boolean nonLetter = false;
     if (newPassword == null || newPassword.length() < 6) {
-      return MESSAGE_KEY_PASSWORD_QUALITY_CHECK_FAILED;
+      return MESSAGE_KEY_PASSWORD_QUALITY_CHECK;
     }
     for (int i = 0; i < newPassword.length(); i++) {
       char ch = newPassword.charAt(i);
@@ -375,7 +375,7 @@ public class UserDao extends BaseDao<PFUserDO>
     if (letter == true && nonLetter == true) {
       return null;
     }
-    return MESSAGE_KEY_PASSWORD_QUALITY_CHECK_FAILED;
+    return MESSAGE_KEY_PASSWORD_QUALITY_CHECK;
   }
 
   @SuppressWarnings("unchecked")
