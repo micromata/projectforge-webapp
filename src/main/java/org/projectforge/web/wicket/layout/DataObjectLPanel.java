@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.ListMultipleChoice;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -444,11 +445,37 @@ public class DataObjectLPanel extends Panel
       field = labelValueTablePanel.add(ctx.getLabel(), (WebMarkupContainer) labelPanel);
     } else {
       field = new DropDownChoiceLPanel(groupPanel.newChildId(), ctx.getValueLength(), dropDownChoice);
-      labelPanel = new LabelLPanel(groupPanel.newChildId(), ctx.getLabelLength(), ctx.getLabel(), (AbstractLPanel) field, true);
-      groupPanel.add(labelPanel);
-      ((DropDownChoiceLPanel) field).getDropDownChoice().setLabel(new Model<String>(ctx.getLabel()));
+      if (ctx.getLabelLength() != null) {
+        labelPanel = new LabelLPanel(groupPanel.newChildId(), ctx.getLabelLength(), ctx.getLabel(), (AbstractLPanel) field, true);
+        groupPanel.add(labelPanel);
+      }
+      if (ctx.getLabel() != null) {
+        ((DropDownChoiceLPanel) field).getDropDownChoice().setLabel(new Model<String>(ctx.getLabel()));
+      }
       groupPanel.add(field);
     }
+    ctx.internalSetValueField(field);
+    ctx.internalSetLabelPanel(labelPanel);
+    return field;
+  }
+
+  public IField addListMultipleChoice(final ListMultipleChoice< ? > listMultipleChoice, final PanelContext ctx)
+  {
+    ensureGroupPanel();
+    IField field;
+    LabelLPanel labelPanel = null;
+    field = new ListMultipleChoiceLPanel(groupPanel.newChildId(), ctx.getValueLength(), listMultipleChoice);
+    if (ctx.getLabelLength() != null) {
+      labelPanel = new LabelLPanel(groupPanel.newChildId(), ctx.getLabelLength(), ctx.getLabel(), (AbstractLPanel) field, true);
+      groupPanel.add(labelPanel);
+    }
+    if (ctx.getLabel() != null) {
+      ((ListMultipleChoiceLPanel) field).getListMultipleChoice().setLabel(new Model<String>(ctx.getLabel()));
+    }
+    if (ctx.isBreakBetweenLabelAndField() == true) {
+      ((ListMultipleChoiceLPanel) field).setBreakBefore();
+    }
+    groupPanel.add(field);
     ctx.internalSetValueField(field);
     ctx.internalSetLabelPanel(labelPanel);
     return field;

@@ -86,6 +86,11 @@ public class PanelContext implements Serializable
     this.labelLength = labelLength;
   }
 
+  public PanelContext(final LayoutLength valueLength)
+  {
+    this.valueLength = valueLength;
+  }
+
   public String getLabel()
   {
     return label;

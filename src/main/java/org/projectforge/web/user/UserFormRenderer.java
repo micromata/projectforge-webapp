@@ -40,8 +40,8 @@ import org.apache.wicket.markup.html.form.ListMultipleChoice;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
 import org.projectforge.common.KeyValueBean;
@@ -67,6 +67,7 @@ import org.projectforge.web.wicket.layout.DropDownChoiceLPanel;
 import org.projectforge.web.wicket.layout.IField;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.LayoutLength;
+import org.projectforge.web.wicket.layout.ListMultipleChoiceLPanel;
 import org.projectforge.web.wicket.layout.PanelContext;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
@@ -269,6 +270,7 @@ public class UserFormRenderer extends AbstractDOFormRenderer
     // </tr>
 
     addRights();
+    addAssignedGroups();
   }
 
   protected void validation()
@@ -306,8 +308,11 @@ public class UserFormRenderer extends AbstractDOFormRenderer
     }
   }
 
-  private void foo()
+  @SuppressWarnings( { "unchecked", "serial"})
+  private void addAssignedGroups()
   {
+    doPanel.newFieldSetPanel(getString("group.groups"));
+
     List<Integer> groupsToAdd = null;
     if (data != null) {
       if (TUTORIAL_DEFAULT_PASSWORD.equals(data.getPassword()) == true) {
@@ -316,19 +321,6 @@ public class UserFormRenderer extends AbstractDOFormRenderer
       }
       groupsToAdd = (List<Integer>) parentPage.getPageParameters().get(TUTORIAL_ADD_GROUPS);
     }
-
-    final SubmitLink unassignButton = new SubmitLink("unassignButton") {
-      public void onSubmit()
-      {
-        groups.unassign(valuesToUnassign);
-        valuesToUnassign.clear();
-        refreshGroupLists();
-      };
-    };
-    add(unassignButton);
-    unassignButton.add(new TooltipImage("buttonUnassignImage", parentPage.getResponse(), WebConstants.IMAGE_BUTTON_ASSIGN_TO_RIGHT,
-        getString("tooltip.unassign")));
-
     final List<Integer> assignedGroups = new ArrayList<Integer>();
     final Collection<Integer> set = userDao.getAssignedGroups(data);
     if (set != null) {
@@ -336,17 +328,6 @@ public class UserFormRenderer extends AbstractDOFormRenderer
         assignedGroups.add(groupId);
       }
     }
-    final SubmitLink assignButton = new SubmitLink("assignButton") {
-      public void onSubmit()
-      {
-        groups.assign(valuesToAssign);
-        valuesToAssign.clear();
-        refreshGroupLists();
-      };
-    };
-    add(assignButton);
-    assignButton.add(new TooltipImage("buttonAssignImage", parentPage.getResponse(), WebConstants.IMAGE_BUTTON_ASSIGN_TO_LEFT,
-        getString("tooltip.assign")));
     final List<KeyValueBean<Integer, String>> fullList = new ArrayList<KeyValueBean<Integer, String>>();
     final List<GroupDO> result = (List<GroupDO>) groupDao.getList(groupDao.getDefaultFilter());
     for (final GroupDO group : result) {
@@ -357,12 +338,40 @@ public class UserFormRenderer extends AbstractDOFormRenderer
       groups.assign(groupsToAdd);
     }
     this.groups.sortLists();
-    valuesToAssignChoice = new ListMultipleChoice<Integer>("valuesToAssign");
+    valuesToAssignChoice = new ListMultipleChoice<Integer>(ListMultipleChoiceLPanel.SELECT_ID);
     valuesToAssignChoice.setModel(new PropertyModel<Collection<Integer>>(this, "valuesToAssign"));
-    add(valuesToAssignChoice);
-    valuesToUnassignChoice = new ListMultipleChoice<Integer>("valuesToUnassign");
+    valuesToUnassignChoice = new ListMultipleChoice<Integer>(ListMultipleChoiceLPanel.SELECT_ID);
     valuesToUnassignChoice.setModel(new PropertyModel<Collection<Integer>>(this, "valuesToUnassign"));
-    add(valuesToUnassignChoice);
+
+    doPanel.addListMultipleChoice(valuesToUnassignChoice, new PanelContext(FULL, getString("user.assignedGroups"), labelLength)
+        .setBreakBetweenLabelAndField(true));
+    doPanel.addListMultipleChoice(valuesToAssignChoice, new PanelContext(FULL, getString("user.unassignedGroups"), labelLength)
+        .setBreakBetweenLabelAndField(true));
+
+    final RepeatingView repeatingView = doPanel.addRepeater(LayoutLength.ONEHALF).getRepeatingView();
+    final SubmitLink unassignButton = new SubmitLink("unassignButton") {
+      public void onSubmit()
+      {
+        groups.unassign(valuesToUnassign);
+        valuesToUnassign.clear();
+        refreshGroupLists();
+      };
+    };
+    repeatingView.add(unassignButton);
+    unassignButton.add(new TooltipImage("buttonUnassignImage", parentPage.getResponse(), WebConstants.IMAGE_BUTTON_ASSIGN_TO_RIGHT,
+        getString("tooltip.unassign")));
+
+    final SubmitLink assignButton = new SubmitLink("assignButton") {
+      public void onSubmit()
+      {
+        groups.assign(valuesToAssign);
+        valuesToAssign.clear();
+        refreshGroupLists();
+      };
+    };
+    repeatingView.add(assignButton);
+    assignButton.add(new TooltipImage("buttonAssignImage", parentPage.getResponse(), WebConstants.IMAGE_BUTTON_ASSIGN_TO_LEFT,
+        getString("tooltip.assign")));
     refreshGroupLists();
   }
 
