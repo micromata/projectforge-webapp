@@ -99,7 +99,7 @@ public abstract class UserBaseEditForm<P extends AbstractEditPage< ? , ? , ? >> 
       add(localeChoice);
     }
     add(new TimeZonePanel("timezoneChoice", new PropertyModel<TimeZone>(getData(), "timeZoneObject")));
-    add(new MaxLengthTextField("organization", new PropertyModel<String>(getData(), "organization")));
+    add(new MaxLengthTextField(this, "organization", getString("organization"), new PropertyModel<String>(getData(), "organization")));
 
     add(new MaxLengthTextField("personalPhoneIdentifiers", new PropertyModel<String>(getData(), "personalPhoneIdentifiers")));
     final WebMarkupContainer mebMobileNumbersRow = new WebMarkupContainer("mebMobileNumbersRow");
