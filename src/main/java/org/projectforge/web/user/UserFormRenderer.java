@@ -26,8 +26,10 @@ package org.projectforge.web.user;
 import static org.projectforge.web.wicket.layout.DropDownChoiceLPanel.SELECT_ID;
 import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -75,6 +77,8 @@ import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
 public class UserFormRenderer extends AbstractDOFormRenderer
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserFormRenderer.class);
+
   public static final String TUTORIAL_DEFAULT_PASSWORD = "test";
 
   public static final String TUTORIAL_ADD_GROUPS = "addGroups";
@@ -169,6 +173,11 @@ public class UserFormRenderer extends AbstractDOFormRenderer
       };
       doPanel.addDropDownChoice(localeChoice, new PanelContext(FULL, getString("user.locale"), labelLength));
     }
+
+    final Date today = new Date();
+    addDateFormatCombobox(today, "dateFormat", "dateFormat", Configuration.getInstance().getDateFormats(), false);
+    addDateFormatCombobox(today, "dateFormat.xls", "excelDateFormat", Configuration.getInstance().getExcelDateFormats(), true);
+
     final TimeZoneField timeZone = new TimeZoneField(TextFieldLPanel.INPUT_ID, new PropertyModel<TimeZone>(data, "timeZoneObject"));
     doPanel.addTextField(timeZone, new PanelContext(FULL, getString("timezone"), labelLength)
         .setTooltip(getString("tooltip.autocomplete.timeZone")));
@@ -256,23 +265,30 @@ public class UserFormRenderer extends AbstractDOFormRenderer
     doPanel.addLabel(getString("login.loginFailures"), labelLength).setBreakBefore();
     doPanel.addLabel(NumberFormatter.format(data.getLoginFailures()), FULL);
 
-    // final LabelValueChoiceRenderer<String> dateFormatChoiceRenderer = new LabelValueChoiceRenderer<String>(container,
-    // Configuration.getInstance().get);
-    // final DropDownChoice<UserRightValue> valueChoice = new DropDownChoice<UserRightValue>("valueChoice",
-    // new PropertyModel<UserRightValue>(rightVO, "value"), valueChoiceRenderer.getValues(), valueChoiceRenderer);
-    // valueChoice.setNullValid(true);
-    // doPanel.addDropDownChoice(valueChoice, new PanelContext(FULL, label, labelLength));
-
-    // <th><wicket:message key="dateFormat" /> / <wicket:message key="dateFormat.xls" /></th>
-    // <td><select wicket:id="dateFormatChoice">
-    // <option>[MM/dd/yyyy]</option>
-    // </select> / <select wicket:id="excelDateFormatChoice">
-    // <option>[MM/DD/YYYY]</option>
-    // </select></td>
-    // </tr>
-
     addAssignedGroups();
     addRights();
+  }
+
+  private void addDateFormatCombobox(final Date today, final String labelKey, final String property, final String[] dateFormats,
+      final boolean convertExcelFormat)
+  {
+    final LabelValueChoiceRenderer<String> dateFormatChoiceRenderer = new LabelValueChoiceRenderer<String>();
+    for (final String str : dateFormats) {
+      String dateString = "???";
+      final String pattern = convertExcelFormat == true ? str.replace('Y', 'y').replace('D', 'd') : str;
+      try {
+        final SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+        dateString = dateFormat.format(today);
+      } catch (final Exception ex) {
+        log.warn("Invalid date format in config.xml: " + pattern);
+      }
+      dateFormatChoiceRenderer.addValue(str, str + ": " + dateString);
+    }
+    @SuppressWarnings("unchecked")
+    final DropDownChoice dateFormatChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, property), dateFormatChoiceRenderer
+        .getValues(), dateFormatChoiceRenderer);
+    dateFormatChoice.setNullValid(true);
+    doPanel.addDropDownChoice(dateFormatChoice, new PanelContext(FULL, getString(labelKey), labelLength));
   }
 
   protected void validation()
