@@ -152,7 +152,7 @@ public class HRPlanningTest extends TestBase
   public void getFirstDayOfWeek()
   {
     final java.sql.Date date = createDate(2010, Calendar.JANUARY, 9, 1, 10, 57, 456);
-    assertEquals("2010-01-04 00:00:00.0 +0000", DateHelper.formatAsUTC(HRPlanningDO.getFirstDayOfWeek(date)));
+    assertEquals("2010-01-04 00:00:00.000 +0000", DateHelper.formatAsUTC(HRPlanningDO.getFirstDayOfWeek(date)));
   }
 
   @Test
@@ -165,14 +165,14 @@ public class HRPlanningTest extends TestBase
     firstDayOfWeek.setDate(2010, Calendar.JANUARY, 4, 0, 0, 0, 0);
     final long millis = firstDayOfWeek.getTimeInMillis();
     planning.setFirstDayOfWeek(date);
-    assertEquals("2010-01-04 00:00:00.0 +0000", DateHelper.formatAsUTC(planning.getWeek()));
+    assertEquals("2010-01-04 00:00:00.000 +0000", DateHelper.formatAsUTC(planning.getWeek()));
     assertEquals(millis, planning.getWeek().getTime());
     // planning.setWeek(date);
     planning.setUser(getUser(TestBase.TEST_USER));
-    assertEquals("2010-01-04 00:00:00.0 +0000", DateHelper.formatAsUTC(planning.getWeek()));
+    assertEquals("2010-01-04 00:00:00.000 +0000", DateHelper.formatAsUTC(planning.getWeek()));
     final Serializable id = hrPlanningDao.save(planning);
     planning = hrPlanningDao.getById(id);
-    assertEquals("2010-01-04 00:00:00.0 +0000", DateHelper.formatAsUTC(planning.getWeek()));
+    assertEquals("2010-01-04 00:00:00.000 +0000", DateHelper.formatAsUTC(planning.getWeek()));
   }
 
   @Test
