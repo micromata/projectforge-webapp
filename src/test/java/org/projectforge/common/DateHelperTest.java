@@ -62,7 +62,7 @@ public class DateHelperTest extends TestBase
   @Test
   public void formatIsoTimestamp()
   {
-    assertEquals("1970-11-21 17:00:00.0", DateHelper.formatIsoTimestamp(createDate(1970, Calendar.NOVEMBER, 21, 17, 0, 0, 0)));
+    assertEquals("1970-11-21 17:00:00.000", DateHelper.formatIsoTimestamp(createDate(1970, Calendar.NOVEMBER, 21, 17, 0, 0, 0)));
     assertEquals("1970-11-21 17:05:07.123", DateHelper.formatIsoTimestamp(createDate(1970, Calendar.NOVEMBER, 21, 17, 5, 7, 123)));
   }
 
