@@ -144,16 +144,16 @@ public class UserTest extends TestBase
   @Test
   public void testPasswordQuality()
   {
-    assertEquals("Empty password not allowed.", UserDao.MESSAGE_KEY_PASSWORD_QUALITY_CHECK_FAILED, userDao.checkPasswordQuality(null));
-    assertEquals("Password with less than 6 characters not allowed.", UserDao.MESSAGE_KEY_PASSWORD_QUALITY_CHECK_FAILED, userDao
+    assertEquals("Empty password not allowed.", UserDao.MESSAGE_KEY_PASSWORD_QUALITY_CHECK, userDao.checkPasswordQuality(null));
+    assertEquals("Password with less than 6 characters not allowed.", UserDao.MESSAGE_KEY_PASSWORD_QUALITY_CHECK, userDao
         .checkPasswordQuality(""));
-    assertEquals("Password with less than 6 characters not allowed.", UserDao.MESSAGE_KEY_PASSWORD_QUALITY_CHECK_FAILED, userDao
+    assertEquals("Password with less than 6 characters not allowed.", UserDao.MESSAGE_KEY_PASSWORD_QUALITY_CHECK, userDao
         .checkPasswordQuality("o2345"));
-    assertEquals("Password must have one non letter at minimum.", UserDao.MESSAGE_KEY_PASSWORD_QUALITY_CHECK_FAILED, userDao
+    assertEquals("Password must have one non letter at minimum.", UserDao.MESSAGE_KEY_PASSWORD_QUALITY_CHECK, userDao
         .checkPasswordQuality("ProjectForge"));
-    assertEquals("Password must have one letter at minimum.", UserDao.MESSAGE_KEY_PASSWORD_QUALITY_CHECK_FAILED, userDao
+    assertEquals("Password must have one letter at minimum.", UserDao.MESSAGE_KEY_PASSWORD_QUALITY_CHECK, userDao
         .checkPasswordQuality("123456"));
-    assertEquals("Password must have one letter at minimum.", UserDao.MESSAGE_KEY_PASSWORD_QUALITY_CHECK_FAILED, userDao
+    assertEquals("Password must have one letter at minimum.", UserDao.MESSAGE_KEY_PASSWORD_QUALITY_CHECK, userDao
         .checkPasswordQuality("1234567"));
     assertNull("Password OK.", userDao.checkPasswordQuality("kjh!id"));
     assertNull("Password OK.", userDao.checkPasswordQuality("kjh8idsf"));
