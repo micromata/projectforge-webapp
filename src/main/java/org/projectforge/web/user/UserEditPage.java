@@ -23,6 +23,11 @@
 
 package org.projectforge.web.user;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -31,6 +36,7 @@ import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightDao;
+import org.projectforge.user.UserRightVO;
 import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -64,27 +70,27 @@ public class UserEditPage extends AbstractAutoLayoutEditPage<PFUserDO, UserEditF
   @Override
   public AbstractBasePage onSaveOrUpdate()
   {
-//    if (StringUtils.isNotEmpty(form.getEncryptedPassword()) == true) {
-//      getData().setPassword(form.getEncryptedPassword());
-//    }
+    if (StringUtils.isNotEmpty(form.renderer.getEncryptedPassword()) == true) {
+      getData().setPassword(form.renderer.getEncryptedPassword());
+    }
     return super.onSaveOrUpdate();
   }
 
   @Override
   public AbstractBasePage afterSaveOrUpdate()
   {
-    // final Set<Integer> assignedGroupIds = new HashSet<Integer>();
-    // for (Integer groupId : form.groups.getValuesToAssign()) {
-    // assignedGroupIds.add(groupId);
-    // }
-    // final Set<Integer> unassignedGroupIds = new HashSet<Integer>();
-    // for (Integer groupId : form.groups.getValuesToUnassign()) {
-    // unassignedGroupIds.add(groupId);
-    // }
-    // groupDao.assignGroups(getData(), assignedGroupIds, unassignedGroupIds);
-    //
-    // final List<UserRightVO> list = form.rightsData.getRights();
-    // userRightDao.updateUserRights(getData(), list);
+     final Set<Integer> assignedGroupIds = new HashSet<Integer>();
+     for (Integer groupId : form.renderer.groups.getValuesToAssign()) {
+     assignedGroupIds.add(groupId);
+     }
+     final Set<Integer> unassignedGroupIds = new HashSet<Integer>();
+     for (Integer groupId : form.renderer.groups.getValuesToUnassign()) {
+     unassignedGroupIds.add(groupId);
+     }
+     groupDao.assignGroups(getData(), assignedGroupIds, unassignedGroupIds);
+    
+     final List<UserRightVO> list = form.renderer.rightsData.getRights();
+     userRightDao.updateUserRights(getData(), list);
 
     return super.afterSaveOrUpdate();
   }

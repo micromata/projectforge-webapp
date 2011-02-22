@@ -65,13 +65,6 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     renderer.validation();
   }
 
-  // @SuppressWarnings( { "serial", "unchecked"})
-  // @Override
-  // protected void init()
-  // {
-  // super.init();
- // }
-
   @Override
   protected Logger getLogger()
   {

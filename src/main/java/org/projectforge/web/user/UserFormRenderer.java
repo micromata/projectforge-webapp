@@ -50,7 +50,6 @@ import org.apache.wicket.validation.validator.AbstractValidator;
 import org.projectforge.common.KeyValueBean;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.Configuration;
-import org.projectforge.core.NumberFormatter;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
@@ -262,8 +261,9 @@ public class UserFormRenderer extends AbstractDOFormRenderer
     doPanel.addLabel(getString("login.lastLogin"), labelLength).setBreakBefore();
     doPanel.addLabel(DateTimeFormatter.instance().getFormattedDateTime(data.getLastLogin()), FULL);
 
-    doPanel.addLabel(getString("login.loginFailures"), labelLength).setBreakBefore();
-    doPanel.addLabel(NumberFormatter.format(data.getLoginFailures()), FULL);
+    // Doesn't work:
+    // doPanel.addLabel(getString("login.loginFailures"), labelLength).setBreakBefore();
+    // doPanel.addLabel(NumberFormatter.format(data.getLoginFailures()), FULL);
 
     addAssignedGroups();
     addRights();
