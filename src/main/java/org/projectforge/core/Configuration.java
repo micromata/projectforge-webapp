@@ -57,6 +57,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.poi.ss.usermodel.PrintSetup;
 import org.projectforge.calendar.ConfigureHoliday;
 import org.projectforge.common.AbstractCache;
+import org.projectforge.common.DateFormats;
 import org.projectforge.common.FileHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.jira.JiraConfig;
@@ -647,6 +648,54 @@ public class Configuration extends AbstractCache
   public boolean isMebMailAccountConfigured()
   {
     return this.mebMailAccount != null && this.mebMailAccount.getHostname() != null;
+  }
+
+  /**
+   * Available date formats (configurable as parameter, see web dialogue with system parameters).
+   * @return
+   */
+  public String[] getDateFormats()
+  {
+    final String str = Configuration.getInstance().getStringValue(ConfigurationParam.DATE_FORMATS);
+    final String[] sa = StringUtils.split(str, " \t\r\n,;");
+    return sa;
+  }
+
+  /**
+   * @return The first entry of {@link #getDateFormats()} if exists, otherwise yyyy-MM-dd (ISO date format).
+   */
+  public String getDefaultDateFormat()
+  {
+    final String[] sa = getDateFormats();
+    if (sa != null && sa.length > 0) {
+      return sa[0];
+    } else {
+      return DateFormats.ISO_DATE;
+    }
+  }
+
+  /**
+   * Available excel date formats (configurable as parameter, see web dialogue with system parameters).
+   * @return
+   */
+  public String[] getExcelDateFormats()
+  {
+    final String str = Configuration.getInstance().getStringValue(ConfigurationParam.EXCEL_DATE_FORMATS);
+    final String[] sa = StringUtils.split(str, " \t\r\n,;");
+    return sa;
+  }
+
+  /**
+   * @return The first entry of {@link #getExcelDateFormats()} if exists, otherwise YYYY-MM-DD (ISO date format).
+   */
+  public String getDefaultExcelDateFormat()
+  {
+    final String[] sa = getExcelDateFormats();
+    if (sa != null && sa.length > 0) {
+      return sa[0];
+    } else {
+      return DateFormats.EXCEL_ISO_DATE;
+    }
   }
 
   /**
