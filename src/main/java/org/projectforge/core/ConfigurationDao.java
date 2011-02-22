@@ -46,7 +46,7 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ConfigurationDao.class);
 
   private TaskTree taskTree;
-  
+
   /**
    * Force reload of the Configuration cache.
    * @see org.projectforge.core.BaseDao#afterSaveOrModify(org.projectforge.core.ExtendedBaseDO)
@@ -89,7 +89,8 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
     return list.get(0);
   }
 
-  public Object getValue(final ConfigurationParam parameter, ConfigurationDO configurationDO) {
+  public Object getValue(final ConfigurationParam parameter, ConfigurationDO configurationDO)
+  {
     if (parameter.getType().isIn(ConfigurationType.STRING, ConfigurationType.TEXT) == true) {
       if (configurationDO == null) {
         return parameter.getDefaultStringValue();
@@ -177,6 +178,9 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
     final ConfigurationDO configuration = new ConfigurationDO();
     configuration.setParameter(param.getKey());
     configuration.setConfigurationType(param.getType());
+    if (param.getType().isIn(ConfigurationType.STRING, ConfigurationType.TEXT) == true) {
+      configuration.setValue(param.getDefaultStringValue());
+    }
     internalSave(configuration);
   }
 
