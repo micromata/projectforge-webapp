@@ -35,12 +35,13 @@ import java.util.TimeZone;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.ListMultipleChoice;
 import org.apache.wicket.markup.html.form.PasswordTextField;
-import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
@@ -60,8 +61,8 @@ import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.common.TwoListHelper;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.components.TimeZoneField;
-import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
 import org.projectforge.web.wicket.layout.DropDownChoiceLPanel;
 import org.projectforge.web.wicket.layout.IField;
@@ -69,6 +70,7 @@ import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.LayoutLength;
 import org.projectforge.web.wicket.layout.ListMultipleChoiceLPanel;
 import org.projectforge.web.wicket.layout.PanelContext;
+import org.projectforge.web.wicket.layout.RepeatingViewLPanel;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
 public class UserFormRenderer extends AbstractDOFormRenderer
@@ -269,8 +271,8 @@ public class UserFormRenderer extends AbstractDOFormRenderer
     // </select></td>
     // </tr>
 
-    addRights();
     addAssignedGroups();
+    addRights();
   }
 
   protected void validation()
@@ -344,34 +346,39 @@ public class UserFormRenderer extends AbstractDOFormRenderer
     valuesToUnassignChoice.setModel(new PropertyModel<Collection<Integer>>(this, "valuesToUnassign"));
 
     doPanel.addListMultipleChoice(valuesToUnassignChoice, new PanelContext(FULL, getString("user.assignedGroups"), labelLength)
-        .setBreakBetweenLabelAndField(true).setCssStyle("width: 30em;"));
-    doPanel.addListMultipleChoice(valuesToAssignChoice, new PanelContext(FULL, getString("user.unassignedGroups"), labelLength)
-        .setBreakBetweenLabelAndField(true).setCssStyle("width: 30em;"));
+        .setBreakBetweenLabelAndField(true).setCssStyle("width: 95%; height:20em;"));
 
-    final RepeatingView repeatingView = doPanel.addRepeater(LayoutLength.ONEHALF).getRepeatingView();
-    final SubmitLink unassignButton = new SubmitLink("unassignButton") {
-      public void onSubmit()
+    final RepeatingViewLPanel repeatingViewPanel = doPanel.addRepeater(LayoutLength.ONEHALF);
+    repeatingViewPanel.setBreakBefore();
+    final RepeatingView repeatingView = repeatingViewPanel.getRepeatingView();
+    final Button unassignButton = new Button("button", new Model<String>(getString("unassign"))) {
+      @Override
+      public final void onSubmit()
       {
         groups.unassign(valuesToUnassign);
         valuesToUnassign.clear();
         refreshGroupLists();
-      };
+      }
     };
-    repeatingView.add(unassignButton);
-    unassignButton.add(new TooltipImage("buttonUnassignImage", parentPage.getResponse(), WebConstants.IMAGE_BUTTON_ASSIGN_TO_RIGHT,
-        getString("tooltip.unassign")));
+    unassignButton.add(WebConstants.BUTTON_CLASS_RESET);
+    final SingleButtonPanel unassignButtonPanel = new SingleButtonPanel(repeatingView.newChildId(), unassignButton);
+    repeatingView.add(unassignButtonPanel);
 
-    final SubmitLink assignButton = new SubmitLink("assignButton") {
-      public void onSubmit()
+    final Button assignButton = new Button("button", new Model<String>(getString("assign"))) {
+      @Override
+      public final void onSubmit()
       {
         groups.assign(valuesToAssign);
         valuesToAssign.clear();
         refreshGroupLists();
-      };
+      }
     };
-    repeatingView.add(assignButton);
-    assignButton.add(new TooltipImage("buttonAssignImage", parentPage.getResponse(), WebConstants.IMAGE_BUTTON_ASSIGN_TO_LEFT,
-        getString("tooltip.assign")));
+    assignButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    final SingleButtonPanel assignButtonPanel = new SingleButtonPanel(repeatingView.newChildId(), assignButton);
+    repeatingView.add(assignButtonPanel);
+
+    doPanel.addListMultipleChoice(valuesToAssignChoice, new PanelContext(FULL, getString("user.unassignedGroups"), labelLength)
+        .setBreakBetweenLabelAndField(true).setCssStyle("width: 95%; height:20em;"));
     refreshGroupLists();
   }
 
