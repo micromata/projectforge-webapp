@@ -52,6 +52,7 @@ import org.projectforge.web.tree.TreeTable;
 import org.projectforge.web.tree.TreeTableEvent;
 import org.projectforge.web.tree.TreeTableNode;
 import org.projectforge.web.user.UserFormatter;
+import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
@@ -206,6 +207,7 @@ class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
     addColumn(colBodyRepeater, col, cssStyle);
     if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
       col = new Label(colBodyRepeater.newChildId(), dateTimeFormatter.getFormattedDate(task.getProtectTimesheetsUntil()));
+      col.add(new AttributeAppendModifier("style", new Model<String>("white-space: nowrap;")));
       addColumn(colBodyRepeater, col, cssStyle);
     }
     col = new Label(colBodyRepeater.newChildId(), task.getReference());
