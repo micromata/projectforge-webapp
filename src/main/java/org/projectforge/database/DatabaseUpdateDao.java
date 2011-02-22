@@ -132,6 +132,11 @@ public class DatabaseUpdateDao
   public boolean isTableEmpty(final String table)
   {
     accessCheck(false);
+    return internalIsTableEmpty(table);
+  }
+
+  public boolean internalIsTableEmpty(final String table)
+  {
     final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
     try {
       return jdbc.queryForInt("SELECT COUNT(*) FROM " + table) == 0;
