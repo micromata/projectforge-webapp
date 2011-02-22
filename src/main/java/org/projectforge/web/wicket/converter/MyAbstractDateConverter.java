@@ -29,13 +29,13 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.MissingResourceException;
 
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.datetime.DateConverter;
 import org.apache.wicket.util.convert.ConversionException;
 import org.projectforge.calendar.DayHolder;
+import org.projectforge.common.DateFormats;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
 
@@ -52,9 +52,6 @@ public abstract class MyAbstractDateConverter extends DateConverter
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MyAbstractDateConverter.class);
 
   private Class< ? extends Date> targetType;
-
-  /** The key used to look up the localized format strings from the resource bundle. */
-  public static final String KEY_FORMAT_STRINGS = "parseDateFormats";
 
   public MyAbstractDateConverter(final Class< ? extends Date> targetType)
   {
@@ -83,18 +80,7 @@ public abstract class MyAbstractDateConverter extends DateConverter
    */
   protected String[] getFormatStrings(final Locale locale)
   {
-    try {
-      return PFUserContext.getResourceBundle(locale).getString(KEY_FORMAT_STRINGS).split(", *");
-    } catch (MissingResourceException mre) {
-      // First get the locale specific date format patterns
-      int[] dateFormats = { DateFormat.SHORT, DateFormat.MEDIUM, DateFormat.LONG};
-      String[] formatStrings = new String[dateFormats.length];
-      for (int i = 0; i < dateFormats.length; i++) {
-        SimpleDateFormat dateFormat = (SimpleDateFormat) DateFormat.getDateInstance(dateFormats[i], locale);
-        formatStrings[i] = preProcessInput(dateFormat.toPattern(), locale);
-      }
-      return formatStrings;
-    }
+    return DateFormats.getDateParseFormats();
   }
 
   /**
