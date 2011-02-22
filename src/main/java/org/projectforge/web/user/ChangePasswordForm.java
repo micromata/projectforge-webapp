@@ -30,6 +30,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 public class ChangePasswordForm extends AbstractForm<ChangePasswordForm, ChangePasswordPage>
@@ -60,6 +61,7 @@ public class ChangePasswordForm extends AbstractForm<ChangePasswordForm, ChangeP
       }
     };
     add(new SingleButtonPanel("update", updateButton));
+    updateButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     setDefaultButton(updateButton);
     final Button cancelButton = new Button("button", new Model<String>(getString("cancel"))) {
       @Override
