@@ -29,12 +29,12 @@ import java.util.Date;
 
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.calendar.TimePeriod;
+import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHelper;
 import org.projectforge.renderer.RenderType;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.core.AbstractFormatter;
-
 
 public class DateTimeFormatter extends AbstractFormatter
 {
@@ -44,57 +44,6 @@ public class DateTimeFormatter extends AbstractFormatter
   {
     return instance;
   }
-
-  /**
-   * Date format without time of day and 'yy'-year representation (two digits). The i18n key is "shortDateFormat".
-   */
-  public static final String I18N_KEY_SHORT_DATE_FORMAT = "shortDateFormat";
-
-  /**
-   * Date format without time of day. Displays the name of the day of the week in short format (2 letter representation). The i18n key is
-   * "longDateFormat".
-   */
-  public static final String I18N_KEY_LONG_DATE_FORMAT = "longDateFormat";
-
-  /**
-   * Date format without time of day and no year. The i18n key is "noYearDateFormat".
-   */
-  public static final String I18N_KEY_DATE_NONE_YEAR_FORMAT = "dateNoneYearFormat";
-
-  /**
-   * Date format without time of day and 'yyyy'-year representation (four digits). The i18n key is "dateFormat".
-   */
-  public static final String I18N_KEY_DATE_FORMAT = "dateFormat";
-
-  /**
-   * Time stamp format with 'yy'-year representation (two digits). The i18n key is "shortTimestampFormat.precision.minutes".
-   */
-  public static final String I18N_KEY_SHORT_TIMESTAMP_FORMAT_WITH_MINUTES = "shortTimestampFormat.precision.minutes";
-
-  /**
-   * Time stamp format with 'yyyy'-year representation (four digits). The i18n key is "timestampFormat.precision.minutes".
-   */
-  public static final String I18N_KEY_TIMESTAMP_FORMAT_WITH_MINUTES = "timestampFormat.precision.minutes";
-
-  /**
-   * Time stamp format with 'yy'-year representation (two digits) and seconds. The i18n key is "shortTimestampFormat".
-   */
-  public static final String I18N_KEY_SHORT_TIMESTAMP_FORMAT = "shortTimestampFormat";
-
-  /**
-   * Time stamp format with 'yyyy'-year representation (four digits). The i18n key is "timestampFormat".
-   */
-  public static final String I18N_KEY_TIMESTAMP_FORMAT = "timestampFormat";
-
-  /**
-   * Time of day format. The i18n key is "timeOfDayFormat.precision.minutes".
-   */
-  public static final String I18N_KEY_TIMEOFDAY_FORMAT = "timeOfDayFormat.precision.minutes";
-
-  /**
-   * Short day of week format. The i18n key is shortDayOfWeekFormat.
-   */
-  public static final String I18N_KEY_SHORT_DAY_OF_WEEK_FORMAT = "shortDayOfWeekFormat";
 
   /** Used by getPrettyFormattedDuration */
   public static final int DEFAULT_HOURS_OF_DAY = 8;
@@ -127,7 +76,7 @@ public class DateTimeFormatter extends AbstractFormatter
    */
   public String getFormattedDate(Object date)
   {
-    return getFormattedDate(date, I18N_KEY_SHORT_DATE_FORMAT);
+    return getFormattedDate(date, DateFormats.getFormatString(org.projectforge.common.DateFormatType.DATE_SHORT));
   }
 
   /**
@@ -135,12 +84,11 @@ public class DateTimeFormatter extends AbstractFormatter
    * @param date
    * @param patternKey i18n key of the pattern
    */
-  public String getFormattedDate(Object date, String patternKey)
+  public String getFormattedDate(Object date, String pattern)
   {
     if (date == null) {
       return "";
     }
-    final String pattern = getI18nMessage(patternKey);
     final DateFormat format = new SimpleDateFormat(pattern, PFUserContext.getLocale());
     format.setTimeZone(PFUserContext.getTimeZone());
     return format.format(date);
@@ -153,7 +101,7 @@ public class DateTimeFormatter extends AbstractFormatter
    */
   public String getFormattedDateTime(Date dateTime)
   {
-    return getFormattedDateTime(dateTime, I18N_KEY_SHORT_TIMESTAMP_FORMAT_WITH_MINUTES);
+    return getFormattedDateTime(dateTime,DateFormats.getFormatString(org.projectforge.common.DateFormatType.TIMESTAMP_SHORT_MINUTES));
   }
 
   /**
@@ -161,12 +109,11 @@ public class DateTimeFormatter extends AbstractFormatter
    * @param dateTime
    * @param patternKey i18n key of the pattern
    */
-  public String getFormattedDateTime(final Date dateTime, final String patternKey)
+  public String getFormattedDateTime(final Date dateTime, final String pattern)
   {
     if (dateTime == null) {
       return "";
     }
-    final String pattern = getI18nMessage(patternKey);
     final DateFormat format = new SimpleDateFormat(pattern);
     format.setTimeZone(PFUserContext.getTimeZone());
     return format.format(dateTime);
@@ -179,7 +126,7 @@ public class DateTimeFormatter extends AbstractFormatter
    */
   public String getFormattedTime(Date time)
   {
-    return getFormattedTime(time, I18N_KEY_TIMEOFDAY_FORMAT);
+    return getFormattedTime(time, DateFormats.getFormatString(org.projectforge.common.DateFormatType.TIME_OF_DAY_MINUTES));
   }
 
   /**
@@ -187,12 +134,12 @@ public class DateTimeFormatter extends AbstractFormatter
    * @param time
    * @param patternKey i18n key of the pattern
    */
-  public String getFormattedTime(Date time, String patternKey)
+  public String getFormattedTime(Date time, String pattern)
   {
     if (time == null) {
       return "";
     }
-    DateFormat format = new SimpleDateFormat(getI18nMessage(patternKey));
+    DateFormat format = new SimpleDateFormat(pattern);
     format.setTimeZone(PFUserContext.getTimeZone());
     return format.format(time);
   }
