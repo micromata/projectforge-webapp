@@ -139,6 +139,22 @@ public class LoginPage extends AbstractBasePage
     internalLogin(this, user);
   }
 
+  public static boolean isAdminUser(final PFUserDO user, final DataSource dataSource)
+  {
+    final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+    String sql = "select pk from t_group where name=?";
+    final int adminGroupId = jdbc.queryForInt(sql, new Object[] { ProjectForgeGroup.ADMIN_GROUP.getKey()});
+    sql = "select count(*) from t_group_user where group_id=? and user_id=?";
+    final int count = jdbc.queryForInt(sql, new Object[] { adminGroupId, user.getId()});
+    if (count != 1) {
+      log.info("Admin login for maintenance (data-base update) failed for user '"
+          + user.getUsername()
+          + "' (user not member of admin group).");
+      return false;
+    }
+    return true;
+  }
+
   public static void internalCheckLogin(final WebPage page, final UserDao userDao, final DataSource dataSource, final String username,
       final String password, final boolean userWantsToStayLoggedIn, final Class< ? extends WebPage> defaultPage,
       final String targetUrlAfterLogin)
@@ -168,12 +184,7 @@ public class LoginPage extends AbstractBasePage
           log.info("Admin login for maintenance (data-base update) failed for user '" + username + "' (user/password not found).");
           return;
         }
-        sql = "select pk from t_group where name=?";
-        final int adminGroupId = jdbc.queryForInt(sql, new Object[] { ProjectForgeGroup.ADMIN_GROUP.getKey()});
-        sql = "select count(*) from t_group_user where group_id=? and user_id=?";
-        final int count = jdbc.queryForInt(sql, new Object[] { adminGroupId, resUser.getId()});
-        if (count != 1) {
-          log.info("Admin login for maintenance (data-base update) failed for user '" + username + "' (user not member of admin group).");
+        if (isAdminUser(resUser, dataSource) == false) {
           return;
         }
         user = resUser;
