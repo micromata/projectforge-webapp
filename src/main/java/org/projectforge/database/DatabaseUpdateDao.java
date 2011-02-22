@@ -31,10 +31,13 @@ import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.access.AccessChecker;
+import org.projectforge.access.AccessException;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.web.LoginPage;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -81,13 +84,25 @@ public class DatabaseUpdateDao
       // No access check for the system admin pseudo user.
       return;
     }
-    accessChecker.checkIsUserMemberOfAdminGroup();
+    if (LoginPage.isAdminUser(PFUserContext.getUser(), dataSource) == false) {
+      throw new AccessException(AccessChecker.I18N_KEY_VIOLATION_USER_NOT_MEMBER_OF, ProjectForgeGroup.ADMIN_GROUP.getKey());
+    }
     accessChecker.checkDemoUser();
   }
 
   public boolean doesTableExist(final String table)
   {
     accessCheck(false);
+    return internalDoesTableExist(table);
+  }
+
+  /**
+   * Without check access.
+   * @param table
+   * @return
+   */
+  public boolean internalDoesTableExist(final String table)
+  {
     /*
      * try { final ResultSet resultSet = dataSource.getConnection().getMetaData().getTables(CATALOG, SCHEMA_PATTERN, table, new String[] {
      * TABLE_TYPE}); return resultSet.next(); } catch (final SQLException ex) { log.error(ex.getMessage(), ex); throw new
