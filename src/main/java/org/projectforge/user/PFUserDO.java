@@ -110,6 +110,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private Locale clientLocale;
 
+  private String dateFormat;
+
   @org.hibernate.search.annotations.Field(index = Index.TOKENIZED, store = Store.NO)
   private String organization;
 
@@ -198,6 +200,27 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public void setLocale(Locale locale)
   {
     this.locale = locale;
+  }
+
+  /**
+   * Default date format for the user. Examples:
+   * <ul>
+   * <li>yyyy-MM-dd: 2011-02-21, ISO format.</li>
+   * <li>dd.MM.yyyy: 21.02.2011, German format (day of month first)</li>
+   * <li>dd/MM/yyyy: 21/02/2011, British and French format (day of month first)</li>
+   * <li>MM/dd/yyyy: 02/21/2011, American format (month first)</li>
+   * </ul>
+   * @return
+   */
+  @Column(name = "date_format", length = 20)
+  public String getDateFormat()
+  {
+    return dateFormat;
+  }
+
+  public void setDateFormat(final String dateFormat)
+  {
+    this.dateFormat = dateFormat;
   }
 
   /**
