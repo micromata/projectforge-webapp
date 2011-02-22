@@ -85,13 +85,13 @@ public class DateHelper implements Serializable
    */
   public final static TimeZone UTC = TimeZone.getTimeZone("UTC");
 
-  private static final DateFormat FORMAT_ISO_DATE = new SimpleDateFormat("yyyy-MM-dd");
+  private static final DateFormat FORMAT_ISO_DATE = new SimpleDateFormat(DateFormats.ISO_DATE);
 
-  private static final DateFormat FORMAT_ISO_TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+  private static final DateFormat FORMAT_ISO_TIMESTAMP = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_MILLIS);
 
-  private static final DateFormat FILENAME_FORMAT_TIMESTAMP = new SimpleDateFormat("yyyy-MM-dd_HH-mm");
+  private static final DateFormat FILENAME_FORMAT_TIMESTAMP = new SimpleDateFormat(DateFormats.ISO_DATE + "_HH-mm");
 
-  private static final DateFormat FILENAME_FORMAT_DATE = new SimpleDateFormat("yyyy-MM-dd");
+  private static final DateFormat FILENAME_FORMAT_DATE = new SimpleDateFormat(DateFormats.ISO_DATE);
 
   /**
    * Compares millis. If both dates are null then they're equal.
@@ -114,9 +114,9 @@ public class DateHelper implements Serializable
    * thread safe
    * @param timezone
    */
-  public static DateFormat getIsoDateFormat(TimeZone timezone)
+  public static DateFormat getIsoDateFormat(final TimeZone timezone)
   {
-    DateFormat df = (DateFormat) FORMAT_ISO_DATE.clone();
+    final DateFormat df = (DateFormat) FORMAT_ISO_DATE.clone();
     if (timezone != null) {
       df.setTimeZone(timezone);
     }
@@ -127,9 +127,9 @@ public class DateHelper implements Serializable
    * thread safe
    * @param timezone If null then time zone is ignored.
    */
-  public static DateFormat getIsoTimestampFormat(TimeZone timezone)
+  public static DateFormat getIsoTimestampFormat(final TimeZone timezone)
   {
-    DateFormat df = (DateFormat) FORMAT_ISO_TIMESTAMP.clone();
+    final DateFormat df = (DateFormat) FORMAT_ISO_TIMESTAMP.clone();
     if (timezone != null) {
       df.setTimeZone(timezone);
     }
@@ -140,9 +140,9 @@ public class DateHelper implements Serializable
    * thread safe
    * @param timezone
    */
-  public static DateFormat getFilenameFormatTimestamp(TimeZone timezone)
+  public static DateFormat getFilenameFormatTimestamp(final TimeZone timezone)
   {
-    DateFormat df = (DateFormat) FILENAME_FORMAT_TIMESTAMP.clone();
+    final DateFormat df = (DateFormat) FILENAME_FORMAT_TIMESTAMP.clone();
     if (timezone != null) {
       df.setTimeZone(timezone);
     }
@@ -153,9 +153,9 @@ public class DateHelper implements Serializable
    * thread safe
    * @param timezone
    */
-  public static DateFormat getFilenameFormatDate(TimeZone timezone)
+  public static DateFormat getFilenameFormatDate(final TimeZone timezone)
   {
-    DateFormat df = (DateFormat) FILENAME_FORMAT_DATE.clone();
+    final DateFormat df = (DateFormat) FILENAME_FORMAT_DATE.clone();
     if (timezone != null) {
       df.setTimeZone(timezone);
     }
@@ -169,7 +169,7 @@ public class DateHelper implements Serializable
     @Override
     protected DateFormat initialValue()
     {
-      DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+      final DateFormat df = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_MILLIS);
       df.setTimeZone(UTC);
       return df;
     }
@@ -182,7 +182,7 @@ public class DateHelper implements Serializable
     @Override
     protected DateFormat initialValue()
     {
-      DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S z");
+      final DateFormat dateFormat = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_MILLIS + " z");
       dateFormat.setTimeZone(UTC);
       return dateFormat;
     }
@@ -193,7 +193,7 @@ public class DateHelper implements Serializable
    */
   public static final String formatShortNameOfDay(Date date)
   {
-    DateFormat df = new SimpleDateFormat("EE", PFUserContext.getLocale());
+    final DateFormat df = new SimpleDateFormat("EE", PFUserContext.getLocale());
     df.setTimeZone(PFUserContext.getTimeZone());
     return df.format(date);
   }
@@ -218,7 +218,7 @@ public class DateHelper implements Serializable
     @Override
     protected DateFormat initialValue()
     {
-      DateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S Z");
+      final DateFormat df = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_MILLIS + " Z");
       df.setTimeZone(UTC);
       return df;
     }
@@ -249,11 +249,11 @@ public class DateHelper implements Serializable
    * @param logError If true, any ParseException error will be logged if occured.
    * @return The parsed date or null, if not parseable.
    */
-  public static Date parseMillis(String str, boolean logError)
+  public static Date parseMillis(final String str, final boolean logError)
   {
     Date date = null;
     try {
-      long millis = Long.parseLong(str);
+      final long millis = Long.parseLong(str);
       date = new Date(millis);
     } catch (NumberFormatException ex) {
       if (logError == true) {
@@ -392,7 +392,7 @@ public class DateHelper implements Serializable
     if (startTime == null || stopTime == null || stopTime.before(startTime) == true) {
       return 0;
     }
-    long millis = stopTime.getTime() - startTime.getTime();
+    final long millis = stopTime.getTime() - startTime.getTime();
     return millis / 60000;
   }
 
@@ -419,7 +419,7 @@ public class DateHelper implements Serializable
    */
   public static List<LabelValueBean<String, Integer>> getMonthList()
   {
-    List<LabelValueBean<String, Integer>> list = new ArrayList<LabelValueBean<String, Integer>>();
+    final List<LabelValueBean<String, Integer>> list = new ArrayList<LabelValueBean<String, Integer>>();
     list.add(new LabelValueBean<String, Integer>("--", -1));
     for (int month = 0; month < 12; month++) {
       list.add(new LabelValueBean<String, Integer>(StringHelper.format2DigitNumber(month + 1), month));
@@ -434,7 +434,7 @@ public class DateHelper implements Serializable
    */
   public static String formatMonth(int year, int month)
   {
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     buf.append(year);
     if (month >= 0) {
       buf.append('-');
