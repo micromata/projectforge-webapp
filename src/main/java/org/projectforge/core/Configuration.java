@@ -85,6 +85,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 @XmlObject(alias = "config")
 public class Configuration extends AbstractCache
 {
+  public static final String[] LOCALIZATIONS = { "en", "de"};
+
   private static transient final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Configuration.class);
 
   private static transient final Set<String> nonExistingResources = new HashSet<String>();
