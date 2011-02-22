@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
@@ -188,16 +189,18 @@ public class DataObjectLPanel extends Panel
   }
 
   /**
-   * @return the created field.
+   * @deprecated Use {@link #addTextField(PanelContext)}
    */
   public IField addTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength)
   {
-    return addTextField(data, property, label, labelLength, valueLength, null, false);
+    final PanelContext ctx = new PanelContext(data, property, valueLength, label, labelLength);
+    addTextField(ctx);
+    return ctx.getValueField();
   }
 
   /**
-   * @return the created field.
+   * @deprecated Use {@link #addTextField(PanelContext)}
    */
   public IField addTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextfield)
@@ -206,7 +209,7 @@ public class DataObjectLPanel extends Panel
   }
 
   /**
-   * @return the created field or a dummy IField if the field is e. g. empty in read-only mode.
+   * @deprecated Use {@link #addTextField(PanelContext)}
    */
   public IField addTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength, final FieldType fieldType, final boolean newLineBetweenLabelAndTextField)
@@ -222,8 +225,7 @@ public class DataObjectLPanel extends Panel
   }
 
   /**
-   * LabelValueTable not supported.
-   * @return the created field or a dummy IField if the field is e. g. empty in read-only mode.
+   * @deprecated Use {@link #addTextField(PanelContext)}
    */
   public IField addTextField(final Object data, final String property, final LayoutLength valueLength)
   {
@@ -232,8 +234,7 @@ public class DataObjectLPanel extends Panel
   }
 
   /**
-   * @param label Only used for setLabel (needed by validation messages).
-   * @return the created field or a dummy IField if the field is e. g. empty in read-only mode.
+   * @deprecated Use {@link #addTextField(PanelContext)}
    */
   public IField addTextField(final String label, final Object data, final String property, final LayoutLength valueLength)
   {
@@ -333,7 +334,7 @@ public class DataObjectLPanel extends Panel
   }
 
   /**
-   * If the value is type of I18Enum then the localized string is shown in read-only mode.
+   * @deprecated Use {@link #addTextField(PanelContext)}
    */
   @SuppressWarnings("serial")
   public IField addDropDownChoice(final Object data, final String property, final String label, final LayoutLength labelLength,
@@ -371,11 +372,7 @@ public class DataObjectLPanel extends Panel
   }
 
   /**
-   * If the value is type of I18Enum then the localized string is shown in read-only mode.
-   * @param data Only needed for read only output.
-   * @param property Only needed for read only output.
-   * @param label Only used of setLabel of form component.
-   * @see FormComponent#setLabel(org.apache.wicket.model.IModel)
+   * @deprecated Use {@link #addDropDownChoice(DropDownChoice, PanelContext)}
    */
   @SuppressWarnings("serial")
   public IField addDropDownChoice(final Object data, final String property, final String label, final DropDownChoice< ? > dropDownChoice,
@@ -409,6 +406,42 @@ public class DataObjectLPanel extends Panel
       }
       groupPanel.add(field);
     }
+    return field;
+  }
+
+  /**
+   * If the value is type of I18Enum then the localized string is shown in read-only mode.
+   * @param ctx
+   * @param dropDownChoice value field to add.
+   */
+  public IField addDropDownChoice(final DropDownChoice< ? > dropDownChoice, final PanelContext ctx)
+  {
+    ensureGroupPanel();
+    IField field;
+    LabelLPanel labelPanel = null;
+    if (layoutContext.isMobileReadonly() == true) {
+      final Object value = BeanHelper.getNestedProperty(ctx.getData(), ctx.getProperty());
+      if (isBlank(value) == true) {
+        return new DummyField();
+      }
+      ensureLabelValueTablePanel();
+      final String displayValue;
+      if (value instanceof I18nEnum) {
+        displayValue = getString(((I18nEnum) value).getI18nKey());
+      } else {
+        displayValue = String.valueOf(value);
+      }
+      labelPanel = new LabelLPanel(LabelValueTableLPanel.WICKET_ID_VALUE, ctx.getLabelLength(), displayValue);
+      field = labelValueTablePanel.add(ctx.getLabel(), (WebMarkupContainer) labelPanel);
+    } else {
+      field = new DropDownChoiceLPanel(groupPanel.newChildId(), ctx.getValueLength(), dropDownChoice);
+      labelPanel = new LabelLPanel(groupPanel.newChildId(), ctx.getLabelLength(), ctx.getLabel(), (AbstractLPanel) field, true);
+      groupPanel.add(labelPanel);
+      ((DropDownChoiceLPanel) field).getDropDownChoice().setLabel(new Model<String>(ctx.getLabel()));
+      groupPanel.add(field);
+    }
+    ctx.internalSetValueField(field);
+    ctx.internalSetLabelPanel(labelPanel);
     return field;
   }
 
@@ -490,11 +523,17 @@ public class DataObjectLPanel extends Panel
     return field;
   }
 
+  /**
+   * @deprecated Use {@link #addContainer(WebMarkupContainer, PanelContext)}
+   */
   public ContainerLPanel addContainer(final WebMarkupContainer container, final LayoutLength valueLength)
   {
     return addContainer(null, null, container, valueLength);
   }
 
+  /**
+   * @deprecated Use {@link #addTextField(PanelContext)}
+   */
   public ContainerLPanel addContainer(final String label, final LayoutLength labelLength, final WebMarkupContainer container,
       final LayoutLength valueLength)
   {
@@ -503,6 +542,22 @@ public class DataObjectLPanel extends Panel
     if (label != null) {
       final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), labelLength, label, container, true);
       groupPanel.add(labelPanel);
+    }
+    groupPanel.add(containerPanel);
+    return containerPanel;
+  }
+
+  public ContainerLPanel addContainer(final WebMarkupContainer container, final PanelContext ctx)
+  {
+    ensureGroupPanel();
+    final ContainerLPanel containerPanel = new ContainerLPanel(groupPanel.newChildId(), ctx.getValueLength(), container);
+    ctx.internalSetValueField(containerPanel);
+    if (ctx.getLabelLength() != null) {
+      final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), ctx.getLabelLength(), ctx.getLabel(), container, true);
+      groupPanel.add(labelPanel);
+    }
+    if (container instanceof FormComponent< ? > && ctx.getLabel() != null) {
+      ((FormComponent< ? >) container).setLabel(new Model<String>(ctx.getLabel()));
     }
     groupPanel.add(containerPanel);
     return containerPanel;
@@ -527,6 +582,47 @@ public class DataObjectLPanel extends Panel
   }
 
   /**
+   * @param textField
+   * @param valueLength
+   * @return
+   */
+  public IField addTextField(final PanelContext ctx)
+  {
+    ensureGroupPanel();
+    IField field;
+    if (layoutContext.isMobileReadonly() == true) {
+      field = addReadonlyTextField(ctx.getData(), ctx.getProperty(), ctx.getLabel(), ctx.getLabelLength(), ctx.getValueLength(), ctx
+          .getFieldType(), ctx.isBreakBetweenLabelAndField());
+    } else {
+      field = groupPanel.addTextField(ctx);
+    }
+    return field;
+  }
+
+  /**
+   * @param textField
+   * @param valueLength
+   * @return
+   */
+  public void addTextField(final TextField< ? > textField, final PanelContext ctx)
+  {
+    ensureGroupPanel();
+    groupPanel.addTextField(textField, ctx);
+  }
+
+
+  /**
+   * @param textField
+   * @param valueLength
+   * @return
+   */
+  public void addPasswordTextField(final PasswordTextField textField, final PanelContext ctx)
+  {
+    ensureGroupPanel();
+    groupPanel.addPasswordTextField(textField, ctx);
+  }
+
+/**
    * @param textField
    * @param valueLength
    * @return

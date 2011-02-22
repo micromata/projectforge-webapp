@@ -24,6 +24,7 @@
 package org.projectforge.web.wicket.layout;
 
 /**
+ * Horizontal alignment.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public enum LayoutAlignment

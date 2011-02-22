@@ -25,6 +25,8 @@ package org.projectforge.web.wicket.layout;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.PasswordTextField;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
@@ -36,6 +38,8 @@ import org.apache.wicket.model.Model;
  */
 public class GroupLPanel extends Panel
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GroupLPanel.class);
+
   private static final long serialVersionUID = -8760386387270114082L;
 
   /**
@@ -62,38 +66,95 @@ public class GroupLPanel extends Panel
     }
   }
 
+  /**
+   * @deprecated Use addTextField(PanelContext) instead.
+   */
   public TextFieldLPanel addTextField(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength)
   {
     return addTextField(dataObject, property, label, labelLength, valueLength, null, false);
   }
 
+  /**
+   * @deprecated Use addTextField(PanelContext) instead.
+   */
   public TextFieldLPanel addTextField(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextField)
   {
     return addTextField(dataObject, property, label, labelLength, valueLength, null, newLineBetweenLabelAndTextField);
   }
 
-  @SuppressWarnings("serial")
+  /**
+   * @deprecated Use addTextField(PanelContext) instead.
+   */
   public TextFieldLPanel addTextField(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength, final FieldType fieldType, final boolean newLineBetweenLabelAndTextField)
   {
-    final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), valueLength, dataObject, property);
-    add(new LabelLPanel(newChildId(), labelLength, label).setLabelFor(textFieldPanel.getTextField()).setBreakBefore());
-    if (newLineBetweenLabelAndTextField == true) {
-      textFieldPanel.setBreakBefore();
-    }
-    textFieldPanel.getTextField().setLabel(new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return label;
-      }
-    });
-    add(textFieldPanel);
+    return addTextField(new PanelContext(dataObject, property, valueLength, label, labelLength) //
+        .setFieldType(fieldType) //
+        .setBreakBetweenLabelAndField(newLineBetweenLabelAndTextField));
+  }
+
+  public TextFieldLPanel addTextField(final PanelContext ctx)
+  {
+    final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), ctx.getValueLength(), ctx.getData(), ctx.getProperty());
+    addTextField(textFieldPanel, ctx);
     return textFieldPanel;
   }
 
+  public TextFieldLPanel addTextField(final TextField< ? > textField, final PanelContext ctx)
+  {
+    final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), ctx.getValueLength(), textField);
+    addTextField(textFieldPanel, ctx);
+    return textFieldPanel;
+  }
+
+  public TextFieldLPanel addPasswordTextField(final PasswordTextField textField, final PanelContext ctx)
+  {
+    final TextFieldLPanel textFieldPanel = new PasswordTextFieldLPanel(newChildId(), ctx.getValueLength(), textField);
+    addTextField(textFieldPanel, ctx);
+    return textFieldPanel;
+  }
+
+  private void addTextField(final TextFieldLPanel textFieldPanel, final PanelContext ctx)
+  {
+    ctx.internalSetValueField(textFieldPanel);
+    if (ctx.getLabel() != null) {
+      textFieldPanel.getTextField().setLabel(new Model<String>(ctx.getLabel()));
+    }
+    if (ctx.getTooltip() != null) {
+      textFieldPanel.setTooltip(ctx.getTooltip());
+    }
+    if (ctx.isRequired() == true) {
+      textFieldPanel.setRequired();
+    }
+    if (ctx.isStrong() == true) {
+      textFieldPanel.setStrong();
+    }
+    if (ctx.isReadonly() == true) {
+      log.error("Field read-only isn't yet supported by this method. If needed, please implement this.");
+    }
+    if (ctx.getLabelLength() != null) {
+      final LabelLPanel labelPanel = new LabelLPanel(newChildId(), ctx.getLabelLength(), ctx.getLabel()).setLabelFor(textFieldPanel
+          .getTextField());
+      ctx.internalSetLabelPanel(labelPanel);
+      if (ctx.isBreakBefore() == true) {
+        labelPanel.setBreakBefore();
+      }
+      if (ctx.getTooltip() != null) {
+        labelPanel.setTooltip(ctx.getTooltip());
+      }
+      add(labelPanel);
+    }
+    if (ctx.isBreakBetweenLabelAndField() == true) {
+      textFieldPanel.setBreakBefore();
+    }
+    add(textFieldPanel);
+  }
+
+  /**
+   * @deprecated Use addTextField(PanelContext) instead.
+   */
   public TextFieldLPanel addTextField(final Object dataObject, final String property, final LayoutLength valueLength)
   {
     final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), valueLength, dataObject, property);
