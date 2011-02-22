@@ -45,7 +45,7 @@ public enum DateFormatType
    */
   DATE_WITH_DAY_NAME,
   /**
-   * "dd.MM.yy", "MM/dd/yy", "dd/MM/yy", ...
+   * "dd.MM.yy", "MM/dd/yy", "dd/MM/yy", ... For Excel: "DD.MM.YY", "MM/DD/YY", "DD/MM/YY", ...
    */
   DATE_SHORT,
   /**
@@ -56,6 +56,10 @@ public enum DateFormatType
    * DATE_SHORT + HH:mm
    */
   TIMESTAMP_SHORT_MINUTES,
+  /**
+   * DATE + "HH:mm:ss.SSS"
+   */
+  TIMESTAMP_MILLIS,
   /**
    * DATE + "HH:mm:ss"
    */
@@ -72,22 +76,6 @@ public enum DateFormatType
    * "HH:mm"
    */
   TIME_OF_DAY_MINUTES,
-  /**
-   * DATE_SHORT -> "DD.MM.YY", "DD/MM/YY", "MM/DD/YY", ...
-   */
-  EXCEL_DATE,
-  /**
-   * EXCEL_DATE + "hh:mm:ss.000"
-   */
-  EXCEL_TIMESTAMP_MILLIS,
-  /**
-   * EXCEL_DATE + "hh:mm:ss"
-   */
-  EXCEL_TIMESTAMP_SECONDS,
-  /**
-   * EXCEL_DATE + "hh:mm"
-   */
-  EXCEL_TIMESTAMP_MINUTES,
   /**
    * yyyy-MM-dd
    */

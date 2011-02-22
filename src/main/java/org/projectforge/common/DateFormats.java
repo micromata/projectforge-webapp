@@ -23,8 +23,6 @@
 
 package org.projectforge.common;
 
-import java.util.Locale;
-
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
@@ -109,6 +107,55 @@ public class DateFormats
     return defaultDateFormat;
   }
 
+  /**
+   * Ensures and gets the default excel date format of the logged-in user.
+   * @return
+   */
+  private static String ensureAndGetDefaultExcelDateFormat()
+  {
+    final PFUserDO user = PFUserContext.getUser();
+    String defaultExcelDateFormat = user != null ? user.getExcelDateFormat() : null;
+    if (defaultExcelDateFormat == null) {
+      final String str = Configuration.getInstance().getStringValue(ConfigurationParam.EXCEL_DATE_FORMATS);
+      final String[] sa = StringUtils.split(str, " \t\r\n,;");
+      if (sa == null || sa.length < 1) {
+        defaultExcelDateFormat = ISO_DATE;
+      } else {
+        defaultExcelDateFormat = sa[0];
+      }
+      if (user != null) {
+        user.setExcelDateFormat(defaultExcelDateFormat);
+      }
+    }
+    return defaultExcelDateFormat;
+  }
+
+  /**
+   * Gets the format string for the logged-in user. Uses the date format of the logged in user and if not given, it'll be set.
+   * @param format
+   * @return
+   */
+  public static String getExcelFormatString(final DateFormatType format)
+  {
+    return getExcelFormatString(ensureAndGetDefaultExcelDateFormat(), format);
+  }
+
+  public static String getExcelFormatString(final String defaultExcelDateFormat, final DateFormatType format)
+  {
+    switch (format) {
+      case DATE:
+        return defaultExcelDateFormat;
+      case TIMESTAMP_MINUTES:
+        return defaultExcelDateFormat + " hh:mm";
+      case TIMESTAMP_SECONDS:
+        return defaultExcelDateFormat + " hh:mm:ss";
+      case TIMESTAMP_MILLIS:
+        return defaultExcelDateFormat + " hh:mm:ss.000";
+      default:
+        return defaultExcelDateFormat + " hh:mm:ss";
+    }
+  }
+
   public static String getFormatString(final String defaultDateFormat, final DateFormatType format)
   {
     switch (format) {
@@ -155,14 +202,6 @@ public class DateFormats
         return "HH:mm";
       case TIME_OF_DAY_SECONDS:
         return "HH:mm:ss";
-      case EXCEL_DATE:
-        return getFormatString(defaultDateFormat, DateFormatType.DATE_SHORT).toUpperCase(Locale.ENGLISH);
-      case EXCEL_TIMESTAMP_MINUTES:
-        return getFormatString(defaultDateFormat, DateFormatType.EXCEL_DATE) + " hh:mm";
-      case EXCEL_TIMESTAMP_SECONDS:
-        return getFormatString(defaultDateFormat, DateFormatType.EXCEL_DATE) + " hh:mm:ss";
-      case EXCEL_TIMESTAMP_MILLIS:
-        return getFormatString(defaultDateFormat, DateFormatType.EXCEL_DATE) + " hh:mm:ss.000";
       default:
         return defaultDateFormat;
     }

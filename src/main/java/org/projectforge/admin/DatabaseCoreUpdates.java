@@ -45,20 +45,25 @@ public class DatabaseCoreUpdates
   public static List<UpdateEntry> getUpdateEntries()
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "3.5.4", "Adds table t_database_update. Adds attribute date_format to table t_pf_user.") {
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "3.5.4",
+        "Adds table t_database_update. Adds attribute (excel_)date_format to table t_pf_user.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         return this.preCheckStatus = dao.doesTableExist("t_database_update") == true
-            && dao.doesTableAttributeExist("t_pf_user", "date_format") ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+            && dao.doesTableAttributeExist("t_pf_user", "date_format") == true
+            && dao.doesTableAttributeExist("t_pf_user", "excel_date_format") == true ? UpdatePreCheckStatus.ALREADY_UPDATED
+            : UpdatePreCheckStatus.OK;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
-        if (dao.doesTableExist(DatabaseUpdateDO.TABLE_NAME) == true && dao.doesTableAttributeExist("t_pf_user", "date_format") == true) {
+        if (dao.doesTableExist(DatabaseUpdateDO.TABLE_NAME) == true
+            && dao.doesTableAttributeExist("t_pf_user", "date_format") == true
+            && dao.doesTableAttributeExist("t_pf_user", "excel_date_format") == true) {
           return this.runningStatus = UpdateRunningStatus.DONE;
         }
         if (dao.doesTableExist(DatabaseUpdateDO.TABLE_NAME) == false) {
@@ -74,9 +79,12 @@ public class DatabaseCoreUpdates
         }
         if (dao.doesTableAttributeExist("t_pf_user", "date_format") == false) {
           dao.addTableAttributes("t_pf_user", new TableAttribute("date_format", TableAttributeType.VARCHAR, 20));
-          final UserDao userDao = (UserDao)Registry.instance().getDao(UserDao.class);
-          userDao.getUserGroupCache().setExpired();
         }
+        if (dao.doesTableAttributeExist("t_pf_user", "excel_date_format") == false) {
+          dao.addTableAttributes("t_pf_user", new TableAttribute("excel_date_format", TableAttributeType.VARCHAR, 20));
+        }
+        final UserDao userDao = (UserDao) Registry.instance().getDao(UserDao.class);
+        userDao.getUserGroupCache().setExpired();
         return this.runningStatus = UpdateRunningStatus.DONE;
       }
     });

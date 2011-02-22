@@ -103,13 +103,13 @@ public class XlsContentProvider implements ContentProvider
   {
     this.workbook = workbook;
     createFonts();
-    defaultFormatMap.put(Date.class, new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_TIMESTAMP_MINUTES)));
-    defaultFormatMap.put(java.sql.Date.class, new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_DATE)));
+    defaultFormatMap.put(Date.class, new CellFormat(DateFormats.getExcelFormatString(DateFormatType.TIMESTAMP_MINUTES)));
+    defaultFormatMap.put(java.sql.Date.class, new CellFormat(DateFormats.getExcelFormatString(DateFormatType.DATE)));
     defaultFormatMap.put(Integer.class, new CellFormat("#,##0", CellStyle.ALIGN_RIGHT));
     defaultFormatMap.put(Number.class, new CellFormat("#,###.######", CellStyle.ALIGN_RIGHT));
     defaultFormatMap.put(DateHolder.class, new CellFormat("YYYY-MM-DD").setAutoDatePrecision(true)); // format unused.
-    defaultFormatMap.put(DayHolder.class, new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_DATE)));
-    defaultFormatMap.put(java.sql.Timestamp.class, new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_TIMESTAMP_MILLIS)));
+    defaultFormatMap.put(DayHolder.class, new CellFormat(DateFormats.getExcelFormatString(DateFormatType.DATE)));
+    defaultFormatMap.put(java.sql.Timestamp.class, new CellFormat(DateFormats.getExcelFormatString(DateFormatType.TIMESTAMP_MILLIS)));
   }
 
   public void updateSheetStyle(ExportSheet sheet)
@@ -244,18 +244,20 @@ public class XlsContentProvider implements ContentProvider
     if (format == null) {
       return null;
     }
-    if (value != null && DateHolder.class.isAssignableFrom(value.getClass()) == true && BooleanUtils.isTrue(format.getAutoDatePrecision()) == true) {
+    if (value != null
+        && DateHolder.class.isAssignableFrom(value.getClass()) == true
+        && BooleanUtils.isTrue(format.getAutoDatePrecision()) == true) {
       // Find a format dependent on the precision:
       final DatePrecision precision = ((DateHolder) value).getPrecision();
       if (precision == DatePrecision.DAY) {
-        return new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_DATE));
+        return new CellFormat(DateFormats.getExcelFormatString(DateFormatType.DATE));
       } else if (precision == DatePrecision.SECOND) {
-        return new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_TIMESTAMP_SECONDS));
+        return new CellFormat(DateFormats.getExcelFormatString(DateFormatType.TIMESTAMP_SECONDS));
       } else if (precision == DatePrecision.MILLISECOND) {
-        return new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_TIMESTAMP_MILLIS));
+        return new CellFormat(DateFormats.getExcelFormatString(DateFormatType.TIMESTAMP_MILLIS));
       } else {
         // HOUR_OF_DAY, MINUTE, MINUTE_15 or null
-        return new CellFormat(DateFormats.getFormatString(DateFormatType.EXCEL_TIMESTAMP_MINUTES));
+        return new CellFormat(DateFormats.getExcelFormatString(DateFormatType.TIMESTAMP_MINUTES));
       }
     }
     return format.clone();

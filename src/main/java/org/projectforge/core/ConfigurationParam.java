@@ -31,6 +31,7 @@ public enum ConfigurationParam
   MESSAGE_OF_THE_DAY("messageOfTheDay", ConfigurationType.TEXT), //
   DEFAULT_TIMEZONE("timezone", ConfigurationType.TIME_ZONE, TimeZone.getDefault().getID()), //
   DATE_FORMATS("dateFormats", ConfigurationType.STRING, "MM/dd/yyyy;dd/MM/yyyy;dd.MM.yyyy;yyyy-MM-dd"), //
+  EXCEL_DATE_FORMATS("excelDateFormats", ConfigurationType.STRING, "MM/DD/YYYY;DD/MM/YYYY;DD.MM.YYYY"), //
   FEEDBACK_E_MAIL("feedbackEMail", ConfigurationType.STRING), //
   FIBU_DEFAULT_VAT("fibu.defaultVAT", ConfigurationType.PERCENT), //
   DEFAULT_TASK_ID_4_ADDRESSES("defaultTask4Addresses", ConfigurationType.TASK), //
