@@ -23,17 +23,20 @@
 
 package org.projectforge.web.user;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
+import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
+import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.MessagePage;
 import org.projectforge.web.wicket.MySession;
 
-public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditForm, UserDao>
+public class MyAccountEditPage extends AbstractAutoLayoutEditPage<PFUserDO, MyAccountEditForm, UserDao>
 {
   private static final long serialVersionUID = 4636922408954211544L;
 
@@ -50,6 +53,12 @@ public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditF
     this.showHistory = false;
   }
 
+  @Override
+  public AbstractBasePage onSaveOrUpdate()
+  {
+    return super.onSaveOrUpdate();
+  }
+
   /**
    * @see org.projectforge.web.wicket.AbstractEditPage#update()
    */
@@ -59,10 +68,13 @@ public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditF
     if (PFUserContext.getUserId().equals(getData().getId()) == false) {
       throw new IllegalStateException("Oups, MyAccountEditPage is called with another than the logged in user!");
     }
+    if (StringUtils.isNotEmpty(form.renderer.getEncryptedPassword()) == true) {
+      getData().setPassword(form.renderer.getEncryptedPassword());
+    }
     getData().setPersonalPhoneIdentifiers(userDao.getNormalizedPersonalPhoneIdentifiers(getData()));
     userDao.updateMyAccount(getData());
     ((MySession)getSession()).setLocale(getRequest());
-    if (form.isInvalidateAllStayLoggedInSessions() == true) {
+    if (form.renderer.isInvalidateAllStayLoggedInSessions() == true) {
       userDao.renewStayLoggedInKey(getData().getId());
     }
     setResponsePage(new MessagePage("message.successfullChanged"));

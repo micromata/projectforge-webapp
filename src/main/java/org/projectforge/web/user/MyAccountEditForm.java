@@ -24,35 +24,50 @@
 package org.projectforge.web.user;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.CheckBox;
-import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.access.AccessChecker;
+import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.user.UserRightDao;
+import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.layout.LayoutContext;
 
-public class MyAccountEditForm extends UserBaseEditForm<MyAccountEditPage>
+public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditPage>
 {
   private static final long serialVersionUID = 4137560623244324454L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MyAccountEditForm.class);
 
-  boolean invalidateAllStayLoggedInSessions;
+  @SpringBean(name = "accessChecker")
+  private AccessChecker accessChecker;
+
+  @SpringBean(name = "userRightDao")
+  private UserRightDao userRightDao;
+
+  @SpringBean(name = "groupDao")
+  private GroupDao groupDao;
+
+  protected UserFormRenderer renderer;
 
   public MyAccountEditForm(MyAccountEditPage parentPage, PFUserDO data)
   {
     super(parentPage, data);
+    renderer = new UserFormRenderer(this, parentPage, new LayoutContext(this), parentPage.getBaseDao(), userRightDao, groupDao,
+        accessChecker, data);
   }
 
   @Override
   protected void init()
   {
     super.init();
-    add(new Label("username", getData().getUsername()));
-    add(new CheckBox("invalidateAllStayLoggedInSessions", new PropertyModel<Boolean>(this, "invalidateAllStayLoggedInSessions")));
-    add(new TooltipImage("invalidateAllStayLoggedInSessionsTooltipImage", getResponse(), WebConstants.IMAGE_HELP,
-        getString("login.stayLoggedIn.invalidateAllStayLoggedInSessions.tooltip")));
-    add(new Label("groupnames", userDao.getGroupnames(getData())));
+    renderer.add();
+  }
+
+  @Override
+  protected void validation()
+  {
+    super.validation();
+    renderer.validation();
   }
 
   @Override
@@ -64,21 +79,6 @@ public class MyAccountEditForm extends UserBaseEditForm<MyAccountEditPage>
     deleteButtonPanel.setVisible(false);
     markAsDeletedButtonPanel.setVisible(false);
     undeleteButtonPanel.setVisible(false);
-  }
-
-  /**
-   * If true then update button results in generating a new stay-logged-in key, therefore any existing stay-logged-in session will be
-   * invalid.
-   * @return
-   */
-  public boolean isInvalidateAllStayLoggedInSessions()
-  {
-    return invalidateAllStayLoggedInSessions;
-  }
-
-  public void setInvalidateAllStayLoggedInSessions(boolean invalidateAllStayLoggedInSessions)
-  {
-    this.invalidateAllStayLoggedInSessions = invalidateAllStayLoggedInSessions;
   }
 
   @Override

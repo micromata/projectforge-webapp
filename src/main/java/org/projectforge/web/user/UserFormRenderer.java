@@ -47,6 +47,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
+import org.projectforge.access.AccessChecker;
 import org.projectforge.common.KeyValueBean;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.Configuration;
@@ -60,6 +61,7 @@ import org.projectforge.user.UserRightVO;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.common.TwoListHelper;
+import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -84,6 +86,8 @@ public class UserFormRenderer extends AbstractDOFormRenderer
 
   private static final long serialVersionUID = 6802305266859905435L;
 
+  private final AccessChecker accessChecker;
+
   private final UserDao userDao;
 
   private PFUserDO data;
@@ -96,7 +100,7 @@ public class UserFormRenderer extends AbstractDOFormRenderer
 
   private GroupDao groupDao;
 
-  private UserEditPage parentPage;
+  private AbstractEditPage< ? , ? , ? > parentPage;
 
   protected UserRightsEditData rightsData;
 
@@ -120,8 +124,9 @@ public class UserFormRenderer extends AbstractDOFormRenderer
 
   final LayoutLength labelLength = LayoutLength.THREEQUART;
 
-  public UserFormRenderer(final MarkupContainer container, final UserEditPage parentPage, final LayoutContext layoutContext,
-      final UserDao userDao, final UserRightDao userRightDao, final GroupDao groupDao, final PFUserDO data)
+  public UserFormRenderer(final MarkupContainer container, final AbstractEditPage< ? , ? , ? > parentPage,
+      final LayoutContext layoutContext, final UserDao userDao, final UserRightDao userRightDao, final GroupDao groupDao,
+      final AccessChecker accessChecker, final PFUserDO data)
   {
     super(container, layoutContext);
     this.parentPage = parentPage;
@@ -129,17 +134,24 @@ public class UserFormRenderer extends AbstractDOFormRenderer
     this.userDao = userDao;
     this.userRightDao = userRightDao;
     this.groupDao = groupDao;
+    this.accessChecker = accessChecker;
   }
 
   @SuppressWarnings( { "unchecked", "serial"})
   @Override
   public void add()
   {
+    final boolean adminAccess = accessChecker.isUserMemberOfAdminGroup();
     IField field;
     doPanel.newFieldSetPanel(isNew() == false ? data.getFullname() : getString("user"));
-    field = doPanel.addTextField(new PanelContext(data, "username", FULL, getString("username"), labelLength).setRequired().setStrong());
-    if (field instanceof TextFieldLPanel) { // Isn't true for read-only fields.
-      usernameField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
+    if (adminAccess == true) {
+      field = doPanel.addTextField(new PanelContext(data, "username", FULL, getString("username"), labelLength).setRequired().setStrong());
+      if (field instanceof TextFieldLPanel) { // Isn't true for read-only fields.
+        usernameField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
+      }
+    } else {
+      doPanel.addLabel(getString("username"), labelLength);
+      doPanel.addLabel(data.getUsername(), FULL);
     }
     doPanel.addTextField(new PanelContext(data, "firstname", FULL, getString("firstName"), labelLength).setRequired().setStrong());
     doPanel.addTextField(new PanelContext(data, "lastname", FULL, getString("name"), labelLength).setRequired().setStrong());
@@ -193,7 +205,7 @@ public class UserFormRenderer extends AbstractDOFormRenderer
               .setTooltip(getString("user.personalMebMobileNumbers.tooltip") + "<br/>" + getString("user.personalMebMobileNumbers.format")));
     }
 
-    {
+    if (adminAccess == true) {
       final PasswordTextField passwordRepeatField = new PasswordTextField(TextFieldLPanel.INPUT_ID, new PropertyModel<String>(this,
           "passwordRepeat")) {
         protected void onComponentTag(final ComponentTag tag)
@@ -272,7 +284,9 @@ public class UserFormRenderer extends AbstractDOFormRenderer
     // doPanel.addLabel(NumberFormatter.format(data.getLoginFailures()), FULL);
 
     addAssignedGroups();
-    addRights();
+    if (adminAccess == true) {
+      addRights();
+    }
   }
 
   private void addDateFormatCombobox(final Date today, final String labelKey, final String property, final String[] dateFormats,
@@ -299,10 +313,12 @@ public class UserFormRenderer extends AbstractDOFormRenderer
 
   protected void validation()
   {
-    usernameField.validate();
-    data.setUsername(usernameField.getConvertedInput());
-    if (StringUtils.isNotEmpty(data.getUsername()) == true && userDao.doesUsernameAlreadyExist(data) == true) {
-      usernameField.error(getString("user.error.usernameAlreadyExists"));
+    if (usernameField != null) {
+      usernameField.validate();
+      data.setUsername(usernameField.getConvertedInput());
+      if (StringUtils.isNotEmpty(data.getUsername()) == true && userDao.doesUsernameAlreadyExist(data) == true) {
+        usernameField.error(getString("user.error.usernameAlreadyExists"));
+      }
     }
   }
 
@@ -335,6 +351,7 @@ public class UserFormRenderer extends AbstractDOFormRenderer
   @SuppressWarnings( { "unchecked", "serial"})
   private void addAssignedGroups()
   {
+    final boolean adminAccess = accessChecker.isUserMemberOfAdminGroup();
     doPanel.newFieldSetPanel(getString("group.groups"));
 
     List<Integer> groupsToAdd = null;
@@ -370,37 +387,41 @@ public class UserFormRenderer extends AbstractDOFormRenderer
     doPanel.addListMultipleChoice(valuesToUnassignChoice, new PanelContext(FULL, getString("user.assignedGroups"), labelLength)
         .setBreakBetweenLabelAndField(true).setCssStyle("width: 95%; height:20em;"));
 
-    final RepeatingViewLPanel repeatingViewPanel = doPanel.addRepeater(LayoutLength.ONEHALF);
-    repeatingViewPanel.setBreakBefore();
-    final RepeatingView repeatingView = repeatingViewPanel.getRepeatingView();
-    final Button unassignButton = new Button("button", new Model<String>(getString("unassign"))) {
-      @Override
-      public final void onSubmit()
-      {
-        groups.unassign(valuesToUnassign);
-        valuesToUnassign.clear();
-        refreshGroupLists();
-      }
-    };
-    unassignButton.add(WebConstants.BUTTON_CLASS_RESET);
-    final SingleButtonPanel unassignButtonPanel = new SingleButtonPanel(repeatingView.newChildId(), unassignButton);
-    repeatingView.add(unassignButtonPanel);
+    if (adminAccess == true) {
+      final RepeatingViewLPanel repeatingViewPanel = doPanel.addRepeater(LayoutLength.ONEHALF);
+      repeatingViewPanel.setBreakBefore();
+      final RepeatingView repeatingView = repeatingViewPanel.getRepeatingView();
+      final Button unassignButton = new Button("button", new Model<String>(getString("unassign"))) {
+        @Override
+        public final void onSubmit()
+        {
+          accessChecker.checkIsUserMemberOfAdminGroup();
+          groups.unassign(valuesToUnassign);
+          valuesToUnassign.clear();
+          refreshGroupLists();
+        }
+      };
+      unassignButton.add(WebConstants.BUTTON_CLASS_RESET);
+      final SingleButtonPanel unassignButtonPanel = new SingleButtonPanel(repeatingView.newChildId(), unassignButton);
+      repeatingView.add(unassignButtonPanel);
 
-    final Button assignButton = new Button("button", new Model<String>(getString("assign"))) {
-      @Override
-      public final void onSubmit()
-      {
-        groups.assign(valuesToAssign);
-        valuesToAssign.clear();
-        refreshGroupLists();
-      }
-    };
-    assignButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    final SingleButtonPanel assignButtonPanel = new SingleButtonPanel(repeatingView.newChildId(), assignButton);
-    repeatingView.add(assignButtonPanel);
+      final Button assignButton = new Button("button", new Model<String>(getString("assign"))) {
+        @Override
+        public final void onSubmit()
+        {
+          accessChecker.checkIsUserMemberOfAdminGroup();
+          groups.assign(valuesToAssign);
+          valuesToAssign.clear();
+          refreshGroupLists();
+        }
+      };
+      assignButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+      final SingleButtonPanel assignButtonPanel = new SingleButtonPanel(repeatingView.newChildId(), assignButton);
+      repeatingView.add(assignButtonPanel);
 
-    doPanel.addListMultipleChoice(valuesToAssignChoice, new PanelContext(FULL, getString("user.unassignedGroups"), labelLength)
-        .setBreakBetweenLabelAndField(true).setCssStyle("width: 95%; height:20em;"));
+      doPanel.addListMultipleChoice(valuesToAssignChoice, new PanelContext(FULL, getString("user.unassignedGroups"), labelLength)
+          .setBreakBetweenLabelAndField(true).setCssStyle("width: 95%; height:20em;"));
+    }
     refreshGroupLists();
   }
 

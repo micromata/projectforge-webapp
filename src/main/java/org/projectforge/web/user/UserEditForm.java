@@ -25,6 +25,7 @@ package org.projectforge.web.user;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.access.AccessChecker;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightDao;
@@ -37,6 +38,9 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserEditForm.class);
 
+  @SpringBean(name = "accessChecker")
+  private AccessChecker accessChecker;
+
   @SpringBean(name = "userRightDao")
   private UserRightDao userRightDao;
 
@@ -48,7 +52,8 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
   public UserEditForm(final UserEditPage parentPage, final PFUserDO data)
   {
     super(parentPage, data);
-    renderer = new UserFormRenderer(this, parentPage, new LayoutContext(this), parentPage.getBaseDao(), userRightDao, groupDao, data);
+    renderer = new UserFormRenderer(this, parentPage, new LayoutContext(this), parentPage.getBaseDao(), userRightDao, groupDao,
+        accessChecker, data);
   }
 
   @Override
@@ -57,7 +62,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     super.init();
     renderer.add();
   }
-  
+
   @Override
   protected void validation()
   {

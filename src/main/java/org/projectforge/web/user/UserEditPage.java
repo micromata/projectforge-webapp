@@ -73,6 +73,7 @@ public class UserEditPage extends AbstractAutoLayoutEditPage<PFUserDO, UserEditF
     if (StringUtils.isNotEmpty(form.renderer.getEncryptedPassword()) == true) {
       getData().setPassword(form.renderer.getEncryptedPassword());
     }
+    getData().setPersonalPhoneIdentifiers(userDao.getNormalizedPersonalPhoneIdentifiers(getData()));
     return super.onSaveOrUpdate();
   }
 
