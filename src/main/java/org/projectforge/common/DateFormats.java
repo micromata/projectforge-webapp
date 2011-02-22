@@ -23,9 +23,7 @@
 
 package org.projectforge.common;
 
-import org.apache.commons.lang.StringUtils;
 import org.projectforge.core.Configuration;
-import org.projectforge.core.ConfigurationParam;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 
@@ -45,6 +43,8 @@ public class DateFormats
   public static final String ISO_TIMESTAMP_SECONDS = "yyyy-MM-dd HH:mm:ss";
 
   public static final String ISO_TIMESTAMP_MILLIS = "yyyy-MM-dd HH:mm:ss.SSS";
+
+  public static final String EXCEL_ISO_DATE = "YYYY-MM-DD";
 
   /**
    * Uses default format of the logged-in user.
@@ -77,7 +77,8 @@ public class DateFormats
   /**
    * Gets the format string for the logged-in user. Uses the date format of the logged in user and if not given, it'll be set.
    * @param format
-   * @return
+   * @see Configuration#getDateFormats()
+   * @see PFUserDO#getExcelDateFormat()
    */
   public static String getFormatString(final DateFormatType format)
   {
@@ -93,13 +94,7 @@ public class DateFormats
     final PFUserDO user = PFUserContext.getUser();
     String defaultDateFormat = user != null ? user.getDateFormat() : null;
     if (defaultDateFormat == null) {
-      final String str = Configuration.getInstance().getStringValue(ConfigurationParam.DATE_FORMATS);
-      final String[] sa = StringUtils.split(str, " \t\r\n,;");
-      if (sa == null || sa.length < 1) {
-        defaultDateFormat = ISO_DATE;
-      } else {
-        defaultDateFormat = sa[0];
-      }
+      defaultDateFormat = Configuration.getInstance().getDefaultDateFormat();
       if (user != null) {
         user.setDateFormat(defaultDateFormat);
       }
@@ -116,13 +111,7 @@ public class DateFormats
     final PFUserDO user = PFUserContext.getUser();
     String defaultExcelDateFormat = user != null ? user.getExcelDateFormat() : null;
     if (defaultExcelDateFormat == null) {
-      final String str = Configuration.getInstance().getStringValue(ConfigurationParam.EXCEL_DATE_FORMATS);
-      final String[] sa = StringUtils.split(str, " \t\r\n,;");
-      if (sa == null || sa.length < 1) {
-        defaultExcelDateFormat = ISO_DATE;
-      } else {
-        defaultExcelDateFormat = sa[0];
-      }
+      defaultExcelDateFormat = Configuration.getInstance().getDefaultExcelDateFormat();
       if (user != null) {
         user.setExcelDateFormat(defaultExcelDateFormat);
       }
@@ -133,7 +122,8 @@ public class DateFormats
   /**
    * Gets the format string for the logged-in user. Uses the date format of the logged in user and if not given, it'll be set.
    * @param format
-   * @return
+   * @see Configuration#getExcelDateFormats()
+   * @see PFUserDO#getExcelDateFormat()
    */
   public static String getExcelFormatString(final DateFormatType format)
   {
@@ -172,6 +162,8 @@ public class DateFormats
         }
         if (pattern.endsWith("/") == true) {
           return pattern.substring(0, pattern.length() - 1);
+        } else if (pattern.startsWith("-") == true) {
+          return pattern.substring(1);
         } else {
           return pattern;
         }
