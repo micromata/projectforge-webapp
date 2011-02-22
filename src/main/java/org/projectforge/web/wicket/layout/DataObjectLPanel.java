@@ -731,6 +731,12 @@ public class DataObjectLPanel extends Panel
       ctx.internalSetLabelPanel(labelPanel);
       groupPanel.add(labelPanel);
       ((CheckBoxLPanel) field).getCheckBox().setLabel(new Model<String>(ctx.getLabel()));
+      if (ctx.getTooltip() != null) {
+        labelPanel.setTooltip(ctx.getTooltip());
+      }
+    }
+    if (ctx.getTooltip() != null) {
+      ((CheckBoxLPanel) field).setTooltip(ctx.getTooltip());
     }
     groupPanel.add(field);
     ctx.internalSetValueField(field);
