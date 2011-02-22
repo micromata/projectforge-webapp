@@ -106,6 +106,8 @@ public class UserFormRenderer extends AbstractDOFormRenderer
 
   private String encryptedPassword;
 
+  boolean invalidateAllStayLoggedInSessions;
+
   TwoListHelper<Integer, String> groups;
 
   private List<Integer> valuesToAssign = new ArrayList<Integer>();
@@ -257,6 +259,10 @@ public class UserFormRenderer extends AbstractDOFormRenderer
       doPanel.addPasswordTextField(passwordRepeatField, new PanelContext(FULL, getString("passwordRepeat"), labelLength));
     }
     doPanel.addTextArea(new PanelContext(data, "description", FULL, getString("description"), labelLength).setCssStyle("height: 10em;"));
+
+    doPanel.addCheckBox(new PanelContext(this, "invalidateAllStayLoggedInSessions", FULL,
+        getString("login.stayLoggedIn.invalidateAllStayLoggedInSessions"), labelLength)
+        .setTooltip(getString("login.stayLoggedIn.invalidateAllStayLoggedInSessions.tooltip")));
 
     doPanel.addLabel(getString("login.lastLogin"), labelLength).setBreakBefore();
     doPanel.addLabel(DateTimeFormatter.instance().getFormattedDateTime(data.getLastLogin()), FULL);
@@ -473,5 +479,20 @@ public class UserFormRenderer extends AbstractDOFormRenderer
   public void setPasswordRepeat(String passwordRepeat)
   {
     this.passwordRepeat = passwordRepeat;
+  }
+
+  /**
+   * If true then update button results in generating a new stay-logged-in key, therefore any existing stay-logged-in session will be
+   * invalid.
+   * @return
+   */
+  public boolean isInvalidateAllStayLoggedInSessions()
+  {
+    return invalidateAllStayLoggedInSessions;
+  }
+
+  public void setInvalidateAllStayLoggedInSessions(boolean invalidateAllStayLoggedInSessions)
+  {
+    this.invalidateAllStayLoggedInSessions = invalidateAllStayLoggedInSessions;
   }
 }

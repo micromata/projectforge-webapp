@@ -79,18 +79,22 @@ public class UserEditPage extends AbstractAutoLayoutEditPage<PFUserDO, UserEditF
   @Override
   public AbstractBasePage afterSaveOrUpdate()
   {
-     final Set<Integer> assignedGroupIds = new HashSet<Integer>();
-     for (Integer groupId : form.renderer.groups.getValuesToAssign()) {
-     assignedGroupIds.add(groupId);
-     }
-     final Set<Integer> unassignedGroupIds = new HashSet<Integer>();
-     for (Integer groupId : form.renderer.groups.getValuesToUnassign()) {
-     unassignedGroupIds.add(groupId);
-     }
-     groupDao.assignGroups(getData(), assignedGroupIds, unassignedGroupIds);
-    
-     final List<UserRightVO> list = form.renderer.rightsData.getRights();
-     userRightDao.updateUserRights(getData(), list);
+    final Set<Integer> assignedGroupIds = new HashSet<Integer>();
+    for (Integer groupId : form.renderer.groups.getValuesToAssign()) {
+      assignedGroupIds.add(groupId);
+    }
+    final Set<Integer> unassignedGroupIds = new HashSet<Integer>();
+    for (Integer groupId : form.renderer.groups.getValuesToUnassign()) {
+      unassignedGroupIds.add(groupId);
+    }
+    groupDao.assignGroups(getData(), assignedGroupIds, unassignedGroupIds);
+
+    final List<UserRightVO> list = form.renderer.rightsData.getRights();
+    userRightDao.updateUserRights(getData(), list);
+
+    if (form.renderer.isInvalidateAllStayLoggedInSessions() == true) {
+      userDao.renewStayLoggedInKey(getData().getId());
+    }
 
     return super.afterSaveOrUpdate();
   }
