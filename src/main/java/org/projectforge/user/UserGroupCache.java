@@ -111,11 +111,12 @@ public class UserGroupCache extends AbstractCache
     if (userId == null) {
       return null;
     }
-    checkRefresh();
-    return getUserMap().get(userId);
+    // checkRefresh(); Done by getUserMap().
+    return getUserMap() != null ? userMap.get(userId) : null; // Only null in maintenance mode (if t_user isn't readable).
   }
-  
-  public PFUserDO getUser(final String username) {
+
+  public PFUserDO getUser(final String username)
+  {
     if (username == null) {
       return null;
     }
@@ -177,7 +178,8 @@ public class UserGroupCache extends AbstractCache
   public boolean isUserMemberOfAdminGroup(final Integer userId)
   {
     checkRefresh();
-    return adminUsers.contains(userId);
+    // adminUsers should only be null in maintenance mode (e. g. if user table isn't readable).
+    return adminUsers != null ? adminUsers.contains(userId) : false;
   }
 
   public boolean isUserMemberOfFinanceGroup()
@@ -188,7 +190,8 @@ public class UserGroupCache extends AbstractCache
   public boolean isUserMemberOfFinanceGroup(final Integer userId)
   {
     checkRefresh();
-    return financeUsers.contains(userId);
+    // financeUsers should only be null in maintenance mode (e. g. if user table isn't readable).
+    return financeUsers != null ? financeUsers.contains(userId) : false;
   }
 
   public boolean isUserMemberOfProjectManagers()
@@ -199,7 +202,8 @@ public class UserGroupCache extends AbstractCache
   public boolean isUserMemberOfProjectManagers(final Integer userId)
   {
     checkRefresh();
-    return projectManagers.contains(userId);
+    // projectManagers should only be null in maintenance mode (e. g. if user table isn't readable).
+    return projectManagers != null ? projectManagers.contains(userId) : false;
   }
 
   public boolean isUserMemberOfProjectAssistant()
@@ -210,7 +214,8 @@ public class UserGroupCache extends AbstractCache
   public boolean isUserMemberOfProjectAssistant(final Integer userId)
   {
     checkRefresh();
-    return projectAssistants.contains(userId);
+    // projectAssistants should only be null in maintenance mode (e. g. if user table isn't readable).
+    return projectAssistants != null ? projectAssistants.contains(userId) : false;
   }
 
   public boolean isUserProjectManagerOrAssistantForProject(final ProjektDO projekt)
@@ -233,7 +238,8 @@ public class UserGroupCache extends AbstractCache
   public boolean isUserMemberOfControllingGroup(final Integer userId)
   {
     checkRefresh();
-    return controllingUsers.contains(userId);
+    // controllingUsers should only be null in maintenance mode (e. g. if user table isn't readable).
+    return controllingUsers != null ? controllingUsers.contains(userId) : false;
   }
 
   public boolean isUserMemberOfMarketingGroup()
@@ -255,7 +261,8 @@ public class UserGroupCache extends AbstractCache
   public boolean isUserMemberOfOrgaGroup(final Integer userId)
   {
     checkRefresh();
-    return orgaUsers.contains(userId);
+    // orgaUsers should only be null in maintenance mode (e. g. if user table isn't readable).
+    return orgaUsers != null ? orgaUsers.contains(userId) : false;
   }
 
   /**
