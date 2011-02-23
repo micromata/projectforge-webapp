@@ -50,6 +50,7 @@ import org.apache.wicket.validation.validator.AbstractValidator;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.common.KeyValueBean;
 import org.projectforge.common.StringHelper;
+import org.projectforge.common.TimeNotation;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
@@ -190,6 +191,15 @@ public class UserFormRenderer extends AbstractDOFormRenderer
     final Date today = new Date();
     addDateFormatCombobox(today, "dateFormat", "dateFormat", Configuration.getInstance().getDateFormats(), false);
     addDateFormatCombobox(today, "dateFormat.xls", "excelDateFormat", Configuration.getInstance().getExcelDateFormats(), true);
+
+    {
+      final LabelValueChoiceRenderer<TimeNotation> timeNotationChoiceRenderer = new LabelValueChoiceRenderer<TimeNotation>();
+      timeNotationChoiceRenderer.addValue(TimeNotation.H12, getString("timeNotation.12"));
+      timeNotationChoiceRenderer.addValue(TimeNotation.H24, getString("timeNotation.24"));
+      final DropDownChoice timeNotationChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "timeNotation"),
+          timeNotationChoiceRenderer.getValues(), timeNotationChoiceRenderer);
+      doPanel.addDropDownChoice(timeNotationChoice, new PanelContext(FULL, getString("timeNotation"), labelLength));
+    }
 
     final TimeZoneField timeZone = new TimeZoneField(TextFieldLPanel.INPUT_ID, new PropertyModel<TimeZone>(data, "timeZoneObject"));
     doPanel.addTextField(timeZone, new PanelContext(FULL, getString("timezone"), labelLength)
