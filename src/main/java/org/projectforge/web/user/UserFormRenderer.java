@@ -198,6 +198,7 @@ public class UserFormRenderer extends AbstractDOFormRenderer
       timeNotationChoiceRenderer.addValue(TimeNotation.H24, getString("timeNotation.24"));
       final DropDownChoice timeNotationChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "timeNotation"),
           timeNotationChoiceRenderer.getValues(), timeNotationChoiceRenderer);
+      timeNotationChoice.setNullValid(true);
       doPanel.addDropDownChoice(timeNotationChoice, new PanelContext(FULL, getString("timeNotation"), labelLength));
     }
 
