@@ -111,7 +111,9 @@ public class DateFormats
     final PFUserDO user = PFUserContext.getUser();
     TimeNotation defaultTimeNotation = user != null ? user.getTimeNotation() : null;
     if (defaultTimeNotation == null) {
-      if (user != null && user.getClientLocale() != null && user.getClientLocale().toString().startsWith("de") == true) {
+      if (Configuration.getInstance().getDefaultTimeNotation() != null) {
+        defaultTimeNotation = Configuration.getInstance().getDefaultTimeNotation();
+      } else if (user != null && user.getClientLocale() != null && user.getClientLocale().toString().startsWith("de") == true) {
         defaultTimeNotation = TimeNotation.H24;
       } else {
         defaultTimeNotation = TimeNotation.H12;

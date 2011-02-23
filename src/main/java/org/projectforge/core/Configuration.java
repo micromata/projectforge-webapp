@@ -60,6 +60,7 @@ import org.projectforge.common.AbstractCache;
 import org.projectforge.common.DateFormats;
 import org.projectforge.common.FileHelper;
 import org.projectforge.common.StringHelper;
+import org.projectforge.common.TimeNotation;
 import org.projectforge.jira.JiraConfig;
 import org.projectforge.jira.JiraIssueType;
 import org.projectforge.mail.MailAccountConfig;
@@ -135,6 +136,9 @@ public class Configuration extends AbstractCache
 
   @XmlField(asElement = true)
   private Locale defaultLocale;
+
+  @XmlField(asElement = true)
+  private TimeNotation defaultTimeNotation;
 
   private String excelDefaultPaperSize;
 
@@ -714,6 +718,15 @@ public class Configuration extends AbstractCache
   public Locale getDefaultLocale()
   {
     return defaultLocale;
+  }
+  
+  /**
+   * The default time notation (12-hour or 24-hour). This notation is used, if the user has not chosen his personal time notation.
+   * Default is 24-hour for locales starting with "de" (German), otherwise 12-hour.
+   */
+  public TimeNotation getDefaultTimeNotation()
+  {
+    return defaultTimeNotation;
   }
 
   /**
