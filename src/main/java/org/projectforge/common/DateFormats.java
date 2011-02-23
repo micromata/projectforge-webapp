@@ -69,7 +69,7 @@ public class DateFormats
       sa[0] = defaultDateFormat;
       sa[1] = defaultDateFormat.replace("yy", "yyyy");
     }
-    sa[2] = getFormatString(defaultDateFormat, DateFormatType.DATE_WITHOUT_YEAR);
+    sa[2] = getFormatString(defaultDateFormat, null, DateFormatType.DATE_WITHOUT_YEAR);
     sa[3] = ISO_DATE;
     return sa;
   }
@@ -82,7 +82,7 @@ public class DateFormats
    */
   public static String getFormatString(final DateFormatType format)
   {
-    return getFormatString(ensureAndGetDefaultDateFormat(), format);
+    return getFormatString(ensureAndGetDefaultDateFormat(), ensureAndGetDefaultTimeNotation(), format);
   }
 
   /**
@@ -100,6 +100,27 @@ public class DateFormats
       }
     }
     return defaultDateFormat;
+  }
+
+  /**
+   * Ensures and gets the default time notation of the logged-in user.
+   * @return
+   */
+  private static TimeNotation ensureAndGetDefaultTimeNotation()
+  {
+    final PFUserDO user = PFUserContext.getUser();
+    TimeNotation defaultTimeNotation = user != null ? user.getTimeNotation() : null;
+    if (defaultTimeNotation == null) {
+      if (user != null && user.getClientLocale() != null && user.getClientLocale().toString().startsWith("de") == true) {
+        defaultTimeNotation = TimeNotation.H24;
+      } else {
+        defaultTimeNotation = TimeNotation.H12;
+      }
+      if (user != null) {
+        user.setTimeNotation(defaultTimeNotation);
+      }
+    }
+    return defaultTimeNotation;
   }
 
   /**
@@ -146,13 +167,13 @@ public class DateFormats
     }
   }
 
-  public static String getFormatString(final String defaultDateFormat, final DateFormatType format)
+  public static String getFormatString(final String defaultDateFormat, final TimeNotation timeNotation, final DateFormatType format)
   {
     switch (format) {
       case DATE:
         return defaultDateFormat;
       case DATE_WITH_DAY_NAME:
-        return "E, " + getFormatString(defaultDateFormat, DateFormatType.DATE);
+        return "E, " + getFormatString(defaultDateFormat, timeNotation, DateFormatType.DATE);
       case DATE_WITHOUT_YEAR:
         String pattern;
         if (defaultDateFormat.contains("yyyy") == true) {
@@ -183,17 +204,21 @@ public class DateFormats
       case DAY_OF_WEEK_SHORT:
         return "EE";
       case TIMESTAMP_MINUTES:
-        return getFormatString(defaultDateFormat, DateFormatType.DATE) + " HH:mm";
+        return getFormatString(defaultDateFormat, timeNotation, DateFormatType.DATE)
+            + (timeNotation == TimeNotation.H24 ? " HH:mm" : " hh:mm aa");
       case TIMESTAMP_SECONDS:
-        return getFormatString(defaultDateFormat, DateFormatType.DATE) + " HH:mm:ss";
+        return getFormatString(defaultDateFormat, timeNotation, DateFormatType.DATE)
+            + (timeNotation == TimeNotation.H24 ? " HH:mm:ss" : " hh:mm:ss aa");
       case TIMESTAMP_SHORT_MINUTES:
-        return getFormatString(defaultDateFormat, DateFormatType.DATE_SHORT) + " HH:mm";
+        return getFormatString(defaultDateFormat, timeNotation, DateFormatType.DATE_SHORT)
+            + (timeNotation == TimeNotation.H24 ? " HH:mm" : " hh:mm aa");
       case TIMESTAMP_SHORT_SECONDS:
-        return getFormatString(defaultDateFormat, DateFormatType.DATE_SHORT) + " HH:mm:ss";
+        return getFormatString(defaultDateFormat, timeNotation, DateFormatType.DATE_SHORT)
+            + (timeNotation == TimeNotation.H24 ? " HH:mm:ss" : " hh:mm:ss aa");
       case TIME_OF_DAY_MINUTES:
-        return "HH:mm";
+        return (timeNotation == TimeNotation.H24 ? " HH:mm" : " hh:mm aa");
       case TIME_OF_DAY_SECONDS:
-        return "HH:mm:ss";
+        return (timeNotation == TimeNotation.H24 ? " HH:mm:ss" : " hh:mm:ss aa");
       default:
         return defaultDateFormat;
     }
