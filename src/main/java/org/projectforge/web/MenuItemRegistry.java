@@ -244,8 +244,8 @@ public class MenuItemRegistry
     // Projects 90 (if user isn't member of FIBU groups.
 
     // FIBU
-    reg.register(fibu, MenuItemDefId.INCOMING_INVOICE_LIST, 10, RechnungListPage.class, RechnungDao.USER_RIGHT_ID, READONLY_READWRITE);
-    reg.register(fibu, MenuItemDefId.OUTGOING_INVOICE_LIST, 20, EingangsrechnungListPage.class, EingangsrechnungDao.USER_RIGHT_ID,
+    reg.register(fibu, MenuItemDefId.OUTGOING_INVOICE_LIST, 10, RechnungListPage.class, RechnungDao.USER_RIGHT_ID, READONLY_READWRITE);
+    reg.register(fibu, MenuItemDefId.INCOMING_INVOICE_LIST, 20, EingangsrechnungListPage.class, EingangsrechnungDao.USER_RIGHT_ID,
         READONLY_READWRITE);
     reg.register(fibu, MenuItemDefId.BANK_ACCOUNT_LIST, 30, BankAccountListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     reg.register(fibu, MenuItemDefId.CUSTOMER_LIST, 40, CustomerListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
