@@ -46,14 +46,15 @@ public class DatabaseCoreUpdates
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
     list.add(new UpdateEntryImpl(CORE_REGION_ID, "3.5.4",
-        "Adds table t_database_update. Adds attribute (excel_)date_format to table t_pf_user.") {
+        "Adds table t_database_update. Adds attribute (excel_)date_format, hour_format_24 to table t_pf_user.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         return this.preCheckStatus = dao.doesTableExist("t_database_update") == true
             && dao.doesTableAttributeExist("t_pf_user", "date_format") == true
-            && dao.doesTableAttributeExist("t_pf_user", "excel_date_format") == true ? UpdatePreCheckStatus.ALREADY_UPDATED
+            && dao.doesTableAttributeExist("t_pf_user", "excel_date_format") == true
+            && dao.doesTableAttributeExist("t_pf_user", "time_notation") == true ? UpdatePreCheckStatus.ALREADY_UPDATED
             : UpdatePreCheckStatus.OK;
       }
 
@@ -63,7 +64,8 @@ public class DatabaseCoreUpdates
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         if (dao.doesTableExist(DatabaseUpdateDO.TABLE_NAME) == true
             && dao.doesTableAttributeExist("t_pf_user", "date_format") == true
-            && dao.doesTableAttributeExist("t_pf_user", "excel_date_format") == true) {
+            && dao.doesTableAttributeExist("t_pf_user", "excel_date_format") == true
+            && dao.doesTableAttributeExist("t_pf_user", "time_notation") == true) {
           return this.runningStatus = UpdateRunningStatus.DONE;
         }
         if (dao.doesTableExist(DatabaseUpdateDO.TABLE_NAME) == false) {
@@ -82,6 +84,9 @@ public class DatabaseCoreUpdates
         }
         if (dao.doesTableAttributeExist("t_pf_user", "excel_date_format") == false) {
           dao.addTableAttributes("t_pf_user", new TableAttribute("excel_date_format", TableAttributeType.VARCHAR, 20));
+        }
+        if (dao.doesTableAttributeExist("t_pf_user", "time_notation") == false) {
+          dao.addTableAttributes("t_pf_user", new TableAttribute("time_notation", TableAttributeType.VARCHAR, 6));
         }
         final UserDao userDao = (UserDao) Registry.instance().getDao(UserDao.class);
         userDao.getUserGroupCache().setExpired();
