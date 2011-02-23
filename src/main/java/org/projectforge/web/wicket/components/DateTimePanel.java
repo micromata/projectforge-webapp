@@ -33,9 +33,11 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponentPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
+import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.common.StringHelper;
+import org.projectforge.common.TimeNotation;
 
 /**
  * Model for date and time of day components.
@@ -46,16 +48,27 @@ public class DateTimePanel extends FormComponentPanel<Date>
 {
   private static final long serialVersionUID = -3835388673051184738L;
 
-  private static final LabelValueChoiceRenderer<Integer> HOURS_OF_DAY_RENDERER;
+  private static final LabelValueChoiceRenderer<Integer> HOURS_OF_DAY_RENDERER_12;
+
+  private static final LabelValueChoiceRenderer<Integer> HOURS_OF_DAY_RENDERER_24;
 
   private static final LabelValueChoiceRenderer<Integer> MINUTES_1_RENDERER;
 
   private static final LabelValueChoiceRenderer<Integer> MINUTES_15_RENDERER;
 
   static {
-    HOURS_OF_DAY_RENDERER = new LabelValueChoiceRenderer<Integer>();
+    HOURS_OF_DAY_RENDERER_24 = new LabelValueChoiceRenderer<Integer>();
     for (int i = 0; i <= 23; i++) {
-      HOURS_OF_DAY_RENDERER.addValue(i, StringHelper.format2DigitNumber(i));
+      HOURS_OF_DAY_RENDERER_24.addValue(i, StringHelper.format2DigitNumber(i));
+    }
+    HOURS_OF_DAY_RENDERER_12 = new LabelValueChoiceRenderer<Integer>();
+    HOURS_OF_DAY_RENDERER_12.addValue(0, "12 AM");
+    for (int i = 1; i <= 11; i++) {
+      HOURS_OF_DAY_RENDERER_12.addValue(i, StringHelper.format2DigitNumber(i) + " AM");
+    }
+    HOURS_OF_DAY_RENDERER_12.addValue(12, "12 PM");
+    for (int i = 1; i <= 12; i++) {
+      HOURS_OF_DAY_RENDERER_12.addValue(i + 12, StringHelper.format2DigitNumber(i) + " PM");
     }
     MINUTES_1_RENDERER = new LabelValueChoiceRenderer<Integer>();
     for (int i = 0; i <= 59; i++) {
@@ -84,7 +97,12 @@ public class DateTimePanel extends FormComponentPanel<Date>
 
   public static LabelValueChoiceRenderer<Integer> getHourOfDayRenderer()
   {
-    return HOURS_OF_DAY_RENDERER;
+    return getHourOfDayRenderer(DateFormats.ensureAndGetDefaultTimeNotation());
+  }
+
+  public static LabelValueChoiceRenderer<Integer> getHourOfDayRenderer(final TimeNotation timeNotation)
+  {
+    return timeNotation == TimeNotation.H12 ? HOURS_OF_DAY_RENDERER_12 : HOURS_OF_DAY_RENDERER_24;
   }
 
   /**
@@ -225,12 +243,12 @@ public class DateTimePanel extends FormComponentPanel<Date>
   {
     return datePanel;
   }
-  
+
   public DateTextField getDateField()
   {
     return datePanel.getDateField();
   }
-  
+
   public void setFocus()
   {
     datePanel.setFocus();

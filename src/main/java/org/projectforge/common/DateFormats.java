@@ -106,7 +106,7 @@ public class DateFormats
    * Ensures and gets the default time notation of the logged-in user.
    * @return
    */
-  private static TimeNotation ensureAndGetDefaultTimeNotation()
+  public static TimeNotation ensureAndGetDefaultTimeNotation()
   {
     final PFUserDO user = PFUserContext.getUser();
     TimeNotation defaultTimeNotation = user != null ? user.getTimeNotation() : null;
