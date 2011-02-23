@@ -210,6 +210,7 @@ public class Configuration extends AbstractCache
     mebMailAccount = new MailAccountConfig();
     currencySymbol = "€";
     defaultLocale = Locale.ENGLISH;
+    defaultTimeNotation = null;
     excelDefaultPaperSize = "DINA4";
     holidays = null;
     contractTypes = null;

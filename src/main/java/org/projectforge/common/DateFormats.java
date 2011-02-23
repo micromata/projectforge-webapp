@@ -23,6 +23,8 @@
 
 package org.projectforge.common;
 
+import java.util.Locale;
+
 import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
@@ -113,10 +115,13 @@ public class DateFormats
     if (defaultTimeNotation == null) {
       if (Configuration.getInstance().getDefaultTimeNotation() != null) {
         defaultTimeNotation = Configuration.getInstance().getDefaultTimeNotation();
-      } else if (user != null && user.getClientLocale() != null && user.getClientLocale().toString().startsWith("de") == true) {
-        defaultTimeNotation = TimeNotation.H24;
       } else {
-        defaultTimeNotation = TimeNotation.H12;
+        final Locale locale = PFUserContext.getLocale();
+        if (locale != null && locale.toString().toLowerCase().startsWith("de") == true) {
+          defaultTimeNotation = TimeNotation.H24;
+        } else {
+          defaultTimeNotation = TimeNotation.H12;
+        }
       }
       if (user != null) {
         user.setTimeNotation(defaultTimeNotation);
