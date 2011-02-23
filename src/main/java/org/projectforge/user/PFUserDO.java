@@ -35,6 +35,8 @@ import java.util.TimeZone;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -50,6 +52,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.common.ReflectionToString;
+import org.projectforge.common.TimeNotation;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.Configuration;
@@ -113,6 +116,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   private String dateFormat;
 
   private String excelDateFormat;
+
+  private TimeNotation timeNotation;
 
   @org.hibernate.search.annotations.Field(index = Index.TOKENIZED, store = Store.NO)
   private String organization;
@@ -243,6 +248,18 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public void setExcelDateFormat(final String excelDateFormat)
   {
     this.excelDateFormat = excelDateFormat;
+  }
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "time_notation", length = 6)
+  public TimeNotation getTimeNotation()
+  {
+    return timeNotation;
+  }
+
+  public void setTimeNotation(final TimeNotation timeNotation)
+  {
+    this.timeNotation = timeNotation;
   }
 
   /**
