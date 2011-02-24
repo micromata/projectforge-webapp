@@ -95,12 +95,12 @@ public class ToDoPlugin extends AbstractPlugin
     // .addAttribute(new TableAttribute("read_access", TableAttributeType.VARCHAR, 16))
     // .addAttribute(new TableAttribute("write_access", TableAttributeType.VARCHAR, 16));
     // dao.createTable(table);
-    final Table table = new Table("T_TODO") //
-        .addAttribute(new TableAttribute("pk", TableAttributeType.INT, true).setPrimaryKey(true)) //
-        .addAttribute(new TableAttribute("created", TableAttributeType.TIMESTAMP)) //
-        .addAttribute(new TableAttribute("last_update", TableAttributeType.TIMESTAMP)) //
-        .addAttribute(new TableAttribute("deleted", TableAttributeType.BOOLEAN, true));
-    databaseUpdateDao.createTable(table);
+//    final Table table = new Table("T_TODO") //
+//        .addAttribute(new TableAttribute("pk", TableAttributeType.INT, true).setPrimaryKey(true)) //
+//        .addAttribute(new TableAttribute("created", TableAttributeType.TIMESTAMP)) //
+//        .addAttribute(new TableAttribute("last_update", TableAttributeType.TIMESTAMP)) //
+//        .addAttribute(new TableAttribute("deleted", TableAttributeType.BOOLEAN, true));
+//    databaseUpdateDao.createTable(table);
     return UpdateRunningStatus.DONE;
   }
 
