@@ -182,7 +182,6 @@ public class MenuPanel extends Panel
     if (menu.getMenuEntries() != null) {
       for (final MenuEntry menuAreaEntry : menu.getMenuEntries()) {
         if (menuAreaEntry.getSubMenuEntries() == null) {
-          log.error("Oups: menu without sub menus not supported: " + menuAreaEntry.getId());
           continue;
         }
         // Now we add a new menu area (title with sub menus):
