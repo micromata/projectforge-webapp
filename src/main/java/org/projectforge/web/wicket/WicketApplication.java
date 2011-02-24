@@ -100,7 +100,7 @@ public class WicketApplication extends WebApplication
   /**
    * Defines some built-in plugins.
    */
-  private AbstractPlugin[] plugins = new AbstractPlugin[] { new ToDoPlugin()};
+  private AbstractPlugin[] plugins = new AbstractPlugin[] { /*new ToDoPlugin()*/};
 
   @SpringBean(name = "wicketApplicationFilter")
   private WicketApplicationFilter wicketApplicationFilter;
