@@ -85,7 +85,7 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("name")), getSortable("name", sortable), "name",
+    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("task")), getSortable("task.title", sortable), "task.title",
         cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
