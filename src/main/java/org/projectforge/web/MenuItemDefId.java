@@ -67,14 +67,14 @@ public enum MenuItemDefId
   MY_ACCOUNT("myAccount"), //
   MY_PREFERENCES("myPreferences"), //
   REPORT_OBJECTIVES("fibu.reporting.reportObjectives"), //
-  REPORT_SCRIPTING("fibu.scripting"), //
   ORDER_LIST("fibu.orderbook"), //
   OUTBOX_LIST("orga.postausgang"), //
   OUTGOING_INVOICE_LIST("fibu.rechnungen"), //
   PERSONAL_STATISTICS("personalStatistics"), //
   PHONE_CALL("phoneCall"), //
   PROJECT_LIST("fibu.projekte"), //
-  SCRIPT_LIST("fibu.scripting"), //
+  SCRIPT_LIST("scriptList"), //
+  SCRIPTING("scripting"), //
   SEARCH("search"), //
   SYSTEM("system"), //
   SYSTEM_FIRST_LOGIN_SETUP_PAGE("system.firstLoginSetup"), //
