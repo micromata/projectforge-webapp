@@ -39,11 +39,11 @@
   <div wicket:id="topPanel">[Here you can add your own fragments.]</div>
 
   <fieldset><legend><wicket:message key="label.filterSettings" /></legend>
-  <table class="form">
+  <table class="form" style="width: 100%;">
     <wicket:container wicket:id="filter">
       <tr wicket:id="searchFilterRow">
         <th><wicket:message key="searchFilter" /></th>
-        <td wicket:id="searchCell"><input type="text" wicket:id="searchString" class="stdtext" />&nbsp;<img wicket:id="helpKeyboardImage"
+        <td wicket:id="searchCell" style="white-space: nowrap;"><input type="text" wicket:id="searchString" class="stdtext" style="width: 70%;" />&nbsp;<img wicket:id="helpKeyboardImage"
           src="images/keyboard.png" border="0" /><a wicket:id="handbuchVolltextsucheLink" href="#" target="_blank"><img
           wicket:id="fulltextSearchTooltipImage" src="images/help.png" border="0" /></a> <a href="#" onclick="javascript:toggleExtendedFilter();"
           wicket:id="toggleExtendedFilter"><wicket:message key="filter.extendedSearch" /></a><br />
