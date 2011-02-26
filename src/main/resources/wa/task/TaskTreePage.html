@@ -15,41 +15,24 @@
   <div wicket:id="feedback">[Validation errors]</div>
 
   <form wicket:id="form">
-  <fieldset style="margin-right:0; border-bottom: 1px solid #D9DFE1;">
-  <table class="form filter" style="width:100%; margin-top:1em;">
+  <fieldset style="margin-right: 0; border-bottom: 1px solid #D9DFE1;">
+  <table class="form filter" style="width: 100%; margin-top: 1em;">
     <tr>
-     
-     	<td>
-      		<label class="big" for="searchString"><wicket:message key="searchFilter" /></label>
-      		<input type="text" wicket:id="searchString" id="searchString" class="stdtext rounded" />
-      		<a wicket:id="handbuchVolltextsucheLink" href="#" target="_blank">
-      			<img wicket:id="fulltextSearchTooltipImage" src="images/help.png" border="0" />
-      		</a>
-      	</td>
-      	<td>
-	      	<div class="buttonset">
-	      		<input id="notOpenedCheckBox" type="checkbox" wicket:id="notOpenedCheckBox" />
-	      		<label for="notOpenedCheckBox"><wicket:message key="task.status.notOpened" /></label>
-	      		<input id="openedCheckBox" type="checkbox" wicket:id="openedCheckBox" />
-	      		<label for="openedCheckBox"><wicket:message key="task.status.opened" /></label>
-	      		<input id="closedCheckBox" type="checkbox" wicket:id="closedCheckBox" />
-				<label for="closedCheckBox" ><wicket:message key="task.status.closed" /></label>
-	      		<input id="deletedCheckBox" type="checkbox" wicket:id="deletedCheckBox" />
-	      		<label for="deletedCheckBox"><wicket:message key="deleted" /></label>
-	      		<input id="ajaxSupportCheckBox" type="checkbox" wicket:id="ajaxSupportCheckBox" /> 
-	      		<label for="ajaxSupportCheckBox"><wicket:message key="ajaxSupport" /></label>
-	      		<img wicket:id="ajaxSupportTooltipImage" src="images/help.png" border="0" />
-	      	</div><!-- "buttonset" END -->
-		</td>
-		<td>
-			<span wicket:id="listView">[list view]</span>
-		</td>
-	    <td class="buttonpanel">
-			<span wicket:id="cancel">[cancel]</span>
-			<span wicket:id="reset">[reset]</span> 
-			
-			<span wicket:id="search">[search]</span>
-		</td>
+      <td><label class="big" for="searchString"><wicket:message key="searchFilter" /></label></td>
+      <td style="width: 60%;"><input type="text" wicket:id="searchString" id="searchString" class="stdtext rounded" style="width: 90%;" /> <a
+        wicket:id="handbuchVolltextsucheLink" href="#" target="_blank"> <img wicket:id="fulltextSearchTooltipImage" src="images/help.png"
+        border="0" /> </a></td>
+      <td style="white-space: nowrap;">
+      <div class="buttonset"><wicket:panel wicket:id="notOpenedCheckBox">[cool check box]</wicket:panel> <wicket:panel
+        wicket:id="openedCheckBox">[cool check box]</wicket:panel> <wicket:panel wicket:id="closedCheckBox">[cool check box]</wicket:panel> <wicket:panel
+        wicket:id="deletedCheckBox">[cool check box]</wicket:panel> <wicket:panel wicket:id="ajaxSupportCheckBox">[cool check box]</wicket:panel></div>
+      </td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td class="buttonpanel"><span wicket:id="cancel">[cancel]</span> <span wicket:id="reset">[reset]</span> <span wicket:id="search">[search]</span><span
+        wicket:id="listView">[list view]</span></td>
+      <td>&nbsp;</td>
     </tr>
   </table>
   </fieldset>

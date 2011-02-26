@@ -26,7 +26,6 @@ package org.projectforge.web.task;
 import org.apache.wicket.Component;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.model.CompoundPropertyModel;
@@ -37,9 +36,9 @@ import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.CoolCheckBoxPanel;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.components.TooltipImage;
-
 
 public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
 {
@@ -52,43 +51,22 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
   private SingleButtonPanel cancelButtonPanel;
 
   private SingleButtonPanel resetButtonPanel;
-  
+
   private SingleButtonPanel listViewButtonPanel;
 
   private SingleButtonPanel searchButtonPanel;
-
-  private class RefreshCheckBox extends CheckBox
-  {
-    private static final long serialVersionUID = -6304659091210189380L;
-
-    RefreshCheckBox(final String componentId, final String property)
-    {
-      super(componentId, new PropertyModel<Boolean>(getSearchFilter(), property));
-    }
-
-    @Override
-    public void onSelectionChanged()
-    {
-      super.onSelectionChanged();
-      parentPage.refresh();
-    }
-
-    @Override
-    protected boolean wantOnSelectionChangedNotifications()
-    {
-      return true;
-    }
-  }
 
   @SuppressWarnings("serial")
   protected void init()
   {
     super.init();
-    add(new RefreshCheckBox("notOpenedCheckBox", "notOpened"));
-    add(new RefreshCheckBox("openedCheckBox", "opened"));
-    add(new RefreshCheckBox("closedCheckBox", "closed"));
-    add(new RefreshCheckBox("deletedCheckBox", "deleted"));
-    add(new RefreshCheckBox("ajaxSupportCheckBox", "ajaxSupport"));
+    add(new CoolCheckBoxPanel("notOpenedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "notOpened"),
+        getString("task.status.notOpened"), true));
+    add(new CoolCheckBoxPanel("openedCheckBox", new PropertyModel<Boolean>(searchFilter, "opened"), getString("task.status.opened"), true));
+    add(new CoolCheckBoxPanel("closedCheckBox", new PropertyModel<Boolean>(searchFilter, "closed"), getString("task.status.closed"), true));
+    add(new CoolCheckBoxPanel("deletedCheckBox", new PropertyModel<Boolean>(searchFilter, "deleted"), getString("deleted"), true));
+    add(new CoolCheckBoxPanel("ajaxSupportCheckBox", new PropertyModel<Boolean>(searchFilter, "ajaxSupport"), getString("ajaxSupport"),
+        true).setTooltip("task.tree.tooltip.ajaxSupport"));
     setModel(new CompoundPropertyModel<TaskFilter>(searchFilter));
     final Component searchField = new TextField<String>("searchString", new PropertyModel<String>(searchFilter, "searchString"));
     searchField.add(new FocusOnLoadBehavior());
@@ -99,7 +77,6 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
     add(handbuchVolltextsucheLink);
     handbuchVolltextsucheLink.add(new TooltipImage("fulltextSearchTooltipImage", getResponse(), WebConstants.IMAGE_HELP,
         getString("tooltip.lucene.link")));
-    add(new TooltipImage("ajaxSupportTooltipImage", getResponse(), WebConstants.IMAGE_HELP, getString("task.tree.tooltip.ajaxSupport")));
     final Button searchButton = new Button("button", new Model<String>(getString("search"))) {
       @Override
       public final void onSubmit()
@@ -107,9 +84,9 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
         getParentPage().onSearchSubmit();
       }
     };
-    
+
     searchButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    
+
     searchButtonPanel = new SingleButtonPanel("search", searchButton);
     add(searchButtonPanel);
     final Button resetButton = new Button("button", new Model<String>(getString("reset"))) {
@@ -121,7 +98,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
     };
     resetButton.add(WebConstants.BUTTON_CLASS_RESET);
     resetButton.setDefaultFormProcessing(false);
-    
+
     resetButtonPanel = new SingleButtonPanel("reset", resetButton);
     add(resetButtonPanel);
     final Button listViewButton = new Button("button", new Model<String>(getString("listView"))) {
@@ -131,11 +108,10 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
         getParentPage().onListViewSubmit();
       }
     };
-    
+
     listViewButton.add(WebConstants.BUTTON_CLASS_NOBUTTON);
     listViewButtonPanel = new SingleButtonPanel("listView", listViewButton);
-    
-    
+
     final Button cancelButton = new Button("button", new Model<String>(getString("cancel"))) {
       @Override
       public final void onSubmit()
@@ -187,5 +163,12 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
       getParentPage().putUserPrefEntry(TaskListForm.class.getName() + ":Filter", this.searchFilter, true);
     }
     return this.searchFilter;
+  }
+
+  @Override
+  protected void onSubmit()
+  {
+    super.onSubmit();
+    parentPage.refresh();
   }
 }

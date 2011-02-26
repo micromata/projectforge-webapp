@@ -24,10 +24,10 @@
 package org.projectforge.web.task;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.components.CoolCheckBoxPanel;
 
 
 public class TaskListForm extends AbstractListForm<TaskFilter, TaskListPage>
@@ -40,11 +40,12 @@ public class TaskListForm extends AbstractListForm<TaskFilter, TaskListPage>
   protected void init()
   {
     super.init();
-    filterContainer.add(new CheckBox("notOpenedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "notOpened")));
-    filterContainer.add(new CheckBox("openedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "opened")));
-    filterContainer.add(new CheckBox("closedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "closed")));
-    filterContainer.add(new CheckBox("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted")));
-  }
+    filterContainer.add(new CoolCheckBoxPanel("notOpenedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "notOpened"),
+        getString("task.status.notOpened"), true));
+    filterContainer.add(new CoolCheckBoxPanel("openedCheckBox", new PropertyModel<Boolean>(searchFilter, "opened"), getString("task.status.opened"), true));
+    filterContainer.add(new CoolCheckBoxPanel("closedCheckBox", new PropertyModel<Boolean>(searchFilter, "closed"), getString("task.status.closed"), true));
+    filterContainer.add(new CoolCheckBoxPanel("deletedCheckBox", new PropertyModel<Boolean>(searchFilter, "deleted"), getString("deleted"), true));
+}
 
   public TaskListForm(TaskListPage parentPage)
   {

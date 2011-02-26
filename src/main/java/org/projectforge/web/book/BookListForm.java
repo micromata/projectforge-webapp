@@ -29,7 +29,6 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.Component;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -40,6 +39,7 @@ import org.projectforge.book.BookFilter;
 import org.projectforge.common.StringHelper;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.components.CoolCheckBoxPanel;
 
 public class BookListForm extends AbstractListForm<BookListFilter, BookListPage>
 {
@@ -54,10 +54,14 @@ public class BookListForm extends AbstractListForm<BookListFilter, BookListPage>
   protected void init()
   {
     super.init();
-    filterContainer.add(new CheckBox("presentCheckbox", new PropertyModel<Boolean>(getSearchFilter(), "present")));
-    filterContainer.add(new CheckBox("missedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "missed")));
-    filterContainer.add(new CheckBox("disposedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "disposed")));
-    filterContainer.add(new CheckBox("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted")));
+    filterContainer.add(new CoolCheckBoxPanel("presentCheckbox", new PropertyModel<Boolean>(getSearchFilter(), "present"),
+        getString("book.status.present"), true));
+    filterContainer.add(new CoolCheckBoxPanel("missedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "missed"),
+        getString("book.status.missed"), true));
+    filterContainer.add(new CoolCheckBoxPanel("disposedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "disposed"),
+        getString("book.status.disposed"), true));
+    filterContainer.add(new CoolCheckBoxPanel("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
+        getString("deleted"), true));
   }
 
   public BookListForm(BookListPage parentPage)

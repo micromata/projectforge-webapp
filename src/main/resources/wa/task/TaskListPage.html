@@ -8,11 +8,11 @@
   <wicket:extend>
     <tr>
       <th><wicket:message key="label.options" /></th>
-      <td><input type="checkbox" wicket:id="notOpenedCheckBox" onchange="javascript:submit();" /> <wicket:message key="task.status.notOpened" />
-      <input type="checkbox" wicket:id="openedCheckBox" onchange="javascript:submit();" /> <wicket:message key="task.status.opened" /> <input
-        type="checkbox" wicket:id="closedCheckBox" onchange="javascript:submit();" /> <wicket:message key="task.status.closed" /> <input
-        type="checkbox" wicket:id="deletedCheckBox" onchange="javascript:submit();" /> <wicket:message key="onlyDeleted" /> | <span wicket:id="pageSize">[Page
-      size setting]</span></td>
+      <td>
+      <div class="buttonset"><wicket:panel wicket:id="notOpenedCheckBox">[cool check box]</wicket:panel> <wicket:panel
+        wicket:id="openedCheckBox">[cool check box]</wicket:panel> <wicket:panel wicket:id="closedCheckBox">[cool check box]</wicket:panel> <wicket:panel
+        wicket:id="deletedCheckBox">[cool check box]</wicket:panel> &nbsp; <span wicket:id="pageSize">[Page size setting]</span></div>
+      </td>
     </tr>
 
     <wicket:fragment wicket:id="bottomFragment">
