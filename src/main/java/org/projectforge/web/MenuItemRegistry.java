@@ -289,7 +289,7 @@ public class MenuItemRegistry
     // REPORTING
     reg.register(reporting, MenuItemDefId.ACCOUNTING_RECORD_LIST, 10, AccountingRecordListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     reg.register(reporting, MenuItemDefId.REPORT_OBJECTIVES, 20, ReportObjectivesPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
-    reg.register(reporting, MenuItemDefId.REPORT_SCRIPTING, 30, ReportScriptingPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
+    reg.register(reporting, MenuItemDefId.SCRIPTING, 30, ReportScriptingPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     reg.register(reporting, MenuItemDefId.SCRIPT_LIST, 40, ScriptListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     reg.register(reporting, MenuItemDefId.DATEV_IMPORT, 50, DatevImportPage.class, DatevImportDao.USER_RIGHT_ID, UserRightValue.TRUE);
 
