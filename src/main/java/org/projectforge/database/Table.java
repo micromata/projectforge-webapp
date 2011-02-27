@@ -46,7 +46,7 @@ public class Table
   {
     return name;
   }
-  
+
   /**
    * Multiple primary keys are not allowed.
    * @return Primary key if found or null.
@@ -54,7 +54,7 @@ public class Table
   public TableAttribute getPrimaryKey()
   {
     for (final TableAttribute attr : attributes) {
-      if(attr.isPrimaryKey() == true) {
+      if (attr.isPrimaryKey() == true) {
         return attr;
       }
     }
