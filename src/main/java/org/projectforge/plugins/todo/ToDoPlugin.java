@@ -26,10 +26,8 @@ package org.projectforge.plugins.todo;
 import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.database.HibernateUtils;
 import org.projectforge.database.Table;
 import org.projectforge.database.TableAttribute;
-import org.projectforge.database.TableAttributeType;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.web.MenuItemDef;
@@ -75,37 +73,23 @@ public class ToDoPlugin extends AbstractPlugin
 
   protected UpdateRunningStatus runDatabaseUpdate()
   {
-    if (databaseUpdateDao.doesTableExist("T_TODO") == true) {
+    final Class< ? > cls = ToDoDO.class;
+    final Table table = new Table(cls);
+    if (databaseUpdateDao.doesTableExist(table.getName()) == true) {
       return UpdateRunningStatus.DONE;
     }
-
-    // if (dao.doesTableAttributeExist("t_gantt_chart", "settings_as_xml") == false) {
-    // if (dao.doesTableExist("t_gantt_chart") == true && dao.dropTable("t_gantt_chart") == false) {
-    // throw new RuntimeException("Table t_gantt_chart is not empty! Aborting the update.");
-    // }
-    // Table table = new Table("t_gantt_chart")
-    // .addAttribute(new TableAttribute("pk", TableAttributeType.INT, true).setPrimaryKey(true))
-    // .addAttribute(new TableAttribute("created", TableAttributeType.TIMESTAMP))
-    // .addAttribute(new TableAttribute("last_update", TableAttributeType.TIMESTAMP))
-    // .addAttribute(new TableAttribute("deleted", TableAttributeType.BOOLEAN, true))
-    // .addAttribute(new TableAttribute("name", TableAttributeType.VARCHAR, 1000))
-    // .addAttribute(new TableAttribute("task_fk", TableAttributeType.INT).setForeignTable("t_task").setForeignAttribute("pk"))
-    // .addAttribute(new TableAttribute("settings_as_xml", TableAttributeType.VARCHAR, 10000))
-    // .addAttribute(new TableAttribute("style_as_xml", TableAttributeType.VARCHAR, 10000))
-    // .addAttribute(new TableAttribute("gantt_objects_as_xml", TableAttributeType.VARCHAR, 10000))
-    // .addAttribute(new TableAttribute("owner_fk", TableAttributeType.INT).setForeignTable("t_pf_user").setForeignAttribute("pk"))
-    // .addAttribute(new TableAttribute("read_access", TableAttributeType.VARCHAR, 16))
-    // .addAttribute(new TableAttribute("write_access", TableAttributeType.VARCHAR, 16));
-    // dao.createTable(table);
-    Class<?> cls = ToDoDO.class;
-    final Table table = new Table("T_TODO") //
+    table //
         .addAttribute(new TableAttribute(cls, "id")) //
         .addAttribute(new TableAttribute(cls, "created")) //
-        .addAttribute(new TableAttribute("last_update", TableAttributeType.TIMESTAMP)) //
-        .addAttribute(new TableAttribute("deleted", TableAttributeType.BOOLEAN, true)) //
-//        .addAttribute(
-//            new TableAttribute("title", TableAttributeType.VARCHAR, databaseUpdateDao.getColumnLength(ToDoDO.class, "title"), true)) //
-        .addAttribute(new TableAttribute("deleted", TableAttributeType.BOOLEAN, true));
+        .addAttribute(new TableAttribute(cls, "lastUpdate")) //
+        .addAttribute(new TableAttribute(cls, "deleted")) //
+        .addAttribute(new TableAttribute(cls, "reporter")) //
+        .addAttribute(new TableAttribute(cls, "assignee")) //
+        .addAttribute(new TableAttribute(cls, "task")) //
+        .addAttribute(new TableAttribute(cls, "comment")) //
+        .addAttribute(new TableAttribute(cls, "description")) //
+        .addAttribute(new TableAttribute(cls, "type")) //
+        .addAttribute(new TableAttribute(cls, "resubmission"));
     databaseUpdateDao.createTable(table);
     return UpdateRunningStatus.DONE;
   }
