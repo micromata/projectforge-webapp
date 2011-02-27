@@ -24,14 +24,19 @@
 package org.projectforge.database;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
+import org.projectforge.common.BeanHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDO;
 import org.projectforge.user.PFUserContext;
@@ -567,6 +572,87 @@ public class DatabaseUpdateDao
     final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
     log.info(jdbcQuery);
     return jdbc.queryForInt(jdbcQuery);
+  }
+
+  /**
+   * Tries to evaluate the column length from the annotated getter, setter method or field.
+   * @param clazz
+   * @param field
+   * @return length, if found, otherwise {@link Column#length()}
+   */
+  public static int getColumnLength(final Class< ? > clazz, final String property)
+  {
+    final Column column = getColumnAnnotation(clazz, property);
+    if (column == null) {
+      return 255;
+    }
+    return column.length();
+  }
+
+  private static Column getColumnAnnotation(final Method method)
+  {
+    if (method == null) {
+      return null;
+    }
+    return method.getAnnotation(Column.class);
+  }
+
+  private static Id getIdAnnotation(final Method method)
+  {
+    if (method == null) {
+      return null;
+    }
+    return method.getAnnotation(Id.class);
+  }
+
+  /**
+   * Tries to find the Column definition from the annotated getter, setter or field.
+   * @param clazz
+   * @param property
+   * @return
+   */
+  public static Column getColumnAnnotation(final Class< ? > clazz, final String property)
+  {
+    Column column = getColumnAnnotation(BeanHelper.determineGetter(clazz, property));
+    if (column == null) {
+      column = getColumnAnnotation(BeanHelper.determineSetter(clazz, property));
+      if (column == null) {
+        try {
+          final Field field = clazz.getDeclaredField(property);
+          if (field != null) {
+            return field.getAnnotation(Column.class);
+          }
+        } catch (final Throwable ex) {
+          log.error(ex.getMessage(), ex);
+        }
+      }
+    }
+    return column;
+  }
+
+  /**
+   * Tries to find the Id definition from the annotated getter, setter or field.
+   * @param clazz
+   * @param property
+   * @return
+   */
+  public static Id getIdAnnotation(final Class< ? > clazz, final String property)
+  {
+    Id id = getIdAnnotation(BeanHelper.determineGetter(clazz, property));
+    if (id == null) {
+      id = getIdAnnotation(BeanHelper.determineSetter(clazz, property));
+      if (id == null) {
+        try {
+          final Field field = clazz.getDeclaredField(property);
+          if (field != null) {
+            return field.getAnnotation(Id.class);
+          }
+        } catch (final Throwable ex) {
+          log.error(ex.getMessage(), ex);
+        }
+      }
+    }
+    return id;
   }
 
   public void setAccessChecker(AccessChecker accessChecker)
