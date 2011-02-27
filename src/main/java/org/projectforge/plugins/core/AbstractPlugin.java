@@ -24,6 +24,7 @@
 package org.projectforge.plugins.core;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang.Validate;
@@ -31,7 +32,10 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.settings.IResourceSettings;
 import org.hibernate.cfg.AnnotationConfiguration;
+import org.projectforge.admin.UpdateEntry;
+import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.plugins.todo.ToDoDO;
+import org.projectforge.plugins.todo.ToDoPlugin;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.web.MenuItemDef;
@@ -45,7 +49,11 @@ import org.projectforge.web.wicket.IListPageColumnsCreator;
  */
 public abstract class AbstractPlugin
 {
+  private static final long serialVersionUID = -3899180128376320221L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractPlugin.class);
+
+  protected DatabaseUpdateDao databaseUpdateDao;
 
   private AnnotationConfiguration annotationConfiguration;
 
@@ -54,6 +62,11 @@ public abstract class AbstractPlugin
   private boolean initialized;
 
   private static Set<Class< ? >> initializedPlugins = new HashSet<Class< ? >>();
+
+  public void setDatabaseUpdateDao(DatabaseUpdateDao databaseUpdateDao)
+  {
+    this.databaseUpdateDao = databaseUpdateDao;
+  }
 
   public void setAnnotationConfiguration(final AnnotationConfiguration annotationConfiguration)
   {
@@ -183,5 +196,24 @@ public abstract class AbstractPlugin
   {
     WebRegistry.instance().addMountPages(mountPageBasename, pageListClass, pageEditClass);
     return this;
+  }
+
+  /**
+   * Override this method if an update entry for initialization does exist. This will be called, if the plugin runs the first time.
+   * @return null at default.
+   * @see ToDoPlugin
+   */
+  public UpdateEntry getInitializationUpdateEntry()
+  {
+    return null;
+  }
+
+  /**
+   * Override this method if update entries does exist for this plugin.
+   * @return null at default.
+   */
+  public List<UpdateEntry> getUpdateEntries()
+  {
+    return null;
   }
 }
