@@ -23,13 +23,13 @@
 
 package org.projectforge.database;
 
+import java.math.BigDecimal;
+
 import javax.persistence.Column;
 import javax.persistence.Id;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.BeanHelper;
-
-import com.ibm.icu.math.BigDecimal;
 
 /**
  * Represents one attribute of a table (e. g. for creation).
@@ -66,27 +66,32 @@ public class TableAttribute
   {
     this.name = property;
     final Class< ? > dType = BeanHelper.determinePropertyType(BeanHelper.determineGetter(clazz, property));
-    if (Boolean.class.isAssignableFrom(dType) == true) {
+    final boolean primitive = dType.isPrimitive();
+    if (Boolean.class.isAssignableFrom(dType) == true || Boolean.TYPE.isAssignableFrom(dType) == true) {
       type = TableAttributeType.BOOLEAN;
     } else if (String.class.isAssignableFrom(dType) == true) {
       type = TableAttributeType.VARCHAR;
-    } else if (Integer.class.isAssignableFrom(dType) == true) {
-      type = TableAttributeType.INT;
     } else if (BigDecimal.class.isAssignableFrom(dType) == true) {
       type = TableAttributeType.DECIMAL;
     } else if (java.sql.Date.class.isAssignableFrom(dType) == true) {
       type = TableAttributeType.DATE;
     } else if (java.util.Date.class.isAssignableFrom(dType) == true) {
       type = TableAttributeType.TIMESTAMP;
+    } else {
+      // Default: Useful for foreign keys.
+      type = TableAttributeType.INT;
     }
     final Id id = DatabaseUpdateDao.getIdAnnotation(clazz, property);
     if (id != null) {
       this.primaryKey = true;
       this.nullable = false;
     }
+    if (primitive == true) {
+      nullable = false;
+    }
     final Column column = DatabaseUpdateDao.getColumnAnnotation(clazz, property);
     if (column != null) {
-      if (isPrimaryKey() == false) {
+      if (isPrimaryKey() == false && primitive == false) {
         this.nullable = column.nullable();
       }
       if (StringUtils.isNotEmpty(column.name()) == true) {
@@ -100,6 +105,9 @@ public class TableAttribute
         this.scale = column.scale();
       }
       this.unique = column.unique();
+    }
+    if (type == TableAttributeType.DECIMAL && this.scale == 0 && this.precision == 0) {
+      throw new UnsupportedOperationException("Decimal values should have a precision and scale definition: " + clazz + "." + property);
     }
   }
 
