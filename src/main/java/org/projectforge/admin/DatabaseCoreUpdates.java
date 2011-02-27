@@ -45,7 +45,7 @@ public class DatabaseCoreUpdates
   public static List<UpdateEntry> getUpdateEntries()
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "3.5.4",
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "3.5.4", "2011-02-24",
         "Adds table t_database_update. Adds attribute (excel_)date_format, hour_format_24 to table t_pf_user.") {
       final Table dbUpdateTable = new Table(DatabaseUpdateDO.class);
 
@@ -55,7 +55,7 @@ public class DatabaseCoreUpdates
       public UpdatePreCheckStatus runPreCheck()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
-        return this.preCheckStatus = dao.doesExist(dbUpdateTable) == true
+        return dao.doesExist(dbUpdateTable) == true
             && dao.doesTableAttributesExist(userTable, "dateFormat", "excelDateFormat", "timeNotation") == true //
         ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
       }
@@ -71,7 +71,7 @@ public class DatabaseCoreUpdates
         dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "timeNotation"));
         final UserDao userDao = (UserDao) Registry.instance().getDao(UserDao.class);
         userDao.getUserGroupCache().setExpired();
-        return this.runningStatus = UpdateRunningStatus.DONE;
+        return UpdateRunningStatus.DONE;
       }
     });
     return list;

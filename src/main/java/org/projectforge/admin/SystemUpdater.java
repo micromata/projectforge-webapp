@@ -25,6 +25,7 @@ package org.projectforge.admin;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,6 +65,24 @@ public class SystemUpdater
   static SystemUpdater instance()
   {
     return instance;
+  }
+
+  public void register(final UpdateEntry... updateEntries)
+  {
+    if (updateEntries == null) {
+      return;
+    }
+    for (final UpdateEntry updateEntry : updateEntries) {
+      getUpdateEntries().add(updateEntry);
+    }
+  }
+
+  public void register(final Collection<UpdateEntry> updateEntries)
+  {
+    if (updateEntries == null) {
+      return;
+    }
+    getUpdateEntries().addAll(updateEntries);
   }
 
   /**
@@ -108,7 +127,7 @@ public class SystemUpdater
   public boolean isUpdated()
   {
     final UpdateEntry firstUpdateEntry = getUpdateEntries().first();
-    firstUpdateEntry.runPreCheck();
+    firstUpdateEntry.setPreCheckStatus(firstUpdateEntry.runPreCheck());
     final boolean result = firstUpdateEntry.getPreCheckStatus() == UpdatePreCheckStatus.ALREADY_UPDATED;
     if (result == false) {
       log
@@ -124,7 +143,7 @@ public class SystemUpdater
   public void runAllPreChecks()
   {
     for (final UpdateEntry updateEntry : getUpdateEntries()) {
-      updateEntry.runPreCheck();
+      updateEntry.setPreCheckStatus(updateEntry.runPreCheck());
     }
   }
 
@@ -144,7 +163,7 @@ public class SystemUpdater
    */
   public void update(final UpdateEntry updateEntry)
   {
-    updateEntry.runUpdate();
+    updateEntry.setRunningStatus(updateEntry.runUpdate());
     final Table table = new Table(DatabaseUpdateDO.class);
     if (databaseUpdateDao.doesTableExist(table.getName()) == true) {
       databaseUpdateDao.insertInto(table.getName(), new String[] { "update_date", "region_id", "version", "execution_result",
@@ -154,7 +173,7 @@ public class SystemUpdater
     } else {
       log.info("Data base table '" + table.getName() + "' doesn't (yet) exist. Can't register update (OK).");
     }
-    updateEntry.runPreCheck();
+    updateEntry.setPreCheckStatus(updateEntry.runPreCheck());
     runAllPreChecks();
   }
 

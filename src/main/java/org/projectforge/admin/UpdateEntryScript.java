@@ -23,6 +23,8 @@
 
 package org.projectforge.admin;
 
+import java.util.Date;
+
 import org.projectforge.Version;
 import org.projectforge.common.ReflectionToString;
 import org.projectforge.scripting.GroovyResult;
@@ -40,9 +42,12 @@ public class UpdateEntryScript extends UpdateEntry
 
   @XmlField
   private String regionId;
-  
+
   @XmlField
   private Version version;
+
+  @XmlField
+  private Date date;
 
   @XmlField
   private String description;
@@ -52,7 +57,7 @@ public class UpdateEntryScript extends UpdateEntry
 
   @XmlField(asCDATA = true)
   private String script;
-  
+
   private transient GroovyResult preCheckResult;
 
   private transient GroovyResult runningResult;
@@ -62,30 +67,36 @@ public class UpdateEntryScript extends UpdateEntry
   {
     return this.regionId;
   }
-  
+
   public void setRegionId(String regionId)
   {
     this.regionId = regionId;
   }
-  
+
   @Override
   public Version getVersion()
   {
     return version;
   }
-  
+
   @Override
   public void setVersion(final Version version)
   {
     this.version = version;
   }
-  
+
+  @Override
+  public Date getDate()
+  {
+    return this.date;
+  }
+
   @Override
   public String getDescription()
   {
     return this.description;
   }
-  
+
   @Override
   public void setDescription(final String description)
   {
@@ -118,7 +129,7 @@ public class UpdateEntryScript extends UpdateEntry
   {
     this.script = script;
   }
-  
+
   @Override
   public String getPreCheckResult()
   {

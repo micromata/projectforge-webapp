@@ -23,8 +23,12 @@
 
 package org.projectforge.admin;
 
+import java.util.Date;
+
 import org.projectforge.Version;
+import org.projectforge.common.DateHelper;
 import org.projectforge.common.ReflectionToString;
+import org.projectforge.user.PFUserContext;
 
 /**
  * Represents a update (written in Java).
@@ -37,6 +41,8 @@ public abstract class UpdateEntryImpl extends UpdateEntry
   private String regionId;
 
   private Version version;
+  
+  private Date date;
 
   private String description;
 
@@ -44,19 +50,20 @@ public abstract class UpdateEntryImpl extends UpdateEntry
   {
   }
 
-  public UpdateEntryImpl(final String regionId, final String versionString, final String description)
+  public UpdateEntryImpl(final String regionId, final String versionString, final String isoDateString, final String description)
   {
     this.regionId = regionId;
+    this.date = DateHelper.parseIsoDate(isoDateString, PFUserContext.getTimeZone());
     this.version = new Version(versionString);
     this.description = description;
   }
-  
+
   @Override
   public String getRegionId()
   {
     return this.regionId;
   }
-  
+
   public void setRegionId(final String regionId)
   {
     this.regionId = regionId;
@@ -72,6 +79,12 @@ public abstract class UpdateEntryImpl extends UpdateEntry
   public void setVersion(final Version version)
   {
     this.version = version;
+  }
+  
+  @Override
+  public Date getDate()
+  {
+    return this.date;
   }
 
   @Override
