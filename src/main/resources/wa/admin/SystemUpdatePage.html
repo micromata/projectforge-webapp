@@ -18,16 +18,18 @@
   <h3>Update scripts</h3>
   <table class="dataview">
     <tr>
+      <th>Region</th>
       <th title="The version to update to."><i>Version</i></th>
-      <th>Update script</th>
+      <th>Date</th>
       <th>Pre-check</th>
       <th>Result</th>
       <th>Description</th>
     </tr>
     <wicket:container wicket:id="scripts">
       <tr wicket:id="scriptRows">
+        <td wicket:id="regionId">[ProjectForge]</td>
         <td wicket:id="version">[3.3.44]</td>
-        <td><a wicket:id="downloadScript"><span wicket:id="fileName">[update-script-3.3.44.xml]</span></a></td>
+        <td wicket:id="date">[2011-02-27]</td>
         <td wicket:id="preCheckResult">[--]</td>
         <td><span wicket:id="update">[run]</span></td>
         <td wicket:id="description">[...]</td>

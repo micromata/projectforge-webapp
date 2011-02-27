@@ -26,20 +26,18 @@ package org.projectforge.web.admin;
 import java.util.SortedSet;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.Version;
 import org.projectforge.admin.UpdateEntry;
-import org.projectforge.admin.UpdateEntryScript;
 import org.projectforge.admin.UpdatePreCheckStatus;
+import org.projectforge.common.DateHelper;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -90,27 +88,14 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
       if (showOldUpdateScripts == false && updateEntry.getPreCheckStatus() == UpdatePreCheckStatus.ALREADY_UPDATED) {
         continue;
       }
-      final UpdateEntryScript updateScript = updateEntry instanceof UpdateEntryScript ? (UpdateEntryScript) updateEntry : null;
       final Version version = updateEntry.getVersion();
       final WebMarkupContainer item = new WebMarkupContainer(scriptRows.newChildId());
       scriptRows.add(item);
+      item.add(new Label("regionId", updateEntry.getRegionId()));
       item.add(new Label("version", version.toString()));
       final String description = updateEntry.getDescription();
       item.add(new Label("description", StringUtils.isBlank(description) == true ? "" : description));
-      final Link<String> downloadScriptLink = new Link<String>("downloadScript") {
-        @Override
-        public void onClick()
-        {
-          parentPage.downloadUpdateScript(updateScript);
-        }
-      };
-      if (updateScript == null) {
-        downloadScriptLink.setVisible(false);
-      } else {
-        downloadScriptLink.add(new SimpleAttributeModifier("title", "You can use this script for own modifications and manual updates."));
-      }
-      item.add(downloadScriptLink);
-      downloadScriptLink.add(new Label("fileName", "update-script-" + version).setRenderBodyOnly(true));
+      item.add(new Label("date", DateHelper.formatIsoDate(updateEntry.getDate())));
       item.add(new Label("preCheckResult", new Model<String>() {
         @Override
         public String getObject()
