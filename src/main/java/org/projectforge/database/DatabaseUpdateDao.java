@@ -96,6 +96,17 @@ public class DatabaseUpdateDao
     return internalDoesTableExist(table);
   }
 
+  public boolean doesExist(final Table... tables)
+  {
+    accessCheck(false);
+    for (final Table table : tables) {
+      if (internalDoesTableExist(table.getName()) == false) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   /**
    * Without check access.
    * @param table
@@ -128,6 +139,20 @@ public class DatabaseUpdateDao
     }
     return true;
   }
+
+  public boolean doesTableAttributesExist(final Table table, final String... properties)
+  {
+    accessCheck(false);
+    for (final String property : properties) {
+      final TableAttribute attr = new TableAttribute(table.getEntityClass(), property);
+      if (doesTableAttributeExist(table.getName(), attr.getName()) == false) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+
 
   public boolean isTableEmpty(final String table)
   {
@@ -235,6 +260,10 @@ public class DatabaseUpdateDao
   public boolean createTable(final Table table)
   {
     accessCheck(true);
+    if (doesExist(table) == true) {
+      log.info("Table '" + table.getName() + "' does already exist.");
+      return false;
+    }
     final StringBuffer buf = new StringBuffer();
     buildCreateTableStatement(buf, table);
     execute(buf.toString());
@@ -256,6 +285,9 @@ public class DatabaseUpdateDao
   public void buildAddTableAttributesStatement(final StringBuffer buf, final String table, final TableAttribute... attributes)
   {
     for (final TableAttribute attr : attributes) {
+      if (doesTableAttributeExist(table, attr.getName()) == true) {
+        buf.append("-- Does already exist: ");
+      }
       buf.append("ALTER TABLE ").append(table).append(" ADD COLUMN ");
       buildAttribute(buf, attr);
       buf.append(";\n");
@@ -285,6 +317,11 @@ public class DatabaseUpdateDao
     buildAddTableAttributesStatement(buf, table, attributes);
     execute(buf.toString());
     return true;
+  }
+
+  public boolean addTableAttributes(final Table table, final TableAttribute... attributes)
+  {
+    return addTableAttributes(table.getName(), attributes);
   }
 
   public void buildAddUniqueConstraintStatement(final StringBuffer buf, final String table, final String constraintName,

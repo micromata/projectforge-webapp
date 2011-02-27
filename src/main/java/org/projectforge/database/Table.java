@@ -23,6 +23,7 @@
 
 package org.projectforge.database;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,8 +36,10 @@ import org.apache.commons.lang.StringUtils;
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class Table
+public class Table implements Serializable
 {
+  private static final long serialVersionUID = -1194016764141859556L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Table.class);
 
   private String name;
@@ -83,6 +86,11 @@ public class Table
       }
     }
     return null;
+  }
+  
+  public Class< ? > getEntityClass()
+  {
+    return entityClass;
   }
 
   public String getName()

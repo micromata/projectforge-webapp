@@ -207,11 +207,15 @@ public class InitDatabaseDao extends HibernateDaoSupport
   {
     try {
       if (userGroupCache.getNumberOfUsers() == 0) {
-        return databaseUpdateDao.internalDoesTableExist("t_pf_user") == false || databaseUpdateDao.internalIsTableEmpty("t_pf_user") == true;
+        final Table userTable = new Table(PFUserDO.class);
+        return databaseUpdateDao.internalDoesTableExist(userTable.getName()) == false
+            || databaseUpdateDao.internalIsTableEmpty(userTable.getName()) == true;
       }
     } catch (final Exception ex) {
       // In the case, that user table is not readable.
-      return databaseUpdateDao.internalDoesTableExist("t_pf_user") == false || databaseUpdateDao.internalIsTableEmpty("t_pf_user") == true;
+      final Table userTable = new Table(PFUserDO.class);
+      return databaseUpdateDao.internalDoesTableExist(userTable.getName()) == false
+          || databaseUpdateDao.internalIsTableEmpty(userTable.getName()) == true;
     }
     return false;
   }

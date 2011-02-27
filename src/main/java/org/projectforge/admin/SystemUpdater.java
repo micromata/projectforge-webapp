@@ -35,6 +35,7 @@ import org.apache.commons.io.IOUtils;
 import org.projectforge.core.UserException;
 import org.projectforge.database.DatabaseUpdateDO;
 import org.projectforge.database.DatabaseUpdateDao;
+import org.projectforge.database.Table;
 import org.projectforge.scripting.GroovyExecutor;
 import org.projectforge.scripting.GroovyResult;
 import org.projectforge.user.PFUserContext;
@@ -144,13 +145,14 @@ public class SystemUpdater
   public void update(final UpdateEntry updateEntry)
   {
     updateEntry.runUpdate();
-    if (databaseUpdateDao.doesTableExist(DatabaseUpdateDO.TABLE_NAME) == true) {
-      databaseUpdateDao.insertInto(DatabaseUpdateDO.TABLE_NAME, new String[] { "update_date", "region_id", "version", "execution_result",
-          "executed_by_user_fk", "description"}, new Object[] { new Date(), updateEntry.getRegionId(), String.valueOf(updateEntry.getVersion()),
-          updateEntry.getRunningResult(), PFUserContext.getUserId(), updateEntry.getDescription()
-      });
+    final Table table = new Table(DatabaseUpdateDO.class);
+    if (databaseUpdateDao.doesTableExist(table.getName()) == true) {
+      databaseUpdateDao.insertInto(table.getName(), new String[] { "update_date", "region_id", "version", "execution_result",
+          "executed_by_user_fk", "description"},
+          new Object[] { new Date(), updateEntry.getRegionId(), String.valueOf(updateEntry.getVersion()), updateEntry.getRunningResult(),
+              PFUserContext.getUserId(), updateEntry.getDescription()});
     } else {
-      log.info("Data base table '" + DatabaseUpdateDO.TABLE_NAME + "' doesn't (yet) exist. Can't register update (OK).");
+      log.info("Data base table '" + table.getName() + "' doesn't (yet) exist. Can't register update (OK).");
     }
     updateEntry.runPreCheck();
     runAllPreChecks();

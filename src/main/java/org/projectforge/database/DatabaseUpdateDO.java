@@ -44,8 +44,6 @@ import org.projectforge.user.PFUserDO;
 @Table(name = "t_database_update")
 public class DatabaseUpdateDO
 {
-  public static final String TABLE_NAME = "t_database_update";
-
   private String regionId;
   
   private Date updateDate;

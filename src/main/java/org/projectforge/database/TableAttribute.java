@@ -23,6 +23,8 @@
 
 package org.projectforge.database;
 
+import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 
 import javax.persistence.Column;
@@ -38,8 +40,10 @@ import org.projectforge.common.BeanHelper;
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class TableAttribute
+public class TableAttribute implements Serializable
 {
+  private static final long serialVersionUID = -8369835632981780449L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TableAttribute.class);
 
   private boolean nullable = true;
@@ -78,7 +82,11 @@ public class TableAttribute
   {
     this.property = property;
     this.name = property;
-    final Class< ? > dType = BeanHelper.determinePropertyType(BeanHelper.determineGetter(clazz, property));
+    final Method getterMethod = BeanHelper.determineGetter(clazz, property);
+    if (getterMethod == null) {
+      throw new IllegalStateException("Can't determine getter: " + clazz + "." + property);
+    }
+    final Class< ? > dType = BeanHelper.determinePropertyType(getterMethod);
     final boolean primitive = dType.isPrimitive();
     if (Boolean.class.isAssignableFrom(dType) == true || Boolean.TYPE.isAssignableFrom(dType) == true) {
       type = TableAttributeType.BOOLEAN;
