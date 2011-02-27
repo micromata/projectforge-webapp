@@ -32,7 +32,7 @@ import org.projectforge.core.I18nEnum;
  */
 public enum ToDoType implements I18nEnum
 {
-  TASK("task"), IMPROVEMENT("improvement"), PHONE_CALL("phoneCall"), BUG("bug"), WISH("wish"), IDEA("idea");
+  TASK("task"), IMPROVEMENT("improvement"), PHONE_CALL("phoneCall"), HINT("hint"), BUG("bug"), WISH("wish"), IDEA("idea");
 
   private String key;
 

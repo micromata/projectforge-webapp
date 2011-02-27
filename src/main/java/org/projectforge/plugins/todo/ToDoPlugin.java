@@ -26,6 +26,7 @@ package org.projectforge.plugins.todo;
 import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDao;
+import org.projectforge.database.HibernateUtils;
 import org.projectforge.database.Table;
 import org.projectforge.database.TableAttribute;
 import org.projectforge.database.TableAttributeType;
@@ -77,6 +78,7 @@ public class ToDoPlugin extends AbstractPlugin
     if (databaseUpdateDao.doesTableExist("T_TODO") == true) {
       return UpdateRunningStatus.DONE;
     }
+
     // if (dao.doesTableAttributeExist("t_gantt_chart", "settings_as_xml") == false) {
     // if (dao.doesTableExist("t_gantt_chart") == true && dao.dropTable("t_gantt_chart") == false) {
     // throw new RuntimeException("Table t_gantt_chart is not empty! Aborting the update.");
@@ -95,12 +97,16 @@ public class ToDoPlugin extends AbstractPlugin
     // .addAttribute(new TableAttribute("read_access", TableAttributeType.VARCHAR, 16))
     // .addAttribute(new TableAttribute("write_access", TableAttributeType.VARCHAR, 16));
     // dao.createTable(table);
-//    final Table table = new Table("T_TODO") //
-//        .addAttribute(new TableAttribute("pk", TableAttributeType.INT, true).setPrimaryKey(true)) //
-//        .addAttribute(new TableAttribute("created", TableAttributeType.TIMESTAMP)) //
-//        .addAttribute(new TableAttribute("last_update", TableAttributeType.TIMESTAMP)) //
-//        .addAttribute(new TableAttribute("deleted", TableAttributeType.BOOLEAN, true));
-//    databaseUpdateDao.createTable(table);
+    Class<?> cls = ToDoDO.class;
+    final Table table = new Table("T_TODO") //
+        .addAttribute(new TableAttribute(cls, "id")) //
+        .addAttribute(new TableAttribute(cls, "created")) //
+        .addAttribute(new TableAttribute("last_update", TableAttributeType.TIMESTAMP)) //
+        .addAttribute(new TableAttribute("deleted", TableAttributeType.BOOLEAN, true)) //
+        .addAttribute(
+            new TableAttribute("title", TableAttributeType.VARCHAR, databaseUpdateDao.getColumnLength(ToDoDO.class, "title"), true)) //
+        .addAttribute(new TableAttribute("deleted", TableAttributeType.BOOLEAN, true));
+    databaseUpdateDao.createTable(table);
     return UpdateRunningStatus.DONE;
   }
 

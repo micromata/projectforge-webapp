@@ -27,6 +27,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -43,7 +45,6 @@ import org.hibernate.search.annotations.Store;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.database.Constants;
 import org.projectforge.task.TaskDO;
-import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.user.PFUserDO;
 
 /**
@@ -82,7 +83,7 @@ public class ToDoDO extends DefaultBaseDO
   @DateBridge(resolution = Resolution.DAY)
   private Date resubmission;
 
-  @Column(length = Constants.LENGHT_TITLE)
+  @Column(length = Constants.LENGTH_TITLE)
   public String getTitle()
   {
     return title;
@@ -141,6 +142,10 @@ public class ToDoDO extends DefaultBaseDO
     return task;
   }
 
+  /**
+   * @param task
+   * @return this for chaining.
+   */
   public ToDoDO setTask(final TaskDO task)
   {
     this.task = task;
@@ -153,5 +158,63 @@ public class ToDoDO extends DefaultBaseDO
     if (this.task == null)
       return null;
     return task.getId();
+  }
+  
+  public String getDescription()
+  {
+    return description;
+  }
+  
+  /**
+   * @return this for chaining.
+   */
+  public ToDoDO setDescription(String description)
+  {
+    this.description = description;
+    return this;
+  }
+  @Column(length = Constants.LENGTH_TEXT)
+  public String getComment()
+  {
+    return comment;
+  }
+  
+  /**
+   * @return this for chaining.
+   */
+  public ToDoDO setComment(String comment)
+  {
+    this.comment = comment;
+    return this;
+  }
+  
+  @Enumerated(EnumType.STRING)
+  @Column(length = 20)
+  public ToDoType getType()
+  {
+    return type;
+  }
+  
+  /**
+   * @return this for chaining.
+   */
+  public ToDoDO setType(ToDoType type)
+  {
+    this.type = type;
+    return this;
+  }
+  
+  public Date getResubmission()
+  {
+    return resubmission;
+  }
+  
+  /**
+   * @return this for chaining.
+   */
+  public ToDoDO setResubmission(Date resubmission)
+  {
+    this.resubmission = resubmission;
+    return this;
   }
 }
