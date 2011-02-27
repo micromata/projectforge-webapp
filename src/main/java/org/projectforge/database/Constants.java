@@ -25,6 +25,7 @@ package org.projectforge.database;
 
 
 /**
+ * Defines different constants (typical length of string columns) usable by plugins and core package.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class Constants
@@ -37,10 +38,10 @@ public class Constants
   /**
    * Default length of text fields in the data-base (1,000).
    */
-  public static final int LENGHT_SUBJECT = 1000;
+  public static final int LENGTH_SUBJECT = 1000;
 
   /**
    * Default length of text fields in the data-base (255).
    */
-  public static final int LENGHT_TITLE = 1000;
+  public static final int LENGTH_TITLE = 1000;
 }
