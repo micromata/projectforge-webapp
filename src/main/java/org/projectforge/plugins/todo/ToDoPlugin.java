@@ -103,8 +103,8 @@ public class ToDoPlugin extends AbstractPlugin
         .addAttribute(new TableAttribute(cls, "created")) //
         .addAttribute(new TableAttribute("last_update", TableAttributeType.TIMESTAMP)) //
         .addAttribute(new TableAttribute("deleted", TableAttributeType.BOOLEAN, true)) //
-        .addAttribute(
-            new TableAttribute("title", TableAttributeType.VARCHAR, databaseUpdateDao.getColumnLength(ToDoDO.class, "title"), true)) //
+//        .addAttribute(
+//            new TableAttribute("title", TableAttributeType.VARCHAR, databaseUpdateDao.getColumnLength(ToDoDO.class, "title"), true)) //
         .addAttribute(new TableAttribute("deleted", TableAttributeType.BOOLEAN, true));
     databaseUpdateDao.createTable(table);
     return UpdateRunningStatus.DONE;
