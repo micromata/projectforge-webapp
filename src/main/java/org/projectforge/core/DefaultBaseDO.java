@@ -36,8 +36,6 @@ import org.projectforge.lucene.PFAnalyzer;
 
 
 /**
- * Defines Lucene's SimpleAnalyzer as default because English stop words in StandardAnalyzer are not useful at default for ProjectForge content.
- * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @MappedSuperclass
