@@ -26,6 +26,10 @@ package org.projectforge.database;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Entity;
+
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Represents one attribute of a table (e. g. for creation).
  * 
@@ -33,9 +37,22 @@ import java.util.List;
  */
 public class Table
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Table.class);
+
   private String name;
 
   private List<TableAttribute> attributes = new ArrayList<TableAttribute>();
+
+  public Table(final Class< ? > entityClass)
+  {
+    final Entity entity = entityClass.getAnnotation(Entity.class);
+    final javax.persistence.Table table = entityClass.getAnnotation(javax.persistence.Table.class);
+    if (entity != null && table != null && StringUtils.isNotEmpty(table.name()) == true) {
+      this.name = table.name();
+    } else {
+      log.info("Unsupported class (@Entity, @Table and @Table.name expected): " + entityClass);
+    }
+  }
 
   public Table(final String name)
   {
