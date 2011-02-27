@@ -73,6 +73,9 @@ public class BeanHelper
 
   public static Class< ? > determinePropertyType(Method method)
   {
+    if (method == null) {
+      return null;
+    }
     String name = method.getName();
     if (name.startsWith("get") == false && name.startsWith("is") == false) {
       throw new UnsupportedOperationException("determinePropertyType only yet implemented for getter methods.");
