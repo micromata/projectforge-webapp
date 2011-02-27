@@ -31,6 +31,7 @@ import java.sql.SQLException;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
@@ -582,6 +583,14 @@ public class DatabaseUpdateDao
     return method.getAnnotation(Column.class);
   }
 
+  private static JoinColumn getJoinColumnAnnotation(final Method method)
+  {
+    if (method == null) {
+      return null;
+    }
+    return method.getAnnotation(JoinColumn.class);
+  }
+
   private static Id getIdAnnotation(final Method method)
   {
     if (method == null) {
@@ -638,6 +647,31 @@ public class DatabaseUpdateDao
       }
     }
     return id;
+  }
+
+  /**
+   * Tries to find the JoinColumn definition from the annotated getter, setter or field.
+   * @param clazz
+   * @param property
+   * @return
+   */
+  public static JoinColumn getJoinColumnAnnotation(final Class< ? > clazz, final String property)
+  {
+    JoinColumn joinColumn = getJoinColumnAnnotation(BeanHelper.determineGetter(clazz, property));
+    if (joinColumn == null) {
+      joinColumn = getJoinColumnAnnotation(BeanHelper.determineSetter(clazz, property));
+      if (joinColumn == null) {
+        try {
+          final Field field = clazz.getDeclaredField(property);
+          if (field != null) {
+            return field.getAnnotation(JoinColumn.class);
+          }
+        } catch (final Throwable ex) {
+          log.error(ex.getMessage(), ex);
+        }
+      }
+    }
+    return joinColumn;
   }
 
   public void setAccessChecker(AccessChecker accessChecker)
