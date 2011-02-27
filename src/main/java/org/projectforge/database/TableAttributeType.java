@@ -31,4 +31,14 @@ package org.projectforge.database;
 public enum TableAttributeType
 {
   INT, VARCHAR, CHAR, TIMESTAMP, DATE, BOOLEAN, DECIMAL;
+
+  public boolean isIn(final TableAttributeType... types)
+  {
+    for (final TableAttributeType type : types) {
+      if (type == this) {
+        return true;
+      }
+    }
+    return false;
+  }
 }
