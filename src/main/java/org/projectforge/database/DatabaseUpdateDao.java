@@ -574,21 +574,6 @@ public class DatabaseUpdateDao
     return jdbc.queryForInt(jdbcQuery);
   }
 
-  /**
-   * Tries to evaluate the column length from the annotated getter, setter method or field.
-   * @param clazz
-   * @param field
-   * @return length, if found, otherwise {@link Column#length()}
-   */
-  public static int getColumnLength(final Class< ? > clazz, final String property)
-  {
-    final Column column = getColumnAnnotation(clazz, property);
-    if (column == null) {
-      return 255;
-    }
-    return column.length();
-  }
-
   private static Column getColumnAnnotation(final Method method)
   {
     if (method == null) {
