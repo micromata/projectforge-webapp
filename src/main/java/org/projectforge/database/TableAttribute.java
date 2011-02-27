@@ -46,6 +46,8 @@ public class TableAttribute
 
   private TableAttributeType type;
 
+  private String property;
+
   private String name;
 
   private int length = 255;
@@ -67,12 +69,14 @@ public class TableAttribute
   private String defaultValue;
 
   /**
-   * Creates a property and gets the information from the entity class. The JPA annotations Column, JoinColumn, Entity, Table and ID are supported.
+   * Creates a property and gets the information from the entity class. The JPA annotations Column, JoinColumn, Entity, Table and ID are
+   * supported.
    * @param clazz
    * @param property
    */
   public TableAttribute(final Class< ? > clazz, final String property)
   {
+    this.property = property;
     this.name = property;
     final Class< ? > dType = BeanHelper.determinePropertyType(BeanHelper.determineGetter(clazz, property));
     final boolean primitive = dType.isPrimitive();
@@ -221,6 +225,17 @@ public class TableAttribute
     return this;
   }
 
+  /**
+   * @return The name of the property or if not exist the data-base identifier of the attribute.
+   */
+  public String getProperty()
+  {
+    return property != null ? property : name;
+  }
+
+  /**
+   * @return The data base identifier of the attribute.
+   */
   public String getName()
   {
     return name;
