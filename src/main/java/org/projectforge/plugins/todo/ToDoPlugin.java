@@ -27,7 +27,6 @@ import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.Table;
-import org.projectforge.database.TableAttribute;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.web.MenuItemDef;
@@ -78,18 +77,8 @@ public class ToDoPlugin extends AbstractPlugin
     if (databaseUpdateDao.doesTableExist(table.getName()) == true) {
       return UpdateRunningStatus.DONE;
     }
-    table //
-        .addAttribute(new TableAttribute(cls, "id")) //
-        .addAttribute(new TableAttribute(cls, "created")) //
-        .addAttribute(new TableAttribute(cls, "lastUpdate")) //
-        .addAttribute(new TableAttribute(cls, "deleted")) //
-        .addAttribute(new TableAttribute(cls, "reporter")) //
-        .addAttribute(new TableAttribute(cls, "assignee")) //
-        .addAttribute(new TableAttribute(cls, "task")) //
-        .addAttribute(new TableAttribute(cls, "comment")) //
-        .addAttribute(new TableAttribute(cls, "description")) //
-        .addAttribute(new TableAttribute(cls, "type")) //
-        .addAttribute(new TableAttribute(cls, "resubmission"));
+    table.addAttributes("id", "created", "lastUpdate", "deleted", "reporter", "assignee", "task", "comment", "description", "type",
+        "resubmission");
     databaseUpdateDao.createTable(table);
     return UpdateRunningStatus.DONE;
   }
