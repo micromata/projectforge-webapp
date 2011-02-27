@@ -23,6 +23,14 @@
 
 package org.projectforge.database;
 
+import javax.persistence.Column;
+import javax.persistence.Id;
+
+import org.apache.commons.lang.StringUtils;
+import org.projectforge.common.BeanHelper;
+
+import com.ibm.icu.math.BigDecimal;
+
 /**
  * Represents one attribute of a table (e. g. for creation).
  * 
@@ -36,21 +44,64 @@ public class TableAttribute
 
   private String name;
 
-  private int length;
+  private int length = 255;
 
-  private int precision;
+  private int precision = 0;
 
-  private int scale;
+  private int scale = 0;
 
   private boolean primaryKey;
 
   private boolean generated;
+
+  private boolean unique;
 
   private String foreignTable;
 
   private String foreignAttribute;
 
   private String defaultValue;
+
+  public TableAttribute(final Class< ? > clazz, final String property)
+  {
+    this.name = property;
+    final Class< ? > dType = BeanHelper.determinePropertyType(BeanHelper.determineGetter(clazz, property));
+    if (Boolean.class.isAssignableFrom(dType) == true) {
+      type = TableAttributeType.BOOLEAN;
+    } else if (String.class.isAssignableFrom(dType) == true) {
+      type = TableAttributeType.VARCHAR;
+    } else if (Integer.class.isAssignableFrom(dType) == true) {
+      type = TableAttributeType.INT;
+    } else if (BigDecimal.class.isAssignableFrom(dType) == true) {
+      type = TableAttributeType.DECIMAL;
+    } else if (java.sql.Date.class.isAssignableFrom(dType) == true) {
+      type = TableAttributeType.DATE;
+    } else if (java.util.Date.class.isAssignableFrom(dType) == true) {
+      type = TableAttributeType.TIMESTAMP;
+    }
+    final Id id = DatabaseUpdateDao.getIdAnnotation(clazz, property);
+    if (id != null) {
+      this.primaryKey = true;
+      this.nullable = false;
+    }
+    final Column column = DatabaseUpdateDao.getColumnAnnotation(clazz, property);
+    if (column != null) {
+      if (isPrimaryKey() == false) {
+        this.nullable = column.nullable();
+      }
+      if (StringUtils.isNotEmpty(column.name()) == true) {
+        this.name = column.name();
+      }
+      if (type.isIn(TableAttributeType.VARCHAR, TableAttributeType.CHAR) == true) {
+        this.length = column.length();
+      }
+      if (type == TableAttributeType.DECIMAL) {
+        this.precision = column.precision();
+        this.scale = column.scale();
+      }
+      this.unique = column.unique();
+    }
+  }
 
   public TableAttribute(final String name, final TableAttributeType type)
   {
@@ -104,6 +155,14 @@ public class TableAttribute
   {
     this.nullable = nullable;
     return this;
+  }
+
+  /**
+   * Not yet supported.
+   */
+  public boolean isUnique()
+  {
+    return unique;
   }
 
   public TableAttributeType getType()
