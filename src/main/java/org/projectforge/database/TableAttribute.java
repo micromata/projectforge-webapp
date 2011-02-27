@@ -66,6 +66,11 @@ public class TableAttribute
 
   private String defaultValue;
 
+  /**
+   * Creates a property and gets the information from the entity class. The JPA annotations Column, JoinColumn, Entity, Table and ID are supported.
+   * @param clazz
+   * @param property
+   */
   public TableAttribute(final Class< ? > clazz, final String property)
   {
     this.name = property;

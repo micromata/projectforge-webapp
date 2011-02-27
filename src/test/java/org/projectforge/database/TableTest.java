@@ -38,5 +38,18 @@ public class TableTest
     assertEquals("T_PF_USER", new Table(PFUserDO.class).getName());
     assertEquals("T_TASK", new Table(TaskDO.class).getName());
     assertEquals("T_TIMESHEET", new Table(TimesheetDO.class).getName());
+
+    final Table table = new Table(TaskDO.class);
+    table.addAttributes("title", "priority", "maxHours", "startDate", "responsibleUser");
+    assertAttribute(table.getAttributes().get(0), "title");
+    assertAttribute(table.getAttributes().get(1), "priority");
+    assertAttribute(table.getAttributes().get(2), "max_hours");
+    assertAttribute(table.getAttributes().get(3), "start_date");
+    assertAttribute(table.getAttributes().get(4), "responsible_user_id");
+  }
+
+  private void assertAttribute(final TableAttribute attribute, final String name)
+  {
+    assertEquals(name, attribute.getName());
   }
 }

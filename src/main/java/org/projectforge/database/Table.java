@@ -41,10 +41,13 @@ public class Table
 
   private String name;
 
+  private Class< ? > entityClass;
+
   private List<TableAttribute> attributes = new ArrayList<TableAttribute>();
 
   public Table(final Class< ? > entityClass)
   {
+    this.entityClass = entityClass;
     final Entity entity = entityClass.getAnnotation(Entity.class);
     final javax.persistence.Table table = entityClass.getAnnotation(javax.persistence.Table.class);
     if (entity != null && table != null && StringUtils.isNotEmpty(table.name()) == true) {
@@ -52,6 +55,19 @@ public class Table
     } else {
       log.info("Unsupported class (@Entity, @Table and @Table.name expected): " + entityClass);
     }
+  }
+
+  /**
+   * Only needed if addAttributes(String[]) will be called after and the entityClass wasn't set via constructor.
+   * @param entityClass
+   * @return this for chaining.
+   * @see #Table(Class)
+   * @see #addAttributes(String...)
+   */
+  public Table setEntityClass(Class< ? > entityClass)
+  {
+    this.entityClass = entityClass;
+    return this;
   }
 
   public Table(final String name)
@@ -86,6 +102,24 @@ public class Table
   public Table addAttribute(final TableAttribute attr)
   {
     attributes.add(attr);
+    return this;
+  }
+
+  /**
+   * Adds all the given properties by auto-detecting the given properties.
+   * @param properties
+   * @see TableAttribute#TableAttribute(Class, String)
+   * @see #addAttribute(TableAttribute)
+   * @return this for chaining.
+   */
+  public Table addAttributes(final String... properties)
+  {
+    if (entityClass == null) {
+      throw new IllegalStateException("Entity class isn't set. Can't add attributes from property names. Please set entity class first.");
+    }
+    for (final String property : properties) {
+      addAttribute(new TableAttribute(entityClass, property));
+    }
     return this;
   }
 }
