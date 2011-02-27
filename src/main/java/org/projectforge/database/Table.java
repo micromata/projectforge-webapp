@@ -117,6 +117,7 @@ public class Table
 
   /**
    * Adds all the given properties by auto-detecting the given properties.
+   * Please note: There is no full auto-detection of all properties: it should be avoided that unwanted properties are created (by a developer mistake).
    * @param properties
    * @see TableAttribute#TableAttribute(Class, String)
    * @see #addAttribute(TableAttribute)
