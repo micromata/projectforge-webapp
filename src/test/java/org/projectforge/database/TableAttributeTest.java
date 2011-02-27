@@ -57,6 +57,11 @@ public class TableAttributeTest
     attr = assertAttribute(TaskDO.class, "maxHours", "max_hours", TableAttributeType.INT, false, true);
     attr = assertAttribute(TaskDO.class, "kost2IsBlackList", "kost2_is_black_list", TableAttributeType.BOOLEAN, false, false);
     attr = assertAttribute(TaskDO.class, "responsibleUser", "responsible_user_id", TableAttributeType.INT, false, true);
+    assertEquals("T_PF_USER", attr.getForeignTable());
+    assertEquals("pk", attr.getForeignAttribute());
+    
+    attr = assertAttribute(TaskDO.class, "priority", "priority", TableAttributeType.VARCHAR, false, true);
+    assertEquals(TaskDO.PRIORITY_LENGTH, attr.getLength());
     
     attr = assertAttribute(TimesheetDO.class, "startTime", "start_time", TableAttributeType.TIMESTAMP, false, false);
     attr = assertAttribute(PFUserDO.class, "loginFailures", "loginFailures", TableAttributeType.INT, false, false);

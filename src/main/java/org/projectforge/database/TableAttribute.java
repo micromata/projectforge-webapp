@@ -26,6 +26,7 @@ package org.projectforge.database;
 import java.math.BigDecimal;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 
@@ -39,6 +40,8 @@ import org.projectforge.common.BeanHelper;
  */
 public class TableAttribute
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TableAttribute.class);
+
   private boolean nullable = true;
 
   private TableAttributeType type;
@@ -70,7 +73,9 @@ public class TableAttribute
     final boolean primitive = dType.isPrimitive();
     if (Boolean.class.isAssignableFrom(dType) == true || Boolean.TYPE.isAssignableFrom(dType) == true) {
       type = TableAttributeType.BOOLEAN;
-    } else if (String.class.isAssignableFrom(dType) == true) {
+    } else if (Integer.class.isAssignableFrom(dType) == true || Integer.TYPE.isAssignableFrom(dType) == true) {
+      type = TableAttributeType.INT;
+    } else if (String.class.isAssignableFrom(dType) == true || dType.isEnum() == true) {
       type = TableAttributeType.VARCHAR;
     } else if (BigDecimal.class.isAssignableFrom(dType) == true) {
       type = TableAttributeType.DECIMAL;
@@ -79,10 +84,30 @@ public class TableAttribute
     } else if (java.util.Date.class.isAssignableFrom(dType) == true) {
       type = TableAttributeType.TIMESTAMP;
     } else {
-      // Default: Useful for foreign keys.
+      final Entity entity = dType.getAnnotation(Entity.class);
+      final javax.persistence.Table table = dType.getAnnotation(javax.persistence.Table.class);
+      if (entity != null && table != null && StringUtils.isNotEmpty(table.name()) == true) {
+        this.foreignTable = table.name();
+        final String idProperty = JPAHelper.getIdProperty(dType);
+        if (idProperty == null) {
+          log.info("Id property not found for class '" + dType + "'): " + clazz + "." + property);
+        }
+        this.foreignAttribute = idProperty;
+        final Column column = JPAHelper.getColumnAnnotation(dType, idProperty);
+        if (column != null && StringUtils.isNotEmpty(column.name()) == true) {
+          this.foreignAttribute = column.name();
+        }
+      } else {
+        log.info("Unsupported property (@Entity, @Table and @Table.name expected for the destination class '"
+            + dType
+            + "'): "
+            + clazz
+            + "."
+            + property);
+      }
       type = TableAttributeType.INT;
     }
-    final Id id = DatabaseUpdateDao.getIdAnnotation(clazz, property);
+    final Id id = JPAHelper.getIdAnnotation(clazz, property);
     if (id != null) {
       this.primaryKey = true;
       this.nullable = false;
@@ -90,7 +115,7 @@ public class TableAttribute
     if (primitive == true) {
       nullable = false;
     }
-    final Column column = DatabaseUpdateDao.getColumnAnnotation(clazz, property);
+    final Column column = JPAHelper.getColumnAnnotation(clazz, property);
     if (column != null) {
       if (isPrimaryKey() == false && primitive == false) {
         this.nullable = column.nullable();
@@ -110,9 +135,9 @@ public class TableAttribute
     if (type == TableAttributeType.DECIMAL && this.scale == 0 && this.precision == 0) {
       throw new UnsupportedOperationException("Decimal values should have a precision and scale definition: " + clazz + "." + property);
     }
-    final JoinColumn joinColumn = DatabaseUpdateDao.getJoinColumnAnnotation(clazz, property);
+    final JoinColumn joinColumn = JPAHelper.getJoinColumnAnnotation(clazz, property);
     if (joinColumn != null) {
-      if (StringUtils.isNotEmpty(joinColumn.name())==true) {
+      if (StringUtils.isNotEmpty(joinColumn.name()) == true) {
         this.name = joinColumn.name();
       }
     }
