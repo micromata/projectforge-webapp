@@ -137,10 +137,16 @@ public class UserGroupCache extends AbstractCache
     return getUserMap().values();
   }
 
-  public int getNumberOfUsers()
+  /**
+   * Only for internal use.
+   */
+  public int internalGetNumberOfUsers()
   {
-    // checkRefresh(); Done by getUserMap().
-    return getUserMap().size();
+    if (userMap == null) {
+      return 0;
+    } else {
+      return userMap.size();
+    }
   }
 
   public String getUsername(Integer userId)
