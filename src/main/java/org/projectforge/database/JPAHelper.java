@@ -1,0 +1,180 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2011 Kai Reinhard (k.reinhard@me.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.database;
+
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+
+import org.projectforge.common.BeanHelper;
+
+/**
+ * For manipulating the database (patching data etc.)
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
+ */
+public class JPAHelper
+{
+  public static final String getIdProperty(final Class< ? > clazz)
+  {
+    final List<Field> fields = getAllDeclaredFields(clazz);
+    for (final Field field : fields) {
+      final Id id = getIdAnnotation(clazz, field.getName());
+      if (id != null) {
+        return field.getName();
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Tries to find the Column definition from the annotated getter, setter or field.
+   * @param clazz
+   * @param property
+   * @return
+   */
+  public static Column getColumnAnnotation(final Class< ? > clazz, final String property)
+  {
+    Column column = getColumnAnnotation(BeanHelper.determineGetter(clazz, property));
+    if (column == null) {
+      column = getColumnAnnotation(BeanHelper.determineSetter(clazz, property));
+      if (column == null) {
+        final Field field = getField(clazz, property);
+        if (field != null) {
+          return field.getAnnotation(Column.class);
+        }
+      }
+    }
+    return column;
+  }
+
+  /**
+   * Tries to find the Id definition from the annotated getter, setter or field.
+   * @param clazz
+   * @param property
+   * @return
+   */
+  public static Id getIdAnnotation(final Class< ? > clazz, final String property)
+  {
+    Id id = getIdAnnotation(BeanHelper.determineGetter(clazz, property));
+    if (id == null) {
+      id = getIdAnnotation(BeanHelper.determineSetter(clazz, property));
+      if (id == null) {
+        final Field field = getField(clazz, property);
+        if (field != null) {
+          return field.getAnnotation(Id.class);
+        }
+      }
+    }
+    return id;
+  }
+
+  /**
+   * Tries to find the JoinColumn definition from the annotated getter, setter or field.
+   * @param clazz
+   * @param property
+   * @return
+   */
+  public static JoinColumn getJoinColumnAnnotation(final Class< ? > clazz, final String property)
+  {
+    JoinColumn joinColumn = getJoinColumnAnnotation(BeanHelper.determineGetter(clazz, property));
+    if (joinColumn == null) {
+      joinColumn = getJoinColumnAnnotation(BeanHelper.determineSetter(clazz, property));
+      if (joinColumn == null) {
+        final Field field = getField(clazz, property);
+        if (field != null) {
+          return field.getAnnotation(JoinColumn.class);
+        }
+      }
+    }
+    return joinColumn;
+  }
+
+  private static Column getColumnAnnotation(final Method method)
+  {
+    if (method == null) {
+      return null;
+    }
+    return method.getAnnotation(Column.class);
+  }
+
+  private static JoinColumn getJoinColumnAnnotation(final Method method)
+  {
+    if (method == null) {
+      return null;
+    }
+    return method.getAnnotation(JoinColumn.class);
+  }
+
+  private static Id getIdAnnotation(final Method method)
+  {
+    if (method == null) {
+      return null;
+    }
+    return method.getAnnotation(Id.class);
+  }
+
+  private static Field getField(final Class< ? > clazz, final String fieldName)
+  {
+    Field field;
+    try {
+      field = clazz.getDeclaredField(fieldName);
+      if (field != null) {
+        return field;
+      }
+    } catch (final SecurityException ex) {
+      // OK, nothing to do.
+    } catch (final NoSuchFieldException ex) {
+      // OK, nothing to do.
+    }
+    if (clazz.getSuperclass() != null) {
+      return getField(clazz.getSuperclass(), fieldName);
+    }
+    return null;
+  }
+
+  private static List<Field> getAllDeclaredFields(final Class< ? > clazz)
+  {
+    return getAllDeclaredFields(new ArrayList<Field>(), clazz);
+  }
+
+  private static List<Field> getAllDeclaredFields(final List<Field> list, final Class< ? > clazz)
+  {
+    final Field[] fields = clazz.getDeclaredFields();
+    AccessibleObject.setAccessible(fields, true);
+    for (final Field field : fields) {
+      list.add(field);
+    }
+    if (clazz.getSuperclass() != null) {
+      getAllDeclaredFields(list, clazz.getSuperclass());
+    }
+    return list;
+  }
+}
