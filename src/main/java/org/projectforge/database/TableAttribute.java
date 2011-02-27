@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.BeanHelper;
@@ -108,6 +109,12 @@ public class TableAttribute
     }
     if (type == TableAttributeType.DECIMAL && this.scale == 0 && this.precision == 0) {
       throw new UnsupportedOperationException("Decimal values should have a precision and scale definition: " + clazz + "." + property);
+    }
+    final JoinColumn joinColumn = DatabaseUpdateDao.getJoinColumnAnnotation(clazz, property);
+    if (joinColumn != null) {
+      if (StringUtils.isNotEmpty(joinColumn.name())==true) {
+        this.name = joinColumn.name();
+      }
     }
   }
 
