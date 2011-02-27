@@ -29,6 +29,7 @@ import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.RestartResponseAtInterceptPageException;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -36,7 +37,6 @@ import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.ConfigurationParam;
-import org.projectforge.core.UserException;
 import org.projectforge.database.DatabaseDao;
 import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.database.XmlDump;
@@ -188,7 +188,9 @@ public class SetupPage extends AbstractSecuredPage
   private void checkAccess()
   {
     if (initDatabaseDao.isEmpty() == false) {
-      throw new UserException("Couldn't call set-up page, because the data-base isn't empty anymore!");
+      log.error("Couldn't call set-up page, because the data-base isn't empty!");
+      ((MySession) getSession()).logout();
+      throw new RestartResponseAtInterceptPageException(LoginPage.class);
     }
   }
 }
