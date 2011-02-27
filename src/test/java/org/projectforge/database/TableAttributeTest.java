@@ -39,7 +39,7 @@ import org.projectforge.user.PFUserDO;
 public class TableAttributeTest
 {
   @Test
-  public void createTableScript()
+  public void createTableAttributes()
   {
     TableAttribute attr;
     attr = assertAttribute(TaskDO.class, "id", "pk", TableAttributeType.INT, true, false);
@@ -59,11 +59,13 @@ public class TableAttributeTest
     attr = assertAttribute(TaskDO.class, "responsibleUser", "responsible_user_id", TableAttributeType.INT, false, true);
     assertEquals("T_PF_USER", attr.getForeignTable());
     assertEquals("pk", attr.getForeignAttribute());
-    
     attr = assertAttribute(TaskDO.class, "priority", "priority", TableAttributeType.VARCHAR, false, true);
     assertEquals(TaskDO.PRIORITY_LENGTH, attr.getLength());
-    
+
     attr = assertAttribute(TimesheetDO.class, "startTime", "start_time", TableAttributeType.TIMESTAMP, false, false);
+    attr = assertAttribute(TimesheetDO.class, "task", "task_id", TableAttributeType.INT, false, true);
+    assertEquals("T_TASK", attr.getForeignTable());
+    assertEquals("pk", attr.getForeignAttribute());
     attr = assertAttribute(PFUserDO.class, "loginFailures", "loginFailures", TableAttributeType.INT, false, false);
     attr = assertAttribute(GroupTaskAccessDO.class, "recursive", "recursive", TableAttributeType.BOOLEAN, false, false);
     attr = assertAttribute(Kost1DO.class, "nummernkreis", "nummernkreis", TableAttributeType.INT, false, false);
