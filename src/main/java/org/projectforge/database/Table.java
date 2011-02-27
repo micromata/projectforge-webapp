@@ -75,6 +75,16 @@ public class Table
     this.name = name;
   }
 
+  public TableAttribute getAttribute(final String name)
+  {
+    for (final TableAttribute attr : attributes) {
+      if (name.equals(attr.getProperty()) == true) {
+        return attr;
+      }
+    }
+    return null;
+  }
+
   public String getName()
   {
     return name;

@@ -46,7 +46,9 @@ public class TableTest
     assertAttribute(table.getAttributes().get(2), "max_hours");
     assertAttribute(table.getAttributes().get(3), "start_date");
     assertAttribute(table.getAttributes().get(4), "responsible_user_id");
-  }
+
+    assertAttribute(table.getAttribute("responsibleUser"), "responsible_user_id");
+}
 
   private void assertAttribute(final TableAttribute attribute, final String name)
   {
