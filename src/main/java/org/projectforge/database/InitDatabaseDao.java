@@ -206,7 +206,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
   public boolean isEmpty()
   {
     try {
-      if (userGroupCache.getNumberOfUsers() == 0) {
+      if (userGroupCache.internalGetNumberOfUsers() == 0) {
         final Table userTable = new Table(PFUserDO.class);
         return databaseUpdateDao.internalDoesTableExist(userTable.getName()) == false
             || databaseUpdateDao.internalIsTableEmpty(userTable.getName()) == true;
