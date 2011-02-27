@@ -23,10 +23,7 @@
 
 package org.projectforge.plugins.todo;
 
-import org.projectforge.admin.UpdatePreCheckStatus;
-import org.projectforge.admin.UpdateRunningStatus;
-import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.database.Table;
+import org.projectforge.admin.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.web.MenuItemDef;
@@ -43,11 +40,10 @@ public class ToDoPlugin extends AbstractPlugin
 
   private ToDoDao toDoDao;
 
-  private DatabaseUpdateDao databaseUpdateDao;
-
   @Override
   protected void initialize()
   {
+    ToDoPluginUpdates.dao = databaseUpdateDao;
     final RegistryEntry entry = new RegistryEntry(ID, ToDoDao.class, toDoDao);
     // The ToDoDao is automatically available by the scripting engine!
     register(entry);
@@ -62,34 +58,14 @@ public class ToDoPlugin extends AbstractPlugin
     addResourceBundle(RESOURCE_BUNDLE_NAME);
   }
 
-  protected UpdatePreCheckStatus checkDatabaseUpdate()
-  {
-    if (databaseUpdateDao.doesTableExist("T_TODO") == true) {
-      return UpdatePreCheckStatus.ALREADY_UPDATED;
-    }
-    return UpdatePreCheckStatus.OK; // Ready for updating.
-  }
-
-  protected UpdateRunningStatus runDatabaseUpdate()
-  {
-    final Class< ? > cls = ToDoDO.class;
-    final Table table = new Table(cls);
-    if (databaseUpdateDao.doesTableExist(table.getName()) == true) {
-      return UpdateRunningStatus.DONE;
-    }
-    table.addAttributes("id", "created", "lastUpdate", "deleted", "reporter", "assignee", "task", "comment", "description", "type",
-        "resubmission");
-    databaseUpdateDao.createTable(table);
-    return UpdateRunningStatus.DONE;
-  }
-
-  public void setDatabaseUpdateDao(DatabaseUpdateDao databaseUpdateDao)
-  {
-    this.databaseUpdateDao = databaseUpdateDao;
-  }
-
   public void setToDoDao(ToDoDao toDoDao)
   {
     this.toDoDao = toDoDao;
+  }
+
+  @Override
+  public UpdateEntry getInitializationUpdateEntry()
+  {
+    return ToDoPluginUpdates.getInitializationUpdateEntry();
   }
 }

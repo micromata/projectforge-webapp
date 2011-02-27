@@ -53,7 +53,7 @@ import org.projectforge.user.PFUserDO;
  */
 @Entity
 @Indexed
-@Table(name = "T_TODO")
+@Table(name = "T_PLUGIN_TODO")
 public class ToDoDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 4864250842083720210L;
