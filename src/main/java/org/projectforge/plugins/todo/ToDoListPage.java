@@ -26,22 +26,18 @@ package org.projectforge.plugins.todo;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.book.BookDO;
-import org.projectforge.book.BookDao;
-import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.user.UserFormatter;
+import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -51,96 +47,68 @@ import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 @ListPage(editPage = ToDoEditPage.class)
-public class ToDoListPage extends AbstractListPage<ToDoListForm, BookDao, BookDO> implements IListPageColumnsCreator<BookDO>
+public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO> implements IListPageColumnsCreator<ToDoDO>
 {
-  private static final long serialVersionUID = 7227240465661485515L;
+  private static final long serialVersionUID = 3232839536537741949L;
 
-  @SpringBean(name = "bookDao")
-  private BookDao bookDao;
+  @SpringBean(name = "toDoDao")
+  private ToDoDao toDoDao;
 
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
 
-  public ToDoListPage(PageParameters parameters)
+  public ToDoListPage(final PageParameters parameters)
   {
-    super(parameters, "book");
-  }
-
-  @Override
-  protected void setup()
-  {
-    super.setup();
-    this.recentSearchTermsUserPrefKey = "bookSearchTerms";
+    super(parameters, "plugins.todo");
   }
 
   @SuppressWarnings("serial")
-  public List<IColumn<BookDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  public List<IColumn<ToDoDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final List<IColumn<BookDO>> columns = new ArrayList<IColumn<BookDO>>();
-    final CellItemListener<BookDO> cellItemListener = new CellItemListener<BookDO>() {
-      public void populateItem(Item<ICellPopulator<BookDO>> item, String componentId, IModel<BookDO> rowModel)
+    final List<IColumn<ToDoDO>> columns = new ArrayList<IColumn<ToDoDO>>();
+    final CellItemListener<ToDoDO> cellItemListener = new CellItemListener<ToDoDO>() {
+      public void populateItem(Item<ICellPopulator<ToDoDO>> item, String componentId, IModel<ToDoDO> rowModel)
       {
-        final BookDO book = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(book.getId(), book.isDeleted());
+        final ToDoDO toDo = rowModel.getObject();
+        final StringBuffer cssStyle = getCssStyle(toDo.getId(), toDo.isDeleted());
         if (cssStyle.length() > 0) {
           item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("created")), getSortable("created", sortable),
+
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("created")), getSortable("created", sortable),
         "created", cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
-        final BookDO book = (BookDO) rowModel.getObject();
-        item.add(new ListSelectActionPanel(componentId, rowModel, ToDoEditPage.class, book.getId(), returnToPage, DateTimeFormatter
-            .instance().getFormattedDate(book.getCreated())));
+        final ToDoDO toDo = (ToDoDO) rowModel.getObject();
+        item.add(new ListSelectActionPanel(componentId, rowModel, ToDoEditPage.class, toDo.getId(), returnToPage, DateTimeFormatter
+            .instance().getFormattedDate(toDo.getCreated())));
         addRowClick(item);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.yearOfPublishing.short")), getSortable(
-        "yearOfPublishing", sortable), "yearOfPublishing", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.signature")), getSortable("signature4Sort",
-        sortable), "signature", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.authors")), getSortable("authors", sortable),
-        "authors", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.title")), getSortable("title", sortable),
-        "title", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.keywords")),
-        getSortable("keywords", sortable), "keywords", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.authors")), getSortable("authors", sortable),
-        "authors", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.lendOutBy")),
-        getSortable("authors", sortable), "authors", cellItemListener) {
-      @Override
-      public void populateItem(final Item<ICellPopulator<BookDO>> item, final String componentId, final IModel<BookDO> rowModel)
-      {
-        final BookDO book = (BookDO) rowModel.getObject();
-        final StringBuffer buf = new StringBuffer();
-        if (book.getLendOutBy() != null) {
-          buf.append(userFormatter.formatUser(book.getLendOutBy()));
-          buf.append(" ");
-          DateTimeFormatter.instance().getFormattedDate(book.getLendOutDate());
-        }
-        if (StringUtils.isNotEmpty(book.getLendOutComment()) == true) {
-          buf.append(" ").append(book.getLendOutComment());
-        }
-        final String htmlString = HtmlHelper.escapeXml(buf.toString());
-        final Label label = new Label(componentId, new Model<String>(htmlString));
-        label.setEscapeModelStrings(false);
-        item.add(label);
-        cellItemListener.populateItem(item, componentId, rowModel);
-      }
-    });
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(getString("modified"), getSortable("lastUpdate", sortable), "lastUpdate",
+        cellItemListener));
+    columns.add(new UserPropertyColumn<ToDoDO>(getString("plugins.todo.assignee"), getSortable("assignee.fullname", sortable), "assignee",
+        cellItemListener).withUserFormatter(userFormatter));
+    columns.add(new UserPropertyColumn<ToDoDO>(getString("plugins.todo.reporter"), getSortable("assignee.reporter", sortable), "reporter",
+        cellItemListener).withUserFormatter(userFormatter));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.title")), getSortable("title",
+        sortable), "title", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.title")), getSortable("title",
+        sortable), "title", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.type")), getSortable("type", sortable),
+        "type", cellItemListener));
     return columns;
   }
 
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "created", false);
+    dataTable = createDataTable(createColumns(this, true), "lastUpdate", false);
     form.add(dataTable);
   }
 
@@ -151,19 +119,19 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, BookDao, BookDO
   }
 
   @Override
-  protected BookDao getBaseDao()
+  protected ToDoDao getBaseDao()
   {
-    return bookDao;
+    return toDoDao;
   }
 
   @Override
-  protected IModel<BookDO> getModel(BookDO object)
+  protected IModel<ToDoDO> getModel(ToDoDO object)
   {
-    return new DetachableDOModel<BookDO, BookDao>(object, getBaseDao());
+    return new DetachableDOModel<ToDoDO, ToDoDao>(object, getBaseDao());
   }
 
-  protected BookDao getBookDao()
+  protected ToDoDao getToDoDao()
   {
-    return bookDao;
+    return toDoDao;
   }
 }

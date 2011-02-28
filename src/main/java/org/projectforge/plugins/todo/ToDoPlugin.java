@@ -34,7 +34,7 @@ import org.projectforge.web.MenuItemDefId;
  */
 public class ToDoPlugin extends AbstractPlugin
 {
-  public static final String ID = "ProjectForgeToDo";
+  public static final String ID = "ToDo";
 
   public static final String RESOURCE_BUNDLE_NAME = ToDoPlugin.class.getPackage().getName() + ".ToDoI18nResources";
 

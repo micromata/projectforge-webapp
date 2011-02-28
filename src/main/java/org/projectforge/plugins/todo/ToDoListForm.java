@@ -24,6 +24,8 @@
 package org.projectforge.plugins.todo;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractListForm;
 
 public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
@@ -36,6 +38,7 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
   protected void init()
   {
     super.init();
+    filterContainer.add(new CheckBox("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted")));
   }
 
   public ToDoListForm(ToDoListPage parentPage)
