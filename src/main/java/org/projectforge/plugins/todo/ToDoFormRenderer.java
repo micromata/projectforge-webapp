@@ -23,146 +23,98 @@
 
 package org.projectforge.plugins.todo;
 
-import static org.projectforge.web.wicket.layout.DropDownChoiceLPanel.SELECT_ID;
-import static org.projectforge.web.wicket.layout.LayoutLength.DOUBLE;
-import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
-import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
-import static org.projectforge.web.wicket.layout.LayoutLength.QUART;
-import static org.projectforge.web.wicket.layout.LayoutLength.THREEQUART;
+import static org.projectforge.web.wicket.layout.SelectLPanel.WICKET_ID_SELECT_PANEL;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.MarkupContainer;
-import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.repeater.RepeatingView;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.projectforge.book.BookDO;
-import org.projectforge.book.BookDao;
-import org.projectforge.book.BookStatus;
-import org.projectforge.book.BookType;
-import org.projectforge.web.calendar.DateTimeFormatter;
-import org.projectforge.web.wicket.WebConstants;
+import org.hibernate.Hibernate;
+import org.projectforge.task.TaskDO;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.task.TaskSelectPanel;
+import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.components.PlainLabel;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
-import org.projectforge.web.wicket.layout.IField;
-import org.projectforge.web.wicket.layout.LayoutAlignment;
+import org.projectforge.web.wicket.layout.DropDownChoiceLPanel;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.LayoutLength;
-import org.projectforge.web.wicket.layout.TextFieldLPanel;
+import org.projectforge.web.wicket.layout.PanelContext;
 
 public class ToDoFormRenderer extends AbstractDOFormRenderer
 {
   private static final long serialVersionUID = -9175062586210446142L;
 
-  private final BookDao bookDao;
+  private final ToDoDao toDoDao;
 
-  private BookDO data;
+  private ToDoDO data;
 
-  private ToDoEditPage bookEditPage;
+  private ToDoEditPage toDoEditPage;
 
-  protected TextField<String> authorsField, signatureField, publisherField, editorField, yearOfPublishingField;
+  private UserGroupCache userGroupCache;
 
-  public ToDoFormRenderer(final ToDoEditPage bookEditPage, final MarkupContainer container, final LayoutContext layoutContext,
-      final BookDao bookDao, final BookDO data)
+  final static LayoutLength labelLength = LayoutLength.HALF;
+
+  final static LayoutLength valueLength = LayoutLength.ONEHALF;
+
+  public ToDoFormRenderer(final ToDoEditPage toDoEditPage, final MarkupContainer container, final LayoutContext layoutContext,
+      final ToDoDao toDoDao, final ToDoDO data, final UserGroupCache userGroupCache)
   {
     super(container, layoutContext);
-    this.bookEditPage = bookEditPage;
+    this.toDoEditPage = toDoEditPage;
     this.data = data;
-    this.bookDao = bookDao;
+    this.toDoDao = toDoDao;
+    this.userGroupCache = userGroupCache;
   }
 
-  protected void validation()
-  {
-    signatureField.validate();
-    authorsField.validate();
-    publisherField.validate();
-    editorField.validate();
-    yearOfPublishingField.validate();
-    data.setSignature(signatureField.getConvertedInput());
-    if (bookDao.doesSignatureAlreadyExist(data) == true) {
-      signatureField.error(getString("book.error.signatureAlreadyExists"));
-    }
-    if (StringUtils.isBlank(authorsField.getConvertedInput())
-        && StringUtils.isBlank(publisherField.getConvertedInput())
-        && StringUtils.isBlank(editorField.getConvertedInput())
-        && StringUtils.isBlank(signatureField.getConvertedInput())
-        && StringUtils.isBlank(yearOfPublishingField.getConvertedInput())) {
-      authorsField.error(getString("book.error.toFewFields"));
-    }
-  }
-
-  @SuppressWarnings("unchecked")
   @Override
   public void add()
   {
-    final IField titleField = (IField) doPanel.addTextField(data, "title", getString("book.title"), HALF, DOUBLE).setStrong().setRequired();
-    titleField.setFocus();
-    IField field;
-    field = doPanel.addTextField(data, "authors", getString("book.authors"), HALF, DOUBLE);
-    if (field instanceof TextFieldLPanel) {
-      authorsField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
+    doPanel.addTextField(new PanelContext(data, "title", valueLength, getString("plugins.todo.title"), labelLength).setRequired()
+        .setStrong());
+    {
+      final LabelValueChoiceRenderer<ToDoType> typeChoiceRenderer = new LabelValueChoiceRenderer<ToDoType>(container, ToDoType.values());
+      final DropDownChoice<ToDoType> typeChoice = new DropDownChoice<ToDoType>(DropDownChoiceLPanel.SELECT_ID, new PropertyModel<ToDoType>(
+          data, "type"), typeChoiceRenderer.getValues(), typeChoiceRenderer);
+      typeChoice.setNullValid(true);
+      doPanel.addDropDownChoice(typeChoice, new PanelContext(LayoutLength.THREEQUART, getString("plugins.todo.type"), labelLength));
     }
     {
-      // DropDownChoice bookType
-      final LabelValueChoiceRenderer<BookType> bookTypeChoiceRenderer = new LabelValueChoiceRenderer<BookType>(container, BookType.values());
-      final DropDownChoice<BookType> bookTypeChoice = new DropDownChoice<BookType>(SELECT_ID, new PropertyModel<BookType>(data, "type"),
-          bookTypeChoiceRenderer.getValues(), bookTypeChoiceRenderer);
-      bookTypeChoice.setNullValid(false).setRequired(true);
-      doPanel.addDropDownChoice(data, "type", getString("book.type"), HALF, bookTypeChoice, THREEQUART);
-    }
-    final String yearLabel = getString("book.yearOfPublishing");
-    doPanel.addLabel(yearLabel, FULL, LayoutAlignment.RIGHT);
-    field = doPanel.addTextField(yearLabel, data, "yearOfPublishing", QUART);
-    if (field instanceof TextFieldLPanel) {
-      yearOfPublishingField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
-    }
-    {
-      // DropDownChoice bookStatus
-      final LabelValueChoiceRenderer<BookStatus> bookStatusChoiceRenderer = new LabelValueChoiceRenderer<BookStatus>(container, BookStatus
-          .values());
-      final DropDownChoice<BookStatus> bookStatusChoice = new DropDownChoice<BookStatus>(SELECT_ID, new PropertyModel<BookStatus>(data,
-          "status"), bookStatusChoiceRenderer.getValues(), bookStatusChoiceRenderer);
-      bookStatusChoice.setNullValid(false).setRequired(true);
-      doPanel.addDropDownChoice(data, "status", getString("status"), HALF, bookStatusChoice, THREEQUART);
-    }
-    field = doPanel.addTextField(data, "signature", getString("book.signature"), HALF, THREEQUART);
-    if (field instanceof TextFieldLPanel) {
-      signatureField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
-    }
-    final String isbnLabel = getString("book.isbn");
-    doPanel.addLabel(isbnLabel, HALF, LayoutAlignment.RIGHT);
-    doPanel.addTextField(isbnLabel, data, "isbn", THREEQUART);
-    doPanel.addTextField(data, "keywords", getString("book.keywords"), HALF, DOUBLE);
-    field = doPanel.addTextField(data, "publisher", getString("book.publisher"), HALF, DOUBLE);
-    if (field instanceof TextFieldLPanel) {
-      publisherField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
-    }
-    field = doPanel.addTextField(data, "editor", getString("book.editor"), HALF, DOUBLE);
-    if (field instanceof TextFieldLPanel) {
-      editorField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
-    }
-    doPanel.addTextArea(data, "abstractText", getString("book.abstract"), HALF, DOUBLE, false).setCssStyle("height: 10em;");
-    doPanel.addTextArea(data, "comment", getString("comment"), HALF, DOUBLE, false).setCssStyle("height: 10em;");
-
-    if (isNew() == false) {
-      doPanel.addLabel(getString("book.lending"), HALF).setBreakBefore();
-      final StringBuffer buf = new StringBuffer();
-      if (data.getLendOutBy() != null) {
-        // Show full user name:
-        buf.append(data.getLendOutBy().getFullname());
-        if (data.getLendOutDate() != null) {
-          buf.append(", ");
-          // Show lend out date:
-          buf.append(DateTimeFormatter.instance().getFormattedDate(data.getLendOutDate()));
-        }
+      PFUserDO assignee = data.getAssignee();
+      if (Hibernate.isInitialized(assignee) == false) {
+        assignee = userGroupCache.getUser(assignee.getId());
+        data.setAssignee(assignee);
       }
-      final RepeatingView repeatingView = doPanel.addRepeater(LayoutLength.ONEHALF).getRepeatingView();
-      repeatingView.add(new PlainLabel(repeatingView.newChildId(), buf.toString()));
-      doPanel.addTextArea(data, "lendOutComment", getString("book.lendOutNote"), HALF, DOUBLE, false).setCssStyle("height: 10em;");
+      final UserSelectPanel assigneeUserSelectPanel = new UserSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<PFUserDO>(data,
+          "assignee"), toDoEditPage, "assigneeId");
+      doPanel.addSelectPanel(getString("plugins.todo.assignee"), labelLength, assigneeUserSelectPanel, valueLength).setStrong();
+      assigneeUserSelectPanel.init();
     }
+    {
+      PFUserDO reporter = data.getReporter();
+      if (Hibernate.isInitialized(reporter) == false) {
+        reporter = userGroupCache.getUser(reporter.getId());
+        data.setReporter(reporter);
+      }
+      final UserSelectPanel reporterUserSelectPanel = new UserSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<PFUserDO>(data,
+          "reporter"), toDoEditPage, "reporterId");
+      doPanel.addSelectPanel(getString("plugins.todo.reporter"), labelLength, reporterUserSelectPanel, valueLength).setStrong();
+      reporterUserSelectPanel.init();
+    }
+    {
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<TaskDO>(data, "task"),
+          toDoEditPage, "taskId");
+      taskSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
+      doPanel.addSelectPanel(getString("task"), labelLength, taskSelectPanel, valueLength);
+      taskSelectPanel.init();
+      taskSelectPanel.setRequired(true);
+    }
+    doPanel.addTextArea(new PanelContext(data, "description", valueLength, getString("description"), labelLength).setCssStyle("height: 10em;"));
+    doPanel.addTextArea(new PanelContext(data, "comment", valueLength, getString("comment"), labelLength).setCssStyle("height: 10em;"));
+
+    // @Field(index = Index.UN_TOKENIZED)
+    // @DateBridge(resolution = Resolution.DAY)
+    // private Date resubmission;
+
   }
 }

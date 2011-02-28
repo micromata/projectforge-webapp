@@ -123,7 +123,7 @@ public class UserFormRenderer extends AbstractDOFormRenderer
 
   private ListMultipleChoice<Integer> valuesToUnassignChoice;
 
-  final LayoutLength labelLength = LayoutLength.THREEQUART;
+  final static LayoutLength labelLength = LayoutLength.THREEQUART;
 
   public UserFormRenderer(final MarkupContainer container, final AbstractEditPage< ? , ? , ? > parentPage,
       final LayoutContext layoutContext, final UserDao userDao, final UserRightDao userRightDao, final GroupDao groupDao,

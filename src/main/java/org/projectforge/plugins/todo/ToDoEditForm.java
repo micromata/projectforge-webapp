@@ -25,35 +25,29 @@ package org.projectforge.plugins.todo;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.book.BookDO;
-import org.projectforge.book.BookDao;
-import org.projectforge.book.BookStatus;
-import org.projectforge.book.BookType;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.layout.LayoutContext;
 
-public class ToDoEditForm extends AbstractEditForm<BookDO, ToDoEditPage>
+public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
 {
-  private static final long serialVersionUID = 3881031215413525517L;
+  private static final long serialVersionUID = -6208809585214296635L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ToDoEditForm.class);
-
-  @SpringBean(name = "bookDao")
-  private BookDao bookDao;
+  
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
 
   protected ToDoFormRenderer renderer;
 
-  public ToDoEditForm(ToDoEditPage parentPage, BookDO data)
+  public ToDoEditForm(ToDoEditPage parentPage, ToDoDO data)
   {
     super(parentPage, data);
     if (isNew() == true) {
-      data.setStatus(BookStatus.PRESENT);
-      data.setType(BookType.BOOK);
+      data.setReporter(PFUserContext.getUser());
     }
-    if (getData().getTaskId() == null) {
-      bookDao.setTask(getData(), bookDao.getDefaultTaskId());
-    }
-    renderer = new ToDoFormRenderer(parentPage, this, new LayoutContext(this), parentPage.getBaseDao(), data);
+    renderer = new ToDoFormRenderer(parentPage, this, new LayoutContext(this), parentPage.getBaseDao(), data, userGroupCache);
   }
 
   @Override
@@ -61,13 +55,6 @@ public class ToDoEditForm extends AbstractEditForm<BookDO, ToDoEditPage>
   {
     super.init();
     renderer.add();
-  }
-
-  @Override
-  protected void validation()
-  {
-    super.validation();
-    renderer.validation();
   }
 
   @Override

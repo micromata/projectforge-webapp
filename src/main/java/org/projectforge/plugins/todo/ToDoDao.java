@@ -34,8 +34,8 @@ import org.projectforge.book.BookFilter;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
-import org.projectforge.registry.DaoRegistry;
-import org.projectforge.registry.Registry;
+import org.projectforge.task.TaskDO;
+import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 
@@ -47,9 +47,11 @@ import org.projectforge.user.UserDao;
 public class ToDoDao extends BaseDao<ToDoDO>
 {
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "reporter.username", "reporter.firstname", "reporter.lastname",
-      "assignee.username", "assignee.firstname", "assignee.lastname"};
-  
-  private UserDao userDao = (UserDao)Registry.instance().getDao(DaoRegistry.USER);
+      "assignee.username", "assignee.firstname", "assignee.lastname", "task.title", "task.taskpath"};
+
+  private UserDao userDao;
+
+  private TaskTree taskTree;
 
   public ToDoDao()
   {
@@ -79,15 +81,22 @@ public class ToDoDao extends BaseDao<ToDoDO>
     return getList(queryFilter);
   }
 
-  /**
-   * @param book
-   * @param lendOutById If null, then task will be set to null;
-   * @see BaseDao#getOrLoad(Integer)
-   */
-  public void setAssignee(final ToDoDO todo, final Integer toDoId)
+  public void setAssignee(final ToDoDO todo, final Integer userId)
   {
-    PFUserDO user = userDao.getOrLoad(toDoId);
+    final PFUserDO user = userDao.getOrLoad(userId);
     todo.setAssignee(user);
+  }
+
+  public void setReporter(final ToDoDO todo, final Integer userId)
+  {
+    final PFUserDO user = userDao.getOrLoad(userId);
+    todo.setReporter(user);
+  }
+
+  public void setTask(final ToDoDO todo, final Integer taskId)
+  {
+    final TaskDO task = taskTree.getTaskById(taskId);
+    todo.setTask(task);
   }
 
   /**
@@ -141,5 +150,15 @@ public class ToDoDao extends BaseDao<ToDoDO>
   public ToDoDO newInstance()
   {
     return new ToDoDO();
+  }
+
+  public void setUserDao(final UserDao userDao)
+  {
+    this.userDao = userDao;
+  }
+
+  public void setTaskTree(final TaskTree taskTree)
+  {
+    this.taskTree = taskTree;
   }
 }

@@ -26,26 +26,24 @@ package org.projectforge.plugins.todo;
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.book.BookDO;
-import org.projectforge.book.BookDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
 @EditPage(defaultReturnPage = ToDoListPage.class)
-public class ToDoEditPage extends AbstractAutoLayoutEditPage<BookDO, ToDoEditForm, BookDao> implements ISelectCallerPage
+public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditForm, ToDoDao> implements ISelectCallerPage
 {
-  private static final long serialVersionUID = 7091721062661400435L;
+  private static final long serialVersionUID = -5058143025817192156L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ToDoEditPage.class);
 
-  @SpringBean(name = "bookDao")
-  private BookDao bookDao;
+  @SpringBean(name = "toDoDao")
+  private ToDoDao toDoDao;
 
   public ToDoEditPage(PageParameters parameters)
   {
-    super(parameters, "book");
+    super(parameters, "toDo");
     init();
   }
 
@@ -54,8 +52,12 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<BookDO, ToDoEditFor
    */
   public void select(String property, Object selectedValue)
   {
-    if ("lendOutById".equals(property) == true) {
-      bookDao.setLendOutBy(getData(), (Integer) selectedValue);
+    if ("reporterId".equals(property) == true) {
+      toDoDao.setReporter(getData(), (Integer) selectedValue);
+    } else if ("assigneeId".equals(property) == true) {
+      toDoDao.setAssignee(getData(), (Integer) selectedValue);
+    } else if ("taskId".equals(property) == true) {
+      toDoDao.setTask(getData(), (Integer) selectedValue);
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
@@ -66,8 +68,12 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<BookDO, ToDoEditFor
    */
   public void unselect(String property)
   {
-    if ("lendOutById".equals(property) == true) {
-      getData().setLendOutBy(null);
+    if ("reporterId".equals(property) == true) {
+      getData().setReporter(null);
+    } else if ("reporterId".equals(property) == true) {
+      getData().setAssignee(null);
+    } else if ("taskId".equals(property) == true) {
+      getData().setTask(null);
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
@@ -82,13 +88,13 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<BookDO, ToDoEditFor
   }
 
   @Override
-  protected BookDao getBaseDao()
+  protected ToDoDao getBaseDao()
   {
-    return bookDao;
+    return toDoDao;
   }
 
   @Override
-  protected ToDoEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, BookDO data)
+  protected ToDoEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, ToDoDO data)
   {
     return new ToDoEditForm(this, data);
   }
