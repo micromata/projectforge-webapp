@@ -33,7 +33,7 @@ import com.thoughtworks.xstream.converters.SingleValueConverter;
  * Converts UserRightId from and to strings.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class UserRightSingleValueConverter implements SingleValueConverter
+public class UserRightIdSingleValueConverter implements SingleValueConverter
 {
   @SuppressWarnings("unchecked")
   @Override
