@@ -28,7 +28,9 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -75,6 +77,18 @@ public class SystemUpdater
     for (final UpdateEntry updateEntry : updateEntries) {
       getUpdateEntries().add(updateEntry);
     }
+  }
+
+  /**
+   * Only for test case (avoids reading of the update-scripts.xml).
+   * @param updateEntries
+   */
+  void testRegister(final UpdateEntry updateEntry)
+  {
+    if (this.updateEntries == null) {
+      this.updateEntries = new TreeSet<UpdateEntry>();
+    }
+    this.updateEntries.add(updateEntry);
   }
 
   public void register(final Collection<UpdateEntry> updateEntries)
@@ -127,7 +141,13 @@ public class SystemUpdater
   public boolean isUpdated()
   {
     log.info("Checking for data-base updates...");
+    final Set<String> checkedRegions = new HashSet<String>();
     for (final UpdateEntry updateEntry : getUpdateEntries()) {
+      if (checkedRegions.contains(updateEntry.getRegionId()) == true) {
+        // Check only the newest update entry.
+        continue;
+      }
+      checkedRegions.add(updateEntry.getRegionId());
       updateEntry.setPreCheckStatus(updateEntry.runPreCheck());
       if (updateEntry.getPreCheckStatus() != UpdatePreCheckStatus.ALREADY_UPDATED) {
         log
@@ -154,6 +174,9 @@ public class SystemUpdater
     }
   }
 
+  /**
+   * @return The sorted update entries of the ProjectForge core and all plugins in descendant order (sorted by date).
+   */
   public SortedSet<UpdateEntry> getUpdateEntries()
   {
     synchronized (this) {
