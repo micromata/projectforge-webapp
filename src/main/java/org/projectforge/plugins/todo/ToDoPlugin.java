@@ -34,7 +34,7 @@ import org.projectforge.web.MenuItemDefId;
  */
 public class ToDoPlugin extends AbstractPlugin
 {
-  public static final String ID = "plugins.todo";
+  public static final String ID = "ProjectForgeToDo";
 
   public static final String RESOURCE_BUNDLE_NAME = ToDoPlugin.class.getPackage().getName() + ".ToDoI18nResources";
 
@@ -53,8 +53,8 @@ public class ToDoPlugin extends AbstractPlugin
 
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
     registerMenuItem(new MenuItemDef(parentMenu, ID, 5, "plugins.todo.menu", ToDoListPage.class));
-    // Updater.
     // UserRights.
+    // Hibernate-search indexer.
     addResourceBundle(RESOURCE_BUNDLE_NAME);
   }
 
