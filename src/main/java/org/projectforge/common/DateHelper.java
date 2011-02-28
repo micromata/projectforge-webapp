@@ -234,6 +234,15 @@ public class DateHelper implements Serializable
   }
 
   /**
+   * Takes time zone of context user if exist.
+   * @param date
+   */
+  public static String formatIsoDate(final Date date, final TimeZone timeZone)
+  {
+    return getIsoDateFormat(timeZone).format(date);
+  }
+
+  /**
    * logError = true
    * @param str
    * @return
