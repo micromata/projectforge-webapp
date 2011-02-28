@@ -115,7 +115,7 @@ public class DatabaseUpdateDaoTest extends TestBase
     StringBuffer buf = new StringBuffer();
     databaseUpdateDao.buildAddTableAttributesStatement(buf, "t_task", new TableAttribute("workpackage_code", TableAttributeType.VARCHAR, 100,
         false), new TableAttribute("user_fk", TableAttributeType.INT).setForeignTable("t_user").setForeignAttribute("pk"));
-    assertEquals("ALTER TABLE t_task ADD COLUMN workpackage_code VARCHAR(100) NOT NULL;\n" //
+    assertEquals("-- Does already exist: ALTER TABLE t_task ADD COLUMN workpackage_code VARCHAR(100) NOT NULL;\n" //
         + "ALTER TABLE t_task ADD COLUMN user_fk INT;\n"
         + "ALTER TABLE t_task ADD CONSTRAINT t_task_user_fk FOREIGN KEY (user_fk) REFERENCES t_user(pk);\n", buf.toString());
   }
