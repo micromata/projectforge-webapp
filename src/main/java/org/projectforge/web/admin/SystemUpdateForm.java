@@ -37,7 +37,6 @@ import org.apache.wicket.model.PropertyModel;
 import org.projectforge.Version;
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.admin.UpdatePreCheckStatus;
-import org.projectforge.common.DateHelper;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
@@ -95,7 +94,7 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
       item.add(new Label("version", version.toString()));
       final String description = updateEntry.getDescription();
       item.add(new Label("description", StringUtils.isBlank(description) == true ? "" : description));
-      item.add(new Label("date", DateHelper.formatIsoDate(updateEntry.getDate())));
+      item.add(new Label("date", updateEntry.getDate()));
       item.add(new Label("preCheckResult", new Model<String>() {
         @Override
         public String getObject()
