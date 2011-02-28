@@ -41,6 +41,7 @@ import org.projectforge.access.OperationType;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightDO;
+import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -135,7 +136,8 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
                 } else {
                   buf.append(", ");
                 }
-                buf.append(right.getRightId());
+                final UserRightId userRightId = right.getRightId();
+                buf.append(getString(userRightId.getI18nKey()));
                 if (right.getValue() == UserRightValue.READONLY) {
                   buf.append(" (ro)");
                 } else if (right.getValue() == UserRightValue.PARTLYREADWRITE) {
