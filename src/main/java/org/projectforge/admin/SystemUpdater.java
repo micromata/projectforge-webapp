@@ -126,15 +126,22 @@ public class SystemUpdater
    */
   public boolean isUpdated()
   {
-    final UpdateEntry firstUpdateEntry = getUpdateEntries().first();
-    firstUpdateEntry.setPreCheckStatus(firstUpdateEntry.runPreCheck());
-    final boolean result = firstUpdateEntry.getPreCheckStatus() == UpdatePreCheckStatus.ALREADY_UPDATED;
-    if (result == false) {
-      log
-          .warn("*** Please note: The data-base perhaps has to be updated first before running the ProjectForge web app. Please login as administrator. Status: "
-              + firstUpdateEntry.getPreCheckStatus());
+    log.info("Checking for data-base updates...");
+    for (final UpdateEntry updateEntry : getUpdateEntries()) {
+      updateEntry.setPreCheckStatus(updateEntry.runPreCheck());
+      if (updateEntry.getPreCheckStatus() != UpdatePreCheckStatus.ALREADY_UPDATED) {
+        log
+            .warn("*** Please note: The data-base perhaps has to be updated first before running the ProjectForge web app. Please login as administrator. Status '"
+                + updateEntry.getPreCheckStatus()
+                + "' for update entry '"
+                + updateEntry.getRegionId()
+                + "' "
+                + updateEntry.getVersion());
+        return false;
+      }
     }
-    return result;
+    log.info("No data-base updates found (OK).");
+    return true;
   }
 
   /**
