@@ -23,8 +23,6 @@
 
 package org.projectforge.admin;
 
-import java.util.Date;
-
 import org.projectforge.Version;
 import org.projectforge.common.ReflectionToString;
 import org.projectforge.scripting.GroovyResult;
@@ -47,7 +45,7 @@ public class UpdateEntryScript extends UpdateEntry
   private Version version;
 
   @XmlField
-  private Date date;
+  private String date;
 
   @XmlField
   private String description;
@@ -86,7 +84,7 @@ public class UpdateEntryScript extends UpdateEntry
   }
 
   @Override
-  public Date getDate()
+  public String getDate()
   {
     return this.date;
   }

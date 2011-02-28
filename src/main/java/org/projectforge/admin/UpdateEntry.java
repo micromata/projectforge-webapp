@@ -24,7 +24,6 @@
 package org.projectforge.admin;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import org.projectforge.Version;
 import org.projectforge.common.ReflectionToString;
@@ -40,12 +39,15 @@ public abstract class UpdateEntry implements Serializable, Comparable<UpdateEntr
   protected transient UpdatePreCheckStatus preCheckStatus = UpdatePreCheckStatus.UNKNOWN;
 
   protected transient UpdateRunningStatus runningStatus;
-  
+
   public abstract Version getVersion();
 
   public abstract void setVersion(final Version version);
-  
-  public abstract Date getDate();
+
+  /**
+   * Should be of iso format: 2011-02-28 (yyyy-MM-dd).
+   */
+  public abstract String getDate();
 
   /**
    * Identifier of the software region: core for ProjectForge core or plugin identifier.
@@ -92,13 +94,20 @@ public abstract class UpdateEntry implements Serializable, Comparable<UpdateEntr
   }
 
   /**
-   * Compares the dates of the both entries in descending order.
+   * Compares the dates of the both entries in descending order. For equal dates, the region id and the version is compared.
    * @param o
-   * @return
    */
   @Override
   public int compareTo(final UpdateEntry o)
   {
-    return o.getDate().compareTo(getDate());
+    int res = o.getDate().compareTo(getDate());
+    if (res != 0) {
+      return res;
+    }
+    res = o.getRegionId().compareTo(getRegionId());
+    if (res != 0) {
+      return res;
+    }
+    return o.getVersion().compareTo(getVersion());
   }
 }

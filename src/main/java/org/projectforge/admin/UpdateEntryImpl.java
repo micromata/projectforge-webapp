@@ -28,7 +28,6 @@ import java.util.Date;
 import org.projectforge.Version;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.ReflectionToString;
-import org.projectforge.user.PFUserContext;
 
 /**
  * Represents a update (written in Java).
@@ -36,13 +35,15 @@ import org.projectforge.user.PFUserContext;
  */
 public abstract class UpdateEntryImpl extends UpdateEntry
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UpdateEntryImpl.class);
+  
   private static final long serialVersionUID = -1178486631632477422L;
 
   private String regionId;
 
   private Version version;
-  
-  private Date date;
+
+  private String date;
 
   private String description;
 
@@ -50,10 +51,20 @@ public abstract class UpdateEntryImpl extends UpdateEntry
   {
   }
 
+  /**
+   * @param regionId
+   * @param versionString
+   * @param isoDateString Date string must be of iso format: yyyy-MM-dd.
+   * @param description
+   */
   public UpdateEntryImpl(final String regionId, final String versionString, final String isoDateString, final String description)
   {
     this.regionId = regionId;
-    this.date = DateHelper.parseIsoDate(isoDateString, PFUserContext.getTimeZone());
+    final Date testDate = DateHelper.parseIsoDate(isoDateString, DateHelper.UTC);
+    if (testDate == null) {
+      log.error("Given date doesn't match the iso format yyyy-MM-dd: " + isoDateString);
+    }
+    this.date = isoDateString;
     this.version = new Version(versionString);
     this.description = description;
   }
@@ -80,9 +91,9 @@ public abstract class UpdateEntryImpl extends UpdateEntry
   {
     this.version = version;
   }
-  
+
   @Override
-  public Date getDate()
+  public String getDate()
   {
     return this.date;
   }
