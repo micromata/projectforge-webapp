@@ -226,6 +226,7 @@ public class XmlDump
       xstream.setMode(XStream.ID_REFERENCES);
       xstreamSavingConverter.setSession(session);
       xstream.registerConverter(xstreamSavingConverter, 10);
+      xstream.registerConverter(new UserRightIdSingleValueConverter(), 20);
       // alle Objekte Laden und speichern
       xstream.fromXML(reader);
 
@@ -283,6 +284,7 @@ public class XmlDump
       {
         xstream.omitField(AbstractBaseDO.class, "minorChange");
         xstream.omitField(AbstractBaseDO.class, "selected");
+        xstream.registerConverter(new UserRightIdSingleValueConverter(), 20);
       }
     };
     converter.setHibernate(hibernate);
@@ -358,7 +360,7 @@ public class XmlDump
         }
       }
       for (final HistoryEntry historyEntry : xstreamSavingConverter.getHistoryEntries()) {
-        final Class<?> type = xstreamSavingConverter.getClassFromHistoryName(historyEntry.getClassName());
+        final Class< ? > type = xstreamSavingConverter.getClassFromHistoryName(historyEntry.getClassName());
         final Object o = session.get(type, historyEntry.getEntityId());
         if (o == null) {
           log.error("A corrupted history entry found (entity of class '"
