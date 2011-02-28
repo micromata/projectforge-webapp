@@ -312,6 +312,8 @@ public class WicketApplication extends WebApplication
       plugin.setResourceSettings(getResourceSettings());
       beanFactory.autowireBeanProperties(plugin, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
       plugin.init();
+      systemUpdater.register(plugin.getInitializationUpdateEntry());
+      systemUpdater.register(plugin.getUpdateEntries());
     }
 
     hibernateConfiguration.buildMappings();
