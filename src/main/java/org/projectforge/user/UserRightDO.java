@@ -52,7 +52,7 @@ public class UserRightDO extends DefaultBaseDO implements Comparable<UserRightDO
 {
   private static final long serialVersionUID = 6703048743393453733L;
 
-  @Field(index = Index.UN_TOKENIZED)
+  @IndexedEmbedded(depth = 2)
   private UserRightId rightId;
 
   @Field(index = Index.UN_TOKENIZED)
@@ -88,8 +88,7 @@ public class UserRightDO extends DefaultBaseDO implements Comparable<UserRightDO
     this.value = value;
   }
 
-  @Enumerated(EnumType.STRING)
-  @Column(name = "right_id", length = 40, nullable = false)
+  @Transient
   public UserRightId getRightId()
   {
     return rightId;
@@ -99,6 +98,23 @@ public class UserRightDO extends DefaultBaseDO implements Comparable<UserRightDO
   {
     this.rightId = rightId;
     return this;
+  }
+
+  /**
+   * Only for storing the right id in the data base.
+   */
+  @Column(name = "right_id", length = 40, nullable = false)
+  public String getRightIdString()
+  {
+    return rightId != null ? rightId.getId() : null;
+  }
+
+  /**
+   * Only for resstoring the right id from the data base.
+   */
+  public void setRightIdString(final String rightId)
+  {
+    this.rightId = rightId != null ? UserRights.instance().getRightId(rightId) : null;
   }
 
   @Enumerated(EnumType.STRING)
@@ -162,7 +178,7 @@ public class UserRightDO extends DefaultBaseDO implements Comparable<UserRightDO
   {
     HashCodeBuilder hcb = new HashCodeBuilder();
     if (getRightId() != null)
-      hcb.append(getRightId().ordinal());
+      hcb.append(getRightId().hashCode());
     hcb.append(getId());
     return hcb.toHashCode();
   }

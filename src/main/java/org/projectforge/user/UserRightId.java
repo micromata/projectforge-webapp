@@ -23,49 +23,115 @@
 
 package org.projectforge.user;
 
+import java.io.Serializable;
+
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.hibernate.search.annotations.ClassBridge;
+import org.hibernate.search.annotations.Index;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
 import org.projectforge.core.I18nEnum;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public enum UserRightId implements I18nEnum
+@Indexed
+@ClassBridge(index = Index.TOKENIZED, store = Store.NO, impl = HibernateSearchUserRightIdBridge.class)
+public class UserRightId implements I18nEnum, Comparable<UserRightId>, Serializable
 {
-  FIBU_EINGANGSRECHNUNGEN("fibu.eingangsrechnungen"), //
-  FIBU_AUSGANGSRECHNUNGEN("fibu.ausgangsrechnungen"), //
-  FIBU_EMPLOYEE_SALARY("fibu.employeeSalaries"), //
-  FIBU_DATEV_IMPORT("fibu.datevImport"), //
-  FIBU_COST_UNIT("fibu.costUnit"), //
+  private static final long serialVersionUID = 2328022474754212904L;
 
-  MISC_MEB("misc.meb"), //
+  public static UserRightId FIBU_EINGANGSRECHNUNGEN = new UserRightId("FIBU_EINGANGSRECHNUNGEN", "fibu1",
+      "access.right.fibu.eingangsrechnungen");
 
-  PM_GANTT("pm.gantt"), //
-  PM_ORDER_BOOK("pm.orderbook"), //
-  PM_HR_PLANNING("pm.hrPlanning"), //
-  PM_PROJECT("pm.project"), //
+  public static UserRightId FIBU_AUSGANGSRECHNUNGEN = new UserRightId("FIBU_AUSGANGSRECHNUNGEN", "fibu2",
+      "access.right.fibu.ausgangsrechnungen");
 
-  ORGA_CONTRACTS("orga.contracts"), //
-  ORGA_INCOMING_MAIL("orga.incomingmail"), //
-  ORGA_OUTGOING_MAIL("orga.outgoingmail");
+  public static UserRightId FIBU_EMPLOYEE_SALARY = new UserRightId("FIBU_EMPLOYEE_SALARY", "fibu3", "access.right.fibu.employeeSalaries");
 
-  private String key;
+  public static UserRightId FIBU_DATEV_IMPORT = new UserRightId("FIBU_DATEV_IMPORT", "fibu4", "access.right.fibu.datevImport");
+
+  public static UserRightId FIBU_COST_UNIT = new UserRightId("FIBU_COST_UNIT", "fibu5", "access.right.fibu.costUnit");
+
+  public static UserRightId MISC_MEB = new UserRightId("MISC_MEB", "misc1", "access.right.misc.meb");
+
+  public static UserRightId PM_GANTT = new UserRightId("PM_GANTT", "pm1", "access.right.pm.gantt");
+
+  public static UserRightId PM_ORDER_BOOK = new UserRightId("PM_ORDER_BOOK", "pm2", "access.right.pm.orderbook");
+
+  public static UserRightId PM_HR_PLANNING = new UserRightId("PM_HR_PLANNING", "pm3", "access.right.pm.hrPlanning");
+
+  public static UserRightId PM_PROJECT = new UserRightId("PM_PROJECT", "pm4", "access.right.pm.project");
+
+  public static UserRightId ORGA_CONTRACTS = new UserRightId("ORGA_CONTRACTS", "orga1", "access.right.orga.contracts");
+
+  public static UserRightId ORGA_INCOMING_MAIL = new UserRightId("ORGA_INCOMING_MAIL", "orga2", "access.right.orga.incomingmail");
+
+  public static UserRightId ORGA_OUTGOING_MAIL = new UserRightId("ORGA_OUTGOING_MAIL", "orga3", "access.right.orga.outgoingmail");
+
+  private String id;
+
+  private String orderString;
+
+  private String i18nKey;
 
   /**
-   * The key will be used e. g. for i18n.
-   * @return
+   * @param id Must be unique (including all plugins).
+   * @param orderString For displaying the rights in e. g. UserEditPage in the correct order.
+   * @param i18nKey
    */
-  public String getKey()
+  public UserRightId(final String id, final String orderString, final String i18nKey)
   {
-    return key;
+    this.id = id;
+    this.orderString = orderString;
+    this.i18nKey = i18nKey;
+  }
+  
+  public String getId()
+  {
+    return id;
   }
 
+  @Override
   public String getI18nKey()
   {
-    return "access.right." + key;
+    return i18nKey;
+  }
+  
+  public String getOrderString()
+  {
+    return orderString;
+  }
+  
+  @Override
+  public String toString()
+  {
+    return String.valueOf(id);
   }
 
-  UserRightId(String key)
+  @Override
+  public int hashCode()
   {
-    this.key = key;
+    return new HashCodeBuilder().append(id).hashCode();
+  }
+
+  @Override
+  public boolean equals(final Object obj)
+  {
+    if (obj == null || obj instanceof UserRightId == false) {
+      return false;
+    }
+    return id.equals(((UserRightId) obj).id);
+  }
+
+  @Override
+  public int compareTo(final UserRightId o)
+  {
+    final int res = orderString.compareTo(o.orderString);
+    if (res != 0) {
+      return res;
+    }
+    return id.compareTo(o.id);
   }
 }

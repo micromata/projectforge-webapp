@@ -38,6 +38,7 @@ import org.projectforge.meb.MebRight;
 
 public class UserRights
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserRights.class);
   /**
    * FALSE, TRUE;
    */
@@ -77,6 +78,8 @@ public class UserRights
 
   private Map<UserRightId, UserRight> rights = new HashMap<UserRightId, UserRight>();
 
+  private Map<String, UserRightId> rightIds = new HashMap<String, UserRightId>();
+
   private List<UserRight> orderedRights = new ArrayList<UserRight>();
 
   private AccessChecker accessChecker;
@@ -114,6 +117,15 @@ public class UserRights
     return rights.get(id);
   }
 
+  public UserRightId getRightId(final String userRightId)
+  {
+    final UserRightId rightId =  rightIds.get(userRightId);
+    if (rightId == null) {
+      log.warn("UserRightId with id '" + userRightId + "' not found.");
+    }
+    return rightId;
+  }
+
   @SuppressWarnings("unchecked")
   public List<UserRight> getOrderedRights()
   {
@@ -123,6 +135,9 @@ public class UserRights
   private UserRights(final AccessChecker accessChecker)
   {
     this.accessChecker = accessChecker;
+    
+
+    
     addRight(UserRightCategory.FIBU, UserRightId.FIBU_EMPLOYEE_SALARY, FALSE_READONLY_READWRITE, FIBU_GROUPS).setAvailableGroupRightValues(
         ProjectForgeGroup.CONTROLLING_GROUP, UserRightValue.FALSE, UserRightValue.READONLY);
     addRight(UserRightCategory.FIBU, UserRightId.FIBU_AUSGANGSRECHNUNGEN, FALSE_READONLY_READWRITE, FIBU_ORGA_GROUPS)
@@ -153,7 +168,9 @@ public class UserRights
 
   private void addRight(final UserRight right)
   {
+    final UserRightId userRightId = right.getId();
     rights.put(right.getId(), right);
+    rightIds.put(userRightId.getId(), userRightId);
     orderedRights.add(right);
   }
 }

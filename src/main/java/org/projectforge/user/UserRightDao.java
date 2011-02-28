@@ -139,7 +139,7 @@ public class UserRightDao extends BaseDao<UserRightDO>
       queryFilter.add(Restrictions.eq("user", myFilter.getUser()));
     }
     queryFilter.createAlias("user", "u");
-    queryFilter.addOrder(Order.asc("u.username")).addOrder(Order.asc("rightId"));
+    queryFilter.addOrder(Order.asc("u.username")).addOrder(Order.asc("rightIdString"));
     List<UserRightDO> list = getList(queryFilter);
     return list;
   }
