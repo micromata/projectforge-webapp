@@ -24,7 +24,6 @@
 package org.projectforge.fibu;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 
@@ -53,10 +52,6 @@ public class HibernateSearchAuftragsPositionBridge implements FieldBridge
     if (log.isDebugEnabled() == true) {
       log.debug(buf.toString());
     }
-    final Field field = new Field(name, buf.toString(), luceneOptions.getStore(), luceneOptions.getIndex());
-    if (luceneOptions.getBoost() != null) {
-      field.setBoost(luceneOptions.getBoost());
-    }
-    document.add(field);
+    luceneOptions.addFieldToDocument(name, buf.toString(), document);
   }
 }

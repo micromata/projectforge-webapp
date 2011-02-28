@@ -26,7 +26,6 @@ package org.projectforge.task;
 import java.util.List;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 import org.projectforge.web.filter.SpringContext;
@@ -41,8 +40,8 @@ public class HibernateSearchTaskPathBridge implements FieldBridge
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(HibernateSearchTaskPathBridge.class);
 
   /**
-   * Get all names of ancestor tasks and task itself and creates an index containing all task titles separated by '|'. <br/> Please note:
-   * does not work in JUnit test mode.
+   * Get all names of ancestor tasks and task itself and creates an index containing all task titles separated by '|'. <br/>
+   * Please note: does not work in JUnit test mode.
    * @see org.hibernate.search.bridge.FieldBridge#set(java.lang.String, java.lang.Object, org.apache.lucene.document.Document,
    *      org.hibernate.search.bridge.LuceneOptions)
    */
@@ -63,11 +62,7 @@ public class HibernateSearchTaskPathBridge implements FieldBridge
       if (log.isDebugEnabled() == true) {
         log.debug(buf.toString());
       }
-      final Field field = new Field(name, buf.toString(), luceneOptions.getStore(), luceneOptions.getIndex());
-      if (luceneOptions.getBoost() != null) {
-        field.setBoost(luceneOptions.getBoost());
-      }
-      document.add(field);
+      luceneOptions.addFieldToDocument(name, buf.toString(), document);
     }
   }
 }

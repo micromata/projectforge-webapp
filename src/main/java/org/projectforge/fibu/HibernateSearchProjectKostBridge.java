@@ -24,7 +24,6 @@
 package org.projectforge.fibu;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
 import org.hibernate.search.bridge.FieldBridge;
 import org.hibernate.search.bridge.LuceneOptions;
 
@@ -46,10 +45,6 @@ public class HibernateSearchProjectKostBridge implements FieldBridge
     buf.append(KostFormatter.format(projekt));
     buf.append(' ');
     buf.append(KostFormatter.format(projekt, true));
-    final Field field = new Field(name, buf.toString(), luceneOptions.getStore(), luceneOptions.getIndex());
-    if (luceneOptions.getBoost() != null) {
-      field.setBoost(luceneOptions.getBoost());
-    }
-    document.add(field);
+    luceneOptions.addFieldToDocument(name, buf.toString(), document);
   }
 }
