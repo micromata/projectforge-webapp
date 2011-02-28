@@ -70,6 +70,7 @@ public class DatabaseCoreUpdates
         dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "excelDateFormat"));
         dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "timeNotation"));
         final UserDao userDao = (UserDao) Registry.instance().getDao(UserDao.class);
+        dao.createMissingIndices();
         userDao.getUserGroupCache().setExpired();
         return UpdateRunningStatus.DONE;
       }
