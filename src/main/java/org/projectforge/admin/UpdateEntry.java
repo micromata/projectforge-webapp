@@ -39,7 +39,7 @@ public abstract class UpdateEntry implements Serializable, Comparable<UpdateEntr
 
   protected transient UpdatePreCheckStatus preCheckStatus = UpdatePreCheckStatus.UNKNOWN;
 
-  protected transient UpdateRunningStatus runningStatus = UpdateRunningStatus.UNKNOWN;
+  protected transient UpdateRunningStatus runningStatus;
   
   public abstract Version getVersion();
 
