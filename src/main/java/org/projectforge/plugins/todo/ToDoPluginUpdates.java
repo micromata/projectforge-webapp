@@ -40,7 +40,7 @@ public class ToDoPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(ToDoPlugin.ID, "1.0.0", "2011-01-27", "Adds table PLUGIN_T_TODO.") {
+    return new UpdateEntryImpl(ToDoPlugin.ID, "1.0.0", "2011-02-28", "Adds table PLUGIN_T_TODO.") {
       final Table table = new Table(ToDoDO.class);
 
       @Override
@@ -56,6 +56,7 @@ public class ToDoPluginUpdates
             .addAttributes("id", "created", "lastUpdate", "deleted", "reporter", "assignee", "task", "comment", "description", "type",
                 "resubmission");
         dao.createTable(table);
+        dao.createMissingIndices();
         return UpdateRunningStatus.DONE;
       }
     };
