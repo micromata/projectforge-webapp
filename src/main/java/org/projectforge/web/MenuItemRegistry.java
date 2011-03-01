@@ -37,6 +37,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Page;
 import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.EmployeeSalaryDao;
@@ -112,7 +113,7 @@ public class MenuItemRegistry
 
   private List<MenuItemDef> registry = new ArrayList<MenuItemDef>();
 
-  private Configuration configuration = Configuration.getInstance();
+  private ConfigXml xmlConfiguration = ConfigXml.getInstance();
 
   private static final MenuItemRegistry instance = new MenuItemRegistry();
 
@@ -148,7 +149,7 @@ public class MenuItemRegistry
    */
   public MenuItemDef register(final MenuItemDef menuItemDef)
   {
-    final MenuEntryConfig root = configuration.getMenuConfig();
+    final MenuEntryConfig root = xmlConfiguration.getMenuConfig();
     if (root != null) {
       final MenuEntryConfig entry = root.findMenuEntry(menuItemDef); //
       if (entry != null) {
@@ -196,6 +197,7 @@ public class MenuItemRegistry
   @SuppressWarnings("serial")
   private static void initialize(final MenuItemRegistry reg)
   {
+    final ConfigXml xmlConfiguration = ConfigXml.getInstance();
     final Configuration configuration = Configuration.getInstance();
     // Super menus
     final MenuItemDef common = reg.register(null, MenuItemDefId.COMMON, 10);
@@ -217,7 +219,7 @@ public class MenuItemRegistry
     if (configuration.isAddressManagementConfigured() == true) {
       reg.register(common, MenuItemDefId.ADDRESS_LIST, 30, AddressListPage.class); // Visible for all.
     }
-    if (StringUtils.isNotEmpty(configuration.getTelephoneSystemUrl()) == true) {
+    if (StringUtils.isNotEmpty(xmlConfiguration.getTelephoneSystemUrl()) == true) {
       reg.register(common, MenuItemDefId.PHONE_CALL, 40, PhoneCallPage.class);
     }
     if (configuration.isMebConfigured() == true) {
@@ -296,7 +298,7 @@ public class MenuItemRegistry
     // ORGA
     reg.register(orga, MenuItemDefId.OUTBOX_LIST, 10, PostausgangListPage.class, PostausgangDao.USER_RIGHT_ID, READONLY_READWRITE);
     reg.register(orga, MenuItemDefId.INBOX_LIST, 20, PosteingangListPage.class, PosteingangDao.USER_RIGHT_ID, READONLY_READWRITE);
-    if (CollectionUtils.isNotEmpty(configuration.getContractTypes()) == true) {
+    if (CollectionUtils.isNotEmpty(xmlConfiguration.getContractTypes()) == true) {
       reg.register(orga, MenuItemDefId.CONTRACTS, 30, ContractListPage.class, ContractDao.USER_RIGHT_ID, READONLY_READWRITE);
     }
 

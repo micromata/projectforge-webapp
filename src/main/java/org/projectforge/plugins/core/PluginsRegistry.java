@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.apache.wicket.settings.IResourceSettings;
 import org.projectforge.admin.SystemUpdater;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.plugins.todo.ToDoPlugin;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -73,8 +73,8 @@ public class PluginsRegistry
     for (final AbstractPlugin plugin : builtinPlugins) {
       plugins.add(plugin);
     }
-    final Configuration configuration = Configuration.getInstance();
-    final String[] pluginMainClasses = configuration.getPluginMainClasses();
+    final ConfigXml xmlConfiguration = ConfigXml.getInstance();
+    final String[] pluginMainClasses = xmlConfiguration.getPluginMainClasses();
     if (pluginMainClasses != null) {
       for (final String pluginMainClassName : pluginMainClasses) {
         try {

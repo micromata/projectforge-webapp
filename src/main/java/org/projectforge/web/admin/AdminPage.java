@@ -47,6 +47,7 @@ import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.core.ReindexSettings;
 import org.projectforge.core.SystemDao;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.database.DatabaseDao;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.XmlDump;
@@ -159,7 +160,7 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   {
     log.info("Administration: reread configuration file config.xml.");
     checkAccess();
-    String result = Configuration.getInstance().readConfiguration();
+    String result = ConfigXml.getInstance().readConfiguration();
     if (result != null) {
       result = result.replaceAll("\n", "<br/>\n");
     }
@@ -170,7 +171,7 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   {
     log.info("Administration: export configuration file config.xml.");
     checkAccess();
-    final String xml = Configuration.getInstance().exportConfiguration();
+    final String xml = ConfigXml.getInstance().exportConfiguration();
     final String filename = "config-" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xml";
     getResponse().setCharacterEncoding("utf-8");
     DownloadUtils.setDownloadTarget(xml.getBytes(), filename);

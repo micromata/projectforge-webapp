@@ -33,8 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationListener;
+import org.projectforge.core.ConfigXml;
 
 /**
  * Servlet for displaying a customizable logo image (see config.xml).
@@ -60,7 +60,7 @@ public class LogoServlet extends HttpServlet implements ConfigurationListener
    */
   public static String getBaseUrl()
   {
-    final String filename = Configuration.getInstance().getLogoFile();
+    final String filename = ConfigXml.getInstance().getLogoFile();
     if (StringUtils.isEmpty(filename) == true) {
       return null;
     } else if (filename.endsWith(".png") == true) {
@@ -78,9 +78,9 @@ public class LogoServlet extends HttpServlet implements ConfigurationListener
     log.debug("Start doPost");
     if (initialized == false) {
       // Synchronization not really needed, multiple initialization works.
-      final String logo = Configuration.getInstance().getLogoFile();
+      final String logo = ConfigXml.getInstance().getLogoFile();
       if (logo != null) {
-        final String logoPath = Configuration.getInstance().getResourcePath() + "/images/" + logo;
+        final String logoPath = ConfigXml.getInstance().getResourcePath() + "/images/" + logo;
         final File file = new File(logoPath);
         if (file.canRead() == true) {
           logoFile = file;
@@ -89,7 +89,7 @@ public class LogoServlet extends HttpServlet implements ConfigurationListener
           log.error("Configured logo not found: " + logoPath);
         }
       }
-      Configuration.getInstance().register(this);
+      ConfigXml.getInstance().register(this);
       initialized = true;
     }
     byte[] bytes = null;

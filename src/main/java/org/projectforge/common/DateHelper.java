@@ -37,6 +37,7 @@ import java.util.TimeZone;
 
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
 
@@ -470,7 +471,7 @@ public class DateHelper implements Serializable
     if (date == null) {
       return -1;
     }
-    final Calendar cal = Calendar.getInstance(PFUserContext.getTimeZone(), Configuration.getInstance().getDefaultLocale());
+    final Calendar cal = Calendar.getInstance(PFUserContext.getTimeZone(), ConfigXml.getInstance().getDefaultLocale());
     cal.setTime(date);
     return cal.get(Calendar.WEEK_OF_YEAR);
   }
@@ -489,7 +490,7 @@ public class DateHelper implements Serializable
     if (calendar == null) {
       return -1;
     }
-    final Calendar cal = Calendar.getInstance(Configuration.getInstance().getDefaultLocale());
+    final Calendar cal = Calendar.getInstance(ConfigXml.getInstance().getDefaultLocale());
     cal.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
     cal.set(Calendar.MONTH, calendar.get(Calendar.MONDAY));
     cal.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH));

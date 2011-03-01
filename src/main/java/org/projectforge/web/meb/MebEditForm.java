@@ -38,7 +38,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.Hibernate;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.jira.JiraConfig;
 import org.projectforge.jira.JiraIssueType;
 import org.projectforge.jira.JiraProject;
@@ -74,7 +74,7 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
 
   private FavoritesChoicePanel<JiraProject, JiraProject> jiraProjectChoice;
 
-  private JiraConfig jiraConfig = Configuration.getInstance().getJiraConfig();
+  private JiraConfig jiraConfig = ConfigXml.getInstance().getJiraConfig();
 
   public MebEditForm(MebEditPage parentPage, MebEntryDO data)
   {

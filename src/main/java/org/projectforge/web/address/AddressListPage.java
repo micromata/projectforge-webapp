@@ -50,7 +50,7 @@ import org.projectforge.address.AddressDao;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.address.PhoneType;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -95,8 +95,8 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
   {
     super.setup();
     this.recentSearchTermsUserPrefKey = "addressSearchTerms";
-    messagingSupported = Configuration.getInstance().isSmsConfigured() == true;
-    phoneCallSupported = Configuration.getInstance().isTelephoneSystemUrlConfigured() == true;
+    messagingSupported = ConfigXml.getInstance().isSmsConfigured() == true;
+    phoneCallSupported = ConfigXml.getInstance().isTelephoneSystemUrlConfigured() == true;
   }
 
   @Override

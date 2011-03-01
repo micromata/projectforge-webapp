@@ -30,7 +30,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 
 /**
  * 
@@ -53,7 +53,7 @@ public class Holidays
 
   private Map<HolidayDefinition, ConfigureHoliday> reconfiguredHolidays = new HashMap<HolidayDefinition, ConfigureHoliday>();
 
-  private Configuration configuration;
+  private ConfigXml xmlConfiguration;
 
   private Map<Integer, Holiday> computeHolidays(int year)
   {
@@ -92,8 +92,8 @@ public class Holidays
         putEasterHoliday(holidays, cal, holiday);
       }
     }
-    if (configuration.getHolidays() != null) {
-      for (final ConfigureHoliday cfgHoliday : configuration.getHolidays()) {
+    if (xmlConfiguration.getHolidays() != null) {
+      for (final ConfigureHoliday cfgHoliday : xmlConfiguration.getHolidays()) {
         if (cfgHoliday.getId() == null && cfgHoliday.isIgnore() == false) {
           // New Holiday.
           if (cfgHoliday.getMonth() == null || cfgHoliday.getDayOfMonth() == null || StringUtils.isBlank(cfgHoliday.getLabel()) == true) {
@@ -174,10 +174,10 @@ public class Holidays
 
   private synchronized Map<Integer, Holiday> getHolidays(int year)
   {
-    if (configuration == null) {
-      configuration = Configuration.getInstance();
-      if (configuration.getHolidays() != null) {
-        for (final ConfigureHoliday holiday : configuration.getHolidays()) {
+    if (xmlConfiguration == null) {
+      xmlConfiguration = ConfigXml.getInstance();
+      if (xmlConfiguration.getHolidays() != null) {
+        for (final ConfigureHoliday holiday : xmlConfiguration.getHolidays()) {
           if (holiday.getId() != null) {
             reconfiguredHolidays.put(holiday.getId(), holiday);
           }

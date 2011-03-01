@@ -25,7 +25,7 @@ package org.projectforge.database;
 
 import org.hibernate.HibernateException;
 import org.hibernate.cfg.AnnotationConfiguration;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean;
@@ -91,7 +91,7 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
    * Needed for ensuring that configuration is initialized.
    * @param projectForgeConfiguration
    */
-  public void setProjectForgeConfiguration(final Configuration projectForgeConfiguration)
+  public void setXmlConfiguration(final ConfigXml xmlConfiguration)
   {
     // Do nothing. Ensure only that configuration is initialized.
   }

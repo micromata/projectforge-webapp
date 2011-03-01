@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 
 public class JiraUtils
 {
@@ -42,7 +43,7 @@ public class JiraUtils
    */
   public static String buildJiraIssueBrowseLinkUrl(final String jiraIssue)
   {
-    return Configuration.getInstance().getJiraBrowseBaseUrl() + jiraIssue;
+    return ConfigXml.getInstance().getJiraBrowseBaseUrl() + jiraIssue;
   }
 
   /**
@@ -52,7 +53,7 @@ public class JiraUtils
    */
   public static String buildJiraIssueBrowseLink(final String jiraIssue)
   {
-    return "<a href=\"" + Configuration.getInstance().getJiraBrowseBaseUrl() + jiraIssue + "\">" + jiraIssue + "</a>";
+    return "<a href=\"" + ConfigXml.getInstance().getJiraBrowseBaseUrl() + jiraIssue + "\">" + jiraIssue + "</a>";
   }
 
   /**
@@ -63,7 +64,7 @@ public class JiraUtils
    */
   public static String[] checkForJiraIssues(final String text)
   {
-    if (Configuration.getInstance().getJiraBrowseBaseUrl() == null) {
+    if (ConfigXml.getInstance().getJiraBrowseBaseUrl() == null) {
       return null;
     }
     return parseJiraIssues(text);

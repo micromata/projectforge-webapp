@@ -25,7 +25,7 @@ package org.projectforge.web.imagecropper;
 
 import java.io.File;
 
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.user.PFUserDO;
 
 
@@ -33,7 +33,7 @@ class ImageCropperUtils
 {
   public static final File getTempFile(PFUserDO user)
   {
-    File result = new File(Configuration.getInstance().getTempDirectory(), "imagecropper-" + user.getUsername() + ".picture");
+    File result = new File(ConfigXml.getInstance().getTempDirectory(), "imagecropper-" + user.getUsername() + ".picture");
     return result;
   }
 }

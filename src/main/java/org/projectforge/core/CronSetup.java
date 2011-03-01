@@ -73,7 +73,7 @@ public class CronSetup
       } catch (SchedulerException ex) {
         log.error(ex.getMessage(), ex);
       }
-      final Configuration cfg = Configuration.getInstance();
+      final ConfigXml cfg = ConfigXml.getInstance();
       if (cfg.isMebMailAccountConfigured() == false) {
         mebJobExecutor = null; // MEB is not configured.
       }

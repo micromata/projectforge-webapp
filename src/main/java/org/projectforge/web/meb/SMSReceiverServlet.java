@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.meb.MebDao;
 import org.projectforge.meb.MebEntryDO;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -63,7 +64,7 @@ public class SMSReceiverServlet extends HttpServlet
     // https://projectforge.micromata.de/secure/SMSReceiver?key=<key>&date=20101105171233&sender=01701891142&msg=Hallo...
     req.setCharacterEncoding("UTF-8");
     final String key = req.getParameter("key");
-    final String expectedKey = Configuration.getInstance().getReceiveSmsKey();
+    final String expectedKey = ConfigXml.getInstance().getReceiveSmsKey();
     if (StringUtils.isBlank(expectedKey) == true) {
       log.warn("Servlet call for receiving sms ignored because receiveSmsKey is not given in config.xml file.");
       response(resp, "NOT YET CONFIGURED");

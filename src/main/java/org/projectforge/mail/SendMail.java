@@ -39,9 +39,9 @@ import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.projectforge.core.Configuration;
 import org.projectforge.core.InternalErrorException;
 import org.projectforge.core.UserException;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.scripting.GroovyExecutor;
 import org.projectforge.scripting.JellyExecutor;
 import org.projectforge.user.PFUserContext;
@@ -62,7 +62,7 @@ public class SendMail
 
   private SendMailConfig sendMailConfig;
 
-  private Configuration configuration;
+  private ConfigXml xmlConfiguration;
 
   private GroovyExecutor groovyExecutor;
 
@@ -167,7 +167,7 @@ public class SendMail
     data.put("loggedInUser", user);
     data.put("msg", composedMessage);
     log.debug("jellyXml=" + jellyXml);
-    Object[] result = configuration.getInputStream(jellyXml);
+    Object[] result = xmlConfiguration.getInputStream(jellyXml);
     InputStream jellyXmlInputStream = (InputStream) result[0];
     return JellyExecutor.runJelly(jellyXmlInputStream, data);
   }
@@ -180,7 +180,7 @@ public class SendMail
     data.put("loggedInUser", user);
     data.put("msg", composedMessage);
     log.debug("groovyTemplate=" + groovyTemplate);
-    final Object[] content = configuration.getContent(groovyTemplate);
+    final Object[] content = xmlConfiguration.getContent(groovyTemplate);
     final String groovyScriptAsString = (String) content[0];
     final String result = groovyExecutor.executeTemplate(groovyScriptAsString, data);
     return result;
@@ -196,10 +196,10 @@ public class SendMail
     return HtmlHelper.formatText(str, true);
   }
 
-  public void setConfiguration(Configuration configuration)
+  public void setXmlConfiguration(ConfigXml xmlConfiguration)
   {
-    this.configuration = configuration;
-    this.sendMailConfig = configuration.getSendMailConfiguration();
+    this.xmlConfiguration = xmlConfiguration;
+    this.sendMailConfig = xmlConfiguration.getSendMailConfiguration();
   }
 
   public void setGroovyExecutor(GroovyExecutor groovyExecutor)

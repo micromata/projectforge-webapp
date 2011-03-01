@@ -41,6 +41,7 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.web.URLHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -57,9 +58,6 @@ public class SendSmsPage extends AbstractSecuredPage
 
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
-
-  @SpringBean(name = "configuration")
-  private Configuration configuration;
 
   private SendSmsForm form;
 
@@ -109,9 +107,9 @@ public class SendSmsPage extends AbstractSecuredPage
         final Object type = parameters.get(PARAMETER_KEY_PHONE_TYPE);
         final PhoneType phoneType;
         if (type instanceof PhoneType) {
-          phoneType = (PhoneType)type;
+          phoneType = (PhoneType) type;
         } else {
-          phoneType = PhoneType.valueOf((String)type);
+          phoneType = PhoneType.valueOf((String) type);
         }
         String number = null;
         if (phoneType == PhoneType.MOBILE) {
@@ -121,8 +119,8 @@ public class SendSmsPage extends AbstractSecuredPage
         }
         if (number != null) {
           getData().setPhoneNumber(
-              SendSmsForm.getPhoneNumberAndPerson(address, number, configuration
-                  .getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX)));
+              SendSmsForm.getPhoneNumberAndPerson(address, number, Configuration.getInstance().getStringValue(
+                  ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX)));
         }
       }
     }
@@ -136,15 +134,15 @@ public class SendSmsPage extends AbstractSecuredPage
 
   protected void send()
   {
-    final String number = NumberHelper.extractPhonenumber(getData().getPhoneNumber(), configuration
-        .getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
-    if (StringUtils.isBlank(configuration.getSmsUrl()) == true) {
+    final String number = NumberHelper.extractPhonenumber(getData().getPhoneNumber(), Configuration.getInstance().getStringValue(
+        ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
+    if (StringUtils.isBlank(ConfigXml.getInstance().getSmsUrl()) == true) {
       log.error("Servlet url for sending sms not configured. SMS not supported.");
       return;
     }
     log.info("User sends message to destination number: '" + StringHelper.hideStringEnding(number, 'x', 3));
     final HttpClient client = new HttpClient();
-    String url = this.configuration.getSmsUrl();
+    String url = ConfigXml.getInstance().getSmsUrl();
     url = StringUtils.replaceOnce(url, "#number", number);
     url = StringUtils.replaceOnce(url, "#message", URLHelper.encode(getData().getMessage()));
     final GetMethod method = new GetMethod(url);
@@ -169,11 +167,17 @@ public class SendSmsPage extends AbstractSecuredPage
       }
     } catch (HttpException ex) {
       errorKey = "Call failed. Please contact administrator.";
-      log.fatal(errorKey + ": " + this.configuration.getSmsUrl() + StringHelper.hideStringEnding(String.valueOf(number), 'x', 3));
+      log.fatal(errorKey
+          + ": "
+          + ConfigXml.getInstance().getSmsUrl()
+          + StringHelper.hideStringEnding(String.valueOf(number), 'x', 3));
       throw new RuntimeException(ex);
     } catch (IOException ex) {
       errorKey = "Call failed. Please contact administrator.";
-      log.fatal(errorKey + ": " + this.configuration.getSmsUrl() + StringHelper.hideStringEnding(String.valueOf(number), 'x', 3));
+      log.fatal(errorKey
+          + ": "
+          + ConfigXml.getInstance().getSmsUrl()
+          + StringHelper.hideStringEnding(String.valueOf(number), 'x', 3));
       throw new RuntimeException(ex);
     }
     if (errorKey != null) {

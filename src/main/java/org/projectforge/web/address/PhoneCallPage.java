@@ -41,6 +41,7 @@ import org.projectforge.common.RecentQueue;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 
@@ -60,9 +61,6 @@ public class PhoneCallPage extends AbstractSecuredPage
 
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
-
-  @SpringBean(name = "configuration")
-  private Configuration configuration;
 
   private PhoneCallForm form;
 
@@ -173,12 +171,12 @@ public class PhoneCallPage extends AbstractSecuredPage
 
   String extractPhonenumber(String number)
   {
-    final String result = NumberHelper.extractPhonenumber(number, configuration
-        .getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
+    final String result = NumberHelper.extractPhonenumber(number, Configuration.getInstance().getStringValue(
+        ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
     if (StringUtils.isNotEmpty(result) == true
-        && StringUtils.isNotEmpty(configuration.getTelephoneSystemNumber()) == true
-        && result.startsWith(configuration.getTelephoneSystemNumber()) == true) {
-      return result.substring(configuration.getTelephoneSystemNumber().length());
+        && StringUtils.isNotEmpty(ConfigXml.getInstance().getTelephoneSystemNumber()) == true
+        && result.startsWith(ConfigXml.getInstance().getTelephoneSystemNumber()) == true) {
+      return result.substring(ConfigXml.getInstance().getTelephoneSystemNumber().length());
     }
     return result;
   }
@@ -212,7 +210,7 @@ public class PhoneCallPage extends AbstractSecuredPage
 
   private void callNow()
   {
-    if (StringUtils.isBlank(configuration.getTelephoneSystemUrl()) == true) {
+    if (StringUtils.isBlank(ConfigXml.getInstance().getTelephoneSystemUrl()) == true) {
       log.error("Telephone system url not configured. Phone calls not supported.");
       return;
     }
@@ -238,7 +236,7 @@ public class PhoneCallPage extends AbstractSecuredPage
       buf.append("???");
     }
     final HttpClient client = new HttpClient();
-    String url = this.configuration.getTelephoneSystemUrl();
+    String url = ConfigXml.getInstance().getTelephoneSystemUrl();
     url = StringUtils.replaceOnce(url, "#source", form.getMyCurrentPhoneId());
     url = StringUtils.replaceOnce(url, "#target", form.getPhoneNumber());
     final String urlProtected = StringHelper.hideStringEnding(url, 'x', 3);
@@ -247,7 +245,7 @@ public class PhoneCallPage extends AbstractSecuredPage
     try {
       form.lastSuccessfulPhoneCall = new Date();
       client.executeMethod(method);
-      final String resultStatus =method.getResponseBodyAsString();
+      final String resultStatus = method.getResponseBodyAsString();
       if ("0".equals(resultStatus) == true) {
         result = DateTimeFormatter.instance().getFormattedDateTime(new Date()) + ": " + getString("address.phoneCall.result.successful");
         getRecentCallsQueue().append(buf.toString());
@@ -266,7 +264,7 @@ public class PhoneCallPage extends AbstractSecuredPage
       result = "Call failed. Please contact administrator.";
       log.fatal(result + ": " + urlProtected);
       throw new RuntimeException(ex);
-  }
+    }
     if (errorKey != null) {
       form.addError(errorKey);
     }

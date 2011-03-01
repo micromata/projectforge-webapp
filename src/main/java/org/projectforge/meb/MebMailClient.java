@@ -31,7 +31,7 @@ import java.util.Date;
 import javax.mail.Flags;
 import javax.mail.MessagingException;
 
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.mail.Mail;
 import org.projectforge.mail.MailAccount;
 import org.projectforge.mail.MailAccountConfig;
@@ -60,7 +60,7 @@ public class MebMailClient
     if (onlyRecentMails == true) {
       filter.setOnlyRecent(true);
     }
-    final MailAccountConfig cfg = Configuration.getInstance().getMebMailAccount();
+    final MailAccountConfig cfg = ConfigXml.getInstance().getMebMailAccount();
     if (cfg == null || cfg.getHostname() == null) {
       // No mail account configured.
       return 0;

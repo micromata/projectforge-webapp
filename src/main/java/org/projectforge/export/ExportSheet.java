@@ -31,7 +31,7 @@ import org.apache.poi.ss.usermodel.PrintSetup;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 
 
 public class ExportSheet
@@ -70,7 +70,7 @@ public class ExportSheet
       }
     }
     final PrintSetup printSetup = getPrintSetup();
-    printSetup.setPaperSize(Configuration.getInstance().getDefaultPaperSize());
+    printSetup.setPaperSize(ConfigXml.getInstance().getDefaultPaperSize());
   }
 
   /**

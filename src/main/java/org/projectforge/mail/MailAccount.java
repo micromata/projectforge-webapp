@@ -44,7 +44,7 @@ import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.search.FlagTerm;
 
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 
 /**
  * Connects to a mail server and receives mails.
@@ -157,9 +157,9 @@ public class MailAccount
     try {
       // Get a Properties object
       final Properties props = new Properties();
-      if (Configuration.getInstance().getUsersSSLSocketFactory() != null) {
+      if (ConfigXml.getInstance().getUsersSSLSocketFactory() != null) {
         props
-            .put("mail." + mailAcccountConfig.getProtocol() + ".ssl.socketFactory", Configuration.getInstance().getUsersSSLSocketFactory());
+            .put("mail." + mailAcccountConfig.getProtocol() + ".ssl.socketFactory", ConfigXml.getInstance().getUsersSSLSocketFactory());
       }
       final Session session = Session.getDefaultInstance(props, null);
 

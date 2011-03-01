@@ -44,10 +44,10 @@ import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.address.AddressDO;
 import org.projectforge.book.BookDO;
 import org.projectforge.calendar.DayHolder;
-import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ExtendedBaseDO;
 import org.projectforge.core.ReindexSettings;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.BankAccountBalanceDO;
@@ -201,7 +201,7 @@ public class DatabaseDao extends HibernateDaoSupport
   private void reindex(final Class< ? > clazz, final ReindexSettings settings, final StringBuffer buf)
   {
     buf.append(ClassUtils.getShortClassName(clazz));
-    final File file = new File(Configuration.getInstance().getApplicationHomeDir() + "/hibernate-search/" + clazz.getName() + "/write.lock");
+    final File file = new File(ConfigXml.getInstance().getApplicationHomeDir() + "/hibernate-search/" + clazz.getName() + "/write.lock");
     if (file.exists() == true) {
       final Date lastModified = new Date(file.lastModified());
       final String message;

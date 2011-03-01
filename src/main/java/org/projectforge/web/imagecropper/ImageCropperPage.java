@@ -31,9 +31,8 @@ import org.apache.wicket.markup.html.CSSPackageResource;
 import org.apache.wicket.markup.html.JavascriptPackageResource;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.StringHelper;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.WicketUtils;
@@ -54,9 +53,6 @@ public class ImageCropperPage extends AbstractSecuredPage
   public static final String PARAM_DEFAULT_RATIO = "defaultRatio";
 
   public static final String PARAM_FILE_FORMAT = "fileFormat";
-
-  @SpringBean(name = "configuration")
-  private Configuration configuration;
 
   private String ratioList = "1:1,1:2,2:1,1:3,2:3,3:1,3:2,1:4,3:4,4:1,4:3,1:5,2:5,3:5,4:5,5:1,5:2,5:3,5:4";
 
@@ -100,8 +96,8 @@ public class ImageCropperPage extends AbstractSecuredPage
     add(JavascriptPackageResource.getHeaderContribution("imagecropper/AC_OETags.js"));
     final ServletWebRequest req = (ServletWebRequest) this.getRequest();
     String domain;
-    if (StringUtils.isNotBlank(configuration.getDomain()) == true) {
-      domain = configuration.getDomain();
+    if (StringUtils.isNotBlank(ConfigXml.getInstance().getDomain()) == true) {
+      domain = ConfigXml.getInstance().getDomain();
     } else {
       domain = req.getHttpServletRequest().getScheme()
           + "://"

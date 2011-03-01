@@ -48,7 +48,7 @@ import org.projectforge.address.PhoneType;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.common.StringHelper;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -69,9 +69,6 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
 
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
-
-  @SpringBean(name = "configuration")
-  private Configuration configuration;
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
@@ -281,7 +278,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
     setDefaultButton(callButton);
     final WebMarkupContainer showOperatorPanel = new WebMarkupContainer("telephoneSystemOperatorPanel");
     add(showOperatorPanel);
-    final String url = configuration.getTelephoneSystemOperatorPanelUrl();
+    final String url = ConfigXml.getInstance().getTelephoneSystemOperatorPanelUrl();
     if (url == null) {
       showOperatorPanel.setVisible(false);
     } else {
