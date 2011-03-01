@@ -38,7 +38,7 @@
       <value>true</value>
     </property>
   </bean>
-  <bean id="xmlConfiguration" class="org.projectforge.core.XmlConfiguration" singleton="true">
+  <bean id="configXml" class="org.projectforge.core.ConfigXml" singleton="true">
     <constructor-arg>
       <value>${base.dir}</value>
     </constructor-arg>
@@ -80,8 +80,8 @@
     <property name="schemaUpdate">
       <value>false</value>
     </property>
-    <property name="xmlConfiguration">
-      <ref bean="xmlConfiguration" />
+    <property name="configXml">
+      <ref bean="configXml" />
     </property>
     <!--  property name="entityInterceptor">
       <ref bean="hibernateHistoryInterceptor" />

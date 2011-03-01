@@ -89,9 +89,9 @@ public class AutoSessionFactoryBean extends AnnotationSessionFactoryBean
 
   /**
    * Needed for ensuring that configuration is initialized.
-   * @param projectForgeConfiguration
+   * @param configXml
    */
-  public void setXmlConfiguration(final ConfigXml xmlConfiguration)
+  public void setConfigXml(final ConfigXml configXml)
   {
     // Do nothing. Ensure only that configuration is initialized.
   }

@@ -62,7 +62,7 @@ public class SendMail
 
   private SendMailConfig sendMailConfig;
 
-  private ConfigXml xmlConfiguration;
+  private ConfigXml configXml;
 
   private GroovyExecutor groovyExecutor;
 
@@ -167,7 +167,7 @@ public class SendMail
     data.put("loggedInUser", user);
     data.put("msg", composedMessage);
     log.debug("jellyXml=" + jellyXml);
-    Object[] result = xmlConfiguration.getInputStream(jellyXml);
+    Object[] result = configXml.getInputStream(jellyXml);
     InputStream jellyXmlInputStream = (InputStream) result[0];
     return JellyExecutor.runJelly(jellyXmlInputStream, data);
   }
@@ -180,7 +180,7 @@ public class SendMail
     data.put("loggedInUser", user);
     data.put("msg", composedMessage);
     log.debug("groovyTemplate=" + groovyTemplate);
-    final Object[] content = xmlConfiguration.getContent(groovyTemplate);
+    final Object[] content = configXml.getContent(groovyTemplate);
     final String groovyScriptAsString = (String) content[0];
     final String result = groovyExecutor.executeTemplate(groovyScriptAsString, data);
     return result;
@@ -191,18 +191,18 @@ public class SendMail
    * @param str
    * @see HtmlHelper#formatText(String, boolean)
    */
-  public String formatHtml(String str)
+  public String formatHtml(final String str)
   {
     return HtmlHelper.formatText(str, true);
   }
 
-  public void setXmlConfiguration(ConfigXml xmlConfiguration)
+  public void setConfigXml(final ConfigXml configXml)
   {
-    this.xmlConfiguration = xmlConfiguration;
-    this.sendMailConfig = xmlConfiguration.getSendMailConfiguration();
+    this.configXml = configXml;
+    this.sendMailConfig = configXml.getSendMailConfiguration();
   }
 
-  public void setGroovyExecutor(GroovyExecutor groovyExecutor)
+  public void setGroovyExecutor(final GroovyExecutor groovyExecutor)
   {
     this.groovyExecutor = groovyExecutor;
   }

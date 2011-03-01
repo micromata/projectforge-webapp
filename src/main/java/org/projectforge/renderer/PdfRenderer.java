@@ -66,7 +66,7 @@ public class PdfRenderer
 
   public final static String DEFAULT_FO_STYLE = "default-style-fo.xsl";
 
-  private ConfigXml xmlConfiguration;
+  private ConfigXml configXml;
 
   private String fontResourceDir;
 
@@ -85,7 +85,7 @@ public class PdfRenderer
   private String getFontResourcePath()
   {
     if (fontResourcePath == null) {
-      File dir = new File(xmlConfiguration.getResourcePath(), fontResourceDir);
+      File dir = new File(configXml.getResourcePath(), fontResourceDir);
       if (dir.exists() == false) {
         log.error("Application's font dir does not exist: " + dir.getAbsolutePath());
       }
@@ -94,9 +94,9 @@ public class PdfRenderer
     return fontResourcePath;
   }
 
-  public void setXmlConfiguration(ConfigXml xmlConfiguration)
+  public void setConfigXml(final ConfigXml configXml)
   {
-    this.xmlConfiguration = xmlConfiguration;
+    this.configXml = configXml;
   }
 
   /*
@@ -105,14 +105,14 @@ public class PdfRenderer
    * loading fonts.'"); return; } fontMap.loadFonts(fontDir); return; }
    */
 
-  public byte[] render(String stylesheet, String jellyXml, Map<String, Object> data)
+  public byte[] render(final String stylesheet, final String jellyXml, final Map<String, Object> data)
   {
     // initialize();
     PFUserDO user = PFUserContext.getUser();
     ResourceBundle bundle = PFUserContext.getResourceBundle();
     data.put("createdLabel", bundle.getString("created"));
     data.put("loggedInUser", user);
-    data.put("baseDir", xmlConfiguration.getResourcePath());
+    data.put("baseDir", configXml.getResourcePath());
     data.put("appId", AppVersion.APP_ID);
     data.put("appVersion", AppVersion.NUMBER);
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -121,7 +121,7 @@ public class PdfRenderer
         + ", jellyXml="
         + jellyXml
         + ", baseDir="
-        + xmlConfiguration.getResourcePath()
+        + configXml.getResourcePath()
         + ", fontBaseDir="
         + getFontResourcePath());
     // fopRenderer.processFo(styleSheet, xmlData, data, new PdfFopOutput(baos));
@@ -154,7 +154,7 @@ public class PdfRenderer
 
       // Setup XSLT
       TransformerFactory factory = TransformerFactory.newInstance();
-      Object[] result = xmlConfiguration.getInputStream(stylesheet);
+      Object[] result = configXml.getInputStream(stylesheet);
       InputStream xsltInputStream = (InputStream) result[0];
       StreamSource xltStreamSource = new StreamSource(xsltInputStream);
       String url = (String) result[1];
@@ -168,7 +168,7 @@ public class PdfRenderer
       }
 
       // First run jelly through xmlData:
-      result = xmlConfiguration.getInputStream(jellyXml);
+      result = configXml.getInputStream(jellyXml);
       InputStream jellyXmlInputStream = (InputStream) result[0];
       String xmlData = JellyExecutor.runJelly(jellyXmlInputStream, data);
 

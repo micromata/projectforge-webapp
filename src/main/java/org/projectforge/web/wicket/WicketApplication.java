@@ -103,7 +103,7 @@ public class WicketApplication extends WebApplication
   @SpringBean(name = "configurationDao")
   private ConfigurationDao configurationDao;
 
-  private ConfigXml xmlConfiguration;
+  private ConfigXml configXml;
 
   private Configuration configuration;
 
@@ -146,9 +146,9 @@ public class WicketApplication extends WebApplication
     this.userXmlPreferencesCache = userXmlPreferencesCache;
   }
 
-  public void setXmlConfiguration(final ConfigXml xmlConfiguration)
+  public void setConfigXml(final ConfigXml configXml)
   {
-    this.xmlConfiguration = xmlConfiguration;
+    this.configXml = configXml;
   }
   
   public void setConfiguration(final Configuration configuration)
@@ -260,11 +260,11 @@ public class WicketApplication extends WebApplication
     final AnnotationConfiguration hibernateConfiguration = (AnnotationConfiguration) localSessionFactoryBean.getConfiguration();
     HibernateUtils.setConfiguration(hibernateConfiguration);
     final ServletContext servletContext = getServletContext();
-    final String configContextPath = xmlConfiguration.getServletContextPath();
+    final String configContextPath = configXml.getServletContextPath();
     String contextPath;
     if (StringUtils.isBlank(configContextPath) == true) {
       contextPath = servletContext.getContextPath();
-      xmlConfiguration.setServletContextPath(contextPath);
+      configXml.setServletContextPath(contextPath);
     } else {
       contextPath = configContextPath;
     }
