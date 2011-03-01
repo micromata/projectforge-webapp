@@ -23,6 +23,8 @@
 
 package org.projectforge.plugins.todo;
 
+import java.sql.Date;
+
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -58,6 +60,10 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
       toDoDao.setAssignee(getData(), (Integer) selectedValue);
     } else if ("taskId".equals(property) == true) {
       toDoDao.setTask(getData(), (Integer) selectedValue);
+    } else if ("dueDate".equals(property) == true) {
+      final Date date = (Date) selectedValue;
+      getData().setDueDate(date);
+      form.renderer.dueDatePanel.markModelAsChanged();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }

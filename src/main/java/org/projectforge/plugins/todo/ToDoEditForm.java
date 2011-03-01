@@ -35,7 +35,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
   private static final long serialVersionUID = -6208809585214296635L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ToDoEditForm.class);
-  
+
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
@@ -45,9 +45,10 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
   {
     super(parentPage, data);
     if (isNew() == true) {
+      data.setAssignee(PFUserContext.getUser());
       data.setReporter(PFUserContext.getUser());
     }
-    renderer = new ToDoFormRenderer(parentPage, this, new LayoutContext(this), parentPage.getBaseDao(), data, userGroupCache);
+    renderer = new ToDoFormRenderer(parentPage, this, new LayoutContext(this), data, userGroupCache);
   }
 
   @Override

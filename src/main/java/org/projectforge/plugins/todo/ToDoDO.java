@@ -23,7 +23,7 @@
 
 package org.projectforge.plugins.todo;
 
-import java.util.Date;
+import java.sql.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -43,6 +43,7 @@ import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.core.Priority;
 import org.projectforge.database.Constants;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
@@ -82,6 +83,13 @@ public class ToDoDO extends DefaultBaseDO
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private ToDoStatus status;
 
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  private Priority priority;
+
+  @Field(index = Index.UN_TOKENIZED)
+  @DateBridge(resolution = Resolution.DAY)
+  private Date dueDate;
+
   @Field(index = Index.UN_TOKENIZED)
   @DateBridge(resolution = Resolution.DAY)
   private Date resubmission;
@@ -118,14 +126,14 @@ public class ToDoDO extends DefaultBaseDO
     this.reporter = reporter;
     return this;
   }
-  
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "assignee_fk")
   public PFUserDO getAssignee()
   {
     return assignee;
   }
-  
+
   /**
    * @param assignee
    * @return this for chaining.
@@ -134,7 +142,7 @@ public class ToDoDO extends DefaultBaseDO
   {
     this.assignee = assignee;
   }
-  
+
   /**
    * Optional task.
    */
@@ -162,12 +170,12 @@ public class ToDoDO extends DefaultBaseDO
       return null;
     return task.getId();
   }
-  
+
   public String getDescription()
   {
     return description;
   }
-  
+
   /**
    * @return this for chaining.
    */
@@ -176,12 +184,13 @@ public class ToDoDO extends DefaultBaseDO
     this.description = description;
     return this;
   }
+
   @Column(length = Constants.LENGTH_TEXT)
   public String getComment()
   {
     return comment;
   }
-  
+
   /**
    * @return this for chaining.
    */
@@ -190,14 +199,14 @@ public class ToDoDO extends DefaultBaseDO
     this.comment = comment;
     return this;
   }
-  
+
   @Enumerated(EnumType.STRING)
   @Column(length = 20)
   public ToDoType getType()
   {
     return type;
   }
-  
+
   /**
    * @return this for chaining.
    */
@@ -206,14 +215,14 @@ public class ToDoDO extends DefaultBaseDO
     this.type = type;
     return this;
   }
-  
+
   @Enumerated(EnumType.STRING)
   @Column(length = 20)
   public ToDoStatus getStatus()
   {
     return status;
   }
-  
+
   /**
    * @return this for chaining.
    */
@@ -222,12 +231,44 @@ public class ToDoDO extends DefaultBaseDO
     this.status = status;
     return this;
   }
-  
+
+  @Enumerated(EnumType.STRING)
+  @Column(length = 20)
+  public Priority getPriority()
+  {
+    return priority;
+  }
+
+  /**
+   * @return this for chaining.
+   */
+  public ToDoDO setPriority(final Priority priority)
+  {
+    this.priority = priority;
+    return this;
+  }
+
+  @Column(name = "due_date")
+  public Date getDueDate()
+  {
+    return dueDate;
+  }
+
+  /**
+   * @return this for chaining.
+   */
+  public ToDoDO setDueDate(Date dueDate)
+  {
+    this.dueDate = dueDate;
+    return this;
+  }
+
+  @Column
   public Date getResubmission()
   {
     return resubmission;
   }
-  
+
   /**
    * @return this for chaining.
    */

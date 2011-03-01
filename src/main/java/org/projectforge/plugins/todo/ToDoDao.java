@@ -25,6 +25,7 @@ package org.projectforge.plugins.todo;
 
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.hibernate.criterion.Order;
@@ -127,12 +128,10 @@ public class ToDoDao extends BaseDao<ToDoDO>
   {
     Validate.notNull(dbObj);
     Validate.notNull(obj);
-    Validate.notNull(dbObj.getTaskId());
-    Validate.notNull(obj.getTaskId());
     if (accessChecker.hasPermission(obj.getTaskId(), AccessType.TASKS, OperationType.UPDATE, throwException) == false) {
       return false;
     }
-    if (dbObj.getTaskId().equals(obj.getTaskId()) == false) {
+    if (ObjectUtils.equals(dbObj.getTaskId(), obj.getTaskId()) == false) {
       // User moves the object to another task:
       if (accessChecker.hasPermission(obj.getTaskId(), AccessType.TASKS, OperationType.INSERT, throwException) == false) {
         // Inserting of object under new task not allowed.

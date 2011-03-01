@@ -31,11 +31,13 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.calendar.DateTimeFormatter;
+import org.projectforge.web.core.PriorityFormatter;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -53,6 +55,9 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
 
   @SpringBean(name = "toDoDao")
   private ToDoDao toDoDao;
+
+  @SpringBean(name = "priorityFormatter")
+  private PriorityFormatter priorityFormatter;
 
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
@@ -92,16 +97,33 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
     });
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(getString("modified"), getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.title")), getSortable("title",
+        sortable), "title", cellItemListener));
     columns.add(new UserPropertyColumn<ToDoDO>(getString("plugins.todo.assignee"), getSortable("assignee.fullname", sortable), "assignee",
         cellItemListener).withUserFormatter(userFormatter));
     columns.add(new UserPropertyColumn<ToDoDO>(getString("plugins.todo.reporter"), getSortable("assignee.reporter", sortable), "reporter",
         cellItemListener).withUserFormatter(userFormatter));
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.title")), getSortable("title",
-        sortable), "title", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.description")), getSortable("description",
-        sortable), "description", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.type")), getSortable("type", sortable),
-        "type", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(getString("dueDate"), getSortable("dueDate", sortable), "dueDate",
+        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.status")), getSortable("status",
+        sortable), "status", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("priority")), getSortable("priority", sortable),
+        "priority", cellItemListener) {
+      @Override
+      public void populateItem(Item<ICellPopulator<ToDoDO>> item, String componentId, IModel<ToDoDO> rowModel)
+      {
+        final ToDoDO todo = rowModel.getObject();
+        final String formattedPriority = priorityFormatter.getFormattedPriority(todo.getPriority());
+        final Label label = new Label(componentId, new Model<String>(formattedPriority));
+        label.setEscapeModelStrings(false);
+        item.add(label);
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.type")),
+        getSortable("type", sortable), "type", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("description")),
+        getSortable("description", sortable), "description", cellItemListener));
     return columns;
   }
 

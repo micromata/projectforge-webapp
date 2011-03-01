@@ -23,19 +23,28 @@
 
 package org.projectforge.plugins.todo;
 
+import static org.projectforge.web.wicket.layout.DropDownChoiceLPanel.SELECT_ID;
+import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
+import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
 import static org.projectforge.web.wicket.layout.SelectLPanel.WICKET_ID_SELECT_PANEL;
+
+import java.util.Date;
 
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.hibernate.Hibernate;
+import org.projectforge.core.Priority;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
+import org.projectforge.web.wicket.components.DatePanel;
+import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
+import org.projectforge.web.wicket.layout.DateFieldLPanel;
 import org.projectforge.web.wicket.layout.DropDownChoiceLPanel;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.LayoutLength;
@@ -45,25 +54,24 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
 {
   private static final long serialVersionUID = -9175062586210446142L;
 
-  private final ToDoDao toDoDao;
-
   private ToDoDO data;
 
   private ToDoEditPage toDoEditPage;
 
   private UserGroupCache userGroupCache;
 
+  protected DatePanel dueDatePanel;
+
   final static LayoutLength labelLength = LayoutLength.HALF;
 
   final static LayoutLength valueLength = LayoutLength.ONEHALF;
 
   public ToDoFormRenderer(final ToDoEditPage toDoEditPage, final MarkupContainer container, final LayoutContext layoutContext,
-      final ToDoDao toDoDao, final ToDoDO data, final UserGroupCache userGroupCache)
+      final ToDoDO data, final UserGroupCache userGroupCache)
   {
     super(container, layoutContext);
     this.toDoEditPage = toDoEditPage;
     this.data = data;
-    this.toDoDao = toDoDao;
     this.userGroupCache = userGroupCache;
   }
 
@@ -78,6 +86,23 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
           data, "type"), typeChoiceRenderer.getValues(), typeChoiceRenderer);
       typeChoice.setNullValid(true);
       doPanel.addDropDownChoice(typeChoice, new PanelContext(LayoutLength.THREEQUART, getString("plugins.todo.type"), labelLength));
+    }
+    {
+      // Priority drop down box:
+      final LabelValueChoiceRenderer<Priority> priorityChoiceRenderer = new LabelValueChoiceRenderer<Priority>(container, Priority.values());
+      final DropDownChoice<Priority> priorityChoice = new DropDownChoice<Priority>(SELECT_ID,
+          new PropertyModel<Priority>(data, "priority"), priorityChoiceRenderer.getValues(), priorityChoiceRenderer);
+      priorityChoice.setNullValid(true);
+      doPanel.addDropDownChoice(priorityChoice, new PanelContext(LayoutLength.THREEQUART, getString("priority"), labelLength));
+    }
+    {
+      // Status drop down box:
+      final LabelValueChoiceRenderer<ToDoStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<ToDoStatus>(container, ToDoStatus
+          .values());
+      final DropDownChoice<ToDoStatus> statusChoice = new DropDownChoice<ToDoStatus>(SELECT_ID, new PropertyModel<ToDoStatus>(data,
+          "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
+      statusChoice.setNullValid(true);
+      doPanel.addDropDownChoice(statusChoice, new PanelContext(LayoutLength.THREEQUART, getString("plugins.todo.status"), labelLength));
     }
     {
       PFUserDO assignee = data.getAssignee();
@@ -98,8 +123,14 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
       }
       final UserSelectPanel reporterUserSelectPanel = new UserSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<PFUserDO>(data,
           "reporter"), toDoEditPage, "reporterId");
-      doPanel.addSelectPanel(getString("plugins.todo.reporter"), labelLength, reporterUserSelectPanel, valueLength).setStrong();
+      doPanel.addSelectPanel(getString("plugins.todo.reporter"), labelLength, reporterUserSelectPanel, valueLength);
       reporterUserSelectPanel.init();
+    }
+    {
+      // Due date
+      dueDatePanel = new DatePanel(DateFieldLPanel.DATE_FIELD_ID, new PropertyModel<Date>(data, "dueDate"), DatePanelSettings.get()
+          .withCallerPage(toDoEditPage).withTargetType(java.sql.Date.class).withSelectProperty("dueDate"));
+      doPanel.addDateFieldPanel(data, "dueDate", getString("dueDate"), HALF, dueDatePanel, FULL);
     }
     {
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<TaskDO>(data, "task"),
@@ -107,9 +138,9 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
       taskSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
       doPanel.addSelectPanel(getString("task"), labelLength, taskSelectPanel, valueLength);
       taskSelectPanel.init();
-      taskSelectPanel.setRequired(true);
     }
-    doPanel.addTextArea(new PanelContext(data, "description", valueLength, getString("description"), labelLength).setCssStyle("height: 10em;"));
+    doPanel.addTextArea(new PanelContext(data, "description", valueLength, getString("description"), labelLength)
+        .setCssStyle("height: 10em;"));
     doPanel.addTextArea(new PanelContext(data, "comment", valueLength, getString("comment"), labelLength).setCssStyle("height: 10em;"));
 
     // @Field(index = Index.UN_TOKENIZED)
