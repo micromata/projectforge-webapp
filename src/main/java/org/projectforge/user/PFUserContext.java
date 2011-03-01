@@ -41,7 +41,7 @@ public class PFUserContext
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PFUserContext.class);
 
-  private static final String BUNDLE_NAME = "I18nResources";
+  public static final String BUNDLE_NAME = "I18nResources";
 
   private static ThreadLocal<PFUserDO> context = new ThreadLocal<PFUserDO>();
 
