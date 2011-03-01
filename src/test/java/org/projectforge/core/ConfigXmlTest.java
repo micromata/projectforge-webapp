@@ -32,12 +32,9 @@ import org.projectforge.calendar.ConfigureHoliday;
 import org.projectforge.calendar.HolidayDefinition;
 import org.projectforge.calendar.Holidays;
 import org.projectforge.common.JiraUtilsTest;
-import org.projectforge.core.Configuration;
-import org.projectforge.test.TestConfiguration;
 import org.projectforge.xml.stream.XmlHelper;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 
-public class ConfigurationTest
+public class ConfigXmlTest
 {
   private final static String xml = XmlHelper.replaceQuotes(XmlHelper.XML_HEADER
       + "\n"
@@ -85,22 +82,20 @@ public class ConfigurationTest
   /**
    * Creates a test configuration if no configuration does already exists.
    */
-  public static Configuration createTestConfiguration()
+  public static ConfigXml createTestConfiguration()
   {
-    if (Configuration.isInitialized() == true && Configuration.getInstance().getHolidays() != null) {
-      return Configuration.getInstance();
+    if (ConfigXml.isInitialized() == true && ConfigXml.getInstance().getHolidays() != null) {
+      return ConfigXml.getInstance();
     }
-    TestConfiguration.initAsTestConfiguration();
-    Configuration.internalSetInstance(xml, TestConfiguration.getConfiguration().getApplicationContext().getBeanFactory());
-    TestConfiguration.getConfiguration().autowire(Configuration.getInstance(), AutowireCapableBeanFactory.AUTOWIRE_BY_NAME);
-    return Configuration.getInstance();
+    ConfigXml.internalSetInstance(xml);
+    return ConfigXml.getInstance();
   }
 
   @Test
   public void testHolidayDefinition()
   {
     createTestConfiguration();
-    final Configuration config = Configuration.getInstance();
+    final ConfigXml config = ConfigXml.getInstance();
     assertEquals(5, config.getHolidays().size());
     ConfigureHoliday holiday = config.getHolidays().get(0);
     assertEquals(Calendar.MAY, (int) holiday.getMonth());
@@ -127,13 +122,13 @@ public class ConfigurationTest
   public void testExport()
   {
     createTestConfiguration();
-    assertEquals(exportXml, Configuration.getInstance().exportConfiguration());
+    assertEquals(exportXml, ConfigXml.getInstance().exportConfiguration());
   }
 
   @Test
   public void testPluginMainClasses()
   {
-    final Configuration configuration = new Configuration();
+    final ConfigXml configuration = new ConfigXml();
     configuration.pluginMainClasses = "\n org.projectforge.plugins.todo.ToDoPlugin,\n  org.projectforge.plugins.software.SoftwarePlugin\n org.projectforge.plugins.ical.ICalPlugin";
     final String[] sa = configuration.getPluginMainClasses();
     assertEquals(3, sa.length);
