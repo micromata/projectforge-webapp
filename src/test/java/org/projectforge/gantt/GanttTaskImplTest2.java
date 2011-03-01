@@ -32,7 +32,7 @@ import java.util.Calendar;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.calendar.DayHolder;
-import org.projectforge.core.ConfigurationTest;
+import org.projectforge.core.ConfigXmlTest;
 
 public class GanttTaskImplTest2
 {
@@ -40,7 +40,7 @@ public class GanttTaskImplTest2
   public static void setUp()
   {
     // Needed if this tests runs before the ConfigurationTest.
-    ConfigurationTest.createTestConfiguration();
+    ConfigXmlTest.createTestConfiguration();
   }
 
   @Test

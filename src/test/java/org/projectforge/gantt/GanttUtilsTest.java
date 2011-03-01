@@ -35,7 +35,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.DateHelper;
-import org.projectforge.core.ConfigurationTest;
+import org.projectforge.core.ConfigXmlTest;
 
 public class GanttUtilsTest
 {
@@ -49,7 +49,7 @@ public class GanttUtilsTest
   public static void setUp()
   {
     // Needed if this tests runs before the ConfigurationTest.
-    ConfigurationTest.createTestConfiguration();
+    ConfigXmlTest.createTestConfiguration();
   }
 
   @Test

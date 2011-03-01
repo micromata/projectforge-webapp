@@ -30,7 +30,7 @@ import static org.junit.Assert.assertFalse;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.projectforge.core.ConfigurationTest;
+import org.projectforge.core.ConfigXmlTest;
 import org.projectforge.jira.JiraUtils;
 
 public class JiraUtilsTest
@@ -40,7 +40,7 @@ public class JiraUtilsTest
   @BeforeClass
   public static void setUp()
   {
-    ConfigurationTest.createTestConfiguration();
+    ConfigXmlTest.createTestConfiguration();
   }
 
   @Test

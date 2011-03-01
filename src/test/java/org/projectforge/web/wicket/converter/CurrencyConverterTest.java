@@ -32,7 +32,7 @@ import java.util.Locale;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.projectforge.core.ConfigurationTest;
+import org.projectforge.core.ConfigXmlTest;
 import org.projectforge.web.wicket.converter.CurrencyConverter;
 
 
@@ -43,7 +43,7 @@ public class CurrencyConverterTest
   @BeforeClass
   public static void setUp()
   {
-    CURRENCY = ConfigurationTest.createTestConfiguration().getCurrencySymbol();
+    CURRENCY = ConfigXmlTest.createTestConfiguration().getCurrencySymbol();
   }
 
   private Locale locale = Locale.GERMAN;

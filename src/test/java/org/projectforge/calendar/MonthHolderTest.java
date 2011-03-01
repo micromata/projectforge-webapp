@@ -36,7 +36,7 @@ import org.projectforge.calendar.MonthHolder;
 import org.projectforge.calendar.WeekHolder;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
-import org.projectforge.core.ConfigurationTest;
+import org.projectforge.core.ConfigXmlTest;
 
 
 public class MonthHolderTest
@@ -44,7 +44,7 @@ public class MonthHolderTest
   @BeforeClass
   public static void setUp()
   {
-    ConfigurationTest.createTestConfiguration();
+    ConfigXmlTest.createTestConfiguration();
   }
 
   @Test

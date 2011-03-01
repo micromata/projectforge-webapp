@@ -35,7 +35,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.calendar.DayHolder;
-import org.projectforge.core.ConfigurationTest;
+import org.projectforge.core.ConfigXmlTest;
 import org.projectforge.renderer.BatikImageRenderer;
 import org.projectforge.renderer.ImageFormat;
 import org.projectforge.test.TestConfiguration;
@@ -48,7 +48,7 @@ public class GanttTest
   public static void setUp()
   {
     // Needed if this tests runs before the ConfigurationTest.
-    ConfigurationTest.createTestConfiguration();
+    ConfigXmlTest.createTestConfiguration();
   }
 
   @Test

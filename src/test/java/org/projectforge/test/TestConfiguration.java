@@ -28,6 +28,7 @@ import java.io.File;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXmlTest;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.jdbc.PropertyDataSource;
 import org.springframework.beans.BeansException;
@@ -59,11 +60,12 @@ public class TestConfiguration
 
   protected boolean isInitialized = false;
 
-  public static TestConfiguration configuration = null;
+  public static TestConfiguration testConfiguration = null;
 
   public static synchronized void initAsTestConfiguration()
   {
     System.setProperty("base.dir", new File(".").getAbsoluteFile().toString());
+    ConfigXmlTest.createTestConfiguration();
     init(TEST_CONTEXT_FILES);
   }
 
@@ -71,13 +73,14 @@ public class TestConfiguration
   {
     init(CMD_CONTEXT_FILES);
   }
-  
+
   /**
    * Get the file from the working directory. If the working directory doesn't exist then it'll be created.
    * @param filename
    * @return
    */
-  public static File getWorkFile(final String filename) {
+  public static File getWorkFile(final String filename)
+  {
     final File workDir = new File(WORK_DIR);
     if (workDir.exists() == false) {
       log.info("Create working directory: " + workDir.getAbsolutePath());
@@ -88,10 +91,10 @@ public class TestConfiguration
 
   private static synchronized void init(String[] contextFiles)
   {
-    if (configuration == null) {
-      configuration = new TestConfiguration(contextFiles);
-    } else if (configuration.contextFiles.equals(contextFiles) == false) {
-      String msg = "Already initialized with incompatible context files: " + configuration.contextFiles;
+    if (testConfiguration == null) {
+      testConfiguration = new TestConfiguration(contextFiles);
+    } else if (testConfiguration.contextFiles.equals(contextFiles) == false) {
+      String msg = "Already initialized with incompatible context files: " + testConfiguration.contextFiles;
       log.fatal(msg);
       throw new RuntimeException(msg);
     }
@@ -99,12 +102,12 @@ public class TestConfiguration
 
   public static TestConfiguration getConfiguration()
   {
-    if (configuration == null) {
+    if (testConfiguration == null) {
       String msg = "Not initialized.";
       log.fatal(msg);
       throw new RuntimeException(msg);
     }
-    return configuration;
+    return testConfiguration;
   }
 
   public boolean isInitialized()
@@ -191,6 +194,7 @@ public class TestConfiguration
       // Get a new HibernateTemplate each time
       ctx.getBeanFactory().autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
     }
-    Configuration.getInstance().setBeanFactory(ctx.getBeanFactory()); // Bean factory need to be set.
+    final Configuration cfg = (Configuration)ctx.getBean("configuration", Configuration.class);
+    cfg.setBeanFactory(ctx.getBeanFactory()); // Bean factory need to be set.
   }
 }

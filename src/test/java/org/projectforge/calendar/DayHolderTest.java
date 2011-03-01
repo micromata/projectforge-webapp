@@ -33,7 +33,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.DateHolder;
-import org.projectforge.core.ConfigurationTest;
+import org.projectforge.core.ConfigXmlTest;
 
 
 public class DayHolderTest
@@ -42,7 +42,7 @@ public class DayHolderTest
   public static void setUp()
   {
     // Needed if this tests runs before the ConfigurationTest.
-    ConfigurationTest.createTestConfiguration();
+    ConfigXmlTest.createTestConfiguration();
   }
 
   @Test

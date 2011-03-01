@@ -33,7 +33,7 @@ import java.util.Locale;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.projectforge.core.ConfigurationTest;
+import org.projectforge.core.ConfigXmlTest;
 
 public class DateHolderTest
 {
@@ -41,7 +41,7 @@ public class DateHolderTest
   public static void setUp()
   {
     // Needed if this tests runs before the ConfigurationTest.
-    ConfigurationTest.createTestConfiguration();
+    ConfigXmlTest.createTestConfiguration();
   }
 
   @Test

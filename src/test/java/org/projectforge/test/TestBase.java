@@ -108,7 +108,7 @@ public class TestBase
 
   public static final String ORGA_GROUP = ProjectForgeGroup.ORGA_TEAM.toString();
 
-  private static TestConfiguration configuration;
+  private static TestConfiguration testConfiguration;
 
   static PFUserDO ADMIN_USER;
 
@@ -122,9 +122,9 @@ public class TestBase
 
   protected int mCount = 0;
 
-  protected static TestConfiguration getConfiguration()
+  protected static TestConfiguration getTestConfiguration()
   {
-    return configuration;
+    return testConfiguration;
   }
 
   /**
@@ -135,9 +135,9 @@ public class TestBase
     TimeZone.setDefault(DateHelper.UTC);
     log.info("user.timezone is: " + System.getProperty("user.timezone"));
     TestConfiguration.initAsTestConfiguration();
-    configuration = TestConfiguration.getConfiguration();
-    initTestDB = configuration.getBean("initTestDB", InitTestDB.class);
-    configuration.autowire(initTestDB, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME);
+    testConfiguration = TestConfiguration.getConfiguration();
+    initTestDB = testConfiguration.getBean("initTestDB", InitTestDB.class);
+    testConfiguration.autowire(initTestDB, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME);
     final File testDir = new File(TEST_DIR);
     if (testDir.exists() == false) {
       testDir.mkdir();
@@ -158,16 +158,16 @@ public class TestBase
   @Before
   public void initTest()
   {
-    userDao = configuration.getBean("userDao", UserDao.class);
-    configuration.autowire(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME);
-    configuration.autowire(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME);
+    userDao = testConfiguration.getBean("userDao", UserDao.class);
+    testConfiguration.autowire(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME);
+    testConfiguration.autowire(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME);
   }
 
   protected static void clearDatabase()
   {
     PFUserContext.setUser(ADMIN_USER); // Logon admin user.
-    TransactionTemplate transactionTemplate = configuration.getBean("txTemplate", TransactionTemplate.class);
-    final HibernateTemplate hibernateTemplate = configuration.getBean("hibernate", HibernateTemplate.class);
+    TransactionTemplate transactionTemplate = testConfiguration.getBean("txTemplate", TransactionTemplate.class);
+    final HibernateTemplate hibernateTemplate = testConfiguration.getBean("hibernate", HibernateTemplate.class);
     transactionTemplate.execute(new TransactionCallback() {
       public Object doInTransaction(TransactionStatus status)
       {
@@ -213,7 +213,7 @@ public class TestBase
         if (all != null && all.size() > 0) {
           all = hibernateTemplate.find("from java.lang.Object o");
           assertEquals("Database should be empty", 0, all.size());
-          configuration.setInitialized(false);
+          testConfiguration.setInitialized(false);
           // logEnd();
         }
         return null;
@@ -302,7 +302,7 @@ public class TestBase
 
   protected static void deleteDB()
   {
-    String databaseUrl = configuration.getDatabaseUrl();
+    String databaseUrl = testConfiguration.getDatabaseUrl();
     String baseFilename = databaseUrl.substring(databaseUrl.lastIndexOf(':') + 1);
     File data = new File(baseFilename + ".data");
     if (data.exists() == true) {

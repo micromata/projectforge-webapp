@@ -37,7 +37,7 @@ import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
-import org.projectforge.core.ConfigurationTest;
+import org.projectforge.core.ConfigXmlTest;
 import org.projectforge.test.TestConfiguration;
 
 public class ExportWorkbookTest
@@ -48,7 +48,7 @@ public class ExportWorkbookTest
   public static void setUp()
   {
     // Needed if this tests runs before the ConfigurationTest.
-    ConfigurationTest.createTestConfiguration();
+    ConfigXmlTest.createTestConfiguration();
   }
 
   @Test
