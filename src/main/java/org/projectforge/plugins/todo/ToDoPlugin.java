@@ -38,8 +38,16 @@ public class ToDoPlugin extends AbstractPlugin
 
   public static final String RESOURCE_BUNDLE_NAME = ToDoPlugin.class.getPackage().getName() + ".ToDoI18nResources";
 
+  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { ToDoDO.class};
+
   private ToDoDao toDoDao;
 
+  @Override
+  public Class< ? >[] getPersistentEntities()
+  {
+    return PERSISTENT_ENTITIES;
+  }
+  
   @Override
   protected void initialize()
   {
@@ -47,7 +55,6 @@ public class ToDoPlugin extends AbstractPlugin
     final RegistryEntry entry = new RegistryEntry(ID, ToDoDao.class, toDoDao);
     // The ToDoDao is automatically available by the scripting engine!
     register(entry);
-    registerDataObject(ToDoDO.class);
     registerListPageColumnsCreator(ID, ToDoListPage.class);
     addMountPages(ID, ToDoListPage.class, ToDoEditPage.class);
 
