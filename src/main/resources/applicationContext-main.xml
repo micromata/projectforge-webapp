@@ -2,16 +2,7 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans default-lazy-init="false" default-autowire="no">
 
-  <bean id="propertyConfigurer" class="org.springframework.web.context.support.ServletContextPropertyPlaceholderConfigurer">
-    <property name="locations">
-      <list>
-        <value>classpath:hibernate-mappings.properties</value>
-      </list>
-    </property>
-    <property name="ignoreResourceNotFound">
-      <value>true</value>
-    </property>
-  </bean>
+  <bean id="propertyConfigurer" class="org.springframework.web.context.support.ServletContextPropertyPlaceholderConfigurer" />
   <bean id="log4jInit" class="org.projectforge.core.Log4Jinitialization">
     <property name="configLocations">
       <list>
@@ -29,11 +20,13 @@
   <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
     <property name="jndiName" value="java:comp/env/jdbc/ProjectForgeDS" />
   </bean>
+  <bean id="configuration" class="org.projectforge.core.Configuration" singleton="true">
+    <constructor-arg>
+      <value>${base.dir}</value>
+    </constructor-arg>
+  </bean>
   <!-- hibernate Session to DB -->
-  <bean id="sessionFactory" class="de.micromata.hibernate.spring.AutoSessionFactoryBean">
-    <property name="initialXmlData">
-      <null />
-    </property>
+  <bean id="sessionFactory" class="org.projectforge.database.AutoSessionFactoryBean">
     <property name="hibernateProperties">
       <props>
         <prop key="hibernate.dialect">${hibernate.dialect}</prop>
@@ -68,6 +61,9 @@
     <!-- never run a schema update on the database -->
     <property name="schemaUpdate">
       <value>${hibernate.schemaUpdate}</value>
+    </property>
+    <property name="projectForgeConfiguration">
+      <ref bean="configuration" />
     </property>
     <property name="entityInterceptor">
       <ref bean="hibernateHistoryInterceptor" />
