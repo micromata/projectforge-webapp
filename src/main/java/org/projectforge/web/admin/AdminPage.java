@@ -43,17 +43,20 @@ import org.projectforge.book.BookDO;
 import org.projectforge.book.BookDao;
 import org.projectforge.book.BookStatus;
 import org.projectforge.common.DateHelper;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.core.ReindexSettings;
 import org.projectforge.core.SystemDao;
-import org.projectforge.core.ConfigXml;
 import org.projectforge.database.DatabaseDao;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.XmlDump;
 import org.projectforge.meb.MebMailClient;
+import org.projectforge.plugins.core.AbstractPlugin;
+import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.user.UserXmlPreferencesMigrationDao;
 import org.projectforge.web.MenuBuilder;
@@ -67,8 +70,6 @@ import org.projectforge.web.wicket.WicketApplication;
 public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AdminPage.class);
-
-  public static final String I18N_PROPERTIES_BASENAME = "I18nResources";
 
   static final int NUMBER_OF_TEST_OBJECTS_TO_CREATE = 100;
 
@@ -188,19 +189,16 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
     Properties propsFound = new Properties();
     ClassLoader cLoader = this.getClass().getClassLoader();
     try {
-      InputStream is = cLoader.getResourceAsStream(I18N_PROPERTIES_BASENAME + ".properties");
-      props.load(is);
-      is = cLoader.getResourceAsStream(I18N_PROPERTIES_BASENAME + "_en.properties");
-      props_en.load(is);
-      is = cLoader.getResourceAsStream(I18N_PROPERTIES_BASENAME + "_de.properties");
-      props_de.load(is);
-      is = cLoader.getResourceAsStream(WebConstants.FILE_I18N_KEYS);
+      load(props, "");
+      load(props_en, "_en");
+      load(props_de, "_de");
+      final InputStream is = cLoader.getResourceAsStream(WebConstants.FILE_I18N_KEYS);
       propsFound.load(is);
     } catch (IOException ex) {
       log.error("Could not load i18n properties: " + ex.getMessage(), ex);
       throw new RuntimeException(ex);
     }
-    buf.append("Checking the differences between the " + I18N_PROPERTIES_BASENAME + " properties (default and _de)\n\n");
+    buf.append("Checking the differences between the " + PFUserContext.BUNDLE_NAME + " properties (default and _de)\n\n");
     buf.append("Found " + props.size() + " entries in default property file (en).\n\n");
     buf.append("Missing in _de:\n");
     buf.append("---------------\n");
@@ -422,5 +420,22 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   private String get(final String basename, final int number, final int counter)
   {
     return basename + "." + number + "." + counter;
+  }
+
+  private void load(final Properties properties, final String locale) throws IOException
+  {
+    final ClassLoader cLoader = this.getClass().getClassLoader();
+    InputStream is = cLoader.getResourceAsStream(PFUserContext.BUNDLE_NAME + locale + ".properties");
+    properties.load(is);
+    for (final AbstractPlugin plugin : PluginsRegistry.instance().getPlugins()) {
+      if (plugin.getResourceBundleName() == null) {
+        continue;
+      }
+      final String basePath = plugin.getResourceBundleName().replace('.', '/');
+      is = cLoader.getResourceAsStream(basePath + locale + ".properties");
+      if (is != null) {
+        properties.load(is);
+      }
+    }
   }
 }
