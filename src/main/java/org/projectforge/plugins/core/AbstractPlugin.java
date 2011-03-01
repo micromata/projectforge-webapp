@@ -31,10 +31,8 @@ import org.apache.commons.lang.Validate;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.settings.IResourceSettings;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.database.DatabaseUpdateDao;
-import org.projectforge.plugins.todo.ToDoDO;
 import org.projectforge.plugins.todo.ToDoPlugin;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
@@ -49,13 +47,9 @@ import org.projectforge.web.wicket.IListPageColumnsCreator;
  */
 public abstract class AbstractPlugin
 {
-  private static final long serialVersionUID = -3899180128376320221L;
-
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractPlugin.class);
 
   protected DatabaseUpdateDao databaseUpdateDao;
-
-  private AnnotationConfiguration annotationConfiguration;
 
   private IResourceSettings resourceSettings;
 
@@ -68,14 +62,17 @@ public abstract class AbstractPlugin
     this.databaseUpdateDao = databaseUpdateDao;
   }
 
-  public void setAnnotationConfiguration(final AnnotationConfiguration annotationConfiguration)
-  {
-    this.annotationConfiguration = annotationConfiguration;
-  }
-
   public void setResourceSettings(final IResourceSettings resourceSettings)
   {
     this.resourceSettings = resourceSettings;
+  }
+
+  /**
+   * Override this method if persistent entities should be added (JPA annotated classes which will be registered at Hibernate).
+   */
+  public Class< ? >[] getPersistentEntities()
+  {
+    return null;
   }
 
   public final void init()
@@ -146,17 +143,6 @@ public abstract class AbstractPlugin
     Validate.notNull(entry);
     Registry.instance().register(existingEntry, insertBefore, entry);
     return entry;
-  }
-
-  /**
-   * Register given class at the hibernate container.
-   * @param doClass Data object which is JPA annotated.
-   * @return this for chaining.
-   */
-  protected AbstractPlugin registerDataObject(final Class< ? > doClass)
-  {
-    annotationConfiguration.addAnnotatedClass(ToDoDO.class);
-    return this;
   }
 
   /**

@@ -23,9 +23,7 @@
 
 package org.projectforge.web.wicket;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -62,8 +60,7 @@ import org.projectforge.core.ProjectForgeException;
 import org.projectforge.core.SystemInfoCache;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.HibernateUtils;
-import org.projectforge.plugins.core.AbstractPlugin;
-import org.projectforge.plugins.todo.ToDoPlugin;
+import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserDao;
@@ -96,11 +93,6 @@ public class WicketApplication extends WebApplication
   private static String alertMessage;
 
   private static Map<Class< ? extends Page>, String> mountedPages = new HashMap<Class< ? extends Page>, String>();
-
-  /**
-   * Defines some built-in plugins.
-   */
-  private AbstractPlugin[] plugins = new AbstractPlugin[] { new ToDoPlugin()};
 
   @SpringBean(name = "wicketApplicationFilter")
   private WicketApplicationFilter wicketApplicationFilter;
@@ -283,40 +275,10 @@ public class WicketApplication extends WebApplication
     }
     daoRegistry.init();
 
-    final List<AbstractPlugin> pluginList = new ArrayList<AbstractPlugin>();
-    for (final AbstractPlugin plugin : plugins) {
-      pluginList.add(plugin);
-    }
-    final String[] pluginMainClasses = configuration.getPluginMainClasses();
-    if (pluginMainClasses != null) {
-      for (final String pluginMainClassName : pluginMainClasses) {
-        try {
-          final Class< ? > pluginMainClass = Class.forName(pluginMainClassName);
-          try {
-            final AbstractPlugin plugin = (AbstractPlugin) pluginMainClass.newInstance();
-            pluginList.add(plugin);
-          } catch (final ClassCastException ex) {
-            log.error("Couldn't load plugin, class '" + pluginMainClassName + "' isn't of type AbstractPlugin.");
-          } catch (final InstantiationException ex) {
-            log.error("Couldn't load plugin, class '" + pluginMainClassName + "' can't be instantiated: " + ex);
-          } catch (final IllegalAccessException ex) {
-            log.error("Couldn't load plugin, class '" + pluginMainClassName + "' can't be instantiated: " + ex);
-          }
-        } catch (final ClassNotFoundException ex) {
-          log.error("Couldn't load plugin, class '" + pluginMainClassName + "' not found");
-        }
-      }
-    }
-    for (final AbstractPlugin plugin : pluginList) {
-      plugin.setAnnotationConfiguration(hibernateConfiguration);
-      plugin.setResourceSettings(getResourceSettings());
-      beanFactory.autowireBeanProperties(plugin, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
-      plugin.init();
-      systemUpdater.register(plugin.getInitializationUpdateEntry());
-      systemUpdater.register(plugin.getUpdateEntries());
-    }
-
-    hibernateConfiguration.buildMappings();
+    final PluginsRegistry pluginsRegistry = PluginsRegistry.instance();
+    pluginsRegistry.set(systemUpdater);
+    pluginsRegistry.set(beanFactory, getResourceSettings());
+    pluginsRegistry.initialize();
 
     for (Map.Entry<String, Class< ? extends WebPage>> mountPage : WebRegistry.instance().getMountPages().entrySet()) {
       mountPage(mountPage.getKey(), mountPage.getValue());
