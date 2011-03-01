@@ -52,6 +52,8 @@ public abstract class AbstractPlugin
   protected DatabaseUpdateDao databaseUpdateDao;
 
   private IResourceSettings resourceSettings;
+  
+  private String resourceBundleName;
 
   private boolean initialized;
 
@@ -65,6 +67,11 @@ public abstract class AbstractPlugin
   public void setResourceSettings(final IResourceSettings resourceSettings)
   {
     this.resourceSettings = resourceSettings;
+  }
+  
+  public String getResourceBundleName()
+  {
+    return resourceBundleName;
   }
 
   /**
@@ -108,12 +115,13 @@ public abstract class AbstractPlugin
 
   /**
    * 
-   * @param resourceBundle
-   * @return
+   * @param resourceBundleName
+   * @return this for chaining.
    */
-  protected AbstractPlugin addResourceBundle(final String resourceBundle)
+  protected AbstractPlugin addResourceBundle(final String resourceBundleName)
   {
-    resourceSettings.addStringResourceLoader(0, new BundleStringResourceLoader(resourceBundle));
+    this.resourceBundleName = resourceBundleName;
+    resourceSettings.addStringResourceLoader(0, new BundleStringResourceLoader(resourceBundleName));
     return this;
   }
 
