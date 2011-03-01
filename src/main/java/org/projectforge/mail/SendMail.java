@@ -28,7 +28,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.ResourceBundle;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -39,9 +38,9 @@ import javax.mail.internet.MimeMessage;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.core.InternalErrorException;
 import org.projectforge.core.UserException;
-import org.projectforge.core.ConfigXml;
 import org.projectforge.scripting.GroovyExecutor;
 import org.projectforge.scripting.JellyExecutor;
 import org.projectforge.user.PFUserContext;
@@ -162,8 +161,7 @@ public class SendMail
   public String renderJelly(final Mail composedMessage, final String jellyXml, final Map<String, Object> data, final Locale locale)
   {
     PFUserDO user = PFUserContext.getUser();
-    ResourceBundle bundle = PFUserContext.getResourceBundle(locale);
-    data.put("createdLabel", bundle.getString("created"));
+    data.put("createdLabel", PFUserContext.getLocalizedString("created"));
     data.put("loggedInUser", user);
     data.put("msg", composedMessage);
     log.debug("jellyXml=" + jellyXml);
@@ -175,8 +173,7 @@ public class SendMail
   public String renderGroovyTemplate(final Mail composedMessage, final String groovyTemplate, final Map<String, Object> data, final Locale locale)
   {
     final PFUserDO user = PFUserContext.getUser();
-    final ResourceBundle bundle = PFUserContext.getResourceBundle(locale);
-    data.put("createdLabel", bundle.getString("created"));
+    data.put("createdLabel", PFUserContext.getLocalizedString("created"));
     data.put("loggedInUser", user);
     data.put("msg", composedMessage);
     log.debug("groovyTemplate=" + groovyTemplate);

@@ -30,7 +30,6 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -109,8 +108,7 @@ public class PdfRenderer
   {
     // initialize();
     PFUserDO user = PFUserContext.getUser();
-    ResourceBundle bundle = PFUserContext.getResourceBundle();
-    data.put("createdLabel", bundle.getString("created"));
+    data.put("createdLabel", PFUserContext.getLocalizedString("created"));
     data.put("loggedInUser", user);
     data.put("baseDir", configXml.getResourcePath());
     data.put("appId", AppVersion.APP_ID);
