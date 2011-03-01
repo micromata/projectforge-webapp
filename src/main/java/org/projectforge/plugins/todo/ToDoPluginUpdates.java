@@ -53,8 +53,8 @@ public class ToDoPluginUpdates
       public UpdateRunningStatus runUpdate()
       {
         final Table table = new Table(ToDoDO.class) //
-            .addAttributes("id", "created", "lastUpdate", "deleted", "reporter", "assignee", "task", "title", "comment", "description", "type",
-                "resubmission");
+            .addAttributes("id", "created", "lastUpdate", "deleted", "reporter", "assignee", "task", "title", "comment", "description",
+                "status", "type", "resubmission");
         dao.createTable(table);
         dao.createMissingIndices();
         return UpdateRunningStatus.DONE;

@@ -79,6 +79,9 @@ public class ToDoDO extends DefaultBaseDO
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private ToDoType type;
 
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  private ToDoStatus status;
+
   @Field(index = Index.UN_TOKENIZED)
   @DateBridge(resolution = Resolution.DAY)
   private Date resubmission;
@@ -201,6 +204,22 @@ public class ToDoDO extends DefaultBaseDO
   public ToDoDO setType(ToDoType type)
   {
     this.type = type;
+    return this;
+  }
+  
+  @Enumerated(EnumType.STRING)
+  @Column(length = 20)
+  public ToDoStatus getStatus()
+  {
+    return status;
+  }
+  
+  /**
+   * @return this for chaining.
+   */
+  public ToDoDO setStatus(ToDoStatus status)
+  {
+    this.status = status;
     return this;
   }
   
