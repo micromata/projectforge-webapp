@@ -20,7 +20,7 @@
   <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
     <property name="jndiName" value="java:comp/env/jdbc/ProjectForgeDS" />
   </bean>
-  <bean id="configuration" class="org.projectforge.core.Configuration" singleton="true">
+  <bean id="xmlConfiguration" class="org.projectforge.core.XmlConfiguration" singleton="true">
     <constructor-arg>
       <value>${base.dir}</value>
     </constructor-arg>
@@ -62,8 +62,8 @@
     <property name="schemaUpdate">
       <value>${hibernate.schemaUpdate}</value>
     </property>
-    <property name="projectForgeConfiguration">
-      <ref bean="configuration" />
+    <property name="xmlConfiguration">
+      <ref bean="xmlConfiguration" />
     </property>
     <property name="entityInterceptor">
       <ref bean="hibernateHistoryInterceptor" />
