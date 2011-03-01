@@ -30,6 +30,8 @@ import java.util.TimeZone;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.projectforge.core.Configuration;
+import org.projectforge.plugins.core.AbstractPlugin;
+import org.projectforge.plugins.core.PluginsRegistry;
 
 /**
  * ThreadLocal context.
@@ -39,7 +41,7 @@ public class PFUserContext
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PFUserContext.class);
 
-  public static final String BUNDLE_NAME = "I18nResources";
+  private static final String BUNDLE_NAME = "I18nResources";
 
   private static ThreadLocal<PFUserDO> context = new ThreadLocal<PFUserDO>();
 
@@ -123,9 +125,9 @@ public class PFUserContext
   /**
    * Gets the logged in user's resource bundle (getting the locale from the context user).
    */
-  public static ResourceBundle getResourceBundle()
+  private static ResourceBundle getResourceBundle(final String bundleName)
   {
-    return getResourceBundle(getLocale());
+    return getResourceBundle(bundleName, getLocale());
   }
 
   /**
@@ -133,12 +135,12 @@ public class PFUserContext
    * @param locale If null, then the context user's locale is assumed.
    * @return
    */
-  public static ResourceBundle getResourceBundle(Locale locale)
+  private static ResourceBundle getResourceBundle(final String bundleName, Locale locale)
   {
     if (locale == null) {
       locale = getLocale();
     }
-    final ResourceBundle resourceBundle = ResourceBundle.getBundle(BUNDLE_NAME, locale);
+    final ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleName, locale);
     return resourceBundle;
   }
 
@@ -150,10 +152,35 @@ public class PFUserContext
     return MessageFormat.format(getLocalizedString(messageKey), params);
   }
 
+  private static String getString(final String bundleName, final String key)
+  {
+    try {
+      final ResourceBundle bundle = getResourceBundle(bundleName);
+      if (bundle.containsKey(key) == true) {
+        return bundle.getString(key);
+      }
+    } catch (final Exception ex) {
+      log.warn("Resource key '" + key + "' not found for locale '" + PFUserContext.getLocale() + "'");
+    }
+    return null;
+  }
+
   public static String getLocalizedString(final String key)
   {
     try {
-      return getResourceBundle().getString(key);
+      String translation = getString(BUNDLE_NAME, key);
+      if (translation != null) {
+        return translation;
+      }
+      for (final AbstractPlugin plugin : PluginsRegistry.instance().getPlugins()) {
+        if (plugin.getResourceBundleName() == null) {
+          continue;
+        }
+        translation = getString(plugin.getResourceBundleName(), key);
+        if (translation != null) {
+          return translation;
+        }
+      }
     } catch (Exception ex) { // MissingResourceException or NullpointerException
       log.warn("Resource key '" + key + "' not found for locale '" + PFUserContext.getLocale() + "'");
     }
