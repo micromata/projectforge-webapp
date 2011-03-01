@@ -3,11 +3,6 @@
 <beans default-lazy-init="false" default-autowire="byType">
   <bean id="accessChecker" class="org.projectforge.access.AccessChecker" singleton="true" />
   <bean id="addressExport" class="org.projectforge.address.AddressExport" singleton="true" />
-  <bean id="configuration" class="org.projectforge.core.Configuration" singleton="true">
-    <constructor-arg>
-      <value>${base.dir}</value>
-    </constructor-arg>
-  </bean>
   <bean id="groovyExecutor" class="org.projectforge.scripting.GroovyExecutor" />
   <bean id="systemUpdater" class="org.projectforge.admin.SystemUpdater" />
   <bean id="historyAdapter" class="de.micromata.hibernate.history.HistoryAdapter" />
