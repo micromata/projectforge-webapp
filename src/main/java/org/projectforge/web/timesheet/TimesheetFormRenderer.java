@@ -67,8 +67,8 @@ import org.hibernate.Hibernate;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
-import org.projectforge.core.Configuration;
 import org.projectforge.core.SystemInfoCache;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.jira.JiraUtils;
@@ -344,7 +344,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       WicketUtils.addTooltip(locationTextField, getString("tooltip.autocomplete.withDblClickFunction"));
       doPanel.addTextField(getString("timesheet.location"), HALF, locationTextField, DOUBLE);
     }
-    final boolean jiraSupport = Configuration.getInstance().isJIRAConfigured();
+    final boolean jiraSupport = ConfigXml.getInstance().isJIRAConfigured();
     {
       final String jiraFootnoteMark = jiraSupport ? "*" : "";
       final IField field = doPanel.addTextArea(data, "description", getString("timesheet.description") + jiraFootnoteMark, HALF, DOUBLE,

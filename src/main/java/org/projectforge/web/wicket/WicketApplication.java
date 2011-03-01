@@ -58,6 +58,7 @@ import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.CronSetup;
 import org.projectforge.core.ProjectForgeException;
 import org.projectforge.core.SystemInfoCache;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.plugins.core.PluginsRegistry;
@@ -102,6 +103,8 @@ public class WicketApplication extends WebApplication
   @SpringBean(name = "configurationDao")
   private ConfigurationDao configurationDao;
 
+  private ConfigXml xmlConfiguration;
+
   private Configuration configuration;
 
   @SpringBean(name = "cronSetup")
@@ -133,47 +136,52 @@ public class WicketApplication extends WebApplication
     return mountedPages.get(pageClass);
   }
 
-  public void setWicketApplicationFilter(WicketApplicationFilter wicketApplicationFilter)
+  public void setWicketApplicationFilter(final WicketApplicationFilter wicketApplicationFilter)
   {
     this.wicketApplicationFilter = wicketApplicationFilter;
   }
 
-  public void setUserXmlPreferencesCache(UserXmlPreferencesCache userXmlPreferencesCache)
+  public void setUserXmlPreferencesCache(final UserXmlPreferencesCache userXmlPreferencesCache)
   {
     this.userXmlPreferencesCache = userXmlPreferencesCache;
   }
 
-  public void setConfiguration(Configuration configuration)
+  public void setXmlConfiguration(final ConfigXml xmlConfiguration)
+  {
+    this.xmlConfiguration = xmlConfiguration;
+  }
+  
+  public void setConfiguration(final Configuration configuration)
   {
     this.configuration = configuration;
   }
 
-  public void setConfigurationDao(ConfigurationDao configurationDao)
+  public void setConfigurationDao(final ConfigurationDao configurationDao)
   {
     this.configurationDao = configurationDao;
   }
 
-  public void setCronSetup(CronSetup cronSetup)
+  public void setCronSetup(final CronSetup cronSetup)
   {
     this.cronSetup = cronSetup;
   }
 
-  public void setDaoRegistry(DaoRegistry daoRegistry)
+  public void setDaoRegistry(final DaoRegistry daoRegistry)
   {
     this.daoRegistry = daoRegistry;
   }
 
-  public void setSystemUpdater(SystemUpdater systemUpdater)
+  public void setSystemUpdater(final SystemUpdater systemUpdater)
   {
     this.systemUpdater = systemUpdater;
   }
 
-  public void setUserDao(UserDao userDao)
+  public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
   }
 
-  public void setSystemInfoCache(SystemInfoCache systemInfoCache)
+  public void setSystemInfoCache(final SystemInfoCache systemInfoCache)
   {
     this.systemInfoCache = systemInfoCache;
   }
@@ -252,11 +260,11 @@ public class WicketApplication extends WebApplication
     final AnnotationConfiguration hibernateConfiguration = (AnnotationConfiguration) localSessionFactoryBean.getConfiguration();
     HibernateUtils.setConfiguration(hibernateConfiguration);
     final ServletContext servletContext = getServletContext();
-    final String configContextPath = configuration.getServletContextPath();
+    final String configContextPath = xmlConfiguration.getServletContextPath();
     String contextPath;
     if (StringUtils.isBlank(configContextPath) == true) {
       contextPath = servletContext.getContextPath();
-      configuration.setServletContextPath(contextPath);
+      xmlConfiguration.setServletContextPath(contextPath);
     } else {
       contextPath = configContextPath;
     }

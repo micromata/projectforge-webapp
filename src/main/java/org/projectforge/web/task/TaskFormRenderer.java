@@ -45,8 +45,8 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.convert.IConverter;
 import org.hibernate.Hibernate;
 import org.projectforge.common.StringHelper;
-import org.projectforge.core.Configuration;
 import org.projectforge.core.Priority;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.gantt.GanttObjectType;
@@ -153,7 +153,7 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
       priorityChoice.setNullValid(true);
       doPanel.addDropDownChoice(data, "priority", getString("priority"), HALF, priorityChoice, THREEQUART);
     }
-    final boolean jiraSupport = Configuration.getInstance().isJIRAConfigured();
+    final boolean jiraSupport = ConfigXml.getInstance().isJIRAConfigured();
     {
       final String jiraFootnoteMark = jiraSupport ? "*" : "";
       doPanel.addTextField(data, "shortDescription", getString("shortDescription") + jiraFootnoteMark, HALF, FULL);

@@ -53,7 +53,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jfree.chart.JFreeChart;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.FileHelper;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.export.ExportJFreeChart;
 import org.projectforge.export.ExportWorkbook;
 import org.projectforge.fibu.kost.Bwa;
@@ -77,9 +77,6 @@ public class ReportScriptingPage extends AbstractSecuredPage
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ReportScriptingPage.class);
 
   private transient ReportScriptingStorage reportScriptingStorage;
-
-  @SpringBean(name = "configuration")
-  private Configuration configuration;
 
   @SpringBean(name = "scriptDao")
   private ScriptDao scriptDao;
@@ -245,7 +242,7 @@ public class ReportScriptingPage extends AbstractSecuredPage
         } else if (clientFileName.endsWith(".xls") == true) {
           StringBuffer buf = new StringBuffer();
           buf.append("report_").append(FileHelper.createSafeFilename(PFUserContext.getUser().getUsername(), 20)).append(".xls");
-          File file = new File(configuration.getWorkingDirectory(), buf.toString());
+          File file = new File(ConfigXml.getInstance().getWorkingDirectory(), buf.toString());
           fileUpload.writeTo(file);
           getReportScriptingStorage().setFilename(clientFileName, file.getAbsolutePath());
         } else {

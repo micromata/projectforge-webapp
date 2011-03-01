@@ -52,6 +52,7 @@ import org.projectforge.common.KeyValueBean;
 import org.projectforge.common.StringHelper;
 import org.projectforge.common.TimeNotation;
 import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
@@ -163,7 +164,7 @@ public class UserFormRenderer extends AbstractDOFormRenderer
     {
       final LabelValueChoiceRenderer<String> localeChoiceRenderer = new LabelValueChoiceRenderer<String>();
       localeChoiceRenderer.addValue("", getString("user.defaultLocale"));
-      for (final String str : Configuration.LOCALIZATIONS) {
+      for (final String str : ConfigXml.LOCALIZATIONS) {
         localeChoiceRenderer.addValue(str, getString("locale." + str));
       }
       final DropDownChoice localeChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "locale"),
@@ -178,7 +179,7 @@ public class UserFormRenderer extends AbstractDOFormRenderer
         @Override
         protected Object convertChoiceIdToChoice(final String id)
         {
-          if (StringHelper.isIn(id, Configuration.LOCALIZATIONS) == true) {
+          if (StringHelper.isIn(id, ConfigXml.LOCALIZATIONS) == true) {
             return new Locale(id);
           } else {
             return null;
@@ -205,7 +206,7 @@ public class UserFormRenderer extends AbstractDOFormRenderer
     final TimeZoneField timeZone = new TimeZoneField(TextFieldLPanel.INPUT_ID, new PropertyModel<TimeZone>(data, "timeZoneObject"));
     doPanel.addTextField(timeZone, new PanelContext(FULL, getString("timezone"), labelLength)
         .setTooltip(getString("tooltip.autocomplete.timeZone")));
-    if (StringUtils.isNotEmpty(Configuration.getInstance().getTelephoneSystemUrl()) == true) {
+    if (StringUtils.isNotEmpty(ConfigXml.getInstance().getTelephoneSystemUrl()) == true) {
       doPanel
           .addTextField(new PanelContext(data, "personalPhoneIdentifiers", FULL, getString("user.personalPhoneIdentifiers"), labelLength)
               .setTooltip(getString("user.personalPhoneIdentifiers.tooltip")));

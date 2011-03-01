@@ -63,7 +63,7 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -554,7 +554,7 @@ public class WicketUtils
 
   public static final boolean isJIRAConfigured()
   {
-    return Configuration.getInstance().isJIRAConfigured();
+    return ConfigXml.getInstance().isJIRAConfigured();
   }
 
   /**

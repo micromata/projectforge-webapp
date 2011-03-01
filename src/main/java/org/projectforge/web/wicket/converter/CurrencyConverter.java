@@ -31,7 +31,7 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.util.convert.converters.BigDecimalConverter;
 import org.projectforge.common.NumberHelper;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.user.PFUserContext;
 
 
@@ -42,12 +42,13 @@ public class CurrencyConverter extends BigDecimalConverter
 {
   private static final long serialVersionUID = -7006507810932242601L;
 
-  private static final String CURRENCY = Configuration.getInstance().getCurrencySymbol();
+  private String currency;
 
   private BigDecimal totalAmount;
 
   public CurrencyConverter()
   {
+    currency = ConfigXml.getInstance().getCurrencySymbol();
   }
 
   /**
@@ -67,7 +68,7 @@ public class CurrencyConverter extends BigDecimalConverter
   public BigDecimal convertToObject(String value, Locale locale)
   {
     value = StringUtils.trimToEmpty(value);
-    if (value.endsWith(CURRENCY) == true) {
+    if (value.endsWith(currency) == true) {
       value = value.substring(0, value.length() - 1).trim();
     } else if (totalAmount != null && value.endsWith("%") == true) {
       value = value.substring(0, value.length() - 1).trim();
@@ -88,6 +89,6 @@ public class CurrencyConverter extends BigDecimalConverter
     } else {
       nf = NumberHelper.getCurrencyFormat(PFUserContext.getLocale());
     }
-    return nf.format(value) + " " + CURRENCY;
+    return nf.format(value) + " " + currency;
   }
 }

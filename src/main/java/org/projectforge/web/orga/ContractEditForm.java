@@ -29,9 +29,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.orga.ContractDO;
 import org.projectforge.orga.ContractStatus;
 import org.projectforge.orga.ContractType;
@@ -56,9 +55,6 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ContractEditForm.class);
 
   protected DatePanel datePanel, validFromDatePanel, validUntilDatePanel, dueDatePanel, resubmissionDatePanel, signingDatePanel;
-
-  @SpringBean(name = "configuration")
-  private Configuration configuration;
 
   public ContractEditForm(ContractEditPage parentPage, ContractDO data)
   {
@@ -114,7 +110,7 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
     add(signingDatePanel);
 
     // DropDownChoice type
-    final List<ContractType> contractTypes = configuration.getContractTypes();
+    final List<ContractType> contractTypes = ConfigXml.getInstance().getContractTypes();
     final LabelValueChoiceRenderer<ContractType> typeChoiceRenderer = new LabelValueChoiceRenderer<ContractType>(this, contractTypes);
     @SuppressWarnings("unchecked")
     final DropDownChoice typeChoice = new DropDownChoice("type", new PropertyModel(data, "type"), typeChoiceRenderer.getValues(),
