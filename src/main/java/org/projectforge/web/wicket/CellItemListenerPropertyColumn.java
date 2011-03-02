@@ -23,6 +23,8 @@
 
 package org.projectforge.web.wicket;
 
+import java.util.Date;
+
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.PropertyColumn;
 import org.apache.wicket.markup.html.basic.Label;
@@ -31,6 +33,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.core.I18nEnum;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.web.calendar.DateTimeFormatter;
 
 /**
  * Supports CellItemListener.
@@ -98,8 +101,14 @@ public class CellItemListenerPropertyColumn<T> extends PropertyColumn<T>
   {
     final IModel< ? > propertyModel = createLabelModel(rowModel);
     final Object object = propertyModel.getObject();
-    if (object != null && object instanceof I18nEnum) {
+    if (object == null) {
+      item.add(new Label(componentId, propertyModel).setRenderBodyOnly(true));
+    } else if (object instanceof I18nEnum) {
       item.add(new Label(componentId, PFUserContext.getLocalizedString(((I18nEnum) object).getI18nKey())).setRenderBodyOnly(true));
+    } else if (object instanceof java.sql.Date) {
+      item.add(new Label(componentId, DateTimeFormatter.instance().getFormattedDate((java.sql.Date)object)).setRenderBodyOnly(true));
+    } else if (object instanceof Date) {
+      item.add(new Label(componentId, DateTimeFormatter.instance().getFormattedDateTime((Date)object)).setRenderBodyOnly(true));
     } else {
       item.add(new Label(componentId, propertyModel).setRenderBodyOnly(true));
     }
