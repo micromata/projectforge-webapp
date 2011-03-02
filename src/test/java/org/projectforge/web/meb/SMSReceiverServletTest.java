@@ -44,7 +44,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.projectforge.common.TestHelper;
-import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.meb.MebDao;
 import org.projectforge.meb.MebEntryDO;
 import org.projectforge.test.TestBase;
@@ -59,8 +59,8 @@ public class SMSReceiverServletTest extends TestBase
   @Test
   public void receiveSMS() throws Exception
   {
-    final String origKey = (String)TestHelper.getDeclaredFieldValue(Configuration.getInstance(), "receiveSmsKey");
-    TestHelper.setDeclaredField(Configuration.getInstance(), "receiveSmsKey", "otieZae9Aiphai5o");
+    final String origKey = (String)TestHelper.getDeclaredFieldValue(ConfigXml.getInstance(), "receiveSmsKey");
+    TestHelper.setDeclaredField(ConfigXml.getInstance(), "receiveSmsKey", "otieZae9Aiphai5o");
     init();
     logon(TEST_ADMIN_USER);
     PFUserDO user = new PFUserDO();
@@ -92,14 +92,14 @@ public class SMSReceiverServletTest extends TestBase
         assertNull(entry.getOwnerId());
       }
     }
-    TestHelper.setDeclaredField(Configuration.getInstance(), "receiveSmsKey", origKey);
+    TestHelper.setDeclaredField(ConfigXml.getInstance(), "receiveSmsKey", origKey);
   }
 
   @Test
   public void receiveSMSWithWrongRequest() throws Exception
   {
-    final String origKey = (String)TestHelper.getDeclaredFieldValue(Configuration.getInstance(), "receiveSmsKey");
-    TestHelper.setDeclaredField(Configuration.getInstance(), "receiveSmsKey", null);
+    final String origKey = (String)TestHelper.getDeclaredFieldValue(ConfigXml.getInstance(), "receiveSmsKey");
+    TestHelper.setDeclaredField(ConfigXml.getInstance(), "receiveSmsKey", null);
     init();
     final Logger mebDaoLoggerSpy = spy(Logger.getLogger(MebDao.class));
     TestHelper.setDeclaredStaticField(MebDao.class, "log", mebDaoLoggerSpy);
@@ -108,7 +108,7 @@ public class SMSReceiverServletTest extends TestBase
     final HttpServletResponse response = mockResponse("");
     servlet.doGet(request, response);
 
-    TestHelper.setDeclaredField(Configuration.getInstance(), "receiveSmsKey", "otieZae9Aiphai5o");
+    TestHelper.setDeclaredField(ConfigXml.getInstance(), "receiveSmsKey", "otieZae9Aiphai5o");
     servlet.doGet(request, response);
     request = mockRequest("otieZae9Aiphai5o", null, null, null);
     servlet.doGet(request, response);
@@ -142,7 +142,7 @@ public class SMSReceiverServletTest extends TestBase
     verify(mebDaoLoggerSpy).warn(logMsg2 + "1274480915");
     verify(mebDaoLoggerSpy).warn(logMsg2 + "3000000000");
     verify(mebDaoLoggerSpy).warn(logMsg3 + "20sjhj4567");
-    TestHelper.setDeclaredField(Configuration.getInstance(), "receiveSmsKey", origKey);
+    TestHelper.setDeclaredField(ConfigXml.getInstance(), "receiveSmsKey", origKey);
   }
 
   private HttpServletRequest mockRequest(final String key, final String date, final String sender, final String msg)
@@ -170,7 +170,7 @@ public class SMSReceiverServletTest extends TestBase
   {
     if (loggerSpy == null) {
       loggerSpy = spy(Logger.getLogger(SMSReceiverServlet.class));
-      TestHelper.setDeclaredField(Configuration.getInstance(), "receiveSmsKey", "otieZae9Aiphai5o");
+      TestHelper.setDeclaredField(ConfigXml.getInstance(), "receiveSmsKey", "otieZae9Aiphai5o");
       TestHelper.setDeclaredStaticField(SMSReceiverServlet.class, "log", loggerSpy);
     }
   }
