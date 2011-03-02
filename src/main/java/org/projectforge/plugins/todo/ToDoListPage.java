@@ -90,7 +90,7 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
       {
         final ToDoDO toDo = (ToDoDO) rowModel.getObject();
         item.add(new ListSelectActionPanel(componentId, rowModel, ToDoEditPage.class, toDo.getId(), returnToPage, DateTimeFormatter
-            .instance().getFormattedDate(toDo.getCreated())));
+            .instance().getFormattedDateTime(toDo.getCreated())));
         addRowClick(item);
         cellItemListener.populateItem(item, componentId, rowModel);
       }

@@ -24,9 +24,9 @@
 package org.projectforge.plugins.todo;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.components.CoolCheckBoxPanel;
 
 public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
 {
@@ -38,7 +38,16 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
   protected void init()
   {
     super.init();
-    filterContainer.add(new CheckBox("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted")));
+    filterContainer.add(new CoolCheckBoxPanel("openedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "opened"),
+        getString(ToDoStatus.OPENED.getI18nKey()), true));
+    filterContainer.add(new CoolCheckBoxPanel("inprogressCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "inprogress"),
+        getString(ToDoStatus.IN_PROGRESS.getI18nKey()), true));
+    filterContainer.add(new CoolCheckBoxPanel("closedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "closed"),
+        getString(ToDoStatus.CLOSED.getI18nKey()), true));
+    filterContainer.add(new CoolCheckBoxPanel("postponedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "postponed"),
+        getString(ToDoStatus.POSTPONED.getI18nKey()), true));
+    filterContainer.add(new CoolCheckBoxPanel("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
+        getString("onlyDeleted"), true).setTooltip(getString("onlyDeleted.tooltip")));
   }
 
   public ToDoListForm(ToDoListPage parentPage)

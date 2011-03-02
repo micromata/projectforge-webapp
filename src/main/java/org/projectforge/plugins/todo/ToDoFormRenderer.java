@@ -62,6 +62,8 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
 
   protected DatePanel dueDatePanel;
 
+  protected boolean sendNotification;
+
   final static LayoutLength labelLength = LayoutLength.HALF;
 
   final static LayoutLength valueLength = LayoutLength.ONEHALF;
@@ -142,6 +144,7 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
     doPanel.addTextArea(new PanelContext(data, "description", valueLength, getString("description"), labelLength)
         .setCssStyle("height: 10em;"));
     doPanel.addTextArea(new PanelContext(data, "comment", valueLength, getString("comment"), labelLength).setCssStyle("height: 10em;"));
+    doPanel.addCheckBox(new PanelContext(this, "sendNotification", valueLength, getString("label.sendEMailNotification"), labelLength));
 
     // @Field(index = Index.UN_TOKENIZED)
     // @DateBridge(resolution = Resolution.DAY)

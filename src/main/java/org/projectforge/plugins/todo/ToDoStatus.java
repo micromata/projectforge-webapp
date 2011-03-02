@@ -32,12 +32,12 @@ import org.projectforge.core.I18nEnum;
  */
 public enum ToDoStatus implements I18nEnum
 {
-  CREATED("created"), CLOSED("closed"), OPEN("open"), RE_OPENED("reopend"), POSTPONED("postponed");
+  OPENED("opened"), IN_PROGRESS("inprogress"), RE_OPENED("reopend"), POSTPONED("postponed"), CLOSED("closed");
 
   private String key;
 
   /**
-   * @return The full i18n key including the i18n prefix "plugins.todo.type.".
+   * @return The full i18n key including the i18n prefix "plugins.todo.status.".
    */
   public String getI18nKey()
   {
