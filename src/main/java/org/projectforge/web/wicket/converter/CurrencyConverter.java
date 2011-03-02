@@ -58,6 +58,7 @@ public class CurrencyConverter extends BigDecimalConverter
    */
   public CurrencyConverter(final BigDecimal totalAmount)
   {
+    this();
     this.totalAmount = totalAmount;
   }
 
