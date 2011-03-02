@@ -47,7 +47,7 @@ public class ToDoPlugin extends AbstractPlugin
   {
     return PERSISTENT_ENTITIES;
   }
-  
+
   @Override
   protected void initialize()
   {
@@ -59,7 +59,8 @@ public class ToDoPlugin extends AbstractPlugin
     addMountPages(ID, ToDoListPage.class, ToDoEditPage.class);
 
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-    registerMenuItem(new MenuItemDef(parentMenu, ID, 5, "plugins.todo.menu", ToDoListPage.class));
+    registerMenuItem(new ToDoMenuItemDef(parentMenu, ID, 5, "plugins.todo.menu", ToDoListPage.class));
+
     // UserRights.
     // Hibernate-search indexer.
     addResourceBundle(RESOURCE_BUNDLE_NAME);

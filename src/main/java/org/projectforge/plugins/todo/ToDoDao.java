@@ -23,22 +23,28 @@
 
 package org.projectforge.plugins.todo;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
-import org.projectforge.book.BookFilter;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.database.Table;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * 
@@ -47,12 +53,20 @@ import org.projectforge.user.UserDao;
  */
 public class ToDoDao extends BaseDao<ToDoDO>
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ToDoDao.class);
+
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "reporter.username", "reporter.firstname", "reporter.lastname",
       "assignee.username", "assignee.firstname", "assignee.lastname", "task.title", "task.taskpath"};
+
+  private Table table = new Table(ToDoDO.class);
+
+  private DataSource dataSource;
 
   private UserDao userDao;
 
   private TaskTree taskTree;
+
+  private ToDoCache toDoCache = new ToDoCache(this);
 
   public ToDoDao()
   {
@@ -66,20 +80,42 @@ public class ToDoDao extends BaseDao<ToDoDO>
   }
 
   @Override
-  public List<ToDoDO> getList(BaseSearchFilter filter)
+  public List<ToDoDO> getList(final BaseSearchFilter filter)
   {
     final ToDoFilter myFilter;
-    if (filter instanceof BookFilter) {
+    if (filter instanceof ToDoFilter) {
       myFilter = (ToDoFilter) filter;
     } else {
       myFilter = new ToDoFilter(filter);
     }
     final QueryFilter queryFilter = new QueryFilter(myFilter);
-    if (StringUtils.isBlank(myFilter.getSearchString()) == true) {
-      // To be done.
+    Collection<ToDoStatus> col = new ArrayList<ToDoStatus>(5);
+    if (myFilter.isOpened() == true) {
+      col.add(ToDoStatus.OPENED);
+    }
+    if (myFilter.isClosed() == true) {
+      col.add(ToDoStatus.CLOSED);
+    }
+    if (myFilter.isPostponed() == true) {
+      col.add(ToDoStatus.POSTPONED);
+    }
+    if (myFilter.isReopened() == true) {
+      col.add(ToDoStatus.RE_OPENED);
+    }
+    if (myFilter.isInprogress() == true) {
+      col.add(ToDoStatus.IN_PROGRESS);
+    }
+    if (col.size() > 0) {
+      queryFilter.add(Restrictions.in("status", col));
     }
     queryFilter.addOrder(Order.desc("created"));
     return getList(queryFilter);
+  }
+
+  @Override
+  protected void afterSaveOrModify(ToDoDO obj)
+  {
+    toDoCache.setExpired(); // Force reload of the menu item counters for open to-do entrie.
   }
 
   public void setAssignee(final ToDoDO todo, final Integer userId)
@@ -145,10 +181,49 @@ public class ToDoDao extends BaseDao<ToDoDO>
     return true;
   }
 
+  /**
+   * Get the number of open to-do entries for the given user. Entries are open (in this context) when they're not deleted or closed. <br/>
+   * The result is cached (therefore you can call this method very often).
+   * @param userId If null then the current logged in user is assumed.
+   * @return Number of open to-do entries.
+   */
+  public int getOpenToDoEntries(Integer userId)
+  {
+    if (userId == null) {
+      userId = PFUserContext.getUserId();
+    }
+    return toDoCache.getOpenToDoEntries(userId);
+  }
+
+  /**
+   * Called by ToDoCache to get the number of open entries for the given users.
+   * @param userId
+   * @return Number of open to-do entries.
+   */
+  int internalGetOpenEntries(final Integer userId)
+  {
+    final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
+    try {
+      return jdbc.queryForInt("SELECT COUNT(*) FROM "
+          + table.getName()
+          + " where assignee_fk="
+          + userId
+          + " and status != 'CLOSED' and deleted=false");
+    } catch (final Exception ex) {
+      log.error(ex.getMessage(), ex);
+      return 0;
+    }
+  }
+
   @Override
   public ToDoDO newInstance()
   {
     return new ToDoDO();
+  }
+
+  public void setDataSource(final DataSource dataSource)
+  {
+    this.dataSource = dataSource;
   }
 
   public void setUserDao(final UserDao userDao)

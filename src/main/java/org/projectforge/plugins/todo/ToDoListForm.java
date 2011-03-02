@@ -40,6 +40,8 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
     super.init();
     filterContainer.add(new CoolCheckBoxPanel("openedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "opened"),
         getString(ToDoStatus.OPENED.getI18nKey()), true));
+    filterContainer.add(new CoolCheckBoxPanel("reopenedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "reopened"),
+        getString(ToDoStatus.RE_OPENED.getI18nKey()), true));
     filterContainer.add(new CoolCheckBoxPanel("inprogressCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "inprogress"),
         getString(ToDoStatus.IN_PROGRESS.getI18nKey()), true));
     filterContainer.add(new CoolCheckBoxPanel("closedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "closed"),

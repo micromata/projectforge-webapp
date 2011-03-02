@@ -36,7 +36,7 @@ public class ToDoFilter extends BaseSearchFilter implements Serializable
 {
   private static final long serialVersionUID = -2799448444375717414L;
 
-  private boolean opened, inprogress, closed, postponed;
+  private boolean opened, reopened, inprogress, closed, postponed;
   
   public ToDoFilter()
   {
@@ -55,6 +55,16 @@ public class ToDoFilter extends BaseSearchFilter implements Serializable
   public void setOpened(boolean opened)
   {
     this.opened = opened;
+  }
+  
+  public boolean isReopened()
+  {
+    return reopened;
+  }
+  
+  public void setReopened(boolean reopened)
+  {
+    this.reopened = reopened;
   }
 
   public boolean isInprogress()
