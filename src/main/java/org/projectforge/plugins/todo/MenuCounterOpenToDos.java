@@ -27,6 +27,11 @@ import org.apache.wicket.injection.web.InjectorHolder;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
+/**
+ * Represents the counter for displaying the open to-do entries as white number in red bubble beside the to-do menu entry.
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
+ */
 public class MenuCounterOpenToDos extends Model<Integer>
 {
   private static final long serialVersionUID = -1500489863982107802L;

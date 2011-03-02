@@ -31,6 +31,8 @@ import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.Table;
 
 /**
+ * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
+ * release of this to-do plugin.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class ToDoPluginUpdates
@@ -40,18 +42,20 @@ public class ToDoPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(ToDoPlugin.ID, "1.0.0", "2011-02-28", "Adds table PLUGIN_T_TODO.") {
+    return new UpdateEntryImpl(ToDoPlugin.ID, "1.0.0", "2011-03-02", "Adds table PLUGIN_T_TODO.") {
       final Table table = new Table(ToDoDO.class);
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
+        // Does the data-base table already exist?
         return dao.doesExist(table) == true ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
+        // Create initial data-base table:
         final Table table = new Table(ToDoDO.class) //
             .addAttributes("id", "created", "lastUpdate", "deleted", "reporter", "assignee", "task", "title", "comment", "description",
                 "status", "type", "priority", "dueDate", "resubmission");
