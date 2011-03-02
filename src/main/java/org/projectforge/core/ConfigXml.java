@@ -369,15 +369,6 @@ public class ConfigXml
   }
 
   /**
-   * For test cases.
-   * @param config
-   */
-  public static void internalSetInstance()
-  {
-    instance = new ConfigXml();
-  }
-
-  /**
    * Copies only not null values of the configuration.
    */
   private static void copyDeclaredFields(String prefix, Class< ? > srcClazz, Object src, Object dest, String... ignoreFields)
