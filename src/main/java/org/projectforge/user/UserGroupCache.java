@@ -145,7 +145,8 @@ public class UserGroupCache extends AbstractCache
     if (userMap == null) {
       return 0;
     } else {
-      return userMap.size();
+      // checkRefresh(); Done by getUserMap().
+      return getUserMap().size();
     }
   }
 
