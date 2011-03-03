@@ -59,12 +59,22 @@ public class GroovyExecutor
   public String executeTemplate(final String template, final Map<String, Object> variables)
   {
     securityChecks(template);
-    final TemplateEngine templateEngine = new SimpleTemplateEngine();
+    return executeTemplate(new SimpleTemplateEngine(), template, variables);
+  }
+
+  public String executeTemplate(final TemplateEngine templateEngine, final String template, final Map<String, Object> variables)
+  {
+    securityChecks(template);
+    if (template == null) {
+      return null;
+    }
     try {
       final Template templateObject = templateEngine.createTemplate(template);
       final Writable writable = templateObject.make(variables);
       final StringWriter writer = new StringWriter();
       writable.writeTo(writer);
+      writer.flush();
+      log.info(writer.toString());
       return writer.toString();
     } catch (CompilationFailedException ex) {
       log.error(ex.getMessage() + " while executing template: " + template, ex);
@@ -137,9 +147,13 @@ public class GroovyExecutor
     return scriptResult;
   }
 
+  /**
+   * Better than nothing...
+   * @param script
+   */
   private void securityChecks(final String script)
   {
-    final String[] forbiddenKeyWords = { "__baseDao", "__baseObject"};
+    final String[] forbiddenKeyWords = { "__baseDao", "__baseObject", "System.ex"};
     for (String forbiddenKeyWord : forbiddenKeyWords) {
       if (StringUtils.contains(script, forbiddenKeyWord) == true) {
         throw new AccessException("access.exception.violation", forbiddenKeyWord);

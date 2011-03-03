@@ -26,8 +26,11 @@ package org.projectforge.scripting;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.projectforge.core.ConfigXml;
+import org.projectforge.core.I18nEnum;
 import org.projectforge.user.I18nHelper;
 
 public class GroovyEngine
@@ -36,11 +39,17 @@ public class GroovyEngine
 
   private GroovyExecutor groovyExecutor;
 
-  private Map<String, Object> variables = new HashMap<String, Object>();
+  private Map<String, Object> variables;
 
   public GroovyEngine(final Locale locale)
   {
+    this(new HashMap<String, Object>(), locale);
+  }
+
+  public GroovyEngine(final Map<String, Object> variables, final Locale locale)
+  {
     this.locale = locale;
+    this.variables = variables;
     this.variables.put("pf", this);
     this.groovyExecutor = new GroovyExecutor();
   }
@@ -65,14 +74,39 @@ public class GroovyEngine
     return this;
   }
 
-
   /**
    * @param template
    * @see GroovyExecutor#executeTemplate(String, Map)
    */
   public String executeTemplate(final String template)
   {
-    return groovyExecutor.executeTemplate(template, variables);
+    final String content = replaceIncludes(template).replaceAll("#HURZ#", "\\$");
+    return groovyExecutor.executeTemplate(content, variables);
+  }
+
+  private String replaceIncludes(final String template)
+  {
+    if (template == null) {
+      return null;
+    }
+    final Pattern p = Pattern.compile("#INCLUDE\\{([0-9\\.a-zA-Z/]*)\\}", Pattern.MULTILINE);
+    final StringBuffer buf = new StringBuffer();
+    final Matcher m = p.matcher(template);
+    while (m.find()) {
+      if (m.group(1) != null) {
+        final String filename = m.group(1);
+        final Object[] res = ConfigXml.getInstance().getContent(filename);
+        String content = (String) res[0];
+        if (content != null) {
+          content = replaceIncludes(content).replaceAll("\\$", "#HURZ#");
+          m.appendReplacement(buf, content); // Doesn't work with $ in content
+        } else {
+          m.appendReplacement(buf, "*** " + filename + " not found! ***");
+        }
+      }
+    }
+    m.appendTail(buf);
+    return buf.toString();
   }
 
   /**
@@ -108,5 +142,19 @@ public class GroovyEngine
   public String getString(final String key)
   {
     return I18nHelper.getLocalizedString(locale, key);
+  }
+
+  /**
+   * Gets i18n string.
+   * @param messageKey
+   * @param params
+   * @see I18nHelper#getLocalizedString(Locale, String)
+   */
+  public String getString(final I18nEnum i18nEnum)
+  {
+    if (i18nEnum == null) {
+      return "";
+    }
+    return I18nHelper.getLocalizedString(locale, i18nEnum.getI18nKey());
   }
 }
