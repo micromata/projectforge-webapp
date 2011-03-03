@@ -45,7 +45,7 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
 
   public ToDoEditPage(PageParameters parameters)
   {
-    super(parameters, "toDo");
+    super(parameters, "plugins.todo");
     init();
   }
 

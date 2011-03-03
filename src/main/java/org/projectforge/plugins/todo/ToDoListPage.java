@@ -97,8 +97,8 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
     });
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(getString("modified"), getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.title")), getSortable("title",
-        sortable), "title", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.subject")), getSortable("subject",
+        sortable), "subject", cellItemListener));
     columns.add(new UserPropertyColumn<ToDoDO>(getString("plugins.todo.assignee"), getSortable("assignee.fullname", sortable), "assignee",
         cellItemListener).withUserFormatter(userFormatter));
     columns.add(new UserPropertyColumn<ToDoDO>(getString("plugins.todo.reporter"), getSortable("assignee.reporter", sortable), "reporter",

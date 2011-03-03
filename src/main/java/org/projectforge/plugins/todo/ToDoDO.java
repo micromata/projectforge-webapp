@@ -60,7 +60,7 @@ public class ToDoDO extends DefaultBaseDO
   private static final long serialVersionUID = 4864250842083720210L;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String title;
+  private String subject;
 
   @IndexedEmbedded
   private PFUserDO reporter;
@@ -95,18 +95,18 @@ public class ToDoDO extends DefaultBaseDO
   private Date resubmission;
 
   @Column(length = Constants.LENGTH_TITLE)
-  public String getTitle()
+  public String getSubject()
   {
-    return title;
+    return subject;
   }
 
   /**
    * @param title
    * @return this for chaining.
    */
-  public ToDoDO setTitle(String title)
+  public ToDoDO setSubject(String subject)
   {
-    this.title = title;
+    this.subject = subject;
     return this;
   }
 

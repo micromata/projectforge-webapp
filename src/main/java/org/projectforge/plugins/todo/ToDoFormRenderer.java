@@ -34,6 +34,7 @@ import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.hibernate.Hibernate;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Priority;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
@@ -80,7 +81,8 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
   @Override
   public void add()
   {
-    doPanel.addTextField(new PanelContext(data, "title", valueLength, getString("plugins.todo.title"), labelLength).setRequired()
+    doPanel.newFieldSetPanel(getString("plugins.todo.todo"));
+    doPanel.addTextField(new PanelContext(data, "subject", valueLength, getString("plugins.todo.subject"), labelLength).setRequired()
         .setStrong());
     {
       final LabelValueChoiceRenderer<ToDoType> typeChoiceRenderer = new LabelValueChoiceRenderer<ToDoType>(container, ToDoType.values());
@@ -144,8 +146,9 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
     doPanel.addTextArea(new PanelContext(data, "description", valueLength, getString("description"), labelLength)
         .setCssStyle("height: 10em;"));
     doPanel.addTextArea(new PanelContext(data, "comment", valueLength, getString("comment"), labelLength).setCssStyle("height: 10em;"));
-    doPanel.addCheckBox(new PanelContext(this, "sendNotification", valueLength, getString("label.sendEMailNotification"), labelLength));
-
+    if (ConfigXml.getInstance().isSendMailConfigured() == true) {
+      doPanel.addCheckBox(new PanelContext(this, "sendNotification", valueLength, getString("label.sendEMailNotification"), labelLength));
+    }
     // @Field(index = Index.UN_TOKENIZED)
     // @DateBridge(resolution = Resolution.DAY)
     // private Date resubmission;
