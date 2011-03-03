@@ -531,7 +531,7 @@ public class AuftragDao extends BaseDao<AuftragDO>
     }
     msg.setProjectForgeSubject(subject);
     data.put("subject", subject);
-    final String content = sendMail.renderJelly(msg, "mail/auftragNotification.html", data, contactPerson.getLocale());
+    final String content = sendMail.renderGroovyTemplate(msg, "mail/orderChangeNotification.html", data, contactPerson);
     msg.setContent(content);
     msg.setContentType(Mail.CONTENTTYPE_HTML);
     return sendMail.send(msg);
