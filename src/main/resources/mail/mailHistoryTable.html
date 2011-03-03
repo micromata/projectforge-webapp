@@ -1,0 +1,24 @@
+<h1><%= pf.getString("label.historyOfChanges") %></h1>
+<table class="history">
+  <tr>
+    <th><%= pf.getString("timestamp") %></th>
+    <th><%= pf.getString("user") %></th>
+    <th><%= pf.getString("history.entryType") %></th>
+    <th><%= pf.getString("history.propertyName") %></th>
+    <th><%= pf.getString("history.newValue") %></th>
+    <th><%= pf.getString("history.oldValue") %></th>
+  </tr>
+  <%
+    int row = 0; 
+    for (entry in history) {
+      String style = (row++ % 2 == 0) ? "even" : "odd"; %>
+    <tr class="${style}">
+      <td>${entry[0]}</td>
+      <td>${entry[1]}</td>
+      <td>${entry[2]}</td>
+      <td>${entry[3]}</td>
+      <td>${entry[4]}</td>
+      <td>${entry[5]}</td>
+    </tr>
+    <% } %>
+</table>
