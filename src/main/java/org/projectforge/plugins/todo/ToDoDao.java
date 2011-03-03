@@ -74,7 +74,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
   private DataSource dataSource;
 
   private UserDao userDao;
-  
+
   private SendMail sendMail;
 
   private TaskTree taskTree;
@@ -124,7 +124,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
     queryFilter.addOrder(Order.desc("created"));
     return getList(queryFilter);
   }
-  
+
   /**
    * Sends an e-mail to the projekt manager if exists and is not equals to the logged in user.
    * @param todo
@@ -147,22 +147,22 @@ public class ToDoDao extends BaseDao<ToDoDO>
     final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.instance();
     final Map<String, Object> data = new HashMap<String, Object>();
     data.put("todo", todo);
-//    data.put("angebotsDatum", dateTimeFormatter.getFormattedDate(todo.getAngebotsDatum()));
-//    data.put("bindungsFrist", dateTimeFormatter.getFormattedDate(todo.getBindungsFrist()));
-//    data.put("beauftragungsDatum", dateTimeFormatter.getFormattedDate(todo.getBeauftragungsDatum()));
-//    data.put("bemerkung", sendMail.formatHtml(todo.getBemerkung()));
-//    data.put("statusBeschreibung", sendMail.formatHtml(todo.getStatusBeschreibung()));
-//    data.put("requestUrl", requestUrl);
-//    final List<Map<String, Object>> positions = new ArrayList<Map<String, Object>>();
-//    data.put("positionen", positions);
-//    if (CollectionUtils.isNotEmpty(todo.getPositionen()) == true) {
-//      for (final AuftragsPositionDO pos : todo.getPositionen()) {
-//        final Map<String, Object> map = new HashMap<String, Object>();
-//        positions.add(map);
-//        map.put("position", pos);
-//        map.put("nettoSumme", CurrencyFormatter.format(todo.getNettoSumme()));
-//      }
-//    }
+    // data.put("angebotsDatum", dateTimeFormatter.getFormattedDate(todo.getAngebotsDatum()));
+    // data.put("bindungsFrist", dateTimeFormatter.getFormattedDate(todo.getBindungsFrist()));
+    // data.put("beauftragungsDatum", dateTimeFormatter.getFormattedDate(todo.getBeauftragungsDatum()));
+    // data.put("bemerkung", sendMail.formatHtml(todo.getBemerkung()));
+    // data.put("statusBeschreibung", sendMail.formatHtml(todo.getStatusBeschreibung()));
+    data.put("requestUrl", requestUrl);
+    // final List<Map<String, Object>> positions = new ArrayList<Map<String, Object>>();
+    // data.put("positionen", positions);
+    // if (CollectionUtils.isNotEmpty(todo.getPositionen()) == true) {
+    // for (final AuftragsPositionDO pos : todo.getPositionen()) {
+    // final Map<String, Object> map = new HashMap<String, Object>();
+    // positions.add(map);
+    // map.put("position", pos);
+    // map.put("nettoSumme", CurrencyFormatter.format(todo.getNettoSumme()));
+    // }
+    // }
     final List<DisplayHistoryEntry> history = getDisplayHistoryEntries(todo);
     final List<Object[]> list = new ArrayList<Object[]>();
     int i = 0;
@@ -183,22 +183,20 @@ public class ToDoDao extends BaseDao<ToDoDO>
     final Mail msg = new Mail();
     msg.setTo(assignee);
     final String subject;
-//    if (operationType == OperationType.INSERT) {
-//      subject = "Auftrag #" + todo.getNummer() + " wurde angelegt.";
-//    } else if (operationType == OperationType.DELETE) {
-//      subject = "Auftrag #" + todo.getNummer() + " wurde gelöscht.";
-//    } else {
-//      subject = "Auftrag #" + todo.getNummer() + " wurde geändert.";
-//    }
-//    msg.setProjectForgeSubject(subject);
-//    data.put("subject", subject);
+    // if (operationType == OperationType.INSERT) {
+    // subject = "Auftrag #" + todo.getNummer() + " wurde angelegt.";
+    // } else if (operationType == OperationType.DELETE) {
+    // subject = "Auftrag #" + todo.getNummer() + " wurde gelöscht.";
+    // } else {
+    // subject = "Auftrag #" + todo.getNummer() + " wurde geändert.";
+    // }
+    // msg.setProjectForgeSubject(subject);
+    // data.put("subject", subject);
     final String content = sendMail.renderJelly(msg, "mail/toDoNotification.html", data, assignee.getLocale());
     msg.setContent(content);
     msg.setContentType(Mail.CONTENTTYPE_HTML);
     return sendMail.send(msg);
   }
-
-
 
   @Override
   protected void afterSaveOrModify(ToDoDO obj)
@@ -217,7 +215,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
     final PFUserDO user = userDao.getOrLoad(userId);
     todo.setReporter(user);
   }
-  
+
   public void setSendMail(final SendMail sendMail)
   {
     this.sendMail = sendMail;
