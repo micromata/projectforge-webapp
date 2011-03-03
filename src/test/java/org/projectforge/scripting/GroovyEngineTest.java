@@ -24,16 +24,25 @@
 package org.projectforge.scripting;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.AppVersion;
 import org.projectforge.core.ConfigXmlTest;
+import org.projectforge.core.DisplayHistoryEntry;
+import org.projectforge.core.Priority;
+import org.projectforge.plugins.todo.ToDoDO;
+import org.projectforge.plugins.todo.ToDoType;
+import org.projectforge.user.PFUserDO;
 
 public class GroovyEngineTest
 {
+  // private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GroovyEngineTest.class);
+
   @BeforeClass
   public static void setUp()
   {
@@ -42,13 +51,27 @@ public class GroovyEngineTest
   }
 
   @Test
-  public void get()
+  public void renderTest()
   {
     final GroovyEngine engine = new GroovyEngine(Locale.GERMAN);
     engine.putVariable("name", "Kai");
 
     final String res = engine.executeTemplate("Hallo $name, your locale is '<%= pf.getString(\"locale.de\") %>'.");
     assertEquals("Hallo Kai, your locale is 'Deutsch'.", res);
-    assertEquals("Hallo Kai, your locale is 'Deutsch'. " + AppVersion.APP_ID, engine.executeTemplateFile("scripting/template.txt"));
+    assertEquals("Hallo Kai, your locale is 'Deutsch'. " + AppVersion.APP_ID + " Finished: Englisch", engine
+        .executeTemplateFile("scripting/template.txt"));
+  }
+
+  @Test
+  public void mailTemplateTest()
+  {
+    final GroovyEngine engine = new GroovyEngine(Locale.GERMAN);
+    engine.putVariable("recipient", new PFUserDO().setFirstname("Kai").setLastname("Reinhard"));
+    engine.putVariable("todo", new ToDoDO().setType(ToDoType.IMPROVEMENT).setPriority(Priority.HIGH));
+    engine.putVariable("history", new ArrayList<DisplayHistoryEntry>());
+    engine.putVariable("requestUrl", "https://localhost:8443/wa/toDoEditPage/id/42");
+    final String result = engine.executeTemplateFile("mail/todoChangeNotification.html");
+    assertTrue("I18n priorty expected.", result.contains("hoch"));
+    assertTrue("I18n key for type improvement expected.", result.contains("???plugins.todo.type.improvement???"));
   }
 }
