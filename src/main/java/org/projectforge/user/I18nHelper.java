@@ -45,9 +45,10 @@ public class I18nHelper
    * @param locale If null, then the context user's locale is assumed.
    * @return
    */
-  private static ResourceBundle getResourceBundle(final String bundleName, Locale locale)
+  private static ResourceBundle getResourceBundle(final String bundleName, final Locale locale)
   {
-    final ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleName, locale);
+    final ResourceBundle resourceBundle = locale != null ? ResourceBundle.getBundle(bundleName, locale) : ResourceBundle
+        .getBundle(bundleName);
     return resourceBundle;
   }
 
