@@ -743,6 +743,14 @@ public class ConfigXml
     return configFile.getPath();
   }
 
+  /**
+   * @return true if at least a send mail host is given, otherwise false.
+   */
+  public boolean isSendMailConfigured()
+  {
+    return sendMailConfiguration != null && StringUtils.isNotBlank(sendMailConfiguration.getHost()) == true;
+  }
+
   public SendMailConfig getSendMailConfiguration()
   {
     return sendMailConfiguration;
