@@ -23,15 +23,11 @@
 
 package org.projectforge.user;
 
-import java.text.MessageFormat;
 import java.util.Locale;
-import java.util.ResourceBundle;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.projectforge.core.Configuration;
-import org.projectforge.plugins.core.AbstractPlugin;
-import org.projectforge.plugins.core.PluginsRegistry;
 
 /**
  * ThreadLocal context.
@@ -122,68 +118,14 @@ public class PFUserContext
     return getUser() != null ? getUser().getTimeZoneObject() : Configuration.getInstance().getDefaultTimeZone();
   }
 
-  /**
-   * Gets the logged in user's resource bundle (getting the locale from the context user).
-   */
-  private static ResourceBundle getResourceBundle(final String bundleName)
-  {
-    return getResourceBundle(bundleName, getLocale());
-  }
-
-  /**
-   * Use-ful for using the locale of another user (e. g. the receiver of an e-mail).
-   * @param locale If null, then the context user's locale is assumed.
-   * @return
-   */
-  private static ResourceBundle getResourceBundle(final String bundleName, Locale locale)
-  {
-    if (locale == null) {
-      locale = getLocale();
-    }
-    final ResourceBundle resourceBundle = ResourceBundle.getBundle(bundleName, locale);
-    return resourceBundle;
-  }
 
   public static String getLocalizedMessage(String messageKey, Object... params)
   {
-    if (params == null) {
-      return getLocalizedString(messageKey);
-    }
-    return MessageFormat.format(getLocalizedString(messageKey), params);
-  }
-
-  private static String getString(final String bundleName, final String key)
-  {
-    try {
-      final ResourceBundle bundle = getResourceBundle(bundleName);
-      if (bundle.containsKey(key) == true) {
-        return bundle.getString(key);
-      }
-    } catch (final Exception ex) {
-      log.warn("Resource key '" + key + "' not found for locale '" + PFUserContext.getLocale() + "'");
-    }
-    return null;
+    return I18nHelper.getLocalizedMessage(getLocale(), messageKey, params);
   }
 
   public static String getLocalizedString(final String key)
   {
-    try {
-      String translation = getString(BUNDLE_NAME, key);
-      if (translation != null) {
-        return translation;
-      }
-      for (final AbstractPlugin plugin : PluginsRegistry.instance().getPlugins()) {
-        if (plugin.getResourceBundleName() == null) {
-          continue;
-        }
-        translation = getString(plugin.getResourceBundleName(), key);
-        if (translation != null) {
-          return translation;
-        }
-      }
-    } catch (Exception ex) { // MissingResourceException or NullpointerException
-      log.warn("Resource key '" + key + "' not found for locale '" + PFUserContext.getLocale() + "'");
-    }
-    return "???" + key + "???";
+    return I18nHelper.getLocalizedString(getLocale(), key);
   }
 }
