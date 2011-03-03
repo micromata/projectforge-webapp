@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -426,7 +427,7 @@ public class ConfigXml
   public Object[] getInputStream(String filename)
   {
     InputStream is = null;
-    String url = null;
+    String path = null;
     final File base = new File(getResourcePath());
     if (base.isDirectory() == true) {
       final File file = new File(base, filename);
@@ -435,8 +436,8 @@ public class ConfigXml
       } else {
         try {
           is = new FileInputStream(file);
-          url = file.toURI().toString();
-        } catch (FileNotFoundException ex) {
+          path = file.toURI().toString();
+        } catch (final FileNotFoundException ex) {
           log.error(file.getAbsoluteFile() + ": " + ex.getMessage(), ex); // Should not occur.
           is = null;
         }
@@ -445,7 +446,10 @@ public class ConfigXml
     }
     if (is == null) {
       final ClassLoader cLoader = ConfigXml.class.getClassLoader();
-      url = ConfigXml.class.getClassLoader().getResource(filename).toExternalForm();
+      final URL url = ConfigXml.class.getClassLoader().getResource(filename);
+      if (url != null) {
+        path = url.toExternalForm();
+      }
       is = cLoader.getResourceAsStream(filename);
     }
     if (is == null) {
@@ -453,7 +457,7 @@ public class ConfigXml
     }
     final Object[] result = new Object[2];
     result[0] = is;
-    result[1] = url;
+    result[1] = path;
     return result;
   }
 
@@ -468,10 +472,12 @@ public class ConfigXml
   {
     final Object[] result = getInputStream(filename);
     final InputStream is = (InputStream) result[0];
-    try {
-      result[0] = IOUtils.toString(is, "UTF-8");
-    } catch (IOException ex) {
-      log.error(ex.getMessage(), ex);
+    if (is != null) {
+      try {
+        result[0] = IOUtils.toString(is, "UTF-8");
+      } catch (IOException ex) {
+        log.error(ex.getMessage(), ex);
+      }
     }
     return result;
   }
