@@ -41,12 +41,11 @@ import org.apache.commons.lang.StringUtils;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.InternalErrorException;
 import org.projectforge.core.UserException;
-import org.projectforge.scripting.GroovyExecutor;
+import org.projectforge.scripting.GroovyEngine;
 import org.projectforge.scripting.JellyExecutor;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.HtmlHelper;
-
 
 /**
  * Helper class for creating and transporting E-Mails. Groovy script is use-able for e-mail template mechanism.
@@ -63,10 +62,7 @@ public class SendMail
 
   private ConfigXml configXml;
 
-  private GroovyExecutor groovyExecutor;
-
   private Properties properties;
-
 
   /**
    * Get the ProjectForge standard subject: "[ProjectForge] ..."
@@ -170,16 +166,24 @@ public class SendMail
     return JellyExecutor.runJelly(jellyXmlInputStream, data);
   }
 
-  public String renderGroovyTemplate(final Mail composedMessage, final String groovyTemplate, final Map<String, Object> data, final Locale locale)
+  /**
+   * @param composedMessage
+   * @param groovyTemplate
+   * @param data
+   * @param locale
+   * @see GroovyEngine#executeTemplateFile(String)
+   */
+  public String renderGroovyTemplate(final Mail composedMessage, final String groovyTemplate, final Map<String, Object> data,
+      final PFUserDO recipient)
   {
     final PFUserDO user = PFUserContext.getUser();
     data.put("createdLabel", PFUserContext.getLocalizedString("created"));
     data.put("loggedInUser", user);
+    data.put("recipient", recipient);
     data.put("msg", composedMessage);
     log.debug("groovyTemplate=" + groovyTemplate);
-    final Object[] content = configXml.getContent(groovyTemplate);
-    final String groovyScriptAsString = (String) content[0];
-    final String result = groovyExecutor.executeTemplate(groovyScriptAsString, data);
+    final GroovyEngine engine = new GroovyEngine(data, recipient.getLocale());
+    final String result = engine.executeTemplateFile(groovyTemplate);
     return result;
   }
 
@@ -197,10 +201,5 @@ public class SendMail
   {
     this.configXml = configXml;
     this.sendMailConfig = configXml.getSendMailConfiguration();
-  }
-
-  public void setGroovyExecutor(final GroovyExecutor groovyExecutor)
-  {
-    this.groovyExecutor = groovyExecutor;
   }
 }
