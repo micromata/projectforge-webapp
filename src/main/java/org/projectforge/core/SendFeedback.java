@@ -51,7 +51,7 @@ public class SendFeedback
     msg.setTo(data.getReceiver());
     msg.setProjectForgeSubject(data.getSubject());
     params.put("subject", data.getSubject());
-    String content = sendMail.renderGroovyTemplate(msg, "mail/feedback.txt", params, PFUserContext.getLocale());
+    String content = sendMail.renderGroovyTemplate(msg, "mail/feedback.txt", params, PFUserContext.getUser());
     msg.setContent(content);
     msg.setContentType(Mail.CONTENTTYPE_TEXT);
     return sendMail.send(msg);
