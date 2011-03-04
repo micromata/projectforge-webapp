@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 import org.projectforge.core.BaseDao;
+import org.projectforge.task.TaskTree;
 
 /**
  * Registry for dao's. Here you can register additional daos and plugins (extensions of ProjectForge).
@@ -47,6 +48,8 @@ public class Registry
   private Map<Class< ? extends BaseDao< ? >>, RegistryEntry> mapByClass = new HashMap<Class< ? extends BaseDao< ? >>, RegistryEntry>();
 
   private List<RegistryEntry> orderedList = new ArrayList<RegistryEntry>();
+  
+  private TaskTree taskTree;
 
   public static Registry instance()
   {
@@ -117,6 +120,16 @@ public class Registry
   {
     final RegistryEntry entry = getEntry(daoClass);
     return entry != null ? entry.getDao() : null;
+  }
+  
+  public void setTaskTree(final TaskTree taskTree)
+  {
+    this.taskTree = taskTree;
+  }
+  
+  public TaskTree getTaskTree()
+  {
+    return taskTree;
   }
 
   private Registry()
