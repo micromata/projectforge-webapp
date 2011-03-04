@@ -25,10 +25,10 @@ package org.projectforge.core;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import org.projectforge.common.NumberHelper;
 import org.projectforge.user.PFUserContext;
-
 
 public class NumberFormatter
 {
@@ -65,15 +65,38 @@ public class NumberFormatter
   }
 
   /**
+   * Uses the scale of the BigDecimal.
+   * @param value
+   * @param locale
+   */
+  public static String format(final BigDecimal value, final Locale locale)
+  {
+    if (value == null) {
+      return "";
+    }
+    return format(value, value.scale(), locale);
+  }
+
+  /**
    * Uses the scale of the BigDecimal. Uses the PFUserContext locale.
    * @param value
    */
   public static String format(final BigDecimal value, final int scale)
   {
+    return format(value, scale, PFUserContext.getLocale());
+  }
+
+  /**
+   * Uses the scale of the BigDecimal
+   * @param value
+   * @param locale
+   */
+  public static String format(final BigDecimal value, final int scale, final Locale locale)
+  {
     if (value == null) {
       return "";
     }
-    final NumberFormat format = NumberFormat.getNumberInstance(PFUserContext.getLocale());
+    final NumberFormat format = NumberFormat.getNumberInstance(locale);
     format.setMaximumFractionDigits(scale);
     format.setMinimumFractionDigits(scale);
     return format.format(value);
