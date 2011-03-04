@@ -79,9 +79,9 @@ public class SendMail
    * @throws UserException if to address is not given.
    * @throws InternalErrorException due to technical failures.
    */
-  public boolean send(Mail composedMessage)
+  public boolean send(final Mail composedMessage)
   {
-    String to = composedMessage.getTo();
+    final String to = composedMessage.getTo();
     if (to == null || to.trim().length() == 0) {
       log.error("No to address given. Sending of mail cancelled: " + composedMessage.toString());
       throw new UserException("mail.error.missingToAddress");
@@ -105,8 +105,18 @@ public class SendMail
         properties.put("mail.debug", "true");
       }
     }
-    Session session = Session.getInstance(properties);
-
+    new Thread() {
+      @Override
+      public void run()
+      {
+       sendIt(composedMessage);
+      }
+    }.start();
+    return true;
+  }
+  
+  private void sendIt(final Mail composedMessage) {
+    final Session session = Session.getInstance(properties);
     Transport transport = null;
     try {
       MimeMessage message = new MimeMessage(session);
@@ -151,7 +161,6 @@ public class SendMail
       }
     }
     log.info("E-Mail successfully sent: " + composedMessage.toString());
-    return true;
   }
 
   public String renderJelly(final Mail composedMessage, final String jellyXml, final Map<String, Object> data, final Locale locale)
