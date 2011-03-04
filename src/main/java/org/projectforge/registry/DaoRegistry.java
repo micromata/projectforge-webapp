@@ -159,6 +159,7 @@ public class DaoRegistry
     register(ADDRESS, AddressDao.class, addressDao);
     register(TIMESHEET, TimesheetDao.class, timesheetDao).setSearchFilterClass(TimesheetFilter.class);
     register(TASK, TaskDao.class, taskDao);
+    Registry.instance().setTaskTree(taskDao.getTaskTree());
     register(BOOK, BookDao.class, bookDao);
     register(OUTGOING_INVOICE, RechnungDao.class, rechnungDao, "fibu.rechnung");
     register(INCOMING_INVOICE, EingangsrechnungDao.class, eingangsrechnungDao, "fibu.eingangsrechnung");
