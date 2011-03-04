@@ -15,10 +15,32 @@ ${todo.subject}:
   <tr>
     <th><%= pf.getString("plugins.todo.type") %></th>
     <td><%= pf.getString(todo.type) %></td>
-  </tr>
-  <tr>
     <th><%= pf.getString("priority") %></th>
     <td><%= pf.getString(todo.priority) %></td>
+  </tr>
+  <tr>
+    <th><%= pf.getString("plugins.todo.status") %></th>
+    <td><%= pf.getString(todo.status) %></td>
+    <th><%= pf.getString("dueDate") %></th>
+    <td><%= pf.getString(todo.dueDate) %></td>
+  </tr>
+  <tr>
+    <th><%= pf.getString("plugins.todo.assignee") %></th>
+    <td><%= pf.getString(todo.assignee) %></td>
+    <th><%= pf.getString("plugins.todo.reporter") %></th>
+    <td><%= pf.getString(todo.reporter) %></td>
+  </tr>
+  <tr>
+    <th><%= pf.getString("task") %></th>
+    <td colspan="3"><%= pf.getString(todo.task) %></td>
+  </tr>
+  <tr>
+    <th><%= pf.getString("description") %></th>
+    <td colspan="3"><%= pf.getString(todo.description) %></td>
+  </tr>
+  <tr>
+    <th><%= pf.getString("comment") %></th>
+    <td colspan="3"><%= pf.getString(todo.comment) %></td>
   </tr>
 </table>
 

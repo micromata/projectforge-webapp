@@ -3,53 +3,54 @@
 <body>
 #INCLUDE{mail/mailOpening.html}
 <br />
-der Auftrag #${auftrag.nummer} wurde ge&amp;auml;ndert bzw. angelegt.
+<%= pf.getMessage("fibu.auftrag.mail.intro", pf.getString(auftrag.nummer)) %>:
 <br />
 <a href="${requestUrl}">${requestUrl}</a>
 <br />
+<br />
 <table class="form">
   <tr>
-    <th>Nummer</th>
+    <th><%= pf.getString("fibu.auftrag.nummer") %></th>
     <td>${auftrag.nummer}</td>
-    <th>Referenz</th>
+    <th><%= pf.getString("fibu.common.reference") %></th>
     <td colspan="3">${auftrag.referenz}</td>
   </tr>
   <tr>
-    <th>Nettosumme</th>
+    <th><%= pf.getString("fibu.auftrag.nettoSumme") %></th>
     <td style="white-space: nowrap;">${nettoSumme}</td>
-    <th>Status</th>
+    <th><%= pf.getString("status") %></th>
     <td colspan="3">${auftragsStatus}</td>
   </tr>
   <tr>
-    <th>Titel</th>
+    <th><%= pf.getString("fibu.auftrag.titel") %></th>
     <td colspan="5">${auftrag.titel}</td>
   </tr>
   <tr>
-    <th>Projekt</th>
+    <th><%= pf.getString("fibu.projekt") %></th>
     <td colspan="5">${projekt}</td>
   </tr>
   <tr>
-    <th>Kunde</th>
+    <th><%= pf.getString("fibu.kunde") %></th>
     <td colspan="5">${kunde}</td>
   </tr>
   <tr>
-    <th>Angebotsdatum</th>
+    <th><%= pf.getString("fibu.auftrag.datum") %></th>
     <td>${angebotsDatum}</td>
-    <th>Bindungsfrist</th>
+    <th><%= pf.getString("fibu.auftrag.bindungsFrist") %></th>
     <td>${bindungsFrist}</td>
-    <th>Beauftragungsdatum</th>
+    <th><%= pf.getString("fibu.auftrag.beauftragungsdatum") %></th>
     <td>${beauftragungsDatum}</td>
   </tr>
   <tr>
-    <th>Anprechpartner</th>
+    <th><%= pf.getString("contactPerson") %></th>
     <td colspan="5">${contactPerson.fullname}</td>
   </tr>
   <tr>
-    <th>Bemerkung</th>
+    <th><%= pf.getString("comment") %></th>
     <td colspan="5">${bemerkung}</td>
   </tr>
   <tr>
-    <th>Beschreibung Status</th>
+    <th><%= pf.getString("fibu.auftrag.statusBeschreibung") %></th>
     <td colspan="5">${statusBeschreibung}</td>
   </tr>
   <% for (position in auftrag.positionen) { %>
@@ -57,17 +58,17 @@ der Auftrag #${auftrag.nummer} wurde ge&amp;auml;ndert bzw. angelegt.
       <th colspan="6">Position #${position.number}</th>
     </tr>
     <tr>
-      <th>Titel</th>
+      <th><%= pf.getString("title") %></th>
       <td>${position.titel}</td>
-      <th>Art</th>
+      <th><%= pf.getString("fibu.auftrag.position.art") %></th>
       <td>${position.art}</td>
-      <th>Status</th>
+      <th><%= pf.getString("status") %></th>
       <td>${position.status}</td>
     </tr>
     <tr>
-      <th>Nettosumme</th>
+      <th><%= pf.getString("fibu.auftrag.nettoSumme") %></th>
       <td style="white-space: nowrap;">${nettoSumme}</td>
-      <th>Bemerkung</th>
+      <th><%= pf.getString("comment") %></th>
       <td colspan="3">${position.bemerkung}</td>
     </tr>
     <% } %>
