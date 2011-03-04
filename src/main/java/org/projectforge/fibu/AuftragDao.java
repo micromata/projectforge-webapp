@@ -44,6 +44,7 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.MessageParam;
@@ -468,6 +469,9 @@ public class AuftragDao extends BaseDao<AuftragDO>
    */
   public boolean sendNotificationIfRequired(AuftragDO auftrag, OperationType operationType, String requestUrl)
   {
+    if (ConfigXml.getInstance().isSendMailConfigured() == false) {
+      return false;
+    }
     final PFUserDO contactPerson = auftrag.getContactPerson();
     if (contactPerson == null) {
       return false;
