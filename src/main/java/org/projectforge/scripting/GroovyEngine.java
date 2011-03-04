@@ -23,6 +23,7 @@
 
 package org.projectforge.scripting;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -30,8 +31,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.projectforge.core.ConfigXml;
+import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.I18nEnum;
+import org.projectforge.core.NumberFormatter;
+import org.projectforge.task.TaskDO;
 import org.projectforge.user.I18nHelper;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.web.common.OutputType;
+import org.projectforge.web.task.TaskFormatter;
 
 public class GroovyEngine
 {
@@ -48,7 +55,11 @@ public class GroovyEngine
 
   public GroovyEngine(final Map<String, Object> variables, final Locale locale)
   {
-    this.locale = locale;
+    if (locale != null) {
+      this.locale = locale;
+    } else {
+      this.locale = ConfigXml.getInstance().getDefaultLocale();
+    }
     this.variables = variables;
     this.variables.put("pf", this);
     this.groovyExecutor = new GroovyExecutor();
@@ -146,9 +157,9 @@ public class GroovyEngine
 
   /**
    * Gets i18n string.
-   * @param messageKey
-   * @param params
+   * @param i18nEnum
    * @see I18nHelper#getLocalizedString(Locale, String)
+   * @see I18nEnum#getI18nKey()
    */
   public String getString(final I18nEnum i18nEnum)
   {
@@ -156,5 +167,53 @@ public class GroovyEngine
       return "";
     }
     return I18nHelper.getLocalizedString(locale, i18nEnum.getI18nKey());
+  }
+
+  /**
+   * Gets the user's name (full name).
+   * @param user
+   * @see PFUserDO#getFullname()
+   */
+  public String getString(final PFUserDO user)
+  {
+    if (user == null) {
+      return "";
+    }
+    return user.getFullname();
+  }
+
+  /**
+   * Gets the user's name (full name).
+   * @param user
+   * @see PFUserDO#getFullname()
+   */
+  public String getString(final TaskDO task)
+  {
+    if (task == null) {
+      return "";
+    }
+    final TaskFormatter taskFormatter = TaskFormatter.instance();
+    if (taskFormatter != null) {
+      return taskFormatter.getTaskPath(task.getId(), true, OutputType.PLAIN);
+    } else {
+      // Only for test-cases (if task tree is not initialized)
+      return task.getTitle();
+    }
+  }
+
+  public String getCurrency(final BigDecimal value)
+  {
+    if (value == null) {
+      return "";
+    }
+    return CurrencyFormatter.format(value, locale);
+  }
+
+  public String getString(final BigDecimal value)
+  {
+    if (value == null) {
+      return "";
+    }
+    return NumberFormatter.format(value, locale);
   }
 }
