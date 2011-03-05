@@ -50,7 +50,7 @@ import org.projectforge.web.MenuItemDefId;
 import org.projectforge.web.wicket.WebConstants;
 
 /**
- * Tries to get all used i18n keys from the sources (java, html and jsp). As result a file is written which will be checked by
+ * Tries to get all used i18n keys from the sources (java and html). As result a file is written which will be checked by
  * AdminAction.checkI18nProperties. Unused i18n keys should be detected.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
@@ -85,9 +85,9 @@ public class GetI18nKeysTest
     log.info("Create file with all detected i18n keys.");
     final Map<String, Set<String>> i18nKeyUsage = new HashMap<String, Set<String>>();
     parseHtml(i18nKeyUsage);
-    parseJsp(i18nKeyUsage);
     parseJava(i18nKeyUsage);
     final FileWriter writer = new FileWriter(I18N_KEYS_FILE);
+    writer.append("# Don't edit this file. This file is only for developers for checking i18n keys and detecting missed and unused ones.\n");
     final Set<String> i18nKeys = new TreeSet<String>(i18nKeyUsage.keySet());
     for (final String i18nKey : i18nKeys) {
       writer.append(i18nKey).append("=");
@@ -113,17 +113,6 @@ public class GetI18nKeysTest
     for (final File file : files) {
       final String content = getContent(file);
       find(file, i18nKeyUsage, content, "<wicket:message\\s+key=\"([a-zA-Z0-9\\.]+)\"\\s/>");
-    }
-  }
-
-  private void parseJsp(final Map<String, Set<String>> i18nKeyUsage) throws IOException
-  {
-    final Collection<File> files = listFiles(PATH + "webapp", "jsp");
-    for (final File file : files) {
-      final String content = getContent(file);
-      find(file, i18nKeyUsage, content, "key=\"([a-zA-Z0-9_\\.]+)\"");
-      find(file, i18nKeyUsage, content, "tooltip=\"([a-zA-Z0-9\\.]+)\"");
-      find(file, i18nKeyUsage, content, "<stripes:submit[\\s=\"a-zA-Z0-9_\\.]+name=\"([a-zA-Z0-9\\.]+)\"");
     }
   }
 
