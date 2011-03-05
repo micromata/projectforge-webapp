@@ -42,6 +42,8 @@ import org.projectforge.web.task.TaskFormatter;
 
 public class GroovyEngine
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GroovyEngine.class);
+
   private Locale locale;
 
   private GroovyExecutor groovyExecutor;
@@ -130,6 +132,10 @@ public class GroovyEngine
   {
     final Object[] res = ConfigXml.getInstance().getContent(file);
     final String template = (String) res[0];
+    if (template == null) {
+      log.error("Template with filename '" + file + "' not found (whether in resource path nor in ProjectForge's application dir.");
+      return "";
+    }
     return executeTemplate(template);
   }
 
