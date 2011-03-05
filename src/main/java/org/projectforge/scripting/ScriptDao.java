@@ -38,6 +38,7 @@ import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.task.ScriptingTaskTree;
 import org.projectforge.task.TaskTree;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 
 /**
@@ -75,9 +76,9 @@ public class ScriptDao extends BaseDao<ScriptDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(ScriptDO obj, ScriptDO oldObj, OperationType operationType, boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final ScriptDO obj, final ScriptDO oldObj, final OperationType operationType, final boolean throwException)
   {
-    return accessChecker.isUserMemberOfGroup(throwException, ProjectForgeGroup.CONTROLLING_GROUP, ProjectForgeGroup.FINANCE_GROUP);
+    return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.CONTROLLING_GROUP, ProjectForgeGroup.FINANCE_GROUP);
   }
 
   @Override
@@ -88,7 +89,7 @@ public class ScriptDao extends BaseDao<ScriptDO>
 
   public GroovyResult execute(final ScriptDO script, List<ScriptParameter> parameters)
   {
-    hasSelectAccess(script, true);
+    hasLoggedInUserSelectAccess(script, true);
     ReportGeneratorList reportGeneratorList = new ReportGeneratorList();
     final Map<String, Object> scriptVariables = new HashMap<String, Object>();
 
