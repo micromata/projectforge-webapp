@@ -59,13 +59,16 @@ public class BeanHelper
     return method.getName();
   }
 
-  public static Method determineGetter(Class< ? > clazz, String fieldname)
+  public static Method determineGetter(final Class< ? > clazz, final String fieldname)
   {
-    String cap = StringUtils.capitalize(fieldname);
-    Method[] methods = clazz.getMethods();
-    for (Method method : methods) {
+    final String cap = StringUtils.capitalize(fieldname);
+    final Method[] methods = clazz.getMethods();
+    for (final Method method : methods) {
       if (("get" + cap).equals(method.getName()) == true || ("is" + cap).equals(method.getName()) == true) {
-        return method;
+        if (method.isBridge() == false) {
+          // Don't return bridged methods (methods defined in interface or super class with different return type).
+          return method;
+        }
       }
     }
     return null;
