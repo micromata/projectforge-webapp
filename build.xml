@@ -125,6 +125,7 @@
         <include name="src/main/webapp/**/*.svg" />
         <include name="src/main/webapp/**/*.tld" />
         <include name="src/main/webapp/**/*.ttf" />
+        <include name="src/test/resources/scripting/*.txt" />
         <include name="version.xml" />
         <include name="pom-public.xml"/>
       	<exclude name="src/**/ModifyJavaFileHeadersTest.java" />
