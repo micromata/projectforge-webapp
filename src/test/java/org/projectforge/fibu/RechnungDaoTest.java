@@ -147,16 +147,16 @@ public class RechnungDaoTest extends TestBase
 
   private void checkNoHistoryAccess(Serializable id, RechnungDO rechnung, String who)
   {
-    assertEquals(who + " users should not have select access to history of invoices.", rechnungDao.hasHistoryAccess(false), false);
+    assertEquals(who + " users should not have select access to history of invoices.", rechnungDao.hasLoggedInUserHistoryAccess(false), false);
     try {
-      rechnungDao.hasHistoryAccess(true);
+      rechnungDao.hasLoggedInUserHistoryAccess(true);
       fail("AccessException expected: " + who + " users should not have select access to history of invoices.");
     } catch (AccessException ex) {
       // OK
     }
-    assertEquals(who + " users should not have select access to history of invoices.", rechnungDao.hasHistoryAccess(rechnung, false), false);
+    assertEquals(who + " users should not have select access to history of invoices.", rechnungDao.hasLoggedInUserHistoryAccess(rechnung, false), false);
     try {
-      rechnungDao.hasHistoryAccess(rechnung, true);
+      rechnungDao.hasLoggedInUserHistoryAccess(rechnung, true);
       fail("AccessException expected: " + who + " users should not have select access to history of invoices.");
     } catch (AccessException ex) {
       // OK

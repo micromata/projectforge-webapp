@@ -65,18 +65,20 @@ public class UserRightTest extends TestBase
     Set<UserRightDO> rights = user.getRights();
     assertEquals("3 rights added to user", 3, rights.size());
     logon(user.getUsername());
-    assertFalse("User not in required groups.", accessChecker.hasRight(UserRightId.FIBU_AUSGANGSRECHNUNGEN, false, UserRightValue.TRUE));
-    assertFalse("User not in required groups.", accessChecker.hasRight(UserRightId.FIBU_EINGANGSRECHNUNGEN, false, UserRightValue.READONLY));
+    assertFalse("User not in required groups.", accessChecker.hasLoggedInUserRight(UserRightId.FIBU_AUSGANGSRECHNUNGEN, false,
+        UserRightValue.TRUE));
+    assertFalse("User not in required groups.", accessChecker.hasLoggedInUserRight(UserRightId.FIBU_EINGANGSRECHNUNGEN, false,
+        UserRightValue.READONLY));
     try {
-      accessChecker.hasRight(UserRightId.FIBU_EINGANGSRECHNUNGEN, true, UserRightValue.READONLY);
+      accessChecker.hasLoggedInUserRight(UserRightId.FIBU_EINGANGSRECHNUNGEN, true, UserRightValue.READONLY);
       fail("AccessException required.");
     } catch (final AccessException ex) {
       // OK
     }
-    assertFalse("Right valid but not available (user is not in fibu group).", accessChecker.hasRight(UserRightId.FIBU_DATEV_IMPORT, false,
-        UserRightValue.FALSE));
-    assertFalse("Right valid but not available (user is not in fibu group).", accessChecker.hasRight(UserRightId.FIBU_DATEV_IMPORT, false,
-        UserRightValue.TRUE));
+    assertFalse("Right valid but not available (user is not in fibu group).", accessChecker.hasLoggedInUserRight(
+        UserRightId.FIBU_DATEV_IMPORT, false, UserRightValue.FALSE));
+    assertFalse("Right valid but not available (user is not in fibu group).", accessChecker.hasLoggedInUserRight(
+        UserRightId.FIBU_DATEV_IMPORT, false, UserRightValue.TRUE));
     logon(TEST_ADMIN_USER);
     final GroupDO group = getGroup(ProjectForgeGroup.FINANCE_GROUP.toString());
     group.getAssignedUsers().add(user);
@@ -85,13 +87,13 @@ public class UserRightTest extends TestBase
     user = userDao.getById(user.getId());
     rights = user.getRights();
     assertEquals("3 rights added to user", 3, rights.size());
-    assertTrue("Invalid setting but value matches.", accessChecker
-        .hasRight(UserRightId.FIBU_AUSGANGSRECHNUNGEN, false, UserRightValue.TRUE));
-    assertTrue("Right matches.", accessChecker.hasRight(UserRightId.FIBU_EINGANGSRECHNUNGEN, false, UserRightValue.READONLY));
-    assertTrue("Right valid.", accessChecker.hasRight(UserRightId.FIBU_DATEV_IMPORT, false, UserRightValue.FALSE));
-    assertFalse("Right valid.", accessChecker.hasRight(UserRightId.FIBU_DATEV_IMPORT, false, UserRightValue.TRUE));
+    assertTrue("Invalid setting but value matches.", accessChecker.hasLoggedInUserRight(UserRightId.FIBU_AUSGANGSRECHNUNGEN, false,
+        UserRightValue.TRUE));
+    assertTrue("Right matches.", accessChecker.hasLoggedInUserRight(UserRightId.FIBU_EINGANGSRECHNUNGEN, false, UserRightValue.READONLY));
+    assertTrue("Right valid.", accessChecker.hasLoggedInUserRight(UserRightId.FIBU_DATEV_IMPORT, false, UserRightValue.FALSE));
+    assertFalse("Right valid.", accessChecker.hasLoggedInUserRight(UserRightId.FIBU_DATEV_IMPORT, false, UserRightValue.TRUE));
     try {
-      accessChecker.hasRight(UserRightId.FIBU_DATEV_IMPORT, true, UserRightValue.TRUE);
+      accessChecker.hasLoggedInUserRight(UserRightId.FIBU_DATEV_IMPORT, true, UserRightValue.TRUE);
       fail("AccessException required.");
     } catch (final AccessException ex) {
       // OK
@@ -117,21 +119,23 @@ public class UserRightTest extends TestBase
     user = userDao.getById(user.getId());
     Set<UserRightDO> rights = user.getRights();
     assertEquals("4 rights added to user", 4, rights.size());
-    assertTrue("Right matches.", accessChecker.hasRight(UserRightId.FIBU_AUSGANGSRECHNUNGEN, false, UserRightValue.READONLY));
-    assertFalse("Right matches but not available.", accessChecker.hasRight(UserRightId.FIBU_EINGANGSRECHNUNGEN, false,
+    assertTrue("Right matches.", accessChecker.hasLoggedInUserRight(UserRightId.FIBU_AUSGANGSRECHNUNGEN, false, UserRightValue.READONLY));
+    assertFalse("Right matches but not available.", accessChecker.hasLoggedInUserRight(UserRightId.FIBU_EINGANGSRECHNUNGEN, false,
         UserRightValue.READWRITE));
-    assertTrue("Right valid.", accessChecker.hasRight(UserRightId.FIBU_DATEV_IMPORT, false, UserRightValue.TRUE));
-    assertFalse("Right valid.", accessChecker.hasRight(UserRightId.FIBU_DATEV_IMPORT, false, UserRightValue.FALSE));
+    assertTrue("Right valid.", accessChecker.hasLoggedInUserRight(UserRightId.FIBU_DATEV_IMPORT, false, UserRightValue.TRUE));
+    assertFalse("Right valid.", accessChecker.hasLoggedInUserRight(UserRightId.FIBU_DATEV_IMPORT, false, UserRightValue.FALSE));
     try {
-      accessChecker.hasRight(UserRightId.FIBU_EINGANGSRECHNUNGEN, true, UserRightValue.READWRITE);
+      accessChecker.hasLoggedInUserRight(UserRightId.FIBU_EINGANGSRECHNUNGEN, true, UserRightValue.READWRITE);
       fail("AccessException required.");
     } catch (final AccessException ex) {
       // OK
     }
-    assertTrue(accessChecker.hasReadAccess(UserRightId.FIBU_AUSGANGSRECHNUNGEN, false));
-    assertTrue(accessChecker.hasReadAccess(UserRightId.ORGA_INCOMING_MAIL, false)); // Because only one value is available and therefore set
+    assertTrue(accessChecker.hasLoggedInUserReadAccess(UserRightId.FIBU_AUSGANGSRECHNUNGEN, false));
+    assertTrue(accessChecker.hasLoggedInUserReadAccess(UserRightId.ORGA_INCOMING_MAIL, false)); // Because only one value is available and
+                                                                                                // therefore set
     // for controlling users.
-    assertFalse(accessChecker.hasReadAccess(UserRightId.ORGA_OUTGOING_MAIL, false)); // Also only one value is available but the explicit
+    assertFalse(accessChecker.hasLoggedInUserReadAccess(UserRightId.ORGA_OUTGOING_MAIL, false)); // Also only one value is available but the
+                                                                                                 // explicit
     // FALSE setting is taken.
   }
 
@@ -168,9 +172,9 @@ public class UserRightTest extends TestBase
   {
     final UserRight right = UserRights.instance().getRight(UserRightId.PM_HR_PLANNING);
     logon(TEST_PROJECT_MANAGER_USER);
-    assertTrue("Right valid.", accessChecker.hasRight(UserRightId.PM_HR_PLANNING, false, UserRightValue.READWRITE));
+    assertTrue("Right valid.", accessChecker.hasLoggedInUserRight(UserRightId.PM_HR_PLANNING, false, UserRightValue.READWRITE));
     logon(TEST_ADMIN_USER);
-    assertFalse("Right invalid.", accessChecker.hasRight(UserRightId.PM_HR_PLANNING, false, UserRightValue.READWRITE));
+    assertFalse("Right invalid.", accessChecker.hasLoggedInUserRight(UserRightId.PM_HR_PLANNING, false, UserRightValue.READWRITE));
     assertFalse("Right is not configurable, because no right values are available.", right.isConfigurable(userDao.getUserGroupCache(),
         PFUserContext.getUser()));
     PFUserDO user = new PFUserDO();
@@ -183,7 +187,7 @@ public class UserRightTest extends TestBase
     group.getAssignedUsers().add(user);
     groupDao.update(group);
     logon(user.getUsername());
-    assertFalse("Right invalid.", accessChecker.hasRight(UserRightId.PM_HR_PLANNING, false, UserRightValue.READWRITE));
+    assertFalse("Right invalid.", accessChecker.hasLoggedInUserRight(UserRightId.PM_HR_PLANNING, false, UserRightValue.READWRITE));
     assertTrue("Right is configurable, because serveral right values are available.", right.isConfigurable(userDao.getUserGroupCache(),
         PFUserContext.getUser()));
     logon(TEST_ADMIN_USER);
@@ -191,8 +195,8 @@ public class UserRightTest extends TestBase
     group.getAssignedUsers().add(user);
     groupDao.update(group);
     logon(user.getUsername());
-    assertTrue("Right now valid because project managers have always READWRITE access.", accessChecker.hasRight(UserRightId.PM_HR_PLANNING,
-        false, UserRightValue.READWRITE));
+    assertTrue("Right now valid because project managers have always READWRITE access.", accessChecker.hasLoggedInUserRight(
+        UserRightId.PM_HR_PLANNING, false, UserRightValue.READWRITE));
     assertFalse("Right is not configurable, because all available right values are automatically assigned to the current user", right
         .isConfigurable(userDao.getUserGroupCache(), PFUserContext.getUser()));
   }

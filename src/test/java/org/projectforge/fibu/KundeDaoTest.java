@@ -88,16 +88,16 @@ public class KundeDaoTest extends TestBase
   
   private void checkNoHistoryAccess(Serializable id, KundeDO kunde, String who)
   {
-    assertEquals(who + " users should not have select access to history of customers.",kundeDao.hasHistoryAccess(false), false);
+    assertEquals(who + " users should not have select access to history of customers.",kundeDao.hasLoggedInUserHistoryAccess(false), false);
     try {
-      kundeDao.hasHistoryAccess(true);
+      kundeDao.hasLoggedInUserHistoryAccess(true);
       fail("AccessException expected: " + who + " users should not have select access to history of customers.");
     } catch (AccessException ex) {
       // OK
     }
-    assertEquals(who + " users should not have select access to history of customers.", kundeDao.hasHistoryAccess(kunde, false), false);
+    assertEquals(who + " users should not have select access to history of customers.", kundeDao.hasLoggedInUserHistoryAccess(kunde, false), false);
     try {
-      kundeDao.hasHistoryAccess(kunde, true);
+      kundeDao.hasLoggedInUserHistoryAccess(kunde, true);
       fail("AccessException expected: " + who + " users should not have select access to history of invoices.");
     } catch (AccessException ex) {
       // OK

@@ -99,16 +99,16 @@ public class ProjektDaoTest extends TestBase
   
   private void checkNoHistoryAccess(Serializable id, ProjektDO projekt, String who)
   {
-    assertEquals(who + " users should not have select access to history of projects.",projektDao.hasHistoryAccess(false), false);
+    assertEquals(who + " users should not have select access to history of projects.",projektDao.hasLoggedInUserHistoryAccess(false), false);
     try {
-      projektDao.hasHistoryAccess(true);
+      projektDao.hasLoggedInUserHistoryAccess(true);
       fail("AccessException expected: " + who + " users should not have select access to history of projects.");
     } catch (AccessException ex) {
       // OK
     }
-    assertEquals(who + " users should not have select access to history of projects.", projektDao.hasHistoryAccess(projekt, false), false);
+    assertEquals(who + " users should not have select access to history of projects.", projektDao.hasLoggedInUserHistoryAccess(projekt, false), false);
     try {
-      projektDao.hasHistoryAccess(projekt, true);
+      projektDao.hasLoggedInUserHistoryAccess(projekt, true);
       fail("AccessException expected: " + who + " users should not have select access to history of invoices.");
     } catch (AccessException ex) {
       // OK

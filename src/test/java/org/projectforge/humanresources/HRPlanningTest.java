@@ -111,9 +111,9 @@ public class HRPlanningTest extends TestBase
     assertFalse(right.isAvailable(userGroupCache, user1));
     final HRPlanningDO planning = new HRPlanningDO().setUser(getUser(TestBase.TEST_USER));
     logon(user1);
-    assertFalse(hrPlanningDao.hasAccess(planning, null, OperationType.SELECT, false));
+    assertFalse(hrPlanningDao.hasLoggedInUserAccess(planning, null, OperationType.SELECT, false));
     try {
-      hrPlanningDao.hasAccess(planning, null, OperationType.SELECT, true);
+      hrPlanningDao.hasLoggedInUserAccess(planning, null, OperationType.SELECT, true);
       fail("AccessException excepted.");
     } catch (AccessException ex) {
       // OK
@@ -124,28 +124,28 @@ public class HRPlanningTest extends TestBase
     groupDao.update(group);
     assertTrue(right.isAvailable(userGroupCache, user1));
     logon(user1);
-    assertFalse(hrPlanningDao.hasAccess(planning, null, OperationType.SELECT, false));
-    assertTrue(accessChecker.hasSelectAccess(UserRightId.PM_HR_PLANNING, false));
-    assertFalse(accessChecker.hasSelectAccess(UserRightId.PM_HR_PLANNING, planning, false));
-    assertFalse(accessChecker.hasHistoryAccess(UserRightId.PM_HR_PLANNING, planning, false));
-    assertFalse(accessChecker.hasInsertAccess(UserRightId.PM_HR_PLANNING, planning, false));
+    assertFalse(hrPlanningDao.hasLoggedInUserAccess(planning, null, OperationType.SELECT, false));
+    assertTrue(accessChecker.hasLoggedInUserSelectAccess(UserRightId.PM_HR_PLANNING, false));
+    assertFalse(accessChecker.hasLoggedInUserSelectAccess(UserRightId.PM_HR_PLANNING, planning, false));
+    assertFalse(accessChecker.hasLoggedInUserHistoryAccess(UserRightId.PM_HR_PLANNING, planning, false));
+    assertFalse(accessChecker.hasLoggedInUserInsertAccess(UserRightId.PM_HR_PLANNING, planning, false));
     logon(TestBase.TEST_ADMIN_USER);
     user1.addRight(new UserRightDO(user1, UserRightId.PM_HR_PLANNING, UserRightValue.READONLY));
     userDao.update(user1);
     logon(user1);
-    assertTrue(hrPlanningDao.hasAccess(planning, null, OperationType.SELECT, false));
-    assertTrue(accessChecker.hasSelectAccess(UserRightId.PM_HR_PLANNING, planning, false));
-    assertTrue(accessChecker.hasHistoryAccess(UserRightId.PM_HR_PLANNING, planning, false));
-    assertFalse(accessChecker.hasInsertAccess(UserRightId.PM_HR_PLANNING, planning, false));
+    assertTrue(hrPlanningDao.hasLoggedInUserAccess(planning, null, OperationType.SELECT, false));
+    assertTrue(accessChecker.hasLoggedInUserSelectAccess(UserRightId.PM_HR_PLANNING, planning, false));
+    assertTrue(accessChecker.hasLoggedInUserHistoryAccess(UserRightId.PM_HR_PLANNING, planning, false));
+    assertFalse(accessChecker.hasLoggedInUserInsertAccess(UserRightId.PM_HR_PLANNING, planning, false));
     logon(TestBase.TEST_ADMIN_USER);
     user1 = userDao.getById(user1.getId());
     user1.getRight(UserRightId.PM_HR_PLANNING).setValue(UserRightValue.READWRITE);
     userDao.update(user1);
     logon(user1);
-    assertTrue(hrPlanningDao.hasAccess(planning, null, OperationType.SELECT, false));
-    assertTrue(accessChecker.hasSelectAccess(UserRightId.PM_HR_PLANNING, planning, false));
-    assertTrue(accessChecker.hasHistoryAccess(UserRightId.PM_HR_PLANNING, planning, false));
-    assertTrue(accessChecker.hasInsertAccess(UserRightId.PM_HR_PLANNING, planning, false));
+    assertTrue(hrPlanningDao.hasLoggedInUserAccess(planning, null, OperationType.SELECT, false));
+    assertTrue(accessChecker.hasLoggedInUserSelectAccess(UserRightId.PM_HR_PLANNING, planning, false));
+    assertTrue(accessChecker.hasLoggedInUserHistoryAccess(UserRightId.PM_HR_PLANNING, planning, false));
+    assertTrue(accessChecker.hasLoggedInUserInsertAccess(UserRightId.PM_HR_PLANNING, planning, false));
   }
 
   @Test
