@@ -42,7 +42,7 @@ public class MemoFormRenderer extends AbstractDOFormRenderer
 
   final static LayoutLength labelLength = LayoutLength.HALF;
 
-  final static LayoutLength valueLength = LayoutLength.ONEHALF;
+  final static LayoutLength valueLength = LayoutLength.DOUBLE;
 
   public MemoFormRenderer(final MarkupContainer container, final LayoutContext layoutContext, final MemoDO data)
   {
@@ -57,6 +57,6 @@ public class MemoFormRenderer extends AbstractDOFormRenderer
     doPanel.addTextField(new PanelContext(data, "subject", valueLength, getString("plugins.memo.subject"), labelLength).setRequired()
         .setStrong());
     doPanel.addTextArea(new PanelContext(data, "memo", valueLength, getString("plugins.memo.memo"), labelLength)
-        .setCssStyle("height: 10em;"));
+        .setCssStyle("height: 50em;"));
   }
 }

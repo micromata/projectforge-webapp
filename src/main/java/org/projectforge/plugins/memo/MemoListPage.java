@@ -26,16 +26,17 @@ package org.projectforge.plugins.memo;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.calendar.DateTimeFormatter;
-import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -47,7 +48,7 @@ import org.projectforge.web.wicket.ListSelectActionPanel;
 /**
  * The controller of the list page. Most functionality such as search etc. is done by the super class.
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 @ListPage(editPage = MemoEditPage.class)
 public class MemoListPage extends AbstractListPage<MemoListForm, MemoDao, MemoDO> implements IListPageColumnsCreator<MemoDO>
@@ -90,7 +91,17 @@ public class MemoListPage extends AbstractListPage<MemoListForm, MemoDao, MemoDO
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<MemoDO>(new Model<String>(getString("plugins.memo.subject")), getSortable("subject",
         sortable), "subject", cellItemListener));
-    columns.add(new UserPropertyColumn<MemoDO>(getString("plugins.memo.memo"), getSortable("memo", sortable), "memo", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<MemoDO>(new Model<String>(getString("plugins.memo.memo")),
+        getSortable("memo", sortable), "memo", cellItemListener) {
+          @Override
+          public void populateItem(Item<ICellPopulator<MemoDO>> item, String componentId, IModel<MemoDO> rowModel)
+          {
+            final MemoDO memo = rowModel.getObject();
+            final Label label = new Label(componentId, new Model<String>(StringUtils.abbreviate(memo.getMemo(), 100)));
+            cellItemListener.populateItem(item, componentId, rowModel);
+            item.add(label);
+          }
+        });
     return columns;
   }
 

@@ -42,8 +42,14 @@ import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.database.Constants;
 import org.projectforge.user.PFUserDO;
 
+import de.micromata.hibernate.history.Historizable;
+
 /**
- * This data object is the Java representation of a data-base entry of a memo.
+ * This data object is the Java representation of a data-base entry of a memo.<br/>
+ * Changes of this object will not be added to the history of changes. After deleting a memo it will be deleted in the data-base (there is
+ * no undo!).<br/>
+ * If you want to use the history of changes and undo functionality please use DefaultBaseDO as super class instead of AbstractBaseDO.
+ * DefaultBaseDO implements the required interface {@link Historizable}.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @Entity
