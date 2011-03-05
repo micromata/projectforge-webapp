@@ -2,5 +2,5 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans default-lazy-init="false" default-autowire="byType">
   <!-- Daos (automatically initialized as singletons.) -->
-  <bean id="toDoDao" class="org.projectforge.plugins.todo.ToDoDao" />
+  <bean id="memoDao" class="org.projectforge.plugins.memo.MemoDao" />
 </beans>
