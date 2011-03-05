@@ -28,14 +28,11 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.projectforge.database.Table;
 import org.projectforge.database.TableAttribute;
-import org.projectforge.task.TaskDO;
-import org.projectforge.timesheet.TimesheetDO;
-import org.projectforge.user.PFUserDO;
 
 public class MemoTableTest
 {
   @Test
-  public void createTables()
+  public void createTable()
   {
     assertEquals("T_PLUGIN_MEMO", new Table(MemoDO.class).getName());
 
@@ -44,6 +41,6 @@ public class MemoTableTest
     table.addAttributes("id");
     final TableAttribute attr = table.getAttributes().get(0);
     assertEquals("id", attr.getProperty());
-    assertEquals("pk", attr.getName());
+    assertEquals("If id is returned then BeanHelper has returned bridged method of interface.", "pk", attr.getName());
   }
 }
