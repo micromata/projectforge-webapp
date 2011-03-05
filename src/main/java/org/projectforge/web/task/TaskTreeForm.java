@@ -66,7 +66,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
     add(new CoolCheckBoxPanel("closedCheckBox", new PropertyModel<Boolean>(searchFilter, "closed"), getString("task.status.closed"), true));
     add(new CoolCheckBoxPanel("deletedCheckBox", new PropertyModel<Boolean>(searchFilter, "deleted"), getString("deleted"), true));
     add(new CoolCheckBoxPanel("ajaxSupportCheckBox", new PropertyModel<Boolean>(searchFilter, "ajaxSupport"), getString("ajaxSupport"),
-        true).setTooltip("task.tree.tooltip.ajaxSupport"));
+        true).setTooltip(getString("task.tree.tooltip.ajaxSupport")));
     setModel(new CompoundPropertyModel<TaskFilter>(searchFilter));
     final Component searchField = new TextField<String>("searchString", new PropertyModel<String>(searchFilter, "searchString"));
     searchField.add(new FocusOnLoadBehavior());
