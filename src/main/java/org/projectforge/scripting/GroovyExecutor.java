@@ -74,7 +74,9 @@ public class GroovyExecutor
       final StringWriter writer = new StringWriter();
       writable.writeTo(writer);
       writer.flush();
-      log.info(writer.toString());
+      if (log.isDebugEnabled() == true) {
+        log.debug(writer.toString());
+      }
       return writer.toString();
     } catch (CompilationFailedException ex) {
       log.error(ex.getMessage() + " while executing template: " + template, ex);
