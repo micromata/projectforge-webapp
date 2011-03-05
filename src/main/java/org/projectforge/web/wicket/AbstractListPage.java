@@ -285,7 +285,7 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
     body.add(form);
     form.init();
     body.add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    if (isSelectMode() == false && (accessChecker.isDemoUser() == true || getBaseDao().hasInsertAccess() == true)) {
+    if (isSelectMode() == false && (accessChecker.isDemoUser() == true || getBaseDao().hasInsertAccess(getUser()) == true)) {
       newItemMenuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
         @Override
         public void onClick()
@@ -477,7 +477,7 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
   {
     if (isSelectMode() == false && ((getBaseDao() instanceof BaseDao< ? >) || providesOwnRebuildDatabaseIndex() == true)) {
       dropDownMenu.setVisible(true);
-      new AbstractReindexTopRightMenu(this, accessChecker.isUserMemberOfAdminGroup()) {
+      new AbstractReindexTopRightMenu(this, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
         @Override
         protected void rebuildDatabaseIndex(boolean onlyNewest)
         {

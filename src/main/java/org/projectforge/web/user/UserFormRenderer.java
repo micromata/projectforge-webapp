@@ -143,7 +143,7 @@ public class UserFormRenderer extends AbstractDOFormRenderer
   @Override
   public void add()
   {
-    final boolean adminAccess = accessChecker.isUserMemberOfAdminGroup();
+    final boolean adminAccess = accessChecker.isLoggedInUserMemberOfAdminGroup();
     IField field;
     doPanel.newFieldSetPanel(isNew() == false ? data.getFullname() : getString("user"));
     if (adminAccess == true) {
@@ -363,7 +363,7 @@ public class UserFormRenderer extends AbstractDOFormRenderer
   @SuppressWarnings( { "unchecked", "serial"})
   private void addAssignedGroups()
   {
-    final boolean adminAccess = accessChecker.isUserMemberOfAdminGroup();
+    final boolean adminAccess = accessChecker.isLoggedInUserMemberOfAdminGroup();
     doPanel.newFieldSetPanel(getString("group.groups"));
 
     List<Integer> groupsToAdd = null;
@@ -407,7 +407,7 @@ public class UserFormRenderer extends AbstractDOFormRenderer
         @Override
         public final void onSubmit()
         {
-          accessChecker.checkIsUserMemberOfAdminGroup();
+          accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
           groups.unassign(valuesToUnassign);
           valuesToUnassign.clear();
           refreshGroupLists();
@@ -421,7 +421,7 @@ public class UserFormRenderer extends AbstractDOFormRenderer
         @Override
         public final void onSubmit()
         {
-          accessChecker.checkIsUserMemberOfAdminGroup();
+          accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
           groups.assign(valuesToAssign);
           valuesToAssign.clear();
           refreshGroupLists();

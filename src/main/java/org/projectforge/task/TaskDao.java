@@ -311,17 +311,17 @@ public class TaskDao extends BaseDao<TaskDO>
    * @see org.projectforge.core.BaseDao#hasSelectAccess(java.lang.Object, boolean)
    */
   @Override
-  public boolean hasSelectAccess(TaskDO obj, boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final TaskDO obj, final boolean throwException)
   {
-    if (accessChecker.isUserMemberOfGroup(false, ProjectForgeGroup.ADMIN_GROUP, ProjectForgeGroup.FINANCE_GROUP,
+    if (accessChecker.isUserMemberOfGroup(user, false, ProjectForgeGroup.ADMIN_GROUP, ProjectForgeGroup.FINANCE_GROUP,
         ProjectForgeGroup.CONTROLLING_GROUP) == true) {
       return true;
     }
-    return super.hasSelectAccess(obj, throwException);
+    return super.hasSelectAccess(user, obj, throwException);
   }
 
   @Override
-  public boolean hasSelectAccess(boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final boolean throwException)
   {
     return true;
   }
@@ -330,16 +330,17 @@ public class TaskDao extends BaseDao<TaskDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(TaskDO obj, TaskDO oldObj, OperationType operationType, boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final TaskDO obj, final TaskDO oldObj, final OperationType operationType,
+      final boolean throwException)
   {
-    return accessChecker.hasPermission(obj.getId(), AccessType.TASKS, operationType, throwException);
+    return accessChecker.hasPermission(user, obj.getId(), AccessType.TASKS, operationType, throwException);
   }
 
   /**
    * @see org.projectforge.core.BaseDao#hasUpdateAccess(java.lang.Object, java.lang.Object)
    */
   @Override
-  public boolean hasUpdateAccess(TaskDO obj, TaskDO dbObj, boolean throwException)
+  public boolean hasUpdateAccess(final PFUserDO user, final TaskDO obj, final TaskDO dbObj, final boolean throwException)
   {
     Validate.notNull(dbObj);
     Validate.notNull(obj);
@@ -347,7 +348,7 @@ public class TaskDao extends BaseDao<TaskDO>
       if (obj.getParentTaskId() != null) {
         throw new UserException(TaskDao.I18N_KEY_ERROR_CYCLIC_REFERENCE);
       }
-      if (accessChecker.isUserMemberOfGroup(throwException, ProjectForgeGroup.ADMIN_GROUP, ProjectForgeGroup.FINANCE_GROUP) == false) {
+      if (accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.ADMIN_GROUP, ProjectForgeGroup.FINANCE_GROUP) == false) {
         return false;
       }
       return true;
@@ -362,19 +363,19 @@ public class TaskDao extends BaseDao<TaskDO>
     }
     // Checks cyclic and self reference. The parent task is not allowed to be a self reference.
     checkCyclicReference(obj);
-    if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.ADMIN_GROUP, ProjectForgeGroup.FINANCE_GROUP) == true) {
+    if (accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.ADMIN_GROUP, ProjectForgeGroup.FINANCE_GROUP) == true) {
       return true;
     }
-    if (accessChecker.hasPermission(obj.getId(), AccessType.TASKS, OperationType.UPDATE, throwException) == false) {
+    if (accessChecker.hasPermission(user, obj.getId(), AccessType.TASKS, OperationType.UPDATE, throwException) == false) {
       return false;
     }
     if (dbObj.getParentTaskId().equals(obj.getParentTaskId()) == false) {
       // User moves the object to another task:
-      if (hasInsertAccess(obj, throwException) == false) {
+      if (hasInsertAccess(user, obj, throwException) == false) {
         // Inserting of object under new task not allowed.
         return false;
       }
-      if (accessChecker.hasPermission(dbObj.getParentTaskId(), AccessType.TASKS, OperationType.DELETE, throwException) == false) {
+      if (accessChecker.hasPermission(user, dbObj.getParentTaskId(), AccessType.TASKS, OperationType.DELETE, throwException) == false) {
         // Deleting of object under old task not allowed.
         return false;
       }
@@ -382,9 +383,9 @@ public class TaskDao extends BaseDao<TaskDO>
     return true;
   }
 
-  public boolean hasAccessForKost2AndTimesheetBookingStatus(final TaskDO obj)
+  public boolean hasAccessForKost2AndTimesheetBookingStatus(final PFUserDO user, final TaskDO obj)
   {
-    if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
+    if (accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.FINANCE_GROUP) == true) {
       return true;
     }
     final Integer taskId = obj.getId() != null ? obj.getId() : obj.getParentTaskId();
@@ -397,15 +398,15 @@ public class TaskDao extends BaseDao<TaskDO>
   }
 
   @Override
-  protected void checkInsertAccess(final TaskDO obj) throws AccessException
+  protected void checkInsertAccess(final PFUserDO user, final TaskDO obj) throws AccessException
   {
-    super.checkInsertAccess(obj);
-    if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == false) {
+    super.checkInsertAccess(user, obj);
+    if (accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.FINANCE_GROUP) == false) {
       if (obj.getProtectTimesheetsUntil() != null) {
         throw new AccessException("task.error.protectTimesheetsUntilReadonly");
       }
     }
-    if (hasAccessForKost2AndTimesheetBookingStatus(obj) == false) {
+    if (hasAccessForKost2AndTimesheetBookingStatus(user, obj) == false) {
       // Non project managers are not able to manipulate the following fields:
       if (StringUtils.isNotBlank(obj.getKost2BlackWhiteList()) == true || obj.isKost2IsBlackList() == true) {
         throw new AccessException("task.error.kost2Readonly");
@@ -417,10 +418,10 @@ public class TaskDao extends BaseDao<TaskDO>
   }
 
   @Override
-  protected void checkUpdateAccess(final TaskDO obj, final TaskDO dbObj) throws AccessException
+  protected void checkUpdateAccess(final PFUserDO user, final TaskDO obj, final TaskDO dbObj) throws AccessException
   {
-    super.checkUpdateAccess(obj, dbObj);
-    if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == false) {
+    super.checkUpdateAccess(user, obj, dbObj);
+    if (accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.FINANCE_GROUP) == false) {
       Long ts1 = null, ts2 = null;
       if (obj.getProtectTimesheetsUntil() != null) {
         ts1 = obj.getProtectTimesheetsUntil().getTime();
@@ -432,7 +433,7 @@ public class TaskDao extends BaseDao<TaskDO>
         throw new AccessException("task.error.protectTimesheetsUntilReadonly");
       }
     }
-    if (hasAccessForKost2AndTimesheetBookingStatus(obj) == false) {
+    if (hasAccessForKost2AndTimesheetBookingStatus(user, obj) == false) {
       // Non project managers are not able to manipulate the following fields:
       if (ObjectUtils.equals(obj.getKost2BlackWhiteList(), dbObj.getKost2BlackWhiteList()) == false
           || obj.isKost2IsBlackList() != dbObj.isKost2IsBlackList()) {
@@ -445,7 +446,7 @@ public class TaskDao extends BaseDao<TaskDO>
   }
 
   @Override
-  public boolean hasInsertAccess(TaskDO obj, boolean throwException)
+  public boolean hasInsertAccess(final PFUserDO user, final TaskDO obj, final boolean throwException)
   {
     Validate.notNull(obj);
     // Checks if the task is orphan.
@@ -453,23 +454,23 @@ public class TaskDao extends BaseDao<TaskDO>
     if (parent == null) {
       throw new UserException(I18N_KEY_ERROR_PARENT_TASK_NOT_FOUND);
     }
-    if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.ADMIN_GROUP, ProjectForgeGroup.FINANCE_GROUP) == true) {
+    if (accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.ADMIN_GROUP, ProjectForgeGroup.FINANCE_GROUP) == true) {
       return true;
     }
-    return accessChecker.hasPermission(obj.getParentTaskId(), AccessType.TASKS, OperationType.INSERT, throwException);
+    return accessChecker.hasPermission(user, obj.getParentTaskId(), AccessType.TASKS, OperationType.INSERT, throwException);
   }
 
   @Override
-  public boolean hasDeleteAccess(final TaskDO obj, final TaskDO dbObj, boolean throwException)
+  public boolean hasDeleteAccess(final PFUserDO user, final TaskDO obj, final TaskDO dbObj, boolean throwException)
   {
     Validate.notNull(obj);
-    if (hasUpdateAccess(obj, dbObj, throwException) == true) {
+    if (hasUpdateAccess(user, obj, dbObj, throwException) == true) {
       return true;
     }
-    if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.ADMIN_GROUP, ProjectForgeGroup.FINANCE_GROUP) == true) {
+    if (accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.ADMIN_GROUP, ProjectForgeGroup.FINANCE_GROUP) == true) {
       return true;
     }
-    return accessChecker.hasPermission(obj.getParentTaskId(), AccessType.TASKS, OperationType.DELETE, throwException);
+    return accessChecker.hasPermission(user, obj.getParentTaskId(), AccessType.TASKS, OperationType.DELETE, throwException);
   }
 
   @Override

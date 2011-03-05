@@ -471,31 +471,32 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
    * @see org.projectforge.core.BaseDao#hasSelectAccess()
    */
   @Override
-  public boolean hasSelectAccess(boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final boolean throwException)
   {
     return true;
   }
 
   @Override
-  public boolean hasAccess(TimesheetDO obj, TimesheetDO oldObj, OperationType operationType, boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final TimesheetDO obj, final TimesheetDO oldObj, final OperationType operationType,
+      final boolean throwException)
   {
-    if (accessChecker.userEqualsToContextUser(obj.getUser()) == true) {
+    if (accessChecker.userEquals(user, obj.getUser()) == true) {
       // Own time sheet
-      if (accessChecker.hasPermission(obj.getTaskId(), AccessType.OWN_TIMESHEETS, operationType, throwException) == false) {
+      if (accessChecker.hasPermission(user, obj.getTaskId(), AccessType.OWN_TIMESHEETS, operationType, throwException) == false) {
         return false;
       }
     } else {
       // Foreign time sheet
-      if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
+      if (accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.FINANCE_GROUP) == true) {
         return true;
       }
-      if (accessChecker.hasPermission(obj.getTaskId(), AccessType.TIMESHEETS, operationType, throwException) == false) {
+      if (accessChecker.hasPermission(user, obj.getTaskId(), AccessType.TIMESHEETS, operationType, throwException) == false) {
         return false;
       }
     }
     if (operationType == OperationType.DELETE) {
       // UPDATE and INSERT is already checked, SELECT will be ignored.
-      boolean result = checkTimesheetProtection(obj, null, operationType, throwException);
+      boolean result = checkTimesheetProtection(user, obj, null, operationType, throwException);
       if (result == true) {
         result = checkTaskBookable(obj, null, operationType, throwException);
       }
@@ -506,15 +507,15 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
 
   /**
    * User can always see his own time sheets. But if he has no access then the location and description values are hidden (empty strings).
-   * @see org.projectforge.core.BaseDao#hasSelectAccess(org.projectforge.core.ExtendedBaseDO, boolean)
+   * @see org.projectforge.core.BaseDao#hasSelectAccess(PFUserDO, org.projectforge.core.ExtendedBaseDO, boolean)
    */
   @Override
-  public boolean hasSelectAccess(TimesheetDO obj, boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final TimesheetDO obj, final boolean throwException)
   {
-    if (hasAccess(obj, null, OperationType.SELECT, false) == false) {
+    if (hasAccess(user, obj, null, OperationType.SELECT, false) == false) {
       // User has now access by definition.
-      if (accessChecker.userEqualsToContextUser(obj.getUser()) == true
-          || accessChecker.isUserMemberOfGroup(ProjectForgeGroup.PROJECT_MANAGER) == true) {
+      if (accessChecker.userEquals(user, obj.getUser()) == true
+          || accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.PROJECT_MANAGER) == true) {
         // An user should see his own time sheets, but the values should be hidden.
         // A project manager should also see all time sheets, but the values should be hidden.
         getSession().evict(obj);
@@ -524,42 +525,42 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
         return true;
       }
     }
-    return super.hasSelectAccess(obj, throwException);
+    return super.hasSelectAccess(user, obj, throwException);
   }
 
   @Override
-  public boolean hasHistoryAccess(TimesheetDO obj, boolean throwException)
+  public boolean hasHistoryAccess(final PFUserDO user, final TimesheetDO obj, final boolean throwException)
   {
-    return hasAccess(obj, null, OperationType.SELECT, throwException);
+    return hasAccess(user, obj, null, OperationType.SELECT, throwException);
   }
 
   /**
    * @see org.projectforge.core.BaseDao#hasUpdateAccess(Object, Object)
    */
   @Override
-  public boolean hasUpdateAccess(TimesheetDO obj, TimesheetDO dbObj, boolean throwException)
+  public boolean hasUpdateAccess(final PFUserDO user, final TimesheetDO obj, final TimesheetDO dbObj, final boolean throwException)
   {
     Validate.notNull(dbObj);
     Validate.notNull(obj);
     Validate.notNull(dbObj.getTaskId());
     Validate.notNull(obj.getTaskId());
-    if (hasAccess(obj, dbObj, OperationType.UPDATE, throwException) == false) {
+    if (hasAccess(user, obj, dbObj, OperationType.UPDATE, throwException) == false) {
       return false;
     }
     if (dbObj.getUserId().equals(obj.getUserId()) == false) {
       // User changes the owner of the time sheet:
-      if (hasAccess(dbObj, null, OperationType.DELETE, throwException) == false) {
+      if (hasAccess(user, dbObj, null, OperationType.DELETE, throwException) == false) {
         // Deleting of time sheet of another user is not allowed.
         return false;
       }
     }
     if (dbObj.getTaskId().equals(obj.getTaskId()) == false) {
       // User moves the object to another task:
-      if (hasAccess(obj, null, OperationType.INSERT, throwException) == false) {
+      if (hasAccess(user, obj, null, OperationType.INSERT, throwException) == false) {
         // Inserting of object under new task not allowed.
         return false;
       }
-      if (hasAccess(dbObj, null, OperationType.DELETE, throwException) == false) {
+      if (hasAccess(user, dbObj, null, OperationType.DELETE, throwException) == false) {
         // Deleting of object under old task not allowed.
         return false;
       }
@@ -567,7 +568,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
     if (hasTimeOverlap(obj, throwException) == true) {
       return false;
     }
-    boolean result = checkTimesheetProtection(obj, dbObj, OperationType.UPDATE, throwException);
+    boolean result = checkTimesheetProtection(user, obj, dbObj, OperationType.UPDATE, throwException);
     if (result == true) {
       result = checkTaskBookable(obj, dbObj, OperationType.UPDATE, throwException);
     }
@@ -575,15 +576,15 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
   }
 
   @Override
-  public boolean hasInsertAccess(TimesheetDO obj, boolean throwException)
+  public boolean hasInsertAccess(final PFUserDO user, final TimesheetDO obj, final boolean throwException)
   {
-    if (hasAccess(obj, null, OperationType.INSERT, throwException) == false) {
+    if (hasAccess(user, obj, null, OperationType.INSERT, throwException) == false) {
       return false;
     }
     if (hasTimeOverlap(obj, throwException) == true) {
       return false;
     }
-    boolean result = checkTimesheetProtection(obj, null, OperationType.INSERT, throwException);
+    boolean result = checkTimesheetProtection(user, obj, null, OperationType.INSERT, throwException);
     if (result == true) {
       result = checkTaskBookable(obj, null, OperationType.INSERT, throwException);
     }
@@ -699,11 +700,11 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
    * @return true, if no time sheet protection is violated or if the logged in user is member of the finance group.
    * @see ProjectForgeGroup#FINANCE_GROUP
    */
-  public boolean checkTimesheetProtection(TimesheetDO timesheet, TimesheetDO oldTimesheet, OperationType operationType,
-      boolean throwException)
+  public boolean checkTimesheetProtection(final PFUserDO user, final TimesheetDO timesheet, final TimesheetDO oldTimesheet,final OperationType operationType,
+     final boolean throwException)
   {
-    if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true
-        && accessChecker.userEqualsToContextUser(timesheet.getUser()) == false) {
+    if (accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.FINANCE_GROUP) == true
+        && accessChecker.userEquals(user, timesheet.getUser()) == false) {
       // Member of financial group are able to book foreign time sheets.
       return true;
     }
@@ -745,7 +746,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
   @SuppressWarnings("unchecked")
   public List<String> getLocationAutocompletion(String searchString)
   {
-    checkSelectAccess();
+    checkLoggedInUserSelectAccess();
     if (StringUtils.isBlank(searchString) == true) {
       return null;
     }
@@ -770,7 +771,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
   @SuppressWarnings("unchecked")
   public Collection<String> getRecentLocation(int maxResults)
   {
-    checkSelectAccess();
+    checkLoggedInUserSelectAccess();
     log.info("Get recent locations from the database.");
     String s = "select location from "
         + (clazz.getSimpleName() + " t where deleted=false and t.user.id = ? and lastUpdate > ? and t.location != null and t.location != '' order by t.lastUpdate desc");

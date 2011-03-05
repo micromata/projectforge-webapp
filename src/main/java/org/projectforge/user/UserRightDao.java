@@ -155,19 +155,19 @@ public class UserRightDao extends BaseDao<UserRightDO>
    * @see org.projectforge.core.BaseDao#hasSelectAccess()
    */
   @Override
-  public boolean hasSelectAccess(boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final boolean throwException)
   {
-    return accessChecker.isUserMemberOfGroup(throwException, ProjectForgeGroup.ADMIN_GROUP);
+    return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.ADMIN_GROUP);
   }
 
   /**
-   * @see org.projectforge.core.BaseDao#hasSelectAccess(org.projectforge.core.ExtendedBaseDO, boolean)
-   * @see #hasSelectAccess(boolean)
+   * @see org.projectforge.core.BaseDao#hasSelectAccess(PFUserDO, org.projectforge.core.ExtendedBaseDO, boolean)
+   * @see #hasSelectAccess(PFUserDO, boolean)
    */
   @Override
-  public boolean hasSelectAccess(UserRightDO obj, boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final UserRightDO obj, final boolean throwException)
   {
-    return hasSelectAccess(throwException);
+    return hasSelectAccess(user, throwException);
   }
 
   /**
@@ -175,9 +175,10 @@ public class UserRightDao extends BaseDao<UserRightDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(UserRightDO obj, UserRightDO oldObj, OperationType operationType, boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final UserRightDO obj, final UserRightDO oldObj, final OperationType operationType,
+      final boolean throwException)
   {
-    return accessChecker.isUserMemberOfGroup(throwException, ProjectForgeGroup.ADMIN_GROUP);
+    return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.ADMIN_GROUP);
   }
 
   @Override

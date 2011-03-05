@@ -164,33 +164,34 @@ public class UserDao extends BaseDao<PFUserDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(PFUserDO obj, PFUserDO oldObj, OperationType operationType, boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final PFUserDO obj, final PFUserDO oldObj, final OperationType operationType,
+      final boolean throwException)
   {
-    return accessChecker.isUserMemberOfAdminGroup(throwException);
+    return accessChecker.isUserMemberOfAdminGroup(user, throwException);
   }
 
   /**
    * @return false, if no admin user and the context user is not at minimum in one groups assigned to the given user or false. Also deleted
    *         users are only visible for admin users.
    * @see org.projectforge.core.BaseDao#hasSelectAccess(org.projectforge.core.BaseDO, boolean)
-   * @see AccessChecker#isContextUserInSameGroup(PFUserDO)
+   * @see AccessChecker#areUsersInSameGroup(PFUserDO, PFUserDO)
    */
   @Override
-  public boolean hasSelectAccess(PFUserDO obj, boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final PFUserDO obj, final boolean throwException)
   {
-    boolean result = accessChecker.isUserMemberOfAdminGroup()
-        || accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
+    boolean result = accessChecker.isUserMemberOfAdminGroup(user)
+        || accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
     if (result == false && obj.isDeleted() == false) {
-      result = accessChecker.isContextUserInSameGroup(obj);
+      result = accessChecker.areUsersInSameGroup(user, obj);
     }
     if (throwException == true && result == false) {
-      throw new AccessException(AccessType.GROUP, OperationType.SELECT);
+      throw new AccessException(user, AccessType.GROUP, OperationType.SELECT);
     }
     return result;
   }
-  
+
   @Override
-  public boolean hasSelectAccess(boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final boolean throwException)
   {
     return true;
   }
@@ -400,15 +401,17 @@ public class UserDao extends BaseDao<PFUserDO>
     final PFUserDO contextUser = PFUserContext.getUser();
     Validate.isTrue(user.getId().equals(contextUser.getId()) == true);
     PFUserDO dbUser = (PFUserDO) getHibernateTemplate().load(clazz, user.getId(), LockMode.PESSIMISTIC_WRITE);
-    if (copyValues(user, dbUser, "deleted", "password", "lastLogin", "loginFailures", "orgUnit", "role", "username", "stayLoggedInKey", "rights") == true) {
+    if (copyValues(user, dbUser, "deleted", "password", "lastLogin", "loginFailures", "orgUnit", "role", "username", "stayLoggedInKey",
+        "rights") == true) {
       dbUser.setLastUpdate();
       log.info("Object updated: " + dbUser.toString());
-      copyValues(user, contextUser, "deleted", "password", "lastLogin", "loginFailures", "orgUnit", "role", "username", "stayLoggedInKey", "rights");
+      copyValues(user, contextUser, "deleted", "password", "lastLogin", "loginFailures", "orgUnit", "role", "username", "stayLoggedInKey",
+          "rights");
     } else {
       log.info("No modifications detected (no update needed): " + dbUser.toString());
     }
     userGroupCache.updateUser(user);
-}
+  }
 
   /**
    * Gets history entries of super and adds all history entries of the AuftragsPositionDO childs.
@@ -418,7 +421,7 @@ public class UserDao extends BaseDao<PFUserDO>
   public List<DisplayHistoryEntry> getDisplayHistoryEntries(PFUserDO obj)
   {
     final List<DisplayHistoryEntry> list = super.getDisplayHistoryEntries(obj);
-    if (hasHistoryAccess(obj, false) == false) {
+    if (hasLoggedInUserHistoryAccess(obj, false) == false) {
       return list;
     }
     if (CollectionUtils.isNotEmpty(obj.getRights()) == true) {
@@ -445,9 +448,9 @@ public class UserDao extends BaseDao<PFUserDO>
   }
 
   @Override
-  public boolean hasHistoryAccess(boolean throwException)
+  public boolean hasHistoryAccess(final PFUserDO user, final boolean throwException)
   {
-    return accessChecker.isUserMemberOfAdminGroup(throwException);
+    return accessChecker.isUserMemberOfAdminGroup(user, throwException);
   }
 
   @Override

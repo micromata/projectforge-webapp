@@ -404,7 +404,7 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
    * @see org.projectforge.core.BaseDao#hasSelectAccess()
    */
   @Override
-  public boolean hasSelectAccess(boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final boolean throwException)
   {
     return true;
   }
@@ -413,9 +413,10 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(UserPrefDO obj, UserPrefDO oldObj, OperationType operationType, boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final UserPrefDO obj, final UserPrefDO oldObj, final OperationType operationType,
+      final boolean throwException)
   {
-    if (accessChecker.userEqualsToContextUser(obj.getUser()) == true) {
+    if (accessChecker.userEquals(user, obj.getUser()) == true) {
       return true;
     }
     if (throwException == true) {

@@ -256,7 +256,7 @@ public class MenuItemRegistry
       @Override
       protected void afterMenuEntryCreation(final MenuEntry createdMenuEntry, final MenuBuilderContext context)
       {
-        if (context.getAccessChecker().isUserMemberOfGroup(fibuGroups) == false) {
+        if (context.getAccessChecker().isLoggedInUserMemberOfGroup(fibuGroups) == false) {
           // Setting project management as parent because fibu isn't visible for this user:
           createdMenuEntry.setParent(context.getMenu(), pm.getId());
         }
@@ -271,7 +271,7 @@ public class MenuItemRegistry
       @Override
       protected void afterMenuEntryCreation(final MenuEntry createdMenuEntry, final MenuBuilderContext context)
       {
-        if (context.getAccessChecker().isUserMemberOfGroup(fibuGroups) == true) {
+        if (context.getAccessChecker().isLoggedInUserMemberOfGroup(fibuGroups) == true) {
           createdMenuEntry.setNewCounterModel(new MenuNewCounterOrder());
           createdMenuEntry.setNewCounterTooltip("menu.fibu.orderbook.htmlSuffixTooltip");
         } else {

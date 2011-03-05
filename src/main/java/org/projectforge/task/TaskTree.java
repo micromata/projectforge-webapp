@@ -472,7 +472,7 @@ public class TaskTree extends AbstractCache implements Serializable
    */
   public boolean hasSelectAccess(TaskNode node)
   {
-    return taskDao.hasSelectAccess(node.getTask(), false);
+    return taskDao.hasLoggedInUserSelectAccess(node.getTask(), false);
   }
 
   /**

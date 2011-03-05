@@ -192,7 +192,7 @@ public class ReportScriptingPage extends AbstractSecuredPage
 
   protected void execute()
   {
-    accessChecker.checkIsUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
+    accessChecker.checkIsLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
     accessChecker.checkDemoUser();
     imageResultContainer.setVisible(false);
     ReportGeneratorList reportGeneratorList = new ReportGeneratorList();
@@ -224,7 +224,7 @@ public class ReportScriptingPage extends AbstractSecuredPage
 
   protected void upload()
   {
-    accessChecker.checkIsUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
+    accessChecker.checkIsLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
     accessChecker.checkDemoUser();
     log.info("upload");
     final FileUpload fileUpload = form.fileUploadField.getFileUpload();

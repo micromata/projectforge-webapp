@@ -195,7 +195,7 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
       undeleteButtonPanel.setVisible(false);
       markAsDeletedButtonPanel.setVisible(false);
       deleteButtonPanel.setVisible(false);
-      createButtonPanel.setVisible(baseDao.hasInsertAccess());
+      createButtonPanel.setVisible(baseDao.hasLoggedInUserInsertAccess());
       if (createButtonPanel.isVisible() == true) {
         setDefaultButton(createButton);
       } else {
@@ -204,7 +204,7 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
     } else {
       createButtonPanel.setVisible(false);
       if (getData().isDeleted() == true) {
-        undeleteButtonPanel.setVisible(baseDao.hasUpdateAccess(getData(), getData(), false));
+        undeleteButtonPanel.setVisible(baseDao.hasLoggedInUserUpdateAccess(getData(), getData(), false));
         if (undeleteButtonPanel.isVisible() == true) {
           setDefaultButton(undeleteButton);
         }
@@ -215,12 +215,12 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
         undeleteButtonPanel.setVisible(false);
         if (parentPage.getBaseDao().isHistorizable() == true) {
           deleteButtonPanel.setVisible(false);
-          markAsDeletedButtonPanel.setVisible(baseDao.hasDeleteAccess(getData(), getData(), false));
+          markAsDeletedButtonPanel.setVisible(baseDao.hasLoggedInUserDeleteAccess(getData(), getData(), false));
         } else {
-          deleteButtonPanel.setVisible(baseDao.hasDeleteAccess(getData(), getData(), false));
+          deleteButtonPanel.setVisible(baseDao.hasLoggedInUserDeleteAccess(getData(), getData(), false));
           markAsDeletedButtonPanel.setVisible(false);
         }
-        updateButtonPanel.setVisible(baseDao.hasUpdateAccess(getData(), getData(), false));
+        updateButtonPanel.setVisible(baseDao.hasLoggedInUserUpdateAccess(getData(), getData(), false));
         if (updateButtonPanel.isVisible() == true) {
           setDefaultButton(updateButton);
         } else {

@@ -86,7 +86,7 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
-        final boolean updateAccess = groupDao.hasAccess(null, null, OperationType.UPDATE, false);
+        final boolean updateAccess = groupDao.hasLoggedInUserAccess(null, null, OperationType.UPDATE, false);
         final GroupDO group = (GroupDO) rowModel.getObject();
         if (isSelectMode() == true) {
           item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, group.getId(), group.getName()));

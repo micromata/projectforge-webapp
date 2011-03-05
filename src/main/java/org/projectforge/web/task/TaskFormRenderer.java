@@ -56,6 +56,7 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskStatus;
 import org.projectforge.task.TimesheetBookingStatus;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.fibu.Kost2ListPage;
@@ -273,7 +274,7 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
 
     // Finance administration group panel
     doPanel.newGroupPanel(getString("financeAdministration"));
-    final boolean hasKost2AndTimesheetBookingAccess = taskDao.hasAccessForKost2AndTimesheetBookingStatus(data);
+    final boolean hasKost2AndTimesheetBookingAccess = taskDao.hasAccessForKost2AndTimesheetBookingStatus(PFUserContext.getUser(), data);
     {
       final String kost2LabelString = getString("fibu.kost2");
       final LabelLPanel label = doPanel.addLabel(kost2LabelString, HALF);

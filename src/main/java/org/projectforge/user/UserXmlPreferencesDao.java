@@ -105,12 +105,12 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
    * Checks if the given userIs is equals to the context user or the if the user is an admin user. If not a AccessException will be thrown.
    * @param userId
    */
-  public void checkAccess(Integer userId)
+  public void checkAccess(final Integer userId)
   {
     Validate.notNull(userId);
     final PFUserDO user = PFUserContext.getUser();
     if (ObjectUtils.equals(userId, user.getId()) == false) {
-      accessChecker.checkIsUserMemberOfAdminGroup();
+      accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
     }
   }
 

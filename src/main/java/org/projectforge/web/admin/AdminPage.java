@@ -392,13 +392,13 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
 
   private void checkAccess()
   {
-    accessChecker.checkIsUserMemberOfAdminGroup();
+    accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
     accessChecker.checkDemoUser();
   }
 
   public void createTestBooks()
   {
-    accessChecker.checkIsUserMemberOfAdminGroup();
+    accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
     accessChecker.checkDemoUser();
     final TaskDO task = taskTree.getTaskById(Configuration.getInstance().getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS));
     final List<BookDO> list = new ArrayList<BookDO>();

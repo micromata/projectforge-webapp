@@ -34,7 +34,7 @@ public enum UserRightCategory implements I18nEnum
 {
   FIBU("fibu"), MISC("misc"), ORGA("orga"),
   /** Project management */
-  PM("pm");
+  PM("pm"), PLUGINS("plugins");
 
   private String key;
 

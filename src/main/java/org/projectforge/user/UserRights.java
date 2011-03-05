@@ -158,7 +158,7 @@ public class UserRights
     addRight(new HRPlanningRight());
   }
 
-  private UserGroupsRight addRight(final UserRightCategory category, final UserRightId id, final UserRightValue[] rightValues,
+  public UserGroupsRight addRight(final UserRightCategory category, final UserRightId id, final UserRightValue[] rightValues,
       final ProjectForgeGroup... fibuGroups)
   {
     final UserGroupsRight right = new UserGroupsRight(id, category, rightValues, fibuGroups);
@@ -166,7 +166,7 @@ public class UserRights
     return right;
   }
 
-  private void addRight(final UserRight right)
+  public void addRight(final UserRight right)
   {
     final UserRightId userRightId = right.getId();
     rights.put(right.getId(), right);

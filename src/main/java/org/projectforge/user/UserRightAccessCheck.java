@@ -25,6 +25,7 @@ package org.projectforge.user;
 
 import org.projectforge.access.AccessChecker;
 import org.projectforge.access.OperationType;
+import org.projectforge.humanresources.HRPlanningRight;
 
 /**
  * These rights implement the checking of the different access types (select, insert, update, delete) itself.
@@ -37,8 +38,7 @@ public class UserRightAccessCheck<O> extends UserRight
 
   protected UserGroupsRight userGroupsRight;
 
-  public UserRightAccessCheck(final UserRightId id, final UserRightCategory category,
-      final UserRightValue... rightValues)
+  public UserRightAccessCheck(final UserRightId id, final UserRightCategory category, final UserRightValue... rightValues)
   {
     super(id, category, rightValues);
   }
@@ -57,52 +57,49 @@ public class UserRightAccessCheck<O> extends UserRight
   /**
    * The default implementation calls for {@link OperationType#SELECT} {@link AccessChecker#hasReadAccess(UserRightId, boolean)} and
    * otherwise {@link AccessChecker#hasWriteAccess(UserRightId, boolean)}.
+   * @param user Check the access for the given user instead of the logged-in user.
    * @param obj null is possible for checking general insert access or general select access.
    * @param oldObj
    * @param operationType
    * @return
    */
-  public boolean hasAccess(final O obj, final O oldObj, final OperationType operationType)
+  public boolean hasAccess(final PFUserDO user, final O obj, final O oldObj, final OperationType operationType)
   {
     if (operationType == OperationType.SELECT) {
-      return UserRights.getAccessChecker().hasRight(this.getId(), false, UserRightValue.READONLY, UserRightValue.READWRITE);
+      return UserRights.getAccessChecker().hasRight(user, this.getId(), false, UserRightValue.READONLY, UserRightValue.READWRITE);
     } else {
-      return UserRights.getAccessChecker().hasRight(this.getId(), false, UserRightValue.READWRITE);
+      return UserRights.getAccessChecker().hasRight(user, this.getId(), false, UserRightValue.READWRITE);
     }
   }
 
-  public boolean hasSelectAccess()
+  public boolean hasSelectAccess(final PFUserDO user)
   {
-    return hasAccess(null, null, OperationType.SELECT);
+    return hasAccess(user, null, null, OperationType.SELECT);
   }
 
-  public boolean hasSelectAccess(final O obj)
+  public boolean hasSelectAccess(final PFUserDO user, final O obj)
   {
-    return hasAccess(obj, null, OperationType.SELECT);
+    return hasAccess(user, obj, null, OperationType.SELECT);
   }
 
-  /**
-   * Checks the general insert access.
-   * @return
-   */
-  public boolean hasInsertAccess()
+  public boolean hasInsertAccess(final PFUserDO user)
   {
-    return hasAccess(null, null, OperationType.INSERT);
+    return hasAccess(user, null, null, OperationType.INSERT);
   }
 
-  public boolean hasInsertAccess(final O obj)
+  public boolean hasInsertAccess(final PFUserDO user, final O obj)
   {
-    return hasAccess(obj, null, OperationType.INSERT);
+    return hasAccess(user, obj, null, OperationType.INSERT);
   }
 
-  public boolean hasUpdateAccess(final O obj, final O oldObj)
+  public boolean hasUpdateAccess(final PFUserDO user, final O obj, final O oldObj)
   {
-    return hasAccess(obj, oldObj, OperationType.UPDATE);
+    return hasAccess(user, obj, oldObj, OperationType.UPDATE);
   }
 
-  public boolean hasDeleteAccess(final O obj)
+  public boolean hasDeleteAccess(final PFUserDO user, final O obj)
   {
-    return hasAccess(obj, null, OperationType.DELETE);
+    return hasAccess(user, obj, null, OperationType.DELETE);
   }
 
   /**
@@ -112,9 +109,9 @@ public class UserRightAccessCheck<O> extends UserRight
    * @param obj
    * @return
    */
-  public boolean hasHistoryAccess(final O obj)
+  public boolean hasHistoryAccess(final PFUserDO user, final O obj)
   {
-    return hasSelectAccess(obj);
+    return hasSelectAccess(user, obj);
   }
 
   /**

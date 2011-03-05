@@ -284,7 +284,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
     }
     columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("shortDescription")), getSortable(
         "shortDescription", sortable), "shortDescription", cellItemListener));
-    if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
+    if (accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
       columns.add(new DatePropertyColumn<TaskDO>(dateTimeFormatter, getString("task.protectTimesheetsUntil.short"), getSortable(
           "protectTimesheetsUntil", sortable), "protectTimesheetsUntil", cellItemListener));
     }

@@ -75,7 +75,7 @@ public class UserXmlPreferencesMigrationDao extends HibernateDaoSupport
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
   public String migrateAllUserPrefs()
   {
-    accessChecker.checkIsUserMemberOfAdminGroup();
+    accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
     final StringBuffer buf = new StringBuffer();
     final List<UserXmlPreferencesDO> list = getHibernateTemplate().find(
         "from " + UserXmlPreferencesDO.class.getSimpleName() + " t order by userId, key");

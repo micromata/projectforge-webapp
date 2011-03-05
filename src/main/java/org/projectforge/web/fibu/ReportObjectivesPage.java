@@ -127,7 +127,7 @@ public class ReportObjectivesPage extends AbstractSecuredPage
 
   private void checkAccess()
   {
-    accessChecker.checkIsUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
+    accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
     accessChecker.checkDemoUser();
   }
 

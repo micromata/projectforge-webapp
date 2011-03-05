@@ -107,12 +107,12 @@ class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
       colHeadRepeater.add(createColHead("fibu.kost2"));
     }
     if (taskTree.hasOrderPositionsEntries() == true
-        && accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
+        && accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
             ProjectForgeGroup.PROJECT_ASSISTANT, ProjectForgeGroup.PROJECT_MANAGER) == true) {
       colHeadRepeater.add(createColHead("fibu.auftrag.auftraege"));
     }
     colHeadRepeater.add(createColHead("shortDescription"));
-    if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
+    if (accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
       colHeadRepeater.add(createColHead("task.protectTimesheetsUntil.short"));
     }
     colHeadRepeater.add(createColHead("task.reference"));
@@ -191,7 +191,7 @@ class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
       addColumn(colBodyRepeater, col, cssStyle);
     }
     if (taskTree.hasOrderPositionsEntries() == true
-        && accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
+        && accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
             ProjectForgeGroup.PROJECT_ASSISTANT, ProjectForgeGroup.PROJECT_MANAGER) == true) {
       final Set<AuftragsPositionVO> orderPositions = taskTree.getOrderPositionEntries(task.getId());
       if (CollectionUtils.isEmpty(orderPositions) == true) {
@@ -205,7 +205,7 @@ class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
     }
     col = new Label(colBodyRepeater.newChildId(), task.getShortDescription());
     addColumn(colBodyRepeater, col, cssStyle);
-    if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
+    if (accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
       col = new Label(colBodyRepeater.newChildId(), dateTimeFormatter.getFormattedDate(task.getProtectTimesheetsUntil()));
       col.add(new AttributeAppendModifier("style", new Model<String>("white-space: nowrap;")));
       addColumn(colBodyRepeater, col, cssStyle);

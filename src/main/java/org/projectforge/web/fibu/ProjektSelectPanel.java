@@ -87,7 +87,7 @@ public class ProjektSelectPanel extends AbstractSelectPanel<ProjektDO>
     };
     selectButton.setDefaultFormProcessing(false);
     add(selectButton);
-    final boolean hasSelectAccess = projektDao.hasSelectAccess(false);
+    final boolean hasSelectAccess = projektDao.hasLoggedInUserSelectAccess(false);
     if (hasSelectAccess == false) {
       selectButton.setVisible(false);
     }

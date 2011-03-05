@@ -1149,7 +1149,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     {
       super(id, "rejectSaveFragment", GanttChartEditTreeTablePanel.this);
       if (task != null) {
-        hasTaskUpdateAccess = taskDao.hasUpdateAccess(task, task, false);
+        hasTaskUpdateAccess = taskDao.hasLoggedInUserUpdateAccess(task, task, false);
       }
       this.dataComponent = dataComponent;
       addColumn(parent, this, "white-space: nowrap; width: 32px;");

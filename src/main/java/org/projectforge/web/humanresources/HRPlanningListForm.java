@@ -82,7 +82,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     super.init();
     final boolean hasFullAccess = parentPage.hasFullAccess();
     final HRPlanningFilter filter = getSearchFilter();
-    if (hrPlanningEntryDao.hasSelectAccess(false) == false) {
+    if (hrPlanningEntryDao.hasLoggedInUserSelectAccess(false) == false) {
       filter.setUserId(getUser().getId());
     }
     startDate = new DatePanel("startDate", new PropertyModel<Date>(getSearchFilter(), "startTime"), DatePanelSettings.get().withCallerPage(
@@ -95,7 +95,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     filterContainer.add(stopDate);
     final WebMarkupContainer projektRow = new WebMarkupContainer("projektRow");
     filterContainer.add(projektRow);
-    if (projektDao.hasSelectAccess(false) == true) {
+    if (projektDao.hasLoggedInUserSelectAccess(false) == true) {
       final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel("projekt", new Model<ProjektDO>() {
         @Override
         public ProjektDO getObject()
@@ -108,7 +108,7 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
     } else {
       projektRow.add(createInvisibleDummyComponent("projekt"));
     }
-    if (hrPlanningEntryDao.hasSelectAccess(false) == true) {
+    if (hrPlanningEntryDao.hasLoggedInUserSelectAccess(false) == true) {
       final UserSelectPanel userSelectPanel = new UserSelectPanel("user", new Model<PFUserDO>() {
         @Override
         public PFUserDO getObject()

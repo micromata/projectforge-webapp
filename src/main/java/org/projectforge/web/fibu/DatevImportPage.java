@@ -184,7 +184,7 @@ public class DatevImportPage extends AbstractSecuredPage
 
   private void checkAccess()
   {
-    accessChecker.checkRight(UserRightId.FIBU_DATEV_IMPORT, UserRightValue.TRUE);
+    accessChecker.checkLoggedInUserRight(UserRightId.FIBU_DATEV_IMPORT, UserRightValue.TRUE);
     accessChecker.checkDemoUser();
   }
 

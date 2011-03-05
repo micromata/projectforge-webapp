@@ -107,7 +107,7 @@ public class TaskTreePage extends AbstractSecuredPage
       }, getString("add"));
       contentMenuEntries.add(newItemMenuEntry);
       dropDownMenu.setVisible(true);
-      new AbstractReindexTopRightMenu(this, accessChecker.isUserMemberOfAdminGroup()) {
+      new AbstractReindexTopRightMenu(this, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
         @Override
         protected void rebuildDatabaseIndex(boolean onlyNewest)
         {
@@ -152,7 +152,7 @@ public class TaskTreePage extends AbstractSecuredPage
    */
   public boolean isShowRootNode()
   {
-    return (accessChecker.isUserMemberOfAdminGroup()) || accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP);
+    return (accessChecker.isLoggedInUserMemberOfAdminGroup()) || accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP);
   }
 
   void persistOpenNodes()

@@ -74,7 +74,7 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
   @Override
   public List<IColumn<PFUserDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    final boolean updateAccess = userDao.hasAccess(null, null, OperationType.UPDATE, false);
+    final boolean updateAccess = userDao.hasLoggedInUserAccess(null, null, OperationType.UPDATE, false);
     final List<IColumn<PFUserDO>> columns = new ArrayList<IColumn<PFUserDO>>();
     final CellItemListener<PFUserDO> cellItemListener = new CellItemListener<PFUserDO>() {
       public void populateItem(Item<ICellPopulator<PFUserDO>> item, String componentId, IModel<PFUserDO> rowModel)

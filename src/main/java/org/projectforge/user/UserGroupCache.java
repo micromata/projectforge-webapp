@@ -165,9 +165,21 @@ public class UserGroupCache extends AbstractCache
    * @param groupId
    * @return
    */
-  public boolean isUserMemberOfGroup(Integer groupId)
+  public boolean isLoggedInUserMemberOfGroup(Integer groupId)
   {
     return isUserMemberOfGroup(PFUserContext.getUserId(), groupId);
+  }
+
+  /**
+   * @param groupId
+   * @return
+   */
+  public boolean isUserMemberOfGroup(final PFUserDO user, final Integer groupId)
+  {
+    if (user == null) {
+      return false;
+    }
+    return isUserMemberOfGroup(user.getId(), groupId);
   }
 
   public boolean isUserMemberOfGroup(Integer userId, Integer groupId)

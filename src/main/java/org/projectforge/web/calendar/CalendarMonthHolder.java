@@ -161,7 +161,7 @@ public class CalendarMonthHolder extends MonthHolder
             col = new ArrayList<BirthdayAddress>();
             day.addObject("birthdays", col);
           }
-          if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
+          if (accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
             ba.setAge(day.getDate());
           }
           col.add(ba);

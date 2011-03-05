@@ -340,7 +340,7 @@ public class HRPlanningListPage extends AbstractListPage<HRPlanningListForm, HRP
   protected boolean hasFullAccess()
   {
     if (fullAccess == null) {
-      fullAccess = hrPlanningDao.hasInsertAccess(null, false);
+      fullAccess = hrPlanningDao.hasLoggedInUserInsertAccess(null, false);
     }
     return fullAccess;
   }

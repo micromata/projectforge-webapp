@@ -95,7 +95,7 @@ public class MenuItemDef implements Serializable
     final ProjectForgeGroup[] visibleForGroups = getVisibleForGroups();
     if (visibleForGroups != null
         && visibleForGroups.length > 0
-        && context.getAccessChecker().isUserMemberOfGroup(visibleForGroups) == false) {
+        && context.getAccessChecker().isLoggedInUserMemberOfGroup(visibleForGroups) == false) {
       // Do nothing because menu is not visible for logged in user.
       return null;
     }
@@ -311,7 +311,7 @@ public class MenuItemDef implements Serializable
       // Should not occur, for security reasons deny at default.
       return false;
     }
-    if (accessChecker.hasRight(requiredRightId, false, requiredRightValues) == true) {
+    if (accessChecker.hasLoggedInUserRight(requiredRightId, false, requiredRightValues) == true) {
       return true;
     }
     return false;

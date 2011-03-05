@@ -193,7 +193,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 
   private boolean isOtherUsersAllowed()
   {
-    return accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
+    return accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
         ProjectForgeGroup.PROJECT_MANAGER);
   }
 

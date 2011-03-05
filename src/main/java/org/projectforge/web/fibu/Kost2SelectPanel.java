@@ -81,7 +81,7 @@ public class Kost2SelectPanel extends AbstractSelectPanel<Kost2DO>
     };
     selectButton.setDefaultFormProcessing(false);
     add(selectButton);
-    final boolean hasSelectAccess = kost2Dao.hasSelectAccess(false);
+    final boolean hasSelectAccess = kost2Dao.hasLoggedInUserSelectAccess(false);
     if (hasSelectAccess == false) {
       selectButton.setVisible(false);
     }

@@ -99,7 +99,7 @@ public class InvoicePositionsPanel extends Panel
           final String invoiceNumber = String.valueOf(invoicePosition.getRechnungNummer());
           final Component label = new Label("label", invoiceNumber).setRenderBodyOnly(true);
           item.add(label);
-          if (rechnungDao.hasSelectAccess(false) == true) {
+          if (rechnungDao.hasLoggedInUserSelectAccess(false) == true) {
             link.add(new Label("label", invoiceNumber));
             label.setVisible(false);
           } else {

@@ -287,6 +287,6 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
     } else if (menuItemDef.getOrderNumber() > o.menuItemDef.getOrderNumber()) {
       return 1;
     }
-    return menuItemDef.getI18nKey().compareTo(menuItemDef.getI18nKey());
+    return menuItemDef.getI18nKey().compareTo(o.getI18nKey());
   }
 }

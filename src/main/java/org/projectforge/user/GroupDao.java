@@ -284,7 +284,7 @@ public class GroupDao extends BaseDao<GroupDO>
    * @see org.projectforge.core.BaseDao#hasSelectAccess()
    */
   @Override
-  public boolean hasSelectAccess(boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final boolean throwException)
   {
     return true;
   }
@@ -294,13 +294,12 @@ public class GroupDao extends BaseDao<GroupDO>
    * @see org.projectforge.core.BaseDao#hasSelectAccess(org.projectforge.core.BaseDO, boolean)
    */
   @Override
-  public boolean hasSelectAccess(GroupDO obj, boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final GroupDO obj, final boolean throwException)
   {
     Validate.notNull(obj);
-    boolean result = accessChecker.isUserMemberOfAdminGroup()
-        || accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
+    boolean result = accessChecker.isUserMemberOfAdminGroup(user)
+        || accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
     if (result == false && obj.isDeleted() == false) {
-      final PFUserDO user = PFUserContext.getUser();
       Validate.notNull(user);
       result = userGroupCache.isUserMemberOfGroup(user.getId(), obj.getId());
     }
@@ -314,15 +313,16 @@ public class GroupDao extends BaseDao<GroupDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(GroupDO obj, GroupDO oldObj, OperationType operationType, boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final GroupDO obj, final GroupDO oldObj, final OperationType operationType,
+      final boolean throwException)
   {
-    return accessChecker.isUserMemberOfAdminGroup(throwException);
+    return accessChecker.isUserMemberOfAdminGroup(user, throwException);
   }
 
   @Override
-  public boolean hasHistoryAccess(boolean throwException)
+  public boolean hasHistoryAccess(final PFUserDO user, final boolean throwException)
   {
-    return accessChecker.isUserMemberOfAdminGroup(throwException);
+    return accessChecker.isUserMemberOfAdminGroup(user, throwException);
   }
 
   @Override
