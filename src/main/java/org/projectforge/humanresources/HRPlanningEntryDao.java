@@ -135,7 +135,7 @@ public class HRPlanningEntryDao extends BaseDao<HRPlanningEntryDO>
         if (projekt.getProjektManagerGroup() == null) {
           continue;
         }
-        if (userGroupCache.isUserMemberOfGroup(projekt.getProjektManagerGroupId()) == false) {
+        if (userGroupCache.isLoggedInUserMemberOfGroup(projekt.getProjektManagerGroupId()) == false) {
           continue;
         }
       }
@@ -223,31 +223,31 @@ public class HRPlanningEntryDao extends BaseDao<HRPlanningEntryDO>
   }
 
   /**
-   * @see HRPlanningDao#hasSelectAccess(boolean)
+   * @see HRPlanningDao#hasSelectAccess(PFUserDO, boolean)
    */
   @Override
-  public boolean hasSelectAccess(boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final boolean throwException)
   {
-    return hrPlanningDao.hasSelectAccess(throwException);
+    return hrPlanningDao.hasSelectAccess(user, throwException);
   }
 
   /**
    * @see HRPlanningDao#hasAccess(HRPlanningDO, OperationType, boolean)
    */
   @Override
-  public boolean hasAccess(HRPlanningEntryDO obj, HRPlanningEntryDO oldObj, OperationType operationType, boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final HRPlanningEntryDO obj, final HRPlanningEntryDO oldObj, final OperationType operationType, final boolean throwException)
   {
     final HRPlanningDO old = oldObj != null ? oldObj.getPlanning() : null;
-    return hrPlanningDao.hasAccess(obj.getPlanning(), old, operationType, throwException);
+    return hrPlanningDao.hasAccess(user, obj.getPlanning(), old, operationType, throwException);
   }
 
   /**
-   * @see HRPlanningDao#hasSelectAccess(HRPlanningDO, boolean)
+   * @see HRPlanningDao#hasUserSelectAccess(HRPlanningDO, boolean)
    */
   @Override
-  public boolean hasSelectAccess(HRPlanningEntryDO obj, boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final HRPlanningEntryDO obj,final boolean throwException)
   {
-    return hrPlanningDao.hasSelectAccess(obj.getPlanning(), throwException);
+    return hrPlanningDao.hasSelectAccess(user, obj.getPlanning(), throwException);
   }
 
   @Override

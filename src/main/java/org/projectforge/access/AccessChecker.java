@@ -60,10 +60,19 @@ public class AccessChecker
    * Tests for every group the user is assigned to, if the given permission is given.
    * @return true, if the user owns the required permission, otherwise false.
    */
-  public boolean hasPermission(final Integer taskId, final AccessType accessType, final OperationType operationType,
+  public boolean hasLoggedInUserPermission(final Integer taskId, final AccessType accessType, final OperationType operationType,
       final boolean throwException)
   {
-    final PFUserDO user = PFUserContext.getUser();
+    return hasPermission(PFUserContext.getUser(), taskId, accessType, operationType, throwException);
+  }
+
+  /**
+   * Tests for every group the user is assigned to, if the given permission is given.
+   * @return true, if the user owns the required permission, otherwise false.
+   */
+  public boolean hasPermission(final PFUserDO user, final Integer taskId, final AccessType accessType, final OperationType operationType,
+      final boolean throwException)
+  {
     Validate.notNull(user);
     if (userGroupCache.isUserMemberOfAdminGroup(user.getId()) == true) {
       // A user group "Admin" has always access.
@@ -120,9 +129,9 @@ public class AccessChecker
    * Checks if the user is an admin user (member of admin group). If not, an AccessException will be thrown.
    * @see #isUserMemberOfAdminGroup()
    */
-  public void checkIsUserMemberOfAdminGroup()
+  public void checkIsLoggedInUserMemberOfAdminGroup()
   {
-    checkIsUserMemberOfGroup(ProjectForgeGroup.ADMIN_GROUP);
+    checkIsLoggedInUserMemberOfGroup(ProjectForgeGroup.ADMIN_GROUP);
   }
 
   /**
@@ -130,9 +139,9 @@ public class AccessChecker
    * @return
    * @see org.projectforge.user.UserGroupCache#isUserMemberOfAdminGroup(java.lang.Integer)
    */
-  public boolean isUserMemberOfAdminGroup()
+  public boolean isLoggedInUserMemberOfAdminGroup()
   {
-    return isUserMemberOfGroup(ProjectForgeGroup.ADMIN_GROUP);
+    return isUserMemberOfAdminGroup(PFUserContext.getUser());
   }
 
   /**
@@ -140,19 +149,48 @@ public class AccessChecker
    * @return
    * @see org.projectforge.user.UserGroupCache#isUserMemberOfAdminGroup(java.lang.Integer)
    */
-  public boolean isUserMemberOfAdminGroup(boolean throwException)
+  public boolean isUserMemberOfAdminGroup(final PFUserDO user)
   {
-    return isUserMemberOfGroup(throwException, ProjectForgeGroup.ADMIN_GROUP);
+    return isUserMemberOfGroup(user, ProjectForgeGroup.ADMIN_GROUP);
+  }
+
+  /**
+   * @param userId
+   * @return
+   * @see org.projectforge.user.UserGroupCache#isUserMemberOfAdminGroup(java.lang.Integer)
+   */
+  public boolean isLoggedInUserMemberOfAdminGroup(boolean throwException)
+  {
+    return isLoggedInUserMemberOfGroup(throwException, ProjectForgeGroup.ADMIN_GROUP);
+  }
+
+  /**
+   * @param userId
+   * @return
+   * @see org.projectforge.user.UserGroupCache#isUserMemberOfAdminGroup(java.lang.Integer)
+   */
+  public boolean isUserMemberOfAdminGroup(final PFUserDO user, final boolean throwException)
+  {
+    return isUserMemberOfGroup(user, throwException, ProjectForgeGroup.ADMIN_GROUP);
   }
 
   /**
    * Checks if the user is in one of the given groups. If not, an AccessException will be thrown.
    * @see #isUserMemberOfGroup(ProjectForgeGroup...)
    */
-  public void checkIsUserMemberOfGroup(ProjectForgeGroup... groups)
+  public void checkIsLoggedInUserMemberOfGroup(final ProjectForgeGroup... groups)
   {
-    if (isUserMemberOfGroup(groups) == false) {
-      throw getUserNotMemberOfException(groups);
+    checkIsUserMemberOfGroup(PFUserContext.getUser(), groups);
+  }
+
+  /**
+   * Checks if the user is in one of the given groups. If not, an AccessException will be thrown.
+   * @see #isUserMemberOfGroup(ProjectForgeGroup...)
+   */
+  public void checkIsUserMemberOfGroup(final PFUserDO user, final ProjectForgeGroup... groups)
+  {
+    if (isUserMemberOfGroup(user, groups) == false) {
+      throw getLoggedInUserNotMemberOfException(groups);
     }
   }
 
@@ -162,9 +200,9 @@ public class AccessChecker
    * @param groups
    * @see #isUserMemberOfGroup(boolean, ProjectForgeGroup...)
    */
-  public boolean isUserMemberOfGroup(ProjectForgeGroup... groups)
+  public boolean isLoggedInUserMemberOfGroup(ProjectForgeGroup... groups)
   {
-    return isUserMemberOfGroup(false, groups);
+    return isLoggedInUserMemberOfGroup(false, groups);
   }
 
   /**
@@ -174,14 +212,25 @@ public class AccessChecker
    * @param groups
    * @see #isUserMemberOfGroup(PFUserDO, ProjectForgeGroup...)
    */
-  public boolean isUserMemberOfGroup(boolean throwException, ProjectForgeGroup... groups)
+  public boolean isLoggedInUserMemberOfGroup(boolean throwException, ProjectForgeGroup... groups)
+  {
+    return isUserMemberOfGroup(PFUserContext.getUser(), throwException, groups);
+  }
+
+  /**
+   * Checks if the user of the PFUserContext (logged in user) is member at least of one of the given groups.
+   * 
+   * @param throwException default false.
+   * @param groups
+   * @see #isUserMemberOfGroup(PFUserDO, ProjectForgeGroup...)
+   */
+  public boolean isUserMemberOfGroup(final PFUserDO user, final boolean throwException, final ProjectForgeGroup... groups)
   {
     Validate.notNull(groups);
-    final PFUserDO user = PFUserContext.getUser();
     if (user == null) {
       // Before user is logged in.
       if (throwException == true) {
-        throw getUserNotMemberOfException(groups);
+        throw getLoggedInUserNotMemberOfException(groups);
       }
       return false;
     }
@@ -190,11 +239,11 @@ public class AccessChecker
     } else if (isUserMemberOfGroup(user, groups) == true) {
       return true;
     } else {
-      throw getUserNotMemberOfException(groups);
+      throw getLoggedInUserNotMemberOfException(groups);
     }
   }
 
-  private AccessException getUserNotMemberOfException(ProjectForgeGroup... groups)
+  private AccessException getLoggedInUserNotMemberOfException(ProjectForgeGroup... groups)
   {
     StringBuffer buf = new StringBuffer();
     for (int i = 0; i < groups.length; i++) {
@@ -248,19 +297,29 @@ public class AccessChecker
    * @param user
    * @return
    */
-  public boolean isContextUserInSameGroup(final PFUserDO user)
+  public boolean isLoggedInUserInSameGroup(final PFUserDO user)
   {
-    Collection<Integer> userGroups = userGroupCache.getUserGroups(user);
+    return areUsersInSameGroup(PFUserContext.getUser(), user);
+  }
+
+  /**
+   * Is the current context user in at minimum one group of the groups assigned to the given user?
+   * @param user2
+   * @return
+   */
+  public boolean areUsersInSameGroup(final PFUserDO user1, final PFUserDO user2)
+  {
+    final Collection<Integer> userGroups = userGroupCache.getUserGroups(user2);
     if (userGroups == null) {
       // No groups found.
       return false;
     }
-    Collection<Integer> currentUserGroups = userGroupCache.getUserGroups(PFUserContext.getUser());
+    final Collection<Integer> currentUserGroups = userGroupCache.getUserGroups(user1);
     if (currentUserGroups == null) {
       // User has now associated groups.
       return false;
     }
-    for (Integer id : currentUserGroups) {
+    for (final Integer id : currentUserGroups) {
       if (userGroups.contains(id) == true) {
         return true;
       }
@@ -269,6 +328,7 @@ public class AccessChecker
   }
 
   /**
+   * @param user Check the access for the given user instead of the logged-in user.
    * @param rightId
    * @param obj
    * @param oldObj
@@ -276,62 +336,89 @@ public class AccessChecker
    * @param throwException
    */
   @SuppressWarnings("unchecked")
-  public boolean hasAccess(final UserRightId rightId, final Object obj, final Object oldObj, final OperationType operationType,
-      final boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final UserRightId rightId, final Object obj, final Object oldObj,
+      final OperationType operationType, final boolean throwException)
   {
     final UserRight right = userRights.getRight(rightId);
     Validate.notNull(right);
     boolean result;
     if (right instanceof UserRightAccessCheck< ? >) {
-      final PFUserDO user = PFUserContext.getUser();
       Validate.notNull(user);
       switch (operationType) {
         case SELECT:
           if (obj != null) {
-            result = ((UserRightAccessCheck) right).hasSelectAccess(obj);
+            result = ((UserRightAccessCheck) right).hasSelectAccess(user, obj);
           } else {
-            result = ((UserRightAccessCheck) right).hasSelectAccess();
+            result = ((UserRightAccessCheck) right).hasSelectAccess(user);
           }
           break;
         case INSERT:
           if (obj != null) {
-            result = ((UserRightAccessCheck) right).hasInsertAccess(obj);
+            result = ((UserRightAccessCheck) right).hasInsertAccess(user, obj);
           } else {
-            result = ((UserRightAccessCheck) right).hasInsertAccess();
+            result = ((UserRightAccessCheck) right).hasInsertAccess(user);
           }
           break;
         case UPDATE:
-          result = ((UserRightAccessCheck) right).hasUpdateAccess(obj, oldObj);
+          result = ((UserRightAccessCheck) right).hasUpdateAccess(user, obj, oldObj);
           break;
         case DELETE:
-          result = ((UserRightAccessCheck) right).hasDeleteAccess(obj);
+          result = ((UserRightAccessCheck) right).hasDeleteAccess(user, obj);
           break;
         default:
           throw new UnsupportedOperationException("Oups, value not supported for OperationType: " + operationType);
       }
       if (result == false && throwException == true) {
-        throw new AccessException("access.exception.userHasNotRight", rightId, operationType);
+        throw new AccessException(user, "access.exception.userHasNotRight", rightId, operationType);
       }
       return result;
     }
     if (operationType == OperationType.SELECT) {
-      return hasRight(rightId, throwException, UserRightValue.READONLY, UserRightValue.READWRITE);
+      return hasRight(user, rightId, throwException, UserRightValue.READONLY, UserRightValue.READWRITE);
     } else {
-      return hasRight(rightId, throwException, UserRightValue.READWRITE);
+      return hasRight(user, rightId, throwException, UserRightValue.READWRITE);
     }
+  }
+
+  /**
+   * Use context user (logged-in user).
+   * @param rightId
+   * @param obj
+   * @param oldObj
+   * @param operationType
+   * @param throwException
+   * @see #hasAccess(PFUserDO, UserRightId, Object, Object, OperationType, boolean)
+   */
+  public boolean hasLoggedInUserAccess(final UserRightId rightId, final Object obj, final Object oldObj, final OperationType operationType,
+      final boolean throwException)
+  {
+    return hasAccess(PFUserContext.getUser(), rightId, obj, oldObj, operationType, throwException);
+  }
+
+  /**
+   * Use context user (logged-in user).
+   * @param rightId
+   * @param obj
+   * @param throwException
+   * @see #hasSelectAccess(PFUserDO, UserRightId, boolean)
+   */
+  public boolean hasLoggedInUserSelectAccess(final UserRightId rightId, final boolean throwException)
+  {
+    return hasSelectAccess(PFUserContext.getUser(), rightId, throwException);
   }
 
   /**
    * Calls {@link #hasAccess(UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#SELECT} and both Objects as
    * null.
+   * @param user Check the access for the given user instead of the logged-in user.
    * @param rightId
    * @param obj
    * @param throwException
    * @see #hasAccess(UserRightId, Object, Object, OperationType, boolean)
    */
-  public boolean hasSelectAccess(final UserRightId rightId, final boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final UserRightId rightId, final boolean throwException)
   {
-    return hasAccess(rightId, null, null, OperationType.SELECT, throwException);
+    return hasAccess(user, rightId, null, null, OperationType.SELECT, throwException);
   }
 
   /**
@@ -341,9 +428,9 @@ public class AccessChecker
    * @param throwException
    * @see #hasAccess(UserRightId, Object, Object, OperationType, boolean)
    */
-  public boolean hasSelectAccess(final UserRightId rightId, final Object obj, final boolean throwException)
+  public boolean hasLoggedInUserSelectAccess(final UserRightId rightId, final Object obj, final boolean throwException)
   {
-    return hasAccess(rightId, obj, null, OperationType.SELECT, throwException);
+    return hasLoggedInUserAccess(rightId, obj, null, OperationType.SELECT, throwException);
   }
 
   /**
@@ -353,9 +440,9 @@ public class AccessChecker
    * @param throwException
    * @see #hasAccess(UserRightId, Object, Object, OperationType, boolean)
    */
-  public boolean hasInsertAccess(final UserRightId rightId, final Object obj, final boolean throwException)
+  public boolean hasLoggedInUserInsertAccess(final UserRightId rightId, final Object obj, final boolean throwException)
   {
-    return hasAccess(rightId, obj, null, OperationType.INSERT, throwException);
+    return hasLoggedInUserAccess(rightId, obj, null, OperationType.INSERT, throwException);
   }
 
   /**
@@ -365,9 +452,21 @@ public class AccessChecker
    * @param throwException
    * @see #hasAccess(UserRightId, Object, Object, OperationType, boolean)
    */
-  public boolean hasInsertAccess(final UserRightId rightId, final boolean throwException)
+  public boolean hasLoggedInUserInsertAccess(final UserRightId rightId, final boolean throwException)
   {
-    return hasAccess(rightId, null, null, OperationType.INSERT, throwException);
+    return hasLoggedInUserAccess(rightId, null, null, OperationType.INSERT, throwException);
+  }
+
+  /**
+   * Calls {@link #hasAccess(UserRightId, Object, Object, OperationType, boolean)} with {@link OperationType#INSERT}.
+   * @param rightId
+   * @param obj
+   * @param throwException
+   * @see #hasAccess(UserRightId, Object, Object, OperationType, boolean)
+   */
+  public boolean hasInsertAccess(final PFUserDO user, final UserRightId rightId, final boolean throwException)
+  {
+    return hasAccess(user, rightId, null, null, OperationType.INSERT, throwException);
   }
 
   /**
@@ -378,9 +477,9 @@ public class AccessChecker
    * @param throwException
    * @see #hasAccess(UserRightId, Object, Object, OperationType, boolean)
    */
-  public boolean hasUpdateAccess(final UserRightId rightId, final Object obj, final Object oldObj, final boolean throwException)
+  public boolean hasLoggedInUserUpdateAccess(final UserRightId rightId, final Object obj, final Object oldObj, final boolean throwException)
   {
-    return hasAccess(rightId, obj, oldObj, OperationType.UPDATE, throwException);
+    return hasLoggedInUserAccess(rightId, obj, oldObj, OperationType.UPDATE, throwException);
   }
 
   /**
@@ -391,18 +490,28 @@ public class AccessChecker
    * @param throwException
    * @see #hasAccess(UserRightId, Object, Object, OperationType, boolean)
    */
-  public boolean hasDeleteAccess(final UserRightId rightId, final Object oldObj, final Object obj, final boolean throwException)
+  public boolean hasLoggedInUserDeleteAccess(final UserRightId rightId, final Object oldObj, final Object obj, final boolean throwException)
   {
-    return hasAccess(rightId, obj, oldObj, OperationType.DELETE, throwException);
+    return hasLoggedInUserAccess(rightId, obj, oldObj, OperationType.DELETE, throwException);
+  }
+
+  /**
+   * Throws now exception if the right check fails.
+   * @see #hasRight(UserRightId, boolean, UserRightValue...)
+   * @deprec
+   */
+  public boolean hasLoggedInUserRight(final UserRightId rightId, final UserRightValue... values)
+  {
+    return hasRight(PFUserContext.getUser(), rightId, false, values);
   }
 
   /**
    * Throws now exception if the right check fails.
    * @see #hasRight(UserRightId, boolean, UserRightValue...)
    */
-  public boolean hasRight(final UserRightId rightId, final UserRightValue... values)
+  public boolean hasRight(final PFUserDO user, final UserRightId rightId, final UserRightValue... values)
   {
-    return hasRight(rightId, false, values);
+    return hasRight(user, rightId, false, values);
   }
 
   /**
@@ -411,11 +520,23 @@ public class AccessChecker
    * @param rightId
    * @param values At least one of the values should match.
    * @param throwException
+   */
+  public boolean hasLoggedInUserRight(final UserRightId rightId, final boolean throwException, final UserRightValue... values)
+  {
+    return hasRight(PFUserContext.getUser(), rightId, throwException, values);
+  }
+
+  /**
+   * Checks the availability and the demanded value of the right for the context user. The right will be checked itself on required
+   * constraints, e. g. if assigned groups required.
+   * @param user Check the access for the given user instead of the logged-in user.
+   * @param rightId
+   * @param values At least one of the values should match.
+   * @param throwException
    * @return
    */
-  public boolean hasRight(final UserRightId rightId, final boolean throwException, final UserRightValue... values)
+  public boolean hasRight(final PFUserDO user, final UserRightId rightId, final boolean throwException, final UserRightValue... values)
   {
-    final PFUserDO user = PFUserContext.getUser();
     Validate.notNull(user);
     Validate.notNull(values);
     final UserRightDO rightDO = user.getRight(rightId);
@@ -441,9 +562,19 @@ public class AccessChecker
    * @param throwException
    * @see #hasRight(UserRightId, boolean, UserRightValue...)
    */
-  public boolean hasReadAccess(final UserRightId rightId, boolean throwException)
+  public boolean hasLoggedInUserReadAccess(final UserRightId rightId, boolean throwException)
   {
-    return hasRight(rightId, throwException, UserRightValue.READONLY, UserRightValue.READWRITE);
+    return hasReadAccess(PFUserContext.getUser(), rightId, throwException);
+  }
+
+  /**
+   * @param rightId
+   * @param throwException
+   * @see #hasRight(UserRightId, boolean, UserRightValue...)
+   */
+  public boolean hasReadAccess(final PFUserDO user, final UserRightId rightId, boolean throwException)
+  {
+    return hasRight(user, rightId, throwException, UserRightValue.READONLY, UserRightValue.READWRITE);
   }
 
   /**
@@ -452,9 +583,9 @@ public class AccessChecker
    * @param value
    * @see #hasReadAccess(UserRightId, boolean)
    */
-  public boolean checkReadAccess(final UserRightId rightId)
+  public boolean checkLoggedInUserReadAccess(final UserRightId rightId)
   {
-    return hasReadAccess(rightId, true);
+    return hasLoggedInUserReadAccess(rightId, true);
   }
 
   /**
@@ -462,9 +593,9 @@ public class AccessChecker
    * @param throwException
    * @see #hasRight(UserRightId, boolean, UserRightValue...)
    */
-  public boolean hasWriteAccess(final UserRightId rightId, boolean throwException)
+  public boolean hasLoggedInUserWriteAccess(final UserRightId rightId, boolean throwException)
   {
-    return hasRight(rightId, throwException, UserRightValue.READWRITE);
+    return hasLoggedInUserRight(rightId, throwException, UserRightValue.READWRITE);
   }
 
   /**
@@ -473,20 +604,24 @@ public class AccessChecker
    * @param value
    * @see #hasWriteAccess(UserRightId, boolean)
    */
-  public boolean checkWriteAccess(final UserRightId rightId)
+  public boolean checkLoggedInUserWriteAccess(final UserRightId rightId)
   {
-    return hasWriteAccess(rightId, true);
+    return hasLoggedInUserWriteAccess(rightId, true);
+  }
+
+  public boolean hasLoggedInUserHistoryAccess(final UserRightId rightId, final Object obj, final boolean throwException)
+  {
+    return hasHistoryAccess(PFUserContext.getUser(), rightId, obj, throwException);
   }
 
   @SuppressWarnings("unchecked")
-  public boolean hasHistoryAccess(final UserRightId rightId, final Object obj, final boolean throwException)
+  public boolean hasHistoryAccess(final PFUserDO user, final UserRightId rightId, final Object obj, final boolean throwException)
   {
     final UserRight right = userRights.getRight(rightId);
     Validate.notNull(right);
     if (right instanceof UserRightAccessCheck< ? >) {
-      final PFUserDO user = PFUserContext.getUser();
       Validate.notNull(user);
-      if (((UserRightAccessCheck) right).hasHistoryAccess(obj) == true) {
+      if (((UserRightAccessCheck) right).hasHistoryAccess(user, obj) == true) {
         return true;
       } else if (throwException == true) {
         throw new AccessException("access.exception.userHasNotRight", rightId, "history");
@@ -494,7 +629,7 @@ public class AccessChecker
         return false;
       }
     } else {
-      return hasRight(rightId, throwException, UserRightValue.READONLY, UserRightValue.READWRITE);
+      return hasRight(user, rightId, throwException, UserRightValue.READONLY, UserRightValue.READWRITE);
     }
   }
 
@@ -504,9 +639,20 @@ public class AccessChecker
    * @param value
    * @see #hasRight(UserRightId, UserRightValue, boolean)
    */
-  public boolean checkRight(final UserRightId rightId, final UserRightValue... values)
+  public boolean checkLoggedInUserRight(final UserRightId rightId, final UserRightValue... values)
   {
-    return hasRight(rightId, true, values);
+    return hasLoggedInUserRight(rightId, true, values);
+  }
+
+  /**
+   * Calls {@link #hasRight(UserRightId, UserRightValue, boolean)} with throwException = true.
+   * @param rightId
+   * @param value
+   * @see #hasRight(UserRightId, UserRightValue, boolean)
+   */
+  public boolean checkUserRight(final PFUserDO user, final UserRightId rightId, final UserRightValue... values)
+  {
+    return hasRight(user, rightId, true, values);
   }
 
   /**
@@ -516,8 +662,17 @@ public class AccessChecker
    */
   public boolean isAvailable(final UserRightId rightId)
   {
+    return isAvailable(PFUserContext.getUser(), rightId);
+  }
+
+  /**
+   * Gets the UserRight and calls {@link UserRight#isAvailable(UserGroupCache, PFUserDO)}.
+   * @param rightId
+   * @return
+   */
+  public boolean isAvailable(final PFUserDO user, final UserRightId rightId)
+  {
     final UserRight right = userRights.getRight(rightId);
-    final PFUserDO user = PFUserContext.getUser();
     return right != null && right.isAvailable(userGroupCache, user) == true;
   }
 

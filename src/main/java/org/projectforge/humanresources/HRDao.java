@@ -227,7 +227,7 @@ public class HRDao extends HibernateDaoSupport implements IDao<HRViewData>
 
   private boolean isMyProject(final ProjektDO projekt)
   {
-    return (projekt != null && projekt.getProjektManagerGroup() != null && userGroupCache.isUserMemberOfGroup(projekt
+    return (projekt != null && projekt.getProjektManagerGroup() != null && userGroupCache.isLoggedInUserMemberOfGroup(projekt
         .getProjektManagerGroupId()) == true);
   }
 
@@ -283,8 +283,8 @@ public class HRDao extends HibernateDaoSupport implements IDao<HRViewData>
    * @return true.
    * @see org.projectforge.core.IDao#hasInsertAccess()
    */
-  public boolean hasInsertAccess()
+  public boolean hasInsertAccess(final PFUserDO user)
   {
-    return hrPlanningDao.hasInsertAccess();
+    return hrPlanningDao.hasInsertAccess(user);
   }
 }

@@ -476,7 +476,7 @@ public class AuftragDao extends BaseDao<AuftragDO>
     if (contactPerson == null) {
       return false;
     }
-    if (hasAccess(auftrag, null, operationType, false) == false) {
+    if (hasAccess(contactPerson, auftrag, null, OperationType.SELECT, false) == false) {
       return false;
     }
     final Map<String, Object> data = new HashMap<String, Object>();
@@ -576,7 +576,7 @@ public class AuftragDao extends BaseDao<AuftragDO>
   public List<DisplayHistoryEntry> getDisplayHistoryEntries(AuftragDO obj)
   {
     final List<DisplayHistoryEntry> list = super.getDisplayHistoryEntries(obj);
-    if (hasHistoryAccess(obj, false) == false) {
+    if (hasLoggedInUserHistoryAccess(obj, false) == false) {
       return list;
     }
     if (CollectionUtils.isNotEmpty(obj.getPositionen()) == true) {

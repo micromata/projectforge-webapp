@@ -42,7 +42,7 @@ import org.projectforge.user.PFUserDO;
 public class AccessException extends ProjectForgeException
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AccessException.class);
-  
+
   private static final long serialVersionUID = 147795804616526958L;
 
   public final static String I18N_KEY_STANDARD = "access.exception.standard";
@@ -67,16 +67,26 @@ public class AccessException extends ProjectForgeException
 
   protected Class< ? > clazz = null;
 
-  public AccessException(String i18nKey, Object... params)
+  public AccessException(final String i18nKey, final Object... params)
   {
+    this(PFUserContext.getUser(), i18nKey, params);
+  }
+
+  public AccessException(final PFUserDO user, final String i18nKey, final Object... params)
+  {
+    this.user = user;
     this.i18nKey = i18nKey;
     this.params = params;
     log.info("AccessException: " + this);
   }
 
-  public AccessException(AccessType accessType, OperationType operationType)
+  public AccessException(final AccessType accessType, final OperationType operationType)
   {
-    final PFUserDO user = PFUserContext.getUser();
+    this(PFUserContext.getUser(), accessType, operationType);
+  }
+
+  public AccessException(final PFUserDO user, final AccessType accessType, final OperationType operationType)
+  {
     this.user = user;
     this.accessType = accessType;
     this.operationType = operationType;
@@ -84,9 +94,13 @@ public class AccessException extends ProjectForgeException
     log.info("AccessException: " + this);
   }
 
-  public AccessException(Integer taskId, AccessType accessType, OperationType operationType)
+  public AccessException(final Integer taskId, final AccessType accessType, final OperationType operationType)
   {
-    final PFUserDO user = PFUserContext.getUser();
+    this(PFUserContext.getUser(), taskId, accessType, operationType);
+  }
+
+  public AccessException(final PFUserDO user, final Integer taskId, final AccessType accessType, final OperationType operationType)
+  {
     this.user = user;
     this.taskId = taskId;
     this.accessType = accessType;
@@ -120,8 +134,9 @@ public class AccessException extends ProjectForgeException
     }
     return result;
   }
-  
-  public MessageParam[] getMessageArgs() {
+
+  public MessageParam[] getMessageArgs()
+  {
     MessageParam[] result = new MessageParam[3];
     if (taskTree != null && this.taskId != null) {
       TaskDO task = taskTree.getTaskById(taskId);

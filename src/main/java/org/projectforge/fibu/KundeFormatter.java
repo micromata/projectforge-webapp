@@ -85,7 +85,7 @@ public class KundeFormatter extends BaseFormatter
     }
     StringBuffer sb = new StringBuffer();
 
-    boolean hasAccess = kundeDao.hasSelectAccess(false);
+    boolean hasAccess = kundeDao.hasLoggedInUserSelectAccess(false);
     if (hasAccess == false) {
         appendNotVisible(sb);
     } else {

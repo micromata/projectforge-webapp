@@ -67,7 +67,7 @@ public class ReportDao extends HibernateDaoSupport
    */
   public Report createReport(InputStream reportObjectiveAsXml)
   {
-    accessChecker.checkIsUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
+    accessChecker.checkIsLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
     ReportObjective reportObjective = deserializeFromXML(reportObjectiveAsXml);
     Report report = new Report(reportObjective);
     return report;
@@ -79,7 +79,7 @@ public class ReportDao extends HibernateDaoSupport
    * @return
    */
   public Report createReport(String reportObjectiveAsXml) {
-    accessChecker.checkIsUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
+    accessChecker.checkIsLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
     ReportObjective reportObjective = deserializeFromXML(reportObjectiveAsXml);
     Report report = new Report(reportObjective);
     return report;
@@ -94,7 +94,7 @@ public class ReportDao extends HibernateDaoSupport
    */
   public void loadReport(Report report)
   {
-    accessChecker.checkIsUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
+    accessChecker.checkIsLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
     final BuchungssatzFilter filter = new BuchungssatzFilter();
     filter.setFromYear(report.getFromYear());
     filter.setFromMonth(report.getFromMonth());

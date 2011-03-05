@@ -152,7 +152,7 @@ public class MebDao extends BaseDao<MebEntryDO>
     final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
     try {
       int counter = jdbc.queryForInt("SELECT COUNT(*) FROM t_meb_entry where owner_fk=" + userId + " and status='RECENT'");
-      if (accessChecker.isUserMemberOfAdminGroup() == true) {
+      if (accessChecker.isLoggedInUserMemberOfAdminGroup() == true) {
         counter += jdbc.queryForInt("SELECT COUNT(*) FROM t_meb_entry where owner_fk is null");
       }
       return counter;

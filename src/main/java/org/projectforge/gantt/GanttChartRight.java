@@ -27,6 +27,7 @@ import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.task.TaskTree;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
@@ -54,7 +55,7 @@ public class GanttChartRight extends UserRightAccessCheck<GanttChartDO>
    * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(org.projectforge.access.AccessChecker, org.projectforge.user.PFUserDO)
    */
   @Override
-  public boolean hasSelectAccess()
+  public boolean hasSelectAccess(final PFUserDO user)
   {
     return true;
   }
@@ -66,12 +67,12 @@ public class GanttChartRight extends UserRightAccessCheck<GanttChartDO>
    * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(java.lang.Object)
    */
   @Override
-  public boolean hasSelectAccess(final GanttChartDO obj)
+  public boolean hasSelectAccess(final PFUserDO user, final GanttChartDO obj)
   {
     if (obj == null) {
       return false;
     }
-    return hasAccess(obj, obj.getReadAccess());
+    return hasAccess(user, obj, obj.getReadAccess());
   }
 
   /**
@@ -81,22 +82,22 @@ public class GanttChartRight extends UserRightAccessCheck<GanttChartDO>
    * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(java.lang.Object)
    */
   @Override
-  public boolean hasAccess(final GanttChartDO obj, final GanttChartDO oldObj, final OperationType operationType)
+  public boolean hasAccess(final PFUserDO user, final GanttChartDO obj, final GanttChartDO oldObj, final OperationType operationType)
   {
     if (obj == null) {
       return false;
     }
     final GanttChartDO gc = oldObj != null ? oldObj : obj;
-    return hasAccess(gc, gc.getWriteAccess());
+    return hasAccess(user, gc, gc.getWriteAccess());
   }
 
   @Override
-  public boolean hasInsertAccess()
+  public boolean hasInsertAccess(final PFUserDO user)
   {
     return true;
   }
 
-  private boolean hasAccess(final GanttChartDO obj, final GanttAccess access)
+  private boolean hasAccess(final PFUserDO user, final GanttChartDO obj, final GanttAccess access)
   {
     if (UserRights.getAccessChecker().userEqualsToContextUser(obj.getOwner()) == true) {
       // Owner has always access:
@@ -111,7 +112,7 @@ public class GanttChartRight extends UserRightAccessCheck<GanttChartDO>
         // Task needed for these GanttAccess types, so no access:
         return false;
       }
-      if (UserRights.getAccessChecker().hasPermission(obj.getTaskId(), AccessType.TASKS, OperationType.SELECT, false) == false) {
+      if (UserRights.getAccessChecker().hasPermission(user, obj.getTaskId(), AccessType.TASKS, OperationType.SELECT, false) == false) {
         // User has no task access:
         return false;
       }
@@ -123,10 +124,10 @@ public class GanttChartRight extends UserRightAccessCheck<GanttChartDO>
       final ProjektDO project = taskTree.getProjekt(obj.getTaskId());
       if (project == null) {
         // Project manager group not found:
-        return UserRights.getAccessChecker().isUserMemberOfGroup(ProjectForgeGroup.PROJECT_MANAGER);
+        return UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.PROJECT_MANAGER);
       }
       // Users of the project manager group have access:
-      return UserRights.getAccessChecker().getUserGroupCache().isUserMemberOfGroup(project.getProjektManagerGroupId());
+      return UserRights.getAccessChecker().getUserGroupCache().isUserMemberOfGroup(user, project.getProjektManagerGroupId());
     } else {
       log.error("Unsupported GanttAccess type: " + access);
     }

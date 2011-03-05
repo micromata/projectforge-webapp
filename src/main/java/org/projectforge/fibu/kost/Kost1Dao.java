@@ -76,7 +76,7 @@ public class Kost1Dao extends BaseDao<Kost1DO>
     if (kost1 == null) {
       return "";
     }
-    if (hasSelectAccess(kost1, false) == true) {
+    if (hasLoggedInUserSelectAccess(kost1, false) == true) {
       return KostFormatter.format(kost1);
     } else {
       EmployeeDO employee = userGroupCache.getEmployee(PFUserContext.getUserId());

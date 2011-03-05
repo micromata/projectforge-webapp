@@ -103,7 +103,7 @@ public class ProjektFormatter extends BaseFormatter
     }
     StringBuffer sb = new StringBuffer();
     // final KundeDO kunde = projekt.getKunde();
-    boolean hasAccess = projektDao.hasSelectAccess(false);
+    boolean hasAccess = projektDao.hasLoggedInUserSelectAccess(false);
     if (hasAccess == false) {
       return null;
     } else if (projekt != null) {

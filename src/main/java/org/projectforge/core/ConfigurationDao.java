@@ -32,6 +32,7 @@ import java.util.TimeZone;
 import org.apache.commons.lang.Validate;
 import org.projectforge.access.OperationType;
 import org.projectforge.task.TaskTree;
+import org.projectforge.user.PFUserDO;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -140,9 +141,10 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
   }
 
   @Override
-  public boolean hasAccess(ConfigurationDO obj, ConfigurationDO oldObj, OperationType operationType, boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final ConfigurationDO obj, final ConfigurationDO oldObj, final OperationType operationType,
+      final boolean throwException)
   {
-    return accessChecker.isUserMemberOfAdminGroup(throwException);
+    return accessChecker.isUserMemberOfAdminGroup(user, throwException);
   }
 
   @Override

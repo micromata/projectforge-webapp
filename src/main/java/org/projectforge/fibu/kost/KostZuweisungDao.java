@@ -25,6 +25,7 @@ package org.projectforge.fibu.kost;
 
 import org.projectforge.access.OperationType;
 import org.projectforge.core.BaseDao;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 
 public class KostZuweisungDao extends BaseDao<KostZuweisungDO>
@@ -43,19 +44,19 @@ public class KostZuweisungDao extends BaseDao<KostZuweisungDO>
    * @see org.projectforge.core.BaseDao#hasSelectAccess()
    */
   @Override
-  public boolean hasSelectAccess(boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final boolean throwException)
   {
-    return accessChecker.isUserMemberOfGroup(throwException, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
+    return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
   }
 
   /**
-   * @see org.projectforge.core.BaseDao#hasSelectAccess(org.projectforge.core.ExtendedBaseDO, boolean)
-   * @see #hasSelectAccess(boolean)
+   * @see org.projectforge.core.BaseDao#hasSelectAccess(PFUserDO, org.projectforge.core.ExtendedBaseDO, boolean)
+   * @see #hasSelectAccess(PFUserDO, boolean)
    */
   @Override
-  public boolean hasSelectAccess(KostZuweisungDO obj, boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final KostZuweisungDO obj, final boolean throwException)
   {
-    return hasSelectAccess(throwException);
+    return hasSelectAccess(user, throwException);
   }
 
   /**
@@ -63,9 +64,10 @@ public class KostZuweisungDao extends BaseDao<KostZuweisungDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(KostZuweisungDO obj, KostZuweisungDO oldObj, OperationType operationType, boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final KostZuweisungDO obj, final KostZuweisungDO oldObj, final OperationType operationType,
+      final boolean throwException)
   {
-    return accessChecker.isUserMemberOfGroup(throwException, ProjectForgeGroup.FINANCE_GROUP);
+    return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.FINANCE_GROUP);
   }
 
   /**

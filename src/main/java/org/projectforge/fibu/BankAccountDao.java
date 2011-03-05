@@ -25,6 +25,7 @@ package org.projectforge.fibu;
 
 import org.projectforge.access.OperationType;
 import org.projectforge.core.BaseDao;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 
 public class BankAccountDao extends BaseDao<BankAccountDO>
@@ -39,9 +40,9 @@ public class BankAccountDao extends BaseDao<BankAccountDO>
    * @see org.projectforge.core.BaseDao#hasSelectAccess()
    */
   @Override
-  public boolean hasSelectAccess(boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final boolean throwException)
   {
-    return accessChecker.isUserMemberOfGroup(throwException, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
+    return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
   }
 
   /**
@@ -49,9 +50,9 @@ public class BankAccountDao extends BaseDao<BankAccountDO>
    * @see #hasSelectAccess(boolean)
    */
   @Override
-  public boolean hasSelectAccess(BankAccountDO obj, boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final BankAccountDO obj, final boolean throwException)
   {
-    return hasSelectAccess(throwException);
+    return hasSelectAccess(user, throwException);
   }
 
   /**
@@ -59,9 +60,10 @@ public class BankAccountDao extends BaseDao<BankAccountDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(BankAccountDO obj, BankAccountDO oldObj, OperationType operationType, boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final BankAccountDO obj, final BankAccountDO oldObj, final OperationType operationType,
+      final boolean throwException)
   {
-    return accessChecker.isUserMemberOfGroup(throwException, ProjectForgeGroup.FINANCE_GROUP);
+    return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.FINANCE_GROUP);
   }
 
   @Override

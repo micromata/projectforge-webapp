@@ -30,8 +30,8 @@ import org.projectforge.access.OperationType;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
-
 
 public class KundeDao extends BaseDao<KundeDO>
 {
@@ -56,22 +56,22 @@ public class KundeDao extends BaseDao<KundeDO>
    * @see org.projectforge.core.BaseDao#hasSelectAccess()
    */
   @Override
-  public boolean hasSelectAccess(boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final boolean throwException)
   {
-    return accessChecker.isUserMemberOfGroup(throwException, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
+    return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
         ProjectForgeGroup.PROJECT_MANAGER, ProjectForgeGroup.PROJECT_ASSISTANT);
   }
 
   @Override
-  public boolean hasSelectAccess(KundeDO obj, boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final KundeDO obj, final boolean throwException)
   {
     if (obj == null) {
       return true;
     }
-    if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP) == true) {
+    if (accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP) == true) {
       return true;
     }
-    if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.PROJECT_MANAGER, ProjectForgeGroup.PROJECT_ASSISTANT) == true) {
+    if (accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.PROJECT_MANAGER, ProjectForgeGroup.PROJECT_ASSISTANT) == true) {
       if (obj.getStatus() != null
           && obj.getStatus().isIn(KundeStatus.ENDED, KundeStatus.NONACTIVE, KundeStatus.NONEXISTENT) == false
           && obj.isDeleted() == false) {
@@ -80,7 +80,7 @@ public class KundeDao extends BaseDao<KundeDO>
       }
     }
     if (throwException == true) {
-      accessChecker.checkIsUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP);
+      accessChecker.checkIsUserMemberOfGroup(user, ProjectForgeGroup.FINANCE_GROUP);
       log.error("Should not occur! An exception should be thrown.");
     }
     return false;
@@ -90,15 +90,16 @@ public class KundeDao extends BaseDao<KundeDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(KundeDO obj, KundeDO oldObj, OperationType operationType, boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final KundeDO obj, final KundeDO oldObj, final OperationType operationType,
+      final boolean throwException)
   {
-    return accessChecker.isUserMemberOfGroup(throwException, ProjectForgeGroup.FINANCE_GROUP);
+    return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.FINANCE_GROUP);
   }
 
   @Override
-  public boolean hasHistoryAccess(boolean throwException)
+  public boolean hasHistoryAccess(final PFUserDO user, final boolean throwException)
   {
-    return accessChecker.isUserMemberOfGroup(throwException, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
+    return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
   }
 
   @Override

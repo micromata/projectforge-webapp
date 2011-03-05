@@ -47,7 +47,7 @@ public class SearchDao extends HibernateDaoSupport
       return null;
     }
     log.debug("Searching in " + clazz);
-    if (baseDao.hasSelectAccess(false) == false || baseDao.hasHistoryAccess(false) == false) {
+    if (baseDao.hasLoggedInUserSelectAccess(false) == false || baseDao.hasLoggedInUserHistoryAccess(false) == false) {
       // User has in general no access to history entries of the given object type (clazz).
       return null;
     }

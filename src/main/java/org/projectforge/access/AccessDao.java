@@ -33,7 +33,6 @@ import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -123,7 +122,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
    * @see org.projectforge.core.BaseDao#hasSelectAccess()
    */
   @Override
-  public boolean hasSelectAccess(boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final boolean throwException)
   {
     return true;
   }
@@ -133,12 +132,11 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
    * @see org.projectforge.core.BaseDao#hasSelectAccess(org.projectforge.core.BaseDO, boolean)
    */
   @Override
-  public boolean hasSelectAccess(GroupTaskAccessDO obj, boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final GroupTaskAccessDO obj, final boolean throwException)
   {
     Validate.notNull(obj);
-    boolean result = accessChecker.isUserMemberOfAdminGroup();
+    boolean result = accessChecker.isUserMemberOfAdminGroup(user);
     if (result == false && obj.isDeleted() == false) {
-      final PFUserDO user = PFUserContext.getUser();
       Validate.notNull(user);
       result = userGroupCache.isUserMemberOfGroup(user.getId(), obj.getGroupId());
     }
@@ -152,31 +150,33 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(GroupTaskAccessDO obj, GroupTaskAccessDO oldObj, OperationType operationType, boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final GroupTaskAccessDO obj, final GroupTaskAccessDO oldObj,
+      final OperationType operationType, final boolean throwException)
   {
-    return accessChecker.hasPermission(obj.getTaskId(), AccessType.TASK_ACCESS_MANAGEMENT, operationType, throwException);
+    return accessChecker.hasPermission(user, obj.getTaskId(), AccessType.TASK_ACCESS_MANAGEMENT, operationType, throwException);
   }
 
   /**
    * @see org.projectforge.core.BaseDao#hasUpdateAccess(Object, Object)
    */
   @Override
-  public boolean hasUpdateAccess(GroupTaskAccessDO obj, GroupTaskAccessDO dbObj, boolean throwException)
+  public boolean hasUpdateAccess(final PFUserDO user, final GroupTaskAccessDO obj, final GroupTaskAccessDO dbObj,
+      final boolean throwException)
   {
     Validate.notNull(dbObj);
     Validate.notNull(obj);
     Validate.notNull(dbObj.getTaskId());
     Validate.notNull(obj.getTaskId());
-    if (accessChecker.hasPermission(obj.getTaskId(), AccessType.TASK_ACCESS_MANAGEMENT, OperationType.UPDATE, throwException) == false) {
+    if (accessChecker.hasPermission(user, obj.getTaskId(), AccessType.TASK_ACCESS_MANAGEMENT, OperationType.UPDATE, throwException) == false) {
       return false;
     }
     if (dbObj.getTaskId().equals(obj.getTaskId()) == false) {
       // User moves the object to another task:
-      if (accessChecker.hasPermission(obj.getTaskId(), AccessType.TASK_ACCESS_MANAGEMENT, OperationType.INSERT, throwException) == false) {
+      if (accessChecker.hasPermission(user, obj.getTaskId(), AccessType.TASK_ACCESS_MANAGEMENT, OperationType.INSERT, throwException) == false) {
         // Inserting of object under new task not allowed.
         return false;
       }
-      if (accessChecker.hasPermission(dbObj.getTaskId(), AccessType.TASK_ACCESS_MANAGEMENT, OperationType.DELETE, throwException) == false) {
+      if (accessChecker.hasPermission(user, dbObj.getTaskId(), AccessType.TASK_ACCESS_MANAGEMENT, OperationType.DELETE, throwException) == false) {
         // Deleting of object under old task not allowed.
         return false;
       }
@@ -196,7 +196,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
       obj.setTask(taskTree.getTaskById(task.getId()));
     }
     final GroupDO group = obj.getGroup();
-    if (group != null && Hibernate.isInitialized(group) == false){
+    if (group != null && Hibernate.isInitialized(group) == false) {
       obj.setGroup(userGroupCache.getGroup(obj.getGroupId()));
     }
   }
@@ -239,9 +239,9 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
   }
 
   @Override
-  public boolean hasHistoryAccess(boolean throwException)
+  public boolean hasHistoryAccess(final PFUserDO user, final boolean throwException)
   {
-    return accessChecker.isUserMemberOfAdminGroup(throwException);
+    return accessChecker.isUserMemberOfAdminGroup(user, throwException);
   }
 
   @Override

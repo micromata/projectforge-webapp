@@ -25,6 +25,7 @@ package org.projectforge.fibu;
 
 import org.projectforge.access.OperationType;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
@@ -58,21 +59,21 @@ public class ProjektRight extends UserRightAccessCheck<ProjektDO>
    * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(org.projectforge.access.AccessChecker, org.projectforge.user.PFUserDO)
    */
   @Override
-  public boolean hasSelectAccess()
+  public boolean hasSelectAccess(final PFUserDO user)
   {
-    return UserRights.getAccessChecker().isAvailable(UserRightId.PM_PROJECT);
+    return UserRights.getAccessChecker().isAvailable(user, UserRightId.PM_PROJECT);
   }
 
   @Override
-  public boolean hasSelectAccess(final ProjektDO obj)
+  public boolean hasSelectAccess(final PFUserDO user, final ProjektDO obj)
   {
     if (obj == null) {
       return true;
     }
-    if (UserRights.getAccessChecker().isUserMemberOfGroup(ProjectForgeGroup.CONTROLLING_GROUP) == true) {
+    if (UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.CONTROLLING_GROUP) == true) {
       return true;
     }
-    if (UserRights.getAccessChecker().isUserMemberOfGroup(ProjectForgeGroup.PROJECT_MANAGER, ProjectForgeGroup.PROJECT_ASSISTANT) == true) {
+    if (UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.PROJECT_MANAGER, ProjectForgeGroup.PROJECT_ASSISTANT) == true) {
       if (obj.getProjektManagerGroup() != null
           && UserRights.getUserGroupCache().isUserMemberOfGroup(PFUserContext.getUserId(), obj.getProjektManagerGroupId()) == true) {
         if ((obj.getStatus() == null || obj.getStatus().isIn(ProjektStatus.ENDED) == false) && obj.isDeleted() == false) {
@@ -80,19 +81,19 @@ public class ProjektRight extends UserRightAccessCheck<ProjektDO>
           return true;
         }
       }
-      if (UserRights.getAccessChecker().isUserMemberOfGroup(ProjectForgeGroup.ORGA_TEAM, ProjectForgeGroup.FINANCE_GROUP) == true) {
-        return UserRights.getAccessChecker().hasReadAccess(getId(), false) == true;
+      if (UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.ORGA_TEAM, ProjectForgeGroup.FINANCE_GROUP) == true) {
+        return UserRights.getAccessChecker().hasReadAccess(user, getId(), false) == true;
       }
       return false;
     } else {
-      return UserRights.getAccessChecker().hasReadAccess(getId(), false) == true;
+      return UserRights.getAccessChecker().hasReadAccess(user, getId(), false) == true;
     }
   }
 
   @Override
-  public boolean hasAccess(final ProjektDO obj, final ProjektDO oldObj, final OperationType operationType)
+  public boolean hasAccess(final PFUserDO user, final ProjektDO obj, final ProjektDO oldObj, final OperationType operationType)
   {
-    return UserRights.getAccessChecker().hasRight(getId(), UserRightValue.READWRITE);
+    return UserRights.getAccessChecker().hasRight(user, getId(), UserRightValue.READWRITE);
   }
 
   /**
@@ -100,11 +101,11 @@ public class ProjektRight extends UserRightAccessCheck<ProjektDO>
    * @see org.projectforge.user.UserRightAccessCheck#hasHistoryAccess(java.lang.Object)
    */
   @Override
-  public boolean hasHistoryAccess(ProjektDO obj)
+  public boolean hasHistoryAccess(final PFUserDO user, final ProjektDO obj)
   {
-    if (UserRights.getAccessChecker().isUserMemberOfGroup(ProjectForgeGroup.CONTROLLING_GROUP) == true) {
+    if (UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.CONTROLLING_GROUP) == true) {
       return true;
     }
-    return UserRights.getAccessChecker().hasRight(getId(), UserRightValue.READWRITE);
+    return UserRights.getAccessChecker().hasRight(user, getId(), UserRightValue.READWRITE);
   }
 }

@@ -160,7 +160,7 @@ public class AddressExport
 
     final List<AddressDO> list = new ArrayList<AddressDO>();
     for (final AddressDO address : origList) {
-      if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.MARKETING_GROUP) == true) {
+      if (accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.MARKETING_GROUP) == true) {
         // Add all addresses for users of finance group:
         list.add(address);
       } else if (personalAddressMap.containsKey(address.getId()) == true)

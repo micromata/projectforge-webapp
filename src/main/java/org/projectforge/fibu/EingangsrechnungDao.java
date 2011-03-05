@@ -159,7 +159,7 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
   public List<DisplayHistoryEntry> getDisplayHistoryEntries(EingangsrechnungDO obj)
   {
     final List<DisplayHistoryEntry> list = super.getDisplayHistoryEntries(obj);
-    if (hasHistoryAccess(obj, false) == false) {
+    if (hasLoggedInUserHistoryAccess(obj, false) == false) {
       return list;
     }
     if (CollectionUtils.isNotEmpty(obj.getPositionen()) == true) {

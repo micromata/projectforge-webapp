@@ -307,7 +307,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       if (obj == null) {
         throw new RuntimeException("Object with id " + id + " not found for class " + clazz);
       }
-      if (hasSelectAccess(obj, false) == true) {
+      if (hasLoggedInUserSelectAccess(obj, false) == true) {
         return obj;
       }
     }
@@ -345,7 +345,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<O> getList(final QueryFilter filter) throws AccessException
   {
-    checkSelectAccess();
+    checkLoggedInUserSelectAccess();
     List<O> list = internalGetList(filter);
     if (list == null || list.size() == 0) {
       return list;
@@ -452,7 +452,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   {
     List<O> result = new ArrayList<O>();
     for (O obj : origList) {
-      if (hasSelectAccess(obj, false) == true) {
+      if (hasLoggedInUserSelectAccess(obj, false) == true) {
         result.add(obj);
         afterLoad(obj);
       }
@@ -543,12 +543,12 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
   public O getById(Serializable id) throws AccessException
   {
-    checkSelectAccess();
+    checkLoggedInUserSelectAccess();
     final O obj = internalGetById(id);
     if (obj == null) {
       return null;
     }
-    checkSelectAccess(obj);
+    checkLoggedInUserSelectAccess(obj);
     return obj;
   }
 
@@ -572,7 +572,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public HistoryEntry[] getHistoryEntries(final O obj)
   {
-    checkHistoryAccess(obj);
+    checkLoggedInUserHistoryAccess(obj);
     return internalGetHistoryEntries(obj);
   }
 
@@ -593,7 +593,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<DisplayHistoryEntry> getDisplayHistoryEntries(final O obj)
   {
-    if (obj.getId() == null || hasHistoryAccess(obj, false) == false) {
+    if (obj.getId() == null || hasLoggedInUserHistoryAccess(obj, false) == false) {
       return EMPTY_HISTORY_ENTRIES;
     }
     @SuppressWarnings("unchecked")
@@ -749,7 +749,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     if (avoidNullIdCheckBeforeSave == false) {
       Validate.isTrue(obj.getId() == null);
     }
-    checkInsertAccess(obj);
+    checkLoggedInUserInsertAccess(obj);
     return internalSave(obj);
   }
 
@@ -940,7 +940,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     @SuppressWarnings("unchecked")
     final O dbObj = (O) getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     if (checkAccess == true) {
-      checkUpdateAccess(obj, dbObj);
+      checkLoggedInUserUpdateAccess(obj, dbObj);
     }
     onChange(obj, dbObj);
     final O dbObjBackup;
@@ -992,7 +992,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     }
     @SuppressWarnings("unchecked")
     O dbObj = (O) getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
-    checkDeleteAccess(obj, dbObj);
+    checkLoggedInUserDeleteAccess(obj, dbObj);
     internalMarkAsDeleted(obj);
   }
 
@@ -1037,7 +1037,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     accessChecker.checkDemoUser();
     @SuppressWarnings("unchecked")
     O dbObj = (O) getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
-    checkDeleteAccess(obj, dbObj);
+    checkLoggedInUserDeleteAccess(obj, dbObj);
     getHibernateTemplate().delete(dbObj);
     log.info("Object deleted: " + obj.toString());
     afterSaveOrModify(obj);
@@ -1057,7 +1057,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       log.error(msg);
       throw new RuntimeException(msg);
     }
-    checkInsertAccess(obj);
+    checkLoggedInUserInsertAccess(obj);
     internalUndelete(obj);
   }
 
@@ -1082,36 +1082,41 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    * Checks the basic select access right. Overload this method if you class supports this right.
    * @return
    */
-  protected void checkSelectAccess() throws AccessException
+  protected final void checkLoggedInUserSelectAccess() throws AccessException
   {
-    if (hasSelectAccess(true) == false) {
+    if (hasSelectAccess(PFUserContext.getUser(), true) == false) {
       // Should not occur!
       log.error("Development error: Subclass should throw an exception instead of returning false.");
       throw new UserException(UserException.I18N_KEY_PLEASE_CONTACT_DEVELOPER_TEAM);
     }
   }
 
-  protected void checkSelectAccess(O obj) throws AccessException
+  protected final void checkLoggedInUserSelectAccess(O obj) throws AccessException
   {
-    if (hasSelectAccess(obj, true) == false) {
+    if (hasSelectAccess(PFUserContext.getUser(), obj, true) == false) {
       // Should not occur!
       log.error("Development error: Subclass should throw an exception instead of returning false.");
       throw new UserException(UserException.I18N_KEY_PLEASE_CONTACT_DEVELOPER_TEAM);
     }
   }
 
-  protected void checkHistoryAccess(O obj) throws AccessException
+  protected final void checkLoggedInUserHistoryAccess(O obj) throws AccessException
   {
-    if (hasHistoryAccess(true) == false || hasHistoryAccess(obj, true) == false) {
+    if (hasHistoryAccess(PFUserContext.getUser(), true) == false || hasLoggedInUserHistoryAccess(obj, true) == false) {
       // Should not occur!
       log.error("Development error: Subclass should throw an exception instead of returning false.");
       throw new UserException(UserException.I18N_KEY_PLEASE_CONTACT_DEVELOPER_TEAM);
     }
   }
 
-  protected void checkInsertAccess(O obj) throws AccessException
+  protected final void checkLoggedInUserInsertAccess(O obj) throws AccessException
   {
-    if (hasInsertAccess(obj, true) == false) {
+    checkInsertAccess(PFUserContext.getUser(), obj);
+  }
+
+  protected void checkInsertAccess(final PFUserDO user, final O obj) throws AccessException
+  {
+    if (hasInsertAccess(user, obj, true) == false) {
       // Should not occur!
       log.error("Development error: Subclass should throw an exception instead of returning false.");
       throw new UserException(UserException.I18N_KEY_PLEASE_CONTACT_DEVELOPER_TEAM);
@@ -1123,18 +1128,28 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    * @param obj
    * @throws AccessException
    */
-  protected void checkUpdateAccess(O obj, O dbObj) throws AccessException
+  protected final void checkLoggedInUserUpdateAccess(O obj, O dbObj) throws AccessException
   {
-    if (hasUpdateAccess(obj, dbObj, true) == false) {
+    checkUpdateAccess(PFUserContext.getUser(), obj, dbObj);
+  }
+
+  /**
+   * @param dbObj The original object (stored in the database)
+   * @param obj
+   * @throws AccessException
+   */
+  protected void checkUpdateAccess(final PFUserDO user, final O obj, final O dbObj) throws AccessException
+  {
+    if (hasUpdateAccess(user, obj, dbObj, true) == false) {
       // Should not occur!
       log.error("Development error: Subclass should throw an exception instead of returning false.");
       throw new UserException(UserException.I18N_KEY_PLEASE_CONTACT_DEVELOPER_TEAM);
     }
   }
 
-  protected void checkDeleteAccess(O obj, O dbObj) throws AccessException
+  protected final void checkLoggedInUserDeleteAccess(O obj, O dbObj) throws AccessException
   {
-    if (hasDeleteAccess(obj, dbObj, true) == false) {
+    if (hasLoggedInUserDeleteAccess(obj, dbObj, true) == false) {
       // Should not occur!
       log.error("Development error: Subclass should throw an exception instead of returning false.");
       throw new UserException(UserException.I18N_KEY_PLEASE_CONTACT_DEVELOPER_TEAM);
@@ -1146,9 +1161,19 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    * @return true at default or if readWriteUserRightId is given hasReadAccess(boolean).
    * @see #hasReadAccess(boolean)
    */
-  public boolean hasSelectAccess(boolean throwException)
+  public final boolean hasLoggedInUserSelectAccess(boolean throwException)
   {
-    return hasAccess(null, null, OperationType.SELECT, throwException);
+    return hasSelectAccess(PFUserContext.getUser(), throwException);
+  }
+
+  /**
+   * Checks the basic select access right. Overwrite this method if the basic select access should be checked.
+   * @return true at default or if readWriteUserRightId is given hasReadAccess(boolean).
+   * @see #hasReadAccess(boolean)
+   */
+  public boolean hasSelectAccess(final PFUserDO user, boolean throwException)
+  {
+    return hasAccess(user, null, null, OperationType.SELECT, throwException);
   }
 
   /**
@@ -1159,24 +1184,49 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    * @param operationType The operation type (select, insert, update or delete)
    * @return true, if the user has the access right for the given operation type and object.
    */
-  public boolean hasAccess(final O obj, final O oldObj, final OperationType operationType, final boolean throwException)
+  public final boolean hasLoggedInUserAccess(final O obj, final O oldObj, final OperationType operationType, final boolean throwException)
+  {
+    return hasAccess(PFUserContext.getUser(), obj, oldObj, operationType, throwException);
+  }
+
+  /**
+   * If userRightId is given then {@link AccessChecker#hasAccess(UserRightId, Object, Object, OperationType, boolean)} is called and
+   * returned. If not given a UnsupportedOperationException is thrown. Checks the user's access to the given object.
+   * @param user Check the access for the given user instead of the logged-in user.
+   * @param obj The object.
+   * @param obj The old version of the object (is only given for operationType {@link OperationType#UPDATE}).
+   * @param operationType The operation type (select, insert, update or delete)
+   * @return true, if the user has the access right for the given operation type and object.
+   */
+  public boolean hasAccess(final PFUserDO user, final O obj, final O oldObj, final OperationType operationType, final boolean throwException)
   {
     if (userRightId != null) {
-      return accessChecker.hasAccess(userRightId, obj, oldObj, operationType, throwException);
+      return accessChecker.hasAccess(user, userRightId, obj, oldObj, operationType, throwException);
     }
     throw new UnsupportedOperationException(
         "readWriteUserRightId not given. Override this method or set readWriteUserRightId in constructor.");
   }
 
   /**
-   * Checks select access right by calling hasAccess(obj, OperationType.SELECT).
    * @param obj Check access to this object.
    * @return
-   * @see #hasAccess(Object, OperationType)
+   * @see #hasLoggedInUserAccess(Object,Object, OperationType, boolean)
    */
-  public boolean hasSelectAccess(O obj, boolean throwException)
+  public final boolean hasLoggedInUserSelectAccess(final O obj, final boolean throwException)
   {
-    return hasAccess(obj, null, OperationType.SELECT, throwException);
+    return hasSelectAccess(PFUserContext.getUser(), obj, throwException);
+  }
+
+  /**
+   * @param user Check the access for the given user instead of the logged-in user. Checks select access right by calling hasAccess(obj,
+   *          OperationType.SELECT).
+   * @param obj Check access to this object.
+   * @return
+   * @see #hasAccess(user, Object, Object, OperationType, boolean)
+   */
+  public boolean hasSelectAccess(final PFUserDO user, final O obj, final boolean throwException)
+  {
+    return hasAccess(user, obj, null, OperationType.SELECT, throwException);
   }
 
   /**
@@ -1184,27 +1234,46 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    * hasSelectAccess.
    * @param throwException
    */
-  public boolean hasHistoryAccess(O obj, boolean throwException)
+  public final boolean hasLoggedInUserHistoryAccess(final O obj, final boolean throwException)
   {
-    if (hasHistoryAccess(throwException) == false) {
+    return hasHistoryAccess(PFUserContext.getUser(), obj, throwException);
+  }
+
+  /**
+   * Has the user access to the history of the given object. At default this method calls hasHistoryAccess(boolean) first and then
+   * hasSelectAccess.
+   * @param throwException
+   */
+  public boolean hasHistoryAccess(final PFUserDO user, final O obj, final boolean throwException)
+  {
+    if (hasHistoryAccess(user, throwException) == false) {
       return false;
     }
     if (userRightId != null) {
-      return accessChecker.hasHistoryAccess(userRightId, obj, throwException);
+      return accessChecker.hasHistoryAccess(user, userRightId, obj, throwException);
     }
-    return hasSelectAccess(obj, throwException);
+    return hasSelectAccess(user, obj, throwException);
   }
 
   /**
    * Has the user access to the history in general of the objects. At default this method calls hasSelectAccess.
    * @param throwException
    */
-  public boolean hasHistoryAccess(boolean throwException)
+  public final boolean hasLoggedInUserHistoryAccess(boolean throwException)
+  {
+    return hasHistoryAccess(PFUserContext.getUser(), throwException);
+  }
+
+  /**
+   * Has the user access to the history in general of the objects. At default this method calls hasSelectAccess.
+   * @param throwException
+   */
+  public boolean hasHistoryAccess(final PFUserDO user, final boolean throwException)
   {
     if (userRightId != null) {
-      return accessChecker.hasHistoryAccess(userRightId, null, throwException);
+      return accessChecker.hasHistoryAccess(user, userRightId, null, throwException);
     }
-    return hasSelectAccess(throwException);
+    return hasSelectAccess(user, throwException);
   }
 
   /**
@@ -1213,9 +1282,31 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    * @return
    * @see #hasAccess(Object, OperationType)
    */
-  public boolean hasInsertAccess(O obj, boolean throwException)
+  public final boolean hasLoggedInUserInsertAccess(O obj, boolean throwException)
   {
-    return hasAccess(obj, null, OperationType.INSERT, throwException);
+    return hasInsertAccess(PFUserContext.getUser(), obj, throwException);
+  }
+
+  /**
+   * Checks insert access right by calling hasAccess(obj, OperationType.INSERT).
+   * @param obj Check access to this object.
+   * @return
+   * @see #hasAccess(Object, OperationType)
+   */
+  public boolean hasInsertAccess(final PFUserDO user, final O obj, final boolean throwException)
+  {
+    return hasAccess(user, obj, null, OperationType.INSERT, throwException);
+  }
+
+  /**
+   * Checks write access of the readWriteUserRight. If not given, true is returned at default. This method should only be used for checking
+   * the insert access to show an insert button or not. Before inserting any object the write access is checked by has*Access(...)
+   * independent of the result of this method.
+   * @see org.projectforge.core.IDao#hasLoggedInUserInsertAccess()
+   */
+  public final boolean hasLoggedInUserInsertAccess()
+  {
+    return hasInsertAccess(PFUserContext.getUser());
   }
 
   /**
@@ -1224,10 +1315,10 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    * independent of the result of this method.
    * @see org.projectforge.core.IDao#hasInsertAccess()
    */
-  public boolean hasInsertAccess()
+  public boolean hasInsertAccess(final PFUserDO user)
   {
     if (userRightId != null) {
-      return accessChecker.hasInsertAccess(userRightId, false);
+      return accessChecker.hasInsertAccess(user, userRightId, false);
     }
     return true;
   }
@@ -1239,9 +1330,21 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    * @return
    * @see #hasAccess(Object, OperationType)
    */
-  public boolean hasUpdateAccess(final O obj, final O dbObj, boolean throwException)
+  public final boolean hasLoggedInUserUpdateAccess(final O obj, final O dbObj, boolean throwException)
   {
-    return hasAccess(obj, dbObj, OperationType.UPDATE, throwException);
+    return hasUpdateAccess(PFUserContext.getUser(), obj, dbObj, throwException);
+  }
+
+  /**
+   * Checks update access right by calling hasAccess(obj, OperationType.UPDATE).
+   * @param dbObj The original object (stored in the database)
+   * @param obj Check access to this object.
+   * @return
+   * @see #hasAccess(Object, OperationType)
+   */
+  public boolean hasUpdateAccess(final PFUserDO user, final O obj, final O dbObj, boolean throwException)
+  {
+    return hasAccess(user, obj, dbObj, OperationType.UPDATE, throwException);
   }
 
   /**
@@ -1251,9 +1354,21 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    * @return
    * @see #hasAccess(Object, OperationType)
    */
-  public boolean hasDeleteAccess(final O obj, final O dbObj, final boolean throwException)
+  public final boolean hasLoggedInUserDeleteAccess(final O obj, final O dbObj, final boolean throwException)
   {
-    return hasAccess(obj, dbObj, OperationType.DELETE, throwException);
+    return hasDeleteAccess(PFUserContext.getUser(), obj, dbObj, throwException);
+  }
+
+  /**
+   * Checks delete access right by calling hasAccess(obj, OperationType.DELETE).
+   * @param obj Check access to this object.
+   * @param dbObj current version of this object in the data base.
+   * @return
+   * @see #hasAccess(Object, OperationType)
+   */
+  public boolean hasDeleteAccess(final PFUserDO user, final O obj, final O dbObj, final boolean throwException)
+  {
+    return hasAccess(user, obj, dbObj, OperationType.DELETE, throwException);
   }
 
   /**
@@ -1294,7 +1409,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   @SuppressWarnings("unchecked")
   public List<String> getAutocompletion(final String property, final String searchString)
   {
-    checkSelectAccess();
+    checkLoggedInUserSelectAccess();
     if (StringUtils.isBlank(searchString) == true) {
       return null;
     }
@@ -1480,7 +1595,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   private Set<Integer> getModifiedEntries(final Session session, final BaseSearchFilter filter)
   {
     log.debug("Searching in " + clazz);
-    if (hasSelectAccess(false) == false || hasHistoryAccess(false) == false) {
+    if (hasLoggedInUserSelectAccess(false) == false || hasLoggedInUserHistoryAccess(false) == false) {
       // User has in general no access to history entries of the given object type (clazz).
       return null;
     }

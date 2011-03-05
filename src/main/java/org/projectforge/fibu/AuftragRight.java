@@ -30,7 +30,6 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
 import org.projectforge.access.OperationType;
 import org.projectforge.common.DateHelper;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserGroupCache;
@@ -68,9 +67,9 @@ public class AuftragRight extends UserRightAccessCheck<AuftragDO>
    * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(org.projectforge.access.AccessChecker, org.projectforge.user.PFUserDO)
    */
   @Override
-  public boolean hasSelectAccess()
+  public boolean hasSelectAccess(final PFUserDO user)
   {
-    return UserRights.getAccessChecker().hasRight(getId(), UserRightValue.READONLY, UserRightValue.PARTLYREADWRITE,
+    return UserRights.getAccessChecker().hasRight(user, getId(), UserRightValue.READONLY, UserRightValue.PARTLYREADWRITE,
         UserRightValue.READWRITE);
   }
 
@@ -84,24 +83,24 @@ public class AuftragRight extends UserRightAccessCheck<AuftragDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(AuftragDO obj, AuftragDO oldObj, OperationType operationType)
+  public boolean hasAccess(final PFUserDO user, final AuftragDO obj, final  AuftragDO oldObj, final OperationType operationType)
   {
     final AccessChecker accessChecker = UserRights.getAccessChecker();
     final UserGroupCache userGroupCache = UserRights.getUserGroupCache();
     if (operationType == OperationType.SELECT) {
-      if (accessChecker.isUserMemberOfGroup(ProjectForgeGroup.CONTROLLING_GROUP) == true) {
+      if (accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.CONTROLLING_GROUP) == true) {
         return true;
       }
-      if (accessChecker.hasRight(getId(), UserRightValue.READONLY, UserRightValue.PARTLYREADWRITE, UserRightValue.READWRITE) == false) {
+      if (accessChecker.hasRight(user, getId(), UserRightValue.READONLY, UserRightValue.PARTLYREADWRITE, UserRightValue.READWRITE) == false) {
         return false;
       }
     } else {
-      if (accessChecker.hasRight(getId(), UserRightValue.PARTLYREADWRITE, UserRightValue.READWRITE) == false) {
+      if (accessChecker.hasRight(user, getId(), UserRightValue.PARTLYREADWRITE, UserRightValue.READWRITE) == false) {
         return false;
       }
     }
     if (obj != null
-        && accessChecker.isUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == false
+        && accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.FINANCE_GROUP) == false
         && CollectionUtils.isNotEmpty(obj.getPositionen()) == true) {
       // Special field check for non finance administrative staff members:
       if (operationType == OperationType.INSERT) {
@@ -124,12 +123,11 @@ public class AuftragRight extends UserRightAccessCheck<AuftragDO>
         }
       }
     }
-    if (accessChecker.isUserMemberOfGroup(UserRights.FIBU_ORGA_GROUPS) == true
-        && accessChecker.hasRight(getId(), UserRightValue.READONLY, UserRightValue.READWRITE)) {
+    if (accessChecker.isUserMemberOfGroup(user, UserRights.FIBU_ORGA_GROUPS) == true
+        && accessChecker.hasRight(user, getId(), UserRightValue.READONLY, UserRightValue.READWRITE)) {
       // No further access checking (but not for users with right PARTLY_READWRITE.
     } else if (obj != null) {
       // User should be a PROJECT_MANAGER or PROJECT_ASSISTANT or user has PARTLYREADWRITE access:
-      final PFUserDO user = PFUserContext.getUser();
       boolean hasAccess = false;
       if (accessChecker.userEquals(user, obj.getContactPerson()) == true) {
         hasAccess = true;

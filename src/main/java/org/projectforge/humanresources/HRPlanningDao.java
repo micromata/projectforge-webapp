@@ -155,7 +155,7 @@ public class HRPlanningDao extends BaseDao<HRPlanningDO>
       return null;
     }
     final HRPlanningDO planning = list.get(0);
-    if (accessChecker.hasSelectAccess(userRightId, planning, false) == true) {
+    if (accessChecker.hasLoggedInUserSelectAccess(userRightId, planning, false) == true) {
       return planning;
     } else {
       return null;
@@ -254,7 +254,7 @@ public class HRPlanningDao extends BaseDao<HRPlanningDO>
   public List<DisplayHistoryEntry> getDisplayHistoryEntries(HRPlanningDO obj)
   {
     final List<DisplayHistoryEntry> list = super.getDisplayHistoryEntries(obj);
-    if (accessChecker.hasHistoryAccess(userRightId, obj, false) == false) {
+    if (accessChecker.hasLoggedInUserHistoryAccess(userRightId, obj, false) == false) {
       return list;
     }
     if (CollectionUtils.isNotEmpty(obj.getEntries()) == true) {

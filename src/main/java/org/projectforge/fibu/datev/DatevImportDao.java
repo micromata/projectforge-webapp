@@ -109,14 +109,14 @@ public class DatevImportDao extends HibernateDaoSupport
    * @see UserRightId#FIBU_DATEV_IMPORT
    * @see AccessChecker#hasRight(UserRightId, UserRightValue, boolean)
    */
-  public static boolean checkRight(final AccessChecker accessChecker)
+  public static boolean checkLoggeinUserRight(final AccessChecker accessChecker)
   {
     return hasRight(accessChecker, true);
   }
 
   private static boolean hasRight(final AccessChecker accessChecker, final boolean throwException)
   {
-    return accessChecker.hasRight(USER_RIGHT_ID, throwException, UserRightValue.TRUE);
+    return accessChecker.hasLoggedInUserRight(USER_RIGHT_ID, throwException, UserRightValue.TRUE);
   }
 
   /**
@@ -129,7 +129,7 @@ public class DatevImportDao extends HibernateDaoSupport
    */
   public ImportStorage<KontoDO> importKontenplan(final InputStream is, final String filename, final ActionLog actionLog) throws Exception
   {
-    checkRight(accessChecker);
+    checkLoggeinUserRight(accessChecker);
     log.info("importKontenplan called");
     ImportStorage<KontoDO> storage = new ImportStorage<KontoDO>(Type.KONTENPLAN);
     storage.setFilename(filename);
@@ -149,7 +149,7 @@ public class DatevImportDao extends HibernateDaoSupport
   public ImportStorage<BuchungssatzDO> importBuchungsdaten(final InputStream is, final String filename, final ActionLog actionLog)
       throws Exception
   {
-    checkRight(accessChecker);
+    checkLoggeinUserRight(accessChecker);
     log.info("importBuchungsdaten called");
     final ImportStorage<BuchungssatzDO> storage = new ImportStorage<BuchungssatzDO>(Type.BUCHUNGSSAETZE);
     storage.setFilename(filename);
@@ -168,7 +168,7 @@ public class DatevImportDao extends HibernateDaoSupport
   @SuppressWarnings("unchecked")
   public void reconcile(ImportStorage< ? > storage, String sheetName)
   {
-    checkRight(accessChecker);
+    checkLoggeinUserRight(accessChecker);
     Validate.notNull(storage.getSheets());
     ImportedSheet< ? > sheet = (ImportedSheet< ? >) storage.getNamedSheet(sheetName);
     Validate.notNull(sheet);
@@ -184,7 +184,7 @@ public class DatevImportDao extends HibernateDaoSupport
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
   public void commit(ImportStorage< ? > storage, String sheetName)
   {
-    checkRight(accessChecker);
+    checkLoggeinUserRight(accessChecker);
     Validate.notNull(storage.getSheets());
     ImportedSheet< ? > sheet = (ImportedSheet< ? >) storage.getNamedSheet(sheetName);
     Validate.notNull(sheet);

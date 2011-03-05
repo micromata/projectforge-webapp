@@ -25,13 +25,15 @@ package org.projectforge.core;
 
 import java.util.List;
 
+import org.projectforge.user.PFUserDO;
+
 public interface IDao<O>
 {
-  public List<O> getList(BaseSearchFilter filter);
+  public List<O> getList(final BaseSearchFilter filter);
 
   public String[] getSearchFields();
 
   public boolean isHistorizable();
-  
-  public boolean hasInsertAccess();
+
+  public boolean hasInsertAccess(final PFUserDO user);
 }

@@ -45,7 +45,7 @@ public class MebRight extends UserRightAccessCheck<MebEntryDO>
 
   public MebRight()
   {
-    super( UserRightId.MISC_MEB, UserRightCategory.MISC, UserRightValue.TRUE);
+    super(UserRightId.MISC_MEB, UserRightCategory.MISC, UserRightValue.TRUE);
   }
 
   /**
@@ -53,55 +53,55 @@ public class MebRight extends UserRightAccessCheck<MebEntryDO>
    * @see org.projectforge.user.UserRightAccessCheck#hasInsertAccess()
    */
   @Override
-  public boolean hasInsertAccess()
+  public boolean hasInsertAccess(final PFUserDO user)
   {
     return true;
   }
-  
+
   /**
    * @return true.
    * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(org.projectforge.access.AccessChecker, org.projectforge.user.PFUserDO)
    */
   @Override
-  public boolean hasSelectAccess()
+  public boolean hasSelectAccess(final PFUserDO user)
   {
     return true;
   }
 
   @Override
-  public boolean hasSelectAccess(final MebEntryDO obj)
+  public boolean hasSelectAccess(final PFUserDO user, final MebEntryDO obj)
   {
     if (obj == null) {
       return true;
     }
     if (obj.getOwner() == null) {
-      return UserRights.getAccessChecker().isUserMemberOfAdminGroup();
+      return UserRights.getAccessChecker().isUserMemberOfAdminGroup(user);
     } else {
-      return UserRights.getAccessChecker().userEqualsToContextUser(obj.getOwner());
+      return UserRights.getAccessChecker().userEquals(user, obj.getOwner());
     }
   }
 
   @Override
-  public boolean hasAccess(final MebEntryDO obj, final MebEntryDO oldObj, final OperationType operationType)
+  public boolean hasAccess(final PFUserDO user, final MebEntryDO obj, final MebEntryDO oldObj, final OperationType operationType)
   {
     if (obj == null) {
       return false;
     }
     if (obj.getOwner() == null) {
-      return UserRights.getAccessChecker().isUserMemberOfAdminGroup();
+      return UserRights.getAccessChecker().isUserMemberOfAdminGroup(user);
     } else {
-      return UserRights.getAccessChecker().userEqualsToContextUser(obj.getOwner());
+      return UserRights.getAccessChecker().userEquals(user, obj.getOwner());
     }
   }
 
   @Override
-  public boolean hasUpdateAccess(MebEntryDO obj, MebEntryDO oldObj)
+  public boolean hasUpdateAccess(final PFUserDO user, MebEntryDO obj, MebEntryDO oldObj)
   {
-    if (oldObj != null && UserRights.getAccessChecker().isUserMemberOfAdminGroup() == true && oldObj.getOwner() == null) {
+    if (oldObj != null && UserRights.getAccessChecker().isUserMemberOfAdminGroup(user) == true && oldObj.getOwner() == null) {
       // Otherwise an admin couldn't assign unassigned entries:
       return true;
     }
-    return hasAccess(obj, oldObj, OperationType.UPDATE);
+    return hasAccess(user, obj, oldObj, OperationType.UPDATE);
   }
 
   /**
@@ -111,6 +111,7 @@ public class MebRight extends UserRightAccessCheck<MebEntryDO>
    * @return Always true.
    * @see UserGroupsRight#matches(UserGroupCache, PFUserDO, UserRightValue)
    */
+  @Override
   public boolean matches(final UserGroupCache userGroupCache, final PFUserDO user, final UserRightValue value)
   {
     return true;

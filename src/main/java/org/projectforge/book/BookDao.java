@@ -45,7 +45,6 @@ import org.projectforge.task.TaskDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 
-
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -203,7 +202,7 @@ public class BookDao extends BaseDao<BookDO>
    * @see org.projectforge.core.BaseDao#hasSelectAccess()
    */
   @Override
-  public boolean hasSelectAccess(boolean throwException)
+  public boolean hasSelectAccess(final PFUserDO user, final boolean throwException)
   {
     return true;
   }
@@ -212,31 +211,32 @@ public class BookDao extends BaseDao<BookDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(BookDO obj, BookDO oldObj, OperationType operationType, boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final BookDO obj, final BookDO oldObj, final OperationType operationType,
+      final boolean throwException)
   {
-    return accessChecker.hasPermission(obj.getTaskId(), AccessType.TASKS, operationType, throwException);
+    return accessChecker.hasPermission(user, obj.getTaskId(), AccessType.TASKS, operationType, throwException);
   }
 
   /**
    * @see org.projectforge.core.BaseDao#hasUpdateAccess(Object, Object)
    */
   @Override
-  public boolean hasUpdateAccess(BookDO obj, BookDO dbObj, boolean throwException)
+  public boolean hasUpdateAccess(final PFUserDO user, final BookDO obj, final BookDO dbObj, final boolean throwException)
   {
     Validate.notNull(dbObj);
     Validate.notNull(obj);
     Validate.notNull(dbObj.getTaskId());
     Validate.notNull(obj.getTaskId());
-    if (accessChecker.hasPermission(obj.getTaskId(), AccessType.TASKS, OperationType.UPDATE, throwException) == false) {
+    if (accessChecker.hasPermission(user, obj.getTaskId(), AccessType.TASKS, OperationType.UPDATE, throwException) == false) {
       return false;
     }
     if (dbObj.getTaskId().equals(obj.getTaskId()) == false) {
       // User moves the object to another task:
-      if (accessChecker.hasPermission(obj.getTaskId(), AccessType.TASKS, OperationType.INSERT, throwException) == false) {
+      if (accessChecker.hasPermission(user, obj.getTaskId(), AccessType.TASKS, OperationType.INSERT, throwException) == false) {
         // Inserting of object under new task not allowed.
         return false;
       }
-      if (accessChecker.hasPermission(dbObj.getTaskId(), AccessType.TASKS, OperationType.DELETE, throwException) == false) {
+      if (accessChecker.hasPermission(user, dbObj.getTaskId(), AccessType.TASKS, OperationType.DELETE, throwException) == false) {
         // Deleting of object under old task not allowed.
         return false;
       }

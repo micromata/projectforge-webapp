@@ -24,6 +24,7 @@
 package org.projectforge.humanresources;
 
 import org.projectforge.access.OperationType;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
@@ -57,24 +58,24 @@ public class HRPlanningRight extends UserRightAccessCheck<HRPlanningDO>
    * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(org.projectforge.access.AccessChecker, org.projectforge.user.PFUserDO)
    */
   @Override
-  public boolean hasSelectAccess()
+  public boolean hasSelectAccess(final PFUserDO user)
   {
     return true;
   }
 
   @Override
-  public boolean hasSelectAccess(final HRPlanningDO obj)
+  public boolean hasSelectAccess(final PFUserDO user, final HRPlanningDO obj)
   {
-    if (UserRights.getAccessChecker().userEqualsToContextUser(obj.getUser()) == true) {
+    if (UserRights.getAccessChecker().userEquals(user, obj.getUser()) == true) {
       return true;
     }
-    return UserRights.getAccessChecker().hasRight(getId(), UserRightValue.READONLY, UserRightValue.READWRITE);
+    return UserRights.getAccessChecker().hasRight(user, getId(), UserRightValue.READONLY, UserRightValue.READWRITE);
   }
 
   @Override
-  public boolean hasAccess(final HRPlanningDO obj, final HRPlanningDO oldObj, final OperationType operationType)
+  public boolean hasAccess(final PFUserDO user, final HRPlanningDO obj, final HRPlanningDO oldObj, final OperationType operationType)
   {
-    return UserRights.getAccessChecker().hasRight(getId(), UserRightValue.READWRITE);
+    return UserRights.getAccessChecker().hasRight(user, getId(), UserRightValue.READWRITE);
   }
 
   /**
@@ -82,8 +83,8 @@ public class HRPlanningRight extends UserRightAccessCheck<HRPlanningDO>
    * @see org.projectforge.user.UserRightAccessCheck#hasHistoryAccess(java.lang.Object)
    */
   @Override
-  public boolean hasHistoryAccess(HRPlanningDO obj)
+  public boolean hasHistoryAccess(final PFUserDO user, final HRPlanningDO obj)
   {
-    return UserRights.getAccessChecker().hasRight(getId(), UserRightValue.READONLY, UserRightValue.READWRITE);
+    return UserRights.getAccessChecker().hasRight(user, getId(), UserRightValue.READONLY, UserRightValue.READWRITE);
   }
 }
