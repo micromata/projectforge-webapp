@@ -31,29 +31,24 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.Validate;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.projectforge.access.AccessType;
-import org.projectforge.access.OperationType;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.ConfigXml;
-import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.database.Table;
-import org.projectforge.fibu.AuftragsPositionDO;
-import org.projectforge.fibu.KostFormatter;
 import org.projectforge.mail.Mail;
 import org.projectforge.mail.SendMail;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
+import org.projectforge.user.I18nHelper;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
+import org.projectforge.user.UserRightId;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -64,6 +59,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
  */
 public class ToDoDao extends BaseDao<ToDoDO>
 {
+  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_TODO", "plugin10", "plugins.todo.todo");;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ToDoDao.class);
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "reporter.username", "reporter.firstname", "reporter.lastname",
@@ -131,38 +128,16 @@ public class ToDoDao extends BaseDao<ToDoDO>
    * @param operationType
    * @return
    */
-  public boolean sendNotification(final ToDoDO todo, final OperationType operationType, final String requestUrl)
+  public void sendNotification(final ToDoDO todo, final String requestUrl)
   {
     if (ConfigXml.getInstance().isSendMailConfigured() == false) {
       // Can't send e-mail because no send mail is configured.
-      return false;
-    }
-    final PFUserDO assignee = todo.getAssignee();
-    if (assignee == null) {
-      return false;
-    }
-    if (hasAccess(todo, null, operationType, false) == false) {
-      return false;
+      return;
     }
     final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.instance();
     final Map<String, Object> data = new HashMap<String, Object>();
     data.put("todo", todo);
-    // data.put("angebotsDatum", dateTimeFormatter.getFormattedDate(todo.getAngebotsDatum()));
-    // data.put("bindungsFrist", dateTimeFormatter.getFormattedDate(todo.getBindungsFrist()));
-    // data.put("beauftragungsDatum", dateTimeFormatter.getFormattedDate(todo.getBeauftragungsDatum()));
-    // data.put("bemerkung", sendMail.formatHtml(todo.getBemerkung()));
-    // data.put("statusBeschreibung", sendMail.formatHtml(todo.getStatusBeschreibung()));
     data.put("requestUrl", requestUrl);
-    // final List<Map<String, Object>> positions = new ArrayList<Map<String, Object>>();
-    // data.put("positionen", positions);
-    // if (CollectionUtils.isNotEmpty(todo.getPositionen()) == true) {
-    // for (final AuftragsPositionDO pos : todo.getPositionen()) {
-    // final Map<String, Object> map = new HashMap<String, Object>();
-    // positions.add(map);
-    // map.put("position", pos);
-    // map.put("nettoSumme", CurrencyFormatter.format(todo.getNettoSumme()));
-    // }
-    // }
     final List<DisplayHistoryEntry> history = getDisplayHistoryEntries(todo);
     final List<Object[]> list = new ArrayList<Object[]>();
     int i = 0;
@@ -180,22 +155,33 @@ public class ToDoDao extends BaseDao<ToDoDO>
       }
     }
     data.put("history", list);
+    sendNotification(todo.getAssignee(), todo, data);
+    sendNotification(todo.getReporter(), todo, data);
+  }
+
+  private void sendNotification(final PFUserDO recipient, final ToDoDO toDo, final Map<String, Object> data)
+  {
+    if (recipient == null || ObjectUtils.equals(PFUserContext.getUserId(), recipient.getId()) == true) {
+      // No recipient given or recipient is equals to logged-in user (no e-mail required).
+      return;
+    }
+    if (hasSelectAccess(recipient, toDo, false) == false) {
+      log.info("Recipient '"
+          + recipient.getFullname()
+          + "' (id="
+          + recipient.getId()
+          + ") of the notification has no select access to the todo entry: "
+          + toDo);
+      return;
+    }
     final Mail msg = new Mail();
-    msg.setTo(assignee);
-    final String subject;
-    // if (operationType == OperationType.INSERT) {
-    // subject = "Auftrag #" + todo.getNummer() + " wurde angelegt.";
-    // } else if (operationType == OperationType.DELETE) {
-    // subject = "Auftrag #" + todo.getNummer() + " wurde gelöscht.";
-    // } else {
-    // subject = "Auftrag #" + todo.getNummer() + " wurde geändert.";
-    // }
-    // msg.setProjectForgeSubject(subject);
-    // data.put("subject", subject);
-    final String content = sendMail.renderJelly(msg, "mail/toDoNotification.html", data, assignee.getLocale());
+    msg.setTo(recipient);
+    final String subject = I18nHelper.getLocalizedString(recipient.getLocale(), "plugins.todo.todo") + ": " + toDo.getSubject();
+    msg.setProjectForgeSubject(subject);
+    final String content = sendMail.renderGroovyTemplate(msg, "mail/toDoNotification.html", data, recipient);
     msg.setContent(content);
     msg.setContentType(Mail.CONTENTTYPE_HTML);
-    return sendMail.send(msg);
+    sendMail.send(msg);
   }
 
   @Override
@@ -225,51 +211,6 @@ public class ToDoDao extends BaseDao<ToDoDO>
   {
     final TaskDO task = taskTree.getTaskById(taskId);
     todo.setTask(task);
-  }
-
-  /**
-   * return Always true, no generic select access needed for book objects.
-   * @see org.projectforge.core.BaseDao#hasSelectAccess()
-   */
-  @Override
-  public boolean hasSelectAccess(boolean throwException)
-  {
-    return true;
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
-   */
-  @Override
-  public boolean hasAccess(ToDoDO obj, ToDoDO oldObj, OperationType operationType, boolean throwException)
-  {
-    // Reporter and Assignee have full access, otherwise task access is used if a task is given.
-    return accessChecker.hasPermission(obj.getTaskId(), AccessType.TASKS, operationType, throwException);
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDao#hasUpdateAccess(Object, Object)
-   */
-  @Override
-  public boolean hasUpdateAccess(ToDoDO obj, ToDoDO dbObj, boolean throwException)
-  {
-    Validate.notNull(dbObj);
-    Validate.notNull(obj);
-    if (accessChecker.hasPermission(obj.getTaskId(), AccessType.TASKS, OperationType.UPDATE, throwException) == false) {
-      return false;
-    }
-    if (ObjectUtils.equals(dbObj.getTaskId(), obj.getTaskId()) == false) {
-      // User moves the object to another task:
-      if (accessChecker.hasPermission(obj.getTaskId(), AccessType.TASKS, OperationType.INSERT, throwException) == false) {
-        // Inserting of object under new task not allowed.
-        return false;
-      }
-      if (accessChecker.hasPermission(dbObj.getTaskId(), AccessType.TASKS, OperationType.DELETE, throwException) == false) {
-        // Deleting of object under old task not allowed.
-        return false;
-      }
-    }
-    return true;
   }
 
   /**

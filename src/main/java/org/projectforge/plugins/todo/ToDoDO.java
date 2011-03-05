@@ -117,6 +117,12 @@ public class ToDoDO extends DefaultBaseDO
     return reporter;
   }
 
+  @Transient
+  public Integer getReporterId()
+  {
+    return reporter != null ? reporter.getId() : null;
+  }
+
   /**
    * @param reporter
    * @return this for chaining.
@@ -132,6 +138,12 @@ public class ToDoDO extends DefaultBaseDO
   public PFUserDO getAssignee()
   {
     return assignee;
+  }
+
+  @Transient
+  public Integer getAssigneeId()
+  {
+    return assignee != null ? assignee.getId() : null;
   }
 
   /**
@@ -171,6 +183,7 @@ public class ToDoDO extends DefaultBaseDO
     return task.getId();
   }
 
+  @Column(length = Constants.LENGTH_TEXT)
   public String getDescription()
   {
     return description;

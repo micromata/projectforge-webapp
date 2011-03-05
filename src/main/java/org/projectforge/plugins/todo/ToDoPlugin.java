@@ -26,6 +26,7 @@ package org.projectforge.plugins.todo;
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.registry.RegistryEntry;
+import org.projectforge.user.UserRights;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
 
@@ -61,8 +62,8 @@ public class ToDoPlugin extends AbstractPlugin
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
     registerMenuItem(new ToDoMenuItemDef(parentMenu, ID, 5, "plugins.todo.menu", ToDoListPage.class));
 
-    // UserRights.
-    // Hibernate-search indexer.
+    UserRights.instance().addRight(new ToDoRight());
+    // ToDo: Hibernate-search indexer.
     addResourceBundle(RESOURCE_BUNDLE_NAME);
   }
 

@@ -30,8 +30,10 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
+import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
+import org.projectforge.web.wicket.WicketUtils;
 
 @EditPage(defaultReturnPage = ToDoListPage.class)
 public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditForm, ToDoDao> implements ISelectCallerPage
@@ -47,6 +49,16 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
   {
     super(parameters, "plugins.todo");
     init();
+  }
+
+  @Override
+  public AbstractBasePage afterSaveOrUpdate()
+  {
+    if (form.renderer.sendNotification == true) {
+      final String url = WicketUtils.getAbsoluteEditPageUrl(getRequest(), ToDoEditPage.class, getData().getId());
+      toDoDao.sendNotification(form.getData(), url);
+    }
+    return null;
   }
 
   /**

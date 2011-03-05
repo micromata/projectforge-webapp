@@ -63,7 +63,7 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
 
   protected DatePanel dueDatePanel;
 
-  protected boolean sendNotification;
+  protected boolean sendNotification = true;
 
   final static LayoutLength labelLength = LayoutLength.HALF;
 
@@ -147,7 +147,7 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
         .setCssStyle("height: 10em;"));
     doPanel.addTextArea(new PanelContext(data, "comment", valueLength, getString("comment"), labelLength).setCssStyle("height: 10em;"));
     if (ConfigXml.getInstance().isSendMailConfigured() == true) {
-      doPanel.addCheckBox(new PanelContext(this, "sendNotification", valueLength, getString("label.sendEMailNotification"), labelLength));
+      doPanel.addCheckBox(new PanelContext(this, "sendNotification", valueLength, getString("label.sendEMailNotification"), labelLength)).setTooltip(getString("plugins.todo.notification.tooltip"));
     }
     // @Field(index = Index.UN_TOKENIZED)
     // @DateBridge(resolution = Resolution.DAY)
