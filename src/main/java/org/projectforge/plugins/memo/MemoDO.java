@@ -43,7 +43,7 @@ import org.projectforge.database.Constants;
 import org.projectforge.user.PFUserDO;
 
 /**
- * This data object is the Java representation of a data-base entry.
+ * This data object is the Java representation of a data-base entry of a memo.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @Entity
