@@ -44,37 +44,15 @@ public class MemoRight extends UserRightAccessCheck<MemoDO>
   }
 
   /**
-   * Generic select access. The select access for single entries is defined here:
-   * {@link #hasAccess(PFUserDO, MemoDO, MemoDO, OperationType)}.
-   * @return true.
-   */
-  @Override
-  public boolean hasSelectAccess(final PFUserDO user)
-  {
-    return true;
-  }
-
-  /**
-   * Generic insert access (for showing the add button in the list page). The select access for single entries is defined here:
-   * {@link #hasAccess(PFUserDO, MemoDO, MemoDO, OperationType)}.
-   */
-  @Override
-  public boolean hasInsertAccess(final PFUserDO user)
-  {
-    return true;
-  }
-
-  /**
    * @return true if the owner is equals to the logged-in user, otherwise false.
    */
   @Override
   public boolean hasAccess(final PFUserDO user, final MemoDO obj, final MemoDO oldObj, final OperationType operationType)
   {
-    if (oldObj != null) {
-      // Show the owner of the old entry (if the owner is changed).
-      return (ObjectUtils.equals(user, oldObj.getOwnerId()) == true);
-    } else {
-      return (ObjectUtils.equals(user, obj.getOwnerId()) == true);
+    final MemoDO memo = oldObj != null ? oldObj : obj;
+    if (memo == null) {
+      return true; // General insert and select access given by default.
     }
+    return (ObjectUtils.equals(user.getId(), memo.getOwnerId()) == true);
   }
 }

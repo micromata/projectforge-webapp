@@ -44,22 +44,17 @@ public class ToDoRight extends UserRightAccessCheck<ToDoDO>
   }
 
   /**
-   * @return true.
-   */
-  @Override
-  public boolean hasSelectAccess(final PFUserDO user)
-  {
-    return true;
-  }
-
-  /**
    * @return true if the reporter or assignee is the logged-in user, otherwise false.
    */
   @Override
   public boolean hasAccess(final PFUserDO user, final ToDoDO obj, final ToDoDO oldObj, final OperationType operationType)
   {
-    if (ObjectUtils.equals(user.getId(), oldObj.getAssigneeId()) == true
-        || ObjectUtils.equals(user.getId(), oldObj.getReporterId()) == true) {
+    final ToDoDO toDo = oldObj != null ? oldObj : obj;
+    if (toDo == null) {
+      return true; // General insert and select access given by default.
+    }
+    if (ObjectUtils.equals(user.getId(), toDo.getAssigneeId()) == true
+        || ObjectUtils.equals(user.getId(), toDo.getReporterId()) == true) {
       return true;
     }
     return false;

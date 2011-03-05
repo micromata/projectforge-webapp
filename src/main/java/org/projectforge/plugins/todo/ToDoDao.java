@@ -81,6 +81,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
   public ToDoDao()
   {
     super(ToDoDO.class);
+    userRightId = USER_RIGHT_ID;
   }
 
   @Override
@@ -178,7 +179,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
     msg.setTo(recipient);
     final String subject = I18nHelper.getLocalizedString(recipient.getLocale(), "plugins.todo.todo") + ": " + toDo.getSubject();
     msg.setProjectForgeSubject(subject);
-    final String content = sendMail.renderGroovyTemplate(msg, "mail/toDoNotification.html", data, recipient);
+    final String content = sendMail.renderGroovyTemplate(msg, "mail/todoChangeNotification.html", data, recipient);
     msg.setContent(content);
     msg.setContentType(Mail.CONTENTTYPE_HTML);
     sendMail.send(msg);
