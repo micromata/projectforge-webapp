@@ -47,6 +47,8 @@ import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.converter.CurrencyConverter;
 import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
 import org.projectforge.web.wicket.layout.LayoutContext;
+import org.projectforge.web.wicket.layout.LayoutLength;
+import org.projectforge.web.wicket.layout.PanelContext;
 import org.projectforge.web.wicket.layout.SelectLPanel;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
@@ -57,6 +59,10 @@ public class EmployeeSalaryFormRenderer extends AbstractDOFormRenderer
   private EmployeeSalaryDO data;
 
   private ISelectCallerPage callerPage;
+
+  private final static LayoutLength LABEL_LENGTH = LayoutLength.HALF;
+
+  private final static LayoutLength VALUE_LENGTH = LayoutLength.ONEHALF;
 
   public EmployeeSalaryFormRenderer(final MarkupContainer container, final ISelectCallerPage callerPage, final LayoutContext layoutContext,
       final EmployeeSalaryDO data)
@@ -85,10 +91,10 @@ public class EmployeeSalaryFormRenderer extends AbstractDOFormRenderer
       final DropDownChoice monthChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "month"), monthChoiceRenderer.getValues(),
           monthChoiceRenderer);
       monthChoice.setNullValid(false).setRequired(true);
-      doPanel.addDropDownChoice(data, "month", getString("calendar.month"), HALF, monthChoice, HALF);
+      doPanel.addDropDownChoice(monthChoice, new PanelContext(data, "month", HALF, getString("calendar.month"), LABEL_LENGTH));
     }
-    final MinMaxNumberField<Integer> yearField = new MinMaxNumberField<Integer>(TextFieldLPanel.INPUT_ID,
-        new PropertyModel<Integer>(data, "year"), 1900, 2999);
+    final MinMaxNumberField<Integer> yearField = new MinMaxNumberField<Integer>(TextFieldLPanel.INPUT_ID, new PropertyModel<Integer>(data,
+        "year"), 1900, 2999);
     doPanel.addTextField(getString("year"), yearField, QUART);
     {
       // DropDownChoice salary type
@@ -98,7 +104,8 @@ public class EmployeeSalaryFormRenderer extends AbstractDOFormRenderer
       final DropDownChoice typeChoice = new DropDownChoice(SELECT_ID, new PropertyModel(data, "type"),
           typeStatusChoiceRenderer.getValues(), typeStatusChoiceRenderer);
       typeChoice.setNullValid(false).setRequired(true);
-      doPanel.addDropDownChoice(data, "type", getString("fibu.employee.salary.type"), HALF, typeChoice, THREEQUART);
+      doPanel.addDropDownChoice(typeChoice,
+          new PanelContext(data, "type", THREEQUART, getString("fibu.employee.salary.type"), LABEL_LENGTH));
     }
     final TextField<BigDecimal> bruttoField = new TextField<BigDecimal>(INPUT_ID, new PropertyModel<BigDecimal>(data, "bruttoMitAgAnteil")) {
       @Override
@@ -107,9 +114,10 @@ public class EmployeeSalaryFormRenderer extends AbstractDOFormRenderer
         return new CurrencyConverter();
       }
     };
-    doPanel.addTextField(getString("fibu.employee.salary.bruttoMitAgAnteil"), HALF, bruttoField, HALF);
+    doPanel.addTextField(bruttoField, new PanelContext(HALF, getString("fibu.employee.salary.bruttoMitAgAnteil"), LABEL_LENGTH));
 
     // Brutto
-    doPanel.addTextArea(data, "comment", getString("comment"), HALF, ONEHALF, true).setCssStyle("height: 20em;");
+    doPanel.addTextArea(new PanelContext(data, "comment", ONEHALF, getString("comment"), ONEHALF).setBreakBetweenLabelAndField(true)
+        .setCssStyle("height: 20em;"));
   }
 }

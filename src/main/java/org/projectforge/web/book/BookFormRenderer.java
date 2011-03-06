@@ -24,7 +24,6 @@
 package org.projectforge.web.book;
 
 import static org.projectforge.web.wicket.layout.DropDownChoiceLPanel.SELECT_ID;
-import static org.projectforge.web.wicket.layout.LayoutLength.DOUBLE;
 import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
 import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
 import static org.projectforge.web.wicket.layout.LayoutLength.QUART;
@@ -52,6 +51,7 @@ import org.projectforge.web.wicket.layout.IField;
 import org.projectforge.web.wicket.layout.LayoutAlignment;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.LayoutLength;
+import org.projectforge.web.wicket.layout.PanelContext;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
 public class BookFormRenderer extends AbstractDOFormRenderer
@@ -65,6 +65,10 @@ public class BookFormRenderer extends AbstractDOFormRenderer
   private BookEditPage bookEditPage;
 
   protected TextField<String> authorsField, signatureField, publisherField, editorField, yearOfPublishingField;
+
+  private final static LayoutLength LABEL_LENGTH = LayoutLength.HALF;
+
+  private final static LayoutLength VALUE_LENGTH = LayoutLength.DOUBLE;
 
   public BookFormRenderer(final BookEditPage bookEditPage, final MarkupContainer container, final LayoutContext layoutContext,
       final BookDao bookDao, final BookDO data)
@@ -99,10 +103,11 @@ public class BookFormRenderer extends AbstractDOFormRenderer
   @Override
   public void add()
   {
-    final IField titleField = (IField) doPanel.addTextField(data, "title", getString("book.title"), HALF, DOUBLE).setStrong().setRequired();
+    final IField titleField = (IField) doPanel.addTextField(new PanelContext(data, "title", VALUE_LENGTH, getString("book.title"),
+        LABEL_LENGTH).setStrong().setRequired());
     titleField.setFocus();
     IField field;
-    field = doPanel.addTextField(data, "authors", getString("book.authors"), HALF, DOUBLE);
+    field = doPanel.addTextField(new PanelContext(data, "authors", VALUE_LENGTH, getString("book.authors"), LABEL_LENGTH));
     if (field instanceof TextFieldLPanel) {
       authorsField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
     }
@@ -112,11 +117,11 @@ public class BookFormRenderer extends AbstractDOFormRenderer
       final DropDownChoice<BookType> bookTypeChoice = new DropDownChoice<BookType>(SELECT_ID, new PropertyModel<BookType>(data, "type"),
           bookTypeChoiceRenderer.getValues(), bookTypeChoiceRenderer);
       bookTypeChoice.setNullValid(false).setRequired(true);
-      doPanel.addDropDownChoice(data, "type", getString("book.type"), HALF, bookTypeChoice, THREEQUART);
+      doPanel.addDropDownChoice(bookTypeChoice, new PanelContext(data, "type", THREEQUART, getString("book.type"), HALF));
     }
     final String yearLabel = getString("book.yearOfPublishing");
     doPanel.addLabel(yearLabel, FULL, LayoutAlignment.RIGHT);
-    field = doPanel.addTextField(yearLabel, data, "yearOfPublishing", QUART);
+    field = doPanel.addTextField(new PanelContext(data, "yearOfPublishing", QUART, yearLabel));
     if (field instanceof TextFieldLPanel) {
       yearOfPublishingField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
     }
@@ -127,26 +132,27 @@ public class BookFormRenderer extends AbstractDOFormRenderer
       final DropDownChoice<BookStatus> bookStatusChoice = new DropDownChoice<BookStatus>(SELECT_ID, new PropertyModel<BookStatus>(data,
           "status"), bookStatusChoiceRenderer.getValues(), bookStatusChoiceRenderer);
       bookStatusChoice.setNullValid(false).setRequired(true);
-      doPanel.addDropDownChoice(data, "status", getString("status"), HALF, bookStatusChoice, THREEQUART);
+      doPanel.addDropDownChoice(bookStatusChoice, new PanelContext(data, "status", THREEQUART, getString("status"), LABEL_LENGTH));
     }
-    field = doPanel.addTextField(data, "signature", getString("book.signature"), HALF, THREEQUART);
+    field = doPanel.addTextField(new PanelContext(data, "signature", THREEQUART, getString("book.signature"), LABEL_LENGTH));
     if (field instanceof TextFieldLPanel) {
       signatureField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
     }
     final String isbnLabel = getString("book.isbn");
     doPanel.addLabel(isbnLabel, HALF, LayoutAlignment.RIGHT);
-    doPanel.addTextField(isbnLabel, data, "isbn", THREEQUART);
-    doPanel.addTextField(data, "keywords", getString("book.keywords"), HALF, DOUBLE);
-    field = doPanel.addTextField(data, "publisher", getString("book.publisher"), HALF, DOUBLE);
+    doPanel.addTextField(new PanelContext(data, "isbn", THREEQUART, isbnLabel));
+    doPanel.addTextField(new PanelContext(data, "keywords", VALUE_LENGTH, getString("book.keywords"), LABEL_LENGTH));
+    field = doPanel.addTextField(new PanelContext(data, "publisher", VALUE_LENGTH, getString("book.publisher"), LABEL_LENGTH));
     if (field instanceof TextFieldLPanel) {
       publisherField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
     }
-    field = doPanel.addTextField(data, "editor", getString("book.editor"), HALF, DOUBLE);
+    field = doPanel.addTextField(new PanelContext(data, "editor", VALUE_LENGTH, getString("book.editor"), LABEL_LENGTH));
     if (field instanceof TextFieldLPanel) {
       editorField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
     }
-    doPanel.addTextArea(data, "abstractText", getString("book.abstract"), HALF, DOUBLE, false).setCssStyle("height: 10em;");
-    doPanel.addTextArea(data, "comment", getString("comment"), HALF, DOUBLE, false).setCssStyle("height: 10em;");
+    doPanel.addTextArea(new PanelContext(data, "abstractText", VALUE_LENGTH, getString("book.abstract"), LABEL_LENGTH)
+        .setCssStyle("height: 10em;"));
+    doPanel.addTextArea(new PanelContext(data, "comment", VALUE_LENGTH, getString("comment"), LABEL_LENGTH).setCssStyle("height: 10em;"));
 
     if (isNew() == false) {
       doPanel.addLabel(getString("book.lending"), HALF).setBreakBefore();
@@ -188,7 +194,7 @@ public class BookFormRenderer extends AbstractDOFormRenderer
       if (data.getLendOutById() == null) {
         returnBookButtonPanel.setVisible(false);
       }
-      doPanel.addTextArea(data, "lendOutComment", getString("book.lendOutNote"), HALF, DOUBLE, false).setCssStyle("height: 10em;");
+      doPanel.addTextArea(new PanelContext(data, "lendOutComment", VALUE_LENGTH, getString("book.lendOutNote"), LABEL_LENGTH).setCssStyle("height: 10em;"));
     }
   }
 }

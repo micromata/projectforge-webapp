@@ -67,8 +67,8 @@ import org.hibernate.Hibernate;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
-import org.projectforge.core.SystemInfoCache;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.core.SystemInfoCache;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.jira.JiraUtils;
@@ -111,6 +111,7 @@ import org.projectforge.web.wicket.layout.IField;
 import org.projectforge.web.wicket.layout.LabelLPanel;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.LayoutLength;
+import org.projectforge.web.wicket.layout.PanelContext;
 import org.projectforge.web.wicket.layout.RepeatingViewLPanel;
 import org.projectforge.web.wicket.layout.TextAreaLPanel;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
@@ -169,6 +170,10 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
 
   @SuppressWarnings("unused")
   private String templateName;
+
+  private final static LayoutLength LABEL_LENGTH = LayoutLength.HALF;
+
+  private final static LayoutLength VALUE_LENGTH = LayoutLength.DOUBLE;
 
   public TimesheetFormRenderer(final TimesheetEditPage timesheetEditPage, final MarkupContainer container,
       final LayoutContext layoutContext, final TimesheetDO data)
@@ -257,7 +262,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       final String label = getString("fibu.kost2");
       cost2ChoiceLabel = doPanel.addLabel(label, HALF);
       cost2ChoiceLabel.setBreakBefore();
-      final IField field = doPanel.addDropDownChoice(data, "kost2", label, null, FULL);
+      final IField field = doPanel.addDropDownChoice(null, new PanelContext(data, "kost2", FULL, label));
       if (field instanceof DropDownChoiceLPanel) {
         cost2ChoicePanel = (DropDownChoiceLPanel) field;
       } else {
@@ -324,7 +329,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     }
     {
       final WebMarkupContainer dummy = (WebMarkupContainer) new WebMarkupContainer(ContainerLPanel.WICKET_ID).setVisible(false);
-      consumptionBarPanel = doPanel.addContainer(getString("task.consumption"), HALF, dummy, FULL);
+      consumptionBarPanel = doPanel.addContainer(dummy, new PanelContext(FULL, getString("task.consumption"), HALF));
     }
     {
       locationTextField = new PFAutoCompleteMaxLengthTextField(TextFieldLPanel.INPUT_ID, new PropertyModel<String>(data, "location")) {
@@ -342,13 +347,13 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       };
       locationTextField.withMatchContains(true).withMinChars(2).withFocus(true);
       WicketUtils.addTooltip(locationTextField, getString("tooltip.autocomplete.withDblClickFunction"));
-      doPanel.addTextField(getString("timesheet.location"), HALF, locationTextField, DOUBLE);
+      doPanel.addTextField(locationTextField, new PanelContext(VALUE_LENGTH, getString("timesheet.location"), LABEL_LENGTH));
     }
     final boolean jiraSupport = ConfigXml.getInstance().isJIRAConfigured();
     {
       final String jiraFootnoteMark = jiraSupport ? "*" : "";
-      final IField field = doPanel.addTextArea(data, "description", getString("timesheet.description") + jiraFootnoteMark, HALF, DOUBLE,
-          false).setCssStyle("height: 20em;");
+      final IField field = doPanel.addTextArea(new PanelContext(data, "description", VALUE_LENGTH, getString("timesheet.description")
+          + jiraFootnoteMark, LABEL_LENGTH).setCssStyle("height: 20em;"));
       if (field instanceof TextAreaLPanel) {
         descriptionArea = ((TextAreaLPanel) field).getTextArea();
       }
@@ -437,7 +442,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     }
     final AjaxSubmitLink link = new AjaxSubmitLink(ImageLinkPanel.LINK_WICKET_ID) {
       @Override
-      protected void onSubmit(final AjaxRequestTarget target, final Form<?> form)
+      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
       {
         showRecentTimesheetsDialog(target);
       }

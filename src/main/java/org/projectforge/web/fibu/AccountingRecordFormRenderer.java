@@ -23,7 +23,6 @@
 
 package org.projectforge.web.fibu;
 
-import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
 import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
 import static org.projectforge.web.wicket.layout.LayoutLength.ONEHALF;
 import static org.projectforge.web.wicket.layout.LayoutLength.QUART;
@@ -51,6 +50,8 @@ import org.projectforge.web.wicket.converter.MonthConverter;
 import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
 import org.projectforge.web.wicket.layout.DateFieldLPanel;
 import org.projectforge.web.wicket.layout.LayoutContext;
+import org.projectforge.web.wicket.layout.LayoutLength;
+import org.projectforge.web.wicket.layout.PanelContext;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
 public class AccountingRecordFormRenderer extends AbstractDOFormRenderer
@@ -58,6 +59,10 @@ public class AccountingRecordFormRenderer extends AbstractDOFormRenderer
   private static final long serialVersionUID = -3418428748298018009L;
 
   private BuchungssatzDO data;
+
+  private final static LayoutLength LABEL_LENGTH = LayoutLength.HALF;
+
+  private final static LayoutLength VALUE_LENGTH = LayoutLength.FULL;
 
   public AccountingRecordFormRenderer(final MarkupContainer container, final LayoutContext layoutContext, final BuchungssatzDO data)
   {
@@ -76,7 +81,7 @@ public class AccountingRecordFormRenderer extends AbstractDOFormRenderer
     final String monthLabel = getString("calendar.month");
     final MinMaxNumberField<Integer> yearField = new RequiredMinMaxNumberField<Integer>(INPUT_ID, yearLabel, new PropertyModel<Integer>(
         data, "year"), 1900, 2100).setConverter(new IntegerConverter(4));
-    doPanel.addTextField(yearLabel + "/" + monthLabel, HALF, yearField, QUART);
+    doPanel.addTextField(yearField, new PanelContext(QUART, yearLabel + "/" + monthLabel, LABEL_LENGTH));
     WicketUtils.setReadonly(yearField);
     final MinMaxNumberField<Integer> monthField = new RequiredMinMaxNumberField<Integer>(INPUT_ID, monthLabel, new PropertyModel<Integer>(
         data, "month"), 1, 12).setConverter(new MonthConverter());
@@ -87,12 +92,12 @@ public class AccountingRecordFormRenderer extends AbstractDOFormRenderer
     final MinMaxNumberField<Integer> satzNrField = new RequiredMinMaxNumberField<Integer>(INPUT_ID, satzNrLabel,
         new PropertyModel<Integer>(data, "satznr"), 1, 99999).setConverter(new IntegerConverter(5));
     WicketUtils.setReadonly(satzNrField);
-    doPanel.addTextField(satzNrLabel, HALF, satzNrField, QUART);
+    doPanel.addTextField(satzNrField, new PanelContext(QUART, satzNrLabel, HALF));
 
     final String dcLabel = getString("finance.accountingRecord.dc");
     final MinMaxNumberField<BigDecimal> betragField = new MinMaxNumberField<BigDecimal>(INPUT_ID, new PropertyModel<BigDecimal>(data,
         "betrag"), new BigDecimal("-99999999"), new BigDecimal("99999999"));
-    doPanel.addTextField(getString("fibu.common.betrag") + "/" + dcLabel, HALF, betragField, HALF);
+    doPanel.addTextField(betragField, new PanelContext(HALF, getString("fibu.common.betrag") + "/" + dcLabel, LABEL_LENGTH));
     WicketUtils.setReadonly(betragField.setConverter(new CurrencyConverter()));
     {
       // DropDownChoice debitor/creditor
@@ -110,13 +115,13 @@ public class AccountingRecordFormRenderer extends AbstractDOFormRenderer
       doPanel.addTextField(dcLabel, dcField, QUART);
     }
 
-    final TextFieldLPanel belegFieldPanel = (TextFieldLPanel) doPanel.addTextField(data, "beleg", getString("fibu.buchungssatz.beleg"),
-        HALF, FULL);
+    final TextFieldLPanel belegFieldPanel = (TextFieldLPanel) doPanel.addTextField(new PanelContext(data, "beleg", VALUE_LENGTH,
+        getString("fibu.buchungssatz.beleg"), LABEL_LENGTH));
     WicketUtils.setReadonly(belegFieldPanel.getTextField());
 
     final String kost2Label = getString("fibu.kost2");
     final Kost1FormComponent kost1Component = new Kost1FormComponent(INPUT_ID, new PropertyModel<Kost1DO>(data, "kost1"), true);
-    doPanel.addTextField(getString("fibu.kost1") + "/" + kost2Label, HALF, kost1Component, HALF);
+    doPanel.addTextField(kost1Component, new PanelContext(HALF, getString("fibu.kost1") + "/" + kost2Label, LABEL_LENGTH));
     WicketUtils.setReadonly(kost1Component);
     final Kost2FormComponent kost2Component = new Kost2FormComponent(INPUT_ID, new PropertyModel<Kost2DO>(data, "kost2"), true);
     doPanel.addTextField(kost2Label, kost2Component, HALF);
@@ -124,20 +129,22 @@ public class AccountingRecordFormRenderer extends AbstractDOFormRenderer
 
     final String gegenKontoLabel = getString("fibu.buchungssatz.gegenKonto");
     final KontoFormComponent kontoComponent = new KontoFormComponent(INPUT_ID, new PropertyModel<KontoDO>(data, "konto"), true);
-    doPanel.addTextField(getString("fibu.buchungssatz.konto") + "/" + gegenKontoLabel, HALF, kontoComponent, HALF);
+    doPanel
+        .addTextField(kontoComponent, new PanelContext(HALF, getString("fibu.buchungssatz.konto") + "/" + gegenKontoLabel, LABEL_LENGTH));
     WicketUtils.setReadonly(kontoComponent);
     final KontoFormComponent gegenKontoComponent = new KontoFormComponent(INPUT_ID, new PropertyModel<KontoDO>(data, "gegenKonto"), true);
     doPanel.addTextField(gegenKontoLabel, gegenKontoComponent, HALF);
     WicketUtils.setReadonly(gegenKontoComponent);
 
-    final TextFieldLPanel textFieldPanel = (TextFieldLPanel) doPanel.addTextField(data, "text", getString("fibu.buchungssatz.text"), HALF,
-        FULL);
+    final TextFieldLPanel textFieldPanel = (TextFieldLPanel) doPanel.addTextField(new PanelContext(data, "text", VALUE_LENGTH,
+        getString("fibu.buchungssatz.text"), LABEL_LENGTH));
     WicketUtils.setReadonly(textFieldPanel.getTextField());
 
-    final TextFieldLPanel mengeFieldPanel = (TextFieldLPanel) doPanel.addTextField(data, "menge", getString("fibu.buchungssatz.menge"),
-        HALF, HALF);
+    final TextFieldLPanel mengeFieldPanel = (TextFieldLPanel) doPanel.addTextField(new PanelContext(data, "menge", HALF,
+        getString("fibu.buchungssatz.menge"), LABEL_LENGTH));
     WicketUtils.setReadonly(mengeFieldPanel.getTextField());
 
-    doPanel.addTextArea(data, "comment", getString("comment"), HALF, ONEHALF, true).setCssStyle("height: 20em;");
+    doPanel.addTextArea(new PanelContext(data, "comment", ONEHALF, getString("comment"), LABEL_LENGTH).setBreakBetweenLabelAndField(true)
+        .setCssStyle("height: 20em;"));
   }
 }

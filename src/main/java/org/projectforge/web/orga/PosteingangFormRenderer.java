@@ -23,7 +23,6 @@
 
 package org.projectforge.web.orga;
 
-import static org.projectforge.web.wicket.layout.LayoutLength.DOUBLE;
 import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
 import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
 
@@ -48,6 +47,8 @@ import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
 import org.projectforge.web.wicket.layout.DateFieldLPanel;
 import org.projectforge.web.wicket.layout.DropDownChoiceLPanel;
 import org.projectforge.web.wicket.layout.LayoutContext;
+import org.projectforge.web.wicket.layout.LayoutLength;
+import org.projectforge.web.wicket.layout.PanelContext;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
 public class PosteingangFormRenderer extends AbstractDOFormRenderer
@@ -61,6 +62,10 @@ public class PosteingangFormRenderer extends AbstractDOFormRenderer
   private ISelectCallerPage callerPage;
 
   protected DatePanel datumPanel;
+
+  private final static LayoutLength LABEL_LENGTH = LayoutLength.HALF;
+
+  private final static LayoutLength VALUE_LENGTH = LayoutLength.DOUBLE;
 
   public PosteingangFormRenderer(final MarkupContainer container, final ISelectCallerPage callerPage, final LayoutContext layoutContext,
       final PosteingangDao posteingangDao, final PosteingangDO data)
@@ -113,7 +118,8 @@ public class PosteingangFormRenderer extends AbstractDOFormRenderer
       };
       absenderTextField.withMatchContains(true).withMinChars(2).withFocus(true);
       absenderTextField.setRequired(true);
-      doPanel.addTextField(getString("orga.posteingang.absender"), HALF, absenderTextField, DOUBLE).setStrong();
+      doPanel.addTextField(absenderTextField, new PanelContext(VALUE_LENGTH, getString("orga.posteingang.absender"), LABEL_LENGTH)
+          .setStrong());
     }
     {
       final PFAutoCompleteMaxLengthTextField personTextField = new PFAutoCompleteMaxLengthTextField(TextFieldLPanel.INPUT_ID,
@@ -125,7 +131,7 @@ public class PosteingangFormRenderer extends AbstractDOFormRenderer
         }
       };
       personTextField.withMatchContains(true).withMinChars(2);
-      doPanel.addTextField(getString("orga.posteingang.person"), HALF, personTextField, DOUBLE);
+      doPanel.addTextField(personTextField, new PanelContext(VALUE_LENGTH, getString("orga.posteingang.person"), LABEL_LENGTH));
     }
     {
       final PFAutoCompleteMaxLengthTextField inhaltTextField = new PFAutoCompleteMaxLengthTextField(TextFieldLPanel.INPUT_ID,
@@ -138,18 +144,18 @@ public class PosteingangFormRenderer extends AbstractDOFormRenderer
       };
       inhaltTextField.withMatchContains(true).withMinChars(2);
       inhaltTextField.setRequired(true);
-      doPanel.addTextField(getString("orga.post.inhalt"), HALF, inhaltTextField, DOUBLE).setStrong();
+      doPanel.addTextField(inhaltTextField, new PanelContext(VALUE_LENGTH, getString("orga.post.inhalt"), LABEL_LENGTH).setStrong());
     }
-    doPanel.addTextArea(data, "bemerkung", getString("comment"), HALF, DOUBLE, false).setCssStyle("height: 20em;");
+    doPanel.addTextArea(new PanelContext(data, "bemerkung", VALUE_LENGTH, getString("comment"), LABEL_LENGTH).setCssStyle("height: 20em;"));
     {
       // Status drop down box:
       final LabelValueChoiceRenderer<PostType> typeChoiceRenderer = new LabelValueChoiceRenderer<PostType>(container, PostType.values());
       @SuppressWarnings("unchecked")
-      final DropDownChoice typeChoice = new DropDownChoice(DropDownChoiceLPanel.SELECT_ID, new PropertyModel(data, "type"), typeChoiceRenderer.getValues(),
-          typeChoiceRenderer);
+      final DropDownChoice typeChoice = new DropDownChoice(DropDownChoiceLPanel.SELECT_ID, new PropertyModel(data, "type"),
+          typeChoiceRenderer.getValues(), typeChoiceRenderer);
       typeChoice.setNullValid(false);
       typeChoice.setRequired(true);
-      doPanel.addDropDownChoice(data, "type", getString("orga.post.type"), HALF, typeChoice, FULL);
+      doPanel.addDropDownChoice(typeChoice, new PanelContext(data, "type", FULL, getString("orga.post.type"), LABEL_LENGTH));
     }
   }
 }
