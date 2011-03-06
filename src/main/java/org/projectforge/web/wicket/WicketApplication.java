@@ -150,7 +150,7 @@ public class WicketApplication extends WebApplication
   {
     this.configXml = configXml;
   }
-  
+
   public void setConfiguration(final Configuration configuration)
   {
     this.configuration = configuration;
@@ -192,7 +192,11 @@ public class WicketApplication extends WebApplication
    */
   public static String getAlertMessage()
   {
-    return WicketApplication.alertMessage;
+    if (UserFilter.isUpdateRequiredFirst() == true) {
+      return "Maintenance mode: Please restart ProjectForge after finishing." + (alertMessage != null ? " " + alertMessage : "");
+    } else {
+      return alertMessage;
+    }
   }
 
   /**
