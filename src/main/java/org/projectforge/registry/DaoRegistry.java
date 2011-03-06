@@ -27,8 +27,14 @@ import org.projectforge.access.AccessDao;
 import org.projectforge.address.AddressDao;
 import org.projectforge.book.BookDao;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.ConfigurationDao;
 import org.projectforge.fibu.AuftragDao;
+import org.projectforge.fibu.AuftragsPositionDO;
+import org.projectforge.fibu.BankAccountBalanceDO;
+import org.projectforge.fibu.BankAccountDao;
+import org.projectforge.fibu.BankAccountingEntryDO;
 import org.projectforge.fibu.EingangsrechnungDao;
+import org.projectforge.fibu.EingangsrechnungsPositionDO;
 import org.projectforge.fibu.EmployeeDao;
 import org.projectforge.fibu.EmployeeSalaryDao;
 import org.projectforge.fibu.EmployeeScriptingDao;
@@ -36,17 +42,28 @@ import org.projectforge.fibu.KontoDao;
 import org.projectforge.fibu.KundeDao;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.fibu.RechnungDao;
+import org.projectforge.fibu.RechnungsPositionDO;
 import org.projectforge.fibu.kost.BuchungssatzDao;
 import org.projectforge.fibu.kost.Kost1Dao;
 import org.projectforge.fibu.kost.Kost1ScriptingDao;
 import org.projectforge.fibu.kost.Kost2ArtDao;
 import org.projectforge.fibu.kost.Kost2Dao;
 import org.projectforge.fibu.kost.KostZuweisungDao;
+import org.projectforge.gantt.GanttChartDao;
+import org.projectforge.humanresources.HRPlanningDao;
+import org.projectforge.humanresources.HRPlanningEntryDO;
+import org.projectforge.meb.MebDao;
+import org.projectforge.orga.ContractDao;
+import org.projectforge.orga.PostausgangDao;
+import org.projectforge.orga.PosteingangDao;
+import org.projectforge.scripting.ScriptDao;
 import org.projectforge.task.TaskDao;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.UserDao;
+import org.projectforge.user.UserPrefDao;
+import org.projectforge.user.UserRightDao;
 
 /**
  * Helper object which stores all dao objects and put them into the registry. <br/>
@@ -75,7 +92,13 @@ public class DaoRegistry
 
   public static final String ADDRESS = "address";
 
+  public static final String BANK_ACCOUNT = "bankAccount";
+
   public static final String BOOK = "book";
+
+  public static final String CONFIGURATION = "configuration";
+
+  public static final String CONTRACT = "contract";
 
   public static final String COST_ASSIGNMENT = "costAssignment";
 
@@ -91,15 +114,27 @@ public class DaoRegistry
 
   public static final String EMPLOYEE_SALARY = "employeeSalary";
 
+  public static final String GANTT = "gantt";
+
   public static final String GROUP = "group";
 
+  public static final String HR_PLANNING = "hrPlanning";
+
   public static final String INCOMING_INVOICE = "incomingInvoice";
+
+  public static final String INCOMING_MAIL = "incomingMail";
+
+  public static final String MEB = "meb";
 
   public static final String ORDERBOOK = "orderBook";
 
   public static final String OUTGOING_INVOICE = "outgoingInvoice";
 
+  public static final String OUTGOING_MAIL = "outgoingMail";
+
   public static final String PROJECT = "project";
+
+  public static final String SCRIPT = "script";
 
   public static final String TASK = "task";
 
@@ -107,15 +142,25 @@ public class DaoRegistry
 
   public static final String USER = "user";
 
+  public static final String USER_RIGHT = "userRight";
+
+  public static final String USER_PREF = "userPref";
+
   private AccessDao accessDao;
 
   private AddressDao addressDao;
 
   private AuftragDao auftragDao;
 
+  private BankAccountDao bankAccountDao;
+
   private BuchungssatzDao buchungssatzDao;
 
   private BookDao bookDao;
+
+  private ConfigurationDao configurationDao;
+
+  private ContractDao contractDao;
 
   private EingangsrechnungDao eingangsrechnungDao;
 
@@ -123,7 +168,11 @@ public class DaoRegistry
 
   private EmployeeSalaryDao employeeSalaryDao;
 
+  private GanttChartDao ganttChartDao;
+
   private GroupDao groupDao;
+
+  private HRPlanningDao hrPlanningDao;
 
   private KontoDao kontoDao;
 
@@ -137,46 +186,85 @@ public class DaoRegistry
 
   private KundeDao kundeDao;
 
+  private MebDao mebDao;
+
+  private PostausgangDao postausgangDao;
+
+  private PosteingangDao posteingangDao;
+
   private RechnungDao rechnungDao;
 
   private ProjektDao projektDao;
 
+  private ScriptDao scriptDao;
+
   private TaskDao taskDao;
+
+  private TimesheetDao timesheetDao;
 
   private UserDao userDao;
 
-  private TimesheetDao timesheetDao;
+  private UserPrefDao userPrefDao;
+
+  private UserRightDao userRightDao;
 
   /**
    * Registers all daos.
    */
+  @SuppressWarnings("unchecked")
   public synchronized void init()
   {
     if (instance != null) {
       log.error("DaoRegistry is already initialized!");
       return;
     }
-    register(ADDRESS, AddressDao.class, addressDao);
-    register(TIMESHEET, TimesheetDao.class, timesheetDao).setSearchFilterClass(TimesheetFilter.class);
-    register(TASK, TaskDao.class, taskDao);
+    register(CONFIGURATION, ConfigurationDao.class, configurationDao, "administration.configuration");
+    register(USER, UserDao.class, userDao, "user");
+    register(GROUP, GroupDao.class, groupDao, "group");
+    register(TASK, TaskDao.class, taskDao, "task"); // needs PFUserDO
     Registry.instance().setTaskTree(taskDao.getTaskTree());
-    register(BOOK, BookDao.class, bookDao);
-    register(OUTGOING_INVOICE, RechnungDao.class, rechnungDao, "fibu.rechnung");
-    register(INCOMING_INVOICE, EingangsrechnungDao.class, eingangsrechnungDao, "fibu.eingangsrechnung");
-    register(USER, UserDao.class, userDao);
-    register(GROUP, GroupDao.class, groupDao);
-    register(ACCESS, AccessDao.class, accessDao);
-    register(ACCOUNTING_RECORD, BuchungssatzDao.class, buchungssatzDao, "fibu.buchungssatz");
-    register(COST1, Kost1Dao.class, kost1Dao, "fibu.kost1").setScriptingDao(new Kost1ScriptingDao(kost1Dao));
-    register(COST2, Kost2Dao.class, kost2Dao, "fibu.kost2");
-    register(COST2_Type, Kost2ArtDao.class, kost2ArtDao, "fibu.kost2art");
-    register(COST_ASSIGNMENT, KostZuweisungDao.class, kostZuweisungDao, "fibu.");
-    register(ACCOUNT, KontoDao.class, kontoDao, "fibu.konto");
+    register(ACCESS, AccessDao.class, accessDao, "access");
+
+    register(ADDRESS, AddressDao.class, addressDao, "address");
+    register(TIMESHEET, TimesheetDao.class, timesheetDao, "timesheet") //
+        .setSearchFilterClass(TimesheetFilter.class);
+    register(BOOK, BookDao.class, bookDao, "book");
+
     register(CUSTOMER, KundeDao.class, kundeDao, "fibu.kunde");
-    register(PROJECT, ProjektDao.class, projektDao, "fibu.projekt");
-    register(ORDERBOOK, AuftragDao.class, auftragDao, "fibu.auftrag");
+    register(PROJECT, ProjektDao.class, projektDao, "fibu.projekt"); // Needs customer
+
+    register(COST1, Kost1Dao.class, kost1Dao, "fibu.kost1").setScriptingDao(new Kost1ScriptingDao(kost1Dao));
+    register(COST2_Type, Kost2ArtDao.class, kost2ArtDao, "fibu.kost2art");
+    register(COST2, Kost2Dao.class, kost2Dao, "fibu.kost2"); // Needs kost2Art and project
+    register(COST_ASSIGNMENT, KostZuweisungDao.class, kostZuweisungDao, "fibu.") // Needs kost, invoices, employee salaries
+        .setFullTextSearchSupport(false);
+
+    register(ORDERBOOK, AuftragDao.class, auftragDao, "fibu.auftrag") // Needs customer, project
+        .setNestedDOClasses(AuftragsPositionDO.class);
+    register(OUTGOING_INVOICE, RechnungDao.class, rechnungDao, "fibu.rechnung") // Needs customer, project
+        .setNestedDOClasses(RechnungsPositionDO.class);
+    register(INCOMING_INVOICE, EingangsrechnungDao.class, eingangsrechnungDao, "fibu.eingangsrechnung") //
+        .setNestedDOClasses(EingangsrechnungsPositionDO.class);
+    register(ACCOUNTING_RECORD, BuchungssatzDao.class, buchungssatzDao, "fibu.buchungssatz"); // Need account, cost1 and cost2.
+    register(ACCOUNT, KontoDao.class, kontoDao, "fibu.konto");
     register(EMPLOYEE, EmployeeDao.class, employeeDao, "fibu.employee").setScriptingDao(new EmployeeScriptingDao(employeeDao));
     register(EMPLOYEE_SALARY, EmployeeDao.class, employeeSalaryDao, "fibu.employee.saraly");
+    register(BANK_ACCOUNT, BankAccountDao.class, bankAccountDao, "fibu.employee.saraly") //
+        .setNestedDOClasses(BankAccountingEntryDO.class, BankAccountBalanceDO.class);
+
+    register(CONTRACT, ContractDao.class, contractDao, "legalAffaires.contract");
+    register(OUTGOING_MAIL, PostausgangDao.class, postausgangDao, "orga.postausgang");
+    register(INCOMING_MAIL, PosteingangDao.class, posteingangDao, "orga.posteingang");
+
+    register(GANTT, GanttChartDao.class, ganttChartDao, "gantt");
+    register(HR_PLANNING, HRPlanningDao.class, hrPlanningDao, "hr.planning") //
+        .setNestedDOClasses(HRPlanningEntryDO.class);
+
+    register(MEB, MebDao.class, mebDao, "meb");
+    register(SCRIPT, ScriptDao.class, scriptDao, "scripting");
+    register(USER_PREF, UserPrefDao.class, userPrefDao);
+    register(USER_RIGHT, UserRightDao.class, userRightDao);
+
     instance = this;
   }
 
@@ -190,7 +278,7 @@ public class DaoRegistry
   }
 
   /**
-   * Registers a new dao, which is available 
+   * Registers a new dao, which is available
    * @param id
    * @param daoClassType
    * @param dao
@@ -226,6 +314,11 @@ public class DaoRegistry
     this.auftragDao = auftragDao;
   }
 
+  public void setBankAccountDao(BankAccountDao bankAccountDao)
+  {
+    this.bankAccountDao = bankAccountDao;
+  }
+
   public void setBuchungssatzDao(BuchungssatzDao buchungssatzDao)
   {
     this.buchungssatzDao = buchungssatzDao;
@@ -234,6 +327,16 @@ public class DaoRegistry
   public void setBookDao(BookDao bookDao)
   {
     this.bookDao = bookDao;
+  }
+
+  public void setConfigurationDao(ConfigurationDao configurationDao)
+  {
+    this.configurationDao = configurationDao;
+  }
+
+  public void setContractDao(ContractDao contractDao)
+  {
+    this.contractDao = contractDao;
   }
 
   public void setEmployeeDao(EmployeeDao employeeDao)
@@ -251,9 +354,19 @@ public class DaoRegistry
     this.eingangsrechnungDao = eingangsrechnungDao;
   }
 
+  public void setGanttChartDao(GanttChartDao ganttChartDao)
+  {
+    this.ganttChartDao = ganttChartDao;
+  }
+
   public void setGroupDao(GroupDao groupDao)
   {
     this.groupDao = groupDao;
+  }
+
+  public void setHRPlanningDao(HRPlanningDao hrPlanningDao)
+  {
+    this.hrPlanningDao = hrPlanningDao;
   }
 
   public void setKontoDao(KontoDao kontoDao)
@@ -286,6 +399,21 @@ public class DaoRegistry
     this.kundeDao = kundeDao;
   }
 
+  public void setMebDao(MebDao mebDao)
+  {
+    this.mebDao = mebDao;
+  }
+
+  public void setPostausgangDao(PostausgangDao postausgangDao)
+  {
+    this.postausgangDao = postausgangDao;
+  }
+
+  public void setPosteingangDao(PosteingangDao posteingangDao)
+  {
+    this.posteingangDao = posteingangDao;
+  }
+
   public void setRechnungDao(RechnungDao rechnungDao)
   {
     this.rechnungDao = rechnungDao;
@@ -296,9 +424,19 @@ public class DaoRegistry
     this.projektDao = projektDao;
   }
 
+  public void setScriptDao(ScriptDao scriptDao)
+  {
+    this.scriptDao = scriptDao;
+  }
+
   public void setTaskDao(TaskDao taskDao)
   {
     this.taskDao = taskDao;
+  }
+
+  public void setTimesheetDao(TimesheetDao timesheetDao)
+  {
+    this.timesheetDao = timesheetDao;
   }
 
   public void setUserDao(UserDao userDao)
@@ -306,8 +444,13 @@ public class DaoRegistry
     this.userDao = userDao;
   }
 
-  public void setTimesheetDao(TimesheetDao timesheetDao)
+  public void setUserPrefDao(UserPrefDao userPrefDao)
   {
-    this.timesheetDao = timesheetDao;
+    this.userPrefDao = userPrefDao;
+  }
+
+  public void setUserRightDao(UserRightDao userRightDao)
+  {
+    this.userRightDao = userRightDao;
   }
 }
