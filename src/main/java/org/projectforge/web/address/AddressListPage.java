@@ -181,7 +181,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
           }
           view.add(new ExternalLinkPanel(view.newChildId(), "mailto:" + address.getPrivateEmail(), address.getPrivateEmail()));
         }
-        // cellItemListener.populateItem(item, componentId, rowModel);
+        cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
     columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("address.phoneNumbers")), null, null,
