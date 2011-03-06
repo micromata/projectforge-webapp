@@ -54,7 +54,7 @@ public class MemoPlugin extends AbstractPlugin
   protected void initialize()
   {
     MemoPluginUpdates.dao = databaseUpdateDao;
-    final RegistryEntry entry = new RegistryEntry(ID, MemoDao.class, memoDao);
+    final RegistryEntry entry = new RegistryEntry(ID, MemoDao.class, memoDao, "plugins.memo");
     // The MemoDao is automatically available by the scripting engine!
     register(entry);
     registerListPageColumnsCreator(ID, MemoListPage.class);

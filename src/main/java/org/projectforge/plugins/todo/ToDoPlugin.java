@@ -53,7 +53,7 @@ public class ToDoPlugin extends AbstractPlugin
   protected void initialize()
   {
     ToDoPluginUpdates.dao = databaseUpdateDao;
-    final RegistryEntry entry = new RegistryEntry(ID, ToDoDao.class, toDoDao);
+    final RegistryEntry entry = new RegistryEntry(ID, ToDoDao.class, toDoDao, "plugins.todo");
     // The ToDoDao is automatically available by the scripting engine!
     register(entry);
     registerListPageColumnsCreator(ID, ToDoListPage.class);
