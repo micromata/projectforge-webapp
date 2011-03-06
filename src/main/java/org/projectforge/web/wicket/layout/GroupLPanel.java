@@ -66,35 +66,6 @@ public class GroupLPanel extends Panel
     }
   }
 
-  /**
-   * @deprecated Use addTextField(PanelContext) instead.
-   */
-  public TextFieldLPanel addTextField(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
-      final LayoutLength valueLength)
-  {
-    return addTextField(dataObject, property, label, labelLength, valueLength, null, false);
-  }
-
-  /**
-   * @deprecated Use addTextField(PanelContext) instead.
-   */
-  public TextFieldLPanel addTextField(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
-      final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextField)
-  {
-    return addTextField(dataObject, property, label, labelLength, valueLength, null, newLineBetweenLabelAndTextField);
-  }
-
-  /**
-   * @deprecated Use addTextField(PanelContext) instead.
-   */
-  public TextFieldLPanel addTextField(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
-      final LayoutLength valueLength, final FieldType fieldType, final boolean newLineBetweenLabelAndTextField)
-  {
-    return addTextField(new PanelContext(dataObject, property, valueLength, label, labelLength) //
-        .setFieldType(fieldType) //
-        .setBreakBetweenLabelAndField(newLineBetweenLabelAndTextField));
-  }
-
   public TextFieldLPanel addTextField(final PanelContext ctx)
   {
     final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), ctx.getValueLength(), ctx.getData(), ctx.getProperty());
@@ -150,16 +121,6 @@ public class GroupLPanel extends Panel
       textFieldPanel.setBreakBefore();
     }
     add(textFieldPanel);
-  }
-
-  /**
-   * @deprecated Use addTextField(PanelContext) instead.
-   */
-  public TextFieldLPanel addTextField(final Object dataObject, final String property, final LayoutLength valueLength)
-  {
-    final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), valueLength, dataObject, property);
-    add(textFieldPanel);
-    return textFieldPanel;
   }
 
   @SuppressWarnings("serial")

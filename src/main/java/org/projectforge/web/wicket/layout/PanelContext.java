@@ -69,6 +69,31 @@ public class PanelContext implements Serializable
     this.property = property;
   }
 
+  /**
+   * Should only be used for DropDownChoices.
+   * @param data
+   * @param property
+   */
+  public PanelContext(final Object data, final String property, final LayoutLength valueLength)
+  {
+    this.data = data;
+    this.property = property;
+    this.valueLength = valueLength;
+  }
+
+  /**
+   * @param data
+   * @param property
+   * @param label No label is printed. Only for displaying validation messages.
+   */
+  public PanelContext(final Object data, final String property, final LayoutLength valueLength, final String label)
+  {
+    this.data = data;
+    this.property = property;
+    this.valueLength = valueLength;
+    this.label = label;
+  }
+
   public PanelContext(final Object data, final String property, final LayoutLength valueLength, final String label,
       final LayoutLength labelLength)
   {

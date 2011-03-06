@@ -25,6 +25,7 @@ package org.projectforge.web.wicket.layout;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.markup.html.form.TextField;
 import org.projectforge.web.mobile.CollapsiblePanel;
 import org.projectforge.web.mobile.ThemeType;
 
@@ -82,11 +83,23 @@ public class GroupMobileLPanel extends GroupLPanel
   }
 
   @Override
-  public TextFieldLPanel addTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
-      final LayoutLength valueLength, final FieldType fieldType, final boolean newLineBetweenLabelAndTextField)
+  public TextFieldLPanel addTextField(final PanelContext ctx)
   {
-    final TextFieldLPanel textFieldPanel = super.addTextField(data, property, label, labelLength, valueLength, fieldType,
-        newLineBetweenLabelAndTextField);
+    final TextFieldLPanel textFieldPanel = super.addTextField(ctx);
+    setFieldType(textFieldPanel, ctx.getFieldType());
+    return textFieldPanel;
+  }
+  
+  @Override
+  public TextFieldLPanel addTextField(final TextField< ? > textField, final PanelContext ctx)
+  {
+    final TextFieldLPanel textFieldPanel = super.addTextField(textField, ctx);
+    setFieldType(textFieldPanel, ctx.getFieldType());
+    return textFieldPanel;
+  }
+
+  private void setFieldType(final TextFieldLPanel textFieldPanel, final FieldType fieldType)
+  {
     if (fieldType == FieldType.E_MAIL) {
       textFieldPanel.textField.add(new SimpleAttributeModifier("type", "email"));
     } else if (fieldType == FieldType.MOBILE_PHONE_NO || fieldType == FieldType.PHONE_NO) {
@@ -94,7 +107,6 @@ public class GroupMobileLPanel extends GroupLPanel
     } else if (fieldType == FieldType.WEB_PAGE) {
       textFieldPanel.textField.add(new SimpleAttributeModifier("type", "url"));
     }
-    return textFieldPanel;
   }
 
   @Override

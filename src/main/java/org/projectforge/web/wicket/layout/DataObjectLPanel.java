@@ -190,60 +190,6 @@ public class DataObjectLPanel extends Panel
     return repeatingViewPanel;
   }
 
-  /**
-   * @deprecated Use {@link #addTextField(PanelContext)}
-   */
-  public IField addTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
-      final LayoutLength valueLength)
-  {
-    final PanelContext ctx = new PanelContext(data, property, valueLength, label, labelLength);
-    return addTextField(ctx);
-  }
-
-  /**
-   * @deprecated Use {@link #addTextField(PanelContext)}
-   */
-  public IField addTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
-      final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextfield)
-  {
-    return addTextField(data, property, label, labelLength, valueLength, null, newLineBetweenLabelAndTextfield);
-  }
-
-  /**
-   * @deprecated Use {@link #addTextField(PanelContext)}
-   */
-  public IField addTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
-      final LayoutLength valueLength, final FieldType fieldType, final boolean newLineBetweenLabelAndTextField)
-  {
-    ensureGroupPanel();
-    IField field;
-    if (layoutContext.isMobileReadonly() == true) {
-      field = addReadonlyTextField(data, property, label, labelLength, valueLength, fieldType, newLineBetweenLabelAndTextField);
-    } else {
-      field = groupPanel.addTextField(data, property, label, labelLength, valueLength, fieldType, newLineBetweenLabelAndTextField);
-    }
-    return field;
-  }
-
-  /**
-   * @deprecated Use {@link #addTextField(PanelContext)}
-   */
-  public IField addTextField(final Object data, final String property, final LayoutLength valueLength)
-  {
-    final IField field = groupPanel.addTextField(data, property, valueLength);
-    return field;
-  }
-
-  /**
-   * @deprecated Use {@link #addTextField(PanelContext)}
-   */
-  public IField addTextField(final String label, final Object data, final String property, final LayoutLength valueLength)
-  {
-    final TextFieldLPanel field = groupPanel.addTextField(data, property, valueLength);
-    field.getTextField().setLabel(new Model<String>(label));
-    return field;
-  }
-
   public IField addReadonlyTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
       final LayoutLength valueLength)
   {
@@ -299,16 +245,6 @@ public class DataObjectLPanel extends Panel
   }
 
   /**
-   * @deprecated Use {@link #addTextArea(PanelContext)}
-   */
-  public IField addTextArea(final Object data, final String property, final String label, final LayoutLength labelLength,
-      final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextarea)
-  {
-    return addTextArea(new PanelContext(data, property, valueLength, label, labelLength)
-        .setBreakBetweenLabelAndField(newLineBetweenLabelAndTextarea));
-  }
-
-  /**
    * @return the created field or a dummy IField if the field is e. g. empty in read-only mode.
    */
   public IField addTextArea(final PanelContext ctx)
@@ -344,82 +280,6 @@ public class DataObjectLPanel extends Panel
   }
 
   /**
-   * @deprecated Use {@link #addTextField(PanelContext)}
-   */
-  @SuppressWarnings("serial")
-  public IField addDropDownChoice(final Object data, final String property, final String label, final LayoutLength labelLength,
-      final DropDownChoice< ? > dropDownChoice, final LayoutLength valueLength)
-  {
-    ensureGroupPanel();
-    IField field;
-    if (layoutContext.isMobileReadonly() == true) {
-      final Object value = BeanHelper.getNestedProperty(data, property);
-      if (isBlank(value) == true) {
-        return new DummyField();
-      }
-      ensureLabelValueTablePanel();
-      final String displayValue;
-      if (value instanceof I18nEnum) {
-        displayValue = getString(((I18nEnum) value).getI18nKey());
-      } else {
-        displayValue = String.valueOf(value);
-      }
-      field = new LabelLPanel(LabelValueTableLPanel.WICKET_ID_VALUE, labelLength, displayValue);
-      field = labelValueTablePanel.add(label, (WebMarkupContainer) field);
-    } else {
-      field = new DropDownChoiceLPanel(groupPanel.newChildId(), valueLength, dropDownChoice);
-      groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
-      ((DropDownChoiceLPanel) field).getDropDownChoice().setLabel(new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          return label;
-        }
-      });
-      groupPanel.add(field);
-    }
-    return field;
-  }
-
-  /**
-   * @deprecated Use {@link #addDropDownChoice(DropDownChoice, PanelContext)}
-   */
-  @SuppressWarnings("serial")
-  public IField addDropDownChoice(final Object data, final String property, final String label, final DropDownChoice< ? > dropDownChoice,
-      final LayoutLength valueLength)
-  {
-    ensureGroupPanel();
-    IField field;
-    if (layoutContext.isMobileReadonly() == true) {
-      final Object value = BeanHelper.getNestedProperty(data, property);
-      if (isBlank(value) == true) {
-        return new DummyField();
-      }
-      ensureLabelValueTablePanel();
-      final String displayValue;
-      if (value instanceof I18nEnum) {
-        displayValue = getString(((I18nEnum) value).getI18nKey());
-      } else {
-        displayValue = String.valueOf(value);
-      }
-      field = labelValueTablePanel.add("", displayValue);
-    } else {
-      field = new DropDownChoiceLPanel(groupPanel.newChildId(), valueLength, dropDownChoice);
-      if (dropDownChoice != null) {
-        dropDownChoice.setLabel(new Model<String>() {
-          @Override
-          public String getObject()
-          {
-            return label;
-          }
-        });
-      }
-      groupPanel.add(field);
-    }
-    return field;
-  }
-
-  /**
    * If the value is type of I18Enum then the localized string is shown in read-only mode.
    * @param ctx
    * @param dropDownChoice value field to add.
@@ -449,7 +309,7 @@ public class DataObjectLPanel extends Panel
         labelPanel = new LabelLPanel(groupPanel.newChildId(), ctx.getLabelLength(), ctx.getLabel(), (AbstractLPanel) field, true);
         groupPanel.add(labelPanel);
       }
-      if (ctx.getLabel() != null) {
+      if (ctx.getLabel() != null && ((DropDownChoiceLPanel) field).getDropDownChoice() != null) {
         ((DropDownChoiceLPanel) field).getDropDownChoice().setLabel(new Model<String>(ctx.getLabel()));
       }
       groupPanel.add(field);
@@ -562,30 +422,6 @@ public class DataObjectLPanel extends Panel
     return field;
   }
 
-  /**
-   * @deprecated Use {@link #addContainer(WebMarkupContainer, PanelContext)}
-   */
-  public ContainerLPanel addContainer(final WebMarkupContainer container, final LayoutLength valueLength)
-  {
-    return addContainer(null, null, container, valueLength);
-  }
-
-  /**
-   * @deprecated Use {@link #addTextField(PanelContext)}
-   */
-  public ContainerLPanel addContainer(final String label, final LayoutLength labelLength, final WebMarkupContainer container,
-      final LayoutLength valueLength)
-  {
-    ensureGroupPanel();
-    final ContainerLPanel containerPanel = new ContainerLPanel(groupPanel.newChildId(), valueLength, container);
-    if (label != null) {
-      final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), labelLength, label, container, true);
-      groupPanel.add(labelPanel);
-    }
-    groupPanel.add(containerPanel);
-    return containerPanel;
-  }
-
   public ContainerLPanel addContainer(final WebMarkupContainer container, final PanelContext ctx)
   {
     ensureGroupPanel();
@@ -600,24 +436,6 @@ public class DataObjectLPanel extends Panel
     }
     groupPanel.add(containerPanel);
     return containerPanel;
-  }
-
-  @SuppressWarnings("serial")
-  public IField addTextField(final String label, final LayoutLength labelLength, final TextField< ? > textField,
-      final LayoutLength valueLength)
-  {
-    ensureGroupPanel();
-    final IField field = new TextFieldLPanel(groupPanel.newChildId(), valueLength, textField);
-    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
-    ((TextFieldLPanel) field).getTextField().setLabel(new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return label;
-      }
-    });
-    groupPanel.add(field);
-    return field;
   }
 
   /**
