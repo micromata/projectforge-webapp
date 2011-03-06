@@ -40,47 +40,12 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
-import org.projectforge.access.GroupTaskAccessDO;
-import org.projectforge.address.AddressDO;
-import org.projectforge.book.BookDO;
 import org.projectforge.calendar.DayHolder;
-import org.projectforge.core.ConfigurationDO;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.core.ExtendedBaseDO;
 import org.projectforge.core.ReindexSettings;
-import org.projectforge.core.ConfigXml;
-import org.projectforge.fibu.AuftragDO;
-import org.projectforge.fibu.AuftragsPositionDO;
-import org.projectforge.fibu.BankAccountBalanceDO;
-import org.projectforge.fibu.BankAccountDO;
-import org.projectforge.fibu.BankAccountingEntryDO;
-import org.projectforge.fibu.EingangsrechnungDO;
-import org.projectforge.fibu.EingangsrechnungsPositionDO;
-import org.projectforge.fibu.EmployeeDO;
-import org.projectforge.fibu.EmployeeSalaryDO;
-import org.projectforge.fibu.KontoDO;
-import org.projectforge.fibu.KundeDO;
-import org.projectforge.fibu.ProjektDO;
-import org.projectforge.fibu.RechnungDO;
-import org.projectforge.fibu.RechnungsPositionDO;
-import org.projectforge.fibu.kost.BuchungssatzDO;
-import org.projectforge.fibu.kost.Kost1DO;
-import org.projectforge.fibu.kost.Kost2ArtDO;
-import org.projectforge.fibu.kost.Kost2DO;
-import org.projectforge.fibu.kost.KostZuweisungDO;
-import org.projectforge.gantt.GanttChartDO;
-import org.projectforge.humanresources.HRPlanningDO;
-import org.projectforge.humanresources.HRPlanningEntryDO;
-import org.projectforge.meb.MebEntryDO;
-import org.projectforge.orga.ContractDO;
-import org.projectforge.orga.PostausgangDO;
-import org.projectforge.orga.PosteingangDO;
-import org.projectforge.scripting.ScriptDO;
-import org.projectforge.task.TaskDO;
-import org.projectforge.timesheet.TimesheetDO;
-import org.projectforge.user.GroupDO;
-import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserPrefDO;
-import org.projectforge.user.UserRightDO;
+import org.projectforge.registry.Registry;
+import org.projectforge.registry.RegistryEntry;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
@@ -152,45 +117,14 @@ public class DatabaseDao extends HibernateDaoSupport
       try {
         currentReindexRun = new Date();
         StringBuffer buf = new StringBuffer();
-        reindex(PFUserDO.class, settings, buf);
-        reindex(GroupDO.class, settings, buf);
-        reindex(TaskDO.class, settings, buf); // needs PFUserDO
-        reindex(KontoDO.class, settings, buf);
-        reindex(KostZuweisungDO.class, settings, buf);
-        reindex(Kost1DO.class, settings, buf);
-        reindex(Kost2DO.class, settings, buf);
-        reindex(Kost2ArtDO.class, settings, buf);
-        reindex(KundeDO.class, settings, buf);
-        reindex(ProjektDO.class, settings, buf);
-
-        reindex(AddressDO.class, settings, buf);
-        reindex(AuftragDO.class, settings, buf); // Needs Kunde, Projekt, User
-        reindex(AuftragsPositionDO.class, settings, buf); // Needs AuftragDO
-        reindex(BankAccountDO.class, settings, buf);
-        reindex(BankAccountingEntryDO.class, settings, buf);
-        reindex(BankAccountBalanceDO.class, settings, buf);
-        reindex(BookDO.class, settings, buf);
-        reindex(BuchungssatzDO.class, settings, buf); // Needs Konto, Kost1, Kost2
-        reindex(ConfigurationDO.class, settings, buf);
-        reindex(ContractDO.class, settings, buf);
-        reindex(EingangsrechnungDO.class, settings, buf);
-        reindex(EingangsrechnungsPositionDO.class, settings, buf);
-        reindex(EmployeeDO.class, settings, buf);
-        reindex(EmployeeSalaryDO.class, settings, buf);
-        reindex(GanttChartDO.class, settings, buf);
-        reindex(GroupTaskAccessDO.class, settings, buf);
-        reindex(HRPlanningDO.class, settings, buf);
-        reindex(HRPlanningEntryDO.class, settings, buf);
-        reindex(MebEntryDO.class, settings, buf);
-        reindex(PostausgangDO.class, settings, buf);
-        reindex(PosteingangDO.class, settings, buf);
-        reindex(RechnungDO.class, settings, buf); // Needs Kunde, Projekt
-        reindex(RechnungsPositionDO.class, settings, buf); // Needs Kunde, Projekt
-        reindex(ScriptDO.class, settings, buf);
-        reindex(TimesheetDO.class, settings, buf);
-        reindex(UserRightDO.class, settings, buf);
-        reindex(UserPrefDO.class, settings, buf);
-
+        for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
+          if (entry.getNestedDOClasses() != null) {
+            for (final Class<?> nestedDOClass : entry.getNestedDOClasses()) {
+              reindex(nestedDOClass, settings, buf);
+            }
+          }
+          reindex(entry.getDOClass(), settings, buf);
+        }
         return buf.toString();
       } finally {
         currentReindexRun = null;
