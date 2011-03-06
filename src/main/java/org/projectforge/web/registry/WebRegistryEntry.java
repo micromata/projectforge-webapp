@@ -58,6 +58,7 @@ public class WebRegistryEntry
   /**
    * Id must be found in {@link Registry}.
    * @param id
+   * @param listPageColumnsCreatorClass Needed for displaying the result-sets by the general search page.
    */
   public WebRegistryEntry(final String id, final Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass)
   {
@@ -80,6 +81,9 @@ public class WebRegistryEntry
     return this;
   }
 
+  /**
+   * Needed for displaying the result-sets by the general search page.
+   */
   public Class< ? extends IListPageColumnsCreator< ? >> getListPageColumnsCreatorClass()
   {
     return listPageColumnsCreatorClass;
