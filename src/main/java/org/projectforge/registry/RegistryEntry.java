@@ -27,6 +27,7 @@ import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.ScriptingDao;
+import org.projectforge.database.DatabaseDao;
 
 /**
  * For registering a dao object and its scripting dao (optional).
@@ -41,9 +42,13 @@ public class RegistryEntry
 
   private BaseDao< ? > dao;
 
+  private Class< ? extends BaseDO< ? >>[] nestedDOClasses;
+
   private ScriptingDao< ? > scriptingDao;
 
   private boolean supressScriptingDao;
+
+  private boolean fullTextSearchSupport = true;
 
   private Class< ? extends BaseSearchFilter> searchFilterClass;
 
@@ -54,7 +59,7 @@ public class RegistryEntry
    * @param daoClassType Needed because dao is a proxy or whatever object.
    * @param dao
    */
-  public RegistryEntry(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > dao)
+  RegistryEntry(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > dao)
   {
     this(id, daoClassType, dao, null);
   }
@@ -115,6 +120,26 @@ public class RegistryEntry
   }
 
   /**
+   * @return true (default) if the re-indexing should be called directly, false otherwise (if no full text search is wanted or if this
+   *         object is a sub object (dependant object).
+   * @see DatabaseDao#rebuildDatabaseSearchIndices()
+   */
+  public boolean isFullTextSearchSupport()
+  {
+    return fullTextSearchSupport;
+  }
+
+  /**
+   * @param fullTextSearchSupport
+   * @return this for chaining.
+   */
+  public RegistryEntry setFullTextSearchSupport(final boolean fullTextSearchSupport)
+  {
+    this.fullTextSearchSupport = fullTextSearchSupport;
+    return this;
+  }
+
+  /**
    * @return The dao specific filter or null if not registered.
    */
   public final Class< ? extends BaseSearchFilter> getSearchFilterClass()
@@ -130,6 +155,25 @@ public class RegistryEntry
   public Class< ? extends BaseDO< ? >> getDOClass()
   {
     return dao.getDOClass();
+  }
+
+  /**
+   * The nested do classes are used e. g. by the full text search engine for re-indexing.
+   * @return Nested (dependant do classes with no own registry entry) if given, otherwise null.
+   */
+  public Class< ? extends BaseDO< ? >>[] getNestedDOClasses()
+  {
+    return nestedDOClasses;
+  }
+
+  /**
+   * @param nestedDOClasses
+   * @return this for chaining.
+   */
+  public RegistryEntry setNestedDOClasses(final Class< ? extends BaseDO< ? >>... nestedDOClasses)
+  {
+    this.nestedDOClasses = nestedDOClasses;
+    return this;
   }
 
   public BaseDao< ? > getDao()
