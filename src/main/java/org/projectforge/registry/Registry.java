@@ -48,7 +48,7 @@ public class Registry
   private Map<Class< ? extends BaseDao< ? >>, RegistryEntry> mapByClass = new HashMap<Class< ? extends BaseDao< ? >>, RegistryEntry>();
 
   private List<RegistryEntry> orderedList = new ArrayList<RegistryEntry>();
-  
+
   private TaskTree taskTree;
 
   public static Registry instance()
@@ -105,6 +105,9 @@ public class Registry
     return mapByClass.get(daoClass);
   }
 
+  /**
+   * @return The list of entries in the order of their registration: the first registered entry is the first of the returned list etc.
+   */
   public List<RegistryEntry> getOrderedList()
   {
     return orderedList;
@@ -121,12 +124,12 @@ public class Registry
     final RegistryEntry entry = getEntry(daoClass);
     return entry != null ? entry.getDao() : null;
   }
-  
+
   public void setTaskTree(final TaskTree taskTree)
   {
     this.taskTree = taskTree;
   }
-  
+
   public TaskTree getTaskTree()
   {
     return taskTree;
