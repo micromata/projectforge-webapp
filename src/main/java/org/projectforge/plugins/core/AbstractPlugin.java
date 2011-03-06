@@ -32,15 +32,20 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.settings.IResourceSettings;
 import org.projectforge.admin.UpdateEntry;
+import org.projectforge.core.BaseDao;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.plugins.todo.ToDoPlugin;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
+import org.projectforge.user.UserRight;
+import org.projectforge.user.UserRights;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
 import org.projectforge.web.MenuItemRegistry;
 import org.projectforge.web.registry.WebRegistry;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
+
+import de.micromata.hibernate.history.Historizable;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -52,7 +57,7 @@ public abstract class AbstractPlugin
   protected DatabaseUpdateDao databaseUpdateDao;
 
   private IResourceSettings resourceSettings;
-  
+
   private String resourceBundleName;
 
   private boolean initialized;
@@ -68,7 +73,7 @@ public abstract class AbstractPlugin
   {
     this.resourceSettings = resourceSettings;
   }
-  
+
   public String getResourceBundleName()
   {
     return resourceBundleName;
@@ -96,6 +101,9 @@ public abstract class AbstractPlugin
     }
   }
 
+  /**
+   * Is called on initialization of the plugin by the method {@link #init()}.
+   */
   protected abstract void initialize();
 
   protected MenuItemDef getMenuItemDef(final MenuItemDefId menuItemDefId)
@@ -123,6 +131,19 @@ public abstract class AbstractPlugin
     this.resourceBundleName = resourceBundleName;
     resourceSettings.addStringResourceLoader(0, new BundleStringResourceLoader(resourceBundleName));
     return this;
+  }
+
+  /**
+   * @param id The unique plugin id.
+   * @param daoClassType The dao object type.
+   * @param baseDao The dao itself.
+   * @param i18nPrefix The prefix for i18n keys.
+   */
+  protected void register(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > baseDao,
+      final String i18nPrefix)
+  {
+    final RegistryEntry entry = new RegistryEntry(id, daoClassType, baseDao, i18nPrefix);
+    register(entry);
   }
 
   /**
@@ -154,15 +175,49 @@ public abstract class AbstractPlugin
   }
 
   /**
+   * Use this method if your entities don't support the general search page (e. g. if you have no data-base entities which implements
+   * {@link Historizable}).
    * @param id
-   * @param listPageColumnsCreatorClass
+   * @return this for chaining.
+   * @see WebRegistry#register(String)
+   */
+  protected AbstractPlugin registerWeb(final String id)
+  {
+    WebRegistry.instance().register(id);
+    return this;
+  }
+
+  /**
+   * @param id
+   * @param listPageColumnsCreatorClass Needed for displaying the result-sets by the general search page.
    * @return this for chaining.
    * @see WebRegistry#register(String, Class)
    */
-  protected AbstractPlugin registerListPageColumnsCreator(final String id,
-      final Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass)
+  protected AbstractPlugin registerWeb(final String id, final Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass)
   {
     WebRegistry.instance().register(id, listPageColumnsCreatorClass);
+    return this;
+  }
+
+  /**
+   * @param id
+   * @param pageListClass list page to mount. Needed for displaying the result-sets by the general search page if the list page implements
+   *          {@link IListPageColumnsCreator}.
+   * @param pageEditClass edit page to mount.
+   * @return this for chaining.
+   * @see WebRegistry#register(String, Class)
+   * @see WebRegistry#addMountPages(String, Class, Class)
+   */
+  @SuppressWarnings("unchecked")
+  protected AbstractPlugin registerWeb(final String id, final Class< ? extends WebPage> pageListClass,
+      final Class< ? extends WebPage> pageEditClass)
+  {
+    if (IListPageColumnsCreator.class.isAssignableFrom(pageListClass) == true) {
+      WebRegistry.instance().register(id, (Class< ? extends IListPageColumnsCreator< ? >>) pageListClass);
+    } else {
+      WebRegistry.instance().register(id);
+    }
+    WebRegistry.instance().addMountPages(id, pageListClass, pageEditClass);
     return this;
   }
 
@@ -172,7 +227,7 @@ public abstract class AbstractPlugin
    * @return this for chaining.
    * @see WebRegistry#addMountPages(String, Class)
    */
-  protected AbstractPlugin addMountPages(final String mountPage, final Class< ? extends WebPage> pageClass)
+  protected AbstractPlugin addMountPage(final String mountPage, final Class< ? extends WebPage> pageClass)
   {
     WebRegistry.instance().addMountPage(mountPage, pageClass);
     return this;
@@ -189,6 +244,17 @@ public abstract class AbstractPlugin
       final Class< ? extends WebPage> pageEditClass)
   {
     WebRegistry.instance().addMountPages(mountPageBasename, pageListClass, pageEditClass);
+    return this;
+  }
+
+  /**
+   * Registers a right which is responsible for the access management.
+   * @param right
+   * @return this for chaining.
+   */
+  protected AbstractPlugin registerRight(final UserRight right)
+  {
+    UserRights.instance().addRight(right);
     return this;
   }
 

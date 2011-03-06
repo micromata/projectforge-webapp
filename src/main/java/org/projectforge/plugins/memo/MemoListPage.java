@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
@@ -70,7 +71,11 @@ public class MemoListPage extends AbstractListPage<MemoListForm, MemoDao, MemoDO
     final CellItemListener<MemoDO> cellItemListener = new CellItemListener<MemoDO>() {
       public void populateItem(Item<ICellPopulator<MemoDO>> item, String componentId, IModel<MemoDO> rowModel)
       {
-        // Do nothing;
+        final MemoDO memo = rowModel.getObject();
+        final StringBuffer cssStyle = getCssStyle(memo.getId(), memo.isDeleted());
+        if (cssStyle.length() > 0) {
+          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+        }
       }
     };
 

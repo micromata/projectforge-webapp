@@ -25,8 +25,6 @@ package org.projectforge.plugins.memo;
 
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
-import org.projectforge.registry.RegistryEntry;
-import org.projectforge.user.UserRights;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
 
@@ -36,7 +34,7 @@ import org.projectforge.web.MenuItemDefId;
  */
 public class MemoPlugin extends AbstractPlugin
 {
-  public static final String ID = "Memo";
+  public static final String ID = "memo";
 
   public static final String RESOURCE_BUNDLE_NAME = MemoPlugin.class.getPackage().getName() + ".MemoI18nResources";
 
@@ -53,18 +51,22 @@ public class MemoPlugin extends AbstractPlugin
   @Override
   protected void initialize()
   {
+    // DatabaseUpdateDao is needed by the updater:
     MemoPluginUpdates.dao = databaseUpdateDao;
-    final RegistryEntry entry = new RegistryEntry(ID, MemoDao.class, memoDao, "plugins.memo");
-    // The MemoDao is automatically available by the scripting engine!
-    register(entry);
-    registerListPageColumnsCreator(ID, MemoListPage.class);
-    addMountPages(ID, MemoListPage.class, MemoEditPage.class);
+    // Register it:
+    register(ID, MemoDao.class, memoDao, "plugins.memo");
 
+    // Register the web part:
+    registerWeb(ID, MemoListPage.class, MemoEditPage.class);
+
+    // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
     registerMenuItem(new MenuItemDef(parentMenu, ID, 10, "plugins.memo.menu", MemoListPage.class));
 
-    UserRights.instance().addRight(new MemoRight());
-    // Memo: Hibernate-search indexer.
+    // Define the access management:
+    registerRight(new MemoRight());
+
+    // All the i18n stuff:
     addResourceBundle(RESOURCE_BUNDLE_NAME);
   }
 
