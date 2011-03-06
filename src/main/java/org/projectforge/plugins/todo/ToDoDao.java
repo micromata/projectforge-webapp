@@ -186,7 +186,16 @@ public class ToDoDao extends BaseDao<ToDoDO>
   }
 
   @Override
-  protected void afterSaveOrModify(ToDoDO obj)
+  protected void onSaveOrModify(final ToDoDO obj)
+  {
+    if (ObjectUtils.equals(PFUserContext.getUserId(), obj.getAssigneeId()) == false) {
+      // To-do is changed by other user than assignee, so set recent flag for this to-do for the assignee.
+      obj.setRecent(true);
+    }
+  }
+
+  @Override
+  protected void afterSaveOrModify(final ToDoDO obj)
   {
     toDoCache.setExpired(); // Force reload of the menu item counters for open to-do entrie.
   }
@@ -241,7 +250,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
           + table.getName()
           + " where assignee_fk="
           + userId
-          + " and status != 'CLOSED' and deleted=false");
+          + " and recent=true and deleted=false");
     } catch (final Exception ex) {
       log.error(ex.getMessage(), ex);
       return 0;

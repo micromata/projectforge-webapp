@@ -26,6 +26,7 @@ package org.projectforge.plugins.todo;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -76,6 +77,9 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
       {
         final ToDoDO toDo = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(toDo.getId(), toDo.isDeleted());
+        if (toDo.isRecent() == true && ObjectUtils.equals(getUserId(), toDo.getAssigneeId()) == true) {
+          cssStyle.append("color:red;");
+        }
         if (cssStyle.length() > 0) {
           item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
         }

@@ -83,6 +83,8 @@ public class ToDoDO extends DefaultBaseDO
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private ToDoStatus status;
 
+  private boolean recent;
+
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private Priority priority;
 
@@ -93,6 +95,11 @@ public class ToDoDO extends DefaultBaseDO
   @Field(index = Index.UN_TOKENIZED)
   @DateBridge(resolution = Resolution.DAY)
   private Date resubmission;
+
+  static {
+    // Field recent should not be listed in the history of changes:
+    invalidHistorizableProperties.add("recent");
+  }
 
   @Column(length = Constants.LENGTH_TITLE)
   public String getSubject()
@@ -242,6 +249,26 @@ public class ToDoDO extends DefaultBaseDO
   public ToDoDO setStatus(ToDoStatus status)
   {
     this.status = status;
+    return this;
+  }
+
+  /**
+   * After any modification of a to-do by other users than the assignee this flag is set to true. The assignee see in his menu a red number
+   * showing the total number of recent to-do's. After displaying the to-do by the assignee the recent flag will be set to false.
+   * @return true if any modification isn't seen by the assignee.
+   */
+  public boolean isRecent()
+  {
+    return recent;
+  }
+  
+  /**
+   * @param recent
+   * @return this for chaining.
+   */
+  public ToDoDO setRecent(final boolean recent)
+  {
+    this.recent = recent;
     return this;
   }
 

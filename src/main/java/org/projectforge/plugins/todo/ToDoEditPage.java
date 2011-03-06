@@ -25,9 +25,11 @@ package org.projectforge.plugins.todo;
 
 import java.sql.Date;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractBasePage;
@@ -49,6 +51,17 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
   {
     super(parameters, "plugins.todo");
     init();
+  }
+  
+  @Override
+  protected void onAfterRender()
+  {
+    super.onAfterRender();
+    if (ObjectUtils.equals(PFUserContext.getUserId(), getData().getAssigneeId()) == true) {
+      // OK, user has now seen this to-do: delete recent flag:
+      getData().setRecent(false);
+      toDoDao.update(getData());
+    }
   }
 
   @Override
