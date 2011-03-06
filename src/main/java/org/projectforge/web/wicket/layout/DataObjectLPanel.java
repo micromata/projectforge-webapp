@@ -197,8 +197,7 @@ public class DataObjectLPanel extends Panel
       final LayoutLength valueLength)
   {
     final PanelContext ctx = new PanelContext(data, property, valueLength, label, labelLength);
-    addTextField(ctx);
-    return ctx.getValueField();
+    return addTextField(ctx);
   }
 
   /**
