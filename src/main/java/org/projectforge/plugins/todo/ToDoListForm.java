@@ -24,9 +24,17 @@
 package org.projectforge.plugins.todo;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.task.TaskDO;
+import org.projectforge.task.TaskTree;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.web.task.TaskSelectPanel;
+import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.components.CoolCheckBoxPanel;
+import org.projectforge.web.wicket.components.LabelForPanel;
 
 public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
 {
@@ -34,6 +42,10 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ToDoListForm.class);
 
+  @SpringBean(name = "taskTree")
+  private TaskTree taskTree;
+
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
@@ -50,6 +62,73 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
         getString(ToDoStatus.POSTPONED.getI18nKey()), true));
     filterContainer.add(new CoolCheckBoxPanel("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
         getString("onlyDeleted"), true).setTooltip(getString("onlyDeleted.tooltip")));
+
+    final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("task", new Model<TaskDO>() {
+      @Override
+      public TaskDO getObject()
+      {
+        return taskTree.getTaskById(getSearchFilter().getTaskId());
+      }
+    }, parentPage, "taskId") {
+      @Override
+      protected void selectTask(final TaskDO task)
+      {
+        super.selectTask(task);
+        if (task != null) {
+          getSearchFilter().setTaskId(task.getId());
+        }
+        parentPage.refresh();
+      }
+    };
+    filterContainer.add(taskSelectPanel);
+    taskSelectPanel.setEnableLinks(true);
+    taskSelectPanel.init();
+    taskSelectPanel.setRequired(false);
+    filterContainer.add(new LabelForPanel("taskLabel", taskSelectPanel, getString("task")));
+    
+    final UserSelectPanel assigneeSelectPanel = new UserSelectPanel("assignee", new Model<PFUserDO>() {
+      @Override
+      public PFUserDO getObject()
+      {
+        return userGroupCache.getUser(getSearchFilter().getAssigneeId());
+      }
+
+      @Override
+      public void setObject(final PFUserDO object)
+      {
+        if (object == null) {
+          getSearchFilter().setAssigneeId(null);
+        } else {
+          getSearchFilter().setAssigneeId(object.getId());
+        }
+      }
+    }, parentPage, "assigneeId");
+    filterContainer.add(assigneeSelectPanel);
+    assigneeSelectPanel.setDefaultFormProcessing(false);
+    assigneeSelectPanel.init().withAutoSubmit(true);
+    filterContainer.add(new LabelForPanel("assigneeLabel", assigneeSelectPanel, getString("plugins.todo.assignee")));
+
+    final UserSelectPanel reporterSelectPanel = new UserSelectPanel("reporter", new Model<PFUserDO>() {
+      @Override
+      public PFUserDO getObject()
+      {
+        return userGroupCache.getUser(getSearchFilter().getReporterId());
+      }
+
+      @Override
+      public void setObject(final PFUserDO object)
+      {
+        if (object == null) {
+          getSearchFilter().setReporterId(null);
+        } else {
+          getSearchFilter().setReporterId(object.getId());
+        }
+      }
+    }, parentPage, "reporterId");
+    filterContainer.add(reporterSelectPanel);
+    reporterSelectPanel.setDefaultFormProcessing(false);
+    reporterSelectPanel.init().withAutoSubmit(true);
+    filterContainer.add(new LabelForPanel("reporterLabel", reporterSelectPanel, getString("plugins.todo.reporter")));
   }
 
   public ToDoListForm(ToDoListPage parentPage)

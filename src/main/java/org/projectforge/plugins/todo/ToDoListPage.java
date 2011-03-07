@@ -37,8 +37,11 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.task.TaskTree;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.core.PriorityFormatter;
+import org.projectforge.web.task.TaskFormatter;
+import org.projectforge.web.task.TaskPropertyColumn;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -59,6 +62,9 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
 
   @SpringBean(name = "priorityFormatter")
   private PriorityFormatter priorityFormatter;
+
+  @SpringBean(name = "taskTree")
+  private TaskTree taskTree;
 
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
@@ -126,6 +132,8 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
     });
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.type")),
         getSortable("type", sortable), "type", cellItemListener));
+    columns.add(new TaskPropertyColumn<ToDoDO>(this, getString("task"), getSortable("task.title", sortable), "task",
+        cellItemListener).withTaskFormatter(TaskFormatter.instance()).withTaskTree(taskTree));
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("description")),
         getSortable("description", sortable), "description", cellItemListener));
     return columns;
@@ -137,6 +145,46 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
     dataTable = createDataTable(createColumns(this, true), "lastUpdate", false);
     form.add(dataTable);
   }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#select(java.lang.String, java.lang.Object)
+   */
+  public void select(final String property, final Object selectedValue)
+  {
+    if ("taskId".equals(property) == true) {
+      form.getSearchFilter().setTaskId((Integer) selectedValue);
+      refresh();
+    } else if ("reporterId".equals(property) == true) {
+      form.getSearchFilter().setReporterId((Integer) selectedValue);
+      refresh();
+    } else if ("assigneeId".equals(property) == true) {
+      form.getSearchFilter().setAssigneeId((Integer) selectedValue);
+      refresh();
+    } else {
+      super.select(property, selectedValue);
+    }
+  }
+
+  /**
+   * 
+   * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
+   */
+  public void unselect(final String property)
+  {
+    if ("taskId".equals(property) == true) {
+      form.getSearchFilter().setTaskId(null);
+      refresh();
+    } else if ("reporterId".equals(property) == true) {
+      form.getSearchFilter().setReporterId(null);
+      refresh();
+    } else if ("assigneeId".equals(property) == true) {
+      form.getSearchFilter().setAssigneeId(null);
+      refresh();
+    } else {
+      super.unselect(property);
+    }
+  }
+
 
   @Override
   protected ToDoListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)

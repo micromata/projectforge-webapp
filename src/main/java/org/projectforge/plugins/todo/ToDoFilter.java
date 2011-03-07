@@ -37,7 +37,11 @@ public class ToDoFilter extends BaseSearchFilter implements Serializable
   private static final long serialVersionUID = -2799448444375717414L;
 
   private boolean opened, reopened, inprogress, closed, postponed;
-  
+
+  private Integer reporterId, assigneeId;
+
+  private Integer taskId;
+
   public ToDoFilter()
   {
   }
@@ -45,6 +49,36 @@ public class ToDoFilter extends BaseSearchFilter implements Serializable
   public ToDoFilter(final BaseSearchFilter filter)
   {
     super(filter);
+  }
+
+  public Integer getReporterId()
+  {
+    return reporterId;
+  }
+
+  public void setReporterId(Integer reporterId)
+  {
+    this.reporterId = reporterId;
+  }
+
+  public Integer getAssigneeId()
+  {
+    return assigneeId;
+  }
+
+  public void setAssigneeId(Integer assigneeId)
+  {
+    this.assigneeId = assigneeId;
+  }
+
+  public Integer getTaskId()
+  {
+    return taskId;
+  }
+
+  public void setTaskId(Integer taskId)
+  {
+    this.taskId = taskId;
   }
 
   public boolean isOpened()
@@ -56,12 +90,12 @@ public class ToDoFilter extends BaseSearchFilter implements Serializable
   {
     this.opened = opened;
   }
-  
+
   public boolean isReopened()
   {
     return reopened;
   }
-  
+
   public void setReopened(boolean reopened)
   {
     this.reopened = reopened;

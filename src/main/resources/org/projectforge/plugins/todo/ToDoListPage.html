@@ -5,24 +5,21 @@
 
 <body>
 <wicket:extend>
-  <!-- tr>
+  <tr>
     <th wicket:id="taskLabel">[task]</th>
-    <td colspan="3"><span wicket:id="task" id="task">[show and select task]</span> <input type="checkbox" wicket:id="recursiveCheckBox"
-      id="recursiveCheckBox" onchange="javascript:submit();" /> <label for="recursiveCheckBox"><wicket:message key="task.recursive" /></label></td>
+    <td><span wicket:id="task" id="task">[show and select task]</span></td>
   </tr>
   <tr>
-    <th><label for="user"><wicket:message key="user" /></label></th>
-    <td><span wicket:id="user" id="user">[show and select user]</span></td>
-    <th><wicket:message key="label.options" /></th>
-    <td><input type="checkbox" wicket:id="longFormatCheckBox" id="longFormatCheckBox" onchange="javascript:submit();" /> <label
-      for="longFormatCheckBox"><wicket:message key="longFormat" /></label> <input type="checkbox" wicket:id="deletedCheckBox" id="deletedCheckBox"
-      onchange="javascript:submit();" /> <label for="deletedCheckBox"><wicket:message key="onlyDeleted" /></label><input type="checkbox"
-      wicket:id="markedCheckBox" id="markedCheckBox" onchange="javascript:submit();" /> <label for="markedCheckBox"><wicket:message
-      key="timesheet.filter.withTimeperiodCollision" /></label></td>
-  </tr-->
+    <th wicket:id="assigneeLabel">[assignee]</th>
+    <td><span wicket:id="assignee">[show and select assignee]</span></td>
+  </tr>
+  <tr>
+    <th wicket:id="reporterLabel">[reporter]</th>
+    <td><span wicket:id="reporter">[show and select reporter]</span></td>
+  </tr>
   <tr>
     <th><wicket:message key="label.options" /></th>
-    <td colspan="3">
+    <td>
     <div class="buttonset"><wicket:panel wicket:id="openedCheckBox">[cool checkbox]</wicket:panel><wicket:panel wicket:id="reopenedCheckBox">[cool checkbox]</wicket:panel><wicket:panel
       wicket:id="inprogressCheckBox">[cool checkbox]</wicket:panel><wicket:panel wicket:id="postponedCheckBox">[cool checkbox]</wicket:panel><wicket:panel
       wicket:id="closedCheckBox">[cool checkbox]</wicket:panel><wicket:panel wicket:id="deletedCheckBox">[cool checkbox]</wicket:panel>&nbsp; <span
@@ -31,7 +28,7 @@
   </tr>
   <tr>
     <th>&nbsp;</th>
-    <td>TBD: Assignee, Reporter, Task, Mobil page, filter, templates.</td>
+    <td>TBD: Mobil page, task rights.</td>
   </tr>
 </wicket:extend>
 </body>

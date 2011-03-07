@@ -43,6 +43,7 @@ import org.projectforge.database.Table;
 import org.projectforge.mail.Mail;
 import org.projectforge.mail.SendMail;
 import org.projectforge.task.TaskDO;
+import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.I18nHelper;
 import org.projectforge.user.PFUserContext;
@@ -118,6 +119,22 @@ public class ToDoDao extends BaseDao<ToDoDO>
     }
     if (col.size() > 0) {
       queryFilter.add(Restrictions.in("status", col));
+    }
+    if (myFilter.getTaskId() != null) {
+      final TaskNode node = taskTree.getTaskNodeById(myFilter.getTaskId());
+      final List<Integer> taskIds = node.getDescendantIds();
+      taskIds.add(node.getId());
+      queryFilter.add(Restrictions.in("task.id", taskIds));
+    }
+    if (myFilter.getAssigneeId() != null) {
+      final PFUserDO assignee = new PFUserDO();
+      assignee.setId(myFilter.getAssigneeId());
+      queryFilter.add(Restrictions.eq("assignee", assignee));
+    }
+    if (myFilter.getReporterId() != null) {
+      final PFUserDO reporter = new PFUserDO();
+      reporter.setId(myFilter.getReporterId());
+      queryFilter.add(Restrictions.eq("reporter", reporter));
     }
     queryFilter.addOrder(Order.desc("created"));
     return getList(queryFilter);
