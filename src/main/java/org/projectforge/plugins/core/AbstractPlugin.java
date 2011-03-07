@@ -265,13 +265,14 @@ public abstract class AbstractPlugin
    * @param areaId 
    * @param cls
    * @param i18nSuffix
-   * @return this for chaining.
+   * @return Created and registered UserPrefArea.
    * @see UserPrefArea#UserPrefArea(String, Class, String)
    */
-  protected AbstractPlugin registerUserPrefArea(final String areaId, final Class< ? > cls, final String i18nSuffix)
+  protected UserPrefArea registerUserPrefArea(final String areaId, final Class< ? > cls, final String i18nSuffix)
   {
-    UserPrefAreaRegistry.instance().register(new UserPrefArea(areaId, cls, i18nSuffix));
-    return this;
+    final UserPrefArea userPrefArea = new UserPrefArea(areaId, cls, i18nSuffix);
+    UserPrefAreaRegistry.instance().register(userPrefArea);
+    return userPrefArea;
   }
 
   /**

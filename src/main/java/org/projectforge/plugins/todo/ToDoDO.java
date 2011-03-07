@@ -76,13 +76,13 @@ public class ToDoDO extends DefaultBaseDO
   @IndexedEmbedded(depth = 1)
   private TaskDO task;
 
-  @UserPrefParameter(i18nKey = "comment")
-  @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String comment;
-
-  @UserPrefParameter(i18nKey = "description")
+  @UserPrefParameter(i18nKey = "description", multiline = true)
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String description;
+
+  @UserPrefParameter(i18nKey = "comment", multiline = true)
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String comment;
 
   @UserPrefParameter(i18nKey = "plugins.todo.type")
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
@@ -94,6 +94,7 @@ public class ToDoDO extends DefaultBaseDO
 
   private boolean recent;
 
+  @UserPrefParameter(i18nKey = "priority")
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private Priority priority;
 
@@ -270,7 +271,7 @@ public class ToDoDO extends DefaultBaseDO
   {
     return recent;
   }
-  
+
   /**
    * @param recent
    * @return this for chaining.

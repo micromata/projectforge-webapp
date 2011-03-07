@@ -25,8 +25,8 @@ package org.projectforge.plugins.todo;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserPrefDao;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.layout.LayoutContext;
 
@@ -39,16 +39,15 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
+  @SpringBean(name = "userPrefDao")
+  private UserPrefDao userPrefDao;
+
   protected ToDoFormRenderer renderer;
 
   public ToDoEditForm(ToDoEditPage parentPage, ToDoDO data)
   {
     super(parentPage, data);
-    if (isNew() == true) {
-      data.setAssignee(PFUserContext.getUser());
-      data.setReporter(PFUserContext.getUser());
-    }
-    renderer = new ToDoFormRenderer(parentPage, this, new LayoutContext(this), data, userGroupCache);
+    renderer = new ToDoFormRenderer(parentPage, this, new LayoutContext(this), data, userGroupCache, userPrefDao);
   }
 
   @Override

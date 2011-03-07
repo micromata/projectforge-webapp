@@ -25,12 +25,14 @@ package org.projectforge.plugins.todo;
 
 import java.sql.Date;
 
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.user.UserPrefEditPage;
 import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -51,27 +53,57 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
   {
     super(parameters, "plugins.todo");
     init();
+    if (isNew() == true) {
+      final ToDoDO pref = getToDoPrefData();
+      if (pref != null) {
+        getData().copyValuesFrom(pref, "id");
+      } else {
+        getData().setAssignee(PFUserContext.getUser());
+        getData().setReporter(PFUserContext.getUser());
+      }
+    }
   }
-  
+
   @Override
   protected void onAfterRender()
   {
     super.onAfterRender();
     if (ObjectUtils.equals(PFUserContext.getUserId(), getData().getAssigneeId()) == true) {
       // OK, user has now seen this to-do: delete recent flag:
-      getData().setRecent(false);
-      toDoDao.update(getData());
+      if (isNew() == false && getData().isRecent() == true) {
+        getData().setRecent(false);
+        toDoDao.update(getData());
+      }
     }
   }
 
   @Override
   public AbstractBasePage afterSaveOrUpdate()
   {
+    // Save to-do as recent to-do
+     final ToDoDO pref = getToDoPrefData();
+     pref.copyValuesFrom(getData(), "id");
+    // Does the user want to store this to-do as template?
     if (form.renderer.sendNotification == true) {
       final String url = WicketUtils.getAbsoluteEditPageUrl(getRequest(), ToDoEditPage.class, getData().getId());
       toDoDao.sendNotification(form.getData(), url);
     }
+    if (BooleanUtils.isTrue(form.renderer.saveAsTemplate) == true) {
+      final UserPrefEditPage userPrefEditPage = new UserPrefEditPage(ToDoPlugin.USER_PREF_AREA, getData());
+      userPrefEditPage.setReturnToPage(this.returnToPage);
+      return userPrefEditPage;
+    }
     return null;
+  }
+
+  protected ToDoDO getToDoPrefData()
+  {
+    ToDoDO pref = (ToDoDO) getUserPrefEntry(ToDoDO.class.getName());
+    if (pref == null) {
+      pref = new ToDoDO();
+      putUserPrefEntry(ToDoDO.class.getName(), pref, true);
+    }
+    return pref;
   }
 
   /**

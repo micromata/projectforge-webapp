@@ -26,6 +26,7 @@ package org.projectforge.plugins.todo;
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
 import org.projectforge.registry.RegistryEntry;
+import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
 
@@ -37,6 +38,8 @@ public class ToDoPlugin extends AbstractPlugin
   public static final String ID = "toDo";
 
   public static final String RESOURCE_BUNDLE_NAME = ToDoPlugin.class.getPackage().getName() + ".ToDoI18nResources";
+  
+  static UserPrefArea USER_PREF_AREA;
 
   private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { ToDoDO.class};
 
@@ -77,7 +80,7 @@ public class ToDoPlugin extends AbstractPlugin
     addResourceBundle(RESOURCE_BUNDLE_NAME);
     
     // Register favorite entries (the user can modify these templates/favorites via 'own settings'):
-    registerUserPrefArea("TODO_FAVORITE", ToDoDO.class, "todo.favorite");
+    USER_PREF_AREA = registerUserPrefArea("TODO_FAVORITE", ToDoDO.class, "todo.favorite");
   }
 
   /**
