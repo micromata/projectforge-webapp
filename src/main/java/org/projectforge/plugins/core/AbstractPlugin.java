@@ -37,6 +37,8 @@ import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.plugins.todo.ToDoPlugin;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
+import org.projectforge.user.UserPrefArea;
+import org.projectforge.user.UserPrefAreaRegistry;
 import org.projectforge.user.UserRight;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.MenuItemDef;
@@ -255,6 +257,20 @@ public abstract class AbstractPlugin
   protected AbstractPlugin registerRight(final UserRight right)
   {
     UserRights.instance().addRight(right);
+    return this;
+  }
+
+  /**
+   * Registers a new user preferences areas (shown in the list of 'own settings' of each user).
+   * @param areaId 
+   * @param cls
+   * @param i18nSuffix
+   * @return this for chaining.
+   * @see UserPrefArea#UserPrefArea(String, Class, String)
+   */
+  protected AbstractPlugin registerUserPrefArea(final String areaId, final Class< ? > cls, final String i18nSuffix)
+  {
+    UserPrefAreaRegistry.instance().register(new UserPrefArea(areaId, cls, i18nSuffix));
     return this;
   }
 

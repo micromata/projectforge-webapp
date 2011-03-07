@@ -44,6 +44,7 @@ import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.Priority;
+import org.projectforge.core.UserPrefParameter;
 import org.projectforge.database.Constants;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
@@ -59,27 +60,35 @@ public class ToDoDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 4864250842083720210L;
 
+  @UserPrefParameter(i18nKey = "plugins.todo.subject")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String subject;
 
+  @UserPrefParameter(i18nKey = "plugins.todo.reporter")
   @IndexedEmbedded
   private PFUserDO reporter;
 
+  @UserPrefParameter(i18nKey = "plugins.todo.assignee")
   @IndexedEmbedded
   private PFUserDO assignee;
 
+  @UserPrefParameter(i18nKey = "task")
   @IndexedEmbedded(depth = 1)
   private TaskDO task;
 
+  @UserPrefParameter(i18nKey = "comment")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String comment;
 
+  @UserPrefParameter(i18nKey = "description")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String description;
 
+  @UserPrefParameter(i18nKey = "plugins.todo.type")
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private ToDoType type;
 
+  @UserPrefParameter(i18nKey = "plugins.todo.status")
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private ToDoStatus status;
 

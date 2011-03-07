@@ -75,6 +75,9 @@ public class ToDoPlugin extends AbstractPlugin
 
     // All the i18n stuff:
     addResourceBundle(RESOURCE_BUNDLE_NAME);
+    
+    // Register favorite entries (the user can modify these templates/favorites via 'own settings'):
+    registerUserPrefArea("TODO_FAVORITE", ToDoDO.class, "todo.favorite");
   }
 
   /**

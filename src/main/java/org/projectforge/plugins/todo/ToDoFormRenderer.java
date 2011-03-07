@@ -32,6 +32,7 @@ import java.util.Date;
 
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.PropertyModel;
 import org.hibernate.Hibernate;
 import org.projectforge.core.ConfigXml;
@@ -41,8 +42,10 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
+import org.projectforge.web.wicket.components.CheckBoxPanel;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
+import org.projectforge.web.wicket.components.LabelForPanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
 import org.projectforge.web.wicket.layout.DateFieldLPanel;
@@ -65,9 +68,12 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
 
   protected boolean sendNotification = true;
 
-  final static LayoutLength labelLength = LayoutLength.HALF;
+  private final static LayoutLength LABEL_LENGTH = LayoutLength.HALF;
 
-  final static LayoutLength valueLength = LayoutLength.ONEHALF;
+  private final static LayoutLength VALUE_LENGTH = LayoutLength.ONEHALF;
+
+  @SuppressWarnings("unused")
+  private String templateName;
 
   public ToDoFormRenderer(final ToDoEditPage toDoEditPage, final MarkupContainer container, final LayoutContext layoutContext,
       final ToDoDO data, final UserGroupCache userGroupCache)
@@ -82,14 +88,47 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
   public void add()
   {
     doPanel.newFieldSetPanel(getString("plugins.todo.todo"));
-    doPanel.addTextField(new PanelContext(data, "subject", valueLength, getString("plugins.todo.subject"), labelLength).setRequired()
+    if (isNew() == true) {
+      // DropDownChoice favorites
+      // final FavoritesChoicePanel<ToDoDO, ToDoDO> favoritesPanel = new FavoritesChoicePanel<ToDoDO, ToDoDO>("favorites",
+      // UserPrefArea.TASK_FAVORITE, tabIndex, "full text") {
+      // @Override
+      // protected void select(final TaskFavorite favorite)
+      // {
+      // if (favorite.getTask() != null) {
+      // TaskSelectPanel.this.selectTask(favorite.getTask());
+      // }
+      // }
+      //
+      // @Override
+      // protected TaskDO getCurrentObject()
+      // {
+      // return TaskSelectPanel.this.getModelObject();
+      // }
+      //
+      // @Override
+      // protected TaskFavorite newFavoriteInstance(final TaskDO currentObject)
+      // {
+      // final TaskFavorite favorite = new TaskFavorite();
+      // favorite.setTask(currentObject);
+      // return favorite;
+      // }
+      // };
+      // divContainer.add(favoritesPanel);
+      // favoritesPanel.init();
+      // if (showFavorites == false) {
+      // favoritesPanel.setVisible(false);
+      // }
+    }
+
+    doPanel.addTextField(new PanelContext(data, "subject", VALUE_LENGTH, getString("plugins.todo.subject"), LABEL_LENGTH).setRequired()
         .setStrong());
     {
       final LabelValueChoiceRenderer<ToDoType> typeChoiceRenderer = new LabelValueChoiceRenderer<ToDoType>(container, ToDoType.values());
       final DropDownChoice<ToDoType> typeChoice = new DropDownChoice<ToDoType>(DropDownChoiceLPanel.SELECT_ID, new PropertyModel<ToDoType>(
           data, "type"), typeChoiceRenderer.getValues(), typeChoiceRenderer);
       typeChoice.setNullValid(true);
-      doPanel.addDropDownChoice(typeChoice, new PanelContext(LayoutLength.THREEQUART, getString("plugins.todo.type"), labelLength));
+      doPanel.addDropDownChoice(typeChoice, new PanelContext(LayoutLength.THREEQUART, getString("plugins.todo.type"), LABEL_LENGTH));
     }
     {
       // Priority drop down box:
@@ -97,7 +136,7 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
       final DropDownChoice<Priority> priorityChoice = new DropDownChoice<Priority>(SELECT_ID,
           new PropertyModel<Priority>(data, "priority"), priorityChoiceRenderer.getValues(), priorityChoiceRenderer);
       priorityChoice.setNullValid(true);
-      doPanel.addDropDownChoice(priorityChoice, new PanelContext(LayoutLength.THREEQUART, getString("priority"), labelLength));
+      doPanel.addDropDownChoice(priorityChoice, new PanelContext(LayoutLength.THREEQUART, getString("priority"), LABEL_LENGTH));
     }
     {
       // Status drop down box:
@@ -106,7 +145,7 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
       final DropDownChoice<ToDoStatus> statusChoice = new DropDownChoice<ToDoStatus>(SELECT_ID, new PropertyModel<ToDoStatus>(data,
           "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
       statusChoice.setNullValid(true);
-      doPanel.addDropDownChoice(statusChoice, new PanelContext(LayoutLength.THREEQUART, getString("plugins.todo.status"), labelLength));
+      doPanel.addDropDownChoice(statusChoice, new PanelContext(LayoutLength.THREEQUART, getString("plugins.todo.status"), LABEL_LENGTH));
     }
     {
       PFUserDO assignee = data.getAssignee();
@@ -116,7 +155,7 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
       }
       final UserSelectPanel assigneeUserSelectPanel = new UserSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<PFUserDO>(data,
           "assignee"), toDoEditPage, "assigneeId");
-      doPanel.addSelectPanel(getString("plugins.todo.assignee"), labelLength, assigneeUserSelectPanel, valueLength).setStrong();
+      doPanel.addSelectPanel(getString("plugins.todo.assignee"), LABEL_LENGTH, assigneeUserSelectPanel, VALUE_LENGTH).setStrong();
       assigneeUserSelectPanel.init();
     }
     {
@@ -127,7 +166,7 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
       }
       final UserSelectPanel reporterUserSelectPanel = new UserSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<PFUserDO>(data,
           "reporter"), toDoEditPage, "reporterId");
-      doPanel.addSelectPanel(getString("plugins.todo.reporter"), labelLength, reporterUserSelectPanel, valueLength);
+      doPanel.addSelectPanel(getString("plugins.todo.reporter"), LABEL_LENGTH, reporterUserSelectPanel, VALUE_LENGTH);
       reporterUserSelectPanel.init();
     }
     {
@@ -140,15 +179,28 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<TaskDO>(data, "task"),
           toDoEditPage, "taskId");
       taskSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
-      doPanel.addSelectPanel(getString("task"), labelLength, taskSelectPanel, valueLength);
+      doPanel.addSelectPanel(getString("task"), LABEL_LENGTH, taskSelectPanel, VALUE_LENGTH);
       taskSelectPanel.init();
     }
-    doPanel.addTextArea(new PanelContext(data, "description", valueLength, getString("description"), labelLength)
+    doPanel.addTextArea(new PanelContext(data, "description", VALUE_LENGTH, getString("description"), LABEL_LENGTH)
         .setCssStyle("height: 10em;"));
-    doPanel.addTextArea(new PanelContext(data, "comment", valueLength, getString("comment"), labelLength).setCssStyle("height: 10em;"));
+    doPanel.addTextArea(new PanelContext(data, "comment", VALUE_LENGTH, getString("comment"), LABEL_LENGTH).setCssStyle("height: 10em;"));
     if (ConfigXml.getInstance().isSendMailConfigured() == true) {
-      doPanel.addCheckBox(new PanelContext(this, "sendNotification", valueLength, getString("label.sendEMailNotification"), labelLength)).setTooltip(getString("plugins.todo.notification.tooltip"));
+      doPanel.addCheckBox(new PanelContext(this, "sendNotification", VALUE_LENGTH, getString("label.sendEMailNotification"), LABEL_LENGTH))
+          .setTooltip(getString("plugins.todo.notification.tooltip"));
     }
+
+    {
+      // Save as template checkbox:
+      doPanel.addLabel("", LABEL_LENGTH).setBreakBefore();
+      final RepeatingView repeatingView = doPanel.addRepeater(VALUE_LENGTH).getRepeatingView();
+      final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(repeatingView.newChildId(), new PropertyModel<Boolean>(this, "saveAsTemplate"));
+      repeatingView.add(checkBoxPanel);
+      final LabelForPanel label = new LabelForPanel(repeatingView.newChildId(), checkBoxPanel.getCheckBox(),
+          getString("user.pref.saveAsTemplate"));
+      repeatingView.add(label);
+    }
+
     // @Field(index = Index.UN_TOKENIZED)
     // @DateBridge(resolution = Resolution.DAY)
     // private Date resubmission;
