@@ -31,8 +31,8 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.hibernate.criterion.Expression;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.projectforge.access.AccessException;
 import org.projectforge.access.OperationType;
 import org.projectforge.common.NumberHelper;
@@ -94,8 +94,8 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
   {
     final PFUserDO user = PFUserContext.getUser();
     @SuppressWarnings("unchecked")
-    final List<Object> list = getSession().createQuery("select name from UserPrefDO t where user_fk=? and area = ? order by name")
-        .setInteger(0, user.getId()).setParameter(1, area).list();
+    final List<Object> list = getSession().createQuery("select name from UserPrefDO t where user_fk=? and areaString = ? order by name")
+        .setInteger(0, user.getId()).setParameter(1, area.getId()).list();
     final String[] result = new String[list.size()];
     int i = 0;
     for (final Object oa : list) {
@@ -120,11 +120,11 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
     Validate.notNull(name);
     final List<UserPrefDO> list;
     if (id != null) {
-      list = getHibernateTemplate().find("from UserPrefDO u where pk <> ? and u.user.id = ? and area = ? and name = ?",
-          new Object[] { id, user.getId(), area, name});
+      list = getHibernateTemplate().find("from UserPrefDO u where pk <> ? and u.user.id = ? and areaString = ? and name = ?",
+          new Object[] { id, user.getId(), area.getId(), name});
     } else {
-      list = getHibernateTemplate().find("from UserPrefDO u where u.user.id = ? and area = ? and name = ?",
-          new Object[] { user.getId(), area, name});
+      list = getHibernateTemplate().find("from UserPrefDO u where u.user.id = ? and areaString = ? and name = ?",
+          new Object[] { user.getId(), area.getId(), name});
     }
     if (CollectionUtils.isNotEmpty(list) == true) {
       return true;
@@ -138,9 +138,9 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
     final UserPrefFilter myFilter = (UserPrefFilter) filter;
     final QueryFilter queryFilter = new QueryFilter(filter);
     if (myFilter.getArea() != null) {
-      queryFilter.add(Expression.eq("area", myFilter.getArea()));
+      queryFilter.add(Restrictions.eq("areaString", myFilter.getArea().getId()));
     }
-    queryFilter.addOrder(Order.asc("area"));
+    queryFilter.addOrder(Order.asc("areaString"));
     queryFilter.addOrder(Order.asc("name"));
     final List<UserPrefDO> list = getList(queryFilter);
     return list;
@@ -150,8 +150,8 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
   {
     final PFUserDO user = PFUserContext.getUser();
     @SuppressWarnings("unchecked")
-    final List<UserPrefDO> list = getHibernateTemplate().find("from UserPrefDO u where u.user.id = ? and u.area = ? and u.name = ?",
-        new Object[] { user.getId(), area, name});
+    final List<UserPrefDO> list = getHibernateTemplate().find("from UserPrefDO u where u.user.id = ? and u.areaString = ? and u.name = ?",
+        new Object[] { user.getId(), area.getId(), name});
     if (list == null || list.size() != 1) {
       return null;
     }
@@ -162,8 +162,8 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
   {
     final PFUserDO user = PFUserContext.getUser();
     @SuppressWarnings("unchecked")
-    final List<UserPrefDO> list = getHibernateTemplate().find("from UserPrefDO u where u.user.id = ? and u.area = ?",
-        new Object[] { user.getId(), area});
+    final List<UserPrefDO> list = getHibernateTemplate().find("from UserPrefDO u where u.user.id = ? and u.areaString = ?",
+        new Object[] { user.getId(), area.getId()});
     return list;
   }
 
@@ -349,6 +349,7 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
    * @return
    * @see #convertParameterValueToString(Object)
    */
+  @SuppressWarnings("unchecked")
   public Object getParameterValue(final Class< ? > type, final String str)
   {
     if (str == null) {
@@ -383,6 +384,8 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
       } else {
         return null;
       }
+    } else if (type.isEnum() == true) {
+      return Enum.valueOf((Class<Enum>) type, str);
     }
     log.error("UserPrefDao does not yet support parameters from type: " + type);
     return null;
@@ -395,7 +398,9 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
     if (userPref == null) {
       return null;
     }
-    evaluateAnnotations(userPref, userPref.getArea().getBeanType());
+    if (userPref.getArea() != null) {
+      evaluateAnnotations(userPref, userPref.getArea().getBeanType());
+    }
     return userPref;
   }
 

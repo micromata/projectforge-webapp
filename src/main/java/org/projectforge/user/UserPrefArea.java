@@ -23,26 +23,50 @@
 
 package org.projectforge.user;
 
+import java.io.Serializable;
+
+import org.apache.commons.lang.Validate;
 import org.projectforge.fibu.KundeFavorite;
 import org.projectforge.fibu.ProjektFavorite;
 import org.projectforge.jira.JiraProject;
 import org.projectforge.task.TaskFavorite;
 import org.projectforge.timesheet.TimesheetDO;
 
-
 /**
  * User preferences are supported by different areas. These areas are defined inside this enum.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public enum UserPrefArea
+public class UserPrefArea implements Serializable
 {
-  KUNDE_FAVORITE(KundeFavorite.class, "kunde.favorite"), PROJEKT_FAVORITE(ProjektFavorite.class, "projekt.favorite"), TASK_FAVORITE(
-      TaskFavorite.class, "task.favorite"), TIMESHEET_TEMPLATE(TimesheetDO.class, "timesheet.template"), USER_FAVORITE(UserFavorite.class,
-      "user.favorite"), JIRA_PROJECT(JiraProject.class, "jira.project");
+  private static final long serialVersionUID = -6594785391128587090L;
+
+  static final int MAX_ID_LENGTH = 20;
+
+  public static final UserPrefArea KUNDE_FAVORITE = new UserPrefArea("KUNDE_FAVORITE", KundeFavorite.class, "kunde.favorite");
+
+  public static final UserPrefArea PROJEKT_FAVORITE = new UserPrefArea("PROJEKT_FAVORITE", ProjektFavorite.class, "projekt.favorite");
+
+  public static final UserPrefArea TASK_FAVORITE = new UserPrefArea("TASK_FAVORITE", TaskFavorite.class, "task.favorite");
+
+  public static final UserPrefArea TIMESHEET_TEMPLATE = new UserPrefArea("TIMESHEET_TEMPLATE", TimesheetDO.class, "timesheet.template");
+
+  public static final UserPrefArea USER_FAVORITE = new UserPrefArea("USER_FAVORITE", UserFavorite.class, "user.favorite");
+
+  public static final UserPrefArea JIRA_PROJECT = new UserPrefArea("JIRA_PROJECT", JiraProject.class, "jira.project");
+
+  private String id;
 
   private String key;
 
   private Class< ? > beanType;
+
+  /**
+   * The id is used as identity in the data-base.
+   */
+  public String getId()
+  {
+    return id;
+  }
 
   /**
    * The key will be used e. g. for i18n (only the suffix not the base i18n key).
@@ -71,8 +95,16 @@ public enum UserPrefArea
     return beanType;
   }
 
-  UserPrefArea(final Class< ? > clazz, final String key)
+  /**
+   * @param id Used as identity in the data-base (max-length = 20). Please don't change this id later, otherwise (de)-serialization will
+   *          fail (could not read data-base entries).
+   * @param clazz The class which contains the user pref parameters.
+   * @param key The i18n suffix (i18nkey starts with 'user.pref.area.").
+   */
+  public UserPrefArea(final String id, final Class< ? > clazz, final String key)
   {
+    Validate.isTrue(id.length() <= MAX_ID_LENGTH);
+    this.id = id;
     this.beanType = clazz;
     this.key = key;
   }
@@ -85,5 +117,11 @@ public enum UserPrefArea
       }
     }
     return false;
+  }
+
+  @Override
+  public String toString()
+  {
+    return String.valueOf(id);
   }
 }

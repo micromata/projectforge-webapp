@@ -37,8 +37,10 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
+import org.projectforge.core.I18nEnum;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
@@ -46,10 +48,12 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserPrefArea;
+import org.projectforge.user.UserPrefAreaRegistry;
 import org.projectforge.user.UserPrefDO;
+import org.projectforge.user.UserPrefDao;
 import org.projectforge.user.UserPrefEntryDO;
-import org.projectforge.web.fibu.Kost2DropDownChoice;
 import org.projectforge.web.fibu.CustomerSelectPanel;
+import org.projectforge.web.fibu.Kost2DropDownChoice;
 import org.projectforge.web.fibu.ProjektSelectPanel;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
@@ -67,6 +71,9 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
   private static final long serialVersionUID = 6647201995353615498L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserPrefEditForm.class);
+
+  @SpringBean(name = "userPrefDao")
+  private UserPrefDao userPrefDao;
 
   private Label areaLabel;
 
@@ -97,7 +104,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
   {
     // DropDownChoice area
     final LabelValueChoiceRenderer<UserPrefArea> areaChoiceRenderer = new LabelValueChoiceRenderer<UserPrefArea>();
-    for (final UserPrefArea area : UserPrefArea.values()) {
+    for (final UserPrefArea area : UserPrefAreaRegistry.instance().getOrderedEntries(PFUserContext.getLocale())) {
       areaChoiceRenderer.addValue(area, parent.getString("user.pref.area." + area.getKey()));
     }
     return areaChoiceRenderer;
@@ -220,15 +227,15 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
         Component valueField = null;
         parentPage.userPrefDao.updateParameterValueObject(param);
         if (PFUserDO.class.isAssignableFrom(param.getType()) == true) {
-          final UserSelectPanel userSelectPanel = new UserSelectPanel("valueField", new PropertyModel<PFUserDO>(param, "valueAsObject"),
-              parentPage, param.getParameter());
+          final UserSelectPanel userSelectPanel = new UserSelectPanel("valueField", new UserPrefPropertyModel<PFUserDO>(userPrefDao, param,
+              "valueAsObject"), parentPage, param.getParameter());
           if (data.getArea() == UserPrefArea.USER_FAVORITE) {
             userSelectPanel.setShowFavorites(false);
           }
           valueField = userSelectPanel;
         } else if (TaskDO.class.isAssignableFrom(param.getType()) == true) {
-          final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("valueField", new PropertyModel<TaskDO>(param, "valueAsObject"),
-              parentPage, param.getParameter());
+          final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("valueField", new UserPrefPropertyModel<TaskDO>(userPrefDao, param,
+              "valueAsObject"), parentPage, param.getParameter());
           if (data.getArea() == UserPrefArea.TASK_FAVORITE) {
             taskSelectPanel.setShowFavorites(false);
           }
@@ -254,15 +261,15 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           valueChoice = kost2DropDownChoice;
           dependentsMap.put(param.getParameter(), kost2DropDownChoice);
         } else if (ProjektDO.class.isAssignableFrom(param.getType()) == true) {
-          final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel("valueField", new PropertyModel<ProjektDO>(param,
-              "valueAsObject"), parentPage, param.getParameter());
+          final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel("valueField", new UserPrefPropertyModel<ProjektDO>(
+              userPrefDao, param, "valueAsObject"), parentPage, param.getParameter());
           if (data.getArea() == UserPrefArea.PROJEKT_FAVORITE) {
             projektSelectPanel.setShowFavorites(false);
           }
           valueField = projektSelectPanel;
         } else if (KundeDO.class.isAssignableFrom(param.getType()) == true) {
-          final CustomerSelectPanel kundeSelectPanel = new CustomerSelectPanel("valueField", new PropertyModel<KundeDO>(param, "valueAsObject"),
-              null, parentPage, param.getParameter());
+          final CustomerSelectPanel kundeSelectPanel = new CustomerSelectPanel("valueField", new UserPrefPropertyModel<KundeDO>(
+              userPrefDao, param, "valueAsObject"), null, parentPage, param.getParameter());
           if (data.getArea() == UserPrefArea.KUNDE_FAVORITE) {
             kundeSelectPanel.setShowFavorites(false);
           }
@@ -273,6 +280,13 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
             maxLength = UserPrefEntryDO.MAX_STRING_VALUE_LENGTH;
           }
           textArea = new MaxLengthTextArea("textArea", new PropertyModel<String>(param, "value"), maxLength);
+        } else if (I18nEnum.class.isAssignableFrom(param.getType()) == true) {
+          final LabelValueChoiceRenderer<I18nEnum> choiceRenderer = new LabelValueChoiceRenderer<I18nEnum>(this, (I18nEnum[]) param
+              .getType().getEnumConstants());
+          final DropDownChoice<I18nEnum> choice = new DropDownChoice<I18nEnum>("valueChoice", new UserPrefPropertyModel<I18nEnum>(
+              userPrefDao, param, "valueAsObject"), choiceRenderer.getValues(), choiceRenderer);
+          choice.setNullValid(true);
+          valueChoice = choice;
         } else {
           Integer maxLength = param.getMaxLength();
           if (maxLength == null || maxLength <= 0 || UserPrefEntryDO.MAX_STRING_VALUE_LENGTH < maxLength) {
@@ -319,5 +333,28 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
   void setData(final UserPrefDO data)
   {
     this.data = data;
+  }
+
+  private class UserPrefPropertyModel<T> extends PropertyModel<T>
+  {
+    private static final long serialVersionUID = 6644505091461853375L;
+
+    private UserPrefDao userPrefDao;
+
+    private UserPrefEntryDO userPrefEntry;
+
+    public UserPrefPropertyModel(final UserPrefDao userPrefDao, final UserPrefEntryDO userPrefEntry, final String expression)
+    {
+      super(userPrefEntry, expression);
+      this.userPrefDao = userPrefDao;
+      this.userPrefEntry = userPrefEntry;
+    }
+
+    @Override
+    public void setObject(final T object)
+    {
+      super.setObject(object);
+      userPrefDao.setValueObject(userPrefEntry, object);
+    };
   }
 }

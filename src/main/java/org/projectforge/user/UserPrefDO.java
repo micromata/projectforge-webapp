@@ -36,8 +36,6 @@ import java.util.TreeSet;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -48,7 +46,6 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
-import org.hibernate.annotations.Cascade;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
@@ -57,7 +54,6 @@ import org.hibernate.search.annotations.Store;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDO;
-
 
 /**
  * Stores preferences of the user for any objects such as list filters or templates for adding new objects (time sheets etc.).
@@ -120,8 +116,7 @@ public class UserPrefDO extends AbstractBaseDO<Integer>
     this.user = user;
   }
 
-  @Enumerated(EnumType.STRING)
-  @Column(length = 20, nullable = false)
+  @Transient
   public UserPrefArea getArea()
   {
     return area;
@@ -132,9 +127,25 @@ public class UserPrefDO extends AbstractBaseDO<Integer>
     this.area = area;
   }
 
-  @OneToMany(cascade = { CascadeType.ALL}, fetch = FetchType.EAGER)
+  /**
+   * Only for storing the user pref area in the data base.
+   */
+  @Column(name = "area", length = UserPrefArea.MAX_ID_LENGTH, nullable = false)
+  public String getAreaString()
+  {
+    return area != null ? area.getId() : null;
+  }
+
+  /**
+   * Only for restoring the user pref area from the data base.
+   */
+  public void setAreaString(final String areaId)
+  {
+    this.area = areaId != null ? UserPrefAreaRegistry.instance().getEntry(areaId) : null;
+  }
+
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
   @JoinColumn(name = "user_pref_fk")
-  @Cascade(value = { org.hibernate.annotations.CascadeType.DELETE_ORPHAN, org.hibernate.annotations.CascadeType.SAVE_UPDATE})
   public Set<UserPrefEntryDO> getUserPrefEntries()
   {
     return this.prefEntries;
