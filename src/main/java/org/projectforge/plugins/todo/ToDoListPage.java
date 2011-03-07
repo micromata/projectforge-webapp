@@ -63,6 +63,9 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
   @SpringBean(name = "priorityFormatter")
   private PriorityFormatter priorityFormatter;
 
+  @SpringBean(name = "taskFormatter")
+  private TaskFormatter taskFormatter;
+
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
 
@@ -133,7 +136,7 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.type")),
         getSortable("type", sortable), "type", cellItemListener));
     columns.add(new TaskPropertyColumn<ToDoDO>(this, getString("task"), getSortable("task.title", sortable), "task",
-        cellItemListener).withTaskFormatter(TaskFormatter.instance()).withTaskTree(taskTree));
+        cellItemListener).withTaskFormatter(taskFormatter).withTaskTree(taskTree));
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("description")),
         getSortable("description", sortable), "description", cellItemListener));
     return columns;

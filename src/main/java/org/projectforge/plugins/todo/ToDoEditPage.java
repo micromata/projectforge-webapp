@@ -54,7 +54,7 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
     super(parameters, "plugins.todo");
     init();
     if (isNew() == true) {
-      final ToDoDO pref = getToDoPrefData();
+      final ToDoDO pref = getToDoPrefData(false);
       if (pref != null) {
         getData().copyValuesFrom(pref, "id");
       } else {
@@ -81,7 +81,7 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
   public AbstractBasePage afterSaveOrUpdate()
   {
     // Save to-do as recent to-do
-     final ToDoDO pref = getToDoPrefData();
+     final ToDoDO pref = getToDoPrefData(true);
      pref.copyValuesFrom(getData(), "id");
     // Does the user want to store this to-do as template?
     if (form.renderer.sendNotification == true) {
@@ -96,10 +96,13 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
     return null;
   }
 
-  protected ToDoDO getToDoPrefData()
+  /**
+   * @param force If true then a pre entry is created if not exist.
+   */
+  protected ToDoDO getToDoPrefData(final boolean force)
   {
     ToDoDO pref = (ToDoDO) getUserPrefEntry(ToDoDO.class.getName());
-    if (pref == null) {
+    if (pref == null && force == true) {
       pref = new ToDoDO();
       putUserPrefEntry(ToDoDO.class.getName(), pref, true);
     }

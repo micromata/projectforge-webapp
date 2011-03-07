@@ -24,13 +24,17 @@
 package org.projectforge.plugins.todo;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightValue;
+import org.projectforge.user.UserRights;
 
 /**
+ * Every user has access to own to-do's or to-do's he's assigned to. All other users have access if the to-do is assigned to a task and the
+ * user has the task access.
  * @author Kai Reinhard (k.reinhard@me.de)
  * 
  */
@@ -44,19 +48,97 @@ public class ToDoRight extends UserRightAccessCheck<ToDoDO>
   }
 
   /**
-   * @return true if the reporter or assignee is the logged-in user, otherwise false.
+   * General select access.
+   * @return true
+   * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(org.projectforge.user.PFUserDO)
    */
+  @Override
+  public boolean hasSelectAccess(final PFUserDO user)
+  {
+    return true;
+  }
+
+  /**
+   * @return true if user is assignee or reporter. If not, the task access is checked.
+   * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(org.projectforge.user.PFUserDO, java.lang.Object)
+   */
+  @Override
+  public boolean hasSelectAccess(final PFUserDO user, final ToDoDO obj)
+  {
+    return hasAccess(user, obj, OperationType.SELECT);
+  }
+
+  /**
+   * General insert access.
+   * @return true
+   * @see org.projectforge.user.UserRightAccessCheck#hasInsertAccess(org.projectforge.user.PFUserDO)
+   */
+  @Override
+  public boolean hasInsertAccess(final PFUserDO user)
+  {
+    return true;
+  }
+
+  /**
+   * If user is not reporter or assignee and task is given the access to task is assumed, meaning if the user has the right to insert sub
+   * tasks he is allowed to insert to-do's to.
+   * @see org.projectforge.user.UserRightAccessCheck#hasInsertAccess(org.projectforge.user.PFUserDO, java.lang.Object)
+   */
+  @Override
+  public boolean hasInsertAccess(final PFUserDO user, final ToDoDO obj)
+  {
+    return hasAccess(user, obj, OperationType.INSERT);
+  }
+
+  /**
+   * If user is not reporter or assignee and task is given the access to task is assumed, meaning if the user has the right to update the
+   * task he is allowed to update to-do's to. If the to-do is moved (from one task to another) the user needs the update right for both
+   * tasks.
+   * @see org.projectforge.user.UserRightAccessCheck#hasUpdateAccess(org.projectforge.user.PFUserDO, java.lang.Object, java.lang.Object)
+   */
+  @Override
+  public boolean hasUpdateAccess(final PFUserDO user, final ToDoDO obj, final ToDoDO oldObj)
+  {
+    return hasAccess(user, obj, OperationType.UPDATE) == true && hasAccess(user, oldObj, OperationType.UPDATE) == true;
+  }
+
+  /**
+   * If user is not reporter or assignee and task is given the access to task is assumed, meaning if the user has the right to delete the
+   * tasks he is allowed to delete to-do's to.
+   * @see org.projectforge.user.UserRightAccessCheck#hasDeleteAccess(org.projectforge.user.PFUserDO, java.lang.Object)
+   */
+  @Override
+  public boolean hasDeleteAccess(final PFUserDO user, final ToDoDO obj)
+  {
+    return hasAccess(user, obj, OperationType.DELETE);
+  }
+
   @Override
   public boolean hasAccess(final PFUserDO user, final ToDoDO obj, final ToDoDO oldObj, final OperationType operationType)
   {
-    final ToDoDO toDo = oldObj != null ? oldObj : obj;
+    return hasAccess(user, obj) == true && hasAccess(user, oldObj) == true;
+  }
+
+  private boolean hasAccess(final PFUserDO user, final ToDoDO toDo)
+  {
     if (toDo == null) {
-      return true; // General insert and select access given by default.
+      return true;
     }
-    if (ObjectUtils.equals(user.getId(), toDo.getAssigneeId()) == true
-        || ObjectUtils.equals(user.getId(), toDo.getReporterId()) == true) {
+    if (ObjectUtils.equals(user.getId(), toDo.getAssigneeId()) == true || ObjectUtils.equals(user.getId(), toDo.getReporterId()) == true) {
       return true;
     }
     return false;
+  }
+
+  private boolean hasAccess(final PFUserDO user, final ToDoDO toDo, final OperationType operationType)
+  {
+    if (hasAccess(user, toDo) == true) {
+      return true;
+    }
+    if (toDo.getTaskId() != null) {
+      return UserRights.getAccessChecker().hasPermission(user, toDo.getTaskId(), AccessType.TASKS, operationType, false);
+    } else {
+      return false;
+    }
   }
 }
