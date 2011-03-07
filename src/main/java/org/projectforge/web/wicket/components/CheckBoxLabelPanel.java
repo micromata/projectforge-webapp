@@ -29,6 +29,7 @@ import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * Panel containing only one check-box followed by one label.
@@ -41,6 +42,8 @@ public class CheckBoxLabelPanel extends Panel
 
   final CheckBox checkBox;
 
+  final Label labelComponent;
+
   public CheckBoxLabelPanel(final String id, final IModel<Boolean> model, final String label)
   {
     super(id);
@@ -50,10 +53,25 @@ public class CheckBoxLabelPanel extends Panel
     checkBox.setLabel(labelModel);
     // I18n key must be implemented as Model not as String because in constructor (before adding this component to parent) a warning will be
     // logged for using getString(String).
-    add(new Label("label", labelModel).add(new SimpleAttributeModifier("for", checkBox.getMarkupId())));
+    labelComponent = new Label("label", labelModel);
+    add(labelComponent.add(new SimpleAttributeModifier("for", checkBox.getMarkupId())));
     setRenderBodyOnly(true);
   }
 
+  /**
+   * @param tooltip
+   * @return this for chaining.
+   */
+  public CheckBoxLabelPanel setTooltip(final String tooltip)
+  {
+    WicketUtils.addTooltip(checkBox, tooltip);
+    WicketUtils.addTooltip(labelComponent, tooltip);
+    return this;
+  }
+
+  /**
+   * @return this for chaining.
+   */
   public CheckBoxLabelPanel setSubmitOnChange()
   {
     checkBox.add(new SimpleAttributeModifier("onchange", "javascript:submit();"));
