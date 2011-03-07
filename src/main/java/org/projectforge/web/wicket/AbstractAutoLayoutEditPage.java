@@ -37,4 +37,8 @@ public abstract class AbstractAutoLayoutEditPage<O extends AbstractBaseDO< ? >, 
     super(parameters, i18nPrefix);
   }
 
+  public F getForm()
+  {
+    return form;
+  }
 }
