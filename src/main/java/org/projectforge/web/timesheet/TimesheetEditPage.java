@@ -384,12 +384,6 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
   }
 
   @Override
-  protected void onBeforeRender()
-  {
-    super.onBeforeRender();
-  }
-
-  @Override
   protected String[] getBookmarkableSelectProperties()
   {
     return BOOKMARKABLE_SELECT_PROPERTIES;
