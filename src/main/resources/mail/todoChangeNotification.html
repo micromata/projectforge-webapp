@@ -3,43 +3,43 @@
 <body>
 #INCLUDE{mail/mailOpening.html}
 <br />
-${todo.subject}:
+<%= pf.getString(todo.subject) %>:
 <br />
 <a href="${requestUrl}">${requestUrl}</a>
 <br />
 <table class="form">
   <tr>
-    <th><%= pf.getString("plugins.todo.subject") %></th>
-    <td colspan="3" style="font-weight: bold;">${todo.subject}</td>
+    <th><%= pf.getI18nString("plugins.todo.subject") %></th>
+    <td colspan="3" style="font-weight: bold;"><% pf.getString(todo.subject) %></td>
   </tr>
   <tr>
-    <th><%= pf.getString("plugins.todo.type") %></th>
+    <th><%= pf.getI18nString("plugins.todo.type") %></th>
     <td><%= pf.getString(todo.type) %></td>
-    <th><%= pf.getString("priority") %></th>
+    <th><%= pf.getI18nString("priority") %></th>
     <td><%= pf.getString(todo.priority) %></td>
   </tr>
   <tr>
-    <th><%= pf.getString("plugins.todo.status") %></th>
+    <th><%= pf.getI18nString("plugins.todo.status") %></th>
     <td><%= pf.getString(todo.status) %></td>
-    <th><%= pf.getString("dueDate") %></th>
+    <th><%= pf.getI18nString("dueDate") %></th>
     <td><%= pf.getString(todo.dueDate) %></td>
   </tr>
   <tr>
-    <th><%= pf.getString("plugins.todo.assignee") %></th>
+    <th><%= pf.getI18nString("plugins.todo.assignee") %></th>
     <td><%= pf.getString(todo.assignee) %></td>
-    <th><%= pf.getString("plugins.todo.reporter") %></th>
+    <th><%= pf.getI18nString("plugins.todo.reporter") %></th>
     <td><%= pf.getString(todo.reporter) %></td>
   </tr>
   <tr>
-    <th><%= pf.getString("task") %></th>
+    <th><%= pf.getI18nString("task") %></th>
     <td colspan="3"><%= pf.getString(todo.task) %></td>
   </tr>
   <tr>
-    <th><%= pf.getString("description") %></th>
+    <th><%= pf.getI18nString("description") %></th>
     <td colspan="3"><%= pf.getString(todo.description) %></td>
   </tr>
   <tr>
-    <th><%= pf.getString("comment") %></th>
+    <th><%= pf.getI18nString("comment") %></th>
     <td colspan="3"><%= pf.getString(todo.comment) %></td>
   </tr>
 </table>
