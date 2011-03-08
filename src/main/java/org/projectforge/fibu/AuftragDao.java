@@ -45,7 +45,6 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.ConfigXml;
-import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.MessageParam;
 import org.projectforge.core.MessageParamType;
@@ -60,7 +59,6 @@ import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
-import org.projectforge.web.calendar.DateTimeFormatter;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,8 +81,6 @@ public class AuftragDao extends BaseDao<AuftragDO>
   private KundeDao kundeDao;
 
   private ProjektDao projektDao;
-
-  private DateTimeFormatter dateTimeFormatter;
 
   private SendMail sendMail;
 
@@ -109,11 +105,6 @@ public class AuftragDao extends BaseDao<AuftragDO>
   public void setProjektDao(ProjektDao projektDao)
   {
     this.projektDao = projektDao;
-  }
-
-  public void setDateTimeFormatter(DateTimeFormatter dateTimeFormatter)
-  {
-    this.dateTimeFormatter = dateTimeFormatter;
   }
 
   public void setRechnungCache(RechnungCache rechnungCache)
@@ -482,42 +473,12 @@ public class AuftragDao extends BaseDao<AuftragDO>
     final Map<String, Object> data = new HashMap<String, Object>();
     data.put("contactPerson", contactPerson);
     data.put("auftrag", auftrag);
-    data.put("nettoSumme", CurrencyFormatter.format(auftrag.getNettoSumme()));
-    if (auftrag.getAuftragsStatus() == null) {
-      data.put("auftragsStatus", "");
-    } else {
-      data.put("auftragsStatus", auftrag.getAuftragsStatus());
-    }
-    data.put("projekt", KostFormatter.formatProjekt(auftrag.getProjekt()));
-    data.put("kunde", KostFormatter.formatKunde(auftrag.getKunde()));
-    data.put("angebotsDatum", dateTimeFormatter.getFormattedDate(auftrag.getAngebotsDatum()));
-    data.put("bindungsFrist", dateTimeFormatter.getFormattedDate(auftrag.getBindungsFrist()));
-    data.put("beauftragungsDatum", dateTimeFormatter.getFormattedDate(auftrag.getBeauftragungsDatum()));
-    data.put("bemerkung", sendMail.formatHtml(auftrag.getBemerkung()));
-    data.put("statusBeschreibung", sendMail.formatHtml(auftrag.getStatusBeschreibung()));
     data.put("requestUrl", requestUrl);
-    final List<Map<String, Object>> positions = new ArrayList<Map<String, Object>>();
-    data.put("positionen", positions);
-    if (CollectionUtils.isNotEmpty(auftrag.getPositionen()) == true) {
-      for (final AuftragsPositionDO pos : auftrag.getPositionen()) {
-        final Map<String, Object> map = new HashMap<String, Object>();
-        positions.add(map);
-        map.put("position", pos);
-        map.put("nettoSumme", CurrencyFormatter.format(auftrag.getNettoSumme()));
-      }
-    }
     final List<DisplayHistoryEntry> history = getDisplayHistoryEntries(auftrag);
-    final List<Object[]> list = new ArrayList<Object[]>();
+    final List<DisplayHistoryEntry> list = new ArrayList<DisplayHistoryEntry>();
     int i = 0;
-    for (DisplayHistoryEntry entry : history) {
-      Object[] oArray = new Object[6];
-      oArray[0] = dateTimeFormatter.getFormattedDateTime(entry.getTimestamp());
-      oArray[1] = entry.getUser().getFullname();
-      oArray[2] = entry.getEntryType();
-      oArray[3] = entry.getPropertyName();
-      oArray[4] = sendMail.formatHtml(entry.getNewValue());
-      oArray[5] = sendMail.formatHtml(entry.getOldValue());
-      list.add(oArray);
+    for (final DisplayHistoryEntry entry : history) {
+      list.add(entry);
       if (++i >= 10) {
         break;
       }

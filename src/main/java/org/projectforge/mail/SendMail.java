@@ -191,7 +191,7 @@ public class SendMail
     data.put("recipient", recipient);
     data.put("msg", composedMessage);
     log.debug("groovyTemplate=" + groovyTemplate);
-    final GroovyEngine engine = new GroovyEngine(data, recipient.getLocale());
+    final GroovyEngine engine = new GroovyEngine(data, recipient.getLocale(), recipient.getTimeZoneObject());
     final String result = engine.executeTemplateFile(groovyTemplate);
     return result;
   }

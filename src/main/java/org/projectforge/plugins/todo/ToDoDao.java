@@ -50,7 +50,6 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
-import org.projectforge.web.calendar.DateTimeFormatter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -163,22 +162,14 @@ public class ToDoDao extends BaseDao<ToDoDO>
       // Can't send e-mail because no send mail is configured.
       return;
     }
-    final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.instance();
     final Map<String, Object> data = new HashMap<String, Object>();
     data.put("todo", todo);
     data.put("requestUrl", requestUrl);
     final List<DisplayHistoryEntry> history = getDisplayHistoryEntries(todo);
-    final List<Object[]> list = new ArrayList<Object[]>();
+    final List<DisplayHistoryEntry> list = new ArrayList<DisplayHistoryEntry>();
     int i = 0;
-    for (DisplayHistoryEntry entry : history) {
-      Object[] oArray = new Object[6];
-      oArray[0] = dateTimeFormatter.getFormattedDateTime(entry.getTimestamp());
-      oArray[1] = entry.getUser().getFullname();
-      oArray[2] = entry.getEntryType();
-      oArray[3] = entry.getPropertyName();
-      oArray[4] = sendMail.formatHtml(entry.getNewValue());
-      oArray[5] = sendMail.formatHtml(entry.getOldValue());
-      list.add(oArray);
+    for (final DisplayHistoryEntry entry : history) {
+      list.add(entry);
       if (++i >= 10) {
         break;
       }
