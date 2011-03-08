@@ -49,7 +49,12 @@ public class VersionTest
     compare(v1_10_17_1043, v1_10_17_1044);
     compare(v1_10_17_1043, v1_10_17_1045);
     compare(v1_10_17_1044, v1_10_17_1045);
-  }
+
+    final Version v1_2b = new Version("1.2b");
+    final Version v1_2b2 = new Version("1.2b2");
+    compare(v1_2b, v1_2);
+    compare(v1_2b, v1_2b2);
+}
 
   private void compare(final Version v1, final Version v2)
   {

@@ -38,7 +38,7 @@ public class Version implements Comparable<Version>, Serializable
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Version.class);
 
-  private int majorRelease, minorRelease, patchLevel, buildNumber, betaVersion = -1;
+  private int majorRelease, minorRelease, patchLevel, buildNumber, betaVersion = Integer.MAX_VALUE;
 
   private String asString;
 
@@ -127,7 +127,7 @@ public class Version implements Comparable<Version>, Serializable
 
   public boolean isBeta()
   {
-    return betaVersion >= 0;
+    return betaVersion < Integer.MAX_VALUE;
   }
 
   @Override
@@ -145,7 +145,11 @@ public class Version implements Comparable<Version>, Serializable
     if (compare != 0) {
       return compare;
     }
-    return compare(this.buildNumber, o.buildNumber);
+    compare = compare(this.buildNumber, o.buildNumber);
+    if (compare != 0) {
+      return compare;
+    }
+    return compare(this.betaVersion, o.betaVersion);
   }
 
   /**
@@ -169,7 +173,7 @@ public class Version implements Comparable<Version>, Serializable
         sb.append('.').append(buildNumber);
       }
     }
-    if (betaVersion >= 0) {
+    if (betaVersion < Integer.MAX_VALUE) {
       sb.append('b').append(betaVersion);
     }
     asString = sb.toString();
