@@ -36,12 +36,12 @@ public class ToDoFilter extends BaseSearchFilter implements Serializable
 {
   private static final long serialVersionUID = -2799448444375717414L;
 
-  private boolean opened, reopened, inprogress, closed, postponed;
+  private boolean opened, reopened, inprogress, closed, postponed, onlyRecent;
 
   private Integer reporterId, assigneeId;
 
   private Integer taskId;
-
+  
   public ToDoFilter()
   {
   }
@@ -129,5 +129,15 @@ public class ToDoFilter extends BaseSearchFilter implements Serializable
   public void setPostponed(boolean postponed)
   {
     this.postponed = postponed;
+  }
+  
+  public boolean isOnlyRecent()
+  {
+    return onlyRecent;
+  }
+  
+  public void setOnlyRecent(boolean onlyRecent)
+  {
+    this.onlyRecent = onlyRecent;
   }
 }

@@ -102,42 +102,53 @@ public class ToDoDao extends BaseDao<ToDoDO>
     }
     final QueryFilter queryFilter = new QueryFilter(myFilter);
     Collection<ToDoStatus> col = new ArrayList<ToDoStatus>(5);
-    if (myFilter.isOpened() == true) {
-      col.add(ToDoStatus.OPENED);
-    }
-    if (myFilter.isClosed() == true) {
-      col.add(ToDoStatus.CLOSED);
-    }
-    if (myFilter.isPostponed() == true) {
-      col.add(ToDoStatus.POSTPONED);
-    }
-    if (myFilter.isReopened() == true) {
-      col.add(ToDoStatus.RE_OPENED);
-    }
-    if (myFilter.isInprogress() == true) {
-      col.add(ToDoStatus.IN_PROGRESS);
-    }
-    if (col.size() > 0) {
-      queryFilter.add(Restrictions.in("status", col));
-    }
-    if (myFilter.getTaskId() != null) {
-      final TaskNode node = taskTree.getTaskNodeById(myFilter.getTaskId());
-      final List<Integer> taskIds = node.getDescendantIds();
-      taskIds.add(node.getId());
-      queryFilter.add(Restrictions.in("task.id", taskIds));
-    }
-    if (myFilter.getAssigneeId() != null) {
+    String searchString = myFilter.getSearchString();
+    if (myFilter.isOnlyRecent() == true) {
       final PFUserDO assignee = new PFUserDO();
-      assignee.setId(myFilter.getAssigneeId());
+      assignee.setId(PFUserContext.getUserId());
       queryFilter.add(Restrictions.eq("assignee", assignee));
-    }
-    if (myFilter.getReporterId() != null) {
-      final PFUserDO reporter = new PFUserDO();
-      reporter.setId(myFilter.getReporterId());
-      queryFilter.add(Restrictions.eq("reporter", reporter));
+      myFilter.setSearchString(""); // Delete search string for ignoring it.
+      queryFilter.add(Restrictions.eq("recent", true));
+    } else {
+      if (myFilter.isOpened() == true) {
+        col.add(ToDoStatus.OPENED);
+      }
+      if (myFilter.isClosed() == true) {
+        col.add(ToDoStatus.CLOSED);
+      }
+      if (myFilter.isPostponed() == true) {
+        col.add(ToDoStatus.POSTPONED);
+      }
+      if (myFilter.isReopened() == true) {
+        col.add(ToDoStatus.RE_OPENED);
+      }
+      if (myFilter.isInprogress() == true) {
+        col.add(ToDoStatus.IN_PROGRESS);
+      }
+      if (col.size() > 0) {
+        queryFilter.add(Restrictions.in("status", col));
+      }
+      if (myFilter.getTaskId() != null) {
+        final TaskNode node = taskTree.getTaskNodeById(myFilter.getTaskId());
+        final List<Integer> taskIds = node.getDescendantIds();
+        taskIds.add(node.getId());
+        queryFilter.add(Restrictions.in("task.id", taskIds));
+      }
+      if (myFilter.getAssigneeId() != null) {
+        final PFUserDO assignee = new PFUserDO();
+        assignee.setId(myFilter.getAssigneeId());
+        queryFilter.add(Restrictions.eq("assignee", assignee));
+      }
+      if (myFilter.getReporterId() != null) {
+        final PFUserDO reporter = new PFUserDO();
+        reporter.setId(myFilter.getReporterId());
+        queryFilter.add(Restrictions.eq("reporter", reporter));
+      }
     }
     queryFilter.addOrder(Order.desc("created"));
-    return getList(queryFilter);
+    final List<ToDoDO> list =  getList(queryFilter);
+    myFilter.setSearchString(searchString); // Restore search string.
+    return list;
   }
 
   /**
@@ -203,11 +214,25 @@ public class ToDoDao extends BaseDao<ToDoDO>
   }
 
   @Override
-  protected void onSaveOrModify(final ToDoDO obj)
+  protected void onSave(final ToDoDO obj)
   {
     if (ObjectUtils.equals(PFUserContext.getUserId(), obj.getAssigneeId()) == false) {
       // To-do is changed by other user than assignee, so set recent flag for this to-do for the assignee.
       obj.setRecent(true);
+    }
+  }
+  
+  @Override
+  protected void onChange(final ToDoDO obj, final ToDoDO dbObj)
+  {
+    if (ObjectUtils.equals(PFUserContext.getUserId(), obj.getAssigneeId()) == false) {
+      // To-do is changed by other user than assignee, so set recent flag for this to-do for the assignee.
+      final ToDoDO copyOfDBObj = new ToDoDO();
+      copyOfDBObj.copyValuesFrom(dbObj, "deleted");
+      if (copyOfDBObj.copyValuesFrom(obj, "deleted") == true) {
+        // Modifications done:
+        obj.setRecent(true);
+      }
     }
   }
 

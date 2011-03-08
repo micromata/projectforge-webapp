@@ -60,6 +60,8 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
         getString(ToDoStatus.CLOSED.getI18nKey()), true));
     filterContainer.add(new CoolCheckBoxPanel("postponedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "postponed"),
         getString(ToDoStatus.POSTPONED.getI18nKey()), true));
+    filterContainer.add(new CoolCheckBoxPanel("onlyRecentCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "onlyRecent"),
+        getString("plugins.todo.status.onlyRecent"), true).setTooltip(getString("plugins.todo.status.onlyRecent.tooltip")));
     filterContainer.add(new CoolCheckBoxPanel("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
         getString("onlyDeleted"), true).setTooltip(getString("onlyDeleted.tooltip")));
 
