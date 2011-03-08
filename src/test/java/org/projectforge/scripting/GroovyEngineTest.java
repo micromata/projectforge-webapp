@@ -28,6 +28,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -53,10 +54,10 @@ public class GroovyEngineTest
   @Test
   public void renderTest()
   {
-    final GroovyEngine engine = new GroovyEngine(Locale.GERMAN);
+    final GroovyEngine engine = new GroovyEngine(Locale.GERMAN, TimeZone.getTimeZone("UTC"));
     engine.putVariable("name", "Kai");
 
-    final String res = engine.executeTemplate("Hallo $name, your locale is '<%= pf.getString(\"locale.de\") %>'.");
+    final String res = engine.executeTemplate("Hallo $name, your locale is '<%= pf.getI18nString(\"locale.de\") %>'.");
     assertEquals("Hallo Kai, your locale is 'Deutsch'.", res);
     assertEquals("Hallo Kai, your locale is 'Deutsch'. " + AppVersion.APP_ID + " Finished: Englisch", engine
         .executeTemplateFile("scripting/template.txt"));
@@ -65,7 +66,7 @@ public class GroovyEngineTest
   @Test
   public void mailTemplateTest()
   {
-    final GroovyEngine engine = new GroovyEngine(Locale.GERMAN);
+    final GroovyEngine engine = new GroovyEngine(Locale.GERMAN,  TimeZone.getTimeZone("UTC"));
     engine.putVariable("recipient", new PFUserDO().setFirstname("Kai").setLastname("Reinhard"));
     engine.putVariable("todo", new ToDoDO().setType(ToDoType.IMPROVEMENT).setPriority(Priority.HIGH));
     engine.putVariable("history", new ArrayList<DisplayHistoryEntry>());
