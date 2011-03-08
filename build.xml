@@ -9,7 +9,7 @@
   <property environment="env" />
 	<property name="APP_ID" value="ProjectForge" />
 	<property name="APP_TITLE" value="${APP_ID} 2011" />
-	<property name="VERSION" value="3.5.4" />
+	<property name="VERSION" value="3.6.0" />
 	<property name="m_doc.home" value="${env.M_DOC_HOME}" />
 	<property name="webproject" value="." />
 	<property name="target" value="${webproject}/target" />
@@ -196,13 +196,12 @@ public class AppVersion
 ]]>
 			</echo>
 			<echo>Creating file ${version-base-dir}/version.xml ...</echo>
-			<echo file="${version-base-dir}/version.xml" append="false">
-				<![CDATA[<?xml version="1.0" encoding="UTF-8" ?>
-				<property name="appId" value="${version-app-id}"/>
-				<property name="appTitle" value="${version-app-title}"/>
-				<property name="version" value="${VERSION}"/>
-				<property name="version.date" value="${VERSION_DATE}"/>
-				<property name="version.timestamp" value="${VERSION_NOW_FC}"/>]]>
+			<echo file="${version-base-dir}/version.xml" append="false"><![CDATA[<?xml version="1.0" encoding="UTF-8" ?>
+  <property name="appId" value="${version-app-id}"/>
+	<property name="appTitle" value="${version-app-title}"/>
+	<property name="version" value="${VERSION}"/>
+	<property name="version.date" value="${VERSION_DATE}"/>
+	<property name="version.timestamp" value="${VERSION_NOW_FC}"/>]]>
 </echo>
 		</target>
 
@@ -218,11 +217,10 @@ public class AppVersion
 				<param name="version-app-title" value="${APP_ID} 2011" />
 			</antcall>
 			<echo>Creating file ${doc-dir}/version.dtd ...</echo>
-			<echo file="${doc-dir}/version.dtd" append="false">
-				<![CDATA[<?xml version="1.0" encoding="UTF-8" ?>
-				<!ENTITY date "${VERSION_DATE}" >
-				<!ENTITY timestamp "${VERSION_NOW}" >
-				<!ENTITY version "${VERSION}" >]]>
+			<echo file="${doc-dir}/version.dtd" append="false"><![CDATA[<?xml version="1.0" encoding="UTF-8" ?>
+<!ENTITY date "${VERSION_DATE}" >
+<!ENTITY timestamp "${VERSION_NOW}" >
+<!ENTITY version "${VERSION}" >]]>
 </echo>
 		</target>
 
