@@ -24,6 +24,8 @@
 package org.projectforge;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
 
@@ -74,9 +76,16 @@ public class VersionTest
     assertEquals("3.0.0.1", new Version(3, 0, 0, 1).toString());
 
     assertEquals("3.5", new Version("3.5.0.0").toString());
+    assertEquals("3.5b4", new Version("3.5.0b4").toString());
     assertEquals("3.5", new Version("3.5.0.0").toString());
     assertEquals("3.0", new Version("3.0.0").toString());
     assertEquals("3.0.0.1", new Version("3.0.0.1").toString());
     assertEquals("3.5.4.1", new Version("3.5.4.1").toString());
+
+    assertEquals("3.5.4.1b1", new Version("3.5.4.1b1").toString());
+    assertEquals("3.5.4.1b0", new Version("3.5.4.1b").toString());
+    assertTrue(new Version("3.5.4.1b4").isBeta());
+    assertTrue(new Version("3.5.4.1b").isBeta());
+    assertFalse(new Version("3.5.4.1").isBeta());
   }
 }

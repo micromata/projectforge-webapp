@@ -38,12 +38,12 @@ public class Version implements Comparable<Version>, Serializable
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Version.class);
 
-  private int majorRelease, minorRelease, patchLevel, buildNumber;
+  private int majorRelease, minorRelease, patchLevel, buildNumber, betaVersion = -1;
 
   private String asString;
 
   /**
-   * Supported formats: "#" ("3"), "#.#" ("3.5"), "#.#.#" ("3.5.4") or "#.#.#.#" ("3.5.4.2").
+   * Supported formats: "#" ("3"), "#.#" ("3.5"), "#.#.#" ("3.5.4") or "#.#.#.#" ("3.5.4.2"). Append b# for marking version as beta version.
    * @param version
    */
   public Version(final String version)
@@ -51,7 +51,9 @@ public class Version implements Comparable<Version>, Serializable
     if (version == null) {
       return;
     }
-    final String[] sa = StringUtils.split(version, ".");
+    final int betaPos = version.indexOf('b');
+    final String str = betaPos >= 0 ? version.substring(0, betaPos) : version;
+    final String[] sa = StringUtils.split(str, ".");
     if (sa.length > 0) {
       majorRelease = parseInt(version, sa[0]);
       if (sa.length > 1) {
@@ -62,6 +64,13 @@ public class Version implements Comparable<Version>, Serializable
             buildNumber = parseInt(version, sa[3]);
           }
         }
+      }
+    }
+    if (betaPos >= 0) {
+      if (betaPos < version.length()) {
+        betaVersion = parseInt(version, version.substring(betaPos + 1));
+      } else {
+        betaVersion = 0;
       }
     }
     asString();
@@ -101,6 +110,26 @@ public class Version implements Comparable<Version>, Serializable
     return buildNumber;
   }
 
+  /**
+   * @param betaVersion
+   * @return this for chaining.
+   */
+  public Version setBetaVersion(int betaVersion)
+  {
+    this.betaVersion = betaVersion;
+    return this;
+  }
+
+  public int getBetaVersion()
+  {
+    return betaVersion;
+  }
+
+  public boolean isBeta()
+  {
+    return betaVersion >= 0;
+  }
+
   @Override
   public int compareTo(final Version o)
   {
@@ -120,7 +149,7 @@ public class Version implements Comparable<Version>, Serializable
   }
 
   /**
-   * @return Version as string: "#.#" ("3.0"), "#.#.#" ("3.5.4") or "#.#.#.#" ("3.5.4.2").
+   * @return Version as string: "#.#" ("3.0"), "#.#.#" ("3.5.4"), "#.#.#.#" ("3.5.4.2") or "#.*.#b#" ("3.5.4.2b2").
    * @see java.lang.Object#toString()
    */
   @Override
@@ -139,6 +168,9 @@ public class Version implements Comparable<Version>, Serializable
       if (buildNumber != 0) {
         sb.append('.').append(buildNumber);
       }
+    }
+    if (betaVersion >= 0) {
+      sb.append('b').append(betaVersion);
     }
     asString = sb.toString();
   }
