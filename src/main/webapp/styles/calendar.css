@@ -176,10 +176,10 @@ overflow: hidden;
 #content table.calendar tr td span.calendartimesheet {
 	font-size:1em;
 	background: #BBC1C3;
-	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#E8E8E8),color-stop(1,#BBC1C3));
-	background: -moz-linear-gradient(top,#E8E8E8,#BBC1C3);
+	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#F8F8F8),color-stop(1,#E8E8E8));
+	background: -moz-linear-gradient(top,#F8F8F8,#E8E8E8);
 	color: #7E8283;
-	border: 1px solid #7E8283;
+	border: 1px solid #D1D1D1;
 }
 
 #content table.calendar tr td span.empty {
@@ -190,9 +190,9 @@ overflow: hidden;
 #content table.calendar tr td span.birthday{
 	background: #FFFFFF;
 	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#FFFFFF),color-stop(1,#FFFFFF));
-	background: -moz-linear-gradient(top,#FFFFFF,#FFFFFF);
-	color: #6E613E;
-	border: 1px solid #AE9962;
+	background: -moz-linear-gradient(top,#EEE9D3,#E3D8AD);
+	color: #887642;
+	border: 1px solid #D9BC67;
 	position:relative;
 }
 
@@ -210,9 +210,9 @@ overflow: hidden;
 	font-weight:normal;
 	background: #FFAAFF;
 	background: -webkit-gradient(linear,left top,left bottom,color-stop(0.0,#FFAAFF),color-stop(1,#FFFFFF));
-	background: -moz-linear-gradient(center top , #FFAAFF, #FFFFFF);
-	color: #6D276E;
-	border: 1px solid #933494;
+	background: -moz-linear-gradient(center top , #FFD8FF, #FFE1FF);
+	color: #9C1D9E;
+	border: 1px solid #E999EC;
 	padding-left:2.5em;
 }
 
