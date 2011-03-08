@@ -779,6 +779,13 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   }
 
   /**
+   * This method will be called before inserting. Does nothing at default.
+   */
+  protected void onSave(final O obj)
+  {
+  }
+
+  /**
    * This method will be called before inserting, updating, deleting or marking the data object as deleted. Does nothing at default.
    */
   protected void onSaveOrModify(final O obj)
@@ -836,6 +843,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     accessChecker.checkDemoUser();
     obj.setCreated();
     obj.setLastUpdate();
+    onSave(obj);
     onSaveOrModify(obj);
     final Serializable id = getHibernateTemplate().save(obj);
     log.info("New object added (" + id + "): " + obj.toString());
