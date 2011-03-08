@@ -26,6 +26,8 @@ package org.projectforge.web.calendar;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.calendar.TimePeriod;
@@ -72,11 +74,21 @@ public class DateTimeFormatter extends AbstractFormatter
   /**
    * Uses patternKey SHORT_DATE_FORMAT
    * @param dateTime
-   * @see #getFormattedDateTime(Object, String)
+   * @see #getFormattedDateTime(Object, String, Locale, TimeZone)
    */
   public String getFormattedDate(Object date)
   {
-    return getFormattedDate(date, DateFormats.getFormatString(org.projectforge.common.DateFormatType.DATE_SHORT));
+    return getFormattedDate(date, PFUserContext.getLocale(), PFUserContext.getTimeZone());
+  }
+
+  /**
+   * Uses patternKey SHORT_DATE_FORMAT
+   * @param dateTime
+   * @see #getFormattedDateTime(Object, String)
+   */
+  public String getFormattedDate(final Object date, final Locale locale, final TimeZone timeZone)
+  {
+    return getFormattedDate(date, DateFormats.getFormatString(org.projectforge.common.DateFormatType.DATE_SHORT), locale, timeZone);
   }
 
   /**
@@ -86,11 +98,23 @@ public class DateTimeFormatter extends AbstractFormatter
    */
   public String getFormattedDate(Object date, String pattern)
   {
+    return getFormattedDate(date, pattern, PFUserContext.getLocale(), PFUserContext.getTimeZone());
+  }
+
+  /**
+   * Gets the formatted date (without time of day) with the context user's time zone and the internationalized pattern.
+   * @param date
+   * @param patternKey i18n key of the pattern
+   */
+  public String getFormattedDate(final Object date, final String pattern, final Locale locale, final TimeZone timeZone)
+  {
     if (date == null) {
       return "";
     }
-    final DateFormat format = new SimpleDateFormat(pattern, PFUserContext.getLocale());
-    format.setTimeZone(PFUserContext.getTimeZone());
+    final DateFormat format = locale != null ? new SimpleDateFormat(pattern, locale) : new SimpleDateFormat(pattern);
+    if (timeZone != null) {
+      format.setTimeZone(timeZone);
+    }
     return format.format(date);
   }
 
@@ -101,7 +125,18 @@ public class DateTimeFormatter extends AbstractFormatter
    */
   public String getFormattedDateTime(Date dateTime)
   {
-    return getFormattedDateTime(dateTime,DateFormats.getFormatString(org.projectforge.common.DateFormatType.TIMESTAMP_SHORT_MINUTES));
+    return getFormattedDateTime(dateTime, DateFormats.getFormatString(org.projectforge.common.DateFormatType.TIMESTAMP_SHORT_MINUTES));
+  }
+
+  /**
+   * Uses patternKey SHORT_TIMESTAMP_FORMAT_WITH_MINUTES
+   * @param dateTime
+   * @see #getFormattedDateTime(Date, String)
+   */
+  public String getFormattedDateTime(final Date dateTime, final Locale locale, final TimeZone timeZone)
+  {
+    return getFormattedDateTime(dateTime, DateFormats.getFormatString(org.projectforge.common.DateFormatType.TIMESTAMP_SHORT_MINUTES),
+        PFUserContext.getLocale(), PFUserContext.getTimeZone());
   }
 
   /**
@@ -111,11 +146,23 @@ public class DateTimeFormatter extends AbstractFormatter
    */
   public String getFormattedDateTime(final Date dateTime, final String pattern)
   {
+    return getFormattedDateTime(dateTime, pattern, PFUserContext.getLocale(), PFUserContext.getTimeZone());
+  }
+
+  /**
+   * Gets the formatted time stamp with the context user's time zone and the internationalized pattern.
+   * @param dateTime
+   * @param patternKey i18n key of the pattern
+   */
+  public String getFormattedDateTime(final Date dateTime, final String pattern, final Locale locale, final TimeZone timeZone)
+  {
     if (dateTime == null) {
       return "";
     }
-    final DateFormat format = new SimpleDateFormat(pattern);
-    format.setTimeZone(PFUserContext.getTimeZone());
+    final DateFormat format = locale != null ? new SimpleDateFormat(pattern, locale) : new SimpleDateFormat(pattern);
+    if (timeZone != null) {
+      format.setTimeZone(PFUserContext.getTimeZone());
+    }
     return format.format(dateTime);
   }
 
@@ -139,7 +186,7 @@ public class DateTimeFormatter extends AbstractFormatter
     if (time == null) {
       return "";
     }
-    DateFormat format = new SimpleDateFormat(pattern);
+    DateFormat format = new SimpleDateFormat(pattern, PFUserContext.getLocale());
     format.setTimeZone(PFUserContext.getTimeZone());
     return format.format(time);
   }
