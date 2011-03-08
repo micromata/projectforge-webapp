@@ -227,6 +227,7 @@ public class XmlDump
       xstreamSavingConverter.setSession(session);
       xstream.registerConverter(xstreamSavingConverter, 10);
       xstream.registerConverter(new UserRightIdSingleValueConverter(), 20);
+      xstream.registerConverter(new UserPrefAreaSingleValueConverter(), 19);
       // alle Objekte Laden und speichern
       xstream.fromXML(reader);
 
@@ -285,6 +286,7 @@ public class XmlDump
         xstream.omitField(AbstractBaseDO.class, "minorChange");
         xstream.omitField(AbstractBaseDO.class, "selected");
         xstream.registerConverter(new UserRightIdSingleValueConverter(), 20);
+        xstream.registerConverter(new UserPrefAreaSingleValueConverter(), 19);
       }
     };
     converter.setHibernate(hibernate);
