@@ -27,16 +27,24 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.projectforge.common.NumberHelper;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.core.Configuration;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.I18nEnum;
 import org.projectforge.core.NumberFormatter;
+import org.projectforge.fibu.KostFormatter;
+import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.ProjektDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.I18nHelper;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.web.HtmlHelper;
+import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.common.OutputType;
 import org.projectforge.web.task.TaskFormatter;
 
@@ -46,21 +54,30 @@ public class GroovyEngine
 
   private Locale locale;
 
+  private TimeZone timeZone;
+
+  private boolean htmlFormat = true;
+
   private GroovyExecutor groovyExecutor;
 
   private Map<String, Object> variables;
 
-  public GroovyEngine(final Locale locale)
+  public GroovyEngine(final Locale locale, final TimeZone timeZone)
   {
-    this(new HashMap<String, Object>(), locale);
+    this(new HashMap<String, Object>(), locale, timeZone);
   }
 
-  public GroovyEngine(final Map<String, Object> variables, final Locale locale)
+  public GroovyEngine(final Map<String, Object> variables, final Locale locale, final TimeZone timeZone)
   {
     if (locale != null) {
       this.locale = locale;
     } else {
       this.locale = ConfigXml.getInstance().getDefaultLocale();
+    }
+    if (timeZone != null) {
+      this.timeZone = timeZone;
+    } else {
+      this.timeZone = Configuration.getInstance().getDefaultTimeZone();
     }
     this.variables = variables;
     this.variables.put("pf", this);
@@ -152,13 +169,36 @@ public class GroovyEngine
 
   /**
    * Gets i18n string.
-   * @param messageKey
-   * @param params
+   * @param key
    * @see I18nHelper#getLocalizedString(Locale, String)
    */
-  public String getString(final String key)
+  public String getI18nString(final String key)
   {
     return I18nHelper.getLocalizedString(locale, key);
+  }
+
+  /**
+   * @param value
+   * @return The value as string using the toString() method or "" if the given value is null.
+   */
+  public String getString(final Object value)
+  {
+    if (value == null) {
+      return "";
+    }
+    return htmlFormat ? HtmlHelper.formatText(value.toString(), true) : value.toString();
+  }
+
+  /**
+   * @param value
+   * @return The given string itself or "" if value is null.
+   */
+  public String getString(final String value)
+  {
+    if (value == null) {
+      return "";
+    }
+    return htmlFormat ? HtmlHelper.formatText(value, true) : value;
   }
 
   /**
@@ -176,6 +216,32 @@ public class GroovyEngine
   }
 
   /**
+   * Gets the customer's name.
+   * @param customer
+   * @see KostFormatter#formatKunde(KundeDO)
+   */
+  public String getString(final KundeDO customer)
+  {
+    if (customer == null) {
+      return "";
+    }
+    return KostFormatter.formatKunde(customer);
+  }
+
+  /**
+   * Gets the project's name.
+   * @param project
+   * @see KostFormatter#formatProjekt(ProjektDO)
+   */
+  public String getString(final ProjektDO project)
+  {
+    if (project == null) {
+      return "";
+    }
+    return KostFormatter.formatProjekt(project);
+  }
+
+  /**
    * Gets the user's name (full name).
    * @param user
    * @see PFUserDO#getFullname()
@@ -186,6 +252,19 @@ public class GroovyEngine
       return "";
     }
     return user.getFullname();
+  }
+
+  /**
+   * Gets the user's name (full name).
+   * @param user
+   * @see PFUserDO#getFullname()
+   */
+  public String getString(final Number value)
+  {
+    if (value == null) {
+      return "";
+    }
+    return NumberHelper.getAsString(value);
   }
 
   /**
@@ -221,5 +300,21 @@ public class GroovyEngine
       return "";
     }
     return NumberFormatter.format(value, locale);
+  }
+
+  public String getString(final java.sql.Date date)
+  {
+    if (date == null) {
+      return "";
+    }
+    return DateTimeFormatter.instance().getFormattedDate(date, locale, timeZone);
+  }
+
+  public String getString(final java.util.Date date)
+  {
+    if (date == null) {
+      return "";
+    }
+    return DateTimeFormatter.instance().getFormattedDateTime(date, locale, timeZone);
   }
 }
