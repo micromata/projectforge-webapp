@@ -38,6 +38,8 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.task.TaskTree;
+import org.projectforge.user.GroupDO;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.core.PriorityFormatter;
 import org.projectforge.web.task.TaskFormatter;
@@ -71,6 +73,9 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
 
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
+
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
 
   public ToDoListPage(final PageParameters parameters)
   {
@@ -137,6 +142,24 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
         getSortable("type", sortable), "type", cellItemListener));
     columns.add(new TaskPropertyColumn<ToDoDO>(this, getString("task"), getSortable("task.title", sortable), "task",
         cellItemListener).withTaskFormatter(taskFormatter).withTaskTree(taskTree));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("group")), null,
+        "group", cellItemListener) {
+      @Override
+      public void populateItem(final Item<ICellPopulator<ToDoDO>> item, final String componentId, final IModel<ToDoDO> rowModel)
+      {
+        final ToDoDO projektDO = rowModel.getObject();
+        String groupName = "";
+        if (projektDO.getGroup() != null) {
+          final GroupDO group = userGroupCache.getGroup(projektDO.getGroupId());
+          if (group != null) {
+            groupName = group.getName();
+          }
+        }
+        final Label label = new Label(componentId, groupName);
+        item.add(label);
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("description")),
         getSortable("description", sortable), "description", cellItemListener));
     return columns;

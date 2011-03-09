@@ -44,7 +44,7 @@ public class MemoPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(MemoPlugin.ID, "1.0.0", "2011-03-06", "Adds table T_PLUGIN_MEMO.") {
+    return new UpdateEntryImpl(MemoPlugin.ID, "1.0.0", "2011-03-08", "Adds table T_PLUGIN_MEMO.") {
       final Table table = new Table(MemoDO.class);
 
       @Override

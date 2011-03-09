@@ -47,6 +47,7 @@ import org.projectforge.core.Priority;
 import org.projectforge.core.UserPrefParameter;
 import org.projectforge.database.Constants;
 import org.projectforge.task.TaskDO;
+import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 
 /**
@@ -75,6 +76,10 @@ public class ToDoDO extends DefaultBaseDO
   @UserPrefParameter(i18nKey = "task")
   @IndexedEmbedded(depth = 1)
   private TaskDO task;
+
+  @UserPrefParameter(i18nKey = "group")
+  @IndexedEmbedded(depth = 1)
+  private GroupDO group;
 
   @UserPrefParameter(i18nKey = "description", multiline = true)
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -195,9 +200,28 @@ public class ToDoDO extends DefaultBaseDO
   @Transient
   public Integer getTaskId()
   {
-    if (this.task == null)
-      return null;
-    return task.getId();
+    return this.task != null ? task.getId() : null;
+  }
+
+  /**
+   * Optional group.
+   */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "group_id", nullable = true)
+  public GroupDO getGroup()
+  {
+    return group;
+  }
+
+  public void setGroup(GroupDO group)
+  {
+    this.group = group;
+  }
+
+  @Transient
+  public Integer getGroupId()
+  {
+    return this.group != null ? group.getId() : null;
   }
 
   @Column(length = Constants.LENGTH_TEXT)

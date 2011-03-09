@@ -42,7 +42,7 @@ public class ToDoPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(ToDoPlugin.ID, "1.0.0", "2011-03-02", "Adds table T_PLUGIN_TODO.") {
+    return new UpdateEntryImpl(ToDoPlugin.ID, "1.0.0", "2011-03-08", "Adds table T_PLUGIN_TODO.") {
       final Table table = new Table(ToDoDO.class);
 
       @Override

@@ -42,11 +42,13 @@ import org.hibernate.Hibernate;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Priority;
 import org.projectforge.task.TaskDO;
+import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefDao;
 import org.projectforge.web.task.TaskSelectPanel;
+import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.components.CheckBoxLabelPanel;
 import org.projectforge.web.wicket.components.DatePanel;
@@ -190,7 +192,7 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
       }
       final UserSelectPanel assigneeUserSelectPanel = new UserSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<PFUserDO>(data,
           "assignee"), toDoEditPage, "assigneeId");
-      doPanel.addSelectPanel(getString("plugins.todo.assignee"), LABEL_LENGTH, assigneeUserSelectPanel, VALUE_LENGTH).setStrong();
+      doPanel.addSelectPanel(assigneeUserSelectPanel, new PanelContext(VALUE_LENGTH, getString("plugins.todo.assignee"), LABEL_LENGTH).setStrong());
       assigneeUserSelectPanel.init();
     }
     {
@@ -201,7 +203,7 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
       }
       final UserSelectPanel reporterUserSelectPanel = new UserSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<PFUserDO>(data,
           "reporter"), toDoEditPage, "reporterId");
-      doPanel.addSelectPanel(getString("plugins.todo.reporter"), LABEL_LENGTH, reporterUserSelectPanel, VALUE_LENGTH);
+      doPanel.addSelectPanel(reporterUserSelectPanel, new PanelContext(VALUE_LENGTH, getString("plugins.todo.reporter"), LABEL_LENGTH));
       reporterUserSelectPanel.init();
     }
     {
@@ -214,8 +216,14 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<TaskDO>(data, "task"),
           toDoEditPage, "taskId");
       taskSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
-      doPanel.addSelectPanel(getString("task"), LABEL_LENGTH, taskSelectPanel, VALUE_LENGTH);
+      doPanel.addSelectPanel(taskSelectPanel, new PanelContext(VALUE_LENGTH, getString("task"), LABEL_LENGTH).setTooltip(getString("plugins.todo.task.tooltip")));
       taskSelectPanel.init();
+    }
+    {
+      final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<GroupDO>(data, "group"),
+          toDoEditPage, "groupId");
+      doPanel.addSelectPanel(groupSelectPanel, new PanelContext(VALUE_LENGTH, getString("group"), LABEL_LENGTH).setTooltip(getString("plugins.todo.group.tooltip")));
+      groupSelectPanel.init();
     }
     doPanel.addTextArea(new PanelContext(data, "description", VALUE_LENGTH, getString("description"), LABEL_LENGTH)
         .setCssStyle("height: 10em;"));
