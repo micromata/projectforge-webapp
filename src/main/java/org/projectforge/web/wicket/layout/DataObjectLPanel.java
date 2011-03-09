@@ -403,22 +403,25 @@ public class DataObjectLPanel extends Panel
   }
 
   @SuppressWarnings("serial")
-  public IField addSelectPanel(final String label, final LayoutLength labelLength, final AbstractSelectPanel< ? > selectPanel,
-      final LayoutLength valueLength)
+  public IField addSelectPanel(final AbstractSelectPanel< ? > selectPanel, final PanelContext ctx)
   {
     ensureGroupPanel();
-    final SelectLPanel field = new SelectLPanel(groupPanel.newChildId(), valueLength, selectPanel);
-    final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true);
-    field.getSelectPanel().setLabel(new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return label;
-      }
-    });
-    groupPanel.add(labelPanel);
-    labelPanel.setLabelFor(field.getWrappedComponent());
+    final SelectLPanel field = new SelectLPanel(groupPanel.newChildId(), selectPanel, ctx);
+    if (ctx.getLabelLength() != null) {
+      final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), ctx.getLabelLength(), ctx.getLabel(), (AbstractLPanel) field, true);
+      field.getSelectPanel().setLabel(new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return ctx.getLabel();
+        }
+      });
+      groupPanel.add(labelPanel);
+      labelPanel.setLabelFor(field.getWrappedComponent());
+      ctx.internalSetLabelPanel(labelPanel);
+    }
     groupPanel.add(field);
+    ctx.internalSetValueField(field);
     return field;
   }
 

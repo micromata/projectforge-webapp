@@ -254,7 +254,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
         }
       };
       taskSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
-      doPanel.addSelectPanel(getString("task"), HALF, taskSelectPanel, DOUBLE);
+      doPanel.addSelectPanel(taskSelectPanel, new PanelContext(VALUE_LENGTH, getString("task"), LABEL_LENGTH));
       taskSelectPanel.init();
       taskSelectPanel.setRequired(true);
     }
@@ -279,7 +279,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       final UserSelectPanel userSelectPanel = new UserSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<PFUserDO>(data, "user"),
           parentPage, "userId");
       userSelectPanel.setRequired(true);
-      doPanel.addSelectPanel(getString("user"), HALF, userSelectPanel, FULL).setStrong();
+      doPanel.addSelectPanel(userSelectPanel, new PanelContext(FULL, getString("user"), LABEL_LENGTH).setStrong());
       userSelectPanel.init();
     }
     {

@@ -78,7 +78,7 @@ public class EmployeeSalaryFormRenderer extends AbstractDOFormRenderer
   {
     final EmployeeSelectPanel employeeSelectPanel = new EmployeeSelectPanel(SelectLPanel.WICKET_ID_SELECT_PANEL,
         new PropertyModel<EmployeeDO>(data, "employee"), callerPage, "employee");
-    doPanel.addSelectPanel(getString("fibu.employee"), HALF, employeeSelectPanel, FULL);
+    doPanel.addSelectPanel(employeeSelectPanel, new PanelContext(FULL, getString("fibu.employee"), LABEL_LENGTH));
     employeeSelectPanel.setRequired(true);
     employeeSelectPanel.init();
     {

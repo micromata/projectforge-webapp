@@ -131,7 +131,7 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
       final TaskSelectPanel parentTaskSelectPanel = new TaskSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<TaskDO>(data,
           "parentTask"), taskEditPage, "parentTaskId");
       parentTaskSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
-      doPanel.addSelectPanel(getString("task.parentTask"), HALF, parentTaskSelectPanel, VALUE_LENGTH);
+      doPanel.addSelectPanel(parentTaskSelectPanel, new PanelContext(VALUE_LENGTH, getString("task.parentTask"), LABEL_LENGTH));
       parentTaskSelectPanel.init();
       if (taskEditPage.getBaseDao().getTaskTree().isRootNode(data) == false) {
         parentTaskSelectPanel.setRequired(true);
@@ -185,7 +185,7 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
       }
       final UserSelectPanel responsibleUserSelectPanel = new UserSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<PFUserDO>(data,
           "responsibleUser"), taskEditPage, "responsibleUserId");
-      doPanel.addSelectPanel(getString("task.assignedUser"), HALF, responsibleUserSelectPanel, FULL).setStrong();
+      doPanel.addSelectPanel(responsibleUserSelectPanel, new PanelContext(FULL, getString("task.assignedUser"), LABEL_LENGTH).setStrong());
       responsibleUserSelectPanel.init();
     }
     {
@@ -276,7 +276,7 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
       final TaskSelectPanel ganttPredecessorSelectPanel = new TaskSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<TaskDO>(data,
           "ganttPredecessor"), taskEditPage, "ganttPredecessorId");
       ganttPredecessorSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
-      doPanel.addSelectPanel(getString("gantt.predecessor"), HALF, ganttPredecessorSelectPanel, VALUE_LENGTH);
+      doPanel.addSelectPanel(ganttPredecessorSelectPanel, new PanelContext(VALUE_LENGTH, getString("gantt.predecessor"), LABEL_LENGTH));
       ganttPredecessorSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
       ganttPredecessorSelectPanel.setShowFavorites(true);
       ganttPredecessorSelectPanel.init();
