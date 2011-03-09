@@ -127,6 +127,9 @@ public class ToDoRight extends UserRightAccessCheck<ToDoDO>
     if (ObjectUtils.equals(user.getId(), toDo.getAssigneeId()) == true || ObjectUtils.equals(user.getId(), toDo.getReporterId()) == true) {
       return true;
     }
+    if (toDo.getGroup() != null && UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), toDo.getGroupId()) == true) {
+      return true;
+    }
     return false;
   }
 
