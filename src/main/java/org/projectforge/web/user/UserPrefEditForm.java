@@ -45,6 +45,7 @@ import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.task.TaskDO;
+import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserPrefArea;
@@ -240,6 +241,10 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
             taskSelectPanel.setShowFavorites(false);
           }
           valueField = taskSelectPanel;
+        } else if (GroupDO.class.isAssignableFrom(param.getType()) == true) {
+          final GroupSelectPanel groupSelectPanel = new GroupSelectPanel("valueField", new UserPrefPropertyModel<GroupDO>(userPrefDao, param,
+              "valueAsObject"), parentPage, param.getParameter());
+          valueField = groupSelectPanel;
         } else if (Kost2DO.class.isAssignableFrom(param.getType()) == true) {
           final UserPrefEntryDO taskParam = data.getUserPrefEntry(param.getDependsOn());
           Integer taskId = null;
