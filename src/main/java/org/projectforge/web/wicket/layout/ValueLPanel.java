@@ -37,6 +37,6 @@ public class ValueLPanel extends LabelLPanel
    */
   ValueLPanel(final String id, final String value)
   {
-    super(id, null, value, true);
+    super(id,value, new PanelContext().setBreakBefore(true));
   }
 }

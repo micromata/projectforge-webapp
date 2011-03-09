@@ -23,7 +23,6 @@
 
 package org.projectforge.web.wicket.layout;
 
-
 /**
  * Represents a label as a heading (in one row). The value should be added below. This is used for mobile devices.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -36,8 +35,8 @@ public class LabelValueHeadingMobileLPanel extends LabelLPanel
   /**
    * @see AbstractDOFormRenderer#createRepeaterLabelPanel(String)
    */
-  LabelValueHeadingMobileLPanel(final String id, final String label)
+  LabelValueHeadingMobileLPanel(final String id, final String label, final PanelContext ctx)
   {
-    super(id, null, label, true);
+    super(id, label, ctx);
   }
 }

@@ -260,8 +260,7 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     }
     if (SystemInfoCache.instance().isCost2EntriesExists() == true) {
       final String label = getString("fibu.kost2");
-      cost2ChoiceLabel = doPanel.addLabel(label, HALF);
-      cost2ChoiceLabel.setBreakBefore();
+      cost2ChoiceLabel = doPanel.addLabel(label, new PanelContext(HALF).setBreakBefore());
       final IField field = doPanel.addDropDownChoice(null, new PanelContext(data, "kost2", FULL, label));
       if (field instanceof DropDownChoiceLPanel) {
         cost2ChoicePanel = (DropDownChoiceLPanel) field;
@@ -284,14 +283,14 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
     }
     {
       final String timePeriodLabel = getString("timePeriod");
-      final LabelLPanel label = doPanel.addLabel(timePeriodLabel, HALF);
-      final RepeatingView repeatingView = doPanel.addRepeater(LayoutLength.DOUBLE).getRepeatingView();
+      final LabelLPanel label = doPanel.addLabel(timePeriodLabel, new PanelContext(HALF));
+      final RepeatingView repeatingView = doPanel.addRepeater(new PanelContext(LayoutLength.DOUBLE)).getRepeatingView();
       // Start time
       startDateTimePanel = new DateTimePanel(repeatingView.newChildId(), new PropertyModel<Date>(data, "startTime"),
           (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withCallerPage(parentPage).withTargetType(
               java.sql.Timestamp.class).withRequired(true), DatePrecision.MINUTE_15);
       repeatingView.add(startDateTimePanel);
-      label.setLabelFor(startDateTimePanel.getDateField()).setBreakBefore();
+      label.setLabelFor(startDateTimePanel.getDateField());
       WicketUtils.addTooltip(startDateTimePanel.getDateField(), new Model<String>() {
         @Override
         public String getObject()
@@ -358,14 +357,14 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
         descriptionArea = ((TextAreaLPanel) field).getTextArea();
       }
       if (jiraSupport == true && JiraUtils.hasJiraIssues(data.getDescription()) == true) {
-        doPanel.addLabel("", HALF).setBreakBefore();
-        doPanel.addJiraIssuesPanel(DOUBLE, data.getDescription());
+        doPanel.addLabel("", new PanelContext(HALF).setBreakBefore());
+        doPanel.addJiraIssuesPanel(data.getDescription(), new PanelContext(DOUBLE));
       }
     }
     {
       // Save as template checkbox:
-      doPanel.addLabel("", HALF).setBreakBefore();
-      final RepeatingView repeatingView = doPanel.addRepeater(LayoutLength.DOUBLE).getRepeatingView();
+      doPanel.addLabel("", new PanelContext(HALF).setBreakBefore());
+      final RepeatingView repeatingView = doPanel.addRepeater(new PanelContext(LayoutLength.DOUBLE)).getRepeatingView();
       final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(repeatingView.newChildId(), new PropertyModel<Boolean>(this, "saveAsTemplate"));
       repeatingView.add(checkBoxPanel);
       final LabelForPanel label = new LabelForPanel(repeatingView.newChildId(), checkBoxPanel.getCheckBox(),
@@ -375,8 +374,8 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
 
     if (jiraSupport == true) {
       // Add help text:
-      doPanel.addLabel("", HALF).setBreakBefore();
-      doPanel.addHelpLabel("*) " + getString("tooltip.jiraSupport.field"), DOUBLE);
+      doPanel.addLabel("", new PanelContext(HALF));
+      doPanel.addHelpLabel("*) " + getString("tooltip.jiraSupport.field"), new PanelContext(DOUBLE).setBreakBeforeLabel(false));
     }
 
     recentTimesheetsModalWindow = new ModalWindow(RECENT_TIME_SHEETS_MODAL_WINDOW_ID);
@@ -387,8 +386,8 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
   @SuppressWarnings("serial")
   private void addTemplatesRow()
   {
-    templatesLabel = doPanel.addLabel(getString("templates"), HALF);
-    templatesPanel = doPanel.addRepeater(DOUBLE);
+    templatesLabel = doPanel.addLabel(getString("templates"), new PanelContext( HALF));
+    templatesPanel = doPanel.addRepeater(new PanelContext(DOUBLE));
     if (isNew() == false) {
       templatesLabel.setVisible(false);
       templatesPanel.setVisible(false);

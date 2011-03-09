@@ -126,14 +126,6 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
     filterContainer.add(businessAssessmentLabel);
   }
   
-  @Override
-  protected void setComponentsVisibility()
-  {
-    super.setComponentsVisibility();
-    searchButtonPanel.setVisible(false);
-    resetButtonPanel.setVisible(false);
-  }
-
   /**
    * The filter is not visible if only a fixed list of accounting records of a record is displayed. 
    * @see org.projectforge.web.wicket.AbstractListForm#isFilterVisible()

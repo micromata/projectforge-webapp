@@ -45,19 +45,11 @@ public class RepeaterLabelLPanel extends AbstractLPanel
   public static final String LABEL_ID = "label";
 
   /**
-   * @see AbstractDOFormRenderer#createRepeaterLabelPanel(String)
-   */
-  RepeaterLabelLPanel(final String id)
-  {
-    this(id, null);
-  }
-
-  /**
    * @see AbstractDOFormRenderer#createRepeaterLabelPanel(String, LayoutLength)
    */
-  RepeaterLabelLPanel(final String id, final LayoutLength length)
+  RepeaterLabelLPanel(final String id, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
     repeater = new RepeatingView("repeater");
     super.add(repeater);
   }

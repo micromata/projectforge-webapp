@@ -44,19 +44,20 @@ public class CheckBoxLPanel extends AbstractLPanel
   private CheckBox checkBox;
 
   /**
+   * @param ctx data and property expected.
    * @see AbstractDOFormRenderer#createCheckBoxPanel(String, Object, String)
    */
-  CheckBoxLPanel(final String id, final Object dataObject, final String property)
+  CheckBoxLPanel(final String id, final PanelContext ctx)
   {
-    this(id, new CheckBox(CHECKBOX_ID, new PropertyModel<Boolean>(dataObject, property)));
+    this(id, new CheckBox(CHECKBOX_ID, new PropertyModel<Boolean>(ctx.getData(), ctx.getProperty())), ctx);
   }
 
   /**
    * @see AbstractDOFormRenderer#createCheckBoxPanel(String, CheckBox)
    */
-  CheckBoxLPanel(final String id, final CheckBox checkBox)
+  CheckBoxLPanel(final String id, final CheckBox checkBox, final PanelContext ctx)
   {
-    super(id, null);
+    super(id, ctx);
     this.checkBox = checkBox;
     this.classAttributeAppender = "checkbox";
     add(checkBox);

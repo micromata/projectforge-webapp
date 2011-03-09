@@ -42,21 +42,27 @@ public class PanelContext implements Serializable
 
   private LayoutLength valueLength;
 
+  private LayoutLength indent;
+
   private Object data;
 
   private String property;
 
   private FieldType fieldType;
 
-  private LayoutAlignment aligment;
+  private LayoutAlignment alignment;
 
   private LabelLPanel labelPanel;
 
   private IField valueField;
 
-  private boolean breakBefore = true, breakBetweenLabelAndField, strong, required, focus, readonly;
+  protected boolean breakBeforeLabel = true, breakBefore, breakBetweenLabelAndField, strong, strongLabel, required, focus, readonly;
 
   private String cssStyle;
+
+  public PanelContext()
+  {
+  }
 
   /**
    * Should only be used for DropDownChoices.
@@ -121,6 +127,12 @@ public class PanelContext implements Serializable
     return label;
   }
 
+  public PanelContext setLabel(final String label)
+  {
+    this.label = label;
+    return this;
+  }
+
   public LayoutLength getLabelLength()
   {
     return labelLength;
@@ -129,6 +141,21 @@ public class PanelContext implements Serializable
   public LayoutLength getValueLength()
   {
     return valueLength;
+  }
+
+  public LayoutLength getIndent()
+  {
+    return indent;
+  }
+
+  /**
+   * @param indent
+   * @return this for chaining.
+   */
+  public PanelContext setIndent(final LayoutLength indent)
+  {
+    this.indent = indent;
+    return this;
   }
 
   public Object getData()
@@ -177,6 +204,16 @@ public class PanelContext implements Serializable
     return breakBefore;
   }
 
+  public PanelContext setBreakBefore()
+  {
+    return setBreakBefore(true);
+  }
+
+  public boolean isBreakBeforeLabel()
+  {
+    return breakBeforeLabel;
+  }
+
   /**
    * Break before this panel (containing field and label as optional). Default is true.
    * @param breakBefore
@@ -185,6 +222,12 @@ public class PanelContext implements Serializable
   public PanelContext setBreakBefore(final boolean breakBefore)
   {
     this.breakBefore = breakBefore;
+    return this;
+  }
+
+  public PanelContext setBreakBeforeLabel(boolean breakBeforeLabel)
+  {
+    this.breakBeforeLabel = breakBeforeLabel;
     return this;
   }
 
@@ -218,18 +261,18 @@ public class PanelContext implements Serializable
     return this;
   }
 
-  public LayoutAlignment getAligment()
+  public LayoutAlignment getAlignment()
   {
-    return aligment;
+    return alignment;
   }
 
   /**
-   * @param aligment
+   * @param alignment
    * @return this for chaining.
    */
-  public PanelContext setAligment(LayoutAlignment aligment)
+  public PanelContext setAlignment(LayoutAlignment alignment)
   {
-    this.aligment = aligment;
+    this.alignment = alignment;
     return this;
   }
 
@@ -272,6 +315,20 @@ public class PanelContext implements Serializable
   public PanelContext setStrong()
   {
     this.strong = true;
+    return this;
+  }
+
+  public boolean isStrongLabel()
+  {
+    return strongLabel;
+  }
+
+  /**
+   * @return this for chaining.
+   */
+  public PanelContext setStrongLabel(boolean strongLabel)
+  {
+    this.strongLabel = strongLabel;
     return this;
   }
 

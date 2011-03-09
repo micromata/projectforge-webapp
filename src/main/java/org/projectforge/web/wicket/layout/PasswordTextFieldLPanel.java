@@ -37,12 +37,9 @@ public class PasswordTextFieldLPanel extends TextFieldLPanel
   /**
    * @see AbstractDOFormRenderer#createTextFieldPanel(String, LayoutLength, TextField)
    */
-  PasswordTextFieldLPanel(final String id, final LayoutLength length, final TextField< ? > textField)
+  PasswordTextFieldLPanel(final String id, final TextField< ? > textField, final PanelContext ctx)
   {
-    super(id, length);
-    this.textField = textField;
-    this.classAttributeAppender = "text";
-    add(textField);
+    super(id, textField, ctx);
   }
 
   /**
@@ -50,8 +47,8 @@ public class PasswordTextFieldLPanel extends TextFieldLPanel
    * @param id
    * @param length
    */
-  protected PasswordTextFieldLPanel(final String id, final LayoutLength length)
+  protected PasswordTextFieldLPanel(final String id, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
   }
 }

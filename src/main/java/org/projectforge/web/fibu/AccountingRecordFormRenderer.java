@@ -76,7 +76,7 @@ public class AccountingRecordFormRenderer extends AbstractDOFormRenderer
     final DatePanel datePanel = new DatePanel(DateFieldLPanel.DATE_FIELD_ID, new PropertyModel<Date>(data, "datum"),
         new DatePanelSettings().withTargetType(java.sql.Date.class));
     WicketUtils.setReadonly(datePanel.getDateField());
-    doPanel.addDateFieldPanel(data, "datum", getString("date"), HALF, datePanel, HALF);
+    doPanel.addDateFieldPanel(datePanel, new PanelContext(data, "datum", HALF, getString("date"), HALF));
     final String yearLabel = getString("calendar.year");
     final String monthLabel = getString("calendar.month");
     final MinMaxNumberField<Integer> yearField = new RequiredMinMaxNumberField<Integer>(INPUT_ID, yearLabel, new PropertyModel<Integer>(
@@ -85,7 +85,7 @@ public class AccountingRecordFormRenderer extends AbstractDOFormRenderer
     WicketUtils.setReadonly(yearField);
     final MinMaxNumberField<Integer> monthField = new RequiredMinMaxNumberField<Integer>(INPUT_ID, monthLabel, new PropertyModel<Integer>(
         data, "month"), 1, 12).setConverter(new MonthConverter());
-    doPanel.addTextField(monthField, QUART);
+    doPanel.addTextField(monthField, new PanelContext(QUART));
     WicketUtils.setReadonly(monthField);
 
     final String satzNrLabel = getString("fibu.buchungssatz.satznr");
@@ -112,7 +112,7 @@ public class AccountingRecordFormRenderer extends AbstractDOFormRenderer
           new PropertyModel<SHType>(data, "sh"), SHType.values());
       WicketUtils.setReadonly(dcField);
       dcField.setEnabled(false);
-      doPanel.addTextField(dcLabel, dcField, QUART);
+      doPanel.addTextField(dcField, new PanelContext(QUART).setLabel(dcLabel));
     }
 
     final TextFieldLPanel belegFieldPanel = (TextFieldLPanel) doPanel.addTextField(new PanelContext(data, "beleg", VALUE_LENGTH,
@@ -124,7 +124,7 @@ public class AccountingRecordFormRenderer extends AbstractDOFormRenderer
     doPanel.addTextField(kost1Component, new PanelContext(HALF, getString("fibu.kost1") + "/" + kost2Label, LABEL_LENGTH));
     WicketUtils.setReadonly(kost1Component);
     final Kost2FormComponent kost2Component = new Kost2FormComponent(INPUT_ID, new PropertyModel<Kost2DO>(data, "kost2"), true);
-    doPanel.addTextField(kost2Label, kost2Component, HALF);
+    doPanel.addTextField(kost2Component, new PanelContext(HALF).setLabel(kost2Label));
     WicketUtils.setReadonly(kost2Component);
 
     final String gegenKontoLabel = getString("fibu.buchungssatz.gegenKonto");
@@ -133,7 +133,7 @@ public class AccountingRecordFormRenderer extends AbstractDOFormRenderer
         .addTextField(kontoComponent, new PanelContext(HALF, getString("fibu.buchungssatz.konto") + "/" + gegenKontoLabel, LABEL_LENGTH));
     WicketUtils.setReadonly(kontoComponent);
     final KontoFormComponent gegenKontoComponent = new KontoFormComponent(INPUT_ID, new PropertyModel<KontoDO>(data, "gegenKonto"), true);
-    doPanel.addTextField(gegenKontoLabel, gegenKontoComponent, HALF);
+    doPanel.addTextField(gegenKontoComponent, new PanelContext(HALF).setLabel(gegenKontoLabel));
     WicketUtils.setReadonly(gegenKontoComponent);
 
     final TextFieldLPanel textFieldPanel = (TextFieldLPanel) doPanel.addTextField(new PanelContext(data, "text", VALUE_LENGTH,

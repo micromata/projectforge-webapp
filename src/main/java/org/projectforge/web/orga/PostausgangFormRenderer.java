@@ -105,7 +105,7 @@ public class PostausgangFormRenderer extends AbstractDOFormRenderer
           return "error.dateInFuture";
         }
       });
-      doPanel.addDateFieldPanel(data, "datum", getString("date"), HALF, datumPanel, FULL);
+      doPanel.addDateFieldPanel(datumPanel, new PanelContext(data, "datum", FULL, getString("date"), HALF));
     }
     {
       final PFAutoCompleteMaxLengthTextField empfaengerTextField = new PFAutoCompleteMaxLengthTextField(TextFieldLPanel.INPUT_ID,

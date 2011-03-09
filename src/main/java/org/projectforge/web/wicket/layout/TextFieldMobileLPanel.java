@@ -53,17 +53,17 @@ public class TextFieldMobileLPanel extends TextFieldLPanel
   /**
    * @see AbstractDOFormRenderer#createTextFieldPanel(String, LayoutLength, Object, String)
    */
-  TextFieldMobileLPanel(final String id, final LayoutLength length, final Object dataObject, final String property)
+  TextFieldMobileLPanel(final String id, final Object dataObject, final String property, final PanelContext ctx)
   {
-    this(id, length, new MaxLengthTextField(INPUT_ID, new PropertyModel<String>(dataObject, property)));
+    this(id, new MaxLengthTextField(INPUT_ID, ctx.getLabel(), new PropertyModel<String>(dataObject, property)), ctx);
   }
 
   /**
    * @see AbstractDOFormRenderer#createTextFieldPanel(String, LayoutLength, TextField)
    */
-  TextFieldMobileLPanel(final String id, final LayoutLength length, final TextField< ? > textField)
+  TextFieldMobileLPanel(final String id,  final TextField< ? > textField, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
     this.textField = textField;
     this.classAttributeAppender = "text";
     add(item);

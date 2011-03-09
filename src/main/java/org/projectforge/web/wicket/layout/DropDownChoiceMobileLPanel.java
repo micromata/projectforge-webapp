@@ -37,9 +37,9 @@ public class DropDownChoiceMobileLPanel extends DropDownChoiceLPanel
   /**
    * @see AbstractDOFormRenderer#createDropDownChoicePanel(String, LayoutLength, DropDownChoice)
    */
-  DropDownChoiceMobileLPanel(final String id, final LayoutLength length, final DropDownChoice< ? > dropDownChoice)
+  DropDownChoiceMobileLPanel(final String id,  final DropDownChoice< ? > dropDownChoice, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
     this.dropDownChoice = dropDownChoice;
     this.classAttributeAppender = "select";
     add(dropDownChoice);

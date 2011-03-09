@@ -42,16 +42,13 @@ public class RepeatingViewLPanel extends AbstractLPanel
 
   private WebMarkupContainer parentContainer;
 
-  RepeatingViewLPanel(final String id, final LayoutLength length)
+  RepeatingViewLPanel(final String id, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
     parentContainer = new WebMarkupContainer("parent");
     add(parentContainer);
     this.repeatingView = new MyRepeatingView("repeatingView");
     parentContainer.add(this.repeatingView);
-    if (breakBefore == true) {
-      setBreakBefore();
-    }
   }
 
   public RepeatingView getRepeatingView()

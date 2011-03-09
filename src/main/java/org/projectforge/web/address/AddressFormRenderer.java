@@ -50,7 +50,6 @@ import org.projectforge.common.BeanHelper;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.common.StringHelper;
-import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.DatePanel;
@@ -210,6 +209,7 @@ public class AddressFormRenderer extends AbstractDOFormRenderer
   @SuppressWarnings( { "unchecked", "serial"})
   public void addPersonalData(final String title)
   {
+    PanelContext ctx;
     doPanel.newGroupPanel();
     // add(new Label("task", taskFormatter.getTaskPath(data.getTaskId(), true, OutputType.HTML)).setEscapeModelStrings(false));
     {
@@ -222,17 +222,15 @@ public class AddressFormRenderer extends AbstractDOFormRenderer
     }
     if (isMobile() == false) {
       final String tooltip = getString("address.tooltip.vCardList");
-      doPanel.addCheckBox(personalAddress, "favoriteCard").setTooltip(tooltip);
-      doPanel.addImage(ImageDef.HELP).setTooltip(tooltip);
+      doPanel.addCheckBox(new PanelContext(personalAddress, "favoriteCard").setTooltip(tooltip));
     }
     doPanel.addTextField(new PanelContext(data, "firstName", VALUE_LENGTH, getString("address.title"), LABEL_LENGTH).setStrong());
     doPanel.addTextField(new PanelContext(data, "firstName", VALUE_LENGTH, getString("firstName"), LABEL_LENGTH).setStrong());
-    final IField nameTextField = doPanel.addTextField(new PanelContext(data, "name", VALUE_LENGTH, getString("name"), LABEL_LENGTH)
-        .setStrong().setRequired());
+    ctx = new PanelContext(data, "name", VALUE_LENGTH, getString("name"), LABEL_LENGTH).setStrong().setRequired();
     if (isNew() == true) {
-      nameTextField.setFocus();
+      ctx.setFocus();
     }
-
+    doPanel.addTextField(ctx);
     {
       // DropDownChoice contactStatus
       final LabelValueChoiceRenderer<ContactStatus> contactStatusChoiceRenderer = new LabelValueChoiceRenderer<ContactStatus>(container,
@@ -244,11 +242,11 @@ public class AddressFormRenderer extends AbstractDOFormRenderer
           getString("address.contactStatus"), LABEL_LENGTH));
     }
     if (isReadonly() == true) {
-      doPanel.addDateFieldPanel(data, "birthday", getString("address.birthday"), LABEL_LENGTH, DatePrecision.DAY, HALF);
+      doPanel.addDateFieldPanel(DatePrecision.DAY, new PanelContext(data, "birthday", HALF, getString("address.birthday"), LABEL_LENGTH));
     } else {
       final DatePanel birthdayPanel = new DatePanel(DateFieldLPanel.DATE_FIELD_ID, new PropertyModel<Date>(data, "birthday"),
           new DatePanelSettings().withTargetType(java.sql.Date.class));
-      doPanel.addDateFieldPanel(data, "birthday", getString("address.birthday"), LABEL_LENGTH, birthdayPanel, HALF);
+      doPanel.addDateFieldPanel(birthdayPanel, new PanelContext(data, "birthday", HALF, getString("address.birthday"), LABEL_LENGTH));
       WicketUtils.addTooltip(birthdayPanel.getDateField(), new Model<String>() {
         @Override
         public String getObject()
@@ -257,12 +255,12 @@ public class AddressFormRenderer extends AbstractDOFormRenderer
         }
       });
     }
-    final IField commentField = doPanel.addTextArea(
-        new PanelContext(data, "comment", ONEHALF, getString("comment"), ONEHALF).setBreakBetweenLabelAndField(true)).setCssStyle(
+    ctx = new PanelContext(data, "comment", ONEHALF, getString("comment"), ONEHALF).setBreakBetweenLabelAndField(true).setCssStyle(
         "height: 20em;");
     if (layoutContext.isNew() == false) {
-      commentField.setFocus();
+      ctx.setFocus();
     }
+    doPanel.addTextArea(ctx);
   }
 
   /**
@@ -326,8 +324,8 @@ public class AddressFormRenderer extends AbstractDOFormRenderer
   public void addPrivateEMail()
   {
     doPanel.newGroupPanel(isMobile() == true ? getString("address.privateEmail") : null);
-    doPanel.addTextField(new PanelContext(data, "privateEmail", VALUE_LENGTH, getString("email"), LABEL_LENGTH)
-        .setFieldType(FieldType.E_MAIL).setStrong());
+    doPanel.addTextField(new PanelContext(data, "privateEmail", VALUE_LENGTH, getString("email"), LABEL_LENGTH).setFieldType(
+        FieldType.E_MAIL).setStrong());
   }
 
   protected GroupLPanel addAddress(final String heading, final String addressTextProperty, final String zipCodeProperty,
@@ -342,10 +340,10 @@ public class AddressFormRenderer extends AbstractDOFormRenderer
     }
     final GroupLPanel groupPanel = doPanel.newGroupPanel(getString(heading));
     if (isMobileReadonly() == true) {
-      doPanel.addReadonlyTextField(data, addressTextProperty, getString("address.addressText"), null, null);
-      doPanel.addReadonlyTextField(zipCode + " " + city, getString("address.city"), null, null);
-      doPanel.addReadonlyTextField(data, countryProperty, getString("address.country"), null, null);
-      doPanel.addReadonlyTextField(data, stateProperty, getString("address.state"), null, null);
+      doPanel.addReadonlyTextField(new PanelContext(data, addressTextProperty).setLabel(getString("address.addressText")));
+      doPanel.addReadonlyTextField(zipCode + " " + city, new PanelContext(null, getString("address.city"), null));
+      doPanel.addReadonlyTextField(new PanelContext(data, countryProperty).setLabel(getString("address.country")));
+      doPanel.addReadonlyTextField(new PanelContext(data, stateProperty).setLabel(getString("address.state")));
     } else {
       @SuppressWarnings("serial")
       final PFAutoCompleteTextField<String> addressTextField = new PFAutoCompleteTextField<String>(INPUT_ID, new PropertyModel<String>(
@@ -365,10 +363,10 @@ public class AddressFormRenderer extends AbstractDOFormRenderer
       } else {
         doPanel.addTextField(new PanelContext(data, zipCodeProperty, QUART, getString("address.zipCode") + "/" + getString("address.city"),
             LABEL_LENGTH));
-        doPanel.addTextField(new PanelContext(data, cityProperty, THREEQUART));
+        doPanel.addTextField(new PanelContext(data, cityProperty, THREEQUART).setLabel(getString("address.zipCode")));
         doPanel.addTextField(new PanelContext(data, countryProperty, HALF, getString("address.country") + "/" + getString("address.state"),
             LABEL_LENGTH));
-        doPanel.addTextField(new PanelContext(data, stateProperty, HALF));
+        doPanel.addTextField(new PanelContext(data, stateProperty, HALF).setLabel(getString("address.state")));
       }
     }
     return groupPanel;
@@ -379,10 +377,7 @@ public class AddressFormRenderer extends AbstractDOFormRenderer
   {
     if (isMobile() == false) {
       final IField field = doPanel.addTextField(new PanelContext(data, property, THREEQUART, getString(labelKey), LABEL_LENGTH));
-      doPanel.addCheckBox(personalAddress, favoriteProperty).setTooltip(phoneListTooltip);
-      if (first == true) {
-        doPanel.addImage(ImageDef.HELP).setTooltip(phoneListTooltip);
-      }
+      doPanel.addCheckBox(new PanelContext(personalAddress, favoriteProperty).setTooltip(phoneListTooltip));
       @SuppressWarnings("unchecked")
       final TextField<String> textField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
       return textField;

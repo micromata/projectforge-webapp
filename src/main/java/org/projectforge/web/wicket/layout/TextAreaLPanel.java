@@ -45,19 +45,27 @@ public class TextAreaLPanel extends AbstractLPanel
 
   private TextArea< ? > textArea;
 
-  TextAreaLPanel(final String id, final LayoutLength length, final Object dataObject, final String property)
+  /**
+   * @param id
+   * @param ctx with data and property.
+   */
+  TextAreaLPanel(final String id, final PanelContext ctx)
   {
-    this(id, length, new MaxLengthTextArea(TEXT_AREA_ID, new PropertyModel<String>(dataObject, property)));
+    this(id, new MaxLengthTextArea(TEXT_AREA_ID, ctx.getLabel(), new PropertyModel<String>(ctx.getData(), ctx.getProperty())), ctx);
   }
 
-  TextAreaLPanel(final String id, final LayoutLength length, final TextArea< ? > textArea)
+  TextAreaLPanel(final String id, final TextArea< ? > textArea, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
     this.textArea = textArea;
     this.classAttributeAppender = "textarea";
+    if (ctx.isFocus() == true) {
+      textArea.add(new FocusOnLoadBehavior());
+    }
     add(textArea);
   }
 
+  @Deprecated
   public TextAreaLPanel setFocus()
   {
     textArea.add(new FocusOnLoadBehavior());

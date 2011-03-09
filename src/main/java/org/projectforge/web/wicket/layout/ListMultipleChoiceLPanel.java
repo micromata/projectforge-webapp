@@ -44,9 +44,9 @@ public class ListMultipleChoiceLPanel extends AbstractLPanel
 
   /**
    */
-  ListMultipleChoiceLPanel(final String id, final LayoutLength length, final ListMultipleChoice< ? > listMultipleChoice)
+  ListMultipleChoiceLPanel(final String id,  final ListMultipleChoice< ? > listMultipleChoice, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
     this.listMultipleChoice = listMultipleChoice;
     this.classAttributeAppender = "select";
     add(this.listMultipleChoice);
@@ -57,9 +57,9 @@ public class ListMultipleChoiceLPanel extends AbstractLPanel
    * @param id
    * @param length
    */
-  protected ListMultipleChoiceLPanel(final String id, final LayoutLength length)
+  protected ListMultipleChoiceLPanel(final String id, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
   }
 
   /**

@@ -43,39 +43,69 @@ public class LabelLPanel extends AbstractLPanel
 
   private Label label;
 
-  LabelLPanel(final String id, final LayoutLength length, final String label)
+  LabelLPanel(final String id, final PanelContext ctx)
   {
-    this(id, length, label, null, false);
+    this(id, new Label(LABEL_ID, ctx.getLabel()), ctx);
   }
 
-  LabelLPanel(final String id, final LayoutLength length, final String label, final boolean breakBefore)
+  LabelLPanel(final String id, final String label, final PanelContext ctx)
   {
-    this(id, length, label, null, breakBefore);
+    this(id, new Label(LABEL_ID, label), ctx);
   }
 
-  LabelLPanel(final String id, final LayoutLength length, final String label, final Component labelFor)
+  LabelLPanel(final String id, final Component labelFor, final PanelContext ctx)
   {
-    this(id, length, label, labelFor, false);
-  }
-
-  LabelLPanel(final String id, final LayoutLength length, final String label, final Component labelFor, final boolean breakBefore)
-  {
-    this(id, length, new Label(LABEL_ID, label));
+    this(id, new Label(LABEL_ID, ctx.getLabel()), ctx);
     if (labelFor != null) {
       setLabelFor(labelFor);
     }
-    if (breakBefore == true) {
-      setBreakBefore();
-    }
   }
 
-  LabelLPanel(final String id, final LayoutLength length, final Label label)
+  LabelLPanel(final String id, final Label label, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
     this.label = label;
     add(label);
   }
 
+  @Override
+  protected String getValueLength()
+  {
+    if (ctx.getLabelLength() != null) {
+      return ctx.getLabelLength().getClassAttrValue();
+    } else if (ctx.getValueLength() != null) {
+      // If this label is added as own element (not as label of another component).
+      return ctx.getValueLength().getClassAttrValue();
+    }
+    return null;
+  }
+  
+  @Override
+  protected String getStrong()
+  {
+    if (ctx.isStrongLabel() == true) {
+      return LayoutConstants.CLASS_STRONG;
+    } else {
+      return null;
+    }
+  }
+  
+  @Override
+  protected String getBreakBefore()
+  {
+    if (ctx.isBreakBeforeLabel() == true) {
+      return LayoutConstants.CLASS_BREAK_BEFORE;
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  protected String getCssStyle()
+  {
+    return null;
+  }
+  
   @Override
   protected Component getClassModifierComponent()
   {

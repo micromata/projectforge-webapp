@@ -30,4 +30,6 @@ package org.projectforge.web.wicket.layout;
 public class LayoutConstants
 {
   public static final String CLASS_BREAK_BEFORE = "clear";
+
+  public static final String CLASS_STRONG = "strong";
 }

@@ -103,9 +103,8 @@ public class BookFormRenderer extends AbstractDOFormRenderer
   @Override
   public void add()
   {
-    final IField titleField = (IField) doPanel.addTextField(new PanelContext(data, "title", VALUE_LENGTH, getString("book.title"),
-        LABEL_LENGTH).setStrong().setRequired());
-    titleField.setFocus();
+    doPanel.addTextField(new PanelContext(data, "title", VALUE_LENGTH, getString("book.title"), LABEL_LENGTH).setStrong().setRequired()
+        .setFocus());
     IField field;
     field = doPanel.addTextField(new PanelContext(data, "authors", VALUE_LENGTH, getString("book.authors"), LABEL_LENGTH));
     if (field instanceof TextFieldLPanel) {
@@ -120,7 +119,7 @@ public class BookFormRenderer extends AbstractDOFormRenderer
       doPanel.addDropDownChoice(bookTypeChoice, new PanelContext(data, "type", THREEQUART, getString("book.type"), HALF));
     }
     final String yearLabel = getString("book.yearOfPublishing");
-    doPanel.addLabel(yearLabel, FULL, LayoutAlignment.RIGHT);
+    doPanel.addLabel(yearLabel, new PanelContext(FULL).setAlignment(LayoutAlignment.RIGHT).setBreakBeforeLabel(false));
     field = doPanel.addTextField(new PanelContext(data, "yearOfPublishing", QUART, yearLabel));
     if (field instanceof TextFieldLPanel) {
       yearOfPublishingField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
@@ -139,7 +138,7 @@ public class BookFormRenderer extends AbstractDOFormRenderer
       signatureField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
     }
     final String isbnLabel = getString("book.isbn");
-    doPanel.addLabel(isbnLabel, HALF, LayoutAlignment.RIGHT);
+    doPanel.addLabel(isbnLabel, new PanelContext(HALF).setAlignment(LayoutAlignment.RIGHT).setBreakBeforeLabel(false));
     doPanel.addTextField(new PanelContext(data, "isbn", THREEQUART, isbnLabel));
     doPanel.addTextField(new PanelContext(data, "keywords", VALUE_LENGTH, getString("book.keywords"), LABEL_LENGTH));
     field = doPanel.addTextField(new PanelContext(data, "publisher", VALUE_LENGTH, getString("book.publisher"), LABEL_LENGTH));
@@ -155,7 +154,7 @@ public class BookFormRenderer extends AbstractDOFormRenderer
     doPanel.addTextArea(new PanelContext(data, "comment", VALUE_LENGTH, getString("comment"), LABEL_LENGTH).setCssStyle("height: 10em;"));
 
     if (isNew() == false) {
-      doPanel.addLabel(getString("book.lending"), HALF).setBreakBefore();
+      doPanel.addLabel(getString("book.lending"), new PanelContext(HALF));
       final StringBuffer buf = new StringBuffer();
       if (data.getLendOutBy() != null) {
         // Show full user name:
@@ -166,7 +165,7 @@ public class BookFormRenderer extends AbstractDOFormRenderer
           buf.append(DateTimeFormatter.instance().getFormattedDate(data.getLendOutDate()));
         }
       }
-      final RepeatingView repeatingView = doPanel.addRepeater(LayoutLength.ONEHALF).getRepeatingView();
+      final RepeatingView repeatingView = doPanel.addRepeater(new PanelContext(LayoutLength.ONEHALF)).getRepeatingView();
       repeatingView.add(new PlainLabel(repeatingView.newChildId(), buf.toString()));
       @SuppressWarnings("serial")
       final Button lendOutButton = new Button("button", new Model<String>(getString("book.lendOut"))) {
@@ -194,7 +193,8 @@ public class BookFormRenderer extends AbstractDOFormRenderer
       if (data.getLendOutById() == null) {
         returnBookButtonPanel.setVisible(false);
       }
-      doPanel.addTextArea(new PanelContext(data, "lendOutComment", VALUE_LENGTH, getString("book.lendOutNote"), LABEL_LENGTH).setCssStyle("height: 10em;"));
+      doPanel.addTextArea(new PanelContext(data, "lendOutComment", VALUE_LENGTH, getString("book.lendOutNote"), LABEL_LENGTH)
+          .setCssStyle("height: 10em;"));
     }
   }
 }

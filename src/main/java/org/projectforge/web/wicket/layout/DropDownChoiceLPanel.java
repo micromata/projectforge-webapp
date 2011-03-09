@@ -46,9 +46,9 @@ public class DropDownChoiceLPanel extends AbstractLPanel
   /**
    * @see AbstractDOFormRenderer#createDropDownChoicePanel(String, LayoutLength, DropDownChoice)
    */
-  DropDownChoiceLPanel(final String id, final LayoutLength length, final DropDownChoice< ? > dropDownChoice)
+  DropDownChoiceLPanel(final String id, final DropDownChoice< ? > dropDownChoice, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
     this.dropDownChoice = dropDownChoice;
     this.classAttributeAppender = "select";
     replaceWithDropDownChoice(dropDownChoice);
@@ -59,9 +59,9 @@ public class DropDownChoiceLPanel extends AbstractLPanel
    * @param id
    * @param length
    */
-  protected DropDownChoiceLPanel(final String id, final LayoutLength length)
+  protected DropDownChoiceLPanel(final String id, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
   }
 
   public DropDownChoiceLPanel replaceWithDropDownChoice(final DropDownChoice< ? > newDropDownChoice)

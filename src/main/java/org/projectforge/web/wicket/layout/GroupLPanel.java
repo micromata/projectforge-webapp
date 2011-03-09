@@ -39,7 +39,7 @@ import org.apache.wicket.model.Model;
 public class GroupLPanel extends Panel
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GroupLPanel.class);
-
+  
   private static final long serialVersionUID = -8760386387270114082L;
 
   /**
@@ -68,21 +68,21 @@ public class GroupLPanel extends Panel
 
   public TextFieldLPanel addTextField(final PanelContext ctx)
   {
-    final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), ctx.getValueLength(), ctx.getData(), ctx.getProperty());
+    final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), ctx);
     addTextField(textFieldPanel, ctx);
     return textFieldPanel;
   }
 
   public TextFieldLPanel addTextField(final TextField< ? > textField, final PanelContext ctx)
   {
-    final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), ctx.getValueLength(), textField);
+    final TextFieldLPanel textFieldPanel = new TextFieldLPanel(newChildId(), textField, ctx);
     addTextField(textFieldPanel, ctx);
     return textFieldPanel;
   }
 
   public TextFieldLPanel addPasswordTextField(final PasswordTextField textField, final PanelContext ctx)
   {
-    final TextFieldLPanel textFieldPanel = new PasswordTextFieldLPanel(newChildId(), ctx.getValueLength(), textField);
+    final TextFieldLPanel textFieldPanel = new PasswordTextFieldLPanel(newChildId(), textField, ctx);
     addTextField(textFieldPanel, ctx);
     return textFieldPanel;
   }
@@ -90,106 +90,29 @@ public class GroupLPanel extends Panel
   private void addTextField(final TextFieldLPanel textFieldPanel, final PanelContext ctx)
   {
     ctx.internalSetValueField(textFieldPanel);
-    if (ctx.getLabel() != null) {
-      textFieldPanel.getTextField().setLabel(new Model<String>(ctx.getLabel()));
-    }
-    if (ctx.getTooltip() != null) {
-      textFieldPanel.setTooltip(ctx.getTooltip());
-    }
-    if (ctx.isRequired() == true) {
-      textFieldPanel.setRequired();
-    }
-    if (ctx.isStrong() == true) {
-      textFieldPanel.setStrong();
-    }
-    if (ctx.isReadonly() == true) {
-      log.error("Field read-only isn't yet supported by this method. If needed, please implement this.");
-    }
     if (ctx.getLabelLength() != null) {
-      final LabelLPanel labelPanel = new LabelLPanel(newChildId(), ctx.getLabelLength(), ctx.getLabel()).setLabelFor(textFieldPanel
+      final LabelLPanel labelPanel = new LabelLPanel(newChildId(), ctx).setLabelFor(textFieldPanel
           .getTextField());
       ctx.internalSetLabelPanel(labelPanel);
-      if (ctx.isBreakBefore() == true) {
-        labelPanel.setBreakBefore();
-      }
-      if (ctx.getTooltip() != null) {
-        labelPanel.setTooltip(ctx.getTooltip());
-      }
       add(labelPanel);
     }
-    if (ctx.isBreakBetweenLabelAndField() == true) {
-      textFieldPanel.setBreakBefore();
+    if (ctx.getLabel() != null) {
+      textFieldPanel.getTextField().setLabel(new Model<String>(ctx.getLabel()));
+    } else {
+      log.warn("No label given for text field component.");
     }
     add(textFieldPanel);
   }
 
-  @SuppressWarnings("serial")
-  public TextAreaLPanel addTextArea(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
-      final LayoutLength valueLength)
-  {
-    final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), valueLength, dataObject, property);
-    add(new LabelLPanel(newChildId(), labelLength, label).setLabelFor(textAreaPanel.getTextArea()).setBreakBefore());
-    textAreaPanel.getTextArea().setLabel(new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return label;
-      }
-    });
-    add(textAreaPanel);
-    return textAreaPanel;
-  }
-
-  @SuppressWarnings("serial")
-  public TextAreaLPanel addTextArea(final Object dataObject, final String property, final String label, final LayoutLength labelLength,
-      final LayoutLength valueLength, final boolean newLineBetweenLabelAndTextarea)
-  {
-    final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), valueLength, dataObject, property);
-    add(new LabelLPanel(newChildId(), labelLength, label).setLabelFor(textAreaPanel.getTextArea()).setBreakBefore());
-    if (newLineBetweenLabelAndTextarea == true) {
-      textAreaPanel.setBreakBefore();
-    }
-    textAreaPanel.getTextArea().setLabel(new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return label;
-      }
-    });
-    add(textAreaPanel);
-    return textAreaPanel;
-  }
-
-  public TextAreaLPanel addTextArea(final Object dataObject, final String property, final LayoutLength valueLength)
-  {
-    final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), valueLength, dataObject, property);
-    add(textAreaPanel);
-    return textAreaPanel;
-  }
-
   public TextAreaLPanel addTextArea(final PanelContext ctx)
   {
-    final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), ctx.getValueLength(), ctx.getData(), ctx.getProperty());
-    if (ctx.getLabelLength() != null) {
-      final LabelLPanel labelPanel = new LabelLPanel(newChildId(), ctx.getLabelLength(), ctx.getLabel()).setLabelFor(textAreaPanel.getTextArea());
-      labelPanel.setBreakBefore();
-      ctx.internalSetLabelPanel(labelPanel);
-      add(labelPanel);
-    }
-    if (ctx.getCssStyle() != null) {
-      textAreaPanel.setCssStyle(ctx.getCssStyle());
-    }
-    if (ctx.getLabel() != null) {
-      textAreaPanel.getTextArea().setLabel(new Model<String>(ctx.getLabel()));
-    }
-    if (ctx.isBreakBetweenLabelAndField() == true) {
-      textAreaPanel.setBreakBefore();
-    }
-    ctx.internalSetValueField(textAreaPanel);
+    final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), ctx);
+    add(new LabelLPanel(newChildId(), ctx).setLabelFor(textAreaPanel.getTextArea()));
+    textAreaPanel.getTextArea().setLabel(new Model<String>(ctx.getLabel()));
     add(textAreaPanel);
     return textAreaPanel;
   }
-
+ 
   public GroupLPanel add(final AbstractLPanel layoutPanel)
   {
     hasChildren = true;

@@ -24,7 +24,6 @@
 package org.projectforge.web.mobile;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
@@ -33,7 +32,7 @@ import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.PresizedImage;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.layout.IField;
-import org.projectforge.web.wicket.layout.LayoutAlignment;
+import org.projectforge.web.wicket.layout.PanelContext;
 
 /**
  * A link panel which instantiates a phone call on an iPhone as well as an sms or an e-mail.
@@ -46,7 +45,7 @@ public class ActionLinkPanel extends Panel implements IField
 
   private AbstractLink link1, link2;
 
-  public ActionLinkPanel(final String id, final ActionLinkType actionLinkType, final String value)
+  public ActionLinkPanel(final String id, final ActionLinkType actionLinkType, final String value, final PanelContext ctx)
   {
     super(id);
     if (actionLinkType == ActionLinkType.CALL) {
@@ -71,54 +70,14 @@ public class ActionLinkPanel extends Panel implements IField
       add(link1 = new ExternalLink("link", url, value));
       add(getInvisibleSmsLink());
     }
-  }
-  
-  /**
-   * Does nothing (not yet implemented).
-   * @see org.projectforge.web.wicket.layout.IField#setAlignment(org.projectforge.web.wicket.layout.LayoutAlignment)
-   */
-  @Override
-  public IField setAlignment(LayoutAlignment aligment)
-  {
-    return this;
-  }
-
-  @Override
-  public ActionLinkPanel setStrong()
-  {
-    add(new SimpleAttributeModifier("class", "strong"));
-    return this;
-  }
-  
-  @Override
-  public IField setCssStyle(final String cssStyle)
-  {
-    add(new SimpleAttributeModifier("style", cssStyle));
-    return this;
-  }
-
-  @Override
-  public ActionLinkPanel setFocus()
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public ActionLinkPanel setRequired()
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public ActionLinkPanel setTooltip(String text)
-  {
-    if (link1 != null) {
-      WicketUtils.addTooltip(link1, text);
+    if (ctx.getTooltip() != null) {
+      if (link1 != null) {
+        WicketUtils.addTooltip(link1, ctx.getTooltip());
+      }
+      if (link2 != null) {
+        WicketUtils.addTooltip(link2, ctx.getTooltip());
+      }
     }
-    if (link2 != null) {
-      WicketUtils.addTooltip(link2, text);
-    }
-    return this;
   }
 
   private ExternalLink getCallLink(final String number)

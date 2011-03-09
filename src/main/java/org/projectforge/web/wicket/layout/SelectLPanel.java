@@ -25,6 +25,7 @@ package org.projectforge.web.wicket.layout;
 
 import org.apache.wicket.Component;
 import org.projectforge.web.wicket.AbstractSelectPanel;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 
 /**
@@ -39,31 +40,30 @@ public class SelectLPanel extends AbstractLPanel
    */
   public static final String WICKET_ID_SELECT_PANEL = "selectPanel";
 
-  private AbstractSelectPanel<?> selectPanel;
+  private AbstractSelectPanel< ? > selectPanel;
 
   /**
    * @see AbstractDOFormRenderer#createDateFieldPanel(String, LayoutLength, DatePanel)
    */
-  SelectLPanel(final String id, final LayoutLength length, final AbstractSelectPanel<?> selectPanel)
+  SelectLPanel(final String id, final AbstractSelectPanel< ? > selectPanel, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
     this.selectPanel = selectPanel;
     add(selectPanel);
+    if (ctx.isStrong() == true) {
+      this.classAttributeAppender = "strong";
+    }
   }
 
-  /**
-   * Only for select panels which supports 
-   * @see org.projectforge.web.wicket.layout.AbstractLPanel#setStrong()
-   */
-  public SelectLPanel setStrong()
-  {
-    this.classAttributeAppender = "strong";
-    return this;
-  }
-
-  public AbstractSelectPanel<?> getSelectPanel()
+  public AbstractSelectPanel< ? > getSelectPanel()
   {
     return selectPanel;
+  }
+  
+  public SelectLPanel setTooltip(final String tooltip)
+  {
+    WicketUtils.addTooltip(selectPanel, tooltip);
+    return this;
   }
 
   @Override
@@ -71,7 +71,7 @@ public class SelectLPanel extends AbstractLPanel
   {
     return selectPanel.getClassModifierComponent();
   }
-  
+
   @Override
   public Component getWrappedComponent()
   {

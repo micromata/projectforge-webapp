@@ -95,7 +95,7 @@ public class EmployeeSalaryFormRenderer extends AbstractDOFormRenderer
     }
     final MinMaxNumberField<Integer> yearField = new MinMaxNumberField<Integer>(TextFieldLPanel.INPUT_ID, new PropertyModel<Integer>(data,
         "year"), 1900, 2999);
-    doPanel.addTextField(getString("year"), yearField, QUART);
+    doPanel.addTextField(yearField, new PanelContext(QUART).setLabel(getString("year")));
     {
       // DropDownChoice salary type
       final LabelValueChoiceRenderer<EmployeeSalaryType> typeStatusChoiceRenderer = new LabelValueChoiceRenderer<EmployeeSalaryType>(

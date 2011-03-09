@@ -26,7 +26,7 @@ package org.projectforge.web.wicket.layout;
 import java.util.Date;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.commons.lang.Validate;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
@@ -154,66 +154,56 @@ public class DataObjectLPanel extends Panel
     closeFieldSetPanel();
   }
 
-  public LabelLPanel addLabel(final String label, final LayoutLength labelLength)
+  public LabelLPanel addLabel(final PanelContext ctx)
   {
-    return addLabel(label, labelLength, null);
+    return addLabel(ctx.getLabel(), ctx);
   }
 
-  public LabelLPanel addLabel(final String label, final LayoutLength labelLength, final LayoutAlignment alignment)
+  public LabelLPanel addLabel(final String label, final PanelContext ctx)
   {
     ensureGroupPanel();
     final LabelLPanel labelPanel;
-    labelPanel = new LabelLPanel(groupPanel.newChildId(), labelLength, label);
+    labelPanel = new LabelLPanel(groupPanel.newChildId(), label, ctx);
     groupPanel.add(labelPanel);
-    if (alignment != null) {
-      labelPanel.setAlignment(alignment);
-    }
     return labelPanel;
   }
 
-  public LabelLPanel addHelpLabel(final String label, final LayoutLength length)
+  public LabelLPanel addHelpLabel(final String label, final PanelContext ctx)
   {
     ensureGroupPanel();
     final LabelLPanel labelPanel;
-    labelPanel = new LabelLPanel(groupPanel.newChildId(), length, label);
+    labelPanel = new LabelLPanel(groupPanel.newChildId(), label, ctx);
     labelPanel.getClassModifierComponent().add(WebConstants.HELP_CLASS);
     groupPanel.add(labelPanel);
     return labelPanel;
   }
 
-  public RepeatingViewLPanel addRepeater(final LayoutLength length)
+  public RepeatingViewLPanel addRepeater(final PanelContext ctx)
   {
     ensureGroupPanel();
     final RepeatingViewLPanel repeatingViewPanel;
-    repeatingViewPanel = new RepeatingViewLPanel(groupPanel.newChildId(), length);
+    repeatingViewPanel = new RepeatingViewLPanel(groupPanel.newChildId(), ctx);
     groupPanel.add(repeatingViewPanel);
     return repeatingViewPanel;
   }
 
-  public IField addReadonlyTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
-      final LayoutLength valueLength)
+  /**
+   * @param ctx with data and property.
+   * @return
+   */
+  public IField addReadonlyTextField(final PanelContext ctx)
   {
-    return addReadonlyTextField(data, property, label, labelLength, valueLength, null, false);
-  }
-
-  public IField addReadonlyTextField(final Object data, final String property, final String label, final LayoutLength labelLength,
-      final LayoutLength valueLength, final FieldType fieldType, final boolean newLineBetweenLabelAndTextField)
-  {
+    Validate.notNull(ctx.getData());
+    Validate.notNull(ctx.getProperty());
     ensureGroupPanel();
-    final Object value = BeanHelper.getNestedProperty(data, property);
+    final Object value = BeanHelper.getNestedProperty(ctx.getData(), ctx.getProperty());
     if (isBlank(value) == true) {
       return new DummyField();
     }
-    return addReadonlyTextField(String.valueOf(value), label, labelLength, valueLength, fieldType, newLineBetweenLabelAndTextField);
+    return addReadonlyTextField(String.valueOf(value), ctx);
   }
 
-  public IField addReadonlyTextField(final String value, final String label, final LayoutLength labelLength, final LayoutLength valueLength)
-  {
-    return addReadonlyTextField(value, label, labelLength, valueLength, null, false);
-  }
-
-  public IField addReadonlyTextField(final String value, final String label, final LayoutLength labelLength,
-      final LayoutLength valueLength, final FieldType fieldType, final boolean newLineBetweenLabelAndTextField)
+  public IField addReadonlyTextField(final String value, final PanelContext ctx)
   {
     ensureGroupPanel();
     IField field;
@@ -222,24 +212,24 @@ public class DataObjectLPanel extends Panel
     } else {
       ensureLabelValueTablePanel();
       final String wicketId;
-      if (newLineBetweenLabelAndTextField == true) {
+      if (ctx.isBreakBetweenLabelAndField() == true) {
         newLabelValueTablePanel();
         wicketId = LabelValueTableLPanel.WICKET_ID_LABEL;
       } else {
         wicketId = LabelValueTableLPanel.WICKET_ID_VALUE;
       }
-      if (fieldType == FieldType.E_MAIL) {
-        field = new ActionLinkPanel(wicketId, ActionLinkType.MAIL, value);
-      } else if (fieldType == FieldType.PHONE_NO) {
-        field = new ActionLinkPanel(wicketId, ActionLinkType.CALL, value);
-      } else if (fieldType == FieldType.MOBILE_PHONE_NO) {
-        field = new ActionLinkPanel(wicketId, ActionLinkType.CALL_AND_SMS, value);
-      } else if (fieldType == FieldType.WEB_PAGE) {
-        field = new ActionLinkPanel(wicketId, ActionLinkType.EXTERNAL_URL, value);
+      if (ctx.getFieldType() == FieldType.E_MAIL) {
+        field = new ActionLinkPanel(wicketId, ActionLinkType.MAIL, value, ctx);
+      } else if (ctx.getFieldType() == FieldType.PHONE_NO) {
+        field = new ActionLinkPanel(wicketId, ActionLinkType.CALL, value, ctx);
+      } else if (ctx.getFieldType() == FieldType.MOBILE_PHONE_NO) {
+        field = new ActionLinkPanel(wicketId, ActionLinkType.CALL_AND_SMS, value, ctx);
+      } else if (ctx.getFieldType() == FieldType.WEB_PAGE) {
+        field = new ActionLinkPanel(wicketId, ActionLinkType.EXTERNAL_URL, value, ctx);
       } else {
-        field = new LabelLPanel(wicketId, labelLength, value);
+        field = new LabelLPanel(wicketId, value, ctx);
       }
-      labelValueTablePanel.add(label, (WebMarkupContainer) field, newLineBetweenLabelAndTextField);
+      labelValueTablePanel.add(ctx.getLabel(), (WebMarkupContainer) field, ctx.isBreakBetweenLabelAndField());
     }
     return field;
   }
@@ -270,7 +260,7 @@ public class DataObjectLPanel extends Panel
         displayValue = HtmlHelper.formatText(String.valueOf(value), true);
       }
       ensureLabelValueTablePanel();
-      final LabelLPanel labelPanel = new LabelLPanel(wicketId, ctx.getValueLength(), displayValue);
+      final LabelLPanel labelPanel = new LabelLPanel(wicketId, displayValue, ctx);
       labelPanel.getWrappedComponent().setEscapeModelStrings(false);
       field = labelValueTablePanel.add(ctx.getLabel(), labelPanel, ctx.isBreakBetweenLabelAndField());
     } else {
@@ -301,12 +291,12 @@ public class DataObjectLPanel extends Panel
       } else {
         displayValue = String.valueOf(value);
       }
-      labelPanel = new LabelLPanel(LabelValueTableLPanel.WICKET_ID_VALUE, ctx.getLabelLength(), displayValue);
+      labelPanel = new LabelLPanel(LabelValueTableLPanel.WICKET_ID_VALUE, displayValue, ctx);
       field = labelValueTablePanel.add(ctx.getLabel(), (WebMarkupContainer) labelPanel);
     } else {
-      field = new DropDownChoiceLPanel(groupPanel.newChildId(), ctx.getValueLength(), dropDownChoice);
+      field = new DropDownChoiceLPanel(groupPanel.newChildId(), dropDownChoice, ctx);
       if (ctx.getLabelLength() != null) {
-        labelPanel = new LabelLPanel(groupPanel.newChildId(), ctx.getLabelLength(), ctx.getLabel(), (AbstractLPanel) field, true);
+        labelPanel = new LabelLPanel(groupPanel.newChildId(), (AbstractLPanel) field, ctx);
         groupPanel.add(labelPanel);
       }
       if (ctx.getLabel() != null && ((DropDownChoiceLPanel) field).getDropDownChoice() != null) {
@@ -324,19 +314,10 @@ public class DataObjectLPanel extends Panel
     ensureGroupPanel();
     IField field;
     LabelLPanel labelPanel = null;
-    field = new ListMultipleChoiceLPanel(groupPanel.newChildId(), ctx.getValueLength(), listMultipleChoice);
+    field = new ListMultipleChoiceLPanel(groupPanel.newChildId(), listMultipleChoice, ctx);
     if (ctx.getLabelLength() != null) {
-      labelPanel = new LabelLPanel(groupPanel.newChildId(), ctx.getLabelLength(), ctx.getLabel(), (AbstractLPanel) field, true);
+      labelPanel = new LabelLPanel(groupPanel.newChildId(), (AbstractLPanel) field, ctx);
       groupPanel.add(labelPanel);
-    }
-    if (ctx.getLabel() != null) {
-      listMultipleChoice.setLabel(new Model<String>(ctx.getLabel()));
-    }
-    if (ctx.isBreakBetweenLabelAndField() == true) {
-      ((ListMultipleChoiceLPanel) field).setBreakBefore();
-    }
-    if (ctx.getCssStyle() != null) {
-      listMultipleChoice.add(new SimpleAttributeModifier("style", ctx.getCssStyle()));
     }
     groupPanel.add(field);
     ctx.internalSetValueField(field);
@@ -344,12 +325,19 @@ public class DataObjectLPanel extends Panel
     return field;
   }
 
-  public IField addDateFieldPanel(final Object data, final String property, final String label, final LayoutLength labelLength,
-      final DatePrecision precision, final LayoutLength valueLength)
+  /**
+   * @param data
+   * @param property
+   * @param precision
+   * @param ctx with data and property.
+   */
+  public IField addDateFieldPanel(final DatePrecision precision, final PanelContext ctx)
   {
+    Validate.notNull(ctx.getData());
+    Validate.notNull(ctx.getProperty());
     ensureGroupPanel();
     IField field;
-    final Object value = BeanHelper.getNestedProperty(data, property);
+    final Object value = BeanHelper.getNestedProperty(ctx.getData(), ctx.getProperty());
     if (isBlank(value) == true) {
       field = new DummyField();
     } else {
@@ -360,24 +348,23 @@ public class DataObjectLPanel extends Panel
       } else {
         displayValue = DateTimeFormatter.instance().getFormattedDateTime((Date) value);
       }
-      field = new LabelLPanel(LabelValueTableLPanel.WICKET_ID_VALUE, labelLength, displayValue);
-      labelValueTablePanel.add(label, (WebMarkupContainer) field);
+      field = new LabelLPanel(LabelValueTableLPanel.WICKET_ID_VALUE, displayValue, ctx);
+      labelValueTablePanel.add(ctx.getLabel(), (WebMarkupContainer) field);
     }
     return field;
   }
 
   @SuppressWarnings("serial")
-  public IField addDateFieldPanel(final Object data, final String property, final String label, final LayoutLength labelLength,
-      final DatePanel datePanel, final LayoutLength valueLength)
+  public IField addDateFieldPanel(final DatePanel datePanel, final PanelContext ctx)
   {
     ensureGroupPanel();
-    final IField field = new DateFieldLPanel(groupPanel.newChildId(), valueLength, datePanel);
-    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
+    final IField field = new DateFieldLPanel(groupPanel.newChildId(), datePanel, ctx);
+    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), (AbstractLPanel) field, ctx));
     ((DateFieldLPanel) field).getDatePanel().setLabel(new Model<String>() {
       @Override
       public String getObject()
       {
-        return label;
+        return ctx.getLabel();
       }
     });
     groupPanel.add(field);
@@ -385,53 +372,48 @@ public class DataObjectLPanel extends Panel
   }
 
   @SuppressWarnings("serial")
-  public IField addDateTimePanel(final Object data, final String property, final String label, final LayoutLength labelLength,
-      final DateTimePanel dateTimePanel, final LayoutLength valueLength)
+  public IField addDateTimePanel(final Object data, final String property, final DateTimePanel dateTimePanel, final PanelContext ctx)
   {
     ensureGroupPanel();
-    final IField field = new DateTimeFieldLPanel(groupPanel.newChildId(), valueLength, dateTimePanel);
-    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), labelLength, label, (AbstractLPanel) field, true));
+    final IField field = new DateTimeFieldLPanel(groupPanel.newChildId(), dateTimePanel, ctx);
+    groupPanel.add(new LabelLPanel(groupPanel.newChildId(), (AbstractLPanel) field, ctx));
     ((DateTimeFieldLPanel) field).getDatePanel().setLabel(new Model<String>() {
       @Override
       public String getObject()
       {
-        return label;
+        return ctx.getLabel();
       }
     });
     groupPanel.add(field);
     return field;
   }
 
-  @SuppressWarnings("serial")
   public IField addSelectPanel(final AbstractSelectPanel< ? > selectPanel, final PanelContext ctx)
   {
     ensureGroupPanel();
     final SelectLPanel field = new SelectLPanel(groupPanel.newChildId(), selectPanel, ctx);
     if (ctx.getLabelLength() != null) {
-      final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), ctx.getLabelLength(), ctx.getLabel(), (AbstractLPanel) field, true);
-      field.getSelectPanel().setLabel(new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          return ctx.getLabel();
-        }
-      });
+      final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), (AbstractLPanel) field, ctx);
+      field.getSelectPanel().setLabel(new Model<String>(ctx.getLabel()));
       groupPanel.add(labelPanel);
       labelPanel.setLabelFor(field.getWrappedComponent());
       ctx.internalSetLabelPanel(labelPanel);
     }
     groupPanel.add(field);
     ctx.internalSetValueField(field);
+    if (ctx.getTooltip() != null) {
+      field.setTooltip(ctx.getTooltip());
+    }
     return field;
   }
 
   public ContainerLPanel addContainer(final WebMarkupContainer container, final PanelContext ctx)
   {
     ensureGroupPanel();
-    final ContainerLPanel containerPanel = new ContainerLPanel(groupPanel.newChildId(), ctx.getValueLength(), container);
+    final ContainerLPanel containerPanel = new ContainerLPanel(groupPanel.newChildId(), container, ctx);
     ctx.internalSetValueField(containerPanel);
     if (ctx.getLabelLength() != null) {
-      final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), ctx.getLabelLength(), ctx.getLabel(), container, true);
+      final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), container, ctx);
       groupPanel.add(labelPanel);
     }
     if (container instanceof FormComponent< ? > && ctx.getLabel() != null) {
@@ -451,8 +433,7 @@ public class DataObjectLPanel extends Panel
     ensureGroupPanel();
     IField field;
     if (layoutContext.isMobileReadonly() == true) {
-      field = addReadonlyTextField(ctx.getData(), ctx.getProperty(), ctx.getLabel(), ctx.getLabelLength(), ctx.getValueLength(), ctx
-          .getFieldType(), ctx.isBreakBetweenLabelAndField());
+      field = addReadonlyTextField(ctx);
     } else {
       field = groupPanel.addTextField(ctx);
     }
@@ -481,58 +462,21 @@ public class DataObjectLPanel extends Panel
     groupPanel.addPasswordTextField(textField, ctx);
   }
 
-  /**
-   * @param textField
-   * @param valueLength
-   * @return
-   */
-  public IField addTextField(final TextField< ? > textField, final LayoutLength valueLength)
+  public IField addJiraIssuesPanel(final String text, final PanelContext ctx)
   {
-    ensureGroupPanel();
-    final IField field = new TextFieldLPanel(groupPanel.newChildId(), valueLength, textField);
-    groupPanel.add(field);
-    return field;
-  }
-
-  /**
-   * @param label Only used for setLabel (needed by validation messages).
-   * @param textField
-   * @param valueLength
-   * @return
-   */
-  public IField addTextField(final String label, final TextField< ? > textField, final LayoutLength valueLength)
-  {
-    final IField field = addTextField(textField, valueLength);
-    textField.setLabel(new Model<String>(label));
-    return field;
-  }
-
-  public IField addJiraIssuesPanel(final LayoutLength length, final String text)
-  {
-    final IField field = new JiraIssuesLPanel(groupPanel.newChildId(), length, text);
+    final IField field = new JiraIssuesLPanel(groupPanel.newChildId(), text, ctx);
     groupPanel.add(field);
     return field;
   }
 
   /**
    * property must be of type boolean.
-   * @param data
-   * @param property
-   * @return
-   */
-  public IField addCheckBox(final Object data, final String property)
-  {
-    return addCheckBox(new PanelContext(data, property));
-  }
-
-  /**
-   * property must be of type boolean.
-   * @param data
-   * @param property
-   * @return
+   * @param ctx data and property should be given.
    */
   public IField addCheckBox(final PanelContext ctx)
   {
+    Validate.notNull(ctx.getData());
+    Validate.notNull(ctx.getProperty());
     ensureGroupPanel();
     IField field;
     if (layoutContext.isReadonly() == true) {
@@ -543,11 +487,10 @@ public class DataObjectLPanel extends Panel
         field = new ImageLPanel(groupPanel.newChildId(), ImageDef.DENY);
       }
     } else {
-      field = new CheckBoxLPanel(groupPanel.newChildId(), ctx.getData(), ctx.getProperty());
+      field = new CheckBoxLPanel(groupPanel.newChildId(), ctx);
     }
     if (ctx.getLabelLength() != null) {
-      final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), ctx.getLabelLength(), ctx.getLabel(), (AbstractLPanel) field,
-          ctx.isBreakBefore());
+      final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), (AbstractLPanel) field, ctx);
       ctx.internalSetLabelPanel(labelPanel);
       groupPanel.add(labelPanel);
       ((CheckBoxLPanel) field).getCheckBox().setLabel(new Model<String>(ctx.getLabel()));

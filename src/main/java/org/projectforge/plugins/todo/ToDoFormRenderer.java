@@ -104,13 +104,13 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
   {
     doPanel.newFieldSetPanel(getString("plugins.todo.todo"));
     if (isNew() == true) {
-      doPanel.addLabel(getString("templates"), HALF);
-      final RepeatingViewLPanel templatesPanel = doPanel.addRepeater(VALUE_LENGTH);
-      final RepeatingView repeatingView = templatesPanel.getRepeatingView();
       // DropDownChoice favorites
       final String[] templateNames = userPrefDao.getPrefNames(ToDoPlugin.USER_PREF_AREA);
       if (templateNames != null && templateNames.length > 0) {
         // DropDownChoice templates
+        doPanel.addLabel(getString("templates"), new PanelContext(HALF));
+        final RepeatingViewLPanel templatesPanel = doPanel.addRepeater(new PanelContext(VALUE_LENGTH));
+        final RepeatingView repeatingView = templatesPanel.getRepeatingView();
         final String label = getString("user.pref.template.select");
         final LabelValueChoiceRenderer<String> templateNamesChoiceRenderer = new LabelValueChoiceRenderer<String>();
         templateNamesChoiceRenderer.addValue("", label);
@@ -210,7 +210,7 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
       // Due date
       dueDatePanel = new DatePanel(DateFieldLPanel.DATE_FIELD_ID, new PropertyModel<Date>(data, "dueDate"), DatePanelSettings.get()
           .withCallerPage(toDoEditPage).withTargetType(java.sql.Date.class).withSelectProperty("dueDate"));
-      doPanel.addDateFieldPanel(data, "dueDate", getString("dueDate"), HALF, dueDatePanel, FULL);
+      doPanel.addDateFieldPanel(dueDatePanel, new PanelContext(data, "dueDate", FULL, getString("dueDate"), HALF));
     }
     {
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<TaskDO>(data, "task"),
@@ -229,8 +229,8 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
         .setCssStyle("height: 10em;"));
     doPanel.addTextArea(new PanelContext(data, "comment", VALUE_LENGTH, getString("comment"), LABEL_LENGTH).setCssStyle("height: 10em;"));
     if (ConfigXml.getInstance().isSendMailConfigured() == true) {
-      doPanel.addLabel("", LABEL_LENGTH).setBreakBefore();
-      final RepeatingView repeatingView = doPanel.addRepeater(VALUE_LENGTH).getRepeatingView();
+      doPanel.addLabel("", new PanelContext(LABEL_LENGTH).setBreakBefore(true));
+      final RepeatingView repeatingView = doPanel.addRepeater(new PanelContext(VALUE_LENGTH)).getRepeatingView();
       final CheckBoxLabelPanel checkBoxLabelPanel = new CheckBoxLabelPanel(repeatingView.newChildId(), new PropertyModel<Boolean>(this,
           "sendNotification"), getString("label.sendEMailNotification"));
       repeatingView.add(checkBoxLabelPanel);
@@ -239,8 +239,8 @@ public class ToDoFormRenderer extends AbstractDOFormRenderer
 
     {
       // Save as template checkbox:
-      doPanel.addLabel("", LABEL_LENGTH).setBreakBefore();
-      final RepeatingView repeatingView = doPanel.addRepeater(VALUE_LENGTH).getRepeatingView();
+      doPanel.addLabel("", new PanelContext(LABEL_LENGTH).setBreakBefore(true));
+      final RepeatingView repeatingView = doPanel.addRepeater(new PanelContext(VALUE_LENGTH)).getRepeatingView();
       final CheckBoxLabelPanel checkBoxLabelPanel = new CheckBoxLabelPanel(repeatingView.newChildId(), new PropertyModel<Boolean>(this,
           "saveAsTemplate"), getString("user.pref.saveAsTemplate"));
       repeatingView.add(checkBoxLabelPanel);

@@ -43,9 +43,9 @@ public class ContainerLPanel extends AbstractLPanel
   /**
    * @see AbstractDOFormRenderer#createDateFieldPanel(String, LayoutLength, DatePanel)
    */
-  ContainerLPanel(final String id, final LayoutLength length, final WebMarkupContainer container)
+  ContainerLPanel(final String id, final WebMarkupContainer container, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
     add(labelTag = new WebMarkupContainer("label"));
     labelTag.add(this.container = container);
   }

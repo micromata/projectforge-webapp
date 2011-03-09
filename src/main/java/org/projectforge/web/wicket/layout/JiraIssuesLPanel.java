@@ -43,29 +43,13 @@ public class JiraIssuesLPanel extends AbstractLPanel implements IField
 
   protected JiraIssuesPanel jiraIssuesPanel;
 
-  JiraIssuesLPanel(final String id, final LayoutLength length, final String text)
+  JiraIssuesLPanel(final String id, final String text, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
     final WebMarkupContainer container = new WebMarkupContainer(WICKET_ID);
     add(container);
     this.jiraIssuesPanel = new JiraIssuesPanel("jiraIssuesPanel", text);
     container.add(jiraIssuesPanel);
-  }
-
-  public JiraIssuesLPanel setStrong()
-  {
-    this.classAttributeAppender = "text strong";
-    return this;
-  }
-
-  public JiraIssuesLPanel setRequired()
-  {
-    return this;
-  }
-
-  public JiraIssuesLPanel setFocus()
-  {
-    return this;
   }
 
   @Override

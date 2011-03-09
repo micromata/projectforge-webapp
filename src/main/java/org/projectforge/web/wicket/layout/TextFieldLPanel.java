@@ -25,6 +25,7 @@ package org.projectforge.web.wicket.layout;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
@@ -36,6 +37,8 @@ import org.projectforge.web.wicket.components.MaxLengthTextField;
  */
 public class TextFieldLPanel extends AbstractLPanel implements IField
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TextFieldLPanel.class);
+
   private static final long serialVersionUID = 5771712946605166500L;
 
   /**
@@ -46,46 +49,52 @@ public class TextFieldLPanel extends AbstractLPanel implements IField
   protected TextField< ? > textField;
 
   /**
+   * @param ctx with data and property
    * @see AbstractDOFormRenderer#createTextFieldPanel(String, LayoutLength, Object, String)
    */
-  TextFieldLPanel(final String id, final LayoutLength length, final Object dataObject, final String property)
+  TextFieldLPanel(final String id, final PanelContext ctx)
   {
-    this(id, length, new MaxLengthTextField(INPUT_ID, new PropertyModel<String>(dataObject, property)));
+    this(id, new MaxLengthTextField(INPUT_ID, ctx.getLabel(), new PropertyModel<String>(ctx.getData(), ctx.getProperty())), ctx);
   }
 
   /**
    * @see AbstractDOFormRenderer#createTextFieldPanel(String, LayoutLength, TextField)
    */
-  TextFieldLPanel(final String id, final LayoutLength length, final TextField< ? > textField)
+  TextFieldLPanel(final String id, final TextField< ? > textField, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
     this.textField = textField;
     this.classAttributeAppender = "text";
     add(textField);
+    if (ctx.getLabel() != null) {
+      textField.setLabel(new Model<String>(ctx.getLabel()));
+    }
+    if (ctx.isRequired() == true) {
+      textField.setRequired(true);
+    }
+    if (ctx.isFocus() == true) {
+      textField.add(new FocusOnLoadBehavior());
+    }
+    if (ctx.isReadonly() == true) {
+      log.error("Field read-only isn't yet supported by this method. If needed, please implement this.");
+    }
   }
 
-  /**
-   * Only used by TextFieldMobileLPanel.
-   * @param id
-   * @param length
-   */
-  protected TextFieldLPanel(final String id, final LayoutLength length)
-  {
-    super(id, length);
-  }
-
+  @Deprecated
   public TextFieldLPanel setStrong()
   {
     this.classAttributeAppender = "text strong";
     return this;
   }
 
+  @Deprecated
   public TextFieldLPanel setRequired()
   {
     textField.setRequired(true);
     return this;
   }
 
+  @Deprecated
   public TextFieldLPanel setFocus()
   {
     textField.add(new FocusOnLoadBehavior());

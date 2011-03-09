@@ -102,6 +102,8 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
 
   private final static LayoutLength LABEL_LENGTH = LayoutLength.HALF;
 
+  private final static LayoutLength LABEL_LENGTH2 = LayoutLength.THREEQUART;
+
   private final static LayoutLength VALUE_LENGTH = LayoutLength.ONEHALF;
 
   public TaskFormRenderer(final TaskEditPage taskEditPage, final MarkupContainer container, final LayoutContext layoutContext,
@@ -166,15 +168,15 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
       doPanel.addTextField(new PanelContext(data, "shortDescription", VALUE_LENGTH, getString("shortDescription") + jiraFootnoteMark,
           LABEL_LENGTH));
       if (jiraSupport == true && JiraUtils.hasJiraIssues(data.getShortDescription()) == true) {
-        doPanel.addLabel("", HALF).setBreakBefore();
-        doPanel.addJiraIssuesPanel(VALUE_LENGTH, data.getShortDescription());
+        doPanel.addLabel("", new PanelContext(HALF));
+        doPanel.addJiraIssuesPanel(data.getShortDescription(), new PanelContext(VALUE_LENGTH));
       }
       doPanel.addTextArea(
           new PanelContext(data, "description", DOUBLE, getString("description") + jiraFootnoteMark, LABEL_LENGTH)
-              .setBreakBetweenLabelAndField(true)).setCssStyle("height: 20em;");
+              .setBreakBetweenLabelAndField(true).setCssStyle("height: 20em;"));
       if (jiraSupport == true && JiraUtils.hasJiraIssues(data.getDescription()) == true) {
-        doPanel.addLabel("", HALF).setBreakBefore();
-        doPanel.addJiraIssuesPanel(DOUBLE, data.getDescription());
+        doPanel.addLabel("", new PanelContext(HALF));
+        doPanel.addJiraIssuesPanel(data.getDescription(), new PanelContext(DOUBLE).setBreakBeforeLabel(false));
       }
     }
     {
@@ -192,9 +194,9 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
       final MinMaxNumberField<Integer> maxNumberField = new MinMaxNumberField<Integer>(TextFieldLPanel.INPUT_ID,
           new PropertyModel<Integer>(data, "maxHours"), 0, 9999);
       final String maxHoursString = getString("task.maxHours");
-      final LabelLPanel label = doPanel.addLabel(maxHoursString, HALF);
-      label.setLabelFor(maxNumberField).setBreakBefore();
-      doPanel.addTextField(maxHoursString, maxNumberField, QUART);
+      final LabelLPanel label = doPanel.addLabel(maxHoursString, new PanelContext(HALF));
+      label.setLabelFor(maxNumberField);
+      doPanel.addTextField(maxNumberField, new PanelContext(QUART).setLabel(maxHoursString));
       if (isNew() == false && taskDao.getTaskTree().hasOrderPositions(data.getId(), true) == true) {
         WicketUtils.setWarningTooltip(maxNumberField);
         WicketUtils.addTooltip(maxNumberField, getString("task.edit.maxHoursIngoredDueToAssignedOrders"));
@@ -202,8 +204,8 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
     }
     if (jiraSupport == true) {
       // Add help text:
-      doPanel.addLabel("", HALF).setBreakBefore();
-      doPanel.addHelpLabel("*) " + getString("tooltip.jiraSupport.field"), VALUE_LENGTH);
+      doPanel.addLabel("", new PanelContext(HALF));
+      doPanel.addHelpLabel("*) " + getString("tooltip.jiraSupport.field"), new PanelContext(VALUE_LENGTH).setBreakBeforeLabel(false));
     }
 
     // New field set
@@ -217,7 +219,7 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
           "ganttObjectType"), objectTypeChoiceRenderer.getValues(), objectTypeChoiceRenderer);
       objectTypeChoice.setNullValid(true);
       doPanel.addDropDownChoice(objectTypeChoice, new PanelContext(data, "ganttObjectType", THREEQUART, getString("gantt.objectType"),
-          LABEL_LENGTH));
+          LABEL_LENGTH2));
     }
     {
       // Progress
@@ -230,27 +232,27 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
         }
       };
       final String progressString = WicketUtils.getLabelWithUnit(getString("task.progress"), "%");
-      final LabelLPanel label = doPanel.addLabel(progressString, HALF);
-      label.setLabelFor(progressField).setBreakBefore();
-      doPanel.addTextField(progressString, progressField, QUART);
+      final LabelLPanel label = doPanel.addLabel(progressString, new PanelContext(LABEL_LENGTH2));
+      label.setLabelFor(progressField);
+      doPanel.addTextField(progressField, new PanelContext(QUART).setLabel(progressString));
     }
     {
       // Gantt: start date
       startDatePanel = new DatePanel(DateFieldLPanel.DATE_FIELD_ID, new PropertyModel<Date>(data, "startDate"), DatePanelSettings.get()
           .withCallerPage(taskEditPage).withTargetType(java.sql.Date.class).withSelectProperty("startDate"));
-      doPanel.addDateFieldPanel(data, "startDate", getString("gantt.startDate"), HALF, startDatePanel, FULL);
+      doPanel.addDateFieldPanel(startDatePanel, new PanelContext(data, "startDate", FULL, getString("gantt.startDate"), LABEL_LENGTH2));
     }
     {
       // Gantt: duration
       durationField = new MinMaxNumberField<BigDecimal>(TextFieldLPanel.INPUT_ID, new PropertyModel<BigDecimal>(data, "duration"),
           BigDecimal.ZERO, TaskEditForm.MAX_DURATION_DAYS);
-      doPanel.addTextField(durationField, new PanelContext(QUART, getString("gantt.duration"), LABEL_LENGTH));
+      doPanel.addTextField(durationField, new PanelContext(QUART, getString("gantt.duration"), LABEL_LENGTH2));
     }
     {
       // Gantt: end date
       endDatePanel = new DatePanel(DateFieldLPanel.DATE_FIELD_ID, new PropertyModel<Date>(data, "endDate"), DatePanelSettings.get()
           .withCallerPage(taskEditPage).withTargetType(java.sql.Date.class).withSelectProperty("endDate"));
-      doPanel.addDateFieldPanel(data, "endDate", getString("gantt.endDate"), HALF, endDatePanel, FULL);
+      doPanel.addDateFieldPanel(endDatePanel, new PanelContext(data, "endDate", FULL, getString("gantt.endDate"), LABEL_LENGTH2));
     }
     {
       // Gantt relation type:
@@ -260,23 +262,23 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
           "ganttRelationType"), relationTypeChoiceRenderer.getValues(), relationTypeChoiceRenderer);
       relationTypeChoice.setNullValid(true);
       doPanel.addDropDownChoice(relationTypeChoice, new PanelContext(data, "ganttRelationType", THREEQUART,
-          getString("gantt.relationType"), LABEL_LENGTH));
+          getString("gantt.relationType"), LABEL_LENGTH2));
     }
     {
       // Gantt: predecessor offset
       final MinMaxNumberField<Integer> ganttPredecessorField = new MinMaxNumberField<Integer>(TextFieldLPanel.INPUT_ID,
           new PropertyModel<Integer>(data, "ganttPredecessorOffset"), Integer.MIN_VALUE, Integer.MAX_VALUE);
       final String ganttPredecessorString = WicketUtils.getLabelWithUnit(getString("gantt.predecessorOffset"), getString("days"));
-      final LabelLPanel label = doPanel.addLabel(ganttPredecessorString, HALF);
-      label.setLabelFor(ganttPredecessorField).setBreakBefore();
-      doPanel.addTextField(ganttPredecessorString, ganttPredecessorField, QUART);
+      final LabelLPanel label = doPanel.addLabel(ganttPredecessorString, new PanelContext(LABEL_LENGTH2));
+      label.setLabelFor(ganttPredecessorField);
+      doPanel.addTextField(ganttPredecessorField, new PanelContext(QUART).setLabel(ganttPredecessorString));
     }
     {
       // Gantt: predecessor
       final TaskSelectPanel ganttPredecessorSelectPanel = new TaskSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<TaskDO>(data,
           "ganttPredecessor"), taskEditPage, "ganttPredecessorId");
       ganttPredecessorSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
-      doPanel.addSelectPanel(ganttPredecessorSelectPanel, new PanelContext(VALUE_LENGTH, getString("gantt.predecessor"), LABEL_LENGTH));
+      doPanel.addSelectPanel(ganttPredecessorSelectPanel, new PanelContext(VALUE_LENGTH, getString("gantt.predecessor"), LABEL_LENGTH2));
       ganttPredecessorSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
       ganttPredecessorSelectPanel.setShowFavorites(true);
       ganttPredecessorSelectPanel.init();
@@ -287,13 +289,13 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
     final boolean hasKost2AndTimesheetBookingAccess = taskDao.hasAccessForKost2AndTimesheetBookingStatus(PFUserContext.getUser(), data);
     {
       final String kost2LabelString = getString("fibu.kost2");
-      final LabelLPanel label = doPanel.addLabel(kost2LabelString, HALF);
+      final LabelLPanel label = doPanel.addLabel(kost2LabelString, new PanelContext(LABEL_LENGTH2));
       final PropertyModel<String> model = new PropertyModel<String>(data, "kost2BlackWhiteList");
       kost2BlackWhiteTextField = new MaxLengthTextField(TextFieldOrLabelPanel.INPUT_FIELD_WICKET_ID, kost2LabelString, model);
-      final RepeatingView repeatingView = doPanel.addRepeater(VALUE_LENGTH).getRepeatingView();
+      final RepeatingView repeatingView = doPanel.addRepeater(new PanelContext(VALUE_LENGTH)).getRepeatingView();
       final TextFieldOrLabelPanel<String> field = new TextFieldOrLabelPanel<String>(repeatingView.newChildId(), model,
           kost2BlackWhiteTextField, false);
-      label.setLabelFor(kost2BlackWhiteTextField).setBreakBefore();
+      label.setLabelFor(kost2BlackWhiteTextField);
       final ProjektDO projekt = taskDao.getTaskTree().getProjekt(data.getId());
       if (projekt != null) {
         final LabelPanel projektKostLabel = new LabelPanel(repeatingView.newChildId(), projekt.getKost() + ".*");
@@ -344,8 +346,8 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
       protectTimesheetsUntilPanel = new DatePanel(DateFieldLPanel.DATE_FIELD_ID, new PropertyModel<Date>(data, "protectTimesheetsUntil"),
           DatePanelSettings.get().withCallerPage(taskEditPage).withTargetType(java.sql.Date.class).withSelectProperty(
               "protectTimesheetsUntil"));
-      doPanel.addDateFieldPanel(data, "protectTimesheetsUntil", getString("task.protectTimesheetsUntil"), HALF,
-          protectTimesheetsUntilPanel, FULL);
+      doPanel.addDateFieldPanel(protectTimesheetsUntilPanel, new PanelContext(data, "protectTimesheetsUntil", FULL,
+          getString("task.protectTimesheetsUntil"), LABEL_LENGTH2));
       if (userGroupCache.isUserMemberOfFinanceGroup() == false) {
         protectTimesheetsUntilPanel.setEnabled(false);
       }
@@ -359,7 +361,7 @@ public class TaskFormRenderer extends AbstractDOFormRenderer
           timesheetBookingStatusChoiceRenderer);
       timesheetBookingStatusChoice.setNullValid(false);
       doPanel.addDropDownChoice(timesheetBookingStatusChoice, new PanelContext(data, "timesheetBookingStatus", THREEQUART,
-          getString("task.timesheetBooking"), LABEL_LENGTH));
+          getString("task.timesheetBooking"), LABEL_LENGTH2));
       if (hasKost2AndTimesheetBookingAccess == false) {
         timesheetBookingStatusChoice.setEnabled(false);
       }

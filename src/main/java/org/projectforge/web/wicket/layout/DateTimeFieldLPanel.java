@@ -46,26 +46,35 @@ public class DateTimeFieldLPanel extends AbstractLPanel
   /**
    * @see AbstractDOFormRenderer#createDateFieldPanel(String, LayoutLength, DatePanel)
    */
-  DateTimeFieldLPanel(final String id, final LayoutLength length, final DateTimePanel dateTimePanel)
+  DateTimeFieldLPanel(final String id,  final DateTimePanel dateTimePanel, final PanelContext ctx)
   {
-    super(id, length);
+    super(id, ctx);
     this.dateTimePanel = dateTimePanel;
     this.classAttributeAppender = "text";
     add(dateTimePanel);
+    if (ctx.isRequired() == true) {
+      dateTimePanel.setRequired(true);
+    }
+    if (ctx.isFocus() == true) {
+      dateTimePanel.setFocus();
+    }
   }
 
+  @Deprecated
   public DateTimeFieldLPanel setStrong()
   {
     this.classAttributeAppender = "text strong";
     return this;
   }
 
+  @Deprecated
   public DateTimeFieldLPanel setRequired()
   {
     dateTimePanel.setRequired(true);
     return this;
   }
 
+  @Deprecated
   public DateTimeFieldLPanel setFocus()
   {
     dateTimePanel.setFocus();

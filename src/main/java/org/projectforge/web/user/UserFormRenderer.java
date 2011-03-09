@@ -152,8 +152,8 @@ public class UserFormRenderer extends AbstractDOFormRenderer
         usernameField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
       }
     } else {
-      doPanel.addLabel(getString("username"), labelLength);
-      doPanel.addLabel(data.getUsername(), FULL);
+      doPanel.addLabel(getString("username"), new PanelContext(labelLength));
+      doPanel.addLabel(data.getUsername(), new PanelContext(FULL));
     }
     doPanel.addTextField(new PanelContext(data, "firstname", FULL, getString("firstName"), labelLength).setRequired().setStrong());
     doPanel.addTextField(new PanelContext(data, "lastname", FULL, getString("name"), labelLength).setRequired().setStrong());
@@ -288,12 +288,12 @@ public class UserFormRenderer extends AbstractDOFormRenderer
         getString("login.stayLoggedIn.invalidateAllStayLoggedInSessions"), labelLength)
         .setTooltip(getString("login.stayLoggedIn.invalidateAllStayLoggedInSessions.tooltip")));
 
-    doPanel.addLabel(getString("login.lastLogin"), labelLength).setBreakBefore();
-    doPanel.addLabel(DateTimeFormatter.instance().getFormattedDateTime(data.getLastLogin()), FULL);
+    doPanel.addLabel(getString("login.lastLogin"), new PanelContext(labelLength));
+    doPanel.addLabel(DateTimeFormatter.instance().getFormattedDateTime(data.getLastLogin()), new PanelContext(FULL).setBreakBeforeLabel(false));
 
     // Doesn't work:
-    // doPanel.addLabel(getString("login.loginFailures"), labelLength).setBreakBefore();
-    // doPanel.addLabel(NumberFormatter.format(data.getLoginFailures()), FULL);
+    // doPanel.addLabel(getString("login.loginFailures"), new PanelContext(labelLength));
+    // doPanel.addLabel(NumberFormatter.format(data.getLoginFailures()), new PanelContext(FULL).setBreakBeforeLabel(false));
 
     addAssignedGroups();
     if (adminAccess == true) {
@@ -400,8 +400,7 @@ public class UserFormRenderer extends AbstractDOFormRenderer
         .setBreakBetweenLabelAndField(true).setCssStyle("width: 95%; height:20em;"));
 
     if (adminAccess == true) {
-      final RepeatingViewLPanel repeatingViewPanel = doPanel.addRepeater(LayoutLength.ONEHALF);
-      repeatingViewPanel.setBreakBefore();
+      final RepeatingViewLPanel repeatingViewPanel = doPanel.addRepeater(new PanelContext(LayoutLength.ONEHALF).setBreakBefore(true));
       final RepeatingView repeatingView = repeatingViewPanel.getRepeatingView();
       final Button unassignButton = new Button("button", new Model<String>(getString("unassign"))) {
         @Override

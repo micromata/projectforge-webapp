@@ -39,6 +39,7 @@ import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.FavoritesChoicePanel;
 import org.projectforge.web.wicket.components.TooltipImage;
 
@@ -180,7 +181,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
   {
     setConvertedInput(getModelObject());
   }
-
+  
   /**
    * @param enableLinks true for showing click-able ancestor tasks, false for no links.
    */
