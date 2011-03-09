@@ -120,6 +120,8 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
       toDoDao.setAssignee(getData(), (Integer) selectedValue);
     } else if ("taskId".equals(property) == true) {
       toDoDao.setTask(getData(), (Integer) selectedValue);
+    } else if ("groupId".equals(property) == true) {
+      toDoDao.setGroup(getData(), (Integer) selectedValue);
     } else if ("dueDate".equals(property) == true) {
       final Date date = (Date) selectedValue;
       getData().setDueDate(date);
@@ -140,6 +142,8 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
       getData().setAssignee(null);
     } else if ("taskId".equals(property) == true) {
       getData().setTask(null);
+    } else if ("groupId".equals(property) == true) {
+      getData().setGroup(null);
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }

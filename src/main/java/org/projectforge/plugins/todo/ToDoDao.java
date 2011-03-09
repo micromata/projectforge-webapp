@@ -45,6 +45,8 @@ import org.projectforge.mail.SendMail;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
+import org.projectforge.user.GroupDO;
+import org.projectforge.user.GroupDao;
 import org.projectforge.user.I18nHelper;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
@@ -69,6 +71,8 @@ public class ToDoDao extends BaseDao<ToDoDO>
   private Table table = new Table(ToDoDO.class);
 
   private DataSource dataSource;
+
+  private GroupDao groupDao;
 
   private UserDao userDao;
 
@@ -145,7 +149,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
       }
     }
     queryFilter.addOrder(Order.desc("created"));
-    final List<ToDoDO> list =  getList(queryFilter);
+    final List<ToDoDO> list = getList(queryFilter);
     myFilter.setSearchString(searchString); // Restore search string.
     return list;
   }
@@ -212,7 +216,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
       obj.setRecent(true);
     }
   }
-  
+
   @Override
   protected void onChange(final ToDoDO obj, final ToDoDO dbObj)
   {
@@ -254,6 +258,12 @@ public class ToDoDao extends BaseDao<ToDoDO>
   {
     final TaskDO task = taskTree.getTaskById(taskId);
     todo.setTask(task);
+  }
+
+  public void setGroup(final ToDoDO todo, final Integer groupId)
+  {
+    final GroupDO group = groupDao.getOrLoad(groupId);
+    todo.setGroup(group);
   }
 
   /**
@@ -299,6 +309,11 @@ public class ToDoDao extends BaseDao<ToDoDO>
   public void setDataSource(final DataSource dataSource)
   {
     this.dataSource = dataSource;
+  }
+  
+  public void setGroupDao(final GroupDao groupDao)
+  {
+    this.groupDao = groupDao;
   }
 
   public void setUserDao(final UserDao userDao)
