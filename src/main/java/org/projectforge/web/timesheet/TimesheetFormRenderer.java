@@ -317,7 +317,6 @@ public class TimesheetFormRenderer extends AbstractDOFormRenderer
       stopHourOfDayDropDownChoice.setNullValid(false);
       stopHourOfDayDropDownChoice.setRequired(true);
       repeatingView.add(stopHourOfDayDropDownChoicePanel);
-      repeatingView.add(new LabelPanel(repeatingView.newChildId(), ":"));
       final DropDownChoicePanel<Integer> stopMinuteDropDownChoicePanel = new DropDownChoicePanel<Integer>(repeatingView.newChildId(),
           new PropertyModel<Integer>(this, "stopMinute"), DateTimePanel.getMinutesRenderer(DatePrecision.MINUTE_15).getValues(),
           DateTimePanel.getMinutesRenderer(DatePrecision.MINUTE_15));
