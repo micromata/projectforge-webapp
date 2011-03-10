@@ -32,6 +32,7 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.settings.IResourceSettings;
 import org.projectforge.admin.UpdateEntry;
+import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.plugins.todo.ToDoPlugin;
@@ -41,6 +42,8 @@ import org.projectforge.user.UserPrefArea;
 import org.projectforge.user.UserPrefAreaRegistry;
 import org.projectforge.user.UserRight;
 import org.projectforge.user.UserRights;
+import org.projectforge.user.UserXmlPreferencesBaseDOSingleValueConverter;
+import org.projectforge.user.UserXmlPreferencesDao;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
 import org.projectforge.web.MenuItemRegistry;
@@ -58,6 +61,8 @@ public abstract class AbstractPlugin
 
   protected DatabaseUpdateDao databaseUpdateDao;
 
+  private UserXmlPreferencesDao userXmlPreferencesDao;
+
   private IResourceSettings resourceSettings;
 
   private String resourceBundleName;
@@ -66,9 +71,14 @@ public abstract class AbstractPlugin
 
   private static Set<Class< ? >> initializedPlugins = new HashSet<Class< ? >>();
 
-  public void setDatabaseUpdateDao(DatabaseUpdateDao databaseUpdateDao)
+  public void setDatabaseUpdateDao(final DatabaseUpdateDao databaseUpdateDao)
   {
     this.databaseUpdateDao = databaseUpdateDao;
+  }
+
+  public void setUserXmlPreferencesDao(final UserXmlPreferencesDao userXmlPreferencesDao)
+  {
+    this.userXmlPreferencesDao = userXmlPreferencesDao;
   }
 
   public void setResourceSettings(final IResourceSettings resourceSettings)
@@ -262,7 +272,7 @@ public abstract class AbstractPlugin
 
   /**
    * Registers a new user preferences areas (shown in the list of 'own settings' of each user).
-   * @param areaId 
+   * @param areaId
    * @param cls
    * @param i18nSuffix
    * @return Created and registered UserPrefArea.
@@ -273,6 +283,42 @@ public abstract class AbstractPlugin
     final UserPrefArea userPrefArea = new UserPrefArea(areaId, cls, i18nSuffix);
     UserPrefAreaRegistry.instance().register(userPrefArea);
     return userPrefArea;
+  }
+
+  /**
+   * The annotations of the given classes will be processed by xstream which is used for marshalling and unmarshalling user xml preferences.
+   * @param classes
+   * @return this for chaining.
+   * @see UserXmlPreferencesDao#processAnnotations(Class...)
+   */
+  protected AbstractPlugin processUserXmlPreferencesAnnotations(final Class< ? >... classes)
+  {
+    userXmlPreferencesDao.processAnnotations(classes);
+    return this;
+  }
+
+  /**
+   * Register converters before marshaling and unmarshaling by XStream.
+   * @param daoClass Class of the dao.
+   * @param doClass Class of the DO which will be converted.
+   * @see UserXmlPreferencesBaseDOSingleValueConverter#UserXmlPreferencesBaseDOSingleValueConverter(Class, Class)
+   */
+  public void registerUserXmlPreferencesConverter(final Class< ? extends BaseDao< ? >> daoClass, final Class< ? extends BaseDO< ? >> doClass)
+  {
+    userXmlPreferencesDao.registerConverter(daoClass, doClass, 10);
+  }
+
+  /**
+   * Register converters before marshaling and unmarshaling by XStream.
+   * @param daoClass Class of the dao.
+   * @param doClass Class of the DO which will be converted.
+   * @param priority The priority needed by xtream for using converters in the demanded order.
+   * @see UserXmlPreferencesBaseDOSingleValueConverter#UserXmlPreferencesBaseDOSingleValueConverter(Class, Class)
+   */
+  public void registerUserXmlPreferencesConverter(final Class< ? extends BaseDao< ? >> daoClass,
+      final Class< ? extends BaseDO< ? >> doClass, final int priority)
+  {
+    userXmlPreferencesDao.registerConverter(daoClass, doClass, priority);
   }
 
   /**
