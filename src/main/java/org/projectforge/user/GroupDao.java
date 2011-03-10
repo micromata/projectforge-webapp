@@ -131,7 +131,7 @@ public class GroupDao extends BaseDao<GroupDO>
       if (user == null) {
         throw new RuntimeException("User '" + id + "' not found. Could not add this unknown user to new group: " + group.getName());
       }
-      if (assignedUsers != null && assignedUsers.contains(user) == false) {
+      if (assignedUsers == null || assignedUsers.contains(user) == false) {
         group.addUser(user);
       }
     }
