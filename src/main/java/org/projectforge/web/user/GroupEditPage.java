@@ -54,11 +54,11 @@ public class GroupEditPage extends AbstractEditPage<GroupDO, GroupEditForm, Grou
   @Override
   public AbstractBasePage onSaveOrUpdate()
   {
-    final Set<Integer> assignedGroupIds = new HashSet<Integer>();
-    for (Integer groupId : form.users.getAssignedValues()) {
-      assignedGroupIds.add(groupId);
+    final Set<Integer> assignedUserIds = new HashSet<Integer>();
+    for (Integer userId : form.users.getAssignedValues()) {
+      assignedUserIds.add(userId);
     }
-    groupDao.setAssignedUsers(getData(), assignedGroupIds);
+    groupDao.setAssignedUsers(getData(), assignedUserIds);
     return super.onSaveOrUpdate();
   }
 
