@@ -71,7 +71,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
   }
 
   /**
-   * Process the given classes before marshaling and unmarshaling by XStream.
+   * Process the given classes before marshaling and unmarshaling by XStream. This method is usable by plugins.
    * @param classes
    */
   public void processAnnotations(final Class< ? >... classes)
@@ -80,7 +80,7 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
   }
 
   /**
-   * Register converters before marshaling and unmarshaling by XStream.
+   * Register converters before marshaling and unmarshaling by XStream. This method is usable by plugins.
    * @param daoClass Class of the dao.
    * @param doClass Class of the DO which will be converted.
    * @param priority The priority needed by xtream for using converters in the demanded order.
