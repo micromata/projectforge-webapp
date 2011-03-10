@@ -23,13 +23,18 @@
 
 package org.projectforge.access;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.Validate;
 import org.hibernate.Hibernate;
+import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.QueryFilter;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
+import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
@@ -115,6 +120,58 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
   protected String[] getAdditionalSearchFields()
   {
     return ADDITIONAL_SEARCH_FIELDS;
+  }
+
+  @Override
+  public List<GroupTaskAccessDO> getList(final BaseSearchFilter filter)
+  {
+    final AccessFilter myFilter;
+    if (filter instanceof AccessFilter) {
+      myFilter = (AccessFilter) filter;
+    } else {
+      myFilter = new AccessFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
+    if (myFilter.getTaskId() != null) {
+      List<Integer> descendants = null;
+      List<Integer> ancestors = null;
+      final TaskNode node = taskTree.getTaskNodeById(myFilter.getTaskId());
+      if (myFilter.isRecursive() == true) {
+        descendants = node.getDescendantIds();
+      }
+      if (myFilter.isInherit() == true) {
+        ancestors = node.getAncestorIds();
+      }
+      if (descendants != null || ancestors != null) {
+        final List<Integer> taskIds = new ArrayList<Integer>();
+        if (descendants != null) {
+          taskIds.addAll(descendants);
+        }
+        if (ancestors != null) {
+          taskIds.addAll(ancestors);
+        }
+        taskIds.add(node.getId());
+        queryFilter.add(Restrictions.in("task.id", taskIds));
+      } else {
+        queryFilter.add(Restrictions.eq("task.id", myFilter.getTaskId()));
+      }
+    }
+    if (myFilter.getGroupId() != null) {
+      final GroupDO group = new GroupDO();
+      group.setId(myFilter.getGroupId());
+      queryFilter.add(Restrictions.eq("group", group));
+    }
+    final List<GroupTaskAccessDO> list = getList(queryFilter);
+    if (myFilter.getUserId() != null) {
+      final List<GroupTaskAccessDO> result = new ArrayList<GroupTaskAccessDO>();
+      for (final GroupTaskAccessDO access : list) {
+        if (userGroupCache.isUserMemberOfGroup(myFilter.getUserId(), access.getGroupId())) {
+          result.add(access);
+        }
+      }
+      return result;
+    }
+    return list;
   }
 
   /**

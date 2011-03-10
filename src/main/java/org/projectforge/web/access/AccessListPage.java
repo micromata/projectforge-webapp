@@ -85,8 +85,8 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("task")), getSortable("task.title", sortable), "task.title",
-        cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("task")), getSortable("task.title",
+        sortable), "task.title", cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
@@ -102,10 +102,10 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("group")), getSortable("group.name", sortable), "group.name",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("recursive")), getSortable("recursive", sortable), "recursive",
-        cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("group")), getSortable("group.name",
+        sortable), "group.name", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("recursive")), getSortable("recursive",
+        sortable), "recursive", cellItemListener) {
       @Override
       public void populateItem(Item<ICellPopulator<GroupTaskAccessDO>> item, String componentId, IModel<GroupTaskAccessDO> rowModel)
       {
@@ -135,8 +135,8 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(getString("description"), getSortable("description", sortable), "description",
-        cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(getString("description"), getSortable("description", sortable),
+        "description", cellItemListener) {
       @Override
       public void populateItem(Item<ICellPopulator<GroupTaskAccessDO>> item, String componentId, IModel<GroupTaskAccessDO> rowModel)
       {
@@ -154,6 +154,47 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
   {
     dataTable = createDataTable(createColumns(this, true), "group.name", true);
     form.add(dataTable);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#select(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public void select(final String property, final Object selectedValue)
+  {
+    if ("taskId".equals(property) == true) {
+      form.getSearchFilter().setTaskId((Integer) selectedValue);
+      refresh();
+    } else if ("groupId".equals(property) == true) {
+      form.getSearchFilter().setGroupId((Integer) selectedValue);
+      refresh();
+    } else if ("userId".equals(property) == true) {
+      form.getSearchFilter().setUserId((Integer) selectedValue);
+      refresh();
+    } else {
+      super.select(property, selectedValue);
+    }
+  }
+
+  /**
+   * 
+   * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
+   */
+  @Override
+  public void unselect(final String property)
+  {
+    if ("taskId".equals(property) == true) {
+      form.getSearchFilter().setTaskId(null);
+      refresh();
+    } else if ("groupId".equals(property) == true) {
+      form.getSearchFilter().setGroupId(null);
+      refresh();
+    } else if ("userId".equals(property) == true) {
+      form.getSearchFilter().setUserId(null);
+      refresh();
+    } else {
+      super.unselect(property);
+    }
   }
 
   @Override
