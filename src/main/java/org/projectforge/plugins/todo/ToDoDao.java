@@ -104,8 +104,8 @@ public class ToDoDao extends BaseDao<ToDoDO>
       myFilter = new ToDoFilter(filter);
     }
     final QueryFilter queryFilter = new QueryFilter(myFilter);
-    Collection<ToDoStatus> col = new ArrayList<ToDoStatus>(5);
-    String searchString = myFilter.getSearchString();
+    final Collection<ToDoStatus> col = new ArrayList<ToDoStatus>(5);
+    final String searchString = myFilter.getSearchString();
     if (myFilter.isOnlyRecent() == true) {
       final PFUserDO assignee = new PFUserDO();
       assignee.setId(PFUserContext.getUserId());
