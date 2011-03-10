@@ -7,9 +7,23 @@
 <table>
   <wicket:extend>
     <tr>
+      <th wicket:id="taskLabel">[task]</th>
+      <td><span wicket:id="task" id="task">[show and select task]</span></td>
+    </tr>
+    <tr>
+      <th wicket:id="groupLabel">[group]</th>
+      <td><span wicket:id="group">[show and select group]</span></td>
+    </tr>
+    <tr>
+      <th wicket:id="userLabel">[user]</th>
+      <td><span wicket:id="user">[show and select user]</span></td>
+    </tr>
+    <tr>
       <th><wicket:message key="label.options" /></th>
-      <td><input type="checkbox" wicket:id="deletedCheckBox" id="deletedCheckBox" onchange="javascript:submit();" /> <label
-        for="deletedCheckBox"><wicket:message key="deleted" /></label> <span wicket:id="pageSize">[Page size setting]</span></td>
+      <td>
+      <div class="buttonset"><wicket:panel wicket:id="inheritCheckBox">[cool checkbox]</wicket:panel><wicket:panel wicket:id="recursiveCheckBox">[cool checkbox]</wicket:panel><wicket:panel
+        wicket:id="deletedCheckBox">[cool checkbox]</wicket:panel>&nbsp; <span wicket:id="pageSize">[Page size setting]</span></div>
+      </td>
     </tr>
   </wicket:extend>
 </table>
