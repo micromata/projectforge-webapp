@@ -207,20 +207,38 @@ public class TaskNode implements Serializable
 
   public List<Integer> getDescendantIds()
   {
-    List<Integer> descendants = new ArrayList<Integer>();
+    final List<Integer> descendants = new ArrayList<Integer>();
     getDescendantIds(descendants);
     return descendants;
   }
 
-  private void getDescendantIds(List<Integer> descendants)
+  private void getDescendantIds(final List<Integer> descendants)
   {
     if (this.childs != null) {
-      for (TaskNode node : this.childs) {
+      for (final TaskNode node : this.childs) {
         if (descendants.contains(node.getId()) == false) {
           // Paranoia setting for cyclic references.
           descendants.add(node.getId());
           node.getDescendantIds(descendants);
         }
+      }
+    }
+  }
+
+  public List<Integer> getAncestorIds()
+  {
+    final List<Integer> ancestors = new ArrayList<Integer>();
+    getAncestorIds(ancestors);
+    return ancestors;
+  }
+
+  private void getAncestorIds(final List<Integer> ancestors)
+  {
+    if (this.parent != null) {
+      if (ancestors.contains(this.parent.getId()) == false) {
+        // Paranoia setting for cyclic references.
+        ancestors.add(this.parent.getId());
+        this.parent.getAncestorIds(ancestors);
       }
     }
   }
