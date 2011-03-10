@@ -36,6 +36,7 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskHelper;
 import org.projectforge.task.TaskTree;
+import org.projectforge.web.access.AccessListPage;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.gantt.GanttChartEditPage;
 import org.projectforge.web.timesheet.TimesheetEditPage;
@@ -158,8 +159,8 @@ public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditFor
       final PageParameters timesheetEditPageParams = new PageParameters();
       timesheetEditPageParams.put(TimesheetEditPage.PARAMETER_KEY_TASK_ID, form.getData().getId());
       @SuppressWarnings("unchecked")
-      final ContentMenuEntryPanel addTimesheetMenuPanel = new ContentMenuEntryPanel(getNewContentMenuChildId(), new BookmarkablePageLink("link",
-          TimesheetEditPage.class, timesheetEditPageParams), getString("task.menu.addTimesheet"));
+      final ContentMenuEntryPanel addTimesheetMenuPanel = new ContentMenuEntryPanel(getNewContentMenuChildId(), new BookmarkablePageLink(
+          "link", TimesheetEditPage.class, timesheetEditPageParams), getString("task.menu.addTimesheet"));
       contentMenuEntries.add(addTimesheetMenuPanel);
 
       @SuppressWarnings("unchecked")
@@ -170,6 +171,17 @@ public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditFor
       final ContentMenuEntryPanel showTimesheetsMenuPanel = new ContentMenuEntryPanel(getNewContentMenuChildId(), showTimesheetsLink,
           getString("task.menu.showTimesheets"));
       contentMenuEntries.add(showTimesheetsMenuPanel);
+
+      if (userGroupCache.isUserMemberOfAdminGroup()) {
+        @SuppressWarnings("unchecked")
+        final BookmarkablePageLink<String> showAccessRightsLink = new BookmarkablePageLink("link", AccessListPage.class);
+        if (form.getData().getId() != null) {
+          showAccessRightsLink.setParameter(AccessListPage.PARAMETER_KEY_TASK_ID, form.getData().getId());
+        }
+        final ContentMenuEntryPanel showAccessRightsMenuPanel = new ContentMenuEntryPanel(getNewContentMenuChildId(), showAccessRightsLink,
+            getString("task.menu.showAccessRights"));
+        contentMenuEntries.add(showAccessRightsMenuPanel);
+      }
 
       @SuppressWarnings("unchecked")
       final BookmarkablePageLink<String> addGanttChartLink = new BookmarkablePageLink("link", GanttChartEditPage.class);

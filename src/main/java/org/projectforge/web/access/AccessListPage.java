@@ -57,6 +57,11 @@ import org.projectforge.web.wicket.components.SingleImagePanel;
 public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, GroupTaskAccessDO> implements
     IListPageColumnsCreator<GroupTaskAccessDO>
 {
+  /**
+   * Key for pre-setting the task id.
+   */
+  public static final String PARAMETER_KEY_TASK_ID = "taskId";
+
   private static final long serialVersionUID = 7017404582337466883L;
 
   @SpringBean(name = "accessDao")
@@ -68,6 +73,10 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
   public AccessListPage(PageParameters parameters)
   {
     super(parameters, "access");
+    if (parameters.containsKey(PARAMETER_KEY_TASK_ID) == true) {
+      final Integer id = parameters.getAsInteger(PARAMETER_KEY_TASK_ID);
+      form.getSearchFilter().setTaskId(id);
+    }
   }
 
   @SuppressWarnings("serial")
