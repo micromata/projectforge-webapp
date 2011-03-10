@@ -30,6 +30,10 @@ import java.util.Map;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.Validate;
 import org.projectforge.access.AccessChecker;
+import org.projectforge.core.BaseDO;
+import org.projectforge.core.BaseDao;
+import org.projectforge.task.TaskDO;
+import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.timesheet.TimesheetPrefData;
 import org.projectforge.web.scripting.RecentScriptCalls;
@@ -61,6 +65,31 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
     xstream = new XStream();
     xstream.processAnnotations(new Class< ? >[] { UserXmlPreferencesMap.class, TaskFilter.class, TimesheetPrefData.class,
         ScriptCallData.class, RecentScriptCalls.class});
+    registerConverter(UserDao.class, PFUserDO.class, 20);
+    registerConverter(GroupDao.class, GroupDO.class, 19);
+    registerConverter(TaskDao.class, TaskDO.class, 18);
+  }
+
+  /**
+   * Process the given classes before marshaling and unmarshaling by XStream.
+   * @param classes
+   */
+  public void processAnnotations(final Class< ? >... classes)
+  {
+    xstream.processAnnotations(classes);
+  }
+
+  /**
+   * Register converters before marshaling and unmarshaling by XStream.
+   * @param daoClass Class of the dao.
+   * @param doClass Class of the DO which will be converted.
+   * @param priority The priority needed by xtream for using converters in the demanded order.
+   * @see UserXmlPreferencesBaseDOSingleValueConverter#UserXmlPreferencesBaseDOSingleValueConverter(Class, Class)
+   */
+  public void registerConverter(final Class< ? extends BaseDao< ? >> daoClass, final Class< ? extends BaseDO< ? >> doClass,
+      final int priority)
+  {
+    xstream.registerConverter(new UserXmlPreferencesBaseDOSingleValueConverter(daoClass, doClass), priority);
   }
 
   public void setAccessChecker(AccessChecker accessChecker)
@@ -149,7 +178,11 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
     for (final Map.Entry<String, Object> prefEntry : data.getPersistentData().entrySet()) {
       final String key = prefEntry.getKey();
       if (data.isModified(key) == true) {
-        saveOrUpdate(userId, key, prefEntry.getValue(), checkAccess);
+        try {
+          saveOrUpdate(userId, key, prefEntry.getValue(), checkAccess);
+        } catch (final Throwable ex) {
+          log.warn(ex.getMessage(), ex);
+        }
         data.setModified(key, false);
       }
     }
