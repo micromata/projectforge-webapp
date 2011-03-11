@@ -224,7 +224,7 @@ public class AddressFormRenderer extends AbstractDOFormRenderer
       final String tooltip = getString("address.tooltip.vCardList");
       doPanel.addCheckBox(new PanelContext(personalAddress, "favoriteCard").setTooltip(tooltip));
     }
-    doPanel.addTextField(new PanelContext(data, "firstName", VALUE_LENGTH, getString("address.title"), LABEL_LENGTH).setStrong());
+    doPanel.addTextField(new PanelContext(data, "title", VALUE_LENGTH, getString("address.title"), LABEL_LENGTH).setStrong());
     doPanel.addTextField(new PanelContext(data, "firstName", VALUE_LENGTH, getString("firstName"), LABEL_LENGTH).setStrong());
     ctx = new PanelContext(data, "name", VALUE_LENGTH, getString("name"), LABEL_LENGTH).setStrong().setRequired();
     if (isNew() == true) {
