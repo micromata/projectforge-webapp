@@ -44,6 +44,11 @@ public class LayoutContext implements Serializable
 
   private boolean newObject;
 
+  public LayoutContext(final boolean mobile)
+  {
+    this.mobile = mobile;
+  }
+
   public LayoutContext(final boolean mobile, final boolean readonly, final boolean newObject)
   {
     this.mobile = mobile;
