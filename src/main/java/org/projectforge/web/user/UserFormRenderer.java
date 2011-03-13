@@ -68,7 +68,7 @@ import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.components.TimeZoneField;
-import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
+import org.projectforge.web.wicket.layout.AbstractFormRenderer;
 import org.projectforge.web.wicket.layout.DropDownChoiceLPanel;
 import org.projectforge.web.wicket.layout.IField;
 import org.projectforge.web.wicket.layout.LayoutContext;
@@ -78,7 +78,7 @@ import org.projectforge.web.wicket.layout.PanelContext;
 import org.projectforge.web.wicket.layout.RepeatingViewLPanel;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
-public class UserFormRenderer extends AbstractDOFormRenderer
+public class UserFormRenderer extends AbstractFormRenderer
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserFormRenderer.class);
 

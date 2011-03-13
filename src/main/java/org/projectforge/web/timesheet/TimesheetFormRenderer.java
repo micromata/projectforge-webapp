@@ -104,7 +104,7 @@ import org.projectforge.web.wicket.components.ImageLinkPanel;
 import org.projectforge.web.wicket.components.LabelForPanel;
 import org.projectforge.web.wicket.components.LabelPanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
+import org.projectforge.web.wicket.layout.AbstractFormRenderer;
 import org.projectforge.web.wicket.layout.ContainerLPanel;
 import org.projectforge.web.wicket.layout.DropDownChoiceLPanel;
 import org.projectforge.web.wicket.layout.IField;
@@ -116,7 +116,7 @@ import org.projectforge.web.wicket.layout.RepeatingViewLPanel;
 import org.projectforge.web.wicket.layout.TextAreaLPanel;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
-public class TimesheetFormRenderer extends AbstractDOFormRenderer
+public class TimesheetFormRenderer extends AbstractFormRenderer
 {
   private static final long serialVersionUID = -9175062586210446142L;
 

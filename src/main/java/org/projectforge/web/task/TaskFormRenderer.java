@@ -72,7 +72,7 @@ import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.TextFieldOrLabelPanel;
 import org.projectforge.web.wicket.converter.IntegerPercentConverter;
-import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
+import org.projectforge.web.wicket.layout.AbstractFormRenderer;
 import org.projectforge.web.wicket.layout.DateFieldLPanel;
 import org.projectforge.web.wicket.layout.LabelLPanel;
 import org.projectforge.web.wicket.layout.LayoutContext;
@@ -80,7 +80,7 @@ import org.projectforge.web.wicket.layout.LayoutLength;
 import org.projectforge.web.wicket.layout.PanelContext;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
-public class TaskFormRenderer extends AbstractDOFormRenderer
+public class TaskFormRenderer extends AbstractFormRenderer
 {
   private static final long serialVersionUID = -5074437615848025965L;
 
