@@ -27,6 +27,8 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
@@ -67,6 +69,7 @@ public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditFor
     super(parameters, "task");
     init();
     addTopMenuPanel();
+    addTopRightMenu();
     final Integer parentTaskId = parameters.getAsInteger("parentTaskId");
     if (NumberHelper.greaterZero(parentTaskId) == true) {
       taskDao.setParentTask(getData(), parentTaskId);
@@ -172,17 +175,6 @@ public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditFor
           getString("task.menu.showTimesheets"));
       contentMenuEntries.add(showTimesheetsMenuPanel);
 
-      if (userGroupCache.isUserMemberOfAdminGroup()) {
-        @SuppressWarnings("unchecked")
-        final BookmarkablePageLink<String> showAccessRightsLink = new BookmarkablePageLink("link", AccessListPage.class);
-        if (form.getData().getId() != null) {
-          showAccessRightsLink.setParameter(AccessListPage.PARAMETER_KEY_TASK_ID, form.getData().getId());
-        }
-        final ContentMenuEntryPanel showAccessRightsMenuPanel = new ContentMenuEntryPanel(getNewContentMenuChildId(), showAccessRightsLink,
-            getString("task.menu.showAccessRights"));
-        contentMenuEntries.add(showAccessRightsMenuPanel);
-      }
-
       @SuppressWarnings("unchecked")
       final BookmarkablePageLink<String> addGanttChartLink = new BookmarkablePageLink("link", GanttChartEditPage.class);
       if (form.getData().getId() != null) {
@@ -194,6 +186,20 @@ public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditFor
 
       addSubTaskLink.setParameter("parentTaskId", getData().getId());
     }
+  }
+
+  protected void addTopRightMenu()
+  {
+    dropDownMenu.setVisible(true);
+    final WebMarkupContainer item = new WebMarkupContainer(getNewDropDownMenuChildId());
+    addDropDownMenuEntry(item);
+    @SuppressWarnings("unchecked")
+    final BookmarkablePageLink<String> showAccessRightsLink = new BookmarkablePageLink("menuEntry", AccessListPage.class);
+    if (form.getData().getId() != null) {
+      showAccessRightsLink.setParameter(AccessListPage.PARAMETER_KEY_TASK_ID, form.getData().getId());
+    }
+    showAccessRightsLink.add(new Label("label", getString("task.menu.showAccessRights")).setRenderBodyOnly(true));
+    item.add(showAccessRightsLink);
   }
 
   @Override
