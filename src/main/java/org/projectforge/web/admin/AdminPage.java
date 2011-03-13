@@ -36,7 +36,6 @@ import java.util.TreeSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.Response;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.book.BookDO;
@@ -108,7 +107,6 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   public AdminPage(PageParameters parameters)
   {
     super(parameters);
-    body.add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     form = new AdminForm(this);
     body.add(form);
     form.init();
@@ -328,6 +326,10 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   {
     log.info("Administration: formatLogEntries");
     checkAccess();
+    if (form.logEntries == null) {
+      form.formattedLogEntries = "";
+      return;
+    }
     int indent = 0;
     final StringBuffer buf = new StringBuffer();
     for (int i = 0; i < form.logEntries.length(); i++) {

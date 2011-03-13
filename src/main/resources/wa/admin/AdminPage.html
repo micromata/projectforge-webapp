@@ -5,65 +5,16 @@
 
 <body>
 <wicket:extend>
+  <form wicket:id="form" class="form">
+  <div id="edit">
   <div wicket:id="feedback">[Validation errors]</div>
-  <form wicket:id="form" name="form">
-  <h3><wicket:message key="system.admin.group.title.systemChecksAndFunctionality" /></h3>
-  <table class="form" style="width: 100%;">
-    <tr>
-      <td><span wicket:id="checkSystemIntegrity">[button]</span> <span wicket:id="checkI18nProperties">[button]</span> <span
-        wicket:id="refreshCaches">[button]</span> <span wicket:id="checkUnseenMebMails">[button]</span> <span wicket:id="importAllMebMails">[button]</span>
-      <br />
-      <span wicket:id="rereadConfiguration">[button]</span> <span wicket:id="exportConfiguration">[button]</span></td>
-    </tr>
-  </table>
-  <h3><wicket:message key="system.admin.group.title.databaseActions" /></h3>
-  <table class="form" style="width: 100%;">
-    <tr>
-      <td><span wicket:id="updateUserPrefs">[button]</span> <span wicket:id="createMissingDatabaseIndices">[button]</span> <span wicket:id="dump">[button]</span>
-      <span wicket:id="schemaExport">[button]</span> <span wicket:id="fixDBHistoryEntries">[button]</span></td>
-    </tr>
-  </table>
-  <h3><wicket:message key="system.admin.group.title.databaseSearchIndices" /></h3>
-  <table class="form" style="width: 100%;">
-    <tr>
-      <td><input type="text" class="stdtext" wicket:id="reindexNewestNEntries" style="width: 5em;" /> <wicket:message
-        key="system.admin.reindexNewestNEntries.newestEntriesAndOrFrom" /> <span wicket:id="reindexFromDate">[date]</span> <span wicket:id="reindex">[button]</span>
-      <wicket:message key="system.admin.reindexNewestNEntries.note" /></td>
-    </tr>
-  </table>
-  <h3><label wicket:id="logEntriesLabel">[Log entries]</label></h3>
-  <table class="form" style="width: 100%;">
-    <tr>
-      <td><input type="text" class="stdtext" wicket:id="logEntries" style="width: 100%" /><span wicket:id="formattedLogEntries">[formatted
-      log entries]</span></td>
-    </tr>
-    <tr>
-      <td><span wicket:id="formatLogEntries">[button]</span></td>
-    </tr>
-  </table>
-  <h3><label wicket:id="alertMessageLabel">[alert message]</label></h3>
-  <table class="form" style="width: 100%;">
-    <tr>
-      <td><input type="text" class="stdtext" wicket:id="alertMessage" style="width: 100%" /></td>
-    </tr>
-    <tr>
-      <td><wicket:message key="system.admin.alertMessage.copyAndPaste.title" /><br />
-      <b wicket:id="copyAndPasteText1">[copy text 1]</b><br />
-      <b><wicket:message key="system.admin.alertMessage.copyAndPaste.text2" /></b><br />
-      <b wicket:id="copyAndPasteText3">[copy text 3]</b></td>
-    </tr>
-    <tr>
-      <td><span wicket:id="setAlertMessage">[button]</span></td>
-    </tr>
-  </table>
-  <wicket:container wicket:id="forDevelopers">
-    <h3>For developers</h3>
-    <table class="form" style="width: 100%;">
-      <tr>
-        <td><wicket:container wicket:id="createTestBooks">[button]</wicket:container></td>
-      </tr>
-    </table>
-  </wicket:container></form>
+  <div class="newform clearfix"><wicket:container wicket:id="fieldSetsPanel">[The field sets.]</wicket:container></div>
+  <wicket:child /></div>
+  <h3><wicket:message key="system.admin.group.title.misc.logEntries" /></h3>
+  <div><textarea wicket:id="logEntries" style="width: 100%; height: 20em;">[log file snippet]</textarea> <br />
+  <span wicket:id="formatLogEntries">[button]</span></div>
+  <div wicket:id="formattedLogEntries" class="clear" style="white-space: pre; font-family: monospace;padding: 1em;">[formatted log entries]</div>
+  </form>
 </wicket:extend>
 </body>
 </html>
