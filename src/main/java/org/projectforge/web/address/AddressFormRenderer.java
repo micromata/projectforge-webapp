@@ -55,7 +55,7 @@ import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
+import org.projectforge.web.wicket.layout.AbstractFormRenderer;
 import org.projectforge.web.wicket.layout.DateFieldLPanel;
 import org.projectforge.web.wicket.layout.FieldType;
 import org.projectforge.web.wicket.layout.GroupLPanel;
@@ -66,7 +66,7 @@ import org.projectforge.web.wicket.layout.LayoutLength;
 import org.projectforge.web.wicket.layout.PanelContext;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
-public class AddressFormRenderer extends AbstractDOFormRenderer
+public class AddressFormRenderer extends AbstractFormRenderer
 {
   private static final long serialVersionUID = -9175062586210446142L;
 
@@ -246,7 +246,7 @@ public class AddressFormRenderer extends AbstractDOFormRenderer
     } else {
       final DatePanel birthdayPanel = new DatePanel(DateFieldLPanel.DATE_FIELD_ID, new PropertyModel<Date>(data, "birthday"),
           new DatePanelSettings().withTargetType(java.sql.Date.class));
-      doPanel.addDateFieldPanel(birthdayPanel, new PanelContext(data, "birthday", HALF, getString("address.birthday"), LABEL_LENGTH));
+      doPanel.addDateFieldPanel(birthdayPanel, new PanelContext(HALF, getString("address.birthday"), LABEL_LENGTH));
       WicketUtils.addTooltip(birthdayPanel.getDateField(), new Model<String>() {
         @Override
         public String getObject()
