@@ -26,10 +26,12 @@ package org.projectforge.web.wicket.layout;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.PasswordTextField;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * Represents a group panel. A field set, form or page can contain multiple group panels. A group panel groups fields.
@@ -39,7 +41,7 @@ import org.apache.wicket.model.Model;
 public class GroupLPanel extends Panel
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GroupLPanel.class);
-  
+
   private static final long serialVersionUID = -8760386387270114082L;
 
   /**
@@ -91,8 +93,7 @@ public class GroupLPanel extends Panel
   {
     ctx.internalSetValueField(textFieldPanel);
     if (ctx.getLabelLength() != null) {
-      final LabelLPanel labelPanel = new LabelLPanel(newChildId(), ctx).setLabelFor(textFieldPanel
-          .getTextField());
+      final LabelLPanel labelPanel = new LabelLPanel(newChildId(), ctx).setLabelFor(textFieldPanel.getTextField());
       ctx.internalSetLabelPanel(labelPanel);
       add(labelPanel);
     }
@@ -101,18 +102,39 @@ public class GroupLPanel extends Panel
     } else {
       log.warn("No label given for text field component.");
     }
+    if (ctx.getTooltip() != null) {
+      WicketUtils.addTooltip(textFieldPanel.getTextField(), ctx.getTooltip());
+    }
     add(textFieldPanel);
   }
 
   public TextAreaLPanel addTextArea(final PanelContext ctx)
   {
     final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), ctx);
-    add(new LabelLPanel(newChildId(), ctx).setLabelFor(textAreaPanel.getTextArea()));
-    textAreaPanel.getTextArea().setLabel(new Model<String>(ctx.getLabel()));
+    return addTextArea(textAreaPanel, ctx);
+  }
+
+  public TextAreaLPanel addTextArea(final TextArea< ? > textArea, final PanelContext ctx)
+  {
+    final TextAreaLPanel textAreaPanel = new TextAreaLPanel(newChildId(), textArea, ctx);
+    return addTextArea(textAreaPanel, ctx);
+  }
+
+  private TextAreaLPanel addTextArea(final TextAreaLPanel textAreaPanel, final PanelContext ctx)
+  {
+    if (ctx.getLabelLength() != null) {
+      add(new LabelLPanel(newChildId(), ctx).setLabelFor(textAreaPanel.getTextArea()));
+    }
+    if (ctx.getLabel() != null) {
+      textAreaPanel.getTextArea().setLabel(new Model<String>(ctx.getLabel()));
+    }
+    if (ctx.getTooltip() != null) {
+      WicketUtils.addTooltip(textAreaPanel.getTextArea(), ctx.getTooltip());
+    }
     add(textAreaPanel);
     return textAreaPanel;
   }
- 
+
   public GroupLPanel add(final AbstractLPanel layoutPanel)
   {
     hasChildren = true;
