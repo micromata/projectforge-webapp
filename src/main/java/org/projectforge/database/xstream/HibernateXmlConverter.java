@@ -157,7 +157,7 @@ public class HibernateXmlConverter
       throws DataAccessException, HibernateException
   {
     // Container für die Objekte
-    List<Object> all = new ArrayList<Object>();
+    final List<Object> all = new ArrayList<Object>();
     final XStream stream = initXStream(session, true);
     final XStream defaultXStream = initXStream(session, false);
 
@@ -165,8 +165,10 @@ public class HibernateXmlConverter
     // Alles laden
     List< ? > list = session.createQuery("select o from java.lang.Object o").setReadOnly(true).list();
     list = (List< ? >) CollectionUtils.select(list, PredicateUtils.uniquePredicate());
+    final int size = list.size();
+    log.info("Writing " + size + " objects");
     for (Iterator< ? > it = list.iterator(); it.hasNext();) {
-      Object obj = it.next();
+      final Object obj = it.next();
       if (log.isDebugEnabled()) {
         log.debug("loaded object " + obj);
       }
