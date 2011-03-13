@@ -47,14 +47,14 @@ import org.projectforge.web.wicket.components.RequiredMinMaxNumberField;
 import org.projectforge.web.wicket.converter.CurrencyConverter;
 import org.projectforge.web.wicket.converter.IntegerConverter;
 import org.projectforge.web.wicket.converter.MonthConverter;
-import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
+import org.projectforge.web.wicket.layout.AbstractFormRenderer;
 import org.projectforge.web.wicket.layout.DateFieldLPanel;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.LayoutLength;
 import org.projectforge.web.wicket.layout.PanelContext;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
-public class AccountingRecordFormRenderer extends AbstractDOFormRenderer
+public class AccountingRecordFormRenderer extends AbstractFormRenderer
 {
   private static final long serialVersionUID = -3418428748298018009L;
 

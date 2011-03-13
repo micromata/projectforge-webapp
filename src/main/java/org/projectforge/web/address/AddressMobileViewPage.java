@@ -30,7 +30,7 @@ import org.projectforge.address.AddressDao;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.web.mobile.AbstractMobileViewPage;
-import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
+import org.projectforge.web.wicket.layout.AbstractFormRenderer;
 import org.projectforge.web.wicket.layout.LayoutContext;
 
 public class AddressMobileViewPage extends AbstractMobileViewPage
@@ -49,7 +49,7 @@ public class AddressMobileViewPage extends AbstractMobileViewPage
   }
 
   @Override
-  protected AbstractDOFormRenderer createRenderer(final LayoutContext layoutContext, final Integer objectId)
+  protected AbstractFormRenderer createRenderer(final LayoutContext layoutContext, final Integer objectId)
   {
     final AddressDO address = addressDao.getById(objectId);
     if (address == null) {

@@ -46,7 +46,7 @@ import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.PlainLabel;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
+import org.projectforge.web.wicket.layout.AbstractFormRenderer;
 import org.projectforge.web.wicket.layout.IField;
 import org.projectforge.web.wicket.layout.LayoutAlignment;
 import org.projectforge.web.wicket.layout.LayoutContext;
@@ -54,7 +54,7 @@ import org.projectforge.web.wicket.layout.LayoutLength;
 import org.projectforge.web.wicket.layout.PanelContext;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
-public class BookFormRenderer extends AbstractDOFormRenderer
+public class BookFormRenderer extends AbstractFormRenderer
 {
   private static final long serialVersionUID = -9175062586210446142L;
 

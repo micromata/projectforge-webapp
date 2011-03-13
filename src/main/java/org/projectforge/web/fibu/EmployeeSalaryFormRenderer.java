@@ -45,14 +45,14 @@ import org.projectforge.fibu.EmployeeSalaryType;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.converter.CurrencyConverter;
-import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
+import org.projectforge.web.wicket.layout.AbstractFormRenderer;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.LayoutLength;
 import org.projectforge.web.wicket.layout.PanelContext;
 import org.projectforge.web.wicket.layout.SelectLPanel;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
-public class EmployeeSalaryFormRenderer extends AbstractDOFormRenderer
+public class EmployeeSalaryFormRenderer extends AbstractFormRenderer
 {
   private static final long serialVersionUID = 2532546903021383010L;
 
@@ -62,7 +62,7 @@ public class EmployeeSalaryFormRenderer extends AbstractDOFormRenderer
 
   private final static LayoutLength LABEL_LENGTH = LayoutLength.HALF;
 
-  private final static LayoutLength VALUE_LENGTH = LayoutLength.ONEHALF;
+  // private final static LayoutLength VALUE_LENGTH = LayoutLength.ONEHALF;
 
   public EmployeeSalaryFormRenderer(final MarkupContainer container, final ISelectCallerPage callerPage, final LayoutContext layoutContext,
       final EmployeeSalaryDO data)

@@ -43,7 +43,7 @@ import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextFie
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
+import org.projectforge.web.wicket.layout.AbstractFormRenderer;
 import org.projectforge.web.wicket.layout.DateFieldLPanel;
 import org.projectforge.web.wicket.layout.DropDownChoiceLPanel;
 import org.projectforge.web.wicket.layout.LayoutContext;
@@ -51,7 +51,7 @@ import org.projectforge.web.wicket.layout.LayoutLength;
 import org.projectforge.web.wicket.layout.PanelContext;
 import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
-public class PostausgangFormRenderer extends AbstractDOFormRenderer
+public class PostausgangFormRenderer extends AbstractFormRenderer
 {
   private static final long serialVersionUID = 2532546903021383010L;
 

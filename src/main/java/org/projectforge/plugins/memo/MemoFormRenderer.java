@@ -24,7 +24,7 @@
 package org.projectforge.plugins.memo;
 
 import org.apache.wicket.MarkupContainer;
-import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
+import org.projectforge.web.wicket.layout.AbstractFormRenderer;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.LayoutLength;
 import org.projectforge.web.wicket.layout.PanelContext;
@@ -34,7 +34,7 @@ import org.projectforge.web.wicket.layout.PanelContext;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  *
  */
-public class MemoFormRenderer extends AbstractDOFormRenderer
+public class MemoFormRenderer extends AbstractFormRenderer
 {
   private static final long serialVersionUID = 8697166062199594608L;
 

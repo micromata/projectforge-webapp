@@ -55,7 +55,7 @@ import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.DropDownChoicePanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.layout.AbstractDOFormRenderer;
+import org.projectforge.web.wicket.layout.AbstractFormRenderer;
 import org.projectforge.web.wicket.layout.DateFieldLPanel;
 import org.projectforge.web.wicket.layout.DropDownChoiceLPanel;
 import org.projectforge.web.wicket.layout.LayoutContext;
@@ -63,7 +63,7 @@ import org.projectforge.web.wicket.layout.LayoutLength;
 import org.projectforge.web.wicket.layout.PanelContext;
 import org.projectforge.web.wicket.layout.RepeatingViewLPanel;
 
-public class ToDoFormRenderer extends AbstractDOFormRenderer
+public class ToDoFormRenderer extends AbstractFormRenderer
 {
   private static final long serialVersionUID = -9175062586210446142L;
 
