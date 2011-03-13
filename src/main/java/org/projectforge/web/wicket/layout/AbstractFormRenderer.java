@@ -29,12 +29,12 @@ import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
 
 /**
- * Base class for renderers of data objects. This renderer can be re-used by different pages (mobile pages as well as read-only or edit form
+ * Base class for renderers of form pages. This renderer can be re-used by different pages (mobile pages as well as read-only or edit form
  * pages).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public abstract class AbstractDOFormRenderer implements Serializable
+public abstract class AbstractFormRenderer implements Serializable
 {
   private static final long serialVersionUID = -5202334758019046183L;
 
@@ -47,7 +47,7 @@ public abstract class AbstractDOFormRenderer implements Serializable
    */
   protected MarkupContainer container;
 
-  public AbstractDOFormRenderer(final MarkupContainer container, final LayoutContext layoutContext)
+  public AbstractFormRenderer(final MarkupContainer container, final LayoutContext layoutContext)
   {
     this.layoutContext = layoutContext;
     this.doPanel = new DataObjectLPanel("fieldSetsPanel", layoutContext);
@@ -57,7 +57,7 @@ public abstract class AbstractDOFormRenderer implements Serializable
 
   public abstract void add();
 
-  protected AbstractDOFormRenderer add(final Component component)
+  protected AbstractFormRenderer add(final Component component)
   {
     container.add(component);
     return this;
