@@ -41,7 +41,7 @@ public class GroupMobileLPanel extends GroupLPanel
   private CollapsiblePanel childPanel;
 
   /**
-   * @see AbstractDOFormRenderer#createGroupPanel(String)
+   * @see AbstractFormRenderer#createGroupPanel(String)
    */
   GroupMobileLPanel(final String id)
   {
@@ -55,7 +55,7 @@ public class GroupMobileLPanel extends GroupLPanel
   }
 
   /**
-   * @see AbstractDOFormRenderer#createGroupPanel(String, String)
+   * @see AbstractFormRenderer#createGroupPanel(String, String)
    */
   GroupMobileLPanel(final String id, final String heading)
   {

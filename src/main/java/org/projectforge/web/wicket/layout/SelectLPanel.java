@@ -43,7 +43,7 @@ public class SelectLPanel extends AbstractLPanel
   private AbstractSelectPanel< ? > selectPanel;
 
   /**
-   * @see AbstractDOFormRenderer#createDateFieldPanel(String, LayoutLength, DatePanel)
+   * @see AbstractFormRenderer#createDateFieldPanel(String, LayoutLength, DatePanel)
    */
   SelectLPanel(final String id, final AbstractSelectPanel< ? > selectPanel, final PanelContext ctx)
   {

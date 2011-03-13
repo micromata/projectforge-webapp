@@ -35,7 +35,7 @@ public class DropDownChoiceMobileLPanel extends DropDownChoiceLPanel
   private static final long serialVersionUID = 3970575700933910729L;
 
   /**
-   * @see AbstractDOFormRenderer#createDropDownChoicePanel(String, LayoutLength, DropDownChoice)
+   * @see AbstractFormRenderer#createDropDownChoicePanel(String, LayoutLength, DropDownChoice)
    */
   DropDownChoiceMobileLPanel(final String id,  final DropDownChoice< ? > dropDownChoice, final PanelContext ctx)
   {

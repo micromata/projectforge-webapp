@@ -48,7 +48,7 @@ public class FieldSetLPanel extends Panel
   private RepeatingView groupRepeater;
 
   /**
-   * @see AbstractDOFormRenderer#createFieldSetLPanel(String)
+   * @see AbstractFormRenderer#createFieldSetLPanel(String)
    */
   FieldSetLPanel(final String id)
   {
@@ -56,7 +56,7 @@ public class FieldSetLPanel extends Panel
   }
 
   /**
-   * @see AbstractDOFormRenderer#createFieldSetPanel(String, String)
+   * @see AbstractFormRenderer#createFieldSetPanel(String, String)
    */
   FieldSetLPanel(final String id, final String heading)
   {

@@ -44,7 +44,7 @@ public class DropDownChoiceLPanel extends AbstractLPanel
   protected Component dropDownChoice;
 
   /**
-   * @see AbstractDOFormRenderer#createDropDownChoicePanel(String, LayoutLength, DropDownChoice)
+   * @see AbstractFormRenderer#createDropDownChoicePanel(String, LayoutLength, DropDownChoice)
    */
   DropDownChoiceLPanel(final String id, final DropDownChoice< ? > dropDownChoice, final PanelContext ctx)
   {

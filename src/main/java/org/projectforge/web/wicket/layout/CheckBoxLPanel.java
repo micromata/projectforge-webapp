@@ -45,7 +45,7 @@ public class CheckBoxLPanel extends AbstractLPanel
 
   /**
    * @param ctx data and property expected.
-   * @see AbstractDOFormRenderer#createCheckBoxPanel(String, Object, String)
+   * @see AbstractFormRenderer#createCheckBoxPanel(String, Object, String)
    */
   CheckBoxLPanel(final String id, final PanelContext ctx)
   {
@@ -53,7 +53,7 @@ public class CheckBoxLPanel extends AbstractLPanel
   }
 
   /**
-   * @see AbstractDOFormRenderer#createCheckBoxPanel(String, CheckBox)
+   * @see AbstractFormRenderer#createCheckBoxPanel(String, CheckBox)
    */
   CheckBoxLPanel(final String id, final CheckBox checkBox, final PanelContext ctx)
   {

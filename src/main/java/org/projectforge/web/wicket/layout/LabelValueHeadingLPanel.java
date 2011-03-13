@@ -33,7 +33,7 @@ public class LabelValueHeadingLPanel extends LabelLPanel
   private static final long serialVersionUID = 6063830369431852574L;
 
   /**
-   * @see AbstractDOFormRenderer#createRepeaterLabelPanel(String)
+   * @see AbstractFormRenderer#createRepeaterLabelPanel(String)
    */
   LabelValueHeadingLPanel(final String id, final String label, final PanelContext ctx)
   {

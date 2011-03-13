@@ -35,7 +35,7 @@ public class PasswordTextFieldLPanel extends TextFieldLPanel
   private static final long serialVersionUID = -8656967306681480177L;
 
   /**
-   * @see AbstractDOFormRenderer#createTextFieldPanel(String, LayoutLength, TextField)
+   * @see AbstractFormRenderer#createTextFieldPanel(String, LayoutLength, TextField)
    */
   PasswordTextFieldLPanel(final String id, final TextField< ? > textField, final PanelContext ctx)
   {

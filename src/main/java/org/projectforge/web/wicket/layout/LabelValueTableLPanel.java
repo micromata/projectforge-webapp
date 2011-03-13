@@ -47,7 +47,7 @@ public class LabelValueTableLPanel extends AbstractLPanel
   private boolean hasChildren;
 
   /**
-   * @see AbstractDOFormRenderer#createRepeaterLabelPanel(String)
+   * @see AbstractFormRenderer#createRepeaterLabelPanel(String)
    */
   LabelValueTableLPanel(final String id)
   {

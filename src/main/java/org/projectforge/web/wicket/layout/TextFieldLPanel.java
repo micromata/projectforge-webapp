@@ -50,7 +50,7 @@ public class TextFieldLPanel extends AbstractLPanel implements IField
 
   /**
    * @param ctx with data and property
-   * @see AbstractDOFormRenderer#createTextFieldPanel(String, LayoutLength, Object, String)
+   * @see AbstractFormRenderer#createTextFieldPanel(String, LayoutLength, Object, String)
    */
   TextFieldLPanel(final String id, final PanelContext ctx)
   {
@@ -58,7 +58,7 @@ public class TextFieldLPanel extends AbstractLPanel implements IField
   }
 
   /**
-   * @see AbstractDOFormRenderer#createTextFieldPanel(String, LayoutLength, TextField)
+   * @see AbstractFormRenderer#createTextFieldPanel(String, LayoutLength, TextField)
    */
   TextFieldLPanel(final String id, final TextField< ? > textField, final PanelContext ctx)
   {
