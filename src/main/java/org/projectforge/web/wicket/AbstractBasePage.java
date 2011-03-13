@@ -408,7 +408,7 @@ public abstract class AbstractBasePage extends WebPage
     return null;
   }
 
-  protected String getLocalizedMessage(String key, Object... params)
+  public String getLocalizedMessage(String key, Object... params)
   {
     if (params == null) {
       return getString(key);
