@@ -32,6 +32,7 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.ListMultipleChoice;
 import org.apache.wicket.markup.html.form.PasswordTextField;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
@@ -267,6 +268,11 @@ public class DataObjectLPanel extends Panel
       field = groupPanel.addTextArea(ctx);
     }
     return field;
+  }
+
+  public IField addTextArea(final TextArea< ? > textArea, final PanelContext ctx)
+  {
+    return groupPanel.addTextArea(textArea, ctx);
   }
 
   /**
