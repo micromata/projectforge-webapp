@@ -66,7 +66,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ToDoDao.class);
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "reporter.username", "reporter.firstname", "reporter.lastname",
-      "assignee.username", "assignee.firstname", "assignee.lastname", "task.title", "task.taskpath"};
+      "assignee.username", "assignee.firstname", "assignee.lastname", "task.title", "task.taskpath", "group.name"};
 
   private Table table = new Table(ToDoDO.class);
 

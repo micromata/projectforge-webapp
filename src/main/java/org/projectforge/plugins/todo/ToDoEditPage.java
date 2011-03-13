@@ -56,7 +56,7 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
     if (isNew() == true) {
       final ToDoDO pref = getToDoPrefData(false);
       if (pref != null) {
-        getData().copyValuesFrom(pref, "id");
+        getData().copyValuesFrom(pref, "id", "description", "comment");
       } else {
         getData().setAssignee(PFUserContext.getUser());
         getData().setReporter(PFUserContext.getUser());
