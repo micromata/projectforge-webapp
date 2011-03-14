@@ -51,6 +51,8 @@ import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 @EditPage(defaultReturnPage = TaskTreePage.class)
 public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditForm, TaskDao> implements ISelectCallerPage
 {
+  public static final String PARAM_PARENT_TASK_ID = "parentTaskId";
+
   private static final long serialVersionUID = 5176663429783524587L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TaskEditPage.class);
@@ -70,7 +72,7 @@ public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditFor
     init();
     addTopMenuPanel();
     addTopRightMenu();
-    final Integer parentTaskId = parameters.getAsInteger("parentTaskId");
+    final Integer parentTaskId = parameters.getAsInteger(PARAM_PARENT_TASK_ID);
     if (NumberHelper.greaterZero(parentTaskId) == true) {
       taskDao.setParentTask(getData(), parentTaskId);
     }
@@ -184,7 +186,7 @@ public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditFor
           getString("gantt.title.add"));
       contentMenuEntries.add(addGanttChartMenuPanel);
 
-      addSubTaskLink.setParameter("parentTaskId", getData().getId());
+      addSubTaskLink.setParameter(PARAM_PARENT_TASK_ID, getData().getId());
     }
   }
 
