@@ -105,6 +105,9 @@ public class GroupLPanel extends Panel
     if (ctx.getTooltip() != null) {
       WicketUtils.addTooltip(textFieldPanel.getTextField(), ctx.getTooltip());
     }
+    if (ctx.getLabelPanel() != null && ctx.getLabelTooltip() != null) {
+      WicketUtils.addTooltip(ctx.getLabelPanel().getWrappedComponent(), ctx.getLabelTooltip());
+    }
     add(textFieldPanel);
   }
 
@@ -130,6 +133,9 @@ public class GroupLPanel extends Panel
     }
     if (ctx.getTooltip() != null) {
       WicketUtils.addTooltip(textAreaPanel.getTextArea(), ctx.getTooltip());
+    }
+    if (ctx.getLabelPanel() != null && ctx.getLabelTooltip() != null) {
+      WicketUtils.addTooltip(ctx.getLabelPanel().getWrappedComponent(), ctx.getLabelTooltip());
     }
     add(textAreaPanel);
     return textAreaPanel;

@@ -36,7 +36,7 @@ public class PanelContext implements Serializable
 
   private String label;
 
-  private String tooltip;
+  private String tooltip, labelTooltip;
 
   private LayoutLength labelLength;
 
@@ -191,6 +191,22 @@ public class PanelContext implements Serializable
   public PanelContext setTooltip(final String tooltip)
   {
     this.tooltip = tooltip;
+    return this;
+  }
+
+  public String getLabelTooltip()
+  {
+    return labelTooltip;
+  }
+
+  /**
+   * Sets a tool-tip for the label. Please note: if you add a tool-tip to a component, the component's label has not automatically a tool-tip.
+   * @param tooltip
+   * @return this for chaining.
+   */
+  public PanelContext setLabelTooltip(final String tooltip)
+  {
+    this.labelTooltip = tooltip;
     return this;
   }
 

@@ -47,6 +47,7 @@ import org.projectforge.web.mobile.ActionLinkType;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DateTimePanel;
 
@@ -409,6 +410,9 @@ public class DataObjectLPanel extends Panel
     ctx.internalSetValueField(field);
     if (ctx.getTooltip() != null) {
       field.setTooltip(ctx.getTooltip());
+    }
+    if (ctx.getLabelPanel() != null && ctx.getLabelTooltip() != null) {
+      WicketUtils.addTooltip(ctx.getLabelPanel().getWrappedComponent(), ctx.getLabelTooltip());
     }
     return field;
   }
