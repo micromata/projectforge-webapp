@@ -51,6 +51,7 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.core.DisplayHistoryEntry;
 import org.projectforge.core.ExtendedBaseDO;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.admin.WizardPage;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.task.TaskTreePage;
 import org.projectforge.web.user.UserFormatter;
@@ -310,6 +311,8 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
       // Force reload/refresh of calling AbstractListPage, otherwise the data object will not be updated.
       ((TaskTreePage) page).setHighlightedRowId((Integer) getData().getId());
       ((TaskTreePage) page).refresh();
+    } else if (returnToPage instanceof WizardPage) {
+      ((WizardPage)returnToPage).setCreatedObject(getData());
     }
     setResponsePage(page);
   }
