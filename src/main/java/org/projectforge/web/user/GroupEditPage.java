@@ -26,6 +26,7 @@ package org.projectforge.web.user;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -38,6 +39,11 @@ import org.projectforge.web.wicket.EditPage;
 @EditPage(defaultReturnPage = GroupListPage.class)
 public class GroupEditPage extends AbstractEditPage<GroupDO, GroupEditForm, GroupDao>
 {
+  /**
+   * Parameter for pre-defining group name (e. g. used by a wizard for creating new groups).
+   */
+  public static final String PARAM_GROUP_NAME = "groupName";
+
   private static final long serialVersionUID = 4636922408954211544L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GroupEditPage.class);
@@ -49,6 +55,10 @@ public class GroupEditPage extends AbstractEditPage<GroupDO, GroupEditForm, Grou
   {
     super(parameters, "group");
     super.init();
+    final String groupName = parameters.getString(PARAM_GROUP_NAME);
+    if (StringUtils.isNotEmpty(groupName) == true) {
+      getData().setName(groupName);
+    }
   }
 
   @Override
