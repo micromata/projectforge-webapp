@@ -56,11 +56,10 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
     if (isNew() == true) {
       final ToDoDO pref = getToDoPrefData(false);
       if (pref != null) {
-        getData().copyValuesFrom(pref, "id", "description", "comment");
-      } else {
-        getData().setAssignee(PFUserContext.getUser());
-        getData().setReporter(PFUserContext.getUser());
+        copyPrefValues(pref, getData());
       }
+      getData().setAssignee(PFUserContext.getUser());
+      getData().setReporter(PFUserContext.getUser());
     }
   }
 
@@ -81,8 +80,8 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
   public AbstractBasePage afterSaveOrUpdate()
   {
     // Save to-do as recent to-do
-     final ToDoDO pref = getToDoPrefData(true);
-     pref.copyValuesFrom(getData(), "id");
+    final ToDoDO pref = getToDoPrefData(true);
+    copyPrefValues(getData(), pref);
     // Does the user want to store this to-do as template?
     if (form.renderer.sendNotification == true) {
       final String url = WicketUtils.getAbsoluteEditPageUrl(getRequest(), ToDoEditPage.class, getData().getId());
@@ -96,10 +95,15 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
     return null;
   }
 
+  private void copyPrefValues(final ToDoDO src, final ToDoDO dest)
+  {
+    dest.setPriority(src.getPriority()).setStatus(src.getStatus()).setType(src.getType());
+  }
+
   /**
    * @param force If true then a pre entry is created if not exist.
    */
-  protected ToDoDO getToDoPrefData(final boolean force)
+  private ToDoDO getToDoPrefData(final boolean force)
   {
     ToDoDO pref = (ToDoDO) getUserPrefEntry(ToDoDO.class.getName());
     if (pref == null && force == true) {
