@@ -33,6 +33,7 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.web.admin.TaskWizardPage;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -95,7 +96,7 @@ public class TaskTreePage extends AbstractSecuredPage
   private void init()
   {
     if (isSelectMode() == false) {
-      final ContentMenuEntryPanel newItemMenuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+      ContentMenuEntryPanel newItemMenuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
         @Override
         public void onClick()
         {
@@ -106,6 +107,20 @@ public class TaskTreePage extends AbstractSecuredPage
         };
       }, getString("add"));
       contentMenuEntries.add(newItemMenuEntry);
+      if (accessChecker.isLoggedInUserMemberOfAdminGroup() == true) {
+        contentMenuEntries.add(newItemMenuEntry);
+        newItemMenuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+          @Override
+          public void onClick()
+          {
+            final PageParameters params = new PageParameters();
+            final TaskWizardPage wizardPage = new TaskWizardPage(params);
+            wizardPage.setReturnToPage(TaskTreePage.this);
+            setResponsePage(wizardPage);
+          };
+        }, getString("wizard"));
+        contentMenuEntries.add(newItemMenuEntry);
+      }
       dropDownMenu.setVisible(true);
       new AbstractReindexTopRightMenu(this, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
         @Override
