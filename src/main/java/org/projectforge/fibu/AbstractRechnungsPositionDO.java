@@ -86,7 +86,7 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
     return this;
   }
 
-  @Column(name = "menge")
+  @Column(scale = 5, precision = 18)
   public BigDecimal getMenge()
   {
     return menge;
@@ -98,7 +98,7 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
     return this;
   }
 
-  @Column(name = "einzel_netto")
+  @Column(name = "einzel_netto", scale = 2, precision = 18)
   public BigDecimal getEinzelNetto()
   {
     return einzelNetto;
@@ -110,7 +110,7 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
     return this;
   }
 
-  @Column
+  @Column(scale = 5, precision = 10)
   public BigDecimal getVat()
   {
     return vat;
