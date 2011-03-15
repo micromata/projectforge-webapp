@@ -42,7 +42,7 @@ public class TaskWizardForm extends AbstractForm<TaskWizardForm, TaskWizardPage>
 
   protected TaskDO task;
   
-  protected GroupDO managerGroup, teamGroup;
+  protected GroupDO managerGroup, team;
 
 
   public TaskWizardForm(final TaskWizardPage parentPage)

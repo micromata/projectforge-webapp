@@ -109,32 +109,47 @@ public class TaskWizardFormRenderer extends AbstractFormRenderer
       repeatingView.add(buttonPanel);
     }
 
-    doPanel.newGroupPanel("2. " + getString("task.wizard.managerGroup"));
-    doPanel.addHelpLabel(getString("task.wizard.managerGroup.intro"), new PanelContext(FULL_LENGTH));
+    // Manager group
+    createGroupComponents(2, "managerGroup");
+
+    // Team
+    createGroupComponents(3, "team");
+  }
+
+  @SuppressWarnings("serial")
+  private void createGroupComponents(final int number, final String key)
+  {
+    doPanel.newGroupPanel(number + ". " + getString("task.wizard." + key));
+    doPanel.addHelpLabel(getString("task.wizard." + key + ".intro"), new PanelContext(FULL_LENGTH));
     {
-      final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<GroupDO>(form,
-          "managerGroup"), wizardPage, "managerGroupId");
+      final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<GroupDO>(form, key),
+          wizardPage, key + "Id");
       doPanel.addSelectPanel(groupSelectPanel, new PanelContext(VALUE_LENGTH, getString("group"), LABEL_LENGTH));
       groupSelectPanel.setShowFavorites(false).init();
     }
     {
       doPanel.addLabel("", new PanelContext(LABEL_LENGTH));
       final RepeatingView repeatingView = doPanel.addRepeater(new PanelContext(VALUE_LENGTH)).getRepeatingView();
-      final Button button = new Button("button", new Model<String>(getString("task.wizard.button.createManagerGroup"))) {
+      final Button button = new Button("button", new Model<String>(getString("task.wizard.button.createGroup"))) {
         @Override
         public final void onSubmit()
         {
+          wizardPage.managingGroupCreated = "managingGroup".equals(key);
           final PageParameters params = new PageParameters();
           final StringBuffer buf = new StringBuffer();
           if (form.task != null) {
-            buf.append(form.task.getTitle()).append(", ");
+            buf.append(form.task.getTitle());
           }
-          buf.append(getString("task.wizard.managerGroup.groupNameSuffix"));
+          if (wizardPage.managingGroupCreated == true) {
+            if (form.task != null) {
+              buf.append(", ");
+            }
+            buf.append(getString("task.wizard.managerGroup.groupNameSuffix"));
+          }
           params.put(GroupEditPage.PARAM_GROUP_NAME, buf.toString());
           final GroupEditPage editPage = new GroupEditPage(params);
           editPage.setReturnToPage(wizardPage);
           setResponsePage(editPage);
-          wizardPage.managingGroupCreated = true;
         }
 
         @Override
@@ -146,11 +161,8 @@ public class TaskWizardFormRenderer extends AbstractFormRenderer
       button.setDefaultFormProcessing(false);
       button.add(WebConstants.BUTTON_CLASS);
       SingleButtonPanel buttonPanel = new SingleButtonPanel(repeatingView.newChildId(), button);
-      WicketUtils.addTooltip(button, getString("task.wizard.button.createManagerGroup.tooltip"));
+      WicketUtils.addTooltip(button, getString("task.wizard.button.createGroup.tooltip"));
       repeatingView.add(buttonPanel);
     }
-    doPanel.newGroupPanel("3. " + getString("task.wizard.group"));
-
   }
-
 }

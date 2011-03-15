@@ -77,7 +77,11 @@ public class TaskWizardPage extends AbstractSecuredPage implements ISelectCaller
     if ("taskId".equals(property) == true) {
       form.task = null;
     } else if ("managerGroupId".equals(property) == true) {
-      form.managerGroup = null;
+      if (managingGroupCreated == true) {
+        form.managerGroup = null;
+      } else {
+        form.team = null;
+      }
     } else {
       log.error("Property '" + property + "' not supported for deselection.");
     }
@@ -86,7 +90,7 @@ public class TaskWizardPage extends AbstractSecuredPage implements ISelectCaller
   @Override
   protected String getTitle()
   {
-    return getString("system.admin.title");
+    return getString("task.wizard.pageTitle");
   }
 
   @Override
@@ -100,7 +104,7 @@ public class TaskWizardPage extends AbstractSecuredPage implements ISelectCaller
       if (managingGroupCreated == true) {
         form.managerGroup = (GroupDO) createdObject;
       } else {
-        form.teamGroup = (GroupDO) createdObject;
+        form.team = (GroupDO) createdObject;
       }
     }
   }
