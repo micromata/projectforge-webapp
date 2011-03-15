@@ -150,13 +150,13 @@ public class TaskWizardFormRenderer extends AbstractFormRenderer
         @Override
         public final void onSubmit()
         {
-          wizardPage.managingGroupCreated = "managerGroup".equals(key);
+          wizardPage.managerGroupCreated = "managerGroup".equals(key);
           final PageParameters params = new PageParameters();
           final StringBuffer buf = new StringBuffer();
           if (form.task != null) {
             buf.append(form.task.getTitle());
           }
-          if (wizardPage.managingGroupCreated == true) {
+          if (wizardPage.managerGroupCreated == true) {
             if (form.task != null) {
               buf.append(", ");
             }

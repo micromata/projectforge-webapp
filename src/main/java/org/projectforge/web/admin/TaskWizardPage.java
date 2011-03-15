@@ -25,18 +25,22 @@ package org.projectforge.web.admin;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.access.AccessDao;
+import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
+import org.projectforge.task.TaskNode;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.task.TaskTreePage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 
 public class TaskWizardPage extends AbstractSecuredPage implements ISelectCallerPage, WizardPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TaskWizardPage.class);
 
-  boolean managingGroupCreated;
+  boolean managerGroupCreated;
 
   private TaskWizardForm form;
 
@@ -45,6 +49,9 @@ public class TaskWizardPage extends AbstractSecuredPage implements ISelectCaller
 
   @SpringBean(name = "groupDao")
   private GroupDao groupDao;
+
+  @SpringBean(name = "accessDao")
+  private AccessDao accessDao;
 
   public TaskWizardPage(PageParameters parameters)
   {
@@ -56,7 +63,39 @@ public class TaskWizardPage extends AbstractSecuredPage implements ISelectCaller
 
   void create()
   {
+    if (actionRequired() == false) {
+      log.info("create: Nothing to do.");
+      return;
+    }
+    final TaskNode taskNode = taskDao.getTaskTree().getTaskNodeById(form.task.getId());
+    createAccessRights(taskNode, form.managerGroup, true, true);
+    createAccessRights(taskNode, form.team, false, true);
+    setResponsePage(TaskTreePage.class);
+  }
 
+  private void createAccessRights(final TaskNode taskNode, final GroupDO group, final boolean isManagerGroup, final boolean isLeaf)
+  {
+    if (taskNode == null || group == null || taskNode.getId() == null || group.getId() == null) {
+      return;
+    }
+    if (taskDao.getTaskTree().isRootNode(taskNode) == true) {
+      return;
+    }
+    final GroupTaskAccessDO access = new GroupTaskAccessDO();
+    accessDao.setTask(access, taskNode.getId());
+    accessDao.setGroup(access, group.getId());
+    if (isLeaf == false) {
+      access.guest();
+      access.setRecursive(false);
+    } else if (isManagerGroup) {
+      access.leader();
+      access.setRecursive(true);
+    } else {
+      access.employee();
+      access.setRecursive(true);
+    }
+    accessDao.save(access);
+    createAccessRights(taskNode.getParent(), group, isManagerGroup, false);
   }
 
   /**
@@ -114,7 +153,7 @@ public class TaskWizardPage extends AbstractSecuredPage implements ISelectCaller
     } else if (createdObject instanceof TaskDO) {
       form.task = (TaskDO) createdObject;
     } else if (createdObject instanceof GroupDO) {
-      if (managingGroupCreated == true) {
+      if (managerGroupCreated == true) {
         form.managerGroup = (GroupDO) createdObject;
       } else {
         form.team = (GroupDO) createdObject;
