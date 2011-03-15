@@ -239,6 +239,20 @@ public class ToDoFormRenderer extends AbstractFormRenderer
       repeatingView.add(checkBoxLabelPanel);
       checkBoxLabelPanel.setTooltip(getString("plugins.todo.notification.tooltip"));
     }
+//    if (ConfigXml.getInstance().isSmsConfigured() == true) {
+//      doPanel.addLabel("", new PanelContext(LABEL_LENGTH).setBreakBefore(true));
+//      final RepeatingView repeatingView = doPanel.addRepeater(new PanelContext(VALUE_LENGTH)).getRepeatingView();
+//      final CheckBox checkBox = new CheckBox(CheckBoxLabelPanel.WICKET_ID, new PropertyModel<Boolean>(this, "sendShortMessage")) {
+//        @Override
+//        public boolean isEnabled()
+//        {
+//          return data.getAssignee() != null && data.getAssignee().getPersonalMebMobileNumbers(); // Außerdem: Beobachter (standardmäßig die letzten Bearbeiter/Reporter.
+//        }
+//      };
+//      final CheckBoxLabelPanel checkBoxLabelPanel = new CheckBoxLabelPanel(repeatingView.newChildId(), checkBox,
+//          getString("label.sendShortMessage"));
+//      repeatingView.add(checkBoxLabelPanel);
+//    }
 
     {
       // Save as template checkbox:
