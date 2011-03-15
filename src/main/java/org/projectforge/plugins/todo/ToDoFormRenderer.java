@@ -145,7 +145,7 @@ public class ToDoFormRenderer extends AbstractFormRenderer
               toDoEditPage.getForm().visitFormComponents(new FormComponent.IVisitor() {
                 public Object formComponent(final IFormVisitorParticipant formComponent)
                 {
-                  final FormComponent<?> fc = (FormComponent<?>) formComponent;
+                  final FormComponent< ? > fc = (FormComponent< ? >) formComponent;
                   fc.modelChanged();
                   return Component.IVisitor.CONTINUE_TRAVERSAL;
                 }
@@ -159,7 +159,7 @@ public class ToDoFormRenderer extends AbstractFormRenderer
     }
 
     doPanel.addTextField(new PanelContext(data, "subject", VALUE_LENGTH, getString("plugins.todo.subject"), LABEL_LENGTH).setRequired()
-        .setStrong());
+        .setStrong().setFocus());
     {
       final LabelValueChoiceRenderer<ToDoType> typeChoiceRenderer = new LabelValueChoiceRenderer<ToDoType>(container, ToDoType.values());
       final DropDownChoice<ToDoType> typeChoice = new DropDownChoice<ToDoType>(DropDownChoiceLPanel.SELECT_ID, new PropertyModel<ToDoType>(
@@ -192,7 +192,8 @@ public class ToDoFormRenderer extends AbstractFormRenderer
       }
       final UserSelectPanel assigneeUserSelectPanel = new UserSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<PFUserDO>(data,
           "assignee"), toDoEditPage, "assigneeId");
-      doPanel.addSelectPanel(assigneeUserSelectPanel, new PanelContext(VALUE_LENGTH, getString("plugins.todo.assignee"), LABEL_LENGTH).setStrong());
+      doPanel.addSelectPanel(assigneeUserSelectPanel, new PanelContext(VALUE_LENGTH, getString("plugins.todo.assignee"), LABEL_LENGTH)
+          .setStrong());
       assigneeUserSelectPanel.init();
     }
     {
@@ -216,13 +217,15 @@ public class ToDoFormRenderer extends AbstractFormRenderer
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<TaskDO>(data, "task"),
           toDoEditPage, "taskId");
       taskSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
-      doPanel.addSelectPanel(taskSelectPanel, new PanelContext(VALUE_LENGTH, getString("task"), LABEL_LENGTH).setTooltip(getString("plugins.todo.task.tooltip")));
+      doPanel.addSelectPanel(taskSelectPanel, new PanelContext(VALUE_LENGTH, getString("task"), LABEL_LENGTH)
+          .setTooltip(getString("plugins.todo.task.tooltip")));
       taskSelectPanel.init();
     }
     {
       final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<GroupDO>(data, "group"),
           toDoEditPage, "groupId");
-      doPanel.addSelectPanel(groupSelectPanel, new PanelContext(VALUE_LENGTH, getString("group"), LABEL_LENGTH).setTooltip(getString("plugins.todo.group.tooltip")));
+      doPanel.addSelectPanel(groupSelectPanel, new PanelContext(VALUE_LENGTH, getString("group"), LABEL_LENGTH)
+          .setTooltip(getString("plugins.todo.group.tooltip")));
       groupSelectPanel.init();
     }
     doPanel.addTextArea(new PanelContext(data, "description", VALUE_LENGTH, getString("description"), LABEL_LENGTH)
