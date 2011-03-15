@@ -28,6 +28,7 @@ import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.ListMultipleChoice;
@@ -162,6 +163,15 @@ public class DataObjectLPanel extends Panel
   }
 
   public LabelLPanel addLabel(final String label, final PanelContext ctx)
+  {
+    ensureGroupPanel();
+    final LabelLPanel labelPanel;
+    labelPanel = new LabelLPanel(groupPanel.newChildId(), label, ctx);
+    groupPanel.add(labelPanel);
+    return labelPanel;
+  }
+
+  public LabelLPanel addLabel(final Label label, final PanelContext ctx)
   {
     ensureGroupPanel();
     final LabelLPanel labelPanel;
