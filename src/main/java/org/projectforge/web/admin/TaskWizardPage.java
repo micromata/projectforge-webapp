@@ -54,6 +54,19 @@ public class TaskWizardPage extends AbstractSecuredPage implements ISelectCaller
     form.init();
   }
 
+  void create()
+  {
+
+  }
+
+  /**
+   * Visibility of the create button.
+   */
+  boolean actionRequired()
+  {
+    return form.task != null && (form.managerGroup != null || form.team != null);
+  }
+
   @Override
   public void cancelSelection(String property)
   {
@@ -66,6 +79,8 @@ public class TaskWizardPage extends AbstractSecuredPage implements ISelectCaller
       form.task = taskDao.getById((Integer) selectedValue);
     } else if ("managerGroupId".equals(property) == true) {
       form.managerGroup = groupDao.getById((Integer) selectedValue);
+    } else if ("teamId".equals(property) == true) {
+      form.team = groupDao.getById((Integer) selectedValue);
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
@@ -77,11 +92,9 @@ public class TaskWizardPage extends AbstractSecuredPage implements ISelectCaller
     if ("taskId".equals(property) == true) {
       form.task = null;
     } else if ("managerGroupId".equals(property) == true) {
-      if (managingGroupCreated == true) {
-        form.managerGroup = null;
-      } else {
-        form.team = null;
-      }
+      form.managerGroup = null;
+    } else if ("teamId".equals(property) == true) {
+      form.team = null;
     } else {
       log.error("Property '" + property + "' not supported for deselection.");
     }

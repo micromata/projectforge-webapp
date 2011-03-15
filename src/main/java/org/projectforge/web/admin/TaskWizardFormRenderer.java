@@ -26,6 +26,7 @@ package org.projectforge.web.admin;
 import static org.projectforge.web.wicket.layout.SelectLPanel.WICKET_ID_SELECT_PANEL;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
@@ -41,6 +42,7 @@ import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.layout.AbstractFormRenderer;
+import org.projectforge.web.wicket.layout.LabelLPanel;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.LayoutLength;
 import org.projectforge.web.wicket.layout.PanelContext;
@@ -80,7 +82,8 @@ public class TaskWizardFormRenderer extends AbstractFormRenderer
   {
     doPanel.newFieldSetPanel(getString("wizard"));
     doPanel.addHelpLabel(getString("task.wizard.intro"), new PanelContext(FULL_LENGTH));
-    doPanel.newGroupPanel("1. " + getString("task"));
+    int number = 1;
+    doPanel.newGroupPanel(String.valueOf(number++) + ". " + getString("task"));
     {
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<TaskDO>(form, "task"),
           wizardPage, "taskId");
@@ -110,10 +113,23 @@ public class TaskWizardFormRenderer extends AbstractFormRenderer
     }
 
     // Manager group
-    createGroupComponents(2, "managerGroup");
+    createGroupComponents(number++, "managerGroup");
 
     // Team
-    createGroupComponents(3, "team");
+    createGroupComponents(number++, "team");
+
+    doPanel.newGroupPanel(getString("task.wizard.action"));
+    doPanel.addLabel(new Label(LabelLPanel.LABEL_ID, new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        if (wizardPage.actionRequired() == true) {
+          return getString("task.wizard.action.taskAndgroupsGiven");
+        } else {
+          return getString("task.wizard.action.noactionRequired");
+        }
+      }
+    }), new PanelContext(FULL_LENGTH));
   }
 
   @SuppressWarnings("serial")
@@ -134,7 +150,7 @@ public class TaskWizardFormRenderer extends AbstractFormRenderer
         @Override
         public final void onSubmit()
         {
-          wizardPage.managingGroupCreated = "managingGroup".equals(key);
+          wizardPage.managingGroupCreated = "managerGroup".equals(key);
           final PageParameters params = new PageParameters();
           final StringBuffer buf = new StringBuffer();
           if (form.task != null) {
