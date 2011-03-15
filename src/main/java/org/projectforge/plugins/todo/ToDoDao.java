@@ -179,17 +179,22 @@ public class ToDoDao extends BaseDao<ToDoDO>
       }
     }
     data.put("history", list);
-    sendNotification(todo.getAssignee(), todo, data);
-    sendNotification(todo.getReporter(), todo, data);
+    final PFUserDO user = PFUserContext.getUser();
+    if (user.getId() != todo.getAssigneeId()) {
+      sendNotification(todo.getAssignee(), todo, data, true);
+    }
+    if (user.getId() != todo.getReporterId()) {
+      sendNotification(todo.getReporter(), todo, data, true);
+    }
+    if (user.getId() != todo.getAssigneeId() && user.getId() != todo.getReporterId() && hasSelectAccess(user, todo, false) == false) {
+      // User is whether reporter nor assignee, so send e-mail (in the case the user hasn't read access anymore).
+      sendNotification(PFUserContext.getUser(), todo, data, false);
+    }
   }
 
-  private void sendNotification(final PFUserDO recipient, final ToDoDO toDo, final Map<String, Object> data)
+  private void sendNotification(final PFUserDO recipient, final ToDoDO toDo, final Map<String, Object> data, final boolean checkAccess)
   {
-    if (recipient == null || ObjectUtils.equals(PFUserContext.getUserId(), recipient.getId()) == true) {
-      // No recipient given or recipient is equals to logged-in user (no e-mail required).
-      return;
-    }
-    if (hasSelectAccess(recipient, toDo, false) == false) {
+    if (checkAccess == true && hasSelectAccess(recipient, toDo, false) == false) {
       log.info("Recipient '"
           + recipient.getFullname()
           + "' (id="
