@@ -303,16 +303,18 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
   @Override
   public void setResponsePageAndHighlightedRow(final WebPage page)
   {
-    if (page instanceof AbstractListPage< ? , ? , ? >) {
-      // Force reload/refresh of calling AbstractListPage, otherwise the data object will not be updated.
-      ((AbstractListPage< ? , ? , ? >) page).setHighlightedRowId(getData().getId());
-      ((AbstractListPage< ? , ? , ? >) page).refresh();
-    } else if (returnToPage instanceof TaskTreePage) {
-      // Force reload/refresh of calling AbstractListPage, otherwise the data object will not be updated.
-      ((TaskTreePage) page).setHighlightedRowId((Integer) getData().getId());
-      ((TaskTreePage) page).refresh();
-    } else if (returnToPage instanceof WizardPage) {
-      ((WizardPage)returnToPage).setCreatedObject(getData());
+    if (getData().getId() != null) {
+      if (page instanceof AbstractListPage< ? , ? , ? >) {
+        // Force reload/refresh of calling AbstractListPage, otherwise the data object will not be updated.
+        ((AbstractListPage< ? , ? , ? >) page).setHighlightedRowId(getData().getId());
+        ((AbstractListPage< ? , ? , ? >) page).refresh();
+      } else if (returnToPage instanceof TaskTreePage) {
+        // Force reload/refresh of calling AbstractListPage, otherwise the data object will not be updated.
+        ((TaskTreePage) page).setHighlightedRowId((Integer) getData().getId());
+        ((TaskTreePage) page).refresh();
+      } else if (returnToPage instanceof WizardPage) {
+        ((WizardPage) returnToPage).setCreatedObject(getData());
+      }
     }
     setResponsePage(page);
   }
