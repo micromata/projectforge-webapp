@@ -39,6 +39,8 @@ import org.projectforge.web.wicket.WicketUtils;
 public class CheckBoxLabelPanel extends Panel
 {
   private static final long serialVersionUID = 1949087680268950965L;
+  
+  public static final String WICKET_ID = "checkBox";
 
   final CheckBox checkBox;
 
@@ -46,8 +48,13 @@ public class CheckBoxLabelPanel extends Panel
 
   public CheckBoxLabelPanel(final String id, final IModel<Boolean> model, final String label)
   {
+    this(id, new CheckBox(WICKET_ID, model), label);
+  }
+
+  public CheckBoxLabelPanel(final String id, final CheckBox checkBox, final String label)
+  {
     super(id);
-    checkBox = new CheckBox("checkBox", model);
+    this.checkBox = checkBox;
     add(checkBox.setOutputMarkupId(true));
     final Model<String> labelModel = new Model<String>(label);
     checkBox.setLabel(labelModel);
