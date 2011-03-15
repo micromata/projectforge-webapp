@@ -91,18 +91,6 @@ public class ToDoRight extends UserRightAccessCheck<ToDoDO>
   }
 
   /**
-   * If user is not reporter or assignee and task is given the access to task is assumed, meaning if the user has the right to update the
-   * task he is allowed to update to-do's to. If the to-do is moved (from one task to another) the user needs the update right for both
-   * tasks.
-   * @see org.projectforge.user.UserRightAccessCheck#hasUpdateAccess(org.projectforge.user.PFUserDO, java.lang.Object, java.lang.Object)
-   */
-  @Override
-  public boolean hasUpdateAccess(final PFUserDO user, final ToDoDO obj, final ToDoDO oldObj)
-  {
-    return hasAccess(user, obj, OperationType.UPDATE) == true && hasAccess(user, oldObj, OperationType.UPDATE) == true;
-  }
-
-  /**
    * If user is not reporter or assignee and task is given the access to task is assumed, meaning if the user has the right to delete the
    * tasks he is allowed to delete to-do's to.
    * @see org.projectforge.user.UserRightAccessCheck#hasDeleteAccess(org.projectforge.user.PFUserDO, java.lang.Object)
@@ -116,7 +104,7 @@ public class ToDoRight extends UserRightAccessCheck<ToDoDO>
   @Override
   public boolean hasAccess(final PFUserDO user, final ToDoDO obj, final ToDoDO oldObj, final OperationType operationType)
   {
-    return hasAccess(user, obj) == true && hasAccess(user, oldObj) == true;
+    return hasAccess(user, obj) == true || hasAccess(user, oldObj) == true;
   }
 
   private boolean hasAccess(final PFUserDO user, final ToDoDO toDo)
