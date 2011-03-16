@@ -314,8 +314,13 @@ public class AuftragDao extends BaseDao<AuftragDO>
 
   private List<AuftragDO> getList(BaseSearchFilter filter, boolean checkAccess)
   {
-    final AuftragFilter myFilter = (AuftragFilter) filter;
-    final QueryFilter queryFilter = new QueryFilter(filter);
+    final AuftragFilter myFilter;
+    if (filter instanceof AuftragFilter) {
+      myFilter = (AuftragFilter) filter;
+    } else {
+      myFilter = new AuftragFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
     if (myFilter.getYear() > 1900) {
       Calendar cal = DateHelper.getUTCCalendar();
       cal.set(Calendar.YEAR, myFilter.getYear());

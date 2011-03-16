@@ -36,6 +36,7 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -61,12 +62,13 @@ import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.CurrencyPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
 
 @ListPage(editPage = AuftragEditPage.class)
-public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDao, AuftragDO>
+public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDao, AuftragDO> implements IListPageColumnsCreator<AuftragDO>
 {
   private static final long serialVersionUID = -8406452960003792763L;
 
@@ -95,7 +97,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
 
   @SuppressWarnings("serial")
   @Override
-  protected void init()
+  public List<IColumn<AuftragDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<AuftragDO>> columns = new ArrayList<IColumn<AuftragDO>>();
     final CellItemListener<AuftragDO> cellItemListener = new CellItemListener<AuftragDO>() {
@@ -230,7 +232,13 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
         });
     columns.add(new CellItemListenerPropertyColumn<AuftragDO>(new Model<String>(getString("status")), "auftragsStatusAsString",
         "auftragsStatusAsString", cellItemListener));
-    dataTable = createDataTable(columns, "nummer", false);
+    return columns;
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this, true), "nummer", false);
     form.add(dataTable);
   }
 

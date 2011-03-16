@@ -121,7 +121,8 @@ import org.projectforge.web.wicket.FeedbackPage;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 
 /**
- * Registry for dao's. Here you can register additional daos and plugins (extensions of ProjectForge). This registry is used e. g. by the general SearchPage.
+ * Registry for dao's. Here you can register additional daos and plugins (extensions of ProjectForge). This registry is used e. g. by the
+ * general SearchPage.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -294,7 +295,7 @@ public class WebRegistry
     addMountPages(DaoRegistry.CUSTOMER, CustomerListPage.class, CustomerEditPage.class);
     register(DaoRegistry.PROJECT, ProjektListPage.class);
     addMountPages(DaoRegistry.PROJECT, ProjektListPage.class, ProjektEditPage.class);
-    // register(DaoRegistry.ORDERBOOK, AuftragListPage.class);
+    register(DaoRegistry.ORDERBOOK, AuftragListPage.class);
     addMountPages(DaoRegistry.ORDERBOOK, AuftragListPage.class, AuftragEditPage.class);
 
     addMountPages("bankAccount", BankAccountListPage.class, BankAccountEditPage.class);
