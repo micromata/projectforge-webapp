@@ -183,9 +183,22 @@ public class MenuItemRegistry
   }
 
   private MenuItemDef register(final MenuItemDef parent, final MenuItemDefId defId, final int orderNumber,
+      final Class< ? extends Page> pageClass, final boolean visible, final ProjectForgeGroup... visibleForGroups)
+  {
+    return register(parent, defId, orderNumber, pageClass, null, visible, visibleForGroups);
+  }
+
+  private MenuItemDef register(final MenuItemDef parent, final MenuItemDefId defId, final int orderNumber,
       final Class< ? extends Page> pageClass, final String[] params, final ProjectForgeGroup... visibleForGroups)
   {
-    return register(new MenuItemDef(parent, defId.getId(), orderNumber, defId.getI18nKey(), pageClass, params, visibleForGroups));
+    return register(parent, defId, orderNumber, pageClass, params, true, visibleForGroups);
+  }
+
+  private MenuItemDef register(final MenuItemDef parent, final MenuItemDefId defId, final int orderNumber,
+      final Class< ? extends Page> pageClass, final String[] params, final boolean visible, final ProjectForgeGroup... visibleForGroups)
+  {
+    return register(new MenuItemDef(parent, defId.getId(), orderNumber, defId.getI18nKey(), pageClass, params, visibleForGroups)
+        .setVisible(visible));
   }
 
   private MenuItemRegistry()
@@ -249,7 +262,9 @@ public class MenuItemRegistry
     reg.register(fibu, MenuItemDefId.OUTGOING_INVOICE_LIST, 10, RechnungListPage.class, RechnungDao.USER_RIGHT_ID, READONLY_READWRITE);
     reg.register(fibu, MenuItemDefId.INCOMING_INVOICE_LIST, 20, EingangsrechnungListPage.class, EingangsrechnungDao.USER_RIGHT_ID,
         READONLY_READWRITE);
-    reg.register(fibu, MenuItemDefId.BANK_ACCOUNT_LIST, 30, BankAccountListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
+    // Not yet finished:
+    reg.register(fibu, MenuItemDefId.BANK_ACCOUNT_LIST, 30, BankAccountListPage.class, WicketApplication.isDevelopmentModus(),
+        FINANCE_GROUP, CONTROLLING_GROUP);
     reg.register(fibu, MenuItemDefId.CUSTOMER_LIST, 40, CustomerListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     final MenuItemDef projects = new MenuItemDef(fibu, MenuItemDefId.PROJECT_LIST.getId(), 50, MenuItemDefId.PROJECT_LIST.getI18nKey(),
         ProjektListPage.class, ProjektDao.USER_RIGHT_ID, READONLY_READWRITE) {
@@ -324,14 +339,11 @@ public class MenuItemRegistry
     reg.register(firstLogin);
 
     // MISC
-    final MenuItemDef imageCropper = new MenuItemDef(misc, MenuItemDefId.IMAGE_CROPPER.getId(), 100, MenuItemDefId.IMAGE_CROPPER
-        .getI18nKey(), ImageCropperPage.class, new String[] { ImageCropperPage.PARAM_SHOW_UPLOAD_BUTTON, "false",
-        ImageCropperPage.PARAM_ENABLE_WHITEBOARD_FILTER, "true"});
-    imageCropper.setVisible(false); // invisible at default (because it's only functioning with valid ssl certificate).
-    reg.register(imageCropper);
-    if (WicketApplication.isDevelopmentModus() == true) {
-      reg.register(misc, MenuItemDefId.GWIKI, 110, GWikiContainerPage.class);
-    }
+    // invisible at default (because it's only functioning with valid ssl certificate).
+    reg.register(misc, MenuItemDefId.IMAGE_CROPPER, 100, ImageCropperPage.class, new String[] { ImageCropperPage.PARAM_SHOW_UPLOAD_BUTTON,
+        "false", ImageCropperPage.PARAM_ENABLE_WHITEBOARD_FILTER, "true"}, false);
+    // Not yet finished:
+    reg.register(misc, MenuItemDefId.GWIKI, 110, GWikiContainerPage.class, WicketApplication.isDevelopmentModus());
     reg.register(misc, MenuItemDefId.DOCUMENTATION, 200, DocumentationPage.class);
   }
 }
