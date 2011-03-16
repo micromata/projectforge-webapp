@@ -80,9 +80,14 @@ public class MenuItemDef implements Serializable
     return this.visible;
   }
 
-  public void setVisible(final boolean visible)
+  /**
+   * @param visible
+   * @return this for chaining.
+   */
+  public MenuItemDef setVisible(final boolean visible)
   {
     this.visible = visible;
+    return this;
   }
 
   /**
