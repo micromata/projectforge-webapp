@@ -180,13 +180,16 @@ public class ToDoDao extends BaseDao<ToDoDO>
     }
     data.put("history", list);
     final PFUserDO user = PFUserContext.getUser();
-    if (user.getId() != todo.getAssigneeId()) {
+    final Integer userId = user.getId();
+    final Integer assigneeId = todo.getAssigneeId();
+    final Integer reporterId = todo.getReporterId();
+    if (assigneeId != null && userId.equals(assigneeId) == false) {
       sendNotification(todo.getAssignee(), todo, data, true);
     }
-    if (user.getId() != todo.getReporterId()) {
+    if (reporterId != null && userId.equals(reporterId) == false && reporterId.equals(assigneeId) == false) {
       sendNotification(todo.getReporter(), todo, data, true);
     }
-    if (user.getId() != todo.getAssigneeId() && user.getId() != todo.getReporterId() && hasSelectAccess(user, todo, false) == false) {
+    if (userId != assigneeId && userId != reporterId && hasSelectAccess(user, todo, false) == false) {
       // User is whether reporter nor assignee, so send e-mail (in the case the user hasn't read access anymore).
       sendNotification(PFUserContext.getUser(), todo, data, false);
     }
