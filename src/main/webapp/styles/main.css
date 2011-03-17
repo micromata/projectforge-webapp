@@ -209,7 +209,7 @@ color: #fff;
 margin-right: 1em;
 float: right;
 }
-.headermeta ul.info li.loggedInLabel a {
+.headermeta ul.info li.loggedInLabel a.logout {
 float: none;
 margin: 0 0 0 0.5em;
 color: #FFD300;
