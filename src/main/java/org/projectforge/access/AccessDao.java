@@ -122,6 +122,24 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
     return ADDITIONAL_SEARCH_FIELDS;
   }
 
+  @SuppressWarnings("unchecked")
+  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+  public GroupTaskAccessDO getEntry(final TaskDO task, final GroupDO group)
+  {
+    Validate.notNull(task);
+    Validate.notNull(task.getId());
+    Validate.notNull(group);
+    Validate.notNull(group.getId());
+    final List<GroupTaskAccessDO> list = (List<GroupTaskAccessDO>) getHibernateTemplate().find(
+        "from GroupTaskAccessDO a where a.task.id = ? and a.group.id = ?", new Object[] { task.getId(), group.getId()});
+    if (list != null && list.size() == 1) {
+      final GroupTaskAccessDO access = list.get(0);
+      checkLoggedInUserSelectAccess(access);
+      return access;
+    }
+    return null;
+  }
+
   @Override
   public List<GroupTaskAccessDO> getList(final BaseSearchFilter filter)
   {
