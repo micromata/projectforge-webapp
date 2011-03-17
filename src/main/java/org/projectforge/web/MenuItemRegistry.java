@@ -212,6 +212,9 @@ public class MenuItemRegistry
   {
     final ConfigXml xmlConfiguration = ConfigXml.getInstance();
     final Configuration configuration = Configuration.getInstance();
+    final boolean costConfigured = configuration.isCostConfigured();
+    final boolean developmentModus = WicketApplication.isDevelopmentModus();
+
     // Super menus
     final MenuItemDef common = reg.register(null, MenuItemDefId.COMMON, 10);
     final MenuItemDef pm = reg.register(null, MenuItemDefId.PROJECT_MANAGEMENT, 20);
@@ -263,24 +266,25 @@ public class MenuItemRegistry
     reg.register(fibu, MenuItemDefId.INCOMING_INVOICE_LIST, 20, EingangsrechnungListPage.class, EingangsrechnungDao.USER_RIGHT_ID,
         READONLY_READWRITE);
     // Not yet finished:
-    reg.register(fibu, MenuItemDefId.BANK_ACCOUNT_LIST, 30, BankAccountListPage.class, WicketApplication.isDevelopmentModus(),
-        FINANCE_GROUP, CONTROLLING_GROUP);
-    reg.register(fibu, MenuItemDefId.CUSTOMER_LIST, 40, CustomerListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
-    final MenuItemDef projects = new MenuItemDef(fibu, MenuItemDefId.PROJECT_LIST.getId(), 50, MenuItemDefId.PROJECT_LIST.getI18nKey(),
-        ProjektListPage.class, ProjektDao.USER_RIGHT_ID, READONLY_READWRITE) {
-      @Override
-      protected void afterMenuEntryCreation(final MenuEntry createdMenuEntry, final MenuBuilderContext context)
-      {
-        if (context.getAccessChecker().isLoggedInUserMemberOfGroup(fibuGroups) == false) {
-          // Setting project management as parent because fibu isn't visible for this user:
-          createdMenuEntry.setParent(context.getMenu(), pm.getId());
+    reg.register(fibu, MenuItemDefId.BANK_ACCOUNT_LIST, 30, BankAccountListPage.class, developmentModus, FINANCE_GROUP, CONTROLLING_GROUP);
+    if (costConfigured == true) {
+      reg.register(fibu, MenuItemDefId.CUSTOMER_LIST, 40, CustomerListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
+      final MenuItemDef projects = new MenuItemDef(fibu, MenuItemDefId.PROJECT_LIST.getId(), 50, MenuItemDefId.PROJECT_LIST.getI18nKey(),
+          ProjektListPage.class, ProjektDao.USER_RIGHT_ID, READONLY_READWRITE) {
+        @Override
+        protected void afterMenuEntryCreation(final MenuEntry createdMenuEntry, final MenuBuilderContext context)
+        {
+          if (context.getAccessChecker().isLoggedInUserMemberOfGroup(fibuGroups) == false) {
+            // Setting project management as parent because fibu isn't visible for this user:
+            createdMenuEntry.setParent(context.getMenu(), pm.getId());
+          }
         }
-      }
-    };
-    reg.register(projects);
-    reg.register(fibu, MenuItemDefId.EMPLOYEE_LIST, 60, EmployeeListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
-    reg.register(fibu, MenuItemDefId.EMPLOYEE_SALARY_LIST, 70, EmployeeSalaryListPage.class, EmployeeSalaryDao.USER_RIGHT_ID,
-        READONLY_READWRITE);
+      };
+      reg.register(projects);
+      reg.register(fibu, MenuItemDefId.EMPLOYEE_LIST, 60, EmployeeListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
+      reg.register(fibu, MenuItemDefId.EMPLOYEE_SALARY_LIST, 70, EmployeeSalaryListPage.class, EmployeeSalaryDao.USER_RIGHT_ID,
+          READONLY_READWRITE);
+    }
     final MenuItemDef orderBook = new MenuItemDef(fibu, MenuItemDefId.ORDER_LIST.getId(), 80, MenuItemDefId.ORDER_LIST.getI18nKey(),
         AuftragListPage.class, AuftragDao.USER_RIGHT_ID, READONLY_PARTLYREADWRITE_READWRITE) {
       @Override
@@ -297,19 +301,24 @@ public class MenuItemRegistry
     };
     reg.register(orderBook);
 
-    // COST
-    reg.register(cost, MenuItemDefId.ACCOUNT_LIST, 10, KontoListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
-    reg.register(cost, MenuItemDefId.COST1_LIST, 20, Kost1ListPage.class, Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE);
-    reg.register(cost, MenuItemDefId.COST2_LIST, 30, Kost2ListPage.class, Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE);
-    reg.register(cost, MenuItemDefId.COST2_TYPE_LIST, 40, Kost2ArtListPage.class, Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE);
+    if (costConfigured == true) {
+      // COST
+      reg.register(cost, MenuItemDefId.ACCOUNT_LIST, 10, KontoListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
+      reg.register(cost, MenuItemDefId.COST1_LIST, 20, Kost1ListPage.class, Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE);
+      reg.register(cost, MenuItemDefId.COST2_LIST, 30, Kost2ListPage.class, Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE);
+      reg.register(cost, MenuItemDefId.COST2_TYPE_LIST, 40, Kost2ArtListPage.class, Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE);
+    }
 
     // REPORTING
-    reg.register(reporting, MenuItemDefId.ACCOUNTING_RECORD_LIST, 10, AccountingRecordListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
-    reg.register(reporting, MenuItemDefId.REPORT_OBJECTIVES, 20, ReportObjectivesPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
+    if (costConfigured == true) {
+      reg.register(reporting, MenuItemDefId.ACCOUNTING_RECORD_LIST, 10, AccountingRecordListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
+      reg.register(reporting, MenuItemDefId.REPORT_OBJECTIVES, 20, ReportObjectivesPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
+    }
     reg.register(reporting, MenuItemDefId.SCRIPTING, 30, ReportScriptingPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     reg.register(reporting, MenuItemDefId.SCRIPT_LIST, 40, ScriptListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
-    reg.register(reporting, MenuItemDefId.DATEV_IMPORT, 50, DatevImportPage.class, DatevImportDao.USER_RIGHT_ID, UserRightValue.TRUE);
-
+    if (costConfigured == true) {
+      reg.register(reporting, MenuItemDefId.DATEV_IMPORT, 50, DatevImportPage.class, DatevImportDao.USER_RIGHT_ID, UserRightValue.TRUE);
+    }
     // ORGA
     reg.register(orga, MenuItemDefId.OUTBOX_LIST, 10, PostausgangListPage.class, PostausgangDao.USER_RIGHT_ID, READONLY_READWRITE);
     reg.register(orga, MenuItemDefId.INBOX_LIST, 20, PosteingangListPage.class, PosteingangDao.USER_RIGHT_ID, READONLY_READWRITE);
@@ -343,7 +352,7 @@ public class MenuItemRegistry
     reg.register(misc, MenuItemDefId.IMAGE_CROPPER, 100, ImageCropperPage.class, new String[] { ImageCropperPage.PARAM_SHOW_UPLOAD_BUTTON,
         "false", ImageCropperPage.PARAM_ENABLE_WHITEBOARD_FILTER, "true"}, false);
     // Not yet finished:
-    reg.register(misc, MenuItemDefId.GWIKI, 110, GWikiContainerPage.class, WicketApplication.isDevelopmentModus());
+    reg.register(misc, MenuItemDefId.GWIKI, 110, GWikiContainerPage.class, developmentModus);
     reg.register(misc, MenuItemDefId.DOCUMENTATION, 200, DocumentationPage.class);
   }
 }
