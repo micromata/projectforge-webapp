@@ -25,7 +25,6 @@ package org.projectforge.user;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.hibernate.Query;
 import org.projectforge.access.AccessChecker;
@@ -156,33 +155,7 @@ public class UserXmlPreferencesMigrationDao extends HibernateDaoSupport
    */
   protected static void migrate(final UserXmlPreferencesDO userPrefs)
   {
-    String s = userPrefs.getSerializedSettings();
     if (userPrefs.getVersion() < 4) {
-      boolean modified = false;
-      if (s.contains("de.micromata.projectforge") == true) {
-        s = StringUtils.replace(s, "de.micromata.projectforge", "org.projectforge");
-        modified = true;
-      }
-      if (s.contains("de.micromata.fibu") == true) {
-        s = StringUtils.replace(s, "de.micromata.fibu", "org.projectforge.fibu");
-        modified = true;
-      }
-      if (modified == true) {
-        userPrefs.setSerializedSettings(s);
-      }
-      s = userPrefs.getKey();
-      if (s.contains("de.micromata.projectforge") == true) {
-        s = StringUtils.replace(s, "de.micromata.projectforge", "org.projectforge");
-        userPrefs.setKey(s);
-        modified = true;
-      } else if (s.contains("de.micromata.fibu") == true) {
-        s = StringUtils.replace(s, "de.micromata.fibu", "org.projectforge.fibu");
-        userPrefs.setKey(s);
-        modified = true;
-      }
-      if (modified == true) {
-        log.info("User settings migrated for user " + userPrefs.getUserId() + ": " + userPrefs.getKey());
-      }
       userPrefs.setVersion(4);
     }
   }
