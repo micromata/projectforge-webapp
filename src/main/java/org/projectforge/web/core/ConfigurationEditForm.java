@@ -45,6 +45,7 @@ import org.projectforge.task.TaskDao;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.components.CheckBoxPanel;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
@@ -97,6 +98,10 @@ public class ConfigurationEditForm extends AbstractEditForm<ConfigurationDO, Con
       valueField.add(new SimpleAttributeModifier("class", WebConstants.CSS_INPUT_STDTEXT));
     } else if (data.getConfigurationType() == ConfigurationType.TEXT) {
       textareaField.setVisible(true);
+      valueField = createInvisibleDummyComponent("value");
+    } else if (data.getConfigurationType() == ConfigurationType.BOOLEAN) {
+      panel = new CheckBoxPanel("panel", new PropertyModel<Boolean>(data, "booleanValue"));
+      add(panel);
       valueField = createInvisibleDummyComponent("value");
     } else if (data.getConfigurationType() == ConfigurationType.TIME_ZONE) {
       panel = new TimeZonePanel("panel", new PropertyModel<TimeZone>(data, "timeZone"));
