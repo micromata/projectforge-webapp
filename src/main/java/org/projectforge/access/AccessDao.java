@@ -72,6 +72,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
   public AccessDao()
   {
     super(GroupTaskAccessDO.class);
+    this.supportAfterUpdate = true;
   }
 
   public void setGroupDao(GroupDao groupDao)
@@ -277,38 +278,69 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
   }
 
   @Override
-  protected void afterSaveOrModify(GroupTaskAccessDO obj)
+  protected void afterSaveOrModify(final GroupTaskAccessDO obj)
   {
     super.afterSaveOrModify(obj);
     taskTree.setGroupTaskAccess(obj);
   }
 
   @Override
-  protected void afterUpdate(GroupTaskAccessDO obj, GroupTaskAccessDO dbObj)
+  protected void afterUpdate(final GroupTaskAccessDO obj, final GroupTaskAccessDO dbObj)
   {
-    List<AccessEntryDO> entries = obj.getOrderedEntries();
-    StringBuffer buf = new StringBuffer();
+    Validate.notNull(dbObj);
+    final List<AccessEntryDO> entries = obj.getOrderedEntries();
+    final StringBuffer bufNew = new StringBuffer();
+    final StringBuffer bufOld = new StringBuffer();
     boolean first = true;
-    for (AccessEntryDO entry : entries) {
+    for (final AccessEntryDO entry : entries) {
+      final AccessEntryDO dbEntry = dbObj.getAccessEntry(entry.getAccessType());
+      if (dbEntry != null
+          && dbEntry.getAccessSelect() == entry.getAccessSelect()
+          && dbEntry.getAccessInsert() == entry.getAccessInsert()
+          && dbEntry.getAccessUpdate() == entry.getAccessUpdate()
+          && dbEntry.getAccessDelete() == entry.getAccessDelete()) {
+        // Nothing changed.
+        continue;
+      }
       if (first == true) {
         first = false;
       } else {
-        buf.append(";");
+        bufNew.append(";");
+        bufOld.append(";");
       }
-      buf.append(entry.getAccessType()).append("={").append(entry.getAccessSelect()).append(",").append(entry.getAccessInsert())
+      bufNew.append(entry.getAccessType()).append("={").append(entry.getAccessSelect()).append(",").append(entry.getAccessInsert())
           .append(",").append(entry.getAccessUpdate()).append(",").append(entry.getAccessDelete()).append("}");
+      bufOld.append(dbEntry.getAccessType()).append("={").append(dbEntry.getAccessSelect()).append(",").append(dbEntry.getAccessInsert())
+      .append(",").append(dbEntry.getAccessUpdate()).append(",").append(dbEntry.getAccessDelete()).append("}");
     }
-    createHistoryEntry(obj, obj.getId(), "entries", String.class, "", buf.toString());
+    if (first == false) {
+      createHistoryEntry(obj, obj.getId(), "entries", String.class, bufOld.toString(), bufNew.toString());
+    }
   }
-
+  
   @Override
-  protected void afterDelete(GroupTaskAccessDO obj)
+  protected GroupTaskAccessDO getBackupObject(final GroupTaskAccessDO dbObj)
+  {
+    final GroupTaskAccessDO access = new GroupTaskAccessDO();
+    for (final AccessEntryDO dbEntry : dbObj.getAccessEntries()) {
+      final AccessEntryDO entry = new AccessEntryDO(dbEntry.getAccessType());
+      entry.setAccessSelect(dbEntry.getAccessSelect());
+      entry.setAccessInsert(dbEntry.getAccessInsert());
+      entry.setAccessUpdate(dbEntry.getAccessUpdate());
+      entry.setAccessDelete(dbEntry.getAccessDelete());
+      access.addAccessEntry(entry);
+    }
+    return access;
+  }
+  
+  @Override
+  protected void afterDelete(final GroupTaskAccessDO obj)
   {
     taskTree.removeGroupTaskAccess(obj);
   }
 
   @Override
-  protected void afterUndelete(GroupTaskAccessDO obj)
+  protected void afterUndelete(final GroupTaskAccessDO obj)
   {
     taskTree.setGroupTaskAccess(obj);
   }
