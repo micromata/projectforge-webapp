@@ -291,7 +291,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
     final List<AccessEntryDO> entries = obj.getOrderedEntries();
     final StringBuffer bufNew = new StringBuffer();
     final StringBuffer bufOld = new StringBuffer();
-    boolean first = true;
+    boolean firstNew = true, firstOld = true;
     for (final AccessEntryDO entry : entries) {
       final AccessEntryDO dbEntry = dbObj.getAccessEntry(entry.getAccessType());
       if (dbEntry != null
@@ -302,22 +302,28 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
         // Nothing changed.
         continue;
       }
-      if (first == true) {
-        first = false;
+      if (firstNew == true) {
+        firstNew = false;
       } else {
         bufNew.append(";");
-        bufOld.append(";");
       }
-      bufNew.append(entry.getAccessType()).append("={").append(entry.getAccessSelect()).append(",").append(entry.getAccessInsert())
-          .append(",").append(entry.getAccessUpdate()).append(",").append(entry.getAccessDelete()).append("}");
-      bufOld.append(dbEntry.getAccessType()).append("={").append(dbEntry.getAccessSelect()).append(",").append(dbEntry.getAccessInsert())
-      .append(",").append(dbEntry.getAccessUpdate()).append(",").append(dbEntry.getAccessDelete()).append("}");
+      bufNew.append(entry.getAccessType()).append("={").append(entry.getAccessSelect()).append(",").append(entry.getAccessInsert()).append(
+          ",").append(entry.getAccessUpdate()).append(",").append(entry.getAccessDelete()).append("}");
+      if (dbEntry != null) {
+        if (firstOld == true) {
+          firstOld = false;
+        } else {
+          bufOld.append(";");
+        }
+        bufOld.append(dbEntry.getAccessType()).append("={").append(dbEntry.getAccessSelect()).append(",").append(dbEntry.getAccessInsert())
+            .append(",").append(dbEntry.getAccessUpdate()).append(",").append(dbEntry.getAccessDelete()).append("}");
+      }
     }
-    if (first == false) {
+    if (firstNew == false || firstOld == false) {
       createHistoryEntry(obj, obj.getId(), "entries", String.class, bufOld.toString(), bufNew.toString());
     }
   }
-  
+
   @Override
   protected GroupTaskAccessDO getBackupObject(final GroupTaskAccessDO dbObj)
   {
@@ -332,7 +338,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
     }
     return access;
   }
-  
+
   @Override
   protected void afterDelete(final GroupTaskAccessDO obj)
   {
