@@ -54,6 +54,7 @@ import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.core.MenuPanel;
 import org.projectforge.web.core.SearchPage;
 import org.projectforge.web.doc.DocumentationPage;
+import org.projectforge.web.user.MyAccountEditPage;
 import org.projectforge.web.wicket.embats.EmbatsSymbolChar;
 import org.projectforge.web.wicket.embats.IconLinkPanel;
 
@@ -141,17 +142,24 @@ public abstract class AbstractBasePage extends WebPage
     } else {
       navigationContainer.add(new Label("logoLeftImage", "[invisible]").setVisible(false));
     }
+    final PFUserDO user = getUser();
+    final BookmarkablePageLink<Void> myAccountLink;
+    if (user == null) {
+      myAccountLink = new BookmarkablePageLink<Void>("myAccountLink", LoginPage.class);
+    } else {
+      myAccountLink = new BookmarkablePageLink<Void>("myAccountLink", MyAccountEditPage.class);
+    }
+    navigationContainer.add(myAccountLink);
     final Model<String> loggedInLabelModel = new Model<String>() {
       public String getObject()
       {
-        final PFUserDO user = getUser();
         if (user == null) {
           return getString("notLoggedIn");
         }
         return getString("loggedInUserInfo") + " <strong>" + escapeHtml(user.getUserDisplayname()) + "</strong> |";
       }
     };
-    navigationContainer.add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false).setRenderBodyOnly(false));
+    myAccountLink.add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false).setRenderBodyOnly(false));
     final PageParameters params = new PageParameters();
     params.add(LoginPage.REQUEST_PARAM_LOGOUT, "true");
     final Link<String> logoutLink = new Link<String>("logoutLink") {

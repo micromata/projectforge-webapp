@@ -17,10 +17,10 @@
 
 
   <ul class="info">
-    <li class="loggedInLabel"><span wicket:id="loggedInLabel">[Logged in: John Mustermann (john)]</span><a wicket:id="logoutLink"
-      href="/login?logout=true"><span wicket:id="logoutLabel">[Logout]</span></a></li>
-    <li><a class="version" wicket:id="docLink" href="docPage" wicket:message="title:menu.documentation"> <span wicket:id="versionLabel">[V. #.#.##
-    2009-...]</span> </a></li>
+    <li class="loggedInLabel"><a wicket:id="myAccountLink" href="/myAccount" wicket:message="title:user.myAccount.title.edit"><span wicket:id="loggedInLabel">[Logged in: John
+    Mustermann (john)]</span></a><a class="logout" wicket:id="logoutLink" href="/login?logout=true"><span wicket:id="logoutLabel">[Logout]</span></a></li>
+    <li><a class="version" wicket:id="docLink" href="docPage" wicket:message="title:menu.documentation"> <span wicket:id="versionLabel">[V.
+    #.#.## 2009-...]</span> </a></li>
     <li><wicket:container wicket:id="sendFeedbackLink">[speech ballon]</wicket:container></li>
     <li><wicket:container wicket:id="bookmarkLink">[star]</wicket:container></li>
     <li><wicket:container wicket:id="searchLink">[loupe]</wicket:container></li>
