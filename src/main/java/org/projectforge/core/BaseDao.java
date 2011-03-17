@@ -158,7 +158,8 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   protected boolean avoidNullIdCheckBeforeSave;
 
   /**
-   * Set this to true if you overload {@link #afterUpdate(ExtendedBaseDO, ExtendedBaseDO)} and you need the origin data base entryfterup.
+   * Set this to true if you overload {@link #afterUpdate(ExtendedBaseDO, ExtendedBaseDO)} and you need the origin data base entry in this
+   * method.
    */
   protected boolean supportAfterUpdate = false;
 
@@ -953,8 +954,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     onChange(obj, dbObj);
     final O dbObjBackup;
     if (supportAfterUpdate == true) {
-      dbObjBackup = newInstance();
-      copyValues(dbObj, dbObjBackup);
+      dbObjBackup = getBackupObject(dbObj);
     } else {
       dbObjBackup = null;
     }
@@ -973,8 +973,23 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     afterSaveOrModify(obj);
     if (supportAfterUpdate == true) {
       afterUpdate(obj, dbObjBackup);
+    } else {
+      afterUpdate(obj, null);
     }
     return result;
+  }
+
+  /**
+   * Used by internal update if supportAfterUpdate is true for storing db object version for afterUpdate. Override this method to implement
+   * your own copy method.
+   * @param dbObj
+   * @return
+   */
+  protected O getBackupObject(final O dbObj)
+  {
+    final O backupObj = newInstance();
+    copyValues(dbObj, backupObj);
+    return backupObj;
   }
 
   /**
