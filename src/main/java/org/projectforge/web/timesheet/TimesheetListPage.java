@@ -191,25 +191,27 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
 
   protected void createDataTable()
   {
-    final List<IColumn<TimesheetDO>> columns = createColumns(this, !isMassUpdateMode(), isMassUpdateMode(), form.getSearchFilter()
-        .isLongFormat(), taskFormatter, taskTree, userFormatter, dateTimeFormatter);
+    final List<IColumn<TimesheetDO>> columns = createColumns(this, !isMassUpdateMode(), isMassUpdateMode(), form.getSearchFilter(),
+        taskFormatter, taskTree, userFormatter, dateTimeFormatter);
     dataTable = createDataTable(columns, "startTime", false);
     form.add(dataTable);
   }
 
   public List<IColumn<TimesheetDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    return createColumns(returnToPage, sortable, false, false, taskFormatter, taskTree, userFormatter, dateTimeFormatter);
+    return createColumns(returnToPage, sortable, false, form.getSearchFilter(), taskFormatter, taskTree, userFormatter, dateTimeFormatter);
   }
 
   /**
    * For re-usage in other pages.
    * @param page
    * @param isMassUpdateMode
+   * @param timesheetFilter If given, then the long format filter setting will be used for displaying the description, otherwise the short
+   *          description is used.
    */
   @SuppressWarnings("serial")
   protected static final List<IColumn<TimesheetDO>> createColumns(final WebPage page, final boolean sortable,
-      final boolean isMassUpdateMode, final boolean longFormat, final TaskFormatter taskFormatter, final TaskTree taskTree,
+      final boolean isMassUpdateMode, final TimesheetFilter timesheetFilter, final TaskFormatter taskFormatter, final TaskTree taskTree,
       final UserFormatter userFormatter, final DateTimeFormatter dateTimeFormatter)
   {
     final List<IColumn<TimesheetDO>> columns = new ArrayList<IColumn<TimesheetDO>>();
@@ -285,7 +287,8 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
       public void populateItem(Item<ICellPopulator<TimesheetDO>> item, String componentId, IModel<TimesheetDO> rowModel)
       {
         final TimesheetDO timesheet = rowModel.getObject();
-        final Label label = new Label(componentId, dateTimeFormatter.getFormattedDate(timesheet.getStartTime(), DateFormats.getFormatString(DateFormatType.DAY_OF_WEEK_SHORT)));
+        final Label label = new Label(componentId, dateTimeFormatter.getFormattedDate(timesheet.getStartTime(), DateFormats
+            .getFormatString(DateFormatType.DAY_OF_WEEK_SHORT)));
         cellItemListener.populateItem(item, componentId, rowModel);
         item.add(label);
       }
@@ -327,7 +330,7 @@ public class TimesheetListPage extends AbstractListPage<TimesheetListForm, Times
           public String getObject()
           {
             String text;
-            if (longFormat == true) {
+            if (timesheetFilter != null && timesheetFilter.isLongFormat() == true) {
               text = HtmlHelper.escapeXml(timesheet.getDescription());
             } else {
               text = HtmlHelper.escapeXml(timesheet.getShortDescription());

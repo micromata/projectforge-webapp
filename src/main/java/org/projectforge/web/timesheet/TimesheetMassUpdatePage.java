@@ -94,7 +94,7 @@ public class TimesheetMassUpdatePage extends AbstractSecuredPage implements ISel
     }
     body.add(form);
     form.init();
-    final List<IColumn<TimesheetDO>> columns = TimesheetListPage.createColumns(this, false, true, false, taskFormatter, taskTree,
+    final List<IColumn<TimesheetDO>> columns = TimesheetListPage.createColumns(this, false, true, null, taskFormatter, taskTree,
         userFormatter, dateTimeFormatter);
     @SuppressWarnings("serial")
     final SortableDataProvider<TimesheetDO> sortableDataProvider = new SortableDataProvider<TimesheetDO>() {
