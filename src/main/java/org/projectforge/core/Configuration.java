@@ -179,6 +179,20 @@ public class Configuration extends AbstractCache
   }
 
   /**
+   * @return The boolean value of the given parameter stored as ConfigurationDO in the data base.
+   * @throws ClassCastException if configuration parameter is from the wrong type.
+   */
+  public boolean getBooleanValue(final ConfigurationParam parameter)
+  {
+    final Object obj = getValue(parameter);
+    if (obj != null && Boolean.TRUE.equals(obj)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
    * @return The BigDecimal value of the given parameter stored as ConfigurationDO in the data base.
    * @throws ClassCastException if configuration parameter is from the wrong type.
    */
@@ -208,6 +222,11 @@ public class Configuration extends AbstractCache
   public boolean isBookManagementConfigured()
   {
     return getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS) != null;
+  }
+
+  public boolean isCostConfigured()
+  {
+    return getBooleanValue(ConfigurationParam.COST_CONFIGURED);
   }
 
   private Object getValue(final ConfigurationParam parameter)
