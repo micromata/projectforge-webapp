@@ -26,7 +26,7 @@ package org.projectforge.core;
 
 public enum ConfigurationType
 {
-  STRING, TEXT, INTEGER, FLOAT, PERCENT, TASK, TIME_ZONE;
+  STRING, TEXT, INTEGER, FLOAT, BOOLEAN, PERCENT, TASK, TIME_ZONE;
   
   public boolean isIn(final ConfigurationType...configurationTypes) {
     for (ConfigurationType type : configurationTypes) {

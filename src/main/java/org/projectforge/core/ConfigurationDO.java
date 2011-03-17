@@ -208,6 +208,21 @@ public class ConfigurationDO extends DefaultBaseDO
   }
 
   @Transient
+  public Boolean getBooleanValue()
+  {
+    if (this.configurationType == ConfigurationType.BOOLEAN) {
+      return Boolean.TRUE.toString().equals(stringValue);
+    } else {
+      return null;
+    }
+  }
+
+  public void setBooleanValue(final Boolean booleanValue)
+  {
+    this.stringValue = booleanValue != null ? booleanValue.toString() : Boolean.FALSE.toString();
+  }
+
+  @Transient
   public Object getValue()
   {
     if (this.configurationType.isIn(ConfigurationType.STRING, ConfigurationType.TEXT, ConfigurationType.TIME_ZONE) == true) {
@@ -216,6 +231,8 @@ public class ConfigurationDO extends DefaultBaseDO
       return this.intValue;
     } else if (this.configurationType == ConfigurationType.FLOAT || this.configurationType == ConfigurationType.PERCENT) {
       return this.floatValue;
+    } else if (this.configurationType == ConfigurationType.BOOLEAN) {
+      return this.getBooleanValue();
     } else {
       throw new UnsupportedOperationException("Unsupported value type: " + this.configurationType);
     }
@@ -252,7 +269,8 @@ public class ConfigurationDO extends DefaultBaseDO
   protected void internalSetConfigurationType(final ConfigurationType type)
   {
     this.configurationType = type;
-    if (this.configurationType.isIn(ConfigurationType.STRING, ConfigurationType.TEXT, ConfigurationType.TIME_ZONE) == true) {
+    if (this.configurationType.isIn(ConfigurationType.STRING, ConfigurationType.BOOLEAN, ConfigurationType.TEXT,
+        ConfigurationType.TIME_ZONE) == true) {
       this.intValue = null;
       this.floatValue = null;
     } else if (this.configurationType.isIn(ConfigurationType.INTEGER, ConfigurationType.TASK) == true) {
@@ -272,7 +290,7 @@ public class ConfigurationDO extends DefaultBaseDO
       if (this.configurationType == type) {
         return;
       } else if (type == ConfigurationType.STRING
-          && this.configurationType.isIn(ConfigurationType.TEXT, ConfigurationType.TIME_ZONE) == true) {
+          && this.configurationType.isIn(ConfigurationType.TEXT, ConfigurationType.BOOLEAN, ConfigurationType.TIME_ZONE) == true) {
         return;
       } else if (type == ConfigurationType.INTEGER && this.configurationType == ConfigurationType.TASK) {
         return;
@@ -293,7 +311,8 @@ public class ConfigurationDO extends DefaultBaseDO
       this.configurationType = type;
     } else if (this.configurationType == type) {
       // Do nothing.
-    } else if (type == ConfigurationType.STRING && this.configurationType.isIn(ConfigurationType.TEXT, ConfigurationType.TIME_ZONE) == true) {
+    } else if (type == ConfigurationType.STRING
+        && this.configurationType.isIn(ConfigurationType.TEXT, ConfigurationType.BOOLEAN, ConfigurationType.TIME_ZONE) == true) {
       // Do nothing.
     } else if (type == ConfigurationType.INTEGER && this.configurationType == ConfigurationType.TASK) {
       // Do nothing.

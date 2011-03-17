@@ -112,6 +112,11 @@ public class ConfigurationDao extends BaseDao<ConfigurationDO>
         return 0;
       }
       return configurationDO.getIntValue();
+    } else if (parameter.getType() == ConfigurationType.BOOLEAN) {
+      if (configurationDO == null) {
+        return null;
+      }
+      return configurationDO.getBooleanValue();
     } else if (parameter.getType() == ConfigurationType.TASK) {
       if (configurationDO == null) {
         return null;

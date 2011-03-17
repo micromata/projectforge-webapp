@@ -34,6 +34,7 @@ public enum ConfigurationParam
   EXCEL_DATE_FORMATS("excelDateFormats", ConfigurationType.STRING, "MM/DD/YYYY;DD/MM/YYYY;DD.MM.YYYY"), //
   FEEDBACK_E_MAIL("feedbackEMail", ConfigurationType.STRING), //
   FIBU_DEFAULT_VAT("fibu.defaultVAT", ConfigurationType.PERCENT), //
+  COST_CONFIGURED("fibu.costConfigured", ConfigurationType.BOOLEAN), //
   DEFAULT_TASK_ID_4_ADDRESSES("defaultTask4Addresses", ConfigurationType.TASK), //
   DEFAULT_TASK_ID_4_BOOKS("defaultTask4Books", ConfigurationType.TASK), //
   DEFAULT_COUNTRY_PHONE_PREFIX("countryPhonePrefix", ConfigurationType.STRING, "+49"), //
