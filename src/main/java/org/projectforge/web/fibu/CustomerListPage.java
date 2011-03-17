@@ -30,6 +30,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -43,6 +44,8 @@ import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.MessagePage;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 
 @ListPage(editPage = CustomerEditPage.class)
@@ -67,6 +70,15 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
   @Override
   protected void init()
   {
+    final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+      @Override
+      public void onClick()
+      {
+        setResponsePage(new MessagePage("fibu.kunde.wizard.notYetAvailable"));
+      };
+    }, getString("wizard"));
+    contentMenuEntries.add(menuEntry);
+
     List<IColumn<KundeDO>> columns = new ArrayList<IColumn<KundeDO>>();
 
     CellItemListener<KundeDO> cellItemListener = new CellItemListener<KundeDO>() {

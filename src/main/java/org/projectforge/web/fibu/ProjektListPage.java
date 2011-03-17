@@ -32,6 +32,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -52,6 +53,8 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.MessagePage;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = ProjektEditPage.class)
 public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDao, ProjektDO> implements IListPageColumnsCreator<ProjektDO>
@@ -169,9 +172,18 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
     return columns;
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
+    final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+      @Override
+      public void onClick()
+      {
+        setResponsePage(new MessagePage("fibu.projekt.wizard.notYetAvailable"));
+      };
+    }, getString("wizard"));
+    contentMenuEntries.add(menuEntry);
     dataTable = createDataTable(createColumns(this, true), "kost", true);
     form.add(dataTable);
   }
