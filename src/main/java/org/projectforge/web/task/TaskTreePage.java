@@ -96,7 +96,7 @@ public class TaskTreePage extends AbstractSecuredPage
   private void init()
   {
     if (isSelectMode() == false) {
-      ContentMenuEntryPanel newItemMenuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+      ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
         @Override
         public void onClick()
         {
@@ -106,10 +106,10 @@ public class TaskTreePage extends AbstractSecuredPage
           setResponsePage(editPage);
         };
       }, getString("add"));
-      contentMenuEntries.add(newItemMenuEntry);
+      contentMenuEntries.add(menuEntry);
       if (accessChecker.isLoggedInUserMemberOfAdminGroup() == true) {
-        contentMenuEntries.add(newItemMenuEntry);
-        newItemMenuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+        contentMenuEntries.add(menuEntry);
+        menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
           @Override
           public void onClick()
           {
@@ -119,7 +119,7 @@ public class TaskTreePage extends AbstractSecuredPage
             setResponsePage(wizardPage);
           };
         }, getString("wizard"));
-        contentMenuEntries.add(newItemMenuEntry);
+        contentMenuEntries.add(menuEntry);
       }
       dropDownMenu.setVisible(true);
       new AbstractReindexTopRightMenu(this, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
