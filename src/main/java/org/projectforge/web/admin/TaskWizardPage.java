@@ -81,9 +81,16 @@ public class TaskWizardPage extends AbstractSecuredPage implements ISelectCaller
     if (taskDao.getTaskTree().isRootNode(taskNode) == true) {
       return;
     }
-    final GroupTaskAccessDO access = new GroupTaskAccessDO();
-    accessDao.setTask(access, taskNode.getId());
-    accessDao.setGroup(access, group.getId());
+    GroupTaskAccessDO access = accessDao.getEntry(taskNode.getTask(), group);
+    if (access == null) {
+      access = new GroupTaskAccessDO();
+      accessDao.setTask(access, taskNode.getId());
+      accessDao.setGroup(access, group.getId());
+    } else {
+      if (access.isDeleted() == true) {
+        accessDao.undelete(access);
+      }
+    }
     if (isLeaf == false) {
       access.guest();
       access.setRecursive(false);
@@ -94,7 +101,7 @@ public class TaskWizardPage extends AbstractSecuredPage implements ISelectCaller
       access.employee();
       access.setRecursive(true);
     }
-    accessDao.save(access);
+    accessDao.saveOrUpdate(access);
     createAccessRights(taskNode.getParent(), group, isManagerGroup, false);
   }
 

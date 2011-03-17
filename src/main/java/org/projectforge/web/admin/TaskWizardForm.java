@@ -59,7 +59,7 @@ public class TaskWizardForm extends AbstractForm<TaskWizardForm, TaskWizardPage>
   {
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     renderer.add();
-    final Button createButton = new Button("button", new Model<String>(getString("create"))) {
+    final Button createButton = new Button("button", new Model<String>(getString("task.wizard.finish"))) {
       @Override
       public final void onSubmit()
       {
@@ -74,7 +74,7 @@ public class TaskWizardForm extends AbstractForm<TaskWizardForm, TaskWizardPage>
     };
     createButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     setDefaultButton(createButton);
-    final SingleButtonPanel createButtonPanel = new SingleButtonPanel("create", createButton);
+    final SingleButtonPanel createButtonPanel = new SingleButtonPanel("finish", createButton);
     add(createButtonPanel);
   }
 }
