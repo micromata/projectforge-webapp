@@ -38,6 +38,7 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.AbstractHistorizableBaseDO;
+import org.projectforge.core.IManualIndex;
 import org.projectforge.core.ShortDisplayNameCapable;
 import org.projectforge.lucene.PFAnalyzer;
 
@@ -52,7 +53,7 @@ import org.projectforge.lucene.PFAnalyzer;
 @Indexed
 @Table(name = "T_FIBU_KUNDE")
 @Analyzer(impl = PFAnalyzer.class)
-public class KundeDO extends AbstractHistorizableBaseDO<Integer> implements ShortDisplayNameCapable
+public class KundeDO extends AbstractHistorizableBaseDO<Integer> implements ShortDisplayNameCapable, IManualIndex
 {
   private static final long serialVersionUID = -2138613066430251341L;
 
