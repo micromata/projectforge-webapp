@@ -45,6 +45,7 @@ import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.LoginPage;
+import org.projectforge.web.MenuItemRegistry;
 import org.projectforge.web.UserFilter;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.MessagePage;
@@ -96,6 +97,9 @@ public class SetupPage extends AbstractSecuredPage
       adminUser = initDatabaseDao.initializeEmptyDatabaseWithTestData(form.getAdminUsername(), form.getEncryptedPassword(), form
           .getTimeZone());
       message = "administration.setup.message.testdata";
+      // refreshes the visibility of the costConfigured dependent menu items:
+      Configuration.getInstance().setExpired(); // Force reload.
+      MenuItemRegistry.instance().refresh();
     }
     ((MySession) getSession()).login(adminUser, getRequest());
     UserFilter.login(((WebRequest) getRequest()).getHttpServletRequest(), adminUser);
