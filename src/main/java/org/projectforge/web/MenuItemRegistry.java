@@ -163,6 +163,35 @@ public class MenuItemRegistry
     return menuItemDef;
   }
 
+  /**
+   * Should be called after any modification of configuration parameters such as costConfigured. It refreshes the visibility of some menu
+   * entries.
+   */
+  public void refresh()
+  {
+    final ConfigXml xmlConfiguration = ConfigXml.getInstance();
+    final Configuration configuration = Configuration.getInstance();
+    final boolean costConfigured = configuration.isCostConfigured();
+    get(MenuItemDefId.CUSTOMER_LIST).setVisible(costConfigured);
+    get(MenuItemDefId.PROJECT_LIST).setVisible(costConfigured);
+    get(MenuItemDefId.EMPLOYEE_LIST).setVisible(costConfigured);
+    get(MenuItemDefId.EMPLOYEE_SALARY_LIST).setVisible(costConfigured);
+    get(MenuItemDefId.ACCOUNT_LIST).setVisible(costConfigured);
+    get(MenuItemDefId.COST1_LIST).setVisible(costConfigured);
+    get(MenuItemDefId.COST2_LIST).setVisible(costConfigured);
+    get(MenuItemDefId.COST2_TYPE_LIST).setVisible(costConfigured);
+    get(MenuItemDefId.ACCOUNTING_RECORD_LIST).setVisible(costConfigured);
+    get(MenuItemDefId.REPORT_OBJECTIVES).setVisible(costConfigured);
+    get(MenuItemDefId.DATEV_IMPORT).setVisible(costConfigured);
+
+    get(MenuItemDefId.ADDRESS_LIST).setVisible(configuration.isAddressManagementConfigured());
+    get(MenuItemDefId.BOOK_LIST).setVisible(configuration.isBookManagementConfigured());
+    get(MenuItemDefId.MEB).setVisible(configuration.isMebConfigured());
+
+    get(MenuItemDefId.PHONE_CALL).setVisible(StringUtils.isNotEmpty(xmlConfiguration.getTelephoneSystemUrl()));
+    get(MenuItemDefId.CONTRACTS).setVisible(CollectionUtils.isNotEmpty(xmlConfiguration.getContractTypes()));
+  }
+
   private MenuItemDef register(final MenuItemDef parent, final MenuItemDefId defId, final int orderNumber,
       final ProjectForgeGroup... visibleForGroups)
   {
@@ -210,9 +239,6 @@ public class MenuItemRegistry
   @SuppressWarnings("serial")
   private static void initialize(final MenuItemRegistry reg)
   {
-    final ConfigXml xmlConfiguration = ConfigXml.getInstance();
-    final Configuration configuration = Configuration.getInstance();
-    final boolean costConfigured = configuration.isCostConfigured();
     final boolean developmentModus = WicketApplication.isDevelopmentModus();
 
     // Super menus
@@ -229,25 +255,17 @@ public class MenuItemRegistry
     // Menu entries
     // COMMON
     reg.register(common, MenuItemDefId.CALENDAR, 10, CalendarPage.class); // Visible for all.
-    if (configuration.isBookManagementConfigured() == true) {
-      reg.register(common, MenuItemDefId.BOOK_LIST, 20, BookListPage.class); // Visible for all.
-    }
-    if (configuration.isAddressManagementConfigured() == true) {
-      reg.register(common, MenuItemDefId.ADDRESS_LIST, 30, AddressListPage.class); // Visible for all.
-    }
-    if (StringUtils.isNotEmpty(xmlConfiguration.getTelephoneSystemUrl()) == true) {
-      reg.register(common, MenuItemDefId.PHONE_CALL, 40, PhoneCallPage.class);
-    }
-    if (configuration.isMebConfigured() == true) {
-      final MenuItemDef meb = new MenuItemDef(common, MenuItemDefId.MEB.getId(), 50, MenuItemDefId.MEB.getI18nKey(), MebListPage.class) {
-        @Override
-        protected void afterMenuEntryCreation(final MenuEntry createdMenuEntry, final MenuBuilderContext context)
-        {
-          createdMenuEntry.setNewCounterModel(new MenuNewCounterMeb());
-        }
-      };
-      reg.register(meb);
-    }
+    reg.register(common, MenuItemDefId.BOOK_LIST, 20, BookListPage.class); // Visible for all.
+    reg.register(common, MenuItemDefId.ADDRESS_LIST, 30, AddressListPage.class); // Visible for all.
+    reg.register(common, MenuItemDefId.PHONE_CALL, 40, PhoneCallPage.class);
+    final MenuItemDef meb = new MenuItemDef(common, MenuItemDefId.MEB.getId(), 50, MenuItemDefId.MEB.getI18nKey(), MebListPage.class) {
+      @Override
+      protected void afterMenuEntryCreation(final MenuEntry createdMenuEntry, final MenuBuilderContext context)
+      {
+        createdMenuEntry.setNewCounterModel(new MenuNewCounterMeb());
+      }
+    };
+    reg.register(meb);
     reg.register(common, MenuItemDefId.SEARCH, 100, SearchPage.class);
 
     // PROJECT_MANAGEMENT
@@ -267,7 +285,8 @@ public class MenuItemRegistry
         READONLY_READWRITE);
     // Not yet finished:
     reg.register(fibu, MenuItemDefId.BANK_ACCOUNT_LIST, 30, BankAccountListPage.class, developmentModus, FINANCE_GROUP, CONTROLLING_GROUP);
-    if (costConfigured == true) {
+    {
+      // Only visible if cost is configured:
       reg.register(fibu, MenuItemDefId.CUSTOMER_LIST, 40, CustomerListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
       final MenuItemDef projects = new MenuItemDef(fibu, MenuItemDefId.PROJECT_LIST.getId(), 50, MenuItemDefId.PROJECT_LIST.getI18nKey(),
           ProjektListPage.class, ProjektDao.USER_RIGHT_ID, READONLY_READWRITE) {
@@ -301,8 +320,9 @@ public class MenuItemRegistry
     };
     reg.register(orderBook);
 
-    if (costConfigured == true) {
+    {
       // COST
+      // Only visible if cost is configured:
       reg.register(cost, MenuItemDefId.ACCOUNT_LIST, 10, KontoListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
       reg.register(cost, MenuItemDefId.COST1_LIST, 20, Kost1ListPage.class, Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE);
       reg.register(cost, MenuItemDefId.COST2_LIST, 30, Kost2ListPage.class, Kost2Dao.USER_RIGHT_ID, READONLY_READWRITE);
@@ -310,21 +330,21 @@ public class MenuItemRegistry
     }
 
     // REPORTING
-    if (costConfigured == true) {
+    {
+      // Only visible if cost is configured:
       reg.register(reporting, MenuItemDefId.ACCOUNTING_RECORD_LIST, 10, AccountingRecordListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
       reg.register(reporting, MenuItemDefId.REPORT_OBJECTIVES, 20, ReportObjectivesPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     }
     reg.register(reporting, MenuItemDefId.SCRIPTING, 30, ReportScriptingPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     reg.register(reporting, MenuItemDefId.SCRIPT_LIST, 40, ScriptListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
-    if (costConfigured == true) {
+    {
+      // Only visible if cost is configured:
       reg.register(reporting, MenuItemDefId.DATEV_IMPORT, 50, DatevImportPage.class, DatevImportDao.USER_RIGHT_ID, UserRightValue.TRUE);
     }
     // ORGA
     reg.register(orga, MenuItemDefId.OUTBOX_LIST, 10, PostausgangListPage.class, PostausgangDao.USER_RIGHT_ID, READONLY_READWRITE);
     reg.register(orga, MenuItemDefId.INBOX_LIST, 20, PosteingangListPage.class, PosteingangDao.USER_RIGHT_ID, READONLY_READWRITE);
-    if (CollectionUtils.isNotEmpty(xmlConfiguration.getContractTypes()) == true) {
-      reg.register(orga, MenuItemDefId.CONTRACTS, 30, ContractListPage.class, ContractDao.USER_RIGHT_ID, READONLY_READWRITE);
-    }
+    reg.register(orga, MenuItemDefId.CONTRACTS, 30, ContractListPage.class, ContractDao.USER_RIGHT_ID, READONLY_READWRITE);
 
     // ADMINISTRATION
     reg.register(admin, MenuItemDefId.MY_ACCOUNT, 10, MyAccountEditPage.class);
@@ -354,5 +374,6 @@ public class MenuItemRegistry
     // Not yet finished:
     reg.register(misc, MenuItemDefId.GWIKI, 110, GWikiContainerPage.class, developmentModus);
     reg.register(misc, MenuItemDefId.DOCUMENTATION, 200, DocumentationPage.class);
+    reg.refresh();
   }
 }
