@@ -115,7 +115,7 @@ public class InitDatabaseDaoWithTestDataTest extends TestBase
     final String encryptedPassword = userDao.encryptPassword(testPassword);
     userGroupCache.setExpired(); // Force reload (because it's may be expired due to previous tests).
     assertTrue(initDatabaseDao.isEmpty());
-    initDatabaseDao.initializeEmptyDatabaseWithTestData("myadmin", null, null);
+    initDatabaseDao.initializeEmptyDatabaseWithTestData("myadmin", encryptedPassword, null);
     final PFUserDO initialAdminUser = userDao.authenticateUser("myadmin", encryptedPassword);
     assertNotNull(initialAdminUser);
     assertEquals("myadmin", initialAdminUser.getUsername());
