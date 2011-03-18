@@ -28,10 +28,11 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDao;
+import org.projectforge.web.MenuItemRegistry;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
-
 
 @EditPage(defaultReturnPage = ConfigurationListPage.class)
 public class ConfigurationEditPage extends AbstractEditPage<ConfigurationDO, ConfigurationEditForm, ConfigurationDao> implements
@@ -48,6 +49,17 @@ public class ConfigurationEditPage extends AbstractEditPage<ConfigurationDO, Con
   {
     super(parameters, "administration.configuration");
     init();
+  }
+
+  /**
+   * Calls {@link MenuItemRegistry#refresh()} for the case that the visibility of some menu entries might have change.
+   * @see org.projectforge.web.wicket.AbstractEditPage#afterSaveOrUpdate()
+   */
+  @Override
+  public AbstractBasePage afterSaveOrUpdate()
+  {
+    MenuItemRegistry.instance().refresh();
+    return null;
   }
 
   @Override
@@ -92,7 +104,7 @@ public class ConfigurationEditPage extends AbstractEditPage<ConfigurationDO, Con
       return;
     }
     if ("taskId".equals(property) == true) {
-      form.setTask((Integer)null);
+      form.setTask((Integer) null);
     } else {
       log.error("Property '" + property + "' not supported for unselection.");
     }
