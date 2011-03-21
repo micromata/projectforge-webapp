@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!-- This files contains the definition of the timesheets in a meta language (like html). It will be rendered through jelly and
-  afterwards via timesheet-template-fo.xsl to xsl-fo. -->
-<template-fo systemDate="${systemDate}" title="${title}" createdLabel="${createdLabel}" loggedInUser="${loggedInUser.fullname}"
-  xmlns:j="jelly:core">
+  <!--
+    This files contains the definition of the timesheets in a meta language (like html). It will be rendered through Groovy and afterwards via
+    timesheet-template-fo.xsl to xsl-fo.
+  -->
+<template-fo systemDate="${systemDate}" title="${title}" createdLabel="${createdLabel}" loggedInUser="${loggedInUser.fullname}">
   <h1-color>${title}</h1-color>
   <table width="100%">
     <table-column column-width="45mm" />
@@ -16,12 +17,12 @@
         <th color="#999999">${monthLabel}</th>
         <td>${year}-${month}</td>
       </tr>
-      <j:if test="${report.formattedUnbookedDays != null}">
-        <tr>
-          <th color="#990000">${unbookedWorkingDaysLabel}</th>
-          <td number-columns-spanned="3" color="#990000">${report.formattedUnbookedDays}</td>
-        </tr>
-      </j:if>
+      <groovy> if (report.formattedUnbookedDays != null) { </groovy>
+      <tr>
+        <th color="#990000">${unbookedWorkingDaysLabel}</th>
+        <td number-columns-spanned="3" color="#990000">${report.formattedUnbookedDays}</td>
+      </tr>
+      <groovy> } </groovy>
       <tr>
         <th color="#999999">${workingDaysLabel}</th>
         <td>${workingDays}</td>
@@ -36,9 +37,9 @@
     <table-column column-width="proportional-column-width(1)" />
     <table-column column-width="40mm" />
     <table-column column-width="50mm" />
-    <j:forEach var="week" items="${report.weeks}">
-      <table-column column-width="14mm" />
-    </j:forEach>
+    <groovy> for (week in report.weeks) { </groovy>
+    <table-column column-width="14mm" />
+    <groovy> } </groovy>
     <table-column column-width="16mm" />
     <table-header>
       <tr border-bottom-line="true">
@@ -46,57 +47,58 @@
         <th>${kundeLabel}</th>
         <th>${projektLabel}</th>
         <th>${kost2ArtLabel}</th>
-        <j:forEach var="week" items="${report.weeks}">
-          <th text-align="center">${week.formattedFromDayOfMonth}.-${week.formattedToDayOfMonth}.</th>
-        </j:forEach>
+        <groovy> for (week in report.weeks) { </groovy>
+        <th text-align="center">${week.formattedFromDayOfMonth}.-${week.formattedToDayOfMonth}.</th>
+        <groovy> } </groovy>
         <th>${sumLabel}</th>
       </tr>
     </table-header>
     <table-body>
       <!-- Kost2 entries. -->
-      <j:forEach var="entry" items="${report.kost2Rows}">
-        <tr even-odd="true" use-font="tiny">
-          <td>${entry.value.kost2.formattedNumber}</td>
-          <j:choose>
-            <j:when test="${entry.value.kost2.projekt != null}">
-              <td>
-                <j:if test="${entry.value.kost2.projekt.kunde != null}">${entry.value.kundename}</j:if>
-              </td>
-              <td>${entry.value.projektname}</td>
-              <td>${entry.value.kost2ArtName}</td>
-            </j:when>
-            <j:otherwise>
-              <td number-columns-spanned="3">${entry.value.kost2Description}</td>
-            </j:otherwise>
-          </j:choose>
-          <j:forEach var="week" items="${report.weeks}">
-            <td text-align="end">${week.kost2Entries[entry.value.kost2.id].formattedDuration}</td>
-          </j:forEach>
-          <td text-align="end">
-            <span use-font="bold">${report.kost2Durations[entry.value.kost2.id].formattedDuration}</span>
-          </td>
-        </tr>
-      </j:forEach>
+      <groovy> for (entry in report.kost2Rows) { </groovy>
+      <tr even-odd="true" use-font="tiny">
+        <td>${entry.value.kost2.formattedNumber}</td>
+        <groovy> if (entry.value.kost2.projekt != null) { </groovy>
+        <td>
+          <groovy> if (entry.value.kost2.projekt.kunde != null) { </groovy>
+          ${entry.value.kundename}
+          <groovy> } </groovy>
+        </td>
+        <td>${entry.value.projektname}</td>
+        <td>${entry.value.kost2ArtName}</td>
+        <groovy> } else { </groovy>
+        <td number-columns-spanned="3">${entry.value.kost2Description}</td>
+        <groovy> } </groovy>
+        <groovy> for (week in report.weeks) {
+        kost2Entry = week.kost2Entries[entry.value.kost2.id] </groovy>
+        <td text-align="end"><groovy-out> kost2Entry != null ? kost2Entry.formattedDuration : ""</groovy-out></td>
+        <groovy> } </groovy>
+        <td text-align="end">
+          <span use-font="bold">${report.kost2Durations[entry.value.kost2.id].formattedDuration}</span>
+        </td>
+      </tr>
+      <groovy> } </groovy>
 
       <!-- Task entries (without kost2 information). -->
-      <j:forEach var="entry" items="${report.taskEntries}">
-        <tr>
-          <td number-columns-spanned="4">${entry.key}</td>
-          <j:forEach var="week" items="${report.weeks}">
-            <td text-align="end">${week.taskEntries[entry.value.id].formattedDuration}</td>
-          </j:forEach>
-          <td text-align="end">
-            <span use-font="bold">${report.taskDurations[entry.value.id].formattedDuration}</span>
-          </td>
-        </tr>
-      </j:forEach>
+      <groovy> for (entry in report.taskEntries) { </groovy>
+      <tr>
+        <td number-columns-spanned="4">${entry.key}</td>
+        <groovy> for (week in report.weeks) {
+        taskEntry = week.taskEntries[entry.value.id] </groovy>
+        <td text-align="end"><groovy-out>taskEntry != null ? taskEntry.formattedDuration : ""</groovy-out></td>
+        <groovy> } </groovy>
+        <td text-align="end">
+          <span use-font="bold">${report.taskDurations[entry.value.id].formattedDuration}</span>
+        </td>
+      </tr>
+      <groovy> } </groovy>
       <tr>
         <td number-columns-spanned="4" text-align="end">
           <span color="#999999" use-font="bold">${totalSumLabel}</span>
         </td>
-        <j:forEach var="week" items="${report.weeks}">
-          <td text-align="end">${week.formattedTotalDuration}</td>
-        </j:forEach>
+        <groovy> for (week in report.weeks) { </groovy>
+        <td text-align="end">${week.formattedTotalDuration}</td>
+        <groovy> } </groovy>
         <td text-align="end">
           <span color="#FF0000" use-font="bold">${report.formattedTotalDuration}</span>
         </td>
