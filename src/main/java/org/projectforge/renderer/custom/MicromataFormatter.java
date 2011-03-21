@@ -39,6 +39,7 @@ import org.projectforge.fibu.kost.KostCache;
 import org.projectforge.renderer.CellHolder;
 import org.projectforge.renderer.RenderType;
 import org.projectforge.renderer.RowHolder;
+import org.projectforge.scripting.NullObject;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.web.HtmlHelper;
@@ -46,7 +47,6 @@ import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.core.DummyPageContext;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.user.UserFormatter;
-
 
 /**
  * @author Sebastian Hardt (s.hardt@micromata.de)
@@ -110,6 +110,8 @@ public class MicromataFormatter extends Formatter
 
     if (StringUtils.isNotEmpty(actionFilter.getSearchString()) == true) {
       data.put("searchString", htmlHelper.formatXSLFOText(actionFilter.getSearchString(), true));
+    } else {
+      data.put("searchString", NullObject.instance);
     }
 
     data.put("timePeriodLabel", getLocalizedString("timePeriod"));
@@ -121,11 +123,14 @@ public class MicromataFormatter extends Formatter
     if (taskId != null) {
       data.put("task", taskFormatter.getTaskPath(pageContext, taskId));
     }
+    data.put("task", NullObject.instance);
 
     data.put("userLabel", getLocalizedString("timesheet.user"));
 
     if (actionFilter.getUserId() != null) {
       data.put("user", userFormatter.getFormattedUser(actionFilter.getUserId()));
+    } else {
+      data.put("user", NullObject.instance);
     }
     data.put("totalDurationLabel", getLocalizedString("timesheet.totalDuration"));
 
@@ -134,6 +139,8 @@ public class MicromataFormatter extends Formatter
     data.put("totalDuration", str1);
     if (str1.equals(str2) == false) {
       data.put("totalHours", str2);
+    } else {
+      data.put("totalHours", NullObject.instance);
     }
 
     data.put("optionsLabel", getLocalizedString("label.options"));
