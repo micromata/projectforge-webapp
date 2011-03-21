@@ -23,9 +23,9 @@
 
 package org.projectforge.web.mobile;
 
+import org.apache.wicket.Page;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
-import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
@@ -48,12 +48,12 @@ public class ListViewItemPanel extends Panel
 
   private String label, comment, counter;
 
-  public ListViewItemPanel(final String id, final Class< ? extends WebPage> linkClass, final String label)
+  public ListViewItemPanel(final String id, final Class< ? extends Page> linkClass, final String label)
   {
     this(id, new BookmarkablePageLink<String>(LINK_ID, linkClass), label);
   }
 
-  public ListViewItemPanel(final String id, final Class< ? extends WebPage> linkClass, final PageParameters params, final String label)
+  public ListViewItemPanel(final String id, final Class< ? extends Page> linkClass, final PageParameters params, final String label)
   {
     this(id, new BookmarkablePageLink<String>(LINK_ID, linkClass, params), label);
   }
