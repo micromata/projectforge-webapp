@@ -24,6 +24,7 @@
 package org.projectforge.scripting;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -74,5 +75,15 @@ public class GroovyEngineTest
     final String result = engine.executeTemplateFile("mail/todoChangeNotification.html");
     assertTrue("I18n priorty expected.", result.contains("hoch"));
     assertTrue("I18n key for type improvement expected.", result.contains("???plugins.todo.type.improvement???"));
+  }
+  
+  @Test
+  public void preprocesTest()
+  {
+    final GroovyEngine engine = new GroovyEngine(Locale.GERMAN,  TimeZone.getTimeZone("UTC"));
+    assertNull(engine.preprocessGroovyXml(null));
+    assertEquals("", engine.preprocessGroovyXml(""));
+    assertEquals("<% if (value != null) { %>", engine.preprocessGroovyXml("<groovy>if (value != null) {</groovy>"));
+    assertEquals("<%= value %>", engine.preprocessGroovyXml("<groovy-out>value</groovy-out>"));
   }
 }
