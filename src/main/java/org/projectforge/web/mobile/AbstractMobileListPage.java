@@ -65,11 +65,7 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
     if (listViewPanel != null) {
       remove(listViewPanel);
     }
-    if (StringUtils.isBlank(form.filter.getSearchString()) == true) {
-      list = null;
-    } else {
-      list = (List<O>) getBaseDao().getList(form.filter);
-    }
+    list = (List<O>) getBaseDao().getList(form.filter);
     add(listViewPanel = new ListViewPanel("listViewPage"));
     if (CollectionUtils.isEmpty(list) == true) {
       listViewPanel.setVisible(false);
@@ -81,8 +77,9 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
       final PageParameters params = new PageParameters();
       params.put(AbstractEditPage.PARAMETER_KEY_ID, entry.getId());
       final String comment = getEntryComment(entry);
-      final ListViewItemPanel listItem = new ListViewItemPanel(listViewPanel.newChildId(), AddressMobileViewPage.class, params, getEntryName(entry));
-      if (StringUtils.isNotBlank(comment) ==true) {
+      final ListViewItemPanel listItem = new ListViewItemPanel(listViewPanel.newChildId(), AddressMobileViewPage.class, params,
+          getEntryName(entry));
+      if (StringUtils.isNotBlank(comment) == true) {
         listItem.setComment(", " + comment);
       }
       listViewPanel.add(listItem);
@@ -120,7 +117,8 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
   @Override
   protected void addTopRightButton()
   {
-    headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.PLUS, AddressMobileEditPage.class, getString("new")).setRelDialog());
+    headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.PLUS, AddressMobileEditPage.class, getString("new"))
+        .setRelDialog());
   }
 
   protected abstract F newListForm(AbstractMobileListPage< ? , ? , ? > parentPage);
