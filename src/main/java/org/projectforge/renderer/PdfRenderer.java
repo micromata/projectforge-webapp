@@ -48,7 +48,7 @@ import org.apache.fop.apps.MimeConstants;
 import org.apache.log4j.Logger;
 import org.projectforge.AppVersion;
 import org.projectforge.core.ConfigXml;
-import org.projectforge.scripting.JellyExecutor;
+import org.projectforge.scripting.GroovyEngine;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 
@@ -104,20 +104,20 @@ public class PdfRenderer
    * loading fonts.'"); return; } fontMap.loadFonts(fontDir); return; }
    */
 
-  public byte[] render(final String stylesheet, final String jellyXml, final Map<String, Object> data)
+  public byte[] render(final String stylesheet, final String groovyXml, final Map<String, Object> data)
   {
     // initialize();
-    PFUserDO user = PFUserContext.getUser();
+    final PFUserDO user = PFUserContext.getUser();
     data.put("createdLabel", PFUserContext.getLocalizedString("created"));
     data.put("loggedInUser", user);
     data.put("baseDir", configXml.getResourcePath());
     data.put("appId", AppVersion.APP_ID);
     data.put("appVersion", AppVersion.NUMBER);
-    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     log.info("stylesheet="
         + stylesheet
         + ", jellyXml="
-        + jellyXml
+        + groovyXml
         + ", baseDir="
         + configXml.getResourcePath()
         + ", fontBaseDir="
@@ -126,7 +126,7 @@ public class PdfRenderer
     // return baos.toByteArray();
 
     // configure fopFactory as desired
-    FopFactory fopFactory = FopFactory.newInstance();
+    final FopFactory fopFactory = FopFactory.newInstance();
     // Configuration cfg = fopFactory.getUserConfig();
 
     try {
@@ -138,7 +138,7 @@ public class PdfRenderer
      * try { fopFactory.setUserConfig(baseDir + "/fop.config"); } catch (SAXException ex) { log.error(ex.getMessage(), ex); throw new
      * RuntimeException(ex); } catch (IOException ex) { log.error(ex.getMessage(), ex); throw new RuntimeException(ex); }
      */
-    FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
+    final FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
     try {
       foUserAgent.getFactory().getFontManager().setFontBaseURL(getFontResourcePath());
     } catch (MalformedURLException ex) {
@@ -148,34 +148,35 @@ public class PdfRenderer
 
     try {
       // Construct fop with desired output format
-      Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, baos);
+      final Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, baos);
 
       // Setup XSLT
-      TransformerFactory factory = TransformerFactory.newInstance();
+      final TransformerFactory factory = TransformerFactory.newInstance();
       Object[] result = configXml.getInputStream(stylesheet);
-      InputStream xsltInputStream = (InputStream) result[0];
-      StreamSource xltStreamSource = new StreamSource(xsltInputStream);
-      String url = (String) result[1];
+      final InputStream xsltInputStream = (InputStream) result[0];
+      final StreamSource xltStreamSource = new StreamSource(xsltInputStream);
+      final String url = (String) result[1];
       xltStreamSource.setSystemId(url);
 
-      Transformer transformer = factory.newTransformer(xltStreamSource);
+      final Transformer transformer = factory.newTransformer(xltStreamSource);
 
       // Set the value of a <param> in the stylesheet
-      for (Map.Entry<String, Object> entry : data.entrySet()) {
+      for (final Map.Entry<String, Object> entry : data.entrySet()) {
         transformer.setParameter(entry.getKey(), entry.getValue());
       }
 
       // First run jelly through xmlData:
-      result = configXml.getInputStream(jellyXml);
-      InputStream jellyXmlInputStream = (InputStream) result[0];
-      String xmlData = JellyExecutor.runJelly(jellyXmlInputStream, data);
+      result = configXml.getContent(groovyXml);
+      final GroovyEngine groovyEngine = new GroovyEngine(data, PFUserContext.getLocale(), PFUserContext.getTimeZone());
+      final String groovyXmlInput = groovyEngine.preprocessGroovyXml((String) result[0]);
+      final String xmlData = groovyEngine.executeTemplate(groovyXmlInput);
 
       // Setup input for XSLT transformation
-      StringReader xmlDataReader = new StringReader(xmlData);
-      Source src = new StreamSource(xmlDataReader);
+      final StringReader xmlDataReader = new StringReader(xmlData);
+      final Source src = new StreamSource(xmlDataReader);
 
       // Resulting SAX events (the generated FO) must be piped through to FOP
-      Result res = new SAXResult(fop.getDefaultHandler());
+      final Result res = new SAXResult(fop.getDefaultHandler());
 
       // Start XSLT transformation and FOP processing
       transformer.transform(src, res);
