@@ -33,11 +33,12 @@ import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.AppVersion;
-import org.projectforge.core.Configuration;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.web.LoginPage;
+import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
+import org.projectforge.web.MenuEntry;
 import org.projectforge.web.UserFilter;
-import org.projectforge.web.address.AddressMobileListPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.components.LabelBookmarkablePageLinkPanel;
@@ -46,9 +47,6 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
 {
   // Indicates that the menu mobile page should be shown directly instead of restoring last page after stay-logged-in.
   private static final String PARAM_HOME_KEY = "home";
-
-  @SpringBean(name = "configuration")
-  private Configuration configuration;
 
   @SpringBean(name = "menuBuilder")
   private MenuBuilder menuBuilder;
@@ -87,8 +85,14 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
     final ListViewPanel listViewPanel = new ListViewPanel("menu");
     add(listViewPanel);
     listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), getString("menu.main.title")).setListDivider());
-    if (configuration.isAddressManagementConfigured() == true) {
-      listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), AddressMobileListPage.class, getString("address.title.heading")));
+    final Menu menu = menuBuilder.getMobileMenu(PFUserContext.getUser());
+    if (menu.getMenuEntries() != null) {
+      for (final MenuEntry menuEntry : menu.getMenuEntries()) {
+        if (menuEntry.isVisible() == true) {
+          listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), menuEntry.getMobilePageClass(), getString(menuEntry
+              .getI18nKey())));
+        }
+      }
     }
     listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), new BookmarkablePageLink<String>(ListViewItemPanel.LINK_ID,
         CalendarPage.class), getString("menu.mobile.fullWebVersion")).setAsExternalLink());
