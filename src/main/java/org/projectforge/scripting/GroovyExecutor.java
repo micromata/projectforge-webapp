@@ -40,6 +40,11 @@ import org.apache.commons.lang.StringUtils;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.projectforge.access.AccessException;
 
+/**
+ * Executes groovy templates. For more functionality please refer GroovyEngine.
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
+ */
 public class GroovyExecutor
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GroovyExecutor.class);
