@@ -45,7 +45,7 @@ public class MenuItemDef implements Serializable
 
   private String i18nKey;
 
-  private MenuItemDef parent;
+  private MenuItemDef parent, mobileParentMenu;
 
   private Class< ? extends Page> pageClass;
 
@@ -55,6 +55,8 @@ public class MenuItemDef implements Serializable
 
   private boolean newWindow;
 
+  private Class< ? extends Page> mobilePageClass;
+
   private boolean visible = true;
 
   private ProjectForgeGroup[] visibleForGroups;
@@ -63,7 +65,11 @@ public class MenuItemDef implements Serializable
 
   private UserRightValue[] requiredRightValues;
 
-  private int orderNumber;
+  private int orderNumber, mobileMenuOrderNumber;
+
+  private boolean mobileMenuSupport = false;
+
+  private boolean desktopMenuSupport = true;
 
   /**
    * Overwrite this if you need special access checking.
@@ -95,6 +101,14 @@ public class MenuItemDef implements Serializable
    */
   protected MenuEntry createMenuEntry(final Menu menu, final MenuBuilderContext context)
   {
+    if (context.isMobileMenu() == true && mobileMenuSupport == false) {
+      // this menu item doesn't support the mobile menu.
+      return null;
+    }
+    if (context.isMobileMenu() == false && desktopMenuSupport == false) {
+      // this menu item doesn't support the desktop menu.
+      return null;
+    }
     if (requiredRightId != null && hasRight(context.getAccessChecker(), context.getLoggedInUser()) == false) {
       return null;
     }
@@ -108,10 +122,8 @@ public class MenuItemDef implements Serializable
       // Do nothing because menu is not visible for logged in user.
       return null;
     }
-    final MenuEntry menuEntry = new MenuEntry(this);
-    if (menuEntry != null) {
-      afterMenuEntryCreation(menuEntry, context);
-    }
+    final MenuEntry menuEntry = new MenuEntry(this, context);
+    afterMenuEntryCreation(menuEntry, context);
     menuEntry.setMenu(menu);
     return menuEntry;
   }
@@ -312,11 +324,73 @@ public class MenuItemDef implements Serializable
 
   /**
    * Order number for sorting menu entries.
-   * @return
    */
   public int getOrderNumber()
   {
     return orderNumber;
+  }
+
+  /**
+   * If set to false then this menu entry will not be displayed in the classical web menu version. Default is true.
+   * @param desktopMenuSupport
+   */
+  public void setDesktopMenuSupport(final boolean desktopMenuSupport)
+  {
+    this.desktopMenuSupport = desktopMenuSupport;
+  }
+
+  /**
+   * Will be automatically set if any setter regarding mobile menu properties is calles (with not-null params), default is false.
+   * @param mobileMenuSupport
+   */
+  public void setMobileMenuSupport(final boolean mobileMenuSupport)
+  {
+    this.mobileMenuSupport = mobileMenuSupport;
+  }
+
+  /**
+   * Order number for sorting menu entries (mobile menu).
+   */
+  public int getMobileMenuOrderNumber()
+  {
+    return mobileMenuOrderNumber;
+  }
+
+  /**
+   * @return The parent menu entry of the mobile menu.
+   */
+  public MenuItemDef getMobileParentMenu()
+  {
+    return mobileParentMenu;
+  }
+
+  /**
+   * TODO: Not yet supported. The menu entry is set as a top level menu entry.
+   * @param mobileParentEntry
+   * @param mobileMenuOrderNumber
+   * @return this for chaining.
+   */
+  public MenuItemDef setMobileMenu(final MenuItemDef mobileParentEntry, Class< ? extends Page> mobilePageClass,
+      final int mobileMenuOrderNumber)
+  {
+    this.mobileParentMenu = mobileParentEntry;
+    setMobileMenu(mobilePageClass, mobileMenuOrderNumber);
+    return this;
+  }
+
+  /**
+   * Adds the given menu entry as root menu entry.
+   * @param mobileParentEntry
+   * @param mobileMenuOrderNumber
+   * @return this for chaining.
+   */
+  public MenuItemDef setMobileMenu(Class< ? extends Page> mobilePageClass,
+      final int mobileMenuOrderNumber)
+  {
+    this.mobileMenuSupport = true;
+    this.mobilePageClass = mobilePageClass;
+    this.mobileMenuOrderNumber = mobileMenuOrderNumber;
+    return this;
   }
 
   /**
@@ -328,11 +402,19 @@ public class MenuItemDef implements Serializable
   }
 
   /**
-   * @return Wicket page or null for Stripes pages.
+   * @return Wicket page or null for non Wicket pages.
    */
   public Class< ? extends Page> getPageClass()
   {
     return pageClass;
+  }
+
+  /**
+   * @return Wicket page or null for non Wicket pages.
+   */
+  public Class< ? extends Page> getMobilePageClass()
+  {
+    return mobilePageClass;
   }
 
   /**

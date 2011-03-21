@@ -31,14 +31,17 @@ import org.projectforge.common.AbstractCache;
 /**
  * Caches the user menus. Expire time is one hour.
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 public class MenuCache extends AbstractCache
 {
   private Map<Integer, Menu> menuMap;
-  
-  public MenuCache() {
-    super(AbstractCache.TICKS_PER_HOUR);
+
+  private Map<Integer, Menu> mobileMenuMap;
+
+  public MenuCache()
+  {
+    super(AbstractCache.TICKS_PER_HOUR); // Expires every hour.
   }
 
   public Menu getMenu(final Integer userId)
@@ -46,14 +49,29 @@ public class MenuCache extends AbstractCache
     return getMenuMap().get(userId);
   }
 
+  public Menu getMobileMenu(final Integer userId)
+  {
+    return getMobileMenuMap().get(userId);
+  }
+
   public void putMenu(final Integer userId, final Menu menu)
   {
     getMenuMap().put(userId, menu);
   }
 
+  public void putMobileMenu(final Integer userId, final Menu menu)
+  {
+    getMobileMenuMap().put(userId, menu);
+  }
+
   public void removeMenu(final Integer userId)
   {
     getMenuMap().remove(userId);
+  }
+
+  public void removeMobileMenu(final Integer userId)
+  {
+    getMobileMenuMap().remove(userId);
   }
 
   private Map<Integer, Menu> getMenuMap()
@@ -62,9 +80,16 @@ public class MenuCache extends AbstractCache
     return menuMap;
   }
 
+  private Map<Integer, Menu> getMobileMenuMap()
+  {
+    checkRefresh();
+    return mobileMenuMap;
+  }
+
   @Override
   protected void refresh()
   {
     menuMap = new HashMap<Integer, Menu>();
+    mobileMenuMap = new HashMap<Integer, Menu>();
   }
 }

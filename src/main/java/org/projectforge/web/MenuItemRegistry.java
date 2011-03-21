@@ -54,6 +54,7 @@ import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.web.access.AccessListPage;
 import org.projectforge.web.address.AddressListPage;
+import org.projectforge.web.address.AddressMobileListPage;
 import org.projectforge.web.address.PhoneCallPage;
 import org.projectforge.web.admin.AdminPage;
 import org.projectforge.web.admin.SetupPage;
@@ -111,7 +112,7 @@ public class MenuItemRegistry
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MenuItemRegistry.class);
 
-  private List<MenuItemDef> registry = new ArrayList<MenuItemDef>();
+  private List<MenuItemDef> menuItemList = new ArrayList<MenuItemDef>();
 
   private ConfigXml xmlConfiguration = ConfigXml.getInstance();
 
@@ -124,7 +125,7 @@ public class MenuItemRegistry
 
   public MenuItemDef get(final String id)
   {
-    for (final MenuItemDef entry : registry) {
+    for (final MenuItemDef entry : menuItemList) {
       if (id.equals(entry.getId()) == true) {
         return entry;
       }
@@ -139,7 +140,7 @@ public class MenuItemRegistry
 
   public List<MenuItemDef> getMenuItemList()
   {
-    return registry;
+    return menuItemList;
   }
 
   /**
@@ -159,7 +160,7 @@ public class MenuItemRegistry
         }
       }
     }
-    registry.add(menuItemDef);
+    menuItemList.add(menuItemDef);
     return menuItemDef;
   }
 
@@ -256,7 +257,7 @@ public class MenuItemRegistry
     // COMMON
     reg.register(common, MenuItemDefId.CALENDAR, 10, CalendarPage.class); // Visible for all.
     reg.register(common, MenuItemDefId.BOOK_LIST, 20, BookListPage.class); // Visible for all.
-    reg.register(common, MenuItemDefId.ADDRESS_LIST, 30, AddressListPage.class); // Visible for all.
+    reg.register(common, MenuItemDefId.ADDRESS_LIST, 30, AddressListPage.class).setMobileMenu(AddressMobileListPage.class, 100); // Visible for all.
     reg.register(common, MenuItemDefId.PHONE_CALL, 40, PhoneCallPage.class);
     final MenuItemDef meb = new MenuItemDef(common, MenuItemDefId.MEB.getId(), 50, MenuItemDefId.MEB.getI18nKey(), MebListPage.class) {
       @Override

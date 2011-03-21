@@ -42,6 +42,10 @@ public class Menu implements Serializable
 
   protected List<MenuEntry> favoriteMenuEntries;
 
+  public Menu()
+  {
+  }
+
   public Collection<MenuEntry> getMenuEntries()
   {
     return rootMenuEntry.getSubMenuEntries();
@@ -106,7 +110,7 @@ public class Menu implements Serializable
   {
     MenuEntry parent = menuEntry.getParent();
     if (parent == null) {
-      final MenuItemDef parentItemDef = menuEntry.menuItemDef.getParent();
+      final MenuItemDef parentItemDef = menuEntry.getParentMenuItemDef();
       if (parentItemDef == null) {
         parent = rootMenuEntry;
       } else {

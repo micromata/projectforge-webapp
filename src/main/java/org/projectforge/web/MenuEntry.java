@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.Validate;
 import org.apache.wicket.Page;
 import org.apache.wicket.model.IModel;
 import org.projectforge.web.wicket.WicketUtils;
@@ -62,6 +63,8 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
   protected MenuItemDef menuItemDef;
 
   protected Menu menu;
+  
+  private boolean mobileMenu;
 
   public IModel<Integer> getNewCounterModel()
   {
@@ -139,10 +142,14 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
   {
   }
 
-  public MenuEntry(final MenuItemDef menuItem)
+  public MenuEntry(final MenuItemDef menuItem, final MenuBuilderContext context)
   {
     this.menuItemDef = menuItem;
-    if (menuItem.isWicketPage() == true) {
+    if (context.isMobileMenu() == true) {
+      mobileMenu = true;
+      Validate.notNull(menuItem.getMobilePageClass());
+      this.url = WicketUtils.getBookmarkablePageUrl(menuItem.getMobilePageClass());
+    } else if (menuItem.isWicketPage() == true) {
       this.url = WicketUtils.getBookmarkablePageUrl(menuItem.getPageClass(), menuItem.getParams());
     } else if (menuItem.getUrl() != null) {
       this.url = "../secure/" + menuItem.getUrl();
@@ -191,6 +198,15 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
     return this.opened;
   }
 
+  public MenuItemDef getParentMenuItemDef()
+  {
+    if (this.mobileMenu == true) {
+      return this.menuItemDef.getMobileParentMenu();
+    } else {
+      return this.menuItemDef.getParent();
+    }
+  }
+
   /**
    * Should the link open a separate window (named 'pforge2')?
    * @return
@@ -208,6 +224,11 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
   public Class< ? extends Page> getPageClass()
   {
     return menuItemDef.getPageClass();
+  }
+
+  public Class< ? extends Page> getMobilePageClass()
+  {
+    return menuItemDef.getMobilePageClass();
   }
 
   /**

@@ -53,14 +53,17 @@ public class MenuBuilder implements Serializable
     menuCache.setExpired();
   }
 
-  private void buildMenuTree(final Menu menu, final PFUserDO user)
+  private void buildMenuTree(final Menu menu, final PFUserDO user, final boolean mobileMenu)
   {
     if (user == null) {
       return;
     }
-    final MenuBuilderContext context = new MenuBuilderContext(menu, accessChecker, user);
+    final MenuBuilderContext context = new MenuBuilderContext(menu, accessChecker, user, mobileMenu);
     final MenuItemRegistry registry = MenuItemRegistry.instance();
     if (LoginPage.FIRST_PSEUDO_SETUP_USER.equals(user.getUsername()) == true) {
+      if (mobileMenu == true) {
+        return;
+      }
       final MenuItemDef firstLogin = registry.get(MenuItemDefId.SYSTEM_FIRST_LOGIN_SETUP_PAGE);
       menu.addMenuEntry(firstLogin.createMenuEntry(menu, context));
       return;
@@ -70,22 +73,41 @@ public class MenuBuilder implements Serializable
       if (menuEntry == null) {
         continue;
       }
+      // Nothing needed to be done.
     }
   }
 
   public Menu getMenu(final PFUserDO user)
   {
+    return getMenu(user, false);
+  }
+
+  public Menu getMobileMenu(final PFUserDO user)
+  {
+    return getMenu(user, true);
+  }
+
+  private Menu getMenu(final PFUserDO user, final boolean mobileMenu)
+  {
     Menu menu = null;
     if (user != null) {
-      menu = menuCache.getMenu(user.getId());
+      if (mobileMenu == true) {
+        menu = menuCache.getMobileMenu(user.getId());
+      } else {
+        menu = menuCache.getMenu(user.getId());
+      }
       if (menu != null) {
         return menu;
       }
     }
     menu = new Menu();
-    buildMenuTree(menu, user);
+    buildMenuTree(menu, user, mobileMenu);
     if (user != null) {
-      menuCache.putMenu(user.getId(), menu);
+      if (mobileMenu == true) {
+        menuCache.putMobileMenu(user.getId(), menu);
+      } else {
+        menuCache.putMenu(user.getId(), menu);
+      }
     }
     return menu;
   }

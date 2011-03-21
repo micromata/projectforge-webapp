@@ -41,16 +41,19 @@ public class MenuBuilderContext
   private AccessChecker accessChecker;
 
   private PFUserDO loggedInUser;
-  
+
   private Menu menu;
+
+  private boolean mobileMenu;
 
   private Map<String, Object> variables;
 
-  MenuBuilderContext(final Menu menu, final AccessChecker accessChecker, final PFUserDO loggedInUser)
+  MenuBuilderContext(final Menu menu, final AccessChecker accessChecker, final PFUserDO loggedInUser, final boolean mobileMenu)
   {
+    this.menu = menu;
     this.accessChecker = accessChecker;
     this.loggedInUser = loggedInUser;
-    this.menu = menu;
+    this.mobileMenu = mobileMenu;
   }
 
   public AccessChecker getAccessChecker()
@@ -62,10 +65,18 @@ public class MenuBuilderContext
   {
     return loggedInUser;
   }
-  
+
   public Menu getMenu()
   {
     return menu;
+  }
+
+  /**
+   * @return true, if this menu represents a mobile menu. A mobile menu is a different menu optimized for mobile devices.
+   */
+  public boolean isMobileMenu()
+  {
+    return mobileMenu;
   }
 
   /**
