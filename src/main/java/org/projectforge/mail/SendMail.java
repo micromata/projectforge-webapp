@@ -23,9 +23,7 @@
 
 package org.projectforge.mail;
 
-import java.io.InputStream;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -42,7 +40,6 @@ import org.projectforge.core.ConfigXml;
 import org.projectforge.core.InternalErrorException;
 import org.projectforge.core.UserException;
 import org.projectforge.scripting.GroovyEngine;
-import org.projectforge.scripting.JellyExecutor;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.HtmlHelper;
@@ -59,8 +56,6 @@ public class SendMail
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SendMail.class);
 
   private SendMailConfig sendMailConfig;
-
-  private ConfigXml configXml;
 
   private Properties properties;
 
@@ -163,18 +158,6 @@ public class SendMail
     log.info("E-Mail successfully sent: " + composedMessage.toString());
   }
 
-  public String renderJelly(final Mail composedMessage, final String jellyXml, final Map<String, Object> data, final Locale locale)
-  {
-    PFUserDO user = PFUserContext.getUser();
-    data.put("createdLabel", PFUserContext.getLocalizedString("created"));
-    data.put("loggedInUser", user);
-    data.put("msg", composedMessage);
-    log.debug("jellyXml=" + jellyXml);
-    Object[] result = configXml.getInputStream(jellyXml);
-    InputStream jellyXmlInputStream = (InputStream) result[0];
-    return JellyExecutor.runJelly(jellyXmlInputStream, data);
-  }
-
   /**
    * @param composedMessage
    * @param groovyTemplate
@@ -208,7 +191,6 @@ public class SendMail
 
   public void setConfigXml(final ConfigXml configXml)
   {
-    this.configXml = configXml;
     this.sendMailConfig = configXml.getSendMailConfiguration();
   }
 }
