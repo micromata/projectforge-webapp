@@ -31,6 +31,7 @@ import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
@@ -82,6 +83,21 @@ public class GroovyEngine
     this.variables = variables;
     this.variables.put("pf", this);
     this.groovyExecutor = new GroovyExecutor();
+  }
+
+  /**
+   * For achieving well-formed XML files you can replace '&lt;% ... %&gt;' by '&lt;groovy&gt; ... &lt;/groovy&gt;' and '&lt;%= ... %&gt;' by
+   * '&lt;groovy-out&gt; ... &lt;/groovy-out&gt;'
+   * @param template
+   * @return
+   */
+  public String preprocessGroovyXml(final String template)
+  {
+    if (template == null) {
+      return null;
+    }
+    return template.replaceAll("<groovy>", "<% ").replaceAll("</groovy>", " %>").replaceAll("<groovy-out>", "<%= ").replaceAll(
+        "</groovy-out>", " %>");
   }
 
   /**
@@ -187,6 +203,85 @@ public class GroovyEngine
       return "";
     }
     return htmlFormat ? HtmlHelper.formatText(value.toString(), true) : value.toString();
+  }
+
+  /**
+   * @param value
+   * @return true if the value is null or instance of NullObject, otherwise false.
+   */
+  public boolean isNull(final Object value)
+  {
+    if (value == null) {
+      return true;
+    }
+    return value instanceof NullObject;
+  }
+
+  /**
+   * @param value
+   * @see StringUtils#isBlank(String)
+   */
+  public boolean isBlank(final String value)
+  {
+    return StringUtils.isBlank(value);
+  }
+
+  /**
+   * @param value
+   * @return true if value is null or value.toString() is blank.
+   * @see StringUtils#isBlank(String)
+   */
+  public boolean isBlank(final Object value)
+  {
+    if (value == null) {
+      return true;
+    }
+    return StringUtils.isBlank(value.toString());
+  }
+
+  /**
+   * @param value
+   * @return Always true.
+   */
+  public boolean isBlank(final NullObject value)
+  {
+    return true;
+  }
+
+  /**
+   * @param value
+   * @see StringUtils#isEmpty(String)
+   */
+  public boolean isEmpty(final String value)
+  {
+    return StringUtils.isEmpty(value);
+  }
+
+  /**
+   * @param value
+   * @return true if value is null or value.toString() is empty.
+   * @see StringUtils#isEmpty(String)
+   */
+  public boolean isEmpty(final Object value)
+  {
+    if (value == null) {
+      return true;
+    }
+    return StringUtils.isEmpty(value.toString());
+  }
+
+  /**
+   * @param value
+   * @return Always true.
+   */
+  public boolean isEmpty(final NullObject value)
+  {
+    return true;
+  }
+
+  public void log(final String message)
+  {
+    log.info(message);
   }
 
   /**
