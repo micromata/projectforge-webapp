@@ -85,6 +85,7 @@ import org.projectforge.web.fibu.ReportObjectivesPage;
 import org.projectforge.web.gantt.GanttChartEditPage;
 import org.projectforge.web.gantt.GanttChartListPage;
 import org.projectforge.web.gwiki.GWikiContainerPage;
+import org.projectforge.web.gwiki.GWikiPage;
 import org.projectforge.web.humanresources.HRListPage;
 import org.projectforge.web.humanresources.HRPlanningEditPage;
 import org.projectforge.web.humanresources.HRPlanningListPage;
@@ -333,6 +334,7 @@ public class WebRegistry
     addMountPage("systemUpdate", SystemUpdatePage.class);
     addMountPage("taskTree", TaskTreePage.class);
     addMountPage("tutorial", TutorialPage.class);
+    addMountPage("gwikiPage", GWikiPage.class);
 
     addMountPages(BOOKMARK_MOBILE_PREFIX + "address", AddressMobileListPage.class, AddressMobileEditPage.class);
 
