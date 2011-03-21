@@ -54,12 +54,12 @@ public class ToDoMobileListPage extends AbstractMobileListPage<ToDoMobileListFor
   @Override
   protected String getEntryName(final ToDoDO entry)
   {
-    return ""; //entry.getFullName();
+    return entry.getSubject();
   }
 
   @Override
   protected String getEntryComment(ToDoDO entry)
   {
-    return ""; //entry.getOrganization();
+    return entry.getAssignee() != null ? entry.getAssignee().getFullname() : "";
   }
 }
