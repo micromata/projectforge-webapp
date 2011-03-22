@@ -340,6 +340,12 @@ public class DatabaseUpdateDao
     return true;
   }
 
+  public boolean addUniqueConstraint(final Table table, final String constraintName, final String... attributes)
+  {
+    accessCheck(true);
+    return addUniqueConstraint(table.getName(), constraintName, attributes);
+  }
+
   public boolean addUniqueConstraint(final String table, final String constraintName, final String... attributes)
   {
     accessCheck(true);
