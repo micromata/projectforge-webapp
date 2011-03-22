@@ -76,6 +76,7 @@ public enum MenuItemDefId
   SCRIPT_LIST("scriptList"), //
   SCRIPTING("scripting"), //
   SEARCH("search"), //
+  SPACE_LIST("spaceList"), //
   SYSTEM("system"), //
   SYSTEM_FIRST_LOGIN_SETUP_PAGE("system.firstLoginSetup"), //
   SYSTEM_STATISTICS("systemStatistics"), //

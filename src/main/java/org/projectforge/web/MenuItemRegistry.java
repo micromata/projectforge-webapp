@@ -36,8 +36,8 @@ import java.util.List;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Page;
-import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.core.Configuration;
 import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.EmployeeSalaryDao;
@@ -63,6 +63,7 @@ import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.core.ConfigurationListPage;
 import org.projectforge.web.core.SearchPage;
+import org.projectforge.web.core.SpaceListPage;
 import org.projectforge.web.doc.DocumentationPage;
 import org.projectforge.web.fibu.AccountingRecordListPage;
 import org.projectforge.web.fibu.AuftragListPage;
@@ -256,9 +257,10 @@ public class MenuItemRegistry
     // Menu entries
     // COMMON
     reg.register(common, MenuItemDefId.CALENDAR, 10, CalendarPage.class); // Visible for all.
-    reg.register(common, MenuItemDefId.BOOK_LIST, 20, BookListPage.class); // Visible for all.
-    reg.register(common, MenuItemDefId.ADDRESS_LIST, 30, AddressListPage.class).setMobileMenu(AddressMobileListPage.class, 100); // Visible for all.
-    reg.register(common, MenuItemDefId.PHONE_CALL, 40, PhoneCallPage.class);
+    reg.register(common, MenuItemDefId.SPACE_LIST, 20, SpaceListPage.class); // Visible for all.
+    reg.register(common, MenuItemDefId.BOOK_LIST, 30, BookListPage.class); // Visible for all.
+    reg.register(common, MenuItemDefId.ADDRESS_LIST, 40, AddressListPage.class).setMobileMenu(AddressMobileListPage.class, 100); // Visible for all.
+    reg.register(common, MenuItemDefId.PHONE_CALL, 50, PhoneCallPage.class);
     final MenuItemDef meb = new MenuItemDef(common, MenuItemDefId.MEB.getId(), 50, MenuItemDefId.MEB.getI18nKey(), MebListPage.class) {
       @Override
       protected void afterMenuEntryCreation(final MenuEntry createdMenuEntry, final MenuBuilderContext context)
