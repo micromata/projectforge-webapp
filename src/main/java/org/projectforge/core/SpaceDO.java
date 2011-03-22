@@ -42,7 +42,7 @@ import org.hibernate.search.annotations.Store;
  */
 @Entity
 @Indexed
-@Table(name = "T_SPACE", uniqueConstraints = { @UniqueConstraint(columnNames = { "name"}), @UniqueConstraint(columnNames = { "identifier"})})
+@Table(name = "T_SPACE", uniqueConstraints = { @UniqueConstraint(columnNames = { "title"}), @UniqueConstraint(columnNames = { "identifier"})})
 public class SpaceDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 6796022256899221724L;
