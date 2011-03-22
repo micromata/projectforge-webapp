@@ -52,6 +52,7 @@ import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.core.ConfigurationListPage;
 import org.projectforge.web.core.SearchPage;
+import org.projectforge.web.core.SpaceListPage;
 import org.projectforge.web.doc.DocumentationPage;
 import org.projectforge.web.doc.TutorialPage;
 import org.projectforge.web.fibu.AccountingRecordEditPage;
@@ -330,6 +331,7 @@ public class WebRegistry
     addMountPage("search", SearchPage.class);
     addMountPage("sendSms", SendSmsPage.class);
     addMountPage("setup", SetupPage.class);
+    addMountPage("space", SpaceListPage.class);
     addMountPage("systemStatistics", SystemStatisticsPage.class);
     addMountPage("systemUpdate", SystemUpdatePage.class);
     addMountPage("taskTree", TaskTreePage.class);
