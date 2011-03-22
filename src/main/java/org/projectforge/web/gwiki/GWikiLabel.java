@@ -45,10 +45,6 @@ public class GWikiLabel extends Label
     GWikiStandaloneContext wikiContext = GWikiStandaloneContext.create();
     wikiContext.setSkin("docexp");
     
-    // TODO (cclaus) this looks like a bug. A plugin is registered which doesn't exist
-    GWikiPluginRepository pluginRepository = wikiContext.getWikiWeb().getDaoContext().getPluginRepository();
-    pluginRepository.deactivatePlugin(wikiContext, "gwiki.s5slideshow");
-    
     try {
       wikiContext.setWikiElement(el);
       el.serve(wikiContext);
