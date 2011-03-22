@@ -7,7 +7,6 @@ import de.micromata.genome.gwiki.model.GWikiElement;
 import de.micromata.genome.gwiki.model.GWikiWeb;
 import de.micromata.genome.gwiki.page.GWikiContext;
 import de.micromata.genome.gwiki.page.GWikiStandaloneContext;
-import de.micromata.genome.gwiki.plugin.GWikiPluginRepository;
 
 /**
  * Label fetched from gwiki fragment.
