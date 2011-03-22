@@ -38,7 +38,7 @@ public class ToDoPlugin extends AbstractPlugin
   public static final String ID = "toDo";
 
   public static final String RESOURCE_BUNDLE_NAME = ToDoPlugin.class.getPackage().getName() + ".ToDoI18nResources";
-  
+
   static UserPrefArea USER_PREF_AREA;
 
   private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { ToDoDO.class};
@@ -71,14 +71,15 @@ public class ToDoPlugin extends AbstractPlugin
 
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-    registerMenuItem(new ToDoMenuItemDef(parentMenu, ID, 5, "plugins.todo.menu", ToDoListPage.class).setMobileMenu(ToDoMobileListPage.class, 10));
+    registerMenuItem(new ToDoMenuItemDef(parentMenu, ID, 5, "plugins.todo.menu", ToDoListPage.class));
+    // .setMobileMenu(ToDoMobileListPage.class, 10));
 
     // Define the access management:
     registerRight(new ToDoRight());
 
     // All the i18n stuff:
     addResourceBundle(RESOURCE_BUNDLE_NAME);
-    
+
     // Register favorite entries (the user can modify these templates/favorites via 'own settings'):
     USER_PREF_AREA = registerUserPrefArea("TODO_FAVORITE", ToDoDO.class, "todo.favorite");
   }
