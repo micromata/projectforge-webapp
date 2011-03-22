@@ -24,6 +24,7 @@
 package org.projectforge.web.gwiki;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.util.string.Strings;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 
 
@@ -38,7 +39,14 @@ public class GWikiContainerPage extends AbstractSecuredPage
   public GWikiContainerPage(final PageParameters parameters)
   {
     super(parameters);
-    body.add(new GWikiLabel("text", "index"));
+    
+    String pageId = parameters.getString("pageId");
+    
+    if (Strings.isEmpty(pageId)) {
+      pageId = "index";
+    }
+    
+    body.add(new GWikiLabel("text", pageId));
   }
   
   @Override
