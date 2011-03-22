@@ -7,6 +7,7 @@ import de.micromata.genome.gwiki.model.GWikiElement;
 import de.micromata.genome.gwiki.model.GWikiWeb;
 import de.micromata.genome.gwiki.page.GWikiContext;
 import de.micromata.genome.gwiki.page.GWikiStandaloneContext;
+import de.micromata.genome.gwiki.plugin.GWikiPluginRepository;
 
 /**
  * Label fetched from gwiki fragment.
@@ -43,6 +44,10 @@ public class GWikiLabel extends Label
 
     GWikiStandaloneContext wikiContext = GWikiStandaloneContext.create();
     wikiContext.setSkin("docexp");
+    
+    // TODO (cclaus) this looks like a bug. A plugin is registered which doesn't exist
+    GWikiPluginRepository pluginRepository = wikiContext.getWikiWeb().getDaoContext().getPluginRepository();
+    pluginRepository.deactivatePlugin(wikiContext, "gwiki.s5slideshow");
     
     try {
       wikiContext.setWikiElement(el);
