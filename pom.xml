@@ -311,12 +311,12 @@
       <groupId>de.micromata.genome.gwiki</groupId>
       <!-- 0.4. -->
       <artifactId>gwiki</artifactId>
-      <version>0.3.1-SNAPSHOT</version>
+      <version>0.4.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>de.micromata.genome.gwiki</groupId>
       <artifactId>gwiki-genome-dependencies</artifactId>
-      <version>0.3.1-SNAPSHOT</version>
+      <version>0.4.2-SNAPSHOT</version>
     </dependency>
     <dependency> <!-- No further versions planned -->
       <groupId>de.micromata</groupId>
