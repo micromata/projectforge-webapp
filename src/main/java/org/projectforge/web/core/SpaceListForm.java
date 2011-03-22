@@ -38,6 +38,12 @@ public class SpaceListForm extends AbstractListForm<SpaceFilter, SpaceListPage>
   public SpaceListForm(SpaceListPage parentPage)
   {
     super(parentPage);
+  }
+  
+  @Override
+  protected void init()
+  {
+    super.init();
     filterContainer.add(new CoolCheckBoxPanel("activeCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "active"),
         getString("space.status.active"), true));
     filterContainer.add(new CoolCheckBoxPanel("closedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "closed"),
