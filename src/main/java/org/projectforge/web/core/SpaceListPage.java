@@ -77,14 +77,15 @@ public class SpaceListPage extends AbstractListPage<SpaceListForm, SpaceDao, Spa
       public void populateItem(final Item<ICellPopulator<SpaceDO>> item, final String componentId, final IModel<SpaceDO> rowModel)
       {
         final SpaceDO space = rowModel.getObject();
-        item.add(new ListSelectActionPanel(componentId, rowModel, SpaceEditPage.class, space.getId(), SpaceListPage.this, getString(space
-            .getIdentifier())));
+        item.add(new ListSelectActionPanel(componentId, rowModel, SpaceEditPage.class, space.getId(), SpaceListPage.this, space
+            .getIdentifier()));
         addRowClick(item);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<SpaceDO>(new Model<String>(getString("space.title")), "title", "title", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<SpaceDO>(new Model<String>(getString("space.status")), "status", "status", cellItemListener));
+    columns
+        .add(new CellItemListenerPropertyColumn<SpaceDO>(new Model<String>(getString("space.title")), "title", "title", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<SpaceDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<SpaceDO>(new Model<String>(getString("description")), "description", "description",
         cellItemListener));
     dataTable = createDataTable(columns, null, true);
