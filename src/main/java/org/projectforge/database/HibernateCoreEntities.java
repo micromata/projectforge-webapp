@@ -62,6 +62,7 @@ class HibernateCoreEntities
       org.projectforge.address.PersonalAddressDO.class, //
       org.projectforge.book.BookDO.class, //
       org.projectforge.core.ConfigurationDO.class, //
+      org.projectforge.core.SpaceDO.class, //
       org.projectforge.database.DatabaseUpdateDO.class, //
       org.projectforge.gantt.GanttChartDO.class, //
       org.projectforge.humanresources.HRPlanningDO.class, //
