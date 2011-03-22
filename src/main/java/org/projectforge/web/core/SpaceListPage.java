@@ -83,7 +83,7 @@ public class SpaceListPage extends AbstractListPage<SpaceListForm, SpaceDao, Spa
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<SpaceDO>(new Model<String>(getString("space.name")), "name", "name", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<SpaceDO>(new Model<String>(getString("space.title")), "title", "title", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<SpaceDO>(new Model<String>(getString("space.status")), "status", "status", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<SpaceDO>(new Model<String>(getString("description")), "description", "description",
         cellItemListener));

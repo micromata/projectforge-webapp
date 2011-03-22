@@ -65,7 +65,7 @@ public class DatabaseCoreUpdates
       public UpdateRunningStatus runUpdate()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
-        spaceTable.addAttributes("identifier", "status", "title", "description");
+        spaceTable.addAttributes("id", "created", "lastUpdate", "deleted", "identifier", "status", "title", "description");
         dao.createTable(spaceTable);
         dao.addUniqueConstraint(spaceTable, "title_unique", "title");
         dao.addUniqueConstraint(spaceTable, "identifier_unique", "identifier");
