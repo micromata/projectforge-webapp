@@ -23,6 +23,7 @@
 
 package org.projectforge.web.wicket.embats;
 
+import org.projectforge.Version;
 import org.projectforge.web.UserAgentBrowser;
 
 /**
@@ -31,28 +32,42 @@ import org.projectforge.web.UserAgentBrowser;
  */
 public class EmbatsUtils
 {
+  private static final Version MIN_VERSION_IE = new Version("4");
+
+  private static final Version MIN_VERSION_FIREFOX = new Version("3.5");
+
+  private static final Version MIN_VERSION_SAFARI = new Version("3.1");
+
+  private static final Version MIN_VERSION_CHROME = new Version("4");
+
+  private static final Version MIN_VERSION_OPERA = new Version("10");
+
   /**
    * @param browser
-   * @param version The browser's version.
+   * @param versionString The browser's version.
    * @return true, if the given browser supports embats, otherwise false.
    */
-  public static boolean isEmbatsSupported(final UserAgentBrowser browser, final String version)
+  public static boolean isEmbatsSupported(final UserAgentBrowser browser, final String versionString)
   {
-    if (version == null) {
+    if (versionString == null) {
       return false;
     }
+
+    final Version version = new Version(versionString);
+
     // http://webfonts.info/wiki/index.php?title=%40font-face_browser_support
     if (browser == UserAgentBrowser.IE) {
-      return version.compareTo("4") >= 0;
+      return version.compareTo(MIN_VERSION_IE) >= 0;
     } else if (browser == UserAgentBrowser.FIREFOX) {
-      return version.compareTo("3.5") >= 0;
+      return version.compareTo(MIN_VERSION_FIREFOX) >= 0;
     } else if (browser == UserAgentBrowser.SAFARI) {
-      return version.compareTo("3.1") >= 0;
+      return version.compareTo(MIN_VERSION_SAFARI) >= 0;
     } else if (browser == UserAgentBrowser.CHROME) {
-      return version.compareTo("4") >= 0;
+      return version.compareTo(MIN_VERSION_CHROME) >= 0;
     } else if (browser == UserAgentBrowser.OPERA) {
-      return version.compareTo("10") >= 0;
+      return version.compareTo(MIN_VERSION_OPERA) >= 0;
     }
+
     return false;
   }
 }
