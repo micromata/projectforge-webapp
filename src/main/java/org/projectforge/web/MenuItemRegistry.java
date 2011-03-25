@@ -82,7 +82,7 @@ import org.projectforge.web.fibu.ProjektListPage;
 import org.projectforge.web.fibu.RechnungListPage;
 import org.projectforge.web.fibu.ReportObjectivesPage;
 import org.projectforge.web.gantt.GanttChartListPage;
-import org.projectforge.web.gwiki.GWikiContainerPage;
+import org.projectforge.web.gwiki.GWikiPage;
 import org.projectforge.web.humanresources.HRListPage;
 import org.projectforge.web.humanresources.HRPlanningListPage;
 import org.projectforge.web.imagecropper.ImageCropperPage;
@@ -375,7 +375,7 @@ public class MenuItemRegistry
     reg.register(misc, MenuItemDefId.IMAGE_CROPPER, 100, ImageCropperPage.class, new String[] { ImageCropperPage.PARAM_SHOW_UPLOAD_BUTTON,
         "false", ImageCropperPage.PARAM_ENABLE_WHITEBOARD_FILTER, "true"}, false);
     // Not yet finished:
-    reg.register(misc, MenuItemDefId.GWIKI, 110, GWikiContainerPage.class, developmentModus);
+    reg.register(misc, MenuItemDefId.GWIKI, 110, GWikiPage.class, developmentModus);
     reg.register(misc, MenuItemDefId.DOCUMENTATION, 200, DocumentationPage.class);
     reg.refresh();
   }

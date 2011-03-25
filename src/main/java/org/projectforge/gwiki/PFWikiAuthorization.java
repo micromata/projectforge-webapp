@@ -168,6 +168,9 @@ public class PFWikiAuthorization implements GWikiAuthorization
 
   public boolean isAllowToView(GWikiContext ctx, GWikiElementInfo ei)
   {
+    // TODO: test if user is allowed to 'view' the space
+    final String space = extractSpace(ei);
+
     return WicketApplication.isDevelopmentModus();
   }
 
@@ -216,4 +219,28 @@ public class PFWikiAuthorization implements GWikiAuthorization
   {
     return WicketApplication.isDevelopmentModus();
   }
+
+  private final String extractSpace(final GWikiElementInfo ei)
+  {
+    if (ei.getId().indexOf('/') != -1) {
+      return ei.getId().substring(0, ei.getId().indexOf('/'));
+    }
+
+    return ei.getId();
+  }
+
+  @Override
+  public <T> T runWithRight(GWikiContext wikiContext, String addRight, CallableX<T, RuntimeException> callback)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public <T> T runWithRights(GWikiContext wikiContext, String[] addRights, CallableX<T, RuntimeException> callback)
+  {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }
