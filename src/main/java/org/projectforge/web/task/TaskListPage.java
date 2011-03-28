@@ -26,7 +26,9 @@ package org.projectforge.web.task;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
@@ -41,6 +43,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
+import org.projectforge.fibu.AuftragsPositionVO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.KostCache;
 import org.projectforge.task.TaskDO;
@@ -52,6 +55,7 @@ import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.core.PriorityFormatter;
+import org.projectforge.web.fibu.OrderPositionsPanel;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -281,6 +285,28 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
           cellItemListener.populateItem(item, componentId, rowModel);
         }
       });
+    }
+    if (taskTree.hasOrderPositionsEntries() == true
+        && accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
+            ProjectForgeGroup.PROJECT_ASSISTANT, ProjectForgeGroup.PROJECT_MANAGER) == true) {
+      columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("fibu.auftrag.auftraege"), null, null, cellItemListener) {
+        @Override
+        public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
+        {
+          final TaskDO task = rowModel.getObject();
+          final Set<AuftragsPositionVO> orderPositions = taskTree.getOrderPositionEntries(task.getId());
+          if (CollectionUtils.isEmpty(orderPositions) == true) {
+            final Label label = new Label(componentId, ""); // Empty label.
+            item.add(label);
+          } else {
+            final OrderPositionsPanel orderPositionsPanel = new OrderPositionsPanel(componentId);
+            item.add(orderPositionsPanel);
+            orderPositionsPanel.init(orderPositions);
+          }
+          cellItemListener.populateItem(item, componentId, rowModel);
+        }
+      });
+
     }
     columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("shortDescription")), getSortable(
         "shortDescription", sortable), "shortDescription", cellItemListener));
