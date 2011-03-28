@@ -152,17 +152,22 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
     });
     columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.kunde"), getSortable("kundeAsString", sortable),
         "kundeAsString", cellItemListener));
-    columns
-        .add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.projekt"), getSortable("projekt.name", sortable), "projekt.name", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.betreff"), getSortable("betreff", sortable), "betreff", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.datum.short"), getSortable("betreff", sortable), "datum", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.faelligkeit.short"), getSortable("faelligkeit", sortable), "faelligkeit",
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.projekt"), getSortable("projekt.name", sortable),
+        "projekt.name", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.betreff"), getSortable("betreff", sortable),
+        "betreff", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.datum.short"), getSortable("betreff", sortable),
+        "datum", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.faelligkeit.short"), getSortable("faelligkeit",
+        sortable), "faelligkeit", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.bezahlDatum.short"), getSortable("bezahlDatum",
+        sortable), "bezahlDatum", cellItemListener));
+    columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.common.netto"), getSortable("netSum", sortable), "netSum",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(getString("fibu.rechnung.bezahlDatum.short"), getSortable("bezahlDatum", sortable), "bezahlDatum",
+    columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.common.brutto"), getSortable("grossSum", sortable), "grossSum",
         cellItemListener));
-    columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.common.netto"), getSortable("netSum", sortable), "netSum", cellItemListener));
-    columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.common.brutto"), getSortable("grossSum", sortable), "grossSum", cellItemListener));
-    // columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.rechnung.zahlBetrag.short"), getSortable("zahlBetrag", sortable), "zahlBetrag",
+    // columns.add(new CurrencyPropertyColumn<RechnungDO>(getString("fibu.rechnung.zahlBetrag.short"), getSortable("zahlBetrag", sortable),
+    // "zahlBetrag",
     // cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("fibu.auftrag.auftraege")), null, null,
         cellItemListener) {
@@ -177,6 +182,8 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
             protected void onBeforeRender()
             {
               super.onBeforeRender();
+              // Lazy initialization because getString(...) of OrderPositionsPanel fails if panel.init(orderPositions) is called directly
+              // after instantiation.
               init(orderPositions);
             };
           };
@@ -185,10 +192,10 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("comment")), getSortable("bemerkung", sortable), "bemerkung",
-        cellItemListener));
-    columns
-        .add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("status")), getSortable("status", sortable), "status", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("comment")), getSortable("bemerkung", sortable),
+        "bemerkung", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("status")), getSortable("status", sortable),
+        "status", cellItemListener));
     return columns;
   }
 
