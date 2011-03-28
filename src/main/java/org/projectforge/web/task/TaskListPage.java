@@ -299,9 +299,16 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
             final Label label = new Label(componentId, ""); // Empty label.
             item.add(label);
           } else {
-            final OrderPositionsPanel orderPositionsPanel = new OrderPositionsPanel(componentId);
+            final OrderPositionsPanel orderPositionsPanel = new OrderPositionsPanel(componentId) {
+              protected void onBeforeRender()
+              {
+                super.onBeforeRender();
+                // Lazy initialization because getString(...) of OrderPositionsPanel fails if panel.init(orderPositions) is called directly
+                // after instantiation.
+                init(orderPositions);
+              };
+            };
             item.add(orderPositionsPanel);
-            orderPositionsPanel.init(orderPositions);
           }
           cellItemListener.populateItem(item, componentId, rowModel);
         }
