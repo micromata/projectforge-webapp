@@ -25,14 +25,13 @@ package org.projectforge.web.task;
 
 import java.math.BigDecimal;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.layout.LayoutContext;
-
-import de.micromata.genome.gwiki.utils.StringUtils;
 
 public class TaskEditForm extends AbstractEditForm<TaskDO, TaskEditPage>
 {
