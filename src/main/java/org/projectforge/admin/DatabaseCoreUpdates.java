@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.projectforge.core.SpaceDO;
+import org.projectforge.core.SpaceRightDO;
 import org.projectforge.database.DatabaseUpdateDO;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.Table;
@@ -49,26 +50,33 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 3.6.1
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "3.6.1", "2011-03-22", "Adds table t_space.") {
-      final Table spaceTable = new Table(SpaceDO.class);
-
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "3.6.1", "2011-03-22", "Adds tables t_space and t_space_right.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
-        return dao.doesExist(spaceTable) == true //
-        ? UpdatePreCheckStatus.ALREADY_UPDATED
-            : UpdatePreCheckStatus.OK;
+        final Table spaceTable = new Table(SpaceDO.class);
+        final Table spaceRightTable = new Table(SpaceRightDO.class);
+        return dao.doesExist(spaceTable) == true && dao.doesExist(spaceRightTable) //
+        ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
       }
 
       @Override
       public UpdateRunningStatus runUpdate()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
-        spaceTable.addAttributes("id", "created", "lastUpdate", "deleted", "identifier", "status", "title", "description");
-        dao.createTable(spaceTable);
-        dao.addUniqueConstraint(spaceTable, "title_unique", "title");
-        dao.addUniqueConstraint(spaceTable, "identifier_unique", "identifier");
+        final Table spaceTable = new Table(SpaceDO.class);
+        final Table spaceRightTable = new Table(SpaceRightDO.class);
+        if (dao.doesExist(spaceTable) == false) {
+          spaceTable.addAttributes("id", "created", "lastUpdate", "deleted", "identifier", "status", "title", "description");
+          dao.createTable(spaceTable);
+          dao.addUniqueConstraint(spaceTable, "title_unique", "title");
+          dao.addUniqueConstraint(spaceTable, "identifier_unique", "identifier");
+        }
+        if (dao.doesExist(spaceRightTable) == false) {
+          spaceRightTable.addAttributes("id", "created", "lastUpdate", "deleted", "identifier", "space", "user", "value", "comment");
+          dao.createTable(spaceRightTable);
+        }
         dao.createMissingIndices();
         return UpdateRunningStatus.DONE;
       }
@@ -78,17 +86,15 @@ public class DatabaseCoreUpdates
     // 3.5.4
     // /////////////////////////////////////////////////////////////////
     list.add(new UpdateEntryImpl(CORE_REGION_ID, "3.5.4", "2011-02-24",
-        "Adds table t_database_update. Adds attribute (excel_)date_format, hour_format_24 to table t_pf_user.") {
-      final Table dbUpdateTable = new Table(DatabaseUpdateDO.class);
-
-      final Table userTable = new Table(PFUserDO.class);
-
+    "Adds table t_database_update. Adds attribute (excel_)date_format, hour_format_24 to table t_pf_user.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        final Table dbUpdateTable = new Table(DatabaseUpdateDO.class);
+        final Table userTable = new Table(PFUserDO.class);
         return dao.doesExist(dbUpdateTable) == true
-            && dao.doesTableAttributesExist(userTable, "dateFormat", "excelDateFormat", "timeNotation") == true //
+        && dao.doesTableAttributesExist(userTable, "dateFormat", "excelDateFormat", "timeNotation") == true //
         ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
       }
 
@@ -96,6 +102,8 @@ public class DatabaseCoreUpdates
       public UpdateRunningStatus runUpdate()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        final Table dbUpdateTable = new Table(DatabaseUpdateDO.class);
+        final Table userTable = new Table(PFUserDO.class);
         dbUpdateTable.addAttributes("updateDate", "regionId", "versionString", "executionResult", "executedBy", "description");
         dao.createTable(dbUpdateTable);
         dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "dateFormat"));
