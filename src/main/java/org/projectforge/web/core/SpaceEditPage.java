@@ -95,7 +95,7 @@ public class SpaceEditPage extends AbstractAutoLayoutEditPage<SpaceDO, SpaceEdit
     if (element != null) {
       removeElementChildren(wikiContext, element.getElementInfo());
     }
-    
+
     // TODO (cclaus) TextExtracts and TextIndex Fragments are still present after deleting!
 
     return super.onDelete();
@@ -203,14 +203,14 @@ public class SpaceEditPage extends AbstractAutoLayoutEditPage<SpaceDO, SpaceEdit
         final int endIndex = builder.indexOf(pageIntro, startIndex);
 
         if (StringUtils.isNotEmpty(spaceData.getDescription())) {
-          if (startIndex != 10) {
+          if (endIndex != -1) {
             builder.delete(startIndex, endIndex);
             builder.insert(startIndex, spaceData.getDescription());
           } else {
             builder.insert(0, pageIntro + spaceData.getDescription() + pageIntro);
           }
 
-        } else {
+        } else if (endIndex != -1){
           builder.delete(0, endIndex + pageIntro.length());
         }
 
