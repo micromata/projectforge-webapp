@@ -87,14 +87,15 @@ public class SpaceEditPage extends AbstractAutoLayoutEditPage<SpaceDO, SpaceEdit
   @Override
   public AbstractBasePage onDelete()
   {
-    final GWikiStandaloneContext wikiContext = GWikiStandaloneContext.create();
-    final String pageId = GWikiContext.getPageIdFromTitle(getForm().getData().getIdentifier()) + "/Index";
-
-    final GWikiElement element = wikiContext.getWikiWeb().findElement(pageId);
-
-    if (element != null) {
-      removeElementChildren(wikiContext, element.getElementInfo());
-    }
+    // TODO Eigentlich kann diese Methode raus (s. E-Mail von Kai vom 30.03.11) bzw. eine Implementierung mit Undelete-Möglichkeit können wir später immer noch realisieren.
+    // final GWikiStandaloneContext wikiContext = GWikiStandaloneContext.create();
+    // final String pageId = GWikiContext.getPageIdFromTitle(getForm().getData().getIdentifier()) + "/Index";
+    //
+    // final GWikiElement element = wikiContext.getWikiWeb().findElement(pageId);
+    //
+    // if (element != null) {
+    // removeElementChildren(wikiContext, element.getElementInfo());
+    // }
 
     // TODO (cclaus) TextExtracts and TextIndex Fragments are still present after deleting!
 
@@ -109,6 +110,7 @@ public class SpaceEditPage extends AbstractAutoLayoutEditPage<SpaceDO, SpaceEdit
    */
   private void removeElementChildren(final GWikiContext wikiContext, final GWikiElementInfo elementInfo)
   {
+    // TODO Eigentlich kann diese Methode raus (s. meine E-Mail) bzw. eine Implementierung mit Undelete-Möglichkeit können wir später immer noch realisieren.
     /*
      * TODO (cclaus) check rights necessary?
      * 
