@@ -70,6 +70,10 @@
     <url-pattern>/wa/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
+    <filter-name>UserFilter</filter-name>
+    <url-pattern>/gwiki/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
     <filter-name>springContext</filter-name>
     <url-pattern>/secure/*</url-pattern>
   </filter-mapping>
