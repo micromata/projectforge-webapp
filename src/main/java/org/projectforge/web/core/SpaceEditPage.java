@@ -23,8 +23,6 @@
 
 package org.projectforge.web.core;
 
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
@@ -39,7 +37,6 @@ import org.projectforge.web.wicket.EditPage;
 
 import de.micromata.genome.gwiki.model.GWikiArtefakt;
 import de.micromata.genome.gwiki.model.GWikiElement;
-import de.micromata.genome.gwiki.model.GWikiElementInfo;
 import de.micromata.genome.gwiki.model.GWikiPropKeys;
 import de.micromata.genome.gwiki.model.GWikiProps;
 import de.micromata.genome.gwiki.model.GWikiSettingsProps;
@@ -80,65 +77,18 @@ public class SpaceEditPage extends AbstractAutoLayoutEditPage<SpaceDO, SpaceEdit
   }
 
   /**
-   * Removes a GWiki-Space recursivley
-   * 
-   * @see org.projectforge.web.wicket.AbstractEditPage#onDelete()
-   */
-  @Override
-  public AbstractBasePage onDelete()
-  {
-    // TODO Eigentlich kann diese Methode raus (s. E-Mail von Kai vom 30.03.11) bzw. eine Implementierung mit Undelete-Möglichkeit können wir später immer noch realisieren.
-    // final GWikiStandaloneContext wikiContext = GWikiStandaloneContext.create();
-    // final String pageId = GWikiContext.getPageIdFromTitle(getForm().getData().getIdentifier()) + "/Index";
-    //
-    // final GWikiElement element = wikiContext.getWikiWeb().findElement(pageId);
-    //
-    // if (element != null) {
-    // removeElementChildren(wikiContext, element.getElementInfo());
-    // }
-
-    // TODO (cclaus) TextExtracts and TextIndex Fragments are still present after deleting!
-
-    return super.onDelete();
-  }
-
-  /**
-   * Recursive function to remove all element children, before the element itself will be removed.
-   * 
-   * @param wikiContext
-   * @param elementInfo
-   */
-  private void removeElementChildren(final GWikiContext wikiContext, final GWikiElementInfo elementInfo)
-  {
-    // TODO Eigentlich kann diese Methode raus (s. meine E-Mail) bzw. eine Implementierung mit Undelete-Möglichkeit können wir später immer noch realisieren.
-    /*
-     * TODO (cclaus) check rights necessary?
-     * 
-     * if (wikiContext.getWikiWeb().getAuthorization().isAllowToEdit(wikiContext, elementInfo) == false) { return; }
-     */
-    final List<GWikiElementInfo> cl = wikiContext.getElementFinder().getAllDirectChilds(elementInfo);
-    for (final GWikiElementInfo childElementInfo : cl) {
-      removeElementChildren(wikiContext, childElementInfo);
-    }
-
-    final GWikiElement element = wikiContext.getWikiWeb().findElement(elementInfo.getId());
-
-    wikiContext.getWikiWeb().removeWikiPage(wikiContext, element);
-  }
-
-  /**
    * Creates a gwiki page: /gwiki/<SPACENAME>/Index if the space doesn't exist Otherwise the corresponding space will be updated by the PF
    * configuration dialog.
    * 
    * @see org.projectforge.web.wicket.AbstractEditPage#onSaveOrUpdate()
    */
   @Override
-  public AbstractBasePage onSaveOrUpdate()
+  public AbstractBasePage afterSaveOrUpdate()
   {
     final SpaceDO spaceData = getForm().getData();
     final GWikiStandaloneContext wikiContext = GWikiStandaloneContext.create();
     final String metaTemplateId = "admin/templates/StandardWikiPageMetaTemplate";
-    final String pageId = GWikiContext.getPageIdFromTitle(spaceData.getIdentifier()) + "/Index";
+    final String pageId = GWikiContext.getPageIdFromTitle(String.valueOf(spaceData.getId())) + "/Index";
     final String pageIntro = "{pageintro}";
 
     // TODO: (cclaus) check rights necessary?
@@ -212,7 +162,7 @@ public class SpaceEditPage extends AbstractAutoLayoutEditPage<SpaceDO, SpaceEdit
             builder.insert(0, pageIntro + spaceData.getDescription() + pageIntro);
           }
 
-        } else if (endIndex != -1){
+        } else if (endIndex != -1) {
           builder.delete(0, endIndex + pageIntro.length());
         }
 
