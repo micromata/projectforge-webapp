@@ -25,7 +25,7 @@ public class GWikiInlineFrame extends WebMarkupContainer
 
   private String target = null;
 
-  public GWikiInlineFrame(String id, String target)
+  public GWikiInlineFrame(final String id, final String target)
   {
     super(id);
 
@@ -34,7 +34,7 @@ public class GWikiInlineFrame extends WebMarkupContainer
 
   private String getTargetURL()
   {
-    String url = WebApplication.get().getServletContext().getContextPath() + "/gwiki/" + target;
+    final String url = WebApplication.get().getServletContext().getContextPath() + "/gwiki/" + target;
     return url;
   }
 
