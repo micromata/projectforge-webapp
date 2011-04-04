@@ -88,7 +88,7 @@ public class SpaceEditPage extends AbstractAutoLayoutEditPage<SpaceDO, SpaceEdit
     final SpaceDO spaceData = getForm().getData();
     final GWikiStandaloneContext wikiContext = GWikiStandaloneContext.create();
     final String metaTemplateId = "admin/templates/StandardWikiPageMetaTemplate";
-    final String pageId = GWikiContext.getPageIdFromTitle(String.valueOf(spaceData.getId())) + "/Index";
+    final String pageId = GWikiContext.getPageIdFromTitle(String.valueOf(spaceData.getId())) + "/index";
     final String pageIntro = "{pageintro}";
 
     // TODO: (cclaus) check rights necessary?
@@ -101,8 +101,10 @@ public class SpaceEditPage extends AbstractAutoLayoutEditPage<SpaceDO, SpaceEdit
       final GWikiProps props = new GWikiSettingsProps();
       props.setStringValue(GWikiPropKeys.WIKIMETATEMPLATE, metaTemplateId);
       props.setStringValue(GWikiPropKeys.TYPE, metaTemplateId);
-      props.setStringValue(GWikiPropKeys.PARENTPAGE, "Index");
+      props.setStringValue(GWikiPropKeys.PARENTPAGE, "index");
       props.setStringValue(GWikiPropKeys.TITLE, spaceData.getTitle());
+      props.setBooleanValue("PF_CONTENT", true);
+      props.setStringValue("SKIN", "ProjectForge");
 
       // Creates new GWiki Element
       final GWikiElement element = GWikiWebUtils.createNewElement(wikiContext, pageId, metaTemplateId, spaceData.getTitle());
