@@ -21,7 +21,12 @@ public class GWikiPage extends AbstractSecuredPage
 
     add(JavascriptPackageResource.getHeaderContribution("scripts/gwiki-iframe.js"));
 
-    final GWikiInlineFrame inlineFrame = new GWikiInlineFrame("gwiki-frame", "Index");
+    String pageId = parameters.getString("pageId");
+    if (pageId == null) {
+      pageId = "Index";
+    }
+
+    final GWikiInlineFrame inlineFrame = new GWikiInlineFrame("gwiki-frame", pageId);
     body.add(inlineFrame);
 
     // TODO: (cclaus) anything like this to hide the content menu
