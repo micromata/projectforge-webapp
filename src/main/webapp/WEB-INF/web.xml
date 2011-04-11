@@ -145,7 +145,7 @@
   </listener>
   <servlet>
     <servlet-name>WikiService</servlet-name>
-    <servlet-class>de.micromata.genome.gwiki.web.GWikiServlet</servlet-class>
+    <servlet-class>org.projectforge.gwiki.PFWikiServlet</servlet-class>
     <init-param>
       <!--  Register class, loading the GWikiDAOContext -->
       <param-name>de.micromata.genome.gwiki.model.config.GWikiBootstrapConfigLoader.className</param-name>
@@ -161,13 +161,6 @@
       <param-value>/wa</param-value>
     </init-param-->
     <load-on-startup>1</load-on-startup>
-  </servlet>
-  
-  <!-- Initializes GWiki Workspace depending on WikiService -->
-  <servlet>
-    <servlet-name>PFWikiInitialization</servlet-name>
-    <servlet-class>org.projectforge.gwiki.PFWikiInitialization</servlet-class>
-    <load-on-startup>2</load-on-startup>
   </servlet>
   
   <servlet>
