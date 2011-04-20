@@ -196,6 +196,11 @@
     <servlet-name>UpAndDownloadImageFileAsByteArray</servlet-name>
     <servlet-class>org.projectforge.web.imagecropper.UpAndDownloadImageFileAsByteArray</servlet-class>
   </servlet>
+  
+  <servlet>
+    <servlet-name>CalendarFeed</servlet-name>
+    <servlet-class>org.projectforge.web.calendar.CalendarFeed</servlet-class>
+  </servlet>
 
   <servlet-mapping>
     <servlet-name>LogoServlet</servlet-name>
@@ -238,6 +243,12 @@
     <servlet-name>WikiService</servlet-name>
     <url-pattern>/gwiki/*</url-pattern>
   </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>CalendarFeed</servlet-name>
+    <url-pattern>/export/ical</url-pattern>
+  </servlet-mapping>
+  
   <session-config>
     <session-timeout>60</session-timeout>
   </session-config>

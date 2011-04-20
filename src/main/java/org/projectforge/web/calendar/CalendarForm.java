@@ -26,14 +26,17 @@ package org.projectforge.web.calendar;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.calendar.MonthHolder;
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserGroupCache;
@@ -144,13 +147,13 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
           return "";
         }
         return parentPage.getFormattedMonthDuration()
-            + " ("
-            + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getBegin(),
-                DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))
+        + " ("
+        + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getBegin(),
+            DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))
             + "-"
             + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getEnd(),
                 DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))
-            + ")";
+                + ")";
       }
     }));
 
@@ -188,6 +191,24 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     add(hideBirthdaysButton);
     hideBirthdaysButton.add(new TooltipImage("hideBirthdaysImage", getResponse(), WebConstants.IMAGE_BIRTHDAY_DELETE,
         getString("tooltip.hideBirthdays")));
+
+
+    final PFUserDO user = PFUserContext.getUser();
+
+    if (StringUtils.isNotBlank(user.getStayLoggedInKey())) {
+      final String contextPath = WebApplication.get().getServletContext().getContextPath();
+      final String iCalTarget = contextPath
+      + "/export/ical?user="
+      + user.getUsername()
+      + "&key="
+      + user.getStayLoggedInKey();
+
+      final ExternalLink exportCalendar = new ExternalLink("exportCalendar", iCalTarget);
+      exportCalendar.add(new TooltipImage("exportCalendarImage", getResponse(), WebConstants.IMAGE_CALENDAR,
+          getString("tooltip.exportCalendar")));
+      add(exportCalendar);
+    }
+
     showTimesheetFilterElements();
   }
 
@@ -211,6 +232,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
         }
       }
     }, EmbatsBaseChar.CLOCK, new Model<String>() {
+      @Override
       public String getObject()
       {
         if (getFilter().getUserId() == null) {
@@ -241,7 +263,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     userSelectPanel.init().withAutoSubmit(true);
   }
 
-  public CalendarForm(CalendarPage parentPage)
+  public CalendarForm(final CalendarPage parentPage)
   {
     super(parentPage);
   }
@@ -251,7 +273,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     return filter;
   }
 
-  void setFilter(CalendarFilter filter)
+  void setFilter(final CalendarFilter filter)
   {
     this.filter = filter;
   }
@@ -276,7 +298,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     return userId != null ? userGroupCache.getUser(userId) : null;
   }
 
-  public void setTimesheetsUser(PFUserDO user)
+  public void setTimesheetsUser(final PFUserDO user)
   {
     if (user == null) {
       getFilter().setUserId(null);

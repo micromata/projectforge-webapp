@@ -37,7 +37,7 @@ public class WebConstants
   public static final String PARAMETER_USER_ID = "uid";
 
   public static final String PARAMETER_DATE = "date";
-  
+
   private static final String DIR = "/images/";
 
   public static final String IMAGE_ACCEPT = DIR + "accept.png";
@@ -63,6 +63,8 @@ public class WebConstants
   public static final String IMAGE_CALENDAR_PREVIOUS_MONTH = DIR + "css_img/leftInactive.png";
 
   public static final String IMAGE_CALENDAR_SELECT_WEEK = DIR + "button_calendar_week.png";
+
+  public static final String IMAGE_CALENDAR = DIR + "calendar.png";
 
   public static final String IMAGE_CLOCK = DIR + "clock.png";
 
