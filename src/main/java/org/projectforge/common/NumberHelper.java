@@ -85,9 +85,9 @@ public class NumberHelper
     return format;
   }
 
-  public static NumberFormat getNumberFractionFormat(Locale locale, int fractionDigits)
+  public static NumberFormat getNumberFractionFormat(final Locale locale, final int fractionDigits)
   {
-    NumberFormat format = NumberFormat.getNumberInstance(locale);
+    final NumberFormat format = NumberFormat.getNumberInstance(locale);
     format.setMaximumFractionDigits(fractionDigits);
     format.setMinimumFractionDigits(fractionDigits);
     return format;
@@ -98,7 +98,7 @@ public class NumberHelper
    * @param bytes
    * @return
    */
-  public static String formatBytes(long bytes)
+  public static String formatBytes(final long bytes)
   {
     if (bytes < KILO_BYTES) {
       return String.valueOf(bytes) + " bytes";
@@ -128,7 +128,7 @@ public class NumberHelper
    * @param value
    * @return true, if value is not null and greater zero.
    */
-  public static boolean greaterZero(Integer value)
+  public static boolean greaterZero(final Integer value)
   {
     return value != null && value.intValue() > 0;
   }
@@ -137,11 +137,11 @@ public class NumberHelper
    * @param value
    * @return true, if value is not null and greater zero.
    */
-  public static boolean greaterZero(Long value)
+  public static boolean greaterZero(final Long value)
   {
     return value != null && value.intValue() > 0;
   }
-  
+
   public static boolean isZeroOrNull(final Integer value) {
     return (value == null || value == 0);
   }
@@ -173,7 +173,7 @@ public class NumberHelper
     Integer result = null;
     try {
       result = new Integer(value);
-    } catch (NumberFormatException ex) {
+    } catch (final NumberFormatException ex) {
       log.debug(ex.getMessage(), ex);
     }
     return result;
@@ -196,7 +196,7 @@ public class NumberHelper
     Short result = null;
     try {
       result = new Short(value);
-    } catch (NumberFormatException ex) {
+    } catch (final NumberFormatException ex) {
       log.debug(ex.getMessage(), ex);
     }
     return result;
@@ -217,7 +217,7 @@ public class NumberHelper
     Long result = null;
     try {
       result = new Long(value);
-    } catch (NumberFormatException ex) {
+    } catch (final NumberFormatException ex) {
       log.debug(ex.getMessage(), ex);
     }
     return result;
@@ -241,7 +241,7 @@ public class NumberHelper
         value = value.replace(',', '.');
       }
       result = new BigDecimal(value);
-    } catch (NumberFormatException ex) {
+    } catch (final NumberFormatException ex) {
       log.debug(ex.getMessage(), ex);
     }
     return result;
@@ -249,7 +249,7 @@ public class NumberHelper
 
   /**
    */
-  public static BigDecimal parseCurrency(String value, Locale locale)
+  public static BigDecimal parseCurrency(String value, final Locale locale)
   {
     if (value == null) {
       return null;
@@ -258,15 +258,15 @@ public class NumberHelper
     if (value.length() == 0) {
       return null;
     }
-    NumberFormat format = getCurrencyFormat(locale);
+    final NumberFormat format = getCurrencyFormat(locale);
     BigDecimal result = null;
     try {
-      Number number = format.parse(value);
+      final Number number = format.parse(value);
       if (number != null) {
         result = new BigDecimal(number.toString());
         result = result.setScale(2, BigDecimal.ROUND_HALF_UP);
       }
-    } catch (ParseException ex) {
+    } catch (final ParseException ex) {
       log.debug(ex.getMessage(), ex);
     }
     return result;
@@ -299,7 +299,7 @@ public class NumberHelper
    * @param value The integer value to convert.
    * @return The String representation or empty String, if value is null.
    */
-  public static String getAsString(Number value)
+  public static String getAsString(final Number value)
   {
     if (value == null) {
       return "";
@@ -314,7 +314,7 @@ public class NumberHelper
    * @param format The format to use.
    * @return The String representation or empty String, if value is null.
    */
-  public static String getAsString(Number value, NumberFormat format)
+  public static String getAsString(final Number value, final NumberFormat format)
   {
     if (value == null) {
       return "";
@@ -326,10 +326,10 @@ public class NumberHelper
   /**
    * @see PFUserContext#getLocale()
    */
-  public static String formatFraction2(Number value)
+  public static String formatFraction2(final Number value)
   {
-    Locale locale = PFUserContext.getLocale();
-    NumberFormat format = getNumberFraction2Format(locale);
+    final Locale locale = PFUserContext.getLocale();
+    final NumberFormat format = getNumberFraction2Format(locale);
     return format.format(value);
   }
 
@@ -342,7 +342,7 @@ public class NumberHelper
    *          by 0. Example: ("+49 561 / 316793-0", "+49") -> 05613167930; ("+39 123456", "+49") -> 0039123456.
    * @return
    */
-  public static String extractPhonenumber(String str, String countryPrefix)
+  public static String extractPhonenumber(String str, final String countryPrefix)
   {
     if (str == null) {
       return null;
@@ -354,8 +354,8 @@ public class NumberHelper
       str = str.substring(countryPrefix.length());
     } else if (str.length() > 3
         && str.charAt(0) == '+'
-        && Character.isDigit(str.charAt(1)) == true
-        && Character.isDigit(str.charAt(2)) == true) {
+          && Character.isDigit(str.charAt(1)) == true
+          && Character.isDigit(str.charAt(2)) == true) {
       buf.append("00");
       buf.append(str.charAt(1));
       buf.append(str.charAt(2));
@@ -382,7 +382,7 @@ public class NumberHelper
    * @return
    * @see BigDecimal#compareTo(BigDecimal)
    */
-  public static boolean isEqual(BigDecimal value1, BigDecimal value2)
+  public static boolean isEqual(final BigDecimal value1, final BigDecimal value2)
   {
     if (value1 == null) {
       return (value2 == null) ? true : false;
@@ -401,7 +401,7 @@ public class NumberHelper
   {
     return !isZeroOrNull(value);
   }
-  
+
   public static boolean isZeroOrNull(final BigDecimal value)
   {
     return (value == null || value.compareTo(BigDecimal.ZERO) == 0);
@@ -414,7 +414,7 @@ public class NumberHelper
    * @return
    * @see Integer#compareTo(Integer)
    */
-  public static boolean isEqual(Integer value1, Integer value)
+  public static boolean isEqual(final Integer value1, final Integer value)
   {
     if (value1 == null) {
       return (value == null) ? true : false;
@@ -434,17 +434,17 @@ public class NumberHelper
    * @param split
    * @return
    */
-  public static int[] splitToInts(Number value, int... split)
+  public static int[] splitToInts(final Number value, final int... split)
   {
     int numberOfDigits = 0;
-    for (int n : split) {
+    for (final int n : split) {
       numberOfDigits += n;
     }
-    String str = StringUtils.leftPad(String.valueOf(value.intValue()), numberOfDigits, '0');
-    int[] result = new int[split.length];
+    final String str = StringUtils.leftPad(String.valueOf(value.intValue()), numberOfDigits, '0');
+    final int[] result = new int[split.length];
     int pos = 0;
     int i = 0;
-    for (int n : split) {
+    for (final int n : split) {
       result[i++] = parseInteger(str.substring(pos, pos + n));
       pos += n;
     }
@@ -460,10 +460,10 @@ public class NumberHelper
    * @see NumberUtils#createBigDecimal(String)
    * @see BigDecimal#toPlainString()
    */
-  public static String toPlainString(String str)
+  public static String toPlainString(final String str)
   {
     if (NumberUtils.isNumber(str) == true) {
-      BigDecimal bd = NumberUtils.createBigDecimal(str);
+      final BigDecimal bd = NumberUtils.createBigDecimal(str);
       return bd.toPlainString();
     } else {
       return str;
@@ -494,11 +494,23 @@ public class NumberHelper
    * @param numberOfBytes
    * @return
    */
-  public static String getSecureRandomUrlSaveString(int numberOfBytes)
+  public static String getSecureRandomUrlSaveString(final int numberOfBytes)
   {
     final SecureRandom random = new SecureRandom();
     final byte[] bytes = new byte[numberOfBytes];
     random.nextBytes(bytes);
     return Base64.encodeBase64URLSafeString(bytes);
+  }
+
+  public static boolean isIn(final int value, final int... numbers) {
+    if (numbers == null) {
+      return false;
+    }
+    for (final int number : numbers) {
+      if (value == number) {
+        return true;
+      }
+    }
+    return false;
   }
 }

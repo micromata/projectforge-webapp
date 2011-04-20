@@ -24,6 +24,8 @@
 package org.projectforge.common;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.Locale;
@@ -35,7 +37,7 @@ import org.projectforge.user.PFUserDO;
 public class NumberHelperTest
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(NumberHelperTest.class);
-  
+
   @Test
   public void greaterZero()
   {
@@ -45,7 +47,7 @@ public class NumberHelperTest
     assertEquals(true, NumberHelper.greaterZero(1));
     assertEquals(true, NumberHelper.greaterZero(100));
   }
-  
+
   @Test
   public void add()
   {
@@ -102,7 +104,7 @@ public class NumberHelperTest
     assertEquals(true, NumberHelper.isEqual(new BigDecimal("1.5").setScale(1), new BigDecimal("1.50").setScale(2)));
     assertEquals(true, NumberHelper.isEqual(new BigDecimal("-891.5").setScale(1), new BigDecimal("-891.50").setScale(2)));
   }
-  
+
   @Test
   public void isIntegerNotZero()
   {
@@ -143,7 +145,7 @@ public class NumberHelperTest
   @Test
   public void formatBytes()
   {
-    PFUserDO user = new PFUserDO();
+    final PFUserDO user = new PFUserDO();
     user.setLocale(Locale.UK);
     PFUserContext.setUser(user);
     assertEquals("0 bytes", NumberHelper.formatBytes(0));
@@ -184,7 +186,16 @@ public class NumberHelperTest
     }
   }
 
-  private void compareIntArray(int[] a1, int[] a2)
+  @Test
+  public void isIn() {
+    assertFalse(NumberHelper.isIn(42));
+    assertFalse(NumberHelper.isIn(42, 0));
+    assertTrue(NumberHelper.isIn(42, 42));
+    assertTrue(NumberHelper.isIn(0, 0));
+    assertTrue(NumberHelper.isIn(0, 1, 0));
+  }
+
+  private void compareIntArray(final int[] a1, final int[] a2)
   {
     assertEquals(a1.length, a2.length);
     for (int i = 0; i < a1.length; i++) {
