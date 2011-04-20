@@ -35,7 +35,7 @@ import org.projectforge.web.mobile.MenuMobilePage;
  */
 public class PageExpiredPage extends MessagePage
 {
-  public PageExpiredPage(PageParameters params)
+  public PageExpiredPage(final PageParameters params)
   {
     super(params);
     if (getMySession().isMobileUserAgent() == true) {
