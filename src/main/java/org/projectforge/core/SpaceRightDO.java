@@ -23,9 +23,7 @@
 
 package org.projectforge.core;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.StringTokenizer;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -41,7 +39,6 @@ import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
-import org.projectforge.common.LabelValueBean;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 
@@ -75,7 +72,7 @@ public class SpaceRightDO extends DefaultBaseDO
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String comment;
 
-  private transient List<LabelValueBean<String, String>> rights;
+  private transient Map<String, String> rights;
 
   /**
    * Examples: 'PF', 'ACME-WEB-PORTAL', ...
@@ -97,10 +94,11 @@ public class SpaceRightDO extends DefaultBaseDO
     return value;
   }
 
-  public void setValue(final String value)
+  public SpaceRightDO setValue(final String value)
   {
     this.value = value;
     this.rights = null; // Force reparsing.
+    return this;
   }
 
   /**
@@ -201,34 +199,9 @@ public class SpaceRightDO extends DefaultBaseDO
     if (key == null) {
       return null;
     }
-    readKeyValues();
-    for (final LabelValueBean<String, String> labelValue : this.rights) {
-      if (key.equals(labelValue.getLabel()) == true) {
-        return labelValue.getValue();
-      }
+    if (rights == null) {
+      rights = SpaceRightUtils.getValues(this);
     }
-    return null;
-  }
-
-  private void readKeyValues()
-  {
-    if (this.rights != null) {
-      return;
-    }
-    this.rights = new ArrayList<LabelValueBean<String, String>>();
-    if (value != null && value.indexOf('=') > 0) {
-      final StringTokenizer tokenizer = new StringTokenizer(value, ",");
-      while (tokenizer.hasMoreTokens() == true) {
-        final String keyValue = tokenizer.nextToken();
-        final int pos = keyValue.indexOf('=');
-        if (pos > 0) {
-          final String key = keyValue.substring(0, pos);
-          final String val = (keyValue.length() > pos + 1) ? keyValue.substring(pos + 1) : null;
-          this.rights.add(new LabelValueBean<String, String>(key, val));
-        } else {
-          this.rights.add(new LabelValueBean<String, String>(keyValue, null));
-        }
-      }
-    }
+    return this.rights.get(key);
   }
 }
