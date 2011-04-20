@@ -12,8 +12,6 @@ package org.projectforge.gwiki;
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -21,6 +19,7 @@ import java.util.zip.ZipFile;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.wicket.util.file.File;
 import org.springframework.core.io.ClassPathResource;
 
@@ -58,8 +57,7 @@ public class PFWikiServlet extends GWikiServlet
         if (entry.isDirectory()) {
           file.mkdir();
         } else {
-          copyInputStreamToOutputStream(zip.getInputStream(entry),
-              new BufferedOutputStream(new FileOutputStream(baseDirName + entry.getName())));
+          IOUtils.copy(zip.getInputStream(entry), new BufferedOutputStream(new FileOutputStream(baseDirName + entry.getName())));
         }
       }
 
@@ -71,19 +69,4 @@ public class PFWikiServlet extends GWikiServlet
 
     log.info("copying init files if not present");
   }
-
-  
-  private void copyInputStreamToOutputStream(final InputStream in, final OutputStream out) throws IOException
-  {
-    final byte[] buffer = new byte[1024];
-    int length;
-
-    while ((length = in.read(buffer)) >= 0) {
-      out.write(buffer, 0, length);
-    }
-
-    in.close();
-    out.close();
-  }
-
 }
