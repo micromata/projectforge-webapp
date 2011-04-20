@@ -1,6 +1,11 @@
-$(document).ready(function() {
-	$("#gwiki-frame").iframeAutoHeight();
-});
+/*
+ * disabled until the problem with dynamic document expansion is solved
+ * 
+	$(document).ready(function() {
+		$("#gwiki-frame").iframeAutoHeight();
+	});
+*/
+
 
 function setBookmark() {
 	var bookmarkUrl = $('#bookmark').children().last().text();

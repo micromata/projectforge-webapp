@@ -41,9 +41,8 @@ public class GWikiLabel extends Label
 
     GWikiWeb wikiWeb = GWikiWeb.getWiki();
     GWikiElement el = wikiWeb.getElement(pageId);
-
+    
     GWikiStandaloneContext wikiContext = GWikiStandaloneContext.create();
-    wikiContext.setSkin("docexp");
     
     // TODO (cclaus) this looks like a bug. A plugin is registered which doesn't exist
     GWikiPluginRepository pluginRepository = wikiContext.getWikiWeb().getDaoContext().getPluginRepository();
