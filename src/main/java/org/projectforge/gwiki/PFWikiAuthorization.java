@@ -56,12 +56,12 @@ public class PFWikiAuthorization implements GWikiAuthorization
     defaultConfig.getUsers().put("anon", new GWikiSimpleUser("anon", "anon", "genome@micromata.de", "GWIKI_VIEWPAGES"));
     defaultConfig.getUsers().put("gwikiadmin", new GWikiSimpleUser("gwikiadmin", "gwiki", "genome@micromata.de", "+*,-GWIKI_DEVELOPER"));
     defaultConfig.getUsers()
-        .put("gwikideveloper", new GWikiSimpleUser("gwikideveloper", "gwiki", "genome@micromata.de", "+*,-GWIKI_ADMIN"));
+    .put("gwikideveloper", new GWikiSimpleUser("gwikideveloper", "gwiki", "genome@micromata.de", "+*,-GWIKI_ADMIN"));
   }
 
   public boolean initThread(final GWikiContext wikiContext)
   {
-    GWikiSimpleUser su = getUser(wikiContext);
+    final GWikiSimpleUser su = getUser(wikiContext);
     if (su == null || StringUtils.equals(su.getUser(), "anon") == true) {
       return false;
     }
@@ -114,7 +114,7 @@ public class PFWikiAuthorization implements GWikiAuthorization
     return getUser(ctx).getUser();
   }
 
-  public String getEffectiveRight(GWikiContext ctx, GWikiElementInfo ei, String pageRight)
+  public String getEffectiveRight(final GWikiContext ctx, final GWikiElementInfo ei, final String pageRight)
   {
     log.warn("Unsupported: getEffectiveRight: ctx=" + ctx + ", ei=" + ", pageRight=" + pageRight);
     return "";
@@ -128,7 +128,7 @@ public class PFWikiAuthorization implements GWikiAuthorization
         return "pf";
       }
     }
-    String val = ctx.getCookie(key);
+    final String val = ctx.getCookie(key);
     if (val != null) {
       return val;
     }
@@ -151,22 +151,27 @@ public class PFWikiAuthorization implements GWikiAuthorization
     }
   }
 
-  public boolean isAllowTo(GWikiContext ctx, String right)
+  public boolean isAllowTo(final GWikiContext ctx, final String right)
+  {
+    // just to demonstrate / test restriction of new elements
+    if ("GWIKI_DEVELOPER".equals(right)) {
+      return false;
+    }
+
+    return WicketApplication.isDevelopmentModus();
+  }
+
+  public boolean isAllowToCreate(final GWikiContext ctx, final GWikiElementInfo ei)
   {
     return WicketApplication.isDevelopmentModus();
   }
 
-  public boolean isAllowToCreate(GWikiContext ctx, GWikiElementInfo ei)
+  public boolean isAllowToEdit(final GWikiContext ctx, final GWikiElementInfo ei)
   {
     return WicketApplication.isDevelopmentModus();
   }
 
-  public boolean isAllowToEdit(GWikiContext ctx, GWikiElementInfo ei)
-  {
-    return WicketApplication.isDevelopmentModus();
-  }
-
-  public boolean isAllowToView(GWikiContext ctx, GWikiElementInfo ei)
+  public boolean isAllowToView(final GWikiContext ctx, final GWikiElementInfo ei)
   {
     // TODO: test if user is allowed to 'view' the space
     final String space = extractSpace(ei);
@@ -174,24 +179,24 @@ public class PFWikiAuthorization implements GWikiAuthorization
     return WicketApplication.isDevelopmentModus();
   }
 
-  public boolean login(GWikiContext ctx, String user, String password)
+  public boolean login(final GWikiContext ctx, final String user, final String password)
   {
     throw new UnsupportedOperationException();
   }
 
-  public void logout(GWikiContext ctx)
+  public void logout(final GWikiContext ctx)
   {
     throw new UnsupportedOperationException();
   }
 
-  public boolean needAuthorization(GWikiContext ctx)
+  public boolean needAuthorization(final GWikiContext ctx)
   {
     return WicketApplication.isDevelopmentModus();
   }
 
-  public <T> T runAsSu(GWikiContext wikiContext, CallableX<T, RuntimeException> callback)
+  public <T> T runAsSu(final GWikiContext wikiContext, final CallableX<T, RuntimeException> callback)
   {
-    GWikiSimpleUser su = GWikiUserServeElementFilterEvent.getUser();
+    final GWikiSimpleUser su = GWikiUserServeElementFilterEvent.getUser();
     try {
       GWikiUserServeElementFilterEvent.setUser(defaultConfig.getUser("gwikisu"));
       return callback.call();
@@ -200,13 +205,13 @@ public class PFWikiAuthorization implements GWikiAuthorization
     }
   }
 
-  public <T> T runAsUser(String user, GWikiContext wikiContext, CallableX<T, RuntimeException> callback)
+  public <T> T runAsUser(final String user, final GWikiContext wikiContext, final CallableX<T, RuntimeException> callback)
   {
-    GWikiSimpleUser su = defaultConfig.getUser(user);
+    final GWikiSimpleUser su = defaultConfig.getUser(user);
     if (su == null) {
       throw new AuthorizationFailedException("User doesn't exits: " + user);
     }
-    GWikiSimpleUser pu = GWikiUserServeElementFilterEvent.getUser();
+    final GWikiSimpleUser pu = GWikiUserServeElementFilterEvent.getUser();
     try {
       GWikiUserServeElementFilterEvent.setUser(su);
       return callback.call();
@@ -215,7 +220,7 @@ public class PFWikiAuthorization implements GWikiAuthorization
     }
   }
 
-  public boolean runIfAuthentificated(GWikiContext wikiContext, CallableX<Void, RuntimeException> callback)
+  public boolean runIfAuthentificated(final GWikiContext wikiContext, final CallableX<Void, RuntimeException> callback)
   {
     return WicketApplication.isDevelopmentModus();
   }
@@ -230,14 +235,14 @@ public class PFWikiAuthorization implements GWikiAuthorization
   }
 
   @Override
-  public <T> T runWithRight(GWikiContext wikiContext, String addRight, CallableX<T, RuntimeException> callback)
+  public <T> T runWithRight(final GWikiContext wikiContext, final String addRight, final CallableX<T, RuntimeException> callback)
   {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public <T> T runWithRights(GWikiContext wikiContext, String[] addRights, CallableX<T, RuntimeException> callback)
+  public <T> T runWithRights(final GWikiContext wikiContext, final String[] addRights, final CallableX<T, RuntimeException> callback)
   {
     // TODO Auto-generated method stub
     return null;

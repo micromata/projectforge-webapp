@@ -9,7 +9,6 @@
 
 package org.projectforge.gwiki;
 
-import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
@@ -57,16 +56,16 @@ public class PFWikiServlet extends GWikiServlet
         if (entry.isDirectory()) {
           file.mkdir();
         } else {
-          IOUtils.copy(zip.getInputStream(entry), new BufferedOutputStream(new FileOutputStream(baseDirName + entry.getName())));
+          IOUtils.copy(zip.getInputStream(entry), new FileOutputStream(baseDirName + entry.getName()));
         }
       }
 
       zip.close();
-
     } catch (final IOException ex) {
       log.fatal("Exception encountered " + ex, ex);
     }
 
     log.info("copying init files if not present");
   }
+
 }
