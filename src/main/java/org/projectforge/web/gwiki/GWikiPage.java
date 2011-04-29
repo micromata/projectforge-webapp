@@ -20,7 +20,6 @@ public class GWikiPage extends AbstractSecuredPage
     super(parameters);
 
     add(JavascriptPackageResource.getHeaderContribution("scripts/gwiki-iframe.js"));
-    //add(JavascriptPackageResource.getHeaderContribution("scripts/jquery.iframe-auto-height.plugin.js"));
 
     String pageId = parameters.getString("pageId");
     if (pageId == null) {
