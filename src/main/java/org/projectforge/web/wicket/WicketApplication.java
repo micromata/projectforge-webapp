@@ -53,12 +53,12 @@ import org.hibernate.cfg.AnnotationConfiguration;
 import org.projectforge.AppVersion;
 import org.projectforge.admin.SystemUpdater;
 import org.projectforge.common.ExceptionHelper;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.CronSetup;
 import org.projectforge.core.ProjectForgeException;
 import org.projectforge.core.SystemInfoCache;
-import org.projectforge.core.ConfigXml;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.plugins.core.PluginsRegistry;
@@ -203,7 +203,7 @@ public class WicketApplication extends WebApplication
    * @param msg
    * @see #getAlertMessage()
    */
-  public static void setAlertMessage(String alertMessage)
+  public static void setAlertMessage(final String alertMessage)
   {
     WicketApplication.alertMessage = alertMessage;
   }
@@ -244,7 +244,7 @@ public class WicketApplication extends WebApplication
     super.init();
     getApplicationSettings().setDefaultMaximumUploadSize(Bytes.megabytes(100));
     getMarkupSettings().setDefaultMarkupEncoding("utf-8");
-    MyAuthorizationStrategy authStrategy = new MyAuthorizationStrategy();
+    final MyAuthorizationStrategy authStrategy = new MyAuthorizationStrategy();
     getSecuritySettings().setAuthorizationStrategy(authStrategy);
     // getSecuritySettings().setUnauthorizedComponentInstantiationListener(authStrategy);
     getResourceSettings().setResourceStreamLocator(new MyResourceStreamLocator());
@@ -257,7 +257,7 @@ public class WicketApplication extends WebApplication
     getApplicationSettings().setInternalErrorPage(ErrorPage.class);
 
     final XmlWebApplicationContext webApplicationContext = (XmlWebApplicationContext) WebApplicationContextUtils
-        .getWebApplicationContext(getServletContext());
+    .getWebApplicationContext(getServletContext());
     final ConfigurableListableBeanFactory beanFactory = webApplicationContext.getBeanFactory();
     beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
     final LocalSessionFactoryBean localSessionFactoryBean = (LocalSessionFactoryBean) beanFactory.getBean("&sessionFactory");
@@ -292,7 +292,7 @@ public class WicketApplication extends WebApplication
     pluginsRegistry.set(beanFactory, getResourceSettings());
     pluginsRegistry.initialize();
 
-    for (Map.Entry<String, Class< ? extends WebPage>> mountPage : WebRegistry.instance().getMountPages().entrySet()) {
+    for (final Map.Entry<String, Class< ? extends WebPage>> mountPage : WebRegistry.instance().getMountPages().entrySet()) {
       mountPage(mountPage.getKey(), mountPage.getValue());
     }
     if (isDevelopmentSystem() == true && isStripWicketTags() == true) {
@@ -303,7 +303,7 @@ public class WicketApplication extends WebApplication
     log.info("Default TimeZone is: " + TimeZone.getDefault());
     log.info("user.timezone is: " + System.getProperty("user.timezone"));
     cronSetup.initialize();
-    log.fatal(AppVersion.APP_ID + " " + AppVersion.NUMBER + " (" + AppVersion.RELEASE_TIMESTAMP + ") initialized.");
+    log.info(AppVersion.APP_ID + " " + AppVersion.NUMBER + " (" + AppVersion.RELEASE_TIMESTAMP + ") initialized.");
 
     PFUserContext.setUser(DatabaseUpdateDao.__internalGetSystemAdminPseudoUser()); // Logon admin user.
     if (systemUpdater.isUpdated() == false) {
@@ -319,7 +319,7 @@ public class WicketApplication extends WebApplication
     log.info("Syncing all user preferences to database.");
     userXmlPreferencesCache.forceReload();
     cronSetup.shutdown();
-    log.fatal("Destroyed");
+    log.info("Destroyed");
   }
 
   public boolean isDevelopmentSystem()
@@ -343,6 +343,7 @@ public class WicketApplication extends WebApplication
   /**
    * @see org.apache.wicket.Application#getHomePage()
    */
+  @Override
   public Class<CalendarPage> getHomePage()
   {
     return CalendarPage.class;
@@ -367,6 +368,7 @@ public class WicketApplication extends WebApplication
   /**
    * 
    */
+  @Override
   protected IConverterLocator newConverterLocator()
   {
     final ConverterLocator converterLocator = new ConverterLocator();
@@ -384,7 +386,7 @@ public class WicketApplication extends WebApplication
   {
     return new WebRequestCycleProcessor() {
       @Override
-      protected Page onRuntimeException(Page page, RuntimeException e)
+      protected Page onRuntimeException(final Page page, final RuntimeException e)
       {
         final Throwable rootCause = ExceptionHelper.getRootCause(e);
         if (page != null && page instanceof AbstractSecuredPage && rootCause instanceof ProjectForgeException) {
@@ -413,7 +415,7 @@ public class WicketApplication extends WebApplication
   {
     return new WebRequestCycle(this, (WebRequest) request, (WebResponse) response) {
       @Override
-      protected void logRuntimeException(RuntimeException e)
+      protected void logRuntimeException(final RuntimeException e)
       {
         final Throwable rootCause = ExceptionHelper.getRootCause(e);
         if (rootCause instanceof ProjectForgeException == false) {
