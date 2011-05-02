@@ -9,6 +9,9 @@
 
 package org.projectforge.web.gwiki;
 
+import javax.servlet.http.Cookie;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.JavascriptPackageResource;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -19,15 +22,21 @@ public class GWikiPage extends AbstractSecuredPage
   {
     super(parameters);
 
-    add(JavascriptPackageResource.getHeaderContribution("scripts/gwiki-iframe.js"));
-
+    final Cookie frameCookie = this.getWebRequestCycle().getWebRequest().getCookie("frameSrc");
     String pageId = parameters.getString("pageId");
+
+    add(JavascriptPackageResource.getHeaderContribution("scripts/gwiki-iframe.js"));
+    add(JavascriptPackageResource.getHeaderContribution("scripts/stringutils.js"));
+
     if (pageId == null) {
-      pageId = "Index";
+      if (frameCookie != null && StringUtils.isNotBlank(frameCookie.getValue())) {
+        pageId = frameCookie.getValue();
+      } else {
+        pageId = "Index";
+      }
     }
 
-    final GWikiInlineFrame inlineFrame = new GWikiInlineFrame("gwiki-frame", pageId);
-    body.add(inlineFrame);
+    body.add(new GWikiInlineFrame("gwiki-frame", pageId));
 
     // TODO: (cclaus) anything like this to hide the content menu
     // contentMenuArea.setVisible(false);

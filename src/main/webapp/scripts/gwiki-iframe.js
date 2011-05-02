@@ -9,6 +9,13 @@ function updateScrolling() {
 	document.body.style.overflow = "hidden !important";
 }
 
+function setCookie(name, value, expiration) {
+	var expirationDate = new Date();
+	expirationDate.setDate(expirationDate.getDate() + expiration);
+	var value=escape(value) + ((expiration == null) ? "" : "; expires=" + expirationDate.toUTCString());
+	document.cookie = name + "=" + value;
+}
+
 function setBookmark() {
 	var bookmarkUrl = $('#bookmark').children().last().text();
 	var src = $('#gwiki-frame').contents().get(0).location.href;
@@ -23,4 +30,5 @@ function setBookmark() {
 	bookmarkUrl += '?pageId=' + pageId;
 
 	$('#bookmark').children().last().text(bookmarkUrl);
+	setCookie('frameSrc', pageId, 365);
 }
