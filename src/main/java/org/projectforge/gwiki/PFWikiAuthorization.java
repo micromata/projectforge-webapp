@@ -95,6 +95,7 @@ public class PFWikiAuthorization implements GWikiAuthorization
     su = new GWikiSimpleUser();
     su.setEmail(user.getEmail());
     su.setUser(user.getUsername());
+    su.getProps().put("lang", user.getLocale().toString());
     user.setAttribute(USER_KEY, su);
     return su;
   }
