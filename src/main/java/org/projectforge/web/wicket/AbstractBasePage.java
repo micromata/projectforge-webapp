@@ -50,6 +50,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuBuilder;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.core.MenuPanel;
 import org.projectforge.web.core.SearchPage;
@@ -120,7 +121,8 @@ public abstract class AbstractBasePage extends WebPage
     add(JavascriptPackageResource.getHeaderContribution("scripts/projectforge.js"));
     add(WicketUtils.headerContributorForFavicon(getUrl("/favicon.ico")));
     body = new WebMarkupContainer("body") {
-      protected void onComponentTag(ComponentTag tag)
+      @Override
+      protected void onComponentTag(final ComponentTag tag)
       {
         onBodyTag(tag);
       }
@@ -129,6 +131,10 @@ public abstract class AbstractBasePage extends WebPage
     body.add(new Label("title", "<not yet visible>").setVisible(false));
     final WebMarkupContainer navigationContainer = new WebMarkupContainer("navigation");
     body.add(navigationContainer);
+    if (WebConfiguration.isPortletMode() == true) {
+      navigationContainer.setVisible(false);
+      return;
+    }
     final Label developmentsystemLabel = new Label("developmentsystem", "Developmentsystem!");
     navigationContainer.add(developmentsystemLabel);
     if (getWicketApplication().isDevelopmentSystem() == true) {
@@ -151,6 +157,7 @@ public abstract class AbstractBasePage extends WebPage
     }
     navigationContainer.add(myAccountLink);
     final Model<String> loggedInLabelModel = new Model<String>() {
+      @Override
       public String getObject()
       {
         if (user == null) {
@@ -163,6 +170,7 @@ public abstract class AbstractBasePage extends WebPage
     final PageParameters params = new PageParameters();
     params.add(LoginPage.REQUEST_PARAM_LOGOUT, "true");
     final Link<String> logoutLink = new Link<String>("logoutLink") {
+      @Override
       public void onClick()
       {
         logout();
@@ -177,7 +185,7 @@ public abstract class AbstractBasePage extends WebPage
     final BookmarkablePageLink<Void> docLink = new BookmarkablePageLink<Void>("docLink", DocumentationPage.class);
     navigationContainer.add(docLink);
     docLink
-        .add(new Label("versionLabel", "V.&nbsp;" + getAppVersion() + ",&nbsp;" + getAppReleaseTimestamp()).setEscapeModelStrings(false));
+    .add(new Label("versionLabel", "V.&nbsp;" + getAppVersion() + ",&nbsp;" + getAppReleaseTimestamp()).setEscapeModelStrings(false));
     final MenuPanel menuPanel = new MenuPanel("mainMenu");
     navigationContainer.add(menuPanel);
     menuPanel.init();
@@ -187,11 +195,12 @@ public abstract class AbstractBasePage extends WebPage
     navigationContainer.add(sendFeedbackLink);
     final IconLinkPanel bookmarkLink = new IconLinkPanel("bookmarkLink", EmbatsSymbolChar.STAR, "javascript:toggle('#bookmark');",
         new Model<String>() {
-          public String getObject()
-          {
-            return getString("tooltip.directPageLink") + ": " + bookmarkableUrl;
-          };
-        });
+      @Override
+      public String getObject()
+      {
+        return getString("tooltip.directPageLink") + ": " + bookmarkableUrl;
+      };
+    });
     navigationContainer.add(bookmarkLink);
     bookmarkLink.setVisible(isBookmarkLinkIconVisible());
     navigationContainer.add(bookmarkLink);
@@ -292,7 +301,7 @@ public abstract class AbstractBasePage extends WebPage
    */
   public Date now()
   {
-    Calendar cal = DateHelper.getCalendar();
+    final Calendar cal = DateHelper.getCalendar();
     return cal.getTime();
   }
 
@@ -332,7 +341,7 @@ public abstract class AbstractBasePage extends WebPage
    * Includes session id (encode URL) at default.
    * @see #getUrl(String, boolean)
    */
-  public String getUrl(String path)
+  public String getUrl(final String path)
   {
     return getUrl(path, true);
   }
@@ -357,7 +366,7 @@ public abstract class AbstractBasePage extends WebPage
    * @param url
    * @see #getUrl(String)
    */
-  protected void redirectToUrl(String url)
+  protected void redirectToUrl(final String url)
   {
     getRequestCycle().setRequestTarget(new RedirectRequestTarget(getUrl(url)));
   }
@@ -379,7 +388,7 @@ public abstract class AbstractBasePage extends WebPage
    * If your page need to manipulate the body tag overwrite this method, e. g.: tag.put("onload", "...");
    * @return
    */
-  protected void onBodyTag(ComponentTag bodyTag)
+  protected void onBodyTag(final ComponentTag bodyTag)
   {
   }
 
@@ -391,7 +400,7 @@ public abstract class AbstractBasePage extends WebPage
   /**
    * @see StringEscapeUtils#escapeHtml(String)
    */
-  protected String escapeHtml(String str)
+  protected String escapeHtml(final String str)
   {
     return StringEscapeUtils.escapeHtml(str);
   }
@@ -416,7 +425,7 @@ public abstract class AbstractBasePage extends WebPage
     return null;
   }
 
-  public String getLocalizedMessage(String key, Object... params)
+  public String getLocalizedMessage(final String key, final Object... params)
   {
     if (params == null) {
       return getString(key);
@@ -431,6 +440,6 @@ public abstract class AbstractBasePage extends WebPage
   private void logout()
   {
     LoginPage
-        .logout((MySession) getSession(), (WebRequest) getRequest(), (WebResponse) getResponse(), userXmlPreferencesCache, menuBuilder);
+    .logout((MySession) getSession(), (WebRequest) getRequest(), (WebResponse) getResponse(), userXmlPreferencesCache, menuBuilder);
   }
 }
