@@ -20,6 +20,7 @@ import javax.servlet.ServletException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.wicket.util.file.File;
+import org.projectforge.web.WebConfiguration;
 import org.springframework.core.io.ClassPathResource;
 
 import de.micromata.genome.gwiki.web.GWikiServlet;
@@ -33,6 +34,10 @@ public class PFWikiServlet extends GWikiServlet
   @Override
   public void init(final ServletConfig config) throws ServletException
   {
+    if (WebConfiguration.isGWikiAvailable() == false) {
+      // GWiki shouldn't be available, so don't init it.
+      return;
+    }
     super.init(config);
 
     // copies the PFContents.zip to base dir and extracts each file, if necessary
@@ -67,5 +72,4 @@ public class PFWikiServlet extends GWikiServlet
 
     log.info("copying init files if not present");
   }
-
 }
