@@ -28,7 +28,7 @@ import java.util.Locale;
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.wicket.WicketApplication;
+import org.projectforge.web.WebConfiguration;
 
 import de.micromata.genome.gwiki.auth.GWikiSimpleUser;
 import de.micromata.genome.gwiki.auth.GWikiSimpleUserConfig;
@@ -159,17 +159,17 @@ public class PFWikiAuthorization implements GWikiAuthorization
       return false;
     }
 
-    return WicketApplication.isDevelopmentModus();
+    return WebConfiguration.isDevelopmentMode();
   }
 
   public boolean isAllowToCreate(final GWikiContext ctx, final GWikiElementInfo ei)
   {
-    return WicketApplication.isDevelopmentModus();
+    return WebConfiguration.isDevelopmentMode();
   }
 
   public boolean isAllowToEdit(final GWikiContext ctx, final GWikiElementInfo ei)
   {
-    return WicketApplication.isDevelopmentModus();
+    return WebConfiguration.isDevelopmentMode();
   }
 
   public boolean isAllowToView(final GWikiContext ctx, final GWikiElementInfo ei)
@@ -177,7 +177,7 @@ public class PFWikiAuthorization implements GWikiAuthorization
     // TODO: test if user is allowed to 'view' the space
     final String space = extractSpace(ei);
 
-    return WicketApplication.isDevelopmentModus();
+    return WebConfiguration.isDevelopmentMode();
   }
 
   public boolean login(final GWikiContext ctx, final String user, final String password)
@@ -192,7 +192,7 @@ public class PFWikiAuthorization implements GWikiAuthorization
 
   public boolean needAuthorization(final GWikiContext ctx)
   {
-    return WicketApplication.isDevelopmentModus();
+    return WebConfiguration.isDevelopmentMode();
   }
 
   public <T> T runAsSu(final GWikiContext wikiContext, final CallableX<T, RuntimeException> callback)
@@ -223,7 +223,7 @@ public class PFWikiAuthorization implements GWikiAuthorization
 
   public boolean runIfAuthentificated(final GWikiContext wikiContext, final CallableX<Void, RuntimeException> callback)
   {
-    return WicketApplication.isDevelopmentModus();
+    return WebConfiguration.isDevelopmentMode();
   }
 
   private final String extractSpace(final GWikiElementInfo ei)
