@@ -59,6 +59,7 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.user.UserXmlPreferencesMigrationDao;
 import org.projectforge.web.MenuBuilder;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.DownloadUtils;
@@ -102,9 +103,9 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   @SpringBean(name = "userXmlPreferencesMigrationDao")
   private UserXmlPreferencesMigrationDao userXmlPreferencesMigrationDao;
 
-  private AdminForm form;
+  private final AdminForm form;
 
-  public AdminPage(PageParameters parameters)
+  public AdminPage(final PageParameters parameters)
   {
     super(parameters);
     form = new AdminForm(this);
@@ -180,19 +181,19 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   {
     log.info("Administration: check i18n properties.");
     checkAccess();
-    StringBuffer buf = new StringBuffer();
-    Properties props = new Properties();
-    Properties props_en = new Properties();
-    Properties props_de = new Properties();
-    Properties propsFound = new Properties();
-    ClassLoader cLoader = this.getClass().getClassLoader();
+    final StringBuffer buf = new StringBuffer();
+    final Properties props = new Properties();
+    final Properties props_en = new Properties();
+    final Properties props_de = new Properties();
+    final Properties propsFound = new Properties();
+    final ClassLoader cLoader = this.getClass().getClassLoader();
     try {
       load(props, "");
       load(props_en, "_en");
       load(props_de, "_de");
       final InputStream is = cLoader.getResourceAsStream(WebConstants.FILE_I18N_KEYS);
       propsFound.load(is);
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       log.error("Could not load i18n properties: " + ex.getMessage(), ex);
       throw new RuntimeException(ex);
     }
@@ -201,28 +202,28 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
     buf.append("Missing in _de:\n");
     buf.append("---------------\n");
     List<String> keys = new ArrayList<String>();
-    for (Object key : props.keySet()) {
+    for (final Object key : props.keySet()) {
       if (props_de.containsKey(key) == false) {
         keys.add(String.valueOf(key));
       }
     }
     Collections.sort(keys);
-    for (String key : keys) {
+    for (final String key : keys) {
       buf.append(key + "=" + props.getProperty(key) + "\n");
     }
     buf.append("\n\nOnly in _de (not in _en):\n");
     buf.append("-------------------------\n");
     keys = new ArrayList<String>();
-    for (Object key : props_de.keySet()) {
+    for (final Object key : props_de.keySet()) {
       if (props.containsKey(key) == false) {
         keys.add(String.valueOf(key));
       }
     }
     Collections.sort(keys);
-    for (String key : keys) {
+    for (final String key : keys) {
       buf.append(key + "=" + props_de.getProperty(key) + "\n");
     }
-    if (WicketApplication.isDevelopmentModus() == true) {
+    if (WebConfiguration.isDevelopmentMode() == true) {
       buf.append("\n\nMaybe not defined but used (found in java, jsp or Wicket's html code):\n");
       buf.append("----------------------------------------------------------------------\n");
       keys = new ArrayList<String>();
@@ -232,7 +233,7 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
         }
       }
       Collections.sort(keys);
-      for (String key : keys) {
+      for (final String key : keys) {
         buf.append(key + "\n");
       }
       buf.append("\n\nExperimental (in progress): Maybe unused (not found in java, jsp or Wicket's html code):\n");
@@ -248,7 +249,7 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
         }
       }
       Collections.sort(keys);
-      for (String key : keys) {
+      for (final String key : keys) {
         String value = props_de.getProperty(key);
         if (value == null) {
           value = props_en.getProperty(key);
@@ -295,12 +296,12 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   }
 
   @Override
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
   }
 
   @Override
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     if ("reindexFromDate".equals(property) == true) {
       // Date selected.
@@ -313,7 +314,7 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   }
 
   @Override
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     if ("reindexFromDate".equals(property) == true) {
       form.reindexFromDate = null;
@@ -411,12 +412,12 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
     for (int i = 1; i <= NUMBER_OF_TEST_OBJECTS_TO_CREATE; i++) {
       list.add(new BookDO().setTitle(get("title", number, i)).setAbstractText(get("abstractText", number, i)).setAuthors(
           get("authors", number, i)).setComment(get("comment", number, i)).setEditor(get("editor", number, i)).setIsbn(
-          get("isbn", number, i)).setKeywords(get("keywords", number, i)).setPublisher(get("publisher", number, i)).setSignature(
-          get("signature", number, i)).setStatus(BookStatus.PRESENT).setTask(task).setYearOfPublishing("2001"));
+              get("isbn", number, i)).setKeywords(get("keywords", number, i)).setPublisher(get("publisher", number, i)).setSignature(
+                  get("signature", number, i)).setStatus(BookStatus.PRESENT).setTask(task).setYearOfPublishing("2001"));
     }
     bookDao.save(list);
     setResponsePage(new MessagePage("system.admin.development.testObjectsCreated", String.valueOf(NUMBER_OF_TEST_OBJECTS_TO_CREATE),
-        "BookDO"));
+    "BookDO"));
   }
 
   private String get(final String basename, final int number, final int counter)
