@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.Localizer;
 import org.apache.wicket.model.IModel;
+import org.projectforge.web.WebConfiguration;
 
 import de.micromata.genome.gwiki.model.GWikiWeb;
 import de.micromata.genome.gwiki.page.impl.GWikiI18nElement;
@@ -44,23 +45,23 @@ public class MyLocalizer extends Localizer
 {
   protected String[] modules;
 
-  public MyLocalizer(String... modules)
+  public MyLocalizer(final String... modules)
   {
     this.modules = modules;
   }
 
-  protected String getI18NFromGWiki(String key, Component component, IModel< ? > model)
+  protected String getI18NFromGWiki(final String key, final Component component, final IModel< ? > model)
   {
-    GWikiWeb wikiWeb = GWikiWeb.getWiki();
-    Locale loc = component.getLocale();
+    final GWikiWeb wikiWeb = GWikiWeb.getWiki();
+    final Locale loc = component.getLocale();
     String lang = loc.getLanguage();
     if (StringUtils.isEmpty(lang) == true) {
       lang = "en";
     }
 
-    for (String mod : modules) {
-      GWikiI18nElement el = (GWikiI18nElement) wikiWeb.getElement(mod);
-      String v = el.getMessage(lang, key);
+    for (final String mod : modules) {
+      final GWikiI18nElement el = (GWikiI18nElement) wikiWeb.getElement(mod);
+      final String v = el.getMessage(lang, key);
       if (v != null) {
         return v;
       }
@@ -69,11 +70,13 @@ public class MyLocalizer extends Localizer
   }
 
   @Override
-  public String getString(String key, Component component, IModel< ? > model, String defaultValue) throws MissingResourceException
+  public String getString(final String key, final Component component, final IModel< ? > model, final String defaultValue) throws MissingResourceException
   {
-    final String ret = getI18NFromGWiki(key, component, model);
-    if (ret != null) {
-      return ret;
+    if (WebConfiguration.isGWikiAvailable() == true) {
+      final String ret = getI18NFromGWiki(key, component, model);
+      if (ret != null) {
+        return ret;
+      }
     }
     return super.getString(key, component, model, defaultValue);
   }
