@@ -235,18 +235,18 @@ public class PFWikiAuthorization implements GWikiAuthorization
     return ei.getId();
   }
 
-  @Override
-  public <T> T runWithRight(final GWikiContext wikiContext, final String addRight, final CallableX<T, RuntimeException> callback)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public <T> T runWithRights(final GWikiContext wikiContext, final String[] addRights, final CallableX<T, RuntimeException> callback)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
+  //  @Override
+  //  public <T> T runWithRight(final GWikiContext wikiContext, final String addRight, final CallableX<T, RuntimeException> callback)
+  //  {
+  //    // TODO Auto-generated method stub
+  //    return null;
+  //  }
+  //
+  //  @Override
+  //  public <T> T runWithRights(final GWikiContext wikiContext, final String[] addRights, final CallableX<T, RuntimeException> callback)
+  //  {
+  //    // TODO Auto-generated method stub
+  //    return null;
+  //  }
 
 }
