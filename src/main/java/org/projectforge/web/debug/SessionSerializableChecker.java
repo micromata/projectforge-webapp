@@ -36,13 +36,14 @@ import javax.servlet.http.HttpSessionAttributeListener;
 import javax.servlet.http.HttpSessionBindingEvent;
 
 import org.apache.commons.lang.ClassUtils;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.WicketApplication;
 
 
 /**
  * In production environment this checker does nothing.
  * @author wolle
- * @see WicketApplication#isDevelopmentModus()
+ * @see WicketApplication#isDevelopmentMode()
  * 
  */
 public class SessionSerializableChecker implements HttpSessionAttributeListener
@@ -53,9 +54,9 @@ public class SessionSerializableChecker implements HttpSessionAttributeListener
   /**
    * @see javax.servlet.http.HttpSessionAttributeListener#attributeAdded(javax.servlet.http.HttpSessionBindingEvent)
    */
-  public void attributeAdded(HttpSessionBindingEvent evt)
+  public void attributeAdded(final HttpSessionBindingEvent evt)
   {
-    if (WicketApplication.isDevelopmentModus() == true) {
+    if (WebConfiguration.isDevelopmentMode() == true) {
       check(evt.getSession(), evt.getName(), evt.getValue());
     }
   }
@@ -63,40 +64,40 @@ public class SessionSerializableChecker implements HttpSessionAttributeListener
   /**
    * @see javax.servlet.http.HttpSessionAttributeListener#attributeRemoved(javax.servlet.http.HttpSessionBindingEvent)
    */
-  public void attributeRemoved(HttpSessionBindingEvent evt)
+  public void attributeRemoved(final HttpSessionBindingEvent evt)
   {
   }
 
   /**
    * @see javax.servlet.http.HttpSessionAttributeListener#attributeReplaced(javax.servlet.http.HttpSessionBindingEvent)
    */
-  public void attributeReplaced(HttpSessionBindingEvent evt)
+  public void attributeReplaced(final HttpSessionBindingEvent evt)
   {
-    if (WicketApplication.isDevelopmentModus() == true) {
+    if (WebConfiguration.isDevelopmentMode() == true) {
       check(evt.getSession(), evt.getName(), evt.getValue());
     }
   }
 
-  private void check(HttpSession session, String name, Object value)
+  private void check(final HttpSession session, final String name, final Object value)
   {
     if (log.isInfoEnabled()) {
       try {
         if (log.isDebugEnabled()) {
           log
-              .debug("Storing "
-                  + ClassUtils.getShortClassName(value, "null")
-                  + " under the name "
-                  + name
-                  + " in session "
-                  + session.getId());
+          .debug("Storing "
+              + ClassUtils.getShortClassName(value, "null")
+              + " under the name "
+              + name
+              + " in session "
+              + session.getId());
         }
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ObjectOutputStream oos = new ObjectOutputStream(baos);
         oos.writeObject(value);
         oos.close();
-        ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
+        final ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(baos.toByteArray()));
         ois.readObject();
-      } catch (Exception ex) {
+      } catch (final Exception ex) {
         log.warn("Trying to store non-serializable value " + value + " under the name " + name + " in session " + session.getId(), ex);
       }
     }
