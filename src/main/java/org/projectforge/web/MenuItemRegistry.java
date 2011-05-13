@@ -101,7 +101,6 @@ import org.projectforge.web.user.GroupListPage;
 import org.projectforge.web.user.MyAccountEditPage;
 import org.projectforge.web.user.UserListPage;
 import org.projectforge.web.user.UserPrefListPage;
-import org.projectforge.web.wicket.WicketApplication;
 
 /**
  * The menu is build from the menu items which are registered in this registry. The order of the menu entries is defined by the order number
@@ -113,9 +112,9 @@ public class MenuItemRegistry
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MenuItemRegistry.class);
 
-  private List<MenuItemDef> menuItemList = new ArrayList<MenuItemDef>();
+  private final List<MenuItemDef> menuItemList = new ArrayList<MenuItemDef>();
 
-  private ConfigXml xmlConfiguration = ConfigXml.getInstance();
+  private final ConfigXml xmlConfiguration = ConfigXml.getInstance();
 
   private static final MenuItemRegistry instance = new MenuItemRegistry();
 
@@ -229,7 +228,7 @@ public class MenuItemRegistry
       final Class< ? extends Page> pageClass, final String[] params, final boolean visible, final ProjectForgeGroup... visibleForGroups)
   {
     return register(new MenuItemDef(parent, defId.getId(), orderNumber, defId.getI18nKey(), pageClass, params, visibleForGroups)
-        .setVisible(visible));
+    .setVisible(visible));
   }
 
   private MenuItemRegistry()
@@ -241,7 +240,7 @@ public class MenuItemRegistry
   @SuppressWarnings("serial")
   private static void initialize(final MenuItemRegistry reg)
   {
-    final boolean developmentModus = WicketApplication.isDevelopmentModus();
+    final boolean developmentMode = WebConfiguration.isDevelopmentMode();
 
     // Super menus
     final MenuItemDef common = reg.register(null, MenuItemDefId.COMMON, 10);
@@ -287,7 +286,7 @@ public class MenuItemRegistry
     reg.register(fibu, MenuItemDefId.INCOMING_INVOICE_LIST, 20, EingangsrechnungListPage.class, EingangsrechnungDao.USER_RIGHT_ID,
         READONLY_READWRITE);
     // Not yet finished:
-    reg.register(fibu, MenuItemDefId.BANK_ACCOUNT_LIST, 30, BankAccountListPage.class, developmentModus, FINANCE_GROUP, CONTROLLING_GROUP);
+    reg.register(fibu, MenuItemDefId.BANK_ACCOUNT_LIST, 30, BankAccountListPage.class, developmentMode, FINANCE_GROUP, CONTROLLING_GROUP);
     {
       // Only visible if cost is configured:
       reg.register(fibu, MenuItemDefId.CUSTOMER_LIST, 40, CustomerListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
@@ -373,9 +372,9 @@ public class MenuItemRegistry
     // MISC
     // invisible at default (because it's only functioning with valid ssl certificate).
     reg.register(misc, MenuItemDefId.IMAGE_CROPPER, 100, ImageCropperPage.class, new String[] { ImageCropperPage.PARAM_SHOW_UPLOAD_BUTTON,
-        "false", ImageCropperPage.PARAM_ENABLE_WHITEBOARD_FILTER, "true"}, false);
+      "false", ImageCropperPage.PARAM_ENABLE_WHITEBOARD_FILTER, "true"}, false);
     // Not yet finished:
-    reg.register(misc, MenuItemDefId.GWIKI, 110, GWikiPage.class, developmentModus);
+    reg.register(misc, MenuItemDefId.GWIKI, 110, GWikiPage.class, developmentMode);
     reg.register(misc, MenuItemDefId.DOCUMENTATION, 200, DocumentationPage.class);
     reg.refresh();
   }
