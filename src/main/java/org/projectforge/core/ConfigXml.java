@@ -167,7 +167,7 @@ public class ConfigXml
   private transient SSLSocketFactory usersSSLSocketFactory;
 
   @XmlField(alias = "sendMail")
-  private final SendMailConfig sendMailConfiguration = new SendMailConfig();
+  private SendMailConfig sendMailConfiguration;
 
   public static ConfigXml getInstance()
   {
@@ -210,6 +210,7 @@ public class ConfigXml
     cronExpressionNightlyJob = null;
     cronExpressionMebPollingJob = null;
     menuConfig = null;
+    sendMailConfiguration = new SendMailConfig();
   }
 
   protected ConfigXml()
@@ -374,7 +375,8 @@ public class ConfigXml
   /**
    * Copies only not null values of the configuration.
    */
-  private static void copyDeclaredFields(final String prefix, final Class< ? > srcClazz, final Object src, final Object dest, final String... ignoreFields)
+  private static void copyDeclaredFields(final String prefix, final Class< ? > srcClazz, final Object src, final Object dest,
+      final String... ignoreFields)
   {
     final Field[] fields = srcClazz.getDeclaredFields();
     AccessibleObject.setAccessible(fields, true);
