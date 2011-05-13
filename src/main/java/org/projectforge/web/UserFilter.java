@@ -50,7 +50,6 @@ import org.projectforge.user.UserDao;
 import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.meb.SMSReceiverServlet;
 import org.projectforge.web.registry.WebRegistry;
-import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -115,7 +114,7 @@ public class UserFilter implements Filter
 
   public static String getTargetUrlAfterLogin(final HttpServletRequest request)
   {
-    return (String) request.getParameter(SESSION_KEY_TARGET_URL);
+    return request.getParameter(SESSION_KEY_TARGET_URL);
   }
 
   public static Cookie getStayLoggedInCookie(final HttpServletRequest request)
@@ -301,8 +300,8 @@ public class UserFilter implements Filter
       // if you use ProjectForge on localhost with http and https (e. g. for testing). You have to delete this cookie normally in your
       // browser.
       final String msg = "Unsecure JSESSIONID cookie found for a secure request. The user should remove this cookie manually, "
-          + "if this message is displayed at the next user's request again and stay-logged-in doesn't work properly for this user.";
-      if (WicketApplication.isDevelopmentModus() == true) {
+        + "if this message is displayed at the next user's request again and stay-logged-in doesn't work properly for this user.";
+      if (WebConfiguration.isDevelopmentMode() == true) {
         log.info("*** " + msg);
       } else {
         log.info(msg);
