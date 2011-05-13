@@ -67,6 +67,7 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.UserFilter;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.registry.WebRegistry;
 import org.projectforge.web.wicket.converter.MyDateConverter;
@@ -87,7 +88,7 @@ public class WicketApplication extends WebApplication
 
   public static final String RESOURCE_BUNDLE_NAME = "I18nResources";
 
-  private static Boolean developmentModus;
+  private static Boolean developmentMode;
 
   private static Boolean stripWicketTags;
 
@@ -123,12 +124,12 @@ public class WicketApplication extends WebApplication
   private SystemInfoCache systemInfoCache;
 
   /**
-   * At application start the flag developmentModus is perhaps not already set. If possible please use isDevelopmentSystem() instead.
-   * @return
+   * At application start the flag developmentMode is perhaps not already set. If possible please use {@link #isDevelopmentSystem()} instead.<br/>
+   * Please use {@link WebConfiguration#isDevelopmentMode()}.
    */
-  public static Boolean isDevelopmentModus()
+  public static Boolean internalIsDevelopmentMode()
   {
-    return developmentModus;
+    return developmentMode;
   }
 
   public static String getBookmarkableMountPath(final Class< ? extends Page> pageClass)
@@ -324,11 +325,11 @@ public class WicketApplication extends WebApplication
 
   public boolean isDevelopmentSystem()
   {
-    if (developmentModus == null) {
+    if (developmentMode == null) {
       final String value = getServletContext().getInitParameter("development");
-      developmentModus = "true".equals(value);
+      developmentMode = "true".equals(value);
     }
-    return developmentModus;
+    return developmentMode;
   }
 
   public boolean isStripWicketTags()
