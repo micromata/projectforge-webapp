@@ -34,6 +34,7 @@ import org.projectforge.AppVersion;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketUtils;
@@ -61,9 +62,9 @@ public class AdminFormRenderer extends AbstractFormRenderer
 
   final static LayoutLength VALUE_LENGTH = LayoutLength.ONEHALF;
 
-  private AdminPage adminPage;
+  private final AdminPage adminPage;
 
-  private AdminForm adminForm;
+  private final AdminForm adminForm;
 
   public AdminFormRenderer(final AdminForm container, final LayoutContext layoutContext, final AdminPage adminPage)
   {
@@ -172,7 +173,7 @@ public class AdminFormRenderer extends AbstractFormRenderer
 
     doPanel.addLabel(getString("system.admin.group.title.databaseActions.export"), new PanelContext(LABEL_LENGTH));
     repeatingView = doPanel.addRepeater(new PanelContext(VALUE_LENGTH)).getRepeatingView();
-    MyButtonPanel buttonPanel = new MyButtonPanel(repeatingView.newChildId(), "dump") {
+    final MyButtonPanel buttonPanel = new MyButtonPanel(repeatingView.newChildId(), "dump") {
       @Override
       public void onSubmit()
       {
@@ -191,7 +192,7 @@ public class AdminFormRenderer extends AbstractFormRenderer
 
     doPanel.newGroupPanel(getString("system.admin.group.title.databaseSearchIndices"));
     doPanel.addTextField(new MinMaxNumberField<Integer>(TextFieldLPanel.INPUT_ID, new PropertyModel<Integer>(adminForm,
-        "reindexNewestNEntries"), 0, Integer.MAX_VALUE), new PanelContext(LayoutLength.QUART,
+    "reindexNewestNEntries"), 0, Integer.MAX_VALUE), new PanelContext(LayoutLength.QUART,
         getString("system.admin.reindex.newestEntries"), LABEL_LENGTH).setTooltip(getString("system.admin.reindex.newestEntries.tooltip")));
     doPanel.addLabel(getString("system.admin.reindex.fromDate"), new PanelContext(LABEL_LENGTH));
     repeatingView = doPanel.addRepeater(new PanelContext(VALUE_LENGTH)).getRepeatingView();
@@ -203,7 +204,7 @@ public class AdminFormRenderer extends AbstractFormRenderer
       public String getObject()
       {
         return getString("system.admin.reindex.fromDate.tooltip")
-            + (adminForm.reindexFromDate != null ? " (" + DateHelper.formatAsUTC(adminForm.reindexFromDate) + ")" : "");
+        + (adminForm.reindexFromDate != null ? " (" + DateHelper.formatAsUTC(adminForm.reindexFromDate) + ")" : "");
       }
     });
     repeatingView.add(new MyButtonPanel(repeatingView.newChildId(), "reindex") {
@@ -218,7 +219,7 @@ public class AdminFormRenderer extends AbstractFormRenderer
     adminForm.alertMessage = WicketApplication.getAlertMessage();
     doPanel.addTextArea(new MaxLengthTextArea(TextAreaLPanel.TEXT_AREA_ID, getString("system.admin.group.title.alertMessage"),
         new PropertyModel<String>(adminForm, "alertMessage"), 1000), new PanelContext(LayoutLength.DOUBLE).setBreakBefore().setTooltip(
-        getString("system.admin.group.title.alertMessage")));
+            getString("system.admin.group.title.alertMessage")));
     // doPanel.addLabel("", new PanelContext(LABEL_LENGTH));
     repeatingView = doPanel.addRepeater(new PanelContext(VALUE_LENGTH).setBreakBefore()).getRepeatingView();
     repeatingView.add(new MyButtonPanel(repeatingView.newChildId(), "setAlertMessage") {
@@ -232,7 +233,7 @@ public class AdminFormRenderer extends AbstractFormRenderer
     doPanel.addLabel(PFUserContext.getLocalizedMessage("system.admin.alertMessage.copyAndPaste.text", AppVersion.NUMBER), new PanelContext(
         LayoutLength.DOUBLE));
 
-    if (WicketApplication.isDevelopmentModus() == true) {
+    if (WebConfiguration.isDevelopmentMode() == true) {
       doPanel.newFieldSetPanel("Development modus");
 
       doPanel.addLabel("Create test objects", new PanelContext(LABEL_LENGTH));
@@ -255,9 +256,9 @@ public class AdminFormRenderer extends AbstractFormRenderer
   {
     private static final long serialVersionUID = -7100891342667728950L;
 
-    private Button button;
+    private final Button button;
 
-    private SingleButtonPanel buttonPanel;
+    private final SingleButtonPanel buttonPanel;
 
     @SuppressWarnings("serial")
     private MyButtonPanel(final String id, final String i18nKey)
