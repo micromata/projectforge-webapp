@@ -89,7 +89,7 @@ public class ConfigXml
 
   private static transient ConfigXml instance;
 
-  private transient List<ConfigurationListener> listeners = new ArrayList<ConfigurationListener>();
+  private transient final List<ConfigurationListener> listeners = new ArrayList<ConfigurationListener>();
 
   @XmlOmitField
   private String applicationHomeDir;
@@ -155,6 +155,8 @@ public class ConfigXml
 
   private MenuEntryConfig menuConfig;
 
+  private boolean portletMode;
+
   /**
    * Separated list of main classes (separated by white chars and or ',').
    */
@@ -165,7 +167,7 @@ public class ConfigXml
   private transient SSLSocketFactory usersSSLSocketFactory;
 
   @XmlField(alias = "sendMail")
-  private SendMailConfig sendMailConfiguration = new SendMailConfig();
+  private final SendMailConfig sendMailConfiguration = new SendMailConfig();
 
   public static ConfigXml getInstance()
   {
@@ -265,7 +267,7 @@ public class ConfigXml
       String xml = null;
       try {
         xml = FileUtils.readFileToString(configFile, "UTF-8");
-      } catch (IOException ex) {
+      } catch (final IOException ex) {
         msg = "Cannot read config file '" + getConfigFilePath() + "' properly: " + ex;
         log.fatal(msg, ex);
       }
@@ -295,7 +297,7 @@ public class ConfigXml
   {
     final XmlObjectWriter writer = new XmlObjectWriter() {
       @Override
-      protected boolean ignoreField(Object obj, Field field)
+      protected boolean ignoreField(final Object obj, final Field field)
       {
         if (field.getDeclaringClass().isAssignableFrom(ConfigXml.class) == true
             && StringHelper.isIn(field.getName(), "expireTime", "timeOfLastRefresh") == true) {
@@ -326,9 +328,9 @@ public class ConfigXml
       final InputStream is = classLoader.getResourceAsStream(filename);
       projectforgesSSLSocketFactory = createSSLSocketFactory(is, "changeit");
       log.info("Keystore successfully read from class path: " + filename);
-    } catch (Throwable ex) {
+    } catch (final Throwable ex) {
       log
-          .error("Could not initialize key store. Therefore the update pages of www.projectforge.org are not available (see error message below)!");
+      .error("Could not initialize key store. Therefore the update pages of www.projectforge.org are not available (see error message below)!");
       log.error(ex.getMessage(), ex);
     }
     if (getKeystoreFile() != null) {
@@ -337,7 +339,7 @@ public class ConfigXml
         final InputStream is = new FileInputStream(keystoreFile);
         usersSSLSocketFactory = createSSLSocketFactory(is, this.keystorePassphrase);
         log.info("Keystore successfully read from file: " + keystoreFile.getAbsolutePath());
-      } catch (Throwable ex) {
+      } catch (final Throwable ex) {
         log.error("Could not initialize your key store (see error message below)!");
         log.error(ex.getMessage(), ex);
       }
@@ -372,11 +374,11 @@ public class ConfigXml
   /**
    * Copies only not null values of the configuration.
    */
-  private static void copyDeclaredFields(String prefix, Class< ? > srcClazz, Object src, Object dest, String... ignoreFields)
+  private static void copyDeclaredFields(final String prefix, final Class< ? > srcClazz, final Object src, final Object dest, final String... ignoreFields)
   {
     final Field[] fields = srcClazz.getDeclaredFields();
     AccessibleObject.setAccessible(fields, true);
-    for (Field field : fields) {
+    for (final Field field : fields) {
       if (ignoreFields != null && ArrayUtils.contains(ignoreFields, field.getName()) == false && accept(field)) {
         try {
           final Object srcFieldValue = field.get(src);
@@ -407,7 +409,7 @@ public class ConfigXml
             field.set(dest, srcFieldValue);
             log.info(StringUtils.defaultString(prefix) + field.getName() + " = " + srcFieldValue);
           }
-        } catch (IllegalAccessException ex) {
+        } catch (final IllegalAccessException ex) {
           throw new InternalError("Unexpected IllegalAccessException: " + ex.getMessage());
         }
       }
@@ -424,7 +426,7 @@ public class ConfigXml
    * @param filename Filename (can include relative path settings): "test.xsl", "/fo-styles/doit.xsl".
    * @return Object[2]: First value is the InputStream and second value is the url in external form.
    */
-  public Object[] getInputStream(String filename)
+  public Object[] getInputStream(final String filename)
   {
     InputStream is = null;
     String path = null;
@@ -468,38 +470,38 @@ public class ConfigXml
    * @return Object[2]: First value is the content as string and second value is the url in external form.
    * @see #getInputStream(String)
    */
-  public Object[] getContent(String filename)
+  public Object[] getContent(final String filename)
   {
     final Object[] result = getInputStream(filename);
     final InputStream is = (InputStream) result[0];
     if (is != null) {
       try {
         result[0] = IOUtils.toString(is, "UTF-8");
-      } catch (IOException ex) {
+      } catch (final IOException ex) {
         log.error(ex.getMessage(), ex);
       }
     }
     return result;
   }
 
-  private static void showNonExistingMessage(File file, boolean directory)
+  private static void showNonExistingMessage(final File file, final boolean directory)
   {
     // Synchronized not needed, for concurrent calls, output entries exist twice in the worst case.
     if (nonExistingResources.contains(file.getAbsolutePath()) == false) {
       nonExistingResources.add(file.getAbsolutePath());
       existingResources.remove(file.getAbsolutePath()); // If changed by administrator during application running.
-      String type = directory == true ? "directory" : "file";
+      final String type = directory == true ? "directory" : "file";
       log.info("Using default " + type + " of ProjectForge, because " + type + "'" + file.getAbsolutePath() + "' does not exist (OK)");
     }
   }
 
-  private static void showExistingMessage(File file, boolean directory)
+  private static void showExistingMessage(final File file, final boolean directory)
   {
     // Synchronized not needed, for concurrent calls, output entries exist twice in the worst case.
     if (existingResources.contains(file.getAbsolutePath()) == false) {
       existingResources.add(file.getAbsolutePath());
       nonExistingResources.remove(file.getAbsolutePath()); // If changed by administrator during application running.
-      String type = directory == true ? "directory" : "file";
+      final String type = directory == true ? "directory" : "file";
       log.info("Using existing " + type + ":" + file.getAbsolutePath());
     }
   }
@@ -515,7 +517,7 @@ public class ConfigXml
    * @param field The Field to test.
    * @return Whether or not to consider the given <code>Field</code>.
    */
-  protected static boolean accept(Field field)
+  protected static boolean accept(final Field field)
   {
     if (field.getName().indexOf(ClassUtils.INNER_CLASS_SEPARATOR_CHAR) != -1) {
       // Reject field from inner class.
@@ -548,7 +550,7 @@ public class ConfigXml
    * FOR INTERNAL USE ONLY (tests). Please configure this value via config.xml.
    * @param jiraBrowseBaseUrl
    */
-  public void setJiraBrowseBaseUrl(String jiraBrowseBaseUrl)
+  public void setJiraBrowseBaseUrl(final String jiraBrowseBaseUrl)
   {
     this.jiraBrowseBaseUrl = jiraBrowseBaseUrl;
   }
@@ -699,7 +701,7 @@ public class ConfigXml
   public String getResourcePath()
   {
     if (this.applicationsResourcePath == null) {
-      File file = new File(applicationHomeDir, resourceDir);
+      final File file = new File(applicationHomeDir, resourceDir);
       this.applicationsResourcePath = file.getAbsolutePath();
     }
     return applicationsResourcePath;
@@ -719,7 +721,7 @@ public class ConfigXml
    * Sets the working dir as relative sub directory of the application's home dir or the absolute path if given.
    * @param workingDirectory
    */
-  public void setWorkingDirectory(String workingDirectory)
+  public void setWorkingDirectory(final String workingDirectory)
   {
     this.workingDirectory = workingDirectory;
   }
@@ -739,7 +741,7 @@ public class ConfigXml
    * ProjectForge to save temporary files such as images from the ImageCropper.
    * @param tempDirectory
    */
-  public void setTempDirectory(String tempDirectory)
+  public void setTempDirectory(final String tempDirectory)
   {
     this.tempDirectory = tempDirectory;
   }
@@ -771,7 +773,7 @@ public class ConfigXml
     return servletContextPath;
   }
 
-  public void setServletContextPath(String servletContextPath)
+  public void setServletContextPath(final String servletContextPath)
   {
     this.servletContextPath = servletContextPath;
   }
@@ -787,7 +789,7 @@ public class ConfigXml
     return domain;
   }
 
-  public void setDomain(String domain)
+  public void setDomain(final String domain)
   {
     this.domain = domain;
   }
@@ -887,5 +889,13 @@ public class ConfigXml
   public MenuEntryConfig getMenuConfig()
   {
     return menuConfig;
+  }
+
+  /**
+   * Experimental and undocumented setting.
+   */
+  public boolean isPortletMode()
+  {
+    return portletMode;
   }
 }
