@@ -3,16 +3,24 @@
 
 <Configure id="ProjectForge" class="org.eclipse.jetty.webapp.WebAppContext">
   <New id="ProjectForgeDS" class="org.eclipse.jetty.plus.jndi.Resource">
-    <Arg><Ref id="ProjectForge"/></Arg>
+    <Arg>
+      <Ref id="ProjectForge" />
+    </Arg>
     <Arg>jdbc/ProjectForgeDS</Arg>
     <Arg>
       <New class="org.apache.commons.dbcp.BasicDataSource">
-        <Set name="driverClassName">org.hsqldb.jdbcDriver</Set>
-        <Set name="url">
-          jdbc:hsqldb:<SystemProperty name="jetty.home" />/database/ProjectForgeDB
+        <Set name="driverClassName">
+          <SystemProperty name="jettyEnv.driverClassName" />
         </Set>
-        <Set name="username">sa</Set>
-        <Set name="password"></Set>
+        <Set name="url">
+          <SystemProperty name="jettyEnv.jdbcUrl" />
+        </Set>
+        <Set name="username">
+          <SystemProperty name="jettyEnv.jdbcUser" />
+        </Set>
+        <Set name="password">
+          <SystemProperty name="jettyEnv.jdbcPassword" />
+        </Set>
         <Set name="maxActive">100</Set>
       </New>
     </Arg>
