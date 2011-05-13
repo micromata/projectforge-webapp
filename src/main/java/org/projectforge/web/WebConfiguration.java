@@ -32,14 +32,14 @@ public class WebConfiguration
    * At application start the flag developmentModus is perhaps not already set.
    * @return true if the system is configured as development system e. g. in the context.xml, otherwise false.
    */
-  public static boolean isDevelopmentModus()
+  public static boolean isDevelopmentMode()
   {
     return WicketApplication.internalIsDevelopmentModus();
   }
 
   public static boolean isGWikiAvailable()
   {
-    return isDevelopmentModus();
+    return isDevelopmentMode();
   }
 
   /**
