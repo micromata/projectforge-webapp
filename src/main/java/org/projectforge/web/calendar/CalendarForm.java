@@ -202,11 +202,12 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       + user.getUsername()
       + "&key="
       + user.getStayLoggedInKey();
-
       final ExternalLink exportCalendar = new ExternalLink("exportCalendar", iCalTarget);
       exportCalendar.add(new TooltipImage("exportCalendarImage", getResponse(), WebConstants.IMAGE_CALENDAR,
           getString("tooltip.exportCalendar")));
       add(exportCalendar);
+    } else {
+      add(new ExternalLink("exportCalendar", "invisible").setVisible(false));
     }
 
     showTimesheetFilterElements();
