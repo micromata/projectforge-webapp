@@ -34,6 +34,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.RepeatingView;
@@ -99,7 +100,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
     return phoneNumber;
   }
 
-  public void setPhoneNumber(String phoneNumber)
+  public void setPhoneNumber(final String phoneNumber)
   {
     this.phoneNumber = phoneNumber;
   }
@@ -112,7 +113,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
     return myCurrentPhoneId;
   }
 
-  public void setMyCurrentPhoneId(String myCurrentPhoneId)
+  public void setMyCurrentPhoneId(final String myCurrentPhoneId)
   {
     this.myCurrentPhoneId = myCurrentPhoneId;
     if (this.myCurrentPhoneId != null) {
@@ -125,7 +126,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
     return address;
   }
 
-  public void setAddress(AddressDO address)
+  public void setAddress(final AddressDO address)
   {
     this.address = address;
   }
@@ -157,7 +158,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
       }
     }) {
       @Override
-      protected List<AddressDO> getChoices(String input)
+      protected List<AddressDO> getChoices(final String input)
       {
         final AddressFilter addressFilter = new AddressFilter();
         addressFilter.setSearchString(input);
@@ -184,7 +185,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
       }
 
       @Override
-      public IConverter getConverter(Class< ? > type)
+      public IConverter getConverter(final Class< ? > type)
       {
         return new IConverter() {
           @Override
@@ -212,7 +213,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
     if (ids == null) {
       myCurrentPhoneIdChoiceRenderer.addValue("--", getString("user.personalPhoneIdentifiers.pleaseDefine"));
     } else {
-      for (String id : ids) {
+      for (final String id : ids) {
         myCurrentPhoneIdChoiceRenderer.addValue(id, id);
       }
     }
@@ -314,9 +315,9 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
     final WebMarkupContainer item = new WebMarkupContainer(phoneNumbersRepeatingView.newChildId());
     phoneNumbersRepeatingView.add(item);
     item.add(new Label("label", label));
-    final Link<String> link = new Link<String>("callNumberLink") {
+    final SubmitLink link = new SubmitLink("callNumberLink") {
       @Override
-      public void onClick()
+      public void onSubmit()
       {
         setPhoneNumber(parentPage.extractPhonenumber(phoneNumber));
         numberTextField.setModelObject(new AddressDO().setName(getPhoneNumber()));
@@ -343,7 +344,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
     }
     if (recentSearchTermsQueue == null) {
       recentSearchTermsQueue = (RecentQueue<String>) parentPage
-          .getUserPrefEntry("org.projectforge.web.address.PhoneCallAction:recentSearchTerms");
+      .getUserPrefEntry("org.projectforge.web.address.PhoneCallAction:recentSearchTerms");
       if (recentSearchTermsQueue != null) {
         // Old entries:
         parentPage.putUserPrefEntry(USER_PREF_KEY_RECENTS, recentSearchTermsQueue, true);
