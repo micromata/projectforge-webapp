@@ -39,6 +39,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.MDC;
@@ -62,7 +63,9 @@ public class UserFilter implements Filter
   /**
    * Set after stay-logged-in functionality (used by MenuMobilePage).
    */
-  public static String USER_ATTR_STAY_LOGGED_IN = "stayLoggedIn";
+  public static final String USER_ATTR_STAY_LOGGED_IN = "stayLoggedIn";
+
+  private static final String SESSION_ATTR_LOGIN_PAGE = "loginPage";
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserFilter.class);
 
@@ -105,6 +108,11 @@ public class UserFilter implements Filter
   public static void setUpdateRequiredFirst(final boolean value)
   {
     updateRequiredFirst = value;
+  }
+
+  public static void setLoginPage(final HttpSession session)
+  {
+    session.setAttribute(SESSION_ATTR_LOGIN_PAGE, "true");
   }
 
   public static boolean isUpdateRequiredFirst()
@@ -151,7 +159,9 @@ public class UserFilter implements Filter
 
   public static void login(final HttpServletRequest request, final PFUserDO user)
   {
-    request.getSession().setAttribute(SESSION_KEY_USER, user);
+    final HttpSession session = request.getSession();
+    session.setAttribute(SESSION_KEY_USER, user);
+    session.removeAttribute(SESSION_ATTR_LOGIN_PAGE);
   }
 
   public static PFUserDO getUser(final HttpServletRequest request)
@@ -251,10 +261,10 @@ public class UserFilter implements Filter
   {
     final String requestUri = request.getRequestURI();
     final String queryString = request.getQueryString();
+    final boolean loginPage = "true".equals(request.getSession().getAttribute(SESSION_ATTR_LOGIN_PAGE)) == true;
     if (requestUri.contains(LOGIN_URL) == true
         || requestUri.contains(MOBILE_LOGIN_URL) == true
-        || (requestUri.endsWith("/wa/") == true && queryString != null && (queryString.startsWith("wicket:interface=") == true
-            && queryString.contains("form::IFormSubmitListener") == true && queryString.endsWith("&loginpage=true") == true))) {
+        || (requestUri.endsWith("/wa/") == true && loginPage == true)) {
       // For unactivated cookies: the login form posts (action link) to /wa;sessionid=.... with queryString
       // ...body:form::IFormSubmitListener...
       // This is no security problem because the MyAuthorizationStrategy throws an exception if the user tries to call a secure page without
@@ -382,7 +392,8 @@ public class UserFilter implements Filter
       if (uri.startsWith(IGNORE_PREFIX_WICKET) && StringHelper.endsWith(uri, ".js", ".css", ".gif", ".png") == true) {
         // No access checking for Wicket resources.
         return true;
-      } else if (StringHelper.startsWith(uri, IGNORE_PREFIX_DOC, IGNORE_PREFIX_SITE_DOC) == true && StringHelper.endsWith(uri, ".html", ".pdf", ".js", ".css", ".gif", ".png") == true) {
+      } else if (StringHelper.startsWith(uri, IGNORE_PREFIX_DOC, IGNORE_PREFIX_SITE_DOC) == true
+          && StringHelper.endsWith(uri, ".html", ".pdf", ".js", ".css", ".gif", ".png") == true) {
         // No access checking for documentation (including site doc).
         return true;
       } else if (StringHelper.startsWith(uri, IGNORE_PREFIX_LOGO, IGNORE_PREFIX_SMS_REVEIVE_SERVLET) == true) {

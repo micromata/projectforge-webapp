@@ -71,7 +71,7 @@ public class LoginPage extends AbstractBasePage
   @SpringBean(name = "dataSource")
   private DataSource dataSource;
 
-  private LoginForm form;
+  private LoginForm form = null;
 
   String targetUrlAfterLogin;
 
@@ -126,6 +126,7 @@ public class LoginPage extends AbstractBasePage
     body.add(new SimpleAttributeModifier("class", "loginpage"));
     body.add(form);
     form.init();
+    UserFilter.setLoginPage(((WebRequest)getRequest()).getHttpServletRequest().getSession());
   }
 
   public static void internalLogin(final WebPage page, final PFUserDO user)
@@ -155,17 +156,30 @@ public class LoginPage extends AbstractBasePage
     return true;
   }
 
-  public static void internalCheckLogin(final WebPage page, final UserDao userDao, final DataSource dataSource, final String username,
+  /**
+   * @param page
+   * @param userDao
+   * @param dataSource
+   * @param username
+   * @param password
+   * @param userWantsToStayLoggedIn
+   * @param defaultPage
+   * @param targetUrlAfterLogin
+   * @return i18n key of the validation error message if not successfully logged in, otherwise null.
+   */
+  public static String internalCheckLogin(final WebPage page, final UserDao userDao, final DataSource dataSource, final String username,
       final String password, final boolean userWantsToStayLoggedIn, final Class< ? extends WebPage> defaultPage,
       final String targetUrlAfterLogin)
   {
     final String encryptedPassword = userDao.encryptPassword(password);
     PFUserDO user = null;
     if (UserFilter.isUpdateRequiredFirst() == true) {
+      // Only administrator login is allowed. The login is checked without Hibernate because the data-base schema may be out-dated for
+      // Hibernate isn't functioning.
       final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
       try {
         final PFUserDO resUser = new PFUserDO();
-        String sql = "select pk, firstname, lastname from t_pf_user where username=? and password=? and deleted=false";
+        final String sql = "select pk, firstname, lastname from t_pf_user where username=? and password=? and deleted=false";
         jdbc.query(sql, new Object[] { username, encryptedPassword}, new ResultSetExtractor() {
           @Override
           public Object extractData(final ResultSet rs) throws SQLException, DataAccessException
@@ -182,16 +196,16 @@ public class LoginPage extends AbstractBasePage
         });
         if (resUser.getUsername() == null) {
           log.info("Admin login for maintenance (data-base update) failed for user '" + username + "' (user/password not found).");
-          return;
+          return "login.error.loginFailed";
         }
         if (isAdminUser(resUser, dataSource) == false) {
-          return;
+          return "login.adminLoginRequired";
         }
         user = resUser;
         internalLogin(page, user);
         page.setResponsePage(SystemUpdatePage.class);
         log.info("Admin login for maintenance (data-base update) successful for user '" + username + "'.");
-        return;
+        return null;
       } catch (final Exception ex) {
         log.error(ex.getMessage(), ex);
       }
@@ -202,7 +216,7 @@ public class LoginPage extends AbstractBasePage
       log.info("User with valid username/password: " + username + "/" + encryptedPassword);
       if (user.isDeleted() == true) {
         log.info("User has no system access (is deleted): " + user.getDisplayUsername());
-        return;
+        return "login.error.loginExpired";
       } else {
         log.info("User successfully logged in: " + user.getDisplayUsername());
         if (userWantsToStayLoggedIn == true) {
@@ -221,17 +235,17 @@ public class LoginPage extends AbstractBasePage
         } else {
           page.setResponsePage(defaultPage);
         }
-        return;
+        return null;
       }
     } else {
       log.info("User login failed: " + username + "/" + encryptedPassword);
+      return "login.error.loginFailed";
     }
-    return;
   }
 
-  protected void checkLogin()
+  protected String checkLogin()
   {
-    internalCheckLogin(this, userDao, dataSource, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), WicketUtils
+    return internalCheckLogin(this, userDao, dataSource, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), WicketUtils
         .getDefaultPage(), targetUrlAfterLogin);
   }
 

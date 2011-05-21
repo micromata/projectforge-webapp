@@ -59,6 +59,7 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
 
   }
 
+  @Override
   @SuppressWarnings("serial")
   protected void init()
   {
@@ -79,7 +80,10 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
       @Override
       public final void onSubmit()
       {
-        parentPage.checkLogin();
+        final String result = parentPage.checkLogin();
+        if (result != null) {
+          addError(result);
+        }
       }
     };
     setDefaultButton(loginButton);
@@ -93,7 +97,7 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
    * @see org.apache.wicket.markup.html.form.Form#onComponentTag(org.apache.wicket.markup.ComponentTag)
    */
   @Override
-  protected void onComponentTag(ComponentTag tag)
+  protected void onComponentTag(final ComponentTag tag)
   {
     super.onComponentTag(tag);
     final String action = tag.getAttribute("action");
