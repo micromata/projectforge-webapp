@@ -61,8 +61,6 @@ public class Bwa implements Serializable
 
   private int month;
 
-  private int toMonth = -1;
-
   private BigDecimal erfolgsquote;
 
   private BigDecimal relativePerformance;
@@ -76,9 +74,9 @@ public class Bwa implements Serializable
    * unter der Zeilennummer als key.
    * @param map Key ist die Zeilen
    */
-  public static void putBwaWerte(Map<String, Object> map, Bwa bwa)
+  public static void putBwaWerte(final Map<String, Object> map, final Bwa bwa)
   {
-    for (BwaZeile zeile : bwa.getZeilen()) {
+    for (final BwaZeile zeile : bwa.getZeilen()) {
       map.put(String.valueOf(zeile.getZeile()), zeile.getBwaWert());
       if (StringUtils.isNotBlank(zeile.getBezeichnung()) == true) {
         map.put(zeile.getBwaZeileId().getKey(), zeile.getBwaWert());
@@ -99,13 +97,13 @@ public class Bwa implements Serializable
   /**
    * Fügt Leerzeile hinzu. Die Priorität ist automatisch {@link Priority#LOW}.
    */
-  private void addBwaZeile(Integer zeile)
+  private void addBwaZeile(final Integer zeile)
   {
-    BwaZeile bwaZeile = new BwaZeile(this, zeile, Priority.LOW, 0);
+    final BwaZeile bwaZeile = new BwaZeile(this, zeile, Priority.LOW, 0);
     bwaZeilen.add(bwaZeile);
   }
 
-  private void addBwaZeile(BwaZeileId id, Priority priority)
+  private void addBwaZeile(final BwaZeileId id, final Priority priority)
   {
     addBwaZeile(id, priority, 0);
   }
@@ -115,17 +113,17 @@ public class Bwa implements Serializable
    * @param bezeichnung
    * @param indent Einrücktiefe, beginnend bei 0 (default).
    */
-  private void addBwaZeile(BwaZeileId id, Priority priority, int indent)
+  private void addBwaZeile(final BwaZeileId id, final Priority priority, final int indent)
   {
     bwaZeilen.add(new BwaZeile(this, id, priority, indent));
   }
 
-  public BwaZeile getZeile(Integer zeile)
+  public BwaZeile getZeile(final Integer zeile)
   {
     if (bwaZeilen == null) {
       return null;
     }
-    for (BwaZeile bwaZeile : bwaZeilen) {
+    for (final BwaZeile bwaZeile : bwaZeilen) {
       if (zeile.intValue() == bwaZeile.getZeile()) {
         return bwaZeile;
       }
@@ -133,14 +131,14 @@ public class Bwa implements Serializable
     throw new UnsupportedOperationException("Zeile '" + zeile + "' not found.");
   }
 
-  public BwaZeile getZeile(BwaZeileId id)
+  public BwaZeile getZeile(final BwaZeileId id)
   {
     return getZeile(id.getId());
   }
 
-  public BwaZeile getZeile(String key)
+  public BwaZeile getZeile(final String key)
   {
-    for (BwaZeile bwaZeile : bwaZeilen) {
+    for (final BwaZeile bwaZeile : bwaZeilen) {
       if (bwaZeile.getBwaZeileId() != null && ObjectUtils.equals(bwaZeile.getBwaZeileId().getKey(), key) == true) {
         return bwaZeile;
       }
@@ -148,7 +146,7 @@ public class Bwa implements Serializable
     throw new UnsupportedOperationException("Zeile '" + key + "' not found.");
   }
 
-  private BwaZeile get(BwaZeileId id)
+  private BwaZeile get(final BwaZeileId id)
   {
     return getZeile(id);
   }
@@ -206,25 +204,25 @@ public class Bwa implements Serializable
     addBwaZeile(1390);
   }
 
-  public Bwa(List<BuchungssatzDO> buchungsSaetze)
+  public Bwa(final List<BuchungssatzDO> buchungsSaetze)
   {
     this();
     setBuchungssaetze(buchungsSaetze);
   }
 
-  public void setBuchungssaetze(List<BuchungssatzDO> buchungsSaetze)
+  public void setBuchungssaetze(final List<BuchungssatzDO> buchungsSaetze)
   {
     if (bwaZeilen == null) {
       return;
     }
     if (CollectionUtils.isNotEmpty(buchungsSaetze) == true) {
-      for (BuchungssatzDO satz : buchungsSaetze) {
+      for (final BuchungssatzDO satz : buchungsSaetze) {
         counter++;
         // Diese Berechnungen werden anhand des Wertenachweises einer Bwa geführt:
         if (satz.isIgnore() == true) {
           continue;
         }
-        int konto = satz.getKonto().getNummer();
+        final int konto = satz.getKonto().getNummer();
         if (konto >= 4000 && konto <= 4799) {
           get(BwaZeileId.UMSATZERLOESE).addKontoUmsatz(satz);
         } else if (konto >= 5700 && konto <= 5999) {
@@ -233,7 +231,7 @@ public class Bwa implements Serializable
           get(BwaZeileId.SO_BETR_ERLOESE).addKontoUmsatz(satz);
         } else if (konto >= 6000 && konto <= 6199) {
           get(BwaZeileId.PERSONALKOSTEN).addKontoUmsatz(satz);
-        } else if (konto >= 6310 && konto <= 6330) {
+        } else if (konto >= 6310 && konto <= 6350) {
           get(BwaZeileId.RAUMKOSTEN).addKontoUmsatz(satz);
         } else if (konto == 7685) {
           get(BwaZeileId.BETRIEBL_STEUERN).addKontoUmsatz(satz);
@@ -257,7 +255,7 @@ public class Bwa implements Serializable
           get(BwaZeileId.ZINSERTRAEGE).addKontoUmsatz(satz);
         } else if (konto == 6392 || konto == 6895 || konto == 6960) {
           get(BwaZeileId.SONST_NEUTR_AUFW).addKontoUmsatz(satz);
-        } else if (konto == 4845 || konto == 4855 || konto == 4930 || konto == 4937 || konto == 4925 || konto == 4960 || konto == 4975) {
+        } else if (NumberHelper.isIn(konto, 4845,4855,4930, 4937, 4925, 4960, 4970, 4975) == true) {
           get(BwaZeileId.SONST_NEUTR_ERTR).addKontoUmsatz(satz);
         } else if (konto >= 7600 && konto <= 7640) {
           get(BwaZeileId.STEUERN_EINK_U_ERTR).addKontoUmsatz(satz);
@@ -270,15 +268,15 @@ public class Bwa implements Serializable
     }
   }
 
-  public Bwa(int year, int month)
+  public Bwa(final int year, final int month)
   {
     this.year = year;
     this.month = month;
   }
 
-  private BwaZeile[] getZeilen(BwaZeileId... ids)
+  private BwaZeile[] getZeilen(final BwaZeileId... ids)
   {
-    BwaZeile[] zeilen = new BwaZeile[ids.length];
+    final BwaZeile[] zeilen = new BwaZeile[ids.length];
     for (int i = 0; i < ids.length; i++) {
       zeilen[i] = get(ids[i]);
     }
@@ -324,13 +322,10 @@ public class Bwa implements Serializable
 
   public String getHeader()
   {
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     buf.append("BWA");
     if (year > 0) {
       buf.append(" für ").append(KostFormatter.formatBuchungsmonat(year, month));
-    }
-    if (toMonth > 0) {
-      buf.append(" bis ").append(KostFormatter.formatBuchungsmonat(year, toMonth));
     }
     if (title != null) {
       buf.append(" \"").append(title).append("\"");
@@ -339,12 +334,13 @@ public class Bwa implements Serializable
     return buf.toString();
   }
 
+  @Override
   public String toString()
   {
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     buf.append(getHeader());
     if (bwaZeilen != null) {
-      for (BwaZeile zeile : bwaZeilen) {
+      for (final BwaZeile zeile : bwaZeilen) {
         asLine(buf, zeile);
       }
     }
@@ -362,7 +358,7 @@ public class Bwa implements Serializable
     return erfolgsquote;
   }
 
-  public void setTitle(String title)
+  public void setTitle(final String title)
   {
     this.title = title;
   }
@@ -392,7 +388,7 @@ public class Bwa implements Serializable
     return bwaZeilen;
   }
 
-  private void asLine(StringBuffer buf, int zeile, String bezeichnung, BigDecimal wert, int indent, int scale, String unit)
+  private void asLine(final StringBuffer buf, final int zeile, final String bezeichnung, final BigDecimal wert, final int indent, final int scale, final String unit)
   {
     buf.append(StringUtils.leftPad(zeile != 0 ? NumberHelper.getAsString(zeile) : "", 4));
     int length = 25;
@@ -406,7 +402,7 @@ public class Bwa implements Serializable
       if ("€".equals(unit) == true) {
         value = CurrencyFormatter.format(wert);
       } else {
-        NumberFormat format = NumberHelper.getNumberFractionFormat(PFUserContext.getLocale(), scale);
+        final NumberFormat format = NumberHelper.getNumberFractionFormat(PFUserContext.getLocale(), scale);
         value = format.format(wert) + " " + unit;
       }
       buf.append(StringUtils.leftPad(value, 18));
@@ -414,12 +410,12 @@ public class Bwa implements Serializable
     buf.append("\n");
   }
 
-  private void asLine(StringBuffer buf, int zeile, String bezeichnung, BigDecimal wert, int indent)
+  private void asLine(final StringBuffer buf, final int zeile, final String bezeichnung, final BigDecimal wert, final int indent)
   {
     asLine(buf, zeile, bezeichnung, wert, indent, 2, "€");
   }
 
-  private void asLine(StringBuffer buf, BwaZeile zeile)
+  private void asLine(final StringBuffer buf, final BwaZeile zeile)
   {
     asLine(buf, zeile.getZeile(), zeile.getBezeichnung(), zeile.getBwaWert(), zeile.getIndent());
   }
@@ -429,7 +425,7 @@ public class Bwa implements Serializable
     return shortname;
   }
 
-  public void setShortname(String shortname)
+  public void setShortname(final String shortname)
   {
     this.shortname = shortname;
   }
@@ -457,7 +453,7 @@ public class Bwa implements Serializable
     return reference;
   }
 
-  public void setReference(Object reference)
+  public void setReference(final Object reference)
   {
     this.reference = reference;
   }
@@ -470,10 +466,10 @@ public class Bwa implements Serializable
     return storeBuchungssaetzeInZeilen;
   }
 
-  public void setStoreBuchungssaetzeInZeilen(boolean value)
+  public void setStoreBuchungssaetzeInZeilen(final boolean value)
   {
     this.storeBuchungssaetzeInZeilen = value;
-    for (BwaZeile bwaZeile : this.bwaZeilen) {
+    for (final BwaZeile bwaZeile : this.bwaZeilen) {
       bwaZeile.setStoreBuchungssaetze(this.storeBuchungssaetzeInZeilen);
     }
   }
