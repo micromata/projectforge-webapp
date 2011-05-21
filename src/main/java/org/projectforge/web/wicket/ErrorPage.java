@@ -59,7 +59,9 @@ public class ErrorPage extends AbstractSecuredPage
 
   public static final String ONLY4NAMESPACE = "org.projectforge";
 
-  private ErrorPageData data;
+  private final ErrorPageData data;
+
+  private String title;
 
   @SpringBean(name = "sendFeedback")
   private SendFeedback sendFeedback;
@@ -71,7 +73,7 @@ public class ErrorPage extends AbstractSecuredPage
    * @param doLog If true, then a log entry with level INFO will be produced.
    * @return
    */
-  public static String getExceptionMessage(AbstractSecuredPage securedPage, ProjectForgeException exception, boolean doLog)
+  public static String getExceptionMessage(final AbstractSecuredPage securedPage, final ProjectForgeException exception, final boolean doLog)
   {
     // Feedbackpanel!
     if (exception instanceof UserException) {
@@ -123,6 +125,7 @@ public class ErrorPage extends AbstractSecuredPage
         log.info("Page expired (session time out).");
         showFeedback = false;
         msg = getString("message.wicket.pageExpired");
+        title = getString("message.title");
       } else {
         messageNumber = String.valueOf(System.currentTimeMillis());
         log.error("Message #" + messageNumber + ": " + throwable.getMessage(), throwable);
@@ -185,7 +188,7 @@ public class ErrorPage extends AbstractSecuredPage
     boolean result = false;
     try {
       result = sendFeedback.send(data);
-    } catch (Throwable ex) {
+    } catch (final Throwable ex) {
       log.error(ex.getMessage(), ex);
       result = false;
     }
@@ -202,7 +205,7 @@ public class ErrorPage extends AbstractSecuredPage
   @Override
   protected String getTitle()
   {
-    return getString("errorpage.title");
+    return title != null ? title : getString("errorpage.title");
   }
 
   /**
