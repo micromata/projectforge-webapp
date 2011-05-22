@@ -32,6 +32,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -44,8 +45,10 @@ import org.projectforge.reporting.Kost2Art;
 import org.projectforge.reporting.impl.ProjektImpl;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.task.TaskPropertyColumn;
+import org.projectforge.web.user.UserPrefListPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -88,8 +91,8 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
   public List<IColumn<ProjektDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<ProjektDO>> columns = new ArrayList<IColumn<ProjektDO>>();
-    CellItemListener<ProjektDO> cellItemListener = new CellItemListener<ProjektDO>() {
-      public void populateItem(Item<ICellPopulator<ProjektDO>> item, String componentId, IModel<ProjektDO> rowModel)
+    final CellItemListener<ProjektDO> cellItemListener = new CellItemListener<ProjektDO>() {
+      public void populateItem(final Item<ICellPopulator<ProjektDO>> item, final String componentId, final IModel<ProjektDO> rowModel)
       {
         final ProjektDO projekt = rowModel.getObject();
         if (projekt.getStatus() == null) {
@@ -146,7 +149,7 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
             groupName = group.getName();
           }
         }
-        Label label = new Label(componentId, groupName);
+        final Label label = new Label(componentId, groupName);
         item.add(label);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
@@ -176,7 +179,7 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
   @Override
   protected void init()
   {
-    final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+    ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
       @Override
       public void onClick()
       {
@@ -186,10 +189,13 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
     contentMenuEntries.add(menuEntry);
     dataTable = createDataTable(createColumns(this, true), "kost", true);
     form.add(dataTable);
+    final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", UserPrefArea.PROJEKT_FAVORITE);
+    menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("favorites"));
+    addContentMenuEntry(menuEntry);
   }
 
   @Override
-  protected ProjektListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected ProjektListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new ProjektListForm(this);
   }
@@ -201,7 +207,7 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
   }
 
   @Override
-  protected IModel<ProjektDO> getModel(ProjektDO object)
+  protected IModel<ProjektDO> getModel(final ProjektDO object)
   {
     return new DetachableDOModel<ProjektDO, ProjektDao>(object, getBaseDao());
   }
