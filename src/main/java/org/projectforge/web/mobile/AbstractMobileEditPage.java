@@ -39,7 +39,7 @@ import org.projectforge.web.wicket.WicketUtils;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public abstract class AbstractMobileEditPage<O extends AbstractBaseDO< ? >, F extends AbstractMobileEditForm<O, ? >, D extends BaseDao<O>>
-    extends AbstractSecuredMobilePage implements IEditPage<O, D>
+extends AbstractSecuredMobilePage implements IEditPage<O, D>
 {
   protected F form;
 
@@ -139,8 +139,28 @@ public abstract class AbstractMobileEditPage<O extends AbstractBaseDO< ? >, F ex
   }
 
   @Override
-  public WebPage afterUpdate(boolean modified)
+  public WebPage afterUpdate(final boolean modified)
   {
+    return null;
+  }
+
+  /**
+   * Will be called directly after deleting the data object (delete or update deleted=true). Any return value is not yet supported.
+   */
+  @Override
+  public WebPage afterDelete()
+  {
+    // Do nothing at default.
+    return null;
+  }
+
+  /**
+   * Will be called directly after un-deleting the data object (update deleted=false). Any return value is not yet supported.
+   */
+  @Override
+  public WebPage afterUndelete()
+  {
+    // Do nothing at default.
     return null;
   }
 
@@ -175,7 +195,7 @@ public abstract class AbstractMobileEditPage<O extends AbstractBaseDO< ? >, F ex
   }
 
   @Override
-  public void setAlreadySubmitted(boolean alreadySubmitted)
+  public void setAlreadySubmitted(final boolean alreadySubmitted)
   {
     this.alreadySubmitted = alreadySubmitted;
   }
@@ -204,7 +224,7 @@ public abstract class AbstractMobileEditPage<O extends AbstractBaseDO< ? >, F ex
    * @see org.projectforge.web.wicket.IEditPage#setResponsePageAndHighlightedRow(org.apache.wicket.markup.html.WebPage)
    */
   @Override
-  public void setResponsePageAndHighlightedRow(WebPage page)
+  public void setResponsePageAndHighlightedRow(final WebPage page)
   {
   }
 
