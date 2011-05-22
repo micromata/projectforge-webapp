@@ -89,6 +89,16 @@ public interface IEditPage<O extends AbstractBaseDO< ? >, D extends BaseDao<O>>
   public WebPage afterUpdate(boolean modified);
 
   /**
+   * Will be called directly after deleting the data object (delete or update deleted=true). Any return value is not yet supported.
+   */
+  public WebPage afterDelete();
+
+  /**
+   * Will be called directly after un-deleting the data object (update deleted=false). Any return value is not yet supported.
+   */
+  public WebPage afterUndelete();
+
+  /**
    * If user tried to add a new object and an error was occurred the edit page is shown again and the object id is cleared (set to null).
    */
   public void clearIds();
