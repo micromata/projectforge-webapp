@@ -30,6 +30,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -38,6 +39,8 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.KundeDao;
 import org.projectforge.fibu.KundeStatus;
+import org.projectforge.user.UserPrefArea;
+import org.projectforge.web.user.UserPrefListPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -47,7 +50,6 @@ import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.MessagePage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
-
 @ListPage(editPage = CustomerEditPage.class)
 public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDao, KundeDO>
 {
@@ -56,7 +58,7 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
   @SpringBean(name = "kundeDao")
   private KundeDao kundeDao;
 
-  public CustomerListPage(PageParameters parameters)
+  public CustomerListPage(final PageParameters parameters)
   {
     super(parameters, "fibu.kunde");
   }
@@ -70,7 +72,7 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
   @Override
   protected void init()
   {
-    final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+    ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
       @Override
       public void onClick()
       {
@@ -78,11 +80,14 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
       };
     }, getString("wizard"));
     contentMenuEntries.add(menuEntry);
+    final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", UserPrefArea.KUNDE_FAVORITE);
+    menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("favorites"));
+    addContentMenuEntry(menuEntry);
 
-    List<IColumn<KundeDO>> columns = new ArrayList<IColumn<KundeDO>>();
+    final List<IColumn<KundeDO>> columns = new ArrayList<IColumn<KundeDO>>();
 
-    CellItemListener<KundeDO> cellItemListener = new CellItemListener<KundeDO>() {
-      public void populateItem(Item<ICellPopulator<KundeDO>> item, String componentId, IModel<KundeDO> rowModel)
+    final CellItemListener<KundeDO> cellItemListener = new CellItemListener<KundeDO>() {
+      public void populateItem(final Item<ICellPopulator<KundeDO>> item, final String componentId, final IModel<KundeDO> rowModel)
       {
         final KundeDO kunde = rowModel.getObject();
         if (kunde.getStatus() == null) {
@@ -102,13 +107,13 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
-        KundeDO kunde = (KundeDO) rowModel.getObject();
+        final KundeDO kunde = (KundeDO) rowModel.getObject();
         if (isSelectMode() == false) {
           item.add(new ListSelectActionPanel(componentId, rowModel, CustomerEditPage.class, kunde.getId(), CustomerListPage.this, String
               .valueOf(kunde.getKost())));
         } else {
           item
-              .add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, kunde.getId(), String.valueOf(kunde.getKost())));
+          .add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, kunde.getId(), String.valueOf(kunde.getKost())));
         }
         cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);
@@ -118,10 +123,9 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
         "identifier", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("fibu.kunde.name")), "name", "name",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("fibu.kunde.division")), "division",
-        "division", cellItemListener));
-    columns
-        .add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("fibu.kunde.division")), "division", "division",
+        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("description")), "description", "description",
         cellItemListener));
     dataTable = createDataTable(columns, "kost", true);
@@ -129,7 +133,7 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
   }
 
   @Override
-  protected CustomerListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected CustomerListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new CustomerListForm(this);
   }
@@ -141,7 +145,7 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
   }
 
   @Override
-  protected IModel<KundeDO> getModel(KundeDO object)
+  protected IModel<KundeDO> getModel(final KundeDO object)
   {
     return new DetachableDOModel<KundeDO, KundeDao>(object, getBaseDao());
   }
