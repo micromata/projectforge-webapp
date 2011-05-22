@@ -29,10 +29,13 @@ import java.util.List;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.user.UserPrefArea;
+import org.projectforge.user.UserPrefAreaRegistry;
 import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefDao;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -41,7 +44,6 @@ import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
-
 
 @ListPage(editPage = UserPrefEditPage.class)
 public class UserPrefListPage extends AbstractListPage<UserPrefListForm, UserPrefDao, UserPrefDO>
@@ -54,19 +56,32 @@ public class UserPrefListPage extends AbstractListPage<UserPrefListForm, UserPre
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
 
-  public UserPrefListPage(PageParameters parameters)
+  public static BookmarkablePageLink<Void> createLink(final String id, final UserPrefArea area)
+  {
+    final PageParameters params = new PageParameters();
+    params.add("area", area.getId());
+    final BookmarkablePageLink<Void> link = new BookmarkablePageLink<Void>(id, UserPrefListPage.class, params);
+    return link;
+  }
+
+  public UserPrefListPage(final PageParameters parameters)
   {
     super(parameters, "user.pref");
+    final String area = parameters.getString("area");
+    if (area != null) {
+      final UserPrefArea userPrefArea = UserPrefAreaRegistry.instance().getEntry(area);
+      form.getSearchFilter().setArea(userPrefArea);
+    }
   }
 
   @SuppressWarnings("serial")
   @Override
   protected void init()
   {
-    List<IColumn<UserPrefDO>> columns = new ArrayList<IColumn<UserPrefDO>>();
+    final List<IColumn<UserPrefDO>> columns = new ArrayList<IColumn<UserPrefDO>>();
 
-    CellItemListener<UserPrefDO> cellItemListener = new CellItemListener<UserPrefDO>() {
-      public void populateItem(Item<ICellPopulator<UserPrefDO>> item, String componentId, IModel<UserPrefDO> rowModel)
+    final CellItemListener<UserPrefDO> cellItemListener = new CellItemListener<UserPrefDO>() {
+      public void populateItem(final Item<ICellPopulator<UserPrefDO>> item, final String componentId, final IModel<UserPrefDO> rowModel)
       {
       }
     };
@@ -99,7 +114,7 @@ public class UserPrefListPage extends AbstractListPage<UserPrefListForm, UserPre
   }
 
   @Override
-  protected UserPrefListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected UserPrefListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new UserPrefListForm(this);
   }
@@ -111,7 +126,7 @@ public class UserPrefListPage extends AbstractListPage<UserPrefListForm, UserPre
   }
 
   @Override
-  protected IModel<UserPrefDO> getModel(UserPrefDO object)
+  protected IModel<UserPrefDO> getModel(final UserPrefDO object)
   {
     return new DetachableDOModel<UserPrefDO, UserPrefDao>(object, getBaseDao());
   }
