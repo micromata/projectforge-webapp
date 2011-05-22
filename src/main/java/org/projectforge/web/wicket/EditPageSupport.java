@@ -38,11 +38,11 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EditPageSupport.class);
 
-  private IEditPage<O, D> editPage;
+  private final IEditPage<O, D> editPage;
 
-  private D baseDao;
+  private final D baseDao;
 
-  private O data;
+  private final O data;
 
   public EditPageSupport(final IEditPage<O, D> editPage, final D baseDao, final O data)
   {
@@ -69,13 +69,13 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
           log.info("User has used the back button in "
               + editPage.getClass()
               + " after inserting a new object? Try to load the object from the data base and show edit page again.");
-          O dbObj = baseDao.getById(data.getId());
+          final O dbObj = baseDao.getById(data.getId());
           if (dbObj == null) {
             // Error while trying to insert Object and user has used the back button?
             log
-                .info("User has used the back button "
-                    + editPage.getClass()
-                    + " after inserting a new object and a failure occured (because object with id not found in the data base)? Deleting the id and show the edit page again.");
+            .info("User has used the back button "
+                + editPage.getClass()
+                + " after inserting a new object and a failure occured (because object with id not found in the data base)? Deleting the id and show the edit page again.");
             editPage.clearIds();
             return;
           }
@@ -167,6 +167,7 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
         baseDao.undelete(data);
       }
     }
+    editPage.afterUndelete();
     editPage.setResponsePage();
   }
 
@@ -186,6 +187,7 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
           return;
         }
         baseDao.markAsDeleted(data);
+        editPage.afterDelete();
         editPage.setResponsePage();
       }
     }
@@ -207,6 +209,7 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
           return;
         }
         baseDao.delete(data);
+        editPage.afterDelete();
         editPage.setResponsePage();
       }
     }
