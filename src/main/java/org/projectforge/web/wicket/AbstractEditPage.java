@@ -58,7 +58,7 @@ import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
 
 public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends AbstractEditForm<O, ? >, D extends BaseDao<O>> extends
-    AbstractSecuredPage implements IEditPage<O, D>
+AbstractSecuredPage implements IEditPage<O, D>
 {
   public static final String PARAMETER_KEY_ID = "id";
 
@@ -134,7 +134,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
     }
     final List<IColumn<DisplayHistoryEntry>> columns = new ArrayList<IColumn<DisplayHistoryEntry>>();
     final CellItemListener<DisplayHistoryEntry> cellItemListener = new CellItemListener<DisplayHistoryEntry>() {
-      public void populateItem(Item<ICellPopulator<DisplayHistoryEntry>> item, String componentId, IModel<DisplayHistoryEntry> rowModel)
+      public void populateItem(final Item<ICellPopulator<DisplayHistoryEntry>> item, final String componentId, final IModel<DisplayHistoryEntry> rowModel)
       {
         // Later a link should show the history entry as popup.
         item.add(new AttributeModifier("class", true, new Model<String>("notrlink")));
@@ -147,12 +147,12 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
     columns.add(new UserPropertyColumn<DisplayHistoryEntry>(getString("user"), null, "user", cellItemListener)
         .withUserFormatter(userFormatter));
     columns
-        .add(new CellItemListenerPropertyColumn<DisplayHistoryEntry>(getString("history.entryType"), null, "entryType", cellItemListener));
+    .add(new CellItemListenerPropertyColumn<DisplayHistoryEntry>(getString("history.entryType"), null, "entryType", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<DisplayHistoryEntry>(getString("history.propertyName"), null, "propertyName",
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<DisplayHistoryEntry>(getString("history.newValue"), null, "newValue", cellItemListener) {
       @Override
-      public void populateItem(Item<ICellPopulator<DisplayHistoryEntry>> item, String componentId, IModel<DisplayHistoryEntry> rowModel)
+      public void populateItem(final Item<ICellPopulator<DisplayHistoryEntry>> item, final String componentId, final IModel<DisplayHistoryEntry> rowModel)
       {
         if (rowModel.getObject().getNewValue() == null) {
           item.add(new Label(componentId, ""));
@@ -164,7 +164,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
     });
     columns.add(new CellItemListenerPropertyColumn<DisplayHistoryEntry>(getString("history.oldValue"), null, "oldValue", cellItemListener) {
       @Override
-      public void populateItem(Item<ICellPopulator<DisplayHistoryEntry>> item, String componentId, IModel<DisplayHistoryEntry> rowModel)
+      public void populateItem(final Item<ICellPopulator<DisplayHistoryEntry>> item, final String componentId, final IModel<DisplayHistoryEntry> rowModel)
       {
         if (rowModel.getObject().getOldValue() == null) {
           item.add(new Label(componentId, ""));
@@ -178,7 +178,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
     final IDataProvider<DisplayHistoryEntry> dataProvider = new ListDataProvider<DisplayHistoryEntry>(getHistory());
     final DataTable<DisplayHistoryEntry> dataTable = new DataTable<DisplayHistoryEntry>("historyTable", colArray, dataProvider, 100) {
       @Override
-      protected Item<DisplayHistoryEntry> newRowItem(String id, int index, IModel<DisplayHistoryEntry> model)
+      protected Item<DisplayHistoryEntry> newRowItem(final String id, final int index, final IModel<DisplayHistoryEntry> model)
       {
         return new OddEvenItem<DisplayHistoryEntry>(id, index, model);
       }
@@ -286,7 +286,27 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
    *          returned to stripes controller.
    * @see BaseDao#update(ExtendedBaseDO)
    */
-  public AbstractBasePage afterUpdate(boolean modified)
+  public AbstractBasePage afterUpdate(final boolean modified)
+  {
+    // Do nothing at default.
+    return null;
+  }
+
+  /**
+   * Will be called directly after deleting the data object (delete or update deleted=true). Any return value is not yet supported.
+   */
+  @Override
+  public WebPage afterDelete()
+  {
+    // Do nothing at default.
+    return null;
+  }
+
+  /**
+   * Will be called directly after un-deleting the data object (update deleted=false). Any return value is not yet supported.
+   */
+  @Override
+  public WebPage afterUndelete()
   {
     // Do nothing at default.
     return null;
@@ -504,7 +524,7 @@ public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends 
   }
 
   @Override
-  public void setAlreadySubmitted(boolean alreadySubmitted)
+  public void setAlreadySubmitted(final boolean alreadySubmitted)
   {
     this.alreadySubmitted = alreadySubmitted;
   }
