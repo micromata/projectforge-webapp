@@ -36,6 +36,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -52,11 +53,13 @@ import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.core.PriorityFormatter;
 import org.projectforge.web.fibu.OrderPositionsPanel;
 import org.projectforge.web.user.UserFormatter;
+import org.projectforge.web.user.UserPrefListPage;
 import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.AttributeAppendModifier;
@@ -70,6 +73,7 @@ import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.ConsumptionBarPanel;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 /**
  * This page is shown when the user searches in the task tree. The task will be displayed as list.
@@ -235,7 +239,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
   public List<IColumn<TaskDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final CellItemListener<TaskDO> cellItemListener = new CellItemListener<TaskDO>() {
-      public void populateItem(Item<ICellPopulator<TaskDO>> item, String componentId, IModel<TaskDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
       {
         final TaskDO task = rowModel.getObject();
         final String cssStyle = TaskListPage.getCssStyle(task, (Integer) highlightedRowId);
@@ -251,7 +255,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
       public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
       {
         final TaskDO task = rowModel.getObject();
-        StringBuffer buf = new StringBuffer();
+        final StringBuffer buf = new StringBuffer();
         taskFormatter.appendFormattedTask(buf, new WicketLocalizerAndUrlBuilder(getResponse()), task, false, true, false);
         final Label formattedTaskLabel = new Label(ListSelectActionPanel.LABEL_ID, buf.toString());
         formattedTaskLabel.setEscapeModelStrings(false);
@@ -265,15 +269,15 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
       }
     });
     columns
-        .add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task.consumption")), null, "task", cellItemListener) {
-          @Override
-          public void populateItem(Item<ICellPopulator<TaskDO>> item, String componentId, final IModel<TaskDO> rowModel)
-          {
-            final TaskNode node = taskTree.getTaskNodeById(rowModel.getObject().getId());
-            item.add(getConsumptionBarPanel(TaskListPage.this, componentId, taskTree, isSelectMode(), node));
-            cellItemListener.populateItem(item, componentId, rowModel);
-          }
-        });
+    .add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("task.consumption")), null, "task", cellItemListener) {
+      @Override
+      public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
+      {
+        final TaskNode node = taskTree.getTaskNodeById(rowModel.getObject().getId());
+        item.add(getConsumptionBarPanel(TaskListPage.this, componentId, taskTree, isSelectMode(), node));
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
     if (kostCache.isKost2EntriesExists() == true) {
       columns.add(new CellItemListenerPropertyColumn<TaskDO>(getString("fibu.kost2"), getSortable("kost2", sortable), "kost2",
           cellItemListener) {
@@ -300,6 +304,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
             item.add(label);
           } else {
             final OrderPositionsPanel orderPositionsPanel = new OrderPositionsPanel(componentId) {
+              @Override
               protected void onBeforeRender()
               {
                 super.onBeforeRender();
@@ -326,7 +331,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
     columns.add(new CellItemListenerPropertyColumn<TaskDO>(new Model<String>(getString("priority")), getSortable("priority", sortable),
         "priority", cellItemListener) {
       @Override
-      public void populateItem(Item<ICellPopulator<TaskDO>> item, String componentId, IModel<TaskDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<TaskDO>> item, final String componentId, final IModel<TaskDO> rowModel)
       {
         final Label label = getPriorityLabel(componentId, priorityFormatter, rowModel.getObject());
         item.add(label);
@@ -345,7 +350,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
     });
     final UserPropertyColumn<TaskDO> userPropertyColumn = new UserPropertyColumn<TaskDO>(getString("task.assignedUser"), getSortable(
         "responsibleUserId", sortable), "responsibleUserId", cellItemListener).withUserFormatter(userFormatter).setUserGroupCache(
-        userGroupCache);
+            userGroupCache);
     columns.add(userPropertyColumn);
     return columns;
   }
@@ -355,10 +360,13 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
   {
     dataTable = createDataTable(createColumns(this, true), "title", false);
     form.add(dataTable);
+    final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", UserPrefArea.TASK_FAVORITE);
+    final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("favorites"));
+    addContentMenuEntry(menuEntry);
   }
 
   @Override
-  protected TaskListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected TaskListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new TaskListForm(this);
   }
@@ -370,7 +378,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
   }
 
   @Override
-  protected IModel<TaskDO> getModel(TaskDO object)
+  protected IModel<TaskDO> getModel(final TaskDO object)
   {
     return new DetachableDOModel<TaskDO, TaskDao>(object, getBaseDao());
   }
