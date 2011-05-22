@@ -26,6 +26,7 @@ package org.projectforge.web.task;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -33,8 +34,10 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.task.TaskDao;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.admin.TaskWizardPage;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.user.UserPrefListPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.AbstractReindexTopRightMenu;
@@ -66,9 +69,9 @@ public class TaskTreePage extends AbstractSecuredPage
 
   TaskTreeForm form;
 
-  private TaskTreeTablePanel taskTreeTablePanel;
+  private final TaskTreeTablePanel taskTreeTablePanel;
 
-  public TaskTreePage(PageParameters parameters)
+  public TaskTreePage(final PageParameters parameters)
   {
     super(parameters);
     taskTreeTablePanel = new TaskTreeTablePanel("taskTree", this);
@@ -107,6 +110,9 @@ public class TaskTreePage extends AbstractSecuredPage
         };
       }, getString("add"));
       contentMenuEntries.add(menuEntry);
+      final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", UserPrefArea.TASK_FAVORITE);
+      menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("favorites"));
+      addContentMenuEntry(menuEntry);
       if (accessChecker.isLoggedInUserMemberOfAdminGroup() == true) {
         contentMenuEntries.add(menuEntry);
         menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
@@ -124,7 +130,7 @@ public class TaskTreePage extends AbstractSecuredPage
       dropDownMenu.setVisible(true);
       new AbstractReindexTopRightMenu(this, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
         @Override
-        protected void rebuildDatabaseIndex(boolean onlyNewest)
+        protected void rebuildDatabaseIndex(final boolean onlyNewest)
         {
           if (onlyNewest == true) {
             taskDao.rebuildDatabaseIndex4NewestEntries();
@@ -134,7 +140,7 @@ public class TaskTreePage extends AbstractSecuredPage
         }
 
         @Override
-        protected String getString(String i18nKey)
+        protected String getString(final String i18nKey)
         {
           return TaskTreePage.this.getString(i18nKey);
         }
@@ -154,7 +160,7 @@ public class TaskTreePage extends AbstractSecuredPage
   }
 
   @Override
-  protected void onBodyTag(ComponentTag bodyTag)
+  protected void onBodyTag(final ComponentTag bodyTag)
   {
     if (taskTreeTablePanel.getEventNode() != null) {
       // Show the selected task entry on top:
@@ -241,7 +247,7 @@ public class TaskTreePage extends AbstractSecuredPage
     return form.getSearchFilter();
   }
 
-  public void setEventNode(Integer id)
+  public void setEventNode(final Integer id)
   {
     taskTreeTablePanel.setEventNode(id);
   }
