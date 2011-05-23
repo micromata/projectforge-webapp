@@ -77,12 +77,12 @@ public class UserGroupCache extends AbstractCache
 
   private HibernateTemplate hibernateTemplate;
 
-  public void setHibernateTemplate(HibernateTemplate hibernateTemplate)
+  public void setHibernateTemplate(final HibernateTemplate hibernateTemplate)
   {
     this.hibernateTemplate = hibernateTemplate;
   }
 
-  public GroupDO getGroup(Integer groupId)
+  public GroupDO getGroup(final Integer groupId)
   {
     checkRefresh();
     return getGroupMap().get(groupId);
@@ -99,10 +99,10 @@ public class UserGroupCache extends AbstractCache
     return null;
   }
 
-  public String getGroupname(Integer groupId)
+  public String getGroupname(final Integer groupId)
   {
     checkRefresh();
-    GroupDO group = getGroup(groupId);
+    final GroupDO group = getGroup(groupId);
     return group == null ? null : group.getName();
   }
 
@@ -150,10 +150,10 @@ public class UserGroupCache extends AbstractCache
     }
   }
 
-  public String getUsername(Integer userId)
+  public String getUsername(final Integer userId)
   {
     // checkRefresh(); Done by getUserMap().
-    PFUserDO user = getUserMap().get(userId);
+    final PFUserDO user = getUserMap().get(userId);
     if (user == null) {
       return String.valueOf(userId);
     }
@@ -165,7 +165,7 @@ public class UserGroupCache extends AbstractCache
    * @param groupId
    * @return
    */
-  public boolean isLoggedInUserMemberOfGroup(Integer groupId)
+  public boolean isLoggedInUserMemberOfGroup(final Integer groupId)
   {
     return isUserMemberOfGroup(PFUserContext.getUserId(), groupId);
   }
@@ -182,10 +182,10 @@ public class UserGroupCache extends AbstractCache
     return isUserMemberOfGroup(user.getId(), groupId);
   }
 
-  public boolean isUserMemberOfGroup(Integer userId, Integer groupId)
+  public boolean isUserMemberOfGroup(final Integer userId, final Integer groupId)
   {
     checkRefresh();
-    Set<Integer> groupSet = getUserGroupIdMap().get(userId);
+    final Set<Integer> groupSet = getUserGroupIdMap().get(userId);
     return (groupSet != null) ? groupSet.contains(groupId) : false;
   }
 
@@ -289,11 +289,11 @@ public class UserGroupCache extends AbstractCache
    * @param user
    * @param groups
    */
-  public boolean isUserMemberOfGroup(PFUserDO user, ProjectForgeGroup... groups)
+  public boolean isUserMemberOfGroup(final PFUserDO user, final ProjectForgeGroup... groups)
   {
     Validate.notNull(user);
     Validate.notNull(groups);
-    for (ProjectForgeGroup group : groups) {
+    for (final ProjectForgeGroup group : groups) {
       boolean result = false;
       if (group == ProjectForgeGroup.ADMIN_GROUP) {
         result = isUserMemberOfAdminGroup(user.getId());
@@ -319,23 +319,23 @@ public class UserGroupCache extends AbstractCache
     return false;
   }
 
-  public String getGroupnames(Integer userId)
+  public String getGroupnames(final Integer userId)
   {
     checkRefresh();
-    Set<Integer> groupSet = getUserGroupIdMap().get(userId);
+    final Set<Integer> groupSet = getUserGroupIdMap().get(userId);
     if (groupSet == null) {
       return "";
     }
-    List<String> list = new ArrayList<String>();
-    for (Integer groupId : groupSet) {
-      GroupDO group = getGroup(groupId);
+    final List<String> list = new ArrayList<String>();
+    for (final Integer groupId : groupSet) {
+      final GroupDO group = getGroup(groupId);
       if (group != null) {
         list.add(group.getName());
       } else {
         log.error("Group with id " + groupId + " not found.");
       }
     }
-    return StringHelper.listToString(list, ", ", true);
+    return StringHelper.listToString(list, "; ", true);
   }
 
   public List<UserRightDO> getUserRights(final Integer userId)
@@ -354,13 +354,13 @@ public class UserGroupCache extends AbstractCache
    * @param user
    * @return collection if found, otherwise null.
    */
-  public Collection<Integer> getUserGroups(PFUserDO user)
+  public Collection<Integer> getUserGroups(final PFUserDO user)
   {
     checkRefresh();
     return getUserGroupIdMap().get(user.getId());
   }
 
-  public EmployeeDO getEmployee(Integer userId)
+  public EmployeeDO getEmployee(final Integer userId)
   {
     checkRefresh();
     EmployeeDO employee = this.employeeMap.get(userId);
@@ -379,7 +379,7 @@ public class UserGroupCache extends AbstractCache
    * Removes given employee from map, so refresh for next access is forced.
    * @param userId
    */
-  public void refreshEmployee(Integer userId)
+  public void refreshEmployee(final Integer userId)
   {
     if (this.employeeMap != null) {
       this.employeeMap.remove(userId);
@@ -402,7 +402,7 @@ public class UserGroupCache extends AbstractCache
    * Should be called after user modifications.
    * @param user
    */
-  void updateUser(PFUserDO user)
+  void updateUser(final PFUserDO user)
   {
     getUserMap().put(user.getId(), user);
   }
@@ -416,6 +416,7 @@ public class UserGroupCache extends AbstractCache
   /**
    * This method will be called by CacheHelper and is synchronized via getData();
    */
+  @Override
   protected void refresh()
   {
     log.info("Initializing UserGroupCache ...");
@@ -424,7 +425,7 @@ public class UserGroupCache extends AbstractCache
     // Could not autowire UserDao because of cyclic reference with AccessChecker.
     @SuppressWarnings("unchecked")
     final List<PFUserDO> users = hibernateTemplate.find("from PFUserDO t");
-    for (PFUserDO user : users) {
+    for (final PFUserDO user : users) {
       uMap.put(user.getId(), user);
     }
     @SuppressWarnings("unchecked")
@@ -438,12 +439,12 @@ public class UserGroupCache extends AbstractCache
     final Set<Integer> nProjectAssistants = new HashSet<Integer>();
     final Set<Integer> nMarketingUsers = new HashSet<Integer>();
     final Set<Integer> nOrgaUsers = new HashSet<Integer>();
-    for (GroupDO group : groups) {
+    for (final GroupDO group : groups) {
       gMap.put(group.getId(), group);
       if (group.getAssignedUsers() != null) {
-        for (PFUserDO user : group.getAssignedUsers()) {
+        for (final PFUserDO user : group.getAssignedUsers()) {
           if (user != null) {
-            Set<Integer> groupIdSet = ensureAndGetUserGroupIdMap(ugIdMap, user.getId());
+            final Set<Integer> groupIdSet = ensureAndGetUserGroupIdMap(ugIdMap, user.getId());
             groupIdSet.add(group.getId());
             if (ProjectForgeGroup.ADMIN_GROUP.equals(group.getName()) == true) {
               log.debug("Adding user '" + user.getUsername() + "' as administrator.");
@@ -507,7 +508,7 @@ public class UserGroupCache extends AbstractCache
     log.info("Initializing of UserGroupCache done.");
   }
 
-  private static Set<Integer> ensureAndGetUserGroupIdMap(Map<Integer, Set<Integer>> ugIdMap, Integer userId)
+  private static Set<Integer> ensureAndGetUserGroupIdMap(final Map<Integer, Set<Integer>> ugIdMap, final Integer userId)
   {
     Set<Integer> set = ugIdMap.get(userId);
     if (set == null) {
