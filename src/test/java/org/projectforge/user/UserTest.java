@@ -37,11 +37,6 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 import org.projectforge.test.TestBase;
-import org.projectforge.user.GroupDO;
-import org.projectforge.user.GroupDao;
-import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserDao;
-import org.projectforge.user.UserGroupCache;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -57,12 +52,12 @@ public class UserTest extends TestBase
 
   private TransactionTemplate txTemplate;
 
-  public void setGroupDao(GroupDao groupDao)
+  public void setGroupDao(final GroupDao groupDao)
   {
     this.groupDao = groupDao;
   }
 
-  public void setTxTemplate(TransactionTemplate txTemplate)
+  public void setTxTemplate(final TransactionTemplate txTemplate)
   {
     this.txTemplate = txTemplate;
   }
@@ -71,17 +66,17 @@ public class UserTest extends TestBase
   public void testUserDO()
   {
     logon(TEST_ADMIN_USER);
-    PFUserDO user = userDao.getInternalByName(TEST_ADMIN_USER);
+    final PFUserDO user = userDao.getInternalByName(TEST_ADMIN_USER);
     assertEquals(user.getUsername(), TEST_ADMIN_USER);
-    UserGroupCache cache = userDao.getUserGroupCache();
-    PFUserDO user1 = getUser("user1");
-    String groupnames = cache.getGroupnames(user1.getId());
-    assertEquals("Groupnames", "group1, group2", groupnames);
+    final UserGroupCache cache = userDao.getUserGroupCache();
+    final PFUserDO user1 = getUser("user1");
+    final String groupnames = cache.getGroupnames(user1.getId());
+    assertEquals("Groupnames", "group1; group2", groupnames);
     assertEquals(true, cache.isUserMemberOfGroup(user1.getId(), getGroupId("group1")));
     assertEquals(false, cache.isUserMemberOfGroup(user1.getId(), getGroupId("group3")));
-    GroupDO group = cache.getGroup(getGroupId("group1"));
+    final GroupDO group = cache.getGroup(getGroupId("group1"));
     assertEquals("group1", group.getName());
-    PFUserDO admin = getUser(ADMIN);
+    final PFUserDO admin = getUser(ADMIN);
     assertEquals("Administrator", true, cache.isUserMemberOfAdminGroup(admin.getId()));
     assertEquals("Not administrator", false, cache.isUserMemberOfAdminGroup(user1.getId()));
   }
@@ -89,7 +84,7 @@ public class UserTest extends TestBase
   @Test
   public void testGetUserDisplayname()
   {
-    PFUserDO user = new PFUserDO();
+    final PFUserDO user = new PFUserDO();
     user.setUsername("hurzel");
     assertEquals("getUserDisplayname", "hurzel", user.getUserDisplayname());
     user.setLastname("Reinhard");
@@ -108,7 +103,7 @@ public class UserTest extends TestBase
     user.setUsername("UserTest");
     user.setPassword("Hurzel");
     user.setDescription("Description");
-    Serializable id = userDao.save(user);
+    final Serializable id = userDao.save(user);
     user = userDao.getById(id);
     assertEquals("UserTest", user.getUsername());
     assertNull(user.getPassword()); // Not SHA, should be ignored.
@@ -128,10 +123,10 @@ public class UserTest extends TestBase
   @Test
   public void testCopyValues()
   {
-    PFUserDO src = new PFUserDO();
+    final PFUserDO src = new PFUserDO();
     src.setPassword("test");
     src.setUsername("usertest");
-    PFUserDO dest = new PFUserDO();
+    final PFUserDO dest = new PFUserDO();
     dest.copyValuesFrom(src);
     assertNull(dest.getPassword());
     assertEquals("usertest", dest.getUsername());
@@ -166,7 +161,7 @@ public class UserTest extends TestBase
     logon(TEST_ADMIN_USER);
     txTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
     txTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status)
+      public Object doInTransaction(final TransactionStatus status)
       {
         initTestDB.addUser("UserTest.historyUser1a");
         initTestDB.addUser("UserTest.historyUser1b");
@@ -180,12 +175,12 @@ public class UserTest extends TestBase
     });
 
     txTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status)
+      public Object doInTransaction(final TransactionStatus status)
       {
         // Checking history entries of user for new group:
         HistoryEntry[] historyEntries = userDao.getHistoryEntries(getUser("UserTest.historyUser1a"));
         assertEquals(2, historyEntries.length); // insert and update assignedGroups
-        HistoryEntry entry = historyEntries[0]; // Update assignedGroups entry
+        final HistoryEntry entry = historyEntries[0]; // Update assignedGroups entry
         assertEquals(1, entry.getDelta().size());
         assertEquals("", entry.getDelta().get(0).getOldValue());
         assertGroupIds(new String[] { "UserTest.historyGroup1"}, entry.getDelta().get(0).getNewValue());
@@ -198,14 +193,14 @@ public class UserTest extends TestBase
     });
 
     txTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status)
+      public Object doInTransaction(final TransactionStatus status)
       {
         // (Un)assigning groups:
-        PFUserDO user = userDao.internalGetById(getUserId("UserTest.historyUser1a"));
-        Set<Integer> groupIdsToAssign = new HashSet<Integer>();
+        final PFUserDO user = userDao.internalGetById(getUserId("UserTest.historyUser1a"));
+        final Set<Integer> groupIdsToAssign = new HashSet<Integer>();
         groupIdsToAssign.add(getGroupId("UserTest.historyGroup2"));
         groupIdsToAssign.add(getGroupId("UserTest.historyGroup3"));
-        Set<Integer> groupIdsToUnassign = new HashSet<Integer>();
+        final Set<Integer> groupIdsToUnassign = new HashSet<Integer>();
         groupIdsToUnassign.add(getGroupId("UserTest.historyGroup1"));
         groupDao.assignGroups(user, groupIdsToAssign, groupIdsToUnassign);
         return null;
@@ -213,7 +208,7 @@ public class UserTest extends TestBase
     });
 
     txTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status)
+      public Object doInTransaction(final TransactionStatus status)
       {
         // Checking history of updated user:
         HistoryEntry[] historyEntries = userDao.getHistoryEntries(getUser("UserTest.historyUser1a"));
@@ -223,8 +218,8 @@ public class UserTest extends TestBase
 
         // Checking history entries of updated groups:
         historyEntries = groupDao.getHistoryEntries(getGroup("UserTest.historyGroup1"));
-        GroupDO group = groupDao.internalGetById(getGroupId("UserTest.historyGroup1"));
-        Set<PFUserDO> users = group.getAssignedUsers();
+        final GroupDO group = groupDao.internalGetById(getGroupId("UserTest.historyGroup1"));
+        final Set<PFUserDO> users = group.getAssignedUsers();
         assertEquals(1, users.size()); // Assigned users are: "UserTest.historyUser1b"
         assertEquals("2 history entries (1 insert and 1 assigned users", 2, historyEntries.length); // insert and update assignedUsers
         assertGroupHistoryEntry(historyEntries[0], null, new String[] { "UserTest.historyUser1a"});
@@ -239,7 +234,7 @@ public class UserTest extends TestBase
     final Serializable[] ids = new Integer[2];
     txTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
     txTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status)
+      public Object doInTransaction(final TransactionStatus status)
       {
         PFUserDO user = createTestUser("42");
         ids[0] = userDao.internalSave(user);
@@ -250,9 +245,9 @@ public class UserTest extends TestBase
     });
     txTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
     txTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status)
+      public Object doInTransaction(final TransactionStatus status)
       {
-        PFUserDO user = createTestUser("42");
+        final PFUserDO user = createTestUser("42");
         assertTrue("Username should already exist.", userDao.doesUsernameAlreadyExist(user));
         user.setUsername("5");
         assertFalse("Signature should not exist.", userDao.doesUsernameAlreadyExist(user));
@@ -262,10 +257,10 @@ public class UserTest extends TestBase
     });
     txTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
     txTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status)
+      public Object doInTransaction(final TransactionStatus status)
       {
-        PFUserDO dbBook = userDao.internalGetById(ids[1]);
-        PFUserDO user = new PFUserDO();
+        final PFUserDO dbBook = userDao.internalGetById(ids[1]);
+        final PFUserDO user = new PFUserDO();
         user.copyValuesFrom(dbBook);
         assertFalse("Signature does not exist.", userDao.doesUsernameAlreadyExist(user));
         user.setUsername("42");
@@ -278,18 +273,18 @@ public class UserTest extends TestBase
     });
     txTemplate.setPropagationBehavior(TransactionTemplate.PROPAGATION_REQUIRES_NEW);
     txTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status)
+      public Object doInTransaction(final TransactionStatus status)
       {
-        PFUserDO user = userDao.internalGetById(ids[1]);
+        final PFUserDO user = userDao.internalGetById(ids[1]);
         assertFalse("Signature does not exist.", userDao.doesUsernameAlreadyExist(user));
         return null;
       }
     });
   }
 
-  private PFUserDO createTestUser(String username)
+  private PFUserDO createTestUser(final String username)
   {
-    PFUserDO user = new PFUserDO();
+    final PFUserDO user = new PFUserDO();
     user.setUsername(username);
     return user;
   }
@@ -300,11 +295,11 @@ public class UserTest extends TestBase
    * @param expectedAssignedUserNames
    * @param expectedUnassignedUserNames
    */
-  void assertGroupHistoryEntry(HistoryEntry entry, String[] expectedAssignedUserNames, String[] expectedUnassignedUserNames)
+  void assertGroupHistoryEntry(final HistoryEntry entry, final String[] expectedAssignedUserNames, final String[] expectedUnassignedUserNames)
   {
-    List<PropertyDelta> list = entry.getDelta();
+    final List<PropertyDelta> list = entry.getDelta();
     assertEquals(1, list.size());
-    PropertyDelta delta = list.get(0);
+    final PropertyDelta delta = list.get(0);
     assertUserIds(expectedUnassignedUserNames, delta.getOldValue());
     assertUserIds(expectedAssignedUserNames, delta.getNewValue());
   }
@@ -315,11 +310,11 @@ public class UserTest extends TestBase
    * @param expectedAssignedGroupNames
    * @param expectedUnassignedGroupNames
    */
-  void assertUserHistoryEntry(HistoryEntry entry, String[] expectedAssignedGroupNames, String[] expectedUnassignedGroupNames)
+  void assertUserHistoryEntry(final HistoryEntry entry, final String[] expectedAssignedGroupNames, final String[] expectedUnassignedGroupNames)
   {
-    List<PropertyDelta> list = entry.getDelta();
+    final List<PropertyDelta> list = entry.getDelta();
     assertEquals(1, list.size());
-    PropertyDelta delta = list.get(0);
+    final PropertyDelta delta = list.get(0);
     assertGroupIds(expectedUnassignedGroupNames, delta.getOldValue());
     assertGroupIds(expectedAssignedGroupNames, delta.getNewValue());
   }
@@ -330,12 +325,12 @@ public class UserTest extends TestBase
    * @param expectedGroupNames
    * @param groupsString csv of groups, e. g. {2,4,7}
    */
-  void assertGroupIds(String[] expectedGroupNames, String groupsString)
+  void assertGroupIds(final String[] expectedGroupNames, final String groupsString)
   {
     if (expectedGroupNames == null) {
       assertTrue(StringUtils.isEmpty(groupsString));
     }
-    String[] expectedGroups = new String[expectedGroupNames.length];
+    final String[] expectedGroups = new String[expectedGroupNames.length];
     for (int i = 0; i < expectedGroupNames.length; i++) {
       expectedGroups[i] = getGroup(expectedGroupNames[i]).getId().toString();
     }
@@ -347,26 +342,26 @@ public class UserTest extends TestBase
    * @param expectedUserNames
    * @param groupsString csv of groups, e. g. {2,4,7}
    */
-  void assertUserIds(String[] expectedUserNames, String usersString)
+  void assertUserIds(final String[] expectedUserNames, final String usersString)
   {
     if (expectedUserNames == null) {
       assertTrue(StringUtils.isEmpty(usersString));
       return;
     }
-    String[] expectedUsers = new String[expectedUserNames.length];
+    final String[] expectedUsers = new String[expectedUserNames.length];
     for (int i = 0; i < expectedUserNames.length; i++) {
       expectedUsers[i] = getUser(expectedUserNames[i]).getId().toString();
     }
     assertIds(expectedUsers, usersString);
   }
 
-  private void assertIds(String[] expectedEntries, String csvString)
+  private void assertIds(final String[] expectedEntries, final String csvString)
   {
-    String[] entries = StringUtils.split(csvString, ',');
-    for (String expected : expectedEntries) {
+    final String[] entries = StringUtils.split(csvString, ',');
+    for (final String expected : expectedEntries) {
       assertTrue("'" + expected + "' expected in: " + ArrayUtils.toString(entries), ArrayUtils.contains(entries, expected));
     }
-    for (String entry : entries) {
+    for (final String entry : entries) {
       assertTrue("'" + entry + "' doesn't expected in: " + ArrayUtils.toString(expectedEntries), ArrayUtils
           .contains(expectedEntries, entry));
     }
