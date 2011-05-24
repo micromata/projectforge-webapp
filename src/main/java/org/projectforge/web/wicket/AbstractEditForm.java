@@ -32,12 +32,13 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.UserException;
 import org.projectforge.web.scripting.ScriptEditForm;
 import org.projectforge.web.timesheet.TimesheetEditForm;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends AbstractEditPage< ? , ? , ? >> extends
-    AbstractSecuredForm<O, P>
+AbstractSecuredForm<O, P>
 {
   private static final long serialVersionUID = -6707610179583359099L;
 
@@ -72,7 +73,7 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
    */
   protected int colspan = 2;
 
-  public AbstractEditForm(P parentPage, O data)
+  public AbstractEditForm(final P parentPage, final O data)
   {
     super(parentPage);
     this.data = data;
@@ -84,12 +85,14 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
   {
     super.init();
     buttonCell = new WebMarkupContainer("buttonCell") {
+      @Override
       public boolean isTransparentResolver()
       {
         return true;
       }
 
-      protected void onComponentTag(ComponentTag tag)
+      @Override
+      protected void onComponentTag(final ComponentTag tag)
       {
         tag.put("colspan", colspan - 1);
       }
@@ -174,7 +177,7 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
 
     addBottomRows();
   }
-  
+
   @Override
   public void onBeforeRender()
   {
@@ -188,50 +191,64 @@ public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends 
    */
   protected void updateButtonVisibility()
   {
-    @SuppressWarnings("unchecked")
-    final BaseDao<O> baseDao = (BaseDao<O>) parentPage.getBaseDao();
-    if (isNew() == true) {
-      updateButtonPanel.setVisible(false);
-      undeleteButtonPanel.setVisible(false);
-      markAsDeletedButtonPanel.setVisible(false);
-      deleteButtonPanel.setVisible(false);
-      createButtonPanel.setVisible(baseDao.hasLoggedInUserInsertAccess());
-      if (createButtonPanel.isVisible() == true) {
-        setDefaultButton(createButton);
-      } else {
-        setDefaultButton(cancelButton);
-      }
-    } else {
-      createButtonPanel.setVisible(false);
-      if (getData().isDeleted() == true) {
-        undeleteButtonPanel.setVisible(baseDao.hasLoggedInUserUpdateAccess(getData(), getData(), false));
-        if (undeleteButtonPanel.isVisible() == true) {
-          setDefaultButton(undeleteButton);
-        }
+    try {
+      @SuppressWarnings("unchecked")
+      final BaseDao<O> baseDao = (BaseDao<O>) parentPage.getBaseDao();
+      if (isNew() == true) {
+        updateButtonPanel.setVisible(false);
+        undeleteButtonPanel.setVisible(false);
         markAsDeletedButtonPanel.setVisible(false);
         deleteButtonPanel.setVisible(false);
-        updateButtonPanel.setVisible(false);
-      } else {
-        undeleteButtonPanel.setVisible(false);
-        if (parentPage.getBaseDao().isHistorizable() == true) {
-          deleteButtonPanel.setVisible(false);
-          markAsDeletedButtonPanel.setVisible(baseDao.hasLoggedInUserDeleteAccess(getData(), getData(), false));
-        } else {
-          deleteButtonPanel.setVisible(baseDao.hasLoggedInUserDeleteAccess(getData(), getData(), false));
-          markAsDeletedButtonPanel.setVisible(false);
-        }
-        updateButtonPanel.setVisible(baseDao.hasLoggedInUserUpdateAccess(getData(), getData(), false));
-        if (updateButtonPanel.isVisible() == true) {
-          setDefaultButton(updateButton);
+        createButtonPanel.setVisible(baseDao.hasLoggedInUserInsertAccess());
+        if (createButtonPanel.isVisible() == true) {
+          setDefaultButton(createButton);
         } else {
           setDefaultButton(cancelButton);
         }
+      } else {
+        createButtonPanel.setVisible(false);
+        if (getData().isDeleted() == true) {
+          undeleteButtonPanel.setVisible(baseDao.hasLoggedInUserUpdateAccess(getData(), getData(), false));
+          if (undeleteButtonPanel.isVisible() == true) {
+            setDefaultButton(undeleteButton);
+          }
+          markAsDeletedButtonPanel.setVisible(false);
+          deleteButtonPanel.setVisible(false);
+          updateButtonPanel.setVisible(false);
+        } else {
+          undeleteButtonPanel.setVisible(false);
+          if (parentPage.getBaseDao().isHistorizable() == true) {
+            deleteButtonPanel.setVisible(false);
+            markAsDeletedButtonPanel.setVisible(baseDao.hasLoggedInUserDeleteAccess(getData(), getData(), false));
+          } else {
+            deleteButtonPanel.setVisible(baseDao.hasLoggedInUserDeleteAccess(getData(), getData(), false));
+            markAsDeletedButtonPanel.setVisible(false);
+          }
+          updateButtonPanel.setVisible(baseDao.hasLoggedInUserUpdateAccess(getData(), getData(), false));
+          if (updateButtonPanel.isVisible() == true) {
+            setDefaultButton(updateButton);
+          } else {
+            setDefaultButton(cancelButton);
+          }
+        }
+      }
+    } catch (final RuntimeException ex) {
+      // It's possible that an exception is thrown by the dao (e. g. Exception in TaskDao if a cyclic reference was detected).
+      if (ex instanceof UserException) {
+        // If an UserException was thrown then try to show the message as validation error:
+        final String i18nKey = ((UserException) ex).getI18nKey();
+        if (i18nKey != null) {
+          addError(i18nKey);
+        }
+      } else {
+        throw ex;
       }
     }
   }
 
   /**
-   * Set the style class for the default buttons. Overwrite this, if you have a different default button than create, update or undelete (don't call super!).
+   * Set the style class for the default buttons. Overwrite this, if you have a different default button than create, update or undelete
+   * (don't call super!).
    */
   protected void markDefaultButtons()
   {
