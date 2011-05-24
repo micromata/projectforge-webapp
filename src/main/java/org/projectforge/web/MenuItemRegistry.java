@@ -256,7 +256,7 @@ public class MenuItemRegistry
     // Menu entries
     // COMMON
     reg.register(common, MenuItemDefId.CALENDAR, 10, CalendarPage.class); // Visible for all.
-    reg.register(common, MenuItemDefId.SPACE_LIST, 20, SpaceListPage.class); // Visible for all.
+    reg.register(common, MenuItemDefId.SPACE_LIST, 20, SpaceListPage.class, developmentMode); // Under development..
     reg.register(common, MenuItemDefId.BOOK_LIST, 30, BookListPage.class); // Visible for all.
     reg.register(common, MenuItemDefId.ADDRESS_LIST, 40, AddressListPage.class).setMobileMenu(AddressMobileListPage.class, 100); // Visible for all.
     reg.register(common, MenuItemDefId.PHONE_CALL, 50, PhoneCallPage.class);
