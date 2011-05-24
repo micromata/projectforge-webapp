@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
@@ -57,6 +56,7 @@ import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.core.PriorityFormatter;
+import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.fibu.OrderPositionsPanel;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPrefListPage;
@@ -108,7 +108,10 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
 
-  protected TaskTreePage taskTreePage; // Sibling page.
+  /**
+   * Sibling page (if the user switches between tree and list view.
+   */
+  private TaskTreePage taskTreePage;
 
   static String getCssStyle(final TaskDO task, final Integer preselectedTaskNode)
   {
@@ -213,26 +216,15 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
     super(parameters, "task");
   }
 
-  public TaskListPage(final TaskTreePage taskTreePage, final PageParameters parameters)
+  /**
+   * Called if the user clicks on button "list view".
+   * @param taskTreePage
+   * @param parameters
+   */
+  TaskListPage(final TaskTreePage taskTreePage, final PageParameters parameters)
   {
     super(parameters, taskTreePage.caller, taskTreePage.selectProperty, "task");
     this.taskTreePage = taskTreePage;
-  }
-
-  @Override
-  protected boolean onSearchSubmit()
-  {
-    final boolean result = super.onSearchSubmit();
-    if (taskTreePage != null && result == false) {
-      // Sibling task tree page is given and no response page was set in super.onSearchSubmit().
-      if (StringUtils.isBlank(form.getSearchFilter().getSearchString()) == true
-          && form.getSearchFilter().isUseModificationFilter() == false) {
-        // OK, search string is empty and modification filter is unused, so redirect to tree view.
-        setResponsePage(taskTreePage);
-        return true;
-      }
-    }
-    return false;
   }
 
   @SuppressWarnings("serial")
@@ -363,6 +355,26 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
     final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", UserPrefArea.TASK_FAVORITE);
     final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("favorites"));
     addContentMenuEntry(menuEntry);
+  }
+
+  void onTreeViewSubmit()
+  {
+    if (taskTreePage != null) {
+      setResponsePage(taskTreePage);
+    } else {
+      setResponsePage(new TaskTreePage(this, getPageParameters()));
+    }
+  }
+
+
+  ISelectCallerPage getCaller()
+  {
+    return this.caller;
+  }
+
+  String getSelectProperty()
+  {
+    return this.selectProperty;
   }
 
   @Override

@@ -23,7 +23,6 @@
 
 package org.projectforge.web.task;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -71,6 +70,11 @@ public class TaskTreePage extends AbstractSecuredPage
 
   private final TaskTreeTablePanel taskTreeTablePanel;
 
+  /**
+   * Sibling page (if the user switches between tree and list view.
+   */
+  private TaskListPage taskListPage;
+
   public TaskTreePage(final PageParameters parameters)
   {
     super(parameters);
@@ -79,6 +83,17 @@ public class TaskTreePage extends AbstractSecuredPage
       taskTreeTablePanel.setHighlightedRowId(parameters.getAsInteger(AbstractListPage.PARAMETER_HIGHLIGHTED_ROW));
     }
     init();
+  }
+
+  /**
+   * Called if the user clicks on button "tree view".
+   * @param taskTreePage
+   * @param parameters
+   */
+  TaskTreePage(final TaskListPage taskListPage, final PageParameters parameters)
+  {
+    this(taskListPage.getCaller(), taskListPage.getSelectProperty());
+    this.taskListPage = taskListPage;
   }
 
   public TaskTreePage(final ISelectCallerPage caller, final String selectProperty)
@@ -114,7 +129,6 @@ public class TaskTreePage extends AbstractSecuredPage
       menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("favorites"));
       addContentMenuEntry(menuEntry);
       if (accessChecker.isLoggedInUserMemberOfAdminGroup() == true) {
-        contentMenuEntries.add(menuEntry);
         menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
           @Override
           public void onClick()
@@ -171,7 +185,7 @@ public class TaskTreePage extends AbstractSecuredPage
   /**
    * The root node will only be shown in select mode and for admin users.
    */
-  public boolean isShowRootNode()
+  boolean isShowRootNode()
   {
     return (accessChecker.isLoggedInUserMemberOfAdminGroup()) || accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP);
   }
@@ -215,16 +229,16 @@ public class TaskTreePage extends AbstractSecuredPage
 
   protected void onSearchSubmit()
   {
-    if (StringUtils.isNotBlank(getTaskFilter().getSearchString()) == true) {
-      setResponsePage(new TaskListPage(this, getPageParameters()));
-    } else {
-      refresh();
-    }
+    refresh();
   }
 
-  protected void onListViewSubmit()
+  void onListViewSubmit()
   {
-    setResponsePage(new TaskListPage(this, getPageParameters()));
+    if (taskListPage != null) {
+      setResponsePage(taskListPage);
+    } else {
+      setResponsePage(new TaskListPage(this, getPageParameters()));
+    }
   }
 
   protected void onResetSubmit()

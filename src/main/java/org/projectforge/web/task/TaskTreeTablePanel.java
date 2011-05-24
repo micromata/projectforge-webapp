@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
@@ -39,6 +40,7 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.fibu.AuftragsPositionVO;
 import org.projectforge.fibu.kost.KostCache;
 import org.projectforge.task.TaskDO;
+import org.projectforge.task.TaskFilter;
 import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.ProjectForgeGroup;
@@ -82,7 +84,7 @@ class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
 
-  private TaskTreePage parentPage;
+  private final TaskTreePage parentPage;
 
   TaskTreeTablePanel(final String id, final TaskTreePage parentPage)
   {
@@ -122,7 +124,7 @@ class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
   }
 
   @Override
-  protected String getCssStyle(TaskTreeTableNode node)
+  protected String getCssStyle(final TaskTreeTableNode node)
   {
     return TaskListPage.getCssStyle(node.getTask(), highlightedRowId);
   }
@@ -131,9 +133,9 @@ class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
   {
     return parentPage.getImageUrl(image);
   }
-  
+
   @Override
-  protected boolean onSetEvent(AjaxRequestTarget target, TreeTableEvent event, TreeTableNode node)
+  protected boolean onSetEvent(final AjaxRequestTarget target, final TreeTableEvent event, final TreeTableNode node)
   {
     if (target == null) {
       // User has clicked an icon for opening in new browser window.
@@ -146,7 +148,7 @@ class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
   }
 
   @Override
-  protected void onSetEventNode(Serializable hashId)
+  protected void onSetEventNode(final Serializable hashId)
   {
     super.onSetEventNode(hashId);
     parentPage.persistOpenNodes();
@@ -172,15 +174,17 @@ class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
   @Override
   protected List<TaskTreeTableNode> buildTreeList()
   {
-    final List<TaskTreeTableNode> treeList = getTreeTable().getNodeList(parentPage.form.getSearchFilter());
-    if (parentPage.isShowRootNode() == true) {
+    final TaskFilter taskFilter = parentPage.form.getSearchFilter();
+    taskFilter.resetMatch();
+    final List<TaskTreeTableNode> treeList = getTreeTable().getNodeList(taskFilter);
+    if (parentPage.isShowRootNode() == true && StringUtils.isBlank(parentPage.getTaskFilter().getSearchString()) == true) {
       treeList.add(new TaskTreeTableNode(null, taskTree.getRootTaskNode()));
     }
     return treeList;
   }
 
   @Override
-  protected void addColumns(RepeatingView colBodyRepeater, String cssStyle, TaskTreeTableNode node)
+  protected void addColumns(final RepeatingView colBodyRepeater, final String cssStyle, final TaskTreeTableNode node)
   {
     final TaskNode taskNode = node.getTaskNode();
     final TaskDO task = node.getTask();
@@ -221,7 +225,7 @@ class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
   }
 
   @Override
-  protected TreeIconsActionPanel< ? extends TreeTableNode> createTreeIconsActionPanel(TaskTreeTableNode node)
+  protected TreeIconsActionPanel< ? extends TreeTableNode> createTreeIconsActionPanel(final TaskTreeTableNode node)
   {
     final TaskDO task = node.getTask();
     final Label formattedTaskLabel = new Label(ListSelectActionPanel.LABEL_ID, task.getTitle());

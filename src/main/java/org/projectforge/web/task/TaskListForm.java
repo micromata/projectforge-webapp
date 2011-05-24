@@ -24,11 +24,14 @@
 package org.projectforge.web.task;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.CoolCheckBoxPanel;
-
+import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 public class TaskListForm extends AbstractListForm<TaskFilter, TaskListPage>
 {
@@ -42,12 +45,26 @@ public class TaskListForm extends AbstractListForm<TaskFilter, TaskListPage>
     super.init();
     filterContainer.add(new CoolCheckBoxPanel("notOpenedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "notOpened"),
         getString("task.status.notOpened"), true));
-    filterContainer.add(new CoolCheckBoxPanel("openedCheckBox", new PropertyModel<Boolean>(searchFilter, "opened"), getString("task.status.opened"), true));
-    filterContainer.add(new CoolCheckBoxPanel("closedCheckBox", new PropertyModel<Boolean>(searchFilter, "closed"), getString("task.status.closed"), true));
-    filterContainer.add(new CoolCheckBoxPanel("deletedCheckBox", new PropertyModel<Boolean>(searchFilter, "deleted"), getString("deleted"), true));
-}
+    filterContainer.add(new CoolCheckBoxPanel("openedCheckBox", new PropertyModel<Boolean>(searchFilter, "opened"),
+        getString("task.status.opened"), true));
+    filterContainer.add(new CoolCheckBoxPanel("closedCheckBox", new PropertyModel<Boolean>(searchFilter, "closed"),
+        getString("task.status.closed"), true));
+    filterContainer.add(new CoolCheckBoxPanel("deletedCheckBox", new PropertyModel<Boolean>(searchFilter, "deleted"), getString("deleted"),
+        true));
 
-  public TaskListForm(TaskListPage parentPage)
+    @SuppressWarnings("serial")
+    final Button taskTreeButton = new Button("button", new Model<String>(getString("task.tree.perspective"))) {
+      @Override
+      public final void onSubmit()
+      {
+        getParentPage().onTreeViewSubmit();
+      }
+    };
+    taskTreeButton.add(WebConstants.BUTTON_CLASS_NOBUTTON);
+    addActionButton(new SingleButtonPanel(getNewActionButtonChildId(), taskTreeButton));
+  }
+
+  public TaskListForm(final TaskListPage parentPage)
   {
     super(parentPage);
   }
