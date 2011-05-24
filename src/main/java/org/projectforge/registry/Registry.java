@@ -31,6 +31,7 @@ import java.util.Map;
 import org.apache.commons.lang.Validate;
 import org.projectforge.core.BaseDao;
 import org.projectforge.task.TaskTree;
+import org.projectforge.user.UserGroupCache;
 
 /**
  * Registry for dao's. Here you can register additional daos and plugins (extensions of ProjectForge).
@@ -43,13 +44,15 @@ public class Registry
 
   private static final Registry instance = new Registry();
 
-  private Map<String, RegistryEntry> mapByName = new HashMap<String, RegistryEntry>();
+  private final Map<String, RegistryEntry> mapByName = new HashMap<String, RegistryEntry>();
 
-  private Map<Class< ? extends BaseDao< ? >>, RegistryEntry> mapByClass = new HashMap<Class< ? extends BaseDao< ? >>, RegistryEntry>();
+  private final Map<Class< ? extends BaseDao< ? >>, RegistryEntry> mapByClass = new HashMap<Class< ? extends BaseDao< ? >>, RegistryEntry>();
 
-  private List<RegistryEntry> orderedList = new ArrayList<RegistryEntry>();
+  private final List<RegistryEntry> orderedList = new ArrayList<RegistryEntry>();
 
   private TaskTree taskTree;
+
+  private UserGroupCache userGroupCache;
 
   public static Registry instance()
   {
@@ -83,7 +86,7 @@ public class Registry
     Validate.notNull(entry);
     mapByName.put(entry.getId(), entry);
     mapByClass.put(entry.getDaoClassType(), entry);
-    int idx = orderedList.indexOf(existingEntry);
+    final int idx = orderedList.indexOf(existingEntry);
     if (idx < 0) {
       log.error("Registry entry '" + existingEntry.getId() + "' not found. Appending the given entry to the list.");
       orderedList.add(entry);
@@ -133,6 +136,16 @@ public class Registry
   public TaskTree getTaskTree()
   {
     return taskTree;
+  }
+
+  public UserGroupCache getUserGroupCache()
+  {
+    return userGroupCache;
+  }
+
+  public void setUserGroupCache(final UserGroupCache userGroupCache)
+  {
+    this.userGroupCache = userGroupCache;
   }
 
   private Registry()
