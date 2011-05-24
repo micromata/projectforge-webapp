@@ -225,6 +225,7 @@ public class DaoRegistry
     }
     register(CONFIGURATION, ConfigurationDao.class, configurationDao, "administration.configuration");
     register(USER, UserDao.class, userDao, "user");
+    Registry.instance().setUserGroupCache(userDao.getUserGroupCache());
     register(GROUP, GroupDao.class, groupDao, "group");
     register(TASK, TaskDao.class, taskDao, "task"); // needs PFUserDO
     Registry.instance().setTaskTree(taskDao.getTaskTree());
@@ -232,7 +233,7 @@ public class DaoRegistry
 
     register(ADDRESS, AddressDao.class, addressDao, "address");
     register(TIMESHEET, TimesheetDao.class, timesheetDao, "timesheet") //
-        .setSearchFilterClass(TimesheetFilter.class);
+    .setSearchFilterClass(TimesheetFilter.class);
     register(BOOK, BookDao.class, bookDao, "book");
 
     register(CUSTOMER, KundeDao.class, kundeDao, "fibu.kunde");
@@ -242,20 +243,20 @@ public class DaoRegistry
     register(COST2_Type, Kost2ArtDao.class, kost2ArtDao, "fibu.kost2art");
     register(COST2, Kost2Dao.class, kost2Dao, "fibu.kost2"); // Needs kost2Art and project
     register(COST_ASSIGNMENT, KostZuweisungDao.class, kostZuweisungDao, "fibu.") // Needs kost, invoices, employee salaries
-        .setFullTextSearchSupport(false);
+    .setFullTextSearchSupport(false);
 
     register(ORDERBOOK, AuftragDao.class, auftragDao, "fibu.auftrag") // Needs customer, project
-        .setNestedDOClasses(AuftragsPositionDO.class);
+    .setNestedDOClasses(AuftragsPositionDO.class);
     register(OUTGOING_INVOICE, RechnungDao.class, rechnungDao, "fibu.rechnung") // Needs customer, project
-        .setNestedDOClasses(RechnungsPositionDO.class);
+    .setNestedDOClasses(RechnungsPositionDO.class);
     register(INCOMING_INVOICE, EingangsrechnungDao.class, eingangsrechnungDao, "fibu.eingangsrechnung") //
-        .setNestedDOClasses(EingangsrechnungsPositionDO.class);
+    .setNestedDOClasses(EingangsrechnungsPositionDO.class);
     register(ACCOUNTING_RECORD, BuchungssatzDao.class, buchungssatzDao, "fibu.buchungssatz"); // Need account, cost1 and cost2.
     register(ACCOUNT, KontoDao.class, kontoDao, "fibu.konto");
     register(EMPLOYEE, EmployeeDao.class, employeeDao, "fibu.employee").setScriptingDao(new EmployeeScriptingDao(employeeDao));
     register(EMPLOYEE_SALARY, EmployeeDao.class, employeeSalaryDao, "fibu.employee.saraly");
     register(BANK_ACCOUNT, BankAccountDao.class, bankAccountDao, "fibu.employee.saraly") //
-        .setNestedDOClasses(BankAccountingEntryDO.class, BankAccountBalanceDO.class);
+    .setNestedDOClasses(BankAccountingEntryDO.class, BankAccountBalanceDO.class);
 
     register(CONTRACT, ContractDao.class, contractDao, "legalAffaires.contract");
     register(OUTGOING_MAIL, PostausgangDao.class, postausgangDao, "orga.postausgang");
@@ -263,7 +264,7 @@ public class DaoRegistry
 
     register(GANTT, GanttChartDao.class, ganttChartDao, "gantt");
     register(HR_PLANNING, HRPlanningDao.class, hrPlanningDao, "hr.planning") //
-        .setNestedDOClasses(HRPlanningEntryDO.class);
+    .setNestedDOClasses(HRPlanningEntryDO.class);
 
     register(MEB, MebDao.class, mebDao, "meb");
     register(SCRIPT, ScriptDao.class, scriptDao, "scripting");
@@ -305,162 +306,162 @@ public class DaoRegistry
     return entry;
   }
 
-  public void setAccessDao(AccessDao accessDao)
+  public void setAccessDao(final AccessDao accessDao)
   {
     this.accessDao = accessDao;
   }
 
-  public void setAddressDao(AddressDao addressDao)
+  public void setAddressDao(final AddressDao addressDao)
   {
     this.addressDao = addressDao;
   }
 
-  public void setAuftragDao(AuftragDao auftragDao)
+  public void setAuftragDao(final AuftragDao auftragDao)
   {
     this.auftragDao = auftragDao;
   }
 
-  public void setBankAccountDao(BankAccountDao bankAccountDao)
+  public void setBankAccountDao(final BankAccountDao bankAccountDao)
   {
     this.bankAccountDao = bankAccountDao;
   }
 
-  public void setBuchungssatzDao(BuchungssatzDao buchungssatzDao)
+  public void setBuchungssatzDao(final BuchungssatzDao buchungssatzDao)
   {
     this.buchungssatzDao = buchungssatzDao;
   }
 
-  public void setBookDao(BookDao bookDao)
+  public void setBookDao(final BookDao bookDao)
   {
     this.bookDao = bookDao;
   }
 
-  public void setConfigurationDao(ConfigurationDao configurationDao)
+  public void setConfigurationDao(final ConfigurationDao configurationDao)
   {
     this.configurationDao = configurationDao;
   }
 
-  public void setContractDao(ContractDao contractDao)
+  public void setContractDao(final ContractDao contractDao)
   {
     this.contractDao = contractDao;
   }
 
-  public void setEmployeeDao(EmployeeDao employeeDao)
+  public void setEmployeeDao(final EmployeeDao employeeDao)
   {
     this.employeeDao = employeeDao;
   }
 
-  public void setEmployeeSalaryDao(EmployeeSalaryDao employeeSalaryDao)
+  public void setEmployeeSalaryDao(final EmployeeSalaryDao employeeSalaryDao)
   {
     this.employeeSalaryDao = employeeSalaryDao;
   }
 
-  public void setEingangsrechnungDao(EingangsrechnungDao eingangsrechnungDao)
+  public void setEingangsrechnungDao(final EingangsrechnungDao eingangsrechnungDao)
   {
     this.eingangsrechnungDao = eingangsrechnungDao;
   }
 
-  public void setGanttChartDao(GanttChartDao ganttChartDao)
+  public void setGanttChartDao(final GanttChartDao ganttChartDao)
   {
     this.ganttChartDao = ganttChartDao;
   }
 
-  public void setGroupDao(GroupDao groupDao)
+  public void setGroupDao(final GroupDao groupDao)
   {
     this.groupDao = groupDao;
   }
 
-  public void setHRPlanningDao(HRPlanningDao hrPlanningDao)
+  public void setHRPlanningDao(final HRPlanningDao hrPlanningDao)
   {
     this.hrPlanningDao = hrPlanningDao;
   }
 
-  public void setKontoDao(KontoDao kontoDao)
+  public void setKontoDao(final KontoDao kontoDao)
   {
     this.kontoDao = kontoDao;
   }
 
-  public void setKost1Dao(Kost1Dao kost1Dao)
+  public void setKost1Dao(final Kost1Dao kost1Dao)
   {
     this.kost1Dao = kost1Dao;
   }
 
-  public void setKost2ArtDao(Kost2ArtDao kost2ArtDao)
+  public void setKost2ArtDao(final Kost2ArtDao kost2ArtDao)
   {
     this.kost2ArtDao = kost2ArtDao;
   }
 
-  public void setKost2Dao(Kost2Dao kost2Dao)
+  public void setKost2Dao(final Kost2Dao kost2Dao)
   {
     this.kost2Dao = kost2Dao;
   }
 
-  public void setKostZuweisungDao(KostZuweisungDao kostZuweisungDao)
+  public void setKostZuweisungDao(final KostZuweisungDao kostZuweisungDao)
   {
     this.kostZuweisungDao = kostZuweisungDao;
   }
 
-  public void setKundeDao(KundeDao kundeDao)
+  public void setKundeDao(final KundeDao kundeDao)
   {
     this.kundeDao = kundeDao;
   }
 
-  public void setMebDao(MebDao mebDao)
+  public void setMebDao(final MebDao mebDao)
   {
     this.mebDao = mebDao;
   }
 
-  public void setPostausgangDao(PostausgangDao postausgangDao)
+  public void setPostausgangDao(final PostausgangDao postausgangDao)
   {
     this.postausgangDao = postausgangDao;
   }
 
-  public void setPosteingangDao(PosteingangDao posteingangDao)
+  public void setPosteingangDao(final PosteingangDao posteingangDao)
   {
     this.posteingangDao = posteingangDao;
   }
 
-  public void setRechnungDao(RechnungDao rechnungDao)
+  public void setRechnungDao(final RechnungDao rechnungDao)
   {
     this.rechnungDao = rechnungDao;
   }
 
-  public void setProjektDao(ProjektDao projektDao)
+  public void setProjektDao(final ProjektDao projektDao)
   {
     this.projektDao = projektDao;
   }
 
-  public void setScriptDao(ScriptDao scriptDao)
+  public void setScriptDao(final ScriptDao scriptDao)
   {
     this.scriptDao = scriptDao;
   }
-  
-  public void setSpaceDao(SpaceDao spaceDao)
+
+  public void setSpaceDao(final SpaceDao spaceDao)
   {
     this.spaceDao = spaceDao;
   }
 
-  public void setTaskDao(TaskDao taskDao)
+  public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
   }
 
-  public void setTimesheetDao(TimesheetDao timesheetDao)
+  public void setTimesheetDao(final TimesheetDao timesheetDao)
   {
     this.timesheetDao = timesheetDao;
   }
 
-  public void setUserDao(UserDao userDao)
+  public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
   }
 
-  public void setUserPrefDao(UserPrefDao userPrefDao)
+  public void setUserPrefDao(final UserPrefDao userPrefDao)
   {
     this.userPrefDao = userPrefDao;
   }
 
-  public void setUserRightDao(UserRightDao userRightDao)
+  public void setUserRightDao(final UserRightDao userRightDao)
   {
     this.userRightDao = userRightDao;
   }
