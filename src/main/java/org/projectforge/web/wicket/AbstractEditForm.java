@@ -68,6 +68,8 @@ AbstractSecuredForm<O, P>
 
   protected SingleButtonPanel undeleteButtonPanel;
 
+  protected FeedbackPanel feedbackPanel;
+
   /**
    * Change this value if the number of columns of your form table differ.
    */
@@ -98,7 +100,9 @@ AbstractSecuredForm<O, P>
       }
     };
     add(buttonCell);
-    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
+    feedbackPanel = new FeedbackPanel("feedback");
+    feedbackPanel.setOutputMarkupId(true);
+    add(feedbackPanel);
 
     addButtonPanel();
 
@@ -293,4 +297,9 @@ AbstractSecuredForm<O, P>
 
   /** This class uses the logger of the extended class. */
   protected abstract Logger getLogger();
+
+  public FeedbackPanel getFeedbackPanel()
+  {
+    return feedbackPanel;
+  }
 }
