@@ -67,13 +67,13 @@ public class ToDoFormRenderer extends AbstractFormRenderer
 {
   private static final long serialVersionUID = -9175062586210446142L;
 
-  private ToDoDO data;
+  private final ToDoDO data;
 
-  private ToDoEditPage toDoEditPage;
+  private final ToDoEditPage toDoEditPage;
 
-  private UserGroupCache userGroupCache;
+  private final UserGroupCache userGroupCache;
 
-  private UserPrefDao userPrefDao;
+  private final UserPrefDao userPrefDao;
 
   protected DatePanel dueDatePanel;
 
@@ -126,7 +126,7 @@ public class ToDoFormRenderer extends AbstractFormRenderer
           }
 
           @Override
-          protected CharSequence getDefaultChoice(Object selected)
+          protected CharSequence getDefaultChoice(final Object selected)
           {
             return "";
           }
@@ -180,7 +180,7 @@ public class ToDoFormRenderer extends AbstractFormRenderer
       final LabelValueChoiceRenderer<ToDoStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<ToDoStatus>(container, ToDoStatus
           .values());
       final DropDownChoice<ToDoStatus> statusChoice = new DropDownChoice<ToDoStatus>(SELECT_ID, new PropertyModel<ToDoStatus>(data,
-          "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
+      "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
       statusChoice.setNullValid(true);
       doPanel.addDropDownChoice(statusChoice, new PanelContext(LayoutLength.THREEQUART, getString("plugins.todo.status"), LABEL_LENGTH));
     }
@@ -191,9 +191,10 @@ public class ToDoFormRenderer extends AbstractFormRenderer
         data.setAssignee(assignee);
       }
       final UserSelectPanel assigneeUserSelectPanel = new UserSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<PFUserDO>(data,
-          "assignee"), toDoEditPage, "assigneeId");
+      "assignee"), toDoEditPage, "assigneeId");
       doPanel.addSelectPanel(assigneeUserSelectPanel, new PanelContext(VALUE_LENGTH, getString("plugins.todo.assignee"), LABEL_LENGTH)
-          .setStrong());
+      .setStrong());
+      assigneeUserSelectPanel.setRequired(true);
       assigneeUserSelectPanel.init();
     }
     {
@@ -203,7 +204,7 @@ public class ToDoFormRenderer extends AbstractFormRenderer
         data.setReporter(reporter);
       }
       final UserSelectPanel reporterUserSelectPanel = new UserSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<PFUserDO>(data,
-          "reporter"), toDoEditPage, "reporterId");
+      "reporter"), toDoEditPage, "reporterId");
       doPanel.addSelectPanel(reporterUserSelectPanel, new PanelContext(VALUE_LENGTH, getString("plugins.todo.reporter"), LABEL_LENGTH));
       reporterUserSelectPanel.init();
     }
@@ -218,48 +219,48 @@ public class ToDoFormRenderer extends AbstractFormRenderer
           toDoEditPage, "taskId");
       taskSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
       doPanel.addSelectPanel(taskSelectPanel, new PanelContext(VALUE_LENGTH, getString("task"), LABEL_LENGTH)
-          .setTooltip(getString("plugins.todo.task.tooltip")));
+      .setTooltip(getString("plugins.todo.task.tooltip")));
       taskSelectPanel.init();
     }
     {
       final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<GroupDO>(data, "group"),
           toDoEditPage, "groupId");
       doPanel.addSelectPanel(groupSelectPanel, new PanelContext(VALUE_LENGTH, getString("group"), LABEL_LENGTH)
-          .setTooltip(getString("plugins.todo.group.tooltip")));
+      .setTooltip(getString("plugins.todo.group.tooltip")));
       groupSelectPanel.init();
     }
     doPanel.addTextArea(new PanelContext(data, "description", VALUE_LENGTH, getString("description"), LABEL_LENGTH)
-        .setCssStyle("height: 10em;"));
+    .setCssStyle("height: 10em;"));
     doPanel.addTextArea(new PanelContext(data, "comment", VALUE_LENGTH, getString("comment"), LABEL_LENGTH).setCssStyle("height: 10em;"));
     if (ConfigXml.getInstance().isSendMailConfigured() == true) {
       doPanel.addLabel("", new PanelContext(LABEL_LENGTH).setBreakBefore(true));
       final RepeatingView repeatingView = doPanel.addRepeater(new PanelContext(VALUE_LENGTH)).getRepeatingView();
       final CheckBoxLabelPanel checkBoxLabelPanel = new CheckBoxLabelPanel(repeatingView.newChildId(), new PropertyModel<Boolean>(this,
-          "sendNotification"), getString("label.sendEMailNotification"));
+      "sendNotification"), getString("label.sendEMailNotification"));
       repeatingView.add(checkBoxLabelPanel);
       checkBoxLabelPanel.setTooltip(getString("plugins.todo.notification.tooltip"));
     }
-//    if (ConfigXml.getInstance().isSmsConfigured() == true) {
-//      doPanel.addLabel("", new PanelContext(LABEL_LENGTH).setBreakBefore(true));
-//      final RepeatingView repeatingView = doPanel.addRepeater(new PanelContext(VALUE_LENGTH)).getRepeatingView();
-//      final CheckBox checkBox = new CheckBox(CheckBoxLabelPanel.WICKET_ID, new PropertyModel<Boolean>(this, "sendShortMessage")) {
-//        @Override
-//        public boolean isEnabled()
-//        {
-//          return data.getAssignee() != null && data.getAssignee().getPersonalMebMobileNumbers(); // Außerdem: Beobachter (standardmäßig die letzten Bearbeiter/Reporter.
-//        }
-//      };
-//      final CheckBoxLabelPanel checkBoxLabelPanel = new CheckBoxLabelPanel(repeatingView.newChildId(), checkBox,
-//          getString("label.sendShortMessage"));
-//      repeatingView.add(checkBoxLabelPanel);
-//    }
+    //    if (ConfigXml.getInstance().isSmsConfigured() == true) {
+    //      doPanel.addLabel("", new PanelContext(LABEL_LENGTH).setBreakBefore(true));
+    //      final RepeatingView repeatingView = doPanel.addRepeater(new PanelContext(VALUE_LENGTH)).getRepeatingView();
+    //      final CheckBox checkBox = new CheckBox(CheckBoxLabelPanel.WICKET_ID, new PropertyModel<Boolean>(this, "sendShortMessage")) {
+    //        @Override
+    //        public boolean isEnabled()
+    //        {
+    //          return data.getAssignee() != null && data.getAssignee().getPersonalMebMobileNumbers(); // Außerdem: Beobachter (standardmäßig die letzten Bearbeiter/Reporter.
+    //        }
+    //      };
+    //      final CheckBoxLabelPanel checkBoxLabelPanel = new CheckBoxLabelPanel(repeatingView.newChildId(), checkBox,
+    //          getString("label.sendShortMessage"));
+    //      repeatingView.add(checkBoxLabelPanel);
+    //    }
 
     {
       // Save as template checkbox:
       doPanel.addLabel("", new PanelContext(LABEL_LENGTH).setBreakBefore(true));
       final RepeatingView repeatingView = doPanel.addRepeater(new PanelContext(VALUE_LENGTH)).getRepeatingView();
       final CheckBoxLabelPanel checkBoxLabelPanel = new CheckBoxLabelPanel(repeatingView.newChildId(), new PropertyModel<Boolean>(this,
-          "saveAsTemplate"), getString("user.pref.saveAsTemplate"));
+      "saveAsTemplate"), getString("user.pref.saveAsTemplate"));
       repeatingView.add(checkBoxLabelPanel);
     }
 

@@ -66,9 +66,9 @@ public class ToDoDao extends BaseDao<ToDoDO>
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ToDoDao.class);
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "reporter.username", "reporter.firstname", "reporter.lastname",
-      "assignee.username", "assignee.firstname", "assignee.lastname", "task.title", "task.taskpath", "group.name"};
+    "assignee.username", "assignee.firstname", "assignee.lastname", "task.title", "task.taskpath", "group.name"};
 
-  private Table table = new Table(ToDoDO.class);
+  private final Table table = new Table(ToDoDO.class);
 
   private DataSource dataSource;
 
@@ -80,7 +80,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
 
   private TaskTree taskTree;
 
-  private ToDoCache toDoCache = new ToDoCache(this);
+  private final ToDoCache toDoCache = new ToDoCache(this);
 
   public ToDoDao()
   {
@@ -318,7 +318,7 @@ public class ToDoDao extends BaseDao<ToDoDO>
   {
     this.dataSource = dataSource;
   }
-  
+
   public void setGroupDao(final GroupDao groupDao)
   {
     this.groupDao = groupDao;

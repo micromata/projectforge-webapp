@@ -33,6 +33,7 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -45,6 +46,7 @@ import org.projectforge.web.core.PriorityFormatter;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.task.TaskPropertyColumn;
 import org.projectforge.web.user.UserFormatter;
+import org.projectforge.web.user.UserPrefListPage;
 import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -53,6 +55,7 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = ToDoEditPage.class)
 public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO> implements IListPageColumnsCreator<ToDoDO>
@@ -87,7 +90,7 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
   {
     final List<IColumn<ToDoDO>> columns = new ArrayList<IColumn<ToDoDO>>();
     final CellItemListener<ToDoDO> cellItemListener = new CellItemListener<ToDoDO>() {
-      public void populateItem(Item<ICellPopulator<ToDoDO>> item, String componentId, IModel<ToDoDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<ToDoDO>> item, final String componentId, final IModel<ToDoDO> rowModel)
       {
         final ToDoDO toDo = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(toDo.getId(), toDo.isDeleted());
@@ -128,7 +131,7 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("priority")), getSortable("priority", sortable),
         "priority", cellItemListener) {
       @Override
-      public void populateItem(Item<ICellPopulator<ToDoDO>> item, String componentId, IModel<ToDoDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<ToDoDO>> item, final String componentId, final IModel<ToDoDO> rowModel)
       {
         final ToDoDO todo = rowModel.getObject();
         final String formattedPriority = priorityFormatter.getFormattedPriority(todo.getPriority());
@@ -140,10 +143,9 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
     });
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.type")),
         getSortable("type", sortable), "type", cellItemListener));
-    columns.add(new TaskPropertyColumn<ToDoDO>(this, getString("task"), getSortable("task.title", sortable), "task",
-        cellItemListener).withTaskFormatter(taskFormatter).withTaskTree(taskTree));
-    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("group")), null,
-        "group", cellItemListener) {
+    columns.add(new TaskPropertyColumn<ToDoDO>(this, getString("task"), getSortable("task.title", sortable), "task", cellItemListener)
+        .withTaskFormatter(taskFormatter).withTaskTree(taskTree));
+    columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("group")), null, "group", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<ToDoDO>> item, final String componentId, final IModel<ToDoDO> rowModel)
       {
@@ -170,6 +172,9 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
   {
     dataTable = createDataTable(createColumns(this, true), "lastUpdate", false);
     form.add(dataTable);
+    final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", ToDoPlugin.USER_PREF_AREA);
+    final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("templates"));
+    addContentMenuEntry(menuEntry);
   }
 
   /**
@@ -214,7 +219,7 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
   }
 
   @Override
-  protected ToDoListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected ToDoListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new ToDoListForm(this);
   }
@@ -226,7 +231,7 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
   }
 
   @Override
-  protected IModel<ToDoDO> getModel(ToDoDO object)
+  protected IModel<ToDoDO> getModel(final ToDoDO object)
   {
     return new DetachableDOModel<ToDoDO, ToDoDao>(object, getBaseDao());
   }

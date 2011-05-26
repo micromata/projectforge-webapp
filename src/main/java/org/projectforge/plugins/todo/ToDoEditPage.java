@@ -29,6 +29,16 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.ajax.markup.html.form.AjaxSubmitLink;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
+import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.markup.html.panel.Fragment;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -37,7 +47,15 @@ import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.layout.DataObjectLPanel;
+import org.projectforge.web.wicket.layout.FieldSetLPanel;
+import org.projectforge.web.wicket.layout.LayoutContext;
+import org.projectforge.web.wicket.layout.LayoutLength;
+import org.projectforge.web.wicket.layout.PanelContext;
 
 @EditPage(defaultReturnPage = ToDoListPage.class)
 public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditForm, ToDoDao> implements ISelectCallerPage
@@ -46,21 +64,36 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ToDoEditPage.class);
 
+  private static final String CLOSE_MODAL_WINDOW_ID = "closeToDoModalWindow";
+
+  protected ModalWindow closeToDoModalWindow;
+
+  private boolean redirect;
+
   @SpringBean(name = "toDoDao")
   private ToDoDao toDoDao;
 
-  public ToDoEditPage(PageParameters parameters)
+  private ToDoDO oldToDo;
+
+  public ToDoEditPage(final PageParameters parameters)
   {
     super(parameters, "plugins.todo");
     init();
+    addTopMenuPanel();
     if (isNew() == true) {
       final ToDoDO pref = getToDoPrefData(false);
       if (pref != null) {
         copyPrefValues(pref, getData());
       }
-      getData().setAssignee(PFUserContext.getUser());
       getData().setReporter(PFUserContext.getUser());
+      getData().setStatus(ToDoStatus.OPENED);
+    } else {
+      // Store old to-do for sending e-mail notification after major changes.
+      oldToDo = new ToDoDO();
+      oldToDo.copyValuesFrom(getData());
     }
+    closeToDoModalWindow = new ModalWindow(CLOSE_MODAL_WINDOW_ID);
+    form.add(closeToDoModalWindow);
   }
 
   @Override
@@ -77,15 +110,52 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
   }
 
   @Override
+  public WebPage afterDelete()
+  {
+    sendNotification();
+    return null;
+  }
+
+  @Override
+  public WebPage afterUndelete()
+  {
+    sendNotification();
+    return null;
+  }
+
+  private void sendNotification()
+  {
+    final String url = WicketUtils.getAbsoluteEditPageUrl(getRequest(), ToDoEditPage.class, getData().getId());
+    toDoDao.sendNotification(form.getData(), url);
+  }
+
+  @Override
   public AbstractBasePage afterSaveOrUpdate()
   {
     // Save to-do as recent to-do
     final ToDoDO pref = getToDoPrefData(true);
     copyPrefValues(getData(), pref);
     // Does the user want to store this to-do as template?
+    boolean sendNotification = false;
     if (form.renderer.sendNotification == true) {
-      final String url = WicketUtils.getAbsoluteEditPageUrl(getRequest(), ToDoEditPage.class, getData().getId());
-      toDoDao.sendNotification(form.getData(), url);
+      sendNotification = true;
+    } else if (oldToDo == null) {
+      // Send notification on new to-do's.
+      sendNotification = true;
+    } else {
+      if (ObjectUtils.equals(oldToDo.getAssigneeId(), getData().getAssigneeId()) == false) {
+        // Assignee was changed.
+        sendNotification = true;
+      } else if (oldToDo.getStatus() != getData().getStatus()) {
+        // Status was changed.
+        sendNotification = true;
+      } else if (oldToDo.isDeleted() != getData().isDeleted()) {
+        // Deletion status was changed.
+        sendNotification = true;
+      }
+    }
+    if (sendNotification == true) {
+      sendNotification();
     }
     if (BooleanUtils.isTrue(form.renderer.saveAsTemplate) == true) {
       final UserPrefEditPage userPrefEditPage = new UserPrefEditPage(ToDoPlugin.USER_PREF_AREA, getData());
@@ -97,7 +167,7 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
 
   private void copyPrefValues(final ToDoDO src, final ToDoDO dest)
   {
-    dest.setPriority(src.getPriority()).setStatus(src.getStatus()).setType(src.getType());
+    dest.setPriority(src.getPriority()).setType(src.getType());
   }
 
   /**
@@ -116,7 +186,7 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Integer)
    */
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     if ("reporterId".equals(property) == true) {
       toDoDao.setReporter(getData(), (Integer) selectedValue);
@@ -138,11 +208,11 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
    */
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     if ("reporterId".equals(property) == true) {
       getData().setReporter(null);
-    } else if ("reporterId".equals(property) == true) {
+    } else if ("assigneeId".equals(property) == true) {
       getData().setAssignee(null);
     } else if ("taskId".equals(property) == true) {
       getData().setTask(null);
@@ -156,9 +226,103 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
    */
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing.
+  }
+
+  @SuppressWarnings("serial")
+  private void addTopMenuPanel()
+  {
+    if (isNew() == false && getData().getStatus() != ToDoStatus.CLOSED) {
+      final AjaxSubmitLink closeLink = new AjaxSubmitLink("link", form) {
+        @Override
+        protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+        {
+          showCloseToDoDialog(target);
+        }
+
+        @Override
+        protected void onError(final AjaxRequestTarget target, final Form< ? > form)
+        {
+          target.addComponent(ToDoEditPage.this.form.getFeedbackPanel());
+        }
+      };
+      final ContentMenuEntryPanel closeMenuPanel = new ContentMenuEntryPanel(getNewContentMenuChildId(), closeLink,
+          getString("plugins.todo.button.close"));
+      contentMenuEntries.add(closeMenuPanel);
+    }
+  }
+
+  @SuppressWarnings("serial")
+  private void showCloseToDoDialog(final AjaxRequestTarget target)
+  {
+    closeToDoModalWindow.setInitialWidth(350);
+    closeToDoModalWindow.setInitialHeight(250);
+    closeToDoModalWindow.setMinimalWidth(350);
+    closeToDoModalWindow.setMinimalHeight(250);
+    redirect = false;
+
+    final Fragment content = new Fragment(closeToDoModalWindow.getContentId(), "closeToDoDialog", this);
+    final Form<Void> ajaxForm = new Form<Void>("form");
+    ajaxForm.add(new FeedbackPanel("feedback").setOutputMarkupId(true));
+    final LayoutContext layoutContext = new LayoutContext(false);
+    final DataObjectLPanel doPanel = new DataObjectLPanel("fieldSetsPanel", layoutContext);
+    final FieldSetLPanel fieldSetPanel = doPanel.newFieldSetPanel(null);
+    fieldSetPanel.getFieldSetContainer().add(new SimpleAttributeModifier("style", "min-height:10em;"));
+    doPanel.addTextArea(new PanelContext(form.getData(), "comment", LayoutLength.ONEHALF, getString("comment"), LayoutLength.HALF)
+    .setCssStyle("height: 10em;"));
+    ajaxForm.add(doPanel);
+
+    final AjaxButton cancelButton = new AjaxButton("button", new Model<String>(getString("cancel"))) {
+
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+      {
+        closeToDoModalWindow.close(target);
+      }
+    };
+    cancelButton.add(WebConstants.BUTTON_CLASS_CANCEL);
+    cancelButton.setDefaultFormProcessing(false); // No validation of the
+    final SingleButtonPanel cancelButtonPanel = new SingleButtonPanel("cancel", cancelButton);
+    ajaxForm.add(cancelButtonPanel);
+    final AjaxButton closeButton = new AjaxButton("button", new Model<String>(getString("plugins.todo.button.close"))) {
+      @Override
+      public final void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+      {
+        getData().setStatus(ToDoStatus.CLOSED);
+        redirect = true;
+        closeToDoModalWindow.close(target);
+      }
+    };
+    closeButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    final SingleButtonPanel closeButtonPanel = new SingleButtonPanel("close", closeButton);
+    ajaxForm.add(closeButtonPanel);
+    content.add(ajaxForm);
+    closeToDoModalWindow.setContent(content);
+    closeToDoModalWindow.setTitle(getString("plugins.todo.closeDialog.heading"));
+
+    closeToDoModalWindow.setWindowClosedCallback(new ModalWindow.WindowClosedCallback() {
+      private static final long serialVersionUID = 2633814101880954425L;
+
+      public void onClose(final AjaxRequestTarget target)
+      {
+        if (redirect == true) {
+          update();
+          redirect = false;
+        }
+      }
+
+    });
+    closeToDoModalWindow.setCloseButtonCallback(new ModalWindow.CloseButtonCallback() {
+      private static final long serialVersionUID = 6761625465164911336L;
+
+      public boolean onCloseButtonClicked(final AjaxRequestTarget target)
+      {
+        return true;
+      }
+    });
+    closeToDoModalWindow.show(target);
   }
 
   @Override
@@ -168,7 +332,7 @@ public class ToDoEditPage extends AbstractAutoLayoutEditPage<ToDoDO, ToDoEditFor
   }
 
   @Override
-  protected ToDoEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, ToDoDO data)
+  protected ToDoEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final ToDoDO data)
   {
     return new ToDoEditForm(this, data);
   }
