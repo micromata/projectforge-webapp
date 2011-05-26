@@ -63,9 +63,9 @@ public class DataObjectLPanel extends Panel
 {
   private static final long serialVersionUID = 6302571306175282690L;
 
-  private LayoutContext layoutContext;
+  private final LayoutContext layoutContext;
 
-  private RepeatingView fieldSetRepeater;
+  private final RepeatingView fieldSetRepeater;
 
   private FieldSetLPanel fieldSetPanel;
 
@@ -309,7 +309,7 @@ public class DataObjectLPanel extends Panel
         displayValue = String.valueOf(value);
       }
       labelPanel = new LabelLPanel(LabelValueTableLPanel.WICKET_ID_VALUE, displayValue, ctx);
-      field = labelValueTablePanel.add(ctx.getLabel(), (WebMarkupContainer) labelPanel);
+      field = labelValueTablePanel.add(ctx.getLabel(), labelPanel);
     } else {
       field = new DropDownChoiceLPanel(groupPanel.newChildId(), dropDownChoice, ctx);
       if (ctx.getLabelLength() != null) {
@@ -410,7 +410,7 @@ public class DataObjectLPanel extends Panel
     ensureGroupPanel();
     final SelectLPanel field = new SelectLPanel(groupPanel.newChildId(), selectPanel, ctx);
     if (ctx.getLabelLength() != null) {
-      final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), (AbstractLPanel) field, ctx);
+      final LabelLPanel labelPanel = new LabelLPanel(groupPanel.newChildId(), field, ctx);
       field.getSelectPanel().setLabel(new Model<String>(ctx.getLabel()));
       groupPanel.add(labelPanel);
       labelPanel.setLabelFor(field.getWrappedComponent());
