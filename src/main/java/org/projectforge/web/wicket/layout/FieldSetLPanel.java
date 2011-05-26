@@ -23,6 +23,7 @@
 
 package org.projectforge.web.wicket.layout;
 
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
@@ -47,12 +48,15 @@ public class FieldSetLPanel extends Panel
 
   private RepeatingView groupRepeater;
 
+  private WebMarkupContainer fieldSetContainer;
+
   /**
    * @see AbstractFormRenderer#createFieldSetLPanel(String)
    */
   FieldSetLPanel(final String id)
   {
     super(id);
+    add(fieldSetContainer = new WebMarkupContainer("fieldset"));
   }
 
   /**
@@ -94,12 +98,12 @@ public class FieldSetLPanel extends Panel
       return this;
     }
     if (this.headingLabel != null) {
-      add(this.headingLabel);
+      fieldSetContainer.add(this.headingLabel);
     } else {
-      add(new Label(HEADING_ID, "[invisible]").setVisible(false));
+      fieldSetContainer.add(new Label(HEADING_ID, "[invisible]").setVisible(false));
     }
     groupRepeater = new RepeatingView("groupRepeater");
-    add(groupRepeater);
+    fieldSetContainer.add(groupRepeater);
     return this;
   }
 
@@ -110,6 +114,15 @@ public class FieldSetLPanel extends Panel
 
   public void setHeading(final String heading)
   {
-    this.headingLabel = new Label(HEADING_ID, heading);
+    if (heading != null) {
+      this.headingLabel = new Label(HEADING_ID, heading);
+    } else {
+      this.headingLabel = null;
+    }
+  }
+
+  public WebMarkupContainer getFieldSetContainer()
+  {
+    return fieldSetContainer;
   }
 }
