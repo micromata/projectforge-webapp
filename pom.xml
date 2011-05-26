@@ -3,7 +3,7 @@
   <groupId>org.projectforge</groupId>
   <artifactId>ProjectForge</artifactId>
   <packaging>war</packaging>
-  <version>3.6.0</version>
+  <version>3.6.0.3</version>
   <name>ProjectForge</name>
   <description>
     ProjectForge is a multi user web application for collaborative team work. Organize time sheets, tasks, addresses, books etc. with project teams.
@@ -404,7 +404,7 @@
     <dependency> <!-- Version check: 2010-08-28 -->
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
-      <version>1.8.3</version>
+      <version>1.8.5</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -491,7 +491,7 @@
     <wtpversion>1.5</wtpversion>
     <downloadSources>true</downloadSources>
     <spring.version>3.0.4.RELEASE</spring.version>
-    <wicket.version>1.4.14</wicket.version> <!-- Version check: 2011-02-01 -->
+    <wicket.version>1.4.17</wicket.version> <!-- Version check: 2011-05-21 -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <build>
