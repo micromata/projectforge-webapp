@@ -40,6 +40,7 @@ import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WebConstants;
@@ -195,7 +196,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 
     final PFUserDO user = PFUserContext.getUser();
 
-    if (StringUtils.isNotBlank(user.getStayLoggedInKey())) {
+    if (WebConfiguration.isDevelopmentMode() == true && StringUtils.isNotBlank(user.getStayLoggedInKey())) {
       final String contextPath = WebApplication.get().getServletContext().getContextPath();
       final String iCalTarget = contextPath
       + "/export/ical?user="
