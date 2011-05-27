@@ -34,14 +34,14 @@ public class Constants
    * Default length of text fields in the data-base (4,000).
    */
   public static final int LENGTH_TEXT = 4000;
-  
+
   /**
    * Default length of text fields in the data-base (1,000).
    */
   public static final int LENGTH_SUBJECT = 1000;
 
   /**
-   * Default length of text fields in the data-base (255).
+   * Default length of title fields in the data-base (1,000).
    */
   public static final int LENGTH_TITLE = 1000;
 }
