@@ -70,6 +70,10 @@
     <url-pattern>/wa/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
+    <filter-name>UserFilter</filter-name>
+    <url-pattern>/gwiki/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
     <filter-name>springContext</filter-name>
     <url-pattern>/secure/*</url-pattern>
   </filter-mapping>
@@ -141,7 +145,7 @@
   </listener>
   <servlet>
     <servlet-name>WikiService</servlet-name>
-    <servlet-class>de.micromata.genome.gwiki.web.GWikiServlet</servlet-class>
+    <servlet-class>org.projectforge.gwiki.PFWikiServlet</servlet-class>
     <init-param>
       <!--  Register class, loading the GWikiDAOContext -->
       <param-name>de.micromata.genome.gwiki.model.config.GWikiBootstrapConfigLoader.className</param-name>
@@ -191,6 +195,10 @@
     <servlet-name>UpAndDownloadImageFileAsByteArray</servlet-name>
     <servlet-class>org.projectforge.web.imagecropper.UpAndDownloadImageFileAsByteArray</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>CalendarFeed</servlet-name>
+    <servlet-class>org.projectforge.web.calendar.CalendarFeed</servlet-class>
+  </servlet>
 
   <servlet-mapping>
     <servlet-name>LogoServlet</servlet-name>
@@ -233,6 +241,11 @@
     <servlet-name>WikiService</servlet-name>
     <url-pattern>/gwiki/*</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>CalendarFeed</servlet-name>
+    <url-pattern>/export/ical</url-pattern>
+  </servlet-mapping>
+  
   <session-config>
     <session-timeout>60</session-timeout>
   </session-config>
