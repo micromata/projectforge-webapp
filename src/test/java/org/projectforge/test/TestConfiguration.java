@@ -27,8 +27,8 @@ import java.io.File;
 
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
-import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigXmlTest;
+import org.projectforge.core.Configuration;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.jdbc.PropertyDataSource;
 import org.springframework.beans.BeansException;
@@ -47,10 +47,10 @@ public class TestConfiguration
   private static final Logger log = Logger.getLogger(TestConfiguration.class);
 
   private static final String[] TEST_CONTEXT_FILES = new String[] { "applicationContext-test.xml", "applicationContext-hibernate.xml",
-      "applicationContext-business.xml"};
+    "applicationContext-business.xml", "applicationContext-web.xml"};
 
   private static final String[] CMD_CONTEXT_FILES = new String[] { "cmd-applicationContext-main.xml", "applicationContext-hibernate.xml",
-      "applicationContext-business.xml"};
+  "applicationContext-business.xml"};
 
   protected ClassPathXmlApplicationContext ctx = null;
 
@@ -89,12 +89,12 @@ public class TestConfiguration
     return new File(workDir, filename);
   }
 
-  private static synchronized void init(String[] contextFiles)
+  private static synchronized void init(final String[] contextFiles)
   {
     if (testConfiguration == null) {
       testConfiguration = new TestConfiguration(contextFiles);
     } else if (testConfiguration.contextFiles.equals(contextFiles) == false) {
-      String msg = "Already initialized with incompatible context files: " + testConfiguration.contextFiles;
+      final String msg = "Already initialized with incompatible context files: " + testConfiguration.contextFiles;
       log.fatal(msg);
       throw new RuntimeException(msg);
     }
@@ -103,7 +103,7 @@ public class TestConfiguration
   public static TestConfiguration getConfiguration()
   {
     if (testConfiguration == null) {
-      String msg = "Not initialized.";
+      final String msg = "Not initialized.";
       log.fatal(msg);
       throw new RuntimeException(msg);
     }
@@ -115,7 +115,7 @@ public class TestConfiguration
     return isInitialized;
   }
 
-  public void setInitialized(boolean isInitialized)
+  public void setInitialized(final boolean isInitialized)
   {
     this.isInitialized = isInitialized;
   }
@@ -126,15 +126,15 @@ public class TestConfiguration
   }
 
   @SuppressWarnings("unchecked")
-  public <T> T getBean(String name, Class<T> requiredType)
+  public <T> T getBean(final String name, final Class<T> requiredType)
   {
-    T obj = (T) ctx.getBean(name, requiredType);
+    final T obj = (T) ctx.getBean(name, requiredType);
     return obj;
   }
 
-  public <T> T getAndAutowireBean(String name, Class<T> requiredType)
+  public <T> T getAndAutowireBean(final String name, final Class<T> requiredType)
   {
-    T obj = (T) getBean(name, requiredType);
+    final T obj = getBean(name, requiredType);
     autowire(obj, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME);
     return obj;
   }
@@ -149,7 +149,7 @@ public class TestConfiguration
    * @param existingBean .
    * @param autowireMode Analog <code>AutowireCapableBeanFactory.AUTOWIRE_BY_NAME</code> etc.
    */
-  public void autowire(final Object existingBean, int autowireMode)
+  public void autowire(final Object existingBean, final int autowireMode)
   {
     Validate.notNull(existingBean, "Bean to wire is null");
     ctx.getBeanFactory().autowireBeanProperties(existingBean, autowireMode, false);
@@ -158,7 +158,7 @@ public class TestConfiguration
   /**
    * Init and reinitialise context for each run
    */
-  protected TestConfiguration(String[] contextFiles) throws BeansException
+  protected TestConfiguration(final String[] contextFiles) throws BeansException
   {
     this.contextFiles = contextFiles;
     initCtx();
@@ -176,17 +176,17 @@ public class TestConfiguration
         ctx = new ClassPathXmlApplicationContext(contextFiles);
         ctx.getBeanFactory().autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
 
-        PropertyDataSource ds = (PropertyDataSource) ctx.getBean("dataSource", PropertyDataSource.class);
+        final PropertyDataSource ds = (PropertyDataSource) ctx.getBean("dataSource", PropertyDataSource.class);
         this.databaseUrl = ds.getUrl();
-        JdbcTemplate jdbc = new JdbcTemplate(ds);
+        final JdbcTemplate jdbc = new JdbcTemplate(ds);
         try {
           jdbc.execute("CHECKPOINT DEFRAG");
-        } catch (org.springframework.jdbc.BadSqlGrammarException ex) {
+        } catch (final org.springframework.jdbc.BadSqlGrammarException ex) {
           // ignore
         }
         final LocalSessionFactoryBean localSessionFactoryBean = (LocalSessionFactoryBean) ctx.getBean("&sessionFactory");
         HibernateUtils.setConfiguration(localSessionFactoryBean.getConfiguration());
-      } catch (Exception ex) {
+      } catch (final Exception ex) {
         log.error(ex.getMessage(), ex);
         throw new RuntimeException(ex);
       }
