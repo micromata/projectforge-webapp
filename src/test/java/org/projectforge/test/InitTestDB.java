@@ -66,7 +66,7 @@ public class InitTestDB
   private UserDao userDao;
 
   private AccessDao accessDao;
-  
+
   private ConfigurationDao configurationDao;
 
   private ProjektDao projektDao;
@@ -83,75 +83,83 @@ public class InitTestDB
 
   private Kost2ArtDao kost2ArtDao;
 
-  private Map<String, GroupDO> groupMap = new HashMap<String, GroupDO>();
+  private final Map<String, GroupDO> groupMap = new HashMap<String, GroupDO>();
 
-  private Map<String, PFUserDO> userMap = new HashMap<String, PFUserDO>();
+  private final Map<String, PFUserDO> userMap = new HashMap<String, PFUserDO>();
 
-  private Map<String, TaskDO> taskMap = new HashMap<String, TaskDO>();
+  private final Map<String, TaskDO> taskMap = new HashMap<String, TaskDO>();
 
-  public void setUserDao(UserDao userDao)
+  public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
   }
 
-  public void setUserGroupCache(UserGroupCache userGroupCache)
+  public void setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
   }
 
-  public void setAccessDao(AccessDao accessDao)
+  public void setAccessDao(final AccessDao accessDao)
   {
     this.accessDao = accessDao;
   }
-  
-  public void setConfigurationDao(ConfigurationDao configurationDao)
+
+  public void setConfigurationDao(final ConfigurationDao configurationDao)
   {
     this.configurationDao = configurationDao;
   }
 
-  public void setTaskDao(TaskDao taskDao)
+  public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
   }
 
-  public void setTimesheetDao(TimesheetDao timesheetDao)
+  public void setTimesheetDao(final TimesheetDao timesheetDao)
   {
     this.timesheetDao = timesheetDao;
   }
 
-  public void setGroupDao(GroupDao groupDao)
+  public void setGroupDao(final GroupDao groupDao)
   {
     this.groupDao = groupDao;
   }
 
-  public void setKost2Dao(Kost2Dao kost2Dao)
+  public void setKost2Dao(final Kost2Dao kost2Dao)
   {
     this.kost2Dao = kost2Dao;
   }
 
-  public void setKost2ArtDao(Kost2ArtDao kost2ArtDao)
+  public void setKost2ArtDao(final Kost2ArtDao kost2ArtDao)
   {
     this.kost2ArtDao = kost2ArtDao;
   }
 
-  public void setProjektDao(ProjektDao projektDao)
+  public void setProjektDao(final ProjektDao projektDao)
   {
     this.projektDao = projektDao;
   }
 
-  public void putUser(PFUserDO user)
+  public void putUser(final PFUserDO user)
   {
     this.userMap.put(user.getUsername(), user);
   }
 
-  public PFUserDO addUser(String username)
+  public PFUserDO addUser(final String username)
   {
-    PFUserDO user = new PFUserDO();
+    return addUser(username, null);
+  }
+
+  public PFUserDO addUser(final String username, final String password)
+  {
+    final PFUserDO user = new PFUserDO();
     user.setUsername(username);
+    if (password != null) {
+      user.setPassword(userDao.encryptPassword(password));
+    }
     return addUser(user);
   }
 
-  public PFUserDO addUser(PFUserDO user)
+  public PFUserDO addUser(final PFUserDO user)
   {
     userDao.internalSave(user);
     putUser(user);
@@ -161,23 +169,23 @@ public class InitTestDB
     return user;
   }
 
-  public PFUserDO getUser(String userName)
+  public PFUserDO getUser(final String userName)
   {
     return this.userMap.get(userName);
   }
 
-  public void putGroup(GroupDO group)
+  public void putGroup(final GroupDO group)
   {
     this.groupMap.put(group.getName(), group);
   }
 
-  public GroupDO addGroup(String groupname, String... usernames)
+  public GroupDO addGroup(final String groupname, final String... usernames)
   {
-    GroupDO group = new GroupDO();
+    final GroupDO group = new GroupDO();
     group.setName(groupname);
     if (usernames != null) {
-      Set<PFUserDO> col = new HashSet<PFUserDO>();
-      for (String username : usernames) {
+      final Set<PFUserDO> col = new HashSet<PFUserDO>();
+      for (final String username : usernames) {
         col.add(getUser(username));
       }
       group.setAssignedUsers(col);
@@ -188,22 +196,22 @@ public class InitTestDB
     return group;
   }
 
-  public GroupDO getGroup(String groupName)
+  public GroupDO getGroup(final String groupName)
   {
     return this.groupMap.get(groupName);
   }
 
-  public void putTask(TaskDO task)
+  public void putTask(final TaskDO task)
   {
     this.taskMap.put(task.getTitle(), task);
   }
 
-  public TaskDO addTask(String taskName, String parentTaskName)
+  public TaskDO addTask(final String taskName, final String parentTaskName)
   {
     return addTask(taskName, parentTaskName, null);
   }
 
-  public TaskDO addTask(String taskName, String parentTaskName, String shortDescription)
+  public TaskDO addTask(final String taskName, final String parentTaskName, final String shortDescription)
   {
     TaskDO task = new TaskDO();
     task.setTitle(taskName);
@@ -213,20 +221,20 @@ public class InitTestDB
     if (shortDescription != null) {
       task.setShortDescription(shortDescription);
     }
-    Serializable id = taskDao.internalSave(task);
+    final Serializable id = taskDao.internalSave(task);
     task = taskDao.internalGetById(id);
     putTask(task);
     return task;
   }
 
-  public TaskDO getTask(String taskName)
+  public TaskDO getTask(final String taskName)
   {
     return this.taskMap.get(taskName);
   }
 
-  public TimesheetDO addTimesheet(PFUserDO user, TaskDO task, Timestamp startTime, Timestamp stopTime, String description)
+  public TimesheetDO addTimesheet(final PFUserDO user, final TaskDO task, final Timestamp startTime, final Timestamp stopTime, final String description)
   {
-    TimesheetDO timesheet = new TimesheetDO();
+    final TimesheetDO timesheet = new TimesheetDO();
     timesheet.setDescription(description);
     timesheet.setStartTime(startTime);
     timesheet.setStopTime(stopTime);
@@ -244,7 +252,7 @@ public class InitTestDB
     projektDao.setKunde(projekt, kunde.getId());
     projektDao.save(projekt);
     if (kost2ArtIds != null) {
-      for (Integer id : kost2ArtIds) {
+      for (final Integer id : kost2ArtIds) {
         final Kost2DO kost2 = new Kost2DO();
         kost2.setProjekt(projekt);
         kost2.setNummernkreis(5);
@@ -270,7 +278,7 @@ public class InitTestDB
   private void initConfiguration()
   {
     configurationDao.checkAndUpdateDatabaseEntries();
-    ConfigurationDO entry = configurationDao.getEntry(ConfigurationParam.DEFAULT_TIMEZONE);
+    final ConfigurationDO entry = configurationDao.getEntry(ConfigurationParam.DEFAULT_TIMEZONE);
     entry.setTimeZone(DateHelper.EUROPE_BERLIN);
     configurationDao.internalUpdate(entry);
   }
@@ -278,16 +286,16 @@ public class InitTestDB
   private void initUsers()
   {
     addUser(TestBase.ADMIN);
-    addUser(TestBase.TEST_ADMIN_USER);
+    addUser(TestBase.TEST_ADMIN_USER, TestBase.TEST_ADMIN_USER_PASSWORD);
     PFUserDO user = new PFUserDO();
     user.setUsername(TestBase.TEST_FINANCE_USER);
     user//
-        .addRight(new UserRightDO(UserRightId.FIBU_AUSGANGSRECHNUNGEN, UserRightValue.READWRITE)) //
-        .addRight(new UserRightDO(UserRightId.FIBU_EINGANGSRECHNUNGEN, UserRightValue.READWRITE)) //
-        .addRight(new UserRightDO(UserRightId.FIBU_COST_UNIT, UserRightValue.READWRITE)) //
-        .addRight(new UserRightDO(UserRightId.PM_ORDER_BOOK, UserRightValue.READWRITE)) //
-        .addRight(new UserRightDO(UserRightId.PM_PROJECT, UserRightValue.READWRITE)) //
-        .addRight(new UserRightDO(UserRightId.PM_HR_PLANNING, UserRightValue.READWRITE)); //
+    .addRight(new UserRightDO(UserRightId.FIBU_AUSGANGSRECHNUNGEN, UserRightValue.READWRITE)) //
+    .addRight(new UserRightDO(UserRightId.FIBU_EINGANGSRECHNUNGEN, UserRightValue.READWRITE)) //
+    .addRight(new UserRightDO(UserRightId.FIBU_COST_UNIT, UserRightValue.READWRITE)) //
+    .addRight(new UserRightDO(UserRightId.PM_ORDER_BOOK, UserRightValue.READWRITE)) //
+    .addRight(new UserRightDO(UserRightId.PM_PROJECT, UserRightValue.READWRITE)) //
+    .addRight(new UserRightDO(UserRightId.PM_HR_PLANNING, UserRightValue.READWRITE)); //
     addUser(user);
     addUser(TestBase.TEST_USER);
     addUser(TestBase.TEST_USER2);
@@ -355,22 +363,22 @@ public class InitTestDB
     addTask("2.2", "2");
   }
 
-  public GroupTaskAccessDO createGroupTaskAccess(GroupDO group, TaskDO task)
+  public GroupTaskAccessDO createGroupTaskAccess(final GroupDO group, final TaskDO task)
   {
     Validate.notNull(group);
     Validate.notNull(task);
-    GroupTaskAccessDO access = new GroupTaskAccessDO();
+    final GroupTaskAccessDO access = new GroupTaskAccessDO();
     access.setGroup(group);
     access.setTask(task);
     accessDao.internalSave(access);
     return access;
   }
 
-  public GroupTaskAccessDO createGroupTaskAccess(GroupDO group, TaskDO task, AccessType accessType, boolean accessSelect,
-      boolean accessInsert, boolean accessUpdate, boolean accessDelete)
+  public GroupTaskAccessDO createGroupTaskAccess(final GroupDO group, final TaskDO task, final AccessType accessType, final boolean accessSelect,
+      final boolean accessInsert, final boolean accessUpdate, final boolean accessDelete)
   {
-    GroupTaskAccessDO access = createGroupTaskAccess(group, task);
-    AccessEntryDO entry = access.ensureAndGetAccessEntry(accessType);
+    final GroupTaskAccessDO access = createGroupTaskAccess(group, task);
+    final AccessEntryDO entry = access.ensureAndGetAccessEntry(accessType);
     entry.setAccess(accessSelect, accessInsert, accessUpdate, accessDelete);
     accessDao.internalUpdate(access);
     return access;
@@ -379,7 +387,7 @@ public class InitTestDB
   private void initAccess()
   {
     GroupTaskAccessDO access = createGroupTaskAccess(getGroup("group1"), getTask("1"));
-    AccessEntryDO entry = access.ensureAndGetAccessEntry(AccessType.TASKS);
+    final AccessEntryDO entry = access.ensureAndGetAccessEntry(AccessType.TASKS);
     entry.setAccess(true, true, true, true);
     accessDao.internalUpdate(access);
 
@@ -407,8 +415,8 @@ public class InitTestDB
     setAllAccessEntries(access, true, false, true, false);
   }
 
-  private void setAllAccessEntries(GroupTaskAccessDO access, boolean selectAccess, boolean insertAccess, boolean updateAccess,
-      boolean deleteAccess)
+  private void setAllAccessEntries(final GroupTaskAccessDO access, final boolean selectAccess, final boolean insertAccess, final boolean updateAccess,
+      final boolean deleteAccess)
   {
     AccessEntryDO entry = access.ensureAndGetAccessEntry(AccessType.TASK_ACCESS_MANAGEMENT);
     entry.setAccess(selectAccess, insertAccess, updateAccess, deleteAccess);
