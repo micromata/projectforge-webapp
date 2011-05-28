@@ -52,7 +52,6 @@ public class WicketPageTestBase extends TestBase
         addComponentInstantiationListener(new SpringComponentInjector(this, getTestConfiguration().getApplicationContext(), true));
         getResourceSettings().setResourceStreamLocator(new MyResourceStreamLocator());
         getResourceSettings().addStringResourceLoader(0, new BundleStringResourceLoader(WicketApplication.RESOURCE_BUNDLE_NAME));
-        getResourceSettings().setThrowExceptionOnMissingResource(false); // Don't throw MissingResourceException for missing i18n keys.
       }
 
       @Override
