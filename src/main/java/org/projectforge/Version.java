@@ -76,6 +76,11 @@ public class Version implements Comparable<Version>, Serializable
     asString();
   }
 
+  public Version(final int majorRelease, final int minorRelease)
+  {
+    this(majorRelease, minorRelease, 0, 0);
+  }
+
   public Version(final int majorRelease, final int minorRelease, final int patchLevel)
   {
     this(majorRelease, minorRelease, patchLevel, 0);
@@ -114,7 +119,7 @@ public class Version implements Comparable<Version>, Serializable
    * @param betaVersion
    * @return this for chaining.
    */
-  public Version setBetaVersion(int betaVersion)
+  public Version setBetaVersion(final int betaVersion)
   {
     this.betaVersion = betaVersion;
     return this;
@@ -130,6 +135,10 @@ public class Version implements Comparable<Version>, Serializable
     return betaVersion < Integer.MAX_VALUE;
   }
 
+  /**
+   * Compares major, minor, patch and build number.
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
   @Override
   public int compareTo(final Version o)
   {
@@ -183,7 +192,7 @@ public class Version implements Comparable<Version>, Serializable
   {
     try {
       return new Integer(str);
-    } catch (NumberFormatException ex) {
+    } catch (final NumberFormatException ex) {
       log.error("Can't parse version string '" + version + "'. '" + str + "'isn't a number");
     }
     return 0;

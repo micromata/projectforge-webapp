@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
   <property name="appId" value="ProjectForge"/>
 	<property name="appTitle" value="ProjectForge 2011"/>
-	<property name="version" value="3.6.0"/>
-	<property name="version.date" value="2011-03-18"/>
-	<property name="version.timestamp" value="2011-03-18_07-54"/>
+	<property name="version" value="3.6.1"/>
+	<property name="version.date" value="2011-05-27"/>
+	<property name="version.timestamp" value="2011-05-27_17-38"/>
