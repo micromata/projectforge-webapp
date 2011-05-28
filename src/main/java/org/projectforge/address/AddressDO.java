@@ -192,9 +192,10 @@ public class AddressDO extends DefaultBaseDO
     return contactStatus;
   }
 
-  public void setContactStatus(ContactStatus contactStatus)
+  public AddressDO setContactStatus(final ContactStatus contactStatus)
   {
     this.contactStatus = contactStatus;
+    return this;
   }
 
   @Enumerated(EnumType.STRING)
@@ -204,9 +205,10 @@ public class AddressDO extends DefaultBaseDO
     return addressStatus;
   }
 
-  public void setAddressStatus(AddressStatus addressStatus)
+  public AddressDO setAddressStatus(final AddressStatus addressStatus)
   {
     this.addressStatus = addressStatus;
+    return this;
   }
 
   @Column(name = "image_broschure", nullable = false)
@@ -215,7 +217,7 @@ public class AddressDO extends DefaultBaseDO
     return imageBroschure;
   }
 
-  public void setImageBroschure(boolean imageBroschure)
+  public void setImageBroschure(final boolean imageBroschure)
   {
     this.imageBroschure = imageBroschure;
   }
@@ -226,7 +228,7 @@ public class AddressDO extends DefaultBaseDO
     return businessPhone;
   }
 
-  public void setBusinessPhone(String businessPhone)
+  public void setBusinessPhone(final String businessPhone)
   {
     this.businessPhone = businessPhone;
   }
@@ -237,7 +239,7 @@ public class AddressDO extends DefaultBaseDO
     return mobilePhone;
   }
 
-  public void setMobilePhone(String mobilePhone)
+  public void setMobilePhone(final String mobilePhone)
   {
     this.mobilePhone = mobilePhone;
   }
@@ -248,7 +250,7 @@ public class AddressDO extends DefaultBaseDO
     return fax;
   }
 
-  public void setFax(String fax)
+  public void setFax(final String fax)
   {
     this.fax = fax;
   }
@@ -259,7 +261,7 @@ public class AddressDO extends DefaultBaseDO
     return addressText;
   }
 
-  public void setAddressText(String addressText)
+  public void setAddressText(final String addressText)
   {
     this.addressText = addressText;
   }
@@ -270,7 +272,7 @@ public class AddressDO extends DefaultBaseDO
     return zipCode;
   }
 
-  public void setZipCode(String zipCode)
+  public void setZipCode(final String zipCode)
   {
     this.zipCode = zipCode;
   }
@@ -281,7 +283,7 @@ public class AddressDO extends DefaultBaseDO
     return city;
   }
 
-  public void setCity(String city)
+  public void setCity(final String city)
   {
     this.city = city;
   }
@@ -292,7 +294,7 @@ public class AddressDO extends DefaultBaseDO
     return country;
   }
 
-  public void setCountry(String country)
+  public void setCountry(final String country)
   {
     this.country = country;
   }
@@ -303,7 +305,7 @@ public class AddressDO extends DefaultBaseDO
     return state;
   }
 
-  public void setState(String state)
+  public void setState(final String state)
   {
     this.state = state;
   }
@@ -314,7 +316,7 @@ public class AddressDO extends DefaultBaseDO
     return postalAddressText;
   }
 
-  public void setPostalAddressText(String postalAddressText)
+  public void setPostalAddressText(final String postalAddressText)
   {
     this.postalAddressText = postalAddressText;
   }
@@ -325,7 +327,7 @@ public class AddressDO extends DefaultBaseDO
     return postalZipCode;
   }
 
-  public void setPostalZipCode(String postalZipCode)
+  public void setPostalZipCode(final String postalZipCode)
   {
     this.postalZipCode = postalZipCode;
   }
@@ -336,7 +338,7 @@ public class AddressDO extends DefaultBaseDO
     return postalCity;
   }
 
-  public void setPostalCity(String postalCity)
+  public void setPostalCity(final String postalCity)
   {
     this.postalCity = postalCity;
   }
@@ -347,7 +349,7 @@ public class AddressDO extends DefaultBaseDO
     return postalCountry;
   }
 
-  public void setPostalCountry(String postalCountry)
+  public void setPostalCountry(final String postalCountry)
   {
     this.postalCountry = postalCountry;
   }
@@ -358,7 +360,7 @@ public class AddressDO extends DefaultBaseDO
     return postalState;
   }
 
-  public void setPostalState(String postalState)
+  public void setPostalState(final String postalState)
   {
     this.postalState = postalState;
   }
@@ -369,7 +371,7 @@ public class AddressDO extends DefaultBaseDO
     return birthday;
   }
 
-  public void setBirthday(Date birthday)
+  public void setBirthday(final Date birthday)
   {
     this.birthday = birthday;
   }
@@ -380,7 +382,7 @@ public class AddressDO extends DefaultBaseDO
     return comment;
   }
 
-  public AddressDO setComment(String comment)
+  public AddressDO setComment(final String comment)
   {
     this.comment = comment;
     return this;
@@ -392,7 +394,7 @@ public class AddressDO extends DefaultBaseDO
     return email;
   }
 
-  public void setEmail(String email)
+  public void setEmail(final String email)
   {
     this.email = email;
   }
@@ -403,7 +405,7 @@ public class AddressDO extends DefaultBaseDO
     return website;
   }
 
-  public void setWebsite(String website)
+  public void setWebsite(final String website)
   {
     this.website = website;
   }
@@ -414,7 +416,7 @@ public class AddressDO extends DefaultBaseDO
     return fingerprint;
   }
 
-  public void setFingerprint(String fingerprint)
+  public void setFingerprint(final String fingerprint)
   {
     this.fingerprint = fingerprint;
   }
@@ -425,9 +427,10 @@ public class AddressDO extends DefaultBaseDO
     return firstName;
   }
 
-  public void setFirstName(String firstName)
+  public AddressDO setFirstName(final String firstName)
   {
     this.firstName = firstName;
+    return this;
   }
 
   @Transient
@@ -442,7 +445,7 @@ public class AddressDO extends DefaultBaseDO
     return name;
   }
 
-  public AddressDO setName(String name)
+  public AddressDO setName(final String name)
   {
     this.name = name;
     return this;
@@ -455,9 +458,10 @@ public class AddressDO extends DefaultBaseDO
     return form;
   }
 
-  public void setForm(FormOfAddress form)
+  public AddressDO setForm(final FormOfAddress form)
   {
     this.form = form;
+    return this;
   }
 
   @Column(length = 255)
@@ -466,7 +470,7 @@ public class AddressDO extends DefaultBaseDO
     return organization;
   }
 
-  public void setOrganization(String organization)
+  public void setOrganization(final String organization)
   {
     this.organization = organization;
   }
@@ -477,7 +481,7 @@ public class AddressDO extends DefaultBaseDO
     return division;
   }
 
-  public void setDivision(String division)
+  public void setDivision(final String division)
   {
     this.division = division;
   }
@@ -488,7 +492,7 @@ public class AddressDO extends DefaultBaseDO
     return positionText;
   }
 
-  public void setPositionText(String positionText)
+  public void setPositionText(final String positionText)
   {
     this.positionText = positionText;
   }
@@ -499,7 +503,7 @@ public class AddressDO extends DefaultBaseDO
     return privatePhone;
   }
 
-  public void setPrivatePhone(String privatePhone)
+  public void setPrivatePhone(final String privatePhone)
   {
     this.privatePhone = privatePhone;
   }
@@ -510,7 +514,7 @@ public class AddressDO extends DefaultBaseDO
     return privateMobilePhone;
   }
 
-  public void setPrivateMobilePhone(String mobilePhone)
+  public void setPrivateMobilePhone(final String mobilePhone)
   {
     this.privateMobilePhone = mobilePhone;
   }
@@ -521,7 +525,7 @@ public class AddressDO extends DefaultBaseDO
     return privateAddressText;
   }
 
-  public void setPrivateAddressText(String privateAddressText)
+  public void setPrivateAddressText(final String privateAddressText)
   {
     this.privateAddressText = privateAddressText;
   }
@@ -532,7 +536,7 @@ public class AddressDO extends DefaultBaseDO
     return privateZipCode;
   }
 
-  public void setPrivateZipCode(String zipCode)
+  public void setPrivateZipCode(final String zipCode)
   {
     this.privateZipCode = zipCode;
   }
@@ -543,7 +547,7 @@ public class AddressDO extends DefaultBaseDO
     return privateCity;
   }
 
-  public void setPrivateCity(String city)
+  public void setPrivateCity(final String city)
   {
     this.privateCity = city;
   }
@@ -554,7 +558,7 @@ public class AddressDO extends DefaultBaseDO
     return privateCountry;
   }
 
-  public void setPrivateCountry(String privateCountry)
+  public void setPrivateCountry(final String privateCountry)
   {
     this.privateCountry = privateCountry;
   }
@@ -565,7 +569,7 @@ public class AddressDO extends DefaultBaseDO
     return privateState;
   }
 
-  public void setPrivateState(String privateState)
+  public void setPrivateState(final String privateState)
   {
     this.privateState = privateState;
   }
@@ -576,7 +580,7 @@ public class AddressDO extends DefaultBaseDO
     return privateEmail;
   }
 
-  public void setPrivateEmail(String email)
+  public void setPrivateEmail(final String email)
   {
     this.privateEmail = email;
   }
@@ -587,7 +591,7 @@ public class AddressDO extends DefaultBaseDO
     return publicKey;
   }
 
-  public void setPublicKey(String publicKey)
+  public void setPublicKey(final String publicKey)
   {
     this.publicKey = publicKey;
   }
@@ -603,7 +607,7 @@ public class AddressDO extends DefaultBaseDO
     return task;
   }
 
-  public void setTask(TaskDO task)
+  public void setTask(final TaskDO task)
   {
     this.task = task;
   }
@@ -622,7 +626,7 @@ public class AddressDO extends DefaultBaseDO
     return title;
   }
 
-  public AddressDO setTitle(String title)
+  public AddressDO setTitle(final String title)
   {
     this.title = title;
     return this;
@@ -753,31 +757,31 @@ public class AddressDO extends DefaultBaseDO
     return getInstantMessagingAsString(instantMessaging);
   }
 
-  public void setInstantMessaging4DB(String properties)
+  public void setInstantMessaging4DB(final String properties)
   {
     if (StringUtils.isBlank(properties) == true) {
       this.instantMessaging = null;
     } else {
-      StringTokenizer tokenizer = new StringTokenizer(properties, "\n");
+      final StringTokenizer tokenizer = new StringTokenizer(properties, "\n");
       while (tokenizer.hasMoreTokens() == true) {
-        String line = tokenizer.nextToken();
+        final String line = tokenizer.nextToken();
         if (StringUtils.isBlank(line) == true) {
           continue;
         }
-        int idx = line.indexOf('=');
+        final int idx = line.indexOf('=');
         if (idx <= 0) {
           log.error("Wrong instant messaging entry format in data base: " + line);
           continue;
         }
         String label = line.substring(0, idx);
-        String value = "";
+        final String value = "";
         if (idx < line.length()) {
           label = line.substring(idx);
         }
         InstantMessagingType type = null;
         try {
           type = InstantMessagingType.get(label);
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
           log.error("Ignoring unknown InstantMessagingType: " + label, ex);
           continue;
         }
@@ -796,12 +800,12 @@ public class AddressDO extends DefaultBaseDO
     return instantMessaging;
   }
 
-  public void setInstantMessaging(InstantMessagingType type, String value)
+  public void setInstantMessaging(final InstantMessagingType type, final String value)
   {
     if (this.instantMessaging == null) {
       this.instantMessaging = new ArrayList<LabelValueBean<InstantMessagingType, String>>();
     } else {
-      for (LabelValueBean<InstantMessagingType, String> entry : this.instantMessaging) {
+      for (final LabelValueBean<InstantMessagingType, String> entry : this.instantMessaging) {
         if (entry.getLabel() == type) {
           // Entry found;
           if (StringUtils.isBlank(value) == true) {
@@ -821,14 +825,14 @@ public class AddressDO extends DefaultBaseDO
   /**
    * Used for representation in the data base and for hibernate search (lucene).
    */
-  static String getInstantMessagingAsString(List<LabelValueBean<InstantMessagingType, String>> list)
+  static String getInstantMessagingAsString(final List<LabelValueBean<InstantMessagingType, String>> list)
   {
     if (list == null || list.size() == 0) {
       return null;
     }
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     boolean first = true;
-    for (LabelValueBean<InstantMessagingType, String> lv : list) {
+    for (final LabelValueBean<InstantMessagingType, String> lv : list) {
       if (StringUtils.isBlank(lv.getValue()) == true) {
         continue; // Do not write empty entries.
       }
