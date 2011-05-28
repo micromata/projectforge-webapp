@@ -78,6 +78,8 @@ public class TestBase
 
   public static final String TEST_ADMIN_USER = "testSysAdmin";
 
+  public static final String TEST_ADMIN_USER_PASSWORD = "testSysAdmin42";
+
   public static final String TEST_FINANCE_USER = "testFinanceUser";
 
   public static final String TEST_GROUP = "testGroup";
@@ -115,7 +117,7 @@ public class TestBase
   protected HibernateTemplate hibernate;
 
   protected UserDao userDao;
-  
+
   protected AccessChecker accessChecker;
 
   protected static InitTestDB initTestDB;
@@ -130,7 +132,7 @@ public class TestBase
   /**
    * Init and reinitialise context before each run
    */
-  protected static void init(boolean createTestData) throws BeansException, IOException
+  protected static void init(final boolean createTestData) throws BeansException, IOException
   {
     TimeZone.setDefault(DateHelper.UTC);
     log.info("user.timezone is: " + System.getProperty("user.timezone"));
@@ -166,10 +168,10 @@ public class TestBase
   protected static void clearDatabase()
   {
     PFUserContext.setUser(ADMIN_USER); // Logon admin user.
-    TransactionTemplate transactionTemplate = testConfiguration.getBean("txTemplate", TransactionTemplate.class);
+    final TransactionTemplate transactionTemplate = testConfiguration.getBean("txTemplate", TransactionTemplate.class);
     final HibernateTemplate hibernateTemplate = testConfiguration.getBean("hibernate", HibernateTemplate.class);
     transactionTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status)
+      public Object doInTransaction(final TransactionStatus status)
       {
         deleteFrom(hibernateTemplate, "TimesheetDO");
         deleteFrom(hibernateTemplate, "HRPlanningEntryDO");
@@ -221,14 +223,14 @@ public class TestBase
     });
   }
 
-  private static void deleteFrom(final HibernateTemplate hibernateTemplate, String entity)
+  private static void deleteFrom(final HibernateTemplate hibernateTemplate, final String entity)
   {
     final Query query = hibernateTemplate.getSessionFactory().getCurrentSession().createQuery("delete from " + entity);
     query.executeUpdate();
     hibernateTemplate.flush();
   }
 
-  private static void deleteAllDBObjects(final HibernateTemplate hibernateTemplate, String entity)
+  private static void deleteAllDBObjects(final HibernateTemplate hibernateTemplate, final String entity)
   {
     final List< ? > all = hibernateTemplate.find("from " + entity + " o");
     if (all != null && all.size() > 0) {
@@ -237,9 +239,9 @@ public class TestBase
     }
   }
 
-  protected PFUserDO logon(String username)
+  protected PFUserDO logon(final String username)
   {
-    PFUserDO user = userDao.getInternalByName(username);
+    final PFUserDO user = userDao.getInternalByName(username);
     if (user == null) {
       fail("User not found: " + username);
     }
@@ -247,7 +249,7 @@ public class TestBase
     return user;
   }
 
-  protected void logon(PFUserDO user)
+  protected void logon(final PFUserDO user)
   {
     PFUserContext.setUser(user);
   }
@@ -262,7 +264,7 @@ public class TestBase
    * 
    * @param hibernate
    */
-  public void setHibernate(HibernateTemplate hibernate)
+  public void setHibernate(final HibernateTemplate hibernate)
   {
     this.hibernate = hibernate;
   }
@@ -277,12 +279,12 @@ public class TestBase
    * 
    * @param userDao
    */
-  public void setUserDao(UserDao userDao)
+  public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
   }
-  
-  public void setAccessChecker(AccessChecker accessChecker)
+
+  public void setAccessChecker(final AccessChecker accessChecker)
   {
     this.accessChecker = accessChecker;
   }
@@ -302,9 +304,9 @@ public class TestBase
 
   protected static void deleteDB()
   {
-    String databaseUrl = testConfiguration.getDatabaseUrl();
-    String baseFilename = databaseUrl.substring(databaseUrl.lastIndexOf(':') + 1);
-    File data = new File(baseFilename + ".data");
+    final String databaseUrl = testConfiguration.getDatabaseUrl();
+    final String baseFilename = databaseUrl.substring(databaseUrl.lastIndexOf(':') + 1);
+    final File data = new File(baseFilename + ".data");
     if (data.exists() == true) {
       System.out.println("Deleting database files (" + baseFilename + ".*)");
       deleteFile(baseFilename + ".backup");
@@ -316,40 +318,40 @@ public class TestBase
     }
   }
 
-  private static void deleteFile(String filename)
+  private static void deleteFile(final String filename)
   {
-    File file = new File(filename);
+    final File file = new File(filename);
     if (file.canRead()) {
       file.delete();
     }
   }
 
-  public GroupDO getGroup(String groupName)
+  public GroupDO getGroup(final String groupName)
   {
     return initTestDB.getGroup(groupName);
   }
 
-  public Integer getGroupId(String groupName)
+  public Integer getGroupId(final String groupName)
   {
     return initTestDB.getGroup(groupName).getId();
   }
 
-  public TaskDO getTask(String taskName)
+  public TaskDO getTask(final String taskName)
   {
     return initTestDB.getTask(taskName);
   }
 
-  public PFUserDO getUser(String userName)
+  public PFUserDO getUser(final String userName)
   {
     return initTestDB.getUser(userName);
   }
 
-  public Integer getUserId(String userName)
+  public Integer getUserId(final String userName)
   {
     return initTestDB.getUser(userName).getId();
   }
 
-  protected void logStart(String name)
+  protected void logStart(final String name)
   {
     logStartPublic(name);
     mCount = 0;
@@ -366,7 +368,7 @@ public class TestBase
     log(".");
   }
 
-  protected void log(String string)
+  protected void log(final String string)
   {
     logPublic(string);
     if (++mCount % 40 == 0) {
@@ -374,7 +376,7 @@ public class TestBase
     }
   }
 
-  public static void logStartPublic(String name)
+  public static void logStartPublic(final String name)
   {
     System.out.print(name + ": ");
   }
@@ -389,30 +391,30 @@ public class TestBase
     logPublic(".");
   }
 
-  public static void logPublic(String string)
+  public static void logPublic(final String string)
   {
     System.out.print(string);
   }
 
-  public static void logSingleEntryPublic(String string)
+  public static void logSingleEntryPublic(final String string)
   {
     System.out.println(string);
   }
 
-  protected void assertAccessException(AccessException ex, Integer taskId, AccessType accessType, OperationType operationType)
+  protected void assertAccessException(final AccessException ex, final Integer taskId, final AccessType accessType, final OperationType operationType)
   {
     assertEquals(accessType, ex.getAccessType());
     assertEquals(operationType, ex.getOperationType());
     assertEquals(taskId, ex.getTaskId());
   }
 
-  protected void assertHistoryEntry(HistoryEntry entry, Integer entityId, PFUserDO user, HistoryEntryType type)
+  protected void assertHistoryEntry(final HistoryEntry entry, final Integer entityId, final PFUserDO user, final HistoryEntryType type)
   {
     assertHistoryEntry(entry, entityId, user, type, null, null, null, null);
   }
 
-  protected void assertHistoryEntry(HistoryEntry entry, Integer entityId, PFUserDO user, HistoryEntryType type, String propertyName,
-      Class< ? > classType, Object oldValue, Object newValue)
+  protected void assertHistoryEntry(final HistoryEntry entry, final Integer entityId, final PFUserDO user, final HistoryEntryType type, final String propertyName,
+      final Class< ? > classType, final Object oldValue, final Object newValue)
   {
     assertEquals(user.getId().toString(), entry.getUserName());
     // assertEquals(AddressDO.class.getSimpleName(), entry.getClassName());
@@ -420,14 +422,14 @@ public class TestBase
     assertEquals(type, entry.getType());
     assertEquals(entityId, entry.getEntityId());
     if (propertyName != null) {
-      List<PropertyDelta> delta = entry.getDelta();
+      final List<PropertyDelta> delta = entry.getDelta();
       assertEquals(1, delta.size());
-      PropertyDelta prop = delta.get(0);
+      final PropertyDelta prop = delta.get(0);
       assertPropertyDelta(prop, propertyName, classType, oldValue, newValue);
     }
   }
 
-  protected void assertPropertyDelta(PropertyDelta prop, String propertyName, Class< ? > propertyType, Object oldValue, Object newValue)
+  protected void assertPropertyDelta(final PropertyDelta prop, final String propertyName, final Class< ? > propertyType, final Object oldValue, final Object newValue)
   {
     assertEquals(propertyName, prop.getPropertyName());
     assertEquals(oldValue.toString(), prop.getOldValue());
@@ -437,8 +439,8 @@ public class TestBase
     }
   }
 
-  protected void assertSimpleHistoryEntry(SimpleHistoryEntry entry, PFUserDO user, HistoryEntryType entryType, String propertyName,
-      Class< ? > propertyType, Object oldValue, Object newValue)
+  protected void assertSimpleHistoryEntry(final SimpleHistoryEntry entry, final PFUserDO user, final HistoryEntryType entryType, final String propertyName,
+      final Class< ? > propertyType, final Object oldValue, final Object newValue)
   {
     assertEquals(user.getId(), entry.getUser().getId());
     assertEquals(entryType, entry.getEntryType());
