@@ -27,7 +27,7 @@ import org.apache.wicket.PageParameters;
 import org.junit.Test;
 import org.projectforge.web.wicket.WicketPageTestBase;
 
-public class AddressListPageTest extends WicketPageTestBase
+public class AddressPagesTest extends WicketPageTestBase
 {
   @Test
   public void testRenderMyPage()
