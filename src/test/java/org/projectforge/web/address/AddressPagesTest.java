@@ -24,16 +24,25 @@
 package org.projectforge.web.address;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
+import org.junit.Assert;
 import org.junit.Test;
+import org.projectforge.address.AddressDO;
 import org.projectforge.web.wicket.WicketPageTestBase;
 
 public class AddressPagesTest extends WicketPageTestBase
 {
+  @SuppressWarnings("unchecked")
   @Test
   public void testRenderMyPage()
   {
     loginTestAdmin();
     tester.startPage(new AddressListPage(new PageParameters()));
     tester.assertRenderedPage(AddressListPage.class);
+    final DataTable<AddressDO> table = (DataTable<AddressDO>)tester.getComponentFromLastRenderedPage("body:form:table");
+    Assert.assertEquals(0, table.getRowCount());
+    // Now, add a new address:
+    tester.clickLink("body:contentMenuArea:menu:1:link");
+    tester.assertRenderedPage(AddressEditPage.class);
   }
 }
