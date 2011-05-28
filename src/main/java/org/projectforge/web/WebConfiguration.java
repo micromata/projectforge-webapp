@@ -34,7 +34,8 @@ public class WebConfiguration
    */
   public static boolean isDevelopmentMode()
   {
-    return WicketApplication.internalIsDevelopmentMode();
+    final Boolean developmentMode = WicketApplication.internalIsDevelopmentMode();
+    return developmentMode != null && developmentMode == true;
   }
 
   public static boolean isGWikiAvailable()
