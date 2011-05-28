@@ -9,4 +9,5 @@ Release
 6. Update demo-war on www.projectforge.org
 7. Update documentation on www.projectforge.org/doc
 8. Publish news on Freshmeat
+9. Update Roadmap with gwiki
 
