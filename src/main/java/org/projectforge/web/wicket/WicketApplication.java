@@ -88,6 +88,8 @@ public class WicketApplication extends WebApplication
 
   public static final String RESOURCE_BUNDLE_NAME = "I18nResources";
 
+  public static final Class<? extends WebPage> DEFAULT_PAGE = CalendarPage.class;
+
   private static Boolean developmentMode;
 
   private static Boolean stripWicketTags;
@@ -345,9 +347,9 @@ public class WicketApplication extends WebApplication
    * @see org.apache.wicket.Application#getHomePage()
    */
   @Override
-  public Class<CalendarPage> getHomePage()
+  public Class<? extends WebPage> getHomePage()
   {
-    return CalendarPage.class;
+    return DEFAULT_PAGE;
   }
 
   @Override
