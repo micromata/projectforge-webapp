@@ -35,41 +35,60 @@ import org.junit.Test;
  */
 public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
 {
+  protected final String PATH_LISTPAGE_BUTTON_ADD = "body:contentMenuArea:menu:1:link";
+
+  protected final String PATH_LISTPAGE_FORM = "body:form";
+
+  protected final String PATH_LISTPAGE_SEARCH_INPUT_FIELD = "filter:searchFilterRow:searchCell:searchString";
+
+  protected final String PATH_LISTPAGE_FIRST_LIST_ENTRY_SELECT_BUTTON = "body:form:table:body:rows:1:cells:1:cell:1:select";
+
+  protected final String PATH_LISTPAGE_TABLE = "body:form:table";
+
+  protected final String PATH_EDITPAGE_FORM = "body:form";
+
+  protected final String PATH_EDITPAGE_BUTTON_CREATE = "create:button";
+
+  protected final String PATH_EDITPAGE_BUTTON_MARK_AS_DELETED = "markAsDeleted:button";
+
   @Test
   public void baseTests()
   {
     loginTestAdmin();
-    tester.startPage(getListPageClass());
-    tester.assertRenderedPage(getListPageClass());
-    DataTable< ? > table = (DataTable< ? >) tester.getComponentFromLastRenderedPage("body:form:table");
-    Assert.assertEquals(getNumberOfExistingListElements(), table.getRowCount());
-
+    startListPage();
+    if (getNumberOfExistingListElements() != null) {
+      final DataTable< ? > table = (DataTable< ? >) tester.getComponentFromLastRenderedPage(PATH_LISTPAGE_TABLE);
+      Assert.assertEquals(getNumberOfExistingListElements().intValue(), table.getRowCount());
+    }
     // Now, add a new element:
-    tester.clickLink("body:contentMenuArea:menu:1:link");
+    tester.clickLink(PATH_LISTPAGE_BUTTON_ADD);
     tester.assertRenderedPage(getEditPageClass());
 
     // Need new page to initialize model:
     final AbstractEditPage< ? , ? , ? > editPage = getEditPageWithPrefilledData();
     tester.startPage(editPage);
-    FormTester form = tester.newFormTester("body:form");
-    form.submit("create:button");
+    FormTester form = tester.newFormTester(PATH_EDITPAGE_FORM);
+    form.submit(PATH_EDITPAGE_BUTTON_CREATE);
 
     // Now check list page
     tester.assertRenderedPage(getListPageClass());
-    table = (DataTable<?>) tester.getComponentFromLastRenderedPage("body:form:table");
-    Assert.assertEquals(getNumberOfExistingListElements() + 1, table.getRowCount());
-
-    // Now re-enter edit page
-    tester.clickLink("body:form:table:body:rows:1:cells:1:cell:1:select"); // Edit page
+    if (getNumberOfExistingListElements() != null) {
+      final DataTable< ? > table = (DataTable< ? >) tester.getComponentFromLastRenderedPage(PATH_LISTPAGE_TABLE);
+      Assert.assertEquals(getNumberOfExistingListElements() + 1, table.getRowCount());
+    }
+    // Now re-enter edit page and mark object as deleted
+    tester.clickLink(PATH_LISTPAGE_FIRST_LIST_ENTRY_SELECT_BUTTON); // Edit page
     tester.assertRenderedPage(getEditPageClass());
     checkEditPage();
-    form = tester.newFormTester("body:form");
-    form.submit("markAsDeleted:button");
+    form = tester.newFormTester(PATH_EDITPAGE_FORM);
+    form.submit(PATH_EDITPAGE_BUTTON_MARK_AS_DELETED);
 
     // Now check list page again after object was deleted:
     tester.assertRenderedPage(getListPageClass());
-    table = (DataTable<?>) tester.getComponentFromLastRenderedPage("body:form:table");
-    Assert.assertEquals(getNumberOfExistingListElements(), table.getRowCount());
+    if (getNumberOfExistingListElements() != null) {
+      final DataTable< ? > table = (DataTable< ? >) tester.getComponentFromLastRenderedPage(PATH_LISTPAGE_TABLE);
+      Assert.assertEquals(getNumberOfExistingListElements().intValue(), table.getRowCount());
+    }
   }
 
   protected abstract Class< ? extends AbstractListPage< ? , ? , ? >> getListPageClass();
@@ -107,10 +126,30 @@ public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
 
   /**
    * Override this method if any test object entries do exist in the list (default is 0).
-   * @return
+   * @return number of existing elements expected in the list view or null if not to-be checked.
    */
-  protected int getNumberOfExistingListElements()
+  protected Integer getNumberOfExistingListElements()
   {
     return 0;
+  }
+
+  /**
+   * Starts list page with reseted filter.
+   */
+  protected void startListPage()
+  {
+    startListPage(null);
+  }
+
+  /**
+   * Starts list page with reseted filter and given search string as filter string.
+   */
+  protected void startListPage(final String searchString)
+  {
+    tester.startPage(getListPageClass());
+    tester.assertRenderedPage(getListPageClass());
+    final FormTester form = tester.newFormTester(PATH_LISTPAGE_FORM);
+    form.setValue(PATH_LISTPAGE_SEARCH_INPUT_FIELD, searchString != null ? searchString : "");
+    form.submit();
   }
 }

@@ -32,41 +32,69 @@ import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressStatus;
 import org.projectforge.address.ContactStatus;
 import org.projectforge.address.FormOfAddress;
-import org.projectforge.web.wicket.WicketPageTestBase;
+import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractListPage;
+import org.projectforge.web.wicket.ListAndEditPagesTestBase;
 
-public class AddressPagesTest extends WicketPageTestBase
+public class AddressPagesTest extends ListAndEditPagesTestBase
 {
   @SuppressWarnings("unchecked")
   @Test
-  public void testRenderPages()
+  public void testViewPage()
   {
     loginTestAdmin();
-    tester.startPage(new AddressListPage(new PageParameters()));
+    tester.startPage(AddressListPage.class);
     tester.assertRenderedPage(AddressListPage.class);
-    DataTable<AddressDO> table = (DataTable<AddressDO>) tester.getComponentFromLastRenderedPage("body:form:table");
-    Assert.assertEquals(0, table.getRowCount());
+
     // Now, add a new address:
-    tester.clickLink("body:contentMenuArea:menu:1:link");
+    tester.clickLink(PATH_LISTPAGE_BUTTON_ADD);
     tester.assertRenderedPage(AddressEditPage.class);
     // Need new page to initialize model:
-    AddressEditPage editPage = new AddressEditPage(new PageParameters());
+    final AddressEditPage editPage = new AddressEditPage(new PageParameters());
     final AddressDO data = editPage.getForm().getData();
     data.setName("Reinhard").setFirstName("Kai").setForm(FormOfAddress.MISTER).setContactStatus(ContactStatus.ACTIVE).setAddressStatus(
         AddressStatus.UPTODATE).setTask(getTask("1.1"));
     tester.startPage(editPage);
-    FormTester form = tester.newFormTester("body:form");
-    form.submit("create:button");
+    FormTester form = tester.newFormTester(PATH_EDITPAGE_FORM);
+    form.submit(PATH_EDITPAGE_BUTTON_CREATE);
     tester.assertRenderedPage(AddressListPage.class);
-    table = (DataTable<AddressDO>) tester.getComponentFromLastRenderedPage("body:form:table");
+    final DataTable<AddressDO> table = (DataTable<AddressDO>) tester.getComponentFromLastRenderedPage(PATH_LISTPAGE_TABLE);
     Assert.assertEquals(1, table.getRowCount());
-    tester.clickLink("body:form:table:body:rows:1:cells:1:cell:1:select"); // Edit page
-    tester.assertRenderedPage(AddressEditPage.class);
-    editPage = (AddressEditPage) tester.getLastRenderedPage();
-    Assert.assertEquals("Kai", editPage.getForm().getData().getFirstName());
-    form = tester.newFormTester("body:form");
-    form.submit("cancel:button");
-    tester.assertRenderedPage(AddressListPage.class);
-    tester.clickLink("body:form:table:body:rows:2:cells:1:cell:2:link"); // View page
+    tester.debugComponentTrees();
+
+    // Check view page
+    tester.clickLink("body:form:table:body:rows:1:cells:1:cell:2:link"); // View page
     tester.assertRenderedPage(AddressViewPage.class);
+
+    // Delete entry
+    tester.startPage(AddressListPage.class);
+    tester.assertRenderedPage(AddressListPage.class);
+    tester.clickLink(PATH_LISTPAGE_FIRST_LIST_ENTRY_SELECT_BUTTON); // Edit page
+    tester.assertRenderedPage(AddressEditPage.class);
+    form = tester.newFormTester(PATH_EDITPAGE_FORM);
+    form.submit(PATH_EDITPAGE_BUTTON_MARK_AS_DELETED);
+
   }
+
+  @Override
+  protected AbstractEditPage< ? , ? , ? > getEditPageWithPrefilledData()
+  {
+    final AddressEditPage editPage = new AddressEditPage(new PageParameters());
+    final AddressDO data = editPage.getForm().getData();
+    data.setName("Reinhard").setFirstName("Kai").setForm(FormOfAddress.MISTER).setContactStatus(ContactStatus.ACTIVE).setAddressStatus(
+        AddressStatus.UPTODATE).setTask(getTask("1.1"));
+    return editPage;
+  }
+
+  @Override
+  protected Class< ? extends AbstractEditPage< ? , ? , ? >> getEditPageClass()
+      {
+    return AddressEditPage.class;
+      }
+
+  @Override
+  protected Class< ? extends AbstractListPage< ? , ? , ? >> getListPageClass()
+      {
+    return AddressListPage.class;
+      }
 }
