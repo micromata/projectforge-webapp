@@ -69,6 +69,7 @@ public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
     tester.startPage(editPage);
     FormTester form = tester.newFormTester(PATH_EDITPAGE_FORM);
     form.submit(PATH_EDITPAGE_BUTTON_CREATE);
+    final Integer id = (Integer) editPage.getData().getId();
 
     // Now check list page
     tester.assertRenderedPage(getListPageClass());
@@ -76,8 +77,9 @@ public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
       final DataTable< ? > table = (DataTable< ? >) tester.getComponentFromLastRenderedPage(PATH_LISTPAGE_TABLE);
       Assert.assertEquals(getNumberOfExistingListElements() + 1, table.getRowCount());
     }
+    startListPage("id:" + id);
     // Now re-enter edit page and mark object as deleted
-    tester.clickLink(PATH_LISTPAGE_FIRST_LIST_ENTRY_SELECT_BUTTON); // Edit page
+    // tester.clickLink(PATH_LISTPAGE_FIRST_LIST_ENTRY_SELECT_BUTTON); // Edit page
     tester.assertRenderedPage(getEditPageClass());
     checkEditPage();
     form = tester.newFormTester(PATH_EDITPAGE_FORM);
