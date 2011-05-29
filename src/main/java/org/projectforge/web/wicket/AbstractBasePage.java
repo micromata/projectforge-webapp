@@ -167,8 +167,6 @@ public abstract class AbstractBasePage extends WebPage
       }
     };
     myAccountLink.add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false).setRenderBodyOnly(false));
-    final PageParameters params = new PageParameters();
-    params.add(LoginPage.REQUEST_PARAM_LOGOUT, "true");
     final Link<String> logoutLink = new Link<String>("logoutLink") {
       @Override
       public void onClick()
