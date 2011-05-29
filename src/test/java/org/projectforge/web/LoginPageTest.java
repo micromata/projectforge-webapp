@@ -24,17 +24,20 @@
 package org.projectforge.web;
 
 import org.apache.wicket.PageParameters;
+import org.apache.wicket.WicketRuntimeException;
 import org.apache.wicket.util.tester.FormTester;
+import org.junit.Assert;
 import org.junit.Test;
 import org.projectforge.test.TestBase;
 import org.projectforge.web.address.AddressListPage;
 import org.projectforge.web.calendar.CalendarPage;
+import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketPageTestBase;
 
 public class LoginPageTest extends WicketPageTestBase
 {
   @Test
-  public void testRenderMyPage()
+  public void testLoginAndLogout()
   {
     final LoginPage loginPage = new LoginPage(new PageParameters());
     // start and render the test page
@@ -53,7 +56,18 @@ public class LoginPageTest extends WicketPageTestBase
     form.setValue("password", TestBase.TEST_ADMIN_USER_PASSWORD);
     form.submit("login:button");
     tester.assertRenderedPage(CalendarPage.class);
-    tester.startPage(new AddressListPage(new PageParameters()));
+    tester.startPage(AddressListPage.class);
     tester.assertRenderedPage(AddressListPage.class);
+
+    loginTestAdmin(); // login should be ignored.
+    tester.assertRenderedPage(WicketApplication.DEFAULT_PAGE);
+
+    logout();
+    try {
+      tester.startPage(AddressListPage.class);
+      Assert.fail("Page must not be available, user not logged-in.");
+    } catch (final WicketRuntimeException ex) {
+      // Everything fine.
+    }
   }
 }
