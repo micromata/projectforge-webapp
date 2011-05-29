@@ -23,8 +23,8 @@
 
 package org.projectforge.web.wicket;
 
+import org.apache.commons.lang.ClassUtils;
 import org.apache.wicket.Page;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.Request;
 import org.apache.wicket.Response;
 import org.apache.wicket.Session;
@@ -35,11 +35,26 @@ import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.tester.WicketTester;
 import org.junit.Before;
 import org.projectforge.test.TestBase;
+import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.LoginPage;
+import org.projectforge.web.MenuBuilder;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+/**
+ * Your wicket tester class must extends this or any derived class from TestBase for correct initialization of Spring, data-base, resource
+ * locator etc. Before your tests a new data-base is initialized and set-up with test data.
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
+ */
 public class WicketPageTestBase extends TestBase
 {
   protected WicketTester tester;
+
+  private MenuBuilder menuBuilder;
+
+  private UserXmlPreferencesCache userXmlPreferencesCache;
 
   @Before
   public void setUpWicketApplication()
@@ -49,9 +64,12 @@ public class WicketPageTestBase extends TestBase
       protected void init()
       {
         super.init();
-        addComponentInstantiationListener(new SpringComponentInjector(this, getTestConfiguration().getApplicationContext(), true));
+        final ClassPathXmlApplicationContext context = getTestConfiguration().getApplicationContext();
+        addComponentInstantiationListener(new SpringComponentInjector(this, context, true));
         getResourceSettings().setResourceStreamLocator(new MyResourceStreamLocator());
         getResourceSettings().addStringResourceLoader(0, new BundleStringResourceLoader(WicketApplication.RESOURCE_BUNDLE_NAME));
+        final ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+        beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
       }
 
       @Override
@@ -69,15 +87,19 @@ public class WicketPageTestBase extends TestBase
   }
 
   /**
-   * 
+   * Logs the user in, if not already logged-in. If an user is already logged in then nothing is done. Therefore you must log-out an user
+   * before any new login.
    * @param username
    * @param password not encrypted.
    */
-  protected void login(final String username, final String password)
+  public void login(final String username, final String password)
   {
-    final LoginPage loginPage = new LoginPage(new PageParameters());
     // start and render the test page
-    tester.startPage(loginPage);
+    tester.startPage(LoginPage.class);
+    if (ClassUtils.isAssignable(tester.getLastRenderedPage().getClass(), WicketApplication.DEFAULT_PAGE) == true) {
+      // Already logged-in.
+      return;
+    }
     // assert rendered page class
     tester.assertRenderedPage(LoginPage.class);
     final FormTester form = tester.newFormTester("body:form");
@@ -87,8 +109,29 @@ public class WicketPageTestBase extends TestBase
     tester.assertRenderedPage(WicketApplication.DEFAULT_PAGE);
   }
 
-  protected void loginTestAdmin()
+  public void loginTestAdmin()
   {
     login(TestBase.TEST_ADMIN_USER, TestBase.TEST_ADMIN_USER_PASSWORD);
+  }
+
+  /**
+   * Logs any current logged-in user out and calls log-in page.
+   */
+  protected void logout()
+  {
+    LoginPage.logout((MySession) tester.getWicketSession(), tester.getWicketRequest(), tester
+        .getWicketResponse(), userXmlPreferencesCache, menuBuilder);
+    tester.startPage(LoginPage.class);
+    tester.assertRenderedPage(LoginPage.class);
+  }
+
+  public void setUserXmlPreferencesCache(final UserXmlPreferencesCache userXmlPreferencesCache)
+  {
+    this.userXmlPreferencesCache = userXmlPreferencesCache;
+  }
+
+  public void setMenuBuilder(final MenuBuilder menuBuilder)
+  {
+    this.menuBuilder = menuBuilder;
   }
 }
