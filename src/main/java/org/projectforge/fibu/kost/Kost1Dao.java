@@ -67,19 +67,19 @@ public class Kost1Dao extends BaseDao<Kost1DO>
    * @return
    */
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public String getKostString(Integer id)
+  public String getKostString(final Integer id)
   {
     if (id == null) {
       return "";
     }
-    Kost1DO kost1 = internalGetById(id);
+    final Kost1DO kost1 = internalGetById(id);
     if (kost1 == null) {
       return "";
     }
     if (hasLoggedInUserSelectAccess(kost1, false) == true) {
       return KostFormatter.format(kost1);
     } else {
-      EmployeeDO employee = userGroupCache.getEmployee(PFUserContext.getUserId());
+      final EmployeeDO employee = userGroupCache.getEmployee(PFUserContext.getUserId());
       if (employee != null && employee.getKost1Id() != null && employee.getKost1Id().compareTo(id) == 0) {
         kost1.setDescription(""); // Paranoia (if KostFormatter shows description in future times and Kost1DO is not visible for the user).
         return KostFormatter.format(kost1);
@@ -103,9 +103,10 @@ public class Kost1Dao extends BaseDao<Kost1DO>
   }
 
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public Kost1DO getKost1(int nummernkreis, int bereich, int teilbereich, int endziffer)
+  public Kost1DO getKost1(final int nummernkreis, final int bereich, final int teilbereich, final int endziffer)
   {
     @SuppressWarnings("unchecked")
+    final
     List<Kost1DO> list = getHibernateTemplate().find(
         "from Kost1DO k where k.nummernkreis=? and k.bereich=? and k.teilbereich=? and k.endziffer=?",
         new Object[] { nummernkreis, bereich, teilbereich, endziffer});
@@ -141,10 +142,10 @@ public class Kost1Dao extends BaseDao<Kost1DO>
 
   @SuppressWarnings("unchecked")
   @Override
-  protected void onSaveOrModify(Kost1DO obj)
+  protected void onSaveOrModify(final Kost1DO obj)
   {
     List<Kost2DO> list = null;
-    String sql = "from Kost1DO k where k.nummernkreis = ? and k.bereich = ? and k.teilbereich = ? and k.endziffer = ?";
+    final String sql = "from Kost1DO k where k.nummernkreis = ? and k.bereich = ? and k.teilbereich = ? and k.endziffer = ?";
     if (obj.getId() == null) {
       // New entry
       list = getHibernateTemplate().find(sql,
@@ -155,12 +156,12 @@ public class Kost1Dao extends BaseDao<Kost1DO>
           new Object[] { obj.getNummernkreis(), obj.getBereich(), obj.getTeilbereich(), obj.getEndziffer(), obj.getId()});
     }
     if (CollectionUtils.isNotEmpty(list) == true) {
-      throw new UserException("Kollision mit vorhandenem Kostenträger.");
+      throw new UserException("fibu.kost.error.collision");
     }
   }
 
   @Override
-  protected void afterSaveOrModify(Kost1DO kost1)
+  protected void afterSaveOrModify(final Kost1DO kost1)
   {
     super.afterSaveOrModify(kost1);
     kostCache.updateKost1(kost1);
@@ -172,7 +173,7 @@ public class Kost1Dao extends BaseDao<Kost1DO>
     return new Kost1DO();
   }
 
-  public void setKostCache(KostCache kostCache)
+  public void setKostCache(final KostCache kostCache)
   {
     this.kostCache = kostCache;
   }
