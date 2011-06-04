@@ -3,7 +3,7 @@
   <groupId>org.projectforge</groupId>
   <artifactId>ProjectForge</artifactId>
   <packaging>war</packaging>
-  <version>3.6.1</version>
+  <version>3.6.1.1</version>
   <name>ProjectForge</name>
   <description>
     ProjectForge is a multi user web application for collaborative team work. Organize time sheets, tasks, addresses, books etc. with project teams.
