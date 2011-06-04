@@ -48,8 +48,8 @@ public class TaskTreeTableNode extends TreeTableNode implements Serializable
   protected TaskTreeTableNode()
   {
   }
-  
-  protected TaskTreeTableNode(TaskTreeTableNode parent, TaskNode taskNode)
+
+  protected TaskTreeTableNode(final TaskTreeTableNode parent, final TaskNode taskNode)
   {
     super(parent, taskNode.getId());
     this.taskNode = taskNode;
@@ -95,6 +95,22 @@ public class TaskTreeTableNode extends TreeTableNode implements Serializable
     return taskNode.isDeleted();
   }
 
+  /** Has this node any childs? Deleted childs (task nodes) are ignored. */
+  @Override
+  public boolean hasChilds()
+  {
+    if (taskNode.hasChilds() == false) {
+      return false;
+    }
+    for (final TaskNode child : taskNode.getChilds()) {
+      if (child.isDeleted() == false) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+
   public PFUserDO getResponsibleUser()
   {
     return getTask().getResponsibleUser();
@@ -103,9 +119,10 @@ public class TaskTreeTableNode extends TreeTableNode implements Serializable
   /**
    * Return a String representation of this object.
    */
+  @Override
   public String toString()
   {
-    StringBuffer sb = new StringBuffer("TaskTreeTableNode[taskName=");
+    final StringBuffer sb = new StringBuffer("TaskTreeTableNode[taskName=");
     sb.append(getTaskTitle());
     sb.append(",id=");
     sb.append(getId());
@@ -115,9 +132,9 @@ public class TaskTreeTableNode extends TreeTableNode implements Serializable
 
   /** Should be overwrite by derived classes. */
   @Override
-  public int compareTo(TreeTableNode obj)
+  public int compareTo(final TreeTableNode obj)
   {
-    TaskTreeTableNode node = (TaskTreeTableNode) obj;
+    final TaskTreeTableNode node = (TaskTreeTableNode) obj;
     return taskNode.getTask().getTitle().compareTo(node.taskNode.getTask().getTitle());
   }
 }
