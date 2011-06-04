@@ -95,22 +95,6 @@ public class TaskTreeTableNode extends TreeTableNode implements Serializable
     return taskNode.isDeleted();
   }
 
-  /** Has this node any childs? Deleted childs (task nodes) are ignored. */
-  @Override
-  public boolean hasChilds()
-  {
-    if (taskNode.hasChilds() == false) {
-      return false;
-    }
-    for (final TaskNode child : taskNode.getChilds()) {
-      if (child.isDeleted() == false) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-
   public PFUserDO getResponsibleUser()
   {
     return getTask().getResponsibleUser();
