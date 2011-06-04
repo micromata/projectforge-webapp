@@ -60,7 +60,6 @@ public class AddressPagesTest extends ListAndEditPagesTestBase
     tester.assertRenderedPage(AddressListPage.class);
     final DataTable<AddressDO> table = (DataTable<AddressDO>) tester.getComponentFromLastRenderedPage(PATH_LISTPAGE_TABLE);
     Assert.assertEquals(1, table.getRowCount());
-    tester.debugComponentTrees();
 
     // Check view page
     tester.clickLink("body:form:table:body:rows:1:cells:1:cell:2:link"); // View page
