@@ -42,8 +42,7 @@ public class Kost2EditPage extends AbstractEditPage<Kost2DO, Kost2EditForm, Kost
   @SpringBean(name = "kost2Dao")
   private Kost2Dao kost2Dao;
 
-  @SuppressWarnings("serial")
-  public Kost2EditPage(PageParameters parameters)
+  public Kost2EditPage(final PageParameters parameters)
   {
     super(parameters, "fibu.kost2");
     init();
@@ -56,7 +55,7 @@ public class Kost2EditPage extends AbstractEditPage<Kost2DO, Kost2EditForm, Kost
   }
 
   @Override
-  protected Kost2EditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, Kost2DO data)
+  protected Kost2EditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final Kost2DO data)
   {
     return new Kost2EditForm(this, data);
   }
@@ -64,7 +63,7 @@ public class Kost2EditPage extends AbstractEditPage<Kost2DO, Kost2EditForm, Kost
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Integer)
    */
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     if ("projektId".equals(property) == true) {
       kost2Dao.setProjekt(getData(), (Integer) selectedValue);
@@ -80,7 +79,7 @@ public class Kost2EditPage extends AbstractEditPage<Kost2DO, Kost2EditForm, Kost
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
    */
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     if ("projektId".equals(property) == true) {
       getData().setProjekt(null);
@@ -92,7 +91,7 @@ public class Kost2EditPage extends AbstractEditPage<Kost2DO, Kost2EditForm, Kost
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
    */
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing.
   }
