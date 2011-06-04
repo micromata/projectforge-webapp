@@ -78,7 +78,7 @@ public class TaskNode implements Serializable
   /**
    * For every group with access to this node the permissions will be stored here.
    */
-  private List<GroupTaskAccessDO> groupTaskAccessList = new ArrayList<GroupTaskAccessDO>();
+  private final List<GroupTaskAccessDO> groupTaskAccessList = new ArrayList<GroupTaskAccessDO>();
 
   public TaskNode()
   {
@@ -92,7 +92,7 @@ public class TaskNode implements Serializable
     return this.task.getParentTaskId() == null;
   }
 
-  public void setTask(TaskDO task)
+  public void setTask(final TaskDO task)
   {
     this.task = task;
   }
@@ -254,16 +254,16 @@ public class TaskNode implements Serializable
   /** Has this task any childs? */
   public boolean hasChilds()
   {
-    return this.childs != null ? true : false;
+    return this.childs != null && this.childs.size() > 0 ? true : false;
   }
 
   /** Checks if the given node is a child / descendant of this node. */
-  public boolean isParentOf(TaskNode node)
+  public boolean isParentOf(final TaskNode node)
   {
     if (this.childs == null) {
       return false;
     }
-    for (TaskNode child : this.childs) {
+    for (final TaskNode child : this.childs) {
       if (child.equals(node) == true) {
         return true;
       } else if (child.isParentOf(node) == true) {
@@ -284,12 +284,12 @@ public class TaskNode implements Serializable
   /**
    * Returns the path to the parent node in an ArrayList.
    */
-  public List<TaskNode> getPathToAncestor(Integer ancestorTaskId)
+  public List<TaskNode> getPathToAncestor(final Integer ancestorTaskId)
   {
     if (this.parent == null || this.task.getId().equals(ancestorTaskId) == true) {
       return new ArrayList<TaskNode>();
     }
-    List<TaskNode> path = this.parent.getPathToAncestor(ancestorTaskId);
+    final List<TaskNode> path = this.parent.getPathToAncestor(ancestorTaskId);
     path.add(this);
     return path;
   }
@@ -297,7 +297,7 @@ public class TaskNode implements Serializable
   /**
    * Sets / changes the parent of this node. This method does not modify the parent task! So it should be called only by TaskTree.
    */
-  void setParent(TaskNode parent)
+  void setParent(final TaskNode parent)
   {
     if (parent != null) {
       if (parent.getId().equals(getId()) == true || this.isParentOf(parent)) {
@@ -313,7 +313,7 @@ public class TaskNode implements Serializable
    * Adds a new task as a child of this node. It does not check wether this task already exist as child or not! This method does not modify
    * the child task!
    */
-  void addChild(TaskNode child)
+  void addChild(final TaskNode child)
   {
     if (child != null) {
       if (child.getId().equals(getId()) == true || child.isParentOf(this)) {
@@ -330,7 +330,7 @@ public class TaskNode implements Serializable
   /**
    * Removes a child task of this node. This method does not modify the child task!
    */
-  void removeChild(TaskNode child)
+  void removeChild(final TaskNode child)
   {
     if (child == null) {
       log.error("Oups, child is null, can't remove it from parent.");
@@ -354,9 +354,9 @@ public class TaskNode implements Serializable
    * @see AccessType
    * @see OperationType
    */
-  public boolean hasPermission(Integer groupId, AccessType accessType, OperationType opType)
+  public boolean hasPermission(final Integer groupId, final AccessType accessType, final OperationType opType)
   {
-    GroupTaskAccessDO groupAccess = getGroupTaskAccess(groupId);
+    final GroupTaskAccessDO groupAccess = getGroupTaskAccess(groupId);
     if (groupAccess == null) {
       if (parent != null) {
         return parent.isPermissionRecursive(groupId) && parent.hasPermission(groupId, accessType, opType);
@@ -378,10 +378,10 @@ public class TaskNode implements Serializable
    * @param groupId
    * @return The GroupTaskAccessDO or null if not exists.
    */
-  GroupTaskAccessDO getGroupTaskAccess(Integer groupId)
+  GroupTaskAccessDO getGroupTaskAccess(final Integer groupId)
   {
     Validate.notNull(groupId);
-    for (GroupTaskAccessDO access : groupTaskAccessList) {
+    for (final GroupTaskAccessDO access : groupTaskAccessList) {
       if (groupId.equals(access.getGroupId()) == true) {
         return access;
       }
@@ -394,7 +394,7 @@ public class TaskNode implements Serializable
    * exists. Multiple GroupTaskAccessDO entries for one group will be avoided.
    * @param GroupTaskAccessDO
    */
-  void setGroupTaskAccess(GroupTaskAccessDO groupTaskAccess)
+  void setGroupTaskAccess(final GroupTaskAccessDO groupTaskAccess)
   {
     Validate.isTrue(ObjectUtils.equals(this.getTaskId(), groupTaskAccess.getTaskId()) == true);
     // TODO: Should be called after update and insert into database.
@@ -412,15 +412,15 @@ public class TaskNode implements Serializable
    * @param groupId
    * @return true if an entry was found and removed, otherwise false.
    */
-  boolean removeGroupTaskAccess(Integer groupId)
+  boolean removeGroupTaskAccess(final Integer groupId)
   {
     // TODO: Should be called after deleting from database.
     Validate.notNull(groupId);
     boolean result = false;
     synchronized (groupTaskAccessList) {
-      Iterator<GroupTaskAccessDO> it = groupTaskAccessList.iterator();
+      final Iterator<GroupTaskAccessDO> it = groupTaskAccessList.iterator();
       while (it.hasNext() == true) {
-        GroupTaskAccessDO access = it.next();
+        final GroupTaskAccessDO access = it.next();
         if (groupId.equals(access.getGroupId()) == true) {
           it.remove();
           result = true;
@@ -454,9 +454,9 @@ public class TaskNode implements Serializable
   public boolean equals(final Object o)
   {
     if (o instanceof TaskNode) {
-      TaskNode other = (TaskNode) o;
+      final TaskNode other = (TaskNode) o;
       return ObjectUtils.equals(this.getParentId(), other.getParentId()) == true
-          && ObjectUtils.equals(this.getTask().getTitle(), other.getTask().getTitle()) == true;
+      && ObjectUtils.equals(this.getTask().getTitle(), other.getTask().getTitle()) == true;
     }
     return false;
   }
@@ -464,7 +464,7 @@ public class TaskNode implements Serializable
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     hcb.append(this.getParentId()).append(this.getTask().getTitle());
     return hcb.toHashCode();
   }
@@ -472,7 +472,7 @@ public class TaskNode implements Serializable
   @Override
   public String toString()
   {
-    ToStringBuilder sb = new ToStringBuilder(this);
+    final ToStringBuilder sb = new ToStringBuilder(this);
     sb.append("id", getId());
     Object parentId = null;
     if (this.parent != null) {
@@ -485,11 +485,11 @@ public class TaskNode implements Serializable
     return sb.toString();
   }
 
-  Element addXMLElement(Element parent)
+  Element addXMLElement(final Element parent)
   {
-    Element el = parent.addElement("task").addAttribute("id", String.valueOf(this.getId())).addAttribute("name", this.task.getTitle());
+    final Element el = parent.addElement("task").addAttribute("id", String.valueOf(this.getId())).addAttribute("name", this.task.getTitle());
     if (this.childs != null) {
-      for (TaskNode node : this.childs) {
+      for (final TaskNode node : this.childs) {
         node.addXMLElement(el);
       }
     }
