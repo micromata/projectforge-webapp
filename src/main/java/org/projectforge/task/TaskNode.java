@@ -122,12 +122,6 @@ public class TaskNode implements Serializable
     return parent.getId();
   }
 
-  /** Fullname of the user assigned to this task. */
-  public String getFullname()
-  {
-    return ""; // TaskDO.internalLoad(getUserId()).getRealname();
-  }
-
   /** Returns the parent task. */
   public TaskNode getParent()
   {
