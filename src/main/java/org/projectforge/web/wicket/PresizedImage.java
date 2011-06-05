@@ -29,12 +29,15 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.wicket.Response;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.image.ContextImage;
 import org.projectforge.core.Configuration;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.core.ImageDimension;
 import org.projectforge.xml.stream.AliasMap;
 import org.projectforge.xml.stream.XmlObjectReader;
@@ -47,9 +50,12 @@ public class PresizedImage extends ContextImage
 
   private static final Map<String, Dimension> registry;
 
+  private static final Set<String> notFound;
+
   static {
     log.info("Reading image dimensions from file " + WebConstants.FILE_IMAGE_DIMENSIONS + " ...");
     registry = new HashMap<String, Dimension>();
+    notFound = new TreeSet<String>();
     final ClassLoader cLoader = Configuration.class.getClassLoader();
     final InputStream is = cLoader.getResourceAsStream(WebConstants.FILE_IMAGE_DIMENSIONS);
     final XmlObjectReader reader = new XmlObjectReader();
@@ -59,7 +65,7 @@ public class PresizedImage extends ContextImage
     String xml = null;
     try {
       xml = IOUtils.toString(is);
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       log.error("Couldn't read image dimensions file: " + ex.getMessage(), ex);
     }
     if (xml == null) {
@@ -92,9 +98,16 @@ public class PresizedImage extends ContextImage
   public PresizedImage(final String id, final Response response, final String path)
   {
     super(id, WicketUtils.getImageUrl(response, path));
-    Dimension dimension = registry.get(path);
+    final Dimension dimension = registry.get(path);
     if (dimension == null) {
-      log.error("Image " + path + " not found (please update image dimension file via GetImageDimensionsTest).");
+      if (WebConfiguration.isDevelopmentMode() == true) {
+        log.warn("Image " + path + " not found (please update image dimension file via GetImageDimensionsTest).");
+      } else {
+        if (notFound.contains(path) == false) {
+          log.warn("Image " + path + " not found (please update image dimension file via GetImageDimensionsTest).");
+          notFound.add(path);
+        }
+      }
     } else {
       add(new SimpleAttributeModifier("height", String.valueOf(dimension.height)));
       add(new SimpleAttributeModifier("width", String.valueOf(dimension.width)));
