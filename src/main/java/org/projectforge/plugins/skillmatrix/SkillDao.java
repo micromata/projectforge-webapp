@@ -35,7 +35,9 @@ public class SkillDao extends BaseDao<SkillDO>
 {
   public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_SKILL_MATRIX", "plugin20", "plugins.skill_matrix.skill");;
 
-  //private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SkillDao.class);
+  static final String I18N_KEY_ERROR_CYCLIC_REFERENCE = "plugins.skillmatrix.error.cyclicReference";
+
+  // private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SkillDao.class);
 
   public SkillDao()
   {

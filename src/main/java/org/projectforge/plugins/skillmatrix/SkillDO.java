@@ -53,7 +53,7 @@ public class SkillDO extends DefaultBaseDO
   private static final long serialVersionUID = 6102127905651011282L;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String name;
+  private String title;
 
   // Null if this skill is a top level skill.
   @IndexedEmbedded(depth = 1)
@@ -70,18 +70,18 @@ public class SkillDO extends DefaultBaseDO
   private boolean rateable;
 
   @Column(length = 100)
-  public String getName()
+  public String getTitle()
   {
-    return name;
+    return title;
   }
 
   /**
-   * @param name
+   * @param title
    * @return this for chaining.
    */
-  public SkillDO setName(final String name)
+  public SkillDO setTitle(final String title)
   {
-    this.name = name;
+    this.title = title;
     return this;
   }
 
