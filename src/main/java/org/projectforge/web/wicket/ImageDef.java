@@ -30,7 +30,7 @@ package org.projectforge.web.wicket;
  */
 public enum ImageDef
 {
-  ADD("add.png"), //
+  ADD(DIRS.MAIN + "add.png"), //
   ACCEPT(DIRS.MAIN + "accept.png"), DENY(DIRS.MAIN + "deny.png"), //
   EDIT(DIRS.MAIN + "pencil.png"), //
   HELP(DIRS.MAIN + "help.png"), //
@@ -41,16 +41,15 @@ public enum ImageDef
   ZOOM(DIRS.MAIN + "zoom.png"), //
   ZOOM_IN(DIRS.MAIN + "zoom_in.png"), //
   ZOOM_OUT(DIRS.MAIN + "zoom_out.png"), //
- 
-  EM_ARROW_LEFT(DIRS.MAIN + "embats-arrow-left.png"),//
-  EM_ARROW_RIGHT(DIRS.MAIN + "embats-arrow-right.png"),//
-  EM_CLOCK(DIRS.MAIN + "embats-clock.png"),//
-  EM_CROSS(DIRS.MAIN + "embats-cross.png"),//
-  EM_PIN(DIRS.MAIN + "embats-pin.png"),//
-  EM_PLUS(DIRS.MAIN + "embats-plus.png"),//
+
+  EM_ARROW_LEFT(DIRS.MAIN + "embats-arrow-left.png"), //
+  EM_ARROW_RIGHT(DIRS.MAIN + "embats-arrow-right.png"), //
+  EM_CLOCK(DIRS.MAIN + "embats-clock.png"), //
+  EM_CROSS(DIRS.MAIN + "embats-cross.png"), //
+  EM_PIN(DIRS.MAIN + "embats-pin.png"), //
+  EM_PLUS(DIRS.MAIN + "embats-plus.png"), //
   EM_STAR(DIRS.MAIN + "embats-star.png");//
 
-  
   // public static final String IMAGE_ADD = DIR + "add.png";
   //
   // public static final String IMAGE_ARROW_DOWN = DIR + "arrow-down.png";
