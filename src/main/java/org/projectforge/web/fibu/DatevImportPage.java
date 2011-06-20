@@ -51,9 +51,9 @@ public class DatevImportPage extends AbstractSecuredPage
 
   static final String KEY_IMPORT_STORAGE = "ImportStorage";
 
-  private DatevImportForm form;
+  private final DatevImportForm form;
 
-  private ActionLog actionLog = new ActionLog();
+  private final ActionLog actionLog = new ActionLog();
 
   public DatevImportPage(final PageParameters parameters)
   {
@@ -81,21 +81,16 @@ public class DatevImportPage extends AbstractSecuredPage
     checkAccess();
     final FileUpload fileUpload = form.fileUploadField.getFileUpload();
     if (fileUpload != null) {
-      boolean delete = false;
       try {
         final InputStream is = fileUpload.getInputStream();
         actionLog.reset();
         final String clientFileName = fileUpload.getClientFileName();
         form.storage = datevImportDao.importKontenplan(is, clientFileName, actionLog);
         putUserPrefEntry(KEY_IMPORT_STORAGE, form.storage, false);
-      } catch (Exception ex) {
+      } catch (final Exception ex) {
         log.error(ex.getMessage(), ex);
         error("An error occurred (see log files for details): " + ex.getMessage());
         clear();
-      } finally {
-        if (delete == true) {
-          fileUpload.delete();
-        }
       }
     }
   }
@@ -105,21 +100,16 @@ public class DatevImportPage extends AbstractSecuredPage
     checkAccess();
     final FileUpload fileUpload = form.fileUploadField.getFileUpload();
     if (fileUpload != null) {
-      boolean delete = false;
       try {
         final InputStream is = fileUpload.getInputStream();
         actionLog.reset();
         final String clientFileName = fileUpload.getClientFileName();
         form.storage = datevImportDao.importBuchungsdaten(is, clientFileName, actionLog);
         putUserPrefEntry(KEY_IMPORT_STORAGE, form.storage, false);
-      } catch (Exception ex) {
+      } catch (final Exception ex) {
         log.error(ex.getMessage(), ex);
         error("An error occurred (see log files for details): " + ex.getMessage());
         clear();
-      } finally {
-        if (delete == true) {
-          fileUpload.delete();
-        }
       }
     }
   }
@@ -147,16 +137,25 @@ public class DatevImportPage extends AbstractSecuredPage
   protected void selectAll(final String sheetName)
   {
     checkAccess();
-    final ImportedSheet< ? > sheet = (ImportedSheet< ? >) form.storage.getNamedSheet(sheetName);
+    final ImportedSheet< ? > sheet = form.storage.getNamedSheet(sheetName);
     Validate.notNull(sheet);
     sheet.selectAll(true, "modified".equals(form.filter.getListType()));
+    // updateSelectedItems();
+  }
+
+  protected void select(final String sheetName, final int number)
+  {
+    checkAccess();
+    final ImportedSheet< ? > sheet = form.storage.getNamedSheet(sheetName);
+    Validate.notNull(sheet);
+    sheet.select(true, "modified".equals(form.filter.getListType()), number);
     // updateSelectedItems();
   }
 
   protected void deselectAll(final String sheetName)
   {
     checkAccess();
-    final ImportedSheet< ? > sheet = (ImportedSheet< ? >) form.storage.getNamedSheet(sheetName);
+    final ImportedSheet< ? > sheet = form.storage.getNamedSheet(sheetName);
     Validate.notNull(sheet);
     sheet.selectAll(false, false);
     // updateSelectedItems();
@@ -164,22 +163,22 @@ public class DatevImportPage extends AbstractSecuredPage
 
   protected void showErrorSummary(final String sheetName)
   {
-    final ImportedSheet< ? > sheet = (ImportedSheet< ? >) form.storage.getNamedSheet(sheetName);
+    final ImportedSheet< ? > sheet = form.storage.getNamedSheet(sheetName);
     Validate.notNull(sheet);
     form.errorProperties = sheet.getErrorProperties();
   }
 
   protected void showBWA(final String sheetName)
   {
-    final ImportedSheet< ? > sheet = (ImportedSheet< ? >) form.storage.getNamedSheet(sheetName);
+    final ImportedSheet< ? > sheet = form.storage.getNamedSheet(sheetName);
     Validate.notNull(sheet);
     final List<BuchungssatzDO> list = new ArrayList<BuchungssatzDO>();
-    for (ImportedElement< ? > element : sheet.getElements()) {
+    for (final ImportedElement< ? > element : sheet.getElements()) {
       final BuchungssatzDO satz = (BuchungssatzDO) element.getValue();
       list.add(satz);
     }
-     form.bwa = new Bwa((Integer) sheet.getProperty("year"), (Integer) sheet.getProperty("month"));
-     form.bwa.setBuchungssaetze(list);
+    form.bwa = new Bwa((Integer) sheet.getProperty("year"), (Integer) sheet.getProperty("month"));
+    form.bwa.setBuchungssaetze(list);
   }
 
   private void checkAccess()

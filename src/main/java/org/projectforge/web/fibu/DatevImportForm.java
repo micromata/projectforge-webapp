@@ -303,6 +303,20 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
         @Override
         public void onSubmit()
         {
+          parentPage.select(sheet.getName(), 100);
+        }
+      }, "select 100");
+      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+        @Override
+        public void onSubmit()
+        {
+          parentPage.select(sheet.getName(), 500);
+        }
+      }, "select 500");
+      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+        @Override
+        public void onSubmit()
+        {
           parentPage.deselectAll(sheet.getName());
         }
       }, "deselect all");

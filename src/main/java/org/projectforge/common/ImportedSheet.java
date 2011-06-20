@@ -79,7 +79,7 @@ public class ImportedSheet<T> implements Serializable
     return elements;
   }
 
-  public void addElement(ImportedElement<T> element)
+  public void addElement(final ImportedElement<T> element)
   {
     if (elements == null) {
       elements = new ArrayList<ImportedElement<T>>();
@@ -102,14 +102,36 @@ public class ImportedSheet<T> implements Serializable
     return numberOfNewElements;
   }
 
-  public void selectAll(boolean select, boolean onlyModified)
+  public void selectAll(final boolean select, final boolean onlyModified)
   {
     if (elements == null) {
       return;
     }
-    for (ImportedElement<T> element : elements) {
-      if (onlyModified == false || element.isModified() == true || element.isNew() == true)
+    for (final ImportedElement<T> element : elements) {
+      if (onlyModified == false || element.isModified() == true || element.isNew() == true) {
         element.setSelected(select);
+      } else {
+        element.setSelected(!select);
+      }
+    }
+  }
+
+  public void select(final boolean select, final boolean onlyModified, final int number)
+  {
+    if (elements == null) {
+      return;
+    }
+    int counter = number;
+    for (final ImportedElement<T> element : elements) {
+      if (onlyModified == false || element.isModified() == true || element.isNew() == true) {
+        if (--counter < 0) {
+          element.setSelected(!select);
+        } else {
+          element.setSelected(select);
+        }
+      } else {
+        element.setSelected(!select);
+      }
     }
   }
 
@@ -139,7 +161,7 @@ public class ImportedSheet<T> implements Serializable
     numberOfFaultyElements = 0;
     boolean changes = false;
     if (elements != null) {
-      for (ImportedElement<T> element : elements) {
+      for (final ImportedElement<T> element : elements) {
         totalNumberOfElements++;
         if (reconciled == true) {
           element.setReconciled(true);
@@ -185,7 +207,7 @@ public class ImportedSheet<T> implements Serializable
     return name;
   }
 
-  public void setName(String name)
+  public void setName(final String name)
   {
     this.name = name;
   }
@@ -198,7 +220,7 @@ public class ImportedSheet<T> implements Serializable
     return open;
   }
 
-  public void setOpen(boolean open)
+  public void setOpen(final boolean open)
   {
     this.open = open;
   }
@@ -229,7 +251,7 @@ public class ImportedSheet<T> implements Serializable
     return numberOfCommittedElements;
   }
 
-  public void setNumberOfCommittedElements(int numberOfCommittedElements)
+  public void setNumberOfCommittedElements(final int numberOfCommittedElements)
   {
     this.numberOfCommittedElements = numberOfCommittedElements;
   }
@@ -239,7 +261,7 @@ public class ImportedSheet<T> implements Serializable
     return numberOfFaultyElements;
   }
 
-  public void setProperty(String key, Object value)
+  public void setProperty(final String key, final Object value)
   {
     if (this.properties == null) {
       this.properties = new HashMap<String, Object>();
@@ -247,7 +269,7 @@ public class ImportedSheet<T> implements Serializable
     this.properties.put(key, value);
   }
 
-  public Object getProperty(String key)
+  public Object getProperty(final String key)
   {
     if (this.properties == null) {
       return null;
@@ -264,11 +286,11 @@ public class ImportedSheet<T> implements Serializable
       return null;
     }
     errorProperties = null;
-    for (ImportedElement<T> el : this.elements) {
+    for (final ImportedElement<T> el : this.elements) {
       if (el.isFaulty() == true) {
-        Map<String, Object> map = el.getErrorProperties();
-        for (String key : map.keySet()) {
-          Object value = map.get(key);
+        final Map<String, Object> map = el.getErrorProperties();
+        for (final String key : map.keySet()) {
+          final Object value = map.get(key);
           if (errorProperties == null) {
             errorProperties = new HashMap<String, Set<Object>>();
           }
@@ -287,7 +309,7 @@ public class ImportedSheet<T> implements Serializable
     return errorProperties;
   }
 
-  public void setStatus(ImportStatus status)
+  public void setStatus(final ImportStatus status)
   {
     boolean allowed = true;
     if (this.status == ImportStatus.NOT_RECONCILED || this.status == null) {
