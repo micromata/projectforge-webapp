@@ -73,7 +73,7 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
    * @param locale
    * @see DateHelper#getCalendar(Locale)
    */
-  public DateHolder(DatePrecision precision, Locale locale)
+  public DateHolder(final DatePrecision precision, final Locale locale)
   {
     calendar = DateHelper.getCalendar(locale);
     setPrecision(precision);
@@ -296,7 +296,7 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
       case HOUR_OF_DAY:
         calendar.set(Calendar.MINUTE, 0);
       case MINUTE_15:
-        int minute = calendar.get(Calendar.MINUTE);
+        final int minute = calendar.get(Calendar.MINUTE);
         if (minute < 15) {
           calendar.set(Calendar.MINUTE, 0);
         } else if (minute < 30) {
@@ -327,14 +327,14 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
 
   public java.sql.Date getSQLDate()
   {
-    Calendar cal = Calendar.getInstance(DateHelper.UTC);
+    final Calendar cal = Calendar.getInstance(DateHelper.UTC);
     cal.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
     cal.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR));
     cal.set(Calendar.HOUR_OF_DAY, 0);
     cal.set(Calendar.MINUTE, 0);
     cal.set(Calendar.SECOND, 0);
     cal.set(Calendar.MILLISECOND, 0);
-    java.sql.Date date = new java.sql.Date(cal.getTimeInMillis());
+    final java.sql.Date date = new java.sql.Date(cal.getTimeInMillis());
     return date;
   }
 
@@ -345,7 +345,7 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
    */
   public boolean isSameDay(final Date date)
   {
-    DateHolder other = new DateHolder(this.calendar);
+    final DateHolder other = new DateHolder(this.calendar);
     other.setDate(date);
     return isSameDay(other);
   }
@@ -395,7 +395,7 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
 
   public DateHolder setEndOfMonth()
   {
-    int day = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+    final int day = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
     calendar.set(Calendar.DAY_OF_MONTH, day);
     setEndOfDay();
     return this;
@@ -545,19 +545,19 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
     return calendar.get(Calendar.HOUR_OF_DAY);
   }
 
-  public DateHolder setMonth(int month)
+  public DateHolder setMonth(final int month)
   {
     calendar.set(Calendar.MONTH, month);
     return this;
   }
 
-  public DateHolder setDayOfMonth(int day)
+  public DateHolder setDayOfMonth(final int day)
   {
     calendar.set(Calendar.DAY_OF_MONTH, day);
     return this;
   }
 
-  public DateHolder setHourOfDay(int hour)
+  public DateHolder setHourOfDay(final int hour)
   {
     calendar.set(Calendar.HOUR_OF_DAY, hour);
     return this;
@@ -624,7 +624,7 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
    */
   public int daysBetween(final Date other)
   {
-    DateHolder o = new DateHolder(calendar);
+    final DateHolder o = new DateHolder(calendar);
     o.setDate(other);
     return daysBetween(o);
   }
@@ -641,7 +641,7 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
     }
     int result = 0;
     final int toYear = to.getYear();
-    DateHolder dh = new DateHolder(from.getDate());
+    final DateHolder dh = new DateHolder(from.getDate());
 
     int endlessLoopProtection = 0;
     while (dh.getYear() < toYear) {
@@ -650,8 +650,8 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
       dh.setDayOfMonth(31);
       result += dh.getDayOfYear() - fromDay + 1;
       dh.add(Calendar.DAY_OF_MONTH, 1);
-      if (++endlessLoopProtection > 500) {
-        throw new IllegalArgumentException("Days between doesn's support more than 500 years");
+      if (++endlessLoopProtection > 5000) {
+        throw new IllegalArgumentException("Days between doesn's support more than 5000 years");
       }
     }
     result += to.getDayOfYear() - dh.getDayOfYear();
@@ -698,6 +698,7 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
     return this;
   }
 
+  @Override
   public String toString()
   {
     return DateHelper.formatAsUTC(getDate()) + ", time zone=" + calendar.getTimeZone().getID() + ", date=" + getDate().toString();
@@ -706,7 +707,7 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
   @Override
   public Object clone()
   {
-    DateHolder res = new DateHolder();
+    final DateHolder res = new DateHolder();
     res.calendar = (Calendar) this.calendar.clone();
     // res.calendar.setTime(this.calendar.getTime());
     res.precision = this.precision;
@@ -780,10 +781,10 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
   }
 
   @Override
-  public boolean equals(Object obj)
+  public boolean equals(final Object obj)
   {
     if (obj instanceof DateHolder) {
-      DateHolder other = (DateHolder) obj;
+      final DateHolder other = (DateHolder) obj;
       if (other.getTimeInMillis() == getTimeInMillis() && other.getPrecision() == getPrecision()) {
         return true;
       }
@@ -794,7 +795,7 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     hcb.append(this.getTimeInMillis()).append(getPrecision());
     return hcb.toHashCode();
   }
@@ -802,7 +803,7 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
   /**
    * @see java.lang.Comparable#compareTo(java.lang.Object)
    */
-  public int compareTo(DateHolder o)
+  public int compareTo(final DateHolder o)
   {
     return calendar.compareTo(o.calendar);
   }
