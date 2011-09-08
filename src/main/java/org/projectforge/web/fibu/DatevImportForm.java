@@ -187,16 +187,17 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
     storageContainer.add(errorPropertiesTable = new WebMarkupContainer("errorPropertiesTable"));
     if (MapUtils.isNotEmpty(errorProperties) == true) {
       final RepeatingView errorPropertiesView = new RepeatingView("errorProperties");
-      storageContainer.add(errorPropertiesView);
+      errorPropertiesTable.add(errorPropertiesView);
       for (final Map.Entry<String, Set<Object>> entry : errorProperties.entrySet()) {
         final WebMarkupContainer entryContainer = new WebMarkupContainer(errorPropertiesView.newChildId());
         errorPropertiesView.add(entryContainer);
+        entryContainer.add(new Label("propertyKey", entry.getKey()));
         final StringBuffer buf = new StringBuffer();
         boolean first = true;
         for (final Object value : entry.getValue()) {
           first = StringHelper.append(buf, first, String.valueOf(value), ", ");
         }
-        errorPropertiesView.add(new Label("propertyItems", buf.toString()));
+        entryContainer.add(new Label("propertyItems", buf.toString()));
       }
     } else {
       errorPropertiesTable.setVisible(false);

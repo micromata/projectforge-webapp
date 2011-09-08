@@ -30,15 +30,17 @@
   <div wicket:id="storage">
   <h1 wicket:id="storageHeading">[Import storage filename]</h1>
   <div id="infolayer">
-  <table wicket:id="errorPropertiesTable">
-    <tr>
-      <th>Key</th>
-      <th>Error values</th>
-    </tr>
-    <tr wicket:id="errorProperties">
-      <td wicket:id="propertyKey">[${prop.key}]</td>
-      <td><span wicket:id="propertyItems">[forEach ${prop.value}: ${val}, ...] </span></td>
-    </tr>
+  <table wicket:id="errorPropertiesTable" class="dataview" cellspacing="0">
+    <tbody>
+      <tr>
+        <th>Key</th>
+        <th>Error values</th>
+      </tr>
+      <tr wicket:id="errorProperties">
+        <td wicket:id="propertyKey">[${prop.key}]</td>
+        <td><span wicket:id="propertyItems">[forEach ${prop.value}: ${val}, ...] </span></td>
+      </tr>
+    </tbody>
   </table>
   <pre wicket:id="bwa">[${actionBean.bwa}]</pre></div>
   <wicket:container wicket:id="sheetRepeater">
