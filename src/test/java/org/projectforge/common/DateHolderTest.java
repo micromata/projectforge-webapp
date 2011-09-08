@@ -33,7 +33,7 @@ import java.util.Locale;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.projectforge.core.ConfigXmlTest;
+import org.projectforge.test.TestConfiguration;
 
 public class DateHolderTest
 {
@@ -41,18 +41,18 @@ public class DateHolderTest
   public static void setUp()
   {
     // Needed if this tests runs before the ConfigurationTest.
-    ConfigXmlTest.createTestConfiguration();
+    TestConfiguration.initAsTestConfiguration();
   }
 
   @Test
   public void isSameDay()
   {
-    Calendar cal = Calendar.getInstance(DateHelper.EUROPE_BERLIN);
+    final Calendar cal = Calendar.getInstance(DateHelper.EUROPE_BERLIN);
     cal.set(2008, Calendar.MARCH, 5, 0, 0, 0);
     cal.set(Calendar.MILLISECOND, 0);
-    DateHolder date = new DateHolder(cal.getTime(), DateHelper.EUROPE_BERLIN);
+    final DateHolder date = new DateHolder(cal.getTime(), DateHelper.EUROPE_BERLIN);
     assertEquals("2008-03-04 23:00:00.000", DateHelper.FOR_TESTCASE_OUTPUT_FORMATTER.get().format(date.getDate()));
-    java.sql.Date sqlDate = date.getSQLDate();
+    final java.sql.Date sqlDate = date.getSQLDate();
     assertEquals("2008-03-05 00:00:00.000", DateHelper.FOR_TESTCASE_OUTPUT_FORMATTER.get().format(sqlDate));
     assertTrue(date.isSameDay(sqlDate) == true);
   }
@@ -60,21 +60,21 @@ public class DateHolderTest
   @Test
   public void getSQLDate()
   {
-    Calendar cal = Calendar.getInstance(DateHelper.EUROPE_BERLIN);
+    final Calendar cal = Calendar.getInstance(DateHelper.EUROPE_BERLIN);
     cal.set(2008, Calendar.MARCH, 5, 0, 0, 0);
     cal.set(Calendar.MILLISECOND, 0);
-    DateHolder date = new DateHolder(cal.getTime(), DateHelper.EUROPE_BERLIN);
+    final DateHolder date = new DateHolder(cal.getTime(), DateHelper.EUROPE_BERLIN);
     assertEquals("2008-03-04 23:00:00.000", DateHelper.FOR_TESTCASE_OUTPUT_FORMATTER.get().format(date.getDate()));
-    java.sql.Date sqlDate = date.getSQLDate();
+    final java.sql.Date sqlDate = date.getSQLDate();
     assertEquals("2008-03-05 00:00:00.000", DateHelper.FOR_TESTCASE_OUTPUT_FORMATTER.get().format(sqlDate));
   }
 
   @Test
   public void daysBetween()
   {
-    DateHolder date1 = new DateHolder(DatePrecision.DAY, Locale.GERMAN);
+    final DateHolder date1 = new DateHolder(DatePrecision.DAY, Locale.GERMAN);
     date1.setDate(2008, 02, 23, 0, 0, 0);
-    DateHolder date2 = new DateHolder(DatePrecision.DAY, Locale.GERMAN);
+    final DateHolder date2 = new DateHolder(DatePrecision.DAY, Locale.GERMAN);
     date2.setDate(2008, 02, 23, 0, 0, 0);
     assertEquals(0, date1.daysBetween(date2.getDate()));
     date2.setDate(2008, 02, 24, 0, 0, 0);
@@ -104,11 +104,11 @@ public class DateHolderTest
   @Test
   public void isBetween()
   {
-    DateHolder date1 = new DateHolder(DatePrecision.DAY);
+    final DateHolder date1 = new DateHolder(DatePrecision.DAY);
     date1.setDate(2010, Calendar.FEBRUARY, 12, 0, 0, 0);
-    DateHolder date2 = new DateHolder(DatePrecision.DAY);
+    final DateHolder date2 = new DateHolder(DatePrecision.DAY);
     date2.setDate(2010, Calendar.FEBRUARY, 14, 0, 0, 0);
-    DateHolder date3 = new DateHolder(DatePrecision.DAY);
+    final DateHolder date3 = new DateHolder(DatePrecision.DAY);
     date3.setDate(2010, Calendar.FEBRUARY, 15, 0, 0, 0);
     assertFalse(date1.isBetween((Date) null, (Date) null));
     assertFalse(date1.isBetween((DateHolder) null, (DateHolder) null));
@@ -125,7 +125,7 @@ public class DateHolderTest
   @Test
   public void ensurePrecision()
   {
-    DateHolder dateHolder = new DateHolder(DatePrecision.DAY, DateHelper.UTC, Locale.GERMAN);
+    final DateHolder dateHolder = new DateHolder(DatePrecision.DAY, DateHelper.UTC, Locale.GERMAN);
     assertPrecision("1970-11-21 00:00:00.000", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 50, 23);
     dateHolder.setPrecision(DatePrecision.HOUR_OF_DAY);
     assertPrecision("1970-11-21 04:00:00.000", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 50, 23);
@@ -144,7 +144,7 @@ public class DateHolderTest
     assertPrecision("1970-11-21 04:50:23.000", dateHolder, 1970, Calendar.NOVEMBER, 21, 4, 50, 23);
   }
 
-  private void assertPrecision(String expected, DateHolder dateHolder, int year, int month, int date, int hourOfDay, int minute, int second)
+  private void assertPrecision(final String expected, final DateHolder dateHolder, final int year, final int month, final int date, final int hourOfDay, final int minute, final int second)
   {
     dateHolder.setDate(year, month, date, hourOfDay, minute, second);
     dateHolder.ensurePrecision();
@@ -198,7 +198,7 @@ public class DateHolderTest
   @Test
   public void addWorkingDays()
   {
-    DateHolder dateHolder = new DateHolder(DatePrecision.MINUTE, DateHelper.UTC, Locale.GERMAN);
+    final DateHolder dateHolder = new DateHolder(DatePrecision.MINUTE, DateHelper.UTC, Locale.GERMAN);
     dateHolder.setDate(2010, Calendar.MAY, 21, 4, 50, 23); // Friday
     dateHolder.addWorkingDays(0);
     assertEquals("2010-05-21 04:50:00.000", DateHelper.getForTestCase(dateHolder.getDate()));
