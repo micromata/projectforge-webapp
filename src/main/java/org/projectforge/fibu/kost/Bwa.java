@@ -52,7 +52,7 @@ public class Bwa implements Serializable
 
   private String shortname; // Ein Kurzname um z.B. labels oder Dateinamen zu generieren
 
-  private List<BwaZeile> bwaZeilen;
+  private final List<BwaZeile> bwaZeilen;
 
   private int counter = 0;
 
@@ -211,6 +211,9 @@ public class Bwa implements Serializable
 
   public void setBuchungssaetze(final List<BuchungssatzDO> buchungsSaetze)
   {
+    if (bwaZeilen == null) {
+      return;
+    }
     if (CollectionUtils.isNotEmpty(buchungsSaetze) == true) {
       for (final BuchungssatzDO satz : buchungsSaetze) {
         counter++;
@@ -233,30 +236,30 @@ public class Bwa implements Serializable
           get(BwaZeileId.BETRIEBL_STEUERN).addKontoUmsatz(satz);
         } else if (konto >= 6400 && konto <= 6430) {
           get(BwaZeileId.VERSICH_BEITRAEGE).addKontoUmsatz(satz);
-        } else if (konto == 6300) {
-          get(BwaZeileId.BESONDERE_KOSTEN).addKontoUmsatz(satz);
         } else if (konto >= 6520 && konto <= 6599) {
           get(BwaZeileId.KFZ_KOSTEN).addKontoUmsatz(satz);
         } else if (konto >= 6600 && konto <= 6699) {
           get(BwaZeileId.WERBE_REISEKOSTEN).addKontoUmsatz(satz);
+        } else if (konto == 6740) {
+          get(BwaZeileId.KOSTEN_WARENABGABE).addKontoUmsatz(satz);
         } else if (konto >= 6200 && konto <= 6299) {
           get(BwaZeileId.ABSCHREIBUNGEN).addKontoUmsatz(satz);
         } else if (konto >= 6470 && konto <= 6490) {
           get(BwaZeileId.REPARATUR_INSTANDH).addKontoUmsatz(satz);
-        } else if (konto >= 6800 && konto <= 6855) {
+        } else if (konto >= 6800 && konto <= 6855 || konto == 6300) {
           get(BwaZeileId.SONSTIGE_KOSTEN).addKontoUmsatz(satz);
-        } else if (konto == 7305 || konto == 7310) {
+        } else if (NumberHelper.isIn(konto, 7305, 7310) == true) {
           get(BwaZeileId.ZINSAUFWAND).addKontoUmsatz(satz);
-        } else if (konto == 6392 || konto == 6895 || konto == 6960) {
-          get(BwaZeileId.SONST_NEUTR_AUFW).addKontoUmsatz(satz);
-        } else if (konto == 7110) {
+        } else if (NumberHelper.isIn(konto, 7100, 7110) == true) {
           get(BwaZeileId.ZINSERTRAEGE).addKontoUmsatz(satz);
-        } else if (konto == 4845 || konto == 4855 || konto == 4930 || konto == 4937 || konto == 4960 || konto == 4970 || konto == 4975) {
+        } else if (NumberHelper.isIn(konto, 6392, 6895, 6960) == true) {
+          get(BwaZeileId.SONST_NEUTR_AUFW).addKontoUmsatz(satz);
+        } else if (NumberHelper.isIn(konto, 4845, 4855, 4925, 4930, 4937, 4960, 4970, 4975) == true) {
           get(BwaZeileId.SONST_NEUTR_ERTR).addKontoUmsatz(satz);
         } else if (konto >= 7600 && konto <= 7640) {
           get(BwaZeileId.STEUERN_EINK_U_ERTR).addKontoUmsatz(satz);
         } else {
-          log.debug("Ignoring Satz: " + satz);
+          log.warn("Ignoring Satz: " + satz);
           satz.setIgnore(true);
         }
       }
@@ -266,6 +269,7 @@ public class Bwa implements Serializable
 
   public Bwa(final int year, final int month)
   {
+    this();
     this.year = year;
     this.month = month;
   }
