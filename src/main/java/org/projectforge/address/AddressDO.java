@@ -168,7 +168,7 @@ public class AddressDO extends DefaultBaseDO
   private String privateEmail; // 255
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String publicKey; // 5000
+  private String publicKey; // 7000
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String fingerprint; // 255
@@ -585,7 +585,7 @@ public class AddressDO extends DefaultBaseDO
     this.privateEmail = email;
   }
 
-  @Column(name = "public_key", length = 5000)
+  @Column(name = "public_key", length = 7000)
   public String getPublicKey()
   {
     return publicKey;
