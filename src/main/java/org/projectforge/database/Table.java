@@ -46,7 +46,7 @@ public class Table implements Serializable
 
   private Class< ? > entityClass;
 
-  private List<TableAttribute> attributes = new ArrayList<TableAttribute>();
+  private final List<TableAttribute> attributes = new ArrayList<TableAttribute>();
 
   public Table(final Class< ? > entityClass)
   {
@@ -67,7 +67,7 @@ public class Table implements Serializable
    * @see #Table(Class)
    * @see #addAttributes(String...)
    */
-  public Table setEntityClass(Class< ? > entityClass)
+  public Table setEntityClass(final Class< ? > entityClass)
   {
     this.entityClass = entityClass;
     return this;
@@ -87,7 +87,7 @@ public class Table implements Serializable
     }
     return null;
   }
-  
+
   public Class< ? > getEntityClass()
   {
     return entityClass;
@@ -124,8 +124,8 @@ public class Table implements Serializable
   }
 
   /**
-   * Adds all the given properties by auto-detecting the given properties.
-   * Please note: There is no full auto-detection of all properties: it should be avoided that unwanted properties are created (by a developer mistake).
+   * Adds all the given properties by auto-detecting the given properties. Please note: There is no full auto-detection of all properties:
+   * it should be avoided that unwanted properties are created (by a developer mistake).
    * @param properties
    * @see TableAttribute#TableAttribute(Class, String)
    * @see #addAttribute(TableAttribute)
@@ -140,5 +140,14 @@ public class Table implements Serializable
       addAttribute(new TableAttribute(entityClass, property));
     }
     return this;
+  }
+
+  /**
+   * Adds default attributes of DefaultBaseDO: "id", "created", "lastUpate", "deleted".
+   * @return this for chaining.
+   */
+  public Table addDefaultBaseDOAttributes()
+  {
+    return addAttributes("id", "created", "lastUpdate", "deleted");
   }
 }
