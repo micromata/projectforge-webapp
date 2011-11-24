@@ -53,15 +53,15 @@ public class AddressExport
 {
   private class MyContentProvider extends XlsContentProvider
   {
-    public MyContentProvider(ExportWorkbook workbook)
+    public MyContentProvider(final ExportWorkbook workbook)
     {
       super(workbook);
     }
 
     @Override
-    public void updateRowStyle(ExportRow row)
+    public void updateRowStyle(final ExportRow row)
     {
-      for (ExportCell cell : row.getCells()) {
+      for (final ExportCell cell : row.getCells()) {
         final CellFormat format = cell.ensureAndGetCellFormat();
         format.setFillForegroundColor(HSSFColor.WHITE.index);
         switch (row.getRowNum()) {
@@ -108,7 +108,7 @@ public class AddressExport
   private enum Col
   {
 
-    NAME, FIRST_NAME, FORM, TITLE, CONTACT_STATUS, ORGANIZATION, DIVISION, POSITION, EMAIL, WEBSITE, MAILING_ADDRESS, MAILING_ZIPCODE, MAILING_CITY, MAILING_COUNTRY, MAILING_STATE, ADDRESS, ZIPCODE, CITY, COUNTRY, STATE, POSTAL_ADDRESS, POSTAL_ZIPCODE, POSTAL_CITY, POSTAL_COUNTRY, POSTAL_STATE, ADDRESS_STATUS, BUSINESS_PHONE, FAX, MOBILE_PHONE, PRIVATE_ADDRESS, PRIVATE_ZIPCODE, PRIVATE_CITY, PRIVATE_COUNTRY, PRIVATE_STATE, PRIVATE_EMAIL, PRIVATE_PHONE, PRIVATE_MOBILE, BIRTHDAY, IMAGE_BROSCHURE, CREATED, MODIFIED, COMMENT, FINGERPRINT, PUBLIC_KEY;
+    NAME, FIRST_NAME, FORM, TITLE, CONTACT_STATUS, ORGANIZATION, DIVISION, POSITION, EMAIL, WEBSITE, MAILING_ADDRESS, MAILING_ZIPCODE, MAILING_CITY, MAILING_COUNTRY, MAILING_STATE, ADDRESS, ZIPCODE, CITY, COUNTRY, STATE, POSTAL_ADDRESS, POSTAL_ZIPCODE, POSTAL_CITY, POSTAL_COUNTRY, POSTAL_STATE, ADDRESS_STATUS, BUSINESS_PHONE, FAX, MOBILE_PHONE, PRIVATE_ADDRESS, PRIVATE_ZIPCODE, PRIVATE_CITY, PRIVATE_COUNTRY, PRIVATE_STATE, PRIVATE_EMAIL, PRIVATE_PHONE, PRIVATE_MOBILE, BIRTHDAY, CREATED, MODIFIED, COMMENT, FINGERPRINT, PUBLIC_KEY;
   }
 
   /**
@@ -119,8 +119,8 @@ public class AddressExport
   public byte[] export(final List<AddressDO> origList, final Map<Integer, PersonalAddressDO> personalAddressMap)
   {
     log.info("Exporting address list.");
-    ExportColumn[] columns = new ExportColumn[] { //
-    new I18nExportColumn(Col.NAME, "name", 20), new I18nExportColumn(Col.FIRST_NAME, "firstName", 20),
+    final ExportColumn[] columns = new ExportColumn[] { //
+        new I18nExportColumn(Col.NAME, "name", 20), new I18nExportColumn(Col.FIRST_NAME, "firstName", 20),
         new I18nExportColumn(Col.FORM, "address.form", 8), new I18nExportColumn(Col.TITLE, "address.title", 10),
         new I18nExportColumn(Col.CONTACT_STATUS, "address.contactStatus", 10),
         new I18nExportColumn(Col.ORGANIZATION, "organization", LENGTH_STD),
@@ -153,7 +153,6 @@ public class AddressExport
         new I18nExportColumn(Col.PRIVATE_PHONE, "address.phoneType.private", LENGTH_PHONENUMBER),
         new I18nExportColumn(Col.PRIVATE_MOBILE, "address.phoneType.privateMobile", LENGTH_PHONENUMBER),
         new I18nExportColumn(Col.BIRTHDAY, "address.birthday", DATE_LENGTH),
-        new I18nExportColumn(Col.IMAGE_BROSCHURE, "address.imageBroschure", 10), new I18nExportColumn(Col.CREATED, "created", DATE_LENGTH),
         new I18nExportColumn(Col.MODIFIED, "modified", DATE_LENGTH), new I18nExportColumn(Col.COMMENT, "comment", LENGTH_EXTRA_LONG),
         new I18nExportColumn(Col.FINGERPRINT, "address.fingerprint", LENGTH_STD),
         new I18nExportColumn(Col.PUBLIC_KEY, "address.publicKey", LENGTH_EXTRA_LONG)};
@@ -176,7 +175,7 @@ public class AddressExport
     xls.setContentProvider(contentProvider);
 
     final String sheetTitle = PFUserContext.getLocalizedString("address.addresses");
-    ExportSheet sheet = xls.addSheet(sheetTitle);
+    final ExportSheet sheet = xls.addSheet(sheetTitle);
     sheet.addRow(); // Column headers
     sheet.setMergedRegion(0, 0, Col.MAILING_ADDRESS.ordinal(), Col.MAILING_STATE.ordinal(), "Mailing");
     sheet.setMergedRegion(0, 0, Col.ADDRESS.ordinal(), Col.STATE.ordinal(), PFUserContext.getLocalizedString("address.addressText"));
@@ -188,12 +187,12 @@ public class AddressExport
     sheet.createFreezePane(1, 2);
     sheet.setColumns(columns);
 
-    PropertyMapping mapping = new PropertyMapping();
+    final PropertyMapping mapping = new PropertyMapping();
     for (final AddressDO address : list) {
       mapping.add(Col.NAME, address.getName());
       mapping.add(Col.FIRST_NAME, address.getFirstName());
       mapping
-          .add(Col.FORM, address.getForm() != null ? PFUserContext.getLocalizedString(address.getForm().getI18nKey()) : "");
+      .add(Col.FORM, address.getForm() != null ? PFUserContext.getLocalizedString(address.getForm().getI18nKey()) : "");
       mapping.add(Col.TITLE, address.getTitle());
       mapping.add(Col.CONTACT_STATUS, address.getContactStatus());
       mapping.add(Col.ORGANIZATION, address.getOrganization());
@@ -229,7 +228,6 @@ public class AddressExport
       mapping.add(Col.PRIVATE_PHONE, address.getPrivatePhone());
       mapping.add(Col.PRIVATE_MOBILE, address.getPrivateMobilePhone());
       mapping.add(Col.BIRTHDAY, address.getBirthday());
-      mapping.add(Col.IMAGE_BROSCHURE, address.isImageBroschure());
       mapping.add(Col.CREATED, address.getCreated());
       mapping.add(Col.MODIFIED, address.getLastUpdate());
       mapping.add(Col.COMMENT, address.getComment());
@@ -241,7 +239,7 @@ public class AddressExport
     return xls.getAsByteArray();
   }
 
-  public void setAccessChecker(AccessChecker accessChecker)
+  public void setAccessChecker(final AccessChecker accessChecker)
   {
     this.accessChecker = accessChecker;
   }

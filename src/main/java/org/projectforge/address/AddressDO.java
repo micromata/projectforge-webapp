@@ -70,8 +70,6 @@ public class AddressDO extends DefaultBaseDO
 
   private AddressStatus addressStatus = AddressStatus.UPTODATE;
 
-  private boolean imageBroschure;
-
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String name; // 255 not null
 
@@ -209,17 +207,6 @@ public class AddressDO extends DefaultBaseDO
   {
     this.addressStatus = addressStatus;
     return this;
-  }
-
-  @Column(name = "image_broschure", nullable = false)
-  public boolean isImageBroschure()
-  {
-    return imageBroschure;
-  }
-
-  public void setImageBroschure(final boolean imageBroschure)
-  {
-    this.imageBroschure = imageBroschure;
   }
 
   @Column(name = "business_phone", length = 255)
