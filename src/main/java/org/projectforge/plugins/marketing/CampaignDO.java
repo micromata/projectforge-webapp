@@ -26,7 +26,9 @@ package org.projectforge.plugins.marketing;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
@@ -66,6 +68,19 @@ public class CampaignDO extends DefaultBaseDO
   public void setTitle(final String title)
   {
     this.title = title;
+  }
+
+  public static String[] getValuesArray(final String values) {
+    if (StringUtils.isBlank(values) == true) {
+      return null;
+    }
+    return StringUtils.split(values, "; ");
+  }
+
+  @Transient
+  public String[] getValuesArray()
+  {
+    return getValuesArray(values);
   }
 
   @Column(length = 1000)

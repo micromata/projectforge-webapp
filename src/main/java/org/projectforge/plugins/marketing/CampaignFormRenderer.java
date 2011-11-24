@@ -24,21 +24,25 @@
 package org.projectforge.plugins.marketing;
 
 import org.apache.wicket.MarkupContainer;
+import org.apache.wicket.markup.html.form.TextField;
 import org.projectforge.web.wicket.layout.AbstractFormRenderer;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.LayoutLength;
 import org.projectforge.web.wicket.layout.PanelContext;
+import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
 /**
  * This layout class is easy to use and generates read-only views as well as edit formulars for browsers and mobile devices.
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 public class CampaignFormRenderer extends AbstractFormRenderer
 {
   private static final long serialVersionUID = 5545284725937684187L;
 
   private final CampaignDO data;
+
+  private TextField<String> valuesField;
 
   final static LayoutLength labelLength = LayoutLength.HALF;
 
@@ -50,14 +54,25 @@ public class CampaignFormRenderer extends AbstractFormRenderer
     this.data = data;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void add()
   {
     doPanel.newFieldSetPanel(getString("plugins.marketing.campaign"));
-    doPanel.addTextField(new PanelContext(data, "title", valueLength, getString("title"), labelLength).setRequired()
-        .setStrong());
-    doPanel.addTextField(new PanelContext(data, "values", valueLength, getString("values"), labelLength).setRequired());
-    doPanel.addTextArea(new PanelContext(data, "comment", valueLength, getString("comment"), labelLength)
-    .setCssStyle("height: 20em;"));
+    doPanel.addTextField(new PanelContext(data, "title", valueLength, getString("title"), labelLength).setRequired().setStrong());
+    doPanel.addLabel(new PanelContext(valueLength, getString("plugins.marketing.campaign.edit.warning.doNotChangeValues"), valueLength)
+    .setIndent(labelLength).setStrongLabel(true));
+    valuesField = (TextField<String>) ((TextFieldLPanel) doPanel.addTextField(new PanelContext(data, "values", valueLength,
+        getString("values"), labelLength).setRequired().setTooltip(getString("plugins.marketing.campaign.values.format")))).getTextField();
+    doPanel.addTextArea(new PanelContext(data, "comment", valueLength, getString("comment"), labelLength).setCssStyle("height: 20em;"));
+  }
+
+  protected void validation()
+  {
+    valuesField.validate();
+    final String values = valuesField.getConvertedInput();
+    if (CampaignDO.getValuesArray(values) == null) {
+      valuesField.error(getString("plugins.marketing.campaign.values.invalidFormat"));
+    }
   }
 }
