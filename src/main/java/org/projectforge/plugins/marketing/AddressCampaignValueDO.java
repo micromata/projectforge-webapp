@@ -1,0 +1,106 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2011 Kai Reinhard (k.reinhard@me.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.plugins.marketing;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
+import org.projectforge.address.AddressDO;
+import org.projectforge.core.DefaultBaseDO;
+import org.projectforge.database.Constants;
+
+/**
+ * A marketing campaign.
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
+ */
+@Entity
+@Indexed
+@Table(name = "T_PLUGIN_MARKETING")
+public class AddressCampaignValueDO extends DefaultBaseDO
+{
+  private static final long serialVersionUID = 4414457700384141088L;
+
+  @IndexedEmbedded(depth = 1)
+  private AddressCampaignDO addressCampaign;
+
+  @IndexedEmbedded(depth = 1)
+  private AddressDO address;
+
+  private String value;
+
+  private String comment;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "address_campaign_id", nullable = false)
+  public AddressCampaignDO getAddressCampaign()
+  {
+    return addressCampaign;
+  }
+
+  public void setAddressCampaign(final AddressCampaignDO addressCampaign)
+  {
+    this.addressCampaign = addressCampaign;
+  }
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "address_id", nullable = false)
+  public AddressDO getAddress()
+  {
+    return address;
+  }
+
+  public void setAddress(final AddressDO address)
+  {
+    this.address = address;
+  }
+
+  @Column(length = AddressCampaignDO.MAX_VALUE_LENGTH)
+  public String getValue()
+  {
+    return value;
+  }
+
+  public void setValue(final String value)
+  {
+    this.value = value;
+  }
+
+  @Column(length = Constants.LENGTH_COMMENT)
+  public String getComment()
+  {
+    return comment;
+  }
+
+  public void setComment(final String comment)
+  {
+    this.comment = comment;
+  }
+}
