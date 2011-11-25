@@ -34,13 +34,17 @@ import org.projectforge.web.MenuItemDefId;
  */
 public class MarketingPlugin extends AbstractPlugin
 {
-  public static final String ID = "marketing";
+  public static final String ADDRESS_CAMPAIGN_ID = "addressCampaign";
+
+  public static final String ADDRESS_CAMPAIGN_VALUE_ID = "addressCampaignValues";
 
   public static final String RESOURCE_BUNDLE_NAME = MarketingPlugin.class.getPackage().getName() + ".MarketingI18nResources";
 
-  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { CampaignDO.class};
+  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { AddressCampaignDO.class};
 
-  private CampaignDao campaignDao;
+  private AddressCampaignDao campaignDao;
+
+  private AddressCampaignValueDao addressCampaignValueDao;
 
   @Override
   public Class< ? >[] getPersistentEntities()
@@ -54,23 +58,24 @@ public class MarketingPlugin extends AbstractPlugin
     // DatabaseUpdateDao is needed by the updater:
     MarketingPluginUpdates.dao = databaseUpdateDao;
     // Register it:
-    register(ID, CampaignDao.class,campaignDao, "plugins.marketing");
+    register(ADDRESS_CAMPAIGN_ID, AddressCampaignDao.class, campaignDao, "plugins.marketing.addressCampaign");
+    register(ADDRESS_CAMPAIGN_VALUE_ID, AddressCampaignValueDao.class, addressCampaignValueDao, "plugins.marketing.addressCampaignValue");
 
     // Register the web part:
-    registerWeb(ID, CampaignListPage.class, CampaignEditPage.class);
+    registerWeb(ADDRESS_CAMPAIGN_ID, AddressCampaignListPage.class, AddressCampaignEditPage.class);
 
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-    registerMenuItem(new MenuItemDef(parentMenu, ID, 30, "plugins.marketing.campaign.menu", CampaignListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ADDRESS_CAMPAIGN_ID, 30, "plugins.marketing.addressCampaign.menu", AddressCampaignListPage.class));
 
     // Define the access management:
-    registerRight(new CampaignRight());
+    registerRight(new AddressCampaignRight());
 
     // All the i18n stuff:
     addResourceBundle(RESOURCE_BUNDLE_NAME);
   }
 
-  public void setCampaignDao(final CampaignDao campaignDao)
+  public void setCampaignDao(final AddressCampaignDao campaignDao)
   {
     this.campaignDao = campaignDao;
   }
