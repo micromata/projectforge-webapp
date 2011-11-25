@@ -2,5 +2,6 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans default-lazy-init="false" default-autowire="byType">
   <!-- Daos (automatically initialized as singletons.) -->
-  <bean id="campaignDao" class="org.projectforge.plugins.marketing.CampaignDao" />
+  <bean id="addressCampaignDao" class="org.projectforge.plugins.marketing.AddressCampaignDao" />
+  <bean id="addressCampaignValueDao" class="org.projectforge.plugins.marketing.AddressCampaignValueDao" />
 </beans>

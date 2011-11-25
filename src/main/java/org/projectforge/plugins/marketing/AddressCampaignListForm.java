@@ -24,6 +24,8 @@
 package org.projectforge.plugins.marketing;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.model.PropertyModel;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.web.wicket.AbstractListForm;
 
@@ -41,6 +43,13 @@ public class AddressCampaignListForm extends AbstractListForm<BaseSearchFilter, 
   public AddressCampaignListForm(final AddressCampaignListPage parentPage)
   {
     super(parentPage);
+  }
+
+  @Override
+  protected void init()
+  {
+    super.init();
+    filterContainer.add(new CheckBox("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted")));
   }
 
   @Override

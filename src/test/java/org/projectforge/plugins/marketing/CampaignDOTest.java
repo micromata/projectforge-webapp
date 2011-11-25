@@ -42,10 +42,10 @@ public class CampaignDOTest
 
   private String[] getValues(final String values)
   {
-    final CampaignDO campaign = new CampaignDO();
+    final AddressCampaignDO campaign = new AddressCampaignDO();
     campaign.setValues(values);
     final String[] result = campaign.getValuesArray();
-    assertArrayEquals(result, CampaignDO.getValuesArray(campaign.getValues()));
+    assertArrayEquals(result, AddressCampaignDO.getValuesArray(campaign.getValues()));
     return result;
   }
 }

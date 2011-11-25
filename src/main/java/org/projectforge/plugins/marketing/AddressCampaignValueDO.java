@@ -43,7 +43,7 @@ import org.projectforge.database.Constants;
  */
 @Entity
 @Indexed
-@Table(name = "T_PLUGIN_MARKETING")
+@Table(name = "T_PLUGIN_MARKETING_ADDRESS_CAMPAIGN_VALUE")
 public class AddressCampaignValueDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 4414457700384141088L;

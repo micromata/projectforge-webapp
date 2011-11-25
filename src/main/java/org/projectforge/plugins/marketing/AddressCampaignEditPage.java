@@ -41,8 +41,8 @@ public class AddressCampaignEditPage extends AbstractAutoLayoutEditPage<AddressC
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressCampaignEditPage.class);
 
-  @SpringBean(name = "campaignDao")
-  private AddressCampaignDao campaignDao;
+  @SpringBean(name = "addressCampaignDao")
+  private AddressCampaignDao addressCampaignDao;
 
   public AddressCampaignEditPage(final PageParameters parameters)
   {
@@ -53,7 +53,7 @@ public class AddressCampaignEditPage extends AbstractAutoLayoutEditPage<AddressC
   @Override
   protected AddressCampaignDao getBaseDao()
   {
-    return campaignDao;
+    return addressCampaignDao;
   }
 
   @Override

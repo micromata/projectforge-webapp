@@ -53,8 +53,8 @@ import org.projectforge.web.wicket.ListSelectActionPanel;
 public class AddressCampaignListPage extends AbstractListPage<AddressCampaignListForm, AddressCampaignDao, AddressCampaignDO> implements IListPageColumnsCreator<AddressCampaignDO>
 {
   private static final long serialVersionUID = -4070838758263185222L;
-  @SpringBean(name = "campaignDao")
-  private AddressCampaignDao campaignDao;
+  @SpringBean(name = "addressCampaignDao")
+  private AddressCampaignDao addressCampaignDao;
 
   public AddressCampaignListPage(final PageParameters parameters)
   {
@@ -115,7 +115,7 @@ public class AddressCampaignListPage extends AbstractListPage<AddressCampaignLis
   @Override
   protected AddressCampaignDao getBaseDao()
   {
-    return campaignDao;
+    return addressCampaignDao;
   }
 
   @Override
@@ -126,6 +126,6 @@ public class AddressCampaignListPage extends AbstractListPage<AddressCampaignLis
 
   protected AddressCampaignDao getCampaignDao()
   {
-    return campaignDao;
+    return addressCampaignDao;
   }
 }
