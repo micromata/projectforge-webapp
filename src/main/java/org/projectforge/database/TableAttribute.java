@@ -208,7 +208,7 @@ public class TableAttribute implements Serializable
     return nullable;
   }
 
-  public TableAttribute setNullable(boolean nullable)
+  public TableAttribute setNullable(final boolean nullable)
   {
     this.nullable = nullable;
     return this;
@@ -227,7 +227,7 @@ public class TableAttribute implements Serializable
     return type;
   }
 
-  public TableAttribute setType(TableAttributeType type)
+  public TableAttribute setType(final TableAttributeType type)
   {
     this.type = type;
     return this;
@@ -249,7 +249,7 @@ public class TableAttribute implements Serializable
     return name;
   }
 
-  public TableAttribute setName(String name)
+  public TableAttribute setName(final String name)
   {
     this.name = name;
     return this;
@@ -264,7 +264,7 @@ public class TableAttribute implements Serializable
     return length;
   }
 
-  public TableAttribute setLength(int length)
+  public TableAttribute setLength(final int length)
   {
     this.length = length;
     return this;
@@ -278,7 +278,7 @@ public class TableAttribute implements Serializable
     return precision;
   }
 
-  public TableAttribute setPrecision(int precision)
+  public TableAttribute setPrecision(final int precision)
   {
     this.precision = precision;
     return this;
@@ -292,7 +292,7 @@ public class TableAttribute implements Serializable
     return scale;
   }
 
-  public TableAttribute setScale(int scale)
+  public TableAttribute setScale(final int scale)
   {
     this.scale = scale;
     return this;
@@ -308,7 +308,7 @@ public class TableAttribute implements Serializable
    * @param primaryKey
    * @return
    */
-  public TableAttribute setPrimaryKey(boolean primaryKey)
+  public TableAttribute setPrimaryKey(final boolean primaryKey)
   {
     this.primaryKey = primaryKey;
     if (this.type == TableAttributeType.INT) {
@@ -325,7 +325,7 @@ public class TableAttribute implements Serializable
     return generated;
   }
 
-  public TableAttribute setGenerated(boolean generated)
+  public TableAttribute setGenerated(final boolean generated)
   {
     this.generated = generated;
     return this;
@@ -336,10 +336,38 @@ public class TableAttribute implements Serializable
     return foreignTable;
   }
 
-  public TableAttribute setForeignTable(String foreignTable)
+  /**
+   * Sets foreign table. The primary key is set to default ("pk") if not set before.
+   * @param foreignTable
+   * @return this for chaining.
+   */
+  public TableAttribute setForeignTable(final String foreignTable)
   {
     this.foreignTable = foreignTable;
+    if (this.foreignAttribute == null) {
+      this.foreignAttribute = "pk";
+    }
     return this;
+  }
+
+  /**
+   * Sets foreign table. The primary key is set to default ("pk") if not set before.
+   * @param foreignTableEntity
+   * @return this for chaining.
+   */
+  public TableAttribute setForeignTable(final Class< ? > foreignTableEntity)
+  {
+    return setForeignTable(new Table(foreignTableEntity));
+  }
+
+  /**
+   * Sets foreign table. The primary key is set to default ("pk") if not set before.
+   * @param foreignTable
+   * @return this for chaining.
+   */
+  public TableAttribute setForeignTable(final Table foreignTable)
+  {
+    return setForeignTable(foreignTable.getName());
   }
 
   public String getForeignAttribute()
@@ -347,7 +375,7 @@ public class TableAttribute implements Serializable
     return foreignAttribute;
   }
 
-  public TableAttribute setForeignAttribute(String foreignAttribute)
+  public TableAttribute setForeignAttribute(final String foreignAttribute)
   {
     this.foreignAttribute = foreignAttribute;
     return this;
@@ -361,7 +389,7 @@ public class TableAttribute implements Serializable
     return defaultValue;
   }
 
-  public TableAttribute setDefaultValue(String defaultValue)
+  public TableAttribute setDefaultValue(final String defaultValue)
   {
     this.defaultValue = defaultValue;
     return this;
