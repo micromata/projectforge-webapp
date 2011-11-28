@@ -63,13 +63,16 @@ public class MarketingPlugin extends AbstractPlugin
 
     // Register the web part:
     registerWeb(ADDRESS_CAMPAIGN_ID, AddressCampaignListPage.class, AddressCampaignEditPage.class);
+    registerWeb(ADDRESS_CAMPAIGN_VALUE_ID, AddressCampaignValueListPage.class, AddressCampaignValueEditPage.class);
 
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
     registerMenuItem(new MenuItemDef(parentMenu, ADDRESS_CAMPAIGN_ID, 30, "plugins.marketing.addressCampaign.menu", AddressCampaignListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ADDRESS_CAMPAIGN_VALUE_ID, 30, "plugins.marketing.addressCampaignValue.menu", AddressCampaignValueListPage.class));
 
     // Define the access management:
     registerRight(new AddressCampaignRight());
+    registerRight(new AddressCampaignValueRight());
 
     // All the i18n stuff:
     addResourceBundle(RESOURCE_BUNDLE_NAME);

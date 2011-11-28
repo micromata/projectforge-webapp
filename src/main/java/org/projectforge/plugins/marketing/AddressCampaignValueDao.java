@@ -23,7 +23,14 @@
 
 package org.projectforge.plugins.marketing;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.QueryFilter;
 import org.projectforge.user.UserRightId;
 
 /**
@@ -42,8 +49,29 @@ public class AddressCampaignValueDao extends BaseDao<AddressCampaignValueDO>
   }
 
   @Override
+  public List<AddressCampaignValueDO> getList(final BaseSearchFilter filter)
+  {
+    final AddressCampaignFilter myFilter;
+    if (filter instanceof AddressCampaignFilter) {
+      myFilter = (AddressCampaignFilter) filter;
+    } else {
+      myFilter = new AddressCampaignFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
+    if (myFilter.getAddressCampaign() != null) {
+      queryFilter.add(Restrictions.eq("address_campaign_fk", myFilter.getAddressCampaign().getId()));
+    }
+    return getList(queryFilter);
+  }
+
+  @Override
   public AddressCampaignValueDO newInstance()
   {
     return new AddressCampaignValueDO();
+  }
+
+  public Map<Integer, AddressCampaignValueDO> getAddressCampaignValuesByAddressId(final AddressCampaignFilter searchFilter)
+  {
+    return new HashMap<Integer, AddressCampaignValueDO>();
   }
 }
