@@ -52,6 +52,11 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
 
   private Integer addressCampaignId;
 
+  @SuppressWarnings("unused")
+  private String addressCampaignValue;
+
+  private DropDownChoice<String> addressCampaignValueDropDownChoice;
+
   public AddressCampaignValueListForm(final AddressCampaignValueListPage parentPage)
   {
     super(parentPage);
@@ -63,6 +68,7 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
   {
     super.init();
     this.addressCampaignId = searchFilter.getAddressCampaignId();
+    this.addressCampaignValue = searchFilter.getAddressCampaignValue();
     final List<AddressCampaignDO> addressCampaignList = addressCampaignDao.getList(new AddressCampaignValueFilter());
     {
       final LabelValueChoiceRenderer<Integer> addressCampaignRenderer = new LabelValueChoiceRenderer<Integer>();
@@ -80,32 +86,73 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
               break;
             }
           }
+          refresh();
         }
+
         @Override
         protected boolean wantOnSelectionChangedNotifications()
         {
           return true;
         }
       };
-      filterContainer.add(new CheckBox("uptodate", new PropertyModel<Boolean>(getSearchFilter(), "uptodate")));
-      filterContainer.add(new CheckBox("outdated", new PropertyModel<Boolean>(getSearchFilter(), "outdated")));
-      filterContainer.add(new CheckBox("leaved", new PropertyModel<Boolean>(getSearchFilter(), "leaved")));
-
-      filterContainer.add(new CheckBox("active", new PropertyModel<Boolean>(getSearchFilter(), "active")));
-      filterContainer.add(new CheckBox("nonActive", new PropertyModel<Boolean>(getSearchFilter(), "nonActive")));
-      filterContainer.add(new CheckBox("uninteresting", new PropertyModel<Boolean>(getSearchFilter(), "uninteresting")));
-      filterContainer.add(new CheckBox("personaIngrata", new PropertyModel<Boolean>(getSearchFilter(), "personaIngrata")));
-      filterContainer.add(new CheckBox("departed", new PropertyModel<Boolean>(getSearchFilter(), "departed")));
-
-      // Radio choices:
-      final RadioGroup<String> filterType = new RadioGroup<String>("filterType", new PropertyModel<String>(getSearchFilter(), "listType"));
-      filterType.add(new Radio<String>("filter", new Model<String>("filter")).setOutputMarkupId(false));
-      filterType.add(new Radio<String>("newest", new Model<String>("newest")));
-      filterType.add(new Radio<String>("myFavorites", new Model<String>("myFavorites")));
-      filterContainer.add(filterType);
-
       filterContainer.add(addressCampaignChoice);
     }
+    {
+      final LabelValueChoiceRenderer<String> choiceRenderer = getValueLabelValueChoiceRenderer();
+      addressCampaignValueDropDownChoice = new DropDownChoice<String>("addressCampaignValue", new PropertyModel<String>(this,
+      "addressCampaignValue"), choiceRenderer.getValues(), choiceRenderer) {
+        @Override
+        protected void onSelectionChanged(final String newSelection)
+        {
+          searchFilter.setAddressCampaignValue(newSelection);
+          parentPage.refresh();
+        }
+
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
+
+
+      };
+      addressCampaignValueDropDownChoice.setNullValid(true);
+      filterContainer.add(addressCampaignValueDropDownChoice);
+    }
+    filterContainer.add(new CheckBox("uptodate", new PropertyModel<Boolean>(getSearchFilter(), "uptodate")));
+    filterContainer.add(new CheckBox("outdated", new PropertyModel<Boolean>(getSearchFilter(), "outdated")));
+    filterContainer.add(new CheckBox("leaved", new PropertyModel<Boolean>(getSearchFilter(), "leaved")));
+
+    filterContainer.add(new CheckBox("active", new PropertyModel<Boolean>(getSearchFilter(), "active")));
+    filterContainer.add(new CheckBox("nonActive", new PropertyModel<Boolean>(getSearchFilter(), "nonActive")));
+    filterContainer.add(new CheckBox("uninteresting", new PropertyModel<Boolean>(getSearchFilter(), "uninteresting")));
+    filterContainer.add(new CheckBox("personaIngrata", new PropertyModel<Boolean>(getSearchFilter(), "personaIngrata")));
+    filterContainer.add(new CheckBox("departed", new PropertyModel<Boolean>(getSearchFilter(), "departed")));
+
+    // Radio choices:
+    final RadioGroup<String> filterType = new RadioGroup<String>("filterType", new PropertyModel<String>(getSearchFilter(), "listType"));
+    filterType.add(new Radio<String>("filter", new Model<String>("filter")).setOutputMarkupId(false));
+    filterType.add(new Radio<String>("newest", new Model<String>("newest")));
+    filterType.add(new Radio<String>("myFavorites", new Model<String>("myFavorites")));
+    filterContainer.add(filterType);
+  }
+
+  protected void refresh()
+  {
+    final LabelValueChoiceRenderer<String> choiceRenderer = getValueLabelValueChoiceRenderer();
+    addressCampaignValueDropDownChoice.setChoiceRenderer(choiceRenderer);
+    addressCampaignValueDropDownChoice.setChoices(choiceRenderer.getValues());
+  }
+
+  private LabelValueChoiceRenderer<String> getValueLabelValueChoiceRenderer()
+  {
+    final LabelValueChoiceRenderer<String> choiceRenderer = new LabelValueChoiceRenderer<String>();
+    if (searchFilter.getAddressCampaign() != null) {
+      for (final String value : searchFilter.getAddressCampaign().getValuesArray()) {
+        choiceRenderer.addValue(value, value);
+      }
+    }
+    return choiceRenderer;
   }
 
   @Override

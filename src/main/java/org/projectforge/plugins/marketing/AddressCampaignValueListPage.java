@@ -215,7 +215,8 @@ IListPageColumnsCreator<AddressDO>
         list.add(sheet);
       }
     }
-    setResponsePage(new AddressCampaignValueMassUpdatePage(this, list, form.getSearchFilter().getAddressCampaign(), personalAddressMap, addressCampaignValueMap));
+    setResponsePage(new AddressCampaignValueMassUpdatePage(this, list, form.getSearchFilter().getAddressCampaign(), personalAddressMap,
+        addressCampaignValueMap));
   }
 
   @Override
@@ -236,6 +237,24 @@ IListPageColumnsCreator<AddressDO>
   {
     personalAddressMap = personalAddressDao.getPersonalAddressByAddressId();
     addressCampaignValueMap = new HashMap<Integer, AddressCampaignValueDO>();
+  }
+
+  @Override
+  public List<AddressDO> getList()
+  {
+    super.getList();
+    final String value = form.getSearchFilter().getAddressCampaignValue();
+    if (StringUtils.isEmpty(value) == false) {
+      final List<AddressDO> origList = list;
+      list = new ArrayList<AddressDO>();
+      for (final AddressDO address : origList) {
+        final AddressCampaignValueDO addressCampaignValue = addressCampaignValueMap.get(address.getId());
+        if (addressCampaignValue != null && value.equals(addressCampaignValue.getValue()) == true) {
+          list.add(address);
+        }
+      }
+    }
+    return list;
   }
 
   @Override

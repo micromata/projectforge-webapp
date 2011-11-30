@@ -83,6 +83,9 @@ public class AddressCampaignValueDao extends BaseDao<AddressCampaignValueDO>
     if (myFilter.getAddressCampaign() != null) {
       queryFilter.add(Restrictions.eq("address_campaign_fk", myFilter.getAddressCampaign().getId()));
     }
+    if (myFilter.getAddressCampaignValue() != null) {
+      queryFilter.add(Restrictions.eq("value", myFilter.getAddressCampaign().getId()));
+    }
     return getList(queryFilter);
   }
 

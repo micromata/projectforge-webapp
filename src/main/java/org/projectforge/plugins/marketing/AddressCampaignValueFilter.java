@@ -37,6 +37,8 @@ public class AddressCampaignValueFilter extends AddressFilter
 
   private AddressCampaignDO addressCampaign;
 
+  private String addressCampaignValue;
+
   public AddressCampaignValueFilter()
   {
   }
@@ -64,5 +66,15 @@ public class AddressCampaignValueFilter extends AddressFilter
   {
     this.addressCampaign = addressCampaign;
     return this;
+  }
+
+  public String getAddressCampaignValue()
+  {
+    return addressCampaignValue;
+  }
+
+  public void setAddressCampaignValue(final String addressCampaignValue)
+  {
+    this.addressCampaignValue = addressCampaignValue;
   }
 }

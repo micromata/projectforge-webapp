@@ -30,10 +30,13 @@ function showOptions() {
     <td><span wicket:id="filterType"><input type="radio" wicket:id="filter" id="filterTypeStandard" onclick="javascript:showOptions();" />
     &nbsp; <wicket:message key="filter" /> <input type="radio" wicket:id="newest" onclick="javascript:hideOptions();submit();" /> &nbsp; <wicket:message
       key="filter.newest" /> &nbsp; <input type="radio" wicket:id="myFavorites" onclick="javascript:hideOptions();submit();" /> &nbsp; <wicket:message
-      key="address.filter.myFavorites" /></span>, <label for="addressCampaign"><wicket:message key="plugins.marketing.addressCampaign" /></label> <select
-      wicket:id="addressCampaign">
+      key="address.filter.myFavorites" /></span> | <label for="addressCampaign"><wicket:message key="plugins.marketing.addressCampaign" /></label> <select
+      wicket:id="addressCampaign" id="addressCampaign">
       <option>Mailing 2012</option>
-    </select> <span wicket:id="pageSize">[Page size setting]</span><br />
+    </select> <label for="addressCampaignValue"><wicket:message key="value" /></label> <select
+      wicket:id="addressCampaignValue" id="addressCampaignValue">
+      <option>True</option>
+    </select> | <span wicket:id="pageSize">[Page size setting]</span><br />
     <div id="options" style="display: none;"><wicket:message key="address.addressStatus" />:&nbsp; <input type="checkbox" wicket:id="uptodate">
     <wicket:message key="address.addressStatus.uptodate" /> <input type="checkbox" wicket:id="outdated"> <wicket:message
       key="address.addressStatus.outdated" /> <input type="checkbox" wicket:id="leaved"> <wicket:message key="address.addressStatus.leaved" />
