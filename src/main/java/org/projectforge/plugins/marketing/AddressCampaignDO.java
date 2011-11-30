@@ -23,9 +23,6 @@
 
 package org.projectforge.plugins.marketing;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -85,16 +82,6 @@ public class AddressCampaignDO extends DefaultBaseDO
   public String[] getValuesArray()
   {
     return getValuesArray(values);
-  }
-
-  @Transient
-  public List<String> getValuesList()
-  {
-    final String[] sa = getValuesArray();
-    if (sa == null) {
-      return null;
-    }
-    return Arrays.asList(sa);
   }
 
   @Column(length = 1000)
