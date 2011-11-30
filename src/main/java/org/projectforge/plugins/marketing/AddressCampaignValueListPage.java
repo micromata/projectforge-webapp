@@ -27,11 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
@@ -84,6 +86,12 @@ IListPageColumnsCreator<AddressDO>
     super(parameters, "plugins.marketing.addressCampaignValue");
   }
 
+  @Override
+  protected void onBodyTag(final ComponentTag bodyTag)
+  {
+    bodyTag.put("onload", "javascript:setOptionStatus();");
+  }
+
   public List<IColumn<AddressDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     return createColumns(returnToPage, sortable, false);
@@ -123,8 +131,8 @@ IListPageColumnsCreator<AddressDO>
         }
       });
     } else {
-      columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("modified")), getSortable("lastUpdate",
-          sortable), "lastUpdate", cellItemListener) {
+      columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("created")), getSortable("created",
+          sortable), "created", cellItemListener) {
         @SuppressWarnings("unchecked")
         @Override
         public void populateItem(final Item item, final String componentId, final IModel rowModel)
@@ -222,6 +230,14 @@ IListPageColumnsCreator<AddressDO>
     form.add(dataTable);
   }
 
+  @Override
+  public void refresh()
+  {
+    super.refresh();
+    if (form.getSearchFilter().isNewest() == true && StringUtils.isBlank(form.getSearchFilter().getSearchString()) == true) {
+      form.getSearchFilter().setMaxRows(form.getPageSize());
+    }
+  }
   @Override
   protected AddressCampaignValueListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {

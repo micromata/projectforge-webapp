@@ -26,7 +26,11 @@ package org.projectforge.plugins.marketing;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.Radio;
+import org.apache.wicket.markup.html.form.RadioGroup;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.wicket.AbstractListForm;
@@ -83,6 +87,23 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
           return true;
         }
       };
+      filterContainer.add(new CheckBox("uptodate", new PropertyModel<Boolean>(getSearchFilter(), "uptodate")));
+      filterContainer.add(new CheckBox("outdated", new PropertyModel<Boolean>(getSearchFilter(), "outdated")));
+      filterContainer.add(new CheckBox("leaved", new PropertyModel<Boolean>(getSearchFilter(), "leaved")));
+
+      filterContainer.add(new CheckBox("active", new PropertyModel<Boolean>(getSearchFilter(), "active")));
+      filterContainer.add(new CheckBox("nonActive", new PropertyModel<Boolean>(getSearchFilter(), "nonActive")));
+      filterContainer.add(new CheckBox("uninteresting", new PropertyModel<Boolean>(getSearchFilter(), "uninteresting")));
+      filterContainer.add(new CheckBox("personaIngrata", new PropertyModel<Boolean>(getSearchFilter(), "personaIngrata")));
+      filterContainer.add(new CheckBox("departed", new PropertyModel<Boolean>(getSearchFilter(), "departed")));
+
+      // Radio choices:
+      final RadioGroup<String> filterType = new RadioGroup<String>("filterType", new PropertyModel<String>(getSearchFilter(), "listType"));
+      filterType.add(new Radio<String>("filter", new Model<String>("filter")).setOutputMarkupId(false));
+      filterType.add(new Radio<String>("newest", new Model<String>("newest")));
+      filterType.add(new Radio<String>("myFavorites", new Model<String>("myFavorites")));
+      filterContainer.add(filterType);
+
       filterContainer.add(addressCampaignChoice);
     }
   }

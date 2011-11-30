@@ -23,8 +23,7 @@
 
 package org.projectforge.plugins.marketing;
 
-import java.io.Serializable;
-
+import org.projectforge.address.AddressFilter;
 import org.projectforge.core.BaseSearchFilter;
 
 /**
@@ -32,7 +31,7 @@ import org.projectforge.core.BaseSearchFilter;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class AddressCampaignFilter extends BaseSearchFilter implements Serializable
+public class AddressCampaignFilter extends AddressFilter
 {
   private static final long serialVersionUID = 5731140604154434730L;
 
