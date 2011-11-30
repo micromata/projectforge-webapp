@@ -24,12 +24,14 @@
 package org.projectforge.plugins.marketing;
 
 import org.apache.wicket.MarkupContainer;
-import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.model.PropertyModel;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.layout.AbstractFormRenderer;
+import org.projectforge.web.wicket.layout.DropDownChoiceLPanel;
 import org.projectforge.web.wicket.layout.LayoutContext;
 import org.projectforge.web.wicket.layout.LayoutLength;
 import org.projectforge.web.wicket.layout.PanelContext;
-import org.projectforge.web.wicket.layout.TextFieldLPanel;
 
 /**
  * This layout class is easy to use and generates read-only views as well as edit formulars for browsers and mobile devices.
@@ -42,8 +44,6 @@ public class AddressCampaignValueFormRenderer extends AbstractFormRenderer
 
   private final AddressCampaignValueDO data;
 
-  private TextField<String> valuesField;
-
   final static LayoutLength labelLength = LayoutLength.HALF;
 
   final static LayoutLength valueLength = LayoutLength.DOUBLE;
@@ -54,25 +54,20 @@ public class AddressCampaignValueFormRenderer extends AbstractFormRenderer
     this.data = data;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public void add()
   {
-    doPanel.newFieldSetPanel(getString("plugins.marketing.addressCampaign"));
-    doPanel.addTextField(new PanelContext(data, "title", valueLength, getString("title"), labelLength).setRequired().setStrong());
-    doPanel.addLabel(new PanelContext(valueLength, getString("plugins.marketing.addressCampaign.edit.warning.doNotChangeValues"), valueLength)
-    .setIndent(labelLength).setStrongLabel(true));
-    valuesField = (TextField<String>) ((TextFieldLPanel) doPanel.addTextField(new PanelContext(data, "values", valueLength,
-        getString("values"), labelLength).setRequired().setTooltip(getString("plugins.marketing.addressCampaign.values.format")))).getTextField();
-    doPanel.addTextArea(new PanelContext(data, "comment", valueLength, getString("comment"), labelLength).setCssStyle("height: 20em;"));
-  }
-
-  protected void validation()
-  {
-    valuesField.validate();
-    final String values = valuesField.getConvertedInput();
-    if (AddressCampaignDO.getValuesArray(values) == null) {
-      valuesField.error(getString("plugins.marketing.addressCampaign.values.invalidFormat"));
+    doPanel.newFieldSetPanel(getString("plugins.marketing.addressCampaignValue"));
+    doPanel.addLabel(new PanelContext(valueLength, getString("name"), valueLength, data.getAddress().getFullName(), labelLength).setStrong());
+    doPanel.addTextField(new PanelContext(data, "value", valueLength, getString("value"), labelLength).setRequired().setStrong());
+    {
+      final AddressCampaignDO addressCampaign = data.getAddressCampaign();
+      final LabelValueChoiceRenderer<String> typeChoiceRenderer = new LabelValueChoiceRenderer<String>(container, addressCampaign.getValues());
+      final DropDownChoice<String> typeChoice = new DropDownChoice<String>(DropDownChoiceLPanel.SELECT_ID, new PropertyModel<String>(
+          data, "value"), typeChoiceRenderer.getValues(), typeChoiceRenderer);
+      typeChoice.setNullValid(true);
+      doPanel.addDropDownChoice(typeChoice, new PanelContext(valueLength, getString("value"), labelLength));
     }
+    doPanel.addTextArea(new PanelContext(data, "comment", valueLength, getString("comment"), labelLength).setCssStyle("height: 20em;"));
   }
 }

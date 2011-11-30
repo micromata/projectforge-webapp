@@ -26,6 +26,9 @@ package org.projectforge.plugins.marketing;
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.address.AddressDO;
+import org.projectforge.address.AddressDao;
+import org.projectforge.core.UserException;
 import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
@@ -35,8 +38,13 @@ import org.projectforge.web.wicket.EditPage;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @EditPage(defaultReturnPage = AddressCampaignValueListPage.class)
-public class AddressCampaignValueEditPage extends AbstractAutoLayoutEditPage<AddressCampaignValueDO, AddressCampaignValueEditForm, AddressCampaignValueDao>
+public class AddressCampaignValueEditPage extends
+AbstractAutoLayoutEditPage<AddressCampaignValueDO, AddressCampaignValueEditForm, AddressCampaignValueDao>
 {
+  public static final String PARAMETER_ADDRESS_ID = "addressId";
+
+  public static final String PARAMETER_ADDRESS_CAMPAIGN_ID = "campaignId";
+
   private static final long serialVersionUID = -5058143025817192156L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressCampaignValueEditPage.class);
@@ -44,10 +52,35 @@ public class AddressCampaignValueEditPage extends AbstractAutoLayoutEditPage<Add
   @SpringBean(name = "addressCampaignValueDao")
   private AddressCampaignValueDao addressCampaignValueDao;
 
+  @SpringBean(name = "addressCampaignDao")
+  private AddressCampaignDao addressCampaignDao;
+
+  @SpringBean(name = "addressDao")
+  private AddressDao addressDao;
+
   public AddressCampaignValueEditPage(final PageParameters parameters)
   {
     super(parameters, "plugins.marketing.addressCampaign");
-    init();
+    final Integer id = parameters.getAsInteger(AbstractEditPage.PARAMETER_KEY_ID);
+    if (id == null) {
+      // Create new entry.
+      final Integer addressId = parameters.getAsInteger(PARAMETER_ADDRESS_ID);
+      final Integer addressCampaignId = parameters.getAsInteger(PARAMETER_ADDRESS_CAMPAIGN_ID);
+      if (addressId == null || addressCampaignId == null) {
+        throw new UserException("plugins.marketing.addressCampaignValue.error.addressOrCampaignNotGiven");
+      }
+      final AddressDO address = addressDao.getById(addressId);
+      final AddressCampaignDO addressCampaign = addressCampaignDao.getById(addressCampaignId);
+      if (address == null || addressCampaign == null) {
+        throw new UserException("plugins.marketing.addressCampaignValue.error.addressOrCampaignNotGiven");
+      }
+      final AddressCampaignValueDO data = new AddressCampaignValueDO();
+      data.setAddress(address);
+      data.setAddressCampaign(addressCampaign);
+      init(data);
+    } else {
+      init();
+    }
   }
 
   @Override

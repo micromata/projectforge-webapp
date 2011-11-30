@@ -52,6 +52,13 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
   }
 
   @Override
+  protected boolean isFilterVisible()
+  {
+    return parentPage.isMassUpdateMode() == false;
+  }
+
+
+  @Override
   protected AddressCampaignFilter newSearchFilterInstance()
   {
     return new AddressCampaignFilter();

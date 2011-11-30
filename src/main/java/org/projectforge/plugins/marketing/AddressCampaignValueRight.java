@@ -51,6 +51,6 @@ public class AddressCampaignValueRight extends UserRightAccessCheck<AddressCampa
       final OperationType operationType)
   {
     final AddressDao addressDao = (AddressDao) Registry.instance().getDao(AddressDao.class);
-    return addressDao.hasAccess(user, obj.getAddress(), oldObj.getAddress(), operationType, false);
+    return addressDao.hasAccess(user, obj.getAddress(), oldObj != null ? oldObj.getAddress() : null, operationType, false);
   }
 }

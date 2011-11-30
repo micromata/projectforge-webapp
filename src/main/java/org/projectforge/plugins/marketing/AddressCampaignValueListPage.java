@@ -37,12 +37,14 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.web.calendar.DateTimeFormatter;
+import org.projectforge.web.timesheet.TimesheetMassUpdatePage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.CellItemListener;
@@ -51,13 +53,14 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.components.CheckBoxPanel;
 
 /**
  * The controller of the list page. Most functionality such as search etc. is done by the super class.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-@ListPage(editPage = AddressCampaignEditPage.class)
+@ListPage(editPage = AddressCampaignValueEditPage.class)
 public class AddressCampaignValueListPage extends AbstractListPage<AddressCampaignValueListForm, AddressDao, AddressDO> implements
 IListPageColumnsCreator<AddressDO>
 {
@@ -81,8 +84,13 @@ IListPageColumnsCreator<AddressDO>
     super(parameters, "plugins.marketing.addressCampaignValue");
   }
 
-  @SuppressWarnings("serial")
   public List<IColumn<AddressDO>> createColumns(final WebPage returnToPage, final boolean sortable)
+  {
+    return createColumns(returnToPage, sortable, false);
+  }
+
+  @SuppressWarnings("serial")
+  public List<IColumn<AddressDO>> createColumns(final WebPage returnToPage, final boolean sortable, final boolean massUpdateMode)
   {
     final List<IColumn<AddressDO>> columns = new ArrayList<IColumn<AddressDO>>();
     final CellItemListener<AddressDO> cellItemListener = new CellItemListener<AddressDO>() {
@@ -101,19 +109,38 @@ IListPageColumnsCreator<AddressDO>
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("modified")),
-        getSortable("lastUpdate", sortable), "lastUpdate", cellItemListener) {
-      @SuppressWarnings("unchecked")
-      @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
-      {
-        final AddressDO campaign = (AddressDO) rowModel.getObject();
-        item.add(new ListSelectActionPanel(componentId, rowModel, AddressCampaignEditPage.class, campaign.getId(), returnToPage,
-            DateTimeFormatter.instance().getFormattedDateTime(campaign.getCreated())));
-        addRowClick(item);
-        cellItemListener.populateItem(item, componentId, rowModel);
-      }
-    });
+
+    if (massUpdateMode == true) {
+      columns.add(new CellItemListenerPropertyColumn<AddressDO>("", null, "selected", cellItemListener) {
+        @Override
+        public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
+        {
+          final AddressDO address = rowModel.getObject();
+          final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(componentId, new PropertyModel<Boolean>(address, "selected"), true);
+          item.add(checkBoxPanel);
+          cellItemListener.populateItem(item, componentId, rowModel);
+          addRowClick(item, massUpdateMode);
+        }
+      });
+    } else {
+      columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("modified")), getSortable("lastUpdate",
+          sortable), "lastUpdate", cellItemListener) {
+        @SuppressWarnings("unchecked")
+        @Override
+        public void populateItem(final Item item, final String componentId, final IModel rowModel)
+        {
+          final AddressDO address = (AddressDO) rowModel.getObject();
+          final AddressCampaignValueDO addressCampaignValue = addressCampaignValueMap.get(address.getId());
+          final Integer addressCampaignValueId = addressCampaignValue != null ? addressCampaignValue.getId() : null;
+          item.add(new ListSelectActionPanel(componentId, rowModel, AddressCampaignValueEditPage.class, addressCampaignValueId, returnToPage,
+              DateTimeFormatter.instance().getFormattedDateTime(address.getCreated()), AddressCampaignValueEditPage.PARAMETER_ADDRESS_ID,
+              String.valueOf(address.getId()), AddressCampaignValueEditPage.PARAMETER_ADDRESS_CAMPAIGN_ID, String.valueOf(form
+                  .getSearchFilter().getAddressCampaignId())));
+          addRowClick(item);
+          cellItemListener.populateItem(item, componentId, rowModel);
+        }
+      });
+    }
     columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("name")), getSortable("name", sortable), "name",
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("firstName")),
@@ -157,12 +184,35 @@ IListPageColumnsCreator<AddressDO>
   }
 
   @Override
+  protected void onNextSubmit()
+  {
+    final ArrayList<AddressDO> list = new ArrayList<AddressDO>();
+    for (final AddressDO sheet : getList()) {
+      if (sheet.isSelected() == true) {
+        list.add(sheet);
+      }
+    }
+    setResponsePage(new TimesheetMassUpdatePage(null, null));
+  }
+
+  @Override
+  public boolean isSupportsMassUpdate()
+  {
+    return true;
+  }
+
+  @Override
   protected void init()
   {
     addressCampaignValueMap = addressCampaignValueDao.getAddressCampaignValuesByAddressId(form.getSearchFilter());
     personalAddressMap = personalAddressDao.getPersonalAddressByAddressId();
-    createColumns(this, true);
-    dataTable = createDataTable(createColumns(this, true), "name", true);
+  }
+
+  @Override
+  protected void createDataTable()
+  {
+    final List<IColumn<AddressDO>> columns = createColumns(this, !isMassUpdateMode(), isMassUpdateMode());
+    dataTable = createDataTable(columns, "name", true);
     form.add(dataTable);
   }
 

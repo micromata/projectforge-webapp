@@ -52,6 +52,11 @@ public class AddressCampaignFilter extends BaseSearchFilter implements Serializa
     return addressCampaign;
   }
 
+  public Integer getAddressCampaignId()
+  {
+    return addressCampaign != null ? addressCampaign.getId() : null;
+  }
+
   /**
    * @param addressCampaign
    * @return this for chaining.
