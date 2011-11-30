@@ -1,0 +1,46 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+<wicket:extend>
+  <script wicket:id="showUpdateQuestionDialog" type="text/javascript">
+    function showUpdateQuestionDialog() {
+      return window.confirm("Update...?");
+    }
+  </script>
+  <form wicket:id="form">
+  <div wicket:id="feedback">[Validation errors]</div>
+
+  <fieldset><legend></legend>
+
+  <table class="form">
+    <wicket:child />
+    <tr>
+      <th><label for="value"><wicket:message key="value" /></label></th>
+      <td><select wicket:id="value">
+        <option>[option]</option>
+      </select></td>
+    </tr>
+    <tr>
+      <th><label for="comment"><wicket:message key="comment" /></label></th>
+      <td><textarea class="stdtext" wicket:id="comment" style="height: 20ex; width: 100%;">[text]</textarea></td>
+    </tr>
+    <tr>
+      <th></th>
+      <td class="buttonpanel colspan="2"><span wicket:id="cancel">[cancel]</span> <span wicket:id="updateAll">[update all]</span></td>
+    </tr>
+  </table>
+  </fieldset>
+  </form>
+
+  <table class="dataview" cellspacing="0" wicket:id="table">
+    <tr>
+      <td>[table]</td>
+    </tr>
+  </table>
+
+</wicket:extend>
+</body>
+</html>
