@@ -60,8 +60,8 @@ import org.projectforge.fibu.RechnungsPositionDO;
     @UniqueConstraint(columnNames = { "index", "rechnungs_pos_fk", "kost1_fk", "kost2_fk"}),
     @UniqueConstraint(columnNames = { "index", "eingangsrechnungs_pos_fk", "kost1_fk", "kost2_fk"}),
     @UniqueConstraint(columnNames = { "index", "employee_salary_fk", "kost1_fk", "kost2_fk"})})
-public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCapable
-{
+    public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCapable
+    {
   private static final long serialVersionUID = 7680349296575044993L;
 
   private short index;
@@ -88,7 +88,7 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
   private String comment;
 
   /**
-   * Die Kostzuweisungen sind als Array organisiert. Dies stellt den Index der Kostzuweisung dar.
+   * Die Kostzuweisungen sind als Array organisiert. Dies stellt den Index der Kostzuweisung dar. Der Index ist für Gehaltszahlungen ohne Belang.
    * @return
    */
   @Column
@@ -97,7 +97,7 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
     return index;
   }
 
-  public void setIndex(short index)
+  public void setIndex(final short index)
   {
     this.index = index;
   }
@@ -108,7 +108,7 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
     return netto;
   }
 
-  public void setNetto(BigDecimal netto)
+  public void setNetto(final BigDecimal netto)
   {
     this.netto = netto;
   }
@@ -140,7 +140,7 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
     return kost1;
   }
 
-  public void setKost1(Kost1DO kost1)
+  public void setKost1(final Kost1DO kost1)
   {
     this.kost1 = kost1;
   }
@@ -160,7 +160,7 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
     return kost2;
   }
 
-  public void setKost2(Kost2DO kost2)
+  public void setKost2(final Kost2DO kost2)
   {
     this.kost2 = kost2;
   }
@@ -184,7 +184,7 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
    * @throws IllegalStateException if eingangsRechnung or employeeSalary is already given.
    * @param rechnungsPosition
    */
-  public void setRechnungsPosition(RechnungsPositionDO rechnungsPosition)
+  public void setRechnungsPosition(final RechnungsPositionDO rechnungsPosition)
   {
     if (rechnungsPosition != null && (this.eingangsrechnungsPosition != null || this.employeeSalary != null)) {
       throw new IllegalStateException("eingangsRechnung or employeeSalary already given!");
@@ -211,7 +211,7 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
    * @throws IllegalStateException if rechnung or employeeSalary is already given.
    * @param eingangsrechnung
    */
-  public void setEingangsrechnungsPosition(EingangsrechnungsPositionDO eingangsrechnungsPosition)
+  public void setEingangsrechnungsPosition(final EingangsrechnungsPositionDO eingangsrechnungsPosition)
   {
     if (eingangsrechnungsPosition != null && (this.rechnungsPosition != null || this.employeeSalary != null)) {
       throw new IllegalStateException("rechnungsPosition or employeeSalary already given!");
@@ -238,7 +238,7 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
    * @throws IllegalStateException if rechnung or eingangsRechnung is already given.
    * @param employeeSalary
    */
-  public void setEmployeeSalary(EmployeeSalaryDO employeeSalary)
+  public void setEmployeeSalary(final EmployeeSalaryDO employeeSalary)
   {
     if (employeeSalary != null && (this.eingangsrechnungsPosition != null || this.rechnungsPosition != null)) {
       throw new IllegalStateException("eingangsRechnung or rechnungsPosition already given!");
@@ -260,7 +260,7 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
     return comment;
   }
 
-  public void setComment(String comment)
+  public void setComment(final String comment)
   {
     this.comment = comment;
   }
@@ -301,10 +301,10 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
   }
 
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object o)
   {
     if (o instanceof KostZuweisungDO) {
-      KostZuweisungDO other = (KostZuweisungDO) o;
+      final KostZuweisungDO other = (KostZuweisungDO) o;
       if (ObjectUtils.equals(this.getIndex(), other.getIndex()) == false)
         return false;
       if (ObjectUtils.equals(this.getRechnungsPositionId(), other.getRechnungsPositionId()) == false)
@@ -321,7 +321,7 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     hcb.append(getIndex());
     if (getRechnungsPosition() != null) {
       hcb.append(getRechnungsPositionId());
@@ -351,4 +351,4 @@ public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCa
     kostZuweisung.copyValuesFrom(this, "id");
     return kostZuweisung;
   }
-}
+    }
