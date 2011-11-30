@@ -56,7 +56,7 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
 
   protected DatePanel datePanel, validFromDatePanel, validUntilDatePanel, dueDatePanel, resubmissionDatePanel, signingDatePanel;
 
-  public ContractEditForm(ContractEditPage parentPage, ContractDO data)
+  public ContractEditForm(final ContractEditPage parentPage, final ContractDO data)
   {
     super(parentPage, data);
     this.colspan = 4;
@@ -68,7 +68,7 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
     final PFAutoCompleteTextField<String> textField = (new PFAutoCompleteMaxLengthTextField(property, new PropertyModel<String>(data,
         property)) {
       @Override
-      protected List<String> getChoices(String input)
+      protected List<String> getChoices(final String input)
       {
         return parentPage.getBaseDao().getAutocompletion(property, input);
       }
@@ -111,7 +111,7 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
 
     // DropDownChoice type
     final List<ContractType> contractTypes = ConfigXml.getInstance().getContractTypes();
-    final LabelValueChoiceRenderer<ContractType> typeChoiceRenderer = new LabelValueChoiceRenderer<ContractType>(this, contractTypes);
+    final LabelValueChoiceRenderer<ContractType> typeChoiceRenderer = new LabelValueChoiceRenderer<ContractType>(contractTypes);
     @SuppressWarnings("unchecked")
     final DropDownChoice typeChoice = new DropDownChoice("type", new PropertyModel(data, "type"), typeChoiceRenderer.getValues(),
         typeChoiceRenderer);

@@ -54,24 +54,13 @@ public class LabelValueChoiceRenderer<T> implements IChoiceRenderer<T>
 
   /**
    * Creates already entries from the given enum.
+   * Works only if T is from type I18nEnum.
    * @param parent Only needed for internationalization.
    * @param i18nEnum if not enum and not from type T a class cast exception will be thrown.
-   * @see Component#getString(String)
-   */
-  public LabelValueChoiceRenderer(final Component parent, final I18nEnum[] values)
-  {
-    this(parent, values, 0);
-  }
-
-  /**
-   * Creates already entries from the given enum.
-   * @param parent Only needed for internationalization.
-   * @param i18nEnum if not enum and not from type T a class cast exception will be thrown.
-   * @param dummy Only for avoiding ambiguous constructors.
    * @see Component#getString(String)
    */
   @SuppressWarnings("unchecked")
-  public LabelValueChoiceRenderer(final Component parent, final I18nEnum[] values, final int dummy)
+  public LabelValueChoiceRenderer(final Component parent, final I18nEnum[] values)
   {
     this();
     for (final I18nEnum value : values) {
@@ -80,35 +69,46 @@ public class LabelValueChoiceRenderer<T> implements IChoiceRenderer<T>
   }
 
   /**
-   * Creates already entries from the given enum.
-   * @param parent Only needed for internationalization.
+   * Works only if T is from type String.
    * @param values if the elements are not from type ILabelValueBean<String, T> a class cast exception will be thrown.
    * @see Component#getString(String)
    */
-  public LabelValueChoiceRenderer(final Component parent, final List<T> values)
+  @SuppressWarnings("unchecked")
+  public LabelValueChoiceRenderer(final String... values)
   {
     this();
-    for (final Object value : values) {
-      @SuppressWarnings("unchecked")
-      final ILabelValueBean<String, T> labelValue = (ILabelValueBean<String, T>)value;
-      addValue(labelValue.getValue(), labelValue.getLabel());
+    for (final String value : values) {
+      addValue((T)value, value);
     }
   }
 
   /**
    * Creates already entries from the given enum.
-   * @param parent Only needed for internationalization.
    * @param values if the elements are not from type ILabelValueBean<String, T> a class cast exception will be thrown.
    * @see Component#getString(String)
    */
-  public LabelValueChoiceRenderer(final Component parent, final T... values)
+  public LabelValueChoiceRenderer(final List<T> values)
   {
     this();
     for (final Object value : values) {
       @SuppressWarnings("unchecked")
-      final ILabelValueBean<String, T> labelValue = (ILabelValueBean<String, T>)value;
+      final ILabelValueBean<String, T> labelValue = (ILabelValueBean<String, T>) value;
       addValue(labelValue.getValue(), labelValue.getLabel());
     }
+  }
+
+  /**
+   * @param values if the elements are not from type ILabelValueBean<String, T> a class cast exception will be thrown.
+   * @return This for chaining.
+   */
+  public LabelValueChoiceRenderer<T> setValues(final T... values)
+  {
+    for (final Object value : values) {
+      @SuppressWarnings("unchecked")
+      final ILabelValueBean<String, T> labelValue = (ILabelValueBean<String, T>) value;
+      addValue(labelValue.getValue(), labelValue.getLabel());
+    }
+    return this;
   }
 
   public LabelValueChoiceRenderer<T> addValue(final T value, final String displayValue)

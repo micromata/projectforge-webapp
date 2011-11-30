@@ -74,9 +74,9 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
 
   private FavoritesChoicePanel<JiraProject, JiraProject> jiraProjectChoice;
 
-  private JiraConfig jiraConfig = ConfigXml.getInstance().getJiraConfig();
+  private final JiraConfig jiraConfig = ConfigXml.getInstance().getJiraConfig();
 
-  public MebEditForm(MebEditPage parentPage, MebEntryDO data)
+  public MebEditForm(final MebEditPage parentPage, final MebEntryDO data)
   {
     super(parentPage, data);
     this.colspan = 2;
@@ -149,7 +149,7 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
       issueTypes = new ArrayList<JiraIssueType>();
     }
     // DropDownChoice issueType
-    final LabelValueChoiceRenderer<JiraIssueType> typeChoiceRenderer = new LabelValueChoiceRenderer<JiraIssueType>(this, issueTypes);
+    final LabelValueChoiceRenderer<JiraIssueType> typeChoiceRenderer = new LabelValueChoiceRenderer<JiraIssueType>(issueTypes);
     @SuppressWarnings("unchecked")
     final DropDownChoice typeChoice = new DropDownChoice("issueType", new PropertyModel(this, "jiraIssueType"), typeChoiceRenderer
         .getValues(), typeChoiceRenderer) {
@@ -176,6 +176,7 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
     add(typeChoice);
 
     final AjaxButton createJiraIssueButton = new AjaxButton("createJiraIssue", new Model<String>(getString("meb.actions.createJIRAIssue"))) {
+      @Override
       public void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
       {
         // ...create result page, get the url path to it...
@@ -203,14 +204,14 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
     }
     final JiraProject jiraProject = jiraProjectChoice.getCurrentFavorite();
     return jiraConfig.getCreateIssueUrl()
-        + "?pid="
-        + (jiraProject != null ? jiraProject.getPid() : null)
-        + "&issuetype="
-        + (jiraIssueType != null ? jiraIssueType : 3)
-        + "&priority=4&reporter="
-        + URLHelper.encode(getUser().getJiraUsernameOrUsername())
-        + "&description="
-        + URLHelper.encode(getData().getMessage());
+    + "?pid="
+    + (jiraProject != null ? jiraProject.getPid() : null)
+    + "&issuetype="
+    + (jiraIssueType != null ? jiraIssueType : 3)
+    + "&priority=4&reporter="
+    + URLHelper.encode(getUser().getJiraUsernameOrUsername())
+    + "&description="
+    + URLHelper.encode(getData().getMessage());
   }
 
   public Integer getJiraIssueType()
@@ -218,7 +219,7 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
     return jiraIssueType;
   }
 
-  public void setJiraIssueType(Integer jiraIssueType)
+  public void setJiraIssueType(final Integer jiraIssueType)
   {
     this.jiraIssueType = jiraIssueType;
   }

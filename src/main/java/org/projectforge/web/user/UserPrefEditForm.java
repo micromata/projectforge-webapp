@@ -242,8 +242,8 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           }
           valueField = taskSelectPanel;
         } else if (GroupDO.class.isAssignableFrom(param.getType()) == true) {
-          final GroupSelectPanel groupSelectPanel = new GroupSelectPanel("valueField", new UserPrefPropertyModel<GroupDO>(userPrefDao, param,
-          "valueAsObject"), parentPage, param.getParameter());
+          final GroupSelectPanel groupSelectPanel = new GroupSelectPanel("valueField", new UserPrefPropertyModel<GroupDO>(userPrefDao,
+              param, "valueAsObject"), parentPage, param.getParameter());
           valueField = groupSelectPanel;
         } else if (Kost2DO.class.isAssignableFrom(param.getType()) == true) {
           final UserPrefEntryDO taskParam = data.getUserPrefEntry(param.getDependsOn());
@@ -287,7 +287,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           textArea = new MaxLengthTextArea("textArea", new PropertyModel<String>(param, "value"), maxLength);
         } else if (I18nEnum.class.isAssignableFrom(param.getType()) == true) {
           final LabelValueChoiceRenderer<I18nEnum> choiceRenderer = new LabelValueChoiceRenderer<I18nEnum>(this, (I18nEnum[]) param
-              .getType().getEnumConstants(), 0);
+              .getType().getEnumConstants());
           final DropDownChoice<I18nEnum> choice = new DropDownChoice<I18nEnum>("valueChoice", new UserPrefPropertyModel<I18nEnum>(
               userPrefDao, param, "valueAsObject"), choiceRenderer.getValues(), choiceRenderer);
           choice.setNullValid(true);
