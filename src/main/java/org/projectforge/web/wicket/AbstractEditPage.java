@@ -23,6 +23,7 @@
 
 package org.projectforge.web.wicket;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -134,7 +135,8 @@ AbstractSecuredPage implements IEditPage<O, D>
     }
     final List<IColumn<DisplayHistoryEntry>> columns = new ArrayList<IColumn<DisplayHistoryEntry>>();
     final CellItemListener<DisplayHistoryEntry> cellItemListener = new CellItemListener<DisplayHistoryEntry>() {
-      public void populateItem(final Item<ICellPopulator<DisplayHistoryEntry>> item, final String componentId, final IModel<DisplayHistoryEntry> rowModel)
+      public void populateItem(final Item<ICellPopulator<DisplayHistoryEntry>> item, final String componentId,
+          final IModel<DisplayHistoryEntry> rowModel)
       {
         // Later a link should show the history entry as popup.
         item.add(new AttributeModifier("class", true, new Model<String>("notrlink")));
@@ -152,7 +154,8 @@ AbstractSecuredPage implements IEditPage<O, D>
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<DisplayHistoryEntry>(getString("history.newValue"), null, "newValue", cellItemListener) {
       @Override
-      public void populateItem(final Item<ICellPopulator<DisplayHistoryEntry>> item, final String componentId, final IModel<DisplayHistoryEntry> rowModel)
+      public void populateItem(final Item<ICellPopulator<DisplayHistoryEntry>> item, final String componentId,
+          final IModel<DisplayHistoryEntry> rowModel)
       {
         if (rowModel.getObject().getNewValue() == null) {
           item.add(new Label(componentId, ""));
@@ -164,7 +167,8 @@ AbstractSecuredPage implements IEditPage<O, D>
     });
     columns.add(new CellItemListenerPropertyColumn<DisplayHistoryEntry>(getString("history.oldValue"), null, "oldValue", cellItemListener) {
       @Override
-      public void populateItem(final Item<ICellPopulator<DisplayHistoryEntry>> item, final String componentId, final IModel<DisplayHistoryEntry> rowModel)
+      public void populateItem(final Item<ICellPopulator<DisplayHistoryEntry>> item, final String componentId,
+          final IModel<DisplayHistoryEntry> rowModel)
       {
         if (rowModel.getObject().getOldValue() == null) {
           item.add(new Label(componentId, ""));
@@ -326,17 +330,25 @@ AbstractSecuredPage implements IEditPage<O, D>
     if (getData().getId() != null) {
       if (page instanceof AbstractListPage< ? , ? , ? >) {
         // Force reload/refresh of calling AbstractListPage, otherwise the data object will not be updated.
-        ((AbstractListPage< ? , ? , ? >) page).setHighlightedRowId(getData().getId());
+        ((AbstractListPage< ? , ? , ? >) page).setHighlightedRowId(getHighlightedRowId());
         ((AbstractListPage< ? , ? , ? >) page).refresh();
       } else if (returnToPage instanceof TaskTreePage) {
         // Force reload/refresh of calling AbstractListPage, otherwise the data object will not be updated.
-        ((TaskTreePage) page).setHighlightedRowId((Integer) getData().getId());
+        ((TaskTreePage) page).setHighlightedRowId((Integer) getHighlightedRowId());
         ((TaskTreePage) page).refresh();
       } else if (returnToPage instanceof WizardPage) {
         ((WizardPage) returnToPage).setCreatedObject(getData());
       }
     }
     setResponsePage(page);
+  }
+
+  /**
+   * Overwrite this, if getData().getId() should not be used.
+   */
+  protected Serializable getHighlightedRowId()
+  {
+    return getData().getId();
   }
 
   protected void cancel()
