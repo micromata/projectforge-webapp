@@ -57,7 +57,7 @@ import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D extends org.projectforge.core.IDao< ? >, O> extends
-    AbstractSecuredPage implements ISelectCallerPage
+AbstractSecuredPage implements ISelectCallerPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractListPage.class);
 
@@ -69,10 +69,8 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
 
   public static final String PARAMETER_HIGHLIGHTED_ROW = "row";
 
-  private static final int PAGE_SIZE_FOR_MASS_UPDATE = 100;
-
   protected static final String[] BOOKMARKABLE_FILTER_PROPERTIES = new String[] { "searchString|s", "useModificationFilter|mod",
-      "modifiedByUserId|mUser", "startTimeOfLastModification|mStart", "stopTimeOfLastModification|mStop", "deleted|del"};
+    "modifiedByUserId|mUser", "startTimeOfLastModification|mStart", "stopTimeOfLastModification|mStop", "deleted|del"};
 
   protected static final String[] BOOKMARKABLE_FORM_PROPERTIES = new String[] { "pageSize"};
 
@@ -129,7 +127,7 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
 
   protected static void addRowClick(final Item< ? > cellItem)
   {
-    final Item< ? > row = ((Item< ? >) cellItem.findParent(Item.class));
+    final Item< ? > row = (cellItem.findParent(Item.class));
     WicketUtils.addRowClick(row);
   }
 
@@ -142,14 +140,14 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
   protected static void addRowClick(final Item< ? > cellItem, final boolean massUpdate)
   {
     if (massUpdate == true) {
-      final Item< ? > row = ((Item< ? >) cellItem.findParent(Item.class));
+      final Item< ? > row = (cellItem.findParent(Item.class));
       row.add(new SimpleAttributeModifier("onclick", "javascript:rowCheckboxClick(this);"));
     } else {
       addRowClick(cellItem);
     }
   }
 
-  protected AbstractListPage(PageParameters parameters, final String i18nPrefix)
+  protected AbstractListPage(final PageParameters parameters, final String i18nPrefix)
   {
     this(parameters, null, null, i18nPrefix);
   }
@@ -192,7 +190,7 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
    * Highlight the row representing the data object with the given id.
    * @param highlightedRowId
    */
-  public void setHighlightedRowId(Serializable highlightedRowId)
+  public void setHighlightedRowId(final Serializable highlightedRowId)
   {
     this.highlightedRowId = highlightedRowId;
   }
@@ -479,7 +477,7 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
       dropDownMenu.setVisible(true);
       new AbstractReindexTopRightMenu(this, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
         @Override
-        protected void rebuildDatabaseIndex(boolean onlyNewest)
+        protected void rebuildDatabaseIndex(final boolean onlyNewest)
         {
           if (providesOwnRebuildDatabaseIndex() == true) {
             ownRebuildDatabaseIndex(onlyNewest);
@@ -493,7 +491,7 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
         }
 
         @Override
-        protected String getString(String i18nKey)
+        protected String getString(final String i18nKey)
         {
           return AbstractListPage.this.getString(i18nKey);
         }
@@ -555,7 +553,7 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
    */
   protected DataTable<O> createDataTable(final List<IColumn<O>> columns, final String sortProperty, final boolean ascending)
   {
-    final int pageSize = isMassUpdateMode() == true ? PAGE_SIZE_FOR_MASS_UPDATE : form.getPageSize();
+    final int pageSize = form.getPageSize();
     return new DefaultDataTable<O>("table", columns, createSortableDataProvider(sortProperty, ascending), pageSize);
     // return new AjaxFallbackDefaultDataTable<O>("table", columns, createSortableDataProvider(sortProperty, ascending), pageSize);
   }
@@ -713,7 +711,7 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
   protected void addRecentSearchTerm()
   {
     if (StringUtils.isNotBlank(form.searchFilter.getSearchString()) == true) {
-      String s = form.searchFilter.getSearchString();
+      final String s = form.searchFilter.getSearchString();
       if (s.startsWith("id:") == false || StringUtils.isNumeric(s.substring(3)) == false) {
         // OK, search string is not from type id:4711
         getRecentSearchTermsQueue().append(s);
@@ -756,7 +754,7 @@ public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D ex
     }
 
     @Override
-    protected IModel<O> getModel(O object)
+    protected IModel<O> getModel(final O object)
     {
       return AbstractListPage.this.getModel(object);
     }
