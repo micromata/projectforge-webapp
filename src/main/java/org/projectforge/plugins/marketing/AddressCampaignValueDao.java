@@ -27,13 +27,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
+import org.projectforge.core.UserException;
 import org.projectforge.user.UserRightId;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -44,6 +48,8 @@ import org.springframework.util.CollectionUtils;
 public class AddressCampaignValueDao extends BaseDao<AddressCampaignValueDO>
 {
   public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_MARKETING_ADDRESS_CAMPAIGN_VALUE", "unused", "unused");;
+
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressCampaignValueDao.class);
 
   private AddressDao addressDao;
 
@@ -67,11 +73,11 @@ public class AddressCampaignValueDao extends BaseDao<AddressCampaignValueDO>
   @Override
   public List<AddressCampaignValueDO> getList(final BaseSearchFilter filter)
   {
-    final AddressCampaignFilter myFilter;
-    if (filter instanceof AddressCampaignFilter) {
-      myFilter = (AddressCampaignFilter) filter;
+    final AddressCampaignValueFilter myFilter;
+    if (filter instanceof AddressCampaignValueFilter) {
+      myFilter = (AddressCampaignValueFilter) filter;
     } else {
-      myFilter = new AddressCampaignFilter(filter);
+      myFilter = new AddressCampaignValueFilter(filter);
     }
     final QueryFilter queryFilter = new QueryFilter(myFilter);
     if (myFilter.getAddressCampaign() != null) {
@@ -91,22 +97,69 @@ public class AddressCampaignValueDao extends BaseDao<AddressCampaignValueDO>
     addressCampaignValue.setAddress(address);
   }
 
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+  public void massUpdate(final List<AddressDO> list, final AddressCampaignDO addressCampaign, final String value, final String comment)
+  {
+    if (list == null || list.size() == 0) {
+      // No entries to update.
+      return;
+    }
+    if (list.size() > MAX_MASS_UPDATE) {
+      throw new UserException(MAX_MASS_UPDATE_EXCEEDED_EXCEPTION_I18N, new Object[] { MAX_MASS_UPDATE});
+    }
+    for (final AddressDO address : list) {
+      AddressCampaignValueDO addressCampaignValue = get(address.getId(), addressCampaign.getId());
+      if (addressCampaignValue == null) {
+        addressCampaignValue = new AddressCampaignValueDO();
+        setAddress(addressCampaignValue, address.getId());
+        addressCampaignValue.setAddressCampaign(addressCampaign);
+      }
+      if (value != null) {
+        addressCampaignValue.setValue(value);
+      }
+      if (StringUtils.isEmpty(comment) == false) {
+        addressCampaignValue.setComment(comment);
+      }
+      if (addressCampaignValue.getId() != null) {
+        try {
+          addressCampaignValue.setDeleted(false);
+          update(addressCampaignValue);
+        } catch (final Exception ex) {
+          log.info("Exception occured while updating entry inside mass update: " + addressCampaignValue);
+        }
+      } else {
+        try {
+          save(addressCampaignValue);
+        } catch (final Exception ex) {
+          log.info("Exception occured while inserting entry inside mass update: " + addressCampaignValue);
+        }
+      }
+    }
+  }
+
   @Override
   public AddressCampaignValueDO newInstance()
   {
     return new AddressCampaignValueDO();
   }
 
-  public Map<Integer, AddressCampaignValueDO> getAddressCampaignValuesByAddressId(final AddressCampaignFilter searchFilter)
+  public Map<Integer, AddressCampaignValueDO> getAddressCampaignValuesByAddressId(final AddressCampaignValueFilter searchFilter)
   {
     final HashMap<Integer, AddressCampaignValueDO> map = new HashMap<Integer, AddressCampaignValueDO>();
+    return getAddressCampaignValuesByAddressId(map, searchFilter);
+  }
+
+  public Map<Integer, AddressCampaignValueDO> getAddressCampaignValuesByAddressId(final Map<Integer, AddressCampaignValueDO> map,
+      final AddressCampaignValueFilter searchFilter)
+      {
+    map.clear();
     final Integer addressCampaignId = searchFilter.getAddressCampaignId();
     if (addressCampaignId == null) {
       return map;
     }
     @SuppressWarnings("unchecked")
-    final List<AddressCampaignValueDO> list = getHibernateTemplate().find("from AddressCampaignValueDO a where a.addressCampaign.id = ? and deleted = false",
-        searchFilter.getAddressCampaignId());
+    final List<AddressCampaignValueDO> list = getHibernateTemplate().find(
+        "from AddressCampaignValueDO a where a.addressCampaign.id = ? and deleted = false", searchFilter.getAddressCampaignId());
     if (CollectionUtils.isEmpty(list) == true) {
       return map;
     }
@@ -114,7 +167,7 @@ public class AddressCampaignValueDao extends BaseDao<AddressCampaignValueDO>
       map.put(addressCampaignValue.getAddressId(), addressCampaignValue);
     }
     return map;
-  }
+      }
 
   public void setAddressDao(final AddressDao addressDao)
   {

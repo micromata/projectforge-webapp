@@ -23,7 +23,9 @@
 
 package org.projectforge.plugins.marketing;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,7 +48,6 @@ import org.projectforge.address.AddressDao;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.web.calendar.DateTimeFormatter;
-import org.projectforge.web.timesheet.TimesheetMassUpdatePage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.CellItemListener;
@@ -97,16 +98,30 @@ IListPageColumnsCreator<AddressDO>
     return createColumns(returnToPage, sortable, false);
   }
 
-  @SuppressWarnings("serial")
   public List<IColumn<AddressDO>> createColumns(final WebPage returnToPage, final boolean sortable, final boolean massUpdateMode)
   {
+    return createColumns(returnToPage, sortable, massUpdateMode, form.getSearchFilter(), personalAddressMap, addressCampaignValueMap);
+  }
+
+  @SuppressWarnings("serial")
+  protected static final List<IColumn<AddressDO>> createColumns(final WebPage page, final boolean sortable, final boolean massUpdateMode,
+      final AddressCampaignValueFilter searchFilter, final Map<Integer, PersonalAddressDO> personalAddressMap,
+      final Map<Integer, AddressCampaignValueDO> addressCampaignValueMap)
+      {
+
     final List<IColumn<AddressDO>> columns = new ArrayList<IColumn<AddressDO>>();
     final CellItemListener<AddressDO> cellItemListener = new CellItemListener<AddressDO>() {
       public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
       {
         final AddressDO address = rowModel.getObject();
+        final Serializable highlightedRowId;
+        if (page instanceof AbstractListPage< ? , ? , ? >) {
+          highlightedRowId = ((AbstractListPage< ? , ? , ? >) page).getHighlightedRowId();
+        } else {
+          highlightedRowId = null;
+        }
         final PersonalAddressDO personalAddress = personalAddressMap.get(address.getId());
-        final StringBuffer cssStyle = getCssStyle(address.getId(), address.isDeleted());
+        final StringBuffer cssStyle = getCssStyle(address.getId(), highlightedRowId, address.isDeleted());
         if (address.isDeleted() == true) {
           // Do nothing further
         } else if (personalAddress != null && personalAddress.isFavoriteCard() == true) {
@@ -131,7 +146,7 @@ IListPageColumnsCreator<AddressDO>
         }
       });
     } else {
-      columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("created")), getSortable("created",
+      columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(page.getString("created")), getSortable("created",
           sortable), "created", cellItemListener) {
         @SuppressWarnings("unchecked")
         @Override
@@ -140,23 +155,23 @@ IListPageColumnsCreator<AddressDO>
           final AddressDO address = (AddressDO) rowModel.getObject();
           final AddressCampaignValueDO addressCampaignValue = addressCampaignValueMap.get(address.getId());
           final Integer addressCampaignValueId = addressCampaignValue != null ? addressCampaignValue.getId() : null;
-          item.add(new ListSelectActionPanel(componentId, rowModel, AddressCampaignValueEditPage.class, addressCampaignValueId, returnToPage,
+          item.add(new ListSelectActionPanel(componentId, rowModel, AddressCampaignValueEditPage.class, addressCampaignValueId, page,
               DateTimeFormatter.instance().getFormattedDateTime(address.getCreated()), AddressCampaignValueEditPage.PARAMETER_ADDRESS_ID,
-              String.valueOf(address.getId()), AddressCampaignValueEditPage.PARAMETER_ADDRESS_CAMPAIGN_ID, String.valueOf(form
-                  .getSearchFilter().getAddressCampaignId())));
+              String.valueOf(address.getId()), AddressCampaignValueEditPage.PARAMETER_ADDRESS_CAMPAIGN_ID, String.valueOf(searchFilter
+                  .getAddressCampaignId())));
           addRowClick(item);
           cellItemListener.populateItem(item, componentId, rowModel);
         }
       });
     }
-    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("name")), getSortable("name", sortable), "name",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("firstName")),
-        getSortable("firstName", sortable), "firstName", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("organization")), getSortable("organization",
-        sortable), "organization", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(page.getString("name")), getSortable("name", sortable),
+        "name", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(page.getString("firstName")), getSortable("firstName",
+        sortable), "firstName", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(page.getString("organization")), getSortable(
+        "organization", sortable), "organization", cellItemListener));
 
-    columns.add(new AbstractColumn<AddressDO>(new Model<String>(getString("value"))) {
+    columns.add(new AbstractColumn<AddressDO>(new Model<String>(page.getString("value"))) {
       @Override
       public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
       {
@@ -172,7 +187,7 @@ IListPageColumnsCreator<AddressDO>
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new AbstractColumn<AddressDO>(new Model<String>(getString("comment"))) {
+    columns.add(new AbstractColumn<AddressDO>(new Model<String>(page.getString("comment"))) {
       @Override
       public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
       {
@@ -189,7 +204,7 @@ IListPageColumnsCreator<AddressDO>
       }
     });
     return columns;
-  }
+      }
 
   @Override
   protected void onNextSubmit()
@@ -200,7 +215,7 @@ IListPageColumnsCreator<AddressDO>
         list.add(sheet);
       }
     }
-    setResponsePage(new TimesheetMassUpdatePage(null, null));
+    setResponsePage(new AddressCampaignValueMassUpdatePage(this, list, form.getSearchFilter().getAddressCampaign(), personalAddressMap, addressCampaignValueMap));
   }
 
   @Override
@@ -212,7 +227,7 @@ IListPageColumnsCreator<AddressDO>
   @Override
   protected void onBeforeRender()
   {
-    addressCampaignValueMap = addressCampaignValueDao.getAddressCampaignValuesByAddressId(form.getSearchFilter());
+    addressCampaignValueDao.getAddressCampaignValuesByAddressId(addressCampaignValueMap, form.getSearchFilter());
     super.onBeforeRender();
   }
 
@@ -220,6 +235,7 @@ IListPageColumnsCreator<AddressDO>
   protected void init()
   {
     personalAddressMap = personalAddressDao.getPersonalAddressByAddressId();
+    addressCampaignValueMap = new HashMap<Integer, AddressCampaignValueDO>();
   }
 
   @Override
@@ -238,6 +254,7 @@ IListPageColumnsCreator<AddressDO>
       form.getSearchFilter().setMaxRows(form.getPageSize());
     }
   }
+
   @Override
   protected AddressCampaignValueListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {

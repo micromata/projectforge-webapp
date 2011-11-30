@@ -41,7 +41,7 @@ import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class AddressCampaignValueListForm extends AbstractListForm<AddressCampaignFilter, AddressCampaignValueListPage>
+public class AddressCampaignValueListForm extends AbstractListForm<AddressCampaignValueFilter, AddressCampaignValueListPage>
 {
   private static final long serialVersionUID = 6190615904711764514L;
 
@@ -63,7 +63,7 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
   {
     super.init();
     this.addressCampaignId = searchFilter.getAddressCampaignId();
-    final List<AddressCampaignDO> addressCampaignList = addressCampaignDao.getList(new AddressCampaignFilter());
+    final List<AddressCampaignDO> addressCampaignList = addressCampaignDao.getList(new AddressCampaignValueFilter());
     {
       final LabelValueChoiceRenderer<Integer> addressCampaignRenderer = new LabelValueChoiceRenderer<Integer>();
       for (final AddressCampaignDO addressCampaign : addressCampaignList) {
@@ -115,9 +115,9 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
   }
 
   @Override
-  protected AddressCampaignFilter newSearchFilterInstance()
+  protected AddressCampaignValueFilter newSearchFilterInstance()
   {
-    return new AddressCampaignFilter();
+    return new AddressCampaignValueFilter();
   }
 
   @Override
