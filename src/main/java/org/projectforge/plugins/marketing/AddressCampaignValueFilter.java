@@ -31,17 +31,17 @@ import org.projectforge.core.BaseSearchFilter;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class AddressCampaignFilter extends AddressFilter
+public class AddressCampaignValueFilter extends AddressFilter
 {
   private static final long serialVersionUID = 5731140604154434730L;
 
   private AddressCampaignDO addressCampaign;
 
-  public AddressCampaignFilter()
+  public AddressCampaignValueFilter()
   {
   }
 
-  public AddressCampaignFilter(final BaseSearchFilter filter)
+  public AddressCampaignValueFilter(final BaseSearchFilter filter)
   {
     super(filter);
   }
@@ -60,7 +60,7 @@ public class AddressCampaignFilter extends AddressFilter
    * @param addressCampaign
    * @return this for chaining.
    */
-  public AddressCampaignFilter setAddressCampaign(final AddressCampaignDO addressCampaign)
+  public AddressCampaignValueFilter setAddressCampaign(final AddressCampaignDO addressCampaign)
   {
     this.addressCampaign = addressCampaign;
     return this;
