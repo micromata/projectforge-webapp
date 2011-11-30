@@ -58,8 +58,20 @@ public class LabelValueChoiceRenderer<T> implements IChoiceRenderer<T>
    * @param i18nEnum if not enum and not from type T a class cast exception will be thrown.
    * @see Component#getString(String)
    */
-  @SuppressWarnings("unchecked")
   public LabelValueChoiceRenderer(final Component parent, final I18nEnum[] values)
+  {
+    this(parent, values, 0);
+  }
+
+  /**
+   * Creates already entries from the given enum.
+   * @param parent Only needed for internationalization.
+   * @param i18nEnum if not enum and not from type T a class cast exception will be thrown.
+   * @param dummy Only for avoiding ambiguous constructors.
+   * @see Component#getString(String)
+   */
+  @SuppressWarnings("unchecked")
+  public LabelValueChoiceRenderer(final Component parent, final I18nEnum[] values, final int dummy)
   {
     this();
     for (final I18nEnum value : values) {
