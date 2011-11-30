@@ -92,14 +92,14 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
    */
   public static DropDownChoice<UserPrefArea> createAreaDropdownChoice(final Component parent, final String id, final Object bean,
       final String propertyName, final boolean nullValid)
-  {
+      {
     // DropDownChoice area
     final LabelValueChoiceRenderer<UserPrefArea> areaChoiceRenderer = createAreaChoiceRenderer(parent);
     final DropDownChoice<UserPrefArea> areaDropDownChoice = new DropDownChoice<UserPrefArea>(id, new PropertyModel<UserPrefArea>(bean,
         propertyName), areaChoiceRenderer.getValues(), areaChoiceRenderer);
     areaDropDownChoice.setNullValid(nullValid);
     return areaDropDownChoice;
-  }
+      }
 
   public static LabelValueChoiceRenderer<UserPrefArea> createAreaChoiceRenderer(final Component parent)
   {
@@ -111,7 +111,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
     return areaChoiceRenderer;
   }
 
-  public UserPrefEditForm(UserPrefEditPage parentPage, UserPrefDO data)
+  public UserPrefEditForm(final UserPrefEditPage parentPage, final UserPrefDO data)
   {
     super(parentPage, data);
     this.colspan = 2;
@@ -179,7 +179,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
     final RequiredMaxLengthTextField nameField = new RequiredMaxLengthTextField("name", new PropertyModel<String>(data, "name"));
     nameField.add(new AbstractValidator<String>() {
       @Override
-      protected void onValidate(IValidatable<String> validatable)
+      protected void onValidate(final IValidatable<String> validatable)
       {
         if (data.getArea() == null) {
           return;
@@ -229,21 +229,21 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
         parentPage.userPrefDao.updateParameterValueObject(param);
         if (PFUserDO.class.isAssignableFrom(param.getType()) == true) {
           final UserSelectPanel userSelectPanel = new UserSelectPanel("valueField", new UserPrefPropertyModel<PFUserDO>(userPrefDao, param,
-              "valueAsObject"), parentPage, param.getParameter());
+          "valueAsObject"), parentPage, param.getParameter());
           if (data.getArea() == UserPrefArea.USER_FAVORITE) {
             userSelectPanel.setShowFavorites(false);
           }
           valueField = userSelectPanel;
         } else if (TaskDO.class.isAssignableFrom(param.getType()) == true) {
           final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("valueField", new UserPrefPropertyModel<TaskDO>(userPrefDao, param,
-              "valueAsObject"), parentPage, param.getParameter());
+          "valueAsObject"), parentPage, param.getParameter());
           if (data.getArea() == UserPrefArea.TASK_FAVORITE) {
             taskSelectPanel.setShowFavorites(false);
           }
           valueField = taskSelectPanel;
         } else if (GroupDO.class.isAssignableFrom(param.getType()) == true) {
           final GroupSelectPanel groupSelectPanel = new GroupSelectPanel("valueField", new UserPrefPropertyModel<GroupDO>(userPrefDao, param,
-              "valueAsObject"), parentPage, param.getParameter());
+          "valueAsObject"), parentPage, param.getParameter());
           valueField = groupSelectPanel;
         } else if (Kost2DO.class.isAssignableFrom(param.getType()) == true) {
           final UserPrefEntryDO taskParam = data.getUserPrefEntry(param.getDependsOn());
@@ -258,7 +258,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           }
           final Kost2DropDownChoice kost2DropDownChoice = new Kost2DropDownChoice("valueChoice", (Kost2DO) param.getValueAsObject(), taskId) {
             @Override
-            protected void setKost2Id(Integer kost2Id)
+            protected void setKost2Id(final Integer kost2Id)
             {
               param.setValue(String.valueOf(kost2Id));
             }
@@ -287,7 +287,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
           textArea = new MaxLengthTextArea("textArea", new PropertyModel<String>(param, "value"), maxLength);
         } else if (I18nEnum.class.isAssignableFrom(param.getType()) == true) {
           final LabelValueChoiceRenderer<I18nEnum> choiceRenderer = new LabelValueChoiceRenderer<I18nEnum>(this, (I18nEnum[]) param
-              .getType().getEnumConstants());
+              .getType().getEnumConstants(), 0);
           final DropDownChoice<I18nEnum> choice = new DropDownChoice<I18nEnum>("valueChoice", new UserPrefPropertyModel<I18nEnum>(
               userPrefDao, param, "valueAsObject"), choiceRenderer.getValues(), choiceRenderer);
           choice.setNullValid(true);
@@ -344,9 +344,9 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
   {
     private static final long serialVersionUID = 6644505091461853375L;
 
-    private UserPrefDao userPrefDao;
+    private final UserPrefDao userPrefDao;
 
-    private UserPrefEntryDO userPrefEntry;
+    private final UserPrefEntryDO userPrefEntry;
 
     public UserPrefPropertyModel(final UserPrefDao userPrefDao, final UserPrefEntryDO userPrefEntry, final String expression)
     {
