@@ -83,6 +83,22 @@ public class LabelValueChoiceRenderer<T> implements IChoiceRenderer<T>
     }
   }
 
+  /**
+   * Creates already entries from the given enum.
+   * @param parent Only needed for internationalization.
+   * @param values if the elements are not from type ILabelValueBean<String, T> a class cast exception will be thrown.
+   * @see Component#getString(String)
+   */
+  public LabelValueChoiceRenderer(final Component parent, final T... values)
+  {
+    this();
+    for (final Object value : values) {
+      @SuppressWarnings("unchecked")
+      final ILabelValueBean<String, T> labelValue = (ILabelValueBean<String, T>)value;
+      addValue(labelValue.getValue(), labelValue.getLabel());
+    }
+  }
+
   public LabelValueChoiceRenderer<T> addValue(final T value, final String displayValue)
   {
     this.values.add(value);
@@ -100,12 +116,12 @@ public class LabelValueChoiceRenderer<T> implements IChoiceRenderer<T>
    * @return given integer as String or "[minYear]-[maxYear]" if value is -1.
    * @see org.apache.wicket.markup.html.form.IChoiceRenderer#getDisplayValue(java.lang.Object)
    */
-  public Object getDisplayValue(T object)
+  public Object getDisplayValue(final T object)
   {
     return this.displayValues.get(object);
   }
 
-  public String getIdValue(T object, int index)
+  public String getIdValue(final T object, final int index)
   {
     return object.toString();
   }
