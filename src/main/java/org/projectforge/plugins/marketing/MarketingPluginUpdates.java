@@ -74,6 +74,7 @@ public class MarketingPluginUpdates
         .addAttribute(new TableAttribute("address_fk", TableAttributeType.INT).setForeignTable(AddressDO.class)) //
         .addAttribute(new TableAttribute("address_campaign_fk", TableAttributeType.INT).setForeignTable(AddressCampaignDO.class));
         dao.createTable(table);
+        dao.addUniqueConstraint(table, "t_address_campaign_value_unique", "address_fk", "address_campaign_fk");
         return UpdateRunningStatus.DONE;
       }
     };

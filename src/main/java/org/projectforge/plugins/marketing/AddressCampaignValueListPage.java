@@ -148,7 +148,7 @@ IListPageColumnsCreator<AddressDO>
     columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(getString("organization")), getSortable("organization",
         sortable), "organization", cellItemListener));
 
-    columns.add(new AbstractColumn<AddressDO>(new Model<String>(getString("plugins.marketing.addressCampaignValue.value"))) {
+    columns.add(new AbstractColumn<AddressDO>(new Model<String>(getString("value"))) {
       @Override
       public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
       {
@@ -202,9 +202,15 @@ IListPageColumnsCreator<AddressDO>
   }
 
   @Override
-  protected void init()
+  protected void onBeforeRender()
   {
     addressCampaignValueMap = addressCampaignValueDao.getAddressCampaignValuesByAddressId(form.getSearchFilter());
+    super.onBeforeRender();
+  }
+
+  @Override
+  protected void init()
+  {
     personalAddressMap = personalAddressDao.getPersonalAddressByAddressId();
   }
 

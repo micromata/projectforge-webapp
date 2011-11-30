@@ -58,11 +58,13 @@ public class AddressCampaignValueFormRenderer extends AbstractFormRenderer
   public void add()
   {
     doPanel.newFieldSetPanel(getString("plugins.marketing.addressCampaignValue"));
-    doPanel.addLabel(new PanelContext(valueLength, getString("name"), valueLength, data.getAddress().getFullName(), labelLength).setStrong());
-    doPanel.addTextField(new PanelContext(data, "value", valueLength, getString("value"), labelLength).setRequired().setStrong());
+    doPanel.addLabel(getString("name"), new PanelContext(labelLength));
+    doPanel.addLabel(data.getAddress().getFullName(), new PanelContext(valueLength).setStrongLabel(true).setBreakBeforeLabel(false));
+    doPanel.addLabel(getString("organization"), new PanelContext(labelLength));
+    doPanel.addLabel(data.getAddress().getOrganization(), new PanelContext(valueLength).setStrongLabel(true).setBreakBeforeLabel(false));
     {
       final AddressCampaignDO addressCampaign = data.getAddressCampaign();
-      final LabelValueChoiceRenderer<String> typeChoiceRenderer = new LabelValueChoiceRenderer<String>(container, addressCampaign.getValues());
+      final LabelValueChoiceRenderer<String> typeChoiceRenderer = new LabelValueChoiceRenderer<String>(addressCampaign.getValuesArray());
       final DropDownChoice<String> typeChoice = new DropDownChoice<String>(DropDownChoiceLPanel.SELECT_ID, new PropertyModel<String>(
           data, "value"), typeChoiceRenderer.getValues(), typeChoiceRenderer);
       typeChoice.setNullValid(true);

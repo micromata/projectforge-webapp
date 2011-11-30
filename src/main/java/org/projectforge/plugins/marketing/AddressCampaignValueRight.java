@@ -40,7 +40,7 @@ public class AddressCampaignValueRight extends UserRightAccessCheck<AddressCampa
 
   public AddressCampaignValueRight()
   {
-    super(AddressCampaignDao.USER_RIGHT_ID, UserRightCategory.PLUGINS, UserRightValue.TRUE);
+    super(AddressCampaignValueDao.USER_RIGHT_ID, UserRightCategory.PLUGINS, UserRightValue.TRUE);
   }
 
   /**
@@ -51,6 +51,10 @@ public class AddressCampaignValueRight extends UserRightAccessCheck<AddressCampa
       final OperationType operationType)
   {
     final AddressDao addressDao = (AddressDao) Registry.instance().getDao(AddressDao.class);
-    return addressDao.hasAccess(user, obj.getAddress(), oldObj != null ? oldObj.getAddress() : null, operationType, false);
+    if (operationType.isIn(OperationType.SELECT, OperationType.INSERT) == true && obj == null) {
+      return addressDao.hasInsertAccess(user);
+    }
+    return addressDao.hasAccess(user, obj != null ? obj.getAddress() : null, oldObj != null ? oldObj.getAddress() : null, operationType,
+        false);
   }
 }

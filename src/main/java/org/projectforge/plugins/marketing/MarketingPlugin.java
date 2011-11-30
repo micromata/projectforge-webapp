@@ -40,7 +40,7 @@ public class MarketingPlugin extends AbstractPlugin
 
   public static final String RESOURCE_BUNDLE_NAME = MarketingPlugin.class.getPackage().getName() + ".MarketingI18nResources";
 
-  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { AddressCampaignDO.class};
+  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { AddressCampaignDO.class, AddressCampaignValueDO.class};
 
   private AddressCampaignDao campaignDao;
 

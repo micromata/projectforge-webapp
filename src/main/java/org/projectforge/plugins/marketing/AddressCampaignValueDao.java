@@ -28,10 +28,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.criterion.Restrictions;
+import org.projectforge.address.AddressDO;
+import org.projectforge.address.AddressDao;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.user.UserRightId;
+import org.springframework.util.CollectionUtils;
 
 /**
  * 
@@ -42,10 +45,23 @@ public class AddressCampaignValueDao extends BaseDao<AddressCampaignValueDO>
 {
   public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_MARKETING_ADDRESS_CAMPAIGN_VALUE", "unused", "unused");;
 
+  private AddressDao addressDao;
+
   public AddressCampaignValueDao()
   {
     super(AddressCampaignValueDO.class);
     userRightId = USER_RIGHT_ID;
+  }
+
+  @SuppressWarnings("unchecked")
+  public AddressCampaignValueDO get(final Integer addressId, final Integer addressCampaignId)
+  {
+    final List<AddressCampaignValueDO> list = getHibernateTemplate().find(
+        "from AddressCampaignValueDO a where a.address.id = ? and a.addressCampaign.id = ?", new Object[] { addressId, addressCampaignId});
+    if (CollectionUtils.isEmpty(list) == true) {
+      return null;
+    }
+    return list.get(0);
   }
 
   @Override
@@ -64,6 +80,17 @@ public class AddressCampaignValueDao extends BaseDao<AddressCampaignValueDO>
     return getList(queryFilter);
   }
 
+  /**
+   * @param address
+   * @param taskId If null, then task will be set to null;
+   * @see BaseDao#getOrLoad(Integer)
+   */
+  public void setAddress(final AddressCampaignValueDO addressCampaignValue, final Integer addressId)
+  {
+    final AddressDO address = addressDao.getOrLoad(addressId);
+    addressCampaignValue.setAddress(address);
+  }
+
   @Override
   public AddressCampaignValueDO newInstance()
   {
@@ -72,6 +99,25 @@ public class AddressCampaignValueDao extends BaseDao<AddressCampaignValueDO>
 
   public Map<Integer, AddressCampaignValueDO> getAddressCampaignValuesByAddressId(final AddressCampaignFilter searchFilter)
   {
-    return new HashMap<Integer, AddressCampaignValueDO>();
+    final HashMap<Integer, AddressCampaignValueDO> map = new HashMap<Integer, AddressCampaignValueDO>();
+    final Integer addressCampaignId = searchFilter.getAddressCampaignId();
+    if (addressCampaignId == null) {
+      return map;
+    }
+    @SuppressWarnings("unchecked")
+    final List<AddressCampaignValueDO> list = getHibernateTemplate().find("from AddressCampaignValueDO a where a.addressCampaign.id = ? and deleted = false",
+        searchFilter.getAddressCampaignId());
+    if (CollectionUtils.isEmpty(list) == true) {
+      return map;
+    }
+    for (final AddressCampaignValueDO addressCampaignValue : list) {
+      map.put(addressCampaignValue.getAddressId(), addressCampaignValue);
+    }
+    return map;
+  }
+
+  public void setAddressDao(final AddressDao addressDao)
+  {
+    this.addressDao = addressDao;
   }
 }

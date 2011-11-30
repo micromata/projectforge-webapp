@@ -23,6 +23,8 @@
 
 package org.projectforge.plugins.marketing;
 
+import java.io.Serializable;
+
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -74,13 +76,26 @@ AbstractAutoLayoutEditPage<AddressCampaignValueDO, AddressCampaignValueEditForm,
       if (address == null || addressCampaign == null) {
         throw new UserException("plugins.marketing.addressCampaignValue.error.addressOrCampaignNotGiven");
       }
-      final AddressCampaignValueDO data = new AddressCampaignValueDO();
-      data.setAddress(address);
-      data.setAddressCampaign(addressCampaign);
+      AddressCampaignValueDO data = addressCampaignValueDao.get(addressId, addressCampaignId);
+      if (data == null) {
+        data = new AddressCampaignValueDO();
+        data.setAddress(address);
+        data.setAddressCampaign(addressCampaign);
+      }
       init(data);
     } else {
       init();
     }
+  }
+
+  /**
+   * @return Address id instead of address campaign value id.
+   * @see org.projectforge.web.wicket.AbstractEditPage#getHighlightedRowId()
+   */
+  @Override
+  protected Serializable getHighlightedRowId()
+  {
+    return getData().getAddressId();
   }
 
   @Override

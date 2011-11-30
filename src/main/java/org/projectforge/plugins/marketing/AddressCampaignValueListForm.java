@@ -23,10 +23,14 @@
 
 package org.projectforge.plugins.marketing;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 
 /**
  * The list formular for the list view (this example has no filter settings). See ToDoListPage for seeing how to use filter settings.
@@ -39,16 +43,48 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressCampaignValueListForm.class);
 
+  @SpringBean(name = "addressCampaignDao")
+  private AddressCampaignDao addressCampaignDao;
+
+  private Integer addressCampaignId;
+
   public AddressCampaignValueListForm(final AddressCampaignValueListPage parentPage)
   {
     super(parentPage);
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     super.init();
-    filterContainer.add(new CheckBox("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted")));
+    this.addressCampaignId = searchFilter.getAddressCampaignId();
+    final List<AddressCampaignDO> addressCampaignList = addressCampaignDao.getList(new AddressCampaignFilter());
+    {
+      final LabelValueChoiceRenderer<Integer> addressCampaignRenderer = new LabelValueChoiceRenderer<Integer>();
+      for (final AddressCampaignDO addressCampaign : addressCampaignList) {
+        addressCampaignRenderer.addValue(addressCampaign.getId(), addressCampaign.getTitle());
+      }
+      final DropDownChoice<Integer> addressCampaignChoice = new DropDownChoice<Integer>("addressCampaign", new PropertyModel<Integer>(this,
+      "addressCampaignId"), addressCampaignRenderer.getValues(), addressCampaignRenderer) {
+        @Override
+        protected void onSelectionChanged(final Integer newSelection)
+        {
+          for (final AddressCampaignDO addressCampaign : addressCampaignList) {
+            if (addressCampaign.getId().equals(addressCampaignId) == true) {
+              searchFilter.setAddressCampaign(addressCampaign);
+              break;
+            }
+          }
+        }
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
+      };
+      filterContainer.add(addressCampaignChoice);
+    }
   }
 
   @Override
@@ -56,7 +92,6 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
   {
     return parentPage.isMassUpdateMode() == false;
   }
-
 
   @Override
   protected AddressCampaignFilter newSearchFilterInstance()

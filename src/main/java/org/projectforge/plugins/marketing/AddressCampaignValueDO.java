@@ -29,6 +29,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
@@ -43,7 +45,8 @@ import org.projectforge.database.Constants;
  */
 @Entity
 @Indexed
-@Table(name = "T_PLUGIN_MARKETING_ADDRESS_CAMPAIGN_VALUE")
+@Table(name = "T_PLUGIN_MARKETING_ADDRESS_CAMPAIGN_VALUE", uniqueConstraints = { @UniqueConstraint(columnNames = { "address_fk",
+"address_campaign_fk"})})
 public class AddressCampaignValueDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 4414457700384141088L;
@@ -59,7 +62,7 @@ public class AddressCampaignValueDO extends DefaultBaseDO
   private String comment;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "address_campaign_id", nullable = false)
+  @JoinColumn(name = "address_campaign_fk", nullable = false)
   public AddressCampaignDO getAddressCampaign()
   {
     return addressCampaign;
@@ -71,7 +74,7 @@ public class AddressCampaignValueDO extends DefaultBaseDO
   }
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "address_id", nullable = false)
+  @JoinColumn(name = "address_fk", nullable = false)
   public AddressDO getAddress()
   {
     return address;
@@ -80,6 +83,12 @@ public class AddressCampaignValueDO extends DefaultBaseDO
   public void setAddress(final AddressDO address)
   {
     this.address = address;
+  }
+
+  @Transient
+  public Integer getAddressId()
+  {
+    return this.address != null ? this.address.getId() : null;
   }
 
   @Column(length = AddressCampaignDO.MAX_VALUE_LENGTH)
