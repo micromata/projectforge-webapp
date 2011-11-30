@@ -7,8 +7,9 @@
 <wicket:extend>
   <tr>
     <th><wicket:message key="label.options" /></th>
-    <td><input type="checkbox" wicket:id="deletedCheckBox" id="deletedCheckBox" onchange="javascript:submit();" /> <label for="deletedCheckBox"><wicket:message
-      key="deleted" /></label>, <span wicket:id="pageSize">[Page size setting]</span></td>
+    <td><label for="addressCampaign"><wicket:message key="plugins.marketing.addressCampaign" /></label> <select wicket:id="addressCampaign">
+      <option>Mailing 2012</option>
+    </select>, <span wicket:id="pageSize">[Page size setting]</span></td>
   </tr>
 </wicket:extend>
 </body>
