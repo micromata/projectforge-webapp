@@ -88,7 +88,7 @@ AbstractSecuredPage implements IEditPage<O, D>
   @SpringBean(name = "dateTimeFormatter")
   protected DateTimeFormatter dateTimeFormatter;
 
-  private EditPageSupport<O, D> editPageSupport;
+  protected EditPageSupport<O, D> editPageSupport;
 
   public AbstractEditPage(final PageParameters parameters, final String i18nPrefix)
   {
@@ -373,6 +373,14 @@ AbstractSecuredPage implements IEditPage<O, D>
     this.editPageSupport.update();
   }
 
+  /**
+   * User has clicked the update button for updating an existing item.
+   */
+  protected void updateAndNext()
+  {
+    this.editPageSupport.updateAndNext();
+  }
+
   protected void undelete()
   {
     this.editPageSupport.undelete();
@@ -414,6 +422,14 @@ AbstractSecuredPage implements IEditPage<O, D>
       params.put(AbstractListPage.PARAMETER_HIGHLIGHTED_ROW, getData().getId());
       setResponsePage(redirectPage, params);
     }
+  }
+
+  /**
+   * @return false, if not overridden.
+   */
+  public boolean isUpdateAndNextSupported()
+  {
+    return false;
   }
 
   /**
