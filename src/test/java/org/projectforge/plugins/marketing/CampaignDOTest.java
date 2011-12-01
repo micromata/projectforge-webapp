@@ -38,6 +38,7 @@ public class CampaignDOTest
     assertNull(getValues("   "));
     assertArrayEquals(new String[] { "true"}, getValues("true; "));
     assertArrayEquals(new String[] { "true", "false"}, getValues("true; false"));
+    assertArrayEquals(new String[] { "Premium-bottle-wine", "greeting-card", "none"}, getValues("Premium-bottle-wine; greeting-card; none"));
   }
 
   private String[] getValues(final String values)
