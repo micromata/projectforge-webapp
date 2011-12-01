@@ -73,6 +73,12 @@ public class AddressCampaignValueDO extends DefaultBaseDO
     this.addressCampaign = addressCampaign;
   }
 
+  @Transient
+  public Integer getAddressCampaignId()
+  {
+    return addressCampaign != null ? addressCampaign.getId() : null;
+  }
+
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "address_fk", nullable = false)
   public AddressDO getAddress()

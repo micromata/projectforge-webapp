@@ -24,6 +24,7 @@
 package org.projectforge.plugins.marketing;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.layout.LayoutContext;
 
@@ -40,10 +41,20 @@ public class AddressCampaignValueEditForm extends AbstractEditForm<AddressCampai
 
   protected AddressCampaignValueFormRenderer renderer;
 
+  @SpringBean(name = "addressCampaignValueDao")
+  private AddressCampaignValueDao addressCampaignValueDao;
+
   public AddressCampaignValueEditForm(final AddressCampaignValueEditPage parentPage, final AddressCampaignValueDO data)
   {
     super(parentPage, data);
     renderer = new AddressCampaignValueFormRenderer(this, new LayoutContext(this), data);
+  }
+
+  @Override
+  protected void updateButtonVisibility()
+  {
+    super.updateButtonVisibility();
+    updateAndNextButtonPanel.setVisible(addressCampaignValueDao.hasLoggedInUserUpdateAccess(getData(), getData(), false));
   }
 
   @Override

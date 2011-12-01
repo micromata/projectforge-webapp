@@ -24,6 +24,7 @@
 package org.projectforge.plugins.marketing;
 
 import java.io.Serializable;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
@@ -86,6 +87,51 @@ AbstractAutoLayoutEditPage<AddressCampaignValueDO, AddressCampaignValueEditForm,
     } else {
       init();
     }
+  }
+
+  @Override
+  public boolean isUpdateAndNextSupported()
+  {
+    return true;
+  }
+
+  @Override
+  protected void updateAndNext()
+  {
+    if (getData().getId() == null) {
+      if (log.isDebugEnabled() == true) {
+        log.debug("update in " + this.editPageSupport.getClass() + ": " + getData());
+      }
+      create();
+      this.editPageSupport.setUpdateAndNext(true);
+      setResponsePage();
+    } else {
+      super.updateAndNext();
+    }
+  }
+
+  @Override
+  public void setResponsePage()
+  {
+    if (this.editPageSupport.isUpdateAndNext() == true) {
+      this.editPageSupport.setUpdateAndNext(false);
+      final AddressCampaignValueListPage listPage = (AddressCampaignValueListPage) this.returnToPage;
+      final Iterator<AddressDO> it = listPage.getList().iterator();
+      while (it.hasNext() == true) {
+        if (it.next().getId().equals(getHighlightedRowId()) == true && it.hasNext() == true) {
+          // Found current entry and next entry available.
+          final AddressDO address = it.next();
+          final PageParameters parameters = new PageParameters();
+          parameters.put(AddressCampaignValueEditPage.PARAMETER_ADDRESS_ID, String.valueOf(address.getId()));
+          parameters.put(AddressCampaignValueEditPage.PARAMETER_ADDRESS_CAMPAIGN_ID, String.valueOf(getData().getAddressCampaignId()));
+          final AddressCampaignValueEditPage editPage = new AddressCampaignValueEditPage(parameters);
+          editPage.setReturnToPage(this.returnToPage);
+          setResponsePage(editPage);
+          return;
+        }
+      }
+    }
+    super.setResponsePage();
   }
 
   /**
