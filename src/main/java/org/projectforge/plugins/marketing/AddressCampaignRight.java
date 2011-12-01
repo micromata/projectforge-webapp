@@ -25,7 +25,6 @@ package org.projectforge.plugins.marketing;
 
 import org.projectforge.access.OperationType;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightValue;
@@ -49,7 +48,7 @@ public class AddressCampaignRight extends UserRightAccessCheck<AddressCampaignDO
   @Override
   public boolean hasAccess(final PFUserDO user, final AddressCampaignDO obj, final AddressCampaignDO oldObj, final OperationType operationType)
   {
-    if (operationType == OperationType.SELECT && UserRights.getAccessChecker().isUserMemberOfGroup(user, ProjectForgeGroup.MARKETING_GROUP) == true) {
+    if (operationType == OperationType.SELECT == true) {
       return true;
     } else if (UserRights.getAccessChecker().isUserMemberOfAdminGroup(user) == true) {
       return true;
