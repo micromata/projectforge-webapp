@@ -38,6 +38,8 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -45,9 +47,14 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
+import org.projectforge.address.AddressStatus;
+import org.projectforge.address.ContactStatus;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.address.PersonalAddressDao;
+import org.projectforge.common.StringHelper;
+import org.projectforge.web.address.AddressEditPage;
 import org.projectforge.web.calendar.DateTimeFormatter;
+import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.CellItemListener;
@@ -127,13 +134,20 @@ IListPageColumnsCreator<AddressDO>
         } else if (personalAddress != null && personalAddress.isFavoriteCard() == true) {
           cssStyle.append("color: red;");
         }
+        if (address.getAddressStatus().isIn(AddressStatus.LEAVED, AddressStatus.OUTDATED) == true
+            || address.getContactStatus().isIn(ContactStatus.DEPARTED, ContactStatus.NON_ACTIVE, ContactStatus.PERSONA_INGRATA,
+                ContactStatus.UNINTERESTING, ContactStatus.DEPARTED) == true) {
+          cssStyle.append("text-decoration: line-through;");
+        }
         if (cssStyle.length() > 0) {
           item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
         }
       }
     };
-
-    if (massUpdateMode == true) {
+    if (page instanceof AddressCampaignValueMassUpdatePage) {
+      columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(page.getString("created")), getSortable("created",
+          sortable), "created", cellItemListener));
+    } else if (massUpdateMode == true) {
       columns.add(new CellItemListenerPropertyColumn<AddressDO>("", null, "selected", cellItemListener) {
         @Override
         public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
@@ -170,7 +184,38 @@ IListPageColumnsCreator<AddressDO>
         sortable), "firstName", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(page.getString("organization")), getSortable(
         "organization", sortable), "organization", cellItemListener));
-
+    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(page.getString("address.contactStatus")), getSortable(
+        "contactStatus", sortable), "contactStatus", cellItemListener));
+    columns.add(new AbstractColumn<AddressDO>(new Model<String>(page.getString("address.addressText"))) {
+      @Override
+      public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
+      {
+        final AddressDO address = rowModel.getObject();
+        final String addressText = StringHelper.listToString("|", address.getMailingAddressText(), address.getMailingZipCode()
+            + " "
+            + address.getMailingCity(), address.getMailingCountry());
+        if (massUpdateMode == false) {
+          final Fragment fragment = new Fragment(componentId, "addressEditLink", page);
+          item.add(fragment);
+          fragment.add(new Link<Object>("link") {
+            @Override
+            public void onClick()
+            {
+              final PageParameters parameters = new PageParameters();
+              parameters.put(AbstractEditPage.PARAMETER_KEY_ID, address.getId());
+              final AddressEditPage editPage = new AddressEditPage(parameters);
+              editPage.setReturnToPage(page);
+              setResponsePage(editPage);
+            }
+          }.add(new Label("label", addressText).setRenderBodyOnly(true)));
+        } else {
+          item.add(new Label(componentId, addressText));
+        }
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
+    columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(page.getString("address.addressStatus")), getSortable(
+        "addressStatus", sortable), "addressStatus", cellItemListener));
     columns.add(new AbstractColumn<AddressDO>(new Model<String>(page.getString("value"))) {
       @Override
       public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
@@ -249,8 +294,16 @@ IListPageColumnsCreator<AddressDO>
       list = new ArrayList<AddressDO>();
       for (final AddressDO address : origList) {
         final AddressCampaignValueDO addressCampaignValue = addressCampaignValueMap.get(address.getId());
-        if (addressCampaignValue != null && value.equals(addressCampaignValue.getValue()) == true) {
-          list.add(address);
+        if (addressCampaignValue != null && addressCampaignValue.getValue() != null) {
+          if (value.equals(addressCampaignValue.getValue()) == true) {
+            list.add(address);
+          }
+        } else {
+          // address campaign value of the given address is not set:
+          if (AddressCampaignValueListForm.ADDRESS_CAMPAIGN_VALUE_UNDEFINED.equals(value) == true) {
+            // Filter all address campaign values without defined value:
+            list.add(address);
+          }
         }
       }
     }

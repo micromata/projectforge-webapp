@@ -47,6 +47,8 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressCampaignValueListForm.class);
 
+  static final String ADDRESS_CAMPAIGN_VALUE_UNDEFINED = "-(null)-";
+
   @SpringBean(name = "addressCampaignDao")
   private AddressCampaignDao addressCampaignDao;
 
@@ -148,6 +150,7 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
   {
     final LabelValueChoiceRenderer<String> choiceRenderer = new LabelValueChoiceRenderer<String>();
     if (searchFilter.getAddressCampaign() != null) {
+      choiceRenderer.addValue(ADDRESS_CAMPAIGN_VALUE_UNDEFINED, "- " + getString("undefined") + " -");
       for (final String value : searchFilter.getAddressCampaign().getValuesArray()) {
         choiceRenderer.addValue(value, value);
       }

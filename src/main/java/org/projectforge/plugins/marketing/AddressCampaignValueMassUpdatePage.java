@@ -46,8 +46,6 @@ import org.projectforge.web.wicket.AbstractSecuredPage;
 
 public class AddressCampaignValueMassUpdatePage extends AbstractSecuredPage
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressCampaignValueMassUpdatePage.class);
-
   @SpringBean(name = "addressCampaignValueDao")
   private AddressCampaignValueDao addressCampaignValueDao;
 
