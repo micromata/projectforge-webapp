@@ -44,6 +44,8 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
 
   private final O data;
 
+  private boolean updateAndNext;
+
   public EditPageSupport(final IEditPage<O, D> editPage, final D baseDao, final O data)
   {
     this.editPage = editPage;
@@ -147,6 +149,29 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
       }
     }
     editPage.setResponsePage();
+  }
+
+  /**
+   * User has clicked the update-and-next button for updating an existing item.
+   */
+  public void updateAndNext()
+  {
+    if (log.isDebugEnabled() == true) {
+      log.debug("update in " + editPage.getClass() + ": " + data);
+    }
+    update();
+    updateAndNext = true;
+    editPage.setResponsePage();
+  }
+
+  public boolean isUpdateAndNext()
+  {
+    return updateAndNext;
+  }
+
+  public void setUpdateAndNext(final boolean updateAndNext)
+  {
+    this.updateAndNext = updateAndNext;
   }
 
   public void undelete()
