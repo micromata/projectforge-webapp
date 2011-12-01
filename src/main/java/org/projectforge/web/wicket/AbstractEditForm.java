@@ -58,7 +58,11 @@ AbstractSecuredForm<O, P>
 
   protected Button updateButton;
 
+  protected Button updateAndNextButton;
+
   protected SingleButtonPanel updateButtonPanel;
+
+  protected SingleButtonPanel updateAndNextButtonPanel;
 
   protected SingleButtonPanel deleteButtonPanel;
 
@@ -115,6 +119,15 @@ AbstractSecuredForm<O, P>
     };
     updateButtonPanel = new SingleButtonPanel("update", updateButton);
     add(updateButtonPanel);
+    updateAndNextButton = new Button("button", new Model<String>(getString("updateAndNext"))) {
+      @Override
+      public final void onSubmit()
+      {
+        parentPage.updateAndNext();
+      }
+    };
+    updateAndNextButtonPanel = new SingleButtonPanel("updateAndNext", updateAndNextButton);
+    add(updateAndNextButtonPanel);
     createButton = new Button("button", new Model<String>(getString("create"))) {
       @Override
       public final void onSubmit()
@@ -200,6 +213,7 @@ AbstractSecuredForm<O, P>
       final BaseDao<O> baseDao = (BaseDao<O>) parentPage.getBaseDao();
       if (isNew() == true) {
         updateButtonPanel.setVisible(false);
+        updateAndNextButtonPanel.setVisible(false);
         undeleteButtonPanel.setVisible(false);
         markAsDeletedButtonPanel.setVisible(false);
         deleteButtonPanel.setVisible(false);
@@ -219,6 +233,7 @@ AbstractSecuredForm<O, P>
           markAsDeletedButtonPanel.setVisible(false);
           deleteButtonPanel.setVisible(false);
           updateButtonPanel.setVisible(false);
+          updateAndNextButtonPanel.setVisible(false);
         } else {
           undeleteButtonPanel.setVisible(false);
           if (parentPage.getBaseDao().isHistorizable() == true) {
@@ -229,6 +244,11 @@ AbstractSecuredForm<O, P>
             markAsDeletedButtonPanel.setVisible(false);
           }
           updateButtonPanel.setVisible(baseDao.hasLoggedInUserUpdateAccess(getData(), getData(), false));
+          if (parentPage.isUpdateAndNextSupported() == true) {
+            updateAndNextButtonPanel.setVisible(baseDao.hasLoggedInUserUpdateAccess(getData(), getData(), false));
+          } else {
+            updateAndNextButton.setVisible(false);
+          }
           if (updateButtonPanel.isVisible() == true) {
             setDefaultButton(updateButton);
           } else {
@@ -258,6 +278,7 @@ AbstractSecuredForm<O, P>
   {
     createButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     updateButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    updateAndNextButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     undeleteButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
     deleteButtonPanel.add(WebConstants.BUTTON_CLASS_RESET);
   }
