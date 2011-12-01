@@ -47,7 +47,7 @@ public enum AddressStatus implements I18nEnum
 
   private String key;
 
-  public static AddressStatus get(String s)
+  public static AddressStatus get(final String s)
   {
     if (StringUtils.isEmpty(s) == true) {
       return null;
@@ -62,6 +62,14 @@ public enum AddressStatus implements I18nEnum
     throw new UnsupportedOperationException("Unknown AddressStatus: '" + s + "'");
   }
 
+  public boolean isIn(final AddressStatus... status) {
+    for (final AddressStatus st : status) {
+      if (this == st) {
+        return true;
+      }
+    }
+    return false;
+  }
   /**
    * @return The full i18n key including the i18n prefix "fibu.auftrag.status.".
    */
@@ -70,7 +78,7 @@ public enum AddressStatus implements I18nEnum
     return "address.addressStatus." + key;
   }
 
-  AddressStatus(String key)
+  AddressStatus(final String key)
   {
     this.key = key;
   }
