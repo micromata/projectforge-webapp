@@ -91,41 +91,37 @@ public class AddressExport
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressExport.class);
 
-  private AccessChecker accessChecker;
+  protected AccessChecker accessChecker;
 
-  private static final int LENGTH_PHONENUMBER = 20;
+  protected static final int LENGTH_PHONENUMBER = 20;
 
-  private static final int LENGTH_EMAIL = 30;
+  protected static final int LENGTH_EMAIL = 30;
 
-  private static final int LENGTH_ZIPCODE = 7;
+  protected static final int LENGTH_ZIPCODE = 7;
 
-  private static final int LENGTH_STD = 30;
+  protected static final int LENGTH_STD = 30;
 
-  private static final int LENGTH_EXTRA_LONG = 80;
+  protected static final int LENGTH_EXTRA_LONG = 80;
 
-  private static final int DATE_LENGTH = 10;
+  protected static final int DATE_LENGTH = 10;
 
   private enum Col
   {
-
-    NAME, FIRST_NAME, FORM, TITLE, CONTACT_STATUS, ORGANIZATION, DIVISION, POSITION, EMAIL, WEBSITE, MAILING_ADDRESS, MAILING_ZIPCODE, MAILING_CITY, MAILING_COUNTRY, MAILING_STATE, ADDRESS, ZIPCODE, CITY, COUNTRY, STATE, POSTAL_ADDRESS, POSTAL_ZIPCODE, POSTAL_CITY, POSTAL_COUNTRY, POSTAL_STATE, ADDRESS_STATUS, BUSINESS_PHONE, FAX, MOBILE_PHONE, PRIVATE_ADDRESS, PRIVATE_ZIPCODE, PRIVATE_CITY, PRIVATE_COUNTRY, PRIVATE_STATE, PRIVATE_EMAIL, PRIVATE_PHONE, PRIVATE_MOBILE, BIRTHDAY, CREATED, MODIFIED, COMMENT, FINGERPRINT, PUBLIC_KEY;
+    NAME, FIRST_NAME, FORM, TITLE, CONTACT_STATUS, ORGANIZATION, DIVISION, POSITION, EMAIL, WEBSITE, MAILING_ADDRESS, MAILING_ZIPCODE, MAILING_CITY, MAILING_COUNTRY, MAILING_STATE, ADDRESS, ZIPCODE, CITY, COUNTRY, STATE, POSTAL_ADDRESS, POSTAL_ZIPCODE, POSTAL_CITY, POSTAL_COUNTRY, POSTAL_STATE, ADDRESS_STATUS, BUSINESS_PHONE, FAX, MOBILE_PHONE, PRIVATE_ADDRESS, PRIVATE_ZIPCODE, PRIVATE_CITY, PRIVATE_COUNTRY, PRIVATE_STATE, PRIVATE_EMAIL, PRIVATE_PHONE, PRIVATE_MOBILE, BIRTHDAY, CREATED, MODIFIED, COMMENT, FINGERPRINT, PUBLIC_KEY, ID;
   }
 
-  /**
-   * Exports the filtered list as table with almost all fields. For members of group FINANCE_GROUP (PF_Finance) and MARKETING_GROUP
-   * (PF_Marketing) all addresses are exported, for others only those which are marked as personal favorites.
-   * @throws IOException
-   */
-  public byte[] export(final List<AddressDO> origList, final Map<Integer, PersonalAddressDO> personalAddressMap)
+  protected ExportColumn[] createColumns()
   {
-    log.info("Exporting address list.");
-    final ExportColumn[] columns = new ExportColumn[] { //
-        new I18nExportColumn(Col.NAME, "name", 20), new I18nExportColumn(Col.FIRST_NAME, "firstName", 20),
-        new I18nExportColumn(Col.FORM, "address.form", 8), new I18nExportColumn(Col.TITLE, "address.title", 10),
+    return new ExportColumn[] { //
+        new I18nExportColumn(Col.NAME, "name", 20),
+        new I18nExportColumn(Col.FIRST_NAME, "firstName", 20),
+        new I18nExportColumn(Col.FORM, "address.form", 8),
+        new I18nExportColumn(Col.TITLE, "address.title", 10),
         new I18nExportColumn(Col.CONTACT_STATUS, "address.contactStatus", 10),
         new I18nExportColumn(Col.ORGANIZATION, "organization", LENGTH_STD),
         new I18nExportColumn(Col.DIVISION, "address.division", LENGTH_STD),
-        new I18nExportColumn(Col.POSITION, "address.positionText", LENGTH_STD), new I18nExportColumn(Col.EMAIL, "email", LENGTH_EMAIL),
+        new I18nExportColumn(Col.POSITION, "address.positionText", LENGTH_STD), //
+        new I18nExportColumn(Col.EMAIL, "email", LENGTH_EMAIL),
         new I18nExportColumn(Col.WEBSITE, "address.website", LENGTH_STD),
         new I18nExportColumn(Col.MAILING_ADDRESS, "address.addressText", LENGTH_STD),
         new I18nExportColumn(Col.MAILING_ZIPCODE, "address.zipCode", LENGTH_ZIPCODE),
@@ -133,8 +129,10 @@ public class AddressExport
         new I18nExportColumn(Col.MAILING_COUNTRY, "address.country", LENGTH_STD),
         new I18nExportColumn(Col.MAILING_STATE, "address.state", LENGTH_STD),
         new I18nExportColumn(Col.ADDRESS, "address.addressText", LENGTH_STD),
-        new I18nExportColumn(Col.ZIPCODE, "address.zipCode", LENGTH_ZIPCODE), new I18nExportColumn(Col.CITY, "address.city", LENGTH_STD),
-        new I18nExportColumn(Col.COUNTRY, "address.country", LENGTH_STD), new I18nExportColumn(Col.STATE, "address.state", LENGTH_STD),
+        new I18nExportColumn(Col.ZIPCODE, "address.zipCode", LENGTH_ZIPCODE), //
+        new I18nExportColumn(Col.CITY, "address.city", LENGTH_STD),
+        new I18nExportColumn(Col.COUNTRY, "address.country", LENGTH_STD), //
+        new I18nExportColumn(Col.STATE, "address.state", LENGTH_STD),
         new I18nExportColumn(Col.POSTAL_ADDRESS, "address.postalAddressText", LENGTH_STD),
         new I18nExportColumn(Col.POSTAL_ZIPCODE, "address.zipCode", LENGTH_ZIPCODE),
         new I18nExportColumn(Col.POSTAL_CITY, "address.city", LENGTH_STD),
@@ -152,10 +150,81 @@ public class AddressExport
         new I18nExportColumn(Col.PRIVATE_EMAIL, "address.privateEmail", LENGTH_EMAIL),
         new I18nExportColumn(Col.PRIVATE_PHONE, "address.phoneType.private", LENGTH_PHONENUMBER),
         new I18nExportColumn(Col.PRIVATE_MOBILE, "address.phoneType.privateMobile", LENGTH_PHONENUMBER),
-        new I18nExportColumn(Col.BIRTHDAY, "address.birthday", DATE_LENGTH),
-        new I18nExportColumn(Col.MODIFIED, "modified", DATE_LENGTH), new I18nExportColumn(Col.COMMENT, "comment", LENGTH_EXTRA_LONG),
+        new I18nExportColumn(Col.BIRTHDAY, "address.birthday", DATE_LENGTH), //
+        new I18nExportColumn(Col.MODIFIED, "modified", DATE_LENGTH), //
+        new I18nExportColumn(Col.COMMENT, "comment", LENGTH_EXTRA_LONG),
         new I18nExportColumn(Col.FINGERPRINT, "address.fingerprint", LENGTH_STD),
-        new I18nExportColumn(Col.PUBLIC_KEY, "address.publicKey", LENGTH_EXTRA_LONG)};
+        new I18nExportColumn(Col.PUBLIC_KEY, "address.publicKey", LENGTH_EXTRA_LONG), //
+        new I18nExportColumn(Col.ID, "id", LENGTH_ZIPCODE)};
+  }
+
+  protected void addAddressMapping(final PropertyMapping mapping, final AddressDO address, final Object... params)
+  {
+    mapping.add(Col.NAME, address.getName());
+    mapping.add(Col.FIRST_NAME, address.getFirstName());
+    mapping.add(Col.FORM, address.getForm() != null ? PFUserContext.getLocalizedString(address.getForm().getI18nKey()) : "");
+    mapping.add(Col.TITLE, address.getTitle());
+    mapping.add(Col.CONTACT_STATUS, address.getContactStatus());
+    mapping.add(Col.ORGANIZATION, address.getOrganization());
+    mapping.add(Col.DIVISION, address.getDivision());
+    mapping.add(Col.POSITION, address.getPositionText());
+    mapping.add(Col.EMAIL, address.getEmail());
+    mapping.add(Col.WEBSITE, address.getWebsite());
+    mapping.add(Col.MAILING_ADDRESS, address.getMailingAddressText());
+    mapping.add(Col.MAILING_ZIPCODE, address.getMailingZipCode());
+    mapping.add(Col.MAILING_CITY, address.getMailingCity());
+    mapping.add(Col.MAILING_COUNTRY, address.getMailingCountry());
+    mapping.add(Col.MAILING_STATE, address.getMailingState());
+    mapping.add(Col.ADDRESS, address.getAddressText());
+    mapping.add(Col.ZIPCODE, address.getZipCode());
+    mapping.add(Col.CITY, address.getCity());
+    mapping.add(Col.COUNTRY, address.getCountry());
+    mapping.add(Col.STATE, address.getState());
+    mapping.add(Col.POSTAL_ADDRESS, address.getPostalAddressText());
+    mapping.add(Col.POSTAL_ZIPCODE, address.getPostalZipCode());
+    mapping.add(Col.POSTAL_CITY, address.getPostalCity());
+    mapping.add(Col.POSTAL_COUNTRY, address.getPostalCountry());
+    mapping.add(Col.POSTAL_STATE, address.getPostalState());
+    mapping.add(Col.ADDRESS_STATUS, address.getAddressStatus());
+    mapping.add(Col.BUSINESS_PHONE, address.getBusinessPhone());
+    mapping.add(Col.FAX, address.getFax());
+    mapping.add(Col.MOBILE_PHONE, address.getMobilePhone());
+    mapping.add(Col.PRIVATE_ADDRESS, address.getPrivateAddressText());
+    mapping.add(Col.PRIVATE_ZIPCODE, address.getPrivateZipCode());
+    mapping.add(Col.PRIVATE_CITY, address.getPrivateCity());
+    mapping.add(Col.PRIVATE_COUNTRY, address.getPrivateCountry());
+    mapping.add(Col.PRIVATE_STATE, address.getPrivateState());
+    mapping.add(Col.PRIVATE_EMAIL, address.getPrivateEmail());
+    mapping.add(Col.PRIVATE_PHONE, address.getPrivatePhone());
+    mapping.add(Col.PRIVATE_MOBILE, address.getPrivateMobilePhone());
+    mapping.add(Col.BIRTHDAY, address.getBirthday());
+    mapping.add(Col.CREATED, address.getCreated());
+    mapping.add(Col.MODIFIED, address.getLastUpdate());
+    mapping.add(Col.COMMENT, address.getComment());
+    mapping.add(Col.FINGERPRINT, address.getFingerprint());
+    mapping.add(Col.PUBLIC_KEY, address.getPublicKey());
+    mapping.add(Col.ID, address.getId());
+  }
+
+  protected String getSheetTitle()
+  {
+    return PFUserContext.getLocalizedString("address.addresses");
+  }
+
+  protected void initSheet(final ExportSheet sheet, final Object... params)
+  {
+  }
+
+  /**
+   * Exports the filtered list as table with almost all fields. For members of group FINANCE_GROUP (PF_Finance) and MARKETING_GROUP
+   * (PF_Marketing) all addresses are exported, for others only those which are marked as personal favorites.
+   * @param Used by sub classes such as AddressCampaignValueExport.
+   * @throws IOException
+   */
+  public byte[] export(final List<AddressDO> origList, final Map<Integer, PersonalAddressDO> personalAddressMap, final Object... params)
+  {
+    log.info("Exporting address list.");
+    final ExportColumn[] columns = createColumns();
 
     final List<AddressDO> list = new ArrayList<AddressDO>();
     for (final AddressDO address : origList) {
@@ -174,7 +243,7 @@ public class AddressExport
     // create a default Date format and currency column
     xls.setContentProvider(contentProvider);
 
-    final String sheetTitle = PFUserContext.getLocalizedString("address.addresses");
+    final String sheetTitle = getSheetTitle();
     final ExportSheet sheet = xls.addSheet(sheetTitle);
     sheet.addRow(); // Column headers
     sheet.setMergedRegion(0, 0, Col.MAILING_ADDRESS.ordinal(), Col.MAILING_STATE.ordinal(), "Mailing");
@@ -183,56 +252,14 @@ public class AddressExport
         .getLocalizedString("address.postalAddressText"));
     sheet.setMergedRegion(0, 0, Col.PRIVATE_ADDRESS.ordinal(), Col.PRIVATE_STATE.ordinal(), PFUserContext
         .getLocalizedString("address.privateAddressText"));
+    initSheet(sheet, params);
 
     sheet.createFreezePane(1, 2);
     sheet.setColumns(columns);
 
     final PropertyMapping mapping = new PropertyMapping();
     for (final AddressDO address : list) {
-      mapping.add(Col.NAME, address.getName());
-      mapping.add(Col.FIRST_NAME, address.getFirstName());
-      mapping
-      .add(Col.FORM, address.getForm() != null ? PFUserContext.getLocalizedString(address.getForm().getI18nKey()) : "");
-      mapping.add(Col.TITLE, address.getTitle());
-      mapping.add(Col.CONTACT_STATUS, address.getContactStatus());
-      mapping.add(Col.ORGANIZATION, address.getOrganization());
-      mapping.add(Col.DIVISION, address.getDivision());
-      mapping.add(Col.POSITION, address.getPositionText());
-      mapping.add(Col.EMAIL, address.getEmail());
-      mapping.add(Col.WEBSITE, address.getWebsite());
-      mapping.add(Col.MAILING_ADDRESS, address.getMailingAddressText());
-      mapping.add(Col.MAILING_ZIPCODE, address.getMailingZipCode());
-      mapping.add(Col.MAILING_CITY, address.getMailingCity());
-      mapping.add(Col.MAILING_COUNTRY, address.getMailingCountry());
-      mapping.add(Col.MAILING_STATE, address.getMailingState());
-      mapping.add(Col.ADDRESS, address.getAddressText());
-      mapping.add(Col.ZIPCODE, address.getZipCode());
-      mapping.add(Col.CITY, address.getCity());
-      mapping.add(Col.COUNTRY, address.getCountry());
-      mapping.add(Col.STATE, address.getState());
-      mapping.add(Col.POSTAL_ADDRESS, address.getPostalAddressText());
-      mapping.add(Col.POSTAL_ZIPCODE, address.getPostalZipCode());
-      mapping.add(Col.POSTAL_CITY, address.getPostalCity());
-      mapping.add(Col.POSTAL_COUNTRY, address.getPostalCountry());
-      mapping.add(Col.POSTAL_STATE, address.getPostalState());
-      mapping.add(Col.ADDRESS_STATUS, address.getAddressStatus());
-      mapping.add(Col.BUSINESS_PHONE, address.getBusinessPhone());
-      mapping.add(Col.FAX, address.getFax());
-      mapping.add(Col.MOBILE_PHONE, address.getMobilePhone());
-      mapping.add(Col.PRIVATE_ADDRESS, address.getPrivateAddressText());
-      mapping.add(Col.PRIVATE_ZIPCODE, address.getPrivateZipCode());
-      mapping.add(Col.PRIVATE_CITY, address.getPrivateCity());
-      mapping.add(Col.PRIVATE_COUNTRY, address.getPrivateCountry());
-      mapping.add(Col.PRIVATE_STATE, address.getPrivateState());
-      mapping.add(Col.PRIVATE_EMAIL, address.getPrivateEmail());
-      mapping.add(Col.PRIVATE_PHONE, address.getPrivatePhone());
-      mapping.add(Col.PRIVATE_MOBILE, address.getPrivateMobilePhone());
-      mapping.add(Col.BIRTHDAY, address.getBirthday());
-      mapping.add(Col.CREATED, address.getCreated());
-      mapping.add(Col.MODIFIED, address.getLastUpdate());
-      mapping.add(Col.COMMENT, address.getComment());
-      mapping.add(Col.FINGERPRINT, address.getFingerprint());
-      mapping.add(Col.PUBLIC_KEY, address.getPublicKey());
+      addAddressMapping(mapping, address, params);
       sheet.addRow(mapping.getMapping(), 0);
     }
     sheet.setZoom(3, 4); // 75%
