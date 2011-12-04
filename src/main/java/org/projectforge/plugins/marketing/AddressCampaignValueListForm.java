@@ -23,9 +23,12 @@
 
 package org.projectforge.plugins.marketing;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Radio;
@@ -33,8 +36,12 @@ import org.apache.wicket.markup.html.form.RadioGroup;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.address.AddressDO;
+import org.projectforge.common.DateHelper;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 /**
  * The list formular for the list view (this example has no filter settings). See ToDoListPage for seeing how to use filter settings.
@@ -51,6 +58,9 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
 
   @SpringBean(name = "addressCampaignDao")
   private AddressCampaignDao addressCampaignDao;
+
+  @SpringBean(name = "addressCampaignValueExport")
+  private AddressCampaignValueExport addressCampaignValueExport;
 
   private Integer addressCampaignId;
 
@@ -116,7 +126,6 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
           return true;
         }
 
-
       };
       addressCampaignValueDropDownChoice.setNullValid(true);
       filterContainer.add(addressCampaignValueDropDownChoice);
@@ -137,6 +146,26 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
     filterType.add(new Radio<String>("newest", new Model<String>("newest")));
     filterType.add(new Radio<String>("myFavorites", new Model<String>("myFavorites")));
     filterContainer.add(filterType);
+
+    final Button exportButton = new Button("button", new Model<String>(getString("address.book.export"))) {
+      @Override
+      public final void onSubmit()
+      {
+        log.info("Exporting address list.");
+        final List<AddressDO> list = parentPage.getList();
+        final byte[] xls = addressCampaignValueExport.export(list, parentPage.personalAddressMap, parentPage.addressCampaignValueMap,
+            getSearchFilter().getAddressCampaign() != null ? getSearchFilter().getAddressCampaign().getTitle() : "");
+        if (xls == null || xls.length == 0) {
+          addError("address.book.hasNoVCards");
+          return;
+        }
+        final String filename = "ProjectForge-AddressCampaignValueExport_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
+        DownloadUtils.setDownloadTarget(xls, filename);
+      }
+    };
+    exportButton.setDefaultFormProcessing(false).add(new SimpleAttributeModifier("title", getString("address.book.export.tooltip")));
+    final SingleButtonPanel exportPanel = new SingleButtonPanel(getNewActionButtonChildId(), exportButton);
+    prependActionButton(exportPanel);
   }
 
   protected void refresh()
