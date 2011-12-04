@@ -4,4 +4,5 @@
   <!-- Daos (automatically initialized as singletons.) -->
   <bean id="addressCampaignDao" class="org.projectforge.plugins.marketing.AddressCampaignDao" />
   <bean id="addressCampaignValueDao" class="org.projectforge.plugins.marketing.AddressCampaignValueDao" />
+  <bean id="addressCampaignValueExport" class="org.projectforge.plugins.marketing.AddressCampaignValueExport" />
 </beans>
