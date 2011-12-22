@@ -45,6 +45,7 @@ public class TableAttributeTest
     attr = assertAttribute(TaskDO.class, "id", "pk", TableAttributeType.INT, true, false);
     attr = assertAttribute(TaskDO.class, "created", "created", TableAttributeType.TIMESTAMP, false, true);
     attr = assertAttribute(TaskDO.class, "lastUpdate", "last_update", TableAttributeType.TIMESTAMP, false, true);
+    attr = assertAttribute(PFUserDO.class, "locale", "locale", TableAttributeType.LOCALE, false, true);
     attr = assertAttribute(TaskDO.class, "duration", "duration", TableAttributeType.DECIMAL, false, true);
     assertEquals(2, attr.getScale());
     assertEquals(10, attr.getPrecision());
