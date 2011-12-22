@@ -92,6 +92,7 @@ IListPageColumnsCreator<AddressDO>
   public AddressCampaignValueListPage(final PageParameters parameters)
   {
     super(parameters, "plugins.marketing.addressCampaignValue");
+    newItemMenuEntry.setVisibilityAllowed(false);
   }
 
   @Override

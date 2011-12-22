@@ -57,7 +57,7 @@ public class AddressCampaignValueFormRenderer extends AbstractFormRenderer
   @Override
   public void add()
   {
-    doPanel.newFieldSetPanel(getString("plugins.marketing.addressCampaignValue"));
+    doPanel.newFieldSetPanel(getString("plugins.marketing.addressCampaignValue") + ": " + data.getAddressCampaign().getTitle());
     doPanel.addLabel(getString("name"), new PanelContext(labelLength));
     doPanel.addLabel(data.getAddress().getFullName(), new PanelContext(valueLength).setStrongLabel(true).setBreakBeforeLabel(false));
     doPanel.addLabel(getString("organization"), new PanelContext(labelLength));
