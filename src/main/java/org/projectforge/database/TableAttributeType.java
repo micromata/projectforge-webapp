@@ -30,7 +30,7 @@ package org.projectforge.database;
  */
 public enum TableAttributeType
 {
-  INT, VARCHAR, CHAR, TIMESTAMP, DATE, BOOLEAN, DECIMAL;
+  INT, VARCHAR, CHAR, LOCALE, TIMESTAMP, DATE, BOOLEAN, DECIMAL;
 
   public boolean isIn(final TableAttributeType... types)
   {

@@ -100,6 +100,8 @@ public class TableAttribute implements Serializable
       type = TableAttributeType.DATE;
     } else if (java.util.Date.class.isAssignableFrom(dType) == true) {
       type = TableAttributeType.TIMESTAMP;
+    } else if (java.util.Locale.class.isAssignableFrom(dType) == true) {
+      type = TableAttributeType.LOCALE;
     } else {
       final Entity entity = dType.getAnnotation(Entity.class);
       final javax.persistence.Table table = dType.getAnnotation(javax.persistence.Table.class);

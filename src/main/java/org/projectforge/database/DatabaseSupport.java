@@ -36,7 +36,7 @@ public class DatabaseSupport
 
   private static DatabaseSupport instance;
 
-  private HibernateDialect dialect;
+  private final HibernateDialect dialect;
 
   public static DatabaseSupport instance()
   {
@@ -72,7 +72,7 @@ public class DatabaseSupport
       if (errorMessageShown == false) {
         errorMessageShown = true;
         log
-            .warn("No data base optimization implemented for the used data base. Please contact the developer if you have an installation with mor than 10.000 time sheet entries for increasing performance");
+        .warn("No data base optimization implemented for the used data base. Please contact the developer if you have an installation with mor than 10.000 time sheet entries for increasing performance");
       }
       // No optimization for this data base.
       return null;
@@ -120,6 +120,8 @@ public class DatabaseSupport
         }
       case TIMESTAMP:
         return "TIMESTAMP";
+      case LOCALE:
+        return "VARCHAR(255)";
       case DATE:
         return "DATE";
       case DECIMAL:
