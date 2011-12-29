@@ -28,6 +28,7 @@ import static org.projectforge.admin.SystemUpdater.CORE_REGION_ID;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.projectforge.address.AddressDO;
 import org.projectforge.core.SpaceDO;
 import org.projectforge.core.SpaceRightDO;
 import org.projectforge.database.DatabaseUpdateDO;
@@ -35,6 +36,7 @@ import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.Table;
 import org.projectforge.database.TableAttribute;
 import org.projectforge.registry.Registry;
+import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 
@@ -47,6 +49,39 @@ public class DatabaseCoreUpdates
   public static List<UpdateEntry> getUpdateEntries()
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
+    // /////////////////////////////////////////////////////////////////
+    // 3.6.1.3
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "3.6.1.3", "2011-12-05",
+    "Adds columns t_task.protection_of_privacy and t_address.communication_language.") {
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        final Table taskTable = new Table(TaskDO.class);
+        final Table addressTable = new Table(AddressDO.class);
+        return dao.doesTableAttributesExist(addressTable, "communicationLanguage") == true //
+        && dao.doesTableAttributesExist(taskTable, "protectionOfPrivacy") //
+        ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        final Table taskTable = new Table(TaskDO.class);
+        if (dao.doesTableAttributesExist(taskTable, "protectionOfPrivacy") == false) {
+          dao.addTableAttributes(taskTable, new TableAttribute(TaskDO.class, "protectionOfPrivacy").setDefaultValue("false"));
+        }
+        final Table addressTable = new Table(AddressDO.class);
+        if (dao.doesTableAttributesExist(addressTable, "communicationLanguage") == false) {
+          dao.addTableAttributes(addressTable, new TableAttribute(AddressDO.class, "communicationLanguage"));
+        }
+        dao.createMissingIndices();
+        return UpdateRunningStatus.DONE;
+      }
+    });
+
     // /////////////////////////////////////////////////////////////////
     // 3.6.1
     // /////////////////////////////////////////////////////////////////
