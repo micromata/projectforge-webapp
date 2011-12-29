@@ -31,6 +31,15 @@ public class WebConstants
 
   public static final String FILE_I18N_KEYS = "i18nKeys.properties";
 
+  /**
+   * The access key for adding new entries in list view.
+   */
+  public static final char ACCESS_KEY_ADD = 'n';
+
+  public static final String ACCESS_KEY_ADD_TOOLTIP = "tooltip.accesskey.addEntry";
+
+  public static final String ACCESS_KEY_ADD_TOOLTIP_TITLE = "tooltip.accesskey.addEntry.title";
+
   /** For setting the caller action page as parameter for the callee. */
   public static final String PARAMETER_CALLER = "caller";
 

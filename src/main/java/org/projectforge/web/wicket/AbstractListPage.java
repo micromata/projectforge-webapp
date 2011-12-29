@@ -291,6 +291,7 @@ AbstractSecuredPage implements ISelectCallerPage
           redirectToEditPage(null);
         };
       }, getString("add"));
+      newItemMenuEntry.setAccessKey(WebConstants.ACCESS_KEY_ADD).setTooltip(getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP_TITLE), getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP));
       addContentMenuEntry(newItemMenuEntry);
     }
     final Label hintQuickSelectLabel = new Label("hintQuickSelect", new Model<String>(getString("hint.selectMode.quickselect"))) {
