@@ -43,6 +43,7 @@ import org.projectforge.export.PropertyMapping;
 import org.projectforge.export.XlsContentProvider;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.web.wicket.converter.LanguageConverter;
 
 /**
  * For excel export.
@@ -107,7 +108,7 @@ public class AddressExport
 
   private enum Col
   {
-    NAME, FIRST_NAME, FORM, TITLE, CONTACT_STATUS, ORGANIZATION, DIVISION, POSITION, EMAIL, WEBSITE, MAILING_ADDRESS, MAILING_ZIPCODE, MAILING_CITY, MAILING_COUNTRY, MAILING_STATE, ADDRESS, ZIPCODE, CITY, COUNTRY, STATE, POSTAL_ADDRESS, POSTAL_ZIPCODE, POSTAL_CITY, POSTAL_COUNTRY, POSTAL_STATE, ADDRESS_STATUS, BUSINESS_PHONE, FAX, MOBILE_PHONE, PRIVATE_ADDRESS, PRIVATE_ZIPCODE, PRIVATE_CITY, PRIVATE_COUNTRY, PRIVATE_STATE, PRIVATE_EMAIL, PRIVATE_PHONE, PRIVATE_MOBILE, BIRTHDAY, CREATED, MODIFIED, COMMENT, FINGERPRINT, PUBLIC_KEY, ID;
+    NAME, FIRST_NAME, FORM, TITLE, CONTACT_STATUS, ORGANIZATION, DIVISION, POSITION, COMMUNICATION_LANG, EMAIL, WEBSITE, MAILING_ADDRESS, MAILING_ZIPCODE, MAILING_CITY, MAILING_COUNTRY, MAILING_STATE, ADDRESS, ZIPCODE, CITY, COUNTRY, STATE, POSTAL_ADDRESS, POSTAL_ZIPCODE, POSTAL_CITY, POSTAL_COUNTRY, POSTAL_STATE, ADDRESS_STATUS, BUSINESS_PHONE, FAX, MOBILE_PHONE, PRIVATE_ADDRESS, PRIVATE_ZIPCODE, PRIVATE_CITY, PRIVATE_COUNTRY, PRIVATE_STATE, PRIVATE_EMAIL, PRIVATE_PHONE, PRIVATE_MOBILE, BIRTHDAY, CREATED, MODIFIED, COMMENT, FINGERPRINT, PUBLIC_KEY, ID;
   }
 
   protected ExportColumn[] createColumns()
@@ -121,6 +122,7 @@ public class AddressExport
         new I18nExportColumn(Col.ORGANIZATION, "organization", LENGTH_STD),
         new I18nExportColumn(Col.DIVISION, "address.division", LENGTH_STD),
         new I18nExportColumn(Col.POSITION, "address.positionText", LENGTH_STD), //
+        new I18nExportColumn(Col.COMMUNICATION_LANG, "address.communication", LENGTH_STD), //
         new I18nExportColumn(Col.EMAIL, "email", LENGTH_EMAIL),
         new I18nExportColumn(Col.WEBSITE, "address.website", LENGTH_STD),
         new I18nExportColumn(Col.MAILING_ADDRESS, "address.addressText", LENGTH_STD),
@@ -168,6 +170,7 @@ public class AddressExport
     mapping.add(Col.ORGANIZATION, address.getOrganization());
     mapping.add(Col.DIVISION, address.getDivision());
     mapping.add(Col.POSITION, address.getPositionText());
+    mapping.add(Col.COMMUNICATION_LANG, LanguageConverter.getLanguageAsString(address.getCommunicationLanguage(), PFUserContext.getLocale()));
     mapping.add(Col.EMAIL, address.getEmail());
     mapping.add(Col.WEBSITE, address.getWebsite());
     mapping.add(Col.MAILING_ADDRESS, address.getMailingAddressText());

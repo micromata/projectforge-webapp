@@ -32,6 +32,7 @@ import org.projectforge.export.ExportSheet;
 import org.projectforge.export.I18nExportColumn;
 import org.projectforge.export.PropertyMapping;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.web.wicket.converter.LanguageConverter;
 
 /**
  * For excel export. export must be called with two params, the first is the AddressCampaignValue map and the second the title of the address campaign.
@@ -42,7 +43,7 @@ public class AddressCampaignValueExport extends AddressExport
 {
   private enum Col
   {
-    NAME, FIRST_NAME, FORM, TITLE, CONTACT_STATUS, ORGANIZATION, DIVISION, POSITION, ADDRESS_CAMPAIGN_VALUE, ADDRESS_CAMPAIGN_COMMENT, EMAIL, WEBSITE, MAILING_ADDRESS, MAILING_ZIPCODE, MAILING_CITY, MAILING_COUNTRY, MAILING_STATE, ADDRESS, ZIPCODE, CITY, COUNTRY, STATE, POSTAL_ADDRESS, POSTAL_ZIPCODE, POSTAL_CITY, POSTAL_COUNTRY, POSTAL_STATE, ADDRESS_STATUS, BUSINESS_PHONE, FAX, MOBILE_PHONE, PRIVATE_ADDRESS, PRIVATE_ZIPCODE, PRIVATE_CITY, PRIVATE_COUNTRY, PRIVATE_STATE, PRIVATE_EMAIL, PRIVATE_PHONE, PRIVATE_MOBILE, BIRTHDAY, CREATED, MODIFIED, ID;
+    NAME, FIRST_NAME, FORM, TITLE, CONTACT_STATUS, ORGANIZATION, DIVISION, POSITION, COMMUNICATION_LANG, ADDRESS_CAMPAIGN_VALUE, ADDRESS_CAMPAIGN_COMMENT, EMAIL, WEBSITE, MAILING_ADDRESS, MAILING_ZIPCODE, MAILING_CITY, MAILING_COUNTRY, MAILING_STATE, ADDRESS, ZIPCODE, CITY, COUNTRY, STATE, POSTAL_ADDRESS, POSTAL_ZIPCODE, POSTAL_CITY, POSTAL_COUNTRY, POSTAL_STATE, ADDRESS_STATUS, BUSINESS_PHONE, FAX, MOBILE_PHONE, PRIVATE_ADDRESS, PRIVATE_ZIPCODE, PRIVATE_CITY, PRIVATE_COUNTRY, PRIVATE_STATE, PRIVATE_EMAIL, PRIVATE_PHONE, PRIVATE_MOBILE, BIRTHDAY, CREATED, MODIFIED, ID;
   }
 
   @Override
@@ -57,6 +58,7 @@ public class AddressCampaignValueExport extends AddressExport
         new I18nExportColumn(Col.ORGANIZATION, "organization", LENGTH_STD),
         new I18nExportColumn(Col.DIVISION, "address.division", LENGTH_STD),
         new I18nExportColumn(Col.POSITION, "address.positionText", LENGTH_STD), //
+        new I18nExportColumn(Col.COMMUNICATION_LANG, "address.communication", LENGTH_STD), //
         new I18nExportColumn(Col.ADDRESS_CAMPAIGN_VALUE, "value", LENGTH_STD),
         new I18nExportColumn(Col.ADDRESS_CAMPAIGN_COMMENT, "comment", LENGTH_STD),
         new I18nExportColumn(Col.EMAIL, "email", LENGTH_EMAIL),
@@ -107,6 +109,7 @@ public class AddressCampaignValueExport extends AddressExport
     mapping.add(Col.ORGANIZATION, address.getOrganization());
     mapping.add(Col.DIVISION, address.getDivision());
     mapping.add(Col.POSITION, address.getPositionText());
+    mapping.add(Col.COMMUNICATION_LANG, LanguageConverter.getLanguageAsString(address.getCommunicationLanguage(), PFUserContext.getLocale()));
     mapping.add(Col.ADDRESS_CAMPAIGN_VALUE, addressCampaignValue != null ? addressCampaignValue.getValue() : "");
     mapping.add(Col.ADDRESS_CAMPAIGN_COMMENT, addressCampaignValue != null ? addressCampaignValue.getComment() : "");
     mapping.add(Col.EMAIL, address.getEmail());

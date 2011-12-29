@@ -44,6 +44,9 @@ public class LanguageConverter implements IConverter
 
   public static final String getLanguageAsString(final Locale language, final Locale locale)
   {
+    if (language == null) {
+      return "";
+    }
     return language.getDisplayName(locale);
   }
 
