@@ -24,6 +24,7 @@
 package org.projectforge.web.address;
 
 import static org.projectforge.web.wicket.layout.DropDownChoiceLPanel.SELECT_ID;
+import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
 import static org.projectforge.web.wicket.layout.LayoutLength.HALF;
 import static org.projectforge.web.wicket.layout.LayoutLength.ONEHALF;
 import static org.projectforge.web.wicket.layout.LayoutLength.QUART;
@@ -32,6 +33,7 @@ import static org.projectforge.web.wicket.layout.TextFieldLPanel.INPUT_ID;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.MarkupContainer;
@@ -55,6 +57,7 @@ import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.components.LanguageField;
 import org.projectforge.web.wicket.layout.AbstractFormRenderer;
 import org.projectforge.web.wicket.layout.DateFieldLPanel;
 import org.projectforge.web.wicket.layout.FieldType;
@@ -72,7 +75,7 @@ public class AddressFormRenderer extends AbstractFormRenderer
 
   private final AddressDao addressDao;
 
-  private AddressDO data;
+  private final AddressDO data;
 
   protected PersonalAddressDO personalAddress;
 
@@ -122,6 +125,14 @@ public class AddressFormRenderer extends AbstractFormRenderer
     addBusinessPhones();
     addBusinesAddress();
     addPostalAddress();
+
+    if (isReadonly() == false && isMobile() == false) {
+      doPanel.newGroupPanel(getString("address.communication"));
+      final LanguageField language = new LanguageField(TextFieldLPanel.INPUT_ID, new PropertyModel<Locale>(data, "communicationLanguage"));
+      language.setFavoriteLanguages(addressDao.getUsedCommunicationLanguages());
+      doPanel.addTextField(language, new PanelContext(FULL, getString("language"), LABEL_LENGTH)
+      .setTooltip(getString("tooltip.autocomplete.language")));
+    }
 
     // *** Private Contact ***
     doPanel.newFieldSetPanel(getString("address.heading.privateContact"));
@@ -256,7 +267,7 @@ public class AddressFormRenderer extends AbstractFormRenderer
       });
     }
     ctx = new PanelContext(data, "comment", ONEHALF, getString("comment"), ONEHALF).setBreakBetweenLabelAndField(true).setCssStyle(
-        "height: 20em;");
+    "height: 20em;");
     if (layoutContext.isNew() == false) {
       ctx.setFocus();
     }
@@ -274,7 +285,7 @@ public class AddressFormRenderer extends AbstractFormRenderer
       groupMobilePanel.setCollapsed();
     }
     doPanel.addTextField(new PanelContext(data, "fingerprint", ONEHALF, getString("address.fingerprint"), ONEHALF)
-        .setBreakBetweenLabelAndField(true));
+    .setBreakBetweenLabelAndField(true));
     doPanel.addTextArea(new PanelContext(data, "publicKey", ONEHALF, getString("address.publicKey"), ONEHALF).setBreakBetweenLabelAndField(
         true).setCssStyle("height: 5em;"));
   }
@@ -292,7 +303,7 @@ public class AddressFormRenderer extends AbstractFormRenderer
       final PFAutoCompleteTextField<String> organizationField = new PFAutoCompleteTextField<String>(INPUT_ID, new PropertyModel<String>(
           data, "organization")) {
         @Override
-        protected List<String> getChoices(String input)
+        protected List<String> getChoices(final String input)
         {
           return addressDao.getAutocompletion("organization", input);
         }
@@ -314,7 +325,7 @@ public class AddressFormRenderer extends AbstractFormRenderer
     doPanel.addTextField(new PanelContext(data, "email", VALUE_LENGTH, getString("email"), LABEL_LENGTH).setFieldType(FieldType.E_MAIL)
         .setStrong());
     doPanel.addTextField(new PanelContext(data, "website", VALUE_LENGTH, getString("address.website"), LABEL_LENGTH)
-        .setFieldType(FieldType.WEB_PAGE));
+    .setFieldType(FieldType.WEB_PAGE));
   }
 
   /**
@@ -349,7 +360,7 @@ public class AddressFormRenderer extends AbstractFormRenderer
       final PFAutoCompleteTextField<String> addressTextField = new PFAutoCompleteTextField<String>(INPUT_ID, new PropertyModel<String>(
           data, addressTextProperty)) {
         @Override
-        protected List<String> getChoices(String input)
+        protected List<String> getChoices(final String input)
         {
           return addressDao.getAutocompletion(addressTextProperty, input);
         }
@@ -374,7 +385,7 @@ public class AddressFormRenderer extends AbstractFormRenderer
 
   private TextField<String> addPhoneNumber(final String property, final String labelKey, final String favoriteProperty,
       final boolean mobileNumber, final String phoneListTooltip, final boolean first)
-  {
+      {
     if (isMobile() == false) {
       final IField field = doPanel.addTextField(new PanelContext(data, property, THREEQUART, getString(labelKey), LABEL_LENGTH));
       doPanel.addCheckBox(new PanelContext(personalAddress, favoriteProperty).setTooltip(phoneListTooltip));
@@ -387,7 +398,7 @@ public class AddressFormRenderer extends AbstractFormRenderer
         return null;
       }
       final IField field = doPanel.addTextField(new PanelContext(data, property, VALUE_LENGTH, getString(labelKey), LABEL_LENGTH)
-          .setFieldType(mobileNumber == true ? FieldType.MOBILE_PHONE_NO : FieldType.PHONE_NO).setStrong());
+      .setFieldType(mobileNumber == true ? FieldType.MOBILE_PHONE_NO : FieldType.PHONE_NO).setStrong());
       if (isReadonly() == false) {
         @SuppressWarnings("unchecked")
         final TextField<String> textField = (TextField<String>) ((TextFieldLPanel) field).getTextField();
@@ -395,7 +406,7 @@ public class AddressFormRenderer extends AbstractFormRenderer
       }
     }
     return null;
-  }
+      }
 
   protected void validation()
   {

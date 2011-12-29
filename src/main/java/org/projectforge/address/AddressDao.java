@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -73,14 +74,14 @@ public class AddressDao extends BaseDao<AddressDO>
     this.configuration = configuration;
   }
 
-  public void setTaskDao(TaskDao taskDao)
+  public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
   }
 
   private PersonalAddressDao personalAddressDao;
 
-  public void setPersonalAddressDao(PersonalAddressDao personalAddressDao)
+  public void setPersonalAddressDao(final PersonalAddressDao personalAddressDao)
   {
     this.personalAddressDao = personalAddressDao;
   }
@@ -98,6 +99,14 @@ public class AddressDao extends BaseDao<AddressDO>
     return configuration.getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES);
   }
 
+  public List<Locale> getUsedCommunicationLanguages()
+  {
+    @SuppressWarnings("unchecked")
+    final List<Locale> list = getHibernateTemplate().find(
+    "select distinct a.communicationLanguage from AddressDO a where deleted=false and a.communicationLanguage is not null order by a.communicationLanguage");
+    return list;
+  }
+
   /**
    * Get the newest address entries (by time of creation).
    * @return
@@ -105,7 +114,7 @@ public class AddressDao extends BaseDao<AddressDO>
    */
   public List<AddressDO> getNewest(final BaseSearchFilter filter)
   {
-    QueryFilter queryFilter = new QueryFilter();
+    final QueryFilter queryFilter = new QueryFilter();
     queryFilter.addOrder(Order.desc("created"));
     if (filter.getMaxRows() > 0) {
       queryFilter.setMaxResults(filter.getMaxRows());
@@ -139,7 +148,7 @@ public class AddressDao extends BaseDao<AddressDO>
             || myFilter.isUninteresting() == true
             || myFilter.isDeparted() == true
             || myFilter.isPersonaIngrata() == true) {
-          Collection<ContactStatus> col = new ArrayList<ContactStatus>();
+          final Collection<ContactStatus> col = new ArrayList<ContactStatus>();
           if (myFilter.isActive() == true) {
             col.add(ContactStatus.ACTIVE);
           }
@@ -161,7 +170,7 @@ public class AddressDao extends BaseDao<AddressDO>
         // Proceed address status:
         // Use filter only for non deleted books:
         if (myFilter.isUptodate() == true || myFilter.isOutdated() == true || myFilter.isLeaved() == true) {
-          Collection<AddressStatus> col = new ArrayList<AddressStatus>();
+          final Collection<AddressStatus> col = new ArrayList<AddressStatus>();
           if (myFilter.isUptodate() == true) {
             col.add(AddressStatus.UPTODATE);
           }
@@ -188,9 +197,9 @@ public class AddressDao extends BaseDao<AddressDO>
    * @param taskId If null, then task will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setTask(final AddressDO address, Integer taskId)
+  public void setTask(final AddressDO address, final Integer taskId)
   {
-    TaskDO task = taskDao.getOrLoad(taskId);
+    final TaskDO task = taskDao.getOrLoad(taskId);
     address.setTask(task);
   }
 
@@ -215,7 +224,8 @@ public class AddressDao extends BaseDao<AddressDO>
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override
-  public boolean hasAccess(final PFUserDO user, final AddressDO obj, final AddressDO oldObj, final OperationType operationType, final boolean throwException)
+  public boolean hasAccess(final PFUserDO user, final AddressDO obj, final AddressDO oldObj, final OperationType operationType,
+      final boolean throwException)
   {
     beforeUpdateOrSave(obj);
     return accessChecker.hasPermission(user, obj.getTaskId(), AccessType.TASKS, operationType, throwException);
@@ -257,35 +267,35 @@ public class AddressDao extends BaseDao<AddressDO>
    * @param all If false, only the birthdays of favorites will be returned.
    * @return The entries are ordered by date of year and name.
    */
-  public Set<BirthdayAddress> getBirthdays(Date fromDate, Date toDate, int max, boolean all)
+  public Set<BirthdayAddress> getBirthdays(final Date fromDate, final Date toDate, final int max, final boolean all)
   {
-    QueryFilter filter = new QueryFilter();
+    final QueryFilter filter = new QueryFilter();
     filter.add(Restrictions.isNotNull("birthday"));
-    List<AddressDO> list = getList(filter);
+    final List<AddressDO> list = getList(filter);
     // Uses not Collections.sort because every comparison needs Calendar.getDayOfYear().
-    Set<BirthdayAddress> set = new TreeSet<BirthdayAddress>();
-    Set<Integer> favorites = getFavorites();
-    DateHolder from = new DateHolder(fromDate);
-    DateHolder to = new DateHolder(toDate);
+    final Set<BirthdayAddress> set = new TreeSet<BirthdayAddress>();
+    final Set<Integer> favorites = getFavorites();
+    final DateHolder from = new DateHolder(fromDate);
+    final DateHolder to = new DateHolder(toDate);
     DateHolder dh;
-    int fromMonth = from.getMonth();
-    int fromDayOfMonth = from.getDayOfMonth();
-    int toMonth = to.getMonth();
-    int toDayOfMonth = to.getDayOfMonth();
-    for (AddressDO address : list) {
+    final int fromMonth = from.getMonth();
+    final int fromDayOfMonth = from.getDayOfMonth();
+    final int toMonth = to.getMonth();
+    final int toDayOfMonth = to.getDayOfMonth();
+    for (final AddressDO address : list) {
       if (all == false && favorites.contains(address.getId()) == false) {
         // Address is not a favorite address, so ignore it.
         continue;
       }
       dh = new DateHolder(address.getBirthday());
-      int month = dh.getMonth();
-      int dayOfMonth = dh.getDayOfMonth();
+      final int month = dh.getMonth();
+      final int dayOfMonth = dh.getDayOfMonth();
       if ((month == fromMonth && dayOfMonth >= fromDayOfMonth)
           || (month == toMonth && dayOfMonth <= toDayOfMonth)
           || (fromMonth < toMonth && month > fromMonth && month < toMonth)
           || // e. g. from June to August
           (fromMonth > toMonth && (month > fromMonth || month < toMonth))) { // e. g. from December to January
-        BirthdayAddress ba = new BirthdayAddress(address);
+        final BirthdayAddress ba = new BirthdayAddress(address);
         if (favorites.contains(address.getId()) == true) {
           ba.setFavorite(true);
         }
@@ -300,7 +310,7 @@ public class AddressDao extends BaseDao<AddressDO>
     final List<PersonalAddressDO> list = personalAddressDao.getList();
     final List<PersonalAddressDO> result = new ArrayList<PersonalAddressDO>();
     if (CollectionUtils.isNotEmpty(list) == true) {
-      for (PersonalAddressDO entry : list) {
+      for (final PersonalAddressDO entry : list) {
         if (entry.isFavoriteCard() == true) {
           result.add(entry);
         }
@@ -314,7 +324,7 @@ public class AddressDao extends BaseDao<AddressDO>
     final List<PersonalAddressDO> list = personalAddressDao.getList();
     final Set<Integer> result = new HashSet<Integer>();
     if (CollectionUtils.isNotEmpty(list) == true) {
-      for (PersonalAddressDO entry : list) {
+      for (final PersonalAddressDO entry : list) {
         if (entry.isFavoriteCard() == true) {
           result.add(entry.getAddressId());
         }
@@ -323,16 +333,16 @@ public class AddressDao extends BaseDao<AddressDO>
     return result;
   }
 
-  public void exportFavoriteVCards(Writer out, List<PersonalAddressDO> favorites)
+  public void exportFavoriteVCards(final Writer out, final List<PersonalAddressDO> favorites)
   {
     log.info("Exporting personal AddressBook.");
-    PrintWriter pw = new PrintWriter(out);
-    for (PersonalAddressDO entry : favorites) {
+    final PrintWriter pw = new PrintWriter(out);
+    for (final PersonalAddressDO entry : favorites) {
       if (entry.isFavoriteCard() == false) {
         // Entry is not marks as vCard-Entry.
         continue;
       }
-      AddressDO a = entry.getAddress();
+      final AddressDO a = entry.getAddress();
       pw.println("BEGIN:VCARD");
       pw.println("VERSION:3.0");
       pw.print("N:");
@@ -406,9 +416,9 @@ public class AddressDao extends BaseDao<AddressDO>
    * Used by vCard export for field 'FN' (full name). Concatenates first name, last name and title.
    * @return
    */
-  public String getFullName(AddressDO a)
+  public String getFullName(final AddressDO a)
   {
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     boolean space = false;
     if (isGiven(a.getName()) == true) {
       buf.append(a.getName());
@@ -438,7 +448,7 @@ public class AddressDao extends BaseDao<AddressDO>
     final List<PersonalAddressDO> list = personalAddressDao.getList();
     final List<PersonalAddressDO> result = new ArrayList<PersonalAddressDO>();
     if (CollectionUtils.isNotEmpty(list) == true) {
-      for (PersonalAddressDO entry : list) {
+      for (final PersonalAddressDO entry : list) {
         if (entry.isFavoriteBusinessPhone() == true
             || entry.isFavoriteFax() == true
             || entry.isFavoriteMobilePhone() == true
@@ -453,13 +463,13 @@ public class AddressDao extends BaseDao<AddressDO>
   /**
    * Throws UserException, if for example the phone list is empty.
    */
-  public void exportFavoritePhoneList(Writer out, List<PersonalAddressDO> favorites)
+  public void exportFavoritePhoneList(final Writer out, final List<PersonalAddressDO> favorites)
   {
     log.info("Exporting phone list");
-    PrintWriter pw = new PrintWriter(out);
+    final PrintWriter pw = new PrintWriter(out);
     pw.println("\"Name\",\"Phone number\"");
-    for (PersonalAddressDO entry : favorites) {
-      AddressDO address = entry.getAddress();
+    for (final PersonalAddressDO entry : favorites) {
+      final AddressDO address = entry.getAddress();
       String number = address.getBusinessPhone();
       if (entry.isFavoriteBusinessPhone() == true && StringUtils.isNotBlank(number)) {
         appendPhoneEntry(pw, address, "", number);
@@ -474,7 +484,7 @@ public class AddressDao extends BaseDao<AddressDO>
       }
       number = address.getPrivateMobilePhone();
       if (entry.isFavoritePrivateMobilePhone() == true && StringUtils.isNotBlank(number)) {
-        String str = StringUtils.isNotBlank(address.getMobilePhone()) == true ? "mobil privat" : "mobil";
+        final String str = StringUtils.isNotBlank(address.getMobilePhone()) == true ? "mobil privat" : "mobil";
         appendPhoneEntry(pw, address, str, number);
       }
       number = address.getPrivatePhone();
@@ -485,7 +495,7 @@ public class AddressDao extends BaseDao<AddressDO>
     pw.flush();
   }
 
-  private void print(PrintWriter pw, String key, String value)
+  private void print(final PrintWriter pw, final String key, final String value)
   {
     if (isGiven(value) == false) {
       return;
@@ -501,7 +511,7 @@ public class AddressDao extends BaseDao<AddressDO>
    * @param str
    * @see StringUtils#defaultString(String)
    */
-  private void out(PrintWriter pw, String str)
+  private void out(final PrintWriter pw, final String str)
   {
     String s = StringUtils.defaultString(str);
     s = s.replaceAll("\r", "");
@@ -517,19 +527,19 @@ public class AddressDao extends BaseDao<AddressDO>
    * @return
    * @see StringUtils#isNotBlank(String)
    */
-  private boolean isGiven(String str)
+  private boolean isGiven(final String str)
   {
     return StringUtils.isNotBlank(str);
   }
 
-  private void appendPhoneEntry(PrintWriter pw, AddressDO address, String suffix, String number)
+  private void appendPhoneEntry(final PrintWriter pw, final AddressDO address, final String suffix, final String number)
   {
     if (isGiven(number) == false) {
       // Do nothing, number is empty.
       return;
     }
     final String no = NumberHelper
-        .extractPhonenumber(number, configuration.getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
+    .extractPhonenumber(number, configuration.getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
     final String name = address.getName();
     pw.print("\"");
     if (StringUtils.isNotEmpty(name)) {

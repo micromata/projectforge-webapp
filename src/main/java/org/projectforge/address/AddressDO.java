@@ -26,6 +26,7 @@ package org.projectforge.address;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringTokenizer;
 
 import javax.persistence.Column;
@@ -138,6 +139,8 @@ public class AddressDO extends DefaultBaseDO
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String website; // 255
+
+  private Locale communicationLanguage;
 
   @FieldBridge(impl = HibernateSearchPhoneNumberBridge.class)
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -395,6 +398,20 @@ public class AddressDO extends DefaultBaseDO
   public void setWebsite(final String website)
   {
     this.website = website;
+  }
+
+  /**
+   * @return The communication will take place in this language.
+   */
+  @Column(name = "communication_language")
+  public Locale getCommunicationLanguage()
+  {
+    return communicationLanguage;
+  }
+
+  public void setCommunicationLanguage(final Locale communicationLanguage)
+  {
+    this.communicationLanguage = communicationLanguage;
   }
 
   @Column(length = 255)
