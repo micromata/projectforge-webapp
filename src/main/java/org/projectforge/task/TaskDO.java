@@ -54,8 +54,8 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.Priority;
 import org.projectforge.core.ShortDisplayNameCapable;
-import org.projectforge.gantt.GanttRelationType;
 import org.projectforge.gantt.GanttObjectType;
+import org.projectforge.gantt.GanttRelationType;
 import org.projectforge.user.PFUserDO;
 
 /**
@@ -131,6 +131,8 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
   private String kost2BlackWhiteList;
 
   private boolean kost2IsBlackList;
+
+  private boolean protectionOfPrivacy;
 
   private transient Date toDate;
 
@@ -434,9 +436,29 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
   }
 
   @Deprecated
-  public void setOldKost2Id(Integer oldKost2Id)
+  public void setOldKost2Id(final Integer oldKost2Id)
   {
     this.oldKost2Id = oldKost2Id;
+  }
+
+  /**
+   * If set then normal user are not allowed to select (read) the time sheets of other users of this task and all sub tasks. This is important e. g. for hiding the days of illness of an employee.
+   * @return True if the flag is set.
+   */
+  @Column(name = "protectionOfPrivacy")
+  public boolean isProtectionOfPrivacy()
+  {
+    return protectionOfPrivacy;
+  }
+
+  /**
+   * @param protectionOfPrivacy
+   * @return This for chaining.
+   */
+  public TaskDO setProtectionOfPrivacy(final boolean protectionOfPrivacy)
+  {
+    this.protectionOfPrivacy = protectionOfPrivacy;
+    return this;
   }
 
   /**
@@ -504,7 +526,7 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
     return ganttObjectType;
   }
 
-  public TaskDO setGanttObjectType(GanttObjectType ganttObjectType)
+  public TaskDO setGanttObjectType(final GanttObjectType ganttObjectType)
   {
     this.ganttObjectType = ganttObjectType;
     return this;
@@ -517,7 +539,7 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
     return ganttRelationType;
   }
 
-  public TaskDO setGanttRelationType(GanttRelationType ganttRelationType)
+  public TaskDO setGanttRelationType(final GanttRelationType ganttRelationType)
   {
     this.ganttRelationType = ganttRelationType;
     return this;
@@ -532,7 +554,7 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
     return ganttPredecessorOffset;
   }
 
-  public TaskDO setGanttPredecessorOffset(Integer ganttPredecessorOffset)
+  public TaskDO setGanttPredecessorOffset(final Integer ganttPredecessorOffset)
   {
     this.ganttPredecessorOffset = ganttPredecessorOffset;
     return this;
@@ -549,7 +571,7 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
     return ganttPredecessor;
   }
 
-  public TaskDO setGanttPredecessor(TaskDO ganttPredecessor)
+  public TaskDO setGanttPredecessor(final TaskDO ganttPredecessor)
   {
     this.ganttPredecessor = ganttPredecessor;
     return this;
@@ -566,12 +588,12 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
   }
 
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object o)
   {
     if (o instanceof TaskDO) {
-      TaskDO other = (TaskDO) o;
+      final TaskDO other = (TaskDO) o;
       return ObjectUtils.equals(this.getParentTaskId(), other.getParentTaskId()) == true
-          && ObjectUtils.equals(this.getTitle(), other.getTitle()) == true;
+      && ObjectUtils.equals(this.getTitle(), other.getTitle()) == true;
     }
     return false;
   }
@@ -579,7 +601,7 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     hcb.append(this.getParentTaskId()).append(this.getTitle());
     return hcb.toHashCode();
   }
@@ -587,7 +609,7 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
   @Override
   public String toString()
   {
-    ToStringBuilder builder = new ToStringBuilder(this);
+    final ToStringBuilder builder = new ToStringBuilder(this);
     builder.append("id", getId());
     builder.append("parentTaskId", getParentTaskId());
     builder.append("title", getTitle());

@@ -60,7 +60,7 @@ public class TaskDao extends BaseDao<TaskDO>
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TaskDao.class);
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "responsibleUser.username", "responsibleUser.firstname",
-      "responsibleUser.lastname", "taskpath", "projekt.name", "projekt.kunde.name", "kost2.nummer", "kost2.description"};
+    "responsibleUser.lastname", "taskpath", "projekt.name", "projekt.kunde.name", "kost2.nummer", "kost2.description"};
 
   public static final String I18N_KEY_ERROR_CYCLIC_REFERENCE = "task.error.cyclicReference";
 
@@ -84,12 +84,12 @@ public class TaskDao extends BaseDao<TaskDO>
     return taskTree;
   }
 
-  public void setTaskTree(TaskTree taskTree)
+  public void setTaskTree(final TaskTree taskTree)
   {
     this.taskTree = taskTree;
   }
 
-  public void setUserDao(UserDao userDao)
+  public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
   }
@@ -105,7 +105,7 @@ public class TaskDao extends BaseDao<TaskDO>
    * @see org.projectforge.core.BaseDao#onSaveOrModify(org.projectforge.core.ExtendedBaseDO)
    */
   @Override
-  protected void onSaveOrModify(TaskDO obj)
+  protected void onSaveOrModify(final TaskDO obj)
   {
     synchronized (this) {
       checkConstraintVioloation(obj);
@@ -117,7 +117,7 @@ public class TaskDao extends BaseDao<TaskDO>
    * @param parentTaskId If null, then task will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public TaskDO setParentTask(final TaskDO task, Integer parentTaskId)
+  public TaskDO setParentTask(final TaskDO task, final Integer parentTaskId)
   {
     final TaskDO parentTask = getOrLoad(parentTaskId);
     task.setParentTask(parentTask);
@@ -129,7 +129,7 @@ public class TaskDao extends BaseDao<TaskDO>
    * @param predecessorId If null, then task will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setGanttPredecessor(final TaskDO task, Integer predecessorId)
+  public void setGanttPredecessor(final TaskDO task, final Integer predecessorId)
   {
     final TaskDO predecessor = getOrLoad(predecessorId);
     task.setGanttPredecessor(predecessor);
@@ -140,9 +140,9 @@ public class TaskDao extends BaseDao<TaskDO>
    * @param responsibleUserId If null, then task will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setResponsibleUser(final TaskDO task, Integer responsibleUserId)
+  public void setResponsibleUser(final TaskDO task, final Integer responsibleUserId)
   {
-    PFUserDO user = userDao.getOrLoad(responsibleUserId);
+    final PFUserDO user = userDao.getOrLoad(responsibleUserId);
     task.setResponsibleUser(user);
   }
 
@@ -158,13 +158,13 @@ public class TaskDao extends BaseDao<TaskDO>
     final String intervalInSeconds = DatabaseSupport.instance().getIntervalInSeconds("startTime", "stopTime");
     if (intervalInSeconds != null) {
       @SuppressWarnings("unchecked")
-      final List<Object[]> list = (List<Object[]>) getHibernateTemplate().find(
+      final List<Object[]> list = getHibernateTemplate().find(
           "select " + intervalInSeconds + ", task.id from TimesheetDO where deleted=false group by task.id");
       return list;
     }
     @SuppressWarnings("unchecked")
-    final List<Object[]> result = (List<Object[]>) getHibernateTemplate().find(
-        "select startTime, stopTime, task.id from TimesheetDO where deleted=false order by task.id");
+    final List<Object[]> result = getHibernateTemplate().find(
+    "select startTime, stopTime, task.id from TimesheetDO where deleted=false order by task.id");
     final List<Object[]> list = new ArrayList<Object[]>();
     if (CollectionUtils.isEmpty(result) == false) {
       Integer currentTaskId = null;
@@ -203,10 +203,10 @@ public class TaskDao extends BaseDao<TaskDO>
     final String intervalInSeconds = DatabaseSupport.instance().getIntervalInSeconds("startTime", "stopTime");
     if (intervalInSeconds != null) {
       @SuppressWarnings("unchecked")
-      final List<Object> list = (List<Object>) getHibernateTemplate().find(
+      final List<Object> list = getHibernateTemplate().find(
           "select "
-              + DatabaseSupport.instance().getIntervalInSeconds("startTime", "stopTime")
-              + " from TimesheetDO where task.id = ? and deleted=false", taskId);
+          + DatabaseSupport.instance().getIntervalInSeconds("startTime", "stopTime")
+          + " from TimesheetDO where task.id = ? and deleted=false", taskId);
       if (list.size() == 0) {
         return new Long(0);
       }
@@ -220,7 +220,7 @@ public class TaskDao extends BaseDao<TaskDO>
       }
     }
     @SuppressWarnings("unchecked")
-    final List<Object[]> result = (List<Object[]>) getHibernateTemplate().find(
+    final List<Object[]> result = getHibernateTemplate().find(
         "select startTime, stopTime from TimesheetDO where task.id = ? and deleted=false", taskId);
     if (CollectionUtils.isEmpty(result) == true) {
       return new Long(0);
@@ -237,7 +237,7 @@ public class TaskDao extends BaseDao<TaskDO>
 
   @Override
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public List<TaskDO> getList(BaseSearchFilter filter) throws AccessException
+  public List<TaskDO> getList(final BaseSearchFilter filter) throws AccessException
   {
     final TaskFilter myFilter;
     if (filter instanceof TaskFilter) {
@@ -246,7 +246,7 @@ public class TaskDao extends BaseDao<TaskDO>
       myFilter = new TaskFilter(filter);
     }
     final QueryFilter queryFilter = new QueryFilter(myFilter);
-    Collection<TaskStatus> col = new ArrayList<TaskStatus>(4);
+    final Collection<TaskStatus> col = new ArrayList<TaskStatus>(4);
     if (myFilter.isNotOpened() == true) {
       col.add(TaskStatus.N);
     }
@@ -299,10 +299,10 @@ public class TaskDao extends BaseDao<TaskDO>
   }
 
   @Override
-  protected void afterSaveOrModify(TaskDO obj)
+  protected void afterSaveOrModify(final TaskDO obj)
   {
     // Reread it from the database to get the current version (given obj could be different, for example after markAsDeleted):
-    TaskDO task = internalGetById(obj.getId());
+    final TaskDO task = internalGetById(obj.getId());
     taskTree.addOrUpdateTaskNode(task);
   }
 
@@ -357,7 +357,7 @@ public class TaskDao extends BaseDao<TaskDO>
     if (obj.getParentTaskId() == null) {
       throw new UserException(I18N_KEY_ERROR_PARENT_TASK_NOT_GIVEN);
     }
-    TaskNode parent = taskTree.getTaskNodeById(obj.getParentTaskId());
+    final TaskNode parent = taskTree.getTaskNodeById(obj.getParentTaskId());
     if (parent == null) {
       throw new UserException(I18N_KEY_ERROR_PARENT_TASK_NOT_FOUND);
     }
@@ -405,6 +405,9 @@ public class TaskDao extends BaseDao<TaskDO>
       if (obj.getProtectTimesheetsUntil() != null) {
         throw new AccessException("task.error.protectTimesheetsUntilReadonly");
       }
+      if (obj.isProtectionOfPrivacy() == true) {
+        throw new AccessException("task.error.protectionOfPrivacyReadonly");
+      }
     }
     if (hasAccessForKost2AndTimesheetBookingStatus(user, obj) == false) {
       // Non project managers are not able to manipulate the following fields:
@@ -431,6 +434,9 @@ public class TaskDao extends BaseDao<TaskDO>
       }
       if (ObjectUtils.equals(ts1, ts2) == false) {
         throw new AccessException("task.error.protectTimesheetsUntilReadonly");
+      }
+      if (ObjectUtils.equals(obj.isProtectionOfPrivacy(), dbObj.isProtectionOfPrivacy()) == false) {
+        throw new AccessException("task.error.protectionOfPrivacyReadonly");
       }
     }
     if (hasAccessForKost2AndTimesheetBookingStatus(user, obj) == false) {
@@ -461,7 +467,7 @@ public class TaskDao extends BaseDao<TaskDO>
   }
 
   @Override
-  public boolean hasDeleteAccess(final PFUserDO user, final TaskDO obj, final TaskDO dbObj, boolean throwException)
+  public boolean hasDeleteAccess(final PFUserDO user, final TaskDO obj, final TaskDO dbObj, final boolean throwException)
   {
     Validate.notNull(obj);
     if (hasUpdateAccess(user, obj, dbObj, throwException) == true) {
@@ -474,7 +480,7 @@ public class TaskDao extends BaseDao<TaskDO>
   }
 
   @Override
-  protected boolean copyValues(TaskDO src, TaskDO dest, String... ignoreFields)
+  protected boolean copyValues(final TaskDO src, final TaskDO dest, final String... ignoreFields)
   {
     boolean modified = super.copyValues(src, dest, ignoreFields);
     // Priority value is null-able (may be was not copied from super.copyValues):

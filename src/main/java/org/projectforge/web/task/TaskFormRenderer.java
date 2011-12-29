@@ -45,8 +45,8 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.convert.IConverter;
 import org.hibernate.Hibernate;
 import org.projectforge.common.StringHelper;
-import org.projectforge.core.Priority;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.core.Priority;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.gantt.GanttObjectType;
@@ -63,6 +63,7 @@ import org.projectforge.web.fibu.Kost2ListPage;
 import org.projectforge.web.fibu.Kost2SelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.CheckBoxLabelPanel;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.DropDownChoicePanel;
@@ -86,9 +87,9 @@ public class TaskFormRenderer extends AbstractFormRenderer
 
   private final TaskDao taskDao;
 
-  private TaskDO data;
+  private final TaskDO data;
 
-  private TaskEditPage taskEditPage;
+  private final TaskEditPage taskEditPage;
 
   protected UserGroupCache userGroupCache;
 
@@ -131,7 +132,7 @@ public class TaskFormRenderer extends AbstractFormRenderer
     }
     {
       final TaskSelectPanel parentTaskSelectPanel = new TaskSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<TaskDO>(data,
-          "parentTask"), taskEditPage, "parentTaskId");
+      "parentTask"), taskEditPage, "parentTaskId");
       parentTaskSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
       doPanel.addSelectPanel(parentTaskSelectPanel, new PanelContext(VALUE_LENGTH, getString("task.parentTask"), LABEL_LENGTH));
       parentTaskSelectPanel.init();
@@ -173,7 +174,7 @@ public class TaskFormRenderer extends AbstractFormRenderer
       }
       doPanel.addTextArea(
           new PanelContext(data, "description", DOUBLE, getString("description") + jiraFootnoteMark, LABEL_LENGTH)
-              .setBreakBetweenLabelAndField(true).setCssStyle("height: 20em;"));
+          .setBreakBetweenLabelAndField(true).setCssStyle("height: 20em;"));
       if (jiraSupport == true && JiraUtils.hasJiraIssues(data.getDescription()) == true) {
         doPanel.addLabel("", new PanelContext(HALF));
         doPanel.addJiraIssuesPanel(data.getDescription(), new PanelContext(DOUBLE).setBreakBeforeLabel(false));
@@ -186,7 +187,7 @@ public class TaskFormRenderer extends AbstractFormRenderer
         data.setResponsibleUser(responsibleUser);
       }
       final UserSelectPanel responsibleUserSelectPanel = new UserSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<PFUserDO>(data,
-          "responsibleUser"), taskEditPage, "responsibleUserId");
+      "responsibleUser"), taskEditPage, "responsibleUserId");
       doPanel.addSelectPanel(responsibleUserSelectPanel, new PanelContext(FULL, getString("task.assignedUser"), LABEL_LENGTH).setStrong());
       responsibleUserSelectPanel.init();
     }
@@ -216,7 +217,7 @@ public class TaskFormRenderer extends AbstractFormRenderer
       final LabelValueChoiceRenderer<GanttObjectType> objectTypeChoiceRenderer = new LabelValueChoiceRenderer<GanttObjectType>(container,
           GanttObjectType.values());
       final DropDownChoice<GanttObjectType> objectTypeChoice = new DropDownChoice<GanttObjectType>(SELECT_ID, new PropertyModel(data,
-          "ganttObjectType"), objectTypeChoiceRenderer.getValues(), objectTypeChoiceRenderer);
+      "ganttObjectType"), objectTypeChoiceRenderer.getValues(), objectTypeChoiceRenderer);
       objectTypeChoice.setNullValid(true);
       doPanel.addDropDownChoice(objectTypeChoice, new PanelContext(data, "ganttObjectType", THREEQUART, getString("gantt.objectType"),
           LABEL_LENGTH2));
@@ -226,7 +227,7 @@ public class TaskFormRenderer extends AbstractFormRenderer
       final MinMaxNumberField<Integer> progressField = new MinMaxNumberField<Integer>(TextFieldLPanel.INPUT_ID, new PropertyModel<Integer>(
           data, "progress"), 0, 100) {
         @Override
-        public IConverter getConverter(Class< ? > type)
+        public IConverter getConverter(final Class< ? > type)
         {
           return new IntegerPercentConverter();
         }
@@ -259,7 +260,7 @@ public class TaskFormRenderer extends AbstractFormRenderer
       final LabelValueChoiceRenderer<GanttRelationType> relationTypeChoiceRenderer = new LabelValueChoiceRenderer<GanttRelationType>(
           container, GanttRelationType.values());
       final DropDownChoice<GanttRelationType> relationTypeChoice = new DropDownChoice<GanttRelationType>(SELECT_ID, new PropertyModel(data,
-          "ganttRelationType"), relationTypeChoiceRenderer.getValues(), relationTypeChoiceRenderer);
+      "ganttRelationType"), relationTypeChoiceRenderer.getValues(), relationTypeChoiceRenderer);
       relationTypeChoice.setNullValid(true);
       doPanel.addDropDownChoice(relationTypeChoice, new PanelContext(data, "ganttRelationType", THREEQUART,
           getString("gantt.relationType"), LABEL_LENGTH2));
@@ -276,7 +277,7 @@ public class TaskFormRenderer extends AbstractFormRenderer
     {
       // Gantt: predecessor
       final TaskSelectPanel ganttPredecessorSelectPanel = new TaskSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<TaskDO>(data,
-          "ganttPredecessor"), taskEditPage, "ganttPredecessorId");
+      "ganttPredecessor"), taskEditPage, "ganttPredecessorId");
       ganttPredecessorSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
       doPanel.addSelectPanel(ganttPredecessorSelectPanel, new PanelContext(VALUE_LENGTH, getString("gantt.predecessor"), LABEL_LENGTH2));
       ganttPredecessorSelectPanel.setEnableLinks(isNew() == false); // Enable click-able ancestor tasks only for edit mode.
@@ -300,6 +301,7 @@ public class TaskFormRenderer extends AbstractFormRenderer
       if (projekt != null) {
         final LabelPanel projektKostLabel = new LabelPanel(repeatingView.newChildId(), projekt.getKost() + ".*");
         WicketUtils.addTooltip(projektKostLabel.getLabel(), new Model<String>() {
+          @Override
           public String getObject()
           {
             final List<Kost2DO> kost2DOs = taskDao.getTaskTree().getKost2List(projekt, data, data.getKost2BlackWhiteItems(),
@@ -317,7 +319,7 @@ public class TaskFormRenderer extends AbstractFormRenderer
       final Kost2SelectPanel kost2SelectPanel = new Kost2SelectPanel(repeatingView.newChildId(),
           new PropertyModel<Kost2DO>(this, "kost2Id"), taskEditPage, "kost2Id") {
         @Override
-        protected void beforeSelectPage(PageParameters parameters)
+        protected void beforeSelectPage(final PageParameters parameters)
         {
           super.beforeSelectPage(parameters);
           if (projekt != null) {
@@ -329,8 +331,8 @@ public class TaskFormRenderer extends AbstractFormRenderer
       repeatingView.add(kost2SelectPanel);
       kost2SelectPanel.init();
       final LabelValueChoiceRenderer<Boolean> kost2listTypeChoiceRenderer = new LabelValueChoiceRenderer<Boolean>() //
-          .addValue(Boolean.FALSE, getString("task.kost2list.whiteList")) //
-          .addValue(Boolean.TRUE, getString("task.kost2list.blackList"));
+      .addValue(Boolean.FALSE, getString("task.kost2list.whiteList")) //
+      .addValue(Boolean.TRUE, getString("task.kost2list.blackList"));
 
       final DropDownChoicePanel<Boolean> kost2listTypeChoicePanel = new DropDownChoicePanel<Boolean>(repeatingView.newChildId(),
           new PropertyModel<Boolean>(data, "kost2IsBlackList"), kost2listTypeChoiceRenderer.getValues(), kost2listTypeChoiceRenderer);
@@ -345,7 +347,7 @@ public class TaskFormRenderer extends AbstractFormRenderer
     {
       protectTimesheetsUntilPanel = new DatePanel(DateFieldLPanel.DATE_FIELD_ID, new PropertyModel<Date>(data, "protectTimesheetsUntil"),
           DatePanelSettings.get().withCallerPage(taskEditPage).withTargetType(java.sql.Date.class).withSelectProperty(
-              "protectTimesheetsUntil"));
+          "protectTimesheetsUntil"));
       doPanel.addDateFieldPanel(protectTimesheetsUntilPanel, new PanelContext(data, "protectTimesheetsUntil", FULL,
           getString("task.protectTimesheetsUntil"), LABEL_LENGTH2));
       if (userGroupCache.isUserMemberOfFinanceGroup() == false) {
@@ -366,6 +368,15 @@ public class TaskFormRenderer extends AbstractFormRenderer
         timesheetBookingStatusChoice.setEnabled(false);
       }
     }
+    if (userGroupCache.isUserMemberOfFinanceGroup() == true) {
+      // Protection of privacy:
+      doPanel.addLabel(getString("task.protectionOfPrivacy"), new PanelContext(LABEL_LENGTH2).setBreakBefore(true));
+      final RepeatingView repeatingView = doPanel.addRepeater(new PanelContext(VALUE_LENGTH)).getRepeatingView();
+      final CheckBoxLabelPanel checkBoxLabelPanel = new CheckBoxLabelPanel(repeatingView.newChildId(), new PropertyModel<Boolean>(data,
+      "protectionOfPrivacy"), getString("task.protectionOfPrivacy.description"));
+      repeatingView.add(checkBoxLabelPanel);
+      checkBoxLabelPanel.setTooltip(getString("task.protectionOfPrivacy.tooltip"));
+    }
   }
 
   public Integer getKost2Id()
@@ -373,7 +384,7 @@ public class TaskFormRenderer extends AbstractFormRenderer
     return kost2Id;
   }
 
-  public void setKost2Id(Integer kost2Id)
+  public void setKost2Id(final Integer kost2Id)
   {
     this.kost2Id = kost2Id;
   }

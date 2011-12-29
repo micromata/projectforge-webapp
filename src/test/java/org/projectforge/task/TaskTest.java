@@ -68,32 +68,32 @@ public class TaskTest extends TestBase
 
   private TimesheetDao timesheetDao;
 
-  public void setTaskDao(TaskDao taskDao)
+  public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
   }
 
-  public void setProjektDao(ProjektDao projektDao)
+  public void setProjektDao(final ProjektDao projektDao)
   {
     this.projektDao = projektDao;
   }
 
-  public void setKost2Dao(Kost2Dao kost2Dao)
+  public void setKost2Dao(final Kost2Dao kost2Dao)
   {
     this.kost2Dao = kost2Dao;
   }
 
-  public void setKost2ArtDao(Kost2ArtDao kost2ArtDao)
+  public void setKost2ArtDao(final Kost2ArtDao kost2ArtDao)
   {
     this.kost2ArtDao = kost2ArtDao;
   }
 
-  public void setTaskTree(TaskTree taskTree)
+  public void setTaskTree(final TaskTree taskTree)
   {
     this.taskTree = taskTree;
   }
 
-  public void setTimesheetDao(TimesheetDao timesheetDao)
+  public void setTimesheetDao(final TimesheetDao timesheetDao)
   {
     this.timesheetDao = timesheetDao;
   }
@@ -101,17 +101,17 @@ public class TaskTest extends TestBase
   @Test
   public void testTaskDO()
   {
-    List<TaskDO> list = taskDao.internalLoadAll();
-    for (TaskDO task : list) {
+    final List<TaskDO> list = taskDao.internalLoadAll();
+    for (final TaskDO task : list) {
       if ("root".equals(task.getTitle()) == true) {
         assertNull("Only root node has no parent task.", task.getParentTaskId());
       } else {
         assertNotNull("Only root node has no parent task.", task.getParentTaskId());
       }
     }
-    TaskDO task = super.getTask("1.1");
+    final TaskDO task = super.getTask("1.1");
     logon(ADMIN);
-    TaskDO dbTask = taskDao.getById(task.getId());
+    final TaskDO dbTask = taskDao.getById(task.getId());
     assertEquals(task.getId(), dbTask.getId());
     assertEquals(task.getTitle(), dbTask.getTitle());
   }
@@ -119,21 +119,21 @@ public class TaskTest extends TestBase
   @Test
   public void testTaskTree()
   {
-    TaskTree taskTree = taskDao.getTaskTree();
-    TaskNode root = taskTree.getRootTaskNode();
+    final TaskTree taskTree = taskDao.getTaskTree();
+    final TaskNode root = taskTree.getRootTaskNode();
     assertNull(root.getParent());
     assertEquals("root", root.getTask().getTitle());
     assertNotNull("root node must have childs", root.getChilds());
     assertTrue("root node must have childs", root.getChilds().size() > 0);
 
-    TaskNode node1_1 = taskTree.getTaskNodeById(getTask("1.1").getId());
+    final TaskNode node1_1 = taskTree.getTaskNodeById(getTask("1.1").getId());
     assertEquals(getTask("1.1").getTitle(), node1_1.getTask().getTitle());
     assertEquals(getTask("1.1").getParentTaskId(), node1_1.getParent().getId());
-    TaskNode node1 = taskTree.getTaskNodeById(getTask("1").getId());
-    List<TaskNode> list = node1.getChilds();
+    final TaskNode node1 = taskTree.getTaskNodeById(getTask("1").getId());
+    final List<TaskNode> list = node1.getChilds();
     assertEquals("Childs of 1 are 1.1 and 1.2", 2, list.size());
-    TaskNode task1_1_1 = taskTree.getTaskNodeById(getTask("1.1.1").getId());
-    List<TaskNode> path = task1_1_1.getPathToRoot();
+    final TaskNode task1_1_1 = taskTree.getTaskNodeById(getTask("1.1.1").getId());
+    final List<TaskNode> path = task1_1_1.getPathToRoot();
     assertEquals("Node has 2 ancestors plus itself.", 3, path.size());
     assertEquals("Top task in path should be '1'", getTask("1").getId(), path.get(0).getId());
     assertEquals("Second task in path sould be '1.1'", getTask("1.1").getId(), path.get(1).getId());
@@ -143,8 +143,8 @@ public class TaskTest extends TestBase
   @Test
   public void testTraversingTaskTree()
   {
-    TaskTree taskTree = taskDao.getTaskTree();
-    TaskNode root = taskTree.getRootTaskNode();
+    final TaskTree taskTree = taskDao.getTaskTree();
+    final TaskNode root = taskTree.getRootTaskNode();
     logStart("Traversing TaskTree");
     traverseTaskTree(root);
     logEnd();
@@ -153,23 +153,23 @@ public class TaskTest extends TestBase
   @Test
   public void testCyclicTasks()
   {
-    TaskTree tree = taskDao.getTaskTree();
+    final TaskTree tree = taskDao.getTaskTree();
     initTestDB.addTask("cyclictest", "root");
     initTestDB.addTask("c", "cyclictest");
     initTestDB.addTask("c.1", "c");
     initTestDB.addTask("c.1.1", "c.1");
-    TaskNode c = tree.getTaskNodeById(getTask("c").getId());
-    TaskNode c_1_1 = tree.getTaskNodeById(getTask("c.1.1").getId());
+    final TaskNode c = tree.getTaskNodeById(getTask("c").getId());
+    final TaskNode c_1_1 = tree.getTaskNodeById(getTask("c.1.1").getId());
     try {
       c.setParent(c_1_1);
       fail("Cyclic reference not detected.");
-    } catch (UserException ex) {
+    } catch (final UserException ex) {
       assertEquals(TaskDao.I18N_KEY_ERROR_CYCLIC_REFERENCE, ex.getI18nKey());
     }
     try {
       c.setParent(c);
       fail("Cyclic reference not detected.");
-    } catch (UserException ex) {
+    } catch (final UserException ex) {
       assertEquals(TaskDao.I18N_KEY_ERROR_CYCLIC_REFERENCE, ex.getI18nKey());
     }
   }
@@ -177,7 +177,7 @@ public class TaskTest extends TestBase
   @Test
   public void testTaskDescendants()
   {
-    TaskTree tree = taskDao.getTaskTree();
+    final TaskTree tree = taskDao.getTaskTree();
     initTestDB.addTask("descendanttest", "root");
     initTestDB.addTask("d", "descendanttest");
     initTestDB.addTask("d.1", "d");
@@ -185,8 +185,8 @@ public class TaskTest extends TestBase
     initTestDB.addTask("d.1.2", "d.1");
     initTestDB.addTask("d.1.2.1", "d.1.2");
     initTestDB.addTask("d.2", "d");
-    TaskNode d = tree.getTaskNodeById(getTask("d").getId());
-    List<Integer> ids = d.getDescendantIds();
+    final TaskNode d = tree.getTaskNodeById(getTask("d").getId());
+    final List<Integer> ids = d.getDescendantIds();
     assertEquals(5, ids.size());
     assertTrue(ids.contains(getTask("d.1").getId()));
     assertTrue(ids.contains(getTask("d.1.1").getId()));
@@ -199,11 +199,11 @@ public class TaskTest extends TestBase
   @Test
   public void testTaskTreeUpdate()
   {
-    TaskTree tree = taskDao.getTaskTree();
+    final TaskTree tree = taskDao.getTaskTree();
     initTestDB.addTask("taskTreeUpdateTest", "root");
     initTestDB.addTask("u", "taskTreeUpdateTest");
-    TaskNode u = tree.getTaskNodeById(getTask("u").getId());
-    TaskNode parent = tree.getTaskNodeById(getTask("taskTreeUpdateTest").getId());
+    final TaskNode u = tree.getTaskNodeById(getTask("u").getId());
+    final TaskNode parent = tree.getTaskNodeById(getTask("taskTreeUpdateTest").getId());
     assertEquals("Should have no childs", false, u.hasChilds());
     assertEquals(u.getParent().getId(), parent.getId());
     initTestDB.addTask("u.1", "u");
@@ -214,20 +214,20 @@ public class TaskTest extends TestBase
     initTestDB.addTask("u.2.1", "u.2");
     initTestDB.addTask("u.2.2", "u.2");
     initTestDB.addTask("u.2.3", "u.2");
-    TaskNode u1 = tree.getTaskNodeById(getTask("u.1").getId());
-    TaskNode u2 = tree.getTaskNodeById(getTask("u.2").getId());
+    final TaskNode u1 = tree.getTaskNodeById(getTask("u.1").getId());
+    final TaskNode u2 = tree.getTaskNodeById(getTask("u.2").getId());
     assertEquals("Should have exact 3 childs", 3, u2.getChilds().size());
     // Now we move u.2.3 to u.1.1:
-    TaskDO tu_2_3 = taskDao.internalGetById(getTask("u.2.3").getId());
+    final TaskDO tu_2_3 = taskDao.internalGetById(getTask("u.2.3").getId());
     tu_2_3.setTitle("u.1.1");
     taskDao.setParentTask(tu_2_3, getTask("u.1").getId());
     taskDao.internalUpdate(tu_2_3);
     assertEquals("Should have exact 2 childs", 2, u2.getChilds().size());
     assertEquals("Should have exact 1 child", 1, u1.getChilds().size());
-    TaskDO tu_1_1 = taskDao.internalGetById(getTask("u.2.3").getId());
+    final TaskDO tu_1_1 = taskDao.internalGetById(getTask("u.2.3").getId());
     assertEquals("u.1.1", tu_1_1.getTitle());
     assertEquals(getTask("u.1").getId(), tu_1_1.getParentTaskId());
-    TaskNode u_1_1 = tree.getTaskNodeById(tu_1_1.getId());
+    final TaskNode u_1_1 = tree.getTaskNodeById(tu_1_1.getId());
     assertEquals("u.1.1", u_1_1.getTask().getTitle());
     assertEquals(getTask("u.1").getId(), u_1_1.getParent().getId());
   }
@@ -252,7 +252,7 @@ public class TaskTest extends TestBase
     try {
       taskDao.getById(getTask("a.1").getId());
       fail("User has no access to select task a.1");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       assertAccessException(ex, getTask("a.1").getId(), AccessType.TASKS, OperationType.SELECT);
     }
     initTestDB.addGroup("taskTest1", new String[] { "taskTest1"});
@@ -265,7 +265,7 @@ public class TaskTest extends TestBase
     try {
       taskDao.update(task);
       fail("User has no access to insert task as child of a.2");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       assertAccessException(ex, getTask("a.2").getId(), AccessType.TASKS, OperationType.INSERT);
     }
     initTestDB.createGroupTaskAccess(getGroup("taskTest1"), getTask("a.2"), AccessType.TASKS, true, false, false, false);
@@ -274,7 +274,7 @@ public class TaskTest extends TestBase
     try {
       taskDao.update(task);
       fail("User has no access to update child task of a.2");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       assertAccessException(ex, getTask("a.2.1").getId(), AccessType.TASKS, OperationType.UPDATE);
     }
 
@@ -288,7 +288,7 @@ public class TaskTest extends TestBase
     try {
       taskDao.update(task);
       fail("User has no access to delete child task from a.2");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       assertAccessException(ex, getTask("a.2").getId(), AccessType.TASKS, OperationType.DELETE);
     }
   }
@@ -296,22 +296,22 @@ public class TaskTest extends TestBase
   @Test
   public void checkAccess()
   {
-    TaskDO task = initTestDB.addTask("checkAccessTestTask", "root");
+    final TaskDO task = initTestDB.addTask("checkAccessTestTask", "root");
     initTestDB.addGroup("checkAccessTestGroup", new String[] { TEST_USER});
     initTestDB.createGroupTaskAccess(getGroup("checkAccessTestGroup"), getTask("checkAccessTestTask"), AccessType.TASKS, true, true, true,
         true);
     logon(TEST_FINANCE_USER);
-    Kost2ArtDO kost2Art = new Kost2ArtDO();
+    final Kost2ArtDO kost2Art = new Kost2ArtDO();
     kost2Art.setId(42);
     kost2Art.setName("Test");
     kost2ArtDao.save(kost2Art);
-    Kost2DO kost2 = new Kost2DO();
+    final Kost2DO kost2 = new Kost2DO();
     kost2.setNummernkreis(3);
     kost2.setBereich(0);
     kost2.setTeilbereich(42);
     kost2.setKost2Art(kost2Art);
     kost2Dao.save(kost2);
-    ProjektDO projekt = new ProjektDO();
+    final ProjektDO projekt = new ProjektDO();
     projekt.setInternKost2_4(123);
     projekt.setName("Testprojekt");
     projektDao.save(projekt);
@@ -330,14 +330,14 @@ public class TaskTest extends TestBase
         TEST_USER});
     initTestDB.createGroupTaskAccess(projectManagers, task, AccessType.TASKS, true, true, true, true); // All rights.
     final ProjektDO projekt = new ProjektDO().setName("checkKost2AndTimesheetBookingStatusAccess").setInternKost2_4(764).setNummer(1)
-        .setProjektManagerGroup(projectManagers).setTask(task);
+    .setProjektManagerGroup(projectManagers).setTask(task);
     projektDao.save(projekt);
     logon(TEST_USER);
     TaskDO task1 = new TaskDO().setParentTask(task).setTitle("Task 1").setKost2BlackWhiteList("Hurzel");
     try {
       taskDao.save(task1);
       fail("AccessException expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       assertEquals("task.error.kost2Readonly", ex.getI18nKey()); // OK
     }
     try {
@@ -345,7 +345,7 @@ public class TaskTest extends TestBase
       task1.setKost2IsBlackList(true);
       taskDao.save(task1);
       fail("AccessException expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       assertEquals("task.error.kost2Readonly", ex.getI18nKey()); // OK
     }
     try {
@@ -353,7 +353,7 @@ public class TaskTest extends TestBase
       task1.setTimesheetBookingStatus(TimesheetBookingStatus.ONLY_LEAFS);
       taskDao.save(task1);
       fail("AccessException expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       assertEquals("task.error.timesheetBookingStatus2Readonly", ex.getI18nKey()); // OK
     }
     logon(TEST_PROJECT_MANAGER_USER);
@@ -365,7 +365,7 @@ public class TaskTest extends TestBase
     try {
       taskDao.update(task1);
       fail("AccessException expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       assertEquals("task.error.kost2Readonly", ex.getI18nKey()); // OK
     }
     try {
@@ -373,7 +373,7 @@ public class TaskTest extends TestBase
       task1.setKost2IsBlackList(false);
       taskDao.update(task1);
       fail("AccessException expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       assertEquals("task.error.kost2Readonly", ex.getI18nKey()); // OK
     }
     try {
@@ -381,7 +381,7 @@ public class TaskTest extends TestBase
       task1.setTimesheetBookingStatus(TimesheetBookingStatus.INHERIT);
       taskDao.update(task1);
       fail("AccessException expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       assertEquals("task.error.timesheetBookingStatus2Readonly", ex.getI18nKey()); // OK
     }
     logon(TEST_PROJECT_MANAGER_USER);
@@ -391,7 +391,7 @@ public class TaskTest extends TestBase
     taskDao.update(task1);
   }
 
-  private void checkAccess(String user, Serializable id, ProjektDO projekt, Kost2DO kost2)
+  private void checkAccess(final String user, final Serializable id, final ProjektDO projekt, final Kost2DO kost2)
   {
     logon(user);
     TaskDO task = taskDao.getById(id);
@@ -399,9 +399,18 @@ public class TaskTest extends TestBase
     try {
       taskDao.update(task);
       fail("AccessException expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       // OK
       assertEquals("task.error.protectTimesheetsUntilReadonly", ex.getI18nKey());
+    }
+    task.setProtectTimesheetsUntil(null);
+    task.setProtectionOfPrivacy(true);
+    try {
+      taskDao.update(task);
+      fail("AccessException expected.");
+    } catch (final AccessException ex) {
+      // OK
+      assertEquals("task.error.protectionOfPrivacyReadonly", ex.getI18nKey());
     }
     task = taskDao.getById(id);
     task = new TaskDO();
@@ -410,9 +419,18 @@ public class TaskTest extends TestBase
     try {
       taskDao.save(task);
       fail("AccessException expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       // OK
       assertEquals("task.error.protectTimesheetsUntilReadonly", ex.getI18nKey());
+    }
+    task.setProtectTimesheetsUntil(null);
+    task.setProtectionOfPrivacy(true);
+    try {
+      taskDao.save(task);
+      fail("AccessException expected.");
+    } catch (final AccessException ex) {
+      // OK
+      assertEquals("task.error.protectionOfPrivacyReadonly", ex.getI18nKey());
     }
     task = taskDao.getById(id);
   }
@@ -431,7 +449,7 @@ public class TaskTest extends TestBase
       // Try to insert sister task with same name:
       initTestDB.addTask("dT.1.1", "dT.1");
       fail("Duplicate task was not detected.");
-    } catch (UserException ex) {
+    } catch (final UserException ex) {
       assertEquals(TaskDao.I18N_KEY_ERROR_DUPLICATE_CHILD_TASKS, ex.getI18nKey());
     }
     TaskDO task = initTestDB.addTask("dT.1.2", "dT.1");
@@ -440,7 +458,7 @@ public class TaskTest extends TestBase
       // Try to rename task to same name as a sister task:
       taskDao.internalUpdate(task);
       fail("Duplicate task was not detected.");
-    } catch (UserException ex) {
+    } catch (final UserException ex) {
       assertEquals(TaskDao.I18N_KEY_ERROR_DUPLICATE_CHILD_TASKS, ex.getI18nKey());
     }
     task = initTestDB.addTask("dT.1.1", "dT.2");
@@ -449,7 +467,7 @@ public class TaskTest extends TestBase
       // Try to move task from dT.1.2 to dT.1.1 where already a task with the same name exists.
       taskDao.internalUpdate(task);
       fail("Duplicate task was not detected.");
-    } catch (UserException ex) {
+    } catch (final UserException ex) {
       assertEquals(TaskDao.I18N_KEY_ERROR_DUPLICATE_CHILD_TASKS, ex.getI18nKey());
     }
     task.setParentTask(initTestDB.getTask("dT.2"));
@@ -464,7 +482,7 @@ public class TaskTest extends TestBase
     final TaskDO subTask1 = initTestDB.addTask("totalDurationTask.subtask1", "totalDurationTask");
     final TaskDO subTask2 = initTestDB.addTask("totalDurationTask.subtask2", "totalDurationTask");
     assertEquals(0, taskDao.readTotalDuration(task.getId()));
-    DateHolder dh = new DateHolder();
+    final DateHolder dh = new DateHolder();
     dh.setDate(2010, Calendar.APRIL, 20, 8, 0);
     TimesheetDO ts = new TimesheetDO().setUser(getUser(TEST_USER)).setStartDate(dh.getDate()).setStopTime(
         dh.add(Calendar.HOUR_OF_DAY, 4).getTimestamp()).setTask(task);
@@ -488,12 +506,12 @@ public class TaskTest extends TestBase
         assertFalse("Entry should only exist once.", taskFound);
         assertFalse("Entry not first.", subtask1Found);
         taskFound = true;
-        assertEquals(new Long(8 * 3600), (Long) oa[0]);
+        assertEquals(new Long(8 * 3600), oa[0]);
       } else if (taskId == subTask1.getId()) {
         assertFalse("Entry should only exist once.", subtask1Found);
         assertTrue("Entry not second.", taskFound);
         subtask1Found = true;
-        assertEquals(new Long(4 * 3600), (Long) oa[0]);
+        assertEquals(new Long(4 * 3600), oa[0]);
       } else if (taskId == subTask2.getId()) {
         fail("Entry not not expected.");
       }
@@ -523,12 +541,12 @@ public class TaskTest extends TestBase
     return taskTree.getTaskNodeById(taskId).getDuration(taskTree, false);
   }
 
-  private void traverseTaskTree(TaskNode node)
+  private void traverseTaskTree(final TaskNode node)
   {
     logDot();
-    List<TaskNode> childs = node.getChilds();
+    final List<TaskNode> childs = node.getChilds();
     if (childs != null) {
-      for (TaskNode child : childs) {
+      for (final TaskNode child : childs) {
         assertEquals("Child should have parent id of current node.", node.getId(), child.getParentId());
         traverseTaskTree(child);
       }
