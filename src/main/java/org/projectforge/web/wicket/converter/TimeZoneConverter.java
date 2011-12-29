@@ -45,7 +45,12 @@ public class TimeZoneConverter implements IConverter
     }
     final int ind = value.indexOf(" (");
     final String id = ind >= 0 ? value.substring(0, ind) : value;
-    return TimeZone.getTimeZone(id);
+    final TimeZone timeZone = TimeZone.getTimeZone(id);
+    if (timeZone.getID().toLowerCase(locale).equals(id.toLowerCase(locale)) == false) {
+      error();
+      return null;
+    }
+    return timeZone;
   }
 
   @Override
@@ -56,5 +61,12 @@ public class TimeZoneConverter implements IConverter
     }
     final TimeZone timeZone = (TimeZone) value;
     return timeZone.getID() + " (" + timeZone.getDisplayName(locale) + ")";
+  }
+
+  /**
+   * Will be called if convert to Object fails. Does nothing at default.
+   */
+  protected void error()
+  {
   }
 }

@@ -48,14 +48,20 @@ public class TimeZoneField extends PFAutoCompleteTextField<TimeZone>
 {
   private static final long serialVersionUID = 6795639659992455936L;
 
-  private static final IConverter converter = new TimeZoneConverter();
+  @SuppressWarnings("serial")
+  private final IConverter converter = new TimeZoneConverter() {
+    @Override
+    protected void error() {
+      TimeZoneField.this.error(getString("error.timezone.unsupported"));
+    };
+  };
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
-  private List<TimeZone> favoriteTimeZones;
+  private final List<TimeZone> favoriteTimeZones;
 
-  private List<TimeZone> timeZones;
+  private final List<TimeZone> timeZones;
 
   public TimeZoneField(final String id, final IModel<TimeZone> model)
   {
@@ -64,7 +70,7 @@ public class TimeZoneField extends PFAutoCompleteTextField<TimeZone>
     Arrays.sort(availableTimeZones);
     timeZones = getAsTimeZoneObjects(availableTimeZones);
     final List<String> favoritesIds = new ArrayList<String>();
-    for (PFUserDO user : userGroupCache.getAllUsers()) {
+    for (final PFUserDO user : userGroupCache.getAllUsers()) {
       final String timeZone = user.getTimeZone();
       if (timeZone == null) {
         continue;
@@ -82,7 +88,7 @@ public class TimeZoneField extends PFAutoCompleteTextField<TimeZone>
   }
 
   @Override
-  protected List<TimeZone> getChoices(String input)
+  protected List<TimeZone> getChoices(final String input)
   {
     final List<TimeZone> result = new ArrayList<TimeZone>();
     for (final TimeZone timeZone : timeZones) {
@@ -95,7 +101,7 @@ public class TimeZoneField extends PFAutoCompleteTextField<TimeZone>
   }
 
   @Override
-  public IConverter getConverter(Class< ? > type)
+  public IConverter getConverter(final Class< ? > type)
   {
     return converter;
   }
@@ -107,7 +113,7 @@ public class TimeZoneField extends PFAutoCompleteTextField<TimeZone>
   }
 
   @Override
-  protected String formatValue(TimeZone value)
+  protected String formatValue(final TimeZone value)
   {
     return converter.convertToString(value, getLocale());
   }
