@@ -23,9 +23,11 @@
 
 package org.projectforge.web.wicket.components;
 
+import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * Panel for using as content top menu entry (needed for css decoration).
@@ -36,13 +38,50 @@ public class ContentMenuEntryPanel extends Panel
 {
   private static final long serialVersionUID = -5507326592369611604L;
 
+  private final AbstractLink link;
+
   public ContentMenuEntryPanel(final String id, final AbstractLink link, final String label)
   {
     super(id);
+    this.link = link;
     setRenderBodyOnly(true);
     add(link);
     final Label labelComp = new Label("label", label);
     labelComp.setRenderBodyOnly(true);
     link.add(labelComp);
+  }
+
+  /**
+   * Adds html attribute "accesskey".
+   * @param ch
+   * @return this for chaining.
+   */
+  public ContentMenuEntryPanel setAccessKey(final char ch)
+  {
+    link.add(new SimpleAttributeModifier("accesskey", String.valueOf(ch)));
+    return this;
+  }
+
+  /**
+   * @param tooltip
+   * @return this for chaining.
+   * @see WicketUtils#addTooltip(org.apache.wicket.Component, String)
+   */
+  public ContentMenuEntryPanel setTooltip(final String tooltip)
+  {
+    WicketUtils.addTooltip(link, tooltip);
+    return this;
+  }
+
+  /**
+   * @param title
+   * @param text
+   * @return this for chaining.
+   * @see WicketUtils#addTooltip(org.apache.wicket.Component, String, String)
+   */
+  public ContentMenuEntryPanel setTooltip(final String title, final String text)
+  {
+    WicketUtils.addTooltip(link, title, text);
+    return this;
   }
 }
