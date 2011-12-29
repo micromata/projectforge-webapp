@@ -67,7 +67,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
 
   private RecentQueue<String> recentUsers;
 
-  private PFAutoCompleteTextField<PFUserDO> userTextField;
+  private final PFAutoCompleteTextField<PFUserDO> userTextField;
 
   // Only used for detecting changes:
   private PFUserDO currentUser;
@@ -85,14 +85,6 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
   {
     this(id, model, null, caller, selectProperty);
   }
-
-  /**
-   * @param id
-   * @param model
-   * @param label Only needed for validation messages (feed back).
-   * @param caller
-   * @param selectProperty
-   */
 
   /**
    * @param id
@@ -213,11 +205,12 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
    * Should be called before init() method. If true, then the validation will be done after submitting.
    * @param defaultFormProcessing
    */
-  public void setDefaultFormProcessing(boolean defaultFormProcessing)
+  public void setDefaultFormProcessing(final boolean defaultFormProcessing)
   {
     this.defaultFormProcessing = defaultFormProcessing;
   }
 
+  @Override
   @SuppressWarnings("serial")
   public UserSelectPanel init()
   {
@@ -238,7 +231,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
       public boolean isVisible()
       {
         // Is visible if no user is given or the given user is not the current logged in user.
-        PFUserDO user = getModelObject();
+        final PFUserDO user = getModelObject();
         return user == null || user.getId().equals(PFUserContext.getUser().getId()) == false;
       }
     };
