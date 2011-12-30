@@ -35,6 +35,8 @@ import org.projectforge.database.DatabaseUpdateDO;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.Table;
 import org.projectforge.database.TableAttribute;
+import org.projectforge.fibu.EingangsrechnungDO;
+import org.projectforge.fibu.KundeDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
@@ -50,17 +52,21 @@ public class DatabaseCoreUpdates
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
     // /////////////////////////////////////////////////////////////////
-    // 3.6.1.3
+    // 3.6.2
     // /////////////////////////////////////////////////////////////////
     list.add(new UpdateEntryImpl(CORE_REGION_ID, "3.6.1.3", "2011-12-05",
-    "Adds columns t_task.protection_of_privacy and t_address.communication_language.") {
+    "Adds columns t_kunde.konto_id, t_task.protection_of_privacy and t_address.communication_language.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        final Table kundeTable = new Table(KundeDO.class);
+        final Table eingangsrechnungTable = new Table(EingangsrechnungDO.class);
         final Table taskTable = new Table(TaskDO.class);
         final Table addressTable = new Table(AddressDO.class);
-        return dao.doesTableAttributesExist(addressTable, "communicationLanguage") == true //
+        return dao.doesTableAttributesExist(kundeTable, "konto") == true //
+        && dao.doesTableAttributesExist(eingangsrechnungTable, "konto") == true //
+        && dao.doesTableAttributesExist(addressTable, "communicationLanguage") == true //
         && dao.doesTableAttributesExist(taskTable, "protectionOfPrivacy") //
         ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
       }
@@ -69,6 +75,14 @@ public class DatabaseCoreUpdates
       public UpdateRunningStatus runUpdate()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        final Table kundeTable = new Table(KundeDO.class);
+        if (dao.doesTableAttributesExist(kundeTable, "konto") == false) {
+          dao.addTableAttributes(kundeTable, new TableAttribute(KundeDO.class, "konto"));
+        }
+        final Table eingangsrechnungTable = new Table(EingangsrechnungDO.class);
+        if (dao.doesTableAttributesExist(eingangsrechnungTable, "konto") == false) {
+          dao.addTableAttributes(eingangsrechnungTable, new TableAttribute(EingangsrechnungDO.class, "konto"));
+        }
         final Table taskTable = new Table(TaskDO.class);
         if (dao.doesTableAttributesExist(taskTable, "protectionOfPrivacy") == false) {
           dao.addTableAttributes(taskTable, new TableAttribute(TaskDO.class, "protectionOfPrivacy").setDefaultValue("false"));
