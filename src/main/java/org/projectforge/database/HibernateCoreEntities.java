@@ -40,9 +40,6 @@ class HibernateCoreEntities
     org.projectforge.fibu.AuftragDO.class, //
     org.projectforge.fibu.AuftragsPositionDO.class, //
     org.projectforge.fibu.EmployeeDO.class, //
-    org.projectforge.fibu.BankAccountDO.class, //
-    org.projectforge.fibu.BankAccountBalanceDO.class, //
-    org.projectforge.fibu.BankAccountingEntryDO.class, //
     org.projectforge.fibu.EmployeeSalaryDO.class, //
     org.projectforge.fibu.EingangsrechnungDO.class, //
     org.projectforge.fibu.EingangsrechnungsPositionDO.class, //
