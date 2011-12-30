@@ -150,12 +150,14 @@ public abstract class AbstractPlugin
    * @param daoClassType The dao object type.
    * @param baseDao The dao itself.
    * @param i18nPrefix The prefix for i18n keys.
+   * @return New RegistryEntry.
    */
-  protected void register(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > baseDao,
+  protected RegistryEntry register(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > baseDao,
       final String i18nPrefix)
   {
     final RegistryEntry entry = new RegistryEntry(id, daoClassType, baseDao, i18nPrefix);
     register(entry);
+    return entry;
   }
 
   /**
