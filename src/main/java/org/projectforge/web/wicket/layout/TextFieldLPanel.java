@@ -37,8 +37,6 @@ import org.projectforge.web.wicket.components.MaxLengthTextField;
  */
 public class TextFieldLPanel extends AbstractLPanel implements IField
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TextFieldLPanel.class);
-
   private static final long serialVersionUID = 5771712946605166500L;
 
   /**
@@ -76,7 +74,10 @@ public class TextFieldLPanel extends AbstractLPanel implements IField
       textField.add(new FocusOnLoadBehavior());
     }
     if (ctx.isReadonly() == true) {
-      log.error("Field read-only isn't yet supported by this method. If needed, please implement this.");
+      textField.setEnabled(false);
+    }
+    if (ctx.isEnabled() == false) {
+      textField.setEnabled(false);
     }
   }
 
