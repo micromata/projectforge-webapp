@@ -37,9 +37,11 @@ import org.projectforge.common.NumberHelper;
  */
 public class TotalNewCounterModel extends Model<Integer>
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TotalNewCounterModel.class);
+
   private static final long serialVersionUID = -900845361698793144L;
 
-  private List<IModel<Integer>> models = new ArrayList<IModel<Integer>>();
+  private final List<IModel<Integer>> models = new ArrayList<IModel<Integer>>();
 
   public void add(final IModel<Integer> model)
   {
@@ -54,9 +56,13 @@ public class TotalNewCounterModel extends Model<Integer>
     }
     Integer totalCounter = 0;
     for (final IModel<Integer> model : models) {
-      final Integer counter = model.getObject();
-      if (NumberHelper.greaterZero(counter) == true) {
-        totalCounter += counter;
+      try {
+        final Integer counter = model.getObject();
+        if (NumberHelper.greaterZero(counter) == true) {
+          totalCounter += counter;
+        }
+      } catch (final Throwable ex) {
+        log.error(ex.getMessage(), ex);
       }
     }
     if (NumberHelper.greaterZero(totalCounter) == false) {
