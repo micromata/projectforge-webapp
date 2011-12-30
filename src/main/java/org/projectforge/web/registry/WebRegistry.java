@@ -59,8 +59,6 @@ import org.projectforge.web.fibu.AccountingRecordEditPage;
 import org.projectforge.web.fibu.AccountingRecordListPage;
 import org.projectforge.web.fibu.AuftragEditPage;
 import org.projectforge.web.fibu.AuftragListPage;
-import org.projectforge.web.fibu.BankAccountEditPage;
-import org.projectforge.web.fibu.BankAccountListPage;
 import org.projectforge.web.fibu.CustomerEditPage;
 import org.projectforge.web.fibu.CustomerListPage;
 import org.projectforge.web.fibu.DatevImportPage;
@@ -140,11 +138,11 @@ public class WebRegistry
 
   private static final WebRegistry instance = new WebRegistry();
 
-  private Map<String, WebRegistryEntry> map = new HashMap<String, WebRegistryEntry>();
+  private final Map<String, WebRegistryEntry> map = new HashMap<String, WebRegistryEntry>();
 
-  private List<WebRegistryEntry> orderedList = new ArrayList<WebRegistryEntry>();
+  private final List<WebRegistryEntry> orderedList = new ArrayList<WebRegistryEntry>();
 
-  private Map<String, Class< ? extends WebPage>> mountPages = new HashMap<String, Class< ? extends WebPage>>();
+  private final Map<String, Class< ? extends WebPage>> mountPages = new HashMap<String, Class< ? extends WebPage>>();
 
   public static WebRegistry instance()
   {
@@ -202,7 +200,7 @@ public class WebRegistry
     Validate.notNull(existingEntry);
     Validate.notNull(entry);
     map.put(entry.getId(), entry);
-    int idx = orderedList.indexOf(existingEntry);
+    final int idx = orderedList.indexOf(existingEntry);
     if (idx < 0) {
       log.error("Registry entry '" + existingEntry.getId() + "' not found. Appending the given entry to the list.");
       orderedList.add(entry);
@@ -300,7 +298,6 @@ public class WebRegistry
     register(DaoRegistry.ORDERBOOK, AuftragListPage.class);
     addMountPages(DaoRegistry.ORDERBOOK, AuftragListPage.class, AuftragEditPage.class);
 
-    addMountPages("bankAccount", BankAccountListPage.class, BankAccountEditPage.class);
     addMountPages("contract", ContractListPage.class, ContractEditPage.class);
     addMountPages("employee", EmployeeListPage.class, EmployeeEditPage.class);
     addMountPages("employeeSalary", EmployeeSalaryListPage.class, EmployeeSalaryEditPage.class);
