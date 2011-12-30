@@ -95,6 +95,23 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
           for (final AddressCampaignDO addressCampaign : addressCampaignList) {
             if (addressCampaign.getId().equals(addressCampaignId) == true) {
               searchFilter.setAddressCampaign(addressCampaign);
+              final String oldValue = searchFilter.getAddressCampaignValue();
+              // Is oldValue given and not "-(null)-"?
+              if (oldValue != null && ADDRESS_CAMPAIGN_VALUE_UNDEFINED.equals(oldValue) == false) {
+                // Check whether the campaign has the former selected value or not.
+                boolean found = false;
+                for (final String value : addressCampaign.getValuesArray()) {
+                  if (oldValue.equals(value) == true) {
+                    found = true;
+                    break;
+                  }
+                }
+                if (found == false) {
+                  // Not found, therefore set the value to null:
+                  searchFilter.setAddressCampaignValue(null);
+                  addressCampaignValueDropDownChoice.modelChanged();
+                }
+              }
               break;
             }
           }
@@ -173,6 +190,7 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
     final LabelValueChoiceRenderer<String> choiceRenderer = getValueLabelValueChoiceRenderer();
     addressCampaignValueDropDownChoice.setChoiceRenderer(choiceRenderer);
     addressCampaignValueDropDownChoice.setChoices(choiceRenderer.getValues());
+    parentPage.refresh();
   }
 
   private LabelValueChoiceRenderer<String> getValueLabelValueChoiceRenderer()

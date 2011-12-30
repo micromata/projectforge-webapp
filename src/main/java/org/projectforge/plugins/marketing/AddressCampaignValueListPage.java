@@ -288,22 +288,24 @@ IListPageColumnsCreator<AddressDO>
   @Override
   public List<AddressDO> getList()
   {
-    super.getList();
-    final String value = form.getSearchFilter().getAddressCampaignValue();
-    if (StringUtils.isEmpty(value) == false) {
-      final List<AddressDO> origList = list;
-      list = new ArrayList<AddressDO>();
-      for (final AddressDO address : origList) {
-        final AddressCampaignValueDO addressCampaignValue = addressCampaignValueMap.get(address.getId());
-        if (addressCampaignValue != null && addressCampaignValue.getValue() != null) {
-          if (value.equals(addressCampaignValue.getValue()) == true) {
-            list.add(address);
-          }
-        } else {
-          // address campaign value of the given address is not set:
-          if (AddressCampaignValueListForm.ADDRESS_CAMPAIGN_VALUE_UNDEFINED.equals(value) == true) {
-            // Filter all address campaign values without defined value:
-            list.add(address);
+    if (list == null) {
+      super.getList();
+      final String value = form.getSearchFilter().getAddressCampaignValue();
+      if (StringUtils.isEmpty(value) == false) {
+        final List<AddressDO> origList = list;
+        list = new ArrayList<AddressDO>();
+        for (final AddressDO address : origList) {
+          final AddressCampaignValueDO addressCampaignValue = addressCampaignValueMap.get(address.getId());
+          if (addressCampaignValue != null && addressCampaignValue.getValue() != null) {
+            if (value.equals(addressCampaignValue.getValue()) == true) {
+              list.add(address);
+            }
+          } else {
+            // address campaign value of the given address is not set:
+            if (AddressCampaignValueListForm.ADDRESS_CAMPAIGN_VALUE_UNDEFINED.equals(value) == true) {
+              // Filter all address campaign values without defined value:
+              list.add(address);
+            }
           }
         }
       }
