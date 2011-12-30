@@ -31,9 +31,6 @@ import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.SpaceDao;
 import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.AuftragsPositionDO;
-import org.projectforge.fibu.BankAccountBalanceDO;
-import org.projectforge.fibu.BankAccountDao;
-import org.projectforge.fibu.BankAccountingEntryDO;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.EingangsrechnungsPositionDO;
 import org.projectforge.fibu.EmployeeDao;
@@ -92,8 +89,6 @@ public class DaoRegistry
   public static final String ACCOUNTING_RECORD = "accountingRecord";
 
   public static final String ADDRESS = "address";
-
-  public static final String BANK_ACCOUNT = "bankAccount";
 
   public static final String BOOK = "book";
 
@@ -154,8 +149,6 @@ public class DaoRegistry
   private AddressDao addressDao;
 
   private AuftragDao auftragDao;
-
-  private BankAccountDao bankAccountDao;
 
   private BuchungssatzDao buchungssatzDao;
 
@@ -255,8 +248,6 @@ public class DaoRegistry
     register(ACCOUNT, KontoDao.class, kontoDao, "fibu.konto");
     register(EMPLOYEE, EmployeeDao.class, employeeDao, "fibu.employee").setScriptingDao(new EmployeeScriptingDao(employeeDao));
     register(EMPLOYEE_SALARY, EmployeeDao.class, employeeSalaryDao, "fibu.employee.saraly");
-    register(BANK_ACCOUNT, BankAccountDao.class, bankAccountDao, "fibu.employee.saraly") //
-    .setNestedDOClasses(BankAccountingEntryDO.class, BankAccountBalanceDO.class);
 
     register(CONTRACT, ContractDao.class, contractDao, "legalAffaires.contract");
     register(OUTGOING_MAIL, PostausgangDao.class, postausgangDao, "orga.postausgang");
@@ -319,11 +310,6 @@ public class DaoRegistry
   public void setAuftragDao(final AuftragDao auftragDao)
   {
     this.auftragDao = auftragDao;
-  }
-
-  public void setBankAccountDao(final BankAccountDao bankAccountDao)
-  {
-    this.bankAccountDao = bankAccountDao;
   }
 
   public void setBuchungssatzDao(final BuchungssatzDao buchungssatzDao)
