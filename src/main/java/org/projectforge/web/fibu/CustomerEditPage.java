@@ -28,12 +28,13 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.KundeDao;
+import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
 
 @EditPage(defaultReturnPage = CustomerListPage.class)
-public class CustomerEditPage extends AbstractEditPage<KundeDO, CustomerEditForm, KundeDao>
+public class CustomerEditPage extends AbstractAutoLayoutEditPage<KundeDO, CustomerEditForm, KundeDao>
 {
   private static final long serialVersionUID = 8763884579951937296L;
 
@@ -42,7 +43,7 @@ public class CustomerEditPage extends AbstractEditPage<KundeDO, CustomerEditForm
   @SpringBean(name = "kundeDao")
   private KundeDao kundeDao;
 
-  public CustomerEditPage(PageParameters parameters)
+  public CustomerEditPage(final PageParameters parameters)
   {
     super(parameters, "fibu.kunde");
     init();
@@ -55,7 +56,7 @@ public class CustomerEditPage extends AbstractEditPage<KundeDO, CustomerEditForm
   }
 
   @Override
-  protected CustomerEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, KundeDO data)
+  protected CustomerEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final KundeDO data)
   {
     return new CustomerEditForm(this, data);
   }
