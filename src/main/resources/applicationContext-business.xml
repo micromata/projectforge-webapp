@@ -70,7 +70,6 @@
   <!--  FiBu -->
   <bean id="auftragDao" class="org.projectforge.fibu.AuftragDao" />
   <bean id="buchungssatzDao" class="org.projectforge.fibu.kost.BuchungssatzDao" />
-  <bean id="bankAccountDao" class="org.projectforge.fibu.BankAccountDao" />
   <bean id="eingangsrechnungDao" class="org.projectforge.fibu.EingangsrechnungDao" />
   <bean id="employeeDao" class="org.projectforge.fibu.EmployeeDao" />
   <bean id="employeeSalaryExportDao" class="org.projectforge.fibu.datev.EmployeeSalaryExportDao" />
