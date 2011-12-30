@@ -32,9 +32,11 @@ import org.apache.wicket.model.Model;
  */
 public class MenuSuffixLabel extends Label
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MenuSuffixLabel.class);
+
   private Integer counter;
 
-  private IModel<Integer> counterModel;
+  private final IModel<Integer> counterModel;
 
   private static final long serialVersionUID = 3239158008743709277L;
 
@@ -58,7 +60,11 @@ public class MenuSuffixLabel extends Label
       return "";
     }
     if (counter == null) {
-      counter = counterModel.getObject();
+      try {
+        counter = counterModel.getObject();
+      } catch (final Throwable ex) {
+        log.error(ex.getMessage(), ex);
+      }
     }
     if (counter != null && counter > 0) {
       return String.valueOf(counter);
