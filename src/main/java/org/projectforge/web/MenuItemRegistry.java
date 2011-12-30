@@ -67,7 +67,6 @@ import org.projectforge.web.core.SpaceListPage;
 import org.projectforge.web.doc.DocumentationPage;
 import org.projectforge.web.fibu.AccountingRecordListPage;
 import org.projectforge.web.fibu.AuftragListPage;
-import org.projectforge.web.fibu.BankAccountListPage;
 import org.projectforge.web.fibu.CustomerListPage;
 import org.projectforge.web.fibu.DatevImportPage;
 import org.projectforge.web.fibu.EingangsrechnungListPage;
@@ -285,8 +284,6 @@ public class MenuItemRegistry
     reg.register(fibu, MenuItemDefId.OUTGOING_INVOICE_LIST, 10, RechnungListPage.class, RechnungDao.USER_RIGHT_ID, READONLY_READWRITE);
     reg.register(fibu, MenuItemDefId.INCOMING_INVOICE_LIST, 20, EingangsrechnungListPage.class, EingangsrechnungDao.USER_RIGHT_ID,
         READONLY_READWRITE);
-    // Not yet finished:
-    reg.register(fibu, MenuItemDefId.BANK_ACCOUNT_LIST, 30, BankAccountListPage.class, developmentMode, FINANCE_GROUP, CONTROLLING_GROUP);
     {
       // Only visible if cost is configured:
       reg.register(fibu, MenuItemDefId.CUSTOMER_LIST, 40, CustomerListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
