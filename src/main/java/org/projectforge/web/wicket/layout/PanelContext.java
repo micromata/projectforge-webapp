@@ -56,7 +56,8 @@ public class PanelContext implements Serializable
 
   private IField valueField;
 
-  protected boolean breakBeforeLabel = true, breakBefore, breakBetweenLabelAndField, strong, strongLabel, required, focus, readonly;
+  protected boolean breakBeforeLabel = true, enabled = true, breakBefore, breakBetweenLabelAndField, strong, strongLabel, required, focus,
+  readonly;
 
   private String cssStyle;
 
@@ -200,7 +201,8 @@ public class PanelContext implements Serializable
   }
 
   /**
-   * Sets a tool-tip for the label. Please note: if you add a tool-tip to a component, the component's label has not automatically a tool-tip.
+   * Sets a tool-tip for the label. Please note: if you add a tool-tip to a component, the component's label has not automatically a
+   * tool-tip.
    * @param tooltip
    * @return this for chaining.
    */
@@ -241,7 +243,7 @@ public class PanelContext implements Serializable
     return this;
   }
 
-  public PanelContext setBreakBeforeLabel(boolean breakBeforeLabel)
+  public PanelContext setBreakBeforeLabel(final boolean breakBeforeLabel)
   {
     this.breakBeforeLabel = breakBeforeLabel;
     return this;
@@ -286,7 +288,7 @@ public class PanelContext implements Serializable
    * @param alignment
    * @return this for chaining.
    */
-  public PanelContext setAlignment(LayoutAlignment alignment)
+  public PanelContext setAlignment(final LayoutAlignment alignment)
   {
     this.alignment = alignment;
     return this;
@@ -320,6 +322,16 @@ public class PanelContext implements Serializable
     return this;
   }
 
+  /**
+   * @param focus
+   * @return this for chaining.
+   */
+  public PanelContext setFocus(final boolean focus)
+  {
+    this.focus = focus;
+    return this;
+  }
+
   public boolean isStrong()
   {
     return strong;
@@ -342,7 +354,7 @@ public class PanelContext implements Serializable
   /**
    * @return this for chaining.
    */
-  public PanelContext setStrongLabel(boolean strongLabel)
+  public PanelContext setStrongLabel(final boolean strongLabel)
   {
     this.strongLabel = strongLabel;
     return this;
@@ -359,6 +371,31 @@ public class PanelContext implements Serializable
   public PanelContext setReadonly()
   {
     this.readonly = true;
+    return this;
+  }
+
+  /**
+   * @param readonly
+   * @return this for chaining.
+   */
+  public PanelContext setReadonly(final boolean readonly)
+  {
+    this.readonly = readonly;
+    return this;
+  }
+
+  public boolean isEnabled()
+  {
+    return enabled;
+  }
+
+  /**
+   * @param enabled
+   * @return this for chaining.
+   */
+  public PanelContext setEnabled(final boolean enabled)
+  {
+    this.enabled = enabled;
     return this;
   }
 
