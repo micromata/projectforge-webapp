@@ -38,6 +38,7 @@ import org.projectforge.user.UserPrefArea;
 import org.projectforge.user.UserPrefAreaRegistry;
 import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefDao;
+import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
@@ -111,6 +112,23 @@ public class UserPrefListPage extends AbstractListPage<UserPrefListForm, UserPre
         "lastUpdate", cellItemListener));
     dataTable = createDataTable(columns, null, false);
     form.add(dataTable);
+  }
+
+  /**
+   * Gets the current area and preset this area for the edit page.
+   * @see org.projectforge.web.wicket.AbstractListPage#onNewEntryClick(org.apache.wicket.PageParameters)
+   */
+  @Override
+  protected AbstractEditPage< ? , ? , ? > redirectToEditPage(PageParameters params)
+  {
+    if (params == null) {
+      params = new PageParameters();
+    }
+    final UserPrefArea area = form.getSearchFilter().getArea();
+    if (area != null) {
+      params.add(UserPrefEditPage.PARAMETER_AREA, area.getId());
+    }
+    return super.redirectToEditPage(params);
   }
 
   @Override

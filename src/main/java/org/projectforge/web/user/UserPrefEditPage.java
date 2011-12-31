@@ -31,6 +31,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserPrefArea;
+import org.projectforge.user.UserPrefAreaRegistry;
 import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefDao;
 import org.projectforge.user.UserPrefEntryDO;
@@ -39,13 +40,14 @@ import org.projectforge.web.fibu.Kost2DropDownChoice;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
-
 @EditPage(defaultReturnPage = UserPrefListPage.class)
 public class UserPrefEditPage extends AbstractEditPage<UserPrefDO, UserPrefEditForm, UserPrefDao> implements ISelectCallerPage
 {
   private static final long serialVersionUID = 3405518532401481456L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserPrefEditPage.class);
+
+  public static final String PARAMETER_AREA = "area";
 
   @SpringBean(name = "userPrefDao")
   UserPrefDao userPrefDao;
@@ -64,6 +66,22 @@ public class UserPrefEditPage extends AbstractEditPage<UserPrefDO, UserPrefEditF
     super.init(userPref);
   }
 
+  public UserPrefEditPage(final PageParameters parameters)
+  {
+    super(parameters, "user.pref");
+    final String areaId = parameters.getString(PARAMETER_AREA);
+    if (areaId != null) {
+      final UserPrefArea area = UserPrefAreaRegistry.instance().getEntry(areaId);
+      if (area != null) {
+        final UserPrefDO userPref = new UserPrefDO();
+        initUserPref(userPref, area, null);
+        super.init(userPref);
+        return;
+      }
+    }
+    super.init();
+  }
+
   private UserPrefDO initUserPref(final UserPrefDO userPref, final UserPrefArea area, final Object object)
   {
     userPref.setArea(area);
@@ -74,12 +92,6 @@ public class UserPrefEditPage extends AbstractEditPage<UserPrefDO, UserPrefEditF
       userPrefDao.addUserPrefParameters(userPref, area);
     }
     return userPref;
-  }
-
-  public UserPrefEditPage(final PageParameters parameters)
-  {
-    super(parameters, "user.pref");
-    super.init();
   }
 
   @Override
@@ -94,7 +106,7 @@ public class UserPrefEditPage extends AbstractEditPage<UserPrefDO, UserPrefEditF
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Integer)
    */
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     final UserPrefEntryDO param = getData().getUserPrefEntry(property);
     if (param == null) {
@@ -107,7 +119,7 @@ public class UserPrefEditPage extends AbstractEditPage<UserPrefDO, UserPrefEditF
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
    */
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     final UserPrefEntryDO param = getData().getUserPrefEntry(property);
     if (param == null) {
@@ -124,8 +136,8 @@ public class UserPrefEditPage extends AbstractEditPage<UserPrefDO, UserPrefEditF
     if (dependents != null) {
       for (final UserPrefEntryDO entry : dependents) {
         if (Kost2DO.class.isAssignableFrom(entry.getType()) == true) {
-          Kost2DropDownChoice choice = (Kost2DropDownChoice)form.dependentsMap.get(entry.getParameter());
-          choice.setTaskId((Integer)value);
+          final Kost2DropDownChoice choice = (Kost2DropDownChoice) form.dependentsMap.get(entry.getParameter());
+          choice.setTaskId((Integer) value);
         }
       }
     }
@@ -134,7 +146,7 @@ public class UserPrefEditPage extends AbstractEditPage<UserPrefDO, UserPrefEditF
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
    */
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing.
   }
@@ -146,7 +158,7 @@ public class UserPrefEditPage extends AbstractEditPage<UserPrefDO, UserPrefEditF
   }
 
   @Override
-  protected UserPrefEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, UserPrefDO data)
+  protected UserPrefEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final UserPrefDO data)
   {
     return new UserPrefEditForm(this, data);
   }

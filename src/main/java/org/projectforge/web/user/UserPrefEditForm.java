@@ -202,7 +202,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
   }
 
   @SuppressWarnings("serial")
-  private void createParameterRepeaterChilds()
+  void createParameterRepeaterChilds()
   {
     if (data.getArea() == null) {
       log.warn("Could not create ParameterRepeater because UserPrefArea is not given.");
