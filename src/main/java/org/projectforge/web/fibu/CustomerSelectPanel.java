@@ -23,28 +23,21 @@
 
 package org.projectforge.web.fibu;
 
-import java.util.List;
-import java.util.Locale;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.SubmitLink;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.common.NumberHelper;
-import org.projectforge.common.RecentQueue;
-import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.fibu.KundeDO;
-import org.projectforge.fibu.KundeDao;
 import org.projectforge.fibu.KundeFavorite;
 import org.projectforge.fibu.KundeFormatter;
+import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.FavoritesChoicePanel;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.TooltipImage;
@@ -62,136 +55,30 @@ public class CustomerSelectPanel extends AbstractSelectPanel<KundeDO>
   @SpringBean(name = "kundeFormatter")
   private KundeFormatter kundeFormatter;
 
-  private final PropertyModel<String> kundeText;
+  private PropertyModel<String> kundeText;
 
-  private RecentQueue<String> recentCustomers;
-
-  private PFAutoCompleteTextField<KundeDO> customerTextField;
-
-  // Only used for detecting changes:
-  private KundeDO currentCustomer;
-
-  @SpringBean(name = "customerDao")
-  private KundeDao customerDao;
+  private TextField<String> kundeTextField;
 
   /**
    * @param id
    * @param model
-   * @param customerText If no Kunde is given then a free text field representing a Kunde can be used.
+   * @param kundeText If no Kunde is given then a free text field representing a Kunde can be used.
    * @param caller
    * @param selectProperty
    */
-  public CustomerSelectPanel(final String id, final IModel<KundeDO> model, final PropertyModel<String> customerText,
+  public CustomerSelectPanel(final String id, final IModel<KundeDO> model, final PropertyModel<String> kundeText,
       final ISelectCallerPage caller, final String selectProperty)
   {
     super(id, model, caller, selectProperty);
-    this.customerText = customerText;
+    this.kundeText = kundeText;
   }
 
-  @Override
   @SuppressWarnings("serial")
   public CustomerSelectPanel init()
   {
     super.init();
-    customerTextField = new PFAutoCompleteTextField<KundeDO>("customerField", getModel()) {
-      @Override
-      protected List<KundeDO> getChoices(final String input)
-      {
-        final BaseSearchFilter filter = new BaseSearchFilter();
-        filter.setSearchFields("name", "identifier");
-        filter.setSearchString(input);
-        final List<KundeDO> list = customerDao.getList(filter);
-        return list;
-      }
-
-      @Override
-      protected List<String> getRecentUserInputs()
-      {
-        return getRecentUsers().getRecents();
-      }
-
-      @Override
-      protected String formatLabel(final KundeDO customer)
-      {
-        if (customer == null) {
-          return "";
-        }
-        return formatKunde(customer);
-      }
-
-      @Override
-      protected String formatValue(final KundeDO customer)
-      {
-        if (customer == null) {
-          return "";
-        }
-        return customer.getName();
-      }
-      @Override
-      protected void convertInput()
-      {
-        final KundeDO customer = (KundeDO) getConverter(getType()).convertToObject(getInput(), getLocale());
-        setConvertedInput(customer);
-        if (customer != null && (currentCustomer == null || customer.getId() != currentCustomer.getId())) {
-          getRecentKundes().append(formatKunde(customer));
-        }
-        currentCustomer = customer;
-      }
-
-      @Override
-      public IConverter getConverter(final Class< ? > type)
-      {
-        return new IConverter() {
-          @Override
-          public Object convertToObject(final String value, final Locale locale)
-          {
-            if (StringUtils.isEmpty(value) == true) {
-              getModel().setObject(null);
-              return null;
-            }
-            final int ind = value.indexOf(": ");
-            final String customername = ind >= 0 ? value.substring(0, ind) : value;
-            final KundeDO customer = customerDao.getKundeGroupCache().getKunde(customername);
-            if (customer == null) {
-              error(getString("customer.panel.error.customernameNotFound"));
-            }
-            getModel().setObject(customer);
-            return customer;
-          }
-
-          @Override
-          public String convertToString(final Object value, final Locale locale)
-          {
-            if (value == null) {
-              return "";
-            }
-            final KundeDO customer = (KundeDO) value;
-            return customer.getKundename();
-          }
-        };
-      }
-    };
-    currentKunde = getModelObject();
-    customerTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400);
-    customerTextField.setLabel(new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        if (label != null) {
-          return label;
-        } else {
-          return getString("customer");
-        }
-      }
-    });
-
-
-
-
-
-
-    if (customerText != null) {
-      customerTextField = new MaxLengthTextField("customerText", customerText) {
+    if (kundeText != null) {
+      kundeTextField = new MaxLengthTextField("kundeText", kundeText) {
         @Override
         public boolean isVisible()
         {
@@ -199,22 +86,21 @@ public class CustomerSelectPanel extends AbstractSelectPanel<KundeDO>
               .greaterZero(CustomerSelectPanel.this.getModelObject().getId()) == false);
         }
       };
-      add(customerTextField);
+      add(kundeTextField);
     } else {
-      add(AbstractForm.createInvisibleDummyComponent("customerText"));
+      add(AbstractForm.createInvisibleDummyComponent("kundeText"));
     }
-    final Label customerAsStringLabel = new Label("customerAsString", new Model<String>() {
+    final Label kundeAsStringLabel = new Label("kundeAsString", new Model<String>() {
 
       @Override
       public String getObject()
       {
-        final KundeDO customer = getModelObject();
-        return customerFormatter.format(customer, false);
+        final KundeDO kunde = getModelObject();
+        return kundeFormatter.format(kunde, false);
       }
     });
-    add(customerAsStringLabel);
+    add(kundeAsStringLabel);
     final SubmitLink selectButton = new SubmitLink("select") {
-      @Override
       public void onSubmit()
       {
         setResponsePage(new CustomerListPage(caller, selectProperty));
@@ -242,7 +128,7 @@ public class CustomerSelectPanel extends AbstractSelectPanel<KundeDO>
         getString("fibu.tooltip.unselectKunde")));
     // DropDownChoice favorites
     final FavoritesChoicePanel<KundeDO, KundeFavorite> favoritesPanel = new FavoritesChoicePanel<KundeDO, KundeFavorite>("favorites",
-        KundePrefArea.KUNDE_FAVORITE, tabIndex, "half select") {
+        UserPrefArea.KUNDE_FAVORITE, tabIndex, "half select") {
       @Override
       protected void select(final KundeFavorite favorite)
       {
@@ -274,22 +160,22 @@ public class CustomerSelectPanel extends AbstractSelectPanel<KundeDO>
   }
 
   /**
-   * Will be called if the customer has chosen an entry of the customer favorites drop down choice.
-   * @param customer
+   * Will be called if the user has chosen an entry of the kunde favorites drop down choice.
+   * @param kunde
    */
-  protected void selectKunde(final KundeDO customer)
+  protected void selectKunde(final KundeDO kunde)
   {
-    setModelObject(customer);
-    caller.select(selectProperty, customer.getId());
+    setModelObject(kunde);
+    caller.select(selectProperty, kunde.getId());
   }
 
   /**
-   * @return The customer's raw input of customer text if given, otherwise null.
+   * @return The user's raw input of kunde text if given, otherwise null.
    */
   public String getKundeTextInput()
   {
-    if (customerTextField != null) {
-      return customerTextField.getRawInput();
+    if (kundeTextField != null) {
+      return kundeTextField.getRawInput();
     }
     return null;
   }
