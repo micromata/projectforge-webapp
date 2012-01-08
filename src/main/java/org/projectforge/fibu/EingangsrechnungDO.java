@@ -30,6 +30,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -39,6 +41,7 @@ import org.hibernate.annotations.IndexColumn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 import org.hibernate.search.annotations.Store;
 
 /**
@@ -59,13 +62,16 @@ public class EingangsrechnungDO extends AbstractRechnungDO<EingangsrechnungsPosi
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String kreditor;
 
+  @IndexedEmbedded(depth = 1)
+  private KontoDO konto;
+
   @Column(length = 255)
   public String getKreditor()
   {
     return kreditor;
   }
 
-  public void setKreditor(String kreditor)
+  public void setKreditor(final String kreditor)
   {
     this.kreditor = kreditor;
   }
@@ -80,7 +86,7 @@ public class EingangsrechnungDO extends AbstractRechnungDO<EingangsrechnungsPosi
     return referenz;
   }
 
-  public void setReferenz(String referenz)
+  public void setReferenz(final String referenz)
   {
     this.referenz = referenz;
   }
@@ -91,6 +97,24 @@ public class EingangsrechnungDO extends AbstractRechnungDO<EingangsrechnungsPosi
   public List<EingangsrechnungsPositionDO> getPositionen()
   {
     return this.positionen;
+  }
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "konto_id")
+  public KontoDO getKonto()
+  {
+    return konto;
+  }
+
+  public void setKonto(final KontoDO konto)
+  {
+    this.konto = konto;
+  }
+
+  @Transient
+  public Integer getKontoId()
+  {
+    return konto != null ? konto.getId() : null;
   }
 
   /**
@@ -106,7 +130,7 @@ public class EingangsrechnungDO extends AbstractRechnungDO<EingangsrechnungsPosi
     return (this.bezahlDatum != null && this.zahlBetrag != null);
   }
 
-  public int compareTo(EingangsrechnungDO o)
+  public int compareTo(final EingangsrechnungDO o)
   {
     int r = this.datum.compareTo(o.datum);
     if (r != 0) {

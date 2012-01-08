@@ -54,6 +54,8 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "positionen.text"};
 
+  private KontoDao kontoDao;
+
   public EingangsrechnungDao()
   {
     super(EingangsrechnungDO.class);
@@ -67,20 +69,31 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
   @SuppressWarnings("unchecked")
   public int[] getYears()
   {
-    final List<Object[]> list = (List<Object[]>) getSession().createQuery("select min(datum), max(datum) from EingangsrechnungDO t").list();
+    final List<Object[]> list = getSession().createQuery("select min(datum), max(datum) from EingangsrechnungDO t").list();
     return SQLHelper.getYears(list);
   }
 
-  public EingangsrechnungsStatistik buildStatistik(List<EingangsrechnungDO> list)
+  public EingangsrechnungsStatistik buildStatistik(final List<EingangsrechnungDO> list)
   {
     final EingangsrechnungsStatistik stats = new EingangsrechnungsStatistik();
     if (list == null) {
       return stats;
     }
-    for (EingangsrechnungDO rechnung : list) {
+    for (final EingangsrechnungDO rechnung : list) {
       stats.add(rechnung);
     }
     return stats;
+  }
+
+  /**
+   * @param eingangsrechnung
+   * @param kontoId If null, then konto will be set to null;
+   * @see BaseDao#getOrLoad(Integer)
+   */
+  public void setKonto(final EingangsrechnungDO eingangsrechnung, final Integer kontoId)
+  {
+    final KontoDO konto = kontoDao.getOrLoad(kontoId);
+    eingangsrechnung.setKonto(konto);
   }
 
   /**
@@ -90,7 +103,7 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
    * @see org.projectforge.core.BaseDao#onSaveOrModify(org.projectforge.core.ExtendedBaseDO)
    */
   @Override
-  protected void onSaveOrModify(EingangsrechnungDO obj)
+  protected void onSaveOrModify(final EingangsrechnungDO obj)
   {
     if (obj.getZahlBetrag() != null) {
       obj.setZahlBetrag(obj.getZahlBetrag().setScale(2, RoundingMode.HALF_UP));
@@ -135,7 +148,7 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
       return list;
     }
     final List<EingangsrechnungDO> result = new ArrayList<EingangsrechnungDO>();
-    for (EingangsrechnungDO rechnung : list) {
+    for (final EingangsrechnungDO rechnung : list) {
       if (myFilter.isShowUnbezahlt() == true) {
         if (rechnung.isBezahlt() == false) {
           result.add(rechnung);
@@ -156,7 +169,7 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
    * @see org.projectforge.core.BaseDao#getDisplayHistoryEntries(org.projectforge.core.ExtendedBaseDO)
    */
   @Override
-  public List<DisplayHistoryEntry> getDisplayHistoryEntries(EingangsrechnungDO obj)
+  public List<DisplayHistoryEntry> getDisplayHistoryEntries(final EingangsrechnungDO obj)
   {
     final List<DisplayHistoryEntry> list = super.getDisplayHistoryEntries(obj);
     if (hasLoggedInUserHistoryAccess(obj, false) == false) {
@@ -192,7 +205,7 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
       }
     }
     Collections.sort(list, new Comparator<DisplayHistoryEntry>() {
-      public int compare(DisplayHistoryEntry o1, DisplayHistoryEntry o2)
+      public int compare(final DisplayHistoryEntry o1, final DisplayHistoryEntry o2)
       {
         return (o2.getTimestamp().compareTo(o1.getTimestamp()));
       }
@@ -211,7 +224,7 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
    * @see org.projectforge.core.BaseDao#contains(java.util.Set, org.projectforge.core.ExtendedBaseDO)
    */
   @Override
-  protected boolean contains(Set<Integer> idSet, EingangsrechnungDO entry)
+  protected boolean contains(final Set<Integer> idSet, final EingangsrechnungDO entry)
   {
     if (super.contains(idSet, entry) == true) {
       return true;
@@ -225,7 +238,7 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
   }
 
   @Override
-  protected List<EingangsrechnungDO> sort(List<EingangsrechnungDO> list)
+  protected List<EingangsrechnungDO> sort(final List<EingangsrechnungDO> list)
   {
     Collections.sort(list);
     return list;
@@ -235,5 +248,10 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
   public EingangsrechnungDO newInstance()
   {
     return new EingangsrechnungDO();
+  }
+
+  public void setKontoDao(final KontoDao kontoDao)
+  {
+    this.kontoDao = kontoDao;
   }
 }
