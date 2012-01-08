@@ -37,16 +37,29 @@ public class KundeDao extends BaseDao<KundeDO>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(KundeDao.class);
 
+  private KontoDao kontoDao;
+
   public KundeDao()
   {
     super(KundeDO.class);
     avoidNullIdCheckBeforeSave = true;
   }
 
-  @Override
-  public List<KundeDO> getList(BaseSearchFilter filter)
+  /**
+   * @param kunde
+   * @param kontoId If null, then konto will be set to null;
+   * @see BaseDao#getOrLoad(Integer)
+   */
+  public void setKonto(final KundeDO kunde, final Integer kontoId)
   {
-    QueryFilter queryFilter = new QueryFilter(filter);
+    final KontoDO konto = kontoDao.getOrLoad(kontoId);
+    kunde.setKonto(konto);
+  }
+
+  @Override
+  public List<KundeDO> getList(final BaseSearchFilter filter)
+  {
+    final QueryFilter queryFilter = new QueryFilter(filter);
     queryFilter.addOrder(Order.asc("id"));
     return getList(queryFilter);
   }
@@ -106,5 +119,10 @@ public class KundeDao extends BaseDao<KundeDO>
   public KundeDO newInstance()
   {
     return new KundeDO();
+  }
+
+  public void setKontoDao(final KontoDao kontoDao)
+  {
+    this.kontoDao = kontoDao;
   }
 }
