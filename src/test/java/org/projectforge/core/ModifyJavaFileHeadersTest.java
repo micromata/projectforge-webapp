@@ -3,7 +3,7 @@
 // Project ProjectForge Community Edition
 //         www.projectforge.org
 //
-// Copyright (C) 2001-2011 Kai Reinhard (k.reinhard@me.com)
+// Copyright (C) 2001-2012 Kai Reinhard (k.reinhard@micromata.com)
 //
 // ProjectForge is dual-licensed.
 //
@@ -44,7 +44,7 @@ public class ModifyJavaFileHeadersTest
   @Test
   public void doit() throws IOException
   {
-    //doitReally();
+    doitReally();
   }
 
   private void doitReally() throws IOException
@@ -67,26 +67,26 @@ public class ModifyJavaFileHeadersTest
         String line = "";
         boolean header = true;
         buf.append("/////////////////////////////////////////////////////////////////////////////\n").append("//\n") //
-            .append("// Project ProjectForge Community Edition\n") //
-            .append("//         www.projectforge.org\n") //
-            .append("//\n") //
-            .append("// Copyright (C) 2001-2011 Kai Reinhard (k.reinhard@me.com)\n") //
-            .append("//\n") //
-            .append("// ProjectForge is dual-licensed.\n") //
-            .append("//\n") //
-            .append("// This community edition is free software; you can redistribute it and/or\n") //
-            .append("// modify it under the terms of the GNU General Public License as published\n") //
-            .append("// by the Free Software Foundation; version 3 of the License.\n") //
-            .append("//\n") //
-            .append("// This community edition is distributed in the hope that it will be useful,\n") //
-            .append("// but WITHOUT ANY WARRANTY; without even the implied warranty of\n") //
-            .append("// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General\n") //
-            .append("// Public License for more details.\n") //
-            .append("//\n") //
-            .append("// You should have received a copy of the GNU General Public License along\n") //
-            .append("// with this program; if not, see http://www.gnu.org/licenses/.\n") //
-            .append("//\n") //
-            .append("/////////////////////////////////////////////////////////////////////////////\n\n"); //
+        .append("// Project ProjectForge Community Edition\n") //
+        .append("//         www.projectforge.org\n") //
+        .append("//\n") //
+        .append("// Copyright (C) 2001-2012 Kai Reinhard (k.reinhard@micromata.com)\n") //
+        .append("//\n") //
+        .append("// ProjectForge is dual-licensed.\n") //
+        .append("//\n") //
+        .append("// This community edition is free software; you can redistribute it and/or\n") //
+        .append("// modify it under the terms of the GNU General Public License as published\n") //
+        .append("// by the Free Software Foundation; version 3 of the License.\n") //
+        .append("//\n") //
+        .append("// This community edition is distributed in the hope that it will be useful,\n") //
+        .append("// but WITHOUT ANY WARRANTY; without even the implied warranty of\n") //
+        .append("// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General\n") //
+        .append("// Public License for more details.\n") //
+        .append("//\n") //
+        .append("// You should have received a copy of the GNU General Public License along\n") //
+        .append("// with this program; if not, see http://www.gnu.org/licenses/.\n") //
+        .append("//\n") //
+        .append("/////////////////////////////////////////////////////////////////////////////\n\n"); //
         while ((line = in.readLine()) != null) {
           if (header == true) {
             if (line.trim().startsWith("//") == true || line.trim().length() == 0) {
