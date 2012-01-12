@@ -51,7 +51,7 @@ public interface ReportBwa
 
   public ReportBwaZeile getVersichBeitraege();
 
-  public ReportBwaZeile getBesondereKosten();
+  public ReportBwaZeile getFremdleistungen();
 
   public ReportBwaZeile getKfzKosten();
 

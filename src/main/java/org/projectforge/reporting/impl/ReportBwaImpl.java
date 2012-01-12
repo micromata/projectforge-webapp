@@ -31,73 +31,73 @@ import org.projectforge.reporting.ReportBwaZeile;
 
 public class ReportBwaImpl implements ReportBwa
 {
-  private ReportBwaZeile umsatzerloese;
+  private final ReportBwaZeile umsatzerloese;
 
-  private ReportBwaZeile bestVerdg;
+  private final ReportBwaZeile bestVerdg;
 
-  private ReportBwaZeile aktEigenleistungen;
+  private final ReportBwaZeile aktEigenleistungen;
 
-  private ReportBwaZeile gesamtleistung;
+  private final ReportBwaZeile gesamtleistung;
 
-  private ReportBwaZeile matWareneinkauf;
+  private final ReportBwaZeile matWareneinkauf;
 
-  private ReportBwaZeile rohertrag;
+  private final ReportBwaZeile rohertrag;
 
-  private ReportBwaZeile soBetrErloese;
+  private final ReportBwaZeile soBetrErloese;
 
-  private ReportBwaZeile betrieblRohertrag;
+  private final ReportBwaZeile betrieblRohertrag;
 
-  private ReportBwaZeile kostenarten;
+  private final ReportBwaZeile kostenarten;
 
-  private ReportBwaZeile personalkosten;
+  private final ReportBwaZeile personalkosten;
 
-  private ReportBwaZeile raumkosten;
+  private final ReportBwaZeile raumkosten;
 
-  private ReportBwaZeile betrieblSteuern;
+  private final ReportBwaZeile betrieblSteuern;
 
-  private ReportBwaZeile versichBeitraege;
+  private final ReportBwaZeile versichBeitraege;
 
-  private ReportBwaZeile besondereKosten;
+  private final ReportBwaZeile fremdleistungen;
 
-  private ReportBwaZeile kfzKosten;
+  private final ReportBwaZeile kfzKosten;
 
-  private ReportBwaZeile werbeReisekosten;
+  private final ReportBwaZeile werbeReisekosten;
 
-  private ReportBwaZeile kostenWarenabgabe;
+  private final ReportBwaZeile kostenWarenabgabe;
 
-  private ReportBwaZeile abschreibungen;
+  private final ReportBwaZeile abschreibungen;
 
-  private ReportBwaZeile reparaturInstandh;
+  private final ReportBwaZeile reparaturInstandh;
 
-  private ReportBwaZeile sonstigeKosten;
+  private final ReportBwaZeile sonstigeKosten;
 
-  private ReportBwaZeile gesamtkosten;
+  private final ReportBwaZeile gesamtkosten;
 
-  private ReportBwaZeile betriebsErgebnis;
+  private final ReportBwaZeile betriebsErgebnis;
 
-  private ReportBwaZeile zinsaufwand;
+  private final ReportBwaZeile zinsaufwand;
 
-  private ReportBwaZeile sonstNeutrAufw;
+  private final ReportBwaZeile sonstNeutrAufw;
 
-  private ReportBwaZeile neutralerAufwand;
+  private final ReportBwaZeile neutralerAufwand;
 
-  private ReportBwaZeile zinsertraege;
+  private final ReportBwaZeile zinsertraege;
 
-  private ReportBwaZeile sonstNeutrErtr;
+  private final ReportBwaZeile sonstNeutrErtr;
 
-  private ReportBwaZeile verrKalkKosten;
+  private final ReportBwaZeile verrKalkKosten;
 
-  private ReportBwaZeile neutralerErtrag;
+  private final ReportBwaZeile neutralerErtrag;
 
-  private ReportBwaZeile kontenklUnbesetzt;
+  private final ReportBwaZeile kontenklUnbesetzt;
 
-  private ReportBwaZeile ergebnisVorSteuern;
+  private final ReportBwaZeile ergebnisVorSteuern;
 
-  private ReportBwaZeile steuernEinkUErtr;
+  private final ReportBwaZeile steuernEinkUErtr;
 
-  private ReportBwaZeile vorlaeufigesErgebnis;
+  private final ReportBwaZeile vorlaeufigesErgebnis;
 
-  public ReportBwaImpl(Bwa bwa)
+  public ReportBwaImpl(final Bwa bwa)
   {
     this.umsatzerloese = new ReportBwaZeileImpl(bwa.getZeile(BwaZeileId.UMSATZERLOESE));
     this.bestVerdg = new ReportBwaZeileImpl(bwa.getZeile(BwaZeileId.BEST_VERDG));
@@ -112,7 +112,7 @@ public class ReportBwaImpl implements ReportBwa
     this.raumkosten = new ReportBwaZeileImpl(bwa.getZeile(BwaZeileId.RAUMKOSTEN));
     this.betrieblSteuern = new ReportBwaZeileImpl(bwa.getZeile(BwaZeileId.BETRIEBL_STEUERN));
     this.versichBeitraege = new ReportBwaZeileImpl(bwa.getZeile(BwaZeileId.VERSICH_BEITRAEGE));
-    this.besondereKosten = new ReportBwaZeileImpl(bwa.getZeile(BwaZeileId.BESONDERE_KOSTEN));
+    this.fremdleistungen = new ReportBwaZeileImpl(bwa.getZeile(BwaZeileId.FREMDLEISTUNGEN));
     this.kfzKosten = new ReportBwaZeileImpl(bwa.getZeile(BwaZeileId.KFZ_KOSTEN));
     this.werbeReisekosten = new ReportBwaZeileImpl(bwa.getZeile(BwaZeileId.WERBE_REISEKOSTEN));
     this.kostenWarenabgabe = new ReportBwaZeileImpl(bwa.getZeile(BwaZeileId.KOSTEN_WARENABGABE));
@@ -149,9 +149,9 @@ public class ReportBwaImpl implements ReportBwa
     return aktEigenleistungen;
   }
 
-  public ReportBwaZeile getBesondereKosten()
+  public ReportBwaZeile getFremdleistungen()
   {
-    return besondereKosten;
+    return fremdleistungen;
   }
 
   public ReportBwaZeile getBestVerdg()
