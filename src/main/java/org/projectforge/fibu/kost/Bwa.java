@@ -173,7 +173,7 @@ public class Bwa implements Serializable
     addBwaZeile(BwaZeileId.RAUMKOSTEN, Priority.LOW, 1);
     addBwaZeile(BwaZeileId.BETRIEBL_STEUERN, Priority.LOW, 1);
     addBwaZeile(BwaZeileId.VERSICH_BEITRAEGE, Priority.LOW, 1);
-    addBwaZeile(BwaZeileId.BESONDERE_KOSTEN, Priority.LOW, 1);
+    addBwaZeile(BwaZeileId.FREMDLEISTUNGEN, Priority.LOW, 1);
     addBwaZeile(BwaZeileId.KFZ_KOSTEN, Priority.LOW, 1);
     addBwaZeile(BwaZeileId.WERBE_REISEKOSTEN, Priority.LOW, 1);
     addBwaZeile(BwaZeileId.KOSTEN_WARENABGABE, Priority.LOW, 1);
@@ -258,6 +258,8 @@ public class Bwa implements Serializable
           get(BwaZeileId.SONST_NEUTR_ERTR).addKontoUmsatz(satz);
         } else if (konto >= 7600 && konto <= 7640) {
           get(BwaZeileId.STEUERN_EINK_U_ERTR).addKontoUmsatz(satz);
+        } else if (konto == 7800) {
+          get(BwaZeileId.FREMDLEISTUNGEN).addKontoUmsatz(satz);
         } else {
           log.warn("Ignoring Satz: " + satz);
           satz.setIgnore(true);
@@ -294,7 +296,7 @@ public class Bwa implements Serializable
     // GESAMTKOSTEN:
     get(BwaZeileId.GESAMTKOSTEN).sum(
         getZeilen(BwaZeileId.PERSONALKOSTEN, BwaZeileId.RAUMKOSTEN, BwaZeileId.BETRIEBL_STEUERN, BwaZeileId.VERSICH_BEITRAEGE,
-            BwaZeileId.BESONDERE_KOSTEN, BwaZeileId.KFZ_KOSTEN, BwaZeileId.WERBE_REISEKOSTEN, BwaZeileId.KOSTEN_WARENABGABE,
+            BwaZeileId.FREMDLEISTUNGEN, BwaZeileId.KFZ_KOSTEN, BwaZeileId.WERBE_REISEKOSTEN, BwaZeileId.KOSTEN_WARENABGABE,
             BwaZeileId.ABSCHREIBUNGEN, BwaZeileId.REPARATUR_INSTANDH, BwaZeileId.SONSTIGE_KOSTEN));
     // BETRIEBSERGEBNIS:
     get(BwaZeileId.BETRIEBSERGEBNIS).sum(getZeilen(BwaZeileId.BETRIEBL_ROHERTRAG, BwaZeileId.GESAMTKOSTEN));

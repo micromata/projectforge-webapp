@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.IntRange;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.Priority;
@@ -38,22 +39,28 @@ public class BwaZeile implements Serializable
 {
   private static final long serialVersionUID = 6135255440593281254L;
 
-  private Priority priority;
+  private final Priority priority;
 
   private BwaZeileId bwaZeileId;
+
+  private List<IntRange> accountRanges;
+
+  private List<Integer> accounts;
+
+  private String valueString;
 
   private Integer zeile;
 
   // Nur für Leerzeilen, wenn bwaZeileId == null:
-  private int indent;
+  private final int indent;
 
-  private Bwa bwa;
+  private final Bwa bwa;
 
   private List<BuchungssatzDO> buchungssaetze;
 
   private BigDecimal bwaWert = BigDecimal.ZERO;
 
-  public BwaZeile(Bwa bwa, Integer zeile, Priority priority, int indent)
+  public BwaZeile(final Bwa bwa, final Integer zeile, final Priority priority, final int indent)
   {
     this.bwa = bwa;
     this.zeile = zeile;
@@ -61,7 +68,7 @@ public class BwaZeile implements Serializable
     this.indent = indent;
   }
 
-  public BwaZeile(Bwa bwa, BwaZeileId bwaZeileId, Priority priority, int indent)
+  public BwaZeile(final Bwa bwa, final BwaZeileId bwaZeileId, final Priority priority, final int indent)
   {
     this.bwa = bwa;
     this.bwaZeileId = bwaZeileId;
@@ -74,7 +81,7 @@ public class BwaZeile implements Serializable
    * @param value Wenn true, dann werden fortan alle Buchungssätze intern hinzugefügt, deren Umsatz über addKontoUmsatz dieser Zeile
    *            hinzugefügt wurde. Andernfalls (default) werden die Buchungssätze nicht vermerkt.
    */
-  public void setStoreBuchungssaetze(boolean value)
+  public void setStoreBuchungssaetze(final boolean value)
   {
     if (value == true) {
       this.buchungssaetze = new ArrayList<BuchungssatzDO>();
@@ -109,7 +116,7 @@ public class BwaZeile implements Serializable
    * Addiert den Kontoumsatz und falls setStoreBuchungsaetze(true) gesetzt wurde, wird der Buchungssatz intern hinzugefügt.
    * @param satz
    */
-  public void addKontoUmsatz(BuchungssatzDO satz)
+  public void addKontoUmsatz(final BuchungssatzDO satz)
   {
     bwaWert = bwaWert.add(satz.getBetrag());
     if (this.buchungssaetze != null) {
@@ -117,10 +124,10 @@ public class BwaZeile implements Serializable
     }
   }
 
-  public void sum(BwaZeile... zeilen)
+  public void sum(final BwaZeile... zeilen)
   {
     bwaWert = BigDecimal.ZERO;
-    for (BwaZeile zeile : zeilen) {
+    for (final BwaZeile zeile : zeilen) {
       bwaWert = bwaWert.add(zeile.getBwaWert());
       if (this.buchungssaetze != null) {
         this.buchungssaetze.addAll(zeile.getBuchungssaetze());
@@ -161,13 +168,14 @@ public class BwaZeile implements Serializable
     return indent;
   }
 
+  @Override
   public String toString()
   {
     return StringUtils.leftPad(NumberHelper.getAsString(getZeile()), 4)
-        + " "
-        + StringUtils.rightPad(getBezeichnung(), 20)
-        + " "
-        + StringUtils.leftPad(CurrencyFormatter.format(getBwaWert()), 18);
+    + " "
+    + StringUtils.rightPad(getBezeichnung(), 20)
+    + " "
+    + StringUtils.leftPad(CurrencyFormatter.format(getBwaWert()), 18);
     /*
      * StringBuffer buf = new StringBuffer(); buf.append(row); for (KontoUmsatz umsatz : kontoUmsaetze) { buf.append("\n ");
      * buf.append(umsatz.toString()); } return buf.toString();
