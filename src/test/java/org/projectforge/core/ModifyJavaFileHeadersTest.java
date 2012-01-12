@@ -44,7 +44,7 @@ public class ModifyJavaFileHeadersTest
   @Test
   public void doit() throws IOException
   {
-    doitReally();
+    //doitReally();
   }
 
   private void doitReally() throws IOException
@@ -70,7 +70,7 @@ public class ModifyJavaFileHeadersTest
         .append("// Project ProjectForge Community Edition\n") //
         .append("//         www.projectforge.org\n") //
         .append("//\n") //
-        .append("// Copyright (C) 2001-2012 Kai Reinhard (k.reinhard@micromata.com)\n") //
+        .append("// Copyright (C) 2001-2012 Kai Reinhard (k.reinhard@micromata.de)\n") //
         .append("//\n") //
         .append("// ProjectForge is dual-licensed.\n") //
         .append("//\n") //
