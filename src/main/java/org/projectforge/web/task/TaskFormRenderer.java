@@ -172,9 +172,8 @@ public class TaskFormRenderer extends AbstractFormRenderer
         doPanel.addLabel("", new PanelContext(HALF));
         doPanel.addJiraIssuesPanel(data.getShortDescription(), new PanelContext(VALUE_LENGTH));
       }
-      doPanel.addTextArea(
-          new PanelContext(data, "description", DOUBLE, getString("description") + jiraFootnoteMark, LABEL_LENGTH)
-          .setBreakBetweenLabelAndField(true).setCssStyle("height: 20em;"));
+      doPanel.addTextArea(new PanelContext(data, "description", DOUBLE, getString("description") + jiraFootnoteMark, LABEL_LENGTH)
+      .setBreakBetweenLabelAndField(true).setCssStyle("height: 20em;"));
       if (jiraSupport == true && JiraUtils.hasJiraIssues(data.getDescription()) == true) {
         doPanel.addLabel("", new PanelContext(HALF));
         doPanel.addJiraIssuesPanel(data.getDescription(), new PanelContext(DOUBLE).setBreakBeforeLabel(false));
@@ -368,12 +367,15 @@ public class TaskFormRenderer extends AbstractFormRenderer
         timesheetBookingStatusChoice.setEnabled(false);
       }
     }
-    if (userGroupCache.isUserMemberOfFinanceGroup() == true) {
+    {
       // Protection of privacy:
       doPanel.addLabel(getString("task.protectionOfPrivacy"), new PanelContext(LABEL_LENGTH2).setBreakBefore(true));
       final RepeatingView repeatingView = doPanel.addRepeater(new PanelContext(VALUE_LENGTH)).getRepeatingView();
       final CheckBoxLabelPanel checkBoxLabelPanel = new CheckBoxLabelPanel(repeatingView.newChildId(), new PropertyModel<Boolean>(data,
       "protectionOfPrivacy"), getString("task.protectionOfPrivacy.description"));
+      if (userGroupCache.isUserMemberOfFinanceGroup() == false) {
+        checkBoxLabelPanel.setEnabled(false);
+      }
       repeatingView.add(checkBoxLabelPanel);
       checkBoxLabelPanel.setTooltip(getString("task.protectionOfPrivacy.tooltip"));
     }
