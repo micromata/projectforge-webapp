@@ -77,7 +77,7 @@ public class XmlStreamTest extends TestBase
     final XmlObjectWriter writer = new XmlObjectWriter();
     final Document document = DocumentHelper.createDocument();
     final Element root = document.addElement("root");
-    TestObject obj = new TestObject();
+    final TestObject obj = new TestObject();
     obj.s0 = "s0";
     obj.t0 = "t0";
     obj.color1 = obj.color2 = TestEnum.RED;
@@ -142,7 +142,7 @@ public class XmlStreamTest extends TestBase
     final XmlObjectWriter writer = new XmlObjectWriter();
     final Document document = DocumentHelper.createDocument();
     final Element root = document.addElement("root");
-    TestObject2 testObject2 = new TestObject2();
+    final TestObject2 testObject2 = new TestObject2();
     Element el = writer.write(root, testObject2);
     assertEquals(TestObject2.class.getName(), el.getName());
     containsNotElements(el, "testObject", "list");
@@ -209,7 +209,7 @@ public class XmlStreamTest extends TestBase
     final XmlObjectWriter writer = new XmlObjectWriter();
     final Document document = DocumentHelper.createDocument();
     final Element root = document.addElement("root");
-    TestObject2 testObject2 = new TestObject2();
+    final TestObject2 testObject2 = new TestObject2();
     Element el = writer.write(root, testObject2);
     TestObject2 o2 = (TestObject2) reader.read(el);
     assertNull(o2.testObject);
@@ -316,7 +316,7 @@ public class XmlStreamTest extends TestBase
     aliasMap.put(TestObject.class, "testAlias1");
     TestObject obj = new TestObject();
     obj.s0 = "s0";
-    String xml = XmlObjectWriter.writeAsXml(obj, aliasMap);
+    final String xml = XmlObjectWriter.writeAsXml(obj, aliasMap);
     assertTrue("Should start with '<testAlias1 ': " + xml, xml.startsWith("<testAlias1 "));
     assertTrue("Should end with '</testAlias1>': " + xml, xml.endsWith("</testAlias1>"));
     final XmlObjectReader reader = new XmlObjectReader();
@@ -330,6 +330,7 @@ public class XmlStreamTest extends TestBase
   public void ignoreFields()
   {
     final XmlObjectWriter writer = new XmlObjectWriter() {
+      @Override
       protected boolean ignoreField(final Object obj, final Field field)
       {
         if (obj instanceof TestObject && field.getName().equals("s1") == true) {
@@ -341,7 +342,7 @@ public class XmlStreamTest extends TestBase
     TestObject obj = new TestObject();
     obj.s1 = "should be ignored.";
     obj.s2 = "s2";
-    String xml = writer.writeToXml(obj);
+    final String xml = writer.writeToXml(obj);
     final XmlObjectReader reader = new XmlObjectReader();
     reader.initialize(TestObject.class);
     obj = (TestObject) reader.read(xml);
@@ -425,7 +426,7 @@ public class XmlStreamTest extends TestBase
         xml);
     final XmlObjectReader reader = new XmlObjectReader() {
       @Override
-      protected Object newInstance(Class< ? > clazz, Element el, String attrName, String attrValue)
+      protected Object newInstance(final Class< ? > clazz, final Element el, final String attrName, final String attrValue)
       {
         if (MyRootElement.class.isAssignableFrom(clazz) == true) {
           return new MyRootElement();
@@ -437,7 +438,7 @@ public class XmlStreamTest extends TestBase
     root = (MyRootElement) reader.read(xml);
     assertEquals(DateHelper.EUROPE_BERLIN.getID(), root.getTimeZone().getID());
     assertEquals(dh.getDate(), root.getCreated());
-    assertEquals("hurzel", ((TestObject) root.testObject).s1);
+    assertEquals("hurzel", (root.testObject).s1);
   }
 
   @Test
@@ -448,6 +449,19 @@ public class XmlStreamTest extends TestBase
     obj.s0 = "Hallo\n  Test";
     final String xml = writer.writeToXml(obj);
     assertEquals("<test3><s0><![CDATA[Hallo\n  Test]]></s0></test3>", xml);
+  }
+
+  @Test
+  public void testEnums()
+  {
+    final XmlObjectReader reader = new XmlObjectReader();
+    reader.initialize(TestObject.class);
+    TestObject obj = (TestObject) reader.read("<test color1=\"RED\" />");
+    assertEquals(TestEnum.RED, obj.color1);
+    obj = (TestObject) reader.read("<test color1=\"BLUE\" />");
+    assertEquals("Default color is BLUE.", TestEnum.BLUE, obj.color1);
+    obj = (TestObject) reader.read("<test color1=\"blue\" />");
+    assertEquals("Default color is BLUE.", TestEnum.BLUE, obj.color1);
   }
 
   private TestObject create(final String s1, final String s2, final String s3, final String s4, final String t1, final String t2,

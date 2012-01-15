@@ -75,7 +75,7 @@ public class XmlObjectReader
   /**
    * Key is the object id (o-id) and value is the already deserialized object.
    */
-  private Map<String, Object> referenceObjects = new HashMap<String, Object>();
+  private final Map<String, Object> referenceObjects = new HashMap<String, Object>();
 
   private boolean ignoreEmptyCollections;
 
@@ -117,7 +117,7 @@ public class XmlObjectReader
    * collection.
    * @param ignoreEmptyCollections
    */
-  public void setIgnoreEmptyCollections(boolean ignoreEmptyCollections)
+  public void setIgnoreEmptyCollections(final boolean ignoreEmptyCollections)
   {
     this.ignoreEmptyCollections = ignoreEmptyCollections;
   }
@@ -189,7 +189,7 @@ public class XmlObjectReader
     if (el == null) {
       return null;
     }
-    Class< ? > clazz = getClass(el.getName());
+    final Class< ? > clazz = getClass(el.getName());
     if (clazz != null) {
       final Object obj = read(clazz, el, null, null);
       return obj;
@@ -224,7 +224,7 @@ public class XmlObjectReader
     if (processedElements.contains(el) == false) {
       buf.append("Ignored xml element: ").append(el.getPath()).append("\n");
     }
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     final List attributes = el.attributes();
     if (attributes != null) {
       final Set<String> attributeSet = processedAttributes.get(el);
@@ -234,7 +234,7 @@ public class XmlObjectReader
         }
       }
     }
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     final List children = el.elements();
     if (children != null) {
       for (final Object child : children) {
@@ -258,7 +258,7 @@ public class XmlObjectReader
         if (mappingClass != null) {
           clazz = mappingClass;
         }
-      } catch (ClassNotFoundException ex) {
+      } catch (final ClassNotFoundException ex) {
         log.error("Class '" + elelementName + "' not found: " + ex.getMessage(), ex);
       }
     }
@@ -286,7 +286,7 @@ public class XmlObjectReader
 
   protected Object fromString(final IConverter< ? > converter, final Element element, final String attrName, final String attrValue)
   {
-    final Object obj =converter.fromString(attrValue != null ? attrValue : element.getText());
+    final Object obj = converter.fromString(attrValue != null ? attrValue : element.getText());
     if (attrName != null) {
       putProcessedAttribute(element, attrName);
     } else {
@@ -295,11 +295,21 @@ public class XmlObjectReader
     return obj;
   }
 
+  @SuppressWarnings({ "unchecked", "rawtypes"})
   protected Object enumFromString(final Class< ? > clazz, final Element element, final String attrName, final String attrValue)
   {
     final String val = attrValue != null ? attrValue : element.getText();
-    @SuppressWarnings("unchecked")
-    final Enum enumValue = StringUtils.isNotBlank(val) && "null".equals(val) == false ? Enum.valueOf((Class) clazz, val) : null;
+    Enum enumValue;
+    if (StringUtils.isBlank(val) || "null".equals(val) == true) {
+      enumValue = null;
+    } else {
+      try {
+        enumValue = Enum.valueOf((Class) clazz, val);
+      } catch (final IllegalArgumentException ex) {
+        // Try toUpperCase:
+        enumValue = Enum.valueOf((Class) clazz, val.toUpperCase());
+      }
+    }
     if (attrName != null) {
       putProcessedAttribute(element, attrName);
     } else {
@@ -308,7 +318,7 @@ public class XmlObjectReader
     return enumValue;
   }
 
-  private Object read(final Class< ? > clazz, final Element el, final String attrName, String attrValue)
+  private Object read(final Class< ? > clazz, final Element el, final String attrName, final String attrValue)
   {
     final Attribute refIdAttr = el.attribute(XmlObjectWriter.ATTR_REF_ID);
     if (refIdAttr != null) {
@@ -433,7 +443,7 @@ public class XmlObjectReader
   {
     try {
       field.set(obj, value);
-    } catch (IllegalArgumentException ex) {
+    } catch (final IllegalArgumentException ex) {
       log.fatal("Exception encountered "
           + ex
           + ". Ignoring field '"
@@ -443,7 +453,7 @@ public class XmlObjectReader
           + "' in deserialization of class '"
           + obj.getClass()
           + "'.", ex);
-    } catch (IllegalAccessException ex) {
+    } catch (final IllegalAccessException ex) {
       log.fatal("Exception encountered "
           + ex
           + ". Ignoring field '"
