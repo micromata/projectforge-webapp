@@ -64,14 +64,14 @@ public class BusinessAssessmentRow implements Serializable
    */
   public boolean doesMatch(final int accountNumber)
   {
-    if (config.accountNumbers != null) {
+    if (config.getAccountNumbers() != null) {
       for (final Integer no : config.accountNumbers) {
         if (no != null && no.intValue() == accountNumber) {
           return true;
         }
       }
     }
-    if (config.accountNumberRanges != null) {
+    if (config.getAccountNumberRanges() != null) {
       for (final IntRange range : config.accountNumberRanges) {
         if (range != null && range.containsInteger(accountNumber) == true) {
           return true;

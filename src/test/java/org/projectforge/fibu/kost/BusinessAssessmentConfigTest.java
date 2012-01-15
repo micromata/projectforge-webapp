@@ -37,12 +37,7 @@ public class BusinessAssessmentConfigTest
   @Test
   public void testReadXml()
   {
-    final AliasMap aliasMap = new AliasMap();
-    aliasMap.put(BusinessAssessmentRowConfig.class, "row");
-    final XmlObjectReader reader = new XmlObjectReader();
-    reader.setAliasMap(aliasMap);
-    reader.initialize(BusinessAssessmentConfig.class);
-    final BusinessAssessmentConfig bwa = (BusinessAssessmentConfig) reader.read(xml);
+    final BusinessAssessmentConfig bwa = getBusinessAssessmentConfig();
     assertEquals(50, bwa.getRows().size());
     {
       final BusinessAssessmentRowConfig row = bwa.getRow("1060");
@@ -75,6 +70,17 @@ public class BusinessAssessmentConfigTest
       assertEquals(0, row.getAccountNumbers().size());
       assertEquals(0, row.getAccountNumberRanges().size());
     }
+  }
+
+  static BusinessAssessmentConfig getBusinessAssessmentConfig()
+  {
+    final AliasMap aliasMap = new AliasMap();
+    aliasMap.put(BusinessAssessmentRowConfig.class, "row");
+    final XmlObjectReader reader = new XmlObjectReader();
+    reader.setAliasMap(aliasMap);
+    reader.initialize(BusinessAssessmentConfig.class);
+    final BusinessAssessmentConfig bwa = (BusinessAssessmentConfig) reader.read(xml);
+    return bwa;
   }
 
   private static final String xml = XmlHelper
