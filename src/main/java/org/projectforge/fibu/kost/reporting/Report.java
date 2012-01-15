@@ -33,10 +33,11 @@ import java.util.regex.Pattern;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.ObjectUtils;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.BuchungssatzDO;
-import org.projectforge.fibu.kost.Bwa;
-import org.projectforge.fibu.kost.BwaTable;
+import org.projectforge.fibu.kost.BusinessAssessment;
+import org.projectforge.fibu.kost.BusinessAssessmentTable;
 import org.projectforge.user.PFUserContext;
 
 /**
@@ -62,9 +63,9 @@ public class Report implements Serializable
 
   private boolean showChilds;
 
-  private transient Bwa bwa;
+  private transient BusinessAssessment businessAssessment;
 
-  private transient BwaTable bwaTable;
+  private transient BusinessAssessmentTable businessAssessmentTable;
 
   private int fromYear;
 
@@ -76,18 +77,18 @@ public class Report implements Serializable
 
   private transient Report parent;
 
-  public Report(ReportObjective reportObjective)
+  public Report(final ReportObjective reportObjective)
   {
     this.reportObjective = reportObjective;
   }
 
-  public Report(ReportObjective reportObjective, Report parent)
+  public Report(final ReportObjective reportObjective, final Report parent)
   {
     this(reportObjective, parent.fromYear, parent.fromMonth, parent.toYear, parent.toMonth);
     this.parent = parent;
   }
 
-  public Report(ReportObjective reportObjective, int fromYear, int fromMonth, int toYear, int toMonth)
+  public Report(final ReportObjective reportObjective, final int fromYear, final int fromMonth, final int toYear, final int toMonth)
   {
     this(reportObjective);
     this.fromYear = fromYear;
@@ -96,13 +97,13 @@ public class Report implements Serializable
     this.toMonth = toMonth;
   }
 
-  public void setFrom(int year, int month)
+  public void setFrom(final int year, final int month)
   {
     this.fromYear = year;
     this.fromMonth = month;
   }
 
-  public void setTo(int year, int month)
+  public void setTo(final int year, final int month)
   {
     this.toYear = year;
     this.toMonth = month;
@@ -142,12 +143,12 @@ public class Report implements Serializable
     if (this.parent == null) {
       return null;
     }
-    List<Report> path = new ArrayList<Report>();
+    final List<Report> path = new ArrayList<Report>();
     this.parent.getPath(path);
     return path;
   }
 
-  private void getPath(List<Report> path)
+  private void getPath(final List<Report> path)
   {
     if (this.parent != null) {
       this.parent.getPath(path);
@@ -160,38 +161,38 @@ public class Report implements Serializable
     return reportObjective;
   }
 
-  public Bwa getBwa()
+  public BusinessAssessment getBusinessAssessment()
   {
-    if (this.bwa == null) {
-      this.bwa = new Bwa();
-      this.bwa.setReference(this);
-      this.bwa.setStoreBuchungssaetzeInZeilen(true);
-      this.bwa.setBuchungssaetze(this.buchungssaetze);
+    if (this.businessAssessment == null) {
+      this.businessAssessment = new BusinessAssessment(ConfigXml.getInstance().getBusinessAssessmentConfig());
+      this.businessAssessment.setReference(this);
+      this.businessAssessment.setStoreAccountRecordsInRows(true);
+      this.businessAssessment.setAccountRecords(this.buchungssaetze);
     }
-    return this.bwa;
+    return this.businessAssessment;
   }
 
   /**
-   * Creates an array with all Bwa's of the child reports.
-   * @param prependThisReport If true then the Bwa of this report will be prepend as first column.
+   * Creates an array with all business assessment's of the child reports.
+   * @param prependThisReport If true then the business assessment of this report will be prepend as first column.
    */
-  public BwaTable getChildBwaTable(boolean prependThisReport)
+  public BusinessAssessmentTable getChildBusinessAssessmentTable(final boolean prependThisReport)
   {
-    if (bwaTable == null) {
+    if (businessAssessmentTable == null) {
       if (prependThisReport == false && hasChilds() == false) {
         return null;
       }
-      bwaTable = new BwaTable();
+      businessAssessmentTable = new BusinessAssessmentTable();
       if (prependThisReport == true) {
-        bwaTable.addBwa(this.getId(), this.getBwa());
+        businessAssessmentTable.addBusinessAssessment(this.getId(), this.getBusinessAssessment());
       }
       if (hasChilds() == true) {
-        for (Report child : getChilds()) {
-          bwaTable.addBwa(child.getId(), child.getBwa());
+        for (final Report child : getChilds()) {
+          businessAssessmentTable.addBusinessAssessment(child.getId(), child.getBusinessAssessment());
         }
       }
     }
-    return bwaTable;
+    return businessAssessmentTable;
   }
 
   /**
@@ -208,7 +209,7 @@ public class Report implements Serializable
     return showChilds;
   }
 
-  public void setShowChilds(boolean showChilds)
+  public void setShowChilds(final boolean showChilds)
   {
     this.showChilds = showChilds;
   }
@@ -237,7 +238,7 @@ public class Report implements Serializable
     return reportObjective.getTitle();
   }
 
-  public Report findById(String id)
+  public Report findById(final String id)
   {
     if (ObjectUtils.equals(this.reportObjective.getId(), id) == true) {
       return this;
@@ -245,13 +246,13 @@ public class Report implements Serializable
     if (hasChilds() == false) {
       return null;
     }
-    for (Report report : getChilds()) {
+    for (final Report report : getChilds()) {
       if (ObjectUtils.equals(report.reportObjective.getId(), id) == true) {
         return report;
       }
     }
-    for (Report report : getChilds()) {
-      Report result = report.findById(id);
+    for (final Report report : getChilds()) {
+      final Report result = report.findById(id);
       if (result != null) {
         return result;
       }
@@ -269,15 +270,15 @@ public class Report implements Serializable
   {
     if (childReports == null && hasChilds() == true) {
       childReports = new ArrayList<Report>();
-      for (ReportObjective child : reportObjective.getChildReportObjectives()) {
-        Report report = new Report(child, this);
+      for (final ReportObjective child : reportObjective.getChildReportObjectives()) {
+        final Report report = new Report(child, this);
         report.select(this.buchungssaetze);
         childReports.add(report);
       }
       if (this.buchungssaetze != null && (reportObjective.isSuppressOther() == false || reportObjective.isSuppressDuplicates() == false)) {
-        for (BuchungssatzDO satz : this.buchungssaetze) {
+        for (final BuchungssatzDO satz : this.buchungssaetze) {
           int n = 0;
-          for (Report child : getChilds()) {
+          for (final Report child : getChilds()) {
             if (child.contains(satz) == true) {
               n++;
             }
@@ -298,20 +299,20 @@ public class Report implements Serializable
         }
       }
       if (reportObjective.isSuppressOther() == false && this.other != null) {
-        ReportObjective objective = new ReportObjective();
-        String other = PFUserContext.getLocalizedString("fibu.reporting.other");
+        final ReportObjective objective = new ReportObjective();
+        final String other = PFUserContext.getLocalizedString("fibu.reporting.other");
         objective.setId(this.getId() + " - " + other);
         objective.setTitle(this.getTitle() + " - " + other);
-        Report report = new Report(objective, this);
+        final Report report = new Report(objective, this);
         report.setBuchungssaetze(this.other);
         childReports.add(report);
       }
       if (reportObjective.isSuppressDuplicates() == false && this.duplicates != null) {
-        ReportObjective objective = new ReportObjective();
-        String duplicates = PFUserContext.getLocalizedString("fibu.reporting.duplicates");
+        final ReportObjective objective = new ReportObjective();
+        final String duplicates = PFUserContext.getLocalizedString("fibu.reporting.duplicates");
         objective.setId(this.getId() + " - " + duplicates);
         objective.setTitle(this.getTitle() + " - " + duplicates);
-        Report report = new Report(objective, this);
+        final Report report = new Report(objective, this);
         report.setBuchungssaetze(this.duplicates);
         childReports.add(report);
       }
@@ -328,7 +329,7 @@ public class Report implements Serializable
    * Bitte entweder diese Methode ODER select(...) benutzen.
    * @param buchungssaetze
    */
-  public void setBuchungssaetze(List<BuchungssatzDO> buchungssaetze)
+  public void setBuchungssaetze(final List<BuchungssatzDO> buchungssaetze)
   {
     this.buchungssaetze = buchungssaetze;
   }
@@ -361,10 +362,10 @@ public class Report implements Serializable
    * Diese initiale Liste der Buchungsliste wird sofort bezüglich Exclude- und Include-Filter selektiert und das Ergebnis gesetzt.
    * @param buchungssaetze vor Selektion.
    */
-  public void select(List<BuchungssatzDO> list)
+  public void select(final List<BuchungssatzDO> list)
   {
     final Predicate regExpPredicate = new Predicate() {
-      public boolean evaluate(Object obj)
+      public boolean evaluate(final Object obj)
       {
         final BuchungssatzDO satz = (BuchungssatzDO) obj;
         final String kost1 = KostFormatter.format(satz.getKost1());
@@ -385,8 +386,8 @@ public class Report implements Serializable
     };
     this.buchungssaetze = new ArrayList<BuchungssatzDO>();
     this.buchungssatzSet = new HashSet<BuchungssatzDO>();
-    this.bwa = null;
-    this.bwaTable = null;
+    this.businessAssessment = null;
+    this.businessAssessmentTable = null;
     this.childReports = null;
     this.duplicates = null;
     this.other = null;
@@ -395,8 +396,8 @@ public class Report implements Serializable
       this.buchungssatzSet.add(satz);
     }
   }
-  
-  public boolean contains(BuchungssatzDO satz)
+
+  public boolean contains(final BuchungssatzDO satz)
   {
     if (buchungssatzSet == null) {
       return false;
@@ -419,11 +420,11 @@ public class Report implements Serializable
    * @see String#matches(String)()
    * @see #modifyRegExp(String)
    */
-  public static boolean match(List<String> regExpList, String kost, boolean emptyListMatches)
+  public static boolean match(final List<String> regExpList, final String kost, final boolean emptyListMatches)
   {
     if (CollectionUtils.isNotEmpty(regExpList) == true) {
-      for (String str : regExpList) {
-        String regExp = modifyRegExp(str);
+      for (final String str : regExpList) {
+        final String regExp = modifyRegExp(str);
         if (kost.matches(regExp) == true) {
           return true;
         }
@@ -440,7 +441,7 @@ public class Report implements Serializable
    * keine Ersetzungen durchgeführt, sondern lediglich das Hochkomma selbst entfernt.
    * @param regExp
    */
-  public static String modifyRegExp(String regExp)
+  public static String modifyRegExp(final String regExp)
   {
     if (regExp == null) {
       return null;
@@ -448,7 +449,7 @@ public class Report implements Serializable
     if (regExp.startsWith("'") == true) {
       return regExp.substring(1);
     }
-    String str = regExp.replace(".", "\\.").replace("*", ".*");
+    final String str = regExp.replace(".", "\\.").replace("*", ".*");
     return str;
   }
 }

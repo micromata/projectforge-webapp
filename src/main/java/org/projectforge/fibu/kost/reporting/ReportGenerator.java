@@ -31,12 +31,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.fibu.kost.BuchungssatzDO;
-import org.projectforge.fibu.kost.Bwa;
+import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.reporting.Buchungssatz;
 import org.projectforge.reporting.impl.BuchungssatzImpl;
-import org.projectforge.reporting.impl.ReportBwaImpl;
-
 
 public class ReportGenerator
 {
@@ -57,40 +56,40 @@ public class ReportGenerator
     return jasperReportId;
   }
 
-  public void setJasperReportId(String jasperReportId)
+  public void setJasperReportId(final String jasperReportId)
   {
     this.jasperReportId = jasperReportId;
   }
 
   /**
    * Adds all lines of the given bwa as parameters.
-   * @see ReportBwaImpl#putBwaWerte(Map, Bwa)
+   * @see ReportBwaImpl#putBwaWerte(Map, BusinessAssessment)
    */
-  public void addBwa(Bwa bwa)
+  public void addBusinessAssessment(final BusinessAssessment businessAssessment)
   {
-    Bwa.putBwaWerte(parameters, bwa);
+    BusinessAssessment.putBusinessAssessmentRows(parameters, businessAssessment);
   }
 
   /**
-   * Creates a new Bwa from the given buchungsSaetze and adds all lines of the resulting bwa as parameters.
-   * @see ReportBwaImpl#putBwaWerte(Map, Bwa)
+   * Creates a new business assessment from the given buchungsSaetze and adds all lines of the resulting BusinessAssessment as parameters.
+   * @see ReportBwaImpl#putBwaWerte(Map, BusinessAssessment)
    */
-  public Bwa addBwa(List<BuchungssatzDO> buchungsSaetze)
+  public BusinessAssessment addBusinessAssessment(final List<BuchungssatzDO> buchungsSaetze)
   {
-    Bwa bwa = new Bwa(buchungsSaetze);
-    addBwa(bwa);
-    return bwa;
+    final BusinessAssessment businessAssessment = new BusinessAssessment(ConfigXml.getInstance().getBusinessAssessmentConfig(), buchungsSaetze);
+    addBusinessAssessment(businessAssessment);
+    return businessAssessment;
   }
 
   /**
    * Adds a parameter which is accessible under the name from inside the JasperReport.
    */
-  public void addParameter(String name, Object value)
+  public void addParameter(final String name, final Object value)
   {
     parameters.put(name, value);
   }
 
-  public Object getParameter(String name)
+  public Object getParameter(final String name)
   {
     return parameters.get(name);
   }
@@ -99,11 +98,11 @@ public class ReportGenerator
    * Attention: Overwrites any existing parameter!
    * @param parameters
    */
-  public void setParameters(Map<String, Object> parameters)
+  public void setParameters(final Map<String, Object> parameters)
   {
     this.parameters = parameters;
   }
-  
+
   public Map<String, Object> getParameters()
   {
     return parameters;
@@ -122,19 +121,20 @@ public class ReportGenerator
    * Converts any collection of BuchungssatzDO into list of Buchungssatz.
    * @param beanCollection
    */
-  public void setBeanCollection(Collection< ? > beanCollection)
+  public void setBeanCollection(final Collection< ? > beanCollection)
   {
     if (CollectionUtils.isEmpty(beanCollection) == true) {
       this.beanCollection = beanCollection;
       return;
     }
-    Iterator< ? > it = beanCollection.iterator();
+    final Iterator< ? > it = beanCollection.iterator();
     if (it.next() instanceof BuchungssatzDO == true) {
-      List<Buchungssatz> list = new ArrayList<Buchungssatz>();
+      final List<Buchungssatz> list = new ArrayList<Buchungssatz>();
       @SuppressWarnings("unchecked")
+      final
       Collection<BuchungssatzDO> col = (Collection<BuchungssatzDO>)beanCollection;
-      for (BuchungssatzDO buchungssatzDO : col) {
-        Buchungssatz satz = new BuchungssatzImpl(buchungssatzDO);
+      for (final BuchungssatzDO buchungssatzDO : col) {
+        final Buchungssatz satz = new BuchungssatzImpl(buchungssatzDO);
         list.add(satz);
       }
       this.beanCollection = list;
@@ -148,12 +148,12 @@ public class ReportGenerator
     return outputType;
   }
 
-  public void setOutputType(ReportOutputType outputType)
+  public void setOutputType(final ReportOutputType outputType)
   {
     this.outputType = outputType;
   }
 
-  public void setOutputType(String outputType)
+  public void setOutputType(final String outputType)
   {
     this.outputType = ReportOutputType.getType(outputType);
   }
