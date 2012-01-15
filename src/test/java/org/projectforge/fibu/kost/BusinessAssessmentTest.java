@@ -60,6 +60,8 @@ public class BusinessAssessmentTest
     assertEquals(new BigDecimal("56.56"), bwa.getRow("1051").getAmount()); // Revenue
     assertEquals(new BigDecimal("-18.18"), bwa.getRow("1280").getAmount()); // Total costs
     assertEquals(new BigDecimal("38.38"), bwa.getRow("1380").getAmount()); // profit
+    assertEquals(new BigDecimal("67.86"), bwa.getRow("erfolgsquote").getAmount()); // profit * 100 / revenue
+    assertEquals(new BigDecimal("0.68"), bwa.getRow("relativePerformance").getAmount()); // profit / revenue
   }
 
   private BuchungssatzDO createRecord(final double amount, final int accountNumber)

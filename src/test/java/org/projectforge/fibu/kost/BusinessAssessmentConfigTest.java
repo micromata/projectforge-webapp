@@ -138,8 +138,24 @@ public class BusinessAssessmentConfigTest
           + "    <row no='1360' />\n" //
           + "    <row no='1380' id='vorlaeufigesErgebnis' value='=ergebnisVorSteuern+steuernEinkUErtr' priority='high' title='Vorläufiges Ergebnis' />\n" //
           + "    <row no='1390' value='='/>\n" //
-          + "    <row no='' id='erfolgsquote' priority='high' title='Erfolgsquote' />\n" //
-          + "    <row no='' id='relativePerformance' priority='high' title='relative Performance' />\n" //
+          + "    <row no='' id='erfolgsquote' priority='high' title='Erfolgsquote'>\n" //
+          + "      <value>\n" //
+          + "        if (gesamtleistung != 0.0) {\n" //
+          + "          return betriebsErgebnis * 100 / gesamtleistung;\n" //
+          + "        } else {\n" //
+          + "          return 0.0;\n" //
+          + "        }\n" //
+          + "      </value>\n" //
+          + "    </row>\n" //
+          + "    <row no='' id='relativePerformance' priority='high' title='relative Performance'>\n" //
+          + "      <value>\n" //
+          + "        if (gesamtleistung != 0.0) {\n" //
+          + "          return vorlaeufigesErgebnis / gesamtleistung;\n" //
+          + "        } else {\n" //
+          + "          return 0.0;\n" //
+          + "        }\n" //
+          + "      </value>\n" //
+          + "    </row>\n" //
           + "  </rows>\n" //
           + "</businessAssessment>");
 }
