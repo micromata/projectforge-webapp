@@ -23,15 +23,22 @@
 
 package org.projectforge.fibu.kost;
 
+import groovy.lang.Script;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.IntRange;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.Priority;
+import org.projectforge.scripting.GroovyExecutor;
+import org.projectforge.scripting.GroovyResult;
 
 /**
  * Used in config.xml for the definition of the used business assessment schema. This object represents a single row of the business
@@ -44,7 +51,7 @@ public class BusinessAssessmentRow implements Serializable
 {
   private static final long serialVersionUID = -5192131633290561520L;
 
-  private final BusinessAssessment bussinessAssessment;
+  private final BusinessAssessment businessAssessment;
 
   private final BusinessAssessmentRowConfig config;
 
@@ -52,9 +59,12 @@ public class BusinessAssessmentRow implements Serializable
 
   private BigDecimal amount;
 
+  // If true then no recalculation is done, otherwise the amounts are lost.
+  private boolean accountRecordsExist;
+
   public BusinessAssessmentRow(final BusinessAssessment bussinessAssessment, final BusinessAssessmentRowConfig config)
   {
-    this.bussinessAssessment = bussinessAssessment;
+    this.businessAssessment = bussinessAssessment;
     this.config = config;
   }
 
@@ -92,6 +102,7 @@ public class BusinessAssessmentRow implements Serializable
     } else {
       this.accountRecords = null;
     }
+    accountRecordsExist = false;
   }
 
   /**
@@ -100,6 +111,7 @@ public class BusinessAssessmentRow implements Serializable
    */
   public void addAccountRecord(final BuchungssatzDO record)
   {
+    accountRecordsExist = true;
     if (amount == null) {
       amount = BigDecimal.ZERO;
     }
@@ -130,7 +142,7 @@ public class BusinessAssessmentRow implements Serializable
    */
   public BusinessAssessment getBussinessAssessment()
   {
-    return bussinessAssessment;
+    return businessAssessment;
   }
 
   /**
@@ -191,6 +203,29 @@ public class BusinessAssessmentRow implements Serializable
   public List<Integer> getAccountNumbers()
   {
     return config.getAccountNumbers();
+  }
+
+  void recalculate()
+  {
+    if (accountRecordsExist == true) {
+      // Nothing to do.
+      return;
+    }
+    final Script groovyScript = config.getValueScript();
+    if (groovyScript == null) {
+      // Nothing to do.
+      return;
+    }
+    amount = BigDecimal.ZERO;
+    final Map<String, Object> vars = new HashMap<String, Object>();
+    BusinessAssessment.putBusinessAssessmentRows(vars, businessAssessment);
+    final GroovyResult result = new GroovyExecutor().execute(groovyScript, vars);
+    final Object rval = result.getResult();
+    if (rval instanceof BigDecimal) {
+      amount = (BigDecimal)rval;
+    } else if (rval instanceof Number) {
+      amount = new BigDecimal(String.valueOf(rval)).setScale(2, RoundingMode.HALF_UP);
+    }
   }
 
   @Override

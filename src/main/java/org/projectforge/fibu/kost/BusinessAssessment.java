@@ -61,7 +61,7 @@ public class BusinessAssessment implements Serializable
 
   private String shortname; // Ein Kurzname um z.B. labels oder Dateinamen zu generieren
 
-  private  int counter = 0;
+  private int counter = 0;
 
   private int year;
 
@@ -79,11 +79,19 @@ public class BusinessAssessment implements Serializable
   public static void putBusinessAssessmentRows(final Map<String, Object> map, final BusinessAssessment businessAssessment)
   {
     for (final BusinessAssessmentRow row : businessAssessment.rows) {
-      map.put(row.getNo(), row.getAmount());
+      final double val = getDouble(row.getAmount());
+      map.put("r" + row.getNo(), val);
       if (StringUtils.isNotBlank(row.getId()) == true) {
-        map.put(row.getId(), row.getAmount());
+        map.put(row.getId(), val);
       }
     }
+  }
+
+  private static double getDouble(final BigDecimal amount) {
+    if (amount == null) {
+      return 0.0;
+    }
+    return amount.doubleValue();
   }
 
   public BusinessAssessment(final BusinessAssessmentConfig config)
@@ -146,6 +154,15 @@ public class BusinessAssessment implements Serializable
 
   public void recalculate()
   {
+    if (rows == null) {
+      return;
+    }
+    for (final BusinessAssessmentRow row : rows) {
+      if (row == null) {
+        continue;
+      }
+      row.recalculate();
+    }
     // GESAMTLEISTUNG:
     // get(BwaZeileId.GESAMTLEISTUNG).sum(getZeilen(BwaZeileId.UMSATZERLOESE, BwaZeileId.BEST_VERDG, BwaZeileId.AKT_EIGENLEISTUNGEN));
     // ROHERTRAG:
