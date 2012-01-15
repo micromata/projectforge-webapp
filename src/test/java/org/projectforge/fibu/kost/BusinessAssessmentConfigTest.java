@@ -85,7 +85,7 @@ public class BusinessAssessmentConfigTest
 
   private static final String xml = XmlHelper
       .replaceQuotes(XmlHelper.XML_HEADER + "\n" //
-          + "<businessAssessment>\n" //
+          + "<businessAssessment heading='BWA' overallPerformance='gesamtleistung' merchandisePurchase='matWareneinkauf' preliminaryResult='vorlaeufigesErgebnis'>\n" //
           + "  <rows>\n" //
           + "    <!-- Empty row: -->\n" //
           + "    <row no='1010' />\n" //
