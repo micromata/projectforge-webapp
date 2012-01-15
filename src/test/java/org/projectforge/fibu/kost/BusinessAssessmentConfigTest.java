@@ -25,6 +25,7 @@ package org.projectforge.fibu.kost;
 
 import static org.junit.Assert.assertEquals;
 
+import org.apache.commons.lang.math.IntRange;
 import org.junit.Test;
 import org.projectforge.xml.stream.AliasMap;
 import org.projectforge.xml.stream.XmlHelper;
@@ -35,13 +36,38 @@ public class BusinessAssessmentConfigTest
   @Test
   public void testReadXml()
   {
-    final AliasMap aliasMap  = new AliasMap();
-    aliasMap.put(BusinessAssessmentRowConfig.class, "row");
+    final AliasMap aliasMap = new AliasMap();
+    aliasMap.put(BusinessAssessmentRow.class, "row");
     final XmlObjectReader reader = new XmlObjectReader();
     reader.setAliasMap(aliasMap);
-    reader.initialize(BusinessAssessmentConfig.class);
-    final BusinessAssessmentConfig obj = (BusinessAssessmentConfig) reader.read(xml);
-    assertEquals(48, obj.getRows().size());
+    reader.initialize(BusinessAssessment.class);
+    final BusinessAssessment bwa = (BusinessAssessment) reader.read(xml);
+    assertEquals(48, bwa.getRows().size());
+    {
+      final BusinessAssessmentRow row = bwa.getRow("1060");
+      assertEquals(0, row.getAccountNumbers().size());
+      assertEquals(1, row.getAccountNumberRanges().size());
+      final IntRange range = row.getAccountNumberRanges().get(0);
+      assertEquals(5700, range.getMinimumInteger());
+      assertEquals(5999, range.getMaximumInteger());
+    }
+    {
+      final BusinessAssessmentRow row = bwa.getRow("sonstigeKosten");
+      assertEquals(1, row.getAccountNumbers().size());
+      assertEquals(6300, (int)row.getAccountNumbers().get(0));
+      assertEquals(1, row.getAccountNumberRanges().size());
+      final IntRange range = row.getAccountNumberRanges().get(0);
+      assertEquals(6800, range.getMinimumInteger());
+      assertEquals(6855, range.getMaximumInteger());
+    }
+    {
+      final BusinessAssessmentRow row = bwa.getRow("1312");
+      assertEquals(3, row.getAccountNumbers().size());
+      assertEquals(6392, (int)row.getAccountNumbers().get(0));
+      assertEquals(6895, (int)row.getAccountNumbers().get(1));
+      assertEquals(6960, (int)row.getAccountNumbers().get(2));
+      assertEquals(0, row.getAccountNumberRanges().size());
+    }
   }
 
   private static final String xml = XmlHelper
