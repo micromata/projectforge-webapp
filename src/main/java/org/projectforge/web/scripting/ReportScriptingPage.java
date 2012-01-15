@@ -56,8 +56,8 @@ import org.projectforge.common.FileHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.export.ExportJFreeChart;
 import org.projectforge.export.ExportWorkbook;
-import org.projectforge.fibu.kost.Bwa;
-import org.projectforge.fibu.kost.BwaZeileId;
+import org.projectforge.fibu.kost.BusinessAssessment;
+import org.projectforge.fibu.kost.BusinessAssessmentRowConfig;
 import org.projectforge.fibu.kost.reporting.Report;
 import org.projectforge.fibu.kost.reporting.ReportGenerator;
 import org.projectforge.fibu.kost.reporting.ReportGeneratorList;
@@ -86,17 +86,17 @@ public class ReportScriptingPage extends AbstractSecuredPage
 
   protected GroovyResult groovyResult;
 
-  private ReportScriptingForm form;
+  private final ReportScriptingForm form;
 
   private Component exceptionContainer;
 
-  private Label availableScriptVariablesLabel, bwaZeilenVariablesLabel;
+  private Label availableScriptVariablesLabel, businessAssessmentRowsVariablesLabel;
 
   private WebMarkupContainer imageResultContainer;
 
   private transient Map<String, Object> scriptVariables;
 
-  public ReportScriptingPage(PageParameters parameters)
+  public ReportScriptingPage(final PageParameters parameters)
   {
     super(parameters);
     form = new ReportScriptingForm(this);
@@ -120,7 +120,7 @@ public class ReportScriptingPage extends AbstractSecuredPage
     set.addAll(scriptVariables.keySet());
     StringBuffer buf = new StringBuffer();
     buf.append("scriptResult"); // first available variable.
-    for (String key : set) {
+    for (final String key : set) {
       buf.append(", ").append(key);
     }
     if (availableScriptVariablesLabel == null) {
@@ -129,19 +129,16 @@ public class ReportScriptingPage extends AbstractSecuredPage
     scriptDao.addAliasForDeprecatedScriptVariables(scriptVariables);
     buf = new StringBuffer();
     boolean first = true;
-    for (final BwaZeileId bwaZeileId : BwaZeileId.values()) {
+    for (final BusinessAssessmentRowConfig rowConfig : ConfigXml.getInstance().getBusinessAssessmentConfig().getRows()) {
       if (first == true) {
         first = false;
       } else {
         buf.append(", ");
       }
-      buf.append('z').append(bwaZeileId.getId()).append(", ").append(bwaZeileId.getKey());
+      buf.append('r').append(rowConfig.getNo()).append(", ").append(rowConfig.getId());
     }
-    for (final String bwaValue : Bwa.getAdditionalValues()) {
-      buf.append(", ").append(bwaValue);
-    }
-    if (bwaZeilenVariablesLabel == null) {
-      body.add(bwaZeilenVariablesLabel = new Label("bwaZeilenVariables", buf.toString()));
+    if (businessAssessmentRowsVariablesLabel == null) {
+      body.add(businessAssessmentRowsVariablesLabel = new Label("businessAssessmentRowsVariables", buf.toString()));
     }
   }
 
@@ -165,7 +162,7 @@ public class ReportScriptingPage extends AbstractSecuredPage
       StringBuffer buf = new StringBuffer();
       int lineNo = 1;
       for (int i = 0; i < groovyScript.length(); i++) {
-        char c = groovyScript.charAt(i);
+        final char c = groovyScript.charAt(i);
         if (c == '\n') {
           addLine(linesRepeater, lineNo++, buf.toString());
           buf = new StringBuffer();
@@ -240,15 +237,15 @@ public class ReportScriptingPage extends AbstractSecuredPage
             getReportScriptingStorage().setJasperReport(report, clientFileName);
           }
         } else if (clientFileName.endsWith(".xls") == true) {
-          StringBuffer buf = new StringBuffer();
+          final StringBuffer buf = new StringBuffer();
           buf.append("report_").append(FileHelper.createSafeFilename(PFUserContext.getUser().getUsername(), 20)).append(".xls");
-          File file = new File(ConfigXml.getInstance().getWorkingDirectory(), buf.toString());
+          final File file = new File(ConfigXml.getInstance().getWorkingDirectory(), buf.toString());
           fileUpload.writeTo(file);
           getReportScriptingStorage().setFilename(clientFileName, file.getAbsolutePath());
         } else {
           log.error("File extension not supported: " + clientFileName);
         }
-      } catch (Exception ex) {
+      } catch (final Exception ex) {
         log.error(ex.getMessage(), ex);
         error("An error occurred (see log files for details): " + ex.getMessage());
       } finally {
@@ -276,7 +273,7 @@ public class ReportScriptingPage extends AbstractSecuredPage
   }
 
   /**
-   * Default report from reportStorage. Uses the current report and puts the bwa values in parameter map.
+   * Default report from reportStorage. Uses the current report and puts the business assessment values in parameter map.
    */
   private void jasperReport()
   {
@@ -287,11 +284,11 @@ public class ReportScriptingPage extends AbstractSecuredPage
     final Map<String, Object> parameters = new HashMap<String, Object>();
     final Report report = getReportStorage().getCurrentReport();
     final Collection< ? > beanCollection = report.getBuchungssaetze();
-    Bwa.putBwaWerte(parameters, report.getBwa());
+    BusinessAssessment.putBusinessAssessmentRows(parameters, report.getBusinessAssessment());
     jasperReport(parameters, beanCollection);
   }
 
-  private void jasperReport(Map<String, Object> parameters, Collection< ? > beanCollection)
+  private void jasperReport(final Map<String, Object> parameters, final Collection< ? > beanCollection)
   {
     try {
       final JasperReport jasperReport = getReportScriptingStorage().getJasperReport();
