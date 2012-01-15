@@ -33,7 +33,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.fibu.kost.BuchungssatzDao;
-import org.projectforge.fibu.kost.Bwa;
+import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
@@ -87,26 +87,27 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
     filterContainer.add(toMonthChoice);
 
     filterContainer.add(businessAssessmentRow = new WebMarkupContainer("businessAssessmentRow") {
+      @Override
       public boolean isVisible()
       {
-        return parentPage.bwa != null;
+        return parentPage.businessAssessment != null;
       };
     });
     final Label summaryBusinessAssessmentLabel = new Label("summaryBusinessAssessment", new Model<String>() {
       @Override
       public String getObject()
       {
-        final Bwa bwa = parentPage.bwa;
-        if (bwa == null) {
+        final BusinessAssessment businessAssessment = parentPage.businessAssessment;
+        if (businessAssessment == null) {
           return "";
         }
         final StringBuffer buf = new StringBuffer();
         buf.append(getString("fibu.businessAssessment.overallPerformance")).append(": ").append(
-            CurrencyFormatter.format(bwa.getGesamtleistung().getBwaWert())).append(", ");
+            CurrencyFormatter.format(businessAssessment.getOverallPerformanceRowAmount())).append(", ");
         buf.append(getString("fibu.businessAssessment.merchandisePurchase")).append(": ").append(
-            CurrencyFormatter.format(bwa.getMatWareneinkauf().getBwaWert())).append(", ");
+            CurrencyFormatter.format(businessAssessment.getMerchandisePurchaseRowAmount())).append(", ");
         buf.append(getString("fibu.businessAssessment.preliminaryResult")).append(": ").append(
-            CurrencyFormatter.format(bwa.getVorlaeufigesErgebnis().getBwaWert()));
+            CurrencyFormatter.format(businessAssessment.getPreliminaryResultRowAmount()));
         return buf.toString();
       }
     });
@@ -116,18 +117,18 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
       @Override
       public String getObject()
       {
-        final Bwa bwa = parentPage.bwa;
-        if (bwa == null) {
+        final BusinessAssessment businessAssessment = parentPage.businessAssessment;
+        if (businessAssessment == null) {
           return "";
         }
-        return bwa.toString();
+        return businessAssessment.toString();
       }
     });
     filterContainer.add(businessAssessmentLabel);
   }
-  
+
   /**
-   * The filter is not visible if only a fixed list of accounting records of a record is displayed. 
+   * The filter is not visible if only a fixed list of accounting records of a record is displayed.
    * @see org.projectforge.web.wicket.AbstractListForm#isFilterVisible()
    */
   @Override
@@ -145,7 +146,7 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
     return getSearchFilter().getFromYear();
   }
 
-  public void setFromYear(Integer year)
+  public void setFromYear(final Integer year)
   {
     if (year == null) {
       getSearchFilter().setFromYear(-1);
@@ -159,7 +160,7 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
     return getSearchFilter().getToYear();
   }
 
-  public void setToYear(Integer year)
+  public void setToYear(final Integer year)
   {
     if (year == null) {
       getSearchFilter().setToYear(-1);
@@ -173,7 +174,7 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
     return getSearchFilter().getFromMonth();
   }
 
-  public void setFromMonth(Integer month)
+  public void setFromMonth(final Integer month)
   {
     if (month == null) {
       getSearchFilter().setFromMonth(-1);
@@ -187,7 +188,7 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
     return getSearchFilter().getToMonth();
   }
 
-  public void setToMonth(Integer month)
+  public void setToMonth(final Integer month)
   {
     if (month == null) {
       getSearchFilter().setToMonth(-1);

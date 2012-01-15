@@ -35,9 +35,10 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.ImportedElement;
 import org.projectforge.common.ImportedSheet;
 import org.projectforge.core.ActionLog;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.fibu.datev.DatevImportDao;
 import org.projectforge.fibu.kost.BuchungssatzDO;
-import org.projectforge.fibu.kost.Bwa;
+import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -168,7 +169,7 @@ public class DatevImportPage extends AbstractSecuredPage
     form.errorProperties = sheet.getErrorProperties();
   }
 
-  protected void showBWA(final String sheetName)
+  protected void showBusinessAssessment(final String sheetName)
   {
     final ImportedSheet< ? > sheet = form.storage.getNamedSheet(sheetName);
     Validate.notNull(sheet);
@@ -177,8 +178,8 @@ public class DatevImportPage extends AbstractSecuredPage
       final BuchungssatzDO satz = (BuchungssatzDO) element.getValue();
       list.add(satz);
     }
-    form.bwa = new Bwa((Integer) sheet.getProperty("year"), (Integer) sheet.getProperty("month"));
-    form.bwa.setBuchungssaetze(list);
+    form.businessAssessment = new BusinessAssessment(ConfigXml.getInstance().getBusinessAssessmentConfig(), (Integer) sheet.getProperty("year"), (Integer) sheet.getProperty("month"));
+    form.businessAssessment.setAccountRecords(list);
   }
 
   private void checkAccess()

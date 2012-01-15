@@ -44,9 +44,9 @@ import org.projectforge.common.LabelValueBean;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.Priority;
-import org.projectforge.fibu.kost.Bwa;
-import org.projectforge.fibu.kost.BwaTable;
-import org.projectforge.fibu.kost.BwaZeile;
+import org.projectforge.fibu.kost.BusinessAssessment;
+import org.projectforge.fibu.kost.BusinessAssessmentRow;
+import org.projectforge.fibu.kost.BusinessAssessmentTable;
 import org.projectforge.fibu.kost.reporting.Report;
 import org.projectforge.fibu.kost.reporting.ReportStorage;
 import org.projectforge.web.HtmlHelper;
@@ -222,31 +222,31 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
     final RepeatingView rowRepeater = new RepeatingView("rowRepeater");
     storageContainer.add(rowRepeater);
     int row = 0;
-    final BwaTable bwaTable = currentReport.getChildBwaTable(true);
-    final Bwa firstBwa = bwaTable.getBwaList().get(0).getValue();
-    for (final BwaZeile firstBwaZeile : firstBwa.getZeilen()) { // First BWA for getting meta data of BWA.
-      if (priority.ordinal() > firstBwaZeile.getPriority().ordinal()) {
+    final BusinessAssessmentTable businessAssessmentTable = currentReport.getChildBusinessAssessmentTable(true);
+    final BusinessAssessment firstBusinessAssessment = businessAssessmentTable.getBusinessAssessmentList().get(0).getValue();
+    for (final BusinessAssessmentRow firstBusinessAssessmentRow : firstBusinessAssessment.getRows()) { // First BusinessAssessment for getting meta data of BusinessAssessment.
+      if (priority.ordinal() > firstBusinessAssessmentRow.getPriority().ordinal()) {
         // Don't show all business assessment rows (priority is here a kind of verbose level).
         continue;
       }
       final WebMarkupContainer rowContainer = new WebMarkupContainer(rowRepeater.newChildId());
       rowRepeater.add(rowContainer);
       rowContainer.add(new SimpleAttributeModifier("class", (row++ % 2 == 0) ? "even" : "odd"));
-      rowContainer.add(new Label("zeileNo", String.valueOf(firstBwaZeile.getZeile())));
+      rowContainer.add(new Label("zeileNo", firstBusinessAssessmentRow.getNo()));
       StringBuffer buf = new StringBuffer();
-      for (int i = 0; i < firstBwaZeile.getIndent(); i++) {
+      for (int i = 0; i < firstBusinessAssessmentRow.getIndent(); i++) {
         buf.append("&nbsp;&nbsp;");
       }
-      buf.append(HtmlHelper.escapeXml(firstBwaZeile.getBezeichnung()));
+      buf.append(HtmlHelper.escapeXml(firstBusinessAssessmentRow.getTitle()));
       rowContainer.add(new Label("description", buf.toString()).setEscapeModelStrings(false));
       final RepeatingView cellRepeater = new RepeatingView("cellRepeater");
       rowContainer.add(cellRepeater);
       int col = 0;
-      for (final LabelValueBean<String, Bwa> lv : bwaTable.getBwaList()) {
-        // So display the row for every BWA:
+      for (final LabelValueBean<String, BusinessAssessment> lv : businessAssessmentTable.getBusinessAssessmentList()) {
+        // So display the row for every BusinessAssessment:
         final String reportId = lv.getLabel();
-        final Bwa bwa = lv.getValue();
-        final BwaZeile bwaZeile = bwa.getZeile(firstBwaZeile.getBwaZeileId());
+        final BusinessAssessment businessAssessment = lv.getValue();
+        final BusinessAssessmentRow businessAssessmentRow = businessAssessment.getRow(firstBusinessAssessmentRow.getId());
         final WebMarkupContainer item = new WebMarkupContainer(cellRepeater.newChildId());
         cellRepeater.add(item);
         buf = new StringBuffer();
@@ -254,17 +254,18 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
         if (col++ == 0) {
           buf.append(" font-weight: bold;");
         }
-        if (bwaZeile.getBwaWert().compareTo(BigDecimal.ZERO) < 0) {
+        final BigDecimal amount = businessAssessmentRow.getAmount();
+        if (amount != null && amount.compareTo(BigDecimal.ZERO) < 0) {
           buf.append(" color: red;");
         }
         item.add(new SimpleAttributeModifier("style", buf.toString()));
-        item.add(new PlainLabel("bwaWert", NumberHelper.isNotZero(bwaZeile.getBwaWert()) == true ? CurrencyFormatter.format(bwaZeile
-            .getBwaWert()) : ""));
+        item.add(new PlainLabel("bwaWert", NumberHelper.isNotZero(businessAssessmentRow.getAmount()) == true ? CurrencyFormatter.format(businessAssessmentRow
+            .getAmount()) : ""));
         item.add(new SubmitLink("showAccountingRecordsLink") {
           @Override
           public void onSubmit()
           {
-            setResponsePage(new AccountingRecordListPage(AccountingRecordListPage.getPageParameters(reportId, bwaZeile.getZeile())));
+            setResponsePage(new AccountingRecordListPage(AccountingRecordListPage.getPageParameters(reportId, businessAssessmentRow.getNo())));
           }
         });
       }

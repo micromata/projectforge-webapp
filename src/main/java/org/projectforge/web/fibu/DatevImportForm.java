@@ -52,7 +52,7 @@ import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.datev.DatevImportDao;
 import org.projectforge.fibu.kost.BuchungssatzDO;
-import org.projectforge.fibu.kost.Bwa;
+import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.web.calendar.DateTimeFormatter;
@@ -82,11 +82,11 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
 
   protected RepeatingView sheetRepeatingView;
 
-  private Label bwaLabel, storageHeadingLabel;
+  private Label businessAssessmentLabel, storageHeadingLabel;
 
   protected Map<String, Set<Object>> errorProperties;
 
-  protected Bwa bwa;
+  protected BusinessAssessment businessAssessment;
 
   protected transient ImportStorage< ? > storage;
 
@@ -171,8 +171,8 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
       return;
     }
     storageContainer.setVisible(true);
-    if (bwaLabel != null) {
-      storageContainer.remove(bwaLabel);
+    if (businessAssessmentLabel != null) {
+      storageContainer.remove(businessAssessmentLabel);
     }
     if (errorPropertiesTable != null) {
       storageContainer.remove(errorPropertiesTable);
@@ -202,10 +202,10 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
     } else {
       errorPropertiesTable.setVisible(false);
     }
-    if (bwa != null) {
-      storageContainer.add(bwaLabel = new Label("bwa", bwa.toString()));
+    if (businessAssessment != null) {
+      storageContainer.add(businessAssessmentLabel = new Label("bwa", businessAssessment.toString()));
     } else {
-      storageContainer.add(bwaLabel = (Label) new Label("bwa", "[invisible]").setVisible(false));
+      storageContainer.add(businessAssessmentLabel = (Label) new Label("bwa", "[invisible]").setVisible(false));
     }
     if (errorPropertiesTable == null) {
       storageContainer.add(errorPropertiesTable = new WebMarkupContainer("errorPropertiesTable")).setVisible(false);
@@ -336,7 +336,7 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
         @Override
         public void onSubmit()
         {
-          parentPage.showBWA(sheet.getName());
+          parentPage.showBusinessAssessment(sheet.getName());
         }
       }, "show business assessment");
     }
@@ -385,7 +385,7 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
       if ("all".equals(listType) == true //
           || ("faulty".equals(listType) == true && element.isFaulty() == true)//
           || ("modified".equals(listType) == true && (element.isNew() == true || element.isModified() == true || element.isFaulty() == true)) //
-      ) {
+          ) {
         // Yes, show this element.
       } else {
         // Don't show this element.

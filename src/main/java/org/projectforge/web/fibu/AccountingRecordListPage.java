@@ -36,12 +36,13 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.BuchungssatzDO;
 import org.projectforge.fibu.kost.BuchungssatzDao;
-import org.projectforge.fibu.kost.Bwa;
-import org.projectforge.fibu.kost.BwaZeile;
+import org.projectforge.fibu.kost.BusinessAssessment;
+import org.projectforge.fibu.kost.BusinessAssessmentRow;
 import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.reporting.Report;
@@ -58,7 +59,7 @@ import org.springframework.util.CollectionUtils;
 
 @ListPage(editPage = AccountingRecordEditPage.class)
 public class AccountingRecordListPage extends AbstractListPage<AccountingRecordListForm, BuchungssatzDao, BuchungssatzDO> implements
-    IListPageColumnsCreator<BuchungssatzDO>
+IListPageColumnsCreator<BuchungssatzDO>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AccountingRecordListPage.class);
 
@@ -66,16 +67,16 @@ public class AccountingRecordListPage extends AbstractListPage<AccountingRecordL
 
   private static final String PARAM_KEY_REPORT_ID = "reportId";
 
-  private static final String PARAM_KEY_BWA_ZEILE_ID = "bwaZeileId";
+  private static final String PARAM_KEY_BUSINESS_ASSESSMENT_ROW_ID = "businessAssessmentRowId";
 
   @SpringBean(name = "buchungssatzDao")
   private BuchungssatzDao buchungssatzDao;
 
-  protected Bwa bwa;
+  protected BusinessAssessment businessAssessment;
 
   protected String reportId;
 
-  private Integer bwaZeileId;
+  private String businessAssessmentRowId;
 
   private Report report;
 
@@ -91,14 +92,14 @@ public class AccountingRecordListPage extends AbstractListPage<AccountingRecordL
   /**
    * Gets the page parameters for calling the list page only for displaying accounting records of the given report.
    * @param reportId The id of the report of the ReportStorage of ReportObjectivesPage.
-   * @param bwaZeileId Display only records concerning the given row of the business assessment.
+   * @param businessAssessmentRowId Display only records concerning the given row of the business assessment.
    */
-  public static PageParameters getPageParameters(final String reportId, final Integer bwaZeileId)
+  public static PageParameters getPageParameters(final String reportId, final String businessAssessmentRowNo)
   {
     final PageParameters params = new PageParameters();
     params.put(PARAM_KEY_REPORT_ID, reportId);
-    if (bwaZeileId != null) {
-      params.put(PARAM_KEY_BWA_ZEILE_ID, bwaZeileId);
+    if (businessAssessmentRowNo != null) {
+      params.put(PARAM_KEY_BUSINESS_ASSESSMENT_ROW_ID, businessAssessmentRowNo);
     }
     return params;
   }
@@ -112,7 +113,7 @@ public class AccountingRecordListPage extends AbstractListPage<AccountingRecordL
   protected void setup()
   {
     reportId = getPageParameters().getString(PARAM_KEY_REPORT_ID);
-    bwaZeileId = getPageParameters().getAsInteger(PARAM_KEY_BWA_ZEILE_ID);
+    businessAssessmentRowId = getPageParameters().getString(PARAM_KEY_BUSINESS_ASSESSMENT_ROW_ID);
     if (reportId != null) {
       storeFilter = false;
     }
@@ -132,7 +133,7 @@ public class AccountingRecordListPage extends AbstractListPage<AccountingRecordL
   {
     final List<IColumn<BuchungssatzDO>> columns = new ArrayList<IColumn<BuchungssatzDO>>();
     final CellItemListener<BuchungssatzDO> cellItemListener = new CellItemListener<BuchungssatzDO>() {
-      public void populateItem(Item<ICellPopulator<BuchungssatzDO>> item, String componentId, IModel<BuchungssatzDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<BuchungssatzDO>> item, final String componentId, final IModel<BuchungssatzDO> rowModel)
       {
         final BuchungssatzDO satz = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(satz.getId(), satz.isDeleted());
@@ -143,7 +144,7 @@ public class AccountingRecordListPage extends AbstractListPage<AccountingRecordL
     };
     columns.add(new CellItemListenerPropertyColumn<BuchungssatzDO>(new Model<String>(getString("fibu.buchungssatz.satznr")),
         "formattedSatzNummer", "formattedSatzNummer", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      @SuppressWarnings({"unchecked", "rawtypes"})
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
@@ -156,7 +157,7 @@ public class AccountingRecordListPage extends AbstractListPage<AccountingRecordL
     });
     columns.add(new CurrencyPropertyColumn<BuchungssatzDO>(getString("fibu.common.betrag"), "betrag", "betrag", cellItemListener));
     columns
-        .add(new CellItemListenerPropertyColumn<BuchungssatzDO>(getString("fibu.buchungssatz.beleg"), "beleg", "beleg", cellItemListener));
+    .add(new CellItemListenerPropertyColumn<BuchungssatzDO>(getString("fibu.buchungssatz.beleg"), "beleg", "beleg", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<BuchungssatzDO>(new Model<String>(getString("fibu.kost1")), getSortable(
         "kost1.shortDisplayName", sortable), "kost1.shortDisplayName", cellItemListener) {
       @Override
@@ -223,7 +224,7 @@ public class AccountingRecordListPage extends AbstractListPage<AccountingRecordL
   }
 
   @Override
-  protected AccountingRecordListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected AccountingRecordListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new AccountingRecordListForm(this);
   }
@@ -243,12 +244,12 @@ public class AccountingRecordListPage extends AbstractListPage<AccountingRecordL
         if (reportStorage != null) {
           report = reportStorage.findById(this.reportId);
           if (report != null) {
-            if (this.bwaZeileId != null) {
-              BwaZeile zeile = report.getBwa().getZeile(bwaZeileId);
-              if (zeile != null) {
-                list = zeile.getBuchungssaetze();
+            if (this.businessAssessmentRowId != null) {
+              final BusinessAssessmentRow row = report.getBusinessAssessment().getRow(businessAssessmentRowId);
+              if (row != null) {
+                list = row.getAccountRecords();
               } else {
-                log.info("BwaZeile " + bwaZeileId + " not found for report with id '" + reportId + "' in existing ReportStorage.");
+                log.info("Business assessment row " + businessAssessmentRowId + " not found for report with id '" + reportId + "' in existing ReportStorage.");
               }
             } else {
               list = report.getBuchungssaetze();
@@ -263,10 +264,10 @@ public class AccountingRecordListPage extends AbstractListPage<AccountingRecordL
         list = super.getList();
       }
       if (CollectionUtils.isEmpty(list) == true) {
-        this.bwa = null;
+        this.businessAssessment = null;
       } else {
-        this.bwa = new Bwa();
-        this.bwa.setBuchungssaetze(list);
+        this.businessAssessment = new BusinessAssessment(ConfigXml.getInstance().getBusinessAssessmentConfig());
+        this.businessAssessment.setAccountRecords(list);
       }
       return list;
     }
@@ -275,7 +276,7 @@ public class AccountingRecordListPage extends AbstractListPage<AccountingRecordL
   }
 
   @Override
-  protected IModel<BuchungssatzDO> getModel(BuchungssatzDO object)
+  protected IModel<BuchungssatzDO> getModel(final BuchungssatzDO object)
   {
     return new DetachableDOModel<BuchungssatzDO, BuchungssatzDao>(object, getBaseDao());
   }
