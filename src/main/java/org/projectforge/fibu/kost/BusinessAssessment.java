@@ -37,23 +37,35 @@ import org.projectforge.xml.stream.XmlObject;
  * 
  */
 @XmlObject(alias = "businessAssessment")
-public class BusinessAssessmentConfig
+public class BusinessAssessment
 {
   @XmlField(alias = "rows")
-  private List<BusinessAssessmentRowConfig> rows;
+  private List<BusinessAssessmentRow> rows;
 
-  public BusinessAssessmentConfig()
+  public BusinessAssessment()
   {
   }
 
-  public List<BusinessAssessmentRowConfig> getRows()
+  public List<BusinessAssessmentRow> getRows()
   {
     return rows;
   }
 
-  public void setRows(final List<BusinessAssessmentRowConfig> rows)
+  /**
+   * @param id id or number of the row.
+   * @return The found row or null if not found.
+   */
+  public BusinessAssessmentRow getRow(final String id)
   {
-    this.rows = rows;
+    if (rows == null || id == null) {
+      return null;
+    }
+    for (final BusinessAssessmentRow row : rows) {
+      if (id.equals(row.getId()) == true || id.equals(row.getNo()) == true) {
+        return row;
+      }
+    }
+    return null;
   }
 
   @Override
