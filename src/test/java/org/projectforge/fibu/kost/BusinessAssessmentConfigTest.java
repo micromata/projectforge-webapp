@@ -27,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.apache.commons.lang.math.IntRange;
 import org.junit.Test;
+import org.projectforge.core.Priority;
 import org.projectforge.xml.stream.AliasMap;
 import org.projectforge.xml.stream.XmlHelper;
 import org.projectforge.xml.stream.XmlObjectReader;
@@ -37,14 +38,15 @@ public class BusinessAssessmentConfigTest
   public void testReadXml()
   {
     final AliasMap aliasMap = new AliasMap();
-    aliasMap.put(BusinessAssessmentRow.class, "row");
+    aliasMap.put(BusinessAssessmentRowConfig.class, "row");
     final XmlObjectReader reader = new XmlObjectReader();
     reader.setAliasMap(aliasMap);
-    reader.initialize(BusinessAssessment.class);
-    final BusinessAssessment bwa = (BusinessAssessment) reader.read(xml);
-    assertEquals(48, bwa.getRows().size());
+    reader.initialize(BusinessAssessmentConfig.class);
+    final BusinessAssessmentConfig bwa = (BusinessAssessmentConfig) reader.read(xml);
+    assertEquals(50, bwa.getRows().size());
     {
-      final BusinessAssessmentRow row = bwa.getRow("1060");
+      final BusinessAssessmentRowConfig row = bwa.getRow("1060");
+      assertEquals(Priority.HIGH, row.getPriority());
       assertEquals(0, row.getAccountNumbers().size());
       assertEquals(1, row.getAccountNumberRanges().size());
       final IntRange range = row.getAccountNumberRanges().get(0);
@@ -52,20 +54,25 @@ public class BusinessAssessmentConfigTest
       assertEquals(5999, range.getMaximumInteger());
     }
     {
-      final BusinessAssessmentRow row = bwa.getRow("sonstigeKosten");
+      final BusinessAssessmentRowConfig row = bwa.getRow("sonstigeKosten");
       assertEquals(1, row.getAccountNumbers().size());
-      assertEquals(6300, (int)row.getAccountNumbers().get(0));
+      assertEquals(6300, (int) row.getAccountNumbers().get(0));
       assertEquals(1, row.getAccountNumberRanges().size());
       final IntRange range = row.getAccountNumberRanges().get(0);
       assertEquals(6800, range.getMinimumInteger());
       assertEquals(6855, range.getMaximumInteger());
     }
     {
-      final BusinessAssessmentRow row = bwa.getRow("1312");
+      final BusinessAssessmentRowConfig row = bwa.getRow("1312");
       assertEquals(3, row.getAccountNumbers().size());
-      assertEquals(6392, (int)row.getAccountNumbers().get(0));
-      assertEquals(6895, (int)row.getAccountNumbers().get(1));
-      assertEquals(6960, (int)row.getAccountNumbers().get(2));
+      assertEquals(6392, (int) row.getAccountNumbers().get(0));
+      assertEquals(6895, (int) row.getAccountNumbers().get(1));
+      assertEquals(6960, (int) row.getAccountNumbers().get(2));
+      assertEquals(0, row.getAccountNumberRanges().size());
+    }
+    {
+      final BusinessAssessmentRowConfig row = bwa.getRow("1390");
+      assertEquals(0, row.getAccountNumbers().size());
       assertEquals(0, row.getAccountNumberRanges().size());
     }
   }
@@ -124,7 +131,9 @@ public class BusinessAssessmentConfigTest
           + "    <row no='1355' id='steuernEinkUErtr' accountRange='7600-7640' priority='low' title='Steuern Eink.u.Ertr' />\n" //
           + "    <row no='1360' />\n" //
           + "    <row no='1380' id='vorlaeufigesErgebnis' value='=ergebnisVorSteuern+steuernEinkUErtr' priority='high' title='Vorläufiges Ergebnis' />\n" //
-          + "    <row no='1390' />\n" //
+          + "    <row no='1390' value='='/>\n" //
+          + "    <row no='' id='erfolgsquote' priority='high' title='Erfolgsquote' />\n" //
+          + "    <row no='' id='relativePerformance' priority='high' title='relative Performance' />\n" //
           + "  </rows>\n" //
           + "</businessAssessment>");
 }
