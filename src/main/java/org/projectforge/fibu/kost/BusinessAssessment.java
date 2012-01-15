@@ -87,7 +87,8 @@ public class BusinessAssessment implements Serializable
     }
   }
 
-  private static double getDouble(final BigDecimal amount) {
+  private static double getDouble(final BigDecimal amount)
+  {
     if (amount == null) {
       return 0.0;
     }
@@ -120,7 +121,7 @@ public class BusinessAssessment implements Serializable
 
   public void setAccountRecords(final List<BuchungssatzDO> records)
   {
-    if (rows == null) {
+    if (CollectionUtils.isEmpty(rows) == true) {
       return;
     }
     if (CollectionUtils.isNotEmpty(records) == true) {
@@ -163,26 +164,66 @@ public class BusinessAssessment implements Serializable
       }
       row.recalculate();
     }
-    // GESAMTLEISTUNG:
-    // get(BwaZeileId.GESAMTLEISTUNG).sum(getZeilen(BwaZeileId.UMSATZERLOESE, BwaZeileId.BEST_VERDG, BwaZeileId.AKT_EIGENLEISTUNGEN));
-    // ROHERTRAG:
-    // if (get(BwaZeileId.GESAMTLEISTUNG).getBwaWert().compareTo(BigDecimal.ZERO) != 0) {
-    // // Erfolgsquote:
-    // this.erfolgsquote = get(BwaZeileId.BETRIEBSERGEBNIS).getBwaWert().multiply(NumberHelper.HUNDRED).divide(
-    // get(BwaZeileId.GESAMTLEISTUNG).getBwaWert(), 0, RoundingMode.HALF_UP);
-    // // relative Performance:
-    // this.relativePerformance = get(BwaZeileId.VORLAEUFIGES_ERGEBNIS).getBwaWert().divide(get(BwaZeileId.GESAMTLEISTUNG).getBwaWert(), 2,
-    // RoundingMode.HALF_UP);
-    // } else {
-    // this.erfolgsquote = BigDecimal.ZERO;
-    // this.relativePerformance = BigDecimal.ZERO;
-    // }
+  }
+
+  /**
+   * @return the rows
+   */
+  public List<BusinessAssessmentRow> getRows()
+  {
+    return rows;
+  }
+
+  public BusinessAssessmentRow getOverallPerformanceRow()
+  {
+    if (config == null) {
+      return null;
+    }
+    return getRow(config.getOverallPerformance());
+  }
+
+  public BigDecimal getOverallPerformanceRowAmount()
+  {
+    final BusinessAssessmentRow row = getOverallPerformanceRow();
+    return row != null ? row.getAmount() : null;
+  }
+
+  public BusinessAssessmentRow getMerchandisePurchaseRow()
+  {
+    if (config == null) {
+      return null;
+    }
+    return getRow(config.getMerchandisePurchase());
+  }
+
+  public BigDecimal getMerchandisePurchaseRowAmount()
+  {
+    final BusinessAssessmentRow row = getMerchandisePurchaseRow();
+    return row != null ? row.getAmount() : null;
+  }
+
+  public BusinessAssessmentRow getPreliminaryResultRow()
+  {
+    if (config == null) {
+      return null;
+    }
+    return getRow(config.getPreliminaryResult());
+  }
+
+  public BigDecimal getPreliminaryResultRowAmount()
+  {
+    final BusinessAssessmentRow row = getPreliminaryResultRow();
+    return row != null ? row.getAmount() : null;
   }
 
   public String getHeader()
   {
     final StringBuffer buf = new StringBuffer();
-    buf.append(config.getHeading());
+    if (config != null) {
+      buf.append(config.getHeading());
+    } else {
+      buf.append("business assessment (not defined in config.xml, see AdministrationGuide).");
+    }
     if (year > 0) {
       buf.append(": ").append(KostFormatter.formatBuchungsmonat(year, month));
     }
@@ -229,14 +270,9 @@ public class BusinessAssessment implements Serializable
     buf.append("\n");
   }
 
-  private void asLine(final StringBuffer buf, final String no, final String title, final BigDecimal amount, final int indent)
-  {
-    asLine(buf, no, title, amount, indent, 2, "€");
-  }
-
   private void asLine(final StringBuffer buf, final BusinessAssessmentRow row)
   {
-    asLine(buf, row.getNo(), row.getTitle(), row.getAmount(), row.getIndent());
+    asLine(buf, row.getNo(), row.getTitle(), row.getAmount(), row.getIndent(), row.getScale(), row.getUnit());
   }
 
   /**

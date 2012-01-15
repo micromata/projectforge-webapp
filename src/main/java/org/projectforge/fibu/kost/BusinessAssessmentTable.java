@@ -29,26 +29,26 @@ import java.util.List;
 import org.projectforge.common.LabelValueBean;
 
 /**
- * Speichert mehrere BWAs in einer Liste. Es kann eine Tabelle mit verschiedenen BWA-Spalten leicht erzeugt werden.
+ * Stores multiple business assessments in a list. A table with different business assessment columns can be used.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class BwaTable
+public class BusinessAssessmentTable
 {
-  private List<LabelValueBean<String, Bwa>> bwaList;
+  private final List<LabelValueBean<String, BusinessAssessment>> businessAssessmentList;
 
-  public BwaTable()
+  public BusinessAssessmentTable()
   {
-    bwaList = new ArrayList<LabelValueBean<String, Bwa>>();
+    businessAssessmentList = new ArrayList<LabelValueBean<String, BusinessAssessment>>();
   }
 
-  public List<LabelValueBean<String, Bwa>> getBwaList()
+  public List<LabelValueBean<String, BusinessAssessment>> getBusinessAssessmentList()
   {
-    return bwaList;
+    return businessAssessmentList;
   }
 
-  public void addBwa(final String label, final Bwa bwa)
+  public void addBusinessAssessment(final String label, final BusinessAssessment businessAssessment)
   {
-    bwaList.add(new LabelValueBean<String, Bwa>(label, bwa));
+    businessAssessmentList.add(new LabelValueBean<String, BusinessAssessment>(label, businessAssessment));
   }
 }

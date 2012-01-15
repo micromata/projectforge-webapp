@@ -35,6 +35,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.IntRange;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.Priority;
 import org.projectforge.scripting.GroovyExecutor;
@@ -169,7 +170,7 @@ public class BusinessAssessmentRow implements Serializable
    */
   public Priority getPriority()
   {
-    return config.getPriority();
+    return config.getPriority() != null ? config.getPriority() : Priority.MIDDLE;
   }
 
   /**
@@ -181,12 +182,29 @@ public class BusinessAssessmentRow implements Serializable
   }
 
   /**
-   * /** Only for indention when displaying this row.
+   * Only for indenting when displaying this row.
    * @return the indent
    */
   public int getIndent()
   {
     return config.getIndent();
+  }
+
+  /**
+   * Only for indenting when displaying this row.
+   * @return the indent
+   */
+  public int getScale()
+  {
+    return config.getScale() >=0 ? config.getScale() : 2;
+  }
+
+  /**
+   * @return the configured unit or if not configured the standard currency symbol.
+   */
+  public String getUnit()
+  {
+    return config.getUnit() != null ? config.getUnit() : ConfigXml.getInstance().getCurrencySymbol();
   }
 
   /**
@@ -224,7 +242,7 @@ public class BusinessAssessmentRow implements Serializable
     if (rval instanceof BigDecimal) {
       amount = (BigDecimal)rval;
     } else if (rval instanceof Number) {
-      amount = new BigDecimal(String.valueOf(rval)).setScale(2, RoundingMode.HALF_UP);
+      amount = new BigDecimal(String.valueOf(rval)).setScale(getScale(), RoundingMode.HALF_UP);
     }
   }
 

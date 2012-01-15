@@ -79,7 +79,9 @@ public class BusinessAssessmentRowConfig implements Serializable
   @XmlField(asAttribute = true)
   private String title;
 
-  private int indent;
+  private int indent, scale = -1;
+
+  private String unit;
 
   @XmlOmitField
   private boolean initialized;
@@ -161,12 +163,34 @@ public class BusinessAssessmentRowConfig implements Serializable
   }
 
   /**
-   * /** Only for indention when displaying this row.
+   * Only for indenting when displaying this row.
    * @return the indent
    */
   public int getIndent()
   {
     return indent;
+  }
+
+  /**
+   * If not given the standard scale 2 is used.
+   * @return the scale
+   */
+  public int getScale()
+  {
+    return scale;
+  }
+
+  public void setScale(final int scale)
+  {
+    this.scale = scale;
+  }
+
+  /**
+   * @return the unit
+   */
+  public String getUnit()
+  {
+    return unit;
   }
 
   /**

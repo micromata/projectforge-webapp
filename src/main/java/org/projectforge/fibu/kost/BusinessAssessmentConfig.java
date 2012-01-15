@@ -23,6 +23,7 @@
 
 package org.projectforge.fibu.kost;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
@@ -37,12 +38,16 @@ import org.projectforge.xml.stream.XmlObject;
  * 
  */
 @XmlObject(alias = "businessAssessment")
-public class BusinessAssessmentConfig
+public class BusinessAssessmentConfig implements Serializable
 {
+  private static final long serialVersionUID = -8466818920551754849L;
+
   @XmlField(alias = "rows")
   private List<BusinessAssessmentRowConfig> rows;
 
-  private final String heading = "business assessement";
+  private String heading = "business assessement";
+
+  private String overallPerformance, merchandisePurchase, preliminaryResult;
 
   public BusinessAssessmentConfig()
   {
@@ -76,6 +81,35 @@ public class BusinessAssessmentConfig
   public String getHeading()
   {
     return heading;
+  }
+
+  void setHeading(final String heading)
+  {
+    this.heading = heading;
+  }
+
+  /**
+   * @return the overallPerformance (id of the business assessment row).
+   */
+  public String getOverallPerformance()
+  {
+    return overallPerformance;
+  }
+
+  /**
+   * @return the merchandisePurchase (id of the business assessment row).
+   */
+  public String getMerchandisePurchase()
+  {
+    return merchandisePurchase;
+  }
+
+  /**
+   * @return the preliminaryResult (id of the business assessment row).
+   */
+  public String getPreliminaryResult()
+  {
+    return preliminaryResult;
   }
 
   @Override
