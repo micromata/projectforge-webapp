@@ -23,11 +23,22 @@
 
 package org.projectforge.fibu.kost;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.projectforge.xml.stream.XmlField;
-import org.projectforge.xml.stream.XmlObject;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.projectforge.common.NumberHelper;
+import org.projectforge.core.CurrencyFormatter;
+import org.projectforge.fibu.KontoDO;
+import org.projectforge.fibu.KostFormatter;
+import org.projectforge.fibu.kost.reporting.Report;
+import org.projectforge.user.PFUserContext;
 
 /**
  * Used in config.xml for the definition of the used business assessment schema. The business assessment is displayed in different
@@ -36,19 +47,179 @@ import org.projectforge.xml.stream.XmlObject;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-@XmlObject(alias = "businessAssessment")
-public class BusinessAssessment
+public class BusinessAssessment implements Serializable
 {
-  @XmlField(alias = "rows")
-  private List<BusinessAssessmentRow> rows;
+  private static final long serialVersionUID = 1752437122374944451L;
 
-  public BusinessAssessment()
+  private BusinessAssessmentConfig config;
+
+  private final List<BusinessAssessmentRow> rows = new ArrayList<BusinessAssessmentRow>();
+
+  private static final Logger log = Logger.getLogger(BusinessAssessment.class);
+
+  private String title;
+
+  private String shortname; // Ein Kurzname um z.B. labels oder Dateinamen zu generieren
+
+  private  int counter = 0;
+
+  private int year;
+
+  private int month;
+
+  private Object reference;
+
+  private boolean storeAccountRecordsInRows;
+
+  /**
+   * Fügt alle namentlichen BwaZeilen der Bwa in die übergebene Map. Nützlich für JasperReport, einmal unter der Bezeichnung und einmal
+   * unter der Zeilennummer als key.
+   * @param map Key ist die Zeilen
+   */
+  public static void putBusinessAssessmentRows(final Map<String, Object> map, final BusinessAssessment businessAssessment)
   {
+    for (final BusinessAssessmentRow row : businessAssessment.rows) {
+      map.put(row.getNo(), row.getAmount());
+      if (StringUtils.isNotBlank(row.getId()) == true) {
+        map.put(row.getId(), row.getAmount());
+      }
+    }
   }
 
-  public List<BusinessAssessmentRow> getRows()
+  public BusinessAssessment(final BusinessAssessmentConfig config)
   {
-    return rows;
+    this.config = config;
+    if (config == null || config.getRows() == null) {
+      return;
+    }
+    for (final BusinessAssessmentRowConfig rowConfig : config.getRows()) {
+      rows.add(new BusinessAssessmentRow(this, rowConfig));
+    }
+  }
+
+  public BusinessAssessment(final BusinessAssessmentConfig config, final List<BuchungssatzDO> records)
+  {
+    this(config);
+    setAccountRecords(records);
+  }
+
+  public BusinessAssessment(final BusinessAssessmentConfig config, final int year, final int month)
+  {
+    this(config);
+    this.year = year;
+    this.month = month;
+  }
+
+  public void setAccountRecords(final List<BuchungssatzDO> records)
+  {
+    if (rows == null) {
+      return;
+    }
+    if (CollectionUtils.isNotEmpty(records) == true) {
+      for (final BuchungssatzDO record : records) {
+        counter++;
+        // Diese Berechnungen werden anhand des Wertenachweises einer Bwa geführt:
+        if (record.isIgnore() == true) {
+          continue;
+        }
+        final KontoDO account = record.getKonto();
+        if (account == null || account.getNummer() == null) {
+          continue;
+        }
+        final int accountNumber = account.getNummer();
+        boolean found = false;
+        for (final BusinessAssessmentRow row : rows) {
+          if (row.doesMatch(accountNumber) == true) {
+            row.addAccountRecord(record);
+            found = true;
+            break;
+          }
+        }
+        if (found == false) {
+          log.warn("Ignoring Satz: " + record);
+          record.setIgnore(true);
+        }
+      }
+      recalculate();
+    }
+  }
+
+  public void recalculate()
+  {
+    // GESAMTLEISTUNG:
+    // get(BwaZeileId.GESAMTLEISTUNG).sum(getZeilen(BwaZeileId.UMSATZERLOESE, BwaZeileId.BEST_VERDG, BwaZeileId.AKT_EIGENLEISTUNGEN));
+    // ROHERTRAG:
+    // if (get(BwaZeileId.GESAMTLEISTUNG).getBwaWert().compareTo(BigDecimal.ZERO) != 0) {
+    // // Erfolgsquote:
+    // this.erfolgsquote = get(BwaZeileId.BETRIEBSERGEBNIS).getBwaWert().multiply(NumberHelper.HUNDRED).divide(
+    // get(BwaZeileId.GESAMTLEISTUNG).getBwaWert(), 0, RoundingMode.HALF_UP);
+    // // relative Performance:
+    // this.relativePerformance = get(BwaZeileId.VORLAEUFIGES_ERGEBNIS).getBwaWert().divide(get(BwaZeileId.GESAMTLEISTUNG).getBwaWert(), 2,
+    // RoundingMode.HALF_UP);
+    // } else {
+    // this.erfolgsquote = BigDecimal.ZERO;
+    // this.relativePerformance = BigDecimal.ZERO;
+    // }
+  }
+
+  public String getHeader()
+  {
+    final StringBuffer buf = new StringBuffer();
+    buf.append(config.getHeading());
+    if (year > 0) {
+      buf.append(": ").append(KostFormatter.formatBuchungsmonat(year, month));
+    }
+    if (title != null) {
+      buf.append(" \"").append(title).append("\"");
+    }
+    buf.append(":\n");
+    return buf.toString();
+  }
+
+  @Override
+  public String toString()
+  {
+    final StringBuffer buf = new StringBuffer();
+    buf.append(getHeader());
+    if (rows != null) {
+      for (final BusinessAssessmentRow row : rows) {
+        asLine(buf, row);
+      }
+    }
+    return buf.toString();
+  }
+
+  private void asLine(final StringBuffer buf, final String no, final String title, final BigDecimal amount, final int indent,
+      final int scale, final String unit)
+  {
+    buf.append(StringUtils.leftPad(no, 4));
+    int length = 25;
+    for (int i = 0; i < indent; i++) {
+      buf.append(" ");
+      length--; // One space lost.
+    }
+    buf.append(" ").append(StringUtils.rightPad(StringUtils.defaultString(title), length)).append(" ");
+    if (amount != null && amount.compareTo(BigDecimal.ZERO) != 0) {
+      String value;
+      if ("€".equals(unit) == true) {
+        value = CurrencyFormatter.format(amount);
+      } else {
+        final NumberFormat format = NumberHelper.getNumberFractionFormat(PFUserContext.getLocale(), scale);
+        value = format.format(amount) + " " + unit;
+      }
+      buf.append(StringUtils.leftPad(value, 18));
+    }
+    buf.append("\n");
+  }
+
+  private void asLine(final StringBuffer buf, final String no, final String title, final BigDecimal amount, final int indent)
+  {
+    asLine(buf, no, title, amount, indent, 2, "€");
+  }
+
+  private void asLine(final StringBuffer buf, final BusinessAssessmentRow row)
+  {
+    asLine(buf, row.getNo(), row.getTitle(), row.getAmount(), row.getIndent());
   }
 
   /**
@@ -68,10 +239,54 @@ public class BusinessAssessment
     return null;
   }
 
-  @Override
-  public String toString()
+  public String getShortname()
   {
-    final ReflectionToStringBuilder builder = new ReflectionToStringBuilder(this);
-    return builder.toString();
+    return shortname;
+  }
+
+  public void setShortname(final String shortname)
+  {
+    this.shortname = shortname;
+  }
+
+  public int getCounter()
+  {
+    return counter;
+  }
+
+  /**
+   * Dieses Objekt kann von der benutzenden Klasse als freies Feld genutzt werden. Z. B. wird dieses Feld benutzt, um den Report zu
+   * erhalten, der diese BWA enthält
+   * @see Report#getChildBwaArray(boolean)
+   */
+  public Object getReference()
+  {
+    return reference;
+  }
+
+  public void setReference(final Object reference)
+  {
+    this.reference = reference;
+  }
+
+  /**
+   * @return true if the account records are stored in the rows.
+   */
+  public boolean isStoreAccountRecordsInRows()
+  {
+    return storeAccountRecordsInRows;
+  }
+
+  /**
+   * @param storeAccountRecordsInRows the storeAccountRecordsInRows to set
+   * @return this for chaining.
+   */
+  public BusinessAssessment setStoreAccountRecordsInRows(final boolean storeAccountRecordsInRows)
+  {
+    this.storeAccountRecordsInRows = storeAccountRecordsInRows;
+    for (final BusinessAssessmentRow row : this.rows) {
+      row.setStoreAccountRecords(this.storeAccountRecordsInRows);
+    }
+    return this;
   }
 }

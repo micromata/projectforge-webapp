@@ -23,16 +23,15 @@
 
 package org.projectforge.fibu.kost;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.math.IntRange;
+import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.Priority;
-import org.projectforge.xml.stream.XmlField;
-import org.projectforge.xml.stream.XmlObject;
-import org.projectforge.xml.stream.XmlOmitField;
 
 /**
  * Used in config.xml for the definition of the used business assessment schema. This object represents a single row of the business
@@ -41,43 +40,97 @@ import org.projectforge.xml.stream.XmlOmitField;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-@XmlObject(alias = "row")
-public class BusinessAssessmentRow
+public class BusinessAssessmentRow implements Serializable
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(BusinessAssessmentRow.class);
+  private static final long serialVersionUID = -5192131633290561520L;
 
-  // <row no="1051" id="gesamtleistung" value="umsatzErloese+bestVerdg+aktEigenleistungen" priority="high" title="Gesamtleistung" />
+  private final BusinessAssessment bussinessAssessment;
 
-  @XmlOmitField
-  List<IntRange> accountNumberRanges;
+  private final BusinessAssessmentRowConfig config;
 
-  @XmlOmitField
-  List<Integer> accountNumbers;
+  private List<BuchungssatzDO> accountRecords;
 
-  @XmlField(asAttribute = true)
-  private String no;
+  private BigDecimal amount;
 
-  @XmlField(asAttribute = true)
-  private String id;
-
-  @XmlField(asAttribute = true, alias = "accountRange")
-  private String accountRangeConfig;
-
-  @XmlField(alias = "value")
-  private String valueConfig;
-
-  private Priority priority;
-
-  @XmlField(asAttribute = true)
-  private String title;
-
-  private int indent;
-
-  @XmlOmitField
-  private boolean initialized;
-
-  public BusinessAssessmentRow()
+  public BusinessAssessmentRow(final BusinessAssessment bussinessAssessment, final BusinessAssessmentRowConfig config)
   {
+    this.bussinessAssessment = bussinessAssessment;
+    this.config = config;
+  }
+
+  /**
+   * @param accountNumber
+   * @return true if the given account number matches the account number ranges of this row.
+   */
+  public boolean doesMatch(final int accountNumber)
+  {
+    if (config.accountNumbers != null) {
+      for (final Integer no : config.accountNumbers) {
+        if (no != null && no.intValue() == accountNumber) {
+          return true;
+        }
+      }
+    }
+    if (config.accountNumberRanges != null) {
+      for (final IntRange range : config.accountNumberRanges) {
+        if (range != null && range.containsInteger(accountNumber) == true) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Removes any previous existing Buchungssatz.
+   * @param value If true then all account records will be stored, if added via addAccountRecord. Otherwise no records are stored.
+   */
+  public void setStoreAccountRecords(final boolean value)
+  {
+    if (value == true) {
+      this.accountRecords = new ArrayList<BuchungssatzDO>();
+    } else {
+      this.accountRecords = null;
+    }
+  }
+
+  /**
+   * Addiert den Kontoumsatz und falls setStoreBuchungsaetze(true) gesetzt wurde, wird der Buchungssatz intern hinzugefügt.
+   * @param satz
+   */
+  public void addAccountRecord(final BuchungssatzDO record)
+  {
+    if (amount == null) {
+      amount = BigDecimal.ZERO;
+    }
+    amount = amount.add(record.getBetrag());
+    if (this.accountRecords != null) {
+      this.accountRecords.add(record);
+    }
+  }
+
+  /**
+   * @return the amount
+   */
+  public BigDecimal getAmount()
+  {
+    return amount;
+  }
+
+  /**
+   * @return the accountRecords if stored otherwise null.
+   */
+  public List<BuchungssatzDO> getAccountRecords()
+  {
+    return accountRecords;
+  }
+
+  /**
+   * @return the bussinessAssessment of which this row is part of.
+   */
+  public BusinessAssessment getBussinessAssessment()
+  {
+    return bussinessAssessment;
   }
 
   /**
@@ -86,7 +139,7 @@ public class BusinessAssessmentRow
    */
   public String getNo()
   {
-    return no;
+    return config.getNo();
   }
 
   /**
@@ -95,29 +148,7 @@ public class BusinessAssessmentRow
    */
   public String getId()
   {
-    return id;
-  }
-
-  /**
-   * The amount is calculated by adding all account records of the given account range. The account range is a coma separated list of
-   * accounts and account ranges (DATEV accounts) such as "4830,4947", "4000-4799" or "6300,6800-6855".
-   * @return the accountRange
-   */
-  public String getAccountRangeConfig()
-  {
-    return accountRangeConfig;
-  }
-
-  /**
-   * The value is optional and used if the amount of this row has to be calculated. If the string starts with '=' then the value is
-   * calculated, e. g. "= resultBeforeTaxes + taxesAndOtherIncomes". resultBeforeTaxes and taxesAndOtherIncomes are id's of rows available
-   * as variables. <br/>
-   * If the string doesn't start with a '=' the value will be taken as Groovy script and the returned value of this script is taken as
-   * amount of this row.
-   */
-  public String getValueConfig()
-  {
-    return valueConfig;
+    return config.getId();
   }
 
   /**
@@ -126,7 +157,7 @@ public class BusinessAssessmentRow
    */
   public Priority getPriority()
   {
-    return priority;
+    return config.getPriority();
   }
 
   /**
@@ -134,7 +165,7 @@ public class BusinessAssessmentRow
    */
   public String getTitle()
   {
-    return title;
+    return config.getTitle();
   }
 
   /**
@@ -143,7 +174,7 @@ public class BusinessAssessmentRow
    */
   public int getIndent()
   {
-    return indent;
+    return config.getIndent();
   }
 
   /**
@@ -151,8 +182,7 @@ public class BusinessAssessmentRow
    */
   public List<IntRange> getAccountNumberRanges()
   {
-    initialize();
-    return accountNumberRanges;
+    return config.getAccountNumberRanges();
   }
 
   /**
@@ -160,57 +190,21 @@ public class BusinessAssessmentRow
    */
   public List<Integer> getAccountNumbers()
   {
-    initialize();
-    return accountNumbers;
+    return config.getAccountNumbers();
   }
 
   @Override
   public String toString()
   {
-    final ReflectionToStringBuilder builder = new ReflectionToStringBuilder(this);
-    return builder.toString();
+    return StringUtils.leftPad(getNo(), 4)
+        + " "
+        + StringUtils.rightPad(getTitle(), 20)
+        + " "
+        + StringUtils.leftPad(CurrencyFormatter.format(getAmount()), 18);
+    /*
+     * StringBuffer buf = new StringBuffer(); buf.append(row); for (KontoUmsatz umsatz : kontoUmsaetze) { buf.append("\n ");
+     * buf.append(umsatz.toString()); } return buf.toString();
+     */
   }
 
-  /**
-   * Extract the account ranges of the configured accountRage at set the ranges. Examples: "4830,4947", "4000-4799" or "6300,6800-6855"
-   */
-  private synchronized void initialize()
-  {
-    if (initialized == true) {
-      return;
-    }
-    accountNumberRanges = new ArrayList<IntRange>();
-    accountNumbers = new ArrayList<Integer>();
-    if (StringUtils.isBlank(accountRangeConfig) == true) {
-      // No account ranges given.
-      return;
-    }
-    final String[] ranges = StringUtils.split(accountRangeConfig, ";,");
-    for (final String range : ranges) {
-      if (StringUtils.isBlank(range) == true) {
-        // No account range given.
-        continue;
-      }
-      final String str = range.trim();
-      if (str.indexOf('-') >= 0) {
-        final String[] numbers = StringUtils.split(str, "-");
-        if (numbers == null || numbers.length != 2) {
-          log.warn("Couldn't parse number range of businessAssessmentRow '" + accountRangeConfig + "'.");
-        } else {
-          try {
-            accountNumberRanges.add(new IntRange(new Integer(numbers[0].trim()), new Integer(numbers[1].trim())));
-          } catch (final NumberFormatException ex) {
-            log.warn("Couldn't parse number range of businessAssessmentRow '" + accountRangeConfig + "':" + ex.getMessage(), ex);
-          }
-        }
-      } else {
-        try {
-          accountNumbers.add(new Integer(str));
-        } catch (final NumberFormatException ex) {
-          log.warn("Couldn't parse number range of businessAssessmentRow '" + accountRangeConfig + "':" + ex.getMessage(), ex);
-        }
-      }
-    }
-    initialized = true;
-  }
 }
