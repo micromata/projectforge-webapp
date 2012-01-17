@@ -30,12 +30,15 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.fibu.KontoCache;
+import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.KundeDao;
 import org.projectforge.fibu.KundeStatus;
@@ -54,6 +57,9 @@ import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDao, KundeDO>
 {
   private static final long serialVersionUID = -8406452960003792763L;
+
+  @SpringBean(name = "kontoCache")
+  private KontoCache kontoCache;
 
   @SpringBean(name = "kundeDao")
   private KundeDao kundeDao;
@@ -125,6 +131,19 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("fibu.kunde.division")), "division", "division",
         cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("fibu.konto")), null, "konto",
+        cellItemListener) {
+      @SuppressWarnings("unchecked")
+      @Override
+      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      {
+        final KundeDO kunde = (KundeDO) rowModel.getObject();
+        final KontoDO konto = kontoCache.getKonto(kunde.getKontoId());
+        item
+        .add(new Label(componentId, konto != null ? konto.formatKonto() : ""));
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
     columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("description")), "description", "description",
         cellItemListener));
