@@ -44,6 +44,7 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.fibu.AuftragsPositionVO;
+import org.projectforge.fibu.KontoCache;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.RechnungDao;
 import org.projectforge.fibu.RechnungsStatistik;
@@ -61,11 +62,14 @@ import org.projectforge.web.wicket.ListSelectActionPanel;
 
 @ListPage(editPage = RechnungEditPage.class)
 public class RechnungListPage extends AbstractListPage<RechnungListForm, RechnungDao, RechnungDO> implements
-    IListPageColumnsCreator<RechnungDO>
+IListPageColumnsCreator<RechnungDO>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(RechnungListPage.class);
 
   private static final long serialVersionUID = -8406452960003792763L;
+
+  @SpringBean(name = "kontoCache")
+  private KontoCache kontoCache;
 
   @SpringBean(name = "rechnungDao")
   private RechnungDao rechnungDao;
@@ -80,7 +84,7 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
     return rechnungsStatistik;
   }
 
-  public RechnungListPage(PageParameters parameters)
+  public RechnungListPage(final PageParameters parameters)
   {
     super(parameters, "fibu.rechnung");
     this.colspan = 4;
@@ -108,8 +112,8 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
   public List<IColumn<RechnungDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<RechnungDO>> columns = new ArrayList<IColumn<RechnungDO>>();
-    CellItemListener<RechnungDO> cellItemListener = new CellItemListener<RechnungDO>() {
-      public void populateItem(Item<ICellPopulator<RechnungDO>> item, String componentId, IModel<RechnungDO> rowModel)
+    final CellItemListener<RechnungDO> cellItemListener = new CellItemListener<RechnungDO>() {
+      public void populateItem(final Item<ICellPopulator<RechnungDO>> item, final String componentId, final IModel<RechnungDO> rowModel)
       {
         final RechnungDO rechnung = rowModel.getObject();
         if (rechnung.getStatus() == null) {
@@ -172,13 +176,14 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
     columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("fibu.auftrag.auftraege")), null, null,
         cellItemListener) {
       @Override
-      public void populateItem(Item<ICellPopulator<RechnungDO>> item, String componentId, IModel<RechnungDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<RechnungDO>> item, final String componentId, final IModel<RechnungDO> rowModel)
       {
         final Set<AuftragsPositionVO> orderPositions = rowModel.getObject().getAuftragsPositionVOs();
         if (CollectionUtils.isEmpty(orderPositions) == true) {
           item.add(AbstractBasePage.createInvisibleDummyComponent(componentId));
         } else {
           final OrderPositionsPanel panel = new OrderPositionsPanel(componentId) {
+            @Override
             protected void onBeforeRender()
             {
               super.onBeforeRender();
@@ -220,7 +225,7 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
         + "_"
         + DateHelper.getDateAsFilenameSuffix(new Date())
         + ".xls";
-    final byte[] xls = KostZuweisungExport.instance.exportRechnungen(rechnungen, getString("fibu.common.debitor"));
+    final byte[] xls = KostZuweisungExport.instance.exportRechnungen(rechnungen, getString("fibu.common.debitor"), kontoCache);
     if (xls == null || xls.length == 0) {
       log.error("Oups, xls has zero size. Filename: " + filename);
       return;
@@ -229,7 +234,7 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
   }
 
   @Override
-  protected RechnungListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected RechnungListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new RechnungListForm(this);
   }
@@ -241,7 +246,7 @@ public class RechnungListPage extends AbstractListPage<RechnungListForm, Rechnun
   }
 
   @Override
-  protected IModel<RechnungDO> getModel(RechnungDO object)
+  protected IModel<RechnungDO> getModel(final RechnungDO object)
   {
     return new DetachableDOModel<RechnungDO, RechnungDao>(object, getBaseDao());
   }
