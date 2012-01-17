@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 import org.projectforge.core.BaseDao;
+import org.projectforge.fibu.KontoCache;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.UserGroupCache;
 
@@ -53,6 +54,8 @@ public class Registry
   private TaskTree taskTree;
 
   private UserGroupCache userGroupCache;
+
+  private KontoCache kontoCache;
 
   public static Registry instance()
   {
@@ -146,6 +149,23 @@ public class Registry
   public void setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
+  }
+
+  /**
+   * @return the kontoCache
+   */
+  public KontoCache getKontoCache()
+  {
+    return kontoCache;
+  }
+
+  /**
+   * @param kontoCache the kontoCache to set
+   * @return this for chaining.
+   */
+  public void setKontoCache(final KontoCache kontoCache)
+  {
+    this.kontoCache = kontoCache;
   }
 
   private Registry()

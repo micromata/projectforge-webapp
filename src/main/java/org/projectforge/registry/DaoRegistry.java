@@ -246,6 +246,7 @@ public class DaoRegistry
     .setNestedDOClasses(EingangsrechnungsPositionDO.class);
     register(ACCOUNTING_RECORD, BuchungssatzDao.class, buchungssatzDao, "fibu.buchungssatz"); // Need account, cost1 and cost2.
     register(ACCOUNT, KontoDao.class, kontoDao, "fibu.konto");
+    Registry.instance().setKontoCache(kontoDao.getKontoCache());
     register(EMPLOYEE, EmployeeDao.class, employeeDao, "fibu.employee").setScriptingDao(new EmployeeScriptingDao(employeeDao));
     register(EMPLOYEE_SALARY, EmployeeDao.class, employeeSalaryDao, "fibu.employee.saraly");
 
