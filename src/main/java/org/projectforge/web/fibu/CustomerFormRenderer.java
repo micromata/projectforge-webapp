@@ -24,13 +24,18 @@
 package org.projectforge.web.fibu;
 
 import static org.projectforge.web.wicket.layout.DropDownChoiceLPanel.SELECT_ID;
+import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
+import static org.projectforge.web.wicket.layout.SelectLPanel.WICKET_ID_SELECT_PANEL;
 
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.convert.IConverter;
+import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.KundeStatus;
+import org.projectforge.fibu.kost.AccountingConfig;
+import org.projectforge.registry.Registry;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.converter.IntegerConverter;
@@ -50,7 +55,7 @@ public class CustomerFormRenderer extends AbstractFormRenderer
 
   private final static LayoutLength VALUE_LENGTH = LayoutLength.ONEHALF;
 
-  public CustomerFormRenderer(final MarkupContainer container, final LayoutContext layoutContext,
+  public CustomerFormRenderer(final MarkupContainer container,final LayoutContext layoutContext,
       final KundeDO data)
   {
     super(container, layoutContext);
@@ -69,20 +74,27 @@ public class CustomerFormRenderer extends AbstractFormRenderer
           {
             return new IntegerConverter(3);
           }
-        }, new PanelContext(LayoutLength.QUART, getString("fibu.kunde.nummer"), LABEL_LENGTH)
-        .setStrong().setFocus(isNew() == true).setEnabled(isNew() == true));
-    doPanel.addTextField(new PanelContext(data, "name", VALUE_LENGTH, getString("fibu.kunde.name"), LABEL_LENGTH).setRequired()
-        .setStrong().setFocus(isNew() == false));
+        }, new PanelContext(LayoutLength.QUART, getString("fibu.kunde.nummer"), LABEL_LENGTH).setStrong().setFocus(isNew() == true)
+        .setEnabled(isNew() == true));
+    doPanel.addTextField(new PanelContext(data, "name", VALUE_LENGTH, getString("fibu.kunde.name"), LABEL_LENGTH).setRequired().setStrong()
+        .setFocus(isNew() == false));
+    if (Registry.instance().getKontoCache().isEmpty() == false) {
+      // Show this field only if DATEV accounts exist.
+      final KontoSelectPanel kontoSelectPanel = new KontoSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<KontoDO>(data, "konto"),
+          null, "kontoId");
+      doPanel.addSelectPanel(kontoSelectPanel, new PanelContext(FULL, getString("fibu.konto"), LABEL_LENGTH).setStrong());
+      kontoSelectPanel.setKontoNumberRanges(AccountingConfig.getInstance().getDebitorsAccountNumberRanges()).init();
+    }
     doPanel.addTextField(new PanelContext(data, "identifier", VALUE_LENGTH, getString("fibu.kunde.identifier"), LABEL_LENGTH));
     doPanel.addTextField(new PanelContext(data, "division", VALUE_LENGTH, getString("fibu.kunde.division"), LABEL_LENGTH));
     doPanel.addTextArea(new PanelContext(data, "description", VALUE_LENGTH, getString("description"), LABEL_LENGTH)
     .setCssStyle("height: 20ex;"));
     {
       // Status drop down box:
-      final LabelValueChoiceRenderer<KundeStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<KundeStatus>(container, KundeStatus
-          .values());
+      final LabelValueChoiceRenderer<KundeStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<KundeStatus>(container,
+          KundeStatus.values());
       final DropDownChoice<KundeStatus> statusChoice = new DropDownChoice<KundeStatus>(SELECT_ID, new PropertyModel<KundeStatus>(data,
-      "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
+          "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
       statusChoice.setNullValid(false).setRequired(true);
       doPanel.addDropDownChoice(statusChoice, new PanelContext(LayoutLength.THREEQUART, getString("status"), LABEL_LENGTH));
     }
