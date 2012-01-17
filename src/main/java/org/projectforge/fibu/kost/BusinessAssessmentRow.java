@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.IntRange;
+import org.projectforge.common.IntRanges;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.Priority;
@@ -75,21 +75,7 @@ public class BusinessAssessmentRow implements Serializable
    */
   public boolean doesMatch(final int accountNumber)
   {
-    if (config.getAccountNumbers() != null) {
-      for (final Integer no : config.accountNumbers) {
-        if (no != null && no.intValue() == accountNumber) {
-          return true;
-        }
-      }
-    }
-    if (config.getAccountNumberRanges() != null) {
-      for (final IntRange range : config.accountNumberRanges) {
-        if (range != null && range.containsInteger(accountNumber) == true) {
-          return true;
-        }
-      }
-    }
-    return false;
+    return config.getAccountNumberRanges().doesMatch(accountNumber);
   }
 
   /**
@@ -210,17 +196,9 @@ public class BusinessAssessmentRow implements Serializable
   /**
    * @return the accountNumberRanges
    */
-  public List<IntRange> getAccountNumberRanges()
+  public IntRanges getAccountNumberRanges()
   {
     return config.getAccountNumberRanges();
-  }
-
-  /**
-   * @return the accountNumbers
-   */
-  public List<Integer> getAccountNumbers()
-  {
-    return config.getAccountNumbers();
   }
 
   void recalculate()

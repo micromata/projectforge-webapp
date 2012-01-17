@@ -26,12 +26,10 @@ package org.projectforge.fibu.kost;
 import groovy.lang.Script;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang.math.IntRange;
+import org.projectforge.common.IntRanges;
 import org.projectforge.core.Priority;
 import org.projectforge.scripting.GroovyExecutor;
 import org.projectforge.xml.stream.XmlField;
@@ -55,10 +53,7 @@ public class BusinessAssessmentRowConfig implements Serializable
   // <row no="1051" id="gesamtleistung" value="umsatzErloese+bestVerdg+aktEigenleistungen" priority="high" title="Gesamtleistung" />
 
   @XmlOmitField
-  List<IntRange> accountNumberRanges;
-
-  @XmlOmitField
-  List<Integer> accountNumbers;
+  IntRanges accountNumberRanges;
 
   @XmlField(asAttribute = true)
   private String no;
@@ -196,19 +191,10 @@ public class BusinessAssessmentRowConfig implements Serializable
   /**
    * @return the accountNumberRanges
    */
-  public List<IntRange> getAccountNumberRanges()
+  public IntRanges getAccountNumberRanges()
   {
     initialize();
     return accountNumberRanges;
-  }
-
-  /**
-   * @return the accountNumbers
-   */
-  public List<Integer> getAccountNumbers()
-  {
-    initialize();
-    return accountNumbers;
   }
 
   @Override
@@ -226,42 +212,11 @@ public class BusinessAssessmentRowConfig implements Serializable
     if (initialized == true) {
       return;
     }
-    initAccountNumberRanges();
+    try {
+      accountNumberRanges = new IntRanges(accountRangeConfig);
+    } catch (final Exception ex) {
+      log.warn("Couldn't parse number range of businessAssessmentRow '" + accountRangeConfig + "':" + ex.getMessage(), ex);
+    }
     initialized = true;
-  }
-
-  private void initAccountNumberRanges() {
-    accountNumberRanges = new ArrayList<IntRange>();
-    accountNumbers = new ArrayList<Integer>();
-    if (StringUtils.isBlank(accountRangeConfig) == true) {
-      // No account ranges given.
-      return;
-    }
-    final String[] ranges = StringUtils.split(accountRangeConfig, ";,");
-    for (final String range : ranges) {
-      if (StringUtils.isBlank(range) == true) {
-        // No account range given.
-        continue;
-      }
-      final String str = range.trim();
-      if (str.indexOf('-') >= 0) {
-        final String[] numbers = StringUtils.split(str, "-");
-        if (numbers == null || numbers.length != 2) {
-          log.warn("Couldn't parse number range of businessAssessmentRow '" + accountRangeConfig + "'.");
-        } else {
-          try {
-            accountNumberRanges.add(new IntRange(new Integer(numbers[0].trim()), new Integer(numbers[1].trim())));
-          } catch (final NumberFormatException ex) {
-            log.warn("Couldn't parse number range of businessAssessmentRow '" + accountRangeConfig + "':" + ex.getMessage(), ex);
-          }
-        }
-      } else {
-        try {
-          accountNumbers.add(new Integer(str));
-        } catch (final NumberFormatException ex) {
-          log.warn("Couldn't parse number range of businessAssessmentRow '" + accountRangeConfig + "':" + ex.getMessage(), ex);
-        }
-      }
-    }
   }
 }
