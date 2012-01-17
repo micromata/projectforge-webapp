@@ -56,6 +56,7 @@ import org.projectforge.common.FileHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.export.ExportJFreeChart;
 import org.projectforge.export.ExportWorkbook;
+import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.fibu.kost.BusinessAssessmentRowConfig;
 import org.projectforge.fibu.kost.reporting.Report;
@@ -129,7 +130,7 @@ public class ReportScriptingPage extends AbstractSecuredPage
     scriptDao.addAliasForDeprecatedScriptVariables(scriptVariables);
     buf = new StringBuffer();
     boolean first = true;
-    for (final BusinessAssessmentRowConfig rowConfig : ConfigXml.getInstance().getBusinessAssessmentConfig().getRows()) {
+    for (final BusinessAssessmentRowConfig rowConfig : AccountingConfig.getInstance().getBusinessAssessmentConfig().getRows()) {
       if (first == true) {
         first = false;
       } else {
