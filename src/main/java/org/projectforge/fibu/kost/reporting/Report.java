@@ -33,8 +33,8 @@ import java.util.regex.Pattern;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.ObjectUtils;
-import org.projectforge.core.ConfigXml;
 import org.projectforge.fibu.KostFormatter;
+import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.fibu.kost.BuchungssatzDO;
 import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.fibu.kost.BusinessAssessmentTable;
@@ -164,7 +164,7 @@ public class Report implements Serializable
   public BusinessAssessment getBusinessAssessment()
   {
     if (this.businessAssessment == null) {
-      this.businessAssessment = new BusinessAssessment(ConfigXml.getInstance().getBusinessAssessmentConfig());
+      this.businessAssessment = new BusinessAssessment(AccountingConfig.getInstance().getBusinessAssessmentConfig());
       this.businessAssessment.setReference(this);
       this.businessAssessment.setStoreAccountRecordsInRows(true);
       this.businessAssessment.setAccountRecords(this.buchungssaetze);

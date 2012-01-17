@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.projectforge.core.ConfigXml;
+import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.fibu.kost.BuchungssatzDO;
 import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.reporting.Buchungssatz;
@@ -76,7 +76,7 @@ public class ReportGenerator
    */
   public BusinessAssessment addBusinessAssessment(final List<BuchungssatzDO> buchungsSaetze)
   {
-    final BusinessAssessment businessAssessment = new BusinessAssessment(ConfigXml.getInstance().getBusinessAssessmentConfig(), buchungsSaetze);
+    final BusinessAssessment businessAssessment = new BusinessAssessment(AccountingConfig.getInstance().getBusinessAssessmentConfig(), buchungsSaetze);
     addBusinessAssessment(businessAssessment);
     return businessAssessment;
   }
