@@ -23,255 +23,169 @@
 
 package org.projectforge.web.fibu;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.convert.IConverter;
+import org.projectforge.common.IntRanges;
+import org.projectforge.common.NumberHelper;
+import org.projectforge.common.Ranges;
+import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.fibu.KontoDO;
+import org.projectforge.fibu.KontoDao;
+import org.projectforge.web.wicket.AbstractSelectPanel;
+import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 
 /**
- * This panel show the actual kunde and buttons for select/unselect kunde.
+ * This panel is a autocompletion text field for selecting an account (DATEV-Konto).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class KontoSelectPanel //extends AbstractSelectPanel<KundeDO>
+public class KontoSelectPanel extends AbstractSelectPanel<KontoDO>
 {
-  //  private static final long serialVersionUID = 5452693296383142460L;
-  //
-  //  @SpringBean(name = "kundeFormatter")
-  //  private KundeFormatter kundeFormatter;
-  //
-  //  private final PropertyModel<String> kundeText;
-  //
-  //  private RecentQueue<String> recentCustomers;
-  //
-  //  private PFAutoCompleteTextField<KundeDO> customerTextField;
-  //
-  //  // Only used for detecting changes:
-  //  private KundeDO currentCustomer;
-  //
-  //  @SpringBean(name = "customerDao")
-  //  private KundeDao customerDao;
-  //
-  //  /**
-  //   * @param id
-  //   * @param model
-  //   * @param customerText If no Kunde is given then a free text field representing a Kunde can be used.
-  //   * @param caller
-  //   * @param selectProperty
-  //   */
-  //  public KontoSelectPanel(final String id, final IModel<KundeDO> model, final PropertyModel<String> customerText,
-  //      final ISelectCallerPage caller, final String selectProperty)
-  //  {
-  //    super(id, model, caller, selectProperty);
-  //    this.customerText = customerText;
-  //  }
-  //
-  //  @Override
-  //  @SuppressWarnings("serial")
-  //  public KontoSelectPanel init()
-  //  {
-  //    super.init();
-  //    customerTextField = new PFAutoCompleteTextField<KundeDO>("customerField", getModel()) {
-  //      @Override
-  //      protected List<KundeDO> getChoices(final String input)
-  //      {
-  //        final BaseSearchFilter filter = new BaseSearchFilter();
-  //        filter.setSearchFields("name", "identifier");
-  //        filter.setSearchString(input);
-  //        final List<KundeDO> list = customerDao.getList(filter);
-  //        return list;
-  //      }
-  //
-  //      @Override
-  //      protected List<String> getRecentUserInputs()
-  //      {
-  //        return getRecentUsers().getRecents();
-  //      }
-  //
-  //      @Override
-  //      protected String formatLabel(final KundeDO customer)
-  //      {
-  //        if (customer == null) {
-  //          return "";
-  //        }
-  //        return formatKunde(customer);
-  //      }
-  //
-  //      @Override
-  //      protected String formatValue(final KundeDO customer)
-  //      {
-  //        if (customer == null) {
-  //          return "";
-  //        }
-  //        return customer.getName();
-  //      }
-  //      @Override
-  //      protected void convertInput()
-  //      {
-  //        final KundeDO customer = (KundeDO) getConverter(getType()).convertToObject(getInput(), getLocale());
-  //        setConvertedInput(customer);
-  //        if (customer != null && (currentCustomer == null || customer.getId() != currentCustomer.getId())) {
-  //          getRecentKundes().append(formatKunde(customer));
-  //        }
-  //        currentCustomer = customer;
-  //      }
-  //
-  //      @Override
-  //      public IConverter getConverter(final Class< ? > type)
-  //      {
-  //        return new IConverter() {
-  //          @Override
-  //          public Object convertToObject(final String value, final Locale locale)
-  //          {
-  //            if (StringUtils.isEmpty(value) == true) {
-  //              getModel().setObject(null);
-  //              return null;
-  //            }
-  //            final int ind = value.indexOf(": ");
-  //            final String customername = ind >= 0 ? value.substring(0, ind) : value;
-  //            final KundeDO customer = customerDao.getKundeGroupCache().getKunde(customername);
-  //            if (customer == null) {
-  //              error(getString("customer.panel.error.customernameNotFound"));
-  //            }
-  //            getModel().setObject(customer);
-  //            return customer;
-  //          }
-  //
-  //          @Override
-  //          public String convertToString(final Object value, final Locale locale)
-  //          {
-  //            if (value == null) {
-  //              return "";
-  //            }
-  //            final KundeDO customer = (KundeDO) value;
-  //            return customer.getKundename();
-  //          }
-  //        };
-  //      }
-  //    };
-  //    currentKunde = getModelObject();
-  //    customerTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400);
-  //    customerTextField.setLabel(new Model<String>() {
-  //      @Override
-  //      public String getObject()
-  //      {
-  //        if (label != null) {
-  //          return label;
-  //        } else {
-  //          return getString("customer");
-  //        }
-  //      }
-  //    });
-  //
-  //
-  //
-  //
-  //
-  //
-  //    if (customerText != null) {
-  //      customerTextField = new MaxLengthTextField("customerText", customerText) {
-  //        @Override
-  //        public boolean isVisible()
-  //        {
-  //          return (KontoSelectPanel.this.getModelObject() == null || NumberHelper
-  //              .greaterZero(KontoSelectPanel.this.getModelObject().getId()) == false);
-  //        }
-  //      };
-  //      add(customerTextField);
-  //    } else {
-  //      add(AbstractForm.createInvisibleDummyComponent("customerText"));
-  //    }
-  //    final Label customerAsStringLabel = new Label("customerAsString", new Model<String>() {
-  //
-  //      @Override
-  //      public String getObject()
-  //      {
-  //        final KundeDO customer = getModelObject();
-  //        return customerFormatter.format(customer, false);
-  //      }
-  //    });
-  //    add(customerAsStringLabel);
-  //    final SubmitLink selectButton = new SubmitLink("select") {
-  //      @Override
-  //      public void onSubmit()
-  //      {
-  //        setResponsePage(new CustomerListPage(caller, selectProperty));
-  //      };
-  //    };
-  //    selectButton.setDefaultFormProcessing(false);
-  //    add(selectButton);
-  //    selectButton.add(new TooltipImage("selectHelp", getResponse(), WebConstants.IMAGE_KUNDE_SELECT, getString("fibu.tooltip.selectKunde")));
-  //    final SubmitLink unselectButton = new SubmitLink("unselect") {
-  //      @Override
-  //      public void onSubmit()
-  //      {
-  //        caller.unselect(selectProperty);
-  //      }
-  //
-  //      @Override
-  //      public boolean isVisible()
-  //      {
-  //        return KontoSelectPanel.this.getModelObject() != null;
-  //      }
-  //    };
-  //    unselectButton.setDefaultFormProcessing(false);
-  //    add(unselectButton);
-  //    unselectButton.add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_KUNDE_UNSELECT,
-  //        getString("fibu.tooltip.unselectKunde")));
-  //    // DropDownChoice favorites
-  //    final FavoritesChoicePanel<KundeDO, KundeFavorite> favoritesPanel = new FavoritesChoicePanel<KundeDO, KundeFavorite>("favorites",
-  //        KundePrefArea.KUNDE_FAVORITE, tabIndex, "half select") {
-  //      @Override
-  //      protected void select(final KundeFavorite favorite)
-  //      {
-  //        if (favorite.getKunde() != null) {
-  //          KontoSelectPanel.this.selectKunde(favorite.getKunde());
-  //        }
-  //      }
-  //
-  //      @Override
-  //      protected KundeDO getCurrentObject()
-  //      {
-  //        return KontoSelectPanel.this.getModelObject();
-  //      }
-  //
-  //      @Override
-  //      protected KundeFavorite newFavoriteInstance(final KundeDO currentObject)
-  //      {
-  //        final KundeFavorite favorite = new KundeFavorite();
-  //        favorite.setKunde(currentObject);
-  //        return favorite;
-  //      }
-  //    };
-  //    add(favoritesPanel);
-  //    favoritesPanel.init();
-  //    if (showFavorites == false) {
-  //      favoritesPanel.setVisible(false);
-  //    }
-  //    return this;
-  //  }
-  //
-  //  /**
-  //   * Will be called if the customer has chosen an entry of the customer favorites drop down choice.
-  //   * @param customer
-  //   */
-  //  protected void selectKunde(final KundeDO customer)
-  //  {
-  //    setModelObject(customer);
-  //    caller.select(selectProperty, customer.getId());
-  //  }
-  //
-  //  /**
-  //   * @return The customer's raw input of customer text if given, otherwise null.
-  //   */
-  //  public String getKundeTextInput()
-  //  {
-  //    if (customerTextField != null) {
-  //      return customerTextField.getRawInput();
-  //    }
-  //    return null;
-  //  }
-  //
-  //  @Override
-  //  protected void convertInput()
-  //  {
-  //    setConvertedInput(getModelObject());
-  //  }
+  private static final long serialVersionUID = 5452693296383142460L;
+
+  private PFAutoCompleteTextField<KontoDO> kontoTextField;
+
+  @SpringBean(name = "kontoDao")
+  private KontoDao kontoDao;
+
+  private IntRanges kontoNumberRanges;
+
+  /**
+   * @param id
+   * @param model
+   * @param kontoText If no Konto is given then a free text field representing a Konto can be used.
+   * @param caller
+   * @param selectProperty
+   */
+  public KontoSelectPanel(final String id, final IModel<KontoDO> model, final ISelectCallerPage caller, final String selectProperty)
+  {
+    super(id, model, caller, selectProperty);
+    kontoNumberRanges = new IntRanges("10000-19999");
+  }
+
+  /**
+   * If set then only accounting numbers are given in auto-completion list, whose number matches the given range(s).
+   * @param kontoNumberRanges the kontoNumberRanges to set
+   * @return this for chaining.
+   * @see Ranges#setRanges(String)
+   */
+  public KontoSelectPanel setKontoNumberRanges(final IntRanges kontoNumberRanges)
+  {
+    this.kontoNumberRanges = kontoNumberRanges;
+    return this;
+  }
+
+  @Override
+  @SuppressWarnings("serial")
+  public KontoSelectPanel init()
+  {
+    super.init();
+    kontoTextField = new PFAutoCompleteTextField<KontoDO>("kontoField", getModel()) {
+      @Override
+      protected List<KontoDO> getChoices(final String input)
+      {
+        final BaseSearchFilter filter = new BaseSearchFilter();
+        filter.setSearchFields("nummer", "bezeichnung", "description");
+        filter.setSearchString(input);
+        final List<KontoDO> list = kontoDao.getList(filter);
+        if (kontoNumberRanges != null && list != null) {
+          final List<KontoDO> result = new ArrayList<KontoDO>();
+          for (final KontoDO konto : list) {
+            if (kontoNumberRanges.doesMatch(konto.getNummer()) == true) {
+              result.add(konto);
+            }
+          }
+          return result;
+        }
+        return list;
+      }
+
+      @Override
+      protected String formatLabel(final KontoDO konto)
+      {
+        if (konto == null) {
+          return "";
+        }
+        return konto.formatKonto();
+      }
+
+      @Override
+      protected String formatValue(final KontoDO konto)
+      {
+        if (konto == null) {
+          return "";
+        }
+        return konto.formatKonto();
+      }
+
+      @Override
+      protected void convertInput()
+      {
+        final KontoDO konto = (KontoDO) getConverter(getType()).convertToObject(getInput(), getLocale());
+        setConvertedInput(konto);
+      }
+
+      @Override
+      public IConverter getConverter(final Class< ? > type)
+      {
+        return new IConverter() {
+          @Override
+          public Object convertToObject(final String value, final Locale locale)
+          {
+            if (StringUtils.isEmpty(value) == true) {
+              getModel().setObject(null);
+              return null;
+            }
+            final int ind = value.indexOf(" ");
+            final String kontonummerString = ind >= 0 ? value.substring(0, ind) : value;
+            final Integer kontonummer = NumberHelper.parseInteger(kontonummerString);
+            final KontoDO konto;
+            if (kontonummer != null) {
+              konto = kontoDao.getKonto(kontonummer);
+            } else {
+              konto = null;
+            }
+            if (konto == null) {
+              error(getString("fibu.konto.error.invalidKonto"));
+            }
+            getModel().setObject(konto);
+            return konto;
+          }
+
+          @Override
+          public String convertToString(final Object value, final Locale locale)
+          {
+            if (value == null) {
+              return "";
+            }
+            final KontoDO konto = (KontoDO) value;
+            return konto.formatKonto();
+          }
+        };
+      }
+    };
+    kontoTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400);
+    kontoTextField.setLabel(new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return getString("fibu.konto");
+      }
+    });
+    add(kontoTextField);
+    return this;
+  }
+
+  @Override
+  protected void convertInput()
+  {
+    setConvertedInput(getModelObject());
+  }
 }
