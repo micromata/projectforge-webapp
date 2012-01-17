@@ -74,6 +74,7 @@
   <bean id="employeeDao" class="org.projectforge.fibu.EmployeeDao" />
   <bean id="employeeSalaryExportDao" class="org.projectforge.fibu.datev.EmployeeSalaryExportDao" />
   <bean id="employeeSalaryDao" class="org.projectforge.fibu.EmployeeSalaryDao" />
+  <bean id="kontoCache" class="org.projectforge.fibu.KontoCache" singleton="true" />
   <bean id="kontoDao" class="org.projectforge.fibu.KontoDao" />
   <bean id="kost1Dao" class="org.projectforge.fibu.kost.Kost1Dao" />
   <bean id="kost2Dao" class="org.projectforge.fibu.kost.Kost2Dao" />
