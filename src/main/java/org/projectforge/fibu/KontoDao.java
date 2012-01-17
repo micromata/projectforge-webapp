@@ -33,9 +33,20 @@ import org.projectforge.user.ProjectForgeGroup;
 
 public class KontoDao extends BaseDao<KontoDO>
 {
+  private KontoCache kontoCache;
+
   public KontoDao()
   {
     super(KontoDO.class);
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#afterSaveOrModify(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void afterSaveOrModify(final KontoDO obj)
+  {
+    kontoCache.refresh();
   }
 
   @SuppressWarnings("unchecked")
@@ -86,5 +97,22 @@ public class KontoDao extends BaseDao<KontoDO>
   public KontoDO newInstance()
   {
     return new KontoDO();
+  }
+
+  /**
+   * @return the kontoCache
+   */
+  public KontoCache getKontoCache()
+  {
+    return kontoCache;
+  }
+
+  /**
+   * @param kontoCache the kontoCache to set
+   * @return this for chaining.
+   */
+  public void setKontoCache(final KontoCache kontoCache)
+  {
+    this.kontoCache = kontoCache;
   }
 }
