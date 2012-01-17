@@ -24,7 +24,6 @@
 package org.projectforge.web.fibu;
 
 import static org.projectforge.web.wicket.layout.DropDownChoiceLPanel.SELECT_ID;
-import static org.projectforge.web.wicket.layout.LayoutLength.FULL;
 import static org.projectforge.web.wicket.layout.SelectLPanel.WICKET_ID_SELECT_PANEL;
 
 import org.apache.wicket.MarkupContainer;
@@ -79,10 +78,10 @@ public class CustomerFormRenderer extends AbstractFormRenderer
     doPanel.addTextField(new PanelContext(data, "name", VALUE_LENGTH, getString("fibu.kunde.name"), LABEL_LENGTH).setRequired().setStrong()
         .setFocus(isNew() == false));
     if (Registry.instance().getKontoCache().isEmpty() == false) {
-      // Show this field only if DATEV accounts exist.
+      // Show this field only if DATEV accounts does exist.
       final KontoSelectPanel kontoSelectPanel = new KontoSelectPanel(WICKET_ID_SELECT_PANEL, new PropertyModel<KontoDO>(data, "konto"),
           null, "kontoId");
-      doPanel.addSelectPanel(kontoSelectPanel, new PanelContext(FULL, getString("fibu.konto"), LABEL_LENGTH).setStrong());
+      doPanel.addSelectPanel(kontoSelectPanel, new PanelContext(VALUE_LENGTH, getString("fibu.konto"), LABEL_LENGTH).setStrong());
       kontoSelectPanel.setKontoNumberRanges(AccountingConfig.getInstance().getDebitorsAccountNumberRanges()).init();
     }
     doPanel.addTextField(new PanelContext(data, "identifier", VALUE_LENGTH, getString("fibu.kunde.identifier"), LABEL_LENGTH));
