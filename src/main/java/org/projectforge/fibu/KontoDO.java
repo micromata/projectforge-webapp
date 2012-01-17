@@ -55,13 +55,31 @@ public class KontoDO extends DefaultBaseDO implements Historizable, ShortDisplay
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String description;
 
+  /**
+   * Formats the account as string: "[nummer] [title]", e. g. "11000 Micromata GmbH"
+   * @param konto
+   */
+  public static String formatKonto(final KontoDO konto)
+  {
+    return String.valueOf(konto.getNummer()) + " " + konto.getBezeichnung();
+  }
+
+  /**
+   * Formats the account as string: "[nummer] [title]", e. g. "11000 Micromata GmbH"
+   * @param konto
+   */
+  public String formatKonto()
+  {
+    return formatKonto(this);
+  }
+
   @Column(name = "nummer", nullable = false, unique = true)
   public Integer getNummer()
   {
     return nummer;
   }
 
-  public void setNummer(Integer nummer)
+  public void setNummer(final Integer nummer)
   {
     this.nummer = nummer;
   }
@@ -72,7 +90,7 @@ public class KontoDO extends DefaultBaseDO implements Historizable, ShortDisplay
     return bezeichnung;
   }
 
-  public void setBezeichnung(String bezeichnung)
+  public void setBezeichnung(final String bezeichnung)
   {
     this.bezeichnung = bezeichnung;
   }
@@ -83,15 +101,16 @@ public class KontoDO extends DefaultBaseDO implements Historizable, ShortDisplay
     return description;
   }
 
-  public void setDescription(String description)
+  public void setDescription(final String description)
   {
     this.description = description;
   }
 
-  public boolean equals(Object o)
+  @Override
+  public boolean equals(final Object o)
   {
     if (o instanceof KontoDO) {
-      KontoDO other = (KontoDO) o;
+      final KontoDO other = (KontoDO) o;
       if (ObjectUtils.equals(this.getNummer(), other.getNummer()) == false) {
         return false;
       }
@@ -103,7 +122,7 @@ public class KontoDO extends DefaultBaseDO implements Historizable, ShortDisplay
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     hcb.append(this.getNummer());
     hcb.append(this.getBezeichnung());
     return hcb.toHashCode();
