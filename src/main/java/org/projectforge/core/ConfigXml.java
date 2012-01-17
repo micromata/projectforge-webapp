@@ -56,8 +56,7 @@ import org.projectforge.calendar.ConfigureHoliday;
 import org.projectforge.common.FileHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.common.TimeNotation;
-import org.projectforge.fibu.kost.BusinessAssessmentConfig;
-import org.projectforge.fibu.kost.BusinessAssessmentRowConfig;
+import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.jira.JiraConfig;
 import org.projectforge.jira.JiraIssueType;
 import org.projectforge.mail.MailAccountConfig;
@@ -160,7 +159,7 @@ public class ConfigXml
 
   private boolean portletMode;
 
-  private BusinessAssessmentConfig businessAssessment;
+  private AccountingConfig accountingConfig;
 
   /**
    * Separated list of main classes (separated by white chars and or ',').
@@ -216,7 +215,8 @@ public class ConfigXml
     cronExpressionMebPollingJob = null;
     menuConfig = null;
     sendMailConfiguration = new SendMailConfig();
-    businessAssessment = null;
+    accountingConfig = new AccountingConfig();
+    accountingConfig.reset();
   }
 
   protected ConfigXml()
@@ -321,13 +321,12 @@ public class ConfigXml
   {
     final XmlObjectReader reader = new XmlObjectReader();
     final AliasMap aliasMap = new AliasMap();
-    aliasMap.put(BusinessAssessmentRowConfig.class, "row");
     reader.setAliasMap(aliasMap);
     reader.initialize(ConfigXml.class);
     reader.initialize(ConfigureHoliday.class);
     reader.initialize(ContractType.class);
     reader.initialize(JiraIssueType.class);
-    reader.initialize(BusinessAssessmentConfig.class);
+    AccountingConfig.registerXmlObjects(reader, aliasMap);
     return reader;
   }
 
@@ -912,10 +911,10 @@ public class ConfigXml
   }
 
   /**
-   * @return the businessAssessmentConfig
+   * @return the accountingConfig
    */
-  public BusinessAssessmentConfig getBusinessAssessmentConfig()
+  public AccountingConfig getAccountingConfig()
   {
-    return businessAssessment;
+    return accountingConfig;
   }
 }
