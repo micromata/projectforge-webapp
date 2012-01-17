@@ -36,9 +36,9 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.core.ConfigXml;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KostFormatter;
+import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.fibu.kost.BuchungssatzDO;
 import org.projectforge.fibu.kost.BuchungssatzDao;
 import org.projectforge.fibu.kost.BusinessAssessment;
@@ -266,7 +266,7 @@ IListPageColumnsCreator<BuchungssatzDO>
       if (CollectionUtils.isEmpty(list) == true) {
         this.businessAssessment = null;
       } else {
-        this.businessAssessment = new BusinessAssessment(ConfigXml.getInstance().getBusinessAssessmentConfig());
+        this.businessAssessment = new BusinessAssessment(AccountingConfig.getInstance().getBusinessAssessmentConfig());
         this.businessAssessment.setAccountRecords(list);
       }
       return list;
