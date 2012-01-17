@@ -71,6 +71,7 @@ public class ConfigXmlTest
       + "  </holidays>\n"
       + "  <workingDirectory>work</workingDirectory>\n"
       + "  <tempDirectory>tmp</tempDirectory>\n"
+      + "  <accountingConfig/>\n"
       + "  <sendMail port='25'>\n"
       + "    <protocol>smtp</protocol>\n"
       + "    <charset>UTF-8</charset>\n"
@@ -106,7 +107,7 @@ public class ConfigXmlTest
     assertEquals(true, holiday.isIgnore());
 
     final Holidays holidays = Holidays.getInstance();
-    Calendar cal = Calendar.getInstance();
+    final Calendar cal = Calendar.getInstance();
     cal.set(Calendar.YEAR, 2009);
     cal.set(Calendar.MONTH, Calendar.MAY);
     cal.set(Calendar.DAY_OF_MONTH, 1);
