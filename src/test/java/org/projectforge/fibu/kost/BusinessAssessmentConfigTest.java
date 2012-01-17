@@ -25,8 +25,8 @@ package org.projectforge.fibu.kost;
 
 import static org.junit.Assert.assertEquals;
 
-import org.apache.commons.lang.math.IntRange;
 import org.junit.Test;
+import org.projectforge.common.Range;
 import org.projectforge.core.Priority;
 import org.projectforge.xml.stream.AliasMap;
 import org.projectforge.xml.stream.XmlHelper;
@@ -42,33 +42,33 @@ public class BusinessAssessmentConfigTest
     {
       final BusinessAssessmentRowConfig row = bwa.getRow("1060");
       assertEquals(Priority.HIGH, row.getPriority());
-      assertEquals(0, row.getAccountNumbers().size());
-      assertEquals(1, row.getAccountNumberRanges().size());
-      final IntRange range = row.getAccountNumberRanges().get(0);
-      assertEquals(5700, range.getMinimumInteger());
-      assertEquals(5999, range.getMaximumInteger());
+      assertEquals(0, row.getAccountNumberRanges().getValues().size());
+      assertEquals(1, row.getAccountNumberRanges().getRanges().size());
+      final Range<Integer> range = row.getAccountNumberRanges().getRanges().get(0);
+      assertEquals(5700, (int) range.getMinValue());
+      assertEquals(5999, (int) range.getMaxValue());
     }
     {
       final BusinessAssessmentRowConfig row = bwa.getRow("sonstigeKosten");
-      assertEquals(1, row.getAccountNumbers().size());
-      assertEquals(6300, (int) row.getAccountNumbers().get(0));
-      assertEquals(1, row.getAccountNumberRanges().size());
-      final IntRange range = row.getAccountNumberRanges().get(0);
-      assertEquals(6800, range.getMinimumInteger());
-      assertEquals(6855, range.getMaximumInteger());
+      assertEquals(1, row.getAccountNumberRanges().getValues().size());
+      assertEquals(6300, (int) row.getAccountNumberRanges().getValues().get(0));
+      assertEquals(1, row.getAccountNumberRanges().getRanges().size());
+      final Range<Integer> range = row.getAccountNumberRanges().getRanges().get(0);
+      assertEquals(6800, (int) range.getMinValue());
+      assertEquals(6855, (int) range.getMaxValue());
     }
     {
       final BusinessAssessmentRowConfig row = bwa.getRow("1312");
-      assertEquals(3, row.getAccountNumbers().size());
-      assertEquals(6392, (int) row.getAccountNumbers().get(0));
-      assertEquals(6895, (int) row.getAccountNumbers().get(1));
-      assertEquals(6960, (int) row.getAccountNumbers().get(2));
-      assertEquals(0, row.getAccountNumberRanges().size());
+      assertEquals(3, row.getAccountNumberRanges().getValues().size());
+      assertEquals(6392, (int) row.getAccountNumberRanges().getValues().get(0));
+      assertEquals(6895, (int) row.getAccountNumberRanges().getValues().get(1));
+      assertEquals(6960, (int) row.getAccountNumberRanges().getValues().get(2));
+      assertEquals(0, row.getAccountNumberRanges().getRanges().size());
     }
     {
       final BusinessAssessmentRowConfig row = bwa.getRow("1390");
-      assertEquals(0, row.getAccountNumbers().size());
-      assertEquals(0, row.getAccountNumberRanges().size());
+      assertEquals(0, row.getAccountNumberRanges().getValues().size());
+      assertEquals(0, row.getAccountNumberRanges().getRanges().size());
     }
   }
 
