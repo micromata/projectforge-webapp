@@ -1,8 +1,8 @@
 Project ProjectForge Community Edition
         www.projectforge.org
 
-Copyright (C) 2001-2011 Kai Reinhard (k.reinhard@me.com)
-                        Wilhelmshoeher Allee 306D
+Copyright (C) 2001-2012 Kai Reinhard (k.reinhard@micromata.com)
+                        Max-Planck-Str. 5
                         34131 Kassel
 
 ProjectForge is a web-based project management tool.
