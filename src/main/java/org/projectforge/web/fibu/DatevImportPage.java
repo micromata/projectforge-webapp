@@ -35,8 +35,8 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.ImportedElement;
 import org.projectforge.common.ImportedSheet;
 import org.projectforge.core.ActionLog;
-import org.projectforge.core.ConfigXml;
 import org.projectforge.fibu.datev.DatevImportDao;
+import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.fibu.kost.BuchungssatzDO;
 import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.user.UserRightId;
@@ -178,7 +178,7 @@ public class DatevImportPage extends AbstractSecuredPage
       final BuchungssatzDO satz = (BuchungssatzDO) element.getValue();
       list.add(satz);
     }
-    form.businessAssessment = new BusinessAssessment(ConfigXml.getInstance().getBusinessAssessmentConfig(), (Integer) sheet.getProperty("year"), (Integer) sheet.getProperty("month"));
+    form.businessAssessment = new BusinessAssessment(AccountingConfig.getInstance().getBusinessAssessmentConfig(), (Integer) sheet.getProperty("year"), (Integer) sheet.getProperty("month"));
     form.businessAssessment.setAccountRecords(list);
   }
 
