@@ -45,6 +45,7 @@ import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.EingangsrechnungsStatistik;
+import org.projectforge.fibu.KontoCache;
 import org.projectforge.fibu.kost.KostZuweisungExport;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -58,7 +59,7 @@ import org.projectforge.web.wicket.ListSelectActionPanel;
 
 @ListPage(editPage = EingangsrechnungEditPage.class)
 public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungListForm, EingangsrechnungDao, EingangsrechnungDO> implements
-    IListPageColumnsCreator<EingangsrechnungDO>
+IListPageColumnsCreator<EingangsrechnungDO>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EingangsrechnungListPage.class);
 
@@ -66,6 +67,9 @@ public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungL
 
   @SpringBean(name = "eingangsrechnungDao")
   private EingangsrechnungDao eingangsrechnungDao;
+
+  @SpringBean(name = "kontoCache")
+  private KontoCache kontoCache;
 
   private EingangsrechnungsStatistik eingangsrechnungsStatistik;
 
@@ -77,7 +81,7 @@ public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungL
     return eingangsrechnungsStatistik;
   }
 
-  public EingangsrechnungListPage(PageParameters parameters)
+  public EingangsrechnungListPage(final PageParameters parameters)
   {
     super(parameters, "fibu.eingangsrechnung");
     this.colspan = 4;
@@ -105,8 +109,8 @@ public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungL
   public List<IColumn<EingangsrechnungDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<EingangsrechnungDO>> columns = new ArrayList<IColumn<EingangsrechnungDO>>();
-    CellItemListener<EingangsrechnungDO> cellItemListener = new CellItemListener<EingangsrechnungDO>() {
-      public void populateItem(Item<ICellPopulator<EingangsrechnungDO>> item, String componentId, IModel<EingangsrechnungDO> rowModel)
+    final CellItemListener<EingangsrechnungDO> cellItemListener = new CellItemListener<EingangsrechnungDO>() {
+      public void populateItem(final Item<ICellPopulator<EingangsrechnungDO>> item, final String componentId, final IModel<EingangsrechnungDO> rowModel)
       {
         final EingangsrechnungDO eingangsrechnung = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(eingangsrechnung.getId(), eingangsrechnung.isDeleted());
@@ -184,7 +188,7 @@ public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungL
         + "_"
         + DateHelper.getDateAsFilenameSuffix(new Date())
         + ".xls";
-    final byte[] xls = KostZuweisungExport.instance.exportRechnungen(rechnungen, getString("fibu.common.creditor"));
+    final byte[] xls = KostZuweisungExport.instance.exportRechnungen(rechnungen, getString("fibu.common.creditor"), kontoCache);
     if (xls == null || xls.length == 0) {
       log.error("Oups, xls has zero size. Filename: " + filename);
       return;
@@ -193,7 +197,7 @@ public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungL
   }
 
   @Override
-  protected EingangsrechnungListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected EingangsrechnungListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new EingangsrechnungListForm(this);
   }
@@ -205,7 +209,7 @@ public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungL
   }
 
   @Override
-  protected IModel<EingangsrechnungDO> getModel(EingangsrechnungDO object)
+  protected IModel<EingangsrechnungDO> getModel(final EingangsrechnungDO object)
   {
     return new DetachableDOModel<EingangsrechnungDO, EingangsrechnungDao>(object, getBaseDao());
   }

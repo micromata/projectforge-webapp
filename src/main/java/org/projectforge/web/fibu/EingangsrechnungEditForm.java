@@ -26,11 +26,13 @@ package org.projectforge.web.fibu;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungsPositionDO;
+import org.projectforge.registry.Registry;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
@@ -38,7 +40,7 @@ import org.projectforge.web.wicket.components.MaxLengthTextField;
 
 
 public class EingangsrechnungEditForm extends
-    AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, EingangsrechnungEditPage>
+AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, EingangsrechnungEditPage>
 {
   private static final long serialVersionUID = 5286417118638335693L;
 
@@ -46,7 +48,7 @@ public class EingangsrechnungEditForm extends
 
   private DropDownChoice<Long> datumChoice;
 
-  public EingangsrechnungEditForm(EingangsrechnungEditPage parentPage, EingangsrechnungDO data)
+  public EingangsrechnungEditForm(final EingangsrechnungEditPage parentPage, final EingangsrechnungDO data)
   {
     super(parentPage, data);
   }
@@ -58,13 +60,26 @@ public class EingangsrechnungEditForm extends
     final PFAutoCompleteTextField<String> kreditorField = new PFAutoCompleteTextField<String>("kreditor", new PropertyModel<String>(data,
         "kreditor")) {
       @Override
-      protected List<String> getChoices(String input)
+      protected List<String> getChoices(final String input)
       {
         return parentPage.getBaseDao().getAutocompletion("kreditor", input);
       }
     };
     kreditorField.withMatchContains(true).withMinChars(2).withFocus(true);
     add(kreditorField);
+
+    final WebMarkupContainer kontoRow = new WebMarkupContainer("kontoRow");
+    add(kontoRow);
+    if (Registry.instance().getKontoCache().isEmpty() == true) {
+      kontoRow.setVisible(false);
+    } else {
+      kontoRow.setVisible(false);
+      //      final KontoSelectPanel kontoSelectPanel = new KontoSelectPanel("kontoSelectPanel", new PropertyModel<KontoDO>(data, "konto"),
+      //          parentPage, "kontoId");
+      //      add(kontoSelectPanel);
+      //      kontoSelectPanel.setKontoNumberRanges(AccountingConfig.getInstance().getDebitorsAccountNumberRanges()).init();
+    }
+
     add(new MaxLengthTextField("referenz", new PropertyModel<String>(data, "referenz")));
     // DropDownChoice datumList
     final LabelValueChoiceRenderer<Long> datumChoiceRenderer = WicketUtils.getDatumChoiceRenderer(20);
@@ -113,7 +128,7 @@ public class EingangsrechnungEditForm extends
    * Dummy method. Does nothing.
    * @param datumInMillis
    */
-  public void setDatumInMillis(Long datumInMillis)
+  public void setDatumInMillis(final Long datumInMillis)
   {
   }
 
