@@ -41,6 +41,9 @@ import org.projectforge.fibu.AbstractRechnungDO;
 import org.projectforge.fibu.AbstractRechnungsPositionDO;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungsPositionDO;
+import org.projectforge.fibu.KontoCache;
+import org.projectforge.fibu.KontoDO;
+import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektFormatter;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.RechnungsPositionDO;
@@ -57,7 +60,7 @@ public class KostZuweisungExport
 
   private class MyContentProvider extends XlsContentProvider
   {
-    public MyContentProvider(ExportWorkbook workbook)
+    public MyContentProvider(final ExportWorkbook workbook)
     {
       super(workbook);
     }
@@ -87,7 +90,7 @@ public class KostZuweisungExport
 
     final int width;
 
-    Col(String theTitle, int width)
+    Col(final String theTitle, final int width)
     {
       this.theTitle = theTitle;
       this.width = (short) width;
@@ -100,7 +103,7 @@ public class KostZuweisungExport
    * @return
    */
   public byte[] exportRechnungen(final List< ? extends AbstractRechnungDO< ? extends AbstractRechnungsPositionDO>> list,
-      final String sheetTitle)
+      final String sheetTitle, final KontoCache kontoCache)
   {
     final List<KostZuweisungDO> zuweisungen = new ArrayList<KostZuweisungDO>();
     for (final AbstractRechnungDO< ? > rechnung : list) {
@@ -112,13 +115,13 @@ public class KostZuweisungExport
         }
       }
     }
-    return export(zuweisungen, sheetTitle);
+    return export(zuweisungen, sheetTitle, kontoCache);
   }
 
   /**
    * Exports the filtered list as table.
    */
-  public byte[] export(final List<KostZuweisungDO> list, final String sheetTitle)
+  public byte[] export(final List<KostZuweisungDO> list, final String sheetTitle, final KontoCache kontoCache)
   {
     log.info("Exporting kost zuweisung list.");
     final ExportWorkbook xls = new ExportWorkbook();
@@ -174,7 +177,17 @@ public class KostZuweisungExport
         }
       }
       mapping.add(Col.BRUTTO, zuweisung.getBrutto());
-      mapping.add(Col.KONTO, "");
+      Integer kontoNummer = null;
+      if (rechnung instanceof RechnungDO) {
+        final KundeDO kunde = ((RechnungDO) rechnung).getKunde();
+        if (kunde != null) {
+          final KontoDO konto = kontoCache.getKonto(kunde.getKontoId());
+          if (konto != null) {
+            kontoNummer = konto.getNummer();
+          }
+        }
+      }
+      mapping.add(Col.KONTO, kontoNummer != null ? kontoNummer : "");
       mapping.add(Col.REFERENZ, StringHelper.removeNonDigitsAndNonASCIILetters(referenz));
       mapping.add(Col.DATE, rechnung.getDatum());
       mapping.add(Col.GEGENKONTO, "");
