@@ -36,6 +36,7 @@ import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.Table;
 import org.projectforge.database.TableAttribute;
 import org.projectforge.fibu.EingangsrechnungDO;
+import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
@@ -54,21 +55,26 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 3.6.2
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "3.6.1.3", "2011-12-05",
-    "Adds columns t_kunde.konto_id, t_task.protection_of_privacy and t_address.communication_language.") {
+    list.add(new UpdateEntryImpl(
+        CORE_REGION_ID,
+        "3.6.1.3",
+        "2011-12-05",
+        "Adds columns t_kunde.konto_id, t_fibu_eingangsrechnung.konto_id, t_konto.status, t_task.protection_of_privacy and t_address.communication_language.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         final Table kundeTable = new Table(KundeDO.class);
         final Table eingangsrechnungTable = new Table(EingangsrechnungDO.class);
+        final Table kontoTable = new Table(KontoDO.class);
         final Table taskTable = new Table(TaskDO.class);
         final Table addressTable = new Table(AddressDO.class);
         return dao.doesTableAttributesExist(kundeTable, "konto") == true //
-        && dao.doesTableAttributesExist(eingangsrechnungTable, "konto") == true //
-        && dao.doesTableAttributesExist(addressTable, "communicationLanguage") == true //
-        && dao.doesTableAttributesExist(taskTable, "protectionOfPrivacy") //
-        ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+            && dao.doesTableAttributesExist(eingangsrechnungTable, "konto") == true //
+            && dao.doesTableAttributesExist(kontoTable, "status") == true //
+            && dao.doesTableAttributesExist(addressTable, "communicationLanguage") == true //
+            && dao.doesTableAttributesExist(taskTable, "protectionOfPrivacy") //
+            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
       }
 
       @Override
@@ -82,6 +88,10 @@ public class DatabaseCoreUpdates
         final Table eingangsrechnungTable = new Table(EingangsrechnungDO.class);
         if (dao.doesTableAttributesExist(eingangsrechnungTable, "konto") == false) {
           dao.addTableAttributes(eingangsrechnungTable, new TableAttribute(EingangsrechnungDO.class, "konto"));
+        }
+        final Table kontoTable = new Table(KontoDO.class);
+        if (dao.doesTableAttributesExist(kontoTable, "status") == false) {
+          dao.addTableAttributes(kontoTable, new TableAttribute(KontoDO.class, "status"));
         }
         final Table taskTable = new Table(TaskDO.class);
         if (dao.doesTableAttributesExist(taskTable, "protectionOfPrivacy") == false) {
@@ -107,7 +117,7 @@ public class DatabaseCoreUpdates
         final Table spaceTable = new Table(SpaceDO.class);
         final Table spaceRightTable = new Table(SpaceRightDO.class);
         return dao.doesExist(spaceTable) == true && dao.doesExist(spaceRightTable) //
-        ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
       }
 
       @Override
@@ -135,7 +145,7 @@ public class DatabaseCoreUpdates
     // 3.5.4
     // /////////////////////////////////////////////////////////////////
     list.add(new UpdateEntryImpl(CORE_REGION_ID, "3.5.4", "2011-02-24",
-    "Adds table t_database_update. Adds attribute (excel_)date_format, hour_format_24 to table t_pf_user.") {
+        "Adds table t_database_update. Adds attribute (excel_)date_format, hour_format_24 to table t_pf_user.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
@@ -143,8 +153,8 @@ public class DatabaseCoreUpdates
         final Table dbUpdateTable = new Table(DatabaseUpdateDO.class);
         final Table userTable = new Table(PFUserDO.class);
         return dao.doesExist(dbUpdateTable) == true
-        && dao.doesTableAttributesExist(userTable, "dateFormat", "excelDateFormat", "timeNotation") == true //
-        ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+            && dao.doesTableAttributesExist(userTable, "dateFormat", "excelDateFormat", "timeNotation") == true //
+            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
       }
 
       @Override
