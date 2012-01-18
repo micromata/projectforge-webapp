@@ -32,12 +32,13 @@ import org.apache.wicket.model.PropertyModel;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungsPositionDO;
+import org.projectforge.fibu.KontoDO;
+import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.registry.Registry;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
-
 
 public class EingangsrechnungEditForm extends
 AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, EingangsrechnungEditPage>
@@ -73,11 +74,10 @@ AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, Eingan
     if (Registry.instance().getKontoCache().isEmpty() == true) {
       kontoRow.setVisible(false);
     } else {
-      kontoRow.setVisible(false);
-      //      final KontoSelectPanel kontoSelectPanel = new KontoSelectPanel("kontoSelectPanel", new PropertyModel<KontoDO>(data, "konto"),
-      //          parentPage, "kontoId");
-      //      add(kontoSelectPanel);
-      //      kontoSelectPanel.setKontoNumberRanges(AccountingConfig.getInstance().getDebitorsAccountNumberRanges()).init();
+      final KontoSelectPanel kontoSelectPanel = new KontoSelectPanel("kontoSelectPanel", new PropertyModel<KontoDO>(data, "konto"),
+          parentPage, "kontoId");
+      kontoSelectPanel.setKontoNumberRanges(AccountingConfig.getInstance().getCreditorsAccountNumberRanges()).init();
+      kontoRow.add(kontoSelectPanel);
     }
 
     add(new MaxLengthTextField("referenz", new PropertyModel<String>(data, "referenz")));

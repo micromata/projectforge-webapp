@@ -46,6 +46,7 @@ import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.EingangsrechnungsStatistik;
 import org.projectforge.fibu.KontoCache;
+import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.kost.KostZuweisungExport;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -146,6 +147,19 @@ IListPageColumnsCreator<EingangsrechnungDO>
             kreditorLabel));
         cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);
+      }
+    });
+    columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(new Model<String>(getString("fibu.konto")), null, "konto",
+        cellItemListener) {
+      @SuppressWarnings("unchecked")
+      @Override
+      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      {
+        final EingangsrechnungDO rechnung = (EingangsrechnungDO) rowModel.getObject();
+        final KontoDO konto = kontoCache.getKonto(rechnung.getKontoId());
+        item
+        .add(new Label(componentId, konto != null ? konto.formatKonto() : ""));
+        cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
     columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(getString("fibu.common.reference"),
