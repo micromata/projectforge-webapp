@@ -24,14 +24,16 @@
 package org.projectforge.web.fibu;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.fibu.KontoDO;
+import org.projectforge.fibu.KontoStatus;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
-
 
 public class KontoEditForm extends AbstractEditForm<KontoDO, KontoEditPage>
 {
@@ -39,7 +41,7 @@ public class KontoEditForm extends AbstractEditForm<KontoDO, KontoEditPage>
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(KontoEditForm.class);
 
-  public KontoEditForm(KontoEditPage parentPage, KontoDO data)
+  public KontoEditForm(final KontoEditPage parentPage, final KontoDO data)
   {
     super(parentPage, data);
     this.colspan = 2;
@@ -49,9 +51,19 @@ public class KontoEditForm extends AbstractEditForm<KontoDO, KontoEditPage>
   protected void init()
   {
     super.init();
-    final MinMaxNumberField<Integer> nummerField = new MinMaxNumberField<Integer>("nummer", new PropertyModel<Integer>(data, "nummer"), 0, 99999999);
+    final MinMaxNumberField<Integer> nummerField = new MinMaxNumberField<Integer>("nummer", new PropertyModel<Integer>(data, "nummer"), 0,
+        99999999);
     add(nummerField);
-    final RequiredMaxLengthTextField nameField = new RequiredMaxLengthTextField("identifier", new PropertyModel<String>(data, "bezeichnung"));
+    // DropDownChoice status
+    final LabelValueChoiceRenderer<KontoStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<KontoStatus>(this, KontoStatus.values());
+    @SuppressWarnings("unchecked")
+    final DropDownChoice statusChoice = new DropDownChoice("status", new PropertyModel(data, "status"), statusChoiceRenderer.getValues(),
+        statusChoiceRenderer);
+    statusChoice.setNullValid(true);
+    statusChoice.setRequired(false);
+    add(statusChoice);
+    final RequiredMaxLengthTextField nameField = new RequiredMaxLengthTextField("identifier",
+        new PropertyModel<String>(data, "bezeichnung"));
     add(nameField);
     if (isNew() == true) {
       nummerField.add(new FocusOnLoadBehavior());

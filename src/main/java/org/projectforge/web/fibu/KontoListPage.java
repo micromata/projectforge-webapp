@@ -68,8 +68,8 @@ public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, Kon
   public List<IColumn<KontoDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<KontoDO>> columns = new ArrayList<IColumn<KontoDO>>();
-    CellItemListener<KontoDO> cellItemListener = new CellItemListener<KontoDO>() {
-      public void populateItem(Item<ICellPopulator<KontoDO>> item, String componentId, IModel<KontoDO> rowModel)
+    final CellItemListener<KontoDO> cellItemListener = new CellItemListener<KontoDO>() {
+      public void populateItem(final Item<ICellPopulator<KontoDO>> item, final String componentId, final IModel<KontoDO> rowModel)
       {
         final KontoDO konto = rowModel.getObject();
         String cellStyle = "";
@@ -85,18 +85,19 @@ public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, Kon
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
-        KontoDO konto = (KontoDO) rowModel.getObject();
+        final KontoDO konto = (KontoDO) rowModel.getObject();
         if (isSelectMode() == false) {
           item.add(new ListSelectActionPanel(componentId, rowModel, KontoEditPage.class, konto.getId(), returnToPage, String.valueOf(konto
               .getNummer())));
         } else {
-          item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, konto.getId(), String
-              .valueOf(konto.getNummer())));
+          item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, konto.getId(),
+              String.valueOf(konto.getNummer())));
         }
         cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);
       }
     });
+    columns.add(new CellItemListenerPropertyColumn<KontoDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<KontoDO>(new Model<String>(getString("fibu.konto.bezeichnung")), getSortable(
         "bezeichnung", sortable), "bezeichnung", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<KontoDO>(new Model<String>(getString("description")), getSortable("description",
@@ -112,7 +113,7 @@ public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, Kon
   }
 
   @Override
-  protected KontoListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected KontoListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new KontoListForm(this);
   }
@@ -124,7 +125,7 @@ public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, Kon
   }
 
   @Override
-  protected IModel<KontoDO> getModel(KontoDO object)
+  protected IModel<KontoDO> getModel(final KontoDO object)
   {
     return new DetachableDOModel<KontoDO, KontoDao>(object, getBaseDao());
   }
