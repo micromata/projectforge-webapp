@@ -49,6 +49,9 @@ public class AccountingConfig implements Serializable
   @XmlField(alias = "debitorsAccountNumberRanges")
   private String debitorsAccountNumberRangesString;
 
+  @XmlField(alias = "creditorsAccountNumberRanges")
+  private String creditorsAccountNumberRangesString;
+
   /**
    * Gets the default configuration from config.xml.
    */
@@ -65,11 +68,20 @@ public class AccountingConfig implements Serializable
 
   /**
    * The number ranges of the account numbers for the debitors, e. g. "10000-12999".
-   * @return the debitorsAccountNumberRangesString
+   * @return the debitorsAccountNumberRanges
    */
   public IntRanges getDebitorsAccountNumberRanges()
   {
     return new IntRanges(debitorsAccountNumberRangesString);
+  }
+
+  /**
+   * The number ranges of the account numbers for the creditors, e. g. "10000-12999".
+   * @return the creditorsAccountNumberRanges
+   */
+  public IntRanges getCreditorsAccountNumberRanges()
+  {
+    return new IntRanges(creditorsAccountNumberRangesString);
   }
 
   public void reset()
