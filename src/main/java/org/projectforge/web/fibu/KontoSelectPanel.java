@@ -38,6 +38,7 @@ import org.projectforge.common.Ranges;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KontoDao;
+import org.projectforge.fibu.KontoStatus;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 
@@ -67,7 +68,6 @@ public class KontoSelectPanel extends AbstractSelectPanel<KontoDO>
   public KontoSelectPanel(final String id, final IModel<KontoDO> model, final ISelectCallerPage caller, final String selectProperty)
   {
     super(id, model, caller, selectProperty);
-    kontoNumberRanges = new IntRanges("10000-19999");
   }
 
   /**
@@ -98,6 +98,9 @@ public class KontoSelectPanel extends AbstractSelectPanel<KontoDO>
         if (kontoNumberRanges != null && list != null) {
           final List<KontoDO> result = new ArrayList<KontoDO>();
           for (final KontoDO konto : list) {
+            if (konto.getStatus() == KontoStatus.NONACTIVE) {
+              continue;
+            }
             if (kontoNumberRanges.doesMatch(konto.getNummer()) == true) {
               result.add(konto);
             }
