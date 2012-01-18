@@ -25,6 +25,8 @@ package org.projectforge.fibu;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -54,6 +56,9 @@ public class KontoDO extends DefaultBaseDO implements Historizable, ShortDisplay
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String description;
+
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
+  private KontoStatus status;
 
   /**
    * Formats the account as string: "[nummer] [title]", e. g. "11000 Micromata GmbH"
@@ -104,6 +109,26 @@ public class KontoDO extends DefaultBaseDO implements Historizable, ShortDisplay
   public void setDescription(final String description)
   {
     this.description = description;
+  }
+
+  /**
+   * @return the status
+   */
+  @Enumerated(EnumType.STRING)
+  @Column(length = 10)
+  public KontoStatus getStatus()
+  {
+    return status;
+  }
+
+  /**
+   * @param status the status to set
+   * @return this for chaining.
+   */
+  public KontoDO setStatus(final KontoStatus status)
+  {
+    this.status = status;
+    return this;
   }
 
   @Override
