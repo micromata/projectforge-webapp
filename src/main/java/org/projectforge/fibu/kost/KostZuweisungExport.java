@@ -48,7 +48,6 @@ import org.projectforge.fibu.ProjektFormatter;
 import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.RechnungsPositionDO;
 
-
 /**
  * For excel export.
  * 
@@ -182,6 +181,14 @@ public class KostZuweisungExport
         final KundeDO kunde = ((RechnungDO) rechnung).getKunde();
         if (kunde != null) {
           final KontoDO konto = kontoCache.getKonto(kunde.getKontoId());
+          if (konto != null) {
+            kontoNummer = konto.getNummer();
+          }
+        }
+      } else if (rechnung instanceof EingangsrechnungDO) {
+        final Integer kontoId = ((EingangsrechnungDO) rechnung).getKontoId();
+        if (kontoId != null) {
+          final KontoDO konto = kontoCache.getKonto(kontoId);
           if (konto != null) {
             kontoNummer = konto.getNummer();
           }
