@@ -4,21 +4,27 @@
 </head>
 
 <body>
-<wicket:extend>
-  <table class="oldform">
-    <tr>
-      <th><wicket:message key="fibu.konto.nummer" /></th>
-      <td><input type="text" wicket:id="nummer" size="8" maxlength="8" /></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="fibu.konto.bezeichnung" /></th>
-      <td><input type="text" class="stdtext" wicket:id="identifier" /></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="description" /></th>
-      <td><textarea class="stdtext" wicket:id="description" style="height: 20ex;">[description]</textarea></td>
-    </tr>
-  </table>
-</wicket:extend>
+  <wicket:extend>
+    <table class="oldform">
+      <tr>
+        <th><wicket:message key="fibu.konto.nummer" /></th>
+        <td><input type="text" wicket:id="nummer" size="8" maxlength="8" /></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="status" /></th>
+        <td><select wicket:id="status">
+            <option>[status]</option>
+        </select></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="fibu.konto.bezeichnung" /></th>
+        <td><input type="text" class="stdtext" wicket:id="identifier" /></td>
+      </tr>
+      <tr>
+        <th><wicket:message key="description" /></th>
+        <td><textarea class="stdtext" wicket:id="description" style="height: 20ex;">[description]</textarea></td>
+      </tr>
+    </table>
+  </wicket:extend>
 </body>
 </html>
