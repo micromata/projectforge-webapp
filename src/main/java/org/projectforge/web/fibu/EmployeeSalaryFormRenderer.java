@@ -56,9 +56,9 @@ public class EmployeeSalaryFormRenderer extends AbstractFormRenderer
 {
   private static final long serialVersionUID = 2532546903021383010L;
 
-  private EmployeeSalaryDO data;
+  private final EmployeeSalaryDO data;
 
-  private ISelectCallerPage callerPage;
+  private final ISelectCallerPage callerPage;
 
   private final static LayoutLength LABEL_LENGTH = LayoutLength.HALF;
 
@@ -78,7 +78,7 @@ public class EmployeeSalaryFormRenderer extends AbstractFormRenderer
   {
     final EmployeeSelectPanel employeeSelectPanel = new EmployeeSelectPanel(SelectLPanel.WICKET_ID_SELECT_PANEL,
         new PropertyModel<EmployeeDO>(data, "employee"), callerPage, "employee");
-    doPanel.addSelectPanel(employeeSelectPanel, new PanelContext(FULL, getString("fibu.employee"), LABEL_LENGTH));
+    doPanel.addSelectPanel(employeeSelectPanel, new PanelContext(FULL, getString("fibu.employee"), LABEL_LENGTH).setFocus());
     employeeSelectPanel.setRequired(true);
     employeeSelectPanel.init();
     {
@@ -109,7 +109,7 @@ public class EmployeeSalaryFormRenderer extends AbstractFormRenderer
     }
     final TextField<BigDecimal> bruttoField = new TextField<BigDecimal>(INPUT_ID, new PropertyModel<BigDecimal>(data, "bruttoMitAgAnteil")) {
       @Override
-      public IConverter getConverter(Class< ? > type)
+      public IConverter getConverter(final Class< ? > type)
       {
         return new CurrencyConverter();
       }
