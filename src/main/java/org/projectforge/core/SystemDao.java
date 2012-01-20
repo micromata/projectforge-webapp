@@ -32,6 +32,7 @@ import java.util.Map;
 import org.apache.commons.io.FileUtils;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.database.SchemaExport;
+import org.projectforge.fibu.KontoCache;
 import org.projectforge.fibu.RechnungCache;
 import org.projectforge.fibu.kost.KostCache;
 import org.projectforge.task.TaskDO;
@@ -55,6 +56,8 @@ public class SystemDao extends HibernateDaoSupport
 
   private UserGroupCache userGroupCache;
 
+  private KontoCache kontoCache;
+
   private KostCache kostCache;
 
   private RechnungCache rechnungCache;
@@ -67,7 +70,7 @@ public class SystemDao extends HibernateDaoSupport
     File file;
     try {
       file = File.createTempFile("projectforge-schema", ".sql");
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       log.error(ex.getMessage(), ex);
       return ex.getMessage();
     }
@@ -75,7 +78,7 @@ public class SystemDao extends HibernateDaoSupport
     String result;
     try {
       result = FileUtils.readFileToString(file, "UTF-8");
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       log.error(ex.getMessage(), ex);
       return ex.getMessage();
     }
@@ -89,22 +92,22 @@ public class SystemDao extends HibernateDaoSupport
    */
   public String checkSystemIntegrity()
   {
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     buf.append("ProjectForge system integrity check.\n\n");
     buf.append("------------------------------------\n");
     buf.append("|                                  |\n");
     buf.append("| Task integrity (abandoned tasks) |\n");
     buf.append("|                                  |\n");
     buf.append("------------------------------------\n");
-    List<TaskDO> tasks = taskDao.internalLoadAll();
+    final List<TaskDO> tasks = taskDao.internalLoadAll();
     buf.append("Found " + tasks.size() + " tasks.\n");
-    Map<Integer, TaskDO> taskMap = new HashMap<Integer, TaskDO>();
-    for (TaskDO task : tasks) {
+    final Map<Integer, TaskDO> taskMap = new HashMap<Integer, TaskDO>();
+    for (final TaskDO task : tasks) {
       taskMap.put(task.getId(), task);
     }
     boolean rootTask = false;
     boolean abandonedTasks = false;
-    for (TaskDO task : tasks) {
+    for (final TaskDO task : tasks) {
       if (task.getParentTask() == null) {
         if (rootTask == true) {
           buf.append("\n*** Error: Found another root task:\n " + task + "\n");
@@ -151,33 +154,39 @@ public class SystemDao extends HibernateDaoSupport
   {
     userGroupCache.forceReload();
     taskDao.getTaskTree().forceReload();
+    kontoCache.forceReload();
     kostCache.forceReload();
     rechnungCache.forceReload();
     systemInfoCache.forceReload();
-    return "UserGroupCache, TaskTree, KostCache, RechnungCache, SystemInfoCache";
+    return "UserGroupCache, TaskTree, KontoCache, KostCache, RechnungCache, SystemInfoCache";
   }
 
-  public void setTaskDao(TaskDao taskDao)
+  public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
   }
 
-  public void setUserGroupCache(UserGroupCache userGroupCache)
+  public void setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
   }
 
-  public void setKostCache(KostCache kostCache)
+  public void setKontoCache(final KontoCache kontoCache)
+  {
+    this.kontoCache = kontoCache;
+  }
+
+  public void setKostCache(final KostCache kostCache)
   {
     this.kostCache = kostCache;
   }
 
-  public void setRechnungCache(RechnungCache rechnungCache)
+  public void setRechnungCache(final RechnungCache rechnungCache)
   {
     this.rechnungCache = rechnungCache;
   }
 
-  public void setSystemInfoCache(SystemInfoCache systemInfoCache)
+  public void setSystemInfoCache(final SystemInfoCache systemInfoCache)
   {
     this.systemInfoCache = systemInfoCache;
   }
