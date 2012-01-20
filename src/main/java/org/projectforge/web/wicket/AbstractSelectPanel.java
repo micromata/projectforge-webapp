@@ -56,6 +56,13 @@ public abstract class AbstractSelectPanel<T> extends FormComponentPanel<T>
   }
 
   /**
+   * Does nothing at default. Should be implemented by derived classes.
+   */
+  public void setFocus()
+  {
+  }
+
+  /**
    * Override this method and don't forget to call super.init() for mark this panel as initialized.
    * @see #onBeforeRender()
    */
@@ -69,7 +76,7 @@ public abstract class AbstractSelectPanel<T> extends FormComponentPanel<T>
    * If true (default) then the favorite tasks will be shown in a drop down choice for selection.
    * @param showFavorites
    */
-  public AbstractSelectPanel<T> setShowFavorites(boolean showFavorites)
+  public AbstractSelectPanel<T> setShowFavorites(final boolean showFavorites)
   {
     this.showFavorites = showFavorites;
     return this;
@@ -79,7 +86,7 @@ public abstract class AbstractSelectPanel<T> extends FormComponentPanel<T>
    * If given then the favorites drop down choice will get this html tab index.
    * @param tabIndex
    */
-  public AbstractSelectPanel<T> setTabIndex(Integer tabIndex)
+  public AbstractSelectPanel<T> setTabIndex(final Integer tabIndex)
   {
     this.tabIndex = tabIndex;
     return this;
@@ -95,7 +102,8 @@ public abstract class AbstractSelectPanel<T> extends FormComponentPanel<T>
   }
 
   /**
-   * Used for setting label for (see {@link WicketUtils#setLabel(org.apache.wicket.markup.html.form.FormComponent, org.apache.wicket.markup.html.basic.Label)}.
+   * Used for setting label for (see
+   * {@link WicketUtils#setLabel(org.apache.wicket.markup.html.form.FormComponent, org.apache.wicket.markup.html.basic.Label)}.
    * @return null if not overridden.
    */
   public Component getWrappedComponent()

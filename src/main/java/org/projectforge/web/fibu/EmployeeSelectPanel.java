@@ -41,6 +41,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.wicket.AbstractSelectPanel;
+import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 
 /**
@@ -205,6 +206,16 @@ public class EmployeeSelectPanel extends AbstractSelectPanel<EmployeeDO>
     add(employeeTextField);
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractSelectPanel#setFocus()
+   */
+  @Override
+  public void setFocus()
+  {
+    employeeTextField.add(new FocusOnLoadBehavior());
+  }
+
+  @Override
   public EmployeeSelectPanel init()
   {
     super.init();

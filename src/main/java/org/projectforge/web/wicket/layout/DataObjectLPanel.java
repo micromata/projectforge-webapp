@@ -424,6 +424,9 @@ public class DataObjectLPanel extends Panel
     if (ctx.getLabelPanel() != null && ctx.getLabelTooltip() != null) {
       WicketUtils.addTooltip(ctx.getLabelPanel().getWrappedComponent(), ctx.getLabelTooltip());
     }
+    if (ctx.isFocus() == true) {
+      selectPanel.setFocus();
+    }
     return field;
   }
 
