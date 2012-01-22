@@ -47,7 +47,7 @@ import de.micromata.hibernate.history.Historizable;
 @Entity
 @Indexed
 @Table(name = "T_FINANCE_BANK_ACCOUNT_ENTRY")
-public class BankAccountingEntryDO extends DefaultBaseDO implements Historizable
+public class BankAccountRecordDO extends DefaultBaseDO implements Historizable
 {
   private static final long serialVersionUID = 2440829270676298481L;
 
