@@ -27,24 +27,24 @@ package org.projectforge.plugins.banking;
 import org.apache.log4j.Logger;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
 
 @EditPage(defaultReturnPage = BankAccountListPage.class)
-public class BankAccountEditPage extends AbstractEditPage<BankAccountDO, BankAccountEditForm, BankAccountDao>
+public class BankAccountEditPage extends AbstractAutoLayoutEditPage<BankAccountDO, BankAccountEditForm, BankAccountDao>
 {
-  private static final long serialVersionUID = -7707234514303512825L;
+  private static final long serialVersionUID = -5058143025817192156L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(BankAccountEditPage.class);
-  
+
   @SpringBean(name = "bankAccountDao")
   private BankAccountDao bankAccountDao;
 
-  @SuppressWarnings("serial")
-  public BankAccountEditPage(PageParameters parameters)
+  public BankAccountEditPage(final PageParameters parameters)
   {
-    super(parameters, "fibu.bankAccount");
+    super(parameters, "plugins.banking.account");
     init();
   }
 
@@ -55,7 +55,7 @@ public class BankAccountEditPage extends AbstractEditPage<BankAccountDO, BankAcc
   }
 
   @Override
-  protected BankAccountEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, BankAccountDO data)
+  protected BankAccountEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final BankAccountDO data)
   {
     return new BankAccountEditForm(this, data);
   }

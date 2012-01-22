@@ -24,7 +24,13 @@
 package org.projectforge.plugins.banking;
 
 import org.projectforge.admin.UpdateEntry;
+import org.projectforge.admin.UpdateEntryImpl;
+import org.projectforge.admin.UpdatePreCheckStatus;
+import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDao;
+import org.projectforge.database.Table;
+import org.projectforge.database.TableAttribute;
+import org.projectforge.database.TableAttributeType;
 
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
@@ -40,37 +46,47 @@ public class BankingPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return null;
-    //    return new UpdateEntryImpl(BankingPlugin.ADDRESS_CAMPAIGN_ID, "1.0.0", "2011-11-24", "Adds tables T_PLUGIN_MARKETING_*.") {
-    //      final Table addressCampaignTable = new Table(AddressCampaignDO.class);
-    //
-    //      final Table addressCampaignValueTable = new Table(AddressCampaignValueDO.class);
-    //
-    //      @Override
-    //      public UpdatePreCheckStatus runPreCheck()
-    //      {
-    //        // Does the data-base table already exist?
-    //        return dao.doesExist(addressCampaignTable, addressCampaignValueTable) ? UpdatePreCheckStatus.ALREADY_UPDATED
-    //            : UpdatePreCheckStatus.OK;
-    //      }
-    //
-    //      @Override
-    //      public UpdateRunningStatus runUpdate()
-    //      {
-    //        // Create initial data-base table:
-    //        Table table = new Table(AddressCampaignDO.class) //
-    //        .addDefaultBaseDOAttributes() //
-    //        .addAttributes("title", "values", "comment");
-    //        dao.createTable(table);
-    //        table = new Table(AddressCampaignValueDO.class) //
-    //        .addDefaultBaseDOAttributes() //
-    //        .addAttributes("value", "comment") //
-    //        .addAttribute(new TableAttribute("address_fk", TableAttributeType.INT).setForeignTable(AddressDO.class)) //
-    //        .addAttribute(new TableAttribute("address_campaign_fk", TableAttributeType.INT).setForeignTable(AddressCampaignDO.class));
-    //        dao.createTable(table);
-    //        dao.addUniqueConstraint(table, "t_address_campaign_value_unique", "address_fk", "address_campaign_fk");
-    //        return UpdateRunningStatus.DONE;
-    //      }
-    //    };
+    return new UpdateEntryImpl(BankingPlugin.BANK_ACCOUNT_ID, "1.0.0", "2012-01-21", "Adds tables T_PLUGIN_BANK_ACCOUNT_*.") {
+      final Table bankAccountTable = new Table(BankAccountDO.class);
+
+      final Table bankAccountBalanceTable = new Table(BankAccountBalanceDO.class);
+
+      final Table bankAccountRecordTable = new Table(BankAccountRecordDO.class);
+
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        // Does the data-base table already exist?
+        return dao.doesExist(bankAccountTable, bankAccountBalanceTable, bankAccountRecordTable) ? UpdatePreCheckStatus.ALREADY_UPDATED
+            : UpdatePreCheckStatus.OK;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        // Create initial data-base table:
+        if (dao.doesExist(bankAccountTable) == false) {
+          final Table table = new Table(BankAccountDO.class) //
+          .addDefaultBaseDOAttributes() //
+          .addAttributes("accountNumber", "bank", "bankIdentificationCode", "name", "description");
+          dao.createTable(table);
+        }
+        if (dao.doesExist(bankAccountBalanceTable) == false) {
+          final Table table = new Table(BankAccountBalanceDO.class) //
+          .addDefaultBaseDOAttributes() //
+          .addAttributes("account", "date", "amount", "description") //
+          .addAttribute(new TableAttribute("account_fk", TableAttributeType.INT).setForeignTable(BankAccountDO.class));
+          dao.createTable(table);
+        }
+        if (dao.doesExist(bankAccountRecordTable) == false) {
+          final Table table = new Table(BankAccountRecordDO.class) //
+          .addDefaultBaseDOAttributes() //
+          .addAttributes("account", "date", "amount", "text") //
+          .addAttribute(new TableAttribute("account_fk", TableAttributeType.INT).setForeignTable(BankAccountDO.class));
+          dao.createTable(table);
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    };
   }
 }

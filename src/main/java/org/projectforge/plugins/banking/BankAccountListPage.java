@@ -51,14 +51,14 @@ public class BankAccountListPage extends AbstractListPage<BankAccountListForm, B
   @SpringBean(name = "bankAccountDao")
   private BankAccountDao bankAccountDao;
 
-  public BankAccountListPage(PageParameters parameters)
+  public BankAccountListPage(final PageParameters parameters)
   {
-    super(parameters, "finance.bankAccount");
+    super(parameters, "plugins.banking.account");
   }
 
   public BankAccountListPage(final ISelectCallerPage caller, final String selectProperty)
   {
-    super(caller, selectProperty, "finance.bankAccount");
+    super(caller, selectProperty, "plugins.banking.account");
   }
 
   @SuppressWarnings("serial")
@@ -67,7 +67,7 @@ public class BankAccountListPage extends AbstractListPage<BankAccountListForm, B
   {
     final List<IColumn<BankAccountDO>> columns = new ArrayList<IColumn<BankAccountDO>>();
     final CellItemListener<BankAccountDO> cellItemListener = new CellItemListener<BankAccountDO>() {
-      public void populateItem(Item<ICellPopulator<BankAccountDO>> item, String componentId, IModel<BankAccountDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<BankAccountDO>> item, final String componentId, final IModel<BankAccountDO> rowModel)
       {
         final BankAccountDO bankAccount = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(bankAccount.getId(), bankAccount.isDeleted());
@@ -76,7 +76,7 @@ public class BankAccountListPage extends AbstractListPage<BankAccountListForm, B
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<BankAccountDO>(new Model<String>(getString("finance.bankAccount.number")),
+    columns.add(new CellItemListenerPropertyColumn<BankAccountDO>(new Model<String>(getString("plugins.banking.account.number")),
         "accountNumber", "accountNumber", cellItemListener) {
       @SuppressWarnings("unchecked")
       @Override
@@ -90,17 +90,17 @@ public class BankAccountListPage extends AbstractListPage<BankAccountListForm, B
       }
     });
     columns
-        .add(new CellItemListenerPropertyColumn<BankAccountDO>(new Model<String>(getString("finance.bankAccount.name")), "name", "name", cellItemListener));
+    .add(new CellItemListenerPropertyColumn<BankAccountDO>(new Model<String>(getString("plugins.banking.account.name")), "name", "name", cellItemListener));
     columns
-        .add(new CellItemListenerPropertyColumn<BankAccountDO>(new Model<String>(getString("finance.bankAccount.bank")), "bank", "bank", cellItemListener));
+    .add(new CellItemListenerPropertyColumn<BankAccountDO>(new Model<String>(getString("plugins.banking.bank")), "bank", "bank", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<BankAccountDO>(
-        new Model<String>(getString("finance.bankAccount.bankIdentificationCode")), "bankIdentificationCode", "bankIdentificationCode", cellItemListener));
+        new Model<String>(getString("plugins.banking.bankIdentificationCode")), "bankIdentificationCode", "bankIdentificationCode", cellItemListener));
     dataTable = createDataTable(columns, "accountNumber", true);
     form.add(dataTable);
   }
 
-   @Override
-  protected BankAccountListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  @Override
+  protected BankAccountListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new BankAccountListForm(this);
   }
@@ -112,7 +112,7 @@ public class BankAccountListPage extends AbstractListPage<BankAccountListForm, B
   }
 
   @Override
-  protected IModel<BankAccountDO> getModel(BankAccountDO object)
+  protected IModel<BankAccountDO> getModel(final BankAccountDO object)
   {
     return new DetachableDOModel<BankAccountDO, BankAccountDao>(object, getBaseDao());
   }

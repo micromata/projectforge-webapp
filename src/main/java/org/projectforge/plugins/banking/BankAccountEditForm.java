@@ -24,33 +24,33 @@
 package org.projectforge.plugins.banking;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.components.MaxLengthTextArea;
-import org.projectforge.web.wicket.components.MaxLengthTextField;
+import org.projectforge.web.wicket.layout.LayoutContext;
 
-
+/**
+ * This is the edit formular page.
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ *
+ */
 public class BankAccountEditForm extends AbstractEditForm<BankAccountDO, BankAccountEditPage>
 {
-  private static final long serialVersionUID = -5486405450790659784L;
+  private static final long serialVersionUID = -6208809585214296635L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(BankAccountEditForm.class);
 
-  public BankAccountEditForm(BankAccountEditPage parentPage, BankAccountDO data)
+  protected BankAccountEditFormRenderer renderer;
+
+  public BankAccountEditForm(final BankAccountEditPage parentPage, final BankAccountDO data)
   {
     super(parentPage, data);
-    this.colspan = 2;
+    renderer = new BankAccountEditFormRenderer(this, new LayoutContext(this), data);
   }
 
   @Override
   protected void init()
   {
     super.init();
-    add(new MaxLengthTextField("name", new PropertyModel<String>(data, "name")));
-    add(new MaxLengthTextField("accountNumber", new PropertyModel<String>(data, "accountNumber")));
-    add(new MaxLengthTextField("bank", new PropertyModel<String>(data, "bank")));
-    add(new MaxLengthTextField("bankIdentificationCode", new PropertyModel<String>(data, "bankIdentificationCode")));
-    add(new MaxLengthTextArea("description", new PropertyModel<String>(data, "description")));
+    renderer.add();
   }
 
   @Override

@@ -38,13 +38,16 @@ public class BankingPlugin extends AbstractPlugin
 
   public static final String BANK_ACCOUNT_BALANCE_ID = "bankAccountBalance";
 
+  public static final String BANK_ACCOUNT_RECORD_ID = "bankAccountRecord";
+
   public static final String RESOURCE_BUNDLE_NAME = BankingPlugin.class.getPackage().getName() + ".BankingI18nResources";
 
-  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { BankAccountDO.class, BankAccountBalanceDO.class};
+  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { BankAccountDO.class, BankAccountBalanceDO.class,
+    BankAccountRecordDO.class};
 
   private BankAccountDao bankAccountDao;
 
-  //private BankAccountBalanceDao addressCampaignValueDao;
+  // private BankAccountBalanceDao addressCampaignValueDao;
 
   @Override
   public Class< ? >[] getPersistentEntities()
@@ -58,21 +61,23 @@ public class BankingPlugin extends AbstractPlugin
     // DatabaseUpdateDao is needed by the updater:
     BankingPluginUpdates.dao = databaseUpdateDao;
     // Register it:
-    register(BANK_ACCOUNT_ID, BankAccountDao.class, bankAccountDao, "plugins.banking.account").setNestedDOClasses(BankAccountingEntryDO.class, BankAccountBalanceDO.class);
-    //register(BANK_ACCOUNT_BALANCE_ID, BankAccountBalanceDao.class, addressCampaignValueDao, "plugins.banking.accountBalance");
+    register(BANK_ACCOUNT_ID, BankAccountDao.class, bankAccountDao, "plugins.banking.account").setNestedDOClasses(
+        BankAccountRecordDO.class, BankAccountBalanceDO.class);
+    // register(BANK_ACCOUNT_BALANCE_ID, BankAccountBalanceDao.class, addressCampaignValueDao, "plugins.banking.accountBalance");
 
     // Register the web part:
     registerWeb(BANK_ACCOUNT_ID, BankAccountListPage.class, BankAccountEditPage.class);
-    //registerWeb(BANK_ACCOUNT_BALANCE_ID, BankAccountBalanceListPage.class, BankAccountBalanceEditPage.class);
+    // registerWeb(BANK_ACCOUNT_BALANCE_ID, BankAccountBalanceListPage.class, BankAccountBalanceEditPage.class);
 
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.COST);
-    registerMenuItem(new MenuItemDef(parentMenu, BANK_ACCOUNT_ID, 30, "plugins.banking.bankAccount.menu", BankAccountListPage.class));
-    //registerMenuItem(new MenuItemDef(parentMenu, BANK_ACCOUNT_BALANCE_ID, 30, "plugins.banking.bankAccountBalance.menu", BankAccountBalanceListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, BANK_ACCOUNT_ID, 30, "plugins.banking.account.menu", BankAccountListPage.class));
+    // registerMenuItem(new MenuItemDef(parentMenu, BANK_ACCOUNT_BALANCE_ID, 30, "plugins.banking.bankAccountBalance.menu",
+    // BankAccountBalanceListPage.class));
 
     // Define the access management:
-    //registerRight(new BankAccountRight());
-    //registerRight(new BankAccountBalanceRight());
+    // registerRight(new BankAccountRight());
+    // registerRight(new BankAccountBalanceRight());
 
     // All the i18n stuff:
     addResourceBundle(RESOURCE_BUNDLE_NAME);
