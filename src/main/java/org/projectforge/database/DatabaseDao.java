@@ -97,7 +97,7 @@ public class DatabaseDao extends HibernateDaoSupport
     synchronized (this) {
       try {
         currentReindexRun = new Date();
-        StringBuffer buf = new StringBuffer();
+        final StringBuffer buf = new StringBuffer();
         reindex(clazz, settings, buf);
         return buf.toString();
       } finally {
@@ -116,14 +116,18 @@ public class DatabaseDao extends HibernateDaoSupport
     synchronized (this) {
       try {
         currentReindexRun = new Date();
-        StringBuffer buf = new StringBuffer();
+        final StringBuffer buf = new StringBuffer();
         for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
-          if (entry.getNestedDOClasses() != null) {
-            for (final Class<?> nestedDOClass : entry.getNestedDOClasses()) {
-              reindex(nestedDOClass, settings, buf);
+          try {
+            if (entry.getNestedDOClasses() != null) {
+              for (final Class< ? > nestedDOClass : entry.getNestedDOClasses()) {
+                reindex(nestedDOClass, settings, buf);
+              }
             }
+            reindex(entry.getDOClass(), settings, buf);
+          } catch (final Exception ex) {
+            log.error("While rebuilding data-base-search-index for '" + entry.getId() + "': " + ex.getMessage(), ex);
           }
-          reindex(entry.getDOClass(), settings, buf);
         }
         return buf.toString();
       } finally {
