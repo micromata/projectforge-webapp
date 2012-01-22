@@ -29,6 +29,7 @@ import java.util.List;
 import org.apache.wicket.settings.IResourceSettings;
 import org.projectforge.admin.SystemUpdater;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.plugins.banking.BankingPlugin;
 import org.projectforge.plugins.memo.MemoPlugin;
 import org.projectforge.plugins.todo.ToDoPlugin;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
@@ -44,11 +45,11 @@ public class PluginsRegistry
   /**
    * Defines some built-in plugins.
    */
-  private AbstractPlugin[] builtinPlugins = new AbstractPlugin[] { new ToDoPlugin(), new MemoPlugin()};
+  private final AbstractPlugin[] builtinPlugins = new AbstractPlugin[] { new ToDoPlugin(), new MemoPlugin(), new BankingPlugin()};
 
   private static PluginsRegistry instance;
 
-  private List<AbstractPlugin> plugins = new ArrayList<AbstractPlugin>();
+  private final List<AbstractPlugin> plugins = new ArrayList<AbstractPlugin>();
 
   public synchronized static PluginsRegistry instance()
   {
