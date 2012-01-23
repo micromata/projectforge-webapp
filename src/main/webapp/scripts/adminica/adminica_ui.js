@@ -180,6 +180,8 @@
 		 			}, function(){
 		 				$(".block").animate({
 		 				opacity: 1
+		 			}, function() {
+		 				$(".focus").focus();
 		 			});
 			});	
  			
