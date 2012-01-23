@@ -161,7 +161,7 @@ public class WicketUtils
   {
     final RequestCycle requestCylce = RequestCycle.get();
     if (requestCylce != null) {
-      PageParameters pageParameter = getPageParameters(params);
+      final PageParameters pageParameter = getPageParameters(params);
       return requestCylce.urlFor(pageClass, pageParameter).toString();
     } else {
       // RequestCycle.get().urlFor(pageClass, pageParameter).toString() can't be used for non wicket requests!
@@ -187,7 +187,7 @@ public class WicketUtils
             buf.append(URLEncoder.encode(params[i + 1], "UTF-8"));
           }
         }
-      } catch (UnsupportedEncodingException ex) {
+      } catch (final UnsupportedEncodingException ex) {
         log.error(ex.getMessage(), ex);
       }
       return buf.toString();
@@ -217,7 +217,7 @@ public class WicketUtils
   /**
    * Gets absolute url for an edit page with the object id as parameter.
    */
-  public static String getAbsoluteEditPageUrl(final Request request, final Class< ? extends Page> pageClass, Integer id)
+  public static String getAbsoluteEditPageUrl(final Request request, final Class< ? extends Page> pageClass, final Integer id)
   {
     return getAbsoluteEditPageUrl(request, WicketApplication.getBookmarkableMountPath(pageClass), id);
   }
@@ -226,14 +226,14 @@ public class WicketUtils
    * Gets absolute url for an edit page with the object id as parameter. The alias' should be defined in WebConstants.
    * @param alias Name under which the page was mounted to (in WicketApplication).
    */
-  public static String getAbsoluteEditPageUrl(final Request request, String alias, Integer id)
+  public static String getAbsoluteEditPageUrl(final Request request, final String alias, final Integer id)
   {
-    StringBuffer buf = buildAbsoluteUrl(request);
+    final StringBuffer buf = buildAbsoluteUrl(request);
     buf.append(alias + "/id/" + id);
     return buf.toString();
   }
 
-  public static String getAbsolutePageUrl(final Request request, String relativeUrl, boolean removeSessionId)
+  public static String getAbsolutePageUrl(final Request request, String relativeUrl, final boolean removeSessionId)
   {
     final HttpServletRequest httpServletRequest = ((ServletWebRequest) request).getHttpServletRequest();
     final StringBuffer buf = buildAbsoluteBaseUrl(request, httpServletRequest).append("/").append(WICKET_APPLICATION_PATH);
@@ -360,7 +360,7 @@ public class WicketUtils
       }
     } else if (Enum.class.isAssignableFrom(objectType) == true) {
       final String sValue = pageParameters.getString(key);
-      @SuppressWarnings("unchecked")
+      @SuppressWarnings({ "unchecked", "rawtypes"})
       final Enum< ? > en = Enum.valueOf((Class<Enum>) objectType, sValue);
       return en;
     } else if (objectType.isAssignableFrom(Integer.class) == true) {
@@ -441,7 +441,7 @@ public class WicketUtils
             final Object value = WicketUtils.getPageParameter(parameters, pre + key, method.getReturnType());
             BeanHelper.setProperty(bean, property, value);
           }
-        } catch (Exception ex) {
+        } catch (final Exception ex) {
           log.warn("Property '" + key + "' not found. Ignoring URL parameter.");
         }
       }
@@ -475,10 +475,10 @@ public class WicketUtils
   private static StringBuffer buildAbsoluteBaseUrl(final Request request, final HttpServletRequest httpServletRequest)
   {
     final StringBuffer buf = new StringBuffer();
-    String scheme = httpServletRequest.getScheme();
+    final String scheme = httpServletRequest.getScheme();
     buf.append(scheme).append("://");
     buf.append(httpServletRequest.getServerName());
-    int port = httpServletRequest.getServerPort();
+    final int port = httpServletRequest.getServerPort();
     if ("https".equals(scheme) == true) {
       if (port != 443) {
         buf.append(":").append(port);
@@ -544,8 +544,8 @@ public class WicketUtils
    */
   public static TooltipImage getJIRASupportTooltipImage(final String componentId, final Response response, final Component parent)
   {
-    final TooltipImage image = new TooltipImage(componentId, response, WebConstants.IMAGE_INFO, parent
-        .getString("tooltip.jiraSupport.field"));
+    final TooltipImage image = new TooltipImage(componentId, response, WebConstants.IMAGE_INFO,
+        parent.getString("tooltip.jiraSupport.field"));
     if (isJIRAConfigured() == false) {
       image.setVisible(false);
     }
@@ -693,8 +693,8 @@ public class WicketUtils
     for (int i = 0; i > -lastNDays; i--) {
       final DayHolder day = new DayHolder();
       day.add(Calendar.DAY_OF_YEAR, i);
-      datumChoiceRenderer.addValue(day.getSQLDate().getTime(), DateTimeFormatter.instance().getFormattedDate(day.getSQLDate(),
-          DateFormats.getFormatString(DateFormatType.DATE)));
+      datumChoiceRenderer.addValue(day.getSQLDate().getTime(),
+          DateTimeFormatter.instance().getFormattedDate(day.getSQLDate(), DateFormats.getFormatString(DateFormatType.DATE)));
     }
     return datumChoiceRenderer;
   }
@@ -845,6 +845,18 @@ public class WicketUtils
   }
 
   /**
+   * Adds class="focus" to the given component. It's evaluated by the adminica_ui.js. FocusOnLoadBehaviour doesn't work because the focus is
+   * set to early (before the components are visible).
+   * @param component
+   * @return This for chaining.
+   */
+  public static FormComponent< ? > setFocus(final FormComponent< ? > component)
+  {
+    component.add(new AttributeAppendModifier("class", "focus"));
+    return component;
+  }
+
+  /**
    * Searchs the attribute behavior (SimpleAttributeModifier or AttibuteApendModifier) with the given attribute name and returns it if
    * found, otherwise null.
    * @param comp
@@ -894,7 +906,7 @@ public class WicketUtils
   }
 
   @SuppressWarnings("unchecked")
-  public static void setLabel(final FormComponent component, final Label label)
+  public static void setLabel(final FormComponent< ? > component, final Label label)
   {
     final IModel<String> labelModel = (IModel<String>) label.getDefaultModel();
     if (component instanceof DatePanel) {
