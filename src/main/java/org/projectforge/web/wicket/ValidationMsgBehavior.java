@@ -37,12 +37,13 @@ public class ValidationMsgBehavior extends AbstractBehavior
 {
   private static final long serialVersionUID = 6188770593311749751L;
 
-  public void onRendered(Component component)
+  @Override
+  public void onRendered(final Component component)
   {
     if (component instanceof FormComponent<?> == false) {
       return;
     }
-    FormComponent< ? > fc = (FormComponent< ? >) component;
+    final FormComponent< ? > fc = (FormComponent< ? >) component;
     if (fc.isValid() == false) {
       String error;
       if (fc.hasFeedbackMessage() == true) {
@@ -50,7 +51,8 @@ public class ValidationMsgBehavior extends AbstractBehavior
       } else {
         error = "Your input is invalid.";
       }
-      fc.getResponse().write("<div class=\"validationMsg\">" + HtmlHelper.escapeXml(error) + "</div>");
+      // TODO: validationMsg muss raus, wenn altes Layout entfernt wurde.
+      fc.getResponse().write("<div class=\"error validationMsg\">" + HtmlHelper.escapeXml(error) + "</div>");
     }
   }
 }
