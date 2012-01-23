@@ -35,8 +35,8 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
-import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.NewAbstractForm;
+import org.projectforge.web.wicket.WicketUtils;
 
 public class LoginForm extends NewAbstractForm<LoginForm, LoginPage>
 {
@@ -59,10 +59,10 @@ public class LoginForm extends NewAbstractForm<LoginForm, LoginPage>
   @SuppressWarnings("serial")
   protected void init()
   {
-    //add(new FeedbackPanel("feedback").setOutputMarkupId(true));
+    // add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     add(new CheckBox("stayLoggedIn", new PropertyModel<Boolean>(this, "stayLoggedIn")));
-    add(new TextField<String>("username", new PropertyModel<String>(this, "username")).setRequired(true).setMarkupId("username").add(
-        new FocusOnLoadBehavior()));
+    add(WicketUtils.setFocus(new TextField<String>("username", new PropertyModel<String>(this, "username")).setRequired(true)).setMarkupId(
+        "username"));
     add(new PasswordTextField("password", new PropertyModel<String>(this, "password")).setResetPassword(true).setRequired(true));
     final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
     final Label messageOfTheDayLabel = new Label("messageOfTheDay", messageOfTheDay);
