@@ -105,7 +105,7 @@ public class WicketPageTestBase extends TestBase
     final FormTester form = tester.newFormTester("body:form");
     form.setValue("username", username);
     form.setValue("password", password);
-    form.submit("login:button");
+    form.submit("login");
     tester.assertRenderedPage(WicketApplication.DEFAULT_PAGE);
   }
 
