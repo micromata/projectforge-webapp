@@ -30,6 +30,7 @@ import org.apache.wicket.Session;
 import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.protocol.http.request.WebClientInfo;
 import org.apache.wicket.request.ClientInfo;
+import org.projectforge.Version;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
@@ -49,17 +50,19 @@ public class MySession extends WebSession
   private String userAgent;
 
   private UserAgentDevice userAgentDevice = UserAgentDevice.UNKNOWN;
-  
+
   private UserAgentBrowser userAgentBrowser = UserAgentBrowser.UNKNOWN;
 
-  private String userAgentBrowserVersion = null;
+  private String userAgentBrowserVersionString = null;
 
-  //private UserAgentOS userAgentOS = UserAgentOS.UNKNOWN;
+  private Version userAgentBrowserVersion = null;
+
+  // private UserAgentOS userAgentOS = UserAgentOS.UNKNOWN;
 
   private boolean mobileUserAgent;
 
   private boolean ignoreMobileUserAgent;
-  
+
   private boolean embatsSupported;
 
   public MySession(final Request request)
@@ -71,12 +74,12 @@ public class MySession extends WebSession
       ((WebClientInfo) info).getProperties().setTimeZone(PFUserContext.getTimeZone());
       userAgent = ((WebClientInfo) info).getUserAgent();
       userAgentDevice = UserAgentDevice.getUserAgentDevice(userAgent);
-      //userAgentOS = UserAgentOS.getUserAgentOS(userAgent);
+      // userAgentOS = UserAgentOS.getUserAgentOS(userAgent);
       mobileUserAgent = userAgentDevice.isMobile();
       final UserAgentDetection userAgentDetection = UserAgentDetection.browserDetect(userAgent);
       userAgentBrowser = userAgentDetection.getUserAgentBrowser();
-      userAgentBrowserVersion = userAgentDetection.getUserAgentBrowserVersion();
-      embatsSupported = EmbatsUtils.isEmbatsSupported(userAgentBrowser, userAgentBrowserVersion);
+      userAgentBrowserVersionString = userAgentDetection.getUserAgentBrowserVersion();
+      embatsSupported = EmbatsUtils.isEmbatsSupported(userAgentBrowser, userAgentBrowserVersionString);
     } else {
       log.error("Oups, ClientInfo is not from type WebClientInfo: " + info);
     }
@@ -104,7 +107,7 @@ public class MySession extends WebSession
     return user != null ? user.getId() : null;
   }
 
-  public synchronized void setUser(PFUserDO user)
+  public synchronized void setUser(final PFUserDO user)
   {
     this.user = user;
     dirty();
@@ -156,6 +159,41 @@ public class MySession extends WebSession
   public boolean isIgnoreMobileUserAgent()
   {
     return ignoreMobileUserAgent;
+  }
+
+  /**
+   * @return the userAgentBrowser
+   */
+  public UserAgentBrowser getUserAgentBrowser()
+  {
+    return userAgentBrowser;
+  }
+
+  /**
+   * @return the userAgentBrowserVersion
+   */
+  public String getUserAgentBrowserVersionString()
+  {
+    return userAgentBrowserVersionString;
+  }
+
+  /**
+   * @return the userAgentBrowserVersion
+   */
+  public Version getUserAgentBrowserVersion()
+  {
+    if (userAgentBrowserVersion == null && userAgentBrowserVersionString != null) {
+      userAgentBrowserVersion = new Version(userAgentBrowserVersionString);
+    }
+    return userAgentBrowserVersion;
+  }
+
+  /**
+   * @return the userAgentDevice
+   */
+  public UserAgentDevice getUserAgentDevice()
+  {
+    return userAgentDevice;
   }
 
   public void setIgnoreMobileUserAgent(final boolean ignoreMobileUserAgent)
