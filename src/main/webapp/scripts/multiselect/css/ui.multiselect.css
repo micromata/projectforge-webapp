@@ -1,0 +1,56 @@
+/* Multiselect
+----------------------------------*/
+
+.ui-multiselect { border: solid 0px #B6B6B6; font-size: 12px; padding: 1px; width: 100% !important; margin: 0px; /* outline: 1px solid #fff; */}
+.ui-multiselect ul { -moz-user-select: none; }
+.ui-multiselect li { margin: 0; padding: 0; cursor: default; line-height: 32px; height: 32px; font-size: 12px; list-style: none; border-top: 1px solid #fff !important;border-bottom: 1px solid #aaa !important;}
+.ui-multiselect li a { color: #999; text-decoration: none; padding: 0; display: block; float: left; cursor: pointer;}
+.ui-multiselect li.ui-draggable-dragging { padding-left: 10px; }
+
+.ui-multiselect div.selected { position: relative; padding: 0; margin: 0; border: 0; float:left; width: 60% !important;margin: 0px;}
+.ui-multiselect ul.selected { position: relative; padding: 0; overflow: auto; overflow-x: hidden; /* background: #fff */; margin: 0; list-style: none; border: 0; position: relative; width: 100%;  height: auto !important;}
+.ui-multiselect ul.selected li { border-right:1px solid #aaa;border-left:1px solid #aaa; }
+
+.ui-multiselect div.available { position: relative; padding: 0; margin: 0; border: 0; float:left; border-left-width: 1px; border-style: solid; border-color: #aaa; margin-left: -1px; width: 40% !important; margin: 0 0 -1px -1px; height: auto !important;}
+.ui-multiselect ul.available { position: relative; padding: 0; overflow: auto; overflow-x: hidden; /* background: #fff */; margin: 0; list-style: none; border: 0; width: 100%;  height: auto !important;}
+.ui-multiselect ul.available li { padding-left: 10px; border-right:1px solid #aaa; }
+ 
+.ui-multiselect .ui-state-default { border-width: 0 0 1px 0; margin-bottom: 0px; position: relative; padding-left: 22px;}
+.ui-multiselect .ui-state-hover { border-width: 0 0 1px 0; }
+.ui-multiselect .ui-widget-header { border-width: 1px 0 1px 0;border-color: #000; font-size: 11px; margin-bottom: 0px; height: 32px; line-height: 32px; background: #4C5766; color: #fff;}
+
+.ui-multiselect .selected .ui-widget-header{
+ margin: 0px -1px 0 0;}
+.ui-multiselect .available .ui-widget-header{
+ margin:0 0px 0 1px;}
+
+ 
+.ui-multiselect .add-all { float: right; padding: 0 10px; text-decoration: none; color: #fff;}
+.ui-multiselect .remove-all { float: right; padding: 0 10px; text-decoration: none; color: #fff;}
+.ui-multiselect .search { float: left; padding: 0 5px; background: none;
+	background: rgba(0,0,0,0.1);
+	border: 1px solid #000;
+	color: #ccc;
+	-moz-box-shadow:inset 0px 0px 2px rgba(0,0,0,0.3);
+	-webkit-box-shadow:inset 0px 0px 2px rgba(0,0,0,0.3);
+	box-shadow:inset 0px 0px 2px rgba(0,0,0,0.3);
+}
+.ui-multiselect .search:focus{
+	background: none;
+	-moz-box-shadow:inset 0px 0px 2px rgba(0,0,0,0.5);
+	-webkit-box-shadow:inset 0px 0px 2px rgba(0,0,0,0.5);
+	box-shadow:inset 0px 0px 2px rgba(0,0,0,0.5);
+}
+.ui-multiselect .count { float: left; padding:0 10px;}
+
+.ui-multiselect li span.ui-icon-arrowthick-2-n-s { position: absolute; left: 2px; top:7px;}
+.ui-multiselect li a.action { position: absolute; right: 7px; top: 7px; }
+ 
+.ui-multiselect input.search { height: 14px; padding: 3px; opacity: 1; margin: 5px; width: 100px; border: 1px solid rgba(0, 0, 0, 0.3); }
+
+/* multiselect styles */
+.multisorter {
+	width: 470px;
+	height: 211px;
+	border: 1px solid #fff;
+}

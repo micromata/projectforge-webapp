@@ -1,0 +1,135 @@
+/*
+	Fluid 960 Grid System - IE Fixes (IE7 and greater)
+	Learn more ~ http://www.designinfluences.com/
+
+	Licensed under GPL and MIT.
+*/
+
+/* =Grid >> Global
+--------------------------------------------------------------------------------*/
+
+.ie7 .grid_1,
+.ie7 .grid_2,
+.ie7 .grid_3,
+.ie7 .grid_4,
+.ie7 .grid_5,
+.ie7 .grid_6,
+.ie7 .grid_7,
+.ie7 .grid_8,
+.ie7 .grid_9,
+.ie7 .grid_10,
+.ie7 .grid_11,
+.ie7 .grid_12,
+.ie7 .grid_13,
+.ie7 .grid_14,
+.ie7 .grid_15,
+.ie7 .grid_16,
+.ie8 .grid_1,
+.ie8 .grid_2,
+.ie8 .grid_3,
+.ie8 .grid_4,
+.ie8 .grid_5,
+.ie8 .grid_6,
+.ie8 .grid_7,
+.ie8 .grid_8,
+.ie8 .grid_9,
+.ie8 .grid_10,
+.ie8 .grid_11,
+.ie8 .grid_12,
+.ie8 .grid_13,
+.ie8 .grid_14,
+.ie8 .grid_15,
+.ie8 .grid_16
+{
+	margin-left: .92%;
+	margin-right: .92%;
+	
+	float: left;
+	display: block;
+	
+	letter-spacing: 0;
+	vertical-align: inherit;
+	
+}
+
+
+.ie7 .indent,
+.ie8 .indent{
+	background: url(../images/trans_black.png) repeat;
+}
+
+.ie7 .flat_area h2,
+.ie8 .flat_area h2
+{
+	background: url(../images/trans_black.png) repeat;
+	
+}
+
+
+.ie7 input.text,.ie7 .textarea, .ie7 .ui-multiselect, .ie7 table.static input.text,
+.ie8 input.text,.ie8 .textarea, .ie8 .ui-multiselect, .ie8 table.static input.text,
+.ie9 input.text,.ie9 .textarea, .ie9 .ui-multiselect, .ie9 table.static input.text{
+	border: 1px solid #ccc;
+	background: #eee;
+}
+.ie7 .dataTables_wrapper input.text,
+.ie8 .dataTables_wrapper input.text,
+.ie9 .dataTables_wrapper input.text{ background: none !important; border: 1px solid #000;}
+
+
+.ie8 div.selector{
+	margin-bottom: 1px;
+}
+
+.ie8 .slider ol.slider_labels li.last-child{
+	display: none;
+}
+
+.ie8 button.img_icon.has_text,
+.ie8 button.div_icon.has_text{ padding-right: 10px; }
+
+
+
+.ie7 .isolate div.main_container,
+.ie8 .isolate div.main_container {
+	background: url(../images/trans_black.png) repeat;
+}
+/*
+
+.ie7 .col_25{width:24.9%;}
+
+
+
+
+
+.ie7 .gallery ul li a,
+.ie8 .gallery ul li a{
+	background: #fff !important;
+	
+}
+
+
+
+.ie8 textarea{
+	padding: 0;
+}
+
+
+.ie7 fieldset.label_side > label {
+	display:block;
+}
+
+
+.ie7 fieldset.label_side > div {
+	width: auto;
+	margin-left: -11px;
+	padding-left: 29px;
+	float: left;
+}
+.ie7 fieldset.label_side > div,
+.ie8 fieldset.label_side > div{
+	min-height: 32px;
+}
+
+
+*/

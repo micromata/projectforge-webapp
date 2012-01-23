@@ -1,0 +1,111 @@
+/* Coloured Header Gradients, eg. Sortable Boxes, Tab Boxes, Date-picker, etc. */
+.grad_black, 
+button,
+.calendar_grad,
+.dark_box, #nav_top > ul > li.current > a, .box_head, .tab_header, .tab_sider, #login_box #bar, .user_box, #search_side, .wizard .wizard_steps ul, .dataTables_wrapper .ui-widget-header, .ui-button .ui-state-active, .ui-widget-header .ui-state-active, .ui-buttonset .ui-button.ui-state-active, .ui-multiselect .ui-widget-header, .ui-slider .ui-slider-range, .slider-content .selected .title, .fc-header .fc-state-active, .fc-header .ui-state-active {
+    background-color: #4c5766;
+    border-color: #313841;
+    color: #fff;
+	text-shadow: 0 1px 0 #000;
+	
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#4c5766), to(#313841)); /* Saf4+, Chrome */
+	background-image: -webkit-linear-gradient(top, #4c5766, #313841); /* Chrome 10+, Saf5.1+, iOS 5+ */
+	background-image:    -moz-linear-gradient(top, #4c5766, #313841); /* FF3.6 */
+	background-image:     -ms-linear-gradient(top, #4c5766, #313841); /* IE10 */
+	background-image:      -o-linear-gradient(top, #4c5766, #313841); /* Opera 11.10+ */
+	background-image:         linear-gradient(top, #4c5766, #313841);
+    }
+    
+.grad_black_reverse,
+button:hover{
+	background-color: #313841;
+	
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#313841), to(#4c5766)); /* Saf4+, Chrome */
+	background-image: -webkit-linear-gradient(top, #313841, #4c5766); /* Chrome 10+, Saf5.1+, iOS 5+ */
+	background-image:    -moz-linear-gradient(top, #313841, #4c5766); /* FF3.6 */
+	background-image:     -ms-linear-gradient(top, #313841, #4c5766); /* IE10 */
+	background-image:      -o-linear-gradient(top, #313841, #4c5766); /* Opera 11.10+ */
+	background-image:         linear-gradient(top, #313841, #4c5766);
+}
+
+/* Grey Header Gradients eg. Nav, Sidebar, Accordion, etc. */
+.grad_grey, 
+button.light,
+.alert_light,
+.ui-multiselect li,
+.side_accordion > li, #nav_top > ul > li, #nav_top > ul > li > ul.dropdown li, .breadcrumb, .toggle_all, .content_accordion h3.bar, .dataTables_scrollHead, .dataTables_paginate span.fg-button, .list_slider .slider-nav, .slider-content .title, .list_slider .slide-up, .list_slider .slide-down, .side_links li a, .tabs ul.tab_header li a, .tabs ul.tab_sider li a, .fc .fc-agenda-slots tr th, table.static thead tr th, .wizard .wizard_steps ul li.current, .alert_light, #wrapper div.main_container .box.light h2.box_head,
+.ui-datepicker-header {
+    color: #333;
+    border-color: #aaa;
+    text-shadow: 0 1px 0 #fff;
+    
+    background-color: #E6ECEF;	
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#E6ECEF), to(#D0D6DA)); /* Saf4+, Chrome */
+	background-image: -webkit-linear-gradient(top, #E6ECEF, #D0D6DA); /* Chrome 10+, Saf5.1+, iOS 5+ */
+	background-image:    -moz-linear-gradient(top, #E6ECEF, #D0D6DA); /* FF3.6 */
+	background-image:     -ms-linear-gradient(top, #E6ECEF, #D0D6DA); /* IE10 */
+	background-image:      -o-linear-gradient(top, #E6ECEF, #D0D6DA); /* Opera 11.10+ */
+	background-image:         linear-gradient(top, #E6ECEF, #D0D6DA);
+}
+
+.grad_grey_reverse,
+button.light:hover,
+.alert_light:hover{
+    background-color: #D0D6DA;	
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#D0D6DA), to(#E6ECEF)); /* Saf4+, Chrome */
+	background-image: -webkit-linear-gradient(top, #D0D6DA, #E6ECEF); /* Chrome 10+, Saf5.1+, iOS 5+ */
+	background-image:    -moz-linear-gradient(top, #D0D6DA, #E6ECEF); /* FF3.6 */
+	background-image:     -ms-linear-gradient(top, #D0D6DA, #E6ECEF); /* IE10 */
+	background-image:      -o-linear-gradient(top, #D0D6DA, #E6ECEF); /* Opera 11.10+ */
+	background-image:         linear-gradient(top, #D0D6DA, #E6ECEF);
+}
+
+
+.grad_grey_light,
+.el-finder-toolbar ul, .el-finder-statusbar, .button_bar {
+    background-color: #E6ECEF;
+    border-color: #d9e1e5;
+    text-shadow: 0 1px 0 #fff;
+    
+    background-color: #eee;	
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#E6ECEF), to(#d9e1e5)); /* Saf4+, Chrome */
+	background-image: -webkit-linear-gradient(top, #E6ECEF, #d9e1e5); /* Chrome 10+, Saf5.1+, iOS 5+ */
+	background-image:    -moz-linear-gradient(top, #E6ECEF, #d9e1e5); /* FF3.6 */
+	background-image:     -ms-linear-gradient(top, #E6ECEF, #d9e1e5); /* IE10 */
+	background-image:      -o-linear-gradient(top, #E6ECEF, #d9e1e5); /* Opera 11.10+ */
+	background-image:         linear-gradient(top, #E6ECEF, #d9e1e5);
+}
+.grad_grey_light_reverse{
+    background-color: #d9e1e5;
+	background-image: -webkit-gradient(linear, left top, left bottom, from(#d9e1e5), to(#eee)); /* Saf4+, Chrome */
+	background-image: -webkit-linear-gradient(top, #d9e1e5, #E6ECEF); /* Chrome 10+, Saf5.1+, iOS 5+ */
+	background-image:    -moz-linear-gradient(top, #d9e1e5, #E6ECEF); /* FF3.6 */
+	background-image:     -ms-linear-gradient(top, #d9e1e5, #E6ECEF); /* IE10 */
+	background-image:      -o-linear-gradient(top, #d9e1e5, #E6ECEF); /* Opera 11.10+ */
+	background-image:         linear-gradient(top, #d9e1e5, #E6ECEF);
+}
+
+
+button{
+	color: #fff;
+	border: 1px solid #000;
+	text-shadow: 0 1px 0 #000;
+
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transition: background 5000ms ease-in;
+    } 
+button:hover {}
+    
+button.light{ 
+	color: #666;
+	border-color: #aaa;
+	text-shadow: 0 1px 0 #fff;   
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+	}
+button.light:hover {}
+
+button.on_dark {
+    box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.2), 0 1px 0 rgba(255, 255, 255, 0.2) inset
+    }
+    
+#bg_light{display:none !important;}

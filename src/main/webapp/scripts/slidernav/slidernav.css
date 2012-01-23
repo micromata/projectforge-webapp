@@ -1,0 +1,44 @@
+/*
+ *  SliderNav - A Simple Content Slider with a Navigation Bar
+ *  Copyright 2010 Monjurul Dolon, http://mdolon.com/
+ *  Released under the MIT, BSD, and GPL Licenses.
+ *  More information: http://devgrow.com/slidernav
+ */
+.list_slider {  min-height: 250px; display: block; position: relative; background: #fff; overflow: hidden; }
+.list_slider ul { list-style: none; }
+.slider-content { float: left; width: 100%; display: block; overflow: hidden; min-height: 250px; border-bottom: 1px solid #CCCCCC;}
+.slider-content ul { float: left; width: 100%; display: block; position: relative; margin-bottom: 0px; margin-top: 0px;}
+.slider-content ul li { float: left; width: 100%; }
+.slider-content ul ul li a { padding: 5px 10px; display: block; border-bottom: 1px solid #f3f3f3; text-transform: capitalize; color:#555 !important;}
+.slider-content ul ul li:last-child a{ border-bottom: 0px;}
+.slider-content ul ul li a:hover { background: #f3f3f3; border-color: #d5d5d5; }
+.slider-content .title { padding: 5px 0; text-indent: 10px; background: #bbb;  width: 98%; float: left; font-weight: bold; text-transform: uppercase; border-top:1px solid #aaa; border-bottom:1px solid #aaa;color: #555; text-shadow: 0 1px 0 #FFFFFF;}
+.slider-content .selected .title { background: #666; color:white; text-shadow: 0 1px 0 #000; }
+.list_slider .slider-nav { position: absolute; right: 0; top: 0; background: #D0D6DA; min-height: 250px; top:0px !important; width:40px; border-left:1px solid #aaa; border-right:1px solid #aaa;}
+.list_slider .slider-nav ul { padding: 5px 0; margin: 0px; }
+.list_slider .slider-nav li a { padding: 3px 5px; line-height: 13px; text-align: center; color: #555; text-shadow: 0 1px 0 #FFFFFF; font-weight: bold; display: block; text-transform: uppercase; cursor: pointer; }
+.list_slider #debug { position: absolute; bottom: 0; left: 0; padding: 5px; background: #000; color: #fff; }
+.list_slider .arrow { font-size: 0px; line-height: 0%; width: 0px; border-bottom: 8px solid #fff; border-left: 5px solid #333; border-right: 5px solid #333; position: relative; top: 5px; display:none;}
+.list_slider .down { border-bottom: none; border-top: 8px solid #fff; top: 15px; }
+.list_slider .slide-up, .list_slider .slide-down { height: 20px; background: #D0D6DA; text-align: center; cursor: pointer; float: right; width: 100%; position: relative; display: none;}
+
+.slide-up, .slide-down{
+border-bottom:1px solid #aaa;
+border-top:1px solid #aaa;
+border-left:1px solid #fff;
+border-right:1px solid #aaa;
+}
+
+.slide-up{
+margin-top:-1px;
+padding-bottom:1px}
+
+
+.slide-down{	
+	-webkit-border-bottom-right-radius: 3px;
+	-webkit-border-bottom-left-radius: 3px;
+	-moz-border-radius-bottomright: 3px;
+	-moz-border-radius-bottomleft: 3px;
+	border-bottom-right-radius: 3px;
+	border-bottom-left-radius: 3px;
+}

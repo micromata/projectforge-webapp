@@ -1,0 +1,25 @@
+#wrapper{
+	position:relative;
+	margin: auto;
+	width: 960px !important;
+	}
+	
+
+.container_12,
+.container_16
+{
+	width: 760px;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
+#wrapper #sidebar{
+	position:absolute;
+	}
+	
+#wrapper #sidebar a.logo{
+	margin-top: -25px;
+	}
+	
+#nav_top ul{
+}
