@@ -25,24 +25,20 @@ package org.projectforge.web;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
-import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.NewAbstractForm;
 
-public class LoginForm extends AbstractForm<LoginForm, LoginPage>
+public class LoginForm extends NewAbstractForm<LoginForm, LoginPage>
 {
   private static final long serialVersionUID = -422822736093879603L;
 
@@ -63,20 +59,15 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
   @SuppressWarnings("serial")
   protected void init()
   {
-    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    final WebMarkupContainer administratorLoginNeeded = new WebMarkupContainer("administratorLoginNeeded");
-    add(administratorLoginNeeded);
-    if (UserFilter.isUpdateRequiredFirst() == false) {
-      administratorLoginNeeded.setVisible(false);
-    }
+    //add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     add(new CheckBox("stayLoggedIn", new PropertyModel<Boolean>(this, "stayLoggedIn")));
-    add(new TextField<String>("username", new PropertyModel<String>(this, "username")).setMarkupId("username").add(
+    add(new TextField<String>("username", new PropertyModel<String>(this, "username")).setRequired(true).setMarkupId("username").add(
         new FocusOnLoadBehavior()));
     add(new PasswordTextField("password", new PropertyModel<String>(this, "password")).setResetPassword(true).setRequired(true));
     final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
     final Label messageOfTheDayLabel = new Label("messageOfTheDay", messageOfTheDay);
     add(messageOfTheDayLabel.setEscapeModelStrings(false).setVisible(StringUtils.isNotBlank(messageOfTheDay)));
-    final Button loginButton = new Button("button", new Model<String>(getString("login"))) {
+    final Button loginButton = new Button("login", new Model<String>(getString("login"))) {
       @Override
       public final void onSubmit()
       {
@@ -87,9 +78,7 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
       }
     };
     setDefaultButton(loginButton);
-    loginButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    final SingleButtonPanel loginButtonPanel = new SingleButtonPanel("login", loginButton);
-    add(loginButtonPanel);
+    add(loginButton);
   }
 
   /**

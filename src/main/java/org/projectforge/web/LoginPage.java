@@ -31,6 +31,7 @@ import javax.sql.DataSource;
 
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebResponse;
@@ -44,14 +45,14 @@ import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.admin.SetupPage;
 import org.projectforge.web.admin.SystemUpdatePage;
 import org.projectforge.web.mobile.LoginMobilePage;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.MySession;
+import org.projectforge.web.wicket.NewAbstractBasePage;
 import org.projectforge.web.wicket.WicketUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
-public class LoginPage extends AbstractBasePage
+public class LoginPage extends NewAbstractBasePage
 {
   static final String FIRST_PSEUDO_SETUP_USER = "firstPseudoSetupUser";
 
@@ -126,6 +127,12 @@ public class LoginPage extends AbstractBasePage
     body.add(new SimpleAttributeModifier("class", "loginpage"));
     body.add(form);
     form.init();
+    final WebMarkupContainer administratorLoginNeeded = new WebMarkupContainer("administratorLoginNeeded");
+    body.add(administratorLoginNeeded);
+    if (UserFilter.isUpdateRequiredFirst() == false) {
+      administratorLoginNeeded.setVisible(false);
+    }
+
     UserFilter.setLoginPage(((WebRequest)getRequest()).getHttpServletRequest().getSession());
   }
 
