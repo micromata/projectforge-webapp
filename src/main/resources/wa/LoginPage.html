@@ -11,7 +11,7 @@
           <div class="box">
             <div class="block">
               <div class="section">
-                <div class="alert dismissible alert_light">
+                <div class="alert dissmissible alert_light">
                   <img src="images/logo-top-right.png" style="float: right; right: 10px; top: 0px"> <img width="24" height="24"
                     src="images/icons/small/grey/locked.png"> <strong><wicket:message key="login.title" /></strong><br />
                   <wicket:message key="login.welcome" />
@@ -19,6 +19,9 @@
                 <div class="alert dissmissible alert_red" wicket:id="administratorLoginNeeded">
                   <img height="24" width="24" src="images/icons/small/white/alarm_bell.png">
                   <wicket:message key="login.adminLoginRequired" />
+                </div>
+                <div class="alert dissmissible alert_red" wicket:id="errors">
+                  <img height="24" width="24" src="images/icons/small/white/alarm_bell.png"> <span wicket:id="msg">[login failed]</span>
                 </div>
               </div>
               <form wicket:id="form" class="validate_form">

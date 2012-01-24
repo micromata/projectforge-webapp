@@ -29,10 +29,13 @@ import java.sql.SQLException;
 import javax.servlet.http.Cookie;
 import javax.sql.DataSource;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.PageParameters;
 import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.protocol.http.WebRequest;
 import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.request.target.basic.RedirectRequestTarget;
@@ -65,6 +68,10 @@ public class LoginPage extends NewAbstractBasePage
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
+
+  private WebMarkupContainer errorsContainer;
+
+  private String errorMessage;
 
   /**
    * Only needed if the data-base needs an update first (may-be the PFUserDO can't be read because of unmatching tables).
@@ -100,6 +107,7 @@ public class LoginPage extends NewAbstractBasePage
   {
   }
 
+  @SuppressWarnings("serial")
   public LoginPage(final PageParameters parameters)
   {
     super(parameters);
@@ -132,8 +140,23 @@ public class LoginPage extends NewAbstractBasePage
     if (UserFilter.isUpdateRequiredFirst() == false) {
       administratorLoginNeeded.setVisible(false);
     }
+    errorsContainer = new WebMarkupContainer("errors");
+    body.add(errorsContainer.setVisible(false));
+    errorsContainer.add(new Label("msg", new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return StringUtils.defaultString(errorMessage);
+      }
+    }));
 
-    UserFilter.setLoginPage(((WebRequest)getRequest()).getHttpServletRequest().getSession());
+    UserFilter.setLoginPage(((WebRequest) getRequest()).getHttpServletRequest().getSession());
+  }
+
+  void addError(final String msg)
+  {
+    errorMessage = msg;
+    errorsContainer.setVisible(true);
   }
 
   public static void internalLogin(final WebPage page, final PFUserDO user)
@@ -233,8 +256,8 @@ public class LoginPage extends NewAbstractBasePage
               + loggedInUser.getUsername()
               + ":"
               + userDao.getStayLoggedInKey(user.getId()));
-          UserFilter.addStayLoggedInCookie(((WebRequest) page.getRequest()).getHttpServletRequest(), ((WebResponse) page.getResponse())
-              .getHttpServletResponse(), cookie);
+          UserFilter.addStayLoggedInCookie(((WebRequest) page.getRequest()).getHttpServletRequest(),
+              ((WebResponse) page.getResponse()).getHttpServletResponse(), cookie);
         }
         internalLogin(page, user);
         if (targetUrlAfterLogin != null) {
@@ -252,8 +275,8 @@ public class LoginPage extends NewAbstractBasePage
 
   protected String checkLogin()
   {
-    return internalCheckLogin(this, userDao, dataSource, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), WicketUtils
-        .getDefaultPage(), targetUrlAfterLogin);
+    return internalCheckLogin(this, userDao, dataSource, form.getUsername(), form.getPassword(), form.isStayLoggedIn(),
+        WicketUtils.getDefaultPage(), targetUrlAfterLogin);
   }
 
   @Override

@@ -40,11 +40,13 @@ import org.apache.wicket.protocol.http.WebResponse;
 import org.apache.wicket.request.target.basic.RedirectRequestTarget;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.AppVersion;
+import org.projectforge.Version;
 import org.projectforge.common.DateHelper;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuBuilder;
+import org.projectforge.web.UserAgentBrowser;
 
 /**
  * Do only derive from this page, if no login is required!
@@ -93,15 +95,34 @@ public abstract class NewAbstractBasePage extends WebPage
   public NewAbstractBasePage(final PageParameters parameters)
   {
     super(parameters);
-    add(new Label("windowTitle", new Model<String>() {
+
+    final MySession session = ((MySession) getSession());
+    final WebMarkupContainer html = new WebMarkupContainer("html");
+    add(html);
+    if (session.getUserAgentBrowser() == UserAgentBrowser.IE) {
+      final Version version = session.getUserAgentBrowserVersion();
+      if (version != null) {
+        final int major = version.getMajorRelease();
+        if (major < 7) {
+          html.add(new AttributeAppendModifier("class", "no-js ie6"));
+        } else if (major == 7) {
+          html.add(new AttributeAppendModifier("class", "no-js ie7"));
+        } else if (major == 8) {
+          html.add(new AttributeAppendModifier("class", "no-js ie8"));
+        } else if (major == 9) {
+          html.add(new AttributeAppendModifier("class", "no-js ie9"));
+        }
+      }
+    }
+    html.add(new Label("windowTitle", new Model<String>() {
       @Override
       public String getObject()
       {
         return getWindowTitle();
       }
     }));
-    add(JavascriptPackageResource.getHeaderContribution("scripts/projectforge.js"));
-    add(WicketUtils.headerContributorForFavicon(getUrl("/favicon.ico")));
+    html.add(JavascriptPackageResource.getHeaderContribution("scripts/projectforge.js"));
+    html.add(WicketUtils.headerContributorForFavicon(getUrl("/favicon.ico")));
     body = new WebMarkupContainer("body") {
       @Override
       protected void onComponentTag(final ComponentTag tag)
@@ -109,99 +130,99 @@ public abstract class NewAbstractBasePage extends WebPage
         onBodyTag(tag);
       }
     };
-    add(body);
-    //body.add(new Label("title", "<not yet visible>").setVisible(false));
-    //    final WebMarkupContainer navigationContainer = new WebMarkupContainer("navigation");
-    //    body.add(navigationContainer);
-    //    if (WebConfiguration.isPortletMode() == true) {
-    //      navigationContainer.setVisible(false);
-    //      return;
-    //    }
-    //    final Label developmentsystemLabel = new Label("developmentsystem", "Developmentsystem!");
-    //    navigationContainer.add(developmentsystemLabel);
-    //    if (WebConfiguration.isDevelopmentMode() == true) {
-    //      navigationContainer.add(new SimpleAttributeModifier("style", WebConstants.CSS_BACKGROUND_COLOR_RED));
-    //    } else {
-    //      developmentsystemLabel.setVisible(false);
-    //    }
-    //    final String logoServlet = LogoServlet.getBaseUrl();
-    //    if (logoServlet != null) {
-    //      navigationContainer.add(new ContextImage("logoLeftImage", logoServlet));
-    //    } else {
-    //      navigationContainer.add(new Label("logoLeftImage", "[invisible]").setVisible(false));
-    //    }
-    //    final PFUserDO user = getUser();
-    //    final BookmarkablePageLink<Void> myAccountLink;
-    //    if (user == null) {
-    //      myAccountLink = new BookmarkablePageLink<Void>("myAccountLink", LoginPage.class);
-    //    } else {
-    //      myAccountLink = new BookmarkablePageLink<Void>("myAccountLink", MyAccountEditPage.class);
-    //    }
-    //    navigationContainer.add(myAccountLink);
-    //    final Model<String> loggedInLabelModel = new Model<String>() {
-    //      @Override
-    //      public String getObject()
-    //      {
-    //        if (user == null) {
-    //          return getString("notLoggedIn");
-    //        }
-    //        return getString("loggedInUserInfo") + " <strong>" + escapeHtml(user.getUserDisplayname()) + "</strong> |";
-    //      }
-    //    };
-    //    myAccountLink.add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false).setRenderBodyOnly(false));
-    //    final Link<String> logoutLink = new Link<String>("logoutLink") {
-    //      @Override
-    //      public void onClick()
-    //      {
-    //        logout();
-    //        setResponsePage(LoginPage.class);
-    //      };
-    //    };
-    //    navigationContainer.add(logoutLink);
-    //    if (getUser() == null) {
-    //      logoutLink.setVisible(false);
-    //    }
-    //    logoutLink.add(new Label("logoutLabel", getString("menu.logout")).setRenderBodyOnly(true));
-    //    final BookmarkablePageLink<Void> docLink = new BookmarkablePageLink<Void>("docLink", DocumentationPage.class);
-    //    navigationContainer.add(docLink);
-    //    docLink
-    //    .add(new Label("versionLabel", "V.&nbsp;" + getAppVersion() + ",&nbsp;" + getAppReleaseTimestamp()).setEscapeModelStrings(false));
-    //    final MenuPanel menuPanel = new MenuPanel("mainMenu");
-    //    navigationContainer.add(menuPanel);
-    //    menuPanel.init();
+    html.add(body);
+    // body.add(new Label("title", "<not yet visible>").setVisible(false));
+    // final WebMarkupContainer navigationContainer = new WebMarkupContainer("navigation");
+    // body.add(navigationContainer);
+    // if (WebConfiguration.isPortletMode() == true) {
+    // navigationContainer.setVisible(false);
+    // return;
+    // }
+    // final Label developmentsystemLabel = new Label("developmentsystem", "Developmentsystem!");
+    // navigationContainer.add(developmentsystemLabel);
+    // if (WebConfiguration.isDevelopmentMode() == true) {
+    // navigationContainer.add(new SimpleAttributeModifier("style", WebConstants.CSS_BACKGROUND_COLOR_RED));
+    // } else {
+    // developmentsystemLabel.setVisible(false);
+    // }
+    // final String logoServlet = LogoServlet.getBaseUrl();
+    // if (logoServlet != null) {
+    // navigationContainer.add(new ContextImage("logoLeftImage", logoServlet));
+    // } else {
+    // navigationContainer.add(new Label("logoLeftImage", "[invisible]").setVisible(false));
+    // }
+    // final PFUserDO user = getUser();
+    // final BookmarkablePageLink<Void> myAccountLink;
+    // if (user == null) {
+    // myAccountLink = new BookmarkablePageLink<Void>("myAccountLink", LoginPage.class);
+    // } else {
+    // myAccountLink = new BookmarkablePageLink<Void>("myAccountLink", MyAccountEditPage.class);
+    // }
+    // navigationContainer.add(myAccountLink);
+    // final Model<String> loggedInLabelModel = new Model<String>() {
+    // @Override
+    // public String getObject()
+    // {
+    // if (user == null) {
+    // return getString("notLoggedIn");
+    // }
+    // return getString("loggedInUserInfo") + " <strong>" + escapeHtml(user.getUserDisplayname()) + "</strong> |";
+    // }
+    // };
+    // myAccountLink.add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false).setRenderBodyOnly(false));
+    // final Link<String> logoutLink = new Link<String>("logoutLink") {
+    // @Override
+    // public void onClick()
+    // {
+    // logout();
+    // setResponsePage(LoginPage.class);
+    // };
+    // };
+    // navigationContainer.add(logoutLink);
+    // if (getUser() == null) {
+    // logoutLink.setVisible(false);
+    // }
+    // logoutLink.add(new Label("logoutLabel", getString("menu.logout")).setRenderBodyOnly(true));
+    // final BookmarkablePageLink<Void> docLink = new BookmarkablePageLink<Void>("docLink", DocumentationPage.class);
+    // navigationContainer.add(docLink);
+    // docLink
+    // .add(new Label("versionLabel", "V.&nbsp;" + getAppVersion() + ",&nbsp;" + getAppReleaseTimestamp()).setEscapeModelStrings(false));
+    // final MenuPanel menuPanel = new MenuPanel("mainMenu");
+    // navigationContainer.add(menuPanel);
+    // menuPanel.init();
     //
-    //    final IconLinkPanel sendFeedbackLink = new IconLinkPanel("sendFeedbackLink", EmbatsSymbolChar.SPEECH_BALLON, FeedbackPage.class,
-    //        getString("feedback.link.tooltip"));
-    //    navigationContainer.add(sendFeedbackLink);
-    //    final IconLinkPanel bookmarkLink = new IconLinkPanel("bookmarkLink", EmbatsSymbolChar.STAR, "javascript:toggle('#bookmark');",
-    //        new Model<String>() {
-    //      @Override
-    //      public String getObject()
-    //      {
-    //        return getString("tooltip.directPageLink") + ": " + bookmarkableUrl;
-    //      };
-    //    });
-    //    navigationContainer.add(bookmarkLink);
-    //    bookmarkLink.setVisible(isBookmarkLinkIconVisible());
-    //    navigationContainer.add(bookmarkLink);
-    //    final Label bookmarkLabel = new Label("bookmark", new Model<String>() {
-    //      @Override
-    //      public String getObject()
-    //      {
-    //        final StringBuffer buf = new StringBuffer();
-    //        buf.append(getString("tooltip.directPageLink")).append(":<br/><b>").append(bookmarkableUrl).append("</b>");
-    //        if (extendedBookmarkableUrl != null) {
-    //          buf.append("<br/>").append(getString("tooltip.directPageExtendedLink")).append(":<br/>").append(extendedBookmarkableUrl);
-    //        }
-    //        return buf.toString();
-    //      }
-    //    });
-    //    bookmarkLabel.setEscapeModelStrings(false);
-    //    navigationContainer.add(bookmarkLabel);
-    //    if (isBookmarkable() == false) {
-    //      bookmarkLink.setVisible(false);
-    //      bookmarkLabel.setVisible(false);
-    //    }
+    // final IconLinkPanel sendFeedbackLink = new IconLinkPanel("sendFeedbackLink", EmbatsSymbolChar.SPEECH_BALLON, FeedbackPage.class,
+    // getString("feedback.link.tooltip"));
+    // navigationContainer.add(sendFeedbackLink);
+    // final IconLinkPanel bookmarkLink = new IconLinkPanel("bookmarkLink", EmbatsSymbolChar.STAR, "javascript:toggle('#bookmark');",
+    // new Model<String>() {
+    // @Override
+    // public String getObject()
+    // {
+    // return getString("tooltip.directPageLink") + ": " + bookmarkableUrl;
+    // };
+    // });
+    // navigationContainer.add(bookmarkLink);
+    // bookmarkLink.setVisible(isBookmarkLinkIconVisible());
+    // navigationContainer.add(bookmarkLink);
+    // final Label bookmarkLabel = new Label("bookmark", new Model<String>() {
+    // @Override
+    // public String getObject()
+    // {
+    // final StringBuffer buf = new StringBuffer();
+    // buf.append(getString("tooltip.directPageLink")).append(":<br/><b>").append(bookmarkableUrl).append("</b>");
+    // if (extendedBookmarkableUrl != null) {
+    // buf.append("<br/>").append(getString("tooltip.directPageExtendedLink")).append(":<br/>").append(extendedBookmarkableUrl);
+    // }
+    // return buf.toString();
+    // }
+    // });
+    // bookmarkLabel.setEscapeModelStrings(false);
+    // navigationContainer.add(bookmarkLabel);
+    // if (isBookmarkable() == false) {
+    // bookmarkLink.setVisible(false);
+    // bookmarkLabel.setVisible(false);
+    // }
   }
 
   /**
