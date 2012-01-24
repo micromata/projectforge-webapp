@@ -102,7 +102,7 @@ public class WicketPageTestBase extends TestBase
     }
     // assert rendered page class
     tester.assertRenderedPage(LoginPage.class);
-    final FormTester form = tester.newFormTester("body:form");
+    final FormTester form = tester.newFormTester("html:body:form");
     form.setValue("username", username);
     form.setValue("password", password);
     form.submit("login");
