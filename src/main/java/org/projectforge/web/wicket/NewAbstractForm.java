@@ -35,7 +35,7 @@ import org.apache.wicket.validation.ValidationError;
 import org.projectforge.user.PFUserDO;
 
 
-public abstract class NewAbstractForm<F, P extends NewAbstractBasePage> extends Form<F>
+public abstract class NewAbstractForm<F, P extends NewAbstractUnsecureBasePage> extends Form<F>
 {
   private static final long serialVersionUID = -5703197102062729288L;
 
