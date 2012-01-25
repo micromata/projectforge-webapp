@@ -44,7 +44,7 @@ function initTooltips() {
 		delay : 0,
 		fade: 250,
 		showURL : false,
-		showBody : " - ",
+		showBody : " - "
 	});
 }
 function showBookmark() {
