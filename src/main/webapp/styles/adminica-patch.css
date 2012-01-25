@@ -1,0 +1,9 @@
+body #sidebar {
+	border-top-right-radius: 0px;
+	top: 67px !important;
+}
+
+#sidebar div.cog {
+	top: 0px;
+	border-top-right-radius: 5px;
+}
