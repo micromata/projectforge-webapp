@@ -24,9 +24,12 @@
 package org.projectforge.web.core;
 
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.Model;
 import org.projectforge.web.MenuEntry;
+import org.projectforge.web.wicket.WicketApplication;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -42,6 +45,28 @@ public class NewFavoriteMenuPanel extends NewAbstractMenuPanel
 
   public void init()
   {
+    @SuppressWarnings("serial")
+    final Model<String> alertMessageModel = new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        if (WicketApplication.getAlertMessage() == null) {
+          return "neverDisplayed";
+        }
+        return WicketApplication.getAlertMessage();
+      }
+    };
+    @SuppressWarnings("serial")
+    final WebMarkupContainer alertMessageContainer = new WebMarkupContainer("alertMessageContainer") {
+      @Override
+      public boolean isVisible()
+      {
+        return (WicketApplication.getAlertMessage() != null);
+      }
+    };
+    add(alertMessageContainer);
+    final Label alertMessageLabel = new Label("alertMessage", alertMessageModel);
+    alertMessageContainer.add(alertMessageLabel.setRenderBodyOnly(true));
     getMenu();
 
     // Main menu:
