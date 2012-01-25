@@ -13,11 +13,6 @@
         </div>
 
         <div class="user_box dark_box clearfix">
-          <img src="images/profile.jpg" width="55" alt="Profile Pic" />
-          <h2>Administrator</h2>
-          <h3>
-            <a class="text_shadow" href="#">John Smith</a>
-          </h3>
           <ul>
             <li><a href="#">profile</a><span class="divider">|</span></li>
             <li><a href="#">settings</a><span class="divider">|</span></li>
@@ -45,156 +40,17 @@
         </div>
         <!-- #user_box -->
 
-        <ul class="side_accordion">
-          <!-- add class 'open_multiple' to change to from accordion to toggles -->
-          <li><a href="#"><img src="images/icons/small/grey/home.png" />Home</a>
-            <ul class="drawer">
-              <li><a href="#">Activity</a></li>
-              <li><a href="#">Events</a></li>
-              <li><a href="#">Tasks</a></li>
-            </ul></li>
-          <li><a href="#"><img src="images/icons/small/grey/mail.png" />Mailbox<span class="alert badge alert_red">5</span></a>
-            <ul class="drawer">
-              <li><a href="#">Inbox</a></li>
-              <li><a href="#">Sent Items</a></li>
-              <li><a href="#">Drafts<span class="alert badge alert_grey">2</span></a></li>
-              <li><a href="#">Trash<span class="alert badge alert_grey">3</span></a></li>
-            </ul></li>
-          <li><a href="#"><img src="images/icons/small/grey/documents.png" />Documents<span class="alert badge alert_black">2</span></a>
-            <ul class="drawer">
-              <li><a href="#">Create New</a></li>
-              <li><a href="#">View All</a></li>
-              <li><a href="#">Upload/Download<span class="alert badge alert_grey">2</span></a></li>
-            </ul></li>
-          <li><a href="#"><img src="images/icons/small/grey/users.png" />Members</a>
-            <ul class="drawer">
-              <li><a href="#">Add New</a></li>
-              <li><a href="#">Edit/Delete</a></li>
-              <li><a href="#">Search Profiles</a></li>
-            </ul></li>
-          <li><a href="http://www.tricycle.ie"><img src="images/icons/small/grey/graph.png" />Statistics</a></li>
-          <li><a href="#"><img src="images/icons/small/grey/cog_2.png" />Settings</a>
-            <ul class="drawer">
-              <li><a href="#">Account</a></li>
-              <li><a href="#">System</a></li>
-            </ul></li>
-        </ul>
-        <form>
-          <div id="search_side" class="dark_box">
-            <input class="" type="text" value="Search Adminica..." onclick="value=''">
-          </div>
-        </form>
-        <ul id="side_links" class="side_links" style="margin-bottom: 0;">
-          <li><a href="http://goo.gl/UjRRe">Online Documentation</a></li>
-          <li><a href="support.tricyclelabs.com">Expert Forum</a></li>
-          <li><a href="#">Product Wiki</a></li>
-          <li><a href="#">Latest Company News</a></li>
-        </ul>
+        <wicket:panel wicket:id="mainMenu">
+        [main menu]
+        </wicket:panel>
       </div>
       <!-- #sidebar -->
 
       <div id="main_container" class="main_container container_16 clearfix">
-        <div id="nav_top" class="clearfix round_top">
-          <ul class="clearfix">
-            <li><a href="index.html"><img src="images/icons/small/grey/laptop.png" /></a></li>
-
-            <li><a href="#"><img src="images/icons/small/grey/frames.png" /><span>Layout</span></a>
-              <ul>
-                <li><a href="layout.html"><span>16 Grid - 960.gs</span></a></li>
-                <li><a href="text.html"><span>Text &amp; Typography</span></a></li>
-                <li><a class="hide_mobile" href="#"><span>Layout Width</span></a>
-                  <ul class="drawer">
-                    <li><a href="styles/theme/switcher1.php?style=layout_fixed.css"><span>Fixed</span></a></li>
-                    <li><a href="styles/theme/switcher1.php?style=switcher.css"><span>Fluid</span></a></li>
-                  </ul></li>
-                <li><a class="hide_mobile" href="#"><span>Layout Position</span></a>
-                  <ul class="drawer">
-                    <li><a href="styles/theme/switcher2.php?style=switcher.css"><span>Side</span></a></li>
-                    <li><a href="styles/theme/switcher2.php?style=header_top.css"><span>Top</span></a></li>
-                    <li><a href="styles/theme/switcher2.php?style=header_slideout.css"><span>Slide</span></a></li>
-                  </ul></li>
-              </ul></li>
-            <li><a href="#"><img src="images/icons/small/grey/coverflow.png" /><span>Boxes</span></a>
-              <ul>
-                <li><a href="tabs.html"><span>Tab Boxes</span></a></li>
-                <li><a href="accordions.html"><span>Accordions Boxes</span></a></li>
-                <li><a href="wizard.html"><span>Step by Step Wizard</span></a></li>
-                <li><a href="code.html"><span>Code View</span></a></li>
-              </ul></li>
-            <li><a href="#"><img src="images/icons/small/grey/create_write.png" /><span>Forms</span></a>
-              <ul>
-                <li><a href="forms.html"><span>Input Fields</span></a></li>
-                <li><a href="buttons.html"><span>Buttons</span></a></li>
-                <li><a href="#"><span>More components</span></a>
-                  <ul class="drawer">
-                    <li><a href="validation.html"><span>Validation</span></a></li>
-                    <li><a href="editor.html"><span>WYSIWYG Editor</span></a></li>
-                  </ul></li>
-              </ul></li>
-            <li><a href="gallery.html"><img src="images/icons/small/grey/images.png" /><span>Gallery</span></a></li>
-            <li><a href="#"><img src="images/icons/small/grey/blocks_images.png" /><span>Tables</span></a>
-              <ul class="">
-                <li><a href="tables.html"><span>DataTables</span></a></li>
-                <li><a href="tables_static.html"><span>Regular Tables</span><span class="alert badge alert_black">new</span></a></li>
-              </ul></li>
-            <li><a href="#"><img src="images/icons/small/grey/file_cabinet.png" /><span>Org</span></a>
-              <ul class="">
-                <li><a href="files.html"><img src="images/icons/small/grey/folder.png" /><span>Files</span></a></li>
-                <li><a href="contacts.html"><img src="images/icons/small/grey/users.png" /><span>Contacts</span></a></li>
-              </ul></li>
-            <li><a href="calendar.html"><img src="images/icons/small/grey/month_calendar.png" /><span>Cal</span><span
-                class="alert badge alert_blue">new</span></a></li>
-            <li><a href="charts.html"><img src="images/icons/small/grey/graph.png" /><span>Charts</span><span
-                class="alert badge alert_green">new</span></a></li>
-            <li><a href="login.php" class="dialog_button" data-dialog="logout"><img src="images/icons/small/grey/locked_2.png" /></a></li>
-          </ul>
-          <div class="display_none">
-            <div id="logout" class="dialog_content narrow" title="Logout">
-              <div class="block">
-                <div class="section">
-                  <h1>Thank you</h1>
-                  <div class="dashed_line"></div>
-                  <p>We will now log you out of Adminica in a 10 seconds…</p>
-                  <p></p>
-                </div>
-                <div class="button_bar clearfix">
-                  <button class="dark blue no_margin_bottom link_button" data-link="login.php">
-                    <div class="ui-icon ui-icon-check"></div>
-                    <span>Ok</span>
-                  </button>
-                  <button class="light send_right close_dialog">
-                    <div class="ui-icon ui-icon-closethick"></div>
-                    <span>Cancel</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-
-
-          <script type="text/javascript">
-											var currentPage = 6 - 1; // This is only used in php to tell the nav what the current page is
-											$('#nav_top > ul > li').eq(
-													currentPage).addClass(
-													"current");
-											$('#nav_top > ul > li').addClass(
-													"icon_only").children("a")
-													.children("span").parent()
-													.parent().removeClass(
-															"icon_only");
-										</script>
-
-
-          <div id="mobile_nav">
-            <div class="main"></div>
-            <div class="side"></div>
-          </div>
-
-        </div>
-        <!-- #nav_top -->
+        <wicket:panel wicket:id="favoriteMenu">
+        [main menu]
+        </wicket:panel>
       </div>
-
       <wicket:child>
         <h2>This is the content!</h2>
       </wicket:child>

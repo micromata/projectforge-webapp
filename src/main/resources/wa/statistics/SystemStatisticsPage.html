@@ -4,29 +4,37 @@
 </head>
 
 <body>
-<wicket:extend>
-  <table style="width: 30em;">
-    <tr>
-      <th style="width: 20em;"><wicket:message key="system.statistics.totalNumberOfTimesheets" /></th>
-      <td wicket:id="totalNumberOfTimesheets" style="text-align: right;">[94.929]</td>
-    </tr>
-    <tr>
-      <th><wicket:message key="system.statistics.totalNumberOfTimesheetDurations" /> (<wicket:message key="projectmanagement.personDays.short" />)</th>
-      <td wicket:id="totalNumberOfTimesheetDurations" style="text-align: right;">[39.602]</td>
-    </tr>
-    <tr>
-      <th><wicket:message key="system.statistics.totalNumberOfUsers" /></th>
-      <td wicket:id="totalNumberOfUsers" style="text-align: right;">[94]</td>
-    </tr>
-    <tr>
-      <th><wicket:message key="system.statistics.totalNumberOfTasks" /></th>
-      <td wicket:id="totalNumberOfTasks" style="text-align: right;">[3.371]</td>
-    </tr>
-    <tr>
-      <th><wicket:message key="system.statistics.totalNumberOfHistoryEntries" /></th>
-      <td wicket:id="totalNumberOfHistoryEntries" style="text-align: right;">[310.519]</td>
-    </tr>
-  </table>
-</wicket:extend>
+  <wicket:extend>
+    <div class="box grid_16 round_all">
+    <h2><wicket:message key="system.statistics.title" /></h2>
+      <div class="block no_padding">
+        <table class="static" style="width: 400px;">
+          <tbody>
+            <tr>
+              <td><wicket:message key="system.statistics.totalNumberOfTimesheets" /></td>
+              <td wicket:id="totalNumberOfTimesheets" style="text-align: right;">[94.929]</td>
+            </tr>
+            <tr>
+              <td><wicket:message key="system.statistics.totalNumberOfTimesheetDurations" /> (<wicket:message
+                  key="projectmanagement.personDays.short" />)</td>
+              <td wicket:id="totalNumberOfTimesheetDurations" style="text-align: right;">[39.602]</td>
+            </tr>
+            <tr>
+              <td><wicket:message key="system.statistics.totalNumberOfUsers" /></td>
+              <td wicket:id="totalNumberOfUsers" style="text-align: right;">[94]</td>
+            </tr>
+            <tr>
+              <td><wicket:message key="system.statistics.totalNumberOfTasks" /></td>
+              <td wicket:id="totalNumberOfTasks" style="text-align: right;">[3.371]</td>
+            </tr>
+            <tr>
+              <td><wicket:message key="system.statistics.totalNumberOfHistoryEntries" /></td>
+              <td wicket:id="totalNumberOfHistoryEntries" style="text-align: right;">[310.519]</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </wicket:extend>
 </body>
 </html>

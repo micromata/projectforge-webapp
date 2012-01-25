@@ -33,6 +33,8 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.ContextImage;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.web.core.LogoServlet;
+import org.projectforge.web.core.NewFavoriteMenuPanel;
+import org.projectforge.web.core.NewMenuPanel;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.components.MyRepeatingView;
 
@@ -68,7 +70,6 @@ public abstract class NewAbstractSecuredPage extends NewAbstractSecuredBasePage
 
   private RepeatingView dropDownMenuRepeater;
 
-  @SuppressWarnings("serial")
   public NewAbstractSecuredPage(final PageParameters parameters)
   {
     super(parameters);
@@ -78,43 +79,49 @@ public abstract class NewAbstractSecuredPage extends NewAbstractSecuredBasePage
     } else {
       body.add(new Label("logoLeftImage", "[invisible]").setVisible(false));
     }
-    //    final Model<String> alertMessageModel = new Model<String>() {
-    //      @Override
-    //      public String getObject()
-    //      {
-    //        if (WicketApplication.getAlertMessage() == null) {
-    //          return "neverDisplayed";
-    //        }
-    //        return WicketApplication.getAlertMessage();
-    //      }
-    //    };
-    //    final Label alertMessageLabel = new Label("alertMessage", alertMessageModel) {
-    //      @Override
-    //      public boolean isVisible()
-    //      {
-    //        return (WicketApplication.getAlertMessage() != null);
-    //      }
-    //    };
-    //    body.add(alertMessageLabel);
-    //    contentMenuArea = new WebMarkupContainer("contentMenuArea") {
-    //      @Override
-    //      public boolean isVisible()
-    //      {
-    //        return contentMenu.isVisible() || dropDownMenu.isVisible();
-    //      }
-    //    };
-    //    body.add(contentMenuArea);
-    //    contentMenuArea.setVisible(false);
-    //    contentMenu = new MyRepeatingView("menu");
-    //    contentMenu.setRenderBodyOnly(true);
-    //    contentMenuArea.add(contentMenu);
-    //    dropDownMenu = new WebMarkupContainer("dropDownMenu");
-    //    // 1dropDownMenu.add(new PresizedImage("cogImage", getResponse(), WebConstants.IMAGE_COG));
-    //    // dropDownMenu.add(new PresizedImage("arrowDownImage", getResponse(), WebConstants.IMAGE_ARROW_DOWN));
-    //    dropDownMenuRepeater = new MyRepeatingView("menu");
-    //    dropDownMenu.add(dropDownMenuRepeater);
-    //    dropDownMenu.setVisible(false);
-    //    contentMenuArea.add(dropDownMenu);
+    final NewMenuPanel menuPanel = new NewMenuPanel("mainMenu");
+    body.add(menuPanel);
+    menuPanel.init();
+    final NewFavoriteMenuPanel favoriteMenuPanel = new NewFavoriteMenuPanel("favoriteMenu");
+    body.add(favoriteMenuPanel);
+    favoriteMenuPanel.init();
+    // final Model<String> alertMessageModel = new Model<String>() {
+    // @Override
+    // public String getObject()
+    // {
+    // if (WicketApplication.getAlertMessage() == null) {
+    // return "neverDisplayed";
+    // }
+    // return WicketApplication.getAlertMessage();
+    // }
+    // };
+    // final Label alertMessageLabel = new Label("alertMessage", alertMessageModel) {
+    // @Override
+    // public boolean isVisible()
+    // {
+    // return (WicketApplication.getAlertMessage() != null);
+    // }
+    // };
+    // body.add(alertMessageLabel);
+    // contentMenuArea = new WebMarkupContainer("contentMenuArea") {
+    // @Override
+    // public boolean isVisible()
+    // {
+    // return contentMenu.isVisible() || dropDownMenu.isVisible();
+    // }
+    // };
+    // body.add(contentMenuArea);
+    // contentMenuArea.setVisible(false);
+    // contentMenu = new MyRepeatingView("menu");
+    // contentMenu.setRenderBodyOnly(true);
+    // contentMenuArea.add(contentMenu);
+    // dropDownMenu = new WebMarkupContainer("dropDownMenu");
+    // // 1dropDownMenu.add(new PresizedImage("cogImage", getResponse(), WebConstants.IMAGE_COG));
+    // // dropDownMenu.add(new PresizedImage("arrowDownImage", getResponse(), WebConstants.IMAGE_ARROW_DOWN));
+    // dropDownMenuRepeater = new MyRepeatingView("menu");
+    // dropDownMenu.add(dropDownMenuRepeater);
+    // dropDownMenu.setVisible(false);
+    // contentMenuArea.add(dropDownMenu);
   }
 
   /**
@@ -151,22 +158,22 @@ public abstract class NewAbstractSecuredPage extends NewAbstractSecuredBasePage
   @Override
   protected void onBeforeRender()
   {
-    //    if (contentMenuRendered == false) {
-    //      if (this.contentMenuEntries.size() > 0) {
-    //        for (final ContentMenuEntryPanel entry : this.contentMenuEntries) {
-    //          this.contentMenu.add(entry);
-    //        }
-    //      }
-    //      contentMenuRendered = true;
-    //    }
-    //    if (dropDownMenuRendered == false) {
-    //      if (this.dropDownMenu.size() > 0) {
-    //        for (final WebMarkupContainer entry : this.dropDownMenuEntries) {
-    //          this.dropDownMenu.add(entry);
-    //        }
-    //      }
-    //      dropDownMenuRendered = true;
-    //    }
+    // if (contentMenuRendered == false) {
+    // if (this.contentMenuEntries.size() > 0) {
+    // for (final ContentMenuEntryPanel entry : this.contentMenuEntries) {
+    // this.contentMenu.add(entry);
+    // }
+    // }
+    // contentMenuRendered = true;
+    // }
+    // if (dropDownMenuRendered == false) {
+    // if (this.dropDownMenu.size() > 0) {
+    // for (final WebMarkupContainer entry : this.dropDownMenuEntries) {
+    // this.dropDownMenu.add(entry);
+    // }
+    // }
+    // dropDownMenuRendered = true;
+    // }
     super.onBeforeRender();
   }
 }

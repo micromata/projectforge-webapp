@@ -7,3 +7,11 @@ body #sidebar {
 	top: 0px;
 	border-top-right-radius: 5px;
 }
+
+#nav_top {
+	margin: -50px 10px 10px 30px;
+}
+
+#nav_top > ul > li > ul,#nav_top ul li ul.dropdown {
+    width: 180px;
+}

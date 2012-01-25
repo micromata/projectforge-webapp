@@ -38,13 +38,13 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.NewAbstractSecuredPage;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import de.micromata.hibernate.history.HistoryEntry;
 import de.micromata.hibernate.history.delta.PropertyDelta;
 
-public class SystemStatisticsPage extends AbstractSecuredPage
+public class SystemStatisticsPage extends NewAbstractSecuredPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SystemStatisticsPage.class);
 
@@ -66,7 +66,7 @@ public class SystemStatisticsPage extends AbstractSecuredPage
         .format(tatalPersonDays)));
     body.add(new Label("totalNumberOfUsers", NumberFormatter.format(getTableCount(jdbc, PFUserDO.class))));
     body.add(new Label("totalNumberOfTasks", NumberFormatter.format(getTableCount(jdbc, TaskDO.class))));
-    int totalNumberOfHistoryEntries = getTableCount(jdbc, HistoryEntry.class) + getTableCount(jdbc, PropertyDelta.class);
+    final int totalNumberOfHistoryEntries = getTableCount(jdbc, HistoryEntry.class) + getTableCount(jdbc, PropertyDelta.class);
     body.add(new Label("totalNumberOfHistoryEntries", NumberFormatter.format(totalNumberOfHistoryEntries)));
   }
 
