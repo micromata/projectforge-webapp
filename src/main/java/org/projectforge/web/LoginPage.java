@@ -49,13 +49,13 @@ import org.projectforge.web.admin.SetupPage;
 import org.projectforge.web.admin.SystemUpdatePage;
 import org.projectforge.web.mobile.LoginMobilePage;
 import org.projectforge.web.wicket.MySession;
-import org.projectforge.web.wicket.NewAbstractBasePage;
+import org.projectforge.web.wicket.NewAbstractUnsecureBasePage;
 import org.projectforge.web.wicket.WicketUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
-public class LoginPage extends NewAbstractBasePage
+public class LoginPage extends NewAbstractUnsecureBasePage
 {
   static final String FIRST_PSEUDO_SETUP_USER = "firstPseudoSetupUser";
 
