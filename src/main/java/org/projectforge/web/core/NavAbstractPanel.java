@@ -41,7 +41,7 @@ import org.projectforge.web.wicket.WicketUtils;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public abstract class NewAbstractMenuPanel extends Panel
+public abstract class NavAbstractPanel extends Panel
 {
   private static final long serialVersionUID = -1019454504282157440L;
 
@@ -49,14 +49,14 @@ public abstract class NewAbstractMenuPanel extends Panel
 
   private static final String USER_PREF_FAVORITE_MENU_ENTRIES_KEY = "usersFavoriteMenuEntries";
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(NewAbstractMenuPanel.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(NavAbstractPanel.class);
 
   @SpringBean(name = "menuBuilder")
   private MenuBuilder menuBuilder;
 
   protected Menu menu;
 
-  public NewAbstractMenuPanel(final String id)
+  public NavAbstractPanel(final String id)
   {
     super(id);
   }

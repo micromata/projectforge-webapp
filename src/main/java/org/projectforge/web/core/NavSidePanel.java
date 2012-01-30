@@ -27,46 +27,24 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
-import org.apache.wicket.model.Model;
 import org.projectforge.web.MenuEntry;
-import org.projectforge.web.wicket.WicketApplication;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class NewFavoriteMenuPanel extends NewAbstractMenuPanel
+public class NavSidePanel extends NavAbstractPanel
 {
   private static final long serialVersionUID = -7858806882044188339L;
 
-  public NewFavoriteMenuPanel(final String id)
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(NavSidePanel.class);
+
+  public NavSidePanel(final String id)
   {
     super(id);
   }
 
   public void init()
   {
-    @SuppressWarnings("serial")
-    final Model<String> alertMessageModel = new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        if (WicketApplication.getAlertMessage() == null) {
-          return "neverDisplayed";
-        }
-        return WicketApplication.getAlertMessage();
-      }
-    };
-    @SuppressWarnings("serial")
-    final WebMarkupContainer alertMessageContainer = new WebMarkupContainer("alertMessageContainer") {
-      @Override
-      public boolean isVisible()
-      {
-        return (WicketApplication.getAlertMessage() != null);
-      }
-    };
-    add(alertMessageContainer);
-    final Label alertMessageLabel = new Label("alertMessage", alertMessageModel);
-    alertMessageContainer.add(alertMessageLabel.setRenderBodyOnly(true));
     getMenu();
 
     // Main menu:
@@ -78,13 +56,14 @@ public class NewFavoriteMenuPanel extends NewAbstractMenuPanel
           continue;
         }
         // Now we add a new menu area (title with sub menus):
-        final WebMarkupContainer menuItem = new WebMarkupContainer(menuRepeater.newChildId());
-        menuRepeater.add(menuItem);
-        final AbstractLink link = getMenuEntryLink(menuEntry, false);
-        menuItem.add(link);
+        final WebMarkupContainer menuContainer = new WebMarkupContainer(menuRepeater.newChildId());
+        menuRepeater.add(menuContainer);
+        menuContainer.add(new Label("label", getString(menuEntry.getI18nKey())).setRenderBodyOnly(true));
+        final Label areaSuffixLabel = getSuffixLabel(menuEntry);
+        menuContainer.add(areaSuffixLabel);
 
         final WebMarkupContainer subMenuContainer = new WebMarkupContainer("subMenu");
-        menuItem.add(subMenuContainer);
+        menuContainer.add(subMenuContainer);
         if (menuEntry.hasSubMenuEntries() == false) {
           subMenuContainer.setVisible(false);
           continue;
@@ -93,12 +72,14 @@ public class NewFavoriteMenuPanel extends NewAbstractMenuPanel
         final RepeatingView subMenuRepeater = new RepeatingView("subMenuRepeater");
         subMenuContainer.add(subMenuRepeater);
         for (final MenuEntry subMenuEntry : menuEntry.getSubMenuEntries()) {
+          if (subMenuEntry.getSubMenuEntries() != null) {
+            log.error("Oups: sub sub menus not supported: " + menuEntry.getId() + " has child menus which are ignored.");
+          }
           // Now we add the next menu entry to the area:
           final WebMarkupContainer subMenuItem = new WebMarkupContainer(subMenuRepeater.newChildId());
           subMenuRepeater.add(subMenuItem);
-          final AbstractLink subLink = getMenuEntryLink(subMenuEntry, false);
-          subMenuItem.add(subLink);
-          subMenuItem.add(new WebMarkupContainer("subsubMenu").setVisible(false));
+          final AbstractLink link = getMenuEntryLink(subMenuEntry, true);
+          subMenuItem.add(link);
         }
       }
     }
