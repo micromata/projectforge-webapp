@@ -33,8 +33,8 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.ContextImage;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.web.core.LogoServlet;
-import org.projectforge.web.core.NewFavoriteMenuPanel;
-import org.projectforge.web.core.NewMenuPanel;
+import org.projectforge.web.core.NavTopPanel;
+import org.projectforge.web.core.NavSidePanel;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.components.MyRepeatingView;
 
@@ -79,10 +79,10 @@ public abstract class NewAbstractSecuredPage extends NewAbstractSecuredBasePage
     } else {
       body.add(new Label("logoLeftImage", "[invisible]").setVisible(false));
     }
-    final NewMenuPanel menuPanel = new NewMenuPanel("mainMenu");
+    final NavSidePanel menuPanel = new NavSidePanel("mainMenu");
     body.add(menuPanel);
     menuPanel.init();
-    final NewFavoriteMenuPanel favoriteMenuPanel = new NewFavoriteMenuPanel("favoriteMenu");
+    final NavTopPanel favoriteMenuPanel = new NavTopPanel("favoriteMenu");
     body.add(favoriteMenuPanel);
     favoriteMenuPanel.init();
     // final Model<String> alertMessageModel = new Model<String>() {
