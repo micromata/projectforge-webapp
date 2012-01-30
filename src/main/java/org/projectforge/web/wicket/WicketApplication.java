@@ -88,7 +88,7 @@ public class WicketApplication extends WebApplication
 
   public static final String RESOURCE_BUNDLE_NAME = "I18nResources";
 
-  public static final Class<? extends WebPage> DEFAULT_PAGE = CalendarPage.class;
+  public static final Class< ? extends WebPage> DEFAULT_PAGE = CalendarPage.class;
 
   private static Boolean developmentMode;
 
@@ -126,7 +126,8 @@ public class WicketApplication extends WebApplication
   private SystemInfoCache systemInfoCache;
 
   /**
-   * At application start the flag developmentMode is perhaps not already set. If possible please use {@link #isDevelopmentSystem()} instead.<br/>
+   * At application start the flag developmentMode is perhaps not already set. If possible please use {@link #isDevelopmentSystem()}
+   * instead.<br/>
    * Please use {@link WebConfiguration#isDevelopmentMode()}.
    */
   public static Boolean internalIsDevelopmentMode()
@@ -249,7 +250,7 @@ public class WicketApplication extends WebApplication
     getMarkupSettings().setDefaultMarkupEncoding("utf-8");
     final MyAuthorizationStrategy authStrategy = new MyAuthorizationStrategy();
     getSecuritySettings().setAuthorizationStrategy(authStrategy);
-    // getSecuritySettings().setUnauthorizedComponentInstantiationListener(authStrategy);
+    getSecuritySettings().setUnauthorizedComponentInstantiationListener(authStrategy);
     getResourceSettings().setResourceStreamLocator(new MyResourceStreamLocator());
     // Prepend the resource bundle for overwriting some Wicket default localizations (such as StringValidator.*)
     getResourceSettings().addStringResourceLoader(0, new BundleStringResourceLoader(RESOURCE_BUNDLE_NAME));
@@ -260,7 +261,7 @@ public class WicketApplication extends WebApplication
     getApplicationSettings().setInternalErrorPage(ErrorPage.class);
 
     final XmlWebApplicationContext webApplicationContext = (XmlWebApplicationContext) WebApplicationContextUtils
-    .getWebApplicationContext(getServletContext());
+        .getWebApplicationContext(getServletContext());
     final ConfigurableListableBeanFactory beanFactory = webApplicationContext.getBeanFactory();
     beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
     final LocalSessionFactoryBean localSessionFactoryBean = (LocalSessionFactoryBean) beanFactory.getBean("&sessionFactory");
@@ -347,7 +348,7 @@ public class WicketApplication extends WebApplication
    * @see org.apache.wicket.Application#getHomePage()
    */
   @Override
-  public Class<? extends WebPage> getHomePage()
+  public Class< ? extends WebPage> getHomePage()
   {
     return DEFAULT_PAGE;
   }

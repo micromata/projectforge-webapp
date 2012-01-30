@@ -24,48 +24,47 @@
 package org.projectforge.web.wicket;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.RestartResponseAtInterceptPageException;
 import org.apache.wicket.authorization.Action;
 import org.apache.wicket.authorization.IAuthorizationStrategy;
+import org.apache.wicket.authorization.IUnauthorizedComponentInstantiationListener;
 import org.apache.wicket.markup.html.WebPage;
 import org.projectforge.web.LoginPage;
+import org.projectforge.web.mobile.AbstractSecuredMobilePage;
 import org.projectforge.web.mobile.LoginMobilePage;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class MyAuthorizationStrategy implements IAuthorizationStrategy// , IUnauthorizedComponentInstantiationListener
+public class MyAuthorizationStrategy implements IAuthorizationStrategy, IUnauthorizedComponentInstantiationListener
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MyAuthorizationStrategy.class);
-
-  public boolean isActionAuthorized(Component component, Action action)
+  public boolean isActionAuthorized(final Component component, final Action action)
   {
     return true;
   }
 
-  public <T extends Component> boolean isInstantiationAuthorized(Class<T> componentClass)
+  public <T extends Component> boolean isInstantiationAuthorized(final Class<T> componentClass)
   {
     if (WebPage.class.isAssignableFrom(componentClass) == true) {
-      if (componentClass.equals(LoginPage.class) == true || componentClass.equals(LoginMobilePage.class) == true) {
+      if (MySession.get().isAuthenticated() == true) {
         return true;
       }
-      boolean isAuthenticated = MySession.get().isAuthenticated();
-      if (isAuthenticated == false) {
-        log.fatal("This should not occur, because LoginFilter should avoid this!");
-        throw new RuntimeException("Fatal security error!");
+      if (NewAbstractSecuredBasePage.class.isAssignableFrom(componentClass) == true
+          || AbstractSecuredBasePage.class.isAssignableFrom(componentClass) == true
+          || AbstractSecuredMobilePage.class.isAssignableFrom(componentClass) == true) {
+        return false;
       }
-      return isAuthenticated;
     }
     return true;
   }
 
-  // public void onUnauthorizedInstantiation(Component component)
-  // {
-  // if (AbstractSecuredPage.class.isAssignableFrom(component.getClass()) == false) {
-  // throw new RestartResponseAtInterceptPageException(new RedirectPage("../secure/Login.action"));
-  // }
-  // final AbstractSecuredPage page = (AbstractSecuredPage) component;
-  // final String url = page.getUrl("/secure/Login.action");
-  // throw new RestartResponseAtInterceptPageException(new RedirectPage(url));
-  // }
+  public void onUnauthorizedInstantiation(final Component component)
+  {
+    if (MySession.get().isMobileUserAgent() == true) {
+      throw new RestartResponseAtInterceptPageException(LoginMobilePage.class);
+    } else {
+      throw new RestartResponseAtInterceptPageException(LoginPage.class);
+    }
+  }
 }
