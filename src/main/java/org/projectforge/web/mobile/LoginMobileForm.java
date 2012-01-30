@@ -23,7 +23,6 @@
 
 package org.projectforge.web.mobile;
 
-import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.SubmitLink;
@@ -57,18 +56,6 @@ public class LoginMobileForm extends AbstractMobileForm<LoginMobileForm, LoginMo
       }
     };
     add(loginButton);
-  }
-
-  /**
-   * Need this for marking login page submit as login page submit (no redirect required). See UserFilter.redirectToLoginPage.
-   * @see org.apache.wicket.markup.html.form.Form#onComponentTag(org.apache.wicket.markup.ComponentTag)
-   */
-  @Override
-  protected void onComponentTag(ComponentTag tag)
-  {
-    super.onComponentTag(tag);
-    final String action = tag.getAttribute("action");
-    tag.put("action", action + "&loginpage=true");
   }
 
   public String getUsername()

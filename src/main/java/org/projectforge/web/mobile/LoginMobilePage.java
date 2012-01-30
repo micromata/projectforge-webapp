@@ -61,16 +61,14 @@ public class LoginMobilePage extends AbstractMobilePage
   @SpringBean(name = "dataSource")
   private DataSource dataSource;
 
-  private LoginMobileForm form;
-
-  String targetUrlAfterLogin;
+  private final LoginMobileForm form;
 
   @Override
   protected void thisIsAnUnsecuredPage()
   {
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes"})
   public LoginMobilePage(final PageParameters parameters)
   {
     super(parameters);
@@ -87,7 +85,6 @@ public class LoginMobilePage extends AbstractMobilePage
         throw new RestartResponseException(WicketUtils.getDefaultMobilePage());
       }
     }
-    targetUrlAfterLogin = UserFilter.getTargetUrlAfterLogin(((WebRequest) getRequest()).getHttpServletRequest());
     setNoBackButton();
     form = new LoginMobileForm(this);
     add(form);
@@ -110,7 +107,7 @@ public class LoginMobilePage extends AbstractMobilePage
   protected void checkLogin()
   {
     LoginPage.internalCheckLogin(this, userDao, dataSource, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), WicketUtils
-        .getDefaultMobilePage(), targetUrlAfterLogin);
+        .getDefaultMobilePage());
   }
 
   @Override
