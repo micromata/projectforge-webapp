@@ -24,7 +24,6 @@
 package org.projectforge.web;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Locale;
@@ -50,7 +49,6 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.meb.SMSReceiverServlet;
-import org.projectforge.web.registry.WebRegistry;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -65,13 +63,9 @@ public class UserFilter implements Filter
    */
   public static final String USER_ATTR_STAY_LOGGED_IN = "stayLoggedIn";
 
-  private static final String SESSION_ATTR_LOGIN_PAGE = "loginPage";
-
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserFilter.class);
 
   private final static String SESSION_KEY_USER = "UserFilter.user";
-
-  private final static String SESSION_KEY_TARGET_URL = "UserFilter.targetUrl";
 
   private static final String COOKIE_NAME_FOR_STAY_LOGGED_IN = "stayLoggedIn";
 
@@ -87,18 +81,20 @@ public class UserFilter implements Filter
 
   private static String IGNORE_PREFIX_SMS_REVEIVE_SERVLET;
 
+  private static String WICKET_PAGES_PREFIX;
+
+  public static String CONTEXT_PATH;
+
   private static UserDao userDao;
 
   private static boolean updateRequiredFirst = false;
 
-  private final static String LOGIN_URL = "/wa/" + WebRegistry.BOOKMARK_LOGIN;
-
-  private final static String MOBILE_LOGIN_URL = "/wa/" + WebRegistry.BOOKMARK_MOBILE_LOGIN;
-
   public static void initialize(final UserDao userDao, final String contextPath)
   {
     UserFilter.userDao = userDao;
-    IGNORE_PREFIX_WICKET = contextPath + '/' + WicketUtils.WICKET_APPLICATION_PATH + "resources";
+    CONTEXT_PATH = contextPath;
+    WICKET_PAGES_PREFIX = CONTEXT_PATH + "/" + WicketUtils.WICKET_APPLICATION_PATH;
+    IGNORE_PREFIX_WICKET = WICKET_PAGES_PREFIX + "resources";
     IGNORE_PREFIX_DOC = contextPath + "/secure/doc";
     IGNORE_PREFIX_SITE_DOC = contextPath + "/secure/site";
     IGNORE_PREFIX_LOGO = contextPath + "/" + LogoServlet.BASE_URL;
@@ -110,19 +106,9 @@ public class UserFilter implements Filter
     updateRequiredFirst = value;
   }
 
-  public static void setLoginPage(final HttpSession session)
-  {
-    session.setAttribute(SESSION_ATTR_LOGIN_PAGE, "true");
-  }
-
   public static boolean isUpdateRequiredFirst()
   {
     return updateRequiredFirst;
-  }
-
-  public static String getTargetUrlAfterLogin(final HttpServletRequest request)
-  {
-    return request.getParameter(SESSION_KEY_TARGET_URL);
   }
 
   public static Cookie getStayLoggedInCookie(final HttpServletRequest request)
@@ -161,7 +147,6 @@ public class UserFilter implements Filter
   {
     final HttpSession session = request.getSession();
     session.setAttribute(SESSION_KEY_USER, user);
-    session.removeAttribute(SESSION_ATTR_LOGIN_PAGE);
   }
 
   public static PFUserDO getUser(final HttpServletRequest request)
@@ -174,7 +159,7 @@ public class UserFilter implements Filter
     // do nothing
   }
 
-  public void init(final FilterConfig cfg) throws ServletException
+  public void init(final FilterConfig filterConfig) throws ServletException
   {
     // do nothing
   }
@@ -236,12 +221,14 @@ public class UserFilter implements Filter
           PFUserContext.setUser(user);
           request = decorateWithLocale(request, user);
           chain.doFilter(request, response);
-        } else if (redirectToLoginPage(request, response) == true) {
-          // Redirect was done.
-          return;
         } else {
-          // No redirect, so process with the chain (loginPage is already the request).
-          chain.doFilter(request, response);
+          if (((HttpServletRequest) req).getRequestURI().startsWith(WICKET_PAGES_PREFIX) == true) {
+            // Access-checking is done by Wicket, not by this filter:
+            request = decorateWithLocale(request, user);
+            chain.doFilter(request, response);
+          } else {
+            response.getWriter().append("No access.");
+          }
         }
       }
     } finally {
@@ -254,46 +241,6 @@ public class UserFilter implements Filter
       if (log.isDebugEnabled() == true) {
         log.debug("doFilter finished for " + request.getRequestURI() + ": " + request.getSession().getId());
       }
-    }
-  }
-
-  private boolean redirectToLoginPage(final HttpServletRequest request, final HttpServletResponse response) throws IOException
-  {
-    final String requestUri = request.getRequestURI();
-    final String queryString = request.getQueryString();
-    final boolean loginPage = "true".equals(request.getSession().getAttribute(SESSION_ATTR_LOGIN_PAGE)) == true;
-    if (requestUri.contains(LOGIN_URL) == true
-        || requestUri.contains(MOBILE_LOGIN_URL) == true
-        || (requestUri.endsWith("/wa/") == true && loginPage == true)) {
-      // For unactivated cookies: the login form posts (action link) to /wa;sessionid=.... with queryString
-      // ...body:form::IFormSubmitListener...
-      // This is no security problem because the MyAuthorizationStrategy throws an exception if the user tries to call a secure page without
-      // login.
-      // Don't redirect to login page after successful login!
-      return false;
-    } else {
-      String targetUrlAfterLogin;
-      if (queryString != null && queryString.contains("wicket:interface") == true) {
-        targetUrlAfterLogin = null;
-      } else if (queryString != null) {
-        targetUrlAfterLogin = requestUri + "?" + request.getQueryString();
-      } else {
-        targetUrlAfterLogin = requestUri;
-      }
-      final StringBuffer buf = new StringBuffer();
-      buf.append(response.encodeRedirectURL(request.getContextPath() + LOGIN_URL));
-      if (targetUrlAfterLogin != null) {
-        final String contextPath = request.getContextPath();
-        if (StringUtils.isNotEmpty(contextPath) == true && targetUrlAfterLogin.startsWith(contextPath) == true) {
-          targetUrlAfterLogin = targetUrlAfterLogin.substring(contextPath.length());
-        }
-        buf.append("?").append(SESSION_KEY_TARGET_URL).append("=").append(URLEncoder.encode(targetUrlAfterLogin, "UTF-8"));
-      }
-      response.sendRedirect(buf.toString());
-      if (log.isDebugEnabled() == true) {
-        log.debug("Redirect to login page " + buf.toString() + " with targetUrlAfterLogin: " + targetUrlAfterLogin);
-      }
-      return true;
     }
   }
 
@@ -310,7 +257,7 @@ public class UserFilter implements Filter
       // if you use ProjectForge on localhost with http and https (e. g. for testing). You have to delete this cookie normally in your
       // browser.
       final String msg = "Unsecure JSESSIONID cookie found for a secure request. The user should remove this cookie manually, "
-        + "if this message is displayed at the next user's request again and stay-logged-in doesn't work properly for this user.";
+          + "if this message is displayed at the next user's request again and stay-logged-in doesn't work properly for this user.";
       if (WebConfiguration.isDevelopmentMode() == true) {
         log.info("*** " + msg);
       } else {
