@@ -21,6 +21,12 @@
     <filter-name>UserFilter</filter-name>
     <filter-class>org.projectforge.web.UserFilter</filter-class>
   </filter>
+  
+  <filter>
+    <filter-name>RestUserFilter</filter-name>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+  </filter>
+  
   <filter>
     <filter-name>HibernateFilter</filter-name>
     <filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
@@ -64,6 +70,10 @@
   <filter-mapping>
     <filter-name>UserFilter</filter-name>
     <url-pattern>/secure/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>RestUserFilter</filter-name>
+    <url-pattern>/rest/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>UserFilter</filter-name>
@@ -144,6 +154,10 @@
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
   <servlet>
+    <servlet-name>jersey</servlet-name>
+    <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>WikiService</servlet-name>
     <servlet-class>org.projectforge.gwiki.PFWikiServlet</servlet-class>
     <init-param>
@@ -199,7 +213,11 @@
     <servlet-name>CalendarFeed</servlet-name>
     <servlet-class>org.projectforge.web.calendar.CalendarFeed</servlet-class>
   </servlet>
-
+  
+  <servlet-mapping>
+    <servlet-name>jersey</servlet-name>
+    <url-pattern>/rest/*</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>LogoServlet</servlet-name>
     <url-pattern>/secure/Logo.png</url-pattern>

@@ -27,7 +27,8 @@
   <bean id="taskFormatter" class="org.projectforge.web.task.TaskFormatter" singleton="true" />
   <bean id="userFormatter" class="org.projectforge.web.user.UserFormatter" singleton="true" />
   <bean id="wicketApplicationFilter" class="org.projectforge.web.wicket.WicketApplicationFilter" />
-
+  <bean id="RestUserFilter" class="org.projectforge.web.RestUserFilter" />
+	
   <!-- Scheduling -->
   <bean id="cronSetup" class="org.projectforge.core.CronSetup" />
   <bean id="hibernateSearchReindexer" class="org.projectforge.core.HibernateSearchReindexer" />
