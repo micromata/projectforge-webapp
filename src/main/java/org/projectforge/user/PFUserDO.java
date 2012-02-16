@@ -142,7 +142,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return organization;
   }
 
-  public void setOrganization(String organization)
+  public void setOrganization(final String organization)
   {
     this.organization = organization;
   }
@@ -171,14 +171,14 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return timeZone.getID();
   }
 
-  public void setTimeZone(String timeZoneId)
+  public void setTimeZone(final String timeZoneId)
   {
     if (StringUtils.isNotBlank(timeZoneId) == true) {
       setTimeZone(TimeZone.getTimeZone(timeZoneId));
     }
   }
 
-  public void setTimeZone(TimeZone timeZone)
+  public void setTimeZone(final TimeZone timeZone)
   {
     this.timeZone = timeZone;
   }
@@ -204,7 +204,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return locale;
   }
 
-  public void setLocale(Locale locale)
+  public void setLocale(final Locale locale)
   {
     this.locale = locale;
   }
@@ -272,7 +272,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return personalPhoneIdentifiers;
   }
 
-  public void setPersonalPhoneIdentifiers(String personalPhoneIdentifiers)
+  public void setPersonalPhoneIdentifiers(final String personalPhoneIdentifiers)
   {
     this.personalPhoneIdentifiers = personalPhoneIdentifiers;
   }
@@ -287,7 +287,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return personalMebMobileNumbers;
   }
 
-  public void setPersonalMebMobileNumbers(String personalMebMobileNumbers)
+  public void setPersonalMebMobileNumbers(final String personalMebMobileNumbers)
   {
     this.personalMebMobileNumbers = personalMebMobileNumbers;
   }
@@ -297,10 +297,12 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * @param user
    * @return
    */
+  @Override
   public String toString()
   {
     return (new ReflectionToString(this) {
-      protected boolean accept(java.lang.reflect.Field f)
+      @Override
+      protected boolean accept(final java.lang.reflect.Field f)
       {
         return super.accept(f) && !"password".equals(f.getName()) && !"stayLoggedInKey".equals(f.getName());
       }
@@ -310,7 +312,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   @Transient
   public String getUserDisplayname()
   {
-    String str = getFullname();
+    final String str = getFullname();
     if (StringUtils.isNotBlank(str) == true) {
       return str + " (" + getUsername() + ")";
     }
@@ -318,10 +320,10 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   }
 
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object o)
   {
     if (o instanceof PFUserDO) {
-      PFUserDO other = (PFUserDO) o;
+      final PFUserDO other = (PFUserDO) o;
       if (ObjectUtils.equals(this.getUsername(), other.getUsername()) == false)
         return false;
       return true;
@@ -335,10 +337,11 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return getUsername() == null ? 0 : getUsername().hashCode();
   }
 
-  public boolean copyValuesFrom(BaseDO< ? extends Serializable> src, String... ignoreFields)
+  @Override
+  public boolean copyValuesFrom(final BaseDO< ? extends Serializable> src, String... ignoreFields)
   {
     ignoreFields = (String[]) ArrayUtils.add(ignoreFields, "password"); // NPE save considering ignoreFields
-    PFUserDO user = (PFUserDO) src;
+    final PFUserDO user = (PFUserDO) src;
     boolean modified = AbstractBaseDO.copyValues(user, this, ignoreFields);
     if (user.getPassword() != null) {
       setPassword(user.getPassword());
@@ -361,6 +364,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   @Transient
   public Set getHistorizableAttributes()
@@ -379,7 +383,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return clientLocale;
   }
 
-  public PFUserDO setClientLocale(Locale clientLocale)
+  public PFUserDO setClientLocale(final Locale clientLocale)
   {
     this.clientLocale = clientLocale;
     return this;
@@ -389,11 +393,13 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * Do nothing.
    * @see org.projectforge.core.ExtendedBaseDO#recalculate()
    */
+  @Override
   public void recalculate()
   {
   }
 
-  public Object getAttribute(String key)
+  @Override
+  public Object getAttribute(final String key)
   {
     if (attributeMap == null) {
       return null;
@@ -401,7 +407,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return attributeMap.get(key);
   }
 
-  public void setAttribute(String key, Object value)
+  @Override
+  public void setAttribute(final String key, final Object value)
   {
     synchronized (this) {
       if (attributeMap == null) {
@@ -411,7 +418,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     }
   }
 
-  public void removeAttribute(String key)
+  public void removeAttribute(final String key)
   {
     if (attributeMap == null) {
       return;
@@ -451,7 +458,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   /**
    * @param email The email to set.
    */
-  public void setEmail(String email)
+  public void setEmail(final String email)
   {
     Validate.isTrue(email == null || email.length() <= 255, email);
     this.email = email;
@@ -466,7 +473,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return stayLoggedInKey;
   }
 
-  public void setStayLoggedInKey(String stayLoggedInKey)
+  public void setStayLoggedInKey(final String stayLoggedInKey)
   {
     this.stayLoggedInKey = stayLoggedInKey;
   }
@@ -485,7 +492,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * @param firstname The firstname to set.
    * @return this for chaining.
    */
-  public PFUserDO setFirstname(String firstname)
+  public PFUserDO setFirstname(final String firstname)
   {
     Validate.isTrue(firstname == null || firstname.length() <= 255, firstname);
     this.firstname = firstname;
@@ -499,7 +506,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   @Transient
   public String getFullname()
   {
-    StringBuffer name = new StringBuffer();
+    final StringBuffer name = new StringBuffer();
     if (this.firstname != null) {
       name.append(this.firstname);
       name.append(" ");
@@ -541,7 +548,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   /**
    * @param description The description to set.
    */
-  public void setDescription(String description)
+  public void setDescription(final String description)
   {
     Validate.isTrue(description == null || description.length() <= 255, description);
     this.description = description;
@@ -565,7 +572,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return jiraUsername;
   }
 
-  public void setJiraUsername(String jiraUsername)
+  public void setJiraUsername(final String jiraUsername)
   {
     this.jiraUsername = jiraUsername;
   }
@@ -596,7 +603,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   /**
    * @param password The password to set.
    */
-  public void setPassword(String password)
+  public void setPassword(final String password)
   {
     this.password = password;
   }
@@ -604,7 +611,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   /**
    * @param lastLogin The lastLogin to set.
    */
-  public void setLastLogin(Timestamp lastLogin)
+  public void setLastLogin(final Timestamp lastLogin)
   {
     this.lastLogin = lastLogin;
   }
@@ -613,7 +620,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * @param lastname The lastname to set.
    * @return this for chaining.
    */
-  public PFUserDO setLastname(String lastname)
+  public PFUserDO setLastname(final String lastname)
   {
     this.lastname = lastname;
     return this;
@@ -622,7 +629,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   /**
    * @param loginFailures The loginFailures to set.
    */
-  public void setLoginFailures(int loginFailures)
+  public void setLoginFailures(final int loginFailures)
   {
     this.loginFailures = loginFailures;
   }
@@ -633,7 +640,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return this.rights;
   }
 
-  public void setRights(Set<UserRightDO> rights)
+  public void setRights(final Set<UserRightDO> rights)
   {
     this.rights = rights;
   }
@@ -655,7 +662,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
       return null;
     }
     for (final UserRightDO right : this.rights) {
-      if (right.getRightId() == rightId) {
+      if (right.getRightId().equals(rightId) == true) {
         return right;
       }
     }
