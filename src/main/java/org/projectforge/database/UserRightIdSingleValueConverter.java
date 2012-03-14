@@ -35,7 +35,7 @@ import com.thoughtworks.xstream.converters.SingleValueConverter;
  */
 public class UserRightIdSingleValueConverter implements SingleValueConverter
 {
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   @Override
   public boolean canConvert(final Class type)
   {
