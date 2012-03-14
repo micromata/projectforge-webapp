@@ -143,7 +143,7 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
   @Transient
   public BigDecimal getBruttoSum()
   {
-    BigDecimal netSum = getNetSum();
+    final BigDecimal netSum = getNetSum();
     if (vat != null) {
       return netSum.add(CurrencyHelper.multiply(netSum, vat));
     } else {
@@ -154,7 +154,7 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
   @Transient
   public BigDecimal getVatAmount()
   {
-    BigDecimal netSum = getNetSum();
+    final BigDecimal netSum = getNetSum();
     if (vat != null) {
       return CurrencyHelper.multiply(netSum, vat);
     } else {
@@ -180,7 +180,7 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
   @Transient
   public abstract List<KostZuweisungDO> getKostZuweisungen();
 
-  public AbstractRechnungsPositionDO setKostZuweisungen(List<KostZuweisungDO> kostZuweisungen)
+  public AbstractRechnungsPositionDO setKostZuweisungen(final List<KostZuweisungDO> kostZuweisungen)
   {
     this.kostZuweisungen = kostZuweisungen;
     return this;
@@ -230,7 +230,7 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
     if (CollectionUtils.isEmpty(this.kostZuweisungen) == true) {
       return BigDecimal.ZERO;
     }
-    BigDecimal result = BigDecimal.ZERO;
+    final BigDecimal result = BigDecimal.ZERO;
     for (final KostZuweisungDO zuweisung : this.kostZuweisungen) {
       if (zuweisung.getNetto() != null) {
         result.add(zuweisung.getNetto());
@@ -291,7 +291,7 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
     }
     if (isKostZuweisungDeletable(zuweisung) == false) {
       log
-          .error("Deleting of cost assignements which are already persisted (a id / pk already exists) or not are not the last entry is not supported. Do nothing.");
+      .error("Deleting of cost assignements which are already persisted (a id / pk already exists) or not are not the last entry is not supported. Do nothing.");
       return this;
     }
     this.kostZuweisungen.remove(zuweisung);
@@ -317,9 +317,9 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
     if (zuweisung.getId() != null) {
       return false;
     }
-    if (zuweisung.getIndex() + 1 < this.kostZuweisungen.size()) {
-      return false;
-    }
+    // if (zuweisung.getIndex() + 1 < this.kostZuweisungen.size()) {
+    // return false;
+    // }
     return true;
   }
 
@@ -379,10 +379,10 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
   }
 
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object o)
   {
     if (o instanceof AbstractRechnungsPositionDO) {
-      AbstractRechnungsPositionDO other = (AbstractRechnungsPositionDO) o;
+      final AbstractRechnungsPositionDO other = (AbstractRechnungsPositionDO) o;
       if (ObjectUtils.equals(this.getNumber(), other.getNumber()) == false) {
         return false;
       }
@@ -397,7 +397,7 @@ public abstract class AbstractRechnungsPositionDO extends DefaultBaseDO implemen
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     hcb.append(getNumber());
     if (getRechnung() != null) {
       hcb.append(getRechnung().getId());
