@@ -23,9 +23,11 @@
                 <div class="alert dissmissible alert_red" wicket:id="errors">
                   <img height="24" width="24" src="images/icons/small/white/alarm_bell.png"> <span wicket:id="msg">[login failed]</span>
                 </div>
+                <div class="alert alert_blue" wicket:id="messageOfTheDay">
+                  <img height="24" width="24" src="images/icons/small/white/alert_2.png"> <span wicket:id="msg">[Have a lot of fun!]</span>
+                </div>
               </div>
               <form wicket:id="form" class="validate_form">
-                <div class="alert" wicket:id="messageOfTheDay">[Have a lot of fun!]</div>
                 <fieldset>
                   <label for="username"><wicket:message key="username" /></label>
                   <div>
@@ -43,7 +45,7 @@
                       href="/doc/Handbuch.html#label_stay-logged-in"><img style="vertical-align: middle;"
                         wicket:message="title:login.stayLoggedIn.tooltip" src="images/icons/small/grey/help.png" /> </a></span></label>
                   <div>
-                    <input type="checkbox" id="stayLoggedIn" wicket:id="stayLoggedIn" value="true" />
+                    <input type="checkbox" wicket:id="stayLoggedIn" />
                   </div>
                 </fieldset>
                 <fieldset class="no_label">
@@ -53,6 +55,16 @@
                   </div>
                 </fieldset>
               </form>
+              <h3>TODO Release 4.0</h3>
+              <ol>
+                <li>Pages: user/MyAccountEdit, timesheet/TimesheetMassUpdate, user/ChangePassword, scripting/ReportScripting, scripting/ScriptEdit, scripting/ScriptExecute, imagecropper/ImageCropper</li>
+                <li>AbstractListPage: topRightMenu</li>
+                <li>DatePicker: i18n, German week of years, ggf. auch Support of dd.mm.yy</li>
+                <li>AddressCampaign: Re-index jobs crashes</li>
+                <li>Contenttype v-card-export mit Wicket 1.5</li>
+                <li>ErrorPage, FeedbackPage, Bookmarks, customized menu bar</li>
+                <li>24/12h Timepicker</li>
+              </ol>
             </div>
           </div>
         </div>
