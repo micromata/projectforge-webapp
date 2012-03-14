@@ -2,7 +2,7 @@
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
   <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>WEB-INF/classes/applicationContext*.xml,WEB-INF/classes/**/*Context.xml</param-value>
+    <param-value>classpath*:applicationContext*.xml,classpath*:**/*Context.xml</param-value>
   </context-param>
   <!--
     filter> <filter-name>WicketSessionFilter</filter-name> <filter-class>org.apache.wicket.protocol.http.servlet.WicketSessionFilter</filter-class>
@@ -22,10 +22,10 @@
     <filter-class>org.projectforge.web.UserFilter</filter-class>
   </filter>
   
-  <filter>
-    <filter-name>RestUserFilter</filter-name>
-    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-  </filter>
+<!--   <filter> -->
+<!--     <filter-name>RestUserFilter</filter-name> -->
+<!--     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class> -->
+<!--   </filter> -->
   
   <filter>
     <filter-name>HibernateFilter</filter-name>
@@ -71,17 +71,13 @@
     <filter-name>UserFilter</filter-name>
     <url-pattern>/secure/*</url-pattern>
   </filter-mapping>
-  <filter-mapping>
-    <filter-name>RestUserFilter</filter-name>
-    <url-pattern>/rest/*</url-pattern>
-  </filter-mapping>
+  <!-- <filter-mapping> -->
+  <!-- <filter-name>RestUserFilter</filter-name> -->
+  <!-- <url-pattern>/rest/*</url-pattern> -->
+  <!-- </filter-mapping> -->
   <filter-mapping>
     <filter-name>UserFilter</filter-name>
     <url-pattern>/wa/*</url-pattern>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>UserFilter</filter-name>
-    <url-pattern>/gwiki/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>springContext</filter-name>
@@ -156,25 +152,6 @@
   <servlet>
     <servlet-name>jersey</servlet-name>
     <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
-  </servlet>
-  <servlet>
-    <servlet-name>WikiService</servlet-name>
-    <servlet-class>org.projectforge.gwiki.PFWikiServlet</servlet-class>
-    <init-param>
-      <!--  Register class, loading the GWikiDAOContext -->
-      <param-name>de.micromata.genome.gwiki.model.config.GWikiBootstrapConfigLoader.className</param-name>
-      <param-value>de.micromata.genome.gwiki.model.config.GWikiCpContextBootstrapConfigLoader
-            </param-value>
-    </init-param>
-    <init-param>
-      <param-name>servletPath</param-name>
-      <param-value>/gwiki</param-value>
-    </init-param>
-    <!-- init-param>
-      <param-name>contextPath</param-name>
-      <param-value>/wa</param-value>
-    </init-param-->
-    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet>
     <!-- Displays logo at the top of the navigation menu. -->
@@ -254,10 +231,6 @@
   <servlet-mapping>
     <servlet-name>UpAndDownloadImageFileAsByteArray</servlet-name>
     <url-pattern>/secure/UpAndDownloadImageFileAsByteArray</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>WikiService</servlet-name>
-    <url-pattern>/gwiki/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>CalendarFeed</servlet-name>
