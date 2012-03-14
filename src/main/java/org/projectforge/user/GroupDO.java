@@ -52,7 +52,6 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.ShortDisplayNameCapable;
 
-
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -82,7 +81,7 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
   private Set<PFUserDO> assignedUsers;
 
   @ManyToMany(targetEntity = org.projectforge.user.PFUserDO.class, cascade = { CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-  @JoinTable(name = "T_GROUP_USER", joinColumns = { @JoinColumn(name = "GROUP_ID")}, inverseJoinColumns = { @JoinColumn(name = "USER_ID")})
+  @JoinTable(name = "T_GROUP_USER", joinColumns = @JoinColumn(name = "GROUP_ID"), inverseJoinColumns = @JoinColumn(name = "USER_ID"))
   public Set<PFUserDO> getAssignedUsers()
   {
     return assignedUsers;
@@ -110,8 +109,8 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
     if (getSafeAssignedUsers() == null) {
       return "";
     }
-    List<String> list = new ArrayList<String>();
-    for (PFUserDO user : getAssignedUsers()) {
+    final List<String> list = new ArrayList<String>();
+    for (final PFUserDO user : getAssignedUsers()) {
       if (user != null) {
         list.add(user.getUsername());
       }
@@ -120,7 +119,7 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return usernames;
   }
 
-  public void setAssignedUsers(Set<PFUserDO> assignedUsers)
+  public void setAssignedUsers(final Set<PFUserDO> assignedUsers)
   {
     this.assignedUsers = assignedUsers;
   }
@@ -139,7 +138,7 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return description;
   }
 
-  public void setDescription(String description)
+  public void setDescription(final String description)
   {
     this.description = description;
   }
@@ -150,7 +149,7 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return name;
   }
 
-  public void setName(String name)
+  public void setName(final String name)
   {
     this.name = name;
   }
@@ -161,7 +160,7 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return organization;
   }
 
-  public void setOrganization(String organization)
+  public void setOrganization(final String organization)
   {
     this.organization = organization;
   }
@@ -169,7 +168,7 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
   @Override
   public String toString()
   {
-    ToStringBuilder builder = new ToStringBuilder(this);
+    final ToStringBuilder builder = new ToStringBuilder(this);
     builder.append("name", getName());
     builder.append("organization", getOrganization());
     builder.append("description", getDescription());
@@ -182,10 +181,10 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
   }
 
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object o)
   {
     if (o instanceof GroupDO) {
-      GroupDO other = (GroupDO) o;
+      final GroupDO other = (GroupDO) o;
       if (ObjectUtils.equals(this.getName(), other.getName()) == false)
         return false;
       return true;
@@ -196,7 +195,7 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     hcb.append(this.getName());
     return hcb.toHashCode();
   }
