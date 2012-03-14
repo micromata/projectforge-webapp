@@ -68,7 +68,7 @@ public class TimesheetFilter extends BaseSearchFilter implements Serializable, T
     return taskId;
   }
 
-  public void setTaskId(Integer taskId)
+  public void setTaskId(final Integer taskId)
   {
     this.taskId = taskId;
   }
@@ -78,7 +78,7 @@ public class TimesheetFilter extends BaseSearchFilter implements Serializable, T
     return userId;
   }
 
-  public void setUserId(Integer userId)
+  public void setUserId(final Integer userId)
   {
     this.userId = userId;
   }
@@ -94,7 +94,7 @@ public class TimesheetFilter extends BaseSearchFilter implements Serializable, T
   /**
    * @param startTime the startTime to set
    */
-  public void setStartTime(Date startTime)
+  public void setStartTime(final Date startTime)
   {
     getTimePeriod().setFromDate(startTime);
   }
@@ -110,7 +110,7 @@ public class TimesheetFilter extends BaseSearchFilter implements Serializable, T
   /**
    * @param stopTime the stopTime to set
    */
-  public void setStopTime(Date stopTime)
+  public void setStopTime(final Date stopTime)
   {
     getTimePeriod().setToDate(stopTime);
   }
@@ -135,7 +135,7 @@ public class TimesheetFilter extends BaseSearchFilter implements Serializable, T
     return marked;
   }
 
-  public void setMarked(boolean marked)
+  public void setMarked(final boolean marked)
   {
     this.marked = marked;
   }
@@ -149,7 +149,7 @@ public class TimesheetFilter extends BaseSearchFilter implements Serializable, T
     return longFormat;
   }
 
-  public void setLongFormat(boolean longFormat)
+  public void setLongFormat(final boolean longFormat)
   {
     this.longFormat = longFormat;
   }
@@ -164,7 +164,7 @@ public class TimesheetFilter extends BaseSearchFilter implements Serializable, T
     return recursive;
   }
 
-  public void setRecursive(boolean recursive)
+  public void setRecursive(final boolean recursive)
   {
     this.recursive = recursive;
   }
@@ -178,7 +178,7 @@ public class TimesheetFilter extends BaseSearchFilter implements Serializable, T
     return orderType;
   }
 
-  public void setOrderType(OrderDirection orderType)
+  public void setOrderType(final OrderDirection orderType)
   {
     this.orderType = orderType;
   }
