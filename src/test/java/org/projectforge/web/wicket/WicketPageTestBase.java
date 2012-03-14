@@ -25,10 +25,10 @@ package org.projectforge.web.wicket;
 
 import org.apache.commons.lang.ClassUtils;
 import org.apache.wicket.Page;
-import org.apache.wicket.Request;
-import org.apache.wicket.Response;
 import org.apache.wicket.Session;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.Response;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.tester.FormTester;
@@ -65,9 +65,9 @@ public class WicketPageTestBase extends TestBase
       {
         super.init();
         final ClassPathXmlApplicationContext context = getTestConfiguration().getApplicationContext();
-        addComponentInstantiationListener(new SpringComponentInjector(this, context, true));
+        getComponentInstantiationListeners().add(new SpringComponentInjector(this, context, true));
         getResourceSettings().setResourceStreamLocator(new MyResourceStreamLocator());
-        getResourceSettings().addStringResourceLoader(0, new BundleStringResourceLoader(WicketApplication.RESOURCE_BUNDLE_NAME));
+        getResourceSettings().getStringResourceLoaders().add(new BundleStringResourceLoader(WicketApplication.RESOURCE_BUNDLE_NAME));
         final ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
         beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
       }
@@ -119,8 +119,7 @@ public class WicketPageTestBase extends TestBase
    */
   protected void logout()
   {
-    LoginPage.logout((MySession) tester.getWicketSession(), tester.getWicketRequest(), tester
-        .getWicketResponse(), userXmlPreferencesCache, menuBuilder);
+    LoginPage.logout((MySession) tester.getSession(), tester.getRequest(), tester.getResponse(), userXmlPreferencesCache, menuBuilder);
     tester.startPage(LoginPage.class);
     tester.assertRenderedPage(LoginPage.class);
   }
