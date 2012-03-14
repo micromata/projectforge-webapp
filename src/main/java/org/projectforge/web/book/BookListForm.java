@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.Component;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -39,7 +39,10 @@ import org.projectforge.book.BookFilter;
 import org.projectforge.common.StringHelper;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
-import org.projectforge.web.wicket.components.CoolCheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
 
 public class BookListForm extends AbstractListForm<BookListFilter, BookListPage>
 {
@@ -54,32 +57,43 @@ public class BookListForm extends AbstractListForm<BookListFilter, BookListPage>
   protected void init()
   {
     super.init();
-    filterContainer.add(new CoolCheckBoxPanel("presentCheckbox", new PropertyModel<Boolean>(getSearchFilter(), "present"),
-        getString("book.status.present"), true));
-    filterContainer.add(new CoolCheckBoxPanel("missedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "missed"),
-        getString("book.status.missed"), true));
-    filterContainer.add(new CoolCheckBoxPanel("disposedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "disposed"),
-        getString("book.status.disposed"), true));
-    filterContainer.add(new CoolCheckBoxPanel("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
-        getString("deleted"), true));
+
+    {
+      gridBuilder.newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
+          new PropertyModel<Boolean>(getSearchFilter(), "present"), getString("book.status.present")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "missed"),
+          getString("book.status.missed")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
+          new PropertyModel<Boolean>(getSearchFilter(), "disposed"), getString("book.status.disposed")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
+          new PropertyModel<Boolean>(getSearchFilter(), "deleted"), getString("deleted")));
+    }
+    {
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      addPageSizeFieldset();
+    }
   }
 
-  public BookListForm(BookListPage parentPage)
+  public BookListForm(final BookListPage parentPage)
   {
     super(parentPage);
   }
 
   @SuppressWarnings("serial")
   @Override
-  protected Component createSearchTextField()
+  protected TextField< ? > createSearchTextField()
   {
-    @SuppressWarnings("unchecked")
-    final PFAutoCompleteTextField<BookDO> searchField = new PFAutoCompleteTextField<BookDO>("searchString", new Model() {
+    @SuppressWarnings({ "unchecked", "rawtypes"})
+    final PFAutoCompleteTextField<BookDO> searchField = new PFAutoCompleteTextField<BookDO>(InputPanel.WICKET_ID, new Model() {
       @Override
       public Serializable getObject()
       {
         // Pseudo object for storing search string (title field is used for this foreign purpose).
-        return new BookDO().setTitle(searchFilter.getSearchString());
+        return new BookDO().setTitle(getSearchFilter().getSearchString());
       }
 
       @Override
@@ -87,10 +101,10 @@ public class BookListForm extends AbstractListForm<BookListFilter, BookListPage>
       {
         if (object != null) {
           if (object instanceof String) {
-            searchFilter.setSearchString((String) object);
+            getSearchFilter().setSearchString((String) object);
           }
         } else {
-          searchFilter.setSearchString("");
+          getSearchFilter().setSearchString("");
         }
       }
     }) {
@@ -117,24 +131,27 @@ public class BookListForm extends AbstractListForm<BookListFilter, BookListPage>
       }
 
       @Override
-      protected String formatValue(BookDO book)
+      protected String formatValue(final BookDO book)
       {
         return "id:" + book.getId();
       }
 
+      /**
+       * @see org.apache.wicket.Component#getConverter(java.lang.Class)
+       */
       @Override
-      public IConverter getConverter(Class< ? > type)
+      public <C> IConverter<C> getConverter(final Class<C> type)
       {
         return new IConverter() {
           @Override
-          public Object convertToObject(String value, Locale locale)
+          public Object convertToObject(final String value, final Locale locale)
           {
             searchFilter.setSearchString(value);
             return null;
           }
 
           @Override
-          public String convertToString(Object value, Locale locale)
+          public String convertToString(final Object value, final Locale locale)
           {
             return searchFilter.getSearchString();
           }
@@ -142,6 +159,7 @@ public class BookListForm extends AbstractListForm<BookListFilter, BookListPage>
       }
     };
     searchField.withLabelValue(true).withMatchContains(true).withMinChars(2).withFocus(true).withAutoSubmit(true);
+    createSearchFieldTooltip(searchField);
     return searchField;
   }
 

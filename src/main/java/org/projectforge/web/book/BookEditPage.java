@@ -26,17 +26,16 @@ package org.projectforge.web.book;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.book.BookDO;
 import org.projectforge.book.BookDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
-import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
 @EditPage(defaultReturnPage = BookListPage.class)
-public class BookEditPage extends AbstractAutoLayoutEditPage<BookDO, BookEditForm, BookDao> implements ISelectCallerPage
+public class BookEditPage extends AbstractEditPage<BookDO, BookEditForm, BookDao> implements ISelectCallerPage
 {
   private static final long serialVersionUID = 7091721062661400435L;
 
@@ -45,7 +44,7 @@ public class BookEditPage extends AbstractAutoLayoutEditPage<BookDO, BookEditFor
   @SpringBean(name = "bookDao")
   private BookDao bookDao;
 
-  public BookEditPage(PageParameters parameters)
+  public BookEditPage(final PageParameters parameters)
   {
     super(parameters, "book");
     init();
@@ -71,7 +70,7 @@ public class BookEditPage extends AbstractAutoLayoutEditPage<BookDO, BookEditFor
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Integer)
    */
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     if ("lendOutById".equals(property) == true) {
       bookDao.setLendOutBy(getData(), (Integer) selectedValue);
@@ -83,7 +82,7 @@ public class BookEditPage extends AbstractAutoLayoutEditPage<BookDO, BookEditFor
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
    */
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     if ("lendOutById".equals(property) == true) {
       getData().setLendOutBy(null);
@@ -95,7 +94,7 @@ public class BookEditPage extends AbstractAutoLayoutEditPage<BookDO, BookEditFor
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
    */
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing.
   }
@@ -107,7 +106,7 @@ public class BookEditPage extends AbstractAutoLayoutEditPage<BookDO, BookEditFor
   }
 
   @Override
-  protected BookEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, BookDO data)
+  protected BookEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final BookDO data)
   {
     return new BookEditForm(this, data);
   }

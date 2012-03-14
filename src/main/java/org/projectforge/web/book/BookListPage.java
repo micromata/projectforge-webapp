@@ -28,14 +28,15 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.book.BookDO;
 import org.projectforge.book.BookDao;
@@ -61,7 +62,7 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
 
-  public BookListPage(PageParameters parameters)
+  public BookListPage(final PageParameters parameters)
   {
     super(parameters, "book");
   }
@@ -78,22 +79,25 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
   {
     final List<IColumn<BookDO>> columns = new ArrayList<IColumn<BookDO>>();
     final CellItemListener<BookDO> cellItemListener = new CellItemListener<BookDO>() {
-      public void populateItem(Item<ICellPopulator<BookDO>> item, String componentId, IModel<BookDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<BookDO>> item, final String componentId, final IModel<BookDO> rowModel)
       {
         final BookDO book = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(book.getId(), book.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("created")), getSortable("created", sortable),
         "created", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<BookDO>> item, final String componentId, final IModel<BookDO> rowModel)
       {
-        final BookDO book = (BookDO) rowModel.getObject();
+        final BookDO book = rowModel.getObject();
         item.add(new ListSelectActionPanel(componentId, rowModel, BookEditPage.class, book.getId(), returnToPage, DateTimeFormatter
             .instance().getFormattedDate(book.getCreated())));
         addRowClick(item);
@@ -110,14 +114,12 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
         "title", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.keywords")),
         getSortable("keywords", sortable), "keywords", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.authors")), getSortable("authors", sortable),
-        "authors", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<BookDO>(new Model<String>(getString("book.lendOutBy")),
         getSortable("authors", sortable), "authors", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<BookDO>> item, final String componentId, final IModel<BookDO> rowModel)
       {
-        final BookDO book = (BookDO) rowModel.getObject();
+        final BookDO book = rowModel.getObject();
         final StringBuffer buf = new StringBuffer();
         if (book.getLendOutBy() != null) {
           buf.append(userFormatter.formatUser(book.getLendOutBy()));
@@ -140,12 +142,12 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "created", false);
+    dataTable = createDataTable(createColumns(this, true), "created", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 
   @Override
-  protected BookListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected BookListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new BookListForm(this);
   }
@@ -157,7 +159,7 @@ public class BookListPage extends AbstractListPage<BookListForm, BookDao, BookDO
   }
 
   @Override
-  protected IModel<BookDO> getModel(BookDO object)
+  protected IModel<BookDO> getModel(final BookDO object)
   {
     return new DetachableDOModel<BookDO, BookDao>(object, getBaseDao());
   }
