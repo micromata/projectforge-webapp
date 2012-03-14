@@ -23,14 +23,11 @@
 
 package org.projectforge.web.core;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.RequestCycle;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.markup.html.CSSPackageResource;
-import org.apache.wicket.markup.html.JavascriptPackageResource;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
@@ -40,6 +37,8 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.Menu;
@@ -70,12 +69,17 @@ public class MenuPanel extends Panel
 
   private String menuJavaScriptLabelString;
 
-  public MenuPanel(String id)
+  public MenuPanel(final String id)
   {
     super(id);
-    add(CSSPackageResource.getHeaderContribution("scripts/jquery-ui-1-2.8.2.custom/css/custom-theme/jquery-ui-1.8.7.custom.css"));
-    add(JavascriptPackageResource.getHeaderContribution("scripts/jquery-ui-1-2.8.2.custom/js/jquery-ui-1.8.2.custom.min.js"));
-    add(JavascriptPackageResource.getHeaderContribution("scripts/menu.js"));
+  }
+
+  @Override
+  public void renderHead(final IHeaderResponse response)
+  {
+    response.renderCSSReference("scripts/jquery-ui-1-2.8.2.custom/css/custom-theme/jquery-ui-1.8.7.custom.css");
+    response.renderJavaScriptReference("scripts/jquery-ui-1-2.8.2.custom/js/jquery-ui-1.8.2.custom.min.js");
+    response.renderJavaScriptReference("scripts/menu.js");
     // should be included in jqueryui, uncomment if something is missing
     // add(JavascriptPackageResource.getHeaderContribution("scripts/jquery.dimensions.min.js"));
   }
@@ -87,13 +91,14 @@ public class MenuPanel extends Panel
 
     final WebMarkupContainer mainMenuLink = new WebMarkupContainer("mainMenuLink");
     final Label mainMenuSuffixLabel = new MenuSuffixLabel(new Model<Integer>() {
+      @Override
       public Integer getObject()
       {
         int counter = 0;
         if (menu.getMenuEntries() == null) {
           return counter;
         }
-        for (MenuEntry menuEntry : menu.getMenuEntries()) {
+        for (final MenuEntry menuEntry : menu.getMenuEntries()) {
           final IModel<Integer> newCounterModel = menuEntry.getNewCounterModel();
           if (newCounterModel != null && newCounterModel.getObject() != null) {
             counter += newCounterModel.getObject();
@@ -116,7 +121,7 @@ public class MenuPanel extends Panel
     add(new AbstractDefaultAjaxBehavior() {
 
       @Override
-      protected void onComponentTag(ComponentTag tag)
+      protected void onComponentTag(final ComponentTag tag)
       {
         if (menuJavaScriptLabelString == null) {
           menuJavaScriptLabelString = "function serialize(favoriteMenuEntries) {\n"
@@ -138,7 +143,8 @@ public class MenuPanel extends Panel
       {
         // Callback with favorite menu entries:
         final RequestCycle requestCycle = RequestCycle.get();
-        final String favoritesMenu = requestCycle.getRequest().getParameter("favoriteMenuEntries");
+        final org.apache.wicket.util.string.StringValue sval = requestCycle.getRequest().getPostParameters().getParameterValue("favoriteMenuEntries");
+        final String favoritesMenu = sval != null ? sval.toString() : null;
         if (log.isDebugEnabled() == true) {
           log.debug(favoritesMenu);
         }
@@ -157,7 +163,7 @@ public class MenuPanel extends Panel
     if (((MySession) getSession()).isMobileUserAgent() == true) {
       final WebMarkupContainer favoriteMenuEntryContainer = new WebMarkupContainer(favoriteMenuEntryRepeater.newChildId());
       favoriteMenuEntryRepeater.add(favoriteMenuEntryContainer);
-      favoriteMenuEntryContainer.add(new SimpleAttributeModifier("id", "m-menu"));
+      favoriteMenuEntryContainer.add(AttributeModifier.replace("id", "m-menu"));
       favoriteMenuEntryContainer.add(new BookmarkablePageLink<String>("link", MenuMobilePage.class).add(
           new Label("label", getString("menu.mobileMenu")).setRenderBodyOnly(true)).add(getSuffixLabel((MenuEntry) null)));
       isFirst = false;
@@ -165,9 +171,9 @@ public class MenuPanel extends Panel
     for (final MenuEntry favoriteMenuEntry : menu.getFavoriteMenuEntries()) {
       final WebMarkupContainer favoriteMenuEntryContainer = new WebMarkupContainer(favoriteMenuEntryRepeater.newChildId());
       favoriteMenuEntryRepeater.add(favoriteMenuEntryContainer);
-      favoriteMenuEntryContainer.add(new SimpleAttributeModifier("id", favoriteMenuEntry.getId()));
+      favoriteMenuEntryContainer.add(AttributeModifier.replace("id", favoriteMenuEntry.getId()));
       if (isFirst == true) {
-        // favoriteMenuEntryContainer.add(new SimpleAttributeModifier("class", "first"));
+        // favoriteMenuEntryContainer.add(AttributeModifier.replace("class", "first"));
         isFirst = false;
       }
       final AbstractLink link = getMenuEntryLink(favoriteMenuEntry);
@@ -190,7 +196,7 @@ public class MenuPanel extends Panel
         final WebMarkupContainer menuAreaItem = new WebMarkupContainer("menuArea");
         menuAreaContainer.add(menuAreaItem);
         if (menuAreaEntry.isFirst() == true) {
-          menuAreaItem.add(new SimpleAttributeModifier("class", "first"));
+          menuAreaItem.add(AttributeModifier.replace("class", "first"));
         }
         menuAreaItem.add(new Label("areaTitle", getString(menuAreaEntry.getI18nKey())));
         final Label areaSuffixLabel = getSuffixLabel(menuAreaEntry);
@@ -204,7 +210,7 @@ public class MenuPanel extends Panel
           // Now we add the next menu entry to the area:
           final WebMarkupContainer menuEntryLi = new WebMarkupContainer(menuEntryRepeater.newChildId());
           menuEntryRepeater.add(menuEntryLi);
-          menuEntryLi.add(new SimpleAttributeModifier("id", "M_" + menuEntry.getId()));
+          menuEntryLi.add(AttributeModifier.replace("id", "M_" + menuEntry.getId()));
           final AbstractLink link = getMenuEntryLink(menuEntry);
           menuEntryLi.add(link);
         }
@@ -241,7 +247,7 @@ public class MenuPanel extends Panel
       link = new ExternalLink("link", WicketUtils.getUrl(getResponse(), menuEntry.getUrl(), true));
     }
     if (menuEntry.isNewWindow() == true) {
-      link.add(new SimpleAttributeModifier("target", "_blank"));
+      link.add(AttributeModifier.replace("target", "_blank"));
     }
     link.add(new Label("label", getString(menuEntry.getI18nKey())).setRenderBodyOnly(true));
     final Label menuSuffixLabel = getSuffixLabel(menuEntry);

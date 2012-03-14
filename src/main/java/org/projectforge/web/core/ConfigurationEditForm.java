@@ -27,13 +27,7 @@ import java.math.BigDecimal;
 import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.Component;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.panel.Fragment;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
@@ -44,21 +38,24 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.components.CheckBoxPanel;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.components.TimeZonePanel;
 import org.projectforge.web.wicket.converter.BigDecimalPercentConverter;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class ConfigurationEditForm extends AbstractEditForm<ConfigurationDO, ConfigurationEditPage>
 {
-  public ConfigurationEditForm(ConfigurationEditPage parentPage, ConfigurationDO data)
+  public ConfigurationEditForm(final ConfigurationEditPage parentPage, final ConfigurationDO data)
   {
     super(parentPage, data);
-    this.colspan = 2;
   }
 
   private static final long serialVersionUID = 6156899763199729949L;
@@ -75,86 +72,58 @@ public class ConfigurationEditForm extends AbstractEditForm<ConfigurationDO, Con
   protected void init()
   {
     super.init();
-    add(new Label("parameter", getString(data.getI18nKey())));
-    add(new Label("description", new Model<String>(getString("administration.configuration.param." + data.getParameter() + ".description"))));
-    final Component textareaField = new MaxLengthTextArea("textValue", new PropertyModel<String>(data, "stringValue"));
-    textareaField.setVisible(false);
-    add(textareaField);
-    final Component valueField;
-    Component panel = null;
-    if (data.getConfigurationType() == ConfigurationType.INTEGER) {
-      valueField = new TextField<Integer>("value", new PropertyModel<Integer>(data, "intValue"));
-    } else if (data.getConfigurationType() == ConfigurationType.PERCENT) {
-      valueField = new MinMaxNumberField<BigDecimal>("value", new PropertyModel<BigDecimal>(data, "floatValue"), BigDecimal.ZERO,
-          NumberHelper.HUNDRED) {
-        @Override
-        public IConverter getConverter(Class< ? > type)
-        {
-          return new BigDecimalPercentConverter(true);
+    gridBuilder.newGrid16();
+    {
+      // Parameter name
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.parameter")).setNoLabelFor();
+      fs.add(new DivTextPanel(fs.newChildId(), getString(data.getI18nKey())));
+    }
+    {
+      // Parameter value
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.value"));
+      if (data.getConfigurationType() == ConfigurationType.INTEGER) {
+        fs.add(new TextField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "intValue")));
+      } else if (data.getConfigurationType() == ConfigurationType.PERCENT) {
+        fs.add(new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(data, "floatValue"), BigDecimal.ZERO,
+            NumberHelper.HUNDRED) {
+          /**
+           * @see org.projectforge.web.wicket.components.MinMaxNumberField#getConverter(java.lang.Class)
+           */
+          @SuppressWarnings({ "rawtypes", "unchecked"})
+          @Override
+          public IConverter getConverter(final Class type)
+          {
+            return new BigDecimalPercentConverter(true);
+          };
+        });
+      } else if (data.getConfigurationType() == ConfigurationType.STRING) {
+        fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "stringValue")));
+      } else if (data.getConfigurationType() == ConfigurationType.TEXT) {
+        fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "stringValue")));
+      } else if (data.getConfigurationType() == ConfigurationType.BOOLEAN) {
+        final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
+        final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), "yes",
+            new PropertyModel<Boolean>(data, "booleanValue"));
+        radioGroupPanel.add(radioGroup);
+        WicketUtils.addYesNo(radioGroup);
+      } else if (data.getConfigurationType() == ConfigurationType.TIME_ZONE) {
+        fs.add(new TimeZonePanel(fs.newChildId(), new PropertyModel<TimeZone>(data, "timeZone")));
+      } else if (data.getConfigurationType() == ConfigurationType.TASK) {
+        if (data.getTaskId() != null) {
+          this.task = taskDao.getById(data.getTaskId());
         }
-      };
-    } else if (data.getConfigurationType() == ConfigurationType.STRING) {
-      valueField = new MaxLengthTextField("value", new PropertyModel<String>(data, "stringValue"));
-      valueField.add(new SimpleAttributeModifier("class", WebConstants.CSS_INPUT_STDTEXT));
-    } else if (data.getConfigurationType() == ConfigurationType.TEXT) {
-      textareaField.setVisible(true);
-      valueField = createInvisibleDummyComponent("value");
-    } else if (data.getConfigurationType() == ConfigurationType.BOOLEAN) {
-      panel = new CheckBoxPanel("panel", new PropertyModel<Boolean>(data, "booleanValue"));
-      add(panel);
-      valueField = createInvisibleDummyComponent("value");
-    } else if (data.getConfigurationType() == ConfigurationType.TIME_ZONE) {
-      panel = new TimeZonePanel("panel", new PropertyModel<TimeZone>(data, "timeZone"));
-      add(panel);
-      valueField = createInvisibleDummyComponent("value");
-    } else if (data.getConfigurationType() == ConfigurationType.TASK) {
-      if (data.getTaskId() != null) {
-        this.task = taskDao.getById(data.getTaskId());
+        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(this, "task"), parentPage,
+            "taskId");
+        fs.add(taskSelectPanel);
+        taskSelectPanel.init();
+      } else {
+        throw new UnsupportedOperationException("Parameter of type '" + data.getConfigurationType() + "' not supported.");
       }
-      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("panel", new PropertyModel<TaskDO>(this, "task"), parentPage, "taskId");
-      panel = taskSelectPanel;
-      add(panel);
-      taskSelectPanel.init();
-      valueField = createInvisibleDummyComponent("value");
-    } else {
-      throw new UnsupportedOperationException("Parameter of type '" + data.getConfigurationType() + "' not supported.");
     }
-    add(valueField);
-    if (panel == null) {
-      panel = createInvisibleDummyComponent("panel");
-      add(panel);
-    }
-    final Label previewLabel = new Label("previewLabel", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return getData().getStringValue();
-      }
-    });
-    previewLabel.setEscapeModelStrings(false);
-    if (data.getConfigurationType() != ConfigurationType.TEXT) {
-      previewLabel.setVisible(false);
-    }
-    add(previewLabel);
-  }
-
-  @SuppressWarnings("serial")
-  @Override
-  protected void addButtonPanel()
-  {
-    final Fragment buttonFragment = new Fragment("buttonPanel", "buttonFragment", this);
-    buttonFragment.setRenderBodyOnly(true);
-    buttonCell.add(buttonFragment);
-    final SingleButtonPanel previewButtonPanel = new SingleButtonPanel("preview", new Button("button", new Model<String>(
-        getString("preview"))) {
-      @Override
-      public final void onSubmit()
-      {
-      }
-    });
-    buttonFragment.add(previewButtonPanel);
-    if (getData().getConfigurationType() != ConfigurationType.TEXT) {
-      previewButtonPanel.setVisible(false);
+    {
+      // Description
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description")).setNoLabelFor();
+      fs.add(new DivTextPanel(fs.newChildId(), getString("administration.configuration.param." + data.getParameter() + ".description")));
     }
   }
 

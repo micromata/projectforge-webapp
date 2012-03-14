@@ -27,13 +27,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDao;
@@ -59,7 +60,7 @@ public class ConfigurationListPage extends AbstractListPage<ConfigurationListFor
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
 
-  public ConfigurationListPage(PageParameters parameters)
+  public ConfigurationListPage(final PageParameters parameters)
   {
     super(parameters, "administration.configuration");
   }
@@ -72,12 +73,12 @@ public class ConfigurationListPage extends AbstractListPage<ConfigurationListFor
     configurationDao.checkAndUpdateDatabaseEntries();
     final List<IColumn<ConfigurationDO>> columns = new ArrayList<IColumn<ConfigurationDO>>();
     final CellItemListener<ConfigurationDO> cellItemListener = new CellItemListener<ConfigurationDO>() {
-      public void populateItem(Item<ICellPopulator<ConfigurationDO>> item, String componentId, IModel<ConfigurationDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<ConfigurationDO>> item, final String componentId, final IModel<ConfigurationDO> rowModel)
       {
         final ConfigurationDO configuration = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(configuration.getId(), configuration.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
@@ -97,7 +98,7 @@ public class ConfigurationListPage extends AbstractListPage<ConfigurationListFor
     columns.add(new CellItemListenerPropertyColumn<ConfigurationDO>(new Model<String>(getString("administration.configuration.value")),
         "value", null, cellItemListener) {
       @Override
-      public void populateItem(Item<ICellPopulator<ConfigurationDO>> item, String componentId, IModel<ConfigurationDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<ConfigurationDO>> item, final String componentId, final IModel<ConfigurationDO> rowModel)
       {
         final ConfigurationDO configuration = rowModel.getObject();
         final String value;
@@ -119,19 +120,19 @@ public class ConfigurationListPage extends AbstractListPage<ConfigurationListFor
     });
     columns.add(new CellItemListenerPropertyColumn<ConfigurationDO>(new Model<String>(getString("description")), null, null, cellItemListener) {
       @Override
-      public void populateItem(Item<ICellPopulator<ConfigurationDO>> item, String componentId, IModel<ConfigurationDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<ConfigurationDO>> item, final String componentId, final IModel<ConfigurationDO> rowModel)
       {
         final ConfigurationDO configuration = rowModel.getObject();
         item.add(new Label(componentId, getString(configuration.getDescriptionI18nKey())));
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    dataTable = createDataTable(columns, null, true);
+    dataTable = createDataTable(columns, null, SortOrder.ASCENDING);
     form.add(dataTable);
   }
 
   @Override
-  protected ConfigurationListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected ConfigurationListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new ConfigurationListForm(this);
   }
@@ -143,7 +144,7 @@ public class ConfigurationListPage extends AbstractListPage<ConfigurationListFor
   }
 
   @Override
-  protected IModel<ConfigurationDO> getModel(ConfigurationDO object)
+  protected IModel<ConfigurationDO> getModel(final ConfigurationDO object)
   {
     return new DetachableDOModel<ConfigurationDO, ConfigurationDao>(object, getBaseDao());
   }

@@ -23,12 +23,16 @@
 
 package org.projectforge.web.core;
 
+import java.util.List;
+
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.projectforge.web.MenuEntry;
+import org.projectforge.web.wicket.FeedbackPage;
 import org.projectforge.web.wicket.WicketApplication;
 
 /**
@@ -67,16 +71,16 @@ public class NavTopPanel extends NavAbstractPanel
     add(alertMessageContainer);
     final Label alertMessageLabel = new Label("alertMessage", alertMessageModel);
     alertMessageContainer.add(alertMessageLabel.setRenderBodyOnly(true));
+
+    add(new BookmarkablePageLink<Void>("feedbackLink", FeedbackPage.class));
     getMenu();
 
     // Main menu:
     final RepeatingView menuRepeater = new RepeatingView("menuRepeater");
     add(menuRepeater);
-    if (menu.getMenuEntries() != null) {
-      for (final MenuEntry menuEntry : menu.getMenuEntries()) {
-        if (menuEntry.getSubMenuEntries() == null) {
-          continue;
-        }
+    final List<MenuEntry> menuEntries = menu.getFavoriteMenuEntries();
+    if (menuEntries != null) {
+      for (final MenuEntry menuEntry : menuEntries) {
         // Now we add a new menu area (title with sub menus):
         final WebMarkupContainer menuItem = new WebMarkupContainer(menuRepeater.newChildId());
         menuRepeater.add(menuItem);

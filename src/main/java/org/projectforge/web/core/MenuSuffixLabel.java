@@ -40,10 +40,15 @@ public class MenuSuffixLabel extends Label
 
   private static final long serialVersionUID = 3239158008743709277L;
 
-  @SuppressWarnings("serial")
-  MenuSuffixLabel(final IModel<Integer> counterModel)
+  public MenuSuffixLabel(final IModel<Integer> counterModel)
   {
-    super("suffix");
+    this("suffix", counterModel);
+  }
+
+  @SuppressWarnings("serial")
+  public MenuSuffixLabel(final String id, final IModel<Integer> counterModel)
+  {
+    super(id);
     this.counterModel = counterModel;
     setDefaultModel(new Model<String>() {
       @Override

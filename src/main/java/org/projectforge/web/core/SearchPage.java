@@ -28,15 +28,16 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
-import org.apache.wicket.markup.html.JavascriptPackageResource;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.BeanHelper;
@@ -64,7 +65,7 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
 
   private static final int MAXIMUM_ENTRIES_WITHOUT_FILTER_SETTINGS = 10000;
 
-  private SearchForm form;
+  private final SearchForm form;
 
   private RepeatingView areaRepeater;
 
@@ -83,16 +84,22 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
   // Do not execute the search on the first call (due to performance issues):
   private boolean refreshed = true;
 
-  public SearchPage(PageParameters parameters)
+  public SearchPage(final PageParameters parameters)
   {
     super(parameters);
-    add(JavascriptPackageResource.getHeaderContribution("scripts/zoom.js"));
     form = new SearchForm(this);
     body.add(form);
     form.init();
     areaRepeater = new RepeatingView("areaRepeater");
     body.add(areaRepeater);
     areaRepeater.setVisible(false);
+  }
+
+  @Override
+  public void renderHead(final IHeaderResponse response)
+  {
+    super.renderHead(response);
+    response.renderJavaScriptReference("scripts/zoom.js");
   }
 
   @Override
@@ -170,7 +177,7 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
       final WebMarkupContainer areaContainer = new WebMarkupContainer(areaRepeater.newChildId());
       areaRepeater.add(areaContainer);
       final List< ? > columns = listPageColumnsCreator.createColumns(this, false);
-      final DataTable dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", false) {
+      final DataTable dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", SortOrder.DESCENDING) {
         @Override
         public List getList()
         {
@@ -178,7 +185,7 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
         }
 
         @Override
-        protected IModel getModel(Object object)
+        protected IModel getModel(final Object object)
         {
           return new Model((Serializable) object);
         }

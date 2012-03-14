@@ -23,19 +23,19 @@
 
 package org.projectforge.web.core;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.MenuEntry;
-import org.projectforge.web.wicket.NewAbstractSecuredPage;
+import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -75,7 +75,7 @@ public abstract class NavAbstractPanel extends Panel
       link = new ExternalLink("link", WicketUtils.getUrl(getResponse(), menuEntry.getUrl(), true));
     }
     if (menuEntry.isNewWindow() == true) {
-      link.add(new SimpleAttributeModifier("target", "_blank"));
+      link.add(AttributeModifier.replace("target", "_blank"));
     }
     link.add(new Label("label", getString(menuEntry.getI18nKey())).setRenderBodyOnly(renderLabelBodyOnly));
     final Label menuSuffixLabel = getSuffixLabel(menuEntry);
@@ -98,11 +98,14 @@ public abstract class NavAbstractPanel extends Panel
     return suffixLabel;
   }
 
-  protected Menu getMenu()
+  public Menu getMenu()
   {
-    NewAbstractSecuredPage securedPage = null;
-    if (getPage() instanceof NewAbstractSecuredPage) {
-      securedPage = ((NewAbstractSecuredPage) getPage());
+    if (menu != null) {
+      return menu;
+    }
+    AbstractSecuredPage securedPage = null;
+    if (getPage() instanceof AbstractSecuredPage) {
+      securedPage = ((AbstractSecuredPage) getPage());
       menu = (Menu) securedPage.getUserPrefEntry(USER_PREF_MENU_KEY);
       if (menu != null) {
         return menu;

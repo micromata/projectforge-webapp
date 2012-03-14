@@ -24,19 +24,19 @@
 package org.projectforge.web.core;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.ConfigurationDO;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.web.MenuItemRegistry;
 import org.projectforge.web.fibu.ISelectCallerPage;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
 
 @EditPage(defaultReturnPage = ConfigurationListPage.class)
 public class ConfigurationEditPage extends AbstractEditPage<ConfigurationDO, ConfigurationEditForm, ConfigurationDao> implements
-    ISelectCallerPage
+ISelectCallerPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ConfigurationEditPage.class);
 
@@ -45,7 +45,7 @@ public class ConfigurationEditPage extends AbstractEditPage<ConfigurationDO, Con
   @SpringBean(name = "configurationDao")
   private ConfigurationDao configurationDao;
 
-  public ConfigurationEditPage(PageParameters parameters)
+  public ConfigurationEditPage(final PageParameters parameters)
   {
     super(parameters, "administration.configuration");
     init();
@@ -55,8 +55,12 @@ public class ConfigurationEditPage extends AbstractEditPage<ConfigurationDO, Con
    * Calls {@link MenuItemRegistry#refresh()} for the case that the visibility of some menu entries might have change.
    * @see org.projectforge.web.wicket.AbstractEditPage#afterSaveOrUpdate()
    */
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#afterSaveOrUpdate()
+   */
   @Override
-  public AbstractBasePage afterSaveOrUpdate()
+  public AbstractSecuredBasePage afterSaveOrUpdate()
   {
     MenuItemRegistry.instance().refresh();
     return null;
@@ -69,7 +73,7 @@ public class ConfigurationEditPage extends AbstractEditPage<ConfigurationDO, Con
   }
 
   @Override
-  protected ConfigurationEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, ConfigurationDO data)
+  protected ConfigurationEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final ConfigurationDO data)
   {
     return new ConfigurationEditForm(this, data);
   }
