@@ -51,7 +51,6 @@
   <bean id="scriptDao" class="org.projectforge.scripting.ScriptDao" />
   <bean id="sendFeedback" class="org.projectforge.core.SendFeedback" />
   <bean id="searchDao" class="org.projectforge.core.SearchDao" />
-  <bean id="spaceDao" class="org.projectforge.core.SpaceDao" />
   <bean id="systemDao" class="org.projectforge.core.SystemDao" />
   <bean id="taskDao" class="org.projectforge.task.TaskDao" />
   <bean id="timesheetDao" class="org.projectforge.timesheet.TimesheetDao" />
