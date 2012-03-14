@@ -26,11 +26,9 @@ package org.projectforge.web.wicket.components;
 import java.lang.reflect.Field;
 
 import org.apache.commons.lang.ClassUtils;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.validation.validator.StringValidator.MaximumLengthValidator;
 import org.projectforge.database.HibernateUtils;
@@ -42,35 +40,16 @@ public class MaxLengthTextArea extends TextArea<String>
   private static final long serialVersionUID = 1507157818607697767L;
 
   /**
-   * Use constructor with parameter label instead.
-   */
-  @Deprecated
-  public MaxLengthTextArea(final String id, final PropertyModel<String> model)
-  {
-    this(null, id, null, model);
-  }
-
-  public MaxLengthTextArea(final String id, final String label, final IModel<String> model)
-  {
-    this(null, id, label, model);
-  }
-
-  /**
    * Tries to get the length definition of the Hibernate configuration. If not available then a warning will be logged. <br/>
    * Example:
    * 
-   * <pre>
-   * &lt;label wicket:id="streetLabel"&gt;[street]&lt;/&gt;&lt;input type="text" wicket:id="street" /&gt;<br/>
-   * add(new MaxLengthTextField(this, "street", "address.street", model);
-   * </pre>
-   * @param parent if not null and label is not null than a label with wicket id [id]Label is added.
    * @param id
    * @param label needed for validation error messages. Is also used for setting label via wicket id [label]Label.
    * @param model
    * @see org.apache.wicket.Component#Component(String, IModel)
    * @see FormComponent#setLabel(IModel)
    */
-  public MaxLengthTextArea(final WebMarkupContainer parent, final String id, final String label, final IModel<String> model)
+  public MaxLengthTextArea(final String id, final IModel<String> model)
   {
     super(id, model);
     Integer length = null;
@@ -81,31 +60,10 @@ public class MaxLengthTextArea extends TextArea<String>
         log.warn("No length validation for: " + model);
       }
     }
-    init(parent, id, label, length);
+    init(id, length);
   }
 
   /**
-   * Use constructor with parameter label instead.
-   */
-  @Deprecated
-  public MaxLengthTextArea(final String id, final IModel<String> model, int maxLength)
-  {
-    this(id, null, model, maxLength);
-  }
-
-  public MaxLengthTextArea(final String id, final String label, final IModel<String> model, int maxLength)
-  {
-    this(null, id, label, model, maxLength);
-  }
-
-  /**
-   * Example:
-   * 
-   * <pre>
-   * &lt;label wicket:id="streetLabel"&gt;[street]&lt;/&gt;&lt;input type="text" wicket:id="street" /&gt;<br/>
-   * add(new MaxLengthTextField(this, "street", "address.street", model);
-   * </pre>
-   * @param parent if not null and label is not null than a label with wicket id [id]Label is added.
    * @param id
    * @param label needed for validation error messages.
    * @param model
@@ -113,34 +71,28 @@ public class MaxLengthTextArea extends TextArea<String>
    * @see org.apache.wicket.Component#Component(String, IModel)
    * @see FormComponent#setLabel(IModel)
    */
-  public MaxLengthTextArea(final WebMarkupContainer parent, final String id, final String label, final IModel<String> model, int maxLength)
+  public MaxLengthTextArea(final String id, final IModel<String> model, final int maxLength)
   {
     super(id, model);
     if (ClassUtils.isAssignable(model.getClass(), PropertyModel.class)) {
       final PropertyModel< ? > propertyModel = (PropertyModel< ? >) model;
       final Field propertyField = propertyModel.getPropertyField();
       if (propertyField != null) {
-        final Integer dbMaxLength = HibernateUtils.getPropertyLength(propertyModel.getTarget().getClass().getName(), propertyField
-            .getName());
+        final Integer dbMaxLength = HibernateUtils.getPropertyLength(propertyModel.getTarget().getClass().getName(),
+            propertyField.getName());
         if (dbMaxLength != null && dbMaxLength < maxLength) {
           log.warn("Data base length of given property is less than given maxLength: " + model);
         }
       }
     }
-    init(parent, id, label, maxLength);
+    init(id, maxLength);
   }
 
-  private void init(final WebMarkupContainer parent, final String id, final String label, final Integer maxLength)
+  private void init(final String id, final Integer maxLength)
   {
-    if (label != null) {
-      setLabel(new Model<String>(label));
-      if (parent != null) {
-        parent.add(new LabelForPanel(id + "Label", this, label));
-      }
-    }
     if (maxLength != null) {
       add(new MaximumLengthValidator(maxLength));
-      // add(new SimpleAttributeModifier("maxlength", String.valueOf(maxLength))); // Not supported by html textarea!
+      // add(AttributeModifier.replace("maxlength", String.valueOf(maxLength))); // Not supported by html textarea!
     }
   }
 }

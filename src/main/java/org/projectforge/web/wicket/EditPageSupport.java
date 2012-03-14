@@ -74,15 +74,15 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
           final O dbObj = baseDao.getById(data.getId());
           if (dbObj == null) {
             // Error while trying to insert Object and user has used the back button?
-            log
-            .info("User has used the back button "
+            log.info("User has used the back button "
                 + editPage.getClass()
                 + " after inserting a new object and a failure occured (because object with id not found in the data base)? Deleting the id and show the edit page again.");
             editPage.clearIds();
             return;
           }
           data.copyValuesFrom(dbObj);
-          editPage.setRedirect(true);
+          log.warn("********* WICKET 1.5 MIGRATION ************** editPage.setRedirect(true); removed!!!!!!!!!!!!!!!");
+          // editPage.setRedirect(true);
           return;
         }
         WebPage page = editPage.onSaveOrUpdate();

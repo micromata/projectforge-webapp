@@ -23,11 +23,13 @@
 
 package org.projectforge.web.wicket;
 
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 /** All pop-up pages with required login should be derived from this page. */
 public abstract class AbstractSecuredPopupPage extends AbstractSecuredBasePage
 {
+  private static final long serialVersionUID = -9014540697833818518L;
+
   public AbstractSecuredPopupPage(final PageParameters parameters)
   {
     super(parameters);

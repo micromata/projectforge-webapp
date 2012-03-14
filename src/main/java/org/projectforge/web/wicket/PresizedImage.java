@@ -33,9 +33,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.wicket.Response;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.image.ContextImage;
+import org.apache.wicket.request.Response;
 import org.projectforge.core.Configuration;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.core.ImageDimension;
@@ -109,8 +109,8 @@ public class PresizedImage extends ContextImage
         }
       }
     } else {
-      add(new SimpleAttributeModifier("height", String.valueOf(dimension.height)));
-      add(new SimpleAttributeModifier("width", String.valueOf(dimension.width)));
+      add(AttributeModifier.replace("height", String.valueOf(dimension.height)));
+      add(AttributeModifier.replace("width", String.valueOf(dimension.width)));
     }
   }
 }

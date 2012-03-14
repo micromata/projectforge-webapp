@@ -23,15 +23,19 @@
 
 package org.projectforge.web.wicket;
 
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.request.target.resource.ResourceStreamRequestTarget;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.wicket.request.Response;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.handler.resource.ResourceStreamRequestHandler;
+import org.apache.wicket.request.resource.ContentDisposition;
 
 public class DownloadUtils
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DownloadUtils.class);
 
   // See e. g.: http://de.selfhtml.org/diverses/mimetypen.htm
-  
+
   public static final String TYPE_JPEG = "image/jpeg";
 
   public static final String TYPE_MS_PROJECT = "application/vnd.ms-project";
@@ -47,7 +51,7 @@ public class DownloadUtils
   public static final String TYPE_SVG = "image/svg+xml";
 
   public static final String TYPE_TEXT = "text";
-  
+
   public static final String TYPE_VCARD = "text/x-vcard";
 
   public static final String TYPE_XLS = "application/vnd.ms-excel";
@@ -55,6 +59,21 @@ public class DownloadUtils
   public static final String TYPE_XML = "application/xml";
 
   public static final String TYPE_ZIP = "application/zip";
+
+  public static void setCharacterEncoding(final Response response, final String encoding)
+  {
+    final Object cresp = response.getContainerResponse();
+    if (cresp instanceof HttpServletResponse) {
+      ((HttpServletResponse) cresp).setCharacterEncoding(encoding);
+    } else {
+      log.warn("Character encoding not supported for response of type: " + response.getClass());
+    }
+  }
+
+  public static void setUTF8CharacterEncoding(final Response response)
+  {
+    setCharacterEncoding(response, "utf-8");
+  }
 
   /**
    * Mime type etc. is done automatically.
@@ -79,9 +98,9 @@ public class DownloadUtils
     } else {
       byteArrayResourceStream = new ByteArrayResourceStream(content, filename);
     }
-    final ResourceStreamRequestTarget target = new ResourceStreamRequestTarget(byteArrayResourceStream);
-    target.setFileName(filename);
-    RequestCycle.get().setRequestTarget(target);
+    final ResourceStreamRequestHandler handler = new ResourceStreamRequestHandler(byteArrayResourceStream);
+    handler.setFileName(filename).setContentDisposition(ContentDisposition.ATTACHMENT);
+    RequestCycle.get().scheduleRequestHandlerAfterCurrent(handler);
     log.info("Starting download for file. filename:" + filename + ", content-type:" + byteArrayResourceStream.getContentType());
   }
 

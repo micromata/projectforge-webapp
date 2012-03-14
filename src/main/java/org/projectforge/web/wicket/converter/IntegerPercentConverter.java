@@ -26,7 +26,6 @@ package org.projectforge.web.wicket.converter;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.util.convert.converters.IntegerConverter;
 
 /**
  * Supports text fields with % symbol.
@@ -34,10 +33,18 @@ import org.apache.wicket.util.convert.converters.IntegerConverter;
  */
 public class IntegerPercentConverter extends IntegerConverter
 {
+  /**
+   * @param digits
+   */
+  public IntegerPercentConverter(final int digits)
+  {
+    super(digits);
+  }
+
   private static final long serialVersionUID = -1210802755722961881L;
 
   @Override
-  public Integer convertToObject(String value, Locale locale)
+  public Integer convertToObject(String value, final Locale locale)
   {
     value = StringUtils.trimToEmpty(value);
     if (value.endsWith("%") == true) {
@@ -47,7 +54,7 @@ public class IntegerPercentConverter extends IntegerConverter
   }
 
   @Override
-  public String convertToString(Object value, Locale locale)
+  public String convertToString(final Integer value, final Locale locale)
   {
     if (value == null) {
       return "%";

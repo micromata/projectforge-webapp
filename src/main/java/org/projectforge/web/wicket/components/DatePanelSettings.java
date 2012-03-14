@@ -27,7 +27,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.projectforge.web.calendar.CalendarPage;
-import org.projectforge.web.fibu.ISelectCallerPage;
 
 
 /**
@@ -47,8 +46,6 @@ public class DatePanelSettings implements Serializable
 
   protected String tooltipI18nKey;
 
-  protected ISelectCallerPage callerPage;
-
   protected String selectProperty;
 
   protected Class< ? extends Date> targetType = Date.class;
@@ -60,7 +57,7 @@ public class DatePanelSettings implements Serializable
    * @param tabIndex Use tabIndex as html tab index of date field (if visible), hours and minutes.
    * @return this
    */
-  public DatePanelSettings withTabIndex(Integer tabIndex)
+  public DatePanelSettings withTabIndex(final Integer tabIndex)
   {
     this.tabIndex = tabIndex;
     return this;
@@ -79,17 +76,6 @@ public class DatePanelSettings implements Serializable
   public DatePanelSettings withTargetType(final Class< ? extends Date> targetType)
   {
     this.targetType = targetType;
-    return this;
-  }
-
-  /**
-   * If given then a calendar page select icon will be shown. The selected date or period of calendar view will be returned to callerPage.
-   * @param callerPage
-   * @return this
-   */
-  public DatePanelSettings withCallerPage(final ISelectCallerPage callerPage)
-  {
-    this.callerPage = callerPage;
     return this;
   }
 

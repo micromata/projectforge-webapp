@@ -31,18 +31,19 @@ import org.apache.commons.lang.StringUtils;
  * Format digits, e. g. "001" instead of "1".
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class IntegerConverter extends org.apache.wicket.util.convert.converters.IntegerConverter
+public class IntegerConverter extends org.apache.wicket.util.convert.converter.IntegerConverter
 {
   private static final long serialVersionUID = 8150882431021230194L;
 
-  private int digits;
+  private final int digits;
 
   public IntegerConverter(final int digits)
   {
     this.digits = digits;
   }
 
-  public String convertToString(Object value, Locale locale)
+  @Override
+  public String convertToString(final Integer value, final Locale locale)
   {
     if (value == null) {
       return "";

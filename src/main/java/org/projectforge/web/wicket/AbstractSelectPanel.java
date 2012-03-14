@@ -56,10 +56,11 @@ public abstract class AbstractSelectPanel<T> extends FormComponentPanel<T>
   }
 
   /**
-   * Does nothing at default. Should be implemented by derived classes.
+   * Throws UnsupportedOperationException if not implemented by the derived class.
    */
-  public void setFocus()
+  public AbstractSelectPanel<T> setFocus()
   {
+    throw new UnsupportedOperationException("Not yet implemented.");
   }
 
   /**

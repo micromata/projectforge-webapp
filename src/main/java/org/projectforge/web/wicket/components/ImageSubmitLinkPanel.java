@@ -23,11 +23,11 @@
 
 package org.projectforge.web.wicket.components;
 
-import org.apache.wicket.Response;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.Response;
 import org.projectforge.web.wicket.PresizedImage;
 
 /**
@@ -39,13 +39,14 @@ public abstract class ImageSubmitLinkPanel extends Panel
 {
   private static final long serialVersionUID = 1333929048394636569L;
 
-  private SubmitLink submitLink;
+  private final SubmitLink submitLink;
 
   @SuppressWarnings("serial")
   private ImageSubmitLinkPanel(final String id, final Form< ? > form)
   {
     super(id);
     submitLink = new SubmitLink("submitLink", form) {
+      @Override
       public void onSubmit()
       {
         ImageSubmitLinkPanel.this.onSubmit();

@@ -30,26 +30,21 @@ package org.projectforge.web.wicket;
  */
 public enum ImageDef
 {
-  ADD(DIRS.MAIN + "add.png"), //
-  ACCEPT(DIRS.MAIN + "accept.png"), DENY(DIRS.MAIN + "deny.png"), //
-  EDIT(DIRS.MAIN + "pencil.png"), //
-  HELP(DIRS.MAIN + "help.png"), //
-  PAGE(DIRS.MAIN + "page_white.png"), //
-  SMS(DIRS.MAIN + "sms.png"), //
-  SPEECH_BALLON(DIRS.MAIN + "comment.png"), //
-  STAR(DIRS.MAIN + "star_plus.png"), //
-  ZOOM(DIRS.MAIN + "zoom.png"), //
-  ZOOM_IN(DIRS.MAIN + "zoom_in.png"), //
-  ZOOM_OUT(DIRS.MAIN + "zoom_out.png"), //
+  GREY_COG(DIRS.SMALL_GREY + "cog_3.png");
+  // ADD(DIRS.MAIN + "add.png"), //
+  // ACCEPT(DIRS.MAIN + "accept.png"), DENY(DIRS.MAIN + "deny.png"), //
+  // EDIT(DIRS.MAIN + "pencil.png"), //
+  // HELP(DIRS.MAIN + "help.png"), //
+  // PAGE(DIRS.MAIN + "page_white.png"), //
+  // SMS(DIRS.MAIN + "sms.png"), //
+  // SPEECH_BALLON(DIRS.MAIN + "comment.png"), //
+  // STAR(DIRS.MAIN + "star_plus.png"), //
+  // ZOOM(DIRS.MAIN + "zoom.png"), //
+  // ZOOM_IN(DIRS.MAIN + "zoom_in.png"), //
+  // ZOOM_OUT(DIRS.MAIN + "zoom_out.png"), //
 
-  EM_ARROW_LEFT(DIRS.MAIN + "embats-arrow-left.png"), //
-  EM_ARROW_RIGHT(DIRS.MAIN + "embats-arrow-right.png"), //
-  EM_CLOCK(DIRS.MAIN + "embats-clock.png"), //
-  EM_CROSS(DIRS.MAIN + "embats-cross.png"), //
-  EM_PIN(DIRS.MAIN + "embats-pin.png"), //
-  EM_PLUS(DIRS.MAIN + "embats-plus.png"), //
-  EM_STAR(DIRS.MAIN + "embats-star.png");//
-
+  // private static final String DIR = "/images/";
+  //
   // public static final String IMAGE_ADD = DIR + "add.png";
   //
   // public static final String IMAGE_ARROW_DOWN = DIR + "arrow-down.png";
@@ -68,7 +63,9 @@ public enum ImageDef
   //
   // public static final String IMAGE_CALENDAR_NEXT_MONTH = DIR + "css_img/rightInactive.png";
   //
+  //
   // public static final String IMAGE_CALENDAR_PREVIOUS_MONTH = DIR + "css_img/leftInactive.png";
+  //
   //
   // public static final String IMAGE_CALENDAR_SELECT_WEEK = DIR + "button_calendar_week.png";
   //
@@ -202,6 +199,6 @@ public enum ImageDef
 
   private class DIRS
   {
-    private static final String MAIN = "/images/";
+    private static final String SMALL_GREY = "/images/small/grey/";
   }
 }

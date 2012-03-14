@@ -23,12 +23,11 @@
 
 package org.projectforge.web.wicket.autocompletion;
 
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.IAutoCompleteRenderer;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.validation.validator.StringValidator.MaximumLengthValidator;
 import org.projectforge.database.HibernateUtils;
-
 
 public abstract class PFAutoCompleteMaxLengthTextField extends PFAutoCompleteTextField<String>
 {
@@ -36,27 +35,50 @@ public abstract class PFAutoCompleteMaxLengthTextField extends PFAutoCompleteTex
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PFAutoCompleteMaxLengthTextField.class);
 
+  /**
+   * 
+   * @param id
+   * @param model
+   */
   public PFAutoCompleteMaxLengthTextField(final String id, final PropertyModel<String> model)
   {
     this(id, model, PFAutoCompleteRenderer.INSTANCE, new PFAutoCompleteSettings());// , type, StringAutoCompleteRenderer.INSTANCE,
     // settings);
   }
 
+  /**
+   * @param id
+   * @param model
+   * @param maxLength
+   */
   public PFAutoCompleteMaxLengthTextField(final String id, final PropertyModel<String> model, final int maxLength)
   {
-    this(id, model, PFAutoCompleteRenderer.INSTANCE, new PFAutoCompleteSettings(), maxLength);// , type,
+    this(id,  model, PFAutoCompleteRenderer.INSTANCE, new PFAutoCompleteSettings(), maxLength);// , type,
     // StringAutoCompleteRenderer.INSTANCE,
     // settings);
   }
 
-  public PFAutoCompleteMaxLengthTextField(final String id, final PropertyModel<String> model, final IAutoCompleteRenderer<String> renderer,
-      final PFAutoCompleteSettings settings)
+  /**
+   * @param id
+   * @param model
+   * @param renderer
+   * @param settings
+   */
+  public PFAutoCompleteMaxLengthTextField(final String id,  final PropertyModel<String> model,
+      final IAutoCompleteRenderer<String> renderer, final PFAutoCompleteSettings settings)
   {
     this(id, model, renderer, settings, null);
   }
 
-  public PFAutoCompleteMaxLengthTextField(final String id, final PropertyModel<String> model, final IAutoCompleteRenderer<String> renderer,
-      final PFAutoCompleteSettings settings, final Integer maxLength)
+  /**
+   * @param id
+   * @param model
+   * @param renderer
+   * @param settings
+   * @param maxLength
+   */
+  public PFAutoCompleteMaxLengthTextField(final String id, final PropertyModel<String> model,
+      final IAutoCompleteRenderer<String> renderer, final PFAutoCompleteSettings settings, final Integer maxLength)
   {
     super(id, model, renderer, settings);
     final Integer length = maxLength != null ? maxLength : HibernateUtils.getPropertyLength(model.getTarget().getClass().getName(), model
@@ -72,7 +94,7 @@ public abstract class PFAutoCompleteMaxLengthTextField extends PFAutoCompleteTex
   {
     if (maxLength != null) {
       add(new MaximumLengthValidator(maxLength));
-      add(new SimpleAttributeModifier("maxlength", String.valueOf(maxLength)));
+      add(AttributeModifier.replace("maxlength", String.valueOf(maxLength)));
     }
   }
 }

@@ -29,6 +29,8 @@ import java.util.Set;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.util.visit.IVisit;
+import org.apache.wicket.util.visit.IVisitor;
 
 /**
  * Visitor for highlighting form components with validation errors. A border around the error fields with error highlighting and validation
@@ -36,7 +38,7 @@ import org.apache.wicket.markup.html.form.FormComponent;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class ShinyFormVisitor implements Component.IVisitor<Component>, Serializable
+public class ShinyFormVisitor implements IVisitor<Component, Void>, Serializable
 {
   private static final long serialVersionUID = -4544543580002871884L;
 
@@ -50,10 +52,11 @@ public class ShinyFormVisitor implements Component.IVisitor<Component>, Serializ
     visited = new HashSet<Component>();
   }
 
-  public Object component(final Component component)
+  @Override
+  public void component(final Component component, final IVisit<Void> visit)
   {
     if (component instanceof FormComponent< ? > == false) {
-      return Component.IVisitor.CONTINUE_TRAVERSAL;
+      return;
     }
     final FormComponent< ? > fc = (FormComponent< ? >) component;
     if (fc.isValid() == false && hasInvalidParent(fc.getParent()) == false) {
@@ -63,13 +66,14 @@ public class ShinyFormVisitor implements Component.IVisitor<Component>, Serializ
         component.add(new ErrorHighlightBehavior());
       }
     }
-    if (fc.isValid() == false && hasInvalidParent(fc.getParent()) == false) {
-      component.setComponentBorder(new ValidationErrorBorder());
-    } else if (component.getComponentBorder() != null) {
-      // Clear component border.
-      component.setComponentBorder(null);
-    }
-    return Component.IVisitor.CONTINUE_TRAVERSAL;
+    //    if (fc.isValid() == false && hasInvalidParent(fc.getParent()) == false) {
+    //      component.setComponentBorder(new ValidationErrorBorder());
+    //    } else if (component.getComponentBorder() != null) {
+    //      // Clear component border.
+    //      component.setComponentBorder(null);
+    //    }
+    visit.dontGoDeeper();
+    return;
   }
 
   /** Avoid borders arround components and child components. */

@@ -25,6 +25,7 @@ package org.projectforge.web.wicket;
 
 import java.math.BigDecimal;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
@@ -53,7 +54,7 @@ public class NumberPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
 
   private boolean displayZeroValues = true;
 
-  public NumberPropertyColumn(final String label, final String sortProperty, final String property, CellItemListener<T> cellItemListener)
+  public NumberPropertyColumn(final String label, final String sortProperty, final String property, final CellItemListener<T> cellItemListener)
   {
     super(new Model<String>(label), sortProperty, property, cellItemListener);
   }
@@ -92,7 +93,7 @@ public class NumberPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
       cellItemListener.populateItem(item, componentId, rowModel);
     }
     if (textAlign != null) {
-      item.add(new AttributeAppendModifier("style", new Model<String>("text-align: " + textAlign + ";")));
+      item.add(AttributeModifier.append("style", new Model<String>("text-align: " + textAlign + ";")));
     }
   }
 

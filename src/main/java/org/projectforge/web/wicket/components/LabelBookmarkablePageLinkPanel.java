@@ -23,12 +23,12 @@
 
 package org.projectforge.web.wicket.components;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 /**
  * An image as bookmarkable link with an href and with a tooltip.
@@ -39,7 +39,7 @@ public class LabelBookmarkablePageLinkPanel extends Panel
 {
   private static final long serialVersionUID = -6763951791178572288L;
 
-  private BookmarkablePageLink<String> link;
+  private final BookmarkablePageLink<String> link;
 
   private LabelBookmarkablePageLinkPanel(final String id, final Class< ? extends WebPage> pageClass)
   {
@@ -76,7 +76,7 @@ public class LabelBookmarkablePageLinkPanel extends Panel
    */
   public LabelBookmarkablePageLinkPanel addLinkAttribute(final String attribute, final String label)
   {
-    link.add(new SimpleAttributeModifier(attribute, label));
+    link.add(AttributeModifier.replace(attribute, label));
     return this;
   }
 }

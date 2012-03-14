@@ -24,46 +24,31 @@
 package org.projectforge.web.wicket;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.AbstractBehavior;
+import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.IHeaderResponse;
 
-public class FocusOnLoadBehavior extends AbstractBehavior
+public class FocusOnLoadBehavior extends Behavior
 {
   private static final long serialVersionUID = 2698344455870507074L;
 
-  private Component component;
-
-  private boolean isTemporary;
-
   public FocusOnLoadBehavior()
   {
-    this(false);
-  }
-
-  /**
-   * @param isTemporary If true, remove the behavior after component has been rendered
-   */
-  public FocusOnLoadBehavior(boolean isTemporary)
-  {
     super();
-    this.isTemporary = isTemporary;
-  }
-
-  public void bind(Component component)
-  {
-    this.component = component;
-    component.setOutputMarkupId(true);
-  }
-
-  public void renderHead(IHeaderResponse iHeaderResponse)
-  {
-    super.renderHead(iHeaderResponse);
-    iHeaderResponse.renderOnLoadJavascript("document.getElementById('" + component.getMarkupId() + "').focus()");
   }
 
   @Override
-  public boolean isTemporary()
+  public void bind(final Component component)
   {
-    return isTemporary;
+    component.setOutputMarkupId(true);
+  }
+
+  /**
+   * @see org.apache.wicket.behavior.Behavior#renderHead(org.apache.wicket.Component, org.apache.wicket.markup.html.IHeaderResponse)
+   */
+  @Override
+  public void renderHead(final Component component, final IHeaderResponse response)
+  {
+    super.renderHead(component, response);
+    response.renderOnLoadJavaScript("document.getElementById('" + component.getMarkupId() + "').focus()");
   }
 }

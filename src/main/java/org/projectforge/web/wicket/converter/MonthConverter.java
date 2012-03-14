@@ -38,16 +38,17 @@ public class MonthConverter extends IntegerConverter
     super(2);
   }
 
-  public String convertToString(Object value, Locale locale)
+  @Override
+  public String convertToString(final Integer value, final Locale locale)
   {
     if (value == null) {
       return "";
     }
-    return super.convertToString(((Integer) value) + 1, locale);
+    return super.convertToString(value + 1, locale);
   }
-  
+
   @Override
-  public Integer convertToObject(String value, Locale locale)
+  public Integer convertToObject(final String value, final Locale locale)
   {
     final Integer result = super.convertToObject(value, locale);
     return result - 1;

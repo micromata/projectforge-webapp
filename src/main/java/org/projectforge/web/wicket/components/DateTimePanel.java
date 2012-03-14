@@ -27,7 +27,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 import org.apache.commons.lang.ClassUtils;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.datetime.markup.html.form.DateTextField;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponentPanel;
@@ -38,13 +38,14 @@ import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.common.StringHelper;
 import org.projectforge.common.TimeNotation;
+import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
  * Model for date and time of day components.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class DateTimePanel extends FormComponentPanel<Date>
+public class DateTimePanel extends FormComponentPanel<Date> implements ComponentWrapperPanel
 {
   private static final long serialVersionUID = -3835388673051184738L;
 
@@ -81,7 +82,7 @@ public class DateTimePanel extends FormComponentPanel<Date>
     MINUTES_15_RENDERER.addValue(45, "45");
   }
 
-  private DateHolder dateHolder;
+  private final DateHolder dateHolder;
 
   private boolean isNull;
 
@@ -119,6 +120,7 @@ public class DateTimePanel extends FormComponentPanel<Date>
 
   /**
    * @param id
+   * @param label Only for displaying the field's name on validation messages.
    * @param model
    * @param precision
    * @param settings.tabIndex Use tabIndex as html tab index of date field, hours and minutes.
@@ -143,10 +145,21 @@ public class DateTimePanel extends FormComponentPanel<Date>
     minuteDropDownChoice.setRequired(settings.required);
     add(minuteDropDownChoice);
     if (settings.tabIndex != null) {
-      datePanel.dateField.add(new SimpleAttributeModifier("tabindex", String.valueOf(settings.tabIndex)));
-      hourOfDayDropDownChoice.add(new SimpleAttributeModifier("tabindex", String.valueOf(settings.tabIndex + 1)));
-      minuteDropDownChoice.add(new SimpleAttributeModifier("tabindex", String.valueOf(settings.tabIndex + 2)));
+      datePanel.dateField.add(AttributeModifier.replace("tabindex", String.valueOf(settings.tabIndex)));
+      hourOfDayDropDownChoice.add(AttributeModifier.replace("tabindex", String.valueOf(settings.tabIndex + 1)));
+      minuteDropDownChoice.add(AttributeModifier.replace("tabindex", String.valueOf(settings.tabIndex + 2)));
     }
+  }
+
+  /**
+   * @see org.apache.wicket.markup.html.form.FormComponent#setLabel(org.apache.wicket.model.IModel)
+   */
+  @Override
+  public DateTimePanel setLabel(final IModel<String> labelModel)
+  {
+    datePanel.setLabel(labelModel);
+    super.setLabel(labelModel);
+    return this;
   }
 
   /**
@@ -207,7 +220,7 @@ public class DateTimePanel extends FormComponentPanel<Date>
     return dateHolder.getHourOfDay();
   }
 
-  public void setHourOfDay(Integer hourOfDay)
+  public void setHourOfDay(final Integer hourOfDay)
   {
     if (hourOfDay != null) {
       dateHolder.setHourOfDay(hourOfDay);
@@ -222,7 +235,7 @@ public class DateTimePanel extends FormComponentPanel<Date>
     return dateHolder.getMinute();
   }
 
-  public void setMinute(Integer minute)
+  public void setMinute(final Integer minute)
   {
     if (minute != null) {
       dateHolder.setMinute(minute);
@@ -257,7 +270,7 @@ public class DateTimePanel extends FormComponentPanel<Date>
   @Override
   protected void onBeforeRender()
   {
-    final Date date = (Date) getModelObject();
+    final Date date = getModelObject();
     if (date != null) {
       dateHolder.setDate(date);
       isNull = false;
@@ -279,12 +292,12 @@ public class DateTimePanel extends FormComponentPanel<Date>
       setConvertedInput(null);
       return;
     }
-    final Date date = (Date) datePanel.getConvertedInput();
+    final Date date = datePanel.getConvertedInput();
     if (date != null) {
       isNull = false;
       getDateHolder().setDate(date);
-      final Integer hours = (Integer) hourOfDayDropDownChoice.getConvertedInput();
-      final Integer minutes = (Integer) minuteDropDownChoice.getConvertedInput();
+      final Integer hours = hourOfDayDropDownChoice.getConvertedInput();
+      final Integer minutes = minuteDropDownChoice.getConvertedInput();
       if (hours != null) {
         dateHolder.setHourOfDay(hours);
       }
@@ -302,11 +315,21 @@ public class DateTimePanel extends FormComponentPanel<Date>
     }
   }
 
+  @Override
   public String toString()
   {
     if (isNull == true) {
       return null;
     }
     return dateHolder.getDate().toString();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getComponentOutputId()
+   */
+  @Override
+  public String getComponentOutputId()
+  {
+    return datePanel.getComponentOutputId();
   }
 }

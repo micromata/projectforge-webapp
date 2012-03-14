@@ -30,8 +30,6 @@ import java.util.TreeSet;
 
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.convert.IConverter;
-import org.projectforge.user.PFUserContext;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.converter.LanguageConverter;
 
@@ -45,18 +43,23 @@ public class LanguageField extends PFAutoCompleteTextField<Locale>
 {
   private static final long serialVersionUID = -8354902369312317045L;
 
-  @SuppressWarnings("serial")
+  @SuppressWarnings({ "serial", "rawtypes"})
   private final IConverter converter = new LanguageConverter() {
     @Override
-    protected void error() {
+    protected void error()
+    {
       LanguageField.this.error(getString("error.language.unsupported"));
     };
   };
 
-  private  List<Locale> favoriteLanguages;
+  private List<Locale> favoriteLanguages;
 
   private final List<Locale> languages;
 
+  /**
+   * @param id
+   * @param model
+   */
   public LanguageField(final String id, final IModel<Locale> model)
   {
     super(id, model);
@@ -67,9 +70,6 @@ public class LanguageField extends PFAutoCompleteTextField<Locale>
     final String[] availableLanguages = locales.toArray(new String[0]);
     languages = getAsLocaleObjects(availableLanguages);
     withMatchContains(true).withMinChars(2);
-    // Cant't use getString(i18nKey) because we're in the constructor and this would result in a Wicket warning.
-    final String tooltip = PFUserContext.getLocalizedString("tooltip.autocomplete.locale");
-    WicketUtils.addTooltip(this, tooltip);
   }
 
   public void setFavoriteLanguages(final List<Locale> favoriteLanguages)
@@ -77,6 +77,7 @@ public class LanguageField extends PFAutoCompleteTextField<Locale>
     this.favoriteLanguages = favoriteLanguages;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected List<Locale> getChoices(final String input)
   {
@@ -90,8 +91,12 @@ public class LanguageField extends PFAutoCompleteTextField<Locale>
     return result;
   }
 
+  /**
+   * @see org.apache.wicket.Component#getConverter(java.lang.Class)
+   */
+  @SuppressWarnings("unchecked")
   @Override
-  public IConverter getConverter(final Class< ? > type)
+  public <C> IConverter<C> getConverter(final Class<C> type)
   {
     return converter;
   }
@@ -102,6 +107,7 @@ public class LanguageField extends PFAutoCompleteTextField<Locale>
     return favoriteLanguages;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected String formatValue(final Locale value)
   {

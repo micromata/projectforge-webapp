@@ -26,23 +26,20 @@ package org.projectforge.web.wicket.autocompletion;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.ResourceReference;
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AbstractDefaultAjaxBehavior;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.IAutoCompleteRenderer;
 import org.apache.wicket.markup.html.IHeaderResponse;
-import org.apache.wicket.markup.html.resources.JavascriptResourceReference;
-import org.apache.wicket.request.target.basic.StringRequestTarget;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.handler.TextRequestHandler;
 import org.apache.wicket.util.string.Strings;
 import org.projectforge.web.core.JsonBuilder;
 
 public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehavior
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PFAutoCompleteBehavior.class);
   private static final long serialVersionUID = -6532710378025987377L;
-
-  private static final ResourceReference AUTOCOMPLETE_JS = new JavascriptResourceReference(PFAutoCompleteBehavior.class,
-      "jquery.wicket-autocomplete.js");
 
   protected PFAutoCompleteSettings settings;
 
@@ -55,12 +52,16 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
   }
 
   /**
-   * @see org.apache.wicket.ajax.AbstractDefaultAjaxBehavior#renderHead(org.apache.wicket.markup.html.IHeaderResponse)
+   * @see org.apache.wicket.ajax.AbstractDefaultAjaxBehavior#renderHead(org.apache.wicket.Component,
+   *      org.apache.wicket.markup.html.IHeaderResponse)
    */
   @Override
-  public void renderHead(IHeaderResponse response)
+  public void renderHead(final Component component, final IHeaderResponse response)
   {
-    super.renderHead(response);
+    super.renderHead(component, response);
+    response.renderJavaScriptReference("scripts/jquery.wicket-autocomplete.js");
+    // private static final ResourceReference AUTOCOMPLETE_JS = new JavascriptResourceReference(PFAutoCompleteBehavior.class,
+    // "jquery.wicket-autocomplete.js");
     renderAutocompleteHead(response);
   }
 
@@ -69,9 +70,8 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
    * 
    * @param response
    */
-  private void renderAutocompleteHead(IHeaderResponse response)
+  private void renderAutocompleteHead(final IHeaderResponse response)
   {
-    response.renderJavascriptReference(AUTOCOMPLETE_JS);
     final String id = getComponent().getMarkupId();
     String indicatorId = findIndicatorId();
     if (Strings.isEmpty(indicatorId)) {
@@ -106,7 +106,7 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
     }
     final String initJS = buf.toString();
     // String initJS = String.format("new Wicket.AutoComplete('%s','%s',%s,%s);", id, getCallbackUrl(), constructSettingsJS(), indicatorId);
-    response.renderOnDomReadyJavascript(initJS);
+    response.renderOnDomReadyJavaScript(initJS);
   }
 
   protected final List<String> getSettingsJS()
@@ -163,7 +163,7 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
       private static final long serialVersionUID = 1L;
 
       @Override
-      protected void respond(AjaxRequestTarget target)
+      protected void respond(final AjaxRequestTarget target)
       {
       }
     });
@@ -173,20 +173,20 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
    * @see org.apache.wicket.ajax.AbstractDefaultAjaxBehavior#respond(org.apache.wicket.ajax.AjaxRequestTarget)
    */
   @Override
-  protected void respond(AjaxRequestTarget target)
+  protected void respond(final AjaxRequestTarget target)
   {
     final RequestCycle requestCycle = RequestCycle.get();
-    final String val = requestCycle.getRequest().getParameter("q");
-    onRequest(val, requestCycle);
+    final org.apache.wicket.util.string.StringValue val = requestCycle.getRequest().getQueryParameters().getParameterValue("q");
+    onRequest(val != null ? val.toString() : null, requestCycle);
   }
 
-  protected final void onRequest(final String val, RequestCycle requestCycle)
+  protected final void onRequest(final String val, final RequestCycle requestCycle)
   {
     // final PageParameters pageParameters = new PageParameters(requestCycle.getRequest().getParameterMap());
     final List<T> choices = getChoices(val);
     final MyJsonBuilder builder = new MyJsonBuilder();
     final String json = builder.append(choices).getAsString();
-    requestCycle.setRequestTarget(new StringRequestTarget("application/json", "utf-8", json));
+    requestCycle.scheduleRequestHandlerAfterCurrent(new TextRequestHandler("application/json", "utf-8", json));
 
     /*
      * IRequestTarget target = new IRequestTarget() {
@@ -237,7 +237,7 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
    * Used for formatting the labels if labelValue is set to true.
    * @return null at default (if not overload).
    */
-  protected String formatLabel(T value)
+  protected String formatLabel(final T value)
   {
     return null;
   }

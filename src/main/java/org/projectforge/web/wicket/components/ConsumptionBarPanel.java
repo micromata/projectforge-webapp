@@ -25,13 +25,13 @@ package org.projectforge.web.wicket.components;
 
 import java.math.BigDecimal;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.web.timesheet.TimesheetListPage;
 import org.projectforge.web.wicket.WicketUtils;
@@ -45,6 +45,8 @@ import org.projectforge.web.wicket.WicketUtils;
 public class ConsumptionBarPanel extends Panel
 {
   private static final long serialVersionUID = -4328646802035960450L;
+
+  private final String tooltip;
 
   /**
    * @param id
@@ -63,17 +65,15 @@ public class ConsumptionBarPanel extends Panel
     if (NumberHelper.isNotZero(maxValue) == false) {
       maxValue = null;
     }
-    @SuppressWarnings( { "unchecked", "serial"})
-    final Link< ? > showTimesheetsLink = new Link("sheets") {
+    @SuppressWarnings("serial")
+    final Link< Void> showTimesheetsLink = new Link<Void>("sheets") {
       @Override
       public void onClick()
       {
         final PageParameters parameters = new PageParameters();
-        parameters.put(TimesheetListPage.PARAMETER_KEY_STORE_FILTER, false);
-        parameters.put(TimesheetListPage.PARAMETER_KEY_TASK_ID, taskId);
-        parameters.put(TimesheetListPage.PARAMETER_KEY_START_TIME, null);
-        parameters.put(TimesheetListPage.PARAMETER_KEY_STOP_TIME, null);
-        parameters.put(TimesheetListPage.PARAMETER_KEY_USER_ID, null);
+        parameters.add(TimesheetListPage.PARAMETER_KEY_CLEAR_ALL, true);
+        parameters.add(TimesheetListPage.PARAMETER_KEY_STORE_FILTER, false);
+        parameters.add(TimesheetListPage.PARAMETER_KEY_TASK_ID, taskId);
         final TimesheetListPage timesheetListPage = new TimesheetListPage(parameters);
         setResponsePage(timesheetListPage);
       }
@@ -84,27 +84,27 @@ public class ConsumptionBarPanel extends Panel
     final Label progressLabel = new Label("progress", new Model<String>(" "));
     final int percentage = maxValue != null ? usage.divide(maxValue, 2, BigDecimal.ROUND_HALF_UP).multiply(NumberHelper.HUNDRED).intValue()
         : 0;
-    int width = percentage <= 100 ? percentage : 10000 / percentage;
+    final int width = percentage <= 100 ? percentage : 10000 / percentage;
     if (percentage <= 80 || (taskNodeFinished == true && percentage <= 100)) {
       if (percentage > 0) {
-        bar.add(new SimpleAttributeModifier("class", "progress-done"));
+        bar.add(AttributeModifier.replace("class", "progress-done"));
       } else {
-        bar.add(new SimpleAttributeModifier("class", "progress-none"));
+        bar.add(AttributeModifier.replace("class", "progress-none"));
         progressLabel.setVisible(false);
       }
     } else if (percentage <= 90) {
-      bar.add(new SimpleAttributeModifier("class", "progress-80"));
+      bar.add(AttributeModifier.replace("class", "progress-80"));
     } else if (percentage <= 100) {
-      bar.add(new SimpleAttributeModifier("class", "progress-90"));
+      bar.add(AttributeModifier.replace("class", "progress-90"));
     } else if (taskNodeFinished == true && percentage <= 110) {
-      bar.add(new SimpleAttributeModifier("class", "progress-overbooked-min"));
+      bar.add(AttributeModifier.replace("class", "progress-overbooked-min"));
     } else {
-      bar.add(new SimpleAttributeModifier("class", "progress-overbooked"));
+      bar.add(AttributeModifier.replace("class", "progress-overbooked"));
     }
     if (maxValue == null && (usage == null || usage.compareTo(BigDecimal.ZERO) == 0)) {
       bar.setVisible(false);
     }
-    progressLabel.add(new SimpleAttributeModifier("style", "width: " + width + "%;"));
+    progressLabel.add(AttributeModifier.replace("style", "width: " + width + "%;"));
     final StringBuffer buf = new StringBuffer();
     buf.append(NumberHelper.getNumberFractionFormat(getLocale(), usage.scale()).format(usage));
     if (unit != null) {
@@ -116,8 +116,17 @@ public class ConsumptionBarPanel extends Panel
       buf.append(unit);
       buf.append(" (").append(percentage).append("%)");
     }
-    WicketUtils.addTooltip(bar, buf.toString(), true);
+    tooltip = buf.toString();
+    WicketUtils.addTooltip(bar, tooltip, true);
     showTimesheetsLink.add(bar);
     bar.add(progressLabel);
+  }
+
+  /**
+   * @return the tooltip
+   */
+  public String getTooltip()
+  {
+    return tooltip;
   }
 }

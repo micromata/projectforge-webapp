@@ -30,27 +30,28 @@ import java.util.Calendar;
 import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.Page;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.Request;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.Response;
-import org.apache.wicket.behavior.AbstractBehavior;
-import org.apache.wicket.behavior.HeaderContributor;
-import org.apache.wicket.behavior.IBehavior;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
-import org.apache.wicket.markup.html.IHeaderContributor;
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.behavior.AttributeAppender;
+import org.apache.wicket.behavior.Behavior;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.image.ContextImage;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
+import org.apache.wicket.model.Model;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.Response;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.util.string.StringValue;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.BeanHelper;
@@ -72,6 +73,10 @@ import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.IconPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
+import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 
 public class WicketUtils
 {
@@ -91,20 +96,103 @@ public class WicketUtils
     APPLICATION_CONTEXT = contextPath;
   }
 
+  public static HttpServletRequest getHttpServletRequest(final Request request)
+  {
+    return (HttpServletRequest) request.getContainerRequest();
+  }
+
+  public static HttpServletResponse getHttpServletResponse(final Response response)
+  {
+    return (HttpServletResponse) response.getContainerResponse();
+  }
+
+  public static boolean contains(final PageParameters parameters, final String name)
+  {
+    final StringValue sval = parameters.get(name);
+    if (sval == null) {
+      return false;
+    } else {
+      return sval.isNull() == false;
+    }
+  }
+
+  public static String getAsString(final PageParameters parameters, final String name)
+  {
+    final StringValue sval = parameters.get(name);
+    if (sval == null || sval.isNull() == true) {
+      return null;
+    } else {
+      return sval.toString();
+    }
+  }
+
+  public static Integer getAsInteger(final PageParameters parameters, final String name)
+  {
+    final StringValue sval = parameters.get(name);
+    if (sval == null || sval.isNull() == true) {
+      return null;
+    } else {
+      return sval.toInteger();
+    }
+  }
+
+  public static int getAsInt(final PageParameters parameters, final String name, final int defaultValue)
+  {
+    final StringValue sval = parameters.get(name);
+    if (sval == null || sval.isNull() == true) {
+      return defaultValue;
+    } else {
+      return sval.toInt();
+    }
+  }
+
+  public static Long getAsLong(final PageParameters parameters, final String name)
+  {
+    final StringValue sval = parameters.get(name);
+    if (sval == null || sval.isNull() == true) {
+      return null;
+    } else {
+      return sval.toLong();
+    }
+  }
+
+  public static Boolean getAsBooleanObject(final PageParameters parameters, final String name)
+  {
+    final StringValue sval = parameters.get(name);
+    if (sval == null || sval.isNull() == true) {
+      return null;
+    } else {
+      return sval.toBooleanObject();
+    }
+  }
+
+  public static boolean getAsBoolean(final PageParameters parameters, final String name)
+  {
+    final StringValue sval = parameters.get(name);
+    if (sval == null || sval.isNull() == true) {
+      return false;
+    } else {
+      return sval.toBoolean();
+    }
+  }
+
+  public static Object getAsObject(final PageParameters parameters, final String name, final Class< ? > type)
+  {
+    final StringValue sval = parameters.get(name);
+    if (sval == null || sval.isNull() == true) {
+      return null;
+    } else {
+      return sval.to(type);
+    }
+  }
+
   /**
    * Renders &lt;link type="image/x-icon" rel="shortcut icon" href="favicon.ico" /&gt;
    * @param favicon The favicon file, e. g. "/ProjectForge/favicon.ico".
    */
-  public static HeaderContributor headerContributorForFavicon(final String favicon)
+  public static String getCssForFavicon(final String favicon)
   {
-    return new HeaderContributor(new IHeaderContributor() {
-      private static final long serialVersionUID = 1L;
-
-      public void renderHead(final IHeaderResponse response)
-      {
-        response.renderString("<link type=\"image/x-icon\" rel=\"shortcut icon\" href=\"" + favicon + "\" />");
-      }
-    });
+    return "<link type=\"image/x-icon\" rel=\"shortcut icon\" href=\"" + favicon + "\" />";
   }
 
   /**
@@ -235,7 +323,7 @@ public class WicketUtils
 
   public static String getAbsolutePageUrl(final Request request, String relativeUrl, final boolean removeSessionId)
   {
-    final HttpServletRequest httpServletRequest = ((ServletWebRequest) request).getHttpServletRequest();
+    final HttpServletRequest httpServletRequest = getHttpServletRequest(request);
     final StringBuffer buf = buildAbsoluteBaseUrl(request, httpServletRequest).append("/").append(WICKET_APPLICATION_PATH);
     if (removeSessionId == true) {
       relativeUrl = removeSessionId(relativeUrl);
@@ -288,7 +376,7 @@ public class WicketUtils
    * @return Default page of ProjectForge. Currently CalendarPage is the default page (e. g. to redirect after cancel if no other return
    *         page is specified).
    */
-  public static Class< ? extends AbstractSecuredPage> getDefaultPage()
+  public static Class< ? extends WebPage> getDefaultPage()
   {
     return CalendarPage.class;
   }
@@ -316,11 +404,11 @@ public class WicketUtils
     } else if (ClassHelper.isDefaultType(value.getClass(), value)) {
       // Do not put default values to page parameters.
     } else if (value instanceof Date) {
-      pageParameters.put(key, ((Date) value).getTime());
+      pageParameters.add(key, ((Date) value).getTime());
     } else if (value instanceof TimePeriod) {
-      pageParameters.put(key, ((TimePeriod) value).getFromDate().getTime() + "-" + ((TimePeriod) value).getToDate().getTime());
+      pageParameters.add(key, ((TimePeriod) value).getFromDate().getTime() + "-" + ((TimePeriod) value).getToDate().getTime());
     } else {
-      pageParameters.put(key, value);
+      pageParameters.add(key, value);
     }
   }
 
@@ -347,28 +435,36 @@ public class WicketUtils
   public static Object getPageParameter(final PageParameters pageParameters, final String key, final Class< ? > objectType)
   {
     if (objectType.isAssignableFrom(Date.class) == true) {
-      final Long longValue = pageParameters.getAsLong(key);
-      if (longValue == null) {
+      final StringValue sval = pageParameters.get(key);
+      if (sval.isNull() == true) {
         return null;
       }
-      return new Date(longValue);
+      return new Date(sval.toLongObject());
     } else if (objectType.isAssignableFrom(Boolean.class) == true) {
-      return pageParameters.getAsBoolean(key);
+      return pageParameters.get(key).toBooleanObject();
     } else if (objectType.isPrimitive() == true) {
       if (Boolean.TYPE.equals(objectType)) {
-        return pageParameters.getAsBoolean(key);
+        return pageParameters.get(key).toBooleanObject();
       }
     } else if (Enum.class.isAssignableFrom(objectType) == true) {
-      final String sValue = pageParameters.getString(key);
+      final StringValue sval = pageParameters.get(key);
+      if (sval.isNull() == true) {
+        return null;
+      }
+      final String sValue = sval.toString();
       @SuppressWarnings({ "unchecked", "rawtypes"})
       final Enum< ? > en = Enum.valueOf((Class<Enum>) objectType, sValue);
       return en;
     } else if (objectType.isAssignableFrom(Integer.class) == true) {
-      return pageParameters.getAsInteger(key);
+      final StringValue sval = pageParameters.get(key);
+      if (sval.isNull() == true) {
+        return null;
+      }
+      return sval.toInteger();
     } else if (objectType.isAssignableFrom(String.class) == true) {
-      return pageParameters.getString(key);
+      return pageParameters.get(key).toString();
     } else if (objectType.isAssignableFrom(TimePeriod.class) == true) {
-      final String sValue = pageParameters.getString(key);
+      final String sValue = pageParameters.get(key).toString();
       if (sValue == null) {
         return null;
       }
@@ -384,6 +480,12 @@ public class WicketUtils
       log.error("PageParameter of type '" + objectType.getName() + "' not yet supported.");
     }
     return null;
+  }
+
+  public static boolean hasParameter(final PageParameters parameters, final String name)
+  {
+    final StringValue sval = parameters.get(name);
+    return sval != null && sval.isNull() == false;
   }
 
   /**
@@ -407,7 +509,7 @@ public class WicketUtils
       final String[] propertyAndAlias = getPropertyAndAlias(str);
       final String property = propertyAndAlias[0];
       final String alias = propertyAndAlias[1];
-      if (parameters.containsKey(pre + property) == true || parameters.containsKey(pre + alias) == true) {
+      if (hasParameter(parameters, pre + property) == true || hasParameter(parameters, pre + alias) == true) {
         useParameters = true;
         break;
       }
@@ -421,16 +523,16 @@ public class WicketUtils
       final String property = propertyAndAlias[0];
       final String alias = propertyAndAlias[1];
       String key = null;
-      if (parameters.containsKey(pre + property) == true) {
+      if (hasParameter(parameters, pre + property) == true) {
         key = property;
-      } else if (parameters.containsKey(pre + alias) == true) {
+      } else if (hasParameter(parameters, pre + alias) == true) {
         key = alias;
       }
       if (bean instanceof ISelectCallerPage) {
         if (key == null) {
           ((ISelectCallerPage) bean).unselect(property);
         } else {
-          ((ISelectCallerPage) bean).select(property, parameters.getString(pre + key));
+          ((ISelectCallerPage) bean).select(property, parameters.get(pre + key).toString());
         }
       } else {
         try {
@@ -466,7 +568,7 @@ public class WicketUtils
 
   private static StringBuffer buildAbsoluteUrl(final Request request)
   {
-    final HttpServletRequest httpServletRequest = ((ServletWebRequest) request).getHttpServletRequest();
+    final HttpServletRequest httpServletRequest = getHttpServletRequest(request);
     final StringBuffer buf = buildAbsoluteBaseUrl(request, httpServletRequest);
     buf.append(httpServletRequest.getServletPath());
     return buf;
@@ -501,7 +603,7 @@ public class WicketUtils
    */
   public static void addRowClick(final Component row)
   {
-    row.add(new SimpleAttributeModifier("onclick", "javascript:rowClick(this);"));
+    row.add(AttributeModifier.replace("onclick", "javascript:rowClick(this);"));
   }
 
   /**
@@ -513,6 +615,11 @@ public class WicketUtils
     final ContextImage image = new ContextImage(id, WicketUtils.getImageUrl(response, WebConstants.IMAGE_SPACER));
     image.setVisible(false);
     return image;
+  }
+
+  public static Component getInvisibleComponent(final String id)
+  {
+    return new Label(id).setVisible(false);
   }
 
   /**
@@ -527,29 +634,36 @@ public class WicketUtils
 
   /**
    * Uses "jiraSupportTooltipImage" as component id.
-   * @param response
-   * @param parent
-   * @see #getJIRASupportTooltipImage(String, Response, Component)
+   * @param parent only needed for localization
+   * @param id
+   * @return IconPanel which is invisible if JIRA isn't configured.
    */
-  public static TooltipImage getJIRASupportTooltipImage(final Response response, final Component parent)
+  public static IconPanel getJIRASupportTooltipIcon(final Component parent, final String id)
   {
-    return getJIRASupportTooltipImage("jiraSupportTooltipImage", response, parent);
+    final IconPanel icon = new IconPanel(id, IconType.JIRA_SUPPORT, parent.getString("tooltip.jiraSupport.field"));
+    if (isJIRAConfigured() == false) {
+      icon.setVisible(false);
+    }
+    return icon;
   }
 
   /**
-   * Component id is jiraSupportTooltipImage: &lt;img wicket:id="jiraSupportTooltipImage" /&gt;
-   * @param response
-   * @param parent Needed for localization (call getString()).
-   * @return Image with tooltip. The image is not visible if JIRA is not configured in the config.xml.
+   * Uses "jiraSupportTooltipImage" as component id. Please use {@link FieldsetPanel#addJIRASupportHelpIcon()} instead of this method if
+   * possible.
+   * @param fieldset needed for localization and for getting new child id.
+   * @return IconPanel which is invisible if JIRA isn't configured.
    */
-  public static TooltipImage getJIRASupportTooltipImage(final String componentId, final Response response, final Component parent)
+  public static IconPanel getJIRASupportTooltipIcon(final FieldsetPanel fieldset)
   {
-    final TooltipImage image = new TooltipImage(componentId, response, WebConstants.IMAGE_INFO,
-        parent.getString("tooltip.jiraSupport.field"));
-    if (isJIRAConfigured() == false) {
-      image.setVisible(false);
-    }
-    return image;
+    return getJIRASupportTooltipIcon(fieldset, fieldset.newChildId());
+  }
+
+  /**
+   */
+  public static IconPanel getAlertTooltipIcon(final FieldsetPanel fieldset, final String tooltip)
+  {
+    final IconPanel icon = new IconPanel(fieldset.newChildId(), IconType.ALERT, tooltip);
+    return icon;
   }
 
   public static final boolean isJIRAConfigured()
@@ -629,7 +743,7 @@ public class WicketUtils
     }
     buf.append("');\n}\n");
     parent.add(new Label("showDeleteEntryQuestionDialog", buf.toString()).setEscapeModelStrings(false).add(
-        new SimpleAttributeModifier("type", "text/javascript")));
+        AttributeModifier.replace("type", "text/javascript")));
   }
 
   /**
@@ -664,6 +778,32 @@ public class WicketUtils
       buf.append("-").append(StringHelper.format2DigitNumber(toWeek));
     }
     return buf.toString();
+  }
+
+  /**
+   * @param date
+   */
+  public static String getUTCDate(final Date date)
+  {
+    if (date == null) {
+      return "";
+    }
+    final DateHolder dh = new DateHolder(date);
+    return DateHelper.TECHNICAL_ISO_UTC.get().format(dh.getDate());
+  }
+
+  /**
+   * @param label Label as prefix
+   * @param date
+   * @return <label>: <date>
+   */
+  public static String getUTCDate(final String label, final Date date)
+  {
+    if (date == null) {
+      return label + ":";
+    }
+    final DateHolder dh = new DateHolder(date);
+    return label + ": " + DateHelper.TECHNICAL_ISO_UTC.get().format(dh.getDate());
   }
 
   /**
@@ -711,7 +851,7 @@ public class WicketUtils
         || ContextImage.class.isAssignableFrom(component.getClass()) == true) {
       return component;
     }
-    component.add(new AttributeAppendModifier("class", "hastooltip"));
+    component.add(AttributeModifier.append("class", "hastooltip"));
     return component;
   }
 
@@ -732,6 +872,8 @@ public class WicketUtils
     if (StringUtils.isBlank(title) == true) {
       if (text == null) {
         return "";
+      } else if (text.contains(" - ") == true) {
+        return text;
       } else {
         return " - " + text;
       }
@@ -788,7 +930,7 @@ public class WicketUtils
    */
   public static Component addTooltip(final Component component, final IModel<String> text, final boolean suppressStyleChange)
   {
-    component.add(new AttributeModifier("title", true, text));
+    component.add(new AttributeModifier("title", text));
     if (suppressStyleChange == false) {
       setStyleHasTooltip(component);
     }
@@ -819,7 +961,7 @@ public class WicketUtils
    */
   public static Component addTooltip(final Component component, final String title, final String text, final boolean suppressStyleChange)
   {
-    component.add(new SimpleAttributeModifier("title", createTooltip(title, text)));
+    component.add(AttributeModifier.replace("title", createTooltip(title, text)));
     if (suppressStyleChange == false) {
       setStyleHasTooltip(component);
     }
@@ -828,7 +970,7 @@ public class WicketUtils
 
   public static Component setWarningTooltip(final Component component)
   {
-    component.add(new AttributeAppendModifier("class", "warning"));
+    component.add(AttributeModifier.append("class", "warning"));
     return component;
   }
 
@@ -839,8 +981,78 @@ public class WicketUtils
    */
   public static FormComponent< ? > setReadonly(final FormComponent< ? > component)
   {
-    component.add(new AttributeAppendModifier("class", "readonly"));
-    component.add(new SimpleAttributeModifier("readonly", "readonly"));
+    component.add(AttributeModifier.append("class", "readonly"));
+    component.add(AttributeModifier.replace("readonly", "readonly"));
+    return component;
+  }
+
+  /**
+   * Sets attribute size (only for TextFields) and style="length: width"; The width value is size + 0.5 em and for drop down choices size +
+   * 2em;
+   * @param component
+   * @param size
+   * @return This for chaining.
+   */
+  public static FormComponent< ? > setSize(final FormComponent< ? > component, final int size)
+  {
+    return setSize(component, size, true);
+  }
+
+  /**
+   * Sets attribute size (only for TextFields) and style="length: width"; The width value is size + 0.5 em and for drop down choices size +
+   * 2em;
+   * @param component
+   * @param size
+   * @param important If true then "!important" is appended to the width style (true is default).
+   * @return This for chaining.
+   */
+  public static FormComponent< ? > setSize(final FormComponent< ? > component, final int size, final boolean important)
+  {
+    if (component instanceof TextField) {
+      component.add(AttributeModifier.replace("size", String.valueOf(size)));
+    }
+    final StringBuffer buf = new StringBuffer(20);
+    buf.append("width: ");
+    if (component instanceof DropDownChoice) {
+      buf.append(size + 2).append("em");
+    } else {
+      buf.append(size).append(".5em");
+    }
+    if (important == true) {
+      buf.append(" !important;");
+    }
+    buf.append(";");
+    component.add(AttributeModifier.append("style", buf.toString()));
+    return component;
+  }
+
+  /**
+   * Sets attribute size (only for TextFields) and style="width: x%";
+   * @param component
+   * @param size
+   * @return This for chaining.
+   */
+  public static FormComponent< ? > setPercentSize(final FormComponent< ? > component, final int size)
+  {
+    component.add(AttributeModifier.append("style", "width: " + size + "%;"));
+    return component;
+  }
+
+  public static FormComponent< ? > setStrong(final FormComponent< ? > component)
+  {
+    component.add(AttributeModifier.append("style", "font-weight: bold;"));
+    return component;
+  }
+
+  /**
+   * Sets attribute style="height: <height>ex;"
+   * @param component
+   * @param size
+   * @return This for chaining.
+   */
+  public static FormComponent< ? > setHeight(final FormComponent< ? > component, final int height)
+  {
+    component.add(AttributeModifier.append("style", "height: " + height + "ex;"));
     return component;
   }
 
@@ -852,8 +1064,27 @@ public class WicketUtils
    */
   public static FormComponent< ? > setFocus(final FormComponent< ? > component)
   {
-    component.add(new AttributeAppendModifier("class", "focus"));
+    component.add(setFocus());
     return component;
+  }
+
+  /**
+   * Same as {@link #setFocus(FormComponent)}
+   * @return AttributeAppender
+   */
+  public static Behavior setFocus()
+  {
+    return new FocusOnLoadBehavior();
+  }
+
+  /**
+   * For field-sets with multiple fields this method generates a multi label, such as "label1/label2", e. g. "zip code/city".
+   * @param label
+   * @return
+   */
+  public static String createMultipleFieldsetLabel(final String... labels)
+  {
+    return StringHelper.listToString("/", labels);
   }
 
   /**
@@ -862,13 +1093,13 @@ public class WicketUtils
    * @param comp
    * @param name Name of attribute.
    */
-  public static AbstractBehavior getAttributeModifier(final Component comp, final String name)
+  public static Behavior getAttributeModifier(final Component comp, final String name)
   {
-    for (final IBehavior behavior : comp.getBehaviors()) {
-      if (behavior instanceof AttributeAppendModifier && name.equals(((AttributeAppendModifier) behavior).getAttribute()) == true) {
-        return (AttributeAppendModifier) behavior;
-      } else if (behavior instanceof SimpleAttributeModifier && name.equals(((SimpleAttributeModifier) behavior).getAttribute()) == true) {
-        return (SimpleAttributeModifier) behavior;
+    for (final Behavior behavior : comp.getBehaviors()) {
+      if (behavior instanceof AttributeAppender && name.equals(((AttributeAppender) behavior).getAttribute()) == true) {
+        return behavior;
+      } else if (behavior instanceof AttributeModifier && name.equals(((AttributeModifier) behavior).getAttribute()) == true) {
+        return behavior;
       }
     }
     return null;
@@ -899,10 +1130,10 @@ public class WicketUtils
     setResponsePage(component, (Component) callerPage);
   }
 
-  public static SimpleAttributeModifier javaScriptConfirmDialogOnClick(final String message)
+  public static AttributeModifier javaScriptConfirmDialogOnClick(final String message)
   {
     final String escapedText = message.replace("'", "\'");
-    return new SimpleAttributeModifier("onclick", "javascript:return showConfirmDialog('" + escapedText + "');");
+    return AttributeModifier.replace("onclick", "javascript:return showConfirmDialog('" + escapedText + "');");
   }
 
   @SuppressWarnings("unchecked")
@@ -914,5 +1145,29 @@ public class WicketUtils
     } else {
       component.setLabel(labelModel);
     }
+  }
+
+  public static boolean isParent(final Component parent, final Component descendant)
+  {
+    final MarkupContainer p = descendant.getParent();
+    if (p == null) {
+      return false;
+    } else if (p == parent) {
+      return true;
+    } else {
+      return isParent(parent, p);
+    }
+  }
+
+  /**
+   * Adds yes/no radio boxes.
+   * @param radioGroup Parent radio group (must be added to the parent's component, otherwise getString("yes/no") will result in warning
+   *          messages.
+   */
+  public static void addYesNo(final RadioGroupPanel<Boolean> radioGroup)
+  {
+    radioGroup.add(new Model<Boolean>(true), radioGroup.getString("yes"));
+    radioGroup.add(new Model<Boolean>(false), radioGroup.getString("no"));
+
   }
 }

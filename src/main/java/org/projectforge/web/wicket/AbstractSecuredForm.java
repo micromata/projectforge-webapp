@@ -27,7 +27,7 @@ public abstract class AbstractSecuredForm<F, P extends AbstractSecuredBasePage> 
 {
   private static final long serialVersionUID = 5034574268522349613L;
 
-  public AbstractSecuredForm(P parentPage)
+  public AbstractSecuredForm(final P parentPage)
   {
     super(parentPage);
   }
@@ -57,7 +57,7 @@ public abstract class AbstractSecuredForm<F, P extends AbstractSecuredBasePage> 
    * @param persistent
    * @see AbstractSecuredPage#putUserPrefEntry(String, Object, boolean)
    */
-  public void putUserPrefEntry(String key, Object value, boolean persistent)
+  public void putUserPrefEntry(final String key, final Object value, final boolean persistent)
   {
     parentPage.putUserPrefEntry(key, value, persistent);
   }

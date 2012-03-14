@@ -23,12 +23,12 @@
 
 package org.projectforge.web.wicket;
 
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.ReflectionHelper;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.components.PlainLabel;
@@ -72,8 +72,8 @@ public class ListSelectActionPanel extends Panel
   {
     super(id, model);
     setRenderBodyOnly(true);
-    @SuppressWarnings("unchecked")
-    Link< ? > link = new Link("select") {
+    final Link< ? > link = new Link<Void>("select") {
+      @Override
       public void onClick()
       {
         WicketUtils.setResponsePage(this, caller);
@@ -115,8 +115,8 @@ public class ListSelectActionPanel extends Panel
   {
     super(id, model);
     setRenderBodyOnly(true);
-    @SuppressWarnings("unchecked")
-    Link< ? > link = new Link("select") {
+    final Link< ? > link = new Link<Void>("select") {
+      @Override
       public void onClick()
       {
         final PageParameters pageParams = WicketUtils.getPageParameters(params);

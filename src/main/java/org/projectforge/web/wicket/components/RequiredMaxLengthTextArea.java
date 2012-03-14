@@ -23,7 +23,6 @@
 
 package org.projectforge.web.wicket.components;
 
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 
@@ -37,36 +36,18 @@ public class RequiredMaxLengthTextArea extends MaxLengthTextArea
   private static final long serialVersionUID = -6828091890941024406L;
 
   /**
-   * Use constructor with parent and/or label params instead.
+   * @see MaxLengthTextArea#MaxLengthTextArea(String, PropertyModel)
    */
-  @Deprecated
   public RequiredMaxLengthTextArea(final String id, final IModel<String> model)
   {
-    this(null, id, null, model);
-  }
-
-  /**
-   * @see MaxLengthTextArea#MaxLengthTextArea(String, String, PropertyModel)
-   */
-  public RequiredMaxLengthTextArea(final String id, final String label, final IModel<String> model)
-  {
-    this(null, id, label, model);
-  }
-
-  /**
-   * @see MaxLengthTextArea#MaxLengthTextArea(WebMarkupContainer, String, String, IModel)
-   */
-  public RequiredMaxLengthTextArea(final WebMarkupContainer parent, final String id, final String label, final IModel<String> model)
-  {
-    super(parent, id, label, model);
+    super(id, model);
     setRequired(true);
   }
 
   /**
-   * Use constructor with parent and/or label params instead.
+   * @see MaxLengthTextArea#MaxLengthTextArea(String,PropertyModel, int)
    */
-  @Deprecated
-  public RequiredMaxLengthTextArea(final String id, final IModel<String> model, int maxLength)
+  public RequiredMaxLengthTextArea(final String id, final IModel<String> model, final int maxLength)
   {
     super(id, model, maxLength);
     setRequired(true);

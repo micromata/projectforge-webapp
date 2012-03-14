@@ -23,16 +23,27 @@
 
 package org.projectforge.web.wicket;
 
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.MetaDataKey;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.core.MessageParam;
+import org.projectforge.core.UserException;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesCache;
 
-/** All pages with required login should be derived from this page. */
-public abstract class AbstractSecuredBasePage extends AbstractBasePage
+/**
+ * All pages with required login should be derived from this page.
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ */
+public abstract class AbstractSecuredBasePage extends AbstractUnsecureBasePage
 {
+  @SuppressWarnings("serial")
+  public static final MetaDataKey<AbstractSecuredBasePage> SECURED_BASE_PAGE = new MetaDataKey<AbstractSecuredBasePage>() {
+  };
+
+  private static final long serialVersionUID = 3225994698301133706L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractSecuredBasePage.class);
 
   @SpringBean(name = "userXmlPreferencesCache")
@@ -47,6 +58,16 @@ public abstract class AbstractSecuredBasePage extends AbstractBasePage
   }
 
   /**
+   * Set the current page as meta data in the current request cycle. Work around because since Wicket 1.5 the exception handler doesn't have
+   * access to the current page.
+   * @see WicketApplication#init()
+   */
+  public void setRequestCycleMetaData()
+  {
+    getRequestCycle().setMetaData(SECURED_BASE_PAGE, this);
+  }
+
+  /**
    * @see MySession#getUser()
    */
   @Override
@@ -58,6 +79,7 @@ public abstract class AbstractSecuredBasePage extends AbstractBasePage
   /**
    * @see MySession#getUserId()
    */
+  @Override
   protected Integer getUserId()
   {
     final PFUserDO user = getUser();
@@ -71,13 +93,13 @@ public abstract class AbstractSecuredBasePage extends AbstractBasePage
    * @param persistent If true, the object will be persisted in the database.
    * @see UserXmlPreferencesCache#putEntry(Integer, String, Object, boolean)
    */
-  public void putUserPrefEntry(String key, Object value, boolean persistent)
+  public void putUserPrefEntry(final String key, final Object value, final boolean persistent)
   {
     if (getUser() == null) {
       // Should only occur, if user is not logged in.
       return;
     }
-    Integer userId = getUser().getId();
+    final Integer userId = getUser().getId();
     userXmlPreferencesCache.putEntry(userId, key, value, persistent);
   }
 
@@ -87,13 +109,13 @@ public abstract class AbstractSecuredBasePage extends AbstractBasePage
    * @return Return a persistent object with this key, if existing, or if not a volatile object with this key, if existing, otherwise null;
    * @see UserXmlPreferencesCache#getEntry(Integer, String)
    */
-  public Object getUserPrefEntry(String key)
+  public Object getUserPrefEntry(final String key)
   {
     if (getUser() == null) {
       // Should only occur, if user is not logged in.
       return null;
     }
-    Integer userId = getUser().getId();
+    final Integer userId = getUser().getId();
     return userXmlPreferencesCache.getEntry(userId, key);
   }
 
@@ -128,13 +150,13 @@ public abstract class AbstractSecuredBasePage extends AbstractBasePage
    * @param key
    * @return The removed entry if found.
    */
-  public Object removeUserPrefEntry(String key)
+  public Object removeUserPrefEntry(final String key)
   {
     if (getUser() == null) {
       // Should only occur, if user is not logged in.
       return null;
     }
-    Integer userId = getUser().getId();
+    final Integer userId = getUser().getId();
     return userXmlPreferencesCache.removeEntry(userId, key);
   }
 
@@ -163,17 +185,28 @@ public abstract class AbstractSecuredBasePage extends AbstractBasePage
   }
 
   /**
+   * No it isn't.
+   * @see org.projectforge.web.wicket.AbstractUnsecureBasePage#thisIsAnUnsecuredPage()
+   */
+  @Override
+  protected void thisIsAnUnsecuredPage()
+  {
+    // It's OK.
+    throw new UnsupportedOperationException();
+  }
+
+  /**
    * @param i18nKey key of the message
    * @param msgParams localized and non-localized message params.
    * @param params non localized message params (used if no msgParams given).
    * @return The params for the localized message if exist (prepared for using with MessageFormat), otherwise params will be returned.
    */
-  public String translateParams(String i18nKey, MessageParam[] msgParams, Object[] params)
+  public String translateParams(final String i18nKey, final MessageParam[] msgParams, final Object[] params)
   {
     if (msgParams == null) {
       return getLocalizedMessage(i18nKey, params);
     }
-    Object[] args = new Object[msgParams.length];
+    final Object[] args = new Object[msgParams.length];
     for (int i = 0; i < msgParams.length; i++) {
       if (msgParams[i].isI18nKey() == true) {
         args[i] = getString(msgParams[i].getI18nKey());
@@ -185,13 +218,13 @@ public abstract class AbstractSecuredBasePage extends AbstractBasePage
   }
 
   /**
-   * No it isn't.
-   * @see org.projectforge.web.wicket.AbstractBasePage#thisIsAnUnsecuredPage()
+   * @param i18nKey key of the message
+   * @param msgParams localized and non-localized message params.
+   * @param params non localized message params (used if no msgParams given).
+   * @return The params for the localized message if exist (prepared for using with MessageFormat), otherwise params will be returned.
    */
-  @Override
-  protected void thisIsAnUnsecuredPage()
+  public String translateParams(final UserException ex)
   {
-    // It's OK.
-    throw new UnsupportedOperationException();
+    return translateParams(ex.getI18nKey(), ex.getMsgParams(), ex.getParams());
   }
 }

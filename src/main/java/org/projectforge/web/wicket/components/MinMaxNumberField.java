@@ -26,7 +26,7 @@ package org.projectforge.web.wicket.components;
 import java.io.Serializable;
 
 import org.apache.commons.lang.ClassUtils;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.util.convert.IConverter;
@@ -43,7 +43,7 @@ public class MinMaxNumberField<Z extends Comparable<Z> & Serializable> extends T
    * @param model
    * @see org.apache.wicket.Component#Component(String, IModel)
    */
-  public MinMaxNumberField(final String id, final IModel<Z> model, Z minimum, Z maximum)
+  public MinMaxNumberField(final String id,  final IModel<Z> model, final Z minimum, final Z maximum)
   {
     super(id, model);
     add(new RangeValidator<Z>(minimum, maximum));
@@ -56,13 +56,27 @@ public class MinMaxNumberField<Z extends Comparable<Z> & Serializable> extends T
    * Results in attribute maxlength in HTML output of input field. For type integer the maxLength will be calculated automatically.
    * @param maxLength
    */
-  public void setMaxLength(int maxLength)
+  public MinMaxNumberField<Z> setMaxLength(final int maxLength)
   {
-    add(new SimpleAttributeModifier("maxlength", String.valueOf(maxLength)));
+    add(AttributeModifier.replace("maxlength", String.valueOf(maxLength)));
+    return this;
   }
 
+  /**
+   * Results in attribute maxlength in HTML output of input field. For type integer the maxLength will be calculated automatically.
+   * @param maxLength
+   */
+  public MinMaxNumberField<Z> setSize(final int size)
+  {
+    add(AttributeModifier.replace("size", String.valueOf(size)));
+    return this;
+  }
+
+  /**
+   * @see org.apache.wicket.Component#getConverter(java.lang.Class)
+   */
   @Override
-  public IConverter getConverter(Class< ? > type)
+  public <C> IConverter<C> getConverter(final Class<C> type)
   {
     if (converter != null) {
       return converter;

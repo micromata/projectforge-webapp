@@ -27,13 +27,13 @@ import javax.servlet.ServletException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.protocol.http.PageExpiredException;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessException;
 import org.projectforge.common.ExceptionHelper;
@@ -55,6 +55,8 @@ import org.projectforge.web.wicket.components.SingleButtonPanel;
  */
 public class ErrorPage extends AbstractSecuredPage
 {
+  private static final long serialVersionUID = -637809894879133209L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ErrorPage.class);
 
   public static final String ONLY4NAMESPACE = "org.projectforge";
@@ -73,7 +75,44 @@ public class ErrorPage extends AbstractSecuredPage
    * @param doLog If true, then a log entry with level INFO will be produced.
    * @return
    */
+  @Deprecated
   public static String getExceptionMessage(final AbstractSecuredPage securedPage, final ProjectForgeException exception, final boolean doLog)
+  {
+    // Feedbackpanel!
+    if (exception instanceof UserException) {
+      final UserException ex = (UserException) exception;
+      if (doLog == true) {
+        log.info(ex.toString() + ExceptionHelper.getFilteredStackTrace(ex, ONLY4NAMESPACE));
+      }
+      return securedPage.translateParams(ex.getI18nKey(), ex.getMsgParams(), ex.getParams());
+    } else if (exception instanceof InternalErrorException) {
+      final InternalErrorException ex = (InternalErrorException) exception;
+      if (doLog == true) {
+        log.info(ex.toString() + ExceptionHelper.getFilteredStackTrace(ex, ONLY4NAMESPACE));
+      }
+      return securedPage.translateParams(ex.getI18nKey(), ex.getMsgParams(), ex.getParams());
+    } else if (exception instanceof AccessException) {
+      final AccessException ex = (AccessException) exception;
+      if (doLog == true) {
+        log.info(ex.toString() + ExceptionHelper.getFilteredStackTrace(ex, ONLY4NAMESPACE));
+      }
+      if (ex.getParams() != null) {
+        return securedPage.getLocalizedMessage(ex.getI18nKey(), ex.getParams());
+      } else {
+        return securedPage.translateParams(ex.getI18nKey(), ex.getMessageArgs(), ex.getParams());
+      }
+    }
+    throw new UnsupportedOperationException("For developer: Please add unknown ProjectForgeException here!", exception);
+  }
+
+  /**
+   * Get internationalized message inclusive the message params if exists.
+   * @param securedPage Needed for localization.
+   * @param exception
+   * @param doLog If true, then a log entry with level INFO will be produced.
+   * @return
+   */
+  public static String getExceptionMessage(final AbstractSecuredBasePage securedPage, final ProjectForgeException exception, final boolean doLog)
   {
     // Feedbackpanel!
     if (exception instanceof UserException) {
@@ -157,7 +196,7 @@ public class ErrorPage extends AbstractSecuredPage
     final Component textareaField = new MaxLengthTextArea("description", new PropertyModel<String>(data, "description"), 4000);
     form.add(textareaField);
     textareaField.add(new FocusOnLoadBehavior());
-    final Button cancelButton = new Button("button", new Model<String>(getString("cancel"))) {
+    final Button cancelButton = new Button("button", new Model<String>("cancel")) {
       @Override
       public final void onSubmit()
       {
@@ -165,15 +204,15 @@ public class ErrorPage extends AbstractSecuredPage
       }
     };
     cancelButton.setDefaultFormProcessing(false); // No validation of the form.
-    form.add(new SingleButtonPanel("cancel", cancelButton));
-    final Button sendButton = new Button("button", new Model<String>(getString("feedback.send.title"))) {
+    form.add(new SingleButtonPanel("cancel", cancelButton, getString("cancel"), SingleButtonPanel.CANCEL));
+    final Button sendButton = new Button("button", new Model<String>("send")) {
       @Override
       public final void onSubmit()
       {
         sendFeedback();
       }
     };
-    form.add(new SingleButtonPanel("send", sendButton));
+    form.add(new SingleButtonPanel("send", sendButton, getString("feedback.send.title"), SingleButtonPanel.DEFAULT_SUBMIT));
     form.setDefaultButton(sendButton);
   }
 

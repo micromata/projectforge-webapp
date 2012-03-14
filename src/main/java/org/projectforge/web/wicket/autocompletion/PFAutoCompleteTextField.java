@@ -46,34 +46,18 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
   protected boolean providesTooltip;
 
   /**
-   * Construct.
-   * 
    * @param id
    * @param model
    * @param type
    * @param settings
    */
-  public PFAutoCompleteTextField(final String id, final IModel<T> model)
+  protected PFAutoCompleteTextField(final String id, final IModel<T> model)
   {
     this(id, model, PFAutoCompleteRenderer.INSTANCE, new PFAutoCompleteSettings());// , type, StringAutoCompleteRenderer.INSTANCE,
     // settings);
   }
 
-  /**
-   * @param id
-   * @param label Label used for validation, calls setLabel(label).
-   * @param model
-   * @param type
-   * @param settings
-   */
-  public PFAutoCompleteTextField(final String id, final String label, final IModel<T> model)
-  {
-    this(id, model, PFAutoCompleteRenderer.INSTANCE, new PFAutoCompleteSettings());// , type, StringAutoCompleteRenderer.INSTANCE,
-    // settings);
-    setLabel(new Model<String>(label));
-  }
-
-  public PFAutoCompleteTextField(final String id, final IModel<T> model, final IAutoCompleteRenderer<String> renderer,
+  protected PFAutoCompleteTextField(final String id, final IModel<T> model, final IAutoCompleteRenderer<String> renderer,
       final PFAutoCompleteSettings settings)
   {
     super(id, model);
@@ -82,7 +66,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
       private static final long serialVersionUID = 1L;
 
       @Override
-      protected List<T> getChoices(String input)
+      protected List<T> getChoices(final String input)
       {
         return PFAutoCompleteTextField.this.getChoices(input);
       }
@@ -100,12 +84,13 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
       }
 
       @Override
-      protected String formatValue(T value)
+      protected String formatValue(final T value)
       {
         return PFAutoCompleteTextField.this.formatValue(value);
       }
 
-      protected String formatLabel(T value)
+      @Override
+      protected String formatLabel(final T value)
       {
         return PFAutoCompleteTextField.this.formatLabel(value);
       }
@@ -128,7 +113,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
 
   /** {@inheritDoc} */
   @Override
-  protected void onComponentTag(ComponentTag tag)
+  protected void onComponentTag(final ComponentTag tag)
   {
     super.onComponentTag(tag);
     // disable browser's autocomplete
@@ -163,7 +148,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * @param value
    * @return
    */
-  protected String formatValue(T value)
+  protected String formatValue(final T value)
   {
     return ObjectUtils.toString(value);
   }
@@ -173,7 +158,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * @param value
    * @return The label to show in the drop down choice. If not overloaded null is returned.
    */
-  protected String formatLabel(T value)
+  protected String formatLabel(final T value)
   {
     return null;
   }
@@ -202,7 +187,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withAutoFill(boolean)
    */
-  public PFAutoCompleteTextField<T> withAutoFill(boolean autoFill)
+  public PFAutoCompleteTextField<T> withAutoFill(final boolean autoFill)
   {
     settings.withAutoFill(autoFill);
     return this;
@@ -212,7 +197,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withAutoSubmit(boolean)
    */
-  public PFAutoCompleteTextField<T> withAutoSubmit(boolean autoSubmit)
+  public PFAutoCompleteTextField<T> withAutoSubmit(final boolean autoSubmit)
   {
     settings.withAutoSubmit(autoSubmit);
     return this;
@@ -222,7 +207,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withFocus(boolean)
    */
-  public PFAutoCompleteTextField<T> withFocus(boolean hasFocus)
+  public PFAutoCompleteTextField<T> withFocus(final boolean hasFocus)
   {
     settings.withFocus(hasFocus);
     return this;
@@ -232,7 +217,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withCacheLength(int)
    */
-  public PFAutoCompleteTextField<T> withCacheLength(int cacheLength)
+  public PFAutoCompleteTextField<T> withCacheLength(final int cacheLength)
   {
     settings.withCacheLength(cacheLength);
     return this;
@@ -242,7 +227,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withDelay(int)
    */
-  public PFAutoCompleteTextField<T> withDelay(int delay)
+  public PFAutoCompleteTextField<T> withDelay(final int delay)
   {
     settings.withDelay(delay);
     return this;
@@ -252,7 +237,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withMatchCase(boolean)
    */
-  public PFAutoCompleteTextField<T> withMatchCase(boolean matchCase)
+  public PFAutoCompleteTextField<T> withMatchCase(final boolean matchCase)
   {
     settings.withMatchCase(matchCase);
     return this;
@@ -262,7 +247,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withMatchContains(boolean)
    */
-  public PFAutoCompleteTextField<T> withMatchContains(boolean matchContains)
+  public PFAutoCompleteTextField<T> withMatchContains(final boolean matchContains)
   {
     settings.withMatchContains(matchContains);
     return this;
@@ -272,7 +257,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withMatchSubset(boolean)
    */
-  public PFAutoCompleteTextField<T> withMatchSubset(boolean matchSubset)
+  public PFAutoCompleteTextField<T> withMatchSubset(final boolean matchSubset)
   {
     settings.withMatchSubset(matchSubset);
     return this;
@@ -282,7 +267,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withMaxItemsToShow(int)
    */
-  public PFAutoCompleteTextField<T> withMaxItemsToShow(int maxItemsToShow)
+  public PFAutoCompleteTextField<T> withMaxItemsToShow(final int maxItemsToShow)
   {
     settings.withMaxItemsToShow(maxItemsToShow);
     return this;
@@ -292,7 +277,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withMinChars(int)
    */
-  public PFAutoCompleteTextField<T> withMinChars(int minChars)
+  public PFAutoCompleteTextField<T> withMinChars(final int minChars)
   {
     settings.withMinChars(minChars);
     return this;
@@ -302,7 +287,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withMustMatch(boolean)
    */
-  public PFAutoCompleteTextField<T> withMustMatch(boolean mustMatch)
+  public PFAutoCompleteTextField<T> withMustMatch(final boolean mustMatch)
   {
     settings.withMustMatch(mustMatch);
     return this;
@@ -312,7 +297,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withScroll(boolean)
    */
-  public PFAutoCompleteTextField<T> withScroll(boolean scroll)
+  public PFAutoCompleteTextField<T> withScroll(final boolean scroll)
   {
     settings.withScroll(scroll);
     return this;
@@ -322,7 +307,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withScrollHeight(boolean)
    */
-  public PFAutoCompleteTextField<T> withScrollHeight(int scrollHeight)
+  public PFAutoCompleteTextField<T> withScrollHeight(final int scrollHeight)
   {
     settings.withScrollHeight(scrollHeight);
     return this;
@@ -332,7 +317,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withSelectFirst(boolean)
    */
-  public PFAutoCompleteTextField<T> withSelectFirst(boolean selectFirst)
+  public PFAutoCompleteTextField<T> withSelectFirst(final boolean selectFirst)
   {
     settings.withSelectFirst(selectFirst);
     return this;
@@ -342,7 +327,7 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withSelectOnly(boolean)
    */
-  public PFAutoCompleteTextField<T> withSelectOnly(boolean selectOnly)
+  public PFAutoCompleteTextField<T> withSelectOnly(final boolean selectOnly)
   {
     settings.withSelectOnly(selectOnly);
     return this;
@@ -352,18 +337,17 @@ public abstract class PFAutoCompleteTextField<T> extends TextField<T>
    * Fluent.
    * @see PFAutoCompleteSettings#withWidth(int)
    */
-  public PFAutoCompleteTextField<T> withWidth(int width)
+  public PFAutoCompleteTextField<T> withWidth(final int width)
   {
     settings.withWidth(width);
     return this;
   }
 
-
   /**
    * Fluent.
    * @see PFAutoCompleteSettings#withLabelValue(boolean)
    */
-  public PFAutoCompleteTextField<T> withLabelValue(boolean labelValue)
+  public PFAutoCompleteTextField<T> withLabelValue(final boolean labelValue)
   {
     settings.withLabelValue(labelValue);
     return this;

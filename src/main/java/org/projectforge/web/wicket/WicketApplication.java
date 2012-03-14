@@ -31,33 +31,25 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Application;
+import org.apache.wicket.ConverterLocator;
 import org.apache.wicket.IConverterLocator;
 import org.apache.wicket.Page;
-import org.apache.wicket.Request;
-import org.apache.wicket.RequestCycle;
-import org.apache.wicket.Response;
+import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
-import org.apache.wicket.protocol.http.WebRequest;
-import org.apache.wicket.protocol.http.WebRequestCycle;
-import org.apache.wicket.protocol.http.WebRequestCycleProcessor;
-import org.apache.wicket.protocol.http.WebResponse;
-import org.apache.wicket.request.IRequestCycleProcessor;
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.Response;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
-import org.apache.wicket.util.convert.ConverterLocator;
 import org.apache.wicket.util.lang.Bytes;
-import org.hibernate.cfg.AnnotationConfiguration;
 import org.projectforge.AppVersion;
 import org.projectforge.admin.SystemUpdater;
-import org.projectforge.common.ExceptionHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.CronSetup;
-import org.projectforge.core.ProjectForgeException;
 import org.projectforge.core.SystemInfoCache;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.HibernateUtils;
@@ -80,7 +72,7 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
 /**
  * Application object for your web application. If you want to run this application without deploying, run the Start class.
  * 
- * @see org.wicket.demo.Start#main(String[])
+ * @see org.StartHelper.demo.Start#main(String[])
  */
 public class WicketApplication extends WebApplication
 {
@@ -228,24 +220,52 @@ public class WicketApplication extends WebApplication
    * @see Application#DEVELOPMENT
    */
   @Override
-  public String getConfigurationType()
+  public RuntimeConfigurationType getConfigurationType()
   {
     if (isDevelopmentSystem() == true) {
-      return DEVELOPMENT;
+      return RuntimeConfigurationType.DEVELOPMENT;
     }
-    return DEPLOYMENT;
-  }
-
-  private void mountPage(final String path, final Class< ? extends Page> pageClass)
-  {
-    mountBookmarkablePage(path, pageClass);
-    mountedPages.put(pageClass, path);
+    return RuntimeConfigurationType.DEPLOYMENT;
   }
 
   @Override
   protected void init()
   {
     super.init();
+    // // Own error page for deployment mode and UserException and AccessException.
+    //    getRequestCycleListeners().add(new AbstractRequestCycleListener() {
+    //      /**
+    //       * Log only non ProjectForge exceptions.
+    //       * @see org.apache.wicket.request.cycle.AbstractRequestCycleListener#onException(org.apache.wicket.request.cycle.RequestCycle,
+    //       *      java.lang.Exception)
+    //       */
+    //      @Override
+    //      public IRequestHandler onException(final RequestCycle cycle, final Exception ex)
+    //      {
+    //        final Throwable rootCause = ExceptionHelper.getRootCause(ex);
+    //        // log.error(rootCause.getMessage(), ex);
+    //        // if (rootCause instanceof ProjectForgeException == false) {
+    //        // return super.onException(cycle, ex);
+    //        // }
+    //        // return null;
+    //        final AbstractSecuredBasePage page = cycle
+    //            .getMetaData(AbstractSecuredBasePage.SECURED_BASE_PAGE);
+    //        if (page != null && rootCause instanceof ProjectForgeException) {
+    //          // Show exception message as error message in feedback panel.
+    //          final String msg = ErrorPage.getExceptionMessage(page, (ProjectForgeException) rootCause, true);
+    //          page.error(msg);
+    //          return new RenderPageRequestHandler(new PageProvider(page));
+    //        }
+    //        if (isDevelopmentSystem() == true) {
+    //          log.error(ex.getMessage(), ex);
+    //          return super.onException(cycle, ex);
+    //        } else {
+    //          // Show always this error page in production mode:
+    //          return new RenderPageRequestHandler(new PageProvider(new ErrorPage(ex)));
+    //        }
+    //      }
+    //    });
+
     getApplicationSettings().setDefaultMaximumUploadSize(Bytes.megabytes(100));
     getMarkupSettings().setDefaultMarkupEncoding("utf-8");
     final MyAuthorizationStrategy authStrategy = new MyAuthorizationStrategy();
@@ -253,19 +273,20 @@ public class WicketApplication extends WebApplication
     getSecuritySettings().setUnauthorizedComponentInstantiationListener(authStrategy);
     getResourceSettings().setResourceStreamLocator(new MyResourceStreamLocator());
     // Prepend the resource bundle for overwriting some Wicket default localizations (such as StringValidator.*)
-    getResourceSettings().addStringResourceLoader(0, new BundleStringResourceLoader(RESOURCE_BUNDLE_NAME));
+    getResourceSettings().getStringResourceLoaders().add(new BundleStringResourceLoader(RESOURCE_BUNDLE_NAME));
     getResourceSettings().setThrowExceptionOnMissingResource(false); // Don't throw MissingResourceException for missing i18n keys.
     getApplicationSettings().setPageExpiredErrorPage(PageExpiredPage.class); // Don't show expired page.
-    getSessionSettings().setMaxPageMaps(20); // Map up to 20 pages per session (default is 5).
-    addComponentInstantiationListener(new SpringComponentInjector(this));
+    // getSessionSettings().setMaxPageMaps(20); // Map up to 20 pages per session (default is 5).
+    getComponentInstantiationListeners().add(new SpringComponentInjector(this));
     getApplicationSettings().setInternalErrorPage(ErrorPage.class);
+    //getRequestCycleSettings().setGatherExtendedBrowserInfo(true); // For getting browser width and height.
 
     final XmlWebApplicationContext webApplicationContext = (XmlWebApplicationContext) WebApplicationContextUtils
         .getWebApplicationContext(getServletContext());
     final ConfigurableListableBeanFactory beanFactory = webApplicationContext.getBeanFactory();
     beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
     final LocalSessionFactoryBean localSessionFactoryBean = (LocalSessionFactoryBean) beanFactory.getBean("&sessionFactory");
-    final AnnotationConfiguration hibernateConfiguration = (AnnotationConfiguration) localSessionFactoryBean.getConfiguration();
+    final org.hibernate.cfg.Configuration hibernateConfiguration = localSessionFactoryBean.getConfiguration();
     HibernateUtils.setConfiguration(hibernateConfiguration);
     final ServletContext servletContext = getServletContext();
     final String configContextPath = configXml.getServletContextPath();
@@ -297,13 +318,15 @@ public class WicketApplication extends WebApplication
     pluginsRegistry.initialize();
 
     for (final Map.Entry<String, Class< ? extends WebPage>> mountPage : WebRegistry.instance().getMountPages().entrySet()) {
-      mountPage(mountPage.getKey(), mountPage.getValue());
+      final String path = mountPage.getKey();
+      final Class< ? extends WebPage> pageClass = mountPage.getValue();
+      mountPage(path, pageClass);
+      mountedPages.put(pageClass, path);
     }
     if (isDevelopmentSystem() == true && isStripWicketTags() == true) {
       log.info("Strip Wicket tags also in development mode at default (see context.xml).");
       Application.get().getMarkupSettings().setStripWicketTags(true);
     }
-    getResourceSettings().setLocalizer(new MyLocalizer("edit/StandardI18n"));
     log.info("Default TimeZone is: " + TimeZone.getDefault());
     log.info("user.timezone is: " + System.getProperty("user.timezone"));
     cronSetup.initialize();
@@ -379,53 +402,5 @@ public class WicketApplication extends WebApplication
     converterLocator.set(java.util.Date.class, new MyDateConverter());
     converterLocator.set(java.sql.Date.class, new MyDateConverter(java.sql.Date.class, "S-"));
     return converterLocator;
-  }
-
-  /**
-   * Own error page for deployment mode and UserException and AccessException.
-   * @see org.apache.wicket.protocol.http.WebApplication#newRequestCycleProcessor()
-   */
-  @Override
-  protected IRequestCycleProcessor newRequestCycleProcessor()
-  {
-    return new WebRequestCycleProcessor() {
-      @Override
-      protected Page onRuntimeException(final Page page, final RuntimeException e)
-      {
-        final Throwable rootCause = ExceptionHelper.getRootCause(e);
-        if (page != null && page instanceof AbstractSecuredPage && rootCause instanceof ProjectForgeException) {
-          // Show exception message as error message in feedback panel.
-          final AbstractSecuredPage securedPage = (AbstractSecuredPage) page;
-          final String msg = ErrorPage.getExceptionMessage(securedPage, (ProjectForgeException) rootCause, true);
-          page.error(msg);
-          return page;
-        }
-        if (isDevelopmentSystem() == true) {
-          return super.onRuntimeException(page, e);
-        } else {
-          // Show always this error page in production mode:
-          return new ErrorPage(e);
-        }
-      }
-    };
-  }
-
-  /**
-   * Log only non ProjectForge exceptions.
-   * @see org.apache.wicket.protocol.http.WebApplication#newRequestCycle(org.apache.wicket.Request, org.apache.wicket.Response)
-   */
-  @Override
-  public RequestCycle newRequestCycle(final Request request, final Response response)
-  {
-    return new WebRequestCycle(this, (WebRequest) request, (WebResponse) response) {
-      @Override
-      protected void logRuntimeException(final RuntimeException e)
-      {
-        final Throwable rootCause = ExceptionHelper.getRootCause(e);
-        if (rootCause instanceof ProjectForgeException == false) {
-          super.logRuntimeException(e);
-        }
-      }
-    };
   }
 }

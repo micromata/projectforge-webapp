@@ -23,9 +23,12 @@
 
 package org.projectforge.web.wicket.components;
 
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.model.Model;
+import org.projectforge.common.StringHelper;
 
 /**
  * Panel for using as single button (needed for css decoration).
@@ -36,31 +39,75 @@ public class SingleButtonPanel extends Panel
 {
   private static final long serialVersionUID = -3241045253014479836L;
 
-  private Button button;
+  private final Button button;
 
-  public SingleButtonPanel(final String id, final Button button)
+  /**
+   * The component id of the enclosed button.
+   */
+  public static final String WICKET_ID = "button";
+
+  public static final String CANCEL = "red";
+
+  public static final String DEFAULT_SUBMIT = "green";
+
+  public static final String DELETE = "blue";
+
+  public static final String GREY = "grey";
+
+  public static final String RED = "red";
+
+  public static final String RESET = "red";
+
+  public static final String SEND_RIGHT = "send_right";
+
+  /**
+   * 
+   * @param id
+   * @param button
+   * @param label
+   * @param classnames css class names
+   */
+  public SingleButtonPanel(final String id, final Button button, final String label, final String... classnames)
+  {
+    this(id, button, new Model<String>(label), classnames);
+  }
+
+  /**
+   * 
+   * @param id
+   * @param button
+   * @param label
+   * @param classnames css class names
+   */
+  public SingleButtonPanel(final String id, final Button button, final Model<String> label, final String... classnames)
   {
     super(id);
     this.button = button;
-    setRenderBodyOnly(true);
     add(button);
-  }
-
-  public SingleButtonPanel(final String id, final Button button, final String tooltip)
-  {
-    this(id, button, tooltip, null);
-  }
-
-  public SingleButtonPanel(final String id, final Button button, final String tooltip, final String classname)
-  {
-    super(id);
-    this.button = button;
-    setRenderBodyOnly(true);
-    add(button);
-    button.add(new SimpleAttributeModifier("title", tooltip));
-    if (classname != null) {
-      button.add(new SimpleAttributeModifier("class", classname));
+    button.add(new Label("label", label).setRenderBodyOnly(true));
+    if (classnames != null) {
+      button.add(AttributeModifier.replace("class", StringHelper.listToString(" ", classnames)));
     }
+  }
+
+  /**
+   * @param classnames css class names
+   * @return this for chaining.
+   */
+  public SingleButtonPanel setClassnames(final String... classnames)
+  {
+    if (classnames != null) {
+      button.add(AttributeModifier.replace("class", StringHelper.listToString(" ", classnames)));
+    }
+    return this;
+  }
+
+  public SingleButtonPanel setTooltip(final String tooltip)
+  {
+    if (tooltip != null) {
+      button.add(AttributeModifier.replace("title", tooltip));
+    }
+    return this;
   }
 
   public Button getButton()

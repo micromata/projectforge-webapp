@@ -23,10 +23,11 @@
 
 package org.projectforge.web.wicket;
 
-import org.apache.wicket.Resource;
 import org.apache.wicket.markup.html.image.Image;
-import org.apache.wicket.markup.html.image.resource.DynamicImageResource;
-import org.apache.wicket.protocol.http.WebResponse;
+import org.apache.wicket.request.http.WebResponse.CacheScope;
+import org.apache.wicket.request.resource.AbstractResource;
+import org.apache.wicket.request.resource.DynamicImageResource;
+import org.apache.wicket.util.time.Duration;
 import org.projectforge.renderer.BatikImageRenderer;
 import org.projectforge.renderer.ImageFormat;
 import org.w3c.dom.Document;
@@ -35,10 +36,10 @@ public class BatikImage extends Image
 {
   private static final long serialVersionUID = -167624996888880342L;
 
-  private int width;
+  private final int width;
 
   private byte[] ba;
-  
+
   private transient Document document;
 
   public BatikImage(final String id, final Document document, final int width)
@@ -47,8 +48,9 @@ public class BatikImage extends Image
     this.document = document;
     this.width = width;
   }
-  
-  private byte[] getByteArray() {
+
+  private byte[] getByteArray()
+  {
     if (ba == null) {
       ba = BatikImageRenderer.getByteArray(document, width, ImageFormat.PNG);
     }
@@ -57,25 +59,25 @@ public class BatikImage extends Image
 
   @SuppressWarnings("serial")
   @Override
-  protected Resource getImageResource()
+  protected AbstractResource getImageResource()
   {
     return new DynamicImageResource() {
+
       @Override
-      protected byte[] getImageData()
+      protected byte[] getImageData(final Attributes attributes)
       {
         return getByteArray();
       }
 
       @Override
-      protected void setHeaders(WebResponse response)
+      protected void configureResponse(final ResourceResponse response, final Attributes attributes)
       {
-        if (isCacheable()) {
-          super.setHeaders(response);
-        } else {
-          response.setHeader("Pragma", "no-cache");
-          response.setHeader("Cache-Control", "no-cache");
-          response.setDateHeader("Expires", 0);
-        }
+        super.configureResponse(response, attributes);
+
+        // if (isCacheable() == false) {
+        response.setCacheDuration(Duration.NONE);
+        response.setCacheScope(CacheScope.PRIVATE);
+        // }
       }
     };
   }

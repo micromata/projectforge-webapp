@@ -23,21 +23,23 @@
 
 package org.projectforge.web.wicket;
 
+import java.io.Serializable;
 import java.util.TimeZone;
 
-import org.apache.wicket.Request;
 import org.apache.wicket.Session;
+import org.apache.wicket.protocol.http.ClientProperties;
 import org.apache.wicket.protocol.http.WebSession;
 import org.apache.wicket.protocol.http.request.WebClientInfo;
 import org.apache.wicket.request.ClientInfo;
+import org.apache.wicket.request.Request;
 import org.projectforge.Version;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.web.BrowserScreenWidthType;
 import org.projectforge.web.UserAgentBrowser;
 import org.projectforge.web.UserAgentDetection;
 import org.projectforge.web.UserAgentDevice;
-import org.projectforge.web.wicket.embats.EmbatsUtils;
 
 public class MySession extends WebSession
 {
@@ -53,6 +55,8 @@ public class MySession extends WebSession
 
   private UserAgentBrowser userAgentBrowser = UserAgentBrowser.UNKNOWN;
 
+  private ClientProperties clientProperties;
+
   private String userAgentBrowserVersionString = null;
 
   private Version userAgentBrowserVersion = null;
@@ -63,15 +67,14 @@ public class MySession extends WebSession
 
   private boolean ignoreMobileUserAgent;
 
-  private boolean embatsSupported;
-
   public MySession(final Request request)
   {
     super(request);
     setLocale(request);
     final ClientInfo info = getClientInfo();
     if (info instanceof WebClientInfo) {
-      ((WebClientInfo) info).getProperties().setTimeZone(PFUserContext.getTimeZone());
+      clientProperties = ((WebClientInfo) clientInfo).getProperties();
+      clientProperties.setTimeZone(PFUserContext.getTimeZone());
       userAgent = ((WebClientInfo) info).getUserAgent();
       userAgentDevice = UserAgentDevice.getUserAgentDevice(userAgent);
       // userAgentOS = UserAgentOS.getUserAgentOS(userAgent);
@@ -79,7 +82,6 @@ public class MySession extends WebSession
       final UserAgentDetection userAgentDetection = UserAgentDetection.browserDetect(userAgent);
       userAgentBrowser = userAgentDetection.getUserAgentBrowser();
       userAgentBrowserVersionString = userAgentDetection.getUserAgentBrowserVersion();
-      embatsSupported = EmbatsUtils.isEmbatsSupported(userAgentBrowser, userAgentBrowserVersionString);
     } else {
       log.error("Oups, ClientInfo is not from type WebClientInfo: " + info);
     }
@@ -147,11 +149,6 @@ public class MySession extends WebSession
     return mobileUserAgent;
   }
 
-  public boolean isEmbatsSupported()
-  {
-    return embatsSupported;
-  }
-
   /**
    * The user wants to ignore the mobile agent and wants to get the PC version (normal web version).
    * @return
@@ -159,6 +156,14 @@ public class MySession extends WebSession
   public boolean isIgnoreMobileUserAgent()
   {
     return ignoreMobileUserAgent;
+  }
+
+  public BrowserScreenWidthType getBrowserScreenWidthType()
+  {
+    if (isMobileUserAgent() == true) {
+      return BrowserScreenWidthType.NARROW;
+    }
+    return BrowserScreenWidthType.WIDE;
   }
 
   /**
@@ -233,7 +238,7 @@ public class MySession extends WebSession
     super.invalidate();
   }
 
-  public void put(final String name, final Object value)
+  public void put(final String name, final Serializable value)
   {
     super.setAttribute(name, value);
   }
@@ -241,5 +246,13 @@ public class MySession extends WebSession
   public Object get(final String name)
   {
     return super.getAttribute(name);
+  }
+
+  /**
+   * @return the clientProperties
+   */
+  public ClientProperties getClientProperties()
+  {
+    return clientProperties;
   }
 }

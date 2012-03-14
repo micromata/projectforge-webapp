@@ -24,13 +24,13 @@
 package org.projectforge.web.wicket;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
@@ -54,14 +54,14 @@ public class FeedbackPage extends AbstractSecuredPage
   @SpringBean(name = "sendFeedback")
   private SendFeedback sendFeedback;
 
-  private SendFeedbackData data;
+  private final SendFeedbackData data;
 
   @SuppressWarnings("serial")
   public FeedbackPage(final PageParameters parameters)
   {
     super(null);
     data = new SendFeedbackData();
-    Form<ErrorPageData> form = new Form<ErrorPageData>("form");
+    final Form<ErrorPageData> form = new Form<ErrorPageData>("form");
     final String receiver = Configuration.getInstance().getStringValue(ConfigurationParam.FEEDBACK_E_MAIL);
     body.add(form);
     form.add(new FeedbackPanel("feedback").setOutputMarkupId(true));
@@ -73,7 +73,7 @@ public class FeedbackPage extends AbstractSecuredPage
     final Component textareaField = new RequiredMaxLengthTextArea("description", new PropertyModel<String>(data, "description"), 4000);
     form.add(textareaField);
     textareaField.add(new FocusOnLoadBehavior());
-    final Button cancelButton = new Button("button", new Model<String>(getString("cancel"))) {
+    final Button cancelButton = new Button("button", new Model<String>("cancel")) {
       @Override
       public final void onSubmit()
       {
@@ -81,15 +81,15 @@ public class FeedbackPage extends AbstractSecuredPage
       }
     };
     cancelButton.setDefaultFormProcessing(false); // No validation of the form.
-    form.add(new SingleButtonPanel("cancel", cancelButton));
-    final Button sendButton = new Button("button", new Model<String>(getString("feedback.send.title"))) {
+    form.add(new SingleButtonPanel("cancel", cancelButton, getString("cancel"), SingleButtonPanel.CANCEL));
+    final Button sendButton = new Button("button", new Model<String>("send")) {
       @Override
       public final void onSubmit()
       {
         sendFeedback();
       }
     };
-    form.add(new SingleButtonPanel("send", sendButton));
+    form.add(new SingleButtonPanel("send", sendButton, getString("feedback.send.title"), SingleButtonPanel.DEFAULT_SUBMIT));
     form.setDefaultButton(sendButton);
   }
 
@@ -104,7 +104,7 @@ public class FeedbackPage extends AbstractSecuredPage
     boolean result = false;
     try {
       result = sendFeedback.send(data);
-    } catch (Throwable ex) {
+    } catch (final Throwable ex) {
       log.error(ex.getMessage(), ex);
       result = false;
     }

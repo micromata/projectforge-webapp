@@ -23,11 +23,11 @@
 
 package org.projectforge.web.wicket.components;
 
-import org.apache.wicket.Response;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.Response;
 import org.projectforge.web.wicket.PresizedImage;
 
 /**
@@ -39,7 +39,7 @@ public class ImageBookmarkablePageLinkPanel extends Panel
 {
   private static final long serialVersionUID = -6763951791178572288L;
 
-  private BookmarkablePageLink<String> link;
+  private final BookmarkablePageLink<String> link;
 
   private ImageBookmarkablePageLinkPanel(final String id, final Class< ? extends WebPage> pageClass)
   {

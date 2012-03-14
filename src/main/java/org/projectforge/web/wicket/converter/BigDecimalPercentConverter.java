@@ -28,10 +28,9 @@ import java.math.RoundingMode;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.util.convert.converters.BigDecimalConverter;
+import org.apache.wicket.util.convert.converter.BigDecimalConverter;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.NumberFormatter;
-
 
 /**
  * Supports text fields with % symbol.
@@ -58,7 +57,7 @@ public class BigDecimalPercentConverter extends BigDecimalConverter
   }
 
   @Override
-  public BigDecimal convertToObject(String value, Locale locale)
+  public BigDecimal convertToObject(String value, final Locale locale)
   {
     value = StringUtils.trimToEmpty(value);
     if (value.endsWith("%") == true) {
@@ -71,13 +70,16 @@ public class BigDecimalPercentConverter extends BigDecimalConverter
     return bd;
   }
 
+  /**
+   * @see org.apache.wicket.util.convert.converter.AbstractNumberConverter#convertToString(java.lang.Number, java.util.Locale)
+   */
   @Override
-  public String convertToString(Object value, Locale locale)
+  public String convertToString(final BigDecimal value, final Locale locale)
   {
     if (value == null) {
       return "%";
     }
-    BigDecimal bd = (BigDecimal) value;
+    BigDecimal bd = value;
     if (decimalFormat == true) {
       bd = bd.multiply(NumberHelper.HUNDRED).stripTrailingZeros();
     }

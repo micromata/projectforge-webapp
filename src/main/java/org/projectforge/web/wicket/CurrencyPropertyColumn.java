@@ -25,6 +25,7 @@ package org.projectforge.web.wicket;
 
 import java.math.BigDecimal;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
@@ -40,7 +41,7 @@ public class CurrencyPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
 
   private boolean suppressZeroValues;
 
-  public CurrencyPropertyColumn(final String label, final String sortProperty, final String property, CellItemListener<T> cellItemListener)
+  public CurrencyPropertyColumn(final String label, final String sortProperty, final String property, final CellItemListener<T> cellItemListener)
   {
     super(new Model<String>(label), sortProperty, property, cellItemListener);
   }
@@ -66,13 +67,13 @@ public class CurrencyPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
     }
     if (value != null && value.compareTo(BigDecimal.ZERO) < 0) {
       // Negative value.
-      item.add(new AttributeAppendModifier("style", new Model<String>("white-space: nowrap; text-align: right; color: red;")));
+      item.add(AttributeModifier.append("style", new Model<String>("white-space: nowrap; text-align: right; color: red;")));
     } else {
-      item.add(new AttributeAppendModifier("style", new Model<String>("white-space: nowrap; text-align: right;")));
+      item.add(AttributeModifier.append("style", new Model<String>("white-space: nowrap; text-align: right;")));
     }
   }
 
-  public CurrencyPropertyColumn<T> setSuppressZeroValues(boolean supressZeroValues)
+  public CurrencyPropertyColumn<T> setSuppressZeroValues(final boolean supressZeroValues)
   {
     this.suppressZeroValues = supressZeroValues;
     return this;

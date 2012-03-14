@@ -23,8 +23,8 @@
 
 package org.projectforge.web.wicket.autocompletion;
 
-import org.apache.wicket.Response;
 import org.apache.wicket.extensions.ajax.markup.html.autocomplete.IAutoCompleteRenderer;
+import org.apache.wicket.request.Response;
 
 public class PFAutoCompleteRenderer implements IAutoCompleteRenderer<String>
 {
@@ -44,16 +44,22 @@ public class PFAutoCompleteRenderer implements IAutoCompleteRenderer<String>
     return INSTANCE;
   }
 
+  @Override
   public void render(final String value, final Response response, final String criteria)
   {
     response.write(value);
   }
 
-  public void renderFooter(final Response response)
+  @Override
+  public void renderHeader(final Response response)
   {
   }
 
-  public void renderHeader(final Response response)
+  /**
+   * @see org.apache.wicket.extensions.ajax.markup.html.autocomplete.IAutoCompleteRenderer#renderFooter(org.apache.wicket.request.Response, int)
+   */
+  @Override
+  public void renderFooter(final Response response, final int count)
   {
   }
 }

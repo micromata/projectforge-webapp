@@ -29,56 +29,68 @@ import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.FormComponent;
-import org.apache.wicket.markup.html.form.validation.AbstractFormValidator;
-import org.apache.wicket.validation.IValidationError;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.validation.ValidationError;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.GridBuilder;
+import org.projectforge.web.wicket.flowlayout.GridBuilderImpl;
 
-
-public abstract class AbstractForm<F, P extends AbstractBasePage> extends Form<F>
+public abstract class AbstractForm<F, P extends AbstractUnsecureBasePage> extends Form<F>
 {
   private static final long serialVersionUID = -5703197102062729288L;
 
   protected final P parentPage;
 
-  private ShinyFormVisitor shinyVisitor = new ShinyFormVisitor();
+  private final ShinyFormVisitor shinyVisitor = new ShinyFormVisitor();
 
   /**
    * Convenience method for creating a component which is in the mark-up file but should not be visible.
    * @param wicketId
    * @return
-   * @see AbstractBasePage#createInvisibleDummyComponent(String)
+   * @see AbstractUnsecureBasePage#createInvisibleDummyComponent(String)
    */
   public static Label createInvisibleDummyComponent(final String wicketId)
   {
-    return AbstractBasePage.createInvisibleDummyComponent(wicketId);
+    return AbstractUnsecureBasePage.createInvisibleDummyComponent(wicketId);
+  }
+
+  public AbstractForm(final P parentPage)
+  {
+    this(parentPage, "form");
+  }
+
+  public AbstractForm(final P parentPage, final String id)
+  {
+    super(id);
+    this.parentPage = parentPage;
+  }
+
+  protected void initUpload(final Bytes maxSize)
+  {
+    // set this form to multipart mode (always needed for uploads!)
+    setMultiPart(true);
+    setMaxSize(maxSize);
   }
 
   @SuppressWarnings("serial")
-  public AbstractForm(P parentPage)
+  protected FeedbackPanel addFeedbackPanel()
   {
-    super("form");
-    this.parentPage = parentPage;
-    add(new AbstractFormValidator() {
-      public FormComponent< ? >[] getDependentFormComponents()
+    final FeedbackPanel feedbackPanel = new FeedbackPanel("feedback") {
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
+      @Override
+      public boolean isVisible()
       {
-        return getDependentFormValidationComponents();
+        return hasError();
       }
-
-      public void validate(Form< ? > form)
-      {
-        validation();
-      }
-    });
-  }
-
-  /**
-   * Dependent form components which should be processed first before form validation.
-   * @return
-   */
-  public FormComponent< ? >[] getDependentFormValidationComponents()
-  {
-    return null;
+    };
+    feedbackPanel.setOutputMarkupId(true);
+    add(feedbackPanel);
+    return feedbackPanel;
   }
 
   public P getParentPage()
@@ -91,9 +103,9 @@ public abstract class AbstractForm<F, P extends AbstractBasePage> extends Form<F
    */
   protected void init()
   {
-
   }
 
+  @Override
   public void onBeforeRender()
   {
     super.onBeforeRender();
@@ -101,27 +113,19 @@ public abstract class AbstractForm<F, P extends AbstractBasePage> extends Form<F
   }
 
   /**
-   * @see AbstractBasePage#getUrl(String)
+   * @see AbstractUnsecureBasePage#getUrl(String)
    */
-  public String getUrl(String path)
+  public String getUrl(final String path)
   {
     return parentPage.getUrl(path, true);
   }
 
   /**
-   * @see AbstractBasePage#getUrl(String, boolean)
+   * @see AbstractUnsecureBasePage#getUrl(String, boolean)
    */
-  public String getUrl(String path, boolean encodeUrl)
+  public String getUrl(final String path, final boolean encodeUrl)
   {
     return parentPage.getUrl(path, encodeUrl);
-  }
-
-  /**
-   * Here you can add validation and errors manually.
-   */
-  protected void validation()
-  {
-    // Do nothing at default;
   }
 
   public void addError(final String msgKey)
@@ -141,7 +145,7 @@ public abstract class AbstractForm<F, P extends AbstractBasePage> extends Form<F
 
   public void addFormComponentError(final FormComponent< ? > component, final String msgKey)
   {
-    component.error((IValidationError) new ValidationError().addMessageKey(msgKey));
+    component.error(new ValidationError().addMessageKey(msgKey));
   }
 
   public void addComponentError(final Component component, final String msgKey)
@@ -149,7 +153,7 @@ public abstract class AbstractForm<F, P extends AbstractBasePage> extends Form<F
     component.error(getString(msgKey));
   }
 
-  public String getLocalizedMessage(String key, Object... params)
+  public String getLocalizedMessage(final String key, final Object... params)
   {
     if (params == null) {
       return getString(key);
@@ -158,9 +162,9 @@ public abstract class AbstractForm<F, P extends AbstractBasePage> extends Form<F
   }
 
   /**
-   * @see AbstractBasePage#escapeHtml(String)
+   * @see AbstractUnsecureBasePage#escapeHtml(String)
    */
-  protected String escapeHtml(String str)
+  protected String escapeHtml(final String str)
   {
     return parentPage.escapeHtml(str);
   }
@@ -179,5 +183,26 @@ public abstract class AbstractForm<F, P extends AbstractBasePage> extends Form<F
   protected Integer getUserId()
   {
     return this.parentPage.getUserId();
+  }
+
+  public MySession getMySession()
+  {
+    return (MySession) getSession();
+  }
+
+  /**
+   * @see GridBuilderImpl#GridBuilder(RepeatingView, MySession)
+   */
+  protected GridBuilder newGridBuilder(final RepeatingView parent)
+  {
+    return new GridBuilderImpl(parent, getMySession());
+  }
+
+  /**
+   * @see GridBuilderImpl#GridBuilder(DivPanel, MySession)
+   */
+  protected GridBuilder newGridBuilder(final DivPanel parent)
+  {
+    return new GridBuilderImpl(parent, getMySession());
   }
 }

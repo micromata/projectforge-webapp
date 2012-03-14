@@ -39,8 +39,8 @@ import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.converter.TimeZoneConverter;
 
 /**
- * Text field contains a ajax autocompletion text field for choosing and displaying a time zone. The time zones of all users will be shown as
- * favorite list.
+ * Text field contains a ajax autocompletion text field for choosing and displaying a time zone. The time zones of all users will be shown
+ * as favorite list.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -51,7 +51,8 @@ public class TimeZoneField extends PFAutoCompleteTextField<TimeZone>
   @SuppressWarnings("serial")
   private final IConverter converter = new TimeZoneConverter() {
     @Override
-    protected void error() {
+    protected void error()
+    {
       TimeZoneField.this.error(getString("error.timezone.unsupported"));
     };
   };
@@ -100,8 +101,11 @@ public class TimeZoneField extends PFAutoCompleteTextField<TimeZone>
     return result;
   }
 
+  /**
+   * @see org.apache.wicket.Component#getConverter(java.lang.Class)
+   */
   @Override
-  public IConverter getConverter(final Class< ? > type)
+  public <C> IConverter<C> getConverter(final Class<C> type)
   {
     return converter;
   }

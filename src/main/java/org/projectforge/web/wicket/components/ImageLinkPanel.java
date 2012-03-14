@@ -23,11 +23,12 @@
 
 package org.projectforge.web.wicket.components;
 
-import org.apache.wicket.Response;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.request.Response;
+import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.PresizedImage;
 
 /**
@@ -35,7 +36,7 @@ import org.projectforge.web.wicket.PresizedImage;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public abstract class ImageLinkPanel extends Panel
+public class ImageLinkPanel extends Panel
 {
   private static final long serialVersionUID = 1333929048394636569L;
 
@@ -48,6 +49,7 @@ public abstract class ImageLinkPanel extends Panel
   {
     super(id);
     link = new Link<Void>("link") {
+      @Override
       public void onClick()
       {
         ImageLinkPanel.this.onClick();
@@ -56,22 +58,34 @@ public abstract class ImageLinkPanel extends Panel
     add(link);
   }
 
+  public ImageLinkPanel(final String id, final Response response, final ImageDef image)
+  {
+    this(id, response, image.getPath());
+  }
+
   public ImageLinkPanel(final String id, final Response response, final String relativeImagePath)
   {
     this(id);
-    link.add(new PresizedImage("image", getResponse(), relativeImagePath));
+    link.add(new PresizedImage("image", response, relativeImagePath));
   }
+
 
   public ImageLinkPanel(final String id, final Response response, final String relativeImagePath, final String tooltip)
   {
     this(id);
-    link.add(new TooltipImage("image", getResponse(), relativeImagePath, tooltip));
+    link.add(new TooltipImage("image", response, relativeImagePath, tooltip));
   }
 
   public ImageLinkPanel(final String id, final Response response, final String relativeImagePath, final IModel<String> tooltip)
   {
     this(id);
-    link.add(new TooltipImage("image", getResponse(), relativeImagePath, tooltip));
+    link.add(new TooltipImage("image", response, relativeImagePath, tooltip));
+  }
+
+  public ImageLinkPanel(final String id, final AbstractLink link, final Response response, final ImageDef image,
+      final String tooltip)
+  {
+    this(id, link, response, image.getPath(), tooltip);
   }
 
   public ImageLinkPanel(final String id, final AbstractLink link, final Response response, final String relativeImagePath,
@@ -79,7 +93,7 @@ public abstract class ImageLinkPanel extends Panel
   {
     super(id);
     add(link);
-    link.add(new TooltipImage("image", getResponse(), relativeImagePath, tooltip));
+    link.add(new TooltipImage("image", response, relativeImagePath, tooltip));
   }
 
   public void onClick()

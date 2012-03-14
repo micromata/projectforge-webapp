@@ -47,7 +47,7 @@ public class WicketApplicationFilter implements Filter
     return application;
   }
 
-  public void setApplication(Application application)
+  public void setApplication(final Application application)
   {
     this.application = application;
   }
@@ -57,23 +57,23 @@ public class WicketApplicationFilter implements Filter
     // blank
   }
 
-  public void init(FilterConfig filterConfig) throws ServletException
+  public void init(final FilterConfig filterConfig) throws ServletException
   {
     // blank
   }
 
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
+  public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException
   {
     // Sollte eigentlich immer NULL ergeben, aber man weiss nie ...
     final Application previousOne = (Application.exists() == true) ? Application.get() : null;
-    Application.set(this.application);
+    org.apache.wicket.ThreadContext.setApplication(this.application);
     try {
       chain.doFilter(request, response);
     } finally {
       if (previousOne != null) {
-        Application.set(previousOne);
+        org.apache.wicket.ThreadContext.setApplication(previousOne);
       } else {
-        Application.unset();
+        org.apache.wicket.ThreadContext.setApplication(null);
       }
     }
   }

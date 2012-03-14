@@ -135,7 +135,7 @@ public class LabelValueChoiceRenderer<T> implements IChoiceRenderer<T>
 
   public String getIdValue(final T object, final int index)
   {
-    return object.toString();
+    return object != null ? object.toString() : "";
   }
 
 }

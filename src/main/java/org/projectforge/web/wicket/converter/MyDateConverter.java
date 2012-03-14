@@ -24,6 +24,7 @@
 package org.projectforge.web.wicket.converter;
 
 import java.util.Date;
+import java.util.Locale;
 
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -78,15 +79,15 @@ public class MyDateConverter extends MyAbstractDateConverter
   }
 
   @Override
-  public String getDatePattern()
+  public String getDatePattern(final Locale locale)
   {
-    return DateTimeFormat.patternForStyle(dateStyle, getLocale());
+    return getPattern();
   }
 
   @Override
-  protected DateTimeFormatter getFormat()
+  protected DateTimeFormatter getFormat(final Locale locale)
   {
-    final DateTimeFormatter dtf = DateTimeFormat.forPattern(getDatePattern()).withLocale(getLocale()).withPivotYear(2000);
+    final DateTimeFormatter dtf = DateTimeFormat.forPattern(getDatePattern(locale)).withLocale(getLocale()).withPivotYear(2000);
     return dtf;
   }
 

@@ -25,18 +25,14 @@ package org.projectforge.web.wicket.components;
 
 import java.util.Date;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.datetime.markup.html.form.DateTextField;
 import org.apache.wicket.markup.html.form.FormComponentPanel;
-import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
-import org.projectforge.user.PFUserContext;
-import org.projectforge.web.calendar.CalendarPage;
-import org.projectforge.web.wicket.FocusOnLoadBehavior;
-import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.converter.MyDateConverter;
+import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
  * Panel for date selection. Works for java.util.Date and java.sql.Date. For java.sql.Date don't forget to call the constructor with
@@ -44,7 +40,7 @@ import org.projectforge.web.wicket.converter.MyDateConverter;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class DatePanel extends FormComponentPanel<Date>
+public class DatePanel extends FormComponentPanel<Date> implements ComponentWrapperPanel
 {
   private static final long serialVersionUID = 3785639935585959803L;
 
@@ -58,69 +54,51 @@ public class DatePanel extends FormComponentPanel<Date>
 
   /**
    * @param id
+   * @param label Only for displaying the field's name on validation messages.
    * @param model
-   * @param caller If set then CalendarPage will be available via second calendar icon.
-   * @param targetType java.util.Date is default. If your model stores the date of type java.sql.Date then java.sql.Date.class should be
-   *          given as targetType for correct converting.
    */
-  @SuppressWarnings("serial")
+  public DatePanel(final String id, final IModel<Date> model)
+  {
+    this(id, model, new DatePanelSettings());
+  }
+
+  /**
+   * @param id
+   * @param label Only for displaying the field's name on validation messages.
+   * @param model
+   * @param settings with target type etc.
+   */
   public DatePanel(final String id, final IModel<Date> model, final DatePanelSettings settings)
   {
     super(id, model);
     setType(settings.targetType);
-    final MyDateConverter dateConverter = new MyDateConverter(settings.targetType, "S-");
+    final MyDateConverter dateConverter = new MyDateConverter(settings.targetType, "M-");
     dateField = new DateTextField("dateField", new PropertyModel<Date>(this, "date"), dateConverter);
-    dateField.add(new SimpleAttributeModifier("size", "10"));
+    dateField.add(AttributeModifier.replace("size", "10"));
     add(dateField);
     if (settings.required == true) {
       this.required = true;
     }
-    /*
-     * @SuppressWarnings("serial") final DatePicker datePicker = new DatePicker() { @Override protected boolean enableMonthYearSelection() {
-     * return true; } }; dateField.add(datePicker);
-     */
-    final SubmitLink selectDateButton = new SubmitLink("selectDate") {
-      public void onSubmit()
-      {
-        if (settings.callerPage != null) {
-          dateField.validate(); // Force to update model from user input.
-          String selectProperty = id;
-          if (StringUtils.isNotEmpty(settings.selectProperty) == true) {
-            selectProperty = settings.selectProperty;
-          }
-          final CalendarPage calendarPage = new CalendarPage(settings.callerPage, selectProperty, dateField.getConvertedInput());
-          calendarPage.setSelectPeriodMode(settings.selectPeriodMode);
-          calendarPage.setSelectStartStopTime(settings.selectStartStopTime);
-          calendarPage.setTargetType(settings.targetType);
-          calendarPage.init();
-          setResponsePage(calendarPage);
-        }
-      };
-    };
-    selectDateButton.setDefaultFormProcessing(false);
-    if (settings.callerPage == null) {
-      selectDateButton.setVisible(false);
-    }
-    add(selectDateButton);
-    String i18nKey;
-    if (settings.tooltipI18nKey != null) {
-      i18nKey = settings.tooltipI18nKey;
-    } else if (settings.selectPeriodMode == true) {
-      i18nKey = "tooltip.selectDateOrPeriod";
-    } else {
-      i18nKey = "tooltip.selectDate";
-    }
-    selectDateButton.add(new TooltipImage("selectDateImage", getResponse(), WebConstants.IMAGE_DATE_SELECT, PFUserContext
-        .getLocalizedString(i18nKey)));
-
     if (settings.tabIndex != null) {
-      dateField.add(new SimpleAttributeModifier("tabindex", String.valueOf(settings.tabIndex)));
+      dateField.add(AttributeModifier.replace("tabindex", String.valueOf(settings.tabIndex)));
     }
   }
 
-  public void setFocus()
+  /**
+   * @see org.apache.wicket.markup.html.form.FormComponent#setLabel(org.apache.wicket.model.IModel)
+   */
+  @Override
+  public DatePanel setLabel(final IModel<String> labelModel)
   {
-    dateField.add(new FocusOnLoadBehavior());
+    dateField.setLabel(labelModel);
+    super.setLabel(labelModel);
+    return this;
+  }
+
+  public DatePanel setFocus()
+  {
+    dateField.add(WicketUtils.setFocus());
+    return this;
   }
 
   /**
@@ -155,6 +133,9 @@ public class DatePanel extends FormComponentPanel<Date>
     super.onBeforeRender();
   }
 
+  /**
+   * @see org.apache.wicket.markup.html.form.FormComponent#updateModel()
+   */
   @Override
   public void updateModel()
   {
@@ -181,5 +162,15 @@ public class DatePanel extends FormComponentPanel<Date>
   public String getInput()
   {
     return dateField.getInput();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getComponentOutputId()
+   */
+  @Override
+  public String getComponentOutputId()
+  {
+    dateField.setOutputMarkupId(true);
+    return dateField.getMarkupId();
   }
 }

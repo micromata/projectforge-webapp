@@ -76,8 +76,11 @@ public class SingleTextFieldPanel extends Panel
     final MinMaxNumberField<Integer> textField;
     if (converter != null) {
       textField = new MinMaxNumberField<Integer>("text", model, minimum, maximum) {
+        /**
+         * @see org.projectforge.web.wicket.components.MinMaxNumberField#getConverter(java.lang.Class)
+         */
         @Override
-        public IConverter getConverter(Class< ? > type)
+        public <C> IConverter<C> getConverter(final Class<C> type)
         {
           return converter;
         }

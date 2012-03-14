@@ -27,9 +27,10 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.projectforge.jira.JiraUtils;
 import org.projectforge.web.wicket.WicketUtils;
-
 
 /**
  * Panel containing only one check-box.
@@ -40,6 +41,11 @@ import org.projectforge.web.wicket.WicketUtils;
 public class JiraIssuesPanel extends Panel
 {
   public JiraIssuesPanel(final String id, final String text)
+  {
+    this(id, new Model<String>(text));
+  }
+
+  public JiraIssuesPanel(final String id, final IModel<String> model)
   {
     super(id);
     setRenderBodyOnly(true);
@@ -52,7 +58,7 @@ public class JiraIssuesPanel extends Panel
     }
     final RepeatingView jiraIssuesRepeater = new RepeatingView("issues");
     add(jiraIssuesRepeater);
-    final String[] jiraIssues = JiraUtils.checkForJiraIssues(text);
+    final String[] jiraIssues = JiraUtils.checkForJiraIssues(model.getObject());
     if (jiraIssues == null) {
       jiraIssuesRepeater.setVisible(false);
     } else {

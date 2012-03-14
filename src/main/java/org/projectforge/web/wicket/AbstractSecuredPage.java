@@ -26,29 +26,41 @@ package org.projectforge.web.wicket;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.image.ContextImage;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.http.WebRequest;
+import org.apache.wicket.request.http.WebResponse;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.projectforge.web.LoginPage;
+import org.projectforge.web.Menu;
+import org.projectforge.web.MenuEntry;
+import org.projectforge.web.core.LogoServlet;
+import org.projectforge.web.core.MenuSuffixLabel;
+import org.projectforge.web.core.NavSidePanel;
+import org.projectforge.web.core.NavTopPanel;
+import org.projectforge.web.user.MyAccountEditPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.components.MyRepeatingView;
+import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 /** All pages with required login should be derived from this page. */
 public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
 {
+  private static final long serialVersionUID = -8721451198050398835L;
+
   protected WebMarkupContainer contentMenuArea;
 
   /**
    * List to create content menu in the desired order before creating the RepeatingView.
    */
-  protected List<ContentMenuEntryPanel> contentMenuEntries = new ArrayList<ContentMenuEntryPanel>();
-
-  // Needed for generating RepeatingView in onBeforeRender() if not already generated.
-  private boolean contentMenuRendered = false;
-
-  private MyRepeatingView contentMenu;
+  protected MyComponentsRepeater<ContentMenuEntryPanel> contentMenu;
 
   protected WebMarkupContainer dropDownMenu;
 
@@ -62,51 +74,66 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
    */
   protected List<WebMarkupContainer> dropDownMenuEntries = new ArrayList<WebMarkupContainer>();
 
-  // Needed for generating RepeatingView in onBeforeRender() if not already generated.
-  private boolean dropDownMenuRendered = false;
-
   private RepeatingView dropDownMenuRepeater;
 
-  @SuppressWarnings("serial")
   public AbstractSecuredPage(final PageParameters parameters)
   {
     super(parameters);
-    final Model<String> alertMessageModel = new Model<String>() {
-      public String getObject()
+    final String logoServlet = LogoServlet.getBaseUrl();
+    if (logoServlet != null) {
+      body.add(new ContextImage("logoLeftImage", logoServlet));
+    } else {
+      body.add(new Label("logoLeftImage", "[invisible]").setVisible(false));
+    }
+    final NavSidePanel menuPanel = new NavSidePanel("mainMenu");
+    body.add(menuPanel);
+    menuPanel.init();
+    @SuppressWarnings("serial")
+    final Label sideMenuSuffixLabel = new MenuSuffixLabel("totalMenuCounter", new Model<Integer>() {
+      @Override
+      public Integer getObject()
       {
-        if (WicketApplication.getAlertMessage() == null) {
-          return "neverDisplayed";
+        int counter = 0;
+        final Menu menu = menuPanel.getMenu();
+        if (menu.getMenuEntries() == null) {
+          return counter;
         }
-        return WicketApplication.getAlertMessage();
-      }
-    };
-    final Label alertMessageLabel = new Label("alertMessage", alertMessageModel) {
+        for (final MenuEntry menuEntry : menu.getMenuEntries()) {
+          final IModel<Integer> newCounterModel = menuEntry.getNewCounterModel();
+          if (newCounterModel != null && newCounterModel.getObject() != null) {
+            counter += newCounterModel.getObject();
+          }
+        }
+        return counter;
+      };
+    });
+    body.add(sideMenuSuffixLabel);
+    final NavTopPanel favoriteMenuPanel = new NavTopPanel("favoriteMenu");
+    body.add(favoriteMenuPanel);
+    favoriteMenuPanel.init();
+    // body.add(new Label("username", getUser().getFullname()));
+    final BookmarkablePageLink<Void> myAccountLink = new BookmarkablePageLink<Void>("myAccountLink", MyAccountEditPage.class);
+    body.add(myAccountLink);
+    @SuppressWarnings("serial")
+    final Link<String> logoutLink = new Link<String>("logoutLink") {
       @Override
-      public boolean isVisible()
+      public void onClick()
       {
-        return (WicketApplication.getAlertMessage() != null);
-      }
+        LoginPage.logout((MySession) getSession(), (WebRequest) getRequest(), (WebResponse) getResponse(), userXmlPreferencesCache);
+        setResponsePage(LoginPage.class);
+      };
     };
-    body.add(alertMessageLabel);
-    contentMenuArea = new WebMarkupContainer("contentMenuArea") {
-      @Override
-      public boolean isVisible()
-      {
-        return contentMenu.isVisible() || dropDownMenu.isVisible();
-      }
-    };
-    body.add(contentMenuArea);
-    contentMenuArea.setVisible(false);
-    contentMenu = new MyRepeatingView("menu");
-    contentMenu.setRenderBodyOnly(true);
-    contentMenuArea.add(contentMenu);
+    body.add(logoutLink);
+
+    contentMenu = new MyComponentsRepeater<ContentMenuEntryPanel>("contentMenuRepeater");
+    body.add(contentMenu.getRepeatingView());
     dropDownMenu = new WebMarkupContainer("dropDownMenu");
     // 1dropDownMenu.add(new PresizedImage("cogImage", getResponse(), WebConstants.IMAGE_COG));
     // dropDownMenu.add(new PresizedImage("arrowDownImage", getResponse(), WebConstants.IMAGE_ARROW_DOWN));
     dropDownMenuRepeater = new MyRepeatingView("menu");
     dropDownMenu.add(dropDownMenuRepeater);
     dropDownMenu.setVisible(false);
-    contentMenuArea.add(dropDownMenu);
+    //contentMenuArea.add(dropDownMenu);
   }
 
   /**
@@ -114,7 +141,7 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
    * set the returnToPage as a page parameter (if supported by the derived page).
    * @param returnToPage
    */
-  public AbstractSecuredPage setReturnToPage(WebPage returnToPage)
+  public AbstractSecuredPage setReturnToPage(final WebPage returnToPage)
   {
     this.returnToPage = returnToPage;
     return this;
@@ -122,7 +149,7 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
 
   protected void addContentMenuEntry(final ContentMenuEntryPanel panel)
   {
-    this.contentMenuEntries.add(panel);
+    this.contentMenu.add(panel);
   }
 
   protected String getNewContentMenuChildId()
@@ -143,22 +170,15 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
   @Override
   protected void onBeforeRender()
   {
-    if (contentMenuRendered == false) {
-      if (this.contentMenuEntries.size() > 0) {
-        for (final ContentMenuEntryPanel entry : this.contentMenuEntries) {
-          this.contentMenu.add(entry);
-        }
-      }
-      contentMenuRendered = true;
-    }
-    if (dropDownMenuRendered == false) {
-      if (this.dropDownMenu.size() > 0) {
-        for (final WebMarkupContainer entry : this.dropDownMenuEntries) {
-          this.dropDownMenu.add(entry);
-        }
-      }
-      dropDownMenuRendered = true;
-    }
+    contentMenu.render();
+    // if (dropDownMenuRendered == false) {
+    // if (this.dropDownMenu.size() > 0) {
+    // for (final WebMarkupContainer entry : this.dropDownMenuEntries) {
+    // this.dropDownMenu.add(entry);
+    // }
+    // }
+    // dropDownMenuRendered = true;
+    // }
     super.onBeforeRender();
   }
 }

@@ -37,16 +37,17 @@ public class MyResourceStreamLocator extends ResourceStreamLocator
 
   public static final String WEB_PREFIX = "wa/";
 
+  @Override
   public IResourceStream locate(final Class<?> clazz, final String path)
   {
-    IResourceStream located = super.locate(clazz, locateWebResource(path));
+    final IResourceStream located = super.locate(clazz, locateWebResource(path));
     if (located != null) {
       return located;
     }
     return super.locate(clazz, path);
   }
 
-  String locateWebResource(String path)
+  String locateWebResource(final String path)
   {
     if (path == null || path.startsWith(PACKAGE_PREFIX) == false) {
       return path; // Do nothing.

@@ -23,7 +23,6 @@
 
 package org.projectforge.web.wicket;
 
-import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebPage;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
@@ -122,10 +121,4 @@ public interface IEditPage<O extends AbstractBaseDO< ? >, D extends BaseDao<O>>
    * @return true if the user wants to create a new data object or false for an already existing object.
    */
   public boolean isNew();
-
-  /**
-   * @see Component#setRedirect(boolean)
-   * @param redirect
-   */
-  public void setRedirect(final boolean redirect);
 }

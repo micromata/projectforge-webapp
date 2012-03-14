@@ -23,7 +23,7 @@
 
 package org.projectforge.web.wicket.components;
 
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Radio;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -50,13 +50,13 @@ public class RadioButtonLabelPanel<T> extends Panel
     radioButton.setLabel(labelModel);
     // I18n key must be implemented as Model not as String because in constructor (before adding this component to parent) a warning will be
     // logged for using getString(String).
-    add(new Label("label", labelModel).add(new SimpleAttributeModifier("for", radioButton.getMarkupId())));
+    add(new Label("label", labelModel).add(AttributeModifier.replace("for", radioButton.getMarkupId())));
     setRenderBodyOnly(true);
   }
 
   public RadioButtonLabelPanel<T> setSubmitOnChange()
   {
-    radioButton.add(new SimpleAttributeModifier("onchange", "javascript:submit();"));
+    radioButton.add(AttributeModifier.replace("onchange", "javascript:submit();"));
     return this;
   }
 }

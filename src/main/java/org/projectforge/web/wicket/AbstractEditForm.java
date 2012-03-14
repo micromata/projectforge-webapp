@@ -24,18 +24,17 @@
 package org.projectforge.web.wicket;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
-import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.UserException;
-import org.projectforge.web.scripting.ScriptEditForm;
-import org.projectforge.web.timesheet.TimesheetEditForm;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.GridBuilder;
+import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 public abstract class AbstractEditForm<O extends AbstractBaseDO< ? >, P extends AbstractEditPage< ? , ? , ? >> extends
 AbstractSecuredForm<O, P>
@@ -44,11 +43,10 @@ AbstractSecuredForm<O, P>
 
   protected O data;
 
-  protected WebMarkupContainer buttonPanel;
-
-  protected WebMarkupContainer buttonCell;
-
-  protected WebMarkupContainer bottomRows;
+  /**
+   * List to create content menu in the desired order before creating the RepeatingView.
+   */
+  protected MyComponentsRepeater<SingleButtonPanel> actionButtons;
 
   protected Button cancelButton;
 
@@ -74,10 +72,9 @@ AbstractSecuredForm<O, P>
 
   protected FeedbackPanel feedbackPanel;
 
-  /**
-   * Change this value if the number of columns of your form table differ.
-   */
-  protected int colspan = 2;
+  protected GridBuilder gridBuilder;
+
+  protected RepeatingView flowform;
 
   public AbstractEditForm(final P parentPage, final O data)
   {
@@ -90,116 +87,158 @@ AbstractSecuredForm<O, P>
   protected void init()
   {
     super.init();
-    buttonCell = new WebMarkupContainer("buttonCell") {
-      @Override
-      public boolean isTransparentResolver()
-      {
-        return true;
-      }
+    addFeedbackPanel();
+    flowform = new RepeatingView("flowform");
+    add(flowform);
+    gridBuilder = newGridBuilder(flowform);
 
-      @Override
-      protected void onComponentTag(final ComponentTag tag)
-      {
-        tag.put("colspan", colspan - 1);
-      }
-    };
-    add(buttonCell);
-    feedbackPanel = new FeedbackPanel("feedback");
-    feedbackPanel.setOutputMarkupId(true);
-    add(feedbackPanel);
+    actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");
+    add(actionButtons.getRepeatingView());
+    {
+      cancelButton = new Button("button", new Model<String>("cancel")) {
+        @Override
+        public final void onSubmit()
+        {
+          try {
+            parentPage.cancel();
+          } catch (final UserException ex) {
+            AbstractEditForm.this.error(parentPage.translateParams(ex));
+          }
+        }
+      };
+      cancelButton.setDefaultFormProcessing(false); // No validation of the
+      final SingleButtonPanel cancelButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), cancelButton, getString("cancel"),
+          SingleButtonPanel.CANCEL);
+      actionButtons.add(cancelButtonPanel);
+    }
+    {
+      final Button markAsDeletedButton = new Button("button", new Model<String>("markAsDeleted")) {
+        @Override
+        public final void onSubmit()
+        {
+          try {
+            parentPage.markAsDeleted();
+          } catch (final UserException ex) {
+            AbstractEditForm.this.error(parentPage.translateParams(ex));
+          }
+        }
+      };
+      markAsDeletedButton.add(AttributeModifier.replace("onclick", "return showDeleteQuestionDialog();"));
+      markAsDeletedButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), markAsDeletedButton, getString("markAsDeleted"),
+          SingleButtonPanel.DELETE);
+      actionButtons.add(markAsDeletedButtonPanel);
+    }
+    {
+      final Button deleteButton = new Button("button", new Model<String>("delete")) {
+        @Override
+        public final void onSubmit()
+        {
+          try {
+            parentPage.delete();
+          } catch (final UserException ex) {
+            AbstractEditForm.this.error(parentPage.translateParams(ex));
+          }
+        }
+      };
+      deleteButton.add(AttributeModifier.replace("onclick", "return showDeleteQuestionDialog();"));
+      deleteButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), deleteButton, getString("delete"), SingleButtonPanel.DELETE);
+      deleteButton.setDefaultFormProcessing(false);
+      actionButtons.add(deleteButtonPanel);
+    }
+    {
+      final Button resetButton = new Button("button", new Model<String>("reset")) {
+        @Override
+        public final void onSubmit()
+        {
+          try {
+            parentPage.reset();
+          } catch (final UserException ex) {
+            AbstractEditForm.this.error(parentPage.translateParams(ex));
+          }
+        }
+      };
+      final SingleButtonPanel resetButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), resetButton, getString("reset"),
+          SingleButtonPanel.RESET);
+      resetButtonPanel.setVisible(false);
+      actionButtons.add(resetButtonPanel);
+    }
+    {
+      updateButton = new Button("button", new Model<String>("update")) {
+        @Override
+        public final void onSubmit()
+        {
+          try {
+            parentPage.update();
+          } catch (final UserException ex) {
+            AbstractEditForm.this.error(parentPage.translateParams(ex));
+          }
+        }
+      };
+      updateButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), updateButton, getString("update"));
+      actionButtons.add(updateButtonPanel);
+    }
+    {
+      updateAndNextButton = new Button("button", new Model<String>("updateAndNext")) {
+        @Override
+        public final void onSubmit()
+        {
+          try {
+            parentPage.updateAndNext();
+          } catch (final UserException ex) {
+            AbstractEditForm.this.error(parentPage.translateParams(ex));
+          }
+        }
+      };
+      updateAndNextButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), updateAndNextButton, getString("updateAndNext"));
+      actionButtons.add(updateAndNextButtonPanel);
+    }
+    {
+      createButton = new Button("button", new Model<String>("create")) {
+        @Override
+        public final void onSubmit()
+        {
+          try {
+            parentPage.create();
+          } catch (final UserException ex) {
+            AbstractEditForm.this.error(parentPage.translateParams(ex));
+          }
+        }
+      };
 
-    addButtonPanel();
-
-    updateButton = new Button("button", new Model<String>(getString("update"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.update();
-      }
-    };
-    updateButtonPanel = new SingleButtonPanel("update", updateButton);
-    add(updateButtonPanel);
-    updateAndNextButton = new Button("button", new Model<String>(getString("updateAndNext"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.updateAndNext();
-      }
-    };
-    updateAndNextButtonPanel = new SingleButtonPanel("updateAndNext", updateAndNextButton);
-    add(updateAndNextButtonPanel);
-    createButton = new Button("button", new Model<String>(getString("create"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.create();
-      }
-    };
-    createButtonPanel = new SingleButtonPanel("create", createButton);
-    add(createButtonPanel);
-    cancelButton = new Button("button", new Model<String>(getString("cancel"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.cancel();
-      }
-    };
-    cancelButton.add(WebConstants.BUTTON_CLASS_CANCEL);
-    cancelButton.setDefaultFormProcessing(false); // No validation of the
-    final SingleButtonPanel cancelButtonPanel = new SingleButtonPanel("cancel", cancelButton);
-    add(cancelButtonPanel);
-    undeleteButton = new Button("button", new Model<String>(getString("undelete"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.undelete();
-      }
-    };
-    undeleteButtonPanel = new SingleButtonPanel("undelete", undeleteButton);
-    add(undeleteButtonPanel);
-    final Button markAsDeletedButton = new Button("button", new Model<String>(getString("markAsDeleted"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.markAsDeleted();
-      }
-    };
-    markAsDeletedButton.add(new SimpleAttributeModifier("onclick", "return showDeleteQuestionDialog();"));
-    markAsDeletedButtonPanel = new SingleButtonPanel("markAsDeleted", markAsDeletedButton);
-    add(markAsDeletedButtonPanel);
-    final Button deleteButton = new Button("button", new Model<String>(getString("delete"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.delete();
-      }
-    };
-    deleteButton.add(new SimpleAttributeModifier("onclick", "return showDeleteQuestionDialog();"));
-    deleteButtonPanel = new SingleButtonPanel("delete", deleteButton);
-    deleteButton.add(WebConstants.BUTTON_CLASS_RESET);
-    deleteButton.setDefaultFormProcessing(false);
-    add(deleteButtonPanel);
-    final Button resetButton = new Button("button", new Model<String>(getString("reset"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.reset();
-      }
-    };
-    final SingleButtonPanel resetButtonPanel = new SingleButtonPanel("reset", resetButton);
-    resetButtonPanel.setVisible(false);
-    add(resetButtonPanel);
+      createButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), createButton, getString("create"));
+      actionButtons.add(createButtonPanel);
+    }
+    {
+      undeleteButton = new Button("button", new Model<String>("undelete")) {
+        @Override
+        public final void onSubmit()
+        {
+          try {
+            parentPage.undelete();
+          } catch (final UserException ex) {
+            AbstractEditForm.this.error(parentPage.translateParams(ex));
+          }
+        }
+      };
+      undeleteButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), undeleteButton, getString("undelete"));
+      actionButtons.add(undeleteButtonPanel);
+    }
     markDefaultButtons();
     updateButtonVisibility();
-
-    addBottomRows();
   }
 
   @Override
   public void onBeforeRender()
   {
+    actionButtons.render();
     updateButtonVisibility();
     super.onBeforeRender();
+  }
+
+  @SuppressWarnings("unchecked")
+  protected BaseDao<O> getBaseDao()
+  {
+    return (BaseDao<O>) parentPage.getBaseDao();
   }
 
   /**
@@ -209,8 +248,7 @@ AbstractSecuredForm<O, P>
   protected void updateButtonVisibility()
   {
     try {
-      @SuppressWarnings("unchecked")
-      final BaseDao<O> baseDao = (BaseDao<O>) parentPage.getBaseDao();
+      final BaseDao<O> baseDao = getBaseDao();
       if (isNew() == true) {
         updateButtonPanel.setVisible(false);
         updateAndNextButtonPanel.setVisible(false);
@@ -276,31 +314,10 @@ AbstractSecuredForm<O, P>
    */
   protected void markDefaultButtons()
   {
-    createButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    updateButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    updateAndNextButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    undeleteButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    deleteButtonPanel.add(WebConstants.BUTTON_CLASS_RESET);
-  }
-
-  /**
-   * Override this method if you need additional buttons. Example in {@link TimesheetEditForm#addButtonPanel()}.
-   */
-  protected void addButtonPanel()
-  {
-    buttonPanel = new WebMarkupContainer("buttonPanel");
-    buttonPanel.setVisible(false);
-    buttonCell.add(buttonPanel);
-  }
-
-  /**
-   * Override this for additional rows below the buttons. Example in {@link ScriptEditForm#addBottomRows()}.
-   */
-  protected void addBottomRows()
-  {
-    bottomRows = new WebMarkupContainer("bottomRows");
-    bottomRows.setVisible(false);
-    add(bottomRows);
+    createButtonPanel.setClassnames(SingleButtonPanel.DEFAULT_SUBMIT);
+    updateButtonPanel.setClassnames(SingleButtonPanel.DEFAULT_SUBMIT);
+    updateAndNextButtonPanel.setClassnames(SingleButtonPanel.DEFAULT_SUBMIT);
+    undeleteButtonPanel.setClassnames(SingleButtonPanel.DEFAULT_SUBMIT);
   }
 
   /**

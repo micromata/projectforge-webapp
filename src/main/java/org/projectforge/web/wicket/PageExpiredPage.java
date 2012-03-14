@@ -23,8 +23,8 @@
 
 package org.projectforge.web.wicket;
 
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.RestartResponseException;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.web.mobile.MenuMobilePage;
 
 /**

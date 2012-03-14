@@ -23,8 +23,8 @@
 
 package org.projectforge.web.wicket.components;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 
@@ -42,7 +42,7 @@ public class LabelForPanel extends Panel
     super(id);
     field.setOutputMarkupId(true);
     final Label label = new Label("label", text);
-    label.add(new SimpleAttributeModifier("for", field.getMarkupId()));
+    label.add(AttributeModifier.replace("for", field.getMarkupId()));
     add(label);
   }
 }

@@ -25,33 +25,31 @@ package org.projectforge.web.wicket;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.markup.html.panel.EmptyPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.projectforge.calendar.TimePeriod;
-import org.projectforge.common.DateHolder;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.common.ReflectionHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDO;
-import org.projectforge.core.BaseDao;
 import org.projectforge.core.UserException;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
@@ -59,6 +57,8 @@ import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 public abstract class AbstractListPage<F extends AbstractListForm< ? , ? >, D extends org.projectforge.core.IDao< ? >, O> extends
 AbstractSecuredPage implements ISelectCallerPage
 {
+  private static final long serialVersionUID = 622509418161777195L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractListPage.class);
 
   public static final String PARAMETER_KEY_STORE_FILTER = "storeFilter";
@@ -120,11 +120,6 @@ AbstractSecuredPage implements ISelectCallerPage
 
   protected RecentQueue<String> recentSearchTermsQueue;
 
-  /**
-   * Change this value if the number of columns of your form table differ.
-   */
-  protected int colspan = 2;
-
   protected static void addRowClick(final Item< ? > cellItem)
   {
     final Item< ? > row = (cellItem.findParent(Item.class));
@@ -141,7 +136,7 @@ AbstractSecuredPage implements ISelectCallerPage
   {
     if (massUpdate == true) {
       final Item< ? > row = (cellItem.findParent(Item.class));
-      row.add(new SimpleAttributeModifier("onclick", "javascript:rowCheckboxClick(this);"));
+      row.add(AttributeModifier.replace("onclick", "javascript:rowCheckboxClick(this);"));
     } else {
       addRowClick(cellItem);
     }
@@ -161,14 +156,14 @@ AbstractSecuredPage implements ISelectCallerPage
       final String i18nPrefix)
   {
     super(parameters);
-    if (parameters.containsKey(PARAMETER_KEY_STORE_FILTER) == true) {
-      final Boolean flag = parameters.getAsBoolean(PARAMETER_KEY_STORE_FILTER);
+    if (parameters.get(PARAMETER_KEY_STORE_FILTER) != null) {
+      final Boolean flag = WicketUtils.getAsBooleanObject(parameters, PARAMETER_KEY_STORE_FILTER);
       if (flag != null && flag == false) {
         storeFilter = false;
       }
     }
-    if (parameters.containsKey(PARAMETER_HIGHLIGHTED_ROW) == true) {
-      this.highlightedRowId = parameters.getAsInteger(PARAMETER_HIGHLIGHTED_ROW);
+    if (parameters.get(PARAMETER_HIGHLIGHTED_ROW) != null) {
+      this.highlightedRowId = WicketUtils.getAsInteger(parameters, PARAMETER_HIGHLIGHTED_ROW);
     }
     this.i18nPrefix = i18nPrefix;
     this.caller = caller;
@@ -198,6 +193,13 @@ AbstractSecuredPage implements ISelectCallerPage
   public Serializable getHighlightedRowId()
   {
     return highlightedRowId;
+  }
+
+  @Override
+  public void renderHead(final IHeaderResponse response)
+  {
+    super.renderHead(response);
+    response.renderCSSReference("styles/table.css");
   }
 
   private F getForm()
@@ -252,20 +254,6 @@ AbstractSecuredPage implements ISelectCallerPage
     WicketUtils.evaluatePageParameters(form, parameters, null, getBookmarkableFormProperties());
   }
 
-  /**
-   * Adds the filter as page parameter.
-   * @see org.projectforge.web.wicket.AbstractBasePage#getBookmarkPageExtendedParameters()
-   */
-  @Override
-  protected PageParameters getBookmarkPageExtendedParameters()
-  {
-    final PageParameters pageParameters = new PageParameters(getPageParameters());
-    WicketUtils.putPageParameters(getForm().getSearchFilter(), pageParameters, PARAMETER_KEY_FILTER, getBookmarkableFilterProperties());
-    WicketUtils.putPageParameters(getForm(), pageParameters, null, getBookmarkableFormProperties());
-    pageParameters.put(PARAMETER_KEY_STORE_FILTER, "false");
-    return pageParameters;
-  }
-
   protected String[] getBookmarkableFilterProperties()
   {
     return BOOKMARKABLE_FILTER_PROPERTIES;
@@ -282,7 +270,6 @@ AbstractSecuredPage implements ISelectCallerPage
     getForm();
     body.add(form);
     form.init();
-    body.add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     if (isSelectMode() == false && (accessChecker.isDemoUser() == true || getBaseDao().hasInsertAccess(getUser()) == true)) {
       newItemMenuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
         @Override
@@ -291,7 +278,8 @@ AbstractSecuredPage implements ISelectCallerPage
           redirectToEditPage(null);
         };
       }, getString("add"));
-      newItemMenuEntry.setAccessKey(WebConstants.ACCESS_KEY_ADD).setTooltip(getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP_TITLE), getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP));
+      newItemMenuEntry.setAccessKey(WebConstants.ACCESS_KEY_ADD).setTooltip(getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP_TITLE),
+          getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP));
       addContentMenuEntry(newItemMenuEntry);
     }
     final Label hintQuickSelectLabel = new Label("hintQuickSelect", new Model<String>(getString("hint.selectMode.quickselect"))) {
@@ -312,13 +300,13 @@ AbstractSecuredPage implements ISelectCallerPage
       addContentMenuEntry(massUpdateMenuEntry);
 
       ExternalLink link = new ExternalLink("link", "#");
-      link.add(new SimpleAttributeModifier("onclick", "javascript:selectAll();"));
+      link.add(AttributeModifier.replace("onclick", "javascript:selectAll();"));
       selectAllMenuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), link, getString("selectAll"));
       selectAllMenuEntry.setVisible(false);
       addContentMenuEntry(selectAllMenuEntry);
 
       link = new ExternalLink("link", "#");
-      link.add(new SimpleAttributeModifier("onclick", "javascript:deselectAll();"));
+      link.add(AttributeModifier.replace("onclick", "javascript:deselectAll();"));
       deselectAllMenuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), link, getString("deselectAll"));
       deselectAllMenuEntry.setVisible(false);
       addContentMenuEntry(deselectAllMenuEntry);
@@ -326,7 +314,7 @@ AbstractSecuredPage implements ISelectCallerPage
     form.add(hintQuickSelectLabel);
     addTopRightMenu();
     addTopPanel();
-    addBottomPanel();
+    addBottomPanel("bottomPanel");
     init();
     createDataTable();
   }
@@ -441,7 +429,7 @@ AbstractSecuredPage implements ISelectCallerPage
   public void refresh()
   {
     list = null; // Force reload of list
-    dataTable.setRowsPerPage(form.getPageSize());
+    dataTable.setItemsPerPage(form.getPageSize());
     addRecentSearchTerm();
   }
 
@@ -474,32 +462,33 @@ AbstractSecuredPage implements ISelectCallerPage
   @SuppressWarnings("serial")
   protected void addTopRightMenu()
   {
-    if (isSelectMode() == false && ((getBaseDao() instanceof BaseDao< ? >) || providesOwnRebuildDatabaseIndex() == true)) {
-      dropDownMenu.setVisible(true);
-      new AbstractReindexTopRightMenu(this, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
-        @Override
-        protected void rebuildDatabaseIndex(final boolean onlyNewest)
-        {
-          if (providesOwnRebuildDatabaseIndex() == true) {
-            ownRebuildDatabaseIndex(onlyNewest);
-          } else {
-            if (onlyNewest == true) {
-              ((BaseDao< ? >) getBaseDao()).rebuildDatabaseIndex4NewestEntries();
-            } else {
-              ((BaseDao< ? >) getBaseDao()).rebuildDatabaseIndex();
-            }
-          }
-        }
-
-        @Override
-        protected String getString(final String i18nKey)
-        {
-          return AbstractListPage.this.getString(i18nKey);
-        }
-      };
-    } else {
-      dropDownMenu.setVisible(false);
-    }
+    log.warn("****** WICKET 1.5 ********: topRightMenu");
+    // if (isSelectMode() == false && ((getBaseDao() instanceof BaseDao< ? >) || providesOwnRebuildDatabaseIndex() == true)) {
+    // dropDownMenu.setVisible(true);
+    // new AbstractReindexTopRightMenu(this, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
+    // @Override
+    // protected void rebuildDatabaseIndex(final boolean onlyNewest)
+    // {
+    // if (providesOwnRebuildDatabaseIndex() == true) {
+    // ownRebuildDatabaseIndex(onlyNewest);
+    // } else {
+    // if (onlyNewest == true) {
+    // ((BaseDao< ? >) getBaseDao()).rebuildDatabaseIndex4NewestEntries();
+    // } else {
+    // ((BaseDao< ? >) getBaseDao()).rebuildDatabaseIndex();
+    // }
+    // }
+    // }
+    //
+    // @Override
+    // protected String getString(final String i18nKey)
+    // {
+    // return NewAbstractListPage.this.getString(i18nKey);
+    // }
+    // };
+    // } else {
+    // dropDownMenu.setVisible(false);
+    // }
   }
 
   protected boolean providesOwnRebuildDatabaseIndex()
@@ -516,7 +505,7 @@ AbstractSecuredPage implements ISelectCallerPage
    */
   protected void addTopPanel()
   {
-    final Panel topPanel = new Panel("topPanel");
+    final Panel topPanel = new EmptyPanel("topPanel");
     topPanel.setVisible(false);
     form.add(topPanel);
   }
@@ -524,9 +513,9 @@ AbstractSecuredPage implements ISelectCallerPage
   /**
    * Override this method if you need a bottom panel. The default bottom panel is empty and not visible.
    */
-  protected void addBottomPanel()
+  protected void addBottomPanel(final String id)
   {
-    final Panel bottomPanel = new Panel("bottomPanel");
+    final Panel bottomPanel = new EmptyPanel(id);
     bottomPanel.setVisible(false);
     form.add(bottomPanel);
   }
@@ -552,10 +541,10 @@ AbstractSecuredPage implements ISelectCallerPage
    * @param ascending
    * @return
    */
-  protected DataTable<O> createDataTable(final List<IColumn<O>> columns, final String sortProperty, final boolean ascending)
+  protected DataTable<O> createDataTable(final List<IColumn<O>> columns, final String sortProperty, final SortOrder sortOrder)
   {
     final int pageSize = form.getPageSize();
-    return new DefaultDataTable<O>("table", columns, createSortableDataProvider(sortProperty, ascending), pageSize);
+    return new DefaultDataTable<O>("table", columns, createSortableDataProvider(sortProperty, sortOrder), pageSize);
     // return new AjaxFallbackDefaultDataTable<O>("table", columns, createSortableDataProvider(sortProperty, ascending), pageSize);
   }
 
@@ -564,9 +553,9 @@ AbstractSecuredPage implements ISelectCallerPage
    * @param sortProperty
    * @param ascending
    */
-  protected ISortableDataProvider<O> createSortableDataProvider(final String sortProperty, final boolean ascending)
+  protected ISortableDataProvider<O> createSortableDataProvider(final String sortProperty, final SortOrder sortOrder)
   {
-    return new ListPageSortableDataProvider(sortProperty, ascending);
+    return new ListPageSortableDataProvider(sortProperty, sortOrder);
   }
 
   /**
@@ -591,7 +580,7 @@ AbstractSecuredPage implements ISelectCallerPage
   /**
    * Calls getString(key) with key "[i18nPrefix].title.list" or "[i18nPrefix].title.list.select" dependent weather the list is shown for
    * browsing or selecting (select mode).
-   * @see org.projectforge.web.wicket.AbstractBasePage#getTitle()
+   * @see org.projectforge.web.wicket.AbstractUnsecureBasePage#getTitle()
    * @see #isSelectMode()
    */
   @Override
@@ -631,42 +620,6 @@ AbstractSecuredPage implements ISelectCallerPage
   {
     if ("modifiedByUserId".equals(property) == true) {
       form.getSearchFilter().setModifiedByUserId((Integer) selectedValue);
-      form.getSearchFilter().setUseModificationFilter(true);
-      refresh();
-    } else if ("startDateOfLastModification".equals(property) == true) {
-      if (selectedValue instanceof Date) {
-        // Date selected.
-        final Date date = (Date) selectedValue;
-        form.getSearchFilter().setStartTimeOfLastModification(date);
-      } else if (selectedValue instanceof TimePeriod) {
-        // Period selected.
-        final TimePeriod timePeriod = (TimePeriod) selectedValue;
-        form.getSearchFilter().setStartTimeOfLastModification(timePeriod.getFromDate());
-        final DateHolder stopDate = new DateHolder(timePeriod.getToDate());
-        stopDate.setEndOfDay();
-        form.getSearchFilter().setStopTimeOfLastModification(stopDate.getDate());
-        form.stopDateTimePanel.markModelAsChanged();
-      }
-      form.startDateTimePanel.markModelAsChanged();
-      form.getSearchFilter().setUseModificationFilter(true);
-      refresh();
-    } else if ("stopDateOfLastModification".equals(property) == true) {
-      if (selectedValue instanceof Date) {
-        // Date selected.
-        final Date date = (Date) selectedValue;
-        final DateHolder stopDate = new DateHolder(date);
-        stopDate.setEndOfDay();
-        form.getSearchFilter().setStopTimeOfLastModification(stopDate.getDate());
-      } else if (selectedValue instanceof TimePeriod) {
-        // Period selected.
-        final TimePeriod timePeriod = (TimePeriod) selectedValue;
-        form.getSearchFilter().setStartTimeOfLastModification(timePeriod.getFromDate());
-        final DateHolder stopDate = new DateHolder(timePeriod.getToDate());
-        stopDate.setEndOfDay();
-        form.getSearchFilter().setStopTimeOfLastModification(stopDate.getDate());
-        form.startDateTimePanel.markModelAsChanged();
-      }
-      form.stopDateTimePanel.markModelAsChanged();
       form.getSearchFilter().setUseModificationFilter(true);
       refresh();
     } else {
@@ -743,9 +696,9 @@ AbstractSecuredPage implements ISelectCallerPage
   {
     private static final long serialVersionUID = 6940805267003006161L;
 
-    public ListPageSortableDataProvider(final String property, final boolean ascending)
+    public ListPageSortableDataProvider(final String property, final SortOrder sortOrder)
     {
-      super(property, ascending);
+      super(property, sortOrder);
     }
 
     @Override

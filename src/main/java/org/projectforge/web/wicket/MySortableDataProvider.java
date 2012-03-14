@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
 import org.apache.wicket.model.IModel;
@@ -41,16 +42,16 @@ public abstract class MySortableDataProvider<O> extends SortableDataProvider<O>
    * @param property If null then no sort will be supported.
    * @param ascending
    */
-  public MySortableDataProvider(final String property, final boolean ascending)
+  public MySortableDataProvider(final String property, final SortOrder sortOrder)
   {
     // set default sort
     if (property != null) {
-      setSort(property, ascending);
+      setSort(property, sortOrder);
     } else {
-      setSort("NOSORT", ascending);
+      setSort("NOSORT", sortOrder);
     }
   }
-  
+
   public abstract List<O> getList();
 
   protected abstract IModel<O> getModel(O object);
@@ -58,15 +59,15 @@ public abstract class MySortableDataProvider<O> extends SortableDataProvider<O>
   /**
    * @see org.apache.wicket.markup.repeater.data.IDataProvider#iterator(int, int)
    */
-  public Iterator<O> iterator(int first, int count)
+  public Iterator<O> iterator(final int first, final int count)
   {
-    SortParam sp = getSort();
-    List<O> list = getList();
+    final SortParam sp = getSort();
+    final List<O> list = getList();
     if (list == null) {
       return null;
     }
     if ("NOSORT".equals(sp.getProperty()) == false) {
-      Comparator<O> comp = getComparator(sp.getProperty(), sp.isAscending());
+      final Comparator<O> comp = getComparator(sp.getProperty(), sp.isAscending());
       Collections.sort(list, comp);
     }
     return list.subList(first, first + count).iterator();
@@ -88,7 +89,7 @@ public abstract class MySortableDataProvider<O> extends SortableDataProvider<O>
   /**
    * @see org.apache.wicket.markup.repeater.data.IDataProvider#model(java.lang.Object)
    */
-  public IModel<O> model(O object)
+  public IModel<O> model(final O object)
   {
     return getModel(object);
   }

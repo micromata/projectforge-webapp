@@ -35,10 +35,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.datetime.DateConverter;
 import org.apache.wicket.util.convert.ConversionException;
 import org.projectforge.calendar.DayHolder;
+import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
-
 
 /**
  * Concepts and implementation based on Stripes DateTypeConverter implementation.
@@ -51,12 +51,22 @@ public abstract class MyAbstractDateConverter extends DateConverter
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MyAbstractDateConverter.class);
 
-  private Class< ? extends Date> targetType;
+  private final Class< ? extends Date> targetType;
+
+  private String userDateFormat;
 
   public MyAbstractDateConverter(final Class< ? extends Date> targetType)
   {
     super(true);
     this.targetType = targetType;
+  }
+
+  public String getPattern()
+  {
+    if (this.userDateFormat == null) {
+      this.userDateFormat = DateFormats.getFormatString(DateFormatType.DATE);
+    }
+    return this.userDateFormat;
   }
 
   /**
@@ -65,7 +75,7 @@ public abstract class MyAbstractDateConverter extends DateConverter
    * @see DateTimeFormatter#getFormattedDate(Object)
    */
   @Override
-  public String convertToString(final Object value, final Locale locale)
+  public String convertToString(final Date value, final Locale locale)
   {
     if (value == null) {
       return null;
@@ -93,8 +103,8 @@ public abstract class MyAbstractDateConverter extends DateConverter
     if (StringUtils.isBlank(value) == true) {
       return null;
     }
-    String[] formatStrings = getFormatStrings(locale);
-    SimpleDateFormat[] dateFormats = new SimpleDateFormat[formatStrings.length];
+    final String[] formatStrings = getFormatStrings(locale);
+    final SimpleDateFormat[] dateFormats = new SimpleDateFormat[formatStrings.length];
 
     for (int i = 0; i < formatStrings.length; i++) {
       dateFormats[i] = new SimpleDateFormat(formatStrings[i], locale);
@@ -107,21 +117,21 @@ public abstract class MyAbstractDateConverter extends DateConverter
     }
 
     // Step 1: pre-process the input to make it more palatable
-    String parseable = preProcessInput(value, locale);
+    final String parseable = preProcessInput(value, locale);
 
     // Step 2: try really hard to parse the input
     Date date = null;
-    for (DateFormat format : dateFormats) {
+    for (final DateFormat format : dateFormats) {
       try {
         date = format.parse(parseable);
         break;
-      } catch (ParseException pe) { /* Do nothing, we'll get lots of these. */
+      } catch (final ParseException pe) { /* Do nothing, we'll get lots of these. */
       }
     }
     // Step 3: If we successfully parsed, return a date, otherwise send back an error
     if (date != null) {
       if (ClassUtils.isAssignable(targetType, java.sql.Date.class) == true) {
-        DayHolder day = new DayHolder(date);
+        final DayHolder day = new DayHolder(date);
         return day.getSQLDate();
       }
       return date;
@@ -185,7 +195,7 @@ public abstract class MyAbstractDateConverter extends DateConverter
       }
     }
     final String str = buf.toString();
-    int count = buf.toString().split("[\\./\\s]").length;
+    final int count = buf.toString().split("[\\./\\s]").length;
     // Looks like we probably only have a day and month component, that won't work!
     if (count == 2) {
       if (str.charAt(str.length() - 1) != separatorChar) {

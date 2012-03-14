@@ -29,7 +29,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.util.convert.converters.BigDecimalConverter;
+import org.apache.wicket.util.convert.converter.BigDecimalConverter;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.user.PFUserContext;
@@ -42,7 +42,7 @@ public class CurrencyConverter extends BigDecimalConverter
 {
   private static final long serialVersionUID = -7006507810932242601L;
 
-  private String currency;
+  private final String currency;
 
   private BigDecimal totalAmount;
 
@@ -66,7 +66,8 @@ public class CurrencyConverter extends BigDecimalConverter
    * If total amount is given also a percentage value is supported.
    * @see org.apache.wicket.util.convert.converters.BigDecimalConverter#convertToObject(java.lang.String, java.util.Locale)
    */
-  public BigDecimal convertToObject(String value, Locale locale)
+  @Override
+  public BigDecimal convertToObject(String value, final Locale locale)
   {
     value = StringUtils.trimToEmpty(value);
     if (value.endsWith(currency) == true) {
@@ -79,7 +80,8 @@ public class CurrencyConverter extends BigDecimalConverter
     return super.convertToObject(value, locale);
   }
 
-  public String convertToString(Object value, Locale locale)
+  @Override
+  public String convertToString(final BigDecimal value, final Locale locale)
   {
     if (value == null) {
       return "";

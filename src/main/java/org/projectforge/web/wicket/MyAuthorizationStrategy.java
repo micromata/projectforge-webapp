@@ -29,6 +29,7 @@ import org.apache.wicket.authorization.Action;
 import org.apache.wicket.authorization.IAuthorizationStrategy;
 import org.apache.wicket.authorization.IUnauthorizedComponentInstantiationListener;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.request.component.IRequestableComponent;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.mobile.AbstractSecuredMobilePage;
 import org.projectforge.web.mobile.LoginMobilePage;
@@ -44,21 +45,25 @@ public class MyAuthorizationStrategy implements IAuthorizationStrategy, IUnautho
     return true;
   }
 
-  public <T extends Component> boolean isInstantiationAuthorized(final Class<T> componentClass)
-  {
-    if (WebPage.class.isAssignableFrom(componentClass) == true) {
-      if (MySession.get().isAuthenticated() == true) {
-        return true;
-      }
-      if (NewAbstractSecuredBasePage.class.isAssignableFrom(componentClass) == true
-          || AbstractSecuredBasePage.class.isAssignableFrom(componentClass) == true
-          || AbstractSecuredMobilePage.class.isAssignableFrom(componentClass) == true) {
-        return false;
-      }
+  /**
+   * @see org.apache.wicket.authorization.IAuthorizationStrategy#isInstantiationAuthorized(java.lang.Class)
+   */
+  @Override
+  public <T extends IRequestableComponent> boolean isInstantiationAuthorized(final Class<T> componentClass)
+  {    if (WebPage.class.isAssignableFrom(componentClass) == true) {
+    if (MySession.get().isAuthenticated() == true) {
+      return true;
     }
-    return true;
+    if (AbstractSecuredBasePage.class.isAssignableFrom(componentClass) == true
+        || AbstractSecuredBasePage.class.isAssignableFrom(componentClass) == true
+        || AbstractSecuredMobilePage.class.isAssignableFrom(componentClass) == true) {
+      return false;
+    }
+  }
+  return true;
   }
 
+  @Override
   public void onUnauthorizedInstantiation(final Component component)
   {
     if (MySession.get().isMobileUserAgent() == true) {
@@ -67,4 +72,5 @@ public class MyAuthorizationStrategy implements IAuthorizationStrategy, IUnautho
       throw new RestartResponseAtInterceptPageException(LoginPage.class);
     }
   }
+
 }

@@ -24,12 +24,10 @@
 package org.projectforge.web.wicket.components;
 
 import org.apache.commons.lang.ClassUtils;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
-import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.convert.IConverter;
 import org.apache.wicket.validation.validator.StringValidator.MaximumLengthValidator;
@@ -41,21 +39,8 @@ public class MaxLengthTextField extends TextField<String>
 
   private static final long serialVersionUID = -6577192527741433068L;
 
+  @SuppressWarnings("rawtypes")
   private IConverter converter;
-
-  /**
-   * Use constructor with parent and/or label params instead.
-   */
-  @Deprecated
-  public MaxLengthTextField(final String id, final IModel<String> model)
-  {
-    this(null, id, null, model);
-  }
-
-  public MaxLengthTextField(final String id, final String label, final IModel<String> model)
-  {
-    this(null, id, label, model);
-  }
 
   /**
    * Tries to get the length definition of the Hibernate configuration. If not available then a warning will be logged. Example:
@@ -64,14 +49,12 @@ public class MaxLengthTextField extends TextField<String>
    * &lt;label wicket:id="streetLabel"&gt;[street]&lt;/&gt;&lt;input type="text" wicket:id="street" /&gt;<br/>
    * add(new MaxLengthTextField(this, "street", "address.street", model);
    * </pre>
-   * @param parent if not null and label is not null than a label with wicket id [id]Label is added.
    * @param id
-   * @param label needed for validation error messages. Is also used for setting label via wicket id [label]Label.
    * @param model
    * @see org.apache.wicket.Component#Component(String, IModel)
    * @see FormComponent#setLabel(IModel)
    */
-  public MaxLengthTextField(final WebMarkupContainer parent, final String id, final String label, final IModel<String> model)
+  public MaxLengthTextField(final String id, final IModel<String> model)
   {
     super(id, model);
     Integer length = null;
@@ -82,21 +65,7 @@ public class MaxLengthTextField extends TextField<String>
         log.warn("No length validation for: " + model);
       }
     }
-    init(parent, id, label, length);
-  }
-
-  /**
-   * Use constructor with parent and/or label params instead.
-   */
-  @Deprecated
-  public MaxLengthTextField(final String id, final IModel<String> model, final int maxLength)
-  {
-    this(null, id, null, model, maxLength);
-  }
-
-  public MaxLengthTextField(final String id, final String label, final IModel<String> model, final int maxLength)
-  {
-    this(null, id, label, model, maxLength);
+    init(id, length);
   }
 
   /**
@@ -108,43 +77,39 @@ public class MaxLengthTextField extends TextField<String>
    * </pre>
    * @param parent if not null and label is not null than a label with wicket id [id]Label is added.
    * @param id
-   * @param label needed for validation error messages. Is also used for setting label via wicket id [label]Label.
    * @param model
    * @param maxLength
    * @see org.apache.wicket.Component#Component(String, IModel)
    * @see FormComponent#setLabel(IModel)
    */
-  public MaxLengthTextField(final WebMarkupContainer parent, final String id, final String label, final IModel<String> model,
-      final int maxLength)
+  public MaxLengthTextField(final String id, final IModel<String> model, final int maxLength)
   {
     super(id, model);
     if (ClassUtils.isAssignable(model.getClass(), PropertyModel.class)) {
-      PropertyModel< ? > propertyModel = (PropertyModel< ? >) model;
+      final PropertyModel< ? > propertyModel = (PropertyModel< ? >) model;
       final Integer dbMaxLength = HibernateUtils.getPropertyLength(propertyModel.getTarget().getClass().getName(), propertyModel
           .getPropertyField().getName());
       if (dbMaxLength != null && dbMaxLength < maxLength) {
         log.warn("Data base length of given property is less than given maxLength: " + model);
       }
     }
-    init(parent, id, label, maxLength);
+    init(id, maxLength);
   }
 
-  private void init(final WebMarkupContainer parent, final String id, final String label, final Integer maxLength)
+  private void init(final String id, final Integer maxLength)
   {
-    if (label != null) {
-      setLabel(new Model<String>(label));
-      if (parent != null) {
-        parent.add(new LabelForPanel(id + "Label", this, label));
-      }
-    }
     if (maxLength != null) {
       add(new MaximumLengthValidator(maxLength));
-      add(new SimpleAttributeModifier("maxlength", String.valueOf(maxLength)));
+      add(AttributeModifier.replace("maxlength", String.valueOf(maxLength)));
     }
   }
 
+  /**
+   * @see org.apache.wicket.Component#getConverter(java.lang.Class)
+   */
+  @SuppressWarnings("unchecked")
   @Override
-  public IConverter getConverter(Class< ? > type)
+  public <C> IConverter<C> getConverter(final Class<C> type)
   {
     if (converter != null) {
       return converter;
@@ -158,7 +123,7 @@ public class MaxLengthTextField extends TextField<String>
    * @param converter
    * @return This for chaining.
    */
-  public MaxLengthTextField setConverter(final IConverter converter)
+  public <C> MaxLengthTextField setConverter(final IConverter<C> converter)
   {
     this.converter = converter;
     return this;

@@ -23,13 +23,15 @@
 
 package org.projectforge.web.wicket;
 
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 
 public class WebConstants
 {
   public static final String FILE_IMAGE_DIMENSIONS = "imageDimensions.xml";
 
   public static final String FILE_I18N_KEYS = "i18nKeys.properties";
+
+  public static final String HTML_TEXT_DIVIDER = " | ";
 
   /**
    * The access key for adding new entries in list view.
@@ -48,6 +50,23 @@ public class WebConstants
   public static final String PARAMETER_DATE = "date";
 
   private static final String DIR = "/images/";
+
+  public static final String DOC_LINK_HANDBUCH_LUCENE = "/secure/doc/Handbuch.html#label_volltextsuche";
+
+  @Deprecated
+  public static final String EMBATS_ARROW_LEFT = DIR + "embats-arrow-left.png";
+
+  @Deprecated
+  public static final String EMBATS_CROSS = DIR + "embats-cross.png";
+
+  @Deprecated
+  public static final String EMBATS_PIN = DIR + "embats-pin.png";
+
+  @Deprecated
+  public static final String EMBATS_PLUS = DIR + "embats-plus.png";
+
+  @Deprecated
+  public static final String EMBATS_ARROW_RIGHT = DIR + "embats-arrow-right.png";
 
   public static final String IMAGE_ACCEPT = DIR + "accept.png";
 
@@ -201,15 +220,5 @@ public class WebConstants
    */
   public static final String CSS_INPUT_STDTEXT = "stdtext";
 
-  public static final SimpleAttributeModifier BUTTON_CLASS = new SimpleAttributeModifier("class", "button");
-
-  public static final SimpleAttributeModifier BUTTON_CLASS_CANCEL = new SimpleAttributeModifier("class", "button");
-
-  public static final SimpleAttributeModifier BUTTON_CLASS_NOBUTTON = new SimpleAttributeModifier("class", "nobutton");
-
-  public static final SimpleAttributeModifier BUTTON_CLASS_RESET = new SimpleAttributeModifier("class", "reset");
-
-  public static final SimpleAttributeModifier BUTTON_CLASS_DEFAULT = new SimpleAttributeModifier("class", "submit");
-
-  public static final SimpleAttributeModifier HELP_CLASS = new SimpleAttributeModifier("class", "help");
+  public static final AttributeModifier HELP_CLASS = AttributeModifier.replace("class", "help");
 }

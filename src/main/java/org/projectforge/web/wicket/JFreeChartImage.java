@@ -26,11 +26,12 @@ package org.projectforge.web.wicket;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.apache.wicket.Resource;
 import org.apache.wicket.markup.html.image.Image;
-import org.apache.wicket.markup.html.image.resource.DynamicImageResource;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.protocol.http.WebResponse;
+import org.apache.wicket.request.http.WebResponse.CacheScope;
+import org.apache.wicket.request.resource.AbstractResource;
+import org.apache.wicket.request.resource.DynamicImageResource;
+import org.apache.wicket.util.time.Duration;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.projectforge.export.JFreeChartImageType;
@@ -41,11 +42,11 @@ public class JFreeChartImage extends Image
 
   private static final long serialVersionUID = 7083627817914127250L;
 
-  private int width;
+  private final int width;
 
-  private int height;
+  private final int height;
 
-  private JFreeChartImageType imageType;
+  private final JFreeChartImageType imageType;
 
   public JFreeChartImage(final String id, final JFreeChart chart, final int width, final int height)
   {
@@ -62,12 +63,13 @@ public class JFreeChartImage extends Image
 
   @SuppressWarnings("serial")
   @Override
-  protected Resource getImageResource()
+  protected AbstractResource getImageResource()
   {
     final String format = this.imageType == JFreeChartImageType.JPEG ? "jpg" : "png";
-    return new DynamicImageResource(format) {
+    return new DynamicImageResource() {
+
       @Override
-      protected byte[] getImageData()
+      protected byte[] getImageData(final Attributes attributes)
       {
         try {
           final JFreeChart chart = (JFreeChart) getDefaultModelObject();
@@ -86,15 +88,14 @@ public class JFreeChartImage extends Image
       }
 
       @Override
-      protected void setHeaders(WebResponse response)
+      protected void configureResponse(final ResourceResponse response, final Attributes attributes)
       {
-        if (isCacheable()) {
-          super.setHeaders(response);
-        } else {
-          response.setHeader("Pragma", "no-cache");
-          response.setHeader("Cache-Control", "no-cache");
-          response.setDateHeader("Expires", 0);
-        }
+        super.configureResponse(response, attributes);
+
+        // if (isCacheable() == false) {
+        response.setCacheDuration(Duration.NONE);
+        response.setCacheScope(CacheScope.PRIVATE);
+        // }
       }
     };
   }

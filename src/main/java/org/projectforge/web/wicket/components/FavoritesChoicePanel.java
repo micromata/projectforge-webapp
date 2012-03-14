@@ -24,7 +24,7 @@
 package org.projectforge.web.wicket.components;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponentPanel;
 import org.apache.wicket.model.PropertyModel;
@@ -34,7 +34,6 @@ import org.projectforge.user.UserPrefDO;
 import org.projectforge.user.UserPrefDao;
 import org.projectforge.web.user.UserPrefEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
-import org.projectforge.web.wicket.AttributeAppendModifier;
 
 /**
  * Combo box for showing and selecting favorites quickly.
@@ -57,7 +56,7 @@ public abstract class FavoritesChoicePanel<T, F> extends FormComponentPanel<Stri
   private DropDownChoice<String> choice;
 
   private Integer tabIndex;
-  
+
   private String cssClass;
 
   private UserPrefArea userPrefArea;
@@ -65,7 +64,7 @@ public abstract class FavoritesChoicePanel<T, F> extends FormComponentPanel<Stri
   private boolean clearSelectionAfterSelection = true;
 
   private String nullKey;
-  
+
   @SuppressWarnings("unused")
   private String dummy;
 
@@ -129,11 +128,11 @@ public abstract class FavoritesChoicePanel<T, F> extends FormComponentPanel<Stri
     };
     choice.setNullValid(true);
     if (tabIndex != null) {
-      choice.add(new SimpleAttributeModifier("tabindex", String.valueOf(tabIndex)));
+      choice.add(AttributeModifier.replace("tabindex", String.valueOf(tabIndex)));
     }
-    
+
     if(cssClass != null){
-    	choice.add(new AttributeAppendModifier("class", cssClass));
+      choice.add(AttributeModifier.append("class", cssClass));
     }
     add(choice);
     return choice;
@@ -167,19 +166,27 @@ public abstract class FavoritesChoicePanel<T, F> extends FormComponentPanel<Stri
    * @param clearSelectionAfterSelection
    * @return this.
    */
-  public FavoritesChoicePanel<T, F> setClearSelectionAfterSelection(boolean clearSelectionAfterSelection)
+  public FavoritesChoicePanel<T, F> setClearSelectionAfterSelection(final boolean clearSelectionAfterSelection)
   {
     this.clearSelectionAfterSelection = clearSelectionAfterSelection;
     return this;
   }
 
-  public FavoritesChoicePanel<T, F> setNullKey(String nullKey)
+  public FavoritesChoicePanel<T, F> setNullKey(final String nullKey)
   {
     this.nullKey = nullKey;
     return this;
   }
 
-  public void setSelected(String selected)
+  /**
+   * @return the selected
+   */
+  public String getSelected()
+  {
+    return selected;
+  }
+
+  public void setSelected(final String selected)
   {
     this.selected = selected;
   }

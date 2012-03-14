@@ -61,7 +61,7 @@ public class TimeZonePanel extends Panel
     Arrays.sort(availableTimeZones);
     final List<TimeZone> list = getAsTimeZoneObjects(availableTimeZones);
     final List<String> favoritesIds = new ArrayList<String>();
-    for (PFUserDO user : userGroupCache.getAllUsers()) {
+    for (final PFUserDO user : userGroupCache.getAllUsers()) {
       final String timeZone = user.getTimeZone();
       if (timeZone == null) {
         continue;
@@ -74,7 +74,7 @@ public class TimeZonePanel extends Panel
     final List<TimeZone> favoriteTimeZones = getAsTimeZoneObjects(favoriteIds);
     final PFAutoCompleteTextField<TimeZone> textField = new PFAutoCompleteTextField<TimeZone>("input", model) {
       @Override
-      protected List<TimeZone> getChoices(String input)
+      protected List<TimeZone> getChoices(final String input)
       {
         final List<TimeZone> result = new ArrayList<TimeZone>();
         for (final TimeZone timeZone : list) {
@@ -86,8 +86,11 @@ public class TimeZonePanel extends Panel
         return result;
       }
 
+      /**
+       * @see org.apache.wicket.Component#getConverter(java.lang.Class)
+       */
       @Override
-      public IConverter getConverter(Class< ? > type)
+      public <C> IConverter<C> getConverter(final Class<C> type)
       {
         return converter;
       }
@@ -99,7 +102,7 @@ public class TimeZonePanel extends Panel
       }
 
       @Override
-      protected String formatValue(TimeZone value)
+      protected String formatValue(final TimeZone value)
       {
         return converter.convertToString(value, getLocale());
       }

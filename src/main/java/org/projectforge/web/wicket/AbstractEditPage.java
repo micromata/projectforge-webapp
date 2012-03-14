@@ -29,11 +29,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.HeadersToolbar;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -43,10 +43,10 @@ import org.apache.wicket.markup.repeater.data.IDataProvider;
 import org.apache.wicket.markup.repeater.data.ListDataProvider;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
-import org.projectforge.common.NumberHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.DisplayHistoryEntry;
@@ -61,6 +61,8 @@ import org.projectforge.web.user.UserPropertyColumn;
 public abstract class AbstractEditPage<O extends AbstractBaseDO< ? >, F extends AbstractEditForm<O, ? >, D extends BaseDao<O>> extends
 AbstractSecuredPage implements IEditPage<O, D>
 {
+  private static final long serialVersionUID = 8283877351980165438L;
+
   public static final String PARAMETER_KEY_ID = "id";
 
   public static final String PARAMETER_KEY_DATA_PRESET = "__data";
@@ -101,7 +103,7 @@ AbstractSecuredPage implements IEditPage<O, D>
     init(null);
   }
 
-  @SuppressWarnings( { "serial", "unchecked"})
+  @SuppressWarnings({ "serial", "unchecked"})
   protected void init(O data)
   {
     final StringBuffer buf = new StringBuffer();
@@ -113,13 +115,13 @@ AbstractSecuredPage implements IEditPage<O, D>
     }
     buf.append("');\n}\n");
     body.add(new Label("showDeleteQuestionDialog", buf.toString()).setEscapeModelStrings(false));
-    final Integer id = getPageParameters().getAsInteger(PARAMETER_KEY_ID);
+    final Integer id = WicketUtils.getAsInteger(getPageParameters(), PARAMETER_KEY_ID);
     if (data == null) {
-      if (NumberHelper.greaterZero(id) == true) {
+      if (id != null) {
         data = getBaseDao().getById(id);
       }
       if (data == null) {
-        data = (O) getPageParameters().get(PARAMETER_KEY_DATA_PRESET);
+        data = (O) WicketUtils.getAsObject(getPageParameters(), PARAMETER_KEY_DATA_PRESET, getBaseDao().newInstance().getClass());
         if (data == null) {
           data = getBaseDao().newInstance();
         }
@@ -133,13 +135,14 @@ AbstractSecuredPage implements IEditPage<O, D>
       showHistory = false;
       showModificationTimes = false;
     }
+    body.add(new Label("tabTitle", getTitle()).setRenderBodyOnly(true));
     final List<IColumn<DisplayHistoryEntry>> columns = new ArrayList<IColumn<DisplayHistoryEntry>>();
     final CellItemListener<DisplayHistoryEntry> cellItemListener = new CellItemListener<DisplayHistoryEntry>() {
       public void populateItem(final Item<ICellPopulator<DisplayHistoryEntry>> item, final String componentId,
           final IModel<DisplayHistoryEntry> rowModel)
       {
         // Later a link should show the history entry as popup.
-        item.add(new AttributeModifier("class", true, new Model<String>("notrlink")));
+        item.add(AttributeModifier.append("class", new Model<String>("notrlink")));
       }
     };
     final DatePropertyColumn<DisplayHistoryEntry> timestampColumn = new DatePropertyColumn<DisplayHistoryEntry>(dateTimeFormatter,
@@ -178,9 +181,8 @@ AbstractSecuredPage implements IEditPage<O, D>
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    final IColumn<DisplayHistoryEntry>[] colArray = columns.toArray(new IColumn[columns.size()]);
     final IDataProvider<DisplayHistoryEntry> dataProvider = new ListDataProvider<DisplayHistoryEntry>(getHistory());
-    final DataTable<DisplayHistoryEntry> dataTable = new DataTable<DisplayHistoryEntry>("historyTable", colArray, dataProvider, 100) {
+    final DataTable<DisplayHistoryEntry> dataTable = new DataTable<DisplayHistoryEntry>("historyTable", columns, dataProvider, 100) {
       @Override
       protected Item<DisplayHistoryEntry> newRowItem(final String id, final int index, final IModel<DisplayHistoryEntry> model)
       {
@@ -196,26 +198,22 @@ AbstractSecuredPage implements IEditPage<O, D>
     final HeadersToolbar headersToolbar = new HeadersToolbar(dataTable, null);
     dataTable.addTopToolbar(headersToolbar);
     body.add(dataTable);
-    final WebMarkupContainer table = new WebMarkupContainer("timeOfModifications");
-    table.setVisible(showModificationTimes);
-    body.add(table);
     final Label timeOfCreationLabel = new Label("timeOfCreation", dateTimeFormatter.getFormattedDateTime(data.getCreated()));
     timeOfCreationLabel.setRenderBodyOnly(true);
-    table.add(timeOfCreationLabel);
+    body.add(timeOfCreationLabel);
     final Label timeOfLastUpdateLabel = new Label("timeOfLastUpdate", dateTimeFormatter.getFormattedDateTime(data.getLastUpdate()));
     timeOfLastUpdateLabel.setRenderBodyOnly(true);
-    table.add(timeOfLastUpdateLabel);
+    body.add(timeOfLastUpdateLabel);
     onPreEdit();
     evaluatePageParameters(getPageParameters());
-    addBottomPanel();
     this.editPageSupport = new EditPageSupport<O, D>(this, getBaseDao(), getData());
   }
 
   @Override
-  protected void onAfterRender()
+  public void renderHead(final IHeaderResponse response)
   {
-    super.onAfterRender();
-    showHistory = false;
+    super.renderHead(response);
+    response.renderCSSReference("styles/table.css");
   }
 
   protected List<DisplayHistoryEntry> getHistory()
@@ -237,7 +235,7 @@ AbstractSecuredPage implements IEditPage<O, D>
   /**
    * Will be called before the data object will be stored. Does nothing at default. Any return value is not yet supported.
    */
-  public AbstractBasePage onSaveOrUpdate()
+  public AbstractSecuredBasePage onSaveOrUpdate()
   {
     // Do nothing at default
     return null;
@@ -248,7 +246,7 @@ AbstractSecuredPage implements IEditPage<O, D>
    * returns a resolution then a redirect to this resolution without calling the baseDao methods will done. <br/>
    * Here you can do validations with add(Global)Error or manipulate the data object before storing to the database etc.
    */
-  public AbstractBasePage onDelete()
+  public AbstractSecuredBasePage onDelete()
   {
     // Do nothing at default
     return null;
@@ -259,7 +257,7 @@ AbstractSecuredPage implements IEditPage<O, D>
    * a resolution then a redirect to this resolution without calling the baseDao methods will done. <br/>
    * Here you can do validations with add(Global)Error or manipulate the data object before storing to the database etc.
    */
-  public AbstractBasePage onUndelete()
+  public AbstractSecuredBasePage onUndelete()
   {
     // Do nothing at default
     return null;
@@ -269,7 +267,7 @@ AbstractSecuredPage implements IEditPage<O, D>
    * Will be called directly after storing the data object (insert, update, delete). If any page is returned then proceed a redirect to this
    * given page.
    */
-  public AbstractBasePage afterSaveOrUpdate()
+  public AbstractSecuredBasePage afterSaveOrUpdate()
   {
     // Do nothing at default.
     return null;
@@ -278,7 +276,7 @@ AbstractSecuredPage implements IEditPage<O, D>
   /**
    * Will be called directly after storing the data object (insert). Any return value is not yet supported.
    */
-  public AbstractBasePage afterSave()
+  public AbstractSecuredBasePage afterSave()
   {
     // Do nothing at default.
     return null;
@@ -290,7 +288,7 @@ AbstractSecuredPage implements IEditPage<O, D>
    *          returned to stripes controller.
    * @see BaseDao#update(ExtendedBaseDO)
    */
-  public AbstractBasePage afterUpdate(final boolean modified)
+  public AbstractSecuredBasePage afterUpdate(final boolean modified)
   {
     // Do nothing at default.
     return null;
@@ -412,14 +410,16 @@ AbstractSecuredPage implements IEditPage<O, D>
       setResponsePageAndHighlightedRow(this.returnToPage);
     } else {
       final EditPage ann = getClass().getAnnotation(EditPage.class);
-      final Class< ? extends AbstractSecuredPage> redirectPage;
+      final Class< ? extends WebPage> redirectPage;
       if (ann != null && ann.defaultReturnPage() != null) {
         redirectPage = getClass().getAnnotation(EditPage.class).defaultReturnPage();
       } else {
         redirectPage = WicketUtils.getDefaultPage();
       }
       final PageParameters params = new PageParameters();
-      params.put(AbstractListPage.PARAMETER_HIGHLIGHTED_ROW, getData().getId());
+      if (getData().getId() != null) {
+        params.add(AbstractListPage.PARAMETER_HIGHLIGHTED_ROW, getData().getId());
+      }
       setResponsePage(redirectPage, params);
     }
   }
@@ -457,20 +457,9 @@ AbstractSecuredPage implements IEditPage<O, D>
   }
 
   /**
-   * Override this for additional content at the bottom (above the history table). Example in
-   * {@link org.projectforge.web.gantt.GanttChartEditPage#addBottomPanel()}.
-   */
-  protected void addBottomPanel()
-  {
-    bottomPanel = new WebMarkupContainer("bottomPanel");
-    bottomPanel.setVisible(false);
-    body.add(bottomPanel);
-  }
-
-  /**
    * Calls getString(key) with key "[i18nPrefix].title.edit" or "[i18nPrefix].title.add" dependent weather the data object is already
    * existing or new.
-   * @see org.projectforge.web.wicket.AbstractBasePage#getTitle()
+   * @see org.projectforge.web.wicket.AbstractUnsecurePage#getTitle()
    */
   @Override
   protected String getTitle()
@@ -508,21 +497,19 @@ AbstractSecuredPage implements IEditPage<O, D>
    * Overwrite this method if you want to add required page parameters for your bookmarks (basic direct link).
    * @return null at default.
    */
-  @Override
   protected PageParameters getBookmarkRequiredPageParameters()
   {
     final PageParameters parameters = new PageParameters();
     if (getData().getId() != null) {
-      parameters.put("id", getData().getId());
+      parameters.add("id", getData().getId());
     }
     return parameters;
   }
 
   /**
    * Adds the filter as page parameter.
-   * @see org.projectforge.web.wicket.AbstractBasePage#getBookmarkPageExtendedParameters()
+   * @see org.projectforge.web.wicket.AbstractUnsecurePage#getBookmarkPageExtendedParameters()
    */
-  @Override
   protected PageParameters getBookmarkPageExtendedParameters()
   {
     final PageParameters pageParameters = new PageParameters(getPageParameters());
@@ -555,6 +542,14 @@ AbstractSecuredPage implements IEditPage<O, D>
   public void setAlreadySubmitted(final boolean alreadySubmitted)
   {
     this.alreadySubmitted = alreadySubmitted;
+  }
+
+  /**
+   * @return the form
+   */
+  public F getForm()
+  {
+    return form;
   }
 
   protected abstract D getBaseDao();

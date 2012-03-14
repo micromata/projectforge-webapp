@@ -41,20 +41,7 @@ public class I18nEnumAutoCompleteTextField<T extends I18nEnum> extends PFAutoCom
 {
   private static final long serialVersionUID = 8174480171305510104L;
 
-  private T[] supportedValues;
-
-  /**
-   * Construct.
-   * 
-   * @param id
-   * @param model
-   * @param type
-   * @param settings
-   */
-  public I18nEnumAutoCompleteTextField(final String id, final IModel<T> model, final T[] supportedValues)
-  {
-    this(id, model, PFAutoCompleteRenderer.INSTANCE, new PFAutoCompleteSettings(), supportedValues);
-  }
+  private final T[] supportedValues;
 
   /**
    * @param id
@@ -63,16 +50,16 @@ public class I18nEnumAutoCompleteTextField<T extends I18nEnum> extends PFAutoCom
    * @param type
    * @param settings
    */
-  public I18nEnumAutoCompleteTextField(final String id, final String label, final IModel<T> model, final T[] supportedValues)
+  public I18nEnumAutoCompleteTextField(final String id, final IModel<T> model, final T[] supportedValues)
   {
-    super(id, label, model);
+    super(id,model);
     this.supportedValues = supportedValues;
   }
 
-  public I18nEnumAutoCompleteTextField(final String id, final IModel<T> model, final IAutoCompleteRenderer<String> renderer,
+  public I18nEnumAutoCompleteTextField(final String id,final IModel<T> model, final IAutoCompleteRenderer<String> renderer,
       final PFAutoCompleteSettings settings, final T[] supportedValues)
   {
-    super(id, model, renderer, settings);
+    super(id,  model, renderer, settings);
     this.supportedValues = supportedValues;
   }
 
@@ -87,6 +74,7 @@ public class I18nEnumAutoCompleteTextField<T extends I18nEnum> extends PFAutoCom
   }
 
 
+  @Override
   protected List<T> getChoices(final String input)
   {
     final List<T> list = new ArrayList<T>();
@@ -95,7 +83,7 @@ public class I18nEnumAutoCompleteTextField<T extends I18nEnum> extends PFAutoCom
     }
     return list;
   }
-  
+
   @Override
   protected String formatLabel(final T value)
   {
@@ -114,10 +102,12 @@ public class I18nEnumAutoCompleteTextField<T extends I18nEnum> extends PFAutoCom
     return getString(((I18nEnum)value).getI18nKey());
   }
 
+  /**
+   * @see org.apache.wicket.Component#getConverter(java.lang.Class)
+   */
   @Override
-  public IConverter getConverter(final Class< ? > type)
+  public <C> IConverter<C> getConverter(final Class<C> type)
   {
     return new I18nEnumConverter(this, supportedValues);
   }
-
 }

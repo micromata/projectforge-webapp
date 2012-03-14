@@ -45,6 +45,11 @@ public class WicketAjaxUtils
         newElementMarkupId, containerMarkupId, elementMarkupId);
   }
 
+  /**
+   * @param containerMarkupId The container which contains the element to remove.
+   * @param markupId The id of the element to remove.
+   * @return
+   */
   public static String removeChild(final String containerMarkupId, final String markupId)
   {
     return String.format("var item=document.getElementById('%s');Wicket.$('%s').removeChild(item);", markupId, containerMarkupId);

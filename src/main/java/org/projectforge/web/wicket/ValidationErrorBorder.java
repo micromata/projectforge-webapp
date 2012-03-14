@@ -23,14 +23,14 @@
 
 package org.projectforge.web.wicket;
 
-import org.apache.wicket.markup.html.border.MarkupComponentBorder;
+import org.apache.wicket.markup.html.border.BorderBehavior;
 
 /**
  * Border around the form components with validation errors.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  *
  */
-public class ValidationErrorBorder extends MarkupComponentBorder
+public class ValidationErrorBorder extends BorderBehavior
 {
   private static final long serialVersionUID = 6652826260821260945L;
 }

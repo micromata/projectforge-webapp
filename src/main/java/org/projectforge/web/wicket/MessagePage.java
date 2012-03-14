@@ -24,9 +24,9 @@
 package org.projectforge.web.wicket;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 /**
  * Standard error page should be shown in production mode.
@@ -36,6 +36,8 @@ import org.apache.wicket.model.Model;
  */
 public class MessagePage extends AbstractSecuredPage
 {
+  private static final long serialVersionUID = 7003922513287662706L;
+
   public static final String PARAM_MESSAGE = "msg";
 
   public static final String PARAM_WARNING = "warn";
@@ -61,10 +63,10 @@ public class MessagePage extends AbstractSecuredPage
   public MessagePage(final PageParameters params)
   {
     super(params);
-    if (params.containsKey(PARAM_MESSAGE) == true) {
-      message = params.getString(PARAM_MESSAGE);
+    if (params.get(PARAM_MESSAGE) != null) {
+      message = params.get(PARAM_MESSAGE).toString();
     }
-    if (params.containsKey(PARAM_WARNING) == true) {
+    if (params.get(PARAM_WARNING) != null) {
       warning = true;
     }
     init();
@@ -81,12 +83,13 @@ public class MessagePage extends AbstractSecuredPage
       }
     });
     msgLabel.add(new AttributeModifier("class", new Model<String>() {
+      @Override
       public String getObject()
       {
         if (warning == true) {
-          return "errors";
+          return "alert alert_orange";
         } else {
-          return "message";
+          return "alert alert_green";
         }
       };
     }));
@@ -99,12 +102,12 @@ public class MessagePage extends AbstractSecuredPage
     return getString("message.title");
   }
 
-  public void setMessage(String message)
+  public void setMessage(final String message)
   {
     this.message = message;
   }
 
-  public MessagePage setWarning(boolean warning)
+  public MessagePage setWarning(final boolean warning)
   {
     this.warning = warning;
     return this;

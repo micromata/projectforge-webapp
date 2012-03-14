@@ -37,55 +37,20 @@ public class RequiredMaxLengthTextField extends MaxLengthTextField
   private static final long serialVersionUID = 7610655476354134456L;
 
   /**
-   * Use constructor with parent and/or label params instead.
+   * @see MaxLengthTextField#MaxLengthTextField(WebMarkupContainer, String,PropertyModel)
    */
-  @Deprecated
-  public RequiredMaxLengthTextField(final String id, final PropertyModel<String> model)
+  public RequiredMaxLengthTextField(final String id, final IModel<String> model)
   {
-    this(null, id, null, model);
-  }
-
-  /**
-   * @see MaxLengthTextField#MaxLengthTextField(WebMarkupContainer, String, String, PropertyModel)
-   */
-  public RequiredMaxLengthTextField(final String id, final String label, final IModel<String> model)
-  {
-    this(null, id, label, model);
-  }
-
-  /**
-   * @see MaxLengthTextField#MaxLengthTextField(WebMarkupContainer, String, String, PropertyModel)
-   */
-  public RequiredMaxLengthTextField(final WebMarkupContainer parent, final String id, final String label, final IModel<String> model)
-  {
-    super(parent, id, label, model);
+    super(id, model);
     setRequired(true);
   }
 
   /**
-   * @see MaxLengthTextField#MaxLengthTextField(WebMarkupContainer, String, String, PropertyModel)
+   * @see MaxLengthTextField#MaxLengthTextField(WebMarkupContainer, String,PropertyModel)
    */
-  public RequiredMaxLengthTextField(final String id, final String label, final IModel<String> model, final int maxLength)
-  {
-    this(null, id, label, model, maxLength);
-  }
-
-  /**
-   * @see MaxLengthTextField#MaxLengthTextField(WebMarkupContainer, String, String, PropertyModel)
-   */
-  public RequiredMaxLengthTextField(final WebMarkupContainer parent, final String id, final String label, final IModel<String> model,
-      final int maxLength)
-  {
-    super(parent, id, label, model, maxLength);
-    setRequired(true);
-  }
-
-  /**
-   * Use constructor with parent and/or label params instead.
-   */
-  @Deprecated
   public RequiredMaxLengthTextField(final String id, final IModel<String> model, final int maxLength)
   {
-    this(null, id, null, model, maxLength);
+    super(id, model, maxLength);
+    setRequired(true);
   }
 }
