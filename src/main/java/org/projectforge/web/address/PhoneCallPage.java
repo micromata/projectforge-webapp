@@ -30,23 +30,23 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.common.StringHelper;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
-import org.projectforge.core.ConfigXml;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 
 public class PhoneCallPage extends AbstractSecuredPage
 {
+  private static final long serialVersionUID = -5040319693295350276L;
+
   public final static String PARAMETER_KEY_ADDRESS_ID = "addressId";
 
   public final static String PARAMETER_KEY_NUMBER = "number";
@@ -62,41 +62,37 @@ public class PhoneCallPage extends AbstractSecuredPage
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
 
-  private PhoneCallForm form;
+  private final PhoneCallForm form;
 
-  private String result;
+  String result;
 
   private RecentQueue<String> recentCallsQueue;
 
-  @SuppressWarnings("serial")
-  public PhoneCallPage(PageParameters parameters)
+  public PhoneCallPage(final PageParameters parameters)
   {
     super(parameters);
+    log.warn("**** WICKET 1.5 migration: add bookmarkable parameters");
     form = new PhoneCallForm(this);
     body.add(form);
     form.init();
-    form.add(new Label("result", new PropertyModel<String>(this, "result")) {
-      @Override
-      public boolean isVisible()
-      {
-        return StringUtils.isNotBlank(result);
-      }
-    });
     parseParameters(parameters);
   }
 
-  @Override
-  protected PageParameters getBookmarkPageExtendedParameters()
-  {
-    final PageParameters pageParameters = new PageParameters();
-    pageParameters.put(PARAMETER_KEY_NUMBER, form.getPhoneNumber());
-    return pageParameters;
-  }
+  // @Override
+  // protected PageParameters getBookmarkPageExtendedParameters()
+  // {
+  // final PageParameters pageParameters = new PageParameters();
+  // final String phoneNumber = form.getPhoneNumber();
+  // if (phoneNumber != null) {
+  // pageParameters.add(PARAMETER_KEY_NUMBER, phoneNumber);
+  // }
+  // return pageParameters;
+  // }
 
   private void parseParameters(final PageParameters parameters)
   {
-    if (parameters.containsKey(PARAMETER_KEY_ADDRESS_ID) == true) {
-      String str = parameters.getString(PARAMETER_KEY_ADDRESS_ID);
+    if (parameters.get(PARAMETER_KEY_ADDRESS_ID) != null) {
+      final String str = parameters.get(PARAMETER_KEY_ADDRESS_ID).toString();
       final Integer addressId = NumberHelper.parseInteger(str);
       if (addressId == null)
         return;
@@ -106,8 +102,8 @@ public class PhoneCallPage extends AbstractSecuredPage
       }
       form.address = address;
     }
-    if (parameters.containsKey(PARAMETER_KEY_NUMBER) == true) {
-      final String number = parameters.getString(PARAMETER_KEY_NUMBER);
+    if (parameters.get(PARAMETER_KEY_NUMBER) != null) {
+      final String number = parameters.get(PARAMETER_KEY_NUMBER).toString();
       if (StringUtils.isNotBlank(number) == true) {
         form.setPhoneNumber(extractPhonenumber(number));
       }
@@ -123,7 +119,7 @@ public class PhoneCallPage extends AbstractSecuredPage
     final String phoneNumber = form.getPhoneNumber();
     if (StringUtils.isNotEmpty(phoneNumber) == true) {
       if (phoneNumber.startsWith("id:") == true && phoneNumber.length() > 3) {
-        Integer id = NumberHelper.parseInteger(phoneNumber.substring(3));
+        final Integer id = NumberHelper.parseInteger(phoneNumber.substring(3));
         if (id != null) {
           form.setPhoneNumber("");
           final AddressDO address = addressDao.getById(id);
@@ -143,7 +139,7 @@ public class PhoneCallPage extends AbstractSecuredPage
         final int numberPos = rest.indexOf('#');
         form.setPhoneNumber(phoneNumber.substring(0, pos));
         if (numberPos > 0) {
-          Integer id = NumberHelper.parseInteger(rest.substring(numberPos + 1));
+          final Integer id = NumberHelper.parseInteger(rest.substring(numberPos + 1));
           if (id != null) {
             final AddressDO address = addressDao.getById(id);
             if (address != null) {
@@ -161,7 +157,7 @@ public class PhoneCallPage extends AbstractSecuredPage
     return false;
   }
 
-  public void setPhoneNumber(String phoneNumber, boolean extract)
+  public void setPhoneNumber(String phoneNumber, final boolean extract)
   {
     if (extract == true) {
       phoneNumber = extractPhonenumber(phoneNumber);
@@ -169,10 +165,10 @@ public class PhoneCallPage extends AbstractSecuredPage
     form.setPhoneNumber(phoneNumber);
   }
 
-  String extractPhonenumber(String number)
+  String extractPhonenumber(final String number)
   {
-    final String result = NumberHelper.extractPhonenumber(number, Configuration.getInstance().getStringValue(
-        ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
+    final String result = NumberHelper.extractPhonenumber(number,
+        Configuration.getInstance().getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
     if (StringUtils.isNotEmpty(result) == true
         && StringUtils.isNotEmpty(ConfigXml.getInstance().getTelephoneSystemNumber()) == true
         && result.startsWith(ConfigXml.getInstance().getTelephoneSystemNumber()) == true) {
@@ -191,12 +187,11 @@ public class PhoneCallPage extends AbstractSecuredPage
     }
     processPhoneNumber();
     form.numberTextField.modelChanged();
-    form.refresh();
   }
 
   void call()
   {
-    boolean extracted = processPhoneNumber();
+    final boolean extracted = processPhoneNumber();
     if (extracted == true) {
       return;
     }
@@ -223,8 +218,9 @@ public class PhoneCallPage extends AbstractSecuredPage
     buf.append(form.getPhoneNumber()).append(SEPARATOR);
     final AddressDO address = form.getAddress();
     if (address != null
-        && StringHelper.isIn(form.getPhoneNumber(), extractPhonenumber(address.getBusinessPhone()), extractPhonenumber(address
-            .getMobilePhone()), extractPhonenumber(address.getPrivatePhone()), extractPhonenumber(address.getPrivateMobilePhone())) == true) {
+        && StringHelper.isIn(form.getPhoneNumber(), extractPhonenumber(address.getBusinessPhone()),
+            extractPhonenumber(address.getMobilePhone()), extractPhonenumber(address.getPrivatePhone()),
+            extractPhonenumber(address.getPrivateMobilePhone())) == true) {
       buf.append(address.getFirstName()).append(" ").append(address.getName());
       if (form.getPhoneNumber().equals(extractPhonenumber(address.getMobilePhone())) == true) {
         buf.append(", ").append(getString("address.phone.mobile"));
@@ -256,11 +252,11 @@ public class PhoneCallPage extends AbstractSecuredPage
       } else {
         errorKey = "address.phoneCall.result.callingError";
       }
-    } catch (HttpException ex) {
+    } catch (final HttpException ex) {
       result = "Call failed. Please contact administrator.";
       log.fatal(result + ": " + urlProtected);
       throw new RuntimeException(ex);
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       result = "Call failed. Please contact administrator.";
       log.fatal(result + ": " + urlProtected);
       throw new RuntimeException(ex);

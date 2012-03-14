@@ -28,14 +28,15 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessDao;
 import org.projectforge.access.AccessEntryDO;
@@ -50,12 +51,12 @@ import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.SingleImagePanel;
 
 @ListPage(editPage = AccessEditPage.class)
 public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, GroupTaskAccessDO> implements
-    IListPageColumnsCreator<GroupTaskAccessDO>
+IListPageColumnsCreator<GroupTaskAccessDO>
 {
   /**
    * Key for pre-setting the task id.
@@ -70,11 +71,11 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
   @SpringBean(name = "taskFormatter")
   private TaskFormatter taskFormatter;
 
-  public AccessListPage(PageParameters parameters)
+  public AccessListPage(final PageParameters parameters)
   {
     super(parameters, "access");
-    if (parameters.containsKey(PARAMETER_KEY_TASK_ID) == true) {
-      final Integer id = parameters.getAsInteger(PARAMETER_KEY_TASK_ID);
+    if (WicketUtils.contains(parameters, PARAMETER_KEY_TASK_ID) == true) {
+      final Integer id = WicketUtils.getAsInteger(parameters, PARAMETER_KEY_TASK_ID);
       form.getSearchFilter().setTaskId(id);
     }
   }
@@ -85,25 +86,29 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
   {
     final List<IColumn<GroupTaskAccessDO>> columns = new ArrayList<IColumn<GroupTaskAccessDO>>();
     final CellItemListener<GroupTaskAccessDO> cellItemListener = new CellItemListener<GroupTaskAccessDO>() {
-      public void populateItem(Item<ICellPopulator<GroupTaskAccessDO>> item, String componentId, IModel<GroupTaskAccessDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<GroupTaskAccessDO>> item, final String componentId,
+          final IModel<GroupTaskAccessDO> rowModel)
       {
         final GroupTaskAccessDO acces = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(acces.getId(), acces.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("task")), getSortable("task.title",
         sortable), "task.title", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<GroupTaskAccessDO>> item, final String componentId, final IModel<GroupTaskAccessDO> rowModel)
       {
-        final GroupTaskAccessDO access = (GroupTaskAccessDO) rowModel.getObject();
+        final GroupTaskAccessDO access = rowModel.getObject();
         final TaskDO task = access.getTask();
         final StringBuffer buf = new StringBuffer();
-        taskFormatter.appendFormattedTask(buf, new WicketLocalizerAndUrlBuilder(getResponse()), task, false, true, false);
+        taskFormatter.appendFormattedTask(getResponse(), buf, task, true, false);
         final Label formattedTaskLabel = new Label(ListSelectActionPanel.LABEL_ID, buf.toString());
         formattedTaskLabel.setEscapeModelStrings(false);
         item.add(new ListSelectActionPanel(componentId, rowModel, AccessEditPage.class, access.getId(), returnToPage, formattedTaskLabel));
@@ -116,9 +121,10 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
     columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("recursive")), getSortable("recursive",
         sortable), "recursive", cellItemListener) {
       @Override
-      public void populateItem(Item<ICellPopulator<GroupTaskAccessDO>> item, String componentId, IModel<GroupTaskAccessDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<GroupTaskAccessDO>> item, final String componentId,
+          final IModel<GroupTaskAccessDO> rowModel)
       {
-        final GroupTaskAccessDO access = (GroupTaskAccessDO) rowModel.getObject();
+        final GroupTaskAccessDO access = rowModel.getObject();
         if (access.isRecursive() == true) {
           item.add(SingleImagePanel.createPresizedImage(componentId, WebConstants.IMAGE_ACCEPT));
         } else {
@@ -130,10 +136,11 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
     columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(new Model<String>(getString("access.type")), null, "accessEntries",
         cellItemListener) {
       @Override
-      public void populateItem(Item<ICellPopulator<GroupTaskAccessDO>> item, String componentId, IModel<GroupTaskAccessDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<GroupTaskAccessDO>> item, final String componentId,
+          final IModel<GroupTaskAccessDO> rowModel)
       {
         final int rowIndex = ((Item< ? >) item.findParent(Item.class)).getIndex();
-        final GroupTaskAccessDO access = (GroupTaskAccessDO) rowModel.getObject();
+        final GroupTaskAccessDO access = rowModel.getObject();
         final List<AccessEntryDO> accessEntries = access.getOrderedEntries();
         final AccessTablePanel accessTablePanel = new AccessTablePanel(componentId, accessEntries);
         if (rowIndex == 0) {
@@ -147,7 +154,8 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
     columns.add(new CellItemListenerPropertyColumn<GroupTaskAccessDO>(getString("description"), getSortable("description", sortable),
         "description", cellItemListener) {
       @Override
-      public void populateItem(Item<ICellPopulator<GroupTaskAccessDO>> item, String componentId, IModel<GroupTaskAccessDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<GroupTaskAccessDO>> item, final String componentId,
+          final IModel<GroupTaskAccessDO> rowModel)
       {
         final GroupTaskAccessDO access = rowModel.getObject();
         final Label label = new Label(componentId, StringUtils.abbreviate(access.getDescription(), 100));
@@ -161,7 +169,7 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "group.name", true);
+    dataTable = createDataTable(createColumns(this, true), "group.name", SortOrder.ASCENDING);
     form.add(dataTable);
   }
 
@@ -207,7 +215,7 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
   }
 
   @Override
-  protected AccessListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected AccessListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new AccessListForm(this);
   }
@@ -219,7 +227,7 @@ public class AccessListPage extends AbstractListPage<AccessListForm, AccessDao, 
   }
 
   @Override
-  protected IModel<GroupTaskAccessDO> getModel(GroupTaskAccessDO object)
+  protected IModel<GroupTaskAccessDO> getModel(final GroupTaskAccessDO object)
   {
     return new DetachableDOModel<GroupTaskAccessDO, AccessDao>(object, getBaseDao());
   }

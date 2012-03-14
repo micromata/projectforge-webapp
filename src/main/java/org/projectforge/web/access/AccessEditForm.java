@@ -24,16 +24,9 @@
 package org.projectforge.web.access;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.Component;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.form.CheckBox;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.projectforge.access.AccessEntryDO;
-import org.projectforge.access.AccessType;
 import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
@@ -41,9 +34,11 @@ import org.projectforge.web.common.TwoListHelper;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEditPage>
 {
@@ -53,10 +48,9 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
 
   TwoListHelper<Integer, String> users;
 
-  public AccessEditForm(final AccessEditPage parentPage, GroupTaskAccessDO data)
+  public AccessEditForm(final AccessEditPage parentPage, final GroupTaskAccessDO data)
   {
     super(parentPage, data);
-    this.colspan = 2;
   }
 
   @SuppressWarnings("serial")
@@ -64,72 +58,82 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
   protected void init()
   {
     super.init();
-    final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("task", new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId");
-    add(taskSelectPanel.setRequired(true));
-    taskSelectPanel.init();
-    final GroupSelectPanel groupSelectPanel = new GroupSelectPanel("group", new PropertyModel<GroupDO>(data, "group"), parentPage,
-        "groupId");
-    add(groupSelectPanel.setRequired(true));
-    groupSelectPanel.init();
-    final Component recursiveLabel = new Label("recursive", getString("recursive"));
-    WicketUtils.addTooltip(recursiveLabel, getString("access.recursive.help"));
-    add(recursiveLabel);
-    add(WicketUtils.addTooltip(new CheckBox("recursiveCheckBox", new PropertyModel<Boolean>(data, "recursive")), getString("access.recursive.help")));
-    final MaxLengthTextArea descriptionArea = new MaxLengthTextArea("description", new PropertyModel<String>(data, "description"));
-    add(descriptionArea);
-    final RepeatingView rowRepeater = new RepeatingView("accessRows");
-    add(rowRepeater);
-    addAccessRow(rowRepeater, data.ensureAndGetAccessEntry(AccessType.TASK_ACCESS_MANAGEMENT));
-    addAccessRow(rowRepeater, data.ensureAndGetAccessEntry(AccessType.TASKS));
-    addAccessRow(rowRepeater, data.ensureAndGetAccessEntry(AccessType.TIMESHEETS));
-    addAccessRow(rowRepeater, data.ensureAndGetAccessEntry(AccessType.OWN_TIMESHEETS));
-
-    add(new SingleButtonPanel("clear", new Button("button", new Model<String>(getString("access.templates.clear"))) {
-      @Override
-      public final void onSubmit()
-      {
-        data.clear();
-      }
-    }));
-    add(new SingleButtonPanel("guest", new Button("button", new Model<String>(getString("access.templates.guest"))) {
-      @Override
-      public final void onSubmit()
-      {
-        data.guest();
-      }
-    }));
-    add(new SingleButtonPanel("employee", new Button("button", new Model<String>(getString("access.templates.employee"))) {
-      @Override
-      public final void onSubmit()
-      {
-        data.employee();
-      }
-    }));
-    add(new SingleButtonPanel("leader", new Button("button", new Model<String>(getString("access.templates.leader"))) {
-      @Override
-      public final void onSubmit()
-      {
-        data.leader();
-      }
-    }));
-    add(new SingleButtonPanel("administrator", new Button("button", new Model<String>(getString("access.templates.administrator"))) {
-      @Override
-      public final void onSubmit()
-      {
-        data.administrator();
-      }
-    }));
-  }
-
-  private void addAccessRow(final RepeatingView rowRepeater, final AccessEntryDO accessEntry)
-  {
-    final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
-    rowRepeater.add(row);
-    row.add(new Label("area", getString(accessEntry.getAccessType().getI18nKey())));
-    row.add(new CheckBox("selectCheckBox", new PropertyModel<Boolean>(accessEntry, "accessSelect")));
-    row.add(new CheckBox("insertCheckBox", new PropertyModel<Boolean>(accessEntry, "accessInsert")));
-    row.add(new CheckBox("updateCheckBox", new PropertyModel<Boolean>(accessEntry, "accessUpdate")));
-    row.add(new CheckBox("deleteCheckBox", new PropertyModel<Boolean>(accessEntry, "accessDelete")));
+    gridBuilder.newGrid16();
+    {
+      // Task
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data, "task"), parentPage,
+          "taskId");
+      fs.add(taskSelectPanel.setRequired(true));
+      taskSelectPanel.init();
+    }
+    {
+      // Group
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group"));
+      final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(data, "group"),
+          parentPage, "groupId");
+      fs.add(groupSelectPanel.setRequired(true));
+      groupSelectPanel.init();
+    }
+    {
+      // Option
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"));
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel
+      .add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(data, "recursive"), getString("recursive"))
+      .setTooltip(getString("access.recursive.help")));
+    }
+    {
+      // Access entries table
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("access.accessTable"));
+      final AccessEditTablePanel accessEditTablePanel = new AccessEditTablePanel(fs.newChildId(), data);
+      fs.add(accessEditTablePanel);
+      accessEditTablePanel.init();
+    }
+    {
+      // Templates
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("access.templates"), true).setNoLabelFor();
+      fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("clear")) {
+        @Override
+        public final void onSubmit()
+        {
+          data.clear();
+        }
+      }, getString("access.templates.clear"), SingleButtonPanel.GREY));
+      fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("guest")) {
+        @Override
+        public final void onSubmit()
+        {
+          data.guest();
+        }
+      }, getString("access.templates.guest"), SingleButtonPanel.GREY));
+      fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("employee")) {
+        @Override
+        public final void onSubmit()
+        {
+          data.employee();
+        }
+      }, getString("access.templates.employee"), SingleButtonPanel.GREY));
+      fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("leader")) {
+        @Override
+        public final void onSubmit()
+        {
+          data.leader();
+        }
+      }, getString("access.templates.leader"), SingleButtonPanel.GREY));
+      fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("administrator")) {
+        @Override
+        public final void onSubmit()
+        {
+          data.administrator();
+        }
+      }, getString("access.templates.administrator"), SingleButtonPanel.RED));
+    }
+    {
+      // Description
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
+      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
+    }
   }
 
   @Override

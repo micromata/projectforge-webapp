@@ -24,19 +24,18 @@
 package org.projectforge.web.address;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.address.PersonalAddressDao;
-import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
 
 @EditPage(defaultReturnPage = AddressListPage.class)
-public class AddressEditPage extends AbstractAutoLayoutEditPage<AddressDO, AddressEditForm, AddressDao>
+public class AddressEditPage extends AbstractEditPage<AddressDO, AddressEditForm, AddressDao>
 {
   private static final long serialVersionUID = 7091721062661400435L;
 
@@ -48,14 +47,14 @@ public class AddressEditPage extends AbstractAutoLayoutEditPage<AddressDO, Addre
   @SpringBean(name = "personalAddressDao")
   private PersonalAddressDao personalAddressDao;
 
-  public AddressEditPage(PageParameters parameters)
+  public AddressEditPage(final PageParameters parameters)
   {
     super(parameters, "address");
     init();
   }
 
   @Override
-  public AbstractBasePage afterSaveOrUpdate()
+  public AbstractSecuredBasePage afterSaveOrUpdate()
   {
     final AddressDO address = addressDao.getOrLoad(getData().getId());
     final PersonalAddressDO personalAddress = form.personalAddress;
@@ -72,7 +71,7 @@ public class AddressEditPage extends AbstractAutoLayoutEditPage<AddressDO, Addre
   }
 
   @Override
-  protected AddressEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, AddressDO data)
+  protected AddressEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final AddressDO data)
   {
     return new AddressEditForm(this, data);
   }

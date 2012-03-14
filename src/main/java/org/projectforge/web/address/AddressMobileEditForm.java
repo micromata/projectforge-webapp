@@ -23,48 +23,44 @@
 
 package org.projectforge.web.address;
 
-import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.model.PropertyModel;
 import org.projectforge.address.AddressDO;
-import org.projectforge.address.PersonalAddressDO;
-import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.web.mobile.AbstractMobileEditForm;
-import org.projectforge.web.wicket.layout.LayoutContext;
+import org.projectforge.web.wicket.components.MaxLengthTextField;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class AddressMobileEditForm extends AbstractMobileEditForm<AddressDO, AddressMobileEditPage>
 {
   private static final long serialVersionUID = -8781593985402346929L;
 
-  @SpringBean(name = "personalAddressDao")
-  private PersonalAddressDao personalAddressDao;
+  //  @SpringBean(name = "personalAddressDao")
+  //  private PersonalAddressDao personalAddressDao;
 
-  protected AddressFormRenderer renderer;
-
-  protected PersonalAddressDO personalAddress;
+  //  protected PersonalAddressDO personalAddress;
 
   public AddressMobileEditForm(final AddressMobileEditPage parentPage, final AddressDO data)
   {
     super(parentPage, data);
-    personalAddress = null;
-    if (isNew() == false) {
-      personalAddress = personalAddressDao.getByAddressId(getData().getId());
-    }
-    if (personalAddress == null) {
-      personalAddress = new PersonalAddressDO();
-    }
-    renderer = new AddressFormRenderer(this, new LayoutContext(this), parentPage.getBaseDao(), data, personalAddress);
+    // personalAddress = null;
+    // if (isNew() == false) {
+    // personalAddress = personalAddressDao.getByAddressId(getData().getId());
+    // }
+    // if (personalAddress == null) {
+    // personalAddress = new PersonalAddressDO();
+    // }
   }
 
   @Override
   protected void init()
   {
     super.init();
-    renderer.add();
-  }
-
-  @Override
-  protected void validation()
-  {
-    super.validation();
-    renderer.validation();
+    gridBuilder.newGrid8().newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // Name
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("name"));
+      final MaxLengthTextField name = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "name"));
+      //fs.add(dependentFormComponents[1] = name);
+    }
   }
 }

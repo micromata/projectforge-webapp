@@ -36,7 +36,7 @@ import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.SingleImagePanel;
 
 /**
- * Panel for showing and selecting one task.
+ * Rows of access rights (without header).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -44,7 +44,7 @@ public class AccessTablePanel extends Panel
 {
   private static final long serialVersionUID = -7347864057331989812L;
 
-  private List<AccessEntryDO> accessEntries;
+  private final List<AccessEntryDO> accessEntries;
 
   private boolean drawHeader;
 
@@ -98,7 +98,7 @@ public class AccessTablePanel extends Panel
       return SingleImagePanel.createPresizedImage(componentId, WebConstants.IMAGE_DENY).setRenderBodyOnly(false);
     }
   }
-  
+
   /**
    * Avoid warnings (AccessTablePanel is added in AccessListPage but Wicket logs warnings?).
    * @param key

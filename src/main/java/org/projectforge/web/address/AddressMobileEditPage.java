@@ -24,7 +24,7 @@
 package org.projectforge.web.address;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
@@ -43,7 +43,6 @@ public class AddressMobileEditPage extends AbstractMobileEditPage<AddressDO, Add
   public AddressMobileEditPage(final PageParameters parameters)
   {
     super(parameters, "address");
-    init();
   }
 
   @Override
@@ -59,14 +58,14 @@ public class AddressMobileEditPage extends AbstractMobileEditPage<AddressDO, Add
   }
 
   @Override
-  protected AddressMobileEditForm newEditForm(AbstractMobileEditPage< ? , ? , ? > parentPage, AddressDO data)
+  protected AddressMobileEditForm newEditForm(final AbstractMobileEditPage< ? , ? , ? > parentPage, final AddressDO data)
   {
     return new AddressMobileEditForm(this, data);
   }
 
   @Override
   protected Class< ? extends AbstractMobileListPage< ? , ? , ? >> getListPageClass()
-  {
+      {
     return AddressMobileListPage.class;
-  }
+      }
 }

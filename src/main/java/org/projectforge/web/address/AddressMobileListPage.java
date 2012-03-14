@@ -23,7 +23,8 @@
 
 package org.projectforge.web.address;
 
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
@@ -48,7 +49,7 @@ public class AddressMobileListPage extends AbstractMobileListPage<AddressMobileL
   }
 
   @Override
-  protected AddressMobileListForm newListForm(AbstractMobileListPage< ? , ? , ? > parentPage)
+  protected AddressMobileListForm newListForm(final AbstractMobileListPage< ? , ? , ? > parentPage)
   {
     return new AddressMobileListForm(this);
   }
@@ -60,8 +61,17 @@ public class AddressMobileListPage extends AbstractMobileListPage<AddressMobileL
   }
 
   @Override
-  protected String getEntryComment(AddressDO entry)
+  protected String getEntryComment(final AddressDO entry)
   {
     return entry.getOrganization();
+  }
+
+  /**
+   * @see org.projectforge.web.mobile.AbstractMobileListPage#getEditPageClass()
+   */
+  @Override
+  protected Class< ? extends WebPage> getEditPageClass()
+  {
+    return AddressMobileEditPage.class;
   }
 }

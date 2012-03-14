@@ -36,8 +36,9 @@ import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.components.CoolCheckBoxPanel;
-import org.projectforge.web.wicket.components.LabelForPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPage>
 {
@@ -53,83 +54,100 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
   protected void init()
   {
     super.init();
-    filterContainer.add(new CoolCheckBoxPanel("inheritCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "inherit"),
-        getString("inherit"), true));
-    filterContainer.add(new CoolCheckBoxPanel("recursiveCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "recursive"),
-        getString("recursive"), true));
-    filterContainer.add(new CoolCheckBoxPanel("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
-        getString("onlyDeleted"), true).setTooltip(getString("onlyDeleted.tooltip")));
-    
-    
-    final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("task", new Model<TaskDO>() {
-      @Override
-      public TaskDO getObject()
-      {
-        return taskTree.getTaskById(getSearchFilter().getTaskId());
-      }
-    }, parentPage, "taskId") {
-      @Override
-      protected void selectTask(final TaskDO task)
-      {
-        super.selectTask(task);
-        if (task != null) {
-          getSearchFilter().setTaskId(task.getId());
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).setNoLabelFor();
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
+        @Override
+        public TaskDO getObject()
+        {
+          return taskTree.getTaskById(getSearchFilter().getTaskId());
         }
-        parentPage.refresh();
-      }
-    };
-    filterContainer.add(taskSelectPanel);
-    taskSelectPanel.setEnableLinks(true);
-    taskSelectPanel.init();
-    taskSelectPanel.setRequired(false);
-    filterContainer.add(new LabelForPanel("taskLabel", taskSelectPanel, getString("task")));
-
-    final GroupSelectPanel groupSelectPanel = new GroupSelectPanel("group", new Model<GroupDO>() {
-      @Override
-      public GroupDO getObject()
-      {
-        return userGroupCache.getGroup(getSearchFilter().getGroupId());
-      }
-
-      @Override
-      public void setObject(final GroupDO object)
-      {
-        if (object == null) {
-          getSearchFilter().setGroupId(null);
-        } else {
-          getSearchFilter().setGroupId(object.getId());
+      }, parentPage, "taskId") {
+        @Override
+        protected void selectTask(final TaskDO task)
+        {
+          super.selectTask(task);
+          if (task != null) {
+            getSearchFilter().setTaskId(task.getId());
+          }
+          parentPage.refresh();
         }
-      }
-    }, parentPage, "groupId");
-    filterContainer.add(groupSelectPanel);
-    groupSelectPanel.setDefaultFormProcessing(false);
-    groupSelectPanel.init();
-    filterContainer.add(new LabelForPanel("groupLabel", groupSelectPanel, getString("group")));
-
-    final UserSelectPanel userSelectPanel = new UserSelectPanel("user", new Model<PFUserDO>() {
-      @Override
-      public PFUserDO getObject()
-      {
-        return userGroupCache.getUser(getSearchFilter().getUserId());
-      }
-
-      @Override
-      public void setObject(final PFUserDO object)
-      {
-        if (object == null) {
-          getSearchFilter().setUserId(null);
-        } else {
-          getSearchFilter().setUserId(object.getId());
+      };
+      fs.add(taskSelectPanel);
+      taskSelectPanel.init();
+      taskSelectPanel.setRequired(false);
+    }
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // Group
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group")).setNoLabelFor();
+      final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new Model<GroupDO>() {
+        @Override
+        public GroupDO getObject()
+        {
+          return userGroupCache.getGroup(getSearchFilter().getGroupId());
         }
-      }
-    }, parentPage, "userId");
-    filterContainer.add(userSelectPanel);
-    userSelectPanel.setDefaultFormProcessing(false);
-    userSelectPanel.init().withAutoSubmit(true);
-    filterContainer.add(new LabelForPanel("userLabel", userSelectPanel, getString("user")));
-}
 
-  public AccessListForm(AccessListPage parentPage)
+        @Override
+        public void setObject(final GroupDO object)
+        {
+          if (object == null) {
+            getSearchFilter().setGroupId(null);
+          } else {
+            getSearchFilter().setGroupId(object.getId());
+          }
+        }
+      }, parentPage, "groupId");
+      fs.add(groupSelectPanel);
+      groupSelectPanel.setDefaultFormProcessing(false);
+      groupSelectPanel.init();
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // User
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"), true).setNoLabelFor();
+      final UserSelectPanel assigneeSelectPanel = new UserSelectPanel(fs.newChildId(), new Model<PFUserDO>() {
+        @Override
+        public PFUserDO getObject()
+        {
+          return userGroupCache.getUser(getSearchFilter().getUserId());
+        }
+
+        @Override
+        public void setObject(final PFUserDO object)
+        {
+          if (object == null) {
+            getSearchFilter().setUserId(null);
+          } else {
+            getSearchFilter().setUserId(object.getId());
+          }
+        }
+      }, parentPage, "userId");
+      fs.add(assigneeSelectPanel);
+      assigneeSelectPanel.setDefaultFormProcessing(false);
+      assigneeSelectPanel.init().withAutoSubmit(true);
+      fs.addHelpIcon(getString("access.tooltip.filter.user"));
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
+          new PropertyModel<Boolean>(getSearchFilter(), "inherit"), getString("inherit")).setTooltip(
+              getString("access.tooltip.filter.inherit")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
+          new PropertyModel<Boolean>(getSearchFilter(), "recursive"), getString("recursive")).setTooltip(
+              getString("access.tooltip.filter.recursive")));
+      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // DropDownChoice page size
+      addPageSizeFieldset();
+    }
+  }
+
+  public AccessListForm(final AccessListPage parentPage)
   {
     super(parentPage);
   }

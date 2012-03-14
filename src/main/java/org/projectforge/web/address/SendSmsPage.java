@@ -30,24 +30,27 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.PhoneType;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
-import org.projectforge.core.ConfigXml;
 import org.projectforge.web.URLHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.WicketUtils;
 
 public class SendSmsPage extends AbstractSecuredPage
 {
+  private static final long serialVersionUID = -1677859643101866297L;
+
   public final static String PARAMETER_KEY_ADDRESS_ID = "addressId";
 
   public final static String PARAMETER_KEY_PHONE_TYPE = "phoneType";
@@ -61,19 +64,31 @@ public class SendSmsPage extends AbstractSecuredPage
 
   private SendSmsForm form;
 
-  private String result;
+  String result;
 
   @SuppressWarnings("serial")
-  public SendSmsPage(PageParameters parameters)
+  public SendSmsPage(final PageParameters parameters)
   {
     super(parameters);
+    log.warn("**** WICKET 1.5 migration: add bookmarkable parameters");
     form = new SendSmsForm(this);
     body.add(form);
     form.init();
     final String javaScript = "function showSendQuestionDialog() {\n  return window.confirm('"
         + getString("address.sendSms.sendMessageQuestion")
-        + "');\n}\n";
-    body.add(new Label("showSendQuestionDialog", javaScript).setEscapeModelStrings(false));
+        + "');\n}\n"
+        + " $(document).ready(function() {\n"
+        + "    var onEditCallback = function(remaining) {\n"
+        + "        $('#charsRemaining').text(remaining + ' "
+        + getString("charactersLeft")
+        + "');\n"
+        + "    }\n"
+        + "    $('textarea[maxlength]').limitMaxlength({\n"
+        + "        onEdit: onEditCallback,\n"
+        + "    });\n"
+        + " });\n";
+
+    body.add(new Label("javascript", javaScript).setEscapeModelStrings(false));
     form.add(new Label("result", new PropertyModel<String>(this, "result")) {
       @Override
       public boolean isVisible()
@@ -84,32 +99,31 @@ public class SendSmsPage extends AbstractSecuredPage
     parseParameters(parameters);
   }
 
-  @Override
-  protected PageParameters getBookmarkPageExtendedParameters()
-  {
-    final PageParameters pageParameters = new PageParameters();
-    pageParameters.put(PARAMETER_KEY_NUMBER, getData().getPhoneNumber());
-    return pageParameters;
-  }
+  // @Override
+  // protected PageParameters getBookmarkPageExtendedParameters()
+  // {
+  // final PageParameters pageParameters = new PageParameters();
+  // pageParameters.add(PARAMETER_KEY_NUMBER, getData().getPhoneNumber());
+  // return pageParameters;
+  // }
 
   private void parseParameters(final PageParameters parameters)
   {
-    if (parameters.containsKey(PARAMETER_KEY_ADDRESS_ID) == true) {
-      String str = parameters.getString(PARAMETER_KEY_ADDRESS_ID);
+    if (parameters.get(PARAMETER_KEY_ADDRESS_ID) != null) {
+      final String str = parameters.get(PARAMETER_KEY_ADDRESS_ID).toString();
       final Integer addressId = NumberHelper.parseInteger(str);
       if (addressId == null)
         return;
       final AddressDO address = addressDao.getById(addressId);
       if (address == null)
         return;
-      if (parameters.containsKey(PARAMETER_KEY_PHONE_TYPE) == true) {
+      if (parameters.get(PARAMETER_KEY_PHONE_TYPE).isNull() == false) {
         log.info(parameters.get(PARAMETER_KEY_PHONE_TYPE));
-        final Object type = parameters.get(PARAMETER_KEY_PHONE_TYPE);
-        final PhoneType phoneType;
-        if (type instanceof PhoneType) {
-          phoneType = (PhoneType) type;
-        } else {
-          phoneType = PhoneType.valueOf((String) type);
+        final String type = WicketUtils.getAsString(parameters, PARAMETER_KEY_PHONE_TYPE);
+        PhoneType phoneType = null;
+        try {
+          phoneType = PhoneType.valueOf(type);
+        } catch (final IllegalArgumentException ex) {
         }
         String number = null;
         if (phoneType == PhoneType.MOBILE) {
@@ -119,13 +133,13 @@ public class SendSmsPage extends AbstractSecuredPage
         }
         if (number != null) {
           getData().setPhoneNumber(
-              SendSmsForm.getPhoneNumberAndPerson(address, number, Configuration.getInstance().getStringValue(
-                  ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX)));
+              SendSmsForm.getPhoneNumberAndPerson(address, number,
+                  Configuration.getInstance().getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX)));
         }
       }
     }
-    if (parameters.containsKey(PARAMETER_KEY_NUMBER) == true) {
-      final String number = parameters.getString(PARAMETER_KEY_NUMBER);
+    if (parameters.get(PARAMETER_KEY_NUMBER) != null) {
+      final String number = parameters.get(PARAMETER_KEY_NUMBER).toString();
       if (StringUtils.isNotBlank(number) == true) {
         getData().setPhoneNumber(number);
       }
@@ -134,8 +148,8 @@ public class SendSmsPage extends AbstractSecuredPage
 
   protected void send()
   {
-    final String number = NumberHelper.extractPhonenumber(getData().getPhoneNumber(), Configuration.getInstance().getStringValue(
-        ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
+    final String number = NumberHelper.extractPhonenumber(getData().getPhoneNumber(),
+        Configuration.getInstance().getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
     if (StringUtils.isBlank(ConfigXml.getInstance().getSmsUrl()) == true) {
       log.error("Servlet url for sending sms not configured. SMS not supported.");
       return;
@@ -150,7 +164,7 @@ public class SendSmsPage extends AbstractSecuredPage
     result = "";
     try {
       client.executeMethod(method);
-      String response = method.getResponseBodyAsString();
+      final String response = method.getResponseBodyAsString();
       if (response == null) {
         errorKey = getString("address.sendSms.sendMessage.result.unknownError");
       } else if (response.startsWith("0") == true) {
@@ -165,19 +179,13 @@ public class SendSmsPage extends AbstractSecuredPage
       } else {
         errorKey = getString("address.sendSms.sendMessage.result.unknownError");
       }
-    } catch (HttpException ex) {
+    } catch (final HttpException ex) {
       errorKey = "Call failed. Please contact administrator.";
-      log.fatal(errorKey
-          + ": "
-          + ConfigXml.getInstance().getSmsUrl()
-          + StringHelper.hideStringEnding(String.valueOf(number), 'x', 3));
+      log.fatal(errorKey + ": " + ConfigXml.getInstance().getSmsUrl() + StringHelper.hideStringEnding(String.valueOf(number), 'x', 3));
       throw new RuntimeException(ex);
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       errorKey = "Call failed. Please contact administrator.";
-      log.fatal(errorKey
-          + ": "
-          + ConfigXml.getInstance().getSmsUrl()
-          + StringHelper.hideStringEnding(String.valueOf(number), 'x', 3));
+      log.fatal(errorKey + ": " + ConfigXml.getInstance().getSmsUrl() + StringHelper.hideStringEnding(String.valueOf(number), 'x', 3));
       throw new RuntimeException(ex);
     }
     if (errorKey != null) {

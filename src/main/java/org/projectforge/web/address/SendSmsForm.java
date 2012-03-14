@@ -27,9 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -45,10 +45,20 @@ import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.GridBuilder;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
+import org.projectforge.web.wicket.flowlayout.TextPanel;
 
 public class SendSmsForm extends AbstractForm<SendSmsData, SendSmsPage>
 {
   private static final long serialVersionUID = -2138017238114715368L;
+
+  public static final int MAX_MESSAGE_LENGTH = 160;
 
   private static final String USER_PREF_KEY_RECENTS = "messagingReceivers";
 
@@ -62,6 +72,10 @@ public class SendSmsForm extends AbstractForm<SendSmsData, SendSmsPage>
 
   private RecentQueue<String> recentSearchTermsQueue;
 
+  private GridBuilder gridBuilder;
+
+  protected MyComponentsRepeater<SingleButtonPanel> actionButtons;
+
   public SendSmsForm(final SendSmsPage parentPage)
   {
     super(parentPage);
@@ -70,8 +84,8 @@ public class SendSmsForm extends AbstractForm<SendSmsData, SendSmsPage>
 
   protected static String getPhoneNumberAndPerson(final AddressDO address, final String number, final String countryPrefix)
   {
-    return StringHelper.listToString(", ", NumberHelper.extractPhonenumber(number, countryPrefix) + ": " + address.getName(), address
-        .getFirstName(), address.getOrganization());
+    return StringHelper.listToString(", ", NumberHelper.extractPhonenumber(number, countryPrefix) + ": " + address.getName(),
+        address.getFirstName(), address.getOrganization());
   }
 
   private void buildAutocompleteEntry(final List<String> list, final AddressDO address, final String number)
@@ -87,11 +101,42 @@ public class SendSmsForm extends AbstractForm<SendSmsData, SendSmsPage>
   protected void init()
   {
     super.init();
-    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    final PFAutoCompleteTextField<String> numberTextField = new PFAutoCompleteTextField<String>("phoneNumber", new PropertyModel<String>(
-        data, "phoneNumber")) {
+    addFeedbackPanel();
+    final DivPanel messagePanel = new DivPanel("message") {
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
       @Override
-      protected List<String> getChoices(String input)
+      public boolean isVisible()
+      {
+        return StringUtils.isNotBlank(parentPage.result);
+      }
+
+      @Override
+      public void onAfterRender()
+      {
+        super.onAfterRender();
+        parentPage.result = null;
+      }
+    };
+    add(messagePanel);
+    messagePanel.add(new TextPanel(DivPanel.CHILD_ID, new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return parentPage.result;
+      }
+    }));
+    final RepeatingView repeater = new RepeatingView("flowform");
+    add(repeater);
+    gridBuilder = newGridBuilder(repeater);
+    gridBuilder.newGrid16().newColumnsPanel();
+
+    FieldsetPanel fs = gridBuilder.newFieldset(getString("address.sendSms.phoneNumber"));
+    final PFAutoCompleteTextField<String> numberTextField = new PFAutoCompleteTextField<String>(InputPanel.WICKET_ID,
+        new PropertyModel<String>(data, "phoneNumber")) {
+      @Override
+      protected List<String> getChoices(final String input)
       {
         final AddressFilter addressFilter = new AddressFilter();
         addressFilter.setSearchString(input);
@@ -111,33 +156,55 @@ public class SendSmsForm extends AbstractForm<SendSmsData, SendSmsPage>
     };
     numberTextField.withMatchContains(true).withMinChars(2).withFocus(true);
     numberTextField.setRequired(true);
-    add(numberTextField);
-    data.setMessage(getUser().getFullname() + ". " + getString("address.sendSms.doNotReply"));
-    final MaxLengthTextArea messageTextArea = new MaxLengthTextArea("message", new PropertyModel<String>(data, "message"), 160);
-    add(messageTextArea);
+    fs.add(numberTextField);
+    data.setMessage(getInitalMessageText());
+    fs = gridBuilder.newFieldset(getString("address.sendSms.message"));
+    final MaxLengthTextArea messageTextArea = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "message"),
+        MAX_MESSAGE_LENGTH);
+    // messageTextArea.add(AttributeModifier.append("onKeyDown", "limitText(this.form.limitedtextarea,this.form.countdown,"
+    // + MAX_MESSAGE_LENGTH
+    // + ")"));
+    // messageTextArea.add(AttributeModifier.append("onKeyUp", "limitText(this.form.limitedtextarea,this.form.countdown,"
+    // + MAX_MESSAGE_LENGTH
+    // + ")"));
+    messageTextArea.add(AttributeModifier.append("maxlength", MAX_MESSAGE_LENGTH));
+    fs.add(messageTextArea);
+    fs = gridBuilder.newFieldset("");
+    final DivTextPanel charsRemaining = new DivTextPanel(fs.newChildId(), "");
+    charsRemaining.setMarkupId("charsRemaining");
+    fs.add(charsRemaining);
 
-    final Button resetButton = new Button("button", new Model<String>(getString("reset"))) {
-      @Override
-      public final void onSubmit()
-      {
-        data.setMessage("");
-        data.setPhoneNumber("");
-      }
-    };
-    resetButton.setDefaultFormProcessing(false);
-    final SingleButtonPanel resetButtonPanel = new SingleButtonPanel("reset", resetButton);
-    resetButtonPanel.setVisible(false);
-    add(resetButtonPanel);
-    final Button sendButton = new Button("button", new Model<String>(getString("send"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.send();
-      }
-    };
-    sendButton.add(new SimpleAttributeModifier("onclick", "return showSendQuestionDialog();"));
-    add(new SingleButtonPanel("send", sendButton));
-    setDefaultButton(sendButton);
+    actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");
+    add(actionButtons.getRepeatingView());
+    {
+      final Button resetButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("reset")) {
+        @Override
+        public final void onSubmit()
+        {
+          data.setMessage(getInitalMessageText());
+          data.setPhoneNumber("");
+          numberTextField.modelChanged();
+          messageTextArea.modelChanged();
+        }
+      };
+      resetButton.setDefaultFormProcessing(false);
+      final SingleButtonPanel resetButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), resetButton, getString("reset"),
+          SingleButtonPanel.RESET);
+      actionButtons.add(resetButtonPanel);
+
+      final Button sendButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("send")) {
+        @Override
+        public final void onSubmit()
+        {
+          parentPage.send();
+        }
+      };
+      sendButton.add(AttributeModifier.replace("onclick", "return showSendQuestionDialog();"));
+      final SingleButtonPanel sendButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), sendButton, getString("send"),
+          SingleButtonPanel.DEFAULT_SUBMIT);
+      actionButtons.add(sendButtonPanel);
+      setDefaultButton(sendButton);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -159,5 +226,20 @@ public class SendSmsForm extends AbstractForm<SendSmsData, SendSmsPage>
       parentPage.putUserPrefEntry(USER_PREF_KEY_RECENTS, recentSearchTermsQueue, true);
     }
     return recentSearchTermsQueue;
+  }
+
+  public String getInitalMessageText()
+  {
+    return getUser().getFullname() + ". " + getString("address.sendSms.doNotReply");
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractForm#onBeforeRender()
+   */
+  @Override
+  public void onBeforeRender()
+  {
+    super.onBeforeRender();
+    actionButtons.render();
   }
 }

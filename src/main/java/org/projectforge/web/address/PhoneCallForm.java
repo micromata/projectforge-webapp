@@ -29,36 +29,41 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.AddressFilter;
 import org.projectforge.address.PhoneType;
+import org.projectforge.common.BeanHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserDao;
+import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractForm;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.GridBuilder;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
+import org.projectforge.web.wicket.flowlayout.TextLinkPanel;
+import org.projectforge.web.wicket.flowlayout.TextPanel;
 
 public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
 {
@@ -76,11 +81,9 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
 
   protected AddressDO address;
 
-  private RepeatingView phoneNumbersRepeatingView;
-
   protected PFAutoCompleteTextField<AddressDO> numberTextField;
 
-  private WebMarkupContainer addressNameRow;
+  private DivPanel addressPanel;
 
   private String phoneNumber;
 
@@ -89,6 +92,13 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
   Date lastSuccessfulPhoneCall;
 
   private RecentQueue<String> recentSearchTermsQueue;
+
+  private GridBuilder gridBuilder;
+
+  /**
+   * List to create content menu in the desired order before creating the RepeatingView.
+   */
+  protected MyComponentsRepeater<SingleButtonPanel> actionButtons;
 
   public PhoneCallForm(final PhoneCallPage parentPage)
   {
@@ -132,12 +142,42 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
   }
 
   @Override
-  @SuppressWarnings( { "serial", "unchecked"})
+  @SuppressWarnings({ "serial", "unchecked", "rawtypes"})
   protected void init()
   {
     super.init();
-    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    numberTextField = new PFAutoCompleteTextField<AddressDO>("phoneNumber", new Model() {
+    addFeedbackPanel();
+    final DivPanel messagePanel = new DivPanel("message") {
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
+      @Override
+      public boolean isVisible()
+      {
+        return StringUtils.isNotBlank(parentPage.result);
+      }
+
+      @Override
+      public void onAfterRender()
+      {
+        super.onAfterRender();
+        parentPage.result = null;
+      }
+    };
+    add(messagePanel);
+    messagePanel.add(new TextPanel(DivPanel.CHILD_ID, new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return parentPage.result;
+      }
+    }));
+    final RepeatingView repeater = new RepeatingView("flowform");
+    add(repeater);
+    gridBuilder = newGridBuilder(repeater);
+    gridBuilder.newGrid16().newColumnsPanel().newColumnPanel(DivType.COL_50);
+    FieldsetPanel fs = gridBuilder.newFieldset(getString("address.phoneCall.number"), true);
+    numberTextField = new PFAutoCompleteTextField<AddressDO>(InputPanel.WICKET_ID, new Model() {
       @Override
       public Serializable getObject()
       {
@@ -184,8 +224,11 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
         return "id:" + address.getId();
       }
 
+      /**
+       * @see org.apache.wicket.Component#getConverter(java.lang.Class)
+       */
       @Override
-      public IConverter getConverter(final Class< ? > type)
+      public <C> IConverter<C> getConverter(final Class<C> type)
       {
         return new IConverter() {
           @Override
@@ -204,136 +247,167 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
       }
     };
     numberTextField.withLabelValue(true).withMatchContains(true).withMinChars(2).withFocus(true).withAutoSubmit(true);
-    add(numberTextField);
-    add(new TooltipImage("numberHelp", getResponse(), WebConstants.IMAGE_HELP_KEYBOARD, getString("address.directCall.number.tooltip")));
-
-    // DropDownChoice myCurrentPhoneId
-    final LabelValueChoiceRenderer<String> myCurrentPhoneIdChoiceRenderer = new LabelValueChoiceRenderer<String>();
-    final String[] ids = userDao.getPersonalPhoneIdentifiers(PFUserContext.getUser());
-    if (ids == null) {
-      myCurrentPhoneIdChoiceRenderer.addValue("--", getString("user.personalPhoneIdentifiers.pleaseDefine"));
-    } else {
-      for (final String id : ids) {
-        myCurrentPhoneIdChoiceRenderer.addValue(id, id);
-      }
+    final String recentNumber = getRecentSearchTermsQueue().get(0);
+    if (StringUtils.isNotBlank(recentNumber) == true) {
+      phoneNumber = recentNumber;
     }
-    final DropDownChoice myCurrentPhoneIdChoice = new DropDownChoice("myCurrentPhoneId", new PropertyModel(this, "myCurrentPhoneId"),
-        myCurrentPhoneIdChoiceRenderer.getValues(), myCurrentPhoneIdChoiceRenderer);
-    myCurrentPhoneIdChoice.setNullValid(false).setRequired(true);
-    add(myCurrentPhoneIdChoice);
-    add(new TooltipImage("myCurrentPhoneIdHelp", getResponse(), WebConstants.IMAGE_HELP, getString("address.myCurrentPhoneId.tooltip")));
-    addressNameRow = new WebMarkupContainer("addressNameRow") {
+    fs.add(numberTextField);
+    fs.addKeyboardHelpIcon(getString("address.directCall.number.tooltip"));
+
+    {
+      // DropDownChoice myCurrentPhoneId
+      fs = gridBuilder.newFieldset(getString("address.myCurrentPhoneId"), true);
+      final LabelValueChoiceRenderer<String> myCurrentPhoneIdChoiceRenderer = new LabelValueChoiceRenderer<String>();
+      final String[] ids = userDao.getPersonalPhoneIdentifiers(PFUserContext.getUser());
+      if (ids == null) {
+        myCurrentPhoneIdChoiceRenderer.addValue("--", getString("user.personalPhoneIdentifiers.pleaseDefine"));
+      } else {
+        for (final String id : ids) {
+          myCurrentPhoneIdChoiceRenderer.addValue(id, id);
+        }
+      }
+      final DropDownChoice myCurrentPhoneIdChoice = new DropDownChoice(fs.getDropDownChoiceId(), new PropertyModel(this,
+          "myCurrentPhoneId"), myCurrentPhoneIdChoiceRenderer.getValues(), myCurrentPhoneIdChoiceRenderer);
+      myCurrentPhoneIdChoice.setNullValid(false).setRequired(true);
+      fs.add(myCurrentPhoneIdChoice);
+      fs.addHelpIcon(getString("address.myCurrentPhoneId.tooltip"));
+    }
+    addressPanel = new DivPanel(gridBuilder.newColumnsPanelId()) {
       @Override
       public boolean isVisible()
       {
         return address != null;
       }
     };
-    add(addressNameRow);
-    final Link<String> addressViewLink = new Link<String>("addressViewLink") {
-      @Override
-      public void onClick()
-      {
-        if (address == null) {
-          log.error("Oups should not occur: AddressViewLink is shown without a given address. Ignoring link.");
-          return;
+    gridBuilder.addColumnPanel(addressPanel, DivType.COL_50);
+    {
+      final Link<String> addressViewLink = new Link<String>(TextLinkPanel.LINK_ID) {
+        @Override
+        public void onClick()
+        {
+          if (address == null) {
+            log.error("Oups should not occur: AddressViewLink is shown without a given address. Ignoring link.");
+            return;
+          }
+          final PageParameters params = new PageParameters();
+          params.add(AbstractEditPage.PARAMETER_KEY_ID, address.getId());
+          setResponsePage(new AddressViewPage(params, parentPage));
         }
-        final PageParameters params = new PageParameters();
-        params.put(AbstractEditPage.PARAMETER_KEY_ID, address.getId());
-        setResponsePage(new AddressViewPage(params, parentPage));
-      }
-    };
-    addressNameRow.add(addressViewLink);
-    addressViewLink.add(new Label("label", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        if (address == null) {
-          return "";
+      };
+      final TextLinkPanel addressLinkPanel = new TextLinkPanel(addressPanel.newChildId(), addressViewLink, new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          if (address == null) {
+            return "";
+          }
+          final StringBuffer buf = new StringBuffer();
+          if (address.getForm() != null) {
+            buf.append(getString(address.getForm().getI18nKey())).append(" ");
+          }
+          if (StringUtils.isNotBlank(address.getTitle()) == true) {
+            buf.append(address.getTitle()).append(" ");
+          }
+          if (StringUtils.isNotBlank(address.getFirstName()) == true) {
+            buf.append(address.getFirstName()).append(" ");
+          }
+          if (StringUtils.isNotBlank(address.getName()) == true) {
+            buf.append(address.getName());
+          }
+          return buf.toString();
         }
-        final StringBuffer buf = new StringBuffer();
-        if (address.getForm() != null) {
-          buf.append(getString(address.getForm().getI18nKey())).append(" ");
-        }
-        if (StringUtils.isNotBlank(address.getTitle()) == true) {
-          buf.append(address.getTitle()).append(" ");
-        }
-        if (StringUtils.isNotBlank(address.getFirstName()) == true) {
-          buf.append(address.getFirstName()).append(" ");
-        }
-        if (StringUtils.isNotBlank(address.getName()) == true) {
-          buf.append(address.getName());
-        }
-        return buf.toString();
-      }
-    }));
-    final Button callButton = new Button("button", new Model<String>(getString("address.directCall.call"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.call();
-      }
-    };
-    callButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    add(new SingleButtonPanel("call", callButton));
-    setDefaultButton(callButton);
-    final WebMarkupContainer showOperatorPanel = new WebMarkupContainer("telephoneSystemOperatorPanel");
-    add(showOperatorPanel);
-    final String url = ConfigXml.getInstance().getTelephoneSystemOperatorPanelUrl();
-    if (url == null) {
-      showOperatorPanel.setVisible(false);
-    } else {
-      final Label content = new Label("content", url);
-      showOperatorPanel.add(content.setEscapeModelStrings(false));
+      });
+      addressPanel.add(addressLinkPanel);
+      addLineBreak();
     }
-    refresh();
+    {
+      addPhoneNumber("businessPhone", getString(PhoneType.BUSINESS.getI18nKey()));
+      addPhoneNumber("mobilePhone", getString(PhoneType.MOBILE.getI18nKey()));
+      addPhoneNumber("privatePhone", getString(PhoneType.PRIVATE.getI18nKey()));
+      addPhoneNumber("privateMobilePhone", getString(PhoneType.PRIVATE_MOBILE.getI18nKey()));
+    }
+    actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");
+    add(actionButtons.getRepeatingView());
+    {
+      final Button callButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("call")) {
+        @Override
+        public final void onSubmit()
+        {
+          parentPage.call();
+        }
+      };
+      final SingleButtonPanel callButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), callButton,
+          getString("address.directCall.call"), SingleButtonPanel.DEFAULT_SUBMIT);
+      actionButtons.add(callButtonPanel);
+      setDefaultButton(callButton);
+    }
+    final String url = ConfigXml.getInstance().getTelephoneSystemOperatorPanelUrl();
+    if (url != null) {
+      final DivPanel section = gridBuilder.newBlockPanel().getPanel();
+      final TextPanel showOperatorPanel = new TextPanel(section.newChildId(), url);
+      showOperatorPanel.getLabel().setEscapeModelStrings(false);
+      section.add(showOperatorPanel);
+    }
   }
 
-  protected void refresh()
+  /**
+   * @see org.projectforge.web.wicket.AbstractForm#onBeforeRender()
+   */
+  @Override
+  public void onBeforeRender()
   {
-    if (phoneNumbersRepeatingView == null) {
-      phoneNumbersRepeatingView = new RepeatingView("phoneNumberRepeater");
-      add(phoneNumbersRepeatingView);
-    } else {
-      phoneNumbersRepeatingView.removeAll();
-    }
-    if (address == null) {
-      return;
-    }
-    addPhoneNumber(address.getBusinessPhone(), getString(PhoneType.BUSINESS.getI18nKey()));
-    addPhoneNumber(address.getMobilePhone(), getString(PhoneType.MOBILE.getI18nKey()));
-    addPhoneNumber(address.getPrivatePhone(), getString(PhoneType.PRIVATE.getI18nKey()));
-    addPhoneNumber(address.getPrivateMobilePhone(), getString(PhoneType.PRIVATE_MOBILE.getI18nKey()));
+    super.onBeforeRender();
+    actionButtons.render();
+  }
+
+  private void addLineBreak()
+  {
+    final TextPanel lineBreak = new TextPanel(addressPanel.newChildId(), "<br/>");
+    lineBreak.getLabel().setEscapeModelStrings(false);
+    addressPanel.add(lineBreak);
   }
 
   @SuppressWarnings("serial")
-  private void addPhoneNumber(final String phoneNumber, final String label)
+  private void addPhoneNumber(final String property, final String label)
   {
-    if (StringUtils.isBlank(phoneNumber) == true) {
-      return;
-    }
-    final WebMarkupContainer item = new WebMarkupContainer(phoneNumbersRepeatingView.newChildId());
-    phoneNumbersRepeatingView.add(item);
-    item.add(new Label("label", label));
-    final SubmitLink link = new SubmitLink("callNumberLink") {
+    final SubmitLink numberLink = new SubmitLink(TextLinkPanel.LINK_ID) {
       @Override
       public void onSubmit()
       {
-        setPhoneNumber(parentPage.extractPhonenumber(phoneNumber));
+        final String number = (String) BeanHelper.getProperty(address, property);
+        setPhoneNumber(parentPage.extractPhonenumber(number));
         numberTextField.setModelObject(new AddressDO().setName(getPhoneNumber()));
         numberTextField.modelChanged();
         parentPage.call();
       }
     };
-    item.add(link);
-    link.add(new Label("number", phoneNumber).setRenderBodyOnly(true));
+    final TextLinkPanel numberLinkPanel = new TextLinkPanel(addressPanel.newChildId(), numberLink, new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        final String number = (String) BeanHelper.getProperty(address, property);
+        return HtmlHelper.escapeHtml(number + " (" + label + ")\n", true);
+      }
+    }) {
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
+      @Override
+      public boolean isVisible()
+      {
+        final String number = (String) BeanHelper.getProperty(address, property);
+        return (StringUtils.isNotBlank(number) == true);
+      }
+    };
+    numberLinkPanel.getLabel().setEscapeModelStrings(false);
+    addressPanel.add(numberLinkPanel);
   }
 
   protected String getPhoneNumberAndPerson(final AddressDO address, final PhoneType phoneType, final String number,
       final String countryPrefix)
   {
-    return StringHelper.listToString(", ", NumberHelper.extractPhonenumber(number, countryPrefix) + ": " + address.getName(), address
-        .getFirstName(), getString(phoneType.getI18nKey()), address.getOrganization());
+    return StringHelper.listToString(", ", NumberHelper.extractPhonenumber(number, countryPrefix) + ": " + address.getName(),
+        address.getFirstName(), getString(phoneType.getI18nKey()), address.getOrganization());
   }
 
   @SuppressWarnings("unchecked")
@@ -344,7 +418,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
     }
     if (recentSearchTermsQueue == null) {
       recentSearchTermsQueue = (RecentQueue<String>) parentPage
-      .getUserPrefEntry("org.projectforge.web.address.PhoneCallAction:recentSearchTerms");
+          .getUserPrefEntry("org.projectforge.web.address.PhoneCallAction:recentSearchTerms");
       if (recentSearchTermsQueue != null) {
         // Old entries:
         parentPage.putUserPrefEntry(USER_PREF_KEY_RECENTS, recentSearchTermsQueue, true);
