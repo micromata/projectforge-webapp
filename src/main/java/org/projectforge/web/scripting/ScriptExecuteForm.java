@@ -29,7 +29,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -52,11 +51,8 @@ import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
-
 
 public class ScriptExecuteForm extends AbstractForm<ScriptDO, ScriptExecutePage>
 {
@@ -112,7 +108,7 @@ public class ScriptExecuteForm extends AbstractForm<ScriptDO, ScriptExecutePage>
 
   private void prefillParameters()
   {
-    RecentScriptCalls recents = parentPage.getRecentScriptCalls();
+    final RecentScriptCalls recents = parentPage.getRecentScriptCalls();
     final ScriptCallData scriptCallData = recents.getScriptCallData(data.getName());
     if (scriptCallData != null && scriptCallData.getScriptParameter() != null) {
       for (final ScriptParameter recentParameter : scriptCallData.getScriptParameter()) {
@@ -153,29 +149,29 @@ public class ScriptExecuteForm extends AbstractForm<ScriptDO, ScriptExecutePage>
         parentPage.cancel();
       }
     };
-    backButton.add(WebConstants.BUTTON_CLASS_CANCEL);
-    backButton.setDefaultFormProcessing(false);
-    final SingleButtonPanel backButtonPanel = new SingleButtonPanel("back", backButton);
-    add(backButtonPanel);
-    final Button executeButton = new Button("button", new Model<String>(getString("execute"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.execute();
-      }
-    };
-    executeButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    setDefaultButton(executeButton);
-    final SingleButtonPanel executeButtonPanel = new SingleButtonPanel("execute", executeButton);
-    add(executeButtonPanel);
-    final MarkupContainer resultRow = new WebMarkupContainer("scriptResultRow") {
-      @Override
-      public boolean isVisible()
-      {
-        return groovyResult != null;
-      }
-    };
-    add(resultRow);
+    // backButton.add(WebConstants.BUTTON_CLASS_CANCEL);
+    // backButton.setDefaultFormProcessing(false);
+    // final SingleButtonPanel backButtonPanel = new SingleButtonPanel("back", backButton);
+    // add(backButtonPanel);
+    // final Button executeButton = new Button("button", new Model<String>(getString("execute"))) {
+    // @Override
+    // public final void onSubmit()
+    // {
+    // parentPage.execute();
+    // }
+    // };
+    // executeButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    // setDefaultButton(executeButton);
+    // final SingleButtonPanel executeButtonPanel = new SingleButtonPanel("execute", executeButton);
+    // add(executeButtonPanel);
+    // final MarkupContainer resultRow = new WebMarkupContainer("scriptResultRow") {
+    // @Override
+    // public boolean isVisible()
+    // {
+    // return groovyResult != null;
+    // }
+    // };
+    // add(resultRow);
     final Label scriptResultLabel = new Label("scriptResult", new Model<String>() {
       @Override
       public String getObject()
@@ -184,7 +180,7 @@ public class ScriptExecuteForm extends AbstractForm<ScriptDO, ScriptExecutePage>
       }
     });
     scriptResultLabel.setEscapeModelStrings(false);
-    resultRow.add(scriptResultLabel);
+    // resultRow.add(scriptResultLabel);
     refreshParametersView();
   }
 
@@ -211,7 +207,7 @@ public class ScriptExecuteForm extends AbstractForm<ScriptDO, ScriptExecutePage>
     int index = 0;
     boolean focusSet = false;
     for (final ScriptParameter parameter : scriptParameters) {
-      WebMarkupContainer item = new WebMarkupContainer(parametersView.newChildId());
+      final WebMarkupContainer item = new WebMarkupContainer(parametersView.newChildId());
       parametersView.add(item);
       final Label parameterNameLabel = new Label("name", StringUtils.capitalize(parameter.getParameterName()));
       item.add(parameterNameLabel);
@@ -227,13 +223,13 @@ public class ScriptExecuteForm extends AbstractForm<ScriptDO, ScriptExecutePage>
         parameterValueField = new TextField<BigDecimal>("value", new PropertyModel<BigDecimal>(parameter, "decimalValue"));
       } else if (parameter.getType() == ScriptParameterType.DATE || parameter.getType() == ScriptParameterType.TIME_PERIOD) {
         final String property = parameter.getType() == ScriptParameterType.TIME_PERIOD ? "timePeriodValue.fromDate" : "dateValue";
-        datePanel1[index] = new DatePanel("panel", new PropertyModel<Date>(parameter, property), DatePanelSettings.get().withCallerPage(
-            parentPage).withSelectProperty("date:" + index).withSelectPeriodMode(true));
+        datePanel1[index] = new DatePanel("panel", new PropertyModel<Date>(parameter, property), DatePanelSettings.get()
+            .withSelectProperty("date:" + index).withSelectPeriodMode(true));
         item.add(datePanel1[index]);
         panel1 = datePanel1[index];
         if (parameter.getType() == ScriptParameterType.TIME_PERIOD) {
           datePanel2[index] = new DatePanel("panel2", new PropertyModel<Date>(parameter, "timePeriodValue.toDate"), DatePanelSettings.get()
-              .withCallerPage(parentPage).withSelectProperty("date2:" + index).withSelectPeriodMode(true));
+              .withSelectProperty("date2:" + index).withSelectPeriodMode(true));
           item.add(datePanel2[index]);
           panel2 = datePanel2[index];
           quickSelectPanel[index] = new QuickSelectPanel("panel3", parentPage, "quickSelect:" + index, datePanel1[index]);
@@ -263,7 +259,7 @@ public class ScriptExecuteForm extends AbstractForm<ScriptDO, ScriptExecutePage>
           parameterValueField.add(new FocusOnLoadBehavior());
           focusSet = true;
         } else if (panel1 instanceof DatePanel) {
-          ((DatePanel)panel1).setFocus();
+          ((DatePanel) panel1).setFocus();
           focusSet = true;
         }
       }
@@ -292,7 +288,7 @@ public class ScriptExecuteForm extends AbstractForm<ScriptDO, ScriptExecutePage>
     refresh = false;
   }
 
-  protected void setScriptResult(GroovyResult result)
+  protected void setScriptResult(final GroovyResult result)
   {
     this.groovyResult = result;
   }

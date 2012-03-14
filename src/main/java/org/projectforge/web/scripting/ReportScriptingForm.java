@@ -32,7 +32,6 @@ import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.fibu.kost.reporting.Report;
 import org.projectforge.fibu.kost.reporting.ReportStorage;
@@ -41,10 +40,6 @@ import org.projectforge.scripting.ScriptDO;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.fibu.ReportScriptingStorage;
 import org.projectforge.web.wicket.AbstractForm;
-import org.projectforge.web.wicket.FocusOnLoadBehavior;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.components.MaxLengthTextArea;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.springframework.util.CollectionUtils;
 
 public class ReportScriptingForm extends AbstractForm<ScriptDO, ReportScriptingPage>
@@ -74,6 +69,7 @@ public class ReportScriptingForm extends AbstractForm<ScriptDO, ReportScriptingP
     setMaxSize(Bytes.megabytes(1));
   }
 
+  @Override
   @SuppressWarnings("serial")
   protected void init()
   {
@@ -94,18 +90,18 @@ public class ReportScriptingForm extends AbstractForm<ScriptDO, ReportScriptingP
         parentPage.upload();
       }
     };
-    add(new SingleButtonPanel("upload", uploadButton));
-    final Button executeButton = new Button("button", new Model<String>(getString("execute"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.execute();
-      }
-    };
-    executeButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    add(new SingleButtonPanel("execute", executeButton));
-    add(new MaxLengthTextArea(this, "groovyScript", getString("label.groovyScript"), new PropertyModel<String>(this, "groovyScript"),
-        MAX_GROOVY_LENGTH).add(new FocusOnLoadBehavior()));
+    //    add(new SingleButtonPanel("upload", uploadButton));
+    //    final Button executeButton = new Button("button", new Model<String>(getString("execute"))) {
+    //      @Override
+    //      public final void onSubmit()
+    //      {
+    //        parentPage.execute();
+    //      }
+    //    };
+    //    executeButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    //    add(new SingleButtonPanel("execute", executeButton));
+    //    add(new MaxLengthTextArea(this, "groovyScript", getString("label.groovyScript"), new PropertyModel<String>(this, "groovyScript"),
+    //        MAX_GROOVY_LENGTH).add(new FocusOnLoadBehavior()));
     add(groovyResultRow = new WebMarkupContainer("groovyResultRow"));
     groovyResultRow.add(groovyResultLabel = (Label) new Label("groovyResult").setEscapeModelStrings(false));
   }
@@ -167,7 +163,7 @@ public class ReportScriptingForm extends AbstractForm<ScriptDO, ReportScriptingP
     return getReportScriptingStorage().getGroovyScript();
   }
 
-  public void setGroovyScript(String groovyScript)
+  public void setGroovyScript(final String groovyScript)
   {
     getReportScriptingStorage().setGroovyScript(groovyScript);
   }

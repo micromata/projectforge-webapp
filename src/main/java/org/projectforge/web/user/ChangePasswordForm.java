@@ -30,8 +30,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 public class ChangePasswordForm extends AbstractForm<ChangePasswordForm, ChangePasswordPage>
 {
@@ -60,17 +58,17 @@ public class ChangePasswordForm extends AbstractForm<ChangePasswordForm, ChangeP
         parentPage.update();
       }
     };
-    add(new SingleButtonPanel("update", updateButton));
-    updateButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    setDefaultButton(updateButton);
-    final Button cancelButton = new Button("button", new Model<String>(getString("cancel"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.cancel();
-      }
-    };
-    add(new SingleButtonPanel("cancel", cancelButton.setDefaultFormProcessing(false)));
+    //    add(new SingleButtonPanel("update", updateButton));
+    //    updateButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    //    setDefaultButton(updateButton);
+    //    final Button cancelButton = new Button("button", new Model<String>(getString("cancel"))) {
+    //      @Override
+    //      public final void onSubmit()
+    //      {
+    //        parentPage.cancel();
+    //      }
+    //    };
+    //    add(new SingleButtonPanel("cancel", cancelButton.setDefaultFormProcessing(false)));
   }
 
   public String getOldPassword()
@@ -78,7 +76,7 @@ public class ChangePasswordForm extends AbstractForm<ChangePasswordForm, ChangeP
     return oldPassword;
   }
 
-  public void setOldPassword(String oldPassword)
+  public void setOldPassword(final String oldPassword)
   {
     this.oldPassword = oldPassword;
   }
@@ -88,7 +86,7 @@ public class ChangePasswordForm extends AbstractForm<ChangePasswordForm, ChangeP
     return newPassword;
   }
 
-  public void setNewPassword(String newPassword)
+  public void setNewPassword(final String newPassword)
   {
     this.newPassword = newPassword;
   }
@@ -98,7 +96,7 @@ public class ChangePasswordForm extends AbstractForm<ChangePasswordForm, ChangeP
     return passwordRepeat;
   }
 
-  public void setPasswordRepeat(String passwordRepeat)
+  public void setPasswordRepeat(final String passwordRepeat)
   {
     this.passwordRepeat = passwordRepeat;
   }

@@ -31,9 +31,6 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
 import org.projectforge.web.wicket.AbstractForm;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.layout.OldLayoutContext;
 
 public class TaskWizardForm extends AbstractForm<TaskWizardForm, TaskWizardPage>
 {
@@ -51,14 +48,13 @@ public class TaskWizardForm extends AbstractForm<TaskWizardForm, TaskWizardPage>
   public TaskWizardForm(final TaskWizardPage parentPage)
   {
     super(parentPage);
-    renderer = new TaskWizardFormRenderer(this, new OldLayoutContext(false), parentPage, taskTree);
   }
 
+  @Override
   @SuppressWarnings("serial")
   protected void init()
   {
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    renderer.add();
     final Button createButton = new Button("button", new Model<String>(getString("task.wizard.finish"))) {
       @Override
       public final void onSubmit()
@@ -72,9 +68,9 @@ public class TaskWizardForm extends AbstractForm<TaskWizardForm, TaskWizardPage>
         return parentPage.actionRequired();
       }
     };
-    createButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    setDefaultButton(createButton);
-    final SingleButtonPanel createButtonPanel = new SingleButtonPanel("finish", createButton);
-    add(createButtonPanel);
+    //    createButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    //    setDefaultButton(createButton);
+    //    final SingleButtonPanel createButtonPanel = new SingleButtonPanel("finish", createButton);
+    //    add(createButtonPanel);
   }
 }

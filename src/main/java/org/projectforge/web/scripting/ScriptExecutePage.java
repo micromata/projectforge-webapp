@@ -38,7 +38,6 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.projectforge.calendar.TimePeriod;
-import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.UserException;
@@ -219,7 +218,7 @@ public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCal
   {
     final StringBuffer buf = new StringBuffer();
     buf.append("pf_report_");
-    buf.append(DateHelper.getTimestampAsFilenameSuffix(now())).append(".xls");
+    // buf.append(DateHelper.getTimestampAsFilenameSuffix(now())).append(".xls");
     final String filename = buf.toString();
     final byte[] xls = workbook.getAsByteArray();
     if (xls == null || xls.length == 0) {
@@ -236,7 +235,7 @@ public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCal
     final int height = exportJFreeChart.getHeight();
     final StringBuffer buf = new StringBuffer();
     buf.append("pf_chart_");
-    buf.append(DateHelper.getTimestampAsFilenameSuffix(now()));
+    //  buf.append(DateHelper.getTimestampAsFilenameSuffix(now()));
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     try {
       if (exportJFreeChart.getImageType() == JFreeChartImageType.PNG) {

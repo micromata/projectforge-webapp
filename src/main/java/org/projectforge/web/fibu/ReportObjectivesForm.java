@@ -51,12 +51,10 @@ import org.projectforge.fibu.kost.reporting.Report;
 import org.projectforge.fibu.kost.reporting.ReportStorage;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractForm;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.PlainLabel;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, ReportObjectivesPage>
 {
@@ -85,7 +83,6 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
     setMaxSize(Bytes.megabytes(10));
   }
 
-  @Override
   protected void validation()
   {
     final Date fromDate = fromDatePanel.getConvertedInput();
@@ -110,14 +107,14 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
         parentPage.importReportObjectivs();
       }
     };
-    uploadContainer.add(new SingleButtonPanel("importReportObjectives", importReportObjectivesButton));
-    add(filterSettingsContainer = new WebMarkupContainer("filterSettings") {
-      @Override
-      public boolean isVisible()
-      {
-        return storageContainer != null && storageContainer.isVisible();
-      }
-    });
+    //    uploadContainer.add(new SingleButtonPanel("importReportObjectives", importReportObjectivesButton));
+    //    add(filterSettingsContainer = new WebMarkupContainer("filterSettings") {
+    //      @Override
+    //      public boolean isVisible()
+    //      {
+    //        return storageContainer != null && storageContainer.isVisible();
+    //      }
+    //    });
 
     final Label timePeriodLabel = new Label("timePeriodLabel", getString("timePeriod"));
     filterSettingsContainer.add(timePeriodLabel);
@@ -133,18 +130,18 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
         parentPage.createReport();
       }
     };
-    createReportButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    setDefaultButton(createReportButton);
-    filterSettingsContainer.add(new SingleButtonPanel("createReport", createReportButton));
-    clearButton = new Button("button", new Model<String>(getString("fibu.kost.reporting.clearStorage"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.clear();
-      }
-    };
-    filterSettingsContainer.add(new SingleButtonPanel("clear", clearButton));
-    clearButton.add(WebConstants.BUTTON_CLASS_RESET);
+    //    createReportButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    //    setDefaultButton(createReportButton);
+    //    filterSettingsContainer.add(new SingleButtonPanel("createReport", createReportButton));
+    //    clearButton = new Button("button", new Model<String>(getString("fibu.kost.reporting.clearStorage"))) {
+    //      @Override
+    //      public final void onSubmit()
+    //      {
+    //        parentPage.clear();
+    //      }
+    //    };
+    //    filterSettingsContainer.add(new SingleButtonPanel("clear", clearButton));
+    //    clearButton.add(WebConstants.BUTTON_CLASS_RESET);
   }
 
   @Override

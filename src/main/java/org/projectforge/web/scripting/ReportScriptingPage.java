@@ -51,7 +51,6 @@ import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jfree.chart.JFreeChart;
-import org.projectforge.common.DateHelper;
 import org.projectforge.common.FileHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.export.ExportJFreeChart;
@@ -300,7 +299,7 @@ public class ReportScriptingPage extends AbstractSecuredPage
       final JasperPrint jasperPrint = jp;
       final StringBuffer buf = new StringBuffer();
       buf.append("pf_report_");
-      buf.append(DateHelper.getTimestampAsFilenameSuffix(now())).append(".pdf");
+      //      buf.append(DateHelper.getTimestampAsFilenameSuffix(now())).append(".pdf");
       final String filename = buf.toString();
       final Response response = getResponse();
       ((WebResponse) response).setAttachmentHeader(filename);
@@ -319,7 +318,7 @@ public class ReportScriptingPage extends AbstractSecuredPage
       final ExportWorkbook workbook = (ExportWorkbook) groovyResult.getResult();
       final StringBuffer buf = new StringBuffer();
       buf.append("pf_report_");
-      buf.append(DateHelper.getTimestampAsFilenameSuffix(now())).append(".xls");
+      //   buf.append(DateHelper.getTimestampAsFilenameSuffix(now())).append(".xls");
       final String filename = buf.toString();
       final Response response = getResponse();
       ((WebResponse) response).setAttachmentHeader(filename);

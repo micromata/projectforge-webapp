@@ -44,10 +44,9 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ScriptEditForm.class);
 
-  public ScriptEditForm(ScriptEditPage parentPage, ScriptDO data)
+  public ScriptEditForm(final ScriptEditPage parentPage, final ScriptDO data)
   {
     super(parentPage, data);
-    this.colspan = 6;
   }
 
   @Override
@@ -64,7 +63,6 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
     super.init();
   }
 
-  @Override
   protected void addBottomRows()
   {
     final Fragment bottomRowsFragment = new Fragment("bottomRows", "bottomRowsFragment", this);
@@ -80,7 +78,7 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
     bottomRowsFragment.add(scriptBackupLabel);
   }
 
-  private void addParameterSettings(int idx)
+  private void addParameterSettings(final int idx)
   {
     final String parameterType = "parameter" + idx + "Type";
     final String parameterName = "parameter" + idx + "Name";

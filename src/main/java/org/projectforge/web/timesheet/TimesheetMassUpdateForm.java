@@ -26,7 +26,6 @@ package org.projectforge.web.timesheet;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Button;
@@ -43,11 +42,8 @@ import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
-
 
 public class TimesheetMassUpdateForm extends AbstractForm<TimesheetDO, TimesheetMassUpdatePage>
 {
@@ -82,7 +78,6 @@ public class TimesheetMassUpdateForm extends AbstractForm<TimesheetDO, Timesheet
     super.init();
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("task", new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId");
-    taskSelectPanel.setEnableLinks(false);
     add(taskSelectPanel);
     taskSelectPanel.init();
     final CheckBox updateTaskCheckBox = new CheckBox("updateTask", new PropertyModel<Boolean>(this, "updateTask"));
@@ -97,22 +92,22 @@ public class TimesheetMassUpdateForm extends AbstractForm<TimesheetDO, Timesheet
         getParentPage().onCancelSubmit();
       }
     };
-    cancelButton.add(WebConstants.BUTTON_CLASS_CANCEL);
-    cancelButton.setDefaultFormProcessing(false);
-    final SingleButtonPanel cancelButtonPanel = new SingleButtonPanel("cancel", cancelButton);
-    add(cancelButtonPanel);
-    final Button updateAllButton = new Button("button", new Model<String>(getString("updateAll"))) {
-      @Override
-      public final void onSubmit()
-      {
-        getParentPage().onUpdateAllSubmit();
-      }
-    };
-    updateAllButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    updateAllButton.add(AttributeModifier.replace("onclick", "return showUpdateQuestionDialog()"));
-    setDefaultButton(updateAllButton);
-    final SingleButtonPanel updateAllButtonPanel = new SingleButtonPanel("updateAll", updateAllButton);
-    add(updateAllButtonPanel);
+    // cancelButton.add(WebConstants.BUTTON_CLASS_CANCEL);
+    // cancelButton.setDefaultFormProcessing(false);
+    // final SingleButtonPanel cancelButtonPanel = new SingleButtonPanel("cancel", cancelButton);
+    // add(cancelButtonPanel);
+    // final Button updateAllButton = new Button("button", new Model<String>(getString("updateAll"))) {
+    // @Override
+    // public final void onSubmit()
+    // {
+    // getParentPage().onUpdateAllSubmit();
+    // }
+    // };
+    // updateAllButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    // updateAllButton.add(AttributeModifier.replace("onclick", "return showUpdateQuestionDialog()"));
+    // setDefaultButton(updateAllButton);
+    // final SingleButtonPanel updateAllButtonPanel = new SingleButtonPanel("updateAll", updateAllButton);
+    // add(updateAllButtonPanel);
   }
 
   protected void refresh()
@@ -135,13 +130,15 @@ public class TimesheetMassUpdateForm extends AbstractForm<TimesheetDO, Timesheet
     };
     add(kost2Row);
     final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = getKost2LabelValueChoiceRenderer();
-    kost2Choice = TimesheetFormRenderer.createCost2ChoiceRenderer("kost2Id", timesheetDao, taskTree, kost2ChoiceRenderer, data, kost2List);
-    kost2Row.add(kost2Choice);
+    // kost2Choice = TimesheetFormRenderer.createCost2ChoiceRenderer("kost2Id", timesheetDao, taskTree, kost2ChoiceRenderer, data,
+    // kost2List);
+    // kost2Row.add(kost2Choice);
   }
 
   private LabelValueChoiceRenderer<Integer> getKost2LabelValueChoiceRenderer()
   {
-    return TimesheetFormRenderer.getCost2LabelValueChoiceRenderer(timesheetDao, kost2List, data, kost2Choice);
+    return null;
+    // return TimesheetFormRenderer.getCost2LabelValueChoiceRenderer(timesheetDao, kost2List, data, kost2Choice);
   }
 
 }

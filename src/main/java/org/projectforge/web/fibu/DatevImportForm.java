@@ -58,12 +58,9 @@ import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.ImageDef;
-import org.projectforge.web.wicket.PresizedImage;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.PlainLabel;
 import org.projectforge.web.wicket.components.RadioButtonLabelPanel;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.springframework.util.CollectionUtils;
 
 import de.micromata.hibernate.history.delta.PropertyDelta;
@@ -123,30 +120,31 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
         parentPage.importAccountList();
       }
     };
-    add(new SingleButtonPanel("importAccountList", importAccountListButton));
-    final Button importAccountingRecordsButton = new Button("button", new Model<String>(getString("finance.datev.importAccountingRecords"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.importAccountRecords();
-      }
-    };
-    add(new SingleButtonPanel("importAccountingRecords", importAccountingRecordsButton));
-    final Button clearStorageButton = new Button("button", new Model<String>(getString("finance.datev.clearStorage"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.clear();
-      }
-    };
-    clearStorageButton.add(WebConstants.BUTTON_CLASS_RESET);
-    add(new SingleButtonPanel("clearStorage", clearStorageButton) {
-      @Override
-      public boolean isVisible()
-      {
-        return storageContainer.isVisible();
-      }
-    });
+    // add(new SingleButtonPanel("importAccountList", importAccountListButton));
+    // final Button importAccountingRecordsButton = new Button("button", new
+    // Model<String>(getString("finance.datev.importAccountingRecords"))) {
+    // @Override
+    // public final void onSubmit()
+    // {
+    // parentPage.importAccountRecords();
+    // }
+    // };
+    // add(new SingleButtonPanel("importAccountingRecords", importAccountingRecordsButton));
+    // final Button clearStorageButton = new Button("button", new Model<String>(getString("finance.datev.clearStorage"))) {
+    // @Override
+    // public final void onSubmit()
+    // {
+    // parentPage.clear();
+    // }
+    // };
+    // clearStorageButton.add(WebConstants.BUTTON_CLASS_RESET);
+    // add(new SingleButtonPanel("clearStorage", clearStorageButton) {
+    // @Override
+    // public boolean isVisible()
+    // {
+    // return storageContainer.isVisible();
+    // }
+    // });
 
     storageContainer = new WebMarkupContainer("storage");
     add(storageContainer);
@@ -245,20 +243,20 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
       }
     };
     cont.add(toggleLink);
-    toggleLink.add(new PresizedImage("zoomInImage", getResponse(), ImageDef.ZOOM_IN) {
-      @Override
-      public boolean isVisible()
-      {
-        return !sheet.isOpen();
-      }
-    });
-    toggleLink.add(new PresizedImage("zoomOutImage", getResponse(), ImageDef.ZOOM_OUT) {
-      @Override
-      public boolean isVisible()
-      {
-        return sheet.isOpen();
-      }
-    });
+    // toggleLink.add(new PresizedImage("zoomInImage", getResponse(), ImageDef.ZOOM_IN) {
+    // @Override
+    // public boolean isVisible()
+    // {
+    // return !sheet.isOpen();
+    // }
+    // });
+    // toggleLink.add(new PresizedImage("zoomOutImage", getResponse(), ImageDef.ZOOM_OUT) {
+    // @Override
+    // public boolean isVisible()
+    // {
+    // return sheet.isOpen();
+    // }
+    // });
     buf = new StringBuffer();
     buf.append("Total=").append(sheet.getTotalNumberOfElements()).append(" ");
     if (sheet.getNumberOfNewElements() > 0) {
@@ -414,14 +412,14 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
       }
       firstCell.add(checkBox);
       final ImageDef imageDef;
-      if (element.isNew() == true) {
-        imageDef = ImageDef.ADD;
-      } else if (element.isModified() == true) {
-        imageDef = ImageDef.EDIT;
-      } else {
-        imageDef = ImageDef.PAGE;
-      }
-      firstCell.add(new PresizedImage("icon", getResponse(), imageDef));
+      // if (element.isNew() == true) {
+      // imageDef = ImageDef.ADD;
+      // } else if (element.isModified() == true) {
+      // imageDef = ImageDef.EDIT;
+      // } else {
+      // imageDef = ImageDef.PAGE;
+      // }
+      // firstCell.add(new PresizedImage("icon", getResponse(), imageDef));
 
       final RepeatingView cellRepeater = new RepeatingView("cellRepeater");
       rowContainer.add(cellRepeater);

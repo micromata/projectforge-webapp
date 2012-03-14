@@ -46,7 +46,7 @@ import org.projectforge.renderer.BatikImageRenderer;
 import org.projectforge.renderer.ImageFormat;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
-import org.projectforge.web.wicket.AbstractUnsecureBasePage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.BatikImage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.EditPage;
@@ -144,20 +144,20 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
   }
 
   @Override
-  public AbstractUnsecureBasePage onSaveOrUpdate()
+  public AbstractSecuredBasePage onSaveOrUpdate()
   {
     getSettings().setOpenNodes(ganttChartEditTreeTablePanel.getOpenNodes());
     getBaseDao().writeGanttObjects(getData(), ganttChartData.getRootObject());
     return null;
   }
 
-  @Override
-  protected void addBottomPanel()
-  {
-    bottomPanelFragment = new Fragment("bottomPanel", "bottomPanelFragment", this);
-    bottomPanelFragment.setRenderBodyOnly(true);
-    body.add(bottomPanelFragment);
-  }
+  //  @Override
+  //  protected void addBottomPanel()
+  //  {
+  //    bottomPanelFragment = new Fragment("bottomPanel", "bottomPanelFragment", this);
+  //    bottomPanelFragment.setRenderBodyOnly(true);
+  //    body.add(bottomPanelFragment);
+  //  }
 
   private GanttChart createGanttChart()
   {

@@ -27,7 +27,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -42,17 +41,15 @@ import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.AbstractSecuredForm;
 import org.projectforge.web.wicket.FocusOnLoadBehavior;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage>
 {
   private static final String USER_PREF_KEY_FILTER = "Search:Filter";
-  
+
   private static final int MAGIC_NUMBER_LAST_DAYS_FOR_WITHOUT_TIME_SETTINGS = 42;
 
   private static final long serialVersionUID = 2638309407446431727L;
@@ -85,10 +82,10 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
     searchField.add(new FocusOnLoadBehavior());
     add(searchField);
     modifiedStartDatePanel = new DatePanel("startDate", new PropertyModel<Date>(filter, "startTimeOfLastModification"), DatePanelSettings
-        .get().withCallerPage(parentPage).withSelectPeriodMode(true));
+        .get().withSelectPeriodMode(true));
     add(modifiedStartDatePanel);
     modifiedStopDatePanel = new DatePanel("stopDate", new PropertyModel<Date>(filter, "stopTimeOfLastModification"), DatePanelSettings
-        .get().withCallerPage(parentPage).withSelectPeriodMode(true));
+        .get().withSelectPeriodMode(true));
     add(modifiedStopDatePanel);
     add(new Label("datesAsUTC", new Model<String>() {
       @Override
@@ -105,7 +102,6 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
 
     taskSelectPanel = new TaskSelectPanel("task", new PropertyModel<TaskDO>(filter, "task"), parentPage, "taskId");
     add(taskSelectPanel);
-    taskSelectPanel.setEnableLinks(true);
     taskSelectPanel.init();
     taskSelectPanel.setRequired(false);
     {
@@ -181,20 +177,20 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
           new PropertyModel<Integer>(filter, "maxRows"), 3, 100);
       add(pageSizeChoice);
     }
-    final Button searchButton = new Button("button", new Model<String>(getString("search")));
-    searchButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    add(new SingleButtonPanel("search", searchButton));
-    setDefaultButton(searchButton);
-
-    final Button resetButton = new Button("button", new Model<String>(getString("reset"))) {
-      @Override
-      public void onSubmit()
-      {
-        super.onSubmit();
-        filter.reset();
-      }
-    };
-    resetButton.add(WebConstants.BUTTON_CLASS_RESET);
-    add(new SingleButtonPanel("reset", resetButton));
+    //    final Button searchButton = new Button("button", new Model<String>(getString("search")));
+    //    searchButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    //    add(new SingleButtonPanel("search", searchButton));
+    //    setDefaultButton(searchButton);
+    //
+    //    final Button resetButton = new Button("button", new Model<String>(getString("reset"))) {
+    //      @Override
+    //      public void onSubmit()
+    //      {
+    //        super.onSubmit();
+    //        filter.reset();
+    //      }
+    //    };
+    //    resetButton.add(WebConstants.BUTTON_CLASS_RESET);
+    //    add(new SingleButtonPanel("reset", resetButton));
   }
 }

@@ -33,8 +33,6 @@ import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.SubmitLink;
-import org.apache.wicket.markup.html.panel.Fragment;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.gantt.GanttAccess;
 import org.projectforge.gantt.GanttChartDO;
@@ -46,7 +44,6 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
@@ -54,8 +51,6 @@ import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.components.TooltipImage;
 
 public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChartEditPage>
 {
@@ -88,7 +83,6 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
   public GanttChartEditForm(final GanttChartEditPage parentPage, final GanttChartDO data)
   {
     super(parentPage, data);
-    this.colspan = 8;
     if (isNew() == true) {
       if (data.getOwner() == null) {
         data.setOwner(PFUserContext.getUser());
@@ -120,7 +114,6 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       }
     };
     add(taskSelectPanel);
-    taskSelectPanel.setEnableLinks(false); // Enable click-able ancestor tasks only for edit mode.
     taskSelectPanel.init();
     taskSelectPanel.setRequired(true);
     final UserSelectPanel userSelectPanel = new UserSelectPanel("owner", new PropertyModel<PFUserDO>(data, "owner"), parentPage, "ownerId");
@@ -129,16 +122,16 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
     taskSelectPanel.setRequired(true);
     {
       // read-access:
-      final LabelValueChoiceRenderer<GanttAccess> readAccessChoiceRenderer = new LabelValueChoiceRenderer<GanttAccess>(this, GanttAccess
-          .values());
+      final LabelValueChoiceRenderer<GanttAccess> readAccessChoiceRenderer = new LabelValueChoiceRenderer<GanttAccess>(this,
+          GanttAccess.values());
       @SuppressWarnings("unchecked")
       final DropDownChoice readAccessChoice = new DropDownChoice("readAccess", new PropertyModel(getData(), "readAccess"),
           readAccessChoiceRenderer.getValues(), readAccessChoiceRenderer);
       readAccessChoice.setNullValid(false);
       add(readAccessChoice);
       // write-access:
-      final LabelValueChoiceRenderer<GanttAccess> writeAccessChoiceRenderer = new LabelValueChoiceRenderer<GanttAccess>(this, GanttAccess
-          .values());
+      final LabelValueChoiceRenderer<GanttAccess> writeAccessChoiceRenderer = new LabelValueChoiceRenderer<GanttAccess>(this,
+          GanttAccess.values());
       @SuppressWarnings("unchecked")
       final DropDownChoice writeAccessChoice = new DropDownChoice("writeAccess", new PropertyModel(getData(), "writeAccess"),
           writeAccessChoiceRenderer.getValues(), writeAccessChoiceRenderer);
@@ -151,11 +144,11 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
     add(new CheckBox("relativeTimeValues", new PropertyModel<Boolean>(data.getStyle(), "relativeTimeValues")));
     add(new CheckBox("showToday", new PropertyModel<Boolean>(data.getStyle(), "showToday")));
     add(new CheckBox("showCompletion", new PropertyModel<Boolean>(data.getStyle(), "showCompletion")));
-    fromDatePanel = new DatePanel("fromDate", new PropertyModel<Date>(getSettings(), "fromDate"), DatePanelSettings.get().withCallerPage(
-        parentPage).withSelectProperty("fromDate"));
+    fromDatePanel = new DatePanel("fromDate", new PropertyModel<Date>(getSettings(), "fromDate"), DatePanelSettings.get()
+        .withSelectProperty("fromDate"));
     add(fromDatePanel);
-    toDatePanel = new DatePanel("toDate", new PropertyModel<Date>(getSettings(), "toDate"), DatePanelSettings.get().withCallerPage(
-        parentPage).withSelectProperty("toDate"));
+    toDatePanel = new DatePanel("toDate", new PropertyModel<Date>(getSettings(), "toDate"), DatePanelSettings.get().withSelectProperty(
+        "toDate"));
     add(toDatePanel);
     add(new CheckBox("showOnlyVisibles", new PropertyModel<Boolean>(getSettings(), "showOnlyVisibles")) {
       @Override
@@ -181,17 +174,18 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       exportFormatChoice.setNullValid(false);
       add(exportFormatChoice);
 
-      final SingleButtonPanel exportButtonPanel = new SingleButtonPanel("export", new Button("button", new Model<String>(
-          getString("export"))) {
-        @Override
-        public final void onSubmit()
-        {
-          parentPage.export(exportFormat);
-        }
-      });
-      add(exportButtonPanel);
+      // final SingleButtonPanel exportButtonPanel = new SingleButtonPanel("export", new Button("button", new Model<String>(
+      // getString("export"))) {
+      // @Override
+      // public final void onSubmit()
+      // {
+      // parentPage.export(exportFormat);
+      // }
+      // });
+      // add(exportButtonPanel);
     }
     final SubmitLink addPositionButton = new SubmitLink("addActivity") {
+      @Override
       public void onSubmit()
       {
         final GanttTaskImpl root = (GanttTaskImpl) parentPage.ganttChartData.getRootObject();
@@ -208,40 +202,40 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
     addPositionButton.add(WicketUtils.getAddRowImage("addImage", getResponse(), getString("gantt.action.newActivity")));
   }
 
-  @Override
-  @SuppressWarnings("serial")
-  protected void addButtonPanel()
-  {
-    final Fragment buttonFragment = new Fragment("buttonPanel", "buttonFragment", this);
-    buttonFragment.setRenderBodyOnly(true);
-    buttonCell.add(buttonFragment);
-    redrawButton = new Button("button", new Model<String>(getString("redraw"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.refresh();
-      }
-    };
-    final SingleButtonPanel redrawButtonPanel = new SingleButtonPanel("redraw", redrawButton);
-    buttonFragment.add(redrawButtonPanel);
-    final TooltipImage redrawInfoImage = new TooltipImage("redrawInfo", getResponse(), WebConstants.IMAGE_INFO,
-        getString("gantt.tooltip.returnKeyCallsRedraw"));
-    buttonFragment.add(redrawInfoImage);
-    final SingleButtonPanel cloneButtonPanel = new SingleButtonPanel("clone", new Button("button", new Model<String>(getString("clone"))) {
-      @Override
-      public final void onSubmit()
-      {
-        getData().setId(null);
-        this.setVisible(false);
-        updateButtonVisibility();
-      }
-    });
-    if (isNew() == true || getData().isDeleted() == true) {
-      // Show clone button only for existing gantt diagrams.
-      cloneButtonPanel.setVisible(false);
-    }
-    buttonFragment.add(cloneButtonPanel);
-  }
+  // @Override
+  // @SuppressWarnings("serial")
+  // protected void addButtonPanel()
+  // {
+  // final Fragment buttonFragment = new Fragment("buttonPanel", "buttonFragment", this);
+  // buttonFragment.setRenderBodyOnly(true);
+  // buttonCell.add(buttonFragment);
+  // redrawButton = new Button("button", new Model<String>(getString("redraw"))) {
+  // @Override
+  // public final void onSubmit()
+  // {
+  // parentPage.refresh();
+  // }
+  // };
+  // final SingleButtonPanel redrawButtonPanel = new SingleButtonPanel("redraw", redrawButton);
+  // buttonFragment.add(redrawButtonPanel);
+  // final TooltipImage redrawInfoImage = new TooltipImage("redrawInfo", getResponse(), WebConstants.IMAGE_INFO,
+  // getString("gantt.tooltip.returnKeyCallsRedraw"));
+  // buttonFragment.add(redrawInfoImage);
+  // final SingleButtonPanel cloneButtonPanel = new SingleButtonPanel("clone", new Button("button", new Model<String>(getString("clone"))) {
+  // @Override
+  // public final void onSubmit()
+  // {
+  // getData().setId(null);
+  // this.setVisible(false);
+  // updateButtonVisibility();
+  // }
+  // });
+  // if (isNew() == true || getData().isDeleted() == true) {
+  // // Show clone button only for existing gantt diagrams.
+  // cloneButtonPanel.setVisible(false);
+  // }
+  // buttonFragment.add(cloneButtonPanel);
+  // }
 
   @Override
   public void updateButtonVisibility()
@@ -249,11 +243,11 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
     super.updateButtonVisibility();
     setDefaultButton(redrawButton);
   }
-  
+
   @Override
   protected void markDefaultButtons()
   {
-    redrawButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    // redrawButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
   }
 
   /**
@@ -275,7 +269,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
   /**
    * @param exportFormat the exportFormat to set
    */
-  public void setExportFormat(String exportFormat)
+  public void setExportFormat(final String exportFormat)
   {
     this.exportFormat = exportFormat;
     parentPage.putUserPrefEntry(this.getClass().getName() + ":exportFormat", this.exportFormat, true);

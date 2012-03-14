@@ -30,7 +30,6 @@ import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightDao;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.layout.OldLayoutContext;
 
 public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditPage>
 {
@@ -47,27 +46,16 @@ public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditP
   @SpringBean(name = "groupDao")
   private GroupDao groupDao;
 
-  protected UserFormRenderer renderer;
 
-  public MyAccountEditForm(MyAccountEditPage parentPage, PFUserDO data)
+  public MyAccountEditForm(final MyAccountEditPage parentPage, final PFUserDO data)
   {
     super(parentPage, data);
-    renderer = new UserFormRenderer(this, parentPage, new OldLayoutContext(this), parentPage.getBaseDao(), userRightDao, groupDao,
-        accessChecker, data);
   }
 
   @Override
   protected void init()
   {
     super.init();
-    renderer.add();
-  }
-
-  @Override
-  protected void validation()
-  {
-    super.validation();
-    renderer.validation();
   }
 
   @Override

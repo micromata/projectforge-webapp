@@ -37,9 +37,7 @@ import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 public class MonthlyEmployeeReportForm extends AbstractForm<MonthlyEmployeeReportFilter, MonthlyEmployeeReportPage>
 {
@@ -93,22 +91,22 @@ public class MonthlyEmployeeReportForm extends AbstractForm<MonthlyEmployeeRepor
         monthChoice.modelChanged();
       }
     };
-    resetButton.add(WebConstants.BUTTON_CLASS_RESET);
-    resetButton.setDefaultFormProcessing(false);
-    final SingleButtonPanel resetButtonPanel = new SingleButtonPanel(actionButtonsView.newChildId(), resetButton);
-    actionButtonsView.add(resetButtonPanel);
-    final Button exportAsPdfButton = new Button("button", new Model<String>(getString("exportAsPdf"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.exportAsPdf();
-      }
-    };
-    actionButtonsView.add(new SingleButtonPanel(actionButtonsView.newChildId(), exportAsPdfButton));
-    final Button showButton = new Button("button", new Model<String>(getString("show")));
-    showButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    setDefaultButton(showButton);
-    actionButtonsView.add(new SingleButtonPanel(actionButtonsView.newChildId(), showButton));
+    //    resetButton.add(WebConstants.BUTTON_CLASS_RESET);
+    //    resetButton.setDefaultFormProcessing(false);
+    //    final SingleButtonPanel resetButtonPanel = new SingleButtonPanel(actionButtonsView.newChildId(), resetButton);
+    //    actionButtonsView.add(resetButtonPanel);
+    //    final Button exportAsPdfButton = new Button("button", new Model<String>(getString("exportAsPdf"))) {
+    //      @Override
+    //      public final void onSubmit()
+    //      {
+    //        parentPage.exportAsPdf();
+    //      }
+    //    };
+    //    actionButtonsView.add(new SingleButtonPanel(actionButtonsView.newChildId(), exportAsPdfButton));
+    //    final Button showButton = new Button("button", new Model<String>(getString("show")));
+    //    showButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    //    setDefaultButton(showButton);
+    //    actionButtonsView.add(new SingleButtonPanel(actionButtonsView.newChildId(), showButton));
   }
 
   @Override
@@ -127,7 +125,7 @@ public class MonthlyEmployeeReportForm extends AbstractForm<MonthlyEmployeeRepor
       years = timesheetDao.getYears(filter.getUser().getId());
     }
     final LabelValueChoiceRenderer<Integer> yearChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-    for (int year : years) {
+    for (final int year : years) {
       yearChoiceRenderer.addValue(year, String.valueOf(year));
     }
     yearChoice.setChoiceRenderer(yearChoiceRenderer);

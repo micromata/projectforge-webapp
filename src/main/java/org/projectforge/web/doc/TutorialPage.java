@@ -48,8 +48,8 @@ import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.access.AccessEditPage;
 import org.projectforge.web.task.TaskEditPage;
 import org.projectforge.web.user.GroupEditPage;
+import org.projectforge.web.user.UserEditForm;
 import org.projectforge.web.user.UserEditPage;
-import org.projectforge.web.user.UserFormRenderer;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.MessagePage;
@@ -140,7 +140,7 @@ public class TutorialPage extends AbstractSecuredPage
     final PFUserDO user;
     if ("linda".equals(reference) == true) {
       user = createUser("linda", "Evans", "Linda", "l.evans@javagurus.com", addTutorialReference("Project manager", tutorialReference));
-      params.add(UserFormRenderer.TUTORIAL_ADD_GROUPS, addGroups(user, ProjectForgeGroup.PROJECT_MANAGER));
+      params.add(UserEditForm.TUTORIAL_ADD_GROUPS, addGroups(user, ProjectForgeGroup.PROJECT_MANAGER));
     } else if ("dave".equals(reference) == true) {
       user = createUser("dave", "Jones", "Dave", "d.jones@javagurus.com", addTutorialReference("Developer", tutorialReference));
     } else if ("betty".equals(reference) == true) {
@@ -178,7 +178,7 @@ public class TutorialPage extends AbstractSecuredPage
     user.setLastname(lastName);
     user.setFirstname(firstName);
     user.setDescription(description);
-    user.setPassword(UserFormRenderer.TUTORIAL_DEFAULT_PASSWORD);
+    user.setPassword(UserEditForm.TUTORIAL_DEFAULT_PASSWORD);
     return user;
   }
 

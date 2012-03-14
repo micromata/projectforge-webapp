@@ -227,11 +227,11 @@ public class ImageCropperPage extends AbstractSecuredPage
    * @return false
    * @see org.projectforge.web.wicket.AbstractUnsecureBasePage#isBookmarkLinkIconVisible()
    */
-  @Override
-  protected boolean isBookmarkLinkIconVisible()
-  {
-    return false;
-  }
+  //  @Override
+  //  protected boolean isBookmarkLinkIconVisible()
+  //  {
+  //    return false;
+  //  }
 
   private ImageCropperPage appendVar(final StringBuffer buf, final String variable, final Object value)
   {

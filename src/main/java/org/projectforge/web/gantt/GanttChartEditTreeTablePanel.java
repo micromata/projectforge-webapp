@@ -156,8 +156,9 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     treeTableHead.add(colHeadRepeater);
     colHeadRepeater.add(createColHead("task"));
     colHeadRepeater.add(createEmtpyColumnHead(16)); // Column for edit icon.
-    colHeadRepeater.add(SingleImagePanel.createTooltipImage(colHeadRepeater.newChildId(), WebConstants.IMAGE_EYE,
-        getString("gantt.tooltip.isVisible")).add(AttributeModifier.replace("style", "width: 16px;")).setRenderBodyOnly(false));
+    colHeadRepeater.add(SingleImagePanel
+        .createTooltipImage(colHeadRepeater.newChildId(), WebConstants.IMAGE_EYE, getString("gantt.tooltip.isVisible"))
+        .add(AttributeModifier.replace("style", "width: 16px;")).setRenderBodyOnly(false));
     addColumnHead(col++, "title");
     addColumnHead(col++, "gantt.startDate");
     addColumnHead(col++, "gantt.duration");
@@ -772,7 +773,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
       final TaskDO task)
   {
     final DatePanel startDatePanel = new DatePanel("startDate", new PropertyModel<Date>(ganttObject, "startDate"), DatePanelSettings.get()
-        .withCallerPage(GanttChartEditTreeTablePanel.this).withSelectProperty("startDate:" + node.getHashId()));
+        .withSelectProperty("startDate:" + node.getHashId()));
     addColumn(item, startDatePanel, "white-space: nowrap;");
     startDatePanelMap.put(ganttObject.getId(), startDatePanel);
     new RejectSaveLinksFragment("rejectSaveStartDate", item, startDatePanel, task, task != null ? DateTimeFormatter.instance()
@@ -821,7 +822,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
       final TaskDO task)
   {
     final DatePanel endDatePanel = new DatePanel("endDate", new PropertyModel<Date>(ganttObject, "endDate"), DatePanelSettings.get()
-        .withCallerPage(GanttChartEditTreeTablePanel.this).withSelectProperty("endDate:" + node.getHashId()));
+        .withSelectProperty("endDate:" + node.getHashId()));
     addColumn(item, endDatePanel, "white-space: nowrap;");
     endDatePanelMap.put(ganttObject.getId(), endDatePanel);
     new RejectSaveLinksFragment("rejectSaveEndDate", item, endDatePanel, task, task != null ? DateTimeFormatter.instance()
@@ -854,8 +855,8 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
       }
     };
     addColumn(item, progressField, null);
-    new RejectSaveLinksFragment("rejectSaveProgress", item, progressField, task, task != null ? NumberHelper
-        .getAsString(task.getProgress()) : "") {
+    new RejectSaveLinksFragment("rejectSaveProgress", item, progressField, task,
+        task != null ? NumberHelper.getAsString(task.getProgress()) : "") {
       @Override
       protected void onSave()
       {
@@ -924,21 +925,21 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     }.setDefaultFormProcessing(false);
     panel.add(unselectSubmitLink);
 
-    new RejectSaveLinksFragment("rejectSavePredecessor", item, panel, task, task != null ? taskFormatter.getTaskPath(
-        new WicketLocalizerAndUrlBuilder(getResponse()), task.getGanttPredecessorId(), null, false, false) : "") {
-      @Override
-      protected void onSave()
-      {
-        taskDao.setGanttPredecessor(task, (Integer) ganttObject.getPredecessorId());
-        taskDao.update(task);
-      }
-
-      @Override
-      protected void onReject()
-      {
-        ganttObject.setPredecessor(findById(task.getGanttPredecessorId()));
-      }
-    };
+    //    new RejectSaveLinksFragment("rejectSavePredecessor", item, panel, task, task != null ? taskFormatter.getTaskPath(
+    //        new WicketLocalizerAndUrlBuilder(getResponse()), task.getGanttPredecessorId(), null, false, false) : "") {
+    //      @Override
+    //      protected void onSave()
+    //      {
+    //        taskDao.setGanttPredecessor(task, (Integer) ganttObject.getPredecessorId());
+    //        taskDao.update(task);
+    //      }
+    //
+    //      @Override
+    //      protected void onReject()
+    //      {
+    //        ganttObject.setPredecessor(findById(task.getGanttPredecessorId()));
+    //      }
+    //    };
   }
 
   @SuppressWarnings("serial")
@@ -981,8 +982,8 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     relationTypeChoice.setNullValid(true);
     addColumn(item, relationTypeChoice, null);
     final GanttRelationType relationType = task != null ? task.getGanttRelationType() : null;
-    new RejectSaveLinksFragment("rejectSaveRelationType", item, relationTypeChoice, task, relationType != null ? getString(relationType
-        .getI18nKey()) : "") {
+    new RejectSaveLinksFragment("rejectSaveRelationType", item, relationTypeChoice, task,
+        relationType != null ? getString(relationType.getI18nKey()) : "") {
       @Override
       protected void onSave()
       {
@@ -1165,8 +1166,8 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
       }
       this.dataComponent = dataComponent;
       addColumn(parent, this, "white-space: nowrap; width: 32px;");
-      rejectSubmitLink = new ImageSubmitLinkPanel("reject", getResponse(), form, WebConstants.IMAGE_BUTTON_CANCEL, PFUserContext
-          .getLocalizedMessage("gantt.tooltip.rejectValue", taskValueAsString)) {
+      rejectSubmitLink = new ImageSubmitLinkPanel("reject", getResponse(), form, WebConstants.IMAGE_BUTTON_CANCEL,
+          PFUserContext.getLocalizedMessage("gantt.tooltip.rejectValue", taskValueAsString)) {
         @Override
         public void onSubmit()
         {
@@ -1179,8 +1180,8 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
         }
       }.setDefaultFormProcessing(false);
       add(rejectSubmitLink);
-      saveSubmitLink = new ImageSubmitLinkPanel("save", getResponse(), form, WebConstants.IMAGE_ACCEPT, GanttChartEditTreeTablePanel.this
-          .getString("gantt.tooltip.saveTaskValue")) {
+      saveSubmitLink = new ImageSubmitLinkPanel("save", getResponse(), form, WebConstants.IMAGE_ACCEPT,
+          GanttChartEditTreeTablePanel.this.getString("gantt.tooltip.saveTaskValue")) {
         @Override
         public void onSubmit()
         {
