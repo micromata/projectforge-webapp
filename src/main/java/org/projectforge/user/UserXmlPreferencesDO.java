@@ -23,6 +23,7 @@
 
 package org.projectforge.user;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Basic;
@@ -40,69 +41,64 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Table(name = "T_USER_XML_PREFS", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "key"})})
-public class UserXmlPreferencesDO
+public class UserXmlPreferencesDO implements Serializable
 {
+  private static final long serialVersionUID = 3203177155834463761L;
+
   /**
    * Don't forget to increase, if any changes in the object stored in user data are made. If not, the user preferences will be lost because
    * of unsupported (de)serialization.
    */
   public static final int CURRENT_VERSION = 4;
 
-  private static final long serialVersionUID = -815810269783729566L;
+  private Integer id;
+
+  private Integer userId;
+
+  private String serializedSettings;
+
+  private String key;
+
+  private Date created;
+
+  private Date lastUpdate;
+
+  private Integer version;
 
   @Id
   @GeneratedValue
   @Column(name = "pk")
-  private Integer id;
-
-  @Column(name = "user_id", nullable = false)
-  private Integer userId;
-
-  @Column(length = 100000)
-  private String serializedSettings;
-
-  @Column(length = 1000)
-  private String key;
-
-  @Basic
-  private Date created;
-
-  @Basic
-  @Column(name = "last_update")
-  private Date lastUpdate;
-
-  @Column
-  private int version;
-
   public Integer getId()
   {
     return id;
   }
-  
-  public void setId(Integer id)
+
+  public void setId(final Integer id)
   {
     this.id = id;
   }
-  
+
+  @Column(name = "user_id", nullable = false)
   public Integer getUserId()
   {
     return userId;
   }
 
-  public void setUserId(Integer userId)
+  public void setUserId(final Integer userId)
   {
     this.userId = userId;
   }
-  
+
   /**
    * Optional if the user preference should be stored in its own data base entry.
    */
+  @Column(length = 1000)
   public String getKey()
   {
     return key;
   }
-  
-  public void setKey(String key)
+
+  public void setKey(final String key)
   {
     this.key = key;
   }
@@ -111,22 +107,24 @@ public class UserXmlPreferencesDO
    * Contains the serialized settings, stored in the database.
    * @return
    */
+  @Column(length = 100000)
   public String getSerializedSettings()
   {
     return serializedSettings;
   }
 
-  public void setSerializedSettings(String settings)
+  public void setSerializedSettings(final String settings)
   {
     this.serializedSettings = settings;
   }
 
+  @Basic
   public Date getCreated()
   {
     return created;
   }
 
-  public void setCreated(Date created)
+  public void setCreated(final Date created)
   {
     this.created = created;
   }
@@ -141,12 +139,14 @@ public class UserXmlPreferencesDO
    * Last update will be modified automatically for every update of the database object.
    * @return
    */
+  @Basic
+  @Column(name = "last_update")
   public Date getLastUpdate()
   {
     return lastUpdate;
   }
 
-  public void setLastUpdate(Date lastUpdate)
+  public void setLastUpdate(final Date lastUpdate)
   {
     this.lastUpdate = lastUpdate;
   }
@@ -164,7 +164,7 @@ public class UserXmlPreferencesDO
     return version;
   }
 
-  public void setVersion(int version)
+  public void setVersion(final int version)
   {
     this.version = version;
   }
@@ -173,6 +173,7 @@ public class UserXmlPreferencesDO
    * Sets CURRENT_VERSION as version.
    * @see #CURRENT_VERSION
    */
+  @Column
   public void setVersion()
   {
     this.version = CURRENT_VERSION;
