@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.access.AccessDao;
@@ -53,6 +53,7 @@ import org.projectforge.web.user.UserFormRenderer;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.MessagePage;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * Standard error page should be shown in production mode.
@@ -62,6 +63,8 @@ import org.projectforge.web.wicket.MessagePage;
  */
 public class TutorialPage extends AbstractSecuredPage
 {
+  private static final long serialVersionUID = 6326263860561990911L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TutorialPage.class);
 
   private static final String KEY_TYPE = "type";
@@ -86,9 +89,9 @@ public class TutorialPage extends AbstractSecuredPage
 
   private static final String ACCESS_TEMPLATE_EMPLOYEE = "employee";
 
-  private String type;
+  private final String type;
 
-  private String reference;
+  private final String reference;
 
   @SpringBean(name = "accessDao")
   private AccessDao accessDao;
@@ -111,8 +114,8 @@ public class TutorialPage extends AbstractSecuredPage
   public TutorialPage(final PageParameters params)
   {
     super(params);
-    type = params.getString(KEY_TYPE);
-    reference = params.getString(KEY_REF);
+    type = WicketUtils.getAsString(params, KEY_TYPE);
+    reference = WicketUtils.getAsString(params, KEY_REF);
     if (TYPE_CREATE_USER.equals(type) == true) {
       createUser();
     } else if (TYPE_CREATE_GROUP.equals(type) == true) {
@@ -137,7 +140,7 @@ public class TutorialPage extends AbstractSecuredPage
     final PFUserDO user;
     if ("linda".equals(reference) == true) {
       user = createUser("linda", "Evans", "Linda", "l.evans@javagurus.com", addTutorialReference("Project manager", tutorialReference));
-      params.put(UserFormRenderer.TUTORIAL_ADD_GROUPS, addGroups(user, ProjectForgeGroup.PROJECT_MANAGER));
+      params.add(UserFormRenderer.TUTORIAL_ADD_GROUPS, addGroups(user, ProjectForgeGroup.PROJECT_MANAGER));
     } else if ("dave".equals(reference) == true) {
       user = createUser("dave", "Jones", "Dave", "d.jones@javagurus.com", addTutorialReference("Developer", tutorialReference));
     } else if ("betty".equals(reference) == true) {
@@ -147,7 +150,7 @@ public class TutorialPage extends AbstractSecuredPage
       setResponsePage(new MessagePage("tutorial.unknown").setWarning(true));
       return;
     }
-    params.put(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, user);
+    params.add(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, user);
     final UserEditPage userEditPage = new UserEditPage(params);
     setResponsePage(userEditPage);
   }
@@ -179,7 +182,7 @@ public class TutorialPage extends AbstractSecuredPage
     return user;
   }
 
-  private List<Integer> addGroups(final PFUserDO user, ProjectForgeGroup... groups)
+  private List<Integer> addGroups(final PFUserDO user, final ProjectForgeGroup... groups)
   {
     final List<Integer> groupsToAssign = new ArrayList<Integer>();
     final GroupDO group = userGroupCache.getGroup(ProjectForgeGroup.PROJECT_MANAGER);
@@ -204,7 +207,7 @@ public class TutorialPage extends AbstractSecuredPage
       setResponsePage(new MessagePage("tutorial.unknown").setWarning(true));
       return;
     }
-    params.put(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, task);
+    params.add(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, task);
     final TaskEditPage taskEditPage = new TaskEditPage(params);
     setResponsePage(taskEditPage);
   }
@@ -237,7 +240,7 @@ public class TutorialPage extends AbstractSecuredPage
     }
     if (group != null) {
       group.setDescription(tutorialReference);
-      params.put(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, group);
+      params.add(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, group);
       final GroupEditPage groupEditPage = new GroupEditPage(params);
       setResponsePage(groupEditPage);
     }
@@ -285,7 +288,7 @@ public class TutorialPage extends AbstractSecuredPage
     if (task == null || group == null) {
       return;
     }
-    params.put(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, access);
+    params.add(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, access);
     final AccessEditPage accessEditPage = new AccessEditPage(params);
     setResponsePage(accessEditPage);
   }
@@ -325,7 +328,7 @@ public class TutorialPage extends AbstractSecuredPage
   private PageParameters createEditPageParameters(final BaseDO< ? > obj)
   {
     final PageParameters params = new PageParameters();
-    params.put(AbstractEditPage.PARAMETER_KEY_ID, obj.getId());
+    params.add(AbstractEditPage.PARAMETER_KEY_ID, obj.getId());
     return params;
   }
 

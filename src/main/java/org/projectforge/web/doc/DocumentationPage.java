@@ -25,45 +25,60 @@ package org.projectforge.web.doc;
 
 import java.util.Locale;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.link.AbstractLink;
+import org.apache.wicket.markup.html.link.ExternalLink;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.WicketUtils;
 
 public class DocumentationPage extends AbstractSecuredPage
 {
+  private static final long serialVersionUID = 1680968273313948593L;
+
+  /**
+   * Adds BookmarkablePageLink with given id to the given parentContainer.
+   * @param id id of the link (shouldn't bee "newsLink" in body, because it's already used by DocumentationPage).
+   * @param parentContainer Page (normally body)
+   */
+  public static final AbstractLink addNewsLink(final WebMarkupContainer parentContainer, final String id)
+  {
+    final AbstractLink link = new ExternalLink(id, WicketUtils.getUrl(parentContainer.getResponse(), "/secure/doc/News.html", true));
+    parentContainer.add(link);
+    return link;
+  }
+
   public DocumentationPage(final PageParameters parameters)
   {
     super(parameters);
     final Locale locale = PFUserContext.getLocale();
     final boolean isGerman = locale != null && locale.toString().startsWith("de") == true;
-    addDocLink("newsLink", "doc/News.html");
-    addDocLink("tutorialLink", "doc/ProjectForge.html");
-    addDocLink("handbookLink", "doc/Handbuch.html");
+    addDocLink(body, "newsLink", "doc/News.html");
+    addDocLink(body, "tutorialLink", "doc/ProjectForge.html");
+    addDocLink(body, "handbookLink", "doc/Handbuch.html");
     if (isGerman == true) {
-      addDocLink("faqLink", "doc/FAQ_de.html");
+      addDocLink(body, "faqLink", "doc/FAQ_de.html");
     } else {
-      addDocLink("faqLink", "doc/FAQ.html");
+      addDocLink(body, "faqLink", "doc/FAQ.html");
     }
-    addDocLink("licenseLink", "LICENSE.txt");
+    addDocLink(body, "licenseLink", "LICENSE.txt");
 
-    addDocLink("adminLogbuchLink", "doc/AdminLogbuch.html");
-    addDocLink("adminGuideLink", "doc/AdministrationGuide.html");
-    addDocLink("developerGuideLink", "doc/DeveloperGuide.html");
-    addDocLink("projectDocLink", "site/index.html");
-    addDocLink("javaDocLink", "site/apidocs/index.html");
+    addDocLink(body, "adminLogbuchLink", "doc/AdminLogbuch.html");
+    addDocLink(body, "adminGuideLink", "doc/AdministrationGuide.html");
+    addDocLink(body, "developerGuideLink", "doc/DeveloperGuide.html");
+    addDocLink(body, "projectDocLink", "site/index.html");
+    addDocLink(body, "javaDocLink", "site/apidocs/index.html");
   }
 
-  private void addDocLink(final String id, final String url)
+  private static void addDocLink(final WebMarkupContainer parentContainer, final String id, final String url)
   {
     final WebMarkupContainer linkContainer = new WebMarkupContainer(id);
-    linkContainer.add(new SimpleAttributeModifier("onclick", "javascript:openDoc('"
-        + WicketUtils.getUrl(getResponse(), "/secure/" + url, true)
-        + "');"));
-    linkContainer.add(new SimpleAttributeModifier("onmouseover", "style.cursor='pointer'"));
-    body.add(linkContainer);
+    linkContainer.add(AttributeModifier.replace("onclick",
+        "javascript:openDoc('" + WicketUtils.getUrl(parentContainer.getResponse(), "/secure/" + url, true) + "');"));
+    linkContainer.add(AttributeModifier.replace("onmouseover", "style.cursor='pointer'"));
+    parentContainer.add(linkContainer);
   }
 
   @Override
