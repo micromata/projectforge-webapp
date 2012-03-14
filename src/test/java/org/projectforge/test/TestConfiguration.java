@@ -46,7 +46,7 @@ public class TestConfiguration
 
   private static final Logger log = Logger.getLogger(TestConfiguration.class);
 
-  private static final String[] TEST_CONTEXT_FILES = new String[] { "applicationContext-test.xml", "applicationContext-hibernate.xml",
+  private static final String[] TEST_CONTEXT_FILES = new String[] { "test-applicationContext-main.xml", "applicationContext-hibernate.xml",
     "applicationContext-business.xml", "applicationContext-web.xml"};
 
   private static final String[] CMD_CONTEXT_FILES = new String[] { "cmd-applicationContext-main.xml", "applicationContext-hibernate.xml",
