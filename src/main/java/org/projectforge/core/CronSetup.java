@@ -70,7 +70,7 @@ public class CronSetup
         // and start it off
         scheduler.start();
 
-      } catch (SchedulerException ex) {
+      } catch (final SchedulerException ex) {
         log.error(ex.getMessage(), ex);
       }
       final ConfigXml cfg = ConfigXml.getInstance();
@@ -98,7 +98,7 @@ public class CronSetup
   {
     try {
       scheduler.shutdown();
-    } catch (SchedulerException ex) {
+    } catch (final SchedulerException ex) {
       log.error(ex.getMessage(), ex);
     }
   }
@@ -113,7 +113,7 @@ public class CronSetup
       final JobDataMap map = job.getJobDataMap();
       for (int i = 0; i < params.length - 1; i += 2) {
         Validate.isTrue(params[i] instanceof String);
-        map.put((String) params[i], params[i + 1]);
+        map.put(params[i], params[i + 1]);
       }
     }
     final String cronEx;
@@ -132,19 +132,19 @@ public class CronSetup
     try {
       // Schedule the job with the trigger
       scheduler.scheduleJob(job, trigger);
-    } catch (SchedulerException ex) {
+    } catch (final SchedulerException ex) {
       log.error("Could not create cron job: " + ex.getMessage(), ex);
       return;
     }
     log.info("Cron job '" + name + "' successfully configured: " + cronEx);
   }
 
-  public void setDatabaseUpdateDao(DatabaseUpdateDao databaseUpdateDao)
+  public void setDatabaseUpdateDao(final DatabaseUpdateDao databaseUpdateDao)
   {
     this.databaseUpdateDao = databaseUpdateDao;
   }
 
-  public void setHibernateSearchReindexer(HibernateSearchReindexer hibernateSearchReindexer)
+  public void setHibernateSearchReindexer(final HibernateSearchReindexer hibernateSearchReindexer)
   {
     this.hibernateSearchReindexer = hibernateSearchReindexer;
   }
