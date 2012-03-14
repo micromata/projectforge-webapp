@@ -91,12 +91,12 @@ public class BaseSearchFilter implements Serializable
     return searchString;
   }
 
-  public void setSearchString(String searchString)
+  public void setSearchString(final String searchString)
   {
     this.searchString = searchString;
   }
 
-  public void setSearchFields(String... searchFields)
+  public void setSearchFields(final String... searchFields)
   {
     this.searchFields = searchFields;
   }
@@ -120,7 +120,7 @@ public class BaseSearchFilter implements Serializable
     return useModificationFilter;
   }
 
-  public void setUseModificationFilter(boolean useModificationFilter)
+  public void setUseModificationFilter(final boolean useModificationFilter)
   {
     this.useModificationFilter = useModificationFilter;
   }
@@ -130,7 +130,7 @@ public class BaseSearchFilter implements Serializable
     return modifiedByUserId;
   }
 
-  public void setModifiedByUserId(Integer modifiedByUserId)
+  public void setModifiedByUserId(final Integer modifiedByUserId)
   {
     this.modifiedByUserId = modifiedByUserId;
   }
@@ -140,7 +140,7 @@ public class BaseSearchFilter implements Serializable
     return startTimeOfLastModification;
   }
 
-  public void setStartTimeOfLastModification(Date startTimeOfLastModification)
+  public void setStartTimeOfLastModification(final Date startTimeOfLastModification)
   {
     this.startTimeOfLastModification = startTimeOfLastModification;
   }
@@ -150,7 +150,7 @@ public class BaseSearchFilter implements Serializable
     return stopTimeOfLastModification;
   }
 
-  public void setStopTimeOfLastModification(Date stopTimeOfLastModification)
+  public void setStopTimeOfLastModification(final Date stopTimeOfLastModification)
   {
     this.stopTimeOfLastModification = stopTimeOfLastModification;
   }
@@ -163,7 +163,7 @@ public class BaseSearchFilter implements Serializable
     return ignoreDeleted;
   }
 
-  public void setIgnoreDeleted(boolean ignoreDeleted)
+  public void setIgnoreDeleted(final boolean ignoreDeleted)
   {
     this.ignoreDeleted = ignoreDeleted;
   }
@@ -176,7 +176,7 @@ public class BaseSearchFilter implements Serializable
     return deleted;
   }
 
-  public void setDeleted(boolean deleted)
+  public void setDeleted(final boolean deleted)
   {
     this.deleted = deleted;
   }
@@ -190,7 +190,7 @@ public class BaseSearchFilter implements Serializable
     return maxRows;
   }
 
-  public void setMaxRows(int maxRows)
+  public void setMaxRows(final int maxRows)
   {
     this.maxRows = maxRows;
   }
@@ -204,7 +204,7 @@ public class BaseSearchFilter implements Serializable
     return errorMessage;
   }
 
-  public void setErrorMessage(String errorMessage)
+  public void setErrorMessage(final String errorMessage)
   {
     this.errorMessage = errorMessage;
   }
