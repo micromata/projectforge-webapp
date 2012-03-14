@@ -1,6 +1,17 @@
 body #sidebar {
 	border-top-right-radius: 0px;
-	top: 67px !important;
+	top: 75px !important;
+}
+
+.display_none {
+}
+
+div.dialog_content .box, div.dialog_content .block{
+	opacity: 1;
+}
+
+#nav_top>ul>li>a>img.gear {
+	padding-right: 10px;
 }
 
 #sidebar div.cog {
@@ -9,35 +20,38 @@ body #sidebar {
 }
 
 #nav_top {
-	margin: -50px 10px 10px 30px;
+	margin: -57px 160px 10px 30px;
 }
 
 #nav_top>ul>li>ul,#nav_top ul li ul.dropdown {
 	width: 180px;
 }
 
-#footer {
-	background-color: #4c5766;
-	border-color: #313841;
-	color: #fff;
-	text-shadow: 0 1px 0 #000;
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#4c5766),
-		to(#313841) ); /* Saf4+, Chrome */
-	background-image: -webkit-linear-gradient(top, #4c5766, #313841);
-	/* Chrome 10+, Saf5.1+, iOS 5+ */
-	background-image: -moz-linear-gradient(top, #4c5766, #313841);
-	/* FF3.6 */
-	background-image: -ms-linear-gradient(top, #4c5766, #313841);
-	/* IE10 */
-	background-image: -o-linear-gradient(top, #4c5766, #313841);
-	/* Opera 11.10+ */
-	background-image: linear-gradient(top, #4c5766, #313841);
-	border: 1px solid rgba(0, 0, 0, 0.5) !important;
-	position: fixed;
-	bottom: 0px;
-	text-align: right;
-	background-color: white;
-	color: #aaaaaa;
-	width: 100%;
+#topbar .user_box {
 	z-index: 1000;
+	width: 150px;
+}
+
+ul.tab_header {
+	letter-spacing: normal;
+}
+
+div.jqui_radios,div.jqui_checkbox {
+	float: left;
+}
+
+div.field_div {
+	float: left;
+	width: 100%;
+}
+
+div.field_div span, div.field_div input, div.field_div div, div.field_div a, div.field_div div input, div.field_div select {
+	float:left;
+}
+
+button, select {
+	letter-spacing: normal;
+}
+fieldset .text {
+	height: 32px;
 }
