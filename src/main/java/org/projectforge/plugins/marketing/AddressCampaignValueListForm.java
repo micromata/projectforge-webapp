@@ -23,28 +23,19 @@
 
 package org.projectforge.plugins.marketing;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
-import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.Radio;
-import org.apache.wicket.markup.html.form.RadioGroup;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.address.AddressDO;
-import org.projectforge.common.DateHelper;
+import org.projectforge.web.address.AddressListForm;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
- * The list formular for the list view (this example has no filter settings). See ToDoListPage for seeing how to use filter settings.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -58,9 +49,6 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
 
   @SpringBean(name = "addressCampaignDao")
   private AddressCampaignDao addressCampaignDao;
-
-  @SpringBean(name = "addressCampaignValueExport")
-  private AddressCampaignValueExport addressCampaignValueExport;
 
   private Integer addressCampaignId;
 
@@ -82,13 +70,15 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
     this.addressCampaignId = searchFilter.getAddressCampaignId();
     this.addressCampaignValue = searchFilter.getAddressCampaignValue();
     final List<AddressCampaignDO> addressCampaignList = addressCampaignDao.getList(new AddressCampaignValueFilter());
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
     {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.marketing.addressCampaign"));
       final LabelValueChoiceRenderer<Integer> addressCampaignRenderer = new LabelValueChoiceRenderer<Integer>();
       for (final AddressCampaignDO addressCampaign : addressCampaignList) {
         addressCampaignRenderer.addValue(addressCampaign.getId(), addressCampaign.getTitle());
       }
-      final DropDownChoice<Integer> addressCampaignChoice = new DropDownChoice<Integer>("addressCampaign", new PropertyModel<Integer>(this,
-      "addressCampaignId"), addressCampaignRenderer.getValues(), addressCampaignRenderer) {
+      final DropDownChoice<Integer> addressCampaignChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(),
+          new PropertyModel<Integer>(this, "addressCampaignId"), addressCampaignRenderer.getValues(), addressCampaignRenderer) {
         @Override
         protected void onSelectionChanged(final Integer newSelection)
         {
@@ -124,12 +114,14 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
           return true;
         }
       };
-      filterContainer.add(addressCampaignChoice);
+      fs.add(addressCampaignChoice);
     }
     {
+      gridBuilder.newColumnPanel(DivType.COL_50);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.marketing.addressCampaign"));
       final LabelValueChoiceRenderer<String> choiceRenderer = getValueLabelValueChoiceRenderer();
-      addressCampaignValueDropDownChoice = new DropDownChoice<String>("addressCampaignValue", new PropertyModel<String>(this,
-      "addressCampaignValue"), choiceRenderer.getValues(), choiceRenderer) {
+      addressCampaignValueDropDownChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(this,
+          "addressCampaignValue"), choiceRenderer.getValues(), choiceRenderer) {
         @Override
         protected void onSelectionChanged(final String newSelection)
         {
@@ -145,44 +137,9 @@ public class AddressCampaignValueListForm extends AbstractListForm<AddressCampai
 
       };
       addressCampaignValueDropDownChoice.setNullValid(true);
-      filterContainer.add(addressCampaignValueDropDownChoice);
+      fs.add(addressCampaignValueDropDownChoice);
     }
-    filterContainer.add(new CheckBox("uptodate", new PropertyModel<Boolean>(getSearchFilter(), "uptodate")));
-    filterContainer.add(new CheckBox("outdated", new PropertyModel<Boolean>(getSearchFilter(), "outdated")));
-    filterContainer.add(new CheckBox("leaved", new PropertyModel<Boolean>(getSearchFilter(), "leaved")));
-
-    filterContainer.add(new CheckBox("active", new PropertyModel<Boolean>(getSearchFilter(), "active")));
-    filterContainer.add(new CheckBox("nonActive", new PropertyModel<Boolean>(getSearchFilter(), "nonActive")));
-    filterContainer.add(new CheckBox("uninteresting", new PropertyModel<Boolean>(getSearchFilter(), "uninteresting")));
-    filterContainer.add(new CheckBox("personaIngrata", new PropertyModel<Boolean>(getSearchFilter(), "personaIngrata")));
-    filterContainer.add(new CheckBox("departed", new PropertyModel<Boolean>(getSearchFilter(), "departed")));
-
-    // Radio choices:
-    final RadioGroup<String> filterType = new RadioGroup<String>("filterType", new PropertyModel<String>(getSearchFilter(), "listType"));
-    filterType.add(new Radio<String>("filter", new Model<String>("filter")).setOutputMarkupId(false));
-    filterType.add(new Radio<String>("newest", new Model<String>("newest")));
-    filterType.add(new Radio<String>("myFavorites", new Model<String>("myFavorites")));
-    filterContainer.add(filterType);
-
-    final Button exportButton = new Button("button", new Model<String>(getString("address.book.export"))) {
-      @Override
-      public final void onSubmit()
-      {
-        log.info("Exporting address list.");
-        final List<AddressDO> list = parentPage.getList();
-        final byte[] xls = addressCampaignValueExport.export(list, parentPage.personalAddressMap, parentPage.addressCampaignValueMap,
-            getSearchFilter().getAddressCampaign() != null ? getSearchFilter().getAddressCampaign().getTitle() : "");
-        if (xls == null || xls.length == 0) {
-          addError("address.book.hasNoVCards");
-          return;
-        }
-        final String filename = "ProjectForge-AddressCampaignValueExport_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
-        DownloadUtils.setDownloadTarget(xls, filename);
-      }
-    };
-    exportButton.setDefaultFormProcessing(false).add(new SimpleAttributeModifier("title", getString("address.book.export.tooltip")));
-    final SingleButtonPanel exportPanel = new SingleButtonPanel(getNewActionButtonChildId(), exportButton);
-    prependActionButton(exportPanel);
+    AddressListForm.addFilter(parentPage, this, gridBuilder, getSearchFilter());
   }
 
   protected void refresh()

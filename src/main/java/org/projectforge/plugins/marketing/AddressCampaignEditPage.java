@@ -24,9 +24,8 @@
 package org.projectforge.plugins.marketing;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
@@ -35,7 +34,7 @@ import org.projectforge.web.wicket.EditPage;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @EditPage(defaultReturnPage = AddressCampaignListPage.class)
-public class AddressCampaignEditPage extends AbstractAutoLayoutEditPage<AddressCampaignDO, AddressCampaignEditForm, AddressCampaignDao>
+public class AddressCampaignEditPage extends AbstractEditPage<AddressCampaignDO, AddressCampaignEditForm, AddressCampaignDao>
 {
   private static final long serialVersionUID = -5058143025817192156L;
 

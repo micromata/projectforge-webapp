@@ -27,12 +27,12 @@ import java.io.Serializable;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.string.StringValue;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.core.UserException;
-import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
@@ -42,7 +42,7 @@ import org.projectforge.web.wicket.EditPage;
  */
 @EditPage(defaultReturnPage = AddressCampaignValueListPage.class)
 public class AddressCampaignValueEditPage extends
-AbstractAutoLayoutEditPage<AddressCampaignValueDO, AddressCampaignValueEditForm, AddressCampaignValueDao>
+AbstractEditPage<AddressCampaignValueDO, AddressCampaignValueEditForm, AddressCampaignValueDao>
 {
   public static final String PARAMETER_ADDRESS_ID = "addressId";
 
@@ -64,11 +64,12 @@ AbstractAutoLayoutEditPage<AddressCampaignValueDO, AddressCampaignValueEditForm,
   public AddressCampaignValueEditPage(final PageParameters parameters)
   {
     super(parameters, "plugins.marketing.addressCampaign");
-    final Integer id = parameters.getAsInteger(AbstractEditPage.PARAMETER_KEY_ID);
+    StringValue sval;
+    final Integer id = (sval = parameters.get(AbstractEditPage.PARAMETER_KEY_ID)) != null ? sval.toInteger() : null;
     if (id == null) {
       // Create new entry.
-      final Integer addressId = parameters.getAsInteger(PARAMETER_ADDRESS_ID);
-      final Integer addressCampaignId = parameters.getAsInteger(PARAMETER_ADDRESS_CAMPAIGN_ID);
+      final Integer addressId = (sval = parameters.get(PARAMETER_ADDRESS_ID)) != null ? sval.toInteger() : null;
+      final Integer addressCampaignId = (sval = parameters.get(PARAMETER_ADDRESS_CAMPAIGN_ID)) != null ? sval.toInteger() : null;
       if (addressId == null || addressCampaignId == null) {
         throw new UserException("plugins.marketing.addressCampaignValue.error.addressOrCampaignNotGiven");
       }
@@ -122,8 +123,8 @@ AbstractAutoLayoutEditPage<AddressCampaignValueDO, AddressCampaignValueEditForm,
           // Found current entry and next entry available.
           final AddressDO address = it.next();
           final PageParameters parameters = new PageParameters();
-          parameters.put(AddressCampaignValueEditPage.PARAMETER_ADDRESS_ID, String.valueOf(address.getId()));
-          parameters.put(AddressCampaignValueEditPage.PARAMETER_ADDRESS_CAMPAIGN_ID, String.valueOf(getData().getAddressCampaignId()));
+          parameters.add(AddressCampaignValueEditPage.PARAMETER_ADDRESS_ID, String.valueOf(address.getId()));
+          parameters.add(AddressCampaignValueEditPage.PARAMETER_ADDRESS_CAMPAIGN_ID, String.valueOf(getData().getAddressCampaignId()));
           final AddressCampaignValueEditPage editPage = new AddressCampaignValueEditPage(parameters);
           editPage.setReturnToPage(this.returnToPage);
           setResponsePage(editPage);

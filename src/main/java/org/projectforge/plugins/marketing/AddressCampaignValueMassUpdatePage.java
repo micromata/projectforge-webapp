@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
@@ -37,15 +37,18 @@ import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvid
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.common.MyBeanComparator;
-import org.projectforge.web.wicket.AbstractListPage;
+import org.projectforge.web.wicket.AbstractMassEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 
-public class AddressCampaignValueMassUpdatePage extends AbstractSecuredPage
+public class AddressCampaignValueMassUpdatePage extends AbstractMassEditPage
 {
+  private static final long serialVersionUID = 7327415575226885117L;
+
   @SpringBean(name = "addressCampaignValueDao")
   private AddressCampaignValueDao addressCampaignValueDao;
 
@@ -53,17 +56,17 @@ public class AddressCampaignValueMassUpdatePage extends AbstractSecuredPage
 
   private final AddressCampaignValueMassUpdateForm form;
 
-  private final AbstractSecuredPage callerPage;
-
-  public AddressCampaignValueMassUpdatePage(final AbstractSecuredPage callerPage, final List<AddressDO> addresses, final AddressCampaignDO addressCampaign, final Map<Integer, PersonalAddressDO> personalAddressMap, final Map<Integer, AddressCampaignValueDO> addressCampaignValueMap)
+  public AddressCampaignValueMassUpdatePage(final AbstractSecuredPage callerPage, final List<AddressDO> addresses,
+      final AddressCampaignDO addressCampaign, final Map<Integer, PersonalAddressDO> personalAddressMap,
+      final Map<Integer, AddressCampaignValueDO> addressCampaignValueMap)
   {
-    super(new PageParameters());
-    this.callerPage = callerPage;
+    super(new PageParameters(), callerPage);
     this.addresses = addresses;
     form = new AddressCampaignValueMassUpdateForm(this, addressCampaign);
     body.add(form);
     form.init();
-    final List<IColumn<AddressDO>> columns = AddressCampaignValueListPage.createColumns(this, false, true, null, personalAddressMap, addressCampaignValueMap);
+    final List<IColumn<AddressDO>> columns = AddressCampaignValueListPage.createColumns(this, false, true, null, personalAddressMap,
+        addressCampaignValueMap);
     @SuppressWarnings("serial")
     final SortableDataProvider<AddressDO> sortableDataProvider = new SortableDataProvider<AddressDO>() {
       public Iterator<AddressDO> iterator(final int first, final int count)
@@ -93,7 +96,7 @@ public class AddressCampaignValueMassUpdatePage extends AbstractSecuredPage
         };
       }
     };
-    sortableDataProvider.setSort("name", false);
+    sortableDataProvider.setSort("name", SortOrder.DESCENDING);
 
     final DefaultDataTable<AddressDO> dataTable = new DefaultDataTable<AddressDO>("table", columns, sortableDataProvider, 1000);
     body.add(dataTable);
@@ -111,18 +114,14 @@ public class AddressCampaignValueMassUpdatePage extends AbstractSecuredPage
     return getString("addressCampaignValue.massupdate.title");
   }
 
-  protected void onCancelSubmit()
-  {
-    setResponsePage(callerPage);
-  }
-
-  protected void onUpdateAllSubmit()
+  /**
+   * @see org.projectforge.web.wicket.AbstractMassEditPage#updateAll()
+   */
+  @Override
+  protected void updateAll()
   {
     final AddressCampaignValueDO data = form.data;
     addressCampaignValueDao.massUpdate(addresses, data.getAddressCampaign(), data.getValue(), data.getComment());
-    if (callerPage instanceof AbstractListPage< ? , ? , ? >) {
-      ((AbstractListPage< ? , ? , ? >) callerPage).setMassUpdateMode(false);
-    }
-    setResponsePage(callerPage);
+    super.updateAll();
   }
 }

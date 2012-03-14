@@ -24,14 +24,19 @@
 package org.projectforge.plugins.marketing;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.layout.LayoutContext;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.components.MaxLengthTextArea;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 /**
  * This is the edit formular page.
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 public class AddressCampaignValueEditForm extends AbstractEditForm<AddressCampaignValueDO, AddressCampaignValueEditPage>
 {
@@ -39,15 +44,12 @@ public class AddressCampaignValueEditForm extends AbstractEditForm<AddressCampai
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressCampaignValueEditForm.class);
 
-  protected AddressCampaignValueFormRenderer renderer;
-
   @SpringBean(name = "addressCampaignValueDao")
   private AddressCampaignValueDao addressCampaignValueDao;
 
   public AddressCampaignValueEditForm(final AddressCampaignValueEditPage parentPage, final AddressCampaignValueDO data)
   {
     super(parentPage, data);
-    renderer = new AddressCampaignValueFormRenderer(this, new LayoutContext(this), data);
   }
 
   @Override
@@ -61,7 +63,34 @@ public class AddressCampaignValueEditForm extends AbstractEditForm<AddressCampai
   protected void init()
   {
     super.init();
-    renderer.add();
+    gridBuilder.newGrid16();
+    {
+      // Heading
+      gridBuilder.newFormHeading(getString("plugins.marketing.addressCampaignValue") + ": " + data.getAddressCampaign().getTitle());
+    }
+    {
+      // Name
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("name"));
+      fs.add(new DivTextPanel(fs.newChildId(), data.getAddress().getFullName()));
+    }
+    {
+      // Organization
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("organization"));
+      fs.add(new DivTextPanel(fs.newChildId(), data.getAddress().getOrganization()));
+    }
+    {
+      // Value
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("value"));
+      final AddressCampaignDO addressCampaign = data.getAddressCampaign();
+      final LabelValueChoiceRenderer<String> valueChoiceRenderer = new LabelValueChoiceRenderer<String>(addressCampaign.getValuesArray());
+      fs.addDropDownChoice(new PropertyModel<String>(data, "value"), valueChoiceRenderer.getValues(), valueChoiceRenderer).setNullValid(
+          true);
+    }
+    {
+      // Comment
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "comment"))).setAutogrow();
+    }
   }
 
   @Override

@@ -27,13 +27,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -50,9 +51,11 @@ import org.projectforge.web.wicket.ListSelectActionPanel;
  * 
  */
 @ListPage(editPage = AddressCampaignEditPage.class)
-public class AddressCampaignListPage extends AbstractListPage<AddressCampaignListForm, AddressCampaignDao, AddressCampaignDO> implements IListPageColumnsCreator<AddressCampaignDO>
+public class AddressCampaignListPage extends AbstractListPage<AddressCampaignListForm, AddressCampaignDao, AddressCampaignDO> implements
+IListPageColumnsCreator<AddressCampaignDO>
 {
   private static final long serialVersionUID = -4070838758263185222L;
+
   @SpringBean(name = "addressCampaignDao")
   private AddressCampaignDao addressCampaignDao;
 
@@ -66,43 +69,48 @@ public class AddressCampaignListPage extends AbstractListPage<AddressCampaignLis
   {
     final List<IColumn<AddressCampaignDO>> columns = new ArrayList<IColumn<AddressCampaignDO>>();
     final CellItemListener<AddressCampaignDO> cellItemListener = new CellItemListener<AddressCampaignDO>() {
-      public void populateItem(final Item<ICellPopulator<AddressCampaignDO>> item, final String componentId, final IModel<AddressCampaignDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<AddressCampaignDO>> item, final String componentId,
+          final IModel<AddressCampaignDO> rowModel)
       {
         final AddressCampaignDO campaign = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(campaign.getId(), campaign.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
 
-    columns.add(new CellItemListenerPropertyColumn<AddressCampaignDO>(new Model<String>(getString("created")), getSortable("created", sortable),
-        "created", cellItemListener) {
-      @SuppressWarnings("unchecked")
+    columns.add(new CellItemListenerPropertyColumn<AddressCampaignDO>(new Model<String>(getString("created")), getSortable("created",
+        sortable), "created", cellItemListener) {
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<AddressCampaignDO>> item, final String componentId, final IModel<AddressCampaignDO> rowModel)
       {
-        final AddressCampaignDO campaign = (AddressCampaignDO) rowModel.getObject();
-        item.add(new ListSelectActionPanel(componentId, rowModel, AddressCampaignEditPage.class, campaign.getId(), returnToPage, DateTimeFormatter
-            .instance().getFormattedDateTime(campaign.getCreated())));
+        final AddressCampaignDO campaign = rowModel.getObject();
+        item.add(new ListSelectActionPanel(componentId, rowModel, AddressCampaignEditPage.class, campaign.getId(), returnToPage,
+            DateTimeFormatter.instance().getFormattedDateTime(campaign.getCreated())));
         addRowClick(item);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<AddressCampaignDO>(getString("modified"), getSortable("lastUpdate", sortable), "lastUpdate",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<AddressCampaignDO>(new Model<String>(getString("title")), getSortable("title",
-        sortable), "title", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<AddressCampaignDO>(getString("modified"), getSortable("lastUpdate", sortable),
+        "lastUpdate", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<AddressCampaignDO>(new Model<String>(getString("title")),
+        getSortable("title", sortable), "title", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<AddressCampaignDO>(new Model<String>(getString("values")), getSortable("values",
         sortable), "values", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<AddressCampaignDO>(new Model<String>(getString("comment")), null, "comment", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<AddressCampaignDO>(new Model<String>(getString("comment")), null, "comment",
+        cellItemListener));
     return columns;
   }
 
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "title", true);
+    dataTable = createDataTable(createColumns(this, true), "title", SortOrder.ASCENDING);
     form.add(dataTable);
   }
 

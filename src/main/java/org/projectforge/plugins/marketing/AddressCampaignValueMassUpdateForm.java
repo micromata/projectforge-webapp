@@ -23,20 +23,13 @@
 
 package org.projectforge.plugins.marketing;
 
-import org.apache.wicket.behavior.SimpleAttributeModifier;
-import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.projectforge.web.wicket.AbstractForm;
-import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.AbstractMassEditForm;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
-
-public class AddressCampaignValueMassUpdateForm extends AbstractForm<AddressCampaignValueDO, AddressCampaignValueMassUpdatePage>
+public class AddressCampaignValueMassUpdateForm extends AbstractMassEditForm<AddressCampaignValueDO, AddressCampaignValueMassUpdatePage>
 {
   private static final long serialVersionUID = -6785832818308468337L;
 
@@ -49,42 +42,27 @@ public class AddressCampaignValueMassUpdateForm extends AbstractForm<AddressCamp
     data.setAddressCampaign(addressCampaign);
   }
 
-  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     super.init();
-    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    final LabelValueChoiceRenderer<String> valueChoiceRenderer = new LabelValueChoiceRenderer<String>(data.getAddressCampaign().getValuesArray());
-    @SuppressWarnings("unchecked")
-    final DropDownChoice valueChoice = new DropDownChoice("value", new PropertyModel(data, "value"), valueChoiceRenderer.getValues(),
-        valueChoiceRenderer);
-    valueChoice.setNullValid(false);
-    add(valueChoice);
-
-    add(new MaxLengthTextArea("comment", new PropertyModel<String>(data, "comment")));
-    final Button cancelButton = new Button("button", new Model<String>(getString("cancel"))) {
-      @Override
-      public final void onSubmit()
-      {
-        getParentPage().onCancelSubmit();
-      }
-    };
-    cancelButton.add(WebConstants.BUTTON_CLASS_CANCEL);
-    cancelButton.setDefaultFormProcessing(false);
-    final SingleButtonPanel cancelButtonPanel = new SingleButtonPanel("cancel", cancelButton);
-    add(cancelButtonPanel);
-    final Button updateAllButton = new Button("button", new Model<String>(getString("updateAll"))) {
-      @Override
-      public final void onSubmit()
-      {
-        getParentPage().onUpdateAllSubmit();
-      }
-    };
-    updateAllButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    updateAllButton.add(new SimpleAttributeModifier("onclick", "return showUpdateQuestionDialog()"));
-    setDefaultButton(updateAllButton);
-    final SingleButtonPanel updateAllButtonPanel = new SingleButtonPanel("updateAll", updateAllButton);
-    add(updateAllButtonPanel);
+    gridBuilder.newGrid16();
+    {
+      // Heading
+      gridBuilder.newFormHeading(getString("plugins.marketing.addressCampaignValue") + ": " + data.getAddressCampaign().getTitle());
+    }
+    {
+      // Value
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("value"));
+      final AddressCampaignDO addressCampaign = data.getAddressCampaign();
+      final LabelValueChoiceRenderer<String> valueChoiceRenderer = new LabelValueChoiceRenderer<String>(addressCampaign.getValuesArray());
+      fs.addDropDownChoice(new PropertyModel<String>(data, "value"), valueChoiceRenderer.getValues(), valueChoiceRenderer).setNullValid(
+          false);
+    }
+    {
+      // Comment
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
+      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "comment"))).setAutogrow();
+    }
   }
 }

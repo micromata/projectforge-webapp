@@ -24,13 +24,19 @@
 package org.projectforge.plugins.marketing;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.validator.AbstractValidator;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.layout.LayoutContext;
+import org.projectforge.web.wicket.components.MaxLengthTextArea;
+import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
  * This is the edit formular page.
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 public class AddressCampaignEditForm extends AbstractEditForm<AddressCampaignDO, AddressCampaignEditPage>
 {
@@ -38,19 +44,46 @@ public class AddressCampaignEditForm extends AbstractEditForm<AddressCampaignDO,
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressCampaignEditForm.class);
 
-  protected AddressCampaignFormRenderer renderer;
+  private TextField<String> valuesField;
 
   public AddressCampaignEditForm(final AddressCampaignEditPage parentPage, final AddressCampaignDO data)
   {
     super(parentPage, data);
-    renderer = new AddressCampaignFormRenderer(this, new LayoutContext(this), data);
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     super.init();
-    renderer.add();
+    gridBuilder.newGrid16();
+    {
+      // Name
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("title"));
+      fs.add(new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "title")));
+    }
+    {
+      // Values
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("values"), true);
+      valuesField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "values"));
+      fs.addHelpIcon(getString("plugins.marketing.addressCampaign.values.format"));
+      fs.add(valuesField);
+      fs.addAlertIcon(getString("plugins.marketing.addressCampaign.edit.warning.doNotChangeValues"));
+      valuesField.add(new AbstractValidator<String>() {
+        @Override
+        protected void onValidate(final IValidatable<String> validatable)
+        {
+          if (AddressCampaignDO.getValuesArray(validatable.getValue()) == null) {
+            valuesField.error(getString("plugins.marketing.addressCampaign.values.invalidFormat"));
+          }
+        }
+      });
+    }
+    {
+      // Text description
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
+      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "comment")));
+    }
   }
 
   @Override

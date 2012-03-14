@@ -25,25 +25,25 @@ package org.projectforge.plugins.marketing;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
-import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.markup.html.panel.Fragment;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
@@ -51,19 +51,19 @@ import org.projectforge.address.AddressStatus;
 import org.projectforge.address.ContactStatus;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.address.PersonalAddressDao;
+import org.projectforge.common.DateHelper;
 import org.projectforge.common.StringHelper;
-import org.projectforge.web.address.AddressEditPage;
 import org.projectforge.web.calendar.DateTimeFormatter;
-import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
-import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
-import org.projectforge.web.wicket.components.CheckBoxPanel;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 
 /**
  * The controller of the list page. Most functionality such as search etc. is done by the super class.
@@ -74,6 +74,8 @@ import org.projectforge.web.wicket.components.CheckBoxPanel;
 public class AddressCampaignValueListPage extends AbstractListPage<AddressCampaignValueListForm, AddressDao, AddressDO> implements
 IListPageColumnsCreator<AddressDO>
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressCampaignValueListPage.class);
+
   private static final long serialVersionUID = -2418497742599443358L;
 
   @SpringBean(name = "addressDao")
@@ -81,6 +83,9 @@ IListPageColumnsCreator<AddressDO>
 
   @SpringBean(name = "addressCampaignValueDao")
   private AddressCampaignValueDao addressCampaignValueDao;
+
+  @SpringBean(name = "addressCampaignValueExport")
+  private AddressCampaignValueExport addressCampaignValueExport;
 
   @SpringBean(name = "personalAddressDao")
   private PersonalAddressDao personalAddressDao;
@@ -93,12 +98,6 @@ IListPageColumnsCreator<AddressDO>
   {
     super(parameters, "plugins.marketing.addressCampaignValue");
     newItemMenuEntry.setVisibilityAllowed(false);
-  }
-
-  @Override
-  protected void onBodyTag(final ComponentTag bodyTag)
-  {
-    bodyTag.put("onload", "javascript:setOptionStatus();");
   }
 
   public List<IColumn<AddressDO>> createColumns(final WebPage returnToPage, final boolean sortable)
@@ -141,7 +140,7 @@ IListPageColumnsCreator<AddressDO>
           cssStyle.append("text-decoration: line-through;");
         }
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
@@ -154,7 +153,7 @@ IListPageColumnsCreator<AddressDO>
         public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
         {
           final AddressDO address = rowModel.getObject();
-          final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(componentId, new PropertyModel<Boolean>(address, "selected"), true);
+          final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(componentId, new PropertyModel<Boolean>(address, "selected"), null);
           item.add(checkBoxPanel);
           cellItemListener.populateItem(item, componentId, rowModel);
           addRowClick(item, massUpdateMode);
@@ -163,11 +162,10 @@ IListPageColumnsCreator<AddressDO>
     } else {
       columns.add(new CellItemListenerPropertyColumn<AddressDO>(new Model<String>(page.getString("created")), getSortable("created",
           sortable), "created", cellItemListener) {
-        @SuppressWarnings("unchecked")
         @Override
-        public void populateItem(final Item item, final String componentId, final IModel rowModel)
+        public void populateItem(final Item<ICellPopulator<AddressDO>> item, final String componentId, final IModel<AddressDO> rowModel)
         {
-          final AddressDO address = (AddressDO) rowModel.getObject();
+          final AddressDO address = rowModel.getObject();
           final AddressCampaignValueDO addressCampaignValue = addressCampaignValueMap.get(address.getId());
           final Integer addressCampaignValueId = addressCampaignValue != null ? addressCampaignValue.getId() : null;
           item.add(new ListSelectActionPanel(componentId, rowModel, AddressCampaignValueEditPage.class, addressCampaignValueId, page,
@@ -196,19 +194,8 @@ IListPageColumnsCreator<AddressDO>
             + " "
             + address.getMailingCity(), address.getMailingCountry());
         if (massUpdateMode == false) {
-          final Fragment fragment = new Fragment(componentId, "addressEditLink", page);
-          item.add(fragment);
-          fragment.add(new Link<Object>("link") {
-            @Override
-            public void onClick()
-            {
-              final PageParameters parameters = new PageParameters();
-              parameters.put(AbstractEditPage.PARAMETER_KEY_ID, address.getId());
-              final AddressEditPage editPage = new AddressEditPage(parameters);
-              editPage.setReturnToPage(page);
-              setResponsePage(editPage);
-            }
-          }.add(new Label("label", addressText).setRenderBodyOnly(true)));
+          final AddressEditLinkPanel addressEditLinkPanel = new AddressEditLinkPanel(componentId, page, address, addressText);
+          item.add(addressEditLinkPanel);
         } else {
           item.add(new Label(componentId, addressText));
         }
@@ -226,7 +213,7 @@ IListPageColumnsCreator<AddressDO>
         final AddressCampaignValueDO addressCampaignValue = addressCampaignValueMap.get(id);
         if (addressCampaignValue != null) {
           item.add(new Label(componentId, addressCampaignValue.getValue()));
-          item.add(new AttributeAppendModifier("style", new Model<String>("white-space: nowrap;")));
+          item.add(AttributeModifier.append("style", new Model<String>("white-space: nowrap;")));
         } else {
           item.add(new Label(componentId, ""));
         }
@@ -242,7 +229,7 @@ IListPageColumnsCreator<AddressDO>
         final AddressCampaignValueDO addressCampaignValue = addressCampaignValueMap.get(id);
         if (addressCampaignValue != null) {
           item.add(new Label(componentId, addressCampaignValue.getComment()));
-          item.add(new AttributeAppendModifier("style", new Model<String>("white-space: nowrap;")));
+          item.add(AttributeModifier.append("style", new Model<String>("white-space: nowrap;")));
         } else {
           item.add(new Label(componentId, ""));
         }
@@ -278,11 +265,34 @@ IListPageColumnsCreator<AddressDO>
     super.onBeforeRender();
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     personalAddressMap = personalAddressDao.getPersonalAddressByAddressId();
     addressCampaignValueMap = new HashMap<Integer, AddressCampaignValueDO>();
+    {
+      // Excel export
+      final SubmitLink excelExportLink = new SubmitLink(ContentMenuEntryPanel.LINK_ID, form) {
+        @Override
+        public void onSubmit()
+        {
+          log.info("Exporting address list.");
+          final List<AddressDO> list = getList();
+          final byte[] xls = addressCampaignValueExport.export(list,personalAddressMap, addressCampaignValueMap,
+              form.getSearchFilter().getAddressCampaign() != null ? form.getSearchFilter().getAddressCampaign().getTitle() : "");
+          if (xls == null || xls.length == 0) {
+            form.addError("address.book.hasNoVCards");
+            return;
+          }
+          final String filename = "ProjectForge-AddressCampaignValueExport_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xls";
+          DownloadUtils.setDownloadTarget(xls, filename);
+        }
+      };
+      final ContentMenuEntryPanel excelExportButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), excelExportLink,
+          getString("address.book.export")).setTooltip(getString("address.book.export.tooltip"));
+      addContentMenuEntry(excelExportButton);
+    }
   }
 
   @Override
@@ -317,7 +327,7 @@ IListPageColumnsCreator<AddressDO>
   protected void createDataTable()
   {
     final List<IColumn<AddressDO>> columns = createColumns(this, !isMassUpdateMode(), isMassUpdateMode());
-    dataTable = createDataTable(columns, "name", true);
+    dataTable = createDataTable(columns, "name", SortOrder.ASCENDING);
     form.add(dataTable);
   }
 
