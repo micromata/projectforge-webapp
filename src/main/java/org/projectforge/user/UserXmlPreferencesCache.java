@@ -40,7 +40,7 @@ public class UserXmlPreferencesCache extends AbstractCache
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserXmlPreferencesCache.class);
 
-  private Map<Integer, UserXmlPreferencesMap> allPreferences = new HashMap<Integer, UserXmlPreferencesMap>();
+  private final Map<Integer, UserXmlPreferencesMap> allPreferences = new HashMap<Integer, UserXmlPreferencesMap>();
 
   private UserXmlPreferencesDao userXmlPreferencesDao;
 
@@ -113,11 +113,8 @@ public class UserXmlPreferencesCache extends AbstractCache
     } else if (data.getVolatileData().containsKey(key) == false) {
       log.warn("Oups, user preferences object with key '" + key + "' is wether persistent nor volatile!");
     }
-    if (data != null) {
-      checkRefresh();
-      return data.removeEntry(key);
-    }
-    return null;
+    checkRefresh();
+    return data.removeEntry(key);
   }
 
   public synchronized UserXmlPreferencesMap ensureAndGetUserPreferencesData(final Integer userId)
@@ -157,7 +154,7 @@ public class UserXmlPreferencesCache extends AbstractCache
 
   private synchronized void flushToDB(final Integer userId, final boolean checkAccess)
   {
-    UserXmlPreferencesMap data = allPreferences.get(userId);
+    final UserXmlPreferencesMap data = allPreferences.get(userId);
     if (data == null || data.isModified() == false) {
       return;
     }
@@ -171,7 +168,7 @@ public class UserXmlPreferencesCache extends AbstractCache
   @Override
   protected void refresh()
   {
-    for (Integer userId : allPreferences.keySet()) {
+    for (final Integer userId : allPreferences.keySet()) {
       flushToDB(userId, false);
     }
   }
