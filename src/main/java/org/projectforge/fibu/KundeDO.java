@@ -43,7 +43,7 @@ import org.hibernate.search.annotations.Store;
 import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.IManualIndex;
 import org.projectforge.core.ShortDisplayNameCapable;
-import org.projectforge.lucene.PFAnalyzer;
+import org.projectforge.lucene.ClassicAnalyzer;
 
 /**
  * Jeder Kunde bei Micromata hat eine Kundennummer. Die Kundennummer ist Bestandteil von KOST2 (2.-4. Ziffer). Aufträge aus dem
@@ -54,7 +54,7 @@ import org.projectforge.lucene.PFAnalyzer;
 @Entity
 @Indexed
 @Table(name = "T_FIBU_KUNDE")
-@Analyzer(impl = PFAnalyzer.class)
+@Analyzer(impl = ClassicAnalyzer.class)
 public class KundeDO extends AbstractHistorizableBaseDO<Integer> implements ShortDisplayNameCapable, IManualIndex
 {
   private static final long serialVersionUID = -2138613066430251341L;
