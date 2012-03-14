@@ -27,8 +27,10 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,8 +38,10 @@ import java.util.Set;
 import org.apache.commons.lang.ClassUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.projectforge.core.BaseDO;
+import org.projectforge.core.IManualIndex;
 import org.projectforge.database.HibernateUtils;
-import org.projectforge.fibu.EingangsrechnungsPositionDO;
+import org.projectforge.user.UserXmlPreferencesDO;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.Converter;
@@ -82,15 +86,16 @@ public class XStreamSavingConverter implements Converter
   // the history entries with the new id's.
   private final Map<String, Serializable> entityMapping = new HashMap<String, Serializable>();
 
-  private List<HistoryEntry> historyEntries = new ArrayList<HistoryEntry>();
+  private final List<HistoryEntry> historyEntries = new ArrayList<HistoryEntry>();
 
-  private Map<String, Class< ? >> historyClassMapping = new HashMap<String, Class< ? >>();
+  private final Map<String, Class< ? >> historyClassMapping = new HashMap<String, Class< ? >>();
 
   private Session session;
 
   public XStreamSavingConverter() throws HibernateException
   {
-    defaultConv = new XStream().getConverterLookup();
+    final XStream xstream = new XStream();
+    defaultConv = xstream.getConverterLookup();
     this.ignoreFromSaving.add(PropertyDelta.class);
     this.ignoreFromSaving.add(SimplePropertyDelta.class);
     this.ignoreFromSaving.add(AssociationPropertyDelta.class);
@@ -112,9 +117,9 @@ public class XStreamSavingConverter implements Converter
     return historyEntries;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings("rawtypes")
   @Override
-  public boolean canConvert(Class arg0)
+  public boolean canConvert(final Class arg0)
   {
     return true;
   }
@@ -181,14 +186,61 @@ public class XStreamSavingConverter implements Converter
       }
       invokeHistorySetter(entry, "setDelta", List.class, null);
       id = save(entry);
-      invokeHistorySetter(entry, "setDelta", List.class, delta);
+      final List<PropertyDelta> list = new ArrayList<PropertyDelta>();
+      invokeHistorySetter(entry, "setDelta", List.class, list);
       for (final PropertyDelta deltaEntry : delta) {
+        list.add(deltaEntry);
         save(deltaEntry);
       }
       this.historyEntries.add(entry);
       return id;
     }
     return null;
+  }
+
+  protected Serializable save(final BaseDO< ? extends Serializable> obj,
+      final Collection< ? extends BaseDO< ? extends Serializable>> children)
+  {
+    final List<Serializable> oldIdList = beforeSave(children);
+    final Serializable id = save(obj);
+    afterSave(children, oldIdList);
+    return id;
+  }
+
+  /**
+   * Remove the id (pk) of every children and stores it to the returned list.
+   * @param children
+   * @return The list of (old) ids of the children.
+   */
+  protected List<Serializable> beforeSave(final Collection< ? extends BaseDO< ? extends Serializable>> children)
+  {
+    if (children == null || children.size() == 0) {
+      return null;
+    }
+    final List<Serializable> idList = new ArrayList<Serializable>(children.size());
+    for (final BaseDO< ? > child : children) {
+      idList.add(child.getId());
+      child.setId(null);
+    }
+    return idList;
+  }
+
+  /**
+   * Registers all children with their old and new id.
+   * @param children
+   * @param oldIdList The returned list of beforeSave(...) method.
+   */
+  protected void afterSave(final Collection< ? extends BaseDO< ? extends Serializable>> children, final List<Serializable> oldIdList)
+  {
+    if (oldIdList == null) {
+      return;
+    }
+    final Iterator<Serializable> oldIdListIterator = oldIdList.iterator();
+    final Iterator< ? extends BaseDO< ? >> childIterator = children.iterator();
+    while (oldIdListIterator.hasNext() == true) {
+      final BaseDO< ? > child = childIterator.next();
+      registerEntityMapping(child.getClass(), oldIdListIterator.next(), child.getId());
+    }
   }
 
   /**
@@ -202,19 +254,19 @@ public class XStreamSavingConverter implements Converter
       final Method method = HistoryEntry.class.getDeclaredMethod(name, parameterType);
       method.setAccessible(true);
       method.invoke(entry, value);
-    } catch (IllegalArgumentException ex) {
+    } catch (final IllegalArgumentException ex) {
       log.error("Can't modify id of history entry. This results in a corrupted history: " + entry);
       log.fatal("Exception encountered " + ex, ex);
-    } catch (IllegalAccessException ex) {
+    } catch (final IllegalAccessException ex) {
       log.error("Can't modify id of history entry. This results in a corrupted history: " + entry);
       log.fatal("Exception encountered " + ex, ex);
-    } catch (InvocationTargetException ex) {
+    } catch (final InvocationTargetException ex) {
       log.error("Can't modify id of history entry. This results in a corrupted history: " + entry);
       log.fatal("Exception encountered " + ex, ex);
-    } catch (SecurityException ex) {
+    } catch (final SecurityException ex) {
       log.error("Can't modify id of history entry. This results in a corrupted history: " + entry);
       log.fatal("Exception encountered " + ex, ex);
-    } catch (NoSuchMethodException ex) {
+    } catch (final NoSuchMethodException ex) {
       log.error("Can't modify id of history entry. This results in a corrupted history: " + entry);
       log.fatal("Exception encountered " + ex, ex);
     }
@@ -239,9 +291,6 @@ public class XStreamSavingConverter implements Converter
       return;
     }
     for (final Object obj : list) {
-      if (obj instanceof EingangsrechnungsPositionDO) {
-        log.info("Eingangsrechnungspositionen: " + obj);
-      }
       if (obj == null || writtenObjects.contains(obj) == true) {
         // Object null or already written. Skip this item.
         continue;
@@ -260,9 +309,9 @@ public class XStreamSavingConverter implements Converter
         if (log.isDebugEnabled() == true) {
           log.debug("wrote object " + obj + " under id " + id);
         }
-      } catch (HibernateException ex) {
+      } catch (final HibernateException ex) {
         log.fatal("Failed to write " + obj + " ex=" + ex, ex);
-      } catch (NullPointerException ex) {
+      } catch (final NullPointerException ex) {
         log.fatal("Failed to write " + obj + " ex=" + ex, ex);
       }
     }
@@ -281,11 +330,37 @@ public class XStreamSavingConverter implements Converter
   protected Serializable save(final Object obj)
   {
     final Serializable oldId = getOriginalIdentifierValue(obj);
-    final Serializable id = session.save(obj);
-    if (oldId != null) {
-      registerEntityMapping(obj.getClass(), oldId, id);
+    final Serializable id;
+    if (session.contains(obj) == false) {
+      if (obj instanceof BaseDO) {
+        if (obj instanceof IManualIndex == false) {
+          ((BaseDO< ? >) obj).setId(null);
+        }
+        id = session.save(obj);
+        if (oldId != null) {
+          registerEntityMapping(obj.getClass(), oldId, id);
+        }
+        writtenObjects.add(obj);
+      } else if (obj instanceof HistoryEntry) {
+        // HistoryEntry
+        ((HistoryEntry) obj).setId(null);
+        id = session.save(obj);
+      } else if (obj instanceof PropertyDelta) {
+        // PropertyDelta
+        ((PropertyDelta) obj).setId(null);
+        id = session.save(obj);
+      } else if (obj instanceof UserXmlPreferencesDO) {
+        ((UserXmlPreferencesDO) obj).setId(null);
+        id = session.save(obj);
+      } else {
+        log.warn("Unknown object: " + obj);
+        id = session.save(obj);
+      }
+    } else {
+      session.saveOrUpdate(obj);
+      id = ((BaseDO< ? >) obj).getId();
     }
-    writtenObjects.add(obj);
+    session.flush();
     return id;
   }
 
@@ -327,12 +402,12 @@ public class XStreamSavingConverter implements Converter
     return this.entityMapping.get(entityClassname + oldId);
   }
 
-  public void marshal(Object arg0, HierarchicalStreamWriter arg1, MarshallingContext arg2)
+  public void marshal(final Object arg0, final HierarchicalStreamWriter arg1, final MarshallingContext arg2)
   {
     defaultConv.lookupConverterForType(arg0.getClass()).marshal(arg0, arg1, arg2);
   }
 
-  public Object unmarshal(HierarchicalStreamReader arg0, UnmarshallingContext arg1)
+  public Object unmarshal(final HierarchicalStreamReader arg0, final UnmarshallingContext arg1)
   {
     Object result;
     Class< ? > targetType = null;
@@ -347,9 +422,9 @@ public class XStreamSavingConverter implements Converter
       if (result != null) {
         registerObject(result);
       }
-    } catch (HibernateException ex) {
+    } catch (final HibernateException ex) {
       log.fatal("Failed to write " + result + " ex=" + ex, ex);
-    } catch (NullPointerException ex) {
+    } catch (final NullPointerException ex) {
       log.fatal("Failed to write " + result + " ex=" + ex, ex);
     }
     return result;
