@@ -323,14 +323,14 @@ public class TaskTest extends TestBase
   public void checkKost2AndTimesheetBookingStatusAccess()
   {
     logon(TEST_FINANCE_USER);
-    final TaskDO task = initTestDB.addTask("checkKost2AndTimesheetBookingStatusAccessTask", "root");
+    final TaskDO task = initTestDB.addTask("checkKost2AndTimesheetStatusAccessTask", "root");
     final String groupName = "checkKost2AndTimesheetBookingStatusAccessGroup";
     // Please note: TEST_USER is no project manager or assistant!
     final GroupDO projectManagers = initTestDB.addGroup(groupName, new String[] { TEST_PROJECT_MANAGER_USER, TEST_PROJECT_ASSISTANT_USER,
         TEST_USER});
     initTestDB.createGroupTaskAccess(projectManagers, task, AccessType.TASKS, true, true, true, true); // All rights.
     final ProjektDO projekt = new ProjektDO().setName("checkKost2AndTimesheetBookingStatusAccess").setInternKost2_4(764).setNummer(1)
-    .setProjektManagerGroup(projectManagers).setTask(task);
+        .setProjektManagerGroup(projectManagers).setTask(task);
     projektDao.save(projekt);
     logon(TEST_USER);
     TaskDO task1 = new TaskDO().setParentTask(task).setTitle("Task 1").setKost2BlackWhiteList("Hurzel");
