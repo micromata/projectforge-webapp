@@ -28,7 +28,6 @@ import org.projectforge.address.AddressDao;
 import org.projectforge.book.BookDao;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ConfigurationDao;
-import org.projectforge.core.SpaceDao;
 import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.EingangsrechnungDao;
@@ -132,8 +131,6 @@ public class DaoRegistry
 
   public static final String SCRIPT = "script";
 
-  public static final String SPACE = "space";
-
   public static final String TASK = "task";
 
   public static final String TIMESHEET = "timesheet";
@@ -193,8 +190,6 @@ public class DaoRegistry
   private ProjektDao projektDao;
 
   private ScriptDao scriptDao;
-
-  private SpaceDao spaceDao;
 
   private TaskDao taskDao;
 
@@ -260,7 +255,6 @@ public class DaoRegistry
 
     register(MEB, MebDao.class, mebDao, "meb");
     register(SCRIPT, ScriptDao.class, scriptDao, "scripting");
-    register(SPACE, SpaceDao.class, spaceDao, "space");
     register(USER_PREF, UserPrefDao.class, userPrefDao);
     register(USER_RIGHT, UserRightDao.class, userRightDao);
 
@@ -421,11 +415,6 @@ public class DaoRegistry
   public void setScriptDao(final ScriptDao scriptDao)
   {
     this.scriptDao = scriptDao;
-  }
-
-  public void setSpaceDao(final SpaceDao spaceDao)
-  {
-    this.spaceDao = spaceDao;
   }
 
   public void setTaskDao(final TaskDao taskDao)
