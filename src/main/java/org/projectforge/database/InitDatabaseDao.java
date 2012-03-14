@@ -74,37 +74,37 @@ public class InitDatabaseDao extends HibernateDaoSupport
 
   private UserDao userDao;
 
-  public void setDatabaseDao(DatabaseDao databaseDao)
+  public void setDatabaseDao(final DatabaseDao databaseDao)
   {
     this.databaseDao = databaseDao;
   }
 
-  public void setDatabaseUpdateDao(DatabaseUpdateDao databaseUpdateDao)
+  public void setDatabaseUpdateDao(final DatabaseUpdateDao databaseUpdateDao)
   {
     this.databaseUpdateDao = databaseUpdateDao;
   }
 
-  public void setUserDao(UserDao userDao)
+  public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
   }
 
-  public void setUserGroupCache(UserGroupCache userGroupCache)
+  public void setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
   }
 
-  public void setGroupDao(GroupDao groupDao)
+  public void setGroupDao(final GroupDao groupDao)
   {
     this.groupDao = groupDao;
   }
 
-  public void setTaskTree(TaskTree taskTree)
+  public void setTaskTree(final TaskTree taskTree)
   {
     this.taskTree = taskTree;
   }
 
-  public void setXmlDump(XmlDump xmlDump)
+  public void setXmlDump(final XmlDump xmlDump)
   {
     this.xmlDump = xmlDump;
   }
@@ -119,18 +119,18 @@ public class InitDatabaseDao extends HibernateDaoSupport
     if (isEmpty() == false) {
       databaseNotEmpty();
     }
-    TaskDO task = new TaskDO();
+    final TaskDO task = new TaskDO();
     task.setTitle("Root");
     task.setStatus(TaskStatus.N);
     task.setShortDescription("ProjectForge root task");
     task.setCreated();
     task.setLastUpdate();
-    Serializable id = getHibernateTemplate().save(task);
+    final Serializable id = getHibernateTemplate().save(task);
     log.info("New object added (" + id + "): " + task.toString());
     // Use of taskDao does not work with maven test case: Could not synchronize database state with session?
 
     // Create Admin user
-    PFUserDO admin = new PFUserDO();
+    final PFUserDO admin = new PFUserDO();
     admin.setUsername(adminUsername);
     admin.setLastname("Administrator");
     admin.setPassword(encryptedAdminPassword);
@@ -149,7 +149,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     admin.addRight(new UserRightDO(UserRightId.PM_HR_PLANNING, UserRightValue.READWRITE));
     userDao.internalSave(admin);
 
-    Set<PFUserDO> adminUsers = new HashSet<PFUserDO>();
+    final Set<PFUserDO> adminUsers = new HashSet<PFUserDO>();
     adminUsers.add(admin);
     addGroup(ProjectForgeGroup.ADMIN_GROUP, "Administrators of ProjectForge", adminUsers);
     addGroup(ProjectForgeGroup.CONTROLLING_GROUP, "Users for having read access to the company's finances.", adminUsers);
@@ -166,9 +166,9 @@ public class InitDatabaseDao extends HibernateDaoSupport
     return admin;
   }
 
-  private void addGroup(ProjectForgeGroup projectForgeGroup, String description, Set<PFUserDO> users)
+  private void addGroup(final ProjectForgeGroup projectForgeGroup, final String description, final Set<PFUserDO> users)
   {
-    GroupDO group = new GroupDO();
+    final GroupDO group = new GroupDO();
     group.setName(projectForgeGroup.toString());
     group.setDescription(description);
     group.setAssignedUsers(users);
@@ -184,7 +184,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     }
     final XStreamSavingConverter xstreamSavingConverter = xmlDump.restoreDatabaseFromClasspathResource(TEST_DATA_BASE_DUMP_FILE, "utf-8");
     xmlDump.verifyDump(xstreamSavingConverter);
-    PFUserDO user = userDao.getInternalByName(DEFAULT_ADMIN_USER);
+    final PFUserDO user = userDao.getInternalByName(DEFAULT_ADMIN_USER);
     if (user == null) {
       log.error("Initialization of database failed. Perhaps caused by corrupted init-test-data.xml.gz.");
     } else {
@@ -197,7 +197,13 @@ public class InitDatabaseDao extends HibernateDaoSupport
       userDao.internalUpdate(user);
       log.fatal("Database successfully initialized with test data.");
     }
-    databaseDao.rebuildDatabaseSearchIndices();
+    new Thread() {
+      @Override
+      public void run()
+      {
+        databaseDao.rebuildDatabaseSearchIndices();
+      }
+    }.start();
     taskTree.setExpired();
     userGroupCache.setExpired();
     return user;
@@ -222,7 +228,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
 
   private void databaseNotEmpty()
   {
-    String msg = "Database seems to be not empty. Initialization of database aborted.";
+    final String msg = "Database seems to be not empty. Initialization of database aborted.";
     log.error(msg);
     throw new AccessException(msg);
   }
