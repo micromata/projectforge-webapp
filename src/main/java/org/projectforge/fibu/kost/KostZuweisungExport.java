@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.projectforge.common.CurrencyHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
@@ -108,8 +109,16 @@ public class KostZuweisungExport
     for (final AbstractRechnungDO< ? > rechnung : list) {
       if (rechnung.getPositionen() != null) {
         for (final AbstractRechnungsPositionDO position : rechnung.getPositionen()) {
-          if (position.getKostZuweisungen() != null) {
+          if (CollectionUtils.isNotEmpty(position.getKostZuweisungen()) == true) {
             zuweisungen.addAll(position.getKostZuweisungen());
+          } else {
+            final KostZuweisungDO zuweisung = new KostZuweisungDO();
+            if (position instanceof RechnungsPositionDO) {
+              zuweisung.setRechnungsPosition((RechnungsPositionDO) position);
+            } else {
+              zuweisung.setEingangsrechnungsPosition((EingangsrechnungsPositionDO) position);
+            }
+            zuweisungen.add(zuweisung);
           }
         }
       }
@@ -198,8 +207,8 @@ public class KostZuweisungExport
       mapping.add(Col.REFERENZ, StringHelper.removeNonDigitsAndNonASCIILetters(referenz));
       mapping.add(Col.DATE, rechnung.getDatum());
       mapping.add(Col.GEGENKONTO, "");
-      mapping.add(Col.KOST1, zuweisung.getKost1().getNummer());
-      mapping.add(Col.KOST2, zuweisung.getKost2().getNummer());
+      mapping.add(Col.KOST1, zuweisung.getKost1() != null ? zuweisung.getKost1().getNummer() : "");
+      mapping.add(Col.KOST2, zuweisung.getKost2() != null ? zuweisung.getKost2().getNummer() : "");
       mapping.add(Col.TEXT, text);
       mapping.add(Col.KORREKTUR, korrektur);
       sheet.addRow(mapping.getMapping(), 0);
