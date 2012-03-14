@@ -46,9 +46,8 @@ import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.TooltipImage;
-import org.projectforge.web.wicket.embats.EmbatsBaseChar;
-import org.projectforge.web.wicket.embats.EmbatsSymbolChar;
-import org.projectforge.web.wicket.embats.IconLinkPanel;
+import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 {
@@ -67,27 +66,31 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   protected void init()
   {
     super.init();
-    final IconLinkPanel previousMonthButton = new IconLinkPanel("previousMonth", new Link<Void>(IconLinkPanel.LINK_WICKET_ID) {
+    final Link<Void> previousMonthButton = new Link<Void>("previousMonth") {
       @Override
       public void onClick()
       {
         parentPage.goToPreviousMonth();
       }
-    }, EmbatsBaseChar.ARROW_LEFT, getString("calendar.tooltip.selectPrevious"));
-    previousMonthButton.appendCssClass("shaded");
+    };
     add(previousMonthButton);
+    previousMonthButton.add(new TooltipImage("previousMonthImage", getResponse(), WebConstants.EMBATS_ARROW_LEFT,
+        getString("calendar.tooltip.selectPrevious")));
+    // previousMonthButton.appendCssClass("shaded");
 
-    final IconLinkPanel nextMonthButton = new IconLinkPanel("nextMonth", new Link<Void>(IconLinkPanel.LINK_WICKET_ID) {
+    final Link<Void> nextMonthButton = new Link<Void>("nextMonth") {
       @Override
       public void onClick()
       {
         parentPage.goToNextMonth();
       }
-    }, EmbatsBaseChar.ARROW_RIGHT, getString("calendar.tooltip.selectNext"));
-    nextMonthButton.appendCssClass("shaded");
+    };
     add(nextMonthButton);
-    @SuppressWarnings("unchecked")
-    final Model monthLabelModel = new Model<String>() {
+    nextMonthButton.add(new TooltipImage("nextMonthImage", getResponse(), WebConstants.EMBATS_ARROW_RIGHT,
+        getString("calendar.tooltip.selectNext")));
+    // nextMonthButton.appendCssClass("shaded");
+    add(nextMonthButton);
+    final Model<String> monthLabelModel = new Model<String>() {
       @Override
       public String getObject()
       {
@@ -97,8 +100,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     final Label monthLabel = new Label("monthLabel", monthLabelModel);
     monthLabel.setEscapeModelStrings(false);
     add(monthLabel);
-    @SuppressWarnings("unchecked")
-    final Link< ? > selectMonthButton = new Link("selectMonth") {
+    final Link<Void> selectMonthButton = new Link<Void>("selectMonth") {
       @Override
       public void onClick()
       {
@@ -116,29 +118,31 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       selectMonthButton.setVisible(false);
     }
 
-    final IconLinkPanel showTodayButton = new IconLinkPanel("showToday", new Link<Void>(IconLinkPanel.LINK_WICKET_ID) {
+    final Link<Void> showTodayButton = new Link<Void>("showToday") {
       @Override
       public void onClick()
       {
         parentPage.goToToday();
       }
-    }, EmbatsSymbolChar.PIN, getString("calendar.today"));
-    showTodayButton.appendCssClass("shaded").setCssStyle("font-size:1.6em;");
+    };
     add(showTodayButton);
+    showTodayButton.add(new TooltipImage("showTodayImage", getResponse(), WebConstants.EMBATS_PIN, getString("calendar.today")));
+    // showTodayButton.appendCssClass("shaded").setCssStyle("font-size:1.6em;");
 
     final WebMarkupContainer cancelItem = new WebMarkupContainer("cancelItem");
     add(cancelItem);
     if (isSelectMode() == false) {
       cancelItem.setVisible(false);
     } else {
-      final IconLinkPanel cancelButton = new IconLinkPanel("cancel", new Link<Void>(IconLinkPanel.LINK_WICKET_ID) {
+      final Link<Void> cancelButton = new Link<Void>("cancel") {
         @Override
         public void onClick()
         {
           parentPage.onCancel();
         }
-      }, EmbatsBaseChar.CROSS, getString("cancel"));
-      cancelItem.add(cancelButton.appendCssClass("shaded"));
+      };
+      cancelItem.add(cancelButton);// .appendCssClass("shaded"));
+      cancelButton.add(new TooltipImage("showTodayImage", getResponse(), WebConstants.EMBATS_CROSS, getString("cancel")));
     }
     add(new Label("monthDuration", new Model<String>() {
       @Override
@@ -148,18 +152,17 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
           return "";
         }
         return parentPage.getFormattedMonthDuration()
-        + " ("
-        + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getBegin(),
-            DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))
-            + "-"
-            + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getEnd(),
+            + " ("
+            + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getBegin(),
                 DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))
-                + ")";
+                + "-"
+                + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getEnd(),
+                    DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))
+                    + ")";
       }
     }));
 
-    @SuppressWarnings("unchecked")
-    final Link< ? > showBirthdaysButton = new Link("showBirthdays") {
+    final Link<Void> showBirthdaysButton = new Link<Void>("showBirthdays") {
       @Override
       public void onClick()
       {
@@ -175,8 +178,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     add(showBirthdaysButton);
     showBirthdaysButton.add(new TooltipImage("showBirthdaysImage", getResponse(), WebConstants.IMAGE_BIRTHDAY,
         getString("tooltip.showBirthdays")));
-    @SuppressWarnings("unchecked")
-    final Link< ? > hideBirthdaysButton = new Link("hideBirthdays") {
+    final Link<Void> hideBirthdaysButton = new Link<Void>("hideBirthdays") {
       @Override
       public void onClick()
       {
@@ -193,16 +195,11 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     hideBirthdaysButton.add(new TooltipImage("hideBirthdaysImage", getResponse(), WebConstants.IMAGE_BIRTHDAY_DELETE,
         getString("tooltip.hideBirthdays")));
 
-
     final PFUserDO user = PFUserContext.getUser();
 
     if (WebConfiguration.isDevelopmentMode() == true && StringUtils.isNotBlank(user.getStayLoggedInKey())) {
       final String contextPath = WebApplication.get().getServletContext().getContextPath();
-      final String iCalTarget = contextPath
-      + "/export/ical?user="
-      + user.getUsername()
-      + "&key="
-      + user.getStayLoggedInKey();
+      final String iCalTarget = contextPath + "/export/ical?user=" + user.getUsername() + "&key=" + user.getStayLoggedInKey();
       final ExternalLink exportCalendar = new ExternalLink("exportCalendar", iCalTarget);
       exportCalendar.add(new TooltipImage("exportCalendarImage", getResponse(), WebConstants.IMAGE_CALENDAR,
           getString("tooltip.exportCalendar")));
@@ -223,17 +220,17 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   @SuppressWarnings("serial")
   private void showTimesheetFilterElements()
   {
-    final IconLinkPanel toggleTimesheetsButton = new IconLinkPanel("toggleTimesheets", new Link<Void>(IconLinkPanel.LINK_WICKET_ID) {
+    final UserSelectPanel userSelectPanel = new UserSelectPanel("timesheetsUser", new PropertyModel<PFUserDO>(this,
+        "timesheetsUser"), parentPage, "userId") {
       @Override
-      public void onClick()
+      public boolean isVisible()
       {
-        if (getFilter().getUserId() == null) {
-          getFilter().setUserId(getUser().getId());
-        } else {
-          getFilter().setUserId(null);
-        }
+        return isOtherUsersAllowed();
       }
-    }, EmbatsBaseChar.CLOCK, new Model<String>() {
+    };
+    add(userSelectPanel);
+    userSelectPanel.init().withAutoSubmit(true).setLabel(new Model<String>(getString("user")));
+    final IconButtonPanel toggleTimesheetsButton = new IconButtonPanel("toggleTimesheets", IconType.CLIPBOARD, new Model<String>() {
       @Override
       public String getObject()
       {
@@ -242,27 +239,26 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
         } else {
           return getString("calendar.tooltip.hideTimesheeets");
         }
-      };
+      }
     }) {
+      @Override
+      public void onSubmit()
+      {
+        if (getFilter().getUserId() == null) {
+          getFilter().setUserId(getUser().getId());
+        } else {
+          getFilter().setUserId(null);
+        }
+      }
+
       @Override
       public boolean isVisible()
       {
         return isOtherUsersAllowed() == false;
       }
     };
-    toggleTimesheetsButton.appendCssClass("shaded");
-    add(toggleTimesheetsButton);
-
-    final UserSelectPanel userSelectPanel = new UserSelectPanel("timesheetsUser", new PropertyModel<PFUserDO>(this, "timesheetsUser"),
-        parentPage, "userId") {
-      @Override
-      public boolean isVisible()
-      {
-        return isOtherUsersAllowed();
-      }
-    };
-    add(userSelectPanel);
-    userSelectPanel.init().withAutoSubmit(true);
+    // toggleTimesheetsButton.appendCssClass("shaded");
+    add(toggleTimesheetsButton.setLight());
   }
 
   public CalendarForm(final CalendarPage parentPage)

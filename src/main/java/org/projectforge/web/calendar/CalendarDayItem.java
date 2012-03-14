@@ -28,12 +28,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.ClassUtils;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.BirthdayAddress;
 import org.projectforge.calendar.DayHolder;
@@ -47,6 +47,8 @@ import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.timesheet.DisplayTimesheet;
 import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.PresizedImage;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.PlainLabel;
 
@@ -54,9 +56,9 @@ public class CalendarDayItem extends WebMarkupContainer
 {
   private static final long serialVersionUID = 6140762327534002674L;
 
-  private DayHolder day;
+  private final DayHolder day;
 
-  private CalendarPage page;
+  private final CalendarPage page;
 
   public CalendarDayItem(final CalendarPage page, final String id, final DayHolder day)
   {
@@ -80,7 +82,7 @@ public class CalendarDayItem extends WebMarkupContainer
     } else {
       cssClass = "normal";
     }
-    add(new SimpleAttributeModifier("class", cssClass));
+    add(AttributeModifier.replace("class", cssClass));
     final Long duration = (Long) day.getObject("duration");
     final String durationString = duration != null ? formatDuration(duration) : "";
     final Label durationLabel = new Label("duration", durationString);
@@ -92,15 +94,14 @@ public class CalendarDayItem extends WebMarkupContainer
     final DateHolder dayDefaultStart = new DateHolder(day.getDate());
     dayDefaultStart.setHourOfDay(8);
     dayDefaultStart.setMinute(0);
-    @SuppressWarnings("unchecked")
-    final Link< ? > addTimesheetLink = new Link("add") {
+    final Link< ? > addTimesheetLink = new Link<Void>("add") {
       @Override
       public void onClick()
       {
         final PageParameters parameters = new PageParameters();
-        parameters.put(TimesheetEditPage.PARAMETER_KEY_START_DATE_IN_MILLIS, dayDefaultStart.getTimeInMillis());
+        parameters.add(TimesheetEditPage.PARAMETER_KEY_START_DATE_IN_MILLIS, dayDefaultStart.getTimeInMillis());
         if (page.getFilter().getUserId() != null) {
-          parameters.put(TimesheetEditPage.PARAMETER_KEY_USER, page.getFilter().getUserId());
+          parameters.add(TimesheetEditPage.PARAMETER_KEY_USER, page.getFilter().getUserId());
         }
         final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
         timesheetEditPage.setReturnToPage(page);
@@ -108,14 +109,13 @@ public class CalendarDayItem extends WebMarkupContainer
       }
     };
     add(addTimesheetLink);
-    final Label addLabel = new PlainLabel("addLabel", "!");
-    addTimesheetLink.add(addLabel);
+    addTimesheetLink.add(new PresizedImage("addImage", getResponse(), WebConstants.EMBATS_PLUS));
     if (isSelectMode() == true) {
       addTimesheetLink.setVisible(false);
     }
 
-    @SuppressWarnings("unchecked")
-    final Link< ? > selectDayButton = new Link("selectDay") {
+    final Link< ? > selectDayButton = new Link<Void>("selectDay") {
+      @Override
       public void onClick()
       {
         if (page.targetType != null && ClassUtils.isAssignable(page.targetType, java.sql.Date.class) == true) {
@@ -152,7 +152,7 @@ public class CalendarDayItem extends WebMarkupContainer
     addBirthdays(day);
   }
 
-  protected String formatDuration(long millis)
+  protected String formatDuration(final long millis)
   {
     return page.formatDuration(millis);
   }
@@ -169,7 +169,7 @@ public class CalendarDayItem extends WebMarkupContainer
     if (timesheets == null) {
       return;
     }
-    for (DisplayTimesheet timesheet : timesheets) {
+    for (final DisplayTimesheet timesheet : timesheets) {
       final WebMarkupContainer item = new WebMarkupContainer(timesheetRepeater.newChildId());
       timesheetRepeater.add(item);
       timesheetRepeater.setRenderBodyOnly(true);
@@ -182,8 +182,7 @@ public class CalendarDayItem extends WebMarkupContainer
   {
     final WebMarkupContainer displayTimesheet = new WebMarkupContainer("sheet");
     item.add(displayTimesheet);
-    @SuppressWarnings("unchecked")
-    final Link< ? > startTimeLink = new Link("start") {
+    final Link< ? > startTimeLink = new Link<Void>("start") {
       @Override
       public void onClick()
       {
@@ -194,9 +193,9 @@ public class CalendarDayItem extends WebMarkupContainer
           caller.select(page.selectProperty, timePeriod);
         } else {
           final PageParameters parameters = new PageParameters();
-          parameters.put(TimesheetEditPage.PARAMETER_KEY_STOP_DATE_IN_MILLIS, timesheet.getStartTime().getTime());
+          parameters.add(TimesheetEditPage.PARAMETER_KEY_STOP_DATE_IN_MILLIS, timesheet.getStartTime().getTime());
           if (page.getFilter().getUserId() != null) {
-            parameters.put(TimesheetEditPage.PARAMETER_KEY_USER, page.getFilter().getUserId());
+            parameters.add(TimesheetEditPage.PARAMETER_KEY_USER, page.getFilter().getUserId());
           }
           final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
           timesheetEditPage.setReturnToPage(page);
@@ -214,8 +213,7 @@ public class CalendarDayItem extends WebMarkupContainer
     } else {
       startTimeLink.setVisible(false);
     }
-    @SuppressWarnings("unchecked")
-    final Link< ? > stopTimeLink = new Link("stop") {
+    final Link< ? > stopTimeLink = new Link<Void>("stop") {
       @Override
       public void onClick()
       {
@@ -226,9 +224,9 @@ public class CalendarDayItem extends WebMarkupContainer
           caller.select(page.selectProperty, timePeriod);
         } else {
           final PageParameters parameters = new PageParameters();
-          parameters.put(TimesheetEditPage.PARAMETER_KEY_START_DATE_IN_MILLIS, timesheet.getStopTime().getTime());
+          parameters.add(TimesheetEditPage.PARAMETER_KEY_START_DATE_IN_MILLIS, timesheet.getStopTime().getTime());
           if (page.getFilter().getUserId() != null) {
-            parameters.put(TimesheetEditPage.PARAMETER_KEY_USER, page.getFilter().getUserId());
+            parameters.add(TimesheetEditPage.PARAMETER_KEY_USER, page.getFilter().getUserId());
           }
           final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
           timesheetEditPage.setReturnToPage(page);
@@ -244,8 +242,7 @@ public class CalendarDayItem extends WebMarkupContainer
 
     final WebMarkupContainer displayBreak = new WebMarkupContainer("break");
     item.add(displayBreak);
-    @SuppressWarnings("unchecked")
-    final Link< ? > timePeriodLink = new Link("period") {
+    final Link< ? > timePeriodLink = new Link<Void>("period") {
       @Override
       public void onClick()
       {
@@ -256,10 +253,10 @@ public class CalendarDayItem extends WebMarkupContainer
           caller.select(page.selectProperty, timePeriod);
         } else {
           final PageParameters parameters = new PageParameters();
-          parameters.put(TimesheetEditPage.PARAMETER_KEY_START_DATE_IN_MILLIS, timesheet.getStartTime().getTime());
-          parameters.put(TimesheetEditPage.PARAMETER_KEY_STOP_DATE_IN_MILLIS, timesheet.getStopTime().getTime());
+          parameters.add(TimesheetEditPage.PARAMETER_KEY_START_DATE_IN_MILLIS, timesheet.getStartTime().getTime());
+          parameters.add(TimesheetEditPage.PARAMETER_KEY_STOP_DATE_IN_MILLIS, timesheet.getStopTime().getTime());
           if (page.getFilter().getUserId() != null) {
-            parameters.put(TimesheetEditPage.PARAMETER_KEY_USER, page.getFilter().getUserId());
+            parameters.add(TimesheetEditPage.PARAMETER_KEY_USER, page.getFilter().getUserId());
           }
           final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
           timesheetEditPage.setReturnToPage(page);
@@ -290,13 +287,12 @@ public class CalendarDayItem extends WebMarkupContainer
         stopTimeLink.setVisible(false);
       }
     }
-    @SuppressWarnings("unchecked")
-    final Link< ? > selectTimesheetLink = new Link("select") {
+    final Link< ? > selectTimesheetLink = new Link<Void>("select") {
       @Override
       public void onClick()
       {
         final PageParameters parameters = new PageParameters();
-        parameters.put(AbstractEditPage.PARAMETER_KEY_ID, timesheet.getId());
+        parameters.add(AbstractEditPage.PARAMETER_KEY_ID, timesheet.getId());
         final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
         timesheetEditPage.setReturnToPage(page);
         setResponsePage(timesheetEditPage);
@@ -320,7 +316,7 @@ public class CalendarDayItem extends WebMarkupContainer
     }
   }
 
-  private String getFormattedTimeOfDay(Date date)
+  private String getFormattedTimeOfDay(final Date date)
   {
     return DateTimeFormatter.instance().getFormattedDateTime(date, DateFormats.getFormatString(DateFormatType.TIME_OF_DAY_MINUTES));
   }
@@ -347,11 +343,12 @@ public class CalendarDayItem extends WebMarkupContainer
     if (page.getFilter().isShowBirthdays() == false) {
       return;
     }
-    StringBuffer buf = new StringBuffer();
-    AddressDO address = birthdayAddress.getAddress();
+    final StringBuffer buf = new StringBuffer();
+    final AddressDO address = birthdayAddress.getAddress();
     if (birthdayAddress.getAge() > 0) {
       // Birthday is not visible for all users (age == 0).
-      buf.append(DateTimeFormatter.instance().getFormattedDate(address.getBirthday(), DateFormats.getFormatString(DateFormatType.DATE_SHORT)))
+      buf.append(
+          DateTimeFormatter.instance().getFormattedDate(address.getBirthday(), DateFormats.getFormatString(DateFormatType.DATE_SHORT)))
           .append(" ");
     }
     buf.append(HtmlHelper.escapeXml(address.getFirstName())).append(" ").append(HtmlHelper.escapeXml(address.getName()));
@@ -361,9 +358,9 @@ public class CalendarDayItem extends WebMarkupContainer
     }
     final Label label = new Label("birthday", buf.toString());
     if (birthdayAddress.isFavorite() == true) {
-      label.add(new SimpleAttributeModifier("class", "birthday favourite"));
+      label.add(AttributeModifier.replace("class", "birthday favourite"));
     } else {
-      label.add(new SimpleAttributeModifier("class", "birthday others"));
+      label.add(AttributeModifier.replace("class", "birthday others"));
     }
     label.setEscapeModelStrings(false);
     item.add(label);

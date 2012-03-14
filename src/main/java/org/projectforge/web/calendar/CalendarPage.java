@@ -28,12 +28,13 @@ import java.util.Date;
 
 import javax.persistence.Transient;
 
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDao;
 import org.projectforge.calendar.DayHolder;
@@ -54,6 +55,8 @@ import org.projectforge.web.wicket.components.TooltipImage;
 
 public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPage
 {
+  private static final long serialVersionUID = 8710165041912824126L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CalendarPage.class);
 
   private static final String USERPREF_KEY = "CalendarPage.userPrefs";
@@ -127,12 +130,12 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
    * @see #isSelectPeriodMode()
    * @param selectPeriodMode
    */
-  public void setSelectPeriodMode(boolean selectPeriodMode)
+  public void setSelectPeriodMode(final boolean selectPeriodMode)
   {
     this.selectPeriodMode = selectPeriodMode;
   }
 
-  public void setSelectStartStopTime(boolean selectStartStopTime)
+  public void setSelectStartStopTime(final boolean selectStartStopTime)
   {
     this.selectStartStopTime = selectStartStopTime;
   }
@@ -140,7 +143,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
   /**
    * @param targetType java.sql.Date is supported.
    */
-  public void setTargetType(Class< ? > targetType)
+  public void setTargetType(final Class< ? > targetType)
   {
     this.targetType = targetType;
   }
@@ -171,7 +174,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     }
     final RepeatingView dayOfWeekLabelRepeater = new RepeatingView("dayOfWeekLabelRepeater");
     body.add(dayOfWeekLabelRepeater);
-    for (DayHolder day : getMonthHolder().getFirstWeek().getDays()) {
+    for (final DayHolder day : getMonthHolder().getFirstWeek().getDays()) {
       final WebMarkupContainer item = new WebMarkupContainer(dayOfWeekLabelRepeater.newChildId());
       dayOfWeekLabelRepeater.add(item);
       item.add(new Label("dayOfWeekLabel", getString("calendar.shortday." + day.getDayKey())));
@@ -194,8 +197,8 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     for (final WeekHolder week : getMonthHolder().getWeeks()) {
       final WebMarkupContainer item = new WebMarkupContainer(weekRepeater.newChildId());
       weekRepeater.add(item);
-      @SuppressWarnings("unchecked")
-      final Link< ? > selectWeekButton = new Link("selectWeek") {
+      final Link< ? > selectWeekButton = new Link<Void>("selectWeek") {
+        @Override
         public void onClick()
         {
           onSelectPeriod(week.getFirstDay().getDate(), week.getLastDay().getDate());
@@ -226,11 +229,11 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     }
   }
 
-  private void addDays(final WebMarkupContainer parent, WeekHolder week)
+  private void addDays(final WebMarkupContainer parent, final WeekHolder week)
   {
     final RepeatingView dayRepeater = new RepeatingView("days");
     parent.add(dayRepeater);
-    for (DayHolder day : week.getDays()) {
+    for (final DayHolder day : week.getDays()) {
       final CalendarDayItem dayItem = new CalendarDayItem(this, dayRepeater.newChildId(), day);
       dayRepeater.add(dayItem);
       dayItem.init();
@@ -239,27 +242,34 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
 
   void goToPreviousMonth()
   {
-    DateHolder date = new DateHolder(form.getFilter().getCurrent(), DatePrecision.DAY);
+    final DateHolder date = new DateHolder(form.getFilter().getCurrent(), DatePrecision.DAY);
     date.add(Calendar.MONTH, -1);
     goToDate(date.getDate());
   }
 
   void goToNextMonth()
   {
-    DateHolder date = new DateHolder(form.getFilter().getCurrent(), DatePrecision.DAY);
+    final DateHolder date = new DateHolder(form.getFilter().getCurrent(), DatePrecision.DAY);
     date.add(Calendar.MONTH, 1);
     goToDate(date.getDate());
   }
 
   void goToToday()
   {
-    DateHolder date = new DateHolder(DatePrecision.DAY);
+    final DateHolder date = new DateHolder(DatePrecision.DAY);
     goToDate(date.getDate());
   }
 
-  private void goToDate(Date date)
+  private void goToDate(final Date date)
   {
     form.getFilter().setCurrent(date);
+  }
+
+  @Override
+  public void renderHead(final IHeaderResponse response)
+  {
+    super.renderHead(response);
+    response.renderCSSReference("styles/oldcalendar.css");
   }
 
   @Override
@@ -284,10 +294,10 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     return monthHolder;
   }
 
-  protected String formatDuration(long millis)
+  protected String formatDuration(final long millis)
   {
-    int[] fields = TimePeriod.getDurationFields(millis, 8, 200);
-    StringBuffer buf = new StringBuffer();
+    final int[] fields = TimePeriod.getDurationFields(millis, 8, 200);
+    final StringBuffer buf = new StringBuffer();
     if (fields[0] > 0) {
       buf.append(fields[0]).append(getString("calendar.unit.day")).append(" ");
     }
@@ -325,7 +335,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
    * User has selected one day. If in selection mode then redirect to the caller with Date or if returnAsISODateString is true date as iso
    * date string: "yyyy-mm-dd".
    */
-  protected void onSelectDay(Date date)
+  protected void onSelectDay(final Date date)
   {
     log.debug("onSelectDay");
     if (isSelectMode() == true) {
@@ -342,7 +352,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
    * User has selected a period (week or whole month). If in selection mode then redirect to the caller with TimePeriod or if
    * returnAsISODateString is true time period as iso date string: "yyyy-mm-dd:yyyy-mm-dd".
    */
-  protected void onSelectPeriod(Date fromDate, Date toDate)
+  protected void onSelectPeriod(final Date fromDate, final Date toDate)
   {
     log.debug("onSelectPeriod");
     if (isSelectMode() == true) {
@@ -375,11 +385,11 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     return selectStartStopTime;
   }
 
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
   }
 
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     if ("userId".equals(property) == true) {
       getFilter().setUserId((Integer) selectedValue);
@@ -388,7 +398,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     }
   }
 
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     if ("userId".equals(property) == true) {
       getFilter().setUserId(null);

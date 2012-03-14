@@ -76,7 +76,7 @@ public class DateTimeFormatter extends AbstractFormatter
    * @param dateTime
    * @see #getFormattedDateTime(Object, String, Locale, TimeZone)
    */
-  public String getFormattedDate(Object date)
+  public String getFormattedDate(final Object date)
   {
     return getFormattedDate(date, PFUserContext.getLocale(), PFUserContext.getTimeZone());
   }
@@ -88,7 +88,7 @@ public class DateTimeFormatter extends AbstractFormatter
    */
   public String getFormattedDate(final Object date, final Locale locale, final TimeZone timeZone)
   {
-    return getFormattedDate(date, DateFormats.getFormatString(org.projectforge.common.DateFormatType.DATE_SHORT), locale, timeZone);
+    return getFormattedDate(date, DateFormats.getFormatString(org.projectforge.common.DateFormatType.DATE), locale, timeZone);
   }
 
   /**
@@ -96,7 +96,7 @@ public class DateTimeFormatter extends AbstractFormatter
    * @param date
    * @param patternKey i18n key of the pattern
    */
-  public String getFormattedDate(Object date, String pattern)
+  public String getFormattedDate(final Object date, final String pattern)
   {
     return getFormattedDate(date, pattern, PFUserContext.getLocale(), PFUserContext.getTimeZone());
   }
@@ -123,7 +123,7 @@ public class DateTimeFormatter extends AbstractFormatter
    * @param dateTime
    * @see #getFormattedDateTime(Date, String)
    */
-  public String getFormattedDateTime(Date dateTime)
+  public String getFormattedDateTime(final Date dateTime)
   {
     return getFormattedDateTime(dateTime, DateFormats.getFormatString(org.projectforge.common.DateFormatType.TIMESTAMP_SHORT_MINUTES));
   }
@@ -171,7 +171,7 @@ public class DateTimeFormatter extends AbstractFormatter
    * @param dateTime
    * @see #getFormattedTime(Date, String)
    */
-  public String getFormattedTime(Date time)
+  public String getFormattedTime(final Date time)
   {
     return getFormattedTime(time, DateFormats.getFormatString(org.projectforge.common.DateFormatType.TIME_OF_DAY_MINUTES));
   }
@@ -181,17 +181,17 @@ public class DateTimeFormatter extends AbstractFormatter
    * @param time
    * @param patternKey i18n key of the pattern
    */
-  public String getFormattedTime(Date time, String pattern)
+  public String getFormattedTime(final Date time, final String pattern)
   {
     if (time == null) {
       return "";
     }
-    DateFormat format = new SimpleDateFormat(pattern, PFUserContext.getLocale());
+    final DateFormat format = new SimpleDateFormat(pattern, PFUserContext.getLocale());
     format.setTimeZone(PFUserContext.getTimeZone());
     return format.format(time);
   }
 
-  public String getFormattedDuration(TimePeriod timePeriod)
+  public String getFormattedDuration(final TimePeriod timePeriod)
   {
     return getFormattedDuration(timePeriod.getDuration());
   }
@@ -202,7 +202,7 @@ public class DateTimeFormatter extends AbstractFormatter
    * @return
    * @see #getFormattedDuration(long, int, int)
    */
-  public String getFormattedDuration(long millis)
+  public String getFormattedDuration(final long millis)
   {
     return getFormattedDuration(millis, durationOfWorkingDay, 24);
   }
@@ -213,7 +213,7 @@ public class DateTimeFormatter extends AbstractFormatter
    * @return
    * @see #getPrettyFormattedDuration(long, int, int)
    */
-  public String getPrettyFormattedDuration(long millis)
+  public String getPrettyFormattedDuration(final long millis)
   {
     return getPrettyFormattedDuration(millis, DEFAULT_HOURS_OF_DAY, DEFAULT_MIN_HOURS4DAY_SEPARATION);
   }
@@ -225,11 +225,11 @@ public class DateTimeFormatter extends AbstractFormatter
    * @param minHours4DaySeparation
    * @return
    */
-  public String getPrettyFormattedDuration(long millis, int hoursOfDay, int minHours4DaySeparation)
+  public String getPrettyFormattedDuration(final long millis, final int hoursOfDay, final int minHours4DaySeparation)
   {
-    StringBuffer buf = new StringBuffer();
-    String str1 = getFormattedDuration(millis, hoursOfDay, minHours4DaySeparation);
-    String str2 = getFormattedDuration(millis, hoursOfDay, -1);
+    final StringBuffer buf = new StringBuffer();
+    final String str1 = getFormattedDuration(millis, hoursOfDay, minHours4DaySeparation);
+    final String str2 = getFormattedDuration(millis, hoursOfDay, -1);
     buf.append(str1);
     if (str1.equals(str2) == false) {
       buf.append(" (").append(str2).append(")");
@@ -244,10 +244,10 @@ public class DateTimeFormatter extends AbstractFormatter
    * @param minHours4DaySeparation
    * @return
    */
-  public String getFormattedDuration(long millis, int hoursOfDay, int minHours4DaySeparation)
+  public String getFormattedDuration(final long millis, final int hoursOfDay, final int minHours4DaySeparation)
   {
-    int[] fields = TimePeriod.getDurationFields(millis, hoursOfDay, minHours4DaySeparation);
-    StringBuffer buf = new StringBuffer();
+    final int[] fields = TimePeriod.getDurationFields(millis, hoursOfDay, minHours4DaySeparation);
+    final StringBuffer buf = new StringBuffer();
     if (fields[0] > 0) { // days
       buf.append(fields[0]).append(getI18nMessage("calendar.unit.day")).append(" ");
     }
@@ -257,7 +257,7 @@ public class DateTimeFormatter extends AbstractFormatter
     return buf.toString();
   }
 
-  private void formatNumber(StringBuffer buf, long number)
+  private void formatNumber(final StringBuffer buf, final long number)
   {
     if (number < 10) {
       buf.append("0");
@@ -265,7 +265,7 @@ public class DateTimeFormatter extends AbstractFormatter
     buf.append(number);
   }
 
-  public String getFormattedTimePeriod(TimePeriod timePeriod)
+  public String getFormattedTimePeriod(final TimePeriod timePeriod)
   {
     return getFormattedTimePeriod(timePeriod, RenderType.HTML, true);
   }
@@ -277,12 +277,12 @@ public class DateTimeFormatter extends AbstractFormatter
    * @param multiLines If true, &gt;br/&lt; tags will be used for a multi line output.
    * @return
    */
-  public String getFormattedTimePeriod(TimePeriod timePeriod, RenderType renderType, boolean multiLines)
+  public String getFormattedTimePeriod(final TimePeriod timePeriod, final RenderType renderType, final boolean multiLines)
   {
     if (timePeriod == null) {
       return "";
     }
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     if (timePeriod.getMarker() == true) {
       // Time collision is marked!
       buf.append("<span");
@@ -303,7 +303,7 @@ public class DateTimeFormatter extends AbstractFormatter
       if (timePeriod.getToDate() != null) {
         buf.append("-");
         appendCSSTime(buf, timePeriod.getToDate(), renderType);
-        DayHolder day = new DayHolder(timePeriod.getFromDate());
+        final DayHolder day = new DayHolder(timePeriod.getFromDate());
         if (day.isSameDay(timePeriod.getToDate()) == false) {
           if (multiLines == true) {
             buf.append("<br/>(");
@@ -324,7 +324,7 @@ public class DateTimeFormatter extends AbstractFormatter
     return buf.toString();
   }
 
-  private void appendCSSDate(StringBuffer buf, Date date, RenderType renderType)
+  private void appendCSSDate(final StringBuffer buf, final Date date, final RenderType renderType)
   {
     buf.append("<span");
     if (renderType == RenderType.FOP) {
@@ -336,7 +336,7 @@ public class DateTimeFormatter extends AbstractFormatter
     buf.append(getFormattedDate(date)).append("</span>");
   }
 
-  private void appendCSSTime(StringBuffer buf, Date date, RenderType renderType)
+  private void appendCSSTime(final StringBuffer buf, final Date date, final RenderType renderType)
   {
     if (renderType == RenderType.FOP) {
       buf.append(getFormattedTime(date));
@@ -347,7 +347,7 @@ public class DateTimeFormatter extends AbstractFormatter
     }
   }
 
-  public void setHtmlHelper(HtmlHelper htmlHelper)
+  public void setHtmlHelper(final HtmlHelper htmlHelper)
   {
     this.htmlHelper = htmlHelper;
   }
@@ -356,7 +356,7 @@ public class DateTimeFormatter extends AbstractFormatter
    * Set the default duration of working day (8 at default).
    * @param durationOfWorkingDay
    */
-  public void setDurationOfWorkingDay(int durationOfWorkingDay)
+  public void setDurationOfWorkingDay(final int durationOfWorkingDay)
   {
     this.durationOfWorkingDay = durationOfWorkingDay;
   }
