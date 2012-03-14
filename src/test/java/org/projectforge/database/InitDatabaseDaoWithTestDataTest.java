@@ -53,6 +53,8 @@ import de.micromata.hibernate.history.HistoryEntry;
 
 public class InitDatabaseDaoWithTestDataTest extends TestBase
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(InitDatabaseDaoWithTestDataTest.class);
+
   private InitDatabaseDao initDatabaseDao;
 
   private AccessDao accessDao;
@@ -67,37 +69,37 @@ public class InitDatabaseDaoWithTestDataTest extends TestBase
 
   private UserGroupCache userGroupCache;
 
-  public void setInitDatabaseDao(InitDatabaseDao initDatabaseDao)
+  public void setInitDatabaseDao(final InitDatabaseDao initDatabaseDao)
   {
     this.initDatabaseDao = initDatabaseDao;
   }
 
-  public void setAccessDao(AccessDao accessDao)
+  public void setAccessDao(final AccessDao accessDao)
   {
     this.accessDao = accessDao;
   }
 
-  public void setAddressDao(AddressDao addressDao)
+  public void setAddressDao(final AddressDao addressDao)
   {
     this.addressDao = addressDao;
   }
 
-  public void setAuftragDao(AuftragDao auftragDao)
+  public void setAuftragDao(final AuftragDao auftragDao)
   {
     this.auftragDao = auftragDao;
   }
 
-  public void setTaskDao(TaskDao taskDao)
+  public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
   }
 
-  public void setBookDao(BookDao bookDao)
+  public void setBookDao(final BookDao bookDao)
   {
     this.bookDao = bookDao;
   }
 
-  public void setUserGroupCache(UserGroupCache userGroupCache)
+  public void setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
   }
@@ -162,24 +164,28 @@ public class InitDatabaseDaoWithTestDataTest extends TestBase
     final List<HistoryEntry> list = hibernate.loadAll(HistoryEntry.class);
     assertTrue("At least 10 history entries expected: " + list.size(), list.size() >= 10);
 
+    log.error("****> Next exception and error message are OK (part of the test).");
     boolean exception = false;
     try {
       initDatabaseDao.initializeEmptyDatabase(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword, null);
       fail("AccessException expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       exception = true;
       // Everything fine.
     }
+    log.error("Last exception and error messages were OK (part of the test). <****");
     assertTrue(exception);
 
+    log.error("****> Next exception and error message are OK (part of the test).");
     exception = false;
     try {
       initDatabaseDao.initializeEmptyDatabaseWithTestData(InitDatabaseDao.DEFAULT_ADMIN_USER, encryptedPassword, null);
       fail("AccessException expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       exception = true;
       // Everything fine.
     }
+    log.error("Last exception and error messages were OK (part of the test). <****");
     assertTrue(exception);
   }
 }
