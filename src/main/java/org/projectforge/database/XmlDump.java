@@ -43,7 +43,6 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -60,11 +59,11 @@ import org.hibernate.Hibernate;
 import org.hibernate.LockOptions;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.projectforge.access.AccessEntryDO;
 import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.core.AbstractBaseDO;
+import org.projectforge.core.ConfigurationDO;
 import org.projectforge.database.xstream.HibernateXmlConverter;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.fibu.AbstractRechnungDO;
@@ -112,8 +111,8 @@ public class XmlDump
   /**
    * These classes are stored automatically because they're dependent.
    */
-  private Class< ? >[] embeddedClasses = new Class< ? >[] { UserRightDO.class, AuftragsPositionDO.class, EingangsrechnungsPositionDO.class,
-      RechnungsPositionDO.class};
+  private final Class< ? >[] embeddedClasses = new Class< ? >[] { UserRightDO.class, AuftragsPositionDO.class,
+      EingangsrechnungsPositionDO.class, RechnungsPositionDO.class};
 
   public HibernateTemplate getHibernate()
   {
@@ -121,7 +120,7 @@ public class XmlDump
     return hibernate;
   }
 
-  public void setHibernate(HibernateTemplate hibernate)
+  public void setHibernate(final HibernateTemplate hibernate)
   {
     this.hibernate = hibernate;
   }
@@ -133,10 +132,10 @@ public class XmlDump
   {
     try {
       return restoreDatabase(new InputStreamReader(new FileInputStream(XML_DUMP_FILENAME), "utf-8"));
-    } catch (UnsupportedEncodingException ex) {
+    } catch (final UnsupportedEncodingException ex) {
       log.error(ex.getMessage(), ex);
       throw new RuntimeException(ex);
-    } catch (FileNotFoundException ex) {
+    } catch (final FileNotFoundException ex) {
       log.error(ex.getMessage(), ex);
       throw new RuntimeException(ex);
     }
@@ -146,7 +145,7 @@ public class XmlDump
    * @param reader
    * @return Only for test cases.
    */
-  public XStreamSavingConverter restoreDatabase(Reader reader)
+  public XStreamSavingConverter restoreDatabase(final Reader reader)
   {
     final XStreamSavingConverter xstreamSavingConverter = new XStreamSavingConverter() {
 
@@ -159,33 +158,29 @@ public class XmlDump
       @Override
       public Serializable onBeforeSave(final Session session, final Object obj)
       {
+        log.info("Object " + obj);
         if (obj instanceof PFUserDO) {
           final PFUserDO user = (PFUserDO) obj;
-          final Set<UserRightDO> rights = user.getRights();
-          user.setRights(null); // Need to nullable rights first (otherwise insert fails).
-          final Serializable id = save(user);
-          user.setRights(rights);
-          if (rights != null) {
-            for (final UserRightDO right : rights) {
-              save(right);
-            }
-          }
-          return id;
+          return save(user, user.getRights());
         } else if (obj instanceof AbstractRechnungDO< ? >) {
           final AbstractRechnungDO< ? extends AbstractRechnungsPositionDO> rechnung = (AbstractRechnungDO< ? >) obj;
           final List< ? extends AbstractRechnungsPositionDO> positions = rechnung.getPositionen();
           rechnung.setPositionen(null); // Need to nullable positions first (otherwise insert fails).
           final Serializable id = save(rechnung);
-          rechnung.internalSetPositionen(positions);
           if (positions != null) {
             for (final AbstractRechnungsPositionDO pos : positions) {
               if (pos.getKostZuweisungen() != null) {
                 final List<KostZuweisungDO> zuweisungen = pos.getKostZuweisungen();
                 pos.setKostZuweisungen(null); // Need to nullable first (otherwise insert fails).
                 save(pos);
-                pos.setKostZuweisungen(zuweisungen);
+                if (pos instanceof RechnungsPositionDO) {
+                  ((RechnungDO) rechnung).addPosition((RechnungsPositionDO) pos);
+                } else {
+                  ((EingangsrechnungDO) rechnung).addPosition((EingangsrechnungsPositionDO) pos);
+                }
                 if (zuweisungen != null) {
                   for (final KostZuweisungDO zuweisung : zuweisungen) {
+                    pos.addKostZuweisung(zuweisung);
                     save(zuweisung);
                   }
                 }
@@ -195,16 +190,7 @@ public class XmlDump
           return id;
         } else if (obj instanceof AuftragDO) {
           final AuftragDO auftrag = (AuftragDO) obj;
-          final List<AuftragsPositionDO> positions = auftrag.getPositionen();
-          auftrag.setPositionen(null); // Need to nullable first (otherwise insert fails).
-          final Serializable id = save(auftrag);
-          auftrag.setPositionen(positions);
-          if (positions != null) {
-            for (final AuftragsPositionDO pos : positions) {
-              save(pos);
-            }
-          }
-          return id;
+          return save(auftrag, auftrag.getPositionen());
         }
         return super.onBeforeSave(session, obj);
       }
@@ -215,13 +201,12 @@ public class XmlDump
         Kost2ArtDO.class, Kost2DO.class, AuftragDO.class, //
         RechnungDO.class, EingangsrechnungDO.class, EmployeeSalaryDO.class, KostZuweisungDO.class,//
         UserPrefEntryDO.class, UserPrefDO.class, //
-        AccessEntryDO.class, GroupTaskAccessDO.class);
+        AccessEntryDO.class, GroupTaskAccessDO.class, ConfigurationDO.class);
     Session session = null;
     try {
       final SessionFactory sessionFactory = hibernate.getSessionFactory();
       session = sessionFactory.openSession(EmptyInterceptor.INSTANCE);
       session.setFlushMode(FlushMode.AUTO);
-      final Transaction transaction = session.beginTransaction();
       final XStream xstream = new XStream(new DomDriver());
       xstream.setMode(XStream.ID_REFERENCES);
       xstreamSavingConverter.setSession(session);
@@ -232,8 +217,7 @@ public class XmlDump
       xstream.fromXML(reader);
 
       xstreamSavingConverter.saveObjects();
-      transaction.commit();
-    } catch (Exception ex) {
+    } catch (final Exception ex) {
       log.error(ex.getMessage(), ex);
       throw new RuntimeException(ex);
     } finally {
@@ -248,9 +232,9 @@ public class XmlDump
   /**
    * @return Only for test cases.
    */
-  public XStreamSavingConverter restoreDatabaseFromClasspathResource(String path, String encoding)
+  public XStreamSavingConverter restoreDatabaseFromClasspathResource(final String path, final String encoding)
   {
-    ClassPathResource cpres = new ClassPathResource(path);
+    final ClassPathResource cpres = new ClassPathResource(path);
     Reader reader;
     try {
       InputStream in;
@@ -260,7 +244,7 @@ public class XmlDump
         in = cpres.getInputStream();
       }
       reader = new InputStreamReader(in, encoding);
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       log.error(ex.getMessage(), ex);
       throw new RuntimeException(ex);
     }
@@ -277,11 +261,11 @@ public class XmlDump
    * @param filename virtual filename: If the filename suffix is "gz" then the dump will be compressed.
    * @param out
    */
-  public void dumpDatabase(String filename, OutputStream out)
+  public void dumpDatabase(final String filename, final OutputStream out)
   {
-    HibernateXmlConverter converter = new HibernateXmlConverter() {
+    final HibernateXmlConverter converter = new HibernateXmlConverter() {
       @Override
-      protected void init(XStream xstream)
+      protected void init(final XStream xstream)
       {
         xstream.omitField(AbstractBaseDO.class, "minorChange");
         xstream.omitField(AbstractBaseDO.class, "selected");
@@ -301,7 +285,7 @@ public class XmlDump
         writer = new OutputStreamWriter(out, "utf-8");
       }
       converter.dumpDatabaseToXml(writer, true); // history=false, preserveIds=true
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       log.error(ex.getMessage(), ex);
     } finally {
       IOUtils.closeQuietly(gzipOut);
@@ -309,13 +293,13 @@ public class XmlDump
     }
   }
 
-  public void dumpDatabase(String path, String encoding)
+  public void dumpDatabase(final String path, final String encoding)
   {
     OutputStream out = null;
     try {
       out = new FileOutputStream(path);
       dumpDatabase(path, out);
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       log.error(ex.getMessage(), ex);
     } finally {
       IOUtils.closeQuietly(out);
@@ -376,10 +360,9 @@ public class XmlDump
         ++counter;
       }
       if (hasError == true) {
-        log
-            .fatal("*********** A inconsistency in the import was found! This may result in a data loss or corrupted data! Please retry the import. "
-                + counter
-                + " entries checked.");
+        log.fatal("*********** A inconsistency in the import was found! This may result in a data loss or corrupted data! Please retry the import. "
+            + counter
+            + " entries checked.");
         return -counter;
       }
       log.info("Data-base import successfully verified: " + counter + " entries checked.");
@@ -488,7 +471,7 @@ public class XmlDump
           }
           return false;
         }
-      } catch (IllegalAccessException ex) {
+      } catch (final IllegalAccessException ex) {
         throw new InternalError("Unexpected IllegalAccessException: " + ex.getMessage());
       }
     }
@@ -531,7 +514,7 @@ public class XmlDump
    * @throws IllegalAccessException
    */
   private Object getValue(final Object obj, final Object compareObj, final Field field) throws IllegalArgumentException,
-      IllegalAccessException
+  IllegalAccessException
   {
     Object val = null;
     final Method getter = BeanHelper.determineGetter(obj.getClass(), field.getName());
