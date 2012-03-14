@@ -9,7 +9,7 @@
   <property environment="env" />
 	<property name="APP_ID" value="ProjectForge" />
 	<property name="APP_TITLE" value="${APP_ID} 2012" />
-	<property name="VERSION" value="3.6.1.5" />
+	<property name="VERSION" value="3.6.1.7" />
 	<property name="m_doc.home" value="${env.M_DOC_HOME}" />
 	<property name="webproject" value="." />
 	<property name="target" value="${webproject}/target" />
@@ -120,7 +120,6 @@
 					<include name="src/**/*.java" />
 					<include name="src/**/*.jflex" />
 					<include name="src/**/*.properties" />
-					<include name="src/main/resources/gwiki/PFContents.zip" />
 					<include name="src/main/resources/images/*.png" />
 					<include name="src/main/resources/keystore" />
 					<include name="src/main/resources/mail/*.txt" />
