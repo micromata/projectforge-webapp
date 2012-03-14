@@ -74,12 +74,12 @@ public class HRPlanningDao extends BaseDao<HRPlanningDO>
     baseDaoReindexRegistry.registerDependent(HRPlanningEntryDO.class, this);
   }
 
-  public void setProjektDao(ProjektDao projektDao)
+  public void setProjektDao(final ProjektDao projektDao)
   {
     this.projektDao = projektDao;
   }
 
-  public void setUserDao(UserDao userDao)
+  public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
   }
@@ -113,25 +113,36 @@ public class HRPlanningDao extends BaseDao<HRPlanningDO>
 
   /**
    * Does an entry with the same user and week of year already exist?
-   * @param username
+   * @param planning
    * @return If week or user id is not given, return false.
    */
-  @SuppressWarnings("unchecked")
   public boolean doesEntryAlreadyExist(final HRPlanningDO planning)
   {
     Validate.notNull(planning);
-    if (planning.getWeek() == null || planning.getUserId() == null) {
+    return doesEntryAlreadyExist(planning.getId(), planning.getUserId(), planning.getWeek());
+  }
+
+  /**
+   * Does an entry with the same user and week of year already exist?
+   * @param planningId Id of the current planning or null if new.
+   * @param userId
+   * @param week
+   * @return If week or user id is not given, return false.
+   */
+  @SuppressWarnings("unchecked")
+  public boolean doesEntryAlreadyExist(final Integer planningId, final Integer userId, final Date week)
+  {
+    if (week == null || userId == null) {
       return false;
     }
     final List<HRPlanningDO> list;
-    if (planning.getId() == null) {
+    if (planningId == null) {
       // New entry
-      list = getHibernateTemplate().find("from HRPlanningDO p where p.user.id = ? and p.week = ?",
-          new Object[] { planning.getUserId(), planning.getWeek()});
+      list = getHibernateTemplate().find("from HRPlanningDO p where p.user.id = ? and p.week = ?", new Object[] { userId, week});
     } else {
       // Entry already exists. Check collision:
       list = getHibernateTemplate().find("from HRPlanningDO p where p.user.id = ? and p.week = ? and pk <> ?",
-          new Object[] { planning.getUserId(), planning.getWeek(), planning.getId()});
+          new Object[] { userId, week, planningId});
     }
     return (CollectionUtils.isNotEmpty(list) == true);
   }
@@ -167,7 +178,7 @@ public class HRPlanningDao extends BaseDao<HRPlanningDO>
   {
     final HRPlanningFilter myFilter = (HRPlanningFilter) filter;
     if (myFilter.getStopTime() != null) {
-      DateHolder date = new DateHolder(myFilter.getStopTime());
+      final DateHolder date = new DateHolder(myFilter.getStopTime());
       date.setEndOfDay();
       myFilter.setStopTime(date.getDate());
     }
@@ -183,7 +194,7 @@ public class HRPlanningDao extends BaseDao<HRPlanningDO>
   {
     final QueryFilter queryFilter = new QueryFilter(filter);
     if (filter.getUserId() != null) {
-      PFUserDO user = new PFUserDO();
+      final PFUserDO user = new PFUserDO();
       user.setId(filter.getUserId());
       queryFilter.add(Restrictions.eq("user", user));
     }
@@ -251,7 +262,7 @@ public class HRPlanningDao extends BaseDao<HRPlanningDO>
    * @see org.projectforge.core.BaseDao#getDisplayHistoryEntries(org.projectforge.core.ExtendedBaseDO)
    */
   @Override
-  public List<DisplayHistoryEntry> getDisplayHistoryEntries(HRPlanningDO obj)
+  public List<DisplayHistoryEntry> getDisplayHistoryEntries(final HRPlanningDO obj)
   {
     final List<DisplayHistoryEntry> list = super.getDisplayHistoryEntries(obj);
     if (accessChecker.hasLoggedInUserHistoryAccess(userRightId, obj, false) == false) {
@@ -280,7 +291,7 @@ public class HRPlanningDao extends BaseDao<HRPlanningDO>
       }
     }
     Collections.sort(list, new Comparator<DisplayHistoryEntry>() {
-      public int compare(DisplayHistoryEntry o1, DisplayHistoryEntry o2)
+      public int compare(final DisplayHistoryEntry o1, final DisplayHistoryEntry o2)
       {
         return (o2.getTimestamp().compareTo(o1.getTimestamp()));
       }
@@ -289,7 +300,7 @@ public class HRPlanningDao extends BaseDao<HRPlanningDO>
   }
 
   @Override
-  public List<HRPlanningDO> getDependentObjectsToReindex(BaseDO< ? > obj)
+  public List<HRPlanningDO> getDependentObjectsToReindex(final BaseDO< ? > obj)
   {
     if (obj instanceof HRPlanningEntryDO) {
       @SuppressWarnings("unchecked")
