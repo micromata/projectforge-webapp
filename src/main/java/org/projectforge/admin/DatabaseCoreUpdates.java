@@ -29,8 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.projectforge.address.AddressDO;
-import org.projectforge.core.SpaceDO;
-import org.projectforge.core.SpaceRightDO;
 import org.projectforge.database.DatabaseUpdateDO;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.Table;
@@ -100,41 +98,6 @@ public class DatabaseCoreUpdates
         final Table addressTable = new Table(AddressDO.class);
         if (dao.doesTableAttributesExist(addressTable, "communicationLanguage") == false) {
           dao.addTableAttributes(addressTable, new TableAttribute(AddressDO.class, "communicationLanguage"));
-        }
-        dao.createMissingIndices();
-        return UpdateRunningStatus.DONE;
-      }
-    });
-
-    // /////////////////////////////////////////////////////////////////
-    // 3.6.1
-    // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "3.6.1", "2011-03-22", "Adds tables t_space and t_space_right.") {
-      @Override
-      public UpdatePreCheckStatus runPreCheck()
-      {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
-        final Table spaceTable = new Table(SpaceDO.class);
-        final Table spaceRightTable = new Table(SpaceRightDO.class);
-        return dao.doesExist(spaceTable) == true && dao.doesExist(spaceRightTable) //
-            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
-      }
-
-      @Override
-      public UpdateRunningStatus runUpdate()
-      {
-        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
-        final Table spaceTable = new Table(SpaceDO.class);
-        final Table spaceRightTable = new Table(SpaceRightDO.class);
-        if (dao.doesExist(spaceTable) == false) {
-          spaceTable.addAttributes("id", "created", "lastUpdate", "deleted", "identifier", "status", "title", "description");
-          dao.createTable(spaceTable);
-          dao.addUniqueConstraint(spaceTable, "title_unique", "title");
-          dao.addUniqueConstraint(spaceTable, "identifier_unique", "identifier");
-        }
-        if (dao.doesExist(spaceRightTable) == false) {
-          spaceRightTable.addAttributes("id", "created", "lastUpdate", "deleted", "identifier", "space", "user", "value", "comment");
-          dao.createTable(spaceRightTable);
         }
         dao.createMissingIndices();
         return UpdateRunningStatus.DONE;
