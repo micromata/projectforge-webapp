@@ -39,7 +39,7 @@ import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
 import org.projectforge.core.AbstractHistorizableBaseDO;
 import org.projectforge.core.IManualIndex;
-import org.projectforge.lucene.PFAnalyzer;
+import org.projectforge.lucene.ClassicAnalyzer;
 
 
 /**
@@ -51,7 +51,7 @@ import org.projectforge.lucene.PFAnalyzer;
 @Entity
 @Indexed
 @Table(name = "T_FIBU_KOST2ART")
-@Analyzer(impl = PFAnalyzer.class)
+@Analyzer(impl = ClassicAnalyzer.class)
 public class Kost2ArtDO extends AbstractHistorizableBaseDO<Integer> implements Comparable<Kost2ArtDO>, IManualIndex
 {
   private static final long serialVersionUID = 2398122998160436266L;
@@ -83,11 +83,11 @@ public class Kost2ArtDO extends AbstractHistorizableBaseDO<Integer> implements C
    * Muss größer als 0 und kleiner als 100 sein, sonst wird ein Validierungsfehler geworfen.
    * @param nummer
    */
-  public void setId(Integer id)
+  public void setId(final Integer id)
   {
     this.id = id;
   }
-  
+
   public Kost2ArtDO withId(final Integer id) {
     setId(id);
     return this;
@@ -99,14 +99,14 @@ public class Kost2ArtDO extends AbstractHistorizableBaseDO<Integer> implements C
     return name;
   }
 
-  public Kost2ArtDO setName(String name)
+  public Kost2ArtDO setName(final String name)
   {
     this.name = name;
     return this;
   }
 
   @Column(length = 5000)
-  public Kost2ArtDO setDescription(String description)
+  public Kost2ArtDO setDescription(final String description)
   {
     this.description = description;
     return this;
@@ -118,7 +118,7 @@ public class Kost2ArtDO extends AbstractHistorizableBaseDO<Integer> implements C
   }
 
   @Column(nullable = false)
-  public Kost2ArtDO setFakturiert(boolean fakturiert)
+  public Kost2ArtDO setFakturiert(final boolean fakturiert)
   {
     this.fakturiert = fakturiert;
     return this;
@@ -140,7 +140,7 @@ public class Kost2ArtDO extends AbstractHistorizableBaseDO<Integer> implements C
     return workFraction;
   }
 
-  public Kost2ArtDO setWorkFraction(BigDecimal workFraction)
+  public Kost2ArtDO setWorkFraction(final BigDecimal workFraction)
   {
     this.workFraction = workFraction;
     return this;
@@ -155,7 +155,7 @@ public class Kost2ArtDO extends AbstractHistorizableBaseDO<Integer> implements C
     return projektStandard;
   }
 
-  public Kost2ArtDO setProjektStandard(boolean projektStandard)
+  public Kost2ArtDO setProjektStandard(final boolean projektStandard)
   {
     this.projektStandard = projektStandard;
     return this;
@@ -166,10 +166,10 @@ public class Kost2ArtDO extends AbstractHistorizableBaseDO<Integer> implements C
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
-  public boolean equals(Object o)
+  public boolean equals(final Object o)
   {
     if (o instanceof Kost2ArtDO) {
-      Kost2ArtDO other = (Kost2ArtDO) o;
+      final Kost2ArtDO other = (Kost2ArtDO) o;
       return (ObjectUtils.equals(this.id, other.id));
     }
     return false;
@@ -183,12 +183,12 @@ public class Kost2ArtDO extends AbstractHistorizableBaseDO<Integer> implements C
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     hcb.append(this.id);
     return hcb.toHashCode();
   }
 
-  public int compareTo(Kost2ArtDO o)
+  public int compareTo(final Kost2ArtDO o)
   {
     return id.compareTo(o.id);
   }
