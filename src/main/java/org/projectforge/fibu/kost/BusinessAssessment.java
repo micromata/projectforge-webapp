@@ -39,6 +39,7 @@ import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.kost.reporting.Report;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.web.HtmlHelper;
 
 /**
  * Used in config.xml for the definition of the used business assessment schema. The business assessment is displayed in different
@@ -216,9 +217,31 @@ public class BusinessAssessment implements Serializable
     return row != null ? row.getAmount() : null;
   }
 
-  public String getHeader()
+  public String asHtml()
   {
     final StringBuffer buf = new StringBuffer();
+    buf.append(getHeader(true));
+    buf.append("<table class=\"business-assessment\">\n");
+    if (rows != null) {
+      for (final BusinessAssessmentRow row : rows) {
+        asLine(buf, row, true);
+      }
+    }
+    buf.append("</table>\n");
+    return buf.toString();
+  }
+
+  public String getHeader()
+  {
+    return getHeader(false);
+  }
+
+  public String getHeader(final boolean html)
+  {
+    final StringBuffer buf = new StringBuffer();
+    if (html == true) {
+      buf.append("<h3>");
+    }
     if (config != null) {
       buf.append(config.getHeading());
     } else {
@@ -230,7 +253,11 @@ public class BusinessAssessment implements Serializable
     if (title != null) {
       buf.append(" \"").append(title).append("\"");
     }
-    buf.append(":\n");
+    if (html == true) {
+      buf.append("</h3>\n");
+    } else {
+      buf.append(":\n");
+    }
     return buf.toString();
   }
 
@@ -241,22 +268,35 @@ public class BusinessAssessment implements Serializable
     buf.append(getHeader());
     if (rows != null) {
       for (final BusinessAssessmentRow row : rows) {
-        asLine(buf, row);
+        asLine(buf, row, false);
       }
     }
     return buf.toString();
   }
 
   private void asLine(final StringBuffer buf, final String no, final String title, final BigDecimal amount, final int indent,
-      final int scale, final String unit)
+      final int scale, final String unit, final boolean html)
   {
-    buf.append(StringUtils.leftPad(no, 4));
+    if (html == true) {
+      buf.append("  <tr><td>").append(no).append("</td><td class=\"indent-").append(indent).append("\">");
+    } else {
+      buf.append(StringUtils.leftPad(no, 4));
+    }
     int length = 25;
     for (int i = 0; i < indent; i++) {
-      buf.append(" ");
+      if (html == false) {
+        buf.append(" ");
+      }
       length--; // One space lost.
     }
-    buf.append(" ").append(StringUtils.rightPad(StringUtils.defaultString(title), length)).append(" ");
+    if (html == true) {
+      buf.append(HtmlHelper.escapeHtml(StringUtils.defaultString(title), false)).append("</td>");
+    } else {
+      buf.append(" ").append(StringUtils.rightPad(StringUtils.defaultString(title), length)).append(" ");
+    }
+    if (html == true) {
+      buf.append("<td style=\"text-align: right;\">");
+    }
     if (amount != null && amount.compareTo(BigDecimal.ZERO) != 0) {
       String value;
       if ("€".equals(unit) == true) {
@@ -267,12 +307,16 @@ public class BusinessAssessment implements Serializable
       }
       buf.append(StringUtils.leftPad(value, 18));
     }
-    buf.append("\n");
+    if (html == true) {
+      buf.append("</td></tr>\n");
+    } else {
+      buf.append("\n");
+    }
   }
 
-  private void asLine(final StringBuffer buf, final BusinessAssessmentRow row)
+  private void asLine(final StringBuffer buf, final BusinessAssessmentRow row, final boolean html)
   {
-    asLine(buf, row.getNo(), row.getTitle(), row.getAmount(), row.getIndent(), row.getScale(), row.getUnit());
+    asLine(buf, row.getNo(), row.getTitle(), row.getAmount(), row.getIndent(), row.getScale(), row.getUnit(), html);
   }
 
   /**
