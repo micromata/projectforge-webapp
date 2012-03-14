@@ -32,14 +32,14 @@ import org.hibernate.search.annotations.Analyzer;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Store;
-import org.projectforge.lucene.PFAnalyzer;
+import org.projectforge.lucene.ClassicAnalyzer;
 
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 @MappedSuperclass
-@Analyzer(impl = PFAnalyzer.class)
+@Analyzer(impl = ClassicAnalyzer.class)
 public class DefaultBaseDO extends AbstractHistorizableBaseDO<Integer>
 {
   private static final long serialVersionUID = 659687830219996653L;
@@ -55,8 +55,8 @@ public class DefaultBaseDO extends AbstractHistorizableBaseDO<Integer>
     return id;
   }
 
-  public void setId(Integer id)
+  public void setId(final Integer id)
   {
-    this.id = (Integer) id;
+    this.id = id;
   }
 }
