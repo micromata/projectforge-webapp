@@ -29,7 +29,7 @@ public enum MenuItemDefId
   ADMINISTRATION("administration"), //
   COMMON("common"), //
   COST("fibu.kost"), //
-  FIBU("fibu"), // 
+  FIBU("fibu"), //
   MISC("misc"), //
   ORGA("orga"), //
   PROJECT_MANAGEMENT("projectmanagement"), //
@@ -56,7 +56,6 @@ public enum MenuItemDefId
   EMPLOYEE_SALARY_LIST("fibu.employeeSalaries"), //
   GANTT("gantt"), //
   GROUP_LIST("groupList"), //
-  GWIKI("gwiki"), //
   HR_PLANNING_LIST("hrPlanningList"), //
   HR_VIEW("hrList"), //
   IMAGE_CROPPER("imageCropper"), //
@@ -78,7 +77,6 @@ public enum MenuItemDefId
   SEARCH("search"), //
   SPACE_LIST("spaceList"), //
   SYSTEM("system"), //
-  SYSTEM_FIRST_LOGIN_SETUP_PAGE("system.firstLoginSetup"), //
   SYSTEM_STATISTICS("systemStatistics"), //
   SYSTEM_UPDATE("systemUpdate"), //
   TASK_TREE("taskTree"), //

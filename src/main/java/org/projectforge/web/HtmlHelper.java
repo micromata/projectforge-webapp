@@ -26,13 +26,11 @@ package org.projectforge.web;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import javax.servlet.jsp.PageContext;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
-import org.projectforge.web.core.LocalizerAndUrlBuilder;
-import org.projectforge.web.core.PageContextLocalizerAndUrlBuilder;
+import org.apache.wicket.request.Response;
+import org.projectforge.web.wicket.WicketUtils;
 
 public class HtmlHelper
 {
@@ -47,7 +45,7 @@ public class HtmlHelper
    * @return
    * @see StringEscapeUtils#escapeXml(String)
    */
-  public static final String escapeXml(String str)
+  public static final String escapeXml(final String str)
   {
     return StringEscapeUtils.escapeXml(str);
   }
@@ -82,9 +80,9 @@ public class HtmlHelper
    * @param value
    * @return
    */
-  public String attribute(String attribute, String value)
+  public String attribute(final String attribute, final String value)
   {
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     return attribute(buf, attribute, value).toString();
   }
 
@@ -95,7 +93,7 @@ public class HtmlHelper
    * @param value
    * @return
    */
-  public StringBuffer attribute(StringBuffer buf, String attribute, String value)
+  public StringBuffer attribute(final StringBuffer buf, final String attribute, final String value)
   {
     return buf.append(" ").append(attribute).append("=\"").append(value).append("\"");
   }
@@ -106,9 +104,9 @@ public class HtmlHelper
    * @param value
    * @return
    */
-  public String attributeSQ(String attribute, String value)
+  public String attributeSQ(final String attribute, final String value)
   {
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     return attributeSQ(buf, attribute, value).toString();
   }
 
@@ -119,51 +117,46 @@ public class HtmlHelper
    * @param value
    * @return
    */
-  public StringBuffer attributeSQ(StringBuffer buf, String attribute, String value)
+  public StringBuffer attributeSQ(final StringBuffer buf, final String attribute, final String value)
   {
     return buf.append(" ").append(attribute).append("='").append(value).append("'");
   }
 
-  public String encodeUrl(String url)
+  public String encodeUrl(final String url)
   {
     try {
       return URLEncoder.encode(url, "UTF-8");
-    } catch (UnsupportedEncodingException ex) {
+    } catch (final UnsupportedEncodingException ex) {
       log.warn(ex);
       return url;
     }
   }
 
-  public String getImageTag(PageContext pageContext, String src)
+  public String getImageTag(final Response response, final String src)
   {
-    StringBuffer buf = new StringBuffer();
-    appendImageTag(pageContext, buf, src);
+    final StringBuffer buf = new StringBuffer();
+    appendImageTag(response, buf, src);
     return buf.toString();
   }
 
-  public HtmlHelper appendImageTag(PageContext pageContext, StringBuffer buf, String src)
+  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src, final String width, final String height)
   {
-    return appendImageTag(pageContext, buf, src, null, null, null, null);
+    return appendImageTag(response, buf, src, width, height, null, null);
   }
 
-  public HtmlHelper appendImageTag(LocalizerAndUrlBuilder locUrlBuilder, StringBuffer buf, String src, int width, int height)
+  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src, final String width, final String height, final String tooltip)
   {
-    return appendImageTag(locUrlBuilder, buf, src, String.valueOf(width), String.valueOf(height), null, null);
+    return appendImageTag(response, buf, src, width, height, tooltip, null);
   }
 
-  public HtmlHelper appendImageTag(PageContext pageContext, StringBuffer buf, String src, String width, String height)
+  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src)
   {
-    return appendImageTag(pageContext, buf, src, width, height, null, null);
+    return appendImageTag(response, buf, src, null, null, null, null);
   }
 
-  public HtmlHelper appendImageTag(PageContext pageContext, StringBuffer buf, String src, String tooltip)
+  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src, final String tooltip)
   {
-    return appendImageTag(pageContext, buf, src, null, null, tooltip, null);
-  }
-
-  public HtmlHelper appendImageTag(PageContext pageContext, StringBuffer buf, String src, String width, String height, String tooltip)
-  {
-    return appendImageTag(pageContext, buf, src, width, height, tooltip, null);
+    return appendImageTag(response, buf, src, null, null, tooltip, null);
   }
 
   /**
@@ -175,37 +168,12 @@ public class HtmlHelper
    * @param tooltip If null, than this attribute will be ignored.
    * @param align If null, than this attribute will be ignored.
    */
-  public HtmlHelper appendImageTag(PageContext pageContext, StringBuffer buf, String src, String width, String height, String tooltip,
-      HtmlAlignment align)
-  {
-    return appendImageTag(new PageContextLocalizerAndUrlBuilder(pageContext), buf, src, width, height, tooltip, align);
-  }
-
-  public HtmlHelper appendImageTag(LocalizerAndUrlBuilder locUrlBuilder, StringBuffer buf, String src)
-  {
-    return appendImageTag(locUrlBuilder, buf, src, null, null, null, null);
-  }
-
-  public HtmlHelper appendImageTag(LocalizerAndUrlBuilder locUrlBuilder, StringBuffer buf, String src, String tooltip)
-  {
-    return appendImageTag(locUrlBuilder, buf, src, null, null, tooltip, null);
-  }
-
-  /**
-   * For the source the URL will be build via buildUrl();
-   * @param buf
-   * @param src
-   * @param width If less than zero, than this attribute will be ignored.
-   * @param height If less than zero, than this attribute will be ignored.
-   * @param tooltip If null, than this attribute will be ignored.
-   * @param align If null, than this attribute will be ignored.
-   */
-  public HtmlHelper appendImageTag(LocalizerAndUrlBuilder locUrlBuilder, StringBuffer buf, String src, String width, String height,
-      String tooltip, HtmlAlignment align)
+  public HtmlHelper appendImageTag(final Response response, final StringBuffer buf, final String src, final String width, final String height,
+      final String tooltip, final HtmlAlignment align)
   {
 
-    HtmlTagBuilder tag = new HtmlTagBuilder(buf, "img");
-    tag.addAttribute("src", locUrlBuilder.buildUrl(src));
+    final HtmlTagBuilder tag = new HtmlTagBuilder(buf, "img");
+    tag.addAttribute("src", WicketUtils.getImageUrl(response, src));
     addTooltip(tag, tooltip);
     tag.addAttribute("width", width);
     tag.addAttribute("height", height);
@@ -217,7 +185,7 @@ public class HtmlHelper
     return this;
   }
 
-  protected void addTooltip(HtmlTagBuilder tag, String tooltip)
+  protected void addTooltip(final HtmlTagBuilder tag, final String tooltip)
   {
     tag.addAttribute("alt", tooltip);
     tag.addAttribute("title", tooltip);
@@ -225,27 +193,15 @@ public class HtmlHelper
 
   /**
    * Creates anchor: &lt;a href="${buildUrl(href)}"&gt;
-   * @param pageContext
+   * @param response
    * @param buf
    * @param href Will be modified via buildUrl.
    * @return
    */
-  public HtmlHelper appendAncorStartTag(PageContext pageContext, StringBuffer buf, String href)
+  public HtmlHelper appendAncorStartTag(final Response response, final StringBuffer buf, final String href)
   {
-    return appendAncorStartTag(new PageContextLocalizerAndUrlBuilder(pageContext), buf, href);
-  }
-
-  /**
-   * Creates anchor: &lt;a href="${buildUrl(href)}"&gt;
-   * @param pageContext
-   * @param buf
-   * @param href Will be modified via buildUrl.
-   * @return
-   */
-  public HtmlHelper appendAncorStartTag(LocalizerAndUrlBuilder locUrlBuilder, StringBuffer buf, String href)
-  {
-    HtmlTagBuilder tag = new HtmlTagBuilder(buf, "a");
-    tag.addAttribute("href", locUrlBuilder.buildUrl(href));
+    final HtmlTagBuilder tag = new HtmlTagBuilder(buf, "a");
+    tag.addAttribute("href", WicketUtils.getImageUrl(response, href));
     tag.finishStartTag();
     return this;
   }
@@ -256,16 +212,16 @@ public class HtmlHelper
    * @param params
    * @return
    */
-  public HtmlHelper appendAncorOnClickSubmitEventStartTag(StringBuffer buf, String method, String... params)
+  public HtmlHelper appendAncorOnClickSubmitEventStartTag(final StringBuffer buf, final String method, final String... params)
   {
     Validate.notNull(params);
-    HtmlTagBuilder tag = new HtmlTagBuilder(buf, "a");
+    final HtmlTagBuilder tag = new HtmlTagBuilder(buf, "a");
     tag.addAttribute("href", "#");
     if (params.length == 1) {
       // Standard code in over 90%, so avoid creation of new StringBuffer:
       tag.addAttribute("onclick", "javascript:" + method + "('" + params[0] + "')");
     } else {
-      StringBuffer s = new StringBuffer();
+      final StringBuffer s = new StringBuffer();
       for (int i = 0; i < params.length; i++) {
         s.append(params[i]);
         if (i < params.length - 1) {
@@ -278,7 +234,7 @@ public class HtmlHelper
     return this;
   }
 
-  public HtmlHelper appendAncorEndTag(StringBuffer buf)
+  public HtmlHelper appendAncorEndTag(final StringBuffer buf)
   {
     buf.append("</a>");
     return this;
@@ -296,7 +252,7 @@ public class HtmlHelper
    * @return
    * @see StringEscapeUtils#escapeXml(String)
    */
-  public static String formatText(String str, boolean escapeChars)
+  public static String formatText(final String str, final boolean escapeChars)
   {
     if (StringUtils.isEmpty(str) == true) {
       return "";
@@ -305,11 +261,11 @@ public class HtmlHelper
     if (escapeChars == true) {
       s = escapeXml(str);
     }
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     boolean doubleSpace = false;
     int col = 0;
     for (int i = 0; i < s.length(); i++) {
-      char ch = s.charAt(i);
+      final char ch = s.charAt(i);
       if (ch == '\n') {
         buf.append("<br/>");
         col = 0;
@@ -339,7 +295,7 @@ public class HtmlHelper
     return buf.toString();
   }
 
-  public String formatXSLFOText(String str, boolean escapeChars)
+  public String formatXSLFOText(final String str, final boolean escapeChars)
   {
     String s = str;
     if (escapeChars == true) {

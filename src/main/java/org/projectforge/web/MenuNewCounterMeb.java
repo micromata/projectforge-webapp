@@ -23,7 +23,7 @@
 
 package org.projectforge.web;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.meb.MebDao;
@@ -35,7 +35,7 @@ public class MenuNewCounterMeb extends Model<Integer>
   @SpringBean(name = "mebDao")
   private MebDao mebDao;
 
-  public void setMebDao(MebDao mebDao)
+  public void setMebDao(final MebDao mebDao)
   {
     this.mebDao = mebDao;
   }
@@ -44,7 +44,7 @@ public class MenuNewCounterMeb extends Model<Integer>
   public Integer getObject()
   {
     if (mebDao == null) {
-      InjectorHolder.getInjector().inject(this);
+      Injector.get().inject(this);
     }
     return mebDao.getRecentMEBEntries(null);
   }

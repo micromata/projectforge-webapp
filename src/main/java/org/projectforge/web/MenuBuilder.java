@@ -36,12 +36,12 @@ public class MenuBuilder implements Serializable
   @SpringBean(name = "accessChecker")
   private AccessChecker accessChecker;
 
-  public void setAccessChecker(AccessChecker accessChecker)
+  public void setAccessChecker(final AccessChecker accessChecker)
   {
     this.accessChecker = accessChecker;
   }
 
-  private MenuCache menuCache = new MenuCache();
+  private final MenuCache menuCache = new MenuCache();
 
   public void expireMenu(final Integer userId)
   {
@@ -60,14 +60,6 @@ public class MenuBuilder implements Serializable
     }
     final MenuBuilderContext context = new MenuBuilderContext(menu, accessChecker, user, mobileMenu);
     final MenuItemRegistry registry = MenuItemRegistry.instance();
-    if (LoginPage.FIRST_PSEUDO_SETUP_USER.equals(user.getUsername()) == true) {
-      if (mobileMenu == true) {
-        return;
-      }
-      final MenuItemDef firstLogin = registry.get(MenuItemDefId.SYSTEM_FIRST_LOGIN_SETUP_PAGE);
-      menu.addMenuEntry(firstLogin.createMenuEntry(menu, context));
-      return;
-    }
     for (final MenuItemDef menuItemDef : registry.getMenuItemList()) {
       final MenuEntry menuEntry = menuItemDef.createMenuEntry(menu, context);
       if (menuEntry == null) {

@@ -38,11 +38,6 @@ public class WebConfiguration
     return developmentMode != null && developmentMode == true;
   }
 
-  public static boolean isGWikiAvailable()
-  {
-    return isDevelopmentMode();
-  }
-
   /**
    * Experimental and undocumented setting. For now, ProjectForge does only hide the navigation header (with logos and menu) of every top
    * page, if set to true.

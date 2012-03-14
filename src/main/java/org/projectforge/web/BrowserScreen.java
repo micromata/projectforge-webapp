@@ -23,29 +23,52 @@
 
 package org.projectforge.web;
 
-import org.apache.wicket.injection.Injector;
-import org.apache.wicket.model.Model;
-import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.fibu.AuftragDao;
+import org.apache.wicket.protocol.http.ClientProperties;
 
-public class MenuNewCounterOrder extends Model<Integer>
+/**
+ * Not yet in use.
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ *
+ */
+public class BrowserScreen
 {
-  private static final long serialVersionUID = -2101644474960685808L;
+  private final int height, width;
 
-  @SpringBean(name = "auftragDao")
-  private AuftragDao auftragDao;
-
-  @Override
-  public Integer getObject()
+  public BrowserScreen(final ClientProperties clientProperties)
   {
-    if (auftragDao == null) {
-      Injector.get().inject(this);
-    }
-    return auftragDao.getAbgeschlossenNichtFakturiertAnzahl();
+    height = clientProperties.getBrowserHeight();
+    width = clientProperties.getBrowserWidth();
   }
 
-  public void setAuftragDao(final AuftragDao auftragDao)
+  /**
+   * @return true if the width of browser window is less than 800.
+   */
+  public boolean isNarrowScreen()
   {
-    this.auftragDao = auftragDao;
+    return height > 0 && height < 800;
+  }
+
+  /**
+   * @return true if the width of browser window is wider than 1200.
+   */
+  public boolean isWideScreen()
+  {
+    return height > 1024;
+  }
+
+  /**
+   * @return height of the browser window.
+   */
+  public int getHeight()
+  {
+    return height;
+  }
+
+  /**
+   * @return width of the browser window.
+   */
+  public int getWidth()
+  {
+    return width;
   }
 }

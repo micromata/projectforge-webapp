@@ -27,18 +27,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.protocol.http.WebRequest;
-import org.apache.wicket.protocol.http.WebResponse;
+import org.apache.wicket.request.http.WebRequest;
+import org.apache.wicket.request.http.WebResponse;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigurationParam;
 import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
@@ -46,20 +51,25 @@ import org.projectforge.user.UserDao;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.admin.SetupPage;
 import org.projectforge.web.admin.SystemUpdatePage;
+import org.projectforge.web.mobile.LoginMobilePage;
+import org.projectforge.web.wicket.AbstractUnsecureBasePage;
 import org.projectforge.web.wicket.MySession;
-import org.projectforge.web.wicket.NewAbstractUnsecureBasePage;
+import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
-public class LoginPage extends NewAbstractUnsecureBasePage
+public class LoginPage extends AbstractUnsecureBasePage
 {
-  static final String FIRST_PSEUDO_SETUP_USER = "firstPseudoSetupUser";
+  private static final long serialVersionUID = 4457817484456315374L;
 
   public static final String REQUEST_PARAM_LOGOUT = "logout";
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LoginPage.class);
+
+  @SpringBean(name = "configuration")
+  private Configuration configuration;
 
   @SpringBean(name = "initDatabaseDao")
   private InitDatabaseDao initDatabaseDao;
@@ -86,10 +96,39 @@ public class LoginPage extends NewAbstractUnsecureBasePage
     if (user != null) {
       userXmlPreferencesCache.flushToDB(user.getId());
       userXmlPreferencesCache.clear(user.getId());
-      menuBuilder.expireMenu(user.getId());
+      if (menuBuilder != null) {
+        menuBuilder.expireMenu(user.getId());
+      }
     }
     mySession.logout();
-    final Cookie stayLoggedInCookie = UserFilter.getStayLoggedInCookie(request.getHttpServletRequest());
+    final Cookie stayLoggedInCookie = UserFilter.getStayLoggedInCookie(WicketUtils.getHttpServletRequest(request));
+    if (stayLoggedInCookie != null) {
+      stayLoggedInCookie.setMaxAge(0);
+      stayLoggedInCookie.setValue(null);
+      stayLoggedInCookie.setPath("/");
+      response.addCookie(stayLoggedInCookie);
+    }
+  }
+
+  public static void logout(final MySession mySession, final WebRequest request, final WebResponse response,
+      final UserXmlPreferencesCache userXmlPreferencesCache)
+  {
+    logout(mySession, request, response, userXmlPreferencesCache, null);
+  }
+
+  public static void logout(final MySession mySession, final HttpServletRequest request, final HttpServletResponse response,
+      final UserXmlPreferencesCache userXmlPreferencesCache, final MenuBuilder menuBuilder)
+  {
+    final PFUserDO user = mySession.getUser();
+    if (user != null) {
+      userXmlPreferencesCache.flushToDB(user.getId());
+      userXmlPreferencesCache.clear(user.getId());
+      if (menuBuilder != null) {
+        menuBuilder.expireMenu(user.getId());
+      }
+    }
+    mySession.logout();
+    final Cookie stayLoggedInCookie = UserFilter.getStayLoggedInCookie(request);
     if (stayLoggedInCookie != null) {
       stayLoggedInCookie.setMaxAge(0);
       stayLoggedInCookie.setValue(null);
@@ -107,33 +146,34 @@ public class LoginPage extends NewAbstractUnsecureBasePage
   public LoginPage(final PageParameters parameters)
   {
     super(parameters);
-    //    if (getMySession().isMobileUserAgent() == true) {
-    //      setResponsePage(LoginMobilePage.class);
-    //      return;
-    //    }
+    if (getMySession().isMobileUserAgent() == true && UserFilter.isUpdateRequiredFirst() == false) {
+      throw new RestartResponseException(LoginMobilePage.class);
+    }
     final PFUserDO wicketSessionUser = getMySession().getUser();
-    final PFUserDO sessionUser = UserFilter.getUser(((WebRequest) getRequest()).getHttpServletRequest());
+    final PFUserDO sessionUser = UserFilter.getUser(WicketUtils.getHttpServletRequest(getRequest()));
     // Sometimes the wicket session user is given but the http session user is lost (re-login required).
     if (wicketSessionUser != null && sessionUser != null && wicketSessionUser.getId() == sessionUser.getId()) {
-      setResponsePage(WicketUtils.getDefaultPage());
-      return;
+      throw new RestartResponseException(WicketApplication.DEFAULT_PAGE);
     }
     if (initDatabaseDao.isEmpty() == true) {
-      final PFUserDO pseudoUser = new PFUserDO();
-      pseudoUser.setUsername(FIRST_PSEUDO_SETUP_USER);
-      pseudoUser.setId(-1);
-      login(pseudoUser);
-      setResponsePage(new SetupPage(new PageParameters()));
-      return;
+      log.info("Data-base is empty: redirect to SetupPage...");
+      throw new RestartResponseException(SetupPage.class);
     }
     form = new LoginForm(this);
-    body.add(new SimpleAttributeModifier("class", "loginpage"));
+    body.add(AttributeModifier.replace("class", "loginpage"));
     body.add(form);
     form.init();
     final WebMarkupContainer administratorLoginNeeded = new WebMarkupContainer("administratorLoginNeeded");
     body.add(administratorLoginNeeded);
     if (UserFilter.isUpdateRequiredFirst() == false) {
       administratorLoginNeeded.setVisible(false);
+    }
+    {
+      final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
+      final WebMarkupContainer container = new WebMarkupContainer("messageOfTheDay");
+      body.add(container.setVisible(StringUtils.isNotBlank(messageOfTheDay)));
+      final Label messageOfTheDayLabel = new Label("msg", messageOfTheDay);
+      container.add(messageOfTheDayLabel.setEscapeModelStrings(false));
     }
     errorsContainer = new WebMarkupContainer("errors");
     body.add(errorsContainer.setVisible(false));
@@ -155,12 +195,7 @@ public class LoginPage extends NewAbstractUnsecureBasePage
   public static void internalLogin(final WebPage page, final PFUserDO user)
   {
     ((MySession) page.getSession()).login(user, page.getRequest());
-    UserFilter.login(((WebRequest) page.getRequest()).getHttpServletRequest(), user);
-  }
-
-  private void login(final PFUserDO user)
-  {
-    internalLogin(this, user);
+    UserFilter.login(WicketUtils.getHttpServletRequest(page.getRequest()), user);
   }
 
   public static boolean isAdminUser(final PFUserDO user, final DataSource dataSource)
@@ -225,9 +260,8 @@ public class LoginPage extends NewAbstractUnsecureBasePage
         }
         user = resUser;
         internalLogin(page, user);
-        page.setResponsePage(SystemUpdatePage.class);
         log.info("Admin login for maintenance (data-base update) successful for user '" + username + "'.");
-        return null;
+        throw new RestartResponseException(SystemUpdatePage.class);
       } catch (final Exception ex) {
         log.error(ex.getMessage(), ex);
       }
@@ -248,13 +282,17 @@ public class LoginPage extends NewAbstractUnsecureBasePage
               + loggedInUser.getUsername()
               + ":"
               + userDao.getStayLoggedInKey(user.getId()));
-          UserFilter.addStayLoggedInCookie(((WebRequest) page.getRequest()).getHttpServletRequest(),
-              ((WebResponse) page.getResponse()).getHttpServletResponse(), cookie);
+          UserFilter.addStayLoggedInCookie(WicketUtils.getHttpServletRequest(page.getRequest()),
+              WicketUtils.getHttpServletResponse(page.getResponse()), cookie);
         }
         internalLogin(page, user);
+        // Do not redirect to requested page in maintenance mode (update required first):
+        if (UserFilter.isUpdateRequiredFirst() == true) {
+          throw new RestartResponseException(SystemUpdatePage.class);
+        }
         if (page.continueToOriginalDestination() == false) {
           // Redirect only if not a redirect is set by Wicket.
-          page.setResponsePage(defaultPage);
+          throw new RestartResponseException(defaultPage);
         }
         return null;
       }

@@ -23,26 +23,17 @@
 
 package org.projectforge.web;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.core.Configuration;
-import org.projectforge.core.ConfigurationParam;
-import org.projectforge.web.wicket.NewAbstractForm;
-import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.AbstractForm;
 
-public class LoginForm extends NewAbstractForm<LoginForm, LoginPage>
+public class LoginForm extends AbstractForm<LoginForm, LoginPage>
 {
   private static final long serialVersionUID = -422822736093879603L;
-
-  @SpringBean(name = "configuration")
-  private Configuration configuration;
 
   private boolean stayLoggedIn;
 
@@ -60,12 +51,11 @@ public class LoginForm extends NewAbstractForm<LoginForm, LoginPage>
   {
     // add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     add(new CheckBox("stayLoggedIn", new PropertyModel<Boolean>(this, "stayLoggedIn")));
-    add(WicketUtils.setFocus(new TextField<String>("username", new PropertyModel<String>(this, "username")).setRequired(true)).setMarkupId(
-        "username"));
+    final TextField<String> username = new TextField<String>("username", new PropertyModel<String>(this, "username"));
+    username.setRequired(true).setMarkupId("username").setOutputMarkupId(true);
+    add(username);
+    // Focus is set in adminica_ui.js
     add(new PasswordTextField("password", new PropertyModel<String>(this, "password")).setResetPassword(true).setRequired(true));
-    final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
-    final Label messageOfTheDayLabel = new Label("messageOfTheDay", messageOfTheDay);
-    add(messageOfTheDayLabel.setEscapeModelStrings(false).setVisible(StringUtils.isNotBlank(messageOfTheDay)));
     final Button loginButton = new Button("login", new Model<String>(getString("login"))) {
       @Override
       public final void onSubmit()

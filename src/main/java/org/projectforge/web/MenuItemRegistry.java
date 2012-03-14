@@ -57,13 +57,11 @@ import org.projectforge.web.address.AddressListPage;
 import org.projectforge.web.address.AddressMobileListPage;
 import org.projectforge.web.address.PhoneCallPage;
 import org.projectforge.web.admin.AdminPage;
-import org.projectforge.web.admin.SetupPage;
 import org.projectforge.web.admin.SystemUpdatePage;
 import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.core.ConfigurationListPage;
 import org.projectforge.web.core.SearchPage;
-import org.projectforge.web.core.SpaceListPage;
 import org.projectforge.web.doc.DocumentationPage;
 import org.projectforge.web.fibu.AccountingRecordListPage;
 import org.projectforge.web.fibu.AuftragListPage;
@@ -81,7 +79,6 @@ import org.projectforge.web.fibu.ProjektListPage;
 import org.projectforge.web.fibu.RechnungListPage;
 import org.projectforge.web.fibu.ReportObjectivesPage;
 import org.projectforge.web.gantt.GanttChartListPage;
-import org.projectforge.web.gwiki.GWikiPage;
 import org.projectforge.web.humanresources.HRListPage;
 import org.projectforge.web.humanresources.HRPlanningListPage;
 import org.projectforge.web.imagecropper.ImageCropperPage;
@@ -255,7 +252,6 @@ public class MenuItemRegistry
     // Menu entries
     // COMMON
     reg.register(common, MenuItemDefId.CALENDAR, 10, CalendarPage.class); // Visible for all.
-    reg.register(common, MenuItemDefId.SPACE_LIST, 20, SpaceListPage.class, developmentMode); // Under development..
     reg.register(common, MenuItemDefId.BOOK_LIST, 30, BookListPage.class); // Visible for all.
     reg.register(common, MenuItemDefId.ADDRESS_LIST, 40, AddressListPage.class).setMobileMenu(AddressMobileListPage.class, 100); // Visible for all.
     reg.register(common, MenuItemDefId.PHONE_CALL, 50, PhoneCallPage.class);
@@ -356,22 +352,12 @@ public class MenuItemRegistry
     reg.register(admin, MenuItemDefId.SYSTEM_UPDATE, 80, SystemUpdatePage.class, ADMIN_GROUP);
     reg.register(admin, MenuItemDefId.SYSTEM_STATISTICS, 90, SystemStatisticsPage.class);
     reg.register(admin, MenuItemDefId.CONFIGURATION, 100, ConfigurationListPage.class, ADMIN_GROUP);
-    final MenuItemDef firstLogin = new MenuItemDef(admin, MenuItemDefId.SYSTEM_FIRST_LOGIN_SETUP_PAGE.getId(), 200,
-        MenuItemDefId.SYSTEM_FIRST_LOGIN_SETUP_PAGE.getI18nKey(), SetupPage.class) {
-      @Override
-      protected boolean isVisible(final MenuBuilderContext context)
-      {
-        return LoginPage.FIRST_PSEUDO_SETUP_USER.equals(context.getLoggedInUser().getUsername());
-      }
-    };
-    reg.register(firstLogin);
 
     // MISC
     // invisible at default (because it's only functioning with valid ssl certificate).
     reg.register(misc, MenuItemDefId.IMAGE_CROPPER, 100, ImageCropperPage.class, new String[] { ImageCropperPage.PARAM_SHOW_UPLOAD_BUTTON,
       "false", ImageCropperPage.PARAM_ENABLE_WHITEBOARD_FILTER, "true"}, false);
     // Not yet finished:
-    reg.register(misc, MenuItemDefId.GWIKI, 110, GWikiPage.class, developmentMode);
     reg.register(misc, MenuItemDefId.DOCUMENTATION, 200, DocumentationPage.class);
     reg.refresh();
   }

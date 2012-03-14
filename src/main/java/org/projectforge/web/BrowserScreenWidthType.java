@@ -23,29 +23,17 @@
 
 package org.projectforge.web;
 
-import org.apache.wicket.injection.Injector;
-import org.apache.wicket.model.Model;
-import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.fibu.AuftragDao;
 
-public class MenuNewCounterOrder extends Model<Integer>
+public enum BrowserScreenWidthType
 {
-  private static final long serialVersionUID = -2101644474960685808L;
+  NARROW, NORMAL, WIDE;
 
-  @SpringBean(name = "auftragDao")
-  private AuftragDao auftragDao;
-
-  @Override
-  public Integer getObject()
-  {
-    if (auftragDao == null) {
-      Injector.get().inject(this);
+  public boolean isIn(final BrowserScreenWidthType... type) {
+    for (final BrowserScreenWidthType t : type) {
+      if (this == t) {
+        return true;
+      }
     }
-    return auftragDao.getAbgeschlossenNichtFakturiertAnzahl();
-  }
-
-  public void setAuftragDao(final AuftragDao auftragDao)
-  {
-    this.auftragDao = auftragDao;
+    return false;
   }
 }
