@@ -87,7 +87,7 @@ public abstract class AbstractRechnungDO<T extends AbstractRechnungsPositionDO> 
     if (this.datum == null || this.faelligkeit == null) {
       return;
     }
-    DateHolder date = new DateHolder(this.datum);
+    final DateHolder date = new DateHolder(this.datum);
     this.zahlungsZielInTagen = date.daysBetween(this.faelligkeit);
   }
 
@@ -250,18 +250,6 @@ public abstract class AbstractRechnungDO<T extends AbstractRechnungsPositionDO> 
   public AbstractRechnungDO<T> setPositionen(final List<T> positionen)
   {
     this.positionen = positionen;
-    return this;
-  }
-
-  /**
-   * Needed by XmlDump.
-   * @param positionen
-   * @return this for chaining.
-   */
-  @SuppressWarnings("unchecked")
-  public AbstractRechnungDO<T> internalSetPositionen(final List< ? extends AbstractRechnungsPositionDO> positionen)
-  {
-    this.positionen = (List<T>) positionen;
     return this;
   }
 
