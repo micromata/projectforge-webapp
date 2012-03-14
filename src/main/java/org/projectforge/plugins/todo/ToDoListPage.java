@@ -28,8 +28,8 @@ import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -37,6 +37,7 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
@@ -98,14 +99,14 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
           cssStyle.append("color:red;");
         }
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
 
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("created")), getSortable("created", sortable),
         "created", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
@@ -143,7 +144,7 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
     });
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.type")),
         getSortable("type", sortable), "type", cellItemListener));
-    columns.add(new TaskPropertyColumn<ToDoDO>(this, getString("task"), getSortable("task.title", sortable), "task", cellItemListener)
+    columns.add(new TaskPropertyColumn<ToDoDO>(getString("task"), getSortable("task.title", sortable), "task", cellItemListener)
         .withTaskFormatter(taskFormatter).withTaskTree(taskTree));
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("group")), null, "group", cellItemListener) {
       @Override
@@ -170,7 +171,7 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "lastUpdate", false);
+    dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
     final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", ToDoPlugin.USER_PREF_AREA);
     final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("templates"));

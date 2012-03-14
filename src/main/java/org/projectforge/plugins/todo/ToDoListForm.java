@@ -33,8 +33,9 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.components.CoolCheckBoxPanel;
-import org.projectforge.web.wicket.components.LabelForPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
 {
@@ -50,90 +51,107 @@ public class ToDoListForm extends AbstractListForm<ToDoFilter, ToDoListPage>
   protected void init()
   {
     super.init();
-    filterContainer.add(new CoolCheckBoxPanel("openedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "opened"),
-        getString(ToDoStatus.OPENED.getI18nKey()), true));
-    filterContainer.add(new CoolCheckBoxPanel("reopenedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "reopened"),
-        getString(ToDoStatus.RE_OPENED.getI18nKey()), true));
-    filterContainer.add(new CoolCheckBoxPanel("inprogressCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "inprogress"),
-        getString(ToDoStatus.IN_PROGRESS.getI18nKey()), true));
-    filterContainer.add(new CoolCheckBoxPanel("closedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "closed"),
-        getString(ToDoStatus.CLOSED.getI18nKey()), true));
-    filterContainer.add(new CoolCheckBoxPanel("postponedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "postponed"),
-        getString(ToDoStatus.POSTPONED.getI18nKey()), true));
-    filterContainer.add(new CoolCheckBoxPanel("onlyRecentCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "onlyRecent"),
-        getString("plugins.todo.status.onlyRecent"), true).setTooltip(getString("plugins.todo.status.onlyRecent.tooltip")));
-    filterContainer.add(new CoolCheckBoxPanel("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
-        getString("onlyDeleted"), true).setTooltip(getString("onlyDeleted.tooltip")));
-
-    final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("task", new Model<TaskDO>() {
-      @Override
-      public TaskDO getObject()
-      {
-        return taskTree.getTaskById(getSearchFilter().getTaskId());
-      }
-    }, parentPage, "taskId") {
-      @Override
-      protected void selectTask(final TaskDO task)
-      {
-        super.selectTask(task);
-        if (task != null) {
-          getSearchFilter().setTaskId(task.getId());
+    gridBuilder.newColumnsPanel();
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).setNoLabelFor();
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
+        @Override
+        public TaskDO getObject()
+        {
+          return taskTree.getTaskById(getSearchFilter().getTaskId());
         }
-        parentPage.refresh();
-      }
-    };
-    filterContainer.add(taskSelectPanel);
-    taskSelectPanel.setEnableLinks(true);
-    taskSelectPanel.init();
-    taskSelectPanel.setRequired(false);
-    filterContainer.add(new LabelForPanel("taskLabel", taskSelectPanel, getString("task")));
-    
-    final UserSelectPanel assigneeSelectPanel = new UserSelectPanel("assignee", new Model<PFUserDO>() {
-      @Override
-      public PFUserDO getObject()
-      {
-        return userGroupCache.getUser(getSearchFilter().getAssigneeId());
-      }
-
-      @Override
-      public void setObject(final PFUserDO object)
-      {
-        if (object == null) {
-          getSearchFilter().setAssigneeId(null);
-        } else {
-          getSearchFilter().setAssigneeId(object.getId());
+      }, parentPage, "taskId") {
+        @Override
+        protected void selectTask(final TaskDO task)
+        {
+          super.selectTask(task);
+          if (task != null) {
+            getSearchFilter().setTaskId(task.getId());
+          }
+          parentPage.refresh();
         }
-      }
-    }, parentPage, "assigneeId");
-    filterContainer.add(assigneeSelectPanel);
-    assigneeSelectPanel.setDefaultFormProcessing(false);
-    assigneeSelectPanel.init().withAutoSubmit(true);
-    filterContainer.add(new LabelForPanel("assigneeLabel", assigneeSelectPanel, getString("plugins.todo.assignee")));
-
-    final UserSelectPanel reporterSelectPanel = new UserSelectPanel("reporter", new Model<PFUserDO>() {
-      @Override
-      public PFUserDO getObject()
-      {
-        return userGroupCache.getUser(getSearchFilter().getReporterId());
-      }
-
-      @Override
-      public void setObject(final PFUserDO object)
-      {
-        if (object == null) {
-          getSearchFilter().setReporterId(null);
-        } else {
-          getSearchFilter().setReporterId(object.getId());
+      };
+      fs.add(taskSelectPanel);
+      taskSelectPanel.init();
+      taskSelectPanel.setRequired(false);
+    }
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // Assignee
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.todo.assignee"));
+      final UserSelectPanel assigneeSelectPanel = new UserSelectPanel(fs.newChildId(), new Model<PFUserDO>() {
+        @Override
+        public PFUserDO getObject()
+        {
+          return userGroupCache.getUser(getSearchFilter().getAssigneeId());
         }
-      }
-    }, parentPage, "reporterId");
-    filterContainer.add(reporterSelectPanel);
-    reporterSelectPanel.setDefaultFormProcessing(false);
-    reporterSelectPanel.init().withAutoSubmit(true);
-    filterContainer.add(new LabelForPanel("reporterLabel", reporterSelectPanel, getString("plugins.todo.reporter")));
+
+        @Override
+        public void setObject(final PFUserDO object)
+        {
+          if (object == null) {
+            getSearchFilter().setAssigneeId(null);
+          } else {
+            getSearchFilter().setAssigneeId(object.getId());
+          }
+        }
+      }, parentPage, "assigneeId");
+      fs.add(assigneeSelectPanel);
+      assigneeSelectPanel.setDefaultFormProcessing(false);
+      assigneeSelectPanel.init().withAutoSubmit(true);
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // Reporter
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.todo.reporter"));
+      final UserSelectPanel reporterSelectPanel = new UserSelectPanel(fs.newChildId(), new Model<PFUserDO>() {
+
+        @Override
+        public PFUserDO getObject()
+        {
+          return userGroupCache.getUser(getSearchFilter().getReporterId());
+        }
+
+        @Override
+        public void setObject(final PFUserDO object)
+        {
+          if (object == null) {
+            getSearchFilter().setReporterId(null);
+          } else {
+            getSearchFilter().setReporterId(object.getId());
+          }
+        }
+      }, parentPage, "reporterId");
+      fs.add(reporterSelectPanel);
+      reporterSelectPanel.setDefaultFormProcessing(false);
+      reporterSelectPanel.init().withAutoSubmit(true);
+    }
+    gridBuilder.newColumnPanel(DivType.COL_66);
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "opened"),
+          getString(ToDoStatus.OPENED.getI18nKey())));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
+          new PropertyModel<Boolean>(getSearchFilter(), "reopened"), getString(ToDoStatus.RE_OPENED.getI18nKey())));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "inprogress"), getString(ToDoStatus.IN_PROGRESS.getI18nKey())));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "closed"),
+          getString(ToDoStatus.CLOSED.getI18nKey())));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "postponed"), getString(ToDoStatus.POSTPONED.getI18nKey())));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "onlyRecent"), getString("plugins.todo.status.onlyRecent"), getString("plugins.todo.status.onlyRecent.tooltip")));
+      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
+    }
+    {
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_33);
+      addPageSizeFieldset();
+    }
   }
 
-  public ToDoListForm(ToDoListPage parentPage)
+  public ToDoListForm(final ToDoListPage parentPage)
   {
     super(parentPage);
   }

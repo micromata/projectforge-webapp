@@ -23,7 +23,7 @@
 
 package org.projectforge.plugins.todo;
 
-import org.apache.wicket.injection.web.InjectorHolder;
+import org.apache.wicket.injection.Injector;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 
@@ -39,7 +39,7 @@ public class MenuCounterOpenToDos extends Model<Integer>
   @SpringBean(name = "toDoDao")
   private ToDoDao toDoDao;
 
-  public void setToDoDao(ToDoDao toDoDao)
+  public void setToDoDao(final ToDoDao toDoDao)
   {
     this.toDoDao = toDoDao;
   }
@@ -48,7 +48,7 @@ public class MenuCounterOpenToDos extends Model<Integer>
   public Integer getObject()
   {
     if (toDoDao == null) {
-      InjectorHolder.getInjector().inject(this);
+      Injector.get().inject(this);
     }
     return toDoDao.getOpenToDoEntries(null);
   }

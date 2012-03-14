@@ -24,7 +24,7 @@
 package org.projectforge.plugins.todo;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.mobile.AbstractMobileEditPage;
 import org.projectforge.web.mobile.AbstractMobileListPage;
@@ -57,14 +57,14 @@ public class ToDoMobileEditPage extends AbstractMobileEditPage<ToDoDO, ToDoMobil
   }
 
   @Override
-  protected ToDoMobileEditForm newEditForm(AbstractMobileEditPage< ? , ? , ? > parentPage, ToDoDO data)
+  protected ToDoMobileEditForm newEditForm(final AbstractMobileEditPage< ? , ? , ? > parentPage, final ToDoDO data)
   {
     return new ToDoMobileEditForm(this, data);
   }
 
   @Override
   protected Class< ? extends AbstractMobileListPage< ? , ? , ? >> getListPageClass()
-  {
+      {
     return ToDoMobileListPage.class;
-  }
+      }
 }

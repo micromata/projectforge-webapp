@@ -23,7 +23,8 @@
 
 package org.projectforge.plugins.todo;
 
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.mobile.AbstractMobileListPage;
 
@@ -46,7 +47,7 @@ public class ToDoMobileListPage extends AbstractMobileListPage<ToDoMobileListFor
   }
 
   @Override
-  protected ToDoMobileListForm newListForm(AbstractMobileListPage< ? , ? , ? > parentPage)
+  protected ToDoMobileListForm newListForm(final AbstractMobileListPage< ? , ? , ? > parentPage)
   {
     return new ToDoMobileListForm(this);
   }
@@ -58,8 +59,17 @@ public class ToDoMobileListPage extends AbstractMobileListPage<ToDoMobileListFor
   }
 
   @Override
-  protected String getEntryComment(ToDoDO entry)
+  protected String getEntryComment(final ToDoDO entry)
   {
     return entry.getAssignee() != null ? entry.getAssignee().getFullname() : "";
+  }
+
+  /**
+   * @see org.projectforge.web.mobile.AbstractMobileListPage#getEditPageClass()
+   */
+  @Override
+  protected Class< ? extends WebPage> getEditPageClass()
+  {
+    return ToDoEditPage.class;
   }
 }

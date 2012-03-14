@@ -104,10 +104,10 @@ public class ToDoRight extends UserRightAccessCheck<ToDoDO>
   @Override
   public boolean hasAccess(final PFUserDO user, final ToDoDO obj, final ToDoDO oldObj, final OperationType operationType)
   {
-    return hasAccess(user, obj) == true || hasAccess(user, oldObj) == true;
+    return hasAccess(user, obj, operationType) == true || hasAccess(user, oldObj, operationType) == true;
   }
 
-  private boolean hasAccess(final PFUserDO user, final ToDoDO toDo)
+  private boolean hasAccess(final PFUserDO user, final ToDoDO toDo, final OperationType operationType)
   {
     if (toDo == null) {
       return true;
@@ -116,14 +116,6 @@ public class ToDoRight extends UserRightAccessCheck<ToDoDO>
       return true;
     }
     if (toDo.getGroup() != null && UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), toDo.getGroupId()) == true) {
-      return true;
-    }
-    return false;
-  }
-
-  private boolean hasAccess(final PFUserDO user, final ToDoDO toDo, final OperationType operationType)
-  {
-    if (hasAccess(user, toDo) == true) {
       return true;
     }
     if (toDo.getTaskId() != null) {
