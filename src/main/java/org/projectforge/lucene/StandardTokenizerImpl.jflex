@@ -1,4 +1,4 @@
-package org.projectforge.lucene;
+package org.apache.lucene.analysis.standard;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -40,11 +40,12 @@ import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
 %integer
 %final
 %public
-%class PFTokenizerImpl
-%implements PFTokenizerInterface
+%class StandardTokenizerImpl
+%implements StandardTokenizerInterface
 %function getNextToken
 %char
 
+// Kai:
 %include src/main/java/org/projectforge/lucene/SUPPLEMENTARY.jflex-macro
 ALetter = ([\p{WB:ALetter}] | {ALetterSupp})
 Format =  ([\p{WB:Format}] | {FormatSupp})
@@ -74,10 +75,10 @@ ExtendNumLetEx = {ExtendNumLet}                ({Format} | {Extend})*
 
 %{
   /** Alphanumeric sequences */
-  public static final int WORD_TYPE = PFTokenizer.ALPHANUM;
+  public static final int WORD_TYPE = StandardTokenizer.ALPHANUM;
   
   /** Numbers */
-  public static final int NUMERIC_TYPE = PFTokenizer.NUM;
+  public static final int NUMERIC_TYPE = StandardTokenizer.NUM;
   
   /**
    * Chars in class \p{Line_Break = Complex_Context} are from South East Asian
@@ -87,18 +88,20 @@ ExtendNumLetEx = {ExtendNumLet}                ({Format} | {Extend})*
    * <p>
    * See Unicode Line Breaking Algorithm: http://www.unicode.org/reports/tr14/#SA
    */
-  public static final int SOUTH_EAST_ASIAN_TYPE = PFTokenizer.SOUTHEAST_ASIAN;
+  public static final int SOUTH_EAST_ASIAN_TYPE = StandardTokenizer.SOUTHEAST_ASIAN;
   
-  public static final int IDEOGRAPHIC_TYPE = PFTokenizer.IDEOGRAPHIC;
+  public static final int IDEOGRAPHIC_TYPE = StandardTokenizer.IDEOGRAPHIC;
   
-  public static final int HIRAGANA_TYPE = PFTokenizer.HIRAGANA;
+  public static final int HIRAGANA_TYPE = StandardTokenizer.HIRAGANA;
   
-  public static final int KATAKANA_TYPE = PFTokenizer.KATAKANA;
+  public static final int KATAKANA_TYPE = StandardTokenizer.KATAKANA;
   
-  public static final int HANGUL_TYPE = PFTokenizer.HANGUL;
+  public static final int HANGUL_TYPE = StandardTokenizer.HANGUL;
   
-  public static final int ISO_DATE = PFTokenizer.ISO_DATE; // Kai
+  public static final int ISO_DATE          = PFTokenizer.ISO_DATE; // Kai
 
+  public static final int COMPANY           = PFTokenizer.COMPANY;
+  
   public final int yychar()
   {
     return yychar;
@@ -112,12 +115,18 @@ ExtendNumLetEx = {ExtendNumLet}                ({Format} | {Extend})*
   }
 %}
 
+
+ISO_DATE   = [0-9]{4} "-" [0-9]{2} "-" [0-9]{2} // Kai
+
+// company names like AT&T and Excite@Home and K+S. // Kai
+COMPANY    =  {ALPHA} ("&"|"@"|"+") {ALPHA}
+
 %%
 
 // UAX#29 WB1. 	sot 	÷ 	
 //        WB2. 		÷ 	eot
 //
-<<EOF>> { return PFTokenizerInterface.YYEOF; }
+<<EOF>> { return StandardTokenizerInterface.YYEOF; }
 
 // UAX#29 WB8.   Numeric × Numeric
 //        WB11.  Numeric (MidNum | MidNumLet) × Numeric
@@ -156,7 +165,6 @@ ExtendNumLetEx = {ExtendNumLet}                ({Format} | {Extend})*
 {ExtendNumLetEx}*  
   { return WORD_TYPE; }
 
-
 // From UAX #29:
 //
 //    [C]haracters with the Line_Break property values of Contingent_Break (CB), 
@@ -190,3 +198,7 @@ ExtendNumLetEx = {ExtendNumLet}                ({Format} | {Extend})*
 //        WB14.  Any ÷ Any
 //
 [^] { /* Not numeric, word, ideographic, hiragana, or SE Asian -- ignore it. */ }
+
+{ISO_DATE}                                                     { return ISO_DATE; } // Kai
+{COMPANY}                                                      { return COMPANY; }
+

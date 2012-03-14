@@ -18,53 +18,56 @@ package org.projectforge.lucene;
  */
 
 import org.apache.lucene.analysis.TokenFilter;
-import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.tokenattributes.CharTermAttribute;
+import org.apache.lucene.analysis.tokenattributes.TypeAttribute;
 
-/** Normalizes tokens extracted with {@link PFTokenizer}. */
+/** Normalizes tokens extracted with {@link ClassicTokenizer}. */
 
-public final class PFFilter extends TokenFilter {
-
+public class ClassicFilter extends TokenFilter {
 
   /** Construct filtering <i>in</i>. */
-  public PFFilter(TokenStream in) {
+  public ClassicFilter(final TokenStream in) {
     super(in);
   }
 
-  private static final String APOSTROPHE_TYPE = PFTokenizerImpl.TOKEN_TYPES[PFTokenizerImpl.APOSTROPHE];
-  private static final String ACRONYM_TYPE = PFTokenizerImpl.TOKEN_TYPES[PFTokenizerImpl.ACRONYM];
+  private static final String APOSTROPHE_TYPE = ClassicTokenizer.TOKEN_TYPES[ClassicTokenizer.APOSTROPHE];
+  private static final String ACRONYM_TYPE = ClassicTokenizer.TOKEN_TYPES[ClassicTokenizer.ACRONYM];
+
+  // this filters uses attribute type
+  private final TypeAttribute typeAtt = addAttribute(TypeAttribute.class);
+  private final CharTermAttribute termAtt = addAttribute(CharTermAttribute.class);
 
   /** Returns the next token in the stream, or null at EOS.
    * <p>Removes <tt>'s</tt> from the end of words.
    * <p>Removes dots from acronyms.
    */
-  public final Token next(final Token reusableToken) throws java.io.IOException {
-    assert reusableToken != null;
-    Token nextToken = input.next(reusableToken);
+  @Override
+  public final boolean incrementToken() throws java.io.IOException {
+    if (!input.incrementToken()) {
+      return false;
+    }
 
-    if (nextToken == null)
-      return null;
+    final char[] buffer = termAtt.buffer();
+    final int bufferLength = termAtt.length();
+    final String type = typeAtt.type();
 
-    char[] buffer = nextToken.termBuffer();
-    final int bufferLength = nextToken.termLength();
-    final String type = nextToken.type();
-
-    if (type == APOSTROPHE_TYPE &&		  // remove 's
-	bufferLength >= 2 &&
+    if (type == APOSTROPHE_TYPE &&      // remove 's
+        bufferLength >= 2 &&
         buffer[bufferLength-2] == '\'' &&
         (buffer[bufferLength-1] == 's' || buffer[bufferLength-1] == 'S')) {
       // Strip last 2 characters off
-      nextToken.setTermLength(bufferLength - 2);
-    } else if (type == ACRONYM_TYPE) {		  // remove dots
+      termAtt.setLength(bufferLength - 2);
+    } else if (type == ACRONYM_TYPE) {      // remove dots
       int upto = 0;
       for(int i=0;i<bufferLength;i++) {
-        char c = buffer[i];
+        final char c = buffer[i];
         if (c != '.')
           buffer[upto++] = c;
       }
-      nextToken.setTermLength(upto);
+      termAtt.setLength(upto);
     }
 
-    return nextToken;
+    return true;
   }
 }
