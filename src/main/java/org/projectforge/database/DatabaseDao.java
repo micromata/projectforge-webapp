@@ -106,7 +106,7 @@ public class DatabaseDao extends HibernateDaoSupport
     }
   }
 
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
+  @Transactional(readOnly = false, propagation = Propagation.SUPPORTS, isolation = Isolation.REPEATABLE_READ)
   public String rebuildDatabaseSearchIndices(final ReindexSettings settings)
   {
     if (currentReindexRun != null) {
@@ -163,7 +163,6 @@ public class DatabaseDao extends HibernateDaoSupport
    * 
    * @param clazz
    */
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
   private void reindex(final Class< ? > clazz, final ReindexSettings settings)
   {
     final Session session = getSession();
@@ -172,13 +171,13 @@ public class DatabaseDao extends HibernateDaoSupport
     final boolean scrollMode = number > MIN_REINDEX_ENTRIES_4_USE_SCROLL_MODE ? true : false;
     log.info("Starting re-indexing of "
         + number
-        + " entries  (total number) of type "
+        + " entries (total number) of type "
         + clazz.getName()
         + " with scrollMode="
         + scrollMode
         + "...");
     final int batchSize = 1000;// NumberUtils.createInteger(System.getProperty("hibernate.search.worker.batch_size")
-    final FullTextSession fullTextSession = Search.getFullTextSession(session);
+    final FullTextSession fullTextSession = Search.createFullTextSession(session);
     fullTextSession.setFlushMode(FlushMode.MANUAL);
     fullTextSession.setCacheMode(CacheMode.IGNORE);
     int index = 0;
