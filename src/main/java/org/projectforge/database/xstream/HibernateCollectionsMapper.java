@@ -51,17 +51,17 @@ import com.thoughtworks.xstream.mapper.XmlFriendlyMapper;
 public class HibernateCollectionsMapper extends XmlFriendlyMapper// MapperWrapper
 {
   private final static String[] hbClassNames = { PersistentList.class.getName(), PersistentSet.class.getName(),
-      PersistentMap.class.getName(), PersistentSortedSet.class.getName(), PersistentSortedMap.class.getName()};
+    PersistentMap.class.getName(), PersistentSortedSet.class.getName(), PersistentSortedMap.class.getName()};
 
   private final static String[] jdkClassNames = { ArrayList.class.getName(), HashSet.class.getName(), HashMap.class.getName(),
-      TreeSet.class.getName(), TreeMap.class.getName()};
+    TreeSet.class.getName(), TreeMap.class.getName()};
 
   private final static Class[] hbClasses = { PersistentList.class, PersistentSet.class, PersistentMap.class, PersistentSortedSet.class,
-      PersistentSortedMap.class};
+    PersistentSortedMap.class};
 
   private final static Class[] jdkClasses = { ArrayList.class, HashSet.class, HashMap.class, TreeSet.class, TreeMap.class};
 
-  public HibernateCollectionsMapper(Mapper wrapped)
+  public HibernateCollectionsMapper(final Mapper wrapped)
   {
     super(wrapped);
   }
@@ -69,7 +69,8 @@ public class HibernateCollectionsMapper extends XmlFriendlyMapper// MapperWrappe
   /**
    * @see com.thoughtworks.xstream.alias.ClassMapper#mapNameToXML(java.lang.String)
    */
-  public String mapNameToXML(String javaName)
+  @Override
+  public String mapNameToXML(final String javaName)
   {
     return super.mapNameToXML(replaceClasses(javaName));
   }
@@ -77,7 +78,8 @@ public class HibernateCollectionsMapper extends XmlFriendlyMapper// MapperWrappe
   /**
    * @see com.thoughtworks.xstream.mapper.Mapper#serializedClass(java.lang.Class)
    */
-  public String serializedClass(Class type)
+  @Override
+  public String serializedClass(final Class type)
   {
     return super.serializedClass(replaceClasses(type));
   }
@@ -85,7 +87,8 @@ public class HibernateCollectionsMapper extends XmlFriendlyMapper// MapperWrappe
   /**
    * @see com.thoughtworks.xstream.mapper.Mapper#serializedMember(java.lang.Class, java.lang.String)
    */
-  public String serializedMember(Class type, String fieldName)
+  @Override
+  public String serializedMember(final Class type, final String fieldName)
   {
     return super.serializedMember(replaceClasses(type), fieldName);
   }
@@ -96,7 +99,7 @@ public class HibernateCollectionsMapper extends XmlFriendlyMapper// MapperWrappe
    * @param name
    * @return the equivalent JDK class name
    */
-  private String replaceClasses(String name)
+  private String replaceClasses(final String name)
   {
     for (int i = 0; i < hbClassNames.length; i++) {
       if (name.equals(hbClassNames[i]))
@@ -111,7 +114,7 @@ public class HibernateCollectionsMapper extends XmlFriendlyMapper// MapperWrappe
    * @param clazz
    * @return the equivalent JDK class
    */
-  private Class replaceClasses(Class clazz)
+  private Class replaceClasses(final Class clazz)
   {
     for (int i = 0; i < hbClasses.length; i++) {
       if (clazz.equals(hbClasses[i]))
