@@ -48,9 +48,9 @@ public class BeanHelper
 {
   private static final Logger log = Logger.getLogger(BeanHelper.class);
 
-  public static String determinePropertyName(Method method)
+  public static String determinePropertyName(final Method method)
   {
-    String name = method.getName();
+    final String name = method.getName();
     if (name.startsWith("get") == true || name.startsWith("set") == true) {
       return StringUtils.uncapitalize(name.substring(3));
     } else if (name.startsWith("is") == true) {
@@ -74,12 +74,12 @@ public class BeanHelper
     return null;
   }
 
-  public static Class< ? > determinePropertyType(Method method)
+  public static Class< ? > determinePropertyType(final Method method)
   {
     if (method == null) {
       return null;
     }
-    String name = method.getName();
+    final String name = method.getName();
     if (name.startsWith("get") == false && name.startsWith("is") == false) {
       throw new UnsupportedOperationException("determinePropertyType only yet implemented for getter methods.");
     }
@@ -92,11 +92,11 @@ public class BeanHelper
    * @param fieldname
    * @return
    */
-  public static Method determineSetter(Class< ? > clazz, String fieldname)
+  public static Method determineSetter(final Class< ? > clazz, final String fieldname)
   {
-    String cap = StringUtils.capitalize(fieldname);
-    Method[] methods = clazz.getMethods();
-    for (Method method : methods) {
+    final String cap = StringUtils.capitalize(fieldname);
+    final Method[] methods = clazz.getMethods();
+    for (final Method method : methods) {
       if (("set" + cap).equals(method.getName()) == true && method.getParameterTypes().length == 1) {
         return method;
       }
@@ -104,26 +104,26 @@ public class BeanHelper
     return null;
   }
 
-  public static Method determineSetter(Class< ? > clazz, Method method)
+  public static Method determineSetter(final Class< ? > clazz, final Method method)
   {
-    String name = method.getName();
+    final String name = method.getName();
     if (name.startsWith("set") == true) {
       return method;
     } else {
       try {
         if (name.startsWith("get") == true) {
-          Class< ? > parameterType = method.getReturnType();
-          String setterName = "s" + name.substring(1);
+          final Class< ? > parameterType = method.getReturnType();
+          final String setterName = "s" + name.substring(1);
           return clazz.getMethod(setterName, new Class[] { parameterType});
         } else if (name.startsWith("is") == true) {
-          Class< ? > parameterType = method.getReturnType();
-          String setterName = "set" + name.substring(2);
+          final Class< ? > parameterType = method.getReturnType();
+          final String setterName = "set" + name.substring(2);
           return clazz.getMethod(setterName, new Class[] { parameterType});
         }
-      } catch (SecurityException ex) {
+      } catch (final SecurityException ex) {
         log.fatal("Could not determine setter for '" + name + "': " + ex, ex);
         throw new RuntimeException(ex);
-      } catch (NoSuchMethodException ex) {
+      } catch (final NoSuchMethodException ex) {
         log.fatal("Could not determine setter for '" + name + "': " + ex, ex);
         throw new RuntimeException(ex);
       }
@@ -132,9 +132,9 @@ public class BeanHelper
     return null;
   }
 
-  public static void invokeSetter(Object obj, Method method, Object value)
+  public static void invokeSetter(final Object obj, final Method method, final Object value)
   {
-    Method setter = determineSetter(obj.getClass(), method);
+    final Method setter = determineSetter(obj.getClass(), method);
     invoke(obj, setter, value);
   }
 
@@ -144,22 +144,22 @@ public class BeanHelper
    * @param method
    * @return
    */
-  public static Object invoke(Object obj, Method method)
+  public static Object invoke(final Object obj, final Method method)
   {
     return invoke(obj, method, null);
   }
 
-  public static Object invoke(Object obj, Method method, Object[] args)
+  public static Object invoke(final Object obj, final Method method, final Object[] args)
   {
     try {
       return method.invoke(obj, args);
-    } catch (IllegalArgumentException ex) {
+    } catch (final IllegalArgumentException ex) {
       log.fatal("Could not invoke '" + method.getName() + "': " + ex + " for object [" + obj + "] with args: " + args, ex);
       throw new RuntimeException(ex);
-    } catch (IllegalAccessException ex) {
+    } catch (final IllegalAccessException ex) {
       log.fatal("Could not invoke '" + method.getName() + "': " + ex + " for object [" + obj + "] with args: " + args, ex);
       throw new RuntimeException(ex);
-    } catch (InvocationTargetException ex) {
+    } catch (final InvocationTargetException ex) {
       log.fatal("Could not invoke '" + method.getName() + "': " + ex + " for object [" + obj + "] with args: " + args, ex);
       throw new RuntimeException(ex);
     }
@@ -184,17 +184,17 @@ public class BeanHelper
     Constructor< ? > constructor = null;
     try {
       constructor = clazz.getDeclaredConstructor(new Class[0]);
-    } catch (SecurityException ex) {
+    } catch (final SecurityException ex) {
       log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
-    } catch (NoSuchMethodException ex) {
+    } catch (final NoSuchMethodException ex) {
       log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
     }
     if (constructor == null) {
       try {
         return clazz.newInstance();
-      } catch (InstantiationException ex) {
+      } catch (final InstantiationException ex) {
         log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
-      } catch (IllegalAccessException ex) {
+      } catch (final IllegalAccessException ex) {
         log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
       }
       return null;
@@ -202,13 +202,13 @@ public class BeanHelper
     constructor.setAccessible(true);
     try {
       return constructor.newInstance();
-    } catch (IllegalArgumentException ex) {
+    } catch (final IllegalArgumentException ex) {
       log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
-    } catch (InstantiationException ex) {
+    } catch (final InstantiationException ex) {
       log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
-    } catch (IllegalAccessException ex) {
+    } catch (final IllegalAccessException ex) {
       log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
-    } catch (InvocationTargetException ex) {
+    } catch (final InvocationTargetException ex) {
       log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
     }
     return null;
@@ -230,27 +230,27 @@ public class BeanHelper
     Constructor< ? > constructor = null;
     try {
       constructor = clazz.getDeclaredConstructor(paramTypes);
-    } catch (SecurityException ex) {
+    } catch (final SecurityException ex) {
       log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
-    } catch (NoSuchMethodException ex) {
+    } catch (final NoSuchMethodException ex) {
       log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
     }
     constructor.setAccessible(true);
     try {
       return constructor.newInstance(params);
-    } catch (IllegalArgumentException ex) {
+    } catch (final IllegalArgumentException ex) {
       log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
-    } catch (InstantiationException ex) {
+    } catch (final InstantiationException ex) {
       log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
-    } catch (IllegalAccessException ex) {
+    } catch (final IllegalAccessException ex) {
       log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
-    } catch (InvocationTargetException ex) {
+    } catch (final InvocationTargetException ex) {
       log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
     }
     return null;
   }
 
-  public static Object invoke(Object obj, Method method, Object arg)
+  public static Object invoke(final Object obj, final Method method, final Object arg)
   {
     return invoke(obj, method, new Object[] { arg});
   }
@@ -280,19 +280,19 @@ public class BeanHelper
    * @throws IllegalAccessException
    * @throws IllegalArgumentException
    */
-  public static Object getProperty(Object bean, String property)
+  public static Object getProperty(final Object bean, final String property)
   {
-    Method getter = determineGetter(bean.getClass(), property);
+    final Method getter = determineGetter(bean.getClass(), property);
     if (getter == null) {
       throw new RuntimeException("Getter for property '" + property + "' not found.");
     }
     try {
       return getter.invoke(bean);
-    } catch (IllegalArgumentException ex) {
+    } catch (final IllegalArgumentException ex) {
       throw new RuntimeException("For property '" + property + "'.", ex);
-    } catch (IllegalAccessException ex) {
+    } catch (final IllegalAccessException ex) {
       throw new RuntimeException("For property '" + property + "'.", ex);
-    } catch (InvocationTargetException ex) {
+    } catch (final InvocationTargetException ex) {
       throw new RuntimeException("For property '" + property + "'.", ex);
     }
   }
@@ -309,17 +309,17 @@ public class BeanHelper
    */
   public static Object setProperty(final Object bean, final String property, final Object value)
   {
-    Method setter = determineSetter(bean.getClass(), property);
+    final Method setter = determineSetter(bean.getClass(), property);
     if (setter == null) {
       throw new RuntimeException("Getter for property '" + property + "' not found.");
     }
     try {
       return setter.invoke(bean, value);
-    } catch (IllegalArgumentException ex) {
+    } catch (final IllegalArgumentException ex) {
       throw new RuntimeException("For property '" + property + "'.", ex);
-    } catch (IllegalAccessException ex) {
+    } catch (final IllegalAccessException ex) {
       throw new RuntimeException("For property '" + property + "'.", ex);
-    } catch (InvocationTargetException ex) {
+    } catch (final InvocationTargetException ex) {
       throw new RuntimeException("For property '" + property + "'.", ex);
     }
   }
@@ -333,19 +333,19 @@ public class BeanHelper
    * @throws IllegalAccessException
    * @throws IllegalArgumentException
    */
-  public static Object getIndexedProperty(Object bean, String property)
+  public static Object getIndexedProperty(final Object bean, final String property)
   {
-    int pos = property.indexOf('[');
+    final int pos = property.indexOf('[');
     if (pos <= 0) {
       throw new UnsupportedOperationException("'" + property + "' is not an indexed property, such as 'xxx[#]'.");
     }
-    String prop = property.substring(0, pos);
-    String indexString = property.substring(pos + 1, property.length() - 1);
-    Integer index = NumberHelper.parseInteger(indexString);
+    final String prop = property.substring(0, pos);
+    final String indexString = property.substring(pos + 1, property.length() - 1);
+    final Integer index = NumberHelper.parseInteger(indexString);
     if (index == null) {
       throw new UnsupportedOperationException("'" + property + "' contains no number as index string: '" + indexString + "'.");
     }
-    Object value = getProperty(bean, prop);
+    final Object value = getProperty(bean, prop);
     if (value == null) {
       return null;
     }
@@ -370,14 +370,14 @@ public class BeanHelper
    * @throws IllegalAccessException
    * @throws IllegalArgumentException
    */
-  public static Object getNestedProperty(Object bean, String property)
+  public static Object getNestedProperty(final Object bean, final String property)
   {
     if (StringUtils.isEmpty(property) == true || bean == null) {
       return null;
     }
-    String[] props = StringUtils.split(property, '.');
+    final String[] props = StringUtils.split(property, '.');
     Object value = bean;
-    for (String prop : props) {
+    for (final String prop : props) {
       if (prop.indexOf('[') > 0) {
         value = getIndexedProperty(value, prop);
       } else {
@@ -415,14 +415,14 @@ public class BeanHelper
   {
     try {
       return field.get(obj);
-    } catch (IllegalArgumentException ex) {
+    } catch (final IllegalArgumentException ex) {
       log.error("Exception encountered while getting value of field '"
           + field.getName()
           + "' of object from type '"
           + obj.getClass().getName()
           + "': "
           + ex, ex);
-    } catch (IllegalAccessException ex) {
+    } catch (final IllegalAccessException ex) {
       log.error("Exception encountered while getting value of field '"
           + field.getName()
           + "' of object from type '"
