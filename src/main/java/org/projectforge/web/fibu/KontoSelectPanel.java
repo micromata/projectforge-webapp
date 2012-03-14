@@ -41,13 +41,14 @@ import org.projectforge.fibu.KontoDao;
 import org.projectforge.fibu.KontoStatus;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
+import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
  * This panel is a autocompletion text field for selecting an account (DATEV-Konto).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class KontoSelectPanel extends AbstractSelectPanel<KontoDO>
+public class KontoSelectPanel extends AbstractSelectPanel<KontoDO> implements ComponentWrapperPanel
 {
   private static final long serialVersionUID = 5452693296383142460L;
 
@@ -82,6 +83,10 @@ public class KontoSelectPanel extends AbstractSelectPanel<KontoDO>
     return this;
   }
 
+  /**
+   * Must be called before component is added to a field set. This is different to most other Panels in ProjectForge.
+   * @see org.projectforge.web.wicket.AbstractSelectPanel#init()
+   */
   @Override
   @SuppressWarnings("serial")
   public KontoSelectPanel init()
@@ -136,7 +141,7 @@ public class KontoSelectPanel extends AbstractSelectPanel<KontoDO>
       }
 
       @Override
-      public IConverter getConverter(final Class< ? > type)
+      public IConverter getConverter(final Class type)
       {
         return new IConverter() {
           @Override
@@ -190,5 +195,15 @@ public class KontoSelectPanel extends AbstractSelectPanel<KontoDO>
   protected void convertInput()
   {
     setConvertedInput(getModelObject());
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getComponentOutputId()
+   */
+  @Override
+  public String getComponentOutputId()
+  {
+    kontoTextField.setOutputMarkupId(true);
+    return kontoTextField.getMarkupId();
   }
 }

@@ -24,11 +24,7 @@
 package org.projectforge.web.fibu;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
-import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.StringHelper;
@@ -36,8 +32,10 @@ import org.projectforge.fibu.EmployeeSalaryDao;
 import org.projectforge.fibu.EmployeeSalaryFilter;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilter, EmployeeSalaryListPage>
 {
@@ -52,45 +50,38 @@ public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilte
   protected void init()
   {
     super.init();
-    // DropDownChoice years
-    final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(employeeSalaryDao.getYears(), true);
-    @SuppressWarnings("unchecked")
-    final DropDownChoice yearChoice = new DropDownChoice("year", new PropertyModel(this, "year"), yearListChoiceRenderer.getYears(),
-        yearListChoiceRenderer);
-    yearChoice.setNullValid(false);
-    filterContainer.add(yearChoice);
-    // DropDownChoice months
-    final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-    for (int i = 0; i <= 11; i++) {
-      monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
-    }
-    @SuppressWarnings("unchecked")
-    final DropDownChoice monthChoice = new DropDownChoice("month", new PropertyModel(this, "month"), monthChoiceRenderer.getValues(),
-        monthChoiceRenderer);
-    monthChoice.setNullValid(true);
-    monthChoice.setRequired(false);
-    filterContainer.add(monthChoice);
-    filterContainer.add(new CheckBox("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted")));
-
-    @SuppressWarnings("serial")
-    final Button exportAsXlsButton = new Button("button", new Model<String>(getString("exportAsXls"))) {
-      @Override
-      public final void onSubmit()
-      {
-        if (getSearchFilter().getMonth() < 0 || getSearchFilter().getMonth() > 11) {
-          addError("fibu.employee.salary.error.monthNotGiven");
-          return;
-        }
-        parentPage.exportExcel();
+    gridBuilder.newColumnsPanel();
+    {
+      gridBuilder.newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
+      // DropDownChoice years
+      final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(employeeSalaryDao.getYears(), true);
+      final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(
+          this, "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
+      yearChoice.setNullValid(false);
+      fs.add(yearChoice);
+      fs.setLabelFor(yearChoice);
+      // DropDownChoice months
+      final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
+      for (int i = 0; i <= 11; i++) {
+        monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
       }
-    };
-    exportAsXlsButton.setDefaultFormProcessing(false).add(
-        new SimpleAttributeModifier("title", getString("fibu.employee.salary.exportXls.tooltip")));
-    final SingleButtonPanel exportVCardsPanel = new SingleButtonPanel(getNewActionButtonChildId(), exportAsXlsButton);
-    prependActionButton(exportVCardsPanel);
-}
+      final DropDownChoice<Integer> monthChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(
+          this, "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer);
+      monthChoice.setNullValid(true);
+      monthChoice.setRequired(false);
+      fs.add(monthChoice);
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
+    }
+    {
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      addPageSizeFieldset();
+    }
+  }
 
-  public EmployeeSalaryListForm(EmployeeSalaryListPage parentPage)
+  public EmployeeSalaryListForm(final EmployeeSalaryListPage parentPage)
   {
     super(parentPage);
   }

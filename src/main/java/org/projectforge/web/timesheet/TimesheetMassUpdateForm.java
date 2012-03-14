@@ -26,8 +26,8 @@ package org.projectforge.web.timesheet;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.MarkupContainer;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
@@ -81,7 +81,7 @@ public class TimesheetMassUpdateForm extends AbstractForm<TimesheetDO, Timesheet
   {
     super.init();
     add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    TaskSelectPanel taskSelectPanel = new TaskSelectPanel("task", new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId");
+    final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("task", new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId");
     taskSelectPanel.setEnableLinks(false);
     add(taskSelectPanel);
     taskSelectPanel.init();
@@ -109,7 +109,7 @@ public class TimesheetMassUpdateForm extends AbstractForm<TimesheetDO, Timesheet
       }
     };
     updateAllButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    updateAllButton.add(new SimpleAttributeModifier("onclick", "return showUpdateQuestionDialog()"));
+    updateAllButton.add(AttributeModifier.replace("onclick", "return showUpdateQuestionDialog()"));
     setDefaultButton(updateAllButton);
     final SingleButtonPanel updateAllButtonPanel = new SingleButtonPanel("updateAll", updateAllButton);
     add(updateAllButtonPanel);

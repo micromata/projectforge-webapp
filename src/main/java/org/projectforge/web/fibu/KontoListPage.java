@@ -27,13 +27,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KontoDao;
@@ -72,20 +73,22 @@ public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, Kon
       public void populateItem(final Item<ICellPopulator<KontoDO>> item, final String componentId, final IModel<KontoDO> rowModel)
       {
         final KontoDO konto = rowModel.getObject();
-        String cellStyle = "";
-        if (konto.isDeleted() == true) {
-          cellStyle = "text-decoration: line-through;";
+        final StringBuffer cssStyle = getCssStyle(konto.getId(), konto.isDeleted());
+        if (cssStyle.length() > 0) {
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
-        item.add(new AttributeModifier("style", true, new Model<String>(cellStyle)));
       }
     };
     columns.add(new CellItemListenerPropertyColumn<KontoDO>(new Model<String>(getString("fibu.konto.nummer")), getSortable("nummer",
         sortable), "nummer", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<KontoDO>> item, final String componentId, final IModel<KontoDO> rowModel)
       {
-        final KontoDO konto = (KontoDO) rowModel.getObject();
+        final KontoDO konto = rowModel.getObject();
         if (isSelectMode() == false) {
           item.add(new ListSelectActionPanel(componentId, rowModel, KontoEditPage.class, konto.getId(), returnToPage, String.valueOf(konto
               .getNummer())));
@@ -108,7 +111,7 @@ public class KontoListPage extends AbstractListPage<KontoListForm, KontoDao, Kon
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "nummer", true);
+    dataTable = createDataTable(createColumns(this, true), "nummer", SortOrder.ASCENDING);
     form.add(dataTable);
   }
 

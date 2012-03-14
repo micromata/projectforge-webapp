@@ -26,17 +26,18 @@ package org.projectforge.web.mobile;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.core.BaseDO;
-import org.projectforge.web.address.AddressMobileEditPage;
-import org.projectforge.web.address.AddressMobileViewPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.springframework.util.CollectionUtils;
 
 public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ? , ? >, D extends org.projectforge.core.IDao< ? >, O extends BaseDO< ? >>
-    extends AbstractSecuredMobilePage
+extends AbstractSecuredMobilePage
 {
+  private static final long serialVersionUID = 4104862404249463041L;
+
   protected static final int MAX_ROWS = 50;
 
   protected F form;
@@ -75,9 +76,9 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
     int counter = 0;
     for (final O entry : list) {
       final PageParameters params = new PageParameters();
-      params.put(AbstractEditPage.PARAMETER_KEY_ID, entry.getId());
+      params.add(AbstractEditPage.PARAMETER_KEY_ID, entry.getId());
       final String comment = getEntryComment(entry);
-      final ListViewItemPanel listItem = new ListViewItemPanel(listViewPanel.newChildId(), AddressMobileViewPage.class, params,
+      final ListViewItemPanel listItem = new ListViewItemPanel(listViewPanel.newChildId(), getEditPageClass(), params,
           getEntryName(entry));
       if (StringUtils.isNotBlank(comment) == true) {
         listItem.setComment(", " + comment);
@@ -117,9 +118,13 @@ public abstract class AbstractMobileListPage<F extends AbstractMobileListForm< ?
   @Override
   protected void addTopRightButton()
   {
-    headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.PLUS, AddressMobileEditPage.class, getString("new"))
-        .setRelDialog());
+    final PageParameters params = new PageParameters();
+    params.add(AbstractMobileEditPage.PARAMETER_KEY_EDIT, true);
+    headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.PLUS, getEditPageClass(), params, getString("new"))
+    .setRelDialog());
   }
+
+  protected abstract Class<? extends WebPage> getEditPageClass();
 
   protected abstract F newListForm(AbstractMobileListPage< ? , ? , ? > parentPage);
 

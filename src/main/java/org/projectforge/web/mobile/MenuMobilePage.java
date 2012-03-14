@@ -24,13 +24,13 @@
 package org.projectforge.web.mobile;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.protocol.http.WebRequest;
-import org.apache.wicket.protocol.http.WebResponse;
+import org.apache.wicket.request.http.WebRequest;
+import org.apache.wicket.request.http.WebResponse;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.AppVersion;
 import org.projectforge.user.PFUserContext;
@@ -41,10 +41,13 @@ import org.projectforge.web.MenuEntry;
 import org.projectforge.web.UserFilter;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.MySession;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelBookmarkablePageLinkPanel;
 
 public class MenuMobilePage extends AbstractSecuredMobilePage
 {
+  private static final long serialVersionUID = 6709192621718648771L;
+
   // Indicates that the menu mobile page should be shown directly instead of restoring last page after stay-logged-in.
   private static final String PARAM_HOME_KEY = "home";
 
@@ -57,7 +60,7 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
   public static Component getHomeLink(final Component parent, final String id)
   {
     final PageParameters params = new PageParameters();
-    params.put(PARAM_HOME_KEY, true);
+    params.add(PARAM_HOME_KEY, true);
     return new LabelBookmarkablePageLinkPanel(id, MenuMobilePage.class, parent.getString("mobile.home"), params).addLinkAttribute("rel",
         "external");
   }
@@ -73,7 +76,7 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
     super(parameters);
     if (getUser().getAttribute(UserFilter.USER_ATTR_STAY_LOGGED_IN) != null) {
       getUser().removeAttribute(UserFilter.USER_ATTR_STAY_LOGGED_IN);
-      if (parameters.containsKey(PARAM_HOME_KEY) == false) {
+      if (WicketUtils.contains(parameters, PARAM_HOME_KEY) == false) {
         final RecentMobilePageInfo pageInfo = (RecentMobilePageInfo) userXmlPreferencesCache.getEntry(getUserId(),
             AbstractSecuredMobilePage.USER_PREF_RECENT_PAGE);
         if (pageInfo != null && pageInfo.getPageClass() != null) {

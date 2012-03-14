@@ -24,10 +24,12 @@
 package org.projectforge.web.user;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 
 public class GroupListForm extends AbstractListForm<BaseSearchFilter, GroupListPage>
@@ -40,10 +42,22 @@ public class GroupListForm extends AbstractListForm<BaseSearchFilter, GroupListP
   protected void init()
   {
     super.init();
-    filterContainer.add(new CheckBox("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted")));
+    gridBuilder.newColumnsPanel();
+    {
+      gridBuilder.newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
+          getString("onlyDeleted")));
+    }
+    {
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      addPageSizeFieldset();
+    }
   }
 
-  public GroupListForm(GroupListPage parentPage)
+  public GroupListForm(final GroupListPage parentPage)
   {
     super(parentPage);
   }

@@ -30,7 +30,7 @@ import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightDao;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.layout.LayoutContext;
+import org.projectforge.web.wicket.layout.OldLayoutContext;
 
 public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditPage>
 {
@@ -52,7 +52,7 @@ public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditP
   public MyAccountEditForm(MyAccountEditPage parentPage, PFUserDO data)
   {
     super(parentPage, data);
-    renderer = new UserFormRenderer(this, parentPage, new LayoutContext(this), parentPage.getBaseDao(), userRightDao, groupDao,
+    renderer = new UserFormRenderer(this, parentPage, new OldLayoutContext(this), parentPage.getBaseDao(), userRightDao, groupDao,
         accessChecker, data);
   }
 

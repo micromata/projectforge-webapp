@@ -42,7 +42,6 @@ import org.projectforge.web.wicket.components.FavoritesChoicePanel;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.TooltipImage;
 
-
 /**
  * This panel show the actual kunde and buttons for select/unselect kunde.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -55,9 +54,11 @@ public class CustomerSelectPanel extends AbstractSelectPanel<KundeDO>
   @SpringBean(name = "kundeFormatter")
   private KundeFormatter kundeFormatter;
 
-  private PropertyModel<String> kundeText;
+  private final PropertyModel<String> kundeText;
 
   private TextField<String> kundeTextField;
+
+  private FavoritesChoicePanel<KundeDO, KundeFavorite> favoritesPanel;
 
   /**
    * @param id
@@ -66,13 +67,14 @@ public class CustomerSelectPanel extends AbstractSelectPanel<KundeDO>
    * @param caller
    * @param selectProperty
    */
-  public CustomerSelectPanel(final String id, final IModel<KundeDO> model, final PropertyModel<String> kundeText,
+  public CustomerSelectPanel(final String id,  final IModel<KundeDO> model, final PropertyModel<String> kundeText,
       final ISelectCallerPage caller, final String selectProperty)
   {
     super(id, model, caller, selectProperty);
     this.kundeText = kundeText;
   }
 
+  @Override
   @SuppressWarnings("serial")
   public CustomerSelectPanel init()
   {
@@ -82,8 +84,8 @@ public class CustomerSelectPanel extends AbstractSelectPanel<KundeDO>
         @Override
         public boolean isVisible()
         {
-          return (CustomerSelectPanel.this.getModelObject() == null || NumberHelper
-              .greaterZero(CustomerSelectPanel.this.getModelObject().getId()) == false);
+          return (CustomerSelectPanel.this.getModelObject() == null || NumberHelper.greaterZero(CustomerSelectPanel.this.getModelObject()
+              .getId()) == false);
         }
       };
       add(kundeTextField);
@@ -101,6 +103,7 @@ public class CustomerSelectPanel extends AbstractSelectPanel<KundeDO>
     });
     add(kundeAsStringLabel);
     final SubmitLink selectButton = new SubmitLink("select") {
+      @Override
       public void onSubmit()
       {
         setResponsePage(new CustomerListPage(caller, selectProperty));
@@ -127,8 +130,7 @@ public class CustomerSelectPanel extends AbstractSelectPanel<KundeDO>
     unselectButton.add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_KUNDE_UNSELECT,
         getString("fibu.tooltip.unselectKunde")));
     // DropDownChoice favorites
-    final FavoritesChoicePanel<KundeDO, KundeFavorite> favoritesPanel = new FavoritesChoicePanel<KundeDO, KundeFavorite>("favorites",
-        UserPrefArea.KUNDE_FAVORITE, tabIndex, "half select") {
+    favoritesPanel = new FavoritesChoicePanel<KundeDO, KundeFavorite>("favorites", UserPrefArea.KUNDE_FAVORITE, tabIndex, "half select") {
       @Override
       protected void select(final KundeFavorite favorite)
       {
@@ -178,6 +180,22 @@ public class CustomerSelectPanel extends AbstractSelectPanel<KundeDO>
       return kundeTextField.getRawInput();
     }
     return null;
+  }
+
+  /**
+   * @return the kundeTextField
+   */
+  public TextField<String> getKundeTextField()
+  {
+    return kundeTextField;
+  }
+
+  /**
+   * @return the favoritesPanel
+   */
+  public FavoritesChoicePanel<KundeDO, KundeFavorite> getFavoritesPanel()
+  {
+    return favoritesPanel;
   }
 
   @Override

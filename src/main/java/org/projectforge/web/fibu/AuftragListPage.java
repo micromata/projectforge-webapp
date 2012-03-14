@@ -32,8 +32,8 @@ import java.util.Set;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
@@ -41,6 +41,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.core.NumberFormatter;
@@ -55,9 +56,8 @@ import org.projectforge.web.common.OutputType;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractListPage;
-import org.projectforge.web.wicket.AttributeAppendModifier;
+import org.projectforge.web.wicket.AbstractUnsecureBasePage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.CurrencyPropertyColumn;
@@ -65,7 +65,6 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
-import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
 
 @ListPage(editPage = AuftragEditPage.class)
 public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDao, AuftragDO> implements IListPageColumnsCreator<AuftragDO>
@@ -90,7 +89,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
   @SpringBean(name = "htmlHelper")
   private HtmlHelper htmlHelper;
 
-  public AuftragListPage(PageParameters parameters)
+  public AuftragListPage(final PageParameters parameters)
   {
     super(parameters, "fibu.auftrag");
   }
@@ -101,7 +100,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
   {
     final List<IColumn<AuftragDO>> columns = new ArrayList<IColumn<AuftragDO>>();
     final CellItemListener<AuftragDO> cellItemListener = new CellItemListener<AuftragDO>() {
-      public void populateItem(Item<ICellPopulator<AuftragDO>> item, String componentId, IModel<AuftragDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<AuftragDO>> item, final String componentId, final IModel<AuftragDO> rowModel)
       {
         final AuftragDO auftrag = rowModel.getObject();
         if (auftrag.getAuftragsStatus() == null) {
@@ -121,17 +120,16 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
           cssStyle.append("font-weight:bold; color: red;");
         }
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<AuftragDO>(new Model<String>(getString("fibu.auftrag.nummer.short")), "nummer",
         "nummer", cellItemListener) {
-      @SuppressWarnings("unchecked")
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<AuftragDO>> item, final String componentId, final IModel<AuftragDO> rowModel)
       {
-        AuftragDO auftrag = (AuftragDO) rowModel.getObject();
+        final AuftragDO auftrag = rowModel.getObject();
         item.add(new ListSelectActionPanel(componentId, rowModel, AuftragEditPage.class, auftrag.getId(), AuftragListPage.this, String
             .valueOf(auftrag.getNummer())));
         cellItemListener.populateItem(item, componentId, rowModel);
@@ -142,21 +140,21 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
     columns.add(new CellItemListenerPropertyColumn<AuftragDO>(getString("fibu.projekt"), "projekt.name", "projekt.name", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<AuftragDO>(getString("fibu.auftrag.titel"), "titel", "titel", cellItemListener));
     columns.add(new AbstractColumn<AuftragDO>(new Model<String>(getString("fibu.auftrag.positions"))) {
-      public void populateItem(Item<ICellPopulator<AuftragDO>> cellItem, String componentId, IModel<AuftragDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<AuftragDO>> cellItem, final String componentId, final IModel<AuftragDO> rowModel)
       {
         final AuftragDO auftrag = rowModel.getObject();
         final List<AuftragsPositionDO> list = auftrag.getPositionen();
         final StringBuffer buf = new StringBuffer();
         if (list != null) {
           buf.append("<span style=\"font-style: italic;\" title=\"").append(NumberFormatter.format(auftrag.getPersonDays())).append(" ")
-              .append(getString("projectmanagement.personDays.short")).append(" - ");
+          .append(getString("projectmanagement.personDays.short")).append(" - ");
           final Iterator<AuftragsPositionDO> it = list.iterator();
           while (it.hasNext() == true) {
             final AuftragsPositionDO pos = it.next();
             buf.append("#").append(pos.getNumber()).append(": ");
             if (pos.getPersonDays() != null && pos.getPersonDays().compareTo(BigDecimal.ZERO) != 0) {
-              buf.append("(").append(NumberFormatter.format(pos.getPersonDays())).append(" ").append(
-                  getString("projectmanagement.personDays.short")).append(") ");
+              buf.append("(").append(NumberFormatter.format(pos.getPersonDays())).append(" ")
+              .append(getString("projectmanagement.personDays.short")).append(") ");
             }
             buf.append(CurrencyFormatter.format(pos.getNettoSumme()));
             if (StringUtils.isNotBlank(pos.getTitel()) == true) {
@@ -176,7 +174,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
             }
           }
           buf.append("\">");
-          htmlHelper.appendImageTag(new WicketLocalizerAndUrlBuilder(getResponse()), buf, htmlHelper.getInfoImage());
+          htmlHelper.appendImageTag(getResponse(), buf, htmlHelper.getInfoImage());
           buf.append("#").append(list.size());
           buf.append("</span>");
         }
@@ -189,15 +187,15 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
     columns.add(new CellItemListenerPropertyColumn<AuftragDO>(getString("projectmanagement.personDays.short"), "personDays", "personDays",
         cellItemListener) {
       @Override
-      public void populateItem(Item<ICellPopulator<AuftragDO>> item, String componentId, IModel<AuftragDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<AuftragDO>> item, final String componentId, final IModel<AuftragDO> rowModel)
       {
         item.add(new Label(componentId, NumberFormatter.format(rowModel.getObject().getPersonDays())));
-        item.add(new AttributeAppendModifier("style", new Model<String>("text-align: right;")));
+        item.add(AttributeModifier.append("style", new Model<String>("text-align: right;")));
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
     columns
-        .add(new CellItemListenerPropertyColumn<AuftragDO>(getString("fibu.common.reference"), "referenz", "referenz", cellItemListener));
+    .add(new CellItemListenerPropertyColumn<AuftragDO>(getString("fibu.common.reference"), "referenz", "referenz", cellItemListener));
     columns.add(new UserPropertyColumn<AuftragDO>(getString("contactPerson"), "contactPerson.fullname", "contactPerson", cellItemListener)
         .withUserFormatter(userFormatter));
     columns.add(new CellItemListenerPropertyColumn<AuftragDO>(getString("fibu.auftrag.datum"), "angebotsDatum", "angebotsDatum",
@@ -209,27 +207,28 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
     columns.add(new CurrencyPropertyColumn<AuftragDO>(getString("fibu.fakturiert"), "fakturiertSum", "fakturiertSum", cellItemListener)
         .setSuppressZeroValues(true));
     columns
-        .add(new CellItemListenerPropertyColumn<AuftragDO>(new Model<String>(getString("fibu.rechnungen")), null, null, cellItemListener) {
-          @Override
-          public void populateItem(Item<ICellPopulator<AuftragDO>> item, String componentId, IModel<AuftragDO> rowModel)
-          {
-            final AuftragDO auftrag = rowModel.getObject();
-            final Set<RechnungsPositionVO> orderPositions = rechnungCache.getRechnungsPositionVOSetByAuftragId(auftrag.getId());
-            if (CollectionUtils.isEmpty(orderPositions) == true) {
-              item.add(AbstractBasePage.createInvisibleDummyComponent(componentId));
-            } else {
-              final InvoicePositionsPanel panel = new InvoicePositionsPanel(componentId) {
-                protected void onBeforeRender()
-                {
-                  super.onBeforeRender();
-                  init(orderPositions);
-                };
-              };
-              item.add(panel);
-            }
-            cellItemListener.populateItem(item, componentId, rowModel);
-          }
-        });
+    .add(new CellItemListenerPropertyColumn<AuftragDO>(new Model<String>(getString("fibu.rechnungen")), null, null, cellItemListener) {
+      @Override
+      public void populateItem(final Item<ICellPopulator<AuftragDO>> item, final String componentId, final IModel<AuftragDO> rowModel)
+      {
+        final AuftragDO auftrag = rowModel.getObject();
+        final Set<RechnungsPositionVO> orderPositions = rechnungCache.getRechnungsPositionVOSetByAuftragId(auftrag.getId());
+        if (CollectionUtils.isEmpty(orderPositions) == true) {
+          item.add(AbstractUnsecureBasePage.createInvisibleDummyComponent(componentId));
+        } else {
+          final InvoicePositionsPanel panel = new InvoicePositionsPanel(componentId) {
+            @Override
+            protected void onBeforeRender()
+            {
+              super.onBeforeRender();
+              init(orderPositions);
+            };
+          };
+          item.add(panel);
+        }
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
     columns.add(new CellItemListenerPropertyColumn<AuftragDO>(new Model<String>(getString("status")), "auftragsStatusAsString",
         "auftragsStatusAsString", cellItemListener));
     return columns;
@@ -238,7 +237,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "nummer", false);
+    dataTable = createDataTable(createColumns(this, true), "nummer", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 
@@ -250,7 +249,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
   }
 
   @Override
-  protected AuftragListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected AuftragListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new AuftragListForm(this);
   }
@@ -272,7 +271,7 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
   }
 
   @Override
-  protected IModel<AuftragDO> getModel(AuftragDO object)
+  protected IModel<AuftragDO> getModel(final AuftragDO object)
   {
     return new DetachableDOModel<AuftragDO, AuftragDao>(object, getBaseDao());
   }

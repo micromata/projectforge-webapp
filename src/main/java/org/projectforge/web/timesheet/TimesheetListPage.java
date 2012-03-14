@@ -30,22 +30,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.ISortableDataProvider;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.protocol.http.WebRequest;
-import org.apache.wicket.protocol.http.WebResponse;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.Hibernate;
-import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
 import org.projectforge.common.DateHelper;
@@ -74,15 +74,15 @@ import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPrefListPage;
 import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
-import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
-import org.projectforge.web.wicket.components.CheckBoxPanel;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 
 @ListPage(editPage = TimesheetEditPage.class)
 public class TimesheetListPage extends AbstractListPage<TimesheetListForm, TimesheetDao, TimesheetDO> implements
@@ -105,6 +105,8 @@ IListPageColumnsCreator<TimesheetDO>
   public static final String PARAMETER_KEY_START_TIME = "startTime";
 
   public static final String PARAMETER_KEY_STOP_TIME = "stopTime";
+
+  public static final String PARAMETER_KEY_CLEAR_ALL = "clear";
 
   private static final long serialVersionUID = 8582874051700734977L;
 
@@ -138,29 +140,41 @@ IListPageColumnsCreator<TimesheetDO>
   public TimesheetListPage(final PageParameters parameters)
   {
     super(parameters, "timesheet");
-    this.colspan = 4;
-    if (parameters.containsKey(PARAMETER_KEY_TASK_ID) == true) {
-      final Integer id = parameters.getAsInteger(PARAMETER_KEY_TASK_ID);
+    if (WicketUtils.contains(parameters, PARAMETER_KEY_CLEAR_ALL) == true) {
+      final boolean clear = WicketUtils.getAsBoolean(parameters, PARAMETER_KEY_CLEAR_ALL);
+      if (clear == true) {
+        form.getSearchFilter().setTaskId(null);
+        form.getSearchFilter().setSearchString(null);
+        form.getSearchFilter().setUserId(null);
+        form.getSearchFilter().setStartTime(null);
+        form.getSearchFilter().setStopTime(null);
+        form.getSearchFilter().setRecursive(true);
+        form.getSearchFilter().setMarked(false);
+        form.getSearchFilter().setDeleted(false);
+      }
+    }
+    if (WicketUtils.contains(parameters, PARAMETER_KEY_TASK_ID) == true) {
+      final Integer id = WicketUtils.getAsInteger(parameters, PARAMETER_KEY_TASK_ID);
       form.getSearchFilter().setTaskId(id);
     }
-    if (parameters.containsKey(PARAMETER_KEY_SEARCHSTRING) == true) {
-      final String searchString = parameters.getString(PARAMETER_KEY_SEARCHSTRING);
+    if (WicketUtils.contains(parameters, PARAMETER_KEY_SEARCHSTRING) == true) {
+      final String searchString = WicketUtils.getAsString(parameters, PARAMETER_KEY_SEARCHSTRING);
       form.getSearchFilter().setSearchString(searchString);
     }
-    if (parameters.containsKey(PARAMETER_KEY_USER_ID) == true) {
-      final Integer id = parameters.getAsInteger(PARAMETER_KEY_USER_ID);
+    if (WicketUtils.contains(parameters, PARAMETER_KEY_USER_ID) == true) {
+      final Integer id = WicketUtils.getAsInteger(parameters, PARAMETER_KEY_USER_ID);
       form.getSearchFilter().setUserId(id);
     }
-    if (parameters.containsKey(PARAMETER_KEY_START_TIME) == true) {
-      final Long time = parameters.getAsLong(PARAMETER_KEY_START_TIME);
+    if (WicketUtils.contains(parameters, PARAMETER_KEY_START_TIME) == true) {
+      final Long time = WicketUtils.getAsLong(parameters, PARAMETER_KEY_START_TIME);
       if (time != null) {
         form.getSearchFilter().setStartTime(new Date(time));
       } else {
         form.getSearchFilter().setStartTime(null);
       }
     }
-    if (parameters.containsKey(PARAMETER_KEY_STOP_TIME) == true) {
-      final Long time = parameters.getAsLong(PARAMETER_KEY_STOP_TIME);
+    if (WicketUtils.contains(parameters, PARAMETER_KEY_STOP_TIME) == true) {
+      final Long time = WicketUtils.getAsLong(parameters, PARAMETER_KEY_STOP_TIME);
       if (time != null) {
         form.getSearchFilter().setStopTime(new Date(time));
       } else {
@@ -169,12 +183,35 @@ IListPageColumnsCreator<TimesheetDO>
     }
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", UserPrefArea.TIMESHEET_TEMPLATE);
     final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("templates"));
     addContentMenuEntry(menuEntry);
+    {
+      final SubmitLink exportPDFButton = new SubmitLink(ContentMenuEntryPanel.LINK_ID, form) {
+        @Override
+        public void onSubmit()
+        {
+          exportPDF();
+        };
+      };
+      addContentMenuEntry(new ContentMenuEntryPanel(getNewContentMenuChildId(), exportPDFButton, getString("exportAsPdf"))
+      .setTooltip(getString("tooltip.export.pdf")));
+    }
+    {
+      final SubmitLink exportExcelButton = new SubmitLink(ContentMenuEntryPanel.LINK_ID, form) {
+        @Override
+        public void onSubmit()
+        {
+          exportExcel();
+        };
+      };
+      addContentMenuEntry(new ContentMenuEntryPanel(getNewContentMenuChildId(), exportExcelButton, getString("exportAsXls"))
+      .setTooltip(getString("tooltip.export.excel")));
+    }
   }
 
   @Override
@@ -200,7 +237,7 @@ IListPageColumnsCreator<TimesheetDO>
   {
     final List<IColumn<TimesheetDO>> columns = createColumns(this, !isMassUpdateMode(), isMassUpdateMode(), form.getSearchFilter(),
         taskFormatter, taskTree, userFormatter, dateTimeFormatter);
-    dataTable = createDataTable(columns, "startTime", false);
+    dataTable = createDataTable(columns, "startTime", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 
@@ -234,7 +271,7 @@ IListPageColumnsCreator<TimesheetDO>
         }
         final StringBuffer cssStyle = getCssStyle(timesheet.getId(), highlightedRowId, timesheet.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeAppendModifier("style", new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
@@ -250,7 +287,7 @@ IListPageColumnsCreator<TimesheetDO>
               final IModel<TimesheetDO> rowModel)
           {
             final TimesheetDO timesheet = rowModel.getObject();
-            final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(componentId, new PropertyModel<Boolean>(timesheet, "selected"), true);
+            final CheckBoxPanel checkBoxPanel = new CheckBoxPanel(componentId, new PropertyModel<Boolean>(timesheet, "selected"), null);
             item.add(checkBoxPanel);
             cellItemListener.populateItem(item, componentId, rowModel);
             addRowClick(item, isMassUpdateMode);
@@ -280,8 +317,8 @@ IListPageColumnsCreator<TimesheetDO>
       columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(page.getString("fibu.projekt")), getSortable(
           "kost2.projekt.name", sortable), "kost2.projekt.name", cellItemListener));
     }
-    columns.add(new TaskPropertyColumn<TimesheetDO>(page, page.getString("task"), getSortable("task.title", sortable), "task",
-        cellItemListener).withTaskFormatter(taskFormatter).withTaskTree(taskTree));
+    columns.add(new TaskPropertyColumn<TimesheetDO>(page.getString("task"), getSortable("task.title", sortable), "task", cellItemListener)
+        .withTaskFormatter(taskFormatter).withTaskTree(taskTree));
     if (systemInfoCache.isCost2EntriesExists() == true) {
       columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("fibu.kost2"), getSortable("kost2.shortDisplayName",
           sortable), "kost2.shortDisplayName", cellItemListener));
@@ -294,8 +331,8 @@ IListPageColumnsCreator<TimesheetDO>
       public void populateItem(final Item<ICellPopulator<TimesheetDO>> item, final String componentId, final IModel<TimesheetDO> rowModel)
       {
         final TimesheetDO timesheet = rowModel.getObject();
-        final Label label = new Label(componentId, dateTimeFormatter.getFormattedDate(timesheet.getStartTime(), DateFormats
-            .getFormatString(DateFormatType.DAY_OF_WEEK_SHORT)));
+        final Label label = new Label(componentId, dateTimeFormatter.getFormattedDate(timesheet.getStartTime(),
+            DateFormats.getFormatString(DateFormatType.DAY_OF_WEEK_SHORT)));
         cellItemListener.populateItem(item, componentId, rowModel);
         item.add(label);
       }
@@ -406,34 +443,8 @@ IListPageColumnsCreator<TimesheetDO>
         log.error("Property '" + property + "' not supported for selection.");
       }
       form.getSearchFilter().setStopTime(dateHolder.getDate());
-      form.startDatePanel.markModelAsChanged();
-      form.stopDatePanel.markModelAsChanged();
-      refresh();
-    } else if ("startDate".equals(property) == true) {
-      if (selectedValue instanceof Date) {
-        // Date selected.
-        final Date date = (Date) selectedValue;
-        form.getSearchFilter().setStartTime(date);
-      } else if (selectedValue instanceof TimePeriod) {
-        // Period selected.
-        final TimePeriod timePeriod = (TimePeriod) selectedValue;
-        form.getSearchFilter().setTimePeriod(timePeriod);
-        form.stopDatePanel.markModelAsChanged();
-      }
-      form.startDatePanel.markModelAsChanged();
-      refresh();
-    } else if ("stopDate".equals(property) == true) {
-      if (selectedValue instanceof Date) {
-        // Date selected.
-        final Date date = (Date) selectedValue;
-        form.getSearchFilter().setStopTime(date);
-      } else if (selectedValue instanceof TimePeriod) {
-        // Period selected.
-        final TimePeriod timePeriod = (TimePeriod) selectedValue;
-        form.getSearchFilter().setTimePeriod(timePeriod);
-        form.startDatePanel.markModelAsChanged();
-      }
-      form.stopDatePanel.markModelAsChanged();
+      form.startDate.markModelAsChanged();
+      form.stopDate.markModelAsChanged();
       refresh();
     } else {
       super.select(property, selectedValue);
@@ -487,8 +498,8 @@ IListPageColumnsCreator<TimesheetDO>
       final String taskTitle = taskTree.getTaskById(filter.getTaskId()).getTitle();
       buf.append(FileHelper.createSafeFilename(taskTitle, 8)).append("_");
     }
-    buf.append(DateHelper.getDateAsFilenameSuffix(filter.getStartTime())).append("_").append(
-        DateHelper.getDateAsFilenameSuffix(filter.getStopTime())).append(".pdf");
+    buf.append(DateHelper.getDateAsFilenameSuffix(filter.getStartTime())).append("_")
+    .append(DateHelper.getDateAsFilenameSuffix(filter.getStopTime())).append(".pdf");
     final String filename = buf.toString();
 
     // get the sheets from the given Format
@@ -500,8 +511,7 @@ IListPageColumnsCreator<TimesheetDO>
 
     final Integer taskId = filter.getTaskId();
 
-    final Map<String, Object> data = formatter.getData(timeSheets, taskId, ((WebRequest) getRequest()).getHttpServletRequest(),
-        ((WebResponse) getResponse()).getHttpServletResponse(), filter);
+    final Map<String, Object> data = formatter.getData(timeSheets, taskId, getRequest(), getResponse(), filter);
 
     // render the PDF with fop
     final byte[] content = pdfRenderer.render(styleSheet, xmlData, data);
@@ -533,9 +543,9 @@ IListPageColumnsCreator<TimesheetDO>
    */
   @SuppressWarnings("serial")
   @Override
-  protected ISortableDataProvider<TimesheetDO> createSortableDataProvider(final String sortProperty, final boolean ascending)
+  protected ISortableDataProvider<TimesheetDO> createSortableDataProvider(final String sortProperty, final SortOrder sortOrder)
   {
-    return new ListPageSortableDataProvider(sortProperty, ascending) {
+    return new ListPageSortableDataProvider(sortProperty, sortOrder) {
       @Override
       protected Comparator<TimesheetDO> getComparator(final String sortProperty, final boolean ascending)
       {

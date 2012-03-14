@@ -29,8 +29,8 @@ import java.util.Set;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -393,8 +393,8 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
       }
       final WebMarkupContainer rowContainer = new WebMarkupContainer(rowRepeater.newChildId());
       rowRepeater.add(rowContainer);
-      rowContainer.add(new SimpleAttributeModifier("class", (row++ % 2 == 0) ? "even" : "odd"));
-      rowContainer.add(new SimpleAttributeModifier("onclick", "javascript:rowCheckboxClick(this);"));
+      rowContainer.add(AttributeModifier.replace("class", (row++ % 2 == 0) ? "even" : "odd"));
+      rowContainer.add(AttributeModifier.replace("onclick", "javascript:rowCheckboxClick(this);"));
       final String style;
       if (element.isFaulty() == true) {
         style = "color: red;";
@@ -405,7 +405,7 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
       }
       final WebMarkupContainer firstCell = new WebMarkupContainer("firstCell");
       if (style != null) {
-        firstCell.add(new SimpleAttributeModifier("style", style));
+        firstCell.add(AttributeModifier.replace("style", style));
       }
       rowContainer.add(firstCell);
       final CheckBox checkBox = new CheckBox("selectItem", new PropertyModel<Boolean>(element, "selected"));
@@ -480,7 +480,7 @@ public class DatevImportForm extends AbstractForm<DatevImportFilter, DatevImport
     final Component comp;
     cellRepeater.add(comp = new Label(cellRepeater.newChildId(), StringUtils.defaultString(value)));
     if (style != null) {
-      comp.add(new SimpleAttributeModifier("style", style));
+      comp.add(AttributeModifier.replace("style", style));
     }
     return comp;
   }

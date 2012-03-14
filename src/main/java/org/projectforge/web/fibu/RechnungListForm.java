@@ -24,175 +24,30 @@
 package org.projectforge.web.fibu;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.CheckBox;
-import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.Radio;
-import org.apache.wicket.markup.html.form.RadioGroup;
-import org.apache.wicket.markup.html.form.SubmitLink;
-import org.apache.wicket.model.Model;
-import org.apache.wicket.model.PropertyModel;
-import org.projectforge.common.StringHelper;
-import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.fibu.RechnungDao;
 import org.projectforge.fibu.RechnungsStatistik;
-import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.components.TooltipImage;
-import org.projectforge.web.wicket.components.YearListCoiceRenderer;
 
-public class RechnungListForm extends AbstractListForm<RechnungListFilter, RechnungListPage>
+public class RechnungListForm extends AbstractRechnungListForm<RechnungListFilter, RechnungListPage>
 {
   private static final long serialVersionUID = 1657084619520768905L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(RechnungListForm.class);
 
-  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     super.init();
     final RechnungDao rechnungDao = getParentPage().getBaseDao();
-    // DropDownChoice years
-    final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(rechnungDao.getYears(), true);
-    @SuppressWarnings("unchecked")
-    final DropDownChoice yearChoice = new DropDownChoice("year", new PropertyModel(this, "year"), yearListChoiceRenderer.getYears(),
-        yearListChoiceRenderer);
-    yearChoice.setNullValid(false);
-    filterContainer.add(yearChoice);
-    filterContainer.add(new CheckBox("showKostZuweisungStatus", new PropertyModel<Boolean>(getSearchFilter(), "showKostZuweisungStatus")));
-
-    // DropDownChoice months
-    final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-    for (int i = 0; i <= 11; i++) {
-      monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
-    }
-    @SuppressWarnings("unchecked")
-    final DropDownChoice monthChoice = new DropDownChoice("month", new PropertyModel(this, "month"), monthChoiceRenderer.getValues(),
-        monthChoiceRenderer);
-    monthChoice.setNullValid(true);
-    monthChoice.setRequired(false);
-    filterContainer.add(monthChoice);
-
-    // Radio choices:
-    final RadioGroup<String> filterType = new RadioGroup<String>("filterType", new PropertyModel<String>(getSearchFilter(), "listType"));
-    filterType.add(new Radio<String>("all", new Model<String>("all"))); // filter.all
-    filterType.add(new Radio<String>("unbezahlt", new Model<String>("unbezahlt"))); // fibu.rechnung.filter.unbezahlt
-    filterType.add(new Radio<String>("ueberfaellig", new Model<String>("ueberfaellig"))); // fibu.rechnung.filter.ueberfaellig
-    filterType.add(new Radio<String>("deleted", new Model<String>("deleted"))); // deleted
-    filterContainer.add(filterType);
-
-    filterContainer.add(new Label("brutto", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return getString("fibu.common.brutto") + ": " + CurrencyFormatter.format(getStats().getBrutto()) + ", ";
-      }
-    }).setRenderBodyOnly(true));
-    filterContainer.add(new Label("netto", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return getString("fibu.common.netto") + ": " + CurrencyFormatter.format(getStats().getNetto()) + ", ";
-      }
-    }).setRenderBodyOnly(true));
-    filterContainer.add(new Label("offen", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return getString("fibu.rechnung.offen") + ": " + CurrencyFormatter.format(getStats().getOffen()) + ", ";
-      }
-    })); // .setRenderBodyOnly(false): style attribute needed.
-    filterContainer.add(new Label("ueberfaellig", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return getString("fibu.rechnung.filter.ueberfaellig") + ": " + CurrencyFormatter.format(getStats().getUeberfaellig()) + ", ";
-      }
-    })); // .setRenderBodyOnly(false): style attribute needed.
-    filterContainer.add(new Label("skonto", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return getString("fibu.rechnung.skonto") + ": " + CurrencyFormatter.format(getStats().getSkonto()) + ", ";
-      }
-    }).setRenderBodyOnly(true));
-    filterContainer.add(new Label("zahlungszielAverage", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return String.valueOf(getStats().getZahlungszielAverage());
-      }
-    }).setRenderBodyOnly(true));
-    filterContainer.add(new Label("tatsaechlichesZahlungzielAverage", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return String.valueOf(getStats().getTatsaechlichesZahlungzielAverage());
-      }
-    }).setRenderBodyOnly(true));
-    filterContainer.add(new Label("counter", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return String.valueOf(getStats().getCounter());
-      }
-    }).setRenderBodyOnly(true));
-    filterContainer.add(new Label("counterBezahlt", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return String.valueOf(getStats().getCounterBezahlt());
-      }
-    }).setRenderBodyOnly(true));
-    {
-      final SubmitLink exportExcelButton = new SubmitLink("exportExcel") {
-        public void onSubmit()
-        {
-          parentPage.exportExcel();
-        };
-      };
-      filterContainer.add(exportExcelButton);
-      exportExcelButton.add(new TooltipImage("exportExcelImage", getResponse(), WebConstants.IMAGE_EXPORT_EXCEL,
-          getString("tooltip.export.excel")));
-    }
+    init(rechnungDao.getYears());
   }
 
-  RechnungsStatistik getStats()
+  @Override
+  protected RechnungsStatistik getStats()
   {
     return parentPage.getRechnungsStatistik();
   }
 
-  public Integer getYear()
-  {
-    return getSearchFilter().getYear();
-  }
-
-  public void setYear(final Integer year)
-  {
-    if (year == null) {
-      getSearchFilter().setYear(-1);
-    } else {
-      getSearchFilter().setYear(year);
-    }
-  }
-
-  public Integer getMonth()
-  {
-    return getSearchFilter().getMonth();
-  }
-
-  public void setMonth(final Integer month)
-  {
-    if (month == null) {
-      getSearchFilter().setMonth(-1);
-    } else {
-      getSearchFilter().setMonth(month);
-    }
-  }
-
-  public RechnungListForm(RechnungListPage parentPage)
+  public RechnungListForm(final RechnungListPage parentPage)
   {
     super(parentPage);
   }

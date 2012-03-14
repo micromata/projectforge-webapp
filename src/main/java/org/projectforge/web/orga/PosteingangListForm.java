@@ -24,8 +24,6 @@
 package org.projectforge.web.orga;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.CheckBox;
-import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.StringHelper;
@@ -33,7 +31,9 @@ import org.projectforge.orga.PosteingangDao;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
-
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class PosteingangListForm extends AbstractListForm<PosteingangListFilter, PosteingangListPage>
 {
@@ -48,29 +48,34 @@ public class PosteingangListForm extends AbstractListForm<PosteingangListFilter,
   protected void init()
   {
     super.init();
-    // DropDownChoice years
-    final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(posteingangDao.getYears(), true);
-    @SuppressWarnings("unchecked")
-    final DropDownChoice yearChoice = new DropDownChoice("year", new PropertyModel(this, "year"), yearListChoiceRenderer.getYears(),
-        yearListChoiceRenderer);
-    yearChoice.setNullValid(false);
-    filterContainer.add(yearChoice);
-    // DropDownChoice months
-    final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-    for (int i = 0; i <= 11; i++) {
-      monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
-    }
+    gridBuilder.newColumnsPanel();
+    {
+      gridBuilder.newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
+      // DropDownChoice years
+      final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(posteingangDao.getYears(), true);
+      fs.addDropDownChoice(new PropertyModel<Integer>(this, "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer, true)
+      .setNullValid(false);
 
-    @SuppressWarnings("unchecked")
-    final DropDownChoice monthChoice = new DropDownChoice("month", new PropertyModel(this, "month"), monthChoiceRenderer.getValues(),
-        monthChoiceRenderer);
-    monthChoice.setNullValid(true);
-    monthChoice.setRequired(false);
-    filterContainer.add(monthChoice);
-    filterContainer.add(new CheckBox("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted")));
+      // DropDownChoice months
+      final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
+      for (int i = 0; i <= 11; i++) {
+        monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
+      }
+      fs.addDropDownChoice(new PropertyModel<Integer>(this, "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer, true)
+      .setNullValid(true).setRequired(false);
+
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
+    }
+    {
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      addPageSizeFieldset();
+    }
   }
 
-  public PosteingangListForm(PosteingangListPage parentPage)
+  public PosteingangListForm(final PosteingangListPage parentPage)
   {
     super(parentPage);
   }

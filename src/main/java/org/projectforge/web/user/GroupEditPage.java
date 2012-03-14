@@ -28,13 +28,14 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
+import org.projectforge.web.wicket.WicketUtils;
 
 @EditPage(defaultReturnPage = GroupListPage.class)
 public class GroupEditPage extends AbstractEditPage<GroupDO, GroupEditForm, GroupDao>
@@ -55,17 +56,17 @@ public class GroupEditPage extends AbstractEditPage<GroupDO, GroupEditForm, Grou
   {
     super(parameters, "group");
     super.init();
-    final String groupName = parameters.getString(PARAM_GROUP_NAME);
+    final String groupName = WicketUtils.getAsString(parameters, PARAM_GROUP_NAME);
     if (StringUtils.isNotEmpty(groupName) == true) {
       getData().setName(groupName);
     }
   }
 
   @Override
-  public AbstractBasePage onSaveOrUpdate()
+  public AbstractSecuredBasePage onSaveOrUpdate()
   {
     final Set<Integer> assignedUserIds = new HashSet<Integer>();
-    for (Integer userId : form.users.getAssignedValues()) {
+    for (final Integer userId : form.users.getAssignedValues()) {
       assignedUserIds.add(userId);
     }
     groupDao.setAssignedUsers(getData(), assignedUserIds);
@@ -79,7 +80,7 @@ public class GroupEditPage extends AbstractEditPage<GroupDO, GroupEditForm, Grou
   }
 
   @Override
-  protected GroupEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, GroupDO data)
+  protected GroupEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final GroupDO data)
   {
     return new GroupEditForm(this, data);
   }

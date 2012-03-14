@@ -23,7 +23,7 @@
 
 package org.projectforge.web.mobile;
 
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 
@@ -36,7 +36,7 @@ public class ListViewPanel extends Panel
 {
   private static final long serialVersionUID = -5465667274834690310L;
 
-  private RepeatingView repeater;
+  private final RepeatingView repeater;
 
   public ListViewPanel(final String id)
   {
@@ -62,7 +62,7 @@ public class ListViewPanel extends Panel
    */
   public ListViewPanel addMoreEntriesAvailable()
   {
-    add((ListViewItemPanel)new ListViewItemPanel(newChildId(), getString("moreEntriesAvailable")).add(new SimpleAttributeModifier("class",
+    add((ListViewItemPanel)new ListViewItemPanel(newChildId(), getString("moreEntriesAvailable")).add(AttributeModifier.replace("class",
         "moreEntriesAvailable")));
     return this;
   }

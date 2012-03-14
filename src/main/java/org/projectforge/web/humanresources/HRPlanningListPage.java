@@ -29,15 +29,15 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.DateHolder;
 import org.projectforge.humanresources.HRPlanningDao;
 import org.projectforge.humanresources.HRPlanningEntryDO;
@@ -65,7 +65,7 @@ import org.projectforge.web.wicket.WebConstants;
  */
 @ListPage(editPage = HRPlanningEditPage.class)
 public class HRPlanningListPage extends AbstractListPage<HRPlanningListForm, HRPlanningEntryDao, HRPlanningEntryDO> implements
-    ISelectCallerPage
+ISelectCallerPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(HRPlanningListPage.class);
 
@@ -85,10 +85,9 @@ public class HRPlanningListPage extends AbstractListPage<HRPlanningListForm, HRP
 
   private Boolean fullAccess;
 
-  public HRPlanningListPage(PageParameters parameters)
+  public HRPlanningListPage(final PageParameters parameters)
   {
     super(parameters, "hr.planning");
-    this.colspan = 4;
   }
 
   @SuppressWarnings("serial")
@@ -97,12 +96,13 @@ public class HRPlanningListPage extends AbstractListPage<HRPlanningListForm, HRP
   {
     final List<IColumn<HRPlanningEntryDO>> columns = new ArrayList<IColumn<HRPlanningEntryDO>>();
     final CellItemListener<HRPlanningEntryDO> cellItemListener = new CellItemListener<HRPlanningEntryDO>() {
-      public void populateItem(Item<ICellPopulator<HRPlanningEntryDO>> item, String componentId, IModel<HRPlanningEntryDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<HRPlanningEntryDO>> item, final String componentId,
+          final IModel<HRPlanningEntryDO> rowModel)
       {
         final HRPlanningEntryDO entry = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(entry.getPlanning().getId(), entry.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
@@ -125,7 +125,8 @@ public class HRPlanningListPage extends AbstractListPage<HRPlanningListForm, HRP
     columns.add(new CellItemListenerPropertyColumn<HRPlanningEntryDO>(getString("calendar.year"), "planning.week", "planning.week",
         cellItemListener) {
       @Override
-      public void populateItem(Item<ICellPopulator<HRPlanningEntryDO>> item, String componentId, IModel<HRPlanningEntryDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<HRPlanningEntryDO>> item, final String componentId,
+          final IModel<HRPlanningEntryDO> rowModel)
       {
         final HRPlanningEntryDO entry = rowModel.getObject();
         final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy");
@@ -144,7 +145,8 @@ public class HRPlanningListPage extends AbstractListPage<HRPlanningListForm, HRP
     columns.add(new CellItemListenerPropertyColumn<HRPlanningEntryDO>(getString("hr.planning.priority"), "priority", "priority",
         cellItemListener) {
       @Override
-      public void populateItem(Item<ICellPopulator<HRPlanningEntryDO>> item, String componentId, IModel<HRPlanningEntryDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<HRPlanningEntryDO>> item, final String componentId,
+          final IModel<HRPlanningEntryDO> rowModel)
       {
         final String formattedPriority = priorityFormatter.getFormattedPriority(rowModel.getObject().getPriority());
         final Label label = new Label(componentId, new Model<String>(formattedPriority));
@@ -167,7 +169,8 @@ public class HRPlanningListPage extends AbstractListPage<HRPlanningListForm, HRP
     columns.add(new CellItemListenerPropertyColumn<HRPlanningEntryDO>(getString("hr.planning.description"), "description", "description",
         cellItemListener) {
       @Override
-      public void populateItem(Item<ICellPopulator<HRPlanningEntryDO>> item, String componentId, IModel<HRPlanningEntryDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<HRPlanningEntryDO>> item, final String componentId,
+          final IModel<HRPlanningEntryDO> rowModel)
       {
         final HRPlanningEntryDO entry = rowModel.getObject();
         final Label label = new Label(componentId, new Model<String>() {
@@ -189,16 +192,16 @@ public class HRPlanningListPage extends AbstractListPage<HRPlanningListForm, HRP
       }
     });
 
-    dataTable = createDataTable(columns, "planning.week", false);
+    dataTable = createDataTable(columns, "planning.week", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 
   private NumberPropertyColumn<HRPlanningEntryDO> newNumberPropertyColumn(final String i18nKey, final String property,
       final CellItemListener<HRPlanningEntryDO> cellItemListener)
-  {
+      {
     return new NumberPropertyColumn<HRPlanningEntryDO>(getString(i18nKey), property, property, cellItemListener).withTextAlign("center")
         .withDisplayZeroValues(false);
-  }
+      }
 
   /**
    * Get the current date (start date) and preset this date for the edit page.
@@ -219,7 +222,7 @@ public class HRPlanningListPage extends AbstractListPage<HRPlanningListForm, HRP
   }
 
   @Override
-  protected HRPlanningListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected HRPlanningListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new HRPlanningListForm(this);
   }
@@ -230,7 +233,7 @@ public class HRPlanningListPage extends AbstractListPage<HRPlanningListForm, HRP
     if (list != null) {
       return list;
     }
-    list = (List<HRPlanningEntryDO>) hrPlanningEntryDao.getList(form.getSearchFilter());
+    list = hrPlanningEntryDao.getList(form.getSearchFilter());
     return list;
   }
 
@@ -253,12 +256,14 @@ public class HRPlanningListPage extends AbstractListPage<HRPlanningListForm, HRP
     };
   }
 
-  public void cancelSelection(String property)
+  @Override
+  public void cancelSelection(final String property)
   {
     // Do nothing.
   }
 
-  public void select(String property, Object selectedValue)
+  @Override
+  public void select(final String property, final Object selectedValue)
   {
     if ("projektId".equals(property) == true) {
       form.getSearchFilter().setProjektId((Integer) selectedValue);
@@ -279,42 +284,13 @@ public class HRPlanningListPage extends AbstractListPage<HRPlanningListForm, HRP
       }
       form.getSearchFilter().setStopTime(dateHolder.getDate());
       refresh();
-    } else if ("startDate".equals(property) == true) {
-      if (selectedValue instanceof Date) {
-        // Date selected.
-        // startDate automatisch Anfang der gewählten Woche
-        final Date date = (Date) selectedValue;
-        if (date != null) {
-          form.getSearchFilter().setStartTime(date);
-          refresh();
-        }
-      } else if (selectedValue instanceof TimePeriod) {
-        // Period selected.
-        final TimePeriod timePeriod = (TimePeriod) selectedValue;
-        form.getSearchFilter().setTimePeriod(timePeriod);
-        refresh();
-      }
-    } else if ("stopDate".equals(property) == true) {
-      if (selectedValue instanceof Date) {
-        // Date selected.
-        // stopDate automatisch Ende der gewählten Woche
-        final Date date = (Date) selectedValue;
-        if (date != null) {
-          form.getSearchFilter().setStopTime(date);
-          refresh();
-        }
-      } else if (selectedValue instanceof TimePeriod) {
-        // Period selected.
-        final TimePeriod timePeriod = (TimePeriod) selectedValue;
-        form.getSearchFilter().setTimePeriod(timePeriod);
-        refresh();
-      }
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
   }
 
-  public void unselect(String property)
+  @Override
+  public void unselect(final String property)
   {
     if ("projektId".equals(property) == true) {
       form.getSearchFilter().setProjektId(null);
@@ -330,8 +306,8 @@ public class HRPlanningListPage extends AbstractListPage<HRPlanningListForm, HRP
   @Override
   public void refresh()
   {
-    form.getSearchFilter().setStartTime(new DateHolder(form.getSearchFilter().getStartTime()).setBeginOfWeek().getDate());
-    form.getSearchFilter().setStopTime(new DateHolder(form.getSearchFilter().getStopTime()).setEndOfWeek().getDate());
+    //form.getSearchFilter().setStartTime(new DateHolder(form.getSearchFilter().getStartTime()).setBeginOfWeek().getDate());
+    //form.getSearchFilter().setStopTime(new DateHolder(form.getSearchFilter().getStopTime()).setEndOfWeek().getDate());
     form.startDate.markModelAsChanged();
     form.stopDate.markModelAsChanged();
     super.refresh();

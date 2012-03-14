@@ -30,7 +30,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
@@ -52,10 +51,14 @@ import org.projectforge.web.URLHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.FavoritesChoicePanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
 {
@@ -79,7 +82,6 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
   public MebEditForm(final MebEditPage parentPage, final MebEntryDO data)
   {
     super(parentPage, data);
-    this.colspan = 2;
   }
 
   @SuppressWarnings("serial")
@@ -87,112 +89,145 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
   protected void init()
   {
     super.init();
-    add(new Label("date", DateTimeFormatter.instance().getFormattedDateTime(data.getDate())));
-    add(new Label("sender", data.getSender()));
-    PFUserDO owner = data.getOwner();
-    if (Hibernate.isInitialized(owner) == false) {
-      owner = userGroupCache.getUser(owner.getId());
-      data.setOwner(owner);
+    gridBuilder.newGrid16();
+    {
+      // Date
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("date")).setNoLabelFor();
+      fs.add(new DivTextPanel(fs.newChildId(), DateTimeFormatter.instance().getFormattedDateTime(data.getDate())));
     }
-    final UserSelectPanel userSelectPanel = new UserSelectPanel("owner", new PropertyModel<PFUserDO>(data, "owner"), parentPage, "ownerId");
-    userSelectPanel.setRequired(true);
-    add(userSelectPanel);
-    userSelectPanel.init();
-    add(new MaxLengthTextArea("message", new PropertyModel<String>(data, "message")));
-    // DropDownChoice status
-    final LabelValueChoiceRenderer<PostType> statusChoiceRenderer = new LabelValueChoiceRenderer<PostType>(this, MebEntryStatus.values());
-    @SuppressWarnings("unchecked")
-    final DropDownChoice statusChoice = new DropDownChoice("status", new PropertyModel(data, "status"), statusChoiceRenderer.getValues(),
-        statusChoiceRenderer);
-    statusChoice.setNullValid(false);
-    statusChoice.setRequired(true);
-    add(statusChoice);
-    final SingleButtonPanel createTimesheetButton = new SingleButtonPanel("createTimesheet", new Button("button", new Model<String>(
-        getString("timesheet.title.add"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.createTimesheet();
+    {
+      // Owner
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("meb.owner"));
+      PFUserDO owner = data.getOwner();
+      if (Hibernate.isInitialized(owner) == false) {
+        owner = userGroupCache.getUser(owner.getId());
+        data.setOwner(owner);
       }
-    });
-    add(createTimesheetButton);
-    // DropDownChoice favorites
-    jiraProjectChoice = new FavoritesChoicePanel<JiraProject, JiraProject>("jiraProject", UserPrefArea.JIRA_PROJECT) {
-      @Override
-      protected void select(final JiraProject favorite)
-      {
-        if (StringUtils.isNotEmpty(this.selected) == true) {
-          parentPage.putUserPrefEntry(USER_PREF_KEY_JIRA_PROJECT, this.selected, true);
+      final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "owner"), parentPage,
+          "ownerId");
+      userSelectPanel.setRequired(true);
+      fs.add(userSelectPanel);
+      userSelectPanel.init();
+    }
+    {
+      // Owner
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("meb.sender")).setNoLabelFor();
+      fs.add(new DivTextPanel(fs.newChildId(), data.getSender()));
+    }
+    {
+      // DropDownChoice status
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("status"));
+      final LabelValueChoiceRenderer<PostType> statusChoiceRenderer = new LabelValueChoiceRenderer<PostType>(this, MebEntryStatus.values());
+      final DropDownChoice<PostType> statusChoice = new DropDownChoice<PostType>(fs.getDropDownChoiceId(), new PropertyModel<PostType>(
+          data, "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
+      statusChoice.setNullValid(false);
+      statusChoice.setRequired(true);
+      fs.add(statusChoice);
+    }
+    {
+      // Message
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("meb.message"));
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "message")));
+    }
+    {
+      // Actions
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("meb.actions"), true).setNoLabelFor();
+      fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("createTimesheet")) {
+        @Override
+        public final void onSubmit()
+        {
+          parentPage.createTimesheet();
         }
-      }
+      }, getString("timesheet.title.add"), SingleButtonPanel.GREY));
 
-      @Override
-      protected JiraProject getCurrentObject()
-      {
-        return null;
-      }
-
-      @Override
-      protected JiraProject newFavoriteInstance(final JiraProject currentObject)
-      {
-        return new JiraProject();
-      }
-    };
-    jiraProjectChoice.setClearSelectionAfterSelection(false).setNullKey("jira.chooseProject");
-    add(jiraProjectChoice);
-    final DropDownChoice<String> choice = jiraProjectChoice.init();
-    choice.setNullValid(false);
-    List<JiraIssueType> issueTypes;
-    if (jiraConfig != null && jiraConfig.getIssueTypes() != null) {
-      issueTypes = jiraConfig.getIssueTypes();
-    } else {
-      issueTypes = new ArrayList<JiraIssueType>();
-    }
-    // DropDownChoice issueType
-    final LabelValueChoiceRenderer<JiraIssueType> typeChoiceRenderer = new LabelValueChoiceRenderer<JiraIssueType>(issueTypes);
-    @SuppressWarnings("unchecked")
-    final DropDownChoice typeChoice = new DropDownChoice("issueType", new PropertyModel(this, "jiraIssueType"), typeChoiceRenderer
-        .getValues(), typeChoiceRenderer) {
-      @Override
-      protected boolean wantOnSelectionChangedNotifications()
-      {
-        return true;
-      }
-
-      @Override
-      protected void onSelectionChanged(final Object newSelection)
-      {
-        if (newSelection != null && newSelection instanceof Integer) {
-          parentPage.putUserPrefEntry(USER_PREF_KEY_JIRA_ISSUE_TYPE, newSelection, true);
-          // refresh();
+      // DropDownChoice favorites
+      jiraProjectChoice = new FavoritesChoicePanel<JiraProject, JiraProject>(fs.newChildId(), UserPrefArea.JIRA_PROJECT) {
+        @Override
+        protected void select(final JiraProject favorite)
+        {
+          if (StringUtils.isNotEmpty(this.selected) == true) {
+            parentPage.putUserPrefEntry(USER_PREF_KEY_JIRA_PROJECT, this.selected, true);
+          }
         }
-      }
-    };
-    final Integer recentJiraIssueType = (Integer) parentPage.getUserPrefEntry(Integer.class, USER_PREF_KEY_JIRA_ISSUE_TYPE);
-    if (recentJiraIssueType != null) {
-      this.jiraIssueType = recentJiraIssueType;
-    }
-    typeChoice.setNullValid(false);
-    add(typeChoice);
 
-    final AjaxButton createJiraIssueButton = new AjaxButton("createJiraIssue", new Model<String>(getString("meb.actions.createJIRAIssue"))) {
-      @Override
-      public void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
-      {
-        // ...create result page, get the url path to it...
-        target.appendJavascript("window.open('" + buildCreateJiraIssueUrl() + "','newWindow');");
+        @Override
+        protected JiraProject getCurrentObject()
+        {
+          return null;
+        }
+
+        @Override
+        protected JiraProject newFavoriteInstance(final JiraProject currentObject)
+        {
+          return new JiraProject();
+        }
+      };
+      jiraProjectChoice.setClearSelectionAfterSelection(false).setNullKey("jira.chooseProject");
+      fs.add(jiraProjectChoice);
+      final DropDownChoice<String> choice = jiraProjectChoice.init();
+      choice.setNullValid(false);
+      List<JiraIssueType> issueTypes;
+      if (jiraConfig != null && jiraConfig.getIssueTypes() != null) {
+        issueTypes = jiraConfig.getIssueTypes();
+      } else {
+        issueTypes = new ArrayList<JiraIssueType>();
       }
-    };
-    add(createJiraIssueButton);
-    if (jiraConfig == null || StringUtils.isEmpty(jiraConfig.getCreateIssueUrl()) == true) {
-      jiraProjectChoice.setVisible(false);
-      typeChoice.setVisible(false);
-      // jiraCreateIssueLink.setVisible(false);
-      createJiraIssueButton.setVisible(false);
-    } else {
-      final String recentJiraProjectFavorite = (String) parentPage.getUserPrefEntry(String.class, USER_PREF_KEY_JIRA_PROJECT);
-      if (recentJiraProjectFavorite != null) {
-        jiraProjectChoice.setSelected(recentJiraProjectFavorite);
+      // DropDownChoice issueType
+      final LabelValueChoiceRenderer<JiraIssueType> typeChoiceRenderer = new LabelValueChoiceRenderer<JiraIssueType>(issueTypes);
+      @SuppressWarnings({ "rawtypes", "unchecked"})
+      final DropDownChoice typeChoice = new DropDownChoice(fs.getDropDownChoiceId(), new PropertyModel(this, "jiraIssueType"),
+          typeChoiceRenderer.getValues(), typeChoiceRenderer) {
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
+
+        @Override
+        protected void onSelectionChanged(final Object newSelection)
+        {
+          if (newSelection != null && newSelection instanceof Integer) {
+            parentPage.putUserPrefEntry(USER_PREF_KEY_JIRA_ISSUE_TYPE, newSelection, true);
+            // refresh();
+          }
+        }
+      };
+      final Integer recentJiraIssueType = (Integer) parentPage.getUserPrefEntry(Integer.class, USER_PREF_KEY_JIRA_ISSUE_TYPE);
+      if (recentJiraIssueType != null) {
+        this.jiraIssueType = recentJiraIssueType;
+      }
+      typeChoice.setNullValid(false);
+      fs.add(typeChoice);
+
+      final AjaxButton createJiraIssueButton = new AjaxButton(SingleButtonPanel.WICKET_ID, new Model<String>("createJIRAIssue")) {
+        @Override
+        public void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+        {
+          // ...create result page, get the url path to it...
+          target.appendJavaScript("window.open('" + buildCreateJiraIssueUrl() + "','newWindow');");
+        }
+
+        /**
+         * @see org.apache.wicket.ajax.markup.html.form.AjaxButton#onError(org.apache.wicket.ajax.AjaxRequestTarget,
+         *      org.apache.wicket.markup.html.form.Form)
+         */
+        @Override
+        protected void onError(final AjaxRequestTarget target, final Form< ? > form)
+        {
+        }
+      };
+      WicketUtils.addTooltip(createJiraIssueButton, getString("tooltip.popups.mustBeAllowed"));
+      fs.add(new SingleButtonPanel(fs.newChildId(), createJiraIssueButton, getString("meb.actions.createJIRAIssue"), SingleButtonPanel.GREY));
+      if (jiraConfig == null || StringUtils.isEmpty(jiraConfig.getCreateIssueUrl()) == true) {
+        jiraProjectChoice.setVisible(false);
+        typeChoice.setVisible(false);
+        // jiraCreateIssueLink.setVisible(false);
+        createJiraIssueButton.setVisible(false);
+      } else {
+        final String recentJiraProjectFavorite = (String) parentPage.getUserPrefEntry(String.class, USER_PREF_KEY_JIRA_PROJECT);
+        if (recentJiraProjectFavorite != null) {
+          jiraProjectChoice.setSelected(recentJiraProjectFavorite);
+        }
       }
     }
   }
@@ -204,14 +239,14 @@ public class MebEditForm extends AbstractEditForm<MebEntryDO, MebEditPage>
     }
     final JiraProject jiraProject = jiraProjectChoice.getCurrentFavorite();
     return jiraConfig.getCreateIssueUrl()
-    + "?pid="
-    + (jiraProject != null ? jiraProject.getPid() : null)
-    + "&issuetype="
-    + (jiraIssueType != null ? jiraIssueType : 3)
-    + "&priority=4&reporter="
-    + URLHelper.encode(getUser().getJiraUsernameOrUsername())
-    + "&description="
-    + URLHelper.encode(getData().getMessage());
+        + "?pid="
+        + (jiraProject != null ? jiraProject.getPid() : null)
+        + "&issuetype="
+        + (jiraIssueType != null ? jiraIssueType : 3)
+        + "&priority=4&reporter="
+        + URLHelper.encode(getUser().getJiraUsernameOrUsername())
+        + "&description="
+        + URLHelper.encode(getData().getMessage());
   }
 
   public Integer getJiraIssueType()

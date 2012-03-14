@@ -40,7 +40,6 @@ import org.projectforge.web.address.AddressEditPage;
 import org.projectforge.web.address.AddressListPage;
 import org.projectforge.web.address.AddressMobileEditPage;
 import org.projectforge.web.address.AddressMobileListPage;
-import org.projectforge.web.address.AddressMobileViewPage;
 import org.projectforge.web.address.AddressViewPage;
 import org.projectforge.web.address.PhoneCallPage;
 import org.projectforge.web.address.SendSmsPage;
@@ -52,7 +51,6 @@ import org.projectforge.web.book.BookListPage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.core.ConfigurationListPage;
 import org.projectforge.web.core.SearchPage;
-import org.projectforge.web.core.SpaceListPage;
 import org.projectforge.web.doc.DocumentationPage;
 import org.projectforge.web.doc.TutorialPage;
 import org.projectforge.web.fibu.AccountingRecordEditPage;
@@ -83,8 +81,6 @@ import org.projectforge.web.fibu.RechnungListPage;
 import org.projectforge.web.fibu.ReportObjectivesPage;
 import org.projectforge.web.gantt.GanttChartEditPage;
 import org.projectforge.web.gantt.GanttChartListPage;
-import org.projectforge.web.gwiki.GWikiContainerPage;
-import org.projectforge.web.gwiki.GWikiPage;
 import org.projectforge.web.humanresources.HRListPage;
 import org.projectforge.web.humanresources.HRPlanningEditPage;
 import org.projectforge.web.humanresources.HRPlanningListPage;
@@ -319,7 +315,6 @@ public class WebRegistry
     addMountPage("doc", DocumentationPage.class);
     addMountPage("error", ErrorPage.class);
     addMountPage("feedback", FeedbackPage.class);
-    addMountPage("gwikiContainer", GWikiContainerPage.class);
     addMountPage(BOOKMARK_LOGIN, LoginPage.class);
     addMountPage("myAccount", MyAccountEditPage.class);
     addMountPage("personalStatistics", PersonalStatisticsPage.class);
@@ -328,17 +323,14 @@ public class WebRegistry
     addMountPage("search", SearchPage.class);
     addMountPage("sendSms", SendSmsPage.class);
     addMountPage("setup", SetupPage.class);
-    addMountPage("space", SpaceListPage.class);
     addMountPage("systemStatistics", SystemStatisticsPage.class);
     addMountPage("systemUpdate", SystemUpdatePage.class);
     addMountPage("taskTree", TaskTreePage.class);
     addMountPage("tutorial", TutorialPage.class);
-    addMountPage("gwikiPage", GWikiPage.class);
 
     addMountPages(BOOKMARK_MOBILE_PREFIX + "address", AddressMobileListPage.class, AddressMobileEditPage.class);
 
     addMountPage(BOOKMARK_MOBILE_LOGIN, LoginMobilePage.class);
     addMountPage(BOOKMARK_MOBILE_PREFIX + "menu", MenuMobilePage.class);
-    addMountPage(BOOKMARK_MOBILE_PREFIX + "addressView", AddressMobileViewPage.class);
   }
 }

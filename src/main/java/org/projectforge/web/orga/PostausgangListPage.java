@@ -27,12 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.orga.PostausgangDO;
 import org.projectforge.orga.PostausgangDao;
@@ -53,7 +54,7 @@ public class PostausgangListPage extends AbstractListPage<PostausgangListForm, P
   @SpringBean(name = "postausgangDao")
   private PostausgangDao postausgangDao;
 
-  public PostausgangListPage(PageParameters parameters)
+  public PostausgangListPage(final PageParameters parameters)
   {
     super(parameters, "orga.postausgang");
   }
@@ -62,32 +63,33 @@ public class PostausgangListPage extends AbstractListPage<PostausgangListForm, P
   @Override
   protected void init()
   {
-    List<IColumn<PostausgangDO>> columns = new ArrayList<IColumn<PostausgangDO>>();
+    final List<IColumn<PostausgangDO>> columns = new ArrayList<IColumn<PostausgangDO>>();
 
-    CellItemListener<PostausgangDO> cellItemListener = new CellItemListener<PostausgangDO>() {
-      public void populateItem(Item<ICellPopulator<PostausgangDO>> item, String componentId, IModel<PostausgangDO> rowModel)
+    final CellItemListener<PostausgangDO> cellItemListener = new CellItemListener<PostausgangDO>() {
+      public void populateItem(final Item<ICellPopulator<PostausgangDO>> item, final String componentId, final IModel<PostausgangDO> rowModel)
       {
         final PostausgangDO postausgang = rowModel.getObject();
-        String cellStyle = "";
-        if (postausgang.isDeleted() == true) {
-          cellStyle = "text-decoration: line-through;";
+        final StringBuffer cssStyle = getCssStyle(postausgang.getId(), postausgang.isDeleted());
+        if (cssStyle.length() > 0) {
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
-        item.add(new AttributeModifier("style", true, new Model<String>(cellStyle)));
       }
     };
     columns
-        .add(new CellItemListenerPropertyColumn<PostausgangDO>(new Model<String>(getString("date")), "datum", "datum", cellItemListener) {
-          @SuppressWarnings("unchecked")
-          @Override
-          public void populateItem(final Item item, final String componentId, final IModel rowModel)
-          {
-            PostausgangDO postausgang = (PostausgangDO) rowModel.getObject();
-            item.add(new ListSelectActionPanel(componentId, rowModel, PostausgangEditPage.class, postausgang.getId(),
-                PostausgangListPage.this, DateTimeFormatter.instance().getFormattedDate(postausgang.getDatum())));
-            cellItemListener.populateItem(item, componentId, rowModel);
-            addRowClick(item);
-          }
-        });
+    .add(new CellItemListenerPropertyColumn<PostausgangDO>(new Model<String>(getString("date")), "datum", "datum", cellItemListener) {
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item, java.lang.String, org.apache.wicket.model.IModel)
+       */
+      @Override
+      public void populateItem(final Item<ICellPopulator<PostausgangDO>> item, final String componentId, final IModel<PostausgangDO> rowModel)
+      {
+        final PostausgangDO postausgang = rowModel.getObject();
+        item.add(new ListSelectActionPanel(componentId, rowModel, PostausgangEditPage.class, postausgang.getId(),
+            PostausgangListPage.this, DateTimeFormatter.instance().getFormattedDate(postausgang.getDatum())));
+        cellItemListener.populateItem(item, componentId, rowModel);
+        addRowClick(item);
+      }
+    });
     columns.add(new CellItemListenerPropertyColumn<PostausgangDO>(new Model<String>(getString("orga.postausgang.empfaenger")),
         "empfaenger", "empfaenger", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<PostausgangDO>(new Model<String>(getString("orga.postausgang.person")), "person",
@@ -98,12 +100,12 @@ public class PostausgangListPage extends AbstractListPage<PostausgangListForm, P
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<PostausgangDO>(new Model<String>(getString("orga.post.type")), "type", "type",
         cellItemListener));
-    dataTable = createDataTable(columns, "datum", false);
+    dataTable = createDataTable(columns, "datum", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 
   @Override
-  protected PostausgangListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected PostausgangListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new PostausgangListForm(this);
   }
@@ -115,7 +117,7 @@ public class PostausgangListPage extends AbstractListPage<PostausgangListForm, P
   }
 
   @Override
-  protected IModel<PostausgangDO> getModel(PostausgangDO object)
+  protected IModel<PostausgangDO> getModel(final PostausgangDO object)
   {
     return new DetachableDOModel<PostausgangDO, PostausgangDao>(object, getBaseDao());
   }

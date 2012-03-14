@@ -28,14 +28,16 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.export.ContentProvider;
@@ -58,7 +60,7 @@ import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
-import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = Kost2EditPage.class)
 public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kost2DO> implements IListPageColumnsCreator<Kost2DO>
@@ -93,23 +95,26 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
   public List<IColumn<Kost2DO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<Kost2DO>> columns = new ArrayList<IColumn<Kost2DO>>();
-    CellItemListener<Kost2DO> cellItemListener = new CellItemListener<Kost2DO>() {
-      public void populateItem(Item<ICellPopulator<Kost2DO>> item, String componentId, IModel<Kost2DO> rowModel)
+    final CellItemListener<Kost2DO> cellItemListener = new CellItemListener<Kost2DO>() {
+      public void populateItem(final Item<ICellPopulator<Kost2DO>> item, final String componentId, final IModel<Kost2DO> rowModel)
       {
         final Kost2DO kost2 = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(kost2.getId(), kost2.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("fibu.kost2")), getSortable("formattedNumber",
         sortable), "formattedNumber", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<Kost2DO>> item, final String componentId, final IModel<Kost2DO> rowModel)
       {
-        final Kost2DO kost2 = (Kost2DO) rowModel.getObject();
+        final Kost2DO kost2 = rowModel.getObject();
         if (isSelectMode() == false) {
           item.add(new ListSelectActionPanel(componentId, rowModel, Kost2EditPage.class, kost2.getId(), returnToPage, String.valueOf(kost2
               .getFormattedNumber())));
@@ -127,12 +132,12 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
     columns.add(new CellItemListenerPropertyColumn<Kost2DO>(new Model<String>(getString("fibu.fakturiert")), getSortable(
         "kost2Art.fakturiert", sortable), "kost2Art.fakturiert", cellItemListener) {
       @Override
-      public void populateItem(Item<ICellPopulator<Kost2DO>> item, String componentId, IModel<Kost2DO> rowModel)
+      public void populateItem(final Item<ICellPopulator<Kost2DO>> item, final String componentId, final IModel<Kost2DO> rowModel)
       {
-        Kost2DO kost2 = (Kost2DO) rowModel.getObject();
-        StringBuffer buf = new StringBuffer();
+        final Kost2DO kost2 = rowModel.getObject();
+        final StringBuffer buf = new StringBuffer();
         if (kost2.getKost2Art() != null && kost2.getKost2Art().isFakturiert() == true) {
-          htmlHelper.appendImageTag(new WicketLocalizerAndUrlBuilder(getResponse()), buf, "/images/accept.png", null);
+          htmlHelper.appendImageTag(getResponse(), buf, "/images/accept.png", null);
         }
         final Label label = new Label(componentId, buf.toString());
         label.setEscapeModelStrings(false);
@@ -155,11 +160,25 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
     return columns;
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "formattedNumber", true);
+    dataTable = createDataTable(createColumns(this, true), "formattedNumber", SortOrder.ASCENDING);
     form.add(dataTable);
+    {
+      // Excel export
+      final SubmitLink excelExportLink = new SubmitLink(ContentMenuEntryPanel.LINK_ID, form) {
+        @Override
+        public void onSubmit()
+        {
+          exportExcel();
+        }
+      };
+      final ContentMenuEntryPanel excelExportButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), excelExportLink,
+          getString("exportAsXls")).setTooltip(getString("tooltip.export.excel"));
+      addContentMenuEntry(excelExportButton);
+    }
   }
 
   private enum Col
@@ -183,7 +202,7 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
     xls.setContentProvider(contentProvider);
     final ExportSheet sheet = xls.addSheet(PFUserContext.getLocalizedString("fibu.kost2.kost2s"));
     final ExportColumn[] cols = new ExportColumn[] { //
-    new I18nExportColumn(Col.KOST, "fibu.kost2", XlsContentProvider.LENGTH_KOSTENTRAEGER),
+        new I18nExportColumn(Col.KOST, "fibu.kost2", XlsContentProvider.LENGTH_KOSTENTRAEGER),
         new I18nExportColumn(Col.ART, "fibu.kost2.art", XlsContentProvider.LENGTH_STD),
         new I18nExportColumn(Col.FAKTURIERT, "fibu.fakturiert", 5),
         new I18nExportColumn(Col.PROJEKT, "fibu.projekt", XlsContentProvider.LENGTH_STD),
@@ -207,7 +226,7 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
   }
 
   @Override
-  protected Kost2ListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected Kost2ListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new Kost2ListForm(this);
   }
@@ -219,7 +238,7 @@ public class Kost2ListPage extends AbstractListPage<Kost2ListForm, Kost2Dao, Kos
   }
 
   @Override
-  protected IModel<Kost2DO> getModel(Kost2DO object)
+  protected IModel<Kost2DO> getModel(final Kost2DO object)
   {
     return new DetachableDOModel<Kost2DO, Kost2Dao>(object, getBaseDao());
   }

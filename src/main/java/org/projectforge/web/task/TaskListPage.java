@@ -29,9 +29,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -39,6 +40,7 @@ import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
@@ -62,7 +64,6 @@ import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPrefListPage;
 import org.projectforge.web.user.UserPropertyColumn;
 import org.projectforge.web.wicket.AbstractListPage;
-import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DatePropertyColumn;
@@ -70,7 +71,6 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
-import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.ConsumptionBarPanel;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
@@ -152,8 +152,8 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
     BigDecimal usage = (node != null) ? new BigDecimal(node.getDuration(taskTree, true)).divide(DateHelper.SECONDS_PER_WORKING_DAY, 2,
         BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO;
     usage = NumberHelper.setDefaultScale(usage);
-    final ConsumptionBarPanel panel = new ConsumptionBarPanel(componentId, usage, maxDays, taskId, finished, parentComponent
-        .getString("projectmanagement.personDays.short"), selectMode == false);
+    final ConsumptionBarPanel panel = new ConsumptionBarPanel(componentId, usage, maxDays, taskId, finished,
+        parentComponent.getString("projectmanagement.personDays.short"), selectMode == false);
     return panel;
   }
 
@@ -236,7 +236,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
         final TaskDO task = rowModel.getObject();
         final String cssStyle = TaskListPage.getCssStyle(task, (Integer) highlightedRowId);
         if (cssStyle != null) {
-          item.add(new AttributeAppendModifier("style", new Model<String>(cssStyle)));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle)));
         }
       }
     };
@@ -248,7 +248,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
       {
         final TaskDO task = rowModel.getObject();
         final StringBuffer buf = new StringBuffer();
-        taskFormatter.appendFormattedTask(buf, new WicketLocalizerAndUrlBuilder(getResponse()), task, false, true, false);
+        taskFormatter.appendFormattedTask(getResponse(), buf, task, true, false);
         final Label formattedTaskLabel = new Label(ListSelectActionPanel.LABEL_ID, buf.toString());
         formattedTaskLabel.setEscapeModelStrings(false);
         if (isSelectMode() == false) {
@@ -350,7 +350,7 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "title", false);
+    dataTable = createDataTable(createColumns(this, true), "title", SortOrder.DESCENDING);
     form.add(dataTable);
     final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", UserPrefArea.TASK_FAVORITE);
     final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("favorites"));
@@ -365,7 +365,6 @@ public class TaskListPage extends AbstractListPage<TaskListForm, TaskDao, TaskDO
       setResponsePage(new TaskTreePage(this, getPageParameters()));
     }
   }
-
 
   ISelectCallerPage getCaller()
   {

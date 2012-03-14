@@ -23,11 +23,12 @@
 
 package org.projectforge.web.task;
 
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.ComponentTag;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.StringHelper;
 import org.projectforge.task.TaskDao;
@@ -80,8 +81,8 @@ public class TaskTreePage extends AbstractSecuredPage
   {
     super(parameters);
     taskTreeTablePanel = new TaskTreeTablePanel("taskTree", this);
-    if (parameters.containsKey(AbstractListPage.PARAMETER_HIGHLIGHTED_ROW) == true) {
-      taskTreeTablePanel.setHighlightedRowId(parameters.getAsInteger(AbstractListPage.PARAMETER_HIGHLIGHTED_ROW));
+    if (WicketUtils.contains(parameters, AbstractListPage.PARAMETER_HIGHLIGHTED_ROW) == true) {
+      taskTreeTablePanel.setHighlightedRowId(WicketUtils.getAsInteger(parameters, AbstractListPage.PARAMETER_HIGHLIGHTED_ROW));
     }
     init();
   }
@@ -106,6 +107,13 @@ public class TaskTreePage extends AbstractSecuredPage
     init();
   }
 
+  @Override
+  public void renderHead(final IHeaderResponse response)
+  {
+    super.renderHead(response);
+    response.renderCSSReference("styles/table.css");
+  }
+
   public void setHighlightedRowId(final Integer highlightedRowId)
   {
     taskTreeTablePanel.setHighlightedRowId(highlightedRowId);
@@ -125,8 +133,10 @@ public class TaskTreePage extends AbstractSecuredPage
           setResponsePage(editPage);
         };
       }, getString("add"));
-      menuEntry.setAccessKey(WebConstants.ACCESS_KEY_ADD).setTooltip(getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP_TITLE), getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP));
-      contentMenuEntries.add(menuEntry);
+      menuEntry.setAccessKey(WebConstants.ACCESS_KEY_ADD).setTooltip(getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP_TITLE),
+          getString(WebConstants.ACCESS_KEY_ADD_TOOLTIP));
+      addContentMenuEntry(menuEntry);
+
       final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", UserPrefArea.TASK_FAVORITE);
       menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("favorites"));
       addContentMenuEntry(menuEntry);
@@ -141,7 +151,7 @@ public class TaskTreePage extends AbstractSecuredPage
             setResponsePage(wizardPage);
           };
         }, getString("wizard"));
-        contentMenuEntries.add(menuEntry);
+        addContentMenuEntry(menuEntry);
       }
       dropDownMenu.setVisible(true);
       new AbstractReindexTopRightMenu(this, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
@@ -162,11 +172,11 @@ public class TaskTreePage extends AbstractSecuredPage
         }
       };
     }
-    body.add(taskTreeTablePanel);
-    taskTreeTablePanel.init();
     form = new TaskTreeForm(this);
     body.add(form);
     form.init();
+    form.add(taskTreeTablePanel);
+    taskTreeTablePanel.init();
     body.add(new FeedbackPanel("feedback").setOutputMarkupId(true));
   }
 

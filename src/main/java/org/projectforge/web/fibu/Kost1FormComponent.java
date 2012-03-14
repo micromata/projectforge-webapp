@@ -47,7 +47,7 @@ public class Kost1FormComponent extends PFAutoCompleteTextField<Kost1DO>
   @SpringBean(name = "kost1Dao")
   private Kost1Dao kost1Dao;
 
-  class Kost1Converter implements IConverter
+  class Kost1Converter implements IConverter<Kost1DO>
   {
     private static final long serialVersionUID = 5770334618044073827L;
 
@@ -57,24 +57,24 @@ public class Kost1FormComponent extends PFAutoCompleteTextField<Kost1DO>
       return kost1Dao.getKost1(value);
     }
 
-    public String convertToString(final Object value, final Locale locale)
+    public String convertToString(final Kost1DO value, final Locale locale)
     {
       if (value == null) {
         return "";
       }
-      return ((Kost1DO) value).getFormattedNumber();
+      return value.getFormattedNumber();
     }
   }
 
   @SuppressWarnings("serial")
   public Kost1FormComponent(final String id, final IModel<Kost1DO> model, final boolean required)
   {
-    super(id, model);
+    super(id,  model);
     if (required == true) {
       setRequired(true);
       add(new AbstractValidator<Kost1DO>() {
         @Override
-        protected void onValidate(IValidatable<Kost1DO> validatable)
+        protected void onValidate(final IValidatable<Kost1DO> validatable)
         {
           final Kost1DO value = validatable.getValue();
           if (value == null) {
@@ -99,6 +99,7 @@ public class Kost1FormComponent extends PFAutoCompleteTextField<Kost1DO>
     enableTooltips();
   }
 
+  @Override
   protected String getTooltip()
   {
     final Kost1DO kost1 = getModelObject();
@@ -109,7 +110,7 @@ public class Kost1FormComponent extends PFAutoCompleteTextField<Kost1DO>
   }
 
   @Override
-  protected List<Kost1DO> getChoices(String input)
+  protected List<Kost1DO> getChoices(final String input)
   {
     final KostFilter filter = new KostFilter();
     filter.setSearchString(input);
@@ -125,7 +126,7 @@ public class Kost1FormComponent extends PFAutoCompleteTextField<Kost1DO>
   }
 
   @Override
-  protected String formatValue(Kost1DO value)
+  protected String formatValue(final Kost1DO value)
   {
     if (value == null) {
       return "";
@@ -134,7 +135,7 @@ public class Kost1FormComponent extends PFAutoCompleteTextField<Kost1DO>
   }
 
   @Override
-  protected String formatLabel(Kost1DO value)
+  protected String formatLabel(final Kost1DO value)
   {
     if (value == null) {
       return "";
@@ -142,8 +143,9 @@ public class Kost1FormComponent extends PFAutoCompleteTextField<Kost1DO>
     return value.getFormattedNumber() + " " + value.getDescription();
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked"})
   @Override
-  public IConverter getConverter(Class< ? > type)
+  public IConverter getConverter(final Class type)
   {
     return new Kost1Converter();
   }

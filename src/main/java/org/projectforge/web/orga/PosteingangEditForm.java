@@ -23,11 +23,29 @@
 
 package org.projectforge.web.orga;
 
+import java.util.Date;
+import java.util.List;
+
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.ValidationError;
+import org.apache.wicket.validation.validator.AbstractValidator;
+import org.projectforge.calendar.DayHolder;
+import org.projectforge.orga.PostType;
 import org.projectforge.orga.PosteingangDO;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.layout.LayoutContext;
-
+import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
+import org.projectforge.web.wicket.components.DatePanel;
+import org.projectforge.web.wicket.components.DatePanelSettings;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.components.MaxLengthTextArea;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class PosteingangEditForm extends AbstractEditForm<PosteingangDO, PosteingangEditPage>
 {
@@ -35,19 +53,103 @@ public class PosteingangEditForm extends AbstractEditForm<PosteingangDO, Postein
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PosteingangEditForm.class);
 
-  protected PosteingangFormRenderer renderer;
-
-  public PosteingangEditForm(PosteingangEditPage parentPage, PosteingangDO data)
+  public PosteingangEditForm(final PosteingangEditPage parentPage, final PosteingangDO data)
   {
     super(parentPage, data);
-    renderer = new PosteingangFormRenderer(this, parentPage, new LayoutContext(this), parentPage.getBaseDao(), data);
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     super.init();
-    renderer.add();
+    gridBuilder.newGrid16();
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // Date
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("date"));
+      final DatePanel datumPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "datum"), DatePanelSettings.get()
+          .withTargetType(java.sql.Date.class).withSelectProperty("datum"));
+      datumPanel.setRequired(true);
+      datumPanel.add(new AbstractValidator<Date>() {
+        @Override
+        protected void onValidate(final IValidatable<Date> validatable)
+        {
+          final Date value = validatable.getValue();
+          if (value == null) {
+            return;
+          }
+          final DayHolder today = new DayHolder();
+          final DayHolder date = new DayHolder(value);
+          if (today.before(date) == true) { // No dates in the future accepted.
+            validatable.error(new ValidationError().addMessageKey("error.dateInFuture"));
+          }
+        }
+      });
+      fs.add(datumPanel);
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // Status drop down box:
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("orga.post.type"));
+      final LabelValueChoiceRenderer<PostType> typeChoiceRenderer = new LabelValueChoiceRenderer<PostType>(fs, PostType.values());
+      final DropDownChoice<PostType> typeChoice = new DropDownChoice<PostType>(fs.getDropDownChoiceId(), new PropertyModel<PostType>(data,
+          "type"), typeChoiceRenderer.getValues(), typeChoiceRenderer);
+      typeChoice.setNullValid(false);
+      typeChoice.setRequired(true);
+      fs.add(typeChoice);
+    }
+    gridBuilder.newBlockPanel();
+    {
+      // Sender
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("orga.posteingang.absender"));
+      final PFAutoCompleteMaxLengthTextField absenderTextField = new PFAutoCompleteMaxLengthTextField(InputPanel.WICKET_ID,
+          new PropertyModel<String>(data, "absender")) {
+        @Override
+        protected List<String> getChoices(final String input)
+        {
+          return getBaseDao().getAutocompletion("absender", input);
+        }
+      };
+      absenderTextField.withMatchContains(true).withMinChars(2).withFocus(true);
+      absenderTextField.setRequired(true);
+      WicketUtils.setStrong(absenderTextField);
+      fs.add(absenderTextField);
+    }
+    {
+      // Person
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("orga.posteingang.person"));
+      final PFAutoCompleteMaxLengthTextField personTextField = new PFAutoCompleteMaxLengthTextField(InputPanel.WICKET_ID,
+          new PropertyModel<String>(data, "person")) {
+        @Override
+        protected List<String> getChoices(final String input)
+        {
+          return getBaseDao().getAutocompletion("person", input);
+        }
+      };
+      personTextField.withMatchContains(true).withMinChars(2);
+      fs.add(personTextField);
+    }
+    {
+      // Content
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("orga.post.inhalt"));
+      final PFAutoCompleteMaxLengthTextField inhaltTextField = new PFAutoCompleteMaxLengthTextField(InputPanel.WICKET_ID,
+          new PropertyModel<String>(data, "inhalt")) {
+        @Override
+        protected List<String> getChoices(final String input)
+        {
+          return getBaseDao().getAutocompletion("inhalt", input);
+        }
+      };
+      inhaltTextField.withMatchContains(true).withMinChars(2);
+      inhaltTextField.setRequired(true);
+      fs.add(inhaltTextField);
+    }
+    {
+      // Content
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "bemerkung"))).setAutogrow();
+    }
   }
 
   @Override

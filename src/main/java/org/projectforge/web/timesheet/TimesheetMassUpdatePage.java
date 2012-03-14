@@ -28,7 +28,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
@@ -36,6 +36,7 @@ import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvid
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.MyBeanComparator;
 import org.projectforge.task.TaskTree;
@@ -98,13 +99,13 @@ public class TimesheetMassUpdatePage extends AbstractSecuredPage implements ISel
         userFormatter, dateTimeFormatter);
     @SuppressWarnings("serial")
     final SortableDataProvider<TimesheetDO> sortableDataProvider = new SortableDataProvider<TimesheetDO>() {
-      public Iterator<TimesheetDO> iterator(int first, int count)
+      public Iterator<TimesheetDO> iterator(final int first, final int count)
       {
-        SortParam sp = getSort();
+        final SortParam sp = getSort();
         if (timesheets == null) {
           return null;
         }
-        Comparator<TimesheetDO> comp = new MyBeanComparator<TimesheetDO>(sp.getProperty(), sp.isAscending());
+        final Comparator<TimesheetDO> comp = new MyBeanComparator<TimesheetDO>(sp.getProperty(), sp.isAscending());
         Collections.sort(timesheets, comp);
         return timesheets.subList(first, first + count).iterator();
       }
@@ -125,7 +126,7 @@ public class TimesheetMassUpdatePage extends AbstractSecuredPage implements ISel
         };
       }
     };
-    sortableDataProvider.setSort("startTime", false);
+    sortableDataProvider.setSort("startTime", SortOrder.DESCENDING);
 
     final DefaultDataTable<TimesheetDO> dataTable = new DefaultDataTable<TimesheetDO>("table", columns, sortableDataProvider, 1000);
     body.add(dataTable);
@@ -134,15 +135,15 @@ public class TimesheetMassUpdatePage extends AbstractSecuredPage implements ISel
         + getString("question.massUpdateQuestion")
         + "');\n"
         + "}\n") //
-        .setEscapeModelStrings(false));
+    .setEscapeModelStrings(false));
   }
 
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing.
   }
 
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     if ("taskId".equals(property) == true) {
       timesheetDao.setTask(form.data, (Integer) selectedValue);
@@ -152,7 +153,7 @@ public class TimesheetMassUpdatePage extends AbstractSecuredPage implements ISel
     }
   }
 
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     if ("taskId".equals(property) == true) {
       form.data.setTask(null);

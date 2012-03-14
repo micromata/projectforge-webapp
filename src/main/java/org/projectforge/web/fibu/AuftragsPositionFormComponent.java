@@ -44,7 +44,6 @@ import org.projectforge.fibu.AuftragFilter;
 import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 
-
 /**
  * For displaying and selecting an order position.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -57,6 +56,7 @@ public class AuftragsPositionFormComponent extends PFAutoCompleteTextField<Auftr
   @SpringBean(name = "auftragDao")
   private AuftragDao auftragDao;
 
+  @SuppressWarnings("rawtypes")
   class AuftragsPositionConverter implements IConverter
   {
     private static final long serialVersionUID = -8117783418789940569L;
@@ -91,7 +91,7 @@ public class AuftragsPositionFormComponent extends PFAutoCompleteTextField<Auftr
       setRequired(true);
       add(new AbstractValidator<AuftragsPositionDO>() {
         @Override
-        protected void onValidate(IValidatable<AuftragsPositionDO> validatable)
+        protected void onValidate(final IValidatable<AuftragsPositionDO> validatable)
         {
           final AuftragsPositionDO value = validatable.getValue();
           if (value == null) {
@@ -127,7 +127,7 @@ public class AuftragsPositionFormComponent extends PFAutoCompleteTextField<Auftr
   }
 
   @Override
-  protected List<AuftragsPositionDO> getChoices(String input)
+  protected List<AuftragsPositionDO> getChoices(final String input)
   {
     final AuftragFilter filter = new AuftragFilter();
     filter.setSearchString(input);
@@ -150,7 +150,7 @@ public class AuftragsPositionFormComponent extends PFAutoCompleteTextField<Auftr
   }
 
   @Override
-  protected String formatValue(AuftragsPositionDO value)
+  protected String formatValue(final AuftragsPositionDO value)
   {
     if (value == null) {
       return "";
@@ -159,7 +159,7 @@ public class AuftragsPositionFormComponent extends PFAutoCompleteTextField<Auftr
   }
 
   @Override
-  protected String formatLabel(AuftragsPositionDO value)
+  protected String formatLabel(final AuftragsPositionDO value)
   {
     if (value == null) {
       return "";
@@ -189,8 +189,9 @@ public class AuftragsPositionFormComponent extends PFAutoCompleteTextField<Auftr
     return buf.toString();
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked"})
   @Override
-  public IConverter getConverter(Class< ? > type)
+  public IConverter getConverter(final Class type)
   {
     return new AuftragsPositionConverter();
   }

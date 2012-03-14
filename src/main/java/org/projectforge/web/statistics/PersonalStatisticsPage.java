@@ -29,9 +29,9 @@ import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
 import java.text.NumberFormat;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jfree.chart.JFreeChart;
 import org.projectforge.common.NumberHelper;
@@ -76,8 +76,8 @@ public class PersonalStatisticsPage extends AbstractSecuredPage
     final TimesheetDisciplineChartBuilder chartBuilder = new TimesheetDisciplineChartBuilder();
     final JFreeChart chart1 = chartBuilder.create(timesheetDao, getUser().getId(), workingHoursPerDay, LAST_N_DAYS, shape, stroke, true);
     JFreeChartImage image = new JFreeChartImage("timesheetStatisticsImage1", chart1, IMAGE_WIDTH, IMAGE_HEIGHT);
-    image.add(new SimpleAttributeModifier("width", String.valueOf(IMAGE_WIDTH)));
-    image.add(new SimpleAttributeModifier("height", String.valueOf(IMAGE_HEIGHT)));
+    image.add(AttributeModifier.replace("width", String.valueOf(IMAGE_WIDTH)));
+    image.add(AttributeModifier.replace("height", String.valueOf(IMAGE_HEIGHT)));
     body.add(image);
     final NumberFormat format = NumberFormat.getNumberInstance(PFUserContext.getLocale());
     final String planHours = "<span style=\"color: #DE1821; font-weight: bold;\">"
@@ -94,8 +94,8 @@ public class PersonalStatisticsPage extends AbstractSecuredPage
 
     final JFreeChart chart2 = chartBuilder.create(timesheetDao, getUser().getId(), LAST_N_DAYS, shape, stroke, true);
     image = new JFreeChartImage("timesheetStatisticsImage2", chart2, IMAGE_WIDTH, IMAGE_HEIGHT);
-    image.add(new SimpleAttributeModifier("width", String.valueOf(IMAGE_WIDTH)));
-    image.add(new SimpleAttributeModifier("height", String.valueOf(IMAGE_HEIGHT)));
+    image.add(AttributeModifier.replace("width", String.valueOf(IMAGE_WIDTH)));
+    image.add(AttributeModifier.replace("height", String.valueOf(IMAGE_HEIGHT)));
     body.add(image);
     final String averageDifference = "<span style=\"color: #DE1821; font-weight: bold;\">"
         + format.format(chartBuilder.getAverageDifferenceBetweenTimesheetAndBooking())

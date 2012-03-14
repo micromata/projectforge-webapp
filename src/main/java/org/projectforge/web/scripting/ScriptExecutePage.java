@@ -29,11 +29,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -60,10 +60,13 @@ import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.DownloadUtils;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCallerPage
 {
+  private static final long serialVersionUID = -183858142939207911L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ScriptExecutePage.class);
 
   @SpringBean(name = "scriptDao")
@@ -82,10 +85,10 @@ public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCal
   private WebMarkupContainer scriptSourceTable;
 
   @SuppressWarnings("serial")
-  public ScriptExecutePage(PageParameters parameters)
+  public ScriptExecutePage(final PageParameters parameters)
   {
     super(parameters);
-    id = parameters.getAsInteger(AbstractEditPage.PARAMETER_KEY_ID);
+    id = WicketUtils.getAsInteger(parameters, AbstractEditPage.PARAMETER_KEY_ID);
     final ContentMenuEntryPanel editMenuEntryPanel = new ContentMenuEntryPanel("edit", new Link<Object>("link") {
       @Override
       public void onClick()
@@ -119,10 +122,10 @@ public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCal
     scriptSourceTable.removeAll();
     final RepeatingView sourceCodeView = new RepeatingView("lines");
     scriptSourceTable.add(sourceCodeView);
-    List<String> lines = getLines();
+    final List<String> lines = getLines();
     int lineNo = 1;
     for (final String line : lines) {
-      WebMarkupContainer item = new WebMarkupContainer(sourceCodeView.newChildId());
+      final WebMarkupContainer item = new WebMarkupContainer(sourceCodeView.newChildId());
       sourceCodeView.add(item);
       item.add(new Label("lineNo", String.valueOf(lineNo++)));
       final Label lineLabel = new Label("line", HtmlHelper.escapeXml(line.toString()));
@@ -144,7 +147,7 @@ public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCal
     }
     StringBuffer line = new StringBuffer();
     for (int i = 0; i < groovyScript.length(); i++) {
-      char c = groovyScript.charAt(i);
+      final char c = groovyScript.charAt(i);
       if (c == '\n') {
         lines.add(HtmlHelper.escapeXml(line.toString()));
         line = new StringBuffer();
@@ -175,7 +178,7 @@ public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCal
   protected void cancel()
   {
     final PageParameters params = new PageParameters();
-    params.put(AbstractListPage.PARAMETER_HIGHLIGHTED_ROW, id);
+    params.add(AbstractListPage.PARAMETER_HIGHLIGHTED_ROW, id);
     setResponsePage(ScriptListPage.class, params);
   }
 
@@ -196,7 +199,7 @@ public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCal
     }
     log.info(buf.toString());
     storeRecentScriptCalls();
-    GroovyResult result = scriptDao.execute(getScript(), form.scriptParameters);
+    final GroovyResult result = scriptDao.execute(getScript(), form.scriptParameters);
     form.setScriptResult(result);
     if (result.hasException() == true) {
       form.error(getLocalizedMessage("exception.groovyError", String.valueOf(result.getException())));
@@ -251,7 +254,7 @@ public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCal
 
   protected void storeRecentScriptCalls()
   {
-    RecentScriptCalls recents = getRecentScriptCalls();
+    final RecentScriptCalls recents = getRecentScriptCalls();
     final ScriptCallData scriptCallData = new ScriptCallData(getScript().getName(), form.scriptParameters);
     recents.append(scriptCallData);
   }
@@ -271,12 +274,12 @@ public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCal
     return form.data;
   }
 
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing.
   }
 
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     if (property == null) {
       log.error("Oups, null property not supported for selection.");
@@ -353,7 +356,7 @@ public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCal
     }
   }
 
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     // Do nothing.
   }

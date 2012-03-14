@@ -28,24 +28,19 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.projectforge.web.wicket.ImageDef;
-import org.projectforge.web.wicket.PresizedImage;
-import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.layout.IField;
-import org.projectforge.web.wicket.layout.PanelContext;
 
 /**
  * A link panel which instantiates a phone call on an iPhone as well as an sms or an e-mail.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class ActionLinkPanel extends Panel implements IField
+public class ActionLinkPanel extends Panel //implements IField
 {
   private static final long serialVersionUID = -5497704312133705066L;
 
   private AbstractLink link1, link2;
 
-  public ActionLinkPanel(final String id, final ActionLinkType actionLinkType, final String value, final PanelContext ctx)
+  public ActionLinkPanel(final String id, final ActionLinkType actionLinkType, final String value)
   {
     super(id);
     if (actionLinkType == ActionLinkType.CALL) {
@@ -70,14 +65,14 @@ public class ActionLinkPanel extends Panel implements IField
       add(link1 = new ExternalLink("link", url, value));
       add(getInvisibleSmsLink());
     }
-    if (ctx.getTooltip() != null) {
-      if (link1 != null) {
-        WicketUtils.addTooltip(link1, ctx.getTooltip());
-      }
-      if (link2 != null) {
-        WicketUtils.addTooltip(link2, ctx.getTooltip());
-      }
-    }
+    //    if (ctx.getTooltip() != null) {
+    //      if (link1 != null) {
+    //        WicketUtils.addTooltip(link1, ctx.getTooltip());
+    //      }
+    //      if (link2 != null) {
+    //        WicketUtils.addTooltip(link2, ctx.getTooltip());
+    //      }
+    //    }
   }
 
   private ExternalLink getCallLink(final String number)
@@ -88,7 +83,7 @@ public class ActionLinkPanel extends Panel implements IField
   private ExternalLink getSmsLink(final String number)
   {
     final ExternalLink smsLink = new ExternalLink("sms", "sms:" + number);
-    smsLink.add(new PresizedImage("smsImage", getResponse(), ImageDef.SMS));
+    //smsLink.add(new PresizedImage("smsImage", getResponse(), ImageDef.SMS));
     return smsLink;
   }
 

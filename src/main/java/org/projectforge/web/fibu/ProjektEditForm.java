@@ -23,20 +23,13 @@
 
 package org.projectforge.web.fibu;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
-import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektStatus;
@@ -47,15 +40,16 @@ import org.projectforge.user.GroupDO;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.FocusOnLoadBehavior;
-import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
-import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.converter.IntegerConverter;
-
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage>
 {
@@ -68,10 +62,9 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
 
   List<Kost2Art> kost2Arts;
 
-  public ProjektEditForm(ProjektEditPage parentPage, ProjektDO data)
+  public ProjektEditForm(final ProjektEditPage parentPage, final ProjektDO data)
   {
     super(parentPage, data);
-    this.colspan = 6;
   }
 
   @SuppressWarnings("serial")
@@ -79,89 +72,102 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
   protected void init()
   {
     super.init();
-    add(new MinMaxNumberField<Integer>("nummer", new PropertyModel<Integer>(data, "nummer"), 0, 99) {
-      @Override
-      public IConverter getConverter(Class< ? > type)
-      {
-        return new IntegerConverter(2);
-      }
-    });
-    final CustomerSelectPanel kundeSelectPanel = new CustomerSelectPanel("kunde", new PropertyModel<KundeDO>(data, "kunde"), null, parentPage,
-        "kundeId");
-    add(kundeSelectPanel);
-    kundeSelectPanel.init();
-    add(new MinMaxNumberField<Integer>("internKost2_4", new PropertyModel<Integer>(data, "internKost2_4"), 0, 999) {
-      @Override
-      public IConverter getConverter(Class< ? > type)
-      {
-        return new IntegerConverter(3);
-      }
-    });
-    add(new MaxLengthTextField("name", new PropertyModel<String>(data, "name")).add(new FocusOnLoadBehavior()));
-    add(new MaxLengthTextField("identifier", new PropertyModel<String>(data, "identifier")));
-    final GroupSelectPanel groupSelectPanel = new GroupSelectPanel("selectProjektManagerGroup", new PropertyModel<GroupDO>(data,
-        "projektManagerGroup"), parentPage, "projektManagerGroupId");
-    add(groupSelectPanel);
-    groupSelectPanel.init();
-    add(new MaxLengthTextArea("description", new PropertyModel<String>(data, "description")));
-    final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("task", new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId");
-    add(taskSelectPanel);
-    taskSelectPanel.init();
-    // DropDownChoice status
-    final LabelValueChoiceRenderer<ProjektStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<ProjektStatus>(this, ProjektStatus
-        .values());
-    @SuppressWarnings("unchecked")
-    final DropDownChoice statusChoice = new DropDownChoice("status", new PropertyModel(data, "status"), statusChoiceRenderer.getValues(),
-        statusChoiceRenderer);
-    statusChoice.setNullValid(false).setRequired(true);
-    add(statusChoice);
+    gridBuilder.newGrid16();
+    {
+      // Number
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt.nummer"));
+      final MinMaxNumberField<Integer> field = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "nummer"),
+          0, 99) {
+        @SuppressWarnings({ "unchecked", "rawtypes"})
+        @Override
+        public IConverter getConverter(final Class type)
+        {
+          return new IntegerConverter(2);
+        }
+      };
+      WicketUtils.setSize(field, 2);
+      fs.add(field);
+    }
+    {
+      // Customer
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde")).setNoLabelFor();
+      final CustomerSelectPanel kundeSelectPanel = new CustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"),
+          null, parentPage, "kundeId");
+      fs.add(kundeSelectPanel);
+      kundeSelectPanel.init();
+    }
+    {
+      // Internal cost (digit 2-4)
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt.internKost2_4"), true);
+      fs.add(new DivTextPanel(fs.newChildId(), "4."));
+      final MinMaxNumberField<Integer> field = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data,
+          "internKost2_4"), 0, 999) {
+        @SuppressWarnings({ "unchecked", "rawtypes"})
+        @Override
+        public IConverter getConverter(final Class type)
+        {
+          return new IntegerConverter(3);
+        }
+      };
+      WicketUtils.setSize(field, 3);
+      fs.add(field);
+      fs.add(new DivTextPanel(fs.newChildId(), ".##.##"));
+    }
+    {
+      // Name
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt.name"));
+      final MaxLengthTextField field = new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "name"));
+      fs.add(field);
+      WicketUtils.setFocus(field);
+      WicketUtils.setStrong(field);
+    }
+    {
+      // Identifier
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt.identifier"));
+      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "identifier")));
+    }
+    {
+      // task
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data, "task"), parentPage,
+          "taskId");
+      fs.add(taskSelectPanel);
+      taskSelectPanel.init();
+    }
+    {
+      // DropDownChoice status
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("status"));
+      final LabelValueChoiceRenderer<ProjektStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<ProjektStatus>(this,
+          ProjektStatus.values());
+      final DropDownChoice<ProjektStatus> statusChoice = new DropDownChoice<ProjektStatus>(fs.getDropDownChoiceId(),
+          new PropertyModel<ProjektStatus>(data, "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
+      statusChoice.setNullValid(false).setRequired(true);
+      fs.add(statusChoice);
+    }
+    {
+      // project manager group
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt.projektManagerGroup")).setNoLabelFor();
+      final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(data,
+          "projektManagerGroup"), parentPage, "projektManagerGroupId");
+      fs.add(groupSelectPanel);
+      groupSelectPanel.init();
+    }
+    {
+      // description
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "description")));
+    }
     if (isNew() == true) {
       kost2Arts = kostCache.getAllKostArts();
     } else {
       kost2Arts = kostCache.getAllKost2Arts(getData().getId());
     }
-    final Iterator<Kost2Art> it = kost2Arts.iterator();
-    final RepeatingView kost2artRowsRepeater = new RepeatingView("kost2artRows");
-    add(kost2artRowsRepeater);
-    while (it.hasNext() == true) {
-      final WebMarkupContainer rowItem = new WebMarkupContainer(kost2artRowsRepeater.newChildId());
-      kost2artRowsRepeater.add(rowItem);
-      final RepeatingView kost2artColsRepeater = new RepeatingView("kost2artCols");
-      rowItem.add(kost2artColsRepeater);
-      for (int i = 0; i < 2 && it.hasNext() == true; i++) {
-        final WebMarkupContainer colItem = new WebMarkupContainer(kost2artColsRepeater.newChildId());
-        kost2artColsRepeater.add(colItem);
-        final Kost2Art kost2Art = it.next();
-        String style = null;
-        if (kost2Art.isExistsAlready() == true) {
-          if (kost2Art.isProjektStandard() == true) {
-            style = "color: green;";
-          }
-        } else {
-          if (kost2Art.isProjektStandard() == true) {
-            style = "color: red;";
-          }
-        }
-        final CheckBox checkBox = new CheckBox("kost2artSelect", new PropertyModel<Boolean>(kost2Art, "selected"));
-        colItem.add(checkBox);
-        final TooltipImage image = new TooltipImage("acceptImage", getResponse(), WebConstants.IMAGE_ACCEPT,
-            getString("fibu.projekt.edit.kost2DoesAlreadyExists"));
-        colItem.add(image);
-        if (kost2Art.isExistsAlready() == true) {
-          checkBox.setVisible(false);
-        } else {
-          image.setVisibilityAllowed(false);
-        }
-        final Label kost2artNummerLabel = new Label("kost2artNummer", StringHelper.format2DigitNumber(kost2Art.getId()));
-        colItem.add(kost2artNummerLabel);
-        final Label kost2artNameLabel = new Label("kost2artName", kost2Art.isFakturiert() == true ? kost2Art.getName() : kost2Art.getName()
-            + " (nf)");
-        colItem.add(kost2artNameLabel);
-        if (style != null) {
-          kost2artNummerLabel.add(new SimpleAttributeModifier("style", style));
-          kost2artNameLabel.add(new SimpleAttributeModifier("style", style));
-        }
-      }
+    {
+      // cost 2 types
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost2art.kost2arten")).setNoLabelFor();
+      final ProjectEditCost2TypeTablePanel table = new ProjectEditCost2TypeTablePanel(fs.newChildId());
+      table.init(kost2Arts);
+      fs.add(table);
     }
   }
 

@@ -27,18 +27,14 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.calendar.DayHolder;
-import org.projectforge.calendar.TimePeriod;
-import org.projectforge.common.DateHolder;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
@@ -54,14 +50,13 @@ import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.user.UserPrefEditPage;
-import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
+import org.projectforge.web.wicket.WicketUtils;
 
 @EditPage(defaultReturnPage = TimesheetListPage.class)
-public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, TimesheetEditForm, TimesheetDao> implements
-    ISelectCallerPage
+public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEditForm, TimesheetDao> implements ISelectCallerPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TimesheetEditPage.class);
 
@@ -112,19 +107,23 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
-  public TimesheetEditPage(PageParameters parameters)
+  public TimesheetEditPage(final PageParameters parameters)
   {
     super(parameters, "timesheet");
-    super.init();
+    init();
+  }
+
+  void preInit() {
     if (isNew() == true) {
-      final Integer taskId = parameters.getAsInteger(PARAMETER_KEY_TASK_ID);
+      final PageParameters parameters = getPageParameters();
+      final Integer taskId = WicketUtils.getAsInteger(parameters, PARAMETER_KEY_TASK_ID);
       if (taskId != null) {
         getBaseDao().setTask(getData(), taskId);
       }
-      final Long startTimeInMillis = parameters.getAsLong(PARAMETER_KEY_START_DATE_IN_MILLIS);
-      final Long stopTimeInMillis = parameters.getAsLong(PARAMETER_KEY_STOP_DATE_IN_MILLIS);
+      final Long startTimeInMillis = WicketUtils.getAsLong(parameters, PARAMETER_KEY_START_DATE_IN_MILLIS);
+      final Long stopTimeInMillis = WicketUtils.getAsLong(parameters, PARAMETER_KEY_STOP_DATE_IN_MILLIS);
       if (startTimeInMillis != null) {
-        form.renderer.startDateTimePanel.setDate(startTimeInMillis);
+        getData().setStartDate(startTimeInMillis);
         if (stopTimeInMillis == null) {
           getData().setStopTime(new Timestamp(startTimeInMillis)); // Default is time sheet with zero duration.
         }
@@ -132,21 +131,21 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
       if (stopTimeInMillis != null) {
         getData().setStopTime(new Timestamp(stopTimeInMillis));
         if (startTimeInMillis == null) {
-          form.renderer.startDateTimePanel.setDate(stopTimeInMillis); // Default is time sheet with zero duration.
+          getData().setStartDate(stopTimeInMillis); // Default is time sheet with zero duration.
         }
       }
-      final String description = parameters.getString(PARAMETER_KEY_DESCRIPTION);
+      final String description = WicketUtils.getAsString(parameters, PARAMETER_KEY_DESCRIPTION);
       if (description != null) {
         getData().setDescription(description);
       }
-      final int userId = parameters.getInt(PARAMETER_KEY_USER, -1);
+      final int userId = WicketUtils.getAsInt(parameters, PARAMETER_KEY_USER, -1);
       if (userId != -1) {
         timesheetDao.setUser(getData(), userId);
       }
     }
 
     if (isNew() == true) {
-      TimesheetPrefData pref = getTimesheetPrefData();
+      final TimesheetPrefData pref = getTimesheetPrefData();
       TimesheetPrefEntry entry = null;
       if (pref != null) {
         entry = pref.getNewesRecentEntry();
@@ -158,9 +157,6 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
         getBaseDao().setUser(getData(), getUser().getId());
       }
     }
-
-    form.renderer.addCost2Row();
-    form.renderer.addConsumptionBar();
   }
 
   @Override
@@ -176,7 +172,7 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
   }
 
   @Override
-  protected TimesheetEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, TimesheetDO data)
+  protected TimesheetEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final TimesheetDO data)
   {
     return new TimesheetEditForm(this, data);
   }
@@ -191,7 +187,7 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
     final List<TimesheetDO> list = new ArrayList<TimesheetDO>();
     if (data != null && data.getRecents() != null) {
       for (final TimesheetPrefEntry entry : data.getRecents()) {
-        TimesheetDO sheet = getRecentSheet(entry);
+        final TimesheetDO sheet = getRecentSheet(entry);
         list.add(sheet);
       }
       Collections.sort(list, new Comparator<TimesheetDO>() {
@@ -203,16 +199,17 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
           final ProjektDO project2 = kost2 != null ? kost2.getProjekt() : null;
           final String kunde1 = project1 != null && project1.getKunde() != null ? project1.getKunde().getName() : null;
           final String kunde2 = project2 != null && project2.getKunde() != null ? project2.getKunde().getName() : null;
-          return new CompareToBuilder().append(kunde1, kunde2).append(project1 != null ? project1.getName() : null,
-              project2 != null ? project2.getName() : null).append(t1.getTask() != null ? t1.getTask().getTitle() : null,
-              t2.getTask() != null ? t2.getTask().getTitle() : null).toComparison();
+          return new CompareToBuilder().append(kunde1, kunde2)
+              .append(project1 != null ? project1.getName() : null, project2 != null ? project2.getName() : null)
+              .append(t1.getTask() != null ? t1.getTask().getTitle() : null, t2.getTask() != null ? t2.getTask().getTitle() : null)
+              .toComparison();
         }
       });
       // Don't show recent block for new users if all entries are already displayed.
       if (data.getRecents().size() > SIZE_OF_FIRST_RECENT_BLOCK) {
         int i = 0;
         for (final TimesheetPrefEntry entry : data.getRecents()) {
-          TimesheetDO sheet = getRecentSheet(entry);
+          final TimesheetDO sheet = getRecentSheet(entry);
           list.add(i, sheet);
           if (i++ >= SIZE_OF_FIRST_RECENT_BLOCK) {
             break;
@@ -235,16 +232,16 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
     return null;
   }
 
-  private TimesheetDO getRecentSheet(TimesheetPrefEntry entry)
+  private TimesheetDO getRecentSheet(final TimesheetPrefEntry entry)
   {
-    TimesheetDO sheet = new TimesheetDO();
-    TaskDO task = taskTree.getTaskById(entry.getTaskId());
+    final TimesheetDO sheet = new TimesheetDO();
+    final TaskDO task = taskTree.getTaskById(entry.getTaskId());
     sheet.setTask(task);
-    Kost2DO kost2 = kostCache.getKost2(entry.getKost2Id());
+    final Kost2DO kost2 = kostCache.getKost2(entry.getKost2Id());
     sheet.setKost2(kost2);
     sheet.setDescription(entry.getDescription());
     sheet.setLocation(entry.getLocation());
-    PFUserDO user = userGroupCache.getUser(entry.getUserId());
+    final PFUserDO user = userGroupCache.getUser(entry.getUserId());
     sheet.setUser(user);
     return sheet;
   }
@@ -265,11 +262,10 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
    */
   protected void cloneTimesheet()
   {
-    TimesheetDO timesheet = getData();
+    final TimesheetDO timesheet = getData();
     log.info("Clone of time sheet chosen: " + timesheet);
     timesheet.setId(null);
     getBaseDao().setUser(timesheet, getUser().getId());
-    form.cloneButtonPanel.setVisible(false);
   }
 
   /**
@@ -285,39 +281,7 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
         id = (Integer) selectedValue;
       }
       getBaseDao().setTask(getData(), id);
-      form.renderer.refresh();
-    } else if ("date".equals(property) == true) {
-      if (selectedValue instanceof TimePeriod) {
-        final Date startDate = ((TimePeriod) selectedValue).getFromDate();
-        final Date stopDate = ((TimePeriod) selectedValue).getToDate();
-        if (startDate != null) {
-          getData().setStartDate(startDate);
-          form.renderer.startDateTimePanel.markModelAsChanged();
-        } else if (stopDate != null) {
-          getData().setStartDate(stopDate);
-          form.renderer.startDateTimePanel.markModelAsChanged();
-        }
-        if (stopDate != null) {
-          getData().setStopTime(new Timestamp(stopDate.getTime()));
-          // form.stopDateTimePanel.markModelAsChanged();
-        } else if (startDate != null) {
-          getData().setStopTime(new Timestamp(startDate.getTime()));
-          // form.stopDateTimePanel.markModelAsChanged();
-        }
-      } else {
-        final Date date;
-        if (selectedValue instanceof String) {
-          final Long ms = NumberHelper.parseLong((String) selectedValue);
-          date = new Date(ms);
-        } else {
-          date = (Date) selectedValue;
-        }
-        final DayHolder dh = new DayHolder(date);
-        final DateHolder startDateHolder = form.renderer.startDateTimePanel.getDateHolder();
-        startDateHolder.setDay(dh.getCalendar());
-        getData().setStartDate(startDateHolder.getDate());
-        form.renderer.startDateTimePanel.markModelAsChanged();
-      }
+      form.refresh();
     } else if ("userId".equals(property) == true) {
       final Integer id;
       if (selectedValue instanceof String) {
@@ -342,14 +306,14 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
    */
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     if ("taskId".equals(property) == true) {
       getData().setTask(null);
-      form.renderer.refresh();
+      form.refresh();
     } else if ("userId".equals(property) == true) {
       getData().setUser(null);
-      form.renderer.refresh();
+      form.refresh();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
@@ -358,13 +322,13 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
    */
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing.
   }
 
   @Override
-  public AbstractBasePage afterSaveOrUpdate()
+  public AbstractSecuredBasePage afterSaveOrUpdate()
   {
     // Save time sheet as recent time sheet
     final TimesheetPrefData pref = getTimesheetPrefData();
@@ -375,7 +339,7 @@ public class TimesheetEditPage extends AbstractAutoLayoutEditPage<TimesheetDO, T
       pref.appendRecentLocation(timesheet.getLocation());
     }
     // Does the user want to store this time sheet as template?
-    if (BooleanUtils.isTrue(form.renderer.saveAsTemplate) == true) {
+    if (BooleanUtils.isTrue(form.saveAsTemplate) == true) {
       final UserPrefEditPage userPrefEditPage = new UserPrefEditPage(UserPrefArea.TIMESHEET_TEMPLATE, getData());
       userPrefEditPage.setReturnToPage(this.returnToPage);
       return userPrefEditPage;

@@ -23,8 +23,8 @@
 
 package org.projectforge.web.mobile;
 
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.core.MessageParam;
@@ -36,6 +36,8 @@ import org.projectforge.web.wicket.MySession;
 /** All pages with required login should be derived from this page. */
 public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
 {
+  private static final long serialVersionUID = -770818367559813217L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractSecuredMobilePage.class);
 
   static final String USER_PREF_RECENT_PAGE = "recentMobilePage";
@@ -69,7 +71,7 @@ public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
    * set the returnToPage as a page parameter (if supported by the derived page).
    * @param returnToPage
    */
-  public AbstractSecuredMobilePage setReturnToPage(WebPage returnToPage)
+  public AbstractSecuredMobilePage setReturnToPage(final WebPage returnToPage)
   {
     this.returnToPage = returnToPage;
     return this;
@@ -97,13 +99,13 @@ public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
    * @param persistent If true, the object will be persisted in the database.
    * @see UserXmlPreferencesCache#putEntry(Integer, String, Object, boolean)
    */
-  public void putUserPrefEntry(String key, Object value, boolean persistent)
+  public void putUserPrefEntry(final String key, final Object value, final boolean persistent)
   {
     if (getUser() == null) {
       // Should only occur, if user is not logged in.
       return;
     }
-    Integer userId = getUser().getId();
+    final Integer userId = getUser().getId();
     userXmlPreferencesCache.putEntry(userId, key, value, persistent);
   }
 
@@ -113,13 +115,13 @@ public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
    * @return Return a persistent object with this key, if existing, or if not a volatile object with this key, if existing, otherwise null;
    * @see UserXmlPreferencesCache#getEntry(Integer, String)
    */
-  public Object getUserPrefEntry(String key)
+  public Object getUserPrefEntry(final String key)
   {
     if (getUser() == null) {
       // Should only occur, if user is not logged in.
       return null;
     }
-    Integer userId = getUser().getId();
+    final Integer userId = getUser().getId();
     return userXmlPreferencesCache.getEntry(userId, key);
   }
 
@@ -154,13 +156,13 @@ public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
    * @param key
    * @return The removed entry if found.
    */
-  public Object removeUserPrefEntry(String key)
+  public Object removeUserPrefEntry(final String key)
   {
     if (getUser() == null) {
       // Should only occur, if user is not logged in.
       return null;
     }
-    Integer userId = getUser().getId();
+    final Integer userId = getUser().getId();
     return userXmlPreferencesCache.removeEntry(userId, key);
   }
 
@@ -194,12 +196,12 @@ public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
    * @param params non localized message params (used if no msgParams given).
    * @return The params for the localized message if exist (prepared for using with MessageFormat), otherwise params will be returned.
    */
-  public String translateParams(String i18nKey, MessageParam[] msgParams, Object[] params)
+  public String translateParams(final String i18nKey, final MessageParam[] msgParams, final Object[] params)
   {
     if (msgParams == null) {
       return getLocalizedMessage(i18nKey, params);
     }
-    Object[] args = new Object[msgParams.length];
+    final Object[] args = new Object[msgParams.length];
     for (int i = 0; i < msgParams.length; i++) {
       if (msgParams[i].isI18nKey() == true) {
         args[i] = getString(msgParams[i].getI18nKey());
@@ -212,7 +214,7 @@ public abstract class AbstractSecuredMobilePage extends AbstractMobilePage
 
   /**
    * No it isn't.
-   * @see org.projectforge.web.wicket.AbstractBasePage#thisIsAnUnsecuredPage()
+   * @see org.projectforge.web.wicket.AbstractUnsecureBasePage#thisIsAnUnsecuredPage()
    */
   @Override
   protected void thisIsAnUnsecuredPage()

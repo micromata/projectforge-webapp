@@ -27,14 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.scripting.ScriptDao;
@@ -45,7 +46,6 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
-
 @ListPage(editPage = ScriptEditPage.class)
 public class ScriptListPage extends AbstractListPage<ScriptListForm, ScriptDao, ScriptDO>
 {
@@ -54,7 +54,7 @@ public class ScriptListPage extends AbstractListPage<ScriptListForm, ScriptDao, 
   @SpringBean(name = "scriptDao")
   private ScriptDao scriptDao;
 
-  public ScriptListPage(PageParameters parameters)
+  public ScriptListPage(final PageParameters parameters)
   {
     super(parameters, "scripting");
   }
@@ -65,22 +65,25 @@ public class ScriptListPage extends AbstractListPage<ScriptListForm, ScriptDao, 
   {
     final List<IColumn<ScriptDO>> columns = new ArrayList<IColumn<ScriptDO>>();
     final CellItemListener<ScriptDO> cellItemListener = new CellItemListener<ScriptDO>() {
-      public void populateItem(Item<ICellPopulator<ScriptDO>> item, String componentId, IModel<ScriptDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<ScriptDO>> item, final String componentId, final IModel<ScriptDO> rowModel)
       {
         final ScriptDO script = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(script.getId(), script.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<ScriptDO>(new Model<String>(getString("scripting.script.name")), "name", "name",
         cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<ScriptDO>> item, final String componentId, final IModel<ScriptDO> rowModel)
       {
-        final ScriptDO script = (ScriptDO) rowModel.getObject();
+        final ScriptDO script = rowModel.getObject();
         item.add(new ListSelectActionPanel(componentId, rowModel, ScriptExecutePage.class, script.getId(), ScriptListPage.this, script
             .getName()));
         cellItemListener.populateItem(item, componentId, rowModel);
@@ -90,7 +93,7 @@ public class ScriptListPage extends AbstractListPage<ScriptListForm, ScriptDao, 
     columns.add(new CellItemListenerPropertyColumn<ScriptDO>(new Model<String>(getString("description")), "description", "description",
         cellItemListener));
     columns.add(new AbstractColumn<ScriptDO>(new Model<String>(getString("scripting.script.parameter"))) {
-      public void populateItem(Item<ICellPopulator<ScriptDO>> cellItem, String componentId, IModel<ScriptDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<ScriptDO>> cellItem, final String componentId, final IModel<ScriptDO> rowModel)
       {
         final ScriptDO script = rowModel.getObject();
         final Label label = new Label(componentId, new Model<String>(script.getParameterNames(true)));
@@ -98,12 +101,12 @@ public class ScriptListPage extends AbstractListPage<ScriptListForm, ScriptDao, 
         cellItemListener.populateItem(cellItem, componentId, rowModel);
       }
     });
-    dataTable = createDataTable(columns, "name", true);
+    dataTable = createDataTable(columns, "name", SortOrder.ASCENDING);
     form.add(dataTable);
   }
 
   @Override
-  protected ScriptListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected ScriptListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new ScriptListForm(this);
   }
@@ -115,7 +118,7 @@ public class ScriptListPage extends AbstractListPage<ScriptListForm, ScriptDao, 
   }
 
   @Override
-  protected IModel<ScriptDO> getModel(ScriptDO object)
+  protected IModel<ScriptDO> getModel(final ScriptDO object)
   {
     return new DetachableDOModel<ScriptDO, ScriptDao>(object, getBaseDao());
   }

@@ -35,10 +35,9 @@ import java.util.Set;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.behavior.IBehavior;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.AbstractSubmitLink;
@@ -55,6 +54,7 @@ import org.apache.wicket.model.CompoundPropertyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.common.DateHelper;
@@ -84,15 +84,13 @@ import org.projectforge.web.tree.TreeIconsActionPanel;
 import org.projectforge.web.tree.TreeTable;
 import org.projectforge.web.tree.TreeTableFilter;
 import org.projectforge.web.tree.TreeTableNode;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
-import org.projectforge.web.wicket.AttributeAppendModifier;
+import org.projectforge.web.wicket.AbstractUnsecureBasePage;
 import org.projectforge.web.wicket.EqualsDecorator;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.PresizedImage;
 import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
@@ -121,19 +119,19 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
 
   private GanttChartData ganttChartData;
 
-  private GanttChartEditForm form;
+  private final GanttChartEditForm form;
 
   private GanttTask clipboard;
 
-  private Map<Serializable, DatePanel> startDatePanelMap = new HashMap<Serializable, DatePanel>();
+  private final Map<Serializable, DatePanel> startDatePanelMap = new HashMap<Serializable, DatePanel>();
 
-  private Map<Serializable, DatePanel> endDatePanelMap = new HashMap<Serializable, DatePanel>();
+  private final Map<Serializable, DatePanel> endDatePanelMap = new HashMap<Serializable, DatePanel>();
 
-  private Map<Serializable, CheckBox> visibleCheckboxMap = new HashMap<Serializable, CheckBox>();
+  private final Map<Serializable, CheckBox> visibleCheckboxMap = new HashMap<Serializable, CheckBox>();
 
   private RefreshingView<GanttTreeTableNode> refreshingView;
 
-  private Component[] rejectSaveColHeads = new Component[NUMBER_OF_REJECT_SAVE_COLS];
+  private final Component[] rejectSaveColHeads = new Component[NUMBER_OF_REJECT_SAVE_COLS];
 
   GanttChartEditTreeTablePanel(final String id, final GanttChartEditForm form, final GanttChartDO ganttChartDO)
   {
@@ -150,6 +148,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     add(new Label("questionDialogsMethods", buf.toString()).setEscapeModelStrings(false));
   }
 
+  @Override
   protected void initializeColumnHeads()
   {
     int col = 0;
@@ -158,7 +157,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     colHeadRepeater.add(createColHead("task"));
     colHeadRepeater.add(createEmtpyColumnHead(16)); // Column for edit icon.
     colHeadRepeater.add(SingleImagePanel.createTooltipImage(colHeadRepeater.newChildId(), WebConstants.IMAGE_EYE,
-        getString("gantt.tooltip.isVisible")).add(new SimpleAttributeModifier("style", "width: 16px;")).setRenderBodyOnly(false));
+        getString("gantt.tooltip.isVisible")).add(AttributeModifier.replace("style", "width: 16px;")).setRenderBodyOnly(false));
     addColumnHead(col++, "title");
     addColumnHead(col++, "gantt.startDate");
     addColumnHead(col++, "gantt.duration");
@@ -191,7 +190,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
 
   public String getImageUrl(final String image)
   {
-    return ((AbstractBasePage) getPage()).getImageUrl(image);
+    return ((AbstractUnsecureBasePage) getPage()).getImageUrl(image);
   }
 
   @Override
@@ -212,7 +211,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
       return null;
     }
     final TreeTableFilter<TreeTableNode> filter = new TreeTableFilter<TreeTableNode>() {
-      public boolean match(TreeTableNode name)
+      public boolean match(final TreeTableNode name)
       {
         return true;
       }
@@ -385,9 +384,9 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
         }
         return new ModelIteratorAdapter(treeList.iterator()) {
           @Override
-          protected IModel< ? > model(Object obj)
+          protected IModel< ? > model(final Object obj)
           {
-            return EqualsDecorator.decorate(new CompoundPropertyModel((GanttTreeTableNode) obj));
+            return EqualsDecorator.decorate(new CompoundPropertyModel(obj));
           }
         };
       }
@@ -399,11 +398,12 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
         final GanttTask ganttObject = node.getGanttObject();
         final TaskDO task = taskDao.getTaskTree().getTaskById((Integer) ganttObject.getId());
         if (item.getIndex() % 2 == 0) {
-          item.add(new SimpleAttributeModifier("class", "even"));
+          item.add(AttributeModifier.replace("class", "even"));
         } else {
-          item.add(new SimpleAttributeModifier("class", "odd"));
+          item.add(AttributeModifier.replace("class", "odd"));
         }
         final Label formattedLabel = new Label(ListSelectActionPanel.LABEL_ID, new Model<String>() {
+          @Override
           public String getObject()
           {
             if (NumberHelper.greaterZero((Integer) ganttObject.getId()) == true) {
@@ -418,9 +418,9 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
           {
             final boolean clipboarded = clipboard != null && clipboard.getId() == ganttObject.getId();
             if (clipboarded == true) {
-              add(new SimpleAttributeModifier("style", "font-weight: bold; color:red;"));
+              add(AttributeModifier.replace("style", "font-weight: bold; color:red;"));
             } else {
-              final IBehavior behavior = WicketUtils.getAttributeModifier(this, "style");
+              final Behavior behavior = WicketUtils.getAttributeModifier(this, "style");
               if (behavior != null) {
                 this.remove(behavior);
               }
@@ -429,12 +429,12 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
           }
         };
 
-        TreeIconsActionPanel< ? extends TreeTableNode> treeIconsActionPanel = new TreeIconsActionPanel<GanttTreeTableNode>("tree",
+        final TreeIconsActionPanel< ? extends TreeTableNode> treeIconsActionPanel = new TreeIconsActionPanel<GanttTreeTableNode>("tree",
             new Model<GanttTreeTableNode>(node), formattedLabel, getTreeTable());
         treeIconsActionPanel.setUseAjaxAtDefault(false).setUseSubmitLinkImages(true);
         addColumn(item, treeIconsActionPanel, null);
         treeIconsActionPanel.init(GanttChartEditTreeTablePanel.this, node);
-        treeIconsActionPanel.add(new AttributeAppendModifier("style", new Model<String>("white-space: nowrap;")));
+        treeIconsActionPanel.add(AttributeModifier.append("style", new Model<String>("white-space: nowrap;")));
         treeIconsActionPanel.setUseAjaxAtDefault(false);
         {
           final WebMarkupContainer dropDownMenu = new WebMarkupContainer("dropDownMenu");
@@ -442,15 +442,16 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
           final WebMarkupContainer parentLi = new WebMarkupContainer("parentLi");
           dropDownMenu.add(parentLi);
           final String id = "m" + ganttObject.getId();
-          parentLi.add(new SimpleAttributeModifier("onmouseover", "mopen('" + id + "')"));
+          parentLi.add(AttributeModifier.replace("onmouseover", "mopen('" + id + "')"));
           parentLi.add(new PresizedImage("cogImage", getResponse(), WebConstants.IMAGE_COG));
           parentLi.add(new PresizedImage("arrowDownImage", getResponse(), WebConstants.IMAGE_ARROW_DOWN));
           final WebMarkupContainer ul = new WebMarkupContainer("ul");
-          ul.add(new SimpleAttributeModifier("id", id));
+          ul.add(AttributeModifier.replace("id", id));
           parentLi.add(ul);
           final RepeatingView menuRepeater = new RepeatingView("menuEntriesRepeater");
           ul.add(menuRepeater);
           menuRepeater.add(new ContextMenuEntry(menuRepeater.newChildId(), "mark") {
+            @Override
             void onSubmit()
             {
               if (clipboard != null && clipboard == node.getGanttObject()) {
@@ -467,17 +468,20 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
               return clipboard != null && clipboard != ganttObject;
             }
 
+            @Override
             void onSubmit()
             {
               ganttObject.setPredecessor(clipboard);
             };
           }.addTooltip(new Model<String>() {
+            @Override
             public String getObject()
             {
               return getString("paste") + ": " + (clipboard != null ? clipboard.getTitle() : "-");
             }
           }));
           menuRepeater.add(new ContextMenuEntry(menuRepeater.newChildId(), "gantt.contextMenu.newSubActivity") {
+            @Override
             void onSubmit()
             {
               final GanttTaskImpl root = (GanttTaskImpl) ganttChartData.getRootObject();
@@ -491,6 +495,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
             };
           });
           menuRepeater.add(new ContextMenuEntry(menuRepeater.newChildId(), new Model<String>() {
+            @Override
             public String getObject()
             {
               if (clipboard == ganttObject) {
@@ -514,6 +519,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
               return (root != parent);
             }
 
+            @Override
             void onSubmit()
             {
               if (clipboard == null) {
@@ -567,6 +573,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
               return task == null;
             }
 
+            @Override
             void onSubmit()
             {
               final GanttTaskImpl root = (GanttTaskImpl) ganttChartData.getRootObject();
@@ -585,6 +592,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
               return task == null;
             }
 
+            @Override
             void onSubmit()
             {
               final GanttTaskImpl root = (GanttTaskImpl) ganttChartData.getRootObject();
@@ -624,6 +632,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
               return task != null;
             }
 
+            @Override
             void onSubmit()
             {
               final PageParameters pageParams = new PageParameters();
@@ -634,6 +643,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
             };
           });
           menuRepeater.add(new ContextMenuEntry(menuRepeater.newChildId(), "gantt.contextMenu.setInvisible") {
+            @Override
             void onSubmit()
             {
               ((GanttTaskImpl) ganttObject).setInvisible();
@@ -643,6 +653,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
             };
           });
           menuRepeater.add(new ContextMenuEntry(menuRepeater.newChildId(), "gantt.contextMenu.setSubTasksVisible") {
+            @Override
             void onSubmit()
             {
               ganttObject.setVisible(true);
@@ -658,7 +669,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
           });
         }
         final CheckBox visibleCheckBox = (CheckBox) new CheckBox("visible", new PropertyModel<Boolean>(ganttObject, "visible"))
-            .setRenderBodyOnly(false);
+        .setRenderBodyOnly(false);
         visibleCheckboxMap.put(ganttObject.getId(), visibleCheckBox);
         addColumn(item, visibleCheckBox, "width: 16px;");
         addTitleColumns(item, node, ganttObject, task);
@@ -680,7 +691,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
   @SuppressWarnings("serial")
   private abstract class ContextMenuEntry extends WebMarkupContainer
   {
-    private AbstractSubmitLink link;
+    private final AbstractSubmitLink link;
 
     String onClick;
 
@@ -720,7 +731,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     public ContextMenuEntry setOnClick(final String value)
     {
       this.onClick = value;
-      link.add(new AttributeAppendModifier("onclick", value).setPrepend());
+      link.add(AttributeModifier.prepend("onclick", value));
       return this;
     }
   };
@@ -728,7 +739,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
   private void addColumn(final Item<GanttTreeTableNode> item, final Component component, final String cssStyle)
   {
     if (cssStyle != null) {
-      component.add(new AttributeAppendModifier("style", new Model<String>(cssStyle)));
+      component.add(AttributeModifier.append("style", new Model<String>(cssStyle)));
     }
     item.add(component);
   }
@@ -837,9 +848,9 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     final MinMaxNumberField<Integer> progressField = new MinMaxNumberField<Integer>("progress", new PropertyModel<Integer>(ganttObject,
         "progress"), 0, 100) {
       @Override
-      public IConverter getConverter(Class< ? > type)
+      public IConverter getConverter(final Class type)
       {
-        return new IntegerPercentConverter();
+        return new IntegerPercentConverter(0);
       }
     };
     addColumn(item, progressField, null);
@@ -869,6 +880,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     final GanttTask predecessor = ganttObject.getPredecessor();
     final TaskDO predecessorTask = predecessor != null ? taskDao.getTaskTree().getTaskById((Integer) predecessor.getId()) : null;
     final Label asStringLabel = new Label("asString", new Model<String>() {
+      @Override
       public String getObject()
       {
         final GanttTask predecessor = ganttObject.getPredecessor();
@@ -962,7 +974,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     relationTypeChoiceRenderer.addValue(GanttRelationType.START_FINISH, getString(GanttRelationType.START_FINISH.getI18nKey() + ".short"));
     relationTypeChoiceRenderer.addValue(GanttRelationType.FINISH_START, getString(GanttRelationType.FINISH_START.getI18nKey() + ".short"));
     relationTypeChoiceRenderer
-        .addValue(GanttRelationType.FINISH_FINISH, getString(GanttRelationType.FINISH_FINISH.getI18nKey() + ".short"));
+    .addValue(GanttRelationType.FINISH_FINISH, getString(GanttRelationType.FINISH_FINISH.getI18nKey() + ".short"));
     final DropDownChoice<GanttRelationType> relationTypeChoice = new DropDownChoice<GanttRelationType>("relationType",
         new PropertyModel<GanttRelationType>(ganttObject, "relationType"), relationTypeChoiceRenderer.getValues(),
         relationTypeChoiceRenderer);
@@ -1021,7 +1033,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
    */
   private Component createEmtpyColumnHead(final int size)
   {
-    return new Label(colHeadRepeater.newChildId(), "").add(new SimpleAttributeModifier("style", "width: " + size + "px;"));
+    return new Label(colHeadRepeater.newChildId(), "").add(AttributeModifier.replace("style", "width: " + size + "px;"));
   }
 
   @Override
@@ -1031,7 +1043,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
         "Please, don't use ajax for tree browsing (otherwise user inputs will be lost if you close trees");
   }
 
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
   }
 
@@ -1100,7 +1112,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     }
   }
 
-  public void unselect(String property)
+  public void unselect(final String property)
   {
   };
 
@@ -1130,12 +1142,12 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
   {
     private static final long serialVersionUID = 2462093138788881814L;
 
-    private ImageSubmitLinkPanel rejectSubmitLink;
+    private final ImageSubmitLinkPanel rejectSubmitLink;
 
-    private ImageSubmitLinkPanel saveSubmitLink;
+    private final ImageSubmitLinkPanel saveSubmitLink;
 
     @SuppressWarnings("unused")
-    private Component dataComponent;
+    private final Component dataComponent;
 
     private boolean hasTaskUpdateAccess = true;
 

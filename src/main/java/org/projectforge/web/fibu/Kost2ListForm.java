@@ -24,14 +24,11 @@
 package org.projectforge.web.fibu;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.components.TooltipImage;
-
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class Kost2ListForm extends AbstractListForm<Kost2ListFilter, Kost2ListPage>
 {
@@ -39,12 +36,14 @@ public class Kost2ListForm extends AbstractListForm<Kost2ListFilter, Kost2ListPa
 
   private static final long serialVersionUID = -5969136444233092172L;
 
-  @SuppressWarnings( { "serial", "unchecked"})
   @Override
   protected void init()
   {
     super.init();
+    gridBuilder.newColumnsPanel();
     {
+      gridBuilder.newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
       // DropDownChoice listType
       final LabelValueChoiceRenderer<String> typeChoiceRenderer = new LabelValueChoiceRenderer<String>();
       typeChoiceRenderer.addValue("all", getString("filter.all"));
@@ -53,25 +52,17 @@ public class Kost2ListForm extends AbstractListForm<Kost2ListFilter, Kost2ListPa
       typeChoiceRenderer.addValue("notEnded", getString("notEnded"));
       typeChoiceRenderer.addValue("ended", getString("ended"));
       typeChoiceRenderer.addValue("deleted", getString("deleted"));
-      final DropDownChoice typeChoice = new DropDownChoice("listType", new PropertyModel(this, "searchFilter.listType"), typeChoiceRenderer
-          .getValues(), typeChoiceRenderer);
-      typeChoice.setNullValid(false);
-      filterContainer. add(typeChoice);
+      fs.addDropDownChoice(new PropertyModel<String>(this, "searchFilter.listType"), typeChoiceRenderer.getValues(), typeChoiceRenderer,
+          true).setNullValid(false);
     }
     {
-      final SubmitLink exportExcelButton = new SubmitLink("exportExcel") {
-        public void onSubmit()
-        {
-          parentPage.exportExcel();
-        };
-      };
-      filterContainer.add(exportExcelButton);
-      exportExcelButton.add(new TooltipImage("exportExcelImage", getResponse(), WebConstants.IMAGE_EXPORT_EXCEL,
-          getString("tooltip.export.excel")));
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      addPageSizeFieldset();
     }
   }
 
-  public Kost2ListForm(Kost2ListPage parentPage)
+  public Kost2ListForm(final Kost2ListPage parentPage)
   {
     super(parentPage);
   }

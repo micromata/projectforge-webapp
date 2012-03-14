@@ -24,7 +24,7 @@
 package org.projectforge.web.scripting;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.scripting.ScriptDao;
@@ -44,12 +44,12 @@ public class ScriptEditPage extends AbstractEditPage<ScriptDO, ScriptEditForm, S
   private ScriptDao scriptDao;
 
   @SuppressWarnings("serial")
-  public ScriptEditPage(PageParameters parameters)
+  public ScriptEditPage(final PageParameters parameters)
   {
     super(parameters, "scripting");
     init();
   }
-  
+
   @Override
   protected ScriptDao getBaseDao()
   {
@@ -57,7 +57,7 @@ public class ScriptEditPage extends AbstractEditPage<ScriptDO, ScriptEditForm, S
   }
 
   @Override
-  protected ScriptEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, ScriptDO data)
+  protected ScriptEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final ScriptDO data)
   {
     return new ScriptEditForm(this, data);
   }
@@ -65,7 +65,7 @@ public class ScriptEditPage extends AbstractEditPage<ScriptDO, ScriptEditForm, S
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Integer)
    */
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     throw new UnsupportedOperationException();
   }
@@ -73,7 +73,7 @@ public class ScriptEditPage extends AbstractEditPage<ScriptDO, ScriptEditForm, S
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
    */
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     throw new UnsupportedOperationException();
   }
@@ -81,7 +81,7 @@ public class ScriptEditPage extends AbstractEditPage<ScriptDO, ScriptEditForm, S
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
    */
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing.
   }

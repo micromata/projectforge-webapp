@@ -26,16 +26,19 @@ package org.projectforge.web.humanresources;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.humanresources.HRFilter;
-import org.projectforge.web.calendar.QuickSelectPanel;
+import org.projectforge.web.calendar.QuickSelectWeekPanel;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 
 /**
  * 
@@ -58,39 +61,59 @@ public class HRListForm extends AbstractListForm<HRFilter, HRListPage>
   {
     final HRFilter filter = getSearchFilter();
     super.init();
-    startDate = new DatePanel("startDate", new PropertyModel<Date>(filter, "startTime"), DatePanelSettings.get().withCallerPage(parentPage)
-        .withSelectPeriodMode(true).withRequired(true));
-    filterContainer.add(startDate);
-    stopDate = new DatePanel("stopDate", new PropertyModel<Date>(filter, "stopTime"), DatePanelSettings.get().withCallerPage(parentPage)
-        .withSelectPeriodMode(true).withRequired(true));
-    filterContainer.add(stopDate);
-    final QuickSelectPanel quickSelectPanel = new QuickSelectPanel("quickSelect", parentPage, "quickSelect", startDate);
-    filterContainer.add(quickSelectPanel);
-    quickSelectPanel.init();
-    filterContainer.add(new Label("calendarWeeks", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return WicketUtils.getCalendarWeeks(HRListForm.this, filter.getStartTime(), filter.getStopTime());
-      }
-    }).setRenderBodyOnly(true));
-    filterContainer.add(new Label("datesAsUTC", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return WicketUtils.getUTCDates(filter.getStartTime(), filter.getStopTime());
-      }
-    }));
-    filterContainer.add(new CheckBox("showPlanningCheckBox", new PropertyModel<Boolean>(filter, "showPlanning")));
-    filterContainer.add(new CheckBox("showBookedTimesheetsCheckBox", new PropertyModel<Boolean>(filter, "showBookedTimesheets")));
-    filterContainer.add(new CheckBox("onlyMyProjectsCheckBox", new PropertyModel<Boolean>(filter, "onlyMyProjects")));
-    filterContainer.add(new CheckBox("allProjectsGroupedByCustomerCheckBox", new PropertyModel<Boolean>(filter,
-        "allProjectsGroupedByCustomer")));
-    filterContainer.add(new CheckBox("otherProjectsGroupedByCustomerCheckBox", new PropertyModel<Boolean>(filter,
-        "otherProjectsGroupedByCustomer")));
+    gridBuilder.newColumnsPanel();
+    {
+      gridBuilder.newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"), true);
+      startDate = new DatePanel(fs.newChildId(),  new PropertyModel<Date>(filter, "startTime"),
+          DatePanelSettings.get().withSelectPeriodMode(true).withRequired(true));
+      fs.add(startDate);
+      fs.add(new DivTextPanel(fs.newChildId(), " - "));
+      stopDate = new DatePanel(fs.newChildId(),  new PropertyModel<Date>(filter, "stopTime"),
+          DatePanelSettings.get().withSelectPeriodMode(true).withRequired(true));
+      fs.add(stopDate);
+      final QuickSelectWeekPanel quickSelectPanel = new QuickSelectWeekPanel(fs.newChildId(), new PropertyModel<Date>(filter,
+          "startTime"), parentPage, "week");
+      fs.add(quickSelectPanel);
+      quickSelectPanel.init();
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return WicketUtils.getCalendarWeeks(HRListForm.this, filter.getStartTime(), filter.getStopTime());
+        }
+      }));
+      fs.add(new HtmlCommentPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return WicketUtils.getUTCDates(filter.getStartTime(), filter.getStopTime());
+        }
+      }));
+    }
+    {
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      addPageSizeFieldset();
+    }
+    gridBuilder.newBlockPanel();
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "showPlanning"), getString("hr.planning.filter.showPlanning")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "showBookedTimesheets"), getString("hr.planning.filter.showBookedTimesheets")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "onlyMyProjects"), getString("hr.planning.filter.onlyMyProjects")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "allProjectsGroupedByCustomer"), getString("hr.planning.filter.allProjectsGroupedByCustomer")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "otherProjectsGroupedByCustomer"), getString("hr.planning.filter.otherProjectsGroupedByCustomer")));
+    }
   }
 
-  public HRListForm(HRListPage parentPage)
+  public HRListForm(final HRListPage parentPage)
   {
     super(parentPage);
   }

@@ -24,11 +24,11 @@
 package org.projectforge.web.fibu;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class ProjektListForm extends AbstractListForm<ProjektListFilter, ProjektListPage>
 {
@@ -40,22 +40,27 @@ public class ProjektListForm extends AbstractListForm<ProjektListFilter, Projekt
   protected void init()
   {
     super.init();
+    gridBuilder.newColumnsPanel();
     {
+      gridBuilder.newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"));
       // DropDownChoice listType
       final LabelValueChoiceRenderer<String> typeChoiceRenderer = new LabelValueChoiceRenderer<String>();
       typeChoiceRenderer.addValue("all", getString("filter.all"));
       typeChoiceRenderer.addValue("notEnded", getString("notEnded"));
       typeChoiceRenderer.addValue("ended", getString("ended"));
       typeChoiceRenderer.addValue("deleted", getString("deleted"));
-      @SuppressWarnings("unchecked")
-      final DropDownChoice typeChoice = new DropDownChoice("listType", new PropertyModel(this, "searchFilter.listType"), typeChoiceRenderer
-          .getValues(), typeChoiceRenderer);
-      typeChoice.setNullValid(false);
-      filterContainer.add(typeChoice);
+      fs.addDropDownChoice(new PropertyModel<String>(this, "searchFilter.listType"), typeChoiceRenderer.getValues(), typeChoiceRenderer,
+          true).setNullValid(false);
+    }
+    {
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      addPageSizeFieldset();
     }
   }
 
-  public ProjektListForm(ProjektListPage parentPage)
+  public ProjektListForm(final ProjektListPage parentPage)
   {
     super(parentPage);
   }

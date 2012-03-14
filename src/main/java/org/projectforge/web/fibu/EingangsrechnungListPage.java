@@ -30,14 +30,16 @@ import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
@@ -57,6 +59,7 @@ import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = EingangsrechnungEditPage.class)
 public class EingangsrechnungListPage extends AbstractListPage<EingangsrechnungListForm, EingangsrechnungDao, EingangsrechnungDO> implements
@@ -85,13 +88,11 @@ IListPageColumnsCreator<EingangsrechnungDO>
   public EingangsrechnungListPage(final PageParameters parameters)
   {
     super(parameters, "fibu.eingangsrechnung");
-    this.colspan = 4;
   }
 
   public EingangsrechnungListPage(final ISelectCallerPage caller, final String selectProperty)
   {
     super(caller, selectProperty, "fibu.eingangsrechnung");
-    this.colspan = 4;
   }
 
   /**
@@ -123,13 +124,13 @@ IListPageColumnsCreator<EingangsrechnungDO>
           cssStyle.append("color: blue;");
         }
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(new Model<String>(getString("fibu.common.creditor")), getSortable(
         "kreditor", sortable), "kreditor", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
@@ -151,7 +152,7 @@ IListPageColumnsCreator<EingangsrechnungDO>
     });
     columns.add(new CellItemListenerPropertyColumn<EingangsrechnungDO>(new Model<String>(getString("fibu.konto")), null, "konto",
         cellItemListener) {
-      @SuppressWarnings("unchecked")
+      @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
@@ -181,11 +182,20 @@ IListPageColumnsCreator<EingangsrechnungDO>
     return columns;
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "datum", false);
+    dataTable = createDataTable(createColumns(this, true), "datum", SortOrder.DESCENDING);
     form.add(dataTable);
+    final ContentMenuEntryPanel exportExcelButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+      @Override
+      public void onClick()
+      {
+        exportExcel();
+      };
+    }, getString("exportAsXls")).setTooltip(getString("tooltip.export.excel"));
+    addContentMenuEntry(exportExcelButton);
   }
 
   void exportExcel()

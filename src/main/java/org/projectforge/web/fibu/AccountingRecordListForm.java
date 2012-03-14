@@ -23,10 +23,13 @@
 
 package org.projectforge.web.fibu;
 
+import java.math.BigDecimal;
+
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -35,8 +38,16 @@ import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.fibu.kost.BuchungssatzDao;
 import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.IconPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
+import org.projectforge.web.wicket.flowlayout.TextStyle;
 
 public class AccountingRecordListForm extends AbstractListForm<AccountingRecordListFilter, AccountingRecordListPage>
 {
@@ -47,8 +58,6 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
   @SpringBean(name = "buchungssatzDao")
   private BuchungssatzDao buchungssatzDao;
 
-  private WebMarkupContainer businessAssessmentRow;
-
   @SuppressWarnings("serial")
   @Override
   protected void init()
@@ -57,74 +66,122 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
       setPageSize(1000);
     }
     super.init();
-    // DropDownChoice years
-    final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(buchungssatzDao.getYears(), false);
-    @SuppressWarnings("unchecked")
-    final DropDownChoice fromYearChoice = new DropDownChoice("fromYear", new PropertyModel(this, "fromYear"), yearListChoiceRenderer
-        .getYears(), yearListChoiceRenderer);
-    fromYearChoice.setNullValid(false).setRequired(true);
-    filterContainer.add(fromYearChoice);
-    @SuppressWarnings("unchecked")
-    final DropDownChoice toYearChoice = new DropDownChoice("toYear", new PropertyModel(this, "toYear"), yearListChoiceRenderer.getYears(),
-        yearListChoiceRenderer);
-    toYearChoice.setNullValid(false).setRequired(true);
-    filterContainer.add(toYearChoice);
+    gridBuilder.newColumnsPanel();
+    {
+      gridBuilder.newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
+      // DropDownChoices from
+      final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(buchungssatzDao.getYears(), false);
+      final DropDownChoice<Integer> fromYearChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(this,
+          "fromYear"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
+      fromYearChoice.setNullValid(false).setRequired(true);
+      fs.add(fromYearChoice);
+      final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
+      for (int i = 0; i <= 11; i++) {
+        monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
+      }
+      final DropDownChoice<Integer> fromMonthChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(
+          this, "fromMonth"), monthChoiceRenderer.getValues(), monthChoiceRenderer);
+      fromMonthChoice.setNullValid(true);
+      fs.add(fromMonthChoice);
 
-    // DropDownChoice months
-    final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-    for (int i = 0; i <= 11; i++) {
-      monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
+      fs.add(new DivTextPanel(fs.newChildId(), " - "));
+
+      // DropDownChoices to
+      final DropDownChoice<Integer> toYearChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(this,
+          "toYear"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
+      toYearChoice.setNullValid(false).setRequired(true);
+      fs.add(toYearChoice);
+
+      final DropDownChoice<Integer> toMonthChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(this,
+          "toMonth"), monthChoiceRenderer.getValues(), monthChoiceRenderer);
+      toMonthChoice.setNullValid(true);
+      fs.add(toMonthChoice);
     }
-    @SuppressWarnings("unchecked")
-    final DropDownChoice fromMonthChoice = new DropDownChoice("fromMonth", new PropertyModel(this, "fromMonth"), monthChoiceRenderer
-        .getValues(), monthChoiceRenderer);
-    fromMonthChoice.setNullValid(true);
-    filterContainer.add(fromMonthChoice);
-    @SuppressWarnings("unchecked")
-    final DropDownChoice toMonthChoice = new DropDownChoice("toMonth", new PropertyModel(this, "toMonth"), monthChoiceRenderer.getValues(),
-        monthChoiceRenderer);
-    toMonthChoice.setNullValid(true);
-    filterContainer.add(toMonthChoice);
+    {
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      addPageSizeFieldset();
+    }
+    {
+      // Statistics
+      gridBuilder.newBlockPanel();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.businessAssessment"), true).setNoLabelFor();
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          final BusinessAssessment bwa = parentPage.getBusinessAssessment();
+          return getString("fibu.businessAssessment.overallPerformance")
+              + ": "
+              + CurrencyFormatter.format(bwa != null ? bwa.getOverallPerformanceRowAmount() : BigDecimal.ZERO)
+              + WebConstants.HTML_TEXT_DIVIDER;
+        }
+      }, TextStyle.BLUE));
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          final BusinessAssessment bwa = parentPage.getBusinessAssessment();
+          return getString("fibu.businessAssessment.merchandisePurchase")
+              + ": "
+              + CurrencyFormatter.format(bwa != null ? bwa.getMerchandisePurchaseRowAmount() : BigDecimal.ZERO)
+              + WebConstants.HTML_TEXT_DIVIDER;
+        }
+      }));
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          final BusinessAssessment bwa = parentPage.getBusinessAssessment();
+          return getString("fibu.businessAssessment.preliminaryResult")
+              + ": "
+              + CurrencyFormatter.format(bwa != null ? bwa.getPreliminaryResultRowAmount() : BigDecimal.ZERO);
+        }
+      }));
 
-    filterContainer.add(businessAssessmentRow = new WebMarkupContainer("businessAssessmentRow") {
-      @Override
-      public boolean isVisible()
-      {
-        return parentPage.businessAssessment != null;
+      final RepeatingView repeater = new RepeatingView(FieldsetPanel.DESCRIPTION_SUFFIX_ID) {
+        /**
+         * @see org.apache.wicket.Component#isVisible()
+         */
+        @Override
+        public boolean isVisible()
+        {
+          return parentPage.getBusinessAssessment() != null;
+        }
       };
-    });
-    final Label summaryBusinessAssessmentLabel = new Label("summaryBusinessAssessment", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        final BusinessAssessment businessAssessment = parentPage.businessAssessment;
-        if (businessAssessment == null) {
-          return "";
+      fs.setDescriptionSuffix(repeater);
+      IconPanel icon = new IconPanel(repeater.newChildId(), IconType.CIRCLE_PLUS).setOnClick("javascript:showBusinessAssessment();");
+      icon.setMarkupId("showBusinessAssessment");
+      repeater.add(icon);
+      icon = new IconPanel(repeater.newChildId(), IconType.CIRCLE_MINUS).setOnClick("javascript:hideBusinessAssessment();")
+          .appendAttribute("style", "display: none;");
+      icon.setMarkupId("hideBusinessAssessment");
+      repeater.add(icon);
+    }
+    {
+      gridBuilder.newBlockPanel();
+      final DivPanel businessAssessmentPanel = gridBuilder.getPanel();
+      businessAssessmentPanel.setMarkupId("businessAssessment");
+      businessAssessmentPanel.add(AttributeModifier.append("style", "display: none;"));
+      final FieldsetPanel fieldset = new FieldsetPanel(businessAssessmentPanel, "").setNoLabelFor();
+      final Label label = new Label(DivTextPanel.WICKET_ID, new Model<String>() {
+        /**
+         * @see org.apache.wicket.model.Model#getObject()
+         */
+        @Override
+        public String getObject()
+        {
+          final BusinessAssessment businessAssessment = parentPage.getBusinessAssessment();
+          if (businessAssessment == null) {
+            return "";
+          }
+          return businessAssessment.asHtml();
         }
-        final StringBuffer buf = new StringBuffer();
-        buf.append(getString("fibu.businessAssessment.overallPerformance")).append(": ").append(
-            CurrencyFormatter.format(businessAssessment.getOverallPerformanceRowAmount())).append(", ");
-        buf.append(getString("fibu.businessAssessment.merchandisePurchase")).append(": ").append(
-            CurrencyFormatter.format(businessAssessment.getMerchandisePurchaseRowAmount())).append(", ");
-        buf.append(getString("fibu.businessAssessment.preliminaryResult")).append(": ").append(
-            CurrencyFormatter.format(businessAssessment.getPreliminaryResultRowAmount()));
-        return buf.toString();
-      }
-    });
-    businessAssessmentRow.add(summaryBusinessAssessmentLabel);
-
-    final Label businessAssessmentLabel = new Label("businessAssessment", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        final BusinessAssessment businessAssessment = parentPage.businessAssessment;
-        if (businessAssessment == null) {
-          return "";
-        }
-        return businessAssessment.toString();
-      }
-    });
-    filterContainer.add(businessAssessmentLabel);
+      });
+      label.setEscapeModelStrings(false);
+      fieldset.add(new DivTextPanel(fieldset.newChildId(), label).setMarkupId("businessAssessment"));
+    }
   }
 
   /**

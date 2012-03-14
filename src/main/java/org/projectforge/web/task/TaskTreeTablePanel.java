@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.basic.Label;
@@ -54,7 +55,6 @@ import org.projectforge.web.tree.TreeTable;
 import org.projectforge.web.tree.TreeTableEvent;
 import org.projectforge.web.tree.TreeTableNode;
 import org.projectforge.web.user.UserFormatter;
-import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
@@ -211,7 +211,7 @@ class TaskTreeTablePanel extends DefaultTreeTablePanel<TaskTreeTableNode>
     addColumn(colBodyRepeater, col, cssStyle);
     if (accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == true) {
       col = new Label(colBodyRepeater.newChildId(), dateTimeFormatter.getFormattedDate(task.getProtectTimesheetsUntil()));
-      col.add(new AttributeAppendModifier("style", new Model<String>("white-space: nowrap;")));
+      col.add(AttributeModifier.append("style", new Model<String>("white-space: nowrap;")));
       addColumn(colBodyRepeater, col, cssStyle);
     }
     col = new Label(colBodyRepeater.newChildId(), task.getReference());

@@ -38,14 +38,17 @@ import org.projectforge.fibu.kost.Kost2ArtDao;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.KostentraegerStatus;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.FocusOnLoadBehavior;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMinMaxNumberField;
 import org.projectforge.web.wicket.converter.IntegerConverter;
-
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class Kost2EditForm extends AbstractEditForm<Kost2DO, Kost2EditPage>
 {
@@ -64,10 +67,9 @@ public class Kost2EditForm extends AbstractEditForm<Kost2DO, Kost2EditPage>
 
   protected TextField<Integer> kost2ArtField;
 
-  public Kost2EditForm(Kost2EditPage parentPage, Kost2DO data)
+  public Kost2EditForm(final Kost2EditPage parentPage, final Kost2DO data)
   {
     super(parentPage, data);
-    this.colspan = 6;
   }
 
   @Override
@@ -75,71 +77,107 @@ public class Kost2EditForm extends AbstractEditForm<Kost2DO, Kost2EditPage>
   protected void init()
   {
     super.init();
-    final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel("projekt", new PropertyModel<ProjektDO>(data, "projekt"),
-        parentPage, "projektId");
-    add(projektSelectPanel);
-    projektSelectPanel.init();
-
-    nummernkreisField = new RequiredMinMaxNumberField<Integer>("nummernkreis", new PropertyModel<Integer>(data, "nummernkreis"), 0, 9);
-    nummernkreisField.add(new FocusOnLoadBehavior());
-    add(nummernkreisField);
-    bereichField = new RequiredMinMaxNumberField<Integer>("bereich", new PropertyModel<Integer>(data, "bereich"), 0, 999) {
-      @Override
-      public IConverter getConverter(Class< ? > type)
-      {
-        return new IntegerConverter(3);
+    gridBuilder.newGrid16();
+    {
+      // Project
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt"));
+      final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"),
+          parentPage, "projektId");
+      fs.add(projektSelectPanel);
+      projektSelectPanel.init();
+    }
+    {
+      // Kost 2
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost.kostentraeger"), true);
+      nummernkreisField = new RequiredMinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "nummernkreis"), 0,
+          9);
+      if (isNew() == true) {
+        WicketUtils.setFocus(nummernkreisField);
       }
-    };
-    add(bereichField);
-    teilbereichField = new RequiredMinMaxNumberField<Integer>("teilbereich", new PropertyModel<Integer>(data, "teilbereich"), 0, 99) {
-      @Override
-      public IConverter getConverter(Class< ? > type)
-      {
-        return new IntegerConverter(2);
-      }
-    };
-    add(teilbereichField);
-    kost2ArtField = new RequiredMinMaxNumberField<Integer>("kost2ArtId", new PropertyModel<Integer>(data, "kost2Art.id"), 0, 99) {
-      @Override
-      public IConverter getConverter(Class< ? > type)
-      {
-        return new IntegerConverter(2);
-      }
-    };
-    kost2ArtField.setRequired(true);
-    kost2ArtField.add(new AbstractValidator<Integer>() {
-      @Override
-      protected void onValidate(IValidatable<Integer> validatable)
-      {
-        final Integer value = validatable.getValue();
-        if (value == null) {
-          return;
+      WicketUtils.setSize(nummernkreisField, 1);
+      fs.add(nummernkreisField);
+      fs.add(new DivTextPanel(fs.newChildId(), "."));
+      bereichField = new RequiredMinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "bereich"), 0, 999) {
+        @SuppressWarnings({ "unchecked", "rawtypes"})
+        @Override
+        public IConverter getConverter(final Class type)
+        {
+          return new IntegerConverter(3);
         }
-        if (kost2ArtDao.getById(value) == null) { // Kost2 available but not selected.
-          error(validatable);
+      };
+      WicketUtils.setSize(bereichField, 3);
+      fs.add(bereichField);
+      fs.add(new DivTextPanel(fs.newChildId(), "."));
+      teilbereichField = new RequiredMinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "teilbereich"), 0,
+          99) {
+        @SuppressWarnings({ "unchecked", "rawtypes"})
+        @Override
+        public IConverter getConverter(final Class type)
+        {
+          return new IntegerConverter(2);
         }
-      }
+      };
+      WicketUtils.setSize(teilbereichField, 2);
+      fs.add(teilbereichField);
+      fs.add(new DivTextPanel(fs.newChildId(), "."));
+      kost2ArtField = new RequiredMinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "kost2Art.id"), 0, 99) {
+        @SuppressWarnings({ "unchecked", "rawtypes"})
+        @Override
+        public IConverter getConverter(final Class type)
+        {
+          return new IntegerConverter(2);
+        }
+      };
+      kost2ArtField.setRequired(true);
+      kost2ArtField.add(new AbstractValidator<Integer>() {
+        @Override
+        protected void onValidate(final IValidatable<Integer> validatable)
+        {
+          final Integer value = validatable.getValue();
+          if (value == null) {
+            return;
+          }
+          if (kost2ArtDao.getById(value) == null) { // Kost2 available but not selected.
+            error(validatable);
+          }
+        }
 
-      @Override
-      protected String resourceKey()
-      {
-        return "fibu.kost2art.error.notFound";
-      }
-    });
-    add(kost2ArtField);
-    add(new MinMaxNumberField<BigDecimal>("workFraction", new PropertyModel<BigDecimal>(data, "workFraction"), BigDecimal.ZERO,
-        BigDecimal.ONE));
-    add(new MaxLengthTextField("description", new PropertyModel<String>(data, "description")));
-    add(new MaxLengthTextArea("comment", new PropertyModel<String>(data, "comment")));
-    // DropDownChoice status
-    final LabelValueChoiceRenderer<KostentraegerStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<KostentraegerStatus>(this,
-        KostentraegerStatus.values());
-    @SuppressWarnings("unchecked")
-    final DropDownChoice statusChoice = new DropDownChoice("kostentraegerStatus", new PropertyModel(data, "kostentraegerStatus"),
-        statusChoiceRenderer.getValues(), statusChoiceRenderer);
-    statusChoice.setNullValid(false);
-    statusChoice.setRequired(true);
-    add(statusChoice);
+        @Override
+        protected String resourceKey()
+        {
+          return "fibu.kost2art.error.notFound";
+        }
+      });
+      WicketUtils.setSize(kost2ArtField, 2);
+      fs.add(kost2ArtField);
+    }
+    {
+      // work fraction
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost2.workFraction"));
+      fs.add(new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(data, "workFraction"), BigDecimal.ZERO,
+          BigDecimal.ONE));
+    }
+    {
+      // description
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
+      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "description")));
+    }
+    {
+      // comment
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "comment")));
+    }
+    {
+      // DropDownChoice status
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("status"));
+      final LabelValueChoiceRenderer<KostentraegerStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<KostentraegerStatus>(this,
+          KostentraegerStatus.values());
+      final DropDownChoice<KostentraegerStatus> statusChoice = new DropDownChoice<KostentraegerStatus>(fs.getDropDownChoiceId(),
+          new PropertyModel<KostentraegerStatus>(data, "kostentraegerStatus"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
+      statusChoice.setNullValid(false);
+      statusChoice.setRequired(true);
+      fs.add(statusChoice);
+    }
   }
 
   @Override

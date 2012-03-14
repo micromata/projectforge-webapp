@@ -24,118 +24,97 @@
 package org.projectforge.web.fibu;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.SubmitLink;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.panel.Fragment;
+import org.apache.wicket.markup.html.form.validation.IFormValidator;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.core.CurrencyFormatter;
-import org.projectforge.core.NumberFormatter;
 import org.projectforge.fibu.AbstractRechnungDO;
 import org.projectforge.fibu.AbstractRechnungsPositionDO;
-import org.projectforge.fibu.KostFormatter;
-import org.projectforge.fibu.RechnungDO;
-import org.projectforge.fibu.kost.Kost1DO;
-import org.projectforge.fibu.kost.Kost2DO;
-import org.projectforge.fibu.kost.Kost2Dao;
+import org.projectforge.fibu.AuftragsPositionDO;
+import org.projectforge.fibu.RechnungsPositionDO;
 import org.projectforge.fibu.kost.KostZuweisungDO;
-import org.projectforge.web.HtmlHelper;
+import org.projectforge.fibu.kost.KostZuweisungenCopyHelper;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.AbstractEditPage;
-import org.projectforge.web.wicket.AttributeAppendModifier;
-import org.projectforge.web.wicket.DatesAsUTCLabel;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
-import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.converter.BigDecimalPercentConverter;
 import org.projectforge.web.wicket.converter.CurrencyConverter;
-
+import org.projectforge.web.wicket.flowlayout.ButtonPanel;
+import org.projectforge.web.wicket.flowlayout.ButtonType;
+import org.projectforge.web.wicket.flowlayout.DialogPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.HtmlCodePanel;
+import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
+import org.projectforge.web.wicket.flowlayout.TextPanel;
+import org.projectforge.web.wicket.flowlayout.TextStyle;
+import org.projectforge.web.wicket.flowlayout.ToggleContainerPanel;
 
 public abstract class AbstractRechnungEditForm<O extends AbstractRechnungDO<T>, T extends AbstractRechnungsPositionDO, P extends AbstractEditPage< ? , ? , ? >>
-    extends AbstractEditForm<O, P>
+extends AbstractEditForm<O, P>
 {
   private static final long serialVersionUID = 9073611406229693582L;
 
   public static final int[] ZAHLUNGSZIELE_IN_TAGEN = { 7, 14, 30, 60, 90};
 
-  @SpringBean(name = "kost2Dao")
-  private Kost2Dao kost2Dao;
+  private static final Component[] COMPONENT_ARRAY = new Component[0];
 
-  private DropDownChoice<Integer> zahlungsZielChoice;
-
-  private DropDownChoice<Long> bezahlDatumChoice;
-
-  protected DatePanel datumPanel;
-
-  protected DatePanel bezahlDatumPanel;
-
-  protected DatePanel faelligkeitPanel;
-
-  protected TextField<BigDecimal> zahlBetragField;
+  private static final String COST_EDIT_DIALOG_ID = "editCostDialog";
 
   protected RepeatingView positionsRepeater;
 
-  private boolean showTextAreas;
-
-  private boolean showKostZuweisungen;
-
-  private boolean showEditableKostZuweisungen;
-  
-  private T highlightedPosition;
-
   protected SingleButtonPanel cloneButtonPanel;
 
-  private class RefreshCheckBox extends CheckBox
-  {
-    private static final long serialVersionUID = 7529562566480212604L;
+  private boolean costConfigured;
 
-    RefreshCheckBox(final String componentId, final String property)
-    {
-      super(componentId, new PropertyModel<Boolean>(AbstractRechnungEditForm.this, property));
-    }
+  private ModalWindow costEditModalWindow;
 
-    @Override
-    public void onSelectionChanged()
-    {
-      super.onSelectionChanged();
-      refresh();
-    }
+  private final List<Component> ajaxUpdateComponents = new ArrayList<Component>();
 
-    @Override
-    protected boolean wantOnSelectionChangedNotifications()
-    {
-      return true;
-    }
-  }
+  private Component[] ajaxUpdateComponentsArray;
+
+  protected final FormComponent< ? >[] dependentFormComponents = new FormComponent[5];
+
+  protected DatePanel datumPanel;
 
   public AbstractRechnungEditForm(final P parentPage, final O data)
   {
     super(parentPage, data);
-    this.colspan = 10;
   }
 
   protected abstract void onInit();
@@ -145,136 +124,223 @@ public abstract class AbstractRechnungEditForm<O extends AbstractRechnungDO<T>, 
 
   }
 
+  @SuppressWarnings("unchecked")
+  protected void validation()
+  {
+    final TextField<Date> datumField = (TextField<Date>) dependentFormComponents[0];
+    final TextField<Date> bezahlDatumField = (TextField<Date>) dependentFormComponents[1];
+    final TextField<Date> faelligkeitField = (TextField<Date>) dependentFormComponents[2];
+    final TextField<BigDecimal> zahlBetragField = (TextField<BigDecimal>) dependentFormComponents[3];
+    final DropDownChoice<Integer> zahlungsZielChoice = (DropDownChoice<Integer>) dependentFormComponents[4];
+
+    final Date bezahlDatum = bezahlDatumField.getConvertedInput();
+
+    final Integer zahlungsZiel = zahlungsZielChoice.getConvertedInput();
+    Date faelligkeit = faelligkeitField.getConvertedInput();
+    if (zahlungsZiel != null) {
+      Date date = datumField.getConvertedInput();
+      if (date == null) {
+        date = getData().getDatum();
+      }
+      if (date != null) {
+        final DayHolder day = new DayHolder(date);
+        day.add(Calendar.DAY_OF_YEAR, zahlungsZiel);
+        faelligkeit = day.getSQLDate();
+        getData().setFaelligkeit(day.getSQLDate());
+        faelligkeitField.modelChanged();
+      }
+    }
+    getData().recalculate();
+
+    final BigDecimal zahlBetrag = zahlBetragField.getConvertedInput();
+    final boolean zahlBetragExists = (zahlBetrag != null && zahlBetrag.compareTo(BigDecimal.ZERO) != 0);
+    if (bezahlDatum != null && zahlBetragExists == false) {
+      addError("fibu.rechnung.error.bezahlDatumUndZahlbetragRequired");
+    }
+    if (faelligkeit == null) {
+      addFieldRequiredError("fibu.rechnung.faelligkeit");
+    }
+  }
+
   @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     super.init();
-    if (isNew() == true) {
-      showTextAreas = true;
-    } else {
-      if (data.hasKostZuweisungen() == true) {
-        showKostZuweisungen = true;
+    add(new IFormValidator() {
+      @Override
+      public FormComponent< ? >[] getDependentFormComponents()
+      {
+        return dependentFormComponents;
       }
+
+      @Override
+      public void validate(final Form< ? > form)
+      {
+        validation();
+      }
+    });
+    if (Configuration.getInstance().isCostConfigured() == true) {
+      costConfigured = true;
     }
+
+    if (isNew() == false && getData().isDeleted() == false && getBaseDao().hasInsertAccess(getUser()) == true) {
+      // Clone button for existing and not deleted invoices:
+      final Button cloneButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("clone")) {
+        @Override
+        public final void onSubmit()
+        {
+          cloneRechnung();
+        }
+      };
+      cloneButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), cloneButton, getString("clone"));
+      actionButtons.add(2, cloneButtonPanel);
+    }
+
     onInit();
-    final RefreshCheckBox showTextAreasCheckBox = new RefreshCheckBox("showTextAreasCheckBox", "showTextAreas");
-    if (isNew() == true) {
-      showTextAreasCheckBox.setEnabled(false);
+
+    /* GRID8 - BLOCK */
+    gridBuilder.newGrid8();
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // Date
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.datum"));
+      datumPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "datum"), DatePanelSettings.get().withTargetType(
+          java.sql.Date.class));
+      dependentFormComponents[0] = datumPanel.getDateField();
+      fs.add(datumPanel);
     }
-    add(showTextAreasCheckBox);
-    add(new RefreshCheckBox("showKostZuweisungenCheckBox", "showKostZuweisungen"));
-    add(new RefreshCheckBox("showEditableKostZuweisungenCheckBox", "showEditableKostZuweisungen"));
-    add(new RequiredMaxLengthTextField("betreff", new PropertyModel<String>(data, "betreff")));
-    zahlBetragField = new TextField<BigDecimal>("zahlBetrag", new PropertyModel<BigDecimal>(data, "zahlBetrag")) {
-      @Override
-      public IConverter getConverter(Class< ? > type)
-      {
-        return new CurrencyConverter();
-      }
-    };
-    add(zahlBetragField);
-    datumPanel = new DatePanel("datum", new PropertyModel<Date>(data, "datum"), DatePanelSettings.get().withCallerPage(
-        (ISelectCallerPage) parentPage).withTargetType(java.sql.Date.class));
-    add(datumPanel);
-    faelligkeitPanel = new DatePanel("faelligkeit", new PropertyModel<Date>(data, "faelligkeit"), DatePanelSettings.get().withCallerPage(
-        (ISelectCallerPage) parentPage).withTargetType(java.sql.Date.class));
-    add(faelligkeitPanel);
-    // DropDownChoice ZahlungsZiel
-    final LabelValueChoiceRenderer<Integer> zielChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-    for (final int days : ZAHLUNGSZIELE_IN_TAGEN) {
-      zielChoiceRenderer.addValue(days, String.valueOf(days) + " " + getString("days"));
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // Net sum
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.netto"));
+      final DivTextPanel netPanel = new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return CurrencyFormatter.format(data.getNetSum());
+        }
+      }, TextStyle.FORM_TEXT);
+      fs.add(netPanel);
+      fs.setNoLabelFor();
+      ajaxUpdateComponents.add(netPanel.getLabel4Ajax());
     }
-    zahlungsZielChoice = new DropDownChoice<Integer>("zahlungsZielList", new PropertyModel<Integer>(this, "zahlungsZiel"),
-        zielChoiceRenderer.getValues(), zielChoiceRenderer) {
-      @Override
-      public boolean isVisible()
-      {
-        return data.getFaelligkeit() == null;
-      }
-    };
-    zahlungsZielChoice.setNullValid(true);
-    zahlungsZielChoice.setRequired(false);
-    add(zahlungsZielChoice);
-    final Label zahlungsZiel = new Label("zahlungsZielInTagen", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return data.getZahlungsZielInTagen() + " " + getString("days");
-      }
-    }) {
-      @Override
-      public boolean isVisible()
-      {
-        return data.getFaelligkeit() != null;
-      }
-    };
-    add(zahlungsZiel);
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // Vat amount
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.vatAmount"));
+      final DivTextPanel vatPanel = new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return CurrencyFormatter.format(data.getVatAmountSum());
+        }
+      }, TextStyle.FORM_TEXT);
+      fs.add(vatPanel);
+      fs.setNoLabelFor();
+      ajaxUpdateComponents.add(vatPanel.getLabel4Ajax());
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // Brutto
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.brutto"));
+      final DivTextPanel grossPanel = new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return CurrencyFormatter.format(data.getGrossSum());
+        }
+      }, TextStyle.FORM_TEXT);
+      fs.add(grossPanel);
+      fs.setNoLabelFor();
+      ajaxUpdateComponents.add(grossPanel.getLabel4Ajax());
+    }
+    gridBuilder.newBlockPanel();
+    {
+      // Fälligkeit und Zahlungsziel
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.faelligkeit"), true);
+      final DatePanel faelligkeitPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "faelligkeit"), DatePanelSettings
+          .get().withTargetType(java.sql.Date.class));
+      dependentFormComponents[2] = faelligkeitPanel.getDateField();
+      fs.add(faelligkeitPanel);
+      fs.setLabelFor(faelligkeitPanel);
 
-    bezahlDatumPanel = new DatePanel("bezahlDatum", new PropertyModel<Date>(data, "bezahlDatum"), DatePanelSettings.get().withCallerPage(
-        (ISelectCallerPage) parentPage).withTargetType(java.sql.Date.class));
-    add(bezahlDatumPanel);
-    // DropDownChoice bezahlDatumList
-    final LabelValueChoiceRenderer<Long> bezahlDatumChoiceRenderer = WicketUtils.getDatumChoiceRenderer(20);
-    bezahlDatumChoice = new DropDownChoice<Long>("bezahlDatumList", new PropertyModel<Long>(this, "bezahlDatumInMillis"),
-        bezahlDatumChoiceRenderer.getValues(), bezahlDatumChoiceRenderer) {
-      @Override
-      public boolean isVisible()
-      {
-        return data.getBezahlDatum() == null;
+      // DropDownChoice ZahlungsZiel
+      final LabelValueChoiceRenderer<Integer> zielChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
+      for (final int days : ZAHLUNGSZIELE_IN_TAGEN) {
+        zielChoiceRenderer.addValue(days, String.valueOf(days) + " " + getString("days"));
       }
-    };
-    bezahlDatumChoice.setNullValid(true);
-    bezahlDatumChoice.setRequired(false);
-    add(bezahlDatumChoice);
+      final DropDownChoice<Integer> zahlungsZielChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(),
+          new PropertyModel<Integer>(this, "zahlungsZiel"), zielChoiceRenderer.getValues(), zielChoiceRenderer) {
+        @Override
+        public boolean isVisible()
+        {
+          return data.getFaelligkeit() == null;
+        }
+      };
+      dependentFormComponents[4] = zahlungsZielChoice;
+      zahlungsZielChoice.setNullValid(true);
+      zahlungsZielChoice.setRequired(false);
 
-    add(new Label("netto", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return CurrencyFormatter.format(data.getNetSum());
-      }
-    }));
-    add(new Label("vatAmount", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return CurrencyFormatter.format(data.getVatAmountSum());
-      }
-    }));
-    add(new Label("brutto", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return CurrencyFormatter.format(data.getGrossSum());
-      }
-    }));
-
-    add(new MaxLengthTextArea("bemerkung", new PropertyModel<String>(data, "bemerkung")));
-    add(new MaxLengthTextArea("besonderheiten", new PropertyModel<String>(data, "besonderheiten")));
-    add(new DatesAsUTCLabel("utcDatum") {
-      @Override
-      public Date getStartTime()
-      {
-        return data.getDatum();
-      }
-    });
-    add(new DatesAsUTCLabel("utcFaelligkeit") {
-      @Override
-      public Date getStartTime()
-      {
-        return data.getFaelligkeit();
-      }
-    });
-    add(new DatesAsUTCLabel("utcBezahlDatum") {
-      @Override
-      public Date getStartTime()
-      {
-        return data.getBezahlDatum();
-      }
-    });
-    positionsRepeater = new RepeatingView("positions");
-    add(positionsRepeater);
+      fs.add(zahlungsZielChoice);
+      fs.add(new TextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return data.getZahlungsZielInTagen() + " " + getString("days");
+        }
+      }) {
+        @Override
+        public boolean isVisible()
+        {
+          return data.getFaelligkeit() != null;
+        }
+      });
+    }
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // Bezahldatum
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.bezahlDatum"));
+      final DatePanel bezahlDatumPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "bezahlDatum"), DatePanelSettings
+          .get().withTargetType(java.sql.Date.class));
+      dependentFormComponents[1] = bezahlDatumPanel.getDateField();
+      fs.add(bezahlDatumPanel);
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // Zahlbetrag
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.zahlBetrag"));
+      final TextField<BigDecimal> zahlBetragField = new TextField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(data,
+          "zahlBetrag")) {
+        @SuppressWarnings({ "rawtypes", "unchecked"})
+        @Override
+        public IConverter getConverter(final Class type)
+        {
+          return new CurrencyConverter();
+        }
+      };
+      dependentFormComponents[3] = zahlBetragField;
+      fs.add(zahlBetragField);
+    }
+    /* GRID16 - BLOCK */
+    gridBuilder.newGrid16();
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // Bemerkung
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "bemerkung"))).setAutogrow();
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // Besonderheiten
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.besonderheiten"));
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "besonderheiten"))).setAutogrow();
+    }
+    flowform.add(positionsRepeater = new RepeatingView(flowform.newChildId()));
+    if (costConfigured == true) {
+      costEditModalWindow = new ModalWindow(COST_EDIT_DIALOG_ID);
+      add(costEditModalWindow);
+    }
     refresh();
     afterInit();
   }
@@ -285,15 +351,14 @@ public abstract class AbstractRechnungEditForm<O extends AbstractRechnungDO<T>, 
   void refresh()
   {
     positionsRepeater.removeAll();
+    final boolean hasInsertAccess = getBaseDao().hasInsertAccess(getUser());
     if (CollectionUtils.isEmpty(data.getPositionen()) == true) {
       // Ensure that at least one position is available:
       final T position = newPositionInstance();
       position.setVat(Configuration.getInstance().getPercentValue(ConfigurationParam.FIBU_DEFAULT_VAT));
       data.addPosition(position);
     }
-    final List<T> positionen = data.getPositionen();
-    final int counter = positionen.size();
-    int no = 0;
+    DivPanel content = null, columns, column, subcolumn;
     for (final T position : data.getPositionen()) {
       // Fetch all kostZuweisungen:
       if (CollectionUtils.isNotEmpty(position.getKostZuweisungen()) == true) {
@@ -301,17 +366,222 @@ public abstract class AbstractRechnungEditForm<O extends AbstractRechnungDO<T>, 
           zuweisung.getNetto(); // Fetch
         }
       }
-      final WebMarkupContainer item = new WebMarkupContainer(positionsRepeater.newChildId());
-      positionsRepeater.add(item);
-      final WebMarkupContainer positionRow = new WebMarkupContainer("positionRow");
-      if (position == this.highlightedPosition) {
-        positionRow.add(new AttributeAppendModifier("style", WicketUtils.getHighlightedRowCssStyle()));
+      final List<Component> ajaxUpdatePositionComponents = new ArrayList<Component>();
+      final RechnungsPositionDO rechnungsPosition = (position instanceof RechnungsPositionDO) ? (RechnungsPositionDO) position : null;
+      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(positionsRepeater.newChildId(), DivType.GRID16,
+          DivType.ROUND_ALL);
+      positionsPanel.getContainer().setOutputMarkupId(true);
+      positionsRepeater.add(positionsPanel);
+      final StringBuffer heading = new StringBuffer();
+      heading.append(escapeHtml(getString("fibu.auftrag.position.short"))).append(" #").append(position.getNumber());
+      positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_ID, heading.toString()));
+      content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
+      positionsPanel.add(content);
+      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
+      final DivType divType = (rechnungsPosition != null) ? DivType.COL_25 : DivType.COL_33;
+      {
+        columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
+        if (rechnungsPosition != null) {
+          // Order
+          column.add(subcolumn = new DivPanel(column.newChildId(), DivType.COL_25));
+          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.auftrag"), true).setLabelSide(false);
+          fieldset.add(new InputPanel(fieldset.newChildId(), new AuftragsPositionFormComponent(InputPanel.WICKET_ID,
+              new PropertyModel<AuftragsPositionDO>(position, "auftragsPosition"), false)));
+          fieldset.add(new IconLinkPanel(fieldset.newChildId(), IconType.CIRCLE_ARROW_EAST, getString("show"), new Link<Void>(
+              IconLinkPanel.LINK_ID) {
+            /**
+             * @see org.apache.wicket.markup.html.link.Link#onClick()
+             */
+            @Override
+            public void onClick()
+            {
+              if (rechnungsPosition.getAuftragsPosition() != null) {
+                final PageParameters parameters = new PageParameters();
+                parameters.add(AbstractEditPage.PARAMETER_KEY_ID, rechnungsPosition.getAuftragsPosition().getAuftrag().getId());
+                final AuftragEditPage auftragEditPage = new AuftragEditPage(parameters);
+                auftragEditPage.setReturnToPage(getParentPage());
+                setResponsePage(auftragEditPage);
+              }
+            }
+
+            @Override
+            public boolean isVisible()
+            {
+              return rechnungsPosition.getAuftragsPosition() != null;
+            }
+          }).setTopRight());
+        }
+        {
+          // Menge
+          column.add(subcolumn = new DivPanel(column.newChildId(), divType));
+          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.rechnung.menge")).setLabelSide(false);
+          final TextField<BigDecimal> amountTextField = new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID,
+              new PropertyModel<BigDecimal>(position, "menge"), BigDecimal.ZERO, NumberHelper.BILLION);
+          amountTextField.add(new AjaxFormComponentUpdatingBehavior("onblur") {
+            @Override
+            protected void onUpdate(final AjaxRequestTarget target)
+            {
+              addAjaxComponents(target, ajaxUpdatePositionComponents);
+            }
+          });
+          fieldset.add(amountTextField);
+        }
+        {
+          // Net price
+          column.add(subcolumn = new DivPanel(column.newChildId(), divType));
+          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.rechnung.position.einzelNetto"))
+          .setLabelSide(false);
+          final TextField<BigDecimal> netTextField = new TextField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(
+              position, "einzelNetto")) {
+            @SuppressWarnings({ "rawtypes", "unchecked"})
+            @Override
+            public IConverter getConverter(final Class type)
+            {
+              return new CurrencyConverter();
+            }
+          };
+          netTextField.add(new AjaxFormComponentUpdatingBehavior("onblur") {
+            @Override
+            protected void onUpdate(final AjaxRequestTarget target)
+            {
+              addAjaxComponents(target, ajaxUpdatePositionComponents);
+            }
+          });
+          fieldset.add(netTextField);
+        }
+        {
+          // VAT
+          column.add(subcolumn = new DivPanel(column.newChildId(), divType));
+          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.rechnung.mehrwertSteuerSatz")).setLabelSide(false);
+          final TextField<BigDecimal> vatTextField = new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(
+              position, "vat"), BigDecimal.ZERO, NumberHelper.HUNDRED) {
+            @SuppressWarnings({ "rawtypes", "unchecked"})
+            @Override
+            public IConverter getConverter(final Class type)
+            {
+              return new BigDecimalPercentConverter(true);
+            }
+          };
+          vatTextField.add(new AjaxFormComponentUpdatingBehavior("onblur") {
+            @Override
+            protected void onUpdate(final AjaxRequestTarget target)
+            {
+              addAjaxComponents(target, ajaxUpdatePositionComponents);
+            }
+          });
+          fieldset.add(vatTextField);
+        }
       }
-      item.add(positionRow);
-      final Label numberLabel = new Label("number", String.valueOf(position.getNumber()));
-      positionRow.add(numberLabel);
-      final SubmitLink addPositionButton = new SubmitLink("addPosition") {
-        public void onSubmit()
+      {
+        columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
+        column.add(subcolumn = new DivPanel(column.newChildId(), DivType.COL_33));
+        {
+          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.common.netto")).setLabelSide(false).setNoLabelFor();
+          final TextPanel netTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
+            @Override
+            public String getObject()
+            {
+              return CurrencyFormatter.format(position.getNetSum());
+            };
+          });
+          ajaxUpdatePositionComponents.add(netTextPanel.getLabel4Ajax());
+          fieldset.add(netTextPanel);
+        }
+      }
+      {
+        column.add(subcolumn = new DivPanel(column.newChildId(), DivType.COL_33));
+        {
+          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.common.vatAmount")).setLabelSide(false)
+              .setNoLabelFor();
+          final TextPanel vatTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
+            @Override
+            public String getObject()
+            {
+              return CurrencyFormatter.format(position.getVatAmount());
+            };
+          });
+          fieldset.add(vatTextPanel);
+          ajaxUpdatePositionComponents.add(vatTextPanel.getLabel4Ajax());
+        }
+      }
+      {
+        column.add(subcolumn = new DivPanel(column.newChildId(), DivType.COL_33));
+        {
+          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.common.brutto")).setLabelSide(false)
+              .setNoLabelFor();
+          final TextPanel grossTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
+            @Override
+            public String getObject()
+            {
+              return CurrencyFormatter.format(position.getBruttoSum());
+            };
+          });
+          fieldset.add(grossTextPanel);
+          ajaxUpdatePositionComponents.add(grossTextPanel.getLabel4Ajax());
+        }
+      }
+      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
+      {
+        // Text
+        if (costConfigured == true) {
+          columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
+        } else {
+          columns.add(column = new DivPanel(columns.newChildId())); // Full width.
+        }
+        final FieldsetPanel fieldset = new FieldsetPanel(column, getString("fibu.rechnung.text"));
+        fieldset.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(position, "text"))).setAutogrow();
+      }
+
+      if (costConfigured == true) {
+        {
+          // Cost assignments
+          columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
+          {
+            column.add(subcolumn = new DivPanel(column.newChildId(), DivType.COL_50));
+            final RechnungCostTablePanel costTable = new RechnungCostTablePanel(subcolumn.newChildId(), position);
+            subcolumn.add(costTable);
+            ajaxUpdatePositionComponents.add(costTable.refresh().getTable());
+
+            column.add(subcolumn = new DivPanel(column.newChildId(), DivType.COL_50));
+            final BigDecimal fehlbetrag = position.getKostZuweisungNetFehlbetrag();
+            if (hasInsertAccess == true) {
+              ButtonType buttonType;
+              if (NumberHelper.isNotZero(fehlbetrag) == true) {
+                buttonType = ButtonType.RED;
+              } else {
+                buttonType = ButtonType.LIGHT;
+              }
+              final AjaxButton editCostButton = new AjaxButton(ButtonPanel.BUTTON_ID, this) {
+                @Override
+                protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+                {
+                  showCostEditModalWindow(target, position, costTable);
+                }
+
+                @Override
+                protected void onError(final AjaxRequestTarget target, final Form< ? > form)
+                {
+                  target.add(AbstractRechnungEditForm.this.feedbackPanel);
+                }
+              };
+              editCostButton.setDefaultFormProcessing(false);
+              subcolumn.add(new ButtonPanel(subcolumn.newChildId(), getString("edit"), editCostButton, buttonType));
+            } else {
+              subcolumn.add(new TextPanel(subcolumn.newChildId(), " "));
+            }
+            if (NumberHelper.isNotZero(fehlbetrag) == true) {
+              subcolumn.add(new TextPanel(subcolumn.newChildId(), CurrencyFormatter.format(fehlbetrag), TextStyle.RED));
+            }
+          }
+        }
+      }
+    }
+    if (hasInsertAccess == true) {
+      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
+      columns.add(column = new DivPanel(columns.newChildId())); // Full width.
+      final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
+        @Override
+        public final void onSubmit()
         {
           final T position = newPositionInstance();
           data.addPosition(position);
@@ -322,167 +592,11 @@ public abstract class AbstractRechnungEditForm<O extends AbstractRechnungDO<T>, 
             }
           }
           refresh();
-        };
+        }
       };
-      item.add(addPositionButton);
-      addPositionButton.add(WicketUtils.getAddRowImage("addPositionImage", getResponse(), getString("fibu.rechnung.tooltip.addPosition")));
-      final MaxLengthTextArea textArea = new MaxLengthTextArea("editableText", new PropertyModel<String>(position, "text"));
-      final Label readOnlyText = new Label("readOnlyText", HtmlHelper.formatText(position.getText(), true));
-      if (isShowTextAreas() == true) {
-        readOnlyText.setVisible(false);
-      } else {
-        textArea.setVisible(false);
-      }
-      positionRow.add(textArea);
-      positionRow.add(readOnlyText.setEscapeModelStrings(false));
-      positionRow.add(new MinMaxNumberField<BigDecimal>("vat", new PropertyModel<BigDecimal>(position, "vat"), BigDecimal.ZERO,
-          NumberHelper.HUNDRED) {
-        @Override
-        public IConverter getConverter(Class< ? > type)
-        {
-          return new BigDecimalPercentConverter(true);
-        }
-      });
-      positionRow.add(new MinMaxNumberField<BigDecimal>("menge", new PropertyModel<BigDecimal>(position, "menge"), BigDecimal.ZERO,
-          NumberHelper.BILLION));
-      positionRow.add(new TextField<BigDecimal>("einzelNetto", new PropertyModel<BigDecimal>(position, "einzelNetto")) {
-        @Override
-        public IConverter getConverter(Class< ? > type)
-        {
-          return new CurrencyConverter();
-        }
-      });
-      positionRow.add(new Label("netto", new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          return CurrencyFormatter.format(position.getNetSum());
-        }
-      }));
-      positionRow.add(new Label("vatAmount", new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          return CurrencyFormatter.format(position.getVatAmount());
-        }
-      }));
-      positionRow.add(new Label("brutto", new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          return CurrencyFormatter.format(position.getBruttoSum());
-        }
-      }));
-      if (++no < counter) {
-        // Show only Button for last position.
-        addPositionButton.setVisible(false);
-      }
-      final WebMarkupContainer kostZuweisungRow = new WebMarkupContainer("kostZuweisungRow");
-      item.add(kostZuweisungRow);
-      if (isShowKostZuweisungen() == false && isShowEditableKostZuweisungen() == false) {
-        kostZuweisungRow.setVisible(false);
-      } else {
-        final RepeatingView kostZuweisungsRepeater = new RepeatingView("kostZuweisungen");
-        kostZuweisungRow.add(kostZuweisungsRepeater);
-        if (CollectionUtils.isNotEmpty(position.getKostZuweisungen()) == true) {
-          for (final KostZuweisungDO zuweisung : position.getKostZuweisungen()) {
-            final WebMarkupContainer subItem = new WebMarkupContainer(kostZuweisungsRepeater.newChildId());
-            kostZuweisungsRepeater.add(subItem);
-            subItem.add(new Kost1FormComponent("kost1", new PropertyModel<Kost1DO>(zuweisung, "kost1"), true)
-                .setVisible(isShowEditableKostZuweisungen()));
-            final Component kost1ReadonlyLabel = new Label("kost1Readonly", KostFormatter.format(zuweisung.getKost1()))
-                .setVisible(!isShowEditableKostZuweisungen());
-            if (kost1ReadonlyLabel.isVisible() == true) {
-              WicketUtils.addTooltip(kost1ReadonlyLabel, KostFormatter.formatToolTip(zuweisung.getKost1()));
-            }
-            subItem.add(kost1ReadonlyLabel);
-            subItem.add(new Kost2FormComponent("kost2", new PropertyModel<Kost2DO>(zuweisung, "kost2"), true)
-                .setVisible(isShowEditableKostZuweisungen()));
-            final Component kost2ReadonlyLabel = new Label("kost2Readonly", KostFormatter.format(zuweisung.getKost2()))
-                .setVisible(!isShowEditableKostZuweisungen());
-            if (kost2ReadonlyLabel.isVisible() == true) {
-              WicketUtils.addTooltip(kost2ReadonlyLabel, KostFormatter.formatToolTip(zuweisung.getKost2()));
-            }
-            subItem.add(kost2ReadonlyLabel);
-            final Component nettoTextField = new TextField<BigDecimal>("netto", new PropertyModel<BigDecimal>(zuweisung, "netto")) {
-              @Override
-              public IConverter getConverter(Class< ? > type)
-              {
-                return new CurrencyConverter(position.getNetSum());
-              }
-            }.setVisible(isShowEditableKostZuweisungen());
-            WicketUtils.addTooltip(nettoTextField, getString("currencyConverter.percentage.help"));
-            subItem.add(nettoTextField);
-            subItem.add(new Label("nettoReadonly", CurrencyFormatter.format(zuweisung.getNetto())).setVisible(
-                !isShowEditableKostZuweisungen()).setRenderBodyOnly(true));
-            final BigDecimal percentage;
-            if (NumberHelper.isZeroOrNull(position.getNetSum()) == true || NumberHelper.isZeroOrNull(zuweisung.getNetto()) == true) {
-              percentage = BigDecimal.ZERO;
-            } else {
-              percentage = zuweisung.getNetto().divide(position.getNetSum(), RoundingMode.HALF_UP);
-            }
-            final boolean percentageVisible = NumberHelper.isNotZero(percentage);
-            subItem.add(new Label("percentage", NumberFormatter.formatPercent(percentage)).setVisible(percentageVisible));
-            final SubmitLink deleteEntryButton = new SubmitLink("deleteEntry") {
-              public void onSubmit()
-              {
-                position.deleteKostZuweisung(zuweisung.getIndex());
-                refresh();
-              };
-            };
-            deleteEntryButton.add(WicketUtils.getDeleteTooltipImage(item, "deleteEntryImage", getResponse()));
-            deleteEntryButton.setDefaultFormProcessing(false);
-            subItem.add(deleteEntryButton);
-            if (isShowEditableKostZuweisungen() == false || position.isKostZuweisungDeletable(zuweisung) == false) {
-              // Only new created entries and last entries are deletable.
-              deleteEntryButton.setVisible(false);
-            }
-          }
-        }
-      }
-      final WebMarkupContainer addZuweisungRow = new WebMarkupContainer("addZuweisungRow");
-      if (showKostZuweisungen == false && showEditableKostZuweisungen == false) {
-        addZuweisungRow.setVisible(false);
-      }
-      kostZuweisungRow.add(addZuweisungRow);
-      final SubmitLink addZuweisungButton = new SubmitLink("addZuweisung") {
-        public void onSubmit()
-        {
-          final KostZuweisungDO kostZuweisung = new KostZuweisungDO();
-          position.addKostZuweisung(kostZuweisung);
-          if (kostZuweisung.getIndex() > 0) {
-            final KostZuweisungDO predecessor = position.getKostZuweisung(kostZuweisung.getIndex() - 1);
-            if (predecessor != null) {
-              kostZuweisung.setKost1(predecessor.getKost1()); // Preset kost1 from the predecessor position.
-              kostZuweisung.setKost2(predecessor.getKost2()); // Preset kost2 from the predecessor position.
-            }
-          }
-          if (RechnungDO.class.isAssignableFrom(getData().getClass()) == true && kostZuweisung.getKost2() == null) {
-            // Preset kost2 with first kost2 found for the projekt.
-            final List<Kost2DO> kost2List = kost2Dao.getActiveKost2(((RechnungDO) getData()).getProjekt());
-            if (CollectionUtils.isNotEmpty(kost2List) == true) {
-              kostZuweisung.setKost2(kost2List.get(0));
-            }
-          }
-          final BigDecimal remainder = position.getNetSum().subtract(position.getKostZuweisungsNetSum());
-          kostZuweisung.setNetto(remainder);
-          highlightedPosition = position;
-          refresh();
-        };
-      };
-      addZuweisungRow.add(addZuweisungButton);
-      if (isShowEditableKostZuweisungen() == false) {
-        addZuweisungButton.setVisible(false);
-      }
-      addZuweisungButton.add(WicketUtils.getAddRowImage("addPositionImage", getResponse(), getString("fibu.rechnung.tooltip.addPosition")));
-      final BigDecimal remainder = position.getNetSum().subtract(position.getKostZuweisungsNetSum());
-      if (remainder.compareTo(BigDecimal.ZERO) == 0) {
-        addZuweisungRow.add(createInvisibleDummyComponent("remainder"));
-      } else {
-        addZuweisungRow.add(new Label("remainder", CurrencyFormatter.format(remainder)));
-      }
-
-      onRenderPosition(item, position);
+      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(column.newChildId(), addPositionButton, getString("add"));
+      addPositionButtonPanel.setTooltip(getString("fibu.rechnung.tooltip.addPosition"));
+      column.add(addPositionButtonPanel);
     }
   }
 
@@ -496,67 +610,91 @@ public abstract class AbstractRechnungEditForm<O extends AbstractRechnungDO<T>, 
 
   }
 
-  @SuppressWarnings("serial")
-  @Override
-  protected void addButtonPanel()
+  protected void showCostEditModalWindow(final AjaxRequestTarget target, final AbstractRechnungsPositionDO position,
+      final RechnungCostTablePanel costTable)
   {
-    final Fragment buttonFragment = new Fragment("buttonPanel", "buttonFragment", this);
-    buttonFragment.setRenderBodyOnly(true);
-    buttonCell.add(buttonFragment);
-    cloneButtonPanel = new SingleButtonPanel("clone", new Button("button", new Model<String>(getString("clone"))) {
+    // Cost edit dialog
+    final DialogPanel costEditDialog = new DialogPanel(costEditModalWindow, getString("fibu.rechnung.showEditableKostZuweisungen"));
+    costEditModalWindow.setContent(costEditDialog);
+
+    final DivPanel content = new DivPanel(costEditDialog.newChildId());
+    costEditDialog.add(content);
+    final RechnungCostEditTablePanel rechnungCostEditTablePanel = new RechnungCostEditTablePanel(content.newChildId());
+    content.add(rechnungCostEditTablePanel);
+    rechnungCostEditTablePanel.add(position);
+
+    @SuppressWarnings("serial")
+    final AjaxButton cancelButton = new AjaxButton(SingleButtonPanel.WICKET_ID, new Model<String>("cancel")) {
+
       @Override
-      public final void onSubmit()
+      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
       {
-        cloneRechnung();
+        costEditModalWindow.close(target);
+      }
+
+      /**
+       * @see org.apache.wicket.ajax.markup.html.form.AjaxButton#onError(org.apache.wicket.ajax.AjaxRequestTarget,
+       *      org.apache.wicket.markup.html.form.Form)
+       */
+      @Override
+      protected void onError(final AjaxRequestTarget target, final Form< ? > form)
+      {
+      }
+    };
+    cancelButton.setDefaultFormProcessing(false); // No validation
+    final SingleButtonPanel cancelButtonPanel = new SingleButtonPanel(costEditDialog.newButtonChildId(), cancelButton, getString("cancel"),
+        SingleButtonPanel.CANCEL);
+    costEditDialog.addButton(cancelButtonPanel);
+
+    final String label = (isNew() == true) ? "create" : "update";
+    @SuppressWarnings("serial")
+    final AjaxButton submitButton = new AjaxButton(SingleButtonPanel.WICKET_ID, new Model<String>(label)) {
+
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+      {
+        // Copy edited values to DO object.
+        final AbstractRechnungsPositionDO srcPosition = rechnungCostEditTablePanel.getPosition();
+        final KostZuweisungenCopyHelper kostZuweisungCopyHelper = new KostZuweisungenCopyHelper();
+        kostZuweisungCopyHelper.mycopy(srcPosition.getKostZuweisungen(), position.getKostZuweisungen(), position);
+        target.add(costTable.refresh().getTable());
+        costEditModalWindow.close(target);
+      }
+
+      /**
+       * @see org.apache.wicket.ajax.markup.html.form.AjaxButton#onError(org.apache.wicket.ajax.AjaxRequestTarget,
+       *      org.apache.wicket.markup.html.form.Form)
+       */
+      @Override
+      protected void onError(final AjaxRequestTarget target, final Form< ? > form)
+      {
+      }
+    };
+    final SingleButtonPanel submitButtonPanel = new SingleButtonPanel(costEditDialog.newButtonChildId(), submitButton, getString(label),
+        SingleButtonPanel.DEFAULT_SUBMIT);
+    costEditDialog.addButton(submitButtonPanel);
+
+    costEditModalWindow.setWindowClosedCallback(new ModalWindow.WindowClosedCallback() {
+      private static final long serialVersionUID = 2633814101880954425L;
+
+      public void onClose(final AjaxRequestTarget target)
+      {
+      }
+
+    });
+    costEditModalWindow.setCloseButtonCallback(new ModalWindow.CloseButtonCallback() {
+      private static final long serialVersionUID = 6761625465164911336L;
+
+      public boolean onCloseButtonClicked(final AjaxRequestTarget target)
+      {
+        return true;
       }
     });
-    if (isNew() == true || getData().isDeleted() == true) {
-      // Show clone button only for existing time sheets.
-      cloneButtonPanel.setVisible(false);
-    }
-    buttonFragment.add(cloneButtonPanel);
+    costEditModalWindow.show(target);
+
   }
 
   protected abstract void cloneRechnung();
-
-  @Override
-  protected void validation()
-  {
-    final Long bezahlDatumInMillis = bezahlDatumChoice.getConvertedInput();
-    Date bezahlDatum = bezahlDatumPanel.getConvertedInput();
-    if (bezahlDatumInMillis != null) {
-      final DayHolder day = new DayHolder(new java.sql.Date(bezahlDatumInMillis));
-      bezahlDatum = day.getSQLDate();
-      data.setBezahlDatum(day.getSQLDate());
-      bezahlDatumPanel.markModelAsChanged();
-    }
-
-    final Integer zahlungsZiel = zahlungsZielChoice.getConvertedInput();
-    Date faelligkeit = faelligkeitPanel.getConvertedInput();
-    if (zahlungsZiel != null) {
-      Date date = datumPanel.getConvertedInput();
-      if (date == null) {
-        date = getData().getDatum();
-      }
-      if (date != null) {
-        final DayHolder day = new DayHolder(date);
-        day.add(Calendar.DAY_OF_YEAR, zahlungsZiel);
-        faelligkeit = day.getSQLDate();
-        getData().setFaelligkeit(day.getSQLDate());
-        faelligkeitPanel.markModelAsChanged();
-      }
-    }
-    getData().recalculate();
-
-    final BigDecimal zahlBetrag = zahlBetragField.getConvertedInput();
-    boolean zahlBetragExists = (zahlBetrag != null && zahlBetrag.compareTo(BigDecimal.ZERO) != 0);
-    if (bezahlDatum != null && zahlBetragExists == false) {
-      addError("fibu.rechnung.error.bezahlDatumUndZahlbetragRequired");
-    }
-    if (faelligkeit == null) {
-      addFieldRequiredError("fibu.rechnung.faelligkeit");
-    }
-  }
 
   /**
    * @return null
@@ -570,7 +708,7 @@ public abstract class AbstractRechnungEditForm<O extends AbstractRechnungDO<T>, 
    * Dummy method. Does nothing.
    * @param bezahlDatumInMillis
    */
-  public void setBezahlDatumInMillis(Long bezahlDatumInMillis)
+  public void setBezahlDatumInMillis(final Long bezahlDatumInMillis)
   {
   }
 
@@ -586,37 +724,16 @@ public abstract class AbstractRechnungEditForm<O extends AbstractRechnungDO<T>, 
    * Dummy method. Does nothing.
    * @param zahlungsZiel
    */
-  public void setZahlungsZiel(Integer zahlungsZiel)
+  public void setZahlungsZiel(final Integer zahlungsZiel)
   {
   }
 
-  public boolean isShowTextAreas()
+  private void addAjaxComponents(final AjaxRequestTarget target, final List<Component> components)
   {
-    return showTextAreas;
-  }
-
-  public void setShowTextAreas(boolean showTextAreas)
-  {
-    this.showTextAreas = showTextAreas;
-  }
-
-  public boolean isShowKostZuweisungen()
-  {
-    return showKostZuweisungen;
-  }
-
-  public void setShowKostZuweisungen(boolean showKostZuweisungen)
-  {
-    this.showKostZuweisungen = showKostZuweisungen;
-  }
-
-  public boolean isShowEditableKostZuweisungen()
-  {
-    return showEditableKostZuweisungen;
-  }
-
-  public void setShowEditableKostZuweisungen(boolean showEditableKostZuweisungen)
-  {
-    this.showEditableKostZuweisungen = showEditableKostZuweisungen;
+    target.add(components.toArray(COMPONENT_ARRAY));
+    if (ajaxUpdateComponentsArray == null) {
+      ajaxUpdateComponentsArray = ajaxUpdateComponents.toArray(COMPONENT_ARRAY);
+    }
+    target.add(ajaxUpdateComponentsArray);
   }
 }

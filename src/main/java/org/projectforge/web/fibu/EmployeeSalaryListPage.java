@@ -28,13 +28,15 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.fibu.EmployeeSalaryDO;
@@ -48,6 +50,7 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = EmployeeSalaryEditPage.class)
 public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListForm, EmployeeSalaryDao, EmployeeSalaryDO>
@@ -62,7 +65,7 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
   @SpringBean(name = "employeeSalaryExportDao")
   private EmployeeSalaryExportDao employeeSalaryExportDao;
 
-  public EmployeeSalaryListPage(PageParameters parameters)
+  public EmployeeSalaryListPage(final PageParameters parameters)
   {
     super(parameters, "fibu.employee.salary");
   }
@@ -75,26 +78,30 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
   @SuppressWarnings("serial")
   public List<IColumn<EmployeeSalaryDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    List<IColumn<EmployeeSalaryDO>> columns = new ArrayList<IColumn<EmployeeSalaryDO>>();
+    final List<IColumn<EmployeeSalaryDO>> columns = new ArrayList<IColumn<EmployeeSalaryDO>>();
 
-    CellItemListener<EmployeeSalaryDO> cellItemListener = new CellItemListener<EmployeeSalaryDO>() {
-      public void populateItem(Item<ICellPopulator<EmployeeSalaryDO>> item, String componentId, IModel<EmployeeSalaryDO> rowModel)
+    final CellItemListener<EmployeeSalaryDO> cellItemListener = new CellItemListener<EmployeeSalaryDO>() {
+      public void populateItem(final Item<ICellPopulator<EmployeeSalaryDO>> item, final String componentId,
+          final IModel<EmployeeSalaryDO> rowModel)
       {
         final EmployeeSalaryDO employeeSalary = rowModel.getObject();
-        String cellStyle = "";
-        if (employeeSalary.isDeleted() == true) {
-          cellStyle = "text-decoration: line-through;";
+        final StringBuffer cssStyle = getCssStyle(employeeSalary.getId(), employeeSalary.isDeleted());
+        if (cssStyle.length() > 0) {
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
-        item.add(new AttributeModifier("style", true, new Model<String>(cellStyle)));
       }
     };
     columns.add(new CellItemListenerPropertyColumn<EmployeeSalaryDO>(new Model<String>(getString("calendar.month")), getSortable(
         "formattedYearAndMonth", sortable), "formattedYearAndMonth", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<EmployeeSalaryDO>> item, final String componentId,
+          final IModel<EmployeeSalaryDO> rowModel)
       {
-        final EmployeeSalaryDO employeeSalary = (EmployeeSalaryDO) rowModel.getObject();
+        final EmployeeSalaryDO employeeSalary = rowModel.getObject();
         if (isSelectMode() == false) {
           item.add(new ListSelectActionPanel(componentId, rowModel, EmployeeSalaryEditPage.class, employeeSalary.getId(), returnToPage,
               employeeSalary.getFormattedYearAndMonth()));
@@ -144,12 +151,30 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
   protected void init()
   {
     final List<IColumn<EmployeeSalaryDO>> columns = createColumns(this, true);
-    dataTable = createDataTable(columns, "employee.user.lastname", true);
+    dataTable = createDataTable(columns, "employee.user.lastname", SortOrder.ASCENDING);
     form.add(dataTable);
+    {
+      // Excel export
+      @SuppressWarnings("serial")
+      final SubmitLink excelExportLink = new SubmitLink(ContentMenuEntryPanel.LINK_ID, form) {
+        @Override
+        public void onSubmit()
+        {
+          if (form.getSearchFilter().getMonth() < 0 || form.getSearchFilter().getMonth() > 11) {
+            form.addError("fibu.employee.salary.error.monthNotGiven");
+            return;
+          }
+          exportExcel();
+        }
+      };
+      final ContentMenuEntryPanel excelExportButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), excelExportLink,
+          getString("exportAsXls")).setTooltip(getString("fibu.employee.salary.exportXls.tooltip"));
+      addContentMenuEntry(excelExportButton);
+    }
   }
 
   @Override
-  protected EmployeeSalaryListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected EmployeeSalaryListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new EmployeeSalaryListForm(this);
   }
@@ -161,7 +186,7 @@ public class EmployeeSalaryListPage extends AbstractListPage<EmployeeSalaryListF
   }
 
   @Override
-  protected IModel<EmployeeSalaryDO> getModel(EmployeeSalaryDO object)
+  protected IModel<EmployeeSalaryDO> getModel(final EmployeeSalaryDO object)
   {
     return new DetachableDOModel<EmployeeSalaryDO, EmployeeSalaryDao>(object, getBaseDao());
   }

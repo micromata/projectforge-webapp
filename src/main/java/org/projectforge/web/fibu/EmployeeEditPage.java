@@ -23,12 +23,9 @@
 
 package org.projectforge.web.fibu;
 
-import java.util.Date;
-
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.EmployeeDao;
@@ -45,7 +42,7 @@ public class EmployeeEditPage extends AbstractEditPage<EmployeeDO, EmployeeEditF
   @SpringBean(name = "employeeDao")
   private EmployeeDao employeeDao;
 
-  public EmployeeEditPage(PageParameters parameters)
+  public EmployeeEditPage(final PageParameters parameters)
   {
     super(parameters, "fibu.employee");
     init();
@@ -56,29 +53,7 @@ public class EmployeeEditPage extends AbstractEditPage<EmployeeDO, EmployeeEditF
    */
   public void select(final String property, final Object selectedValue)
   {
-    if ("eintrittsDatum".equals(property) == true) {
-      final Date date;
-      if (selectedValue instanceof String) {
-        final Long ms = NumberHelper.parseLong((String) selectedValue);
-        date = new Date(ms);
-      } else {
-        date = (Date) selectedValue;
-      }
-      final DayHolder dh = new DayHolder(date);
-      getData().setEintrittsDatum(dh.getDate());
-      form.eintrittsDatePanel.markModelAsChanged();
-    } else if ("eintrittsDatum".equals(property) == true) {
-      final Date date;
-      if (selectedValue instanceof String) {
-        final Long ms = NumberHelper.parseLong((String) selectedValue);
-        date = new Date(ms);
-      } else {
-        date = (Date) selectedValue;
-      }
-      final DayHolder dh = new DayHolder(date);
-      getData().setAustrittsDatum(dh.getDate());
-      form.austrittsDatePanel.markModelAsChanged();
-    } else if ("userId".equals(property) == true) {
+    if ("userId".equals(property) == true) {
       final Integer id;
       if (selectedValue instanceof String) {
         id = NumberHelper.parseInteger((String) selectedValue);
@@ -102,7 +77,7 @@ public class EmployeeEditPage extends AbstractEditPage<EmployeeDO, EmployeeEditF
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
    */
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     log.error("Property '" + property + "' not supported for selection.");
   }
@@ -110,7 +85,7 @@ public class EmployeeEditPage extends AbstractEditPage<EmployeeDO, EmployeeEditF
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
    */
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing.
   }
@@ -122,7 +97,7 @@ public class EmployeeEditPage extends AbstractEditPage<EmployeeDO, EmployeeEditF
   }
 
   @Override
-  protected EmployeeEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, EmployeeDO data)
+  protected EmployeeEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final EmployeeDO data)
   {
     return new EmployeeEditForm(this, data);
   }

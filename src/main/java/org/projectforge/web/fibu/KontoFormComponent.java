@@ -50,7 +50,7 @@ public class KontoFormComponent extends PFAutoCompleteTextField<KontoDO>
   {
     private static final long serialVersionUID = -6179453515097650206L;
 
-    public KontoDO convertToObject(String value, final Locale locale)
+    public KontoDO convertToObject(final String value, final Locale locale)
     {
       if (StringUtils.isBlank(value) == true) {
         return null;
@@ -81,7 +81,7 @@ public class KontoFormComponent extends PFAutoCompleteTextField<KontoDO>
       setRequired(true);
       add(new AbstractValidator<KontoDO>() {
         @Override
-        protected void onValidate(IValidatable<KontoDO> validatable)
+        protected void onValidate(final IValidatable<KontoDO> validatable)
         {
           final KontoDO value = validatable.getValue();
           if (value == null) {
@@ -106,6 +106,7 @@ public class KontoFormComponent extends PFAutoCompleteTextField<KontoDO>
     enableTooltips();
   }
 
+  @Override
   protected String getTooltip()
   {
     final KontoDO konto = getModelObject();
@@ -116,7 +117,7 @@ public class KontoFormComponent extends PFAutoCompleteTextField<KontoDO>
   }
 
   @Override
-  protected List<KontoDO> getChoices(String input)
+  protected List<KontoDO> getChoices(final String input)
   {
     final BaseSearchFilter filter = new BaseSearchFilter();
     filter.setSearchString(input);
@@ -131,7 +132,7 @@ public class KontoFormComponent extends PFAutoCompleteTextField<KontoDO>
   }
 
   @Override
-  protected String formatValue(KontoDO value)
+  protected String formatValue(final KontoDO value)
   {
     if (value == null) {
       return "";
@@ -140,7 +141,7 @@ public class KontoFormComponent extends PFAutoCompleteTextField<KontoDO>
   }
 
   @Override
-  protected String formatLabel(KontoDO value)
+  protected String formatLabel(final KontoDO value)
   {
     if (value == null) {
       return "";
@@ -149,7 +150,7 @@ public class KontoFormComponent extends PFAutoCompleteTextField<KontoDO>
   }
 
   @Override
-  public IConverter getConverter(Class< ? > type)
+  public IConverter getConverter(final Class type)
   {
     return new KontoConverter();
   }

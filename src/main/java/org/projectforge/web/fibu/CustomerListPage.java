@@ -27,15 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.KontoCache;
 import org.projectforge.fibu.KontoDO;
@@ -50,7 +50,6 @@ import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
-import org.projectforge.web.wicket.MessagePage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = CustomerEditPage.class)
@@ -78,17 +77,6 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
   @Override
   protected void init()
   {
-    ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
-      @Override
-      public void onClick()
-      {
-        setResponsePage(new MessagePage("fibu.kunde.wizard.notYetAvailable"));
-      };
-    }, getString("wizard"));
-    contentMenuEntries.add(menuEntry);
-    final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", UserPrefArea.KUNDE_FAVORITE);
-    menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("favorites"));
-    addContentMenuEntry(menuEntry);
 
     final List<IColumn<KundeDO>> columns = new ArrayList<IColumn<KundeDO>>();
 
@@ -100,26 +88,28 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
           // Should not occur:
           return;
         }
-        String cellStyle = "";
-        if (kunde.isDeleted() == true || kunde.getStatus().isIn(KundeStatus.ENDED) == true) {
-          cellStyle = "text-decoration: line-through;";
+        final StringBuffer cssStyle = getCssStyle(kunde.getId(), kunde.isDeleted() == true
+            || kunde.getStatus().isIn(KundeStatus.ENDED) == true);
+        if (cssStyle.length() > 0) {
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
-        item.add(new AttributeModifier("style", true, new Model<String>(cellStyle)));
       }
     };
     columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("fibu.kunde.nummer")), "kost", "kost",
         cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<KundeDO>> item, final String componentId, final IModel<KundeDO> rowModel)
       {
-        final KundeDO kunde = (KundeDO) rowModel.getObject();
+        final KundeDO kunde = rowModel.getObject();
         if (isSelectMode() == false) {
           item.add(new ListSelectActionPanel(componentId, rowModel, CustomerEditPage.class, kunde.getId(), CustomerListPage.this, String
               .valueOf(kunde.getKost())));
         } else {
-          item
-          .add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, kunde.getId(), String.valueOf(kunde.getKost())));
+          item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, kunde.getId(), String.valueOf(kunde.getKost())));
         }
         cellItemListener.populateItem(item, componentId, rowModel);
         addRowClick(item);
@@ -131,24 +121,30 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("fibu.kunde.division")), "division", "division",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("fibu.konto")), null, "konto",
-        cellItemListener) {
-      @SuppressWarnings("unchecked")
+    columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("fibu.konto")), null, "konto", cellItemListener) {
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<KundeDO>> item, final String componentId, final IModel<KundeDO> rowModel)
       {
-        final KundeDO kunde = (KundeDO) rowModel.getObject();
+        final KundeDO kunde = rowModel.getObject();
         final KontoDO konto = kontoCache.getKonto(kunde.getKontoId());
-        item
-        .add(new Label(componentId, konto != null ? konto.formatKonto() : ""));
+        item.add(new Label(componentId, konto != null ? konto.formatKonto() : ""));
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
     columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("description")), "description", "description",
         cellItemListener));
-    dataTable = createDataTable(columns, "kost", true);
+    dataTable = createDataTable(columns, "kost", SortOrder.ASCENDING);
     form.add(dataTable);
+
+    final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink(ContentMenuEntryPanel.LINK_ID,
+        UserPrefArea.KUNDE_FAVORITE);
+    final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("favorites"));
+    addContentMenuEntry(menuEntry);
   }
 
   @Override

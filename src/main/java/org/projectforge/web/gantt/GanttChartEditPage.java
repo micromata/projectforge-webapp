@@ -28,9 +28,9 @@ import java.util.Date;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebComponent;
 import org.apache.wicket.markup.html.panel.Fragment;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.FileHelper;
 import org.projectforge.common.NumberHelper;
@@ -45,8 +45,8 @@ import org.projectforge.gantt.GanttTask;
 import org.projectforge.renderer.BatikImageRenderer;
 import org.projectforge.renderer.ImageFormat;
 import org.projectforge.web.fibu.ISelectCallerPage;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractUnsecureBasePage;
 import org.projectforge.web.wicket.BatikImage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.EditPage;
@@ -78,7 +78,7 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
     super(parameters, "gantt");
     init();
     if (isNew() == true) {
-      final Integer taskId = parameters.getAsInteger(PARAM_KEY_TASK);
+      final Integer taskId = WicketUtils.getAsInteger(parameters, PARAM_KEY_TASK);
       if (taskId != null) {
         getBaseDao().setTask(getData(), taskId);
       }
@@ -144,7 +144,7 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
   }
 
   @Override
-  public AbstractBasePage onSaveOrUpdate()
+  public AbstractUnsecureBasePage onSaveOrUpdate()
   {
     getSettings().setOpenNodes(ganttChartEditTreeTablePanel.getOpenNodes());
     getBaseDao().writeGanttObjects(getData(), ganttChartData.getRootObject());
@@ -268,7 +268,7 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
   }
 
   @Override
-  protected GanttChartEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, GanttChartDO data)
+  protected GanttChartEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final GanttChartDO data)
   {
     return new GanttChartEditForm(this, data);
   }

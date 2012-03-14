@@ -24,9 +24,10 @@
 package org.projectforge.web.fibu;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.CheckBox;
-import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class Kost2ArtListForm extends AbstractListForm<Kost2ArtListFilter, Kost2ArtListPage>
 {
@@ -34,7 +35,7 @@ public class Kost2ArtListForm extends AbstractListForm<Kost2ArtListFilter, Kost2
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Kost2ArtListForm.class);
 
-  public Kost2ArtListForm(Kost2ArtListPage parentPage)
+  public Kost2ArtListForm(final Kost2ArtListPage parentPage)
   {
     super(parentPage);
   }
@@ -43,7 +44,18 @@ public class Kost2ArtListForm extends AbstractListForm<Kost2ArtListFilter, Kost2
   protected void init()
   {
     super.init();
-    filterContainer.add(new CheckBox("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted")));
+    gridBuilder.newColumnsPanel();
+    {
+      gridBuilder.newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
+    }
+    {
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      addPageSizeFieldset();
+    }
   }
 
   @Override

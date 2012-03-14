@@ -27,16 +27,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
-import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektDao;
@@ -56,7 +56,6 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
-import org.projectforge.web.wicket.MessagePage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = ProjektEditPage.class)
@@ -101,17 +100,20 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
         }
         final StringBuffer cssStyle = getCssStyle(projekt.getId(), projekt.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.projekt.nummer")), getSortable("kost",
         sortable), "kost", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<ProjektDO>> item, final String componentId, final IModel<ProjektDO> rowModel)
       {
-        final ProjektDO projekt = (ProjektDO) rowModel.getObject();
+        final ProjektDO projekt = rowModel.getObject();
         if (isSelectMode() == false) {
           item.add(new ListSelectActionPanel(componentId, rowModel, ProjektEditPage.class, projekt.getId(), returnToPage, String
               .valueOf(projekt.getKost())));
@@ -131,17 +133,20 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
         sortable), "name", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.kunde.division")), getSortable(
         "kunde.division", sortable), "kunde.division", cellItemListener));
-    columns.add(new TaskPropertyColumn<ProjektDO>(this, getString("task"), getSortable("task.title", sortable), "task", cellItemListener)
+    columns.add(new TaskPropertyColumn<ProjektDO>(getString("task"), getSortable("task.title", sortable), "task", cellItemListener)
         .withTaskFormatter(taskFormatter));
     columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("status")), getSortable("status", sortable),
         "status", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.projekt.projektManagerGroup")), null,
         "projektManagerGroup", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<ProjektDO>> item, final String componentId, final IModel<ProjektDO> rowModel)
       {
-        final ProjektDO projektDO = (ProjektDO) rowModel.getObject();
+        final ProjektDO projektDO = rowModel.getObject();
         String groupName = "";
         if (projektDO.getProjektManagerGroupId() != null) {
           final GroupDO group = userGroupCache.getGroup(projektDO.getProjektManagerGroupId());
@@ -156,11 +161,14 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
     });
     columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.kost2art.kost2arten")), null,
         "kost2ArtsAsHtml", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<ProjektDO>> item, final String componentId, final IModel<ProjektDO> rowModel)
       {
-        final ProjektDO projektDO = (ProjektDO) rowModel.getObject();
+        final ProjektDO projektDO = rowModel.getObject();
         final ProjektImpl projekt = new ProjektImpl(projektDO);
         final List<Kost2Art> kost2Arts = kostCache.getAllKost2Arts(projektDO.getId());
         projekt.setKost2Arts(kost2Arts);
@@ -175,22 +183,13 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
     return columns;
   }
 
-  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
-    ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
-      @Override
-      public void onClick()
-      {
-        setResponsePage(new MessagePage("fibu.projekt.wizard.notYetAvailable"));
-      };
-    }, getString("wizard"));
-    contentMenuEntries.add(menuEntry);
-    dataTable = createDataTable(createColumns(this, true), "kost", true);
+    dataTable = createDataTable(createColumns(this, true), "kost", SortOrder.ASCENDING);
     form.add(dataTable);
     final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", UserPrefArea.PROJEKT_FAVORITE);
-    menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("favorites"));
+    final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, getString("favorites"));
     addContentMenuEntry(menuEntry);
   }
 

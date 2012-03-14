@@ -25,11 +25,10 @@ package org.projectforge.web.task;
 
 import java.util.List;
 
-import javax.servlet.jsp.PageContext;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.wicket.request.Response;
 import org.hibernate.Hibernate;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskNode;
@@ -38,9 +37,6 @@ import org.projectforge.task.TaskTree;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.common.OutputType;
 import org.projectforge.web.core.AbstractFormatter;
-import org.projectforge.web.core.LocalizerAndUrlBuilder;
-import org.projectforge.web.core.PageContextLocalizerAndUrlBuilder;
-import org.projectforge.web.wicket.WicketUtils;
 
 public class TaskFormatter extends AbstractFormatter
 {
@@ -65,12 +61,12 @@ public class TaskFormatter extends AbstractFormatter
     }
   }
 
-  public void setTaskTree(TaskTree taskTree)
+  public void setTaskTree(final TaskTree taskTree)
   {
     this.taskTree = taskTree;
   }
 
-  public void setHtmlHelper(HtmlHelper htmlHelper)
+  public void setHtmlHelper(final HtmlHelper htmlHelper)
   {
     this.htmlHelper = htmlHelper;
   }
@@ -80,9 +76,9 @@ public class TaskFormatter extends AbstractFormatter
    * @param taskId
    * @see #getTaskPath(Integer, boolean)
    */
-  public String getTaskPath(PageContext pageContext, Integer taskId)
+  public String getTaskPath(final Response response, final Integer taskId)
   {
-    return getTaskPath(pageContext, taskId, false, true);
+    return getTaskPath(response, taskId, true);
   }
 
   /**
@@ -90,49 +86,34 @@ public class TaskFormatter extends AbstractFormatter
    * @param taskId
    * @param enableLinks If true, every task title is associated with a link to EditTask.
    */
-  public String getTaskPath(PageContext pageContext, Integer taskId, boolean enableLinks, boolean lineThroughDeletedTasks)
+  public String getTaskPath(final Response response, final Integer taskId, final boolean lineThroughDeletedTasks)
   {
-    return getTaskPath(pageContext, taskId, null, enableLinks, lineThroughDeletedTasks);
+    return getTaskPath(response, taskId, null, lineThroughDeletedTasks);
   }
 
   /**
    * Gets the path of the task as String: ProjectForge -&gt; ... -&gt; database -&gt; backup strategy.
    * @param taskId
-   * @param enableLinks If true, every task title is associated with a link to EditTask.
    * @param lineThroughDeletedTasks If true, deleted task will be visualized by line through.
    * @param ancestorTaskId If not null, the path will shown between taskId and ancestorTaskId. If mainTaskId is not an ancestor of taskId,
    *          the whole path will be shown.
    */
-  public String getTaskPath(PageContext pageContext, Integer taskId, Integer ancestorTaskId, boolean enableLinks,
-      boolean lineThroughDeletedTasks)
-  {
-    return getTaskPath(new PageContextLocalizerAndUrlBuilder(pageContext), taskId, ancestorTaskId, enableLinks, lineThroughDeletedTasks);
-  }
-
-  /**
-   * Gets the path of the task as String: ProjectForge -&gt; ... -&gt; database -&gt; backup strategy.
-   * @param taskId
-   * @param enableLinks If true, every task title is associated with a link to EditTask.
-   * @param lineThroughDeletedTasks If true, deleted task will be visualized by line through.
-   * @param ancestorTaskId If not null, the path will shown between taskId and ancestorTaskId. If mainTaskId is not an ancestor of taskId,
-   *          the whole path will be shown.
-   */
-  public String getTaskPath(LocalizerAndUrlBuilder locUrlBuilder, Integer taskId, Integer ancestorTaskId, boolean enableLinks,
-      boolean lineThroughDeletedTasks)
+  public String getTaskPath(final Response response, final Integer taskId, final Integer ancestorTaskId,
+      final boolean lineThroughDeletedTasks)
   {
     if (taskId == null || taskTree.getTaskNodeById(taskId) == null) {
       return null;
     }
-    List<TaskNode> list = taskTree.getPath(taskId, ancestorTaskId);
+    final List<TaskNode> list = taskTree.getPath(taskId, ancestorTaskId);
     if (list.size() > 0) {
-      StringBuffer buf = new StringBuffer();
+      final StringBuffer buf = new StringBuffer();
       int i = 0;
-      for (TaskNode node : list) {
-        TaskDO task = node.getTask();
+      for (final TaskNode node : list) {
+        final TaskDO task = node.getTask();
         if (i++ > 0) {
           buf.append(" -&gt; ");
         }
-        appendFormattedTask(buf, locUrlBuilder, task, enableLinks, false, lineThroughDeletedTasks);
+        appendFormattedTask(response, buf, task, false, lineThroughDeletedTasks);
       }
       return buf.toString();
     } else if (ancestorTaskId != null) {
@@ -149,7 +130,7 @@ public class TaskFormatter extends AbstractFormatter
    *          shown.
    * @param escapeHtml
    */
-  public String getTaskPath(Integer taskId, boolean showCurrentTask, OutputType outputType)
+  public String getTaskPath(final Integer taskId, final boolean showCurrentTask, final OutputType outputType)
   {
     return getTaskPath(taskId, null, showCurrentTask, outputType);
   }
@@ -162,7 +143,7 @@ public class TaskFormatter extends AbstractFormatter
    *          shown.
    * @param escapeHtml
    */
-  public String getTaskPath(Integer taskId, Integer ancestorTaskId, boolean showCurrentTask, OutputType outputType)
+  public String getTaskPath(Integer taskId, final Integer ancestorTaskId, final boolean showCurrentTask, final OutputType outputType)
   {
     if (taskId == null) {
       return null;
@@ -178,14 +159,14 @@ public class TaskFormatter extends AbstractFormatter
       }
       taskId = n.getTaskId();
     }
-    List<TaskNode> list = taskTree.getPath(taskId, ancestorTaskId);
+    final List<TaskNode> list = taskTree.getPath(taskId, ancestorTaskId);
     if (CollectionUtils.isEmpty(list) == true) {
       return "";
     }
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     int i = 0;
-    for (TaskNode node : list) {
-      TaskDO task = node.getTask();
+    for (final TaskNode node : list) {
+      final TaskDO task = node.getTask();
       if (i++ > 0) {
         buf.append(" -> ");
       }
@@ -203,42 +184,25 @@ public class TaskFormatter extends AbstractFormatter
   /**
    * Writes the html formatted task to the given StringBuffer.
    * @param buf
-   * @param pageContext
    * @param task
    * @param enableLink If true, the task has a link to the EditTask.action.
    * @param showPathAsTooltip If true, an info icon with the whole task path as tooltip will be added.
    */
-  public void appendFormattedTask(StringBuffer buf, PageContext pageContext, TaskDO task, boolean enableLink, boolean showPathAsTooltip,
-      boolean lineThroughDeletedTask)
-  {
-    appendFormattedTask(buf, new PageContextLocalizerAndUrlBuilder(pageContext), task, enableLink, showPathAsTooltip,
-        lineThroughDeletedTask);
-  }
-
-  /**
-   * Writes the html formatted task to the given StringBuffer.
-   * @param buf
-   * @param pageContext
-   * @param task
-   * @param enableLink If true, the task has a link to the EditTask.action.
-   * @param showPathAsTooltip If true, an info icon with the whole task path as tooltip will be added.
-   */
-  public void appendFormattedTask(StringBuffer buf, LocalizerAndUrlBuilder locUrlBuilder, TaskDO task, boolean enableLink,
-      boolean showPathAsTooltip, boolean lineThroughDeletedTask)
+  public void appendFormattedTask(final Response response, final StringBuffer buf, TaskDO task, final boolean showPathAsTooltip,
+      final boolean lineThroughDeletedTask)
   {
     Validate.notNull(buf);
-    Validate.notNull(locUrlBuilder);
     Validate.notNull(task);
     if (showPathAsTooltip == true) {
-      String taskPath = getTaskPath(locUrlBuilder, task.getId(), null, false, false);
+      final String taskPath = getTaskPath(response, task.getId(), null, false);
       if (taskPath != null) {
-        htmlHelper.appendImageTag(locUrlBuilder, buf, htmlHelper.getInfoImage(), taskPath);
+        htmlHelper.appendImageTag(response, buf, htmlHelper.getInfoImage(), taskPath);
       }
     }
-    if (enableLink == true) {
-      htmlHelper.appendAncorStartTag(locUrlBuilder, buf, WicketUtils.getBookmarkablePageUrl(TaskEditPage.class, "id", String.valueOf(task
-          .getId())));
-    }
+    // if (enableLink == true) {
+    // htmlHelper.appendAncorStartTag(locUrlBuilder, buf,
+    // WicketUtils.getBookmarkablePageUrl(TaskEditPage.class, "id", String.valueOf(task.getId())));
+    // }
     if (Hibernate.isInitialized(task) == false) {
       task = taskTree.getTaskById(task.getId());
     }
@@ -257,9 +221,9 @@ public class TaskFormatter extends AbstractFormatter
     } else {
       buf.append(HtmlHelper.escapeXml(task.getTitle()));
     }
-    if (enableLink == true) {
-      htmlHelper.appendAncorEndTag(buf);
-    }
+    // if (enableLink == true) {
+    // htmlHelper.appendAncorEndTag(buf);
+    // }
   }
 
   public String getFormattedTaskStatus(final TaskStatus status)
@@ -268,18 +232,12 @@ public class TaskFormatter extends AbstractFormatter
       // Show 'not opened' as blank field:
       return "";
     }
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     buf.append("<span");
     htmlHelper.attribute(buf, "class", "taskStatus_" + status.getKey());
     buf.append(">");
     buf.append(getI18nMessage("task.status." + status.getKey()));
     buf.append("</span>");
     return buf.toString();
-  }
-
-  @Deprecated
-  public String appendFormattedTaskStatus(PageContext pageContext, TaskStatus status)
-  {
-    return getFormattedTaskStatus(status);
   }
 }

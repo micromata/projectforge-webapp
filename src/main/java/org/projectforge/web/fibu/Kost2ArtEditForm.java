@@ -26,17 +26,22 @@ package org.projectforge.web.fibu;
 import java.math.BigDecimal;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.fibu.kost.Kost2ArtDO;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
-import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
+import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.RequiredMinMaxNumberField;
 import org.projectforge.web.wicket.converter.IntegerConverter;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class Kost2ArtEditForm extends AbstractEditForm<Kost2ArtDO, Kost2ArtEditPage>
 {
@@ -44,10 +49,9 @@ public class Kost2ArtEditForm extends AbstractEditForm<Kost2ArtDO, Kost2ArtEditP
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Kost2ArtEditForm.class);
 
-  public Kost2ArtEditForm(Kost2ArtEditPage parentPage, Kost2ArtDO data)
+  public Kost2ArtEditForm(final Kost2ArtEditPage parentPage, final Kost2ArtDO data)
   {
     super(parentPage, data);
-    this.colspan = 6;
   }
 
   @Override
@@ -55,25 +59,60 @@ public class Kost2ArtEditForm extends AbstractEditForm<Kost2ArtDO, Kost2ArtEditP
   protected void init()
   {
     super.init();
-
-    final TextField<Integer> nummerField = new RequiredMinMaxNumberField<Integer>("nummer", new PropertyModel<Integer>(data, "id"), 0,
-        99) {
-      @Override
-      public IConverter getConverter(Class< ? > type)
-      {
-        return new IntegerConverter(2);
+    gridBuilder.newGrid16();
+    {
+      // Number
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost2art.nummer"));
+      final TextField<Integer> nummerField = new RequiredMinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data,
+          "id"), 0, 99) {
+        @SuppressWarnings({ "rawtypes", "unchecked"})
+        @Override
+        public IConverter getConverter(final Class type)
+        {
+          return new IntegerConverter(2);
+        }
+      };
+      if (isNew() == false) {
+        nummerField.setEnabled(false);
       }
-    };
-    if (isNew() == false) {
-      nummerField.setEnabled(false);
+      fs.add(nummerField);
     }
-    add(nummerField);
-    add(new CheckBox("fakturiertCheckBox", new PropertyModel<Boolean>(data, "fakturiert")));
-    add(new CheckBox("projektStandardCheckBox", new PropertyModel<Boolean>(data, "projektStandard")));
-    add(new MaxLengthTextField("name", new PropertyModel<String>(data, "name")));
-    add(new MinMaxNumberField<BigDecimal>("workFraction", new PropertyModel<BigDecimal>(data, "workFraction"), BigDecimal.ZERO,
-        BigDecimal.ONE));
-    add(new MaxLengthTextArea("description", new PropertyModel<String>(data, "description")));
+    {
+      // Invoiced
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.fakturiert"));
+      final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
+      final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), "invoiced",
+          new PropertyModel<Boolean>(data, "fakturiert"));
+      radioGroupPanel.add(radioGroup);
+      WicketUtils.addYesNo(radioGroup);
+      fs.setLabelFor(radioGroup.getRadioGroup());
+    }
+    {
+      // Invoiced
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost2art.projektStandard"));
+      final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
+      final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), "projectStandard",
+          new PropertyModel<Boolean>(data, "projektStandard"));
+      radioGroupPanel.add(radioGroup);
+      WicketUtils.addYesNo(radioGroup);
+      fs.setLabelFor(radioGroup.getRadioGroup());
+    }
+    {
+      // Name
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost2art.name"));
+      fs.add(new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "name")));
+    }
+    {
+      // Work frqction
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost2art.workFraction"));
+      fs.add(new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(data, "workFraction"), BigDecimal.ZERO,
+          BigDecimal.ONE));
+    }
+    {
+      // Description
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "description"))).setAutogrow();
+    }
   }
 
   @Override

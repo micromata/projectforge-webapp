@@ -34,7 +34,6 @@ import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.TooltipImage;
 
-
 /**
  * This panel show the actual group and buttons for select/unselect group.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -52,7 +51,8 @@ public class GroupSelectPanel extends AbstractSelectPanel<GroupDO>
    * @param caller
    * @param selectProperty
    */
-  public GroupSelectPanel(final String id, final IModel<GroupDO> model, final ISelectCallerPage caller, final String selectProperty)
+  public GroupSelectPanel(final String id, final IModel<GroupDO> model, final ISelectCallerPage caller,
+      final String selectProperty)
   {
     super(id, model, caller, selectProperty);
   }
@@ -61,11 +61,12 @@ public class GroupSelectPanel extends AbstractSelectPanel<GroupDO>
    * Should be called before init() method. If true, then the validation will be done after submitting.
    * @param defaultFormProcessing
    */
-  public void setDefaultFormProcessing(boolean defaultFormProcessing)
+  public void setDefaultFormProcessing(final boolean defaultFormProcessing)
   {
     this.defaultFormProcessing = defaultFormProcessing;
   }
 
+  @Override
   @SuppressWarnings("serial")
   public GroupSelectPanel init()
   {
@@ -84,6 +85,7 @@ public class GroupSelectPanel extends AbstractSelectPanel<GroupDO>
     });
     add(groupAsStringLabel);
     final SubmitLink selectButton = new SubmitLink("select") {
+      @Override
       public void onSubmit()
       {
         setResponsePage(new GroupListPage(caller, selectProperty));
@@ -107,8 +109,8 @@ public class GroupSelectPanel extends AbstractSelectPanel<GroupDO>
     };
     unselectButton.setDefaultFormProcessing(defaultFormProcessing);
     add(unselectButton);
-    unselectButton
-        .add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_GROUP_UNSELECT, getString("tooltip.unselectGroup")));
+    unselectButton.add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_GROUP_UNSELECT,
+        getString("tooltip.unselectGroup")));
     return this;
   }
 

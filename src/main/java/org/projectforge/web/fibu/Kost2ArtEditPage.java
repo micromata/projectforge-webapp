@@ -24,7 +24,7 @@
 package org.projectforge.web.fibu;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.kost.Kost2ArtDO;
 import org.projectforge.fibu.kost.Kost2ArtDao;
@@ -42,7 +42,7 @@ public class Kost2ArtEditPage extends AbstractEditPage<Kost2ArtDO, Kost2ArtEditF
   @SpringBean(name = "kost2ArtDao")
   private Kost2ArtDao kost2ArtDao;
 
-  public Kost2ArtEditPage(PageParameters parameters)
+  public Kost2ArtEditPage(final PageParameters parameters)
   {
     super(parameters, "fibu.kost2art");
     init();
@@ -55,7 +55,7 @@ public class Kost2ArtEditPage extends AbstractEditPage<Kost2ArtDO, Kost2ArtEditF
   }
 
   @Override
-  protected Kost2ArtEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, Kost2ArtDO data)
+  protected Kost2ArtEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final Kost2ArtDO data)
   {
     return new Kost2ArtEditForm(this, data);
   }

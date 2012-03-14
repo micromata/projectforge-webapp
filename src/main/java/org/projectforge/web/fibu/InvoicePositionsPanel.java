@@ -28,12 +28,12 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.fibu.RechnungDao;
@@ -51,7 +51,7 @@ import org.projectforge.web.wicket.WicketUtils;
 public class InvoicePositionsPanel extends Panel
 {
   private static final long serialVersionUID = 4744964208090705536L;
-  
+
   @SpringBean(name = "rechnungDao")
   private RechnungDao rechnungDao;
 
@@ -66,7 +66,7 @@ public class InvoicePositionsPanel extends Panel
     final RepeatingView positionsRepeater = new RepeatingView("pos");
     add(positionsRepeater);
     if (invoicePositions != null) {
-      Iterator<RechnungsPositionVO> it = invoicePositions.iterator();
+      final Iterator<RechnungsPositionVO> it = invoicePositions.iterator();
       int orderNumber = -1;
       Link<String> link = null;
       RechnungsPositionVO previousOrderPosition = null;

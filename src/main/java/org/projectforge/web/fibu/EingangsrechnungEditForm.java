@@ -26,7 +26,6 @@ package org.projectforge.web.fibu;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.calendar.DayHolder;
@@ -37,8 +36,9 @@ import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.registry.Registry;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
-import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
 
 public class EingangsrechnungEditForm extends
 AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, EingangsrechnungEditPage>
@@ -58,42 +58,43 @@ AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, Eingan
   @Override
   protected void onInit()
   {
-    final PFAutoCompleteTextField<String> kreditorField = new PFAutoCompleteTextField<String>("kreditor", new PropertyModel<String>(data,
-        "kreditor")) {
-      @Override
-      protected List<String> getChoices(final String input)
-      {
-        return parentPage.getBaseDao().getAutocompletion("kreditor", input);
-      }
-    };
-    kreditorField.withMatchContains(true).withMinChars(2).withFocus(true);
-    add(kreditorField);
-
-    final WebMarkupContainer kontoRow = new WebMarkupContainer("kontoRow");
-    add(kontoRow);
-    if (Registry.instance().getKontoCache().isEmpty() == true) {
-      kontoRow.setVisible(false);
-    } else {
-      final KontoSelectPanel kontoSelectPanel = new KontoSelectPanel("kontoSelectPanel", new PropertyModel<KontoDO>(data, "konto"),
+    /* GRID16 - BLOCK */
+    gridBuilder.newGrid16();
+    {
+      // Subject
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.betreff"));
+      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "betreff")));
+    }
+    /* GRID8 - BLOCK */
+    gridBuilder.newGrid8();
+    {
+      // Creditor
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.creditor"));
+      final PFAutoCompleteTextField<String> kreditorField = new PFAutoCompleteTextField<String>(InputPanel.WICKET_ID,
+          new PropertyModel<String>(data, "kreditor")) {
+        @Override
+        protected List<String> getChoices(final String input)
+        {
+          return parentPage.getBaseDao().getAutocompletion("kreditor", input);
+        }
+      };
+      kreditorField.withMatchContains(true).withMinChars(2).withFocus(true).add(WicketUtils.setFocus());
+      fs.add(kreditorField);
+    }
+    {
+      // Reference
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.reference"));
+      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "referenz")));
+    }
+    if (Registry.instance().getKontoCache().isEmpty() == false) {
+      // Account
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.konto"));
+      final KontoSelectPanel kontoSelectPanel = new KontoSelectPanel(fs.newChildId(), new PropertyModel<KontoDO>(data, "konto"),
           parentPage, "kontoId");
       kontoSelectPanel.setKontoNumberRanges(AccountingConfig.getInstance().getCreditorsAccountNumberRanges()).init();
-      kontoRow.add(kontoSelectPanel);
+      fs.add(kontoSelectPanel);
+      fs.setLabelFor(kontoSelectPanel);
     }
-
-    add(new MaxLengthTextField("referenz", new PropertyModel<String>(data, "referenz")));
-    // DropDownChoice datumList
-    final LabelValueChoiceRenderer<Long> datumChoiceRenderer = WicketUtils.getDatumChoiceRenderer(20);
-    datumChoice = new DropDownChoice<Long>("datumList", new PropertyModel<Long>(this, "datumInMillis"), datumChoiceRenderer.getValues(),
-        datumChoiceRenderer) {
-      @Override
-      public boolean isVisible()
-      {
-        return data.getDatum() == null;
-      }
-    };
-    datumChoice.setNullValid(true);
-    datumChoice.setRequired(false);
-    add(datumChoice);
   }
 
   @Override

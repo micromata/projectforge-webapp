@@ -25,9 +25,9 @@ package org.projectforge.web.fibu;
 
 import java.io.InputStream;
 
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHolder;
 import org.projectforge.fibu.kost.reporting.Report;
@@ -45,7 +45,7 @@ public class ReportObjectivesPage extends AbstractSecuredPage
   @SpringBean(name = "reportDao")
   private ReportDao reportDao;
 
-  private ReportObjectivesForm form;
+  private final ReportObjectivesForm form;
 
   protected transient ReportStorage reportStorage;
 
@@ -64,7 +64,7 @@ public class ReportObjectivesPage extends AbstractSecuredPage
     log.info("import report objectives.");
     final FileUpload fileUpload = form.fileUploadField.getFileUpload();
     if (fileUpload != null) {
-      boolean delete = false;
+      final boolean delete = false;
       try {
         final String clientFileName = fileUpload.getClientFileName();
         final InputStream is = fileUpload.getInputStream();
@@ -72,7 +72,7 @@ public class ReportObjectivesPage extends AbstractSecuredPage
         reportStorage = new ReportStorage(report);
         reportStorage.setFileName(clientFileName);
         putUserPrefEntry(KEY_REPORT_STORAGE, reportStorage, false);
-      } catch (Exception ex) {
+      } catch (final Exception ex) {
         log.error(ex.getMessage(), ex);
         error("An error occurred (see log files for details): " + ex.getMessage());
       } finally {

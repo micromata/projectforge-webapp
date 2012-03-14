@@ -24,8 +24,8 @@
 package org.projectforge.web.mobile;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
@@ -41,16 +41,38 @@ import org.projectforge.web.wicket.WicketUtils;
 public abstract class AbstractMobileEditPage<O extends AbstractBaseDO< ? >, F extends AbstractMobileEditForm<O, ? >, D extends BaseDao<O>>
 extends AbstractSecuredMobilePage implements IEditPage<O, D>
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AbstractMobileEditPage.class);
+
+  private static final long serialVersionUID = -2264060989458529585L;
+
+  public static final String PARAMETER_KEY_EDIT = "edit";
+
   protected F form;
 
   protected String i18nPrefix;
 
   private EditPageSupport<O, D> editPageSupport;
 
+  protected boolean editMode;
+
   public AbstractMobileEditPage(final PageParameters parameters, final String i18nPrefix)
   {
     super(parameters);
     this.i18nPrefix = i18nPrefix;
+    editMode = WicketUtils.getAsBoolean(parameters, PARAMETER_KEY_EDIT);
+    final Integer id = WicketUtils.getAsInteger(parameters, AbstractEditPage.PARAMETER_KEY_ID);
+    O data = null;
+    if (NumberHelper.greaterZero(id) == true) {
+      data = getBaseDao().getById(id);
+      if (data == null) {
+        log.error("Oups, no object id given. Can't display object.");
+        setResponsePage(getListPageClass());
+        return;
+      }
+      init();
+    } else {
+      init(data);
+    }
   }
 
   protected abstract Class< ? extends AbstractMobileListPage< ? , ? , ? >> getListPageClass();
@@ -63,13 +85,13 @@ extends AbstractSecuredMobilePage implements IEditPage<O, D>
   @SuppressWarnings("unchecked")
   protected void init(O data)
   {
-    final Integer id = getPageParameters().getAsInteger(AbstractEditPage.PARAMETER_KEY_ID);
+    final Integer id = WicketUtils.getAsInteger(getPageParameters(), AbstractEditPage.PARAMETER_KEY_ID);
     if (data == null) {
       if (NumberHelper.greaterZero(id) == true) {
         data = getBaseDao().getById(id);
       }
       if (data == null) {
-        data = (O) getPageParameters().get(AbstractEditPage.PARAMETER_KEY_DATA_PRESET);
+        data = (O) getPageParameters().get(AbstractEditPage.PARAMETER_KEY_DATA_PRESET).to(getBaseDao().getDOClass());
         if (data == null) {
           data = getBaseDao().newInstance();
         }
@@ -92,6 +114,19 @@ extends AbstractSecuredMobilePage implements IEditPage<O, D>
       create();
     } else {
       update();
+    }
+  }
+
+  @Override
+  protected void addTopRightButton()
+  {
+    if (editMode == false) {
+      final PageParameters params = new PageParameters();
+      params.add(AbstractEditPage.PARAMETER_KEY_ID, getData().getId());
+      params.add(PARAMETER_KEY_EDIT, true);
+      headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.CHECK, getClass(), params, getString("edit")));
+    } else {
+      super.addTopRightButton();
     }
   }
 
@@ -214,7 +249,7 @@ extends AbstractSecuredMobilePage implements IEditPage<O, D>
         redirectPage = WicketUtils.getDefaultMobilePage();
       }
       final PageParameters params = new PageParameters();
-      params.put(AbstractListPage.PARAMETER_HIGHLIGHTED_ROW, getData().getId());
+      params.add(AbstractListPage.PARAMETER_HIGHLIGHTED_ROW, getData().getId());
       setResponsePage(redirectPage, params);
     }
   }

@@ -24,21 +24,27 @@
 package org.projectforge.web.task;
 
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.link.ExternalLink;
-import org.apache.wicket.model.CompoundPropertyModel;
+import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.web.wicket.AbstractForm;
-import org.projectforge.web.wicket.FocusOnLoadBehavior;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.components.CoolCheckBoxPanel;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldSetIconPosition;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.GridBuilder;
+import org.projectforge.web.wicket.flowlayout.IconPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
 {
@@ -48,6 +54,8 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
 
   private TaskFilter searchFilter;
 
+  private MyComponentsRepeater<Component> actionButtons;
+
   private SingleButtonPanel cancelButtonPanel;
 
   private SingleButtonPanel resetButtonPanel;
@@ -56,81 +64,110 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
 
   private SingleButtonPanel searchButtonPanel;
 
+  protected GridBuilder gridBuilder;
+
+  @Override
   @SuppressWarnings("serial")
   protected void init()
   {
     super.init();
-    add(new CoolCheckBoxPanel("notOpenedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "notOpened"),
-        getString("task.status.notOpened"), true));
-    add(new CoolCheckBoxPanel("openedCheckBox", new PropertyModel<Boolean>(searchFilter, "opened"), getString("task.status.opened"), true));
-    add(new CoolCheckBoxPanel("closedCheckBox", new PropertyModel<Boolean>(searchFilter, "closed"), getString("task.status.closed"), true));
-    add(new CoolCheckBoxPanel("deletedCheckBox", new PropertyModel<Boolean>(searchFilter, "deleted"), getString("deleted"), true));
-    add(new CoolCheckBoxPanel("ajaxSupportCheckBox", new PropertyModel<Boolean>(searchFilter, "ajaxSupport"), getString("ajaxSupport"),
-        true).setTooltip(getString("task.tree.tooltip.ajaxSupport")));
-    setModel(new CompoundPropertyModel<TaskFilter>(searchFilter));
-    final Component searchField = new TextField<String>("searchString", new PropertyModel<String>(searchFilter, "searchString"));
-    searchField.add(new FocusOnLoadBehavior());
-    WicketUtils.addTooltip(searchField, getString("search.string.info.title"), getParentPage().getSearchToolTip());
-    add(searchField);
-    final ExternalLink handbuchVolltextsucheLink = new ExternalLink("handbuchVolltextsucheLink",
-        getUrl("/secure/doc/Handbuch.html#label_volltextsuche"));
-    add(handbuchVolltextsucheLink);
-    handbuchVolltextsucheLink.add(new TooltipImage("fulltextSearchTooltipImage", getResponse(), WebConstants.IMAGE_HELP,
-        getString("tooltip.lucene.link")));
-    final Button searchButton = new Button("button", new Model<String>(getString("search"))) {
-      @Override
-      public final void onSubmit()
-      {
-        getParentPage().onSearchSubmit();
-      }
-    };
+    addFeedbackPanel();
+    final RepeatingView flowform = new RepeatingView("flowform");
+    add(flowform);
+    gridBuilder = newGridBuilder(flowform).newGrid16().newColumnsPanel();
+    {
+      gridBuilder.newColumnPanel(DivType.COL_50);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"), true);
+      final TextField<String> searchField = new TextField<String>(InputPanel.WICKET_ID, new PropertyModel<String>(getSearchFilter(),
+          "searchString"));
+      searchField.add(WicketUtils.setFocus());
+      WicketUtils.addTooltip(searchField, getString("search.string.info.title"), getParentPage().getSearchToolTip());
+      fs.add(new InputPanel(fs.newChildId(), searchField));
+      fs.add(new IconPanel(fs.newChildId(), IconType.HELP, getString("tooltip.lucene.link")).setOnClickLocation(
+          WebConstants.DOC_LINK_HANDBUCH_LUCENE, true), FieldSetIconPosition.TOP_RIGHT);
+    }
+    {
+      gridBuilder.newColumnPanel(DivType.COL_50);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(new MyCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "notOpened"),
+          getString("task.status.notOpened")));
+      checkBoxPanel.add(new MyCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "opened"),
+          getString("task.status.opened")));
+      checkBoxPanel.add(new MyCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "closed"),
+          getString("task.status.closed")));
+      checkBoxPanel.add(new MyCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
+          getString("deleted")));
+    }
+    searchFilter.setAjaxSupport(true); // Experimental test phase completed.
+    // add(new CoolCheckBoxPanel("ajaxSupportCheckBox", new PropertyModel<Boolean>(searchFilter, "ajaxSupport"), getString("ajaxSupport"),
+    // true).setTooltip(getString("task.tree.tooltip.ajaxSupport")));
+    // setModel(new CompoundPropertyModel<TaskFilter>(searchFilter));
 
-    searchButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
+    actionButtons = new MyComponentsRepeater<Component>("actionButtons");
+    add(actionButtons.getRepeatingView());
+    {
+      final Button cancelButton = new Button("button", new Model<String>("cancel")) {
+        @Override
+        public final void onSubmit()
+        {
+          getParentPage().onCancelSubmit();
+        }
+      };
+      cancelButton.setDefaultFormProcessing(false);
+      cancelButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), cancelButton, getString("cancel"), SingleButtonPanel.CANCEL);
+      actionButtons.add(cancelButtonPanel);
+    }
+    {
+      final Button resetButton = new Button("button", new Model<String>("reset")) {
+        @Override
+        public final void onSubmit()
+        {
+          getParentPage().onResetSubmit();
+        }
+      };
+      resetButton.setDefaultFormProcessing(false);
+      resetButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), resetButton, getString("reset"), SingleButtonPanel.RESET);
+      actionButtons.add(resetButtonPanel);
+    }
+    {
+      final Button listViewButton = new Button("button", new Model<String>("listView")) {
+        @Override
+        public final void onSubmit()
+        {
+          getParentPage().onListViewSubmit();
+        }
+      };
 
-    searchButtonPanel = new SingleButtonPanel("search", searchButton);
-    add(searchButtonPanel);
-    final Button resetButton = new Button("button", new Model<String>(getString("reset"))) {
-      @Override
-      public final void onSubmit()
-      {
-        getParentPage().onResetSubmit();
-      }
-    };
-    resetButton.add(WebConstants.BUTTON_CLASS_RESET);
-    resetButton.setDefaultFormProcessing(false);
-
-    resetButtonPanel = new SingleButtonPanel("reset", resetButton);
-    add(resetButtonPanel);
-    final Button listViewButton = new Button("button", new Model<String>(getString("listView"))) {
-      @Override
-      public final void onSubmit()
-      {
-        getParentPage().onListViewSubmit();
-      }
-    };
-
-    listViewButton.add(WebConstants.BUTTON_CLASS_NOBUTTON);
-    listViewButtonPanel = new SingleButtonPanel("listView", listViewButton);
-
-    final Button cancelButton = new Button("button", new Model<String>(getString("cancel"))) {
-      @Override
-      public final void onSubmit()
-      {
-        getParentPage().onCancelSubmit();
-      }
-    };
-    cancelButton.setDefaultFormProcessing(false);
-    cancelButton.add(new SimpleAttributeModifier("class", "cancel"));
-    cancelButtonPanel = new SingleButtonPanel("cancel", cancelButton);
-    add(cancelButtonPanel);
-    add(listViewButtonPanel);
-    setDefaultButton(searchButton);
+      listViewButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), listViewButton, getString("listView"), SingleButtonPanel.GREY);
+      actionButtons.add(listViewButtonPanel);
+    }
+    {
+      final Button searchButton = new Button("button", new Model<String>("search")) {
+        @Override
+        public final void onSubmit()
+        {
+          getParentPage().onSearchSubmit();
+        }
+      };
+      searchButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), searchButton, getString("search"),
+          SingleButtonPanel.DEFAULT_SUBMIT);
+      actionButtons.add(searchButtonPanel);
+      setDefaultButton(searchButton);
+    }
     setComponentsVisibility();
   }
 
-  public TaskTreeForm(TaskTreePage parentPage)
+  public TaskTreeForm(final TaskTreePage parentPage)
   {
     super(parentPage);
+  }
+
+  @Override
+  public void onBeforeRender()
+  {
+    super.onBeforeRender();
+    actionButtons.render();
   }
 
   protected void setComponentsVisibility()
@@ -150,7 +187,7 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
       if (filter != null) {
         try {
           this.searchFilter = (TaskFilter) filter;
-        } catch (ClassCastException ex) {
+        } catch (final ClassCastException ex) {
           // Probably a new software release results in an incompability of old and new filter format.
           log.info("Could not restore filter from user prefs: (old) filter type "
               + filter.getClass().getName()
@@ -170,5 +207,26 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
   {
     super.onSubmit();
     parentPage.refresh();
+  }
+
+  @SuppressWarnings("serial")
+  private class MyCheckBoxPanel extends CheckBoxPanel
+  {
+    public MyCheckBoxPanel(final String id, final IModel<Boolean> model, final String labelString)
+    {
+      super(id, model, labelString);
+    }
+
+    @Override
+    protected boolean wantOnSelectionChangedNotifications()
+    {
+      return true;
+    }
+
+    @Override
+    protected void onSelectionChanged(final Boolean newSelection)
+    {
+      parentPage.refresh();
+    }
   }
 }

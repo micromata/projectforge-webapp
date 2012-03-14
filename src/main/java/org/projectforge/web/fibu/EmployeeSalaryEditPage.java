@@ -26,21 +26,20 @@ package org.projectforge.web.fibu;
 import java.util.Calendar;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.fibu.EmployeeSalaryDO;
 import org.projectforge.fibu.EmployeeSalaryDao;
 import org.projectforge.fibu.EmployeeSalaryType;
-import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
 
 @EditPage(defaultReturnPage = EmployeeSalaryListPage.class)
-public class EmployeeSalaryEditPage extends AbstractAutoLayoutEditPage<EmployeeSalaryDO, EmployeeSalaryEditForm, EmployeeSalaryDao> implements
-    ISelectCallerPage
+public class EmployeeSalaryEditPage extends AbstractEditPage<EmployeeSalaryDO, EmployeeSalaryEditForm, EmployeeSalaryDao> implements
+ISelectCallerPage
 {
   private static final long serialVersionUID = -3899191243765232906L;
 
@@ -49,7 +48,7 @@ public class EmployeeSalaryEditPage extends AbstractAutoLayoutEditPage<EmployeeS
   @SpringBean(name = "employeeSalaryDao")
   private EmployeeSalaryDao employeeSalaryDao;
 
-  public EmployeeSalaryEditPage(PageParameters parameters)
+  public EmployeeSalaryEditPage(final PageParameters parameters)
   {
     super(parameters, "fibu.employee.salary");
     init();
@@ -57,7 +56,7 @@ public class EmployeeSalaryEditPage extends AbstractAutoLayoutEditPage<EmployeeS
 
   private EmployeeSalaryEditRecentEntry recent;
 
-  
+
   @Override
   protected void onPreEdit()
   {
@@ -87,7 +86,7 @@ public class EmployeeSalaryEditPage extends AbstractAutoLayoutEditPage<EmployeeS
   }
 
   @Override
-  public AbstractBasePage afterSaveOrUpdate()
+  public AbstractSecuredBasePage afterSaveOrUpdate()
   {
     recent = getRecent();
     if (getData().getYear() != null) {
@@ -101,7 +100,7 @@ public class EmployeeSalaryEditPage extends AbstractAutoLayoutEditPage<EmployeeS
     }
     return null;
   }
-  
+
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Integer)
    */
@@ -123,7 +122,7 @@ public class EmployeeSalaryEditPage extends AbstractAutoLayoutEditPage<EmployeeS
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
    */
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     log.error("Property '" + property + "' not supported for selection.");
   }
@@ -131,7 +130,7 @@ public class EmployeeSalaryEditPage extends AbstractAutoLayoutEditPage<EmployeeS
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
    */
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing.
   }
@@ -143,7 +142,7 @@ public class EmployeeSalaryEditPage extends AbstractAutoLayoutEditPage<EmployeeS
   }
 
   @Override
-  protected EmployeeSalaryEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, EmployeeSalaryDO data)
+  protected EmployeeSalaryEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final EmployeeSalaryDO data)
   {
     return new EmployeeSalaryEditForm(this, data);
   }

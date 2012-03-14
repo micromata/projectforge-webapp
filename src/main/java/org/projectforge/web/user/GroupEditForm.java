@@ -33,6 +33,7 @@ import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.AbstractValidator;
 import org.projectforge.common.KeyValueBean;
 import org.projectforge.user.GroupDO;
@@ -41,12 +42,16 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.common.TwoListHelper;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
-import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
 {
@@ -70,10 +75,9 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
 
   private ListMultipleChoice<Integer> valuesToUnassignChoice;
 
-  public GroupEditForm(final GroupEditPage parentPage, GroupDO data)
+  public GroupEditForm(final GroupEditPage parentPage, final GroupDO data)
   {
     super(parentPage, data);
-    this.colspan = 2;
   }
 
   @SuppressWarnings("serial")
@@ -81,76 +85,89 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
   protected void init()
   {
     super.init();
-    List<Integer> usersToAdd = null;
-    add(new RequiredMaxLengthTextField("name", new PropertyModel<String>(getData(), "name")).add(new AbstractValidator<String>() {
-      @Override
-      protected void onValidate(IValidatable<String> validatable)
-      {
-        final String groupname = validatable.getValue();
-        if (groupname == null) {
-          return;
+    gridBuilder.newGrid8();
+    {
+      // Name
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("name"));
+      final RequiredMaxLengthTextField name = new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(getData(),
+          "name"));
+      name.add(new AbstractValidator<String>() {
+        @Override
+        protected void onValidate(final IValidatable<String> validatable)
+        {
+          final String groupname = validatable.getValue();
+          if (groupname == null) {
+            return;
+          }
+          getData().setName(groupname);
+          if (groupDao.doesGroupnameAlreadyExist(getData()) == true) {
+            validatable.error(new ValidationError().addMessageKey("group.error.groupnameAlreadyExists"));
+          }
         }
-        getData().setName(groupname);
-        if (groupDao.doesGroupnameAlreadyExist(getData()) == true) {
-          error(validatable);
+      });
+      fs.add(name);
+      WicketUtils.setStrong(name);
+    }
+    {
+      // Organization
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("organization"));
+      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(getData(), "organization")));
+    }
+    {
+      // Description
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(getData(), "description")));
+    }
+    gridBuilder.newGrid8();
+    {
+      // User lists
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group.assignedUsers"), true).setLabelSide(false);
+      final List<KeyValueBean<Integer, String>> fullList = new ArrayList<KeyValueBean<Integer, String>>();
+      final List<PFUserDO> result = userDao.getList(userDao.getDefaultFilter());
+      for (final PFUserDO user : result) {
+        fullList.add(new KeyValueBean<Integer, String>(user.getId(), user.getFullname()));
+      }
+      final List<Integer> assignedUsers = new ArrayList<Integer>();
+      final Collection<PFUserDO> set = getData().getAssignedUsers();
+      if (set != null) {
+        for (final PFUserDO user : set) {
+          assignedUsers.add(user.getId());
         }
       }
-
-      @Override
-      protected String resourceKey()
-      {
-        return "group.error.groupnameAlreadyExists";
-      }
-    }));
-    add(new MaxLengthTextField("organization", new PropertyModel<String>(getData(), "organization")));
-    add(new MaxLengthTextArea("description", new PropertyModel<String>(getData(), "description")));
-
-    final SubmitLink unassignButton = new SubmitLink("unassignButton") {
-      public void onSubmit()
-      {
-        users.unassign(valuesToUnassign);
-        valuesToUnassign.clear();
-        refreshUsersLists();
-      };
-    };
-    add(unassignButton);
-    unassignButton.add(new TooltipImage("buttonUnassignImage", getResponse(), WebConstants.IMAGE_BUTTON_ASSIGN_TO_RIGHT,
-        getString("tooltip.unassign")));
-
-    final List<Integer> assignedUsers = new ArrayList<Integer>();
-    final Collection<PFUserDO> set = getData().getAssignedUsers();
-    if (set != null) {
-      for (final PFUserDO user : set) {
-        assignedUsers.add(user.getId());
-      }
+      this.users = new TwoListHelper<Integer, String>(fullList, assignedUsers);
+      this.users.sortLists();
+      valuesToUnassignChoice = new ListMultipleChoice<Integer>(fs.getListChoiceId());
+      valuesToUnassignChoice.setModel(new PropertyModel<Collection<Integer>>(this, "valuesToUnassign"));
+      WicketUtils.setHeight(valuesToUnassignChoice, 50);
+      WicketUtils.setPercentSize(valuesToUnassignChoice, 45);
+      fs.add(valuesToUnassignChoice);
+      fs.add(new IconLinkPanel(fs.newChildId(), IconType.CIRCLE_ARROW_WEST, getString("tooltip.assign"), new SubmitLink(
+          IconLinkPanel.LINK_ID) {
+        @Override
+        public void onSubmit()
+        {
+          users.assign(valuesToAssign);
+          valuesToAssign.clear();
+          refreshUsersLists();
+        };
+      }));
+      fs.add(new IconLinkPanel(fs.newChildId(), IconType.CIRCLE_ARROW_EAST, getString("tooltip.unassign"), new SubmitLink(
+          IconLinkPanel.LINK_ID) {
+        @Override
+        public void onSubmit()
+        {
+          users.unassign(valuesToUnassign);
+          valuesToUnassign.clear();
+          refreshUsersLists();
+        };
+      }));
+      valuesToAssignChoice = new ListMultipleChoice<Integer>(fs.getListChoiceId());
+      valuesToAssignChoice.setModel(new PropertyModel<Collection<Integer>>(this, "valuesToAssign"));
+      WicketUtils.setHeight(valuesToAssignChoice, 50);
+      WicketUtils.setPercentSize(valuesToAssignChoice, 45);
+      fs.add(valuesToAssignChoice);
+      fs.setNowrap();
     }
-    final SubmitLink assignButton = new SubmitLink("assignButton") {
-      public void onSubmit()
-      {
-        users.assign(valuesToAssign);
-        valuesToAssign.clear();
-        refreshUsersLists();
-      };
-    };
-    add(assignButton);
-    assignButton.add(new TooltipImage("buttonAssignImage", getResponse(), WebConstants.IMAGE_BUTTON_ASSIGN_TO_LEFT,
-        getString("tooltip.assign")));
-    final List<KeyValueBean<Integer, String>> fullList = new ArrayList<KeyValueBean<Integer, String>>();
-    final List<PFUserDO> result = (List<PFUserDO>) userDao.getList(userDao.getDefaultFilter());
-    for (final PFUserDO user : result) {
-      fullList.add(new KeyValueBean<Integer, String>(user.getId(), user.getUsername()));
-    }
-    this.users = new TwoListHelper<Integer, String>(fullList, assignedUsers);
-    if (usersToAdd != null) {
-      users.assign(usersToAdd);
-    }
-    this.users.sortLists();
-    valuesToAssignChoice = new ListMultipleChoice<Integer>("valuesToAssign");
-    valuesToAssignChoice.setModel(new PropertyModel<Collection<Integer>>(this, "valuesToAssign"));
-    add(valuesToAssignChoice);
-    valuesToUnassignChoice = new ListMultipleChoice<Integer>("valuesToUnassign");
-    valuesToUnassignChoice.setModel(new PropertyModel<Collection<Integer>>(this, "valuesToUnassign"));
-    add(valuesToUnassignChoice);
     refreshUsersLists();
   }
 
@@ -175,7 +192,7 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
     return valuesToAssign;
   }
 
-  public void setValuesToAssign(List<Integer> valuesToAssign)
+  public void setValuesToAssign(final List<Integer> valuesToAssign)
   {
     this.valuesToAssign = valuesToAssign;
   }
@@ -185,7 +202,7 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
     return valuesToUnassign;
   }
 
-  public void setValuesToUnassign(List<Integer> valuesToUnassign)
+  public void setValuesToUnassign(final List<Integer> valuesToUnassign)
   {
     this.valuesToUnassign = valuesToUnassign;
   }

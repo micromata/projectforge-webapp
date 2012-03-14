@@ -23,23 +23,24 @@
 
 package org.projectforge.web.imagecropper;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.markup.html.CSSPackageResource;
-import org.apache.wicket.markup.html.JavascriptPackageResource;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.protocol.http.servlet.ServletWebRequest;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.WicketUtils;
 
-
 public class ImageCropperPage extends AbstractSecuredPage
 {
+  private static final long serialVersionUID = -3868048775620052627L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ImageCropperPage.class);
 
   public static final String PARAM_ENABLE_WHITEBOARD_FILTER = "enableWhiteboardFilter";
@@ -70,42 +71,36 @@ public class ImageCropperPage extends AbstractSecuredPage
    * See list of constants PARAM_* for supported parameters.
    * @param parameters
    */
-  public ImageCropperPage(PageParameters parameters)
+  public ImageCropperPage(final PageParameters parameters)
   {
     super(parameters);
-    if (parameters.containsKey(PARAM_SHOW_UPLOAD_BUTTON) == true) {
-      setEnableWhiteBoardFilter(parameters.getBoolean(PARAM_SHOW_UPLOAD_BUTTON));
+    if (WicketUtils.contains(parameters, PARAM_SHOW_UPLOAD_BUTTON) == true) {
+      setEnableWhiteBoardFilter(WicketUtils.getAsBoolean(parameters, PARAM_SHOW_UPLOAD_BUTTON));
     }
-    if (parameters.containsKey(PARAM_ENABLE_WHITEBOARD_FILTER) == true) {
-      setEnableWhiteBoardFilter(parameters.getBoolean(PARAM_ENABLE_WHITEBOARD_FILTER));
+    if (WicketUtils.contains(parameters, PARAM_ENABLE_WHITEBOARD_FILTER) == true) {
+      setEnableWhiteBoardFilter(WicketUtils.getAsBoolean(parameters, PARAM_ENABLE_WHITEBOARD_FILTER));
     }
-    if (parameters.containsKey(PARAM_LANGUAGE) == true) {
-      setDefaultLanguage(parameters.getString(PARAM_LANGUAGE));
+    if (WicketUtils.contains(parameters, PARAM_LANGUAGE) == true) {
+      setDefaultLanguage(WicketUtils.getAsString(parameters, PARAM_LANGUAGE));
     }
-    if (parameters.containsKey(PARAM_RATIOLIST) == true) {
-      setRatioList(parameters.getString(PARAM_RATIOLIST));
+    if (WicketUtils.contains(parameters, PARAM_RATIOLIST) == true) {
+      setRatioList(WicketUtils.getAsString(parameters, PARAM_RATIOLIST));
     }
-    if (parameters.containsKey(PARAM_DEFAULT_RATIO) == true) {
-      setDefaultRatio(parameters.getString(PARAM_DEFAULT_RATIO));
+    if (WicketUtils.contains(parameters, PARAM_DEFAULT_RATIO) == true) {
+      setDefaultRatio(WicketUtils.getAsString(parameters, PARAM_DEFAULT_RATIO));
     }
-    if (parameters.containsKey(PARAM_FILE_FORMAT) == true) {
-      setFileFormat(parameters.getString(PARAM_FILE_FORMAT));
+    if (WicketUtils.contains(parameters, PARAM_FILE_FORMAT) == true) {
+      setFileFormat(WicketUtils.getAsString(parameters, PARAM_FILE_FORMAT));
     }
-    add(CSSPackageResource.getHeaderContribution("imagecropper/history/history.css"));
-    add(JavascriptPackageResource.getHeaderContribution("imagecropper/history/history.js"));
-    add(JavascriptPackageResource.getHeaderContribution("imagecropper/AC_OETags.js"));
     final ServletWebRequest req = (ServletWebRequest) this.getRequest();
+    final HttpServletRequest hreq = req.getContainerRequest();
     String domain;
     if (StringUtils.isNotBlank(ConfigXml.getInstance().getDomain()) == true) {
       domain = ConfigXml.getInstance().getDomain();
     } else {
-      domain = req.getHttpServletRequest().getScheme()
-          + "://"
-          + req.getHttpServletRequest().getLocalName()
-          + ":"
-          + req.getHttpServletRequest().getLocalPort();
+      domain = hreq.getScheme() + "://" + hreq.getLocalName() + ":" + hreq.getLocalPort();
     }
-    final String url = domain + req.getHttpServletRequest().getContextPath() + "/secure/";
+    final String url = domain + hreq.getContextPath() + "/secure/";
     final StringBuffer buf = new StringBuffer();
     appendVar(buf, "serverURL", url); // TODO: Wird wohl nicht mehr gebraucht.
     appendVar(buf, "uploadImageFileTemporaryServlet", url + "UploadImageFileTemporary");
@@ -116,7 +111,7 @@ public class ImageCropperPage extends AbstractSecuredPage
     appendVar(buf, "uploadImageFileServletParams", "filedirectory=images;filename=image;croppedname=cropped");
     appendVar(buf, "upAndDownloadImageFileAsByteArrayServlet", url + "UpAndDownloadImageFileAsByteArray");
     appendVar(buf, "upAndDownloadImageFileAsByteArrayServletParams", "filename=image;croppedname=cropped");
-    final HttpSession httpSession = req.getHttpServletRequest().getSession();
+    final HttpSession httpSession = hreq.getSession();
     appendVar(buf, "sessionid", httpSession.getId());
     appendVar(buf, "ratioList", ratioList);
     appendVar(buf, "defaultRatio", defaultRatio);
@@ -128,6 +123,15 @@ public class ImageCropperPage extends AbstractSecuredPage
     add(new Label("javaScriptVars", buf.toString()).setEscapeModelStrings(false));
   }
 
+  @Override
+  public void renderHead(final IHeaderResponse response)
+  {
+    super.renderHead(response);
+    response.renderCSSReference("imagecropper/history/history.css");
+    response.renderJavaScriptReference("imagecropper/history/history.js");
+    response.renderJavaScriptReference("imagecropper/AC_OETags.js");
+  }
+
   /**
    * Valid Ratio Examples: "1:4, 4:1, 1:2, 2:1, 1:3, 3:1, 2:3, 3:2" etc.
    */
@@ -136,7 +140,7 @@ public class ImageCropperPage extends AbstractSecuredPage
     return ratioList;
   }
 
-  public void setRatioList(String ratioList)
+  public void setRatioList(final String ratioList)
   {
     this.ratioList = ratioList;
   }
@@ -150,11 +154,11 @@ public class ImageCropperPage extends AbstractSecuredPage
     return defaultRatio;
   }
 
-  public void setDefaultRatio(String defaultRatio)
+  public void setDefaultRatio(final String defaultRatio)
   {
     this.defaultRatio = defaultRatio;
   }
-  
+
   /**
    * If true then the upload button in ImageCropper flash app will be shown.
    */
@@ -162,8 +166,8 @@ public class ImageCropperPage extends AbstractSecuredPage
   {
     return showUploadButton;
   }
-  
-  public void setShowUploadButton(boolean showUploadButton)
+
+  public void setShowUploadButton(final boolean showUploadButton)
   {
     this.showUploadButton = showUploadButton;
   }
@@ -176,7 +180,7 @@ public class ImageCropperPage extends AbstractSecuredPage
     return enableWhiteBoardFilter;
   }
 
-  public void setEnableWhiteBoardFilter(boolean enableWhiteBoardFilter)
+  public void setEnableWhiteBoardFilter(final boolean enableWhiteBoardFilter)
   {
     this.enableWhiteBoardFilter = enableWhiteBoardFilter;
   }
@@ -190,7 +194,7 @@ public class ImageCropperPage extends AbstractSecuredPage
     return fileFormat;
   }
 
-  public void setFileFormat(String fileFormat)
+  public void setFileFormat(final String fileFormat)
   {
     if (StringHelper.isIn(fileFormat, "png", "gif", "jpg", "jpeg") == true) {
       this.fileFormat = fileFormat;
@@ -210,7 +214,7 @@ public class ImageCropperPage extends AbstractSecuredPage
     return PFUserContext.getLocale().getCountry();
   }
 
-  public void setDefaultLanguage(String defaultLanguage)
+  public void setDefaultLanguage(final String defaultLanguage)
   {
     if (StringHelper.isIn(defaultLanguage, "EN", "DE") == true) {
       this.defaultLanguage = defaultLanguage;
@@ -221,14 +225,14 @@ public class ImageCropperPage extends AbstractSecuredPage
 
   /**
    * @return false
-   * @see org.projectforge.web.wicket.AbstractBasePage#isBookmarkLinkIconVisible()
+   * @see org.projectforge.web.wicket.AbstractUnsecureBasePage#isBookmarkLinkIconVisible()
    */
   @Override
   protected boolean isBookmarkLinkIconVisible()
   {
     return false;
   }
-  
+
   private ImageCropperPage appendVar(final StringBuffer buf, final String variable, final Object value)
   {
     buf.append("var ").append(variable).append(" = ");

@@ -27,12 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.gantt.GanttChartDO;
 import org.projectforge.gantt.GanttChartDao;
@@ -65,7 +66,7 @@ public class GanttChartListPage extends AbstractListPage<GanttChartListForm, Gan
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
 
-  public GanttChartListPage(PageParameters parameters)
+  public GanttChartListPage(final PageParameters parameters)
   {
     super(parameters, "gantt");
   }
@@ -77,22 +78,25 @@ public class GanttChartListPage extends AbstractListPage<GanttChartListForm, Gan
     final List<IColumn<GanttChartDO>> columns = new ArrayList<IColumn<GanttChartDO>>();
 
     final CellItemListener<GanttChartDO> cellItemListener = new CellItemListener<GanttChartDO>() {
-      public void populateItem(Item<ICellPopulator<GanttChartDO>> item, String componentId, IModel<GanttChartDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<GanttChartDO>> item, final String componentId, final IModel<GanttChartDO> rowModel)
       {
         final GanttChartDO ganttChart = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(ganttChart.getId(), ganttChart.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<GanttChartDO>(new Model<String>(getString("gantt.name")), "name", "number",
         cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<GanttChartDO>> item, final String componentId, final IModel<GanttChartDO> rowModel)
       {
-        final GanttChartDO ganttChart = (GanttChartDO) rowModel.getObject();
+        final GanttChartDO ganttChart = rowModel.getObject();
         item.add(new ListSelectActionPanel(componentId, rowModel, GanttChartEditPage.class, ganttChart.getId(), GanttChartListPage.this,
             ganttChart.getName()));
         cellItemListener.populateItem(item, componentId, rowModel);
@@ -103,14 +107,14 @@ public class GanttChartListPage extends AbstractListPage<GanttChartListForm, Gan
         cellItemListener));
     columns.add(new UserPropertyColumn<GanttChartDO>(getString("gantt.owner"), "user.fullname", "owner", cellItemListener)
         .withUserFormatter(userFormatter));
-    columns.add(new TaskPropertyColumn<GanttChartDO>(this, getString("task"), "task.title", "task", cellItemListener).withTaskFormatter(
+    columns.add(new TaskPropertyColumn<GanttChartDO>(getString("task"), "task.title", "task", cellItemListener).withTaskFormatter(
         taskFormatter).withTaskTree(taskTree));
-    dataTable = createDataTable(columns, "name", false);
+    dataTable = createDataTable(columns, "name", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 
   @Override
-  protected GanttChartListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected GanttChartListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new GanttChartListForm(this);
   }
@@ -122,7 +126,7 @@ public class GanttChartListPage extends AbstractListPage<GanttChartListForm, Gan
   }
 
   @Override
-  protected IModel<GanttChartDO> getModel(GanttChartDO object)
+  protected IModel<GanttChartDO> getModel(final GanttChartDO object)
   {
     return new DetachableDOModel<GanttChartDO, GanttChartDao>(object, getBaseDao());
   }

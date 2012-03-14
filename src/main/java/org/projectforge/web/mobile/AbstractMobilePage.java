@@ -27,15 +27,14 @@ import java.text.MessageFormat;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.wicket.Application;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
-import org.apache.wicket.markup.html.CSSPackageResource;
-import org.apache.wicket.markup.html.JavascriptPackageResource;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.AppVersion;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -49,8 +48,10 @@ import org.projectforge.web.wicket.WicketUtils;
  */
 public abstract class AbstractMobilePage extends WebPage
 {
+  private static final long serialVersionUID = -6221091194614601467L;
+
   protected final static String TOP_RIGHT_BUTTON_ID = "topRightButton";
-  
+
   protected final static String TOP_CENTER_ID = "topCenter";
 
   protected boolean alreadySubmitted = false;
@@ -71,7 +72,7 @@ public abstract class AbstractMobilePage extends WebPage
 
   protected void setNoBackButton()
   {
-    headerContainer.add(new SimpleAttributeModifier("data-nobackbtn", "true"));
+    headerContainer.add(AttributeModifier.replace("data-nobackbtn", "true"));
   }
 
   /**
@@ -86,14 +87,6 @@ public abstract class AbstractMobilePage extends WebPage
     if (stripTags == null) {
       stripTags = Application.get().getMarkupSettings().getStripWicketTags();
     }
-    // add(CSSPackageResource.getHeaderContribution("mobile/css/iWebKit.css"));
-    add(CSSPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery.mobile-1.0a3.min.css"));
-    // add(CSSPackageResource.getHeaderContribution("mobile/css/projectforge.css"));
-    add(CSSPackageResource.getHeaderContribution("mobile/projectforge.css"));
-    add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery-1.5.min.js"));
-    add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/myconfig.js"));
-    add(JavascriptPackageResource.getHeaderContribution("mobile/jquery.mobile/jquery.mobile-1.0a3.min.js"));
-    add(WicketUtils.headerContributorForFavicon(getUrl("/favicon.ico")));
     add(headerContainer = new WebMarkupContainer("header"));
     headerContainer.add(getTopCenter());
     add(new Label("windowTitle", new Model<String>() {
@@ -104,6 +97,7 @@ public abstract class AbstractMobilePage extends WebPage
       }
     }));
     final Model<String> loggedInLabelModel = new Model<String>() {
+      @Override
       public String getObject()
       {
         return "<strong>" + escapeHtml(AppVersion.APP_TITLE) + "</strong>";
@@ -111,9 +105,23 @@ public abstract class AbstractMobilePage extends WebPage
     };
     add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false).setRenderBodyOnly(false).setVisible(getUser() != null));
     if (getWicketApplication().isDevelopmentSystem() == true) {
-      // navigationContainer.add(new SimpleAttributeModifier("style", WebConstants.CSS_BACKGROUND_COLOR_RED));
+      // navigationContainer.add(AttributeModifier.replace("style", WebConstants.CSS_BACKGROUND_COLOR_RED));
     } else {
     }
+  }
+
+  @Override
+  public void renderHead(final IHeaderResponse response)
+  {
+    super.renderHead(response);
+    response.renderString(WicketUtils.getCssForFavicon(getUrl("/favicon.ico")));
+    // add(CSSPackageResource.getHeaderContribution("mobile/css/iWebKit.css"));
+    response.renderCSSReference("mobile/jquery.mobile/jquery.mobile-1.0.1.min.css");
+    // add(CSSPackageResource.getHeaderContribution("mobile/css/projectforge.css"));
+    response.renderCSSReference("mobile/projectforge.css");
+    response.renderJavaScriptReference("scripts/jquery/1.7.1/jquery.min.js");
+    //response.renderJavaScriptReference("mobile/jquery.mobile/myconfig.js");
+    response.renderJavaScriptReference("mobile/jquery.mobile/jquery.mobile-1.0.1.min.js");
   }
 
   /**
@@ -168,7 +176,7 @@ public abstract class AbstractMobilePage extends WebPage
   /**
    * @see StringEscapeUtils#escapeHtml(String)
    */
-  protected String escapeHtml(String str)
+  protected String escapeHtml(final String str)
   {
     return StringEscapeUtils.escapeHtml(str);
   }
@@ -183,7 +191,7 @@ public abstract class AbstractMobilePage extends WebPage
     return null;
   }
 
-  protected String getLocalizedMessage(String key, Object... params)
+  protected String getLocalizedMessage(final String key, final Object... params)
   {
     if (params == null) {
       return getString(key);
@@ -195,7 +203,7 @@ public abstract class AbstractMobilePage extends WebPage
    * Includes session id (encode URL) at default.
    * @see #getUrl(String, boolean)
    */
-  public String getUrl(String path)
+  public String getUrl(final String path)
   {
     return getUrl(path, true);
   }

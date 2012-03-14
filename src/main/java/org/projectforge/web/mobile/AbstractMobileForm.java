@@ -24,8 +24,12 @@
 package org.projectforge.web.mobile;
 
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.FormComponent;
-import org.apache.wicket.markup.html.form.validation.AbstractFormValidator;
+import org.apache.wicket.markup.repeater.RepeatingView;
+import org.projectforge.web.wicket.MySession;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.GridBuilder;
+import org.projectforge.web.wicket.flowlayout.GridBuilderImpl;
+import org.projectforge.web.wicket.mobileflowlayout.GridBuilderMobileImpl;
 
 public abstract class AbstractMobileForm<F, P extends AbstractMobilePage> extends Form<F>
 {
@@ -33,38 +37,30 @@ public abstract class AbstractMobileForm<F, P extends AbstractMobilePage> extend
 
   protected final P parentPage;
 
-  @SuppressWarnings("serial")
-  public AbstractMobileForm(P parentPage)
+  public AbstractMobileForm(final P parentPage)
   {
     super("form");
     this.parentPage = parentPage;
-    add(new AbstractFormValidator() {
-      public FormComponent< ? >[] getDependentFormComponents()
-      {
-        return getDependentFormValidationComponents();
-      }
+  }
 
-      public void validate(Form< ? > form)
-      {
-        validation();
-      }
-    });
+  public MySession getMySession()
+  {
+    return (MySession) getSession();
   }
 
   /**
-   * Dependent form components which should be processed first before form validation.
-   * @return
+   * @see GridBuilderImpl#GridBuilder(RepeatingView, MySession)
    */
-  public FormComponent< ? >[] getDependentFormValidationComponents()
+  protected GridBuilder newGridBuilder(final RepeatingView parent)
   {
-    return null;
+    return new GridBuilderMobileImpl(parent, getMySession());
   }
 
   /**
-   * Here you can add validation and errors manually.
+   * @see GridBuilderImpl#GridBuilder(DivPanel, MySession)
    */
-  protected void validation()
+  protected GridBuilder newGridBuilder(final DivPanel parent)
   {
-    // Do nothing at default;
+    return new GridBuilderMobileImpl(parent, getMySession());
   }
 }

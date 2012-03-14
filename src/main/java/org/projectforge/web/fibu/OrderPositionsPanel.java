@@ -28,12 +28,12 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.core.NumberFormatter;
 import org.projectforge.fibu.AuftragsPositionVO;
 import org.projectforge.web.HtmlHelper;
@@ -62,7 +62,7 @@ public class OrderPositionsPanel extends Panel
     final RepeatingView positionsRepeater = new RepeatingView("pos");
     add(positionsRepeater);
     if (orderPositions != null) {
-      Iterator<AuftragsPositionVO> it = orderPositions.iterator();
+      final Iterator<AuftragsPositionVO> it = orderPositions.iterator();
       int orderNumber = -1;
       StringBuffer buf = new StringBuffer();
       Link<String> link = null;

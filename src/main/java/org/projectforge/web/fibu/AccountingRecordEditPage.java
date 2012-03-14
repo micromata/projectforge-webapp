@@ -24,16 +24,15 @@
 package org.projectforge.web.fibu;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.kost.BuchungssatzDO;
 import org.projectforge.fibu.kost.BuchungssatzDao;
-import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
 @EditPage(defaultReturnPage = AccountingRecordListPage.class)
-public class AccountingRecordEditPage extends AbstractAutoLayoutEditPage<BuchungssatzDO, AccountingRecordEditForm, BuchungssatzDao>
+public class AccountingRecordEditPage extends AbstractEditPage<BuchungssatzDO, AccountingRecordEditForm, BuchungssatzDao>
 {
   private static final long serialVersionUID = -3899191243765232906L;
 
@@ -42,7 +41,7 @@ public class AccountingRecordEditPage extends AbstractAutoLayoutEditPage<Buchung
   @SpringBean(name = "buchungssatzDao")
   private BuchungssatzDao buchungssatzDao;
 
-  public AccountingRecordEditPage(PageParameters parameters)
+  public AccountingRecordEditPage(final PageParameters parameters)
   {
     super(parameters, "fibu.buchungssatz");
     init();
@@ -61,7 +60,7 @@ public class AccountingRecordEditPage extends AbstractAutoLayoutEditPage<Buchung
   }
 
   @Override
-  protected AccountingRecordEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, BuchungssatzDO data)
+  protected AccountingRecordEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final BuchungssatzDO data)
   {
     return new AccountingRecordEditForm(this, data);
   }

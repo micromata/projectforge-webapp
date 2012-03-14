@@ -27,12 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.meb.MebDao;
 import org.projectforge.meb.MebEntryDO;
@@ -58,7 +59,7 @@ public class MebListPage extends AbstractListPage<MebListForm, MebDao, MebEntryD
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
 
-  public MebListPage(PageParameters parameters)
+  public MebListPage(final PageParameters parameters)
   {
     super(parameters, "meb");
   }
@@ -67,9 +68,9 @@ public class MebListPage extends AbstractListPage<MebListForm, MebDao, MebEntryD
   @Override
   protected void init()
   {
-    List<IColumn<MebEntryDO>> columns = new ArrayList<IColumn<MebEntryDO>>();
-    CellItemListener<MebEntryDO> cellItemListener = new CellItemListener<MebEntryDO>() {
-      public void populateItem(Item<ICellPopulator<MebEntryDO>> item, String componentId, IModel<MebEntryDO> rowModel)
+    final List<IColumn<MebEntryDO>> columns = new ArrayList<IColumn<MebEntryDO>>();
+    final CellItemListener<MebEntryDO> cellItemListener = new CellItemListener<MebEntryDO>() {
+      public void populateItem(final Item<ICellPopulator<MebEntryDO>> item, final String componentId, final IModel<MebEntryDO> rowModel)
       {
         final MebEntryDO meb = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(meb.getId(), meb.isDeleted());
@@ -83,16 +84,18 @@ public class MebListPage extends AbstractListPage<MebListForm, MebDao, MebEntryD
           cssStyle.append("color: green;");
         }
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add( AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<MebEntryDO>(new Model<String>(getString("date")), "date", "date", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item, java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<MebEntryDO>> item, final String componentId, final IModel<MebEntryDO> rowModel)
       {
-        final MebEntryDO meb = (MebEntryDO) rowModel.getObject();
+        final MebEntryDO meb = rowModel.getObject();
         item.add(new ListSelectActionPanel(componentId, rowModel, MebEditPage.class, meb.getId(), MebListPage.this, DateTimeFormatter
             .instance().getFormattedDateTime(meb.getDate())));
         cellItemListener.populateItem(item, componentId, rowModel);
@@ -105,15 +108,15 @@ public class MebListPage extends AbstractListPage<MebListForm, MebDao, MebEntryD
     columns.add(new CellItemListenerPropertyColumn<MebEntryDO>(new Model<String>(getString("meb.sender")), "sender", "sender",
         cellItemListener));
     columns
-        .add(new CellItemListenerPropertyColumn<MebEntryDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
+    .add(new CellItemListenerPropertyColumn<MebEntryDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<MebEntryDO>(new Model<String>(getString("meb.message")), "message", "message",
         cellItemListener));
-    dataTable = createDataTable(columns, "date", false);
+    dataTable = createDataTable(columns, "date", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 
   @Override
-  protected MebListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected MebListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new MebListForm(this);
   }
@@ -125,7 +128,7 @@ public class MebListPage extends AbstractListPage<MebListForm, MebDao, MebEntryD
   }
 
   @Override
-  protected IModel<MebEntryDO> getModel(MebEntryDO object)
+  protected IModel<MebEntryDO> getModel(final MebEntryDO object)
   {
     return new DetachableDOModel<MebEntryDO, MebDao>(object, getBaseDao());
   }

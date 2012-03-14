@@ -27,12 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.orga.ContractDO;
@@ -52,7 +53,7 @@ public class ContractListPage extends AbstractListPage<ContractListForm, Contrac
   @SpringBean(name = "contractDao")
   private ContractDao contractDao;
 
-  public ContractListPage(PageParameters parameters)
+  public ContractListPage(final PageParameters parameters)
   {
     super(parameters, "legalAffaires.contract");
   }
@@ -64,18 +65,18 @@ public class ContractListPage extends AbstractListPage<ContractListForm, Contrac
     final List<IColumn<ContractDO>> columns = new ArrayList<IColumn<ContractDO>>();
 
     final CellItemListener<ContractDO> cellItemListener = new CellItemListener<ContractDO>() {
-      public void populateItem(Item<ICellPopulator<ContractDO>> item, String componentId, IModel<ContractDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<ContractDO>> item, final String componentId, final IModel<ContractDO> rowModel)
       {
         final ContractDO contract = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(contract.getId(), contract.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("legalAffaires.contract.number")), "number",
         "number", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
@@ -90,7 +91,7 @@ public class ContractListPage extends AbstractListPage<ContractListForm, Contrac
     columns.add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("legalAffaires.contract.type")), "type", "type",
         cellItemListener));
     columns
-        .add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
+    .add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("title")), "title", "title", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("legalAffaires.contract.coContractorA")),
         "coContractorA", "coContractorA", cellItemListener));
@@ -100,12 +101,12 @@ public class ContractListPage extends AbstractListPage<ContractListForm, Contrac
         "resubmissionOnDate", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("dueDate")), "dueDate", "dueDate",
         cellItemListener));
-    dataTable = createDataTable(columns, "number", false);
+    dataTable = createDataTable(columns, "number", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 
   @Override
-  protected ContractListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected ContractListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new ContractListForm(this);
   }
@@ -117,7 +118,7 @@ public class ContractListPage extends AbstractListPage<ContractListForm, Contrac
   }
 
   @Override
-  protected IModel<ContractDO> getModel(ContractDO object)
+  protected IModel<ContractDO> getModel(final ContractDO object)
   {
     return new DetachableDOModel<ContractDO, ContractDao>(object, getBaseDao());
   }

@@ -28,13 +28,15 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.export.ContentProvider;
@@ -55,6 +57,7 @@ import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = Kost1EditPage.class)
 public class Kost1ListPage extends AbstractListPage<Kost1ListForm, Kost1Dao, Kost1DO> implements IListPageColumnsCreator<Kost1DO>
@@ -81,23 +84,26 @@ public class Kost1ListPage extends AbstractListPage<Kost1ListForm, Kost1Dao, Kos
   public List<IColumn<Kost1DO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<Kost1DO>> columns = new ArrayList<IColumn<Kost1DO>>();
-    CellItemListener<Kost1DO> cellItemListener = new CellItemListener<Kost1DO>() {
-      public void populateItem(Item<ICellPopulator<Kost1DO>> item, String componentId, IModel<Kost1DO> rowModel)
+    final CellItemListener<Kost1DO> cellItemListener = new CellItemListener<Kost1DO>() {
+      public void populateItem(final Item<ICellPopulator<Kost1DO>> item, final String componentId, final IModel<Kost1DO> rowModel)
       {
         final Kost1DO kost1 = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(kost1.getId(), kost1.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<Kost1DO>(new Model<String>(getString("fibu.kost1")), getSortable("formattedNumber", sortable),
-        "formattedNumber", cellItemListener) {
-      @SuppressWarnings("unchecked")
+    columns.add(new CellItemListenerPropertyColumn<Kost1DO>(new Model<String>(getString("fibu.kost1")), getSortable("formattedNumber",
+        sortable), "formattedNumber", cellItemListener) {
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<Kost1DO>> item, final String componentId, final IModel<Kost1DO> rowModel)
       {
-        final Kost1DO kost1 = (Kost1DO) rowModel.getObject();
+        final Kost1DO kost1 = rowModel.getObject();
         if (isSelectMode() == false) {
           item.add(new ListSelectActionPanel(componentId, rowModel, Kost1EditPage.class, kost1.getId(), returnToPage, String.valueOf(kost1
               .getFormattedNumber())));
@@ -110,18 +116,32 @@ public class Kost1ListPage extends AbstractListPage<Kost1ListForm, Kost1Dao, Kos
         addRowClick(item);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<Kost1DO>(new Model<String>(getString("description")), getSortable("description", sortable), "description",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<Kost1DO>(new Model<String>(getString("status")), getSortable("kostentraegerStatus", sortable),
-        "kostentraegerStatus", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<Kost1DO>(new Model<String>(getString("description")), getSortable("description",
+        sortable), "description", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<Kost1DO>(new Model<String>(getString("status")), getSortable("kostentraegerStatus",
+        sortable), "kostentraegerStatus", cellItemListener));
     return columns;
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "formattedNumber", true);
+    dataTable = createDataTable(createColumns(this, true), "formattedNumber", SortOrder.ASCENDING);
     form.add(dataTable);
+    {
+      // Excel export
+      final SubmitLink excelExportLink = new SubmitLink(ContentMenuEntryPanel.LINK_ID, form) {
+        @Override
+        public void onSubmit()
+        {
+          exportExcel();
+        }
+      };
+      final ContentMenuEntryPanel excelExportButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), excelExportLink,
+          getString("exportAsXls")).setTooltip(getString("tooltip.export.excel"));
+      addContentMenuEntry(excelExportButton);
+    }
   }
 
   private enum Col
@@ -145,7 +165,7 @@ public class Kost1ListPage extends AbstractListPage<Kost1ListForm, Kost1Dao, Kos
     xls.setContentProvider(contentProvider);
     final ExportSheet sheet = xls.addSheet(PFUserContext.getLocalizedString("fibu.kost1.kost1s"));
     final ExportColumn[] cols = new ExportColumn[] { //
-    new I18nExportColumn(Col.KOST, "fibu.kost1", XlsContentProvider.LENGTH_KOSTENTRAEGER),
+        new I18nExportColumn(Col.KOST, "fibu.kost1", XlsContentProvider.LENGTH_KOSTENTRAEGER),
         new I18nExportColumn(Col.DESCRIPTION, "description", XlsContentProvider.LENGTH_STD),
         new I18nExportColumn(Col.STATUS, "status", XlsContentProvider.LENGTH_STD)};
     sheet.setColumns(cols);
@@ -161,7 +181,7 @@ public class Kost1ListPage extends AbstractListPage<Kost1ListForm, Kost1Dao, Kos
   }
 
   @Override
-  protected Kost1ListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected Kost1ListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new Kost1ListForm(this);
   }
@@ -173,7 +193,7 @@ public class Kost1ListPage extends AbstractListPage<Kost1ListForm, Kost1Dao, Kos
   }
 
   @Override
-  protected IModel<Kost1DO> getModel(Kost1DO object)
+  protected IModel<Kost1DO> getModel(final Kost1DO object)
   {
     return new DetachableDOModel<Kost1DO, Kost1Dao>(object, getBaseDao());
   }

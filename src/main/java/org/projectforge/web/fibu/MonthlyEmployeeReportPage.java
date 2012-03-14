@@ -29,23 +29,23 @@ import java.util.Map;
 
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.MonthlyEmployeeReport;
+import org.projectforge.fibu.MonthlyEmployeeReport.Kost2Row;
 import org.projectforge.fibu.MonthlyEmployeeReportDao;
 import org.projectforge.fibu.MonthlyEmployeeReportEntry;
 import org.projectforge.fibu.MonthlyEmployeeReportWeek;
 import org.projectforge.fibu.ProjektDO;
-import org.projectforge.fibu.MonthlyEmployeeReport.Kost2Row;
 import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost1Dao;
 import org.projectforge.fibu.kost.Kost2ArtDO;
@@ -72,7 +72,7 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
-  private MonthlyEmployeeReportForm form;
+  private final MonthlyEmployeeReportForm form;
 
   private MonthlyEmployeeReport report;
 
@@ -160,7 +160,7 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
       headcolRepeater.add(new Label(headcolRepeater.newChildId(), getString("fibu.kost2.art")));
     } else {
       // No kost 2 entries, so only task as head is useful.
-      headcolRepeater.add(new Label(headcolRepeater.newChildId(), getString("task")).add(new SimpleAttributeModifier("colspan", "4")));
+      headcolRepeater.add(new Label(headcolRepeater.newChildId(), getString("task")).add(AttributeModifier.replace("colspan", "4")));
     }
     final RepeatingView headcolWeekRepeater = new RepeatingView("headcolWeekRepeater");
     reportContainer.add(headcolWeekRepeater);
@@ -177,9 +177,9 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
       final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
       rowRepeater.add(row);
       if (rowCounter++ % 2 == 0) {
-        row.add(new SimpleAttributeModifier("class", "even"));
+        row.add(AttributeModifier.replace("class", "even"));
       } else {
-        row.add(new SimpleAttributeModifier("class", "odd"));
+        row.add(AttributeModifier.replace("class", "odd"));
       }
       final Kost2Row kost2Row = rowEntry.getValue();
       final Kost2DO cost2 = kost2Row.getKost2();
@@ -198,9 +198,9 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
       final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
       rowRepeater.add(row);
       if (rowCounter++ % 2 == 0) {
-        row.add(new SimpleAttributeModifier("class", "even"));
+        row.add(AttributeModifier.replace("class", "even"));
       } else {
-        row.add(new SimpleAttributeModifier("class", "odd"));
+        row.add(AttributeModifier.replace("class", "odd"));
       }
       final TaskDO task = rowEntry.getValue();
       addLabelCols(row, null, task, null, report.getUser(), report.getFromDate().getTime(), report.getToDate().getTime());
@@ -217,18 +217,18 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
       final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
       rowRepeater.add(row);
       if (rowCounter++ % 2 == 0) {
-        row.add(new SimpleAttributeModifier("class", "even"));
+        row.add(AttributeModifier.replace("class", "even"));
       } else {
-        row.add(new SimpleAttributeModifier("class", "odd"));
+        row.add(AttributeModifier.replace("class", "odd"));
       }
       addLabelCols(row, null, null, null, report.getUser(), report.getFromDate().getTime(), report.getToDate().getTime()).add(
-          new SimpleAttributeModifier("style", "text-align: right;"));
+          AttributeModifier.replace("style", "text-align: right;"));
       final RepeatingView colWeekRepeater = new RepeatingView("colWeekRepeater");
       row.add(colWeekRepeater);
       for (final MonthlyEmployeeReportWeek week : report.getWeeks()) {
         colWeekRepeater.add(new Label(colWeekRepeater.newChildId(), week.getFormattedTotalDuration()));
       }
-      row.add(new Label("sum", report.getFormattedTotalDuration()).add(new SimpleAttributeModifier("style",
+      row.add(new Label("sum", report.getFormattedTotalDuration()).add(AttributeModifier.replace("style",
           "font-weight: bold; color:red; text-align: right;")));
     }
   }
@@ -244,15 +244,15 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
       public void onClick()
       {
         final PageParameters params = new PageParameters();
-        params.put("userId", user.getId());
+        params.add("userId", user.getId());
         if (task != null) {
-          params.put("taskId", task.getId());
+          params.add("taskId", task.getId());
         }
-        params.put("startTime", startTime);
-        params.put("stopTime", stopTime);
-        params.put("storeFilter", false);
+        params.add("startTime", startTime);
+        params.add("stopTime", stopTime);
+        params.add("storeFilter", false);
         if (searchString != null) {
-          params.put("searchString", searchString);
+          params.add("searchString", searchString);
         }
         setResponsePage(new TimesheetListPage(params));
       }
@@ -268,7 +268,7 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
         row.add(new Label("customer", customer != null ? customer.getName() : ""));
         row.add(new Label("project", project.getName()));
       } else {
-        row.add(new Label("customer", cost2.getDescription()).add(new SimpleAttributeModifier("colspan", "2")));
+        row.add(new Label("customer", cost2.getDescription()).add(AttributeModifier.replace("colspan", "2")));
         row.add(new Label("project", "").setVisible(false));
       }
       row.add(new Label("costType", costType.getName()));
@@ -279,7 +279,7 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
       } else {
         link.add(new Label("label", getString("totalSum")));
       }
-      result.add(new SimpleAttributeModifier("colspan", "4"));
+      result.add(AttributeModifier.replace("colspan", "4"));
       row.add(new Label("customer", "").setVisible(false));
       row.add(new Label("project", "").setVisible(false));
       row.add(new Label("costType", "").setVisible(false));
@@ -294,7 +294,7 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
     buf.append(getString("menu.monthlyEmployeeReport.fileprefix")).append("_");
     final PFUserDO employee = userDao.getById(form.filter.getUserId());
     buf.append(employee.getLastname()).append("_").append(form.filter.getYear()).append("-").append(form.filter.getFormattedMonth())
-        .append(".pdf");
+    .append(".pdf");
     final String filename = buf.toString();
 
     // get the sheets of the given format
@@ -337,13 +337,13 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
   }
 
   @Override
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     log.error("cancelSelection not supported. Property was '" + property + "'.");
   }
 
   @Override
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     if ("user".equals(property) == true) {
       final Integer id;
@@ -359,7 +359,7 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
   }
 
   @Override
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     log.error("unselect not supported. Property was '" + property + "'.");
   }

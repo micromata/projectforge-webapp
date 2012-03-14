@@ -27,8 +27,8 @@ import java.math.BigDecimal;
 
 import javax.sql.DataSource;
 
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
@@ -38,14 +38,16 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.wicket.NewAbstractSecuredPage;
+import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import de.micromata.hibernate.history.HistoryEntry;
 import de.micromata.hibernate.history.delta.PropertyDelta;
 
-public class SystemStatisticsPage extends NewAbstractSecuredPage
+public class SystemStatisticsPage extends AbstractSecuredPage
 {
+  private static final long serialVersionUID = 8587252641914110851L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SystemStatisticsPage.class);
 
   @SpringBean(name = "dataSource")

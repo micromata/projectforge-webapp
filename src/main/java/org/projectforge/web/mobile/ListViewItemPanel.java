@@ -23,13 +23,13 @@
 
 package org.projectforge.web.mobile;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Page;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 /**
  * li of an ul-Panel which is used for most content areas.
@@ -46,7 +46,11 @@ public class ListViewItemPanel extends Panel
 
   private Link< ? > link;
 
-  private String label, comment, counter;
+  private final String label;
+
+  private String comment;
+
+  private String counter;
 
   public ListViewItemPanel(final String id, final Class< ? extends Page> linkClass, final String label)
   {
@@ -103,7 +107,7 @@ public class ListViewItemPanel extends Panel
    */
   public ListViewItemPanel addLinkAttribute(final String attribute, final String label)
   {
-    link.add(new SimpleAttributeModifier(attribute, label));
+    link.add(AttributeModifier.replace(attribute, label));
     return this;
   }
 
@@ -115,7 +119,7 @@ public class ListViewItemPanel extends Panel
   public ListViewItemPanel init()
   {
     if (listDivider == true) {
-      add(new SimpleAttributeModifier("data-role", "list-divider"));
+      add(AttributeModifier.replace("data-role", "list-divider"));
     }
     if (link != null) {
       add(new Label("label", "[invisible]").setVisible(false));

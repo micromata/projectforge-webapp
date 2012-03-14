@@ -26,7 +26,7 @@ package org.projectforge.web.user;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.user.PFUserContext;
@@ -39,6 +39,7 @@ import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.fibu.Kost2DropDownChoice;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
+import org.projectforge.web.wicket.WicketUtils;
 
 @EditPage(defaultReturnPage = UserPrefListPage.class)
 public class UserPrefEditPage extends AbstractEditPage<UserPrefDO, UserPrefEditForm, UserPrefDao> implements ISelectCallerPage
@@ -69,7 +70,7 @@ public class UserPrefEditPage extends AbstractEditPage<UserPrefDO, UserPrefEditF
   public UserPrefEditPage(final PageParameters parameters)
   {
     super(parameters, "user.pref");
-    final String areaId = parameters.getString(PARAMETER_AREA);
+    final String areaId = WicketUtils.getAsString(parameters, PARAMETER_AREA);
     if (areaId != null) {
       final UserPrefArea area = UserPrefAreaRegistry.instance().getEntry(areaId);
       if (area != null) {

@@ -40,15 +40,15 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.Response;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.repeater.RepeatingView;
-import org.apache.wicket.protocol.http.WebResponse;
+import org.apache.wicket.request.Response;
+import org.apache.wicket.request.http.WebResponse;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jfree.chart.JFreeChart;
 import org.projectforge.common.DateHelper;
@@ -72,9 +72,12 @@ import org.projectforge.web.fibu.ReportScriptingStorage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.JFreeChartImage;
+import org.projectforge.web.wicket.WicketUtils;
 
 public class ReportScriptingPage extends AbstractSecuredPage
 {
+  private static final long serialVersionUID = -1910145309628761662L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ReportScriptingPage.class);
 
   private transient ReportScriptingStorage reportScriptingStorage;
@@ -301,7 +304,7 @@ public class ReportScriptingPage extends AbstractSecuredPage
       final String filename = buf.toString();
       final Response response = getResponse();
       ((WebResponse) response).setAttachmentHeader(filename);
-      response.setContentType(DownloadUtils.getContentType(filename));
+      WicketUtils.getHttpServletResponse(response).setContentType(DownloadUtils.getContentType(filename));
       JasperExportManager.exportReportToPdfStream(jasperPrint, response.getOutputStream());
       response.getOutputStream().flush();
     } catch (final Exception ex) {
@@ -320,7 +323,7 @@ public class ReportScriptingPage extends AbstractSecuredPage
       final String filename = buf.toString();
       final Response response = getResponse();
       ((WebResponse) response).setAttachmentHeader(filename);
-      response.setContentType(DownloadUtils.getContentType(filename));
+      WicketUtils.getHttpServletResponse(response).setContentType(DownloadUtils.getContentType(filename));
       workbook.write(response.getOutputStream());
       response.getOutputStream().flush();
     } catch (final Exception ex) {
@@ -349,8 +352,8 @@ public class ReportScriptingPage extends AbstractSecuredPage
       // }
       // final String filename = buf.toString();
       final JFreeChartImage image = new JFreeChartImage("image", chart, exportJFreeChart.getImageType(), width, height);
-      image.add(new SimpleAttributeModifier("width", String.valueOf(width)));
-      image.add(new SimpleAttributeModifier("height", String.valueOf(height)));
+      image.add(AttributeModifier.replace("width", String.valueOf(width)));
+      image.add(AttributeModifier.replace("height", String.valueOf(height)));
       imageResultContainer.removeAll();
       imageResultContainer.add(image).setVisible(true);
       // ((WebResponse) response).setAttachmentHeader(filename);

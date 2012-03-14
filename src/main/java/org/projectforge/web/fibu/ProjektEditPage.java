@@ -24,15 +24,15 @@
 package org.projectforge.web.fibu;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.Kost2Dao;
 import org.projectforge.reporting.Kost2Art;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
 
 
@@ -49,7 +49,7 @@ public class ProjektEditPage extends AbstractEditPage<ProjektDO, ProjektEditForm
   @SpringBean(name = "projektDao")
   private ProjektDao projektDao;
 
-  public ProjektEditPage(PageParameters parameters)
+  public ProjektEditPage(final PageParameters parameters)
   {
     super(parameters, "fibu.projekt");
     init();
@@ -62,18 +62,18 @@ public class ProjektEditPage extends AbstractEditPage<ProjektDO, ProjektEditForm
   }
 
   @Override
-  protected ProjektEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, ProjektDO data)
+  protected ProjektEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final ProjektDO data)
   {
     return new ProjektEditForm(this, data);
   }
 
   @Override
-  public AbstractBasePage afterSaveOrUpdate()
+  public AbstractSecuredBasePage afterSaveOrUpdate()
   {
     if (getData() != null && getData().getId() != null) {
-      for (Kost2Art art : form.kost2Arts) {
+      for (final Kost2Art art : form.kost2Arts) {
         if (art.isExistsAlready() == false && art.isSelected() == true) {
-          Kost2DO kost2 = new Kost2DO();
+          final Kost2DO kost2 = new Kost2DO();
           kost2Dao.setProjekt(kost2, getData().getId());
           kost2Dao.setKost2Art(kost2, art.getId());
           kost2Dao.save(kost2);
@@ -89,12 +89,12 @@ public class ProjektEditPage extends AbstractEditPage<ProjektDO, ProjektEditForm
     return log;
   }
 
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing.
   }
 
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     if ("kundeId".equals(property) == true) {
       projektDao.setKunde(getData(), (Integer) selectedValue);
@@ -107,7 +107,7 @@ public class ProjektEditPage extends AbstractEditPage<ProjektDO, ProjektEditForm
     }
   }
 
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     if ("kundeId".equals(property) == true) {
       getData().setKunde(null);

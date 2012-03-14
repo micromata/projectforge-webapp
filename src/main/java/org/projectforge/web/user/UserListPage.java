@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.AbstractColumn;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
@@ -36,6 +36,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.OperationType;
 import org.projectforge.user.PFUserDO;
@@ -77,21 +78,23 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
     final boolean updateAccess = userDao.hasLoggedInUserAccess(null, null, OperationType.UPDATE, false);
     final List<IColumn<PFUserDO>> columns = new ArrayList<IColumn<PFUserDO>>();
     final CellItemListener<PFUserDO> cellItemListener = new CellItemListener<PFUserDO>() {
-      public void populateItem(Item<ICellPopulator<PFUserDO>> item, String componentId, IModel<PFUserDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<PFUserDO>> item, final String componentId, final IModel<PFUserDO> rowModel)
       {
         final PFUserDO user = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(user.getId(), user.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add( AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("user.username"), getSortable("username", sortable), "username", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item, java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<PFUserDO>> item, final String componentId, final IModel<PFUserDO> rowModel)
       {
-        PFUserDO user = (PFUserDO) rowModel.getObject();
+        final PFUserDO user = rowModel.getObject();
         if (isSelectMode() == true) {
           item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, user.getId(), user.getUsername()));
           addRowClick(item);
@@ -112,17 +115,17 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
     if (updateAccess == true) {
       // Show these columns only for admin users:
       columns.add(new AbstractColumn<PFUserDO>(new Model<String>(getString("user.assignedGroups"))) {
-        public void populateItem(Item<ICellPopulator<PFUserDO>> cellItem, String componentId, IModel<PFUserDO> rowModel)
+        public void populateItem(final Item<ICellPopulator<PFUserDO>> cellItem, final String componentId, final IModel<PFUserDO> rowModel)
         {
-          PFUserDO user = rowModel.getObject();
-          String groups = userDao.getGroupnames(user);
-          Label label = new Label(componentId, new Model<String>(groups));
+          final PFUserDO user = rowModel.getObject();
+          final String groups = userDao.getGroupnames(user);
+          final Label label = new Label(componentId, new Model<String>(groups));
           cellItem.add(label);
           cellItemListener.populateItem(cellItem, componentId, rowModel);
         }
       });
       columns.add(new AbstractColumn<PFUserDO>(new Model<String>(getString("access.rights"))) {
-        public void populateItem(Item<ICellPopulator<PFUserDO>> cellItem, String componentId, IModel<PFUserDO> rowModel)
+        public void populateItem(final Item<ICellPopulator<PFUserDO>> cellItem, final String componentId, final IModel<PFUserDO> rowModel)
         {
           final PFUserDO user = rowModel.getObject();
           final List<UserRightDO> rights = userDao.getUserRights(user.getId());
@@ -148,7 +151,7 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
               }
             }
           }
-          Label label = new Label(componentId, buf.toString());
+          final Label label = new Label(componentId, buf.toString());
           cellItem.add(label);
           cellItemListener.populateItem(cellItem, componentId, rowModel);
         }
@@ -160,12 +163,12 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "username", true);
+    dataTable = createDataTable(createColumns(this, true), "username", SortOrder.ASCENDING);
     form.add(dataTable);
   }
 
   @Override
-  protected UserListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected UserListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new UserListForm(this);
   }
@@ -177,7 +180,7 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
   }
 
   @Override
-  protected IModel<PFUserDO> getModel(PFUserDO object)
+  protected IModel<PFUserDO> getModel(final PFUserDO object)
   {
     return new DetachableDOModel<PFUserDO, UserDao>(object, getBaseDao());
   }

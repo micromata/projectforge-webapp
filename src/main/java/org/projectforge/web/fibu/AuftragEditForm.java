@@ -24,20 +24,18 @@
 package org.projectforge.web.fibu;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
@@ -45,9 +43,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.common.NumberHelper;
-import org.projectforge.common.StringHelper;
 import org.projectforge.core.CurrencyFormatter;
-import org.projectforge.core.NumberFormatter;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.AuftragsPositionsArt;
@@ -63,10 +59,8 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.FocusOnLoadBehavior;
-import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.AbstractUnsecureBasePage;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
@@ -75,9 +69,19 @@ import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
-import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.converter.CurrencyConverter;
-
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.HtmlCodePanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
+import org.projectforge.web.wicket.flowlayout.TextStyle;
+import org.projectforge.web.wicket.flowlayout.ToggleContainerPanel;
 
 public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage>
 {
@@ -94,48 +98,18 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
 
   protected CheckBox sendEMailNotficationCheckBox;
 
-  protected DatePanel angebotsDatumPanel;
-
-  protected DatePanel bindungsFristPanel;
-
-  protected DatePanel beauftragungsDatumPanel;
-
   protected RepeatingView positionsRepeater;
 
   protected CustomerSelectPanel kundeSelectPanel;
 
-  private boolean showInactivePositions = false;
+  private final List<Component> ajaxUpdateComponents = new ArrayList<Component>();
 
   @SpringBean(name = "rechnungCache")
   private RechnungCache rechnungCache;
 
-  private class RefreshCheckBox extends CheckBox
-  {
-    private static final long serialVersionUID = -8209057947011133420L;
-
-    RefreshCheckBox(final String componentId, final String property)
-    {
-      super(componentId, new PropertyModel<Boolean>(AuftragEditForm.this, property));
-    }
-
-    @Override
-    public void onSelectionChanged()
-    {
-      super.onSelectionChanged();
-      refresh();
-    }
-
-    @Override
-    protected boolean wantOnSelectionChangedNotifications()
-    {
-      return true;
-    }
-  }
-
-  public AuftragEditForm(AuftragEditPage parentPage, AuftragDO data)
+  public AuftragEditForm(final AuftragEditPage parentPage, final AuftragDO data)
   {
     super(parentPage, data);
-    this.colspan = 9;
   }
 
   public boolean isSendEMailNotification()
@@ -143,7 +117,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     return sendEMailNotification;
   }
 
-  public void setSendEMailNotification(boolean sendEMailNotification)
+  public void setSendEMailNotification(final boolean sendEMailNotification)
   {
     this.sendEMailNotification = sendEMailNotification;
   }
@@ -153,70 +127,137 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
   protected void init()
   {
     super.init();
-    add(new RefreshCheckBox("showInactivePositionsCheckBox", "showInactivePositions"));
-    final Component nummerField = new TextField<Integer>("nummer", new PropertyModel<Integer>(data, "nummer"));
-    add(nummerField);
-
-    add(new TooltipImage("nummerHelp", getResponse(), WebConstants.IMAGE_HELP, getString("fibu.tooltip.nummerWirdAutomatischVergeben")) {
-      @Override
-      public boolean isVisible()
-      {
-        return NumberHelper.greaterZero(getData().getNummer()) == false;
+    /* GRID8 - BLOCK */
+    gridBuilder.newGrid16();
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // Number
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.nummer"), true);
+      final MinMaxNumberField<Integer> number = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data,
+          "nummer"), 0, 99999999);
+      number.setMaxLength(8).add(AttributeModifier.append("style", "width: 6em !important;"));
+      fs.add(number);
+      if (NumberHelper.greaterZero(getData().getNummer()) == false) {
+        fs.addHelpIcon(getString("fibu.tooltip.nummerWirdAutomatischVergeben"));
       }
-    });
-    add(new Label("nettoSumme", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return CurrencyFormatter.format(data.getNettoSumme());
-      }
-    }));
-
-    // DropDownChoice status
-    final LabelValueChoiceRenderer<AuftragsStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<AuftragsStatus>(this, AuftragsStatus
-        .values());
-    @SuppressWarnings("unchecked")
-    final DropDownChoice statusChoice = new DropDownChoice("status", new PropertyModel(data, "auftragsStatus"), statusChoiceRenderer
-        .getValues(), statusChoiceRenderer);
-    statusChoice.setNullValid(false).setRequired(true);
-    add(statusChoice);
-
-    final RequiredMaxLengthTextField titleField = new RequiredMaxLengthTextField("titel", new PropertyModel<String>(data, "titel"));
-    add(titleField);
-    titleField.add(new FocusOnLoadBehavior());
-    add(new MaxLengthTextField("referenz", new PropertyModel<String>(data, "referenz")));
-    add(new MaxLengthTextArea("bemerkung", new PropertyModel<String>(data, "bemerkung")));
-    add(new MaxLengthTextArea("statusBeschreibung", new PropertyModel<String>(data, "statusBeschreibung")));
-    add(new TooltipImage("kundeHelp", getResponse(), WebConstants.IMAGE_HELP, getString("fibu.auftrag.hint.kannVonProjektKundenAbweichen")));
-
-    angebotsDatumPanel = new DatePanel("angebotsDatum", new PropertyModel<Date>(data, "angebotsDatum"), DatePanelSettings.get()
-        .withCallerPage(parentPage).withTargetType(java.sql.Date.class));
-    angebotsDatumPanel.setRequired(true);
-    add(angebotsDatumPanel);
-    bindungsFristPanel = new DatePanel("bindungsFrist", new PropertyModel<Date>(data, "bindungsFrist"), DatePanelSettings.get()
-        .withCallerPage(parentPage).withTargetType(java.sql.Date.class));
-    add(bindungsFristPanel);
-    beauftragungsDatumPanel = new DatePanel("beauftragungsDatum", new PropertyModel<Date>(data, "beauftragungsDatum"), DatePanelSettings
-        .get().withCallerPage(parentPage).withTargetType(java.sql.Date.class));
-    add(beauftragungsDatumPanel);
-    sendEMailNotficationCheckBox = new CheckBox("sendEMailNotification", new PropertyModel<Boolean>(this, "sendEMailNotification"));
-
-    add(sendEMailNotficationCheckBox);
-    final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel("projekt", new PropertyModel<ProjektDO>(data, "projekt"),
-        parentPage, "projektId");
-    add(projektSelectPanel);
-    projektSelectPanel.init();
-    kundeSelectPanel = new CustomerSelectPanel("kunde", new PropertyModel<KundeDO>(data, "kunde"),
-        new PropertyModel<String>(data, "kundeText"), parentPage, "kundeId");
-    add(kundeSelectPanel);
-    kundeSelectPanel.init();
-    final UserSelectPanel contactPersonSelectPanel = new UserSelectPanel("contactPerson",
-        new PropertyModel<PFUserDO>(data, "contactPerson"), parentPage, "contactPersonId");
-    contactPersonSelectPanel.setRequired(true);
-    add(contactPersonSelectPanel);
-    contactPersonSelectPanel.init();
-    positionsRepeater = new RepeatingView("positions");
-    add(positionsRepeater);
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // Net sum
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.nettoSumme"));
+      final DivTextPanel netPanel = new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return CurrencyFormatter.format(data.getNettoSumme());
+        }
+      }, TextStyle.FORM_TEXT);
+      fs.add(netPanel);
+      fs.setNoLabelFor();
+      ajaxUpdateComponents.add(netPanel.getLabel4Ajax());
+    }
+    gridBuilder.newBlockPanel();
+    {
+      // Title
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.titel"));
+      final MaxLengthTextField subject = new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "titel"));
+      subject.add(WicketUtils.setFocus());
+      fs.add(subject);
+    }
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // reference
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.reference"));
+      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "referenz")));
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // DropDownChoice status
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("status"));
+      final LabelValueChoiceRenderer<AuftragsStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<AuftragsStatus>(this,
+          AuftragsStatus.values());
+      final DropDownChoice<AuftragsStatus> statusChoice = new DropDownChoice<AuftragsStatus>(fs.getDropDownChoiceId(),
+          new PropertyModel<AuftragsStatus>(data, "auftragsStatus"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
+      statusChoice.setNullValid(false).setRequired(true);
+      fs.add(statusChoice);
+    }
+    gridBuilder.newBlockPanel();
+    {
+      // project
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt")).setNoLabelFor();
+      final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new PropertyModel<ProjektDO>(data, "projekt"),
+          parentPage, "projektId");
+      fs.add(projektSelectPanel);
+      projektSelectPanel.init();
+    }
+    {
+      // customer
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde"), true).setNoLabelFor();
+      kundeSelectPanel = new CustomerSelectPanel(fs.newChildId(), new PropertyModel<KundeDO>(data, "kunde"), new PropertyModel<String>(
+          data, "kundeText"), parentPage, "kundeId");
+      fs.add(kundeSelectPanel);
+      kundeSelectPanel.init();
+      fs.addHelpIcon(getString("fibu.auftrag.hint.kannVonProjektKundenAbweichen"));
+    }
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // date
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.datum"));
+      final DatePanel angebotsDatumPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "angebotsDatum"), DatePanelSettings
+          .get().withTargetType(java.sql.Date.class));
+      angebotsDatumPanel.setRequired(true);
+      fs.add(angebotsDatumPanel);
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // Bindungsfrist
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.bindungsFrist"));
+      final DatePanel bindungsFristPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "bindungsFrist"), DatePanelSettings
+          .get().withTargetType(java.sql.Date.class));
+      fs.add(bindungsFristPanel);
+    }
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // contact person
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("contactPerson"));
+      final UserSelectPanel contactPersonSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data,
+          "contactPerson"), parentPage, "contactPersonId");
+      contactPersonSelectPanel.setRequired(true);
+      fs.add(contactPersonSelectPanel);
+      contactPersonSelectPanel.init();
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // Beauftragungsdatum
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.beauftragungsdatum"));
+      final DatePanel beauftragungsDatumPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "beauftragungsDatum"),
+          DatePanelSettings.get().withTargetType(java.sql.Date.class));
+      fs.add(beauftragungsDatumPanel);
+    }
+    positionsRepeater = new RepeatingView(flowform.newChildId());
+    flowform.add(positionsRepeater);
+    gridBuilder.newGrid16();
+    {
+      // comment
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "bemerkung"))).setAutogrow();
+    }
+    {
+      // status comment
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.statusBeschreibung"));
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "statusBeschreibung"))).setAutogrow();
+    }
+    {
+      // email
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("email"), true);
+      final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
+      final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), "sendEMailNotification",
+          new PropertyModel<Boolean>(this, "sendEMailNotification"));
+      radioGroupPanel.add(radioGroup);
+      WicketUtils.addYesNo(radioGroup);
+      fs.setLabelFor(radioGroup.getRadioGroup());
+      fs.addHelpIcon(getString("label.sendEMailNotification"));
+    }
     refresh();
   }
 
@@ -224,158 +265,145 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
   void refresh()
   {
     positionsRepeater.removeAll();
+    final boolean hasInsertAccess = getBaseDao().hasInsertAccess(getUser());
     if (CollectionUtils.isEmpty(data.getPositionen()) == true) {
       // Ensure that at least one position is available:
       data.addPosition(new AuftragsPositionDO());
     }
-    final List<AuftragsPositionDO> positionen = data.getPositionen();
-    final int counter = positionen.size();
+    DivPanel content = null, columns, column;
     for (final AuftragsPositionDO position : data.getPositionen()) {
       final boolean abgeschlossenUndNichtFakturiert = position.isAbgeschlossenUndNichtVollstaendigFakturiert();
-      final WebMarkupContainer item = new WebMarkupContainer(positionsRepeater.newChildId());
-      positionsRepeater.add(item);
-      final WebMarkupContainer shortPositionView = new WebMarkupContainer("shortPositionView");
-      item.add(shortPositionView);
-      final WebMarkupContainer normalPositionView = new WebMarkupContainer("normalPositionView");
-      item.add(normalPositionView);
-      if (isShowInactivePositions() == false
-          && (position.isDeleted() == true || position.isVollstaendigFakturiert() == true || position.getStatus() == AuftragsPositionsStatus.NICHT_BEAUFTRAGT)) {
-        normalPositionView.setVisible(false);
-      } else {
-        shortPositionView.setVisible(false);
+      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(positionsRepeater.newChildId(), DivType.GRID16,
+          DivType.ROUND_ALL);
+      positionsPanel.getContainer().setOutputMarkupId(true);
+      positionsRepeater.add(positionsPanel);
+      final StringBuffer heading = new StringBuffer();
+      heading.append(escapeHtml(getString("fibu.auftrag.position.short"))).append(" #").append(position.getNumber());
+      positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_ID, heading.toString()));
+      content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
+      positionsPanel.add(content);
+      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
+      {
+        final FieldsetPanel fs = new FieldsetPanel(columns, getString("fibu.auftrag.titel"));
+        fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(position, "titel")));
       }
-      final Label numberLabel = new Label("number", String.valueOf(position.getNumber()));
-      if (normalPositionView.isVisible() == false) {
-        shortPositionView.add(numberLabel);
-        final StringBuffer buf = new StringBuffer();
-        boolean first = true;
-        if (StringUtils.isNotBlank(position.getTitel()) == true) {
-          first = StringHelper.append(buf, first, position.getTitel(), ", ");
-        }
-        if (NumberHelper.isNotZero(position.getPersonDays()) == true) {
-          first = StringHelper.append(buf, first, NumberFormatter.format(position.getPersonDays()), ", ");
-          buf.append(" ").append(getString("projectmanagement.personDays.short"));
-        }
-        if (NumberHelper.isNotZero(position.getNettoSumme()) == true) {
-          first = StringHelper.append(buf, first, CurrencyFormatter.format(position.getNettoSumme()), ", ");
-        }
-        if (position.getStatus() != null) {
-          first = StringHelper.append(buf, first, getString(position.getStatus().getI18nKey()), ", ");
-        }
-        if (position.isVollstaendigFakturiert() == true) {
-          first = StringHelper.append(buf, first, getString("fibu.auftrag.vollstaendigFakturiert"), ", ");
-        }
-        shortPositionView.add(new Label("shortText", buf.toString()).setRenderBodyOnly(true));
-      } else {
-        normalPositionView.add(numberLabel);
-        normalPositionView.add(new MaxLengthTextField("titel", new PropertyModel<String>(position, "titel")));
-
-        // DropDownChoice listType
-        final LabelValueChoiceRenderer<AuftragsPositionsArt> artChoiceRenderer = new LabelValueChoiceRenderer<AuftragsPositionsArt>(item,
+      content.add(columns = new DivPanel(content.newChildId(), DivType.COLUMNS));
+      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_33));
+      {
+        // DropDownChoice type
+        final FieldsetPanel fs = new FieldsetPanel(column, getString("fibu.auftrag.position.art"));
+        final LabelValueChoiceRenderer<AuftragsPositionsArt> artChoiceRenderer = new LabelValueChoiceRenderer<AuftragsPositionsArt>(fs,
             AuftragsPositionsArt.values());
-        @SuppressWarnings("unchecked")
-        final DropDownChoice artChoice = new DropDownChoice("art", new PropertyModel(position, "art"), artChoiceRenderer.getValues(),
-            artChoiceRenderer);
+        final DropDownChoice<AuftragsPositionsArt> artChoice = new DropDownChoice<AuftragsPositionsArt>(fs.getDropDownChoiceId(),
+            new PropertyModel<AuftragsPositionsArt>(position, "art"), artChoiceRenderer.getValues(), artChoiceRenderer);
         artChoice.setNullValid(false);
         artChoice.setRequired(true);
-        normalPositionView.add(artChoice);
-
-        final Label statusLabel = new Label("statusLabel", getString("status"));
-        if (abgeschlossenUndNichtFakturiert == true) {
-          statusLabel.add(new SimpleAttributeModifier("style", WebConstants.CSS_BACKGROUND_COLOR_RED));
-        }
-        normalPositionView.add(statusLabel);
-        // DropDownChoice listType
-        final LabelValueChoiceRenderer<AuftragsPositionsStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<AuftragsPositionsStatus>(
-            item, AuftragsPositionsStatus.values());
-        @SuppressWarnings("unchecked")
-        final DropDownChoice statusChoice = new DropDownChoice("status", new PropertyModel(position, "status"), statusChoiceRenderer
-            .getValues(), statusChoiceRenderer);
-        statusChoice.setNullValid(true);
-        statusChoice.setRequired(false);
-        normalPositionView.add(statusChoice);
-
-        final Label nettoSummeLabel = new Label("nettoSummeLabel", getString("fibu.auftrag.nettoSumme"));
-        if (abgeschlossenUndNichtFakturiert == true) {
-          nettoSummeLabel.add(new SimpleAttributeModifier("style", WebConstants.CSS_BACKGROUND_COLOR_RED));
-        }
-        normalPositionView.add(nettoSummeLabel);
-        normalPositionView.add(new TextField<String>("nettoSumme", new PropertyModel<String>(position, "nettoSumme")) {
+        fs.add(artChoice);
+      }
+      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_33));
+      {
+        // Person days
+        final FieldsetPanel fs = new FieldsetPanel(column, getString("projectmanagement.personDays"));
+        fs.add(new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(position, "personDays"),
+            BigDecimal.ZERO, MAX_PERSON_DAYS));
+      }
+      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_33));
+      {
+        // Net sum
+        final FieldsetPanel fs = new FieldsetPanel(column, getString("fibu.auftrag.nettoSumme"));
+        fs.add(new TextField<String>(InputPanel.WICKET_ID, new PropertyModel<String>(position, "nettoSumme")) {
+          @SuppressWarnings({ "rawtypes", "unchecked"})
           @Override
-          public IConverter getConverter(Class< ? > type)
+          public IConverter getConverter(final Class type)
           {
             return new CurrencyConverter();
           }
         });
-
-        final Set<RechnungsPositionVO> orderPositions = rechnungCache.getRechnungsPositionVOSetByAuftragsPositionId(position.getId());
-        final boolean showInvoices = CollectionUtils.isNotEmpty(orderPositions);
-        final Label invoicesLabel = new Label("invoicesLabel", getString("fibu.rechnungen"));
-        normalPositionView.add(invoicesLabel).setRenderBodyOnly(true);
+        if (abgeschlossenUndNichtFakturiert == true) {
+          fs.setWarninngBackground();
+        }
+      }
+      content.add(columns = new DivPanel(content.newChildId(), DivType.COLUMNS));
+      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_33));
+      final Set<RechnungsPositionVO> orderPositions = rechnungCache.getRechnungsPositionVOSetByAuftragsPositionId(position.getId());
+      final boolean showInvoices = CollectionUtils.isNotEmpty(orderPositions);
+      {
+        // Invoices
+        final FieldsetPanel fs = new FieldsetPanel(column, getString("fibu.rechnungen")).setNoLabelFor();
         if (showInvoices == true) {
-          final InvoicePositionsPanel panel = new InvoicePositionsPanel("invoices");
-          normalPositionView.add(panel);
+          final InvoicePositionsPanel panel = new InvoicePositionsPanel(fs.newChildId());
+          fs.add(panel);
           panel.init(orderPositions);
         } else {
-          normalPositionView.add(AbstractBasePage.createInvisibleDummyComponent("invoices"));
+          fs.add(AbstractUnsecureBasePage.createInvisibleDummyComponent(fs.newChildId()));
         }
-        final Label invoicedLabel = new Label("invoicedLabel", getString("fibu.fakturiert"));
-        normalPositionView.add(invoicedLabel);
-        final Label invoicedSum = new Label("invoicedSum", CurrencyFormatter.format(RechnungDao.getNettoSumme(orderPositions)));
-        normalPositionView.add(invoicedSum);
-        if (showInvoices == false) {
-          invoicesLabel.setVisible(false);
-          invoicedLabel.setVisible(false);
-          invoicedSum.setVisible(false);
+      }
+      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_33));
+      {
+        // invoiced
+        final FieldsetPanel fs = new FieldsetPanel(column, getString("fibu.fakturiert"), true).setNoLabelFor();
+        if (showInvoices == true) {
+          fs.add(new DivTextPanel(fs.newChildId(), CurrencyFormatter.format(RechnungDao.getNettoSumme(orderPositions))));
+        } else {
+          fs.add(AbstractUnsecureBasePage.createInvisibleDummyComponent(fs.newChildId()));
         }
-
-        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("task", new PropertyModel<TaskDO>(position, "task"), parentPage,
-            "taskId:" + position.getNumber()) {
+        if (userGroupCache.isUserMemberOfFinanceGroup() == true) {
+          final DivPanel checkBoxDiv = fs.addNewCheckBoxDiv();
+          checkBoxDiv.add(new CheckBoxPanel(checkBoxDiv.newChildId(), new PropertyModel<Boolean>(position, "vollstaendigFakturiert"),
+              getString("fibu.auftrag.vollstaendigFakturiert")));
+        }
+      }
+      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_33));
+      {
+        // DropDownChoice status
+        final FieldsetPanel fs = new FieldsetPanel(column, getString("status"));
+        final LabelValueChoiceRenderer<AuftragsPositionsStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<AuftragsPositionsStatus>(
+            fs, AuftragsPositionsStatus.values());
+        final DropDownChoice<AuftragsPositionsStatus> statusChoice = new DropDownChoice<AuftragsPositionsStatus>(fs.getDropDownChoiceId(),
+            new PropertyModel<AuftragsPositionsStatus>(position, "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
+        statusChoice.setNullValid(true);
+        statusChoice.setRequired(false);
+        fs.add(statusChoice);
+        if (abgeschlossenUndNichtFakturiert == true) {
+          fs.setWarninngBackground();
+        }
+      }
+      content.add(columns = new DivPanel(content.newChildId(), DivType.COLUMNS));
+      {
+        // Task
+        final FieldsetPanel fs = new FieldsetPanel(columns, getString("task"));
+        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(position, "task"),
+            parentPage, "taskId:" + position.getNumber()) {
           @Override
-          protected void selectTask(TaskDO task)
+          protected void selectTask(final TaskDO task)
           {
             super.selectTask(task);
             parentPage.getBaseDao().setTask(position, task.getId());
           }
         };
-        normalPositionView.add(taskSelectPanel);
+        fs.add(taskSelectPanel);
         taskSelectPanel.init();
-        taskSelectPanel.setEnableLinks(true);
-        normalPositionView.add(new MinMaxNumberField<BigDecimal>("personDays", new PropertyModel<BigDecimal>(position, "personDays"),
-            BigDecimal.ZERO, MAX_PERSON_DAYS));
-        normalPositionView.add(new MaxLengthTextArea("bemerkung", new PropertyModel<String>(position, "bemerkung")));
-        final CheckBox vollstaendigFakturiertCheckBox = new CheckBox("vollstaendigFakturiert", new PropertyModel<Boolean>(position,
-            "vollstaendigFakturiert"));
-        WicketUtils.addTooltip(vollstaendigFakturiertCheckBox, getString("fibu.auftrag.vollstaendigFakturiert"));
-        if (userGroupCache.isUserMemberOfFinanceGroup() == false) {
-          vollstaendigFakturiertCheckBox.setVisible(false);
-        }
-        normalPositionView.add(vollstaendigFakturiertCheckBox);
       }
-      final SubmitLink addPositionButton = new SubmitLink("addPosition") {
-        public void onSubmit()
+      {
+        // Comment
+        final FieldsetPanel fs = new FieldsetPanel(columns, getString("comment"));
+        fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(position, "bemerkung")));
+      }
+    }
+    if (hasInsertAccess == true) {
+      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
+      final Button addPositionButton = new Button(SingleButtonPanel.WICKET_ID) {
+        @Override
+        public final void onSubmit()
         {
           getData().addPosition(new AuftragsPositionDO());
           refresh();
-        };
+        }
       };
-      item.add(addPositionButton);
-      addPositionButton.add(WicketUtils.getAddRowImage("addPositionImage", getResponse(), getString("fibu.auftrag.tooltip.addPosition")));
-      if (position.getNumber() < counter) {
-        // Show only Button for last position.
-        addPositionButton.setVisible(false);
-      }
+      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(columns.newChildId(), addPositionButton, getString("add"));
+      addPositionButtonPanel.setTooltip(getString("fibu.auftrag.tooltip.addPosition"));
+      columns.add(addPositionButtonPanel);
     }
-  }
-
-  public boolean isShowInactivePositions()
-  {
-    return showInactivePositions;
-  }
-
-  public void setShowInactivePositions(boolean showInactivePositions)
-  {
-    this.showInactivePositions = showInactivePositions;
   }
 
   @Override

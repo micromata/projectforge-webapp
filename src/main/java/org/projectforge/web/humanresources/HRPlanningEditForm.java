@@ -24,23 +24,31 @@
 package org.projectforge.web.humanresources;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.wicket.Component;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.CheckBox;
+import org.apache.wicket.AttributeModifier;
+import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.SubmitLink;
-import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.validation.IValidatable;
+import org.apache.wicket.validation.validator.AbstractValidator;
 import org.hibernate.Hibernate;
+import org.projectforge.calendar.DayHolder;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.core.Priority;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.humanresources.HRPlanningDO;
@@ -53,14 +61,20 @@ import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.fibu.ProjektSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DateTimePanelSettings;
 import org.projectforge.web.wicket.components.JiraIssuesPanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
-
+import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.HtmlCodePanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
+import org.projectforge.web.wicket.flowlayout.ToggleContainerPanel;
 
 /**
  * 
@@ -81,108 +95,211 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
 
   private boolean showDeletedOnly;
 
-  private WebMarkupContainer showDeletedCheckBoxRow;
+  private RepeatingView entriesRepeater;
 
-  protected DatePanel weekDatePanel;
+  private HRPlanningDO predecessor;
 
-  protected RepeatingView entriesRepeater;
+  private boolean predecessorUpdToDate;
 
-  public HRPlanningEditForm(HRPlanningEditPage parentPage, HRPlanningDO data)
+  // Components for form validation.
+  private final FormComponent< ? >[] dependentFormComponents = new FormComponent[2];
+
+  private final List<FormComponent< ? >> dependentEntryFormComponents = new ArrayList<FormComponent< ? >>();
+
+  private FormComponent< ? >[] dependentEntryFormComponentsArray;
+
+  public HRPlanningEditForm(final HRPlanningEditPage parentPage, final HRPlanningDO data)
   {
     super(parentPage, data);
-    this.colspan = 9;
   }
 
-  @Override
-  protected void validation()
-  {
-    final Iterator< ? extends Component> it = entriesRepeater.iterator();
-    while (it.hasNext() == true) {
-      final WebMarkupContainer entry = (WebMarkupContainer) it.next();
-      final ProjektSelectPanel projektSelectPanel = (ProjektSelectPanel) entry.get("projekt");
-      @SuppressWarnings("unchecked")
-      final DropDownChoice<HRPlanningEntryStatus> statusChoice = (DropDownChoice<HRPlanningEntryStatus>) entry.get("status");
-      final ProjektDO projekt;
-      if (projektSelectPanel.isEnabled() == true) {
-        projekt = projektSelectPanel.getConvertedInput();
-      } else {
-        projekt = projektSelectPanel.getModelObject();
-      }
-      final HRPlanningEntryStatus status;
-      if (statusChoice.isEnabled() == true) {
-        status = statusChoice.getConvertedInput();
-      } else {
-        status = statusChoice.getModelObject();
-      }
-      if (projekt == null && status == null) {
-        addComponentError(projektSelectPanel, "hr.planning.entry.error.statusOrProjektRequired");
-      } else if (projekt != null && status != null) {
-        addComponentError(projektSelectPanel, "hr.planning.entry.error.statusAndProjektNotAllowed");
-      }
-    }
-    if (hrPlanningDao.doesEntryAlreadyExist(data) == true) {
-      addComponentError(weekDatePanel, "hr.planning.entry.error.entryDoesAlreadyExistForUserAndWeekOfYear");
-    }
-  }
-
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     super.init();
-    {
-      Hibernate.initialize(data.getUser());
-      final UserSelectPanel userSelectPanel = new UserSelectPanel("user", new PropertyModel<PFUserDO>(data, "user"), parentPage, "userId");
-      add(userSelectPanel);
-      userSelectPanel.setRequired(true);
-      userSelectPanel.init();
-    }
-    showDeletedCheckBoxRow = new WebMarkupContainer("deletedCheckBoxRow");
-    add(showDeletedCheckBoxRow);
-    @SuppressWarnings("serial")
-    final CheckBox deletedCheckBox = new CheckBox("deletedCheckBox", new PropertyModel<Boolean>(this, "showDeletedOnly")) {
+    add(new IFormValidator() {
       @Override
-      public void onSelectionChanged()
+      public FormComponent< ? >[] getDependentFormComponents()
       {
-        super.onSelectionChanged();
-        refresh();
+        return dependentFormComponents;
       }
 
       @Override
-      protected boolean wantOnSelectionChangedNotifications()
+      public void validate(final Form< ? > form)
       {
-        return true;
-      }
-    };
-    showDeletedCheckBoxRow.add(deletedCheckBox);
-    // Start Date
-    weekDatePanel = new DatePanel("weekDate", new PropertyModel<Date>(data, "week"), (DateTimePanelSettings) DateTimePanelSettings.get()
-        .withTabIndex(3).withSelectStartStopTime(false).withCallerPage(parentPage).withTargetType(java.sql.Date.class));
-    weekDatePanel.setRequired(true);
-    add(weekDatePanel);
-    @SuppressWarnings("serial")
-    final Label weekOfYear = new Label("weekOfYear", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        if (data.getWeek() != null) {
-          return DateTimeFormatter.formatWeekOfYear(data.getWeek());
-        } else {
-          return "--";
+        if (hrPlanningDao.doesEntryAlreadyExist(data.getId(), data.getUserId(), data.getWeek()) == true) {
+          error(getString("hr.planning.entry.error.entryDoesAlreadyExistForUserAndWeekOfYear"));
         }
       }
     });
-    add(weekOfYear);
-    entriesRepeater = new RepeatingView("entries");
-    add(entriesRepeater);
+    add(new IFormValidator() {
+      @Override
+      public FormComponent< ? >[] getDependentFormComponents()
+      {
+        if (dependentEntryFormComponentsArray == null) {
+          dependentEntryFormComponentsArray = new FormComponent[dependentEntryFormComponents.size()];
+          dependentEntryFormComponentsArray = dependentEntryFormComponents.toArray(dependentEntryFormComponentsArray);
+        }
+        return dependentEntryFormComponentsArray;
+      }
+
+      @Override
+      public void validate(final Form< ? > form)
+      {
+        for (int i = 0; i < getDependentFormComponents().length - 1; i += 2) {
+          @SuppressWarnings("unchecked")
+          final DropDownChoice<HRPlanningEntryStatus> statusChoice = (DropDownChoice<HRPlanningEntryStatus>) dependentEntryFormComponentsArray[i];
+          final HRPlanningEntryStatus status = statusChoice.getConvertedInput();
+          final ProjektSelectPanel projektSelectPanel = (ProjektSelectPanel) dependentEntryFormComponentsArray[i + 1];
+          final ProjektDO projekt = projektSelectPanel.getModelObject();
+          if (projekt == null && status == null) {
+            projektSelectPanel.error(getString("hr.planning.entry.error.statusOrProjektRequired"));
+          } else if (projekt != null && status != null) {
+            projektSelectPanel.error(getString("hr.planning.entry.error.statusAndProjektNotAllowed"));
+          }
+        }
+      }
+    });
+    gridBuilder.newGrid16();
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // User
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"));
+      Hibernate.initialize(data.getUser());
+      final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "user"), parentPage,
+          "userId");
+      fs.add(dependentFormComponents[0] = userSelectPanel);
+      userSelectPanel.setRequired(true);
+      userSelectPanel.init();
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // Start Date
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.startTime"), true);
+      final DatePanel weekDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "week"), DateTimePanelSettings.get()
+          .withSelectStartStopTime(false).withTargetType(java.sql.Date.class));
+      weekDatePanel.setRequired(true);
+      weekDatePanel.add(new AbstractValidator<Date>() {
+        /**
+         * @see org.apache.wicket.validation.validator.AbstractValidator#onValidate(org.apache.wicket.validation.IValidatable)
+         */
+        @Override
+        protected void onValidate(final IValidatable<Date> validatable)
+        {
+          final Date date = validatable.getValue();
+          if (date != null) {
+            final DayHolder dh = new DayHolder(date);
+            dh.setBeginOfWeek();
+            data.setWeek(dh.getSQLDate());
+          }
+          weekDatePanel.markModelAsChanged();
+        }
+      });
+      // weekDatePanel.getDateField().add(new AjaxFormComponentUpdatingBehavior("onblur") {
+      // @Override
+      // protected void onUpdate(final AjaxRequestTarget target)
+      // {
+      // // Doesn't work with DatePicker (because DatePicker updates the value after onblur event.
+      // }
+      // });
+      fs.add(dependentFormComponents[1] = weekDatePanel);
+      fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("calendarWeek")) {
+        @Override
+        public final void onSubmit()
+        {
+        }
+      }, new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          if (data.getWeek() != null) {
+            return getString("calendar.weekOfYearShortLabel") + " " + DateTimeFormatter.formatWeekOfYear(data.getWeek());
+          } else {
+            return getString("calendar.weekOfYearShortLabel");
+          }
+        }
+
+      }, SingleButtonPanel.GREY).setTooltip(getString("recalculate")));
+      final DivPanel checkBoxDiv = new DivPanel(fs.newChildId(), DivType.CHECKBOX) {
+        /**
+         * @see org.apache.wicket.Component#isVisible()
+         */
+        @Override
+        public boolean isVisible()
+        {
+          return data.hasDeletedEntries();
+        }
+      };
+      fs.add(checkBoxDiv);
+      checkBoxDiv.add(new CheckBoxPanel(checkBoxDiv.newChildId(), new PropertyModel<Boolean>(this, "showDeletedOnly"),
+          getString("onlyDeleted")) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged(java.lang.Boolean)
+         */
+        @Override
+        protected void onSelectionChanged(final Boolean newSelection)
+        {
+          super.onSelectionChanged(newSelection);
+          refresh();
+        }
+
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
+      });
+      if (isNew() == true) {
+        fs.add(new SingleButtonPanel(fs.newChildId(), new Button(SingleButtonPanel.WICKET_ID, new Model<String>("predecessor")) {
+          @Override
+          public final void onSubmit()
+          {
+            if (getPredecessor() != null && predecessor.getEntries() != null) {
+              final Iterator<HRPlanningEntryDO> it = getData().getEntries().iterator();
+              while (it.hasNext() == true) {
+                if (it.next().isEmpty() == true) {
+                  it.remove();
+                }
+              }
+              for (final HRPlanningEntryDO entry : predecessor.getEntries()) {
+                getData().addEntry(entry.newClone());
+              }
+            }
+            predecessor = null;
+            refresh();
+          }
+        }, getString("hr.planning.entry.copyFromPredecessor")) {
+          /**
+           * @see org.apache.wicket.Component#isVisible()
+           */
+          @Override
+          public boolean isVisible()
+          {
+            return getPredecessor() != null;
+          }
+        });
+      }
+    }
+    entriesRepeater = new RepeatingView(flowform.newChildId());
+    flowform.add(entriesRepeater);
     refresh();
     WicketUtils.addShowDeleteRowQuestionDialog(this, hrPlanningEntryDao);
   }
 
+  @SuppressWarnings("serial")
   void refresh()
   {
-    showDeletedCheckBoxRow.setVisible(data.hasDeletedEntries());
+    if (hasError() == true) {
+      // Do nothing.
+      return;
+    }
+    DivPanel content = null, columns, column;
     if (data.hasDeletedEntries() == false) {
       this.showDeletedOnly = false;
+    }
+    if (isNew() == true) {
+      this.predecessorUpdToDate = false;
     }
     entriesRepeater.removeAll();
     if (CollectionUtils.isEmpty(data.getEntries()) == true) {
@@ -190,127 +307,158 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
       data.addEntry(new HRPlanningEntryDO());
     }
     int idx = -1;
+    dependentEntryFormComponents.clear();
+    dependentEntryFormComponentsArray = null;
     for (final HRPlanningEntryDO entry : data.getEntries()) {
       ++idx;
       if (entry.isDeleted() != showDeletedOnly) {
         // Don't show deleted/undeleted entries.
         continue;
       }
-      final WebMarkupContainer item = new WebMarkupContainer(entriesRepeater.newChildId());
-      entriesRepeater.add(item);
-      final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel("projekt", new PropertyModel<ProjektDO>(entry, "projekt"),
-          parentPage, "projektId:" + idx);
-      projektSelectPanel.setRequired(false).setEnabled(!entry.isDeleted());
-      item.add(projektSelectPanel);
-      projektSelectPanel.init();
-      // DropDownChoice status
+      final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(entriesRepeater.newChildId(), DivType.GRID16, DivType.ROUND_ALL);
+      positionsPanel.getContainer().setOutputMarkupId(true);
+      entriesRepeater.add(positionsPanel);
+      String heading = escapeHtml(entry.getProjektNameOrStatus());
+      if (StringUtils.isBlank(heading) == true) {
+        heading = "???";
+      }
+      final BigDecimal totalHours = entry.getTotalHours();
+      if (NumberHelper.isNotZero(totalHours) == true) {
+        heading += ": " + NumberHelper.formatFraction2(totalHours);
+      }
+      positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_ID, heading));
+      content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
+      positionsPanel.add(content);
+      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
       {
+        // DropDownChoice status / project
+        final FieldsetPanel fs = new FieldsetPanel(columns, WicketUtils.createMultipleFieldsetLabel(getString("status"),
+            getString("fibu.projekt")), true);
         final LabelValueChoiceRenderer<HRPlanningEntryStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<HRPlanningEntryStatus>(
-            item, HRPlanningEntryStatus.values());
-        @SuppressWarnings("unchecked")
-        final DropDownChoice statusChoice = new DropDownChoice("status", new PropertyModel(entry, "status"), statusChoiceRenderer
-            .getValues(), statusChoiceRenderer);
+            fs, HRPlanningEntryStatus.values());
+        final DropDownChoice<HRPlanningEntryStatus> statusChoice = new DropDownChoice<HRPlanningEntryStatus>(fs.getDropDownChoiceId(),
+            new PropertyModel<HRPlanningEntryStatus>(entry, "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
         statusChoice.setNullValid(true).setRequired(false).setEnabled(!entry.isDeleted());
-        item.add(statusChoice);
-      }
-      // DropDownChoice Priority
-      {
-        final LabelValueChoiceRenderer<Priority> priorityChoiceRenderer = new LabelValueChoiceRenderer<Priority>(item, Priority.values());
-        @SuppressWarnings("unchecked")
-        final DropDownChoice priorityChoice = new DropDownChoice("priorityChoice", new PropertyModel(entry, "priority"),
-            priorityChoiceRenderer.getValues(), priorityChoiceRenderer);
-        priorityChoice.setNullValid(true).setEnabled(!entry.isDeleted());
-        item.add(priorityChoice);
-      }
+        fs.add(statusChoice);
+        dependentEntryFormComponents.add(statusChoice);
+        final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(),
+            new PropertyModel<ProjektDO>(entry, "projekt"), parentPage, "projektId:" + idx);
+        projektSelectPanel.setRequired(false).setEnabled(!entry.isDeleted());
+        fs.add(projektSelectPanel);
+        projektSelectPanel.init();
+        dependentEntryFormComponents.add(projektSelectPanel);
 
-      // DropDownChoice probability
+        final Button button = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("deleteUndelete")) {
+          @Override
+          public final void onSubmit()
+          {
+            if (entry.isDeleted() == true) {
+              // Undelete
+              entry.setDeleted(false);
+            } else {
+              getData().deleteEntry(entry);
+            }
+            refresh();
+          }
+        };
+        final String buttonLabel, classNames;
+        if (entry.isDeleted() == true) {
+          buttonLabel = getString("undelete");
+          classNames = SingleButtonPanel.GREY;
+        } else {
+          buttonLabel = getString("delete");
+          classNames = SingleButtonPanel.DELETE;
+          if (entry.getId() != null) {
+            button.add(AttributeModifier.prepend("onclick", "if (showDeleteQuestionDialog() == false) return false;"));
+          }
+        }
+        button.setDefaultFormProcessing(false);
+        fs.add(new SingleButtonPanel(fs.newChildId(), button, buttonLabel, classNames) {
+
+        });
+      }
+      content.add(columns = new DivPanel(content.newChildId(), DivType.COLUMNS));
+      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
       {
+        // DropDownChoice Priority
+        final FieldsetPanel fs = new FieldsetPanel(column, getString("hr.planning.priority"));
+        final LabelValueChoiceRenderer<Priority> priorityChoiceRenderer = new LabelValueChoiceRenderer<Priority>(fs, Priority.values());
+        final DropDownChoice<Priority> priorityChoice = new DropDownChoice<Priority>(fs.getDropDownChoiceId(), new PropertyModel<Priority>(
+            entry, "priority"), priorityChoiceRenderer.getValues(), priorityChoiceRenderer);
+        priorityChoice.setNullValid(true).setEnabled(!entry.isDeleted());
+        fs.add(priorityChoice);
+      }
+      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
+      {
+        // DropDownChoice probability
+        final FieldsetPanel fs = new FieldsetPanel(column, getString("hr.planning.probability"));
         final LabelValueChoiceRenderer<Integer> probabilityChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
         probabilityChoiceRenderer.addValue(25, "25%");
         probabilityChoiceRenderer.addValue(50, "50%");
         probabilityChoiceRenderer.addValue(75, "75%");
         probabilityChoiceRenderer.addValue(95, "95%");
         probabilityChoiceRenderer.addValue(100, "100%");
-        @SuppressWarnings("unchecked")
-        final DropDownChoice probabilityChoice = new DropDownChoice("probabilityChoice", new PropertyModel(entry, "probability"),
-            probabilityChoiceRenderer.getValues(), probabilityChoiceRenderer);
+        final DropDownChoice<Integer> probabilityChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(
+            entry, "probability"), probabilityChoiceRenderer.getValues(), probabilityChoiceRenderer);
         probabilityChoice.setNullValid(true).setEnabled(!entry.isDeleted());
-        item.add(probabilityChoice);
+        fs.add(probabilityChoice);
       }
-      final TextField<BigDecimal> unassignedHours = new TextField<BigDecimal>("unassignedHours", new PropertyModel<BigDecimal>(entry,
-          "unassignedHours"));
-      item.add(unassignedHours.setEnabled(!entry.isDeleted()));
-      final TextField<BigDecimal> mondayHours = new TextField<BigDecimal>("mondayHours",
-          new PropertyModel<BigDecimal>(entry, "mondayHours"));
-      item.add(mondayHours.setEnabled(!entry.isDeleted()));
-      final TextField<BigDecimal> tuesdayHours = new TextField<BigDecimal>("tuesdayHours", new PropertyModel<BigDecimal>(entry,
-          "tuesdayHours"));
-      item.add(tuesdayHours.setEnabled(!entry.isDeleted()));
-      final TextField<BigDecimal> wednesdayHours = new TextField<BigDecimal>("wednesdayHours", new PropertyModel<BigDecimal>(entry,
-          "wednesdayHours"));
-      item.add(wednesdayHours.setEnabled(!entry.isDeleted()));
-      final TextField<BigDecimal> thursdayHours = new TextField<BigDecimal>("thursdayHours", new PropertyModel<BigDecimal>(entry,
-          "thursdayHours"));
-      item.add(thursdayHours.setEnabled(!entry.isDeleted()));
-      final TextField<BigDecimal> fridayHours = new TextField<BigDecimal>("fridayHours",
-          new PropertyModel<BigDecimal>(entry, "fridayHours"));
-      item.add(fridayHours.setEnabled(!entry.isDeleted()));
-      final TextField<BigDecimal> weekendHours = new TextField<BigDecimal>("weekendHours", new PropertyModel<BigDecimal>(entry,
-          "weekendHours"));
-      item.add(weekendHours.setEnabled(!entry.isDeleted()));
-
-      item.add(WicketUtils.getJIRASupportTooltipImage(getResponse(), this).setEnabled(!entry.isDeleted()));
-      final MaxLengthTextArea description = new MaxLengthTextArea("description", new PropertyModel<String>(entry, "description"));
-      item.add(description.setEnabled(!entry.isDeleted()));
-      item.add(new JiraIssuesPanel("jiraIssues", entry.getDescription()));
-      @SuppressWarnings("serial")
-      final SubmitLink deleteUndeleteEntryButton = new SubmitLink("deleteUndeleteEntry") {
-        public void onSubmit()
-        {
-          if (entry.isDeleted() == true) {
-            // Undelete
-            entry.setDeleted(false);
-          } else {
-            getData().deleteEntry(entry);
-          }
-          refresh();
-        };
-      };
-      if (entry.isDeleted() == true) {
-        deleteUndeleteEntryButton.add(WicketUtils.getUndeleteRowImage(item, "deleteUndeleteEntryImage", getResponse()));
-      } else {
-        if (entry.getId() != null) {
-          deleteUndeleteEntryButton.add(new AttributeAppendModifier("onclick", "if (showDeleteQuestionDialog() == false) return false;")
-              .setPrepend());
+      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
+      {
+        // Hours
+        final FieldsetPanel fs = new FieldsetPanel(columns, getString("hours")).setNoLabelFor();
+        final HRPlanningEditTablePanel table = new HRPlanningEditTablePanel(fs.newChildId());
+        fs.add(table);
+        table.init(entry);
+      }
+      {
+        // Description
+        final FieldsetPanel fs = new FieldsetPanel(columns, getString("hr.planning.description"), true);
+        final IModel<String> model = new PropertyModel<String>(entry, "description");
+        final MaxLengthTextArea description = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, model);
+        if (entry.isDeleted() == true) {
+          description.setEnabled(false);
         }
-        deleteUndeleteEntryButton.add(WicketUtils.getDeleteRowImage(item, "deleteUndeleteEntryImage", getResponse(), entry));
+        fs.add(description);
+        fs.add(new JiraIssuesPanel(fs.newChildId(), entry.getDescription()));
+        fs.addJIRAField(model);
       }
-      deleteUndeleteEntryButton.setDefaultFormProcessing(false);
-      item.add(deleteUndeleteEntryButton);
-      @SuppressWarnings("serial")
-      final SubmitLink addEntryButton = new SubmitLink("addEntry") {
-        public void onSubmit()
+    }
+    if (getBaseDao().hasInsertAccess(getUser()) == true && showDeletedOnly == false) {
+      if (content == null) {
+        // No entries
+        content = new DivPanel(entriesRepeater.newChildId(), DivType.GRID16, DivType.ROUND_ALL);
+        entriesRepeater.add(content);
+      }
+      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
+      final Button addEntryButton = new Button(SingleButtonPanel.WICKET_ID) {
+        @Override
+        public final void onSubmit()
         {
           getData().addEntry(new HRPlanningEntryDO());
           refresh();
-        };
+        }
       };
-      item.add(addEntryButton);
-      addEntryButton.add(WicketUtils.getAddRowImage("addEntryImage", getResponse(), getString("hr.planning.tooltip.addEntry")));
-      if (showDeletedOnly == true) {
-        addEntryButton.setVisible(false);
-      }
+      final SingleButtonPanel addPositionButtonPanel = new SingleButtonPanel(columns.newChildId(), addEntryButton, getString("add"));
+      addPositionButtonPanel.setTooltip(getString("hr.planning.tooltip.addEntry"));
+      columns.add(addPositionButtonPanel);
     }
-    final Iterator< ? extends Component> it = entriesRepeater.iterator();
-    while (it.hasNext() == true) {
-      // Needed because last entry can be deleted:
-      final WebMarkupContainer entry = (WebMarkupContainer) it.next();
-      if (it.hasNext() == true) {
-        // Show only Button for last position.
-        final SubmitLink addEntryButton = (SubmitLink) entry.get("addEntry");
-        addEntryButton.setVisible(false);
+  }
+
+  private HRPlanningDO getPredecessor()
+  {
+    if (predecessorUpdToDate == false) {
+      predecessor = null;
+      final Integer userId = data.getUserId();
+      if (userId != null) {
+        // Get the entry from the predecessor week:
+        final DayHolder dh = new DayHolder(getData().getWeek());
+        dh.add(Calendar.WEEK_OF_YEAR, -1);
+        predecessor = hrPlanningDao.getEntry(userId, dh.getSQLDate());
       }
+      predecessorUpdToDate = true;
     }
+    return predecessor;
   }
 
   public boolean isShowDeletedOnly()
@@ -318,7 +466,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
     return showDeletedOnly;
   }
 
-  public void setShowDeletedOnly(boolean showDeletedOnly)
+  public void setShowDeletedOnly(final boolean showDeletedOnly)
   {
     this.showDeletedOnly = showDeletedOnly;
   }

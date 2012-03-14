@@ -26,6 +26,9 @@ package org.projectforge.web.scripting;
 import org.apache.log4j.Logger;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 
 public class ScriptListForm extends AbstractListForm<BaseSearchFilter, ScriptListPage>
@@ -34,14 +37,25 @@ public class ScriptListForm extends AbstractListForm<BaseSearchFilter, ScriptLis
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ScriptListForm.class);
 
-  @SuppressWarnings( { "serial", "unchecked"})
   @Override
   protected void init()
   {
     super.init();
+    gridBuilder.newColumnsPanel();
+    {
+      gridBuilder.newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
+    }
+    {
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      addPageSizeFieldset();
+    }
   }
 
-  public ScriptListForm(ScriptListPage parentPage)
+  public ScriptListForm(final ScriptListPage parentPage)
   {
     super(parentPage);
   }

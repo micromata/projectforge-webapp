@@ -23,13 +23,13 @@
 
 package org.projectforge.web.mobile;
 
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.core.BaseSearchFilter;
 
 public abstract class AbstractMobileListForm<F extends BaseSearchFilter, P extends AbstractMobileListPage< ? , ? , ? >> extends
-    AbstractMobileForm<AbstractMobileListForm< ? , ? >, AbstractMobileListPage< ? , ? , ? >>
+AbstractMobileForm<AbstractMobileListForm< ? , ? >, AbstractMobileListPage< ? , ? , ? >>
 {
   private static final long serialVersionUID = -2521426347126048630L;
 
@@ -55,7 +55,7 @@ public abstract class AbstractMobileListForm<F extends BaseSearchFilter, P exten
 
   protected void init()
   {
-    add(new TextField<String>("searchField", new PropertyModel<String>(filter, "searchString")).add(new SimpleAttributeModifier(
+    add(new TextField<String>("searchField", new PropertyModel<String>(filter, "searchString")).add(AttributeModifier.replace(
         "placeholder", getString("search"))));
   }
 

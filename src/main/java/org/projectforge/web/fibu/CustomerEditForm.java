@@ -24,11 +24,25 @@
 package org.projectforge.web.fibu;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.util.convert.IConverter;
+import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.KundeStatus;
+import org.projectforge.fibu.kost.AccountingConfig;
+import org.projectforge.registry.Registry;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.layout.LayoutContext;
-
-
+import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.components.MaxLengthTextArea;
+import org.projectforge.web.wicket.components.MaxLengthTextField;
+import org.projectforge.web.wicket.components.MinMaxNumberField;
+import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
+import org.projectforge.web.wicket.converter.IntegerConverter;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class CustomerEditForm extends AbstractEditForm<KundeDO, CustomerEditPage>
 {
@@ -36,19 +50,77 @@ public class CustomerEditForm extends AbstractEditForm<KundeDO, CustomerEditPage
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CustomerEditForm.class);
 
-  protected CustomerFormRenderer renderer;
-
   public CustomerEditForm(final CustomerEditPage parentPage, final KundeDO data)
   {
     super(parentPage, data);
-    renderer = new CustomerFormRenderer(this, new LayoutContext(this), data);
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     super.init();
-    renderer.add();
+    /* GRID16 - BLOCK */
+    gridBuilder.newGrid16();
+    {
+      // Number
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde.nummer"));
+      final MinMaxNumberField<Integer> number = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID,
+          new PropertyModel<Integer>(data, "id"), 0, KundeDO.MAX_ID) {
+        @SuppressWarnings({ "unchecked", "rawtypes"})
+        @Override
+        public IConverter getConverter(final Class type)
+        {
+          return new IntegerConverter(3);
+        }
+      };
+      WicketUtils.setSize(number, 7);
+      fs.add(number);
+      if (isNew() == true) {
+        WicketUtils.setFocus(number);
+      }
+    }
+    {
+      // Name
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde.name"));
+      final RequiredMaxLengthTextField name = new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "name"));
+      fs.add(name);
+      if (isNew() == false) {
+        WicketUtils.setFocus(name);
+      }
+    }
+    if (Registry.instance().getKontoCache().isEmpty() == false) {
+      // Show this field only if DATEV accounts does exist.
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.konto"));
+      final KontoSelectPanel kontoSelectPanel = new KontoSelectPanel(fs.newChildId(), new PropertyModel<KontoDO>(data, "konto"), null,
+          "kontoId");
+      kontoSelectPanel.setKontoNumberRanges(AccountingConfig.getInstance().getDebitorsAccountNumberRanges()).init();
+      fs.add(kontoSelectPanel);
+    }
+    {
+      // Identifier
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde.identifier"));
+      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "identifier")));
+    }
+    {
+      // Identifier
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kunde.division"));
+      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "division")));
+    }
+    {
+      // Identifier
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "description")));
+    }
+    {
+      // Status drop down box:
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("status"));
+      final LabelValueChoiceRenderer<KundeStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<KundeStatus>(fs, KundeStatus.values());
+      final DropDownChoice<KundeStatus> statusChoice = new DropDownChoice<KundeStatus>(fs.getDropDownChoiceId(),
+          new PropertyModel<KundeStatus>(data, "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
+      statusChoice.setNullValid(false).setRequired(true);
+      fs.add(statusChoice);
+    }
   }
 
   @Override

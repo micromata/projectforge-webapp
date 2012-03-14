@@ -23,8 +23,8 @@
 
 package org.projectforge.web.mobile;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -40,11 +40,11 @@ public class CollapsiblePanel extends Panel
 {
   private static final long serialVersionUID = 4624904578211630743L;
 
-  private RepeatingView repeater;
+  private final RepeatingView repeater;
 
   private boolean hasChildren;
 
-  private WebMarkupContainer mainContainer;
+  private final WebMarkupContainer mainContainer;
 
   private Label headingLabel;
 
@@ -78,7 +78,7 @@ public class CollapsiblePanel extends Panel
    */
   public CollapsiblePanel setTheme(final ThemeType theme)
   {
-    mainContainer.add(new SimpleAttributeModifier("data-theme", theme.getCssId()));
+    mainContainer.add(AttributeModifier.replace("data-theme", theme.getCssId()));
     return this;
   }
 
@@ -88,7 +88,7 @@ public class CollapsiblePanel extends Panel
    */
   public CollapsiblePanel setCollapsed()
   {
-    mainContainer.add(new SimpleAttributeModifier("data-collapsed", "true"));
+    mainContainer.add(AttributeModifier.replace("data-collapsed", "true"));
     return this;
   }
 

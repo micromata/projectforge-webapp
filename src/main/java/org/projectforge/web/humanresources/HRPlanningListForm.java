@@ -27,8 +27,6 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -44,12 +42,17 @@ import org.projectforge.web.calendar.QuickSelectPanel;
 import org.projectforge.web.fibu.ProjektSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.components.CheckBoxLabelPanel;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
-import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
+import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
+import org.projectforge.web.wicket.flowlayout.TextPanel;
 
 /**
  * 
@@ -75,41 +78,90 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
 
   protected DatePanel stopDate;
 
-  @SuppressWarnings( { "serial"})
+  @SuppressWarnings({ "serial"})
   @Override
   protected void init()
   {
     super.init();
-    final boolean hasFullAccess = parentPage.hasFullAccess();
     final HRPlanningFilter filter = getSearchFilter();
     if (hrPlanningEntryDao.hasLoggedInUserSelectAccess(false) == false) {
       filter.setUserId(getUser().getId());
     }
-    startDate = new DatePanel("startDate", new PropertyModel<Date>(getSearchFilter(), "startTime"), DatePanelSettings.get().withCallerPage(
-        parentPage).withSelectPeriodMode(true));
-    filterContainer.add(startDate);
-
-    stopDate = new DatePanel("stopDate", new PropertyModel<Date>(getSearchFilter(), "stopTime"), DatePanelSettings.get().withCallerPage(
-        parentPage).withSelectPeriodMode(true));
-
-    filterContainer.add(stopDate);
-    final WebMarkupContainer projektRow = new WebMarkupContainer("projektRow");
-    filterContainer.add(projektRow);
+    gridBuilder.newColumnsPanel();
+    {
+      gridBuilder.newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timePeriod"), true);
+      startDate = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "startTime"), DatePanelSettings.get()
+          .withSelectPeriodMode(true).withRequired(true));
+      fs.add(startDate);
+      fs.setLabelFor(startDate);
+      fs.add(new DivTextPanel(fs.newChildId(), " - ").setRenderBodyOnly(false));
+      stopDate = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "stopTime"), DatePanelSettings.get()
+          .withSelectPeriodMode(true).withRequired(true));
+      fs.add(stopDate);
+      {
+        fs.add(new IconLinkPanel(fs.newChildId(), IconType.CIRCLE_CLOSE, getString("calendar.tooltip.unselectPeriod"), new SubmitLink(
+            IconLinkPanel.LINK_ID) {
+          @Override
+          public void onSubmit()
+          {
+            getSearchFilter().setStartTime(null);
+            getSearchFilter().setStopTime(null);
+            clearInput();
+            parentPage.refresh();
+          };
+        }));
+      }
+      final QuickSelectPanel quickSelectPanel = new QuickSelectPanel(fs.newChildId(), parentPage, "quickSelect", startDate);
+      fs.add(quickSelectPanel);
+      quickSelectPanel.init();
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return WicketUtils.getCalendarWeeks(HRPlanningListForm.this, filter.getStartTime(), filter.getStopTime());
+        }
+      }));
+      fs.add(new HtmlCommentPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return WicketUtils.getUTCDates(filter.getStartTime(), filter.getStopTime());
+        }
+      }));
+    }
+    {
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      addPageSizeFieldset();
+    }
+    boolean showProjectSelectPanel = false;
+    final boolean hasFullAccess = parentPage.hasFullAccess();
     if (projektDao.hasLoggedInUserSelectAccess(false) == true) {
-      final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel("projekt", new Model<ProjektDO>() {
+      // Project
+      showProjectSelectPanel = true;
+      gridBuilder.newColumnsPanel();
+      if (hasFullAccess == true) {
+        gridBuilder.newColumnPanel(DivType.COL_60);
+      }
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.projekt"));
+      final ProjektSelectPanel projektSelectPanel = new ProjektSelectPanel(fs.newChildId(), new Model<ProjektDO>() {
         @Override
         public ProjektDO getObject()
         {
           return projektDao.getById(filter.getProjektId());
         }
       }, parentPage, "projektId");
-      projektRow.add(projektSelectPanel);
+      fs.add(projektSelectPanel);
       projektSelectPanel.init();
-    } else {
-      projektRow.add(createInvisibleDummyComponent("projekt"));
     }
-    if (hrPlanningEntryDao.hasLoggedInUserSelectAccess(false) == true) {
-      final UserSelectPanel userSelectPanel = new UserSelectPanel("user", new Model<PFUserDO>() {
+    if (hasFullAccess == true) {
+      // User
+      if (showProjectSelectPanel == true) {
+        gridBuilder.newColumnPanel(DivType.COL_40);
+      }
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"));
+      final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new Model<PFUserDO>() {
         @Override
         public PFUserDO getObject()
         {
@@ -126,73 +178,45 @@ public class HRPlanningListForm extends AbstractListForm<HRPlanningListFilter, H
           }
         }
       }, parentPage, "userId");
-      filterContainer.add(userSelectPanel);
-      userSelectPanel.setDefaultFormProcessing(false); // No validation.
+      fs.add(userSelectPanel);
+      userSelectPanel.setDefaultFormProcessing(false);
       userSelectPanel.init().withAutoSubmit(true);
-    } else {
-      projektRow.add(createInvisibleDummyComponent("projekt"));
-      filterContainer.add(new Label("user", getUser().getFullname()));
     }
-    filterContainer.add(new CheckBoxLabelPanel("groupEntriesCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "groupEntries"),
-        getString("hr.planning.filter.groupEntries")).setSubmitOnChange());
-    filterContainer.add(new CheckBoxLabelPanel("onlyMyProjectsCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "onlyMyProjects"),
-        getString("hr.planning.filter.onlyMyProjects")).setSubmitOnChange().setVisible(hasFullAccess));
-    filterContainer.add(new CheckBoxLabelPanel("longFormatCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "longFormat"),
-        getString("longFormat")).setSubmitOnChange());
-    filterContainer.add(new CheckBoxLabelPanel("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
-        getString("onlyDeleted")).setSubmitOnChange().setVisible(hasFullAccess));
     {
-      final SubmitLink clearPeriodButton = new SubmitLink("clearPeriod") {
-        public void onSubmit()
-        {
-          getSearchFilter().setStartTime(null);
-          getSearchFilter().setStopTime(null);
-          clearInput();
-          parentPage.refresh();
-        };
-      };
-      filterContainer.add(clearPeriodButton);
-      clearPeriodButton.add(new TooltipImage("clearPeriodImage", getResponse(), WebConstants.IMAGE_DATE_UNSELECT,
-          getString("calendar.tooltip.unselectPeriod")));
+      gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "groupEntries"), getString("hr.planning.filter.groupEntries")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "onlyMyProjects"), getString("hr.planning.filter.onlyMyProjects")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
+          "longFormat"), getString("longFormat")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
+          new PropertyModel<Boolean>(getSearchFilter(), "deleted"), getString("onlyDeleted")));
     }
-    final QuickSelectPanel quickSelectPanel = new QuickSelectPanel("quickSelect", parentPage, "quickSelect", startDate);
-    filterContainer.add(quickSelectPanel);
-    quickSelectPanel.init();
-
-    filterContainer.add(new Label("calendarWeeks", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return WicketUtils.getCalendarWeeks(HRPlanningListForm.this, filter.getStartTime(), filter.getStopTime());
-      }
-    }).setRenderBodyOnly(true));
-    filterContainer.add(new Label("datesAsUTC", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return WicketUtils.getUTCDates(filter.getStartTime(), filter.getStopTime());
-      }
-    }));
-
-    final Label totalHoursLabel = new Label("totalHours", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        BigDecimal duration = new BigDecimal(0);
-        if (parentPage.getList() != null) {
-          for (HRPlanningEntryDO sheet : parentPage.getList()) {
-            BigDecimal temp = sheet.getTotalHours();
-            duration = duration.add(temp);
+    {
+      // Total hours
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.totalDuration"), true).setNoLabelFor();
+      fs.add(new TextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          BigDecimal duration = new BigDecimal(0);
+          if (parentPage.getList() != null) {
+            for (final HRPlanningEntryDO sheet : parentPage.getList()) {
+              final BigDecimal temp = sheet.getTotalHours();
+              duration = duration.add(temp);
+            }
           }
+          return duration.toString();
         }
-        return duration.toString();
-      }
-    });
-    totalHoursLabel.setRenderBodyOnly(true);
-    filterContainer.add(totalHoursLabel);
+      }));
+    }
   }
 
-  public HRPlanningListForm(HRPlanningListPage parentPage)
+  public HRPlanningListForm(final HRPlanningListPage parentPage)
   {
     super(parentPage);
   }

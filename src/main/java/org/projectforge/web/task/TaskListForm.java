@@ -29,9 +29,10 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.task.TaskFilter;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.components.CoolCheckBoxPanel;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class TaskListForm extends AbstractListForm<TaskFilter, TaskListPage>
 {
@@ -43,25 +44,36 @@ public class TaskListForm extends AbstractListForm<TaskFilter, TaskListPage>
   protected void init()
   {
     super.init();
-    filterContainer.add(new CoolCheckBoxPanel("notOpenedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "notOpened"),
-        getString("task.status.notOpened"), true));
-    filterContainer.add(new CoolCheckBoxPanel("openedCheckBox", new PropertyModel<Boolean>(searchFilter, "opened"),
-        getString("task.status.opened"), true));
-    filterContainer.add(new CoolCheckBoxPanel("closedCheckBox", new PropertyModel<Boolean>(searchFilter, "closed"),
-        getString("task.status.closed"), true));
-    filterContainer.add(new CoolCheckBoxPanel("deletedCheckBox", new PropertyModel<Boolean>(searchFilter, "deleted"), getString("deleted"),
-        true));
+    {
+      gridBuilder.newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "notOpened"),
+          getString("task.status.notOpened")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "opened"),
+          getString("task.status.opened")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "closed"),
+          getString("task.status.closed")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
+          getString("deleted")));
+    }
+    {
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      addPageSizeFieldset();
+    }
 
+    // Task tree view
     @SuppressWarnings("serial")
-    final Button taskTreeButton = new Button("button", new Model<String>(getString("task.tree.perspective"))) {
+    final Button taskTreeButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("listView")) {
       @Override
       public final void onSubmit()
       {
-        getParentPage().onTreeViewSubmit();
+        parentPage.onTreeViewSubmit();
       }
     };
-    taskTreeButton.add(WebConstants.BUTTON_CLASS_NOBUTTON);
-    addActionButton(new SingleButtonPanel(getNewActionButtonChildId(), taskTreeButton));
+    actionButtons.add(2, new SingleButtonPanel(actionButtons.newChildId(), taskTreeButton, getString("task.tree.perspective"),
+        SingleButtonPanel.GREY));
   }
 
   public TaskListForm(final TaskListPage parentPage)

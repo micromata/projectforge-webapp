@@ -23,23 +23,19 @@
 
 package org.projectforge.web.orga;
 
-import java.util.Date;
-
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.orga.PostType;
 import org.projectforge.orga.PostausgangDO;
 import org.projectforge.orga.PostausgangDao;
-import org.projectforge.web.fibu.ISelectCallerPage;
-import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
 
 @EditPage(defaultReturnPage = PostausgangListPage.class)
-public class PostausgangEditPage extends AbstractAutoLayoutEditPage<PostausgangDO, PostausgangEditForm, PostausgangDao> implements ISelectCallerPage
+public class PostausgangEditPage extends AbstractEditPage<PostausgangDO, PostausgangEditForm, PostausgangDao>
 {
   private static final long serialVersionUID = 4375220914096256551L;
 
@@ -48,7 +44,7 @@ public class PostausgangEditPage extends AbstractAutoLayoutEditPage<PostausgangD
   @SpringBean(name = "postausgangDao")
   private PostausgangDao postausgangDao;
 
-  public PostausgangEditPage(PageParameters parameters)
+  public PostausgangEditPage(final PageParameters parameters)
   {
     super(parameters, "orga.postausgang");
     init();
@@ -58,35 +54,6 @@ public class PostausgangEditPage extends AbstractAutoLayoutEditPage<PostausgangD
     }
   }
 
-  /**
-   * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Integer)
-   */
-  public void select(String property, Object selectedValue)
-  {
-    if ("datum".equals(property) == true) {
-      final Date date = (Date) selectedValue;
-      final java.sql.Date sqlDate = new java.sql.Date(date.getTime());
-      getData().setDatum(sqlDate);
-      form.renderer.datumPanel.markModelAsChanged();
-    }
-  }
-
-  /**
-   * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
-   */
-  public void unselect(String property)
-  {
-    log.error("Property '" + property + "' not supported for selection.");
-  }
-
-  /**
-   * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
-   */
-  public void cancelSelection(String property)
-  {
-    // Do nothing.
-  }
-
   @Override
   protected PostausgangDao getBaseDao()
   {
@@ -94,7 +61,7 @@ public class PostausgangEditPage extends AbstractAutoLayoutEditPage<PostausgangD
   }
 
   @Override
-  protected PostausgangEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, PostausgangDO data)
+  protected PostausgangEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final PostausgangDO data)
   {
     return new PostausgangEditForm(this, data);
   }

@@ -23,24 +23,21 @@
 
 package org.projectforge.web.fibu;
 
-import java.util.Date;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.OperationType;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.NumberHelper;
-import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragDao;
 import org.projectforge.fibu.AuftragsPositionDO;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.user.ProjectForgeGroup;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
 import org.projectforge.web.wicket.WicketUtils;
 
@@ -58,7 +55,7 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
   @SpringBean(name = "projektDao")
   private ProjektDao projektDao;
 
-  public AuftragEditPage(PageParameters parameters)
+  public AuftragEditPage(final PageParameters parameters)
   {
     super(parameters, "fibu.auftrag");
     init();
@@ -74,7 +71,7 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
   }
 
   @Override
-  protected AuftragEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, AuftragDO data)
+  protected AuftragEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final AuftragDO data)
   {
     return new AuftragEditForm(this, data);
   }
@@ -82,14 +79,14 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Integer)
    */
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     if ("projektId".equals(property) == true) {
       auftragDao.setProjekt(getData(), (Integer) selectedValue);
       if (getData().getProjektId() != null && getData().getProjektId() >= 0 && getData().getKundeId() == null) {
         if (StringUtils.isBlank(form.kundeSelectPanel.getKundeTextInput()) == true) {
           // User has selected a project and the kunde is not set:
-          ProjektDO projekt = projektDao.getById(getData().getProjektId());
+          final ProjektDO projekt = projektDao.getById(getData().getProjektId());
           if (projekt != null) {
             auftragDao.setKunde(getData(), projekt.getKundeId());
           }
@@ -100,19 +97,6 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
     } else if ("contactPersonId".equals(property) == true) {
       auftragDao.setContactPerson(getData(), (Integer) selectedValue);
       setSendEMailNotification();
-    } else if (StringHelper.isIn(property, "angebotsDatum", "bindungsFrist", "beauftragungsDatum") == true) {
-      final Date date = (Date) selectedValue;
-      final java.sql.Date sqlDate = new java.sql.Date(date.getTime());
-      if ("angebotsDatum".equals(property) == true) {
-        getData().setAngebotsDatum(sqlDate);
-        form.angebotsDatumPanel.markModelAsChanged();
-      } else if ("bindungsFrist".equals(property) == true) {
-        getData().setBindungsFrist(sqlDate);
-        form.bindungsFristPanel.markModelAsChanged();
-      } else if ("beauftragungsDatum".equals(property) == true) {
-        getData().setBeauftragungsDatum(sqlDate);
-        form.beauftragungsDatumPanel.markModelAsChanged();
-      }
     } else if (property.startsWith("taskId:") == true) {
       final Short number = NumberHelper.parseShort(property.substring(property.indexOf(':') + 1));
       final AuftragsPositionDO pos = getData().getPosition(number);
@@ -132,7 +116,7 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
    */
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     if ("projektId".equals(property) == true) {
       getData().setProjekt(null);
@@ -153,13 +137,13 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
    */
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing.
   }
 
   @Override
-  public AbstractBasePage onSaveOrUpdate()
+  public AbstractSecuredBasePage onSaveOrUpdate()
   {
     if (getData().getNummer() == null) {
       getData().setNummer(auftragDao.getNextNumber(getData()));
@@ -175,7 +159,7 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
   {
     if (getData().getId() == null) {
       if (getData().getAngebotsDatum() == null) {
-        DayHolder today = new DayHolder();
+        final DayHolder today = new DayHolder();
         getData().setAngebotsDatum(new java.sql.Date(today.getTimeInMillis()));
       }
       if (getData().getContactPersonId() == null && accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.PROJECT_MANAGER) == true) {
@@ -189,7 +173,7 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
   }
 
   @Override
-  public AbstractBasePage afterSave()
+  public AbstractSecuredBasePage afterSave()
   {
     if (form.isSendEMailNotification() == false) {
       return null;
@@ -199,7 +183,7 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
   }
 
   @Override
-  public AbstractBasePage afterUpdate(boolean modified)
+  public AbstractSecuredBasePage afterUpdate(final boolean modified)
   {
     if (form.isSendEMailNotification() == false) {
       return null;

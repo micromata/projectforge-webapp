@@ -25,7 +25,6 @@ package org.projectforge.web.task;
 
 import org.apache.commons.lang.Validate;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
-import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
@@ -34,19 +33,18 @@ import org.hibernate.Hibernate;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
+import org.projectforge.web.common.OutputType;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
-import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
+import org.projectforge.web.wicket.WicketUtils;
 
 public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
 {
   private static final long serialVersionUID = -26352961662061891L;
 
-  private TaskFormatter taskFormatter;
-
   private TaskTree taskTree;
 
-  private WebPage parentPage;
+  private TaskFormatter taskFormatter;
 
   /**
    * @param taskFormatter
@@ -55,11 +53,9 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
    * @param property Should be from type TaskDO or Integer for task id.
    * @param cellItemListener
    */
-  public TaskPropertyColumn(final WebPage parentPage, final String label, final String sortProperty, final String property,
-      final CellItemListener<T> cellItemListener)
+  public TaskPropertyColumn(final String label, final String sortProperty, final String property, final CellItemListener<T> cellItemListener)
   {
     super(new Model<String>(label), sortProperty, property, cellItemListener);
-    this.parentPage = parentPage;
   }
 
   /**
@@ -68,22 +64,29 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
    * @param sortProperty
    * @param property Should be from type TaskDO or Integer for task id.
    */
-  public TaskPropertyColumn(final WebPage parentPage, final String label, final String sortProperty, final String property)
+  public TaskPropertyColumn(final String label, final String sortProperty, final String property)
   {
-    this(parentPage, label, sortProperty, property, null);
+    this(label, sortProperty, property, null);
   }
 
   @Override
   public void populateItem(final Item<ICellPopulator<T>> item, final String componentId, final IModel<T> rowModel)
   {
-    final Label label = new Label(componentId, new Model<String>(getLabelString(rowModel)));
-    label.setEscapeModelStrings(false);
-    item.add(label);
+    final TaskDO task = getTask(rowModel);
+    if (task == null) {
+      item.add(new Label(componentId, ""));
+    } else {
+      final Label label = new Label(componentId, task.getTitle());
+      final String taskPath = taskFormatter.getTaskPath(task.getId(), false, OutputType.HTML);
+      WicketUtils.addTooltip(label, taskPath);
+      label.setEscapeModelStrings(false);
+      item.add(label);
+    }
     if (cellItemListener != null)
       cellItemListener.populateItem(item, componentId, rowModel);
   }
 
-  protected String getLabelString(final IModel<T> rowModel)
+  protected TaskDO getTask(final IModel<T> rowModel)
   {
     final Object obj = BeanHelper.getNestedProperty(rowModel.getObject(), getPropertyExpression());
     TaskDO task = null;
@@ -105,16 +108,7 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
         throw new IllegalStateException("Unsupported column type: " + obj);
       }
     }
-    String result;
-    if (task != null) {
-      Validate.notNull(taskFormatter);
-      final StringBuffer buf = new StringBuffer();
-      taskFormatter.appendFormattedTask(buf, new WicketLocalizerAndUrlBuilder(parentPage.getResponse()), task, false, true, false);
-      result = buf.toString();
-    } else {
-      result = "";
-    }
-    return result;
+    return task;
   }
 
   /**
@@ -129,7 +123,7 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
 
   /**
    * Fluent pattern
-   * @param taskFormatter
+   * @param taskTree
    */
   public TaskPropertyColumn<T> withTaskTree(final TaskTree taskTree)
   {

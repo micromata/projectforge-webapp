@@ -25,18 +25,17 @@ package org.projectforge.web.user;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
-import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.MessagePage;
 import org.projectforge.web.wicket.MySession;
 
-public class MyAccountEditPage extends AbstractAutoLayoutEditPage<PFUserDO, MyAccountEditForm, UserDao>
+public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditForm, UserDao>
 {
   private static final long serialVersionUID = 4636922408954211544L;
 
@@ -54,16 +53,16 @@ public class MyAccountEditPage extends AbstractAutoLayoutEditPage<PFUserDO, MyAc
   }
 
   @Override
-  public AbstractBasePage onSaveOrUpdate()
+  public AbstractSecuredBasePage onSaveOrUpdate()
   {
     return super.onSaveOrUpdate();
   }
 
   /**
-   * @see org.projectforge.web.wicket.AbstractEditPage#update()
+   * @see org.projectforge.web.wicket.AbstractEditPage#updateAll()
    */
   @Override
-  protected void update()
+  protected void updateAll()
   {
     if (PFUserContext.getUserId().equals(getData().getId()) == false) {
       throw new IllegalStateException("Oups, MyAccountEditPage is called with another than the logged in user!");
@@ -127,7 +126,7 @@ public class MyAccountEditPage extends AbstractAutoLayoutEditPage<PFUserDO, MyAc
   }
 
   @Override
-  protected MyAccountEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, PFUserDO data)
+  protected MyAccountEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final PFUserDO data)
   {
     return new MyAccountEditForm(this, data);
   }

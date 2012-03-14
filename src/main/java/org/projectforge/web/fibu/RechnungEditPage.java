@@ -25,15 +25,14 @@ package org.projectforge.web.fibu;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.DayHolder;
-import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.ProjektDao;
 import org.projectforge.fibu.RechnungDO;
@@ -41,10 +40,9 @@ import org.projectforge.fibu.RechnungDao;
 import org.projectforge.fibu.RechnungStatus;
 import org.projectforge.fibu.RechnungTyp;
 import org.projectforge.fibu.RechnungsPositionDO;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
-
 
 @EditPage(defaultReturnPage = RechnungListPage.class)
 public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditForm, RechnungDao> implements ISelectCallerPage
@@ -59,7 +57,7 @@ public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditF
   @SpringBean(name = "projektDao")
   private ProjektDao projektDao;
 
-  public RechnungEditPage(PageParameters parameters)
+  public RechnungEditPage(final PageParameters parameters)
   {
     super(parameters, "fibu.rechnung");
     init();
@@ -73,7 +71,14 @@ public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditF
   }
 
   @Override
-  public AbstractBasePage onSaveOrUpdate()
+  public void renderHead(final IHeaderResponse response)
+  {
+    super.renderHead(response);
+    response.renderCSSReference("styles/table.css");
+  }
+
+  @Override
+  public AbstractSecuredBasePage onSaveOrUpdate()
   {
     if (isNew() == true && getData().getNummer() == null && getData().getTyp() != RechnungTyp.GUTSCHRIFTSANZEIGE_DURCH_KUNDEN) {
       getData().setNummer(rechnungDao.getNextNumber(getData()));
@@ -88,7 +93,7 @@ public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditF
   }
 
   @Override
-  protected RechnungEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, RechnungDO data)
+  protected RechnungEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final RechnungDO data)
   {
     return new RechnungEditForm(this, data);
   }
@@ -108,10 +113,12 @@ public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditF
     final RechnungDO rechnung = getData();
     rechnung.setId(null);
     rechnung.setNummer(null);
-    final int zahlungsZielInTagen = rechnung.getZahlungsZielInTagen();
+    final Integer zahlungsZielInTagen = rechnung.getZahlungsZielInTagen();
     final DayHolder day = new DayHolder();
     rechnung.setDatum(day.getSQLDate());
-    day.add(Calendar.DAY_OF_MONTH, zahlungsZielInTagen);
+    if (zahlungsZielInTagen != null) {
+      day.add(Calendar.DAY_OF_MONTH, zahlungsZielInTagen);
+    }
     rechnung.setFaelligkeit(day.getSQLDate());
     rechnung.setZahlBetrag(null);
     rechnung.setBezahlDatum(null);
@@ -120,7 +127,7 @@ public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditF
     if (positionen != null) {
       rechnung.setPositionen(new ArrayList<RechnungsPositionDO>());
       for (final RechnungsPositionDO origPosition : positionen) {
-        final RechnungsPositionDO position = (RechnungsPositionDO)origPosition.newClone();
+        final RechnungsPositionDO position = (RechnungsPositionDO) origPosition.newClone();
         rechnung.addPosition(position);
       }
     }
@@ -128,12 +135,12 @@ public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditF
     form.cloneButtonPanel.setVisible(false);
   }
 
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing.
   }
 
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     if ("projektId".equals(property) == true) {
       rechnungDao.setProjekt(getData(), (Integer) selectedValue);
@@ -149,25 +156,12 @@ public class RechnungEditPage extends AbstractEditPage<RechnungDO, RechnungEditF
       }
     } else if ("kundeId".equals(property) == true) {
       rechnungDao.setKunde(getData(), (Integer) selectedValue);
-    } else if (StringHelper.isIn(property, "datum", "faelligkeit", "bezahlDatum") == true) {
-      final Date date = (Date) selectedValue;
-      final java.sql.Date sqlDate = new java.sql.Date(date.getTime());
-      if ("datum".equals(property) == true) {
-        getData().setDatum(sqlDate);
-        form.datumPanel.markModelAsChanged();
-      } else if ("faelligkeit".equals(property) == true) {
-        getData().setFaelligkeit(sqlDate);
-        form.faelligkeitPanel.markModelAsChanged();
-      } else if ("bezahlDatum".equals(property) == true) {
-        getData().setBezahlDatum(sqlDate);
-        form.bezahlDatumPanel.markModelAsChanged();
-      }
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
   }
 
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     if ("projektId".equals(property) == true) {
       getData().setProjekt(null);

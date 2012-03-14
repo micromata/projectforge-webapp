@@ -23,12 +23,12 @@
 
 package org.projectforge.web.mobile;
 
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 /**
  * A jquery button with an icon (e. g. at the top right corner).
@@ -39,18 +39,18 @@ public class JQueryButtonPanel extends Panel
 {
   private static final long serialVersionUID = 6460153798143225741L;
 
-  private Class< ? extends WebPage> pageClass;
+  private final Class< ? extends WebPage> pageClass;
 
-  private PageParameters params;
+  private final PageParameters params;
 
-  private JQueryButtonType type;
+  private final JQueryButtonType type;
 
   private boolean initialized;
 
-  private String label;
+  private final String label;
 
   private boolean relExternal;
-  
+
   private boolean relDialog;
 
   public JQueryButtonPanel(final String id, final JQueryButtonType type, final Class< ? extends WebPage> pageClass, final String label)
@@ -92,18 +92,18 @@ public class JQueryButtonPanel extends Panel
         link = new BookmarkablePageLink<String>("button", pageClass, params);
       }
       if (type == JQueryButtonType.PLUS) {
-        link.add(new SimpleAttributeModifier("data-icon", "plus"));
+        link.add(AttributeModifier.replace("data-icon", "plus"));
       } else {
-        link.add(new SimpleAttributeModifier("data-icon", "check"));
+        link.add(AttributeModifier.replace("data-icon", "check"));
       }
-      link.add(new SimpleAttributeModifier("class", "ui-btn-right"));
+      link.add(AttributeModifier.replace("class", "ui-btn-right"));
       add(link);
       link.add(new Label("label", label));
       if (this.relExternal == true) {
-        link.add(new SimpleAttributeModifier("rel", "external"));
+        link.add(AttributeModifier.replace("rel", "external"));
       }
       if (this.relDialog == true) {
-        link.add(new SimpleAttributeModifier("data-rel", "dialog"));
+        link.add(AttributeModifier.replace("data-rel", "dialog"));
       }
     }
     super.onBeforeRender();

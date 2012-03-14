@@ -28,8 +28,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
@@ -231,7 +231,7 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
       }
       final WebMarkupContainer rowContainer = new WebMarkupContainer(rowRepeater.newChildId());
       rowRepeater.add(rowContainer);
-      rowContainer.add(new SimpleAttributeModifier("class", (row++ % 2 == 0) ? "even" : "odd"));
+      rowContainer.add(AttributeModifier.replace("class", (row++ % 2 == 0) ? "even" : "odd"));
       rowContainer.add(new Label("zeileNo", firstBusinessAssessmentRow.getNo()));
       StringBuffer buf = new StringBuffer();
       for (int i = 0; i < firstBusinessAssessmentRow.getIndent(); i++) {
@@ -258,7 +258,7 @@ public class ReportObjectivesForm extends AbstractForm<ReportObjectivesFilter, R
         if (amount != null && amount.compareTo(BigDecimal.ZERO) < 0) {
           buf.append(" color: red;");
         }
-        item.add(new SimpleAttributeModifier("style", buf.toString()));
+        item.add(AttributeModifier.replace("style", buf.toString()));
         item.add(new PlainLabel("bwaWert", NumberHelper.isNotZero(businessAssessmentRow.getAmount()) == true ? CurrencyFormatter.format(businessAssessmentRow
             .getAmount()) : ""));
         item.add(new SubmitLink("showAccountingRecordsLink") {

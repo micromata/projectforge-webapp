@@ -31,14 +31,16 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
@@ -49,8 +51,8 @@ import org.projectforge.fibu.RechnungDO;
 import org.projectforge.fibu.RechnungDao;
 import org.projectforge.fibu.RechnungsStatistik;
 import org.projectforge.fibu.kost.KostZuweisungExport;
-import org.projectforge.web.wicket.AbstractBasePage;
 import org.projectforge.web.wicket.AbstractListPage;
+import org.projectforge.web.wicket.AbstractUnsecureBasePage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.CurrencyPropertyColumn;
@@ -59,6 +61,7 @@ import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = RechnungEditPage.class)
 public class RechnungListPage extends AbstractListPage<RechnungListForm, RechnungDao, RechnungDO> implements
@@ -87,13 +90,11 @@ IListPageColumnsCreator<RechnungDO>
   public RechnungListPage(final PageParameters parameters)
   {
     super(parameters, "fibu.rechnung");
-    this.colspan = 4;
   }
 
   public RechnungListPage(final ISelectCallerPage caller, final String selectProperty)
   {
     super(caller, selectProperty, "fibu.rechnung");
-    this.colspan = 4;
   }
 
   /**
@@ -129,17 +130,20 @@ IListPageColumnsCreator<RechnungDO>
           cssStyle.append("color: blue;");
         }
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<RechnungDO>(new Model<String>(getString("fibu.rechnung.nummer.short")), getSortable(
         "nummer", sortable), "nummer", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<RechnungDO>> item, final String componentId, final IModel<RechnungDO> rowModel)
       {
-        final RechnungDO rechnung = (RechnungDO) rowModel.getObject();
+        final RechnungDO rechnung = rowModel.getObject();
         String nummer = String.valueOf(rechnung.getNummer());
         if (form.getSearchFilter().isShowKostZuweisungStatus() == true) {
           final BigDecimal fehlBetrag = rechnung.getKostZuweisungFehlbetrag();
@@ -180,7 +184,7 @@ IListPageColumnsCreator<RechnungDO>
       {
         final Set<AuftragsPositionVO> orderPositions = rowModel.getObject().getAuftragsPositionVOs();
         if (CollectionUtils.isEmpty(orderPositions) == true) {
-          item.add(AbstractBasePage.createInvisibleDummyComponent(componentId));
+          item.add(AbstractUnsecureBasePage.createInvisibleDummyComponent(componentId));
         } else {
           final OrderPositionsPanel panel = new OrderPositionsPanel(componentId) {
             @Override
@@ -204,11 +208,20 @@ IListPageColumnsCreator<RechnungDO>
     return columns;
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "nummer", false);
+    dataTable = createDataTable(createColumns(this, true), "nummer", SortOrder.DESCENDING);
     form.add(dataTable);
+    final ContentMenuEntryPanel exportExcelButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
+      @Override
+      public void onClick()
+      {
+        exportExcel();
+      };
+    }, getString("exportAsXls")).setTooltip(getString("tooltip.export.excel"));
+    addContentMenuEntry(exportExcelButton);
   }
 
   void exportExcel()

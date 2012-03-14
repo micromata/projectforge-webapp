@@ -24,12 +24,14 @@
 package org.projectforge.web.orga;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.orga.ContractDao;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class ContractListForm extends AbstractListForm<ContractListFilter, ContractListPage>
 {
@@ -37,19 +39,36 @@ public class ContractListForm extends AbstractListForm<ContractListFilter, Contr
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ContractListForm.class);
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     super.init();
     final ContractDao contractDao = getParentPage().getBaseDao();
-    // DropDownChoice years
-    final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(contractDao.getYears(), true);
-    @SuppressWarnings("unchecked")
-    final DropDownChoice yearChoice = new DropDownChoice("year", new PropertyModel(this, "year"), yearListChoiceRenderer.getYears(),
-        yearListChoiceRenderer);
-    yearChoice.setNullValid(false);
-    filterContainer.add(yearChoice);
-    filterContainer.add(new CheckBox("deletedCheckBox", new PropertyModel<Boolean>(getSearchFilter(), "deleted")));
+    gridBuilder.newColumnsPanel();
+    {
+      gridBuilder.newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
+      // DropDownChoice years
+      final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(contractDao.getYears(), true);
+      final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(this,
+          "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer) {
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
+      };
+      yearChoice.setNullValid(false);
+      fs.add(yearChoice);
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
+    }
+    {
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      addPageSizeFieldset();
+    }
   }
 
   public ContractListForm(final ContractListPage parentPage)

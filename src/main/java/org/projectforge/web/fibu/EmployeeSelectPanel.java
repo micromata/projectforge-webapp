@@ -41,7 +41,7 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.wicket.AbstractSelectPanel;
-import org.projectforge.web.wicket.FocusOnLoadBehavior;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 
 /**
@@ -151,8 +151,9 @@ public class EmployeeSelectPanel extends AbstractSelectPanel<EmployeeDO>
         currentEmployee = employee;
       }
 
+      @SuppressWarnings({ "rawtypes", "unchecked"})
       @Override
-      public IConverter getConverter(final Class< ? > type)
+      public IConverter getConverter(final Class type)
       {
         return new IConverter() {
           @Override
@@ -210,9 +211,10 @@ public class EmployeeSelectPanel extends AbstractSelectPanel<EmployeeDO>
    * @see org.projectforge.web.wicket.AbstractSelectPanel#setFocus()
    */
   @Override
-  public void setFocus()
+  public EmployeeSelectPanel setFocus()
   {
-    employeeTextField.add(new FocusOnLoadBehavior());
+    employeeTextField.add(WicketUtils.setFocus());
+    return this;
   }
 
   @Override

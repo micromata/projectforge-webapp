@@ -38,14 +38,14 @@ import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.FavoritesChoicePanel;
 import org.projectforge.web.wicket.components.TooltipImage;
-
+import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
  * This panel show the actual project and buttons for select/unselect projects.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class ProjektSelectPanel extends AbstractSelectPanel<ProjektDO>
+public class ProjektSelectPanel extends AbstractSelectPanel<ProjektDO> implements ComponentWrapperPanel
 {
   private static final long serialVersionUID = 5452693296383142460L;
 
@@ -55,16 +55,20 @@ public class ProjektSelectPanel extends AbstractSelectPanel<ProjektDO>
   @SpringBean(name = "projektDao")
   private ProjektDao projektDao;
 
+  private Label projektAsStringLabel;
+
+  /**
+   * @param id
+   * @param label Not yet in use.
+   * @param model
+   * @param caller
+   * @param selectProperty
+   */
+  @SuppressWarnings("serial")
   public ProjektSelectPanel(final String id, final IModel<ProjektDO> model, final ISelectCallerPage caller, final String selectProperty)
   {
     super(id, model, caller, selectProperty);
-  }
-
-  @SuppressWarnings("serial")
-  public ProjektSelectPanel init()
-  {
-    super.init();
-    final Label projektAsStringLabel = new Label("projectAsString", new Model<String>() {
+    projektAsStringLabel = new Label("projectAsString", new Model<String>() {
 
       @Override
       public String getObject()
@@ -79,7 +83,15 @@ public class ProjektSelectPanel extends AbstractSelectPanel<ProjektDO>
     });
     projektAsStringLabel.setEscapeModelStrings(false);
     add(projektAsStringLabel);
+  }
+
+  @Override
+  @SuppressWarnings("serial")
+  public ProjektSelectPanel init()
+  {
+    super.init();
     final SubmitLink selectButton = new SubmitLink("select") {
+      @Override
       public void onSubmit()
       {
         setResponsePage(new ProjektListPage(caller, selectProperty));
@@ -111,8 +123,8 @@ public class ProjektSelectPanel extends AbstractSelectPanel<ProjektDO>
     unselectButton.add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_PROJEKT_UNSELECT,
         getString("fibu.tooltip.unselectProjekt")));
     // DropDownChoice favorites
-    final FavoritesChoicePanel<ProjektDO, ProjektFavorite> favoritesPanel = new FavoritesChoicePanel<ProjektDO, ProjektFavorite>("favorites",
-        UserPrefArea.PROJEKT_FAVORITE, tabIndex, "select half") {
+    final FavoritesChoicePanel<ProjektDO, ProjektFavorite> favoritesPanel = new FavoritesChoicePanel<ProjektDO, ProjektFavorite>(
+        "favorites", UserPrefArea.PROJEKT_FAVORITE, tabIndex, "select half") {
       @Override
       protected void select(final ProjektFavorite favorite)
       {
@@ -142,7 +154,7 @@ public class ProjektSelectPanel extends AbstractSelectPanel<ProjektDO>
     }
     return this;
   }
-  
+
   /**
    * Will be called if the user has chosen an entry of the projekt favorites drop down choice.
    * @param projekt
@@ -157,5 +169,15 @@ public class ProjektSelectPanel extends AbstractSelectPanel<ProjektDO>
   protected void convertInput()
   {
     setConvertedInput(getModelObject());
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getComponentOutputId()
+   */
+  @Override
+  public String getComponentOutputId()
+  {
+    projektAsStringLabel.setOutputMarkupId(true);
+    return projektAsStringLabel.getMarkupId();
   }
 }

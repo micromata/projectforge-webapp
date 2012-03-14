@@ -23,11 +23,11 @@
 
 package org.projectforge.web.fibu;
 
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.Kost2Dao;
@@ -53,6 +53,7 @@ public class Kost2SelectPanel extends AbstractSelectPanel<Kost2DO>
     super(id, model, caller, selectProperty);
   }
 
+  @Override
   @SuppressWarnings("serial")
   public Kost2SelectPanel init()
   {
@@ -71,6 +72,7 @@ public class Kost2SelectPanel extends AbstractSelectPanel<Kost2DO>
     });
     add(kost2AsStringLabel);
     final SubmitLink selectButton = new SubmitLink("select") {
+      @Override
       public void onSubmit()
       {
         final PageParameters parameters = new PageParameters();

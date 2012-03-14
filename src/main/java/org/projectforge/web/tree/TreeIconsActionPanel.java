@@ -25,10 +25,9 @@ package org.projectforge.web.tree;
 
 import java.io.Serializable;
 
-import org.apache.wicket.Response;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.markup.html.AjaxFallbackLink;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.SubmitLink;
@@ -39,6 +38,7 @@ import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.Response;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.PresizedImage;
@@ -55,13 +55,13 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
 {
   public static final String LABEL_ID = "label";
 
-  private Link< ? > link;
+  private final Link< ? > link;
 
   private boolean useAjaxAtDefault;
 
   private boolean useSubmitLinkImages;
 
-  private TreeTable< ? > treeTable;
+  private final TreeTable< ? > treeTable;
 
   private TreeTableNode treeNode;
 
@@ -84,7 +84,9 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
     super(id, model);
     this.treeTable = treeTable;
     @SuppressWarnings("unchecked")
+    final
     Link< ? > selectLink = new Link("select") {
+      @Override
       public void onClick()
       {
         WicketUtils.setResponsePage(this, caller);
@@ -128,6 +130,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
     this.treeTable = treeTable;
     @SuppressWarnings("unchecked")
     final Link< ? > selectLink = new Link("select") {
+      @Override
       public void onClick()
       {
         // Do nothing
@@ -164,7 +167,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
     if (showExploreIcon == true)
       spacerWidth = treeNode.getIndent() * WebConstants.IMAGE_TREE_ICON_WIDTH + 1;
     else spacerWidth = (treeNode.getIndent() + 1) * WebConstants.IMAGE_TREE_ICON_WIDTH + 1;
-    spacerImage.add(new SimpleAttributeModifier("width", String.valueOf(spacerWidth)));
+    spacerImage.add(AttributeModifier.replace("width", String.valueOf(spacerWidth)));
     if (this.link.isVisible() == true) {
       link.add(spacerImage);
       add(WicketUtils.getInvisibleDummyImage("spacer", getResponse()));
@@ -183,6 +186,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
       final WebMarkupContainer exploreLink;
       if (useAjaxAtDefault == true) {
         exploreLink = new AjaxFallbackLink<Object>("explore") {
+          @Override
           public void onClick(final AjaxRequestTarget target)
           {
             if (target == null || treeTable == null) {
@@ -201,6 +205,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
         };
       } else if (useSubmitLinkImages == true) {
         exploreLink = new SubmitLink("explore") {
+          @Override
           public void onSubmit()
           {
             treeTable.setOpenedStatusOfNode(TreeTableEvent.EXPLORE, treeNode.getHashId());
@@ -209,6 +214,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
         };
       } else {
         exploreLink = new Link<Object>("explore") {
+          @Override
           public void onClick()
           {
             treeTable.setOpenedStatusOfNode(TreeTableEvent.EXPLORE, treeNode.getHashId());
@@ -226,6 +232,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
       final WebMarkupContainer folderLink;
       if (useAjaxAtDefault == true) {
         folderLink = new AjaxFallbackLink<TreeTableNode>("folder", new Model<TreeTableNode>(treeNode)) {
+          @Override
           public void onClick(final AjaxRequestTarget target)
           {
             if (target == null || treeTable == null) {
@@ -243,6 +250,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
         };
       } else if (useSubmitLinkImages == true) {
         folderLink = new SubmitLink("folder", new Model<TreeTableNode>(treeNode)) {
+          @Override
           public void onSubmit()
           {
             if (((TreeTableNode) getDefaultModelObject()).isOpened() == true) {
@@ -256,6 +264,7 @@ public class TreeIconsActionPanel<T extends Serializable> extends Panel
         };
       } else {
         folderLink = new Link<TreeTableNode>("folder", new Model<TreeTableNode>(treeNode)) {
+          @Override
           public void onClick()
           {
             if (getModelObject().isOpened() == true) {

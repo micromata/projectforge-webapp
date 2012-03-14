@@ -23,10 +23,31 @@
 
 package org.projectforge.web.fibu;
 
+import java.math.BigDecimal;
+import java.util.Date;
+
 import org.apache.log4j.Logger;
+import org.apache.wicket.model.PropertyModel;
+import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.kost.BuchungssatzDO;
+import org.projectforge.fibu.kost.Kost1DO;
+import org.projectforge.fibu.kost.Kost2DO;
+import org.projectforge.fibu.kost.SHType;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.layout.LayoutContext;
+import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.autocompletion.I18nEnumAutoCompleteTextField;
+import org.projectforge.web.wicket.components.DatePanel;
+import org.projectforge.web.wicket.components.DatePanelSettings;
+import org.projectforge.web.wicket.components.MaxLengthTextArea;
+import org.projectforge.web.wicket.components.MaxLengthTextField;
+import org.projectforge.web.wicket.components.MinMaxNumberField;
+import org.projectforge.web.wicket.components.RequiredMinMaxNumberField;
+import org.projectforge.web.wicket.converter.CurrencyConverter;
+import org.projectforge.web.wicket.converter.IntegerConverter;
+import org.projectforge.web.wicket.converter.MonthConverter;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class AccountingRecordEditForm extends AbstractEditForm<BuchungssatzDO, AccountingRecordEditPage>
 {
@@ -34,19 +55,123 @@ public class AccountingRecordEditForm extends AbstractEditForm<BuchungssatzDO, A
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AccountingRecordEditForm.class);
 
-  protected AccountingRecordFormRenderer renderer;
-
-  public AccountingRecordEditForm(AccountingRecordEditPage parentPage, BuchungssatzDO data)
+  public AccountingRecordEditForm(final AccountingRecordEditPage parentPage, final BuchungssatzDO data)
   {
     super(parentPage, data);
-    renderer = new AccountingRecordFormRenderer(this, new LayoutContext(this), data);
   }
 
   @Override
   protected void init()
   {
     super.init();
-    renderer.add();
+    gridBuilder.newGrid8();
+    {
+      // Date
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("date"));
+      final DatePanel datePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "datum"),
+          new DatePanelSettings().withTargetType(java.sql.Date.class));
+      WicketUtils.setReadonly(datePanel.getDateField());
+      fs.add(datePanel);
+    }
+    {
+      // Year / month
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("calendar.year") + "/" + getString("calendar.month"), true);
+      final MinMaxNumberField<Integer> yearField = new RequiredMinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(
+          data, "year"), 1900, 2100).setConverter(new IntegerConverter(4));
+      fs.add(yearField);
+      WicketUtils.setReadonly(yearField);
+      final MinMaxNumberField<Integer> monthField = new RequiredMinMaxNumberField<Integer>(InputPanel.WICKET_ID,
+          new PropertyModel<Integer>(data, "month"), 0, 11).setConverter(new MonthConverter());
+      fs.add(monthField);
+      WicketUtils.setReadonly(monthField);
+    }
+    {
+      // Satznr.
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.buchungssatz.satznr"));
+      final MinMaxNumberField<Integer> satzNrField = new RequiredMinMaxNumberField<Integer>(InputPanel.WICKET_ID,
+          new PropertyModel<Integer>(data, "satznr"), 1, 99999).setConverter(new IntegerConverter(5));
+      WicketUtils.setReadonly(satzNrField);
+      fs.add(satzNrField);
+    }
+    {
+      // Amount / debit/credit
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.betrag") + "/" + getString("finance.accountingRecord.dc"),
+          true);
+      final MinMaxNumberField<BigDecimal> betragField = new MinMaxNumberField<BigDecimal>(InputPanel.WICKET_ID,
+          new PropertyModel<BigDecimal>(data, "betrag"), new BigDecimal("-99999999"), new BigDecimal("99999999"));
+      fs.add(betragField);
+      WicketUtils.setReadonly(betragField.setConverter(new CurrencyConverter()));
+      final I18nEnumAutoCompleteTextField<SHType> dcField = new I18nEnumAutoCompleteTextField<SHType>(InputPanel.WICKET_ID,
+          new PropertyModel<SHType>(data, "sh"), SHType.values());
+      WicketUtils.setReadonly(dcField);
+      dcField.setEnabled(false);
+      fs.add(dcField);
+    }
+    {
+      // DropDownChoice debitor/creditor
+      // final LabelValueChoiceRenderer<SHType> dcChoiceRenderer = new LabelValueChoiceRenderer<SHType>(container, SHType.values());
+      // final DropDownChoice<SHType> dcTypeChoice = new DropDownChoice<SHType>(SELECT_ID, new PropertyModel<SHType>(data, "sh"),
+      // dcChoiceRenderer.getValues(), dcChoiceRenderer);
+      // WicketUtils.setReadonly(dcTypeChoice.setNullValid(false).setRequired(true));
+      // dcTypeChoice.setEnabled(false);
+      // doPanel.addDropDownChoice(data, "sh", getString("finance.accountingRecord.dc"), HALF, dcTypeChoice, HALF);
+
+    }
+    {
+      // Beleg
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.buchungssatz.beleg"));
+      final MaxLengthTextField belegField = new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "beleg"));
+      WicketUtils.setReadonly(belegField);
+      fs.add(belegField);
+    }
+    gridBuilder.newGrid8();
+    {
+      // Cost 1 / cost2
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost1") + "/" + getString("fibu.kost2"), true);
+      final Kost1FormComponent kost1Component = new Kost1FormComponent(InputPanel.WICKET_ID, new PropertyModel<Kost1DO>(data, "kost1"),
+          true);
+      fs.add(kost1Component);
+      WicketUtils.setReadonly(kost1Component);
+      final Kost2FormComponent kost2Component = new Kost2FormComponent(InputPanel.WICKET_ID, new PropertyModel<Kost2DO>(data, "kost2"),
+          true);
+      fs.add(kost2Component);
+      WicketUtils.setReadonly(kost2Component);
+    }
+    {
+      // Cost 1 / cost2
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.buchungssatz.konto")
+          + "/"
+          + getString("fibu.buchungssatz.gegenKonto"), true);
+      final KontoFormComponent kontoComponent = new KontoFormComponent(InputPanel.WICKET_ID, new PropertyModel<KontoDO>(data, "konto"),
+          true);
+      fs.add(kontoComponent);
+      WicketUtils.setReadonly(kontoComponent);
+      final KontoFormComponent gegenKontoComponent = new KontoFormComponent(InputPanel.WICKET_ID, new PropertyModel<KontoDO>(data,
+          "gegenKonto"), true);
+      fs.add(gegenKontoComponent);
+      WicketUtils.setReadonly(gegenKontoComponent);
+    }
+    {
+      // Text
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.buchungssatz.text"));
+      final MaxLengthTextField textField = new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "text"));
+      WicketUtils.setReadonly(textField);
+      fs.add(textField);
+    }
+    {
+      // Menge
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.buchungssatz.menge"));
+      final MaxLengthTextField mengeField = new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "menge"));
+      WicketUtils.setReadonly(mengeField);
+      fs.add(mengeField);
+    }
+    gridBuilder.newGrid16();
+    {
+      // Comment
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
+      final MaxLengthTextArea commentField = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "comment"));
+      fs.add(commentField);
+    }
   }
 
   @Override

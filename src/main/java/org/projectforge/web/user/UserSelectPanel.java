@@ -28,10 +28,8 @@ import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.common.RecentQueue;
@@ -45,13 +43,14 @@ import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
  * This panel shows the actual user and buttons for select/unselect user.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
+public class UserSelectPanel extends AbstractSelectPanel<PFUserDO> implements ComponentWrapperPanel
 {
   private static final long serialVersionUID = -7114401036341110814L;
 
@@ -72,20 +71,6 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
   // Only used for detecting changes:
   private PFUserDO currentUser;
 
-  private WebMarkupContainer spanContainer;
-
-  /**
-   * Label is assumed as "user" translation.
-   * @param id
-   * @param model
-   * @param caller
-   * @param selectProperty
-   */
-  public UserSelectPanel(final String id, final IModel<PFUserDO> model, final ISelectCallerPage caller, final String selectProperty)
-  {
-    this(id, model, null, caller, selectProperty);
-  }
-
   /**
    * @param id
    * @param model
@@ -93,8 +78,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
    * @param selectProperty
    */
   @SuppressWarnings("serial")
-  public UserSelectPanel(final String id, final IModel<PFUserDO> model, final String label, final ISelectCallerPage caller,
-      final String selectProperty)
+  public UserSelectPanel(final String id, final IModel<PFUserDO> model, final ISelectCallerPage caller, final String selectProperty)
   {
     super(id, model, caller, selectProperty);
     userTextField = new PFAutoCompleteTextField<PFUserDO>("userField", getModel()) {
@@ -145,7 +129,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
       @Override
       protected void convertInput()
       {
-        final PFUserDO user = (PFUserDO) getConverter(getType()).convertToObject(getInput(), getLocale());
+        final PFUserDO user = getConverter(getType()).convertToObject(getInput(), getLocale());
         setConvertedInput(user);
         if (user != null && (currentUser == null || user.getId() != currentUser.getId())) {
           getRecentUsers().append(formatUser(user));
@@ -153,8 +137,12 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
         currentUser = user;
       }
 
+      /**
+       * @see org.apache.wicket.Component#getConverter(java.lang.Class)
+       */
+      @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
-      public IConverter getConverter(final Class< ? > type)
+      public <C> IConverter<C> getConverter(final Class<C> type)
       {
         return new IConverter() {
           @Override
@@ -168,7 +156,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
             final String username = ind >= 0 ? value.substring(0, ind) : value;
             final PFUserDO user = userDao.getUserGroupCache().getUser(username);
             if (user == null) {
-              error(getString("user.panel.error.usernameNotFound"));
+              userTextField.error(getString("user.panel.error.usernameNotFound"));
             }
             getModel().setObject(user);
             return user;
@@ -183,22 +171,23 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
             final PFUserDO user = (PFUserDO) value;
             return user.getUsername();
           }
+
         };
       }
     };
     currentUser = getModelObject();
     userTextField.enableTooltips().withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400);
-    userTextField.setLabel(new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        if (label != null) {
-          return label;
-        } else {
-          return getString("user");
-        }
-      }
-    });
+  }
+
+  /**
+   * @see org.apache.wicket.markup.html.form.FormComponent#setLabel(org.apache.wicket.model.IModel)
+   */
+  @Override
+  public UserSelectPanel setLabel(final IModel<String> labelModel)
+  {
+    userTextField.setLabel(labelModel);
+    super.setLabel(labelModel);
+    return this;
   }
 
   /**
@@ -216,9 +205,7 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
   {
     super.init();
 
-    spanContainer = new WebMarkupContainer("span");
-    add(spanContainer);
-    spanContainer.add(userTextField);
+    add(userTextField);
     final SubmitLink selectMeButton = new SubmitLink("selectMe") {
       @Override
       public void onSubmit()
@@ -235,13 +222,13 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
         return user == null || user.getId().equals(PFUserContext.getUser().getId()) == false;
       }
     };
-    spanContainer.add(selectMeButton);
+    add(selectMeButton);
     selectMeButton.setDefaultFormProcessing(defaultFormProcessing);
     selectMeButton.add(new TooltipImage("selectMeHelp", getResponse(), WebConstants.IMAGE_USER_SELECT_ME, getString("tooltip.selectMe")));
     return this;
   }
 
-  private void markTextFieldModelAsChanged()
+  public void markTextFieldModelAsChanged()
   {
     userTextField.modelChanged();
     final PFUserDO user = getModelObject();
@@ -254,12 +241,6 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
   {
     userTextField.withAutoSubmit(autoSubmit);
     return this;
-  }
-
-  @Override
-  public Component getClassModifierComponent()
-  {
-    return spanContainer;
   }
 
   @Override
@@ -293,5 +274,15 @@ public class UserSelectPanel extends AbstractSelectPanel<PFUserDO>
       return "";
     }
     return user.getUsername() + " (" + user.getFullname() + ", " + user.getEmail() + ")";
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getComponentOutputId()
+   */
+  @Override
+  public String getComponentOutputId()
+  {
+    userTextField.setOutputMarkupId(true);
+    return userTextField.getMarkupId();
   }
 }

@@ -23,13 +23,12 @@
 
 package org.projectforge.web.task;
 
-import java.util.Date;
-
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
+import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.fibu.kost.Kost2DO;
@@ -43,13 +42,13 @@ import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.gantt.GanttChartEditPage;
 import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.timesheet.TimesheetListPage;
-import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @EditPage(defaultReturnPage = TaskTreePage.class)
-public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditForm, TaskDao> implements ISelectCallerPage
+public class TaskEditPage extends AbstractEditPage<TaskDO, TaskEditForm, TaskDao> implements ISelectCallerPage
 {
   public static final String PARAM_PARENT_TASK_ID = "parentTaskId";
 
@@ -72,7 +71,7 @@ public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditFor
     init();
     addTopMenuPanel();
     addTopRightMenu();
-    final Integer parentTaskId = parameters.getAsInteger(PARAM_PARENT_TASK_ID);
+    final Integer parentTaskId = WicketUtils.getAsInteger(parameters, PARAM_PARENT_TASK_ID);
     if (NumberHelper.greaterZero(parentTaskId) == true) {
       taskDao.setParentTask(getData(), parentTaskId);
     }
@@ -85,7 +84,7 @@ public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditFor
   }
 
   @Override
-  protected TaskEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, TaskDO data)
+  protected TaskEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final TaskDO data)
   {
     return new TaskEditForm(this, data);
   }
@@ -93,7 +92,7 @@ public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditFor
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Integer)
    */
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     if ("parentTaskId".equals(property) == true) {
       taskDao.setParentTask(getData(), (Integer) selectedValue);
@@ -101,18 +100,6 @@ public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditFor
       taskDao.setGanttPredecessor(getData(), (Integer) selectedValue);
     } else if ("responsibleUserId".equals(property) == true) {
       taskDao.setResponsibleUser(getData(), (Integer) selectedValue);
-    } else if ("startDate".equals(property) == true) {
-      final Date date = (Date) selectedValue;
-      getData().setStartDate(date);
-      form.renderer.startDatePanel.markModelAsChanged();
-    } else if ("protectTimesheetsUntil".equals(property) == true) {
-      final Date date = (Date) selectedValue;
-      getData().setProtectTimesheetsUntil(date);
-      form.renderer.protectTimesheetsUntilPanel.markModelAsChanged();
-    } else if ("endDate".equals(property) == true) {
-      final Date date = (Date) selectedValue;
-      getData().setEndDate(date);
-      form.renderer.endDatePanel.markModelAsChanged();
     } else if ("kost2Id".equals(property) == true) {
       final Integer kost2Id = (Integer) selectedValue;
       if (kost2Id != null) {
@@ -120,7 +107,7 @@ public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditFor
         if (kost2 != null) {
           final String newKost2String = TaskHelper.addKost2(taskTree, getData(), kost2);
           getData().setKost2BlackWhiteList(newKost2String);
-          form.renderer.kost2BlackWhiteTextField.modelChanged();
+          form.kost2BlackWhiteTextField.modelChanged();
         }
       }
     } else {
@@ -131,7 +118,7 @@ public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditFor
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
    */
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     if ("parentTaskId".equals(property) == true) {
       getData().setParentTask(null);
@@ -147,46 +134,57 @@ public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditFor
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#cancelSelection(java.lang.String)
    */
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing.
   }
 
+  @SuppressWarnings("serial")
   private void addTopMenuPanel()
   {
     if (isNew() == false) {
-      @SuppressWarnings("unchecked")
-      final BookmarkablePageLink<String> addSubTaskLink = new BookmarkablePageLink("link", getClass());
-      final ContentMenuEntryPanel addSubTaskMenuPanel = new ContentMenuEntryPanel(getNewContentMenuChildId(), addSubTaskLink,
-          getString("task.menu.addSubTask"));
-      contentMenuEntries.add(addSubTaskMenuPanel);
+      final Integer id = form.getData().getId();
+      ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+        @Override
+        public void onClick()
+        {
+          final PageParameters params = new PageParameters();
+          params.set(PARAM_PARENT_TASK_ID, id);
+          final TaskEditPage taskEditPage = new TaskEditPage(params);
+          taskEditPage.setReturnToPage(TaskEditPage.this);
+          setResponsePage(taskEditPage);
+        };
+      }, getString("task.menu.addSubTask"));
+      addContentMenuEntry(menu);
+      menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+        @Override
+        public void onClick()
+        {
+          final PageParameters params = new PageParameters();
+          params.add(TimesheetEditPage.PARAMETER_KEY_TASK_ID, id);
+          final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(params);
+          timesheetEditPage.setReturnToPage(TaskEditPage.this);
+          setResponsePage(timesheetEditPage);
+        };
+      }, getString("task.menu.addTimesheet"));
+      addContentMenuEntry(menu);
 
-      final PageParameters timesheetEditPageParams = new PageParameters();
-      timesheetEditPageParams.put(TimesheetEditPage.PARAMETER_KEY_TASK_ID, form.getData().getId());
-      @SuppressWarnings("unchecked")
-      final ContentMenuEntryPanel addTimesheetMenuPanel = new ContentMenuEntryPanel(getNewContentMenuChildId(), new BookmarkablePageLink(
-          "link", TimesheetEditPage.class, timesheetEditPageParams), getString("task.menu.addTimesheet"));
-      contentMenuEntries.add(addTimesheetMenuPanel);
-
-      @SuppressWarnings("unchecked")
-      final BookmarkablePageLink<String> showTimesheetsLink = new BookmarkablePageLink("link", TimesheetListPage.class);
-      if (form.getData().getId() != null) {
-        showTimesheetsLink.setParameter(TimesheetListPage.PARAMETER_KEY_TASK_ID, form.getData().getId());
-      }
-      final ContentMenuEntryPanel showTimesheetsMenuPanel = new ContentMenuEntryPanel(getNewContentMenuChildId(), showTimesheetsLink,
-          getString("task.menu.showTimesheets"));
-      contentMenuEntries.add(showTimesheetsMenuPanel);
-
-      @SuppressWarnings("unchecked")
-      final BookmarkablePageLink<String> addGanttChartLink = new BookmarkablePageLink("link", GanttChartEditPage.class);
-      if (form.getData().getId() != null) {
-        addGanttChartLink.setParameter(GanttChartEditPage.PARAM_KEY_TASK, form.getData().getId());
-      }
-      final ContentMenuEntryPanel addGanttChartMenuPanel = new ContentMenuEntryPanel(getNewContentMenuChildId(), addGanttChartLink,
-          getString("gantt.title.add"));
-      contentMenuEntries.add(addGanttChartMenuPanel);
-
-      addSubTaskLink.setParameter(PARAM_PARENT_TASK_ID, getData().getId());
+      final BookmarkablePageLink<Void> showTimesheetsLink = new BookmarkablePageLink<Void>("link", TimesheetListPage.class);
+      showTimesheetsLink.getPageParameters().set(TimesheetListPage.PARAMETER_KEY_TASK_ID, id);
+      menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), showTimesheetsLink, getString("task.menu.showTimesheets"));
+      addContentMenuEntry(menu);
+      menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+        @Override
+        public void onClick()
+        {
+          final PageParameters params = new PageParameters();
+          params.set(GanttChartEditPage.PARAM_KEY_TASK, id);
+          final GanttChartEditPage ganttChartEditPage = new GanttChartEditPage(params);
+          ganttChartEditPage.setReturnToPage(TaskEditPage.this);
+          setResponsePage(ganttChartEditPage);
+        };
+      }, getString("gantt.title.add"));
+      addContentMenuEntry(menu);
     }
   }
 
@@ -195,10 +193,9 @@ public class TaskEditPage extends AbstractAutoLayoutEditPage<TaskDO, TaskEditFor
     dropDownMenu.setVisible(true);
     final WebMarkupContainer item = new WebMarkupContainer(getNewDropDownMenuChildId());
     addDropDownMenuEntry(item);
-    @SuppressWarnings("unchecked")
-    final BookmarkablePageLink<String> showAccessRightsLink = new BookmarkablePageLink("menuEntry", AccessListPage.class);
+    final BookmarkablePageLink<Void> showAccessRightsLink = new BookmarkablePageLink<Void>("menuEntry", AccessListPage.class);
     if (form.getData().getId() != null) {
-      showAccessRightsLink.setParameter(AccessListPage.PARAMETER_KEY_TASK_ID, form.getData().getId());
+      showAccessRightsLink.getPageParameters().set(AccessListPage.PARAMETER_KEY_TASK_ID, form.getData().getId());
     }
     showAccessRightsLink.add(new Label("label", getString("task.menu.showAccessRights")).setRenderBodyOnly(true));
     item.add(showAccessRightsLink);

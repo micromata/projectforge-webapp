@@ -27,14 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.EmployeeDO;
 import org.projectforge.fibu.EmployeeDao;
@@ -55,7 +56,7 @@ public class EmployeeListPage extends AbstractListPage<EmployeeListForm, Employe
   @SpringBean(name = "employeeDao")
   private EmployeeDao employeeDao;
 
-  public EmployeeListPage(PageParameters parameters)
+  public EmployeeListPage(final PageParameters parameters)
   {
     super(parameters, "fibu.employee");
   }
@@ -68,30 +69,28 @@ public class EmployeeListPage extends AbstractListPage<EmployeeListForm, Employe
   @SuppressWarnings("serial")
   public List<IColumn<EmployeeDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    List<IColumn<EmployeeDO>> columns = new ArrayList<IColumn<EmployeeDO>>();
+    final List<IColumn<EmployeeDO>> columns = new ArrayList<IColumn<EmployeeDO>>();
 
-    CellItemListener<EmployeeDO> cellItemListener = new CellItemListener<EmployeeDO>() {
-      public void populateItem(Item<ICellPopulator<EmployeeDO>> item, String componentId, IModel<EmployeeDO> rowModel)
+    final CellItemListener<EmployeeDO> cellItemListener = new CellItemListener<EmployeeDO>() {
+      public void populateItem(final Item<ICellPopulator<EmployeeDO>> item, final String componentId, final IModel<EmployeeDO> rowModel)
       {
         final EmployeeDO employee = rowModel.getObject();
-        if (employee.getStatus() == null) {
-          // Should not occur:
-          return;
+        final StringBuffer cssStyle = getCssStyle(employee.getId(), employee.isDeleted());
+        if (cssStyle.length() > 0) {
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
-        String cellStyle = "";
-        if (employee.isDeleted() == true) {
-          cellStyle = "text-decoration: line-through;";
-        }
-        item.add(new AttributeModifier("style", true, new Model<String>(cellStyle)));
       }
     };
     columns.add(new CellItemListenerPropertyColumn<EmployeeDO>(new Model<String>(getString("name")),
         getSortable("user.lastname", sortable), "user.lastname", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<EmployeeDO>> item, final String componentId, final IModel<EmployeeDO> rowModel)
       {
-        final EmployeeDO employee = (EmployeeDO) rowModel.getObject();
+        final EmployeeDO employee = rowModel.getObject();
         final PFUserDO user = employee != null ? employee.getUser() : null;
         final String lastname = user != null ? user.getLastname() : null;
         if (isSelectMode() == false) {
@@ -118,7 +117,7 @@ public class EmployeeListPage extends AbstractListPage<EmployeeListForm, Employe
       @Override
       public void populateItem(final Item<ICellPopulator<EmployeeDO>> item, final String componentId, final IModel<EmployeeDO> rowModel)
       {
-        final EmployeeDO employee = (EmployeeDO) rowModel.getObject();
+        final EmployeeDO employee = rowModel.getObject();
         item.add(new Label(componentId, DateTimeFormatter.instance().getFormattedDate(employee.getEintrittsDatum())));
       }
     });
@@ -127,7 +126,7 @@ public class EmployeeListPage extends AbstractListPage<EmployeeListForm, Employe
       @Override
       public void populateItem(final Item<ICellPopulator<EmployeeDO>> item, final String componentId, final IModel<EmployeeDO> rowModel)
       {
-        final EmployeeDO employee = (EmployeeDO) rowModel.getObject();
+        final EmployeeDO employee = rowModel.getObject();
         item.add(new Label(componentId, DateTimeFormatter.instance().getFormattedDate(employee.getAustrittsDatum())));
       }
     });
@@ -140,12 +139,12 @@ public class EmployeeListPage extends AbstractListPage<EmployeeListForm, Employe
   protected void init()
   {
     final List<IColumn<EmployeeDO>> columns = createColumns(this, true);
-    dataTable = createDataTable(columns, "user.lastname", true);
+    dataTable = createDataTable(columns, "user.lastname", SortOrder.ASCENDING);
     form.add(dataTable);
   }
 
   @Override
-  protected EmployeeListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected EmployeeListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new EmployeeListForm(this);
   }
@@ -157,7 +156,7 @@ public class EmployeeListPage extends AbstractListPage<EmployeeListForm, Employe
   }
 
   @Override
-  protected IModel<EmployeeDO> getModel(EmployeeDO object)
+  protected IModel<EmployeeDO> getModel(final EmployeeDO object)
   {
     return new DetachableDOModel<EmployeeDO, EmployeeDao>(object, getBaseDao());
   }

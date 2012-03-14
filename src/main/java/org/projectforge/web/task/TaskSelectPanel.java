@@ -23,46 +23,49 @@
 
 package org.projectforge.web.task;
 
+import java.util.List;
+import java.util.ListIterator;
+
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.SubmitLink;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.Hibernate;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskFavorite;
+import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.WicketLocalizerAndUrlBuilder;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.FavoritesChoicePanel;
 import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
  * Panel for showing and selecting one task.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
+public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements ComponentWrapperPanel
 {
   private static final long serialVersionUID = -7231190025292695850L;
-
-  @SpringBean(name = "taskFormatter")
-  private TaskFormatter taskFormatter;
 
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
 
-  private boolean enableLinks;
-
   private boolean showPath = true;
 
-  private WebMarkupContainer divContainer;
+  private final WebMarkupContainer divContainer;
+
+  private RepeatingView ancestorRepeater;
+
+  private Integer currentTaskId;
 
   public TaskSelectPanel(final String id, final IModel<TaskDO> model, final ISelectCallerPage caller, final String selectProperty)
   {
@@ -72,32 +75,76 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
       task = taskTree.getTaskById(task.getId());
       model.setObject(task);
     }
+    divContainer = new WebMarkupContainer("div");
+    add(divContainer);
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractSelectPanel#onBeforeRender()
+   */
+  @SuppressWarnings("serial")
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
+    final TaskDO task = getModelObject();
+    final Integer taskId = task != null ? task.getId() : null;
+    if (currentTaskId == taskId) {
+      return;
+    }
+    currentTaskId = taskId;
+    if (showPath == true && task != null) {
+      ancestorRepeater.removeAll();
+      final TaskNode taskNode = taskTree.getTaskNodeById(task.getId());
+      final List<Integer> ancestorIds = taskNode.getAncestorIds();
+      final ListIterator<Integer> it = ancestorIds.listIterator(ancestorIds.size());
+      while(it.hasPrevious() == true) {
+        final Integer ancestorId = it.previous();
+        final TaskDO ancestorTask = taskTree.getTaskById(ancestorId);
+        if (ancestorTask.getParentTask() == null) {
+          // Don't show root node:
+          continue;
+        }
+        final WebMarkupContainer cont = new WebMarkupContainer(ancestorRepeater.newChildId());
+        ancestorRepeater.add(cont);
+        final SubmitLink selectTaskLink = new SubmitLink("ancestorTaskLink") {
+          @Override
+          public void onSubmit()
+          {
+            caller.select(selectProperty, ancestorTask.getId());
+          }
+        };
+        selectTaskLink.setDefaultFormProcessing(false);
+        cont.add(selectTaskLink);
+        selectTaskLink.add(new Label("name", ancestorTask.getTitle()));
+      }
+      ancestorRepeater.setVisible(true);
+    } else {
+      ancestorRepeater.setVisible(false);
+    }
+  }
+
+  @Override
   @SuppressWarnings("serial")
   public TaskSelectPanel init()
   {
     super.init();
-    divContainer = new WebMarkupContainer("div");
-    add(divContainer);
-    // Todo: replace taskAsString with Wicket mechanism
-    final Label taskAsStringLabel = new Label("taskAsString", new Model<String>() {
+    ancestorRepeater = new RepeatingView("ancestorTasks");
+    divContainer.add(ancestorRepeater);
+    divContainer.add(new Label("name", new Model<String>() {
+      /**
+       * @see org.apache.wicket.model.Model#getObject()
+       */
       @Override
       public String getObject()
       {
         final TaskDO task = getModelObject();
-        if (task == null) {
-          return "";
-        } else if (showPath == true) {
-          return taskFormatter.getTaskPath(new WicketLocalizerAndUrlBuilder(getResponse()), task.getId(), null, enableLinks, true);
-        } else {
-          return task.getTitle();
-        }
+        return task != null ? task.getTitle() : "";
       }
-    });
-    taskAsStringLabel.setEscapeModelStrings(false);
-    divContainer.add(taskAsStringLabel);
+    }));
+
     final SubmitLink selectButton = new SubmitLink("select") {
+      @Override
       public void onSubmit()
       {
         final TaskTreePage taskTreePage = new TaskTreePage(caller, selectProperty);
@@ -126,7 +173,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
     unselectButton.setDefaultFormProcessing(false);
     divContainer.add(unselectButton);
     unselectButton
-        .add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_TASK_UNSELECT, getString("tooltip.unselectTask")));
+    .add(new TooltipImage("unselectHelp", getResponse(), WebConstants.IMAGE_TASK_UNSELECT, getString("tooltip.unselectTask")));
     // DropDownChoice favorites
     final FavoritesChoicePanel<TaskDO, TaskFavorite> favoritesPanel = new FavoritesChoicePanel<TaskDO, TaskFavorite>("favorites",
         UserPrefArea.TASK_FAVORITE, tabIndex, "full text") {
@@ -181,23 +228,24 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO>
   {
     setConvertedInput(getModelObject());
   }
-  
-  /**
-   * @param enableLinks true for showing click-able ancestor tasks, false for no links.
-   */
-  public TaskSelectPanel setEnableLinks(boolean enableLinks)
-  {
-    this.enableLinks = enableLinks;
-    return this;
-  }
 
   /**
    * If true (default) then the path from the root task to the currently selected will be shown, otherwise only the name of the task is
    * displayed.
    * @param showPath
    */
-  public void setShowPath(boolean showPath)
+  public void setShowPath(final boolean showPath)
   {
     this.showPath = showPath;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel#getComponentOutputId()
+   */
+  @Override
+  public String getComponentOutputId()
+  {
+    divContainer.setOutputMarkupId(true);
+    return divContainer.getMarkupId();
   }
 }

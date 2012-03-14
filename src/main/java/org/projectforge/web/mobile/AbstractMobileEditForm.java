@@ -26,16 +26,20 @@ package org.projectforge.web.mobile;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.core.AbstractBaseDO;
+import org.projectforge.web.wicket.flowlayout.GridBuilder;
 
 public abstract class AbstractMobileEditForm<O extends AbstractBaseDO< ? >, P extends AbstractMobileEditPage< ? , ? , ? >> extends
-    AbstractMobileForm<O, P>
+AbstractMobileForm<O, P>
 {
   private static final long serialVersionUID = 1836099012618517190L;
 
   protected O data;
 
-  public AbstractMobileEditForm(P parentPage, O data)
+  protected GridBuilder gridBuilder;
+
+  public AbstractMobileEditForm(final P parentPage, final O data)
   {
     super(parentPage);
     this.data = data;
@@ -44,6 +48,11 @@ public abstract class AbstractMobileEditForm<O extends AbstractBaseDO< ? >, P ex
   public O getData()
   {
     return this.data;
+  }
+
+  public void setData(final O data)
+  {
+    this.data = data;
   }
 
   public boolean isNew()
@@ -62,6 +71,10 @@ public abstract class AbstractMobileEditForm<O extends AbstractBaseDO< ? >, P ex
         parentPage.save();
       }
     };
+    final RepeatingView flowform = new RepeatingView("flowform");
+    add(flowform);
+    gridBuilder = newGridBuilder(flowform);
+
     add(submitButton);
     if (isNew() == true) {
       submitButton.add(new Label("label", getString("create")));

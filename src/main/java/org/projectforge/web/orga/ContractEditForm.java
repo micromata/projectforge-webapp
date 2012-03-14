@@ -27,7 +27,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.ConfigXml;
@@ -35,18 +37,20 @@ import org.projectforge.orga.ContractDO;
 import org.projectforge.orga.ContractStatus;
 import org.projectforge.orga.ContractType;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
-import org.projectforge.web.wicket.components.JiraIssuesPanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
-import org.projectforge.web.wicket.components.TooltipImage;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditPage>
 {
@@ -59,21 +63,19 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
   public ContractEditForm(final ContractEditPage parentPage, final ContractDO data)
   {
     super(parentPage, data);
-    this.colspan = 4;
   }
 
   @SuppressWarnings("serial")
-  private PFAutoCompleteTextField<String> addAutocompleteTextField(final String property)
+  private PFAutoCompleteTextField<String> createAutocompleteTextField(final String property)
   {
-    final PFAutoCompleteTextField<String> textField = (new PFAutoCompleteMaxLengthTextField(property, new PropertyModel<String>(data,
-        property)) {
+    final PFAutoCompleteTextField<String> textField = (new PFAutoCompleteMaxLengthTextField(InputPanel.WICKET_ID,
+        new PropertyModel<String>(data, property)) {
       @Override
       protected List<String> getChoices(final String input)
       {
         return parentPage.getBaseDao().getAutocompletion(property, input);
       }
     }.withMatchContains(true).withMinChars(2));
-    add(textField);
     return textField;
   }
 
@@ -81,64 +83,148 @@ public class ContractEditForm extends AbstractEditForm<ContractDO, ContractEditP
   protected void init()
   {
     super.init();
-    add(new MinMaxNumberField<Integer>("number", new PropertyModel<Integer>(data, "number"), 0, 99999999));
-    final TooltipImage nummerHelpImage = new TooltipImage("numberHelp", getResponse(), WebConstants.IMAGE_HELP,
-        getString("fibu.tooltip.nummerWirdAutomatischVergeben"));
-    if (NumberHelper.greaterZero(getData().getNumber()) == true) {
-      nummerHelpImage.setVisible(false); // Show only if number is not already given.
+    /* GRID8 - BLOCK */
+    gridBuilder.newGrid8();
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // Number
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.number"), true);
+      fs.add(new DivTextPanel(fs.newChildId(), "C-"));
+      final MinMaxNumberField<Integer> number = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data,
+          "number"), 0, 99999999);
+      number.setMaxLength(8).add(AttributeModifier.append("style", "width: 6em !important;"));
+      fs.add(number);
+      if (NumberHelper.greaterZero(getData().getNumber()) == false) {
+        fs.addHelpIcon(getString("fibu.tooltip.nummerWirdAutomatischVergeben"));
+      }
     }
-    add(nummerHelpImage);
-    datePanel = new DatePanel("date", new PropertyModel<Date>(data, "date"), DatePanelSettings.get().withCallerPage(parentPage)
-        .withTargetType(java.sql.Date.class));
-    datePanel.setRequired(true);
-    add(datePanel);
-    validFromDatePanel = new DatePanel("validFrom", new PropertyModel<Date>(data, "validFrom"), DatePanelSettings.get().withCallerPage(
-        parentPage).withTargetType(java.sql.Date.class));
-    add(validFromDatePanel);
-    validUntilDatePanel = new DatePanel("validUntil", new PropertyModel<Date>(data, "validUntil"), DatePanelSettings.get().withCallerPage(
-        parentPage).withTargetType(java.sql.Date.class));
-    add(validUntilDatePanel);
-    addAutocompleteTextField("title").setRequired(true);
-    addAutocompleteTextField("coContractorA");
-    addAutocompleteTextField("contractPersonA");
-    addAutocompleteTextField("signerA");
-    addAutocompleteTextField("coContractorB");
-    addAutocompleteTextField("contractPersonB");
-    addAutocompleteTextField("signerB");
-    signingDatePanel = new DatePanel("signingDate", new PropertyModel<Date>(data, "signingDate"), DatePanelSettings.get().withCallerPage(
-        parentPage).withTargetType(java.sql.Date.class));
-    add(signingDatePanel);
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // Date
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("date"));
+      datePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "date"), DatePanelSettings.get().withTargetType(
+          java.sql.Date.class));
+      fs.add(datePanel);
+    }
+    gridBuilder.newBlockPanel();
+    {
+      // Title
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("title"));
+      fs.add(createAutocompleteTextField("title")).getField().setRequired(true).add(WicketUtils.setFocus());
+    }
+    {
+      // Contract type
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.type"));
+      final List<ContractType> contractTypes = ConfigXml.getInstance().getContractTypes();
+      final LabelValueChoiceRenderer<ContractType> typeChoiceRenderer = new LabelValueChoiceRenderer<ContractType>(contractTypes);
+      final DropDownChoice<ContractType> typeChoice = new DropDownChoice<ContractType>(fs.getDropDownChoiceId(),
+          new PropertyModel<ContractType>(data, "type"), typeChoiceRenderer.getValues(), typeChoiceRenderer);
+      typeChoice.setNullValid(false);
+      fs.add(typeChoice);
+    }
+    {
+      // Status
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("status"));
+      // DropDownChoice for convenient selection of time periods.
+      final LabelValueChoiceRenderer<String> statusChoiceRenderer = new LabelValueChoiceRenderer<String>();
+      for (final ContractStatus status : ContractStatus.values()) {
+        statusChoiceRenderer.addValue(status.name(), getString(status.getI18nKey()));
+      }
+      final DropDownChoice<String> statusChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(data,
+          "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
+      statusChoice.setNullValid(false);
+      fs.add(statusChoice);
 
-    // DropDownChoice type
-    final List<ContractType> contractTypes = ConfigXml.getInstance().getContractTypes();
-    final LabelValueChoiceRenderer<ContractType> typeChoiceRenderer = new LabelValueChoiceRenderer<ContractType>(contractTypes);
-    @SuppressWarnings("unchecked")
-    final DropDownChoice typeChoice = new DropDownChoice("type", new PropertyModel(data, "type"), typeChoiceRenderer.getValues(),
-        typeChoiceRenderer);
-    typeChoice.setNullValid(false);
-    add(typeChoice);
-
-    // DropDownChoice status
-    final LabelValueChoiceRenderer<ContractStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<ContractStatus>(this, ContractStatus
-        .values());
-    @SuppressWarnings("unchecked")
-    final DropDownChoice statusChoice = new DropDownChoice("status", new PropertyModel(data, "status"), statusChoiceRenderer.getValues(),
-        statusChoiceRenderer);
-    statusChoice.setNullValid(false);
-    statusChoice.setRequired(true);
-    add(statusChoice);
-
-    add(new MaxLengthTextArea("text", new PropertyModel<String>(data, "text")));
-    add(WicketUtils.getJIRASupportTooltipImage("jiraSupportTooltipImage", getResponse(), this));
-    add(new JiraIssuesPanel("jiraIssues", data.getText()));
-    add(new MaxLengthTextField("reference", new PropertyModel<String>(data, "reference")));
-    add(new MaxLengthTextField("filing", new PropertyModel<String>(data, "filing")));
-    resubmissionDatePanel = new DatePanel("resubmissionOnDate", new PropertyModel<Date>(data, "resubmissionOnDate"), DatePanelSettings
-        .get().withCallerPage(parentPage).withTargetType(java.sql.Date.class));
-    add(resubmissionDatePanel);
-    dueDatePanel = new DatePanel("dueDate", new PropertyModel<Date>(data, "dueDate"), DatePanelSettings.get().withCallerPage(parentPage)
-        .withTargetType(java.sql.Date.class));
-    add(dueDatePanel);
+    }
+    gridBuilder.newGrid8();
+    {
+      // Reference
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.reference"));
+      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "reference")));
+    }
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // Resubmission date
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("resubmissionOnDate"));
+      resubmissionDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "resubmissionOnDate"), DatePanelSettings.get()
+          .withTargetType(java.sql.Date.class));
+      fs.add(resubmissionDatePanel);
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // Due date
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("dueDate"));
+      dueDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "dueDate"), DatePanelSettings.get().withTargetType(
+          java.sql.Date.class));
+      fs.add(dueDatePanel);
+    }
+    gridBuilder.newBlockPanel();
+    {
+      // Signing date
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.signing"), getString("date"));
+      signingDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "signingDate"), DatePanelSettings.get()
+          .withTargetType(java.sql.Date.class));
+      fs.add(signingDatePanel);
+    }
+    {
+      // Validity
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.validity"), true);
+      validFromDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "validFrom"), DatePanelSettings.get()
+          .withTargetType(java.sql.Date.class));
+      fs.add(validFromDatePanel);
+      fs.add(new DivTextPanel(fs.newChildId(), "-"));
+      validUntilDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "validUntil"), DatePanelSettings.get()
+          .withTargetType(java.sql.Date.class));
+      fs.add(validUntilDatePanel);
+    }
+    /* GRID8 */
+    gridBuilder.newGrid8();
+    {
+      // CocontractorA
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.coContractorA"));
+      fs.add(createAutocompleteTextField("coContractorA"));
+    }
+    {
+      // CopersonA
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.contractPersonA"));
+      fs.add(createAutocompleteTextField("contractPersonA"));
+    }
+    {
+      // SignerA
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.signerA"));
+      fs.add(createAutocompleteTextField("signerA"));
+    }
+    /* GRID8 */
+    gridBuilder.newGrid8();
+    {
+      // CocontractorB
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.coContractorB"));
+      fs.add(createAutocompleteTextField("coContractorB"));
+    }
+    {
+      // CopersonB
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.contractPersonB"));
+      fs.add(createAutocompleteTextField("contractPersonB"));
+    }
+    {
+      // SignerB
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("legalAffaires.contract.signerB"));
+      fs.add(createAutocompleteTextField("signerB"));
+    }
+    /* GRID16 */
+    gridBuilder.newGrid16();
+    {
+      // Text with JIRA support
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("text"), true);
+      final IModel<String> model = new PropertyModel<String>(data, "text");
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, model));
+      fs.addJIRAField(model);
+    }
+    {
+      // Filing
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("filing"));
+      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "filing")));
+    }
   }
 
   @Override

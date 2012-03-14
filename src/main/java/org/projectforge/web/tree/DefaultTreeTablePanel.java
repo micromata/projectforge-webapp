@@ -29,9 +29,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.behavior.SimpleAttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.ContextImage;
@@ -40,7 +40,6 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.projectforge.web.fibu.ISelectCallerPage;
-import org.projectforge.web.wicket.AttributeAppendModifier;
 import org.projectforge.web.wicket.WicketAjaxUtils;
 import org.projectforge.web.wicket.WicketUtils;
 
@@ -137,9 +136,9 @@ public abstract class DefaultTreeTablePanel<T extends TreeTableNode> extends Pan
     for (final T node : treeList) {
       final WebMarkupContainer row = createTreeRow(node);
       if (counter++ % 2 == 0) {
-        row.add(new SimpleAttributeModifier("class", "even"));
+        row.add(AttributeModifier.replace("class", "even"));
       } else {
-        row.add(new SimpleAttributeModifier("class", "odd"));
+        row.add(AttributeModifier.replace("class", "odd"));
       }
     }
   }
@@ -161,7 +160,7 @@ public abstract class DefaultTreeTablePanel<T extends TreeTableNode> extends Pan
   {
     final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId(), new Model<TreeTableNode>(node));
     row.setOutputMarkupId(true);
-    row.add(new SimpleAttributeModifier("class", "even"));
+    row.add(AttributeModifier.replace("class", "even"));
     if (clickRows == true) {
       WicketUtils.addRowClick(row);
     }
@@ -174,7 +173,7 @@ public abstract class DefaultTreeTablePanel<T extends TreeTableNode> extends Pan
     final TreeIconsActionPanel< ? extends TreeTableNode> treeIconsActionPanel = createTreeIconsActionPanel(node);
     addColumn(row, treeIconsActionPanel, cssStyle);
     treeIconsActionPanel.init(this, node);
-    treeIconsActionPanel.add(new AttributeAppendModifier("style", new Model<String>("white-space: nowrap;")));
+    treeIconsActionPanel.add(AttributeModifier.append("style", new Model<String>("white-space: nowrap;")));
 
     addColumns(colBodyRepeater, cssStyle, node);
     return row;
@@ -188,7 +187,7 @@ public abstract class DefaultTreeTablePanel<T extends TreeTableNode> extends Pan
   protected void addColumn(final WebMarkupContainer parent, final Component component, final String cssStyle)
   {
     if (cssStyle != null) {
-      component.add(new AttributeAppendModifier("style", new Model<String>(cssStyle)));
+      component.add(AttributeModifier.append("style", new Model<String>(cssStyle)));
     }
     parent.add(component);
   }
@@ -217,7 +216,7 @@ public abstract class DefaultTreeTablePanel<T extends TreeTableNode> extends Pan
     return treeTable;
   }
 
-  public void setOpenNodes(Set<Serializable> openNodes)
+  public void setOpenNodes(final Set<Serializable> openNodes)
   {
     if (getTreeTable() != null && openNodes != null) {
       getTreeTable().setOpenNodes(openNodes);
@@ -229,12 +228,12 @@ public abstract class DefaultTreeTablePanel<T extends TreeTableNode> extends Pan
     return getTreeTable().getOpenNodes();
   }
 
-  protected WebMarkupContainer getTreeRow(final Serializable hashId)
+  protected Component getTreeRow(final Serializable hashId)
   {
     @SuppressWarnings("unchecked")
-    final Iterator<WebMarkupContainer> it = (Iterator<WebMarkupContainer>) rowRepeater.iterator();
+    final Iterator<Component> it = rowRepeater.iterator();
     while (it.hasNext() == true) {
-      final WebMarkupContainer child = it.next();
+      final Component child = it.next();
       final TreeTableNode node = (TreeTableNode) child.getDefaultModelObject();
       if (node.getHashId().equals(hashId) == true) {
         return child;
@@ -248,7 +247,7 @@ public abstract class DefaultTreeTablePanel<T extends TreeTableNode> extends Pan
    * @param hashId
    * @return
    */
-  protected WebMarkupContainer getTreeRowAfter(final Serializable hashId)
+  protected Component getTreeRowAfter(final Serializable hashId)
   {
     final TreeTableNode node = getTreeTable().getElementAfter(getTreeList(), hashId);
     if (node == null) {
@@ -258,9 +257,9 @@ public abstract class DefaultTreeTablePanel<T extends TreeTableNode> extends Pan
     }
   }
 
-  protected WebMarkupContainer removeTreeRow(final Serializable hashId)
+  protected Component removeTreeRow(final Serializable hashId)
   {
-    final WebMarkupContainer row = getTreeRow(hashId);
+    final Component row = getTreeRow(hashId);
     if (row != null) {
       treeTableBody.remove(row);
     }
@@ -293,13 +292,13 @@ public abstract class DefaultTreeTablePanel<T extends TreeTableNode> extends Pan
     if (log.isDebugEnabled() == true) {
       log.debug("setEvent: node=" + node.getHashId() + ", event=" + event + ", nodeStatus=" + node.getNodeStatus());
     }
-    final WebMarkupContainer currentRow = getTreeRow(node.getHashId());
+    final Component currentRow = getTreeRow(node.getHashId());
     final AbstractLink link = (AbstractLink) currentRow.get("c1:icons:folder");
     if (event == TreeTableEvent.OPEN || event == TreeTableEvent.EXPLORE) {
       final StringBuffer prependJavascriptBuf = new StringBuffer();
       {
         // Add all childs
-        final WebMarkupContainer row = getTreeRowAfter(node.getHashId());
+        final Component row = getTreeRowAfter(node.getHashId());
         refresh(); // Force to rebuild tree list.
         for (final T child : getTreeTable().getDescendants(getTreeList(), (T) node)) {
           final WebMarkupContainer newRow = createTreeRow(child);
@@ -318,23 +317,23 @@ public abstract class DefaultTreeTablePanel<T extends TreeTableNode> extends Pan
       }
       final String javaScript = prependJavascriptBuf.toString();
       if (javaScript.length() > 0) {
-        target.prependJavascript(javaScript);
+        target.prependJavaScript(javaScript);
       }
-      target.appendJavascript("updateEvenOdd();initTooltips();");
+      target.appendJavaScript("updateEvenOdd();initTooltips();");
     } else {
       // Remove all childs
       final StringBuffer prependJavascriptBuf = new StringBuffer();
-      final Iterator<WebMarkupContainer> it = (Iterator<WebMarkupContainer>) rowRepeater.iterator();
-      final List<WebMarkupContainer> toRemove = new ArrayList<WebMarkupContainer>();
+      final Iterator<Component> it = rowRepeater.iterator();
+      final List<Component> toRemove = new ArrayList<Component>();
       while (it.hasNext() == true) {
-        final WebMarkupContainer row = it.next();
+        final Component row = it.next();
         final TreeTableNode model = (TreeTableNode) row.getDefaultModelObject();
         if (node.isParentOf(model) == true) {
           prependJavascriptBuf.append(WicketAjaxUtils.removeChild(treeTableBody.getMarkupId(), row.getMarkupId()));
           toRemove.add(row);
         }
       }
-      for (final WebMarkupContainer row : toRemove) {
+      for (final Component row : toRemove) {
         rowRepeater.remove(row);
       }
       {
@@ -343,9 +342,9 @@ public abstract class DefaultTreeTablePanel<T extends TreeTableNode> extends Pan
       }
       final String javaScript = prependJavascriptBuf.toString();
       if (javaScript.length() > 0) {
-        target.prependJavascript(javaScript);
+        target.prependJavaScript(javaScript);
       }
-      target.appendJavascript("updateEvenOdd();");
+      target.appendJavaScript("updateEvenOdd();");
     }
   }
 
@@ -378,8 +377,8 @@ public abstract class DefaultTreeTablePanel<T extends TreeTableNode> extends Pan
   {
     return this.highlightedRowId;
   }
-  
-  public void setHighlightedRowId(Integer highlightedRowId)
+
+  public void setHighlightedRowId(final Integer highlightedRowId)
   {
     this.highlightedRowId = highlightedRowId;
     getTreeTable().openNode(highlightedRowId); // Open path to highlighted (preselected) node.

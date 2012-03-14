@@ -24,7 +24,7 @@
 package org.projectforge.web.fibu;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KontoDao;
@@ -42,7 +42,7 @@ public class KontoEditPage extends AbstractEditPage<KontoDO, KontoEditForm, Kont
   @SpringBean(name = "kontoDao")
   private KontoDao kontoDao;
 
-  public KontoEditPage(PageParameters parameters)
+  public KontoEditPage(final PageParameters parameters)
   {
     super(parameters, "fibu.konto");
     init();
@@ -55,7 +55,7 @@ public class KontoEditPage extends AbstractEditPage<KontoDO, KontoEditForm, Kont
   }
 
   @Override
-  protected KontoEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, KontoDO data)
+  protected KontoEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final KontoDO data)
   {
     return new KontoEditForm(this, data);
   }

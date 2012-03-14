@@ -26,13 +26,14 @@ package org.projectforge.web.user;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.user.UserPrefAreaRegistry;
@@ -45,6 +46,7 @@ import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.WicketUtils;
 
 @ListPage(editPage = UserPrefEditPage.class)
 public class UserPrefListPage extends AbstractListPage<UserPrefListForm, UserPrefDao, UserPrefDO>
@@ -68,7 +70,7 @@ public class UserPrefListPage extends AbstractListPage<UserPrefListForm, UserPre
   public UserPrefListPage(final PageParameters parameters)
   {
     super(parameters, "user.pref");
-    final String area = parameters.getString("area");
+    final String area = WicketUtils.getAsString(parameters, "area");
     if (area != null) {
       final UserPrefArea userPrefArea = UserPrefAreaRegistry.instance().getEntry(area);
       form.getSearchFilter().setArea(userPrefArea);
@@ -88,11 +90,14 @@ public class UserPrefListPage extends AbstractListPage<UserPrefListForm, UserPre
     };
     columns.add(new CellItemListenerPropertyColumn<UserPrefDO>(new Model<String>(getString("user.pref.area")), "area", "area",
         cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<UserPrefDO>> item, final String componentId, final IModel<UserPrefDO> rowModel)
       {
-        final UserPrefDO userPref = (UserPrefDO) rowModel.getObject();
+        final UserPrefDO userPref = rowModel.getObject();
         final String label;
         if (userPref.getArea() != null) {
           label = getString(userPref.getArea().getI18nKey());
@@ -110,7 +115,7 @@ public class UserPrefListPage extends AbstractListPage<UserPrefListForm, UserPre
         .withUserFormatter(userFormatter));
     columns.add(new CellItemListenerPropertyColumn<UserPrefDO>(new Model<String>(getString("filter.lastModified")), "lastUpdate",
         "lastUpdate", cellItemListener));
-    dataTable = createDataTable(columns, null, false);
+    dataTable = createDataTable(columns, null, SortOrder.DESCENDING);
     form.add(dataTable);
   }
 

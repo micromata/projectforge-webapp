@@ -28,13 +28,14 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KostFormatter;
@@ -55,6 +56,7 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.WicketUtils;
 import org.springframework.util.CollectionUtils;
 
 @ListPage(editPage = AccountingRecordEditPage.class)
@@ -97,9 +99,9 @@ IListPageColumnsCreator<BuchungssatzDO>
   public static PageParameters getPageParameters(final String reportId, final String businessAssessmentRowNo)
   {
     final PageParameters params = new PageParameters();
-    params.put(PARAM_KEY_REPORT_ID, reportId);
+    params.add(PARAM_KEY_REPORT_ID, reportId);
     if (businessAssessmentRowNo != null) {
-      params.put(PARAM_KEY_BUSINESS_ASSESSMENT_ROW_ID, businessAssessmentRowNo);
+      params.add(PARAM_KEY_BUSINESS_ASSESSMENT_ROW_ID, businessAssessmentRowNo);
     }
     return params;
   }
@@ -112,8 +114,8 @@ IListPageColumnsCreator<BuchungssatzDO>
   @Override
   protected void setup()
   {
-    reportId = getPageParameters().getString(PARAM_KEY_REPORT_ID);
-    businessAssessmentRowId = getPageParameters().getString(PARAM_KEY_BUSINESS_ASSESSMENT_ROW_ID);
+    reportId = WicketUtils.getAsString(getPageParameters(), PARAM_KEY_REPORT_ID);
+    businessAssessmentRowId = WicketUtils.getAsString(getPageParameters(), PARAM_KEY_BUSINESS_ASSESSMENT_ROW_ID);
     if (reportId != null) {
       storeFilter = false;
     }
@@ -123,7 +125,7 @@ IListPageColumnsCreator<BuchungssatzDO>
   protected void init()
   {
     final List<IColumn<BuchungssatzDO>> columns = createColumns(this, true);
-    dataTable = createDataTable(columns, "formattedSatzNummer", true);
+    dataTable = createDataTable(columns, "formattedSatzNummer", SortOrder.ASCENDING);
     form.add(dataTable);
   }
 
@@ -133,18 +135,19 @@ IListPageColumnsCreator<BuchungssatzDO>
   {
     final List<IColumn<BuchungssatzDO>> columns = new ArrayList<IColumn<BuchungssatzDO>>();
     final CellItemListener<BuchungssatzDO> cellItemListener = new CellItemListener<BuchungssatzDO>() {
-      public void populateItem(final Item<ICellPopulator<BuchungssatzDO>> item, final String componentId, final IModel<BuchungssatzDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<BuchungssatzDO>> item, final String componentId,
+          final IModel<BuchungssatzDO> rowModel)
       {
         final BuchungssatzDO satz = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(satz.getId(), satz.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
     columns.add(new CellItemListenerPropertyColumn<BuchungssatzDO>(new Model<String>(getString("fibu.buchungssatz.satznr")),
         "formattedSatzNummer", "formattedSatzNummer", cellItemListener) {
-      @SuppressWarnings({"unchecked", "rawtypes"})
+      @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
@@ -249,7 +252,11 @@ IListPageColumnsCreator<BuchungssatzDO>
               if (row != null) {
                 list = row.getAccountRecords();
               } else {
-                log.info("Business assessment row " + businessAssessmentRowId + " not found for report with id '" + reportId + "' in existing ReportStorage.");
+                log.info("Business assessment row "
+                    + businessAssessmentRowId
+                    + " not found for report with id '"
+                    + reportId
+                    + "' in existing ReportStorage.");
               }
             } else {
               list = report.getBuchungssaetze();
@@ -272,7 +279,14 @@ IListPageColumnsCreator<BuchungssatzDO>
       return list;
     }
     return list;
+  }
 
+  /**
+   * @return the businessAssessment
+   */
+  BusinessAssessment getBusinessAssessment()
+  {
+    return businessAssessment;
   }
 
   @Override

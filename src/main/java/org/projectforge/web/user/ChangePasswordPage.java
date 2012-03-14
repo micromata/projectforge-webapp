@@ -24,7 +24,7 @@
 package org.projectforge.web.user;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -32,12 +32,14 @@ import org.projectforge.web.wicket.MessagePage;
 
 public class ChangePasswordPage extends AbstractSecuredPage
 {
+  private static final long serialVersionUID = -2506732790809310722L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ChangePasswordPage.class);
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
-  private ChangePasswordForm form;
+  private final ChangePasswordForm form;
 
   public ChangePasswordPage(final PageParameters parameters)
   {

@@ -28,7 +28,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters.NamedPair;
 
 /**
  * Stores the recent called mobile page including it's parameters. So after re-login through the mobile client the user is redirected to his
@@ -56,7 +57,7 @@ public class RecentMobilePageInfo implements Serializable
     this.pageClass = page.getClass();
     if (page.getPageParameters() != null) {
       pageParameters = new HashMap<String, Object>();
-      for (final Entry<String, Object> entry : page.getPageParameters().entrySet()) {
+      for (final NamedPair entry : page.getPageParameters().getAllNamed()) {
         final Object value = entry.getValue();
         if (value == null) {
           continue;
@@ -80,7 +81,7 @@ public class RecentMobilePageInfo implements Serializable
     }
     final PageParameters params = new PageParameters();
     for (final Entry<String, Object> entry : pageParameters.entrySet()) {
-      params.put(entry.getKey(), entry.getValue());
+      params.add(entry.getKey(), entry.getValue());
     }
     return params;
   }

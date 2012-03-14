@@ -27,14 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.OperationType;
 import org.projectforge.user.GroupDO;
@@ -72,22 +73,26 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
   {
     final List<IColumn<GroupDO>> columns = new ArrayList<IColumn<GroupDO>>();
     final CellItemListener<GroupDO> cellItemListener = new CellItemListener<GroupDO>() {
-      public void populateItem(Item<ICellPopulator<GroupDO>> item, String componentId, IModel<GroupDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<GroupDO>> item, final String componentId, final IModel<GroupDO> rowModel)
       {
         final GroupDO group = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(group.getId(), group.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("name")), getSortable("name", sortable), "name", cellItemListener) {
-      @SuppressWarnings("unchecked")
+    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("name")), getSortable("name", sortable), "name",
+        cellItemListener) {
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<GroupDO>> item, final String componentId, final IModel<GroupDO> rowModel)
       {
         final boolean updateAccess = groupDao.hasLoggedInUserAccess(null, null, OperationType.UPDATE, false);
-        final GroupDO group = (GroupDO) rowModel.getObject();
+        final GroupDO group = rowModel.getObject();
         if (isSelectMode() == true) {
           item.add(new ListSelectActionPanel(componentId, rowModel, caller, selectProperty, group.getId(), group.getName()));
           addRowClick(item);
@@ -100,24 +105,24 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("organization")), getSortable("organization", sortable), "organization",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("description")), getSortable("description", sortable), "description",
-        cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("group.assignedUsers")), getSortable("usernames", sortable), "usernames",
-        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("organization")), getSortable("organization",
+        sortable), "organization", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("description")), getSortable("description",
+        sortable), "description", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<GroupDO>(new Model<String>(getString("group.assignedUsers")), getSortable("usernames",
+        sortable), "usernames", cellItemListener));
     return columns;
   }
 
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "name", true);
+    dataTable = createDataTable(createColumns(this, true), "name", SortOrder.ASCENDING);
     form.add(dataTable);
   }
 
   @Override
-  protected GroupListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected GroupListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new GroupListForm(this);
   }
@@ -129,7 +134,7 @@ public class GroupListPage extends AbstractListPage<GroupListForm, GroupDao, Gro
   }
 
   @Override
-  protected IModel<GroupDO> getModel(GroupDO object)
+  protected IModel<GroupDO> getModel(final GroupDO object)
   {
     return new DetachableDOModel<GroupDO, GroupDao>(object, getBaseDao());
   }

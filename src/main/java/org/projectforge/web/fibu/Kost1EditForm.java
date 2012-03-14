@@ -31,12 +31,15 @@ import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.KostentraegerStatus;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.FocusOnLoadBehavior;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMinMaxNumberField;
 import org.projectforge.web.wicket.converter.IntegerConverter;
-
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class Kost1EditForm extends AbstractEditForm<Kost1DO, Kost1EditPage>
 {
@@ -44,18 +47,11 @@ public class Kost1EditForm extends AbstractEditForm<Kost1DO, Kost1EditPage>
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(Kost1EditForm.class);
 
-  protected TextField<Integer> nummernkreisField;
+  protected TextField<Integer> nummernkreisField, bereichField, teilbereichField, endzifferField;
 
-  protected TextField<Integer> bereichField;
-
-  protected TextField<Integer> teilbereichField;
-
-  protected TextField<Integer> endzifferField;
-
-  public Kost1EditForm(Kost1EditPage parentPage, Kost1DO data)
+  public Kost1EditForm(final Kost1EditPage parentPage, final Kost1DO data)
   {
     super(parentPage, data);
-    this.colspan = 6;
   }
 
   @Override
@@ -63,45 +59,70 @@ public class Kost1EditForm extends AbstractEditForm<Kost1DO, Kost1EditPage>
   protected void init()
   {
     super.init();
-
-    nummernkreisField = new RequiredMinMaxNumberField<Integer>("nummernkreis", new PropertyModel<Integer>(data, "nummernkreis"), 0, 9);
-    nummernkreisField.add(new FocusOnLoadBehavior());
-    add(nummernkreisField);
-    bereichField = new RequiredMinMaxNumberField<Integer>("bereich", new PropertyModel<Integer>(data, "bereich"), 0, 999) {
-      @Override
-      public IConverter getConverter(Class< ? > type)
-      {
-        return new IntegerConverter(3);
+    /* GRID16 - BLOCK */
+    gridBuilder.newGrid16();
+    {
+      // Number range
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost.kostentraeger"), true);
+      nummernkreisField = new RequiredMinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "nummernkreis"), 0,
+          9);
+      if (isNew() == true) {
+        WicketUtils.setFocus(nummernkreisField);
       }
-    };
-    add(bereichField);
-    teilbereichField = new RequiredMinMaxNumberField<Integer>("teilbereich", new PropertyModel<Integer>(data, "teilbereich"), 0, 99) {
-      @Override
-      public IConverter getConverter(Class< ? > type)
-      {
-        return new IntegerConverter(2);
-      }
-    };
-    add(teilbereichField);
-    endzifferField = new RequiredMinMaxNumberField<Integer>("endziffer", new PropertyModel<Integer>(data, "endziffer"), 0, 99) {
-      @Override
-      public IConverter getConverter(Class< ? > type)
-      {
-        return new IntegerConverter(2);
-      }
-    };
-    endzifferField.setRequired(true);
-    add(endzifferField);
-    add(new MaxLengthTextArea("description", new PropertyModel<String>(data, "description")));
-    // DropDownChoice status
-    final LabelValueChoiceRenderer<KostentraegerStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<KostentraegerStatus>(this,
-        KostentraegerStatus.values());
-    @SuppressWarnings("unchecked")
-    final DropDownChoice statusChoice = new DropDownChoice("kostentraegerStatus", new PropertyModel(data, "kostentraegerStatus"),
-        statusChoiceRenderer.getValues(), statusChoiceRenderer);
-    statusChoice.setNullValid(false);
-    statusChoice.setRequired(true);
-    add(statusChoice);
+      WicketUtils.setSize(nummernkreisField, 1);
+      fs.add(nummernkreisField);
+      fs.add(new DivTextPanel(fs.newChildId(), "."));
+      bereichField = new RequiredMinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "bereich"), 0, 999) {
+        @SuppressWarnings({ "rawtypes", "unchecked"})
+        @Override
+        public IConverter getConverter(final Class type)
+        {
+          return new IntegerConverter(3);
+        }
+      };
+      WicketUtils.setSize(bereichField, 3);
+      fs.add(bereichField);
+      fs.add(new DivTextPanel(fs.newChildId(), "."));
+      teilbereichField = new RequiredMinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "teilbereich"), 0,
+          99) {
+        @SuppressWarnings({ "rawtypes", "unchecked"})
+        @Override
+        public IConverter getConverter(final Class type)
+        {
+          return new IntegerConverter(2);
+        }
+      };
+      WicketUtils.setSize(teilbereichField, 2);
+      fs.add(teilbereichField);
+      fs.add(new DivTextPanel(fs.newChildId(), "."));
+      endzifferField = new RequiredMinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data, "endziffer"), 0, 99) {
+        @SuppressWarnings({ "rawtypes", "unchecked"})
+        @Override
+        public IConverter getConverter(final Class type)
+        {
+          return new IntegerConverter(2);
+        }
+      };
+      endzifferField.setRequired(true);
+      WicketUtils.setSize(endzifferField, 2);
+      fs.add(endzifferField);
+    }
+    {
+      // Description
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "description")));
+    }
+    {
+      // DropDownChoice status
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("status"));
+      final LabelValueChoiceRenderer<KostentraegerStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<KostentraegerStatus>(this,
+          KostentraegerStatus.values());
+      final DropDownChoice<KostentraegerStatus> statusChoice = new DropDownChoice<KostentraegerStatus>(fs.getDropDownChoiceId(),
+          new PropertyModel<KostentraegerStatus>(data, "kostentraegerStatus"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
+      statusChoice.setNullValid(false);
+      statusChoice.setRequired(true);
+      fs.add(statusChoice);
+    }
   }
 
   @Override

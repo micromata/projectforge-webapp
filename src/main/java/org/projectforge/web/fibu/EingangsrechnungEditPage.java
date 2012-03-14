@@ -25,14 +25,13 @@ package org.projectforge.web.fibu;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.calendar.DayHolder;
-import org.projectforge.common.StringHelper;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungDao;
 import org.projectforge.fibu.EingangsrechnungsPositionDO;
@@ -41,7 +40,7 @@ import org.projectforge.web.wicket.EditPage;
 
 @EditPage(defaultReturnPage = EingangsrechnungListPage.class)
 public class EingangsrechnungEditPage extends AbstractEditPage<EingangsrechnungDO, EingangsrechnungEditForm, EingangsrechnungDao> implements
-    ISelectCallerPage
+ISelectCallerPage
 {
   private static final long serialVersionUID = 6847624027377867591L;
 
@@ -50,11 +49,18 @@ public class EingangsrechnungEditPage extends AbstractEditPage<EingangsrechnungD
   @SpringBean(name = "eingangsrechnungDao")
   private EingangsrechnungDao eingangsrechnungDao;
 
-  public EingangsrechnungEditPage(PageParameters parameters)
+  public EingangsrechnungEditPage(final PageParameters parameters)
   {
     super(parameters, "fibu.eingangsrechnung");
     init();
     getData().recalculate(); // Muss immer gemacht werden, damit das Zahlungsziel in Tagen berechnet wird.
+  }
+
+  @Override
+  public void renderHead(final IHeaderResponse response)
+  {
+    super.renderHead(response);
+    response.renderCSSReference("styles/table.css");
   }
 
   @Override
@@ -64,7 +70,7 @@ public class EingangsrechnungEditPage extends AbstractEditPage<EingangsrechnungD
   }
 
   @Override
-  protected EingangsrechnungEditForm newEditForm(AbstractEditPage< ? , ? , ? > parentPage, EingangsrechnungDO data)
+  protected EingangsrechnungEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final EingangsrechnungDO data)
   {
     return new EingangsrechnungEditForm(this, data);
   }
@@ -100,33 +106,17 @@ public class EingangsrechnungEditPage extends AbstractEditPage<EingangsrechnungD
     form.cloneButtonPanel.setVisible(false);
   }
 
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
     // Do nothing.
   }
 
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
-    if (StringHelper.isIn(property, "datum", "faelligkeit", "bezahlDatum") == true) {
-      final Date date = (Date) selectedValue;
-      final java.sql.Date sqlDate = new java.sql.Date(date.getTime());
-      if ("datum".equals(property) == true) {
-        getData().setDatum(sqlDate);
-        form.datumPanel.markModelAsChanged();
-      } else if ("faelligkeit".equals(property) == true) {
-        getData().setFaelligkeit(sqlDate);
-        form.faelligkeitPanel.markModelAsChanged();
-      } else if ("bezahlDatum".equals(property) == true) {
-        getData().setBezahlDatum(sqlDate);
-        form.bezahlDatumPanel.markModelAsChanged();
-      }
-      getData().recalculate();
-    } else {
-      log.error("Property '" + property + "' not supported for selection.");
-    }
+    log.error("Property '" + property + "' not supported for selection.");
   }
 
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     log.error("Property '" + property + "' not supported for selection.");
   }

@@ -29,11 +29,14 @@ import org.apache.wicket.model.PropertyModel;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KontoStatus;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.FocusOnLoadBehavior;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class KontoEditForm extends AbstractEditForm<KontoDO, KontoEditPage>
 {
@@ -44,34 +47,50 @@ public class KontoEditForm extends AbstractEditForm<KontoDO, KontoEditPage>
   public KontoEditForm(final KontoEditPage parentPage, final KontoDO data)
   {
     super(parentPage, data);
-    this.colspan = 2;
   }
 
   @Override
   protected void init()
   {
     super.init();
-    final MinMaxNumberField<Integer> nummerField = new MinMaxNumberField<Integer>("nummer", new PropertyModel<Integer>(data, "nummer"), 0,
-        99999999);
-    add(nummerField);
-    // DropDownChoice status
-    final LabelValueChoiceRenderer<KontoStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<KontoStatus>(this, KontoStatus.values());
-    @SuppressWarnings("unchecked")
-    final DropDownChoice statusChoice = new DropDownChoice("status", new PropertyModel(data, "status"), statusChoiceRenderer.getValues(),
-        statusChoiceRenderer);
-    statusChoice.setNullValid(true);
-    statusChoice.setRequired(false);
-    add(statusChoice);
-    final RequiredMaxLengthTextField nameField = new RequiredMaxLengthTextField("identifier",
-        new PropertyModel<String>(data, "bezeichnung"));
-    add(nameField);
-    if (isNew() == true) {
-      nummerField.add(new FocusOnLoadBehavior());
-    } else {
-      nummerField.setEnabled(false);
-      nameField.add(new FocusOnLoadBehavior());
+    /* GRID16 - BLOCK */
+    gridBuilder.newGrid16();
+    {
+      // Number
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.konto.nummer"));
+      final MinMaxNumberField<Integer> nummerField = new MinMaxNumberField<Integer>(InputPanel.WICKET_ID, new PropertyModel<Integer>(data,
+          "nummer"), 0, 99999999);
+      fs.add(nummerField);
+      if (isNew() == true) {
+        WicketUtils.setFocus(nummerField);
+      }
     }
-    add(new MaxLengthTextArea("description", new PropertyModel<String>(data, "description")));
+    {
+      // DropDownChoice status
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("status"));
+      final LabelValueChoiceRenderer<KontoStatus> statusChoiceRenderer = new LabelValueChoiceRenderer<KontoStatus>(this,
+          KontoStatus.values());
+      final DropDownChoice<KontoStatus> statusChoice = new DropDownChoice<KontoStatus>(fs.getDropDownChoiceId(),
+          new PropertyModel<KontoStatus>(data, "status"), statusChoiceRenderer.getValues(), statusChoiceRenderer);
+      statusChoice.setNullValid(true);
+      statusChoice.setRequired(false);
+      fs.add(statusChoice);
+    }
+    {
+      // Identifier
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.konto.bezeichnung"));
+      final RequiredMaxLengthTextField identifier = new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data,
+          "bezeichnung"));
+      fs.add(identifier);
+      if (isNew() == false) {
+        WicketUtils.setFocus(identifier);
+      }
+    }
+    {
+      // Description
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
+      fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "description")));
+    }
   }
 
   @Override

@@ -27,7 +27,8 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.wicket.AbstractListForm;
-
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class UserPrefListForm extends AbstractListForm<UserPrefListFilter, UserPrefListPage>
 {
@@ -39,13 +40,23 @@ public class UserPrefListForm extends AbstractListForm<UserPrefListFilter, UserP
   protected void init()
   {
     super.init();
-    // DropDownChoice area
-    final DropDownChoice<UserPrefArea> areaDropDownChoice = UserPrefEditForm.createAreaDropdownChoice(this, "areaChoice",
-        getSearchFilter(), "area", true);
-    filterContainer.add(areaDropDownChoice);
+    gridBuilder.newColumnsPanel();
+    {
+      gridBuilder.newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"));
+      // DropDownChoice area
+      final DropDownChoice<UserPrefArea> areaDropDownChoice = UserPrefEditForm.createAreaDropdownChoice(this, fs.getDropDownChoiceId(),
+          getSearchFilter(), "area", true);
+      fs.add(areaDropDownChoice);
+    }
+    {
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      addPageSizeFieldset();
+    }
   }
 
-  public UserPrefListForm(UserPrefListPage parentPage)
+  public UserPrefListForm(final UserPrefListPage parentPage)
   {
     super(parentPage);
   }

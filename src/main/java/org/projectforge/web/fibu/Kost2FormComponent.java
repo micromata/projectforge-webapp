@@ -40,7 +40,6 @@ import org.projectforge.fibu.kost.Kost2Dao;
 import org.projectforge.fibu.kost.KostFilter;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 
-
 public class Kost2FormComponent extends PFAutoCompleteTextField<Kost2DO>
 {
   private static final long serialVersionUID = 8411456751099783863L;
@@ -75,7 +74,7 @@ public class Kost2FormComponent extends PFAutoCompleteTextField<Kost2DO>
       setRequired(true);
       add(new AbstractValidator<Kost2DO>() {
         @Override
-        protected void onValidate(IValidatable<Kost2DO> validatable)
+        protected void onValidate(final IValidatable<Kost2DO> validatable)
         {
           final Kost2DO value = validatable.getValue();
           if (value == null) {
@@ -100,6 +99,7 @@ public class Kost2FormComponent extends PFAutoCompleteTextField<Kost2DO>
     enableTooltips();
   }
 
+  @Override
   protected String getTooltip()
   {
     final Kost2DO kost2 = getModelObject();
@@ -110,7 +110,7 @@ public class Kost2FormComponent extends PFAutoCompleteTextField<Kost2DO>
   }
 
   @Override
-  protected List<Kost2DO> getChoices(String input)
+  protected List<Kost2DO> getChoices(final String input)
   {
     final KostFilter filter = new KostFilter();
     filter.setSearchString(input);
@@ -126,7 +126,7 @@ public class Kost2FormComponent extends PFAutoCompleteTextField<Kost2DO>
   }
 
   @Override
-  protected String formatValue(Kost2DO value)
+  protected String formatValue(final Kost2DO value)
   {
     if (value == null) {
       return "";
@@ -135,7 +135,7 @@ public class Kost2FormComponent extends PFAutoCompleteTextField<Kost2DO>
   }
 
   @Override
-  protected String formatLabel(Kost2DO value)
+  protected String formatLabel(final Kost2DO value)
   {
     if (value == null) {
       return "";
@@ -144,7 +144,7 @@ public class Kost2FormComponent extends PFAutoCompleteTextField<Kost2DO>
   }
 
   @Override
-  public IConverter getConverter(Class< ? > type)
+  public IConverter getConverter(final Class type)
   {
     return new Kost2Converter();
   }
