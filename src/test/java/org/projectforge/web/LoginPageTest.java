@@ -23,8 +23,8 @@
 
 package org.projectforge.web;
 
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.WicketRuntimeException;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.tester.FormTester;
 import org.junit.Assert;
 import org.junit.Test;
