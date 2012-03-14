@@ -141,7 +141,7 @@ public abstract class AbstractPlugin
   protected AbstractPlugin addResourceBundle(final String resourceBundleName)
   {
     this.resourceBundleName = resourceBundleName;
-    resourceSettings.addStringResourceLoader(0, new BundleStringResourceLoader(resourceBundleName));
+    resourceSettings.getStringResourceLoaders().add(new BundleStringResourceLoader(resourceBundleName));
     return this;
   }
 
