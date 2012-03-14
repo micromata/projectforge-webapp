@@ -6,7 +6,7 @@
   <bean id="log4jInit" class="org.projectforge.core.Log4Jinitialization">
     <property name="configLocations">
       <list>
-        <value>/WEB-INF/classes/log4j.properties</value>
+        <value>classpath*:log4j.properties</value>
       </list>
     </property>
     <property name="configProperties">
@@ -15,7 +15,7 @@
       </props>
     </property>
   </bean>
-  <!--bean id="debugging" class="de.micromata.printing.common.DebuggingWebAttribute" /-->
+  <!--bean id="debugging" class="de.micromata.printing.common.DebuggingWebAttribute" / -->
   <!-- Sample database -->
   <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
     <property name="jndiName" value="java:comp/env/jdbc/ProjectForgeDS" />
@@ -43,7 +43,7 @@
         <prop key="hibernate.cache.use_second_level_cache">true</prop>
         <prop key="hibernate.cache.provider_class">net.sf.ehcache.hibernate.SingletonEhCacheProvider</prop>
         <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.SingletonEhCacheRegionFactory</prop>
-        <prop key="hibernate.connection.driver_class">org.postgresql.Driver</prop> <!--  Overwritten by context.xml. -->
+        <prop key="hibernate.connection.driver_class">org.postgresql.Driver</prop> <!-- Overwritten by context.xml. -->
         <prop key="hibernate.jdbc.batch_size">50</prop>
         <prop key="hibernate.jdbc.fetch_size">200</prop>
         <prop key="hibernate.search.default.directory_provider">org.hibernate.search.store.FSDirectoryProvider</prop>
@@ -68,18 +68,14 @@
     <property name="entityInterceptor">
       <ref bean="hibernateHistoryInterceptor" />
     </property>
-    <property name="eventListeners">
-      <map>
-        <entry key="post-update" value-ref="luceneListener" />
-        <entry key="post-insert" value-ref="luceneListener" />
-        <entry key="post-delete" value-ref="luceneListener" />
-        <!--
-          entry key="post-collection-recreate" value-ref="luceneListener" /> <entry key="post-collection-remove" value-ref="luceneListener" /> <entry
-          key="post-collection-update" value-ref="luceneListener" /
-        -->
-      </map>
-    </property>
+    <!-- <property name="eventListeners"> -->
+    <!-- <map> -->
+    <!-- <entry key="post-update" value-ref="luceneListener" /> -->
+    <!-- <entry key="post-insert" value-ref="luceneListener" /> -->
+    <!-- <entry key="post-delete" value-ref="luceneListener" /> -->
+    <!-- </map> -->
+    <!-- </property> -->
   </bean>
 
-  <bean id="luceneListener" class="org.hibernate.search.event.FullTextIndexEventListener" />
+  <!-- <bean id="luceneListener" class="org.hibernate.search.event.FullTextIndexEventListener" /> -->
 </beans>
