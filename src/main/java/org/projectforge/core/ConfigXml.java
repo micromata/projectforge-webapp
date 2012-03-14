@@ -224,6 +224,19 @@ public class ConfigXml
     reset();
   }
 
+  private boolean ensureDir(final File dir)
+  {
+    if (dir.exists() == false) {
+      log.info("Creating directory " + dir);
+      dir.mkdir();
+    }
+    if (dir.canRead() == false) {
+      log.fatal("Can't create directory: " + applicationHomeDir);
+      return false;
+    }
+    return true;
+  }
+
   /**
    * Loads the configuration file config.xml from the application's home dir if given, otherwise the default values will be assumed.
    * Constructor is used by Spring instantiation.
@@ -231,20 +244,14 @@ public class ConfigXml
   public ConfigXml(final String applicationHomeDir)
   {
     this.applicationHomeDir = applicationHomeDir;
-    File dir = new File(this.applicationHomeDir);
-    if (dir.exists() == false) {
-      log.fatal("Application's home directory does not exist: " + applicationHomeDir);
-    }
-    readConfiguration();
-    this.workingDirectory = FileHelper.getAbsolutePath(applicationHomeDir, this.workingDirectory);
-    dir = new File(workingDirectory);
-    if (dir.exists() == false) {
-      log.fatal("Application's working directory does not exist: " + workingDirectory);
-    }
-    this.tempDirectory = FileHelper.getAbsolutePath(applicationHomeDir, this.tempDirectory);
-    dir = new File(tempDirectory);
-    if (dir.exists() == false) {
-      log.fatal("Application's temporary directory does not exist: " + tempDirectory);
+    final File dir = new File(this.applicationHomeDir);
+    final boolean status = ensureDir(dir);
+    if (status == true) {
+      readConfiguration();
+      this.workingDirectory = FileHelper.getAbsolutePath(applicationHomeDir, this.workingDirectory);
+      ensureDir(new File(workingDirectory));
+      this.tempDirectory = FileHelper.getAbsolutePath(applicationHomeDir, this.tempDirectory);
+      ensureDir(new File(tempDirectory));
     }
     setupKeyStores();
     if (menuConfig != null) {
@@ -339,8 +346,7 @@ public class ConfigXml
       projectforgesSSLSocketFactory = createSSLSocketFactory(is, "changeit");
       log.info("Keystore successfully read from class path: " + filename);
     } catch (final Throwable ex) {
-      log
-      .error("Could not initialize key store. Therefore the update pages of www.projectforge.org are not available (see error message below)!");
+      log.error("Could not initialize key store. Therefore the update pages of www.projectforge.org are not available (see error message below)!");
       log.error(ex.getMessage(), ex);
     }
     if (getKeystoreFile() != null) {
