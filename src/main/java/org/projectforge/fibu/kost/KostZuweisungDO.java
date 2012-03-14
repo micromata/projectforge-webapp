@@ -60,8 +60,8 @@ import org.projectforge.fibu.RechnungsPositionDO;
     @UniqueConstraint(columnNames = { "index", "rechnungs_pos_fk", "kost1_fk", "kost2_fk"}),
     @UniqueConstraint(columnNames = { "index", "eingangsrechnungs_pos_fk", "kost1_fk", "kost2_fk"}),
     @UniqueConstraint(columnNames = { "index", "employee_salary_fk", "kost1_fk", "kost2_fk"})})
-    public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCapable
-    {
+public class KostZuweisungDO extends DefaultBaseDO implements ShortDisplayNameCapable
+{
   private static final long serialVersionUID = 7680349296575044993L;
 
   private short index;
@@ -88,7 +88,8 @@ import org.projectforge.fibu.RechnungsPositionDO;
   private String comment;
 
   /**
-   * Die Kostzuweisungen sind als Array organisiert. Dies stellt den Index der Kostzuweisung dar. Der Index ist für Gehaltszahlungen ohne Belang.
+   * Die Kostzuweisungen sind als Array organisiert. Dies stellt den Index der Kostzuweisung dar. Der Index ist für Gehaltszahlungen ohne
+   * Belang.
    * @return
    */
   @Column
@@ -108,9 +109,14 @@ import org.projectforge.fibu.RechnungsPositionDO;
     return netto;
   }
 
-  public void setNetto(final BigDecimal netto)
+  /**
+   * @param netto
+   * @return this for chaining.
+   */
+  public KostZuweisungDO setNetto(final BigDecimal netto)
   {
     this.netto = netto;
+    return this;
   }
 
   /**
@@ -140,9 +146,14 @@ import org.projectforge.fibu.RechnungsPositionDO;
     return kost1;
   }
 
-  public void setKost1(final Kost1DO kost1)
+  /**
+   * @param kost1
+   * @return this for chaining.
+   */
+  public KostZuweisungDO setKost1(final Kost1DO kost1)
   {
     this.kost1 = kost1;
+    return this;
   }
 
   @Transient
@@ -160,9 +171,14 @@ import org.projectforge.fibu.RechnungsPositionDO;
     return kost2;
   }
 
-  public void setKost2(final Kost2DO kost2)
+  /**
+   * @param kost2
+   * @return this for chaining.
+   */
+  public KostZuweisungDO setKost2(final Kost2DO kost2)
   {
     this.kost2 = kost2;
+    return this;
   }
 
   @Transient
@@ -183,13 +199,15 @@ import org.projectforge.fibu.RechnungsPositionDO;
   /**
    * @throws IllegalStateException if eingangsRechnung or employeeSalary is already given.
    * @param rechnungsPosition
+   * @return this for chaining.
    */
-  public void setRechnungsPosition(final RechnungsPositionDO rechnungsPosition)
+  public KostZuweisungDO setRechnungsPosition(final RechnungsPositionDO rechnungsPosition)
   {
     if (rechnungsPosition != null && (this.eingangsrechnungsPosition != null || this.employeeSalary != null)) {
       throw new IllegalStateException("eingangsRechnung or employeeSalary already given!");
     }
     this.rechnungsPosition = rechnungsPosition;
+    return this;
   }
 
   @Transient
@@ -210,13 +228,15 @@ import org.projectforge.fibu.RechnungsPositionDO;
   /**
    * @throws IllegalStateException if rechnung or employeeSalary is already given.
    * @param eingangsrechnung
+   * @return this for chaining.
    */
-  public void setEingangsrechnungsPosition(final EingangsrechnungsPositionDO eingangsrechnungsPosition)
+  public KostZuweisungDO setEingangsrechnungsPosition(final EingangsrechnungsPositionDO eingangsrechnungsPosition)
   {
     if (eingangsrechnungsPosition != null && (this.rechnungsPosition != null || this.employeeSalary != null)) {
       throw new IllegalStateException("rechnungsPosition or employeeSalary already given!");
     }
     this.eingangsrechnungsPosition = eingangsrechnungsPosition;
+    return this;
   }
 
   @Transient
@@ -237,13 +257,15 @@ import org.projectforge.fibu.RechnungsPositionDO;
   /**
    * @throws IllegalStateException if rechnung or eingangsRechnung is already given.
    * @param employeeSalary
+   * @return this for chaining.
    */
-  public void setEmployeeSalary(final EmployeeSalaryDO employeeSalary)
+  public KostZuweisungDO setEmployeeSalary(final EmployeeSalaryDO employeeSalary)
   {
     if (employeeSalary != null && (this.eingangsrechnungsPosition != null || this.rechnungsPosition != null)) {
       throw new IllegalStateException("eingangsRechnung or rechnungsPosition already given!");
     }
     this.employeeSalary = employeeSalary;
+    return this;
   }
 
   @Transient
@@ -260,9 +282,14 @@ import org.projectforge.fibu.RechnungsPositionDO;
     return comment;
   }
 
-  public void setComment(final String comment)
+  /**
+   * @param comment
+   * @return this for chaining.
+   */
+  public KostZuweisungDO setComment(final String comment)
   {
     this.comment = comment;
+    return this;
   }
 
   /**
@@ -351,4 +378,4 @@ import org.projectforge.fibu.RechnungsPositionDO;
     kostZuweisung.copyValuesFrom(this, "id");
     return kostZuweisung;
   }
-    }
+}
