@@ -26,31 +26,30 @@ package org.projectforge.web.admin;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.PasswordTextField;
-import org.apache.wicket.markup.html.form.RadioChoice;
-import org.apache.wicket.markup.html.form.upload.FileUploadField;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.apache.wicket.util.lang.Bytes;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
-import org.projectforge.core.ConfigurationDO;
-import org.projectforge.database.HibernateUtils;
 import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.wicket.AbstractForm;
-import org.projectforge.web.wicket.FocusOnLoadBehavior;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.components.LabelForPanel;
-import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.components.TimeZonePanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.GridBuilder;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
+import org.projectforge.web.wicket.flowlayout.ParTextPanel;
+import org.projectforge.web.wicket.flowlayout.PasswordPanel;
+import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 
 public class SetupForm extends AbstractForm<SetupForm, SetupPage>
 {
@@ -59,18 +58,18 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
-  private SetupTarget setupMode = SetupTarget.TEST_DATA;
+  private final SetupTarget setupMode = SetupTarget.TEST_DATA;
 
-  private TimeZone timeZone = TimeZone.getDefault();
+  private final TimeZone timeZone = TimeZone.getDefault();
 
   private String sysopEMail;
 
   private String feedbackEMail;
 
-  private String adminUsername = InitDatabaseDao.DEFAULT_ADMIN_USER;
+  private final String adminUsername = InitDatabaseDao.DEFAULT_ADMIN_USER;
 
-//  @SuppressWarnings("unused")
-//  private String organization;
+  // @SuppressWarnings("unused")
+  // private String organization;
 
   @SuppressWarnings("unused")
   private String password;
@@ -80,113 +79,118 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
 
   private String encryptedPassword;
 
-  protected FileUploadField fileUploadField;
-
-  protected String filename;
-
   public SetupForm(final SetupPage parentPage)
   {
-    super(parentPage);
-    // set this form to multipart mode (always needed for uploads!)
-    setMultiPart(true);
-    // Add one file input field
-    add(fileUploadField = new FileUploadField("fileInput"));
-    setMaxSize(Bytes.megabytes(100));
+    super(parentPage, "setupform");
   }
 
+  @Override
   @SuppressWarnings("serial")
   protected void init()
   {
-    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    // RadioChoice mode
-    final LabelValueChoiceRenderer<SetupTarget> modeChoiceRenderer = new LabelValueChoiceRenderer<SetupTarget>(this, SetupTarget.values());
-    final RadioChoice<SetupTarget> modeChoice = new RadioChoice<SetupTarget>("setupMode",
-        new PropertyModel<SetupTarget>(this, "setupMode"), modeChoiceRenderer.getValues(), modeChoiceRenderer);
-    add(modeChoice);
+    addFeedbackPanel();
+    final RepeatingView repeater = new RepeatingView("flowform");
+    add(repeater);
+    final GridBuilder gridBuilder = newGridBuilder(repeater);
+    gridBuilder.newGrid16().newColumnsPanel();
+    gridBuilder.newFormHeading(getString("administration.setup.heading"));
+    final DivPanel section = gridBuilder.newSectionPanel();
+    section.add(new ParTextPanel(section.newChildId(), getString("administration.setup.heading.subtitle")));
+    {
+      // RadioChoice mode
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.setup.target"));
+      final DivPanel radioPanel = new DivPanel(fs.newChildId(), DivType.RADIOBOX);
+      fs.add(radioPanel);
+      fs.setLabelFor(radioPanel);
+      final RadioGroupPanel<SetupTarget> radioGroup = new RadioGroupPanel<SetupTarget>(radioPanel.newChildId(), "setuptarget",
+          new PropertyModel<SetupTarget>(this, "setupMode"));
+      radioPanel.add(radioGroup);
+      for (final SetupTarget target : SetupTarget.values()) {
+        radioGroup.add(new Model<SetupTarget>(target), getString(target.getI18nKey()), getString(target.getI18nKey() + ".tooltip"));
+      }
+    }
     // final RequiredMaxLengthTextField organizationField = new RequiredMaxLengthTextField(this, "organization", getString("organization"),
     // new PropertyModel<String>(this, "organization"), 100);
     // add(organizationField);
-    final RequiredMaxLengthTextField adminUsernameField = new RequiredMaxLengthTextField(this, "adminUsername", getString("username"),
-        new PropertyModel<String>(this, "adminUsername"), 100);
-    add(adminUsernameField);
-
-    String str = getString("passwordRepeat");
-    final PasswordTextField passwordRepeatField = new PasswordTextField("passwordRepeat", new PropertyModel<String>(this, "passwordRepeat"));
-    passwordRepeatField.setLabel(new Model<String>(str));
-    passwordRepeatField.setResetPassword(true).setRequired(true);
-    add(passwordRepeatField);
-    final LabelForPanel passwordRepeatLabel = new LabelForPanel("passwordRepeatLabel", passwordRepeatField, str);
-    add(passwordRepeatLabel);
-
-    str = getString("password");
-    final PasswordTextField passwordField = new PasswordTextField("password", new PropertyModel<String>(this, "password"));
-    passwordField.setLabel(new Model<String>(str));
-    passwordField.setResetPassword(true).setRequired(true);
-    passwordField.add(new AbstractValidator<String>() {
-      private String errorMsgKey = null;
-
-      @Override
-      protected void onValidate(IValidatable<String> validatable)
-      {
-        final String passwordInput = validatable.getValue();
-        final String passwordRepeatInput = passwordRepeatField.getConvertedInput();
-        errorMsgKey = null;
-        if (StringUtils.equals(passwordInput, passwordRepeatInput) == false) {
-          errorMsgKey = "user.error.passwordAndRepeatDoesNotMatch";
-          error(validatable);
-        } else {
-          errorMsgKey = userDao.checkPasswordQuality(passwordInput);
+    {
+      // User name
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("username"));
+      fs.add(new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "adminUsername"), 100));
+    }
+    {
+      // Password
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("password"));
+      final PasswordTextField passwordField = new PasswordTextField(PasswordPanel.WICKET_ID, new PropertyModel<String>(this, "password"));
+      passwordField.setRequired(true); // No setReset(true), otherwise uploading and re-entering passwords is a real pain.
+      passwordField.add(new AbstractValidator<String>() {
+        @Override
+        protected void onValidate(final IValidatable<String> validatable)
+        {
+          final String input = validatable.getValue();
+          final String errorMsgKey = userDao.checkPasswordQuality(input);
           if (errorMsgKey != null) {
-            error(validatable);
+            passwordField.error(getString(errorMsgKey));
+          } else {
+            encryptedPassword = userDao.encryptPassword(input);
           }
         }
-        if (errorMsgKey == null) {
-          encryptedPassword = userDao.encryptPassword(passwordInput);
+      });
+      fs.add(passwordField);
+      WicketUtils.setFocus(passwordField);
+    }
+    {
+      // Password repeat
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("passwordRepeat"));
+      final PasswordTextField passwordRepeatField = new PasswordTextField(PasswordPanel.WICKET_ID, new PropertyModel<String>(this,
+          "passwordRepeat"));
+      passwordRepeatField.setRequired(true); // No setReset(true), otherwise uploading and re-entering passwords is a real pain.
+      passwordRepeatField.add(new AbstractValidator<String>() {
+        @Override
+        protected void onValidate(final IValidatable<String> validatable)
+        {
+          final String input = validatable.getValue();
+          if (StringUtils.equals(input, passwordRepeatField.getValue()) == false) {
+            passwordRepeatField.error(getString("user.error.passwordAndRepeatDoesNotMatch"));
+          }
         }
-      }
-
-      @Override
-      protected String resourceKey()
-      {
-        return errorMsgKey;
-      }
-    });
-    add(passwordField);
-    passwordField.add(new FocusOnLoadBehavior());
-    final LabelForPanel passwordLabel = new LabelForPanel("passwordLabel", passwordField, str);
-    add(passwordLabel);
-
-    add(new TimeZonePanel("timezone", new PropertyModel<TimeZone>(this, "timeZone")));
-    add(new MaxLengthTextField(this, "sysopEMail", getString("administration.configuration.param.systemAdministratorEMail"),
-        new PropertyModel<String>(this, "sysopEMail"), HibernateUtils.getPropertyLength(ConfigurationDO.class, "stringValue")));
-    add(new MaxLengthTextField(this, "feedbackEMail", getString("administration.configuration.param.feedbackEMail"),
-        new PropertyModel<String>(this, "feedbackEMail"), HibernateUtils.getPropertyLength(ConfigurationDO.class, "stringValue")));
-    final Button finishButton = new Button("button", new Model<String>("finish")) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.finishSetup();
-      }
-    };
-    finishButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    add(new SingleButtonPanel("finish", finishButton));
-    setDefaultButton(finishButton);
-    add(new Label("filename", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return fileUploadField.getFileUpload() != null ? fileUploadField.getFileUpload().getClientFileName() : "";
-      }
-    }));
-    final Button uploadButton = new Button("button", new Model<String>(getString("upload"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.upload();
-      }
-    };
-    uploadButton.setDefaultFormProcessing(false);
-    add(new SingleButtonPanel("upload", uploadButton));
+      });
+      fs.add(passwordRepeatField);
+    }
+    {
+      // Time zone
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.timezone"), true);
+      final TimeZonePanel timeZone = new TimeZonePanel(fs.newChildId(), new PropertyModel<TimeZone>(this, "timeZone"));
+      fs.setLabelFor(timeZone);
+      fs.add(timeZone);
+      fs.addHelpIcon(getString("administration.configuration.param.timezone.description"));
+    }
+    {
+      // E-Mail sysops
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.systemAdministratorEMail"), true);
+      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "sysopEMail")));
+      fs.addHelpIcon(getString("administration.configuration.param.systemAdministratorEMail.description"));
+    }
+    {
+      // E-Mail sysops
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.feedbackEMail"), true);
+      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "feedbackEMail")));
+      fs.addHelpIcon(getString("administration.configuration.param.feedbackEMail.description"));
+    }
+    final RepeatingView actionButtons = new RepeatingView("buttons");
+    add(actionButtons);
+    {
+      final Button finishButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("finish")) {
+        @Override
+        public final void onSubmit()
+        {
+          parentPage.finishSetup();
+        }
+      };
+      final SingleButtonPanel finishButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), finishButton,
+          getString("administration.setup.finish"), SingleButtonPanel.DEFAULT_SUBMIT);
+      actionButtons.add(finishButtonPanel);
+      setDefaultButton(finishButton);
+    }
   }
 
   public SetupTarget getSetupMode()

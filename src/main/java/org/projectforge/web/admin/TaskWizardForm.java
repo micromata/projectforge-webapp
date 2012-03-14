@@ -33,7 +33,7 @@ import org.projectforge.user.GroupDO;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.layout.LayoutContext;
+import org.projectforge.web.wicket.layout.OldLayoutContext;
 
 public class TaskWizardForm extends AbstractForm<TaskWizardForm, TaskWizardPage>
 {
@@ -51,7 +51,7 @@ public class TaskWizardForm extends AbstractForm<TaskWizardForm, TaskWizardPage>
   public TaskWizardForm(final TaskWizardPage parentPage)
   {
     super(parentPage);
-    renderer = new TaskWizardFormRenderer(this, new LayoutContext(false), parentPage, taskTree);
+    renderer = new TaskWizardFormRenderer(this, new OldLayoutContext(false), parentPage, taskTree);
   }
 
   @SuppressWarnings("serial")

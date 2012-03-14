@@ -23,7 +23,7 @@
 
 package org.projectforge.web.admin;
 
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessDao;
 import org.projectforge.access.GroupTaskAccessDO;
@@ -42,7 +42,7 @@ public class TaskWizardPage extends AbstractSecuredPage implements ISelectCaller
 
   boolean managerGroupCreated;
 
-  private TaskWizardForm form;
+  private final TaskWizardForm form;
 
   @SpringBean(name = "taskDao")
   private TaskDao taskDao;
@@ -53,7 +53,7 @@ public class TaskWizardPage extends AbstractSecuredPage implements ISelectCaller
   @SpringBean(name = "accessDao")
   private AccessDao accessDao;
 
-  public TaskWizardPage(PageParameters parameters)
+  public TaskWizardPage(final PageParameters parameters)
   {
     super(parameters);
     form = new TaskWizardForm(this);
@@ -114,12 +114,12 @@ public class TaskWizardPage extends AbstractSecuredPage implements ISelectCaller
   }
 
   @Override
-  public void cancelSelection(String property)
+  public void cancelSelection(final String property)
   {
   }
 
   @Override
-  public void select(String property, Object selectedValue)
+  public void select(final String property, final Object selectedValue)
   {
     if ("taskId".equals(property) == true) {
       form.task = taskDao.getById((Integer) selectedValue);
@@ -133,7 +133,7 @@ public class TaskWizardPage extends AbstractSecuredPage implements ISelectCaller
   }
 
   @Override
-  public void unselect(String property)
+  public void unselect(final String property)
   {
     if ("taskId".equals(property) == true) {
       form.task = null;

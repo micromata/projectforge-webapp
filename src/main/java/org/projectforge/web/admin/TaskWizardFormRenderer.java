@@ -25,12 +25,12 @@ package org.projectforge.web.admin;
 
 import static org.projectforge.web.wicket.layout.SelectLPanel.WICKET_ID_SELECT_PANEL;
 
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
@@ -41,9 +41,9 @@ import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
-import org.projectforge.web.wicket.layout.AbstractFormRenderer;
+import org.projectforge.web.wicket.layout.OldAbstractFormRenderer;
 import org.projectforge.web.wicket.layout.LabelLPanel;
-import org.projectforge.web.wicket.layout.LayoutContext;
+import org.projectforge.web.wicket.layout.OldLayoutContext;
 import org.projectforge.web.wicket.layout.LayoutLength;
 import org.projectforge.web.wicket.layout.PanelContext;
 
@@ -51,7 +51,7 @@ import org.projectforge.web.wicket.layout.PanelContext;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class TaskWizardFormRenderer extends AbstractFormRenderer
+public class TaskWizardFormRenderer extends OldAbstractFormRenderer
 {
   private static final long serialVersionUID = 4515982116827709004L;
 
@@ -61,13 +61,13 @@ public class TaskWizardFormRenderer extends AbstractFormRenderer
 
   final static LayoutLength FULL_LENGTH = LayoutLength.DOUBLE;
 
-  private TaskWizardPage wizardPage;
+  private final TaskWizardPage wizardPage;
 
-  private TaskWizardForm form;
+  private final TaskWizardForm form;
 
-  private TaskTree taskTree;
+  private final TaskTree taskTree;
 
-  public TaskWizardFormRenderer(final TaskWizardForm container, final LayoutContext layoutContext, final TaskWizardPage wizardPage,
+  public TaskWizardFormRenderer(final TaskWizardForm container, final OldLayoutContext layoutContext, final TaskWizardPage wizardPage,
       final TaskTree taskTree)
   {
     super(container, layoutContext);
@@ -99,7 +99,7 @@ public class TaskWizardFormRenderer extends AbstractFormRenderer
         public final void onSubmit()
         {
           final PageParameters params = new PageParameters();
-          params.put(TaskEditPage.PARAM_PARENT_TASK_ID, taskTree.getRootTaskNode().getId());
+          params.add(TaskEditPage.PARAM_PARENT_TASK_ID, taskTree.getRootTaskNode().getId());
           final TaskEditPage editPage = new TaskEditPage(params);
           editPage.setReturnToPage(wizardPage);
           setResponsePage(editPage);
@@ -107,7 +107,7 @@ public class TaskWizardFormRenderer extends AbstractFormRenderer
       };
       button.setDefaultFormProcessing(false);
       button.add(WebConstants.BUTTON_CLASS);
-      SingleButtonPanel buttonPanel = new SingleButtonPanel(repeatingView.newChildId(), button);
+      final SingleButtonPanel buttonPanel = new SingleButtonPanel(repeatingView.newChildId(), button);
       WicketUtils.addTooltip(button, getString("task.wizard.button.createTask.tooltip"));
       repeatingView.add(buttonPanel);
     }
@@ -162,7 +162,7 @@ public class TaskWizardFormRenderer extends AbstractFormRenderer
             }
             buf.append(getString("task.wizard.managerGroup.groupNameSuffix"));
           }
-          params.put(GroupEditPage.PARAM_GROUP_NAME, buf.toString());
+          params.add(GroupEditPage.PARAM_GROUP_NAME, buf.toString());
           final GroupEditPage editPage = new GroupEditPage(params);
           editPage.setReturnToPage(wizardPage);
           setResponsePage(editPage);
@@ -176,7 +176,7 @@ public class TaskWizardFormRenderer extends AbstractFormRenderer
       };
       button.setDefaultFormProcessing(false);
       button.add(WebConstants.BUTTON_CLASS);
-      SingleButtonPanel buttonPanel = new SingleButtonPanel(repeatingView.newChildId(), button);
+      final SingleButtonPanel buttonPanel = new SingleButtonPanel(repeatingView.newChildId(), button);
       WicketUtils.addTooltip(button, getString("task.wizard.button.createGroup.tooltip"));
       repeatingView.add(buttonPanel);
     }

@@ -28,10 +28,9 @@ import java.io.Reader;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.RestartResponseAtInterceptPageException;
+import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
-import org.apache.wicket.protocol.http.WebRequest;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDO;
@@ -47,12 +46,16 @@ import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuItemRegistry;
 import org.projectforge.web.UserFilter;
-import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.AbstractUnsecureBasePage;
 import org.projectforge.web.wicket.MessagePage;
 import org.projectforge.web.wicket.MySession;
+import org.projectforge.web.wicket.WicketApplication;
+import org.projectforge.web.wicket.WicketUtils;
 
-public class SetupPage extends AbstractSecuredPage
+public class SetupPage extends AbstractUnsecureBasePage
 {
+  private static final long serialVersionUID = 9174903871130640690L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SetupPage.class);
 
   @SpringBean(name = "initDatabaseDao")
@@ -73,15 +76,29 @@ public class SetupPage extends AbstractSecuredPage
   @SpringBean(name = "xmlDump")
   private XmlDump xmlDump;
 
-  private SetupForm form;
+  private final SetupForm setupForm;
 
-  public SetupPage(PageParameters parameters)
+  private final SetupImportForm importForm;
+
+  public SetupPage(final PageParameters parameters)
   {
     super(parameters);
     checkAccess();
-    form = new SetupForm(this);
-    body.add(form);
-    form.init();
+    setupForm = new SetupForm(this);
+    body.add(setupForm);
+    setupForm.init();
+    importForm = new SetupImportForm(this);
+    body.add(importForm);
+    importForm.init();
+    // final StringBuffer js = new StringBuffer("<script>\n") //
+    // .append("$(function() {") //
+    // .append("  $('input:file').uniform({\n") //
+    // .append("    fileDefaultText : '- No file selected',\n") //
+    // .append("    fileBtnText : 'Choose - File'\n") //
+    // .append("  }); });\n") //
+    // .append("alert('Hurzel');") //
+    // .append("</script>\n");
+    // body.add(new Label("uploadScript", js.toString()).setEscapeModelStrings(false));
   }
 
   protected void finishSetup()
@@ -90,29 +107,30 @@ public class SetupPage extends AbstractSecuredPage
     checkAccess();
     PFUserDO adminUser = null;
     final String message;
-    if (form.getSetupMode() == SetupTarget.EMPTY_DATABASE) {
-      adminUser = initDatabaseDao.initializeEmptyDatabase(form.getAdminUsername(), form.getEncryptedPassword(), form.getTimeZone());
+    if (setupForm.getSetupMode() == SetupTarget.EMPTY_DATABASE) {
+      adminUser = initDatabaseDao.initializeEmptyDatabase(setupForm.getAdminUsername(), setupForm.getEncryptedPassword(),
+          setupForm.getTimeZone());
       message = "administration.setup.message.emptyDatabase";
     } else {
-      adminUser = initDatabaseDao.initializeEmptyDatabaseWithTestData(form.getAdminUsername(), form.getEncryptedPassword(), form
-          .getTimeZone());
+      adminUser = initDatabaseDao.initializeEmptyDatabaseWithTestData(setupForm.getAdminUsername(), setupForm.getEncryptedPassword(),
+          setupForm.getTimeZone());
       message = "administration.setup.message.testdata";
       // refreshes the visibility of the costConfigured dependent menu items:
       Configuration.getInstance().setExpired(); // Force reload.
       MenuItemRegistry.instance().refresh();
     }
     ((MySession) getSession()).login(adminUser, getRequest());
-    UserFilter.login(((WebRequest) getRequest()).getHttpServletRequest(), adminUser);
+    UserFilter.login(WicketUtils.getHttpServletRequest(getRequest()), adminUser);
     configurationDao.checkAndUpdateDatabaseEntries();
-    if (form.getTimeZone() != null) {
+    if (setupForm.getTimeZone() != null) {
       final ConfigurationDO configurationDO = getConfigurationDO(ConfigurationParam.DEFAULT_TIMEZONE);
       if (configurationDO != null) {
-        configurationDO.setTimeZone(form.getTimeZone());
+        configurationDO.setTimeZone(setupForm.getTimeZone());
         configurationDao.update(configurationDO);
       }
     }
-    configure(ConfigurationParam.SYSTEM_ADMIN_E_MAIL, form.getSysopEMail());
-    configure(ConfigurationParam.FEEDBACK_E_MAIL, form.getFeedbackEMail());
+    configure(ConfigurationParam.SYSTEM_ADMIN_E_MAIL, setupForm.getSysopEMail());
+    configure(ConfigurationParam.FEEDBACK_E_MAIL, setupForm.getFeedbackEMail());
     setResponsePage(new MessagePage(message, adminUser.getUsername()));
     log.info("Set-up finished.");
   }
@@ -142,7 +160,7 @@ public class SetupPage extends AbstractSecuredPage
   {
     checkAccess();
     log.info("Uploading data-base dump file...");
-    final FileUpload fileUpload = form.fileUploadField.getFileUpload();
+    final FileUpload fileUpload = importForm.fileUploadField.getFileUpload();
     if (fileUpload == null) {
       return;
     }
@@ -177,7 +195,7 @@ public class SetupPage extends AbstractSecuredPage
       } else {
         error(getString("administration.setup.error.import"));
       }
-    } catch (Exception ex) {
+    } catch (final Exception ex) {
       log.error(ex.getMessage(), ex);
       error(getString("administration.setup.error.import"));
     }
@@ -194,7 +212,15 @@ public class SetupPage extends AbstractSecuredPage
     if (initDatabaseDao.isEmpty() == false) {
       log.error("Couldn't call set-up page, because the data-base isn't empty!");
       ((MySession) getSession()).logout();
-      throw new RestartResponseAtInterceptPageException(LoginPage.class);
+      throw new RestartResponseException(WicketApplication.DEFAULT_PAGE);
     }
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractUnsecureBasePage#thisIsAnUnsecuredPage()
+   */
+  @Override
+  protected void thisIsAnUnsecuredPage()
+  {
   }
 }

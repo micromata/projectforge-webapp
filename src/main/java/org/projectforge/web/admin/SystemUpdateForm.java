@@ -26,11 +26,10 @@ package org.projectforge.web.admin;
 import java.util.SortedSet;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.form.CheckBox;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -39,7 +38,13 @@ import org.projectforge.admin.UpdateEntry;
 import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.GridBuilder;
+import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
+import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 
 public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdatePage>
 {
@@ -49,28 +54,73 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
 
   public boolean showOldUpdateScripts;
 
+  private GridBuilder gridBuilder;
+
+  /**
+   * List to create content menu in the desired order before creating the RepeatingView.
+   */
+  protected MyComponentsRepeater<SingleButtonPanel> actionButtons;
+
   public SystemUpdateForm(final SystemUpdatePage parentPage)
   {
     super(parentPage);
   }
 
+  @Override
   @SuppressWarnings("serial")
   protected void init()
   {
+    addFeedbackPanel();
+    final RepeatingView repeater = new RepeatingView("flowform");
+    add(repeater);
+    gridBuilder = newGridBuilder(repeater);
+    gridBuilder.newGrid16();
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset("Show all");
+      final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
+      final RadioGroupPanel<Boolean> radioGroup = new RadioGroupPanel<Boolean>(radioGroupPanel.newChildId(), "showOldUpdateScripts",
+          new PropertyModel<Boolean>(this, "showOldUpdateScripts")) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#wantOnSelectionChangedNotifications()
+         */
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
+
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#onSelectionChanged(java.lang.Object)
+         */
+        @Override
+        protected void onSelectionChanged(final Object newSelection)
+        {
+          parentPage.refresh();
+        }
+      };
+      radioGroupPanel.add(radioGroup);
+      WicketUtils.addYesNo(radioGroup);
+      fs.setLabelFor(radioGroup.getRadioGroup());
+    }
     scripts = new WebMarkupContainer("scripts");
     add(scripts);
     updateEntryRows();
-    add(new CheckBox("showOldVersionUpdatesCheckBox", new PropertyModel<Boolean>(this, "showOldUpdateScripts")));
-    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    final Button refresh = new Button("button", new Model<String>("refresh")) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.refresh();
-      }
-    };
-    add(new SingleButtonPanel("refresh", refresh));
-    setDefaultButton(refresh);
+
+    actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");
+    add(actionButtons.getRepeatingView());
+    {
+      final Button refreshButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("refresh")) {
+        @Override
+        public final void onSubmit()
+        {
+          parentPage.refresh();
+        }
+      };
+      final SingleButtonPanel refreshButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), refreshButton, "refresh",
+          SingleButtonPanel.DEFAULT_SUBMIT);
+      actionButtons.add(refreshButtonPanel);
+      setDefaultButton(refreshButton);
+    }
   }
 
   @SuppressWarnings("serial")
@@ -83,6 +133,7 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
     if (updateEntries == null) {
       return;
     }
+    boolean odd = true;
     for (final UpdateEntry updateEntry : updateEntries) {
       if (showOldUpdateScripts == false && updateEntry.getPreCheckStatus() == UpdatePreCheckStatus.ALREADY_UPDATED) {
         continue;
@@ -90,6 +141,12 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
       final Version version = updateEntry.getVersion();
       final WebMarkupContainer item = new WebMarkupContainer(scriptRows.newChildId());
       scriptRows.add(item);
+      if (odd == true) {
+        item.add(AttributeModifier.append("class", "odd"));
+      } else {
+        item.add(AttributeModifier.append("class", "even"));
+      }
+      odd = !odd;
       item.add(new Label("regionId", updateEntry.getRegionId()));
       item.add(new Label("version", version.toString()));
       final String description = updateEntry.getDescription();
@@ -111,7 +168,7 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
             parentPage.update(updateEntry);
           }
         };
-        item.add(new SingleButtonPanel("update", updateButton));
+        item.add(new SingleButtonPanel("update", updateButton, "update"));
       } else {
         item.add(new Label("update", new Model<String>() {
           @Override
@@ -125,13 +182,13 @@ public class SystemUpdateForm extends AbstractForm<SystemUpdateForm, SystemUpdat
     }
   }
 
-  public boolean isShowOldUpdateScripts()
+  /**
+   * @see org.projectforge.web.wicket.AbstractForm#onBeforeRender()
+   */
+  @Override
+  public void onBeforeRender()
   {
-    return showOldUpdateScripts;
-  }
-
-  public void setShowOldUpdateScripts(boolean showOldUpdateScripts)
-  {
-    this.showOldUpdateScripts = showOldUpdateScripts;
+    super.onBeforeRender();
+    actionButtons.render();
   }
 }

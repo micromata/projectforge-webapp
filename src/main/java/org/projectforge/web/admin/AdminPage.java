@@ -34,9 +34,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.wicket.PageParameters;
-import org.apache.wicket.Response;
-import org.apache.wicket.protocol.http.WebResponse;
+import org.apache.wicket.request.Response;
+import org.apache.wicket.request.http.WebResponse;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.book.BookDO;
 import org.projectforge.book.BookDao;
@@ -69,6 +69,8 @@ import org.projectforge.web.wicket.WicketApplication;
 
 public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
 {
+  private static final long serialVersionUID = 8345068133036236305L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AdminPage.class);
 
   static final int NUMBER_OF_TEST_OBJECTS_TO_CREATE = 100;
@@ -173,7 +175,7 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
     checkAccess();
     final String xml = ConfigXml.getInstance().exportConfiguration();
     final String filename = "config-" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".xml";
-    getResponse().setCharacterEncoding("utf-8");
+    DownloadUtils.setUTF8CharacterEncoding(getResponse());
     DownloadUtils.setDownloadTarget(xml.getBytes(), filename);
   }
 
@@ -273,7 +275,7 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
     final String filename = "projectforgedump_" + ts + ".xml.gz";
     final Response response = getResponse();
     ((WebResponse) response).setAttachmentHeader(filename);
-    response.setContentType(DownloadUtils.getContentType(filename));
+    ((WebResponse) response).setContentType(DownloadUtils.getContentType(filename));
     xmlDump.dumpDatabase(filename, response.getOutputStream());
   }
 
@@ -362,6 +364,14 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
     WicketApplication.setAlertMessage(form.alertMessage);
   }
 
+  protected void clearAlertMessage()
+  {
+    log.info("Admin user has cleared the alert message.");
+    checkAccess();
+    form.alertMessage = null;
+    WicketApplication.setAlertMessage(form.alertMessage);
+  }
+
   protected void updateUserPrefs()
   {
     checkAccess();
@@ -417,7 +427,7 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
     }
     bookDao.save(list);
     setResponsePage(new MessagePage("system.admin.development.testObjectsCreated", String.valueOf(NUMBER_OF_TEST_OBJECTS_TO_CREATE),
-    "BookDO"));
+        "BookDO"));
   }
 
   private String get(final String basename, final int number, final int counter)
