@@ -44,7 +44,7 @@ import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
-import org.projectforge.web.core.DummyPageContext;
+import org.projectforge.web.common.OutputType;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.user.UserFormatter;
 
@@ -65,24 +65,24 @@ public class MicromataFormatter extends Formatter
 
   private HtmlHelper htmlHelper;
 
-  public Map<String, Object> getData(List<TimesheetDO> timeSheets, Integer taskId, HttpServletRequest request,
-      HttpServletResponse response, TimesheetFilter actionFilter)
-  {
+  @Override
+  public Map<String, Object> getData(final List<TimesheetDO> timeSheets, final Integer taskId, final HttpServletRequest request,
+      final HttpServletResponse response, final TimesheetFilter actionFilter)
+      {
 
-    Map<String, Object> data = new HashMap<String, Object>();
+    final Map<String, Object> data = new HashMap<String, Object>();
 
     long durationSum = 0;
 
-    for (TimesheetDO timesheet : timeSheets) {
+    for (final TimesheetDO timesheet : timeSheets) {
       durationSum += timesheet.getDuration();
     }
 
-    DummyPageContext pageContext = new DummyPageContext(request, response);
-    List<RowHolder> list = new ArrayList<RowHolder>();
-    for (TimesheetDO timesheet : timeSheets) {
-      RowHolder row = new RowHolder();
+    final List<RowHolder> list = new ArrayList<RowHolder>();
+    for (final TimesheetDO timesheet : timeSheets) {
+      final RowHolder row = new RowHolder();
       if (actionFilter.getUserId() != null) {
-        Kost2DO kost2 = kostCache.getKost2(timesheet.getKost2Id());
+        final Kost2DO kost2 = kostCache.getKost2(timesheet.getKost2Id());
         if (kost2 != null) {
           row.addCell(new CellHolder(KostFormatter.format(kost2)));
         } else {
@@ -91,7 +91,7 @@ public class MicromataFormatter extends Formatter
       } else {
         row.addCell(new CellHolder(userFormatter.getFormattedUser(timesheet.getUser())));
       }
-      row.addCell(new CellHolder(taskFormatter.getTaskPath(pageContext, timesheet.getTaskId(), taskId, false, true)));
+      row.addCell(new CellHolder(taskFormatter.getTaskPath(timesheet.getTaskId(), taskId, true, OutputType.PLAIN)));
       row.addCell(new CellHolder(dateTimeFormatter.getFormattedTimePeriod(timesheet.getTimePeriod(), RenderType.FOP, true)));
       row.addCell(new CellHolder(dateTimeFormatter.getFormattedDuration(timesheet.getTimePeriod())));
       row.addCell(new CellHolder(htmlHelper.formatXSLFOText(timesheet.getDescription(), true)));
@@ -121,10 +121,10 @@ public class MicromataFormatter extends Formatter
     data.put("taskLabel", getLocalizedString("task"));
 
     if (taskId != null) {
-      data.put("task", taskFormatter.getTaskPath(pageContext, taskId));
+      data.put("task", taskFormatter.getTaskPath(taskId, true, OutputType.PLAIN));
+    } else {
+      data.put("task", NullObject.instance);
     }
-    data.put("task", NullObject.instance);
-
     data.put("userLabel", getLocalizedString("timesheet.user"));
 
     if (actionFilter.getUserId() != null) {
@@ -134,8 +134,8 @@ public class MicromataFormatter extends Formatter
     }
     data.put("totalDurationLabel", getLocalizedString("timesheet.totalDuration"));
 
-    String str1 = dateTimeFormatter.getFormattedDuration(durationSum);
-    String str2 = dateTimeFormatter.getFormattedDuration(durationSum, dateTimeFormatter.getDurationOfWorkingDay(), -1);
+    final String str1 = dateTimeFormatter.getFormattedDuration(durationSum);
+    final String str2 = dateTimeFormatter.getFormattedDuration(durationSum, dateTimeFormatter.getDurationOfWorkingDay(), -1);
     data.put("totalDuration", str1);
     if (str1.equals(str2) == false) {
       data.put("totalHours", str2);
@@ -153,12 +153,12 @@ public class MicromataFormatter extends Formatter
     data.put("locationLabel", getLocalizedString("timesheet.location"));
 
     return data;
-  }
+      }
 
   /**
    * @param taskFormatter the taskFormatter to set
    */
-  public void setTaskFormatter(TaskFormatter taskFormatter)
+  public void setTaskFormatter(final TaskFormatter taskFormatter)
   {
     this.taskFormatter = taskFormatter;
   }
@@ -166,7 +166,7 @@ public class MicromataFormatter extends Formatter
   /**
    * @param userFormatter the userFormatter to set
    */
-  public void setUserFormatter(UserFormatter userFormatter)
+  public void setUserFormatter(final UserFormatter userFormatter)
   {
     this.userFormatter = userFormatter;
   }
@@ -174,7 +174,7 @@ public class MicromataFormatter extends Formatter
   /**
    * @param dateTimeFormatter the dateTimeFormatter to set
    */
-  public void setDateTimeFormatter(DateTimeFormatter dateTimeFormatter)
+  public void setDateTimeFormatter(final DateTimeFormatter dateTimeFormatter)
   {
     this.dateTimeFormatter = dateTimeFormatter;
   }
@@ -182,12 +182,12 @@ public class MicromataFormatter extends Formatter
   /**
    * @param htmlHelper the htmlHelper to set
    */
-  public void setHtmlHelper(HtmlHelper htmlHelper)
+  public void setHtmlHelper(final HtmlHelper htmlHelper)
   {
     this.htmlHelper = htmlHelper;
   }
 
-  public void setKostCache(KostCache kostCache)
+  public void setKostCache(final KostCache kostCache)
   {
     this.kostCache = kostCache;
   }

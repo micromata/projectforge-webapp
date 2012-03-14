@@ -29,15 +29,16 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.wicket.request.Request;
+import org.apache.wicket.request.Response;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.user.PFUserContext;
 
-
 /**
  * @author Sebastian Hardt (s.hardt@micromata.de) This Interface is for the different output Formatters for the PDF exporter.
  */
-abstract public class Formatter
+public abstract class Formatter
 {
   /**
    * Takes a Map of Parameters and returns a Map of data for the PDF Renderer
@@ -45,8 +46,15 @@ abstract public class Formatter
    * @param parameters
    * @return
    */
-  abstract public Map<String, Object> getData(List<TimesheetDO> timeSheets, Integer taskId, HttpServletRequest request,
+  public abstract Map<String, Object> getData(List<TimesheetDO> timeSheets, Integer taskId, HttpServletRequest request,
       HttpServletResponse response, TimesheetFilter actionFilter);
+
+  public Map<String, Object> getData(final List<TimesheetDO> timeSheets, final Integer taskId, final Request request, final Response response,
+      final TimesheetFilter actionFilter)
+      {
+    return getData(timeSheets, taskId, (HttpServletRequest) request.getContainerRequest(),
+        (HttpServletResponse) response.getContainerResponse(), actionFilter);
+      }
 
   public String getLocalizedString(final String key)
   {
