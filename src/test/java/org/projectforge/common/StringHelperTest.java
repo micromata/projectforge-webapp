@@ -39,7 +39,7 @@ public class StringHelperTest
   @Test
   public void append()
   {
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     boolean first = StringHelper.append(buf, true, null, ",");
     first = StringHelper.append(buf, first, "", ",");
     first = StringHelper.append(buf, first, "1", ",");
@@ -50,7 +50,7 @@ public class StringHelperTest
   @Test
   public void listToString()
   {
-    List<String> list = new ArrayList<String>();
+    final List<String> list = new ArrayList<String>();
     list.add("Micromata");
     list.add("Computer");
     list.add("IT-Services");
@@ -87,7 +87,7 @@ public class StringHelperTest
     assertFalse(StringHelper.isIn("pen", new String[] { "open", "close", "explore", "implore"}));
     assertFalse(StringHelper.isIn(null, new String[] { "open", "close", "explore", "implore"}));
   }
-  
+
   @Test
   public void endsWith()
   {
@@ -97,7 +97,7 @@ public class StringHelperTest
     assertTrue(StringHelper.endsWith("icon.gif", ".gif"));
     assertTrue(StringHelper.endsWith("icon.png", ".gif", ".png"));
     assertTrue(StringHelper.endsWith(".png", ".gif", ".png"));
-  }  
+  }
 
   @Test
   public void startsWith()
@@ -108,7 +108,7 @@ public class StringHelperTest
     try {
       assertFalse(StringHelper.startsWith("Hurzel", (String)null));
       fail();
-    } catch (NullPointerException ex) {
+    } catch (final NullPointerException ex) {
     }
     assertFalse(StringHelper.startsWith("Hurzel", "foo"));
     assertTrue(StringHelper.startsWith("Hurzel", "Ha", "Hu"));
@@ -157,12 +157,12 @@ public class StringHelperTest
   @Test
   public void abbreviate()
   {
-    int[] maxWidth = new int[] { 5, 5, 100};
+    final int[] maxWidth = new int[] { 5, 5, 100};
     String str = StringHelper.abbreviate(new String[] { "1", "Hello", "ProjectForge"}, maxWidth, 22, ": ");
     assertEquals("1: Hello: ProjectForge", str);
     assertTrue(str.length() <= 22);
     str = StringHelper.abbreviate(new String[] { "11234567", "Hello, how are you?",
-        "ProjectForge is the world fines Project management app."}, maxWidth, 22, ": ");
+    "ProjectForge is the world fines Project management app."}, maxWidth, 22, ": ");
     assertTrue(str.length() == 22);
     assertEquals("11...: He...: Proje...", str);
     str = StringHelper.abbreviate(new String[] { null, "1", "ProjectForge is the world fines Project management app."}, maxWidth, 22, ": ");
@@ -268,7 +268,7 @@ public class StringHelperTest
     assertEquals("000aef", StringHelper.asHex(new byte[] { 0, 0x0a, (byte) 0xef}));
   }
 
-  private void compareIntArray(int[] a1, int[] a2)
+  private void compareIntArray(final int[] a1, final int[] a2)
   {
     assertEquals(a1.length, a2.length);
     for (int i = 0; i < a1.length; i++) {
@@ -276,7 +276,7 @@ public class StringHelperTest
     }
   }
 
-  private void compareStringArray(String[] a1, String[] a2)
+  private void compareStringArray(final String[] a1, final String[] a2)
   {
     assertEquals(a1.length, a2.length);
     for (int i = 0; i < a1.length; i++) {
