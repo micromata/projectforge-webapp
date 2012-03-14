@@ -1,0 +1,72 @@
+/////////////////////////////////////////////////////////////////////////////
+//
+// Project ProjectForge Community Edition
+//         www.projectforge.org
+//
+// Copyright (C) 2001-2012 Kai Reinhard (k.reinhard@micromata.com)
+//
+// ProjectForge is dual-licensed.
+//
+// This community edition is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License as published
+// by the Free Software Foundation; version 3 of the License.
+//
+// This community edition is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+// Public License for more details.
+//
+// You should have received a copy of the GNU General Public License along
+// with this program; if not, see http://www.gnu.org/licenses/.
+//
+/////////////////////////////////////////////////////////////////////////////
+
+package org.projectforge.fibu.kost;
+
+import java.util.List;
+
+import org.projectforge.common.ListCopyHelper;
+import org.projectforge.fibu.AbstractRechnungsPositionDO;
+
+public class KostZuweisungenCopyHelper extends ListCopyHelper<KostZuweisungDO>
+{
+  public static final String[] IGNORE_FIELDS = { "rechnungsPosition"};
+
+  /**
+   * @see org.projectforge.common.ListCopyHelper#copy(java.util.List, java.util.List, java.lang.Object[])
+   */
+  @Override
+  public boolean copy(final List<KostZuweisungDO> srcList, final List<KostZuweisungDO> destList, final Object... objects)
+  {
+    throw new IllegalArgumentException("Please call mycopy with AbstractRechnungsPositionDO instead!");
+  }
+
+  public boolean mycopy(final List<KostZuweisungDO> srcList, final List<KostZuweisungDO> destList,
+      final AbstractRechnungsPositionDO destPosition)
+  {
+    return super.copy(srcList, destList, destPosition);
+  }
+
+  @Override
+  protected boolean copyFrom(final KostZuweisungDO srcEntry, final KostZuweisungDO destEntry, final Object... objects)
+  {
+    return destEntry.copyValuesFrom(srcEntry, IGNORE_FIELDS);
+  }
+
+  @Override
+  protected void appendDestEntry(final List<KostZuweisungDO> destList, final KostZuweisungDO srcEntry, final Object... objects)
+  {
+    final AbstractRechnungsPositionDO destPositionDO = (AbstractRechnungsPositionDO) objects[0];
+    final KostZuweisungDO destEntry = new KostZuweisungDO();
+    destEntry.copyValuesFrom(srcEntry, IGNORE_FIELDS);
+    destPositionDO.addKostZuweisung(destEntry);
+  }
+
+  @Override
+  protected void removeDestEntry(final List<KostZuweisungDO> destList, final KostZuweisungDO destEntry, final int pos,
+      final Object... objects)
+  {
+    final AbstractRechnungsPositionDO destPositionDO = (AbstractRechnungsPositionDO) objects[0];
+    destPositionDO.deleteKostZuweisung(destEntry.getIndex());
+  }
+}
