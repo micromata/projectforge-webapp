@@ -208,6 +208,7 @@ public class InitTestDB
 
   public TaskDO addTask(final String taskName, final String parentTaskName)
   {
+    Validate.isTrue(taskName.length() <= TaskDO.TITLE_LENGTH);
     return addTask(taskName, parentTaskName, null);
   }
 
