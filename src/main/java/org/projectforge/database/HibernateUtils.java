@@ -60,12 +60,12 @@ public class HibernateUtils
 
   private Configuration configuration;
 
-  private Map<String, Integer> columnLengthMap = new HashMap<String, Integer>();
+  private final Map<String, Integer> columnLengthMap = new HashMap<String, Integer>();
 
   /**
    * For saving performance of trying to get non Hibernate properties multiple times.
    */
-  private Set<String> columnLengthFailedSet = new HashSet<String>();
+  private final Set<String> columnLengthFailedSet = new HashSet<String>();
 
   /**
    * Workaround for: http://opensource.atlassian.com/projects/hibernate/browse/HHH-3502:
@@ -91,6 +91,29 @@ public class HibernateUtils
     return null;
   }
 
+  /**
+   * @param obj
+   * @return
+   */
+  public static <T extends Serializable> void setIdentifier(final BaseDO<T> obj, final T value)
+  {
+    if (Hibernate.isInitialized(obj) == true) {
+      obj.setId(value);
+    } else if (obj instanceof DefaultBaseDO) {
+      ((DefaultBaseDO) obj).setId((Integer) value);
+    } else if (obj instanceof AccessEntryDO) {
+      ((AccessEntryDO) obj).setId((Integer) value);
+    } else if (obj instanceof Kost2ArtDO) {
+      ((Kost2ArtDO) obj).setId((Integer) value);
+    } else if (obj instanceof KundeDO) {
+      ((KundeDO) obj).setId((Integer) value);
+    } else if (obj instanceof UserPrefEntryDO) {
+      ((UserPrefEntryDO) obj).setId((Integer) value);
+    } else {
+      log.error("Couldn't set the identifier of the given object for class: " + obj.getClass().getName());
+    }
+  }
+
   public static Serializable getIdentifier(final Object obj)
   {
     if (obj instanceof BaseDO< ? >) {
@@ -106,14 +129,36 @@ public class HibernateUtils
           if (idObject != null && Serializable.class.isAssignableFrom(idObject.getClass()) == true) {
             return (Serializable) idObject;
           }
-        } catch (IllegalArgumentException e) {
+        } catch (final IllegalArgumentException e) {
           e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (final IllegalAccessException e) {
           e.printStackTrace();
         }
       }
     }
     return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T extends Serializable> void setIdentifier(final Object obj, final T value)
+  {
+    if (obj instanceof BaseDO< ? >) {
+      setIdentifier((BaseDO<T>) obj, value);
+    }
+    for (final Field field : obj.getClass().getDeclaredFields()) {
+      if (field.isAnnotationPresent(Id.class) == true && field.isAnnotationPresent(GeneratedValue.class) == true) {
+        final boolean isAccessible = field.isAccessible();
+        try {
+          field.setAccessible(true);
+          field.set(obj, value);
+          field.setAccessible(isAccessible);
+        } catch (final IllegalArgumentException e) {
+          e.printStackTrace();
+        } catch (final IllegalAccessException e) {
+          e.printStackTrace();
+        }
+      }
+    }
   }
 
   public static Configuration getConfiguration()
@@ -154,7 +199,7 @@ public class HibernateUtils
   }
 
   /** Should be set at initialization of ProjectForge after initialization of hibernate. */
-  public static void setConfiguration(Configuration configuration)
+  public static void setConfiguration(final Configuration configuration)
   {
     instance.configuration = configuration;
   }
@@ -218,7 +263,7 @@ public class HibernateUtils
       Property property = null;
       try {
         property = persistentClass.getProperty(propertyName);
-      } catch (MappingException ex) {
+      } catch (final MappingException ex) {
         log.error(ex.getMessage(), ex);
         putFailedEntry(entityName, propertyName);
         return null;
