@@ -70,8 +70,8 @@ public class BankingPlugin extends AbstractPlugin
     // registerWeb(BANK_ACCOUNT_BALANCE_ID, BankAccountBalanceListPage.class, BankAccountBalanceEditPage.class);
 
     // Register the menu entry as sub menu entry of the misc menu:
-    final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.COST);
-    registerMenuItem(new MenuItemDef(parentMenu, BANK_ACCOUNT_ID, 30, "plugins.banking.account.menu", BankAccountListPage.class));
+    final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.FIBU);
+    registerMenuItem(new MenuItemDef(parentMenu, BANK_ACCOUNT_ID, 100, "plugins.banking.account.menu", BankAccountListPage.class));
     // registerMenuItem(new MenuItemDef(parentMenu, BANK_ACCOUNT_BALANCE_ID, 30, "plugins.banking.bankAccountBalance.menu",
     // BankAccountBalanceListPage.class));
 

@@ -24,13 +24,18 @@
 package org.projectforge.plugins.banking;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.layout.LayoutContext;
+import org.projectforge.web.wicket.components.MaxLengthTextArea;
+import org.projectforge.web.wicket.components.MaxLengthTextField;
+import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
  * This is the edit formular page.
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 public class BankAccountEditForm extends AbstractEditForm<BankAccountDO, BankAccountEditPage>
 {
@@ -38,19 +43,43 @@ public class BankAccountEditForm extends AbstractEditForm<BankAccountDO, BankAcc
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(BankAccountEditForm.class);
 
-  protected BankAccountEditFormRenderer renderer;
-
   public BankAccountEditForm(final BankAccountEditPage parentPage, final BankAccountDO data)
   {
     super(parentPage, data);
-    renderer = new BankAccountEditFormRenderer(this, new LayoutContext(this), data);
   }
 
   @Override
   protected void init()
   {
     super.init();
-    renderer.add();
+    gridBuilder.newGrid16().newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // Name
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.banking.account.name"));
+      fs.add(new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "name")));
+    }
+    {
+      // Account number
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.banking.account.number"));
+      fs.add(new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "accountNumber")));
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      // Bank
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.banking.bank"));
+      fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "bank")));
+    }
+    {
+      // Bank identification code
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.banking.bankIdentificationCode"));
+      fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "bankIdentificationCode")));
+    }
+    gridBuilder.newColumnsPanel();
+    {
+      // Text description
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
+      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
+    }
   }
 
   @Override

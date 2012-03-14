@@ -46,7 +46,7 @@ import de.micromata.hibernate.history.Historizable;
 
 @Entity
 @Indexed
-@Table(name = "T_FINANCE_BANK_ACCOUNT_ENTRY")
+@Table(name = "T_PLUGIN_BANK_ACCOUNT_RECORD")
 public class BankAccountRecordDO extends DefaultBaseDO implements Historizable
 {
   private static final long serialVersionUID = 2440829270676298481L;
@@ -70,7 +70,7 @@ public class BankAccountRecordDO extends DefaultBaseDO implements Historizable
     return account;
   }
 
-  public void setAccount(BankAccountDO account)
+  public void setAccount(final BankAccountDO account)
   {
     this.account = account;
   }
@@ -81,18 +81,18 @@ public class BankAccountRecordDO extends DefaultBaseDO implements Historizable
     return date;
   }
 
-  public void setDate(Date date)
+  public void setDate(final Date date)
   {
     this.date = date;
   }
 
-  @Column(nullable = false)
+  @Column(nullable = false, scale = 5, precision = 18)
   public BigDecimal getAmount()
   {
     return amount;
   }
 
-  public void setAmount(BigDecimal amount)
+  public void setAmount(final BigDecimal amount)
   {
     this.amount = amount;
   }
@@ -103,7 +103,7 @@ public class BankAccountRecordDO extends DefaultBaseDO implements Historizable
     return text;
   }
 
-  public void setText(String text)
+  public void setText(final String text)
   {
     this.text = text;
   }

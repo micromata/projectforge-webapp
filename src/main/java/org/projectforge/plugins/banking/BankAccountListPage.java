@@ -27,12 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -95,7 +96,7 @@ public class BankAccountListPage extends AbstractListPage<BankAccountListForm, B
     .add(new CellItemListenerPropertyColumn<BankAccountDO>(new Model<String>(getString("plugins.banking.bank")), "bank", "bank", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<BankAccountDO>(
         new Model<String>(getString("plugins.banking.bankIdentificationCode")), "bankIdentificationCode", "bankIdentificationCode", cellItemListener));
-    dataTable = createDataTable(columns, "accountNumber", true);
+    dataTable = createDataTable(columns, "accountNumber", SortOrder.ASCENDING);
     form.add(dataTable);
   }
 

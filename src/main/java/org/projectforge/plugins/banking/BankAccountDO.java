@@ -39,7 +39,7 @@ import de.micromata.hibernate.history.Historizable;
 
 @Entity
 @Indexed
-@Table(name = "T_FINANCE_BANK_ACCOUNT")
+@Table(name = "T_PLUGIN_BANK_ACCOUNT")
 public class BankAccountDO extends DefaultBaseDO implements Historizable, ShortDisplayNameCapable
 {
   private static final long serialVersionUID = -6492718816678384637L;
@@ -65,7 +65,7 @@ public class BankAccountDO extends DefaultBaseDO implements Historizable, ShortD
     return accountNumber;
   }
 
-  public void setAccountNumber(String accountNumber)
+  public void setAccountNumber(final String accountNumber)
   {
     this.accountNumber = accountNumber;
   }
@@ -76,7 +76,7 @@ public class BankAccountDO extends DefaultBaseDO implements Historizable, ShortD
     return bank;
   }
 
-  public void setBank(String bank)
+  public void setBank(final String bank)
   {
     this.bank = bank;
   }
@@ -87,7 +87,7 @@ public class BankAccountDO extends DefaultBaseDO implements Historizable, ShortD
     return bankIdentificationCode;
   }
 
-  public void setBankIdentificationCode(String bankIdentificationCode)
+  public void setBankIdentificationCode(final String bankIdentificationCode)
   {
     this.bankIdentificationCode = bankIdentificationCode;
   }
@@ -98,7 +98,7 @@ public class BankAccountDO extends DefaultBaseDO implements Historizable, ShortD
     return name;
   }
 
-  public void setName(String name)
+  public void setName(final String name)
   {
     this.name = name;
   }
@@ -109,7 +109,7 @@ public class BankAccountDO extends DefaultBaseDO implements Historizable, ShortD
     return description;
   }
 
-  public void setDescription(String description)
+  public void setDescription(final String description)
   {
     this.description = description;
   }

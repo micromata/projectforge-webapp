@@ -29,8 +29,6 @@ import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.Table;
-import org.projectforge.database.TableAttribute;
-import org.projectforge.database.TableAttributeType;
 
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
@@ -74,15 +72,13 @@ public class BankingPluginUpdates
         if (dao.doesExist(bankAccountBalanceTable) == false) {
           final Table table = new Table(BankAccountBalanceDO.class) //
           .addDefaultBaseDOAttributes() //
-          .addAttributes("account", "date", "amount", "description") //
-          .addAttribute(new TableAttribute("account_fk", TableAttributeType.INT).setForeignTable(BankAccountDO.class));
+          .addAttributes("account", "date", "amount", "description"); //
           dao.createTable(table);
         }
         if (dao.doesExist(bankAccountRecordTable) == false) {
           final Table table = new Table(BankAccountRecordDO.class) //
           .addDefaultBaseDOAttributes() //
-          .addAttributes("account", "date", "amount", "text") //
-          .addAttribute(new TableAttribute("account_fk", TableAttributeType.INT).setForeignTable(BankAccountDO.class));
+          .addAttributes("account", "date", "amount", "text"); //
           dao.createTable(table);
         }
         return UpdateRunningStatus.DONE;

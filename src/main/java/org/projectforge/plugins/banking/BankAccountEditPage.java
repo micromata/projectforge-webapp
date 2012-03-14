@@ -25,15 +25,14 @@ package org.projectforge.plugins.banking;
 
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.PageParameters;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.web.wicket.AbstractAutoLayoutEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
 
 
 @EditPage(defaultReturnPage = BankAccountListPage.class)
-public class BankAccountEditPage extends AbstractAutoLayoutEditPage<BankAccountDO, BankAccountEditForm, BankAccountDao>
+public class BankAccountEditPage extends AbstractEditPage<BankAccountDO, BankAccountEditForm, BankAccountDao>
 {
   private static final long serialVersionUID = -5058143025817192156L;
 
