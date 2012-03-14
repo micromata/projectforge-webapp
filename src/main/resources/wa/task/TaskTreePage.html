@@ -4,46 +4,34 @@
 </head>
 
 <body>
-<wicket:extend>
-  <script>
-    function updateEvenOdd() {
-      $("tr:odd:not(.headers)").removeClass('even').addClass('odd');
-      $("tr:even:not(.headers)").removeClass('odd').addClass('even');
-    }
-  </script>
+  <wicket:extend>
+    <script>
+					function updateEvenOdd() {
+						$("tr:odd:not(.headers)").removeClass('even').addClass(
+								'odd');
+						$("tr:even:not(.headers)").removeClass('odd').addClass(
+								'even');
+					}
+				</script>
 
-  <div wicket:id="feedback">[Validation errors]</div>
+    <div wicket:id="feedback">[Validation errors]</div>
 
-  <form wicket:id="form">
-  <fieldset style="margin-right: 0; border-bottom: 1px solid #D9DFE1;">
-  <table class="form filter" style="width: 100%; margin-top: 1em;">
-    <tr>
-      <td><label class="big" for="searchString"><wicket:message key="searchFilter" /></label></td>
-      <td style="width: 60%;"><input type="text" wicket:id="searchString" id="searchString" class="stdtext rounded" style="width: 90%;" /> <a
-        wicket:id="handbuchVolltextsucheLink" href="#" target="_blank"> <img wicket:id="fulltextSearchTooltipImage" src="images/help.png"
-        border="0" /> </a></td>
-      <td style="white-space: nowrap;">
-      <div class="buttonset"><wicket:panel wicket:id="notOpenedCheckBox">[cool check box]</wicket:panel> <wicket:panel
-        wicket:id="openedCheckBox">[cool check box]</wicket:panel> <wicket:panel wicket:id="closedCheckBox">[cool check box]</wicket:panel> <wicket:panel
-        wicket:id="deletedCheckBox">[cool check box]</wicket:panel> <wicket:panel wicket:id="ajaxSupportCheckBox">[cool check box]</wicket:panel></div>
-      </td>
-    </tr>
-    <tr>
-      <td>&nbsp;</td>
-      <td class="buttonpanel"><span wicket:id="cancel">[cancel]</span> <span wicket:id="reset">[reset]</span> <span wicket:id="search">[search]</span><span
-        wicket:id="listView">[list view]</span></td>
-      <td>&nbsp;</td>
-    </tr>
-  </table>
-  </fieldset>
-  </form>
+    <form wicket:id="form">
+      <div class="alert feedback" wicket:id="feedback" style="margin-top: 20px;"></div>
 
-  <table class="dataview" cellspacing="0" wicket:id="taskTree">
-    <tr>
-      <td>[taskTree]</td>
-    </tr>
-  </table>
-</wicket:extend>
+      <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
+
+      <div class="button_bar clearfix">
+        <wicket:container wicket:id="actionButtons">[cancel] [search]</wicket:container>
+      </div>
+      <table class="dataview" wicket:id="taskTree">
+        <tr>
+          <td>[taskTree]</td>
+        </tr>
+      </table>
+
+    </form>
+  </wicket:extend>
 
 </body>
 </html>

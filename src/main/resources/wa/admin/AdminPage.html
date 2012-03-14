@@ -5,16 +5,22 @@
 
 <body>
 <wicket:extend>
-  <form wicket:id="form" class="form">
-  <div id="edit">
-  <div wicket:id="feedback">[Validation errors]</div>
-  <div class="newform clearfix"><wicket:container wicket:id="fieldSetsPanel">[The field sets.]</wicket:container></div>
-  <wicket:child /></div>
-  <h3><wicket:message key="system.admin.group.title.misc.logEntries" /></h3>
-  <div><textarea wicket:id="logEntries" style="width: 100%; height: 20em;">[log file snippet]</textarea> <br />
-  <span wicket:id="formatLogEntries">[button]</span></div>
-  <div wicket:id="formattedLogEntries" class="clear" style="white-space: pre; font-family: monospace;padding: 1em;">[formatted log entries]</div>
-  </form>
-</wicket:extend>
+    <form wicket:id="form" name="form">
+      <div class="grid_16">
+        <div class="alert alert_red feedback" wicket:id="feedback"></div>
+      </div>
+      <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
+    </form>
+    <!--   <form wicket:id="form" class="form"> -->
+    <!--   <div id="edit"> -->
+    <!--   <div wicket:id="feedback">[Validation errors]</div> -->
+    <!--   <div class="newform clearfix"><wicket:container wicket:id="fieldSetsPanel">[The field sets.]</wicket:container></div> -->
+    <!--   <wicket:child /></div> -->
+    <!--   <h3><wicket:message key="system.admin.group.title.misc.logEntries" /></h3> -->
+    <!--   <div><textarea wicket:id="logEntries" style="width: 100%; height: 20em;">[log file snippet]</textarea> <br /> -->
+    <!--   <span wicket:id="formatLogEntries">[button]</span></div> -->
+    <!--   <div wicket:id="formattedLogEntries" class="clear" style="white-space: pre; font-family: monospace;padding: 1em;">[formatted log entries]</div> -->
+    <!--   </form> -->
+  </wicket:extend>
 </body>
 </html>

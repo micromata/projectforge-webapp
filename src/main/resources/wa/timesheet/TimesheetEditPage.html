@@ -4,27 +4,11 @@
 </head>
 
 <body>
-<wicket:extend>
-  <wicket:fragment wicket:id="buttonFragment">
-    <span wicket:id="clone">[clone]</span>
-  </wicket:fragment>
-  <wicket:fragment wicket:id="selectRecentSheet">
-    <a href="#" wicket:id="selectRecent"><img src="images/row_pointer.png" border="0" /></a>
-    <span wicket:id="label">4711</span>
-  </wicket:fragment>
-  <wicket:fragment wicket:id="recentTimesheetsTable">
-    <h3><wicket:message key="timesheet.recent.select" /></h3>
-    <table class="dataview" cellspacing="0" wicket:id="table">
-      <tr>
-        <th>[Table of recent time sheets.]</th>
-      </tr>
-    </table>
-  </wicket:fragment>
-  <div wicket:id="recentTimesheetsModalWindow">[Table of recent time sheets as modal dialog.]</div>
-  <script type="text/javascript">
-   <!--
-   Wicket.Window.unloadConfirmation = false;    // -->
-  </script>
-</wicket:extend>
+  <wicket:extend>
+    <div wicket:id="recentSheetsModalWindow">[Close to-do as modal dialog.]</div>
+    <script type="text/javascript">
+					Wicket.Window.unloadConfirmation = false;
+				</script>
+  </wicket:extend>
 </body>
 </html>

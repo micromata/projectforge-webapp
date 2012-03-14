@@ -7,17 +7,20 @@
 
 <body>
 
-<div id="topbar">
-<div id="title">ProjectForge - Edit</div>
-</div>
-<wicket:extend>
-  <div id="content">
-  <form wicket:id="form">
-  <div wicket:id="feedback">[feedback]</div>
-  <wicket:container wicket:id="fieldSetsPanel">[The field sets.]</wicket:container>
-  <p><a wicket:id="submitButton" rel="external" data-role="button"><wicket:container wicket:id="label">[create or update]</wicket:container></a></p>
-  </form>
+  <div id="topbar">
+    <div id="title">ProjectForge - Edit</div>
   </div>
-</wicket:extend>
+  <wicket:extend>
+    <div id="content">
+      <form wicket:id="form">
+        <div wicket:id="feedback">[feedback]</div>
+        <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
+        <wicket:child />
+        <p>
+          <a wicket:id="submitButton" rel="external" data-role="button"><wicket:container wicket:id="label">[create or update]</wicket:container></a>
+        </p>
+      </form>
+    </div>
+  </wicket:extend>
 </body>
 </html>

@@ -4,60 +4,65 @@
 </head>
 
 <body>
-<wicket:extend>
-  <script wicket:id="showDeleteQuestionDialog" type="text/javascript">
-   function showDeleteQuestionDialog() {
-      return window.confirm("Delete...?");
-    }
-  </script>
+  <wicket:extend>
+    <script wicket:id="showDeleteQuestionDialog" type="text/javascript">
+					function showDeleteQuestionDialog() {
+						return window.confirm("Delete...?");
+					}
+				</script>
 
+    <div class="box tabs">
+      <ul class="tab_header clearfix">
+        <li><a href="#editform"><span wicket:id="tabTitle">[Edit item]</span></a></li>
+        <li><a href="#history"><wicket:message key="label.historyOfChanges" /></a></li>
+      </ul>
 
+      <div class="toggle_container">
+        <div id="editform" class="section">
+          <form wicket:id="form">
+            <div class="alert alert_red feedback" wicket:id="feedback"></div>
 
-  <!--  <script>-->
-  <!--	$(function() {-->
-  <!--		$("#tabs").tabs();-->
-  <!--	});-->
-  <!--	</script>-->
+            <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
+            <wicket:child />
+            <div class="button_cell clearfix">
+              <wicket:container wicket:id="buttons">[action buttons]</wicket:container>
+            </div>
+          </form>
 
-  <div id="tabs"><!--@kai: wenn du oben das script und die liste hier wieder einkommentierst, haben wir tabs. teste mal.	<ul>--> <!--		<li><a href="#edit">i18n Bearbeiten</a></li>-->
-  <!--		<li><a href="#history">i18n History</a></li>--> <!--	</ul>-->
+        </div>
+      </div>
+      <div class="toggle_container">
+        <div id="history" class="section">
+          <div class="box grid_16 round_all">
+            <div class="block">
+              <div class="col_50">
+                <fieldset>
+                  <label><wicket:message key="timeOfLastUpdate" /></label>
+                  <div>
+                    <wicket:container wicket:id="timeOfLastUpdate">[08.10.2009 13:27:02]</wicket:container>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="col_50">
+                <fieldset>
+                  <label><wicket:message key="timeOfCreation" /></label>
+                  <div>
+                    <wicket:container wicket:id="timeOfCreation">[08.10.2009 13:27:02]</wicket:container>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+            <table class="dataview" wicket:id="historyTable">
+              <tr>
+                <td>[history table]</td>
+              </tr>
+            </table>
 
-  <div id="edit">
-  <form wicket:id="form" class="form">
-  <div wicket:id="feedback">[Validation errors]</div>
-  <wicket:child />
-  <fieldset class="buttons" wicket:id="buttonCell"><span wicket:id="cancel">[cancel]</span> <span wicket:id="reset">[reset]</span> <span
-    wicket:id="buttonPanel">[Place for page specific buttons]</span> <span wicket:id="markAsDeleted">[mark as deleted]</span> <span
-    wicket:id="undelete">[undelete]</span> <span wicket:id="delete">[delete]</span> <span wicket:id="create">[create]</span> <span wicket:id="update">[update]</span>
-  <span wicket:id="updateAndNext">[update and next]</span></fieldset>
-
-  <fieldset wicket:id="bottomRows"><!-- Place here your content below the buttons. --></fieldset>
-
-  </form>
-  </div>
-  <!-- edit END -->
-
-  <div id="history"><span wicket:id="bottomPanel"> <!-- Place here your content below the form and buttons. --> </span>
-
-  <h3><wicket:message key="label.historyOfChanges" /></h3>
-
-  <dl class="horizontal clearfix" wicket:id="timeOfModifications">
-    <dt><wicket:message key="timeOfCreation" /></dt>
-    <dd><wicket:container wicket:id="timeOfCreation">[08.10.2009 13:27:02]</wicket:container></dd>
-    <dt><wicket:message key="timeOfLastUpdate" /></dt>
-    <dd><wicket:container wicket:id="timeOfLastUpdate">[08.10.2009 13:27:02]</wicket:container></dd>
-  </dl>
-
-  <table class="dataview" cellspacing="0" wicket:id="historyTable">
-    <tr>
-      <td>[history table]</td>
-    </tr>
-  </table>
-
-  </div>
-  <!-- history END --></div>
-  <!-- tabs END -->
-
-</wicket:extend>
+            <!-- history END -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </wicket:extend>
 </body>
 </html>

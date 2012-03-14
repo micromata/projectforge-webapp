@@ -4,46 +4,47 @@
 </head>
 
 <body>
-<wicket:extend>
-  <div id="contentMenu"></div>
-  <form wicket:id="form" name="form">
-  <fieldset><legend><wicket:message key="label.data" /></legend>
-  <div wicket:id="feedback">[Validation errors]</div>
-  <div class="message" wicket:id="result">[Message send successfully at 2009/11/21 09:57 am.]</div>
-  <table class="form">
-    <tr>
-      <th><wicket:message key="address.sendSms.phoneNumber" /></th>
-      <td><input type="text" class="stdtext" wicket:id="phoneNumber" /></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="address.sendSms.message" /></th>
-      <td><textarea class="stdtext" wicket:id="message" name="message" style="height: 10ex;"
-        onKeyDown="textCounter(document.form.message,document.form.messageLength,160)"
-        onKeyUp="textCounter(document.form.message,document.form.messageLength,160)">[Message]</textarea><br />
-      <input readonly="readonly" type="text" name="messageLength" size="3" maxlength="3" value="160"> <wicket:message key="charactersLeft" /></td>
-    </tr>
-    <tr>
-      <th></th>
-      <td class="buttonpanel"><span wicket:id="reset">[reset]</span> <span wicket:id="send">[send]</span></td>
-    </tr>
-  </table>
-  </fieldset>
-  </form>
-
-  <script wicket:id="showSendQuestionDialog" type="text/javascript">
-    function showSendQuestionDialog() {
-      return window.confirm("Send...?");
-    }
-  </script>
-  <script type="text/javascript">
-    function textCounter(field,cntfield,maxlimit) {
-      if (field.value.length > maxlimit) // if too long...trim it!
-        field.value = field.value.substring(0, maxlimit);
-        // otherwise, update 'characters left' counter
-      else
-        cntfield.value = maxlimit - field.value.length;
-    }
-  </script>
-</wicket:extend>
+  <wicket:extend>
+    <form wicket:id="form" name="form">
+      <div class="grid_16">
+        <div class="alert alert_red feedback" wicket:id="feedback"></div>
+        <div class="alert alert_green" wicket:id="message"></div>
+      </div>
+      <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
+      <div class="button_cell clearfix">
+        <wicket:container wicket:id="buttons">[action buttons]</wicket:container>
+      </div>
+    </form>
+    <script wicket:id="javascript" type="text/javascript">
+					function showSendQuestionDialog() {
+						return window.confirm("Send...?");
+					}
+				</script>
+    <script type="text/javascript">
+					jQuery.fn.limitMaxlength = function(options) {
+						var settings = jQuery.extend({
+							attribute : "maxlength",
+							onEdit : function() {
+							}
+						}, options);
+						// Event handler to limit the textarea
+						var onEdit = function() {
+							var textarea = jQuery(this);
+							var maxlength = parseInt(textarea
+									.attr(settings.attribute));
+							if (textarea.val().length > maxlength) {
+								textarea.val(textarea.val()
+										.substr(0, maxlength));
+							}
+							// Call the onEdit handler within the scope of the textarea
+							jQuery.proxy(settings.onEdit, this)(
+									maxlength - textarea.val().length);
+						}
+						this.each(onEdit);
+						return this.keyup(onEdit).keydown(onEdit).focus(onEdit)
+								.live('input paste', onEdit);
+					}
+				</script>
+  </wicket:extend>
 </body>
 </html>

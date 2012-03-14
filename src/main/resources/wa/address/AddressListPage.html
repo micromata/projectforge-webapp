@@ -4,59 +4,8 @@
 </head>
 
 <body>
-<table>
-  <wicket:head>
-    <script type="text/javascript">
-<!--
-function setOptionStatus() {
-  if ($("#filterTypeStandard").attr("checked") == true) {
-    $("#options").attr("style", "display: block;");
-  }
-}
-
-function hideOptions() {
-  $("#options").hide();
-}
-
-function showOptions() {
-  $("#options").show();
-}
-
-//  End -->
-</script>
-  </wicket:head>
   <wicket:extend>
-    <wicket:fragment wicket:id="topFragment">
-      <div id="divZoom"></div>
-    </wicket:fragment>
-    <wicket:fragment wicket:id="phoneNumber">
-      <a wicket:id="directCallLink" href="/phoneCall?addressId=2&phoneType=privateMobile" onmouseover="zoom('01234 56789'); return false;"
-        onmouseout="hide()"> <img wicket:id="phoneImage" src="/images/phone.png" />&nbsp;<span wicket:id="number">[phone number]</span></a>
-      <span wicket:id="phoneNumber" onmouseover="zoom('01234 56789'); return false;" onmouseout="hide()"> <img wicket:id="phoneImage"
-        src="/images/phone.png" />&nbsp;<span wicket:id="number">[phone number]</span></span>
-      <a wicket:id="sendMessageLink" wicket:message="title:address.tooltip.writeSMS" href="sendSms?addressId=2&phoneType=privateMobile"> <img
-        src="images/sms.png" /></a>
-    </wicket:fragment>
-    <tr>
-      <th><wicket:message key="label.options" /></th>
-      <td><span wicket:id="filterType"><input type="radio" wicket:id="filter" id="filterTypeStandard" onclick="javascript:showOptions();" />
-      &nbsp; <wicket:message key="filter" /> <input type="radio" wicket:id="newest" onclick="javascript:hideOptions();submit();" /> &nbsp; <wicket:message
-        key="filter.newest" /> &nbsp; <input type="radio" wicket:id="myFavorites" onclick="javascript:hideOptions();submit();" /> &nbsp; <wicket:message
-        key="address.filter.myFavorites" /> &nbsp; <input type="radio" wicket:id="deleted" onclick="javascript:hideOptions();submit();" /> <wicket:message
-        key="deleted" />,</span> <span wicket:id="pageSize">[Page size setting]</span><br />
-      <div id="options" style="display: none;"><wicket:message key="address.addressStatus" />:&nbsp; <input type="checkbox"
-        wicket:id="uptodate"> <wicket:message key="address.addressStatus.uptodate" /> <input type="checkbox" wicket:id="outdated"> <wicket:message
-        key="address.addressStatus.outdated" /> <input type="checkbox" wicket:id="leaved"> <wicket:message key="address.addressStatus.leaved" />
-      <br />
-      <wicket:message key="address.contactStatus" />:&nbsp; <input type="checkbox" wicket:id="active"> <wicket:message
-        key="address.contactStatus.active" /> <input type="checkbox" wicket:id="nonActive"> <wicket:message
-        key="address.contactStatus.nonActive" /> <input type="checkbox" wicket:id="uninteresting"> <wicket:message
-        key="address.contactStatus.uninteresting" /> <input type="checkbox" wicket:id="personaIngrata"> <wicket:message
-        key="address.contactStatus.personaIngrata" /> <input type="checkbox" wicket:id="departed"> <wicket:message
-        key="address.contactStatus.departed" /></div>
-      </td>
-    </tr>
+    <div id="divZoom"></div>
   </wicket:extend>
-</table>
 </body>
 </html>

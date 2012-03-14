@@ -1,36 +1,65 @@
-<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-
 </head>
-
 <body>
-<wicket:extend>
-	<script type="text/javascript" charset="utf-8">
-	/* <![CDATA[ */
-		$(function() {
-			$( ".buttonset" ).buttonset();					
-			
-		});
-	
-	/* ]]> */
-	</script>
-	
-	
-  <div wicket:id="alertMessage" class="alert">[This is an alert message!]</div>
-  
-  <div class="menu clearfix" id="contentMenu" wicket:id="contentMenuArea">
-  	<span wicket:id="menu">[menu entries]</span>
-  	
-	<wicket:container wicket:id="dropDownMenu">
-	<span style="float:right;">
-					<wicket:container wicket:id="menu"><a class="toolbarbutton rounded boxshadow gradienttopdown" wicket:id="menuEntry"><wicket:container wicket:id="label">[action]</wicket:container></a></wicket:container>
-					</span>
-	</wicket:container>
+  <div id="wrapper">
+    <wicket:extend>
+      <div id="topbar" class="clearfix">
+
+        <div class="logo" style="border-bottom: 1px solid #D9DFE1; padding: 1em 2em; text-align: right; background-color: #ffffff;">
+          <img id="logo-left" wicket:id="logoLeftImage" src="/secure/Logo.jpg" style="border: none; float: left;" /> <img id="logo-right"
+            src="images/logo-top-right.png" style="border: none;" />
+        </div>
+
+        <div class="user_box dark_box clearfix">
+          <!--           <h2 wicket:id="username">[John Smith]</h2> -->
+          <ul>
+            <li><a wicket:id="myAccountLink" href="/myAccount"><wicket:message key="menu.myAccount" /></a><span class="divider">|</span></li>
+            <li><a class="logout" wicket:id="logoutLink" href="/login?logout=true"><wicket:message key="menu.logout" /></a></li>
+          </ul>
+        </div>
+        <!-- #user_box -->
+      </div>
+      <!-- #topbar -->
+      <div id="sidebar">
+        <div class="cog">
+          &nbsp;<span class="alert badge alert_red" wicket:id="totalMenuCounter">[8]</span>
+        </div>
+
+        <a href="index.php" class="logo"><span>Adminica</span></a>
+
+        <div class="user_box dark_box clearfix">
+          <ul>
+            <li><a href="#">Kai Reinhard</a><span class="divider">|</span></li>
+            <li><a href="login.html">logout</a></li>
+          </ul>
+        </div>
+        <!-- #user_box -->
+
+        <wicket:panel wicket:id="mainMenu">
+        [main menu]
+        </wicket:panel>
+      </div>
+      <!-- #sidebar -->
+
+      <div id="main_container" class="main_container container_16 clearfix">
+        <wicket:panel wicket:id="favoriteMenu">
+        [main menu]
+        </wicket:panel>
+        <div class="contentmenu clearfix">
+          <wicket:container wicket:id="contentMenuRepeater">
+          [menu entries]
+          </wicket:container>
+        </div>
+        <wicket:child>
+          <h2>This is the content!</h2>
+        </wicket:child>
+      </div>
+
+
+    </wicket:extend>
+
   </div>
-  <wicket:child>
-    <h2>This is the content!</h2>
-  </wicket:child>
-</wicket:extend>
 </body>
 </html>

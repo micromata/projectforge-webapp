@@ -4,90 +4,36 @@
 </head>
 
 <body>
-<wicket:extend>
-  <form wicket:id="form" name="form">
-  <h1><wicket:message key="administration.setup.heading" /></h1>
-  <fieldset><legend><wicket:message key="label.data" /></legend>
-  <div wicket:id="feedback">[Validation errors]</div>
-  <table class="form">
-    <tr>
-      <td colspan="3"><wicket:message key="administration.setup.heading.subtitle" /></td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="3"></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="administration.setup.target" /></th>
-      <td wicket:id="setupMode"><input type="radio" /> Empty data base (for productive system)<br />
-      <input type="radio" /> Data-base with test data (for test system)<br />
-      </td>
-      <td>&nbsp;</td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="3"></td>
-    </tr>
-    <!-- tr>
-      <th><label wicket:id="organizationLabel">[Organization]</label></th>
-      <td><input type="text" class="stdtext" wicket:id="organization" /></td>
-      <td>&nbsp;</td>
-    </tr-->
-    <tr>
-      <th><label wicket:id="adminUsernameLabel">[admin user]</label></th>
-      <td><input type="text" class="stdtext" wicket:id="adminUsername" /></td>
-      <td>&nbsp;</td>
-    </tr>
-    <tr>
-      <th><label wicket:id="passwordLabel">[password]</label></th>
-      <td><input type="password" class="stdtext" wicket:id="password" /></td>
-      <td>&nbsp;</td>
-    </tr>
-    <tr>
-      <th><label wicket:id="passwordRepeatLabel">[password repeat]</label></th>
-      <td><input type="password" class="stdtext" wicket:id="passwordRepeat" /></td>
-      <td>&nbsp;</td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="3"></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="administration.configuration.param.timezone" /></th>
-      <td style="white-space: nowrap;"><span wicket:id="timezone">[time zone]</span></td>
-      <td><wicket:message key="administration.configuration.param.timezone.description" /></td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="3"></td>
-    </tr>
-    <tr>
-      <th><label wicket:id="sysopEMailLabel">[System admin e-mail]</label></th>
-      <td><input type="text" class="stdtext" wicket:id="sysopEMail" /></td>
-      <td><wicket:message key="administration.configuration.param.systemAdministratorEMail.description" /></td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="3"></td>
-    </tr>
-    <tr>
-      <th><label wicket:id="feedbackEMailLabel">[Feed-back e-mail]</label></th>
-      <td><input type="text" class="stdtext" wicket:id="feedbackEMail" /></td>
-      <td><wicket:message key="administration.configuration.param.feedbackEMail.description" /></td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="3"></td>
-    </tr>
-    <tr>
-      <th></th>
-      <td colspan="2" class="buttonpanel"><span wicket:id="finish">[finish]</span></td>
-    </tr>
-    <tr class="hRuler">
-      <td colspan="3"></td>
-    </tr>
-    <tr>
-      <th><label for="upload"><wicket:message key="administration.setup.dumpFile" /> (*.xml.gz)</label></th>
-      <td><label wicket:id="filename">[filename]</label><input wicket:id="fileInput" id="upload" type="file" /> <span wicket:id="upload">[upload]</span>
-      </td>
-    </tr>
-  </table>
-  </fieldset>
-  </form>
-</wicket:extend>
+  <wicket:extend>
+    <div class="box tabs" style="margin-top: 80px;">
+      <ul class="tab_header clearfix">
+        <li><a href="#setupform"><wicket:message key="administration.setup" /></a></li>
+        <li><a href="#upload"><wicket:message key="import" /></a></li>
+      </ul>
+
+      <div class="toggle_container">
+        <div id="setupform" class="section">
+          <form wicket:id="setupform">
+            <div class="alert alert_red feedback" wicket:id="feedback"></div>
+            <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
+            <div class="button_cell clearfix">
+              <wicket:container wicket:id="buttons">[action buttons]</wicket:container>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="toggle_container">
+        <div id="upload" class="section">
+          <form wicket:id="importform">
+            <div class="alert alert_red feedback" wicket:id="feedback"></div>
+            <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
+            <div class="button_cell clearfix">
+              <wicket:container wicket:id="buttons">[action buttons]</wicket:container>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </wicket:extend>
 </body>
 </html>
