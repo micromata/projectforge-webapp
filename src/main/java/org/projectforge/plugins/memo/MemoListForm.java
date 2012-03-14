@@ -30,7 +30,7 @@ import org.projectforge.web.wicket.AbstractListForm;
 /**
  * The list formular for the list view (this example has no filter settings). See ToDoListPage for seeing how to use filter settings.
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 public class MemoListForm extends AbstractListForm<BaseSearchFilter, MemoListPage>
 {
@@ -38,9 +38,19 @@ public class MemoListForm extends AbstractListForm<BaseSearchFilter, MemoListPag
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MemoListForm.class);
 
-  public MemoListForm(MemoListPage parentPage)
+  public MemoListForm(final MemoListPage parentPage)
   {
     super(parentPage);
+  }
+
+  @Override
+  protected void init()
+  {
+    super.init();
+    {
+      // DropDownChoice page size
+      addPageSizeFieldset();
+    }
   }
 
   @Override

@@ -28,14 +28,15 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.PageParameters;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
+import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -69,23 +70,26 @@ public class MemoListPage extends AbstractListPage<MemoListForm, MemoDao, MemoDO
   {
     final List<IColumn<MemoDO>> columns = new ArrayList<IColumn<MemoDO>>();
     final CellItemListener<MemoDO> cellItemListener = new CellItemListener<MemoDO>() {
-      public void populateItem(Item<ICellPopulator<MemoDO>> item, String componentId, IModel<MemoDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<MemoDO>> item, final String componentId, final IModel<MemoDO> rowModel)
       {
         final MemoDO memo = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(memo.getId(), memo.isDeleted());
         if (cssStyle.length() > 0) {
-          item.add(new AttributeModifier("style", true, new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
 
     columns.add(new CellItemListenerPropertyColumn<MemoDO>(new Model<String>(getString("created")), getSortable("created", sortable),
         "created", cellItemListener) {
-      @SuppressWarnings("unchecked")
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
-      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      public void populateItem(final Item<ICellPopulator<MemoDO>> item, final String componentId, final IModel<MemoDO> rowModel)
       {
-        final MemoDO memo = (MemoDO) rowModel.getObject();
+        final MemoDO memo = rowModel.getObject();
         item.add(new ListSelectActionPanel(componentId, rowModel, MemoEditPage.class, memo.getId(), returnToPage, DateTimeFormatter
             .instance().getFormattedDateTime(memo.getCreated())));
         addRowClick(item);
@@ -98,27 +102,27 @@ public class MemoListPage extends AbstractListPage<MemoListForm, MemoDao, MemoDO
         sortable), "subject", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<MemoDO>(new Model<String>(getString("plugins.memo.memo")),
         getSortable("memo", sortable), "memo", cellItemListener) {
-          @Override
-          public void populateItem(Item<ICellPopulator<MemoDO>> item, String componentId, IModel<MemoDO> rowModel)
-          {
-            final MemoDO memo = rowModel.getObject();
-            final Label label = new Label(componentId, new Model<String>(StringUtils.abbreviate(memo.getMemo(), 100)));
-            cellItemListener.populateItem(item, componentId, rowModel);
-            item.add(label);
-          }
-        });
+      @Override
+      public void populateItem(final Item<ICellPopulator<MemoDO>> item, final String componentId, final IModel<MemoDO> rowModel)
+      {
+        final MemoDO memo = rowModel.getObject();
+        final Label label = new Label(componentId, new Model<String>(StringUtils.abbreviate(memo.getMemo(), 100)));
+        cellItemListener.populateItem(item, componentId, rowModel);
+        item.add(label);
+      }
+    });
     return columns;
   }
 
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "lastUpdate", false);
+    dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 
   @Override
-  protected MemoListForm newListForm(AbstractListPage< ? , ? , ? > parentPage)
+  protected MemoListForm newListForm(final AbstractListPage< ? , ? , ? > parentPage)
   {
     return new MemoListForm(this);
   }
@@ -130,7 +134,7 @@ public class MemoListPage extends AbstractListPage<MemoListForm, MemoDao, MemoDO
   }
 
   @Override
-  protected IModel<MemoDO> getModel(MemoDO object)
+  protected IModel<MemoDO> getModel(final MemoDO object)
   {
     return new DetachableDOModel<MemoDO, MemoDao>(object, getBaseDao());
   }
