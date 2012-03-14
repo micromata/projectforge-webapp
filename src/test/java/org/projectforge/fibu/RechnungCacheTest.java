@@ -24,6 +24,7 @@
 package org.projectforge.fibu;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
 import java.util.Iterator;
@@ -31,14 +32,6 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.projectforge.calendar.DayHolder;
-import org.projectforge.fibu.AuftragDO;
-import org.projectforge.fibu.AuftragDao;
-import org.projectforge.fibu.AuftragsPositionDO;
-import org.projectforge.fibu.RechnungCache;
-import org.projectforge.fibu.RechnungDO;
-import org.projectforge.fibu.RechnungDao;
-import org.projectforge.fibu.RechnungsPositionDO;
-import org.projectforge.fibu.RechnungsPositionVO;
 import org.projectforge.test.TestBase;
 
 
@@ -91,35 +84,35 @@ public class RechnungCacheTest extends TestBase
     assertEquals("1.2", posVO.getText());
     posVO = it.next();
     assertEquals("2.1", posVO.getText());
-    assertEquals(new BigDecimal("700"), RechnungDao.getNettoSumme(set));
+    assertTrue(new BigDecimal("700").compareTo(RechnungDao.getNettoSumme(set)) == 0);
 
     set = rechnungCache.getRechnungsPositionVOSetByAuftragsPositionId(auftrag.getPosition((short)1).getId());
     assertEquals("2 invoice positions expected.", 2, set.size());
-    assertEquals(new BigDecimal("500"), RechnungDao.getNettoSumme(set));
+    assertTrue(new BigDecimal("500").compareTo(RechnungDao.getNettoSumme(set)) == 0);
 
     set = rechnungCache.getRechnungsPositionVOSetByAuftragsPositionId(auftrag.getPosition((short)2).getId());
     assertEquals("1 invoice positions expected.", 1, set.size());
-    assertEquals(new BigDecimal("200"), RechnungDao.getNettoSumme(set));
+    assertTrue(new BigDecimal("200").compareTo(RechnungDao.getNettoSumme(set)) == 0);
 
-    RechnungDO rechnung = rechnungDao.getById(rechnung2.getId());
+    final RechnungDO rechnung = rechnungDao.getById(rechnung2.getId());
     rechnung.getPosition(0).setAuftragsPosition(null);
     rechnungDao.update(rechnung);
     set = rechnungCache.getRechnungsPositionVOSetByAuftragId(auftrag.getId());
     assertEquals("2 invoice positions expected.", 2, set.size());
-    assertEquals(new BigDecimal("300"), RechnungDao.getNettoSumme(set));
+    assertTrue(new BigDecimal("300").compareTo(RechnungDao.getNettoSumme(set)) == 0);
   }
 
-  public void setAuftragDao(AuftragDao auftragDao)
+  public void setAuftragDao(final AuftragDao auftragDao)
   {
     this.auftragDao = auftragDao;
   }
 
-  public void setRechnungCache(RechnungCache rechnungCache)
+  public void setRechnungCache(final RechnungCache rechnungCache)
   {
     this.rechnungCache = rechnungCache;
   }
 
-  public void setRechnungDao(RechnungDao rechnungDao)
+  public void setRechnungDao(final RechnungDao rechnungDao)
   {
     this.rechnungDao = rechnungDao;
   }
