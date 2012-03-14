@@ -54,16 +54,16 @@ public interface BaseDO<I extends Serializable>
    * @return
    */
   public Object getAttribute(String key);
-  
+
   public void setAttribute(String key, Object value);
 
   /**
    * Copies all values from the given src object excluding the values created and lastUpdate. Do not overwrite created and lastUpdate from
    * the original database object. Null values will be excluded therefore for such null properties the original properties will be
-   * preserved. If you want to delete such properties, please overwrite them manually.<br/> This method is required by BaseDao for example
-   * for updating DOs.
+   * preserved. If you want to delete such properties, please overwrite them manually.<br/>
+   * This method is required by BaseDao for example for updating DOs.
    * @param src
    * @return true, if any modifications are detected, otherwise false;
    */
-  public boolean copyValuesFrom(BaseDO<? extends Serializable> src, String... ignoreFields);
+  public boolean copyValuesFrom(BaseDO< ? extends Serializable> src, String... ignoreFields);
 }
