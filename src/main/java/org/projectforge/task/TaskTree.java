@@ -109,7 +109,7 @@ public class TaskTree extends AbstractCache implements Serializable
   }
 
   /** Adds the given node as child of the given parent. */
-  private synchronized TaskNode addTaskNode(TaskNode node, TaskNode parent)
+  private synchronized TaskNode addTaskNode(final TaskNode node, final TaskNode parent)
   {
     checkRefresh();
     if (parent != null) {
@@ -124,7 +124,7 @@ public class TaskTree extends AbstractCache implements Serializable
    * Adds a new node with the given data. The given Task holds all data and the information (id) of the parent node of the node to add. Will
    * be called by TaskDAO after inserting a new task.
    */
-  TaskNode addTaskNode(TaskDO task)
+  TaskNode addTaskNode(final TaskDO task)
   {
     checkRefresh();
     final TaskNode node = new TaskNode();
@@ -132,6 +132,9 @@ public class TaskTree extends AbstractCache implements Serializable
     final TaskNode parent = getTaskNodeById(task.getParentTaskId());
     if (parent != null) {
       node.setParent(parent);
+    } else if (root == null) {
+      // this is the root node:
+      root = node;
     } else if (node.getId().equals(root.getId()) == false) {
       // This node is not the root node:
       node.setParent(root);
@@ -146,13 +149,13 @@ public class TaskTree extends AbstractCache implements Serializable
    * @return
    * @see TaskNode#getPathToAncestor(Integer)
    */
-  public List<TaskNode> getPath(Integer taskId, Integer ancestorTaskId)
+  public List<TaskNode> getPath(final Integer taskId, final Integer ancestorTaskId)
   {
     checkRefresh();
     if (taskId == null) {
       return EMPTY_LIST;
     }
-    TaskNode taskNode = getTaskNodeById(taskId);
+    final TaskNode taskNode = getTaskNodeById(taskId);
     if (taskNode == null) {
       return EMPTY_LIST;
     }
@@ -163,7 +166,7 @@ public class TaskTree extends AbstractCache implements Serializable
    * Returns the path to the root node in an ArrayList.
    * @see #getPath(Integer, Integer)
    */
-  public List<TaskNode> getPathToRoot(Integer taskId)
+  public List<TaskNode> getPathToRoot(final Integer taskId)
   {
     return getPath(taskId, null);
   }
@@ -178,10 +181,10 @@ public class TaskTree extends AbstractCache implements Serializable
     return taskMap.get(id);
   }
 
-  public TaskDO getTaskById(Integer id)
+  public TaskDO getTaskById(final Integer id)
   {
     checkRefresh();
-    TaskNode node = getTaskNodeById(id);
+    final TaskNode node = getTaskNodeById(id);
     if (node != null) {
       return node.getTask();
     }
@@ -251,7 +254,7 @@ public class TaskTree extends AbstractCache implements Serializable
    */
   public List<Kost2DO> getKost2List(ProjektDO projekt, final TaskDO task, final String[] blackWhiteList, final boolean kost2IsBlackList)
   {
-    List<Kost2DO> kost2List = new ArrayList<Kost2DO>();
+    final List<Kost2DO> kost2List = new ArrayList<Kost2DO>();
     final boolean wildcard = blackWhiteList != null && blackWhiteList.length == 1 && "*".equals(blackWhiteList[0]);
     if (projekt != null && Hibernate.isPropertyInitialized(projekt, "kunde") == false) {
       projekt = projektDao.internalGetById(projekt.getId());
@@ -347,12 +350,12 @@ public class TaskTree extends AbstractCache implements Serializable
    * After changing a task this method will be called by TaskDao for updating the task and the task tree.
    * @param task Updating the existing task in the taskTree. If not exist, a new task will be added.
    */
-  TaskNode addOrUpdateTaskNode(TaskDO task)
+  TaskNode addOrUpdateTaskNode(final TaskDO task)
   {
     checkRefresh();
     Validate.notNull(task);
     Validate.notNull(task.getId());
-    TaskNode node = getTaskNodeById(task.getId());
+    final TaskNode node = getTaskNodeById(task.getId());
     if (node == null) {
       return addTaskNode(task);
     }
@@ -361,10 +364,10 @@ public class TaskTree extends AbstractCache implements Serializable
       if (log.isDebugEnabled() == true) {
         log.debug("Task hierarchy was changed for task: " + task);
       }
-      TaskNode oldParent = node.getParent();
+      final TaskNode oldParent = node.getParent();
       Validate.notNull(oldParent);
       oldParent.removeChild(node);
-      TaskNode newParent = getTaskNodeById(task.getParentTaskId());
+      final TaskNode newParent = getTaskNodeById(task.getParentTaskId());
       node.setParent(newParent);
       newParent.addChild(node);
     }
@@ -377,11 +380,11 @@ public class TaskTree extends AbstractCache implements Serializable
    * after inserting or updating GroupTaskAccess to the database.
    * @see GroupTaskAccess
    */
-  public void setGroupTaskAccess(GroupTaskAccessDO groupTaskAccess)
+  public void setGroupTaskAccess(final GroupTaskAccessDO groupTaskAccess)
   {
     checkRefresh();
-    Integer taskId = groupTaskAccess.getTaskId();
-    TaskNode node = (TaskNode) taskMap.get(taskId);
+    final Integer taskId = groupTaskAccess.getTaskId();
+    final TaskNode node = taskMap.get(taskId);
     node.setGroupTaskAccess(groupTaskAccess);
   }
 
@@ -390,11 +393,11 @@ public class TaskTree extends AbstractCache implements Serializable
    * after deleting GroupTaskAccess from the database.
    * @see GroupTaskAccess
    */
-  public void removeGroupTaskAccess(GroupTaskAccessDO groupTaskAccess)
+  public void removeGroupTaskAccess(final GroupTaskAccessDO groupTaskAccess)
   {
     checkRefresh();
-    Integer taskId = groupTaskAccess.getTaskId();
-    TaskNode node = (TaskNode) taskMap.get(taskId);
+    final Integer taskId = groupTaskAccess.getTaskId();
+    final TaskNode node = taskMap.get(taskId);
     node.removeGroupTaskAccess(groupTaskAccess.getGroupId());
   }
 
@@ -403,27 +406,28 @@ public class TaskTree extends AbstractCache implements Serializable
     return this.timeOfLastModification;
   }
 
+  @Override
   public String toString()
   {
     if (root == null) {
       return "<empty/>";
     }
-    Document document = DocumentHelper.createDocument();
-    Element root = document.addElement("root");
+    final Document document = DocumentHelper.createDocument();
+    final Element root = document.addElement("root");
     this.root.addXMLElement(root);
     // Pretty print the document to System.out
-    StringWriter sw = new StringWriter();
+    final StringWriter sw = new StringWriter();
     String result = "";
-    XMLWriter writer = new XMLWriter(sw, OutputFormat.createPrettyPrint());
+    final XMLWriter writer = new XMLWriter(sw, OutputFormat.createPrettyPrint());
     try {
       writer.write(document);
       result = sw.toString();
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       log.error(ex.getMessage(), ex);
     } finally {
       try {
         writer.close();
-      } catch (IOException ex) {
+      } catch (final IOException ex) {
         log.error("Error while closing xml writer: " + ex.getMessage(), ex);
       }
     }
@@ -434,7 +438,7 @@ public class TaskTree extends AbstractCache implements Serializable
   {
   }
 
-  public void setTaskDao(TaskDao taskDao)
+  public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
   }
@@ -444,22 +448,22 @@ public class TaskTree extends AbstractCache implements Serializable
     return taskDao;
   }
 
-  public void setGroupTaskAccessdao(AccessDao accessDao)
+  public void setGroupTaskAccessdao(final AccessDao accessDao)
   {
     this.accessDao = accessDao;
   }
 
-  public void setProjektDao(ProjektDao projektDao)
+  public void setProjektDao(final ProjektDao projektDao)
   {
     this.projektDao = projektDao;
   }
 
-  public void setKostCache(KostCache kostCache)
+  public void setKostCache(final KostCache kostCache)
   {
     this.kostCache = kostCache;
   }
 
-  public void setAuftragDao(AuftragDao auftragDao)
+  public void setAuftragDao(final AuftragDao auftragDao)
   {
     this.auftragDao = auftragDao;
     auftragDao.registerTaskTree(this);
@@ -470,7 +474,7 @@ public class TaskTree extends AbstractCache implements Serializable
    * @param node
    * @return
    */
-  public boolean hasSelectAccess(TaskNode node)
+  public boolean hasSelectAccess(final TaskNode node)
   {
     return taskDao.hasLoggedInUserSelectAccess(node.getTask(), false);
   }
@@ -478,7 +482,7 @@ public class TaskTree extends AbstractCache implements Serializable
   /**
    * @see #isRootNode(TaskDO)
    */
-  public boolean isRootNode(TaskNode node)
+  public boolean isRootNode(final TaskNode node)
   {
     Validate.notNull(node);
     return isRootNode(node.getTask());
@@ -488,7 +492,7 @@ public class TaskTree extends AbstractCache implements Serializable
    * @param node
    * @return true, if the given task has the same id as the task tree's root node, otherwise false;
    */
-  public boolean isRootNode(TaskDO task)
+  public boolean isRootNode(final TaskDO task)
   {
     Validate.notNull(task);
     if (root == null && task.getParentTaskId() == null) {
@@ -530,7 +534,7 @@ public class TaskTree extends AbstractCache implements Serializable
         this.orderPositionReferences = auftragDao.getTaskReferences();
         if (this.orderPositionReferences != null) {
           resetOrderPersonDays(this.root);
-          for (Map.Entry<Integer, Set<AuftragsPositionVO>> entry : this.orderPositionReferences.entrySet()) {
+          for (final Map.Entry<Integer, Set<AuftragsPositionVO>> entry : this.orderPositionReferences.entrySet()) {
             final TaskNode node = getTaskNodeById(entry.getKey());
             node.orderedPersonDays = null;
             if (CollectionUtils.isNotEmpty(entry.getValue()) == true) {
@@ -783,7 +787,7 @@ public class TaskTree extends AbstractCache implements Serializable
     final List<TaskDO> taskList = taskDao.internalLoadAll();
     TaskNode node;
     log.debug("Loading list of tasks ...");
-    for (TaskDO task : taskList) {
+    for (final TaskDO task : taskList) {
       node = new TaskNode();
       node.setTask(task);
       taskMap.put(node.getTaskId(), node);
@@ -838,7 +842,7 @@ public class TaskTree extends AbstractCache implements Serializable
     // Now read all explicit group task access' from the database:
     final List<GroupTaskAccessDO> accessList = accessDao.internalLoadAll();
     for (final GroupTaskAccessDO access : accessList) {
-      node = (TaskNode) taskMap.get(access.getTaskId());
+      node = taskMap.get(access.getTaskId());
       node.setGroupTaskAccess(access);
       if (log.isDebugEnabled() == true) {
         log.debug(access.toString());
