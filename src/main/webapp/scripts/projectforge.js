@@ -3,7 +3,7 @@ function showConfirmDialog(text) {
 }
 
 function toggle(component) {
-	$(component).toggle('slow');
+	$(component).toggle('fast');
 }
 
 function rowClick(row) {
@@ -39,10 +39,10 @@ function preventBubble(e) {
 }
 function initTooltips() {
 	// Enable all title attributes as tooltip:
-	$(':*[title]').tooltip( {
+	$(':*[title]').tooltip({
 		track : true,
 		delay : 0,
-		fade: 250,
+		fade : 250,
 		showURL : false,
 		showBody : " - "
 	});
