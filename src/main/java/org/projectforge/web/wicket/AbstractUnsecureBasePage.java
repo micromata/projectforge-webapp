@@ -84,7 +84,7 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     super(parameters);
 
     final MySession session = ((MySession) getSession());
-    html = new TransparentWebMarkupContainer("htmlTag");
+    html = new TransparentWebMarkupContainer("html");
     add(html);
     if (session.getUserAgentBrowser() == UserAgentBrowser.IE) {
       final Version version = session.getUserAgentBrowserVersion();
