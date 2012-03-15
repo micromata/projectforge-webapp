@@ -42,11 +42,14 @@ public class ContentMenuEntryPanel extends Panel
 
   private final AbstractLink link;
 
+  private final String label;
+
   public ContentMenuEntryPanel(final String id, final AbstractLink link, final String label)
   {
     super(id);
     this.link = link;
     add(link);
+    this.label = label;
     final Label labelComp = new Label("label", label);
     labelComp.setRenderBodyOnly(true);
     link.add(labelComp);
@@ -84,5 +87,13 @@ public class ContentMenuEntryPanel extends Panel
   {
     WicketUtils.addTooltip(link, title, text);
     return this;
+  }
+
+  /**
+   * @return the label
+   */
+  public String getLabel()
+  {
+    return label;
   }
 }
