@@ -96,6 +96,7 @@ public class StartHelper
 
     final WebAppContext webAppContext = new WebAppContext();
     webAppContext.setServer(server);
+    webAppContext.setClassLoader(StartHelper.class.getClassLoader());
     webAppContext.setContextPath("/ProjectForge");
     webAppContext.setWar("src/main/webapp");
     webAppContext.setDescriptor("src/main/webapp/WEB-INF/web.xml");
