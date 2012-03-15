@@ -47,7 +47,7 @@ public class AddressPagesTest extends ListAndEditPagesTestBase
     tester.assertRenderedPage(AddressListPage.class);
 
     // Now, add a new address:
-    tester.clickLink(PATH_LISTPAGE_BUTTON_ADD);
+    tester.clickLink(findComponentByLabel(tester, PATH_CONTENT_MENU_REPEATER, KEY_LISTPAGE_BUTTON_ADD));
     tester.assertRenderedPage(AddressEditPage.class);
     // Need new page to initialize model:
     final AddressEditPage editPage = new AddressEditPage(new PageParameters());
@@ -56,7 +56,7 @@ public class AddressPagesTest extends ListAndEditPagesTestBase
         AddressStatus.UPTODATE).setTask(getTask("1.1"));
     tester.startPage(editPage);
     FormTester form = tester.newFormTester(PATH_EDITPAGE_FORM);
-    form.submit(PATH_EDITPAGE_BUTTON_CREATE);
+    form.submit(findComponentByLabel(form, KEY_EDITPAGE_BUTTON_CREATE));
     tester.assertRenderedPage(AddressListPage.class);
     final DataTable<AddressDO> table = (DataTable<AddressDO>) tester.getComponentFromLastRenderedPage(PATH_LISTPAGE_TABLE);
     Assert.assertEquals(1, table.getRowCount());
@@ -71,8 +71,7 @@ public class AddressPagesTest extends ListAndEditPagesTestBase
     tester.clickLink(PATH_LISTPAGE_FIRST_LIST_ENTRY_SELECT_BUTTON); // Edit page
     tester.assertRenderedPage(AddressEditPage.class);
     form = tester.newFormTester(PATH_EDITPAGE_FORM);
-    form.submit(PATH_EDITPAGE_BUTTON_MARK_AS_DELETED);
-
+    form.submit(findComponentByLabel(form, KEY_EDITPAGE_BUTTON_MARK_AS_DELETED));
   }
 
   @Override

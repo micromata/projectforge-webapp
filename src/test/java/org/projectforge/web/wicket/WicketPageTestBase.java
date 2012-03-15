@@ -24,8 +24,14 @@
 package org.projectforge.web.wicket;
 
 import org.apache.commons.lang.ClassUtils;
+import org.apache.wicket.Component;
+import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.Page;
 import org.apache.wicket.Session;
+import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.LabeledWebMarkupContainer;
+import org.apache.wicket.markup.html.link.AbstractLink;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
@@ -33,11 +39,14 @@ import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.tester.WicketTester;
+import org.apache.wicket.util.visit.IVisit;
+import org.apache.wicket.util.visit.IVisitor;
 import org.junit.Before;
 import org.projectforge.test.TestBase;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuBuilder;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -102,7 +111,7 @@ public class WicketPageTestBase extends TestBase
     }
     // assert rendered page class
     tester.assertRenderedPage(LoginPage.class);
-    final FormTester form = tester.newFormTester("html:body:form");
+    final FormTester form = tester.newFormTester("body:form");
     form.setValue("username", username);
     form.setValue("password", password);
     form.submit("login");
@@ -112,6 +121,78 @@ public class WicketPageTestBase extends TestBase
   public void loginTestAdmin()
   {
     login(TestBase.TEST_ADMIN_USER, TestBase.TEST_ADMIN_USER_PASSWORD);
+  }
+
+  /**
+   * Searches FormComponents (model object), LabeledWebmarkupContainers (label model) and ContentMenuEntryPanels (label).
+   * @param container
+   * @param label i18n key of the label or label (for buttons).
+   * @return Found component with the given label or null if no such component found.
+   * @see FormComponent#getModelObject()
+   * @see LabeledWebMarkupContainer#getLabel()
+   * @see ContentMenuEntryPanel#getLabel()
+   */
+  public Component findComponentByLabel(final MarkupContainer container, final String label)
+  {
+    final String locLabel = container.getString(label);
+    final Component[] component = new Component[1];
+    container.visitChildren(new IVisitor<Component, Void>() {
+      @Override
+      public void component(final Component object, final IVisit<Void> visit)
+      {
+        if (object instanceof AbstractLink) {
+          final MarkupContainer parent = object.getParent();
+          if (parent instanceof ContentMenuEntryPanel) {
+            if (labelEquals(((ContentMenuEntryPanel) parent).getLabel(), label, locLabel) == true) {
+              component[0] = object;
+            }
+          }
+        } else {
+          if (object instanceof LabeledWebMarkupContainer) {
+            final IModel<String> labelModel = ((LabeledWebMarkupContainer) object).getLabel();
+            if (labelModel != null) {
+              if (labelEquals(labelModel.getObject(), label, locLabel) == true) {
+                component[0] = object;
+              }
+            }
+          }
+          if (object instanceof FormComponent< ? >) {
+            final Object modelObject = ((FormComponent< ? >) object).getModelObject();
+            if (modelObject instanceof String) {
+              if (labelEquals((String)modelObject, label, locLabel) == true) {
+                component[0] = object;
+              }
+            }
+          }
+        }
+      }
+    });
+    return component[0];
+  }
+
+  private boolean labelEquals(final String label, final String l1, final String l2)
+  {
+    if (label == null) {
+      return false;
+    }
+    return l1 != null && label.equals(l1) == true || l2 != null && label.equals(l2) == true;
+  }
+
+  public Component findComponentByLabel(final FormTester form, final String label)
+  {
+    return findComponentByLabel(form.getForm(), label);
+  }
+
+  /**
+   * 
+   * @param tester WicketTester with the last rendered page.
+   * @param containerPath path of the container to search in.
+   * @param label
+   * @see #findComponentByLabel(MarkupContainer, String)
+   */
+  public Component findComponentByLabel(final WicketTester tester, final String containerPath, final String label)
+  {
+    return findComponentByLabel((MarkupContainer) tester.getComponentFromLastRenderedPage(containerPath), label);
   }
 
   /**

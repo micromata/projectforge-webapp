@@ -23,6 +23,7 @@
 
 package org.projectforge.web.wicket;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.util.tester.FormTester;
 import org.junit.Assert;
@@ -35,21 +36,23 @@ import org.junit.Test;
  */
 public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
 {
-  protected final String PATH_LISTPAGE_BUTTON_ADD = "body:contentMenuArea:menu:1:link";
+  protected final String KEY_LISTPAGE_SEARCH_INPUT_FIELD = "searchFilter";
+
+  protected final String KEY_EDITPAGE_BUTTON_CREATE = "create";
+
+  protected final String KEY_EDITPAGE_BUTTON_MARK_AS_DELETED = "markAsDeleted";
+
+  protected final String KEY_LISTPAGE_BUTTON_ADD = "add";
+
+  protected final String PATH_CONTENT_MENU_REPEATER = "body:contentMenuRepeater";
+
+  protected final String PATH_EDITPAGE_FORM = "body:form";
 
   protected final String PATH_LISTPAGE_FORM = "body:form";
-
-  protected final String PATH_LISTPAGE_SEARCH_INPUT_FIELD = "filter:searchFilterRow:searchCell:searchString";
 
   protected final String PATH_LISTPAGE_FIRST_LIST_ENTRY_SELECT_BUTTON = "body:form:table:body:rows:1:cells:1:cell:1:select";
 
   protected final String PATH_LISTPAGE_TABLE = "body:form:table";
-
-  protected final String PATH_EDITPAGE_FORM = "body:form";
-
-  protected final String PATH_EDITPAGE_BUTTON_CREATE = "create:button";
-
-  protected final String PATH_EDITPAGE_BUTTON_MARK_AS_DELETED = "markAsDeleted:button";
 
   @Test
   public void baseTests()
@@ -61,14 +64,14 @@ public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
       Assert.assertEquals(getNumberOfExistingListElements().intValue(), table.getRowCount());
     }
     // Now, add a new element:
-    tester.clickLink(PATH_LISTPAGE_BUTTON_ADD);
+    tester.clickLink(findComponentByLabel(tester, PATH_CONTENT_MENU_REPEATER, KEY_LISTPAGE_BUTTON_ADD));
     tester.assertRenderedPage(getEditPageClass());
 
     // Need new page to initialize model:
     final AbstractEditPage< ? , ? , ? > editPage = getEditPageWithPrefilledData();
     tester.startPage(editPage);
     FormTester form = tester.newFormTester(PATH_EDITPAGE_FORM);
-    form.submit(PATH_EDITPAGE_BUTTON_CREATE);
+    form.submit(findComponentByLabel(form, KEY_EDITPAGE_BUTTON_CREATE));
     final Integer id = (Integer) editPage.getData().getId();
 
     // Now check list page
@@ -83,7 +86,7 @@ public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
     tester.assertRenderedPage(getEditPageClass());
     checkEditPage();
     form = tester.newFormTester(PATH_EDITPAGE_FORM);
-    form.submit(PATH_EDITPAGE_BUTTON_MARK_AS_DELETED);
+    form.submit(findComponentByLabel(form, KEY_EDITPAGE_BUTTON_MARK_AS_DELETED));
 
     // Now check list page again after object was deleted:
     tester.assertRenderedPage(getListPageClass());
@@ -151,7 +154,8 @@ public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
     tester.startPage(getListPageClass());
     tester.assertRenderedPage(getListPageClass());
     final FormTester form = tester.newFormTester(PATH_LISTPAGE_FORM);
-    form.setValue(PATH_LISTPAGE_SEARCH_INPUT_FIELD, searchString != null ? searchString : "");
+    final Component comp = findComponentByLabel(form, KEY_LISTPAGE_SEARCH_INPUT_FIELD);
+    form.setValue(comp, searchString != null ? searchString : "");
     form.submit();
   }
 }
