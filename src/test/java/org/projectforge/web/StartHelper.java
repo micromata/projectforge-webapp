@@ -23,10 +23,8 @@
 
 package org.projectforge.web;
 
-import java.io.File;
 import java.io.InputStream;
 
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.bio.SocketConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -95,8 +93,8 @@ public class StartHelper
     // }
 
     final WebAppContext webAppContext = new WebAppContext();
-    webAppContext.setServer(server);
     webAppContext.setClassLoader(StartHelper.class.getClassLoader());
+    webAppContext.setServer(server);
     webAppContext.setContextPath("/ProjectForge");
     webAppContext.setWar("src/main/webapp");
     webAppContext.setDescriptor("src/main/webapp/WEB-INF/web.xml");
@@ -104,16 +102,6 @@ public class StartHelper
     webAppContext.setExtraClasspath("target/classes");
     webAppContext.setInitParameter("development", String.valueOf(settings.isDevelopment()));
     webAppContext.setInitParameter("stripWicketTargets", String.valueOf(settings.isStripWicketTargets()));
-    if (StringUtils.isNotBlank(settings.getJdbcJar()) == true) {
-      final File jdbcJarFile = new File(settings.getJdbcJar());
-      if (jdbcJarFile.canRead() == true) {
-        // If started with other jdbc driver:
-        log.info("Using jdbc jar file: " + jdbcJarFile.getAbsolutePath());
-        webAppContext.setExtraClasspath(jdbcJarFile.getAbsolutePath());
-      } else {
-        log.error("Can't load jdbc jar file: " + jdbcJarFile.getAbsolutePath());
-      }
-    }
 
     // START JMX SERVER
     // MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
