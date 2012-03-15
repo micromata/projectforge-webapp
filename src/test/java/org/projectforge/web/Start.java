@@ -27,7 +27,7 @@ import org.projectforge.database.HibernateDialect;
 
 /**
  * Starts ProjectForge for development purposes as an alternative to WTP. Debug mode is supported.<br/>
- * For own parameter sets (other database etc.), make a clone first (such as StartPostgreSQL is).<br/>
+ * For own parameter sets (other database etc.), use MyStart (see StartPostgreSQL as a PostgreSQL example).<br/>
  * For larger installations please increase memory by giving the following start VM parameters: -Xmx1024m -XX:MaxPermSize=256m
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
