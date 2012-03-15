@@ -44,6 +44,8 @@ import org.projectforge.web.wicket.flowlayout.GridBuilder;
  */
 public class GridBuilderMobileImpl implements GridBuilder
 {
+  private static final long serialVersionUID = 134863232462613937L;
+
   private DivPanel gridPanel, blockPanel, columnsPanel, columnPanel;
 
   private BrowserScreenWidthType browserScreenWidthType;

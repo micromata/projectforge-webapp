@@ -39,6 +39,8 @@ import org.projectforge.web.wicket.MySession;
  */
 public class GridBuilderImpl implements GridBuilder
 {
+  private static final long serialVersionUID = 4323077384391963834L;
+
   private DivPanel gridPanel, blockPanel, columnsPanel, columnPanel;
 
   private BrowserScreenWidthType browserScreenWidthType;

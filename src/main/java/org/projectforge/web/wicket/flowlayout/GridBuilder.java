@@ -9,11 +9,13 @@
 
 package org.projectforge.web.wicket.flowlayout;
 
+import java.io.Serializable;
+
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public interface GridBuilder
+public interface GridBuilder extends Serializable
 {
   /**
    * Generates new grid panel. For narrow screens a grid16 panel will be created.
