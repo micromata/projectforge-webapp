@@ -39,14 +39,14 @@ public class StartPostgreSQL
 
   private static final String BASE_DIR = System.getProperty("user.home") + "/ProjectForge";
 
-  private static final String JDBC_JAR = System.getProperty("user.home") + "/workspace/Java/apache-tomcat/lib/postgresql-8.3-603.jdbc3.jar";
-
   private static final String JDBC_USER = "projectforge";
 
   public static void main(final String[] args) throws Exception
   {
+    // Please don't forget to add your Postgresql driver, such as postgresql-8.3-603.jdbc3.jar
+    // Open Run/Debug configurations dialog (Eclipse context menu of this class) and add external jar to classpath.
     final StartSettings settings = new StartSettings(HibernateDialect.PostgreSQL, BASE_DIR);
-    settings.setJdbcJar(JDBC_JAR).setJdbcUser(JDBC_USER);
+    settings.setJdbcUser(JDBC_USER);
     settings.setSchemaUpdate(SCHEMA_UPDATE);
     StartHelper.start(settings);
   }
