@@ -44,7 +44,7 @@ public class StartSettings
 
   private String jdbcUrl;
 
-  private String jdbcJar, jdbcDriverClass;
+  private String jdbcDriverClass;
 
   private String jdbcUser;
 
@@ -174,20 +174,6 @@ public class StartSettings
   public StartSettings setJdbcUrl(final String jdbcUrl)
   {
     this.jdbcUrl = jdbcUrl;
-    return this;
-  }
-
-  /**
-   * For PostgreSQL or any other data-base other than HSQLDB a jar file has to be defined which contains the jdbc driver of the data-base.
-   */
-  public String getJdbcJar()
-  {
-    return jdbcJar;
-  }
-
-  public StartSettings setJdbcJar(final String jdbcJar)
-  {
-    this.jdbcJar = jdbcJar;
     return this;
   }
 
