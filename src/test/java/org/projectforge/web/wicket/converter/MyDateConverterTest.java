@@ -38,7 +38,6 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.test.TestBase;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.wicket.converter.MyDateConverter;
 
 public class MyDateConverterTest extends TestBase
 {
@@ -46,7 +45,7 @@ public class MyDateConverterTest extends TestBase
   public void preProcessInput()
   {
     final int year = Calendar.getInstance(Locale.GERMAN).get(Calendar.YEAR);
-    MyDateConverter conv = new MyDateConverter();
+    final MyDateConverter conv = new MyDateConverter();
     assertEquals("21.11.1970", conv.preProcessInput("21.11.1970", Locale.GERMAN));
     assertEquals("21.11.1970", conv.preProcessInput(" 21 .   11 . 1970   ", Locale.GERMAN));
     assertEquals("21.11." + year, conv.preProcessInput("21 .11.", Locale.GERMAN));
@@ -71,35 +70,35 @@ public class MyDateConverterTest extends TestBase
   @Test
   public void convertToObjetErrors()
   {
-    MyDateConverter conv = new MyDateConverter();
+    final MyDateConverter conv = new MyDateConverter();
     try {
       conv.convertToObject("31.11.09", Locale.GERMAN);
       fail("ConversionException exprected.");
-    } catch (ConversionException ex) {
+    } catch (final ConversionException ex) {
       // OK
     }
     try {
       conv.convertToObject("31.11.", Locale.GERMAN);
       fail("ConversionException exprected.");
-    } catch (ConversionException ex) {
+    } catch (final ConversionException ex) {
       // OK
     }
     try {
       conv.convertToObject("11/31/1970", Locale.ENGLISH);
       fail("ConversionException exprected.");
-    } catch (ConversionException ex) {
+    } catch (final ConversionException ex) {
       // OK
     }
     try {
       conv.convertToObject("11/31/70", Locale.ENGLISH);
       fail("ConversionException exprected.");
-    } catch (ConversionException ex) {
+    } catch (final ConversionException ex) {
       // OK
     }
     try {
       conv.convertToObject("11/31", Locale.ENGLISH);
       fail("ConversionException exprected.");
-    } catch (ConversionException ex) {
+    } catch (final ConversionException ex) {
       // OK
     }
   }
@@ -107,47 +106,47 @@ public class MyDateConverterTest extends TestBase
   @Test
   public void convertToString()
   {
-    MyDateConverter conv = new MyDateConverter();
-    PFUserDO user = new PFUserDO();
+    final MyDateConverter conv = new MyDateConverter();
+    final PFUserDO user = new PFUserDO();
     user.setTimeZone(DateHelper.EUROPE_BERLIN);
     user.setLocale(Locale.GERMAN);
     user.setDateFormat("dd.MM.yyyy");
     PFUserContext.setUser(user);
     Date testDate = createDate(1970, 10, 21, 0, 0, 0, 0, DateHelper.EUROPE_BERLIN);
-    assertEquals("21.11.70", conv.convertToString(testDate, Locale.GERMAN));
+    assertEquals("21.11.1970", conv.convertToString(testDate, Locale.GERMAN));
     user.setLocale(Locale.ENGLISH);
     user.setDateFormat("MM/dd/yyyy");
-    assertEquals("11/21/70", conv.convertToString(testDate, Locale.GERMAN));
+    assertEquals("11/21/1970", conv.convertToString(testDate, Locale.GERMAN));
 
     user.setLocale(Locale.GERMAN);
     user.setDateFormat("dd.MM.yyyy");
     testDate = createDate(2009, 1, 1, 0, 0, 0, 0, DateHelper.EUROPE_BERLIN);
-    assertEquals("01.02.09", conv.convertToString(testDate, Locale.GERMAN));
+    assertEquals("01.02.2009", conv.convertToString(testDate, Locale.GERMAN));
     user.setLocale(Locale.ENGLISH);
     user.setDateFormat("MM/dd/yyyy");
-    assertEquals("02/01/09", conv.convertToString(testDate, Locale.GERMAN));
+    assertEquals("02/01/2009", conv.convertToString(testDate, Locale.GERMAN));
   }
 
   private void convertToObjectGerman(final TimeZone timeZone)
   {
-    MyDateConverter conv = new MyDateConverter();
+    final MyDateConverter conv = new MyDateConverter();
     assertNull(conv.convertToObject("", Locale.GERMAN));
 
-    PFUserDO user = new PFUserDO();
+    final PFUserDO user = new PFUserDO();
     user.setTimeZone(timeZone);
     user.setDateFormat("dd.MM.yyyy");
     PFUserContext.setUser(user);
     Date testDate = createDate(1970, 9, 21, 0, 0, 0, 0, timeZone);
-    Date date = (Date) conv.convertToObject("21.10.1970", Locale.GERMAN);
+    Date date = conv.convertToObject("21.10.1970", Locale.GERMAN);
     assertDates(testDate, date);
     try {
-      date = (Date) conv.convertToObject("21/10/1970", Locale.GERMAN);
+      date = conv.convertToObject("21/10/1970", Locale.GERMAN);
       fail("ConversionException exprected.");
-    } catch (ConversionException ex) {
+    } catch (final ConversionException ex) {
       // OK
     }
     assertDates(testDate, date);
-    date = (Date) conv.convertToObject("21.10.70", Locale.GERMAN);
+    date = conv.convertToObject("21.10.70", Locale.GERMAN);
     assertDates(testDate, date);
 
     // date = (Date) conv.convertToObject("21. Okt 1970", Locale.GERMAN);
@@ -155,37 +154,37 @@ public class MyDateConverterTest extends TestBase
     // date = (Date) conv.convertToObject("21. Oktober 1970", Locale.GERMAN);
     // assertDates(testDate, date);
 
-    date = (Date) conv.convertToObject("1970-10-21", Locale.GERMAN);
+    date = conv.convertToObject("1970-10-21", Locale.GERMAN);
     assertDates(testDate, date);
-    date = (Date) conv.convertToObject("1970 - 10 - 21", Locale.GERMAN);
+    date = conv.convertToObject("1970 - 10 - 21", Locale.GERMAN);
     assertDates(testDate, date);
     try {
-      date = (Date) conv.convertToObject("1970.10.21", Locale.GERMAN);
+      date = conv.convertToObject("1970.10.21", Locale.GERMAN);
       fail("ConversionException exprected.");
-    } catch (ConversionException ex) {
+    } catch (final ConversionException ex) {
       // OK
     }
 
     try {
-      date = (Date) conv.convertToObject(String.valueOf(testDate.getTime()), Locale.GERMAN); // millis not supported.
+      date = conv.convertToObject(String.valueOf(testDate.getTime()), Locale.GERMAN); // millis not supported.
       fail("ConversionException exprected.");
-    } catch (ConversionException ex) {
+    } catch (final ConversionException ex) {
       // OK
     }
 
     testDate = createDate(1970, 9, 1, 0, 0, 0, 0, timeZone);
-    date = (Date) conv.convertToObject("1.10.1970", Locale.GERMAN);
+    date = conv.convertToObject("1.10.1970", Locale.GERMAN);
     assertDates(testDate, date);
-    date = (Date) conv.convertToObject("01.10.70", Locale.GERMAN);
+    date = conv.convertToObject("01.10.70", Locale.GERMAN);
     assertDates(testDate, date);
 
-    Calendar cal = Calendar.getInstance(timeZone);
-    int year = cal.get(Calendar.YEAR);
+    final Calendar cal = Calendar.getInstance(timeZone);
+    final int year = cal.get(Calendar.YEAR);
 
     testDate = createDate(year, 9, 21, 0, 0, 0, 0, timeZone);
-    date = (Date) conv.convertToObject("21.10.", Locale.GERMAN);
+    date = conv.convertToObject("21.10.", Locale.GERMAN);
     assertDates(testDate, date);
-    date = (Date) conv.convertToObject("21.10", Locale.GERMAN);
+    date = conv.convertToObject("21.10", Locale.GERMAN);
     assertDates(testDate, date);
     // date = (Date) conv.convertToObject("21. Okt " + year, Locale.GERMAN);
     // assertDates(testDate, date);
@@ -195,41 +194,41 @@ public class MyDateConverterTest extends TestBase
 
   private void convertToObjectEnglish(final TimeZone timeZone)
   {
-    MyDateConverter conv = new MyDateConverter();
-    PFUserDO user = new PFUserDO();
+    final MyDateConverter conv = new MyDateConverter();
+    final PFUserDO user = new PFUserDO();
     user.setTimeZone(timeZone);
     PFUserContext.setUser(user);
     Date testDate = createDate(1970, 9, 21, 0, 0, 0, 0, timeZone);
-    Date date = (Date) conv.convertToObject("10/21/1970", Locale.ENGLISH);
+    Date date = conv.convertToObject("10/21/1970", Locale.ENGLISH);
     assertDates(testDate, date);
-    date = (Date) conv.convertToObject("10/21/70", Locale.ENGLISH);
+    date = conv.convertToObject("10/21/70", Locale.ENGLISH);
     assertDates(testDate, date);
-    date = (Date) conv.convertToObject("1970-10-21", Locale.ENGLISH);
+    date = conv.convertToObject("1970-10-21", Locale.ENGLISH);
     assertDates(testDate, date);
     try {
-      date = (Date) conv.convertToObject(String.valueOf(testDate.getTime()), Locale.ENGLISH); // millis not supported.
+      date = conv.convertToObject(String.valueOf(testDate.getTime()), Locale.ENGLISH); // millis not supported.
       fail("ConversionException exprected.");
-    } catch (ConversionException ex) {
+    } catch (final ConversionException ex) {
       // OK
     }
 
-    Calendar cal = Calendar.getInstance(timeZone);
-    int year = cal.get(Calendar.YEAR);
+    final Calendar cal = Calendar.getInstance(timeZone);
+    final int year = cal.get(Calendar.YEAR);
 
     testDate = createDate(year, 9, 21, 0, 0, 0, 0, timeZone);
-    date = (Date) conv.convertToObject("10/21", Locale.ENGLISH);
+    date = conv.convertToObject("10/21", Locale.ENGLISH);
     assertDates(testDate, date);
   }
 
-  private void assertDates(Date exptected, Date actual)
+  private void assertDates(final Date exptected, final Date actual)
   {
     assertEquals(DateHelper.formatAsUTC(exptected), DateHelper.formatAsUTC(actual));
     assertEquals(exptected.getTime(), actual.getTime());
   }
 
-  private Date createDate(int year, int month, int day, int hour, int minute, int second, int millisecond, TimeZone timeZone)
+  private Date createDate(final int year, final int month, final int day, final int hour, final int minute, final int second, final int millisecond, final TimeZone timeZone)
   {
-    Calendar cal = Calendar.getInstance(timeZone);
+    final Calendar cal = Calendar.getInstance(timeZone);
     cal.set(Calendar.YEAR, year);
     cal.set(Calendar.MONTH, month);
     cal.set(Calendar.DAY_OF_MONTH, day);
