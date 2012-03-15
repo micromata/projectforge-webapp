@@ -45,13 +45,13 @@ public class LoginPageTest extends WicketPageTestBase
     // assert rendered page class
     tester.assertRenderedPage(LoginPage.class);
     // assert rendered label component
-    tester.assertVisible("html:body:form:username");
-    FormTester form = tester.newFormTester("html:body:form");
+    tester.assertVisible("body:form:username");
+    FormTester form = tester.newFormTester("body:form");
     form.setValue("username", "demo");
     form.setValue("password", "wrong");
     form.submit("login");
     tester.assertRenderedPage(LoginPage.class);
-    form = tester.newFormTester("html:body:form");
+    form = tester.newFormTester("body:form");
     form.setValue("username", TestBase.TEST_ADMIN_USER);
     form.setValue("password", TestBase.TEST_ADMIN_USER_PASSWORD);
     form.submit("login");
