@@ -59,7 +59,7 @@
         <prop key="hibernate.use_outer_join">true</prop>
         <prop key="hibernate.max_fetch_depth">3</prop>
         <prop key="hibernate.default_batch_fetch_size">8</prop>
-        <prop key="hibernate.cglib.use_reflection_optimizer">true</prop>
+        <prop key="hibernate.bytecode.use_reflection_optimizer">true</prop>
         <prop key="hibernate.cache.use_query_cache">true</prop>
         <prop key="hibernate.cache.use_second_level_cache">true</prop>
         <prop key="hibernate.cache.provider_class">net.sf.ehcache.hibernate.SingletonEhCacheProvider</prop>
