@@ -63,7 +63,6 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
   public UserXmlPreferencesDao()
   {
     xstream = new XStream();
-    xstream.setClassLoader(getClass().getClassLoader()); // Crashes without setClassLoader() if started via StartHelper.
     xstream.processAnnotations(new Class< ? >[] { UserXmlPreferencesMap.class, TaskFilter.class, TimesheetPrefData.class,
         ScriptCallData.class, RecentScriptCalls.class});
     registerConverter(UserDao.class, PFUserDO.class, 20);
