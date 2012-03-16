@@ -333,6 +333,10 @@
           <groupId>org.hibernate</groupId>
           <artifactId>hibernate-annotations</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency> <!-- Version check: 2010-08-28 -->
