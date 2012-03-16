@@ -38,11 +38,9 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
 import org.projectforge.address.FormOfAddress;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.calendar.MonthHolder;
-import org.projectforge.core.Priority;
 import org.projectforge.fibu.AuftragFilter;
 import org.projectforge.fibu.AuftragsStatus;
 import org.projectforge.web.MenuItemDef;
@@ -55,11 +53,11 @@ import org.projectforge.web.wicket.WebConstants;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class GetI18nKeysTest
+public class CreateI18nKeys
 {
   // TODO: I18nEnums
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GetI18nKeysTest.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CreateI18nKeys.class);
 
   private static final String PATH = "src/main/";
 
@@ -79,19 +77,24 @@ public class GetI18nKeysTest
 
   private static final String I18N_KEYS_FILE = "src/main/resources/" + WebConstants.FILE_I18N_KEYS;
 
-  @Test
-  public void doit() throws IOException
+  public static void main(final String[] args) throws IOException
+  {
+    new CreateI18nKeys().run();
+  }
+
+  public void run() throws IOException
   {
     log.info("Create file with all detected i18n keys.");
     final Map<String, Set<String>> i18nKeyUsage = new HashMap<String, Set<String>>();
     parseHtml(i18nKeyUsage);
     parseJava(i18nKeyUsage);
     final FileWriter writer = new FileWriter(I18N_KEYS_FILE);
-    writer.append("# Don't edit this file. This file is only for developers for checking i18n keys and detecting missed and unused ones.\n");
+    writer
+    .append("# Don't edit this file. This file is only for developers for checking i18n keys and detecting missed and unused ones.\n");
     final Set<String> i18nKeys = new TreeSet<String>(i18nKeyUsage.keySet());
     for (final String i18nKey : i18nKeys) {
       writer.append(i18nKey).append("=");
-      Set<String> set = i18nKeyUsage.get(i18nKey);
+      final Set<String> set = i18nKeyUsage.get(i18nKey);
       boolean first = true;
       for (final String filename : set) {
         if (first == false) {
@@ -183,7 +186,7 @@ public class GetI18nKeysTest
     }
   }
 
-  private static String getPathForClass(Class< ? > clazz)
+  private static String getPathForClass(final Class< ? > clazz)
   {
     return clazz.getName().replace(".", "/") + ".java";
   }

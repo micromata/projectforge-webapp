@@ -31,20 +31,18 @@ import java.io.LineNumberReader;
 import java.util.Collection;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.Test;
 
 /**
  */
-public class ModifyJavaFileHeadersTest
+public class ModifyJavaFileHeaders
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ModifyJavaFileHeadersTest.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ModifyJavaFileHeaders.class);
 
   private static final String PATH = "src";
 
-  @Test
-  public void doit() throws IOException
+  public static void main(final String[] args) throws IOException
   {
-    //doitReally();
+    new ModifyJavaFileHeaders().doitReally();
   }
 
   private void doitReally() throws IOException
