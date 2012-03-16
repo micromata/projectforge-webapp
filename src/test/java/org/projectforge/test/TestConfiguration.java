@@ -170,7 +170,7 @@ public class TestConfiguration
   protected void initCtx() throws BeansException
   {
     if (ctx == null) {
-      log.info("Initializing context");
+      log.info("Initializing context: " + org.projectforge.common.StringHelper.listToString(", ", contextFiles));
       try {
         // Build spring context
         ctx = new ClassPathXmlApplicationContext(contextFiles);
@@ -186,7 +186,7 @@ public class TestConfiguration
         }
         final LocalSessionFactoryBean localSessionFactoryBean = (LocalSessionFactoryBean) ctx.getBean("&sessionFactory");
         HibernateUtils.setConfiguration(localSessionFactoryBean.getConfiguration());
-      } catch (final Exception ex) {
+      } catch (final Throwable ex) {
         log.error(ex.getMessage(), ex);
         throw new RuntimeException(ex);
       }
@@ -194,7 +194,7 @@ public class TestConfiguration
       // Get a new HibernateTemplate each time
       ctx.getBeanFactory().autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
     }
-    final Configuration cfg = (Configuration)ctx.getBean("configuration", Configuration.class);
+    final Configuration cfg = (Configuration) ctx.getBean("configuration", Configuration.class);
     cfg.setBeanFactory(ctx.getBeanFactory()); // Bean factory need to be set.
   }
 }
