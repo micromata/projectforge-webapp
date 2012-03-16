@@ -191,10 +191,10 @@
     <servlet-class>org.projectforge.web.calendar.CalendarFeed</servlet-class>
   </servlet>
   
-  <servlet-mapping>
+  <!-- servlet-mapping>
     <servlet-name>jersey</servlet-name>
     <url-pattern>/rest/*</url-pattern>
-  </servlet-mapping>
+  </servlet-mapping-->
   <servlet-mapping>
     <servlet-name>LogoServlet</servlet-name>
     <url-pattern>/secure/Logo.png</url-pattern>
