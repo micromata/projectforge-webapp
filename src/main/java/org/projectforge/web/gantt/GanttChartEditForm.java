@@ -243,6 +243,7 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       panel.add(ganttChartEditTreeTablePanel);
       ganttChartEditTreeTablePanel.init();
       ganttChartEditTreeTablePanel.setOpenNodes(getSettings().getOpenNodes());
+      gridBuilder.getPanel().add(imagePanel = new DivPanel(panel.newChildId()));
     }
     {
       // Redraw:
@@ -274,9 +275,6 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
       final SingleButtonPanel cloneButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), cloneButton, getString("clone"),
           SingleButtonPanel.GREY);
       actionButtons.add(3, cloneButtonPanel);
-    }
-    {
-      imagePanel = gridBuilder.getPanel();
     }
 
     // final SubmitLink addPositionButton = new SubmitLink("addActivity") {

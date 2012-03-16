@@ -155,10 +155,8 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
 
   protected void redraw()
   {
-    if (ganttImage != null) {
-      form.imagePanel.remove(ganttImage);
-    }
     final GanttChart ganttChart = createGanttChart();
+    final Component oldGanttImage = ganttImage;
     if (ganttChart != null) {
       final Document document = ganttChart.create();
       if (document != null) {
@@ -169,7 +167,11 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
     } else {
       ganttImage = WicketUtils.getInvisibleComponent(DivPanel.CHILD_ID);
     }
-    form.imagePanel.add(ganttImage);
+    if (oldGanttImage != null) {
+      form.imagePanel.replace(ganttImage);
+    } else {
+      form.imagePanel.add(ganttImage);
+    }
   }
 
   private GanttChartStyle getGanttChartStyle()
