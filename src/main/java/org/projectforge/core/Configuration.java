@@ -38,7 +38,6 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
  * This class It's also provides the configuration of the parameters which are stored via ConfigurationDao. Those parameters are cached. <br/>
- * The config.xml will never re-read automatically. Please call the web admin page to force a re-read.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -55,6 +54,8 @@ public class Configuration extends AbstractCache
 
   private Map<ConfigurationParam, Object> configurationParamMap;
 
+  private boolean testMode;
+
   public void setBeanFactory(final ConfigurableListableBeanFactory beanFactory)
   {
     this.beanFactory = beanFactory;
@@ -68,6 +69,15 @@ public class Configuration extends AbstractCache
   public void setConfigurationDao(final ConfigurationDao configurationDao)
   {
     this.configurationDao = configurationDao;
+  }
+
+  public static void init4TestMode()
+  {
+    if (instance == null) {
+      new Configuration();
+      instance.testMode = true;
+      instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
+    }
   }
 
   public static Configuration getInstance()
@@ -238,6 +248,11 @@ public class Configuration extends AbstractCache
   @Override
   protected void refresh()
   {
+    if (testMode == true) {
+      // Do nothing.
+      log.info("Initializing Configuration (ConfigurationDO parameters): Do nothing (test mode)...");
+      return;
+    }
     log.info("Initializing Configuration (ConfigurationDO parameters) ...");
     final Map<ConfigurationParam, Object> newMap = new HashMap<ConfigurationParam, Object>();
     final List<ConfigurationDO> list = configurationDao.internalLoadAll();
