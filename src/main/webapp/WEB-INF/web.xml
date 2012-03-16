@@ -149,10 +149,10 @@
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
-  <servlet>
+  <!-- servlet>
     <servlet-name>jersey</servlet-name>
     <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
-  </servlet>
+  </servlet-->
   <servlet>
     <!-- Displays logo at the top of the navigation menu. -->
     <servlet-name>LogoServlet</servlet-name>
