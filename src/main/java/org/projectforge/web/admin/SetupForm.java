@@ -34,6 +34,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.validator.AbstractValidator;
+import org.projectforge.core.ConfigurationDO;
 import org.projectforge.database.InitDatabaseDao;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.wicket.AbstractForm;
@@ -168,13 +169,13 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
     {
       // E-Mail sysops
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.systemAdministratorEMail"), true);
-      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "sysopEMail")));
+      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "sysopEMail"), ConfigurationDO.PARAM_LENGTH));
       fs.addHelpIcon(getString("administration.configuration.param.systemAdministratorEMail.description"));
     }
     {
       // E-Mail sysops
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("administration.configuration.param.feedbackEMail"), true);
-      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "feedbackEMail")));
+      fs.add(new MaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "feedbackEMail"), ConfigurationDO.PARAM_LENGTH));
       fs.addHelpIcon(getString("administration.configuration.param.feedbackEMail.description"));
     }
     final RepeatingView actionButtons = new RepeatingView("buttons");
