@@ -36,6 +36,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.core.ConfigXmlTest;
+import org.projectforge.core.Configuration;
 import org.projectforge.renderer.BatikImageRenderer;
 import org.projectforge.renderer.ImageFormat;
 import org.projectforge.test.TestConfiguration;
@@ -49,6 +50,7 @@ public class GanttTest
   {
     // Needed if this tests runs before the ConfigurationTest.
     ConfigXmlTest.createTestConfiguration();
+    Configuration.init4TestMode();
   }
 
   @Test
@@ -63,7 +65,7 @@ public class GanttTest
     writeFile("ganttTest.svg", BatikImageRenderer.getByteArray(diagram.create(), 800, ImageFormat.SVG));
     writeFile("ganttTest.pdf", BatikImageRenderer.getByteArray(diagram.create(), 800, ImageFormat.PDF));
   }
-  
+
   private void writeFile(final String filename, final byte[] ba) throws IOException {
     final File file = TestConfiguration.getWorkFile(filename);
     log.info("Writing Gantt test image to work directory: " + file.getAbsolutePath());
