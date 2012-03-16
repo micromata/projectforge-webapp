@@ -56,7 +56,7 @@ public class HibernateSearchTaskPathBridge implements FieldBridge
       }
       final List<TaskNode> list = taskNode.getPathToRoot();
       final StringBuffer buf = new StringBuffer();
-      for (TaskNode node : list) {
+      for (final TaskNode node : list) {
         buf.append(node.getTask().getTitle()).append("|");
       }
       if (log.isDebugEnabled() == true) {
