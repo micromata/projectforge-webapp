@@ -48,6 +48,8 @@ import org.hibernate.search.annotations.Store;
 @Table(name = "T_CONFIGURATION")
 public class ConfigurationDO extends DefaultBaseDO
 {
+  public static final int PARAM_LENGTH = 4000;
+
   private static final long serialVersionUID = -1369978022611555731L;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -95,7 +97,7 @@ public class ConfigurationDO extends DefaultBaseDO
   /**
    * @return The string value. If entry is not from type STRING then a RuntimeException will be thrown.
    */
-  @Column(length = 4000)
+  @Column(length = PARAM_LENGTH)
   public String getStringValue()
   {
     if (stringValue != null) {
