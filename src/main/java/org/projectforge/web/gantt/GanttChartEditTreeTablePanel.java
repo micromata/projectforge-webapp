@@ -92,12 +92,12 @@ import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.PresizedImage;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.AjaxRequiredMaxLengthEditableLabel;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.ImageSubmitLinkPanel;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
-import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.SingleImagePanel;
 import org.projectforge.web.wicket.converter.IntegerPercentConverter;
 
@@ -168,7 +168,6 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     addColumnHead(col++, "gantt.predecessorOffset");
     addColumnHead(col++, "gantt.relationType.short");
     addColumnHead(col++, "gantt.objectType.short");
-    colHeadRepeater.add(createColHead("title"));
   }
 
   /**
@@ -682,7 +681,6 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
         addPredecessorOffsetColumns(item, node, ganttObject, task);
         addRelationTypeColumns(item, node, ganttObject, task);
         addTypeColumns(item, node, ganttObject, task);
-        addColumn(item, new Label("titleAsText", new PropertyModel<String>(ganttObject, "title")), null);
       }
     };
     refreshingView.setItemReuseStrategy(ReuseIfModelsEqualStrategy.getInstance());
@@ -749,8 +747,12 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
   private void addTitleColumns(final Item<GanttTreeTableNode> item, final GanttTreeTableNode node, final GanttTask ganttObject,
       final TaskDO task)
   {
-    final RequiredMaxLengthTextField titleField = new RequiredMaxLengthTextField("title", new PropertyModel<String>(ganttObject, "title"),
-        HibernateUtils.getPropertyLength(TaskDO.class.getName(), "title"));
+    final AjaxRequiredMaxLengthEditableLabel titleField = new AjaxRequiredMaxLengthEditableLabel("title",
+        new PropertyModel<String>(ganttObject, "title"), HibernateUtils.getPropertyLength(TaskDO.class.getName(), "title"));
+    titleField.setOutputMarkupId(true);
+    // final RequiredMaxLengthTextField titleField = new RequiredMaxLengthTextField("title", new PropertyModel<String>(ganttObject,
+    // "title"),
+    // HibernateUtils.getPropertyLength(TaskDO.class.getName(), "title"));
     addColumn(item, titleField, null);
     new RejectSaveLinksFragment("rejectSaveTitle", item, titleField, task, task != null ? task.getTitle() : "") {
       @Override
@@ -910,11 +912,7 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
       @Override
       public void onSubmit()
       {
-        if (ganttObject != null) {
-          ganttObject.setPredecessor(null);
-        } else {
-          log.error("GanttObject not found: + " + ganttObject);
-        }
+        ganttObject.setPredecessor(null);
       }
 
       @Override
@@ -925,21 +923,21 @@ public class GanttChartEditTreeTablePanel extends DefaultTreeTablePanel<GanttTre
     }.setDefaultFormProcessing(false);
     panel.add(unselectSubmitLink);
 
-    //    new RejectSaveLinksFragment("rejectSavePredecessor", item, panel, task, task != null ? taskFormatter.getTaskPath(
-    //        new WicketLocalizerAndUrlBuilder(getResponse()), task.getGanttPredecessorId(), null, false, false) : "") {
-    //      @Override
-    //      protected void onSave()
-    //      {
-    //        taskDao.setGanttPredecessor(task, (Integer) ganttObject.getPredecessorId());
-    //        taskDao.update(task);
-    //      }
-    //
-    //      @Override
-    //      protected void onReject()
-    //      {
-    //        ganttObject.setPredecessor(findById(task.getGanttPredecessorId()));
-    //      }
-    //    };
+    new RejectSaveLinksFragment("rejectSavePredecessor", item, panel, task, task != null ? taskFormatter.getTaskPath(getResponse(),
+        task.getGanttPredecessorId()) : "") {
+      @Override
+      protected void onSave()
+      {
+        taskDao.setGanttPredecessor(task, (Integer) ganttObject.getPredecessorId());
+        taskDao.update(task);
+      }
+
+      @Override
+      protected void onReject()
+      {
+        ganttObject.setPredecessor(findById(task.getGanttPredecessorId()));
+      }
+    };
   }
 
   @SuppressWarnings("serial")

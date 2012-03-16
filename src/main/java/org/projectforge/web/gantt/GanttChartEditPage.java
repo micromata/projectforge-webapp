@@ -26,8 +26,7 @@ package org.projectforge.web.gantt;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.WebComponent;
-import org.apache.wicket.markup.html.panel.Fragment;
+import org.apache.wicket.Component;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.FileHelper;
@@ -49,6 +48,8 @@ import org.projectforge.web.wicket.BatikImage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.EditPage;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.ImagePanel;
 import org.w3c.dom.Document;
 
 @EditPage(defaultReturnPage = GanttChartListPage.class)
@@ -63,13 +64,9 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
   @SpringBean(name = "ganttChartDao")
   private GanttChartDao ganttChartDao;
 
-  GanttChartEditTreeTablePanel ganttChartEditTreeTablePanel;
-
   GanttChartData ganttChartData;
 
-  private WebComponent ganttImage;
-
-  Fragment bottomPanelFragment;
+  private Component ganttImage;
 
   public GanttChartEditPage(final PageParameters parameters)
   {
@@ -81,11 +78,7 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
         getBaseDao().setTask(getData(), taskId);
       }
     }
-    ganttChartEditTreeTablePanel = new GanttChartEditTreeTablePanel("ganttTree", this.form, getData());
-    form.add(ganttChartEditTreeTablePanel);
-    ganttChartEditTreeTablePanel.init();
     refresh();
-    ganttChartEditTreeTablePanel.setOpenNodes(getSettings().getOpenNodes());
   }
 
   void export(final String exportFormat)
@@ -144,7 +137,7 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
   @Override
   public AbstractSecuredBasePage onSaveOrUpdate()
   {
-    getSettings().setOpenNodes(ganttChartEditTreeTablePanel.getOpenNodes());
+    getSettings().setOpenNodes(form.ganttChartEditTreeTablePanel.getOpenNodes());
     getBaseDao().writeGanttObjects(getData(), ganttChartData.getRootObject());
     return null;
   }
@@ -163,20 +156,20 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
   protected void redraw()
   {
     if (ganttImage != null) {
-      bottomPanelFragment.remove(ganttImage);
+      form.imagePanel.remove(ganttImage);
     }
     final GanttChart ganttChart = createGanttChart();
     if (ganttChart != null) {
       final Document document = ganttChart.create();
       if (document != null) {
-        ganttImage = new BatikImage("ganttChart", document, getGanttChartStyle().getWidth());
+        ganttImage = new ImagePanel(DivPanel.CHILD_ID, new BatikImage(ImagePanel.IMAGE_ID, document, getGanttChartStyle().getWidth()));
       } else {
-        ganttImage = WicketUtils.getInvisibleDummyImage("ganttChart", getResponse());
+        ganttImage = WicketUtils.getInvisibleComponent(DivPanel.CHILD_ID);
       }
     } else {
-      ganttImage = WicketUtils.getInvisibleDummyImage("ganttChart", getResponse());
+      ganttImage = WicketUtils.getInvisibleComponent(DivPanel.CHILD_ID);
     }
-    bottomPanelFragment.add(ganttImage);
+    form.imagePanel.add(ganttImage);
   }
 
   private GanttChartStyle getGanttChartStyle()
@@ -205,7 +198,7 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
       }
       if (ganttChartData == null || ObjectUtils.equals(id, ganttChartData.getRootObject().getId()) == false) {
         ganttChartData = null; // Force refresh.
-        ganttChartEditTreeTablePanel.refreshTreeTable();
+        form.ganttChartEditTreeTablePanel.refreshTreeTable();
       }
       getBaseDao().setTask(getData(), id);
       refresh();
@@ -239,7 +232,7 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
         }
       }
     }
-    ganttChartEditTreeTablePanel.setGanttChartData(ganttChartData).refresh();
+    form.ganttChartEditTreeTablePanel.setGanttChartData(ganttChartData).refresh();
     redraw();
   }
 
