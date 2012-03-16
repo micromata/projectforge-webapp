@@ -117,10 +117,10 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("username"));
       fs.add(new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(this, "adminUsername"), 100));
     }
+    final PasswordTextField passwordField = new PasswordTextField(PasswordPanel.WICKET_ID, new PropertyModel<String>(this, "password"));
     {
       // Password
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("password"));
-      final PasswordTextField passwordField = new PasswordTextField(PasswordPanel.WICKET_ID, new PropertyModel<String>(this, "password"));
       passwordField.setRequired(true); // No setReset(true), otherwise uploading and re-entering passwords is a real pain.
       passwordField.add(new AbstractValidator<String>() {
         @Override
@@ -149,7 +149,8 @@ public class SetupForm extends AbstractForm<SetupForm, SetupPage>
         protected void onValidate(final IValidatable<String> validatable)
         {
           final String input = validatable.getValue();
-          if (StringUtils.equals(input, passwordRepeatField.getValue()) == false) {
+          final String passwordInput = passwordField.getConvertedInput();
+          if (StringUtils.equals(input, passwordInput) == false) {
             passwordRepeatField.error(getString("user.error.passwordAndRepeatDoesNotMatch"));
           }
         }
