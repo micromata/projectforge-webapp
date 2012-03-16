@@ -33,6 +33,7 @@ import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.SubmitLink;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.gantt.GanttAccess;
 import org.projectforge.gantt.GanttChartDO;
@@ -48,9 +49,11 @@ import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
-import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.GridBuilder;
 
 public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChartEditPage>
 {
@@ -80,6 +83,8 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
 
   private String exportFormat;
 
+  private GridBuilder gridBuilder;
+
   public GanttChartEditForm(final GanttChartEditPage parentPage, final GanttChartDO data)
   {
     super(parentPage, data);
@@ -104,43 +109,84 @@ public class GanttChartEditForm extends AbstractEditForm<GanttChartDO, GanttChar
   protected void init()
   {
     super.init();
-    add(new RequiredMaxLengthTextField("name", new PropertyModel<String>(data, "name")));
-    final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("task", new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId") {
-      @Override
-      protected void selectTask(final TaskDO task)
-      {
-        super.selectTask(task);
-        parentPage.refresh(); // Task was changed. Therefore update the kost2 list.
-      }
-    };
-    add(taskSelectPanel);
-    taskSelectPanel.init();
-    taskSelectPanel.setRequired(true);
-    final UserSelectPanel userSelectPanel = new UserSelectPanel("owner", new PropertyModel<PFUserDO>(data, "owner"), parentPage, "ownerId");
-    add(userSelectPanel);
-    userSelectPanel.init();
-    taskSelectPanel.setRequired(true);
+    addFeedbackPanel();
+    final RepeatingView repeater = new RepeatingView("flowform");
+    add(repeater);
+    gridBuilder = newGridBuilder(repeater);
+    gridBuilder.newGrid16();
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data, "task"), parentPage,
+          "taskId") {
+        @Override
+        protected void selectTask(final TaskDO task)
+        {
+          super.selectTask(task);
+          parentPage.refresh(); // Task was changed. Therefore update the kost2 list.
+        }
+      };
+      fs.add(taskSelectPanel);
+      taskSelectPanel.init();
+      taskSelectPanel.setRequired(true);
+    }
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.name"));
+      final RequiredMaxLengthTextField name = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "name"));
+      WicketUtils.setStrong(name);
+      fs.add(name);
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.owner"));
+      final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(data, "owner"), parentPage,
+          "ownerId");
+      fs.add(userSelectPanel);
+      userSelectPanel.init();
+    }
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("title"));
+      final RequiredMaxLengthTextField title = new RequiredMaxLengthTextField(fs.getTextFieldId(),
+          new PropertyModel<String>(data, "title"), 100);
+      WicketUtils.setStrong(title);
+      fs.add(title);
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
     {
       // read-access:
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("access.read"));
       final LabelValueChoiceRenderer<GanttAccess> readAccessChoiceRenderer = new LabelValueChoiceRenderer<GanttAccess>(this,
           GanttAccess.values());
-      @SuppressWarnings("unchecked")
-      final DropDownChoice readAccessChoice = new DropDownChoice("readAccess", new PropertyModel(getData(), "readAccess"),
-          readAccessChoiceRenderer.getValues(), readAccessChoiceRenderer);
+      final DropDownChoice<GanttAccess> readAccessChoice = new DropDownChoice<GanttAccess>(fs.getDropDownChoiceId(),
+          new PropertyModel<GanttAccess>(getData(), "readAccess"), readAccessChoiceRenderer.getValues(), readAccessChoiceRenderer);
       readAccessChoice.setNullValid(false);
-      add(readAccessChoice);
+      fs.add(readAccessChoice);
+    }
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // Width
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.settings.width"));
+      fs.add(new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(data.getStyle(), "width"), 100, 10000));
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
       // write-access:
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("access.write"));
       final LabelValueChoiceRenderer<GanttAccess> writeAccessChoiceRenderer = new LabelValueChoiceRenderer<GanttAccess>(this,
           GanttAccess.values());
-      @SuppressWarnings("unchecked")
-      final DropDownChoice writeAccessChoice = new DropDownChoice("writeAccess", new PropertyModel(getData(), "writeAccess"),
-          writeAccessChoiceRenderer.getValues(), writeAccessChoiceRenderer);
+      final DropDownChoice<GanttAccess> writeAccessChoice = new DropDownChoice<GanttAccess>(fs.getDropDownChoiceId(),
+          new PropertyModel<GanttAccess>(getData(), "writeAccess"), writeAccessChoiceRenderer.getValues(), writeAccessChoiceRenderer);
       writeAccessChoice.setNullValid(false);
-      add(writeAccessChoice);
+      fs.add(writeAccessChoice);
     }
-    add(new MaxLengthTextField("title", new PropertyModel<String>(getSettings(), "title"), 100));
-    add(new MinMaxNumberField<Double>("totalLabelWidth", new PropertyModel<Double>(data.getStyle(), "totalLabelWidth"), 10.0, 10000.0));
-    add(new MinMaxNumberField<Integer>("width", new PropertyModel<Integer>(data.getStyle(), "width"), 100, 10000));
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // Total label width:
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("gantt.settings.totalLabelWidth"));
+      fs.add(new MinMaxNumberField<Double>(fs.getTextFieldId(), new PropertyModel<Double>(data.getStyle(), "totalLabelWidth"), 10.0,
+          10000.0));
+    }
     add(new CheckBox("relativeTimeValues", new PropertyModel<Boolean>(data.getStyle(), "relativeTimeValues")));
     add(new CheckBox("showToday", new PropertyModel<Boolean>(data.getStyle(), "showToday")));
     add(new CheckBox("showCompletion", new PropertyModel<Boolean>(data.getStyle(), "showCompletion")));

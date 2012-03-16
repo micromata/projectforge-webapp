@@ -23,8 +23,6 @@
 
 package org.projectforge.web.gantt;
 
-import java.util.Date;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
@@ -151,14 +149,6 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
     return null;
   }
 
-  //  @Override
-  //  protected void addBottomPanel()
-  //  {
-  //    bottomPanelFragment = new Fragment("bottomPanel", "bottomPanelFragment", this);
-  //    bottomPanelFragment.setRenderBodyOnly(true);
-  //    body.add(bottomPanelFragment);
-  //  }
-
   private GanttChart createGanttChart()
   {
     if (ganttChartData == null) {
@@ -227,14 +217,6 @@ public class GanttChartEditPage extends AbstractEditPage<GanttChartDO, GanttChar
         id = (Integer) selectedValue;
       }
       getBaseDao().setOwner(getData(), id);
-    } else if ("fromDate".equals(property) == true) {
-      final Date date = (Date) selectedValue;
-      getSettings().setFromDate(date);
-      form.fromDatePanel.markModelAsChanged();
-    } else if ("toDate".equals(property) == true) {
-      final Date date = (Date) selectedValue;
-      getSettings().setToDate(date);
-      form.toDatePanel.markModelAsChanged();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
