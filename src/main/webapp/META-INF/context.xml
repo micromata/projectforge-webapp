@@ -6,7 +6,7 @@
     value="org.hibernate.dialect.HSQLDialect" /> <Parameter name="hibernate.schemaUpdate" value="true" /> <Parameter name="development" value="false"
     /> <Parameter name="stripWicketTargets" value="true" override="false" /> </Context>
   -->
-<Context path="" reloadable="false" debug="0" docBase="webapps" cookies="false">
+<Context path="" reloadable="false" debug="0" docBase="webapps" cookies="true">
   <Resource name="jdbc/ProjectForgeDS" type="javax.sql.DataSource" auth="Container" driverClassName="org.postgresql.Driver"
     url="jdbc:postgresql://localhost:5432/projectforge" maxActive="100" maxIdle="30" maxWait="10000" username="projectforge" password="" />
   <Parameter name="base.dir" value="${user.home}/ProjectForge" override="false" />
