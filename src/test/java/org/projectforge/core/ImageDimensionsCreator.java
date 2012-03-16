@@ -36,7 +36,6 @@ import javax.swing.ImageIcon;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.Test;
 import org.projectforge.web.core.ImageDimension;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.xml.stream.AliasMap;
@@ -49,9 +48,9 @@ import org.projectforge.xml.stream.XmlObjectWriter;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class GetImageDimensionsTest
+public class ImageDimensionsCreator
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GetImageDimensionsTest.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ImageDimensionsCreator.class);
 
   private static final String PATH = "src/main/webapp/";
 
@@ -61,8 +60,7 @@ public class GetImageDimensionsTest
 
   private static final String[] IMAGE_SUFFIXES = new String[] { "png", "gif", "jpg"};
 
-  @Test
-  public void doit() throws IOException
+  public static void main(final String[] args) throws IOException
   {
     log.info("Create dimension file of all webapp images.");
     final List<ImageDimension> dimensions = new ArrayList<ImageDimension>();
