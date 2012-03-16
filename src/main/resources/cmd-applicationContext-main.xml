@@ -1,34 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans default-lazy-init="true" default-autowire="no">
-  <bean id="propertyConfigurer"
-    class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+  <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
     <property name="order">
       <value>2</value>
     </property>
   </bean>
-  <bean id="initTestDB"
-    class="org.projectforge.test.InitTestDB" />
-  <bean id="migrateFromV2"
-    class="org.projectforge.patches.MigrateFromV2" />
+  <bean id="initTestDB" class="org.projectforge.test.InitTestDB" />
   <!-- Sample database -->
-  <bean id="dataSource" class="de.micromata.jdbc.PropertyDataSource"
-    destroy-method="close">
-    <!-- p6spy for debugging -->
+  <bean id="dataSource" class="org.projectforge.jdbc.PropertyDataSource" destroy-method="close">
     <property name="driverClassName">
-      <value>org.postgresql.Driver</value>
+      <value>org.hsqldb.jdbcDriver</value>
     </property>
     <property name="url">
-      <value>jdbc:postgresql://localhost:5432/projectforge</value>
+      <value>jdbc:hsqldb:file:./tmp/ProjectForgeTestDB</value>
     </property>
     <property name="username">
-      <value>projectforge</value>
+      <value>sa</value>
     </property>
     <property name="password">
       <value></value>
     </property>
     <property name="properties">
       <props>
+        <prop key="hsqldb.default_table_type">cached</prop>
       </props>
     </property>
     <property name="maxActive">
@@ -45,31 +40,26 @@
   </bean>
   <!-- hibernate Session to DB -->
   <bean id="sessionFactory" class="org.projectforge.database.AutoSessionFactoryBean">
-    <!--property name="mappingResources">
-      <value>${hibernate.mappings}</value>
-      </property-->
-    <!-- property name="initialXmlData">
-      <value>classpath:database-dump.xml</value>
-      </property-->
-    <!-- property name="dumpOnExit">
-      <value>false</value>
-      </property -->
+    <!--property name="mappingResources"> <value>${hibernate.mappings}</value> </property -->
+    <!-- property name="initialXmlData"> <value>classpath:database-dump.xml</value> </property -->
+    <!-- property name="dumpOnExit"> <value>false</value> </property -->
     <property name="hibernateProperties">
       <props>
-        <prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
+        <prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
         <prop key="hibernate.query.substitutions"></prop><!-- Need to force empty despite Hibernate reference saying this is the default -->
         <prop key="hibernate.cache.region_prefix"></prop><!-- Need to force empty. Hibernate reference says this is the default -->
         <prop key="hibernate.show_sql">false</prop>
         <prop key="hibernate.format_sql">false</prop>
-        <prop key="hibernate.use_outer_join">false</prop>
+        <prop key="hibernate.use_outer_join">true</prop>
         <prop key="hibernate.max_fetch_depth">3</prop>
         <prop key="hibernate.default_batch_fetch_size">8</prop>
         <prop key="hibernate.bytecode.use_reflection_optimizer">true</prop>
         <prop key="hibernate.cache.use_query_cache">true</prop>
         <prop key="hibernate.cache.use_second_level_cache">true</prop>
-        <prop key="hibernate.cache.provider_class">
-          org.hibernate.cache.EhCacheProvider
-        </prop>
+        <prop key="hibernate.cache.provider_class">net.sf.ehcache.hibernate.SingletonEhCacheProvider</prop>
+        <prop key="hibernate.cache.region.factory_class">net.sf.ehcache.hibernate.SingletonEhCacheRegionFactory</prop>
+        <prop key="hibernate.search.default.directory_provider">org.hibernate.search.store.FSDirectoryProvider</prop>
+        <prop key="hibernate.search.default.indexBase">/tmp/ProjectForgeTests</prop><!-- If you change this, don't forget to change it in TestBase too! -->
         <prop key="hibernate.jdbc.batch_size">0</prop>
       </props>
     </property>
@@ -78,40 +68,13 @@
     </property>
     <!-- never run a schema update on the database -->
     <property name="schemaUpdate">
-      <value>false</value>
+      <value>true</value>
     </property>
     <property name="configXml">
       <ref bean="configXml" />
     </property>
-    <!--  property name="entityInterceptor">
+    <property name="entityInterceptor">
       <ref bean="hibernateHistoryInterceptor" />
-      </property -->
+    </property>
   </bean>
-  <!-- shortcut to hibernate -->
-  <bean id="hibernate"
-    class="org.springframework.orm.hibernate3.HibernateTemplate">
-    <constructor-arg>
-      <ref bean="sessionFactory" />
-    </constructor-arg>
-    <property name="alwaysUseNewSession">
-      <value>false</value>
-    </property>
-    <property name="checkWriteOperations" value="false" />
-  </bean>
-  <!--bean name="hibernateHistoryInterceptor" class="de.micromata.hibernate.history.HistoryInterceptor" lazy-init="false">
-    <constructor-arg>
-    <bean class="de.micromata.user.HistoryUser" />
-    </constructor-arg>
-    <property name="delegateInterceptor">
-    <ref bean="hibernateSpringInterceptor" />
-    </property>
-    <property name="sessionFactoryBeanName">
-    <value>sessionFactory</value>
-    </property>
-    </bean>
-    <bean name="historyAdapter" class="de.micromata.hibernate.history.HistoryAdapter"> 
-    <property name="sessionFactory">
-    <ref bean="sessionFactory" />
-    </property>
-    </bean-->
 </beans>
