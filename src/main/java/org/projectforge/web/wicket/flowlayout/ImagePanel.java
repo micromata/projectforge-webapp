@@ -24,6 +24,7 @@
 package org.projectforge.web.wicket.flowlayout;
 
 import org.apache.wicket.markup.html.image.ContextImage;
+import org.apache.wicket.markup.html.image.Image;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.PresizedImage;
@@ -56,6 +57,12 @@ public class ImagePanel extends Panel
   }
 
   public ImagePanel(final String id, final ContextImage image)
+  {
+    super(id, null);
+    add(image);
+  }
+
+  public ImagePanel(final String id, final Image image)
   {
     super(id, null);
     add(image);
