@@ -105,12 +105,9 @@ public class DivPanel extends Panel
    * @see org.apache.wicket.MarkupContainer#remove(org.apache.wicket.Component)
    */
   @Override
-  public DivPanel remove(final Component component)
+  public DivPanel replace(final Component component)
   {
-    if (repeater == null) {
-      childAdded = false;
-    }
-    div.remove(component);
+    div.replace(component);
     return this;
   }
 
