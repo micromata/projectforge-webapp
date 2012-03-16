@@ -25,6 +25,7 @@ package org.projectforge.web.filter;
 
 import org.springframework.web.context.WebApplicationContext;
 
+
 /**
  * @author wolle
  */
@@ -37,15 +38,14 @@ public class SpringContext
     return CTX.get();
   }
 
-  static void setWebApplicationContext(WebApplicationContext ctx)
+  static void setWebApplicationContext(final WebApplicationContext ctx)
   {
     CTX.set(ctx);
   }
 
-  @SuppressWarnings("unchecked")
-  public static <T> T getBean(Class<T> clazz)
+  public static <T> T getBean(final Class<T> clazz)
   {
-    String[] beanNamesForType = getWebApplicationContext().getBeanNamesForType(clazz);
-    return (T) getWebApplicationContext().getBean(beanNamesForType[0], clazz);
+    final String[] beanNamesForType = getWebApplicationContext().getBeanNamesForType(clazz);
+    return getWebApplicationContext().getBean(beanNamesForType[0], clazz);
   }
 }
