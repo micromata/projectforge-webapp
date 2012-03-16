@@ -31,9 +31,9 @@ import java.util.Calendar;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.DateHolder;
 import org.projectforge.core.ConfigXmlTest;
+import org.projectforge.core.Configuration;
 
 
 public class DayHolderTest
@@ -43,21 +43,22 @@ public class DayHolderTest
   {
     // Needed if this tests runs before the ConfigurationTest.
     ConfigXmlTest.createTestConfiguration();
+    Configuration.init4TestMode();
   }
 
   @Test
   public void testDayHolder()
   {
-    DayHolder day = new DayHolder();
+    final DayHolder day = new DayHolder();
     assertFields(day);
-    DateHolder dh = (DateHolder) day.clone();
+    final DateHolder dh = (DateHolder) day.clone();
     assertFields(dh);
   }
 
   @Test
   public void isToday()
   {
-    DayHolder day = new DayHolder();
+    final DayHolder day = new DayHolder();
     assertTrue(day.isToday());
   }
 
@@ -76,7 +77,7 @@ public class DayHolderTest
   @Test
   public void testAdd()
   {
-    DayHolder day = new DayHolder();
+    final DayHolder day = new DayHolder();
     day.setDate(2008, Calendar.JANUARY, 1, 0, 0, 0);
     day.add(Calendar.DAY_OF_YEAR, -1);
     assertEquals(day.getYear(), 2007);
@@ -84,7 +85,7 @@ public class DayHolderTest
     assertEquals(day.getDayOfMonth(), 31);
   }
 
-  private void assertFields(DateHolder day)
+  private void assertFields(final DateHolder day)
   {
     assertEquals("Hours of day should be 0", 0, day.getHourOfDay());
     assertEquals("Minutes should be 0", 0, day.getMinute());

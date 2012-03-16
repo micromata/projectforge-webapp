@@ -32,11 +32,10 @@ import java.util.Locale;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.projectforge.calendar.MonthHolder;
-import org.projectforge.calendar.WeekHolder;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.core.ConfigXmlTest;
+import org.projectforge.core.Configuration;
 
 
 public class MonthHolderTest
@@ -45,14 +44,15 @@ public class MonthHolderTest
   public static void setUp()
   {
     ConfigXmlTest.createTestConfiguration();
+    Configuration.init4TestMode();
   }
 
   @Test
   public void testMonthHolder()
   {
-    DateHolder date = new DateHolder(new Date(), DatePrecision.DAY, Locale.GERMAN);
+    final DateHolder date = new DateHolder(new Date(), DatePrecision.DAY, Locale.GERMAN);
     date.setDate(1970, Calendar.NOVEMBER, 21, 0, 0, 0);
-    MonthHolder month = new MonthHolder(date.getDate());
+    final MonthHolder month = new MonthHolder(date.getDate());
     assertEquals(6, month.getWeeks().size());
     WeekHolder week = month.getFirstWeek();
     assertEquals("monday", week.getDays()[0].getDayKey());

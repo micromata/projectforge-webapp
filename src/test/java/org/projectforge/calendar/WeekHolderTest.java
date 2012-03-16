@@ -28,25 +28,35 @@ import static org.junit.Assert.assertEquals;
 import java.util.Calendar;
 import java.util.Locale;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.projectforge.calendar.WeekHolder;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
+import org.projectforge.core.ConfigXmlTest;
+import org.projectforge.core.Configuration;
 
 
 public class WeekHolderTest
 {
   //private final static Logger log = Logger.getLogger(WeekHolderTest.class);
 
+  @BeforeClass
+  public static void setUp()
+  {
+    // Needed if this tests runs before the ConfigurationTest.
+    ConfigXmlTest.createTestConfiguration();
+    Configuration.init4TestMode();
+  }
+
   @Test
   public void testWeekHolder()
   {
-    Calendar cal = Calendar.getInstance(Locale.GERMAN);
+    final Calendar cal = Calendar.getInstance(Locale.GERMAN);
     WeekHolder week = new WeekHolder(cal);
     assertEquals(7, week.getDays().length);
     assertEquals(2, week.getDays()[0].getDayOfWeek());
     assertEquals("monday", week.getDays()[0].getDayKey());
-    DateHolder dateHolder = new DateHolder(DatePrecision.DAY, Locale.GERMAN);
+    final DateHolder dateHolder = new DateHolder(DatePrecision.DAY, Locale.GERMAN);
     dateHolder.setDate(1970, Calendar.NOVEMBER, 21, 4, 50, 23);
     week = new WeekHolder(dateHolder.getCalendar());
     assertEquals(7, week.getDays().length);

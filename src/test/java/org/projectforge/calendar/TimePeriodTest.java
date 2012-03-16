@@ -29,23 +29,33 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
-import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
+import org.projectforge.core.ConfigXmlTest;
+import org.projectforge.core.Configuration;
 
 
 public class TimePeriodTest
 {
   //private final static Logger log = Logger.getLogger(WeekHolderTest.class);
 
+  @BeforeClass
+  public static void setUp()
+  {
+    // Needed if this tests runs before the ConfigurationTest.
+    ConfigXmlTest.createTestConfiguration();
+    Configuration.init4TestMode();
+  }
+
   @Test
   public void testTimePeriod()
   {
-    DateHolder date1 = new DateHolder(new Date(), DatePrecision.MINUTE, Locale.GERMAN);
+    final DateHolder date1 = new DateHolder(new Date(), DatePrecision.MINUTE, Locale.GERMAN);
     date1.setDate(1970, Calendar.NOVEMBER, 21, 0, 0, 0);
 
-    DateHolder date2 = new DateHolder(new Date(), DatePrecision.MINUTE, Locale.GERMAN);
+    final DateHolder date2 = new DateHolder(new Date(), DatePrecision.MINUTE, Locale.GERMAN);
     date2.setDate(1970, Calendar.NOVEMBER, 21, 10, 0, 0);
 
     TimePeriod timePeriod = new TimePeriod(date1.getDate(), date2.getDate());
@@ -72,9 +82,9 @@ public class TimePeriodTest
     assertResultArray(new int[] {6, 5, 30}, timePeriod.getDurationFields(8));
     assertResultArray(new int[] {0, 53, 30}, timePeriod.getDurationFields(8, 54));
     assertResultArray(new int[] {6, 5, 30}, timePeriod.getDurationFields(8, 53));
-}
-  
-  private void assertResultArray(int[] required, int[] result) {
+  }
+
+  private void assertResultArray(final int[] required, final int[] result) {
     assertEquals("days", required[0], result[0]);
     assertEquals("hours", required[1], result[1]);
     assertEquals("minutes", required[2], result[2]);
