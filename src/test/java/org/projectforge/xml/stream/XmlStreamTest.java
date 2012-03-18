@@ -40,6 +40,7 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.junit.Test;
+import org.projectforge.common.BeanHelper;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.test.TestBase;
@@ -359,11 +360,13 @@ public class XmlStreamTest extends TestBase
     final String xml = XmlObjectWriter.writeAsXml(obj);
     final XmlObjectReader reader = new XmlObjectReader();
     reader.initialize(TestObject2.class);
-    log.info("Following java.lang.InstantiationException is expected:");
+    BeanHelper.enterTestMode();
     obj = (TestObject2) reader.read(xml); // throws java.lang.InstantiationException
     assertNull(obj.testObjectIFace);
     reader.addImplementationMapping(TestObjectIFace.class, TestObject.class);
     obj = (TestObject2) reader.read(xml); // throws java.lang.InstantiationException
+    log.info("***** TESTMODE: The last warning message of XmlObjectReader while parsing xml was expected.");
+    BeanHelper.exitTestMode();
     assertNotNull(obj.testObjectIFace);
     assertEquals("iface", ((TestObject) obj.testObjectIFace).s1);
   }
