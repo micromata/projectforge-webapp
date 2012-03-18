@@ -85,9 +85,6 @@
   <image path="/images/css_img/leftInactive.png" width="21" height="20"/>
   <image path="/images/css_img/rightActive.png" width="21" height="20"/>
   <image path="/images/css_img/rightInactive.png" width="21" height="20"/>
-  <image path="/images/css_img/sort.png" width="16" height="15"/>
-  <image path="/images/css_img/sort_asc.png" width="16" height="15"/>
-  <image path="/images/css_img/sort_desc.png" width="16" height="15"/>
   <image path="/images/cup.png" width="16" height="16"/>
   <image path="/images/customer.png" width="16" height="16"/>
   <image path="/images/database_delete.png" width="16" height="16"/>
@@ -125,6 +122,16 @@
   <image path="/images/holiday.png" width="16" height="16"/>
   <image path="/images/house.png" width="16" height="16"/>
   <image path="/images/html.png" width="16" height="16"/>
+  <image path="/images/icons/small/grey/help.png" width="24" height="24"/>
+  <image path="/images/icons/small/grey/locked.png" width="24" height="24"/>
+  <image path="/images/icons/small/white/alarm_bell.png" width="24" height="24"/>
+  <image path="/images/icons/small/white/alert_2.png" width="24" height="24"/>
+  <image path="/images/icons/small/white/cog.png" width="24" height="24"/>
+  <image path="/images/icons/small/white/cog_3.png" width="24" height="24"/>
+  <image path="/images/icons/small/white/marker.png" width="24" height="24"/>
+  <image path="/images/icons/small/white/refresh.png" width="24" height="24"/>
+  <image path="/images/icons/small/white/refresh_2.png" width="24" height="24"/>
+  <image path="/images/icons/small/white/speech_bubble_2.png" width="24" height="24"/>
   <image path="/images/images.png" width="16" height="16"/>
   <image path="/images/info.png" width="16" height="16"/>
   <image path="/images/information.png" width="16" height="16"/>
@@ -132,6 +139,7 @@
   <image path="/images/keyboard.png" width="16" height="16"/>
   <image path="/images/kost2art.png" width="16" height="16"/>
   <image path="/images/leaf.gif" width="19" height="15"/>
+  <image path="/images/loading.gif" width="128" height="15"/>
   <image path="/images/lock.png" width="16" height="16"/>
   <image path="/images/lock_add.png" width="16" height="16"/>
   <image path="/images/lock_delete.png" width="16" height="16"/>
@@ -220,13 +228,8 @@
   <image path="/images/zoom_in.png" width="16" height="16"/>
   <image path="/images/zoom_out.png" width="16" height="16"/>
   <image path="/mobile/jquery.mobile/images/ajax-loader.png" width="35" height="35"/>
-  <image path="/mobile/jquery.mobile/images/form-check-off.png" width="20" height="20"/>
-  <image path="/mobile/jquery.mobile/images/form-check-on.png" width="20" height="20"/>
-  <image path="/mobile/jquery.mobile/images/form-radio-off.png" width="20" height="20"/>
-  <image path="/mobile/jquery.mobile/images/form-radio-on.png" width="20" height="20"/>
-  <image path="/mobile/jquery.mobile/images/icon-search-black.png" width="16" height="16"/>
-  <image path="/mobile/jquery.mobile/images/icons-18-black.png" width="630" height="18"/>
-  <image path="/mobile/jquery.mobile/images/icons-18-white.png" width="630" height="18"/>
-  <image path="/mobile/jquery.mobile/images/icons-36-black.png" width="1260" height="36"/>
-  <image path="/mobile/jquery.mobile/images/icons-36-white.png" width="1260" height="36"/>
+  <image path="/mobile/jquery.mobile/images/icons-18-black.png" width="776" height="18"/>
+  <image path="/mobile/jquery.mobile/images/icons-18-white.png" width="776" height="18"/>
+  <image path="/mobile/jquery.mobile/images/icons-36-black.png" width="1548" height="36"/>
+  <image path="/mobile/jquery.mobile/images/icons-36-white.png" width="1548" height="36"/>
 </images>
