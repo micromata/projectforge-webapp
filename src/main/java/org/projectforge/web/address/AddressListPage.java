@@ -48,7 +48,6 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
@@ -276,11 +275,8 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
           final String filename = "ProjectForge-PersonalAddressBook_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".vcf";
           final StringWriter writer = new StringWriter();
           addressDao.exportFavoriteVCards(writer, list);
-
           DownloadUtils.setUTF8CharacterEncoding(getResponse());
           DownloadUtils.setDownloadTarget(writer.toString().getBytes(), filename);
-          log.warn("*** Workarround for Wicket 1.5 ***"); // TODO remove the next line:
-          ((WebResponse) getResponse()).setContentType(DownloadUtils.getContentType(filename));
         }
       };
       final ContentMenuEntryPanel exportVCardsButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), exportVCardsLink,
