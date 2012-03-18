@@ -48,6 +48,27 @@ public class BeanHelper
 {
   private static final Logger log = Logger.getLogger(BeanHelper.class);
 
+  private static boolean TEST_MODE = false;
+
+  /**
+   * For internal test cases only! If true, log errors are suppressed. Please call {@link #exitTestMode()} always directly after your test
+   * call!
+   */
+  public static void enterTestMode()
+  {
+    TEST_MODE = true;
+    log.info("***** Entering TESTMODE.");
+  }
+
+  /**
+   * For internal test cases only! If true, log errors are suppressed. Please set TEST_MODE always to false after your test call!
+   */
+  public static void exitTestMode()
+  {
+    TEST_MODE = false;
+    log.info("***** Exit TESTMODE.");
+  }
+
   public static String determinePropertyName(final Method method)
   {
     final String name = method.getName();
@@ -171,12 +192,24 @@ public class BeanHelper
     try {
       clazz = Class.forName(className);
     } catch (final ClassNotFoundException ex) {
-      log.error("Can't create instance of '" + className + "': " + ex.getMessage(), ex);
+      logInstantiationException(ex, className);
     }
     if (clazz != null) {
       return newInstance(clazz);
     }
     return null;
+  }
+
+  private static void logInstantiationException(final Exception ex, final Class<?> clazz) {
+    logInstantiationException(ex, clazz.getName());
+  }
+
+  private static void logInstantiationException(final Exception ex, final String className) {
+    if (TEST_MODE == false) {
+      log.error("Can't create instance of '" + className + "': " + ex.getMessage(), ex);
+    } else {
+      log.info("***** TESTMODE: '" + className + "' wasn't created (OK in test mode).");
+    }
   }
 
   public static Object newInstance(final Class< ? > clazz)
@@ -185,17 +218,17 @@ public class BeanHelper
     try {
       constructor = clazz.getDeclaredConstructor(new Class[0]);
     } catch (final SecurityException ex) {
-      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+      logInstantiationException(ex, clazz);
     } catch (final NoSuchMethodException ex) {
-      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+      logInstantiationException(ex, clazz);
     }
     if (constructor == null) {
       try {
         return clazz.newInstance();
       } catch (final InstantiationException ex) {
-        log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+        logInstantiationException(ex, clazz);
       } catch (final IllegalAccessException ex) {
-        log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+        logInstantiationException(ex, clazz);
       }
       return null;
     }
@@ -203,13 +236,13 @@ public class BeanHelper
     try {
       return constructor.newInstance();
     } catch (final IllegalArgumentException ex) {
-      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+      logInstantiationException(ex, clazz);
     } catch (final InstantiationException ex) {
-      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+      logInstantiationException(ex, clazz);
     } catch (final IllegalAccessException ex) {
-      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+      logInstantiationException(ex, clazz);
     } catch (final InvocationTargetException ex) {
-      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+      logInstantiationException(ex, clazz);
     }
     return null;
   }
@@ -231,21 +264,21 @@ public class BeanHelper
     try {
       constructor = clazz.getDeclaredConstructor(paramTypes);
     } catch (final SecurityException ex) {
-      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+      logInstantiationException(ex, clazz);
     } catch (final NoSuchMethodException ex) {
-      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+      logInstantiationException(ex, clazz);
     }
     constructor.setAccessible(true);
     try {
       return constructor.newInstance(params);
     } catch (final IllegalArgumentException ex) {
-      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+      logInstantiationException(ex, clazz);
     } catch (final InstantiationException ex) {
-      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+      logInstantiationException(ex, clazz);
     } catch (final IllegalAccessException ex) {
-      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+      logInstantiationException(ex, clazz);
     } catch (final InvocationTargetException ex) {
-      log.error("Can't create instance of '" + clazz.getName() + "': " + ex.getMessage(), ex);
+      logInstantiationException(ex, clazz);
     }
     return null;
   }
