@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.ListMultipleChoice;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.SubmitLink;
@@ -73,6 +74,7 @@ import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
@@ -125,6 +127,174 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     super(parentPage, data);
   }
 
+  public static void createFirstName(final GridBuilder gridBuilder, final PFUserDO user)
+  {
+    // First name
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("firstName"));
+    final RequiredMaxLengthTextField firstName = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(user,
+        "firstname"));
+    WicketUtils.setStrong(firstName);
+    fs.add(firstName);
+  }
+
+  public static void createLastName(final GridBuilder gridBuilder, final PFUserDO user)
+  {
+    // Last name
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("name"));
+    final RequiredMaxLengthTextField name = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(user, "lastname"));
+    WicketUtils.setStrong(name);
+    fs.add(name);
+  }
+
+  public static void createOrganization(final GridBuilder gridBuilder, final PFUserDO user)
+  {
+    // Organization
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("organization"));
+    fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(user, "organization")));
+  }
+
+  public static void createEMail(final GridBuilder gridBuilder, final PFUserDO user)
+  {
+    // E-Mail
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("email"));
+    fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(user, "email")));
+  }
+
+  public static void createJIRAUsername(final GridBuilder gridBuilder, final PFUserDO user)
+  {
+    // JIRA user name
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.jiraUsername"), true);
+    fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(user, "jiraUsername")));
+    fs.addHelpIcon(gridBuilder.getString("user.jiraUsername.tooltip"));
+  }
+
+  public static void createLastLoginAndDeleteAllStayLogins(final GridBuilder gridBuilder, final PFUserDO user, final UserDao userDao,
+      final Form< ? > form)
+  {
+    // Last login and deleteAllStayLoggedInSessions
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("login.lastLogin"), true).setNoLabelFor();
+    fs.add(new DivTextPanel(fs.newChildId(), DateTimeFormatter.instance().getFormattedDateTime(user.getLastLogin())));
+    @SuppressWarnings("serial")
+    final Button button = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("invalidateStayLoggedInSessions")) {
+      @Override
+      public final void onSubmit()
+      {
+        userDao.renewStayLoggedInKey(user.getId());
+        form.error(getString("login.stayLoggedIn.invalidateAllStayLoggedInSessions.successfullDeleted"));
+      }
+    };
+    fs.add(new SingleButtonPanel(fs.newChildId(), button, gridBuilder.getString("login.stayLoggedIn.invalidateAllStayLoggedInSessions"),
+        SingleButtonPanel.RED));
+    WicketUtils.addTooltip(button, gridBuilder.getString("login.stayLoggedIn.invalidateAllStayLoggedInSessions.tooltip"));
+  }
+
+  public static void createLocale(final GridBuilder gridBuilder, final PFUserDO user)
+  {
+    // Locale
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.locale"));
+    final LabelValueChoiceRenderer<Locale> localeChoiceRenderer = new LabelValueChoiceRenderer<Locale>();
+    localeChoiceRenderer.addValue(null, gridBuilder.getString("user.defaultLocale"));
+    for (final String str : ConfigXml.LOCALIZATIONS) {
+      localeChoiceRenderer.addValue(new Locale(str), gridBuilder.getString("locale." + str));
+    }
+    @SuppressWarnings("serial")
+    final DropDownChoice<Locale> localeChoice = new DropDownChoice<Locale>(fs.getDropDownChoiceId(), new PropertyModel<Locale>(user,
+        "locale"), localeChoiceRenderer.getValues(), localeChoiceRenderer) {
+      /**
+       * @see org.apache.wicket.markup.html.form.AbstractSingleSelectChoice#getDefaultChoice(java.lang.String)
+       */
+      @Override
+      protected CharSequence getDefaultChoice(final String selectedValue)
+      {
+        return "";
+      }
+
+      @Override
+      protected Locale convertChoiceIdToChoice(final String id)
+      {
+        if (StringHelper.isIn(id, ConfigXml.LOCALIZATIONS) == true) {
+          return new Locale(id);
+        } else {
+          return null;
+        }
+      }
+    };
+    fs.add(localeChoice);
+  }
+
+  public static void createLanguage(final GridBuilder gridBuilder, final PFUserDO user)
+  {
+  }
+
+  public static void createDateFormat(final GridBuilder gridBuilder, final PFUserDO user)
+  {
+    addDateFormatCombobox(gridBuilder, user, "dateFormat", "dateFormat", Configuration.getInstance().getDateFormats(), false);
+  }
+
+  public static void createExcelDateFormat(final GridBuilder gridBuilder, final PFUserDO user)
+  {
+    addDateFormatCombobox(gridBuilder, user, "dateFormat.xls", "excelDateFormat", Configuration.getInstance().getExcelDateFormats(), true);
+  }
+
+  public static void createTimeNotation(final GridBuilder gridBuilder, final PFUserDO user)
+  {
+    // Time notation
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("timeNotation"));
+    final LabelValueChoiceRenderer<TimeNotation> timeNotationChoiceRenderer = new LabelValueChoiceRenderer<TimeNotation>();
+    timeNotationChoiceRenderer.addValue(TimeNotation.H12, gridBuilder.getString("timeNotation.12"));
+    timeNotationChoiceRenderer.addValue(TimeNotation.H24, gridBuilder.getString("timeNotation.24"));
+    final DropDownChoice<TimeNotation> timeNotationChoice = new DropDownChoice<TimeNotation>(fs.getDropDownChoiceId(),
+        new PropertyModel<TimeNotation>(user, "timeNotation"), timeNotationChoiceRenderer.getValues(), timeNotationChoiceRenderer);
+    timeNotationChoice.setNullValid(true);
+    fs.add(timeNotationChoice);
+  }
+
+  public static void createTimeZone(final GridBuilder gridBuilder, final PFUserDO user)
+  {
+    // Time zone
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("timezone"), true);
+    final TimeZoneField timeZone = new TimeZoneField(fs.getTextFieldId(), new PropertyModel<TimeZone>(user, "timeZoneObject"));
+    fs.addKeyboardHelpIcon(gridBuilder.getString("tooltip.autocomplete.timeZone"));
+    fs.add(timeZone);
+  }
+
+  /**
+   * If no telephone system url is set in config.xml nothing will be done.
+   * @param gridBuilder
+   * @param user
+   */
+  public static void createPhoneIds(final GridBuilder gridBuilder, final PFUserDO user)
+  {
+    if (StringUtils.isNotEmpty(ConfigXml.getInstance().getTelephoneSystemUrl()) == true) {
+      // Personal phone identifiers
+      final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.personalPhoneIdentifiers"), true);
+      fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(user, "personalPhoneIdentifiers")));
+      fs.addHelpIcon(gridBuilder.getString("user.personalPhoneIdentifiers.tooltip"));
+    }
+  }
+
+  /**
+   * If no MEB is configured in config.xml nothing will be done.
+   * @param gridBuilder
+   * @param user
+   */
+  public static void createMEBPhoneNumbers(final GridBuilder gridBuilder, final PFUserDO user)
+  {
+    if (Configuration.getInstance().isMebConfigured() == true) {
+      // MEB mobile phone numbers
+      final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.personalMebMobileNumbers"), true);
+      fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(user, "personalMebMobileNumbers")));
+      fs.addHelpIcon(gridBuilder.getString("user.personalMebMobileNumbers.tooltip") + "<br/>" + gridBuilder.getString("user.personalMebMobileNumbers.format"));
+    }
+  }
+
+  public static void createDescription(final GridBuilder gridBuilder, final PFUserDO user)
+  {
+    // Description
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("description"));
+    fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(user, "description")));
+  }
+
   @SuppressWarnings("serial")
   @Override
   protected void init()
@@ -146,7 +316,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
           protected void onValidate(final IValidatable<String> validatable)
           {
             data.setUsername(validatable.getValue());
-            if (StringUtils.isNotEmpty(data.getUsername()) == true && ((UserDao)getBaseDao()).doesUsernameAlreadyExist(data) == true) {
+            if (StringUtils.isNotEmpty(data.getUsername()) == true && ((UserDao) getBaseDao()).doesUsernameAlreadyExist(data) == true) {
               validatable.error(new ValidationError().addMessageKey("user.error.usernameAlreadyExists"));
             }
           }
@@ -155,124 +325,25 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
         fs.add(new DivTextPanel(fs.newChildId(), data.getUsername()));
       }
     }
-    {
-      // First name
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("firstName"));
-      final RequiredMaxLengthTextField firstName = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
-          "firstname"));
-      WicketUtils.setStrong(firstName);
-      fs.add(firstName);
-    }
-    {
-      // Last name
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("name"));
-      final RequiredMaxLengthTextField name = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
-          "lastname"));
-      WicketUtils.setStrong(name);
-      fs.add(name);
-    }
-    {
-      // Organization
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("organization"));
-      fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "organization")));
-    }
-    {
-      // E-Mail
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("email"));
-      fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "email")));
-    }
-    {
-      // JIRA user name
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.jiraUsername"), true);
-      fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "jiraUsername")));
-      fs.addHelpIcon(getString("user.jiraUsername.tooltip"));
-    }
+    createFirstName(gridBuilder, data);
+    createLastName(gridBuilder, data);
+    createOrganization(gridBuilder, data);
+    createEMail(gridBuilder, data);
+    createJIRAUsername(gridBuilder, data);
 
     if (adminAccess == true) {
       addPassswordFields();
     }
 
     gridBuilder.newGrid8();
-    {
-      // Last login and deleteAllStayLoggedInSessions
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("login.lastLogin"), true).setNoLabelFor();
-      fs.add(new DivTextPanel(fs.newChildId(), DateTimeFormatter.instance().getFormattedDateTime(data.getLastLogin())));
-      final Button button = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("invalidateStayLoggedInSessions")) {
-        @Override
-        public final void onSubmit()
-        {
-          ((UserDao) getBaseDao()).renewStayLoggedInKey(getData().getId());
-          UserEditForm.this.error(getString("login.stayLoggedIn.invalidateAllStayLoggedInSessions.successfullDeleted"));
-        }
-      };
-      fs.add(new SingleButtonPanel(fs.newChildId(), button, getString("login.stayLoggedIn.invalidateAllStayLoggedInSessions"),
-          SingleButtonPanel.RED));
-      WicketUtils.addTooltip(button, getString("login.stayLoggedIn.invalidateAllStayLoggedInSessions.tooltip"));
-    }
-    {
-      // Locale
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.locale"));
-      final LabelValueChoiceRenderer<Locale> localeChoiceRenderer = new LabelValueChoiceRenderer<Locale>();
-      localeChoiceRenderer.addValue(null, getString("user.defaultLocale"));
-      for (final String str : ConfigXml.LOCALIZATIONS) {
-        localeChoiceRenderer.addValue(new Locale(str), getString("locale." + str));
-      }
-      final DropDownChoice<Locale> localeChoice = new DropDownChoice<Locale>(fs.getDropDownChoiceId(), new PropertyModel<Locale>(data,
-          "locale"), localeChoiceRenderer.getValues(), localeChoiceRenderer) {
-        /**
-         * @see org.apache.wicket.markup.html.form.AbstractSingleSelectChoice#getDefaultChoice(java.lang.String)
-         */
-        @Override
-        protected CharSequence getDefaultChoice(final String selectedValue)
-        {
-          return "";
-        }
-
-        @Override
-        protected Locale convertChoiceIdToChoice(final String id)
-        {
-          if (StringHelper.isIn(id, ConfigXml.LOCALIZATIONS) == true) {
-            return new Locale(id);
-          } else {
-            return null;
-          }
-        }
-      };
-      fs.add(localeChoice);
-    }
-    final Date today = new Date();
-    addDateFormatCombobox(today, "dateFormat", "dateFormat", Configuration.getInstance().getDateFormats(), false);
-    addDateFormatCombobox(today, "dateFormat.xls", "excelDateFormat", Configuration.getInstance().getExcelDateFormats(), true);
-    {
-      // Time notation
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timeNotation"));
-      final LabelValueChoiceRenderer<TimeNotation> timeNotationChoiceRenderer = new LabelValueChoiceRenderer<TimeNotation>();
-      timeNotationChoiceRenderer.addValue(TimeNotation.H12, getString("timeNotation.12"));
-      timeNotationChoiceRenderer.addValue(TimeNotation.H24, getString("timeNotation.24"));
-      final DropDownChoice<TimeNotation> timeNotationChoice = new DropDownChoice<TimeNotation>(fs.getDropDownChoiceId(),
-          new PropertyModel<TimeNotation>(data, "timeNotation"), timeNotationChoiceRenderer.getValues(), timeNotationChoiceRenderer);
-      timeNotationChoice.setNullValid(true);
-      fs.add(timeNotationChoice);
-    }
-    {
-      // Time notation
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timezone"), true);
-      final TimeZoneField timeZone = new TimeZoneField(fs.getTextFieldId(), new PropertyModel<TimeZone>(data, "timeZoneObject"));
-      fs.addKeyboardHelpIcon(getString("tooltip.autocomplete.timeZone"));
-      fs.add(timeZone);
-    }
-    if (StringUtils.isNotEmpty(ConfigXml.getInstance().getTelephoneSystemUrl()) == true) {
-      // Personal phone identifiers
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.personalPhoneIdentifiers"), true);
-      fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "personalPhoneIdentifiers")));
-      fs.addHelpIcon(getString("user.personalPhoneIdentifiers.tooltip"));
-    }
-    if (Configuration.getInstance().isMebConfigured() == true) {
-      // MEB mobile phone numbers
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.personalMebMobileNumbers"), true);
-      fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "personalMebMobileNumbers")));
-      fs.addHelpIcon(getString("user.personalMebMobileNumbers.tooltip") + "<br/>" + getString("user.personalMebMobileNumbers.format"));
-    }
+    createLastLoginAndDeleteAllStayLogins(gridBuilder, data, (UserDao) getBaseDao(), this);
+    createLocale(gridBuilder, data);
+    createDateFormat(gridBuilder, data);
+    createExcelDateFormat(gridBuilder, data);
+    createTimeNotation(gridBuilder, data);
+    createTimeZone(gridBuilder, data);
+    createPhoneIds(gridBuilder, data);
+    createMEBPhoneNumbers(gridBuilder, data);
 
     gridBuilder.newGrid16(true);
     addAssignedGroups(adminAccess);
@@ -281,11 +352,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     }
 
     gridBuilder.newGrid16();
-    {
-      // Description
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
-      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description")));
-    }
+    createDescription(gridBuilder, data);
   }
 
   @SuppressWarnings("serial")
@@ -353,23 +420,23 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     fs.addHelpIcon(getString(UserDao.MESSAGE_KEY_PASSWORD_QUALITY_CHECK));
   }
 
-  private void addDateFormatCombobox(final Date today, final String labelKey, final String property, final String[] dateFormats,
-      final boolean convertExcelFormat)
+  private static void addDateFormatCombobox(final GridBuilder gridBuilder, final PFUserDO user, final String labelKey,
+      final String property, final String[] dateFormats, final boolean convertExcelFormat)
   {
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString(labelKey));
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString(labelKey));
     final LabelValueChoiceRenderer<String> dateFormatChoiceRenderer = new LabelValueChoiceRenderer<String>();
     for (final String str : dateFormats) {
       String dateString = "???";
       final String pattern = convertExcelFormat == true ? str.replace('Y', 'y').replace('D', 'd') : str;
       try {
         final SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
-        dateString = dateFormat.format(today);
+        dateString = dateFormat.format(new Date());
       } catch (final Exception ex) {
         log.warn("Invalid date format in config.xml: " + pattern);
       }
       dateFormatChoiceRenderer.addValue(str, str + ": " + dateString);
     }
-    final DropDownChoice<String> dateFormatChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(data,
+    final DropDownChoice<String> dateFormatChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(user,
         property), dateFormatChoiceRenderer.getValues(), dateFormatChoiceRenderer);
     dateFormatChoice.setNullValid(true);
     fs.add(dateFormatChoice);
@@ -392,7 +459,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
         rightsData = new UserRightsEditData();
         first = false;
       }
-      if (odd == true){
+      if (odd == true) {
         gridBuilder.newColumnsPanel();
       }
       odd = !odd;
@@ -421,7 +488,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
   @SuppressWarnings({ "unchecked", "serial"})
   private void addAssignedGroups(final boolean adminAccess)
   {
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("group.assignedUsers"), true).setLabelSide(false);
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.assignedGroups"), true).setLabelSide(false);
     List<Integer> groupsToAdd = null;
     if (data != null) {
       if (TUTORIAL_DEFAULT_PASSWORD.equals(data.getPassword()) == true) {
