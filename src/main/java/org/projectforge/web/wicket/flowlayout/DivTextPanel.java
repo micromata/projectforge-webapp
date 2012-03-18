@@ -27,6 +27,7 @@ import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * Represents a simple text panel enclosed in a div element.
@@ -88,6 +89,16 @@ public class DivTextPanel extends Panel
   {
     label.setOutputMarkupId(true);
     label.setMarkupId(markupId);
+    return this;
+  }
+
+  /**
+   * @see WicketUtils#setStrong(org.apache.wicket.markup.html.form.FormComponent)
+   * @return this for chaining.
+   */
+  public DivTextPanel setStrong()
+  {
+    WicketUtils.setStrong(label);
     return this;
   }
 
