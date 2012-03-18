@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>classpath*:applicationContext*.xml,classpath*:**/*Context.xml</param-value>
   </context-param>
-  <!--
-    filter> <filter-name>WicketSessionFilter</filter-name> <filter-class>org.apache.wicket.protocol.http.servlet.WicketSessionFilter</filter-class>
-    <init-param> <param-name>filterName</param-name> <param-value>wicket.app</param-value> </init-param> </filter
-  -->
+  <!-- filter> <filter-name>WicketSessionFilter</filter-name> <filter-class>org.apache.wicket.protocol.http.servlet.WicketSessionFilter</filter-class> 
+    <init-param> <param-name>filterName</param-name> <param-value>wicket.app</param-value> </init-param> </filter -->
   <filter>
     <filter-name>WicketApplicationFilter</filter-name>
     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
@@ -21,12 +20,12 @@
     <filter-name>UserFilter</filter-name>
     <filter-class>org.projectforge.web.UserFilter</filter-class>
   </filter>
-  
-<!--   <filter> -->
-<!--     <filter-name>RestUserFilter</filter-name> -->
-<!--     <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class> -->
-<!--   </filter> -->
-  
+
+  <filter>
+    <filter-name>RestUserFilter</filter-name>
+    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+  </filter>
+
   <filter>
     <filter-name>HibernateFilter</filter-name>
     <filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
@@ -71,10 +70,10 @@
     <filter-name>UserFilter</filter-name>
     <url-pattern>/secure/*</url-pattern>
   </filter-mapping>
-  <!-- <filter-mapping> -->
-  <!-- <filter-name>RestUserFilter</filter-name> -->
-  <!-- <url-pattern>/rest/*</url-pattern> -->
-  <!-- </filter-mapping> -->
+  <filter-mapping>
+    <filter-name>RestUserFilter</filter-name>
+    <url-pattern>/rest/*</url-pattern>
+  </filter-mapping>
   <filter-mapping>
     <filter-name>UserFilter</filter-name>
     <url-pattern>/wa/*</url-pattern>
@@ -92,10 +91,7 @@
     <filter-name>HibernateFilter</filter-name>
     <url-pattern>/wa/*</url-pattern>
   </filter-mapping>
-  <!-- filter-mapping>
-    <filter-name>WicketSessionFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping-->
+  <!-- filter-mapping> <filter-name>WicketSessionFilter</filter-name> <url-pattern>/*</url-pattern> </filter-mapping -->
   <filter-mapping>
     <filter-name>WicketApplicationFilter</filter-name>
     <url-pattern>/wa/*</url-pattern>
@@ -138,7 +134,7 @@
     <filter-name>expire</filter-name>
     <url-pattern>*.swf</url-pattern>
   </filter-mapping>
-  <!-- Startupcode	-->
+  <!-- Startupcode -->
   <listener>
     <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
   </listener>
@@ -149,10 +145,10 @@
   <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
-  <!-- servlet>
+  <servlet>
     <servlet-name>jersey</servlet-name>
     <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
-  </servlet-->
+  </servlet>
   <servlet>
     <!-- Displays logo at the top of the navigation menu. -->
     <servlet-name>LogoServlet</servlet-name>
@@ -190,11 +186,11 @@
     <servlet-name>CalendarFeed</servlet-name>
     <servlet-class>org.projectforge.web.calendar.CalendarFeed</servlet-class>
   </servlet>
-  
-  <!-- servlet-mapping>
+
+  <servlet-mapping>
     <servlet-name>jersey</servlet-name>
     <url-pattern>/rest/*</url-pattern>
-  </servlet-mapping-->
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>LogoServlet</servlet-name>
     <url-pattern>/secure/Logo.png</url-pattern>
@@ -236,7 +232,7 @@
     <servlet-name>CalendarFeed</servlet-name>
     <url-pattern>/export/ical</url-pattern>
   </servlet-mapping>
-  
+
   <session-config>
     <session-timeout>60</session-timeout>
   </session-config>
@@ -246,33 +242,17 @@
     <welcome-file>wa/login</welcome-file>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>
-  <!--
-    error-page> <error-code>404</error-code> <location>/error.jsp</location> </error-page> <error-page> <error-code>500</error-code>
-    <location>/error.jsp</location> </error-page
-  -->
+  <!-- error-page> <error-code>404</error-code> <location>/error.jsp</location> </error-page> <error-page> <error-code>500</error-code> <location>/error.jsp</location> 
+    </error-page -->
   <error-page>
     <exception-type>java.lang.Throwable</exception-type>
     <location>/wa/error</location>
   </error-page>
   <!-- Uncomment the folloging security constraints to ensure, that login and pages under /secure and /wa are accessed via https -->
-  <!-- security-constraint>
-    <web-resource-collection>
-      <web-resource-name>Applikation</web-resource-name>
-      <url-pattern>/secure/*</url-pattern>
-    </web-resource-collection>
-    <user-data-constraint>
-      <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-    </user-data-constraint>
-  </security-constraint>
-  <security-constraint>
-    <web-resource-collection>
-      <web-resource-name>wicket.app</web-resource-name>
-      <url-pattern>/wa/*</url-pattern>
-    </web-resource-collection>
-    <user-data-constraint>
-      <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-    </user-data-constraint>
-  </security-constraint-->
+  <!-- security-constraint> <web-resource-collection> <web-resource-name>Applikation</web-resource-name> <url-pattern>/secure/*</url-pattern> </web-resource-collection> 
+    <user-data-constraint> <transport-guarantee>CONFIDENTIAL</transport-guarantee> </user-data-constraint> </security-constraint> <security-constraint> <web-resource-collection> 
+    <web-resource-name>wicket.app</web-resource-name> <url-pattern>/wa/*</url-pattern> </web-resource-collection> <user-data-constraint> <transport-guarantee>CONFIDENTIAL</transport-guarantee> 
+    </user-data-constraint> </security-constraint -->
   <resource-ref>
     <description>Resourcename of the database to use</description>
     <res-ref-name>jdbc/ProjectForgeDS</res-ref-name>
