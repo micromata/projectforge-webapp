@@ -78,21 +78,21 @@
 <script type="text/javascript" src="scripts/adminica/adminica_forms.js"></script>
 <script type="text/javascript" src="scripts/adminica/adminica_mobile.js"></script>
 <script wicket:id="javaScriptLocalization" type="text/javascript">
-  $(function() {
-    $.datepicker.setDefaults($.datepicker.regional['de']);
-    $.datepicker.setDefaults({
-      showAnim : 'fadeIn',
-      showWeek : true
-    });
-    $(".datepicker").datepicker({
-      dateFormat : 'dd.mm.yy'
-    });
-  })
+	$(function() {
+		$.datepicker.setDefaults($.datepicker.regional['de']);
+		$.datepicker.setDefaults({
+			showAnim : 'fadeIn',
+			showWeek : true
+		});
+		$(".datepicker").datepicker({
+			dateFormat : 'dd.mm.yy'
+		});
+	})
 </script>
 <script type="text/javascript" charset="utf-8">
-  $(document).ready(function() {
-    initTooltips();
-  });
+	$(document).ready(function() {
+		initTooltips();
+	});
 </script>
 </head>
 <body onload="" wicket:id="body">
@@ -104,7 +104,8 @@
     <div id="footer">
       <div class="left" wicket:id="username">[Kai Reinhard]</div>
       <div class="right">
-        <a href="http://www.projectforge.org" class="tooltip" title="www.projectforge.org">&copy;2001-2012 by Kai Reinhard</a><span class="divider">|</span><a
+        <a href="http://www.projectforge.org" class="tooltip" title="www.projectforge.org" target="_blank">&copy;2001-2012 by Kai Reinhard</a><span
+          class="divider">|</span><a href="http://www.micromata.com" target="_blank" title="www.micromata.com">Micromata GmbH</a><span class="divider">|</span><a
           href=".../News.html" title="Release-News" class="tooltip" wicket:id="footerNewsLink"><span wicket:id="version">[Version 3.6.1.7,
             2012-01-24 08:50]</span></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       </div>
