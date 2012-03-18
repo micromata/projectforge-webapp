@@ -25,11 +25,12 @@ package org.projectforge.web.user;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.access.AccessChecker;
-import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserRightDao;
+import org.projectforge.user.UserDao;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditPage>
 {
@@ -37,15 +38,10 @@ public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditP
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MyAccountEditForm.class);
 
-  @SpringBean(name = "accessChecker")
-  private AccessChecker accessChecker;
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
 
-  @SpringBean(name = "userRightDao")
-  private UserRightDao userRightDao;
-
-  @SpringBean(name = "groupDao")
-  private GroupDao groupDao;
-
+  boolean invalidateAllStayLoggedInSessions;
 
   public MyAccountEditForm(final MyAccountEditPage parentPage, final PFUserDO data)
   {
@@ -56,6 +52,30 @@ public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditP
   protected void init()
   {
     super.init();
+    gridBuilder.newGrid8();
+    {
+      // User
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"));
+      fs.add(new DivTextPanel(fs.newChildId(), data.getUsername()).setStrong());
+    }
+    UserEditForm.createFirstName(gridBuilder, data);
+    UserEditForm.createLastName(gridBuilder, data);
+    UserEditForm.createOrganization(gridBuilder, data);
+    UserEditForm.createEMail(gridBuilder, data);
+    UserEditForm.createJIRAUsername(gridBuilder, data);
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.assignedGroups"));
+    fs.add(new DivTextPanel(fs.newChildId(), userGroupCache.getGroupnames(data.getId())));
+    gridBuilder.newGrid8();
+    UserEditForm.createLastLoginAndDeleteAllStayLogins(gridBuilder, data, (UserDao) getBaseDao(), this);
+    UserEditForm.createLocale(gridBuilder, data);
+    UserEditForm.createDateFormat(gridBuilder, data);
+    UserEditForm.createExcelDateFormat(gridBuilder, data);
+    UserEditForm.createTimeNotation(gridBuilder, data);
+    UserEditForm.createTimeZone(gridBuilder, data);
+    UserEditForm.createPhoneIds(gridBuilder, data);
+    UserEditForm.createMEBPhoneNumbers(gridBuilder, data);
+    gridBuilder.newGrid16();
+    UserEditForm.createDescription(gridBuilder, data);
   }
 
   @Override
