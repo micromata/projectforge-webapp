@@ -5,34 +5,17 @@
 </head>
 
 <body>
-<wicket:extend>
-  <div class="errors" wicket:id="errorMessage">[An error occurs....]</div>
-  <form wicket:id="form">
-  <fieldset><legend><wicket:message key="errorpage.title" /></legend>
-  <table class="form">
-    <wicket:child />
-    <tr>
-      <th><wicket:message key="feedback.receiver" /></th>
-      <td><span wicket:id="receiver">[admin@acme.org]</span></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="feedback.sender" /></th>
-      <td><span wicket:id="sender">[kai]</span></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="errorpage.feedback.messageNumber" /></th>
-      <td><span wicket:id="errorId">[#1253381285454]</span></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="errorpage.feedback.description" /></th>
-      <td><textarea class="stdtext" wicket:id="description" style="height: 20ex;">[Description]</textarea></td>
-    </tr>
-    <tr>
-      <td class="buttonpanel" colspan="2"><span wicket:id="cancel">[cancel]</span> <span wicket:id="send">[send]</span></td>
-    </tr>
-  </table>
-  </fieldset>
-  </form>
-</wicket:extend>
+  <wicket:extend>
+    <form wicket:id="form" name="form">
+      <div class="grid_16">
+        <div class="alert alert_red feedback" wicket:id="feedback"></div>
+        <div class="alert alert_red feedback" wicket:id="errorMessage"></div>
+      </div>
+      <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
+      <div class="button_cell clearfix">
+        <wicket:container wicket:id="buttons">[action buttons]</wicket:container>
+      </div>
+    </form>
+  </wicket:extend>
 </body>
 </html>
