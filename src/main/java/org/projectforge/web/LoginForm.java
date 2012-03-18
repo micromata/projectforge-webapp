@@ -62,7 +62,6 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
       {
         final String result = parentPage.checkLogin();
         if (result != null) {
-          addError(result);
           parentPage.addError(getString(result));
         }
       }

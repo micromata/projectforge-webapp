@@ -225,6 +225,7 @@ public class LoginPage extends AbstractUnsecureBasePage
    * @param targetUrlAfterLogin
    * @return i18n key of the validation error message if not successfully logged in, otherwise null.
    */
+  @SuppressWarnings({ "unchecked", "rawtypes"})
   public static String internalCheckLogin(final WebPage page, final UserDao userDao, final DataSource dataSource, final String username,
       final String password, final boolean userWantsToStayLoggedIn, final Class< ? extends WebPage> defaultPage)
   {
