@@ -1038,7 +1038,7 @@ public class WicketUtils
     return component;
   }
 
-  public static FormComponent< ? > setStrong(final FormComponent< ? > component)
+  public static Component setStrong(final Component component)
   {
     component.add(AttributeModifier.append("style", "font-weight: bold;"));
     return component;
