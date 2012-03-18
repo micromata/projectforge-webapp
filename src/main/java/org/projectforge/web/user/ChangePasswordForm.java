@@ -25,17 +25,25 @@ package org.projectforge.web.user;
 
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.PasswordTextField;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractForm;
-import org.projectforge.web.wicket.FocusOnLoadBehavior;
+import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.GridBuilder;
+import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 public class ChangePasswordForm extends AbstractForm<ChangePasswordForm, ChangePasswordPage>
 {
   private static final long serialVersionUID = -3424973755250980758L;
 
   private String oldPassword, newPassword, passwordRepeat;
+
+  private GridBuilder gridBuilder;
+
+  protected MyComponentsRepeater<SingleButtonPanel> actionButtons;
 
   public ChangePasswordForm(final ChangePasswordPage parentPage)
   {
@@ -47,57 +55,91 @@ public class ChangePasswordForm extends AbstractForm<ChangePasswordForm, ChangeP
   protected void init()
   {
     super.init();
-    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    add(new PasswordTextField("oldPassword", new PropertyModel<String>(this, "oldPassword")).setResetPassword(true).setRequired(true).add(new FocusOnLoadBehavior()));
-    add(new PasswordTextField("newPassword", new PropertyModel<String>(this, "newPassword")).setResetPassword(true).setRequired(true));
-    add(new PasswordTextField("passwordRepeat", new PropertyModel<String>(this, "passwordRepeat")).setResetPassword(true).setRequired(true));
-    final Button updateButton = new Button("button", new Model<String>(getString("update"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.update();
-      }
-    };
-    //    add(new SingleButtonPanel("update", updateButton));
-    //    updateButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    //    setDefaultButton(updateButton);
-    //    final Button cancelButton = new Button("button", new Model<String>(getString("cancel"))) {
-    //      @Override
-    //      public final void onSubmit()
-    //      {
-    //        parentPage.cancel();
-    //      }
-    //    };
-    //    add(new SingleButtonPanel("cancel", cancelButton.setDefaultFormProcessing(false)));
+    addFeedbackPanel();
+    final RepeatingView repeater = new RepeatingView("flowform");
+    add(repeater);
+    gridBuilder = newGridBuilder(repeater);
+    gridBuilder.newGrid8();
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.changePassword.oldPassword"));
+      final PasswordTextField oldPassword = new PasswordTextField(fs.getTextFieldId(), new PropertyModel<String>(this, "oldPassword"));
+      oldPassword.setResetPassword(true).setRequired(true);
+      WicketUtils.setFocus(oldPassword);
+      fs.add(oldPassword);
+    }
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.changePassword.newPassword"));
+      final PasswordTextField newPassword = new PasswordTextField(fs.getTextFieldId(), new PropertyModel<String>(this, "newPassword"));
+      newPassword.setResetPassword(true).setRequired(true);
+      fs.add(newPassword);
+    }
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("passwordRepeat"));
+      final PasswordTextField passwordRepeat = new PasswordTextField(fs.getTextFieldId(), new PropertyModel<String>(this, "passwordRepeat"));
+      passwordRepeat.setResetPassword(true).setRequired(true);
+      fs.add(passwordRepeat);
+    }
+
+    actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");
+    add(actionButtons.getRepeatingView());
+    {
+      final Button cancelButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("cancel")) {
+        @Override
+        public final void onSubmit()
+        {
+          parentPage.cancel();
+        }
+      };
+      cancelButton.setDefaultFormProcessing(false);
+      final SingleButtonPanel cancelButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), cancelButton, getString("cancel"),
+          SingleButtonPanel.CANCEL);
+      actionButtons.add(cancelButtonPanel);
+
+      final Button changeButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("change")) {
+        @Override
+        public final void onSubmit()
+        {
+          parentPage.update();
+        }
+      };
+      final SingleButtonPanel changeButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), changeButton, getString("update"),
+          SingleButtonPanel.DEFAULT_SUBMIT);
+      actionButtons.add(changeButtonPanel);
+      setDefaultButton(changeButton);
+    }
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractForm#onBeforeRender()
+   */
+  @Override
+  public void onBeforeRender()
+  {
+    super.onBeforeRender();
+    actionButtons.render();
+  }
+
+  /**
+   * @return the oldPassword
+   */
   public String getOldPassword()
   {
     return oldPassword;
   }
 
-  public void setOldPassword(final String oldPassword)
-  {
-    this.oldPassword = oldPassword;
-  }
-
+  /**
+   * @return the newPassword
+   */
   public String getNewPassword()
   {
     return newPassword;
   }
 
-  public void setNewPassword(final String newPassword)
-  {
-    this.newPassword = newPassword;
-  }
-
+  /**
+   * @return the passwordRepeat
+   */
   public String getPasswordRepeat()
   {
     return passwordRepeat;
-  }
-
-  public void setPasswordRepeat(final String passwordRepeat)
-  {
-    this.passwordRepeat = passwordRepeat;
   }
 }
