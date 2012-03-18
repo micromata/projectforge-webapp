@@ -42,7 +42,7 @@ import org.projectforge.web.wicket.flowlayout.TextPanel;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class ErrorForm extends AbstractForm<Object, ErrorPage>
+public class ErrorForm extends AbstractForm<ErrorPageData, ErrorPage>
 {
   private static final long serialVersionUID = -637809894879133209L;
 
@@ -82,15 +82,15 @@ public class ErrorForm extends AbstractForm<Object, ErrorPage>
     gridBuilder = newGridBuilder(repeater);
     gridBuilder.newGrid16();
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.receiver"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.receiver"), true).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), data.getReceiver()));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.sender"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.sender"), true).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), data.getSender()));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("errorpage.feedback.messageNumber"), true);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("errorpage.feedback.messageNumber"), true).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), data.getMessageNumber()));
     }
     {

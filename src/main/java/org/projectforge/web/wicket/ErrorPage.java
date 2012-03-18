@@ -60,9 +60,9 @@ public class ErrorPage extends AbstractSecuredPage
   @SpringBean(name = "sendFeedback")
   private SendFeedback sendFeedback;
 
-  ErrorForm form;
+  private final ErrorForm form;
 
-  boolean showFeedback;
+  private boolean showFeedback;
 
   /**
    * Get internationalized message inclusive the message params if exists.
