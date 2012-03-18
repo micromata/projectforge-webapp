@@ -23,6 +23,7 @@
 
 package org.projectforge.web.user;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -65,16 +66,16 @@ public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditF
     if (PFUserContext.getUserId().equals(getData().getId()) == false) {
       throw new IllegalStateException("Oups, MyAccountEditPage is called with another than the logged in user!");
     }
-    //    if (StringUtils.isNotEmpty(form.renderer.getEncryptedPassword()) == true) {
-    //      getData().setPassword(form.renderer.getEncryptedPassword());
-    //    }
-    getData().setPersonalPhoneIdentifiers(userDao.getNormalizedPersonalPhoneIdentifiers(getData()));
-    userDao.updateMyAccount(getData());
-    ((MySession)getSession()).setLocale(getRequest());
-    //    if (form.renderer.isInvalidateAllStayLoggedInSessions() == true) {
-    //      userDao.renewStayLoggedInKey(getData().getId());
-    //    }
-    setResponsePage(new MessagePage("message.successfullChanged"));
+//    if (StringUtils.isNotEmpty(form.getEncryptedPassword()) == true) {
+//      getData().setPassword(form.getEncryptedPassword());
+//    }
+//    getData().setPersonalPhoneIdentifiers(userDao.getNormalizedPersonalPhoneIdentifiers(getData()));
+//    userDao.updateMyAccount(getData());
+//    ((MySession) getSession()).setLocale(getRequest());
+//    if (form.isInvalidateAllStayLoggedInSessions() == true) {
+//      userDao.renewStayLoggedInKey(getData().getId());
+//    }
+//    setResponsePage(new MessagePage("message.successfullChanged"));
   }
 
   /**
