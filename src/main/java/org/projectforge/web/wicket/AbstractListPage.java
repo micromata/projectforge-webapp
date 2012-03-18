@@ -45,7 +45,6 @@ import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.projectforge.common.NumberHelper;
 import org.projectforge.common.RecentQueue;
 import org.projectforge.common.ReflectionHelper;
 import org.projectforge.common.StringHelper;
@@ -370,16 +369,17 @@ AbstractSecuredPage implements ISelectCallerPage
         return true;
       }
     } else {
-      final String searchString = form.searchFilter.getSearchString();
-      if (searchString != null && searchString.matches("id:[0-9]+") == true) {
-        final Integer id = NumberHelper.parseInteger(searchString.substring(3));
-        if (id != null) {
-          final PageParameters pageParams = new PageParameters();
-          pageParams.add(AbstractEditPage.PARAMETER_KEY_ID, String.valueOf(id));
-          redirectToEditPage(pageParams);
-          return true;
-        }
-      }
+      // auto-select of a single entry:
+      // final String searchString = form.searchFilter.getSearchString();
+      // if (searchString != null && searchString.matches("id:[0-9]+") == true) {
+      // final Integer id = NumberHelper.parseInteger(searchString.substring(3));
+      // if (id != null) {
+      // final PageParameters pageParams = new PageParameters();
+      // pageParams.add(AbstractEditPage.PARAMETER_KEY_ID, String.valueOf(id));
+      // redirectToEditPage(pageParams);
+      // return true;
+      // }
+      // }
     }
     return false;
   }
