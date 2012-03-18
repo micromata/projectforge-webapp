@@ -4,9 +4,6 @@
   <projects/>
   <buildSpec>
     <buildCommand>
-      <name>org.codehaus.groovy.eclipse.groovyBuilder</name>
-    </buildCommand>
-    <buildCommand>
       <name>org.eclipse.jdt.core.javabuilder</name>
     </buildCommand>
     <buildCommand>
@@ -17,10 +14,9 @@
     </buildCommand>
   </buildSpec>
   <natures>
-    <nature>org.eclipse.wst.common.project.facet.core.nature</nature>
     <nature>org.eclipse.jdt.core.javanature</nature>
+    <nature>org.eclipse.wst.common.project.facet.core.nature</nature>
     <nature>org.eclipse.wst.common.modulecore.ModuleCoreNature</nature>
     <nature>org.eclipse.jem.workbench.JavaEMFNature</nature>
-    <nature>org.codehaus.groovy.eclipse.groovyNature</nature>
   </natures>
 </projectDescription>
