@@ -74,8 +74,8 @@ public class ContractListPage extends AbstractListPage<ContractListForm, Contrac
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("legalAffaires.contract.number")), "number",
-        "number", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<ContractDO>(getString("legalAffaires.contract.number"), "number", "number",
+        cellItemListener) {
       @SuppressWarnings({ "unchecked", "rawtypes"})
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
@@ -87,20 +87,17 @@ public class ContractListPage extends AbstractListPage<ContractListForm, Contrac
         addRowClick(item);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("date")), "date", "date", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("legalAffaires.contract.type")), "type", "type",
+    columns.add(new CellItemListenerPropertyColumn<ContractDO>(getString("date"), "date", "date", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ContractDO>(getString("legalAffaires.contract.type"), "type", "type", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ContractDO>(getString("status"), "status", "status", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ContractDO>(getString("title"), "title", "title", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ContractDO>(getString("legalAffaires.contract.coContractorA"), "coContractorA",
+        "coContractorA", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ContractDO>(getString("legalAffaires.contract.coContractorB"), "coContractorB",
+        "coContractorB", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ContractDO>(getString("resubmissionOnDate"), "resubmissionOnDate", "resubmissionOnDate",
         cellItemListener));
-    columns
-    .add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("title")), "title", "title", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("legalAffaires.contract.coContractorA")),
-        "coContractorA", "coContractorA", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("legalAffaires.contract.coContractorB")),
-        "coContractorB", "coContractorB", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("resubmissionOnDate")), "resubmissionOnDate",
-        "resubmissionOnDate", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<ContractDO>(new Model<String>(getString("dueDate")), "dueDate", "dueDate",
-        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<ContractDO>(getString("dueDate"), "dueDate", "dueDate", cellItemListener));
     dataTable = createDataTable(columns, "number", SortOrder.DESCENDING);
     form.add(dataTable);
   }
