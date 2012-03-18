@@ -11,6 +11,8 @@ package org.projectforge.web.wicket.flowlayout;
 
 import java.io.Serializable;
 
+import org.apache.wicket.Component;
+
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
@@ -135,4 +137,10 @@ public interface GridBuilder extends Serializable
   public FieldsetPanel newFieldset(final String labelText, final String labelDescription, final boolean multipleChildren);
 
   public DivPanel newSectionPanel();
+
+  /**
+   * @param i18nKey
+   * @see Component#get(String)
+   */
+  public String getString(String i18nKey);
 }

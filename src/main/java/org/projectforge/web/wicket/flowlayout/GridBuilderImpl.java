@@ -84,7 +84,6 @@ public class GridBuilderImpl implements GridBuilder
     return newGrid8(id, false);
   }
 
-
   /**
    * Generates new grid panel. For narrow screens a grid16 panel will be created.
    * @param id if no RepeatingView is given as parent, the id is needed.
@@ -365,6 +364,19 @@ public class GridBuilderImpl implements GridBuilder
     final DivPanel section = new DivPanel(current.newChildId(), DivType.SECTION);
     current.add(section);
     return section;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.GridBuilder#getString(java.lang.String)
+   */
+  @Override
+  public String getString(final String i18nKey)
+  {
+    if (this.parentRepeatingView != null) {
+      return this.parentRepeatingView.getString(i18nKey);
+    } else {
+      return this.parentDivPanel.getString(i18nKey);
+    }
   }
 
   private WebMarkupContainer getParent()

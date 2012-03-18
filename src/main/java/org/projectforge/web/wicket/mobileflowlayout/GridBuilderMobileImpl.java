@@ -370,6 +370,19 @@ public class GridBuilderMobileImpl implements GridBuilder
     return section;
   }
 
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.GridBuilder#getString(java.lang.String)
+   */
+  @Override
+  public String getString(final String i18nKey)
+  {
+    if (this.parentRepeatingView != null) {
+      return this.parentRepeatingView.getString(i18nKey);
+    } else {
+      return this.parentDivPanel.getString(i18nKey);
+    }
+  }
+
   private WebMarkupContainer getParent()
   {
     if (parentRepeatingView != null) {
