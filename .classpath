@@ -124,13 +124,13 @@
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring-tx/3.1.1.RELEASE/spring-tx-3.1.1.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-tx/3.1.1.RELEASE/spring-tx-3.1.1.RELEASE-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring-web/3.1.1.RELEASE/spring-web-3.1.1.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-web/3.1.1.RELEASE/spring-web-3.1.1.RELEASE-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/taglibs/standard/1.1.2/standard-1.1.2.jar" sourcepath="M2_REPO/taglibs/standard/1.1.2/standard-1.1.2-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-core/1.5.4/wicket-core-1.5.4.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-core/1.5.4/wicket-core-1.5.4-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-datetime/1.5.4/wicket-datetime-1.5.4.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-datetime/1.5.4/wicket-datetime-1.5.4-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-extensions/1.5.4/wicket-extensions-1.5.4.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-extensions/1.5.4/wicket-extensions-1.5.4-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-ioc/1.5.4/wicket-ioc-1.5.4.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-ioc/1.5.4/wicket-ioc-1.5.4-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-request/1.5.4/wicket-request-1.5.4.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-request/1.5.4/wicket-request-1.5.4-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-spring/1.5.4/wicket-spring-1.5.4.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-spring/1.5.4/wicket-spring-1.5.4-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-util/1.5.4/wicket-util-1.5.4.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-util/1.5.4/wicket-util-1.5.4-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-core/1.5.5/wicket-core-1.5.5.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-core/1.5.5/wicket-core-1.5.5-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-datetime/1.5.5/wicket-datetime-1.5.5.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-datetime/1.5.5/wicket-datetime-1.5.5-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-extensions/1.5.5/wicket-extensions-1.5.5.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-extensions/1.5.5/wicket-extensions-1.5.5-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-ioc/1.5.5/wicket-ioc-1.5.5.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-ioc/1.5.5/wicket-ioc-1.5.5-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-request/1.5.5/wicket-request-1.5.5.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-request/1.5.5/wicket-request-1.5.5-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-spring/1.5.5/wicket-spring-1.5.5.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-spring/1.5.5/wicket-spring-1.5.5-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-util/1.5.5/wicket-util-1.5.5.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-util/1.5.5/wicket-util-1.5.5-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/xalan/xalan/2.6.0/xalan-2.6.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/xerces/xercesImpl/2.8.1/xercesImpl-2.8.1.jar" sourcepath="M2_REPO/xerces/xercesImpl/2.8.1/xercesImpl-2.8.1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2.jar" sourcepath="M2_REPO/xml-apis/xml-apis/1.0.b2/xml-apis-1.0.b2-sources.jar"/>
