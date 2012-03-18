@@ -38,18 +38,25 @@ import org.apache.wicket.RuntimeConfigurationType;
 import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.protocol.http.WebApplication;
+import org.apache.wicket.request.IRequestHandler;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
+import org.apache.wicket.request.cycle.AbstractRequestCycleListener;
+import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.handler.PageProvider;
+import org.apache.wicket.request.handler.RenderPageRequestHandler;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.AppVersion;
 import org.projectforge.admin.SystemUpdater;
+import org.projectforge.common.ExceptionHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationDao;
 import org.projectforge.core.CronSetup;
+import org.projectforge.core.ProjectForgeException;
 import org.projectforge.core.SystemInfoCache;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.HibernateUtils;
@@ -232,39 +239,38 @@ public class WicketApplication extends WebApplication
   protected void init()
   {
     super.init();
-    // // Own error page for deployment mode and UserException and AccessException.
-    //    getRequestCycleListeners().add(new AbstractRequestCycleListener() {
-    //      /**
-    //       * Log only non ProjectForge exceptions.
-    //       * @see org.apache.wicket.request.cycle.AbstractRequestCycleListener#onException(org.apache.wicket.request.cycle.RequestCycle,
-    //       *      java.lang.Exception)
-    //       */
-    //      @Override
-    //      public IRequestHandler onException(final RequestCycle cycle, final Exception ex)
-    //      {
-    //        final Throwable rootCause = ExceptionHelper.getRootCause(ex);
-    //        // log.error(rootCause.getMessage(), ex);
-    //        // if (rootCause instanceof ProjectForgeException == false) {
-    //        // return super.onException(cycle, ex);
-    //        // }
-    //        // return null;
-    //        final AbstractSecuredBasePage page = cycle
-    //            .getMetaData(AbstractSecuredBasePage.SECURED_BASE_PAGE);
-    //        if (page != null && rootCause instanceof ProjectForgeException) {
-    //          // Show exception message as error message in feedback panel.
-    //          final String msg = ErrorPage.getExceptionMessage(page, (ProjectForgeException) rootCause, true);
-    //          page.error(msg);
-    //          return new RenderPageRequestHandler(new PageProvider(page));
-    //        }
-    //        if (isDevelopmentSystem() == true) {
-    //          log.error(ex.getMessage(), ex);
-    //          return super.onException(cycle, ex);
-    //        } else {
-    //          // Show always this error page in production mode:
-    //          return new RenderPageRequestHandler(new PageProvider(new ErrorPage(ex)));
-    //        }
-    //      }
-    //    });
+    // Own error page for deployment mode and UserException and AccessException.
+    getRequestCycleListeners().add(new AbstractRequestCycleListener() {
+      /**
+       * Log only non ProjectForge exceptions.
+       * @see org.apache.wicket.request.cycle.AbstractRequestCycleListener#onException(org.apache.wicket.request.cycle.RequestCycle,
+       *      java.lang.Exception)
+       */
+      @Override
+      public IRequestHandler onException(final RequestCycle cycle, final Exception ex)
+      {
+        final Throwable rootCause = ExceptionHelper.getRootCause(ex);
+        // log.error(rootCause.getMessage(), ex);
+        // if (rootCause instanceof ProjectForgeException == false) {
+        // return super.onException(cycle, ex);
+        // }
+        // return null;
+        final AbstractSecuredBasePage page = cycle.getMetaData(AbstractSecuredBasePage.SECURED_BASE_PAGE);
+        if (page != null && rootCause instanceof ProjectForgeException) {
+          // Show exception message as error message in feedback panel.
+          final String msg = ErrorPage.getExceptionMessage(page, (ProjectForgeException) rootCause, true);
+          page.error(msg);
+          return new RenderPageRequestHandler(new PageProvider(page));
+        }
+        if (isDevelopmentSystem() == true) {
+          log.error(ex.getMessage(), ex);
+          return super.onException(cycle, ex);
+        } else {
+          // Show always this error page in production mode:
+          return new RenderPageRequestHandler(new PageProvider(new ErrorPage(ex)));
+        }
+      }
+    });
 
     getApplicationSettings().setDefaultMaximumUploadSize(Bytes.megabytes(100));
     getMarkupSettings().setDefaultMarkupEncoding("utf-8");
