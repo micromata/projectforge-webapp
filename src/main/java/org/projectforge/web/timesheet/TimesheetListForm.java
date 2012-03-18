@@ -199,7 +199,7 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
     }
     {
       gridBuilder.newColumnPanel(DivType.COL_60);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(),
           "longFormat"), getString("longFormat")));
