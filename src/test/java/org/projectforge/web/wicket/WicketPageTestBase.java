@@ -23,6 +23,8 @@
 
 package org.projectforge.web.wicket;
 
+import java.util.MissingResourceException;
+
 import org.apache.commons.lang.ClassUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
@@ -134,7 +136,13 @@ public class WicketPageTestBase extends TestBase
    */
   public Component findComponentByLabel(final MarkupContainer container, final String label)
   {
-    final String locLabel = container.getString(label);
+    String str = label;
+    try {
+      str = container.getString(label);
+    } catch (final MissingResourceException ex) {
+      // OK
+    }
+    final String locLabel = str;
     final Component[] component = new Component[1];
     container.visitChildren(new IVisitor<Component, Void>() {
       @Override
@@ -145,7 +153,11 @@ public class WicketPageTestBase extends TestBase
           if (parent instanceof ContentMenuEntryPanel) {
             if (labelEquals(((ContentMenuEntryPanel) parent).getLabel(), label, locLabel) == true) {
               component[0] = object;
+              visit.stop();
             }
+          } else if (object.getId().equals(locLabel) == true) {
+            component[0] = object;
+            visit.stop();
           }
         } else {
           if (object instanceof LabeledWebMarkupContainer) {
@@ -153,14 +165,16 @@ public class WicketPageTestBase extends TestBase
             if (labelModel != null) {
               if (labelEquals(labelModel.getObject(), label, locLabel) == true) {
                 component[0] = object;
+                visit.stop();
               }
             }
           }
           if (object instanceof FormComponent< ? >) {
             final Object modelObject = ((FormComponent< ? >) object).getModelObject();
             if (modelObject instanceof String) {
-              if (labelEquals((String)modelObject, label, locLabel) == true) {
+              if (labelEquals((String) modelObject, label, locLabel) == true) {
                 component[0] = object;
+                visit.stop();
               }
             }
           }
