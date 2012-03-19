@@ -33,7 +33,6 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataT
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -46,11 +45,13 @@ import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.user.UserFormatter;
-import org.projectforge.web.wicket.AbstractListPage;
+import org.projectforge.web.wicket.AbstractMassEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 
-public class TimesheetMassUpdatePage extends AbstractSecuredPage implements ISelectCallerPage
+public class TimesheetMassUpdatePage extends AbstractMassEditPage implements ISelectCallerPage
 {
+  private static final long serialVersionUID = -5549904132530779884L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TimesheetMassUpdatePage.class);
 
   @SpringBean(name = "dateTimeFormatter")
@@ -72,12 +73,9 @@ public class TimesheetMassUpdatePage extends AbstractSecuredPage implements ISel
 
   private final TimesheetMassUpdateForm form;
 
-  private AbstractSecuredPage callerPage;
-
   public TimesheetMassUpdatePage(final AbstractSecuredPage callerPage, final List<TimesheetDO> timesheets)
   {
-    super(new PageParameters());
-    this.callerPage = callerPage;
+    super(new PageParameters(), callerPage);
     this.timesheets = timesheets;
     form = new TimesheetMassUpdateForm(this);
     Integer taskId = null;
@@ -102,9 +100,6 @@ public class TimesheetMassUpdatePage extends AbstractSecuredPage implements ISel
       public Iterator<TimesheetDO> iterator(final int first, final int count)
       {
         final SortParam sp = getSort();
-        if (timesheets == null) {
-          return null;
-        }
         final Comparator<TimesheetDO> comp = new MyBeanComparator<TimesheetDO>(sp.getProperty(), sp.isAscending());
         Collections.sort(timesheets, comp);
         return timesheets.subList(first, first + count).iterator();
@@ -130,12 +125,6 @@ public class TimesheetMassUpdatePage extends AbstractSecuredPage implements ISel
 
     final DefaultDataTable<TimesheetDO> dataTable = new DefaultDataTable<TimesheetDO>("table", columns, sortableDataProvider, 1000);
     body.add(dataTable);
-    body.add(new Label("showUpdateQuestionDialog", "function showUpdateQuestionDialog() {\n" + //
-        "  return window.confirm('"
-        + getString("question.massUpdateQuestion")
-        + "');\n"
-        + "}\n") //
-    .setEscapeModelStrings(false));
   }
 
   public void cancelSelection(final String property)
@@ -169,17 +158,16 @@ public class TimesheetMassUpdatePage extends AbstractSecuredPage implements ISel
     return getString("timesheet.massupdate.title");
   }
 
-  protected void onCancelSubmit()
+  /**
+   * @see org.projectforge.web.wicket.AbstractMassEditPage#updateAll()
+   */
+  @Override
+  protected void updateAll()
   {
-    setResponsePage(callerPage);
-  }
-
-  protected void onUpdateAllSubmit()
-  {
-    timesheetDao.massUpdate(timesheets, form.data);
-    if (callerPage instanceof AbstractListPage< ? , ? , ? >) {
-      ((AbstractListPage< ? , ? , ? >) callerPage).setMassUpdateMode(false);
+    if (form.updateTask == false) {
+      form.data.setTask(null);
     }
-    setResponsePage(callerPage);
+    timesheetDao.massUpdate(timesheets, form.data);
+    super.updateAll();
   }
 }

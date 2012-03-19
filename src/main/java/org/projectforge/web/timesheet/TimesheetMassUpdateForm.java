@@ -26,13 +26,7 @@ package org.projectforge.web.timesheet;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.wicket.MarkupContainer;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.fibu.kost.Kost2DO;
@@ -41,17 +35,18 @@ import org.projectforge.task.TaskTree;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.web.task.TaskSelectPanel;
-import org.projectforge.web.wicket.AbstractForm;
-import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.AbstractMassEditForm;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
-public class TimesheetMassUpdateForm extends AbstractForm<TimesheetDO, TimesheetMassUpdatePage>
+public class TimesheetMassUpdateForm extends AbstractMassEditForm<TimesheetDO, TimesheetMassUpdatePage>
 {
   private static final long serialVersionUID = -6785832818308468337L;
 
   private DropDownChoice<Integer> kost2Choice;
 
-  private MarkupContainer kost2Row;
+  private FieldsetPanel kost2Fieldset;
 
   protected TimesheetDO data;
 
@@ -76,38 +71,30 @@ public class TimesheetMassUpdateForm extends AbstractForm<TimesheetDO, Timesheet
   protected void init()
   {
     super.init();
-    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("task", new PropertyModel<TaskDO>(data, "task"), parentPage, "taskId");
-    add(taskSelectPanel);
-    taskSelectPanel.init();
-    final CheckBox updateTaskCheckBox = new CheckBox("updateTask", new PropertyModel<Boolean>(this, "updateTask"));
-    WicketUtils.addTooltip(updateTaskCheckBox, getString("massupdate.updateTask"));
-    add(updateTaskCheckBox);
-    kost2List = timesheetDao.getKost2List(data);
-    addKost2Row();
-    final Button cancelButton = new Button("button", new Model<String>(getString("cancel"))) {
-      @Override
-      public final void onSubmit()
-      {
-        getParentPage().onCancelSubmit();
-      }
-    };
-    // cancelButton.add(WebConstants.BUTTON_CLASS_CANCEL);
-    // cancelButton.setDefaultFormProcessing(false);
-    // final SingleButtonPanel cancelButtonPanel = new SingleButtonPanel("cancel", cancelButton);
-    // add(cancelButtonPanel);
-    // final Button updateAllButton = new Button("button", new Model<String>(getString("updateAll"))) {
-    // @Override
-    // public final void onSubmit()
-    // {
-    // getParentPage().onUpdateAllSubmit();
-    // }
-    // };
-    // updateAllButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    // updateAllButton.add(AttributeModifier.replace("onclick", "return showUpdateQuestionDialog()"));
-    // setDefaultButton(updateAllButton);
-    // final SingleButtonPanel updateAllButtonPanel = new SingleButtonPanel("updateAll", updateAllButton);
-    // add(updateAllButtonPanel);
+    gridBuilder.newGrid16();
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"), true);
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(data, "task"), parentPage,
+          "taskId");
+      fs.add(taskSelectPanel);
+      taskSelectPanel.init();
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.addCheckBox(new PropertyModel<Boolean>(this, "updateTask"), getString("update"), getString("massupdate.updateTask"));
+    }
+    {
+      kost2Fieldset = new FieldsetPanel(gridBuilder.getPanel(), getString("fibu.kost2")) {
+        @Override
+        public boolean isVisible()
+        {
+          return CollectionUtils.isNotEmpty(kost2List);
+        }
+      };
+      kost2List = timesheetDao.getKost2List(data);
+      final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = getKost2LabelValueChoiceRenderer();
+      kost2Choice = TimesheetEditForm.createCost2ChoiceRenderer(kost2Fieldset.getDropDownChoiceId(), timesheetDao, taskTree,
+          kost2ChoiceRenderer, data, kost2List);
+      kost2Fieldset.add(kost2Choice);
+    }
   }
 
   protected void refresh()
@@ -118,27 +105,8 @@ public class TimesheetMassUpdateForm extends AbstractForm<TimesheetDO, Timesheet
     kost2Choice.setChoices(kost2ChoiceRenderer.getValues());
   }
 
-  @SuppressWarnings("serial")
-  protected void addKost2Row()
-  {
-    kost2Row = new WebMarkupContainer("kost2Row") {
-      @Override
-      public boolean isVisible()
-      {
-        return CollectionUtils.isNotEmpty(kost2List);
-      }
-    };
-    add(kost2Row);
-    final LabelValueChoiceRenderer<Integer> kost2ChoiceRenderer = getKost2LabelValueChoiceRenderer();
-    // kost2Choice = TimesheetFormRenderer.createCost2ChoiceRenderer("kost2Id", timesheetDao, taskTree, kost2ChoiceRenderer, data,
-    // kost2List);
-    // kost2Row.add(kost2Choice);
-  }
-
   private LabelValueChoiceRenderer<Integer> getKost2LabelValueChoiceRenderer()
   {
-    return null;
-    // return TimesheetFormRenderer.getCost2LabelValueChoiceRenderer(timesheetDao, kost2List, data, kost2Choice);
+    return TimesheetEditForm.getCost2LabelValueChoiceRenderer(timesheetDao, kost2List, data, kost2Choice);
   }
-
 }
