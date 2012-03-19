@@ -23,6 +23,7 @@
 
 package org.projectforge.web.address;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.tester.FormTester;
@@ -52,8 +53,8 @@ public class AddressPagesTest extends ListAndEditPagesTestBase
     // Need new page to initialize model:
     final AddressEditPage editPage = new AddressEditPage(new PageParameters());
     final AddressDO data = editPage.getForm().getData();
-    data.setName("Reinhard").setFirstName("Kai").setForm(FormOfAddress.MISTER).setContactStatus(ContactStatus.ACTIVE).setAddressStatus(
-        AddressStatus.UPTODATE).setTask(getTask("1.1"));
+    data.setName("Reinhard").setFirstName("Kai").setForm(FormOfAddress.MISTER).setContactStatus(ContactStatus.ACTIVE)
+    .setAddressStatus(AddressStatus.UPTODATE).setTask(getTask("1.1"));
     tester.startPage(editPage);
     FormTester form = tester.newFormTester(PATH_EDITPAGE_FORM);
     form.submit(findComponentByLabel(form, KEY_EDITPAGE_BUTTON_CREATE));
@@ -68,7 +69,8 @@ public class AddressPagesTest extends ListAndEditPagesTestBase
     // Delete entry
     tester.startPage(AddressListPage.class);
     tester.assertRenderedPage(AddressListPage.class);
-    tester.clickLink(PATH_LISTPAGE_FIRST_LIST_ENTRY_SELECT_BUTTON); // Edit page
+    final Component link = findComponentByLabel(tester, PATH_LISTPAGE_TABLE, "select");
+    tester.clickLink(link); // Edit page
     tester.assertRenderedPage(AddressEditPage.class);
     form = tester.newFormTester(PATH_EDITPAGE_FORM);
     form.submit(findComponentByLabel(form, KEY_EDITPAGE_BUTTON_MARK_AS_DELETED));
@@ -79,8 +81,8 @@ public class AddressPagesTest extends ListAndEditPagesTestBase
   {
     final AddressEditPage editPage = new AddressEditPage(new PageParameters());
     final AddressDO data = editPage.getForm().getData();
-    data.setName("Reinhard").setFirstName("Kai").setForm(FormOfAddress.MISTER).setContactStatus(ContactStatus.ACTIVE).setAddressStatus(
-        AddressStatus.UPTODATE).setTask(getTask("1.1"));
+    data.setName("Reinhard").setFirstName("Kai").setForm(FormOfAddress.MISTER).setContactStatus(ContactStatus.ACTIVE)
+    .setAddressStatus(AddressStatus.UPTODATE).setTask(getTask("1.1"));
     return editPage;
   }
 
