@@ -24,7 +24,6 @@
 package org.projectforge.web.wicket;
 
 import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.core.SendFeedbackData;
@@ -32,8 +31,6 @@ import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
-import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 /**
  * Standard error page should be shown in production mode.
@@ -41,20 +38,13 @@ import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class FeedbackForm extends AbstractForm<SendFeedbackData, FeedbackPage>
+public class FeedbackForm extends AbstractStandardForm<SendFeedbackData, FeedbackPage>
 {
   private static final long serialVersionUID = -637809894879133209L;
 
   public static final String ONLY4NAMESPACE = "org.projectforge";
 
   final SendFeedbackData data = new SendFeedbackData();
-
-  private GridBuilder gridBuilder;
-
-  /**
-   * List to create content menu in the desired order before creating the RepeatingView.
-   */
-  protected MyComponentsRepeater<SingleButtonPanel> actionButtons;
 
   public FeedbackForm(final FeedbackPage parentPage)
   {
@@ -66,10 +56,6 @@ public class FeedbackForm extends AbstractForm<SendFeedbackData, FeedbackPage>
   protected void init()
   {
     super.init();
-    addFeedbackPanel();
-    final RepeatingView repeater = new RepeatingView("flowform");
-    add(repeater);
-    gridBuilder = newGridBuilder(repeater);
     gridBuilder.newGrid16();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("feedback.receiver"), true).setNoLabelFor();
@@ -85,20 +71,14 @@ public class FeedbackForm extends AbstractForm<SendFeedbackData, FeedbackPage>
       WicketUtils.setFocus(description);
       fs.add(description).setAutogrow();
     }
-    actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");
-    add(actionButtons.getRepeatingView());
     {
-      final Button cancelButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("cancel")) {
+      addCancelButton(new Button(SingleButtonPanel.WICKET_ID, new Model<String>("cancel")) {
         @Override
         public final void onSubmit()
         {
           parentPage.cancel();
         }
-      };
-      cancelButton.setDefaultFormProcessing(false); // No validation of the form.
-      final SingleButtonPanel callButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), cancelButton, getString("cancel"),
-          SingleButtonPanel.CANCEL);
-      actionButtons.add(callButtonPanel);
+      });
     }
     {
       final Button sendButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("send")) {

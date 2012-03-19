@@ -35,7 +35,7 @@ import org.projectforge.user.PFUserContext;
  * 
  */
 @SuppressWarnings("serial")
-public class FeedbackPage extends AbstractSecuredPage
+public class FeedbackPage extends AbstractStandardFormPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(FeedbackPage.class);
 
