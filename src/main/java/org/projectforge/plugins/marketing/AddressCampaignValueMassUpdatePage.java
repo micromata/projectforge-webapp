@@ -34,7 +34,6 @@ import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataT
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortParam;
 import org.apache.wicket.extensions.markup.html.repeater.util.SortableDataProvider;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -100,12 +99,6 @@ public class AddressCampaignValueMassUpdatePage extends AbstractMassEditPage
 
     final DefaultDataTable<AddressDO> dataTable = new DefaultDataTable<AddressDO>("table", columns, sortableDataProvider, 1000);
     body.add(dataTable);
-    body.add(new Label("showUpdateQuestionDialog", "function showUpdateQuestionDialog() {\n" + //
-        "  return window.confirm('"
-        + getString("question.massUpdateQuestion")
-        + "');\n"
-        + "}\n") //
-    .setEscapeModelStrings(false));
   }
 
   @Override

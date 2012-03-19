@@ -23,7 +23,7 @@
 
 package org.projectforge.web.wicket;
 
-import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
 public abstract class AbstractMassEditPage extends AbstractSecuredPage
@@ -36,13 +36,12 @@ public abstract class AbstractMassEditPage extends AbstractSecuredPage
   {
     super(parameters);
     this.callerPage = callerPage;
-  }
-
-  @Override
-  public void renderHead(final IHeaderResponse response)
-  {
-    super.renderHead(response);
-    response.renderCSSReference("styles/table.css");
+    body.add(new Label("showUpdateQuestionDialog", "function showUpdateQuestionDialog() {\n" + //
+        "  return window.confirm('"
+        + getString("question.massUpdateQuestion")
+        + "');\n"
+        + "}\n") //
+    .setEscapeModelStrings(false));
   }
 
   protected void cancel()
