@@ -36,21 +36,19 @@ import org.junit.Test;
  */
 public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
 {
-  protected final String KEY_LISTPAGE_SEARCH_INPUT_FIELD = "searchFilter";
-
   protected final String KEY_EDITPAGE_BUTTON_CREATE = "create";
 
   protected final String KEY_EDITPAGE_BUTTON_MARK_AS_DELETED = "markAsDeleted";
 
   protected final String KEY_LISTPAGE_BUTTON_ADD = "add";
 
+  protected final String KEY_LISTPAGE_SEARCH_INPUT_FIELD = "searchFilter";
+
   protected final String PATH_CONTENT_MENU_REPEATER = "body:contentMenuRepeater";
 
   protected final String PATH_EDITPAGE_FORM = "body:form";
 
   protected final String PATH_LISTPAGE_FORM = "body:form";
-
-  protected final String PATH_LISTPAGE_FIRST_LIST_ENTRY_SELECT_BUTTON = "body:form:table:body:rows:1:cells:1:cell:1:select";
 
   protected final String PATH_LISTPAGE_TABLE = "body:form:table";
 
@@ -82,7 +80,9 @@ public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
     }
     startListPage("id:" + id);
     // Now re-enter edit page and mark object as deleted
-    // tester.clickLink(PATH_LISTPAGE_FIRST_LIST_ENTRY_SELECT_BUTTON); // Edit page
+    tester.debugComponentTrees();
+    final Component link = findComponentByLabel(tester, PATH_LISTPAGE_TABLE, "select");
+    tester.clickLink(link); // Edit page
     tester.assertRenderedPage(getEditPageClass());
     checkEditPage();
     form = tester.newFormTester(PATH_EDITPAGE_FORM);
