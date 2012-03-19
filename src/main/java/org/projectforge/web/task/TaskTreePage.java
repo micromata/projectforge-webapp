@@ -24,7 +24,6 @@
 package org.projectforge.web.task;
 
 import org.apache.wicket.markup.ComponentTag;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
@@ -105,13 +104,6 @@ public class TaskTreePage extends AbstractSecuredPage
     this.selectProperty = selectProperty;
     taskTreeTablePanel = new TaskTreeTablePanel("taskTree", caller, selectProperty, this);
     init();
-  }
-
-  @Override
-  public void renderHead(final IHeaderResponse response)
-  {
-    super.renderHead(response);
-    response.renderCSSReference("styles/table.css");
   }
 
   public void setHighlightedRowId(final Integer highlightedRowId)

@@ -33,7 +33,6 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.HeadersToolbar;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -207,13 +206,6 @@ AbstractSecuredPage implements IEditPage<O, D>
     onPreEdit();
     evaluatePageParameters(getPageParameters());
     this.editPageSupport = new EditPageSupport<O, D>(this, getBaseDao(), getData());
-  }
-
-  @Override
-  public void renderHead(final IHeaderResponse response)
-  {
-    super.renderHead(response);
-    response.renderCSSReference("styles/table.css");
   }
 
   protected List<DisplayHistoryEntry> getHistory()

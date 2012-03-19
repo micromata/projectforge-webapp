@@ -25,7 +25,6 @@ package org.projectforge.web.admin;
 
 import javax.sql.DataSource;
 
-import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
@@ -99,13 +98,6 @@ public class SystemUpdatePage extends AbstractSecuredPage
     if (LoginPage.isAdminUser(PFUserContext.getUser(), dataSource) == false) {
       throw new AccessException(AccessChecker.I18N_KEY_VIOLATION_USER_NOT_MEMBER_OF, ProjectForgeGroup.ADMIN_GROUP.getKey());
     }
-  }
-
-  @Override
-  public void renderHead(final IHeaderResponse response)
-  {
-    super.renderHead(response);
-    response.renderCSSReference("styles/table.css");
   }
 
   @Override
