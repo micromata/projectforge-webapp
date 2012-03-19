@@ -44,10 +44,10 @@ import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.web.URLHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
-import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.WicketUtils;
 
-public class SendSmsPage extends AbstractSecuredPage
+public class SendSmsPage extends AbstractStandardFormPage
 {
   private static final long serialVersionUID = -1677859643101866297L;
 

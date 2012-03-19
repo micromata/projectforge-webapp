@@ -5,16 +5,6 @@
 
 <body>
   <wicket:extend>
-    <form wicket:id="form" name="form">
-      <div class="grid_16">
-        <div class="alert alert_red feedback" wicket:id="feedback"></div>
-        <div class="alert alert_green" wicket:id="message"></div>
-      </div>
-      <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
-      <div class="button_cell clearfix">
-        <wicket:container wicket:id="buttons">[action buttons]</wicket:container>
-      </div>
-    </form>
     <script wicket:id="javascript" type="text/javascript">
 					function showSendQuestionDialog() {
 						return window.confirm("Send...?");

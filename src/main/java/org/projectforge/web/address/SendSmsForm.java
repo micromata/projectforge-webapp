@@ -29,7 +29,6 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -41,20 +40,18 @@ import org.projectforge.common.RecentQueue;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
-import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
-import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 import org.projectforge.web.wicket.flowlayout.TextPanel;
 
-public class SendSmsForm extends AbstractForm<SendSmsData, SendSmsPage>
+public class SendSmsForm extends AbstractStandardForm<SendSmsData, SendSmsPage>
 {
   private static final long serialVersionUID = -2138017238114715368L;
 
@@ -71,10 +68,6 @@ public class SendSmsForm extends AbstractForm<SendSmsData, SendSmsPage>
   protected SendSmsData data;
 
   private RecentQueue<String> recentSearchTermsQueue;
-
-  private GridBuilder gridBuilder;
-
-  protected MyComponentsRepeater<SingleButtonPanel> actionButtons;
 
   public SendSmsForm(final SendSmsPage parentPage)
   {
@@ -101,35 +94,6 @@ public class SendSmsForm extends AbstractForm<SendSmsData, SendSmsPage>
   protected void init()
   {
     super.init();
-    addFeedbackPanel();
-    final DivPanel messagePanel = new DivPanel("message") {
-      /**
-       * @see org.apache.wicket.Component#isVisible()
-       */
-      @Override
-      public boolean isVisible()
-      {
-        return StringUtils.isNotBlank(parentPage.result);
-      }
-
-      @Override
-      public void onAfterRender()
-      {
-        super.onAfterRender();
-        parentPage.result = null;
-      }
-    };
-    add(messagePanel);
-    messagePanel.add(new TextPanel(DivPanel.CHILD_ID, new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return parentPage.result;
-      }
-    }));
-    final RepeatingView repeater = new RepeatingView("flowform");
-    add(repeater);
-    gridBuilder = newGridBuilder(repeater);
     gridBuilder.newGrid16().newColumnsPanel();
 
     FieldsetPanel fs = gridBuilder.newFieldset(getString("address.sendSms.phoneNumber"));
@@ -174,8 +138,6 @@ public class SendSmsForm extends AbstractForm<SendSmsData, SendSmsPage>
     charsRemaining.setMarkupId("charsRemaining");
     fs.add(charsRemaining);
 
-    actionButtons = new MyComponentsRepeater<SingleButtonPanel>("buttons");
-    add(actionButtons.getRepeatingView());
     {
       final Button resetButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("reset")) {
         @Override
@@ -207,6 +169,40 @@ public class SendSmsForm extends AbstractForm<SendSmsData, SendSmsPage>
     }
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractStandardForm#addMessageField()
+   */
+  @SuppressWarnings("serial")
+  @Override
+  protected void addMessageField()
+  {
+    final DivPanel messagePanel = new DivPanel("message") {
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
+      @Override
+      public boolean isVisible()
+      {
+        return StringUtils.isNotBlank(parentPage.result);
+      }
+
+      @Override
+      public void onAfterRender()
+      {
+        super.onAfterRender();
+        parentPage.result = null;
+      }
+    };
+    add(messagePanel);
+    messagePanel.add(new TextPanel(DivPanel.CHILD_ID, new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return parentPage.result;
+      }
+    }));
+  }
+
   @SuppressWarnings("unchecked")
   protected RecentQueue<String> getRecentSearchTermsQueue()
   {
@@ -231,15 +227,5 @@ public class SendSmsForm extends AbstractForm<SendSmsData, SendSmsPage>
   public String getInitalMessageText()
   {
     return getUser().getFullname() + ". " + getString("address.sendSms.doNotReply");
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractForm#onBeforeRender()
-   */
-  @Override
-  public void onBeforeRender()
-  {
-    super.onBeforeRender();
-    actionButtons.render();
   }
 }
