@@ -24,19 +24,29 @@
 package org.projectforge.web.admin;
 
 import org.apache.wicket.markup.html.form.Button;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
-import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.task.TaskEditPage;
+import org.projectforge.web.task.TaskSelectPanel;
+import org.projectforge.web.task.TaskTreePage;
+import org.projectforge.web.user.GroupEditPage;
+import org.projectforge.web.user.GroupSelectPanel;
+import org.projectforge.web.wicket.AbstractStandardForm;
+import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.Heading3Panel;
 
-public class TaskWizardForm extends AbstractForm<TaskWizardForm, TaskWizardPage>
+public class TaskWizardForm extends AbstractStandardForm<TaskWizardForm, TaskWizardPage>
 {
   private static final long serialVersionUID = -2450673501083584299L;
-
-  private TaskWizardFormRenderer renderer;
 
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
@@ -54,8 +64,74 @@ public class TaskWizardForm extends AbstractForm<TaskWizardForm, TaskWizardPage>
   @SuppressWarnings("serial")
   protected void init()
   {
-    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    final Button createButton = new Button("button", new Model<String>(getString("task.wizard.finish"))) {
+    super.init();
+    gridBuilder.newGrid16();
+    int number = 1;
+    {
+      gridBuilder.newFormHeading(getString("wizard"));
+      final DivPanel section = gridBuilder.newSectionPanel();
+      section.add(new DivTextPanel(section.newChildId(), getString("task.wizard.intro")));
+    }
+    gridBuilder.newGrid16();
+    {
+      final DivPanel section = gridBuilder.newSectionPanel();
+      section.add(new Heading3Panel(section.newChildId(), String.valueOf(number++) + ". " + getString("task")));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"), true);
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(this, "task"), parentPage,
+          "taskId");
+      fs.add(taskSelectPanel);
+      taskSelectPanel.setShowFavorites(false).init();
+      taskSelectPanel.setRequired(true);
+      final Button createTaskButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("createTask")) {
+        @Override
+        public final void onSubmit()
+        {
+          final PageParameters params = new PageParameters();
+          params.add(TaskEditPage.PARAM_PARENT_TASK_ID, taskTree.getRootTaskNode().getId());
+          final TaskEditPage editPage = new TaskEditPage(params);
+          editPage.setReturnToPage(parentPage);
+          setResponsePage(editPage);
+        }
+      };
+      createTaskButton.setDefaultFormProcessing(false);
+      WicketUtils.addTooltip(createTaskButton, getString("task.wizard.button.createTask.tooltip"));
+      fs.add(new SingleButtonPanel(fs.newChildId(), createTaskButton, getString("task.wizard.button.createTask"), SingleButtonPanel.GREY));
+    }
+    // Team
+    createGroupComponents(number++, "team");
+
+    // Manager group
+    createGroupComponents(number++, "managerGroup");
+
+    gridBuilder.newGrid16();
+    {
+      final DivPanel section = gridBuilder.newSectionPanel();
+      section.add(new Heading3Panel(section.newChildId(), getString("task.wizard.action")));
+      section.add(new DivTextPanel(section.newChildId(), new Model<String>() {
+        /**
+         * @see org.apache.wicket.model.Model#getObject()
+         */
+        @Override
+        public String getObject()
+        {
+          if (parentPage.actionRequired() == true) {
+            return getString("task.wizard.action.taskAndgroupsGiven");
+          } else {
+            return getString("task.wizard.action.noactionRequired");
+          }
+        }
+      }));
+    }
+    {
+      addCancelButton(new Button(SingleButtonPanel.WICKET_ID, new Model<String>("cancel")) {
+        @Override
+        public final void onSubmit()
+        {
+          setResponsePage(TaskTreePage.class);
+        }
+      });
+    }
+    final Button finishButton = new Button("button", new Model<String>("finish")) {
       @Override
       public final void onSubmit()
       {
@@ -68,9 +144,57 @@ public class TaskWizardForm extends AbstractForm<TaskWizardForm, TaskWizardPage>
         return parentPage.actionRequired();
       }
     };
-    //    createButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    //    setDefaultButton(createButton);
-    //    final SingleButtonPanel createButtonPanel = new SingleButtonPanel("finish", createButton);
-    //    add(createButtonPanel);
+    final SingleButtonPanel finishButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), finishButton, getString("task.wizard.finish"),
+        SingleButtonPanel.DEFAULT_SUBMIT);
+    actionButtons.add(finishButtonPanel);
+  }
+
+  @SuppressWarnings("serial")
+  private void createGroupComponents(final int number, final String key)
+  {
+    gridBuilder.newGrid16();
+    final DivPanel section = gridBuilder.newSectionPanel();
+    section.add(new Heading3Panel(section.newChildId(), String.valueOf(number) + ". " + getString("task.wizard." + key)));
+    section.add(new DivTextPanel(section.newChildId(), getString("task.wizard." + key + ".intro")));
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group"), true).setNoLabelFor();
+      final GroupSelectPanel groupSelectPanel = new GroupSelectPanel(fs.newChildId(), new PropertyModel<GroupDO>(this, key), parentPage,
+          key + "Id");
+      fs.add(groupSelectPanel);
+      groupSelectPanel.setShowFavorites(false).init();
+      final Button createGroupButton = new Button("button", new Model<String>("createGroup" + key)) {
+        @Override
+        public final void onSubmit()
+        {
+          parentPage.managerGroupCreated = "managerGroup".equals(key);
+          final PageParameters params = new PageParameters();
+          final StringBuffer buf = new StringBuffer();
+          if (task != null) {
+            buf.append(task.getTitle());
+          }
+          if (parentPage.managerGroupCreated == true) {
+            if (task != null) {
+              buf.append(", ");
+            }
+            buf.append(getString("task.wizard.managerGroup.groupNameSuffix"));
+          }
+          params.add(GroupEditPage.PARAM_GROUP_NAME, buf.toString());
+          final GroupEditPage editPage = new GroupEditPage(params);
+          editPage.setReturnToPage(parentPage);
+          setResponsePage(editPage);
+        }
+
+        @Override
+        public boolean isVisible()
+        {
+          return task != null;
+        }
+      };
+      createGroupButton.setDefaultFormProcessing(false);
+      final SingleButtonPanel createGroupButtonPanel = new SingleButtonPanel(fs.newChildId(), createGroupButton,
+          getString("task.wizard.button.createGroup"), SingleButtonPanel.GREY);
+      WicketUtils.addTooltip(createGroupButton, getString("task.wizard.button.createGroup.tooltip"));
+      fs.add(createGroupButtonPanel);
+    }
   }
 }

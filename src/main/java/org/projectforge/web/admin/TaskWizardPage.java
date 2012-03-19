@@ -34,10 +34,12 @@ import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.task.TaskTreePage;
-import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.AbstractStandardFormPage;
 
-public class TaskWizardPage extends AbstractSecuredPage implements ISelectCallerPage, WizardPage
+public class TaskWizardPage extends AbstractStandardFormPage implements ISelectCallerPage, WizardPage
 {
+  private static final long serialVersionUID = -297781176304100445L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TaskWizardPage.class);
 
   boolean managerGroupCreated;
