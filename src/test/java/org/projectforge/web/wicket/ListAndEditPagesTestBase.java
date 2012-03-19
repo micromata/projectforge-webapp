@@ -80,7 +80,6 @@ public abstract class ListAndEditPagesTestBase extends WicketPageTestBase
     }
     startListPage("id:" + id);
     // Now re-enter edit page and mark object as deleted
-    tester.debugComponentTrees();
     final Component link = findComponentByLabel(tester, PATH_LISTPAGE_TABLE, "select");
     tester.clickLink(link); // Edit page
     tester.assertRenderedPage(getEditPageClass());
