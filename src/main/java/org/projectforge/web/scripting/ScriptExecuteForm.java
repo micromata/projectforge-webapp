@@ -29,16 +29,11 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.scripting.GroovyResult;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.scripting.ScriptParameter;
 import org.projectforge.scripting.ScriptParameterType;
@@ -49,12 +44,15 @@ import org.projectforge.user.UserDao;
 import org.projectforge.web.calendar.QuickSelectPanel;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
-import org.projectforge.web.wicket.AbstractForm;
-import org.projectforge.web.wicket.FocusOnLoadBehavior;
+import org.projectforge.web.wicket.AbstractStandardForm;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
-import org.projectforge.web.wicket.components.DatePanelSettings;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
 
-public class ScriptExecuteForm extends AbstractForm<ScriptDO, ScriptExecutePage>
+public class ScriptExecuteForm extends AbstractStandardForm<ScriptDO, ScriptExecutePage>
 {
   private static final long serialVersionUID = -8371629527384652778L;
 
@@ -66,15 +64,13 @@ public class ScriptExecuteForm extends AbstractForm<ScriptDO, ScriptExecutePage>
 
   protected ScriptDO data;
 
-  protected transient GroovyResult groovyResult;
-
   protected List<ScriptParameter> scriptParameters;
-
-  protected RepeatingView parametersView;
 
   protected DatePanel[] datePanel1 = new DatePanel[5];
 
   protected DatePanel[] datePanel2 = new DatePanel[5];
+
+  protected FieldsetPanel parameterFieldsets[];
 
   protected QuickSelectPanel[] quickSelectPanel = new QuickSelectPanel[5];
 
@@ -139,48 +135,35 @@ public class ScriptExecuteForm extends AbstractForm<ScriptDO, ScriptExecutePage>
   {
     super.init();
     prefillParameters();
-    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    add(new Label("name", data.getName()));
-    add(new Label("description", data.getDescription()));
-    final Button backButton = new Button("button", new Model<String>(getString("back"))) {
-      @Override
-      public final void onSubmit()
-      {
-        parentPage.cancel();
-      }
-    };
-    // backButton.add(WebConstants.BUTTON_CLASS_CANCEL);
-    // backButton.setDefaultFormProcessing(false);
-    // final SingleButtonPanel backButtonPanel = new SingleButtonPanel("back", backButton);
-    // add(backButtonPanel);
-    // final Button executeButton = new Button("button", new Model<String>(getString("execute"))) {
-    // @Override
-    // public final void onSubmit()
-    // {
-    // parentPage.execute();
-    // }
-    // };
-    // executeButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    // setDefaultButton(executeButton);
-    // final SingleButtonPanel executeButtonPanel = new SingleButtonPanel("execute", executeButton);
-    // add(executeButtonPanel);
-    // final MarkupContainer resultRow = new WebMarkupContainer("scriptResultRow") {
-    // @Override
-    // public boolean isVisible()
-    // {
-    // return groovyResult != null;
-    // }
-    // };
-    // add(resultRow);
-    final Label scriptResultLabel = new Label("scriptResult", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return groovyResult != null ? groovyResult.getResultAsHtmlString() : "";
-      }
-    });
-    scriptResultLabel.setEscapeModelStrings(false);
-    // resultRow.add(scriptResultLabel);
+    gridBuilder.newGrid16();
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script.name")).setNoLabelFor();
+      fs.add(new DivTextPanel(fs.newChildId(), data.getName()));
+    }
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description")).setNoLabelFor();
+      fs.add(new DivTextPanel(fs.newChildId(), data.getDescription()));
+    }
+    {
+      addCancelButton(new Button(SingleButtonPanel.WICKET_ID, new Model<String>("cancel")) {
+        @Override
+        public final void onSubmit()
+        {
+          parentPage.cancel();
+        }
+      });
+      final Button executeButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("execute")) {
+        @Override
+        public final void onSubmit()
+        {
+          parentPage.execute();
+        }
+      };
+      final SingleButtonPanel executeButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), executeButton, getString("execute"),
+          SingleButtonPanel.DEFAULT_SUBMIT);
+      actionButtons.add(executeButtonPanel);
+      setDefaultButton(executeButton);
+    }
     refreshParametersView();
   }
 
@@ -199,97 +182,59 @@ public class ScriptExecuteForm extends AbstractForm<ScriptDO, ScriptExecutePage>
 
   protected void refreshParametersView()
   {
-    if (parametersView != null) {
-      remove(parametersView);
+    if (parameterFieldsets != null) {
+      for (final FieldsetPanel parameterFieldset : parameterFieldsets) {
+        remove(parameterFieldset);
+      }
+      parameterFieldsets = new FieldsetPanel[5];
     }
-    parametersView = new RepeatingView("parameters");
-    add(parametersView);
     int index = 0;
     boolean focusSet = false;
     for (final ScriptParameter parameter : scriptParameters) {
-      final WebMarkupContainer item = new WebMarkupContainer(parametersView.newChildId());
-      parametersView.add(item);
-      final Label parameterNameLabel = new Label("name", StringUtils.capitalize(parameter.getParameterName()));
-      item.add(parameterNameLabel);
-      TextField< ? > parameterValueField = null;
-      WebMarkupContainer panel1 = null;
-      WebMarkupContainer panel2 = null;
-      WebMarkupContainer panel3 = null;
+      final FieldsetPanel fs = gridBuilder.newFieldset(StringUtils.capitalize(parameter.getParameterName()),
+          getString("scripting.script.parameter") + " " + (index + 1), true);
+      InputPanel inputPanel = null;
       if (parameter.getType() == ScriptParameterType.INTEGER) {
-        parameterValueField = new TextField<Integer>("value", new PropertyModel<Integer>(parameter, "intValue"));
+        inputPanel = fs.add(new TextField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(parameter, "intValue")));
       } else if (parameter.getType() == ScriptParameterType.STRING) {
-        parameterValueField = new TextField<String>("value", new PropertyModel<String>(parameter, "stringValue"));
+        inputPanel = fs.add(new TextField<String>(fs.getTextFieldId(), new PropertyModel<String>(parameter, "stringValue")));
       } else if (parameter.getType() == ScriptParameterType.DECIMAL) {
-        parameterValueField = new TextField<BigDecimal>("value", new PropertyModel<BigDecimal>(parameter, "decimalValue"));
+        inputPanel = fs.add(new TextField<BigDecimal>(fs.getTextFieldId(), new PropertyModel<BigDecimal>(parameter, "decimalValue")));
       } else if (parameter.getType() == ScriptParameterType.DATE || parameter.getType() == ScriptParameterType.TIME_PERIOD) {
         final String property = parameter.getType() == ScriptParameterType.TIME_PERIOD ? "timePeriodValue.fromDate" : "dateValue";
-        datePanel1[index] = new DatePanel("panel", new PropertyModel<Date>(parameter, property), DatePanelSettings.get()
-            .withSelectProperty("date:" + index).withSelectPeriodMode(true));
-        item.add(datePanel1[index]);
-        panel1 = datePanel1[index];
+        datePanel1[index] = new DatePanel(fs.newChildId(), new PropertyModel<Date>(parameter, property));
+        fs.add(datePanel1[index]);
         if (parameter.getType() == ScriptParameterType.TIME_PERIOD) {
-          datePanel2[index] = new DatePanel("panel2", new PropertyModel<Date>(parameter, "timePeriodValue.toDate"), DatePanelSettings.get()
-              .withSelectProperty("date2:" + index).withSelectPeriodMode(true));
-          item.add(datePanel2[index]);
-          panel2 = datePanel2[index];
-          quickSelectPanel[index] = new QuickSelectPanel("panel3", parentPage, "quickSelect:" + index, datePanel1[index]);
-          item.add(quickSelectPanel[index]);
+          fs.add(new DivTextPanel(fs.newChildId(), " - "));
+          datePanel2[index] = new DatePanel(fs.newChildId(), new PropertyModel<Date>(parameter, "timePeriodValue.toDate"));
+          fs.add(datePanel2[index]);
+          quickSelectPanel[index] = new QuickSelectPanel(fs.newChildId(), parentPage, "quickSelect:" + index, datePanel1[index]);
+          fs.add(quickSelectPanel[index]);
           quickSelectPanel[index].init();
-          panel3 = quickSelectPanel[index];
         }
       } else if (parameter.getType() == ScriptParameterType.TASK) {
-        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel("panel", new PropertyModel<TaskDO>(parameter, "task"), parentPage,
-            "taskId:" + index);
-        item.add(taskSelectPanel);
+        final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(parameter, "task"),
+            parentPage, "taskId:" + index);
+        fs.add(taskSelectPanel);
         taskSelectPanel.init();
         taskSelectPanel.setRequired(true);
-        panel1 = taskSelectPanel;
       } else if (parameter.getType() == ScriptParameterType.USER) {
-        final UserSelectPanel userSelectPanel = new UserSelectPanel("panel", new PropertyModel<PFUserDO>(parameter, "user"), parentPage,
-            "userId:" + index);
-        item.add(userSelectPanel);
+        final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(parameter, "user"),
+            parentPage, "userId:" + index);
+        fs.add(userSelectPanel);
         userSelectPanel.init();
         userSelectPanel.setRequired(true);
-        panel1 = userSelectPanel;
       } else {
         throw new UnsupportedOperationException("Parameter type: " + parameter.getType() + " not supported.");
       }
       if (focusSet == false) {
-        if (parameterValueField != null) {
-          parameterValueField.add(new FocusOnLoadBehavior());
-          focusSet = true;
-        } else if (panel1 instanceof DatePanel) {
-          ((DatePanel) panel1).setFocus();
+        if (inputPanel != null) {
+          WicketUtils.setFocus(inputPanel.getField());
           focusSet = true;
         }
-      }
-      if (parameterValueField == null) {
-        parameterValueField = new TextField<String>("value");
-        parameterValueField.setVisible(false);
-      }
-      item.add(parameterValueField);
-      if (panel1 == null) {
-        panel1 = new WebMarkupContainer("panel");
-        panel1.setVisible(false);
-        item.add(panel1);
-      }
-      if (panel2 == null) {
-        panel2 = new WebMarkupContainer("panel2");
-        panel2.setVisible(false);
-        item.add(panel2);
-      }
-      if (panel3 == null) {
-        panel3 = new WebMarkupContainer("panel3");
-        panel3.setVisible(false);
-        item.add(panel3);
       }
       index++;
     }
     refresh = false;
-  }
-
-  protected void setScriptResult(final GroovyResult result)
-  {
-    this.groovyResult = result;
   }
 }

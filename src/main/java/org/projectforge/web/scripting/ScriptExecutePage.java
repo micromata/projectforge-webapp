@@ -33,6 +33,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jfree.chart.ChartUtilities;
@@ -48,7 +49,6 @@ import org.projectforge.scripting.GroovyResult;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.scripting.ScriptDao;
 import org.projectforge.scripting.ScriptParameter;
-import org.projectforge.scripting.ScriptParameterType;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.user.PFUserDO;
@@ -57,12 +57,15 @@ import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
-import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.GridBuilder;
 
-public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCallerPage
+public class ScriptExecutePage extends AbstractStandardFormPage implements ISelectCallerPage
 {
   private static final long serialVersionUID = -183858142939207911L;
 
@@ -81,14 +84,20 @@ public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCal
 
   private Integer id;
 
+  protected FieldsetPanel scriptResultFieldsetPanel;
+
   private WebMarkupContainer scriptSourceTable;
+
+  private GridBuilder resultGridBuilder;
+
+  protected transient GroovyResult groovyResult;
 
   @SuppressWarnings("serial")
   public ScriptExecutePage(final PageParameters parameters)
   {
     super(parameters);
     id = WicketUtils.getAsInteger(parameters, AbstractEditPage.PARAMETER_KEY_ID);
-    final ContentMenuEntryPanel editMenuEntryPanel = new ContentMenuEntryPanel("edit", new Link<Object>("link") {
+    final ContentMenuEntryPanel editMenuEntryPanel = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Object>("link") {
       @Override
       public void onClick()
       {
@@ -101,15 +110,40 @@ public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCal
         setResponsePage(editPage);
       };
     }, getString("edit"));
-    body.add(editMenuEntryPanel);
+    addContentMenuEntry(editMenuEntryPanel);
     form = new ScriptExecuteForm(this, loadScript());
     body.add(form);
     form.init();
-    scriptSourceTable = new WebMarkupContainer("scriptSource") {
+    final RepeatingView repeater = new RepeatingView("results");
+    body.add(repeater);
+    resultGridBuilder = form.newGridBuilder(repeater);
+    resultGridBuilder.newGrid16();
+    {
+      scriptResultFieldsetPanel = new FieldsetPanel(resultGridBuilder.getPanel(), "scripting.script.result") {
+        /**
+         * @see org.apache.wicket.Component#isVisible()
+         */
+        @Override
+        public boolean isVisible()
+        {
+          return groovyResult != null;
+        }
+      };
+      final DivTextPanel resultPanel = new DivTextPanel(scriptResultFieldsetPanel.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return groovyResult != null ? groovyResult.getResultAsHtmlString() : "";
+        }
+      });
+      resultPanel.getLabel().setEscapeModelStrings(false);
+      scriptResultFieldsetPanel.add(resultPanel);
+    }
+    scriptSourceTable = new WebMarkupContainer("sourceTable") {
       @Override
       public boolean isVisible()
       {
-        return form.groovyResult != null && form.groovyResult.hasException();
+        return groovyResult != null && groovyResult.hasException();
       }
     };
     body.add(scriptSourceTable);
@@ -198,14 +232,13 @@ public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCal
     }
     log.info(buf.toString());
     storeRecentScriptCalls();
-    final GroovyResult result = scriptDao.execute(getScript(), form.scriptParameters);
-    form.setScriptResult(result);
-    if (result.hasException() == true) {
-      form.error(getLocalizedMessage("exception.groovyError", String.valueOf(result.getException())));
+    groovyResult = scriptDao.execute(getScript(), form.scriptParameters);
+    if (groovyResult.hasException() == true) {
+      form.error(getLocalizedMessage("exception.groovyError", String.valueOf(groovyResult.getException())));
       return;
     }
-    if (result.hasResult() == true) {
-      final Object obj = result.getResult();
+    if (groovyResult.hasResult() == true) {
+      final Object obj = groovyResult.getResult();
       if (obj instanceof ExportWorkbook == true) {
         exportExcel((ExportWorkbook) obj);
       } else if (obj instanceof ExportJFreeChart == true) {
@@ -235,7 +268,7 @@ public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCal
     final int height = exportJFreeChart.getHeight();
     final StringBuffer buf = new StringBuffer();
     buf.append("pf_chart_");
-    //  buf.append(DateHelper.getTimestampAsFilenameSuffix(now()));
+    // buf.append(DateHelper.getTimestampAsFilenameSuffix(now()));
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     try {
       if (exportJFreeChart.getImageType() == JFreeChartImageType.PNG) {
@@ -293,39 +326,7 @@ public class ScriptExecutePage extends AbstractSecuredPage implements ISelectCal
       indexString = colonPos > 0 ? property.substring(colonPos + 1) : null;
     }
     final Integer idx = NumberHelper.parseInteger(indexString);
-    if (property.startsWith("date:") == true) {
-      if (selectedValue instanceof TimePeriod) {
-        form.scriptParameters.get(idx).setTimePeriodValue((TimePeriod) selectedValue);
-        form.datePanel2[idx].markModelAsChanged();
-      } else if (form.scriptParameters.get(idx).getType() == ScriptParameterType.TIME_PERIOD) {
-        TimePeriod timePeriod = form.scriptParameters.get(idx).getTimePeriodValue();
-        if (timePeriod == null) {
-          timePeriod = new TimePeriod();
-        }
-        timePeriod.setFromDate((Date) selectedValue);
-        form.scriptParameters.get(idx).setTimePeriodValue(timePeriod);
-      } else {
-        form.scriptParameters.get(idx).setDateValue((Date) selectedValue);
-      }
-      form.datePanel1[idx].markModelAsChanged();
-    } else if (property.startsWith("date2:") == true) {
-      if (selectedValue instanceof TimePeriod) {
-        form.scriptParameters.get(idx).setTimePeriodValue((TimePeriod) selectedValue);
-        form.datePanel1[idx].markModelAsChanged();
-        form.datePanel2[idx].markModelAsChanged();
-      } else if (form.scriptParameters.get(idx).getType() == ScriptParameterType.TIME_PERIOD) {
-        TimePeriod timePeriod = form.scriptParameters.get(idx).getTimePeriodValue();
-        if (timePeriod == null) {
-          timePeriod = new TimePeriod();
-        }
-        timePeriod.setToDate((Date) selectedValue);
-        form.scriptParameters.get(idx).setTimePeriodValue(timePeriod);
-        form.datePanel2[idx].markModelAsChanged();
-      } else {
-        form.scriptParameters.get(idx).setDateValue((Date) selectedValue);
-        form.datePanel2[idx].markModelAsChanged();
-      }
-    } else if (property.startsWith("quickSelect:") == true) {
+    if (property.startsWith("quickSelect:") == true) {
       final Date date = (Date) selectedValue;
       TimePeriod timePeriod = form.scriptParameters.get(idx).getTimePeriodValue();
       if (timePeriod == null) {
