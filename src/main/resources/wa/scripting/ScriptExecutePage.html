@@ -4,53 +4,16 @@
 </head>
 
 <body>
-<wicket:extend>
-  <div id="contentMenu"><span wicket:id="edit">[edit]</span></div>
-  <form wicket:id="form">
-  <div wicket:id="feedback">[Validation errors]</div>
-
-  <fieldset><legend><wicket:message key="label.data" /></legend>
-  <table class="form">
-    <tr>
-      <th><wicket:message key="scripting.script.name" /></th>
-      <td colspan="5"><span wicket:id="name">[name]</span></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="scripting.script.parameter" /></th>
-      <td>
-      <table>
-        <tr wicket:id="parameters">
-          <th><span wicket:id="name">[Param xy]</span></th>
-          <td><input type="text" class="stdtext" style="width: 10em;" wicket:id="value" /><span wicket:id="panel">[Task or user panel or date]</span><span
-            wicket:id="panel2">[second date for time period]</span><span wicket:id="panel3">[third panel for quick select]</span></td>
+  <wicket:extend>
+    <wicket:container wicket:id="results">[result fields]</wicket:container>
+    <table class="dataview" wicket:id="sourceTable">
+      <tbody>
+        <tr wicket:id="lines">
+          <td wicket:id="lineNo" style="text-align: right; font-size: smaller">[1]</td>
+          <td wicket:id="line" style="font-size: smaller">[return "Hello world"]</td>
         </tr>
-      </table>
-      </td>
-    </tr>
-    <tr>
-      <th></th>
-      <td class="buttonpanel" colspan="5"><span wicket:id="back">[back]</span> <span wicket:id="execute">[execute]</span></td>
-    </tr>
-    <tr>
-      <th><wicket:message key="description" /></th>
-      <td colspan="5"><span wicket:id="description">[Description]</span></td>
-    </tr>
-    <tr wicket:id="scriptResultRow">
-      <th><wicket:message key="scripting.script.result" /></th>
-      <td><span wicket:id="scriptResult">[Groovy result]</span></td>
-    </tr>
-  </table>
-  </fieldset>
-  </form>
-
-  <table wicket:id="scriptSource">
-    <tbody>
-      <tr wicket:id="lines">
-        <td wicket:id="lineNo" style="text-align: right; font-size: smaller">[1]</td>
-        <td wicket:id="line" style="font-size: smaller">[return "Hello world"]</td>
-      </tr>
-    </tbody>
-  </table>
-</wicket:extend>
+      </tbody>
+    </table>
+  </wicket:extend>
 </body>
 </html>
