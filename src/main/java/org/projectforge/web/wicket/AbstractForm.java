@@ -193,7 +193,7 @@ public abstract class AbstractForm<F, P extends AbstractUnsecureBasePage> extend
   /**
    * @see GridBuilderImpl#GridBuilder(RepeatingView, MySession)
    */
-  protected GridBuilder newGridBuilder(final RepeatingView parent)
+  public GridBuilder newGridBuilder(final RepeatingView parent)
   {
     return new GridBuilderImpl(parent, getMySession());
   }
@@ -201,7 +201,7 @@ public abstract class AbstractForm<F, P extends AbstractUnsecureBasePage> extend
   /**
    * @see GridBuilderImpl#GridBuilder(DivPanel, MySession)
    */
-  protected GridBuilder newGridBuilder(final DivPanel parent)
+  public GridBuilder newGridBuilder(final DivPanel parent)
   {
     return new GridBuilderImpl(parent, getMySession());
   }
