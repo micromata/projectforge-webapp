@@ -27,6 +27,7 @@ import java.io.InputStream;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.bio.SocketConnector;
+import org.eclipse.jetty.server.session.HashSessionManager;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.jetty.xml.XmlConfiguration;
 import org.projectforge.common.DateHelper;
@@ -101,7 +102,12 @@ public class StartHelper
     webAppContext.setConfigurationClasses(CONFIGURATION_CLASSES);
     webAppContext.setExtraClasspath("target/classes");
     webAppContext.setInitParameter("development", String.valueOf(settings.isDevelopment()));
-    webAppContext.setInitParameter("stripWicketTargets", String.valueOf(settings.isStripWicketTargets()));
+    webAppContext.setInitParameter("stripWicketTags", String.valueOf(settings.isStripWicketTags()));
+    if (settings.isUsingCookies() == false) {
+      log.info("Using cookies is disabled.");
+      final HashSessionManager manager = (HashSessionManager) webAppContext.getSessionHandler().getSessionManager();
+      manager.setUsingCookies(false);
+    }
 
     // START JMX SERVER
     // MBeanServer mBeanServer = ManagementFactory.getPlatformMBeanServer();
