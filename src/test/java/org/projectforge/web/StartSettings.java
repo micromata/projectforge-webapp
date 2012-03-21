@@ -52,7 +52,9 @@ public class StartSettings
 
   private String dialect;
 
-  private boolean stripWicketTargets = true;
+  private boolean stripWicketTags = true;
+
+  private boolean usingCookies = true;
 
   private static final String DEFAULT_JDBC_URL_HSQL_DB = "ProjectForgeDB";
 
@@ -206,18 +208,36 @@ public class StartSettings
   }
 
   /**
+   * @return the usingCookies
+   */
+  public boolean isUsingCookies()
+  {
+    return usingCookies;
+  }
+
+  /**
+   * @param usingCookies the usingCookies to set
+   * @return this for chaining.
+   */
+  public StartSettings setUsingCookies(final boolean usingCookies)
+  {
+    this.usingCookies = usingCookies;
+    return this;
+  }
+
+  /**
    * If true then the wicket specific html tags are removed from the HTML output. This is default for the productive mode and can be set
    * optional for the development mode for increasing the readability of the html markup. If you have to debug the Wicket output itself,
    * this value should be set to false.
    */
-  public boolean isStripWicketTargets()
+  public boolean isStripWicketTags()
   {
-    return stripWicketTargets;
+    return stripWicketTags;
   }
 
-  public StartSettings setStripWicketTargets(final boolean stripWicketTargets)
+  public StartSettings setStripWicketTags(final boolean stripWicketTags)
   {
-    this.stripWicketTargets = stripWicketTargets;
+    this.stripWicketTags = stripWicketTags;
     return this;
   }
 }
