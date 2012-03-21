@@ -26,7 +26,9 @@ package org.projectforge.web;
 import org.projectforge.database.HibernateDialect;
 
 /**
- * For larger installations please increase memory by giving the following start VM parameters: -Xmx1024m -XX:MaxPermSize=256m
+ * For larger installations please increase memory by giving the following start VM parameters: -Xmx1024m -Xms512m -XX:PermSize=96m
+ * -XX:MaxPermSize=192m <br/>
+ * Please note: you need to add the PostgreSQL jdbc driver (edit run configuration and add the jar file as external jar to the classpath).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * @see Start
  */
