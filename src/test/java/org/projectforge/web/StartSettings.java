@@ -208,6 +208,7 @@ public class StartSettings
   }
 
   /**
+   * This feature is useful for developing for testing the functionality of ProjectForge if cookies are disabled.
    * @return the usingCookies
    */
   public boolean isUsingCookies()
