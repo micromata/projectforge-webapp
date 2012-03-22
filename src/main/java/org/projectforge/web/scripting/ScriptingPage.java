@@ -26,6 +26,7 @@ package org.projectforge.web.scripting;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
@@ -50,11 +51,14 @@ import org.apache.wicket.request.Response;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.projectforge.common.DateHelper;
 import org.projectforge.common.FileHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.export.ExportJFreeChart;
 import org.projectforge.export.ExportWorkbook;
+import org.projectforge.export.JFreeChartImageType;
 import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.fibu.kost.BusinessAssessmentRowConfig;
@@ -67,17 +71,18 @@ import org.projectforge.scripting.GroovyResult;
 import org.projectforge.scripting.ScriptDao;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.web.fibu.ReportObjectivesPage;
 import org.projectforge.web.fibu.ReportScriptingStorage;
-import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.JFreeChartImage;
 import org.projectforge.web.wicket.WicketUtils;
 
-public class ReportScriptingPage extends AbstractSecuredPage
+public class ScriptingPage extends AbstractStandardFormPage
 {
   private static final long serialVersionUID = -1910145309628761662L;
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ReportScriptingPage.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ScriptingPage.class);
 
   private transient ReportScriptingStorage reportScriptingStorage;
 
@@ -89,7 +94,7 @@ public class ReportScriptingPage extends AbstractSecuredPage
 
   protected GroovyResult groovyResult;
 
-  private final ReportScriptingForm form;
+  private final ScriptingForm form;
 
   private Component exceptionContainer;
 
@@ -99,10 +104,12 @@ public class ReportScriptingPage extends AbstractSecuredPage
 
   private transient Map<String, Object> scriptVariables;
 
-  public ReportScriptingPage(final PageParameters parameters)
+  protected transient ReportStorage reportStorage;
+
+  public ScriptingPage(final PageParameters parameters)
   {
     super(parameters);
-    form = new ReportScriptingForm(this);
+    form = new ScriptingForm(this);
     body.add(form);
     form.init();
     initScriptVariables();
@@ -299,7 +306,7 @@ public class ReportScriptingPage extends AbstractSecuredPage
       final JasperPrint jasperPrint = jp;
       final StringBuffer buf = new StringBuffer();
       buf.append("pf_report_");
-      //      buf.append(DateHelper.getTimestampAsFilenameSuffix(now())).append(".pdf");
+      buf.append(DateHelper.getTimestampAsFilenameSuffix(new Date())).append(".pdf");
       final String filename = buf.toString();
       final Response response = getResponse();
       ((WebResponse) response).setAttachmentHeader(filename);
@@ -318,7 +325,7 @@ public class ReportScriptingPage extends AbstractSecuredPage
       final ExportWorkbook workbook = (ExportWorkbook) groovyResult.getResult();
       final StringBuffer buf = new StringBuffer();
       buf.append("pf_report_");
-      //   buf.append(DateHelper.getTimestampAsFilenameSuffix(now())).append(".xls");
+      buf.append(DateHelper.getTimestampAsFilenameSuffix(new Date())).append(".xls");
       final String filename = buf.toString();
       final Response response = getResponse();
       ((WebResponse) response).setAttachmentHeader(filename);
@@ -338,27 +345,26 @@ public class ReportScriptingPage extends AbstractSecuredPage
       final JFreeChart chart = exportJFreeChart.getJFreeChart();
       final int width = exportJFreeChart.getWidth();
       final int height = exportJFreeChart.getHeight();
-      // final StringBuffer buf = new StringBuffer();
-      // buf.append("pf_chart_");
-      // buf.append(DateHelper.getTimestampAsFilenameSuffix(now()));
-      // final Response response = getResponse();
-      // if (exportJFreeChart.getImageType() == JFreeChartImageType.PNG) {
-      // ChartUtilities.writeChartAsPNG(response.getOutputStream(), chart, width, height);
-      // buf.append(".png");
-      // } else {
-      // ChartUtilities.writeChartAsJPEG(response.getOutputStream(), chart, width, height);
-      // buf.append(".jpg");
-      // }
-      // final String filename = buf.toString();
+      final StringBuffer buf = new StringBuffer();
+      buf.append("pf_chart_");
+      buf.append(DateHelper.getTimestampAsFilenameSuffix(new Date()));
+      final Response response = getResponse();
+      if (exportJFreeChart.getImageType() == JFreeChartImageType.PNG) {
+        ChartUtilities.writeChartAsPNG(response.getOutputStream(), chart, width, height);
+        buf.append(".png");
+      } else {
+        ChartUtilities.writeChartAsJPEG(response.getOutputStream(), chart, width, height);
+        buf.append(".jpg");
+      }
+      final String filename = buf.toString();
       final JFreeChartImage image = new JFreeChartImage("image", chart, exportJFreeChart.getImageType(), width, height);
       image.add(AttributeModifier.replace("width", String.valueOf(width)));
       image.add(AttributeModifier.replace("height", String.valueOf(height)));
       imageResultContainer.removeAll();
       imageResultContainer.add(image).setVisible(true);
-      // ((WebResponse) response).setAttachmentHeader(filename);
-      // response.setContentType(DownloadUtils.getContentType(filename));
-      // response.getOutputStream().flush();
-      // setRedirect(false);
+      ((WebResponse) response).setAttachmentHeader(filename);
+      ((WebResponse) response).setContentType(DownloadUtils.getContentType(filename));
+      response.getOutputStream().flush();
     } catch (final Exception ex) {
       error(getLocalizedMessage("error", ex.getMessage()));
       log.error(ex.getMessage(), ex);
@@ -366,12 +372,14 @@ public class ReportScriptingPage extends AbstractSecuredPage
   }
 
   /**
-   * TODO
-   * @return
+   * @return Any existing user storage or null if not exist (wether in class nor in user's session).
    */
-  public ReportStorage getReportStorage()
+  protected ReportStorage getReportStorage()
   {
-    return null;// ReportObjectivesAction.getReportStorage(getContext());
+    if (reportStorage != null) {
+      return reportStorage;
+    }
+    return (ReportStorage) getUserPrefEntry(ReportObjectivesPage.KEY_REPORT_STORAGE);
   }
 
   protected ReportScriptingStorage getReportScriptingStorage()

@@ -86,7 +86,7 @@ import org.projectforge.web.meb.MebListPage;
 import org.projectforge.web.orga.ContractListPage;
 import org.projectforge.web.orga.PostausgangListPage;
 import org.projectforge.web.orga.PosteingangListPage;
-import org.projectforge.web.scripting.ReportScriptingPage;
+import org.projectforge.web.scripting.ScriptingPage;
 import org.projectforge.web.scripting.ScriptListPage;
 import org.projectforge.web.statistics.PersonalStatisticsPage;
 import org.projectforge.web.statistics.SystemStatisticsPage;
@@ -330,7 +330,7 @@ public class MenuItemRegistry
       reg.register(reporting, MenuItemDefId.ACCOUNTING_RECORD_LIST, 10, AccountingRecordListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
       reg.register(reporting, MenuItemDefId.REPORT_OBJECTIVES, 20, ReportObjectivesPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     }
-    reg.register(reporting, MenuItemDefId.SCRIPTING, 30, ReportScriptingPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
+    reg.register(reporting, MenuItemDefId.SCRIPTING, 30, ScriptingPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     reg.register(reporting, MenuItemDefId.SCRIPT_LIST, 40, ScriptListPage.class, FINANCE_GROUP, CONTROLLING_GROUP);
     {
       // Only visible if cost is configured:
