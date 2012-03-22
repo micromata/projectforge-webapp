@@ -39,6 +39,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.projectforge.calendar.TimePeriod;
+import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.UserException;
@@ -53,7 +54,6 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
-import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -119,7 +119,7 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
     resultGridBuilder = form.newGridBuilder(repeater);
     resultGridBuilder.newGrid16();
     {
-      scriptResultFieldsetPanel = new FieldsetPanel(resultGridBuilder.getPanel(), "scripting.script.result") {
+      scriptResultFieldsetPanel = new FieldsetPanel(resultGridBuilder.getPanel(), getString("scripting.script.result")) {
         /**
          * @see org.apache.wicket.Component#isVisible()
          */
@@ -128,7 +128,7 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
         {
           return groovyResult != null;
         }
-      };
+      }.setNoLabelFor();
       final DivTextPanel resultPanel = new DivTextPanel(scriptResultFieldsetPanel.newChildId(), new Model<String>() {
         @Override
         public String getObject()
@@ -161,8 +161,8 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
       final WebMarkupContainer item = new WebMarkupContainer(sourceCodeView.newChildId());
       sourceCodeView.add(item);
       item.add(new Label("lineNo", String.valueOf(lineNo++)));
-      final Label lineLabel = new Label("line", HtmlHelper.escapeXml(line.toString()));
-      lineLabel.setEscapeModelStrings(false);
+      final Label lineLabel = new Label("line", line.toString());
+      //lineLabel.setEscapeModelStrings(false);
       item.add(lineLabel);
     }
   }
@@ -182,13 +182,13 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
     for (int i = 0; i < groovyScript.length(); i++) {
       final char c = groovyScript.charAt(i);
       if (c == '\n') {
-        lines.add(HtmlHelper.escapeXml(line.toString()));
+        lines.add(line.toString());
         line = new StringBuffer();
       } else {
         line.append(c);
       }
     }
-    lines.add(HtmlHelper.escapeXml(line.toString()));
+    lines.add(line.toString());
     return lines;
   }
 
@@ -251,7 +251,7 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
   {
     final StringBuffer buf = new StringBuffer();
     buf.append("pf_report_");
-    // buf.append(DateHelper.getTimestampAsFilenameSuffix(now())).append(".xls");
+    buf.append(DateHelper.getTimestampAsFilenameSuffix(new Date())).append(".xls");
     final String filename = buf.toString();
     final byte[] xls = workbook.getAsByteArray();
     if (xls == null || xls.length == 0) {
@@ -268,7 +268,7 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
     final int height = exportJFreeChart.getHeight();
     final StringBuffer buf = new StringBuffer();
     buf.append("pf_chart_");
-    // buf.append(DateHelper.getTimestampAsFilenameSuffix(now()));
+    buf.append(DateHelper.getTimestampAsFilenameSuffix(new Date()));
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     try {
       if (exportJFreeChart.getImageType() == JFreeChartImageType.PNG) {
