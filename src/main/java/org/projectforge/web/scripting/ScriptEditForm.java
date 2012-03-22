@@ -23,26 +23,38 @@
 
 package org.projectforge.web.scripting;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.panel.Fragment;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.scripting.ScriptParameterType;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
-
+import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DialogPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
 {
   private static final long serialVersionUID = 9088102999434892079L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ScriptEditForm.class);
+
+  private static final String SHOW_BACKUP_SCRIPT_DIALOG_ID = "showBackupScriptModalWindow";
+
+  private ModalWindow showBackupScriptModalWindow;
 
   public ScriptEditForm(final ScriptEditPage parentPage, final ScriptDO data)
   {
@@ -52,46 +64,104 @@ public class ScriptEditForm extends AbstractEditForm<ScriptDO, ScriptEditPage>
   @Override
   protected void init()
   {
-    add(new MaxLengthTextField("name", new PropertyModel<String>(data, "name")));
-    add(new MaxLengthTextArea("description", new PropertyModel<String>(data, "description")));
-    add(new MaxLengthTextArea("script", new PropertyModel<String>(data, "script")));
-    addParameterSettings(1);
-    addParameterSettings(2);
-    addParameterSettings(3);
-    addParameterSettings(4);
-    addParameterSettings(5);
     super.init();
-  }
-
-  protected void addBottomRows()
-  {
-    final Fragment bottomRowsFragment = new Fragment("bottomRows", "bottomRowsFragment", this);
-    bottomRowsFragment.setRenderBodyOnly(true);
-    add(bottomRowsFragment);
-    String esc = HtmlHelper.escapeXml(data.getScriptBackup());
-    esc = StringUtils.replace(esc, "\n", "<br/>\n");
-    final Label scriptBackupLabel = new Label("scriptBackup", esc);
-    scriptBackupLabel.setEscapeModelStrings(false);
-    if (StringUtils.isEmpty(data.getScriptBackup()) == true) {
-      scriptBackupLabel.setVisible(false);
+    gridBuilder.newGrid16();
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script.name"));
+      fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "name")));
     }
-    bottomRowsFragment.add(scriptBackupLabel);
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    addParameterSettings(1);
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    addParameterSettings(2);
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    addParameterSettings(3);
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    addParameterSettings(4);
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    addParameterSettings(5);
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    addParameterSettings(6);
+    gridBuilder.newBlockPanel();
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
+      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description")));
+    }
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script"), true);
+      final MaxLengthTextArea script = new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "script"));
+      WicketUtils.setHeight(script, 50);
+      fs.add(script);
+      fs.addHelpIcon(getString("fieldNotHistorizable"));
+    }
+    showBackupScriptModalWindow = new ModalWindow(SHOW_BACKUP_SCRIPT_DIALOG_ID);
+    add(showBackupScriptModalWindow);
   }
 
   private void addParameterSettings(final int idx)
   {
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("scripting.script.parameterName") + " " + idx, true);
+
     final String parameterType = "parameter" + idx + "Type";
     final String parameterName = "parameter" + idx + "Name";
-    add(new MaxLengthTextField(parameterName, new PropertyModel<String>(data, parameterName)));
+    final MaxLengthTextField name = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, parameterName));
+    WicketUtils.setSize(name, 20);
+    fs.add(name);
     // DropDownChoice type
     final LabelValueChoiceRenderer<ScriptParameterType> typeChoiceRenderer = new LabelValueChoiceRenderer<ScriptParameterType>(this,
         ScriptParameterType.values());
-    @SuppressWarnings("unchecked")
-    final DropDownChoice typeChoice = new DropDownChoice(parameterType, new PropertyModel(data, parameterType), typeChoiceRenderer
-        .getValues(), typeChoiceRenderer);
+    final DropDownChoice<ScriptParameterType> typeChoice = new DropDownChoice<ScriptParameterType>(fs.getDropDownChoiceId(),
+        new PropertyModel<ScriptParameterType>(data, parameterType), typeChoiceRenderer.getValues(), typeChoiceRenderer);
     typeChoice.setNullValid(true);
     typeChoice.setRequired(false);
-    add(typeChoice);
+    fs.add(typeChoice);
+  }
+
+  protected void showBackupScriptModalWindow(final AjaxRequestTarget target)
+  {
+    // Close dialog
+    final DialogPanel showBackuScriptDialog = new DialogPanel(showBackupScriptModalWindow, getString("scripting.scriptBackup"));
+    showBackupScriptModalWindow.setContent(showBackuScriptDialog);
+
+    final DivPanel content = new DivPanel(showBackuScriptDialog.newChildId());
+    showBackuScriptDialog.add(content);
+    final FieldsetPanel fs = new FieldsetPanel(content, getString("scripting.scriptBackup"));
+    final String esc = HtmlHelper.escapeHtml(data.getScriptBackup(), true);
+    final DivTextPanel scriptBackup = new DivTextPanel(fs.newChildId(), esc);
+    scriptBackup.getLabel().setEscapeModelStrings(false);
+    fs.add(scriptBackup);
+
+    @SuppressWarnings("serial")
+    final AjaxButton okButton = new AjaxButton(SingleButtonPanel.WICKET_ID, new Model<String>("ok")) {
+
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+      {
+        showBackupScriptModalWindow.close(target);
+      }
+
+      /**
+       * @see org.apache.wicket.ajax.markup.html.form.AjaxButton#onError(org.apache.wicket.ajax.AjaxRequestTarget,
+       *      org.apache.wicket.markup.html.form.Form)
+       */
+      @Override
+      protected void onError(final AjaxRequestTarget target, final Form< ? > form)
+      {
+      }
+    };
+    okButton.setDefaultFormProcessing(false); // No validation
+    final SingleButtonPanel okButtonPanel = new SingleButtonPanel(showBackuScriptDialog.newButtonChildId(), okButton, getString("ok"),
+        SingleButtonPanel.DEFAULT_SUBMIT);
+    showBackuScriptDialog.addButton(okButtonPanel);
+    showBackupScriptModalWindow.setCloseButtonCallback(new ModalWindow.CloseButtonCallback() {
+      private static final long serialVersionUID = 6761625465164911336L;
+
+      public boolean onCloseButtonClicked(final AjaxRequestTarget target)
+      {
+        return true;
+      }
+    });
+    showBackupScriptModalWindow.show(target);
   }
 
   @Override

@@ -23,7 +23,10 @@
 
 package org.projectforge.web.scripting;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.AjaxLink;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.scripting.ScriptDO;
@@ -31,7 +34,7 @@ import org.projectforge.scripting.ScriptDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
-
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @EditPage(defaultReturnPage = ScriptListPage.class)
 public class ScriptEditPage extends AbstractEditPage<ScriptDO, ScriptEditForm, ScriptDao> implements ISelectCallerPage
@@ -48,6 +51,19 @@ public class ScriptEditPage extends AbstractEditPage<ScriptDO, ScriptEditForm, S
   {
     super(parameters, "scripting");
     init();
+    if (StringUtils.isNotEmpty(form.getData().getScriptBackup()) == true) {
+      // Show backup script button:
+      final AjaxLink<Void> showBackupScriptButton = new AjaxLink<Void>(ContentMenuEntryPanel.LINK_ID) {
+        @Override
+        public void onClick(final AjaxRequestTarget target)
+        {
+          form.showBackupScriptModalWindow(target);
+        }
+      };
+      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), showBackupScriptButton,
+          getString("scripting.scriptBackup.show"));
+      addContentMenuEntry(menu);
+    }
   }
 
   @Override

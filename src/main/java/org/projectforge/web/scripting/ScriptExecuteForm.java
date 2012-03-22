@@ -93,6 +93,7 @@ public class ScriptExecuteForm extends AbstractStandardForm<ScriptDO, ScriptExec
     addParameter(data.getParameter3Name(), data.getParameter3Type());
     addParameter(data.getParameter4Name(), data.getParameter4Type());
     addParameter(data.getParameter5Name(), data.getParameter5Type());
+    addParameter(data.getParameter6Name(), data.getParameter6Type());
   }
 
   private void addParameter(final String parameterName, final ScriptParameterType type)
