@@ -38,9 +38,11 @@ import org.projectforge.web.wicket.AbstractSecuredPage;
 
 public class ReportObjectivesPage extends AbstractSecuredPage
 {
+  private static final long serialVersionUID = 5880523229854750164L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ReportObjectivesPage.class);
 
-  static final String KEY_REPORT_STORAGE = "ReportObjectivesPage:storage";
+  public static final String KEY_REPORT_STORAGE = "ReportObjectivesPage:storage";
 
   @SpringBean(name = "reportDao")
   private ReportDao reportDao;
