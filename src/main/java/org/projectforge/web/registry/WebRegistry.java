@@ -96,6 +96,7 @@ import org.projectforge.web.orga.PostausgangListPage;
 import org.projectforge.web.orga.PosteingangEditPage;
 import org.projectforge.web.orga.PosteingangListPage;
 import org.projectforge.web.scripting.ScriptEditPage;
+import org.projectforge.web.scripting.ScriptExecutePage;
 import org.projectforge.web.scripting.ScriptListPage;
 import org.projectforge.web.statistics.PersonalStatisticsPage;
 import org.projectforge.web.statistics.SystemStatisticsPage;
@@ -320,6 +321,7 @@ public class WebRegistry
     addMountPage("personalStatistics", PersonalStatisticsPage.class);
     addMountPage("phoneCall", PhoneCallPage.class);
     addMountPage("reportObjectives", ReportObjectivesPage.class);
+    addMountPage("scriptExecute", ScriptExecutePage.class);
     addMountPage("search", SearchPage.class);
     addMountPage("sendSms", SendSmsPage.class);
     addMountPage("setup", SetupPage.class);
