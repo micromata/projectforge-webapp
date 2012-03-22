@@ -50,6 +50,8 @@ public class ScriptDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 7069806875752038860L;
 
+  public static final int PARAMETER_NAME_MAX_LENGTH = 100;
+
   static {
     invalidHistorizableProperties.add("script");
     invalidHistorizableProperties.add("scriptBackup");
@@ -91,13 +93,18 @@ public class ScriptDO extends DefaultBaseDO
 
   private ScriptParameterType parameter5Type;
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String parameter6Name;
+
+  private ScriptParameterType parameter6Type;
+
   @Column(length = 255, nullable = false)
   public String getName()
   {
     return name;
   }
 
-  public void setName(String name)
+  public void setName(final String name)
   {
     this.name = name;
   }
@@ -112,7 +119,7 @@ public class ScriptDO extends DefaultBaseDO
     return script;
   }
 
-  public void setScript(String script)
+  public void setScript(final String script)
   {
     this.script = script;
   }
@@ -127,7 +134,7 @@ public class ScriptDO extends DefaultBaseDO
     return scriptBackup;
   }
 
-  public void setScriptBackup(String scriptBackup)
+  public void setScriptBackup(final String scriptBackup)
   {
     this.scriptBackup = scriptBackup;
   }
@@ -138,18 +145,18 @@ public class ScriptDO extends DefaultBaseDO
     return description;
   }
 
-  public void setDescription(String description)
+  public void setDescription(final String description)
   {
     this.description = description;
   }
 
-  @Column(length = 100)
+  @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter1Name()
   {
     return parameter1Name;
   }
 
-  public void setParameter1Name(String parameter1Name)
+  public void setParameter1Name(final String parameter1Name)
   {
     this.parameter1Name = parameter1Name;
   }
@@ -161,18 +168,18 @@ public class ScriptDO extends DefaultBaseDO
     return parameter1Type;
   }
 
-  public void setParameter1Type(ScriptParameterType parameter1Type)
+  public void setParameter1Type(final ScriptParameterType parameter1Type)
   {
     this.parameter1Type = parameter1Type;
   }
 
-  @Column(length = 100)
+  @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter2Name()
   {
     return parameter2Name;
   }
 
-  public void setParameter2Name(String parameter2Name)
+  public void setParameter2Name(final String parameter2Name)
   {
     this.parameter2Name = parameter2Name;
   }
@@ -184,18 +191,18 @@ public class ScriptDO extends DefaultBaseDO
     return parameter2Type;
   }
 
-  public void setParameter2Type(ScriptParameterType parameter2Type)
+  public void setParameter2Type(final ScriptParameterType parameter2Type)
   {
     this.parameter2Type = parameter2Type;
   }
 
-  @Column(length = 100)
+  @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter3Name()
   {
     return parameter3Name;
   }
 
-  public void setParameter3Name(String parameter3Name)
+  public void setParameter3Name(final String parameter3Name)
   {
     this.parameter3Name = parameter3Name;
   }
@@ -207,18 +214,18 @@ public class ScriptDO extends DefaultBaseDO
     return parameter3Type;
   }
 
-  public void setParameter3Type(ScriptParameterType parameter3Type)
+  public void setParameter3Type(final ScriptParameterType parameter3Type)
   {
     this.parameter3Type = parameter3Type;
   }
 
-  @Column(length = 100)
+  @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter4Name()
   {
     return parameter4Name;
   }
 
-  public void setParameter4Name(String parameter4Name)
+  public void setParameter4Name(final String parameter4Name)
   {
     this.parameter4Name = parameter4Name;
   }
@@ -230,18 +237,18 @@ public class ScriptDO extends DefaultBaseDO
     return parameter4Type;
   }
 
-  public void setParameter4Type(ScriptParameterType parameter4Type)
+  public void setParameter4Type(final ScriptParameterType parameter4Type)
   {
     this.parameter4Type = parameter4Type;
   }
 
-  @Column(length = 100)
+  @Column(length = PARAMETER_NAME_MAX_LENGTH)
   public String getParameter5Name()
   {
     return parameter5Name;
   }
 
-  public void setParameter5Name(String parameter5Name)
+  public void setParameter5Name(final String parameter5Name)
   {
     this.parameter5Name = parameter5Name;
   }
@@ -253,13 +260,36 @@ public class ScriptDO extends DefaultBaseDO
     return parameter5Type;
   }
 
-  public void setParameter5Type(ScriptParameterType parameter5Type)
+  public void setParameter5Type(final ScriptParameterType parameter5Type)
   {
     this.parameter5Type = parameter5Type;
   }
 
+  @Column(length = PARAMETER_NAME_MAX_LENGTH)
+  public String getParameter6Name()
+  {
+    return parameter5Name;
+  }
+
+  public void setParameter6Name(final String parameter6Name)
+  {
+    this.parameter6Name = parameter6Name;
+  }
+
+  @Enumerated(EnumType.STRING)
+  @Column(length = 20)
+  public ScriptParameterType getParameter6Type()
+  {
+    return parameter6Type;
+  }
+
+  public void setParameter6Type(final ScriptParameterType parameter6Type)
+  {
+    this.parameter6Type = parameter6Type;
+  }
+
   @Transient
-  public String getParameterNames(boolean capitalize)
+  public String getParameterNames(final boolean capitalize)
   {
     final StringBuffer buf = new StringBuffer();
     boolean first = appendParameterName(buf, parameter1Name, capitalize, true);
@@ -267,6 +297,7 @@ public class ScriptDO extends DefaultBaseDO
     first = appendParameterName(buf, parameter3Name, capitalize, first);
     first = appendParameterName(buf, parameter4Name, capitalize, first);
     first = appendParameterName(buf, parameter5Name, capitalize, first);
+    first = appendParameterName(buf, parameter6Name, capitalize, first);
     return buf.toString();
   }
 

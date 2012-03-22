@@ -37,6 +37,7 @@ import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.registry.Registry;
+import org.projectforge.scripting.ScriptDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
@@ -50,6 +51,35 @@ public class DatabaseCoreUpdates
   public static List<UpdateEntry> getUpdateEntries()
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
+    // /////////////////////////////////////////////////////////////////
+    // 4.0
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.0", "2012-03-22", "Adds 6th parameter to t_script.") {
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        final Table scriptTable = new Table(ScriptDO.class);
+        return dao.doesTableAttributesExist(scriptTable, "parameter6Name") == true //
+            && dao.doesTableAttributesExist(scriptTable, "parameter6Type") == true //
+            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        final Table scriptTable = new Table(ScriptDO.class);
+        if (dao.doesTableAttributesExist(scriptTable, "parameter6Name") == false) {
+          dao.addTableAttributes(scriptTable, new TableAttribute(ScriptDO.class, "parameter6Name"));
+        }
+        if (dao.doesTableAttributesExist(scriptTable, "parameter6Type") == false) {
+          dao.addTableAttributes(scriptTable, new TableAttribute(ScriptDO.class, "parameter6Type"));
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    });
+
     // /////////////////////////////////////////////////////////////////
     // 3.6.2
     // /////////////////////////////////////////////////////////////////
