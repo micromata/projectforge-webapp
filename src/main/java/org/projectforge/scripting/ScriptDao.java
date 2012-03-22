@@ -87,10 +87,10 @@ public class ScriptDao extends BaseDao<ScriptDO>
     return new ScriptDO();
   }
 
-  public GroovyResult execute(final ScriptDO script, List<ScriptParameter> parameters)
+  public GroovyResult execute(final ScriptDO script, final List<ScriptParameter> parameters)
   {
     hasLoggedInUserSelectAccess(script, true);
-    ReportGeneratorList reportGeneratorList = new ReportGeneratorList();
+    final ReportGeneratorList reportGeneratorList = new ReportGeneratorList();
     final Map<String, Object> scriptVariables = new HashMap<String, Object>();
 
     addScriptVariables(scriptVariables);
@@ -101,7 +101,7 @@ public class ScriptDao extends BaseDao<ScriptDO>
         scriptVariables.put(param.getParameterName(), param.getValue());
       }
     }
-    groovyResult = groovyExecutor.execute(script.getScript(), scriptVariables);
+    groovyResult = groovyExecutor.execute(new GroovyResult(), script.getScript(), scriptVariables);
     return groovyResult;
   }
 
@@ -109,7 +109,6 @@ public class ScriptDao extends BaseDao<ScriptDO>
    * Adds all registered dao's and other variables, such as appId, appVersion and task-tree. These variables are available in Groovy scripts
    * @param scriptVariables
    */
-  @SuppressWarnings("unchecked")
   public void addScriptVariables(final Map<String, Object> scriptVariables)
   {
     scriptVariables.put("appId", AppVersion.APP_ID);
@@ -118,7 +117,7 @@ public class ScriptDao extends BaseDao<ScriptDO>
     scriptVariables.put("reportList", null);
     scriptVariables.put("taskTree", new ScriptingTaskTree(taskTree));
     for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
-      final ScriptingDao scriptingDao = entry.getScriptingDao();
+      final ScriptingDao<?> scriptingDao = entry.getScriptingDao();
       if (scriptingDao != null) {
         final String varName = StringUtils.uncapitalize(entry.getId());
         scriptVariables.put(varName + "Dao", scriptingDao);
@@ -144,12 +143,12 @@ public class ScriptDao extends BaseDao<ScriptDO>
     scriptVariables.put("rechnungDao", scriptVariables.get(DaoRegistry.OUTGOING_INVOICE + "Dao"));
   }
 
-  public void setTaskTree(TaskTree taskTree)
+  public void setTaskTree(final TaskTree taskTree)
   {
     this.taskTree = taskTree;
   }
 
-  public void setGroovyExecutor(GroovyExecutor groovyExecutor)
+  public void setGroovyExecutor(final GroovyExecutor groovyExecutor)
   {
     this.groovyExecutor = groovyExecutor;
   }
