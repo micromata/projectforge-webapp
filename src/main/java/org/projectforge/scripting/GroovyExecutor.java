@@ -61,6 +61,18 @@ public class GroovyExecutor
     return execute(groovyObject, variables);
   }
 
+  public GroovyResult execute(final GroovyResult result, final String script, final Map<String, Object> variables)
+  {
+    if (script == null) {
+      return result;
+    }
+    final Script groovyObject = compileGroovy(result, script, true);
+    if (groovyObject == null) {
+      return result;
+    }
+    return execute(result, groovyObject, variables);
+  }
+
   public String executeTemplate(final String template, final Map<String, Object> variables)
   {
     securityChecks(template);
@@ -83,13 +95,13 @@ public class GroovyExecutor
         log.debug(writer.toString());
       }
       return writer.toString();
-    } catch (CompilationFailedException ex) {
+    } catch (final CompilationFailedException ex) {
       log.error(ex.getMessage() + " while executing template: " + template, ex);
-    } catch (FileNotFoundException ex) {
+    } catch (final FileNotFoundException ex) {
       log.error(ex.getMessage() + " while executing template: " + template, ex);
-    } catch (ClassNotFoundException ex) {
+    } catch (final ClassNotFoundException ex) {
       log.error(ex.getMessage() + " while executing template: " + template, ex);
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       log.error(ex.getMessage() + " while executing template: " + template, ex);
     }
     return null;
@@ -100,25 +112,44 @@ public class GroovyExecutor
    * @param bindScriptResult If true then "scriptResult" from type GroovyResult is binded.
    * @return
    */
-  public Script compileGroovy(final String script, boolean bindScriptResult)
+  public Script compileGroovy(final String script, final boolean bindScriptResult)
+  {
+    return compileGroovy(null, script, bindScriptResult);
+  }
+
+  /**
+   * @param script
+   * @param bindScriptResult If true then "scriptResult" from type GroovyResult is binded.
+   * @return
+   */
+  public Script compileGroovy(final GroovyResult result, final String script, final boolean bindScriptResult)
   {
     securityChecks(script);
     final GroovyClassLoader gcl = new GroovyClassLoader();
     Class< ? > groovyClass = null;
     try {
       groovyClass = gcl.parseClass(script);
-    } catch (CompilationFailedException ex) {
+    } catch (final CompilationFailedException ex) {
       log.info("Groovy-CompilationFailedException: " + ex.getMessage());
+      if (result != null) {
+        result.setException(ex);
+      }
       return null;
     }
     Script groovyObject = null;
     try {
       groovyObject = (Script) groovyClass.newInstance();
-    } catch (InstantiationException ex) {
+    } catch (final InstantiationException ex) {
       log.error(ex.getMessage(), ex);
+      if (result != null) {
+        result.setException(ex);
+      }
       return null;
-    } catch (IllegalAccessException ex) {
+    } catch (final IllegalAccessException ex) {
       log.error(ex.getMessage(), ex);
+      if (result != null) {
+        result.setException(ex);
+      }
       return null;
     }
     if (bindScriptResult == true) {
@@ -136,22 +167,29 @@ public class GroovyExecutor
 
   public GroovyResult execute(final Script groovyScript, final Map<String, Object> variables)
   {
+    return execute((GroovyResult) null, groovyScript, variables);
+  }
+
+  public GroovyResult execute(GroovyResult result, final Script groovyScript, final Map<String, Object> variables)
+  {
     if (variables != null) {
       final Binding binding = groovyScript.getBinding();
-      for (Map.Entry<String, Object> entry : variables.entrySet()) {
+      for (final Map.Entry<String, Object> entry : variables.entrySet()) {
         binding.setVariable(entry.getKey(), entry.getValue());
       }
     }
-    final GroovyResult scriptResult = new GroovyResult();
-    Object result = null;
+    if (result == null) {
+      result = new GroovyResult();
+    }
+    Object res = null;
     try {
-      result = groovyScript.run();
-    } catch (Exception ex) {
+      res = groovyScript.run();
+    } catch (final Exception ex) {
       log.info("Groovy-Execution-Exception: " + ex.getMessage(), ex);
       return new GroovyResult(ex);
     }
-    scriptResult.setResult(result);
-    return scriptResult;
+    result.setResult(res);
+    return result;
   }
 
   /**
@@ -161,7 +199,7 @@ public class GroovyExecutor
   private void securityChecks(final String script)
   {
     final String[] forbiddenKeyWords = { "__baseDao", "__baseObject", "System.ex"};
-    for (String forbiddenKeyWord : forbiddenKeyWords) {
+    for (final String forbiddenKeyWord : forbiddenKeyWords) {
       if (StringUtils.contains(script, forbiddenKeyWord) == true) {
         throw new AccessException("access.exception.violation", forbiddenKeyWord);
       }
