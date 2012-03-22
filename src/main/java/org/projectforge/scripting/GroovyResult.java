@@ -42,12 +42,12 @@ public class GroovyResult implements Serializable
   {
   }
 
-  public GroovyResult(Exception ex)
+  public GroovyResult(final Exception ex)
   {
     this.exception = ex;
   }
 
-  public void setResult(Object result)
+  public void setResult(final Object result)
   {
     this.result = result;
   }
@@ -85,12 +85,22 @@ public class GroovyResult implements Serializable
     return exception;
   }
 
+  /**
+   * @param exception the exception to set
+   * @return this for chaining.
+   */
+  public GroovyResult setException(final Exception exception)
+  {
+    this.exception = exception;
+    return this;
+  }
+
   public String getOutput()
   {
     return output;
   }
 
-  public void setOutput(String output)
+  public void setOutput(final String output)
   {
     this.output = output;
   }
