@@ -42,11 +42,9 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.upload.FileUpload;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -77,6 +75,7 @@ import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.JFreeChartImage;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.SourceCodePanel;
 
 public class ScriptingPage extends AbstractStandardFormPage
 {
@@ -96,7 +95,7 @@ public class ScriptingPage extends AbstractStandardFormPage
 
   private final ScriptingForm form;
 
-  private Component exceptionContainer;
+  private SourceCodePanel sourceCodePanel;
 
   private Label availableScriptVariablesLabel, businessAssessmentRowsVariablesLabel;
 
@@ -114,6 +113,7 @@ public class ScriptingPage extends AbstractStandardFormPage
     form.init();
     initScriptVariables();
     body.add(imageResultContainer = (WebMarkupContainer) new WebMarkupContainer("imageResult").setVisible(false));
+    body.add(sourceCodePanel = new SourceCodePanel("sourceCode"));
   }
 
   private void initScriptVariables()
@@ -155,46 +155,8 @@ public class ScriptingPage extends AbstractStandardFormPage
   @Override
   protected void onBeforeRender()
   {
-    addGroovyResult();
+    sourceCodePanel.setCode(getReportScriptingStorage().getGroovyScript(), groovyResult);
     super.onBeforeRender();
-  }
-
-  private void addGroovyResult()
-  {
-    if (exceptionContainer != null) {
-      body.remove(exceptionContainer);
-    }
-    if (this.groovyResult != null && this.groovyResult.hasException() == true) {
-      body.add(exceptionContainer = new WebMarkupContainer("exceptionContainer"));
-      final RepeatingView linesRepeater = new RepeatingView("linesRepeater");
-      ((WebMarkupContainer) exceptionContainer).add(linesRepeater);
-      final String groovyScript = getReportScriptingStorage().getGroovyScript();
-      StringBuffer buf = new StringBuffer();
-      int lineNo = 1;
-      for (int i = 0; i < groovyScript.length(); i++) {
-        final char c = groovyScript.charAt(i);
-        if (c == '\n') {
-          addLine(linesRepeater, lineNo++, buf.toString());
-          buf = new StringBuffer();
-        } else {
-          buf.append(c);
-        }
-      }
-      final String line = buf.toString();
-      if (StringUtils.isNotEmpty(line) == true) {
-        addLine(linesRepeater, lineNo++, buf.toString());
-      }
-    } else {
-      body.add(exceptionContainer = new Label("exceptionContainer", "[invisible]").setVisible(false));
-    }
-  }
-
-  private void addLine(final RepeatingView linesRepeater, final int lineNo, final String line)
-  {
-    final WebMarkupContainer row = new WebMarkupContainer(linesRepeater.newChildId());
-    linesRepeater.add(row);
-    row.add(new Label("lineNo", String.valueOf(lineNo)));
-    row.add(new Label("line", line));
   }
 
   protected void execute()
@@ -208,9 +170,9 @@ public class ScriptingPage extends AbstractStandardFormPage
     scriptVariables.put("reportScriptingStorage", getReportScriptingStorage());
     scriptVariables.put("reportList", reportGeneratorList);
     if (StringUtils.isNotBlank(getReportScriptingStorage().getGroovyScript()) == true) {
-      groovyResult = groovyExecutor.execute(getReportScriptingStorage().getGroovyScript(), scriptVariables);
+      groovyResult = groovyExecutor.execute(new GroovyResult(), getReportScriptingStorage().getGroovyScript(), scriptVariables);
       if (groovyResult.hasException() == true) {
-        error(getLocalizedMessage("exception.groovyError", String.valueOf(groovyResult.getException())));
+        form.error(getLocalizedMessage("exception.groovyError", String.valueOf(groovyResult.getException())));
         return;
       }
       if (groovyResult.hasResult() == true) {

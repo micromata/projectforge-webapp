@@ -136,21 +136,12 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
       resultPanel.getLabel().setEscapeModelStrings(false);
       scriptResultFieldsetPanel.add(resultPanel);
     }
-    sourceCodePanel = new SourceCodePanel("sourceCode") {
-      @Override
-      public boolean isVisible()
-      {
-        return groovyResult != null && groovyResult.hasException();
-      }
-    };
-    body.add(sourceCodePanel);
-    refreshSourceCode();
+    body.add(sourceCodePanel = new SourceCodePanel("sourceCode"));
   }
 
   protected void refreshSourceCode()
   {
-    final String groovyScript = getScript().getScript();
-    sourceCodePanel.setCode(groovyScript);
+    sourceCodePanel.setCode(getScript().getScript(), groovyResult);
   }
 
   protected ScriptDO loadScript()
@@ -194,6 +185,7 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
     log.info(buf.toString());
     storeRecentScriptCalls();
     groovyResult = scriptDao.execute(getScript(), form.scriptParameters);
+    refreshSourceCode();
     if (groovyResult.hasException() == true) {
       form.error(getLocalizedMessage("exception.groovyError", String.valueOf(groovyResult.getException())));
       return;

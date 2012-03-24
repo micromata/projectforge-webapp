@@ -4,34 +4,27 @@
 </head>
 
 <body>
-<wicket:extend>
-  <div wicket:id="imageResult"><img wicket:id="image" /></div>
+  <wicket:extend>
+    <div wicket:id="imageResult">
+      <img wicket:id="image" />
+    </div>
 
-  <table wicket:id="exceptionContainer" class="dataview">
-    <tbody>
-      <tr wicket:id="linesRepeater">
-        <td style="text-align: right; font-size: smaller" wicket:id="lineNo">[1]</td>
-        <td style="font-size: smaller" wicket:id="line">[...]</td>
-      </tr>
-    </tbody>
-  </table>
-  <h3><wicket:message key="label.help" /></h3>
-  <table class="dataview">
-    <tbody>
-      <tr>
-        <th>JavaDocApi:</th>
-        <td><a href="../doc/reporting-javadoc.html" target="_blank">JavaDoc</a></td>
-      </tr>
-      <tr>
-        <th>Available script variables</th>
-        <td wicket:id="availableScriptVariables"></td>
-      </tr>
-      <tr>
-        <th>Bwa-Zeilen als Variablen</th>
-        <td wicket:id="bwaZeilenVariables"></td>
-      </tr>
-    </tbody>
-  </table>
-</wicket:extend>
+    <wicket:container wicket:id="sourceCode">[Here goes the source code if any error occured.]</wicket:container>
+    <h3>
+      <wicket:message key="label.help" />
+    </h3>
+    <table class="dataview">
+      <tbody>
+        <tr>
+          <th>Available script variables</th>
+          <td wicket:id="availableScriptVariables"></td>
+        </tr>
+        <tr>
+          <th>Bwa-Zeilen als Variablen</th>
+          <td wicket:id="businessAssessmentRowsVariables"></td>
+        </tr>
+      </tbody>
+    </table>
+  </wicket:extend>
 </body>
 </html>

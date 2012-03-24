@@ -31,6 +31,7 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.projectforge.scripting.GroovyResult;
 
 /**
  * For displaying source-code. No syntax highlighting yet available.
@@ -55,6 +56,20 @@ public class SourceCodePanel extends Panel
     add(linesRepeater = new RepeatingView("lines"));
   }
 
+  /**
+   * Sets the source code only and only if groovyResult is not null and has an exception.
+   * @param sourceCode
+   * @param groovyResult
+   * @see GroovyResult#hasException()
+   */
+  public void setCode(final String sourceCode, final GroovyResult groovyResult) {
+    if (groovyResult == null || groovyResult.hasException() == false) {
+      setCode(null);
+    } else {
+      setCode(sourceCode);
+    }
+  }
+
   public void setCode(final String sourceCode)
   {
     if (StringUtils.equals(this.sourceCode, sourceCode) == true) {
@@ -72,6 +87,16 @@ public class SourceCodePanel extends Panel
       // lineLabel.setEscapeModelStrings(false);
       item.add(lineLabel);
     }
+  }
+
+  /**
+   * @return true, if source code is contained, otherwise false.
+   * @see org.apache.wicket.Component#isVisible()
+   */
+  @Override
+  public boolean isVisible()
+  {
+    return sourceCode != null;
   }
 
   /**
