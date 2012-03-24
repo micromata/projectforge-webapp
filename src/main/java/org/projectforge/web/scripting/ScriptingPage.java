@@ -57,9 +57,7 @@ import org.projectforge.core.ConfigXml;
 import org.projectforge.export.ExportJFreeChart;
 import org.projectforge.export.ExportWorkbook;
 import org.projectforge.export.JFreeChartImageType;
-import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.fibu.kost.BusinessAssessment;
-import org.projectforge.fibu.kost.BusinessAssessmentRowConfig;
 import org.projectforge.fibu.kost.reporting.Report;
 import org.projectforge.fibu.kost.reporting.ReportGenerator;
 import org.projectforge.fibu.kost.reporting.ReportGeneratorList;
@@ -97,7 +95,7 @@ public class ScriptingPage extends AbstractStandardFormPage
 
   private SourceCodePanel sourceCodePanel;
 
-  private Label availableScriptVariablesLabel, businessAssessmentRowsVariablesLabel;
+  private Label availableScriptVariablesLabel;
 
   private WebMarkupContainer imageResultContainer;
 
@@ -128,7 +126,7 @@ public class ScriptingPage extends AbstractStandardFormPage
     scriptDao.addScriptVariables(scriptVariables);
     final SortedSet<String> set = new TreeSet<String>();
     set.addAll(scriptVariables.keySet());
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     buf.append("scriptResult"); // first available variable.
     for (final String key : set) {
       buf.append(", ").append(key);
@@ -137,19 +135,22 @@ public class ScriptingPage extends AbstractStandardFormPage
       body.add(availableScriptVariablesLabel = new Label("availableScriptVariables", buf.toString()));
     }
     scriptDao.addAliasForDeprecatedScriptVariables(scriptVariables);
-    buf = new StringBuffer();
-    boolean first = true;
-    for (final BusinessAssessmentRowConfig rowConfig : AccountingConfig.getInstance().getBusinessAssessmentConfig().getRows()) {
-      if (first == true) {
-        first = false;
-      } else {
-        buf.append(", ");
-      }
-      buf.append('r').append(rowConfig.getNo()).append(", ").append(rowConfig.getId());
-    }
-    if (businessAssessmentRowsVariablesLabel == null) {
-      body.add(businessAssessmentRowsVariablesLabel = new Label("businessAssessmentRowsVariables", buf.toString()));
-    }
+    // buf = new StringBuffer();
+    // boolean first = true;
+    // for (final BusinessAssessmentRowConfig rowConfig : AccountingConfig.getInstance().getBusinessAssessmentConfig().getRows()) {
+    // if (rowConfig.getId() == null) {
+    // continue;
+    // }
+    // if (first == true) {
+    // first = false;
+    // } else {
+    // buf.append(", ");
+    // }
+    // buf.append('r').append(rowConfig.getNo()).append(", ").append(rowConfig.getId());
+    // }
+    // if (businessAssessmentRowsVariablesLabel == null) {
+    // body.add(businessAssessmentRowsVariablesLabel = new Label("businessAssessmentRowsVariables", buf.toString()));
+    // }
   }
 
   @Override
