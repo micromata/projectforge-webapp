@@ -25,12 +25,8 @@ package org.projectforge.web.scripting;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
@@ -61,6 +57,7 @@ import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
+import org.projectforge.web.wicket.components.SourceCodePanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.GridBuilder;
@@ -86,7 +83,7 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
 
   protected FieldsetPanel scriptResultFieldsetPanel;
 
-  private WebMarkupContainer scriptSourceTable;
+  private SourceCodePanel sourceCodePanel;
 
   private GridBuilder resultGridBuilder;
 
@@ -139,57 +136,21 @@ public class ScriptExecutePage extends AbstractStandardFormPage implements ISele
       resultPanel.getLabel().setEscapeModelStrings(false);
       scriptResultFieldsetPanel.add(resultPanel);
     }
-    scriptSourceTable = new WebMarkupContainer("sourceTable") {
+    sourceCodePanel = new SourceCodePanel("sourceCode") {
       @Override
       public boolean isVisible()
       {
         return groovyResult != null && groovyResult.hasException();
       }
     };
-    body.add(scriptSourceTable);
+    body.add(sourceCodePanel);
     refreshSourceCode();
   }
 
   protected void refreshSourceCode()
   {
-    scriptSourceTable.removeAll();
-    final RepeatingView sourceCodeView = new RepeatingView("lines");
-    scriptSourceTable.add(sourceCodeView);
-    final List<String> lines = getLines();
-    int lineNo = 1;
-    for (final String line : lines) {
-      final WebMarkupContainer item = new WebMarkupContainer(sourceCodeView.newChildId());
-      sourceCodeView.add(item);
-      item.add(new Label("lineNo", String.valueOf(lineNo++)));
-      final Label lineLabel = new Label("line", line.toString());
-      //lineLabel.setEscapeModelStrings(false);
-      item.add(lineLabel);
-    }
-  }
-
-  /**
-   * Gets the lines of the groovy script for displaying line number etc.
-   * @return
-   */
-  private List<String> getLines()
-  {
-    final List<String> lines = new ArrayList<String>();
     final String groovyScript = getScript().getScript();
-    if (groovyScript == null) {
-      return lines;
-    }
-    StringBuffer line = new StringBuffer();
-    for (int i = 0; i < groovyScript.length(); i++) {
-      final char c = groovyScript.charAt(i);
-      if (c == '\n') {
-        lines.add(line.toString());
-        line = new StringBuffer();
-      } else {
-        line.append(c);
-      }
-    }
-    lines.add(line.toString());
-    return lines;
+    sourceCodePanel.setCode(groovyScript);
   }
 
   protected ScriptDO loadScript()

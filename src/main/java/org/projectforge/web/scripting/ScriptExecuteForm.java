@@ -177,6 +177,7 @@ public class ScriptExecuteForm extends AbstractStandardForm<ScriptDO, ScriptExec
       prefillParameters();
       refreshParametersView();
       parentPage.refreshSourceCode();
+      refresh = false;
     }
     super.onBeforeRender();
   }
