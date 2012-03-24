@@ -53,7 +53,16 @@ public class TextAreaPanel extends Panel implements ComponentWrapperPanel
    */
   public TextAreaPanel setAutogrow()
   {
-    field.add(AttributeModifier.append("class", "autogrow"));
+    return setAutogrow(0, 500);
+  }
+
+  /**
+   * class="autogrow"
+   * @return this for chaining.
+   */
+  public TextAreaPanel setAutogrow(final int minHeight, final int maxHeight)
+  {
+    field.add(AttributeModifier.append("class", "expand" + minHeight + "-" + maxHeight));
     return this;
   }
 
