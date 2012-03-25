@@ -23,16 +23,20 @@
 
 package org.projectforge.web.user;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
+import org.projectforge.web.UserFilter;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.MessagePage;
 import org.projectforge.web.wicket.MySession;
+import org.projectforge.web.wicket.WicketUtils;
 
 public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditForm, UserDao>
 {
@@ -55,6 +59,17 @@ public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditF
   public AbstractSecuredBasePage onSaveOrUpdate()
   {
     return super.onSaveOrUpdate();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#afterSaveOrUpdate()
+   */
+  @Override
+  public AbstractSecuredBasePage afterSaveOrUpdate()
+  {
+    final HttpServletRequest request = WicketUtils.getHttpServletRequest(getRequest());
+    UserFilter.updateUser(request, form.getData());
+    return super.afterSaveOrUpdate();
   }
 
   /**
