@@ -24,6 +24,7 @@
 package org.projectforge.web.fibu;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -34,6 +35,7 @@ import org.projectforge.common.DateHolder;
 import org.projectforge.common.StringHelper;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.web.calendar.QuickSelectMonthPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
@@ -49,7 +51,7 @@ public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmplo
 
   protected MonthlyEmployeeReportFilter filter;
 
-  private DropDownChoice<Integer> yearChoice;
+  private DropDownChoice<Integer> yearChoice, monthChoice;
 
   public MonthlyEmployeeReportForm(final MonthlyEmployeeReportPage parentPage)
   {
@@ -90,7 +92,7 @@ public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmplo
       for (int i = 0; i <= 11; i++) {
         monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
       }
-      final DropDownChoice<Integer> monthChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(filter,
+      monthChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(filter,
           "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer) {
         /**
          * @see org.apache.wicket.markup.html.form.DropDownChoice#wantOnSelectionChangedNotifications()
@@ -103,6 +105,31 @@ public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmplo
       };
       monthChoice.setNullValid(false).setRequired(true);
       fs.add(monthChoice);
+      final QuickSelectMonthPanel quickSelectPanel = new QuickSelectMonthPanel(fs.newChildId(), new Model<Date>() {
+        /**
+         * @see org.apache.wicket.model.Model#getObject()
+         */
+        @Override
+        public Date getObject()
+        {
+          final DateHolder dh = new DateHolder();
+          dh.setDate(filter.getYear(), filter.getMonth(), 1, 0, 0, 0);
+          return dh.getDate();
+        }
+
+        /**
+         * @see org.apache.wicket.model.Model#setObject(java.io.Serializable)
+         */
+        @Override
+        public void setObject(final Date object)
+        {
+          if (object != null) {
+            setDate(object);
+          }
+        }
+      }, parentPage, "quickSelect");
+      fs.add(quickSelectPanel);
+      quickSelectPanel.init();
     }
     {
       final Button showButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("show"));
@@ -111,6 +138,14 @@ public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmplo
       actionButtons.add(showButtonPanel);
       setDefaultButton(showButton);
     }
+  }
+
+  void setDate(final Date date) {
+    final DateHolder dh = new DateHolder(date);
+    filter.setYear(dh.getYear());
+    filter.setMonth(dh.getMonth());
+    yearChoice.modelChanged();
+    monthChoice.modelChanged();
   }
 
   @Override

@@ -442,6 +442,9 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
         id = (Integer) selectedValue;
       }
       form.filter.setUser(userGroupCache.getUser(id));
+    } else if ("quickSelect".equals(property) == true) {
+      final Date date = (Date) selectedValue;
+      form.setDate(date);
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
