@@ -53,7 +53,7 @@ public class BookEditPage extends AbstractEditPage<BookDO, BookEditForm, BookDao
   protected void lendOut()
   {
     getData().setLendOutDate(new Date());
-    getData().setLendOutBy(getUser());
+    bookDao.setLendOutBy(getData(), getUserId());
     bookDao.update(getData());
     setResponsePage();
   }
