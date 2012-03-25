@@ -23,31 +23,19 @@
 
 package org.projectforge.web.fibu;
 
-import java.math.BigDecimal;
-
 import org.apache.log4j.Logger;
-import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.repeater.RepeatingView;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.StringHelper;
-import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.fibu.kost.BuchungssatzDao;
 import org.projectforge.fibu.kost.BusinessAssessment;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.YearListCoiceRenderer;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.IconPanel;
-import org.projectforge.web.wicket.flowlayout.IconType;
-import org.projectforge.web.wicket.flowlayout.TextStyle;
 
 public class AccountingRecordListForm extends AbstractListForm<AccountingRecordListFilter, AccountingRecordListPage>
 {
@@ -105,82 +93,16 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
     }
     {
       // Statistics
-      gridBuilder.newBlockPanel();
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.businessAssessment"), true).setNoLabelFor();
-      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          final BusinessAssessment bwa = parentPage.getBusinessAssessment();
-          return getString("fibu.businessAssessment.overallPerformance")
-              + ": "
-              + CurrencyFormatter.format(bwa != null ? bwa.getOverallPerformanceRowAmount() : BigDecimal.ZERO)
-              + WebConstants.HTML_TEXT_DIVIDER;
-        }
-      }, TextStyle.BLUE));
-      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          final BusinessAssessment bwa = parentPage.getBusinessAssessment();
-          return getString("fibu.businessAssessment.merchandisePurchase")
-              + ": "
-              + CurrencyFormatter.format(bwa != null ? bwa.getMerchandisePurchaseRowAmount() : BigDecimal.ZERO)
-              + WebConstants.HTML_TEXT_DIVIDER;
-        }
-      }));
-      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          final BusinessAssessment bwa = parentPage.getBusinessAssessment();
-          return getString("fibu.businessAssessment.preliminaryResult")
-              + ": "
-              + CurrencyFormatter.format(bwa != null ? bwa.getPreliminaryResultRowAmount() : BigDecimal.ZERO);
-        }
-      }));
-
-      final RepeatingView repeater = new RepeatingView(FieldsetPanel.DESCRIPTION_SUFFIX_ID) {
+      new BusinessAssessment4Fieldset(gridBuilder) {
         /**
-         * @see org.apache.wicket.Component#isVisible()
+         * @see org.projectforge.web.fibu.BusinessAssessment4Fieldset#getBusinessAssessment()
          */
         @Override
-        public boolean isVisible()
+        protected BusinessAssessment getBusinessAssessment()
         {
-          return parentPage.getBusinessAssessment() != null;
+          return parentPage.getBusinessAssessment();
         }
       };
-      fs.setDescriptionSuffix(repeater);
-      IconPanel icon = new IconPanel(repeater.newChildId(), IconType.CIRCLE_PLUS).setOnClick("javascript:showBusinessAssessment();");
-      icon.setMarkupId("showBusinessAssessment");
-      repeater.add(icon);
-      icon = new IconPanel(repeater.newChildId(), IconType.CIRCLE_MINUS).setOnClick("javascript:hideBusinessAssessment();")
-          .appendAttribute("style", "display: none;");
-      icon.setMarkupId("hideBusinessAssessment");
-      repeater.add(icon);
-    }
-    {
-      gridBuilder.newBlockPanel();
-      final DivPanel businessAssessmentPanel = gridBuilder.getPanel();
-      businessAssessmentPanel.setMarkupId("businessAssessment");
-      businessAssessmentPanel.add(AttributeModifier.append("style", "display: none;"));
-      final FieldsetPanel fieldset = new FieldsetPanel(businessAssessmentPanel, "").setNoLabelFor();
-      final Label label = new Label(DivTextPanel.WICKET_ID, new Model<String>() {
-        /**
-         * @see org.apache.wicket.model.Model#getObject()
-         */
-        @Override
-        public String getObject()
-        {
-          final BusinessAssessment businessAssessment = parentPage.getBusinessAssessment();
-          if (businessAssessment == null) {
-            return "";
-          }
-          return businessAssessment.asHtml();
-        }
-      });
-      label.setEscapeModelStrings(false);
-      fieldset.add(new DivTextPanel(fieldset.newChildId(), label).setMarkupId("businessAssessment"));
     }
   }
 
