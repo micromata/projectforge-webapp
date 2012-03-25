@@ -401,7 +401,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
     data.put("report", report);
     data.put("signatureEmployeeLabel", getString("timesheet.signatureEmployee") + ": " + employee.getFullname());
     data.put("signatureProjectLeaderLabel", getString("timesheet.signatureProjectLeader"));
-    data.put("unbookedWorkingDaysLabel", getString("fibu.monthlyEmployeeReport.unbookedWorkingDays"));
+    data.put("unbookedWorkingDaysLabel", getString("fibu.monthlyEmployeeReport.withoutTimesheets"));
     // render the PDF with fop
     final byte[] ba = pdfRenderer.render(styleSheet, xmlData, data);
     DownloadUtils.setDownloadTarget(ba, filename);
