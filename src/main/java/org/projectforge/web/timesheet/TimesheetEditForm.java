@@ -131,13 +131,18 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   private String templateName, consumptionBarId;
 
   // Components for form validation.
-  private final FormComponent< ? >[] dependentFormComponents = new FormComponent[4];
+  private final FormComponent< ? >[] dependentFormComponentsWithCost2 = new FormComponent[4];
+
+  private final FormComponent< ? >[] dependentFormComponentsWithoutCost2 = new FormComponent[3];
 
   private ModalWindow recentSheetsModalWindow;
+
+  private final boolean cost2Exists;
 
   public TimesheetEditForm(final TimesheetEditPage parentPage, final TimesheetDO data)
   {
     super(parentPage, data);
+    cost2Exists = SystemInfoCache.instance().isCost2EntriesExists();
   }
 
   @SuppressWarnings("serial")
@@ -149,17 +154,20 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       @Override
       public FormComponent< ? >[] getDependentFormComponents()
       {
-        return dependentFormComponents;
+        if (cost2ChoiceFieldset.isVisible() == true) {
+          return dependentFormComponentsWithoutCost2;
+        } else {
+          return dependentFormComponentsWithoutCost2;
+        }
       }
 
       @SuppressWarnings("unchecked")
       @Override
       public void validate(final Form< ? > form)
       {
-        final DateTimePanel startDateTimePanel = (DateTimePanel) dependentFormComponents[0];
-        final DropDownChoice<Integer> stopHourOfDayDropDownChoice = (DropDownChoice<Integer>) dependentFormComponents[1];
-        final DropDownChoice<Integer> stopMinuteDropDownChoice = (DropDownChoice<Integer>) dependentFormComponents[2];
-        final DropDownChoice<Integer> cost2Choice = (DropDownChoice<Integer>) dependentFormComponents[3];
+        final DateTimePanel startDateTimePanel = (DateTimePanel) dependentFormComponentsWithCost2[0];
+        final DropDownChoice<Integer> stopHourOfDayDropDownChoice = (DropDownChoice<Integer>) dependentFormComponentsWithCost2[1];
+        final DropDownChoice<Integer> stopMinuteDropDownChoice = (DropDownChoice<Integer>) dependentFormComponentsWithCost2[2];
         final DateHolder startDate = new DateHolder(startDateTimePanel.getConvertedInput());
         final DateHolder stopDate = new DateHolder(startDate.getTimestamp());
         stopDate.setHourOfDay(stopHourOfDayDropDownChoice.getConvertedInput());
@@ -176,22 +184,25 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
         } else if (data.getDuration() > TimesheetDao.MAXIMUM_DURATION) {
           stopMinuteDropDownChoice.error(getString("timesheet.error.maximumDurationExceeded"));
         }
-        if (cost2Choice != null && cost2Choice.getConvertedInput() == null) {
-          // cost2Choice is always != null (but may-be invisible) if cost2 entries does exist in the system.
-          // Kost2 is not available for current task.
-          final TaskNode taskNode = taskTree.getTaskNodeById(data.getTaskId());
-          if (taskNode != null) {
-            final List<Integer> descendents = taskNode.getDescendantIds();
-            for (final Integer taskId : descendents) {
-              if (CollectionUtils.isNotEmpty(taskTree.getKost2List(taskId)) == true) {
-                // But Kost2 is available for sub task, so user should book his time sheet
-                // on a sub task with kost2s.
-                if (cost2Choice.isVisible()) {
-                  cost2Choice.error(getString("timesheet.error.kost2NeededChooseSubTask"));
-                } else {
-                  error(getString("timesheet.error.kost2NeededChooseSubTask"));
+        if (cost2Exists == true) {
+          final DropDownChoice<Integer> cost2Choice = (DropDownChoice<Integer>) dependentFormComponentsWithCost2[3];
+          if (cost2Choice != null && cost2Choice.getConvertedInput() == null) {
+            // cost2Choice is always != null (but may-be invisible) if cost2 entries does exist in the system.
+            // Kost2 is not available for current task.
+            final TaskNode taskNode = taskTree.getTaskNodeById(data.getTaskId());
+            if (taskNode != null) {
+              final List<Integer> descendents = taskNode.getDescendantIds();
+              for (final Integer taskId : descendents) {
+                if (CollectionUtils.isNotEmpty(taskTree.getKost2List(taskId)) == true) {
+                  // But Kost2 is available for sub task, so user should book his time sheet
+                  // on a sub task with kost2s.
+                  if (cost2Choice.isVisible()) {
+                    cost2Choice.error(getString("timesheet.error.kost2NeededChooseSubTask"));
+                  } else {
+                    error(getString("timesheet.error.kost2NeededChooseSubTask"));
+                  }
+                  break;
                 }
-                break;
               }
             }
           }
@@ -223,17 +234,17 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     }
     {
     }
-    if (SystemInfoCache.instance().isCost2EntriesExists() == true) {
+    if (cost2Exists == true) {
       // Cost 2 entries does exist in the data-base.
       cost2ChoiceFieldset = gridBuilder.newFieldset(getString("fibu.kost2"));
       cost2List = taskTree.getKost2List(data.getTaskId());
       final LabelValueChoiceRenderer<Integer> cost2ChoiceRenderer = getCost2LabelValueChoiceRenderer(parentPage.getBaseDao(), cost2List,
           data, null);
-      final DropDownChoice<Integer> cost2Choice = createCost2ChoiceRenderer(cost2ChoiceFieldset.getDropDownChoiceId(), parentPage.getBaseDao(),
-          taskTree, cost2ChoiceRenderer, data, cost2List);
+      final DropDownChoice<Integer> cost2Choice = createCost2ChoiceRenderer(cost2ChoiceFieldset.getDropDownChoiceId(),
+          parentPage.getBaseDao(), taskTree, cost2ChoiceRenderer, data, cost2List);
       cost2Choice.setRequired(true);
       cost2ChoicePanel = cost2ChoiceFieldset.add(cost2Choice);
-      dependentFormComponents[3] = cost2Choice;
+      dependentFormComponentsWithCost2[3] = cost2Choice;
       updateCost2ChoiceVisibility();
     }
     {
@@ -255,7 +266,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       final DateTimePanel startDateTimePanel = new DateTimePanel(fs.newChildId(), new PropertyModel<Date>(data, "startTime"),
           (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
           .withRequired(true), DatePrecision.MINUTE_15);
-      dependentFormComponents[0] = startDateTimePanel;
+      dependentFormComponentsWithCost2[0] = dependentFormComponentsWithoutCost2[0] = startDateTimePanel;
       fs.add(startDateTimePanel);
       WicketUtils.addTooltip(startDateTimePanel.getDateField(), new Model<String>() {
         @Override
@@ -282,14 +293,14 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       stopHourOfDayDropDownChoice.setNullValid(false);
       stopHourOfDayDropDownChoice.setRequired(true);
       fs.add(stopHourOfDayDropDownChoice);
-      dependentFormComponents[1] = stopHourOfDayDropDownChoice;
+      dependentFormComponentsWithCost2[1] = dependentFormComponentsWithoutCost2[1] = stopHourOfDayDropDownChoice;
       final DropDownChoice<Integer> stopMinuteDropDownChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(),
           new PropertyModel<Integer>(this, "stopMinute"), DateTimePanel.getMinutesRenderer(DatePrecision.MINUTE_15).getValues(),
           DateTimePanel.getMinutesRenderer(DatePrecision.MINUTE_15));
       stopMinuteDropDownChoice.setNullValid(false);
       stopMinuteDropDownChoice.setRequired(true);
       fs.add(stopMinuteDropDownChoice);
-      dependentFormComponents[2] = stopMinuteDropDownChoice;
+      dependentFormComponentsWithCost2[2] = dependentFormComponentsWithoutCost2[2] = stopMinuteDropDownChoice;
     }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task.consumption"), true).setNoLabelFor();
@@ -374,8 +385,8 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       for (final String name : templateNames) {
         templateNamesChoiceRenderer.addValue(name, name);
       }
-      final DropDownChoice<String> templateNamesChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(),
-          new PropertyModel<String>(this, "templateName"), templateNamesChoiceRenderer.getValues(), templateNamesChoiceRenderer) {
+      final DropDownChoice<String> templateNamesChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(
+          this, "templateName"), templateNamesChoiceRenderer.getValues(), templateNamesChoiceRenderer) {
         @Override
         protected boolean wantOnSelectionChangedNotifications()
         {
