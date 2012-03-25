@@ -58,6 +58,8 @@ public class HibernateUtils
 
   private static final HibernateUtils instance = new HibernateUtils();
 
+  private static boolean TEST_MODE = false;
+
   private Configuration configuration;
 
   private final Map<String, Integer> columnLengthMap = new HashMap<String, Integer>();
@@ -66,6 +68,25 @@ public class HibernateUtils
    * For saving performance of trying to get non Hibernate properties multiple times.
    */
   private final Set<String> columnLengthFailedSet = new HashSet<String>();
+
+  /**
+   * For internal test cases only! If true, log errors are suppressed. Please call {@link #exitTestMode()} always directly after your test
+   * call!
+   */
+  public static void enterTestMode()
+  {
+    TEST_MODE = true;
+    log.info("***** Entering TESTMODE.");
+  }
+
+  /**
+   * For internal test cases only! If true, log errors are suppressed. Please set TEST_MODE always to false after your test call!
+   */
+  public static void exitTestMode()
+  {
+    TEST_MODE = false;
+    log.info("***** Exit TESTMODE.");
+  }
 
   /**
    * Workaround for: http://opensource.atlassian.com/projects/hibernate/browse/HHH-3502:
@@ -264,7 +285,11 @@ public class HibernateUtils
       try {
         property = persistentClass.getProperty(propertyName);
       } catch (final MappingException ex) {
-        log.error(ex.getMessage(), ex);
+        if (TEST_MODE == false) {
+          log.error(ex.getMessage(), ex);
+        } else {
+          log.info("***** TESTMODE: property '" + propertyName + "' not found (OK in test mode).");
+        }
         putFailedEntry(entityName, propertyName);
         return null;
       }

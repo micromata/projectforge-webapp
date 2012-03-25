@@ -28,14 +28,11 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.projectforge.database.HibernateUtils;
 import org.projectforge.task.TaskDO;
 import org.projectforge.test.TestBase;
 
 public class HibernateUtilsTest extends TestBase
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(HibernateUtilsTest.class);
-
   @Test
   public void propertyLengthTest()
   {
@@ -45,8 +42,9 @@ public class HibernateUtilsTest extends TestBase
     assertEquals(new Integer(255), length);
     length = HibernateUtils.getPropertyLength(TaskDO.class, "shortDescription");
     assertEquals(new Integer(255), length);
-    log.info("Following org.hibernate.MappingException is expected:");
+    HibernateUtils.enterTestMode();
     length = HibernateUtils.getPropertyLength("org.projectforge.task.TaskDO", "unknown");
+    HibernateUtils.exitTestMode();
     assertNull(length);
     length = HibernateUtils.getPropertyLength("unknown", "name");
     assertNull(length);
