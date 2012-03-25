@@ -347,14 +347,14 @@
     </fo:external-graphic>
   </xsl:template>
 
-  <xsl:template name="micromata-logo">
+  <xsl:template name="pdf-logo">
     <xsl:param name="height" select="'20mm'" />
     <fo:external-graphic scaling="uniform">
       <xsl:attribute name="height">
         <xsl:value-of select="$height" />
       </xsl:attribute>
       <xsl:attribute name="src">
-        <xsl:value-of select="concat($baseDir, '/images/Micromata-Logo.png')" />
+        <xsl:value-of select="concat($baseDir, '/images/pdf-logo.png')" />
       </xsl:attribute>
     </fo:external-graphic>
   </xsl:template>
@@ -378,12 +378,12 @@
                   <fo:table-cell display-align="before">
                     <fo:block text-align="start" font-size="14pt" color="#999999">
                       <xsl:call-template name="bold-font-family" />
-                      <xsl:value-of select="$appId" />
+                      <xsl:value-of select="$organization" />
                     </fo:block>
                   </fo:table-cell>
                   <fo:table-cell display-align="before">
                     <fo:block text-align="end">
-                      <xsl:call-template name="micromata-logo" />
+                      <xsl:call-template name="pdf-logo" />
                     </fo:block>
                   </fo:table-cell>
                 </fo:table-row>
@@ -409,7 +409,7 @@
                 <fo:table-row height="12pt">
                   <fo:table-cell display-align="center">
                     <fo:block text-align="start">
-                      http://www.micromata.de | Version
+                      www.projectforge.org | Version
                       <xsl:value-of select="$appVersion" />
                     </fo:block>
                   </fo:table-cell>
