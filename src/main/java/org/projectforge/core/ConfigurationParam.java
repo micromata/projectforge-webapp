@@ -28,6 +28,7 @@ import java.util.TimeZone;
 public enum ConfigurationParam
 {
   SYSTEM_ADMIN_E_MAIL("systemAdministratorEMail", ConfigurationType.STRING), //
+  ORGANIZATION("organization", ConfigurationType.TEXT), //
   MESSAGE_OF_THE_DAY("messageOfTheDay", ConfigurationType.TEXT), //
   DEFAULT_TIMEZONE("timezone", ConfigurationType.TIME_ZONE, TimeZone.getDefault().getID()), //
   DATE_FORMATS("dateFormats", ConfigurationType.STRING, "MM/dd/yyyy;dd/MM/yyyy;dd.MM.yyyy;yyyy-MM-dd"), //
@@ -86,7 +87,7 @@ public enum ConfigurationParam
     this(key, type, null);
   }
 
-  ConfigurationParam(final String key, final ConfigurationType type, String defaultStringValue)
+  ConfigurationParam(final String key, final ConfigurationType type, final String defaultStringValue)
   {
     this.key = key;
     this.type = type;
