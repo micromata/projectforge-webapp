@@ -46,6 +46,7 @@ public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilte
   @SpringBean(name = "employeeSalaryDao")
   private EmployeeSalaryDao employeeSalaryDao;
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
@@ -56,8 +57,17 @@ public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilte
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true);
       // DropDownChoice years
       final YearListCoiceRenderer yearListChoiceRenderer = new YearListCoiceRenderer(employeeSalaryDao.getYears(), true);
-      final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(
-          this, "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer);
+      final DropDownChoice<Integer> yearChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(this,
+          "year"), yearListChoiceRenderer.getYears(), yearListChoiceRenderer) {
+        /**
+         * @see org.apache.wicket.markup.html.form.DropDownChoice#wantOnSelectionChangedNotifications()
+         */
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
+      };
       yearChoice.setNullValid(false);
       fs.add(yearChoice);
       fs.setLabelFor(yearChoice);
@@ -66,8 +76,17 @@ public class EmployeeSalaryListForm extends AbstractListForm<EmployeeSalaryFilte
       for (int i = 0; i <= 11; i++) {
         monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
       }
-      final DropDownChoice<Integer> monthChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(
-          this, "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer);
+      final DropDownChoice<Integer> monthChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(this,
+          "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer) {
+        /**
+         * @see org.apache.wicket.markup.html.form.DropDownChoice#wantOnSelectionChangedNotifications()
+         */
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
+      };
       monthChoice.setNullValid(true);
       monthChoice.setRequired(false);
       fs.add(monthChoice);
