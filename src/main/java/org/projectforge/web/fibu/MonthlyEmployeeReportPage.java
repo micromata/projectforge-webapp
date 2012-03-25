@@ -112,6 +112,7 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
   public MonthlyEmployeeReportPage(final PageParameters parameters)
   {
     super(parameters);
+    final boolean costConfigured = Configuration.getInstance().isCostConfigured();
     form = new MonthlyEmployeeReportForm(this);
     if (form.filter == null) {
       form.filter = (MonthlyEmployeeReportFilter) getUserPrefEntry(MonthlyEmployeeReportFilter.class, USER_PREF_KEY_FILTER);
@@ -138,7 +139,8 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
     final RepeatingView repeater = new RepeatingView("fields");
     body.add(repeater);
     gridBuilder = form.newGridBuilder(repeater);
-    gridBuilder.newGrid16().newColumnsPanel().newColumnPanel(DivType.COL_50);
+    final DivType colType = costConfigured == true ? DivType.COL_33 : DivType.COL_50;
+    gridBuilder.newGrid16().newColumnsPanel().newColumnPanel(colType);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.user")).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
@@ -153,33 +155,8 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
         }
       }));
     }
-    gridBuilder.newColumnPanel(DivType.COL_50);
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("calendar.month")).setNoLabelFor();
-      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
-        /**
-         * @see org.apache.wicket.model.Model#getObject()
-         */
-        @Override
-        public String getObject()
-        {
-          return form.filter.getYear() + "-" + form.filter.getFormattedMonth();
-        }
-      }));
-    }
-    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.workingDays")).setNoLabelFor();
-      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
-        @Override
-        public String getObject()
-        {
-          return report != null ? String.valueOf(report.getNumberOfWorkingDays()) : "";
-        };
-      }));
-    }
-    if (Configuration.getInstance().isCostConfigured() == true) {
-      gridBuilder.newColumnPanel(DivType.COL_50);
+    if (costConfigured == true) {
+      gridBuilder.newColumnPanel(colType);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost1")).setNoLabelFor();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         /**
@@ -194,6 +171,17 @@ public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implemen
           final Kost1DO kost1 = kost1Dao.internalGetById(report.getKost1Id());
           return kost1 != null ? KostFormatter.format(kost1) : "";
         }
+      }));
+    }
+    gridBuilder.newColumnPanel(colType);
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.workingDays")).setNoLabelFor();
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return report != null ? String.valueOf(report.getNumberOfWorkingDays()) : "";
+        };
       }));
     }
     gridBuilder.newBlockPanel();
