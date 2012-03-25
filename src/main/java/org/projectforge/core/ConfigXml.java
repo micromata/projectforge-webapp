@@ -440,7 +440,7 @@ public class ConfigXml
   /**
    * Tries to get the given filename from the application's resource dir (file system). If not exist, the input stream will be taken as
    * resource input stream.
-   * @param filename Filename (can include relative path settings): "test.xsl", "/fo-styles/doit.xsl".
+   * @param filename Filename (can include relative path settings): "test.xsl", "fo-styles/doit.xsl".
    * @return Object[2]: First value is the InputStream and second value is the url in external form.
    */
   public Object[] getInputStream(final String filename)
@@ -464,8 +464,8 @@ public class ConfigXml
       }
     }
     if (is == null) {
-      final ClassLoader cLoader = ConfigXml.class.getClassLoader();
-      final URL url = ConfigXml.class.getClassLoader().getResource(filename);
+      final ClassLoader cLoader = getClass().getClassLoader();
+      final URL url = cLoader.getResource(filename);
       if (url != null) {
         path = url.toExternalForm();
       }
@@ -483,7 +483,7 @@ public class ConfigXml
   /**
    * Tries to get the given filename from the application's resource dir (file system). If not exist, the content will be taken as resource
    * input stream. Calls getInputStream(filename) and converts input stream to String.
-   * @param filename Filename (can include relative path settings): "test.xsl", "/fo-styles/doit.xsl".
+   * @param filename Filename (can include relative path settings): "test.xsl", "fo-styles/doit.xsl".
    * @return Object[2]: First value is the content as string and second value is the url in external form.
    * @see #getInputStream(String)
    */
