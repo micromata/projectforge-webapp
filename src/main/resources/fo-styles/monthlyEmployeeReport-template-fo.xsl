@@ -11,6 +11,7 @@
   <xsl:param name="baseDir" select="''" />
   <xsl:param name="appId" select="''" />
   <xsl:param name="appVersion" select="''" />
+  <xsl:param name="organization" select="''" />
   
   <xsl:template match="/template-fo">
     <xsl:call-template name="standard-header" />
