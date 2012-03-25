@@ -146,7 +146,24 @@ public class UserFilter implements Filter
   public static void login(final HttpServletRequest request, final PFUserDO user)
   {
     final HttpSession session = request.getSession();
-    session.setAttribute(SESSION_KEY_USER, user);
+    final PFUserDO storedUser = new PFUserDO();
+    copyUser(user, storedUser);
+    session.setAttribute(SESSION_KEY_USER, storedUser);
+  }
+
+  public static void updateUser(final HttpServletRequest request, final PFUserDO user)
+  {
+    final PFUserDO origUser = getUser(request);
+    if (origUser.getId().equals(user.getId()) == false) {
+      log.error("**** Intruser? User id of the session user is different to the id of the given user!");
+      return;
+    }
+    copyUser(user, origUser);
+  }
+
+  private static void copyUser(final PFUserDO srcUser, final PFUserDO destUser)
+  {
+    destUser.copyValuesFrom(srcUser, "password", "stayLoggedInKey", "rights");
   }
 
   public static PFUserDO getUser(final HttpServletRequest request)
