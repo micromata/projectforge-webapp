@@ -1,69 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 </head>
 
 <body>
-<wicket:extend>
-  <div wicket:id="feedback">[Validation errors]</div>
-
-  <form wicket:id="form">
-  <h3><wicket:message key="upload" /></h3>
-  <table class="oldform">
-    <tr>
-      <th><label for="uploadCell"><wicket:message key="fibu.datev.upload" /></label></th>
-      <td id="uploadCell"><input wicket:id="fileInput" id="upload" type="file" /></td>
-    </tr>
-    <tr>
-      <th>&nbsp;</th>
-      <td><wicket:container wicket:id="filterType">
-        <wicket:container wicket:id="repeater">[radio buttons: all, modified and faulty]</wicket:container>
-      </wicket:container></td>
-    </tr>
-    <tr>
-      <td colspan="2" class="buttons"><span wicket:id="importAccountList">[import account list]</span><span wicket:id="importAccountingRecords">[accounting
-      records]</span><span wicket:id="clearStorage">[clear storage]</span></td>
-    </tr>
-  </table>
-
-  <div wicket:id="storage">
-  <h1 wicket:id="storageHeading">[Import storage filename]</h1>
-  <div id="infolayer">
-  <table wicket:id="errorPropertiesTable" class="dataview" cellspacing="0">
-    <tbody>
-      <tr>
-        <th>Key</th>
-        <th>Error values</th>
-      </tr>
-      <tr wicket:id="errorProperties">
-        <td wicket:id="propertyKey">[${prop.key}]</td>
-        <td><span wicket:id="propertyItems">[forEach ${prop.value}: ${val}, ...] </span></td>
-      </tr>
-    </tbody>
-  </table>
-  <pre wicket:id="bwa">[${actionBean.bwa}]</pre></div>
-  <wicket:container wicket:id="sheetRepeater">
-    <h3 wicket:id="sheetName">[Sheet_: ${sheet.name} ...]</h3>
-    <a wicket:id="toggle"><img src="../images/zoom_in.png" wicket:id="zoomInImage" /><img src="../images/zoom_out.png" wicket:id="zoomOutImage" /></a>
-    <span wicket:id="statistics">[Total=...]</span>
-    <wicket:container wicket:id="actionLinkRepeater"> | <a wicket:id="actionLink"><span wicket:id="label">[reconcile,
-      commit, select all, deselect all, show error summory, show BWA]</span></a>
-    </wicket:container>
-    <table class="dataview" wicket:id="sheetTable" cellspacing="0">
-      <tbody>
-        <tr>
-          <th>&nbsp;</th>
-          <th wicket:id="headColRepeater"></th>
-        </tr>
-        <tr wicket:id="rowRepeater">
-          <td wicket:id="firstCell"><input type="checkbox" wicket:id="selectItem" /> <img src="images/add.png" wicket:id="icon" /></td>
-          <td wicket:id="cellRepeater">[cells]</td>
-        </tr>
-      </tbody>
-    </table>
-  </wicket:container></div>
-  </form>
-</wicket:extend>
+  <wicket:extend>
+    <script type="text/javascript">
+					function showBusinessAssessment() {
+						$("#businessAssessment").show('fast');
+						$("#showBusinessAssessment").hide();
+						$("#hideBusinessAssessment").show();
+					}
+					function hideBusinessAssessment() {
+						$("#businessAssessment").hide('fast');
+						$("#showBusinessAssessment").show();
+						$("#hideBusinessAssessment").hide();
+					}
+				</script>
+  </wicket:extend>
 </body>
 </html>
