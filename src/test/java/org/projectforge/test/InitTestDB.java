@@ -293,10 +293,23 @@ public class InitTestDB
     user//
     .addRight(new UserRightDO(UserRightId.FIBU_AUSGANGSRECHNUNGEN, UserRightValue.READWRITE)) //
     .addRight(new UserRightDO(UserRightId.FIBU_EINGANGSRECHNUNGEN, UserRightValue.READWRITE)) //
+    .addRight(new UserRightDO(UserRightId.FIBU_EMPLOYEE_SALARY, UserRightValue.READWRITE)) //
     .addRight(new UserRightDO(UserRightId.FIBU_COST_UNIT, UserRightValue.READWRITE)) //
     .addRight(new UserRightDO(UserRightId.PM_ORDER_BOOK, UserRightValue.READWRITE)) //
     .addRight(new UserRightDO(UserRightId.PM_PROJECT, UserRightValue.READWRITE)) //
     .addRight(new UserRightDO(UserRightId.PM_HR_PLANNING, UserRightValue.READWRITE)); //
+    addUser(user);
+    user = new PFUserDO();
+    user.setUsername(TestBase.TEST_FULL_ACCESS_USER);
+    user//
+    .addRight(new UserRightDO(UserRightId.FIBU_AUSGANGSRECHNUNGEN, UserRightValue.READWRITE)) //
+    .addRight(new UserRightDO(UserRightId.FIBU_EINGANGSRECHNUNGEN, UserRightValue.READWRITE)) //
+    .addRight(new UserRightDO(UserRightId.FIBU_EMPLOYEE_SALARY, UserRightValue.READWRITE)) //
+    .addRight(new UserRightDO(UserRightId.FIBU_COST_UNIT, UserRightValue.READWRITE)) //
+    .addRight(new UserRightDO(UserRightId.PM_ORDER_BOOK, UserRightValue.READWRITE)) //
+    .addRight(new UserRightDO(UserRightId.PM_PROJECT, UserRightValue.READWRITE)) //
+    .addRight(new UserRightDO(UserRightId.PM_HR_PLANNING, UserRightValue.READWRITE)); //
+    user.setPassword(userDao.encryptPassword(TestBase.TEST_FULL_ACCESS_USER_PASSWORD));
     addUser(user);
     addUser(TestBase.TEST_USER);
     addUser(TestBase.TEST_USER2);
@@ -314,9 +327,9 @@ public class InitTestDB
 
   private void initGroups()
   {
-    addGroup(TestBase.ADMIN_GROUP, new String[] { "PFAdmin", TestBase.TEST_ADMIN_USER});
-    addGroup(TestBase.FINANCE_GROUP, new String[] { TestBase.TEST_FINANCE_USER});
-    addGroup(TestBase.CONTROLLING_GROUP, new String[] { TestBase.TEST_CONTROLLING_USER});
+    addGroup(TestBase.ADMIN_GROUP, new String[] { "PFAdmin", TestBase.TEST_ADMIN_USER, TestBase.TEST_FULL_ACCESS_USER});
+    addGroup(TestBase.FINANCE_GROUP, new String[] { TestBase.TEST_FINANCE_USER, TestBase.TEST_FULL_ACCESS_USER});
+    addGroup(TestBase.CONTROLLING_GROUP, new String[] { TestBase.TEST_CONTROLLING_USER, TestBase.TEST_FULL_ACCESS_USER});
     addGroup(TestBase.ORGA_GROUP);
     addGroup(TestBase.PROJECT_MANAGER, new String[] { TestBase.TEST_PROJECT_MANAGER_USER});
     addGroup(TestBase.PROJECT_ASSISTANT, new String[] { TestBase.TEST_PROJECT_ASSISTANT_USER});
