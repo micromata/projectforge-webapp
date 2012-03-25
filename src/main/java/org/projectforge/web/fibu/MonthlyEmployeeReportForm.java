@@ -27,7 +27,6 @@ import java.util.ArrayList;
 
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -36,10 +35,12 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.user.UserSelectPanel;
-import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
-public class MonthlyEmployeeReportForm extends AbstractForm<MonthlyEmployeeReportFilter, MonthlyEmployeeReportPage>
+public class MonthlyEmployeeReportForm extends AbstractStandardForm<MonthlyEmployeeReportFilter, MonthlyEmployeeReportPage>
 {
   private static final long serialVersionUID = 8746545908106124484L;
 
@@ -48,7 +49,7 @@ public class MonthlyEmployeeReportForm extends AbstractForm<MonthlyEmployeeRepor
 
   protected MonthlyEmployeeReportFilter filter;
 
-  private DropDownChoice<Integer> yearChoice, monthChoice;
+  private DropDownChoice<Integer> yearChoice;
 
   public MonthlyEmployeeReportForm(final MonthlyEmployeeReportPage parentPage)
   {
@@ -60,53 +61,56 @@ public class MonthlyEmployeeReportForm extends AbstractForm<MonthlyEmployeeRepor
   protected void init()
   {
     super.init();
-    final UserSelectPanel userSelectPanel = new UserSelectPanel("selectUser", new PropertyModel<PFUserDO>(filter, "user"), parentPage,
-        "user");
-    userSelectPanel.setRequired(true);
-    add(userSelectPanel);
-    userSelectPanel.init();
+    gridBuilder.newGrid16();
     {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.user"));
+      final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(filter, "user"), parentPage,
+          "user");
+      userSelectPanel.setRequired(true);
+      fs.add(userSelectPanel);
+      userSelectPanel.init();
+    }
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("calendar.month"), true);
+      yearChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(filter, "year"),
+          new ArrayList<Integer>()) {
+        /**
+         * @see org.apache.wicket.markup.html.form.DropDownChoice#wantOnSelectionChangedNotifications()
+         */
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
+      };
+      yearChoice.setNullValid(false).setRequired(true);
+      fs.add(yearChoice);
       // DropDownChoice months
       final LabelValueChoiceRenderer<Integer> monthChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
       for (int i = 0; i <= 11; i++) {
         monthChoiceRenderer.addValue(i, StringHelper.format2DigitNumber(i + 1));
       }
-      monthChoice = new DropDownChoice<Integer>("month", new PropertyModel<Integer>(filter, "month"), monthChoiceRenderer.getValues(),
-          monthChoiceRenderer);
+      final DropDownChoice<Integer> monthChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(filter,
+          "month"), monthChoiceRenderer.getValues(), monthChoiceRenderer) {
+        /**
+         * @see org.apache.wicket.markup.html.form.DropDownChoice#wantOnSelectionChangedNotifications()
+         */
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
+      };
       monthChoice.setNullValid(false).setRequired(true);
-      add(monthChoice);
+      fs.add(monthChoice);
     }
-    yearChoice = new DropDownChoice<Integer>("year", new PropertyModel<Integer>(filter, "year"), new ArrayList<Integer>());
-    yearChoice.setNullValid(false).setRequired(true);
-    add(yearChoice);
-
-    final RepeatingView actionButtonsView = new RepeatingView("actionButtons");
-    add(actionButtonsView.setRenderBodyOnly(true));
-    final Button resetButton = new Button("button", new Model<String>(getString("reset"))) {
-      @Override
-      public final void onSubmit()
-      {
-        filter.reset();
-        yearChoice.modelChanged();
-        monthChoice.modelChanged();
-      }
-    };
-    //    resetButton.add(WebConstants.BUTTON_CLASS_RESET);
-    //    resetButton.setDefaultFormProcessing(false);
-    //    final SingleButtonPanel resetButtonPanel = new SingleButtonPanel(actionButtonsView.newChildId(), resetButton);
-    //    actionButtonsView.add(resetButtonPanel);
-    //    final Button exportAsPdfButton = new Button("button", new Model<String>(getString("exportAsPdf"))) {
-    //      @Override
-    //      public final void onSubmit()
-    //      {
-    //        parentPage.exportAsPdf();
-    //      }
-    //    };
-    //    actionButtonsView.add(new SingleButtonPanel(actionButtonsView.newChildId(), exportAsPdfButton));
-    //    final Button showButton = new Button("button", new Model<String>(getString("show")));
-    //    showButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    //    setDefaultButton(showButton);
-    //    actionButtonsView.add(new SingleButtonPanel(actionButtonsView.newChildId(), showButton));
+    {
+      final Button showButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("show"));
+      final SingleButtonPanel showButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), showButton, getString("show"),
+          SingleButtonPanel.DEFAULT_SUBMIT);
+      actionButtons.add(showButtonPanel);
+      setDefaultButton(showButton);
+    }
   }
 
   @Override

@@ -32,12 +32,14 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.core.Configuration;
 import org.projectforge.fibu.KostFormatter;
 import org.projectforge.fibu.KundeDO;
 import org.projectforge.fibu.MonthlyEmployeeReport;
@@ -59,12 +61,20 @@ import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.common.OutputType;
 import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.timesheet.TimesheetListPage;
-import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.AbstractStandardFormPage;
 import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.GridBuilder;
+import org.projectforge.web.wicket.flowlayout.TextStyle;
 
-public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements ISelectCallerPage
+public class MonthlyEmployeeReportPage extends AbstractStandardFormPage implements ISelectCallerPage
 {
+  private static final long serialVersionUID = -136398850032685654L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MonthlyEmployeeReportPage.class);
 
   private static final String USER_PREF_KEY_FILTER = "monthlyEmployeeReportFilter";
@@ -76,7 +86,7 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
 
   private MonthlyEmployeeReport report;
 
-  private WebMarkupContainer reportContainer;
+  private WebMarkupContainer table;
 
   @SpringBean(name = "monthlyEmployeeReportDao")
   private MonthlyEmployeeReportDao monthlyEmployeeReportDao;
@@ -96,10 +106,12 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
+  private final GridBuilder gridBuilder;
+
+  @SuppressWarnings("serial")
   public MonthlyEmployeeReportPage(final PageParameters parameters)
   {
     super(parameters);
-    body.add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     form = new MonthlyEmployeeReportForm(this);
     if (form.filter == null) {
       form.filter = (MonthlyEmployeeReportFilter) getUserPrefEntry(MonthlyEmployeeReportFilter.class, USER_PREF_KEY_FILTER);
@@ -113,19 +125,113 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
     }
     body.add(form);
     form.init();
+    {
+      final ContentMenuEntryPanel exportAsPdf = new ContentMenuEntryPanel(getNewContentMenuChildId(), new SubmitLink("link", form) {
+        @Override
+        public void onSubmit()
+        {
+          exportAsPdf();
+        };
+      }, getString("exportAsPdf"));
+      addContentMenuEntry(exportAsPdf);
+    }
+    final RepeatingView repeater = new RepeatingView("fields");
+    body.add(repeater);
+    gridBuilder = form.newGridBuilder(repeater);
+    gridBuilder.newGrid16().newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.user")).setNoLabelFor();
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        /**
+         * @see org.apache.wicket.model.Model#getObject()
+         */
+        @Override
+        public String getObject()
+        {
+          final PFUserDO user = form.filter.getUser();
+          return user != null ? user.getFullname() : "";
+        }
+      }));
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("calendar.month")).setNoLabelFor();
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        /**
+         * @see org.apache.wicket.model.Model#getObject()
+         */
+        @Override
+        public String getObject()
+        {
+          return form.filter.getYear() + "-" + form.filter.getFormattedMonth();
+        }
+      }));
+    }
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.common.workingDays")).setNoLabelFor();
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return report != null ? String.valueOf(report.getNumberOfWorkingDays()) : "";
+        };
+      }));
+    }
+    if (Configuration.getInstance().isCostConfigured() == true) {
+      gridBuilder.newColumnPanel(DivType.COL_50);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost1")).setNoLabelFor();
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        /**
+         * @see org.apache.wicket.model.Model#getObject()
+         */
+        @Override
+        public String getObject()
+        {
+          if (report == null) {
+            return "";
+          }
+          final Kost1DO kost1 = kost1Dao.internalGetById(report.getKost1Id());
+          return kost1 != null ? KostFormatter.format(kost1) : "";
+        }
+      }));
+    }
+    gridBuilder.newBlockPanel();
+    {
+      final FieldsetPanel fs = new FieldsetPanel(gridBuilder.getPanel(), getString("fibu.common.workingDays"),
+          getString("fibu.monthlyEmployeeReport.withoutTimesheets")) {
+        /**
+         * @see org.apache.wicket.Component#isVisible()
+         */
+        @Override
+        public boolean isVisible()
+        {
+          return report != null && StringUtils.isNotBlank(report.getFormattedUnbookedDays());
+        }
+      }.setNoLabelFor();
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+        /**
+         * @see org.apache.wicket.model.Model#getObject()
+         */
+        @Override
+        public String getObject()
+        {
+          return report.getFormattedUnbookedDays();
+        }
+      }, TextStyle.RED));
+    }
   }
 
   @Override
   public void onBeforeRender()
   {
-    if (reportContainer != null) {
-      body.remove(reportContainer);
+    if (table != null) {
+      body.remove(table);
     }
-    reportContainer = new WebMarkupContainer("report");
-    body.add(reportContainer.setRenderBodyOnly(true));
+    body.add(table = new WebMarkupContainer("table"));
     report = monthlyEmployeeReportDao.getReport(form.filter.getYear(), form.filter.getMonth(), form.filter.getUser());
     if (report == null) {
-      reportContainer.setVisible(false);
+      table.setVisible(false);
     } else {
       addReport();
     }
@@ -134,25 +240,8 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
 
   private void addReport()
   {
-    reportContainer.add(new Label("user", form.filter.getUser().getFullname()));
-    reportContainer.add(new Label("month", form.filter.getYear() + "-" + form.filter.getFormattedMonth()));
-    final String unbookedDays = report.getFormattedUnbookedDays();
-    if (StringUtils.isBlank(unbookedDays) == true) {
-      reportContainer.add(new WebMarkupContainer("unbookedWorkingDaysRow").setVisible(false));
-    } else {
-      final WebMarkupContainer unbookedWorkingDaysRow = new WebMarkupContainer("unbookedWorkingDaysRow");
-      reportContainer.add(unbookedWorkingDaysRow);
-      unbookedWorkingDaysRow.add(new Label("unbookedWorkingDays", unbookedDays));
-    }
-    reportContainer.add(new Label("numberOfWorkingDays", String.valueOf(report.getNumberOfWorkingDays())));
-    final Kost1DO kost1 = kost1Dao.internalGetById(report.getKost1Id());
-    if (kost1 != null) {
-      reportContainer.add(new Label("kost1", KostFormatter.format(kost1)));
-    } else {
-      reportContainer.add(new Label("kost1", "[invisible]").setVisible(false));
-    }
     final RepeatingView headcolRepeater = new RepeatingView("headcolRepeater");
-    reportContainer.add(headcolRepeater);
+    table.add(headcolRepeater);
     if (MapUtils.isEmpty(report.getKost2Rows()) == false) {
       headcolRepeater.add(new Label(headcolRepeater.newChildId(), getString("fibu.kost2")));
       headcolRepeater.add(new Label(headcolRepeater.newChildId(), getString("fibu.kunde")));
@@ -163,7 +252,7 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
       headcolRepeater.add(new Label(headcolRepeater.newChildId(), getString("task")).add(AttributeModifier.replace("colspan", "4")));
     }
     final RepeatingView headcolWeekRepeater = new RepeatingView("headcolWeekRepeater");
-    reportContainer.add(headcolWeekRepeater);
+    table.add(headcolWeekRepeater);
     for (final MonthlyEmployeeReportWeek week : report.getWeeks()) {
       headcolWeekRepeater.add(new Label(headcolWeekRepeater.newChildId(), week.getFormattedFromDayOfMonth()
           + ".-"
@@ -171,7 +260,7 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
           + "."));
     }
     final RepeatingView rowRepeater = new RepeatingView("rowRepeater");
-    reportContainer.add(rowRepeater);
+    table.add(rowRepeater);
     int rowCounter = 0;
     for (final Map.Entry<String, Kost2Row> rowEntry : report.getKost2Rows().entrySet()) {
       final WebMarkupContainer row = new WebMarkupContainer(rowRepeater.newChildId());
@@ -298,8 +387,8 @@ public class MonthlyEmployeeReportPage extends AbstractSecuredPage implements IS
     final String filename = buf.toString();
 
     // get the sheets of the given format
-    final String styleSheet = "/fo-styles/monthlyEmployeeReport-template-fo.xsl";
-    final String xmlData = "/fo-styles/monthlyEmployeeReport2pdf.xml";
+    final String styleSheet = "fo-styles/monthlyEmployeeReport-template-fo.xsl";
+    final String xmlData = "fo-styles/monthlyEmployeeReport2pdf.xml";
 
     report = monthlyEmployeeReportDao.getReport(form.filter.getYear(), form.filter.getMonth(), employee);
     final Map<String, Object> data = new HashMap<String, Object>();
