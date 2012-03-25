@@ -70,11 +70,11 @@ public class AddressViewPage extends AbstractSecuredPage
     super(parameters);
     log.warn("**** WICKET 1.5 migration: add bookmarkable parameters");
     this.returnToPage = returnToPage;
-    if (parameters.get(AbstractEditPage.PARAMETER_KEY_ID) != null) {
+    if (parameters.get(AbstractEditPage.PARAMETER_KEY_ID).isEmpty() == false) {
       final Integer addressId = parameters.get(AbstractEditPage.PARAMETER_KEY_ID).toInteger();
       address = addressDao.getById(addressId);
     }
-    if (address == null) {
+    if (address == null && returnToPage != null) {
       setResponsePage(returnToPage);
       return;
     }
