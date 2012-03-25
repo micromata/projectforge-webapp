@@ -164,7 +164,7 @@ public class TaskDao extends BaseDao<TaskDO>
     }
     @SuppressWarnings("unchecked")
     final List<Object[]> result = getHibernateTemplate().find(
-    "select startTime, stopTime, task.id from TimesheetDO where deleted=false order by task.id");
+        "select startTime, stopTime, task.id from TimesheetDO where deleted=false order by task.id");
     final List<Object[]> list = new ArrayList<Object[]>();
     if (CollectionUtils.isEmpty(result) == false) {
       Integer currentTaskId = null;
@@ -205,8 +205,8 @@ public class TaskDao extends BaseDao<TaskDO>
       @SuppressWarnings("unchecked")
       final List<Object> list = getHibernateTemplate().find(
           "select "
-          + DatabaseSupport.instance().getIntervalInSeconds("startTime", "stopTime")
-          + " from TimesheetDO where task.id = ? and deleted=false", taskId);
+              + DatabaseSupport.instance().getIntervalInSeconds("startTime", "stopTime")
+              + " from TimesheetDO where task.id = ? and deleted=false", taskId);
       if (list.size() == 0) {
         return new Long(0);
       }
@@ -458,7 +458,11 @@ public class TaskDao extends BaseDao<TaskDO>
     // Checks if the task is orphan.
     final TaskNode parent = taskTree.getTaskNodeById(obj.getParentTaskId());
     if (parent == null) {
-      throw new UserException(I18N_KEY_ERROR_PARENT_TASK_NOT_FOUND);
+      if (taskTree.isRootNode(obj) == true && obj.isDeleted() == true) {
+        // Oups, the user has deleted the root task!
+      } else {
+        throw new UserException(I18N_KEY_ERROR_PARENT_TASK_NOT_FOUND);
+      }
     }
     if (accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.ADMIN_GROUP, ProjectForgeGroup.FINANCE_GROUP) == true) {
       return true;
@@ -513,6 +517,18 @@ public class TaskDao extends BaseDao<TaskDO>
     if (node.isParentOf(parent) == true) {
       // Cyclic reference because task is ancestor of itself.
       throw new UserException(TaskDao.I18N_KEY_ERROR_CYCLIC_REFERENCE);
+    }
+  }
+
+  /**
+   * Checks only root task (can't be deleted).
+   * @see org.projectforge.core.BaseDao#onDelete(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void onDelete(final TaskDO obj)
+  {
+    if (taskTree.isRootNode(obj) == true) {
+      throw new UserException("task.error.couldNotDeleteRootTask");
     }
   }
 
