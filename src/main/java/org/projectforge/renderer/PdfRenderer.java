@@ -40,6 +40,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
@@ -48,6 +49,9 @@ import org.apache.fop.apps.MimeConstants;
 import org.apache.log4j.Logger;
 import org.projectforge.AppVersion;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigurationParam;
+import org.projectforge.core.InternalErrorException;
 import org.projectforge.scripting.GroovyEngine;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
@@ -76,7 +80,7 @@ public class PdfRenderer
   /**
    * Relative to application's resource dir.
    */
-  public void setFontResourceDir(String fontResourceDir)
+  public void setFontResourceDir(final String fontResourceDir)
   {
     this.fontResourceDir = fontResourceDir;
   }
@@ -84,7 +88,7 @@ public class PdfRenderer
   private String getFontResourcePath()
   {
     if (fontResourcePath == null) {
-      File dir = new File(configXml.getResourcePath(), fontResourceDir);
+      final File dir = new File(configXml.getResourcePath(), fontResourceDir);
       if (dir.exists() == false) {
         log.error("Application's font dir does not exist: " + dir.getAbsolutePath());
       }
@@ -113,6 +117,7 @@ public class PdfRenderer
     data.put("baseDir", configXml.getResourcePath());
     data.put("appId", AppVersion.APP_ID);
     data.put("appVersion", AppVersion.NUMBER);
+    data.put("organization", StringUtils.defaultString(Configuration.getInstance().getStringValue(ConfigurationParam.ORGANIZATION), AppVersion.APP_ID));
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
     log.info("stylesheet="
         + stylesheet
@@ -131,7 +136,7 @@ public class PdfRenderer
 
     try {
       fopFactory.getFontManager().setFontBaseURL(getFontResourcePath());
-    } catch (MalformedURLException ex) {
+    } catch (final MalformedURLException ex) {
       log.error(ex.getMessage(), ex);
     }
     /*
@@ -141,7 +146,7 @@ public class PdfRenderer
     final FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
     try {
       foUserAgent.getFactory().getFontManager().setFontBaseURL(getFontResourcePath());
-    } catch (MalformedURLException ex) {
+    } catch (final MalformedURLException ex) {
       log.error(ex.getMessage(), ex);
     }
     // configure foUserAgent as desired
@@ -156,6 +161,10 @@ public class PdfRenderer
       final InputStream xsltInputStream = (InputStream) result[0];
       final StreamSource xltStreamSource = new StreamSource(xsltInputStream);
       final String url = (String) result[1];
+      if (url == null) {
+        log.error("Url of xsl resource is null.");
+        throw new InternalErrorException();
+      }
       xltStreamSource.setSystemId(url);
 
       final Transformer transformer = factory.newTransformer(xltStreamSource);
@@ -180,19 +189,19 @@ public class PdfRenderer
 
       // Start XSLT transformation and FOP processing
       transformer.transform(src, res);
-    } catch (FOPException ex) {
+    } catch (final FOPException ex) {
       log.error(ex.getMessage(), ex);
       throw new RuntimeException(ex);
-    } catch (TransformerConfigurationException ex) {
+    } catch (final TransformerConfigurationException ex) {
       log.error(ex.getMessage(), ex);
       throw new RuntimeException(ex);
-    } catch (TransformerException ex) {
+    } catch (final TransformerException ex) {
       log.error(ex.getMessage(), ex);
       throw new RuntimeException(ex);
     } finally {
       try {
         baos.close();
-      } catch (IOException ex) {
+      } catch (final IOException ex) {
         log.error(ex.getMessage(), ex);
         throw new RuntimeException(ex);
       }
