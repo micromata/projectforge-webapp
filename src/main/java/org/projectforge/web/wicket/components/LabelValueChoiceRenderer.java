@@ -90,6 +90,9 @@ public class LabelValueChoiceRenderer<T> implements IChoiceRenderer<T>
   public LabelValueChoiceRenderer(final List<T> values)
   {
     this();
+    if (values == null) {
+      return;
+    }
     for (final Object value : values) {
       @SuppressWarnings("unchecked")
       final ILabelValueBean<String, T> labelValue = (ILabelValueBean<String, T>) value;
