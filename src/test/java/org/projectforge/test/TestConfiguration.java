@@ -125,10 +125,9 @@ public class TestConfiguration
     return this.ctx;
   }
 
-  @SuppressWarnings("unchecked")
   public <T> T getBean(final String name, final Class<T> requiredType)
   {
-    final T obj = (T) ctx.getBean(name, requiredType);
+    final T obj = ctx.getBean(name, requiredType);
     return obj;
   }
 
@@ -176,7 +175,7 @@ public class TestConfiguration
         ctx = new ClassPathXmlApplicationContext(contextFiles);
         ctx.getBeanFactory().autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
 
-        final PropertyDataSource ds = (PropertyDataSource) ctx.getBean("dataSource", PropertyDataSource.class);
+        final PropertyDataSource ds = ctx.getBean("dataSource", PropertyDataSource.class);
         this.databaseUrl = ds.getUrl();
         final JdbcTemplate jdbc = new JdbcTemplate(ds);
         try {
@@ -194,7 +193,7 @@ public class TestConfiguration
       // Get a new HibernateTemplate each time
       ctx.getBeanFactory().autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
     }
-    final Configuration cfg = (Configuration) ctx.getBean("configuration", Configuration.class);
+    final Configuration cfg = ctx.getBean("configuration", Configuration.class);
     cfg.setBeanFactory(ctx.getBeanFactory()); // Bean factory need to be set.
   }
 }
