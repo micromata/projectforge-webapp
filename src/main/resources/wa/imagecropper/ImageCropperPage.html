@@ -84,10 +84,8 @@ var fileFormat ="png";
 </head>
 
 <body>
-<wicket:extend>
-  <script language="JavaScript" type="text/javascript">
-<!--
-// -----------------------------------------------------------------------------
+  <wicket:extend>
+    <script language="JavaScript" type="text/javascript">// -----------------------------------------------------------------------------
 // Globals
 // Major version of Flash required
 var requiredMajorVersion = 9;
@@ -151,38 +149,38 @@ if ( hasProductInstall && !hasRequestedVersion ) {
     + '<a href=http://www.adobe.com/go/getflash/>Get Flash</a>';
     document.write(alternateContent);  // insert non-flash content
   }
-// -->
 </script>
-  <h1 style="padding-left: 5px;">Image Cropper</h1>
-  <p style="width: 640; padding-left: 5px;">Der Image Cropper kann aktuell gut genutzt werden, um Bilder zu beschneiden, schnell zu modifizieren
-  und insbesondere um &uuml;ber den <b>Whiteboard-Filter</b> Strichgrafiken von Whiteboard-Fotos anzufertigen (bisher s/w). <br />
-  Er ist einfach parametrisierbar und k&ouml;nnte auch in anderen Projekten leicht eingesetzt werden. <br />
-  Als n&auml;chstes soll er in ProjectForge eingesetzt werden, um Bilder zu Adressen/Kontakten im System zu hinterlegen. <br />
-  <br />
-  <b>Der Image Cropper, eine echte Alternative, powered by Reto.</b> <br />
-  </p>
-  <h3 style="padding-left: 5px;">Features</h3>
-  <ul>
-    <li>Unterst&uuml;tzt vorgegebenes H&ouml;henbreitenverh&auml;ltnis, wenn festgelegt.</li>
-    <li>Bilingual (englisch/deutsch)</li>
-    <li>Whiteboardfilter als Filterbeispiel zum Erzeugen von Strichzeichnungen</li>
-    <li>Radiergummi bei Whiteboardfilter</li>
-    <li>Beschneiden</li>
-    <li>Skalieren</li>
-    <li>Unterst&uuml;tzte Grafikformate: png, jpg und gif.</li>
-    <li>Rotation, Farb&auml;nderungen.</li>
-    <li>Leicht erweiterbar um Filter sowie Bildbearbeitungsfunktionen</li>
-    <li>Adobe Flex basiert. Einbindung in Stripes, Struts, JSP und Wicket einfach.</li>
-  </ul>
-  <p style="width: 640; padding-left: 5px; font-size: 80%;">Datenschutz: Es werden die Bilder auf dem Server nur temporär im Rahmen der Funktion
-  von ImageCropper gespeichert.</p>
-  <noscript>
-  <table width="100%" height="100%">
-    <tr align="center" valign="middle">
-      <td>Please enable JavaScript in your Browser to see this content!</td>
-    </tr>
-  </table>
-  </noscript>
-</wicket:extend>
+    <div class="grid_16">
+      <h1 style="padding-left: 5px;">Image Cropper</h1>
+      <p style="width: 640; padding-left: 5px;">
+        Der Image Cropper kann aktuell gut genutzt werden, um Bilder zu beschneiden, schnell zu modifizieren und insbesondere um &uuml;ber den <b>Whiteboard-Filter</b>
+        Strichgrafiken von Whiteboard-Fotos anzufertigen (bisher s/w). <br /> Er ist einfach parametrisierbar und k&ouml;nnte auch in anderen
+        Projekten leicht eingesetzt werden. <br /> Als n&auml;chstes soll er in ProjectForge eingesetzt werden, um Bilder zu Adressen/Kontakten im
+        System zu hinterlegen. <br /> <br /> <b>Der Image Cropper, eine echte Alternative, powered by Reto.</b> <br />
+      </p>
+      <h3 style="padding-left: 5px;">Features</h3>
+      <ul>
+        <li>Unterst&uuml;tzt vorgegebenes H&ouml;henbreitenverh&auml;ltnis, wenn festgelegt.</li>
+        <li>Bilingual (englisch/deutsch)</li>
+        <li>Whiteboardfilter als Filterbeispiel zum Erzeugen von Strichzeichnungen</li>
+        <li>Radiergummi bei Whiteboardfilter</li>
+        <li>Beschneiden</li>
+        <li>Skalieren</li>
+        <li>Unterst&uuml;tzte Grafikformate: png, jpg und gif.</li>
+        <li>Rotation, Farb&auml;nderungen.</li>
+        <li>Leicht erweiterbar um Filter sowie Bildbearbeitungsfunktionen</li>
+        <li>Adobe Flex basiert. Einbindung in Stripes, Struts, JSP und Wicket einfach.</li>
+      </ul>
+      <p style="width: 640; padding-left: 5px; font-size: 80%;">Datenschutz: Es werden die Bilder auf dem Server nur temporär im Rahmen der
+        Funktion von ImageCropper gespeichert.</p>
+    </div>
+    <noscript>
+      <table width="100%" height="100%">
+        <tr align="center" valign="middle">
+          <td>Please enable JavaScript in your Browser to see this content!</td>
+        </tr>
+      </table>
+    </noscript>
+  </wicket:extend>
 </body>
 </html>
