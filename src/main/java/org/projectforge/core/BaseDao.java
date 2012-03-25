@@ -313,8 +313,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       }
     }
     @SuppressWarnings("unchecked")
-    final
-    O result = (O) getSession().load(clazz, id);
+    final O result = (O) getSession().load(clazz, id);
     return result;
   }
 
@@ -446,8 +445,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   protected List<O> selectUnique(final List<O> list)
   {
     @SuppressWarnings("unchecked")
-    final
-    List<O> result = (List<O>) CollectionUtils.select(list, PredicateUtils.uniquePredicate());
+    final List<O> result = (List<O>) CollectionUtils.select(list, PredicateUtils.uniquePredicate());
     return result;
   }
 
@@ -562,7 +560,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       return null;
     }
     @SuppressWarnings("unchecked")
-    final O obj = (O) getHibernateTemplate().get(clazz, id, LockMode.READ);
+    final O obj = getHibernateTemplate().get(clazz, id, LockMode.READ);
     afterLoad(obj);
     return obj;
   }
@@ -616,8 +614,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   public List<DisplayHistoryEntry> internalGetDisplayHistoryEntries(final BaseDO< ? > obj)
   {
     @SuppressWarnings("unchecked")
-    final
-    List<DisplayHistoryEntry> result = (List<DisplayHistoryEntry>) getHibernateTemplate().execute(new HibernateCallback() {
+    final List<DisplayHistoryEntry> result = (List<DisplayHistoryEntry>) getHibernateTemplate().execute(new HibernateCallback() {
       public Object doInHibernate(final Session session) throws HibernateException, SQLException
       {
         final HistoryEntry[] entries = internalGetHistoryEntries(obj);
@@ -666,8 +663,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   public List<SimpleHistoryEntry> getSimpleHistoryEntries(final O obj)
   {
     @SuppressWarnings("unchecked")
-    final
-    List<SimpleHistoryEntry> result = (List<SimpleHistoryEntry>) getHibernateTemplate().execute(new HibernateCallback() {
+    final List<SimpleHistoryEntry> result = (List<SimpleHistoryEntry>) getHibernateTemplate().execute(new HibernateCallback() {
       public Object doInHibernate(final Session session) throws HibernateException, SQLException
       {
         final HistoryEntry[] entries = getHistoryEntries(obj);
@@ -819,9 +815,16 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   }
 
   /**
+   * This method will be called before deleting. Does nothing at default.
+   * @param obj The deleted object.
+   */
+  protected void onDelete(final O obj)
+  {
+  }
+
+  /**
    * This method will be called after deleting. Does nothing at default.
    * @param obj The deleted object.
-   * @param dbObj The object from data base before modification.
    */
   protected void afterDelete(final O obj)
   {
@@ -830,7 +833,6 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   /**
    * This method will be called after undeleting. Does nothing at default.
    * @param obj The deleted object.
-   * @param dbObj The object from data base before modification.
    */
   protected void afterUndelete(final O obj)
   {
@@ -951,7 +953,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     onSaveOrModify(obj);
     accessChecker.checkDemoUser();
     @SuppressWarnings("unchecked")
-    final O dbObj = (O) getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
+    final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     if (checkAccess == true) {
       checkLoggedInUserUpdateAccess(obj, dbObj);
     }
@@ -1018,8 +1020,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       throw new RuntimeException(msg);
     }
     @SuppressWarnings("unchecked")
-    final
-    O dbObj = (O) getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
+    final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     checkLoggedInUserDeleteAccess(obj, dbObj);
     internalMarkAsDeleted(obj);
   }
@@ -1032,9 +1033,8 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       throw new InternalErrorException();
     }
     accessChecker.checkDemoUser();
-    @SuppressWarnings("unchecked")
-    final
-    O dbObj = (O) getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
+    onDelete(obj);
+    final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     onSaveOrModify(obj);
     copyValues(obj, dbObj, "deleted"); // If user has made additional changes.
     dbObj.setDeleted(true);
@@ -1064,9 +1064,8 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       throw new RuntimeException(msg);
     }
     accessChecker.checkDemoUser();
-    @SuppressWarnings("unchecked")
-    final
-    O dbObj = (O) getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
+    onDelete(obj);
+    final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     checkLoggedInUserDeleteAccess(obj, dbObj);
     getHibernateTemplate().delete(dbObj);
     log.info("Object deleted: " + obj.toString());
@@ -1096,8 +1095,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   {
     accessChecker.checkDemoUser();
     @SuppressWarnings("unchecked")
-    final
-    O dbObj = (O) getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
+    final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     onSaveOrModify(obj);
     copyValues(obj, dbObj, "deleted"); // If user has made additional changes.
     dbObj.setDeleted(false);
@@ -1415,7 +1413,8 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     return dest.copyValuesFrom(src, ignoreFields);
   }
 
-  protected void createHistoryEntry(final Object entity, final Number id, final String property, final Class< ? > valueClass, final Object oldValue, final Object newValue)
+  protected void createHistoryEntry(final Object entity, final Number id, final String property, final Class< ? > valueClass,
+      final Object oldValue, final Object newValue)
   {
     accessChecker.checkDemoUser();
     final PFUserDO contextUser = PFUserContext.getUser();
