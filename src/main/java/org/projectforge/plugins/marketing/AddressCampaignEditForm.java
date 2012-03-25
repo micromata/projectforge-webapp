@@ -58,7 +58,7 @@ public class AddressCampaignEditForm extends AbstractEditForm<AddressCampaignDO,
     super.init();
     gridBuilder.newGrid16();
     {
-      // Name
+      // Title
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("title"));
       fs.add(new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "title")));
     }
