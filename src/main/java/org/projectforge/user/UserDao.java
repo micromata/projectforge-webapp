@@ -156,8 +156,7 @@ public class UserDao extends BaseDao<PFUserDO>
   @Override
   protected void afterSaveOrModify(final PFUserDO user)
   {
-    super.afterSaveOrModify(user);
-    userGroupCache.updateUser(user);
+    userGroupCache.setExpired();
   }
 
   /**
@@ -180,7 +179,7 @@ public class UserDao extends BaseDao<PFUserDO>
   public boolean hasSelectAccess(final PFUserDO user, final PFUserDO obj, final boolean throwException)
   {
     boolean result = accessChecker.isUserMemberOfAdminGroup(user)
-    || accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
+        || accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
     if (result == false && obj.isDeleted() == false) {
       result = accessChecker.areUsersInSameGroup(user, obj);
     }
@@ -411,13 +410,13 @@ public class UserDao extends BaseDao<PFUserDO>
     accessChecker.checkDemoUser();
     final PFUserDO contextUser = PFUserContext.getUser();
     Validate.isTrue(user.getId().equals(contextUser.getId()) == true);
-    final PFUserDO dbUser = (PFUserDO) getHibernateTemplate().load(clazz, user.getId(), LockMode.PESSIMISTIC_WRITE);
+    final PFUserDO dbUser = getHibernateTemplate().load(clazz, user.getId(), LockMode.PESSIMISTIC_WRITE);
     if (copyValues(user, dbUser, "deleted", "password", "lastLogin", "loginFailures", "orgUnit", "role", "username", "stayLoggedInKey",
-    "rights") == true) {
+        "rights") == true) {
       dbUser.setLastUpdate();
       log.info("Object updated: " + dbUser.toString());
       copyValues(user, contextUser, "deleted", "password", "lastLogin", "loginFailures", "orgUnit", "role", "username", "stayLoggedInKey",
-      "rights");
+          "rights");
     } else {
       log.info("No modifications detected (no update needed): " + dbUser.toString());
     }
