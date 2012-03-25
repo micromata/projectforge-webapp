@@ -503,8 +503,8 @@ IListPageColumnsCreator<TimesheetDO>
     final String filename = buf.toString();
 
     // get the sheets from the given Format
-    final String styleSheet = "/fo-styles/" + form.getExportFormat() + "/timesheet-template-fo.xsl";
-    final String xmlData = "/fo-styles/" + form.getExportFormat() + "/timesheets2pdf.xml";
+    final String styleSheet = "fo-styles/" + form.getExportFormat() + "/timesheet-template-fo.xsl";
+    final String xmlData = "fo-styles/" + form.getExportFormat() + "/timesheets2pdf.xml";
 
     // get the formatter for the different export formats
     final Formatter formatter = formatterFactory.getFormatter(form.getExportFormat());
