@@ -82,6 +82,10 @@ public class TestBase
 
   public static final String TEST_FINANCE_USER = "testFinanceUser";
 
+  public static final String TEST_FULL_ACCESS_USER = "testFullAccessUser";
+
+  public static final String TEST_FULL_ACCESS_USER_PASSWORD = "testFullAccessUser42";
+
   public static final String TEST_GROUP = "testGroup";
 
   public static final String TEST_USER = "testUser";
@@ -165,6 +169,7 @@ public class TestBase
     testConfiguration.autowire(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME);
   }
 
+  @SuppressWarnings({ "unchecked", "rawtypes"})
   protected static void clearDatabase()
   {
     PFUserContext.setUser(ADMIN_USER); // Logon admin user.
