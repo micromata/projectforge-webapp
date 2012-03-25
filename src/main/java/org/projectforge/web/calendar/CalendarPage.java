@@ -166,7 +166,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
 
     if (pageParameters != null) {
       if (pageParameters.get("showTimesheets") != null) {
-        form.getFilter().setUserId(getUser().getId());
+        form.getFilter().setUserId(getUserId());
       }
       if (pageParameters.get("showBirthdays") != null) {
         form.getFilter().setShowBirthdays(true);
