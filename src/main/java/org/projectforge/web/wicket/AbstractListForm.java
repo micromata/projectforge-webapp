@@ -204,7 +204,7 @@ AbstractSecuredForm<F, P>
         }
       }
     }
-    if (parentPage.getBaseDao().isHistorizable() == true) {
+    if (parentPage.getBaseDao().isHistorizable() == true && isFilterVisible() == true) {
       addExtendedFilter();
     }
     final WebMarkupContainer buttonCell = new WebMarkupContainer("buttonCell");
