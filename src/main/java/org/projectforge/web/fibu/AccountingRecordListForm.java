@@ -54,6 +54,9 @@ public class AccountingRecordListForm extends AbstractListForm<AccountingRecordL
       setPageSize(1000);
     }
     super.init();
+    if (isFilterVisible() == false) {
+      return;
+    }
     gridBuilder.newColumnsPanel();
     {
       gridBuilder.newColumnPanel(DivType.COL_60);
