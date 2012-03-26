@@ -70,7 +70,7 @@ public class ReportObjectivesPanel extends Panel
       @Override
       public String getObject()
       {
-        return currentReport != null ? currentReport.getId() + " - " + currentReport.getTitle() + ": " + currentReport.getZeitraum() : "";
+        return currentReport != null ? currentReport.getId() + " - " + currentReport.getTitle() + ": " + currentReport.getZeitraum() + " (beta)": "(beta)";
       }
     }));
     add(path = new WebMarkupContainer("path"));
