@@ -26,7 +26,6 @@ package org.projectforge.web.fibu;
 import java.io.InputStream;
 
 import org.apache.wicket.markup.html.form.upload.FileUpload;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHolder;
@@ -34,9 +33,9 @@ import org.projectforge.fibu.kost.reporting.Report;
 import org.projectforge.fibu.kost.reporting.ReportDao;
 import org.projectforge.fibu.kost.reporting.ReportStorage;
 import org.projectforge.user.ProjectForgeGroup;
-import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.AbstractStandardFormPage;
 
-public class ReportObjectivesPage extends AbstractSecuredPage
+public class ReportObjectivesPage extends AbstractStandardFormPage
 {
   private static final long serialVersionUID = 5880523229854750164L;
 
@@ -54,7 +53,6 @@ public class ReportObjectivesPage extends AbstractSecuredPage
   public ReportObjectivesPage(final PageParameters parameters)
   {
     super(parameters);
-    body.add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     form = new ReportObjectivesForm(this);
     body.add(form);
     form.init();
@@ -66,7 +64,6 @@ public class ReportObjectivesPage extends AbstractSecuredPage
     log.info("import report objectives.");
     final FileUpload fileUpload = form.fileUploadField.getFileUpload();
     if (fileUpload != null) {
-      final boolean delete = false;
       try {
         final String clientFileName = fileUpload.getClientFileName();
         final InputStream is = fileUpload.getInputStream();
@@ -77,10 +74,6 @@ public class ReportObjectivesPage extends AbstractSecuredPage
       } catch (final Exception ex) {
         log.error(ex.getMessage(), ex);
         error("An error occurred (see log files for details): " + ex.getMessage());
-      } finally {
-        if (delete == true) {
-          fileUpload.delete();
-        }
       }
     }
   }
