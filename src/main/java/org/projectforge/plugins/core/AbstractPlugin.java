@@ -155,6 +155,11 @@ public abstract class AbstractPlugin
   protected RegistryEntry register(final String id, final Class< ? extends BaseDao< ? >> daoClassType, final BaseDao< ? > baseDao,
       final String i18nPrefix)
   {
+    if (baseDao == null) {
+      throw new IllegalArgumentException(
+          id
+          + ": Dao object is null. May-be the developer forgots to initialize it in pluginContext.xml or the setter method is not given in the main plugin class!");
+    }
     final RegistryEntry entry = new RegistryEntry(id, daoClassType, baseDao, i18nPrefix);
     register(entry);
     return entry;
