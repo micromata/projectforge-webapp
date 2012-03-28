@@ -95,7 +95,7 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
     final PFUserDO user = PFUserContext.getUser();
     @SuppressWarnings("unchecked")
     final List<Object> list = getSession().createQuery("select name from UserPrefDO t where user_fk=? and areaString = ? order by name")
-        .setInteger(0, user.getId()).setParameter(1, area.getId()).list();
+    .setInteger(0, user.getId()).setParameter(1, area.getId()).list();
     final String[] result = new String[list.size()];
     int i = 0;
     for (final Object oa : list) {
@@ -206,7 +206,7 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
           try {
             value = field.get(obj);
             userPrefEntry.setValue(convertParameterValueToString(value));
-          } catch (IllegalAccessException ex) {
+          } catch (final IllegalAccessException ex) {
             log.error(ex.getMessage(), ex);
           }
           userPrefEntry.valueAsObject = value;
@@ -293,14 +293,14 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
           final Object value = getParameterValue(field.getType(), entry.getValue());
           try {
             field.set(obj, value);
-          } catch (IllegalArgumentException ex) {
+          } catch (final IllegalArgumentException ex) {
             log.error(ex.getMessage()
                 + " While setting declared field '"
                 + entry.getParameter()
                 + "' of "
                 + obj.getClass()
                 + ". Ignoring parameter.", ex);
-          } catch (IllegalAccessException ex) {
+          } catch (final IllegalAccessException ex) {
             log.error(ex.getMessage()
                 + " While setting declared field '"
                 + entry.getParameter()
@@ -392,7 +392,7 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
   }
 
   @Override
-  public UserPrefDO internalGetById(Serializable id)
+  public UserPrefDO internalGetById(final Serializable id)
   {
     final UserPrefDO userPref = super.internalGetById(id);
     if (userPref == null) {
@@ -425,7 +425,7 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
       return true;
     }
     if (throwException == true) {
-      throw new AccessException("user.pref.error.userIsNotOwner");
+      throw new AccessException("userPref.error.userIsNotOwner");
     } else {
       return false;
     }
@@ -437,27 +437,27 @@ public class UserPrefDao extends BaseDao<UserPrefDO>
     return new UserPrefDO();
   }
 
-  public void setKost2Dao(Kost2Dao kost2Dao)
+  public void setKost2Dao(final Kost2Dao kost2Dao)
   {
     this.kost2Dao = kost2Dao;
   }
 
-  public void setKundeDao(KundeDao kundeDao)
+  public void setKundeDao(final KundeDao kundeDao)
   {
     this.kundeDao = kundeDao;
   }
 
-  public void setProjektDao(ProjektDao projektDao)
+  public void setProjektDao(final ProjektDao projektDao)
   {
     this.projektDao = projektDao;
   }
 
-  public void setTaskDao(TaskDao taskDao)
+  public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
   }
 
-  public void setUserDao(UserDao userDao)
+  public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
   }

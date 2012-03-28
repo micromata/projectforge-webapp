@@ -99,7 +99,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
     // DropDownChoice area
     final LabelValueChoiceRenderer<UserPrefArea> areaChoiceRenderer = new LabelValueChoiceRenderer<UserPrefArea>();
     for (final UserPrefArea area : UserPrefAreaRegistry.instance().getOrderedEntries(PFUserContext.getLocale())) {
-      areaChoiceRenderer.addValue(area, parent.getString("user.pref.area." + area.getKey()));
+      areaChoiceRenderer.addValue(area, parent.getString("userPref.area." + area.getKey()));
     }
     return areaChoiceRenderer;
   }
@@ -120,7 +120,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
     gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
     {
       // Name
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.pref.name"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("userPref.name"));
       final RequiredMaxLengthTextField name = new RequiredMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "name"));
       name.add(new AbstractValidator<String>() {
         @Override
@@ -138,7 +138,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
         @Override
         protected String resourceKey()
         {
-          return "user.pref.error.nameDoesAlreadyExist";
+          return "userPref.error.nameDoesAlreadyExist";
         }
       });
       name.add(WicketUtils.setFocus());
@@ -154,7 +154,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
     gridBuilder.newBlockPanel();
     {
       // Area
-      final FieldsetPanel fieldset = new FieldsetPanel(gridBuilder.getPanel(), getString("user.pref.area")) {
+      final FieldsetPanel fieldset = new FieldsetPanel(gridBuilder.getPanel(), getString("userPref.area")) {
         @Override
         public boolean isVisible()
         {
@@ -176,7 +176,7 @@ public class UserPrefEditForm extends AbstractEditForm<UserPrefDO, UserPrefEditP
     }
     if (isNew() == true && data.getArea() == null) {
       // Area choice
-      final FieldsetPanel fieldset = new FieldsetPanel(gridBuilder.getPanel(), getString("user.pref.area")) {
+      final FieldsetPanel fieldset = new FieldsetPanel(gridBuilder.getPanel(), getString("userPref.area")) {
         @Override
         public boolean isVisible()
         {

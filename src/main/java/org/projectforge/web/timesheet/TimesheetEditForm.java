@@ -346,7 +346,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       // Save as template checkbox:
       final FieldsetPanel fs = gridBuilder.newFieldset("").setNoLabelFor();
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.addCheckBox(new PropertyModel<Boolean>(this, "saveAsTemplate"), getString("user.pref.saveAsTemplate"));
+      checkBoxPanel.addCheckBox(new PropertyModel<Boolean>(this, "saveAsTemplate"), getString("userPref.saveAsTemplate"));
     }
     if (isNew() == false) {
       // Clone button for existing and not deleted invoices:
@@ -379,7 +379,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
     final String[] templateNames = userPrefDao.getPrefNames(UserPrefArea.TIMESHEET_TEMPLATE);
     if (templateNames != null && templateNames.length > 0) {
       // DropDownChoice templates
-      final String label = getString("user.pref.template.select");
+      final String label = getString("userPref.template.select");
       final LabelValueChoiceRenderer<String> templateNamesChoiceRenderer = new LabelValueChoiceRenderer<String>();
       templateNamesChoiceRenderer.addValue("", label);
       for (final String name : templateNames) {

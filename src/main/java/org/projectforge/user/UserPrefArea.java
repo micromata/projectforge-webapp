@@ -54,11 +54,11 @@ public class UserPrefArea implements Serializable
 
   public static final UserPrefArea JIRA_PROJECT = new UserPrefArea("JIRA_PROJECT", JiraProject.class, "jira.project");
 
-  private String id;
+  private final String id;
 
-  private String key;
+  private final String key;
 
-  private Class< ? > beanType;
+  private final Class< ? > beanType;
 
   /**
    * The id is used as identity in the data-base.
@@ -83,7 +83,7 @@ public class UserPrefArea implements Serializable
    */
   public String getI18nKey()
   {
-    return "user.pref.area." + key;
+    return "userPref.area." + key;
   }
 
   /**
@@ -99,7 +99,7 @@ public class UserPrefArea implements Serializable
    * @param id Used as identity in the data-base (max-length = 20). Please don't change this id later, otherwise (de)-serialization will
    *          fail (could not read data-base entries).
    * @param clazz The class which contains the user pref parameters.
-   * @param key The i18n suffix (i18nkey starts with 'user.pref.area.").
+   * @param key The i18n suffix (i18nkey starts with 'userPref.area.").
    */
   public UserPrefArea(final String id, final Class< ? > clazz, final String key)
   {

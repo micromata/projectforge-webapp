@@ -36,7 +36,7 @@ public class JiraProject implements Serializable
 {
   private static final long serialVersionUID = -1573788962309994887L;
 
-  @UserPrefParameter(i18nKey = "user.pref.area.jira.project.pid", tooltipI18nKey = "user.pref.area.jira.project.pid.tooltip", required = true)
+  @UserPrefParameter(i18nKey = "userPref.area.jira.project.pid", tooltipI18nKey = "userPref.area.jira.project.pid.tooltip", required = true)
   private Integer pid;
 
   /**
@@ -47,7 +47,7 @@ public class JiraProject implements Serializable
     return pid;
   }
 
-  public void setPid(Integer pid)
+  public void setPid(final Integer pid)
   {
     this.pid = pid;
   }

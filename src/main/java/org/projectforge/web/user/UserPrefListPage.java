@@ -69,7 +69,7 @@ public class UserPrefListPage extends AbstractListPage<UserPrefListForm, UserPre
 
   public UserPrefListPage(final PageParameters parameters)
   {
-    super(parameters, "user.pref");
+    super(parameters, "userPref");
     final String area = WicketUtils.getAsString(parameters, "area");
     if (area != null) {
       final UserPrefArea userPrefArea = UserPrefAreaRegistry.instance().getEntry(area);
@@ -88,7 +88,7 @@ public class UserPrefListPage extends AbstractListPage<UserPrefListForm, UserPre
       {
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<UserPrefDO>(new Model<String>(getString("user.pref.area")), "area", "area",
+    columns.add(new CellItemListenerPropertyColumn<UserPrefDO>(new Model<String>(getString("userPref.area")), "area", "area",
         cellItemListener) {
       /**
        * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
@@ -109,7 +109,7 @@ public class UserPrefListPage extends AbstractListPage<UserPrefListForm, UserPre
         addRowClick(item);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<UserPrefDO>(new Model<String>(getString("user.pref.name")), "name", "name",
+    columns.add(new CellItemListenerPropertyColumn<UserPrefDO>(new Model<String>(getString("userPref.name")), "name", "name",
         cellItemListener));
     columns.add(new UserPropertyColumn<UserPrefDO>(getString("user"), "user.fullname", "user", cellItemListener)
         .withUserFormatter(userFormatter));

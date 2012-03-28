@@ -137,7 +137,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
         // DropDownChoice templates
         final FieldsetPanel fs = gridBuilder.newFieldset(getString("templates"));
         final LabelValueChoiceRenderer<String> templateNamesChoiceRenderer = new LabelValueChoiceRenderer<String>();
-        templateNamesChoiceRenderer.addValue("", getString("user.pref.template.select"));
+        templateNamesChoiceRenderer.addValue("", getString("userPref.template.select"));
         for (final String name : templateNames) {
           templateNamesChoiceRenderer.addValue(name, name);
         }
@@ -295,7 +295,7 @@ public class ToDoEditForm extends AbstractEditForm<ToDoDO, ToDoEditPage>
       // getString("label.sendShortMessage")));
       // }
       checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(this, "saveAsTemplate"),
-          getString("user.pref.saveAsTemplate")));
+          getString("userPref.saveAsTemplate")));
     }
   }
 

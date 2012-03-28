@@ -61,7 +61,7 @@ public class UserPrefEditPage extends AbstractEditPage<UserPrefDO, UserPrefEditF
    */
   public UserPrefEditPage(final UserPrefArea area, final Object object)
   {
-    super(new PageParameters(), "user.pref");
+    super(new PageParameters(), "userPref");
     final UserPrefDO userPref = new UserPrefDO();
     initUserPref(userPref, area, object);
     super.init(userPref);
@@ -69,7 +69,7 @@ public class UserPrefEditPage extends AbstractEditPage<UserPrefDO, UserPrefEditF
 
   public UserPrefEditPage(final PageParameters parameters)
   {
-    super(parameters, "user.pref");
+    super(parameters, "userPref");
     final String areaId = WicketUtils.getAsString(parameters, PARAMETER_AREA);
     if (areaId != null) {
       final UserPrefArea area = UserPrefAreaRegistry.instance().getEntry(areaId);

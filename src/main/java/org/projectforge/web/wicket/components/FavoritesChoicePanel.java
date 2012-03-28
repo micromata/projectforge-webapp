@@ -145,7 +145,7 @@ public abstract class FavoritesChoicePanel<T, F> extends FormComponentPanel<Stri
     for (final String entry : entries) {
       renderer.addValue(entry, entry);
     }
-    renderer.addValue(ADD_NEW_ENTRY, getString("user.pref.favorite.create"));
+    renderer.addValue(ADD_NEW_ENTRY, getString("userPref.favorite.create"));
     return renderer;
   }
 
