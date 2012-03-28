@@ -375,7 +375,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     if (searchFilter.isSearchNotEmpty() == true) {
       String searchString = "";
       try {
-        final FullTextSession fullTextSession = Search.createFullTextSession(getSession());
+        final FullTextSession fullTextSession = Search.getFullTextSession(getSession());
         final String[] searchFields = searchFilter.getSearchFields() != null ? searchFilter.getSearchFields() : getSearchFields();
         final MultiFieldQueryParser parser = new MultiFieldQueryParser(LUCENE_VERSION, searchFields, new ClassicAnalyzer(Version.LUCENE_31));
         parser.setAllowLeadingWildcard(true);
