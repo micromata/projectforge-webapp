@@ -26,39 +26,38 @@ package org.projectforge.web.core;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
+import org.projectforge.registry.Registry;
+import org.projectforge.registry.RegistryEntry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
-import org.projectforge.web.wicket.AbstractSecuredForm;
-import org.projectforge.web.wicket.FocusOnLoadBehavior;
+import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 
-public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage>
+public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPage>
 {
   private static final String USER_PREF_KEY_FILTER = "Search:Filter";
 
   private static final int MAGIC_NUMBER_LAST_DAYS_FOR_WITHOUT_TIME_SETTINGS = 42;
 
   private static final long serialVersionUID = 2638309407446431727L;
-
-  protected DatePanel modifiedStartDatePanel;
-
-  protected DatePanel modifiedStopDatePanel;
-
-  private TaskSelectPanel taskSelectPanel;
 
   SearchPageFilter filter;
 
@@ -77,34 +76,38 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
   protected void init()
   {
     super.init();
-    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
-    final TextField<String> searchField = new TextField<String>("searchString", new PropertyModel<String>(filter, "searchString"));
-    searchField.add(new FocusOnLoadBehavior());
-    add(searchField);
-    modifiedStartDatePanel = new DatePanel("startDate", new PropertyModel<Date>(filter, "startTimeOfLastModification"), DatePanelSettings
-        .get().withSelectPeriodMode(true));
-    add(modifiedStartDatePanel);
-    modifiedStopDatePanel = new DatePanel("stopDate", new PropertyModel<Date>(filter, "stopTimeOfLastModification"), DatePanelSettings
-        .get().withSelectPeriodMode(true));
-    add(modifiedStopDatePanel);
-    add(new Label("datesAsUTC", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return WicketUtils.getUTCDates(filter.getStartTimeOfLastModification(), filter.getStopTimeOfLastModification());
-      }
-    }));
-
-    final UserSelectPanel userSelectPanel = new UserSelectPanel("modifiedByUser", new PropertyModel<PFUserDO>(filter, "modifiedByUser"),
-        parentPage, "userId");
-    add(userSelectPanel);
-    userSelectPanel.init().withAutoSubmit(true);
-
-    taskSelectPanel = new TaskSelectPanel("task", new PropertyModel<TaskDO>(filter, "task"), parentPage, "taskId");
-    add(taskSelectPanel);
-    taskSelectPanel.init();
-    taskSelectPanel.setRequired(false);
+    gridBuilder.newGrid16();
     {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"));
+      final TextField<String> searchField = new TextField<String>(fs.getTextFieldId(), new PropertyModel<String>(filter, "searchString"));
+      WicketUtils.setFocus(searchField);
+      fs.add(searchField);
+    }
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"));
+      final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new PropertyModel<TaskDO>(filter, "task"), parentPage,
+          "taskId");
+      fs.add(taskSelectPanel);
+      taskSelectPanel.init();
+      taskSelectPanel.setRequired(false);
+    }
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("filter.lastModified"), true);
+      final DatePanel modifiedStartDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter,
+          "startTimeOfLastModification"), DatePanelSettings.get().withSelectPeriodMode(true));
+      fs.add(modifiedStartDatePanel);
+      fs.add(new DivTextPanel(fs.newChildId(), " - "));
+      final DatePanel modifiedStopDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "stopTimeOfLastModification"),
+          DatePanelSettings.get().withSelectPeriodMode(true));
+      fs.add(modifiedStopDatePanel);
+      fs.add(new HtmlCommentPanel(fs.newChildId(), new Model<String>() {
+        @Override
+        public String getObject()
+        {
+          return WicketUtils.getUTCDates(filter.getStartTimeOfLastModification(), filter.getStopTimeOfLastModification());
+        }
+      }));
       // DropDownChoice: time period
       final LabelValueChoiceRenderer<Integer> lastDaysChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
       lastDaysChoiceRenderer.addValue(MAGIC_NUMBER_LAST_DAYS_FOR_WITHOUT_TIME_SETTINGS, getString("search.withoutTimePeriod"));
@@ -113,8 +116,8 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
       for (final int days : new int[] { 3, 7, 14, 30, 60, 90}) {
         lastDaysChoiceRenderer.addValue(days, getLocalizedMessage("search.lastDays", days));
       }
-      final DropDownChoice<Integer> lastDaysChoice = new DropDownChoice<Integer>("lastDays",
-          new PropertyModel<Integer>(filter, "lastDays"), lastDaysChoiceRenderer.getValues(), lastDaysChoiceRenderer) {
+      final DropDownChoice<Integer> lastDaysChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(
+          filter, "lastDays"), lastDaysChoiceRenderer.getValues(), lastDaysChoiceRenderer) {
         @Override
         protected void onSelectionChanged(final Integer newSelection)
         {
@@ -148,49 +151,65 @@ public class SearchForm extends AbstractSecuredForm<SearchPageFilter, SearchPage
       };
       lastDaysChoice.setNullValid(true);
       lastDaysChoice.setRequired(false);
-      add(lastDaysChoice);
+      fs.add(lastDaysChoice);
     }
-    // {
-    // // DropDownChoice: area
-    // final LabelValueChoiceRenderer<String> areaChoiceRenderer = new LabelValueChoiceRenderer<String>();
-    // areaChoiceRenderer.addValue("ALL", getString("filter.all"));
-    // for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
-    // if (entry.getDao().hasHistoryAccess(false) == true) {
-    // areaChoiceRenderer.addValue(entry.getId(), getString(entry.getI18nTitleHeading()));
-    // }
-    // }
-    // final DropDownChoice<String> areaChoice = new DropDownChoice<String>("area", new PropertyModel<String>(filter, "area"),
-    // areaChoiceRenderer.getValues(), areaChoiceRenderer) {
-    // @Override
-    // protected boolean wantOnSelectionChangedNotifications()
-    // {
-    // return true;
-    // }
-    // };
-    // areaChoice.setNullValid(true);
-    // areaChoice.setRequired(false);
-    // add(areaChoice);
-    // }
+    gridBuilder.newColumnPanel(DivType.COL_50);
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("modifiedBy"));
+      final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(filter, "modifiedByUser"),
+          parentPage, "userId");
+      fs.add(userSelectPanel);
+      userSelectPanel.init().withAutoSubmit(true);
+    }
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("search.area"));
+      // DropDownChoice: area
+      final LabelValueChoiceRenderer<String> areaChoiceRenderer = new LabelValueChoiceRenderer<String>();
+      areaChoiceRenderer.addValue("ALL", getString("filter.all"));
+      for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
+        if (entry.getDao().hasLoggedInUserHistoryAccess(false) == true) {
+          areaChoiceRenderer.addValue(entry.getId(), getString(entry.getI18nTitleHeading()));
+        }
+      }
+      final DropDownChoice<String> areaChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(filter,
+          "area"), areaChoiceRenderer.getValues(), areaChoiceRenderer) {
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
+      };
+      areaChoice.setNullValid(true);
+      areaChoice.setRequired(false);
+      fs.add(areaChoice);
+    }
+    gridBuilder.newColumnPanel(DivType.COL_50);
     {
       // DropDownChoice pageSize
-      final DropDownChoice<Integer> pageSizeChoice = AbstractListForm.getPageSizeDropDownChoice("maxRows", getLocale(),
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.pageSize"));
+      final DropDownChoice<Integer> pageSizeChoice = AbstractListForm.getPageSizeDropDownChoice(fs.getDropDownChoiceId(), getLocale(),
           new PropertyModel<Integer>(filter, "maxRows"), 3, 100);
-      add(pageSizeChoice);
+      fs.add(pageSizeChoice);
     }
-    //    final Button searchButton = new Button("button", new Model<String>(getString("search")));
-    //    searchButton.add(WebConstants.BUTTON_CLASS_DEFAULT);
-    //    add(new SingleButtonPanel("search", searchButton));
-    //    setDefaultButton(searchButton);
-    //
-    //    final Button resetButton = new Button("button", new Model<String>(getString("reset"))) {
-    //      @Override
-    //      public void onSubmit()
-    //      {
-    //        super.onSubmit();
-    //        filter.reset();
-    //      }
-    //    };
-    //    resetButton.add(WebConstants.BUTTON_CLASS_RESET);
-    //    add(new SingleButtonPanel("reset", resetButton));
+    {
+      final Button resetButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("reset")) {
+        @Override
+        public final void onSubmit()
+        {
+          filter.reset();
+        }
+      };
+      resetButton.setDefaultFormProcessing(false);
+      final SingleButtonPanel resetButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), resetButton, getString("reset"),
+          SingleButtonPanel.RESET);
+      actionButtons.add(resetButtonPanel);
+
+      final Button searchButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("search"));
+      final SingleButtonPanel sendButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), searchButton, getString("search"),
+          SingleButtonPanel.DEFAULT_SUBMIT);
+      actionButtons.add(sendButtonPanel);
+      setDefaultButton(searchButton);
+    }
   }
 }

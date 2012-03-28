@@ -4,55 +4,9 @@
 </head>
 
 <body>
-<wicket:extend>
-  <form wicket:id="form" class="filter newform clearfix">
-  <div wicket:id="feedback">[Validation errors]</div>
-  <div>
-  <div id="divZoom"></div>
-  </div>
-
-
-
-
-  <label for="searchfilter" class="clear full title"><wicket:message key="searchFilter" /></label> <input type="text" id="searchfilter"
-    wicket:id="searchString" class="text double title" />
-  <label class="clear double putfull"><wicket:container wicket:id="datesAsUTC">[2001-09-30 22:00:00.0 UTC - 2001-10-31 22:59:59.999 UTC]</wicket:container></label>
-  <label for="lastmodified" class="clear full"><wicket:message key="filter.lastModified" /></label> <span wicket:id="startDate">[startDate]</span> <label
-    class="quart center"> bis </label> <span wicket:id="stopDate">[stopDate]</span> <label for="lastdays" class="quart">Range</label> <select
-    id="lastdays" class="half" wicket:id="lastDays" onchange="javascript:submit();">
-    <option>[choose time period]</option>
-  </select> <!-- label class="full clear"><wicket:message key="search.area" /></label> <select class="double" wicket:id="area" onchange="javascript:submit();">
-    <option>[All]</option>
-  </select--> <!-- th><wicket:message key="search.history" />
-        <td><wicket:message key="message.notYetImplemented" /></td--> <label for="modifiedBy" class="clear full"><wicket:message
-    key="modifiedBy" /></label> <span wicket:id="modifiedByUser">[modified by]</span> <label for="pageSize" class="clear full"><wicket:message
-    key="label.pageSize" /></label> <select wicket:id="pageSize" onchange="javascript:submit();" id="pageSize">
-    <option>50</option>
-  </select> <label class="clear full"><wicket:message key="task" /></label> <span wicket:id="task">[Task]</span>
-
-  <fieldset class="buttons roundcorners boxshadow"><span wicket:id="search">[search]</span> <span wicket:id="reset">[reset]</span></fieldset>
-
-  </form>
-
-  <fieldset><legend><wicket:message key="label.resultset" /></legend> <wicket:container wicket:id="areaRepeater">
-    <h2 wicket:id="areaTitle">[Time sheets]</h2>
-    <table class="dataview" cellspacing="0" wicket:id="dataTable">
-      <tbody>
-        <tr>
-          <th>[modified]</th>
-          <th>[name]</th>
-          <th>[first name]</th>
-        </tr>
-        <tr>
-          <td>2010-12-11 08:52</td>
-          <td>[Reinhard]</td>
-          <td>[Kai]</td>
-        </tr>
-      </tbody>
-    </table>
-    <div style="color: red;" wicket:id="hasMoreEntries"><a href="#"> <wicket:message key="moreEntriesAvailable" /> </a></div>
-  </wicket:container></fieldset>
-
-</wicket:extend>
+  <wicket:extend>
+    <div id="divZoom"></div>
+    <wicket:container wicket:id="results">[results]</wicket:container>
+  </wicket:extend>
 </body>
 </html>

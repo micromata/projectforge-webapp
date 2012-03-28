@@ -23,57 +23,23 @@
 
 package org.projectforge.web.core;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.DataTable;
-import org.apache.wicket.extensions.markup.html.repeater.data.table.DefaultDataTable;
 import org.apache.wicket.markup.html.IHeaderResponse;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.repeater.RepeatingView;
-import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.calendar.TimePeriod;
-import org.projectforge.common.BeanHelper;
-import org.projectforge.core.BaseSearchFilter;
-import org.projectforge.core.NumberFormatter;
-import org.projectforge.core.SearchDao;
-import org.projectforge.core.SearchResultData;
-import org.projectforge.database.StatisticsCache;
 import org.projectforge.task.TaskDO;
-import org.projectforge.task.TaskDependentFilter;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.fibu.ISelectCallerPage;
-import org.projectforge.web.registry.WebRegistry;
-import org.projectforge.web.registry.WebRegistryEntry;
-import org.projectforge.web.wicket.AbstractSecuredPage;
-import org.projectforge.web.wicket.IListPageColumnsCreator;
-import org.projectforge.web.wicket.MySortableDataProvider;
-import org.springframework.util.CollectionUtils;
+import org.projectforge.web.wicket.AbstractStandardFormPage;
 
-public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
+public class SearchPage extends AbstractStandardFormPage implements ISelectCallerPage
 {
+  private static final long serialVersionUID = -8416731462457080883L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SearchPage.class);
 
-  private static final int MAXIMUM_ENTRIES_WITHOUT_FILTER_SETTINGS = 10000;
-
   private final SearchForm form;
-
-  private RepeatingView areaRepeater;
-
-  @SpringBean(name = "searchDao")
-  private SearchDao searchDao;
-
-  @SpringBean(name = "statisticsCache")
-  private StatisticsCache statisticsCache;
 
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
@@ -81,124 +47,13 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
-  // Do not execute the search on the first call (due to performance issues):
-  private boolean refreshed = true;
-
   public SearchPage(final PageParameters parameters)
   {
     super(parameters);
     form = new SearchForm(this);
     body.add(form);
     form.init();
-    areaRepeater = new RepeatingView("areaRepeater");
-    body.add(areaRepeater);
-    areaRepeater.setVisible(false);
-  }
-
-  @Override
-  public void renderHead(final IHeaderResponse response)
-  {
-    super.renderHead(response);
-    response.renderJavaScriptReference("scripts/zoom.js");
-  }
-
-  @Override
-  protected void onBeforeRender()
-  {
-    super.onBeforeRender();
-    refresh();
-  }
-
-  @Override
-  protected void onAfterRender()
-  {
-    super.onAfterRender();
-    refreshed = false;
-  }
-
-  @SuppressWarnings( { "serial", "unchecked"})
-  void refresh()
-  {
-    if (refreshed == true) {
-      // Do nothing (called twice).
-      return;
-    }
-    refreshed = true;
-    if (areaRepeater != null) {
-      body.remove(areaRepeater);
-    }
-    areaRepeater = new RepeatingView("areaRepeater");
-    body.add(areaRepeater);
-    if (form.filter.isEmpty() == true) {
-      return;
-    }
-    for (final WebRegistryEntry registryEntry : WebRegistry.instance().getOrderedList()) {
-      final long millis = System.currentTimeMillis();
-      final Class< ? extends IListPageColumnsCreator< ? >> clazz = registryEntry.getListPageColumnsCreatorClass();
-      final IListPageColumnsCreator< ? > listPageColumnsCreator = clazz == null ? null : (IListPageColumnsCreator< ? >) BeanHelper
-          .newInstance(clazz, PageParameters.class, new PageParameters());
-      if (listPageColumnsCreator == null) {
-        continue;
-      }
-      final Integer number = statisticsCache.getNumberOfEntities(registryEntry.getDOClass());
-      final Class< ? extends BaseSearchFilter> registeredFilterClass = registryEntry.getSearchFilterClass();
-      final boolean isTaskDependentFilter = registeredFilterClass != null
-          && TaskDependentFilter.class.isAssignableFrom(registeredFilterClass);
-      if (number > MAXIMUM_ENTRIES_WITHOUT_FILTER_SETTINGS
-          && (form.filter.getSearchString() == null || form.filter.getSearchString().length() < 3)
-          && (isTaskDependentFilter == false || form.filter.getTask() == null)
-          && form.filter.getStartTimeOfLastModification() == null
-          && form.filter.getStopTimeOfLastModification() == null) {
-        // Don't search to large tables if to less filter settings are given.
-        continue;
-      }
-      final BaseSearchFilter filter;
-      if (isTaskDependentFilter == true) {
-        filter = (BaseSearchFilter) BeanHelper.newInstance(registeredFilterClass, new Class< ? >[] { BaseSearchFilter.class}, form.filter);
-        ((TaskDependentFilter) filter).setTaskId(form.filter.getTaskId());
-      } else {
-        filter = form.filter;
-      }
-      final List<SearchResultData> searchResult = searchDao.getEntries(filter, registryEntry.getDOClass(), registryEntry.getDao());
-      if (CollectionUtils.isEmpty(searchResult) == true) {
-        continue;
-      }
-      final List list = new ArrayList();
-      boolean hasMore = false;
-      for (final SearchResultData data : searchResult) {
-        if (data.getDataObject() != null) {
-          list.add(data.getDataObject());
-        } else {
-          // Empty entry means: more entries found.
-          hasMore = true;
-          break;
-        }
-      }
-      final WebMarkupContainer areaContainer = new WebMarkupContainer(areaRepeater.newChildId());
-      areaRepeater.add(areaContainer);
-      final List< ? > columns = listPageColumnsCreator.createColumns(this, false);
-      final DataTable dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", SortOrder.DESCENDING) {
-        @Override
-        public List getList()
-        {
-          return list;
-        }
-
-        @Override
-        protected IModel getModel(final Object object)
-        {
-          return new Model((Serializable) object);
-        }
-      }, form.filter.getMaxRows());
-      areaContainer.add(dataTable);
-      if (hasMore == true) {
-        areaContainer.add(new WebMarkupContainer("hasMoreEntries"));
-      } else {
-        areaContainer.add(new Label("hasMoreEntries", "[invisible]").setVisible(false));
-      }
-      final long duration = System.currentTimeMillis() - millis;
-      areaContainer.add(new Label("areaTitle", getString(registryEntry.getI18nTitleHeading()) + " (" + NumberFormatter.format(duration) + " ms)"));
-    }
+    body.add(new SearchAreaPanel("results", form.filter));
   }
 
   @Override
@@ -214,32 +69,6 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     } else if ("userId".equals(property) == true) {
       final PFUserDO user = userGroupCache.getUser((Integer) selectedValue);
       form.filter.setModifiedByUser(user);
-    } else if ("startDate".equals(property) == true) {
-      if (selectedValue instanceof Date) {
-        // Date selected.
-        final Date date = (Date) selectedValue;
-        form.filter.setStartTimeOfLastModification(date);
-      } else if (selectedValue instanceof TimePeriod) {
-        // Period selected.
-        final TimePeriod timePeriod = (TimePeriod) selectedValue;
-        form.filter.setStartTimeOfLastModification(timePeriod.getFromDate());
-        form.filter.setStopTimeOfLastModification(timePeriod.getToDate());
-        form.modifiedStopDatePanel.markModelAsChanged();
-      }
-      form.modifiedStartDatePanel.markModelAsChanged();
-    } else if ("stopDate".equals(property) == true) {
-      if (selectedValue instanceof Date) {
-        // Date selected.
-        final Date date = (Date) selectedValue;
-        form.filter.setStopTimeOfLastModification(date);
-      } else if (selectedValue instanceof TimePeriod) {
-        // Period selected.
-        final TimePeriod timePeriod = (TimePeriod) selectedValue;
-        form.filter.setStartTimeOfLastModification(timePeriod.getFromDate());
-        form.filter.setStopTimeOfLastModification(timePeriod.getToDate());
-        form.modifiedStartDatePanel.markModelAsChanged();
-      }
-      form.modifiedStopDatePanel.markModelAsChanged();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
@@ -252,6 +81,13 @@ public class SearchPage extends AbstractSecuredPage implements ISelectCallerPage
     } else {
       log.error("Property '" + property + "' not supported for unselection.");
     }
+  }
+
+  @Override
+  public void renderHead(final IHeaderResponse response)
+  {
+    super.renderHead(response);
+    response.renderJavaScriptReference("scripts/zoom.js");
   }
 
   @Override
