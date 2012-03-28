@@ -111,6 +111,11 @@ table.dataview tbody tr td.motivate {
 	color: #009c0e;
 }
 
+table.dataview th a {
+	color: black;
+	font-weight: bold;
+}
+
 .tablelinks {
 	text-align: center;
 }
