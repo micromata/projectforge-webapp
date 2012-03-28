@@ -40,7 +40,7 @@ public class WebRegistryEntry
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(WebRegistryEntry.class);
 
-  private RegistryEntry registryEntry;
+  private final RegistryEntry registryEntry;
 
   private Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass;
 
@@ -75,7 +75,15 @@ public class WebRegistryEntry
     this.registryEntry = registryEntry;
   }
 
-  public WebRegistryEntry setListPageColumnsCreatorClass(Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass)
+  /**
+   * @return the registryEntry
+   */
+  public RegistryEntry getRegistryEntry()
+  {
+    return registryEntry;
+  }
+
+  public WebRegistryEntry setListPageColumnsCreatorClass(final Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass)
   {
     this.listPageColumnsCreatorClass = listPageColumnsCreatorClass;
     return this;
@@ -85,9 +93,9 @@ public class WebRegistryEntry
    * Needed for displaying the result-sets by the general search page.
    */
   public Class< ? extends IListPageColumnsCreator< ? >> getListPageColumnsCreatorClass()
-  {
+      {
     return listPageColumnsCreatorClass;
-  }
+      }
 
   /**
    * Creates a proxy via LazyInitProxyFactory. Use-full if needed in Wicket components. Avoids Wicket serialization of the dao.
@@ -104,14 +112,14 @@ public class WebRegistryEntry
   }
 
   public Class< ? extends BaseDao< ? >> getDaoClassType()
-  {
+      {
     return registryEntry.getDaoClassType();
-  }
+      }
 
   public Class< ? extends BaseDO< ? >> getDOClass()
-  {
+      {
     return registryEntry.getDOClass();
-  }
+      }
 
   public String getI18nPrefix()
   {
@@ -131,5 +139,17 @@ public class WebRegistryEntry
   public final Class< ? extends BaseSearchFilter> getSearchFilterClass()
   {
     return registryEntry.getSearchFilterClass();
+  }
+
+
+  /**
+   * If true (default) then the search in the web search page is supported for this area. Otherwise this area will not be included in the
+   * search.
+   * @return the searchable
+   * @see RegistryEntry#isSearchable()
+   */
+  public boolean isSearchable()
+  {
+    return registryEntry.isSearchable();
   }
 }
