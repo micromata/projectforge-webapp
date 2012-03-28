@@ -42,7 +42,7 @@ public class MarketingPlugin extends AbstractPlugin
 
   private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { AddressCampaignDO.class, AddressCampaignValueDO.class};
 
-  private AddressCampaignDao campaignDao;
+  private AddressCampaignDao addressCampaignDao;
 
   private AddressCampaignValueDao addressCampaignValueDao;
 
@@ -58,7 +58,7 @@ public class MarketingPlugin extends AbstractPlugin
     // DatabaseUpdateDao is needed by the updater:
     MarketingPluginUpdates.dao = databaseUpdateDao;
     // Register it:
-    register(ADDRESS_CAMPAIGN_ID, AddressCampaignDao.class, campaignDao, "plugins.marketing.addressCampaign");
+    register(ADDRESS_CAMPAIGN_ID, AddressCampaignDao.class, addressCampaignDao, "plugins.marketing.addressCampaign");
     register(ADDRESS_CAMPAIGN_VALUE_ID, AddressCampaignValueDao.class, addressCampaignValueDao, "plugins.marketing.addressCampaignValue");
 
     // Register the web part:
@@ -67,8 +67,10 @@ public class MarketingPlugin extends AbstractPlugin
 
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-    registerMenuItem(new MenuItemDef(parentMenu, ADDRESS_CAMPAIGN_ID, 30, "plugins.marketing.addressCampaign.menu", AddressCampaignListPage.class));
-    registerMenuItem(new MenuItemDef(parentMenu, ADDRESS_CAMPAIGN_VALUE_ID, 30, "plugins.marketing.addressCampaignValue.menu", AddressCampaignValueListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ADDRESS_CAMPAIGN_ID, 30, "plugins.marketing.addressCampaign.menu",
+        AddressCampaignListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ADDRESS_CAMPAIGN_VALUE_ID, 30, "plugins.marketing.addressCampaignValue.menu",
+        AddressCampaignValueListPage.class));
 
     // Define the access management:
     registerRight(new AddressCampaignRight());
@@ -78,9 +80,20 @@ public class MarketingPlugin extends AbstractPlugin
     addResourceBundle(RESOURCE_BUNDLE_NAME);
   }
 
-  public void setCampaignDao(final AddressCampaignDao campaignDao)
+  /**
+   * @param addressCampaignDao the addressCampaignDao to set
+   */
+  public void setAddressCampaignDao(final AddressCampaignDao addressCampaignDao)
   {
-    this.campaignDao = campaignDao;
+    this.addressCampaignDao = addressCampaignDao;
+  }
+
+  /**
+   * @param addressCampaignValueDao the addressCampaignValueDao to set
+   */
+  public void setAddressCampaignValueDao(final AddressCampaignValueDao addressCampaignValueDao)
+  {
+    this.addressCampaignValueDao = addressCampaignValueDao;
   }
 
   @Override
