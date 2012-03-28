@@ -39,7 +39,6 @@ public class SearchDao extends HibernateDaoSupport
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SearchDao.class);
 
-  @SuppressWarnings("unchecked")
   public List<SearchResultData> getEntries(final BaseSearchFilter filter, final Class clazz, final BaseDao baseDao)
   {
     if (filter == null) {
@@ -66,8 +65,8 @@ public class SearchDao extends HibernateDaoSupport
     // TODO: Search for history entries.
     // Now put the stuff together:
     int counter = 0;
-    for (ExtendedBaseDO entry : list) {
-      SearchResultData data = new SearchResultData();
+    for (final ExtendedBaseDO entry : list) {
+      final SearchResultData data = new SearchResultData();
       // Integer userId = NumberHelper.parseInteger(entry.getUserName());
       // if (userId != null) {
       // data.modifiedByUser = userGroupCache.getUser(userId);
