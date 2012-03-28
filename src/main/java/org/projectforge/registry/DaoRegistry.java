@@ -211,7 +211,7 @@ public class DaoRegistry
       log.error("DaoRegistry is already initialized!");
       return;
     }
-    register(CONFIGURATION, ConfigurationDao.class, configurationDao, "administration.configuration");
+    register(CONFIGURATION, ConfigurationDao.class, configurationDao, "administration.configuration").setSearchable(false);
     register(USER, UserDao.class, userDao, "user");
     Registry.instance().setUserGroupCache(userDao.getUserGroupCache());
     register(GROUP, GroupDao.class, groupDao, "group");
@@ -231,7 +231,7 @@ public class DaoRegistry
     register(COST2_Type, Kost2ArtDao.class, kost2ArtDao, "fibu.kost2art");
     register(COST2, Kost2Dao.class, kost2Dao, "fibu.kost2"); // Needs kost2Art and project
     register(COST_ASSIGNMENT, KostZuweisungDao.class, kostZuweisungDao, "fibu.") // Needs kost, invoices, employee salaries
-    .setFullTextSearchSupport(false);
+    .setFullTextSearchSupport(false).setSearchable(false);
 
     register(ORDERBOOK, AuftragDao.class, auftragDao, "fibu.auftrag") // Needs customer, project
     .setNestedDOClasses(AuftragsPositionDO.class);
@@ -243,7 +243,7 @@ public class DaoRegistry
     register(ACCOUNT, KontoDao.class, kontoDao, "fibu.konto");
     Registry.instance().setKontoCache(kontoDao.getKontoCache());
     register(EMPLOYEE, EmployeeDao.class, employeeDao, "fibu.employee").setScriptingDao(new EmployeeScriptingDao(employeeDao));
-    register(EMPLOYEE_SALARY, EmployeeDao.class, employeeSalaryDao, "fibu.employee.saraly");
+    register(EMPLOYEE_SALARY, EmployeeDao.class, employeeSalaryDao, "fibu.employee.salary");
 
     register(CONTRACT, ContractDao.class, contractDao, "legalAffaires.contract");
     register(OUTGOING_MAIL, PostausgangDao.class, postausgangDao, "orga.postausgang");
@@ -256,7 +256,7 @@ public class DaoRegistry
     register(MEB, MebDao.class, mebDao, "meb");
     register(SCRIPT, ScriptDao.class, scriptDao, "scripting");
     register(USER_PREF, UserPrefDao.class, userPrefDao);
-    register(USER_RIGHT, UserRightDao.class, userRightDao);
+    register(USER_RIGHT, UserRightDao.class, userRightDao).setSearchable(false);
 
     instance = this;
   }
