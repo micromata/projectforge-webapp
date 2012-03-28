@@ -24,6 +24,8 @@
 package org.projectforge.web.wicket.components;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,8 +55,7 @@ public class LabelValueChoiceRenderer<T> implements IChoiceRenderer<T>
   }
 
   /**
-   * Creates already entries from the given enum.
-   * Works only if T is from type I18nEnum.
+   * Creates already entries from the given enum. Works only if T is from type I18nEnum.
    * @param parent Only needed for internationalization.
    * @param i18nEnum if not enum and not from type T a class cast exception will be thrown.
    * @see Component#getString(String)
@@ -78,7 +79,7 @@ public class LabelValueChoiceRenderer<T> implements IChoiceRenderer<T>
   {
     this();
     for (final String value : values) {
-      addValue((T)value, value);
+      addValue((T) value, value);
     }
   }
 
@@ -118,6 +119,32 @@ public class LabelValueChoiceRenderer<T> implements IChoiceRenderer<T>
   {
     this.values.add(value);
     this.displayValues.put(value, displayValue);
+    return this;
+  }
+
+  public LabelValueChoiceRenderer<T> addValue(final int index, final T value, final String displayValue)
+  {
+    this.values.add(index, value);
+    this.displayValues.put(value, displayValue);
+    return this;
+  }
+
+  /**
+   * Sort the entries by label.
+   * @return This for chaining.
+   */
+  public LabelValueChoiceRenderer<T> sortLabels()
+  {
+    Collections.sort(values, new Comparator<T>() {
+      @Override
+      public int compare(final T value1, final T value2)
+      {
+        final String label1 = displayValues.get(value1).toLowerCase();
+        final String label2 = displayValues.get(value2).toLowerCase();
+        return label1.compareTo(label2);
+      }
+
+    });
     return this;
   }
 
