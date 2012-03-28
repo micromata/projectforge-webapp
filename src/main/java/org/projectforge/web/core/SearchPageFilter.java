@@ -29,18 +29,20 @@ import org.projectforge.xml.stream.XmlObject;
 @XmlObject(alias = "searchPageFilter")
 public class SearchPageFilter extends SearchFilter
 {
+  public static final String ALL = "ALL";
+
   private static final long serialVersionUID = 2056162179686892853L;
 
   private Integer lastDays;
 
-  private String area;
+  private String area = ALL;
 
   public Integer getLastDays()
   {
     return lastDays;
   }
 
-  public void setLastDays(Integer lastDays)
+  public void setLastDays(final Integer lastDays)
   {
     this.lastDays = lastDays;
   }
@@ -50,12 +52,12 @@ public class SearchPageFilter extends SearchFilter
     return area;
   }
 
-  public void setArea(String area)
+  public void setArea(final String area)
   {
     this.area = area;
   }
-  
-  public void setMaxRows(Integer maxRows)
+
+  public void setMaxRows(final Integer maxRows)
   {
     super.setMaxRows(maxRows != null ? maxRows : 3);
   }

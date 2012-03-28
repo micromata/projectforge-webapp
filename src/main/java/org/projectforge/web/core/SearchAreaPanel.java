@@ -114,7 +114,9 @@ public class SearchAreaPanel extends Panel
     }
     if ("ALL".equals(filter.getArea()) == true) {
       for (final WebRegistryEntry registryEntry : WebRegistry.instance().getOrderedList()) {
-        addArea(registryEntry);
+        if (SearchForm.isSearchable(registryEntry.getRegistryEntry()) == true) {
+          addArea(registryEntry);
+        }
       }
     } else {
       final WebRegistryEntry registryEntry = WebRegistry.instance().getEntry(filter.getArea());

@@ -94,8 +94,8 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
     gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("filter.lastModified"), true);
-      final DatePanel modifiedStartDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter,
-          "startTimeOfLastModification"), DatePanelSettings.get().withSelectPeriodMode(true));
+      final DatePanel modifiedStartDatePanel = new DatePanel(fs.newChildId(),
+          new PropertyModel<Date>(filter, "startTimeOfLastModification"), DatePanelSettings.get().withSelectPeriodMode(true));
       fs.add(modifiedStartDatePanel);
       fs.add(new DivTextPanel(fs.newChildId(), " - "));
       final DatePanel modifiedStopDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(filter, "stopTimeOfLastModification"),
@@ -166,12 +166,13 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("search.area"));
       // DropDownChoice: area
       final LabelValueChoiceRenderer<String> areaChoiceRenderer = new LabelValueChoiceRenderer<String>();
-      areaChoiceRenderer.addValue("ALL", getString("filter.all"));
       for (final RegistryEntry entry : Registry.instance().getOrderedList()) {
-        if (entry.getDao().hasLoggedInUserHistoryAccess(false) == true) {
+        if (isSearchable(entry) == true) {
           areaChoiceRenderer.addValue(entry.getId(), getString(entry.getI18nTitleHeading()));
         }
       }
+      areaChoiceRenderer.sortLabels();
+      areaChoiceRenderer.addValue(0, SearchPageFilter.ALL, getString("filter.all"));
       final DropDownChoice<String> areaChoice = new DropDownChoice<String>(fs.getDropDownChoiceId(), new PropertyModel<String>(filter,
           "area"), areaChoiceRenderer.getValues(), areaChoiceRenderer) {
         @Override
@@ -180,7 +181,6 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
           return true;
         }
       };
-      areaChoice.setNullValid(true);
       areaChoice.setRequired(false);
       fs.add(areaChoice);
     }
@@ -211,5 +211,10 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
       actionButtons.add(sendButtonPanel);
       setDefaultButton(searchButton);
     }
+  }
+
+  static boolean isSearchable(final RegistryEntry entry)
+  {
+    return entry.getDao().hasLoggedInUserHistoryAccess(false) == true && entry.isSearchable() == true;
   }
 }
