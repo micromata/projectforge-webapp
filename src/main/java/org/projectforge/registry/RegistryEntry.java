@@ -36,11 +36,11 @@ import org.projectforge.database.DatabaseDao;
  */
 public class RegistryEntry
 {
-  private String id;
+  private final String id;
 
-  private String i18nPrefix;
+  private final String i18nPrefix;
 
-  private BaseDao< ? > dao;
+  private final BaseDao< ? > dao;
 
   private Class< ? extends BaseDO< ? >>[] nestedDOClasses;
 
@@ -50,9 +50,11 @@ public class RegistryEntry
 
   private boolean fullTextSearchSupport = true;
 
+  private boolean searchable = true;
+
   private Class< ? extends BaseSearchFilter> searchFilterClass;
 
-  private Class< ? extends BaseDao< ? >> daoClassType;
+  private final Class< ? extends BaseDao< ? >> daoClassType;
 
   /**
    * @param id
@@ -95,7 +97,7 @@ public class RegistryEntry
     return this;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes"})
   public ScriptingDao< ? > getScriptingDao()
   {
     if (this.supressScriptingDao == true) {
@@ -153,18 +155,18 @@ public class RegistryEntry
   }
 
   public Class< ? extends BaseDO< ? >> getDOClass()
-  {
+      {
     return dao.getDOClass();
-  }
+      }
 
   /**
    * The nested do classes are used e. g. by the full text search engine for re-indexing.
    * @return Nested (dependant do classes with no own registry entry) if given, otherwise null.
    */
   public Class< ? extends BaseDO< ? >>[] getNestedDOClasses()
-  {
+      {
     return nestedDOClasses;
-  }
+      }
 
   /**
    * @param nestedDOClasses
@@ -182,9 +184,9 @@ public class RegistryEntry
   }
 
   public Class< ? extends BaseDao< ? >> getDaoClassType()
-  {
+      {
     return daoClassType;
-  }
+      }
 
   /**
    * Is used e. g. by {@link org.projectforge.web.core.SearchForm}: &lt;i18nPrefix&gt;.title.heading.
@@ -198,5 +200,25 @@ public class RegistryEntry
   public String getI18nTitleHeading()
   {
     return i18nPrefix + ".title.heading";
+  }
+
+  /**
+   * If true (default) then the search in the web search page is supported for this area. Otherwise this area will not be included in the
+   * search.
+   * @return the searchable
+   */
+  public boolean isSearchable()
+  {
+    return searchable;
+  }
+
+  /**
+   * @param searchable the searchable to set
+   * @return this for chaining.
+   */
+  public RegistryEntry setSearchable(final boolean searchable)
+  {
+    this.searchable = searchable;
+    return this;
   }
 }
