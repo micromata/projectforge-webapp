@@ -91,6 +91,7 @@ public class SystemInfoCache extends AbstractCache
     customerEntriesExists = hasTableEntries(jdbc, KundeDO.class);
     projectEntriesExists = hasTableEntries(jdbc, ProjektDO.class);
     cost2EntriesExists = hasTableEntries(jdbc, Kost2DO.class);
+    log.info("Refreshing SystemInfoCache done.");
   }
 
   private boolean hasTableEntries(final JdbcTemplate jdbc, final Class< ? > entity)
@@ -103,7 +104,7 @@ public class SystemInfoCache extends AbstractCache
       return false;
     }
   }
-  
+
   public void setDataSource(final DataSource dataSource)
   {
     this.dataSource = dataSource;
