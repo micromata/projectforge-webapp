@@ -129,7 +129,6 @@ public class SearchAreaPanel extends Panel
   @SuppressWarnings("serial")
   private void addArea(final WebRegistryEntry registryEntry)
   {
-    log.info("Search '" + registryEntry.getId() + "'.");
     final long millis = System.currentTimeMillis();
     final Class< ? extends IListPageColumnsCreator< ? >> clazz = registryEntry.getListPageColumnsCreatorClass();
     final IListPageColumnsCreator< ? > listPageColumnsCreator = clazz == null ? null : (IListPageColumnsCreator< ? >) BeanHelper
