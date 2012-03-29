@@ -62,7 +62,7 @@ public class BankingPlugin extends AbstractPlugin
     BankingPluginUpdates.dao = databaseUpdateDao;
     // Register it:
     register(BANK_ACCOUNT_ID, BankAccountDao.class, bankAccountDao, "plugins.banking.account").setNestedDOClasses(
-        BankAccountRecordDO.class, BankAccountBalanceDO.class);
+        BankAccountRecordDO.class, BankAccountBalanceDO.class).setSearchable(false);
     // register(BANK_ACCOUNT_BALANCE_ID, BankAccountBalanceDao.class, addressCampaignValueDao, "plugins.banking.accountBalance");
 
     // Register the web part:
