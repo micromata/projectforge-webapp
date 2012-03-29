@@ -59,7 +59,8 @@ public class MarketingPlugin extends AbstractPlugin
     MarketingPluginUpdates.dao = databaseUpdateDao;
     // Register it:
     register(ADDRESS_CAMPAIGN_ID, AddressCampaignDao.class, addressCampaignDao, "plugins.marketing.addressCampaign");
-    register(ADDRESS_CAMPAIGN_VALUE_ID, AddressCampaignValueDao.class, addressCampaignValueDao, "plugins.marketing.addressCampaignValue");
+    register(ADDRESS_CAMPAIGN_VALUE_ID, AddressCampaignValueDao.class, addressCampaignValueDao, "plugins.marketing.addressCampaignValue")
+    .setSearchable(false);
 
     // Register the web part:
     registerWeb(ADDRESS_CAMPAIGN_ID, AddressCampaignListPage.class, AddressCampaignEditPage.class);
