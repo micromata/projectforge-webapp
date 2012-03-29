@@ -36,11 +36,9 @@ import org.projectforge.web.address.AddressMobileListPage;
 import org.projectforge.web.address.AddressViewPage;
 import org.projectforge.web.admin.SetupPage;
 import org.projectforge.web.calendar.CalendarPage;
-import org.projectforge.web.core.SearchPage;
 import org.projectforge.web.doc.TutorialPage;
 import org.projectforge.web.fibu.EingangsrechnungEditPage;
 import org.projectforge.web.fibu.RechnungEditPage;
-import org.projectforge.web.fibu.ReportObjectivesPage;
 import org.projectforge.web.mobile.LoginMobilePage;
 import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.registry.WebRegistry;
@@ -54,7 +52,7 @@ public class CallAllPagesTest extends WicketPageTestBase
   @SuppressWarnings("unchecked")
   private final Class< ? extends WebPage>[] skipPages = new Class[] { AddressMobileEditPage.class, AddressMobileListPage.class,
     AddressViewPage.class, CalendarPage.class, EingangsrechnungEditPage.class, LoginPage.class, LoginMobilePage.class,
-    MenuMobilePage.class, RechnungEditPage.class, ReportObjectivesPage.class, SetupPage.class, SearchPage.class, ScriptExecutePage.class,
+    MenuMobilePage.class, RechnungEditPage.class, SetupPage.class, ScriptExecutePage.class,
     TutorialPage.class};
 
   @Test
