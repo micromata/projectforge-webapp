@@ -215,6 +215,8 @@ public class SearchForm extends AbstractStandardForm<SearchPageFilter, SearchPag
 
   static boolean isSearchable(final RegistryEntry entry)
   {
-    return entry.getDao().hasLoggedInUserHistoryAccess(false) == true && entry.isSearchable() == true;
+    return entry.getDao().isHistorizable() == true
+        && entry.getDao().hasLoggedInUserHistoryAccess(false) == true
+        && entry.isSearchable() == true;
   }
 }
