@@ -45,11 +45,12 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 @ListPage(editPage = EmployeeEditPage.class)
-public class EmployeeListPage extends AbstractListPage<EmployeeListForm, EmployeeDao, EmployeeDO>
+public class EmployeeListPage extends AbstractListPage<EmployeeListForm, EmployeeDao, EmployeeDO> implements IListPageColumnsCreator<EmployeeDO>
 {
   private static final long serialVersionUID = -8406452960003792763L;
 

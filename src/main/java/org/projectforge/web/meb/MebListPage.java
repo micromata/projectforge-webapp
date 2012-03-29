@@ -30,6 +30,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -45,11 +46,12 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 @ListPage(editPage = MebEditPage.class)
-public class MebListPage extends AbstractListPage<MebListForm, MebDao, MebEntryDO>
+public class MebListPage extends AbstractListPage<MebListForm, MebDao, MebEntryDO> implements IListPageColumnsCreator<MebEntryDO>
 {
   private static final long serialVersionUID = -3852280776436565963L;
 
@@ -64,9 +66,12 @@ public class MebListPage extends AbstractListPage<MebListForm, MebDao, MebEntryD
     super(parameters, "meb");
   }
 
+  /**
+   * @see org.projectforge.web.wicket.IListPageColumnsCreator#createColumns(org.apache.wicket.markup.html.WebPage, boolean)
+   */
   @SuppressWarnings("serial")
   @Override
-  protected void init()
+  public List<IColumn<MebEntryDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<MebEntryDO>> columns = new ArrayList<IColumn<MebEntryDO>>();
     final CellItemListener<MebEntryDO> cellItemListener = new CellItemListener<MebEntryDO>() {
@@ -111,7 +116,13 @@ public class MebListPage extends AbstractListPage<MebListForm, MebDao, MebEntryD
     .add(new CellItemListenerPropertyColumn<MebEntryDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<MebEntryDO>(new Model<String>(getString("meb.message")), "message", "message",
         cellItemListener));
-    dataTable = createDataTable(columns, "date", SortOrder.DESCENDING);
+    return columns;
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this, true), "date", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 

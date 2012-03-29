@@ -30,6 +30,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -42,11 +43,12 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 @ListPage(editPage = ContractEditPage.class)
-public class ContractListPage extends AbstractListPage<ContractListForm, ContractDao, ContractDO>
+public class ContractListPage extends AbstractListPage<ContractListForm, ContractDao, ContractDO> implements IListPageColumnsCreator<ContractDO>
 {
   private static final long serialVersionUID = 671935723386728113L;
 
@@ -58,9 +60,12 @@ public class ContractListPage extends AbstractListPage<ContractListForm, Contrac
     super(parameters, "legalAffaires.contract");
   }
 
+  /**
+   * @see org.projectforge.web.wicket.IListPageColumnsCreator#createColumns(org.apache.wicket.markup.html.WebPage, boolean)
+   */
   @SuppressWarnings("serial")
   @Override
-  protected void init()
+  public List<IColumn<ContractDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<ContractDO>> columns = new ArrayList<IColumn<ContractDO>>();
 
@@ -98,7 +103,13 @@ public class ContractListPage extends AbstractListPage<ContractListForm, Contrac
     columns.add(new CellItemListenerPropertyColumn<ContractDO>(getString("resubmissionOnDate"), "resubmissionOnDate", "resubmissionOnDate",
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<ContractDO>(getString("dueDate"), "dueDate", "dueDate", cellItemListener));
-    dataTable = createDataTable(columns, "number", SortOrder.DESCENDING);
+    return columns;
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this, true), "number", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 

@@ -30,6 +30,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.Item;
@@ -48,12 +49,13 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @ListPage(editPage = CustomerEditPage.class)
-public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDao, KundeDO>
+public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDao, KundeDO> implements IListPageColumnsCreator<KundeDO>
 {
   private static final long serialVersionUID = -8406452960003792763L;
 
@@ -63,21 +65,13 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
   @SpringBean(name = "kundeDao")
   private KundeDao kundeDao;
 
-  public CustomerListPage(final PageParameters parameters)
-  {
-    super(parameters, "fibu.kunde");
-  }
-
-  public CustomerListPage(final ISelectCallerPage caller, final String selectProperty)
-  {
-    super(caller, selectProperty, "fibu.kunde");
-  }
-
+  /**
+   * @see org.projectforge.web.wicket.IListPageColumnsCreator#createColumns(org.apache.wicket.markup.html.WebPage, boolean)
+   */
   @SuppressWarnings("serial")
   @Override
-  protected void init()
+  public List<IColumn<KundeDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-
     final List<IColumn<KundeDO>> columns = new ArrayList<IColumn<KundeDO>>();
 
     final CellItemListener<KundeDO> cellItemListener = new CellItemListener<KundeDO>() {
@@ -138,7 +132,23 @@ public class CustomerListPage extends AbstractListPage<CustomerListForm, KundeDa
     columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("status")), "status", "status", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<KundeDO>(new Model<String>(getString("description")), "description", "description",
         cellItemListener));
-    dataTable = createDataTable(columns, "kost", SortOrder.ASCENDING);
+    return columns;
+  }
+
+  public CustomerListPage(final PageParameters parameters)
+  {
+    super(parameters, "fibu.kunde");
+  }
+
+  public CustomerListPage(final ISelectCallerPage caller, final String selectProperty)
+  {
+    super(caller, selectProperty, "fibu.kunde");
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this, true), "kost", SortOrder.ASCENDING);
     form.add(dataTable);
 
     final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink(ContentMenuEntryPanel.LINK_ID,

@@ -30,6 +30,7 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -42,12 +43,13 @@ import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
+import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
-
 @ListPage(editPage = PostausgangEditPage.class)
-public class PostausgangListPage extends AbstractListPage<PostausgangListForm, PostausgangDao, PostausgangDO>
+public class PostausgangListPage extends AbstractListPage<PostausgangListForm, PostausgangDao, PostausgangDO> implements
+IListPageColumnsCreator<PostausgangDO>
 {
   private static final long serialVersionUID = 6121734373079865758L;
 
@@ -59,14 +61,17 @@ public class PostausgangListPage extends AbstractListPage<PostausgangListForm, P
     super(parameters, "orga.postausgang");
   }
 
+  /**
+   * @see org.projectforge.web.wicket.IListPageColumnsCreator#createColumns(org.apache.wicket.markup.html.WebPage, boolean)
+   */
   @SuppressWarnings("serial")
   @Override
-  protected void init()
+  public List<IColumn<PostausgangDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<PostausgangDO>> columns = new ArrayList<IColumn<PostausgangDO>>();
-
     final CellItemListener<PostausgangDO> cellItemListener = new CellItemListener<PostausgangDO>() {
-      public void populateItem(final Item<ICellPopulator<PostausgangDO>> item, final String componentId, final IModel<PostausgangDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<PostausgangDO>> item, final String componentId,
+          final IModel<PostausgangDO> rowModel)
       {
         final PostausgangDO postausgang = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(postausgang.getId(), postausgang.isDeleted());
@@ -78,10 +83,12 @@ public class PostausgangListPage extends AbstractListPage<PostausgangListForm, P
     columns
     .add(new CellItemListenerPropertyColumn<PostausgangDO>(new Model<String>(getString("date")), "datum", "datum", cellItemListener) {
       /**
-       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item, java.lang.String, org.apache.wicket.model.IModel)
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
        */
       @Override
-      public void populateItem(final Item<ICellPopulator<PostausgangDO>> item, final String componentId, final IModel<PostausgangDO> rowModel)
+      public void populateItem(final Item<ICellPopulator<PostausgangDO>> item, final String componentId,
+          final IModel<PostausgangDO> rowModel)
       {
         final PostausgangDO postausgang = rowModel.getObject();
         item.add(new ListSelectActionPanel(componentId, rowModel, PostausgangEditPage.class, postausgang.getId(),
@@ -100,7 +107,13 @@ public class PostausgangListPage extends AbstractListPage<PostausgangListForm, P
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<PostausgangDO>(new Model<String>(getString("orga.post.type")), "type", "type",
         cellItemListener));
-    dataTable = createDataTable(columns, "datum", SortOrder.DESCENDING);
+    return columns;
+  }
+
+  @Override
+  protected void init()
+  {
+    dataTable = createDataTable(createColumns(this, true), "datum", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 
