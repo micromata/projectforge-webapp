@@ -113,6 +113,8 @@ public class DaoRegistry
 
   public static final String GROUP = "group";
 
+  public static final String HR_LIST = "hrList";
+
   public static final String HR_PLANNING = "hrPlanning";
 
   public static final String INCOMING_INVOICE = "incomingInvoice";
@@ -239,11 +241,12 @@ public class DaoRegistry
     .setNestedDOClasses(RechnungsPositionDO.class);
     register(INCOMING_INVOICE, EingangsrechnungDao.class, eingangsrechnungDao, "fibu.eingangsrechnung") //
     .setNestedDOClasses(EingangsrechnungsPositionDO.class);
-    register(ACCOUNTING_RECORD, BuchungssatzDao.class, buchungssatzDao, "fibu.buchungssatz"); // Need account, cost1 and cost2.
+    register(ACCOUNTING_RECORD, BuchungssatzDao.class, buchungssatzDao, "fibu.buchungssatz").setSearchable(false); // Need account, cost1
+    // and cost2.
     register(ACCOUNT, KontoDao.class, kontoDao, "fibu.konto");
     Registry.instance().setKontoCache(kontoDao.getKontoCache());
     register(EMPLOYEE, EmployeeDao.class, employeeDao, "fibu.employee").setScriptingDao(new EmployeeScriptingDao(employeeDao));
-    register(EMPLOYEE_SALARY, EmployeeDao.class, employeeSalaryDao, "fibu.employee.salary");
+    register(EMPLOYEE_SALARY, EmployeeDao.class, employeeSalaryDao, "fibu.employee.salary").setSearchable(false);
 
     register(CONTRACT, ContractDao.class, contractDao, "legalAffaires.contract");
     register(OUTGOING_MAIL, PostausgangDao.class, postausgangDao, "orga.postausgang");
@@ -251,11 +254,11 @@ public class DaoRegistry
 
     register(GANTT, GanttChartDao.class, ganttChartDao, "gantt");
     register(HR_PLANNING, HRPlanningDao.class, hrPlanningDao, "hr.planning") //
-    .setNestedDOClasses(HRPlanningEntryDO.class);
+    .setNestedDOClasses(HRPlanningEntryDO.class).setSearchable(false);
 
     register(MEB, MebDao.class, mebDao, "meb");
-    register(SCRIPT, ScriptDao.class, scriptDao, "scripting");
-    register(USER_PREF, UserPrefDao.class, userPrefDao);
+    register(SCRIPT, ScriptDao.class, scriptDao, "scripting").setSearchable(false);
+    register(USER_PREF, UserPrefDao.class, userPrefDao).setSearchable(false);
     register(USER_RIGHT, UserRightDao.class, userRightDao).setSearchable(false);
 
     instance = this;
