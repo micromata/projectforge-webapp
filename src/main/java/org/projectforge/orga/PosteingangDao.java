@@ -52,19 +52,24 @@ public class PosteingangDao extends BaseDao<PosteingangDO>
   @SuppressWarnings("unchecked")
   public int[] getYears()
   {
-    List<Object[]> list = (List<Object[]>) getSession().createQuery("select min(datum), max(datum) from PosteingangDO t").list();
+    final List<Object[]> list = getSession().createQuery("select min(datum), max(datum) from PosteingangDO t").list();
     return SQLHelper.getYears(list);
   }
 
   @Override
-  public List<PosteingangDO> getList(BaseSearchFilter filter)
+  public List<PosteingangDO> getList(final BaseSearchFilter filter)
   {
-    PostFilter myFilter = (PostFilter) filter;
-    QueryFilter queryFilter = new QueryFilter(filter);
+    final PostFilter myFilter;
+    if (filter instanceof PostFilter) {
+      myFilter = (PostFilter) filter;
+    } else {
+      myFilter = new PostFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(filter);
     queryFilter.setYearAndMonth("datum", myFilter.getYear(), myFilter.getMonth());
     queryFilter.addOrder(Order.desc("datum"));
     queryFilter.addOrder(Order.asc("absender"));
-    List<PosteingangDO> list = getList(queryFilter);
+    final List<PosteingangDO> list = getList(queryFilter);
     return list;
   }
 

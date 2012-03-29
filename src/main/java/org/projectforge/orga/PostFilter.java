@@ -41,6 +41,16 @@ public class PostFilter extends BaseSearchFilter implements Serializable
 
   protected int month = -1;
 
+  public PostFilter()
+  {
+  }
+
+  public PostFilter(final BaseSearchFilter filter)
+  {
+    super(filter);
+  }
+
+
   /**
    * Year of invoices to filter. "<= 0" means showing all years.
    * @return
@@ -50,7 +60,7 @@ public class PostFilter extends BaseSearchFilter implements Serializable
     return year;
   }
 
-  public void setYear(int year)
+  public void setYear(final int year)
   {
     this.year = year;
   }
@@ -64,7 +74,7 @@ public class PostFilter extends BaseSearchFilter implements Serializable
     return month;
   }
 
-  public void setMonth(int month)
+  public void setMonth(final int month)
   {
     this.month = month;
   }
