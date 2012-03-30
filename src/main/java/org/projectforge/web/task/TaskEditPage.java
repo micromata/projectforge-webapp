@@ -24,8 +24,6 @@
 package org.projectforge.web.task;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -70,7 +68,6 @@ public class TaskEditPage extends AbstractEditPage<TaskDO, TaskEditForm, TaskDao
     super(parameters, "task");
     init();
     addTopMenuPanel();
-    addTopRightMenu();
     final Integer parentTaskId = WicketUtils.getAsInteger(parameters, PARAM_PARENT_TASK_ID);
     if (NumberHelper.greaterZero(parentTaskId) == true) {
       taskDao.setParentTask(getData(), parentTaskId);
@@ -156,6 +153,7 @@ public class TaskEditPage extends AbstractEditPage<TaskDO, TaskEditForm, TaskDao
         };
       }, getString("task.menu.addSubTask"));
       addContentMenuEntry(menu);
+
       menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
         @Override
         public void onClick()
@@ -173,6 +171,15 @@ public class TaskEditPage extends AbstractEditPage<TaskDO, TaskEditForm, TaskDao
       showTimesheetsLink.getPageParameters().set(TimesheetListPage.PARAMETER_KEY_TASK_ID, id);
       menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), showTimesheetsLink, getString("task.menu.showTimesheets"));
       addContentMenuEntry(menu);
+
+      final BookmarkablePageLink<Void> showAccessRightsLink = new BookmarkablePageLink<Void>("link", AccessListPage.class);
+      if (form.getData().getId() != null) {
+        showAccessRightsLink.getPageParameters().set(AccessListPage.PARAMETER_KEY_TASK_ID, form.getData().getId());
+      }
+      menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), showAccessRightsLink, getString("task.menu.showAccessRights"));
+      addContentMenuEntry(menu);
+
+
       menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
         @Override
         public void onClick()
@@ -186,19 +193,6 @@ public class TaskEditPage extends AbstractEditPage<TaskDO, TaskEditForm, TaskDao
       }, getString("gantt.title.add"));
       addContentMenuEntry(menu);
     }
-  }
-
-  protected void addTopRightMenu()
-  {
-    dropDownMenu.setVisible(true);
-    final WebMarkupContainer item = new WebMarkupContainer(getNewDropDownMenuChildId());
-    addDropDownMenuEntry(item);
-    final BookmarkablePageLink<Void> showAccessRightsLink = new BookmarkablePageLink<Void>("menuEntry", AccessListPage.class);
-    if (form.getData().getId() != null) {
-      showAccessRightsLink.getPageParameters().set(AccessListPage.PARAMETER_KEY_TASK_ID, form.getData().getId());
-    }
-    showAccessRightsLink.add(new Label("label", getString("task.menu.showAccessRights")).setRenderBodyOnly(true));
-    item.add(showAccessRightsLink);
   }
 
   @Override
