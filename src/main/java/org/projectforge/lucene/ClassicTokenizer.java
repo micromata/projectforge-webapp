@@ -59,16 +59,17 @@ import org.apache.lucene.util.Version;
 
 public final class ClassicTokenizer extends Tokenizer {
   /** A private instance of the JFlex-constructed scanner */
-  private StandardTokenizerInterface scanner;
+  private ClassicTokenizerInterface scanner;
 
   public static final int ALPHANUM          = 0;
   public static final int APOSTROPHE        = 1;
   public static final int ACRONYM           = 2;
   public static final int COMPANY           = 3;
-  public static final int EMAIL             = 4;
-  public static final int HOST              = 5;
-  public static final int NUM               = 6;
-  public static final int CJ                = 7;
+  public static final int ISO_DATE          = 4; // Kai
+  public static final int EMAIL             = 5;
+  public static final int HOST              = 6;
+  public static final int NUM               = 7;
+  public static final int CJ                = 8;
 
   /**
    * @deprecated this solves a bug where HOSTs that end with '.' are identified
@@ -165,7 +166,7 @@ public final class ClassicTokenizer extends Tokenizer {
     while(true) {
       final int tokenType = scanner.getNextToken();
 
-      if (tokenType == StandardTokenizerInterface.YYEOF) {
+      if (tokenType == ClassicTokenizerInterface.YYEOF) {
         return false;
       }
 
