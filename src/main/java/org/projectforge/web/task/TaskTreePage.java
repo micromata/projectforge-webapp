@@ -145,7 +145,6 @@ public class TaskTreePage extends AbstractSecuredPage
         }, getString("wizard"));
         addContentMenuEntry(menuEntry);
       }
-      dropDownMenu.setVisible(true);
       new AbstractReindexTopRightMenu(this, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
         @Override
         protected void rebuildDatabaseIndex(final boolean onlyNewest)

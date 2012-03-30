@@ -23,16 +23,11 @@
 
 package org.projectforge.web.wicket;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.ContextImage;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.http.WebRequest;
@@ -47,7 +42,6 @@ import org.projectforge.web.core.NavSidePanel;
 import org.projectforge.web.core.NavTopPanel;
 import org.projectforge.web.user.MyAccountEditPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
-import org.projectforge.web.wicket.components.MyRepeatingView;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 /** All pages with required login should be derived from this page. */
@@ -55,26 +49,20 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
 {
   private static final long serialVersionUID = -8721451198050398835L;
 
-  protected WebMarkupContainer contentMenuArea;
-
   /**
    * List to create content menu in the desired order before creating the RepeatingView.
    */
   protected MyComponentsRepeater<ContentMenuEntryPanel> contentMenu;
 
-  protected WebMarkupContainer dropDownMenu;
+  /**
+   * List to create content menu in the desired order before creating the RepeatingView.
+   */
+  protected MyComponentsRepeater<ContentMenuEntryPanel> contentRightMenu;
 
   /**
    * If set then return after save, update or cancel to this page. If not given then return to given list page.
    */
   protected WebPage returnToPage;
-
-  /**
-   * List to create drop down menu in the desired order before creating the RepeatingView.
-   */
-  protected List<WebMarkupContainer> dropDownMenuEntries = new ArrayList<WebMarkupContainer>();
-
-  private RepeatingView dropDownMenuRepeater;
 
   public AbstractSecuredPage(final PageParameters parameters)
   {
@@ -127,13 +115,10 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
 
     contentMenu = new MyComponentsRepeater<ContentMenuEntryPanel>("contentMenuRepeater");
     body.add(contentMenu.getRepeatingView());
-    dropDownMenu = new WebMarkupContainer("dropDownMenu");
-    // 1dropDownMenu.add(new PresizedImage("cogImage", getResponse(), WebConstants.IMAGE_COG));
+    contentRightMenu = new MyComponentsRepeater<ContentMenuEntryPanel>("contentRightMenuRepeater");
+    body.add(contentRightMenu.getRepeatingView());
+    // dropDownMenu.add(new PresizedImage("cogImage", getResponse(), WebConstants.IMAGE_COG));
     // dropDownMenu.add(new PresizedImage("arrowDownImage", getResponse(), WebConstants.IMAGE_ARROW_DOWN));
-    dropDownMenuRepeater = new MyRepeatingView("menu");
-    dropDownMenu.add(dropDownMenuRepeater);
-    dropDownMenu.setVisible(false);
-    //contentMenuArea.add(dropDownMenu);
   }
 
   /**
@@ -157,28 +142,21 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     return this.contentMenu.newChildId();
   }
 
-  public void addDropDownMenuEntry(final WebMarkupContainer entry)
+  protected void addContentRightMenuEntry(final ContentMenuEntryPanel panel)
   {
-    this.dropDownMenuRepeater.add(entry);
+    this.contentRightMenu.add(panel);
   }
 
-  public String getNewDropDownMenuChildId()
+  protected String getNewContentRightMenuChildId()
   {
-    return this.dropDownMenuRepeater.newChildId();
+    return this.contentRightMenu.newChildId();
   }
 
   @Override
   protected void onBeforeRender()
   {
     contentMenu.render();
-    // if (dropDownMenuRendered == false) {
-    // if (this.dropDownMenu.size() > 0) {
-    // for (final WebMarkupContainer entry : this.dropDownMenuEntries) {
-    // this.dropDownMenu.add(entry);
-    // }
-    // }
-    // dropDownMenuRendered = true;
-    // }
+    contentRightMenu.render();
     super.onBeforeRender();
   }
 }

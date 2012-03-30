@@ -25,9 +25,8 @@ package org.projectforge.web.wicket;
 
 import java.io.Serializable;
 
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 /**
  * Helper for creating re-index menu items in the top right drop down menu.
@@ -45,31 +44,25 @@ public abstract class AbstractReindexTopRightMenu implements Serializable
   @SuppressWarnings("serial")
   protected AbstractReindexTopRightMenu(final AbstractSecuredPage page, final boolean enableFullReindex)
   {
-    WebMarkupContainer item = new WebMarkupContainer(page.getNewDropDownMenuChildId());
-    page.addDropDownMenuEntry(item);
-    Link<String> link = new Link<String>("menuEntry") {
+    final ContentMenuEntryPanel  reindex = new ContentMenuEntryPanel(page.getNewContentRightMenuChildId(), new Link<Object>("link") {
       @Override
       public void onClick()
       {
         rebuildDatabaseIndex(true);
-      }
-    };
-    WicketUtils.addTooltip(link, getString("menu.reindexNewestDatabaseEntries.tooltip"));
-    link.add(new Label("label", getString("menu.reindexNewestDatabaseEntries")).setRenderBodyOnly(true));
-    item.add(link);
+      };
+    }, getString("menu.reindexNewestDatabaseEntries"));
+    WicketUtils.addTooltip(reindex, getString("menu.reindexNewestDatabaseEntries.tooltip"));
+    page.addContentRightMenuEntry(reindex);
     if (enableFullReindex == true) {
-      item = new WebMarkupContainer(page.getNewDropDownMenuChildId());
-      page.addDropDownMenuEntry(item);
-      link = new Link<String>("menuEntry") {
+      final ContentMenuEntryPanel  reindexAll = new ContentMenuEntryPanel(page.getNewContentRightMenuChildId(), new Link<Object>("link") {
         @Override
         public void onClick()
         {
           rebuildDatabaseIndex(false);
-        }
-      };
-      WicketUtils.addTooltip(link, getString("menu.reindexAllDatabaseEntries.tooltip"));
-      link.add(new Label("label", getString("menu.reindexAllDatabaseEntries")).setRenderBodyOnly(true));
-      item.add(link);
+        };
+      }, getString("menu.reindexAllDatabaseEntries"));
+      WicketUtils.addTooltip(reindexAll, getString("menu.reindexAllDatabaseEntries.tooltip"));
+      page.addContentRightMenuEntry(reindexAll);
     }
   }
 }

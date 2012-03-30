@@ -48,6 +48,7 @@ import org.projectforge.common.RecentQueue;
 import org.projectforge.common.ReflectionHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDO;
+import org.projectforge.core.BaseDao;
 import org.projectforge.core.UserException;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
@@ -455,32 +456,29 @@ AbstractSecuredPage implements ISelectCallerPage
   protected void addTopRightMenu()
   {
     log.warn("****** WICKET 1.5 ********: topRightMenu");
-    // if (isSelectMode() == false && ((getBaseDao() instanceof BaseDao< ? >) || providesOwnRebuildDatabaseIndex() == true)) {
-    // dropDownMenu.setVisible(true);
-    // new AbstractReindexTopRightMenu(this, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
-    // @Override
-    // protected void rebuildDatabaseIndex(final boolean onlyNewest)
-    // {
-    // if (providesOwnRebuildDatabaseIndex() == true) {
-    // ownRebuildDatabaseIndex(onlyNewest);
-    // } else {
-    // if (onlyNewest == true) {
-    // ((BaseDao< ? >) getBaseDao()).rebuildDatabaseIndex4NewestEntries();
-    // } else {
-    // ((BaseDao< ? >) getBaseDao()).rebuildDatabaseIndex();
-    // }
-    // }
-    // }
-    //
-    // @Override
-    // protected String getString(final String i18nKey)
-    // {
-    // return NewAbstractListPage.this.getString(i18nKey);
-    // }
-    // };
-    // } else {
-    // dropDownMenu.setVisible(false);
-    // }
+    if (isSelectMode() == false && ((getBaseDao() instanceof BaseDao< ? >) || providesOwnRebuildDatabaseIndex() == true)) {
+      new AbstractReindexTopRightMenu(this, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
+        @Override
+        protected void rebuildDatabaseIndex(final boolean onlyNewest)
+        {
+          if (providesOwnRebuildDatabaseIndex() == true) {
+            ownRebuildDatabaseIndex(onlyNewest);
+          } else {
+            if (onlyNewest == true) {
+              ((BaseDao< ? >) getBaseDao()).rebuildDatabaseIndex4NewestEntries();
+            } else {
+              ((BaseDao< ? >) getBaseDao()).rebuildDatabaseIndex();
+            }
+          }
+        }
+
+        @Override
+        protected String getString(final String i18nKey)
+        {
+          return AbstractListPage.this.getString(i18nKey);
+        }
+      };
+    }
   }
 
   protected boolean providesOwnRebuildDatabaseIndex()

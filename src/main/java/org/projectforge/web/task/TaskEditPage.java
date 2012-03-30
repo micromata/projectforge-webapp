@@ -172,14 +172,6 @@ public class TaskEditPage extends AbstractEditPage<TaskDO, TaskEditForm, TaskDao
       menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), showTimesheetsLink, getString("task.menu.showTimesheets"));
       addContentMenuEntry(menu);
 
-      final BookmarkablePageLink<Void> showAccessRightsLink = new BookmarkablePageLink<Void>("link", AccessListPage.class);
-      if (form.getData().getId() != null) {
-        showAccessRightsLink.getPageParameters().set(AccessListPage.PARAMETER_KEY_TASK_ID, form.getData().getId());
-      }
-      menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), showAccessRightsLink, getString("task.menu.showAccessRights"));
-      addContentMenuEntry(menu);
-
-
       menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
         @Override
         public void onClick()
@@ -192,6 +184,13 @@ public class TaskEditPage extends AbstractEditPage<TaskDO, TaskEditForm, TaskDao
         };
       }, getString("gantt.title.add"));
       addContentMenuEntry(menu);
+
+      final BookmarkablePageLink<Void> showAccessRightsLink = new BookmarkablePageLink<Void>("link", AccessListPage.class);
+      if (form.getData().getId() != null) {
+        showAccessRightsLink.getPageParameters().set(AccessListPage.PARAMETER_KEY_TASK_ID, form.getData().getId());
+      }
+      menu = new ContentMenuEntryPanel(getNewContentRightMenuChildId(), showAccessRightsLink, getString("task.menu.showAccessRights"));
+      addContentRightMenuEntry(menu);
     }
   }
 
