@@ -152,7 +152,8 @@ public final class StandardTokenizer extends Tokenizer
 
   private final void init(final Reader input, final Version matchVersion)
   {
-    this.scanner = matchVersion.onOrAfter(Version.LUCENE_31) ? new StandardTokenizerImpl(input) : new ClassicTokenizerImpl(input);
+    //this.scanner = matchVersion.onOrAfter(Version.LUCENE_31) ? new StandardTokenizerImpl(input) : new ClassicTokenizerImpl(input);
+    this.scanner =  new StandardTokenizerImpl(input);
     if (matchVersion.onOrAfter(Version.LUCENE_24)) {
       replaceInvalidAcronym = true;
     } else {
