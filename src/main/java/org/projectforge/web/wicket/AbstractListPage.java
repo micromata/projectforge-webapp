@@ -455,7 +455,6 @@ AbstractSecuredPage implements ISelectCallerPage
   @SuppressWarnings("serial")
   protected void addTopRightMenu()
   {
-    log.warn("****** WICKET 1.5 ********: topRightMenu");
     if (isSelectMode() == false && ((getBaseDao() instanceof BaseDao< ? >) || providesOwnRebuildDatabaseIndex() == true)) {
       new AbstractReindexTopRightMenu(this, accessChecker.isLoggedInUserMemberOfAdminGroup()) {
         @Override
