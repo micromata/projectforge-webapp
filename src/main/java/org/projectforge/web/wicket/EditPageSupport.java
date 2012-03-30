@@ -81,8 +81,6 @@ public class EditPageSupport<O extends AbstractBaseDO< ? >, D extends BaseDao<O>
             return;
           }
           data.copyValuesFrom(dbObj);
-          log.warn("********* WICKET 1.5 MIGRATION ************** editPage.setRedirect(true); removed!!!!!!!!!!!!!!!");
-          // editPage.setRedirect(true);
           return;
         }
         WebPage page = editPage.onSaveOrUpdate();
