@@ -27,6 +27,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.repeater.RepeatingView;
 
@@ -51,6 +52,25 @@ public class MyComponentsRepeater<T extends Component> implements Serializable
     repeatingView = new RepeatingView(repeatingViewId);
   }
 
+  public boolean hasEntries()
+  {
+    return CollectionUtils.isNotEmpty(this.components);
+  }
+
+  /**
+   * @param visible
+   * @return this for chaining.
+   * @see Component#setVisible(boolean)
+   */
+  public MyComponentsRepeater<T> setVisibility(final boolean visible) {
+    repeatingView.setVisible(visible);
+    return this;
+  }
+
+  /**
+   * @param component
+   * @return this for chaining.
+   */
   public MyComponentsRepeater<T> add(final T component)
   {
     components.add(component);
@@ -107,15 +127,20 @@ public class MyComponentsRepeater<T extends Component> implements Serializable
   /**
    * Add all the components to the repeating view (if not already added). Should be used e. g. in onBeforeRender().
    */
-  public void render() {
+  public void render()
+  {
     if (rendered == false) {
-      if (components.size() > 0) {
-        for (final T component : this.components) {
-          this.repeatingView.add(component);
+      if (hasEntries() == false) {
+        setVisibility(false);
+      } else {
+        setVisibility(true);
+        if (components.size() > 0) {
+          for (final T component : this.components) {
+            this.repeatingView.add(component);
+          }
         }
       }
       rendered = true;
     }
-
   }
 }
