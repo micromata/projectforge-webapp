@@ -1,0 +1,106 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+  <wicket:extend>
+    <div class="box grid_16 round_all">
+      <div class="block">
+        <div class="columns clearfix">
+          <div class="col_50">
+            <h2>Persönliches Menü</h2>
+            <div id="cust-menu" class="customize-menu">
+              <ul>
+                <li id="phtml_1" rel="root"><a href="#">Root node 1</a>
+                  <ul>
+                    <li id="phtml_2" rel="leaf"><a href="#">Child node 1</a></li>
+                    <li id="phtml_3" rel="leaf"><a href="#">Child node 2</a></li>
+                  </ul></li>
+                <li id="phtml_4" rel="root"><a href="#">Root node 2</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col_50">
+            <h2>Komplettes Menü</h2>
+            <div id="compl-menu" class="customize-menu">
+              <ul>
+                <li rel="parent-menu" wicket:id="parentMenu"><a href="#" wicket:id="label">[menu label]</a>
+                  <ul>
+                    <li rel="leaf" wicket:id="menu"><a href="#" wicket:id="label">[menu label]</a></li>
+                  </ul></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="block">
+      <h1>ToDo: Löschen, speichern, neue Gruppe, Namen ändern.</h1>
+        <wicket:message key="menu.customize.help" />
+      </div>
+    </div>
+    <script type="text/javascript">
+					$(function() {
+						$("#cust-menu")
+								.jstree(
+										{
+											"dnd" : {
+												"drop_check" : function() {
+													alert("DROP");
+												},
+											},
+											"themes" : {
+												"theme" : "apple",
+												"dots" : false,
+												"icons" : true
+											},
+											"types" : {
+												"types" : {
+													"root" : {
+														"max_depth" : 3,
+													},
+													"leaf" : {
+														"valid_children" : "none"
+													},
+													"default" : {
+														"max_children" : -1,
+														"valid_children" : "all"
+													}
+												}
+											},
+											"plugins" : [ "themes",
+													"html_data", "ui", "dnd",
+													"types", "hotkeys" ]
+										});
+					});
+					$(function() {
+						$("#compl-menu").jstree(
+								{
+									"crrm" : {
+										"move" : {
+											"check_move" : function(m) {
+												// Don't allow re-ordering the original tree.
+												return false;
+											}
+										}
+									},
+									"themes" : {
+										"theme" : "apple",
+										"dots" : false,
+										"icons" : true
+									},
+									"types" : {
+										"types" : {
+											"parent-menu" : {
+												"max_depth" : 3,
+											}
+										}
+									},
+									"plugins" : [ "themes", "html_data", "ui",
+											"crrm", "dnd", "types", "hotkeys" ]
+								});
+					});
+				</script>
+  </wicket:extend>
+</body>
+</html>
