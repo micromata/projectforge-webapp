@@ -31,6 +31,7 @@ import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
+import org.projectforge.web.CustomizeMenuPage;
 import org.projectforge.web.MenuEntry;
 import org.projectforge.web.wicket.FeedbackPage;
 import org.projectforge.web.wicket.WicketApplication;
@@ -72,6 +73,7 @@ public class NavTopPanel extends NavAbstractPanel
     final Label alertMessageLabel = new Label("alertMessage", alertMessageModel);
     alertMessageContainer.add(alertMessageLabel.setRenderBodyOnly(true));
 
+    add(new BookmarkablePageLink<Void>("customizeMenuLink", CustomizeMenuPage.class));
     add(new BookmarkablePageLink<Void>("feedbackLink", FeedbackPage.class));
     getMenu();
 
