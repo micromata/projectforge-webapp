@@ -5,37 +5,49 @@
 
 <body>
   <wicket:extend>
+    <wicket:fragment wicket:id="custMenuEntryFragment">
+      <li wicket:id="li"><ins class="jstree-icon">&nbsp;</ins><a href="#" wicket:id="label">[menu label]</a> <span
+        wicket:id="renameMenuEntryLink"><img wicket:id="renameEntryIcon" /></span> <span wicket:id="deleteMenuEntryLink"><img
+          wicket:id="deleteEntryIcon" /></span>
+        <ul wicket:id="subMenu">
+          <wicket:container wicket:id="subMenuEntry" />
+        </ul></li>
+    </wicket:fragment>
+    <wicket:fragment wicket:id="completeMenuEntryFragment">
+      <li wicket:id="li"><ins class="jstree-icon">&nbsp;</ins><a href="#"><span wicket:id="label">[menu label]</span></a>
+        <ul wicket:id="subMenu">
+          <wicket:container wicket:id="subMenuEntry" />
+        </ul></li>
+    </wicket:fragment>
     <div class="box grid_16 round_all">
       <div class="block">
         <div class="columns clearfix">
           <div class="col_50">
-            <h2>Persönliches Menü</h2>
-            <div id="cust-menu" class="customize-menu">
+            <h2>
+              <wicket:message key="menu.customize.title" />
+            </h2>
+            <div id="cust-menu">
               <ul>
-                <li id="phtml_1" rel="root"><a href="#">Root node 1</a>
-                  <ul>
-                    <li id="phtml_2" rel="leaf"><a href="#">Child node 1</a></li>
-                    <li id="phtml_3" rel="leaf"><a href="#">Child node 2</a></li>
-                  </ul></li>
-                <li id="phtml_4" rel="root"><a href="#">Root node 2</a></li>
+                <wicket:container wicket:id="custMenuEntry" />
               </ul>
             </div>
+            <input type="button" onclick="javascript:createCustomMenuEntry();" value="create" /> <input type="button"
+              onclick="javascript:saveCustomMenuEntry();" value="save" />
           </div>
           <div class="col_50">
-            <h2>Komplettes Menü</h2>
-            <div id="compl-menu" class="customize-menu">
+            <h2>
+              <wicket:message key="menu.customize.completeMenu" />
+            </h2>
+            <div id="compl-menu">
               <ul>
-                <li rel="parent-menu" wicket:id="parentMenu"><a href="#" wicket:id="label">[menu label]</a>
-                  <ul>
-                    <li rel="leaf" wicket:id="menu"><a href="#" wicket:id="label">[menu label]</a></li>
-                  </ul></li>
+                <wicket:container wicket:id="completeMenuEntry" />
               </ul>
             </div>
           </div>
         </div>
       </div>
       <div class="block">
-      <h1>ToDo: Löschen, speichern, neue Gruppe, Namen ändern.</h1>
+        <h1>ToDo: speichern, neue Gruppe, Namen ändern.</h1>
         <wicket:message key="menu.customize.help" />
       </div>
     </div>
@@ -48,6 +60,12 @@
 												"drop_check" : function() {
 													alert("DROP");
 												},
+												"drag_finish" : function(data) {
+													alert("DRAG OK, obj="
+															+ data.o.id
+															+ ", target="
+															+ data.r);
+												}
 											},
 											"themes" : {
 												"theme" : "apple",
@@ -56,50 +74,62 @@
 											},
 											"types" : {
 												"types" : {
-													"root" : {
-														"max_depth" : 3,
-													},
 													"leaf" : {
-														"valid_children" : "none"
+														"valid_children" : "none",
+														"icon" : {
+															"image" : "../images/star.png"
+														}
 													},
 													"default" : {
 														"max_children" : -1,
+														"max_depth" : 3,
 														"valid_children" : "all"
 													}
 												}
 											},
 											"plugins" : [ "themes",
 													"html_data", "ui", "dnd",
-													"types", "hotkeys" ]
+													"crrm", "types", "hotkeys",
+													"xml_data" ]
 										});
 					});
 					$(function() {
-						$("#compl-menu").jstree(
-								{
-									"crrm" : {
-										"move" : {
-											"check_move" : function(m) {
-												// Don't allow re-ordering the original tree.
-												return false;
-											}
-										}
-									},
-									"themes" : {
-										"theme" : "apple",
-										"dots" : false,
-										"icons" : true
-									},
-									"types" : {
-										"types" : {
-											"parent-menu" : {
-												"max_depth" : 3,
-											}
-										}
-									},
-									"plugins" : [ "themes", "html_data", "ui",
-											"crrm", "dnd", "types", "hotkeys" ]
-								});
+						$("#compl-menu")
+								.jstree(
+										{
+											"themes" : {
+												"theme" : "apple",
+												"dots" : false,
+												"icons" : true
+											},
+											"types" : {
+												"types" : {
+													"leaf" : {
+														"icon" : {
+															"image" : "../images/star.png"
+														}
+													}
+												}
+											},
+											"plugins" : [ "themes",
+													"html_data", "ui", "types",
+													"hotkeys" ]
+										});
 					});
+					function createCustomMenuEntry() {
+						$("#cust-menu").jstree("create", "#new", "last",
+								"Enter a new name");
+					}
+					function removeCustomMenuEntry(id) {
+						$("#cust-menu").jstree("remove", id);
+					}
+					function renameCustomMenuEntry(id) {
+						$("#cust-menu").jstree("rename", id);
+					}
+					function saveCustomMenuEntry() {
+						alert($("#cust-menu").jstree("get_xml", "nest", "-1",
+								[ "id" ]));
+					}
 				</script>
   </wicket:extend>
 </body>

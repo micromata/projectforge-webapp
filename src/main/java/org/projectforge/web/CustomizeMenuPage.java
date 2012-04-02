@@ -23,19 +23,21 @@
 
 package org.projectforge.web;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.wicket.AbstractSecuredPage;
+import org.projectforge.web.wicket.ImageDef;
+import org.projectforge.web.wicket.PresizedImage;
 
 public class CustomizeMenuPage extends AbstractSecuredPage
 {
   private static final long serialVersionUID = 8587252641914110851L;
-
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CustomizeMenuPage.class);
 
   @SpringBean(name = "menuBuilder")
   private MenuBuilder menuBuilder;
@@ -43,24 +45,100 @@ public class CustomizeMenuPage extends AbstractSecuredPage
   public CustomizeMenuPage(final PageParameters parameters)
   {
     super(parameters);
-    // body.add(new Label("totalNumberOfHistoryEntries", NumberFormatter.format(totalNumberOfHistoryEntries)));
-    final RepeatingView origMenuRepeater = new RepeatingView("parentMenu");
-    body.add(origMenuRepeater);
     final Menu menu = menuBuilder.getMenu(getUser());
-    for (final MenuEntry parentMenuEntry : menu.getMenuEntries()) {
-      if (parentMenuEntry.hasSubMenuEntries() == false) {
+    buildCustMenu(menu);
+    buildCompleteMenu(menu);
+  }
+
+  /**
+   * The menu tree to customize.
+   */
+  private void buildCustMenu(final Menu menu)
+  {
+    final RepeatingView menuRepeater = new RepeatingView("custMenuEntry");
+    body.add(menuRepeater);
+    for (final MenuEntry menuEntry : menu.getFavoriteMenuEntries()) {
+      addCustMenuEntry(menuRepeater, menuEntry);
+    }
+  }
+
+  /**
+   * Used by buildCustMenu for recursive building of all menu entries.
+   */
+  private void addCustMenuEntry(final RepeatingView menuRepeater, final MenuEntry menuEntry)
+  {
+    final Fragment frag = new Fragment(menuRepeater.newChildId(), "custMenuEntryFragment", body);
+    menuRepeater.add(frag);
+    final WebMarkupContainer li = new WebMarkupContainer("li");
+    frag.add(li);
+    if (menuEntry.getPageClass() != null || menuEntry.getUrl() != null) {
+      li.add(AttributeModifier.append("rel", "leaf"));
+    }
+    final String id = "c-" + menuEntry.getId();
+    li.setOutputMarkupId(true).setMarkupId(id);
+    li.add(new Label("label", getString(menuEntry.getI18nKey())));
+    final WebMarkupContainer renameMenuEntryLink = new WebMarkupContainer("renameMenuEntryLink");
+    renameMenuEntryLink.add(AttributeModifier.append("onclick", "javascript:renameCustomMenuEntry('#" + id + "');"));
+    renameMenuEntryLink.add(new PresizedImage("renameEntryIcon", getResponse(), ImageDef.JSTREE_EDIT));
+    li.add(renameMenuEntryLink);
+    final WebMarkupContainer deleteMenuEntryLink = new WebMarkupContainer("deleteMenuEntryLink");
+    deleteMenuEntryLink.add(AttributeModifier.append("onclick", "javascript:removeCustomMenuEntry('#" + id + "');"));
+    deleteMenuEntryLink.add(new PresizedImage("deleteEntryIcon", getResponse(), ImageDef.JSTREE_REMOVE));
+    li.add(deleteMenuEntryLink);
+    final WebMarkupContainer subMenu = new WebMarkupContainer("subMenu");
+    li.add(subMenu);
+    if (menuEntry.hasSubMenuEntries() == false) {
+      subMenu.setVisible(false);
+      return;
+    }
+    final RepeatingView subMenuRepeater = new RepeatingView("subMenuEntry");
+    subMenu.add(subMenuRepeater);
+    for (final MenuEntry subMenuEntry : menuEntry.getSubMenuEntries()) {
+      addCustMenuEntry(subMenuRepeater, subMenuEntry);
+    }
+  }
+
+  /**
+   * Complete menu of the user for drag&drop.
+   */
+  private void buildCompleteMenu(final Menu menu)
+  {
+    final RepeatingView menuRepeater = new RepeatingView("completeMenuEntry");
+    body.add(menuRepeater);
+    for (final MenuEntry menuEntry : menu.getMenuEntries()) {
+      if (menuEntry.hasSubMenuEntries() == false) {
         continue;
       }
-      final WebMarkupContainer parentItem = new WebMarkupContainer(origMenuRepeater.newChildId());
-      origMenuRepeater.add(parentItem);
-      parentItem.add(new Label("label", getString(parentMenuEntry.getI18nKey())));
-      final RepeatingView subMenuRepeater = new RepeatingView("menu");
-      parentItem.add(subMenuRepeater);
-      for (final MenuEntry menuEntry : parentMenuEntry.getSubMenuEntries()) {
-        final WebMarkupContainer item = new WebMarkupContainer(subMenuRepeater.newChildId());
-        subMenuRepeater.add(item);
-        item.add(new Label("label", getString(menuEntry.getI18nKey())));
-      }
+      addCompleteMenuEntry(menuRepeater, menuEntry);
+    }
+  }
+
+  /**
+   * Used by buildCompleteMenu for recursive building of all menu entries.
+   */
+  private void addCompleteMenuEntry(final RepeatingView menuRepeater, final MenuEntry menuEntry)
+  {
+    final Fragment frag = new Fragment(menuRepeater.newChildId(), "completeMenuEntryFragment", body);
+    menuRepeater.add(frag);
+    final WebMarkupContainer li = new WebMarkupContainer("li");
+    frag.add(li);
+    final Label label = new Label("label", getString(menuEntry.getI18nKey()));
+    if (menuEntry.getPageClass() != null || menuEntry.getUrl() != null) {
+      li.add(AttributeModifier.append("rel", "leaf"));
+    }
+    label.setOutputMarkupId(true).setMarkupId("o-" + menuEntry.getId());
+    li.add(label);
+    final WebMarkupContainer subMenu = new WebMarkupContainer("subMenu");
+    li.add(subMenu);
+    if (menuEntry.hasSubMenuEntries() == false) {
+      li.add(AttributeModifier.append("class", "jstree-draggable"));
+      subMenu.setVisible(false);
+      return;
+    }
+    final RepeatingView subMenuRepeater = new RepeatingView("subMenuEntry");
+    subMenu.add(subMenuRepeater);
+    for (final MenuEntry subMenuEntry : menuEntry.getSubMenuEntries()) {
+      addCompleteMenuEntry(subMenuRepeater, subMenuEntry);
     }
   }
 
