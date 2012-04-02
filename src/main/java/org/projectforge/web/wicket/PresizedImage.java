@@ -101,10 +101,10 @@ public class PresizedImage extends ContextImage
     final Dimension dimension = registry.get(path);
     if (dimension == null) {
       if (WebConfiguration.isDevelopmentMode() == true) {
-        log.warn("Image " + path + " not found (please update image dimension file via GetImageDimensionsTest).");
+        log.warn("Image " + path + " not found (please update image dimension file via ImageDimensionsCreator).");
       } else {
         if (notFound.contains(path) == false) {
-          log.warn("Image " + path + " not found (please update image dimension file via GetImageDimensionsTest).");
+          log.warn("Image " + path + " not found (please update image dimension file via ImageDimensionsCreator).");
           notFound.add(path);
         }
       }
