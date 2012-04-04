@@ -48,7 +48,15 @@ public class CustomizeMenuPage extends AbstractSecuredPage
     menu.setFavoriteMenuEntries((String) getUserPrefEntry(NavAbstractPanel.USER_PREF_FAVORITE_MENU_ENTRIES_KEY));
     buildCustMenu(menu);
     buildCompleteMenu(menu);
-    body.add(new Label("i18nVars", "var enterNewName = \"" + getString("menu.customize.enterNewName") + "\";").setEscapeModelStrings(false));
+    body.add(new Label("i18nVars", "var enterNewName = \""
+        + getString("menu.customize.enterNewName")
+        + "\";\nvar create = \""
+        + getString("menu.customize.create")
+        + "\";\nvar remove = \""
+        + getString("menu.customize.remove")
+        + "\";\nvar rename = \""
+        + getString("menu.customize.rename")
+        + "\";").setEscapeModelStrings(false));
   }
 
   /**

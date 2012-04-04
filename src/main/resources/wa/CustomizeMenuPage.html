@@ -6,9 +6,7 @@
 <body>
   <wicket:extend>
     <wicket:fragment wicket:id="custMenuEntryFragment">
-      <li wicket:id="li"><a href="#" wicket:id="label">[menu label]</a> <span wicket:id="renameMenuEntryLink">&nbsp;<img
-          wicket:id="renameEntryIcon" />&nbsp;
-      </span> <span wicket:id="deleteMenuEntryLink"><img wicket:id="deleteEntryIcon" /></span>
+      <li wicket:id="li"><a href="#" wicket:id="label">[menu label]</a>
         <ul wicket:id="subMenu">
           <wicket:container wicket:id="subMenuEntry" />
         </ul></li>
@@ -53,6 +51,9 @@
     </div>
     <script type="text/javascript" wicket:id="i18nVars">
 					var enterNewName = "Enter a new name";
+					var create = "Create";
+					var remove = "Remove";
+					var rename = "Rename";
 				</script>
     <script type="text/javascript">
 					$(function() {
@@ -104,7 +105,7 @@
 											"contextmenu" : {
 												"items" : {
 													"create" : {
-														"label" : "Anlegen",
+														"label" : create,
 														"separator_before" : false,
 														"separator_after" : true,
 														"action" : function(obj) {
@@ -114,7 +115,7 @@
 													"rename" : {
 														"separator_before" : false,
 														"separator_after" : false,
-														"label" : "Rename",
+														"label" : rename,
 														"icon" : "../images/jstree-edit.png",
 														"action" : function(obj) {
 															this.rename(obj);
@@ -124,7 +125,7 @@
 														"separator_before" : false,
 														"icon" : "../images/jstree-remove.png",
 														"separator_after" : false,
-														"label" : "Delete",
+														"label" : remove,
 														"action" : function(obj) {
 															if (this
 																	.is_selected(obj)) {
