@@ -47,7 +47,7 @@ public abstract class NavAbstractPanel extends Panel
 
   private static final String USER_PREF_MENU_KEY = "usersMenu";
 
-  private static final String USER_PREF_FAVORITE_MENU_ENTRIES_KEY = "usersFavoriteMenuEntries";
+  public static final String USER_PREF_FAVORITE_MENU_ENTRIES_KEY = "usersFavoriteMenuEntries";
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(NavAbstractPanel.class);
 
