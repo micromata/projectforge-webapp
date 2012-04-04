@@ -191,6 +191,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
         if (object != null) {
           if (object instanceof String) {
             phoneNumber = (String) object;
+            getRecentSearchTermsQueue().append(phoneNumber);
           }
         } else {
           phoneNumber = "";
@@ -266,8 +267,8 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
           myCurrentPhoneIdChoiceRenderer.addValue(id, id);
         }
       }
-      final DropDownChoice myCurrentPhoneIdChoice = new DropDownChoice(fs.getDropDownChoiceId(), new PropertyModel(this,
-          "myCurrentPhoneId"), myCurrentPhoneIdChoiceRenderer.getValues(), myCurrentPhoneIdChoiceRenderer);
+      final DropDownChoice myCurrentPhoneIdChoice = new DropDownChoice(fs.getDropDownChoiceId(),
+          new PropertyModel(this, "myCurrentPhoneId"), myCurrentPhoneIdChoiceRenderer.getValues(), myCurrentPhoneIdChoiceRenderer);
       myCurrentPhoneIdChoice.setNullValid(false).setRequired(true);
       fs.add(myCurrentPhoneIdChoice);
       fs.addHelpIcon(getString("address.myCurrentPhoneId.tooltip"));
