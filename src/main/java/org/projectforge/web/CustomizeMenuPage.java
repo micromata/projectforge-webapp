@@ -33,8 +33,6 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.core.NavAbstractPanel;
 import org.projectforge.web.wicket.AbstractSecuredPage;
-import org.projectforge.web.wicket.ImageDef;
-import org.projectforge.web.wicket.PresizedImage;
 
 public class CustomizeMenuPage extends AbstractSecuredPage
 {
@@ -80,14 +78,6 @@ public class CustomizeMenuPage extends AbstractSecuredPage
     final String id = "c-" + menuEntry.getId();
     li.setOutputMarkupId(true).setMarkupId(id);
     li.add(new Label("label", getString(menuEntry.getI18nKey())));
-    final WebMarkupContainer renameMenuEntryLink = new WebMarkupContainer("renameMenuEntryLink");
-    renameMenuEntryLink.add(AttributeModifier.append("onclick", "javascript:renameCustomMenuEntry('#" + id + "');"));
-    renameMenuEntryLink.add(new PresizedImage("renameEntryIcon", getResponse(), ImageDef.JSTREE_EDIT));
-    li.add(renameMenuEntryLink);
-    final WebMarkupContainer deleteMenuEntryLink = new WebMarkupContainer("deleteMenuEntryLink");
-    deleteMenuEntryLink.add(AttributeModifier.append("onclick", "javascript:removeCustomMenuEntry('#" + id + "');"));
-    deleteMenuEntryLink.add(new PresizedImage("deleteEntryIcon", getResponse(), ImageDef.JSTREE_REMOVE));
-    li.add(deleteMenuEntryLink);
     final WebMarkupContainer subMenu = new WebMarkupContainer("subMenu");
     li.add(subMenu);
     if (menuEntry.hasSubMenuEntries() == false) {
