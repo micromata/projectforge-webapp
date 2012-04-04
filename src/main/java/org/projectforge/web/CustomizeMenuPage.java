@@ -31,6 +31,7 @@ import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.web.core.NavAbstractPanel;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.ImageDef;
 import org.projectforge.web.wicket.PresizedImage;
@@ -46,8 +47,10 @@ public class CustomizeMenuPage extends AbstractSecuredPage
   {
     super(parameters);
     final Menu menu = menuBuilder.getMenu(getUser());
+    menu.setFavoriteMenuEntries((String) getUserPrefEntry(NavAbstractPanel.USER_PREF_FAVORITE_MENU_ENTRIES_KEY));
     buildCustMenu(menu);
     buildCompleteMenu(menu);
+    body.add(new Label("i18nVars", "var enterNewName = \"" + getString("menu.customize.enterNewName") + "\";").setEscapeModelStrings(false));
   }
 
   /**

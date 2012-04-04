@@ -6,15 +6,15 @@
 <body>
   <wicket:extend>
     <wicket:fragment wicket:id="custMenuEntryFragment">
-      <li wicket:id="li"><ins class="jstree-icon">&nbsp;</ins><a href="#" wicket:id="label">[menu label]</a> <span
-        wicket:id="renameMenuEntryLink"><img wicket:id="renameEntryIcon" /></span> <span wicket:id="deleteMenuEntryLink"><img
-          wicket:id="deleteEntryIcon" /></span>
+      <li wicket:id="li"><a href="#" wicket:id="label">[menu label]</a> <span wicket:id="renameMenuEntryLink">&nbsp;<img
+          wicket:id="renameEntryIcon" />&nbsp;
+      </span> <span wicket:id="deleteMenuEntryLink"><img wicket:id="deleteEntryIcon" /></span>
         <ul wicket:id="subMenu">
           <wicket:container wicket:id="subMenuEntry" />
         </ul></li>
     </wicket:fragment>
     <wicket:fragment wicket:id="completeMenuEntryFragment">
-      <li wicket:id="li"><ins class="jstree-icon">&nbsp;</ins><a href="#"><span wicket:id="label">[menu label]</span></a>
+      <li wicket:id="li"><a href="#"><span wicket:id="label">[menu label]</span></a>
         <ul wicket:id="subMenu">
           <wicket:container wicket:id="subMenuEntry" />
         </ul></li>
@@ -51,20 +51,34 @@
         <wicket:message key="menu.customize.help" />
       </div>
     </div>
+    <script type="text/javascript" wicket:id="i18nVars">
+					var enterNewName = "Enter a new name";
+				</script>
     <script type="text/javascript">
 					$(function() {
 						$("#cust-menu")
 								.jstree(
 										{
 											"dnd" : {
-												"drop_check" : function() {
-													alert("DROP");
+												"drag_check" : function(data) {
+													var id = $(data.r).attr(
+															"id");
+													if (id && id.match(/^c/)) {
+														// Target is menu entry with link.
+														return false;
+													}
+													return {
+														after : false,
+														before : false,
+														inside : true
+													};
 												},
 												"drag_finish" : function(data) {
 													alert("DRAG OK, obj="
 															+ data.o.id
 															+ ", target="
-															+ data.r);
+															+ $(data.r).attr(
+																	"id"));
 												}
 											},
 											"themes" : {
@@ -77,7 +91,7 @@
 													"leaf" : {
 														"valid_children" : "none",
 														"icon" : {
-															"image" : "../images/star.png"
+															"image" : "../images/jstree-star.png"
 														}
 													},
 													"default" : {
@@ -87,10 +101,46 @@
 													}
 												}
 											},
+											"contextmenu" : {
+												"items" : {
+													"create" : {
+														"label" : "Anlegen",
+														"separator_before" : false,
+														"separator_after" : true,
+														"action" : function(obj) {
+															this.create(obj);
+														}
+													},
+													"rename" : {
+														"separator_before" : false,
+														"separator_after" : false,
+														"label" : "Rename",
+														"icon" : "../images/jstree-edit.png",
+														"action" : function(obj) {
+															this.rename(obj);
+														}
+													},
+													"remove" : {
+														"separator_before" : false,
+														"icon" : "../images/jstree-remove.png",
+														"separator_after" : false,
+														"label" : "Delete",
+														"action" : function(obj) {
+															if (this
+																	.is_selected(obj)) {
+																this.remove();
+															} else {
+																this
+																		.remove(obj);
+															}
+														}
+													}
+												}
+											},
 											"plugins" : [ "themes",
 													"html_data", "ui", "dnd",
 													"crrm", "types", "hotkeys",
-													"xml_data" ]
+													"xml_data", "contextmenu" ]
 										});
 					});
 					$(function() {
@@ -106,7 +156,7 @@
 												"types" : {
 													"leaf" : {
 														"icon" : {
-															"image" : "../images/star.png"
+															"image" : "../images/jstree-star.png"
 														}
 													}
 												}
@@ -118,7 +168,7 @@
 					});
 					function createCustomMenuEntry() {
 						$("#cust-menu").jstree("create", "#new", "last",
-								"Enter a new name");
+								enterNewName);
 					}
 					function removeCustomMenuEntry(id) {
 						$("#cust-menu").jstree("remove", id);
