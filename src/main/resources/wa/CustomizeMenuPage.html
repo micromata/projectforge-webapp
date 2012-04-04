@@ -60,20 +60,12 @@
 						$("#cust-menu")
 								.jstree(
 										{
+											"core" : {
+												strings : {
+													new_node : enterNewName,
+												}
+											},
 											"dnd" : {
-												"drag_check" : function(data) {
-													var id = $(data.r).attr(
-															"id");
-													if (id && id.match(/^c/)) {
-														// Target is menu entry with link.
-														return false;
-													}
-													return {
-														after : false,
-														before : false,
-														inside : true
-													};
-												},
 												"drag_finish" : function(data) {
 													alert("DRAG OK, obj="
 															+ data.o.id
@@ -109,7 +101,20 @@
 														"separator_before" : false,
 														"separator_after" : true,
 														"action" : function(obj) {
-															this.create(obj);
+															var id = $(obj)
+																	.attr("id");
+															if (isMenuLink(id)) {
+																// Create before
+																this
+																		.create(
+																				this,
+																				"after");
+															} else {
+																this
+																		.create(
+																				obj,
+																				enterNewName);
+															}
 														}
 													},
 													"rename" : {
@@ -180,6 +185,9 @@
 					function saveCustomMenuEntry() {
 						alert($("#cust-menu").jstree("get_xml", "nest", "-1",
 								[ "id" ]));
+					}
+					function isMenuLink(id) {
+						return (id && id.match(/^c/));
 					}
 				</script>
   </wicket:extend>
