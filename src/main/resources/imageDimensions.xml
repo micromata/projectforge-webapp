@@ -137,6 +137,7 @@
   <image path="/images/information.png" width="16" height="16"/>
   <image path="/images/jstree-edit.png" width="10" height="10"/>
   <image path="/images/jstree-remove.png" width="10" height="10"/>
+  <image path="/images/jstree-star.png" width="10" height="10"/>
   <image path="/images/key.png" width="16" height="16"/>
   <image path="/images/keyboard.png" width="16" height="16"/>
   <image path="/images/kost2art.png" width="16" height="16"/>
@@ -204,7 +205,6 @@
   <image path="/images/server_chart.png" width="16" height="16"/>
   <image path="/images/sms.png" width="23" height="16"/>
   <image path="/images/spacer.gif" width="1" height="1"/>
-  <image path="/images/star.png" width="17" height="16"/>
   <image path="/images/star_plus.png" width="20" height="20"/>
   <image path="/images/table_row_insert.png" width="16" height="16"/>
   <image path="/images/tag_blue_add.png" width="16" height="16"/>
