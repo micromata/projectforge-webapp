@@ -25,6 +25,7 @@ package org.projectforge.web.wicket.flowlayout;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
+import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.panel.Panel;
@@ -97,6 +98,21 @@ public class DivPanel extends Panel
     } else {
       childAdded = true;
       repeater.add(childs);
+      return this;
+    }
+  }
+
+  /**
+   * @see org.apache.wicket.MarkupContainer#remove(org.apache.wicket.Component)
+   */
+  @Override
+  public MarkupContainer remove(final Component component)
+  {
+    if (repeater == null) {
+      div.remove(component);
+      return this;
+    } else {
+      repeater.remove(component);
       return this;
     }
   }
