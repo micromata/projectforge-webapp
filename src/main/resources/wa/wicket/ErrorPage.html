@@ -6,11 +6,11 @@
 
 <body>
   <wicket:extend>
+    <div class="grid_16">
+      <div class="alert alert_red feedback" wicket:id="feedback"></div>
+      <div class="alert alert_red feedback" wicket:id="errorMessage"></div>
+    </div>
     <form wicket:id="form" name="form">
-      <div class="grid_16">
-        <div class="alert alert_red feedback" wicket:id="feedback"></div>
-        <div class="alert alert_red feedback" wicket:id="errorMessage"></div>
-      </div>
       <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
       <div class="button_cell clearfix">
         <wicket:container wicket:id="buttons">[action buttons]</wicket:container>

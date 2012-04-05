@@ -26,6 +26,8 @@ package org.projectforge.web.wicket;
 import javax.servlet.ServletException;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.protocol.http.PageExpiredException;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -154,6 +156,21 @@ public class ErrorPage extends AbstractSecuredPage
       form.init();
     }
     form.setVisible(visible);
+    final Label errorMessageLabel = new Label("errorMessage", errorMessage);
+    body.add(errorMessageLabel.setVisible(errorMessage != null));
+    @SuppressWarnings("serial")
+    final FeedbackPanel feedbackPanel = new FeedbackPanel("feedback") {
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
+      @Override
+      public boolean isVisible()
+      {
+        return form.hasError();
+      }
+    };
+    feedbackPanel.setOutputMarkupId(true);
+    body.add(feedbackPanel);
   }
 
   void cancel()
