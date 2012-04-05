@@ -285,7 +285,7 @@ public class WicketApplication extends WebApplication
     // getSessionSettings().setMaxPageMaps(20); // Map up to 20 pages per session (default is 5).
     getComponentInstantiationListeners().add(new SpringComponentInjector(this));
     getApplicationSettings().setInternalErrorPage(ErrorPage.class);
-    //getRequestCycleSettings().setGatherExtendedBrowserInfo(true); // For getting browser width and height.
+    // getRequestCycleSettings().setGatherExtendedBrowserInfo(true); // For getting browser width and height.
 
     final XmlWebApplicationContext webApplicationContext = (XmlWebApplicationContext) WebApplicationContextUtils
         .getWebApplicationContext(getServletContext());
@@ -344,6 +344,7 @@ public class WicketApplication extends WebApplication
       UserFilter.setUpdateRequiredFirst(true);
     }
     PFUserContext.setUser(null);
+    UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
   }
 
   @Override
@@ -385,7 +386,8 @@ public class WicketApplication extends WebApplication
   @Override
   public Session newSession(final Request request, final Response response)
   {
-    return new MySession(request);
+    final MySession mySession = new MySession(request);
+    return mySession;
   }
 
   /**
