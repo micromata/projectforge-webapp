@@ -36,7 +36,9 @@ import org.projectforge.Version;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.BrowserScreenWidthType;
+import org.projectforge.web.LayoutSettingsPage;
 import org.projectforge.web.UserAgentBrowser;
 import org.projectforge.web.UserAgentDetection;
 import org.projectforge.web.UserAgentDevice;
@@ -66,6 +68,8 @@ public class MySession extends WebSession
   private boolean mobileUserAgent;
 
   private boolean ignoreMobileUserAgent;
+
+  private BrowserScreenWidthType browserScreenWidthType;
 
   public MySession(final Request request)
   {
@@ -160,10 +164,30 @@ public class MySession extends WebSession
 
   public BrowserScreenWidthType getBrowserScreenWidthType()
   {
-    if (isMobileUserAgent() == true) {
-      return BrowserScreenWidthType.NARROW;
+    if (browserScreenWidthType == null) {
+      browserScreenWidthType = (BrowserScreenWidthType)UserXmlPreferencesCache.getDefaultInstance().getEntry(getUserId(), LayoutSettingsPage.getBrowserScreenWidthUserPrefKey(this));
+      if (browserScreenWidthType != null) {
+        return browserScreenWidthType;
+      }
+      if (isMobileUserAgent() == true) {
+        if (getUserAgentDevice() == UserAgentDevice.IPAD) {
+          browserScreenWidthType = BrowserScreenWidthType.NORMAL;
+        }
+        browserScreenWidthType = BrowserScreenWidthType.NARROW;
+      }
+      browserScreenWidthType = BrowserScreenWidthType.WIDE;
     }
-    return BrowserScreenWidthType.WIDE;
+    return browserScreenWidthType;
+  }
+
+  /**
+   * @param browserScreenWidthType the browserScreenWidthType to set
+   * @return this for chaining.
+   */
+  public MySession setBrowserScreenWidthType(final BrowserScreenWidthType browserScreenWidthType)
+  {
+    this.browserScreenWidthType = browserScreenWidthType;
+    return this;
   }
 
   /**
