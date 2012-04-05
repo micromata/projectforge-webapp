@@ -82,7 +82,7 @@ public class FavoritesMenu implements Serializable
    * @param userXmlPreferencesCache For storing and getting the persisted favorites menu.
    * @param accessChecker For building the menu entries regarding the access rights of the logged-in user.
    */
-  private FavoritesMenu(final UserXmlPreferencesCache userXmlPreferencesCache, final AccessChecker accessChecker)
+  FavoritesMenu(final UserXmlPreferencesCache userXmlPreferencesCache, final AccessChecker accessChecker)
   {
     this.menu = (Menu) userXmlPreferencesCache.getEntry(NavAbstractPanel.USER_PREF_MENU_KEY);
     this.userXmlPreferencesCache = userXmlPreferencesCache;
@@ -137,6 +137,7 @@ public class FavoritesMenu implements Serializable
     } else {
       menuEntry = new MenuEntry();
     }
+    menuEntry.setSorted(false);
     Element title;
     if (mode == ParseMode.JS_TREE) {
       final Element content = item.element("content");
@@ -187,12 +188,16 @@ public class FavoritesMenu implements Serializable
 
   private void addFavoriteMenuEntry(final MenuItemDef menuItemDef)
   {
+    if (menu == null) {
+      return;
+    }
     final MenuEntry menuEntry = menu.getMenuEntry(menuItemDef);
     if (menuEntry == null) {
       return;
     }
     for (final MenuEntry entry : this.menuEntries) {
       if (entry.menuItemDef == menuItemDef) {
+        // Entry does already exist, ignore it.
         return;
       }
     }
