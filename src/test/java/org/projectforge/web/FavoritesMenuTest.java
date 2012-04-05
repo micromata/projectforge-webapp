@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.FavoritesMenu.ParseMode;
 import org.projectforge.web.wicket.WicketPageTestBase;
@@ -37,7 +38,8 @@ import org.projectforge.xml.stream.XmlHelper;
 
 public class FavoritesMenuTest extends WicketPageTestBase
 {
-  private final static String jsTreeXml = XmlHelper.replaceQuotes("<?xml version='1.0' encoding='UTF-8'?><root>" //
+  private final static String JS_TREE_XML = XmlHelper.replaceQuotes("<?xml version='1.0' encoding='UTF-8'?>" //
+      + "<root>" //
       + "<item id='c-TASK_TREE' rel='leaf'><content><name><![CDATA[Aufgaben]]></name></content></item>" //
       + "<item id='c-CALENDAR' rel='leaf'><content><name><![CDATA[Kalender]]></name></content></item>" //
       + "<item id='c-toDo' rel='leaf'><content><name><![CDATA[ToDo]]></name></content></item>" //
@@ -56,14 +58,35 @@ public class FavoritesMenuTest extends WicketPageTestBase
       + "<item id='c-PHONE_CALL' rel='leaf'><content><name><![CDATA[Direktwahl]]></name></content></item>" //
       + "</root>");
 
+  private final static String USER_PREF_XML = XmlHelper.replaceQuotes("<?xml version='1.0' encoding='UTF-8'?>" //
+      + "<root>" //
+      + "<item id='TASK_TREE'>Aufgaben</item>" //
+      + "<item id='CALENDAR'>Kalender</item>" //
+      + "<item id='toDo'>ToDo</item><item id='BOOK_LIST'>Bücher</item>" //
+      + "<item id='HR_VIEW'>Personalplanung</item>" //
+      // Fibu
+      + "<item>FiBu" //
+      + "<item id='ORDER_LIST'>Auftragsbuch</item>" //
+      + "<item id='OUTGOING_INVOICE_LIST'>Debitorenrechnungen</item>" //
+      + "</item>" //
+      // Adressen
+      + "<item>Adressen<item id='ADDRESS_LIST'>Adressen</item>" //
+      + "<item id='addressCampaignValues'>Adressen für Kampagnen</item>" //
+      + "</item>" //
+      + "<item id='PHONE_CALL'>Direktwahl</item>" //
+      + "</root>");
+
+  private final static String USER_PREF_OLD_FORMAT = "TASK_TREE,CALENDAR,INCOMING_INVOICE_LIST,OUTGOING_INVOICE_LIST,MONTHLY_EMPLOYEE_REPORT";
+
   private UserXmlPreferencesCache userXmlPreferencesCache;
 
   @Test
   public void readJsTreeXml()
   {
-    logon(TEST_ADMIN_USER);
+    logon(TEST_FULL_ACCESS_USER);
     final FavoritesMenu menu = new FavoritesMenu(userXmlPreferencesCache, accessChecker);
-    menu.readFromXml(jsTreeXml, ParseMode.JS_TREE);
+    menu.setMenu(menuBuilder.getMenu(PFUserContext.getUser()));
+    menu.readFromXml(JS_TREE_XML, ParseMode.JS_TREE);
     final List<MenuEntry> mainEntries = menu.getMenuEntries();
     assertEquals(8, mainEntries.size());
     assertEquals("TASK_TREE", mainEntries.get(0).getId());
@@ -75,6 +98,19 @@ public class FavoritesMenuTest extends WicketPageTestBase
     final Collection<MenuEntry> fibuEntries = fibu.getSubMenuEntries();
     assertEquals(2, fibuEntries.size());
     assertEquals("ORDER_LIST", fibuEntries.iterator().next().getId());
+  }
+
+  @Test
+  public void readOldFormat()
+  {
+    logon(TEST_FULL_ACCESS_USER);
+    final FavoritesMenu menu = new FavoritesMenu(userXmlPreferencesCache, accessChecker);
+    menu.setMenu(menuBuilder.getMenu(PFUserContext.getUser()));
+    menu.buildFromOldUserPrefFormat(USER_PREF_OLD_FORMAT);
+    final List<MenuEntry> mainEntries = menu.getMenuEntries();
+    assertEquals(5, mainEntries.size());
+    assertEquals("TASK_TREE", mainEntries.get(0).getId());
+    assertEquals("MONTHLY_EMPLOYEE_REPORT", mainEntries.get(4).getId());
   }
 
   /**
