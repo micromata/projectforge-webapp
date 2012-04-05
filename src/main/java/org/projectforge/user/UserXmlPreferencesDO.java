@@ -43,6 +43,8 @@ import javax.persistence.UniqueConstraint;
 @Table(name = "T_USER_XML_PREFS", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "key"})})
 public class UserXmlPreferencesDO implements Serializable
 {
+  public static final int MAX_SERIALIZED_LENGTH = 10000;
+
   private static final long serialVersionUID = 3203177155834463761L;
 
   /**
@@ -107,7 +109,7 @@ public class UserXmlPreferencesDO implements Serializable
    * Contains the serialized settings, stored in the database.
    * @return
    */
-  @Column(length = 100000)
+  @Column(length = MAX_SERIALIZED_LENGTH)
   public String getSerializedSettings()
   {
     return serializedSettings;
