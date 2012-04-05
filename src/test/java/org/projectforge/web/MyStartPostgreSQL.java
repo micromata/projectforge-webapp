@@ -39,6 +39,8 @@ public class MyStartPostgreSQL
    */
   private static final boolean SCHEMA_UPDATE = false;
 
+  private static final boolean DEVELOPMENT_MODE = true;
+
   private static final String BASE_DIR = System.getProperty("user.home") + "/ProjectForge";
 
   private static final String JDBC_USER = "projectforge";
@@ -51,6 +53,7 @@ public class MyStartPostgreSQL
     settings.setJdbcUser(JDBC_USER);
     settings.setSchemaUpdate(SCHEMA_UPDATE);
     settings.setUsingCookies(false);
+    settings.setDevelopment(DEVELOPMENT_MODE);
     StartHelper.start(settings);
   }
 }
