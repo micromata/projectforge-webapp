@@ -166,8 +166,8 @@ public class ProjektEditForm extends AbstractEditForm<ProjektDO, ProjektEditPage
       // cost 2 types
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.kost2art.kost2arten")).setNoLabelFor();
       final ProjectEditCost2TypeTablePanel table = new ProjectEditCost2TypeTablePanel(fs.newChildId());
-      table.init(kost2Arts);
       fs.add(table);
+      table.init(kost2Arts);
     }
   }
 
