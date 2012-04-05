@@ -223,9 +223,9 @@ public class PhoneCallPage extends AbstractSecuredPage
             extractPhonenumber(address.getPrivateMobilePhone())) == true) {
       buf.append(address.getFirstName()).append(" ").append(address.getName());
       if (form.getPhoneNumber().equals(extractPhonenumber(address.getMobilePhone())) == true) {
-        buf.append(", ").append(getString("address.phone.mobile"));
+        buf.append(", ").append(getString("address.phoneType.mobile"));
       } else if (form.getPhoneNumber().equals(extractPhonenumber(address.getPrivatePhone())) == true) {
-        buf.append(", ").append(getString("address.phone.private"));
+        buf.append(", ").append(getString("address.phoneType.private"));
       }
       buf.append(" #").append(address.getId());
     } else {
