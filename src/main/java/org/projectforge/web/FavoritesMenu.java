@@ -58,7 +58,7 @@ public class FavoritesMenu implements Serializable
 
   private List<MenuEntry> menuEntries;
 
-  private final Menu menu;
+  private Menu menu;
 
   private final AccessChecker accessChecker;
 
@@ -95,6 +95,17 @@ public class FavoritesMenu implements Serializable
     return this.menuEntries;
   }
 
+  /**
+   * Only for test cases.
+   * @param menu the menu to set
+   * @return this for chaining.
+   */
+  FavoritesMenu setMenu(final Menu menu)
+  {
+    this.menu = menu;
+    return this;
+  }
+
   public void readFromXml(final String menuAsXml, final ParseMode mode)
   {
     if (log.isDebugEnabled() == true) {
@@ -129,7 +140,8 @@ public class FavoritesMenu implements Serializable
       id = id.substring(2);
     }
     if (id != null) {
-      menuItemDef = MenuItemRegistry.instance().get(id);
+      final MenuEntry origEntry = menu.findById(id);
+      menuItemDef = origEntry != null ? origEntry.menuItemDef : null;
     }
     final MenuEntry menuEntry;
     if (menuItemDef != null) {
@@ -207,7 +219,7 @@ public class FavoritesMenu implements Serializable
   /**
    * @param userPrefEntry coma separated list of MenuItemDefs.
    */
-  private void buildFromOldUserPrefFormat(final String userPrefEntry)
+  void buildFromOldUserPrefFormat(final String userPrefEntry)
   {
     this.menuEntries = new ArrayList<MenuEntry>();
     if (userPrefEntry == null) {
@@ -220,7 +232,8 @@ public class FavoritesMenu implements Serializable
         token = token.substring(2);
       }
       try {
-        final MenuItemDef menuItemDef = MenuItemRegistry.instance().get(token);
+        final MenuEntry origEntry = menu.findById(token);
+        final MenuItemDef menuItemDef = origEntry != null ? origEntry.menuItemDef : null;
         if (menuItemDef == null) {
           continue;
         }
