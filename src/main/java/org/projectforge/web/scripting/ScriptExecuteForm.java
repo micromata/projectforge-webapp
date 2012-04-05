@@ -48,6 +48,7 @@ import org.projectforge.web.wicket.AbstractStandardForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
@@ -71,6 +72,8 @@ public class ScriptExecuteForm extends AbstractStandardForm<ScriptDO, ScriptExec
   protected DatePanel[] datePanel2 = new DatePanel[5];
 
   protected FieldsetPanel parameterFieldsets[];
+
+  private DivPanel fieldSetsPanel;
 
   protected QuickSelectPanel[] quickSelectPanel = new QuickSelectPanel[5];
 
@@ -186,15 +189,19 @@ public class ScriptExecuteForm extends AbstractStandardForm<ScriptDO, ScriptExec
   {
     if (parameterFieldsets != null) {
       for (final FieldsetPanel parameterFieldset : parameterFieldsets) {
-        remove(parameterFieldset);
+        if (parameterFieldset != null) {
+          fieldSetsPanel.remove(parameterFieldset);
+        }
       }
-      parameterFieldsets = new FieldsetPanel[5];
     }
+    parameterFieldsets = new FieldsetPanel[5];
     int index = 0;
     boolean focusSet = false;
+    fieldSetsPanel = gridBuilder.getPanel();
     for (final ScriptParameter parameter : scriptParameters) {
       final FieldsetPanel fs = gridBuilder.newFieldset(StringUtils.capitalize(parameter.getParameterName()),
           getString("scripting.script.parameter") + " " + (index + 1), true);
+      parameterFieldsets[index] = fs;
       InputPanel inputPanel = null;
       if (parameter.getType() == ScriptParameterType.INTEGER) {
         inputPanel = fs.add(new TextField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(parameter, "intValue")));
