@@ -23,10 +23,12 @@
 
 package org.projectforge.web;
 
+import org.projectforge.core.I18nEnum;
 
-public enum BrowserScreenWidthType
+
+public enum BrowserScreenWidthType implements I18nEnum
 {
-  NARROW, NORMAL, WIDE;
+  NARROW("narrow"), NORMAL("normal"), WIDE("wide");
 
   public boolean isIn(final BrowserScreenWidthType... type) {
     for (final BrowserScreenWidthType t : type) {
@@ -35,5 +37,21 @@ public enum BrowserScreenWidthType
       }
     }
     return false;
+  }
+
+
+  private String key;
+
+  /**
+   * @return The full i18n key including the i18n prefix "layout.settings.browserScreenWidth.".
+   */
+  public String getI18nKey()
+  {
+    return "layout.settings.browserScreenWidth." + key;
+  }
+
+  private BrowserScreenWidthType(final String key)
+  {
+    this.key = key;
   }
 }
