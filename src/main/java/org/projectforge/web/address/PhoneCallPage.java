@@ -35,7 +35,6 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.common.NumberHelper;
-import org.projectforge.common.RecentQueue;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
@@ -55,8 +54,6 @@ public class PhoneCallPage extends AbstractSecuredPage
 
   private static final String USER_PREF_KEY_MY_RECENT_PHONE_ID = "PhoneCall:recentPhoneId";
 
-  private static final String USER_PREF_KEY_RECENT_CALLS = "PhoneCall:recentCalls";
-
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PhoneCallPage.class);
 
   @SpringBean(name = "addressDao")
@@ -65,8 +62,6 @@ public class PhoneCallPage extends AbstractSecuredPage
   private final PhoneCallForm form;
 
   String result;
-
-  private RecentQueue<String> recentCallsQueue;
 
   public PhoneCallPage(final PageParameters parameters)
   {
@@ -244,7 +239,7 @@ public class PhoneCallPage extends AbstractSecuredPage
       final String resultStatus = method.getResponseBodyAsString();
       if ("0".equals(resultStatus) == true) {
         result = DateTimeFormatter.instance().getFormattedDateTime(new Date()) + ": " + getString("address.phoneCall.result.successful");
-        getRecentCallsQueue().append(buf.toString());
+        form.getRecentSearchTermsQueue().append(buf.toString());
       } else if ("2".equals(resultStatus) == true) {
         errorKey = "address.phoneCall.result.wrongSourceNumber";
       } else if ("3".equals(resultStatus) == true) {
@@ -264,19 +259,6 @@ public class PhoneCallPage extends AbstractSecuredPage
     if (errorKey != null) {
       form.addError(errorKey);
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  protected RecentQueue<String> getRecentCallsQueue()
-  {
-    if (recentCallsQueue == null) {
-      recentCallsQueue = (RecentQueue<String>) getUserPrefEntry(USER_PREF_KEY_RECENT_CALLS);
-    }
-    if (recentCallsQueue == null) {
-      recentCallsQueue = new RecentQueue<String>();
-      putUserPrefEntry(USER_PREF_KEY_RECENT_CALLS, recentCallsQueue, true);
-    }
-    return recentCallsQueue;
   }
 
   protected String getRecentMyPhoneId()

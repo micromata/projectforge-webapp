@@ -191,7 +191,6 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
         if (object != null) {
           if (object instanceof String) {
             phoneNumber = (String) object;
-            getRecentSearchTermsQueue().append(phoneNumber);
           }
         } else {
           phoneNumber = "";
@@ -210,7 +209,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
       @Override
       protected List<String> getRecentUserInputs()
       {
-        return parentPage.getRecentCallsQueue().getRecents();
+        return getRecentSearchTermsQueue().getRecents();
       }
 
       @Override
