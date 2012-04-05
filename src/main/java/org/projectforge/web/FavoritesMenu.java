@@ -36,9 +36,11 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.projectforge.access.AccessChecker;
+import org.projectforge.core.UserException;
 import org.projectforge.plugins.todo.ToDoPlugin;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserXmlPreferencesCache;
+import org.projectforge.user.UserXmlPreferencesDO;
 import org.projectforge.web.core.NavAbstractPanel;
 
 /**
@@ -237,6 +239,9 @@ public class FavoritesMenu implements Serializable
       buildElement(root.addElement("item"), menuEntry);
     }
     final String xml = document.asXML();
+    if (xml.length() > UserXmlPreferencesDO.MAX_SERIALIZED_LENGTH) {
+      throw new UserException("menu.favorite.maxSizeExceeded");
+    }
     userXmlPreferencesCache.putEntry(USER_PREF_FAVORITES_MENU_ENTRIES_KEY, xml, true);
     userXmlPreferencesCache.putEntry(USER_PREF_FAVORITES_MENU_KEY, this, false);
     if (log.isDebugEnabled() == true) {
