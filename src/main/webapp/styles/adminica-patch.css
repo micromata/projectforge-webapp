@@ -4,9 +4,10 @@ body #sidebar {
 }
 
 .display_none {
+	
 }
 
-div.dialog_content .box, div.dialog_content .block{
+div.dialog_content .box,div.dialog_content .block {
 	opacity: 1;
 }
 
@@ -45,13 +46,19 @@ div.field_div {
 	width: 100%;
 }
 
-div.field_div span, div.field_div input, div.field_div div, div.field_div a, div.field_div div input, div.field_div select {
-	float:left;
+div.field_div span,div.field_div input,div.field_div div,div.field_div a,div.field_div div input,div.field_div select
+	{
+	float: left;
 }
 
-button, select {
+button,select {
 	letter-spacing: normal;
 }
+
 fieldset .text {
 	height: 32px;
+}
+
+.ui-buttonset {
+	letter-spacing: -3px;
 }
