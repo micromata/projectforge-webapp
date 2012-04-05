@@ -34,6 +34,7 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.Registry;
 import org.projectforge.web.CustomizeMenuPage;
+import org.projectforge.web.LayoutSettingsPage;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.access.AccessEditPage;
 import org.projectforge.web.access.AccessListPage;
@@ -323,6 +324,7 @@ public class WebRegistry
     addMountPage("doc", DocumentationPage.class);
     addMountPage("error", ErrorPage.class);
     addMountPage("feedback", FeedbackPage.class);
+    addMountPage("layoutSettings", LayoutSettingsPage.class);
     addMountPage(BOOKMARK_LOGIN, LoginPage.class);
     addMountPage("myAccount", MyAccountEditPage.class);
     addMountPage("personalStatistics", PersonalStatisticsPage.class);
