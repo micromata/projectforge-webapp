@@ -24,8 +24,8 @@
 package org.projectforge.web;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.Validate;
@@ -43,7 +43,7 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
 
   private static final long serialVersionUID = 7961498640193169174L;
 
-  protected SortedSet<MenuEntry> subMenuEntries;
+  protected Collection<MenuEntry> subMenuEntries;
 
   protected String url;
 
@@ -68,6 +68,18 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
   protected Menu menu;
 
   private boolean mobileMenu;
+
+  private boolean sorted = true;
+
+  /**
+   * @param sorted if true (default) the entries are sorted, otherwise the order is the order of adding.
+   * @return this for chaining.
+   */
+  public MenuEntry setSorted(final boolean sorted)
+  {
+    this.sorted = sorted;
+    return this;
+  }
 
   public IModel<Integer> getNewCounterModel()
   {
@@ -186,7 +198,11 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
   public void addMenuEntry(final MenuEntry subMenuEntry)
   {
     if (subMenuEntries == null) {
-      subMenuEntries = new TreeSet<MenuEntry>();
+      if (sorted == true) {
+        subMenuEntries = new TreeSet<MenuEntry>();
+      } else {
+        subMenuEntries = new ArrayList<MenuEntry>();
+      }
     }
     subMenuEntries.add(subMenuEntry);
     subMenuEntry.setParent(this);
@@ -324,12 +340,16 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
   @Override
   public int compareTo(final MenuEntry o)
   {
-    if (menuItemDef.getOrderNumber() < o.menuItemDef.getOrderNumber()) {
+    final int orderNumber = menuItemDef != null ? menuItemDef.getOrderNumber() : 10000;
+    final int otherOrderNumber = o.menuItemDef != null ? o.menuItemDef.getOrderNumber() : 10000;
+    if (orderNumber < otherOrderNumber) {
       return -1;
-    } else if (menuItemDef.getOrderNumber() > o.menuItemDef.getOrderNumber()) {
+    } else if (orderNumber > otherOrderNumber) {
       return 1;
     }
-    return menuItemDef.getI18nKey().compareTo(o.getI18nKey());
+    final String name = menuItemDef != null ? menuItemDef.getI18nKey() : getName();
+    final String otherName = o.menuItemDef != null ? o.menuItemDef.getI18nKey() : o.getName();
+    return name.compareTo(otherName);
   }
 
   /**
