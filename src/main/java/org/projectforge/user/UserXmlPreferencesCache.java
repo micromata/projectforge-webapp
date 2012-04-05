@@ -46,6 +46,18 @@ public class UserXmlPreferencesCache extends AbstractCache
 
   private AccessChecker accessChecker;
 
+  private static UserXmlPreferencesCache instance;
+
+  public static void setInternalInstance(final UserXmlPreferencesCache cache)
+  {
+    instance = cache;
+  }
+
+  public static UserXmlPreferencesCache getDefaultInstance()
+  {
+    return instance;
+  }
+
   public void setUserXmlPreferencesDao(final UserXmlPreferencesDao userXmlPreferencesDao)
   {
     this.userXmlPreferencesDao = userXmlPreferencesDao;
@@ -106,7 +118,6 @@ public class UserXmlPreferencesCache extends AbstractCache
   {
     removeEntry(PFUserContext.getUserId(), key);
   }
-
 
   /**
    * @see org.projectforge.user.UserXmlPreferencesMap#removeEntry(String)
