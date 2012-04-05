@@ -81,6 +81,7 @@ public class WicketPageTestBase extends TestBase
         getResourceSettings().getStringResourceLoaders().add(new BundleStringResourceLoader(WicketApplication.RESOURCE_BUNDLE_NAME));
         final ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
         beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
+        UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
       }
 
       @Override
