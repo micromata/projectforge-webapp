@@ -83,10 +83,33 @@ public class FavoritesMenuTest extends WicketPageTestBase
   @Test
   public void readJsTreeXml()
   {
+    assertMenu(JS_TREE_XML, ParseMode.JS_TREE);
+  }
+
+  @Test
+  public void readUserPrefXml()
+  {
+    assertMenu(USER_PREF_XML, ParseMode.USER_PREF);
+  }
+
+  @Test
+  public void readWriteRead()
+  {
     logon(TEST_FULL_ACCESS_USER);
     final FavoritesMenu menu = new FavoritesMenu(userXmlPreferencesCache, accessChecker);
     menu.setMenu(menuBuilder.getMenu(PFUserContext.getUser()));
-    menu.readFromXml(JS_TREE_XML, ParseMode.JS_TREE);
+    menu.readFromXml(USER_PREF_XML, ParseMode.USER_PREF);
+    menu.storeAsUserPref();
+    final String xml = (String) userXmlPreferencesCache.getEntry(FavoritesMenu.USER_PREF_FAVORITES_MENU_ENTRIES_KEY);
+    assertMenu(xml, ParseMode.USER_PREF);
+  }
+
+  private void assertMenu(final String xml, final ParseMode parseMode)
+  {
+    logon(TEST_FULL_ACCESS_USER);
+    final FavoritesMenu menu = new FavoritesMenu(userXmlPreferencesCache, accessChecker);
+    menu.setMenu(menuBuilder.getMenu(PFUserContext.getUser()));
+    menu.readFromXml(xml, parseMode);
     final List<MenuEntry> mainEntries = menu.getMenuEntries();
     assertEquals(8, mainEntries.size());
     assertEquals("TASK_TREE", mainEntries.get(0).getId());
