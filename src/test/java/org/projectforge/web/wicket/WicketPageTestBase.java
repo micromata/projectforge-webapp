@@ -63,7 +63,7 @@ public class WicketPageTestBase extends TestBase
 {
   protected WicketTester tester;
 
-  private MenuBuilder menuBuilder;
+  protected MenuBuilder menuBuilder;
 
   private UserXmlPreferencesCache userXmlPreferencesCache;
 
