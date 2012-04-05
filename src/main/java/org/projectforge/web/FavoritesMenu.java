@@ -50,7 +50,7 @@ public class FavoritesMenu implements Serializable
 {
   public static final String USER_PREF_FAVORITES_MENU_KEY = "usersFavoritesMenu";
 
-  private static final String USER_PREF_FAVORITES_MENU_ENTRIES_KEY = "usersFavoriteMenuEntries";
+  static final String USER_PREF_FAVORITES_MENU_ENTRIES_KEY = "usersFavoriteMenuEntries";
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(FavoritesMenu.class);
 
@@ -139,7 +139,7 @@ public class FavoritesMenu implements Serializable
     if (id != null && id.startsWith("c-") == true) {
       id = id.substring(2);
     }
-    if (id != null) {
+    if (id != null && menu != null) { // menu is only null for FavoritesMenuTest.
       final MenuEntry origEntry = menu.findById(id);
       menuItemDef = origEntry != null ? origEntry.menuItemDef : null;
     }
