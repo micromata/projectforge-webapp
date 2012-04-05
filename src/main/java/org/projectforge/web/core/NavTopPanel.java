@@ -35,6 +35,7 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.CustomizeMenuPage;
 import org.projectforge.web.FavoritesMenu;
+import org.projectforge.web.LayoutSettingsPage;
 import org.projectforge.web.MenuEntry;
 import org.projectforge.web.wicket.FeedbackPage;
 import org.projectforge.web.wicket.WicketApplication;
@@ -80,6 +81,7 @@ public class NavTopPanel extends NavAbstractPanel
     alertMessageContainer.add(alertMessageLabel.setRenderBodyOnly(true));
 
     add(new BookmarkablePageLink<Void>("customizeMenuLink", CustomizeMenuPage.class));
+    add(new BookmarkablePageLink<Void>("layoutSettingsMenuLink", LayoutSettingsPage.class));
     add(new BookmarkablePageLink<Void>("feedbackLink", FeedbackPage.class));
     getMenu();
 
@@ -110,7 +112,22 @@ public class NavTopPanel extends NavAbstractPanel
           subMenuRepeater.add(subMenuItem);
           final AbstractLink subLink = getMenuEntryLink(subMenuEntry, false);
           subMenuItem.add(subLink);
-          subMenuItem.add(new WebMarkupContainer("subsubMenu").setVisible(false));
+
+          final WebMarkupContainer subsubMenuContainer = new WebMarkupContainer("subsubMenu");
+          subMenuItem.add(subsubMenuContainer);
+          if (subMenuEntry.hasSubMenuEntries() == false) {
+            subsubMenuContainer.setVisible(false);
+            continue;
+          }
+          final RepeatingView subsubMenuRepeater = new RepeatingView("subsubMenuRepeater");
+          subsubMenuContainer.add(subsubMenuRepeater);
+          for (final MenuEntry subsubMenuEntry : subMenuEntry.getSubMenuEntries()) {
+            // Now we add the next menu entry to the sub menu:
+            final WebMarkupContainer subsubMenuItem = new WebMarkupContainer(subsubMenuRepeater.newChildId());
+            subsubMenuRepeater.add(subsubMenuItem);
+            final AbstractLink subsubLink = getMenuEntryLink(subsubMenuEntry, false);
+            subsubMenuItem.add(subsubLink);
+          }
         }
       }
     }
