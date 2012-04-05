@@ -29,8 +29,6 @@
                 <wicket:container wicket:id="custMenuEntry" />
               </ul>
             </div>
-            <input type="button" onclick="javascript:createCustomMenuEntry();" value="create" /> <input type="button"
-              onclick="javascript:saveCustomMenuEntry();" value="save" />
           </div>
           <div class="col_50">
             <h2>
@@ -43,9 +41,19 @@
             </div>
           </div>
         </div>
+        <div class="button_cell clearfix">
+          <form wicket:id="form">
+            <input id="menuAsXml" type="hidden" wicket:id="menuAsXml" />
+            <button class="grey icon_only text_only" onclick="javascript:return createCustomMenuEntry();">
+              <wicket:message key="menu.customize.create">[create]</wicket:message>
+            </button>
+            <button class="green icon_only text_only" wicket:id="updateButton" onclick="javascript:return beforeSaveCustomMenuEntry();">
+              <wicket:message key="update">[update]</wicket:message>
+            </button>
+          </form>
+        </div>
       </div>
       <div class="block">
-        <h1>ToDo: speichern, neue Gruppe, Namen ändern.</h1>
         <wicket:message key="menu.customize.help" />
       </div>
     </div>
@@ -67,11 +75,31 @@
 											},
 											"dnd" : {
 												"drag_finish" : function(data) {
-													alert("DRAG OK, obj="
-															+ data.o.id
-															+ ", target="
-															+ $(data.r).attr(
-																	"id"));
+													var id = $(data.o).attr(
+															"id");
+													var newId = id.replace(
+															"o-", "c-");
+													var title = $(data.o)
+															.text();
+													var name = $(data.r).attr(
+															"id");
+													var position = "inside";
+													if (isMenuLink($(data.r)
+															.attr("id"))) {
+														position = "before";
+													}
+													this
+															.create(
+																	$(data.r),
+																	position,
+																	{
+																		attr : {
+																			id : newId,
+																			rel : "leaf"
+																		},
+																		data : title
+																	}, null,
+																	true);
 												}
 											},
 											"themes" : {
@@ -103,18 +131,16 @@
 														"action" : function(obj) {
 															var id = $(obj)
 																	.attr("id");
+															var position = "inside";
 															if (isMenuLink(id)) {
-																// Create before
-																this
-																		.create(
-																				this,
-																				"after");
-															} else {
-																this
-																		.create(
-																				obj,
-																				enterNewName);
+																position = "before";
 															}
+															this
+																	.create(
+																			obj,
+																			position,
+																			null,
+																			false);
 														}
 													},
 													"rename" : {
@@ -175,6 +201,7 @@
 					function createCustomMenuEntry() {
 						$("#cust-menu").jstree("create", "#new", "last",
 								enterNewName);
+						return false;
 					}
 					function removeCustomMenuEntry(id) {
 						$("#cust-menu").jstree("remove", id);
@@ -182,9 +209,11 @@
 					function renameCustomMenuEntry(id) {
 						$("#cust-menu").jstree("rename", id);
 					}
-					function saveCustomMenuEntry() {
-						alert($("#cust-menu").jstree("get_xml", "nest", "-1",
-								[ "id" ]));
+					function beforeSaveCustomMenuEntry() {
+						var menuAsXml = $("#cust-menu").jstree("get_xml",
+								"nest", "-1", [ "id" ]);
+						$('#menuAsXml').val(menuAsXml);
+						return true;
 					}
 					function isMenuLink(id) {
 						return (id && id.match(/^c/));
