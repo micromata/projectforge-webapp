@@ -99,6 +99,16 @@ public class UserXmlPreferencesCache extends AbstractCache
   }
 
   /**
+   * Remove the entry of the current logged in user.
+   * @see #removeEntry(Integer, String)
+   */
+  public void removeEntry(final String key)
+  {
+    removeEntry(PFUserContext.getUserId(), key);
+  }
+
+
+  /**
    * @see org.projectforge.user.UserXmlPreferencesMap#removeEntry(String)
    */
   public Object removeEntry(final Integer userId, final String key)
