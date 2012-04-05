@@ -27,10 +27,13 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.HiddenField;
 import org.apache.wicket.markup.html.panel.Fragment;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.core.NavAbstractPanel;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 
@@ -38,15 +41,15 @@ public class CustomizeMenuPage extends AbstractSecuredPage
 {
   private static final long serialVersionUID = 8587252641914110851L;
 
-  @SpringBean(name = "menuBuilder")
-  private MenuBuilder menuBuilder;
+  private String menuAsXml;
 
+  @SuppressWarnings("serial")
   public CustomizeMenuPage(final PageParameters parameters)
   {
     super(parameters);
-    final Menu menu = menuBuilder.getMenu(getUser());
-    menu.setFavoriteMenuEntries((String) getUserPrefEntry(NavAbstractPanel.USER_PREF_FAVORITE_MENU_ENTRIES_KEY));
-    buildCustMenu(menu);
+    final FavoritesMenu favoriteMenu = FavoritesMenu.get(userXmlPreferencesCache, accessChecker);
+    buildCustMenu(favoriteMenu);
+    final Menu menu = (Menu) getUserPrefEntry(NavAbstractPanel.USER_PREF_MENU_KEY);
     buildCompleteMenu(menu);
     body.add(new Label("i18nVars", "var enterNewName = \""
         + getString("menu.customize.enterNewName")
@@ -57,16 +60,31 @@ public class CustomizeMenuPage extends AbstractSecuredPage
         + "\";\nvar rename = \""
         + getString("menu.customize.rename")
         + "\";").setEscapeModelStrings(false));
+    final Form<Void> form = new Form<Void>("form");
+    body.add(form);
+    form.add(new HiddenField<String>("menuAsXml", new PropertyModel<String>(this, "menuAsXml")));
+    form.add(new Button("updateButton") {
+      /**
+       * @see org.apache.wicket.markup.html.form.Button#onSubmit()
+       */
+      @Override
+      public void onSubmit()
+      {
+        favoriteMenu.readFromXml(menuAsXml, FavoritesMenu.ParseMode.JS_TREE);
+        favoriteMenu.storeAsUserPref();
+        setResponsePage(CustomizeMenuPage.class);
+      }
+    });
   }
 
   /**
    * The menu tree to customize.
    */
-  private void buildCustMenu(final Menu menu)
+  private void buildCustMenu(final FavoritesMenu favoriteMenu)
   {
     final RepeatingView menuRepeater = new RepeatingView("custMenuEntry");
     body.add(menuRepeater);
-    for (final MenuEntry menuEntry : menu.getFavoriteMenuEntries()) {
+    for (final MenuEntry menuEntry : favoriteMenu.getMenuEntries()) {
       addCustMenuEntry(menuRepeater, menuEntry);
     }
   }
@@ -82,10 +100,11 @@ public class CustomizeMenuPage extends AbstractSecuredPage
     frag.add(li);
     if (menuEntry.getPageClass() != null || menuEntry.getUrl() != null) {
       li.add(AttributeModifier.append("rel", "leaf"));
+      final String id = "c-" + menuEntry.getId();
+      li.setOutputMarkupId(true).setMarkupId(id);
     }
-    final String id = "c-" + menuEntry.getId();
-    li.setOutputMarkupId(true).setMarkupId(id);
-    li.add(new Label("label", getString(menuEntry.getI18nKey())));
+    final String i18nKey = menuEntry.getI18nKey();
+    li.add(new Label("label", i18nKey != null ? getString(menuEntry.getI18nKey()) : menuEntry.getName()));
     final WebMarkupContainer subMenu = new WebMarkupContainer("subMenu");
     li.add(subMenu);
     if (menuEntry.hasSubMenuEntries() == false) {

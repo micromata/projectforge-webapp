@@ -29,6 +29,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.Validate;
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.wicket.Page;
 import org.apache.wicket.model.IModel;
 import org.projectforge.web.wicket.WicketUtils;
@@ -62,8 +63,10 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
 
   protected MenuItemDef menuItemDef;
 
+  protected String name;
+
   protected Menu menu;
-  
+
   private boolean mobileMenu;
 
   public IModel<Integer> getNewCounterModel()
@@ -88,7 +91,7 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
     return totalNewCounterModel;
   }
 
-  public void setNewCounterTooltip(String newCounterTooltip)
+  public void setNewCounterTooltip(final String newCounterTooltip)
   {
     this.newCounterTooltip = newCounterTooltip;
   }
@@ -162,6 +165,24 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
     menu.addMenuEntry(this);
   }
 
+  /**
+   * @return the name Only given for customized menu entries if the user renamed the menu.
+   */
+  public String getName()
+  {
+    return name;
+  }
+
+  /**
+   * @param name the name to set
+   * @return this for chaining.
+   */
+  public MenuEntry setName(final String name)
+  {
+    this.name = name;
+    return this;
+  }
+
   public void addMenuEntry(final MenuEntry subMenuEntry)
   {
     if (subMenuEntries == null) {
@@ -213,22 +234,22 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
    */
   public boolean isNewWindow()
   {
-    return menuItemDef.isNewWindow();
+    return menuItemDef != null && menuItemDef.isNewWindow();
   }
 
   public boolean isWicketPage()
   {
-    return menuItemDef.isWicketPage();
+    return menuItemDef != null && menuItemDef.isWicketPage();
   }
 
   public Class< ? extends Page> getPageClass()
   {
-    return menuItemDef.getPageClass();
+    return menuItemDef != null ? menuItemDef.getPageClass() : null;
   }
 
   public Class< ? extends Page> getMobilePageClass()
   {
-    return menuItemDef.getMobilePageClass();
+    return menuItemDef != null ? menuItemDef.getMobilePageClass() : null;
   }
 
   /**
@@ -241,7 +262,7 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
 
   public String getI18nKey()
   {
-    return menuItemDef.getI18nKey();
+    return menuItemDef != null ? menuItemDef.getI18nKey() : null;
   }
 
   /**
@@ -290,14 +311,14 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
     return visible;
   }
 
-  public void setVisible(boolean visible)
+  public void setVisible(final boolean visible)
   {
     this.visible = visible;
   }
 
   public String getId()
   {
-    return menuItemDef.getId();
+    return menuItemDef != null ? menuItemDef.getId() : null;
   }
 
   @Override
@@ -309,5 +330,19 @@ public class MenuEntry implements Serializable, Comparable<MenuEntry>
       return 1;
     }
     return menuItemDef.getI18nKey().compareTo(o.getI18nKey());
+  }
+
+  /**
+   * @see java.lang.Object#toString()
+   */
+  @Override
+  public String toString()
+  {
+    final ToStringBuilder tos = new ToStringBuilder(this);
+    if (menuItemDef != null)
+      tos.append("menuItemDef", menuItemDef);
+    if (name != null)
+      tos.append("name", name);
+    return tos.toString();
   }
 }

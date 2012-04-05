@@ -24,10 +24,7 @@
 package org.projectforge.web;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * Helper for the web menu. Use MenuTreeTable instead.
@@ -38,9 +35,7 @@ public class Menu implements Serializable
 
   private static final long serialVersionUID = -4954464926815538198L;
 
-  private MenuEntry rootMenuEntry = new MenuEntry();
-
-  protected List<MenuEntry> favoriteMenuEntries;
+  private final MenuEntry rootMenuEntry = new MenuEntry();
 
   public Menu()
   {
@@ -54,50 +49,6 @@ public class Menu implements Serializable
   public MenuEntry findById(final String id)
   {
     return rootMenuEntry.findById(id);
-  }
-
-  /**
-   * @param favoritesString coma separated list of MenuItemDefs.
-   */
-  public void setFavoriteMenuEntries(final String favoritesString)
-  {
-    this.favoriteMenuEntries = new ArrayList<MenuEntry>();
-    if (favoritesString == null) {
-      return;
-    }
-    final StringTokenizer tokenizer = new StringTokenizer(favoritesString, ",");
-    while (tokenizer.hasMoreTokens() == true) {
-      String token = tokenizer.nextToken();
-      if (token.startsWith("M_") == true) {
-        token = token.substring(2);
-      }
-      try {
-        final MenuItemDef menuItemDef = MenuItemRegistry.instance().get(token);
-        if (menuItemDef == null) {
-          continue;
-        }
-        addFavoriteMenuEntry(menuItemDef);
-      } catch (final Exception ex) {
-        log.info("Menu '" + token + "' not found: " + ex.getMessage(), ex);
-      }
-    }
-  }
-
-  public List<MenuEntry> getFavoriteMenuEntries()
-  {
-    synchronized (this) {
-      if (this.favoriteMenuEntries == null || this.favoriteMenuEntries.size() == 0) {
-        this.favoriteMenuEntries = new ArrayList<MenuEntry>();
-        final MenuItemRegistry registry = MenuItemRegistry.instance();
-        addFavoriteMenuEntry(registry.get(MenuItemDefId.TASK_TREE));
-        addFavoriteMenuEntry(registry.get(MenuItemDefId.CALENDAR));
-        addFavoriteMenuEntry(registry.get(MenuItemDefId.ADDRESS_LIST));
-        addFavoriteMenuEntry(registry.get(MenuItemDefId.BOOK_LIST));
-        addFavoriteMenuEntry(registry.get(MenuItemDefId.PHONE_CALL));
-        addFavoriteMenuEntry(registry.get(MenuItemDefId.MEB));
-      }
-      return this.favoriteMenuEntries;
-    }
   }
 
   public boolean isFirst(final MenuEntry entry)
@@ -124,7 +75,7 @@ public class Menu implements Serializable
     parent.addMenuEntry(menuEntry);
   }
 
-  private MenuEntry getMenuEntry(final MenuItemDef menuItemDef)
+  public MenuEntry getMenuEntry(final MenuItemDef menuItemDef)
   {
     if (getMenuEntries() == null) {
       return null;
@@ -152,19 +103,5 @@ public class Menu implements Serializable
       }
     }
     return null;
-  }
-
-  private void addFavoriteMenuEntry(final MenuItemDef menuItemDef)
-  {
-    final MenuEntry menuEntry = getMenuEntry(menuItemDef);
-    if (menuEntry == null) {
-      return;
-    }
-    for (final MenuEntry entry : this.favoriteMenuEntries) {
-      if (entry.menuItemDef == menuItemDef) {
-        return;
-      }
-    }
-    this.favoriteMenuEntries.add(menuEntry);
   }
 }

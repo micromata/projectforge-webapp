@@ -23,7 +23,7 @@
 
 package org.projectforge.web.core;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
@@ -31,7 +31,10 @@ import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
+import org.projectforge.access.AccessChecker;
+import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.CustomizeMenuPage;
+import org.projectforge.web.FavoritesMenu;
 import org.projectforge.web.MenuEntry;
 import org.projectforge.web.wicket.FeedbackPage;
 import org.projectforge.web.wicket.WicketApplication;
@@ -43,9 +46,12 @@ public class NavTopPanel extends NavAbstractPanel
 {
   private static final long serialVersionUID = -7858806882044188339L;
 
-  public NavTopPanel(final String id)
+  private final FavoritesMenu favoritesMenu;
+
+  public NavTopPanel(final String id, final UserXmlPreferencesCache userXmlPreferencesCache, final AccessChecker accessChecker)
   {
     super(id);
+    this.favoritesMenu = FavoritesMenu.get(userXmlPreferencesCache, accessChecker);
   }
 
   public void init()
@@ -80,7 +86,7 @@ public class NavTopPanel extends NavAbstractPanel
     // Main menu:
     final RepeatingView menuRepeater = new RepeatingView("menuRepeater");
     add(menuRepeater);
-    final List<MenuEntry> menuEntries = menu.getFavoriteMenuEntries();
+    final Collection<MenuEntry> menuEntries = favoritesMenu.getMenuEntries();
     if (menuEntries != null) {
       for (final MenuEntry menuEntry : menuEntries) {
         // Now we add a new menu area (title with sub menus):

@@ -96,7 +96,7 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
       };
     });
     body.add(sideMenuSuffixLabel);
-    final NavTopPanel favoriteMenuPanel = new NavTopPanel("favoriteMenu");
+    final NavTopPanel favoriteMenuPanel = new NavTopPanel("favoriteMenu", userXmlPreferencesCache, accessChecker);
     body.add(favoriteMenuPanel);
     favoriteMenuPanel.init();
     // body.add(new Label("username", getUser().getFullname()));

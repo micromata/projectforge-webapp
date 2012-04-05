@@ -32,6 +32,7 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.web.FavoritesMenu;
 import org.projectforge.web.Menu;
 import org.projectforge.web.MenuBuilder;
 import org.projectforge.web.MenuEntry;
@@ -45,9 +46,7 @@ public abstract class NavAbstractPanel extends Panel
 {
   private static final long serialVersionUID = -1019454504282157440L;
 
-  private static final String USER_PREF_MENU_KEY = "usersMenu";
-
-  public static final String USER_PREF_FAVORITE_MENU_ENTRIES_KEY = "usersFavoriteMenuEntries";
+  public static final String USER_PREF_MENU_KEY = "usersMenu";
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(NavAbstractPanel.class);
 
@@ -55,6 +54,8 @@ public abstract class NavAbstractPanel extends Panel
   private MenuBuilder menuBuilder;
 
   protected Menu menu;
+
+  protected FavoritesMenu favoritesMenu;
 
   public NavAbstractPanel(final String id)
   {
@@ -77,7 +78,8 @@ public abstract class NavAbstractPanel extends Panel
     if (menuEntry.isNewWindow() == true) {
       link.add(AttributeModifier.replace("target", "_blank"));
     }
-    link.add(new Label("label", getString(menuEntry.getI18nKey())).setRenderBodyOnly(renderLabelBodyOnly));
+    final String i18nKey = menuEntry.getI18nKey();
+    link.add(new Label("label", i18nKey != null ? getString(i18nKey) : menuEntry.getName()).setRenderBodyOnly(renderLabelBodyOnly));
     final Label menuSuffixLabel = getSuffixLabel(menuEntry);
     link.add(menuSuffixLabel);
     return link;
@@ -111,19 +113,13 @@ public abstract class NavAbstractPanel extends Panel
         return menu;
       }
     }
-    if (menu != null) { // After getting menu from user pref entry, because otherwise resetMenu() doesn't work if menu is stored in this
-      // panel.
-      return menu;
-    }
     if (log.isDebugEnabled() == true) {
       log.debug("Build new menu.");
     }
     menu = menuBuilder.getMenu(PFUserContext.getUser());
     if (securedPage != null) {
-      menu.setFavoriteMenuEntries((String) securedPage.getUserPrefEntry(USER_PREF_FAVORITE_MENU_ENTRIES_KEY));
       securedPage.putUserPrefEntry(USER_PREF_MENU_KEY, menu, false);
     }
     return menu;
   }
-
 }
