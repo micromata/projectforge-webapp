@@ -117,8 +117,6 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     body.add(contentMenu.getRepeatingView());
     contentRightMenu = new MyComponentsRepeater<ContentMenuEntryPanel>("contentRightMenuRepeater");
     body.add(contentRightMenu.getRepeatingView());
-    // dropDownMenu.add(new PresizedImage("cogImage", getResponse(), WebConstants.IMAGE_COG));
-    // dropDownMenu.add(new PresizedImage("arrowDownImage", getResponse(), WebConstants.IMAGE_ARROW_DOWN));
   }
 
   /**
