@@ -157,4 +157,22 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     contentRightMenu.render();
     super.onBeforeRender();
   }
+
+  /**
+   * @return This page as link with the page parameters of this page.
+   */
+  public String getPageAsLink()
+  {
+    return getPageAsLink(getPageParameters());
+  }
+
+  /**
+   * @param parameters
+   * @return This page as link with the given page parameters.
+   */
+  public String getPageAsLink(final PageParameters parameters)
+  {
+    final String relativeUrl = (String) urlFor(this.getClass(), parameters);
+    return WicketUtils.toAbsolutePath(relativeUrl);
+  }
 }
