@@ -23,6 +23,7 @@
 
 package org.projectforge.web;
 
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractStandardForm;
@@ -51,8 +52,7 @@ public class LayoutSettingsForm extends AbstractStandardForm<LayoutSettingsData,
     super.init();
     data.setBrowserScreenWidthType(getMySession().getBrowserScreenWidthType());
     gridBuilder.newGrid16().newBlockPanel();
-    final FieldsetPanel fs = gridBuilder.newFieldset(parentPage.getString("layout.settings.browserScreenWidth")).setLabelSide(false)
-        .setNoLabelFor();
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("layout.settings.browserScreenWidth")).setLabelSide(false).setNoLabelFor();
     final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
     final RadioGroupPanel<BrowserScreenWidthType> radioGroup = new RadioGroupPanel<BrowserScreenWidthType>(radioGroupPanel.newChildId(),
         "screenWidthType", new PropertyModel<BrowserScreenWidthType>(data, "browserScreenWidthType")) {
@@ -71,8 +71,8 @@ public class LayoutSettingsForm extends AbstractStandardForm<LayoutSettingsData,
       @Override
       protected void onSelectionChanged(final Object newSelection)
       {
-        parentPage.putUserPrefEntry(LayoutSettingsPage.getBrowserScreenWidthUserPrefKey(getMySession()),
-            data.getBrowserScreenWidthType(), true);
+        parentPage.putUserPrefEntry(LayoutSettingsPage.getBrowserScreenWidthUserPrefKey(getMySession()), data.getBrowserScreenWidthType(),
+            true);
         getMySession().setBrowserScreenWidthType(data.getBrowserScreenWidthType());
         setResponsePage(LayoutSettingsPage.class);
       }
@@ -83,29 +83,31 @@ public class LayoutSettingsForm extends AbstractStandardForm<LayoutSettingsData,
     addRadioBox(radioGroup, BrowserScreenWidthType.WIDE);
     gridBuilder.newGrid8().newColumnsPanel().newColumnPanel(DivType.COL_50);
     gridBuilder.newFormHeading(getString("layout.settings.test") + " 1.1");
-    addBlindText();
+    addContent();
     gridBuilder.newColumnPanel(DivType.COL_50);
     gridBuilder.newFormHeading(getString("layout.settings.test") + " 1.2");
-    addBlindText();
+    addContent();
     gridBuilder.newGrid8().newColumnsPanel().newColumnPanel(DivType.COL_50);
     gridBuilder.newFormHeading(getString("layout.settings.test") + " 2.1");
-    addBlindText();
+    addContent();
     gridBuilder.newColumnPanel(DivType.COL_50);
     gridBuilder.newFormHeading(getString("layout.settings.test") + " 2.2");
-    addBlindText();
+    addContent();
   }
 
-  private void addBlindText()
+  private void addContent()
   {
     final DivPanel current = gridBuilder.getPanel();
     current
     .add(new DivTextPanel(
         current.newChildId(),
         "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim."));
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("layout.settings.test"));
+    fs.add(new TextField<String>(fs.getTextFieldId(), new Model<String>(getString("layout.settings.test"))));
   }
 
   private void addRadioBox(final RadioGroupPanel<BrowserScreenWidthType> radioGroup, final BrowserScreenWidthType type)
   {
-    radioGroup.add(new Model<BrowserScreenWidthType>(type), parentPage.getString(type.getI18nKey()));
+    radioGroup.add(new Model<BrowserScreenWidthType>(type), getString(type.getI18nKey()));
   }
 }
