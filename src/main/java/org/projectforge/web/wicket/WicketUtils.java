@@ -51,7 +51,6 @@ import org.apache.wicket.protocol.http.RequestUtils;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.request.cycle.RequestCycle;
-import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.StringValue;
 import org.projectforge.calendar.DayHolder;
@@ -311,9 +310,9 @@ public class WicketUtils
    * @see RequestUtils#toAbsolutePath(String, String)
    * @see URLHelper#removeJSessionId(String)
    */
-  public final static String toAbsolutePath(final String relativePagePath)
+  public final static String toAbsolutePath(final Request request, final String relativePagePath)
   {
-    final HttpServletRequest req = (HttpServletRequest) ((WebRequest) RequestCycle.get().getRequest()).getContainerRequest();
+    final HttpServletRequest req = (HttpServletRequest)request.getContainerRequest();
     final String absoluteUrl = RequestUtils.toAbsolutePath(req.getRequestURL().toString(), relativePagePath);
     return URLHelper.removeJSessionId(absoluteUrl);
   }
