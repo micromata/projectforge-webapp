@@ -163,7 +163,7 @@ public class UserFilter implements Filter
 
   private static void copyUser(final PFUserDO srcUser, final PFUserDO destUser)
   {
-    destUser.copyValuesFrom(srcUser, "password", "stayLoggedInKey", "rights");
+    destUser.copyValuesFrom(srcUser, "password", "stayLoggedInKey");
   }
 
   public static PFUserDO getUser(final HttpServletRequest request)
