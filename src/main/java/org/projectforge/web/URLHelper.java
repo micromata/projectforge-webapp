@@ -42,9 +42,35 @@ public class URLHelper
     }
     try {
       return URLEncoder.encode(str, "UTF-8");
-    } catch (UnsupportedEncodingException ex) {
+    } catch (final UnsupportedEncodingException ex) {
       log.info("Can't URL-encode '" + str + "': " + ex.getMessage());
       return "";
     }
+  }
+
+  /**
+   * Removes the jsessionid parameter from the given url if exists.
+   * @param url
+   * @return
+   */
+  public static String removeJSessionId(final String url)
+  {
+    if (url == null) {
+      return null;
+    }
+    final int pos = url.indexOf(";jsessionid=");
+    if (pos < 0) {
+      return url;
+    }
+    final int questionMark = url.indexOf('?');
+    if (questionMark < 0) {
+      // No parameters, so url ends with jsession id.
+      return url.substring(0, pos);
+    }
+    if (questionMark < pos) {
+      // What the hell?
+      return url;
+    }
+    return url.substring(0, pos) + url.substring(questionMark);
   }
 }
