@@ -5,6 +5,12 @@
 
 <body>
   <wicket:extend>
+    <div id="topbar" class="clearfix">
+      <div class="logo" style="border-bottom: 1px solid #D9DFE1; padding: 1em 2em; text-align: right; background-color: #ffffff;">
+        <img id="logo-left" wicket:id="logoLeftImage" src="/secure/Logo.jpg" style="border: none; float: left;" /> <img id="logo-right"
+          src="images/logo-top-right.png" style="border: none;" />
+      </div>
+    </div>
     <div class="isolate">
       <div id="login_box" class="center" style="display: none;">
         <div class="main_container clearfix">
@@ -48,12 +54,9 @@
                     <input type="checkbox" wicket:id="stayLoggedIn" />
                   </div>
                 </fieldset>
-                <fieldset class="no_label">
-                  <div style="">
-                    <div class="slider_unlock" wicket:message="title:login.slideToLogin"></div>
-                    <button type="submit" wicket:id="login" style="display: none"></button>
-                  </div>
-                </fieldset>
+                <div class="button_cell clearfix">
+                  <wicket:container wicket:id="loginButton">[login button]</wicket:container>
+                </div>
               </form>
             </div>
           </div>

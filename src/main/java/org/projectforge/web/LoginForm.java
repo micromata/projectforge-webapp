@@ -30,6 +30,7 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
 
 public class LoginForm extends AbstractForm<LoginForm, LoginPage>
 {
@@ -56,7 +57,7 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
     add(username);
     // Focus is set in adminica_ui.js
     add(new PasswordTextField("password", new PropertyModel<String>(this, "password")).setResetPassword(true).setRequired(true));
-    final Button loginButton = new Button("login", new Model<String>(getString("login"))) {
+    final Button loginButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("login")) {
       @Override
       public final void onSubmit()
       {
@@ -67,7 +68,7 @@ public class LoginForm extends AbstractForm<LoginForm, LoginPage>
       }
     };
     setDefaultButton(loginButton);
-    add(loginButton);
+    add(new SingleButtonPanel("loginButton", loginButton, getString("login"), SingleButtonPanel.DEFAULT_SUBMIT));
   }
 
   public String getUsername()
