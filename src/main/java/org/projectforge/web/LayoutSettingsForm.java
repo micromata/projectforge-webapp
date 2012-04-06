@@ -23,11 +23,9 @@
 
 package org.projectforge.web;
 
-import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractStandardForm;
-import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
@@ -57,7 +55,28 @@ public class LayoutSettingsForm extends AbstractStandardForm<LayoutSettingsData,
         .setNoLabelFor();
     final DivPanel radioGroupPanel = fs.addNewRadioBoxDiv();
     final RadioGroupPanel<BrowserScreenWidthType> radioGroup = new RadioGroupPanel<BrowserScreenWidthType>(radioGroupPanel.newChildId(),
-        "screenWidthType", new PropertyModel<BrowserScreenWidthType>(data, "browserScreenWidthType"));
+        "screenWidthType", new PropertyModel<BrowserScreenWidthType>(data, "browserScreenWidthType")) {
+      /**
+       * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#wantOnSelectionChangedNotifications()
+       */
+      @Override
+      protected boolean wantOnSelectionChangedNotifications()
+      {
+        return true;
+      }
+
+      /**
+       * @see org.projectforge.web.wicket.flowlayout.RadioGroupPanel#onSelectionChanged(java.lang.Object)
+       */
+      @Override
+      protected void onSelectionChanged(final Object newSelection)
+      {
+        parentPage.putUserPrefEntry(LayoutSettingsPage.getBrowserScreenWidthUserPrefKey(getMySession()),
+            data.getBrowserScreenWidthType(), true);
+        getMySession().setBrowserScreenWidthType(data.getBrowserScreenWidthType());
+        setResponsePage(LayoutSettingsPage.class);
+      }
+    };
     radioGroupPanel.add(radioGroup);
     addRadioBox(radioGroup, BrowserScreenWidthType.NARROW);
     addRadioBox(radioGroup, BrowserScreenWidthType.NORMAL);
@@ -74,22 +93,6 @@ public class LayoutSettingsForm extends AbstractStandardForm<LayoutSettingsData,
     gridBuilder.newColumnPanel(DivType.COL_50);
     gridBuilder.newFormHeading(getString("layout.settings.test") + " 2.2");
     addBlindText();
-    {
-      final Button updateButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("update")) {
-        @Override
-        public final void onSubmit()
-        {
-          parentPage.putUserPrefEntry(LayoutSettingsPage.getBrowserScreenWidthUserPrefKey(getMySession()),
-              data.getBrowserScreenWidthType(), true);
-          getMySession().setBrowserScreenWidthType(data.getBrowserScreenWidthType());
-          setResponsePage(LayoutSettingsPage.class);
-        }
-      };
-      final SingleButtonPanel updateButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), updateButton, getString("update"),
-          SingleButtonPanel.DEFAULT_SUBMIT);
-      actionButtons.add(updateButtonPanel);
-      setDefaultButton(updateButton);
-    }
   }
 
   private void addBlindText()
