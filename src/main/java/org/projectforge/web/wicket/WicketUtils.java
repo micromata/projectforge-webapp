@@ -47,9 +47,11 @@ import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.image.ContextImage;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.protocol.http.RequestUtils;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.request.cycle.RequestCycle;
+import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.string.StringValue;
 import org.projectforge.calendar.DayHolder;
@@ -65,6 +67,7 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.web.URLHelper;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -303,41 +306,18 @@ public class WicketUtils
   }
 
   /**
-   * Gets absolute url for an edit page with the object id as parameter.
+   * @param relativePagePath
+   * @return
+   * @see RequestUtils#toAbsolutePath(String, String)
+   * @see URLHelper#removeJSessionId(String)
    */
-  public static String getAbsoluteEditPageUrl(final Request request, final Class< ? extends Page> pageClass, final Integer id)
+  public final static String toAbsolutePath(final String relativePagePath)
   {
-    return getAbsoluteEditPageUrl(request, WicketApplication.getBookmarkableMountPath(pageClass), id);
+    final HttpServletRequest req = (HttpServletRequest) ((WebRequest) RequestCycle.get().getRequest()).getContainerRequest();
+    final String absoluteUrl = RequestUtils.toAbsolutePath(req.getRequestURL().toString(), relativePagePath);
+    return URLHelper.removeJSessionId(absoluteUrl);
   }
 
-  /**
-   * Gets absolute url for an edit page with the object id as parameter. The alias' should be defined in WebConstants.
-   * @param alias Name under which the page was mounted to (in WicketApplication).
-   */
-  public static String getAbsoluteEditPageUrl(final Request request, final String alias, final Integer id)
-  {
-    final StringBuffer buf = buildAbsoluteUrl(request);
-    buf.append(alias + "/id/" + id);
-    return buf.toString();
-  }
-
-  public static String getAbsolutePageUrl(final Request request, String relativeUrl, final boolean removeSessionId)
-  {
-    final HttpServletRequest httpServletRequest = getHttpServletRequest(request);
-    final StringBuffer buf = buildAbsoluteBaseUrl(request, httpServletRequest).append("/").append(WICKET_APPLICATION_PATH);
-    if (removeSessionId == true) {
-      relativeUrl = removeSessionId(relativeUrl);
-    }
-    if (buf.indexOf(relativeUrl) < 0) {
-      // relative url is not yet part of result.
-      buf.append(relativeUrl);
-    }
-    if (removeSessionId == true) {
-      return removeSessionId(buf.toString());
-    }
-    return buf.toString();
-
-  }
 
   /**
    * @return Default page of ProjectForge. Currently CalendarPage is the default page (e. g. to redirect after login if no forward url is
@@ -352,24 +332,12 @@ public class WicketUtils
    * Removes sessionId from url if exists.
    * @param url
    */
-  public static String removeSessionId(final String url)
-  {
-    if (url == null) {
-      return null;
-    }
-    return url.replaceFirst(";jsessionid=[a-zA-Z0-9]*", "");
-  }
-
-  /**
-   * Removes sessionId from url if exists.
-   * @param url
-   */
   public static String removeSessionId(final CharSequence url)
   {
     if (url == null) {
       return null;
     }
-    return removeSessionId((String) url);
+    return removeSessionId(url);
   }
 
   /**
@@ -564,37 +532,6 @@ public class WicketUtils
       alias = propertyString;
     }
     return new String[] { property, alias};
-  }
-
-  private static StringBuffer buildAbsoluteUrl(final Request request)
-  {
-    final HttpServletRequest httpServletRequest = getHttpServletRequest(request);
-    final StringBuffer buf = buildAbsoluteBaseUrl(request, httpServletRequest);
-    buf.append(httpServletRequest.getServletPath());
-    return buf;
-  }
-
-  private static StringBuffer buildAbsoluteBaseUrl(final Request request, final HttpServletRequest httpServletRequest)
-  {
-    final StringBuffer buf = new StringBuffer();
-    final String scheme = httpServletRequest.getScheme();
-    buf.append(scheme).append("://");
-    buf.append(httpServletRequest.getServerName());
-    final int port = httpServletRequest.getServerPort();
-    if ("https".equals(scheme) == true) {
-      if (port != 443) {
-        buf.append(":").append(port);
-      }
-    } else if ("http".equals(scheme) == true) {
-      if (port != 80) {
-        buf.append(":").append(port);
-      }
-    } else {
-      log.warn("Oups, unkown protocol: " + scheme);
-      buf.append(":").append(port);
-    }
-    buf.append(httpServletRequest.getContextPath());
-    return buf;
   }
 
   /**
