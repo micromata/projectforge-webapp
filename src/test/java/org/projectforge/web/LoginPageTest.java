@@ -49,12 +49,12 @@ public class LoginPageTest extends WicketPageTestBase
     FormTester form = tester.newFormTester("body:form");
     form.setValue("username", "demo");
     form.setValue("password", "wrong");
-    form.submit("login");
+    form.submit(KEY_LOGINPAGE_BUTTON_LOGIN);
     tester.assertRenderedPage(LoginPage.class);
     form = tester.newFormTester("body:form");
     form.setValue("username", TestBase.TEST_ADMIN_USER);
     form.setValue("password", TestBase.TEST_ADMIN_USER_PASSWORD);
-    form.submit("login");
+    form.submit(KEY_LOGINPAGE_BUTTON_LOGIN);
     tester.assertRenderedPage(CalendarPage.class);
     tester.startPage(AddressListPage.class);
     tester.assertRenderedPage(AddressListPage.class);

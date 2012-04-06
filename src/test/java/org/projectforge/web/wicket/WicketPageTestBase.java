@@ -61,6 +61,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class WicketPageTestBase extends TestBase
 {
+  protected static final String KEY_LOGINPAGE_BUTTON_LOGIN = "loginButton:button";
   protected WicketTester tester;
 
   protected MenuBuilder menuBuilder;
@@ -117,7 +118,7 @@ public class WicketPageTestBase extends TestBase
     final FormTester form = tester.newFormTester("body:form");
     form.setValue("username", username);
     form.setValue("password", password);
-    form.submit("loginButton:button");
+    form.submit(KEY_LOGINPAGE_BUTTON_LOGIN);
     tester.assertRenderedPage(WicketApplication.DEFAULT_PAGE);
   }
 
