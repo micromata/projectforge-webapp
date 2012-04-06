@@ -318,6 +318,14 @@ public class WicketUtils
     return URLHelper.removeJSessionId(absoluteUrl);
   }
 
+  /**
+   * @param id
+   * @return new PageParameters containing the given id as page parameter.
+   */
+  public final static PageParameters getEditPageParameters(final Integer id)
+  {
+    return new PageParameters().set(AbstractEditPage.PARAMETER_KEY_ID, id);
+  }
 
   /**
    * @return Default page of ProjectForge. Currently CalendarPage is the default page (e. g. to redirect after login if no forward url is
@@ -326,18 +334,6 @@ public class WicketUtils
   public static String getDefaultPageUrl()
   {
     return getBookmarkablePageUrl(CalendarPage.class);
-  }
-
-  /**
-   * Removes sessionId from url if exists.
-   * @param url
-   */
-  public static String removeSessionId(final CharSequence url)
-  {
-    if (url == null) {
-      return null;
-    }
-    return removeSessionId(url);
   }
 
   /**
