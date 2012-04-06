@@ -39,6 +39,7 @@ import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
+import org.projectforge.web.wicket.WicketUtils;
 
 
 @EditPage(defaultReturnPage = AuftragListPage.class)
@@ -195,7 +196,7 @@ public class AuftragEditPage extends AbstractEditPage<AuftragDO, AuftragEditForm
 
   private void sendNotificationIfRequired(final OperationType operationType)
   {
-    final String url = getPageAsLink(new PageParameters().set(PARAMETER_KEY_ID, getData().getId()));
+    final String url = getPageAsLink(WicketUtils.getEditPageParameters(getData().getId()));
     auftragDao.sendNotificationIfRequired(getData(), operationType, url);
   }
 
