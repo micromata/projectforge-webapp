@@ -559,7 +559,6 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     if (id == null) {
       return null;
     }
-    @SuppressWarnings("unchecked")
     final O obj = getHibernateTemplate().get(clazz, id, LockMode.READ);
     afterLoad(obj);
     return obj;
