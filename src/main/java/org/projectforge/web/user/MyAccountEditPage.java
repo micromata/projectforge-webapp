@@ -68,7 +68,8 @@ public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditF
   public AbstractSecuredBasePage afterSaveOrUpdate()
   {
     final HttpServletRequest request = WicketUtils.getHttpServletRequest(getRequest());
-    UserFilter.updateUser(request, form.getData());
+    // Don't trust the form data, use logged in user from the data base instead.
+    UserFilter.updateUser(request, userDao.internalGetById(getUserId()));
     return super.afterSaveOrUpdate();
   }
 
