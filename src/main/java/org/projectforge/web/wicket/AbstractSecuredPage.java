@@ -173,6 +173,6 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
   public String getPageAsLink(final PageParameters parameters)
   {
     final String relativeUrl = (String) urlFor(this.getClass(), parameters);
-    return WicketUtils.toAbsolutePath(relativeUrl);
+    return WicketUtils.toAbsolutePath(getRequest(), relativeUrl);
   }
 }
