@@ -205,3 +205,6 @@ table.business-assessment td.indent-3 {
 table.business-assessment td.indent-4 {
 	padding-left: 65px;
 }
+table.dataview a {
+	color: blue;
+}
