@@ -48,8 +48,6 @@ import org.projectforge.web.wicket.flowlayout.ParTextPanel;
 
 public class AddressViewPage extends AbstractSecuredPage
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AddressViewPage.class);
-
   private static final long serialVersionUID = 6317382828021216284L;
 
   @SpringBean(name = "addressDao")
@@ -68,7 +66,6 @@ public class AddressViewPage extends AbstractSecuredPage
   public AddressViewPage(final PageParameters parameters, final AbstractSecuredPage returnToPage)
   {
     super(parameters);
-    log.warn("**** WICKET 1.5 migration: add bookmarkable parameters");
     this.returnToPage = returnToPage;
     if (parameters.get(AbstractEditPage.PARAMETER_KEY_ID).isEmpty() == false) {
       final Integer addressId = parameters.get(AbstractEditPage.PARAMETER_KEY_ID).toInteger();
@@ -162,16 +159,6 @@ public class AddressViewPage extends AbstractSecuredPage
       section.add(textPanel);
     }
   }
-
-  // @Override
-  // protected PageParameters getBookmarkRequiredPageParameters()
-  // {
-  // final PageParameters parameters = new PageParameters();
-  // if (address != null && address.getId() != null) {
-  // parameters.add("id", address.getId());
-  // }
-  // return parameters;
-  // }
 
   private boolean addAddressRow(final DivPanel section, final String type, final String name, final String organization,
       final String addressText, final String zipCode, final String city, final String country, final String state, final String phone,
