@@ -90,8 +90,8 @@ IListPageColumnsCreator<TimesheetDO>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TimesheetListPage.class);
 
-  protected static final String[] BOOKMARKABLE_PROPERTIES = mergeStringArrays(BOOKMARKABLE_FILTER_PROPERTIES, new String[] { "userId|user",
-      "taskId|task", "startTime|t1", "stopTime|t2", "marked", "longFormat|long", "recursive"});
+  protected static final String[] MY_BOOKMARKABLE_INITIAL_PROPERTIES = mergeStringArrays(BOOKMARKABLE_INITIAL_PROPERTIES, new String[] {
+      "f.userId|user", "f.taskId|task", "f.startTime|t1", "f.stopTime|t2", "f.marked", "f.longFormat|long", "f.recursive"});
 
   /**
    * Key for pre-setting the task id.
@@ -579,9 +579,12 @@ IListPageColumnsCreator<TimesheetDO>
     };
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#getBookmarkableInitialProperties()
+   */
   @Override
-  protected String[] getBookmarkableFilterProperties()
+  protected String[] getBookmarkableInitialProperties()
   {
-    return BOOKMARKABLE_PROPERTIES;
+    return MY_BOOKMARKABLE_INITIAL_PROPERTIES;
   }
 }

@@ -40,6 +40,7 @@ import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.core.MenuSuffixLabel;
 import org.projectforge.web.core.NavSidePanel;
 import org.projectforge.web.core.NavTopPanel;
+import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.user.MyAccountEditPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
@@ -174,5 +175,79 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
   {
     final String relativeUrl = (String) urlFor(this.getClass(), parameters);
     return WicketUtils.toAbsolutePath(getRequest(), relativeUrl);
+  }
+
+  /**
+   * Evaluates the page parameters and sets the properties, if parameters are given.
+   * @param parameters
+   * @see WicketUtils#evaluatePageParameters(Object, PageParameters, String, String[])
+   */
+  protected void evaluateInitialPageParameters(final PageParameters parameters)
+  {
+    if (getBookmarkableInitialProperties() != null) {
+      WicketUtils.evaluatePageParameters(getICallerPageForInitialParameters(), getDataObjectForInitialParameters(),
+          getFilterObjectForInitialParameters(), parameters, getBookmarkableInitialProperties());
+    }
+  }
+
+  /**
+   * Adds additional page parameter. Used by NavTopPanel to show direct page links including the page parameters returned by
+   * {@link #getBookmarkableInitialProperties()}.
+   * @see org.projectforge.web.wicket.AbstractUnsecurePage#getBookmarkableInitialParameters()
+   */
+  public PageParameters getBookmarkableInitialParameters()
+  {
+    final PageParameters pageParameters = new PageParameters();
+    WicketUtils.putPageParameters(getICallerPageForInitialParameters(), getDataObjectForInitialParameters(),
+        getFilterObjectForInitialParameters(), pageParameters, getBookmarkableInitialProperties());
+    return pageParameters;
+  }
+
+  /**
+   * The title of the page link shown with initial parameters (overridden by e. g. AbstractEditPage).
+   * @return
+   */
+  public String getTitleKey4BookmarkableInitialParameters()
+  {
+    return "bookmark.directPageExtendedLink";
+  }
+
+  /**
+   * Properties which should be evaluated for new entries. These properties, if given in PageParameters, will be set as initial values. All
+   * this properties will be set via {@link ISelectCallerPage#select(String, Object)}.
+   */
+  protected String[] getBookmarkableInitialProperties()
+  {
+    return null;
+  }
+
+  /**
+   * Overwritten by e. g. {@link AbstractEditPage}.
+   * @return this at default (works if the page holds the data directly).
+   */
+  protected Object getDataObjectForInitialParameters()
+  {
+    return this;
+  }
+
+  /**
+   * Overwritten by e. g. {@link AbstractListPage}.
+   * @return this at default (works if the page holds the data directly).
+   */
+  protected Object getFilterObjectForInitialParameters()
+  {
+    return null;
+  }
+
+  /**
+   * @return this at default (works if the page is an instance of {@link ISelectCallerPage}.
+   */
+  protected ISelectCallerPage getICallerPageForInitialParameters()
+  {
+    if (this instanceof ISelectCallerPage) {
+      return (ISelectCallerPage) this;
+    } else {
+      return null;
+    }
   }
 }

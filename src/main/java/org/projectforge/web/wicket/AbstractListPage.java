@@ -68,10 +68,8 @@ AbstractSecuredPage implements ISelectCallerPage
 
   public static final String PARAMETER_HIGHLIGHTED_ROW = "row";
 
-  protected static final String[] BOOKMARKABLE_FILTER_PROPERTIES = new String[] { "searchString|s", "useModificationFilter|mod",
-    "modifiedByUserId|mUser", "startTimeOfLastModification|mStart", "stopTimeOfLastModification|mStop", "deleted|del"};
-
-  protected static final String[] BOOKMARKABLE_FORM_PROPERTIES = new String[] { "pageSize"};
+  protected static final String[] BOOKMARKABLE_INITIAL_PROPERTIES = new String[] { "f.searchString|s", "f.useModificationFilter|mod",
+    "f.modifiedByUserId|mUser", "f.startTimeOfLastModification|mStart", "f.stopTimeOfLastModification|mStop", "f.deleted|del", "pageSize"};
 
   protected static final String[] mergeStringArrays(final String[] a1, final String a2[])
   {
@@ -169,7 +167,7 @@ AbstractSecuredPage implements ISelectCallerPage
     this.selectProperty = selectProperty;
     setup();
     preInit();
-    evaluatePageParameters(parameters);
+    evaluateInitialPageParameters(parameters);
   }
 
   /**
@@ -237,23 +235,52 @@ AbstractSecuredPage implements ISelectCallerPage
   }
 
   /**
-   * Evaluates the page parameters and sets the search filter, if parameters are given.
-   * @param parameters
+   * Adds storeFilter=false to the parameters.
+   * @see org.projectforge.web.wicket.AbstractSecuredPage#getBookmarkableInitialParameters()
    */
-  protected void evaluatePageParameters(final PageParameters parameters)
+  @Override
+  public PageParameters getBookmarkableInitialParameters()
   {
-    WicketUtils.evaluatePageParameters(form.searchFilter, parameters, PARAMETER_KEY_FILTER, getBookmarkableFilterProperties());
-    WicketUtils.evaluatePageParameters(form, parameters, null, getBookmarkableFormProperties());
+    final PageParameters pageParameters = super.getBookmarkableInitialParameters();
+    WicketUtils.addOrReplaceParameter(pageParameters, PARAMETER_KEY_STORE_FILTER, false);
+    return pageParameters;
   }
 
-  protected String[] getBookmarkableFilterProperties()
+  /**
+   * @see org.projectforge.web.wicket.AbstractSecuredPage#getBookmarkableInitialProperties()
+   */
+  @Override
+  protected String[] getBookmarkableInitialProperties()
   {
-    return BOOKMARKABLE_FILTER_PROPERTIES;
+    return BOOKMARKABLE_INITIAL_PROPERTIES;
   }
 
-  protected String[] getBookmarkableFormProperties()
+  /**
+   * @see org.projectforge.web.wicket.AbstractSecuredPage#getFilterObjectForInitialParameters()
+   */
+  @Override
+  protected Object getFilterObjectForInitialParameters()
   {
-    return BOOKMARKABLE_FORM_PROPERTIES;
+    return form.getSearchFilter();
+  }
+
+  /**
+   * @return the form.
+   * @see org.projectforge.web.wicket.AbstractSecuredPage#getDataObjectForInitialParameters()
+   */
+  @Override
+  protected Object getDataObjectForInitialParameters()
+  {
+    return form;
+  }
+
+  /**
+   * @return This page as link with the page parameters of this page.
+   */
+  @Override
+  public String getPageAsLink()
+  {
+    return getPageAsLink(new PageParameters());
   }
 
   @SuppressWarnings("serial")

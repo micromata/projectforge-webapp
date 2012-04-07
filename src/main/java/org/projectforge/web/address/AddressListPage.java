@@ -84,6 +84,10 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
 
   private static final String APPLE_SCRIPT_FOR_ADDRESS_BOOK = "AddressBookRemoveNotesOfClassWork.scpt";
 
+  protected static final String[] MY_BOOKMARKABLE_INITIAL_PROPERTIES = mergeStringArrays(BOOKMARKABLE_INITIAL_PROPERTIES, new String[] {
+      "f.listType|lt", "f.uptodate", "f.outdated", "f.leaved", "f.active", "f.nonActive", "f.uninteresting", "f.personaIngrata",
+  "f.departed"});
+
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
 
@@ -368,6 +372,15 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         phoneNumber, favoriteNumber, sendSms, image, first);
     view.add(phoneNumberPanel);
     return false;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#getBookmarkableInitialProperties()
+   */
+  @Override
+  protected String[] getBookmarkableInitialProperties()
+  {
+    return MY_BOOKMARKABLE_INITIAL_PROPERTIES;
   }
 
   @Override

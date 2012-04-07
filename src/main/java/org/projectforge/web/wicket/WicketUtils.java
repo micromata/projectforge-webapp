@@ -312,7 +312,7 @@ public class WicketUtils
    */
   public final static String toAbsolutePath(final Request request, final String relativePagePath)
   {
-    final HttpServletRequest req = (HttpServletRequest)request.getContainerRequest();
+    final HttpServletRequest req = (HttpServletRequest) request.getContainerRequest();
     final String absoluteUrl = RequestUtils.toAbsolutePath(req.getRequestURL().toString(), relativePagePath);
     return URLHelper.removeJSessionId(absoluteUrl);
   }
@@ -367,25 +367,46 @@ public class WicketUtils
     } else if (ClassHelper.isDefaultType(value.getClass(), value)) {
       // Do not put default values to page parameters.
     } else if (value instanceof Date) {
-      pageParameters.add(key, ((Date) value).getTime());
+      addOrReplaceParameter(pageParameters, key, ((Date) value).getTime());
     } else if (value instanceof TimePeriod) {
-      pageParameters.add(key, ((TimePeriod) value).getFromDate().getTime() + "-" + ((TimePeriod) value).getToDate().getTime());
+      addOrReplaceParameter(pageParameters, key, ((TimePeriod) value).getFromDate().getTime()
+          + "-"
+          + ((TimePeriod) value).getToDate().getTime());
     } else {
-      pageParameters.add(key, value);
+      addOrReplaceParameter(pageParameters, key, value);
     }
   }
 
-  public static void putPageParameters(final Object bean, final PageParameters pageParameters, final String prefix,
-      final String[] bookmarkableProperties)
+  public static void addOrReplaceParameter(final PageParameters pageParameters, final String key, final Object value)
+  {
+    if (pageParameters.get(key).isNull() == true) {
+      pageParameters.add(key, value);
+    } else {
+      pageParameters.set(key, value);
+    }
+  }
+
+  public static void putPageParameters(final ISelectCallerPage callerPage, final Object dataObject, final Object filterObject,
+      final PageParameters pageParameters, final String[] bookmarkableProperties)
   {
     if (bookmarkableProperties == null) {
       return;
     }
-    final String pre = prefix != null ? prefix + "." : "";
+    // final String pre = prefix != null ? prefix + "." : "";
     for (final String propertyString : bookmarkableProperties) {
-      final String[] propertyAndAlias = getPropertyAndAlias(propertyString);
-      final Object value = BeanHelper.getProperty(bean, propertyAndAlias[0]);
-      WicketUtils.putPageParameter(pageParameters, pre + propertyAndAlias[1], value);
+      final InitialPageParameterHolder paramHolder = new InitialPageParameterHolder(propertyString);
+      final Object bean;
+      if (paramHolder.isFilterParameter() == true) {
+        bean = filterObject;
+      } else {
+        bean = dataObject;
+      }
+      try {
+        final Object value = BeanHelper.getProperty(bean, paramHolder.property);
+        WicketUtils.putPageParameter(pageParameters, paramHolder.prefix + paramHolder.alias, value);
+      } catch (final Exception ex) {
+        log.warn("Couldn't put page parameter '" + paramHolder.property + "' of bean '" + bean + "'. Ignoring this parameter.");
+      }
     }
   }
 
@@ -408,6 +429,18 @@ public class WicketUtils
     } else if (objectType.isPrimitive() == true) {
       if (Boolean.TYPE.equals(objectType)) {
         return pageParameters.get(key).toBooleanObject();
+      } else if (Integer.TYPE.equals(objectType) == true) {
+        return pageParameters.get(key).toInteger();
+      } else if (Long.TYPE.equals(objectType) == true) {
+        return pageParameters.get(key).toLong();
+      } else if (Float.TYPE.equals(objectType) == true) {
+        return new Float(pageParameters.get(key).toDouble());
+      } else if (Double.TYPE.equals(objectType) == true) {
+        return pageParameters.get(key).toDouble();
+      } else if (Character.TYPE.equals(objectType) == true) {
+        return pageParameters.get(key).toChar();
+      } else {
+        log.warn("Primitive objectType '" + objectType + "' not yet implemented. Parameter type '" + key + "' is ignored.");
       }
     } else if (Enum.class.isAssignableFrom(objectType) == true) {
       final StringValue sval = pageParameters.get(key);
@@ -453,26 +486,25 @@ public class WicketUtils
 
   /**
    * At least one parameter should be given for setting the fill the bean with all book-markable properties (absent properties will be set
-   * to zero).
+   * to zero). If the given bean is an instance of {@link ISelectCallerPage} then the select/unselect methods are used, otherwise the
+   * properties will set directly of the given bean.
    * @param bean
    * @param parameters
    * @param prefix
    * @param bookmarkableProperties
    */
-  public static void evaluatePageParameters(final Object bean, final PageParameters parameters, final String prefix,
-      final String[] bookmarkableProperties)
+  public static void evaluatePageParameters(final ISelectCallerPage callerPage, final Object dataObject, final Object filter,
+      final PageParameters parameters, final String[] bookmarkableProperties)
   {
     if (bookmarkableProperties == null) {
       return;
     }
-    final String pre = prefix != null ? prefix + "." : "";
     // First check if any parameter is given:
     boolean useParameters = false;
     for (final String str : bookmarkableProperties) {
-      final String[] propertyAndAlias = getPropertyAndAlias(str);
-      final String property = propertyAndAlias[0];
-      final String alias = propertyAndAlias[1];
-      if (hasParameter(parameters, pre + property) == true || hasParameter(parameters, pre + alias) == true) {
+      final InitialPageParameterHolder paramHolder = new InitialPageParameterHolder(str);
+      if (hasParameter(parameters, paramHolder.prefix + paramHolder.property) == true
+          || hasParameter(parameters, paramHolder.prefix + paramHolder.alias) == true) {
         useParameters = true;
         break;
       }
@@ -482,51 +514,50 @@ public class WicketUtils
       return;
     }
     for (final String str : bookmarkableProperties) {
-      final String[] propertyAndAlias = getPropertyAndAlias(str);
-      final String property = propertyAndAlias[0];
-      final String alias = propertyAndAlias[1];
+      final InitialPageParameterHolder paramHolder = new InitialPageParameterHolder(str);
       String key = null;
-      if (hasParameter(parameters, pre + property) == true) {
-        key = property;
-      } else if (hasParameter(parameters, pre + alias) == true) {
-        key = alias;
+      if (hasParameter(parameters, paramHolder.prefix + paramHolder.property) == true) {
+        key = paramHolder.property;
+      } else if (hasParameter(parameters, paramHolder.prefix + paramHolder.alias) == true) {
+        key = paramHolder.alias;
       }
-      if (bean instanceof ISelectCallerPage) {
-        if (key == null) {
-          ((ISelectCallerPage) bean).unselect(property);
+      if (paramHolder.isCallerPageParameter() == true) {
+        if (callerPage == null) {
+          log.warn("PageParameter '" + str + "' ignored, ISelectCallerPage isn't given.");
+        } else if (key == null) {
+          callerPage.unselect(paramHolder.property);
         } else {
-          ((ISelectCallerPage) bean).select(property, parameters.get(pre + key).toString());
+          callerPage.select(paramHolder.property, parameters.get(paramHolder.prefix + key).toString());
         }
       } else {
         try {
-          final Method method = BeanHelper.determineGetter(bean.getClass(), property);
-          if (key == null) {
-            BeanHelper.setProperty(bean, property, ClassHelper.getDefaultType(method.getReturnType()));
+          final Object bean;
+          if (paramHolder.isFilterParameter() == true) {
+            // Use filter object
+            bean = filter;
+            if (filter == null) {
+              log.warn("PageParameter '" + str + "' ignored, filter isn't given.");
+              continue;
+            }
           } else {
-            final Object value = WicketUtils.getPageParameter(parameters, pre + key, method.getReturnType());
-            BeanHelper.setProperty(bean, property, value);
+            bean = dataObject;
+            if (filter == null) {
+              log.warn("PageParameter '" + str + "' ignored, dataObject isn't given.");
+              continue;
+            }
+          }
+          final Method method = BeanHelper.determineGetter(bean.getClass(), paramHolder.property);
+          if (key == null) {
+            BeanHelper.setProperty(bean, paramHolder.property, ClassHelper.getDefaultType(method.getReturnType()));
+          } else {
+            final Object value = WicketUtils.getPageParameter(parameters, paramHolder.prefix + key, method.getReturnType());
+            BeanHelper.setProperty(bean, paramHolder.property, value);
           }
         } catch (final Exception ex) {
           log.warn("Property '" + key + "' not found. Ignoring URL parameter.");
         }
       }
     }
-  }
-
-  public static String[] getPropertyAndAlias(final String propertyString)
-  {
-    final int pos = propertyString.indexOf('|');
-    final String property;
-    final String alias;
-    if (pos >= 0) {
-      property = propertyString.substring(0, pos);
-      alias = propertyString.substring(pos + 1);
-    } else {
-      // No alias given.
-      property = propertyString;
-      alias = propertyString;
-    }
-    return new String[] { property, alias};
   }
 
   /**

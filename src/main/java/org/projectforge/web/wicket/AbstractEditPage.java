@@ -204,7 +204,7 @@ AbstractSecuredPage implements IEditPage<O, D>
     timeOfLastUpdateLabel.setRenderBodyOnly(true);
     body.add(timeOfLastUpdateLabel);
     onPreEdit();
-    evaluatePageParameters(getPageParameters());
+    evaluateInitialPageParameters(getPageParameters());
     this.editPageSupport = new EditPageSupport<O, D>(this, getBaseDao(), getData());
   }
 
@@ -474,54 +474,36 @@ AbstractSecuredPage implements IEditPage<O, D>
   }
 
   /**
-   * Evaluates the page parameters and sets the search filter, if parameters are given.
-   * @param parameters
+   * Removes id from the initial parameters set.
+   * @see org.projectforge.web.wicket.AbstractSecuredPage#getBookmarkableInitialParameters()
    */
-  protected void evaluatePageParameters(final PageParameters parameters)
+  @Override
+  public PageParameters getBookmarkableInitialParameters()
   {
-    WicketUtils.evaluatePageParameters(getData(), parameters, "p", getBookmarkableProperties());
-    if (getBookmarkableSelectProperties() != null) {
-      WicketUtils.evaluatePageParameters(this, parameters, "p", getBookmarkableSelectProperties());
+    if (isNew() == true) {
+      return new PageParameters();
     }
-  }
-
-  /**
-   * Overwrite this method if you want to add required page parameters for your bookmarks (basic direct link).
-   * @return null at default.
-   */
-  protected PageParameters getBookmarkRequiredPageParameters()
-  {
-    final PageParameters parameters = new PageParameters();
-    if (getData().getId() != null) {
-      parameters.add("id", getData().getId());
-    }
-    return parameters;
-  }
-
-  /**
-   * Adds the filter as page parameter.
-   * @see org.projectforge.web.wicket.AbstractUnsecurePage#getBookmarkPageExtendedParameters()
-   */
-  protected PageParameters getBookmarkPageExtendedParameters()
-  {
-    final PageParameters pageParameters = new PageParameters(getPageParameters());
+    final PageParameters pageParameters = super.getBookmarkableInitialParameters();
     pageParameters.remove("id"); // Don't show id if other extended parameters are given.
-    WicketUtils.putPageParameters(getData(), pageParameters, "p", getBookmarkableProperties());
-    WicketUtils.putPageParameters(getData(), pageParameters, "p", getBookmarkableSelectProperties());
     return pageParameters;
   }
 
-  protected String[] getBookmarkableProperties()
+  /**
+   * @see org.projectforge.web.wicket.AbstractSecuredPage#getDataObjectForInitialParameters()
+   */
+  @Override
+  protected Object getDataObjectForInitialParameters()
   {
-    return null;
+    return getData();
   }
 
   /**
-   * Properties set via ISelectCallerPage.
+   * @see org.projectforge.web.wicket.AbstractSecuredPage#getTitleKey4BookmarkableInitialParameters()
    */
-  protected String[] getBookmarkableSelectProperties()
+  @Override
+  public String getTitleKey4BookmarkableInitialParameters()
   {
-    return null;
+    return "bookmark.directPageExtendedLink.editPage";
   }
 
   @Override

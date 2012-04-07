@@ -32,10 +32,12 @@ import org.apache.wicket.extensions.ajax.markup.html.modal.ModalWindow;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.CustomizeMenuPage;
@@ -48,7 +50,6 @@ import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DialogPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
@@ -175,11 +176,15 @@ public class NavTopPanel extends NavAbstractPanel
 
     final DivPanel content = new DivPanel(closeDialog.newChildId());
     closeDialog.add(content);
-    final FieldsetPanel fs = new FieldsetPanel(content, getString("bookmark.directPageLink")).setLabelSide(false).setNoLabelFor();
-    fs.add(new DivTextPanel(fs.newChildId(), ((AbstractSecuredPage)getPage()).getPageAsLink()));
-
-    // fs = new FieldsetPanel(content, getString("bookmark.directPageExtendedLink")).setLabelSide(false).setNoLabelFor();
-    // fs.add(new DivTextPanel(fs.newChildId(), "link with parameter"));
+    FieldsetPanel fs = new FieldsetPanel(content, getString("bookmark.directPageLink")).setLabelSide(false);
+    final AbstractSecuredPage page = (AbstractSecuredPage) getPage();
+    fs.add(new TextArea<String>(fs.getTextAreaId(), new Model<String>(page.getPageAsLink())));
+    final PageParameters params = page.getBookmarkableInitialParameters();
+    if (params.isEmpty() == false) {
+      fs = new FieldsetPanel(content, getString(page.getTitleKey4BookmarkableInitialParameters())).setLabelSide(false);
+      fs.add(new TextArea<String>(fs.getTextAreaId(), new Model<String>(page.getPageAsLink(params))));
+      bookmarkModalWindow.setInitialHeight(400);
+    }
 
     final AjaxButton closeButton = new AjaxButton(SingleButtonPanel.WICKET_ID, new Model<String>("close")) {
 

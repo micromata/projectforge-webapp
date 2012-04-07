@@ -71,8 +71,8 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
 {
   private static final long serialVersionUID = -8406452960003792763L;
 
-  protected static final String[] BOOKMARKABLE_PROPERTIES = mergeStringArrays(BOOKMARKABLE_FILTER_PROPERTIES, new String[] { "year|y",
-      "listType|lt", "auftragsPositionsArt|art"});
+  protected static final String[] MY_BOOKMARKABLE_INITIAL_PROPERTIES = mergeStringArrays(BOOKMARKABLE_INITIAL_PROPERTIES, new String[] {
+      "f.year|y", "f.listType|lt", "f.auftragsPositionsArt|art"});
 
   @SpringBean(name = "auftragDao")
   private AuftragDao auftragDao;
@@ -276,9 +276,12 @@ public class AuftragListPage extends AbstractListPage<AuftragListForm, AuftragDa
     return new DetachableDOModel<AuftragDO, AuftragDao>(object, getBaseDao());
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#getBookmarkableInitialProperties()
+   */
   @Override
-  protected String[] getBookmarkableFilterProperties()
+  protected String[] getBookmarkableInitialProperties()
   {
-    return BOOKMARKABLE_PROPERTIES;
+    return MY_BOOKMARKABLE_INITIAL_PROPERTIES;
   }
 }

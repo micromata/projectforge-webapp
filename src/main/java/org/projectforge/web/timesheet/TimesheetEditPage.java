@@ -60,7 +60,7 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TimesheetEditPage.class);
 
-  protected static final String[] BOOKMARKABLE_SELECT_PROPERTIES = new String[] { "taskId|task", "userId|user", "kost2Id|kost2"};
+  protected static final String[] BOOKMARKABLE_SELECT_PROPERTIES = new String[] { "p.taskId|task", "p.userId|user", "p.kost2Id|kost2"};
 
   /**
    * Key for preset the start date.
@@ -314,8 +314,11 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
     } else if ("userId".equals(property) == true) {
       getData().setUser(null);
       form.refresh();
+    } else if ("kost2Id".equals(property) == true) {
+      getData().setKost2(null);
+      form.refresh();
     } else {
-      log.error("Property '" + property + "' not supported for selection.");
+      log.error("Property '" + property + "' not supported for unselection.");
     }
   }
 
@@ -348,7 +351,7 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
   }
 
   @Override
-  protected String[] getBookmarkableSelectProperties()
+  protected String[] getBookmarkableInitialProperties()
   {
     return BOOKMARKABLE_SELECT_PROPERTIES;
   }
