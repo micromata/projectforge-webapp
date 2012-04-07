@@ -165,9 +165,13 @@ public class MySession extends WebSession
   public BrowserScreenWidthType getBrowserScreenWidthType()
   {
     if (browserScreenWidthType == null) {
-      browserScreenWidthType = (BrowserScreenWidthType)UserXmlPreferencesCache.getDefaultInstance().getEntry(getUserId(), LayoutSettingsPage.getBrowserScreenWidthUserPrefKey(this));
-      if (browserScreenWidthType != null) {
-        return browserScreenWidthType;
+      final Integer userId = getUserId();
+      if (userId != null) {
+        browserScreenWidthType = (BrowserScreenWidthType) UserXmlPreferencesCache.getDefaultInstance().getEntry(userId,
+            LayoutSettingsPage.getBrowserScreenWidthUserPrefKey(this));
+        if (browserScreenWidthType != null) {
+          return browserScreenWidthType;
+        }
       }
       if (isMobileUserAgent() == true) {
         if (getUserAgentDevice() == UserAgentDevice.IPAD) {
