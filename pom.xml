@@ -263,11 +263,6 @@
       <artifactId>mpxj</artifactId>
       <version>4.0.0</version>
     </dependency>
-    <!-- <dependency> Version check: 2010-08-?? -->
-    <!-- <groupId>org.apache.lucene</groupId> -->
-    <!-- <artifactId>lucene-core</artifactId> -->
-    <!-- <version>2.9.2</version> 3.x not yet supported by hibernate-search. -->
-    <!-- </dependency> -->
     <dependency>
       <groupId>org.apache.wicket</groupId>
       <artifactId>wicket-core</artifactId>
