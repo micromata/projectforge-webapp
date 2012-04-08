@@ -272,14 +272,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
       fs.add(myCurrentPhoneIdChoice);
       fs.addHelpIcon(getString("address.myCurrentPhoneId.tooltip"));
     }
-    addressPanel = new DivPanel(gridBuilder.newColumnsPanelId()) {
-      @Override
-      public boolean isVisible()
-      {
-        return address != null;
-      }
-    };
-    gridBuilder.addColumnPanel(addressPanel, DivType.COL_50);
+    addressPanel = gridBuilder.newColumnPanel(DivType.COL_50).getPanel();
     {
       final Link<String> addressViewLink = new Link<String>(TextLinkPanel.LINK_ID) {
         @Override
@@ -395,6 +388,9 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
       @Override
       public boolean isVisible()
       {
+        if (address == null) {
+          return false;
+        }
         final String number = (String) BeanHelper.getProperty(address, property);
         return (StringUtils.isNotBlank(number) == true);
       }
