@@ -39,6 +39,7 @@ public class HibernateSearchDependentObjectsReindexerTest
   public void register()
   {
     final HibernateSearchDependentObjectsReindexer reindexer = new HibernateSearchDependentObjectsReindexer();
+    reindexer.map.clear(); // Only if the Registry isn't empty from any previous test run.
     reindexer.register(TaskDO.class);
     final List<HibernateSearchDependentObjectsReindexer.Entry> list = reindexer.map.get(PFUserDO.class);
     assertEquals(1, reindexer.map.size());
