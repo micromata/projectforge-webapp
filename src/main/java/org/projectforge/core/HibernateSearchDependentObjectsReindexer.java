@@ -40,6 +40,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
+import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.IndexedEmbedded;
 import org.projectforge.registry.Registry;
 import org.projectforge.registry.RegistryEntry;
@@ -72,10 +73,13 @@ public class HibernateSearchDependentObjectsReindexer
 
     String fieldName;
 
-    Entry(final Class< ? extends BaseDO< ? >> clazz, final String fieldName)
+    boolean setOrCollection;
+
+    Entry(final Class< ? extends BaseDO< ? >> clazz, final String fieldName, final boolean setOrCollection)
     {
       this.clazz = clazz;
       this.fieldName = fieldName;
+      this.setOrCollection = setOrCollection;
     }
 
     /**
@@ -145,7 +149,10 @@ public class HibernateSearchDependentObjectsReindexer
       }
       final List< ? > result = getDependents(hibernateTemplate, registryEntry, entry, obj);
       if (result != null) {
-        for (final Object dependentObject : result) {
+        for ( Object dependentObject : result) {
+          if (dependentObject instanceof Object[]) {
+            dependentObject = ((Object[])dependentObject)[0];
+          }
           if (dependentObject instanceof BaseDO) {
             reindexDependents(hibernateTemplate, session, (BaseDO< ? >) dependentObject, alreadyReindexed);
           }
@@ -189,11 +196,16 @@ public class HibernateSearchDependentObjectsReindexer
   private List< ? > getDependents(final HibernateTemplate hibernateTemplate, final RegistryEntry registryEntry, final Entry entry,
       final BaseDO< ? > obj)
       {
-    final List< ? > result = hibernateTemplate.find("from "
-        + registryEntry.getDOClass().getName()
-        + " o where o."
-        + entry.fieldName
-        + ".id=?", obj.getId());
+    final String queryString;
+    if (entry.setOrCollection == true) {
+      queryString = "from " + registryEntry.getDOClass().getName() + " o join o." + entry.fieldName + " r where r.id=?";
+    } else {
+      queryString = "from " + registryEntry.getDOClass().getName() + " o where o." + entry.fieldName + ".id=?";
+    }
+    if (log.isDebugEnabled() == true) {
+      log.debug(queryString + ", id=" + obj.getId());
+    }
+    final List< ? > result = hibernateTemplate.find(queryString, obj.getId());
     return result;
       }
 
@@ -212,8 +224,10 @@ public class HibernateSearchDependentObjectsReindexer
   {
     final Field[] fields = clazz.getDeclaredFields();
     for (final Field field : fields) {
-      if (field.isAnnotationPresent(IndexedEmbedded.class) == true) {
+      if (field.isAnnotationPresent(IndexedEmbedded.class) == true ||
+          field.isAnnotationPresent(ContainedIn.class) == true) {
         Class< ? > embeddedClass = field.getType();
+        boolean setOrCollection = false;
         if (Set.class.isAssignableFrom(embeddedClass) == true || Collection.class.isAssignableFrom(embeddedClass) == true) {
           // Please use @ContainedIn.
           final Type type = field.getGenericType();
@@ -221,6 +235,7 @@ public class HibernateSearchDependentObjectsReindexer
             final Type actualTypeArgument = ((ParameterizedType) type).getActualTypeArguments()[0];
             if (actualTypeArgument instanceof Class) {
               embeddedClass = (Class< ? >) actualTypeArgument;
+              setOrCollection = true;
             }
           }
         }
@@ -229,7 +244,7 @@ public class HibernateSearchDependentObjectsReindexer
           continue;
         }
         final String name = field.getName();
-        final Entry entry = new Entry(clazz, name);
+        final Entry entry = new Entry(clazz, name, setOrCollection);
         List<Entry> list = map.get(embeddedClass);
         if (list == null) {
           list = new ArrayList<Entry>();

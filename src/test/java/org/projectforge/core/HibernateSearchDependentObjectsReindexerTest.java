@@ -40,18 +40,18 @@ public class HibernateSearchDependentObjectsReindexerTest
   {
     final HibernateSearchDependentObjectsReindexer reindexer = new HibernateSearchDependentObjectsReindexer();
     reindexer.register(TaskDO.class);
-    List<HibernateSearchDependentObjectsReindexer.Entry> list = reindexer.map.get(PFUserDO.class);
+    final List<HibernateSearchDependentObjectsReindexer.Entry> list = reindexer.map.get(PFUserDO.class);
     assertEquals(1, reindexer.map.size());
     assertEquals(1, list.size());
     assertEntry(list.get(0), TaskDO.class, "responsibleUser");
     reindexer.register(GroupDO.class);
-    list = reindexer.map.get(PFUserDO.class);
-    assertEquals(1, reindexer.map.size());
-    assertEquals(1, list.size());
-    reindexer.register(UserPrefDO.class);
     assertEquals(1, reindexer.map.size());
     assertEquals(2, list.size());
-    assertEntry(list.get(1), UserPrefDO.class, "user");
+    assertEntry(list.get(1), GroupDO.class, "assignedUsers");
+    reindexer.register(UserPrefDO.class);
+    assertEquals(1, reindexer.map.size());
+    assertEquals(3, list.size());
+    assertEntry(list.get(2), UserPrefDO.class, "user");
   }
 
   private void assertEntry(final HibernateSearchDependentObjectsReindexer.Entry entry, final Class< ? > clazz, final String fieldName)
