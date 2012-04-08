@@ -99,7 +99,7 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     body.add(sideMenuSuffixLabel);
     final NavTopPanel favoriteMenuPanel = new NavTopPanel("favoriteMenu", userXmlPreferencesCache, accessChecker);
     body.add(favoriteMenuPanel);
-    favoriteMenuPanel.init();
+    favoriteMenuPanel.init(this);
     // body.add(new Label("username", getUser().getFullname()));
     final BookmarkablePageLink<Void> myAccountLink = new BookmarkablePageLink<Void>("myAccountLink", MyAccountEditPage.class);
     body.add(myAccountLink);

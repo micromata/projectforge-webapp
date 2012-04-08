@@ -44,6 +44,7 @@ import org.projectforge.web.CustomizeMenuPage;
 import org.projectforge.web.FavoritesMenu;
 import org.projectforge.web.LayoutSettingsPage;
 import org.projectforge.web.MenuEntry;
+import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.FeedbackPage;
 import org.projectforge.web.wicket.WicketApplication;
@@ -71,7 +72,7 @@ public class NavTopPanel extends NavAbstractPanel
     this.favoritesMenu = FavoritesMenu.get(userXmlPreferencesCache, accessChecker);
   }
 
-  public void init()
+  public void init(final AbstractSecuredPage page)
   {
     @SuppressWarnings("serial")
     final Model<String> alertMessageModel = new Model<String>() {
@@ -96,6 +97,11 @@ public class NavTopPanel extends NavAbstractPanel
     final Label alertMessageLabel = new Label("alertMessage", alertMessageModel);
     alertMessageContainer.add(alertMessageLabel.setRenderBodyOnly(true));
 
+    if (page.getMySession().isMobileUserAgent() == true) {
+      add(new BookmarkablePageLink<Void>("goMobile", MenuMobilePage.class));
+    } else {
+      add(new WebMarkupContainer("goMobile").setVisible(false));
+    }
     add(new BookmarkablePageLink<Void>("customizeMenuLink", CustomizeMenuPage.class));
     add(new BookmarkablePageLink<Void>("layoutSettingsMenuLink", LayoutSettingsPage.class));
     add(new BookmarkablePageLink<Void>("feedbackLink", FeedbackPage.class));
@@ -116,7 +122,6 @@ public class NavTopPanel extends NavAbstractPanel
       bookmarkModalWindow.setInitialHeight(200);
       add(bookmarkModalWindow);
     }
-
     getMenu();
 
     // Main menu:
