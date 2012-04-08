@@ -9,7 +9,7 @@
   <property environment="env" />
 	<property name="APP_ID" value="ProjectForge" />
 	<property name="APP_TITLE" value="${APP_ID} 2012" />
-	<property name="VERSION" value="4.0.0" />
+	<property name="VERSION" value="4.0.0b1" />
 	<property name="m_doc.home" value="${env.M_DOC_HOME}" />
 	<property name="webproject" value="." />
 	<property name="target" value="${webproject}/target" />
