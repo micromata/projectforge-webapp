@@ -535,13 +535,13 @@ public class WicketUtils
           if (paramHolder.isFilterParameter() == true) {
             // Use filter object
             bean = filter;
-            if (filter == null) {
+            if (bean == null) {
               log.warn("PageParameter '" + str + "' ignored, filter isn't given.");
               continue;
             }
           } else {
             bean = dataObject;
-            if (filter == null) {
+            if (bean == null) {
               log.warn("PageParameter '" + str + "' ignored, dataObject isn't given.");
               continue;
             }
