@@ -43,6 +43,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.hibernate.Hibernate;
+import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
@@ -77,6 +78,7 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private String usernames;
 
+  @ContainedIn
   @IndexedEmbedded(depth = 1)
   private Set<PFUserDO> assignedUsers;
 

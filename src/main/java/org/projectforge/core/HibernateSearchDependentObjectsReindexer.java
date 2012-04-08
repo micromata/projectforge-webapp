@@ -24,7 +24,10 @@
 package org.projectforge.core;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -210,11 +213,17 @@ public class HibernateSearchDependentObjectsReindexer
     final Field[] fields = clazz.getDeclaredFields();
     for (final Field field : fields) {
       if (field.isAnnotationPresent(IndexedEmbedded.class) == true) {
-        final Class< ? > embeddedClass = field.getType();
-        // if (Set.class.isAssignableFrom(embeddedClass) == true || Collection.class.isAssignableFrom(embeddedClass) == true) {
-        // // Please use @ContainedIn. Collections are not supported by this class.
-        // continue;
-        // }
+        Class< ? > embeddedClass = field.getType();
+        if (Set.class.isAssignableFrom(embeddedClass) == true || Collection.class.isAssignableFrom(embeddedClass) == true) {
+          // Please use @ContainedIn.
+          final Type type = field.getGenericType();
+          if (type instanceof ParameterizedType) {
+            final Type actualTypeArgument = ((ParameterizedType) type).getActualTypeArguments()[0];
+            if (actualTypeArgument instanceof Class) {
+              embeddedClass = (Class< ? >) actualTypeArgument;
+            }
+          }
+        }
         if (BaseDO.class.isAssignableFrom(embeddedClass) == false) {
           // Only BaseDO objects are supported.
           continue;

@@ -463,6 +463,22 @@ public class UserDao extends BaseDao<PFUserDO>
     return accessChecker.isUserMemberOfAdminGroup(user, throwException);
   }
 
+  /**
+   * Re-index all dependent objects only if the username, first or last name was changed.
+   * @see org.projectforge.core.BaseDao#wantsReindexAllDependentObjects(org.projectforge.core.ExtendedBaseDO,
+   *      org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected boolean wantsReindexAllDependentObjects(final PFUserDO obj, final PFUserDO dbObj)
+  {
+    if (super.wantsReindexAllDependentObjects(obj, dbObj) == false) {
+      return false;
+    }
+    return StringUtils.equals(obj.getUsername(), dbObj.getUsername()) == false
+        || StringUtils.equals(obj.getFirstname(), dbObj.getFirstname()) == false
+        || StringUtils.equals(obj.getLastname(), dbObj.getLastname()) == false;
+  }
+
   @Override
   public PFUserDO newInstance()
   {

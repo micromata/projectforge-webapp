@@ -532,6 +532,20 @@ public class TaskDao extends BaseDao<TaskDO>
     }
   }
 
+  /**
+   * Re-index all dependent objects only if the title was changed.
+   * @see org.projectforge.core.BaseDao#wantsReindexAllDependentObjects(org.projectforge.core.ExtendedBaseDO,
+   *      org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected boolean wantsReindexAllDependentObjects(final TaskDO obj, final TaskDO dbObj)
+  {
+    if (super.wantsReindexAllDependentObjects(obj, dbObj) == false) {
+      return false;
+    }
+    return StringUtils.equals(obj.getTitle(), dbObj.getTitle()) == false;
+  }
+
   @Override
   public TaskDO newInstance()
   {

@@ -37,7 +37,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.access.OperationType;
 import org.projectforge.common.DateHolder;
-import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
@@ -61,12 +60,12 @@ public class HRPlanningEntryDao extends BaseDao<HRPlanningEntryDO>
 
   private HRPlanningDao hrPlanningDao;
 
-  public void setProjektDao(ProjektDao projektDao)
+  public void setProjektDao(final ProjektDao projektDao)
   {
     this.projektDao = projektDao;
   }
 
-  public void setHRPlanningDao(HRPlanningDao hrPlanningDao)
+  public void setHRPlanningDao(final HRPlanningDao hrPlanningDao)
   {
     this.hrPlanningDao = hrPlanningDao;
   }
@@ -75,14 +74,13 @@ public class HRPlanningEntryDao extends BaseDao<HRPlanningEntryDO>
   protected String[] getAdditionalSearchFields()
   {
     return new String[] { "projekt.name", "projekt.kunde.name", "planning.user.username", "planning.user.firstname",
-        "planning.user.lastname"};
+    "planning.user.lastname"};
   }
 
   protected HRPlanningEntryDao()
   {
     super(HRPlanningEntryDO.class);
     userRightId = USER_RIGHT_ID;
-    baseDaoReindexRegistry.registerDependent(HRPlanningDO.class, this);
   }
 
   /**
@@ -100,7 +98,7 @@ public class HRPlanningEntryDao extends BaseDao<HRPlanningEntryDO>
   {
     final HRPlanningFilter myFilter = (HRPlanningFilter) filter;
     if (myFilter.getStopTime() != null) {
-      DateHolder date = new DateHolder(myFilter.getStopTime());
+      final DateHolder date = new DateHolder(myFilter.getStopTime());
       date.setEndOfDay();
       myFilter.setStopTime(date.getDate());
     }
@@ -182,7 +180,7 @@ public class HRPlanningEntryDao extends BaseDao<HRPlanningEntryDO>
     final QueryFilter queryFilter = new QueryFilter(filter);
     queryFilter.createAlias("planning", "p").createAlias("p.user", "u");
     if (filter.getUserId() != null) {
-      PFUserDO user = new PFUserDO();
+      final PFUserDO user = new PFUserDO();
       user.setId(filter.getUserId());
       queryFilter.add(Restrictions.eq("p.user", user));
     }
@@ -248,18 +246,6 @@ public class HRPlanningEntryDao extends BaseDao<HRPlanningEntryDO>
   public boolean hasSelectAccess(final PFUserDO user, final HRPlanningEntryDO obj,final boolean throwException)
   {
     return hrPlanningDao.hasSelectAccess(user, obj.getPlanning(), throwException);
-  }
-
-  @Override
-  public List<HRPlanningEntryDO> getDependentObjectsToReindex(final BaseDO< ? > obj)
-  {
-    if (obj instanceof HRPlanningDO) {
-      @SuppressWarnings("unchecked")
-      final List<HRPlanningEntryDO> list = getHibernateTemplate().find("from HRPlanningEntryDO p where p.planning.id=?", obj.getId());
-      return list;
-    } else {
-      return dependencyNotSupportedOf(obj);
-    }
   }
 
   @Override

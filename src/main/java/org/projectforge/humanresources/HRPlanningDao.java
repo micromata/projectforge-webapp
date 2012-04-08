@@ -39,7 +39,6 @@ import org.hibernate.criterion.Restrictions;
 import org.projectforge.access.OperationType;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
-import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.DisplayHistoryEntry;
@@ -71,7 +70,6 @@ public class HRPlanningDao extends BaseDao<HRPlanningDO>
   {
     super(HRPlanningDO.class);
     userRightId = USER_RIGHT_ID;
-    baseDaoReindexRegistry.registerDependent(HRPlanningEntryDO.class, this);
   }
 
   public void setProjektDao(final ProjektDao projektDao)
@@ -297,19 +295,6 @@ public class HRPlanningDao extends BaseDao<HRPlanningDO>
       }
     });
     return list;
-  }
-
-  @Override
-  public List<HRPlanningDO> getDependentObjectsToReindex(final BaseDO< ? > obj)
-  {
-    if (obj instanceof HRPlanningEntryDO) {
-      @SuppressWarnings("unchecked")
-      final List<HRPlanningDO> list = getHibernateTemplate().find("from HRPlanningDO p where p.id=?",
-          ((HRPlanningEntryDO) obj).getPlanningId());
-      return list;
-    } else {
-      return dependencyNotSupportedOf(obj);
-    }
   }
 
   @Override

@@ -46,9 +46,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.util.Version;
-import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
-import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.LockMode;
 import org.hibernate.Query;
@@ -94,10 +92,9 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   public static final String EXCEPTION_HISTORIZABLE_NOTDELETABLE = "Could not delete of Historizable objects (contact your software developer): ";
 
   /**
-   * Use the latest Lucene 2.9 version at default.
-   * @see Version#LUCENE_29
+   * @see Version#LUCENE_31
    */
-  public static final Version LUCENE_VERSION = Version.LUCENE_29;
+  public static final Version LUCENE_VERSION = Version.LUCENE_31;
 
   /**
    * Maximum allowed mass updates within one massUpdate call.
@@ -596,9 +593,8 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     if (obj.getId() == null || hasLoggedInUserHistoryAccess(obj, false) == false) {
       return EMPTY_HISTORY_ENTRIES;
     }
-    @SuppressWarnings("unchecked")
-    final List<DisplayHistoryEntry> result = (List<DisplayHistoryEntry>) getHibernateTemplate().execute(new HibernateCallback() {
-      public Object doInHibernate(final Session session) throws HibernateException, SQLException
+    final List<DisplayHistoryEntry> result = getHibernateTemplate().execute(new HibernateCallback<List<DisplayHistoryEntry>>() {
+      public List<DisplayHistoryEntry> doInHibernate(final Session session) throws HibernateException, SQLException
       {
         final HistoryEntry[] entries = getHistoryEntries(obj);
         if (entries == null) {
@@ -612,9 +608,8 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
 
   public List<DisplayHistoryEntry> internalGetDisplayHistoryEntries(final BaseDO< ? > obj)
   {
-    @SuppressWarnings("unchecked")
-    final List<DisplayHistoryEntry> result = (List<DisplayHistoryEntry>) getHibernateTemplate().execute(new HibernateCallback() {
-      public Object doInHibernate(final Session session) throws HibernateException, SQLException
+    final List<DisplayHistoryEntry> result = getHibernateTemplate().execute(new HibernateCallback<List<DisplayHistoryEntry>>() {
+      public List<DisplayHistoryEntry> doInHibernate(final Session session) throws HibernateException, SQLException
       {
         final HistoryEntry[] entries = internalGetHistoryEntries(obj);
         if (entries == null) {
@@ -661,9 +656,8 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<SimpleHistoryEntry> getSimpleHistoryEntries(final O obj)
   {
-    @SuppressWarnings("unchecked")
-    final List<SimpleHistoryEntry> result = (List<SimpleHistoryEntry>) getHibernateTemplate().execute(new HibernateCallback() {
-      public Object doInHibernate(final Session session) throws HibernateException, SQLException
+    final List<SimpleHistoryEntry> result = getHibernateTemplate().execute(new HibernateCallback<List<SimpleHistoryEntry>>() {
+      public List<SimpleHistoryEntry> doInHibernate(final Session session) throws HibernateException, SQLException
       {
         final HistoryEntry[] entries = getHistoryEntries(obj);
         if (entries == null) {
@@ -742,7 +736,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
    * @return the generated identifier.
    * @throws AccessException
    */
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
   public Serializable save(final O obj) throws AccessException
   {
     Validate.notNull(obj);
@@ -851,9 +845,12 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     obj.setLastUpdate();
     onSave(obj);
     onSaveOrModify(obj);
-    final Serializable id = getHibernateTemplate().save(obj);
+    final Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+    final Serializable id = session.save(obj);
     log.info("New object added (" + id + "): " + obj.toString());
     prepareHibernateSearch(obj, OperationType.INSERT);
+    session.flush();
+    Search.getFullTextSession(session).flushToIndexes();
     afterSaveOrModify(obj);
     afterSave(obj);
     return id;
@@ -951,7 +948,6 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   {
     onSaveOrModify(obj);
     accessChecker.checkDemoUser();
-    @SuppressWarnings("unchecked")
     final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     if (checkAccess == true) {
       checkLoggedInUserUpdateAccess(obj, dbObj);
@@ -963,6 +959,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     } else {
       dbObjBackup = null;
     }
+    final boolean wantsReindexAllDependentObjects = wantsReindexAllDependentObjects(obj, dbObj);
     // Copy all values of modified user to database object, ignore field 'deleted'.
     final boolean result = copyValues(obj, dbObj, "deleted");
     if (result == true) {
@@ -971,17 +968,30 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     } else {
       log.info("No modifications detected (no update needed): " + dbObj.toString());
     }
-    if (obj.isMinorChange() == false) {
-      reindex(obj);
-    }
     prepareHibernateSearch(obj, OperationType.UPDATE);
+    final Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+    session.flush();
+    Search.getFullTextSession(session).flushToIndexes();
     afterSaveOrModify(obj);
     if (supportAfterUpdate == true) {
       afterUpdate(obj, dbObjBackup);
     } else {
       afterUpdate(obj, null);
     }
+    if (wantsReindexAllDependentObjects == true) {
+      reindexDependentObjects(obj);
+    }
     return result;
+  }
+
+  /**
+   * @return If true (default if not minor Change) all dependent data-base objects will be re-indexed. For e. g. PFUserDO all time-sheets
+   *         etc. of this user will be re-indexed. It's called after internalUpdate. Refer UserDao to see more.
+   * @see BaseDO#isMinorChange()
+   */
+  protected boolean wantsReindexAllDependentObjects(final O obj, final O dbObj)
+  {
+    return obj.isMinorChange() == false;
   }
 
   /**
@@ -1018,7 +1028,6 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       log.error(msg);
       throw new RuntimeException(msg);
     }
-    @SuppressWarnings("unchecked")
     final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     checkLoggedInUserDeleteAccess(obj, dbObj);
     internalMarkAsDeleted(obj);
@@ -1093,7 +1102,6 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   public void internalUndelete(final O obj)
   {
     accessChecker.checkDemoUser();
-    @SuppressWarnings("unchecked")
     final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     onSaveOrModify(obj);
     copyValues(obj, dbObj, "deleted"); // If user has made additional changes.
@@ -1460,19 +1468,6 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   }
 
   /**
-   * If this dao is registered at BaseDaoReindexRegistry then this method should be implemented and should return a list of all objects
-   * which are needed to re-index because of dependency of the given modified object.
-   * @param obj Modified object.
-   */
-  public List<O> getDependentObjectsToReindex(final BaseDO< ? > obj)
-  {
-    log.warn("This dao is registered as dependent of objects of type "
-        + obj.getClass()
-        + " but does not implement getDependentObjectsToReindex(BaseDO<?>). Ignoring registry enry.");
-    return null;
-  }
-
-  /**
    * Re-indexes the entries of the last day, 1,000 at max.
    * @see DatabaseDao#createReindexSettings(boolean)
    */
@@ -1492,88 +1487,13 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   }
 
   /**
-   * Re-index this object manually (hibernate search). Also all registered dao classes will be called for re-indexing depending data base
-   * entries.
+   * Re-index all dependent objects manually (hibernate search). Hibernate doesn't re-index these objects, does it?
    * @param obj
    */
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
-  public void reindex(final O obj)
+  public void reindexDependentObjects(final O obj)
   {
-    reindex(obj, new HashSet<String>());
-  }
-
-  /**
-   * @param obj
-   * @param alreadyReindexed Avoids double re-indexing within one run.
-   */
-  @SuppressWarnings("unchecked")
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
-  protected void reindex(final O obj, final Set<String> alreadyReindexed)
-  {
-    if (alreadyReindexed.contains(getReindexId(obj)) == true) {
-      if (log.isDebugEnabled() == true) {
-        log.debug("Object already re-indexed (skipping): " + getReindexId(obj));
-      }
-      return;
-    }
-    final Session session = getSession();
-    session.flush(); // Needed to flush the object changes!
-    final FullTextSession fullTextSession = Search.createFullTextSession(session);
-    fullTextSession.setFlushMode(FlushMode.AUTO);
-    fullTextSession.setCacheMode(CacheMode.IGNORE);
-    O dbObj = (O) session.get(obj.getClass(), obj.getId());
-    if (dbObj == null) {
-      dbObj = (O) session.load(obj.getClass(), obj.getId());
-    }
-    fullTextSession.index(dbObj);
-    alreadyReindexed.add(getReindexId(dbObj));
-    // session.flush(); // clear every batchSize since the queue is processed
-    if (log.isDebugEnabled() == true) {
-      log.debug("Object added to index: " + getReindexId(dbObj));
-    }
-    final Set<BaseDao< ? >> dependentDaos = baseDaoReindexRegistry.getRegisteredDependents(dbObj);
-    if (dependentDaos != null) {
-      for (final BaseDao< ? > dao : dependentDaos) {
-        dao.reindexDependents(obj, alreadyReindexed);
-      }
-    }
-  }
-
-  /**
-   * Logs error message. Called by registered daos as dependent of modified objects.
-   * @param obj Object which is not supported by the dao.
-   * @return null
-   */
-  protected List<O> dependencyNotSupportedOf(final BaseDO< ? > obj)
-  {
-    log.error("Object of type "
-        + getReindexId(obj)
-        + " not supported for handling dependents for dao of type: "
-        + this.getClass().getName());
-    return null;
-  }
-
-  private String getReindexId(final BaseDO< ? > obj)
-  {
-    return obj.getClass() + ":" + obj.getId();
-  }
-
-  /**
-   * Re-index all entries of the given list. If the given set isn't null, then the id's of the re-indexed objects are added. Objects which
-   * are already in the given set, will be ignored.
-   * @param reindexObjects Objects to re-index.
-   * @param alreadyReindexed This set, if not null, contains already re-indexed objects inside the caller method.
-   */
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRED, isolation = Isolation.REPEATABLE_READ)
-  private void reindexDependents(final BaseDO< ? > obj, final Set<String> alreadyReindexed)
-  {
-    final List<O> dependents = getDependentObjectsToReindex(obj);
-    if (dependents == null) {
-      return;
-    }
-    for (final O dependentObj : dependents) {
-      reindex(dependentObj, alreadyReindexed);
-    }
+    HibernateSearchDependentObjectsReindexer.getSingleton().reindexDependents(getHibernateTemplate(), obj);
   }
 
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
