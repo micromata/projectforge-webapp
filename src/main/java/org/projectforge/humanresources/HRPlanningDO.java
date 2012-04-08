@@ -41,6 +41,7 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Cascade;
+import org.hibernate.search.annotations.ContainedIn;
 import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
@@ -77,7 +78,7 @@ public class HRPlanningDO extends DefaultBaseDO
   private Date week;
 
   @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
-  @IndexedEmbedded(depth = 3)
+  @ContainedIn
   private List<HRPlanningEntryDO> entries;
 
   /**
@@ -118,7 +119,7 @@ public class HRPlanningDO extends DefaultBaseDO
   /**
    * @param week
    */
-  public void setWeek(Date week)
+  public void setWeek(final Date week)
   {
     this.week = week;
   }
@@ -153,7 +154,7 @@ public class HRPlanningDO extends DefaultBaseDO
   /**
    * @param user the user to set
    */
-  public HRPlanningDO setUser(PFUserDO user)
+  public HRPlanningDO setUser(final PFUserDO user)
   {
     this.user = user;
     return this;
@@ -178,7 +179,7 @@ public class HRPlanningDO extends DefaultBaseDO
     return this.entries;
   }
 
-  public void setEntries(List<HRPlanningEntryDO> entries)
+  public void setEntries(final List<HRPlanningEntryDO> entries)
   {
     this.entries = entries;
   }
