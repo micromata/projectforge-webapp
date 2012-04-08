@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.Validate;
+import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.fibu.KontoCache;
 import org.projectforge.task.TaskTree;
@@ -47,7 +48,9 @@ public class Registry
 
   private final Map<String, RegistryEntry> mapByName = new HashMap<String, RegistryEntry>();
 
-  private final Map<Class< ? extends BaseDao< ? >>, RegistryEntry> mapByClass = new HashMap<Class< ? extends BaseDao< ? >>, RegistryEntry>();
+  private final Map<Class< ? extends BaseDao< ? >>, RegistryEntry> mapByDao = new HashMap<Class< ? extends BaseDao< ? >>, RegistryEntry>();
+
+  private final Map<Class< ? extends BaseDO< ? >>, RegistryEntry> mapByDO = new HashMap<Class< ? extends BaseDO< ? >>, RegistryEntry>();
 
   private final List<RegistryEntry> orderedList = new ArrayList<RegistryEntry>();
 
@@ -71,7 +74,8 @@ public class Registry
   {
     Validate.notNull(entry);
     mapByName.put(entry.getId(), entry);
-    mapByClass.put(entry.getDaoClassType(), entry);
+    mapByDao.put(entry.getDaoClassType(), entry);
+    mapByDO.put(entry.getDOClass(), entry);
     orderedList.add(entry);
     return this;
   }
@@ -88,7 +92,8 @@ public class Registry
     Validate.notNull(existingEntry);
     Validate.notNull(entry);
     mapByName.put(entry.getId(), entry);
-    mapByClass.put(entry.getDaoClassType(), entry);
+    mapByDao.put(entry.getDaoClassType(), entry);
+    mapByDO.put(entry.getDOClass(), entry);
     final int idx = orderedList.indexOf(existingEntry);
     if (idx < 0) {
       log.error("Registry entry '" + existingEntry.getId() + "' not found. Appending the given entry to the list.");
@@ -108,7 +113,12 @@ public class Registry
 
   public RegistryEntry getEntry(final Class< ? extends BaseDao< ? >> daoClass)
   {
-    return mapByClass.get(daoClass);
+    return mapByDao.get(daoClass);
+  }
+
+  public RegistryEntry getEntryByDO(final Class< ? extends BaseDO< ? >> doClass)
+  {
+    return mapByDO.get(doClass);
   }
 
   /**
