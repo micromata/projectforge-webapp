@@ -68,35 +68,46 @@ public class WicketPageTestBase extends TestBase
 
   private UserXmlPreferencesCache userXmlPreferencesCache;
 
+  private class WicketTestApplication extends WebApplication implements WicketApplicationInterface {
+    @Override
+    protected void init()
+    {
+      super.init();
+      final ClassPathXmlApplicationContext context = getTestConfiguration().getApplicationContext();
+      getComponentInstantiationListeners().add(new SpringComponentInjector(this, context, true));
+      getResourceSettings().setResourceStreamLocator(new MyResourceStreamLocator());
+      getResourceSettings().getStringResourceLoaders().add(new BundleStringResourceLoader(WicketApplication.RESOURCE_BUNDLE_NAME));
+      final ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+      beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
+      UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
+    }
+
+    @Override
+    public Class< ? extends Page> getHomePage()
+    {
+      return WicketApplication.DEFAULT_PAGE;
+    }
+
+    @Override
+    public Session newSession(final Request request, final Response response)
+    {
+      return new MySession(request);
+    }
+
+    /**
+     * @see org.projectforge.web.wicket.WicketApplicationInterface#isDevelopmentSystem()
+     */
+    @Override
+    public boolean isDevelopmentSystem()
+    {
+      return false;
+    }
+  };
+
   @Before
   public void setUpWicketApplication()
   {
-    tester = new WicketTester(new WebApplication() {
-      @Override
-      protected void init()
-      {
-        super.init();
-        final ClassPathXmlApplicationContext context = getTestConfiguration().getApplicationContext();
-        getComponentInstantiationListeners().add(new SpringComponentInjector(this, context, true));
-        getResourceSettings().setResourceStreamLocator(new MyResourceStreamLocator());
-        getResourceSettings().getStringResourceLoaders().add(new BundleStringResourceLoader(WicketApplication.RESOURCE_BUNDLE_NAME));
-        final ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
-        beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
-        UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
-      }
-
-      @Override
-      public Class< ? extends Page> getHomePage()
-      {
-        return WicketApplication.DEFAULT_PAGE;
-      }
-
-      @Override
-      public Session newSession(final Request request, final Response response)
-      {
-        return new MySession(request);
-      }
-    });
+    tester = new WicketTester(new WicketTestApplication());
   }
 
   /**
