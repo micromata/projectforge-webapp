@@ -42,7 +42,6 @@ import org.hibernate.criterion.Order;
 import org.projectforge.access.AccessException;
 import org.projectforge.access.OperationType;
 import org.projectforge.common.DateHelper;
-import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.DisplayHistoryEntry;
@@ -69,15 +68,15 @@ public class RechnungDao extends BaseDao<RechnungDO>
   private static final Class< ? >[] ADDITIONAL_SEARCH_DOS = new Class[] { RechnungsPositionDO.class};
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "kunde.name", "projekt.name", "projekt.kunde.name",
-      "positionen.text", "positionen.auftragsPosition.position", "positionen.auftragsPosition.position",
-      "positionen.auftragsPosition.titel", "positionen.auftragsPosition.bemerkung"};
+    "positionen.text", "positionen.auftragsPosition.position", "positionen.auftragsPosition.position",
+    "positionen.auftragsPosition.titel", "positionen.auftragsPosition.bemerkung"};
 
   private static BigDecimal defaultSteuersatz;
 
   private KundeDao kundeDao;
 
   private ProjektDao projektDao;
-  
+
   private RechnungCache rechnungCache;
 
   public static BigDecimal getNettoSumme(final Collection<RechnungsPositionVO> col) {
@@ -89,18 +88,18 @@ public class RechnungDao extends BaseDao<RechnungDO>
     }
     return nettoSumme;
   }
-  
-  public void setKundeDao(KundeDao kundeDao)
+
+  public void setKundeDao(final KundeDao kundeDao)
   {
     this.kundeDao = kundeDao;
   }
 
-  public void setProjektDao(ProjektDao projektDao)
+  public void setProjektDao(final ProjektDao projektDao)
   {
     this.projektDao = projektDao;
   }
-  
-  public void setRechnungCache(RechnungCache rechnungCache)
+
+  public void setRechnungCache(final RechnungCache rechnungCache)
   {
     this.rechnungCache = rechnungCache;
   }
@@ -109,8 +108,6 @@ public class RechnungDao extends BaseDao<RechnungDO>
   {
     super(RechnungDO.class);
     userRightId = USER_RIGHT_ID;
-    baseDaoReindexRegistry.registerDependent(KundeDO.class, this);
-    baseDaoReindexRegistry.registerDependent(ProjektDO.class, this);
   }
 
   /**
@@ -120,17 +117,17 @@ public class RechnungDao extends BaseDao<RechnungDO>
   @SuppressWarnings("unchecked")
   public int[] getYears()
   {
-    List<Object[]> list = (List<Object[]>) getSession().createQuery("select min(datum), max(datum) from RechnungDO t").list();
+    final List<Object[]> list = getSession().createQuery("select min(datum), max(datum) from RechnungDO t").list();
     return SQLHelper.getYears(list);
   }
 
-  public RechnungsStatistik buildStatistik(List<RechnungDO> list)
+  public RechnungsStatistik buildStatistik(final List<RechnungDO> list)
   {
-    RechnungsStatistik stats = new RechnungsStatistik();
+    final RechnungsStatistik stats = new RechnungsStatistik();
     if (list == null) {
       return stats;
     }
-    for (RechnungDO rechnung : list) {
+    for (final RechnungDO rechnung : list) {
       stats.add(rechnung);
     }
     return stats;
@@ -141,12 +138,12 @@ public class RechnungDao extends BaseDao<RechnungDO>
    * @param days
    * @see DateHelper#getCalendar()
    */
-  public Date calculateFaelligkeit(RechnungDO rechnung, int days)
+  public Date calculateFaelligkeit(final RechnungDO rechnung, final int days)
   {
     if (rechnung.getDatum() == null) {
       return null;
     }
-    Calendar cal = DateHelper.getCalendar();
+    final Calendar cal = DateHelper.getCalendar();
     cal.setTime(rechnung.getDatum());
     cal.add(Calendar.DAY_OF_YEAR, days);
     return cal.getTime();
@@ -157,9 +154,9 @@ public class RechnungDao extends BaseDao<RechnungDO>
    * @param kundeId If null, then kunde will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setKunde(final RechnungDO rechnung, Integer kundeId)
+  public void setKunde(final RechnungDO rechnung, final Integer kundeId)
   {
-    KundeDO kunde = kundeDao.getOrLoad(kundeId);
+    final KundeDO kunde = kundeDao.getOrLoad(kundeId);
     rechnung.setKunde(kunde);
   }
 
@@ -168,9 +165,9 @@ public class RechnungDao extends BaseDao<RechnungDO>
    * @param projektId If null, then projekt will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setProjekt(final RechnungDO rechnung, Integer projektId)
+  public void setProjekt(final RechnungDO rechnung, final Integer projektId)
   {
-    ProjektDO projekt = projektDao.getOrLoad(projektId);
+    final ProjektDO projekt = projektDao.getOrLoad(projektId);
     rechnung.setProjekt(projekt);
   }
 
@@ -182,7 +179,7 @@ public class RechnungDao extends BaseDao<RechnungDO>
    */
   @SuppressWarnings("unchecked")
   @Override
-  protected void onSaveOrModify(RechnungDO obj)
+  protected void onSaveOrModify(final RechnungDO obj)
   {
     if (obj.getTyp() == RechnungTyp.GUTSCHRIFTSANZEIGE_DURCH_KUNDEN) {
       if (obj.getNummer() != null) {
@@ -194,12 +191,12 @@ public class RechnungDao extends BaseDao<RechnungDO>
       }
       if (obj.getId() == null) {
         // Neue Rechnung
-        Integer next = getNextNumber(obj);
+        final Integer next = getNextNumber(obj);
         if (next.intValue() != obj.getNummer().intValue()) {
           throw new UserException("fibu.rechnung.error.rechnungsNummerIstNichtFortlaufend");
         }
       } else {
-        List<RechnungDO> list = getHibernateTemplate().find("from RechnungDO r where r.nummer = ? and r.id <> ?",
+        final List<RechnungDO> list = getHibernateTemplate().find("from RechnungDO r where r.nummer = ? and r.id <> ?",
             new Object[] { obj.getNummer(), obj.getId()});
         if (list != null && list.size() > 0) {
           throw new UserException("fibu.rechnung.error.rechnungsNummerBereitsVergeben");
@@ -224,13 +221,13 @@ public class RechnungDao extends BaseDao<RechnungDO>
       }
     }
   }
-  
+
   @Override
   protected void afterSaveOrModify(final RechnungDO obj)
   {
     rechnungCache.setExpired(); // Expire the cache because assignments to order position may be changed.
   }
-  
+
   /**
    * @see org.projectforge.core.BaseDao#prepareHibernateSearch(org.projectforge.core.ExtendedBaseDO, org.projectforge.access.OperationType)
    */
@@ -245,7 +242,7 @@ public class RechnungDao extends BaseDao<RechnungDO>
   {
     return ADDITIONAL_SEARCH_FIELDS;
   }
-  
+
   /**
    * Fetches the cost assignments.
    * @see org.projectforge.core.BaseDao#getById(java.io.Serializable)
@@ -272,19 +269,19 @@ public class RechnungDao extends BaseDao<RechnungDO>
     } else {
       myFilter = new RechnungFilter(filter);
     }
-    QueryFilter queryFilter = new QueryFilter(myFilter);
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
     queryFilter.setYearAndMonth("datum", myFilter.getYear(), myFilter.getMonth());
     queryFilter.addOrder(Order.desc("datum"));
     queryFilter.addOrder(Order.desc("nummer"));
     if (myFilter.isShowKostZuweisungStatus() == true) {
       queryFilter.setFetchMode("positionen.kostZuweisungen", FetchMode.JOIN);
     }
-    List<RechnungDO> list = getList(queryFilter);
+    final List<RechnungDO> list = getList(queryFilter);
     if (myFilter.isShowAll() == true || myFilter.isDeleted() == true) {
       return list;
     }
-    List<RechnungDO> result = new ArrayList<RechnungDO>();
-    for (RechnungDO rechnung : list) {
+    final List<RechnungDO> result = new ArrayList<RechnungDO>();
+    for (final RechnungDO rechnung : list) {
       if (myFilter.isShowUnbezahlt() == true) {
         if (rechnung.isBezahlt() == false) {
           result.add(rechnung);
@@ -302,7 +299,7 @@ public class RechnungDao extends BaseDao<RechnungDO>
   }
 
   @Override
-  protected List<RechnungDO> sort(List<RechnungDO> list)
+  protected List<RechnungDO> sort(final List<RechnungDO> list)
   {
     Collections.sort(list);
     return list;
@@ -316,16 +313,16 @@ public class RechnungDao extends BaseDao<RechnungDO>
    */
   @SuppressWarnings("unchecked")
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public Integer getNextNumber(RechnungDO rechnung)
+  public Integer getNextNumber(final RechnungDO rechnung)
   {
     if (rechnung.getId() != null) {
-      RechnungDO orig = internalGetById(rechnung.getId());
+      final RechnungDO orig = internalGetById(rechnung.getId());
       if (orig.getNummer() != null) {
         rechnung.setNummer(orig.getNummer());
         return orig.getNummer();
       }
     }
-    List<Integer> list = (List<Integer>) getSession().createQuery("select max(t.nummer) from RechnungDO t").list();
+    final List<Integer> list = getSession().createQuery("select max(t.nummer) from RechnungDO t").list();
     Validate.notNull(list);
     if (list.size() == 0 || list.get(0) == null) {
       log.info("First entry of RechnungDO");
@@ -340,7 +337,7 @@ public class RechnungDao extends BaseDao<RechnungDO>
    * @see org.projectforge.core.BaseDao#getDisplayHistoryEntries(org.projectforge.core.ExtendedBaseDO)
    */
   @Override
-  public List<DisplayHistoryEntry> getDisplayHistoryEntries(RechnungDO obj)
+  public List<DisplayHistoryEntry> getDisplayHistoryEntries(final RechnungDO obj)
   {
     final List<DisplayHistoryEntry> list = super.getDisplayHistoryEntries(obj);
     if (hasLoggedInUserHistoryAccess(obj, false) == false) {
@@ -376,30 +373,12 @@ public class RechnungDao extends BaseDao<RechnungDO>
       }
     }
     Collections.sort(list, new Comparator<DisplayHistoryEntry>() {
-      public int compare(DisplayHistoryEntry o1, DisplayHistoryEntry o2)
+      public int compare(final DisplayHistoryEntry o1, final DisplayHistoryEntry o2)
       {
         return (o2.getTimestamp().compareTo(o1.getTimestamp()));
       }
     });
     return list;
-  }
-
-  @Override
-  public List<RechnungDO> getDependentObjectsToReindex(BaseDO< ? > obj)
-  {
-    if (obj instanceof KundeDO) {
-      final Integer id = ((KundeDO) obj).getId();
-      @SuppressWarnings("unchecked")
-      final List<RechnungDO> list = getHibernateTemplate().find("from RechnungDO r where r.kunde.id=? or r.projekt.kunde.id=?",
-          new Object[] { id, id});
-      return list;
-    } else if (obj instanceof ProjektDO) {
-      @SuppressWarnings("unchecked")
-      final List<RechnungDO> list = getHibernateTemplate().find("from RechnungDO r where r.projekt.id=?", ((ProjektDO) obj).getId());
-      return list;
-    } else {
-      return dependencyNotSupportedOf(obj);
-    }
   }
 
   @Override
@@ -413,7 +392,7 @@ public class RechnungDao extends BaseDao<RechnungDO>
    * @see org.projectforge.core.BaseDao#contains(java.util.Set, org.projectforge.core.ExtendedBaseDO)
    */
   @Override
-  protected boolean contains(Set<Integer> idSet, RechnungDO entry)
+  protected boolean contains(final Set<Integer> idSet, final RechnungDO entry)
   {
     if (super.contains(idSet, entry) == true) {
       return true;
@@ -438,7 +417,7 @@ public class RechnungDao extends BaseDao<RechnungDO>
    * Not static for invocation of Spring.
    * @param value
    */
-  public void setDefaultSteuersatz(BigDecimal value)
+  public void setDefaultSteuersatz(final BigDecimal value)
   {
     defaultSteuersatz = value;
   }
