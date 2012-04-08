@@ -81,7 +81,7 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
  * 
  * @see org.StartHelper.demo.Start#main(String[])
  */
-public class WicketApplication extends WebApplication
+public class WicketApplication extends WebApplication implements WicketApplicationInterface
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(WicketApplication.class);
 
@@ -356,6 +356,9 @@ public class WicketApplication extends WebApplication
     log.info("Destroyed");
   }
 
+  /**
+   * @return True if configured as servlet context param.
+   */
   public boolean isDevelopmentSystem()
   {
     if (developmentMode == null) {
