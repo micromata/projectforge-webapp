@@ -39,7 +39,7 @@ import org.projectforge.AppVersion;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.MySession;
-import org.projectforge.web.wicket.WicketApplication;
+import org.projectforge.web.wicket.WicketApplicationInterface;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
@@ -160,9 +160,9 @@ public abstract class AbstractMobilePage extends WebPage
     return (MySession) getSession();
   }
 
-  protected WicketApplication getWicketApplication()
+  protected WicketApplicationInterface getWicketApplication()
   {
-    return (WicketApplication) getApplication();
+    return (WicketApplicationInterface) getApplication();
   }
 
   protected abstract String getTitle();
