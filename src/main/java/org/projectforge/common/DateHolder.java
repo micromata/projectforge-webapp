@@ -407,7 +407,7 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
    */
   public DateHolder setBeginOfWeek()
   {
-    calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+    calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
     setBeginOfDay();
     return this;
   }
