@@ -29,7 +29,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Hibernate;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
@@ -46,7 +45,7 @@ public class ProjektDao extends BaseDao<ProjektDO>
   public static final UserRightId USER_RIGHT_ID = UserRightId.PM_PROJECT;
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "kunde.name", "kunde.division", "kost2",
-      "projektManagerGroup.name"};
+  "projektManagerGroup.name"};
 
   private KundeDao kundeDao;
 
@@ -54,17 +53,17 @@ public class ProjektDao extends BaseDao<ProjektDO>
 
   private TaskDao taskDao;
 
-  public void setKundeDao(KundeDao kundeDao)
+  public void setKundeDao(final KundeDao kundeDao)
   {
     this.kundeDao = kundeDao;
   }
 
-  public void setGroupDao(GroupDao groupDao)
+  public void setGroupDao(final GroupDao groupDao)
   {
     this.groupDao = groupDao;
   }
 
-  public void setTaskDao(TaskDao taskDao)
+  public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
   }
@@ -74,7 +73,6 @@ public class ProjektDao extends BaseDao<ProjektDO>
     super(ProjektDO.class);
     this.supportAfterUpdate = true;
     userRightId = USER_RIGHT_ID;
-    baseDaoReindexRegistry.registerDependent(KundeDO.class, this);
   }
 
   @Override
@@ -144,9 +142,9 @@ public class ProjektDao extends BaseDao<ProjektDO>
 
   @SuppressWarnings("unchecked")
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public ProjektDO getProjekt(KundeDO kunde, int nummer)
+  public ProjektDO getProjekt(final KundeDO kunde, final int nummer)
   {
-    List<ProjektDO> list = getHibernateTemplate().find("from ProjektDO p where p.kunde.id=? and p.nummer=?",
+    final List<ProjektDO> list = getHibernateTemplate().find("from ProjektDO p where p.kunde.id=? and p.nummer=?",
         new Object[] { kunde.getId(), nummer});
     if (CollectionUtils.isEmpty(list) == true) {
       return null;
@@ -156,9 +154,9 @@ public class ProjektDao extends BaseDao<ProjektDO>
 
   @SuppressWarnings("unchecked")
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public ProjektDO getProjekt(int intern_kost2_4, int nummer)
+  public ProjektDO getProjekt(final int intern_kost2_4, final int nummer)
   {
-    List<ProjektDO> list = getHibernateTemplate().find("from ProjektDO p where p.internKost2_4=? and p.nummer=?",
+    final List<ProjektDO> list = getHibernateTemplate().find("from ProjektDO p where p.internKost2_4=? and p.nummer=?",
         new Object[] { intern_kost2_4, nummer});
     if (CollectionUtils.isEmpty(list) == true) {
       return null;
@@ -168,7 +166,7 @@ public class ProjektDao extends BaseDao<ProjektDO>
 
   @Override
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public List<ProjektDO> getList(BaseSearchFilter filter)
+  public List<ProjektDO> getList(final BaseSearchFilter filter)
   {
     final ProjektFilter myFilter;
     if (filter instanceof ProjektFilter) {
@@ -187,12 +185,12 @@ public class ProjektDao extends BaseDao<ProjektDO>
   }
 
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public List<ProjektDO> getKundenProjekte(Integer kundeId)
+  public List<ProjektDO> getKundenProjekte(final Integer kundeId)
   {
     if (kundeId == null) {
       return null;
     }
-    QueryFilter queryFilter = new QueryFilter();
+    final QueryFilter queryFilter = new QueryFilter();
     queryFilter.add(Restrictions.eq("kunde.id", kundeId));
     queryFilter.addOrder(Order.asc("nummer"));
     return getList(queryFilter);
@@ -228,18 +226,6 @@ public class ProjektDao extends BaseDao<ProjektDO>
       taskDao.getTaskTree().internalSetProject(dbObj.getTaskId(), null);
     }
     super.afterUpdate(obj, dbObj);
-  }
-
-  @Override
-  public List<ProjektDO> getDependentObjectsToReindex(BaseDO< ? > obj)
-  {
-    if (obj instanceof KundeDO) {
-      @SuppressWarnings("unchecked")
-      final List<ProjektDO> list = getHibernateTemplate().find("from ProjektDO p where p.kunde.id=?", ((KundeDO) obj).getId());
-      return list;
-    } else {
-      return dependencyNotSupportedOf(obj);
-    }
   }
 
   @Override
