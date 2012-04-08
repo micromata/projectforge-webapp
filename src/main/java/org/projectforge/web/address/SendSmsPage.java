@@ -45,7 +45,6 @@ import org.projectforge.core.ConfigurationParam;
 import org.projectforge.web.URLHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractStandardFormPage;
-import org.projectforge.web.wicket.WicketUtils;
 
 public class SendSmsPage extends AbstractStandardFormPage
 {
@@ -57,10 +56,15 @@ public class SendSmsPage extends AbstractStandardFormPage
 
   public final static String PARAMETER_KEY_NUMBER = "number";
 
+  protected static final String[] BOOKMARKABLE_SELECT_PROPERTIES = new String[] { PARAMETER_KEY_ADDRESS_ID + "|address",
+    PARAMETER_KEY_PHONE_TYPE + "|phone", PARAMETER_KEY_NUMBER + "|no"};
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SendSmsPage.class);
 
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
+
+  private AddressDO address;
 
   private SendSmsForm form;
 
@@ -70,9 +74,9 @@ public class SendSmsPage extends AbstractStandardFormPage
   public SendSmsPage(final PageParameters parameters)
   {
     super(parameters);
-    log.warn("**** WICKET 1.5 migration: add bookmarkable parameters");
     form = new SendSmsForm(this);
     body.add(form);
+    evaluateInitialPageParameters(getPageParameters());
     form.init();
     final String javaScript = "function showSendQuestionDialog() {\n  return window.confirm('"
         + getString("address.sendSms.sendMessageQuestion")
@@ -96,53 +100,59 @@ public class SendSmsPage extends AbstractStandardFormPage
         return StringUtils.isNotBlank(result);
       }
     });
-    parseParameters(parameters);
   }
 
-  // @Override
-  // protected PageParameters getBookmarkPageExtendedParameters()
-  // {
-  // final PageParameters pageParameters = new PageParameters();
-  // pageParameters.add(PARAMETER_KEY_NUMBER, getData().getPhoneNumber());
-  // return pageParameters;
-  // }
-
-  private void parseParameters(final PageParameters parameters)
+  public Integer getAddressId()
   {
-    if (parameters.get(PARAMETER_KEY_ADDRESS_ID) != null) {
-      final String str = parameters.get(PARAMETER_KEY_ADDRESS_ID).toString();
-      final Integer addressId = NumberHelper.parseInteger(str);
-      if (addressId == null)
-        return;
-      final AddressDO address = addressDao.getById(addressId);
-      if (address == null)
-        return;
-      if (parameters.get(PARAMETER_KEY_PHONE_TYPE).isNull() == false) {
-        log.info(parameters.get(PARAMETER_KEY_PHONE_TYPE));
-        final String type = WicketUtils.getAsString(parameters, PARAMETER_KEY_PHONE_TYPE);
-        PhoneType phoneType = null;
-        try {
-          phoneType = PhoneType.valueOf(type);
-        } catch (final IllegalArgumentException ex) {
-        }
-        String number = null;
-        if (phoneType == PhoneType.MOBILE) {
-          number = address.getMobilePhone();
-        } else if (phoneType == PhoneType.PRIVATE_MOBILE) {
-          number = address.getPrivateMobilePhone();
-        }
-        if (number != null) {
-          getData().setPhoneNumber(
-              SendSmsForm.getPhoneNumberAndPerson(address, number,
-                  Configuration.getInstance().getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX)));
-        }
-      }
+    return null;
+  }
+
+  public void setAddressId(final Integer addressId)
+  {
+    if (addressId != null) {
+      address = addressDao.getById(addressId);
     }
-    if (parameters.get(PARAMETER_KEY_NUMBER) != null) {
-      final String number = parameters.get(PARAMETER_KEY_NUMBER).toString();
-      if (StringUtils.isNotBlank(number) == true) {
-        getData().setPhoneNumber(number);
-      }
+  }
+
+  public String getNumber()
+  {
+    final String number = getData().getPhoneNumber();
+    final int pos = number != null ? number.indexOf(':') : -1;
+    if (pos > 0) {
+      return number.substring(0, pos);
+    }
+    return number;
+  }
+
+  public void setNumber(final String number)
+  {
+    if (StringUtils.isNotBlank(number) == true) {
+      getData().setPhoneNumber(number);
+    }
+  }
+
+  public String getPhoneType()
+  {
+    return null;
+  }
+
+  public void setPhoneType(final String phoneType)
+  {
+    PhoneType type = null;
+    try {
+      type = PhoneType.valueOf(phoneType);
+    } catch (final IllegalArgumentException ex) {
+    }
+    String number = null;
+    if (type == PhoneType.MOBILE) {
+      number = address.getMobilePhone();
+    } else if (type == PhoneType.PRIVATE_MOBILE) {
+      number = address.getPrivateMobilePhone();
+    }
+    if (number != null) {
+      getData().setPhoneNumber(
+          SendSmsForm.getPhoneNumberAndPerson(address, number,
+              Configuration.getInstance().getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX)));
     }
   }
 
@@ -203,6 +213,21 @@ public class SendSmsPage extends AbstractStandardFormPage
   private SendSmsData getData()
   {
     return form.data;
+  }
+
+  /**
+   * @return This page as link with the page parameters of this page.
+   */
+  @Override
+  public String getPageAsLink()
+  {
+    return getPageAsLink(new PageParameters());
+  }
+
+  @Override
+  protected String[] getBookmarkableInitialProperties()
+  {
+    return BOOKMARKABLE_SELECT_PROPERTIES;
   }
 
   @Override
