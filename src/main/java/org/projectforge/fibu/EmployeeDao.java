@@ -31,7 +31,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang.Validate;
 import org.projectforge.access.OperationType;
-import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
@@ -53,7 +52,7 @@ public class EmployeeDao extends BaseDao<EmployeeDO>
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EmployeeDao.class);
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "user.firstname", "user.lastname", "user.description",
-      "user.organization"};
+  "user.organization"};
 
   private UserDao userDao;
 
@@ -62,8 +61,6 @@ public class EmployeeDao extends BaseDao<EmployeeDO>
   public EmployeeDao()
   {
     super(EmployeeDO.class);
-    baseDaoReindexRegistry.registerDependent(PFUserDO.class, this);
-    baseDaoReindexRegistry.registerDependent(Kost1DO.class, this);
   }
 
   @Override
@@ -73,7 +70,7 @@ public class EmployeeDao extends BaseDao<EmployeeDO>
   }
 
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public EmployeeDO getByUserId(Integer userId)
+  public EmployeeDO getByUserId(final Integer userId)
   {
     @SuppressWarnings("unchecked")
     final List<EmployeeDO> list = getHibernateTemplate().find("from EmployeeDO e where e.user.id = ?", userId);
@@ -88,15 +85,15 @@ public class EmployeeDao extends BaseDao<EmployeeDO>
    * @param fullname Format: &lt;last name&gt;, &lt;first name&gt;
    */
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public EmployeeDO getByName(String fullname)
+  public EmployeeDO getByName(final String fullname)
   {
-    StringTokenizer tokenizer = new StringTokenizer(fullname, ",");
+    final StringTokenizer tokenizer = new StringTokenizer(fullname, ",");
     if (tokenizer.countTokens() != 2) {
       log.error("EmployeeDao.getByName: Token '" + fullname + "' not supported.");
     }
     Validate.isTrue(tokenizer.countTokens() == 2);
-    String lastname = tokenizer.nextToken().trim();
-    String firstname = tokenizer.nextToken().trim();
+    final String lastname = tokenizer.nextToken().trim();
+    final String firstname = tokenizer.nextToken().trim();
     @SuppressWarnings("unchecked")
     final List<EmployeeDO> list = getHibernateTemplate().find("from EmployeeDO e where e.user.lastname = ? and e.user.firstname = ?",
         new Object[] { lastname, firstname});
@@ -112,9 +109,9 @@ public class EmployeeDao extends BaseDao<EmployeeDO>
    * @param userId If null, then user will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setUser(final EmployeeDO employee, Integer userId)
+  public void setUser(final EmployeeDO employee, final Integer userId)
   {
-    PFUserDO user = userDao.getOrLoad(userId);
+    final PFUserDO user = userDao.getOrLoad(userId);
     employee.setUser(user);
   }
 
@@ -123,9 +120,9 @@ public class EmployeeDao extends BaseDao<EmployeeDO>
    * @param kost1Id If null, then kost1 will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setKost1(final EmployeeDO employee, Integer kost1Id)
+  public void setKost1(final EmployeeDO employee, final Integer kost1Id)
   {
-    Kost1DO kost1 = kost1Dao.getOrLoad(kost1Id);
+    final Kost1DO kost1 = kost1Dao.getOrLoad(kost1Id);
     employee.setKost1(kost1);
   }
 
@@ -184,34 +181,18 @@ public class EmployeeDao extends BaseDao<EmployeeDO>
   }
 
   @Override
-  protected void afterSaveOrModify(EmployeeDO employee)
+  protected void afterSaveOrModify(final EmployeeDO employee)
   {
     super.afterSaveOrModify(employee);
     userGroupCache.refreshEmployee(employee.getUserId());
   }
 
-  @Override
-  public List<EmployeeDO> getDependentObjectsToReindex(BaseDO< ? > obj)
-  {
-    if (obj instanceof PFUserDO) {
-      @SuppressWarnings("unchecked")
-      final List<EmployeeDO> list = getHibernateTemplate().find("from EmployeeDO e where e.user.id=?", ((PFUserDO) obj).getId());
-      return list;
-    } else if (obj instanceof Kost1DO) {
-      @SuppressWarnings("unchecked")
-      final List<EmployeeDO> list = getHibernateTemplate().find("from EmployeeDO e where e.kost1.id=?", ((Kost1DO) obj).getId());
-      return list;
-    } else {
-      return dependencyNotSupportedOf(obj);
-    }
-  }
-
-  public void setUserDao(UserDao userDao)
+  public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
   }
 
-  public void setKost1Dao(Kost1Dao kost1Dao)
+  public void setKost1Dao(final Kost1Dao kost1Dao)
   {
     this.kost1Dao = kost1Dao;
   }
