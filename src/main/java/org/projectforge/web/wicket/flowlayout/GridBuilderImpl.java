@@ -41,17 +41,17 @@ public class GridBuilderImpl implements GridBuilder
 {
   private static final long serialVersionUID = 4323077384391963834L;
 
-  private DivPanel gridPanel, blockPanel, columnsPanel, columnPanel;
+  protected DivPanel gridPanel, blockPanel, columnsPanel, columnPanel;
 
-  private BrowserScreenWidthType browserScreenWidthType;
+  protected BrowserScreenWidthType browserScreenWidthType;
 
-  private RepeatingView parentRepeatingView;
+  protected RepeatingView parentRepeatingView;
 
-  private DivPanel parentDivPanel;
+  protected DivPanel parentDivPanel;
 
-  private DivPanel current;
+  protected DivPanel current;
 
-  private DivType gridSize;
+  protected DivType gridSize;
 
   public GridBuilderImpl(final RepeatingView parent, final MySession session)
   {
@@ -71,6 +71,10 @@ public class GridBuilderImpl implements GridBuilder
     if (this.browserScreenWidthType == null) {
       this.browserScreenWidthType = BrowserScreenWidthType.NORMAL;
     }
+  }
+
+  protected GridBuilderImpl()
+  {
   }
 
   /**
