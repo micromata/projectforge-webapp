@@ -23,6 +23,8 @@
 
 package org.projectforge.registry;
 
+import java.io.Serializable;
+
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
@@ -34,17 +36,19 @@ import org.projectforge.database.DatabaseDao;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class RegistryEntry
+public class RegistryEntry implements Serializable
 {
+  private static final long serialVersionUID = -5464929865679294316L;
+
   private final String id;
 
   private final String i18nPrefix;
 
-  private final BaseDao< ? > dao;
+  private transient BaseDao< ? > dao;
 
   private Class< ? extends BaseDO< ? >>[] nestedDOClasses;
 
-  private ScriptingDao< ? > scriptingDao;
+  private transient ScriptingDao< ? > scriptingDao;
 
   private boolean supressScriptingDao;
 
@@ -180,6 +184,10 @@ public class RegistryEntry
 
   public BaseDao< ? > getDao()
   {
+    if (dao == null) {
+      // After deserialization:
+      dao = Registry.instance().getDao(id);
+    }
     return dao;
   }
 

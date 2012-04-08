@@ -23,6 +23,8 @@
 
 package org.projectforge.web.registry;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang.Validate;
 import org.apache.wicket.proxy.LazyInitProxyFactory;
 import org.projectforge.core.BaseDO;
@@ -36,8 +38,10 @@ import org.projectforge.web.wicket.IListPageColumnsCreator;
  * Contains more information than a RegistryEntry. This is e. g. needed by general search page.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class WebRegistryEntry
+public class WebRegistryEntry implements Serializable
 {
+  private static final long serialVersionUID = 8289071922222570636L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(WebRegistryEntry.class);
 
   private final RegistryEntry registryEntry;
