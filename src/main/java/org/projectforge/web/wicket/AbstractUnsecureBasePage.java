@@ -24,7 +24,6 @@
 package org.projectforge.web.wicket;
 
 import java.text.MessageFormat;
-import java.util.Locale;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -45,6 +44,7 @@ import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.web.I18nCore;
 import org.projectforge.web.UserAgentBrowser;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.doc.DocumentationPage;
@@ -110,16 +110,15 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     }));
     final StringBuffer buf = new StringBuffer();
     buf.append("$(function() {\n");
-    final Locale locale = getLocale();
-    final boolean isGerman = locale != null && locale.toString().startsWith("de") == true;
-    if (isGerman == true) {
-      buf.append("  $.datepicker.setDefaults($.datepicker.regional['de']);\n");
+    final String loc = I18nCore.getDatePickerLocale(getLocale());
+    if (loc != null) {
+      buf.append("  $.datepicker.setDefaults($.datepicker.regional['").append(loc).append("de']);\n");
     }
     buf.append("  $.datepicker.setDefaults({\n");
     buf.append("    showAnim : 'fadeIn',\n");
-    if (isGerman == true) {
-      buf.append("    showWeek : true\n");
-    }
+    // if (isGerman == true) {
+    // buf.append("    showWeek : true\n");
+    // }
     buf.append("  });\n");
     String dateFormat = DateFormats.getFormatString(DateFormatType.DATE);
     if (StringUtils.isNotBlank(dateFormat) == true) {
@@ -161,6 +160,10 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     super.renderHead(response);
     response.renderString(WicketUtils.getCssForFavicon(getUrl("/favicon.ico")));
     response.renderJavaScriptReference("scripts/projectforge.js");
+    final String datePickerLocalizationFile = I18nCore.getDatePickerLocalizationFile(getLocale());
+    if (datePickerLocalizationFile != null) {
+      response.renderJavaScriptReference(datePickerLocalizationFile);
+    }
   }
 
   @Override
