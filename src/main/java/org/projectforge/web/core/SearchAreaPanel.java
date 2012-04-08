@@ -34,7 +34,6 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -47,7 +46,6 @@ import org.projectforge.core.SearchDao;
 import org.projectforge.core.SearchResultData;
 import org.projectforge.database.StatisticsCache;
 import org.projectforge.task.TaskDependentFilter;
-import org.projectforge.web.registry.WebRegistry;
 import org.projectforge.web.registry.WebRegistryEntry;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.MySortableDataProvider;
@@ -55,8 +53,6 @@ import org.springframework.util.CollectionUtils;
 
 public class SearchAreaPanel extends Panel
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SearchAreaPanel.class);
-
   private static final long serialVersionUID = -4258095807245346743L;
 
   private static final int MAXIMUM_ENTRIES_WITHOUT_FILTER_SETTINGS = 10000;
@@ -67,79 +63,25 @@ public class SearchAreaPanel extends Panel
   @SpringBean(name = "statisticsCache")
   private StatisticsCache statisticsCache;
 
-  private RepeatingView areaRepeater;
-
-  private final SearchPageFilter filter;
-
-  // Do not execute the search on the first call (due to performance issues):
-  private boolean refreshed = true;
-
-  public SearchAreaPanel(final String id, final SearchPageFilter filter)
+  /**
+   * @param page Needed, because in constructor this panel is not yet added to a page.
+   * @param id
+   * @param filter
+   * @param registryEntry the area to show.
+   */
+  @SuppressWarnings("serial")
+  public SearchAreaPanel(final WebPage page, final String id, final SearchPageFilter filter, final WebRegistryEntry webRegistryEntry)
   {
     super(id);
-    this.filter = filter;
-    areaRepeater = new RepeatingView("areaRepeater");
-    add(areaRepeater);
-    areaRepeater.setVisible(false);
-  }
-
-  @Override
-  protected void onBeforeRender()
-  {
-    super.onBeforeRender();
-    refresh();
-  }
-
-  @Override
-  protected void onAfterRender()
-  {
-    super.onAfterRender();
-    refreshed = false;
-  }
-
-  void refresh()
-  {
-    if (refreshed == true) {
-      // Do nothing (called twice).
-      return;
-    }
-    refreshed = true;
-    if (areaRepeater != null) {
-      remove(areaRepeater);
-    }
-    areaRepeater = new RepeatingView("areaRepeater");
-    add(areaRepeater);
-    if (filter.isEmpty() == true) {
-      return;
-    }
-    if ("ALL".equals(filter.getArea()) == true) {
-      for (final WebRegistryEntry registryEntry : WebRegistry.instance().getOrderedList()) {
-        if (SearchForm.isSearchable(registryEntry.getRegistryEntry()) == true) {
-          addArea(registryEntry);
-        }
-      }
-    } else {
-      final WebRegistryEntry registryEntry = WebRegistry.instance().getEntry(filter.getArea());
-      if (registryEntry == null) {
-        log.error("Can't search in area '" + filter.getArea() + "'. No such area registered in WebRegistry! No results.");
-      } else {
-        addArea(registryEntry);
-      }
-    }
-  }
-
-  @SuppressWarnings("serial")
-  private void addArea(final WebRegistryEntry registryEntry)
-  {
     final long millis = System.currentTimeMillis();
-    final Class< ? extends IListPageColumnsCreator< ? >> clazz = registryEntry.getListPageColumnsCreatorClass();
-    final IListPageColumnsCreator< ? > listPageColumnsCreator = clazz == null ? null : (IListPageColumnsCreator< ? >) BeanHelper
-        .newInstance(clazz, PageParameters.class, new PageParameters());
+    final Class< ? extends IListPageColumnsCreator< ? >> listPageColumnsCreatorClass = webRegistryEntry.getListPageColumnsCreatorClass();
+    final IListPageColumnsCreator< ? > listPageColumnsCreator = listPageColumnsCreatorClass == null ? null
+        : (IListPageColumnsCreator< ? >) BeanHelper.newInstance(listPageColumnsCreatorClass, PageParameters.class, new PageParameters());
     if (listPageColumnsCreator == null) {
       return;
     }
-    final Integer number = statisticsCache.getNumberOfEntities(registryEntry.getDOClass());
-    final Class< ? extends BaseSearchFilter> registeredFilterClass = registryEntry.getSearchFilterClass();
+    final Integer number = statisticsCache.getNumberOfEntities(webRegistryEntry.getDOClass());
+    final Class< ? extends BaseSearchFilter> registeredFilterClass = webRegistryEntry.getSearchFilterClass();
     final boolean isTaskDependentFilter = registeredFilterClass != null
         && TaskDependentFilter.class.isAssignableFrom(registeredFilterClass);
     if (number > MAXIMUM_ENTRIES_WITHOUT_FILTER_SETTINGS
@@ -158,7 +100,7 @@ public class SearchAreaPanel extends Panel
     } else {
       baseSearchFilter = filter;
     }
-    final List<SearchResultData> searchResult = searchDao.getEntries(baseSearchFilter, registryEntry.getDOClass(), registryEntry.getDao());
+    final List<SearchResultData> searchResult = searchDao.getEntries(baseSearchFilter, webRegistryEntry.getDOClass(), webRegistryEntry.getDao());
     if (CollectionUtils.isEmpty(searchResult) == true) {
       return;
     }
@@ -173,9 +115,7 @@ public class SearchAreaPanel extends Panel
         break;
       }
     }
-    final WebMarkupContainer areaContainer = new WebMarkupContainer(areaRepeater.newChildId());
-    areaRepeater.add(areaContainer);
-    final List< ? > columns = listPageColumnsCreator.createColumns((WebPage) getPage(), false);
+    final List< ? > columns = listPageColumnsCreator.createColumns(page, false);
     @SuppressWarnings({ "rawtypes", "unchecked"})
     final DataTable< ? > dataTable = new DefaultDataTable("dataTable", columns, new MySortableDataProvider("NOSORT", SortOrder.DESCENDING) {
       @Override
@@ -190,16 +130,13 @@ public class SearchAreaPanel extends Panel
         return new Model((Serializable) object);
       }
     }, filter.getMaxRows());
-    areaContainer.add(dataTable);
+    add(dataTable);
     if (hasMore == true) {
-      areaContainer.add(new WebMarkupContainer("hasMoreEntries"));
+      add(new WebMarkupContainer("hasMoreEntries"));
     } else {
-      areaContainer.add(new Label("hasMoreEntries", "[invisible]").setVisible(false));
+      add(new Label("hasMoreEntries", "[invisible]").setVisible(false));
     }
     final long duration = System.currentTimeMillis() - millis;
-    areaContainer.add(new Label("areaTitle", getString(registryEntry.getI18nTitleHeading())
-        + " ("
-        + NumberFormatter.format(duration)
-        + " ms)"));
+    add(new Label("areaTitle", page.getString(webRegistryEntry.getI18nTitleHeading()) + " (" + NumberFormatter.format(duration) + " ms)"));
   }
 }

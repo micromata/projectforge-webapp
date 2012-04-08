@@ -24,6 +24,8 @@
 package org.projectforge.web.core;
 
 import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.task.TaskDO;
@@ -31,6 +33,8 @@ import org.projectforge.task.TaskTree;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.registry.WebRegistry;
+import org.projectforge.web.registry.WebRegistryEntry;
 import org.projectforge.web.wicket.AbstractStandardFormPage;
 
 public class SearchPage extends AbstractStandardFormPage implements ISelectCallerPage
@@ -47,13 +51,19 @@ public class SearchPage extends AbstractStandardFormPage implements ISelectCalle
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
+  private final RepeatingView areaRepeater;
+
+  // Do not execute the search on the first call (due to performance issues):
+  private boolean refreshed = true;
+
   public SearchPage(final PageParameters parameters)
   {
     super(parameters);
     form = new SearchForm(this);
     body.add(form);
     form.init();
-    body.add(new SearchAreaPanel("results", form.filter));
+    areaRepeater = new RepeatingView("areaRepeater");
+    body.add(areaRepeater);
   }
 
   @Override
@@ -81,6 +91,62 @@ public class SearchPage extends AbstractStandardFormPage implements ISelectCalle
     } else {
       log.error("Property '" + property + "' not supported for unselection.");
     }
+  }
+
+  @Override
+  protected void onBeforeRender()
+  {
+    refresh();
+    super.onBeforeRender();
+  }
+
+  @Override
+  protected void onAfterRender()
+  {
+    refreshed = false;
+    super.onAfterRender();
+  }
+
+  void refresh()
+  {
+    if (refreshed == true) {
+      // Do nothing (called twice).
+      return;
+    }
+    refreshed = true;
+    areaRepeater.removeAll();
+    if (form.filter.isEmpty() == true) {
+      return;
+    }
+    if ("ALL".equals(form.filter.getArea()) == true) {
+      for (final WebRegistryEntry registryEntry : WebRegistry.instance().getOrderedList()) {
+        if (SearchForm.isSearchable(registryEntry.getRegistryEntry()) == true) {
+          addArea(registryEntry);
+        }
+      }
+    } else {
+      final WebRegistryEntry registryEntry = WebRegistry.instance().getEntry(form.filter.getArea());
+      if (registryEntry == null) {
+        log.error("Can't search in area '" + form.filter.getArea() + "'. No such area registered in WebRegistry! No results.");
+      } else {
+        addArea(registryEntry);
+      }
+    }
+  }
+
+  private void addArea(final WebRegistryEntry webRegistryEntry)
+  {
+    //    final Panel panel = new AjaxLazyLoadPanel(areaRepeater.newChildId()) {
+    //      @Override
+    //      public final Component getLazyLoadComponent(final String id)
+    //      {
+    //        log.info("getLazyLoadComponent(" + id +")");
+    //        final SearchAreaPanel searchAreaPanel = new SearchAreaPanel(SearchPage.this, id, form.filter, webRegistryEntry);
+    //        return searchAreaPanel;
+    //      }
+    //    };
+    final Panel panel = new SearchAreaPanel(SearchPage.this, areaRepeater.newChildId(), form.filter, webRegistryEntry);
+    areaRepeater.add(panel);
   }
 
   @Override

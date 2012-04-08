@@ -5,28 +5,24 @@
 
 <body>
   <wicket:panel>
-    <div class="grid_16">
-      <wicket:container wicket:id="areaRepeater">
-        <h2 wicket:id="areaTitle">[Time sheets]</h2>
-        <table class="dataview" wicket:id="dataTable">
-          <tbody>
-            <tr>
-              <th>[modified]</th>
-              <th>[name]</th>
-              <th>[first name]</th>
-            </tr>
-            <tr>
-              <td>2010-12-11 08:52</td>
-              <td>[Reinhard]</td>
-              <td>[Kai]</td>
-            </tr>
-          </tbody>
-        </table>
-        <div style="color: red;" wicket:id="hasMoreEntries">
-          <a href="#"> <wicket:message key="moreEntriesAvailable" />
-          </a>
-        </div>
-      </wicket:container>
+    <h2 wicket:id="areaTitle">[Time sheets]</h2>
+    <table class="dataview" wicket:id="dataTable">
+      <tbody>
+        <tr>
+          <th>[modified]</th>
+          <th>[name]</th>
+          <th>[first name]</th>
+        </tr>
+        <tr>
+          <td>2010-12-11 08:52</td>
+          <td>[Reinhard]</td>
+          <td>[Kai]</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="color: red;" wicket:id="hasMoreEntries">
+      <a href="#"> <wicket:message key="moreEntriesAvailable" />
+      </a>
     </div>
   </wicket:panel>
 </body>
