@@ -340,6 +340,8 @@ extends AbstractEditForm<O, P>
     if (costConfigured == true) {
       costEditModalWindow = new ModalWindow(COST_EDIT_DIALOG_ID);
       add(costEditModalWindow);
+    } else {
+      add(new WebMarkupContainer(COST_EDIT_DIALOG_ID).setVisible(false));
     }
     refresh();
     afterInit();
