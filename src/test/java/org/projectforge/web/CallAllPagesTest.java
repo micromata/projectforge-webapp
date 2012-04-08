@@ -25,46 +25,64 @@ package org.projectforge.web;
 
 import java.util.Map;
 
+import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.WebPage;
 import org.junit.Test;
 import org.projectforge.core.SystemInfoCache;
 import org.projectforge.registry.DaoRegistry;
+import org.projectforge.registry.Registry;
 import org.projectforge.test.TestBase;
 import org.projectforge.test.TestConfiguration;
-import org.projectforge.web.address.AddressMobileEditPage;
-import org.projectforge.web.address.AddressMobileListPage;
 import org.projectforge.web.address.AddressViewPage;
 import org.projectforge.web.admin.SetupPage;
-import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.doc.TutorialPage;
-import org.projectforge.web.fibu.EingangsrechnungEditPage;
-import org.projectforge.web.fibu.RechnungEditPage;
 import org.projectforge.web.mobile.LoginMobilePage;
-import org.projectforge.web.mobile.MenuMobilePage;
 import org.projectforge.web.registry.WebRegistry;
 import org.projectforge.web.scripting.ScriptExecutePage;
+import org.projectforge.web.wicket.MessagePage;
+import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketPageTestBase;
 
 public class CallAllPagesTest extends WicketPageTestBase
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CallAllPagesTest.class);
 
+  int counter;
+
   @SuppressWarnings("unchecked")
-  private final Class< ? extends WebPage>[] skipPages = new Class[] { AddressMobileEditPage.class, AddressMobileListPage.class,
-    AddressViewPage.class, CalendarPage.class, EingangsrechnungEditPage.class, LoginPage.class, LoginMobilePage.class,
-    MenuMobilePage.class, RechnungEditPage.class, SetupPage.class, ScriptExecutePage.class,
-    TutorialPage.class};
+  private final Class< ? extends WebPage>[] skipPages = new Class[] { //
+    // Checked below:
+    LoginPage.class, LoginMobilePage.class, SetupPage.class, TutorialPage.class, //
+    AddressViewPage.class, // Checked in AddressPagesTest
+    // Not yet checked:
+    ScriptExecutePage.class};
 
   @Test
   public void testAllMountedPages()
   {
+    //testAllMountedPages(BrowserScreenWidthType.NARROW);
+    testAllMountedPages(BrowserScreenWidthType.NORMAL);
+    testAllMountedPages(BrowserScreenWidthType.WIDE);
+    testPage(LoginPage.class);
+    testPage(LoginMobilePage.class);
+    clearDatabase();
+    deleteDB();
+    Registry.instance().getUserGroupCache().setExpired();
+    testPage(SetupPage.class);
+    log.info("Number of tested Wicket pages: " + counter);
+  }
+
+  private void testAllMountedPages(final BrowserScreenWidthType browserScreenWidthType)
+  {
+    log.info("Test all web pages with resolution '" + browserScreenWidthType + "'.");
     login(TestBase.TEST_FULL_ACCESS_USER, TestBase.TEST_FULL_ACCESS_USER_PASSWORD);
+    ((MySession) Session.get()).setBrowserScreenWidthType(browserScreenWidthType);
     final DaoRegistry daoRegistry = TestConfiguration.getConfiguration().getBean("daoRegistry", DaoRegistry.class);
     daoRegistry.init();
     final SystemInfoCache systemInfoCache = TestConfiguration.getConfiguration().getBean("systemInfoCache", SystemInfoCache.class);
     SystemInfoCache.internalInitialize(systemInfoCache);
     final Map<String, Class< ? extends WebPage>> pages = WebRegistry.instance().getMountPages();
-    int counter = 0;
+    counter = 0;
     for (final Map.Entry<String, Class< ? extends WebPage>> entry : pages.entrySet()) {
       boolean skip = false;
       for (final Class< ? > clazz : skipPages) {
@@ -76,11 +94,22 @@ public class CallAllPagesTest extends WicketPageTestBase
       if (skip == true) {
         continue;
       }
-      log.info("Calling page " + entry.getKey() + ": " + entry.getValue().getName());
-      counter++;
-      tester.startPage(entry.getValue());
-      tester.assertRenderedPage(entry.getValue());
+      testPage(entry.getValue());
     }
-    log.info("Number of tested Wicket pages: " + counter);
+    testPage(TutorialPage.class, MessagePage.class); // Tutorial page not available at default.
+    logout();
+  }
+
+  private void testPage(final Class< ? extends WebPage> pageClass)
+  {
+    testPage(pageClass, pageClass);
+  }
+
+  private void testPage(final Class< ? extends WebPage> pageClass, final Class< ? extends WebPage> expectedRenderedPage)
+  {
+    log.info("Calling page: " + pageClass.getName());
+    tester.startPage(pageClass);
+    tester.assertRenderedPage(expectedRenderedPage);
+    ++counter;
   }
 }
