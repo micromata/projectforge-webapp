@@ -60,7 +60,7 @@ public class CallAllPagesTest extends WicketPageTestBase
   @Test
   public void testAllMountedPages()
   {
-    //testAllMountedPages(BrowserScreenWidthType.NARROW);
+    testAllMountedPages(BrowserScreenWidthType.NARROW);
     testAllMountedPages(BrowserScreenWidthType.NORMAL);
     testAllMountedPages(BrowserScreenWidthType.WIDE);
     testPage(LoginPage.class);
