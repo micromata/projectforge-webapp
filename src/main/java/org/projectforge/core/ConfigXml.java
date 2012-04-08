@@ -81,8 +81,6 @@ import org.projectforge.xml.stream.XmlOmitField;
 @XmlObject(alias = "config")
 public class ConfigXml
 {
-  public static final String[] LOCALIZATIONS = { "en", "de"};
-
   private static transient final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ConfigXml.class);
 
   private static transient final Set<String> nonExistingResources = new HashSet<String>();

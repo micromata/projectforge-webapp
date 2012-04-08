@@ -60,6 +60,7 @@ import org.projectforge.user.UserRight;
 import org.projectforge.user.UserRightDao;
 import org.projectforge.user.UserRightVO;
 import org.projectforge.user.UserRightValue;
+import org.projectforge.web.I18nCore;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.common.TwoListHelper;
 import org.projectforge.web.wicket.AbstractEditForm;
@@ -194,7 +195,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.locale"));
     final LabelValueChoiceRenderer<Locale> localeChoiceRenderer = new LabelValueChoiceRenderer<Locale>();
     localeChoiceRenderer.addValue(null, gridBuilder.getString("user.defaultLocale"));
-    for (final String str : ConfigXml.LOCALIZATIONS) {
+    for (final String str : I18nCore.LOCALIZATIONS) {
       localeChoiceRenderer.addValue(new Locale(str), gridBuilder.getString("locale." + str));
     }
     @SuppressWarnings("serial")
@@ -212,7 +213,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       @Override
       protected Locale convertChoiceIdToChoice(final String id)
       {
-        if (StringHelper.isIn(id, ConfigXml.LOCALIZATIONS) == true) {
+        if (StringHelper.isIn(id, I18nCore.LOCALIZATIONS) == true) {
           return new Locale(id);
         } else {
           return null;

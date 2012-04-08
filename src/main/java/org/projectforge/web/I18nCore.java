@@ -32,6 +32,11 @@ import java.util.Locale;
 public class I18nCore
 {
   /**
+   * If you add new languages don't forget to add the I18nResources_##.properties also for all used plugins.
+   */
+  public static final String[] LOCALIZATIONS = { "en", "de"};
+
+  /**
    * The datepicker locale is used for localization of the DatePicker. If you add a new language please add also the datepicker translation
    * file jquery.ui.datepicker-de.js (replace de by your language short cut).
    * @param locale
