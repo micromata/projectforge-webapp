@@ -60,7 +60,6 @@ public class BookDO extends DefaultBaseDO
 
   private static final long serialVersionUID = 8036741307214351813L;
 
-  @IndexedEmbedded
   private TaskDO task;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -69,7 +68,7 @@ public class BookDO extends DefaultBaseDO
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String keywords; // 1024
 
-  @IndexedEmbedded
+  @IndexedEmbedded(depth = 1)
   private PFUserDO lendOutBy;
 
   @Field(index = Index.UN_TOKENIZED)
@@ -115,7 +114,7 @@ public class BookDO extends DefaultBaseDO
     return publisher;
   }
 
-  public BookDO setPublisher(String publisher)
+  public BookDO setPublisher(final String publisher)
   {
     this.publisher = publisher;
     return this;
@@ -127,7 +126,7 @@ public class BookDO extends DefaultBaseDO
     return editor;
   }
 
-  public BookDO setEditor(String editor)
+  public BookDO setEditor(final String editor)
   {
     this.editor = editor;
     return this;
@@ -139,7 +138,7 @@ public class BookDO extends DefaultBaseDO
     return authors;
   }
 
-  public BookDO setAuthors(String authors)
+  public BookDO setAuthors(final String authors)
   {
     this.authors = authors;
     return this;
@@ -151,7 +150,7 @@ public class BookDO extends DefaultBaseDO
     return comment;
   }
 
-  public BookDO setComment(String comment)
+  public BookDO setComment(final String comment)
   {
     this.comment = comment;
     return this;
@@ -163,7 +162,7 @@ public class BookDO extends DefaultBaseDO
     return isbn;
   }
 
-  public BookDO setIsbn(String isbn)
+  public BookDO setIsbn(final String isbn)
   {
     this.isbn = isbn;
     return this;
@@ -175,7 +174,7 @@ public class BookDO extends DefaultBaseDO
     return signature;
   }
 
-  public BookDO setSignature(String signature)
+  public BookDO setSignature(final String signature)
   {
     this.signature = signature;
     return this;
@@ -220,7 +219,7 @@ public class BookDO extends DefaultBaseDO
     return lendOutBy;
   }
 
-  public BookDO setLendOutBy(PFUserDO lendOutBy)
+  public BookDO setLendOutBy(final PFUserDO lendOutBy)
   {
     this.lendOutBy = lendOutBy;
     return this;
@@ -240,7 +239,7 @@ public class BookDO extends DefaultBaseDO
     return lendOutDate;
   }
 
-  public BookDO setLendOutDate(Date lendOutDate)
+  public BookDO setLendOutDate(final Date lendOutDate)
   {
     this.lendOutDate = lendOutDate;
     return this;
@@ -252,7 +251,7 @@ public class BookDO extends DefaultBaseDO
     return lendOutComment;
   }
 
-  public BookDO setLendOutComment(String lendOutComment)
+  public BookDO setLendOutComment(final String lendOutComment)
   {
     this.lendOutComment = lendOutComment;
     return this;
@@ -264,7 +263,7 @@ public class BookDO extends DefaultBaseDO
     return keywords;
   }
 
-  public BookDO setKeywords(String keywords)
+  public BookDO setKeywords(final String keywords)
   {
     this.keywords = keywords;
     return this;
@@ -276,7 +275,7 @@ public class BookDO extends DefaultBaseDO
     return abstractText;
   }
 
-  public BookDO setAbstractText(String abstractText)
+  public BookDO setAbstractText(final String abstractText)
   {
     this.abstractText = abstractText;
     return this;
@@ -293,7 +292,7 @@ public class BookDO extends DefaultBaseDO
     return task;
   }
 
-  public BookDO setTask(TaskDO task)
+  public BookDO setTask(final TaskDO task)
   {
     this.task = task;
     return this;
@@ -313,7 +312,7 @@ public class BookDO extends DefaultBaseDO
     return title;
   }
 
-  public BookDO setTitle(String title)
+  public BookDO setTitle(final String title)
   {
     this.title = title;
     return this;
@@ -325,7 +324,7 @@ public class BookDO extends DefaultBaseDO
     return yearOfPublishing;
   }
 
-  public BookDO setYearOfPublishing(String yearOfPublishing)
+  public BookDO setYearOfPublishing(final String yearOfPublishing)
   {
     this.yearOfPublishing = yearOfPublishing;
     return this;
@@ -338,7 +337,7 @@ public class BookDO extends DefaultBaseDO
     return status;
   }
 
-  public BookDO setStatus(BookStatus status)
+  public BookDO setStatus(final BookStatus status)
   {
     this.status = status;
     return this;
@@ -351,7 +350,7 @@ public class BookDO extends DefaultBaseDO
     return type;
   }
 
-  public BookDO setType(BookType type)
+  public BookDO setType(final BookType type)
   {
     this.type = type;
     return this;
