@@ -50,6 +50,9 @@ public class PhoneCallPage extends AbstractSecuredPage
 
   public final static String PARAMETER_KEY_NUMBER = "number";
 
+  protected static final String[] BOOKMARKABLE_SELECT_PROPERTIES = new String[] { PARAMETER_KEY_ADDRESS_ID + "|address",
+    PARAMETER_KEY_NUMBER + "|no"};
+
   private static final String SEPARATOR = " | ";
 
   private static final String USER_PREF_KEY_MY_RECENT_PHONE_ID = "PhoneCall:recentPhoneId";
@@ -66,42 +69,34 @@ public class PhoneCallPage extends AbstractSecuredPage
   public PhoneCallPage(final PageParameters parameters)
   {
     super(parameters);
-    log.warn("**** WICKET 1.5 migration: add bookmarkable parameters");
     form = new PhoneCallForm(this);
     body.add(form);
+    evaluateInitialPageParameters(getPageParameters());
     form.init();
-    parseParameters(parameters);
   }
 
-  // @Override
-  // protected PageParameters getBookmarkPageExtendedParameters()
-  // {
-  // final PageParameters pageParameters = new PageParameters();
-  // final String phoneNumber = form.getPhoneNumber();
-  // if (phoneNumber != null) {
-  // pageParameters.add(PARAMETER_KEY_NUMBER, phoneNumber);
-  // }
-  // return pageParameters;
-  // }
-
-  private void parseParameters(final PageParameters parameters)
+  public Integer getAddressId()
   {
-    if (parameters.get(PARAMETER_KEY_ADDRESS_ID) != null) {
-      final String str = parameters.get(PARAMETER_KEY_ADDRESS_ID).toString();
-      final Integer addressId = NumberHelper.parseInteger(str);
-      if (addressId == null)
-        return;
+    return form.address != null ? form.address.getId() : null;
+  }
+
+  public void setAddressId(final Integer addressId)
+  {
+    if (addressId != null) {
       final AddressDO address = addressDao.getById(addressId);
-      if (address == null) {
-        return;
-      }
       form.address = address;
     }
-    if (parameters.get(PARAMETER_KEY_NUMBER) != null) {
-      final String number = parameters.get(PARAMETER_KEY_NUMBER).toString();
-      if (StringUtils.isNotBlank(number) == true) {
-        form.setPhoneNumber(extractPhonenumber(number));
-      }
+  }
+
+  public String getNumber()
+  {
+    return form.phoneNumber;
+  }
+
+  public void setNumber(final String number)
+  {
+    if (StringUtils.isNotBlank(number) == true) {
+      form.setPhoneNumber(extractPhonenumber(number));
     }
   }
 
@@ -276,6 +271,21 @@ public class PhoneCallPage extends AbstractSecuredPage
   {
     super.onAfterRender();
     result = null;
+  }
+
+  /**
+   * @return This page as link with the page parameters of this page.
+   */
+  @Override
+  public String getPageAsLink()
+  {
+    return getPageAsLink(new PageParameters());
+  }
+
+  @Override
+  protected String[] getBookmarkableInitialProperties()
+  {
+    return BOOKMARKABLE_SELECT_PROPERTIES;
   }
 
   @Override

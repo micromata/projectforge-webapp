@@ -85,7 +85,7 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
 
   private DivPanel addressPanel;
 
-  private String phoneNumber;
+  protected String phoneNumber;
 
   private String myCurrentPhoneId;
 
@@ -247,9 +247,11 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
       }
     };
     numberTextField.withLabelValue(true).withMatchContains(true).withMinChars(2).withFocus(true).withAutoSubmit(true);
-    final String recentNumber = getRecentSearchTermsQueue().get(0);
-    if (StringUtils.isNotBlank(recentNumber) == true) {
-      phoneNumber = recentNumber;
+    if (StringUtils.isBlank(phoneNumber) == true) {
+      final String recentNumber = getRecentSearchTermsQueue().get(0);
+      if (StringUtils.isNotBlank(recentNumber) == true) {
+        phoneNumber = recentNumber;
+      }
     }
     fs.add(numberTextField);
     fs.addKeyboardHelpIcon(getString("address.directCall.number.tooltip"));
