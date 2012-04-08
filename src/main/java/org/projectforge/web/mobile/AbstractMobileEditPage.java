@@ -91,7 +91,7 @@ extends AbstractSecuredMobilePage implements IEditPage<O, D>
         data = getBaseDao().getById(id);
       }
       if (data == null) {
-        data = (O) getPageParameters().get(AbstractEditPage.PARAMETER_KEY_DATA_PRESET).to(getBaseDao().getDOClass());
+        data = (O) WicketUtils.getAsObject(getPageParameters(), AbstractEditPage.PARAMETER_KEY_DATA_PRESET, getBaseDao().newInstance().getClass());
         if (data == null) {
           data = getBaseDao().newInstance();
         }
@@ -120,7 +120,7 @@ extends AbstractSecuredMobilePage implements IEditPage<O, D>
   @Override
   protected void addTopRightButton()
   {
-    if (editMode == false) {
+    if (editMode == false && getData().getId() != null) {
       final PageParameters params = new PageParameters();
       params.add(AbstractEditPage.PARAMETER_KEY_ID, getData().getId());
       params.add(PARAMETER_KEY_EDIT, true);
