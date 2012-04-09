@@ -69,6 +69,8 @@ public class ConfigXmlTest
       + "    <holiday id='SHROVE_TUESDAY' ignore='true'/>\n"
       + "    <holiday id='SYLVESTER' workingDay='true' workFraction='0.5'/>\n"
       + "  </holidays>\n"
+      + "  <databaseDirectory>database</databaseDirectory>\n"
+      + "  <loggingDirectory>log</loggingDirectory>\n"
       + "  <workingDirectory>work</workingDirectory>\n"
       + "  <tempDirectory>tmp</tempDirectory>\n"
       + "  <accountingConfig/>\n"
