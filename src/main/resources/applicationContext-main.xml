@@ -3,18 +3,6 @@
 <beans default-lazy-init="false" default-autowire="no">
 
   <bean id="propertyConfigurer" class="org.springframework.web.context.support.ServletContextPropertyPlaceholderConfigurer" />
-  <bean id="log4jInit" class="org.projectforge.core.Log4Jinitialization">
-    <property name="configLocations">
-      <list>
-        <value>classpath*:log4j.properties</value>
-      </list>
-    </property>
-    <property name="configProperties">
-      <props>
-        <prop key="logDir">${base.dir}/logs</prop>
-      </props>
-    </property>
-  </bean>
   <!--bean id="debugging" class="de.micromata.printing.common.DebuggingWebAttribute" / -->
   <!-- Sample database -->
   <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">

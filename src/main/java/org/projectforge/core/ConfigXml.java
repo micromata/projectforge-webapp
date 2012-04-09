@@ -51,6 +51,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
+import org.apache.log4j.PropertyConfigurator;
 import org.apache.poi.ss.usermodel.PrintSetup;
 import org.projectforge.calendar.ConfigureHoliday;
 import org.projectforge.common.FileHelper;
@@ -88,6 +89,10 @@ public class ConfigXml
   private static transient final Set<String> existingResources = new HashSet<String>();
 
   private static transient ConfigXml instance;
+
+  private static final String LOG4J_PROPERTY_FILE = "log4j.properties";
+
+  private static final String LOG4J_PROPERTY_SOURCE_FILE = "appHomeDir-log4j.properties";
 
   private transient final List<ConfigurationListener> listeners = new ArrayList<ConfigurationListener>();
 
@@ -132,6 +137,10 @@ public class ConfigXml
   private transient short excelDefaultPaperSizeValue = -42;
 
   private transient File configFile;
+
+  private String databaseDirectory;
+
+  private String loggingDirectory;
 
   private String workingDirectory;
 
@@ -201,6 +210,8 @@ public class ConfigXml
     excelDefaultPaperSize = "DINA4";
     holidays = null;
     contractTypes = null;
+    databaseDirectory = "database";
+    loggingDirectory = "log";
     workingDirectory = "work";
     tempDirectory = "tmp";
     servletContextPath = null;
@@ -245,7 +256,26 @@ public class ConfigXml
     final File dir = new File(this.applicationHomeDir);
     final boolean status = ensureDir(dir);
     if (status == true) {
+      final File log4j = new File(this.applicationHomeDir, LOG4J_PROPERTY_FILE);
+      if (log4j.canRead() == false) {
+        try {
+          log.info("Creating new log4j.properties in application's home dir: " + LOG4J_PROPERTY_FILE);
+          final ClassLoader cLoader = getClass().getClassLoader();
+          final InputStream is = cLoader.getResourceAsStream(LOG4J_PROPERTY_SOURCE_FILE);
+          FileUtils.copyInputStreamToFile(is, log4j);
+        } catch (final IOException ex) {
+          log.error("Exception encountered while copiing " + LOG4J_PROPERTY_FILE + ": " + ex, ex);
+        }
+      }
+      if (log4j.canRead() == true) {
+        log.info("Read log4j configuration: "+ log4j.getAbsolutePath());
+        PropertyConfigurator.configure(log4j.getAbsolutePath());
+      }
       readConfiguration();
+      this.databaseDirectory = FileHelper.getAbsolutePath(applicationHomeDir, this.databaseDirectory);
+      ensureDir(new File(databaseDirectory));
+      this.loggingDirectory = FileHelper.getAbsolutePath(applicationHomeDir, this.loggingDirectory);
+      ensureDir(new File(loggingDirectory));
       this.workingDirectory = FileHelper.getAbsolutePath(applicationHomeDir, this.workingDirectory);
       ensureDir(new File(workingDirectory));
       this.tempDirectory = FileHelper.getAbsolutePath(applicationHomeDir, this.tempDirectory);
@@ -720,6 +750,40 @@ public class ConfigXml
       this.applicationsResourcePath = file.getAbsolutePath();
     }
     return applicationsResourcePath;
+  }
+
+  /**
+   * @return the databaseDirectory
+   */
+  public String getDatabaseDirectory()
+  {
+    return databaseDirectory;
+  }
+
+  /**
+   * @param databaseDirectory the databaseDirectory to set absolute or relative to the application's home dir.
+   * @return this for chaining.
+   */
+  public void setDatabaseDirectory(final String databaseDirectory)
+  {
+    this.databaseDirectory = databaseDirectory;
+  }
+
+  /**
+   * @return the loggingDirectory
+   */
+  public String getLoggingDirectory()
+  {
+    return loggingDirectory;
+  }
+
+  /**
+   * @param loggingDirectory the loggingDirectory to set absolute or relative to the application's home dir.
+   * @return this for chaining.
+   */
+  public void setLoggingDirectory(final String loggingDirectory)
+  {
+    this.loggingDirectory = loggingDirectory;
   }
 
   /**
