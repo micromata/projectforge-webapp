@@ -53,6 +53,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.poi.ss.usermodel.PrintSetup;
+import org.projectforge.AppVersion;
 import org.projectforge.calendar.ConfigureHoliday;
 import org.projectforge.common.FileHelper;
 import org.projectforge.common.StringHelper;
@@ -82,6 +83,9 @@ import org.projectforge.xml.stream.XmlOmitField;
 @XmlObject(alias = "config")
 public class ConfigXml
 {
+  // If change this, please change it also in EmbeddedJetty. If true then no log4j is initialized.
+  private static final String SYSTEM_PROPERTY_STANDALONE = "ProjectForge.standalone";
+
   private static transient final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ConfigXml.class);
 
   private static transient final Set<String> nonExistingResources = new HashSet<String>();
@@ -211,7 +215,7 @@ public class ConfigXml
     holidays = null;
     contractTypes = null;
     databaseDirectory = "database";
-    loggingDirectory = "log";
+    loggingDirectory = "logs";
     workingDirectory = "work";
     tempDirectory = "tmp";
     servletContextPath = null;
@@ -256,20 +260,25 @@ public class ConfigXml
     final File dir = new File(this.applicationHomeDir);
     final boolean status = ensureDir(dir);
     if (status == true) {
-      final File log4j = new File(this.applicationHomeDir, LOG4J_PROPERTY_FILE);
-      if (log4j.canRead() == false) {
-        try {
-          log.info("Creating new log4j.properties in application's home dir: " + LOG4J_PROPERTY_FILE);
-          final ClassLoader cLoader = getClass().getClassLoader();
-          final InputStream is = cLoader.getResourceAsStream(LOG4J_PROPERTY_SOURCE_FILE);
-          FileUtils.copyInputStreamToFile(is, log4j);
-        } catch (final IOException ex) {
-          log.error("Exception encountered while copiing " + LOG4J_PROPERTY_FILE + ": " + ex, ex);
+      if ("true".equals(System.getProperty(SYSTEM_PROPERTY_STANDALONE)) == true) {
+        log.info("Do not initialize log4j.properties. It's done by the standalone application of " + AppVersion.APP_ID + ".");
+      } else {
+        // Initialize log4j (not in standalone version):
+        final File log4j = new File(this.applicationHomeDir, LOG4J_PROPERTY_FILE);
+        if (log4j.canRead() == false) {
+          try {
+            log.info("Creating new log4j.properties in application's home dir: " + LOG4J_PROPERTY_FILE);
+            final ClassLoader cLoader = getClass().getClassLoader();
+            final InputStream is = cLoader.getResourceAsStream(LOG4J_PROPERTY_SOURCE_FILE);
+            FileUtils.copyInputStreamToFile(is, log4j);
+          } catch (final IOException ex) {
+            log.error("Exception encountered while copiing " + LOG4J_PROPERTY_FILE + ": " + ex, ex);
+          }
         }
-      }
-      if (log4j.canRead() == true) {
-        log.info("Read log4j configuration: "+ log4j.getAbsolutePath());
-        PropertyConfigurator.configure(log4j.getAbsolutePath());
+        if (log4j.canRead() == true) {
+          log.info("Read log4j configuration: " + log4j.getAbsolutePath());
+          PropertyConfigurator.configure(log4j.getAbsolutePath());
+        }
       }
       readConfiguration();
       this.databaseDirectory = FileHelper.getAbsolutePath(applicationHomeDir, this.databaseDirectory);
