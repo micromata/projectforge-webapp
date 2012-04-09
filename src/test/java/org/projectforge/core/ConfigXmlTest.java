@@ -70,7 +70,7 @@ public class ConfigXmlTest
       + "    <holiday id='SYLVESTER' workingDay='true' workFraction='0.5'/>\n"
       + "  </holidays>\n"
       + "  <databaseDirectory>database</databaseDirectory>\n"
-      + "  <loggingDirectory>log</loggingDirectory>\n"
+      + "  <loggingDirectory>logs</loggingDirectory>\n"
       + "  <workingDirectory>work</workingDirectory>\n"
       + "  <tempDirectory>tmp</tempDirectory>\n"
       + "  <accountingConfig/>\n"
