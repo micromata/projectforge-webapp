@@ -64,7 +64,7 @@ public class TestConfiguration
 
   public static synchronized void initAsTestConfiguration()
   {
-    System.setProperty("base.dir", new File(".").getAbsoluteFile().toString());
+    System.setProperty("base.dir", new File("./tmp").getAbsoluteFile().toString());
     ConfigXmlTest.createTestConfiguration();
     init(TEST_CONTEXT_FILES);
   }
