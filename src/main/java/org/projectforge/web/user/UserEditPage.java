@@ -57,10 +57,33 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
   @SpringBean(name = "userRightDao")
   private UserRightDao userRightDao;
 
+  protected boolean tutorialMode;
+
+  protected List<Integer> tutorialGroupsToAdd;
+
+  /**
+   * Used by the TutorialPage.
+   * @param tutorialUser
+   * @param tutorialGroupsToAdd
+   */
+  public UserEditPage(final PFUserDO tutorialUser, final List<Integer> tutorialGroupsToAdd)
+  {
+    super(new PageParameters(), "user");
+    this.tutorialGroupsToAdd = tutorialGroupsToAdd;
+    this.tutorialMode = true;
+    super.init(tutorialUser);
+    myInit();
+  }
+
   public UserEditPage(final PageParameters parameters)
   {
     super(parameters, "user");
     super.init();
+    myInit();
+  }
+
+  private void myInit()
+  {
     if (isNew() == true) {
       getData().setTimeZone(Configuration.getInstance().getDefaultTimeZone());
     }

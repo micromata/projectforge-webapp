@@ -84,8 +84,6 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 {
   public static final String TUTORIAL_DEFAULT_PASSWORD = "test";
 
-  public static final String TUTORIAL_ADD_GROUPS = "addGroups";
-
   private static final long serialVersionUID = 7872294377838461659L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserEditForm.class);
@@ -285,7 +283,9 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       // MEB mobile phone numbers
       final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.personalMebMobileNumbers"), true);
       fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(user, "personalMebMobileNumbers")));
-      fs.addHelpIcon(gridBuilder.getString("user.personalMebMobileNumbers.tooltip") + "<br/>" + gridBuilder.getString("user.personalMebMobileNumbers.format"));
+      fs.addHelpIcon(gridBuilder.getString("user.personalMebMobileNumbers.tooltip")
+          + "<br/>"
+          + gridBuilder.getString("user.personalMebMobileNumbers.format"));
     }
   }
 
@@ -486,17 +486,15 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     }
   }
 
-  @SuppressWarnings({ "unchecked", "serial"})
+  @SuppressWarnings("serial")
   private void addAssignedGroups(final boolean adminAccess)
   {
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.assignedGroups"), true).setLabelSide(false);
-    List<Integer> groupsToAdd = null;
     if (data != null) {
-      if (TUTORIAL_DEFAULT_PASSWORD.equals(data.getPassword()) == true) {
+      if (parentPage.tutorialMode == true && TUTORIAL_DEFAULT_PASSWORD.equals(data.getPassword()) == true) {
         encryptedPassword = ((UserDao) getBaseDao()).encryptPassword(TUTORIAL_DEFAULT_PASSWORD);
         password = passwordRepeat = MAGIC_PASSWORD;
       }
-      groupsToAdd = (List<Integer>) WicketUtils.getAsObject(parentPage.getPageParameters(), TUTORIAL_ADD_GROUPS, List.class);
     }
     final List<KeyValueBean<Integer, String>> fullList = new ArrayList<KeyValueBean<Integer, String>>();
     final List<GroupDO> result = groupDao.getList(groupDao.getDefaultFilter());
@@ -511,8 +509,8 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       }
     }
     this.groups = new TwoListHelper<Integer, String>(fullList, assignedGroups);
-    if (groupsToAdd != null) {
-      groups.assign(groupsToAdd);
+    if (parentPage.tutorialGroupsToAdd != null) {
+      groups.assign(parentPage.tutorialGroupsToAdd);
     }
     this.groups.sortLists();
     valuesToUnassignChoice = new ListMultipleChoice<Integer>(fs.getListChoiceId());

@@ -52,6 +52,16 @@ public class GroupEditPage extends AbstractEditPage<GroupDO, GroupEditForm, Grou
   @SpringBean(name = "groupDao")
   private GroupDao groupDao;
 
+  /**
+   * Used by the TutorialPage.
+   * @param group
+   */
+  public GroupEditPage(final GroupDO group)
+  {
+    super(new PageParameters(), "group");
+    super.init(group);
+  }
+
   public GroupEditPage(final PageParameters parameters)
   {
     super(parameters, "group");

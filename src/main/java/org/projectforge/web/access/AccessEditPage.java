@@ -42,6 +42,17 @@ public class AccessEditPage extends AbstractEditPage<GroupTaskAccessDO, AccessEd
   @SpringBean(name = "accessDao")
   private AccessDao accessDao;
 
+  /**
+   * Used by the TutorialPage.
+   * @param groupTaskAccess
+   */
+  public AccessEditPage(final GroupTaskAccessDO groupTaskAccess)
+  {
+    super(new PageParameters(), "access");
+    super.init(groupTaskAccess);
+  }
+
+
   public AccessEditPage(final PageParameters parameters)
   {
     super(parameters, "access");

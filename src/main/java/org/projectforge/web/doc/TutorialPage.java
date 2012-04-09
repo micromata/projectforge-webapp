@@ -136,11 +136,11 @@ public class TutorialPage extends AbstractSecuredPage
     if (doesEntryAlreadyExist(userDao, tutorialReference) == true) {
       return;
     }
-    final PageParameters params = new PageParameters();
     final PFUserDO user;
+    List<Integer> groupsToAdd = null;
     if ("linda".equals(reference) == true) {
       user = createUser("linda", "Evans", "Linda", "l.evans@javagurus.com", addTutorialReference("Project manager", tutorialReference));
-      params.add(UserEditForm.TUTORIAL_ADD_GROUPS, addGroups(user, ProjectForgeGroup.PROJECT_MANAGER));
+      groupsToAdd = addGroups(user, ProjectForgeGroup.PROJECT_MANAGER);
     } else if ("dave".equals(reference) == true) {
       user = createUser("dave", "Jones", "Dave", "d.jones@javagurus.com", addTutorialReference("Developer", tutorialReference));
     } else if ("betty".equals(reference) == true) {
@@ -150,8 +150,7 @@ public class TutorialPage extends AbstractSecuredPage
       setResponsePage(new MessagePage("tutorial.unknown").setWarning(true));
       return;
     }
-    params.add(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, user);
-    final UserEditPage userEditPage = new UserEditPage(params);
+    final UserEditPage userEditPage = new UserEditPage(user, groupsToAdd);
     setResponsePage(userEditPage);
   }
 
@@ -196,7 +195,6 @@ public class TutorialPage extends AbstractSecuredPage
     if (doesEntryAlreadyExist(taskDao, tutorialReference) == true) {
       return;
     }
-    final PageParameters params = new PageParameters();
     final TaskDO task;
     if (REF_TASK_JAVA_GURUS.equals(reference) == true) {
       task = createTask(taskTree.getRootTaskNode().getTask(), "Java Gurus inc.", tutorialReference);
@@ -207,8 +205,7 @@ public class TutorialPage extends AbstractSecuredPage
       setResponsePage(new MessagePage("tutorial.unknown").setWarning(true));
       return;
     }
-    params.add(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, task);
-    final TaskEditPage taskEditPage = new TaskEditPage(params);
+    final TaskEditPage taskEditPage = new TaskEditPage(task);
     setResponsePage(taskEditPage);
   }
 
@@ -227,7 +224,6 @@ public class TutorialPage extends AbstractSecuredPage
     if (doesEntryAlreadyExist(groupDao, tutorialReference) == true) {
       return;
     }
-    final PageParameters params = new PageParameters();
     final GroupDO group;
     if (REF_GROUP_JAVA_GURUS.equals(reference) == true) {
       group = createGroup("JavaGurus employees", "linda", "dave", "betty");
@@ -240,8 +236,7 @@ public class TutorialPage extends AbstractSecuredPage
     }
     if (group != null) {
       group.setDescription(tutorialReference);
-      params.add(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, group);
-      final GroupEditPage groupEditPage = new GroupEditPage(params);
+      final GroupEditPage groupEditPage = new GroupEditPage(group);
       setResponsePage(groupEditPage);
     }
   }
@@ -268,7 +263,6 @@ public class TutorialPage extends AbstractSecuredPage
     if (doesEntryAlreadyExist(accessDao, tutorialReference) == true) {
       return;
     }
-    final PageParameters params = new PageParameters();
     final GroupTaskAccessDO access;
     TaskDO task = null;
     GroupDO group = null;
@@ -288,8 +282,7 @@ public class TutorialPage extends AbstractSecuredPage
     if (task == null || group == null) {
       return;
     }
-    params.add(AbstractEditPage.PARAMETER_KEY_DATA_PRESET, access);
-    final AccessEditPage accessEditPage = new AccessEditPage(params);
+    final AccessEditPage accessEditPage = new AccessEditPage(access);
     setResponsePage(accessEditPage);
   }
 
