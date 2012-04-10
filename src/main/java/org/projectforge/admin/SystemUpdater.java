@@ -23,27 +23,17 @@
 
 package org.projectforge.admin;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.apache.commons.io.IOUtils;
-import org.projectforge.core.UserException;
 import org.projectforge.database.DatabaseUpdateDO;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.Table;
-import org.projectforge.scripting.GroovyExecutor;
-import org.projectforge.scripting.GroovyResult;
 import org.projectforge.user.PFUserContext;
-import org.projectforge.xml.stream.AliasMap;
-import org.projectforge.xml.stream.XmlObjectReader;
 
 /**
  * Checks whether the data-base is up-to-date or not.
@@ -56,9 +46,6 @@ public class SystemUpdater
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SystemUpdater.class);
 
   DatabaseUpdateDao databaseUpdateDao;
-
-  // Used for update scripts
-  private GroovyExecutor groovyExecutor;
 
   private SortedSet<UpdateEntry> updateEntries;
 
@@ -100,41 +87,6 @@ public class SystemUpdater
   }
 
   /**
-   * Reads the update-scripts.xml file.
-   */
-  public void readUpdateFile()
-  {
-    final String filename = "updates/update-scripts.xml";
-    final ClassLoader classLoader = this.getClass().getClassLoader();
-    final InputStream is = classLoader.getResourceAsStream(filename);
-    readUpdateFile(is);
-  }
-
-  /**
-   * Reads the update script file from the given input stream.
-   * @param is
-   */
-  @SuppressWarnings("unchecked")
-  public void readUpdateFile(final InputStream is)
-  {
-    instance = this; // Used by scripts.
-    final XmlObjectReader reader = new XmlObjectReader();
-    final AliasMap aliasMap = new AliasMap();
-    aliasMap.put(TreeSet.class, "projectforge-self-update");
-    reader.setAliasMap(aliasMap);
-    reader.initialize(UpdateEntryScript.class);
-    String xml = null;
-    try {
-      xml = IOUtils.toString(is);
-    } catch (IOException ex) {
-      log.error(ex.getMessage(), ex);
-      throw new UserException("Unsupported update script format (see log files for details).");
-    }
-    updateEntries = (SortedSet<UpdateEntry>) reader.read(xml); // Read all scripts from xml.
-    updateEntries.addAll(DatabaseCoreUpdates.getUpdateEntries());
-  }
-
-  /**
    * Runs the pre-check test of the first update entry in the list.
    * @return true if ALREADY_UPDATED, otherwise false.
    */
@@ -151,12 +103,12 @@ public class SystemUpdater
       updateEntry.setPreCheckStatus(updateEntry.runPreCheck());
       if (updateEntry.getPreCheckStatus() != UpdatePreCheckStatus.ALREADY_UPDATED) {
         log
-            .warn("*** Please note: The data-base perhaps has to be updated first before running the ProjectForge web app. Please login as administrator. Status '"
-                + updateEntry.getPreCheckStatus()
-                + "' for update entry '"
-                + updateEntry.getRegionId()
-                + "' "
-                + updateEntry.getVersion());
+        .warn("*** Please note: The data-base perhaps has to be updated first before running the ProjectForge web app. Please login as administrator. Status '"
+            + updateEntry.getPreCheckStatus()
+            + "' for update entry '"
+            + updateEntry.getRegionId()
+            + "' "
+            + updateEntry.getVersion());
         return false;
       }
     }
@@ -181,7 +133,9 @@ public class SystemUpdater
   {
     synchronized (this) {
       if (updateEntries == null) {
-        readUpdateFile();
+        instance = this; // Used by update entries.
+        updateEntries = new TreeSet<UpdateEntry>();
+        updateEntries.addAll(DatabaseCoreUpdates.getUpdateEntries());
       }
     }
     return updateEntries;
@@ -197,9 +151,9 @@ public class SystemUpdater
     final Table table = new Table(DatabaseUpdateDO.class);
     if (databaseUpdateDao.doesTableExist(table.getName()) == true) {
       databaseUpdateDao.insertInto(table.getName(), new String[] { "update_date", "region_id", "version", "execution_result",
-          "executed_by_user_fk", "description"},
-          new Object[] { new Date(), updateEntry.getRegionId(), String.valueOf(updateEntry.getVersion()), updateEntry.getRunningResult(),
-              PFUserContext.getUserId(), updateEntry.getDescription()});
+        "executed_by_user_fk", "description"},
+        new Object[] { new Date(), updateEntry.getRegionId(), String.valueOf(updateEntry.getVersion()), updateEntry.getRunningResult(),
+        PFUserContext.getUserId(), updateEntry.getDescription()});
     } else {
       log.info("Data base table '" + table.getName() + "' doesn't (yet) exist. Can't register update (OK).");
     }
@@ -207,59 +161,8 @@ public class SystemUpdater
     runAllPreChecks();
   }
 
-  /**
-   * Method used by UpdateScriptEntry for executing the groovy stuff.
-   * @param updateScript
-   * @return
-   */
-  UpdatePreCheckStatus runPreCheck(final UpdateEntryScript updateScript)
-  {
-    final GroovyResult result = execute(updateScript.getPreCheck());
-    updateScript.setPreCheckResult(result);
-    return (UpdatePreCheckStatus) result.getResult();
-  }
-
-  /**
-   * Method used by UpdateScriptEntry for executing the groovy stuff.
-   * @param updateScript
-   * @return
-   */
-  UpdateRunningStatus runUpdate(final UpdateEntryScript updateScript)
-  {
-    log.info("Updating script " + updateScript.getVersion());
-    runPreCheck(updateScript);
-    if (UpdatePreCheckStatus.OK != updateScript.getPreCheckStatus()) {
-      log.error("Pre-check failed. Aborting.");
-      return UpdateRunningStatus.FAILED;
-    }
-    final GroovyResult result = execute(updateScript.getScript());
-    updateScript.setRunningResult(result);
-    if (result != null) {
-      return (UpdateRunningStatus) result.getResult();
-    }
-    return UpdateRunningStatus.UNKNOWN;
-  }
-
-  GroovyResult execute(final String script)
-  {
-    final Map<String, Object> scriptVariables = new HashMap<String, Object>();
-    scriptVariables.put("dao", databaseUpdateDao);
-    scriptVariables.put("log", log);
-    final StringBuffer buf = new StringBuffer();
-    buf.append("import org.projectforge.admin.*;\n")//
-        .append("import org.projectforge.database.*;\n\n")//
-        .append(script);
-    final GroovyResult groovyResult = groovyExecutor.execute(buf.toString(), scriptVariables);
-    return groovyResult;
-  }
-
   public void setDatabaseUpdateDao(final DatabaseUpdateDao databaseUpdateDao)
   {
     this.databaseUpdateDao = databaseUpdateDao;
-  }
-
-  public void setGroovyExecutor(GroovyExecutor groovyExecutor)
-  {
-    this.groovyExecutor = groovyExecutor;
   }
 }
