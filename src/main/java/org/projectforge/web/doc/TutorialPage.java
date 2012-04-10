@@ -48,7 +48,6 @@ import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.access.AccessEditPage;
 import org.projectforge.web.task.TaskEditPage;
 import org.projectforge.web.user.GroupEditPage;
-import org.projectforge.web.user.UserEditForm;
 import org.projectforge.web.user.UserEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -177,7 +176,6 @@ public class TutorialPage extends AbstractSecuredPage
     user.setLastname(lastName);
     user.setFirstname(firstName);
     user.setDescription(description);
-    user.setPassword(UserEditForm.TUTORIAL_DEFAULT_PASSWORD);
     return user;
   }
 

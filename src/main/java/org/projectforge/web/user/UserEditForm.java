@@ -82,8 +82,6 @@ import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
 
 public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 {
-  public static final String TUTORIAL_DEFAULT_PASSWORD = "test";
-
   private static final long serialVersionUID = 7872294377838461659L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserEditForm.class);
@@ -490,12 +488,6 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
   private void addAssignedGroups(final boolean adminAccess)
   {
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.assignedGroups"), true).setLabelSide(false);
-    if (data != null) {
-      if (parentPage.tutorialMode == true && TUTORIAL_DEFAULT_PASSWORD.equals(data.getPassword()) == true) {
-        encryptedPassword = ((UserDao) getBaseDao()).encryptPassword(TUTORIAL_DEFAULT_PASSWORD);
-        password = passwordRepeat = MAGIC_PASSWORD;
-      }
-    }
     final List<KeyValueBean<Integer, String>> fullList = new ArrayList<KeyValueBean<Integer, String>>();
     final List<GroupDO> result = groupDao.getList(groupDao.getDefaultFilter());
     for (final GroupDO group : result) {
