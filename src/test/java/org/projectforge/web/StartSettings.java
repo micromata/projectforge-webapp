@@ -56,7 +56,7 @@ public class StartSettings
 
   private boolean usingCookies = true;
 
-  private static final String DEFAULT_JDBC_URL_HSQL_DB = "ProjectForgeDB";
+  private static final String DEFAULT_JDBC_URL_HSQL_DB = "database/ProjectForgeDB";
 
   private static final String DEFAULT_JDBC_URL_POSTGRESQL = "jdbc:postgresql://localhost:5432/projectforge";
 
