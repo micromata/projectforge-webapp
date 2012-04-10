@@ -31,22 +31,14 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
 import org.projectforge.admin.SystemUpdater;
 import org.projectforge.admin.UpdateEntry;
-import org.projectforge.admin.UpdateEntryScript;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
-import org.projectforge.web.wicket.DownloadUtils;
-import org.projectforge.xml.stream.XmlHelper;
-import org.projectforge.xml.stream.XmlObjectWriter;
 
 public class SystemUpdatePage extends AbstractSecuredPage
 {
   private static final long serialVersionUID = -7624191773850329338L;
-
-  public static final String DOWNLOAD_BASE_URL = "http://www.projectforge.org/downloads/";
-
-  public static final String UPDATE_URL = "https://www.projectforge.org/downloads/update-scripts.xml.gz";
 
   @SpringBean(name = "systemUpdater")
   protected SystemUpdater systemUpdater;
@@ -63,19 +55,6 @@ public class SystemUpdatePage extends AbstractSecuredPage
     body.add(form);
     form.init();
     refresh();
-  }
-
-  protected void downloadUpdateScript(final UpdateEntryScript updateScript)
-  {
-    final String filename = "update-script-" + updateScript.getVersion() + ".xml";
-    final XmlObjectWriter writer = new XmlObjectWriter();
-    final String script = writer.writeToXml(updateScript, true);
-    final StringBuffer buf = new StringBuffer();
-    buf.append(XmlHelper.XML_HEADER) //
-    .append("\n<projectforge-self-update>") //
-    .append(script) //
-    .append("\n</projectforge-self-update>");
-    DownloadUtils.setDownloadTarget(buf.toString().getBytes(), filename);
   }
 
   protected void update(final UpdateEntry updateEntry)
