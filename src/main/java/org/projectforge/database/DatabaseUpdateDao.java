@@ -242,19 +242,20 @@ public class DatabaseUpdateDao
     if (attr.isPrimaryKey() == true) {
       buf.append(getDatabaseSupport().getPrimaryKeyAttributeSuffix(attr));
     }
-    if (attr.isNullable() == false) {
-      buf.append(" NOT NULL");
-    }
-    if (StringUtils.isNotBlank(attr.getDefaultValue()) == true) {
-      buf.append(" DEFAULT(").append(attr.getDefaultValue()).append(")");
-    }
+    databaseSupport.addDefaultAndNotNull(buf, attr);
+    // if (attr.isNullable() == false) {
+    // buf.append(" NOT NULL");
+    // }
+    // if (StringUtils.isNotBlank(attr.getDefaultValue()) == true) {
+    // buf.append(" DEFAULT(").append(attr.getDefaultValue()).append(")");
+    // }
   }
 
   public void buildForeignKeyConstraint(final StringBuffer buf, final String table, final TableAttribute attr)
   {
     buf.append("ALTER TABLE ").append(table).append(" ADD CONSTRAINT ").append(table).append("_").append(attr.getName()).append(
         " FOREIGN KEY (").append(attr.getName()).append(") REFERENCES ").append(attr.getForeignTable()).append("(").append(
-        attr.getForeignAttribute()).append(");\n");
+            attr.getForeignAttribute()).append(");\n");
   }
 
   public boolean createTable(final Table table)
@@ -268,18 +269,6 @@ public class DatabaseUpdateDao
     buildCreateTableStatement(buf, table);
     execute(buf.toString());
     return true;
-  }
-
-  /**
-   * Use buildAddTableAttributesStatement instead.
-   * @deprecated
-   * @param buf
-   * @param table
-   * @param attributes
-   */
-  public void buildAddTableColumnsStatement(final StringBuffer buf, final String table, final TableAttribute... attributes)
-  {
-    buildAddTableAttributesStatement(buf, table, attributes);
   }
 
   public void buildAddTableAttributesStatement(final StringBuffer buf, final String table, final TableAttribute... attributes)
@@ -299,19 +288,7 @@ public class DatabaseUpdateDao
     }
   }
 
-  /**
-   * Use addTableAttributes instead.
-   * @deprecated
-   * @param table
-   * @param attributes
-   * @return
-   */
-  public boolean addTableColumns(final String table, final TableAttribute... attributes)
-  {
-    return addTableAttributes(table, attributes);
-  }
-
-  public boolean addTableAttributes(final String table, final TableAttribute... attributes)
+ public boolean addTableAttributes(final String table, final TableAttribute... attributes)
   {
     final StringBuffer buf = new StringBuffer();
     buildAddTableAttributesStatement(buf, table, attributes);

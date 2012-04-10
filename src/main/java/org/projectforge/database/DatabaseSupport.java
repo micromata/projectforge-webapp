@@ -23,6 +23,8 @@
 
 package org.projectforge.database;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * All data base dialect specific implementations should be placed here.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -71,8 +73,7 @@ public class DatabaseSupport
     } else {
       if (errorMessageShown == false) {
         errorMessageShown = true;
-        log
-        .warn("No data base optimization implemented for the used data base. Please contact the developer if you have an installation with mor than 10.000 time sheet entries for increasing performance");
+        log.warn("No data base optimization implemented for the used data base. Please contact the developer if you have an installation with mor than 10.000 time sheet entries for increasing performance");
       }
       // No optimization for this data base.
       return null;
@@ -128,6 +129,25 @@ public class DatabaseSupport
         return "DECIMAL(" + attr.getPrecision() + ", " + attr.getScale() + ")";
       default:
         throw new UnsupportedOperationException("Type '" + attr.getType() + "' not supported for the current database dialect: " + dialect);
+    }
+  }
+
+  public void addDefaultAndNotNull(final StringBuffer buf, final TableAttribute attr)
+  {
+    if (dialect != HibernateDialect.HSQL) {
+      if (attr.isNullable() == false) {
+        buf.append(" NOT NULL");
+      }
+      if (StringUtils.isNotBlank(attr.getDefaultValue()) == true) {
+        buf.append(" DEFAULT(").append(attr.getDefaultValue()).append(")");
+      }
+    } else {
+      if (StringUtils.isNotBlank(attr.getDefaultValue()) == true) {
+        buf.append(" DEFAULT '").append(attr.getDefaultValue()).append("'");
+      }
+      if (attr.isNullable() == false) {
+        buf.append(" NOT NULL");
+      }
     }
   }
 
