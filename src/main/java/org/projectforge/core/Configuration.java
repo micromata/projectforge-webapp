@@ -24,6 +24,7 @@
 package org.projectforge.core;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -255,7 +256,14 @@ public class Configuration extends AbstractCache
     }
     log.info("Initializing Configuration (ConfigurationDO parameters) ...");
     final Map<ConfigurationParam, Object> newMap = new HashMap<ConfigurationParam, Object>();
-    final List<ConfigurationDO> list = configurationDao.internalLoadAll();
+    List<ConfigurationDO> list;
+    try {
+      list = configurationDao.internalLoadAll();
+    } catch (final Exception ex) {
+      log.fatal(
+          "******* Exception while getting configuration parameters from data-base (only OK for migration from older versions): " + ex.getMessage());
+      list = new ArrayList<ConfigurationDO>();
+    }
     for (final ConfigurationParam param : ConfigurationParam.values()) {
       ConfigurationDO configuration = null;
       for (final ConfigurationDO entry : list) {
