@@ -83,6 +83,9 @@ import org.springframework.web.context.support.XmlWebApplicationContext;
  */
 public class WicketApplication extends WebApplication implements WicketApplicationInterface
 {
+  // If you change this you have to change this also in PFApplication. This is used for updating the hsqldb.
+  // private static final String SYSTEM_PROPERTY_HSQLDB_18_UPDATE = "hsqldb18Update";
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(WicketApplication.class);
 
   public static final String RESOURCE_BUNDLE_NAME = "I18nResources";
@@ -292,6 +295,17 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     final ConfigurableListableBeanFactory beanFactory = webApplicationContext.getBeanFactory();
     beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
     final LocalSessionFactoryBean localSessionFactoryBean = (LocalSessionFactoryBean) beanFactory.getBean("&sessionFactory");
+    // if ("true".equals(System.getProperty(SYSTEM_PROPERTY_HSQLDB_18_UPDATE)) == true) {
+    // try {
+    // log.info("Send SHUTDOWN COMPACT to upgrade data-base version:");
+    // final DataSource dataSource = (DataSource)beanFactory.getBean("dataSource");
+    // dataSource.getConnection().createStatement().execute("SHUTDOWN COMPACT");
+    // log.fatal("************ PLEASE RESTART APPLICATION NOW FOR PROPER INSTALLATION !!!!!!!!!!!!!! ************");
+    // return;
+    // } catch (final SQLException ex) {
+    // log.fatal("Data-base SHUTDOWN COMPACT failed: " + ex.getMessage());
+    // }
+    // }
     final org.hibernate.cfg.Configuration hibernateConfiguration = localSessionFactoryBean.getConfiguration();
     HibernateUtils.setConfiguration(hibernateConfiguration);
     final ServletContext servletContext = getServletContext();
