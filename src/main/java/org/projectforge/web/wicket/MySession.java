@@ -42,6 +42,7 @@ import org.projectforge.web.LayoutSettingsPage;
 import org.projectforge.web.UserAgentBrowser;
 import org.projectforge.web.UserAgentDetection;
 import org.projectforge.web.UserAgentDevice;
+import org.projectforge.web.UserAgentOS;
 
 public class MySession extends WebSession
 {
@@ -63,7 +64,7 @@ public class MySession extends WebSession
 
   private Version userAgentBrowserVersion = null;
 
-  // private UserAgentOS userAgentOS = UserAgentOS.UNKNOWN;
+  private UserAgentOS userAgentOS = UserAgentOS.UNKNOWN;
 
   private boolean mobileUserAgent;
 
@@ -81,7 +82,7 @@ public class MySession extends WebSession
       clientProperties.setTimeZone(PFUserContext.getTimeZone());
       userAgent = ((WebClientInfo) info).getUserAgent();
       userAgentDevice = UserAgentDevice.getUserAgentDevice(userAgent);
-      // userAgentOS = UserAgentOS.getUserAgentOS(userAgent);
+      userAgentOS = UserAgentOS.getUserAgentOS(userAgent);
       mobileUserAgent = userAgentDevice.isMobile();
       final UserAgentDetection userAgentDetection = UserAgentDetection.browserDetect(userAgent);
       userAgentBrowser = userAgentDetection.getUserAgentBrowser();
@@ -135,6 +136,14 @@ public class MySession extends WebSession
   }
 
   /**
+   * @return the userAgentOS
+   */
+  public UserAgentOS getUserAgentOS()
+  {
+    return userAgentOS;
+  }
+
+  /**
    * @return true, if the user agent device is an iPad, iPhone or iPod.
    */
   public boolean isIOSDevice()
@@ -170,6 +179,7 @@ public class MySession extends WebSession
         browserScreenWidthType = (BrowserScreenWidthType) UserXmlPreferencesCache.getDefaultInstance().getEntry(userId,
             LayoutSettingsPage.getBrowserScreenWidthUserPrefKey(this));
         if (browserScreenWidthType != null) {
+          // browser screen width for the device is given.
           return browserScreenWidthType;
         }
       }
