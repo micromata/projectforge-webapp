@@ -31,20 +31,23 @@ public class LayoutSettingsPage extends AbstractStandardFormPage
 {
   private static final String USER_PREF_BROWSER_SCREEN_WIDTH_KEY = "browserScreenWidth";
 
-  private static final String USER_PREF_BROWSER_SCREEN_WIDTH_MOBILE_KEY = "browserScreenWidthMobile";
-
   private static final long serialVersionUID = -5855547280552503160L;
 
   private final LayoutSettingsForm form;
 
   String result;
 
-  public static String getBrowserScreenWidthUserPrefKey(final MySession mySession) {
-    if (mySession.isMobileUserAgent() == true) {
-      return LayoutSettingsPage.USER_PREF_BROWSER_SCREEN_WIDTH_MOBILE_KEY;
-    } else {
-      return LayoutSettingsPage.USER_PREF_BROWSER_SCREEN_WIDTH_KEY;
+  public static String getBrowserScreenWidthUserPrefKey(final MySession mySession)
+  {
+    final UserAgentDevice device = mySession.getUserAgentDevice();
+    if (device != UserAgentDevice.UNKNOWN) {
+      return USER_PREF_BROWSER_SCREEN_WIDTH_KEY + "." + device;
     }
+    final UserAgentOS os = mySession.getUserAgentOS();
+    if (os != UserAgentOS.UNKNOWN) {
+      return USER_PREF_BROWSER_SCREEN_WIDTH_KEY + "." + os;
+    }
+    return USER_PREF_BROWSER_SCREEN_WIDTH_KEY;
   }
 
   public LayoutSettingsPage(final PageParameters parameters)
