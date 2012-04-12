@@ -57,7 +57,7 @@ public class AddressEditPage extends AbstractEditPage<AddressDO, AddressEditForm
   public AbstractSecuredBasePage afterSaveOrUpdate()
   {
     final AddressDO address = addressDao.getOrLoad(getData().getId());
-    final PersonalAddressDO personalAddress = form.personalAddress;
+    final PersonalAddressDO personalAddress = form.addressEditSupport.personalAddress;
     personalAddress.setAddress(address);
     personalAddressDao.setOwner(personalAddress, getUserId()); // Set current logged in user as owner.
     personalAddressDao.saveOrUpdate(personalAddress);
