@@ -1,0 +1,15 @@
+<html lang="en" xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+
+<body>
+  <h1>Represents a fieldset in a mobile form.</h1>
+  <wicket:panel>
+    <div data-role="fieldcontain" class="ui-field-contain ui-body ui-br" wicket:id="fieldset">
+      <label class="ui-input-text" wicket:id="label"><wicket:container wicket:id="labeltext">[field label]</wicket:container></label>
+      <wicket:container wicket:id="fields">[field(s)]</wicket:container>
+    </div>
+  </wicket:panel>
+</body>
+</html>
