@@ -80,6 +80,7 @@ class AddressEditSupport implements Serializable
 
   GridBuilder gridBuilder;
 
+  @SuppressWarnings("serial")
   public AddressEditSupport(final Form<AddressDO> form, final GridBuilder gridBuilder, final AddressDao addressDao,
       final PersonalAddressDao personalAddressDao, final AddressDO address)
   {
@@ -94,11 +95,6 @@ class AddressEditSupport implements Serializable
     if (personalAddress == null) {
       personalAddress = new PersonalAddressDO();
     }
-  }
-
-  @SuppressWarnings("serial")
-  public void init()
-  {
     form.add(new IFormValidator() {
       @Override
       public FormComponent< ? >[] getDependentFormComponents()

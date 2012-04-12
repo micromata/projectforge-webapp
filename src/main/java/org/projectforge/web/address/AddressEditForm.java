@@ -59,7 +59,6 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
   {
     super.init();
     addressEditSupport = new AddressEditSupport(this, gridBuilder, (AddressDao) getBaseDao(), personalAddressDao, data);
-    addressEditSupport.init();
     /* GRID8 - BLOCK */
     gridBuilder.newGrid8().newColumnsPanel().newColumnPanel(DivType.COL_50);
     addressEditSupport.addName();
