@@ -54,7 +54,6 @@ import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.web.access.AccessListPage;
 import org.projectforge.web.address.AddressListPage;
-import org.projectforge.web.address.AddressMobileListPage;
 import org.projectforge.web.address.PhoneCallPage;
 import org.projectforge.web.admin.AdminPage;
 import org.projectforge.web.admin.SystemUpdatePage;
@@ -86,8 +85,8 @@ import org.projectforge.web.meb.MebListPage;
 import org.projectforge.web.orga.ContractListPage;
 import org.projectforge.web.orga.PostausgangListPage;
 import org.projectforge.web.orga.PosteingangListPage;
-import org.projectforge.web.scripting.ScriptingPage;
 import org.projectforge.web.scripting.ScriptListPage;
+import org.projectforge.web.scripting.ScriptingPage;
 import org.projectforge.web.statistics.PersonalStatisticsPage;
 import org.projectforge.web.statistics.SystemStatisticsPage;
 import org.projectforge.web.task.TaskTreePage;
@@ -253,7 +252,7 @@ public class MenuItemRegistry
     // COMMON
     reg.register(common, MenuItemDefId.CALENDAR, 10, CalendarPage.class); // Visible for all.
     reg.register(common, MenuItemDefId.BOOK_LIST, 30, BookListPage.class); // Visible for all.
-    reg.register(common, MenuItemDefId.ADDRESS_LIST, 40, AddressListPage.class).setMobileMenu(AddressMobileListPage.class, 100); // Visible for all.
+    reg.register(common, MenuItemDefId.ADDRESS_LIST, 40, AddressListPage.class);//.setMobileMenu(AddressMobileListPage.class, 100); // Visible for all.
     reg.register(common, MenuItemDefId.PHONE_CALL, 50, PhoneCallPage.class);
     final MenuItemDef meb = new MenuItemDef(common, MenuItemDefId.MEB.getId(), 50, MenuItemDefId.MEB.getI18nKey(), MebListPage.class) {
       @Override
