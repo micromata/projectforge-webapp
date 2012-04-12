@@ -60,6 +60,8 @@ public abstract class AbstractMobilePage extends WebPage
 
   protected WebMarkupContainer rightButtonContainer;
 
+  protected WebMarkupContainer pageContainer;
+
   // iWebKit doesn't work completely with wicket tags such as wicket:panel etc.
   private static Boolean stripTags;
 
@@ -87,7 +89,8 @@ public abstract class AbstractMobilePage extends WebPage
     if (stripTags == null) {
       stripTags = Application.get().getMarkupSettings().getStripWicketTags();
     }
-    add(headerContainer = new WebMarkupContainer("header"));
+    add(pageContainer = new WebMarkupContainer("page"));
+    pageContainer.add(headerContainer = new WebMarkupContainer("header"));
     headerContainer.add(getTopCenter());
     add(new Label("windowTitle", new Model<String>() {
       @Override
@@ -103,11 +106,19 @@ public abstract class AbstractMobilePage extends WebPage
         return "<strong>" + escapeHtml(AppVersion.APP_TITLE) + "</strong>";
       }
     };
-    add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false).setRenderBodyOnly(false).setVisible(getUser() != null));
+    pageContainer.add(new Label("loggedInLabel", loggedInLabelModel).setEscapeModelStrings(false).setRenderBodyOnly(false)
+        .setVisible(getUser() != null));
     if (getWicketApplication().isDevelopmentSystem() == true) {
       // navigationContainer.add(AttributeModifier.replace("style", WebConstants.CSS_BACKGROUND_COLOR_RED));
     } else {
     }
+    pageContainer.add(AttributeModifier.append("data-title", new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return getTitle();
+      }
+    }));
   }
 
   @Override
@@ -120,7 +131,7 @@ public abstract class AbstractMobilePage extends WebPage
     // add(CSSPackageResource.getHeaderContribution("mobile/css/projectforge.css"));
     response.renderCSSReference("mobile/projectforge.css");
     response.renderJavaScriptReference("scripts/jquery/1.7.1/jquery.min.js");
-    //response.renderJavaScriptReference("mobile/jquery.mobile/myconfig.js");
+    // response.renderJavaScriptReference("mobile/jquery.mobile/myconfig.js");
     response.renderJavaScriptReference("mobile/jquery.mobile/jquery.mobile-1.0.1.min.js");
   }
 

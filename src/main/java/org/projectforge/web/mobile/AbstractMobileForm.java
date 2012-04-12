@@ -53,7 +53,7 @@ public abstract class AbstractMobileForm<F, P extends AbstractMobilePage> extend
    */
   protected GridBuilder newGridBuilder(final RepeatingView parent)
   {
-    return new GridBuilderMobileImpl(parent, getMySession());
+    return new GridBuilderMobileImpl(parent);
   }
 
   /**
@@ -61,6 +61,6 @@ public abstract class AbstractMobileForm<F, P extends AbstractMobilePage> extend
    */
   protected GridBuilder newGridBuilder(final DivPanel parent)
   {
-    return new GridBuilderMobileImpl(parent, getMySession());
+    return new GridBuilderMobileImpl(parent);
   }
 }

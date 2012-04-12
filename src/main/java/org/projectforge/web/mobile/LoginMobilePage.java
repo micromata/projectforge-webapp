@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -45,6 +46,8 @@ import org.projectforge.web.wicket.WicketUtils;
 
 public class LoginMobilePage extends AbstractMobilePage
 {
+  private static final long serialVersionUID = 313568971144109236L;
+
   @SpringBean(name = "configuration")
   private Configuration configuration;
 
@@ -86,15 +89,24 @@ public class LoginMobilePage extends AbstractMobilePage
     }
     setNoBackButton();
     form = new LoginMobileForm(this);
-    add(form);
+    pageContainer.add(form);
     form.init();
-    add(new FeedbackPanel("feedback").setOutputMarkupId(true));
+    pageContainer. add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
     if (StringUtils.isBlank(messageOfTheDay) == true) {
-      add(new Label("messageOfTheDay", "[invisible]").setVisible(false));
+      pageContainer. add(new Label("messageOfTheDay", "[invisible]").setVisible(false));
     } else {
-      add(new Label("messageOfTheDay", messageOfTheDay).setEscapeModelStrings(false));
+      pageContainer.add(new Label("messageOfTheDay", messageOfTheDay).setEscapeModelStrings(false));
     }
+    @SuppressWarnings("serial")
+    final Link<Void> goButton = new Link<Void>("goFullWebVersion") {
+      @Override
+      public final void onClick()
+      {
+        setResponsePage(LoginPage.class);
+      }
+    };
+    pageContainer. add(goButton);
   }
 
   @Override

@@ -91,7 +91,8 @@ extends AbstractSecuredMobilePage implements IEditPage<O, D>
         data = getBaseDao().getById(id);
       }
       if (data == null) {
-        data = (O) WicketUtils.getAsObject(getPageParameters(), AbstractEditPage.PARAMETER_KEY_DATA_PRESET, getBaseDao().newInstance().getClass());
+        data = (O) WicketUtils.getAsObject(getPageParameters(), AbstractEditPage.PARAMETER_KEY_DATA_PRESET, getBaseDao().newInstance()
+            .getClass());
         if (data == null) {
           data = getBaseDao().newInstance();
         }
@@ -99,7 +100,7 @@ extends AbstractSecuredMobilePage implements IEditPage<O, D>
     }
     form = newEditForm(this, data);
 
-    add(form);
+    pageContainer.add(form);
     form.init();
     // add(new Label("title", getString(AbstractEditPage.getTitleKey(i18nPrefix, isNew()))));
     this.editPageSupport = new EditPageSupport<O, D>(this, getBaseDao(), getData());

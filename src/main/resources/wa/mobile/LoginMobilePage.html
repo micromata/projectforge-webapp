@@ -7,33 +7,38 @@
 
 <body>
 
-<h1>Login page</h1>
-<wicket:extend>
-  <div wicket:id="feedback">[feedback]</div>
-  <span class="graytitle"><wicket:message key="login.welcome" /></span>
-  <form wicket:id="form" class="loginform">
+  <h1>Login page</h1>
+  <wicket:extend>
+    <div wicket:id="feedback">[feedback]</div>
+    <p class="graytitle"><wicket:message key="login.welcome" /></p>
+    <form wicket:id="form" class="loginform">
 
-  <table>
-    <tbody>
-      <tr>
-        <td><label for="username"><wicket:message key="username" /></label></td>
-        <td><input id="username" wicket:id="username" wicket:message="placeholder:username" type="text" /></td>
-      </tr>
-      <tr>
-        <td><label for="password"><wicket:message key="password" /></label></td>
-        <td><input id="password" wicket:id="password" wicket:message="placeholder:password" type="password" /></td>
-      </tr>
-      <tr>
-        <td colspan="2"><input type="checkbox" id="stayLoggedIn" wicket:id="stayLoggedIn" class="custom" /> <label for="stayLoggedIn"><wicket:message
-          key="login.stayLoggedIn" /></label></td>
-      </tr>
-    </tbody>
-  </table>
-  <p><a wicket:id="login" rel="external" data-role="button"><wicket:message key="login" /></a></p>
+      <table>
+        <tbody>
+          <tr>
+            <td><label for="username"><wicket:message key="username" /></label></td>
+            <td><input id="username" wicket:id="username" wicket:message="placeholder:username" type="text" /></td>
+          </tr>
+          <tr>
+            <td><label for="password"><wicket:message key="password" /></label></td>
+            <td><input id="password" wicket:id="password" wicket:message="placeholder:password" type="password" /></td>
+          </tr>
+          <tr>
+            <td colspan="2"><input type="checkbox" id="stayLoggedIn" wicket:id="stayLoggedIn" class="custom" /> <label for="stayLoggedIn"><wicket:message
+                  key="login.stayLoggedIn" /></label></td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <a wicket:id="login" rel="external" data-role="button"><wicket:message key="login" /></a>
+      </p>
 
-  </form>
-  <p wicket:id="messageOfTheDay">[Have a lot of fun!]</p>
-  <p style="color: grey;"><wicket:message key="mobile.loginPageInfo" /></p>
-</wicket:extend>
+    </form>
+    <p wicket:id="messageOfTheDay">[Have a lot of fun!]</p>
+    <p style="color: grey;">
+      <wicket:message key="mobile.loginPageInfo" />
+    </p>
+    <a wicket:id="goFullWebVersion" rel="external" data-role="button"><wicket:message key="menu.mobile.fullWebVersion" /></a>
+  </wicket:extend>
 </body>
 </html>

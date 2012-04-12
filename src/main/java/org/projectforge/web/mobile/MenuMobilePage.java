@@ -24,6 +24,7 @@
 package org.projectforge.web.mobile;
 
 import org.apache.wicket.Component;
+import org.apache.wicket.Page;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
@@ -70,7 +71,7 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
     this(new PageParameters());
   }
 
-  @SuppressWarnings( { "serial", "unchecked"})
+  @SuppressWarnings("serial")
   public MenuMobilePage(final PageParameters parameters)
   {
     super(parameters);
@@ -80,13 +81,13 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
         final RecentMobilePageInfo pageInfo = (RecentMobilePageInfo) userXmlPreferencesCache.getEntry(getUserId(),
             AbstractSecuredMobilePage.USER_PREF_RECENT_PAGE);
         if (pageInfo != null && pageInfo.getPageClass() != null) {
-          throw new RestartResponseException((Class) pageInfo.getPageClass(), pageInfo.restorePageParameters());
+          throw new RestartResponseException((Class< ? extends Page>) pageInfo.getPageClass(), pageInfo.restorePageParameters());
         }
       }
     }
     setNoBackButton();
     final ListViewPanel listViewPanel = new ListViewPanel("menu");
-    add(listViewPanel);
+    pageContainer.add(listViewPanel);
     listViewPanel.add(new ListViewItemPanel(listViewPanel.newChildId(), getString("menu.main.title")).setListDivider());
     final Menu menu = menuBuilder.getMobileMenu(PFUserContext.getUser());
     if (menu.getMenuEntries() != null) {
@@ -112,9 +113,9 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
     }, getString("menu.logout")) {
     });
     if (getMySession().isIOSDevice() == true) {
-      add(new Label("iOSHint", getString("mobile.iOS.startScreenInfo")));
+      pageContainer.add(new Label("iOSHint", getString("mobile.iOS.startScreenInfo")));
     } else {
-      add(new Label("iOSHint", getString("mobile.others.startScreenInfo")));
+      pageContainer.add(new Label("iOSHint", getString("mobile.others.startScreenInfo")));
     }
   }
 

@@ -55,7 +55,7 @@ extends AbstractSecuredMobilePage
     super(parameters);
     this.i18nKey = i18nKey;
     form = newListForm(this);
-    add(form);
+    pageContainer. add(form);
     form.init();
     setNoBackButton();
   }
@@ -67,7 +67,7 @@ extends AbstractSecuredMobilePage
       remove(listViewPanel);
     }
     list = (List<O>) getBaseDao().getList(form.filter);
-    add(listViewPanel = new ListViewPanel("listViewPage"));
+    pageContainer. add(listViewPanel = new ListViewPanel("listViewPage"));
     if (CollectionUtils.isEmpty(list) == true) {
       listViewPanel.setVisible(false);
       return;
