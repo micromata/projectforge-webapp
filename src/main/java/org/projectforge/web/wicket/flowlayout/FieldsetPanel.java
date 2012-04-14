@@ -31,18 +31,12 @@ import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.ListMultipleChoice;
-import org.apache.wicket.markup.html.form.PasswordTextField;
-import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
-import org.projectforge.web.WebConfiguration;
-import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.JiraIssuesPanel;
 
@@ -51,10 +45,8 @@ import org.projectforge.web.wicket.components.JiraIssuesPanel;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class FieldsetPanel extends Panel
+public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(FieldsetPanel.class);
-
   /**
    * Please use this only and only if you haven't multiple children. Please use {@link #newChildId()} instead.
    */
@@ -66,21 +58,11 @@ public class FieldsetPanel extends Panel
 
   private static final long serialVersionUID = -6318707656650110365L;
 
-  private final WebMarkupContainer fieldset, div;
-
-  private WebMarkupContainer label;
+  private final WebMarkupContainer div;
 
   private boolean labelSide = true;
 
-  private boolean rendered, labelFor, childAdded;
-
-  private final boolean multipleChildren;
-
   private Component labelSuffix, descriptionSuffix;
-
-  private String labelText;
-
-  private RepeatingView repeater;
 
   private DivPanel fieldDiv;
 
@@ -139,7 +121,7 @@ public class FieldsetPanel extends Panel
     this.labelText = labeltext;
     this.multipleChildren = multipleChildren;
     fieldset = new WebMarkupContainer("fieldset");
-    super.add(fieldset);
+    superAdd(fieldset);
     fieldset.add((label = new WebMarkupContainer("label")));
     label.add(new Label("labeltext", new Model<String>() {
       @Override
@@ -154,20 +136,6 @@ public class FieldsetPanel extends Panel
       label.add(WicketUtils.getInvisibleComponent("labeldescription"));
     }
     fieldset.add(div = new WebMarkupContainer("div"));
-  }
-
-  public FieldsetPanel setUnit(final String unit)
-  {
-    this.labelText = WicketUtils.getLabelWithUnit(labelText, unit);
-    return this;
-  }
-
-  /**
-   * @return the labelText
-   */
-  public String getLabel()
-  {
-    return labelText;
   }
 
   /**
@@ -193,16 +161,6 @@ public class FieldsetPanel extends Panel
   }
 
   /**
-   * Sets the background color of this whole fieldset to red.
-   * @return this for chaining.
-   */
-  public FieldsetPanel setWarningBackground()
-  {
-    fieldset.add(AttributeModifier.replace("style", WebConstants.CSS_BACKGROUND_COLOR_RED));
-    return this;
-  }
-
-  /**
    * @param descriptionSuffix the descriptionSuffix to set
    * @return this for chaining.
    */
@@ -210,28 +168,6 @@ public class FieldsetPanel extends Panel
   {
     this.descriptionSuffix = descriptionSuffix;
     label.add(descriptionSuffix);
-    return this;
-  }
-
-  public FieldsetPanel setLabelFor(final Component component)
-  {
-    if (component instanceof ComponentWrapperPanel) {
-      this.label.add(AttributeModifier.replace("for", ((ComponentWrapperPanel) component).getComponentOutputId()));
-    } else {
-      this.label.add(AttributeModifier.replace("for", component.getOutputMarkupId()));
-    }
-    labelFor = true;
-    return this;
-  }
-
-  /**
-   * Declares that there is no validation field which the label should set for. This has no other meaning and effect than not to display the
-   * development warning "No label set for field...'.
-   * @return
-   */
-  public FieldsetPanel setNoLabelFor()
-  {
-    labelFor = true;
     return this;
   }
 
@@ -246,94 +182,18 @@ public class FieldsetPanel extends Panel
   }
 
   /**
-   * @see org.apache.wicket.MarkupContainer#add(org.apache.wicket.Component[])
+   * @see org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel#modifyAddedChild(org.apache.wicket.Component)
    */
   @Override
-  public MarkupContainer add(final Component... childs)
+  protected void modifyAddedChild(final Component child)
   {
-    if (repeater == null) {
-      if (childAdded == true) {
-        throw new IllegalArgumentException("You can't add multiple children, please call constructor with multipleChildren=true.");
+    if (child instanceof InputPanel) {
+      final InputPanel inputPanel = (InputPanel) child;
+      if (inputPanel.getField() instanceof TextField) {
+        inputPanel.getField().add(AttributeModifier.append("class", "text"));
       }
-      childAdded = true;
-      checkLabelFor(childs);
-      return div.add(childs);
-    } else {
-      childAdded = true;
-      checkLabelFor(childs);
-      for (final Component component : childs) {
-        if (component instanceof InputPanel) {
-          final InputPanel inputPanel = (InputPanel) component;
-          if (inputPanel.getField() instanceof TextField) {
-            inputPanel.getField().add(AttributeModifier.append("class", "text"));
-          }
-        }
-      }
-      return repeater.add(childs);
     }
   }
-
-  /**
-   * @param textField
-   * @return The created InputPanel.
-   * @see InputPanel#InputPanel(String, Component)
-   */
-  public InputPanel add(final TextField< ? > textField)
-  {
-    final InputPanel input = new InputPanel(newChildId(), textField);
-    if (textField.getLabel() == null) {
-      textField.setLabel(new Model<String>(labelText));
-    }
-    add(input);
-    return input;
-  }
-
-  /**
-   * @param passwordField
-   * @return The created PasswordPanel.
-   * @see PasswordPanel#PasswordPanel(String, Component)
-   */
-  public PasswordPanel add(final PasswordTextField passwordField)
-  {
-    final PasswordPanel passwordInput = new PasswordPanel(newChildId(), passwordField);
-    if (passwordField.getLabel() == null) {
-      passwordField.setLabel(new Model<String>(labelText));
-    }
-    add(passwordInput);
-    return passwordInput;
-  }
-
-  /**
-   * @return The Wicket id of the embedded text field of InputPanel
-   */
-  public final String getTextFieldId()
-  {
-    return InputPanel.WICKET_ID;
-  }
-
-  /**
-   * @param textArea
-   * @return The created InputPanel.
-   * @see TextAreaPanel#TextAreaPanel(String, Component)
-   */
-  public TextAreaPanel add(final TextArea< ? > textArea)
-  {
-    final TextAreaPanel panel = new TextAreaPanel(newChildId(), textArea);
-    if (textArea.getLabel() == null) {
-      textArea.setLabel(new Model<String>(labelText));
-    }
-    add(panel);
-    return panel;
-  }
-
-  /**
-   * @return The Wicket id of the embedded text field of TextAreaPanel
-   */
-  public final String getTextAreaId()
-  {
-    return TextAreaPanel.WICKET_ID;
-  }
-
   /**
    * @param id
    * @param label
@@ -534,27 +394,11 @@ public class FieldsetPanel extends Panel
     return this;
   }
 
-  private void checkLabelFor(final Component... components)
-  {
-    if (labelFor == true) {
-      return;
-    }
-    final Component component = components[0];
-    if (component instanceof ComponentWrapperPanel) {
-      this.label.add(AttributeModifier.replace("for", ((ComponentWrapperPanel) component).getComponentOutputId()));
-      labelFor = true;
-    }
-    for (final Component comp : components) {
-      if (comp instanceof FormComponent) {
-        ((FormComponent< ? >) comp).setLabel(new Model<String>(getLabel()));
-      }
-    }
-  }
-
   /**
    * Creates and add a new RepeatingView as div-child if not already exist.
    * @see RepeatingView#newChildId()
    */
+  @Override
   public String newChildId()
   {
     if (multipleChildren == true) {
@@ -597,8 +441,6 @@ public class FieldsetPanel extends Panel
   protected void onBeforeRender()
   {
     if (rendered == false) {
-      // The first time of rendering this component, so do the rest before:
-      rendered = true;
       if (labelSide == true) {
         fieldset.add(AttributeModifier.append("class", "label_side"));
       }
@@ -608,14 +450,34 @@ public class FieldsetPanel extends Panel
       if (descriptionSuffix == null) {
         label.add(descriptionSuffix = WicketUtils.getInvisibleComponent("descriptionSuffix"));
       }
-      if (childAdded == false) {
-        childAdded = true;
-        div.add(WicketUtils.getInvisibleComponent(FIELDS_ID));
-      }
-    }
-    if (labelFor == false && WebConfiguration.isDevelopmentMode() == true) {
-      log.warn("No label set for field '" + labelText + "'. Please call setLabelFor(component) for this fieldset.");
     }
     super.onBeforeRender();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel#addChild(org.apache.wicket.Component[])
+   */
+  @Override
+  protected MarkupContainer addChild(final Component... childs)
+  {
+    return div.add(childs);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel#addInvisibleChild()
+   */
+  @Override
+  protected void addInvisibleChild()
+  {
+    div.add(WicketUtils.getInvisibleComponent(FIELDS_ID));
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel#getThis()
+   */
+  @Override
+  protected FieldsetPanel getThis()
+  {
+    return this;
   }
 }
