@@ -44,7 +44,7 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
 
   private TaskTree taskTree;
 
-  private TaskFormatter taskFormatter;
+  private transient TaskFormatter taskFormatter;
 
   /**
    * @param taskFormatter
@@ -59,7 +59,6 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
   }
 
   /**
-   * @param taskFormatter
    * @param label
    * @param sortProperty
    * @param property Should be from type TaskDO or Integer for task id.
@@ -77,7 +76,7 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
       item.add(new Label(componentId, ""));
     } else {
       final Label label = new Label(componentId, task.getTitle());
-      final String taskPath = taskFormatter.getTaskPath(task.getId(), false, OutputType.HTML);
+      final String taskPath = getTaskFormatter().getTaskPath(task.getId(), false, OutputType.HTML);
       WicketUtils.addTooltip(label, taskPath);
       label.setEscapeModelStrings(false);
       item.add(label);
@@ -112,13 +111,14 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
   }
 
   /**
-   * Fluent pattern
-   * @param taskFormatter
+   * @return the taskFormatter
    */
-  public TaskPropertyColumn<T> withTaskFormatter(final TaskFormatter taskFormatter)
+  private TaskFormatter getTaskFormatter()
   {
-    this.taskFormatter = taskFormatter;
-    return this;
+    if (taskFormatter == null) {
+      taskFormatter = TaskFormatter.instance();
+    }
+    return taskFormatter;
   }
 
   /**
