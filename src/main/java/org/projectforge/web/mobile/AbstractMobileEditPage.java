@@ -45,21 +45,16 @@ extends AbstractSecuredMobilePage implements IEditPage<O, D>
 
   private static final long serialVersionUID = -2264060989458529585L;
 
-  public static final String PARAMETER_KEY_EDIT = "edit";
-
   protected F form;
 
   protected String i18nPrefix;
 
   private EditPageSupport<O, D> editPageSupport;
 
-  protected boolean editMode;
-
   public AbstractMobileEditPage(final PageParameters parameters, final String i18nPrefix)
   {
     super(parameters);
     this.i18nPrefix = i18nPrefix;
-    editMode = WicketUtils.getAsBoolean(parameters, PARAMETER_KEY_EDIT);
     final Integer id = WicketUtils.getAsInteger(parameters, AbstractEditPage.PARAMETER_KEY_ID);
     O data = null;
     if (NumberHelper.greaterZero(id) == true) {
@@ -115,19 +110,6 @@ extends AbstractSecuredMobilePage implements IEditPage<O, D>
       create();
     } else {
       update();
-    }
-  }
-
-  @Override
-  protected void addTopRightButton()
-  {
-    if (editMode == false && getData().getId() != null) {
-      final PageParameters params = new PageParameters();
-      params.add(AbstractEditPage.PARAMETER_KEY_ID, getData().getId());
-      params.add(PARAMETER_KEY_EDIT, true);
-      headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.CHECK, getClass(), params, getString("edit")));
-    } else {
-      super.addTopRightButton();
     }
   }
 

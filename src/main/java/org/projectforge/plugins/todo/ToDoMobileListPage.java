@@ -23,10 +23,10 @@
 
 package org.projectforge.plugins.todo;
 
-import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.mobile.AbstractMobileListPage;
+import org.projectforge.web.mobile.AbstractSecuredMobilePage;
 
 public class ToDoMobileListPage extends AbstractMobileListPage<ToDoMobileListForm, ToDoDao, ToDoDO>
 {
@@ -68,8 +68,8 @@ public class ToDoMobileListPage extends AbstractMobileListPage<ToDoMobileListFor
    * @see org.projectforge.web.mobile.AbstractMobileListPage#getEditPageClass()
    */
   @Override
-  protected Class< ? extends WebPage> getEditPageClass()
+  protected Class< ? extends AbstractSecuredMobilePage> getEditPageClass()
   {
-    return ToDoEditPage.class;
+    return ToDoMobileEditPage.class;
   }
 }

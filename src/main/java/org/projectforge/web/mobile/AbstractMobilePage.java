@@ -127,7 +127,7 @@ public abstract class AbstractMobilePage extends WebPage
     super.renderHead(response);
     response.renderString(WicketUtils.getCssForFavicon(getUrl("/favicon.ico")));
     response.renderCSSReference("mobile/jquery.mobile/jquery.mobile-1.1.0.min.css");
-    // add(CSSPackageResource.getHeaderContribution("mobile/css/projectforge.css"));
+    response.renderCSSReference("mobile/projectforge.css");
     response.renderCSSReference("mobile/projectforge.css");
     response.renderJavaScriptReference("scripts/jquery/1.7.1/jquery.min.js");
     // response.renderJavaScriptReference("mobile/jquery.mobile/myconfig.js");

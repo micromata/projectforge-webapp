@@ -27,7 +27,6 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.core.BaseDO;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -76,9 +75,11 @@ extends AbstractSecuredMobilePage
     int counter = 0;
     for (final O entry : list) {
       final PageParameters params = new PageParameters();
+      final Class< ? extends AbstractSecuredMobilePage> viewPage = getViewPageClass();
       params.add(AbstractEditPage.PARAMETER_KEY_ID, entry.getId());
       final String comment = getEntryComment(entry);
-      final ListViewItemPanel listItem = new ListViewItemPanel(listViewPanel.newChildId(), getEditPageClass(), params, getEntryName(entry));
+      final ListViewItemPanel listItem = new ListViewItemPanel(listViewPanel.newChildId(),
+          viewPage != null ? viewPage : getEditPageClass(), params, getEntryName(entry));
       if (StringUtils.isNotBlank(comment) == true) {
         listItem.setComment(", " + comment);
       }
@@ -118,11 +119,19 @@ extends AbstractSecuredMobilePage
   protected void addTopRightButton()
   {
     final PageParameters params = new PageParameters();
-    params.add(AbstractMobileEditPage.PARAMETER_KEY_EDIT, true);
     headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.PLUS, getEditPageClass(), params, getString("new")));
   }
 
-  protected abstract Class< ? extends WebPage> getEditPageClass();
+  protected abstract Class< ? extends AbstractSecuredMobilePage> getEditPageClass();
+
+  /**
+   * Click on an entry of the list opens the view page (if this method returns one). Otherwise the edit page is called directly.
+   * @return null at default.
+   */
+  protected Class< ? extends AbstractSecuredMobilePage> getViewPageClass()
+  {
+    return null;
+  }
 
   protected abstract F newListForm(AbstractMobileListPage< ? , ? , ? > parentPage);
 
