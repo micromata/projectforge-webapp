@@ -52,6 +52,7 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.HibernateSearchPhoneNumberBridge;
 import org.projectforge.task.TaskDO;
+import org.projectforge.user.PFUserContext;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -441,6 +442,24 @@ public class AddressDO extends DefaultBaseDO
   public String getFullName()
   {
     return StringHelper.listToString(", ", name, firstName);
+  }
+
+  @Transient
+  public String getFullNameWithTitleAndForm() {
+    final StringBuffer buf = new StringBuffer();
+    if (getForm() != null) {
+      buf.append(PFUserContext.getLocalizedString(getForm().getI18nKey())).append(" ");
+    }
+    if (getTitle() != null) {
+      buf.append(getTitle()).append(" ");
+    }
+    if (getFirstName() != null) {
+      buf.append(getFirstName()).append(" ");
+    }
+    if (getName() != null) {
+      buf.append(getName());
+    }
+    return buf.toString();
   }
 
   @Column(length = 255)

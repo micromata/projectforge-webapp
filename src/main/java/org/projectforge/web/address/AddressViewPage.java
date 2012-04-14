@@ -102,20 +102,8 @@ public class AddressViewPage extends AbstractSecuredPage
     final RepeatingView flowform = new RepeatingView("flowform");
     body.add(flowform);
     gridBuilder = new GridBuilder(flowform, getMySession());
-    final StringBuffer buf = new StringBuffer();
-    if (address.getForm() != null) {
-      buf.append(getString(address.getForm().getI18nKey())).append(" ");
-    }
-    if (address.getTitle() != null) {
-      buf.append(address.getTitle()).append(" ");
-    }
-    if (address.getFirstName() != null) {
-      buf.append(address.getFirstName()).append(" ");
-    }
-    if (address.getName() != null) {
-      buf.append(address.getName());
-    }
-    final String name = buf.toString();
+
+    final String name = address.getFullNameWithTitleAndForm();
 
     gridBuilder.newGrid8(true).newBlockPanel();
     DivPanel section = gridBuilder.newSectionPanel();
