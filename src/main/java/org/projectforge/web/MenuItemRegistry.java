@@ -208,12 +208,6 @@ public class MenuItemRegistry
   }
 
   private MenuItemDef register(final MenuItemDef parent, final MenuItemDefId defId, final int orderNumber,
-      final Class< ? extends Page> pageClass, final boolean visible, final ProjectForgeGroup... visibleForGroups)
-  {
-    return register(parent, defId, orderNumber, pageClass, null, visible, visibleForGroups);
-  }
-
-  private MenuItemDef register(final MenuItemDef parent, final MenuItemDefId defId, final int orderNumber,
       final Class< ? extends Page> pageClass, final String[] params, final ProjectForgeGroup... visibleForGroups)
   {
     return register(parent, defId, orderNumber, pageClass, params, true, visibleForGroups);
@@ -235,8 +229,6 @@ public class MenuItemRegistry
   @SuppressWarnings("serial")
   private static void initialize(final MenuItemRegistry reg)
   {
-    final boolean developmentMode = WebConfiguration.isDevelopmentMode();
-
     // Super menus
     final MenuItemDef common = reg.register(null, MenuItemDefId.COMMON, 10);
     final MenuItemDef pm = reg.register(null, MenuItemDefId.PROJECT_MANAGEMENT, 20);
