@@ -25,12 +25,16 @@ package org.projectforge.web;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.Validate;
 import org.apache.wicket.Page;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.UserRight;
+import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
+import org.projectforge.user.UserRights;
 import org.projectforge.web.wicket.WicketApplication;
 
 /**
@@ -239,7 +243,7 @@ public class MenuItemDef implements Serializable
    * @param visibleForGroups Reduce the visibility of this menu entry (if wanted).
    */
   public MenuItemDef(final MenuItemDef parent, final String id, final int orderNumber, final String i18nKey, final String url,
-      boolean newWindow, final ProjectForgeGroup... visibleForGroups)
+      final boolean newWindow, final ProjectForgeGroup... visibleForGroups)
   {
     this.parent = parent;
     this.id = id;
@@ -294,7 +298,7 @@ public class MenuItemDef implements Serializable
    * @param requiredRightValues Reducing the visibility: which right values are required?
    */
   public MenuItemDef(final MenuItemDef parent, final String id, final int orderNumber, final String i18nKey, final String url,
-      boolean newWindow, final UserRightId requiredRightId, final UserRightValue... requiredRightValues)
+      final boolean newWindow, final UserRightId requiredRightId, final UserRightValue... requiredRightValues)
   {
     this.parent = parent;
     this.id = id;
@@ -370,7 +374,7 @@ public class MenuItemDef implements Serializable
    * @param mobileMenuOrderNumber
    * @return this for chaining.
    */
-  public MenuItemDef setMobileMenu(final MenuItemDef mobileParentEntry, Class< ? extends Page> mobilePageClass,
+  public MenuItemDef setMobileMenu(final MenuItemDef mobileParentEntry, final Class< ? extends Page> mobilePageClass,
       final int mobileMenuOrderNumber)
   {
     this.mobileParentMenu = mobileParentEntry;
@@ -384,8 +388,7 @@ public class MenuItemDef implements Serializable
    * @param mobileMenuOrderNumber
    * @return this for chaining.
    */
-  public MenuItemDef setMobileMenu(Class< ? extends Page> mobilePageClass,
-      final int mobileMenuOrderNumber)
+  public MenuItemDef setMobileMenu(final Class< ? extends Page> mobilePageClass, final int mobileMenuOrderNumber)
   {
     this.mobileMenuSupport = true;
     this.mobilePageClass = mobilePageClass;
@@ -482,6 +485,17 @@ public class MenuItemDef implements Serializable
       // Should not occur, for security reasons deny at default.
       return false;
     }
+    if (requiredRightValues.length == 0) {
+      final UserRight right = UserRights.instance().getRight(requiredRightId);
+      if (right instanceof UserRightAccessCheck< ? >) {
+        Validate.notNull(loggedInUser);
+        return (((UserRightAccessCheck< ? >) right).hasSelectAccess(loggedInUser) == true);
+      } else {
+        // Should not occur, for security reasons deny at default.
+        return false;
+      }
+    }
+
     if (accessChecker.hasLoggedInUserRight(requiredRightId, false, requiredRightValues) == true) {
       return true;
     }
