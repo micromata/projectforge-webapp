@@ -28,7 +28,6 @@ import java.text.MessageFormat;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.wicket.Application;
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
@@ -52,6 +51,8 @@ public abstract class AbstractMobilePage extends WebPage
 
   protected final static String TOP_RIGHT_BUTTON_ID = "topRightButton";
 
+  protected final static String TOP_LEFT_BUTTON_ID = "topLeftButton";
+
   protected final static String TOP_CENTER_ID = "topCenter";
 
   protected boolean alreadySubmitted = false;
@@ -65,7 +66,7 @@ public abstract class AbstractMobilePage extends WebPage
   // iWebKit doesn't work completely with wicket tags such as wicket:panel etc.
   private static Boolean stripTags;
 
-  private boolean rightButtonRendered;
+  private boolean topButtonsRendered;
 
   public AbstractMobilePage()
   {
@@ -91,7 +92,6 @@ public abstract class AbstractMobilePage extends WebPage
     }
     add(pageContainer = new WebMarkupContainer("page"));
     pageContainer.add(headerContainer = new WebMarkupContainer("header"));
-    headerContainer.add(getTopCenter());
     add(new Label("windowTitle", new Model<String>() {
       @Override
       public String getObject()
@@ -134,20 +134,14 @@ public abstract class AbstractMobilePage extends WebPage
     response.renderJavaScriptReference("mobile/jquery.mobile/jquery.mobile-1.1.0.min.js");
   }
 
-  /**
-   * @return Home link as default.
-   */
-  protected Component getTopCenter()
-  {
-    return MenuMobilePage.getHomeLink(this, TOP_CENTER_ID);
-  }
-
   @Override
   protected void onBeforeRender()
   {
     super.onBeforeRender();
-    if (rightButtonRendered == false) {
-      rightButtonRendered = true;
+    if (topButtonsRendered == false) {
+      topButtonsRendered = true;
+      addTopLeftButton();
+      addTopCenter();
       addTopRightButton();
     }
     if (stripTags == false) {
@@ -240,10 +234,28 @@ public abstract class AbstractMobilePage extends WebPage
   }
 
   /**
-   * Adds invisible component as default.
+   * Adds about link as default.
    */
   protected void addTopRightButton()
   {
-    headerContainer.add(new Label(TOP_RIGHT_BUTTON_ID, "[invisible]").setVisible(false));
+    headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.INFO, AboutMobilePage.class, null,
+        getString("mobile.about")).setNoText().setAlignment(Alignment.LEFT).setRelDialog());
+  }
+
+  /**
+   * @return Title of this page as default.
+   */
+  protected void addTopCenter()
+  {
+    //headerContainer.add(new Label(AbstractMobilePage.TOP_CENTER_ID, AppVersion.APP_TITLE));
+    headerContainer.add(new Label(AbstractMobilePage.TOP_CENTER_ID, getTitle()));
+  }
+
+  /**
+   * Adds home link as default.
+   */
+  protected void addTopLeftButton()
+  {
+    headerContainer.add(MenuMobilePage.getHomeLink(this, TOP_LEFT_BUTTON_ID));
   }
 }

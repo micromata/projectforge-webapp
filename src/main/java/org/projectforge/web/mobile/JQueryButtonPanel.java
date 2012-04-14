@@ -29,6 +29,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * A jquery button with an icon (e. g. at the top right corner).
@@ -51,7 +52,9 @@ public class JQueryButtonPanel extends Panel
 
   private boolean relExternal;
 
-  private boolean relDialog;
+  private boolean relDialog, noText;
+
+  private Alignment alignment;
 
   public JQueryButtonPanel(final String id, final JQueryButtonType type, final Class< ? extends WebPage> pageClass, final String label)
   {
@@ -80,6 +83,18 @@ public class JQueryButtonPanel extends Panel
     return this;
   }
 
+  public JQueryButtonPanel setNoText()
+  {
+    this.noText = true;
+    return this;
+  }
+
+  public JQueryButtonPanel setAlignment(final Alignment alignment)
+  {
+    this.alignment = alignment;
+    return this;
+  }
+
   @Override
   protected void onBeforeRender()
   {
@@ -91,20 +106,27 @@ public class JQueryButtonPanel extends Panel
       } else {
         link = new BookmarkablePageLink<String>("button", pageClass, params);
       }
-      if (type == JQueryButtonType.PLUS) {
-        link.add(AttributeModifier.replace("data-icon", "plus"));
-      } else {
-        link.add(AttributeModifier.replace("data-icon", "check"));
+      if (type != null) {
+        link.add(AttributeModifier.replace("data-icon", type.getCssId()));
       }
-      link.add(AttributeModifier.replace("class", "ui-btn-right"));
       add(link);
-      link.add(new Label("label", label));
+      if (label != null) {
+        link.add(new Label("label", label));
+      } else {
+        link.add(WicketUtils.getInvisibleComponent("label"));
+      }
       if (this.relExternal == true) {
         link.add(AttributeModifier.replace("rel", "external"));
       }
       if (this.relDialog == true) {
         link.add(AttributeModifier.replace("data-rel", "dialog"));
       }
+      if (this.noText == true) {
+        link.add(AttributeModifier.replace("data-iconpos", "notext"));
+      }
+      //      if (alignment == Alignment.LEFT) {
+      //        link.add(AttributeModifier.add("class", "ui-btn-left"));
+      //      }
     }
     super.onBeforeRender();
   }

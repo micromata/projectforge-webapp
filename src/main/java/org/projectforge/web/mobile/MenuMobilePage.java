@@ -33,7 +33,6 @@ import org.apache.wicket.request.http.WebRequest;
 import org.apache.wicket.request.http.WebResponse;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.AppVersion;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.Menu;
@@ -43,7 +42,6 @@ import org.projectforge.web.UserFilter;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.components.LabelBookmarkablePageLinkPanel;
 
 public class MenuMobilePage extends AbstractSecuredMobilePage
 {
@@ -58,12 +56,11 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
   /**
    * Returns a link to this the menu mobile page. It should be shown directly instead of restoring last page after stay-logged-in .
    */
-  public static Component getHomeLink(final Component parent, final String id)
+  public static JQueryButtonPanel getHomeLink(final Component parent, final String id)
   {
     final PageParameters params = new PageParameters();
     params.add(PARAM_HOME_KEY, true);
-    return new LabelBookmarkablePageLinkPanel(id, MenuMobilePage.class, parent.getString("mobile.home"), params).addLinkAttribute("rel",
-        "external");
+    return new JQueryButtonPanel(id, JQueryButtonType.HOME, MenuMobilePage.class, params, parent.getString("mobile.home")).setNoText();
   }
 
   public MenuMobilePage()
@@ -117,12 +114,6 @@ public class MenuMobilePage extends AbstractSecuredMobilePage
     } else {
       pageContainer.add(new Label("iOSHint", getString("mobile.others.startScreenInfo")));
     }
-  }
-
-  @Override
-  protected Component getTopCenter()
-  {
-    return new Label(AbstractMobilePage.TOP_CENTER_ID, AppVersion.APP_TITLE);
   }
 
   @Override

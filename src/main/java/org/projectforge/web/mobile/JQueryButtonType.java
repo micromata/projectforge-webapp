@@ -23,12 +23,23 @@
 
 package org.projectforge.web.mobile;
 
-
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
 public enum JQueryButtonType
 {
-  CHECK, PLUS;
+  CHECK("check"), DELETE("delete"), GEAR("gear"), HOME("home"), INFO("info"), PLUS("plus");
+
+  private final String cssId;
+
+  public String getCssId()
+  {
+    return cssId;
+  }
+
+  JQueryButtonType(final String cssId)
+  {
+    this.cssId = cssId;
+  }
 }

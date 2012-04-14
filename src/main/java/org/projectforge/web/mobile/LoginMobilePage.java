@@ -26,7 +26,6 @@ package org.projectforge.web.mobile;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.Component;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.Link;
@@ -109,16 +108,37 @@ public class LoginMobilePage extends AbstractMobilePage
     pageContainer. add(goButton);
   }
 
-  @Override
-  protected Component getTopCenter()
-  {
-    return new Label(AbstractMobilePage.TOP_CENTER_ID, AppVersion.APP_TITLE);
-  }
-
   protected void checkLogin()
   {
     LoginPage.internalCheckLogin(this, userDao, dataSource, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), WicketUtils
         .getDefaultMobilePage());
+  }
+
+  /**
+   * @return Application title
+   */
+  @Override
+  protected void addTopCenter()
+  {
+    headerContainer.add(new Label(AbstractMobilePage.TOP_CENTER_ID, AppVersion.APP_TITLE));
+  }
+
+  /**
+   * Invisible
+   */
+  @Override
+  protected void addTopLeftButton()
+  {
+    headerContainer.add(WicketUtils.getInvisibleComponent(TOP_LEFT_BUTTON_ID));
+  }
+
+  /**
+   * Invisible
+   */
+  @Override
+  protected void addTopRightButton()
+  {
+    headerContainer.add(WicketUtils.getInvisibleComponent(TOP_RIGHT_BUTTON_ID));
   }
 
   @Override

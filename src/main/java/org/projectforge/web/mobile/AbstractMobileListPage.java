@@ -119,8 +119,7 @@ extends AbstractSecuredMobilePage
   {
     final PageParameters params = new PageParameters();
     params.add(AbstractMobileEditPage.PARAMETER_KEY_EDIT, true);
-    headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.PLUS, getEditPageClass(), params, getString("new"))
-    .setRelDialog());
+    headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.PLUS, getEditPageClass(), params, getString("new")));
   }
 
   protected abstract Class< ? extends WebPage> getEditPageClass();
