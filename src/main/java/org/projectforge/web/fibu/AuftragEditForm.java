@@ -320,7 +320,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           }
         });
         if (abgeschlossenUndNichtFakturiert == true) {
-          fs.setWarninngBackground();
+          fs.setWarningBackground();
         }
       }
       content.add(columns = new DivPanel(content.newChildId(), DivType.COLUMNS));
@@ -365,7 +365,7 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
         statusChoice.setRequired(false);
         fs.add(statusChoice);
         if (abgeschlossenUndNichtFakturiert == true) {
-          fs.setWarninngBackground();
+          fs.setWarningBackground();
         }
       }
       content.add(columns = new DivPanel(content.newChildId(), DivType.COLUMNS));

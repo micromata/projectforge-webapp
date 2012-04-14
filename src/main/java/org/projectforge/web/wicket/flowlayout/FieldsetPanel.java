@@ -196,7 +196,7 @@ public class FieldsetPanel extends Panel
    * Sets the background color of this whole fieldset to red.
    * @return this for chaining.
    */
-  public FieldsetPanel setWarninngBackground()
+  public FieldsetPanel setWarningBackground()
   {
     fieldset.add(AttributeModifier.replace("style", WebConstants.CSS_BACKGROUND_COLOR_RED));
     return this;
