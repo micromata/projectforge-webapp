@@ -51,7 +51,7 @@ public class AddressMobileEditForm extends AbstractMobileEditForm<AddressDO, Add
   {
     super.init();
     addressEditSupport = new AddressEditSupport(this, gridBuilder, addressDao, personalAddressDao, data);
-    gridBuilder.newBlockPanel();
+    //gridBuilder.newBlockPanel();
     addressEditSupport.addName();
   }
 }

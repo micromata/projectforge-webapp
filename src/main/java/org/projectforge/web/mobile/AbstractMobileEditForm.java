@@ -28,7 +28,7 @@ import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.core.AbstractBaseDO;
-import org.projectforge.web.wicket.flowlayout.GridBuilderInterface;
+import org.projectforge.web.wicket.mobileflowlayout.MobileGridBuilder;
 
 public abstract class AbstractMobileEditForm<O extends AbstractBaseDO< ? >, P extends AbstractMobileEditPage< ? , ? , ? >> extends
 AbstractMobileForm<O, P>
@@ -37,7 +37,7 @@ AbstractMobileForm<O, P>
 
   protected O data;
 
-  protected GridBuilderInterface gridBuilder;
+  protected MobileGridBuilder gridBuilder;
 
   public AbstractMobileEditForm(final P parentPage, final O data)
   {

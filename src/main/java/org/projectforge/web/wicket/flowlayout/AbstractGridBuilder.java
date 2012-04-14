@@ -23,11 +23,8 @@
 
 package org.projectforge.web.wicket.flowlayout;
 
-import static org.projectforge.web.BrowserScreenWidthType.NARROW;
-import static org.projectforge.web.BrowserScreenWidthType.NORMAL;
-import static org.projectforge.web.BrowserScreenWidthType.WIDE;
+import java.io.Serializable;
 
-import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.web.BrowserScreenWidthType;
@@ -37,23 +34,15 @@ import org.projectforge.web.wicket.MySession;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public abstract class AbstractGridBuilder<T extends AbstractFieldsetPanel<?>> implements GridBuilderInterface<T>
+public abstract class AbstractGridBuilder<T extends AbstractFieldsetPanel< ? >> implements Serializable
 {
   private static final long serialVersionUID = -8804674487579491611L;
-
-  private DivPanel gridPanel, columnsPanel, columnPanel;
-
-  protected DivPanel blockPanel;
 
   protected BrowserScreenWidthType browserScreenWidthType;
 
   protected RepeatingView parentRepeatingView;
 
   protected DivPanel parentDivPanel;
-
-  protected DivPanel current;
-
-  private DivType gridSize;
 
   public AbstractGridBuilder(final RepeatingView parent, final MySession session)
   {
@@ -80,266 +69,8 @@ public abstract class AbstractGridBuilder<T extends AbstractFieldsetPanel<?>> im
   }
 
   /**
-   * Generates new grid panel. For narrow screens a grid16 panel will be created.
-   * @param id if no RepeatingView is given as parent, the id is needed.
-   * @return grid16 panel for narrow screens, otherwise grid8.
-   */
-  @Override
-  public GridBuilderInterface<T> newGrid8(final String id)
-  {
-    return newGrid8(id, false);
-  }
-
-  /**
-   * Generates new grid panel. For narrow screens a grid16 panel will be created.
-   * @param id if no RepeatingView is given as parent, the id is needed.
-   * @param clearfix If true then css class clearfix will be added.
-   * @return grid16 panel for narrow screens, otherwise grid8.
-   */
-  @Override
-  public GridBuilderInterface<T> newGrid8(final String id, final boolean clearfix)
-  {
-    if (browserScreenWidthType == NARROW) {
-      return newGrid(DivType.GRID16, id, clearfix);
-    } else {
-      return newGrid(DivType.GRID8, id, clearfix);
-    }
-  }
-
-  /**
-   * Generates new grid panel. For narrow screens a grid16 panel will be created.
-   * @return grid16 panel for narrow screens, otherwise grid8.
-   */
-  @Override
-  public GridBuilderInterface<T> newGrid8()
-  {
-    return newGrid8(newParentChildId());
-  }
-
-  /**
-   * Generates new grid panel. For narrow screens a grid16 panel will be created.
-   * @param clearfix If true then css class clearfix will be added.
-   * @return grid16 panel for narrow screens, otherwise grid8.
-   */
-  @Override
-  public GridBuilderInterface<T> newGrid8(final boolean clearfix)
-  {
-    return newGrid8(newParentChildId(), clearfix);
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newGrid16(java.lang.String)
-   */
-  @Override
-  public GridBuilderInterface<T> newGrid16(final String id)
-  {
-    return newGrid16(id, false);
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newGrid16(java.lang.String, boolean)
-   */
-  @Override
-  public GridBuilderInterface<T> newGrid16(final String id, final boolean clearfix)
-  {
-    return newGrid(DivType.GRID16, id, clearfix);
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newGrid16()
-   */
-  @Override
-  public GridBuilderInterface<T> newGrid16()
-  {
-    return newGrid16(newParentChildId());
-  }
-
-  /**
-   * @return grid16 panel.
-   */
-  @Override
-  public GridBuilderInterface<T> newGrid16(final boolean clearfix)
-  {
-    return newGrid16(newParentChildId(), clearfix);
-  }
-
-  private GridBuilderInterface<T> newGrid(final DivType gridType, final String id, final boolean clearfix)
-  {
-    gridSize = gridType;
-    final DivPanel divPanel = new DivPanel(id, gridType, DivType.BOX, DivType.NO_TITLE);
-    if (clearfix == true) {
-      divPanel.add(AttributeModifier.append("style", "clear: left;"));
-    }
-    getParent().add(divPanel);
-    gridPanel = new DivPanel(DivPanel.CHILD_ID, DivType.TOGGLE_CONTAINER);
-    divPanel.add(gridPanel);
-    blockPanel = columnsPanel = columnPanel = null;
-    current = gridPanel;
-    return this;
-  }
-
-  /**
-   * @return new block panel.
-   */
-  @Override
-  public GridBuilderInterface<T> newBlockPanel()
-  {
-    blockPanel = new DivPanel(gridPanel.newChildId(), DivType.BLOCK);
-    gridPanel.add(blockPanel);
-    columnsPanel = columnPanel = null;
-    current = blockPanel;
-    return this;
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newColumnsPanelId()
-   */
-  @Override
-  public String newColumnsPanelId()
-  {
-    if (blockPanel == null) {
-      newBlockPanel();
-    }
-    return blockPanel.newChildId();
-  }
-
-  /**
-   * If you need to implement isVisible() of DivPanel etc. you can use this method instead of {@link #newColumnsPanel()}.
-   * @param colPanel Please use {@link #newColumnsPanelId()} as component id.
-   * @return new columns panel for wide screens and gridPanel itself for all other screens.
-   */
-  @Override
-  public GridBuilderInterface<T> addColumnsPanel(final DivPanel colPanel)
-  {
-    blockPanel.add(columnsPanel = colPanel);
-    current = columnsPanel;
-    return this;
-  }
-
-  /**
-   */
-  @Override
-  public GridBuilderInterface<T> newColumnsPanel()
-  {
-    if (blockPanel == null) {
-      newBlockPanel();
-    }
-    columnPanel = null;
-    columnsPanel = columnPanel = null;
-    if (browserScreenWidthType == WIDE || browserScreenWidthType == NORMAL && gridSize == DivType.GRID16) {
-      columnsPanel = new DivPanel(blockPanel.newChildId(), DivType.COLUMNS, DivType.CLEARFIX);
-      blockPanel.add(columnsPanel);
-      current = columnsPanel;
-      return this;
-    } else {
-      current = blockPanel;
-      columnsPanel = columnPanel = null;
-      return this;
-    }
-  }
-
-  /**
-   * @param length {@link DivType#COL_25}, {@link DivType#COL_33}, ...
-   */
-  @Override
-  public GridBuilderInterface<T> newColumnPanel(final DivType length)
-  {
-    return addColumnPanel(new DivPanel(newColumnPanelId()), length);
-  }
-
-  /**
-   * @param length {@link DivType#COL_25}, {@link DivType#COL_33}, ...
-   */
-  @Override
-  public GridBuilderInterface<T> newColumnPanel(final DivType length, final boolean newBlock4NonWideScreen)
-  {
-    if (newBlock4NonWideScreen == false || browserScreenWidthType == WIDE) {
-      return addColumnPanel(new DivPanel(newColumnPanelId()), length);
-    } else {
-      return newGrid(gridSize, newParentChildId(), false);
-    }
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newColumnPanelId()
-   */
-  @Override
-  public String newColumnPanelId()
-  {
-    if (columnsPanel != null) {
-      return columnsPanel.newChildId();
-    } else {
-      return blockPanel.newChildId();
-    }
-  }
-
-  /**
-   * If you need to implement isVisible() of DivPanel etc. you can use this method instead of {@link #newColumnPanel(DivType)}.
-   * @param colPanel Please use {@link #newColumnPanelId()} as component id.
-   * @param length {@link DivType#COL_25}, {@link DivType#COL_33}, ... Please don't set the width directly to the given DivPanel because the
-   *          layout manager can't handle different screen resolutions anymore properly.
-   * @return new columns panel for wide screens and gridPanel itself for all other screens.
-   */
-  @Override
-  public GridBuilderInterface<T> addColumnPanel(final DivPanel colPanel, final DivType length)
-  {
-    if (columnsPanel != null) {
-      columnPanel = colPanel;
-      if (browserScreenWidthType == WIDE || browserScreenWidthType == NORMAL && gridSize == DivType.GRID16) {
-        colPanel.addCssClasses(length);
-      } else {
-        // No length e. g. for extended filter in AbstractListForm:
-      }
-      columnsPanel.add(columnPanel);
-      current = columnPanel;
-      return this;
-    } else {
-      // ToDo:
-      if (blockPanel.hasChilds() == true) {
-        // newGrid(gridSize, newParentChildId());
-        return newBlockPanel();
-      } else {
-        current = blockPanel;
-        return this;
-      }
-    }
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#getPanel()
-   */
-  @Override
-  public DivPanel getPanel()
-  {
-    return current;
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFormHeading(java.lang.String)
-   */
-  @Override
-  public FormHeadingPanel newFormHeading(final String label)
-  {
-    final FormHeadingPanel formHeading = new FormHeadingPanel(current.newChildId(), label);
-    current.add(formHeading);
-    return formHeading;
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newSectionPanel()
-   */
-  @Override
-  public DivPanel newSectionPanel()
-  {
-    final DivPanel section = new DivPanel(current.newChildId(), DivType.SECTION);
-    current.add(section);
-    return section;
-  }
-
-  /**
    * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#getString(java.lang.String)
    */
-  @Override
   public String getString(final String i18nKey)
   {
     if (this.parentRepeatingView != null) {
@@ -366,4 +97,12 @@ public abstract class AbstractGridBuilder<T extends AbstractFieldsetPanel<?>> im
       return parentDivPanel.newChildId();
     }
   }
+
+  public abstract T newFieldset(final String label);
+
+  public abstract T newFieldset(final String label, final boolean multipleChildren);
+
+  public abstract T newFieldset(final String labelText, final String labelDescription);
+
+  public abstract T newFieldset(final String labelText, final String labelDescription, final boolean multipleChildren);
 }

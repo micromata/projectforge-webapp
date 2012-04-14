@@ -27,7 +27,6 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilderInterface;
 import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.mobileflowlayout.MobileGridBuilder;
 
@@ -51,7 +50,7 @@ public abstract class AbstractMobileForm<F, P extends AbstractMobilePage> extend
   /**
    * @see GridBuilder#GridBuilder(RepeatingView, MySession)
    */
-  protected GridBuilderInterface newGridBuilder(final RepeatingView parent)
+  protected MobileGridBuilder newGridBuilder(final RepeatingView parent)
   {
     return new MobileGridBuilder(parent);
   }
@@ -59,7 +58,7 @@ public abstract class AbstractMobileForm<F, P extends AbstractMobilePage> extend
   /**
    * @see GridBuilder#GridBuilder(DivPanel, MySession)
    */
-  protected GridBuilderInterface newGridBuilder(final DivPanel parent)
+  protected MobileGridBuilder newGridBuilder(final DivPanel parent)
   {
     return new MobileGridBuilder(parent);
   }

@@ -26,8 +26,6 @@ package org.projectforge.web.wicket.mobileflowlayout;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.web.wicket.flowlayout.AbstractGridBuilder;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivType;
-import org.projectforge.web.wicket.flowlayout.FormHeadingPanel;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -48,177 +46,12 @@ public class MobileGridBuilder extends AbstractGridBuilder<MobileFieldsetPanel>
   }
 
   /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public MobileGridBuilder newGrid8(final String id)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public MobileGridBuilder newGrid8(final String id, final boolean clearfix)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public MobileGridBuilder newGrid8()
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public MobileGridBuilder newGrid8(final boolean clearfix)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public MobileGridBuilder newGrid16(final String id)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public MobileGridBuilder newGrid16(final String id, final boolean clearfix)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public MobileGridBuilder newGrid16()
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public MobileGridBuilder newGrid16(final boolean clearfix)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * @return new block panel.
-   */
-  @Override
-  public MobileGridBuilder newBlockPanel()
-  {
-    blockPanel = new DivPanel(newParentChildId());
-    getParent().add(blockPanel);
-    current = blockPanel;
-    return this;
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public String newColumnsPanelId()
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public MobileGridBuilder addColumnsPanel(final DivPanel colPanel)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public MobileGridBuilder newColumnsPanel()
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public MobileGridBuilder newColumnPanel(final DivType length)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public MobileGridBuilder newColumnPanel(final DivType length, final boolean newBlock4NonWideScreen)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public String newColumnPanelId()
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public MobileGridBuilder addColumnPanel(final DivPanel colPanel, final DivType length)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#getPanel()
-   */
-  @Override
-  public DivPanel getPanel()
-  {
-    return current;
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public FormHeadingPanel newFormHeading(final String label)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
    * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFieldset(java.lang.String)
    */
   @Override
   public MobileFieldsetPanel newFieldset(final String label)
   {
-    return new MobileFieldsetPanel(current, label);
+    return null;// new MobileFieldsetPanel(current, label);
   }
 
   /**
@@ -244,15 +77,6 @@ public class MobileGridBuilder extends AbstractGridBuilder<MobileFieldsetPanel>
    */
   @Override
   public MobileFieldsetPanel newFieldset(final String labelText, final String labelDescription, final boolean multipleChildren)
-  {
-    throw new UnsupportedOperationException();
-  }
-
-  /**
-   * Throws {@link UnsupportedOperationException}.
-   */
-  @Override
-  public DivPanel newSectionPanel()
   {
     throw new UnsupportedOperationException();
   }

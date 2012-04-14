@@ -53,9 +53,9 @@ import org.projectforge.web.wicket.components.LanguageField;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.AbstractGridBuilder;
 import org.projectforge.web.wicket.flowlayout.FieldType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilderInterface;
 import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
@@ -79,10 +79,10 @@ class AddressEditSupport implements Serializable
   @SuppressWarnings("unchecked")
   private final TextField<String>[] dependentFormComponents = new TextField[3];
 
-  GridBuilderInterface<?> gridBuilder;
+  AbstractGridBuilder<?> gridBuilder;
 
   @SuppressWarnings("serial")
-  public AddressEditSupport(final Form<AddressDO> form, final GridBuilderInterface<?> gridBuilder, final AddressDao addressDao,
+  public AddressEditSupport(final Form<AddressDO> form, final AbstractGridBuilder<?> gridBuilder, final AddressDao addressDao,
       final PersonalAddressDao personalAddressDao, final AddressDO address)
   {
     this.form = form;
