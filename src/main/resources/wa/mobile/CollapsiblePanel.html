@@ -8,9 +8,9 @@
 <body>
 <h1>Collapsible panel</h1>
 <wicket:panel>
-  <div data-role="collapsible" wicket:id="mainContainer">
+  <div data-role="collapsible" wicket:id="mainContainer" data-collapsed="false" data-theme="c" data-content-theme="c">
   <h3 wicket:id="heading">[heading]</h3>
-  <div class="content ui-corner-all"><wicket:container wicket:id="contentRepeater" /></div>
+  <div><wicket:container wicket:id="contentRepeater" /></div>
   </div>
 </wicket:panel>
 </body>

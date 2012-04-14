@@ -55,7 +55,7 @@ extends AbstractSecuredMobilePage
     super(parameters);
     this.i18nKey = i18nKey;
     form = newListForm(this);
-    pageContainer. add(form);
+    pageContainer.add(form);
     form.init();
     setNoBackButton();
   }
@@ -64,10 +64,10 @@ extends AbstractSecuredMobilePage
   protected void search()
   {
     if (listViewPanel != null) {
-      remove(listViewPanel);
+      pageContainer.remove(listViewPanel);
     }
     list = (List<O>) getBaseDao().getList(form.filter);
-    pageContainer. add(listViewPanel = new ListViewPanel("listViewPage"));
+    pageContainer.add(listViewPanel = new ListViewPanel("listViewPage"));
     if (CollectionUtils.isEmpty(list) == true) {
       listViewPanel.setVisible(false);
       return;
@@ -78,8 +78,7 @@ extends AbstractSecuredMobilePage
       final PageParameters params = new PageParameters();
       params.add(AbstractEditPage.PARAMETER_KEY_ID, entry.getId());
       final String comment = getEntryComment(entry);
-      final ListViewItemPanel listItem = new ListViewItemPanel(listViewPanel.newChildId(), getEditPageClass(), params,
-          getEntryName(entry));
+      final ListViewItemPanel listItem = new ListViewItemPanel(listViewPanel.newChildId(), getEditPageClass(), params, getEntryName(entry));
       if (StringUtils.isNotBlank(comment) == true) {
         listItem.setComment(", " + comment);
       }
@@ -124,7 +123,7 @@ extends AbstractSecuredMobilePage
     .setRelDialog());
   }
 
-  protected abstract Class<? extends WebPage> getEditPageClass();
+  protected abstract Class< ? extends WebPage> getEditPageClass();
 
   protected abstract F newListForm(AbstractMobileListPage< ? , ? , ? > parentPage);
 

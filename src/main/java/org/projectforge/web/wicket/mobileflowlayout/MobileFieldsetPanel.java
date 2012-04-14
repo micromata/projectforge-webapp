@@ -29,9 +29,9 @@ import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
+import org.projectforge.web.mobile.CollapsiblePanel;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
 
 /**
  * Represents a entry of a group panel. This can be a label, text field or other form components.
@@ -46,10 +46,6 @@ public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPan
   private static final String FIELDS_ID = "fields";
 
   private static final long serialVersionUID = 2845731250470151819L;
-
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MobileFieldsetPanel.class);
-
-  private WebMarkupContainer fields;
 
   /**
    */
@@ -72,7 +68,7 @@ public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPan
 
   /**
    */
-  public MobileFieldsetPanel(final DivPanel parent, final String labeltext)
+  public MobileFieldsetPanel(final CollapsiblePanel parent, final String labeltext)
   {
     this(parent.newChildId(), labeltext);
     parent.add(this);

@@ -23,7 +23,10 @@
 
 package org.projectforge.web.wicket.mobileflowlayout;
 
+import org.apache.commons.lang.Validate;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.projectforge.web.mobile.CollapsiblePanel;
 import org.projectforge.web.wicket.flowlayout.AbstractGridBuilder;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 
@@ -35,6 +38,8 @@ public class MobileGridBuilder extends AbstractGridBuilder<MobileFieldsetPanel>
 {
   private static final long serialVersionUID = 134863232462613937L;
 
+  WebMarkupContainer current;
+
   public MobileGridBuilder(final RepeatingView parent)
   {
     this.parentRepeatingView = parent;
@@ -45,13 +50,25 @@ public class MobileGridBuilder extends AbstractGridBuilder<MobileFieldsetPanel>
     this.parentDivPanel = parent;
   }
 
+  public CollapsiblePanel newCollapsiblePanel(final String heading)
+  {
+    final CollapsiblePanel collapsiblePanel = new CollapsiblePanel(newParentChildId(), heading);
+    getParent().add(collapsiblePanel);
+    current = collapsiblePanel;
+    return collapsiblePanel;
+  }
+
   /**
    * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFieldset(java.lang.String)
    */
   @Override
   public MobileFieldsetPanel newFieldset(final String label)
   {
-    return null;// new MobileFieldsetPanel(current, label);
+    Validate.notNull(current);
+    if (current instanceof CollapsiblePanel) {
+      return new MobileFieldsetPanel((CollapsiblePanel)current, label);
+    }
+    throw new UnsupportedOperationException("Please add collapsiblePanel to the GridBuilder first.");
   }
 
   /**
@@ -64,7 +81,7 @@ public class MobileGridBuilder extends AbstractGridBuilder<MobileFieldsetPanel>
   }
 
   /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFieldset(java.lang.String, java.lang.String)
+   * @see org.projectforge.web.wicket.flowlayout.AbstractGridBuilder#newFieldset(java.lang.String, java.lang.String)
    */
   @Override
   public MobileFieldsetPanel newFieldset(final String labelText, final String labelDescription)
@@ -73,7 +90,7 @@ public class MobileGridBuilder extends AbstractGridBuilder<MobileFieldsetPanel>
   }
 
   /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFieldset(java.lang.String, java.lang.String, boolean)
+   * @see org.projectforge.web.wicket.flowlayout.AbstractGridBuilder#newFieldset(java.lang.String, java.lang.String, boolean)
    */
   @Override
   public MobileFieldsetPanel newFieldset(final String labelText, final String labelDescription, final boolean multipleChildren)
