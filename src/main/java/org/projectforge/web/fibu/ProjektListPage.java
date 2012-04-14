@@ -46,7 +46,6 @@ import org.projectforge.reporting.impl.ProjektImpl;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
-import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.task.TaskPropertyColumn;
 import org.projectforge.web.user.UserPrefListPage;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -71,9 +70,6 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
-
-  @SpringBean(name = "taskFormatter")
-  private TaskFormatter taskFormatter;
 
   public ProjektListPage(final PageParameters parameters)
   {
@@ -133,8 +129,7 @@ public class ProjektListPage extends AbstractListPage<ProjektListForm, ProjektDa
         sortable), "name", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.kunde.division")), getSortable(
         "kunde.division", sortable), "kunde.division", cellItemListener));
-    columns.add(new TaskPropertyColumn<ProjektDO>(getString("task"), getSortable("task.title", sortable), "task", cellItemListener)
-        .withTaskFormatter(taskFormatter));
+    columns.add(new TaskPropertyColumn<ProjektDO>(getString("task"), getSortable("task.title", sortable), "task", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("status")), getSortable("status", sortable),
         "status", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<ProjektDO>(new Model<String>(getString("fibu.projekt.projektManagerGroup")), null,

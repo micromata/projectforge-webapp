@@ -43,7 +43,6 @@ import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.fibu.ISelectCallerPage;
-import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.wicket.AbstractMassEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -56,9 +55,6 @@ public class TimesheetMassUpdatePage extends AbstractMassEditPage implements ISe
 
   @SpringBean(name = "dateTimeFormatter")
   private DateTimeFormatter dateTimeFormatter;
-
-  @SpringBean(name = "taskFormatter")
-  private TaskFormatter taskFormatter;
 
   @SpringBean(name = "userFormatter")
   private UserFormatter userFormatter;
@@ -93,7 +89,7 @@ public class TimesheetMassUpdatePage extends AbstractMassEditPage implements ISe
     }
     body.add(form);
     form.init();
-    final List<IColumn<TimesheetDO>> columns = TimesheetListPage.createColumns(this, false, true, null, taskFormatter, taskTree,
+    final List<IColumn<TimesheetDO>> columns = TimesheetListPage.createColumns(this, false, true, null, taskTree,
         userFormatter, dateTimeFormatter);
     @SuppressWarnings("serial")
     final SortableDataProvider<TimesheetDO> sortableDataProvider = new SortableDataProvider<TimesheetDO>() {

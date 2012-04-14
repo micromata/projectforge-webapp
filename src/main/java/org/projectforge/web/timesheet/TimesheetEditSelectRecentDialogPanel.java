@@ -183,8 +183,7 @@ public class TimesheetEditSelectRecentDialogPanel extends Panel
           "kost2.projekt.kunde.name", cellItemListener));
       columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(getString("fibu.projekt")), null, "kost2.projekt.name",
           cellItemListener));
-      columns.add(new TaskPropertyColumn<TimesheetDO>(getString("task"), null, "task", cellItemListener).withTaskFormatter(
-          TaskFormatter.instance()).withTaskTree(taskTree));
+      columns.add(new TaskPropertyColumn<TimesheetDO>(getString("task"), null, "task", cellItemListener).withTaskTree(taskTree));
     } else {
       columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(new Model<String>(getString("task")), null, "task.title",
           cellItemListener) {

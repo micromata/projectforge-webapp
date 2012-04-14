@@ -38,7 +38,6 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.gantt.GanttChartDO;
 import org.projectforge.gantt.GanttChartDao;
 import org.projectforge.task.TaskTree;
-import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.task.TaskPropertyColumn;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
@@ -56,9 +55,6 @@ public class GanttChartListPage extends AbstractListPage<GanttChartListForm, Gan
 
   @SpringBean(name = "ganttChartDao")
   private GanttChartDao ganttChartDao;
-
-  @SpringBean(name = "taskFormatter")
-  private TaskFormatter taskFormatter;
 
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
@@ -107,8 +103,7 @@ public class GanttChartListPage extends AbstractListPage<GanttChartListForm, Gan
         cellItemListener));
     columns.add(new UserPropertyColumn<GanttChartDO>(getString("gantt.owner"), "user.fullname", "owner", cellItemListener)
         .withUserFormatter(userFormatter));
-    columns.add(new TaskPropertyColumn<GanttChartDO>(getString("task"), "task.title", "task", cellItemListener).withTaskFormatter(
-        taskFormatter).withTaskTree(taskTree));
+    columns.add(new TaskPropertyColumn<GanttChartDO>(getString("task"), "task.title", "task", cellItemListener).withTaskTree(taskTree));
     dataTable = createDataTable(columns, "name", SortOrder.DESCENDING);
     form.add(dataTable);
   }

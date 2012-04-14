@@ -68,7 +68,6 @@ import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
-import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.task.TaskPropertyColumn;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPrefListPage;
@@ -124,9 +123,6 @@ IListPageColumnsCreator<TimesheetDO>
 
   @SpringBean(name = "timesheetExport")
   private TimesheetExport timesheetExport;
-
-  @SpringBean(name = "taskFormatter")
-  private TaskFormatter taskFormatter;
 
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
@@ -236,14 +232,14 @@ IListPageColumnsCreator<TimesheetDO>
   protected void createDataTable()
   {
     final List<IColumn<TimesheetDO>> columns = createColumns(this, !isMassUpdateMode(), isMassUpdateMode(), form.getSearchFilter(),
-        taskFormatter, taskTree, userFormatter, dateTimeFormatter);
+        taskTree, userFormatter, dateTimeFormatter);
     dataTable = createDataTable(columns, "startTime", SortOrder.DESCENDING);
     form.add(dataTable);
   }
 
   public List<IColumn<TimesheetDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
-    return createColumns(returnToPage, sortable, false, form.getSearchFilter(), taskFormatter, taskTree, userFormatter, dateTimeFormatter);
+    return createColumns(returnToPage, sortable, false, form.getSearchFilter(), taskTree, userFormatter, dateTimeFormatter);
   }
 
   /**
@@ -255,8 +251,8 @@ IListPageColumnsCreator<TimesheetDO>
    */
   @SuppressWarnings("serial")
   protected static final List<IColumn<TimesheetDO>> createColumns(final WebPage page, final boolean sortable,
-      final boolean isMassUpdateMode, final TimesheetFilter timesheetFilter, final TaskFormatter taskFormatter, final TaskTree taskTree,
-      final UserFormatter userFormatter, final DateTimeFormatter dateTimeFormatter)
+      final boolean isMassUpdateMode, final TimesheetFilter timesheetFilter, final TaskTree taskTree, final UserFormatter userFormatter,
+      final DateTimeFormatter dateTimeFormatter)
       {
     final List<IColumn<TimesheetDO>> columns = new ArrayList<IColumn<TimesheetDO>>();
     final CellItemListener<TimesheetDO> cellItemListener = new CellItemListener<TimesheetDO>() {
@@ -318,7 +314,7 @@ IListPageColumnsCreator<TimesheetDO>
           "kost2.projekt.name", sortable), "kost2.projekt.name", cellItemListener));
     }
     columns.add(new TaskPropertyColumn<TimesheetDO>(page.getString("task"), getSortable("task.title", sortable), "task", cellItemListener)
-        .withTaskFormatter(taskFormatter).withTaskTree(taskTree));
+        .withTaskTree(taskTree));
     if (systemInfoCache.isCost2EntriesExists() == true) {
       columns.add(new CellItemListenerPropertyColumn<TimesheetDO>(page.getString("fibu.kost2"), getSortable("kost2.shortDisplayName",
           sortable), "kost2.shortDisplayName", cellItemListener));

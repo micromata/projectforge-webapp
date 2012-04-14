@@ -44,7 +44,6 @@ import org.projectforge.user.GroupDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.core.PriorityFormatter;
-import org.projectforge.web.task.TaskFormatter;
 import org.projectforge.web.task.TaskPropertyColumn;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPrefListPage;
@@ -68,9 +67,6 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
 
   @SpringBean(name = "priorityFormatter")
   private PriorityFormatter priorityFormatter;
-
-  @SpringBean(name = "taskFormatter")
-  private TaskFormatter taskFormatter;
 
   @SpringBean(name = "taskTree")
   private TaskTree taskTree;
@@ -145,7 +141,7 @@ public class ToDoListPage extends AbstractListPage<ToDoListForm, ToDoDao, ToDoDO
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("plugins.todo.type")),
         getSortable("type", sortable), "type", cellItemListener));
     columns.add(new TaskPropertyColumn<ToDoDO>(getString("task"), getSortable("task.title", sortable), "task", cellItemListener)
-        .withTaskFormatter(taskFormatter).withTaskTree(taskTree));
+        .withTaskTree(taskTree));
     columns.add(new CellItemListenerPropertyColumn<ToDoDO>(new Model<String>(getString("group")), null, "group", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<ToDoDO>> item, final String componentId, final IModel<ToDoDO> rowModel)
