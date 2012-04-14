@@ -74,7 +74,8 @@ public class TaskTreeForm extends AbstractForm<TaskFilter, TaskTreePage>
     addFeedbackPanel();
     final RepeatingView flowform = new RepeatingView("flowform");
     add(flowform);
-    gridBuilder = newGridBuilder(flowform).newGrid16().newColumnsPanel();
+    gridBuilder = newGridBuilder(flowform);
+    gridBuilder.newGrid16().newColumnsPanel();
     {
       gridBuilder.newColumnPanel(DivType.COL_50);
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"), true);
