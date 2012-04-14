@@ -31,6 +31,7 @@ import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.address.PersonalAddressDao;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
@@ -55,7 +56,7 @@ public class AddressEditPage extends AbstractEditPage<AddressDO, AddressEditForm
     super(parameters, "address");
     init();
     if (isNew() == false) {
-      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
         @Override
         public void onClick()
         {
@@ -67,6 +68,19 @@ public class AddressEditPage extends AbstractEditPage<AddressDO, AddressEditForm
         };
       }, getString("printView"));
       addContentMenuEntry(menu);
+      if (ConfigXml.getInstance().isTelephoneSystemUrlConfigured() == true) {
+        menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+          @Override
+          public void onClick()
+          {
+            final Integer addressId = form.getData().getId();
+            final PageParameters params = new PageParameters();
+            params.add(PhoneCallPage.PARAMETER_KEY_ADDRESS_ID, addressId);
+            setResponsePage(new PhoneCallPage(params));
+          };
+        }, getString("address.directCall.call"));
+        addContentMenuEntry(menu);
+      }
     }
   }
 

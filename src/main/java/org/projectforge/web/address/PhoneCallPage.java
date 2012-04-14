@@ -101,6 +101,26 @@ public class PhoneCallPage extends AbstractSecuredPage
   }
 
   /**
+   * Find a phone number, search order is business, mobile, private mobile and private.
+   * @return Number if found, otherwise empty string.
+   */
+  protected String getFirstPhoneNumber() {
+    if (form.address == null) {
+      return "";
+    }
+    if (StringUtils.isNotEmpty(form.address.getBusinessPhone()) == true) {
+      return form.address.getBusinessPhone();
+    } else if (StringUtils.isNotEmpty(form.address.getMobilePhone()) == true) {
+      return form.address.getMobilePhone();
+    } else if (StringUtils.isNotEmpty(form.address.getPrivateMobilePhone()) == true) {
+      return form.address.getPrivateMobilePhone();
+    } else if (StringUtils.isNotEmpty(form.address.getPrivatePhone()) == true) {
+      return form.address.getPrivatePhone();
+    }
+    return "";
+  }
+
+  /**
    * For special phone numbers: id:# or # | name.
    * @return true, if the phone number was successfully processed.
    */
@@ -115,10 +135,9 @@ public class PhoneCallPage extends AbstractSecuredPage
           final AddressDO address = addressDao.getById(id);
           if (address != null) {
             form.setAddress(address);
-            if (StringUtils.isNotEmpty(address.getBusinessPhone()) == true) {
-              setPhoneNumber(address.getBusinessPhone(), true);
-            } else if (StringUtils.isNotEmpty(address.getMobilePhone()) == true) {
-              setPhoneNumber(address.getMobilePhone(), true);
+            final String no = getFirstPhoneNumber();
+            if (StringUtils.isNotEmpty(no) == true) {
+              setPhoneNumber(no, true);
             }
           }
         }

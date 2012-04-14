@@ -248,9 +248,16 @@ public class PhoneCallForm extends AbstractForm<Object, PhoneCallPage>
     };
     numberTextField.withLabelValue(true).withMatchContains(true).withMinChars(2).withFocus(true).withAutoSubmit(true);
     if (StringUtils.isBlank(phoneNumber) == true) {
-      final String recentNumber = getRecentSearchTermsQueue().get(0);
-      if (StringUtils.isNotBlank(recentNumber) == true) {
-        phoneNumber = recentNumber;
+      if (address != null) {
+        final String no = parentPage.getFirstPhoneNumber();
+        if (StringUtils.isNotBlank(no) == true) {
+          phoneNumber = parentPage.extractPhonenumber(no);
+        }
+      } else {
+        final String recentNumber = getRecentSearchTermsQueue().get(0);
+        if (StringUtils.isNotBlank(recentNumber) == true) {
+          phoneNumber = recentNumber;
+        }
       }
     }
     fs.add(numberTextField);
