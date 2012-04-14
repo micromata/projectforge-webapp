@@ -64,14 +64,15 @@ public class BankingPlugin extends AbstractPlugin
     register(BANK_ACCOUNT_ID, BankAccountDao.class, bankAccountDao, "plugins.banking.account").setNestedDOClasses(
         BankAccountRecordDO.class, BankAccountBalanceDO.class).setSearchable(false);
     // register(BANK_ACCOUNT_BALANCE_ID, BankAccountBalanceDao.class, addressCampaignValueDao, "plugins.banking.accountBalance");
-
+    registerRight(new BankAccountRight());
     // Register the web part:
     registerWeb(BANK_ACCOUNT_ID, BankAccountListPage.class, BankAccountEditPage.class);
     // registerWeb(BANK_ACCOUNT_BALANCE_ID, BankAccountBalanceListPage.class, BankAccountBalanceEditPage.class);
 
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.FIBU);
-    registerMenuItem(new MenuItemDef(parentMenu, BANK_ACCOUNT_ID, 100, "plugins.banking.account.menu", BankAccountListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, BANK_ACCOUNT_ID, 100, "plugins.banking.account.menu", BankAccountListPage.class,
+        BankAccountDao.USER_RIGHT_ID));
     // registerMenuItem(new MenuItemDef(parentMenu, BANK_ACCOUNT_BALANCE_ID, 30, "plugins.banking.bankAccountBalance.menu",
     // BankAccountBalanceListPage.class));
 

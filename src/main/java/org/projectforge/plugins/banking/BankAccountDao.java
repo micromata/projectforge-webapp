@@ -23,47 +23,17 @@
 
 package org.projectforge.plugins.banking;
 
-import org.projectforge.access.OperationType;
 import org.projectforge.core.BaseDao;
-import org.projectforge.user.PFUserDO;
-import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.UserRightId;
 
 public class BankAccountDao extends BaseDao<BankAccountDO>
 {
+  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_BANK_ACCOUNT", "unused", "unused");;
+
   public BankAccountDao()
   {
     super(BankAccountDO.class);
-  }
-
-  /**
-   * User must member of group finance or controlling.
-   * @see org.projectforge.core.BaseDao#hasSelectAccess()
-   */
-  @Override
-  public boolean hasSelectAccess(final PFUserDO user, final boolean throwException)
-  {
-    return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
-  }
-
-  /**
-   * @see org.projectforge.core.BaseDao#hasSelectAccess(org.projectforge.core.ExtendedBaseDO, boolean)
-   * @see #hasSelectAccess(boolean)
-   */
-  @Override
-  public boolean hasSelectAccess(final PFUserDO user, final BankAccountDO obj, final boolean throwException)
-  {
-    return hasSelectAccess(user, throwException);
-  }
-
-  /**
-   * User must member of group finance.
-   * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
-   */
-  @Override
-  public boolean hasAccess(final PFUserDO user, final BankAccountDO obj, final BankAccountDO oldObj, final OperationType operationType,
-      final boolean throwException)
-  {
-    return accessChecker.isUserMemberOfGroup(user, throwException, ProjectForgeGroup.FINANCE_GROUP);
+    userRightId = USER_RIGHT_ID;
   }
 
   @Override
