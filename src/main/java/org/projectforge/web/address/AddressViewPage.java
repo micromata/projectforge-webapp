@@ -41,7 +41,6 @@ import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.GridBuilder;
-import org.projectforge.web.wicket.flowlayout.GridBuilderImpl;
 import org.projectforge.web.wicket.flowlayout.Heading1Panel;
 import org.projectforge.web.wicket.flowlayout.Heading3Panel;
 import org.projectforge.web.wicket.flowlayout.ParTextPanel;
@@ -102,7 +101,7 @@ public class AddressViewPage extends AbstractSecuredPage
 
     final RepeatingView flowform = new RepeatingView("flowform");
     body.add(flowform);
-    gridBuilder = new GridBuilderImpl(flowform, getMySession());
+    gridBuilder = new GridBuilder(flowform, getMySession());
     final StringBuffer buf = new StringBuffer();
     if (address.getForm() != null) {
       buf.append(getString(address.getForm().getI18nKey())).append(" ");
