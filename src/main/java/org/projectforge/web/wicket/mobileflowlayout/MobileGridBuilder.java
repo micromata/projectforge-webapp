@@ -24,27 +24,25 @@
 package org.projectforge.web.wicket.mobileflowlayout;
 
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.projectforge.web.wicket.flowlayout.AbstractGridBuilder;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
-import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.FormHeadingPanel;
-import org.projectforge.web.wicket.flowlayout.GridBuilder;
-import org.projectforge.web.wicket.flowlayout.GridBuilderImpl;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class GridBuilderMobileImpl extends GridBuilderImpl
+public class MobileGridBuilder extends AbstractGridBuilder<MobileFieldsetPanel>
 {
   private static final long serialVersionUID = 134863232462613937L;
 
-  public GridBuilderMobileImpl(final RepeatingView parent)
+  public MobileGridBuilder(final RepeatingView parent)
   {
     this.parentRepeatingView = parent;
   }
 
-  public GridBuilderMobileImpl(final DivPanel parent)
+  public MobileGridBuilder(final DivPanel parent)
   {
     this.parentDivPanel = parent;
   }
@@ -53,7 +51,7 @@ public class GridBuilderMobileImpl extends GridBuilderImpl
    * Throws {@link UnsupportedOperationException}.
    */
   @Override
-  public GridBuilder newGrid8(final String id)
+  public MobileGridBuilder newGrid8(final String id)
   {
     throw new UnsupportedOperationException();
   }
@@ -62,7 +60,7 @@ public class GridBuilderMobileImpl extends GridBuilderImpl
    * Throws {@link UnsupportedOperationException}.
    */
   @Override
-  public GridBuilder newGrid8(final String id, final boolean clearfix)
+  public MobileGridBuilder newGrid8(final String id, final boolean clearfix)
   {
     throw new UnsupportedOperationException();
   }
@@ -71,7 +69,7 @@ public class GridBuilderMobileImpl extends GridBuilderImpl
    * Throws {@link UnsupportedOperationException}.
    */
   @Override
-  public GridBuilder newGrid8()
+  public MobileGridBuilder newGrid8()
   {
     throw new UnsupportedOperationException();
   }
@@ -80,7 +78,7 @@ public class GridBuilderMobileImpl extends GridBuilderImpl
    * Throws {@link UnsupportedOperationException}.
    */
   @Override
-  public GridBuilder newGrid8(final boolean clearfix)
+  public MobileGridBuilder newGrid8(final boolean clearfix)
   {
     throw new UnsupportedOperationException();
   }
@@ -89,7 +87,7 @@ public class GridBuilderMobileImpl extends GridBuilderImpl
    * Throws {@link UnsupportedOperationException}.
    */
   @Override
-  public GridBuilder newGrid16(final String id)
+  public MobileGridBuilder newGrid16(final String id)
   {
     throw new UnsupportedOperationException();
   }
@@ -98,7 +96,7 @@ public class GridBuilderMobileImpl extends GridBuilderImpl
    * Throws {@link UnsupportedOperationException}.
    */
   @Override
-  public GridBuilder newGrid16(final String id, final boolean clearfix)
+  public MobileGridBuilder newGrid16(final String id, final boolean clearfix)
   {
     throw new UnsupportedOperationException();
   }
@@ -107,7 +105,7 @@ public class GridBuilderMobileImpl extends GridBuilderImpl
    * Throws {@link UnsupportedOperationException}.
    */
   @Override
-  public GridBuilder newGrid16()
+  public MobileGridBuilder newGrid16()
   {
     throw new UnsupportedOperationException();
   }
@@ -116,7 +114,7 @@ public class GridBuilderMobileImpl extends GridBuilderImpl
    * Throws {@link UnsupportedOperationException}.
    */
   @Override
-  public GridBuilder newGrid16(final boolean clearfix)
+  public MobileGridBuilder newGrid16(final boolean clearfix)
   {
     throw new UnsupportedOperationException();
   }
@@ -125,14 +123,11 @@ public class GridBuilderMobileImpl extends GridBuilderImpl
    * @return new block panel.
    */
   @Override
-  public GridBuilder newBlockPanel()
+  public MobileGridBuilder newBlockPanel()
   {
-    // final DivPanel divPanel = new DivPanel(newParentChildId());
-    // getParent().add(divPanel);
-    // gridPanel = new DivPanel(DivPanel.CHILD_ID, DivType.TOGGLE_CONTAINER);
-    // blockPanel = new DivPanel(gridPanel.newChildId(), DivType.BLOCK);
-    // gridPanel.add(blockPanel);
-    // current = blockPanel;
+    blockPanel = new DivPanel(newParentChildId());
+    getParent().add(blockPanel);
+    current = blockPanel;
     return this;
   }
 
@@ -149,7 +144,7 @@ public class GridBuilderMobileImpl extends GridBuilderImpl
    * Throws {@link UnsupportedOperationException}.
    */
   @Override
-  public GridBuilder addColumnsPanel(final DivPanel colPanel)
+  public MobileGridBuilder addColumnsPanel(final DivPanel colPanel)
   {
     throw new UnsupportedOperationException();
   }
@@ -158,7 +153,7 @@ public class GridBuilderMobileImpl extends GridBuilderImpl
    * Throws {@link UnsupportedOperationException}.
    */
   @Override
-  public GridBuilder newColumnsPanel()
+  public MobileGridBuilder newColumnsPanel()
   {
     throw new UnsupportedOperationException();
   }
@@ -167,7 +162,7 @@ public class GridBuilderMobileImpl extends GridBuilderImpl
    * Throws {@link UnsupportedOperationException}.
    */
   @Override
-  public GridBuilder newColumnPanel(final DivType length)
+  public MobileGridBuilder newColumnPanel(final DivType length)
   {
     throw new UnsupportedOperationException();
   }
@@ -176,7 +171,7 @@ public class GridBuilderMobileImpl extends GridBuilderImpl
    * Throws {@link UnsupportedOperationException}.
    */
   @Override
-  public GridBuilder newColumnPanel(final DivType length, final boolean newBlock4NonWideScreen)
+  public MobileGridBuilder newColumnPanel(final DivType length, final boolean newBlock4NonWideScreen)
   {
     throw new UnsupportedOperationException();
   }
@@ -194,13 +189,13 @@ public class GridBuilderMobileImpl extends GridBuilderImpl
    * Throws {@link UnsupportedOperationException}.
    */
   @Override
-  public GridBuilder addColumnPanel(final DivPanel colPanel, final DivType length)
+  public MobileGridBuilder addColumnPanel(final DivPanel colPanel, final DivType length)
   {
     throw new UnsupportedOperationException();
   }
 
   /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilder#getPanel()
+   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#getPanel()
    */
   @Override
   public DivPanel getPanel()
@@ -218,39 +213,39 @@ public class GridBuilderMobileImpl extends GridBuilderImpl
   }
 
   /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilder#newFieldset(java.lang.String)
+   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFieldset(java.lang.String)
    */
   @Override
-  public FieldsetPanel newFieldset(final String label)
+  public MobileFieldsetPanel newFieldset(final String label)
   {
-    return new FieldsetPanel(current, label);
+    return new MobileFieldsetPanel(current, label);
   }
 
   /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilder#newFieldset(java.lang.String, boolean)
+   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFieldset(java.lang.String, boolean)
    */
   @Override
-  public FieldsetPanel newFieldset(final String label, final boolean multipleChildren)
+  public MobileFieldsetPanel newFieldset(final String label, final boolean multipleChildren)
   {
-    return new FieldsetPanel(current, label, multipleChildren);
+    throw new UnsupportedOperationException();
   }
 
   /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilder#newFieldset(java.lang.String, java.lang.String)
+   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFieldset(java.lang.String, java.lang.String)
    */
   @Override
-  public FieldsetPanel newFieldset(final String labelText, final String labelDescription)
+  public MobileFieldsetPanel newFieldset(final String labelText, final String labelDescription)
   {
-    return new FieldsetPanel(current, labelText, labelDescription);
+    throw new UnsupportedOperationException();
   }
 
   /**
-   * @see org.projectforge.web.wicket.flowlayout.GridBuilder#newFieldset(java.lang.String, java.lang.String, boolean)
+   * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFieldset(java.lang.String, java.lang.String, boolean)
    */
   @Override
-  public FieldsetPanel newFieldset(final String labelText, final String labelDescription, final boolean multipleChildren)
+  public MobileFieldsetPanel newFieldset(final String labelText, final String labelDescription, final boolean multipleChildren)
   {
-    return new FieldsetPanel(current, labelText, labelDescription, multipleChildren);
+    throw new UnsupportedOperationException();
   }
 
   /**
