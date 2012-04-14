@@ -158,7 +158,8 @@ AbstractSecuredForm<F, P>
     } else {
       final RepeatingView filter = new RepeatingView("filter");
       add(filter);
-      gridBuilder = newGridBuilder(filter).newGrid16();
+      gridBuilder = newGridBuilder(filter);
+      gridBuilder.newGrid16();
       {
         // Fieldset search filter
         final FieldsetPanel fs = gridBuilder.newFieldset(getString("searchFilter"), true);
