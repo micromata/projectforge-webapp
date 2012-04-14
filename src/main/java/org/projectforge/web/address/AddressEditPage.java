@@ -24,6 +24,7 @@
 package org.projectforge.web.address;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
@@ -33,6 +34,7 @@ import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 @EditPage(defaultReturnPage = AddressListPage.class)
 public class AddressEditPage extends AbstractEditPage<AddressDO, AddressEditForm, AddressDao>
@@ -47,10 +49,25 @@ public class AddressEditPage extends AbstractEditPage<AddressDO, AddressEditForm
   @SpringBean(name = "personalAddressDao")
   private PersonalAddressDao personalAddressDao;
 
+  @SuppressWarnings("serial")
   public AddressEditPage(final PageParameters parameters)
   {
     super(parameters, "address");
     init();
+    if (isNew() == false) {
+      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+        @Override
+        public void onClick()
+        {
+          final Integer addressId = form.getData().getId();
+          final PageParameters params = new PageParameters();
+          params.add(AbstractEditPage.PARAMETER_KEY_ID, addressId);
+          final AddressViewPage addressViewPage = new AddressViewPage(params);
+          setResponsePage(addressViewPage);
+        };
+      }, getString("printView"));
+      addContentMenuEntry(menu);
+    }
   }
 
   @Override
