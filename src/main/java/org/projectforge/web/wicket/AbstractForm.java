@@ -36,7 +36,6 @@ import org.apache.wicket.validation.ValidationError;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.GridBuilder;
-import org.projectforge.web.wicket.flowlayout.GridBuilderImpl;
 
 public abstract class AbstractForm<F, P extends AbstractUnsecureBasePage> extends Form<F>
 {
@@ -191,18 +190,18 @@ public abstract class AbstractForm<F, P extends AbstractUnsecureBasePage> extend
   }
 
   /**
-   * @see GridBuilderImpl#GridBuilder(RepeatingView, MySession)
+   * @see GridBuilder#GridBuilder(RepeatingView, MySession)
    */
   public GridBuilder newGridBuilder(final RepeatingView parent)
   {
-    return new GridBuilderImpl(parent, getMySession());
+    return new GridBuilder(parent, getMySession());
   }
 
   /**
-   * @see GridBuilderImpl#GridBuilder(DivPanel, MySession)
+   * @see GridBuilder#GridBuilder(DivPanel, MySession)
    */
   public GridBuilder newGridBuilder(final DivPanel parent)
   {
-    return new GridBuilderImpl(parent, getMySession());
+    return new GridBuilder(parent, getMySession());
   }
 }
