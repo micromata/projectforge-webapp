@@ -174,8 +174,14 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   {
     final InputPanel input = add(textField);
     if (fieldProperties.getFieldType() != null) {
-      input.setFieldType(fieldProperties.getFieldType());
+      setFieldType(input, fieldProperties.getFieldType());
     }
+    return input;
+  }
+
+  protected InputPanel setFieldType(final InputPanel input, final FieldType fieldType)
+  {
+    input.setFieldType(fieldType);
     return input;
   }
 
@@ -296,7 +302,7 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
     return DropDownChoicePanel.WICKET_ID;
   }
 
-  protected abstract String newChildId();
+  public abstract String newChildId();
 
   protected void modifyAddedChild(final Component child)
   {

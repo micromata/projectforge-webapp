@@ -82,7 +82,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   private static String getString(final Component parent, final String label, final boolean translate)
   {
     if (translate == false || label == null) {
-      return null;
+      return label;
     }
     return parent.getString(label);
   }

@@ -38,35 +38,28 @@ public class InputPanel extends Panel implements ComponentWrapperPanel
 
   private static final long serialVersionUID = -4126462093466172226L;
 
-  private FormComponent<?> field;
+  private FormComponent< ? > field;
 
   private FieldType fieldType;
 
-  private boolean initialized;
-
-  public InputPanel(final String id, final FormComponent<?> field)
+  public InputPanel(final String id, final FormComponent< ? > field)
   {
     super(id);
     add(this.field = field);
   }
 
   /**
-   * @see org.apache.wicket.Component#onBeforeRender()
+   * @see org.apache.wicket.Component#onInitialize()
    */
   @Override
-  protected void onBeforeRender()
+  protected void onInitialize()
   {
-    super.onBeforeRender();
-    if (initialized == true) {
-      return;
-    }
-    initialized = true;
+    super.onInitialize();
     if (fieldType != null) {
-      if (fieldType == FieldType.PHONE_NO ||fieldType == FieldType.MOBILE_PHONE_NO) {
+      if (fieldType == FieldType.PHONE_NO || fieldType == FieldType.MOBILE_PHONE_NO) {
         field.add(AttributeModifier.append("class", "phone"));
       }
     }
-
   }
 
   /**
@@ -82,7 +75,7 @@ public class InputPanel extends Panel implements ComponentWrapperPanel
   /**
    * @return the field
    */
-  public FormComponent<?> getField()
+  public FormComponent< ? > getField()
   {
     return field;
   }
@@ -102,6 +95,17 @@ public class InputPanel extends Panel implements ComponentWrapperPanel
   public InputPanel setFieldType(final FieldType fieldType)
   {
     this.fieldType = fieldType;
+    return this;
+  }
+
+  /**
+   * Sets the html markup attribute type to the given value.
+   * @param attr
+   * @return this for chaining.
+   */
+  public InputPanel setTypeAttribute(final String attr)
+  {
+    field.add(AttributeModifier.replace("type", attr));
     return this;
   }
 }

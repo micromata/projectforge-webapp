@@ -33,6 +33,8 @@ import org.projectforge.web.mobile.CollapsiblePanel;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.FieldProperties;
+import org.projectforge.web.wicket.flowlayout.FieldType;
+import org.projectforge.web.wicket.flowlayout.InputPanel;
 
 /**
  * Represents a entry of a group panel. This can be a label, text field or other form components.
@@ -52,6 +54,7 @@ public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPan
   public MobileFieldsetPanel(final String id, final FieldProperties< ? > fieldProperties)
   {
     super(id);
+    this.multipleChildren = fieldProperties.isMultipleChildren();
     fieldset = new WebMarkupContainer("fieldset");
     superAdd(fieldset);
     this.labelText = fieldProperties.getLabel();
@@ -60,7 +63,7 @@ public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPan
       @Override
       public String getObject()
       {
-        return labelText;
+        return getString(labelText);
       };
     }).setRenderBodyOnly(true));
   }
@@ -91,6 +94,19 @@ public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPan
     add(WicketUtils.getInvisibleComponent(FIELDS_ID));
   }
 
+  @Override
+  protected InputPanel setFieldType(final InputPanel input, final FieldType fieldType)
+  {
+    if (fieldType == FieldType.E_MAIL) {
+      input.setTypeAttribute("email");
+    } else if (fieldType == FieldType.WEB_PAGE) {
+      input.setTypeAttribute("url");
+    } else if (fieldType == FieldType.PHONE_NO) {
+      input.setTypeAttribute("tel");
+    }
+    return input;
+  }
+
   /**
    * @see org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel#getThis()
    */
@@ -110,7 +126,7 @@ public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPan
     if (multipleChildren == true) {
       if (repeater == null) {
         repeater = new RepeatingView(FIELDS_ID);
-        add(repeater);
+        fieldset.add(repeater);
       }
       return repeater.newChildId();
     } else {

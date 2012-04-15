@@ -27,7 +27,9 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.PersonalAddressDao;
+import org.projectforge.web.address.AddressPageSupport.AddressParameters;
 import org.projectforge.web.mobile.AbstractMobileEditForm;
+import org.projectforge.web.wicket.flowlayout.FieldType;
 
 public class AddressMobileEditForm extends AbstractMobileEditForm<AddressDO, AddressMobileEditPage>
 {
@@ -39,7 +41,7 @@ public class AddressMobileEditForm extends AbstractMobileEditForm<AddressDO, Add
   @SpringBean(name = "personalAddressDao")
   private PersonalAddressDao personalAddressDao;
 
-  protected AddressPageSupport addressEditSupport;
+  protected AddressPageSupport pageSupport;
 
   public AddressMobileEditForm(final AddressMobileEditPage parentPage, final AddressDO data)
   {
@@ -50,14 +52,44 @@ public class AddressMobileEditForm extends AbstractMobileEditForm<AddressDO, Add
   protected void init()
   {
     super.init();
-    addressEditSupport = new AddressPageSupport(this, gridBuilder, addressDao, personalAddressDao, data);
+    pageSupport = new AddressPageSupport(this, gridBuilder, addressDao, personalAddressDao, data);
     gridBuilder.newCollapsiblePanel(data.getFullNameWithTitleAndForm());
-    addressEditSupport.addFormOfAddress();
-    //    addressEditSupport.addTitle();
-    //    addressEditSupport.addFirstName();
-    addressEditSupport.addName();
-    // addressEditSupport.addContactStatus();
-    // addressEditSupport.addBirthday();
-    // addressEditSupport.addWebsite();
+    pageSupport.addFormOfAddress();
+    pageSupport.addTitle();
+    pageSupport.addFirstName();
+    pageSupport.addName();
+    pageSupport.addContactStatus();
+    pageSupport.addBirthday();
+    pageSupport.addOrganization();
+    pageSupport.addDivision();
+    pageSupport.addPosition();
+    pageSupport.addWebsite();
+    pageSupport.addAddressStatus();
+    // addressEditSupport.addLanguage(); // Autocomplete doesn't work yet
+    addAddress(pageSupport.getBusinessAddressParameters(), "businessPhone", "mobilePhone", "fax");
+    pageSupport.addEmail();
+    addAddress(pageSupport.getPrivateAddressParameters(), "privatePhone", "privateMobilePhone", null);
+    pageSupport.addPrivateEmail();
+    addAddress(pageSupport.getPostalAddressParameters(), null, null, null);
+
+    gridBuilder.newCollapsiblePanel(getString("comment")).setCollapsed();
+    pageSupport.addComment();
+  }
+
+  private void addAddress(final AddressParameters addressParameters, final String phone, final String mobile, final String fax)
+  {
+    gridBuilder.newCollapsiblePanel(addressParameters.addressType).setCollapsed();
+    pageSupport.addAddressText(addressParameters.addressType, addressParameters.addressTextProperty);
+    pageSupport.addZipCode(addressParameters.zipCodeProperty);
+    pageSupport.addCity(addressParameters.cityProperty);
+    if (phone != null) {
+      pageSupport.addPhoneNumber(phone, "address.phone", null, FieldType.PHONE_NO);
+    }
+    if (mobile != null) {
+      pageSupport.addPhoneNumber(phone, "address.phoneType.mobile", null, FieldType.PHONE_NO);
+    }
+    if (fax != null) {
+      pageSupport.addPhoneNumber(phone, "address.phoneType.fax", null, FieldType.PHONE_NO);
+    }
   }
 }
