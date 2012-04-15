@@ -23,15 +23,19 @@
 
 package org.projectforge.web.mobile;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.AbstractBaseDO;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.I18nEnum;
 import org.projectforge.web.address.AddressMobileEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.flowlayout.FieldProperties;
+import org.projectforge.web.wicket.mobileflowlayout.LabelValueDataTablePanel;
 import org.projectforge.web.wicket.mobileflowlayout.MobileGridBuilder;
 
 /**
@@ -63,12 +67,52 @@ public abstract class AbstractMobileViewPage<O extends AbstractBaseDO< ? >, D ex
     gridBuilder = new MobileGridBuilder(flowfields);
   }
 
+  /**
+   * Adds row only and only if the value isn't blank.
+   * @param label
+   * @param value
+   */
+  protected void addRow(final LabelValueDataTablePanel table, final String labelKey, final String value)
+  {
+    if (StringUtils.isBlank(value) == true) {
+      // Do nothing.
+      return;
+    }
+    table.addRow(getString(labelKey), value);
+  }
+
+  /**
+   * Adds row only and only if the value isn't null and its string representation isn't blank.
+   * @param label
+   * @param fieldProperties
+   */
+  protected void addRow(final LabelValueDataTablePanel table, final FieldProperties< ? > fieldProperties)
+  {
+    final Object value = fieldProperties.getValue();
+    if (value == null) {
+      // Do nothing.
+      return;
+    }
+    final String valueString;
+    if (value instanceof I18nEnum) {
+      valueString = getString(((I18nEnum) value).getI18nKey());
+    } else {
+      valueString = value.toString();
+    }
+    if (StringUtils.isBlank(valueString) == true) {
+      // Do nothing.
+      return;
+    }
+    table.addRow(getString(fieldProperties.getLabel()), valueString);
+  }
+
   @Override
   protected void addTopRightButton()
   {
     final PageParameters params = new PageParameters();
     params.add(AbstractEditPage.PARAMETER_KEY_ID, data.getId());
-    headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.CHECK, AddressMobileEditPage.class, params, getString("edit")));
+    headerContainer.add(new JQueryButtonPanel(TOP_RIGHT_BUTTON_ID, JQueryButtonType.CHECK, AddressMobileEditPage.class, params,
+        getString("edit")));
   }
 
   protected abstract Class< ? extends AbstractSecuredMobilePage> getListPageClass();

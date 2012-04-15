@@ -39,7 +39,7 @@ public class AddressMobileEditForm extends AbstractMobileEditForm<AddressDO, Add
   @SpringBean(name = "personalAddressDao")
   private PersonalAddressDao personalAddressDao;
 
-  protected AddressEditSupport addressEditSupport;
+  protected AddressPageSupport addressEditSupport;
 
   public AddressMobileEditForm(final AddressMobileEditPage parentPage, final AddressDO data)
   {
@@ -50,7 +50,7 @@ public class AddressMobileEditForm extends AbstractMobileEditForm<AddressDO, Add
   protected void init()
   {
     super.init();
-    addressEditSupport = new AddressEditSupport(this, gridBuilder, addressDao, personalAddressDao, data);
+    addressEditSupport = new AddressPageSupport(this, gridBuilder, addressDao, personalAddressDao, data);
     gridBuilder.newCollapsiblePanel(data.getFullNameWithTitleAndForm());
     addressEditSupport.addName();
   }
