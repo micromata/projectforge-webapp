@@ -96,7 +96,11 @@ public class MobileGridBuilder extends AbstractGridBuilder<MobileFieldsetPanel>
   @Override
   public MobileFieldsetPanel newFieldset(final String label, final boolean multipleChildren)
   {
-    throw new UnsupportedOperationException();
+    Validate.notNull(current);
+    if (current instanceof CollapsiblePanel) {
+      return new MobileFieldsetPanel((CollapsiblePanel) current, label, multipleChildren);
+    }
+    throw new UnsupportedOperationException("Please add collapsiblePanel to the GridBuilder first.");
   }
 
   /**

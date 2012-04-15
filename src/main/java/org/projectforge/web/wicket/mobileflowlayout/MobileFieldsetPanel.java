@@ -74,6 +74,13 @@ public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPan
     parent.add(this);
   }
 
+  public MobileFieldsetPanel(final CollapsiblePanel parent, final String labeltext, final boolean multipleChildren)
+  {
+    this(parent.newChildId(), labeltext);
+    this.multipleChildren = multipleChildren;
+    parent.add(this);
+  }
+
   /**
    * @see org.apache.wicket.Component#onBeforeRender()
    */
