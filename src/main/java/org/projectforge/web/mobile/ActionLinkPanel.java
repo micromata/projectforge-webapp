@@ -29,6 +29,8 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.projectforge.web.wicket.ImageDef;
+import org.projectforge.web.wicket.PresizedImage;
 
 /**
  * A link panel which instantiates a phone call on an iPhone as well as an sms or an e-mail.
@@ -84,7 +86,7 @@ public class ActionLinkPanel extends Panel // implements IField
   private ExternalLink getSmsLink(final String number)
   {
     final ExternalLink smsLink = new ExternalLink("sms", "sms:" + number);
-    // smsLink.add(new PresizedImage("smsImage", getResponse(), ImageDef.SMS));
+    smsLink.add(new PresizedImage("smsImage", getResponse(), ImageDef.SMS));
     return smsLink;
   }
 

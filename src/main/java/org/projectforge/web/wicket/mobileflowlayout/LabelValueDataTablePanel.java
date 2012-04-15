@@ -102,7 +102,7 @@ public class LabelValueDataTablePanel extends Panel
     } else if (type == FieldType.PHONE_NO) {
       row.add(new ActionLinkPanel("value", ActionLinkType.CALL, valueString));
     } else if (type == FieldType.MOBILE_PHONE_NO) {
-      row.add(new ActionLinkPanel("value", ActionLinkType.CALL, valueString));
+      row.add(new ActionLinkPanel("value", ActionLinkType.CALL_AND_SMS, valueString));
     } else if (type == FieldType.E_MAIL) {
       row.add(new ActionLinkPanel("value", ActionLinkType.MAIL, valueString));
     } else {
