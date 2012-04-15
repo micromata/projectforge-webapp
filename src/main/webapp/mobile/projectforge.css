@@ -16,6 +16,10 @@ table.data td {
 	font-weight: bold;
 }
 
+ul.feedbackPanel {
+	color: red;
+}
+
 li.moreEntriesAvailable {
 	color: red;
 	font-style: italic;
