@@ -29,6 +29,7 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.projectforge.web.mobile.CollapsiblePanel;
 import org.projectforge.web.wicket.flowlayout.AbstractGridBuilder;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.FieldProperties;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -65,6 +66,15 @@ public class MobileGridBuilder extends AbstractGridBuilder<MobileFieldsetPanel>
       return new LabelValueDataTablePanel((CollapsiblePanel) current);
     }
     throw new UnsupportedOperationException("Please add collapsiblePanel to the GridBuilder first.");
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.flowlayout.AbstractGridBuilder#newFieldset(org.projectforge.web.wicket.flowlayout.FieldProperties)
+   */
+  @Override
+  public MobileFieldsetPanel newFieldset(final FieldProperties< ? > fieldProperties)
+  {
+    return new MobileFieldsetPanel((CollapsiblePanel) current, getString(fieldProperties.getLabel()));
   }
 
   /**

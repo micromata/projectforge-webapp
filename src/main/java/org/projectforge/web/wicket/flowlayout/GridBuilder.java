@@ -297,6 +297,15 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
   }
 
   /**
+   * @see org.projectforge.web.wicket.flowlayout.AbstractGridBuilder#newFieldset(org.projectforge.web.wicket.flowlayout.FieldProperties)
+   */
+  @Override
+  public FieldsetPanel newFieldset(final FieldProperties<?> fieldProperties)
+  {
+    return new FieldsetPanel(current, getString(fieldProperties.getLabel()));
+  }
+
+  /**
    * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFieldset(java.lang.String)
    */
   @Override
