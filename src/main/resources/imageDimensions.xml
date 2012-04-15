@@ -230,6 +230,7 @@
   <image path="/images/zoom.png" width="16" height="16"/>
   <image path="/images/zoom_in.png" width="16" height="16"/>
   <image path="/images/zoom_out.png" width="16" height="16"/>
+  <image path="/mobile/jquery.mobile/images/ajax-loader.gif" width="46" height="46"/>
   <image path="/mobile/jquery.mobile/images/ajax-loader.png" width="35" height="35"/>
   <image path="/mobile/jquery.mobile/images/icons-18-black.png" width="776" height="18"/>
   <image path="/mobile/jquery.mobile/images/icons-18-white.png" width="776" height="18"/>
