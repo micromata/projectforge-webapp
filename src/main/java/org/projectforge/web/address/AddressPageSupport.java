@@ -54,6 +54,7 @@ import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.AbstractGridBuilder;
+import org.projectforge.web.wicket.flowlayout.FieldProperties;
 import org.projectforge.web.wicket.flowlayout.FieldType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
@@ -64,25 +65,44 @@ import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-class AddressEditSupport implements Serializable
+class AddressPageSupport implements Serializable
 {
   private static final long serialVersionUID = -7434267003873770614L;
 
-  private final AddressDao addressDao;
+  private AddressDao addressDao;
 
   protected PersonalAddressDO personalAddress;
 
   private final AddressDO address;
 
-  private final Form<AddressDO> form;
+  private Form<AddressDO> form;
 
   @SuppressWarnings("unchecked")
   private final TextField<String>[] dependentFormComponents = new TextField[3];
 
-  AbstractGridBuilder<?> gridBuilder;
+  AbstractGridBuilder< ? > gridBuilder;
 
+  /**
+   * Constructor for mobile view page.
+   * @param gridBuilder
+   * @param address
+   */
+  public AddressPageSupport(final AbstractGridBuilder< ? > gridBuilder, final AddressDO address)
+  {
+    this.gridBuilder = gridBuilder;
+    this.address = address;
+  }
+
+  /**
+   * Constructor for edit pages.
+   * @param form
+   * @param gridBuilder
+   * @param addressDao
+   * @param personalAddressDao
+   * @param address
+   */
   @SuppressWarnings("serial")
-  public AddressEditSupport(final Form<AddressDO> form, final AbstractGridBuilder<?> gridBuilder, final AddressDao addressDao,
+  public AddressPageSupport(final Form<AddressDO> form, final AbstractGridBuilder< ? > gridBuilder, final AddressDao addressDao,
       final PersonalAddressDao personalAddressDao, final AddressDO address)
   {
     this.form = form;
@@ -131,14 +151,14 @@ class AddressEditSupport implements Serializable
 
   public FieldsetPanel addFirstName()
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("firstName"));
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("firstName"));
     fs.add(dependentFormComponents[0] = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(address, "firstName")));
     return fs;
   }
 
   public FieldsetPanel addFormOfAddress()
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("address.form"), true);
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("address.form"), true);
     final LabelValueChoiceRenderer<FormOfAddress> formChoiceRenderer = new LabelValueChoiceRenderer<FormOfAddress>(form,
         FormOfAddress.values());
     fs.addDropDownChoice(new PropertyModel<FormOfAddress>(address, "form"), formChoiceRenderer.getValues(), formChoiceRenderer)
@@ -148,14 +168,14 @@ class AddressEditSupport implements Serializable
 
   public FieldsetPanel addTitle()
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("address.title"));
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("address.title"));
     fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(address, "title")));
     return fs;
   }
 
   public FieldsetPanel addWebsite()
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("address.website"));
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("address.website"));
     fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(address, "website"))).setFieldType(FieldType.WEB_PAGE);
     return fs;
   }
@@ -163,9 +183,9 @@ class AddressEditSupport implements Serializable
   @SuppressWarnings("serial")
   public FieldsetPanel addOrganization()
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("organization"));
-    fs.add(dependentFormComponents[2] = new PFAutoCompleteMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(address,
-        "organization")) {
+    final FieldProperties<String> props = getOrganizationProperties();
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(props);
+    fs.add(dependentFormComponents[2] = new PFAutoCompleteMaxLengthTextField(fs.getTextFieldId(), props.getPropertyModel()) {
 
       @Override
       protected List<String> getChoices(final String input)
@@ -176,37 +196,48 @@ class AddressEditSupport implements Serializable
     return fs;
   }
 
+  public FieldProperties<String> getOrganizationProperties()
+  {
+    return new FieldProperties<String>("organization", new PropertyModel<String>(address, "organization"));
+  }
+
   public FieldsetPanel addDivision()
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("address.division"));
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("address.division"));
     fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(address, "division")));
     return fs;
   }
 
   public FieldsetPanel addPosition()
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("address.positionText"));
-    fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(address, "positionText")));
+    final FieldProperties<String> props = getPositionTextProperties();
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(props);
+    fs.add(new MaxLengthTextField(fs.getTextFieldId(), props.getPropertyModel()));
     return fs;
+  }
+
+  public FieldProperties<String> getPositionTextProperties()
+  {
+    return new FieldProperties<String>("address.positionText", new PropertyModel<String>(address, "positionText"));
   }
 
   public FieldsetPanel addEmail()
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("email"), getString("address.business"));
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("email"), getString("address.business"));
     fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(address, "email"))).setFieldType(FieldType.E_MAIL);
     return fs;
   }
 
   public FieldsetPanel addPrivateEmail()
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("email"), getString("address.private"));
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("email"), getString("address.private"));
     fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(address, "privateEmail"))).setFieldType(FieldType.E_MAIL);
     return fs;
   }
 
   public FieldsetPanel addContactStatus()
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("address.contactStatus"));
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("address.contactStatus"));
     final LabelValueChoiceRenderer<ContactStatus> contactStatusChoiceRenderer = new LabelValueChoiceRenderer<ContactStatus>(form,
         ContactStatus.values());
     fs.addDropDownChoice(new PropertyModel<ContactStatus>(address, "contactStatus"), contactStatusChoiceRenderer.getValues(),
@@ -216,18 +247,24 @@ class AddressEditSupport implements Serializable
 
   public FieldsetPanel addAddressStatus()
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("address.addressStatus"));
+    final FieldProperties<AddressStatus> props = getAddressStatusProperties();
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(props);
     final LabelValueChoiceRenderer<AddressStatus> addressStatusChoiceRenderer = new LabelValueChoiceRenderer<AddressStatus>(form,
         AddressStatus.values());
-    fs.addDropDownChoice(new PropertyModel<AddressStatus>(address, "addressStatus"), addressStatusChoiceRenderer.getValues(),
-        addressStatusChoiceRenderer).setRequired(true).setNullValid(false);
+    fs.addDropDownChoice(props.getModel(), addressStatusChoiceRenderer.getValues(), addressStatusChoiceRenderer).setRequired(true)
+    .setNullValid(false);
     return fs;
+  }
+
+  public FieldProperties<AddressStatus> getAddressStatusProperties()
+  {
+    return new FieldProperties<AddressStatus>("address.addressStatus", new PropertyModel<AddressStatus>(address, "addressStatus"));
   }
 
   @SuppressWarnings("serial")
   public FieldsetPanel addBirthday()
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("address.birthday"), true);
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("address.birthday"), true);
     fs.add(new DatePanel(fs.newChildId(), new PropertyModel<Date>(address, "birthday"), DatePanelSettings.get().withTargetType(
         java.sql.Date.class)));
     fs.add(new HtmlCommentPanel(fs.newChildId(), new Model<String>() {
@@ -242,7 +279,7 @@ class AddressEditSupport implements Serializable
 
   public FieldsetPanel addLanguage()
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("language"), true);
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("language"), true);
     final LanguageField language = new LanguageField(fs.getTextFieldId(), new PropertyModel<Locale>(address, "communicationLanguage"));
     language.setFavoriteLanguages(addressDao.getUsedCommunicationLanguages());
     fs.add(language);
@@ -253,21 +290,21 @@ class AddressEditSupport implements Serializable
   public FieldsetPanel addFingerPrint()
   {
     // Finger print
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("address.fingerprint"));
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("address.fingerprint"));
     fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(address, "fingerprint")));
     return fs;
   }
 
   public FieldsetPanel addPublicKey()
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("address.publicKey"));
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("address.publicKey"));
     fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(address, "publicKey")));// .setAutogrow();
     return fs;
   }
 
   public FieldsetPanel addComment()
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("comment"));
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("comment"));
     final MaxLengthTextArea comment = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(address, "comment"));
     fs.add(comment).setAutogrow();
     return fs;
@@ -276,7 +313,7 @@ class AddressEditSupport implements Serializable
   public FieldsetPanel addPhoneNumber(final String property, final String labelKey, final String labelDescriptionKey,
       final String favoriteProperty, final FieldType fieldType)
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString(labelKey), getString(labelDescriptionKey), true);
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString(labelKey), getString(labelDescriptionKey), true);
     final MaxLengthTextField phoneNumber = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(address, property));
     fs.add(phoneNumber).setFieldType(fieldType);
     phoneNumber.add(new PhoneNumberValidator());
@@ -286,7 +323,7 @@ class AddressEditSupport implements Serializable
   @SuppressWarnings("serial")
   public FieldsetPanel addAddressText(final String addressType, final String addressTextProperty)
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("address.addressText"), addressType);
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("address.addressText"), addressType);
     fs.add(new PFAutoCompleteTextField<String>(fs.getTextFieldId(), new PropertyModel<String>(address, addressTextProperty)) {
       @Override
       protected List<String> getChoices(final String input)
@@ -299,28 +336,28 @@ class AddressEditSupport implements Serializable
 
   public FieldsetPanel addZipCode(final String zipCodeProperty)
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("address.zipCode"));
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("address.zipCode"));
     fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(address, zipCodeProperty)));
     return fs;
   }
 
   public FieldsetPanel addCity(final String cityProperty)
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("address.city"));
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("address.city"));
     fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(address, cityProperty)));
     return fs;
   }
 
   public FieldsetPanel addCountry(final String countryProperty)
   {
-    final FieldsetPanel fs =(FieldsetPanel) gridBuilder.newFieldset(getString("address.country"));
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("address.country"));
     fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(address, countryProperty)));
     return fs;
   }
 
   public FieldsetPanel addState(final String stateProperty)
   {
-    final FieldsetPanel fs = (FieldsetPanel)gridBuilder.newFieldset(getString("address.state"));
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("address.state"));
     fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(address, stateProperty)));
     return fs;
   }

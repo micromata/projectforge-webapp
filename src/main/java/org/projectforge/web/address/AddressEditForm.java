@@ -29,7 +29,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.PersonalAddressDao;
-import org.projectforge.web.address.AddressEditSupport.AddressParameters;
+import org.projectforge.web.address.AddressPageSupport.AddressParameters;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
@@ -45,7 +45,7 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
   @SpringBean(name = "personalAddressDao")
   private PersonalAddressDao personalAddressDao;
 
-  protected AddressEditSupport addressEditSupport;
+  protected AddressPageSupport addressEditSupport;
 
   private static final String PHONE_NUMBER_FAVORITE_LABEL = "*";
 
@@ -58,7 +58,7 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
   protected void init()
   {
     super.init();
-    addressEditSupport = new AddressEditSupport(this, gridBuilder, (AddressDao) getBaseDao(), personalAddressDao, data);
+    addressEditSupport = new AddressPageSupport(this, gridBuilder, (AddressDao) getBaseDao(), personalAddressDao, data);
     /* GRID8 - BLOCK */
     gridBuilder.newGrid8().newColumnsPanel().newColumnPanel(DivType.COL_50);
     addressEditSupport.addName();
