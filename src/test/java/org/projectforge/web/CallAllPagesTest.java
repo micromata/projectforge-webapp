@@ -33,6 +33,7 @@ import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.Registry;
 import org.projectforge.test.TestBase;
 import org.projectforge.test.TestConfiguration;
+import org.projectforge.web.address.AddressMobileViewPage;
 import org.projectforge.web.address.AddressViewPage;
 import org.projectforge.web.admin.SetupPage;
 import org.projectforge.web.doc.TutorialPage;
@@ -55,6 +56,7 @@ public class CallAllPagesTest extends WicketPageTestBase
     LoginPage.class, LoginMobilePage.class, SetupPage.class, TutorialPage.class, //
     AddressViewPage.class, // Checked in AddressPagesTest
     // Not yet checked:
+    AddressMobileViewPage.class, // Needs id of an address.
     ScriptExecutePage.class};
 
   @Test
