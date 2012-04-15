@@ -48,9 +48,9 @@ import org.projectforge.xml.stream.XmlObjectWriter;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class ImageDimensionsCreator
+public class CreateImageDimensions
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ImageDimensionsCreator.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CreateImageDimensions.class);
 
   private static final String PATH = "src/main/webapp/";
 
