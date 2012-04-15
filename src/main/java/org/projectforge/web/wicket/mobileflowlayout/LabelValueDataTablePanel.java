@@ -101,7 +101,8 @@ public class LabelValueDataTablePanel extends Panel
       row.add(new ActionLinkPanel("value", ActionLinkType.EXTERNAL_URL, valueString));
     } else if (type == FieldType.PHONE_NO) {
       row.add(new ActionLinkPanel("value", ActionLinkType.CALL, valueString));
-
+    } else if (type == FieldType.MOBILE_PHONE_NO) {
+      row.add(new ActionLinkPanel("value", ActionLinkType.CALL, valueString));
     } else {
       row.add(new Label("value", valueString));
     }
