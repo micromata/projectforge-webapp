@@ -59,6 +59,7 @@ import org.projectforge.web.wicket.flowlayout.FieldType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
+import org.projectforge.web.wicket.mobileflowlayout.MobileGridBuilder;
 
 /**
  * For sharing functionality between mobile and normal edit pages.
@@ -84,11 +85,12 @@ class AddressPageSupport implements Serializable
 
   /**
    * Constructor for mobile view page.
-   * @param gridBuilder
+   * @param gridBuilder Needed for translations.
    * @param address
    */
-  public AddressPageSupport(final AddressDO address)
+  public AddressPageSupport(final MobileGridBuilder gridBuilder, final AddressDO address)
   {
+    this.gridBuilder = gridBuilder;
     this.address = address;
   }
 
@@ -393,9 +395,9 @@ class AddressPageSupport implements Serializable
   }
 
   public FieldsetPanel addPhoneNumber(final String property, final String labelKey, final String labelDescriptionKey,
-      final String favoriteProperty, final FieldType fieldType)
+      final FieldType fieldType)
   {
-    final FieldProperties<String> props = getPhoneNumberProperties(property, labelKey, labelDescriptionKey, favoriteProperty, fieldType);
+    final FieldProperties<String> props = getPhoneNumberProperties(property, labelKey, labelDescriptionKey, fieldType);
     final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(props);
     final MaxLengthTextField phoneNumber = new MaxLengthTextField(fs.getTextFieldId(), props.getModel());
     fs.add(phoneNumber, props);
@@ -404,7 +406,7 @@ class AddressPageSupport implements Serializable
   }
 
   public FieldProperties<String> getPhoneNumberProperties(final String property, final String labelKey, final String labelDescriptionKey,
-      final String favoriteProperty, final FieldType fieldType)
+      final FieldType fieldType)
       {
     return new FieldProperties<String>(labelKey, new PropertyModel<String>(address, property), true).setLabelDescription(
         labelDescriptionKey).setFieldType(fieldType);
@@ -427,8 +429,8 @@ class AddressPageSupport implements Serializable
 
   public FieldProperties<String> getAddressTextProperties(final String addressType, final String addressTextProperty)
   {
-    return new FieldProperties<String>("address.addressText", new PropertyModel<String>(address, "name")).setLabelDescription(addressType,
-        false);
+    return new FieldProperties<String>("address.addressText", new PropertyModel<String>(address, addressTextProperty)).setLabelDescription(
+        addressType, false);
   }
 
   public FieldsetPanel addZipCode(final String zipCodeProperty)
@@ -485,7 +487,7 @@ class AddressPageSupport implements Serializable
 
   public String getString(final String key)
   {
-    return form.getString(key);
+    return gridBuilder.getString(key);
   }
 
   /**

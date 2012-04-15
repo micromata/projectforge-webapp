@@ -126,7 +126,7 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
   private void addPhoneNumber(final String property, final String labelKey, final String labelDescriptionKey,
       final String favoriteProperty, final FieldType fieldType)
   {
-    final FieldsetPanel fs = addressEditSupport.addPhoneNumber(property, labelKey, labelDescriptionKey, favoriteProperty, fieldType);
+    final FieldsetPanel fs = addressEditSupport.addPhoneNumber(property, labelKey, labelDescriptionKey, fieldType);
     final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
     checkBoxPanel
     .addCheckBox(new PropertyModel<Boolean>(addressEditSupport.personalAddress, favoriteProperty), PHONE_NUMBER_FAVORITE_LABEL)

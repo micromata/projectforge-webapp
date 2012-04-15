@@ -99,6 +99,9 @@ public class LabelValueDataTablePanel extends Panel
     final FieldType type = fieldProperties.getFieldType();
     if (type == FieldType.WEB_PAGE) {
       row.add(new ActionLinkPanel("value", ActionLinkType.EXTERNAL_URL, valueString));
+    } else if (type == FieldType.PHONE_NO) {
+      row.add(new ActionLinkPanel("value", ActionLinkType.CALL, valueString));
+
     } else {
       row.add(new Label("value", valueString));
     }

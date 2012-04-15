@@ -28,8 +28,11 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
+import org.projectforge.web.address.AddressPageSupport.AddressParameters;
 import org.projectforge.web.mobile.AbstractMobileViewPage;
 import org.projectforge.web.mobile.AbstractSecuredMobilePage;
+import org.projectforge.web.wicket.flowlayout.FieldProperties;
+import org.projectforge.web.wicket.flowlayout.FieldType;
 import org.projectforge.web.wicket.mobileflowlayout.LabelValueDataTablePanel;
 
 public class AddressMobileViewPage extends AbstractMobileViewPage<AddressDO, AddressDao>
@@ -45,14 +48,23 @@ public class AddressMobileViewPage extends AbstractMobileViewPage<AddressDO, Add
   {
     super(parameters);
     gridBuilder.newCollapsiblePanel(data.getFullNameWithTitleAndForm());
-    final AddressPageSupport pageSupport = new AddressPageSupport(data);
-    final LabelValueDataTablePanel table = gridBuilder.newLabelValueDataTable();
+    final AddressPageSupport pageSupport = new AddressPageSupport(gridBuilder, data);
+    LabelValueDataTablePanel table = gridBuilder.newLabelValueDataTable();
     table.addRow(pageSupport.getOrganizationProperties());
     table.addRow(pageSupport.getPositionTextProperties());
     table.addRow(pageSupport.getAddressStatusProperties());
     table.addRow(pageSupport.getWebsiteProperties());
+
     gridBuilder.newCollapsiblePanel(getString("address.business"));
-    table.addRow(pageSupport.getWebsiteProperties());
+    table = gridBuilder.newLabelValueDataTable();
+    final AddressParameters addressParameters = pageSupport.getBusinessAddressParameters();
+    table.addRow(pageSupport.getAddressTextProperties(addressParameters.addressType, addressParameters.addressTextProperty));
+    final FieldProperties<String> city = pageSupport.getCityProperties(addressParameters.cityProperty);
+    final FieldProperties<String> zipCode = pageSupport.getCityProperties(addressParameters.zipCodeProperty);
+    city.setValueAsString(zipCode.getModel().getObject() + " " + city.getModel().getObject());
+    table.addRow(city);
+    table.addRow(pageSupport.getPhoneNumberProperties("businessPhone", "address.phone", null, FieldType.PHONE_NO));
+    table.addRow(pageSupport.getPhoneNumberProperties("fax", "address.phoneType.fax", null, null));
   }
 
   @Override
