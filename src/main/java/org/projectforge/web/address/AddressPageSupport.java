@@ -87,9 +87,8 @@ class AddressPageSupport implements Serializable
    * @param gridBuilder
    * @param address
    */
-  public AddressPageSupport(final AbstractGridBuilder< ? > gridBuilder, final AddressDO address)
+  public AddressPageSupport(final AddressDO address)
   {
-    this.gridBuilder = gridBuilder;
     this.address = address;
   }
 
@@ -175,10 +174,17 @@ class AddressPageSupport implements Serializable
 
   public FieldsetPanel addWebsite()
   {
-    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(getString("address.website"));
-    fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(address, "website"))).setFieldType(FieldType.WEB_PAGE);
+    final FieldProperties<String> props = getWebsiteProperties();
+    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(props);
+    fs.add(new MaxLengthTextField(fs.getTextFieldId(), props.getModel()), props);
     return fs;
   }
+
+  public FieldProperties<String> getWebsiteProperties()
+  {
+    return new FieldProperties<String>("address.website", new PropertyModel<String>(address, "website")).setFieldType(FieldType.WEB_PAGE);
+  }
+
 
   @SuppressWarnings("serial")
   public FieldsetPanel addOrganization()

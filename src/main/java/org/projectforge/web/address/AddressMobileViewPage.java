@@ -45,12 +45,12 @@ public class AddressMobileViewPage extends AbstractMobileViewPage<AddressDO, Add
   {
     super(parameters);
     gridBuilder.newCollapsiblePanel(data.getFullNameWithTitleAndForm());
-    final AddressPageSupport pageSupport = new AddressPageSupport(gridBuilder, data);
+    final AddressPageSupport pageSupport = new AddressPageSupport(data);
     final LabelValueDataTablePanel table = gridBuilder.newLabelValueDataTable();
-    addRow(table, pageSupport.getOrganizationProperties());
-    addRow(table, pageSupport.getPositionTextProperties());
-    addRow(table, pageSupport.getAddressStatusProperties());
-    //    addRow(table, "address.website", data.getWebsite());
+    table.addRow(pageSupport.getOrganizationProperties());
+    table.addRow(pageSupport.getPositionTextProperties());
+    table.addRow(pageSupport.getAddressStatusProperties());
+    table.addRow(pageSupport.getWebsiteProperties());
   }
 
   @Override

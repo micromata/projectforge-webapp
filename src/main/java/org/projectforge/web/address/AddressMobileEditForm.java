@@ -52,6 +52,12 @@ public class AddressMobileEditForm extends AbstractMobileEditForm<AddressDO, Add
     super.init();
     addressEditSupport = new AddressPageSupport(this, gridBuilder, addressDao, personalAddressDao, data);
     gridBuilder.newCollapsiblePanel(data.getFullNameWithTitleAndForm());
+    addressEditSupport.addFormOfAddress();
+    addressEditSupport.addTitle();
+    addressEditSupport.addFirstName();
     addressEditSupport.addName();
+    addressEditSupport.addContactStatus();
+    addressEditSupport.addBirthday();
+    addressEditSupport.addWebsite();
   }
 }

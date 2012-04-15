@@ -41,6 +41,8 @@ public class FieldProperties<T extends Serializable>
 
   private FieldType fieldType;
 
+  private String valueAsString;
+
   public FieldProperties(final String label, final IModel<T> model)
   {
     this.label = label;
@@ -93,5 +95,23 @@ public class FieldProperties<T extends Serializable>
   public T getValue()
   {
     return model.getObject();
+  }
+
+  /**
+   * @return the valueAsString
+   */
+  public String getValueAsString()
+  {
+    return valueAsString;
+  }
+
+  /**
+   * @param valueAsString the valueAsString to set
+   * @return this for chaining.
+   */
+  public FieldProperties<T> setValueAsString(final String valueAsString)
+  {
+    this.valueAsString = valueAsString;
+    return this;
   }
 }

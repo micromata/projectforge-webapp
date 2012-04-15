@@ -23,12 +23,18 @@
 
 package org.projectforge.web.wicket.mobileflowlayout;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.projectforge.core.I18nEnum;
 import org.projectforge.web.address.AddressMobileViewPage;
+import org.projectforge.web.mobile.ActionLinkPanel;
+import org.projectforge.web.mobile.ActionLinkType;
 import org.projectforge.web.mobile.CollapsiblePanel;
+import org.projectforge.web.wicket.flowlayout.FieldProperties;
+import org.projectforge.web.wicket.flowlayout.FieldType;
 
 /**
  * Represents a table with two columns. This table is used for displaying data objects (refer {@link AddressMobileViewPage} as an example).
@@ -57,9 +63,44 @@ public class LabelValueDataTablePanel extends Panel
 
   public void addRow(final String label, final String value)
   {
+    if (StringUtils.isBlank(value) == true) {
+      // Do nothing.
+      return;
+    }
     final WebMarkupContainer row = new WebMarkupContainer(rows.newChildId());
     rows.add(row);
     row.add(new Label("label", label));
     row.add(new Label("value", value));
+  }
+
+  public void addRow(final FieldProperties< ? > fieldProperties)
+  {
+    final Object valueObject = fieldProperties.getValue();
+    if (valueObject == null) {
+      // Do nothing.
+      return;
+    }
+    String valueString = fieldProperties.getValueAsString();
+    if (valueString == null) {
+      if (valueObject instanceof I18nEnum) {
+        valueString = getString(((I18nEnum) valueObject).getI18nKey());
+      } else {
+        valueString = valueObject.toString();
+      }
+      if (StringUtils.isBlank(valueString) == true) {
+        // Do nothing.
+        return;
+      }
+      fieldProperties.setValueAsString(valueString);
+    }
+    final WebMarkupContainer row = new WebMarkupContainer(rows.newChildId());
+    rows.add(row);
+    row.add(new Label("label", getString(fieldProperties.getLabel())));
+    final FieldType type = fieldProperties.getFieldType();
+    if (type == FieldType.WEB_PAGE) {
+      row.add(new ActionLinkPanel("value", ActionLinkType.EXTERNAL_URL, valueString));
+    } else {
+      row.add(new Label("value", valueString));
+    }
   }
 }

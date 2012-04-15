@@ -145,7 +145,6 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
     }
   }
 
-
   /**
    * @param textField
    * @return The created InputPanel.
@@ -158,6 +157,20 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
       textField.setLabel(new Model<String>(labelText));
     }
     add(input);
+    return input;
+  }
+
+  /**
+   * @param textField
+   * @return The created InputPanel.
+   * @see InputPanel#InputPanel(String, Component)
+   */
+  public InputPanel add(final TextField< ? > textField, final FieldProperties< ? > fieldProperties)
+  {
+    final InputPanel input = add(textField);
+    if (fieldProperties.getFieldType() != null) {
+      input.setFieldType(fieldProperties.getFieldType());
+    }
     return input;
   }
 
