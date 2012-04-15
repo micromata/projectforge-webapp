@@ -30,13 +30,12 @@ package org.projectforge.web.wicket;
  */
 public enum ImageDef
 {
-  GREY_COG(DIRS.SMALL_GREY + "cog_3.png");
+  GREY_COG(DIRS.SMALL_GREY + "cog_3.png"), SMS(DIRS.MAIN + "sms.png"); //
   // ADD(DIRS.MAIN + "add.png"), //
   // ACCEPT(DIRS.MAIN + "accept.png"), DENY(DIRS.MAIN + "deny.png"), //
   // EDIT(DIRS.MAIN + "pencil.png"), //
   // HELP(DIRS.MAIN + "help.png"), //
   // PAGE(DIRS.MAIN + "page_white.png"), //
-  // SMS(DIRS.MAIN + "sms.png"), //
   // SPEECH_BALLON(DIRS.MAIN + "comment.png"), //
   // STAR(DIRS.MAIN + "star_plus.png"), //
   // ZOOM(DIRS.MAIN + "zoom.png"), //
@@ -199,6 +198,7 @@ public enum ImageDef
 
   private class DIRS
   {
-    private static final String SMALL_GREY = "/images/small/grey/";
+    private static final String MAIN = "/images/";
+    private static final String SMALL_GREY = MAIN + "small/grey/";
   }
 }
