@@ -86,7 +86,7 @@ public class StringHelper
     if (StringUtils.isEmpty(string) == true) {
       return false;
     }
-    for (String field : fields) {
+    for (final String field : fields) {
       if (string.equals(field) == true) {
         return true;
       }
@@ -145,7 +145,7 @@ public class StringHelper
     }
     final StringBuffer buf = new StringBuffer();
     boolean first = true;
-    for (String item : list) {
+    for (final String item : list) {
       first = append(buf, first, item, delimiter);
     }
     return buf.toString();
@@ -165,7 +165,7 @@ public class StringHelper
     }
     final StringBuffer buf = new StringBuffer();
     boolean first = true;
-    for (String s : strings) {
+    for (final String s : strings) {
       if (s == null || s.length() == 0) {
         continue;
       }
@@ -239,9 +239,9 @@ public class StringHelper
    */
   public static String listToExpressions(final String delimiter, final String prefix, final String suffix, final String... strings)
   {
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     boolean first = true;
-    for (String s : strings) {
+    for (final String s : strings) {
       append(buf, first, prefix, delimiter);
       if (first == true)
         first = false;
@@ -257,7 +257,7 @@ public class StringHelper
     }
     final Set<String> set = new TreeSet<String>();
     set.addAll(Arrays.asList(array));
-    String[] result = (String[]) (set.toArray(new String[set.size()]));
+    final String[] result = (set.toArray(new String[set.size()]));
     return result;
   }
 
@@ -312,7 +312,7 @@ public class StringHelper
     }
     final StringBuffer buf = new StringBuffer();
     for (int i = 0; i < str.length(); i++) {
-      char ch = str.charAt(i);
+      final char ch = str.charAt(i);
       if (ch >= '0' && ch <= '9') {
         buf.append(ch);
       }
@@ -327,7 +327,7 @@ public class StringHelper
     }
     final StringBuffer buf = new StringBuffer();
     for (int i = 0; i < str.length(); i++) {
-      char ch = str.charAt(i);
+      final char ch = str.charAt(i);
       if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch >= '0' && ch <= '9') {
         buf.append(ch);
       }
@@ -349,11 +349,11 @@ public class StringHelper
     Validate.notNull(maxWidth);
     Validate.isTrue(strings.length == maxWidth.length);
     int rest = maxTotalLength;
-    StringBuffer buf = new StringBuffer();
-    int separatorLength = separator.length();
+    final StringBuffer buf = new StringBuffer();
+    final int separatorLength = separator.length();
     boolean output = false;
     for (int i = 0; i < strings.length; i++) {
-      String str = strings[i];
+      final String str = strings[i];
       if (StringUtils.isBlank(str) == true) {
         continue;
       }
@@ -366,7 +366,7 @@ public class StringHelper
       if (rest <= 0) {
         break;
       }
-      int max = Math.min(maxWidth[i], rest);
+      final int max = Math.min(maxWidth[i], rest);
       buf.append(StringUtils.abbreviate(str, max));
       rest -= Math.min(str.length(), max);
     }
@@ -466,8 +466,8 @@ public class StringHelper
     if (str == null) {
       return null;
     }
-    StringBuffer buf = new StringBuffer();
-    int toPos = str.length() - numberOfCharacters;
+    final StringBuffer buf = new StringBuffer();
+    final int toPos = str.length() - numberOfCharacters;
     for (int i = 0; i < str.length(); i++) {
       if (i < toPos) {
         buf.append(str.charAt(i));
@@ -480,12 +480,12 @@ public class StringHelper
 
   public static int[] splitToInts(final String str, final String delim)
   {
-    StringTokenizer tokenizer = new StringTokenizer(str, delim);
-    int[] result = new int[tokenizer.countTokens()];
+    final StringTokenizer tokenizer = new StringTokenizer(str, delim);
+    final int[] result = new int[tokenizer.countTokens()];
     int i = 0;
     while (tokenizer.hasMoreTokens() == true) {
-      String token = tokenizer.nextToken();
-      Integer value = NumberHelper.parseInteger(token);
+      final String token = tokenizer.nextToken();
+      final Integer value = NumberHelper.parseInteger(token);
       result[i++] = value != null ? value : 0;
     }
     return result;
@@ -512,22 +512,33 @@ public class StringHelper
   }
 
   /**
-   * Calls isNotBlank for each of the given strings.
+   * Calls !{@link #isBlank(String...)}.
    * @param strs
    * @return true if one of the given strings is not blank, otherwise false.
    * @see StringUtils#isNotBlank(String)
    */
   public static boolean isNotBlank(final String... strs)
   {
+    return isBlank(strs) == false;
+  }
+
+  /**
+   * Calls {@link StringUtils#isBlank(String)} for each of the given strings.
+   * @param strs
+   * @return true if one of the given strings is not blank, otherwise false.
+   * @see #isNotBlank(String...)
+   */
+  public static boolean isBlank(final String... strs)
+  {
     if (strs == null) {
-      return false;
+      return true;
     }
-    for (String s : strs) {
+    for (final String s : strs) {
       if (StringUtils.isNotBlank(s) == true) {
-        return true;
+        return false;
       }
     }
-    return false;
+    return true;
   }
 
   private static final char[] HEX_CHARS = "0123456789abcdef".toCharArray();

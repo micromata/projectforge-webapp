@@ -58,8 +58,8 @@ public class StringHelperTest
     assertEquals("Computer, IT-Services, Micromata", StringHelper.listToString(list, ", ", true));
     assertEquals("Micromata,Computer,IT-Services", StringHelper.listToString(",", "Micromata", "Computer", "IT-Services"));
     assertEquals("Micromata", StringHelper.listToString(",", "Micromata"));
-    assertEquals("(Micromata == ?) and (Computer == ?) and (IT-Services == ?)", StringHelper.listToExpressions(" and ", "(", " == ?)",
-        "Micromata", "Computer", "IT-Services"));
+    assertEquals("(Micromata == ?) and (Computer == ?) and (IT-Services == ?)",
+        StringHelper.listToExpressions(" and ", "(", " == ?)", "Micromata", "Computer", "IT-Services"));
     assertEquals("(Micromata == ?)", StringHelper.listToExpressions(" and ", "(", " == ?)", "Micromata"));
 
     assertEquals("a,b,c", StringHelper.listToString(",", "a", null, "b", "", "c"));
@@ -104,9 +104,9 @@ public class StringHelperTest
   {
     assertTrue(StringHelper.startsWith("Hurzel", "Hu"));
     assertFalse(StringHelper.startsWith(null, "Hu"));
-    assertFalse(StringHelper.startsWith(null, (String)null));
+    assertFalse(StringHelper.startsWith(null, (String) null));
     try {
-      assertFalse(StringHelper.startsWith("Hurzel", (String)null));
+      assertFalse(StringHelper.startsWith("Hurzel", (String) null));
       fail();
     } catch (final NullPointerException ex) {
     }
@@ -266,6 +266,23 @@ public class StringHelperTest
     assertEquals("00", StringHelper.asHex(new byte[] { 0}));
     assertEquals("000a0f", StringHelper.asHex(new byte[] { 0, 0x0a, 0x0f}));
     assertEquals("000aef", StringHelper.asHex(new byte[] { 0, 0x0a, (byte) 0xef}));
+  }
+
+  @Test
+  public void blank() {
+    testBlank(true, (String[])null);
+    testBlank(true, null, null);
+    testBlank(true, null, "");
+    testBlank(true, " ", null);
+    testBlank(false, ".");
+    testBlank(false, null, ".");
+    testBlank(false, null, ".", null);
+  }
+
+  private void testBlank(final boolean expectedValue, final String... strs)
+  {
+    assertEquals(expectedValue, StringHelper.isBlank(strs));
+    assertEquals(!expectedValue, StringHelper.isNotBlank(strs));
   }
 
   private void compareIntArray(final int[] a1, final int[] a2)
