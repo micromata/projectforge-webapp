@@ -33,6 +33,8 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.web.address.AddressPageSupport.AddressParameters;
 import org.projectforge.web.mobile.AbstractMobileViewPage;
 import org.projectforge.web.mobile.AbstractSecuredMobilePage;
+import org.projectforge.web.mobile.CollapsiblePanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldProperties;
 import org.projectforge.web.wicket.flowlayout.FieldType;
 import org.projectforge.web.wicket.mobileflowlayout.LabelValueDataTablePanel;
@@ -51,25 +53,35 @@ public class AddressMobileViewPage extends AbstractMobileViewPage<AddressDO, Add
   public AddressMobileViewPage(final PageParameters parameters)
   {
     super(parameters);
-    gridBuilder.newCollapsiblePanel(data.getFullNameWithTitleAndForm());
     pageSupport = new AddressPageSupport(gridBuilder, data);
+    gridBuilder.newCollapsiblePanel(data.getFullNameWithTitleAndForm());
     final LabelValueDataTablePanel table = gridBuilder.newLabelValueDataTable();
     table.addRow(pageSupport.getOrganizationProperties());
     table.addRow(pageSupport.getPositionTextProperties());
     table.addRow(pageSupport.getAddressStatusProperties());
     table.addRow(pageSupport.getWebsiteProperties());
-    addAddress(pageSupport.getBusinessAddressParameters(), "businessPhone", "mobilePhone", "fax");
-    addAddress(pageSupport.getPrivateAddressParameters(), "privatePhone", "privateMobilePhone", null);
-    addAddress(pageSupport.getPostalAddressParameters(), null, null, null);
+    addAddress(pageSupport.getBusinessAddressParameters(), "businessPhone", "mobilePhone", "fax", pageSupport.getEmailProperties());
+    addAddress(pageSupport.getPrivateAddressParameters(), "privatePhone", "privateMobilePhone", null,
+        pageSupport.getPrivateEmailProperties());
+    addAddress(pageSupport.getPostalAddressParameters(), null, null, null, null);
+    final FieldProperties<String> comment = pageSupport.getCommentProperties();
+    if (StringUtils.isNotBlank(comment.getValue()) == true) {
+      final CollapsiblePanel panel = gridBuilder.newCollapsiblePanel(getString(comment.getLabel())).setCollapsed();
+      panel.add(new DivTextPanel(panel.newChildId(), comment.getValue()));
+    }
   }
 
-  private void addAddress(final AddressParameters addressParameters, final String phone, final String mobile, final String fax)
+  private void addAddress(final AddressParameters addressParameters, final String phone, final String mobile, final String fax,
+      final FieldProperties<String> emailProp)
   {
     final FieldProperties<String> addressTextProp = pageSupport.getAddressTextProperties(addressParameters.addressType,
         addressParameters.addressTextProperty);
     final FieldProperties<String> cityProp = pageSupport.getCityProperties(addressParameters.cityProperty);
     final FieldProperties<String> zipCodeProp = pageSupport.getCityProperties(addressParameters.zipCodeProperty);
-    cityProp.setValueAsString(StringUtils.defaultString(zipCodeProp.getModel().getObject()) + " " + StringUtils.defaultString(cityProp.getModel().getObject()));
+    cityProp.setValueAsString(StringUtils.defaultString(zipCodeProp.getModel().getObject())
+        + " "
+        + StringUtils.defaultString(cityProp.getModel().getObject()));
+    final FieldProperties<String> countryProp = pageSupport.getCountryProperties(addressParameters.countryProperty);
     final FieldProperties<String> phoneProp = phone != null ? pageSupport.getPhoneNumberProperties(phone, "address.phone", null,
         FieldType.PHONE_NO) : null;
     final String phoneValue = phoneProp != null ? phoneProp.getValue() : null;
@@ -79,7 +91,9 @@ public class AddressMobileViewPage extends AbstractMobileViewPage<AddressDO, Add
     final FieldProperties<String> faxProp = fax != null ? pageSupport.getPhoneNumberProperties(fax, "address.phoneType.fax", null, null)
         : null;
     final String faxValue = faxProp != null ? faxProp.getValue() : null;
-    if (StringHelper.isBlank(addressTextProp.getValue(), cityProp.getValueAsString(), phoneValue, mobileValue, faxValue) == true) {
+    final String emailValue = emailProp != null ? emailProp.getValue() : null;
+    if (StringHelper.isBlank(addressTextProp.getValue(), cityProp.getValueAsString(), countryProp.getValue(), phoneValue, mobileValue,
+        faxValue, emailValue) == true) {
       // Do nothing.
       return;
     }
@@ -87,6 +101,7 @@ public class AddressMobileViewPage extends AbstractMobileViewPage<AddressDO, Add
     final LabelValueDataTablePanel table = gridBuilder.newLabelValueDataTable();
     table.addRow(addressTextProp);
     table.addRow(cityProp);
+    table.addRow(countryProp);
     if (phoneProp != null) {
       table.addRow(phoneProp);
     }
@@ -95,6 +110,9 @@ public class AddressMobileViewPage extends AbstractMobileViewPage<AddressDO, Add
     }
     if (faxProp != null) {
       table.addRow(faxProp);
+    }
+    if (emailProp != null) {
+      table.addRow(emailProp);
     }
   }
 

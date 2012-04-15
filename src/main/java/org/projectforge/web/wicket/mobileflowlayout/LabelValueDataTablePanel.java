@@ -103,6 +103,8 @@ public class LabelValueDataTablePanel extends Panel
       row.add(new ActionLinkPanel("value", ActionLinkType.CALL, valueString));
     } else if (type == FieldType.MOBILE_PHONE_NO) {
       row.add(new ActionLinkPanel("value", ActionLinkType.CALL, valueString));
+    } else if (type == FieldType.E_MAIL) {
+      row.add(new ActionLinkPanel("value", ActionLinkType.MAIL, valueString));
     } else {
       row.add(new Label("value", valueString));
     }
