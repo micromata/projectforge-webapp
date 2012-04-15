@@ -34,15 +34,14 @@ import org.apache.wicket.markup.html.panel.Panel;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class ActionLinkPanel extends Panel //implements IField
+public class ActionLinkPanel extends Panel // implements IField
 {
   private static final long serialVersionUID = -5497704312133705066L;
-
-  private AbstractLink link1, link2;
 
   public ActionLinkPanel(final String id, final ActionLinkType actionLinkType, final String value)
   {
     super(id);
+    AbstractLink link1, link2;
     if (actionLinkType == ActionLinkType.CALL) {
       add(link1 = getCallLink(value));
       add(getInvisibleSmsLink());
@@ -65,14 +64,14 @@ public class ActionLinkPanel extends Panel //implements IField
       add(link1 = new ExternalLink("link", url, value));
       add(getInvisibleSmsLink());
     }
-    //    if (ctx.getTooltip() != null) {
-    //      if (link1 != null) {
-    //        WicketUtils.addTooltip(link1, ctx.getTooltip());
-    //      }
-    //      if (link2 != null) {
-    //        WicketUtils.addTooltip(link2, ctx.getTooltip());
-    //      }
-    //    }
+    // if (ctx.getTooltip() != null) {
+    // if (link1 != null) {
+    // WicketUtils.addTooltip(link1, ctx.getTooltip());
+    // }
+    // if (link2 != null) {
+    // WicketUtils.addTooltip(link2, ctx.getTooltip());
+    // }
+    // }
   }
 
   private ExternalLink getCallLink(final String number)
@@ -83,7 +82,7 @@ public class ActionLinkPanel extends Panel //implements IField
   private ExternalLink getSmsLink(final String number)
   {
     final ExternalLink smsLink = new ExternalLink("sms", "sms:" + number);
-    //smsLink.add(new PresizedImage("smsImage", getResponse(), ImageDef.SMS));
+    // smsLink.add(new PresizedImage("smsImage", getResponse(), ImageDef.SMS));
     return smsLink;
   }
 
