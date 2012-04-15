@@ -71,6 +71,31 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
    * @param parent
    * @param label
    */
+  public FieldsetPanel(final DivPanel parent, final FieldProperties< ? > fieldProperties)
+  {
+    this(parent, getString(parent, fieldProperties.getLabel()), //
+        getString(parent, fieldProperties.getLabelDescription(), fieldProperties.isTranslateLabelDecsription()), //
+        fieldProperties.isMultipleChildren());
+  }
+
+  private static String getString(final Component parent, final String label)
+  {
+    return getString(parent, label, true);
+  }
+
+  private static String getString(final Component parent, final String label, final boolean translate)
+  {
+    if (translate == false || label == null) {
+      return null;
+    }
+    return parent.getString(label);
+  }
+
+  /**
+   * Adds this FieldsetPanel to the parent panel.
+   * @param parent
+   * @param label
+   */
   public FieldsetPanel(final DivPanel parent, final String label)
   {
     this(parent, label, null, false);
@@ -194,6 +219,7 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
       }
     }
   }
+
   /**
    * @param id
    * @param label

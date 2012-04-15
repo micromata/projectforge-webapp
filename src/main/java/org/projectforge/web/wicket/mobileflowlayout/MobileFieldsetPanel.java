@@ -32,6 +32,7 @@ import org.apache.wicket.model.Model;
 import org.projectforge.web.mobile.CollapsiblePanel;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.FieldProperties;
 
 /**
  * Represents a entry of a group panel. This can be a label, text field or other form components.
@@ -47,15 +48,13 @@ public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPan
 
   private static final long serialVersionUID = 2845731250470151819L;
 
-  /**
-   */
   @SuppressWarnings("serial")
-  public MobileFieldsetPanel(final String id, final String labeltext)
+  public MobileFieldsetPanel(final String id, final FieldProperties< ? > fieldProperties)
   {
     super(id);
     fieldset = new WebMarkupContainer("fieldset");
     superAdd(fieldset);
-    this.labelText = labeltext;
+    this.labelText = fieldProperties.getLabel();
     fieldset.add((label = new WebMarkupContainer("label")));
     label.add(new Label("labeltext", new Model<String>() {
       @Override
@@ -68,16 +67,9 @@ public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPan
 
   /**
    */
-  public MobileFieldsetPanel(final CollapsiblePanel parent, final String labeltext)
+  public MobileFieldsetPanel(final CollapsiblePanel parent, final FieldProperties< ? > fieldProperties)
   {
-    this(parent.newChildId(), labeltext);
-    parent.add(this);
-  }
-
-  public MobileFieldsetPanel(final CollapsiblePanel parent, final String labeltext, final boolean multipleChildren)
-  {
-    this(parent.newChildId(), labeltext);
-    this.multipleChildren = multipleChildren;
+    this(parent.newChildId(), fieldProperties);
     parent.add(this);
   }
 

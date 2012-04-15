@@ -57,7 +57,6 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
     super(parent, session);
   }
 
-
   /**
    * Generates new grid panel. For narrow screens a grid16 panel will be created.
    * @param id if no RepeatingView is given as parent, the id is needed.
@@ -300,9 +299,9 @@ public class GridBuilder extends AbstractGridBuilder<FieldsetPanel>
    * @see org.projectforge.web.wicket.flowlayout.AbstractGridBuilder#newFieldset(org.projectforge.web.wicket.flowlayout.FieldProperties)
    */
   @Override
-  public FieldsetPanel newFieldset(final FieldProperties<?> fieldProperties)
+  public FieldsetPanel newFieldset(final FieldProperties< ? > fieldProperties)
   {
-    return new FieldsetPanel(current, getString(fieldProperties.getLabel()));
+    return new FieldsetPanel(current, fieldProperties);
   }
 
   /**
