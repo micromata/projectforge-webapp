@@ -24,15 +24,13 @@
 package org.projectforge.web.address;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.web.mobile.AbstractMobileViewPage;
 import org.projectforge.web.mobile.AbstractSecuredMobilePage;
-import org.projectforge.web.wicket.components.MaxLengthTextField;
-import org.projectforge.web.wicket.mobileflowlayout.MobileFieldsetPanel;
+import org.projectforge.web.wicket.mobileflowlayout.LabelValueDataTablePanel;
 
 public class AddressMobileViewPage extends AbstractMobileViewPage<AddressDO, AddressDao>
 {
@@ -47,9 +45,8 @@ public class AddressMobileViewPage extends AbstractMobileViewPage<AddressDO, Add
   {
     super(parameters);
     gridBuilder.newCollapsiblePanel(data.getFullNameWithTitleAndForm());
-    final MobileFieldsetPanel fs = gridBuilder.newFieldset(getString("name"));
-    final MaxLengthTextField name = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "name"));
-    fs.add(name);
+    final LabelValueDataTablePanel table = gridBuilder.newLabelValueDataTable();
+    table.addRow(getString("name"), data.getName());
   }
 
   @Override

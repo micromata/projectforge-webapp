@@ -58,6 +58,15 @@ public class MobileGridBuilder extends AbstractGridBuilder<MobileFieldsetPanel>
     return collapsiblePanel;
   }
 
+  public LabelValueDataTablePanel newLabelValueDataTable()
+  {
+    Validate.notNull(current);
+    if (current instanceof CollapsiblePanel) {
+      return new LabelValueDataTablePanel((CollapsiblePanel) current);
+    }
+    throw new UnsupportedOperationException("Please add collapsiblePanel to the GridBuilder first.");
+  }
+
   /**
    * @see org.projectforge.web.wicket.flowlayout.GridBuilderInterface#newFieldset(java.lang.String)
    */
@@ -66,7 +75,7 @@ public class MobileGridBuilder extends AbstractGridBuilder<MobileFieldsetPanel>
   {
     Validate.notNull(current);
     if (current instanceof CollapsiblePanel) {
-      return new MobileFieldsetPanel((CollapsiblePanel)current, label);
+      return new MobileFieldsetPanel((CollapsiblePanel) current, label);
     }
     throw new UnsupportedOperationException("Please add collapsiblePanel to the GridBuilder first.");
   }
