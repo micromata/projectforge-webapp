@@ -37,16 +37,28 @@ public class FieldProperties<T extends Serializable>
 {
   private final String label;
 
+  private String labelDescription;
+
+  private boolean translateLabelDecsription = true;
+
   private final IModel<T> model;
 
   private FieldType fieldType;
 
   private String valueAsString;
 
+  private boolean multipleChildren;
+
   public FieldProperties(final String label, final IModel<T> model)
   {
     this.label = label;
     this.model = model;
+  }
+
+  public FieldProperties(final String label, final IModel<T> model, final boolean multipleChildren)
+  {
+    this(label, model);
+    this.multipleChildren = multipleChildren;
   }
 
   /**
@@ -113,5 +125,53 @@ public class FieldProperties<T extends Serializable>
   {
     this.valueAsString = valueAsString;
     return this;
+  }
+
+  /**
+   * Used by FieldsetPanels.
+   * @return the multipleChildren
+   */
+  public boolean isMultipleChildren()
+  {
+    return multipleChildren;
+  }
+
+  /**
+   * Is only supported by FieldsetPanel (in desktop version).
+   * @return the labelDescription
+   */
+  public String getLabelDescription()
+  {
+    return labelDescription;
+  }
+
+  /**
+   * @param labelDescription the labelDescription to set
+   * @return this for chaining.
+   */
+  public FieldProperties<T> setLabelDescription(final String labelDescription)
+  {
+    return setLabelDescription(labelDescription, true);
+  }
+
+  /**
+   * @param labelDescription the labelDescription to set
+   * @param translate if true (default) then the label description is an i18n key which has to be translated.
+   * @return this for chaining.
+   */
+  public FieldProperties<T> setLabelDescription(final String labelDescription, final boolean translate)
+  {
+    this.labelDescription = labelDescription;
+    this.translateLabelDecsription = translate;
+    return this;
+  }
+
+  /**
+   * If true (default) then the label description is an i18n key which has to be translated.
+   * @return the translateLabelDecsription
+   */
+  public boolean isTranslateLabelDecsription()
+  {
+    return translateLabelDecsription;
   }
 }

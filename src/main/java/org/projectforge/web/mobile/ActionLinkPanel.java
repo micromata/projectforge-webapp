@@ -23,6 +23,7 @@
 
 package org.projectforge.web.mobile;
 
+import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.AbstractLink;
@@ -62,6 +63,7 @@ public class ActionLinkPanel extends Panel // implements IField
         url = "http://" + value;
       }
       add(link1 = new ExternalLink("link", url, value));
+      link1.add(AttributeModifier.append("target", "_blank"));
       add(getInvisibleSmsLink());
     }
     // if (ctx.getTooltip() != null) {

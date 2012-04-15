@@ -51,6 +51,8 @@ public class AddressMobileViewPage extends AbstractMobileViewPage<AddressDO, Add
     table.addRow(pageSupport.getPositionTextProperties());
     table.addRow(pageSupport.getAddressStatusProperties());
     table.addRow(pageSupport.getWebsiteProperties());
+    gridBuilder.newCollapsiblePanel(getString("address.business"));
+    table.addRow(pageSupport.getWebsiteProperties());
   }
 
   @Override
