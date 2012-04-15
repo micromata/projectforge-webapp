@@ -102,7 +102,7 @@ public class LoginMobilePage extends AbstractMobilePage
       @Override
       public final void onClick()
       {
-        setResponsePage(LoginPage.class);
+        setResponsePage(LoginPage.class, LoginPage.forceNonMobile());
       }
     };
     pageContainer. add(goButton);

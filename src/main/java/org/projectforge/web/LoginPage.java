@@ -70,6 +70,9 @@ public class LoginPage extends AbstractUnsecureBasePage
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LoginPage.class);
 
+  // Used by LoginMobilePage
+  private static final String PARAMETER_KEY_FORCE_NON_MOBILE = "forceNonMobile";
+
   @SpringBean(name = "configuration")
   private Configuration configuration;
 
@@ -90,6 +93,17 @@ public class LoginPage extends AbstractUnsecureBasePage
   private DataSource dataSource;
 
   private LoginForm form = null;
+
+  /**
+   * Add parameter to force non-mobile version. This avoids a redirect to the LoginMobilePage and is used by LoginMobilePage.
+   * @return PageParameters.
+   */
+  public static PageParameters forceNonMobile()
+  {
+    final PageParameters params = new PageParameters();
+    params.add(PARAMETER_KEY_FORCE_NON_MOBILE, "true");
+    return params;
+  }
 
   public static void logout(final MySession mySession, final WebRequest request, final WebResponse response,
       final UserXmlPreferencesCache userXmlPreferencesCache, final MenuBuilder menuBuilder)
@@ -148,7 +162,9 @@ public class LoginPage extends AbstractUnsecureBasePage
   public LoginPage(final PageParameters parameters)
   {
     super(parameters);
-    if (getMySession().isMobileUserAgent() == true && UserFilter.isUpdateRequiredFirst() == false) {
+    if (getMySession().isMobileUserAgent() == true
+        && UserFilter.isUpdateRequiredFirst() == false
+        && "true".equals(WicketUtils.getAsString(parameters, PARAMETER_KEY_FORCE_NON_MOBILE)) == false) {
       throw new RestartResponseException(LoginMobilePage.class);
     }
     final PFUserDO wicketSessionUser = getMySession().getUser();
