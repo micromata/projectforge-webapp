@@ -74,17 +74,6 @@ public class MobileFieldsetPanel extends AbstractFieldsetPanel<MobileFieldsetPan
   }
 
   /**
-   * @see org.apache.wicket.Component#onBeforeRender()
-   */
-  @Override
-  protected void onBeforeRender()
-  {
-    if (rendered == false) {
-    }
-    super.onBeforeRender();
-  }
-
-  /**
    * @see org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel#addChild(org.apache.wicket.Component[])
    */
   @Override

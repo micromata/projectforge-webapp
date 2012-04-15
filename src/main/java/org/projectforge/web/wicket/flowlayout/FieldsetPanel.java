@@ -23,15 +23,11 @@
 
 package org.projectforge.web.wicket.flowlayout;
 
-import java.util.List;
-
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.form.DropDownChoice;
-import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.ListMultipleChoice;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.repeater.RepeatingView;
@@ -223,77 +219,6 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   /**
    * @param id
    * @param label
-   * @param model
-   * @param values
-   * @param renderer
-   * @return The created DropDownChoicePanel.
-   * @see DropDownChoicePanel#DropDownChoicePanel(String, String, IModel, List, IChoiceRenderer)
-   */
-  public <T> DropDownChoicePanel<T> addDropDownChoice(final IModel<T> model, final List< ? extends T> values,
-      final IChoiceRenderer<T> renderer)
-      {
-    return addDropDownChoice(model, values, renderer, false);
-      }
-
-  /**
-   * @param id
-   * @param label
-   * @param model
-   * @param values
-   * @param renderer
-   * @param submitOnChange.
-   * @return The created DropDownChoicePanel.
-   * @see DropDownChoicePanel#DropDownChoicePanel(String, String, IModel, List, IChoiceRenderer, boolean))
-   */
-  public <T> DropDownChoicePanel<T> addDropDownChoice(final IModel<T> model, final List< ? extends T> values,
-      final IChoiceRenderer<T> renderer, final boolean submitOnChange)
-      {
-    final DropDownChoicePanel<T> dropDownChoicePanel = new DropDownChoicePanel<T>(newChildId(), model, values, renderer, submitOnChange);
-    dropDownChoicePanel.getDropDownChoice().setLabel(new Model<String>(getLabel()));
-    add(dropDownChoicePanel);
-    return dropDownChoicePanel;
-      }
-
-  /**
-   * @param id
-   * @param label
-   * @param dropDownChoice
-   * @return The created DropDownChoicePanel.
-   * @see DropDownChoicePanel#DropDownChoicePanel(String, String, DropDownChoice)
-   */
-  public <T> DropDownChoicePanel<T> add(final DropDownChoice<T> dropDownChoice)
-  {
-    dropDownChoice.setLabel(new Model<String>(getLabel()));
-    return add(dropDownChoice, false);
-  }
-
-  /**
-   * @param id
-   * @param label
-   * @param dropDownChoice
-   * @return The created DropDownChoicePanel.
-   * @see DropDownChoicePanel#DropDownChoicePanel(String, String, DropDownChoice, boolean)
-   */
-  public <T> DropDownChoicePanel<T> add(final DropDownChoice<T> dropDownChoice, final boolean submitOnChange)
-  {
-
-    final DropDownChoicePanel<T> dropDownChoicePanel = new DropDownChoicePanel<T>(newChildId(), dropDownChoice, submitOnChange);
-    dropDownChoicePanel.getDropDownChoice().setLabel(new Model<String>(getLabel()));
-    add(dropDownChoicePanel);
-    return dropDownChoicePanel;
-  }
-
-  /**
-   * @return The Wicket id of the embedded text fiel of {@link DropDownChoicePanel}.
-   */
-  public String getDropDownChoiceId()
-  {
-    return DropDownChoicePanel.WICKET_ID;
-  }
-
-  /**
-   * @param id
-   * @param label
    * @param listChoice
    * @return The created ListMultipleChoicePanel.
    * @see ListMultipleChoicePanel#ListMultipleChoicePanel(String, String, ListMultipleChoice)
@@ -461,23 +386,21 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   }
 
   /**
-   * @see org.apache.wicket.Component#onBeforeRender()
+   * @see org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel#onInitialize()
    */
   @Override
-  protected void onBeforeRender()
+  protected void onInitialize()
   {
-    if (rendered == false) {
-      if (labelSide == true) {
-        fieldset.add(AttributeModifier.append("class", "label_side"));
-      }
-      if (labelSuffix == null) {
-        label.add(labelSuffix = WicketUtils.getInvisibleComponent("labelSuffix"));
-      }
-      if (descriptionSuffix == null) {
-        label.add(descriptionSuffix = WicketUtils.getInvisibleComponent("descriptionSuffix"));
-      }
+    super.onInitialize();
+    if (labelSide == true) {
+      fieldset.add(AttributeModifier.append("class", "label_side"));
     }
-    super.onBeforeRender();
+    if (labelSuffix == null) {
+      label.add(labelSuffix = WicketUtils.getInvisibleComponent("labelSuffix"));
+    }
+    if (descriptionSuffix == null) {
+      label.add(descriptionSuffix = WicketUtils.getInvisibleComponent("descriptionSuffix"));
+    }
   }
 
   /**

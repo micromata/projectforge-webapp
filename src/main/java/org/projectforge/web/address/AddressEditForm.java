@@ -63,7 +63,7 @@ public class AddressEditForm extends AbstractEditForm<AddressDO, AddressEditPage
     gridBuilder.newGrid8().newColumnsPanel().newColumnPanel(DivType.COL_50);
     addressEditSupport.addName();
     addressEditSupport.addFirstName();
-    final FieldsetPanel fs = addressEditSupport.addFormOfAddress();
+    final FieldsetPanel fs = (FieldsetPanel)addressEditSupport.addFormOfAddress();
     final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
     checkBoxPanel.addCheckBox(new PropertyModel<Boolean>(addressEditSupport.personalAddress, "favoriteCard"), getString("favorite"),
         getString("address.tooltip.vCardList"));

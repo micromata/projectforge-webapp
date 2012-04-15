@@ -169,10 +169,10 @@ class AddressPageSupport implements Serializable
     return new FieldProperties<String>("firstName", new PropertyModel<String>(address, "firstName"));
   }
 
-  public FieldsetPanel addFormOfAddress()
+  public AbstractFieldsetPanel< ? > addFormOfAddress()
   {
     final FieldProperties<FormOfAddress> props = getFormOfAddressProperties();
-    final FieldsetPanel fs = (FieldsetPanel) gridBuilder.newFieldset(props);
+    final AbstractFieldsetPanel< ? > fs = gridBuilder.newFieldset(props);
     final LabelValueChoiceRenderer<FormOfAddress> formChoiceRenderer = new LabelValueChoiceRenderer<FormOfAddress>(form,
         FormOfAddress.values());
     fs.addDropDownChoice(props.getModel(), formChoiceRenderer.getValues(), formChoiceRenderer).setRequired(true).setNullValid(false);

@@ -23,16 +23,21 @@
 
 package org.projectforge.web.wicket.flowlayout;
 
+import java.util.List;
+
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.form.PasswordTextField;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.WebConstants;
@@ -53,7 +58,7 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
 
   protected WebMarkupContainer label;
 
-  protected boolean rendered, labelFor, childAdded;
+  protected boolean labelFor, childAdded;
 
   protected boolean multipleChildren;
 
@@ -220,6 +225,77 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
     return TextAreaPanel.WICKET_ID;
   }
 
+  /**
+   * @param id
+   * @param label
+   * @param model
+   * @param values
+   * @param renderer
+   * @return The created DropDownChoicePanel.
+   * @see DropDownChoicePanel#DropDownChoicePanel(String, String, IModel, List, IChoiceRenderer)
+   */
+  public <C> DropDownChoicePanel<C> addDropDownChoice(final IModel<C> model, final List< ? extends C> values,
+      final IChoiceRenderer<C> renderer)
+      {
+    return addDropDownChoice(model, values, renderer, false);
+      }
+
+  /**
+   * @param id
+   * @param label
+   * @param model
+   * @param values
+   * @param renderer
+   * @param submitOnChange.
+   * @return The created DropDownChoicePanel.
+   * @see DropDownChoicePanel#DropDownChoicePanel(String, String, IModel, List, IChoiceRenderer, boolean))
+   */
+  public <C> DropDownChoicePanel<C> addDropDownChoice(final IModel<C> model, final List< ? extends C> values,
+      final IChoiceRenderer<C> renderer, final boolean submitOnChange)
+      {
+    final DropDownChoicePanel<C> dropDownChoicePanel = new DropDownChoicePanel<C>(newChildId(), model, values, renderer, submitOnChange);
+    dropDownChoicePanel.getDropDownChoice().setLabel(new Model<String>(getLabel()));
+    add(dropDownChoicePanel);
+    return dropDownChoicePanel;
+      }
+
+  /**
+   * @param id
+   * @param label
+   * @param dropDownChoice
+   * @return The created DropDownChoicePanel.
+   * @see DropDownChoicePanel#DropDownChoicePanel(String, String, DropDownChoice)
+   */
+  public <C> DropDownChoicePanel<C> add(final DropDownChoice<C> dropDownChoice)
+  {
+    dropDownChoice.setLabel(new Model<String>(getLabel()));
+    return add(dropDownChoice, false);
+  }
+
+  /**
+   * @param id
+   * @param label
+   * @param dropDownChoice
+   * @return The created DropDownChoicePanel.
+   * @see DropDownChoicePanel#DropDownChoicePanel(String, String, DropDownChoice, boolean)
+   */
+  public <C> DropDownChoicePanel<C> add(final DropDownChoice<C> dropDownChoice, final boolean submitOnChange)
+  {
+
+    final DropDownChoicePanel<C> dropDownChoicePanel = new DropDownChoicePanel<C>(newChildId(), dropDownChoice, submitOnChange);
+    dropDownChoicePanel.getDropDownChoice().setLabel(new Model<String>(getLabel()));
+    add(dropDownChoicePanel);
+    return dropDownChoicePanel;
+  }
+
+  /**
+   * @return The Wicket id of the embedded text fiel of {@link DropDownChoicePanel}.
+   */
+  public String getDropDownChoiceId()
+  {
+    return DropDownChoicePanel.WICKET_ID;
+  }
+
   protected abstract String newChildId();
 
   protected void modifyAddedChild(final Component child)
@@ -247,19 +323,24 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   }
 
   /**
+   * @see org.apache.wicket.Component#onInitialize()
+   */
+  @Override
+  protected void onInitialize()
+  {
+    super.onInitialize();
+    if (childAdded == false) {
+      childAdded = true;
+      addInvisibleChild();
+    }
+  }
+
+  /**
    * @see org.apache.wicket.Component#onBeforeRender()
    */
   @Override
   protected void onBeforeRender()
   {
-    if (rendered == false) {
-      // The first time of rendering this component, so do the rest before:
-      rendered = true;
-      if (childAdded == false) {
-        childAdded = true;
-        addInvisibleChild();
-      }
-    }
     if (labelFor == false && WebConfiguration.isDevelopmentMode() == true) {
       log.warn("No label set for field '" + labelText + "'. Please call setLabelFor(component) for this fieldset.");
     }
