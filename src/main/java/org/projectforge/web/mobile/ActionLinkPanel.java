@@ -44,16 +44,16 @@ public class ActionLinkPanel extends Panel // implements IField
   public ActionLinkPanel(final String id, final ActionLinkType actionLinkType, final String value)
   {
     super(id);
-    AbstractLink link1, link2;
+    AbstractLink link1;
     if (actionLinkType == ActionLinkType.CALL) {
       add(link1 = getCallLink(value));
       add(getInvisibleSmsLink());
     } else if (actionLinkType == ActionLinkType.SMS) {
       add(new Label("link", "[invisible]").setVisible(false));
-      add(link2 = getSmsLink(value));
+      add(getSmsLink(value));
     } else if (actionLinkType == ActionLinkType.CALL_AND_SMS) {
       add(link1 = getCallLink(value));
-      add(link2 = getSmsLink(value));
+      add(getSmsLink(value));
     } else if (actionLinkType == ActionLinkType.MAIL) {
       add(link1 = new ExternalLink("link", "mailto:" + value, value));
       add(getInvisibleSmsLink());
@@ -68,14 +68,6 @@ public class ActionLinkPanel extends Panel // implements IField
       link1.add(AttributeModifier.append("target", "_blank"));
       add(getInvisibleSmsLink());
     }
-    // if (ctx.getTooltip() != null) {
-    // if (link1 != null) {
-    // WicketUtils.addTooltip(link1, ctx.getTooltip());
-    // }
-    // if (link2 != null) {
-    // WicketUtils.addTooltip(link2, ctx.getTooltip());
-    // }
-    // }
   }
 
   private ExternalLink getCallLink(final String number)
