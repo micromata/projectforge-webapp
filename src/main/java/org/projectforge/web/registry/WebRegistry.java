@@ -42,6 +42,7 @@ import org.projectforge.web.address.AddressEditPage;
 import org.projectforge.web.address.AddressListPage;
 import org.projectforge.web.address.AddressMobileEditPage;
 import org.projectforge.web.address.AddressMobileListPage;
+import org.projectforge.web.address.AddressMobileViewPage;
 import org.projectforge.web.address.AddressViewPage;
 import org.projectforge.web.address.PhoneCallPage;
 import org.projectforge.web.address.SendSmsPage;
@@ -254,6 +255,23 @@ public class WebRegistry
     return this;
   }
 
+  /**
+   * Adds all page classes as mount pages: mountPageBasename + "{List,Edit,View}.
+   * @param mountPageBasename
+   * @param pageListClass
+   * @param pageEditClass
+   * @param pageViewClass
+   * @return this for chaining.
+   */
+  public WebRegistry addMountPages(final String mountPageBasename, final Class< ? extends WebPage> pageListClass,
+      final Class< ? extends WebPage> pageEditClass, final Class< ? extends WebPage> pageViewClass)
+  {
+    addMountPage(mountPageBasename + "List", pageListClass);
+    addMountPage(mountPageBasename + "Edit", pageEditClass);
+    addMountPage(mountPageBasename + "View", pageViewClass);
+    return this;
+  }
+
   public Map<String, Class< ? extends WebPage>> getMountPages()
   {
     return mountPages;
@@ -339,7 +357,7 @@ public class WebRegistry
     addMountPage("taskTree", TaskTreePage.class);
     addMountPage("tutorial", TutorialPage.class);
 
-    addMountPages(BOOKMARK_MOBILE_PREFIX + "address", AddressMobileListPage.class, AddressMobileEditPage.class);
+    addMountPages(BOOKMARK_MOBILE_PREFIX + "address", AddressMobileListPage.class, AddressMobileEditPage.class, AddressMobileViewPage.class);
 
     addMountPage(BOOKMARK_MOBILE_LOGIN, LoginMobilePage.class);
     addMountPage(BOOKMARK_MOBILE_PREFIX + "menu", MenuMobilePage.class);
