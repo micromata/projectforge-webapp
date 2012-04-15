@@ -27,6 +27,8 @@ import java.util.Map;
 
 import org.apache.wicket.Session;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.projectforge.core.SystemInfoCache;
 import org.projectforge.registry.DaoRegistry;
@@ -48,16 +50,21 @@ public class CallAllPagesTest extends WicketPageTestBase
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CallAllPagesTest.class);
 
-  int counter;
+  static int counter;
 
   @SuppressWarnings("unchecked")
   private final Class< ? extends WebPage>[] skipPages = new Class[] { //
     // Checked below:
     LoginPage.class, LoginMobilePage.class, SetupPage.class, TutorialPage.class, //
-    AddressViewPage.class, // Checked in AddressPagesTest
+    AddressViewPage.class, AddressMobileViewPage.class,// Checked in AddressPagesTest
     // Not yet checked:
-    AddressMobileViewPage.class, // Needs id of an address.
     ScriptExecutePage.class};
+
+  @AfterClass
+  public static void logNumberOfTestesPages()
+  {
+    log.info("Number of tested Wicket pages: " + counter);
+  }
 
   @Test
   public void testAllMountedPages()
@@ -71,7 +78,6 @@ public class CallAllPagesTest extends WicketPageTestBase
     deleteDB();
     Registry.instance().getUserGroupCache().setExpired();
     testPage(SetupPage.class);
-    log.info("Number of tested Wicket pages: " + counter);
   }
 
   private void testAllMountedPages(final BrowserScreenWidthType browserScreenWidthType)
@@ -104,13 +110,29 @@ public class CallAllPagesTest extends WicketPageTestBase
 
   private void testPage(final Class< ? extends WebPage> pageClass)
   {
-    testPage(pageClass, pageClass);
+    testPage(pageClass, null, pageClass);
+  }
+
+  @SuppressWarnings("unused")
+  private void testPage(final Class< ? extends WebPage> pageClass, final PageParameters params)
+  {
+    testPage(pageClass, params, pageClass);
   }
 
   private void testPage(final Class< ? extends WebPage> pageClass, final Class< ? extends WebPage> expectedRenderedPage)
   {
+    testPage(pageClass, null, expectedRenderedPage);
+  }
+
+  private void testPage(final Class< ? extends WebPage> pageClass, final PageParameters params,
+      final Class< ? extends WebPage> expectedRenderedPage)
+  {
     log.info("Calling page: " + pageClass.getName());
-    tester.startPage(pageClass);
+    if (params != null) {
+      tester.startPage(pageClass, params);
+    } else {
+      tester.startPage(pageClass);
+    }
     tester.assertRenderedPage(expectedRenderedPage);
     ++counter;
   }
