@@ -30,6 +30,7 @@ import org.apache.wicket.util.tester.FormTester;
 import org.junit.Assert;
 import org.junit.Test;
 import org.projectforge.address.AddressDO;
+import org.projectforge.address.AddressDao;
 import org.projectforge.address.AddressStatus;
 import org.projectforge.address.ContactStatus;
 import org.projectforge.address.FormOfAddress;
@@ -39,9 +40,11 @@ import org.projectforge.web.wicket.ListAndEditPagesTestBase;
 
 public class AddressPagesTest extends ListAndEditPagesTestBase
 {
+  AddressDao addressDao;
+
   @SuppressWarnings("unchecked")
   @Test
-  public void testViewPage()
+  public void testViewPages()
   {
     loginTestAdmin();
     tester.startPage(AddressListPage.class);
@@ -65,6 +68,12 @@ public class AddressPagesTest extends ListAndEditPagesTestBase
     // Check view page
     tester.clickLink("body:form:table:body:rows:1:cells:1:cell:2:link"); // View page
     tester.assertRenderedPage(AddressViewPage.class);
+
+    // Check mobile view page
+    final Integer id = addressDao.internalLoadAll().get(0).getId();
+    final PageParameters params = new PageParameters().add(AbstractEditPage.PARAMETER_KEY_ID, id);
+    tester.startPage(AddressMobileViewPage.class, params);
+    tester.assertRenderedPage(AddressMobileViewPage.class);
 
     // Delete entry
     tester.startPage(AddressListPage.class);
@@ -97,4 +106,13 @@ public class AddressPagesTest extends ListAndEditPagesTestBase
       {
     return AddressListPage.class;
       }
+
+  /**
+   * @param addressDao the addressDao to set
+   * @return this for chaining.
+   */
+  public void setAddressDao(final AddressDao addressDao)
+  {
+    this.addressDao = addressDao;
+  }
 }
