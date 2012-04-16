@@ -85,6 +85,7 @@ public abstract class AbstractRechnungDO<T extends AbstractRechnungsPositionDO> 
   public void recalculate()
   {
     if (this.datum == null || this.faelligkeit == null) {
+      this.zahlungsZielInTagen = null;
       return;
     }
     final DateHolder date = new DateHolder(this.datum);
