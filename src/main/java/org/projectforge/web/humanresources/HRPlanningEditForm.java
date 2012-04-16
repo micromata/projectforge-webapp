@@ -269,7 +269,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
             predecessor = null;
             refresh();
           }
-        }, getString("hr.planning.entry.copyFromPredecessor")) {
+        }.setDefaultFormProcessing(false), getString("hr.planning.entry.copyFromPredecessor")) {
           /**
            * @see org.apache.wicket.Component#isVisible()
            */
