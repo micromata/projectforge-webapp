@@ -125,9 +125,9 @@ public abstract class AbstractUnsecureBasePage extends WebPage
       dateFormat = dateFormat.toLowerCase().replace("yy", "y"); // Date format conversion for DatePicker of jquery ui.
       buf.append("     $('.datepicker').datepicker({ dateFormat : '");
       buf.append(dateFormat);
-      buf.append("' });\n");
+      buf.append("', showButtonPanel: true });\n");
     } else {
-      buf.append("     $('.datepicker').datepicker();\n");
+      buf.append("     $('.datepicker').datepicker({ showButtonPanel: true });\n");
     }
     buf.append("  });\n");
     add(new Label("javaScriptLocalization", buf.toString()).setEscapeModelStrings(false));

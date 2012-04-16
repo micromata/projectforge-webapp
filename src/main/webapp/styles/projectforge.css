@@ -444,3 +444,11 @@ ul.dropdown-menu ul li a {
 ul.dropdown-menu ul li a:hover {
 	background: #FFFFFF;
 }
+
+td.ui-datepicker-today {
+	background: #F7BE81;
+}
+
+button.ui-datepicker-current, button.ui-datepicker-close {
+	background: #FFFFFF;
+}
