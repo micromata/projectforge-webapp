@@ -45,7 +45,7 @@ public class MebListForm extends AbstractListForm<MebListFilter, MebListPage>
     gridBuilder.newColumnsPanel();
     {
       gridBuilder.newColumnPanel(DivType.COL_60);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.hint"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.hint")).setNoLabelFor();
       fs.add(new TextPanel(fs.newChildId(), PFUserContext.getLocalizedMessage("meb.intro",
           Configuration.getInstance().getStringValue(ConfigurationParam.MEB_SMS_RECEIVING_PHONE_NUMBER))));
     }
