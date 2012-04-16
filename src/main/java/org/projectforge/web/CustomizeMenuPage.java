@@ -62,6 +62,9 @@ public class CustomizeMenuPage extends AbstractSecuredPage
         + "\";").setEscapeModelStrings(false));
     final Form<Void> form = new Form<Void>("form");
     body.add(form);
+    final boolean debugModeAndWicketTags = getWicketApplication().isDevelopmentSystem() == true
+        && getWicketApplication().isStripWicketTags() == false;
+    body.add(new WebMarkupContainer("hintForDevelopers").setVisible(debugModeAndWicketTags));
     form.add(new HiddenField<String>("menuAsXml", new PropertyModel<String>(this, "menuAsXml")));
     form.add(new Button("updateButton") {
       /**
