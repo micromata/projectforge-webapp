@@ -257,6 +257,8 @@ public class ConfigXml
   public ConfigXml(final String applicationHomeDir)
   {
     this.applicationHomeDir = applicationHomeDir;
+    log.info("Using application home dir: " + applicationHomeDir);
+    System.setProperty("base.dir", applicationHomeDir); // Needed by log4j
     final File dir = new File(this.applicationHomeDir);
     final boolean status = ensureDir(dir);
     if (status == true) {
