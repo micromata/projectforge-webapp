@@ -253,8 +253,8 @@ extends AbstractEditForm<O, P>
       fs.setNoLabelFor();
       ajaxUpdateComponents.add(grossPanel.getLabel4Ajax());
     }
-    gridBuilder.newBlockPanel();
     {
+      gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
       // Fälligkeit und Zahlungsziel
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.faelligkeit"), true);
       faelligkeitPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "faelligkeit"), DatePanelSettings.get()
@@ -262,6 +262,7 @@ extends AbstractEditForm<O, P>
       dependentFormComponents[2] = faelligkeitPanel.getDateField();
       fs.add(faelligkeitPanel);
       fs.setLabelFor(faelligkeitPanel);
+      addCellAfterFaelligkeit();
 
       // DropDownChoice ZahlungsZiel
       final LabelValueChoiceRenderer<Integer> zielChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
@@ -343,6 +344,11 @@ extends AbstractEditForm<O, P>
       add(new WebMarkupContainer(COST_EDIT_DIALOG_ID).setVisible(false));
     }
     refresh();
+  }
+
+  protected void addCellAfterFaelligkeit()
+  {
+    // Do nothing.
   }
 
   protected abstract T newPositionInstance();

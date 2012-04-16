@@ -55,13 +55,14 @@ public class DatabaseCoreUpdates
     // 4.0
     // /////////////////////////////////////////////////////////////////
     list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.0", "2012-03-22", "Adds 6th parameter to t_script.") {
+      final Table scriptTable = new Table(ScriptDO.class);
+      final Table eingangsrechnungTable = new Table(EingangsrechnungDO.class);
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
-        final Table scriptTable = new Table(ScriptDO.class);
-        return dao.doesTableAttributesExist(scriptTable, "parameter6Name") == true //
-            && dao.doesTableAttributesExist(scriptTable, "parameter6Type") == true //
+        return dao.doesTableAttributesExist(scriptTable, "parameter6Name", "parameter6Type") == true //
+            && dao.doesTableAttributesExist(eingangsrechnungTable, "paymentType") == true //
             ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
       }
 
@@ -69,12 +70,14 @@ public class DatabaseCoreUpdates
       public UpdateRunningStatus runUpdate()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
-        final Table scriptTable = new Table(ScriptDO.class);
         if (dao.doesTableAttributesExist(scriptTable, "parameter6Name") == false) {
           dao.addTableAttributes(scriptTable, new TableAttribute(ScriptDO.class, "parameter6Name"));
         }
         if (dao.doesTableAttributesExist(scriptTable, "parameter6Type") == false) {
           dao.addTableAttributes(scriptTable, new TableAttribute(ScriptDO.class, "parameter6Type"));
+        }
+        if (dao.doesTableAttributesExist(eingangsrechnungTable, "paymentType") == false) {
+          dao.addTableAttributes(eingangsrechnungTable, new TableAttribute(EingangsrechnungDO.class, "paymentType"));
         }
         return UpdateRunningStatus.DONE;
       }

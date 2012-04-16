@@ -29,6 +29,8 @@ import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -64,6 +66,8 @@ public class EingangsrechnungDO extends AbstractRechnungDO<EingangsrechnungsPosi
 
   @IndexedEmbedded(depth = 1)
   private KontoDO konto;
+
+  private PaymentType paymentType;
 
   @Column(length = 255)
   public String getKreditor()
@@ -115,6 +119,26 @@ public class EingangsrechnungDO extends AbstractRechnungDO<EingangsrechnungsPosi
   public Integer getKontoId()
   {
     return konto != null ? konto.getId() : null;
+  }
+
+  /**
+   * @return the paymentType
+   */
+  @Enumerated(EnumType.STRING)
+  @Column(length = 20, name = "payment_type")
+  public PaymentType getPaymentType()
+  {
+    return paymentType;
+  }
+
+  /**
+   * @param paymentType the paymentType to set
+   * @return this for chaining.
+   */
+  public EingangsrechnungDO setPaymentType(final PaymentType paymentType)
+  {
+    this.paymentType = paymentType;
+    return this;
   }
 
   /**
