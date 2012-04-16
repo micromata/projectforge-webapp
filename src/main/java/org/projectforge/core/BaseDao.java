@@ -1047,6 +1047,9 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     copyValues(obj, dbObj, "deleted"); // If user has made additional changes.
     dbObj.setDeleted(true);
     dbObj.setLastUpdate();
+    final Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+    session.flush();
+    Search.getFullTextSession(session).flushToIndexes();
     afterSaveOrModify(obj);
     afterDelete(obj);
     getSession().flush();
@@ -1110,6 +1113,9 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     dbObj.setLastUpdate();
     obj.setLastUpdate(dbObj.getLastUpdate());
     log.info("Object undeleted: " + dbObj.toString());
+    final Session session = getHibernateTemplate().getSessionFactory().getCurrentSession();
+    session.flush();
+    Search.getFullTextSession(session).flushToIndexes();
     afterSaveOrModify(obj);
     afterUndelete(obj);
   }
