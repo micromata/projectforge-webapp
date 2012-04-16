@@ -329,19 +329,6 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   }
 
   /**
-   * @see org.apache.wicket.Component#onInitialize()
-   */
-  @Override
-  protected void onInitialize()
-  {
-    super.onInitialize();
-    if (childAdded == false) {
-      childAdded = true;
-      addInvisibleChild();
-    }
-  }
-
-  /**
    * @see org.apache.wicket.Component#onBeforeRender()
    */
   @Override
@@ -351,6 +338,10 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
       log.warn("No label set for field '" + labelText + "'. Please call setLabelFor(component) for this fieldset.");
     }
     super.onBeforeRender();
+    if (childAdded == false) {
+      childAdded = true;
+      addInvisibleChild();
+    }
   }
 
   protected abstract void addInvisibleChild();
