@@ -71,11 +71,13 @@ public class FavoritesMenu implements Serializable
 
   public static FavoritesMenu get(final UserXmlPreferencesCache userXmlPreferencesCache, final AccessChecker accessChecker)
   {
-    final FavoritesMenu favoritesMenu = (FavoritesMenu) userXmlPreferencesCache.getEntry(USER_PREF_FAVORITES_MENU_KEY);
+    FavoritesMenu favoritesMenu = (FavoritesMenu) userXmlPreferencesCache.getEntry(USER_PREF_FAVORITES_MENU_KEY);
     if (favoritesMenu != null) {
       return favoritesMenu;
     }
-    return new FavoritesMenu(userXmlPreferencesCache, accessChecker);
+    favoritesMenu = new FavoritesMenu(userXmlPreferencesCache, accessChecker);
+    userXmlPreferencesCache.putEntry(USER_PREF_FAVORITES_MENU_KEY, favoritesMenu, false);
+    return favoritesMenu;
   }
 
   /**
@@ -145,7 +147,7 @@ public class FavoritesMenu implements Serializable
     }
     final MenuEntry menuEntry;
     if (menuItemDef != null) {
-      menuEntry = new MenuEntry(menuItemDef, context);
+      menuEntry = menu.getMenuEntry(menuItemDef);
     } else {
       menuEntry = new MenuEntry();
     }
