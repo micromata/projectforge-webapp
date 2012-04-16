@@ -209,7 +209,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         public final void onSubmit()
         {
         }
-      }, new Model<String>() {
+      }.setDefaultFormProcessing(false), new Model<String>() {
         @Override
         public String getObject()
         {
