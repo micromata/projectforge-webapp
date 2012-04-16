@@ -29,7 +29,7 @@ import org.projectforge.xml.stream.XmlField;
 import org.projectforge.xml.stream.XmlObject;
 
 /**
- * Can't use LabelValueBean because XStream doesn't support generics (isn't it?).
+ * Can't use LabelValueBean because XStream doesn't support generics (does it?).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -47,7 +47,7 @@ public class ContractType implements ILabelValueBean<String, String>
     return label;
   }
 
-  public ContractType setLabel(String label)
+  public ContractType setLabel(final String label)
   {
     this.label = label;
     return this;
@@ -58,7 +58,7 @@ public class ContractType implements ILabelValueBean<String, String>
     return value;
   }
 
-  public ContractType setValue(String value)
+  public ContractType setValue(final String value)
   {
     this.value = value;
     return this;
