@@ -6,4 +6,6 @@
   <Parameter name="hibernate.dialect" value="org.hibernate.dialect.HSQLDialect" />
   <Parameter name="hibernate.schemaUpdate" value="true" />
   <Parameter name="development" value="false" />
+  <!-- stripWicketTargets: Strip Wicket tags also in development mode. -->
+  <Parameter name="stripWicketTags" value="true" override="false" />
 </Context>

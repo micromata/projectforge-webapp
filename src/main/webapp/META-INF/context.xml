@@ -13,5 +13,5 @@
   <Parameter name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" override="false" />
   <Parameter name="hibernate.schemaUpdate" value="false" override="false" />
   <Parameter name="development" value="true" override="false" />
-  <Parameter name="stripWicketTargets" value="true" override="false" />
+  <Parameter name="stripWicketTags" value="true" override="false" />
 </Context>
