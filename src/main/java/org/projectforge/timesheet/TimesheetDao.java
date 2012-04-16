@@ -89,8 +89,8 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
    * Internal error message if maximum duration is exceeded.
    */
   private static final String MAXIMUM_DURATION_EXCEEDED = "Maximum duration of time sheet exceeded. Maximum is "
-    + (MAXIMUM_DURATION / 3600 / 1000)
-    + "h!";
+      + (MAXIMUM_DURATION / 3600 / 1000)
+      + "h!";
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "user.username", "user.firstname", "user.lastname", "task.title",
     "task.taskpath", "kost2.nummer", "kost2.description", "kost2.projekt.name"};
@@ -760,8 +760,8 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
       return null;
     }
     final String s = "select distinct location from "
-      + clazz.getSimpleName()
-      + " t where deleted=false and t.user.id = ? and lastUpdate > ? and lower(t.location) like ?) order by t.location";
+        + clazz.getSimpleName()
+        + " t where deleted=false and t.user.id = ? and lastUpdate > ? and lower(t.location) like ?) order by t.location";
     final Query query = getSession().createQuery(s);
     query.setInteger(0, PFUserContext.getUser().getId());
     final DateHolder dh = new DateHolder();
@@ -783,7 +783,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
     checkLoggedInUserSelectAccess();
     log.info("Get recent locations from the database.");
     final String s = "select location from "
-      + (clazz.getSimpleName() + " t where deleted=false and t.user.id = ? and lastUpdate > ? and t.location != null and t.location != '' order by t.lastUpdate desc");
+        + (clazz.getSimpleName() + " t where deleted=false and t.user.id = ? and lastUpdate > ? and t.location != null and t.location != '' order by t.lastUpdate desc");
     final Query query = getSession().createQuery(s);
     query.setInteger(0, PFUserContext.getUser().getId());
     final DateHolder dh = new DateHolder();
@@ -861,7 +861,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
     if (master.getTaskId() != null) {
       setTask(entry, master.getTaskId());
     }
-    if (master.getLocation() != null) {
+    if (StringUtils.isNotBlank(master.getLocation()) == true) {
       entry.setLocation(master.getLocation());
     }
     return true;

@@ -60,6 +60,8 @@ public class TimesheetMassUpdateForm extends AbstractMassEditForm<TimesheetDO, T
 
   protected boolean updateTask;
 
+  private TimesheetPageSupport timesheetPageSupport;
+
   public TimesheetMassUpdateForm(final TimesheetMassUpdatePage parentPage)
   {
     super(parentPage);
@@ -71,6 +73,7 @@ public class TimesheetMassUpdateForm extends AbstractMassEditForm<TimesheetDO, T
   protected void init()
   {
     super.init();
+    timesheetPageSupport = new TimesheetPageSupport(parentPage, gridBuilder, timesheetDao, data);
     gridBuilder.newGrid16();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task"), true);
@@ -94,6 +97,9 @@ public class TimesheetMassUpdateForm extends AbstractMassEditForm<TimesheetDO, T
       kost2Choice = TimesheetEditForm.createCost2ChoiceRenderer(kost2Fieldset.getDropDownChoiceId(), timesheetDao, taskTree,
           kost2ChoiceRenderer, data, kost2List);
       kost2Fieldset.add(kost2Choice);
+    }
+    {
+      timesheetPageSupport.addLocation();
     }
   }
 

@@ -248,12 +248,7 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
 
   protected TimesheetPrefData getTimesheetPrefData()
   {
-    TimesheetPrefData pref = (TimesheetPrefData) getUserPrefEntry(TimesheetEditPage.class.getName());
-    if (pref == null) {
-      pref = new TimesheetPrefData();
-      putUserPrefEntry(TimesheetEditPage.class.getName(), pref, true);
-    }
-    return pref;
+    return form.timesheetPageSupport.getTimesheetPrefData();
   }
 
   /**

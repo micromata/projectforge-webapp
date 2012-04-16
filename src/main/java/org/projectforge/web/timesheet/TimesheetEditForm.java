@@ -76,13 +76,13 @@ import org.projectforge.web.wicket.components.DateTimePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
+import org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
-import org.projectforge.web.wicket.flowlayout.InputPanel;
 import org.projectforge.web.wicket.flowlayout.TextAreaPanel;
 
 public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEditPage>
@@ -139,6 +139,8 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
 
   private final boolean cost2Exists;
 
+  protected TimesheetPageSupport timesheetPageSupport;
+
   public TimesheetEditForm(final TimesheetEditPage parentPage, final TimesheetDO data)
   {
     super(parentPage, data);
@@ -150,6 +152,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   protected void init()
   {
     super.init();
+    timesheetPageSupport = new TimesheetPageSupport(parentPage, gridBuilder, timesheetDao, data);
     add(new IFormValidator() {
       @Override
       public FormComponent< ? >[] getDependentFormComponents()
@@ -318,23 +321,8 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       }));
     }
     {
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.location"), true);
-      locationTextField = new PFAutoCompleteMaxLengthTextField(InputPanel.WICKET_ID, new PropertyModel<String>(data, "location")) {
-        @Override
-        protected List<String> getChoices(final String input)
-        {
-          return parentPage.getBaseDao().getLocationAutocompletion(input);
-        }
-
-        @Override
-        protected List<String> getFavorites()
-        {
-          return parentPage.getRecentLocations();
-        }
-      };
-      locationTextField.withMatchContains(true).withMinChars(2).withFocus(true);
-      fs.add(locationTextField);
-      fs.addKeyboardHelpIcon(getString("tooltip.autocomplete.withDblClickFunction"));
+      final AbstractFieldsetPanel< ? > fs = timesheetPageSupport.addLocation();
+      locationTextField = (PFAutoCompleteMaxLengthTextField) fs.getStoreObject();
     }
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("timesheet.description"), true);
