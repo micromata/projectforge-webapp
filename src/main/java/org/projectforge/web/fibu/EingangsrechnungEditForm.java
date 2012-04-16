@@ -26,9 +26,7 @@ package org.projectforge.web.fibu;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
-import org.projectforge.calendar.DayHolder;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.EingangsrechnungsPositionDO;
 import org.projectforge.fibu.KontoDO;
@@ -46,8 +44,6 @@ AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, Eingan
   private static final long serialVersionUID = 5286417118638335693L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EingangsrechnungEditForm.class);
-
-  private DropDownChoice<Long> datumChoice;
 
   public EingangsrechnungEditForm(final EingangsrechnungEditPage parentPage, final EingangsrechnungDO data)
   {
@@ -101,36 +97,6 @@ AbstractRechnungEditForm<EingangsrechnungDO, EingangsrechnungsPositionDO, Eingan
   protected void cloneRechnung()
   {
     parentPage.cloneRechnung();
-  }
-
-  @Override
-  protected void validation()
-  {
-    final Long datumInMillis = datumChoice.getConvertedInput();
-    if (datumInMillis != null) {
-      final DayHolder day = new DayHolder(new java.sql.Date(datumInMillis));
-      data.setDatum(day.getSQLDate());
-      datumPanel.markModelAsChanged();
-    } else if (datumPanel.getConvertedInput() == null) {
-      addFieldRequiredError("fibu.rechnung.datum");
-    }
-    super.validation();
-  }
-
-  /**
-   * @return null
-   */
-  public Long getDatumInMillis()
-  {
-    return null;
-  }
-
-  /**
-   * Dummy method. Does nothing.
-   * @param datumInMillis
-   */
-  public void setDatumInMillis(final Long datumInMillis)
-  {
   }
 
   @Override

@@ -110,7 +110,9 @@ extends AbstractEditForm<O, P>
 
   protected final FormComponent< ? >[] dependentFormComponents = new FormComponent[5];
 
-  protected DatePanel datumPanel;
+  protected DatePanel datumPanel, faelligkeitPanel;
+
+  protected Integer zahlungsZiel;
 
   public AbstractRechnungEditForm(final P parentPage, final O data)
   {
@@ -118,11 +120,6 @@ extends AbstractEditForm<O, P>
   }
 
   protected abstract void onInit();
-
-  protected void afterInit()
-  {
-
-  }
 
   @SuppressWarnings("unchecked")
   protected void validation()
@@ -137,7 +134,7 @@ extends AbstractEditForm<O, P>
 
     final Integer zahlungsZiel = zahlungsZielChoice.getConvertedInput();
     Date faelligkeit = faelligkeitField.getConvertedInput();
-    if (zahlungsZiel != null) {
+    if (faelligkeit == null && zahlungsZiel != null) {
       Date date = datumField.getConvertedInput();
       if (date == null) {
         date = getData().getDatum();
@@ -145,9 +142,9 @@ extends AbstractEditForm<O, P>
       if (date != null) {
         final DayHolder day = new DayHolder(date);
         day.add(Calendar.DAY_OF_YEAR, zahlungsZiel);
-        faelligkeit = day.getSQLDate();
+        faelligkeit = day.getDate();
         getData().setFaelligkeit(day.getSQLDate());
-        faelligkeitField.modelChanged();
+        faelligkeitPanel.markModelAsChanged();
       }
     }
     getData().recalculate();
@@ -208,6 +205,7 @@ extends AbstractEditForm<O, P>
       datumPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "datum"), DatePanelSettings.get().withTargetType(
           java.sql.Date.class));
       dependentFormComponents[0] = datumPanel.getDateField();
+      datumPanel.setRequired(true);
       fs.add(datumPanel);
     }
     gridBuilder.newColumnPanel(DivType.COL_50);
@@ -259,8 +257,8 @@ extends AbstractEditForm<O, P>
     {
       // Fälligkeit und Zahlungsziel
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.rechnung.faelligkeit"), true);
-      final DatePanel faelligkeitPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "faelligkeit"), DatePanelSettings
-          .get().withTargetType(java.sql.Date.class));
+      faelligkeitPanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "faelligkeit"), DatePanelSettings.get()
+          .withTargetType(java.sql.Date.class));
       dependentFormComponents[2] = faelligkeitPanel.getDateField();
       fs.add(faelligkeitPanel);
       fs.setLabelFor(faelligkeitPanel);
@@ -270,8 +268,8 @@ extends AbstractEditForm<O, P>
       for (final int days : ZAHLUNGSZIELE_IN_TAGEN) {
         zielChoiceRenderer.addValue(days, String.valueOf(days) + " " + getString("days"));
       }
-      final DropDownChoice<Integer> zahlungsZielChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(),
-          new PropertyModel<Integer>(this, "zahlungsZiel"), zielChoiceRenderer.getValues(), zielChoiceRenderer) {
+      final DropDownChoice<Integer> zahlungsZielChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(), new PropertyModel<Integer>(
+          this, "zahlungsZiel"), zielChoiceRenderer.getValues(), zielChoiceRenderer) {
         @Override
         public boolean isVisible()
         {
@@ -287,6 +285,7 @@ extends AbstractEditForm<O, P>
         @Override
         public String getObject()
         {
+          data.recalculate();
           return data.getZahlungsZielInTagen() + " " + getString("days");
         }
       }) {
@@ -344,7 +343,6 @@ extends AbstractEditForm<O, P>
       add(new WebMarkupContainer(COST_EDIT_DIALOG_ID).setVisible(false));
     }
     refresh();
-    afterInit();
   }
 
   protected abstract T newPositionInstance();
@@ -431,8 +429,7 @@ extends AbstractEditForm<O, P>
         {
           // Net price
           column.add(subcolumn = new DivPanel(column.newChildId(), divType));
-          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.rechnung.position.einzelNetto"))
-          .setLabelSide(false);
+          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.rechnung.position.einzelNetto")).setLabelSide(false);
           final TextField<BigDecimal> netTextField = new TextField<BigDecimal>(InputPanel.WICKET_ID, new PropertyModel<BigDecimal>(
               position, "einzelNetto")) {
             @SuppressWarnings({ "rawtypes", "unchecked"})
@@ -509,8 +506,7 @@ extends AbstractEditForm<O, P>
       {
         column.add(subcolumn = new DivPanel(column.newChildId(), DivType.COL_33));
         {
-          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.common.brutto")).setLabelSide(false)
-              .setNoLabelFor();
+          final FieldsetPanel fieldset = new FieldsetPanel(subcolumn, getString("fibu.common.brutto")).setLabelSide(false).setNoLabelFor();
           final TextPanel grossTextPanel = new TextPanel(fieldset.newChildId(), new Model<String>() {
             @Override
             public String getObject()
@@ -711,22 +707,6 @@ extends AbstractEditForm<O, P>
    * @param bezahlDatumInMillis
    */
   public void setBezahlDatumInMillis(final Long bezahlDatumInMillis)
-  {
-  }
-
-  /**
-   * @return null
-   */
-  public Integer getZahlungsZiel()
-  {
-    return null;
-  }
-
-  /**
-   * Dummy method. Does nothing.
-   * @param zahlungsZiel
-   */
-  public void setZahlungsZiel(final Integer zahlungsZiel)
   {
   }
 

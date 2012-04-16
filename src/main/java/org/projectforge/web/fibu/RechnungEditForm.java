@@ -136,12 +136,6 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     }
   }
 
-  @Override
-  protected void afterInit()
-  {
-    datumPanel.setRequired(true);
-  }
-
   @SuppressWarnings("serial")
   @Override
   protected void onRenderPosition(final WebMarkupContainer item, final RechnungsPositionDO position)

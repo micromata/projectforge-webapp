@@ -52,7 +52,6 @@ ISelectCallerPage
   {
     super(parameters, "fibu.eingangsrechnung");
     init();
-    getData().recalculate(); // Muss immer gemacht werden, damit das Zahlungsziel in Tagen berechnet wird.
   }
 
   @Override
