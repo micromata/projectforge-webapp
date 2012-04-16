@@ -385,8 +385,12 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   public boolean isStripWicketTags()
   {
     if (stripWicketTags == null) {
-      final String value = getServletContext().getInitParameter("stripWicketTags");
-      stripWicketTags = "true".equals(value);
+      if (isDevelopmentSystem() == false) {
+        stripWicketTags = true;
+      } else {
+        final String value = getServletContext().getInitParameter("stripWicketTags");
+        stripWicketTags = "true".equals(value);
+      }
     }
     return stripWicketTags;
   }
