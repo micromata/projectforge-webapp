@@ -66,6 +66,8 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
 
   protected RepeatingView repeater;
 
+  private Object storeObject;
+
   /**
    * Adds this FieldsetPanel to the parent panel.
    * @param parent
@@ -347,4 +349,24 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   protected abstract void addInvisibleChild();
 
   protected abstract T getThis();
+
+  /**
+   * Can be used by e. g. TimesheetPageSupport for storing objects, used by the supported form.
+   * @param storeObject the childField to set
+   * @return this for chaining.
+   */
+  public T setStoreObject(final Object storeObject)
+  {
+    this.storeObject = storeObject;
+    return getThis();
+  }
+
+  /**
+   * Can be used by e. g. TimesheetPageSupport for storing objects, used by the supported form.
+   * @return the childField
+   */
+  public Object getStoreObject()
+  {
+    return storeObject;
+  }
 }
