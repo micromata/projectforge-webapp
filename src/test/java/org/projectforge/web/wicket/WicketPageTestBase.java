@@ -102,6 +102,15 @@ public class WicketPageTestBase extends TestBase
     {
       return false;
     }
+
+    /**
+     * @see org.projectforge.web.wicket.WicketApplicationInterface#isStripWicketTags()
+     */
+    @Override
+    public boolean isStripWicketTags()
+    {
+      return true;
+    }
   };
 
   @Before
