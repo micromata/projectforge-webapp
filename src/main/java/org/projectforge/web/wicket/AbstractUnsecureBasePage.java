@@ -255,9 +255,9 @@ public abstract class AbstractUnsecureBasePage extends WebPage
   {
   }
 
-  protected WicketApplication getWicketApplication()
+  protected WicketApplicationInterface getWicketApplication()
   {
-    return (WicketApplication) getApplication();
+    return (WicketApplicationInterface) getApplication();
   }
 
   /**
