@@ -54,6 +54,8 @@ public abstract class AbstractMobileViewPage<O extends AbstractBaseDO< ? >, D ex
       data = getBaseDao().getById(id);
     }
     if (data == null) {
+      // Create empty address for avoiding NPE...
+      data = getBaseDao().newInstance();
       getLogger().error("Oups, no object id given. Can't display object.");
       setResponsePage(getListPageClass());
       return;
