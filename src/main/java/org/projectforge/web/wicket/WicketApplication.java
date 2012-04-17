@@ -382,6 +382,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     return developmentMode;
   }
 
+  @Override
   public boolean isStripWicketTags()
   {
     if (stripWicketTags == null) {
