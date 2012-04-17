@@ -29,7 +29,12 @@ package org.projectforge.web.wicket;
 public interface WicketApplicationInterface
 {
   /**
-   * @return True if configured as servlet context param.
+   * @return True if configured as servlet context param or in Jetty settings.
    */
   public boolean isDevelopmentSystem();
+
+  /**
+   * @return True if configured as servlet context param or in Jetty settings. In deployment mode this method returns always true.
+   */
+  public boolean isStripWicketTags();
 }
