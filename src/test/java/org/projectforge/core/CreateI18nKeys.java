@@ -227,7 +227,6 @@ public class CreateI18nKeys
     set.add(file.getPath());
   }
 
-  @SuppressWarnings("unchecked")
   private Collection<File> listFiles(final String path, final String suffix)
   {
     return FileUtils.listFiles(new File(path), new String[] { suffix}, true);
