@@ -54,7 +54,7 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 4.0
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.0", "2012-03-22", "Adds 6th parameter to t_script.") {
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.0", "2012-04-17", "Adds 6th parameter to t_script and payment_type to t_fibu_eingangsrechnung.") {
       final Table scriptTable = new Table(ScriptDO.class);
       final Table eingangsrechnungTable = new Table(EingangsrechnungDO.class);
       @Override
