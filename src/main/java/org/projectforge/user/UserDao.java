@@ -195,6 +195,15 @@ public class UserDao extends BaseDao<PFUserDO>
     return true;
   }
 
+  /**
+   * @see org.projectforge.core.BaseDao#hasInsertAccess(org.projectforge.user.PFUserDO)
+   */
+  @Override
+  public boolean hasInsertAccess(final PFUserDO user)
+  {
+    return accessChecker.isUserMemberOfAdminGroup(user, false);
+  }
+
   @Override
   protected void onSaveOrModify(final PFUserDO obj)
   {

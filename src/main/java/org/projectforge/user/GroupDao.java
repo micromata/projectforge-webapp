@@ -55,11 +55,11 @@ public class GroupDao extends BaseDao<GroupDO>
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GroupDao.class);
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "assignedUsers.username", "assignedUsers.firstname",
-      "assignedUsers.lastname"};
+  "assignedUsers.lastname"};
 
   private UserDao userDao;
 
-  public void setUserDao(UserDao userDao)
+  public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
   }
@@ -72,14 +72,14 @@ public class GroupDao extends BaseDao<GroupDO>
 
   public QueryFilter getDefaultFilter()
   {
-    QueryFilter queryFilter = new QueryFilter();
+    final QueryFilter queryFilter = new QueryFilter();
     return queryFilter;
   }
 
   @Override
-  public List<GroupDO> getList(BaseSearchFilter filter)
+  public List<GroupDO> getList(final BaseSearchFilter filter)
   {
-    QueryFilter queryFilter = new QueryFilter(filter);
+    final QueryFilter queryFilter = new QueryFilter(filter);
     queryFilter.addOrder(Order.asc("name"));
     queryFilter.setFetchMode("assignedUsers", FetchMode.JOIN);
     return getList(queryFilter);
@@ -114,7 +114,7 @@ public class GroupDao extends BaseDao<GroupDO>
    * @param assignedUserIds Full list of all users which have to assigned to this group.
    * @return
    */
-  public void setAssignedUsers(GroupDO group, Set<Integer> assignedUserIds) throws AccessException
+  public void setAssignedUsers(final GroupDO group, final Set<Integer> assignedUserIds) throws AccessException
   {
     final Set<PFUserDO> assignedUsers = group.getAssignedUsers();
     if (assignedUsers != null) {
@@ -126,7 +126,7 @@ public class GroupDao extends BaseDao<GroupDO>
         }
       }
     }
-    for (Integer id : assignedUserIds) {
+    for (final Integer id : assignedUserIds) {
       final PFUserDO user = userDao.internalGetById(id);
       if (user == null) {
         throw new RuntimeException("User '" + id + "' not found. Could not add this unknown user to new group: " + group.getName());
@@ -181,11 +181,11 @@ public class GroupDao extends BaseDao<GroupDO>
     final Collection<GroupDO> groupList = new ArrayList<GroupDO>();
     groupList.add(group);
     // Create history entry of PFUserDO for all new assigned users:
-    for (PFUserDO user : assignedList) {
+    for (final PFUserDO user : assignedList) {
       createHistoryEntry(user, null, groupList);
     }
     // Create history entry of PFUserDO for all unassigned users:
-    for (PFUserDO user : unassignedList) {
+    for (final PFUserDO user : unassignedList) {
       createHistoryEntry(user, groupList, null);
     }
   }
@@ -198,13 +198,13 @@ public class GroupDao extends BaseDao<GroupDO>
    * @throws AccessException
    */
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
-  public void assignGroups(final PFUserDO user, Set<Integer> groupIdsToAssign, Set<Integer> groupIdsToUnassign) throws AccessException
+  public void assignGroups(final PFUserDO user, final Set<Integer> groupIdsToAssign, final Set<Integer> groupIdsToUnassign) throws AccessException
   {
     getHibernateTemplate().refresh(user, LockMode.READ);
     final List<GroupDO> assignedGroups = new ArrayList<GroupDO>();
     if (groupIdsToAssign != null) {
       for (final Integer groupId : groupIdsToAssign) {
-        GroupDO group = (GroupDO) getHibernateTemplate().get(clazz, groupId, LockMode.PESSIMISTIC_WRITE);
+        final GroupDO group = getHibernateTemplate().get(clazz, groupId, LockMode.PESSIMISTIC_WRITE);
         Set<PFUserDO> assignedUsers = group.getAssignedUsers();
         if (assignedUsers == null) {
           assignedUsers = new HashSet<PFUserDO>();
@@ -223,8 +223,8 @@ public class GroupDao extends BaseDao<GroupDO>
     final List<GroupDO> unassignedGroups = new ArrayList<GroupDO>();
     if (groupIdsToUnassign != null) {
       for (final Integer groupId : groupIdsToUnassign) {
-        GroupDO group = (GroupDO) getHibernateTemplate().get(clazz, groupId, LockMode.PESSIMISTIC_WRITE);
-        Set<PFUserDO> assignedUsers = group.getAssignedUsers();
+        final GroupDO group = getHibernateTemplate().get(clazz, groupId, LockMode.PESSIMISTIC_WRITE);
+        final Set<PFUserDO> assignedUsers = group.getAssignedUsers();
         if (assignedUsers != null && assignedUsers.contains(user) == true) {
           log.info("Unassigning user '" + user.getUsername() + "' from group '" + group.getName() + "'.");
           assignedUsers.remove(user);
@@ -240,7 +240,7 @@ public class GroupDao extends BaseDao<GroupDO>
     userGroupCache.setExpired();
   }
 
-  private void createHistoryEntry(PFUserDO user, Collection<GroupDO> unassignedList, Collection<GroupDO> assignedList)
+  private void createHistoryEntry(final PFUserDO user, Collection<GroupDO> unassignedList, Collection<GroupDO> assignedList)
   {
     if (unassignedList != null && unassignedList.size() == 0) {
       unassignedList = null;
@@ -262,12 +262,12 @@ public class GroupDao extends BaseDao<GroupDO>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   List<GroupDO> loadAll()
   {
-    List<GroupDO> list = getHibernateTemplate().find("from GroupDO t join fetch t.assignedUsers");
+    final List<GroupDO> list = getHibernateTemplate().find("from GroupDO t join fetch t.assignedUsers");
     return list;
   }
 
   @Override
-  protected void afterSaveOrModify(GroupDO group)
+  protected void afterSaveOrModify(final GroupDO group)
   {
     super.afterSaveOrModify(group);
     userGroupCache.setExpired();
@@ -323,6 +323,15 @@ public class GroupDao extends BaseDao<GroupDO>
   public boolean hasHistoryAccess(final PFUserDO user, final boolean throwException)
   {
     return accessChecker.isUserMemberOfAdminGroup(user, throwException);
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#hasInsertAccess(org.projectforge.user.PFUserDO)
+   */
+  @Override
+  public boolean hasInsertAccess(final PFUserDO user)
+  {
+    return accessChecker.isUserMemberOfAdminGroup(user);
   }
 
   @Override
