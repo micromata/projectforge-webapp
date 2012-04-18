@@ -37,7 +37,7 @@
     <developer>
       <id>kai</id>
       <name>Kai Reinhard</name>
-      <email>k.reinhard@micromata.de</email>
+      <email>k.reinhard at micromata.de</email>
       <organization>Micromata GmbH</organization>
       <organizationUrl>http://www.micromata.com</organizationUrl>
       <roles>
@@ -50,7 +50,7 @@
     <developer>
       <id>wolle</id>
       <name>Wolfgang Jung</name>
-      <email>w.jung@micromata.de</email>
+      <email>w.jung at micromata.de</email>
       <organization>Micromata GmbH</organization>
       <organizationUrl>http://www.micromata.com</organizationUrl>
       <roles>
@@ -59,7 +59,40 @@
       </roles>
       <timezone>-1</timezone>
     </developer>
+    <developer>
+      <id>cclaus</id>
+      <name>Christian Claus</name>
+      <email>c.claus at micromata.de</email>
+      <organization>Micromata GmbH</organization>
+      <organizationUrl>http://www.micromata.com</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>-1</timezone>
+    </developer>
+    <developer>
+      <id>daniel</id>
+      <name>Daniel Ludwig</name>
+      <email>d.ludwig at micromata.de</email>
+      <organization>Micromata GmbH</organization>
+      <organizationUrl>http://www.micromata.com</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>-1</timezone>
+    </developer>
   </developers>
+   <contributors>
+    <contributor>
+      <name>Oisin Lavery</name>
+      <organization>Tricycle Interactive</organization>
+      <organizationUrl>http://www.tricycle.ie/</organizationUrl>
+      <roles>
+        <role>Contributor of Adminica, the web site template used by ProjectForge.</role>
+      </roles>
+      <timezone>-1</timezone>
+    </contributor>
+  </contributors>
   <licenses>
     <license>
       <name>Dual license</name>
