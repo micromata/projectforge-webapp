@@ -82,7 +82,7 @@
       <timezone>-1</timezone>
     </developer>
   </developers>
-   <contributors>
+  <contributors>
     <contributor>
       <name>Oisin Lavery</name>
       <organization>Tricycle Interactive</organization>
@@ -156,6 +156,17 @@
       <layout>default</layout>
     </repository>
   </repositories>
+  <properties>
+    <!-- wtpversion>1.5</wtpversion -->
+    <downloadSources>true</downloadSources>
+    <spring.version>3.1.1.RELEASE</spring.version>
+    <wicket.version>1.5.5</wicket.version> <!-- Version check: 2012-03-12 -->
+    <!-- <wiquery.version>1.5.5</wiquery.version> -->
+    <joda.version>1.6.2</joda.version>
+    <jackson.version>1.7.5</jackson.version>
+    <jetty.version>7.5.0.v20110901</jetty.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.sun.jersey</groupId>
@@ -286,6 +297,11 @@
       <version>2.5</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>${joda.version}</version>
+    </dependency>
     <dependency> <!-- Version check: 2010-08-28 -->
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
@@ -360,6 +376,16 @@
       <artifactId>xmlgraphics-commons</artifactId>
       <version>1.4</version>
     </dependency>
+      <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-core-asl</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-mapper-asl</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
     <dependency> <!-- Version check: 2010-08-28 -->
       <groupId>org.mockito</groupId>
       <artifactId>mockito-all</artifactId>
@@ -563,15 +589,6 @@
       <version>${jetty.version}</version>
     </dependency>
   </dependencies>
-  <properties>
-    <!-- wtpversion>1.5</wtpversion -->
-    <downloadSources>true</downloadSources>
-    <spring.version>3.1.1.RELEASE</spring.version>
-    <wicket.version>1.5.5</wicket.version> <!-- Version check: 2012-03-12 -->
-  <!-- <wiquery.version>1.5.5</wiquery.version> -->
-    <jetty.version>7.5.0.v20110901</jetty.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
   <build>
     <finalName>ProjectForge</finalName>
     <sourceDirectory>src/main/java</sourceDirectory>
@@ -581,6 +598,7 @@
         <includes>
           <include>keystore</include>
           <include>**/*.properties</include>
+          <include>**/*.css</include>
           <include>**/*.html</include>
           <include>**/*.js</include>
           <include>misc/*.scpt</include>
@@ -590,6 +608,7 @@
           <include>**/*.xsl</include>
           <include>**/*.gif</include>
           <include>**/*.png</include>
+          <include>**/*.tpl</include>
         </includes>
       </resource>
     </resources>
