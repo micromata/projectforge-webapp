@@ -445,7 +445,7 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
    * If set then normal user are not allowed to select (read) the time sheets of other users of this task and all sub tasks. This is important e. g. for hiding the days of illness of an employee.
    * @return True if the flag is set.
    */
-  @Column(name = "protectionOfPrivacy")
+  @Column(name = "protectionOfPrivacy", nullable = false, columnDefinition = "BOOLEAN DEFAULT 'false'")
   public boolean isProtectionOfPrivacy()
   {
     return protectionOfPrivacy;
@@ -593,7 +593,7 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
     if (o instanceof TaskDO) {
       final TaskDO other = (TaskDO) o;
       return ObjectUtils.equals(this.getParentTaskId(), other.getParentTaskId()) == true
-      && ObjectUtils.equals(this.getTitle(), other.getTitle()) == true;
+          && ObjectUtils.equals(this.getTitle(), other.getTitle()) == true;
     }
     return false;
   }
