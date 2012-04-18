@@ -21,9 +21,9 @@ public class AppVersion
 
   public static final String NUMBER = VERSION.toString();
 
-  public static final String RELEASE_DATE = "2012-04-17";
+  public static final String RELEASE_DATE = "2012-04-18";
 
-  public static final String RELEASE_TIMESTAMP = "2012-04-17 23:19";
+  public static final String RELEASE_TIMESTAMP = "2012-04-18 06:03";
 }
 
 			
