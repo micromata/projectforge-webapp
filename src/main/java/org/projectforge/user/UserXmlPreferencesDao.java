@@ -158,14 +158,14 @@ public class UserXmlPreferencesDao extends HibernateDaoSupport
       return value;
     } catch (final Throwable ex) {
       if (logError == true) {
-        log.error("Can't deserialize user preferences: "
+        log.warn("Can't deserialize user preferences: "
             + ex.getMessage()
             + " for user: "
             + userPrefs.getUserId()
             + ":"
             + userPrefs.getKey()
-            + ". xml="
-            + xml, ex);
+            + " (may-be ok after a new ProjectForge release). xml="
+            + xml);
       }
       return null;
     }
