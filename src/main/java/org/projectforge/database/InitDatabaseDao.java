@@ -29,8 +29,12 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import org.projectforge.access.AccessException;
+import org.projectforge.core.ConfigurationDO;
+import org.projectforge.core.ConfigurationDao;
+import org.projectforge.core.ConfigurationParam;
 import org.projectforge.database.xstream.XStreamSavingConverter;
 import org.projectforge.task.TaskDO;
+import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskStatus;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.GroupDO;
@@ -60,6 +64,8 @@ public class InitDatabaseDao extends HibernateDaoSupport
 
   public static final String DEFAULT_ADMIN_USER = "admin";
 
+  private ConfigurationDao configurationDao;
+
   private DatabaseDao databaseDao;
 
   private DatabaseUpdateDao databaseUpdateDao;
@@ -73,6 +79,15 @@ public class InitDatabaseDao extends HibernateDaoSupport
   private XmlDump xmlDump;
 
   private UserDao userDao;
+
+  /**
+   * @param configurationDao the configurationDao to set
+   * @return this for chaining.
+   */
+  public void setConfigurationDao(final ConfigurationDao configurationDao)
+  {
+    this.configurationDao = configurationDao;
+  }
 
   public void setDatabaseDao(final DatabaseDao databaseDao)
   {
@@ -195,6 +210,21 @@ public class InitDatabaseDao extends HibernateDaoSupport
       }
       user.setTimeZone(adminUserTimezone);
       userDao.internalUpdate(user);
+      Integer taskId = null;
+      for (final TaskNode node : taskTree.getRootTaskNode().getChilds()) {
+        if ("ACME".equals(node.getTask().getTitle()) == true) {
+          taskId = node.getId();
+          break;
+        }
+      }
+      if (taskId != null) {
+        ConfigurationDO configuration = configurationDao.getEntry(ConfigurationParam.DEFAULT_TASK_ID_4_ADDRESSES);
+        configuration.setTaskId(taskId);
+        configurationDao.internalUpdate(configuration);
+        configuration = configurationDao.getEntry(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS);
+        configuration.setTaskId(taskId);
+        configurationDao.internalUpdate(configuration);
+      }
       log.fatal("Database successfully initialized with test data.");
     }
     new Thread() {
