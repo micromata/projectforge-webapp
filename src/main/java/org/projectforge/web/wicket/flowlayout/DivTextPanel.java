@@ -24,6 +24,7 @@
 package org.projectforge.web.wicket.flowlayout;
 
 import org.apache.wicket.behavior.Behavior;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
@@ -42,9 +43,12 @@ public class DivTextPanel extends Panel
 
   private final Label label;
 
+  private final WebMarkupContainer div;
+
   public DivTextPanel(final String id, final String text, final Behavior... behaviors)
   {
     super(id);
+    add(div = new WebMarkupContainer("div"));
     label = new Label(WICKET_ID, text);
     init(behaviors);
   }
@@ -52,6 +56,7 @@ public class DivTextPanel extends Panel
   public DivTextPanel(final String id, final IModel<String> text, final Behavior... behaviors)
   {
     super(id);
+    add(div = new WebMarkupContainer("div"));
     label = new Label(WICKET_ID, text);
     init(behaviors);
   }
@@ -59,8 +64,9 @@ public class DivTextPanel extends Panel
   public DivTextPanel(final String id, final Label label)
   {
     super(id);
+    add(div = new WebMarkupContainer("div"));
     this.label = label;
-    add(label);
+    div.add(label);
   }
 
   /**
@@ -105,6 +111,6 @@ public class DivTextPanel extends Panel
   private void init(final Behavior... behaviors)
   {
     label.add(behaviors);
-    add(label);
+    div.add(label);
   }
 }
