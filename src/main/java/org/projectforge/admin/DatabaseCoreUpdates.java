@@ -52,9 +52,33 @@ public class DatabaseCoreUpdates
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
     // /////////////////////////////////////////////////////////////////
+    // 4.1
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.1", "2012-04-21", "Adds t_pf_user.first_day_of_week") {
+      final Table userTable = new Table(PFUserDO.class);
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        return dao.doesTableAttributesExist(userTable, "firstDayOfWeek") == true //
+            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        if (dao.doesTableAttributesExist(userTable, "firstDayOfWeek") == false) {
+          dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "firstDayOfWeek"));
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    });
+
+    // /////////////////////////////////////////////////////////////////
     // 4.0
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.0", "2012-04-17", "Adds 6th parameter to t_script and payment_type to t_fibu_eingangsrechnung.") {
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.0", "2012-04-18", "Adds 6th parameter to t_script and payment_type to t_fibu_eingangsrechnung.") {
       final Table scriptTable = new Table(ScriptDO.class);
       final Table eingangsrechnungTable = new Table(EingangsrechnungDO.class);
       @Override

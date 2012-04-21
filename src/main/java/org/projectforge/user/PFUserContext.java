@@ -23,6 +23,7 @@
 
 package org.projectforge.user;
 
+import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -67,7 +68,7 @@ public class PFUserContext
    */
   public final static Integer getUserId()
   {
-    PFUserDO user = getUser();
+    final PFUserDO user = getUser();
     return user != null ? user.getId() : null;
   }
 
@@ -89,10 +90,10 @@ public class PFUserContext
    * @see #getUser()
    * @see PFUserDO#getLocale()
    */
-  public final static Locale getLocale(Locale defaultLocale)
+  public final static Locale getLocale(final Locale defaultLocale)
   {
-    PFUserDO user = getUser();
-    Locale userLocale = user != null ? user.getLocale() : null;
+    final PFUserDO user = getUser();
+    final Locale userLocale = user != null ? user.getLocale() : null;
     if (userLocale != null) {
       return userLocale;
     }
@@ -118,8 +119,23 @@ public class PFUserContext
     return getUser() != null ? getUser().getTimeZoneObject() : Configuration.getInstance().getDefaultTimeZone();
   }
 
+  /**
+   * The first day of the week, configured at the given user, if not configured {@link Calendar#getFirstDayOfWeek()} with the locale
+   * returned by {@link #getLocale()} is used.
+   * @return
+   * @see Calendar#getFirstDayOfWeek()
+   */
+  public final static int getFirstDayOfWeek()
+  {
+    final PFUserDO user = getUser();
+    final Integer firstDayOfWeek = user.getFirstDayOfWeek();
+    if (firstDayOfWeek != null) {
+      return firstDayOfWeek;
+    }
+    return Calendar.getInstance(getLocale()).getFirstDayOfWeek();
+  }
 
-  public static String getLocalizedMessage(String messageKey, Object... params)
+  public static String getLocalizedMessage(final String messageKey, final Object... params)
   {
     return I18nHelper.getLocalizedMessage(getLocale(), messageKey, params);
   }

@@ -117,6 +117,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private String excelDateFormat;
 
+  private Integer firstDayOfWeek;
+
   private TimeNotation timeNotation;
 
   @org.hibernate.search.annotations.Field(index = Index.TOKENIZED, store = Store.NO)
@@ -255,6 +257,26 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public TimeNotation getTimeNotation()
   {
     return timeNotation;
+  }
+
+  /**
+   * 0 - sunday, 1 - monday etc.
+   * @return the firstDayOfWeek
+   */
+  @Column(name = "first_day_of_week")
+  public Integer getFirstDayOfWeek()
+  {
+    return firstDayOfWeek;
+  }
+
+  /**
+   * @param firstDayOfWeek the firstDayOfWeek to set
+   * @return this for chaining.
+   */
+  public PFUserDO setFirstDayOfWeek(final Integer firstDayOfWeek)
+  {
+    this.firstDayOfWeek = firstDayOfWeek;
+    return this;
   }
 
   public void setTimeNotation(final TimeNotation timeNotation)
