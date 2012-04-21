@@ -76,7 +76,8 @@ public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditF
   /**
    * @see org.projectforge.web.wicket.AbstractEditPage#updateAll()
    */
-  protected void updateAll()
+  @Override
+  protected void update()
   {
     if (PFUserContext.getUserId().equals(getData().getId()) == false) {
       throw new IllegalStateException("Oups, MyAccountEditPage is called with another than the logged in user!");
