@@ -39,7 +39,8 @@ import org.projectforge.web.HtmlHelper;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class DisplayTimesheet implements Serializable
+@Deprecated
+public class OldDisplayTimesheet implements Serializable
 {
   private static final long serialVersionUID = 7956824126208303614L;
 
@@ -69,15 +70,15 @@ public class DisplayTimesheet implements Serializable
    * @return
    * @see #isEmptyTimesheet()
    */
-  public static DisplayTimesheet createBreak(Date startTime, Date stopTime)
+  public static OldDisplayTimesheet createBreak(final Date startTime, final Date stopTime)
   {
-    DisplayTimesheet timesheet = new DisplayTimesheet();
+    final OldDisplayTimesheet timesheet = new OldDisplayTimesheet();
     timesheet.startTime = startTime;
     timesheet.stopTime = stopTime;
     return timesheet;
   }
 
-  private DisplayTimesheet()
+  private OldDisplayTimesheet()
   {
 
   }
@@ -92,7 +93,7 @@ public class DisplayTimesheet implements Serializable
     return task == null;
   }
 
-  public DisplayTimesheet(TimesheetDO timesheet)
+  public OldDisplayTimesheet(final TimesheetDO timesheet)
   {
     this.startTime = timesheet.getStartTime();
     this.stopTime = timesheet.getStopTime();
@@ -134,8 +135,8 @@ public class DisplayTimesheet implements Serializable
     if (kost2 == null) {
       return (task != null && task.getTitle() != null) ? HtmlHelper.escapeXml(task.getTitle()) : "";
     }
-    StringBuffer buf = new StringBuffer();
-    StringBuffer b2 = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
+    final StringBuffer b2 = new StringBuffer();
     final ProjektDO projekt = kost2.getProjekt();
     if (projekt != null) {
       // final KundeDO kunde = projekt.getKunde();
@@ -155,13 +156,13 @@ public class DisplayTimesheet implements Serializable
     } else {
       b2.append(kost2.getDescription());
     }
-    buf.append(HtmlHelper.escapeXml(StringUtils.abbreviate(b2.toString(), 30)));
+    buf.append(StringUtils.abbreviate(b2.toString(), 30));
     return buf.toString();
   }
 
   public String getToolTip()
   {
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     if (StringUtils.isNotBlank(this.location) == true) {
       buf.append(this.location);
       if (StringUtils.isNotBlank(this.description) == true) {
@@ -187,7 +188,7 @@ public class DisplayTimesheet implements Serializable
     return startTimeLinkEnabled;
   }
 
-  public void setStartTimeLinkEnabled(boolean startTimeLinkEnabled)
+  public void setStartTimeLinkEnabled(final boolean startTimeLinkEnabled)
   {
     this.startTimeLinkEnabled = startTimeLinkEnabled;
   }
@@ -201,7 +202,7 @@ public class DisplayTimesheet implements Serializable
     return stopTimeLinkEnabled;
   }
 
-  public void setStopTimeLinkEnabled(boolean stopTimeLinkEnabled)
+  public void setStopTimeLinkEnabled(final boolean stopTimeLinkEnabled)
   {
     this.stopTimeLinkEnabled = stopTimeLinkEnabled;
   }
