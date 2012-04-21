@@ -34,8 +34,11 @@ import net.ftlines.wicket.fullcalendar.EventProvider;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.Component;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
+import org.projectforge.calendar.TimePeriod;
+import org.projectforge.common.StringHelper;
 import org.projectforge.core.OrderDirection;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
@@ -61,8 +64,19 @@ public class TimesheetEventsProvider implements EventProvider
 
   private final Map<Integer, Event> events = new HashMap<Integer, Event>();
 
-  public TimesheetEventsProvider(final TimesheetDao timesheetDao, final CalendarFilter calFilter)
+  private long duration;
+
+  private final Component parent;
+
+  /**
+   * @param parent For i18n.
+   * @param timesheetDao
+   * @param calFilter
+   * @see Component#getString(String)
+   */
+  public TimesheetEventsProvider(final Component parent, final TimesheetDao timesheetDao, final CalendarFilter calFilter)
   {
+    this.parent = parent;
     this.timesheetDao = timesheetDao;
     this.calFilter = calFilter;
   }
@@ -125,6 +139,17 @@ public class TimesheetEventsProvider implements EventProvider
     throw new EventNotFoundException("Event with id: " + id + " not found");
   }
 
+  public String formatDuration(final long millis)
+  {
+    final int[] fields = TimePeriod.getDurationFields(millis, 8, 200);
+    final StringBuffer buf = new StringBuffer();
+    if (fields[0] > 0) {
+      buf.append(fields[0]).append(getString("calendar.unit.day")).append(" ");
+    }
+    buf.append(fields[1]).append(":").append(StringHelper.format2DigitNumber(fields[2])).append(getString("calendar.unit.hour"));
+    return buf.toString();
+  }
+
   private String getTitle(final TimesheetDO timesheet)
   {
     final Kost2DO kost2 = timesheet.getKost2();
@@ -174,5 +199,10 @@ public class TimesheetEventsProvider implements EventProvider
       buf.append("; \n").append(task.getTitle());
     }
     return buf.toString();
+  }
+
+  private String getString(final String key)
+  {
+    return parent.getString(key);
   }
 }

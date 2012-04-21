@@ -24,8 +24,6 @@
 package org.projectforge.web.calendar;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.model.Model;
@@ -34,8 +32,6 @@ import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.calendar.MonthHolder;
-import org.projectforge.common.DateFormatType;
-import org.projectforge.common.DateFormats;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
@@ -44,7 +40,6 @@ import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
@@ -66,84 +61,6 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   protected void init()
   {
     super.init();
-    final Link<Void> previousMonthButton = new Link<Void>("previousMonth") {
-      @Override
-      public void onClick()
-      {
-        // parentPage.goToPreviousMonth();
-      }
-    };
-    add(previousMonthButton);
-    previousMonthButton.add(new TooltipImage("previousMonthImage", getResponse(), WebConstants.EMBATS_ARROW_LEFT,
-        getString("calendar.tooltip.selectPrevious")));
-    // previousMonthButton.appendCssClass("shaded");
-
-    final Link<Void> nextMonthButton = new Link<Void>("nextMonth") {
-      @Override
-      public void onClick()
-      {
-        // parentPage.goToNextMonth();
-      }
-    };
-    add(nextMonthButton);
-    nextMonthButton.add(new TooltipImage("nextMonthImage", getResponse(), WebConstants.EMBATS_ARROW_RIGHT,
-        getString("calendar.tooltip.selectNext")));
-    // nextMonthButton.appendCssClass("shaded");
-    add(nextMonthButton);
-    final Model<String> monthLabelModel = new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return getString("calendar.month." + getMonthHolder().getMonthKey()) + "&nbsp;" + getMonthHolder().getYear();
-      }
-    };
-    final Label monthLabel = new Label("monthLabel", monthLabelModel);
-    monthLabel.setEscapeModelStrings(false);
-    add(monthLabel);
-    final Link<Void> selectMonthButton = new Link<Void>("selectMonth") {
-      @Override
-      public void onClick()
-      {
-        // parentPage.onSelectPeriod(getMonthHolder().getBegin(), getMonthHolder().getEnd());
-      }
-    };
-    WicketUtils.addTooltip(selectMonthButton, getString("calendar.tooltip.selectMonth"), true);
-    add(selectMonthButton);
-    final Label monthSelectLabel = new Label("monthSelectLabel", monthLabelModel);
-    monthSelectLabel.setEscapeModelStrings(false);
-    selectMonthButton.add(monthSelectLabel);
-
-    final Link<Void> showTodayButton = new Link<Void>("showToday") {
-      @Override
-      public void onClick()
-      {
-        //parentPage.goToToday();
-      }
-    };
-    add(showTodayButton);
-    showTodayButton.add(new TooltipImage("showTodayImage", getResponse(), WebConstants.EMBATS_PIN, getString("calendar.today")));
-    // showTodayButton.appendCssClass("shaded").setCssStyle("font-size:1.6em;");
-
-    final WebMarkupContainer cancelItem = new WebMarkupContainer("cancelItem");
-    add(cancelItem);
-    add(new Label("monthDuration", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        if (StringUtils.isEmpty(parentPage.getFormattedMonthDuration()) == true) {
-          return "";
-        }
-        return parentPage.getFormattedMonthDuration()
-            + " ("
-            + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getBegin(),
-                DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))
-                + "-"
-                + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getEnd(),
-                    DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))
-                    + ")";
-      }
-    }));
-
     final Link<Void> showBirthdaysButton = new Link<Void>("showBirthdays") {
       @Override
       public void onClick()
@@ -157,7 +74,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
         return !getFilter().isShowBirthdays();
       }
     };
-    add(showBirthdaysButton);
+    //add(showBirthdaysButton);
     showBirthdaysButton.add(new TooltipImage("showBirthdaysImage", getResponse(), WebConstants.IMAGE_BIRTHDAY,
         getString("tooltip.showBirthdays")));
     final Link<Void> hideBirthdaysButton = new Link<Void>("hideBirthdays") {
@@ -173,7 +90,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
         return getFilter().isShowBirthdays();
       }
     };
-    add(hideBirthdaysButton);
+    //add(hideBirthdaysButton);
     hideBirthdaysButton.add(new TooltipImage("hideBirthdaysImage", getResponse(), WebConstants.IMAGE_BIRTHDAY_DELETE,
         getString("tooltip.hideBirthdays")));
 
@@ -185,9 +102,9 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       final ExternalLink exportCalendar = new ExternalLink("exportCalendar", iCalTarget);
       exportCalendar.add(new TooltipImage("exportCalendarImage", getResponse(), WebConstants.IMAGE_CALENDAR,
           getString("tooltip.exportCalendar")));
-      add(exportCalendar);
+      //add(exportCalendar);
     } else {
-      add(new ExternalLink("exportCalendar", "invisible").setVisible(false));
+      //add(new ExternalLink("exportCalendar", "invisible").setVisible(false));
     }
 
     showTimesheetFilterElements();

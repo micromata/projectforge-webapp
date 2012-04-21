@@ -38,9 +38,7 @@ import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDao;
-import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.DateHolder;
-import org.projectforge.common.StringHelper;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
@@ -53,8 +51,6 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(CalendarPage.class);
 
   private static final String USERPREF_KEY = "CalendarPage.userPrefs";
-
-  private transient OldCalendarMonthHolder monthHolder;
 
   @SpringBean(name = "timesheetDao")
   private TimesheetDao timesheetDao;
@@ -192,24 +188,13 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
       config.setDayOfMonth(date.getDayOfMonth());
     }
     final EventSource reservations = new EventSource();
-    timesheetEventsProvider = new TimesheetEventsProvider(timesheetDao, form.getFilter());
+    timesheetEventsProvider = new TimesheetEventsProvider(this, timesheetDao, form.getFilter());
     reservations.setEventsProvider(timesheetEventsProvider);
     reservations.setEditable(true);
     // reservations.setBackgroundColor("#63BA68");
     // reservations.setBorderColor("#63BA68");
     config.add(reservations);
 
-  }
-
-  protected String formatDuration(final long millis)
-  {
-    final int[] fields = TimePeriod.getDurationFields(millis, 8, 200);
-    final StringBuffer buf = new StringBuffer();
-    if (fields[0] > 0) {
-      buf.append(fields[0]).append(getString("calendar.unit.day")).append(" ");
-    }
-    buf.append(fields[1]).append(":").append(StringHelper.format2DigitNumber(fields[2])).append(getString("calendar.unit.hour"));
-    return buf.toString();
   }
 
   @Override
@@ -221,11 +206,6 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
   CalendarFilter getFilter()
   {
     return form.getFilter();
-  }
-
-  String getFormattedMonthDuration()
-  {
-    return formatDuration(monthHolder.getMonthDuration());
   }
 
   public void cancelSelection(final String property)
