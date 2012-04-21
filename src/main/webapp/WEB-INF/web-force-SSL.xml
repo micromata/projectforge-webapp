@@ -5,7 +5,7 @@
     <param-name>contextConfigLocation</param-name>
     <param-value>
     classpath*:applicationContext*.xml
-    classpath*:**/*Context.xml
+    classpath*:/**/*Context.xml
     </param-value>
   </context-param>
   <!-- filter> <filter-name>WicketSessionFilter</filter-name> <filter-class>org.apache.wicket.protocol.http.servlet.WicketSessionFilter</filter-class> 
