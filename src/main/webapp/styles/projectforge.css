@@ -449,6 +449,10 @@ td.ui-datepicker-today {
 	background: #F7BE81;
 }
 
-button.ui-datepicker-current, button.ui-datepicker-close {
+button.ui-datepicker-current,button.ui-datepicker-close {
 	background: #FFFFFF;
 }
+
+td.fc-sun, td.fc-sat, td.fc-holiday {
+	background: #FFE5E5;
+	}
