@@ -44,14 +44,15 @@ import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.user.ProjectForgeGroup;
-import org.projectforge.web.timesheet.DisplayTimesheet;
+import org.projectforge.web.timesheet.OldDisplayTimesheet;
 
 
+@Deprecated
 public class OldCalendarMonthHolder extends MonthHolder
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(OldCalendarMonthHolder.class);
 
-  private CalendarFilter calFilter;
+  private final CalendarFilter calFilter;
 
   private AccessChecker accessChecker;
 
@@ -84,24 +85,24 @@ public class OldCalendarMonthHolder extends MonthHolder
         final Iterator<TimesheetDO> it = timesheets.iterator();
         TimesheetDO timesheet = it.next(); // Start with first time sheet
         Date lastStoptime = null;
-        DisplayTimesheet last = null;
-        for (WeekHolder week : getWeeks()) {
+        OldDisplayTimesheet last = null;
+        for (final WeekHolder week : getWeeks()) {
           long weekDuration = 0;
-          for (DayHolder day : week.getDays()) {
+          for (final DayHolder day : week.getDays()) {
             long dayDuration = 0;
-            Collection<DisplayTimesheet> col = null;
+            Collection<OldDisplayTimesheet> col = null;
             while (day.isSameDay(timesheet.getStartTime()) == true) {
               if (col == null) {
-                col = new ArrayList<DisplayTimesheet>();
+                col = new ArrayList<OldDisplayTimesheet>();
                 day.addObject("timesheets", col);
               }
-              final DisplayTimesheet cur = new DisplayTimesheet(timesheet);
+              final OldDisplayTimesheet cur = new OldDisplayTimesheet(timesheet);
               if (lastStoptime != null) {
-                DayHolder d = new DayHolder(lastStoptime);
+                final DayHolder d = new DayHolder(lastStoptime);
                 if (d.isSameDay(timesheet.getStartTime()) == true) {
                   if (lastStoptime.before(timesheet.getStartTime()) == true) {
                     // Create empty entry (may be pause):
-                    col.add(DisplayTimesheet.createBreak(lastStoptime, timesheet.getStartTime()));
+                    col.add(OldDisplayTimesheet.createBreak(lastStoptime, timesheet.getStartTime()));
                   } else {
                     // The stop time of the last time sheet is equals to start time of current, so do not display link for this time stamp
                     // (the user
@@ -144,7 +145,7 @@ public class OldCalendarMonthHolder extends MonthHolder
       if (CollectionUtils.isNotEmpty(set) == true) {
         Collection<BirthdayAddress> col = null;
         DayHolder day;
-        for (BirthdayAddress ba : set) {
+        for (final BirthdayAddress ba : set) {
           day = getDay(ba.getMonth(), ba.getDayOfMonth());
           if (day == null) { // February, 29th fix:
             if (ba.getMonth() == Calendar.FEBRUARY && ba.getDayOfMonth() == 29) {
@@ -170,17 +171,17 @@ public class OldCalendarMonthHolder extends MonthHolder
     }
   }
 
-  public void setAccessChecker(AccessChecker accessChecker)
+  public void setAccessChecker(final AccessChecker accessChecker)
   {
     this.accessChecker = accessChecker;
   }
 
-  public void setAddressDao(AddressDao addressDao)
+  public void setAddressDao(final AddressDao addressDao)
   {
     this.addressDao = addressDao;
   }
 
-  public void setTimesheetDao(TimesheetDao timesheetDao)
+  public void setTimesheetDao(final TimesheetDao timesheetDao)
   {
     this.timesheetDao = timesheetDao;
   }

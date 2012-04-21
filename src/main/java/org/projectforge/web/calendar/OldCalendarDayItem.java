@@ -44,7 +44,7 @@ import org.projectforge.common.DateHolder;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.fibu.ISelectCallerPage;
-import org.projectforge.web.timesheet.DisplayTimesheet;
+import org.projectforge.web.timesheet.OldDisplayTimesheet;
 import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.PresizedImage;
@@ -52,6 +52,7 @@ import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.PlainLabel;
 
+@Deprecated
 public class OldCalendarDayItem extends WebMarkupContainer
 {
   private static final long serialVersionUID = 6140762327534002674L;
@@ -165,11 +166,11 @@ public class OldCalendarDayItem extends WebMarkupContainer
       return;
     }
     @SuppressWarnings("unchecked")
-    final List<DisplayTimesheet> timesheets = (List<DisplayTimesheet>) day.getObject("timesheets");
+    final List<OldDisplayTimesheet> timesheets = (List<OldDisplayTimesheet>) day.getObject("timesheets");
     if (timesheets == null) {
       return;
     }
-    for (final DisplayTimesheet timesheet : timesheets) {
+    for (final OldDisplayTimesheet timesheet : timesheets) {
       final WebMarkupContainer item = new WebMarkupContainer(timesheetRepeater.newChildId());
       timesheetRepeater.add(item);
       timesheetRepeater.setRenderBodyOnly(true);
@@ -178,7 +179,7 @@ public class OldCalendarDayItem extends WebMarkupContainer
   }
 
   @SuppressWarnings("serial")
-  private void addTimesheet(final WebMarkupContainer item, final DisplayTimesheet timesheet)
+  private void addTimesheet(final WebMarkupContainer item, final OldDisplayTimesheet timesheet)
   {
     final WebMarkupContainer displayTimesheet = new WebMarkupContainer("sheet");
     item.add(displayTimesheet);

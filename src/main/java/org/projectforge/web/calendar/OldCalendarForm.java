@@ -49,6 +49,7 @@ import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
+@Deprecated
 public class OldCalendarForm extends AbstractForm<CalendarFilter, OldCalendarPage>
 {
   private static final long serialVersionUID = -145923669780937370L;

@@ -53,6 +53,7 @@ import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.TooltipImage;
 
+@Deprecated
 public class OldCalendarPage extends AbstractSecuredPage implements ISelectCallerPage
 {
   private static final long serialVersionUID = 8710165041912824126L;
