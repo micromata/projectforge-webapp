@@ -25,6 +25,7 @@ package org.projectforge.web.calendar;
 
 import java.text.DateFormatSymbols;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,7 +79,7 @@ public class MyFullCalendarConfig extends Config
     final DateFormatSymbols dateFormatSymbols = new DateFormatSymbols(parent.getLocale());
     setDayNames(convert(dateFormatSymbols.getWeekdays()));
     setDayNamesShort(convert(dateFormatSymbols.getShortWeekdays()));
-    setMonthNames(convert(dateFormatSymbols.getMonths()));
+    setMonthNames(dateFormatSymbols.getMonths());
     setTitleFormatDay(getString("calendar.format.titleFormat.day"));
     setTitleFormatMonth(getString("calendar.format.titleFormat.month"));
     setTitleFormatWeek(getString("calendar.format.titleFormat.week"));
@@ -87,6 +88,11 @@ public class MyFullCalendarConfig extends Config
     setColumnFormatWeek(getString("calendar.format.columnFormat.week"));
   }
 
+  /**
+   * DateFormatSymbols uses index {@link Calendar#SUNDAY}, {@link Calendar#MONDAY}, ... So the first entry is empty and there are 8 entries.
+   * @param dateFormatSymbolsArray
+   * @return The given array without the first element.
+   */
   private String[] convert(final String[] dateFormatSymbolsArray)
   {
     return Arrays.copyOfRange(dateFormatSymbolsArray, 1, 8);
