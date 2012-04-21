@@ -70,7 +70,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       @Override
       public void onClick()
       {
-        parentPage.goToPreviousMonth();
+        // parentPage.goToPreviousMonth();
       }
     };
     add(previousMonthButton);
@@ -82,7 +82,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       @Override
       public void onClick()
       {
-        parentPage.goToNextMonth();
+        // parentPage.goToNextMonth();
       }
     };
     add(nextMonthButton);
@@ -104,7 +104,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       @Override
       public void onClick()
       {
-        parentPage.onSelectPeriod(getMonthHolder().getBegin(), getMonthHolder().getEnd());
+        // parentPage.onSelectPeriod(getMonthHolder().getBegin(), getMonthHolder().getEnd());
       }
     };
     WicketUtils.addTooltip(selectMonthButton, getString("calendar.tooltip.selectMonth"), true);
@@ -112,17 +112,12 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     final Label monthSelectLabel = new Label("monthSelectLabel", monthLabelModel);
     monthSelectLabel.setEscapeModelStrings(false);
     selectMonthButton.add(monthSelectLabel);
-    if (isSelectMode() == true && parentPage.isSelectPeriodMode() == true) {
-      monthLabel.setVisible(false);
-    } else {
-      selectMonthButton.setVisible(false);
-    }
 
     final Link<Void> showTodayButton = new Link<Void>("showToday") {
       @Override
       public void onClick()
       {
-        parentPage.goToToday();
+        //parentPage.goToToday();
       }
     };
     add(showTodayButton);
@@ -131,19 +126,6 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 
     final WebMarkupContainer cancelItem = new WebMarkupContainer("cancelItem");
     add(cancelItem);
-    if (isSelectMode() == false) {
-      cancelItem.setVisible(false);
-    } else {
-      final Link<Void> cancelButton = new Link<Void>("cancel") {
-        @Override
-        public void onClick()
-        {
-          parentPage.onCancel();
-        }
-      };
-      cancelItem.add(cancelButton);// .appendCssClass("shaded"));
-      cancelButton.add(new TooltipImage("showTodayImage", getResponse(), WebConstants.EMBATS_CROSS, getString("cancel")));
-    }
     add(new Label("monthDuration", new Model<String>() {
       @Override
       public String getObject()
@@ -220,8 +202,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   @SuppressWarnings("serial")
   private void showTimesheetFilterElements()
   {
-    final UserSelectPanel userSelectPanel = new UserSelectPanel("timesheetsUser", new PropertyModel<PFUserDO>(this,
-        "timesheetsUser"), parentPage, "userId") {
+    final UserSelectPanel userSelectPanel = new UserSelectPanel("timesheetsUser", new PropertyModel<PFUserDO>(this, "timesheetsUser"),
+        parentPage, "userId") {
       @Override
       public boolean isVisible()
       {
@@ -278,12 +260,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 
   private MonthHolder getMonthHolder()
   {
-    return parentPage.getMonthHolder();
-  }
-
-  private boolean isSelectMode()
-  {
-    return parentPage.isSelectMode();
+    return null;// parentPage.getMonthHolder();
   }
 
   public void refresh()

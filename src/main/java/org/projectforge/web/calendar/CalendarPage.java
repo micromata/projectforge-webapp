@@ -23,35 +23,28 @@
 
 package org.projectforge.web.calendar;
 
-import java.util.Calendar;
 import java.util.Date;
 
-import javax.persistence.Transient;
+import net.ftlines.wicket.fullcalendar.CalendarResponse;
+import net.ftlines.wicket.fullcalendar.EventSource;
+import net.ftlines.wicket.fullcalendar.callback.ClickedEvent;
+import net.ftlines.wicket.fullcalendar.callback.DroppedEvent;
+import net.ftlines.wicket.fullcalendar.callback.ResizedEvent;
+import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
+import net.ftlines.wicket.fullcalendar.callback.View;
+import net.ftlines.wicket.fullcalendar.selector.EventSourceSelector;
 
-import org.apache.wicket.markup.html.IHeaderResponse;
-import org.apache.wicket.markup.html.WebMarkupContainer;
-import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.markup.html.link.Link;
-import org.apache.wicket.markup.repeater.RepeatingView;
-import org.apache.wicket.model.Model;
+import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDao;
-import org.projectforge.calendar.DayHolder;
-import org.projectforge.calendar.MonthHolder;
 import org.projectforge.calendar.TimePeriod;
-import org.projectforge.calendar.WeekHolder;
-import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
-import org.projectforge.common.DatePrecision;
-import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.timesheet.TimesheetEventsProvider;
 import org.projectforge.web.wicket.AbstractSecuredPage;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.WicketUtils;
-import org.projectforge.web.wicket.components.TooltipImage;
 
 public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPage
 {
@@ -61,7 +54,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
 
   private static final String USERPREF_KEY = "CalendarPage.userPrefs";
 
-  private transient CalendarMonthHolder monthHolder;
+  private transient OldCalendarMonthHolder monthHolder;
 
   @SpringBean(name = "timesheetDao")
   private TimesheetDao timesheetDao;
@@ -71,97 +64,116 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
 
   private CalendarForm form;
 
-  private RepeatingView weekRepeater;
-
-  protected ISelectCallerPage caller;
-
-  protected String selectProperty;
-
-  protected boolean selectPeriodMode;
-
-  protected boolean selectStartStopTime;
-
   protected final PageParameters pageParameters;
 
-  protected final Date date;
-
-  protected Class< ? > targetType;
-
-  private boolean returnAsISODateString;
-
-  /**
-   * Don't forget to call init() after configuration.
-   * @param caller
-   * @param selectProperty
-   * @param date
-   */
-  public CalendarPage(final ISelectCallerPage caller, final String selectProperty, final Date date)
-  {
-    super(new PageParameters());
-    this.date = date;
-    this.pageParameters = null;
-    this.caller = caller;
-    this.selectProperty = selectProperty;
-  }
+  private TimesheetEventsProvider timesheetEventsProvider;
 
   public CalendarPage(final PageParameters parameters)
   {
     super(parameters);
     this.pageParameters = parameters;
-    this.date = null;
     init();
-  }
-
-  public CalendarPage setReturnAsIsoDateString()
-  {
-    returnAsISODateString = true;
-    return this;
-  }
-
-  /**
-   * If true then the user can also choose time periods.
-   */
-  protected boolean isSelectPeriodMode()
-  {
-    return selectPeriodMode;
-  }
-
-  /**
-   * @see #isSelectPeriodMode()
-   * @param selectPeriodMode
-   */
-  public void setSelectPeriodMode(final boolean selectPeriodMode)
-  {
-    this.selectPeriodMode = selectPeriodMode;
-  }
-
-  public void setSelectStartStopTime(final boolean selectStartStopTime)
-  {
-    this.selectStartStopTime = selectStartStopTime;
-  }
-
-  /**
-   * @param targetType java.sql.Date is supported.
-   */
-  public void setTargetType(final Class< ? > targetType)
-  {
-    this.targetType = targetType;
   }
 
   @SuppressWarnings("serial")
   public void init()
   {
+    final FeedbackPanel feedbackPanel = new FeedbackPanel("feedback") {
+      /**
+       * @see org.apache.wicket.Component#isVisible()
+       */
+      @Override
+      public boolean isVisible()
+      {
+        return false;
+      }
+    };
+    feedbackPanel.setOutputMarkupId(true);
+    body.add(feedbackPanel);
+
+    final MyFullCalendarConfig config = new MyFullCalendarConfig(this);
+    config.setSelectable(true);
+    config.setSelectHelper(true);
+
+    config.setDefaultView("agendaWeek"); // TODO: get from user prefs.
+
+
+    config.setLoading("function(bool) { if (bool) $(\"#loading\").show(); else $(\"#loading\").hide(); }");
+
+    // config.setMinTime(new LocalTime(6, 30));
+    // config.setMaxTime(new LocalTime(17, 30));
+    config.setAllDaySlot(true);
+    final MyFullCalendar calendar = new MyFullCalendar("cal", config) {
+      @Override
+      protected void onDateRangeSelected(final SelectedRange range, final CalendarResponse response)
+      {
+        log.info("Selected region: " + range.getStart() + " - " + range.getEnd() + " / allDay: " + range.isAllDay());
+        // response.getTarget().add(feedbackPanel);
+      }
+
+      @Override
+      protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response)
+      {
+        log.info("Event drop. eventId: "
+            + event.getEvent().getId()
+            + " sourceId: "
+            + event.getSource().getUuid()
+            + " dayDelta: "
+            + event.getDaysDelta()
+            + " minuteDelta: "
+            + event.getMinutesDelta()
+            + " allDay: "
+            + event.isAllDay());
+        log.info("Original start time: " + event.getEvent().getStart() + ", original end time: " + event.getEvent().getEnd());
+        log.info("New start time: " + event.getNewStartTime() + ", new end time: " + event.getNewEndTime());
+        // response.getTarget().add(feedbackPanel);
+        return true;
+      }
+
+      @Override
+      protected boolean onEventResized(final ResizedEvent event, final CalendarResponse response)
+      {
+        log.info("Event resized. eventId: "
+            + event.getEvent().getId()
+            + " sourceId: "
+            + event.getSource().getUuid()
+            + " dayDelta: "
+            + event.getDaysDelta()
+            + " minuteDelta: "
+            + event.getMinutesDelta());
+        // response.getTarget().add(feedbackPanel);
+        return true;
+      }
+
+      @Override
+      protected void onEventClicked(final ClickedEvent event, final CalendarResponse response)
+      {
+        log.info("Event clicked. eventId: " + event.getEvent().getId() + ", sourceId: " + event.getSource().getUuid());
+        response.refetchEvents();
+        // response.getTarget().add(feedbackPanel);
+      }
+
+      @Override
+      protected void onViewDisplayed(final View view, final CalendarResponse response)
+      {
+        log.info("View displayed. viewType: " + view.getType().name() + ", start: " + view.getStart() + ", end: " + view.getEnd());
+        response.refetchEvents();
+        // response.getTarget().add(feedbackPanel);
+      }
+    };
+    calendar.setMarkupId("calendar");
+    body.add(calendar);
+    body.add(new EventSourceSelector("selector", calendar));
+
     form = new CalendarForm(this);
-    body.add(form);
+
+    // body.add(form);
     CalendarFilter filter = (CalendarFilter) getUserPrefEntry(USERPREF_KEY);
     if (filter == null) {
       filter = new CalendarFilter();
       putUserPrefEntry(USERPREF_KEY, filter, true);
     }
     form.setFilter(filter);
-    if (this.date != null) {
-      filter.setCurrent(date);
-    }
     form.init();
 
     if (pageParameters != null) {
@@ -172,126 +184,21 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
         form.getFilter().setShowBirthdays(true);
       }
     }
-    final RepeatingView dayOfWeekLabelRepeater = new RepeatingView("dayOfWeekLabelRepeater");
-    body.add(dayOfWeekLabelRepeater);
-    for (final DayHolder day : getMonthHolder().getFirstWeek().getDays()) {
-      final WebMarkupContainer item = new WebMarkupContainer(dayOfWeekLabelRepeater.newChildId());
-      dayOfWeekLabelRepeater.add(item);
-      item.add(new Label("dayOfWeekLabel", getString("calendar.shortday." + day.getDayKey())));
+    final Date current = form.getFilter().getCurrent();
+    if (current != null) {
+      final DateHolder date = new DateHolder(current);
+      config.setYear(date.getYear());
+      config.setMonth(date.getMonth());
+      config.setDayOfMonth(date.getDayOfMonth());
     }
-    addWeeks();
-    body.add(new Label("numberOfWeeksJavascript", new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        return "var numberOfWeeks = " + getMonthHolder().getWeeks().size() + ";";
-      }
-    }).setEscapeModelStrings(false));
-  }
+    final EventSource reservations = new EventSource();
+    timesheetEventsProvider = new TimesheetEventsProvider(timesheetDao, form.getFilter());
+    reservations.setEventsProvider(timesheetEventsProvider);
+    reservations.setEditable(true);
+    // reservations.setBackgroundColor("#63BA68");
+    // reservations.setBorderColor("#63BA68");
+    config.add(reservations);
 
-  @SuppressWarnings("serial")
-  private void addWeeks()
-  {
-    weekRepeater = new RepeatingView("weeks");
-    body.add(weekRepeater);
-    for (final WeekHolder week : getMonthHolder().getWeeks()) {
-      final WebMarkupContainer item = new WebMarkupContainer(weekRepeater.newChildId());
-      weekRepeater.add(item);
-      final Link< ? > selectWeekButton = new Link<Void>("selectWeek") {
-        @Override
-        public void onClick()
-        {
-          onSelectPeriod(week.getFirstDay().getDate(), week.getLastDay().getDate());
-        };
-      };
-      item.add(selectWeekButton);
-      selectWeekButton.add(new TooltipImage("selectWeekHelp", getResponse(), WebConstants.IMAGE_CALENDAR_SELECT_WEEK,
-          getString("calendar.tooltip.selectWeek")));
-      final Label weekOfYearLabel1 = new Label("weekOfYearLabel", String.valueOf(week.getWeekOfYear()));
-      selectWeekButton.add(weekOfYearLabel1);
-      final Label weekOfYearLabel2 = new Label("weekOfYearLabel", String.valueOf(week.getWeekOfYear()));
-      item.add(weekOfYearLabel2);
-      if (isSelectMode() == true && isSelectPeriodMode() == true) {
-        weekOfYearLabel2.setVisible(false);
-      } else {
-        selectWeekButton.setVisible(false);
-      }
-      // Total duration of all time sheets in current week:
-      final Long duration = (Long) week.getObject("duration");
-      final String durationString = duration != null ? formatDuration(duration) : "";
-      final Label weekDuration = new Label("weekDuration", "<br/>" + durationString);
-      weekDuration.setEscapeModelStrings(false);
-      if (NumberHelper.greaterZero(duration) == false) {
-        weekDuration.setVisible(false);
-      }
-      item.add(weekDuration);
-      addDays(item, week);
-    }
-  }
-
-  private void addDays(final WebMarkupContainer parent, final WeekHolder week)
-  {
-    final RepeatingView dayRepeater = new RepeatingView("days");
-    parent.add(dayRepeater);
-    for (final DayHolder day : week.getDays()) {
-      final CalendarDayItem dayItem = new CalendarDayItem(this, dayRepeater.newChildId(), day);
-      dayRepeater.add(dayItem);
-      dayItem.init();
-    }
-  }
-
-  void goToPreviousMonth()
-  {
-    final DateHolder date = new DateHolder(form.getFilter().getCurrent(), DatePrecision.DAY);
-    date.add(Calendar.MONTH, -1);
-    goToDate(date.getDate());
-  }
-
-  void goToNextMonth()
-  {
-    final DateHolder date = new DateHolder(form.getFilter().getCurrent(), DatePrecision.DAY);
-    date.add(Calendar.MONTH, 1);
-    goToDate(date.getDate());
-  }
-
-  void goToToday()
-  {
-    final DateHolder date = new DateHolder(DatePrecision.DAY);
-    goToDate(date.getDate());
-  }
-
-  private void goToDate(final Date date)
-  {
-    form.getFilter().setCurrent(date);
-  }
-
-  @Override
-  public void renderHead(final IHeaderResponse response)
-  {
-    super.renderHead(response);
-    response.renderCSSReference("styles/oldcalendar.css");
-  }
-
-  @Override
-  protected void onBeforeRender()
-  {
-    super.onBeforeRender();
-    monthHolder = null;
-    body.remove(weekRepeater);
-    addWeeks();
-  }
-
-  @Transient
-  MonthHolder getMonthHolder()
-  {
-    if (monthHolder == null) {
-      monthHolder = new CalendarMonthHolder(form.getFilter());
-      monthHolder.setTimesheetDao(timesheetDao);
-      monthHolder.setAddressDao(addressDao);
-      monthHolder.setAccessChecker(accessChecker);
-      monthHolder.init();
-    }
-    return monthHolder;
   }
 
   protected String formatDuration(final long millis)
@@ -308,61 +215,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
   @Override
   protected String getTitle()
   {
-    if (isSelectMode() == true) {
-      if (isSelectPeriodMode() == true) {
-        return getString("calendar.selectDateOrPeriod.title");
-      } else {
-        return getString("calendar.selectDate.title");
-      }
-    } else {
-      return getString("calendar.title");
-    }
-  }
-
-  /**
-   * User has pressed the cancel button. If in selection mode then redirect to the caller.
-   */
-  protected void onCancel()
-  {
-    log.debug("onCancel");
-    if (isSelectMode() == true) {
-      WicketUtils.setResponsePage(this, caller);
-      caller.cancelSelection(selectProperty);
-    }
-  }
-
-  /**
-   * User has selected one day. If in selection mode then redirect to the caller with Date or if returnAsISODateString is true date as iso
-   * date string: "yyyy-mm-dd".
-   */
-  protected void onSelectDay(final Date date)
-  {
-    log.debug("onSelectDay");
-    if (isSelectMode() == true) {
-      WicketUtils.setResponsePage(this, caller);
-      if (returnAsISODateString == true) {
-        caller.select(this.selectProperty, DateHelper.formatIsoDate(date));
-      } else {
-        caller.select(this.selectProperty, date);
-      }
-    }
-  }
-
-  /**
-   * User has selected a period (week or whole month). If in selection mode then redirect to the caller with TimePeriod or if
-   * returnAsISODateString is true time period as iso date string: "yyyy-mm-dd:yyyy-mm-dd".
-   */
-  protected void onSelectPeriod(final Date fromDate, final Date toDate)
-  {
-    log.debug("onSelectPeriod");
-    if (isSelectMode() == true) {
-      WicketUtils.setResponsePage(this, caller);
-      if (returnAsISODateString == true) {
-        caller.select(this.selectProperty, DateHelper.formatIsoTimePeriod(fromDate, toDate));
-      } else {
-        caller.select(this.selectProperty, new TimePeriod(fromDate, toDate));
-      }
-    }
+    return getString("calendar.title");
   }
 
   CalendarFilter getFilter()
@@ -370,19 +223,9 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     return form.getFilter();
   }
 
-  boolean isSelectMode()
-  {
-    return this.caller != null;
-  }
-
   String getFormattedMonthDuration()
   {
     return formatDuration(monthHolder.getMonthDuration());
-  }
-
-  public boolean isSelectStartStopTime()
-  {
-    return selectStartStopTime;
   }
 
   public void cancelSelection(final String property)
