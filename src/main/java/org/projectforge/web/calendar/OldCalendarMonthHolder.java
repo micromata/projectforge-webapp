@@ -64,7 +64,7 @@ public class OldCalendarMonthHolder extends MonthHolder
 
   public OldCalendarMonthHolder(final CalendarFilter calFilter)
   {
-    super(calFilter.getCurrent());
+    super(new Date());//calFilter.getCurrent());
     this.calFilter = calFilter;
   }
 

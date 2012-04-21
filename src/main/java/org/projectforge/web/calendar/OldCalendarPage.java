@@ -23,7 +23,6 @@
 
 package org.projectforge.web.calendar;
 
-import java.util.Calendar;
 import java.util.Date;
 
 import javax.persistence.Transient;
@@ -161,7 +160,7 @@ public class OldCalendarPage extends AbstractSecuredPage implements ISelectCalle
     }
     form.setFilter(filter);
     if (this.date != null) {
-      filter.setCurrent(date);
+      //filter.setCurrent(date);
     }
     form.init();
 
@@ -243,16 +242,16 @@ public class OldCalendarPage extends AbstractSecuredPage implements ISelectCalle
 
   void goToPreviousMonth()
   {
-    final DateHolder date = new DateHolder(form.getFilter().getCurrent(), DatePrecision.DAY);
-    date.add(Calendar.MONTH, -1);
-    goToDate(date.getDate());
+    //    final DateHolder date = new DateHolder(form.getFilter().getCurrent(), DatePrecision.DAY);
+    //    date.add(Calendar.MONTH, -1);
+    //    goToDate(date.getDate());
   }
 
   void goToNextMonth()
   {
-    final DateHolder date = new DateHolder(form.getFilter().getCurrent(), DatePrecision.DAY);
-    date.add(Calendar.MONTH, 1);
-    goToDate(date.getDate());
+    //    final DateHolder date = new DateHolder(form.getFilter().getCurrent(), DatePrecision.DAY);
+    //    date.add(Calendar.MONTH, 1);
+    //    goToDate(date.getDate());
   }
 
   void goToToday()
@@ -263,7 +262,7 @@ public class OldCalendarPage extends AbstractSecuredPage implements ISelectCalle
 
   private void goToDate(final Date date)
   {
-    form.getFilter().setCurrent(date);
+    // form.getFilter().setCurrent(date);
   }
 
   @Override

@@ -26,6 +26,9 @@ package org.projectforge.web.calendar;
 import java.io.Serializable;
 import java.util.Date;
 
+import net.ftlines.wicket.fullcalendar.ViewType;
+
+import org.joda.time.DateMidnight;
 import org.projectforge.user.PFUserContext;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -40,6 +43,9 @@ public class CalendarFilter implements Serializable
   private static final long serialVersionUID = -4154764049316136395L;
 
   @XStreamAsAttribute
+  private DateMidnight startDate;
+
+  @XStreamAsAttribute
   private Date current;
 
   @XStreamAsAttribute
@@ -48,23 +54,33 @@ public class CalendarFilter implements Serializable
   @XStreamAsAttribute
   private Integer userId;
 
+  @XStreamAsAttribute
+  private ViewType viewType;
+
   public CalendarFilter()
   {
-    current = new Date();
+    startDate = new DateMidnight();
     userId = PFUserContext.getUserId();
   }
 
-  public Date getCurrent()
+  /**
+   * @return the startDate
+   */
+  public DateMidnight getStartDate()
   {
-    return current;
+    return startDate;
   }
 
-  public void setCurrent(Date current)
+  /**
+   * @param startDate the startDate to set
+   * @return this for chaining.
+   */
+  public void setStartDate(final DateMidnight startDate)
   {
-    if (current != null) {
-      this.current = current;
+    if (startDate != null) {
+      this.startDate = startDate.plusDays(1);
     } else {
-      this.current = new Date();
+      this.startDate = new DateMidnight();
     }
   }
 
@@ -73,7 +89,7 @@ public class CalendarFilter implements Serializable
     return showBirthdays == Boolean.TRUE;
   }
 
-  public void setShowBirthdays(boolean showBirthdays)
+  public void setShowBirthdays(final boolean showBirthdays)
   {
     this.showBirthdays = showBirthdays;
   }
@@ -83,8 +99,41 @@ public class CalendarFilter implements Serializable
     return userId;
   }
 
-  public void setUserId(Integer userId)
+  public void setUserId(final Integer userId)
   {
     this.userId = userId;
+  }
+
+  /**
+   * @return the viewType
+   */
+  public ViewType getViewType()
+  {
+    return viewType != null ? viewType : ViewType.AGENDA_WEEK;
+  }
+
+  /**
+   * @param viewType the viewType to set
+   * @return this for chaining.
+   */
+  public CalendarFilter setViewType(final ViewType viewType)
+  {
+    this.viewType = viewType;
+    return this;
+  }
+
+  /**
+   * Was used from old calendar.
+   */
+  @Deprecated
+  public Date getCurrent()
+  {
+    return null;
+  }
+
+  @Deprecated
+  public void setCurrent(final Date current)
+  {
+    this.current = current;
   }
 }

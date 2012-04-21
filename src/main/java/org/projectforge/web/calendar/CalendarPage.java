@@ -23,8 +23,6 @@
 
 package org.projectforge.web.calendar;
 
-import java.util.Date;
-
 import net.ftlines.wicket.fullcalendar.CalendarResponse;
 import net.ftlines.wicket.fullcalendar.EventSource;
 import net.ftlines.wicket.fullcalendar.callback.ClickedEvent;
@@ -37,8 +35,8 @@ import net.ftlines.wicket.fullcalendar.selector.EventSourceSelector;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.joda.time.DateMidnight;
 import org.projectforge.address.AddressDao;
-import org.projectforge.common.DateHolder;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
@@ -90,9 +88,6 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     final MyFullCalendarConfig config = new MyFullCalendarConfig(this);
     config.setSelectable(true);
     config.setSelectHelper(true);
-
-    config.setDefaultView("agendaWeek"); // TODO: get from user prefs.
-
 
     config.setLoading("function(bool) { if (bool) $(\"#loading\").show(); else $(\"#loading\").hide(); }");
 
@@ -152,8 +147,13 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
       @Override
       protected void onViewDisplayed(final View view, final CalendarResponse response)
       {
-        log.info("View displayed. viewType: " + view.getType().name() + ", start: " + view.getStart() + ", end: " + view.getEnd());
+        if (log.isDebugEnabled() == true) {
+          log.debug("View displayed. viewType: " + view.getType().name() + ", start: " + view.getStart() + ", end: " + view.getEnd());
+        }
         response.refetchEvents();
+        final CalendarFilter filter = form.getFilter();
+        filter.setStartDate(view.getVisibleStart());
+        filter.setViewType(view.getType());
         // response.getTarget().add(feedbackPanel);
       }
     };
@@ -180,13 +180,14 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
         form.getFilter().setShowBirthdays(true);
       }
     }
-    final Date current = form.getFilter().getCurrent();
-    if (current != null) {
-      final DateHolder date = new DateHolder(current);
-      config.setYear(date.getYear());
-      config.setMonth(date.getMonth());
-      config.setDayOfMonth(date.getDayOfMonth());
+    final DateMidnight startDate = form.getFilter().getStartDate();
+    if (startDate != null) {
+      config.setYear(startDate.getYear());
+      config.setMonth(startDate.getMonthOfYear() - 1);
+      config.setDate(startDate.getDayOfMonth());
     }
+    config.setDefaultView(filter.getViewType().getCode());
+
     final EventSource reservations = new EventSource();
     timesheetEventsProvider = new TimesheetEventsProvider(this, timesheetDao, form.getFilter());
     reservations.setEventsProvider(timesheetEventsProvider);

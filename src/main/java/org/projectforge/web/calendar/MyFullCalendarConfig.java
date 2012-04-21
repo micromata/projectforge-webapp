@@ -48,7 +48,7 @@ public class MyFullCalendarConfig extends Config
 
   private boolean theme = true;
 
-  private Integer year, month, dayOfMonth;
+  private Integer year, month, date;
 
   @JsonProperty
   private final Map<ColumnFormat, String> titleFormat = new HashMap<Config.ColumnFormat, String>();
@@ -87,6 +87,7 @@ public class MyFullCalendarConfig extends Config
     setColumnFormatMonth(getString("calendar.format.columnFormat.month"));
     setColumnFormatWeek(getString("calendar.format.columnFormat.week"));
     setTimeFormat(getString("calendar.format.timeFormat"));
+    setWeekMode("liquid");
   }
 
   /**
@@ -180,20 +181,21 @@ public class MyFullCalendarConfig extends Config
   }
 
   /**
-   * @return the dayOfMonth
+   * Date means day of month.
+   * @return the date
    */
-  public Integer getDayOfMonth()
+  public Integer getDate()
   {
-    return dayOfMonth;
+    return date;
   }
 
   /**
-   * @param dayOfMonth the dayOfMonth to set
+   * @param date the dayOfMonth to set
    * @return this for chaining.
    */
-  public MyFullCalendarConfig setDayOfMonth(final Integer dayOfMonth)
+  public MyFullCalendarConfig setDate(final Integer date)
   {
-    this.dayOfMonth = dayOfMonth;
+    this.date = date;
     return this;
   }
 
