@@ -86,6 +86,7 @@ public class MyFullCalendarConfig extends Config
     setColumnFormatDay(getString("calendar.format.columnFormat.day"));
     setColumnFormatMonth(getString("calendar.format.columnFormat.month"));
     setColumnFormatWeek(getString("calendar.format.columnFormat.week"));
+    setTimeFormat(getString("calendar.format.timeFormat"));
   }
 
   /**
