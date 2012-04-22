@@ -30,7 +30,9 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
+import org.projectforge.address.PhoneType;
 import org.projectforge.common.StringHelper;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -97,6 +99,37 @@ public class AddressViewPage extends AbstractSecuredPage
         };
       }, getString("edit"));
       addContentMenuEntry(edit);
+    }
+    if (ConfigXml.getInstance().isTelephoneSystemUrlConfigured() == true) {
+      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+        @Override
+        public void onClick()
+        {
+          final Integer addressId = address.getId();
+          final PageParameters params = new PageParameters();
+          params.add(PhoneCallPage.PARAMETER_KEY_ADDRESS_ID, addressId);
+          setResponsePage(new PhoneCallPage(params));
+        };
+      }, getString("address.directCall.call"));
+      addContentMenuEntry(menu);
+    }
+    if (ConfigXml.getInstance().isSmsConfigured() == true && StringHelper.isNotBlank(address.getMobilePhone(), address.getPrivateMobilePhone()) == true) {
+      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+        @Override
+        public void onClick()
+        {
+          final Integer addressId = address.getId();
+          final PageParameters params = new PageParameters();
+          params.add(SendSmsPage.PARAMETER_KEY_ADDRESS_ID, addressId);
+          if (StringUtils.isNotBlank(address.getPrivateMobilePhone()) == true) {
+            params.add(SendSmsPage.PARAMETER_KEY_PHONE_TYPE, PhoneType.PRIVATE_MOBILE.toString());
+          } else {
+            params.add(SendSmsPage.PARAMETER_KEY_PHONE_TYPE, PhoneType.MOBILE.toString());
+          }
+          setResponsePage(new SendSmsPage(params));
+        };
+      }, getString("address.sendSms.title"));
+      addContentMenuEntry(menu);
     }
 
     final RepeatingView flowform = new RepeatingView("flowform");
@@ -169,10 +202,10 @@ public class AddressViewPage extends AbstractSecuredPage
     if (StringUtils.isNotBlank(zipCode) == true || StringUtils.isNotBlank(city) == true) {
       final StringBuffer buf2 = new StringBuffer();
       if (zipCode != null) {
-        buf2.append(HtmlHelper.escapeXml(zipCode)).append(" ");
+        buf2.append(zipCode).append(" ");
       }
       if (city != null) {
-        buf2.append(HtmlHelper.escapeXml(city));
+        buf2.append(city);
       }
       first = appendRow(buf, first, buf2.toString());
     }
