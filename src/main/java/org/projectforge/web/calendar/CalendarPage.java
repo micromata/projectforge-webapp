@@ -37,11 +37,15 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateMidnight;
 import org.projectforge.address.AddressDao;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.web.address.AddressViewPage;
 import org.projectforge.web.address.BirthdayEventsProvider;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
+import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 
 public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPage
@@ -145,7 +149,27 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
       @Override
       protected void onEventClicked(final ClickedEvent event, final CalendarResponse response)
       {
-        log.info("Event clicked. eventId: " + event.getEvent().getId() + ", sourceId: " + event.getSource().getUuid());
+        if (log.isDebugEnabled() == true) {
+          log.debug("Event clicked. eventId: " + event.getEvent().getId() + ", sourceId: " + event.getSource().getUuid());
+        }
+        final String eventId = event.getEvent().getId();
+        if (eventId != null && eventId.startsWith("ts-") == true) {
+          final Integer id = NumberHelper.parseInteger(eventId.substring(3));
+          final PageParameters parameters = new PageParameters();
+          parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
+          final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
+          setResponsePage(timesheetEditPage);
+          return;
+        }
+        if (eventId != null && eventId.startsWith("b-") == true) {
+          final Integer id = NumberHelper.parseInteger(eventId.substring(2));
+          final PageParameters parameters = new PageParameters();
+          parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
+          final AddressViewPage addressViewPage = new AddressViewPage(parameters);
+          setResponsePage(addressViewPage);
+          addressViewPage.setReturnToPage(CalendarPage.this);
+          return;
+        }
         response.refetchEvents();
         // response.getTarget().add(feedbackPanel);
       }
@@ -200,7 +224,8 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     reservations.setEditable(true);
     config.add(reservations);
     reservations = new EventSource();
-    birthdayEventsProvider = new BirthdayEventsProvider(this, addressDao, accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == false);
+    birthdayEventsProvider = new BirthdayEventsProvider(this, addressDao,
+        accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == false);
     reservations.setEventsProvider(birthdayEventsProvider);
     reservations.setEditable(false);
     reservations.setBackgroundColor("#EEEEEE");
