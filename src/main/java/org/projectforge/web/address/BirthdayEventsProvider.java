@@ -123,7 +123,8 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
       }
       event.setTitle(buf.toString());
       if (birthdayAddress.isFavorite() == true) {
-        event.setTextColor("red");
+        event.setTextColor("#227722");
+        event.setBackgroundColor("#BBEEBB");
       }
       events.put(id, event);
     }
@@ -132,11 +133,16 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
   private DateTime getDate(final DateTime start, final DateTime end, final int month, final int dayOfMonth)
   {
     DateTime day = start;
+    int paranoiaCounter = 0;
     do {
       if (day.getMonthOfYear() == month && day.getDayOfMonth() == dayOfMonth) {
         return day;
       }
       day = day.plusDays(1);
+      if (++paranoiaCounter > 1000) {
+        log.error("Paranoia counter exceeded! Dear developer, please have a look at the implementation of getDate.");
+        break;
+      }
     } while (day.isAfter(end) == false);
     return null;
   }

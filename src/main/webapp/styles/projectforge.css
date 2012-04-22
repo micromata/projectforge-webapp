@@ -453,6 +453,11 @@ button.ui-datepicker-current,button.ui-datepicker-close {
 	background: #FFFFFF;
 }
 
-td.fc-sun, td.fc-sat, td.fc-holiday {
+/* Any change here should be done also in HolidayEventsProvider.java */
+td.fc-sun,td.fc-sat,td.fc-holiday {
 	background: #FFE5E5;
-	}
+}
+
+.fc .fc-event {
+	text-shadow: none;
+}

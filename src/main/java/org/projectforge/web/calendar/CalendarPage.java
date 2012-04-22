@@ -62,9 +62,11 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
 
   protected final PageParameters pageParameters;
 
-  private TimesheetEventsProvider timesheetEventsProvider;
-
   private BirthdayEventsProvider birthdayEventsProvider;
+
+  private HolidayEventsProvider holidayEventsProvider;
+
+  private TimesheetEventsProvider timesheetEventsProvider;
 
   public CalendarPage(final PageParameters parameters)
   {
@@ -200,6 +202,14 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     reservations = new EventSource();
     birthdayEventsProvider = new BirthdayEventsProvider(this, addressDao, accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == false);
     reservations.setEventsProvider(birthdayEventsProvider);
+    reservations.setEditable(false);
+    reservations.setBackgroundColor("#EEEEEE");
+    reservations.setColor("#EEEEEE");
+    reservations.setTextColor("#222222");
+    config.add(reservations);
+    reservations = new EventSource();
+    holidayEventsProvider = new HolidayEventsProvider(this);
+    reservations.setEventsProvider(holidayEventsProvider);
     reservations.setEditable(false);
     config.add(reservations);
   }

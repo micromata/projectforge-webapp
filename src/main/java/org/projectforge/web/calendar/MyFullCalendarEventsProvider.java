@@ -41,11 +41,13 @@ import org.joda.time.DateTime;
  */
 public abstract class MyFullCalendarEventsProvider implements EventProvider
 {
+  private static final long serialVersionUID = 4530847672654878127L;
+
   protected final Map<String, Event> events = new HashMap<String, Event>();
 
   protected final Component parent;
 
-  protected DateTime start, end;
+  protected DateTime lastStart, lastEnd;
 
   /**
    * @param parent For i18n.
@@ -63,14 +65,14 @@ public abstract class MyFullCalendarEventsProvider implements EventProvider
   @Override
   public Collection<Event> getEvents(final DateTime start, final DateTime end)
   {
-    if (this.start != null && this.end != null && this.start.isEqual(start) == true && this.end.isEqual(end) == true) {
+    if (this.lastStart != null && this.lastEnd != null && this.lastStart.isEqual(start) == true && this.lastEnd.isEqual(end) == true) {
       // Nothing to be done.
       return events.values();
     }
     events.clear();
     buildEvents(start, end);
-    this.start = start;
-    this.end = end;
+    this.lastStart = start;
+    this.lastEnd = end;
     return events.values();
   }
 
