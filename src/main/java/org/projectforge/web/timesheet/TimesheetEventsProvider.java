@@ -41,6 +41,7 @@ import org.projectforge.task.TaskDO;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetFilter;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
@@ -98,8 +99,8 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
       longFormat = true;
     }
     for (final TimesheetDO timesheet : timesheets) {
-      final DateTime startTime = new DateTime(timesheet.getStartTime());
-      final DateTime stopTime = new DateTime(timesheet.getStopTime());
+      final DateTime startTime = new DateTime(timesheet.getStartTime(), PFUserContext.getDateTimeZone());
+      final DateTime stopTime = new DateTime(timesheet.getStopTime(), PFUserContext.getDateTimeZone());
       if (stopTime.isBefore(start) == true || startTime.isAfter(end) == true) {
         // Time sheet doesn't match time period start - end.
         continue;
