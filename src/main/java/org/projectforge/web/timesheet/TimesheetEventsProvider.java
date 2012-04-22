@@ -23,14 +23,9 @@
 
 package org.projectforge.web.timesheet;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.ftlines.wicket.fullcalendar.Event;
-import net.ftlines.wicket.fullcalendar.EventNotFoundException;
-import net.ftlines.wicket.fullcalendar.EventProvider;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -48,13 +43,14 @@ import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.CalendarFilter;
+import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 
 /**
  * Creates events for FullCalendar.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class TimesheetEventsProvider implements EventProvider
+public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
 {
   private static final long serialVersionUID = 2241430630558260146L;
 
@@ -62,11 +58,7 @@ public class TimesheetEventsProvider implements EventProvider
 
   private final CalendarFilter calFilter;
 
-  private final Map<Integer, Event> events = new HashMap<Integer, Event>();
-
   private long duration;
-
-  private final Component parent;
 
   /**
    * @param parent For i18n.
@@ -76,18 +68,20 @@ public class TimesheetEventsProvider implements EventProvider
    */
   public TimesheetEventsProvider(final Component parent, final TimesheetDao timesheetDao, final CalendarFilter calFilter)
   {
-    this.parent = parent;
+    super(parent);
     this.timesheetDao = timesheetDao;
     this.calFilter = calFilter;
   }
 
+  /**
+   * @see org.projectforge.web.calendar.MyFullCalendarEventsProvider#buildEvents(org.joda.time.DateTime, org.joda.time.DateTime)
+   */
   @Override
-  public Collection<Event> getEvents(final DateTime start, final DateTime end)
+  protected void buildEvents(final DateTime start, final DateTime end)
   {
-    events.clear();
     final Integer userId = calFilter.getUserId();
     if (userId == null) {
-      return events.values();
+      return ;
     }
     final TimesheetFilter filter = new TimesheetFilter();
     filter.setUserId(userId);
@@ -96,7 +90,7 @@ public class TimesheetEventsProvider implements EventProvider
     filter.setOrderType(OrderDirection.ASC);
     final List<TimesheetDO> timesheets = timesheetDao.getList(filter);
     if (CollectionUtils.isEmpty(timesheets) == true) {
-      return events.values();
+      return ;
     }
     boolean longFormat = false;
     if (Days.daysBetween(start, end).getDays() < 10) {
@@ -111,7 +105,7 @@ public class TimesheetEventsProvider implements EventProvider
         continue;
       }
       final Event event = new Event();
-      final Integer id = timesheet.getId();
+      final String id = "ts-" + timesheet.getId();
       event.setId("" + id);
       event.setStart(startTime);
       event.setEnd(stopTime);
@@ -125,18 +119,6 @@ public class TimesheetEventsProvider implements EventProvider
       }
       events.put(id, event);
     }
-    return events.values();
-  }
-
-  @Override
-  public Event getEventForId(final String id) throws EventNotFoundException
-  {
-    final Integer idd = Integer.valueOf(id);
-    final Event event = events.get(idd);
-    if (event != null) {
-      return event;
-    }
-    throw new EventNotFoundException("Event with id: " + id + " not found");
   }
 
   public String formatDuration(final long millis)
@@ -199,10 +181,5 @@ public class TimesheetEventsProvider implements EventProvider
       buf.append("; \n").append(task.getTitle());
     }
     return buf.toString();
-  }
-
-  private String getString(final String key)
-  {
-    return parent.getString(key);
   }
 }

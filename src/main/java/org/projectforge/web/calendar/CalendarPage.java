@@ -38,6 +38,8 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateMidnight;
 import org.projectforge.address.AddressDao;
 import org.projectforge.timesheet.TimesheetDao;
+import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.web.address.BirthdayEventsProvider;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 import org.projectforge.web.wicket.AbstractSecuredPage;
@@ -61,6 +63,8 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
   protected final PageParameters pageParameters;
 
   private TimesheetEventsProvider timesheetEventsProvider;
+
+  private BirthdayEventsProvider birthdayEventsProvider;
 
   public CalendarPage(final PageParameters parameters)
   {
@@ -188,14 +192,16 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     }
     config.setDefaultView(filter.getViewType().getCode());
 
-    final EventSource reservations = new EventSource();
+    EventSource reservations = new EventSource();
     timesheetEventsProvider = new TimesheetEventsProvider(this, timesheetDao, form.getFilter());
     reservations.setEventsProvider(timesheetEventsProvider);
     reservations.setEditable(true);
-    // reservations.setBackgroundColor("#63BA68");
-    // reservations.setBorderColor("#63BA68");
     config.add(reservations);
-
+    reservations = new EventSource();
+    birthdayEventsProvider = new BirthdayEventsProvider(this, addressDao, accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == false);
+    reservations.setEventsProvider(birthdayEventsProvider);
+    reservations.setEditable(false);
+    config.add(reservations);
   }
 
   @Override
