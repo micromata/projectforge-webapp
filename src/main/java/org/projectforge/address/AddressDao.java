@@ -43,6 +43,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
+import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.core.BaseDao;
@@ -102,8 +103,9 @@ public class AddressDao extends BaseDao<AddressDO>
   public List<Locale> getUsedCommunicationLanguages()
   {
     @SuppressWarnings("unchecked")
-    final List<Locale> list = getHibernateTemplate().find(
-    "select distinct a.communicationLanguage from AddressDO a where deleted=false and a.communicationLanguage is not null order by a.communicationLanguage");
+    final List<Locale> list = getHibernateTemplate()
+    .find(
+        "select distinct a.communicationLanguage from AddressDO a where deleted=false and a.communicationLanguage is not null order by a.communicationLanguage");
     return list;
   }
 
@@ -290,17 +292,14 @@ public class AddressDao extends BaseDao<AddressDO>
       dh = new DateHolder(address.getBirthday());
       final int month = dh.getMonth();
       final int dayOfMonth = dh.getDayOfMonth();
-      if ((month == fromMonth && dayOfMonth >= fromDayOfMonth)
-          || (month == toMonth && dayOfMonth <= toDayOfMonth)
-          || (fromMonth < toMonth && month > fromMonth && month < toMonth)
-          || // e. g. from June to August
-          (fromMonth > toMonth && (month > fromMonth || month < toMonth))) { // e. g. from December to January
-        final BirthdayAddress ba = new BirthdayAddress(address);
-        if (favorites.contains(address.getId()) == true) {
-          ba.setFavorite(true);
-        }
-        set.add(ba);
+      if (DateHelper.dateOfYearBetween(month, dayOfMonth, fromMonth, fromDayOfMonth, toMonth, toDayOfMonth) == false) {
+        continue;
       }
+      final BirthdayAddress ba = new BirthdayAddress(address);
+      if (favorites.contains(address.getId()) == true) {
+        ba.setFavorite(true);
+      }
+      set.add(ba);
     }
     return set;
   }
@@ -539,7 +538,7 @@ public class AddressDao extends BaseDao<AddressDO>
       return;
     }
     final String no = NumberHelper
-    .extractPhonenumber(number, configuration.getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
+        .extractPhonenumber(number, configuration.getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX));
     final String name = address.getName();
     pw.print("\"");
     if (StringUtils.isNotEmpty(name)) {
