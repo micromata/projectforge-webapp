@@ -124,7 +124,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
         log.info("Original start time: " + event.getEvent().getStart() + ", original end time: " + event.getEvent().getEnd());
         log.info("New start time: " + event.getNewStartTime() + ", new end time: " + event.getNewEndTime());
         // response.getTarget().add(feedbackPanel);
-        return true;
+        return false;
       }
 
       @Override
@@ -139,7 +139,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
             + " minuteDelta: "
             + event.getMinutesDelta());
         // response.getTarget().add(feedbackPanel);
-        return true;
+        return false;
       }
 
       @Override

@@ -63,7 +63,8 @@ public class MyFullCalendarConfig extends Config
   public MyFullCalendarConfig(final Component parent)
   {
     this.parent = parent;
-    // setAspectRatio(1.5f);
+    setAspectRatio(1.5f);
+    setIgnoreTimezone(true);
     setSlotMinutes(15);
     setFirstHour(8);
     getHeader().setLeft("prev,next today");
@@ -87,7 +88,7 @@ public class MyFullCalendarConfig extends Config
     setColumnFormatMonth(getString("calendar.format.columnFormat.month"));
     setColumnFormatWeek(getString("calendar.format.columnFormat.week"));
     setTimeFormat(getString("calendar.format.timeFormat"));
-    setWeekMode("liquid");
+    setWeekMode("variable");
   }
 
   /**
