@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.commons.lang.ObjectUtils;
+import org.joda.time.DateTimeZone;
 import org.projectforge.core.Configuration;
 
 /**
@@ -117,6 +118,12 @@ public class PFUserContext
   public final static TimeZone getTimeZone()
   {
     return getUser() != null ? getUser().getTimeZoneObject() : Configuration.getInstance().getDefaultTimeZone();
+  }
+
+  public final static DateTimeZone getDateTimeZone()
+  {
+    final TimeZone timeZone = getTimeZone();
+    return DateTimeZone.forTimeZone(timeZone);
   }
 
   /**
