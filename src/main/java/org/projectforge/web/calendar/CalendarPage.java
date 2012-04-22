@@ -30,7 +30,6 @@ import net.ftlines.wicket.fullcalendar.callback.DroppedEvent;
 import net.ftlines.wicket.fullcalendar.callback.ResizedEvent;
 import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
 import net.ftlines.wicket.fullcalendar.callback.View;
-import net.ftlines.wicket.fullcalendar.selector.EventSourceSelector;
 
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -94,7 +93,6 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     };
     feedbackPanel.setOutputMarkupId(true);
     body.add(feedbackPanel);
-
     final MyFullCalendarConfig config = new MyFullCalendarConfig(this);
     config.setSelectable(true);
     config.setSelectHelper(true);
@@ -198,7 +196,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     };
     calendar.setMarkupId("calendar");
     body.add(calendar);
-    body.add(new EventSourceSelector("selector", calendar));
+    //body.add(new EventSourceSelector("selector", calendar));
 
     form = new CalendarForm(this);
 
@@ -209,7 +207,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
       putUserPrefEntry(USERPREF_KEY, filter, true);
     }
     form.setFilter(filter);
-    form.init();
+    // form.init();
 
     if (pageParameters != null) {
       if (pageParameters.get("showTimesheets") != null) {
