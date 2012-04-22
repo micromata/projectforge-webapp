@@ -48,11 +48,11 @@ public class ModifyJavaFileHeaders
   private void doitReally() throws IOException
   {
     log.info("Modify all Java file headers.");
-    @SuppressWarnings("unchecked")
     final Collection<File> files = FileUtils.listFiles(new File(PATH), new String[] { "java"}, true);
     int counter = 0;
     for (final File file : files) {
-      if (file.getAbsolutePath().contains("org/projectforge/lucene/PF") == true) {
+      if (file.getAbsolutePath().contains("org/projectforge/lucene/PF") == true ||
+          file.getAbsolutePath().contains("java/net") == true) {
         continue;
       }
       FileReader reader = null;
