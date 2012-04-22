@@ -35,13 +35,13 @@ public class BirthdayAddress implements Comparable<BirthdayAddress>, Serializabl
 {
   private static final long serialVersionUID = -611024181799550736L;
 
-  private String dateOfYear;
+  private final String dateOfYear;
 
-  private String compareString;
+  private final String compareString;
 
-  private int month;
+  private final int month;
 
-  private int dayOfMonth;
+  private final int dayOfMonth;
 
   private boolean isFavorite;
 
@@ -49,13 +49,13 @@ public class BirthdayAddress implements Comparable<BirthdayAddress>, Serializabl
 
   AddressDO address;
 
-  public BirthdayAddress(AddressDO address)
+  public BirthdayAddress(final AddressDO address)
   {
     this.address = address;
     if (address.getBirthday() == null) {
       throw new UnsupportedOperationException("Birthday not given!");
     }
-    DateHolder day = new DateHolder(address.getBirthday());
+    final DateHolder day = new DateHolder(address.getBirthday());
     month = day.getMonth();
     dayOfMonth = day.getDayOfMonth();
     dateOfYear = getDateOfYear(month, dayOfMonth);
@@ -63,7 +63,7 @@ public class BirthdayAddress implements Comparable<BirthdayAddress>, Serializabl
   }
 
   @Override
-  public boolean equals(Object obj)
+  public boolean equals(final Object obj)
   {
     return compareString.equals(((BirthdayAddress) obj).compareString);
   }
@@ -71,12 +71,12 @@ public class BirthdayAddress implements Comparable<BirthdayAddress>, Serializabl
   @Override
   public int hashCode()
   {
-    HashCodeBuilder hcb = new HashCodeBuilder();
+    final HashCodeBuilder hcb = new HashCodeBuilder();
     hcb.append(this.compareString);
     return hcb.toHashCode();
   }
 
-  public int compareTo(BirthdayAddress o)
+  public int compareTo(final BirthdayAddress o)
   {
     return this.compareString.compareTo(o.compareString);
   }
@@ -85,16 +85,16 @@ public class BirthdayAddress implements Comparable<BirthdayAddress>, Serializabl
    * Ignores the year!
    * @see #getDateOfYear(Date)
    */
-  public boolean isSameDay(Date date)
+  public boolean isSameDay(final Date date)
   {
     return this.dateOfYear.equals(getDateOfYear(date));
   }
 
   /** Sets and gets the age of the person at the given date. */
-  public int setAge(Date date)
+  public int setAge(final Date date)
   {
-    DateHolder dh = new DateHolder(date);
-    DateHolder birthday = new DateHolder(address.getBirthday());
+    final DateHolder dh = new DateHolder(date);
+    final DateHolder birthday = new DateHolder(address.getBirthday());
     age = dh.getYear() - birthday.getYear();
     return age;
   }
@@ -131,16 +131,22 @@ public class BirthdayAddress implements Comparable<BirthdayAddress>, Serializabl
     return isFavorite;
   }
 
-  public void setFavorite(boolean isFavorite)
+  public void setFavorite(final boolean isFavorite)
   {
     this.isFavorite = isFavorite;
   }
 
+  /**
+   * 0 - January, 1 - February...
+   */
   public int getMonth()
   {
     return month;
   }
 
+  /**
+   * Java calendar style.
+   */
   public int getDayOfMonth()
   {
     return dayOfMonth;
@@ -156,16 +162,16 @@ public class BirthdayAddress implements Comparable<BirthdayAddress>, Serializabl
    * Gets the date of year as string (without year) in format {mmdd}.
    * @param date
    */
-  public static String getDateOfYear(Date date)
+  public static String getDateOfYear(final Date date)
   {
     if (date == null) {
       throw new UnsupportedOperationException("Date not given!");
     }
-    DateHolder dh = new DateHolder(date);
+    final DateHolder dh = new DateHolder(date);
     return getDateOfYear(dh.getMonth(), dh.getDayOfMonth());
   }
 
-  public static String getDateOfYear(int month, int dayOfMonth)
+  public static String getDateOfYear(final int month, final int dayOfMonth)
   {
     return StringHelper.format2DigitNumber(month) + StringHelper.format2DigitNumber(dayOfMonth);
   }
