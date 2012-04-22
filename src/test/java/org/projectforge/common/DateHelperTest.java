@@ -24,6 +24,8 @@
 package org.projectforge.common;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -36,19 +38,18 @@ import org.junit.Test;
 import org.projectforge.core.Configuration;
 import org.projectforge.test.TestBase;
 
-
 public class DateHelperTest extends TestBase
 {
   @Test
   public void testTimeZone() throws ParseException
   {
-    DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm");
+    final DateFormat df = new SimpleDateFormat("yyyy-MM-dd hh:mm");
     df.setTimeZone(DateHelper.EUROPE_BERLIN);
-    Date mezDate = df.parse("2008-03-14 17:25");
-    long mezMillis = mezDate.getTime();
+    final Date mezDate = df.parse("2008-03-14 17:25");
+    final long mezMillis = mezDate.getTime();
     df.setTimeZone(DateHelper.UTC);
-    Date utcDate = df.parse("2008-03-14 16:25");
-    long utcMillis = utcDate.getTime();
+    final Date utcDate = df.parse("2008-03-14 16:25");
+    final long utcMillis = utcDate.getTime();
     assertEquals(mezMillis, utcMillis);
   }
 
@@ -69,11 +70,11 @@ public class DateHelperTest extends TestBase
   @Test
   public void getDuration()
   {
-    DateHolder dateHolder = new DateHolder(DatePrecision.MINUTE, Locale.GERMAN);
+    final DateHolder dateHolder = new DateHolder(DatePrecision.MINUTE, Locale.GERMAN);
     dateHolder.setDate(1970, Calendar.NOVEMBER, 21, 4, 50, 0);
-    Date startTime = dateHolder.getDate();
+    final Date startTime = dateHolder.getDate();
     dateHolder.setDate(1970, Calendar.NOVEMBER, 21, 6, 59, 0);
-    Date stopTime = dateHolder.getDate();
+    final Date stopTime = dateHolder.getDate();
     assertEquals(129, DateHelper.getDuration(startTime, stopTime));
     assertEquals(0, DateHelper.getDuration(stopTime, startTime));
     assertEquals(0, DateHelper.getDuration(null, stopTime));
@@ -93,9 +94,56 @@ public class DateHelperTest extends TestBase
     assertEquals("2009-12", DateHelper.formatMonth(2009, Calendar.DECEMBER));
   }
 
-  private Date createDate(int year, int month, int day, int hour, int minute, int second, int millisecond)
+  @Test
+  public void dateOfYearBetween()
   {
-    Calendar cal = Calendar.getInstance(Configuration.getInstance().getDefaultTimeZone());
+    assertTrue(DateHelper.dateOfYearBetween(1, 3, 1, 3, 1, 3)); // 1/3 is between 1/3 and 1/3
+    // 1/3 - 1/20
+    assertTrue(DateHelper.dateOfYearBetween(1, 3, 1, 3, 1, 20)); // 1/3 is between 1/3 and 1/20
+    assertTrue(DateHelper.dateOfYearBetween(1, 20, 1, 3, 1, 20)); // 1/20 is between 1/3 and 1/20
+    assertFalse(DateHelper.dateOfYearBetween(1, 2, 1, 3, 1, 20)); // 1/2 isn't between 1/3 and 1/20
+    assertFalse(DateHelper.dateOfYearBetween(1, 21, 1, 3, 1, 20)); // 1/21 isn't between 1/3 and 1/20
+
+    // 1/3 - 2/20
+    assertTrue(DateHelper.dateOfYearBetween(1, 3, 1, 3, 2, 20)); // 1/3 is between 1/3 and 2/20
+    assertTrue(DateHelper.dateOfYearBetween(1, 30, 1, 3, 2, 20)); // 1/30 is between 1/3 and 2/20
+    assertTrue(DateHelper.dateOfYearBetween(2, 20, 1, 3, 2, 20)); // 2/20 is between 1/3 and 2/20
+    assertFalse(DateHelper.dateOfYearBetween(1, 2, 1, 3, 2, 20)); // 1/2 isn't between 1/3 and 1/20
+    assertFalse(DateHelper.dateOfYearBetween(2, 21, 1, 3, 2, 20)); // 2/21 isn't between 1/3 and 1/20
+
+    // 1/3 - 3/20
+    assertTrue(DateHelper.dateOfYearBetween(2, 1, 1, 3, 2, 20)); // 2/1 is between 1/3 and 3/20
+    assertFalse(DateHelper.dateOfYearBetween(1, 2, 1, 3, 2, 20)); // 1/2 isn't between 1/3 and 3/20
+    assertFalse(DateHelper.dateOfYearBetween(3, 21, 1, 3, 2, 20)); // 3/21 isn't between 1/3 and 3/20
+    assertFalse(DateHelper.dateOfYearBetween(0, 21, 1, 3, 2, 20)); // 0/21 isn't between 1/3 and 3/20
+    assertFalse(DateHelper.dateOfYearBetween(4, 21, 1, 3, 2, 20)); // 4/21 isn't between 1/3 and 3/20
+
+    // 11/3 - 0/20
+    assertTrue(DateHelper.dateOfYearBetween(0, 1, 11, 3, 0, 20)); // 0/1 is between 11/3 and 0/20
+    assertTrue(DateHelper.dateOfYearBetween(11, 3, 11, 3, 0, 20)); // 11/3 is between 11/3 and 0/20
+    assertTrue(DateHelper.dateOfYearBetween(0, 20, 11, 3, 0, 20)); // 11/3 is between 11/3 and 0/20
+    assertFalse(DateHelper.dateOfYearBetween(0, 21, 11, 3, 0, 20)); // 0/21 isn't between 11/3 and 0/20
+    assertFalse(DateHelper.dateOfYearBetween(11, 2, 11, 3, 0, 20)); // 11/21 isn't between 11/3 and 0/20
+
+    // 10/3 - 2/20
+    assertTrue(DateHelper.dateOfYearBetween(0, 1, 10, 3, 2, 20)); // 0/1 is between 10/3 and 2/20
+    assertTrue(DateHelper.dateOfYearBetween(11, 3, 10, 3, 2, 20)); // 11/3 is between 10/3 and 2/20
+    assertTrue(DateHelper.dateOfYearBetween(0, 20, 10, 3, 2, 20)); // 11/3 is between 10/3 and 2/20
+    assertTrue(DateHelper.dateOfYearBetween(0, 21, 10, 3, 2, 20)); // 0/21 is between 10/3 and 2/20
+    assertTrue(DateHelper.dateOfYearBetween(11, 2, 10, 3, 2, 20)); // 11/21 is between 10/3 and 2/20
+    assertTrue(DateHelper.dateOfYearBetween(10, 3, 10, 3, 2, 20)); // 10/03 is between 10/3 and 2/20
+    assertTrue(DateHelper.dateOfYearBetween(2, 20, 10, 3, 2, 20)); // 2/20 is between 10/3 and 2/20
+    assertFalse(DateHelper.dateOfYearBetween(10, 2, 10, 3, 2, 20)); // 10/2 isn't between 10/3 and 2/20
+    assertFalse(DateHelper.dateOfYearBetween(2, 21, 10, 3, 2, 20)); // 2/21 isn't between 10/3 and 2/20
+
+    assertFalse(DateHelper.dateOfYearBetween(3, 21, 10, 3, 2, 20)); // 3/21 isn't between 10/3 and 2/20
+    assertFalse(DateHelper.dateOfYearBetween(9, 21, 10, 3, 2, 20)); // 9/21 isn't between 10/3 and 2/20
+  }
+
+  private Date createDate(final int year, final int month, final int day, final int hour, final int minute, final int second,
+      final int millisecond)
+  {
+    final Calendar cal = Calendar.getInstance(Configuration.getInstance().getDefaultTimeZone());
     cal.set(Calendar.YEAR, year);
     cal.set(Calendar.MONTH, month);
     cal.set(Calendar.DAY_OF_MONTH, day);

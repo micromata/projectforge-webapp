@@ -36,8 +36,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.projectforge.calendar.TimePeriod;
-import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
 
@@ -192,7 +192,7 @@ public class DateHelper implements Serializable
   /**
    * @return Short name of day represented by the giving day. The context user's locale and time zone is considered.
    */
-  public static final String formatShortNameOfDay(Date date)
+  public static final String formatShortNameOfDay(final Date date)
   {
     final DateFormat df = new SimpleDateFormat("EE", PFUserContext.getLocale());
     df.setTimeZone(PFUserContext.getTimeZone());
@@ -204,7 +204,7 @@ public class DateHelper implements Serializable
    * @param date
    * @return
    */
-  public static final String formatAsUTC(Date date)
+  public static final String formatAsUTC(final Date date)
   {
     if (date == null) {
       return "";
@@ -249,7 +249,7 @@ public class DateHelper implements Serializable
    * @return
    * @see #parseMillis(String, boolean)
    */
-  public static Date parseMillis(String str)
+  public static Date parseMillis(final String str)
   {
     return parseMillis(str, true);
   }
@@ -265,7 +265,7 @@ public class DateHelper implements Serializable
     try {
       final long millis = Long.parseLong(str);
       date = new Date(millis);
-    } catch (NumberFormatException ex) {
+    } catch (final NumberFormatException ex) {
       if (logError == true) {
         log.error("Could not parse date string (millis expected): " + str, ex);
       }
@@ -273,7 +273,7 @@ public class DateHelper implements Serializable
     return date;
   }
 
-  public static String formatIsoTimestamp(Date date)
+  public static String formatIsoTimestamp(final Date date)
   {
     return getIsoTimestampFormat(PFUserContext.getTimeZone()).format(date);
   }
@@ -290,7 +290,7 @@ public class DateHelper implements Serializable
     Date date;
     try {
       date = df.parse(isoDateString);
-    } catch (ParseException ex) {
+    } catch (final ParseException ex) {
       return null;
     }
     return date;
@@ -327,7 +327,7 @@ public class DateHelper implements Serializable
    * @param dateHolder
    * @return
    */
-  public static final String getForTestCase(DateHolder dateHolder)
+  public static final String getForTestCase(final DateHolder dateHolder)
   {
     return FOR_TESTCASE_OUTPUT_FORMATTER.get().format(dateHolder.getDate());
   }
@@ -337,12 +337,12 @@ public class DateHelper implements Serializable
    * @param dateHolder
    * @return
    */
-  public static final String getForTestCase(Date date)
+  public static final String getForTestCase(final Date date)
   {
     return FOR_TESTCASE_OUTPUT_FORMATTER.get().format(date);
   }
 
-  public static final String getTimestampAsFilenameSuffix(Date date)
+  public static final String getTimestampAsFilenameSuffix(final Date date)
   {
     if (date == null) {
       return "--";
@@ -350,7 +350,7 @@ public class DateHelper implements Serializable
     return getFilenameFormatTimestamp(PFUserContext.getTimeZone()).format(date);
   }
 
-  public static final String getDateAsFilenameSuffix(Date date)
+  public static final String getDateAsFilenameSuffix(final Date date)
   {
     if (date == null) {
       return "--";
@@ -397,7 +397,7 @@ public class DateHelper implements Serializable
    * @param stopTime
    * @return Duration in minutes or 0, if not computable (if start or stop time is null or stopTime is before startTime).
    */
-  public static long getDuration(Date startTime, Date stopTime)
+  public static long getDuration(final Date startTime, final Date stopTime)
   {
     if (startTime == null || stopTime == null || stopTime.before(startTime) == true) {
       return 0;
@@ -410,12 +410,12 @@ public class DateHelper implements Serializable
    * @return Formatted string without seconds, such as 5:45.
    * @param time in millis
    */
-  public static String formatDuration(long milliSeconds)
+  public static String formatDuration(final long milliSeconds)
   {
-    long duration = milliSeconds / 60000;
-    long durationHours = duration / 60;
-    long durationMinutes = (duration % 60);
-    StringBuffer buf = new StringBuffer(10);
+    final long duration = milliSeconds / 60000;
+    final long durationHours = duration / 60;
+    final long durationMinutes = (duration % 60);
+    final StringBuffer buf = new StringBuffer(10);
     buf.append(durationHours);
     if (durationMinutes < 10)
       buf.append(":0");
@@ -442,13 +442,13 @@ public class DateHelper implements Serializable
    * @param month 0-11
    * @return "yyyy-mm"
    */
-  public static String formatMonth(int year, int month)
+  public static String formatMonth(final int year, final int month)
   {
     final StringBuffer buf = new StringBuffer();
     buf.append(year);
     if (month >= 0) {
       buf.append('-');
-      int m = month + 1;
+      final int m = month + 1;
       if (m <= 9) {
         buf.append('0');
       }
@@ -516,5 +516,38 @@ public class DateHelper implements Serializable
     }
     final DateHolder dh = new DateHolder(d1);
     return dh.isSameDay(d2);
+  }
+
+  public static boolean dateOfYearBetween(final int month, final int dayOfMonth, final int fromMonth, final int fromDayOfMonth, final int toMonth, final int toDayOfMonth)
+  {
+    if (fromMonth == toMonth) {
+      if (month != fromMonth) {
+        return false;
+      }
+      if (dayOfMonth < fromDayOfMonth || dayOfMonth > toDayOfMonth) {
+        return false;
+      }
+    } else if (fromMonth < toMonth) {
+      // e. g. APR - JUN
+      if (month < fromMonth || month > toMonth) {
+        // e. g. FEB or JUL
+        return false;
+      } else if (month == fromMonth && dayOfMonth < fromDayOfMonth) {
+        return false;
+      } else if (month == toMonth && dayOfMonth > toDayOfMonth) {
+        return false;
+      }
+    } else if (fromMonth > toMonth) {
+      // e. g. NOV - FEB
+      if (month > toMonth && month < fromMonth) {
+        // e. g. MAR
+        return false;
+      } else if (month == fromMonth && dayOfMonth < fromDayOfMonth) {
+        return false;
+      } else if (month == toMonth && dayOfMonth > toDayOfMonth) {
+        return false;
+      }
+    }
+    return true;
   }
 }
