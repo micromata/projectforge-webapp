@@ -24,6 +24,7 @@
 package org.projectforge.web;
 
 import java.io.File;
+import java.util.TimeZone;
 
 import org.projectforge.database.HibernateDialect;
 
@@ -62,6 +63,8 @@ public class StartSettings
 
   public StartSettings(final HibernateDialect hibernateDialect, final String baseDir)
   {
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+    System.setProperty("user.timezone", TimeZone.getDefault().getID());
     this.baseDir = baseDir;
     if (hibernateDialect == HibernateDialect.PostgreSQL) {
       dialect = "org.hibernate.dialect.PostgreSQLDialect";
