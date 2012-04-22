@@ -108,25 +108,29 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
       @Override
       protected void onDateRangeSelected(final SelectedRange range, final CalendarResponse response)
       {
-        log.info("Selected region: " + range.getStart() + " - " + range.getEnd() + " / allDay: " + range.isAllDay());
+        if (log.isDebugEnabled() == true) {
+          log.debug("Selected region: " + range.getStart() + " - " + range.getEnd() + " / allDay: " + range.isAllDay());
+        }
         // response.getTarget().add(feedbackPanel);
       }
 
       @Override
       protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response)
       {
-        log.info("Event drop. eventId: "
-            + event.getEvent().getId()
-            + " sourceId: "
-            + event.getSource().getUuid()
-            + " dayDelta: "
-            + event.getDaysDelta()
-            + " minuteDelta: "
-            + event.getMinutesDelta()
-            + " allDay: "
-            + event.isAllDay());
-        log.info("Original start time: " + event.getEvent().getStart() + ", original end time: " + event.getEvent().getEnd());
-        log.info("New start time: " + event.getNewStartTime() + ", new end time: " + event.getNewEndTime());
+        if (log.isDebugEnabled() == true) {
+          log.debug("Event drop. eventId: "
+              + event.getEvent().getId()
+              + " sourceId: "
+              + event.getSource().getUuid()
+              + " dayDelta: "
+              + event.getDaysDelta()
+              + " minuteDelta: "
+              + event.getMinutesDelta()
+              + " allDay: "
+              + event.isAllDay());
+          log.debug("Original start time: " + event.getEvent().getStart() + ", original end time: " + event.getEvent().getEnd());
+          log.debug("New start time: " + event.getNewStartTime() + ", new end time: " + event.getNewEndTime());
+        }
         // response.getTarget().add(feedbackPanel);
         return false;
       }
@@ -134,14 +138,16 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
       @Override
       protected boolean onEventResized(final ResizedEvent event, final CalendarResponse response)
       {
-        log.info("Event resized. eventId: "
-            + event.getEvent().getId()
-            + " sourceId: "
-            + event.getSource().getUuid()
-            + " dayDelta: "
-            + event.getDaysDelta()
-            + " minuteDelta: "
-            + event.getMinutesDelta());
+        if (log.isDebugEnabled() == true) {
+          log.debug("Event resized. eventId: "
+              + event.getEvent().getId()
+              + " sourceId: "
+              + event.getSource().getUuid()
+              + " dayDelta: "
+              + event.getDaysDelta()
+              + " minuteDelta: "
+              + event.getMinutesDelta());
+        }
         // response.getTarget().add(feedbackPanel);
         return false;
       }
@@ -154,14 +160,17 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
         }
         final String eventId = event.getEvent().getId();
         if (eventId != null && eventId.startsWith("ts-") == true) {
+          // User clicked on a time sheet, show the time sheet:
           final Integer id = NumberHelper.parseInteger(eventId.substring(3));
           final PageParameters parameters = new PageParameters();
           parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
           final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
+          timesheetEditPage.setReturnToPage(CalendarPage.this);
           setResponsePage(timesheetEditPage);
           return;
         }
         if (eventId != null && eventId.startsWith("b-") == true) {
+          // User clicked on birthday, show the address:
           final Integer id = NumberHelper.parseInteger(eventId.substring(2));
           final PageParameters parameters = new PageParameters();
           parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
@@ -182,7 +191,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
         }
         response.refetchEvents();
         final CalendarFilter filter = form.getFilter();
-        filter.setStartDate(view.getVisibleStart());
+        filter.setStartDate(view.getStart());
         filter.setViewType(view.getType());
         // response.getTarget().add(feedbackPanel);
       }

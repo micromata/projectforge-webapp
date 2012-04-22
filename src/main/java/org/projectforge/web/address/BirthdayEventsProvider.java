@@ -24,7 +24,6 @@
 package org.projectforge.web.address;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Set;
 
 import net.ftlines.wicket.fullcalendar.Event;
@@ -36,7 +35,6 @@ import org.projectforge.address.AddressDao;
 import org.projectforge.address.BirthdayAddress;
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
-import org.projectforge.common.DateHolder;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 
@@ -74,21 +72,19 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
   @Override
   protected void buildEvents(final DateTime start, final DateTime end)
   {
-    Date from = start.toDate();
+    DateTime from = start;
     if (start.getMonthOfYear() == Calendar.MARCH && start.getDayOfMonth() == 1) {
-      final DateHolder dh = new DateHolder(start.toDate());
-      dh.add(Calendar.DAY_OF_MONTH, -1); // Take birthday from February 29th into March, 1st.
-      from = dh.getDate();
+      from = start.minusDays(1);
     }
-    final Set<BirthdayAddress> set = addressDao.getBirthdays(from, end.toDate(), 1000, true);
+    final Set<BirthdayAddress> set = addressDao.getBirthdays(from.toDate(), end.toDate(), 1000, true);
     for (final BirthdayAddress birthdayAddress : set) {
       final AddressDO address = birthdayAddress.getAddress();
       final int month = birthdayAddress.getMonth() + 1;
       final int dayOfMonth = birthdayAddress.getDayOfMonth();
-      DateTime date = getDate(start, end, month, dayOfMonth);
+      DateTime date = getDate(from, end, month, dayOfMonth);
       // February, 29th fix:
       if (date == null && month == Calendar.FEBRUARY + 1 && dayOfMonth == 29) {
-        date = getDate(start, end, month + 1, 1);
+        date = getDate(from, end, month + 1, 1);
       }
       if (date == null) {
         log.warn("Date "
@@ -96,7 +92,7 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
             + "/"
             + (birthdayAddress.getMonth() + 1)
             + " not found between "
-            + start
+            + from
             + " and "
             + end);
         continue;
