@@ -348,6 +348,14 @@ public class WicketApplication extends WebApplication implements WicketApplicati
       Application.get().getMarkupSettings().setStripWicketTags(true);
     }
     log.info("Default TimeZone is: " + TimeZone.getDefault());
+    if ("UTC".equals(TimeZone.getDefault().getID()) == false) {
+      for (final String str : UTC_RECOMMENDED) {
+        log.fatal(str);
+      }
+      for (final String str : UTC_RECOMMENDED) {
+        System.err.println(str);
+      }
+    }
     log.info("user.timezone is: " + System.getProperty("user.timezone"));
     cronSetup.initialize();
     log.info(AppVersion.APP_ID + " " + AppVersion.NUMBER + " (" + AppVersion.RELEASE_TIMESTAMP + ") initialized.");
@@ -433,4 +441,14 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     converterLocator.set(java.sql.Date.class, new MyDateConverter(java.sql.Date.class, "S-"));
     return converterLocator;
   }
+
+  private static final String[] UTC_RECOMMENDED = { //
+    "**********************************************************", //
+    "***                                                    ***", //
+    "*** It's highly recommended to start ProjectForge      ***", //
+    "*** with TimeZone UTC. This default TimeZone has to be ***", //
+    "*** set before any initialization of Hibernate!!!!     ***", //
+    "*** You can do this e. g. in JAVA_OPTS etc.            ***", //
+    "***                                                    ***", //
+  "**********************************************************"};
 }
