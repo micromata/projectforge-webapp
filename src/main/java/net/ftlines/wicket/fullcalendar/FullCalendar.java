@@ -28,6 +28,7 @@ import net.ftlines.wicket.fullcalendar.callback.View;
 import net.ftlines.wicket.fullcalendar.callback.ViewDisplayCallback;
 
 import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.util.collections.MicroMap;
 import org.apache.wicket.util.string.Strings;
 import org.apache.wicket.util.template.PackageTextTemplate;
@@ -71,12 +72,6 @@ public class FullCalendar extends AbstractFullCalendar
 			String uuid = UUID.randomUUID().toString().replaceAll("[^A-Za-z0-9]", "");
 			source.setUuid(uuid);
 		}
-	}
-
-	@Override
-	protected void onBeforeRender()
-	{
-		super.onBeforeRender();
 		setupCallbacks();
 	}
 
@@ -87,9 +82,14 @@ public class FullCalendar extends AbstractFullCalendar
 
 		getEvents = new GetEventsCallback();
 		add(getEvents);
-		for (EventSource source : config.getEventSources())
+		for (final EventSource source : config.getEventSources())
 		{
-			source.setEvents(EVENTS.asString(new MicroMap("url", getEvents.getUrl(source))));
+			source.setEventsModel(new AbstractReadOnlyModel<String>() {
+				@Override
+				public String getObject() {
+					return EVENTS.asString(new MicroMap("url", getEvents.getUrl(source)));
+				}
+			});
 		}
 
 		if (Strings.isEmpty(config.getEventClick()))
@@ -102,7 +102,7 @@ public class FullCalendar extends AbstractFullCalendar
 					onEventClicked(event, response);
 				}
 			});
-			config.setEventClick(eventClicked.getHandlerScript());
+			config.setEventClickModel(eventClicked.getHandlerScript());
 		}
 
 		if (Strings.isEmpty(config.getSelect()))
@@ -115,7 +115,7 @@ public class FullCalendar extends AbstractFullCalendar
 					FullCalendar.this.onDateRangeSelected(range, response);
 				}
 			});
-			config.setSelect(dateRangeSelected.getHandlerScript());
+			config.setSelectModel(dateRangeSelected.getHandlerScript());
 		}
 
 		if (Strings.isEmpty(config.getEventDrop()))
@@ -129,7 +129,7 @@ public class FullCalendar extends AbstractFullCalendar
 					return FullCalendar.this.onEventDropped(event, response);
 				}
 			});
-			config.setEventDrop(eventDropped.getHandlerScript());
+			config.setEventDropModel(eventDropped.getHandlerScript());
 		}
 
 		if (Strings.isEmpty(config.getEventResize()))
@@ -145,7 +145,7 @@ public class FullCalendar extends AbstractFullCalendar
 
 			});
 
-			config.setEventResize(eventResized.getHandlerScript());
+			config.setEventResizeModel(eventResized.getHandlerScript());
 		}
 
 		if (Strings.isEmpty(config.getViewDisplay()))
@@ -158,7 +158,7 @@ public class FullCalendar extends AbstractFullCalendar
 					FullCalendar.this.onViewDisplayed(view, response);
 				}
 			});
-			config.setViewDisplay(viewDisplay.getHandlerScript());
+			config.setViewDisplayModel(viewDisplay.getHandlerScript());
 		}
 
 		getPage().dirty();

@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.model.IModel;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonRawValue;
@@ -38,16 +40,19 @@ public class Config implements Serializable
 	private ButtonText buttonText = new ButtonText();
 	private String loading;
 	private Boolean editable;
-	private String eventDrop;
-	private String eventResize;
-	private String eventClick;
 	
-	private String viewDisplay;
+	/** Callbacks */
+	private IModel<String> eventDropModel;
+	private IModel<String> eventResizeModel;
+	private IModel<String> eventClickModel;
+	private IModel<String> eventRenderModel;
+	private IModel<String> selectModel;
+	private IModel<String> defaultViewModel;
+	private IModel<String> viewDisplayModel;
+
 	private Boolean selectable;
 	private Boolean selectHelper;
-	/** A callback that will fire after a selection is made */
-	private String select;
-	private String defaultView;
+	
 	@JsonProperty
 	private Map<ColumnFormat, String> columnFormat = new HashMap<Config.ColumnFormat, String>();
 
@@ -57,8 +62,6 @@ public class Config implements Serializable
 	private Boolean allDaySlot;
 	
 	private String timeFormat;
-	
-	private String eventRender;
 	
 	private Boolean disableDragging;
 	private Boolean disableResizing;
@@ -85,15 +88,29 @@ public class Config implements Serializable
 	@JsonRawValue
 	public String getEventResize()
 	{
-		return eventResize;
+		return eventResizeModel == null ? null : eventResizeModel.getObject();
 	}
 
-	public void setEventResize(String eventResize)
+	public void setEventResize(final String eventResize)
 	{
-		this.eventResize = eventResize;
+		this.eventResizeModel = new AbstractReadOnlyModel<String>() {
+		    @Override
+		    public String getObject() {
+		        return eventResize;
+		    }
+        };
 	}
 
-	@JsonRawValue
+	@JsonIgnore
+	public IModel<String> getEventResizeModel() {
+        return eventResizeModel;
+    }
+
+    public void setEventResizeModel(IModel<String> eventResizeModel) {
+        this.eventResizeModel = eventResizeModel;
+    }
+
+    @JsonRawValue
 	public String getLoading()
 	{
 		return loading;
@@ -117,15 +134,29 @@ public class Config implements Serializable
 	@JsonRawValue
 	public String getEventDrop()
 	{
-		return eventDrop;
+		return eventDropModel == null ? null : eventDropModel.getObject();
 	}
 
-	public void setEventDrop(String eventDrop)
+	public void setEventDrop(final String eventDrop)
 	{
-		this.eventDrop = eventDrop;
+		this.eventDropModel = new AbstractReadOnlyModel<String>() {
+		    @Override
+		    public String getObject() {
+		        return eventDrop;
+		    }
+        };
 	}
 
-	public Boolean isSelectable()
+	@JsonIgnore
+	public IModel<String> getEventDropModel() {
+        return eventDropModel;
+    }
+
+    public void setEventDropModel(IModel<String> eventDropModel) {
+        this.eventDropModel = eventDropModel;
+    }
+
+    public Boolean isSelectable()
 	{
 		return selectable;
 	}
@@ -148,31 +179,59 @@ public class Config implements Serializable
 	@JsonRawValue
 	public String getSelect()
 	{
-		return select;
+		return selectModel == null ? null : selectModel.getObject();
 	}
 
-	public void setSelect(String select)
+	public void setSelect(final String select)
 	{
-		this.select = select;
+        this.selectModel = new AbstractReadOnlyModel<String>() {
+            @Override
+            public String getObject() {
+                return select;
+            }
+        };
 	}
 
-	@JsonRawValue
+	@JsonIgnore
+	public IModel<String> getSelectModel() {
+        return selectModel;
+    }
+
+    public void setSelectModel(IModel<String> selectModel) {
+        this.selectModel = selectModel;
+    }
+
+    @JsonRawValue
 	public String getEventClick()
 	{
-		return eventClick;
+		return eventClickModel == null ? null : eventClickModel.getObject();
 	}
 
-	public void setEventClick(String eventClick)
+	public void setEventClick(final String eventClick)
 	{
-		this.eventClick = eventClick;
+		this.eventClickModel = new AbstractReadOnlyModel<String>() {
+		    @Override
+		    public String getObject() {
+		        return eventClick;
+		    }
+        };
 	}
 
-	/**
+	@JsonIgnore
+	public IModel<String> getEventClickModel() {
+        return eventClickModel;
+    }
+
+    public void setEventClickModel(IModel<String> eventClickModel) {
+        this.eventClickModel = eventClickModel;
+    }
+
+    /**
 	 * @return the defaultView
 	 */
 	public String getDefaultView()
 	{
-		return defaultView;
+		return defaultViewModel == null ? null : defaultViewModel.getObject();
 	}
 
 	/**
@@ -182,12 +241,27 @@ public class Config implements Serializable
 	 * @param defaultView
 	 *            the defaultView to set
 	 */
-	public void setDefaultView(String defaultView)
+	public void setDefaultView(final String defaultView)
 	{
-		this.defaultView = defaultView;
+		this.defaultViewModel = new AbstractReadOnlyModel<String>() {
+
+		    @Override
+		    public String getObject() {
+		        return defaultView;
+		    }
+        };
 	}
 
 	@JsonIgnore
+	public IModel<String> getDefaultViewModel() {
+        return defaultViewModel;
+    }
+
+    public void setDefaultViewModel(IModel<String> defaultViewModel) {
+        this.defaultViewModel = defaultViewModel;
+    }
+
+    @JsonIgnore
 	public String getColumnFormatDay()
 	{
 		return columnFormat.get(ColumnFormat.day);
@@ -278,15 +352,29 @@ public class Config implements Serializable
 	@JsonRawValue
 	public String getEventRender()
 	{
-		return eventRender;
+		return eventRenderModel == null ? null : eventRenderModel.getObject();
 	}
 
-	public void setEventRender(String eventRenderer)
+	public void setEventRender(final String eventRenderer)
 	{
-		this.eventRender = eventRenderer;
+		this.eventRenderModel = new AbstractReadOnlyModel<String>() {
+		    @Override
+		    public String getObject() {
+		        return eventRenderer;
+		    }
+        };
 	}
 
-	public Boolean getDisableDragging()
+	@JsonIgnore
+	public IModel<String> getEventRenderModel() {
+        return eventRenderModel;
+    }
+
+    public void setEventRenderModel(IModel<String> eventRenderModel) {
+        this.eventRenderModel = eventRenderModel;
+    }
+
+    public Boolean getDisableDragging()
 	{
 		return disableDragging;
 	}
@@ -309,15 +397,29 @@ public class Config implements Serializable
 	@JsonRawValue
 	public String getViewDisplay()
 	{
-		return viewDisplay;
+		return viewDisplayModel == null ? null : viewDisplayModel.getObject();
 	}
 
-	public void setViewDisplay(String viewDisplay)
+	public void setViewDisplay(final String viewDisplay)
 	{
-		this.viewDisplay = viewDisplay;
+		this.viewDisplayModel = new AbstractReadOnlyModel<String>() {
+		    @Override
+		    public String getObject() {
+		        return viewDisplay;
+		    }
+        };
 	}
 
-	public void setSlotMinutes(Integer slotMinutes)
+	@JsonIgnore
+	public IModel<String> getViewDisplayModel() {
+        return viewDisplayModel;
+    }
+
+    public void setViewDisplayModel(IModel<String> viewDisplayModel) {
+        this.viewDisplayModel = viewDisplayModel;
+    }
+
+    public void setSlotMinutes(Integer slotMinutes)
 	{
 		this.slotMinutes = slotMinutes;
 	}
