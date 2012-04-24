@@ -17,6 +17,8 @@ import net.ftlines.wicket.fullcalendar.Event;
 import net.ftlines.wicket.fullcalendar.EventSource;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.Request;
 
 public abstract class EventResizedCallback extends AbstractAjaxCallbackWithClientsideRevert
@@ -30,10 +32,14 @@ public abstract class EventResizedCallback extends AbstractAjaxCallbackWithClien
 			"+'&dayDelta='+dayDelta+'&minuteDelta='+minuteDelta+'");
 	}
 
-	@Override
-	public String getHandlerScript()
+	public IModel<String> getHandlerScript()
 	{
-		return "function(event, dayDelta, minuteDelta,  revertFunc) { " + getCallbackScript() + "}";
+		return new AbstractReadOnlyModel<String>() {
+			@Override
+			public String getObject() {
+				return "function(event, dayDelta, minuteDelta,  revertFunc) { " + getCallbackScript() + "}";
+			}
+		};
 	}
 
 	@Override

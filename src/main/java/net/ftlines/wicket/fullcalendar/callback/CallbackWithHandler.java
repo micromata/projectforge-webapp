@@ -14,7 +14,9 @@
 
 package net.ftlines.wicket.fullcalendar.callback;
 
+import org.apache.wicket.model.IModel;
+
 public interface CallbackWithHandler
 {
-	String getHandlerScript();
+	IModel<String> getHandlerScript();
 }

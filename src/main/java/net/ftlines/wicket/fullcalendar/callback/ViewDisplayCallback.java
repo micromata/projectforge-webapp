@@ -16,6 +16,8 @@ import net.ftlines.wicket.fullcalendar.CalendarResponse;
 import net.ftlines.wicket.fullcalendar.ViewType;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.Request;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTimeZone;
@@ -39,10 +41,14 @@ public abstract class ViewDisplayCallback extends AbstractAjaxCallback implement
 			"&view='+v.name+'&start='+fullCalendarExtIsoDate(v.start)+'&end='+fullCalendarExtIsoDate(v.end)+'&visibleStart='+fullCalendarExtIsoDate(v.visStart)+'&visibleEnd='+fullCalendarExtIsoDate(v.visEnd)+'");
 	}
 
-	@Override
-	public String getHandlerScript()
+	public IModel<String> getHandlerScript()
 	{
-		return String.format("function(v) {%s;}", getCallbackScript());
+		return new AbstractReadOnlyModel<String>() {
+			@Override
+			public String getObject() {
+				return String.format("function(v) {%s;}", getCallbackScript());
+			}
+		};
 	}
 
 

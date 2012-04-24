@@ -15,6 +15,8 @@ package net.ftlines.wicket.fullcalendar.callback;
 import net.ftlines.wicket.fullcalendar.CalendarResponse;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.model.AbstractReadOnlyModel;
+import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.Request;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -29,8 +31,8 @@ public abstract class DateRangeSelectedCallback extends AbstractAjaxCallback imp
 	 * start and end values, but in the server's time zone.
 	 * 
 	 * @param ignoreTimezone
-	 *            whether or not to ignore the remote client's time zone when determining the
-	 *            selected date range
+	 *			whether or not to ignore the remote client's time zone when determining the
+	 *			selected date range
 	 */
 	public DateRangeSelectedCallback(final boolean ignoreTimezone)
 	{
@@ -44,10 +46,14 @@ public abstract class DateRangeSelectedCallback extends AbstractAjaxCallback imp
 			"&timezoneOffset='+startDate.getTimezoneOffset()+'&startDate='+startDate.getTime()+'&endDate='+endDate.getTime()+'&allDay='+allDay+'");
 	}
 
-	@Override
-	public String getHandlerScript()
+	public IModel<String> getHandlerScript()
 	{
-		return "function(startDate, endDate, allDay) { " + getCallbackScript() + "}";
+		return new AbstractReadOnlyModel<String>() {
+			@Override
+			public String getObject() {
+				return "function(startDate, endDate, allDay) { " + getCallbackScript() + "}";
+			}
+		};
 	}
 
 	@Override
