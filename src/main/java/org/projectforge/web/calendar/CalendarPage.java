@@ -63,6 +63,10 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
 
   private CalendarForm form;
 
+  private DateMidnight startDate;
+
+  private MyFullCalendar calendar;
+
   protected final PageParameters pageParameters;
 
   private BirthdayEventsProvider birthdayEventsProvider;
@@ -102,7 +106,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     // config.setMinTime(new LocalTime(6, 30));
     // config.setMaxTime(new LocalTime(17, 30));
     config.setAllDaySlot(true);
-    final MyFullCalendar calendar = new MyFullCalendar("cal", config) {
+    calendar = new MyFullCalendar("cal", config) {
       @Override
       protected void onDateRangeSelected(final SelectedRange range, final CalendarResponse response)
       {
@@ -189,6 +193,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
         }
         response.refetchEvents();
         final CalendarFilter filter = form.getFilter();
+        setStartDate(startDate);
         filter.setStartDate(view.getStart());
         filter.setViewType(view.getType());
         // response.getTarget().add(feedbackPanel);
@@ -196,7 +201,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     };
     calendar.setMarkupId("calendar");
     body.add(calendar);
-    //body.add(new EventSourceSelector("selector", calendar));
+    // body.add(new EventSourceSelector("selector", calendar));
 
     form = new CalendarForm(this);
 
@@ -217,7 +222,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
         form.getFilter().setShowBirthdays(true);
       }
     }
-    final DateMidnight startDate = form.getFilter().getStartDate();
+    startDate = form.getFilter().getStartDate();
     if (startDate != null) {
       config.setYear(startDate.getYear());
       config.setMonth(startDate.getMonthOfYear() - 1);
@@ -244,6 +249,33 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     reservations.setEventsProvider(holidayEventsProvider);
     reservations.setEditable(false);
     config.add(reservations);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractSecuredPage#onBeforeRender()
+   */
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
+    // Restore current date (e. g. on reload or on coming back from callee page).
+    final CalendarFilter filter = form.getFilter();
+    if (startDate != null) {
+      final MyFullCalendarConfig config = calendar.getConfig();
+      config.setYear(startDate.getYear());
+      config.setMonth(startDate.getMonthOfYear() - 1);
+      config.setDate(startDate.getDayOfMonth());
+      config.setDefaultView(filter.getViewType().getCode());
+    }
+  }
+
+  /**
+   * @param startDate the startDate to set
+   * @return this for chaining.
+   */
+  public void setStartDate(final DateMidnight startDate)
+  {
+    this.startDate = startDate;
   }
 
   @Override

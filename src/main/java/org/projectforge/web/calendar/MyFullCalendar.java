@@ -23,7 +23,6 @@
 
 package org.projectforge.web.calendar;
 
-import net.ftlines.wicket.fullcalendar.Config;
 import net.ftlines.wicket.fullcalendar.FullCalendar;
 
 public class MyFullCalendar extends FullCalendar
@@ -32,9 +31,18 @@ public class MyFullCalendar extends FullCalendar
    * @param id
    * @param config
    */
-  public MyFullCalendar(final String id, final Config config)
+  public MyFullCalendar(final String id, final MyFullCalendarConfig config)
   {
     super(id, config);
+  }
+
+  /**
+   * @see net.ftlines.wicket.fullcalendar.FullCalendar#getConfig()
+   */
+  @Override
+  public MyFullCalendarConfig getConfig()
+  {
+    return (MyFullCalendarConfig)super.getConfig();
   }
 
   private static final long serialVersionUID = -8152563244661679227L;
