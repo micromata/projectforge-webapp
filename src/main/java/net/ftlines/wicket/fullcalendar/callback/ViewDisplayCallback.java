@@ -20,9 +20,9 @@ import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.request.Request;
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
+import org.projectforge.user.PFUserContext;
 
 
 /**
@@ -33,43 +33,44 @@ import org.joda.time.format.ISODateTimeFormat;
  */
 public abstract class ViewDisplayCallback extends AbstractAjaxCallback implements CallbackWithHandler
 {
-	@Override
-	protected String configureCallbackScript(String script, String urlTail)
-	{
-		return script.replace(
-			urlTail,
-			"&view='+v.name+'&start='+fullCalendarExtIsoDate(v.start)+'&end='+fullCalendarExtIsoDate(v.end)+'&visibleStart='+fullCalendarExtIsoDate(v.visStart)+'&visibleEnd='+fullCalendarExtIsoDate(v.visEnd)+'");
-	}
+  @Override
+  protected String configureCallbackScript(final String script, final String urlTail)
+  {
+    return script.replace(
+        urlTail,
+        "&view='+v.name+'&start='+fullCalendarExtIsoDate(v.start)+'&end='+fullCalendarExtIsoDate(v.end)+'&visibleStart='+fullCalendarExtIsoDate(v.visStart)+'&visibleEnd='+fullCalendarExtIsoDate(v.visEnd)+'");
+  }
 
-	public IModel<String> getHandlerScript()
-	{
-		return new AbstractReadOnlyModel<String>() {
-			@Override
-			public String getObject() {
-				return String.format("function(v) {%s;}", getCallbackScript());
-			}
-		};
-	}
+  public IModel<String> getHandlerScript()
+  {
+    return new AbstractReadOnlyModel<String>() {
+      @Override
+      public String getObject() {
+        return String.format("function(v) {%s;}", getCallbackScript());
+      }
+    };
+  }
 
 
-	@Override
-	protected void respond(AjaxRequestTarget target)
-	{
-		Request r = target.getPage().getRequest();
-		ViewType type = ViewType.forCode(r.getRequestParameters().getParameterValue("view").toString());
-		DateTimeFormatter fmt = ISODateTimeFormat.dateTimeParser().withZone(DateTimeZone.UTC);
-		DateMidnight start = fmt.parseDateTime(r.getRequestParameters().getParameterValue("start").toString())
-			.toDateMidnight();
-		DateMidnight end = fmt.parseDateTime(r.getRequestParameters().getParameterValue("end").toString())
-			.toDateMidnight();
-		DateMidnight visibleStart = fmt.parseDateTime(
-			r.getRequestParameters().getParameterValue("visibleStart").toString()).toDateMidnight();
-		DateMidnight visibleEnd = fmt.parseDateTime(r.getRequestParameters().getParameterValue("visibleEnd").toString())
-			.toDateMidnight();
-		View view = new View(type, start, end, visibleStart, visibleEnd);
-		CalendarResponse response = new CalendarResponse(getCalendar(), target);
-		onViewDisplayed(view, response);
-	}
+  @Override
+  protected void respond(final AjaxRequestTarget target)
+  {
+    final Request r = target.getPage().getRequest();
+    final ViewType type = ViewType.forCode(r.getRequestParameters().getParameterValue("view").toString());
+    // Kai Reinhard: User's time zone needed.
+    final DateTimeFormatter fmt = ISODateTimeFormat.dateTimeParser().withZone(PFUserContext.getDateTimeZone());
+    final DateMidnight start = fmt.parseDateTime(r.getRequestParameters().getParameterValue("start").toString())
+        .toDateMidnight();
+    final DateMidnight end = fmt.parseDateTime(r.getRequestParameters().getParameterValue("end").toString())
+        .toDateMidnight();
+    final DateMidnight visibleStart = fmt.parseDateTime(
+        r.getRequestParameters().getParameterValue("visibleStart").toString()).toDateMidnight();
+    final DateMidnight visibleEnd = fmt.parseDateTime(r.getRequestParameters().getParameterValue("visibleEnd").toString())
+        .toDateMidnight();
+    final View view = new View(type, start, end, visibleStart, visibleEnd);
+    final CalendarResponse response = new CalendarResponse(getCalendar(), target);
+    onViewDisplayed(view, response);
+  }
 
-	protected abstract void onViewDisplayed(View view, CalendarResponse response);
+  protected abstract void onViewDisplayed(View view, CalendarResponse response);
 }
