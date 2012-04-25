@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.joda.time.DateTime;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
@@ -296,6 +297,24 @@ public class DateHelper implements Serializable
     return date;
   }
 
+  /**
+   * Format: {@link DateFormats#ISO_TIMESTAMP_MILLIS}
+   * @param isoDateString
+   * @return Parsed date or null if a parse error occurs.
+   */
+  public static Date parseIsoTimestamp(final String isoDateString, final TimeZone timeZone)
+  {
+    final DateFormat df = new SimpleDateFormat(DateFormats.ISO_TIMESTAMP_MILLIS);
+    df.setTimeZone(timeZone);
+    Date date;
+    try {
+      date = df.parse(isoDateString);
+    } catch (final ParseException ex) {
+      return null;
+    }
+    return date;
+  }
+
   public static String formatIsoTimePeriod(final Date fromDate, final Date toDate)
   {
     return formatIsoDate(fromDate) + ":" + formatIsoDate(toDate);
@@ -518,7 +537,8 @@ public class DateHelper implements Serializable
     return dh.isSameDay(d2);
   }
 
-  public static boolean dateOfYearBetween(final int month, final int dayOfMonth, final int fromMonth, final int fromDayOfMonth, final int toMonth, final int toDayOfMonth)
+  public static boolean dateOfYearBetween(final int month, final int dayOfMonth, final int fromMonth, final int fromDayOfMonth,
+      final int toMonth, final int toDayOfMonth)
   {
     if (fromMonth == toMonth) {
       if (month != fromMonth) {
@@ -549,5 +569,19 @@ public class DateHelper implements Serializable
       }
     }
     return true;
+  }
+
+  /**
+   * Sets given DateTime (UTC) as local time, meaning e. g. 08:00 UTC will be 08:00 local time.
+   * @param dateTime
+   * @return
+   * @see DateTime#toString(String)
+   * @see DateHelper#parseIsoDate(String, TimeZone)
+   */
+  public static long getDateTimeAsMillis(final DateTime dateTime)
+  {
+    final String isDateString = dateTime.toString(DateFormats.ISO_TIMESTAMP_MILLIS);
+    final Date date = DateHelper.parseIsoTimestamp(isDateString, PFUserContext.getTimeZone());
+    return date.getTime();
   }
 }
