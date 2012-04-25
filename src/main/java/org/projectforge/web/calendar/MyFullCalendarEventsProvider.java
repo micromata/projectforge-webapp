@@ -62,6 +62,14 @@ public abstract class MyFullCalendarEventsProvider implements EventProvider
 
   protected abstract void buildEvents(DateTime start, DateTime end);
 
+  /**
+   * Force {@link #buildEvents(DateTime, DateTime)} on next call of {@link #getEvents(DateTime, DateTime)}.
+   */
+  public void forceReload()
+  {
+    this.lastStart = this.lastEnd = null;
+  }
+
   @Override
   public Collection<Event> getEvents(final DateTime start, final DateTime end)
   {
