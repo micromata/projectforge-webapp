@@ -76,6 +76,16 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
   public static final String PARAMETER_KEY_STOP_DATE_IN_MILLIS = "stopMillis";
 
   /**
+   * Key for moving start date.
+   */
+  public static final String PARAMETER_KEY_NEW_START_DATE = "newStartDate";
+
+  /**
+   * Key for moving start date.
+   */
+  public static final String PARAMETER_KEY_NEW_END_DATE = "newEndDate";
+
+  /**
    * Key for preset the description.
    */
   public static final String PARAMETER_KEY_DESCRIPTION = "description";
@@ -116,7 +126,8 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
     init();
   }
 
-  void preInit() {
+  void preInit()
+  {
     if (isNew() == true) {
       final PageParameters parameters = getPageParameters();
       final Integer taskId = WicketUtils.getAsInteger(parameters, PARAMETER_KEY_TASK_ID);
@@ -144,6 +155,15 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
       final int userId = WicketUtils.getAsInt(parameters, PARAMETER_KEY_USER, -1);
       if (userId != -1) {
         timesheetDao.setUser(getData(), userId);
+      }
+    } else {
+      final Long newStartTimeInMillis = WicketUtils.getAsLong(getPageParameters(), PARAMETER_KEY_NEW_START_DATE);
+      final Long newStopTimeInMillis = WicketUtils.getAsLong(getPageParameters(), PARAMETER_KEY_NEW_END_DATE);
+      if (newStartTimeInMillis != null) {
+        getData().setStartDate(newStartTimeInMillis);
+      }
+      if (newStopTimeInMillis != null) {
+        getData().setStopTime(new Timestamp(newStopTimeInMillis));
       }
     }
 
@@ -347,7 +367,7 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
     }
     if (returnToPage instanceof CalendarPage) {
       // If the timesheet is moved, then display the new date as current date in calendar view:
-      ((CalendarPage)returnToPage).setStartDate(new DateMidnight(getData().getStartTime(), PFUserContext.getDateTimeZone()));
+      ((CalendarPage) returnToPage).setStartDate(new DateMidnight(getData().getStartTime(), PFUserContext.getDateTimeZone())).forceReload();
     }
     return null;
   }
