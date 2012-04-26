@@ -61,6 +61,9 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
 
   private long duration;
 
+  // duration by day of month.
+  private final Long[] durations = new Long[32];
+
   /**
    * @param parent For i18n.
    * @param timesheetDao
@@ -82,7 +85,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
   {
     final Integer userId = calFilter.getUserId();
     if (userId == null) {
-      return ;
+      return;
     }
     final TimesheetFilter filter = new TimesheetFilter();
     filter.setUserId(userId);
@@ -91,7 +94,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     filter.setOrderType(OrderDirection.ASC);
     final List<TimesheetDO> timesheets = timesheetDao.getList(filter);
     if (CollectionUtils.isEmpty(timesheets) == true) {
-      return ;
+      return;
     }
     boolean longFormat = false;
     if (Days.daysBetween(start, end).getDays() < 10) {
@@ -119,6 +122,9 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
         event.setTitle(title);
       }
       events.put(id, event);
+      final long dur = timesheet.getDuration();
+      duration += dur;
+      durations[startTime.getDayOfMonth()] += dur;
     }
   }
 
@@ -182,5 +188,22 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
       buf.append("; \n").append(task.getTitle());
     }
     return buf.toString();
+  }
+
+  /**
+   * @return the duration
+   */
+  public long getDuration()
+  {
+    return duration;
+  }
+
+  /**
+   * @param dayOfMonth
+   * @see DateTime#getDayOfMonth()
+   */
+  public long getDuration(final int dayOfMonth)
+  {
+    return durations[dayOfMonth];
   }
 }
