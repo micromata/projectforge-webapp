@@ -53,7 +53,6 @@ import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.HtmlCommentPanel;
 import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
-import org.projectforge.web.wicket.flowlayout.TextPanel;
 
 public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, TimesheetListPage>
 {
@@ -177,7 +176,7 @@ public class TimesheetListForm extends AbstractListForm<TimesheetListFilter, Tim
       final QuickSelectPanel quickSelectPanel = new QuickSelectPanel(fs.newChildId(), parentPage, "quickSelect", startDate);
       fs.add(quickSelectPanel);
       quickSelectPanel.init();
-      fs.add(new TextPanel(fs.newChildId(), new Model<String>() {
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         @Override
         public String getObject()
         {
