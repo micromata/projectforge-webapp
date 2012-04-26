@@ -5,12 +5,15 @@
 
 <body>
   <wicket:extend>
-    <div class="grid_16">
-      <div class="alert alert_red feedback" wicket:id="feedback"></div>
-    </div>
-    <div class="grid_16 box">
-      <div wicket:id="cal"></div>
-    </div>
+    <form wicket:id="form" name="form">
+      <div class="grid_16">
+        <div class="alert alert_red feedback" wicket:id="feedback"></div>
+      </div>
+      <div class="grid_16 box">
+        <wicket:container wicket:id="flowform">[the form fields]</wicket:container>
+        <wicket:container wicket:id="cal"></wicket:container>
+      </div>
+    </form>
   </wicket:extend>
 </body>
 </html>

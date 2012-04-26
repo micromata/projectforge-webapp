@@ -23,34 +23,9 @@
 
 package org.projectforge.web.calendar;
 
-import java.sql.Timestamp;
-
-import net.ftlines.wicket.fullcalendar.CalendarResponse;
-import net.ftlines.wicket.fullcalendar.Event;
-import net.ftlines.wicket.fullcalendar.EventSource;
-import net.ftlines.wicket.fullcalendar.callback.ClickedEvent;
-import net.ftlines.wicket.fullcalendar.callback.DroppedEvent;
-import net.ftlines.wicket.fullcalendar.callback.ResizedEvent;
-import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
-import net.ftlines.wicket.fullcalendar.callback.View;
-
-import org.apache.wicket.markup.html.panel.FeedbackPanel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateMidnight;
-import org.joda.time.DateTime;
-import org.projectforge.address.AddressDao;
-import org.projectforge.common.DateHelper;
-import org.projectforge.common.NumberHelper;
-import org.projectforge.timesheet.TimesheetDO;
-import org.projectforge.timesheet.TimesheetDao;
-import org.projectforge.user.ProjectForgeGroup;
-import org.projectforge.web.address.AddressViewPage;
-import org.projectforge.web.address.BirthdayEventsProvider;
 import org.projectforge.web.fibu.ISelectCallerPage;
-import org.projectforge.web.timesheet.TimesheetEditPage;
-import org.projectforge.web.timesheet.TimesheetEventsProvider;
-import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 
 public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPage
@@ -61,27 +36,11 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
 
   private static final String USERPREF_KEY = "CalendarPage.userPrefs";
 
-  @SpringBean(name = "timesheetDao")
-  private TimesheetDao timesheetDao;
-
-  @SpringBean(name = "addressDao")
-  private AddressDao addressDao;
-
   private CalendarForm form;
 
-  private DateMidnight startDate;
-
-  private MyFullCalendar calendar;
+  private CalendarPanel calendarPanel;
 
   protected final PageParameters pageParameters;
-
-  private BirthdayEventsProvider birthdayEventsProvider;
-
-  private HolidayEventsProvider holidayEventsProvider;
-
-  private TimesheetEventsProvider timesheetEventsProvider;
-
-  private boolean refresh;
 
   public CalendarPage(final PageParameters parameters)
   {
@@ -90,149 +49,19 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     init();
   }
 
-  @SuppressWarnings("serial")
   public void init()
   {
-    final FeedbackPanel feedbackPanel = new FeedbackPanel("feedback") {
-      /**
-       * @see org.apache.wicket.Component#isVisible()
-       */
-      @Override
-      public boolean isVisible()
-      {
-        return false;
-      }
-    };
-    feedbackPanel.setOutputMarkupId(true);
-    body.add(feedbackPanel);
-    final MyFullCalendarConfig config = new MyFullCalendarConfig(this);
-    config.setSelectable(true);
-    config.setSelectHelper(true);
-
-    config.setLoading("function(bool) { if (bool) $(\"#loading\").show(); else $(\"#loading\").hide(); }");
-
-    // config.setMinTime(new LocalTime(6, 30));
-    // config.setMaxTime(new LocalTime(17, 30));
-    config.setAllDaySlot(true);
-    calendar = new MyFullCalendar("cal", config) {
-      @Override
-      protected void onDateRangeSelected(final SelectedRange range, final CalendarResponse response)
-      {
-        if (log.isDebugEnabled() == true) {
-          log.debug("Selected region: " + range.getStart() + " - " + range.getEnd() + " / allDay: " + range.isAllDay());
-        }
-        final PageParameters parameters = new PageParameters();
-        parameters.add(TimesheetEditPage.PARAMETER_KEY_START_DATE_IN_MILLIS, DateHelper.getDateTimeAsMillis(range.getStart()));
-        parameters.add(TimesheetEditPage.PARAMETER_KEY_STOP_DATE_IN_MILLIS, DateHelper.getDateTimeAsMillis(range.getEnd()));
-        if (getFilter().getUserId() != null) {
-          parameters.add(TimesheetEditPage.PARAMETER_KEY_USER, getFilter().getUserId());
-        }
-        final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
-        timesheetEditPage.setReturnToPage(CalendarPage.this);
-        setResponsePage(timesheetEditPage);
-      }
-
-      /**
-       * Event was moved, a new start time was chosen.
-       * @see net.ftlines.wicket.fullcalendar.FullCalendar#onEventDropped(net.ftlines.wicket.fullcalendar.callback.DroppedEvent,
-       *      net.ftlines.wicket.fullcalendar.CalendarResponse)
-       */
-      @Override
-      protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response)
-      {
-        if (log.isDebugEnabled() == true) {
-          log.debug("Event drop. eventId: "
-              + event.getEvent().getId()
-              + " sourceId: "
-              + event.getSource().getUuid()
-              + " dayDelta: "
-              + event.getDaysDelta()
-              + " minuteDelta: "
-              + event.getMinutesDelta()
-              + " allDay: "
-              + event.isAllDay());
-          log.debug("Original start time: " + event.getEvent().getStart() + ", original end time: " + event.getEvent().getEnd());
-          log.debug("New start time: " + event.getNewStartTime() + ", new end time: " + event.getNewEndTime());
-        }
-        modifyEvent(event.getEvent(), event.getNewStartTime(), event.getNewEndTime());
-        return false;
-      }
-
-      @Override
-      protected boolean onEventResized(final ResizedEvent event, final CalendarResponse response)
-      {
-        if (log.isDebugEnabled() == true) {
-          log.debug("Event resized. eventId: "
-              + event.getEvent().getId()
-              + " sourceId: "
-              + event.getSource().getUuid()
-              + " dayDelta: "
-              + event.getDaysDelta()
-              + " minuteDelta: "
-              + event.getMinutesDelta());
-        }
-        modifyEvent(event.getEvent(), null, event.getNewEndTime());
-        return false;
-      }
-
-      @Override
-      protected void onEventClicked(final ClickedEvent event, final CalendarResponse response)
-      {
-        if (log.isDebugEnabled() == true) {
-          log.debug("Event clicked. eventId: " + event.getEvent().getId() + ", sourceId: " + event.getSource().getUuid());
-        }
-        final String eventId = event.getEvent().getId();
-        if (eventId != null && eventId.startsWith("ts-") == true) {
-          // User clicked on a time sheet, show the time sheet:
-          final Integer id = NumberHelper.parseInteger(eventId.substring(3));
-          final PageParameters parameters = new PageParameters();
-          parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
-          final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
-          timesheetEditPage.setReturnToPage(CalendarPage.this);
-          setResponsePage(timesheetEditPage);
-          return;
-        }
-        if (eventId != null && eventId.startsWith("b-") == true) {
-          // User clicked on birthday, show the address:
-          final Integer id = NumberHelper.parseInteger(eventId.substring(2));
-          final PageParameters parameters = new PageParameters();
-          parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
-          final AddressViewPage addressViewPage = new AddressViewPage(parameters);
-          setResponsePage(addressViewPage);
-          addressViewPage.setReturnToPage(CalendarPage.this);
-          return;
-        }
-        response.refetchEvents();
-      }
-
-      @Override
-      protected void onViewDisplayed(final View view, final CalendarResponse response)
-      {
-        if (log.isDebugEnabled() == true) {
-          log.debug("View displayed. viewType: " + view.getType().name() + ", start: " + view.getStart() + ", end: " + view.getEnd());
-        }
-        response.refetchEvents();
-        final CalendarFilter filter = form.getFilter();
-        setStartDate(view.getStart());
-        filter.setStartDate(startDate);
-        filter.setViewType(view.getType());
-      }
-    };
-    calendar.setMarkupId("calendar");
-    body.add(calendar);
-    // body.add(new EventSourceSelector("selector", calendar));
-
     form = new CalendarForm(this);
-
-    // body.add(form);
+    body.add(form);
     CalendarFilter filter = (CalendarFilter) getUserPrefEntry(USERPREF_KEY);
     if (filter == null) {
       filter = new CalendarFilter();
       putUserPrefEntry(USERPREF_KEY, filter, true);
     }
     form.setFilter(filter);
-    // form.init();
-
+    form.init();
+    calendarPanel = new CalendarPanel("cal", getFilter());
+    form.add(calendarPanel);
     if (pageParameters != null) {
       if (pageParameters.get("showTimesheets") != null) {
         form.getFilter().setUserId(getUserId());
@@ -240,92 +69,6 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
       if (pageParameters.get("showBirthdays") != null) {
         form.getFilter().setShowBirthdays(true);
       }
-    }
-    startDate = form.getFilter().getStartDate();
-    if (startDate != null) {
-      config.setYear(startDate.getYear());
-      config.setMonth(startDate.getMonthOfYear() - 1);
-      config.setDate(startDate.getDayOfMonth());
-    }
-    config.setDefaultView(filter.getViewType().getCode());
-
-    EventSource reservations = new EventSource();
-    timesheetEventsProvider = new TimesheetEventsProvider(this, timesheetDao, form.getFilter());
-    reservations.setEventsProvider(timesheetEventsProvider);
-    reservations.setEditable(true);
-    config.add(reservations);
-    reservations = new EventSource();
-    birthdayEventsProvider = new BirthdayEventsProvider(this, addressDao,
-        accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == false);
-    reservations.setEventsProvider(birthdayEventsProvider);
-    reservations.setEditable(false);
-    reservations.setBackgroundColor("#EEEEEE");
-    reservations.setColor("#EEEEEE");
-    reservations.setTextColor("#222222");
-    config.add(reservations);
-    reservations = new EventSource();
-    holidayEventsProvider = new HolidayEventsProvider(this);
-    reservations.setEventsProvider(holidayEventsProvider);
-    reservations.setEditable(false);
-    config.add(reservations);
-  }
-
-  private void modifyEvent(final Event event, final DateTime newStartTime, final DateTime newEndTime)
-  {
-    final String eventId = event.getId();
-    if (eventId != null && eventId.startsWith("ts-") == true) {
-      // User clicked on a time sheet, show the time sheet:
-      final Integer id = NumberHelper.parseInteger(eventId.substring(3));
-      final TimesheetDO dbTimesheet = timesheetDao.internalGetById(id);
-      if (dbTimesheet == null) {
-        return;
-      }
-      final TimesheetDO timesheet = new TimesheetDO();
-      timesheet.copyValuesFrom(dbTimesheet);
-      final Long newStartTimeMillis = newStartTime != null ? DateHelper.getDateTimeAsMillis(newStartTime) : null;
-      final Long newEndTimeMillis = newEndTime != null ? DateHelper.getDateTimeAsMillis(newEndTime) : null;
-      if (newStartTimeMillis != null) {
-        timesheet.setStartDate(newStartTimeMillis);
-      }
-      if (newEndTimeMillis != null) {
-        timesheet.setStopTime(new Timestamp(newEndTimeMillis));
-      }
-      if (timesheetDao.hasUpdateAccess(getUser(), timesheet, dbTimesheet, false) == false) {
-        // User has no update access, therefore ignore this request...
-        return;
-      }
-      final PageParameters parameters = new PageParameters();
-      parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
-      if (newStartTime != null) {
-        parameters.add(TimesheetEditPage.PARAMETER_KEY_NEW_START_DATE, DateHelper.getDateTimeAsMillis(newStartTime));
-      }
-      if (newEndTime != null) {
-        parameters.add(TimesheetEditPage.PARAMETER_KEY_NEW_END_DATE, DateHelper.getDateTimeAsMillis(newEndTime));
-      }
-      final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
-      timesheetEditPage.setReturnToPage(CalendarPage.this);
-      setResponsePage(timesheetEditPage);
-    }
-
-  }
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractSecuredPage#onBeforeRender()
-   */
-  @Override
-  protected void onBeforeRender()
-  {
-    super.onBeforeRender();
-    // Restore current date (e. g. on reload or on coming back from callee page).
-    if (startDate != null) {
-      final MyFullCalendarConfig config = calendar.getConfig();
-      config.setYear(startDate.getYear());
-      config.setMonth(startDate.getMonthOfYear() - 1);
-      config.setDate(startDate.getDayOfMonth());
-    }
-    if (refresh == true) {
-      refresh = false;
-      timesheetEventsProvider.forceReload();
     }
   }
 
@@ -335,7 +78,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
    */
   public CalendarPage setStartDate(final DateMidnight startDate)
   {
-    this.startDate = startDate;
+    calendarPanel.setStartDate(startDate);
     return this;
   }
 
@@ -346,7 +89,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
    */
   public CalendarPage forceReload()
   {
-    this.refresh = true;
+    calendarPanel.forceReload();
     return this;
   }
 
@@ -369,6 +112,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
   {
     if ("userId".equals(property) == true) {
       getFilter().setUserId((Integer) selectedValue);
+      forceReload();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
@@ -378,6 +122,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
   {
     if ("userId".equals(property) == true) {
       getFilter().setUserId(null);
+      forceReload();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }

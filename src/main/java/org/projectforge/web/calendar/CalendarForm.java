@@ -23,26 +23,20 @@
 
 package org.projectforge.web.calendar;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.wicket.markup.html.link.ExternalLink;
-import org.apache.wicket.markup.html.link.Link;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
-import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
-import org.projectforge.calendar.MonthHolder;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
-import org.projectforge.user.UserGroupCache;
-import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
-import org.projectforge.web.wicket.WebConstants;
-import org.projectforge.web.wicket.components.TooltipImage;
-import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
-import org.projectforge.web.wicket.flowlayout.IconType;
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.GridBuilder;
 
 public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 {
@@ -51,113 +45,125 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   @SpringBean(name = "accessChecker")
   private AccessChecker accessChecker;
 
-  @SpringBean(name = "userGroupCache")
-  private UserGroupCache userGroupCache;
-
   private CalendarFilter filter;
+
+  private GridBuilder gridBuilder;
+
+  @SuppressWarnings("unused")
+  private boolean showTimesheets;
 
   @SuppressWarnings("serial")
   @Override
   protected void init()
   {
     super.init();
-    final Link<Void> showBirthdaysButton = new Link<Void>("showBirthdays") {
-      @Override
-      public void onClick()
-      {
-        getFilter().setShowBirthdays(true);
-      }
-
-      @Override
-      public boolean isVisible()
-      {
-        return !getFilter().isShowBirthdays();
-      }
-    };
-    //add(showBirthdaysButton);
-    showBirthdaysButton.add(new TooltipImage("showBirthdaysImage", getResponse(), WebConstants.IMAGE_BIRTHDAY,
-        getString("tooltip.showBirthdays")));
-    final Link<Void> hideBirthdaysButton = new Link<Void>("hideBirthdays") {
-      @Override
-      public void onClick()
-      {
-        getFilter().setShowBirthdays(false);
-      }
-
-      @Override
-      public boolean isVisible()
-      {
-        return getFilter().isShowBirthdays();
-      }
-    };
-    //add(hideBirthdaysButton);
-    hideBirthdaysButton.add(new TooltipImage("hideBirthdaysImage", getResponse(), WebConstants.IMAGE_BIRTHDAY_DELETE,
-        getString("tooltip.hideBirthdays")));
-
-    final PFUserDO user = PFUserContext.getUser();
-
-    if (WebConfiguration.isDevelopmentMode() == true && StringUtils.isNotBlank(user.getStayLoggedInKey())) {
-      final String contextPath = WebApplication.get().getServletContext().getContextPath();
-      final String iCalTarget = contextPath + "/export/ical?user=" + user.getUsername() + "&key=" + user.getStayLoggedInKey();
-      final ExternalLink exportCalendar = new ExternalLink("exportCalendar", iCalTarget);
-      exportCalendar.add(new TooltipImage("exportCalendarImage", getResponse(), WebConstants.IMAGE_CALENDAR,
-          getString("tooltip.exportCalendar")));
-      //add(exportCalendar);
+    addFeedbackPanel();
+    final RepeatingView repeater = new RepeatingView("flowform");
+    add(repeater);
+    gridBuilder = newGridBuilder(repeater);
+    gridBuilder.newGrid16().newColumnsPanel().newColumnPanel(DivType.COL_75);
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
+    if (isOtherUsersAllowed() == true) {
+      final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(this, "timesheetsUser"),
+          parentPage, "userId");
+      fs.add(userSelectPanel);
+      userSelectPanel.init().withAutoSubmit(true).setLabel(new Model<String>(getString("user")));
     } else {
-      //add(new ExternalLink("exportCalendar", "invisible").setVisible(false));
-    }
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+      checkBoxPanel.add(new CheckBoxPanel(DivPanel.CHILD_ID, new PropertyModel<Boolean>(filter, "showTimesheets"),
+          getString("calendar.timesheeets")) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#wantOnSelectionChangedNotifications()
+         */
+        @Override
+        protected boolean wantOnSelectionChangedNotifications()
+        {
+          return true;
+        }
 
-    showTimesheetFilterElements();
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged()
+         */
+        @Override
+        protected void onSelectionChanged(final Boolean newSelection)
+        {
+          if (Boolean.TRUE.equals(newSelection) == true) {
+            filter.setUserId(getUserId());
+          } else {
+            filter.setUserId(null);
+          }
+        }
+      });
+    }
+    //    gridBuilder.newColumnPanel(DivType.COL_25);
+    //    final DivTextPanel durationPanel = new DivTextPanel(gridBuilder.getPanel().CHILD_ID, new Label(DivTextPanel.WICKET_ID, new Model<String>() {
+    //      @Override
+    //      public String getObject()
+    //      {
+    //        if (StringUtils.isEmpty(parentPage.getFormattedMonthDuration()) == true) {
+    //          return "";
+    //        }
+    //        return parentPage.getFormattedMonthDuration()
+    //            + " ("
+    //            + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getBegin(),
+    //                DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))
+    //                + "-"
+    //                + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getEnd(),
+    //                    DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))
+    //                    + ")";
+    //      }
+    //    }));
+    // final Link<Void> showBirthdaysButton = new Link<Void>("showBirthdays") {
+    // @Override
+    // public void onClick()
+    // {
+    // getFilter().setShowBirthdays(true);
+    // }
+    //
+    // @Override
+    // public boolean isVisible()
+    // {
+    // return !getFilter().isShowBirthdays();
+    // }
+    // };
+    // // add(showBirthdaysButton);
+    // showBirthdaysButton.add(new TooltipImage("showBirthdaysImage", getResponse(), WebConstants.IMAGE_BIRTHDAY,
+    // getString("tooltip.showBirthdays")));
+    // final Link<Void> hideBirthdaysButton = new Link<Void>("hideBirthdays") {
+    // @Override
+    // public void onClick()
+    // {
+    // getFilter().setShowBirthdays(false);
+    // }
+    //
+    // @Override
+    // public boolean isVisible()
+    // {
+    // return getFilter().isShowBirthdays();
+    // }
+    // };
+    // // add(hideBirthdaysButton);
+    // hideBirthdaysButton.add(new TooltipImage("hideBirthdaysImage", getResponse(), WebConstants.IMAGE_BIRTHDAY_DELETE,
+    // getString("tooltip.hideBirthdays")));
+    //
+    // final PFUserDO user = PFUserContext.getUser();
+    //
+    // if (WebConfiguration.isDevelopmentMode() == true && StringUtils.isNotBlank(user.getStayLoggedInKey())) {
+    // final String contextPath = WebApplication.get().getServletContext().getContextPath();
+    // final String iCalTarget = contextPath + "/export/ical?user=" + user.getUsername() + "&key=" + user.getStayLoggedInKey();
+    // final ExternalLink exportCalendar = new ExternalLink("exportCalendar", iCalTarget);
+    // exportCalendar.add(new TooltipImage("exportCalendarImage", getResponse(), WebConstants.IMAGE_CALENDAR,
+    // getString("tooltip.exportCalendar")));
+    // // add(exportCalendar);
+    // } else {
+    // // add(new ExternalLink("exportCalendar", "invisible").setVisible(false));
+    // }
   }
 
   private boolean isOtherUsersAllowed()
   {
     return accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP,
         ProjectForgeGroup.PROJECT_MANAGER);
-  }
-
-  @SuppressWarnings("serial")
-  private void showTimesheetFilterElements()
-  {
-    final UserSelectPanel userSelectPanel = new UserSelectPanel("timesheetsUser", new PropertyModel<PFUserDO>(this, "timesheetsUser"),
-        parentPage, "userId") {
-      @Override
-      public boolean isVisible()
-      {
-        return isOtherUsersAllowed();
-      }
-    };
-    add(userSelectPanel);
-    userSelectPanel.init().withAutoSubmit(true).setLabel(new Model<String>(getString("user")));
-    final IconButtonPanel toggleTimesheetsButton = new IconButtonPanel("toggleTimesheets", IconType.CLIPBOARD, new Model<String>() {
-      @Override
-      public String getObject()
-      {
-        if (getFilter().getUserId() == null) {
-          return getString("calendar.tooltip.showTimesheeets");
-        } else {
-          return getString("calendar.tooltip.hideTimesheeets");
-        }
-      }
-    }) {
-      @Override
-      public void onSubmit()
-      {
-        if (getFilter().getUserId() == null) {
-          getFilter().setUserId(getUser().getId());
-        } else {
-          getFilter().setUserId(null);
-        }
-      }
-
-      @Override
-      public boolean isVisible()
-      {
-        return isOtherUsersAllowed() == false;
-      }
-    };
-    // toggleTimesheetsButton.appendCssClass("shaded");
-    add(toggleTimesheetsButton.setLight());
   }
 
   public CalendarForm(final CalendarPage parentPage)
@@ -173,29 +179,5 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   void setFilter(final CalendarFilter filter)
   {
     this.filter = filter;
-  }
-
-  private MonthHolder getMonthHolder()
-  {
-    return null;// parentPage.getMonthHolder();
-  }
-
-  public void refresh()
-  {
-  }
-
-  public PFUserDO getTimesheetsUser()
-  {
-    final Integer userId = getFilter().getUserId();
-    return userId != null ? userGroupCache.getUser(userId) : null;
-  }
-
-  public void setTimesheetsUser(final PFUserDO user)
-  {
-    if (user == null) {
-      getFilter().setUserId(null);
-    } else {
-      getFilter().setUserId(user.getId());
-    }
   }
 }
