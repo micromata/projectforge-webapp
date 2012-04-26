@@ -71,7 +71,7 @@ public abstract class AbstractSecuredBasePage extends AbstractUnsecureBasePage
    * @see MySession#getUser()
    */
   @Override
-  protected PFUserDO getUser()
+  public PFUserDO getUser()
   {
     return getMySession().getUser();
   }
