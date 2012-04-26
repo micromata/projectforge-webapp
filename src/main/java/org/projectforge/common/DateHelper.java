@@ -537,6 +537,26 @@ public class DateHelper implements Serializable
     return dh.isSameDay(d2);
   }
 
+  /**
+   * @param d1
+   * @param d2
+   * @return True if the dates are both null or both represents the same day (year, month, day) independant of the hours, minutes etc.
+   * @see DateHolder#isSameDay(Date)
+   */
+  public static boolean isSameDay(final DateTime d1, final DateTime d2)
+  {
+    if (d1 == null) {
+      if (d2 == null) {
+        return true;
+      } else {
+        return false;
+      }
+    } else if (d2 == null) {
+      return false;
+    }
+    return d1.getYear() == d2.getYear() && d1.getDayOfYear() == d2.getDayOfYear();
+  }
+
   public static boolean dateOfYearBetween(final int month, final int dayOfMonth, final int fromMonth, final int fromDayOfMonth,
       final int toMonth, final int toDayOfMonth)
   {
