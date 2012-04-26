@@ -30,6 +30,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
@@ -44,6 +45,9 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 
   @SpringBean(name = "accessChecker")
   private AccessChecker accessChecker;
+
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
 
   private CalendarFilter filter;
 
@@ -179,5 +183,20 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   void setFilter(final CalendarFilter filter)
   {
     this.filter = filter;
+  }
+
+  public PFUserDO getTimesheetsUser()
+  {
+    final Integer userId = getFilter().getUserId();
+    return userId != null ? userGroupCache.getUser(userId) : null;
+  }
+
+  public void setTimesheetsUser(final PFUserDO user)
+  {
+    if (user == null) {
+      getFilter().setUserId(null);
+    } else {
+      getFilter().setUserId(user.getId());
+    }
   }
 }
