@@ -60,8 +60,9 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     }
     form.setFilter(filter);
     form.init();
-    calendarPanel = new CalendarPanel("cal", getFilter());
+    calendarPanel = new CalendarPanel("cal");
     form.add(calendarPanel);
+    calendarPanel.init(getFilter());
     if (pageParameters != null) {
       if (pageParameters.get("showTimesheets") != null) {
         form.getFilter().setUserId(getUserId());

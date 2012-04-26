@@ -82,10 +82,14 @@ public class CalendarPanel extends Panel
 
   private boolean refresh;
 
-  @SuppressWarnings("serial")
-  public CalendarPanel(final String id, final CalendarFilter filter)
+  public CalendarPanel(final String id)
   {
     super(id);
+  }
+
+  @SuppressWarnings("serial")
+  void init(final CalendarFilter filter)
+  {
     final MyFullCalendarConfig config = new MyFullCalendarConfig(this);
     config.setSelectable(true);
     config.setSelectHelper(true);
