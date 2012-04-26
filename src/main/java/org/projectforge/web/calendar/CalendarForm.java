@@ -70,7 +70,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       userSelectPanel.init().withAutoSubmit(true).setLabel(new Model<String>(getString("user")));
     } else {
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(new CheckBoxPanel(DivPanel.CHILD_ID, new PropertyModel<Boolean>(filter, "showTimesheets"),
+      checkBoxPanel.add(new CheckBoxPanel(DivPanel.CHILD_ID, new PropertyModel<Boolean>(this, "showTimesheets"),
           getString("calendar.timesheeets")) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#wantOnSelectionChangedNotifications()
