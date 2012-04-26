@@ -23,6 +23,7 @@
 
 package org.projectforge.web.wicket;
 
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.image.ContextImage;
@@ -55,6 +56,8 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
    */
   protected MyComponentsRepeater<ContentMenuEntryPanel> contentMenu;
 
+  protected WebMarkupContainer contentMenuContainer, contentRightMenuContainer;
+
   /**
    * List to create content menu in the desired order before creating the RepeatingView.
    */
@@ -65,6 +68,7 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
    */
   protected WebPage returnToPage;
 
+  @SuppressWarnings("serial")
   public AbstractSecuredPage(final PageParameters parameters)
   {
     super(parameters);
@@ -113,11 +117,24 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
       };
     };
     body.add(logoutLink);
-
+    contentMenuContainer = new WebMarkupContainer("contentMenu") {
+      @Override
+      public boolean isVisible() {
+        return contentMenu.hasEntries() == true || contentRightMenu.hasEntries() == true;
+      };
+    };
+    body.add(contentMenuContainer);
     contentMenu = new MyComponentsRepeater<ContentMenuEntryPanel>("contentMenuRepeater");
-    body.add(contentMenu.getRepeatingView());
+    contentMenuContainer.add(contentMenu.getRepeatingView());
+    contentRightMenuContainer = new WebMarkupContainer("contentRightMenu") {
+      @Override
+      public boolean isVisible() {
+        return contentMenu.hasEntries() == true || contentRightMenu.hasEntries() == true;
+      };
+    };
+    body.add(contentRightMenuContainer);
     contentRightMenu = new MyComponentsRepeater<ContentMenuEntryPanel>("contentRightMenuRepeater");
-    body.add(contentRightMenu.getRepeatingView());
+    contentRightMenuContainer.add(contentRightMenu.getRepeatingView());
   }
 
   /**
