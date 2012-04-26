@@ -59,10 +59,10 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
 
   private final CalendarFilter calFilter;
 
-  private long duration;
+  private long totalDuration;
 
   // duration by day of month.
-  private final Long[] durations = new Long[32];
+  private final long[] durationsPerDayOfMonth = new long[32];
 
   /**
    * @param parent For i18n.
@@ -123,8 +123,8 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
       }
       events.put(id, event);
       final long dur = timesheet.getDuration();
-      duration += dur;
-      durations[startTime.getDayOfMonth()] += dur;
+      totalDuration += dur;
+      addDuration(startTime.getDayOfMonth(), dur);
     }
   }
 
@@ -195,7 +195,12 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
    */
   public long getDuration()
   {
-    return duration;
+    return totalDuration;
+  }
+
+  private void addDuration(final int dayOfMonth, final long duration)
+  {
+    durationsPerDayOfMonth[dayOfMonth] += duration;
   }
 
   /**
@@ -204,6 +209,6 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
    */
   public long getDuration(final int dayOfMonth)
   {
-    return durations[dayOfMonth];
+    return durationsPerDayOfMonth[dayOfMonth];
   }
 }
