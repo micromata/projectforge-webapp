@@ -33,6 +33,7 @@ import net.ftlines.wicket.fullcalendar.EventProvider;
 
 import org.apache.wicket.Component;
 import org.joda.time.DateTime;
+import org.projectforge.common.DateHelper;
 
 /**
  * Creates events for FullCalendar.
@@ -73,7 +74,10 @@ public abstract class MyFullCalendarEventsProvider implements EventProvider
   @Override
   public Collection<Event> getEvents(final DateTime start, final DateTime end)
   {
-    if (this.lastStart != null && this.lastEnd != null && this.lastStart.isEqual(start) == true && this.lastEnd.isEqual(end) == true) {
+    if (this.lastStart != null
+        && this.lastEnd != null
+        && DateHelper.isSameDay(this.lastStart, start) == true
+        && DateHelper.isSameDay(this.lastEnd, end) == true) {
       // Nothing to be done.
       return events.values();
     }

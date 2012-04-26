@@ -36,9 +36,9 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
 
   private static final String USERPREF_KEY = "CalendarPage.userPrefs";
 
-  private CalendarForm form;
+  protected CalendarForm form;
 
-  private CalendarPanel calendarPanel;
+  protected CalendarPanel calendarPanel;
 
   protected final PageParameters pageParameters;
 

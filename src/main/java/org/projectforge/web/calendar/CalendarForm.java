@@ -23,6 +23,7 @@
 
 package org.projectforge.web.calendar;
 
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -35,6 +36,7 @@ import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
+import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.GridBuilder;
@@ -55,6 +57,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 
   @SuppressWarnings("unused")
   private boolean showTimesheets;
+
+  Label durationLabel;
 
   @SuppressWarnings("serial")
   @Override
@@ -99,24 +103,16 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
         }
       });
     }
-    //    gridBuilder.newColumnPanel(DivType.COL_25);
-    //    final DivTextPanel durationPanel = new DivTextPanel(gridBuilder.getPanel().CHILD_ID, new Label(DivTextPanel.WICKET_ID, new Model<String>() {
-    //      @Override
-    //      public String getObject()
-    //      {
-    //        if (StringUtils.isEmpty(parentPage.getFormattedMonthDuration()) == true) {
-    //          return "";
-    //        }
-    //        return parentPage.getFormattedMonthDuration()
-    //            + " ("
-    //            + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getBegin(),
-    //                DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))
-    //                + "-"
-    //                + DateTimeFormatter.instance().getFormattedDate(getMonthHolder().getEnd(),
-    //                    DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))
-    //                    + ")";
-    //      }
-    //    }));
+    gridBuilder.newColumnPanel(DivType.COL_25);
+    final DivTextPanel durationPanel = new DivTextPanel(DivPanel.CHILD_ID, new Label(DivTextPanel.WICKET_ID, new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return parentPage.calendarPanel.getTotalTimesheetDuration();
+      }
+    }));
+    durationLabel = durationPanel.getLabel4Ajax();
+    gridBuilder.getPanel().add(durationPanel);
     // final Link<Void> showBirthdaysButton = new Link<Void>("showBirthdays") {
     // @Override
     // public void onClick()

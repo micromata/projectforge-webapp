@@ -200,6 +200,10 @@ public class CalendarPanel extends Panel
         setStartDate(view.getStart());
         filter.setStartDate(startDate);
         filter.setViewType(view.getType());
+        // Need calling getEvents for getting correct duration label, it's not predictable what will be called first: onViewDisplayed or
+        // getEvents.
+        timesheetEventsProvider.getEvents(view.getVisibleStart().toDateTime(), view.getVisibleEnd().toDateTime());
+        response.getTarget().add(((CalendarPage) getPage()).form.durationLabel);
       }
     };
     calendar.setMarkupId("calendar");
@@ -273,7 +277,6 @@ public class CalendarPanel extends Panel
       timesheetEditPage.setReturnToPage((WebPage) getPage());
       setResponsePage(timesheetEditPage);
     }
-
   }
 
   /**
@@ -315,5 +318,10 @@ public class CalendarPanel extends Panel
   {
     this.refresh = true;
     return this;
+  }
+
+  public String getTotalTimesheetDuration()
+  {
+    return timesheetEventsProvider.formatDuration(timesheetEventsProvider.getTotalDuration());
   }
 }

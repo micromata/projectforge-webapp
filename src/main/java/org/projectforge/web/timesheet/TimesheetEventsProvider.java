@@ -33,6 +33,8 @@ import org.apache.wicket.Component;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.projectforge.calendar.TimePeriod;
+import org.projectforge.common.DateFormatType;
+import org.projectforge.common.DateFormats;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.OrderDirection;
 import org.projectforge.fibu.ProjektDO;
@@ -44,6 +46,7 @@ import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.CalendarFilter;
+import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 
 /**
@@ -60,6 +63,10 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
   private final CalendarFilter calFilter;
 
   private long totalDuration;
+
+  private Integer month;
+
+  private DateTime firstDayOfMonth;
 
   // duration by day of month.
   private final long[] durationsPerDayOfMonth = new long[32];
@@ -83,6 +90,10 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
   @Override
   protected void buildEvents(final DateTime start, final DateTime end)
   {
+    totalDuration = 0;
+    for (int i = 0; i < durationsPerDayOfMonth.length; i++) {
+      durationsPerDayOfMonth[i] = 0;
+    }
     final Integer userId = calFilter.getUserId();
     if (userId == null) {
       return;
@@ -100,6 +111,14 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     if (Days.daysBetween(start, end).getDays() < 10) {
       // Week or day view:
       longFormat = true;
+      month = null;
+      firstDayOfMonth = null;
+    } else {
+      // Month view:
+      final DateTime currentMonth = new DateTime(start.plusDays(10), PFUserContext.getDateTimeZone()); // Now we're definitely in the right
+      // month.
+      month = currentMonth.getMonthOfYear();
+      firstDayOfMonth = currentMonth.withDayOfMonth(1);
     }
     for (final TimesheetDO timesheet : timesheets) {
       final DateTime startTime = new DateTime(timesheet.getStartTime(), PFUserContext.getDateTimeZone());
@@ -123,8 +142,10 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
       }
       events.put(id, event);
       final long dur = timesheet.getDuration();
-      totalDuration += dur;
-      addDuration(startTime.getDayOfMonth(), dur);
+      if (month == null || stopTime.getMonthOfYear() == month) {
+        totalDuration += dur;
+        addDuration(startTime.getDayOfMonth(), dur);
+      }
     }
   }
 
@@ -136,6 +157,16 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
       buf.append(fields[0]).append(getString("calendar.unit.day")).append(" ");
     }
     buf.append(fields[1]).append(":").append(StringHelper.format2DigitNumber(fields[2])).append(getString("calendar.unit.hour"));
+    if (firstDayOfMonth != null) {
+      buf.append(" (")
+      .append(
+          DateTimeFormatter.instance().getFormattedDate(firstDayOfMonth.toDate(),
+              DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR)))
+              .append("-")
+              .append(
+                  DateTimeFormatter.instance().getFormattedDate(firstDayOfMonth.dayOfMonth().withMaximumValue().toDate(),
+                      DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))).append(")");
+    }
     return buf.toString();
   }
 
@@ -193,7 +224,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
   /**
    * @return the duration
    */
-  public long getDuration()
+  public long getTotalDuration()
   {
     return totalDuration;
   }
