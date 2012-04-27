@@ -82,7 +82,7 @@ pre,
 table,
 address{
 	margin-bottom: 10px;
-	-webkit-text-size-adjust:none; 
+	/*-webkit-text-size-adjust:none; deactivated by Markus Thoene: enable text-zoom in chrome and safari */ 
 }
 
 
