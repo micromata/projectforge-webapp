@@ -33,8 +33,7 @@ import org.apache.wicket.Component;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.projectforge.calendar.TimePeriod;
-import org.projectforge.common.DateFormatType;
-import org.projectforge.common.DateFormats;
+import org.projectforge.common.DateHelper;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.OrderDirection;
 import org.projectforge.fibu.ProjektDO;
@@ -46,7 +45,6 @@ import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.calendar.CalendarFilter;
-import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 
 /**
@@ -56,6 +54,8 @@ import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
  */
 public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TimesheetEventsProvider.class);
+
   private static final long serialVersionUID = 2241430630558260146L;
 
   private final TimesheetDao timesheetDao;
@@ -70,6 +70,8 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
 
   // duration by day of month.
   private final long[] durationsPerDayOfMonth = new long[32];
+
+  private final long[] durationsPerWeekOfYear = new long[55];
 
   /**
    * @param parent For i18n.
@@ -93,6 +95,9 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     totalDuration = 0;
     for (int i = 0; i < durationsPerDayOfMonth.length; i++) {
       durationsPerDayOfMonth[i] = 0;
+    }
+    for (int i = 0; i < durationsPerWeekOfYear.length; i++) {
+      durationsPerWeekOfYear[i] = 0;
     }
     final Integer userId = calFilter.getUserId();
     if (userId == null) {
@@ -127,6 +132,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
         // Time sheet doesn't match time period start - end.
         continue;
       }
+      final long duration = timesheet.getDuration();
       final Event event = new Event();
       final String id = "ts-" + timesheet.getId();
       event.setId("" + id);
@@ -135,21 +141,75 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
       final String title = getTitle(timesheet);
       if (longFormat == true) {
         // Week or day view:
-        event.setTitle(title + "\n" + getToolTip(timesheet));
+        event.setTitle(title + "\n" + getToolTip(timesheet) + "\n" + formatDuration(duration, false));
       } else {
         // Month view:
         event.setTitle(title);
       }
-      events.put(id, event);
-      final long dur = timesheet.getDuration();
-      if (month == null || stopTime.getMonthOfYear() == month) {
-        totalDuration += dur;
-        addDuration(startTime.getDayOfMonth(), dur);
+      if (month != null && startTime.getMonthOfYear() != month && stopTime.getMonthOfYear() != month) {
+        // Display time sheets of other month as grey blue:
+        event.setTextColor("#222222").setBackgroundColor("#ACD9E8").setColor("#ACD9E8");
       }
+      events.put(id, event);
+      if (month == null || startTime.getMonthOfYear() == month) {
+        totalDuration += duration;
+        addDurationOfDay(startTime.getDayOfMonth(), duration);
+      }
+      if (month != null) {
+        final int weekOfYear = startTime.getWeekOfWeekyear();
+        addDurationOfWeekOfYear(weekOfYear, duration);
+      }
+    }
+    if (calFilter.isShowStatistics() == true) {
+      // Show statistics: duration of every day is shown as all day event.
+      DateTime day = start;
+      int paranoiaCounter = 0;
+      do {
+        if (++paranoiaCounter > 1000) {
+          log.error("Paranoia counter exceeded! Dear developer, please have a look at the implementation of buildEvents.");
+          break;
+        }
+        final int dayOfMonth = day.getDayOfMonth();
+        final long duration = durationsPerDayOfMonth[dayOfMonth];
+        final boolean firstDayOfWeek = day.getDayOfWeek() == PFUserContext.getFirstDayOfWeek() - 1;
+        if (firstDayOfWeek == false && (duration == 0 || (month != null && month != day.getMonthOfYear()))) {
+          day = day.plusDays(1);
+          continue;
+        }
+        final Event event = new Event().setAllDay(true);
+        final String id = "s-" + (dayOfMonth);
+        event.setId(id);
+        event.setStart(day);
+        final String durationString = formatDuration(duration, false);
+        if (firstDayOfWeek == true) {
+          // Show week of year at top of first day of week.
+          final int weekOfYear = day.getWeekOfWeekyear();
+          final StringBuffer buf = new StringBuffer();
+          buf.append(getString("calendar.weekOfYearShortLabel")).append(DateHelper.getWeekOfYear(day));
+          if (durationsPerWeekOfYear[weekOfYear] > 0) {
+            // Show total sum of durations over all time sheets of current week.
+            buf.append(": ").append(formatDuration(durationsPerWeekOfYear[weekOfYear], false));
+          }
+          if (duration > 0) {
+            buf.append(", ").append(durationString);
+          }
+          event.setTitle(buf.toString());
+        } else {
+          event.setTitle(durationString);
+        }
+        event.setTextColor("#222222").setBackgroundColor("#FFFFBE").setColor("#FFFFBE");
+        events.put(id, event);
+        day = day.plusDays(1);
+      } while (day.isAfter(end) == false);
     }
   }
 
   public String formatDuration(final long millis)
+  {
+    return formatDuration(millis, firstDayOfMonth != null);
+  }
+
+  private String formatDuration(final long millis, final boolean showTimePeriod)
   {
     final int[] fields = TimePeriod.getDurationFields(millis, 8, 200);
     final StringBuffer buf = new StringBuffer();
@@ -157,15 +217,8 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
       buf.append(fields[0]).append(getString("calendar.unit.day")).append(" ");
     }
     buf.append(fields[1]).append(":").append(StringHelper.format2DigitNumber(fields[2])).append(getString("calendar.unit.hour"));
-    if (firstDayOfMonth != null) {
-      buf.append(" (")
-      .append(
-          DateTimeFormatter.instance().getFormattedDate(firstDayOfMonth.toDate(),
-              DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR)))
-              .append("-")
-              .append(
-                  DateTimeFormatter.instance().getFormattedDate(firstDayOfMonth.dayOfMonth().withMaximumValue().toDate(),
-                      DateFormats.getFormatString(DateFormatType.DATE_WITHOUT_YEAR))).append(")");
+    if (showTimePeriod == true) {
+      buf.append(" (").append(getString("calendar.month")).append(")");
     }
     return buf.toString();
   }
@@ -205,7 +258,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
   private String getToolTip(final TimesheetDO timesheet)
   {
     final String location = timesheet.getLocation();
-    final String description = timesheet.getDescription();
+    final String description = timesheet.getShortDescription();
     final TaskDO task = timesheet.getTask();
     final StringBuffer buf = new StringBuffer();
     if (StringUtils.isNotBlank(location) == true) {
@@ -214,7 +267,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
         buf.append(": ");
       }
     }
-    buf.append(StringUtils.defaultString(description));
+    buf.append(description);
     if (timesheet.getKost2() == null) {
       buf.append("; \n").append(task.getTitle());
     }
@@ -229,7 +282,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     return totalDuration;
   }
 
-  private void addDuration(final int dayOfMonth, final long duration)
+  private void addDurationOfDay(final int dayOfMonth, final long duration)
   {
     durationsPerDayOfMonth[dayOfMonth] += duration;
   }
@@ -238,8 +291,22 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
    * @param dayOfMonth
    * @see DateTime#getDayOfMonth()
    */
-  public long getDuration(final int dayOfMonth)
+  public long getDurationOfDay(final int dayOfMonth)
   {
     return durationsPerDayOfMonth[dayOfMonth];
+  }
+
+  private void addDurationOfWeekOfYear(final int weekOfYear, final long duration)
+  {
+    durationsPerWeekOfYear[weekOfYear] += duration;
+  }
+
+  /**
+   * @param weekOfYear
+   * @see DateTime#getDayOfMonth()
+   */
+  public long getDurationOfWeekOfYear(final int weekOfYear)
+  {
+    return durationsPerDayOfMonth[weekOfYear];
   }
 }
