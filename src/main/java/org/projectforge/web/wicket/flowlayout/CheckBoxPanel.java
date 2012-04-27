@@ -45,15 +45,29 @@ public class CheckBoxPanel extends Panel
 
   private Label label;
 
+  private boolean wantOnSelectionChangedNotifications;
+
   /**
    * @param id
    * @param model
    * @param labelString
-   * @param submitOnChange if true then onchange="javascript:submit()" is added.
    */
   public CheckBoxPanel(final String id, final IModel<Boolean> model, final String labelString)
   {
+    this(id, model, labelString, false);
+  }
+
+  /**
+   * @param id
+   * @param model
+   * @param labelString
+   * @param wantOnSelectionChangedNotifications if true then wantOnSelectionChangedNotifications method returns true.
+   * @see CheckBox#wantOnSelectionChangedNotifications()
+   */
+  public CheckBoxPanel(final String id, final IModel<Boolean> model, final String labelString, final boolean wantOnSelectionChangedNotifications)
+  {
     super(id);
+    this.wantOnSelectionChangedNotifications = wantOnSelectionChangedNotifications;
     checkBox = new CheckBox(WICKET_ID, model) {
       @Override
       public void onSelectionChanged(final Boolean newSelection)
@@ -91,17 +105,19 @@ public class CheckBoxPanel extends Panel
     return this;
   }
 
+  /**
+   * @see CheckBox#onSelectionChanged()
+   */
   protected void onSelectionChanged(final Boolean newSelection)
   {
   }
 
   /**
-   * Doesn't work, isn't it?
-   * @return
+   * @see CheckBox#wantOnSelectionChangedNotifications()
    */
   protected boolean wantOnSelectionChangedNotifications()
   {
-    return false;
+    return wantOnSelectionChangedNotifications;
   }
 
   public CheckBox getCheckBox()
