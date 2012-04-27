@@ -151,9 +151,15 @@ public class TimesheetDO extends DefaultBaseDO implements Comparable<TimesheetDO
     return description;
   }
 
+  /**
+   * @return The abbreviated description (maximum length is 50 characters).
+   */
   @Transient
   public String getShortDescription()
   {
+    if (this.description == null) {
+      return "";
+    }
     return StringUtils.abbreviate(getDescription(), 50);
   }
 
@@ -229,7 +235,7 @@ public class TimesheetDO extends DefaultBaseDO implements Comparable<TimesheetDO
   public TimesheetDO setStartDate(final Date startDate)
   {
     if (startDate != null) {
-      DateHolder date = new DateHolder(startDate, DatePrecision.MINUTE_15);
+      final DateHolder date = new DateHolder(startDate, DatePrecision.MINUTE_15);
       this.startTime = date.getTimestamp();
     } else {
       this.stopTime = null;
@@ -271,7 +277,7 @@ public class TimesheetDO extends DefaultBaseDO implements Comparable<TimesheetDO
   public TimesheetDO setStopTime(final Timestamp stopTime)
   {
     if (stopTime != null) {
-      DateHolder date = new DateHolder(stopTime, DatePrecision.MINUTE_15);
+      final DateHolder date = new DateHolder(stopTime, DatePrecision.MINUTE_15);
       this.stopTime = date.getTimestamp();
     } else {
       this.stopTime = null;
@@ -359,7 +365,7 @@ public class TimesheetDO extends DefaultBaseDO implements Comparable<TimesheetDO
     return kost2.getId();
   }
 
-  public int compareTo(TimesheetDO o)
+  public int compareTo(final TimesheetDO o)
   {
     return (getStartTime().compareTo(o.getStartTime()));
   }
