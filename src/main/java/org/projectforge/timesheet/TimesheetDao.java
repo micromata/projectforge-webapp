@@ -454,8 +454,8 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
     final List<TimesheetDO> list = getList(queryFilter);
     if (list != null && list.size() > 0) {
       final TimesheetDO ts = list.get(0);
-      log.info("Time sheet collision detected of time sheet " + timesheet + " with existing time sheet " + ts);
       if (throwException == true) {
+        log.info("Time sheet collision detected of time sheet " + timesheet + " with existing time sheet " + ts);
         final String startTime = DateHelper.formatIsoTimestamp(ts.getStartTime());
         final String stopTime = DateHelper.formatIsoTimestamp(ts.getStopTime());
         throw new UserException("timesheet.error.timeperiodOverlapDetection", new MessageParam(ts.getId()), new MessageParam(startTime),
