@@ -69,7 +69,7 @@ public class HolidayEventsProvider extends MyFullCalendarEventsProvider
       String backgroundColor, color, textColor;
       if (dh.isHoliday() == true) {
         if (dh.isWorkingDay() == true) {
-          backgroundColor = "#EEEEEE";
+          backgroundColor = "#FFF0F0";
           color = "#EEEEEE";
           textColor = "#222222";
         } else {

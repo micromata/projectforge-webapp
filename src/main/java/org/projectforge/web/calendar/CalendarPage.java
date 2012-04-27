@@ -64,13 +64,23 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     form.add(calendarPanel);
     calendarPanel.init(getFilter());
     if (pageParameters != null) {
-      if (pageParameters.get("showTimesheets") != null) {
+      if (pageParameters.get("showTimesheets").isNull() == false) {
         form.getFilter().setUserId(getUserId());
       }
-      if (pageParameters.get("showBirthdays") != null) {
+      if (pageParameters.get("showBirthdays").isNull() == false) {
         form.getFilter().setShowBirthdays(true);
       }
     }
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractSecuredPage#onBeforeRender()
+   */
+  @Override
+  protected void onBeforeRender()
+  {
+    super.onBeforeRender();
+    calendarPanel.forceReload(); // Needed if e. g. user or anything was changed.
   }
 
   /**
@@ -80,17 +90,6 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
   public CalendarPage setStartDate(final DateMidnight startDate)
   {
     calendarPanel.setStartDate(startDate);
-    return this;
-  }
-
-  /**
-   * Forces to reloaded time sheets in onBeforeRender().
-   * @param refresh the refresh to set
-   * @return this for chaining.
-   */
-  public CalendarPage forceReload()
-  {
-    calendarPanel.forceReload();
     return this;
   }
 
@@ -113,7 +112,6 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
   {
     if ("userId".equals(property) == true) {
       getFilter().setUserId((Integer) selectedValue);
-      forceReload();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
@@ -123,7 +121,6 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
   {
     if ("userId".equals(property) == true) {
       getFilter().setUserId(null);
-      forceReload();
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }

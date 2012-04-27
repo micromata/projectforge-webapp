@@ -35,6 +35,7 @@ import org.projectforge.address.AddressDao;
 import org.projectforge.address.BirthdayAddress;
 import org.projectforge.common.DateFormatType;
 import org.projectforge.common.DateFormats;
+import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 
@@ -53,15 +54,18 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
 
   private final boolean dataProtection;
 
+  private final CalendarFilter filter;
+
   /**
    * @param parent For i18n.
    * @param addressDao
    * @param dataProtection If true (default) then no ages will be shown, only the names.
    * @see Component#getString(String)
    */
-  public BirthdayEventsProvider(final Component parent, final AddressDao addressDao, final boolean dataProtection)
+  public BirthdayEventsProvider(final Component parent, final CalendarFilter filter, final AddressDao addressDao, final boolean dataProtection)
   {
     super(parent);
+    this.filter = filter;
     this.addressDao = addressDao;
     this.dataProtection = dataProtection;
   }
@@ -72,6 +76,10 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
   @Override
   protected void buildEvents(final DateTime start, final DateTime end)
   {
+    if (filter.isShowBirthdays() == false) {
+      // Don't show birthdays.
+      return;
+    }
     DateTime from = start;
     if (start.getMonthOfYear() == Calendar.MARCH && start.getDayOfMonth() == 1) {
       from = start.minusDays(1);

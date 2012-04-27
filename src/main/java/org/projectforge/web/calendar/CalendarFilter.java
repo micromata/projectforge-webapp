@@ -45,14 +45,28 @@ public class CalendarFilter implements Serializable
   @XStreamAsAttribute
   private DateMidnight startDate;
 
+  /**
+   * Was used by old calendar.
+   */
+  @SuppressWarnings("unused")
   @XStreamAsAttribute
+  @Deprecated
   private Date current;
 
   @XStreamAsAttribute
   private Boolean showBirthdays;
 
   @XStreamAsAttribute
+  private Boolean showStatistics;
+
+  @XStreamAsAttribute
+  private Boolean slot30;
+
+  @XStreamAsAttribute
   private Integer userId;
+
+  @XStreamAsAttribute
+  private Integer firstHour = 8;
 
   @XStreamAsAttribute
   private ViewType viewType;
@@ -94,6 +108,43 @@ public class CalendarFilter implements Serializable
     this.showBirthdays = showBirthdays;
   }
 
+  /**
+   * @return the showStatistics
+   */
+  public boolean isShowStatistics()
+  {
+    return showStatistics == Boolean.TRUE;
+  }
+
+  /**
+   * @param showStatistics the showStatistics to set
+   * @return this for chaining.
+   */
+  public CalendarFilter setShowStatistics(final boolean showStatistics)
+  {
+    this.showStatistics = showStatistics;
+    return this;
+  }
+
+  /**
+   * If true then the slot is 30 minutes otherwise 15 minutes.
+   * @return the slot30
+   */
+  public boolean isSlot30()
+  {
+    return slot30 == Boolean.TRUE;
+  }
+
+  /**
+   * @param slot30 the slot30 to set
+   * @return this for chaining.
+   */
+  public CalendarFilter setSlot30(final boolean slot30)
+  {
+    this.slot30 = slot30;
+    return this;
+  }
+
   public Integer getUserId()
   {
     return userId;
@@ -123,7 +174,25 @@ public class CalendarFilter implements Serializable
   }
 
   /**
-   * Was used from old calendar.
+   * @return the firstHour to display in week mode of calendar.
+   */
+  public Integer getFirstHour()
+  {
+    return (firstHour != null && firstHour < 24) ? firstHour : 8;
+  }
+
+  /**
+   * @param firstHour the firstHour to set
+   * @return this for chaining.
+   */
+  public CalendarFilter setFirstHour(final Integer firstHour)
+  {
+    this.firstHour = firstHour;
+    return this;
+  }
+
+  /**
+   * Was used by old calendar.
    */
   @Deprecated
   public Date getCurrent()

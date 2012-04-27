@@ -24,6 +24,7 @@
 package org.projectforge.web.calendar;
 
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
@@ -34,6 +35,8 @@ import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
+import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
@@ -70,25 +73,18 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     add(repeater);
     gridBuilder = newGridBuilder(repeater);
     gridBuilder.newGrid16().newColumnsPanel().newColumnPanel(DivType.COL_75);
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
+    FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
     if (isOtherUsersAllowed() == true) {
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(this, "timesheetsUser"),
           parentPage, "userId");
       fs.add(userSelectPanel);
       userSelectPanel.init().withAutoSubmit(true).setLabel(new Model<String>(getString("user")));
-    } else {
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(new CheckBoxPanel(DivPanel.CHILD_ID, new PropertyModel<Boolean>(this, "showTimesheets"),
-          getString("calendar.timesheeets")) {
-        /**
-         * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#wantOnSelectionChangedNotifications()
-         */
-        @Override
-        protected boolean wantOnSelectionChangedNotifications()
-        {
-          return true;
-        }
-
+    }
+    final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+    if (isOtherUsersAllowed() == false) {
+      showTimesheets = filter.getUserId() != null;
+      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(this, "showTimesheets"),
+          getString("calendar.option.timesheeets"), true) {
         /**
          * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged()
          */
@@ -103,8 +99,31 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
         }
       });
     }
+    checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showBirthdays"),
+        getString("calendar.option.birthdays"), true));
+    checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showStatistics"),
+        getString("calendar.option.statistics"), true).setTooltip(getString("calendar.option.statistics.tooltip")));
+    checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "slot30"),
+        getString("calendar.option.slot30"), true).setTooltip(getString("calendar.option.slot30.tooltip")));
+    final DropDownChoice<Integer> firstHourDropDownChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(),
+        new PropertyModel<Integer>(filter, "firstHour"), DateTimePanel.getHourOfDayRenderer().getValues(),
+        DateTimePanel.getHourOfDayRenderer()) {
+      /**
+       * @see org.apache.wicket.markup.html.form.DropDownChoice#wantOnSelectionChangedNotifications()
+       */
+      @Override
+      protected boolean wantOnSelectionChangedNotifications()
+      {
+        return true;
+      }
+    };
+    firstHourDropDownChoice.setNullValid(false);
+    firstHourDropDownChoice.setRequired(true);
+    WicketUtils.addTooltip(firstHourDropDownChoice, getString("calendar.option.firstHour.tooltip"));
+    fs.add(firstHourDropDownChoice);
     gridBuilder.newColumnPanel(DivType.COL_25);
-    final DivTextPanel durationPanel = new DivTextPanel(DivPanel.CHILD_ID, new Label(DivTextPanel.WICKET_ID, new Model<String>() {
+    fs = gridBuilder.newFieldset(getString("timesheet.duration")).setNoLabelFor();
+    final DivTextPanel durationPanel = new DivTextPanel(fs.newChildId(), new Label(DivTextPanel.WICKET_ID, new Model<String>() {
       @Override
       public String getObject()
       {
@@ -112,40 +131,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       }
     }));
     durationLabel = durationPanel.getLabel4Ajax();
-    gridBuilder.getPanel().add(durationPanel);
-    // final Link<Void> showBirthdaysButton = new Link<Void>("showBirthdays") {
-    // @Override
-    // public void onClick()
-    // {
-    // getFilter().setShowBirthdays(true);
-    // }
-    //
-    // @Override
-    // public boolean isVisible()
-    // {
-    // return !getFilter().isShowBirthdays();
-    // }
-    // };
-    // // add(showBirthdaysButton);
-    // showBirthdaysButton.add(new TooltipImage("showBirthdaysImage", getResponse(), WebConstants.IMAGE_BIRTHDAY,
-    // getString("tooltip.showBirthdays")));
-    // final Link<Void> hideBirthdaysButton = new Link<Void>("hideBirthdays") {
-    // @Override
-    // public void onClick()
-    // {
-    // getFilter().setShowBirthdays(false);
-    // }
-    //
-    // @Override
-    // public boolean isVisible()
-    // {
-    // return getFilter().isShowBirthdays();
-    // }
-    // };
-    // // add(hideBirthdaysButton);
-    // hideBirthdaysButton.add(new TooltipImage("hideBirthdaysImage", getResponse(), WebConstants.IMAGE_BIRTHDAY_DELETE,
-    // getString("tooltip.hideBirthdays")));
-    //
+    fs.add(durationPanel);
     // final PFUserDO user = PFUserContext.getUser();
     //
     // if (WebConfiguration.isDevelopmentMode() == true && StringUtils.isNotBlank(user.getStayLoggedInKey())) {
@@ -183,16 +169,16 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 
   public PFUserDO getTimesheetsUser()
   {
-    final Integer userId = getFilter().getUserId();
+    final Integer userId = filter.getUserId();
     return userId != null ? userGroupCache.getUser(userId) : null;
   }
 
   public void setTimesheetsUser(final PFUserDO user)
   {
     if (user == null) {
-      getFilter().setUserId(null);
+      filter.setUserId(null);
     } else {
-      getFilter().setUserId(user.getId());
+      filter.setUserId(user.getId());
     }
   }
 }

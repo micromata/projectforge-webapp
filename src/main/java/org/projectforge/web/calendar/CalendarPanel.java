@@ -80,6 +80,8 @@ public class CalendarPanel extends Panel
 
   private TimesheetEventsProvider timesheetEventsProvider;
 
+  private CalendarFilter filter;
+
   private boolean refresh;
 
   public CalendarPanel(final String id)
@@ -90,12 +92,11 @@ public class CalendarPanel extends Panel
   @SuppressWarnings("serial")
   void init(final CalendarFilter filter)
   {
+    this.filter = filter;
     final MyFullCalendarConfig config = new MyFullCalendarConfig(this);
     config.setSelectable(true);
     config.setSelectHelper(true);
-
     config.setLoading("function(bool) { if (bool) $(\"#loading\").show(); else $(\"#loading\").hide(); }");
-
     // config.setMinTime(new LocalTime(6, 30));
     // config.setMaxTime(new LocalTime(17, 30));
     config.setAllDaySlot(true);
@@ -214,7 +215,7 @@ public class CalendarPanel extends Panel
       config.setMonth(startDate.getMonthOfYear() - 1);
       config.setDate(startDate.getDayOfMonth());
     }
-    config.setDefaultView(filter.getViewType().getCode());
+    setConfig();
 
     // Time sheets
     EventSource reservations = new EventSource();
@@ -230,7 +231,7 @@ public class CalendarPanel extends Panel
     config.add(reservations);
     // Birthdays:
     reservations = new EventSource();
-    birthdayEventsProvider = new BirthdayEventsProvider(this, addressDao,
+    birthdayEventsProvider = new BirthdayEventsProvider(this, filter, addressDao,
         accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == false);
     reservations.setEventsProvider(birthdayEventsProvider);
     reservations.setEditable(false);
@@ -287,15 +288,30 @@ public class CalendarPanel extends Panel
   {
     super.onBeforeRender();
     // Restore current date (e. g. on reload or on coming back from callee page).
+    final MyFullCalendarConfig config = calendar.getConfig();
     if (startDate != null) {
-      final MyFullCalendarConfig config = calendar.getConfig();
       config.setYear(startDate.getYear());
       config.setMonth(startDate.getMonthOfYear() - 1);
       config.setDate(startDate.getDayOfMonth());
     }
+    config.setDefaultView(filter.getViewType().getCode());
     if (refresh == true) {
       refresh = false;
       timesheetEventsProvider.forceReload();
+      birthdayEventsProvider.forceReload();
+      setConfig();
+    }
+  }
+
+  private void setConfig() {
+    final MyFullCalendarConfig config = calendar.getConfig();
+    if (filter.isSlot30() == true) {
+      config.setSlotMinutes(30);
+    } else {
+      config.setSlotMinutes(15);
+    }
+    if (filter.getFirstHour() != null) {
+      config.setFirstHour(filter.getFirstHour());
     }
   }
 
