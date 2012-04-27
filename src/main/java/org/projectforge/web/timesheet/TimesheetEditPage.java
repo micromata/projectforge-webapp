@@ -35,7 +35,6 @@ import org.apache.commons.lang.builder.CompareToBuilder;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.joda.time.DateMidnight;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.fibu.ProjektDO;
 import org.projectforge.fibu.kost.Kost2DO;
@@ -46,11 +45,9 @@ import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.timesheet.TimesheetPrefData;
 import org.projectforge.timesheet.TimesheetPrefEntry;
-import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
-import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.user.UserPrefEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -364,10 +361,6 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
       final UserPrefEditPage userPrefEditPage = new UserPrefEditPage(UserPrefArea.TIMESHEET_TEMPLATE, getData());
       userPrefEditPage.setReturnToPage(this.returnToPage);
       return userPrefEditPage;
-    }
-    if (returnToPage instanceof CalendarPage) {
-      // If the timesheet is moved, then display the new date as current date in calendar view:
-      ((CalendarPage) returnToPage).setStartDate(new DateMidnight(getData().getStartTime(), PFUserContext.getDateTimeZone())).forceReload();
     }
     return null;
   }
