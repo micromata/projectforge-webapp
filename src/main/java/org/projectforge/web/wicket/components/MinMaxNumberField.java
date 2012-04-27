@@ -43,10 +43,15 @@ public class MinMaxNumberField<Z extends Comparable<Z> & Serializable> extends T
    * @param model
    * @see org.apache.wicket.Component#Component(String, IModel)
    */
-  public MinMaxNumberField(final String id,  final IModel<Z> model, final Z minimum, final Z maximum)
+  public MinMaxNumberField(final String id, final IModel<Z> model, final Z minimum, final Z maximum)
   {
     super(id, model);
-    add(new RangeValidator<Z>(minimum, maximum));
+    if (minimum.compareTo(maximum) <= 0) {
+      add(new RangeValidator<Z>(minimum, maximum));
+    } else {
+      add(new RangeValidator<Z>(maximum, minimum));
+
+    }
     if (ClassUtils.isAssignable(minimum.getClass(), Integer.class) == true) {
       setMaxLength(Math.max(String.valueOf(minimum).length(), String.valueOf(maximum).length()));
     }
