@@ -517,6 +517,23 @@ public class DateHelper implements Serializable
   }
 
   /**
+   * Should be used application wide for getting and/or displaying the week of year!
+   * @param date
+   * @return Return the week of year. The week of year depends on the Locale set in the Configuration (config.xml). If given date is null
+   *         then -1 is returned. For "de" the first week of year is the first week with a minimum of 4 days in the new year. For "en" the
+   *         first week of the year is the first week with a minimum of 1 days in the new year.
+   * @see java.util.Calendar#getMinimalDaysInFirstWeek()
+   * @see Configuration#getDefaultLocale()
+   */
+  public static int getWeekOfYear(final DateTime date)
+  {
+    if (date == null) {
+      return -1;
+    }
+    return getWeekOfYear(date.toDate());
+  }
+
+  /**
    * @param d1
    * @param d2
    * @return True if the dates are both null or both represents the same day (year, month, day) independant of the hours, minutes etc.
