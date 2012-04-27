@@ -1,4 +1,3 @@
-/* Testmthoene */
 body #sidebar {
 	border-top-right-radius: 0px;
 	top: 75px !important;
@@ -72,6 +71,8 @@ fieldset .text {
 /* reduce field set height: */
 fieldset .text {
 	height: 20px;
+	line-height:20px;
+	padding:0;
 }
 
 /* reduce distances of select boxes: */
