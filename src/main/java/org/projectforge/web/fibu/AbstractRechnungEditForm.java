@@ -282,7 +282,7 @@ extends AbstractEditForm<O, P>
       zahlungsZielChoice.setRequired(false);
 
       fs.add(zahlungsZielChoice);
-      fs.add(new TextPanel(fs.newChildId(), new Model<String>() {
+      fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
         @Override
         public String getObject()
         {
