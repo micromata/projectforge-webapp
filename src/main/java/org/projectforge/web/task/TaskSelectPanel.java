@@ -33,6 +33,7 @@ import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.Hibernate;
 import org.projectforge.task.TaskDO;
@@ -41,8 +42,11 @@ import org.projectforge.task.TaskNode;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.AbstractSelectPanel;
 import org.projectforge.web.wicket.WebConstants;
+import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.FavoritesChoicePanel;
 import org.projectforge.web.wicket.components.TooltipImage;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
@@ -98,7 +102,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
       final TaskNode taskNode = taskTree.getTaskNodeById(task.getId());
       final List<Integer> ancestorIds = taskNode.getAncestorIds();
       final ListIterator<Integer> it = ancestorIds.listIterator(ancestorIds.size());
-      while(it.hasPrevious() == true) {
+      while (it.hasPrevious() == true) {
         final Integer ancestorId = it.previous();
         final TaskDO ancestorTask = taskTree.getTaskById(ancestorId);
         if (ancestorTask.getParentTask() == null) {
@@ -116,6 +120,7 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
         };
         selectTaskLink.setDefaultFormProcessing(false);
         cont.add(selectTaskLink);
+        WicketUtils.addTooltip(selectTaskLink, getString("task.selectPanel.selectAncestorTask.tooltip"));
         selectTaskLink.add(new Label("name", ancestorTask.getTitle()));
       }
       ancestorRepeater.setVisible(true);
@@ -131,7 +136,25 @@ public class TaskSelectPanel extends AbstractSelectPanel<TaskDO> implements Comp
     super.init();
     ancestorRepeater = new RepeatingView("ancestorTasks");
     divContainer.add(ancestorRepeater);
-    divContainer.add(new Label("name", new Model<String>() {
+    final SubmitLink taskLink = new SubmitLink("taskLink") {
+      @Override
+      public void onSubmit()
+      {
+        final TaskDO task = getModelObject();
+        if (task == null) {
+          return;
+        }
+        final PageParameters pageParams = new PageParameters();
+        pageParams.add(AbstractEditPage.PARAMETER_KEY_ID, String.valueOf(task.getId()));
+        final TaskEditPage editPage = new TaskEditPage(pageParams);
+        editPage.setReturnToPage((AbstractSecuredPage) getPage());
+        setResponsePage(editPage);
+      }
+    };
+    taskLink.setDefaultFormProcessing(false);
+    divContainer.add(taskLink);
+    WicketUtils.addTooltip(taskLink, getString("task.selectPanel.displayTask.tooltip"));
+    taskLink.add(new Label("name", new Model<String>() {
       /**
        * @see org.apache.wicket.model.Model#getObject()
        */
