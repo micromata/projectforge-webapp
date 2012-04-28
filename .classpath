@@ -2,7 +2,7 @@
   <classpathentry kind="src" path="src/test/java" output="target/test-classes" including="**/*.java"/>
   <classpathentry kind="src" path="src/test/resources" output="target/test-classes" excluding="**/*.java"/>
   <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
-  <classpathentry kind="src" path="src/main/resources" including="keystore|**/*.properties|**/*.html|**/*.js|misc/*.scpt|**/*.txt|**/*.xml|**/*.gz|**/*.xsl|**/*.gif|**/*.png" excluding="**/*.java"/>
+  <classpathentry kind="src" path="src/main/resources" including="keystore|**/*.properties|**/*.css|**/*.html|**/*.js|misc/*.scpt|**/*.txt|**/*.xml|**/*.gz|**/*.xsl|**/*.gif|**/*.png|**/*.tpl" excluding="**/*.java"/>
   <classpathentry kind="output" path="target/classes"/>
   <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar" sourcepath="M2_REPO/javax/activation/activation/1.1/activation-1.1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/servlet/jsp-api/2.0/jsp-api-2.0.jar"/>
@@ -69,6 +69,8 @@
   <classpathentry kind="var" path="M2_REPO/hsqldb/hsqldb/1.8.0.7/hsqldb-1.8.0.7.jar"/>
   <classpathentry kind="var" path="M2_REPO/ical4j/ical4j/0.9.20/ical4j-0.9.20.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/lowagie/itext/2.1.0/itext-2.1.0.jar" sourcepath="M2_REPO/com/lowagie/itext/2.1.0/itext-2.1.0-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.7.5/jackson-core-asl-1.7.5.jar" sourcepath="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.7.5/jackson-core-asl-1.7.5-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-mapper-asl/1.7.5/jackson-mapper-asl-1.7.5.jar" sourcepath="M2_REPO/org/codehaus/jackson/jackson-mapper-asl/1.7.5/jackson-mapper-asl-1.7.5-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/jasperreports/jasperreports/3.1.3/jasperreports-3.1.3.jar" sourcepath="M2_REPO/jasperreports/jasperreports/3.1.3/jasperreports-3.1.3-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/javassist/javassist/3.12.1.GA/javassist-3.12.1.GA.jar" sourcepath="M2_REPO/javassist/javassist/3.12.1.GA/javassist-3.12.1.GA-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/jfree/jcommon/1.0.15/jcommon-1.0.15.jar"/>
@@ -120,10 +122,10 @@
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/3.1.1.RELEASE/spring-core-3.1.1.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-core/3.1.1.RELEASE/spring-core-3.1.1.RELEASE-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring-expression/3.1.1.RELEASE/spring-expression-3.1.1.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-expression/3.1.1.RELEASE/spring-expression-3.1.1.RELEASE-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring-jdbc/3.1.1.RELEASE/spring-jdbc-3.1.1.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-jdbc/3.1.1.RELEASE/spring-jdbc-3.1.1.RELEASE-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/ldap/spring-ldap-core/1.3.1.RELEASE/spring-ldap-core-1.3.1.RELEASE.jar" sourcepath="M2_REPO/org/springframework/ldap/spring-ldap-core/1.3.1.RELEASE/spring-ldap-core-1.3.1.RELEASE-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring-orm/3.1.1.RELEASE/spring-orm-3.1.1.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-orm/3.1.1.RELEASE/spring-orm-3.1.1.RELEASE-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring-tx/3.1.1.RELEASE/spring-tx-3.1.1.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-tx/3.1.1.RELEASE/spring-tx-3.1.1.RELEASE-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring-web/3.1.1.RELEASE/spring-web-3.1.1.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-web/3.1.1.RELEASE/spring-web-3.1.1.RELEASE-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/taglibs/standard/1.1.2/standard-1.1.2.jar" sourcepath="M2_REPO/taglibs/standard/1.1.2/standard-1.1.2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-core/1.5.5/wicket-core-1.5.5.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-core/1.5.5/wicket-core-1.5.5-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-datetime/1.5.5/wicket-datetime-1.5.5.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-datetime/1.5.5/wicket-datetime-1.5.5-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/wicket/wicket-extensions/1.5.5/wicket-extensions-1.5.5.jar" sourcepath="M2_REPO/org/apache/wicket/wicket-extensions/1.5.5/wicket-extensions-1.5.5-sources.jar"/>
