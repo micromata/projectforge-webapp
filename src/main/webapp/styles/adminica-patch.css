@@ -141,5 +141,9 @@ fieldset.label_side>div { /* [main.css z1198]*/
 }
 
 div.tasktree {
-	padding-top: - 5px;
+	padding-top: -5px;
+}
+
+div.margin_top_10 {
+	margin-top: 10px;
 }

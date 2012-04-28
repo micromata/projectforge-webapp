@@ -72,7 +72,9 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     final RepeatingView repeater = new RepeatingView("flowform");
     add(repeater);
     gridBuilder = newGridBuilder(repeater);
-    gridBuilder.newGrid16().newColumnsPanel().newColumnPanel(DivType.COL_75);
+    gridBuilder.newGrid16();
+    gridBuilder.getPanel().addCssClasses(DivType.MARGIN_TOP_10); // Add additional margin at the top.
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_75);
     FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
     if (isOtherUsersAllowed() == true) {
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new PropertyModel<PFUserDO>(this, "timesheetsUser"),
