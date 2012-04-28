@@ -62,6 +62,8 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
 
   private DivPanel fieldDiv;
 
+  private boolean initialized;
+
   /**
    * Adds this FieldsetPanel to the parent panel.
    * @param parent
@@ -386,21 +388,26 @@ public class FieldsetPanel extends AbstractFieldsetPanel<FieldsetPanel>
   }
 
   /**
-   * @see org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel#onInitialize()
+   * @see org.projectforge.web.wicket.flowlayout.AbstractFieldsetPanel#onBeforeRender()
    */
   @Override
-  protected void onInitialize()
+  protected void onBeforeRender()
   {
-    super.onInitialize();
-    if (labelSide == true) {
-      fieldset.add(AttributeModifier.append("class", "label_side"));
+    if (initialized == false) {
+      // Can't be done in onInitialize() because this component is added to its parent in constructor and onInitialize() is some times
+      // called before the setter methods (e. g. for labelSide) are called.
+      initialized = true;
+      if (labelSide == true) {
+        fieldset.add(AttributeModifier.append("class", "label_side"));
+      }
+      if (labelSuffix == null) {
+        label.add(labelSuffix = WicketUtils.getInvisibleComponent("labelSuffix"));
+      }
+      if (descriptionSuffix == null) {
+        label.add(descriptionSuffix = WicketUtils.getInvisibleComponent("descriptionSuffix"));
+      }
     }
-    if (labelSuffix == null) {
-      label.add(labelSuffix = WicketUtils.getInvisibleComponent("labelSuffix"));
-    }
-    if (descriptionSuffix == null) {
-      label.add(descriptionSuffix = WicketUtils.getInvisibleComponent("descriptionSuffix"));
-    }
+    super.onBeforeRender();
   }
 
   /**
