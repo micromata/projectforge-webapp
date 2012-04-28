@@ -24,6 +24,7 @@
 package org.projectforge.ldap;
 
 /**
+ * Bean used by ConfigXML (config.xml).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class LdapConfig

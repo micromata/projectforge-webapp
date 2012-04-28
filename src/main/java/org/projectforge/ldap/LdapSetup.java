@@ -29,11 +29,14 @@ import org.projectforge.core.ConfigurationListener;
 import org.springframework.ldap.core.support.LdapContextSource;
 
 /**
+ * Should be initialized on start-up and will be called every time if config.xml is reread. This class is needed for initialization of the
+ * spring beans with properties configured in config.xml.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class LdapSetup implements ConfigurationListener
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapSetup.class);
+
   private static final LdapSetup instance = new LdapSetup();
 
   private LdapContextSource ldapContextSource;
@@ -43,6 +46,10 @@ public class LdapSetup implements ConfigurationListener
     return instance;
   }
 
+  /**
+   * Need to be called before first usage of ldap beans. Can be called after reading config.xml.
+   * @param ldapContextSource
+   */
   public void init(final LdapContextSource ldapContextSource)
   {
     this.ldapContextSource = ldapContextSource;
@@ -69,7 +76,13 @@ public class LdapSetup implements ConfigurationListener
       log.info("LDAP not configured (OK).");
       return;
     }
-    log.info("Initializing LDAP: url=[" + config.getUrl() + "], userDN=[" + config.getUserDn() + "], base=[" + config.getBase() + "], password=[***].");
+    log.info("Initializing LDAP: url=["
+        + config.getUrl()
+        + "], userDN=["
+        + config.getUserDn()
+        + "], base=["
+        + config.getBase()
+        + "], password=[***].");
     ldapContextSource.setUrl(config.getUrl());
     ldapContextSource.setUserDn(config.getUserDn());
     ldapContextSource.setPassword(config.getPassword());
