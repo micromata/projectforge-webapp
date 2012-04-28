@@ -72,8 +72,15 @@ public class HRListForm extends AbstractListForm<HRFilter, HRListPage>
       stopDate = new DatePanel(fs.newChildId(),  new PropertyModel<Date>(filter, "stopTime"),
           DatePanelSettings.get().withSelectPeriodMode(true).withRequired(true));
       fs.add(stopDate);
-      final QuickSelectWeekPanel quickSelectPanel = new QuickSelectWeekPanel(fs.newChildId(), new PropertyModel<Date>(filter,
-          "startTime"), parentPage, "week");
+      final QuickSelectWeekPanel quickSelectPanel = new QuickSelectWeekPanel(fs.newChildId(), new Model<Date>() {
+        @Override
+        public Date getObject()
+        {
+          startDate.validate(); // Update model from form field.
+          final Date date = startDate.getConvertedInput();
+          return date;
+        }
+      }, parentPage, "week");
       fs.add(quickSelectPanel);
       quickSelectPanel.init();
       fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
