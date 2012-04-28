@@ -61,6 +61,7 @@ import org.projectforge.common.TimeNotation;
 import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.jira.JiraConfig;
 import org.projectforge.jira.JiraIssueType;
+import org.projectforge.ldap.LdapConfig;
 import org.projectforge.mail.MailAccountConfig;
 import org.projectforge.mail.SendMailConfig;
 import org.projectforge.orga.ContractType;
@@ -172,6 +173,8 @@ public class ConfigXml
 
   private AccountingConfig accountingConfig;
 
+  private LdapConfig ldapConfig;
+
   /**
    * Separated list of main classes (separated by white chars and or ',').
    */
@@ -230,6 +233,7 @@ public class ConfigXml
     sendMailConfiguration = new SendMailConfig();
     accountingConfig = new AccountingConfig();
     accountingConfig.reset();
+    ldapConfig = new LdapConfig();
   }
 
   protected ConfigXml()
@@ -995,5 +999,13 @@ public class ConfigXml
   public AccountingConfig getAccountingConfig()
   {
     return accountingConfig;
+  }
+
+  /**
+   * @return the ldapConfig
+   */
+  public LdapConfig getLdapConfig()
+  {
+    return ldapConfig;
   }
 }
