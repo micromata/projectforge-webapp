@@ -51,7 +51,6 @@ div.field_div span,div.field_div input,div.field_div div,div.field_div a,div.fie
 	float: left;
 }
 
-
 button,select {
 	letter-spacing: normal;
 }
@@ -64,6 +63,9 @@ fieldset .text {
 	letter-spacing: -3px;
 }
 
+.col_100,.col_50,.col_33,.col_66,.col_25,.col_75,.col_60,.col_40 {
+	margin-right: -2px; /* Avoid line break for smaller zoom */
+}
 
 /*---------------------------------------------------
   Changes of Markus Thoene */
@@ -71,8 +73,8 @@ fieldset .text {
 /* reduce field set height: */
 fieldset .text {
 	height: 20px;
-	line-height:20px;
-	padding:0;
+	line-height: 20px;
+	padding: 0;
 }
 
 /* reduce distances of select boxes: */
@@ -82,62 +84,62 @@ select {
 }
 
 /* Adapt width of select boxes: */
-fieldset.label_side > div > select {
+fieldset.label_side>div>select {
 	width: auto;
 	max-width: 80%;
 }
 
 /* Reduce distances of text fields: */
 input.text {
-	margin-top:0px;
+	margin-top: 0px;
 }
 /* used for text between date-picker fields in field sets: */
 div.field_div div span {
-	padding-top:3px;
+	padding-top: 3px;
 }
 
 /* timesheetList: previous/next month/week/day buttons: */
-div.field_div > div > span > span {
-	display:inline-block;
+div.field_div>div>span>span {
+	display: inline-block;
 	margin: -7px 0 0;
 }
 
 /* timesheet: position of total duration: */
-fieldset > div > div > span {
-	margin-top:5px;
-	display:inline-block;
+fieldset>div>div>span {
+	margin-top: 5px;
+	display: inline-block;
 }
 
 /* Distances between progress bars. */
 div.progress-done {
-	margin-right:3px;
+	margin-right: 3px;
 	margin-top: 2px;
 }
 
 fieldset.label_side {
-	margin-left:1px;
-	margin-bottom:0px;
-	padding-bottom:0px;
+	margin-left: 1px;
+	margin-bottom: 0px;
+	padding-bottom: 0px;
 }
 
 /* Doubled lines removed: */
 fieldset {
-	border-bottom-width:0px;
+	border-bottom-width: 0px;
 }
 
 /* left of text-input fields in field sets. */
-div.field_div  a{
-	padding-top:4px;
+div.field_div  a {
+	padding-top: 4px;
 }
 
-fieldset.label_side > label { /* [main.css z1178]*/
-padding: 13px 20px 8px;
+fieldset.label_side>label { /* [main.css z1178]*/
+	padding: 13px 20px 8px;
 }
 
-fieldset.label_side > div { /* [main.css z1198]*/
-padding: 10px 20px;
+fieldset.label_side>div { /* [main.css z1198]*/
+	padding: 10px 20px;
 }
 
 div.tasktree {
-padding-top: - 5px;
+	padding-top: - 5px;
 }
