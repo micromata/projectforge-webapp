@@ -109,6 +109,12 @@ public class SystemUpdater
             + updateEntry.getRegionId()
             + "' "
             + updateEntry.getVersion());
+        for (final String str : DATA_BASE_UPDATES_REQUIRED) {
+          log.warn(str);
+        }
+        for (final String str : DATA_BASE_UPDATES_REQUIRED) {
+          System.err.println(str);
+        }
         return false;
       }
     }
@@ -165,4 +171,16 @@ public class SystemUpdater
   {
     this.databaseUpdateDao = databaseUpdateDao;
   }
+
+  private static final String[] DATA_BASE_UPDATES_REQUIRED = { //
+    "**********************************************************", //
+    "***                                                    ***", //
+    "*** It seems that there have to be done some data-base ***", //
+    "*** updates first. Please login as administrator!      ***", //
+    "*** Otherwise login of any non-administrator user      ***", //
+    "*** isn't possible!                                    ***", //
+    "*** Don't forget to restart ProjectForge after update. ***", //
+    "*** It's possible that tons of error messages follow.  ***", //
+    "***                                                    ***", //
+  "**********************************************************"};
 }
