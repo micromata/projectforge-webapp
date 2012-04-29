@@ -126,7 +126,7 @@
 					<include name="src/main/resources/mail/*.txt" />
 					<include name="src/main/resources/misc/*.scpt" />
 					<include name="src/main/resources/**/*.html" />
-					<include name="src/main/resources/wa/**/*.js" />
+					<include name="src/main/resources/**/*.js" />
 					<include name="src/**/*.xml" />
 					<include name="src/**/*.xml.gz" />
 					<include name="src/**/*.xsl" />
