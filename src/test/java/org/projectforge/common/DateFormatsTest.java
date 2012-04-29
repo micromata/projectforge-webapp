@@ -42,11 +42,20 @@ public class DateFormatsTest
   }
 
   @Test
-  public void get() {
+  public void getDateSeparatorChar() {
     assertEquals('/', DateFormats.getDateSeparatorChar(null));
     assertEquals('/', DateFormats.getDateSeparatorChar("dskjfs"));
     assertEquals('/', DateFormats.getDateSeparatorChar("MM/dd/yyyy mm:hh"));
     assertEquals('/', DateFormats.getDateSeparatorChar("dd/MM/yyyy mm:hh"));
     assertEquals('.', DateFormats.getDateSeparatorChar("dd.MM.yyyy mm:hh"));
+  }
+
+  @Test
+  public void isIsoFormat() {
+    assertFalse(DateFormats.isIsoFormat(null));
+    assertFalse(DateFormats.isIsoFormat("dfsfds"));
+    assertFalse(DateFormats.isIsoFormat("MM/dd/yyyy"));
+    assertTrue(DateFormats.isIsoFormat("yyyy-MM-dd"));
+    assertTrue(DateFormats.isIsoFormat("yyyy-MM-dd mm:hh"));
   }
 }

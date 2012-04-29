@@ -66,9 +66,8 @@ public class DateFormats
 
   /**
    * Tries to get the separator char in dates ('/' is the default if nothing found). <br/>
-   * Example: "dd.MM.yyyy ..." results in '.', "MM/dd/yyy ..." results in '/'.
-   * <br/>
-   * Only '/' and '.' are supported for now.
+   * Example: "dd.MM.yyyy ..." results in '.', "MM/dd/yyy ..." results in '/'. <br/>
+   * Only '/', '-' and '.' are supported for now.
    * @param dateString
    * @return the separator char.
    */
@@ -81,8 +80,22 @@ public class DateFormats
       return '/';
     } else if (dateString.indexOf('.') > 0) {
       return '.';
+    } else if (dateString.indexOf('-') > 0) {
+      return '-';
     }
     return '/';
+  }
+
+  /**
+   * @param dateString
+   * @return true if the dateString starts with "yyyy-MM-dd", otherwise false.
+   */
+  public static boolean isIsoFormat(final String dateString)
+  {
+    if (dateString == null) {
+      return false;
+    }
+    return dateString.startsWith("yyyy-MM-dd");
   }
 
   /**
