@@ -42,8 +42,6 @@ public class HolidayEventsProvider extends MyFullCalendarEventsProvider
 
   /**
    * @param parent For i18n.
-   * @param addressDao
-   * @param dataProtection If true (default) then no ages will be shown, only the names.
    * @see Component#getString(String)
    */
   public HolidayEventsProvider(final Component parent)

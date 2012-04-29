@@ -101,6 +101,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
         }
       });
     }
+    checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showPlanning"),
+        getString("calendar.option.planning"), true).setTooltip(getString("calendar.option.planning.tooltip")));
     checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showBirthdays"),
         getString("calendar.option.birthdays"), true));
     checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showStatistics"),

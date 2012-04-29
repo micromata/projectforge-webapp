@@ -44,12 +44,14 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.address.AddressDao;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.humanresources.HRPlanningDao;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.address.AddressViewPage;
 import org.projectforge.web.address.BirthdayEventsProvider;
+import org.projectforge.web.humanresources.HRPlanningEventsProvider;
 import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -67,6 +69,9 @@ public class CalendarPanel extends Panel
   @SpringBean(name = "addressDao")
   private AddressDao addressDao;
 
+  @SpringBean(name = "hrPlanningDao")
+  private HRPlanningDao hrPlanningDao;
+
   @SpringBean(name = "timesheetDao")
   private TimesheetDao timesheetDao;
 
@@ -77,6 +82,8 @@ public class CalendarPanel extends Panel
   private BirthdayEventsProvider birthdayEventsProvider;
 
   private HolidayEventsProvider holidayEventsProvider;
+
+  private HRPlanningEventsProvider hrPlanningEventsProvider;
 
   private TimesheetEventsProvider timesheetEventsProvider;
 
@@ -218,27 +225,35 @@ public class CalendarPanel extends Panel
     setConfig();
 
     // Time sheets
-    EventSource reservations = new EventSource();
+    EventSource eventSource = new EventSource();
     timesheetEventsProvider = new TimesheetEventsProvider(this, timesheetDao, filter);
-    reservations.setEventsProvider(timesheetEventsProvider);
-    reservations.setEditable(true);
-    config.add(reservations);
+    eventSource.setEventsProvider(timesheetEventsProvider);
+    eventSource.setEditable(true);
+    config.add(eventSource);
     // Holidays:
-    reservations = new EventSource();
+    eventSource = new EventSource();
     holidayEventsProvider = new HolidayEventsProvider(this);
-    reservations.setEventsProvider(holidayEventsProvider);
-    reservations.setEditable(false);
-    config.add(reservations);
+    eventSource.setEventsProvider(holidayEventsProvider);
+    eventSource.setEditable(false);
+    config.add(eventSource);
+    // HR planning:
+    eventSource = new EventSource();
+    hrPlanningEventsProvider = new HRPlanningEventsProvider(this, filter, hrPlanningDao);
+    eventSource.setEventsProvider(hrPlanningEventsProvider);
+    eventSource.setEditable(false);
+    eventSource.setBackgroundColor("#0080FF");
+    eventSource.setColor("#0080FF");
+    config.add(eventSource);
     // Birthdays:
-    reservations = new EventSource();
+    eventSource = new EventSource();
     birthdayEventsProvider = new BirthdayEventsProvider(this, filter, addressDao,
         accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == false);
-    reservations.setEventsProvider(birthdayEventsProvider);
-    reservations.setEditable(false);
-    reservations.setBackgroundColor("#EEEEEE");
-    reservations.setColor("#EEEEEE");
-    reservations.setTextColor("#222222");
-    config.add(reservations);
+    eventSource.setEventsProvider(birthdayEventsProvider);
+    eventSource.setEditable(false);
+    eventSource.setBackgroundColor("#EEEEEE");
+    eventSource.setColor("#EEEEEE");
+    eventSource.setTextColor("#222222");
+    config.add(eventSource);
   }
 
   private void modifyEvent(final Event event, final DateTime newStartTime, final DateTime newEndTime)
@@ -299,6 +314,7 @@ public class CalendarPanel extends Panel
       refresh = false;
       timesheetEventsProvider.forceReload();
       birthdayEventsProvider.forceReload();
+      hrPlanningEventsProvider.forceReload();
       setConfig();
     }
   }

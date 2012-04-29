@@ -69,6 +69,9 @@ public class CalendarFilter implements Serializable
   private Integer firstHour = 8;
 
   @XStreamAsAttribute
+  private Boolean showPlanning;
+
+  @XStreamAsAttribute
   private ViewType viewType;
 
   public CalendarFilter()
@@ -123,6 +126,24 @@ public class CalendarFilter implements Serializable
   public CalendarFilter setShowStatistics(final boolean showStatistics)
   {
     this.showStatistics = showStatistics;
+    return this;
+  }
+
+  /**
+   * @return the showPlanning
+   */
+  public Boolean isShowPlanning()
+  {
+    return showPlanning == Boolean.TRUE;
+  }
+
+  /**
+   * @param showPlanning the showPlanning to set
+   * @return this for chaining.
+   */
+  public CalendarFilter setShowPlanning(final Boolean showPlanning)
+  {
+    this.showPlanning = showPlanning;
     return this;
   }
 
