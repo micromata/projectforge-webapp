@@ -25,8 +25,8 @@ package org.projectforge.common;
 
 import java.util.Locale;
 
-import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 
@@ -48,6 +48,42 @@ public class DateFormats
   public static final String ISO_TIMESTAMP_MILLIS = "yyyy-MM-dd HH:mm:ss.SSS";
 
   public static final String EXCEL_ISO_DATE = "YYYY-MM-DD";
+
+  /**
+   * Check weather the given dateString has month or day first. If not analyzable then true is returned as default value.
+   * @param dateString
+   * @return true if month is used before day of month.
+   */
+  public static boolean isFormatMonthFirst(final String dateString)
+  {
+    if (dateString == null) {
+      return true;
+    }
+    final int monthPos = dateString.indexOf('M');
+    final int dayPos = dateString.indexOf('d');
+    return monthPos <= dayPos; // '=': if none of both found, true is the default.
+  }
+
+  /**
+   * Tries to get the separator char in dates ('/' is the default if nothing found). <br/>
+   * Example: "dd.MM.yyyy ..." results in '.', "MM/dd/yyy ..." results in '/'.
+   * <br/>
+   * Only '/' and '.' are supported for now.
+   * @param dateString
+   * @return the separator char.
+   */
+  public static char getDateSeparatorChar(final String dateString)
+  {
+    if (dateString == null) {
+      return '/';
+    }
+    if (dateString.indexOf('/') > 0) {
+      return '/';
+    } else if (dateString.indexOf('.') > 0) {
+      return '.';
+    }
+    return '/';
+  }
 
   /**
    * Uses default format of the logged-in user.
@@ -149,7 +185,8 @@ public class DateFormats
   }
 
   /**
-   * Gets the format string for the logged-in user. Uses the date format of the logged in user and if not given, it'll be set.
+   * Gets the format string for the logged-in user. Uses the date format of the logged in user and if not given, a default format is
+   * returned.
    * @param format
    * @see Configuration#getExcelDateFormats()
    * @see PFUserDO#getExcelDateFormat()
