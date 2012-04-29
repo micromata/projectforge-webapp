@@ -31,6 +31,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.hibernate.Hibernate;
 import org.projectforge.common.BeanHelper;
+import org.projectforge.registry.Registry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskTree;
 import org.projectforge.web.common.OutputType;
@@ -93,11 +94,7 @@ public class TaskPropertyColumn<T> extends CellItemListenerPropertyColumn<T>
       if (obj instanceof TaskDO) {
         task = (TaskDO) obj;
         if (Hibernate.isInitialized(task) == false) {
-          if (taskTree != null) {
-            task = taskTree.getTaskById(task.getId());
-          } else {
-            Hibernate.initialize(task);
-          }
+          task = Registry.instance().getTaskTree().getTaskById(task.getId());
         }
       } else if (obj instanceof Integer) {
         Validate.notNull(taskTree);
