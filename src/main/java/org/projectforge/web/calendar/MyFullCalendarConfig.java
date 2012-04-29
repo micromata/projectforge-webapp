@@ -35,6 +35,7 @@ import org.apache.wicket.Component;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.web.I18nCore;
 
 public class MyFullCalendarConfig extends Config
 {
@@ -76,18 +77,12 @@ public class MyFullCalendarConfig extends Config
     getButtonText().setMonth(getString("calendar.month"));
     getButtonText().setDay(getString("calendar.day"));
     setAllDayText(getString("calendar.allday"));
-    setAxisFormat(getString("calendar.format.axisFormat"));
+    I18nCore.setFullCalendarDateFormats(PFUserContext.getUser(), this);
     final DateFormatSymbols dateFormatSymbols = new DateFormatSymbols(parent.getLocale());
     setDayNames(convert(dateFormatSymbols.getWeekdays()));
     setDayNamesShort(convert(dateFormatSymbols.getShortWeekdays()));
     setMonthNames(dateFormatSymbols.getMonths());
-    setTitleFormatDay(getString("calendar.format.titleFormat.day"));
-    setTitleFormatMonth(getString("calendar.format.titleFormat.month"));
-    setTitleFormatWeek(getString("calendar.format.titleFormat.week"));
-    setColumnFormatDay(getString("calendar.format.columnFormat.day"));
-    setColumnFormatMonth(getString("calendar.format.columnFormat.month"));
-    setColumnFormatWeek(getString("calendar.format.columnFormat.week"));
-    setTimeFormat(getString("calendar.format.timeFormat"));
+    setMonthNamesShort(dateFormatSymbols.getShortMonths());
     setWeekMode("variable");
   }
 
