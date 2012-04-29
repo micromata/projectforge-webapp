@@ -403,17 +403,19 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         probabilityChoice.setNullValid(true).setEnabled(!entry.isDeleted());
         fs.add(probabilityChoice);
       }
-      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
+      content.add(columns = new DivPanel(content.newChildId(), DivType.COLUMNS));
+      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
       {
         // Hours
-        final FieldsetPanel fs = new FieldsetPanel(columns, getString("hours")).setNoLabelFor();
+        final FieldsetPanel fs = new FieldsetPanel(column, getString("hours")).setNoLabelFor();
         final HRPlanningEditTablePanel table = new HRPlanningEditTablePanel(fs.newChildId());
         fs.add(table);
         table.init(entry);
       }
+      columns.add(column = new DivPanel(columns.newChildId(), DivType.COL_50));
       {
         // Description
-        final FieldsetPanel fs = new FieldsetPanel(columns, getString("hr.planning.description"), true);
+        final FieldsetPanel fs = new FieldsetPanel(column, getString("hr.planning.description"), true);
         final IModel<String> model = new PropertyModel<String>(entry, "description");
         final MaxLengthTextArea description = new MaxLengthTextArea(TextAreaPanel.WICKET_ID, model);
         if (entry.isDeleted() == true) {
