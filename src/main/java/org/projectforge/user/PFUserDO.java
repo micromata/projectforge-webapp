@@ -121,16 +121,18 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private TimeNotation timeNotation;
 
-  @org.hibernate.search.annotations.Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String organization;
 
-  @org.hibernate.search.annotations.Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String personalPhoneIdentifiers;
 
-  @org.hibernate.search.annotations.Field(index = Index.TOKENIZED, store = Store.NO)
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String personalMebMobileNumbers;
 
   private Set<UserRightDO> rights = new HashSet<UserRightDO>();
+
+  private boolean hrPlanning;
 
   @Transient
   public String getShortDisplayName()
@@ -386,8 +388,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     }
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked"})
   @Override
-  @SuppressWarnings("unchecked")
   @Transient
   public Set getHistorizableAttributes()
   {
@@ -689,6 +691,26 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
       }
     }
     return null;
+  }
+
+  /**
+   * If true (default) then the user is highlighted in the human resource planning page if not planned for the actual week.
+   * @return the hrPlanning
+   */
+  @Column(name = "hr_planning", nullable = false)
+  public boolean isHrPlanning()
+  {
+    return hrPlanning;
+  }
+
+  /**
+   * @param hrPlanning the hrPlanning to set
+   * @return this for chaining.
+   */
+  public PFUserDO setHrPlanning(final boolean hrPlanning)
+  {
+    this.hrPlanning = hrPlanning;
+    return this;
   }
 
   @Transient

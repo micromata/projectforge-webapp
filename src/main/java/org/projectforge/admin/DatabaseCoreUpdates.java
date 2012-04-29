@@ -54,13 +54,13 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 4.1
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.1", "2012-04-21", "Adds t_pf_user.first_day_of_week") {
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.1", "2012-04-21", "Adds t_pf_user.first_day_of_week and t_pf_user.hr_planning.") {
       final Table userTable = new Table(PFUserDO.class);
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
-        return dao.doesTableAttributesExist(userTable, "firstDayOfWeek") == true //
+        return dao.doesTableAttributesExist(userTable, "firstDayOfWeek", "hrPlanning") == true //
             ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
       }
 
@@ -70,6 +70,9 @@ public class DatabaseCoreUpdates
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         if (dao.doesTableAttributesExist(userTable, "firstDayOfWeek") == false) {
           dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "firstDayOfWeek"));
+        }
+        if (dao.doesTableAttributesExist(userTable, "hrPlanning") == false) {
+          dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "hrPlanning").setDefaultValue("true"));
         }
         return UpdateRunningStatus.DONE;
       }
