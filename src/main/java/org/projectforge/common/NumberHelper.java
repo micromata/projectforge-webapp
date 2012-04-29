@@ -35,7 +35,6 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.projectforge.user.PFUserContext;
 
-
 /**
  * Some helper methods ...
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -142,8 +141,14 @@ public class NumberHelper
     return value != null && value.intValue() > 0;
   }
 
-  public static boolean isZeroOrNull(final Integer value) {
+  public static boolean isZeroOrNull(final Integer value)
+  {
     return (value == null || value == 0);
+  }
+
+  public static boolean isGreaterZero(final BigDecimal value)
+  {
+    return (value != null && value.compareTo(BigDecimal.ZERO) > 0);
   }
 
   /**
@@ -154,7 +159,6 @@ public class NumberHelper
   {
     return !isZeroOrNull(value);
   }
-
 
   /**
    * Parses the given string as integer value.
@@ -354,8 +358,8 @@ public class NumberHelper
       str = str.substring(countryPrefix.length());
     } else if (str.length() > 3
         && str.charAt(0) == '+'
-          && Character.isDigit(str.charAt(1)) == true
-          && Character.isDigit(str.charAt(2)) == true) {
+        && Character.isDigit(str.charAt(1)) == true
+        && Character.isDigit(str.charAt(2)) == true) {
       buf.append("00");
       buf.append(str.charAt(1));
       buf.append(str.charAt(2));
@@ -502,7 +506,8 @@ public class NumberHelper
     return Base64.encodeBase64URLSafeString(bytes);
   }
 
-  public static boolean isIn(final int value, final int... numbers) {
+  public static boolean isIn(final int value, final int... numbers)
+  {
     if (numbers == null) {
       return false;
     }
