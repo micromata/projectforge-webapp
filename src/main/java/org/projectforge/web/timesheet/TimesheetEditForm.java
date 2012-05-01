@@ -363,7 +363,7 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
   @SuppressWarnings("serial")
   private void addTemplatesRow()
   {
-    final FieldsetPanel fs = gridBuilder.newFieldset(getString("templates"), true);
+    final FieldsetPanel fs = gridBuilder.newFieldset(getString("templates"), true).setNoLabelFor();
     final String[] templateNames = userPrefDao.getPrefNames(UserPrefArea.TIMESHEET_TEMPLATE);
     if (templateNames != null && templateNames.length > 0) {
       // DropDownChoice templates
