@@ -29,7 +29,7 @@ package org.projectforge.web.wicket.flowlayout;
  */
 public enum DivType
 {
-  ACCORDION_BOX("accordion_box"), BLOCK("block"), BOX("box"), CLEARFIX("clearfix"), COL_25("col_25"), COL_33("col_33"), COL_40("col_40"), COL_50(
+  ACCORDION_BOX("accordion_box"), BLOCK("block"), BOX("box"), CLEARFIX("clearfix mm_clear"), COL_25("col_25"), COL_33("col_33"), COL_40("col_40"), COL_50(
       "col_50"), COL_60("col_60"), COL_66("col_66"), COL_75("col_75"), COL_100("col_100"), COLUMNS("columns"), CHECKBOX("jqui_checkbox"), FIELD_DIV(
           "field_div"), GRID4("grid_4"), GRID8("grid_8"), GRID16("grid_16"), MARGIN_TOP_10("margin_top_10"), NO_TITLE("no_titlebar"), RADIOBOX(
               "jqui_radios"), ROUND_ALL("round_all"), SECTION("section"), TOGGLE_CONTAINER("toggle_container");
