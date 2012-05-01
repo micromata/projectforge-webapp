@@ -432,7 +432,7 @@ public class HRPlanningEditForm extends AbstractEditForm<HRPlanningDO, HRPlannin
         content = new DivPanel(entriesRepeater.newChildId(), DivType.GRID16, DivType.ROUND_ALL);
         entriesRepeater.add(content);
       }
-      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));
+      content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK, DivType.CLEARFIX));
       final Button addEntryButton = new Button(SingleButtonPanel.WICKET_ID) {
         @Override
         public final void onSubmit()
