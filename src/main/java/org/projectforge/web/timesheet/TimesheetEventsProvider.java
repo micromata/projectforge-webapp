@@ -198,6 +198,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
           event.setTitle(durationString);
         }
         event.setTextColor("#222222").setBackgroundColor("#FFFFBE").setColor("#FFFFBE");
+        event.setEditable(false);
         events.put(id, event);
         day = day.plusDays(1);
       } while (day.isAfter(end) == false);
