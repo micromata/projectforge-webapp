@@ -66,20 +66,21 @@
 					tmp.setAttribute('type',"text/css");
 					if(opts.title) { tmp.setAttribute("id", opts.title + "-stylesheet"); }
 				}
-				if(tmp.styleSheet) {
+				if(tmp.stylesheet) {
 					if(is_new) { 
 						document.getElementsByTagName("head")[0].appendChild(tmp); 
-						tmp.styleSheet.cssText = opts.str; 
+						tmp.stylesheet.cssText = opts.str; 
 					}
 					else {
-						tmp.styleSheet.cssText = tmp.styleSheet.cssText + " " + opts.str; 
+						tmp.stylesheet.cssText = tmp.stylesheet.cssText + " " + opts.str;
+						
 					}
 				}
 				else {
 					tmp.appendChild(document.createTextNode(opts.str));
 					document.getElementsByTagName("head")[0].appendChild(tmp);
 				}
-				return tmp.sheet || tmp.styleSheet;
+				return tmp.sheet || tmp.stylesheet;
 			}
 			if(opts.url) {
 				if(document.createStyleSheet) {
