@@ -178,6 +178,7 @@ public class TestBase
     transactionTemplate.execute(new TransactionCallback() {
       public Object doInTransaction(final TransactionStatus status)
       {
+        deleteFrom(hibernateTemplate, "ToDoDO");
         deleteFrom(hibernateTemplate, "TimesheetDO");
         deleteFrom(hibernateTemplate, "HRPlanningEntryDO");
         deleteFrom(hibernateTemplate, "HRPlanningDO");
