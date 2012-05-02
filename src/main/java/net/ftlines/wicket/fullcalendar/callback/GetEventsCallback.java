@@ -20,39 +20,53 @@ import net.ftlines.wicket.fullcalendar.EventSource;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.handler.TextRequestHandler;
 import org.apache.wicket.util.collections.MicroMap;
+import org.apache.wicket.util.string.StringValue;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-
 public class GetEventsCallback extends AbstractCallback
 {
-	private static final String SOURCE_ID = "sid";
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GetEventsCallback.class);
 
-	public String getUrl(EventSource source)
-	{
-		return getUrl(new MicroMap<String, Object>(SOURCE_ID, source.getUuid()));
-	}
+  private static final String SOURCE_ID = "sid";
 
-	@Override
-	protected void respond()
-	{
-		Request r = getCalendar().getRequest();
-		String sid = r.getRequestParameters().getParameterValue(SOURCE_ID).toString();
-		DateTime start = new DateTime(r.getRequestParameters().getParameterValue("start").toLong());
-		DateTime end = new DateTime(r.getRequestParameters().getParameterValue("end").toLong());
+  public String getUrl(final EventSource source)
+  {
+    return getUrl(new MicroMap<String, Object>(SOURCE_ID, source.getUuid()));
+  }
 
-		if (getCalendar().getConfig().isIgnoreTimezone())
-		{
-			// Convert to same DateTime in local time zone.
-			int remoteOffset = -r.getRequestParameters().getParameterValue("timezoneOffset").toInt();
-			int localOffset = DateTimeZone.getDefault().getOffset(null) / 60000;
-			int minutesAdjustment = remoteOffset - localOffset;
-			start = start.plusMinutes(minutesAdjustment);
-			end = end.plusMinutes(minutesAdjustment);
-		}
-		EventSource source = getCalendar().getEventManager().getEventSource(sid);
-		EventProvider provider = source.getEventProvider();
-		String response = getCalendar().toJson(provider.getEvents(start, end));
-		getCalendar().getRequestCycle().scheduleRequestHandlerAfterCurrent(new TextRequestHandler(response));
-	}
+  @Override
+  protected void respond()
+  {
+    try {
+      final Request r = getCalendar().getRequest();
+      final String sid = r.getRequestParameters().getParameterValue(SOURCE_ID).toString();
+      DateTime start = parseDateTime(r, "start");
+      DateTime end = parseDateTime(r, "end");
+      if (getCalendar().getConfig().isIgnoreTimezone()) {
+        // Convert to same DateTime in local time zone.
+        final int remoteOffset = -r.getRequestParameters().getParameterValue("timezoneOffset").toInt();
+        final int localOffset = DateTimeZone.getDefault().getOffset(null) / 60000;
+        final int minutesAdjustment = remoteOffset - localOffset;
+        start = start.plusMinutes(minutesAdjustment);
+        end = end.plusMinutes(minutesAdjustment);
+      }
+      final EventSource source = getCalendar().getEventManager().getEventSource(sid);
+      final EventProvider provider = source.getEventProvider();
+      final String response = getCalendar().toJson(provider.getEvents(start, end));
+      getCalendar().getRequestCycle().scheduleRequestHandlerAfterCurrent(new TextRequestHandler(response));
+    } catch (final Exception ex) {
+      // Happens normally after session time out. Do nothing.
+      log.info("Exception after session time out? " + ex.getMessage());
+    }
+  }
+
+  private DateTime parseDateTime(final Request r, final String param) {
+    final StringValue sval = r.getRequestParameters().getParameterValue(param);
+    if (sval.toString("").contains("-") == true) {
+      return new DateTime(sval.toString());
+    } else {
+      return new DateTime(sval.toLong());
+    }
+  }
 }

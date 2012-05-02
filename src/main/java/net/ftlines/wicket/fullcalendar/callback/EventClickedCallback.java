@@ -15,6 +15,7 @@ package net.ftlines.wicket.fullcalendar.callback;
 import net.ftlines.wicket.fullcalendar.CalendarResponse;
 import net.ftlines.wicket.fullcalendar.Event;
 import net.ftlines.wicket.fullcalendar.EventSource;
+import net.ftlines.wicket.fullcalendar.EventSourceNotFoundException;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.AbstractReadOnlyModel;
@@ -23,38 +24,43 @@ import org.apache.wicket.request.Request;
 
 public abstract class EventClickedCallback extends AbstractAjaxCallback implements CallbackWithHandler
 {
-	@Override
-	protected String configureCallbackScript(String script, String urlTail)
-	{
-		return script.replace(urlTail, "&eventId='+event.id+'&sourceId='+event.source.data." + EventSource.Const.UUID +
-			"+'");
-	}
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EventClickedCallback.class);
 
-	public IModel<String> getHandlerScript()
-	{
-		return new AbstractReadOnlyModel<String>() {
-			@Override
-			public String getObject() {
-				return "function(event) { " + getCallbackScript() + "}";
-			}
-		};
-	}
-	
-	@Override
-	protected void respond(AjaxRequestTarget target)
-	{
-		Request r = getCalendar().getRequest();
-		String eventId = r.getRequestParameters().getParameterValue("eventId").toString();
-		String sourceId = r.getRequestParameters().getParameterValue("sourceId").toString();
+  @Override
+  protected String configureCallbackScript(final String script, final String urlTail)
+  {
+    return script.replace(urlTail, "&eventId='+event.id+'&sourceId='+event.source.data." + EventSource.Const.UUID + "+'");
+  }
 
-		EventSource source = getCalendar().getEventManager().getEventSource(sourceId);
-		Event event = source.getEventProvider().getEventForId(eventId);
+  public IModel<String> getHandlerScript()
+  {
+    return new AbstractReadOnlyModel<String>() {
+      @Override
+      public String getObject()
+      {
+        return "function(event) { " + getCallbackScript() + "}";
+      }
+    };
+  }
 
-		onClicked(new ClickedEvent(source, event), new CalendarResponse(getCalendar(), target));
-	}
+  @Override
+  protected void respond(final AjaxRequestTarget target)
+  {
+    try {
+      final Request r = getCalendar().getRequest();
+      final String eventId = r.getRequestParameters().getParameterValue("eventId").toString();
+      final String sourceId = r.getRequestParameters().getParameterValue("sourceId").toString();
 
+      final EventSource source = getCalendar().getEventManager().getEventSource(sourceId);
+      final Event event = source.getEventProvider().getEventForId(eventId);
 
-	protected abstract void onClicked(ClickedEvent event, CalendarResponse response);
+      onClicked(new ClickedEvent(source, event), new CalendarResponse(getCalendar(), target));
+    } catch (final EventSourceNotFoundException ex) {
+      // Event not found, this happened after session time out and click.
+      log.info("Exception after session time out? " + ex.getMessage());
+    }
+  }
 
+  protected abstract void onClicked(ClickedEvent event, CalendarResponse response);
 
 }
