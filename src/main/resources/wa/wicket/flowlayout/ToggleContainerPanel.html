@@ -6,10 +6,12 @@
 <body>
   <h1>Represents a container.</h1>
   <wicket:panel>
-    <div wicket:id="toggleContainer">
+    <div wicket:id="panel">
       <h2 class="box_head" wicket:id="heading">[heading]</h2>
-      <a href="#" class="toggle"></a>
-      <div class="toggle_container grey"><wicket:container wicket:id="content">[Toggle container.]</wicket:container></div>
+      <a wicket:id="toggleLink" href="#" class="toggle"></a>
+      <div class="toggle_container grey" wicket:id="toggleContainer">
+        <wicket:container wicket:id="content">[Toggle container.]</wicket:container>
+      </div>
     </div>
   </wicket:panel>
 </body>

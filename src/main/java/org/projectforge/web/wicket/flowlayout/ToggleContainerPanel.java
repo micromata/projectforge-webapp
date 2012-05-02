@@ -43,7 +43,9 @@ public class ToggleContainerPanel extends Panel
 
   public static final String HEADING_ID = "heading";
 
-  private final WebMarkupContainer toggleContainer;
+  private Component heading, toggleLink;
+
+  private final WebMarkupContainer panel, toggleContainer;
 
   /**
    * @param id
@@ -51,18 +53,20 @@ public class ToggleContainerPanel extends Panel
   public ToggleContainerPanel(final String id, final DivType... cssClasses)
   {
     super(id);
-    toggleContainer = new WebMarkupContainer("toggleContainer");
-    super.add(toggleContainer);
+    panel = new WebMarkupContainer("panel");
+    super.add(panel);
     if (cssClasses != null) {
       for (final DivType cssClass : cssClasses) {
-        toggleContainer.add(AttributeModifier.append("class", cssClass.getClassAttrValue()));
+        panel.add(AttributeModifier.append("class", cssClass.getClassAttrValue()));
       }
     }
+    panel.add(toggleContainer = new WebMarkupContainer("toggleContainer"));
+    panel.add(toggleLink = new WebMarkupContainer("toggleLink"));
   }
 
   public ToggleContainerPanel setHeading(final String heading)
   {
-    toggleContainer.add(new Label(HEADING_ID, heading));
+    panel.add(this.heading = new Label(HEADING_ID, heading));
     return this;
   }
 
@@ -72,7 +76,8 @@ public class ToggleContainerPanel extends Panel
    */
   public ToggleContainerPanel setHeading(final Component heading)
   {
-    toggleContainer.add(heading);
+    this.heading = heading;
+    panel.add(heading);
     return this;
   }
 
@@ -104,5 +109,18 @@ public class ToggleContainerPanel extends Panel
   public Component add(final Behavior... behaviors)
   {
     return toggleContainer.add(behaviors);
+  }
+
+  /**
+   * Has only effect before rendering this component the first time. Must be called after heading was set.
+   * @param closed the closed to set
+   * @return this for chaining.
+   */
+  public ToggleContainerPanel setClosed()
+  {
+    toggleContainer.add(AttributeModifier.append("style", "display: none;"));
+    heading.add(AttributeModifier.append("class", "round_all"));
+    toggleLink.add(AttributeModifier.append("class", "toggle_closed"));
+    return this;
   }
 }
