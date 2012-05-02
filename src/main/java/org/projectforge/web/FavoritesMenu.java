@@ -191,12 +191,24 @@ public class FavoritesMenu implements Serializable
     }
     if (this.menuEntries.size() == 0) {
       final MenuItemRegistry registry = MenuItemRegistry.instance();
-      addFavoriteMenuEntry(registry.get(MenuItemDefId.TASK_TREE));
-      addFavoriteMenuEntry(registry.get(MenuItemDefId.CALENDAR));
-      addFavoriteMenuEntry(registry.get(MenuItemDefId.ADDRESS_LIST));
-      addFavoriteMenuEntry(registry.get(MenuItemDefId.BOOK_LIST));
-      addFavoriteMenuEntry(registry.get(MenuItemDefId.PHONE_CALL));
-      addFavoriteMenuEntry(registry.get(ToDoPlugin.ID));
+      if (accessChecker.isLoggedInUserMemberOfAdminGroup() == true) {
+        final MenuEntry adminMenu = new MenuEntry().setName(PFUserContext.getLocalizedString(MenuItemDefId.ADMINISTRATION.getI18nKey()));
+        menuEntries.add(adminMenu);
+        adminMenu.addMenuEntry(menu.getMenuEntry(registry.get(MenuItemDefId.ACCESS_LIST)));
+        adminMenu.addMenuEntry(menu.getMenuEntry(registry.get(MenuItemDefId.USER_LIST)));
+        adminMenu.addMenuEntry(menu.getMenuEntry(registry.get(MenuItemDefId.GROUP_LIST)));
+        adminMenu.addMenuEntry(menu.getMenuEntry(registry.get(MenuItemDefId.SYSTEM)));
+      }
+      final MenuEntry projectManagementMenu = new MenuEntry().setName(PFUserContext.getLocalizedString(MenuItemDefId.PROJECT_MANAGEMENT.getI18nKey()));
+      menuEntries.add(projectManagementMenu);
+      projectManagementMenu.addMenuEntry(menu.getMenuEntry(registry.get(MenuItemDefId.MONTHLY_EMPLOYEE_REPORT)));
+      projectManagementMenu.addMenuEntry(menu.getMenuEntry(registry.get(MenuItemDefId.TIMESHEET_LIST)));
+      menuEntries.add(menu.getMenuEntry(registry.get(MenuItemDefId.TASK_TREE)));
+      menuEntries.add(menu.getMenuEntry(registry.get(MenuItemDefId.CALENDAR)));
+      menuEntries.add(menu.getMenuEntry(registry.get(MenuItemDefId.ADDRESS_LIST)));
+      menuEntries.add(menu.getMenuEntry(registry.get(MenuItemDefId.BOOK_LIST)));
+      menuEntries.add(menu.getMenuEntry(registry.get(MenuItemDefId.PHONE_CALL)));
+      menuEntries.add(menu.getMenuEntry(registry.get(ToDoPlugin.ID)));
     }
   }
 
