@@ -71,6 +71,10 @@ public class ToDoEditPage extends AbstractEditPage<ToDoDO, ToDoEditForm, ToDoDao
   protected void onAfterRender()
   {
     super.onAfterRender();
+    if (accessChecker.isDemoUser() == true) {
+      // Do nothing.
+      return;
+    }
     if (ObjectUtils.equals(PFUserContext.getUserId(), getData().getAssigneeId()) == true) {
       // OK, user has now seen this to-do: delete recent flag:
       if (isNew() == false && getData().isRecent() == true) {
