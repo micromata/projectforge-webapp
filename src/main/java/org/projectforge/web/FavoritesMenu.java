@@ -194,22 +194,35 @@ public class FavoritesMenu implements Serializable
       if (accessChecker.isLoggedInUserMemberOfAdminGroup() == true) {
         final MenuEntry adminMenu = new MenuEntry().setName(PFUserContext.getLocalizedString(MenuItemDefId.ADMINISTRATION.getI18nKey()));
         menuEntries.add(adminMenu);
-        adminMenu.addMenuEntry(menu.getMenuEntry(registry.get(MenuItemDefId.ACCESS_LIST)));
-        adminMenu.addMenuEntry(menu.getMenuEntry(registry.get(MenuItemDefId.USER_LIST)));
-        adminMenu.addMenuEntry(menu.getMenuEntry(registry.get(MenuItemDefId.GROUP_LIST)));
-        adminMenu.addMenuEntry(menu.getMenuEntry(registry.get(MenuItemDefId.SYSTEM)));
+        addFavoriteMenuEntry(adminMenu, registry.get(MenuItemDefId.ACCESS_LIST));
+        addFavoriteMenuEntry(adminMenu, registry.get(MenuItemDefId.USER_LIST));
+        addFavoriteMenuEntry(adminMenu, registry.get(MenuItemDefId.GROUP_LIST));
+        addFavoriteMenuEntry(adminMenu, registry.get(MenuItemDefId.SYSTEM));
       }
-      final MenuEntry projectManagementMenu = new MenuEntry().setName(PFUserContext.getLocalizedString(MenuItemDefId.PROJECT_MANAGEMENT.getI18nKey()));
+      final MenuEntry projectManagementMenu = new MenuEntry().setName(PFUserContext.getLocalizedString(MenuItemDefId.PROJECT_MANAGEMENT
+          .getI18nKey()));
       menuEntries.add(projectManagementMenu);
-      projectManagementMenu.addMenuEntry(menu.getMenuEntry(registry.get(MenuItemDefId.MONTHLY_EMPLOYEE_REPORT)));
-      projectManagementMenu.addMenuEntry(menu.getMenuEntry(registry.get(MenuItemDefId.TIMESHEET_LIST)));
-      menuEntries.add(menu.getMenuEntry(registry.get(MenuItemDefId.TASK_TREE)));
-      menuEntries.add(menu.getMenuEntry(registry.get(MenuItemDefId.CALENDAR)));
-      menuEntries.add(menu.getMenuEntry(registry.get(MenuItemDefId.ADDRESS_LIST)));
-      menuEntries.add(menu.getMenuEntry(registry.get(MenuItemDefId.BOOK_LIST)));
-      menuEntries.add(menu.getMenuEntry(registry.get(MenuItemDefId.PHONE_CALL)));
-      menuEntries.add(menu.getMenuEntry(registry.get(ToDoPlugin.ID)));
+      addFavoriteMenuEntry(projectManagementMenu, registry.get(MenuItemDefId.MONTHLY_EMPLOYEE_REPORT));
+      addFavoriteMenuEntry(projectManagementMenu, registry.get(MenuItemDefId.TIMESHEET_LIST));
+      addFavoriteMenuEntry(registry.get(MenuItemDefId.TASK_TREE));
+      addFavoriteMenuEntry(registry.get(MenuItemDefId.CALENDAR));
+      addFavoriteMenuEntry(registry.get(MenuItemDefId.ADDRESS_LIST));
+      addFavoriteMenuEntry(registry.get(MenuItemDefId.BOOK_LIST));
+      addFavoriteMenuEntry(registry.get(MenuItemDefId.PHONE_CALL));
+      addFavoriteMenuEntry(registry.get(ToDoPlugin.ID));
     }
+  }
+
+  private void addFavoriteMenuEntry(final MenuEntry parent, final MenuItemDef menuItemDef)
+  {
+    if (menu == null) {
+      return;
+    }
+    final MenuEntry menuEntry = menu.getMenuEntry(menuItemDef);
+    if (menuEntry == null) {
+      return;
+    }
+    parent.addMenuEntry(menuEntry);
   }
 
   private void addFavoriteMenuEntry(final MenuItemDef menuItemDef)
