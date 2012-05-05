@@ -36,6 +36,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeConstants;
 import org.projectforge.calendar.TimePeriod;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
@@ -620,5 +621,13 @@ public class DateHelper implements Serializable
     final String isDateString = dateTime.toString(DateFormats.ISO_TIMESTAMP_MILLIS);
     final Date date = DateHelper.parseIsoTimestamp(isDateString, PFUserContext.getTimeZone());
     return date.getTime();
+  }
+
+  public final static int convertCalendarDayOfWeekToJoda(final int calendarDayOfWeek)
+  {
+    if (calendarDayOfWeek == Calendar.SUNDAY) {
+      return DateTimeConstants.SUNDAY;
+    }
+    return calendarDayOfWeek - 1;
   }
 }
