@@ -73,7 +73,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
   // duration by day of month.
   private final long[] durationsPerDayOfMonth = new long[32];
 
-  private final long[] durationsPerWeekOfYear = new long[55];
+  private final long[] durationsPerDayOfYear = new long[370];
 
   /**
    * @param parent For i18n.
@@ -98,8 +98,8 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     for (int i = 0; i < durationsPerDayOfMonth.length; i++) {
       durationsPerDayOfMonth[i] = 0;
     }
-    for (int i = 0; i < durationsPerWeekOfYear.length; i++) {
-      durationsPerWeekOfYear[i] = 0;
+    for (int i = 0; i < durationsPerDayOfYear.length; i++) {
+      durationsPerDayOfYear[i] = 0;
     }
     final Integer userId = calFilter.getUserId();
     if (userId == null) {
@@ -158,8 +158,8 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
         totalDuration += duration;
         addDurationOfDay(startTime.getDayOfMonth(), duration);
       }
-      final int weekOfYear = startTime.getWeekOfWeekyear();
-      addDurationOfWeekOfYear(weekOfYear, duration);
+      final int dayOfYear = startTime.getDayOfYear();
+      addDurationOfDayOfYear(dayOfYear, duration);
     }
     if (calFilter.isShowStatistics() == true) {
       // Show statistics: duration of every day is shown as all day event.
@@ -172,7 +172,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
         }
         final int dayOfMonth = day.getDayOfMonth();
         final long duration = durationsPerDayOfMonth[dayOfMonth];
-        final boolean firstDayOfWeek = day.getDayOfWeek() == PFUserContext.getFirstDayOfWeek() - 1;
+        final boolean firstDayOfWeek = day.getDayOfWeek() == PFUserContext.getJodaFirstDayOfWeek();
         if (firstDayOfWeek == false && (duration == 0 || (month != null && month != day.getMonthOfYear()))) {
           day = day.plusDays(1);
           continue;
@@ -184,12 +184,16 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
         final String durationString = formatDuration(duration, false);
         if (firstDayOfWeek == true) {
           // Show week of year at top of first day of week.
-          final int weekOfYear = day.getWeekOfWeekyear();
+          final int dayOfYear = day.getDayOfYear();
+          long weekDuration = 0;
+          for (short i = 0; i < 7; i++) {
+            weekDuration += durationsPerDayOfYear[dayOfYear + i];
+          }
           final StringBuffer buf = new StringBuffer();
           buf.append(getString("calendar.weekOfYearShortLabel")).append(DateHelper.getWeekOfYear(day));
-          if (days > 1) {
+          if (days > 1 && weekDuration > 0) {
             // Show total sum of durations over all time sheets of current week (only in week and month view).
-            buf.append(": ").append(formatDuration(durationsPerWeekOfYear[weekOfYear], false));
+            buf.append(": ").append(formatDuration(weekDuration, false));
           }
           if (duration > 0) {
             buf.append(", ").append(durationString);
@@ -298,9 +302,9 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     return durationsPerDayOfMonth[dayOfMonth];
   }
 
-  private void addDurationOfWeekOfYear(final int weekOfYear, final long duration)
+  private void addDurationOfDayOfYear(final int dayOfYear, final long duration)
   {
-    durationsPerWeekOfYear[weekOfYear] += duration;
+    durationsPerDayOfYear[dayOfYear] += duration;
   }
 
   /**
