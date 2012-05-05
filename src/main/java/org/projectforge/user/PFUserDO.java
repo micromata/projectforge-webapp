@@ -51,6 +51,7 @@ import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.Store;
+import org.joda.time.DateTimeZone;
 import org.projectforge.common.ReflectionToString;
 import org.projectforge.common.TimeNotation;
 import org.projectforge.core.AbstractBaseDO;
@@ -200,6 +201,13 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public void setTimeZoneObject(final TimeZone timeZone)
   {
     this.timeZone = timeZone;
+  }
+
+  @Transient
+  public DateTimeZone getDateTimeZone()
+  {
+    final TimeZone timeZone = getTimeZoneObject();
+    return DateTimeZone.forID(timeZone.getID());
   }
 
   @Column
