@@ -101,7 +101,7 @@ public class MyFullCalendarConfig extends Config
    */
   public int getFirstDay()
   {
-    return PFUserContext.getFirstDayOfWeek() - 1;
+    return PFUserContext.getJodaFirstDayOfWeek();
   }
 
   /**
