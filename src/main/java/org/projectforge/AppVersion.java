@@ -23,7 +23,7 @@ public class AppVersion
 
   public static final String RELEASE_DATE = "2012-05-03";
 
-  public static final String RELEASE_TIMESTAMP = "2012-05-03 01:12";
+  public static final String RELEASE_TIMESTAMP = "2012-05-03 01:20";
 }
 
 			
