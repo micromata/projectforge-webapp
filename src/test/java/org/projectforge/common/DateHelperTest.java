@@ -34,6 +34,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import org.joda.time.DateTimeConstants;
 import org.junit.Test;
 import org.projectforge.core.Configuration;
 import org.projectforge.test.TestBase;
@@ -138,6 +139,18 @@ public class DateHelperTest extends TestBase
 
     assertFalse(DateHelper.dateOfYearBetween(3, 21, 10, 3, 2, 20)); // 3/21 isn't between 10/3 and 2/20
     assertFalse(DateHelper.dateOfYearBetween(9, 21, 10, 3, 2, 20)); // 9/21 isn't between 10/3 and 2/20
+  }
+
+  @Test
+  public void convertCalendarDayOfWeekToJoda()
+  {
+    assertEquals(DateTimeConstants.MONDAY, DateHelper.convertCalendarDayOfWeekToJoda(Calendar.MONDAY));
+    assertEquals(DateTimeConstants.TUESDAY, DateHelper.convertCalendarDayOfWeekToJoda(Calendar.TUESDAY));
+    assertEquals(DateTimeConstants.WEDNESDAY, DateHelper.convertCalendarDayOfWeekToJoda(Calendar.WEDNESDAY));
+    assertEquals(DateTimeConstants.THURSDAY, DateHelper.convertCalendarDayOfWeekToJoda(Calendar.THURSDAY));
+    assertEquals(DateTimeConstants.FRIDAY, DateHelper.convertCalendarDayOfWeekToJoda(Calendar.FRIDAY));
+    assertEquals(DateTimeConstants.SATURDAY, DateHelper.convertCalendarDayOfWeekToJoda(Calendar.SATURDAY));
+    assertEquals(DateTimeConstants.SUNDAY, DateHelper.convertCalendarDayOfWeekToJoda(Calendar.SUNDAY));
   }
 
   private Date createDate(final int year, final int month, final int day, final int hour, final int minute, final int second,
