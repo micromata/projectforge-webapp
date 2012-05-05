@@ -33,6 +33,7 @@ import java.util.TimeZone;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.projectforge.calendar.DayHolder;
+import org.projectforge.user.PFUserContext;
 
 /**
  * Parse and formats dates.
@@ -407,17 +408,22 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
    */
   public DateHolder setBeginOfWeek()
   {
-    calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+    calendar.set(Calendar.DAY_OF_WEEK, getFirstDayOfWeek());
     setBeginOfDay();
     return this;
   }
 
+  private static int getFirstDayOfWeek()
+  {
+    return PFUserContext.getCalendarFirstDayOfWeek();
+  }
+
   /**
-   * Checks on day equals MONDAY and hour, minute, second and millisecond equals zero.
+   * Checks on day equals first day of week and hour, minute, second and millisecond equals zero.
    */
   public boolean isBeginOfWeek()
   {
-    return getDayOfWeek() == Calendar.MONDAY && getMilliSecond() == 0 && getSecond() == 0 && getMinute() == 0 && getHourOfDay() == 0;
+    return getDayOfWeek() == getFirstDayOfWeek() && getMilliSecond() == 0 && getSecond() == 0 && getMinute() == 0 && getHourOfDay() == 0;
 
   }
 
@@ -427,7 +433,7 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
    */
   public DateHolder setEndOfWeek()
   {
-    calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek() + 6);
+    calendar.set(Calendar.DAY_OF_WEEK, getFirstDayOfWeek() + 6);
     setEndOfDay();
     return this;
   }
