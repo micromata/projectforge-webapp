@@ -29,6 +29,7 @@ import java.util.TimeZone;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.joda.time.DateTimeZone;
+import org.projectforge.common.DateHelper;
 import org.projectforge.core.Configuration;
 
 /**
@@ -132,7 +133,7 @@ public class PFUserContext
    * @return
    * @see Calendar#getFirstDayOfWeek()
    */
-  public final static int getFirstDayOfWeek()
+  public final static int getCalendarFirstDayOfWeek()
   {
     final PFUserDO user = getUser();
     final Integer firstDayOfWeek = user.getFirstDayOfWeek();
@@ -140,6 +141,10 @@ public class PFUserContext
       return firstDayOfWeek;
     }
     return Calendar.getInstance(getLocale()).getFirstDayOfWeek();
+  }
+
+  public final static int getJodaFirstDayOfWeek() {
+    return DateHelper.convertCalendarDayOfWeekToJoda(getCalendarFirstDayOfWeek());
   }
 
   public static String getLocalizedMessage(final String messageKey, final Object... params)
