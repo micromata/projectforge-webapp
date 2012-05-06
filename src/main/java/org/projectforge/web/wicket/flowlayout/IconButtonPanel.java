@@ -119,6 +119,14 @@ public class IconButtonPanel extends Panel
   }
 
   /**
+   * @return the button
+   */
+  public Button getButton()
+  {
+    return button;
+  }
+
+  /**
    * @param attributeName
    * @param value
    * @return this for chaining.
