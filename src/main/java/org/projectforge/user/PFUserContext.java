@@ -23,7 +23,6 @@
 
 package org.projectforge.user;
 
-import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -129,10 +128,9 @@ public class PFUserContext
   }
 
   /**
-   * The first day of the week, configured at the given user, if not configured {@link Calendar#getFirstDayOfWeek()} with the locale
-   * returned by {@link #getLocale()} is used.
+   * The first day of the week, configured at the given user, if not configured {@link ConfigXml#getFirstDayOfWeek()} is used.
    * @return
-   * @see Calendar#getFirstDayOfWeek()
+   * @see ConfigXml#getFirstDayOfWeek()
    */
   public final static int getCalendarFirstDayOfWeek()
   {

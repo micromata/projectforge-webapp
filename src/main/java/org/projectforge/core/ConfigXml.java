@@ -729,7 +729,7 @@ public class ConfigXml
   }
 
   /**
-   * The default first day of week (0 - Sunday, 1 - Monday, ...)
+   * The default first day of week (1 - Sunday, 2 - Monday, ...)
    * @return the firstDayOfWeek
    */
   public int getFirstDayOfWeek()
