@@ -73,6 +73,19 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     return dummyLabel;
   }
 
+  public static void appendDatePickerInitJavaScript(final StringBuffer buf)
+  {
+    String dateFormat = DateFormats.getFormatString(DateFormatType.DATE);
+    if (StringUtils.isNotBlank(dateFormat) == true) {
+      dateFormat = dateFormat.toLowerCase().replace("yy", "y"); // Date format conversion for DatePicker of jquery ui.
+      buf.append(".datepicker({ dateFormat : '");
+      buf.append(dateFormat);
+      buf.append("', showButtonPanel: true });\n");
+    } else {
+      buf.append(".datepicker({ showButtonPanel: true });\n");
+    }
+  }
+
   /**
    * Constructor that is invoked when page is invoked without a session.
    * 
@@ -112,7 +125,7 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     buf.append("$(function() {\n");
     final String loc = I18nCore.getDatePickerLocale(getLocale());
     if (loc != null) {
-      buf.append("  $.datepicker.setDefaults($.datepicker.regional['").append(loc).append("de']);\n");
+      buf.append("  $.datepicker.setDefaults($.datepicker.regional['").append(loc).append("']);\n");
     }
     buf.append("  $.datepicker.setDefaults({\n");
     buf.append("    showAnim : 'fadeIn',\n");
@@ -120,15 +133,8 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     // buf.append("    showWeek : true\n");
     // }
     buf.append("  });\n");
-    String dateFormat = DateFormats.getFormatString(DateFormatType.DATE);
-    if (StringUtils.isNotBlank(dateFormat) == true) {
-      dateFormat = dateFormat.toLowerCase().replace("yy", "y"); // Date format conversion for DatePicker of jquery ui.
-      buf.append("     $('.datepicker').datepicker({ dateFormat : '");
-      buf.append(dateFormat);
-      buf.append("', showButtonPanel: true });\n");
-    } else {
-      buf.append("     $('.datepicker').datepicker({ showButtonPanel: true });\n");
-    }
+    buf.append("     $('.datepicker')");
+    appendDatePickerInitJavaScript(buf);
     buf.append("  });\n");
     add(new Label("javaScriptLocalization", buf.toString()).setEscapeModelStrings(false));
 
