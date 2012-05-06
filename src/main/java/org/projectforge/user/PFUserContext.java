@@ -30,6 +30,7 @@ import java.util.TimeZone;
 import org.apache.commons.lang.ObjectUtils;
 import org.joda.time.DateTimeZone;
 import org.projectforge.common.DateHelper;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 
 /**
@@ -142,7 +143,7 @@ public class PFUserContext
         return firstDayOfWeek;
       }
     }
-    return Calendar.getInstance(getLocale()).getFirstDayOfWeek();
+    return ConfigXml.getInstance().getFirstDayOfWeek();
   }
 
   public final static int getJodaFirstDayOfWeek()

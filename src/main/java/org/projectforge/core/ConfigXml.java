@@ -34,6 +34,7 @@ import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.security.KeyStore;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -133,6 +134,9 @@ public class ConfigXml
   @XmlField(asElement = true)
   private TimeNotation defaultTimeNotation;
 
+  @XmlField(asElement = true)
+  private int firstDayOfWeek = Calendar.MONDAY;
+
   private String excelDefaultPaperSize;
 
   private List<ConfigureHoliday> holidays;
@@ -214,6 +218,7 @@ public class ConfigXml
     currencySymbol = "€";
     defaultLocale = Locale.ENGLISH;
     defaultTimeNotation = null;
+    firstDayOfWeek = Calendar.MONDAY;
     excelDefaultPaperSize = "DINA4";
     holidays = null;
     contractTypes = null;
@@ -721,6 +726,15 @@ public class ConfigXml
   public TimeNotation getDefaultTimeNotation()
   {
     return defaultTimeNotation;
+  }
+
+  /**
+   * The default first day of week (0 - Sunday, 1 - Monday, ...)
+   * @return the firstDayOfWeek
+   */
+  public int getFirstDayOfWeek()
+  {
+    return firstDayOfWeek;
   }
 
   /**
