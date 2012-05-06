@@ -136,14 +136,17 @@ public class PFUserContext
   public final static int getCalendarFirstDayOfWeek()
   {
     final PFUserDO user = getUser();
-    final Integer firstDayOfWeek = user.getFirstDayOfWeek();
-    if (firstDayOfWeek != null) {
-      return firstDayOfWeek;
+    if (user != null) {
+      final Integer firstDayOfWeek = user.getFirstDayOfWeek();
+      if (firstDayOfWeek != null) {
+        return firstDayOfWeek;
+      }
     }
     return Calendar.getInstance(getLocale()).getFirstDayOfWeek();
   }
 
-  public final static int getJodaFirstDayOfWeek() {
+  public final static int getJodaFirstDayOfWeek()
+  {
     return DateHelper.convertCalendarDayOfWeekToJoda(getCalendarFirstDayOfWeek());
   }
 
