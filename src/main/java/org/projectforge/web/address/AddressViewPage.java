@@ -155,7 +155,6 @@ public class AddressViewPage extends AbstractSecuredPage
     // addRow("publicKey", address.getPublicKey());
     // addRow("fingerprint", address.getFingerprint());
 
-    gridBuilder.newGrid8().newBlockPanel();
     boolean firstRow = addAddressRow("address.heading.postalAddress", name, address.getOrganization(), address.getPostalAddressText(),
         address.getPostalZipCode(), address.getPostalCity(), address.getPostalCountry(), address.getPostalState(), null, null, null, true);
     firstRow = addAddressRow("address.business", name, address.getOrganization(), address.getAddressText(), address.getZipCode(),
@@ -181,6 +180,9 @@ public class AddressViewPage extends AbstractSecuredPage
   {
     if (StringHelper.isNotBlank(addressText, zipCode, city, country, state, phone, mobile, fax) == false) {
       return firstRow;
+    }
+    if (firstRow == true) {
+      gridBuilder.newGrid8().newBlockPanel();
     }
     final DivPanel section = gridBuilder.newSectionPanel();
     if (firstRow == true) {
