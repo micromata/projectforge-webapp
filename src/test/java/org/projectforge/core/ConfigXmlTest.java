@@ -61,6 +61,7 @@ public class ConfigXmlTest
       + "  <mebMailAccount/>\n"
       + "  <currencySymbol>€</currencySymbol>\n"
       + "  <defaultLocale>en</defaultLocale>\n"
+      + "  <firstDayOfWeek>2</firstDayOfWeek>\n"
       + "  <excelDefaultPaperSize>DINA4</excelDefaultPaperSize>\n"
       + "  <holidays>\n"
       + "    <holiday label='Erster Mai' month='4' dayOfMonth='1'/>\n"
