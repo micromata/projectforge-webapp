@@ -29,6 +29,7 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.joda.time.DateMidnight;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
@@ -37,12 +38,15 @@ import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DateTimePanel;
+import org.projectforge.web.wicket.components.JodaDatePanel;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.GridBuilder;
+import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 {
@@ -60,6 +64,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 
   @SuppressWarnings("unused")
   private boolean showTimesheets;
+
+  JodaDatePanel currentDatePanel;
 
   Label durationLabel;
 
@@ -82,6 +88,9 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       fs.add(userSelectPanel);
       userSelectPanel.init().withAutoSubmit(true).setLabel(new Model<String>(getString("user")));
     }
+    currentDatePanel = new JodaDatePanel(fs.newChildId(), new PropertyModel<DateMidnight>(filter, "startDate"));
+    currentDatePanel.getDateField().setOutputMarkupId(true).setVisible(false);
+    fs.add(currentDatePanel);
     final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
     if (isOtherUsersAllowed() == false) {
       showTimesheets = filter.getUserId() != null;
@@ -125,6 +134,10 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     firstHourDropDownChoice.setRequired(true);
     WicketUtils.addTooltip(firstHourDropDownChoice, getString("calendar.option.firstHour.tooltip"));
     fs.add(firstHourDropDownChoice);
+    final IconButtonPanel refreshButtonPanel = new IconButtonPanel(fs.newChildId(), IconType.ARROW_REFRESH, getString("refresh"))
+    .setLight().setDefaultFormProcessing(false);
+    fs.add(refreshButtonPanel);
+    setDefaultButton(refreshButtonPanel.getButton());
     gridBuilder.newColumnPanel(DivType.COL_25);
     fs = gridBuilder.newFieldset(getString("timesheet.duration")).setNoLabelFor();
     final DivTextPanel durationPanel = new DivTextPanel(fs.newChildId(), new Label(DivTextPanel.WICKET_ID, new Model<String>() {

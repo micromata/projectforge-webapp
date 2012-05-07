@@ -24,7 +24,6 @@
 package org.projectforge.web.calendar;
 
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.joda.time.DateMidnight;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 
@@ -60,7 +59,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     }
     form.setFilter(filter);
     form.init();
-    calendarPanel = new CalendarPanel("cal");
+    calendarPanel = new CalendarPanel("cal", form.currentDatePanel);
     form.add(calendarPanel);
     calendarPanel.init(getFilter());
     if (pageParameters != null) {
@@ -81,16 +80,6 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
   {
     super.onBeforeRender();
     calendarPanel.forceReload(); // Needed if e. g. user or anything was changed.
-  }
-
-  /**
-   * @param startDate the startDate to set
-   * @return this for chaining.
-   */
-  public CalendarPage setStartDate(final DateMidnight startDate)
-  {
-    calendarPanel.setStartDate(startDate);
-    return this;
   }
 
   @Override

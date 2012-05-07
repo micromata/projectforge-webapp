@@ -56,6 +56,8 @@ import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
+import org.projectforge.web.wicket.AbstractUnsecureBasePage;
+import org.projectforge.web.wicket.components.JodaDatePanel;
 
 public class CalendarPanel extends Panel
 {
@@ -75,8 +77,6 @@ public class CalendarPanel extends Panel
   @SpringBean(name = "timesheetDao")
   private TimesheetDao timesheetDao;
 
-  private DateMidnight startDate;
-
   private MyFullCalendar calendar;
 
   private BirthdayEventsProvider birthdayEventsProvider;
@@ -91,9 +91,12 @@ public class CalendarPanel extends Panel
 
   private boolean refresh;
 
-  public CalendarPanel(final String id)
+  private final JodaDatePanel currentDatePanel;
+
+  public CalendarPanel(final String id, final JodaDatePanel currentDatePanel)
   {
     super(id);
+    this.currentDatePanel = currentDatePanel;
   }
 
   @SuppressWarnings("serial")
@@ -206,17 +209,26 @@ public class CalendarPanel extends Panel
         }
         response.refetchEvents();
         setStartDate(view.getStart());
-        filter.setStartDate(startDate);
         filter.setViewType(view.getType());
         // Need calling getEvents for getting correct duration label, it's not predictable what will be called first: onViewDisplayed or
         // getEvents.
         timesheetEventsProvider.getEvents(view.getVisibleStart().toDateTime(), view.getVisibleEnd().toDateTime());
+        if (currentDatePanel != null) {
+          currentDatePanel.getDateField().modelChanged();
+          response.getTarget().add(currentDatePanel.getDateField());
+          final StringBuffer buf = new StringBuffer();
+          buf.append("$('#");
+          buf.append(currentDatePanel.getDateField().getMarkupId());
+          buf.append("')");
+          AbstractUnsecureBasePage.appendDatePickerInitJavaScript(buf);
+          response.getTarget().appendJavaScript(buf.toString());
+        }
         response.getTarget().add(((CalendarPage) getPage()).form.durationLabel);
       }
     };
     calendar.setMarkupId("calendar");
     add(calendar);
-    startDate = filter.getStartDate();
+    final DateMidnight startDate = filter.getStartDate();
     if (startDate != null) {
       config.setYear(startDate.getYear());
       config.setMonth(startDate.getMonthOfYear() - 1);
@@ -304,6 +316,7 @@ public class CalendarPanel extends Panel
     super.onBeforeRender();
     // Restore current date (e. g. on reload or on coming back from callee page).
     final MyFullCalendarConfig config = calendar.getConfig();
+    final DateMidnight startDate = filter.getStartDate();
     if (startDate != null) {
       config.setYear(startDate.getYear());
       config.setMonth(startDate.getMonthOfYear() - 1);
@@ -319,7 +332,8 @@ public class CalendarPanel extends Panel
     }
   }
 
-  private void setConfig() {
+  private void setConfig()
+  {
     final MyFullCalendarConfig config = calendar.getConfig();
     if (filter.isSlot30() == true) {
       config.setSlotMinutes(30);
@@ -337,8 +351,16 @@ public class CalendarPanel extends Panel
    */
   public CalendarPanel setStartDate(final DateMidnight startDate)
   {
-    this.startDate = startDate;
+    filter.setStartDate(startDate);
     return this;
+  }
+
+  /**
+   * @return the startDate
+   */
+  public DateMidnight getStartDate()
+  {
+    return filter.getStartDate();
   }
 
   /**
