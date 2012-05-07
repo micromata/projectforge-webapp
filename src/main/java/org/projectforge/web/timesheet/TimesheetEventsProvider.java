@@ -111,9 +111,6 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     filter.setStopTime(end.toDate());
     filter.setOrderType(OrderDirection.ASC);
     final List<TimesheetDO> timesheets = timesheetDao.getList(filter);
-    if (CollectionUtils.isEmpty(timesheets) == true) {
-      return;
-    }
     boolean longFormat = false;
     days = Days.daysBetween(start, end).getDays();
     if (days < 10) {
@@ -128,38 +125,40 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
       month = currentMonth.getMonthOfYear();
       firstDayOfMonth = currentMonth.withDayOfMonth(1);
     }
-    for (final TimesheetDO timesheet : timesheets) {
-      final DateTime startTime = new DateTime(timesheet.getStartTime(), PFUserContext.getDateTimeZone());
-      final DateTime stopTime = new DateTime(timesheet.getStopTime(), PFUserContext.getDateTimeZone());
-      if (stopTime.isBefore(start) == true || startTime.isAfter(end) == true) {
-        // Time sheet doesn't match time period start - end.
-        continue;
+    if (CollectionUtils.isNotEmpty(timesheets) == true) {
+      for (final TimesheetDO timesheet : timesheets) {
+        final DateTime startTime = new DateTime(timesheet.getStartTime(), PFUserContext.getDateTimeZone());
+        final DateTime stopTime = new DateTime(timesheet.getStopTime(), PFUserContext.getDateTimeZone());
+        if (stopTime.isBefore(start) == true || startTime.isAfter(end) == true) {
+          // Time sheet doesn't match time period start - end.
+          continue;
+        }
+        final long duration = timesheet.getDuration();
+        final Event event = new Event();
+        final String id = "ts-" + timesheet.getId();
+        event.setId("" + id);
+        event.setStart(startTime);
+        event.setEnd(stopTime);
+        final String title = getTitle(timesheet);
+        if (longFormat == true) {
+          // Week or day view:
+          event.setTitle(title + "\n" + getToolTip(timesheet) + "\n" + formatDuration(duration, false));
+        } else {
+          // Month view:
+          event.setTitle(title);
+        }
+        if (month != null && startTime.getMonthOfYear() != month && stopTime.getMonthOfYear() != month) {
+          // Display time sheets of other month as grey blue:
+          event.setTextColor("#222222").setBackgroundColor("#ACD9E8").setColor("#ACD9E8");
+        }
+        events.put(id, event);
+        if (month == null || startTime.getMonthOfYear() == month) {
+          totalDuration += duration;
+          addDurationOfDay(startTime.getDayOfMonth(), duration);
+        }
+        final int dayOfYear = startTime.getDayOfYear();
+        addDurationOfDayOfYear(dayOfYear, duration);
       }
-      final long duration = timesheet.getDuration();
-      final Event event = new Event();
-      final String id = "ts-" + timesheet.getId();
-      event.setId("" + id);
-      event.setStart(startTime);
-      event.setEnd(stopTime);
-      final String title = getTitle(timesheet);
-      if (longFormat == true) {
-        // Week or day view:
-        event.setTitle(title + "\n" + getToolTip(timesheet) + "\n" + formatDuration(duration, false));
-      } else {
-        // Month view:
-        event.setTitle(title);
-      }
-      if (month != null && startTime.getMonthOfYear() != month && stopTime.getMonthOfYear() != month) {
-        // Display time sheets of other month as grey blue:
-        event.setTextColor("#222222").setBackgroundColor("#ACD9E8").setColor("#ACD9E8");
-      }
-      events.put(id, event);
-      if (month == null || startTime.getMonthOfYear() == month) {
-        totalDuration += duration;
-        addDurationOfDay(startTime.getDayOfMonth(), duration);
-      }
-      final int dayOfYear = startTime.getDayOfYear();
-      addDurationOfDayOfYear(dayOfYear, duration);
     }
     if (calFilter.isShowStatistics() == true) {
       // Show statistics: duration of every day is shown as all day event.
