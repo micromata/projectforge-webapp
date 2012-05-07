@@ -66,362 +66,362 @@ import de.micromata.hibernate.history.delta.PropertyDelta;
  */
 public class DatevImportStoragePanel extends Panel
 {
-  private static final long serialVersionUID = -5732520730823126042L;
+	private static final long serialVersionUID = -5732520730823126042L;
 
-  protected WebMarkupContainer errorPropertiesTable;
+	protected WebMarkupContainer errorPropertiesTable;
 
-  protected RepeatingView sheetRepeatingView;
+	protected RepeatingView sheetRepeatingView;
 
-  private Label businessAssessmentLabel, storageHeadingLabel;
+	private Label businessAssessmentLabel, storageHeadingLabel;
 
-  protected Map<String, Set<Object>> errorProperties;
+	protected Map<String, Set<Object>> errorProperties;
 
-  protected BusinessAssessment businessAssessment;
+	protected BusinessAssessment businessAssessment;
 
-  protected transient ImportStorage< ? > storage;
+	protected transient ImportStorage< ? > storage;
 
-  protected DatevImportPage parentPage;
+	protected DatevImportPage parentPage;
 
-  protected DatevImportFilter filter;
+	protected DatevImportFilter filter;
 
-  /**
-   * @param id
-   */
-  public DatevImportStoragePanel(final String id, final DatevImportPage parentPage, final DatevImportFilter filter)
-  {
-    super(id);
-    this.parentPage = parentPage;
-    this.filter = filter;
-    sheetRepeatingView = new RepeatingView("sheetRepeater");
-    add(sheetRepeatingView);
-  }
+	/**
+	 * @param id
+	 */
+	public DatevImportStoragePanel(final String id, final DatevImportPage parentPage, final DatevImportFilter filter)
+	{
+		super(id);
+		this.parentPage = parentPage;
+		this.filter = filter;
+		sheetRepeatingView = new RepeatingView("sheetRepeater");
+		add(sheetRepeatingView);
+	}
 
-  public void refresh()
-  {
-    if (businessAssessmentLabel != null) {
-      remove(businessAssessmentLabel);
-    }
-    if (errorPropertiesTable != null) {
-      remove(errorPropertiesTable);
-    }
-    if (storageHeadingLabel != null) {
-      remove(storageHeadingLabel);
-    }
-    add(storageHeadingLabel = new Label("storageHeading", "Import storage: " + (storage != null ? storage.getFilename() : "")))
-    .setRenderBodyOnly(true);
+	public void refresh()
+	{
+		if (businessAssessmentLabel != null) {
+			remove(businessAssessmentLabel);
+		}
+		if (errorPropertiesTable != null) {
+			remove(errorPropertiesTable);
+		}
+		if (storageHeadingLabel != null) {
+			remove(storageHeadingLabel);
+		}
+		add(storageHeadingLabel = new Label("storageHeading", "Import storage: " + (storage != null ? storage.getFilename() : "")))
+		.setRenderBodyOnly(true);
 
-    add(errorPropertiesTable = new WebMarkupContainer("errorPropertiesTable"));
-    if (MapUtils.isNotEmpty(errorProperties) == true) {
-      final RepeatingView errorPropertiesView = new RepeatingView("errorProperties");
-      errorPropertiesTable.add(errorPropertiesView);
-      for (final Map.Entry<String, Set<Object>> entry : errorProperties.entrySet()) {
-        final WebMarkupContainer entryContainer = new WebMarkupContainer(errorPropertiesView.newChildId());
-        errorPropertiesView.add(entryContainer);
-        entryContainer.add(new Label("propertyKey", entry.getKey()));
-        final StringBuffer buf = new StringBuffer();
-        boolean first = true;
-        for (final Object value : entry.getValue()) {
-          first = StringHelper.append(buf, first, String.valueOf(value), ", ");
-        }
-        entryContainer.add(new Label("propertyItems", buf.toString()));
-      }
-    } else {
-      errorPropertiesTable.setVisible(false);
-    }
-    if (errorPropertiesTable == null) {
-      add(errorPropertiesTable = new WebMarkupContainer("errorPropertiesTable")).setVisible(false);
-    }
-    if (storageHeadingLabel == null) {
-      add(storageHeadingLabel = (Label) new Label("storageHeading", "[invisible]").setVisible(false));
-    }
-    sheetRepeatingView.removeAll();
-    if (storage.getSheets() != null) {
-      for (final ImportedSheet< ? > sheet : storage.getSheets()) {
-        addSheet(sheet);
-      }
-    }
-  }
+		add(errorPropertiesTable = new WebMarkupContainer("errorPropertiesTable"));
+		if (MapUtils.isNotEmpty(errorProperties) == true) {
+			final RepeatingView errorPropertiesView = new RepeatingView("errorProperties");
+			errorPropertiesTable.add(errorPropertiesView);
+			for (final Map.Entry<String, Set<Object>> entry : errorProperties.entrySet()) {
+				final WebMarkupContainer entryContainer = new WebMarkupContainer(errorPropertiesView.newChildId());
+				errorPropertiesView.add(entryContainer);
+				entryContainer.add(new Label("propertyKey", entry.getKey()));
+				final StringBuffer buf = new StringBuffer();
+				boolean first = true;
+				for (final Object value : entry.getValue()) {
+					first = StringHelper.append(buf, first, String.valueOf(value), ", ");
+				}
+				entryContainer.add(new Label("propertyItems", buf.toString()));
+			}
+		} else {
+			errorPropertiesTable.setVisible(false);
+		}
+		if (errorPropertiesTable == null) {
+			add(errorPropertiesTable = new WebMarkupContainer("errorPropertiesTable")).setVisible(false);
+		}
+		if (storageHeadingLabel == null) {
+			add(storageHeadingLabel = (Label) new Label("storageHeading", "[invisible]").setVisible(false));
+		}
+		sheetRepeatingView.removeAll();
+		if (storage.getSheets() != null) {
+			for (final ImportedSheet< ? > sheet : storage.getSheets()) {
+				addSheet(sheet);
+			}
+		}
+	}
 
-  @SuppressWarnings("serial")
-  protected void addSheet(final ImportedSheet< ? > sheet)
-  {
-    final WebMarkupContainer cont = new WebMarkupContainer(sheetRepeatingView.newChildId());
-    sheetRepeatingView.add(cont);
-    StringBuffer buf = new StringBuffer();
-    buf.append("Sheet: ").append(sheet.getName()).append(" ");
-    if (sheet.isReconciled() == true) {
-      buf.append(getString(sheet.getStatus().getI18nKey())).append(" ");
-      if (sheet.getNumberOfCommittedElements() >= 0) {
-        buf.append(": #").append(sheet.getNumberOfCommittedElements());
-      }
-    } else {
-      buf.append(getString(ImportStatus.NOT_RECONCILED.getI18nKey()));
-    }
-    cont.add(new Label("sheetName", buf.toString()));
-    final SubmitLink toggleLink = new SubmitLink("toggle") {
-      @Override
-      public void onSubmit()
-      {
-        sheet.setOpen(!sheet.isOpen()); // Toggle open status.
-      }
-    };
-    cont.add(toggleLink);
-    toggleLink.add(new IconPanel("zoomInImage", IconType.PLUS_THICK) {
-      @Override
-      public boolean isVisible()
-      {
-        return !sheet.isOpen();
-      }
-    });
-    toggleLink.add(new IconPanel("zoomOutImage", IconType.MINUS_THICK) {
-      @Override
-      public boolean isVisible()
-      {
-        return sheet.isOpen();
-      }
-    });
-    buf = new StringBuffer();
-    buf.append("Total=").append(sheet.getTotalNumberOfElements()).append(" ");
-    if (sheet.getNumberOfNewElements() > 0) {
-      buf.append(" | New=<span style=\"color: red;\">").append(sheet.getNumberOfNewElements()).append("</span>");
-    }
-    if (sheet.getNumberOfModifiedElements() > 0) {
-      buf.append(" | Modified=<span style=\"color: red;\">").append(sheet.getNumberOfModifiedElements()).append("</span>");
-    }
-    if (sheet.getNumberOfUnmodifiedElements() > 0) {
-      buf.append(" | Unmodified=").append(sheet.getNumberOfUnmodifiedElements());
-    }
-    if (sheet.getNumberOfFaultyElements() > 0) {
-      buf.append(" | Errors=<span style=\"color: red; font-weight: bold;\">").append(sheet.getNumberOfFaultyElements()).append("</span>");
-    }
-    cont.add(new PlainLabel("statistics", buf.toString()).setEscapeModelStrings(false));
-    final RepeatingView actionLinkRepeater = new RepeatingView("actionLinkRepeater");
-    cont.add(actionLinkRepeater);
-    if (sheet.isReconciled() == false
-        || sheet.getStatus().isIn(ImportStatus.IMPORTED, ImportStatus.NOTHING_TODO, ImportStatus.HAS_ERRORS) == true) {
-      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.reconcile(sheet.getName());
-        }
-      }, "reconcile");
-    } else if (sheet.isReconciled() == true) {
-      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.commit(sheet.getName());
-        }
-      }, "commit");
-      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.selectAll(sheet.getName());
-        }
-      }, "select all");
-      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.select(sheet.getName(), 100);
-        }
-      }, "select 100");
-      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.select(sheet.getName(), 500);
-        }
-      }, "select 500");
-      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.deselectAll(sheet.getName());
-        }
-      }, "deselect all");
-    }
-    if (sheet.isFaulty() == true) {
-      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.showErrorSummary(sheet.getName());
-        }
-      }, "show error summary");
-    }
-    if (getStorageType() == DatevImportDao.Type.BUCHUNGSSAETZE) {
-      addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
-        @Override
-        public void onSubmit()
-        {
-          parentPage.showBusinessAssessment(sheet.getName());
-        }
-      }, "show business assessment");
-    }
-    addSheetTable(sheet, cont);
-  }
+	@SuppressWarnings("serial")
+	protected void addSheet(final ImportedSheet< ? > sheet)
+	{
+		final WebMarkupContainer cont = new WebMarkupContainer(sheetRepeatingView.newChildId());
+		sheetRepeatingView.add(cont);
+		StringBuffer buf = new StringBuffer();
+		buf.append("Sheet: ").append(sheet.getName()).append(" ");
+		if (sheet.isReconciled() == true) {
+			buf.append(getString(sheet.getStatus().getI18nKey())).append(" ");
+			if (sheet.getNumberOfCommittedElements() >= 0) {
+				buf.append(": #").append(sheet.getNumberOfCommittedElements());
+			}
+		} else {
+			buf.append(getString(ImportStatus.NOT_RECONCILED.getI18nKey()));
+		}
+		cont.add(new Label("sheetName", buf.toString()));
+		final SubmitLink toggleLink = new SubmitLink("toggle") {
+			@Override
+			public void onSubmit()
+			{
+				sheet.setOpen(!sheet.isOpen()); // Toggle open status.
+			}
+		};
+		cont.add(toggleLink);
+		toggleLink.add(new IconPanel("zoomInImage", IconType.PLUS_THICK) {
+			@Override
+			public boolean isVisible()
+			{
+				return !sheet.isOpen();
+			}
+		});
+		toggleLink.add(new IconPanel("zoomOutImage", IconType.MINUS_THICK) {
+			@Override
+			public boolean isVisible()
+			{
+				return sheet.isOpen();
+			}
+		});
+		buf = new StringBuffer();
+		buf.append("Total=").append(sheet.getTotalNumberOfElements()).append(" ");
+		if (sheet.getNumberOfNewElements() > 0) {
+			buf.append(" | New=<span style=\"color: red;\">").append(sheet.getNumberOfNewElements()).append("</span>");
+		}
+		if (sheet.getNumberOfModifiedElements() > 0) {
+			buf.append(" | Modified=<span style=\"color: red;\">").append(sheet.getNumberOfModifiedElements()).append("</span>");
+		}
+		if (sheet.getNumberOfUnmodifiedElements() > 0) {
+			buf.append(" | Unmodified=").append(sheet.getNumberOfUnmodifiedElements());
+		}
+		if (sheet.getNumberOfFaultyElements() > 0) {
+			buf.append(" | Errors=<span style=\"color: red; font-weight: bold;\">").append(sheet.getNumberOfFaultyElements()).append("</span>");
+		}
+		cont.add(new PlainLabel("statistics", buf.toString()).setEscapeModelStrings(false));
+		final RepeatingView actionLinkRepeater = new RepeatingView("actionLinkRepeater");
+		cont.add(actionLinkRepeater);
+		if (sheet.isReconciled() == false
+				|| sheet.getStatus().isIn(ImportStatus.IMPORTED, ImportStatus.NOTHING_TODO, ImportStatus.HAS_ERRORS) == true) {
+			addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+				@Override
+				public void onSubmit()
+				{
+					parentPage.reconcile(sheet.getName());
+				}
+			}, "reconcile");
+		} else if (sheet.isReconciled() == true) {
+			addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+				@Override
+				public void onSubmit()
+				{
+					parentPage.commit(sheet.getName());
+				}
+			}, "commit");
+			addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+				@Override
+				public void onSubmit()
+				{
+					parentPage.selectAll(sheet.getName());
+				}
+			}, "select all");
+			addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+				@Override
+				public void onSubmit()
+				{
+					parentPage.select(sheet.getName(), 100);
+				}
+			}, "select 100");
+			addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+				@Override
+				public void onSubmit()
+				{
+					parentPage.select(sheet.getName(), 500);
+				}
+			}, "select 500");
+			addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+				@Override
+				public void onSubmit()
+				{
+					parentPage.deselectAll(sheet.getName());
+				}
+			}, "deselect all");
+		}
+		if (sheet.isFaulty() == true) {
+			addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+				@Override
+				public void onSubmit()
+				{
+					parentPage.showErrorSummary(sheet.getName());
+				}
+			}, "show error summary");
+		}
+		if (getStorageType() == DatevImportDao.Type.BUCHUNGSSAETZE) {
+			addActionLink(actionLinkRepeater, new SubmitLink("actionLink") {
+				@Override
+				public void onSubmit()
+				{
+					parentPage.showBusinessAssessment(sheet.getName());
+				}
+			}, "show business assessment");
+		}
+		addSheetTable(sheet, cont);
+	}
 
-  private void addActionLink(final RepeatingView actionLinkRepeater, final SubmitLink link, final String label)
-  {
-    final WebMarkupContainer actionLinkContainer = new WebMarkupContainer(actionLinkRepeater.newChildId());
-    actionLinkRepeater.add(actionLinkContainer);
-    actionLinkContainer.add(link.add(new PlainLabel("label", label)));
-  }
+	private void addActionLink(final RepeatingView actionLinkRepeater, final SubmitLink link, final String label)
+	{
+		final WebMarkupContainer actionLinkContainer = new WebMarkupContainer(actionLinkRepeater.newChildId());
+		actionLinkRepeater.add(actionLinkContainer);
+		actionLinkContainer.add(link.add(new PlainLabel("label", label)));
+	}
 
-  private void addSheetTable(final ImportedSheet< ? > sheet, final WebMarkupContainer container)
-  {
-    final WebMarkupContainer table = new WebMarkupContainer("sheetTable");
-    container.add(table);
-    final List< ? > elements = sheet.getElements();
-    if (sheet.isOpen() == false || CollectionUtils.isEmpty(elements) == true) {
-      table.setVisible(false);
-      return;
-    }
-    final RepeatingView headColRepeater = new RepeatingView("headColRepeater");
-    table.add(headColRepeater);
-    if (getStorageType() == DatevImportDao.Type.KONTENPLAN) {
-      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.konto.nummer")));
-      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.konto.bezeichnung")));
-    } else {
-      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.buchungssatz.satznr")));
-      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("date")));
-      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.common.betrag")));
-      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.buchungssatz.text")));
-      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.buchungssatz.konto")));
-      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.buchungssatz.gegenKonto")));
-      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.kost1")));
-      headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.kost2")));
-    }
-    headColRepeater.add(new Label(headColRepeater.newChildId(), getString("modifications")));
-    headColRepeater.add(new Label(headColRepeater.newChildId(), getString("errors")));
-    final RepeatingView rowRepeater = new RepeatingView("rowRepeater");
-    table.add(rowRepeater);
-    int row = 0;
-    for (final Object rawElement : sheet.getElements()) {
-      final ImportedElement< ? > element = (ImportedElement< ? >) rawElement;
-      final String listType = filter.getListType();
-      if ("all".equals(listType) == true //
-          || ("faulty".equals(listType) == true && element.isFaulty() == true)//
-          || ("modified".equals(listType) == true && (element.isNew() == true || element.isModified() == true || element.isFaulty() == true)) //
-          ) {
-        // Yes, show this element.
-      } else {
-        // Don't show this element.
-        continue;
-      }
-      final WebMarkupContainer rowContainer = new WebMarkupContainer(rowRepeater.newChildId());
-      rowRepeater.add(rowContainer);
-      rowContainer.add(AttributeModifier.replace("class", (row++ % 2 == 0) ? "even" : "odd"));
-      rowContainer.add(AttributeModifier.replace("onclick", "javascript:rowCheckboxClick(this);"));
-      final String style;
-      if (element.isFaulty() == true) {
-        style = "color: red;";
-      } else if (element.getOldValue() != null && element.getValue() == null) {
-        style = "text-decoration: line-through;";
-      } else {
-        style = null;
-      }
-      final WebMarkupContainer firstCell = new WebMarkupContainer("firstCell");
-      if (style != null) {
-        firstCell.add(AttributeModifier.replace("style", style));
-      }
-      rowContainer.add(firstCell);
-      final CheckBox checkBox = new CheckBox("selectItem", new PropertyModel<Boolean>(element, "selected"));
-      if (sheet.getStatus() != ImportStatus.RECONCILED) {
-        checkBox.setVisible(false);
-      }
-      firstCell.add(checkBox);
-      final IconType iconType;
-      if (element.isNew() == true) {
-        iconType = IconType.CIRCLE_PLUS;
-      } else if (element.isModified() == true) {
-        iconType = IconType.MODIFIED;
-      } else {
-        iconType = IconType.DOCUMENT;
-      }
-      firstCell.add(new IconPanel("icon", iconType));
+	private void addSheetTable(final ImportedSheet< ? > sheet, final WebMarkupContainer container)
+	{
+		final WebMarkupContainer table = new WebMarkupContainer("sheetTable");
+		container.add(table);
+		final List< ? > elements = sheet.getElements();
+		if (sheet.isOpen() == false || CollectionUtils.isEmpty(elements) == true) {
+			table.setVisible(false);
+			return;
+		}
+		final RepeatingView headColRepeater = new RepeatingView("headColRepeater");
+		table.add(headColRepeater);
+		if (getStorageType() == DatevImportDao.Type.KONTENPLAN) {
+			headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.konto.nummer")));
+			headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.konto.bezeichnung")));
+		} else {
+			headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.buchungssatz.satznr")));
+			headColRepeater.add(new Label(headColRepeater.newChildId(), getString("date")));
+			headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.common.betrag")));
+			headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.buchungssatz.text")));
+			headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.buchungssatz.konto")));
+			headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.buchungssatz.gegenKonto")));
+			headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.kost1")));
+			headColRepeater.add(new Label(headColRepeater.newChildId(), getString("fibu.kost2")));
+		}
+		headColRepeater.add(new Label(headColRepeater.newChildId(), getString("modifications")));
+		headColRepeater.add(new Label(headColRepeater.newChildId(), getString("errors")));
+		final RepeatingView rowRepeater = new RepeatingView("rowRepeater");
+		table.add(rowRepeater);
+		int row = 0;
+		for (final Object rawElement : sheet.getElements()) {
+			final ImportedElement< ? > element = (ImportedElement< ? >) rawElement;
+			final String listType = filter.getListType();
+			if ("all".equals(listType) == true //
+					|| ("faulty".equals(listType) == true && element.isFaulty() == true)//
+					|| ("modified".equals(listType) == true && (element.isNew() == true || element.isModified() == true || element.isFaulty() == true)) //
+			) {
+				// Yes, show this element.
+			} else {
+				// Don't show this element.
+				continue;
+			}
+			final WebMarkupContainer rowContainer = new WebMarkupContainer(rowRepeater.newChildId());
+			rowRepeater.add(rowContainer);
+			rowContainer.add(AttributeModifier.replace("class", (row++ % 2 == 0) ? "even" : "odd"));
+			rowContainer.add(AttributeModifier.replace("onmousedown", "javascript:rowCheckboxClick(this);"));
+			final String style;
+			if (element.isFaulty() == true) {
+				style = "color: red;";
+			} else if (element.getOldValue() != null && element.getValue() == null) {
+				style = "text-decoration: line-through;";
+			} else {
+				style = null;
+			}
+			final WebMarkupContainer firstCell = new WebMarkupContainer("firstCell");
+			if (style != null) {
+				firstCell.add(AttributeModifier.replace("style", style));
+			}
+			rowContainer.add(firstCell);
+			final CheckBox checkBox = new CheckBox("selectItem", new PropertyModel<Boolean>(element, "selected"));
+			if (sheet.getStatus() != ImportStatus.RECONCILED) {
+				checkBox.setVisible(false);
+			}
+			firstCell.add(checkBox);
+			final IconType iconType;
+			if (element.isNew() == true) {
+				iconType = IconType.CIRCLE_PLUS;
+			} else if (element.isModified() == true) {
+				iconType = IconType.MODIFIED;
+			} else {
+				iconType = IconType.DOCUMENT;
+			}
+			firstCell.add(new IconPanel("icon", iconType));
 
-      final RepeatingView cellRepeater = new RepeatingView("cellRepeater");
-      rowContainer.add(cellRepeater);
-      if (getStorageType() == DatevImportDao.Type.KONTENPLAN) {
-        final KontoDO konto = (KontoDO) element.getValue();
-        addCell(cellRepeater, konto.getNummer(), style + " white-space: nowrap; text-align: right;");
-        addCell(cellRepeater, konto.getBezeichnung(), style);
-      } else {
-        final BuchungssatzDO satz = (BuchungssatzDO) element.getValue();
-        addCell(cellRepeater, satz.getSatznr(), style + " white-space: nowrap; text-align: right;");
-        addCell(cellRepeater, DateTimeFormatter.instance().getFormattedDate(satz.getDatum()), style + " white-space: nowrap;");
-        addCell(cellRepeater, CurrencyFormatter.format(satz.getBetrag()), style + " white-space: nowrap; text-align: right;");
-        addCell(cellRepeater, satz.getText(), style);
-        addCell(cellRepeater, satz.getKonto() != null ? satz.getKonto().getNummer() : null, style);
-        addCell(cellRepeater, satz.getGegenKonto() != null ? satz.getGegenKonto().getNummer() : null, style);
-        final Kost1DO kost1 = satz.getKost1();
-        Component comp = addCell(cellRepeater, kost1 != null ? kost1.getShortDisplayName() : null, style);
-        if (kost1 != null) {
-          WicketUtils.addTooltip(comp, KostFormatter.formatToolTip(kost1));
-        }
-        final Kost2DO kost2 = satz.getKost2();
-        comp = addCell(cellRepeater, kost2 != null ? kost2.getShortDisplayName() : null, style);
-        if (kost2 != null) {
-          WicketUtils.addTooltip(comp, KostFormatter.formatToolTip(kost2));
-        }
-      }
-      if (element.getOldValue() != null && element.getPropertyChanges() != null) {
-        final StringBuffer buf = new StringBuffer();
-        boolean first = true;
-        for (final PropertyDelta delta : element.getPropertyChanges()) {
-          first = StringHelper.append(buf, first, delta.getPropertyName(), "; ");
-          buf.append("=").append(delta.getNewValue()).append(" [").append(getString("history.was")).append(": ")
-          .append(delta.getOldValue()).append("]");
-        }
-        addCell(cellRepeater, buf.toString(), style);
-      } else {
-        addCell(cellRepeater, "", null);
-      }
-      if (element.isFaulty() == true) {
-        final StringBuffer buf = new StringBuffer();
-        if (element.getErrorProperties() != null) {
-          boolean first = true;
-          for (final Map.Entry<String, Object> entry : element.getErrorProperties().entrySet()) {
-            first = StringHelper.append(buf, first, entry.getKey(), ", ");
-            buf.append("=[").append(entry.getValue()).append("]");
-          }
-        }
-        addCell(cellRepeater, buf.toString(), " color: red; font-weight: bold;");
-      } else {
-        addCell(cellRepeater, "", null);
-      }
-    }
-  }
+			final RepeatingView cellRepeater = new RepeatingView("cellRepeater");
+			rowContainer.add(cellRepeater);
+			if (getStorageType() == DatevImportDao.Type.KONTENPLAN) {
+				final KontoDO konto = (KontoDO) element.getValue();
+				addCell(cellRepeater, konto.getNummer(), style + " white-space: nowrap; text-align: right;");
+				addCell(cellRepeater, konto.getBezeichnung(), style);
+			} else {
+				final BuchungssatzDO satz = (BuchungssatzDO) element.getValue();
+				addCell(cellRepeater, satz.getSatznr(), style + " white-space: nowrap; text-align: right;");
+				addCell(cellRepeater, DateTimeFormatter.instance().getFormattedDate(satz.getDatum()), style + " white-space: nowrap;");
+				addCell(cellRepeater, CurrencyFormatter.format(satz.getBetrag()), style + " white-space: nowrap; text-align: right;");
+				addCell(cellRepeater, satz.getText(), style);
+				addCell(cellRepeater, satz.getKonto() != null ? satz.getKonto().getNummer() : null, style);
+				addCell(cellRepeater, satz.getGegenKonto() != null ? satz.getGegenKonto().getNummer() : null, style);
+				final Kost1DO kost1 = satz.getKost1();
+				Component comp = addCell(cellRepeater, kost1 != null ? kost1.getShortDisplayName() : null, style);
+				if (kost1 != null) {
+					WicketUtils.addTooltip(comp, KostFormatter.formatToolTip(kost1));
+				}
+				final Kost2DO kost2 = satz.getKost2();
+				comp = addCell(cellRepeater, kost2 != null ? kost2.getShortDisplayName() : null, style);
+				if (kost2 != null) {
+					WicketUtils.addTooltip(comp, KostFormatter.formatToolTip(kost2));
+				}
+			}
+			if (element.getOldValue() != null && element.getPropertyChanges() != null) {
+				final StringBuffer buf = new StringBuffer();
+				boolean first = true;
+				for (final PropertyDelta delta : element.getPropertyChanges()) {
+					first = StringHelper.append(buf, first, delta.getPropertyName(), "; ");
+					buf.append("=").append(delta.getNewValue()).append(" [").append(getString("history.was")).append(": ")
+					.append(delta.getOldValue()).append("]");
+				}
+				addCell(cellRepeater, buf.toString(), style);
+			} else {
+				addCell(cellRepeater, "", null);
+			}
+			if (element.isFaulty() == true) {
+				final StringBuffer buf = new StringBuffer();
+				if (element.getErrorProperties() != null) {
+					boolean first = true;
+					for (final Map.Entry<String, Object> entry : element.getErrorProperties().entrySet()) {
+						first = StringHelper.append(buf, first, entry.getKey(), ", ");
+						buf.append("=[").append(entry.getValue()).append("]");
+					}
+				}
+				addCell(cellRepeater, buf.toString(), " color: red; font-weight: bold;");
+			} else {
+				addCell(cellRepeater, "", null);
+			}
+		}
+	}
 
-  private Component addCell(final RepeatingView cellRepeater, final String value, final String style)
-  {
-    final Component comp;
-    cellRepeater.add(comp = new Label(cellRepeater.newChildId(), StringUtils.defaultString(value)));
-    if (style != null) {
-      comp.add(AttributeModifier.replace("style", style));
-    }
-    return comp;
-  }
+	private Component addCell(final RepeatingView cellRepeater, final String value, final String style)
+	{
+		final Component comp;
+		cellRepeater.add(comp = new Label(cellRepeater.newChildId(), StringUtils.defaultString(value)));
+		if (style != null) {
+			comp.add(AttributeModifier.replace("style", style));
+		}
+		return comp;
+	}
 
-  private Component addCell(final RepeatingView cellRepeater, final Integer value, final String style)
-  {
-    if (value == null) {
-      return addCell(cellRepeater, "", style);
-    } else {
-      return addCell(cellRepeater, String.valueOf(value), style);
-    }
-  }
+	private Component addCell(final RepeatingView cellRepeater, final Integer value, final String style)
+	{
+		if (value == null) {
+			return addCell(cellRepeater, "", style);
+		} else {
+			return addCell(cellRepeater, String.valueOf(value), style);
+		}
+	}
 
-  private DatevImportDao.Type getStorageType()
-  {
-    if (storage == null) {
-      return null;
-    } else {
-      return (DatevImportDao.Type) storage.getId();
-    }
-  }
+	private DatevImportDao.Type getStorageType()
+	{
+		if (storage == null) {
+			return null;
+		} else {
+			return (DatevImportDao.Type) storage.getId();
+		}
+	}
 }
