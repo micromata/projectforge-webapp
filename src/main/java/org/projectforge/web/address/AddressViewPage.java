@@ -101,7 +101,8 @@ public class AddressViewPage extends AbstractSecuredPage
       addContentMenuEntry(edit);
     }
     if (ConfigXml.getInstance().isTelephoneSystemUrlConfigured() == true) {
-      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(),
+          new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
         @Override
         public void onClick()
         {
@@ -113,8 +114,10 @@ public class AddressViewPage extends AbstractSecuredPage
       }, getString("address.directCall.call"));
       addContentMenuEntry(menu);
     }
-    if (ConfigXml.getInstance().isSmsConfigured() == true && StringHelper.isNotBlank(address.getMobilePhone(), address.getPrivateMobilePhone()) == true) {
-      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+    if (ConfigXml.getInstance().isSmsConfigured() == true
+        && StringHelper.isNotBlank(address.getMobilePhone(), address.getPrivateMobilePhone()) == true) {
+      final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(),
+          new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
         @Override
         public void onClick()
         {
@@ -142,7 +145,7 @@ public class AddressViewPage extends AbstractSecuredPage
     DivPanel section = gridBuilder.newSectionPanel();
     section.add(new Heading1Panel(section.newChildId(), name));
     appendFieldset("organization", address.getOrganization());
-    appendFieldset("division", address.getDivision());
+    appendFieldset("address.division", address.getDivision());
     appendFieldset("address.positionText", address.getPositionText());
     appendEmailFieldset("email", address.getEmail());
     appendEmailFieldset("address.privateEmail", address.getPrivateEmail());
@@ -153,22 +156,14 @@ public class AddressViewPage extends AbstractSecuredPage
     // addRow("fingerprint", address.getFingerprint());
 
     gridBuilder.newGrid8().newBlockPanel();
-    section = gridBuilder.newSectionPanel();
-    section.add(new Heading1Panel(section.newChildId(), getString("address.addresses")));
-    final boolean output = addAddressRow(section, "address.heading.postalAddress", name, address.getOrganization(),
-        address.getPostalAddressText(), address.getPostalZipCode(), address.getPostalCity(), address.getPostalCountry(),
-        address.getPostalState(), null, null, null);
-    if (output == true) {
-      section = gridBuilder.newSectionPanel();
-    }
-    addAddressRow(section, "address.business", name, address.getOrganization(), address.getAddressText(), address.getZipCode(),
-        address.getCity(), address.getCountry(), address.getState(), address.getBusinessPhone(), address.getMobilePhone(), address.getFax());
-    if (output == true) {
-      section = gridBuilder.newSectionPanel();
-    }
-    addAddressRow(section, "address.private", name, null, address.getPrivateAddressText(), address.getPrivateZipCode(),
+    boolean firstRow = addAddressRow("address.heading.postalAddress", name, address.getOrganization(), address.getPostalAddressText(),
+        address.getPostalZipCode(), address.getPostalCity(), address.getPostalCountry(), address.getPostalState(), null, null, null, true);
+    firstRow = addAddressRow("address.business", name, address.getOrganization(), address.getAddressText(), address.getZipCode(),
+        address.getCity(), address.getCountry(), address.getState(), address.getBusinessPhone(), address.getMobilePhone(),
+        address.getFax(), firstRow);
+    firstRow = addAddressRow("address.private", name, null, address.getPrivateAddressText(), address.getPrivateZipCode(),
         address.getPrivateCity(), address.getPrivateCountry(), address.getPrivateState(), address.getPrivatePhone(),
-        address.getPrivateMobilePhone(), null);
+        address.getPrivateMobilePhone(), null, firstRow);
 
     if (StringUtils.isNotBlank(address.getComment()) == true) {
       gridBuilder.newGrid16();
@@ -180,12 +175,16 @@ public class AddressViewPage extends AbstractSecuredPage
     }
   }
 
-  private boolean addAddressRow(final DivPanel section, final String type, final String name, final String organization,
-      final String addressText, final String zipCode, final String city, final String country, final String state, final String phone,
-      final String mobile, final String fax)
+  private boolean addAddressRow(final String type, final String name, final String organization, final String addressText,
+      final String zipCode, final String city, final String country, final String state, final String phone, final String mobile,
+      final String fax, final boolean firstRow)
   {
     if (StringHelper.isNotBlank(addressText, zipCode, city, country, state, phone, mobile, fax) == false) {
-      return false;
+      return firstRow;
+    }
+    final DivPanel section = gridBuilder.newSectionPanel();
+    if (firstRow == true) {
+      section.add(new Heading1Panel(section.newChildId(), getString("address.addresses")));
     }
     section.add(new ParTextPanel(section.newChildId(), getString(type) + ":"));
     final StringBuffer buf = new StringBuffer();
@@ -227,7 +226,7 @@ public class AddressViewPage extends AbstractSecuredPage
     final ParTextPanel text = new ParTextPanel(section.newChildId(), buf.toString());
     text.getLabel().setEscapeModelStrings(false);
     section.add(text);
-    return true;
+    return false;
   }
 
   private boolean appendRow(final StringBuffer buf, final boolean first, final String str)
