@@ -64,12 +64,14 @@ AbstractEditPage<AddressCampaignValueDO, AddressCampaignValueEditForm, AddressCa
   public AddressCampaignValueEditPage(final PageParameters parameters)
   {
     super(parameters, "plugins.marketing.addressCampaign");
-    StringValue sval;
-    final Integer id = (sval = parameters.get(AbstractEditPage.PARAMETER_KEY_ID)) != null ? sval.toInteger() : null;
+    StringValue sval = parameters.get(AbstractEditPage.PARAMETER_KEY_ID);
+    final Integer id = sval.isEmpty() == true ? null : sval.toInteger();
     if (id == null) {
       // Create new entry.
-      final Integer addressId = (sval = parameters.get(PARAMETER_ADDRESS_ID)) != null ? sval.toInteger() : null;
-      final Integer addressCampaignId = (sval = parameters.get(PARAMETER_ADDRESS_CAMPAIGN_ID)) != null ? sval.toInteger() : null;
+      sval = parameters.get(PARAMETER_ADDRESS_ID);
+      final Integer addressId = sval.isEmpty() ? null : sval.toInteger();
+      sval = parameters.get(PARAMETER_ADDRESS_CAMPAIGN_ID);
+      final Integer addressCampaignId = sval.isEmpty() ? null : sval.toInteger();
       if (addressId == null || addressCampaignId == null) {
         throw new UserException("plugins.marketing.addressCampaignValue.error.addressOrCampaignNotGiven");
       }
