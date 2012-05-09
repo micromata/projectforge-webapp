@@ -280,6 +280,7 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
     final TimesheetDO timesheet = getData();
     log.info("Clone of time sheet chosen: " + timesheet);
     timesheet.setId(null);
+    timesheet.setDeleted(false);
     getBaseDao().setUser(timesheet, getUser().getId());
   }
 
