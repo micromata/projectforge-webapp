@@ -38,7 +38,6 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
-import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
@@ -122,12 +121,6 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
     this.recentSearchTermsUserPrefKey = "addressSearchTerms";
     messagingSupported = ConfigXml.getInstance().isSmsConfigured() == true;
     phoneCallSupported = ConfigXml.getInstance().isTelephoneSystemUrlConfigured() == true;
-  }
-
-  @Override
-  protected void onBodyTag(final ComponentTag bodyTag)
-  {
-    bodyTag.put("onload", "javascript:setOptionStatus();");
   }
 
   @SuppressWarnings("serial")
