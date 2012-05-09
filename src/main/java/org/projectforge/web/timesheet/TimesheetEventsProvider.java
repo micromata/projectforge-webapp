@@ -303,9 +303,6 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
 
   private void addDurationOfDayOfYear(final int dayOfYear, final long duration)
   {
-    if (dayOfYear == 6) {
-      log.info("Hurzel");
-    }
     durationsPerDayOfYear[dayOfYear] += duration;
   }
 
