@@ -203,6 +203,9 @@ public class UserGroupCache extends AbstractCache
       return false;
     }
     for (final Integer groupId : groupIds) {
+      if (groupId == null) {
+        continue;
+      }
       if (groupSet.contains(groupId) == true) {
         return true;
       }

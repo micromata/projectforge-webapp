@@ -77,6 +77,8 @@ public class UserGroupCacheTest extends TestBase
     assertFalse(userGroupCache.isUserMemberOfAtLeastOneGroup(getUser(TEST_ADMIN_USER).getId(), group1.getId()));
     assertTrue(userGroupCache.isUserMemberOfAtLeastOneGroup(getUser(TEST_ADMIN_USER).getId(), group2.getId()));
     assertTrue(userGroupCache.isUserMemberOfAtLeastOneGroup(getUser(TEST_ADMIN_USER).getId(), group1.getId(), group2.getId()));
+    assertTrue(userGroupCache.isUserMemberOfAtLeastOneGroup(getUser(TEST_ADMIN_USER).getId(), null, group1.getId(), group2.getId()));
+    assertTrue(userGroupCache.isUserMemberOfAtLeastOneGroup(getUser(TEST_ADMIN_USER).getId(), null, group1.getId(), null, group2.getId(), null));
     assertTrue(userGroupCache.isUserMemberOfAtLeastOneGroup(getUser(TEST_ADMIN_USER).getId(), group2.getId(), group1.getId()));
   }
 }
