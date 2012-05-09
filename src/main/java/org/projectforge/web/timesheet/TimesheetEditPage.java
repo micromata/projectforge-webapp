@@ -48,6 +48,7 @@ import org.projectforge.timesheet.TimesheetPrefEntry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserPrefArea;
+import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.user.UserPrefEditPage;
 import org.projectforge.web.wicket.AbstractEditPage;
@@ -189,6 +190,10 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
   public void setResponsePage()
   {
     super.setResponsePage();
+    if (returnToPage instanceof CalendarPage) {
+      // Display the date of this time sheet in the CalendarPage (usefull if the time sheet was moved).
+      ((CalendarPage) returnToPage).setStartDate(getData().getStartTime());
+    }
   }
 
   @Override
