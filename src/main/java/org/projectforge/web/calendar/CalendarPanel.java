@@ -56,7 +56,7 @@ import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
-import org.projectforge.web.wicket.AbstractUnsecureBasePage;
+import org.projectforge.web.wicket.components.DatePickerUtils;
 import org.projectforge.web.wicket.components.JodaDatePanel;
 
 public class CalendarPanel extends Panel
@@ -216,12 +216,7 @@ public class CalendarPanel extends Panel
         if (currentDatePanel != null) {
           currentDatePanel.getDateField().modelChanged();
           response.getTarget().add(currentDatePanel.getDateField());
-          final StringBuffer buf = new StringBuffer();
-          buf.append("$('#");
-          buf.append(currentDatePanel.getDateField().getMarkupId());
-          buf.append("')");
-          AbstractUnsecureBasePage.appendDatePickerInitJavaScript(buf);
-          response.getTarget().appendJavaScript(buf.toString());
+          response.getTarget().appendJavaScript(DatePickerUtils.getDatePickerInitJavaScript(currentDatePanel.getDateField().getMarkupId(), true));
         }
         response.getTarget().add(((CalendarPage) getPage()).form.durationLabel);
       }

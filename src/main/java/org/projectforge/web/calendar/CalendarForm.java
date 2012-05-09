@@ -89,7 +89,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       userSelectPanel.init().withAutoSubmit(true).setLabel(new Model<String>(getString("user")));
     }
     currentDatePanel = new JodaDatePanel(fs.newChildId(), new PropertyModel<DateMidnight>(filter, "startDate"));
-    currentDatePanel.getDateField().setOutputMarkupId(true).setVisible(false);
+    currentDatePanel.getDateField().setOutputMarkupId(true);
     fs.add(currentDatePanel);
     final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
     if (isOtherUsersAllowed() == false) {
@@ -135,7 +135,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     WicketUtils.addTooltip(firstHourDropDownChoice, getString("calendar.option.firstHour.tooltip"));
     fs.add(firstHourDropDownChoice);
     final IconButtonPanel refreshButtonPanel = new IconButtonPanel(fs.newChildId(), IconType.ARROW_REFRESH, getString("refresh"))
-    .setLight().setDefaultFormProcessing(false);
+    .setLight();
     fs.add(refreshButtonPanel);
     setDefaultButton(refreshButtonPanel.getButton());
     gridBuilder.newColumnPanel(DivType.COL_25);
