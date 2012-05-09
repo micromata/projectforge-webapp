@@ -23,7 +23,11 @@
 
 package org.projectforge.web.calendar;
 
+import java.util.Date;
+
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.joda.time.DateMidnight;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 
@@ -113,5 +117,15 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     } else {
       log.error("Property '" + property + "' not supported for selection.");
     }
+  }
+
+  /**
+   * @param startDate
+   * @return this for chaining.
+   */
+  public CalendarPage setStartDate(final Date startDate)
+  {
+    form.getFilter().setStartDate(new DateMidnight(startDate, PFUserContext.getDateTimeZone()));
+    return this;
   }
 }
