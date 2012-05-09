@@ -27,6 +27,7 @@ import java.util.Date;
 
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.datetime.markup.html.form.DateTextField;
+import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.form.FormComponentPanel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.PropertyModel;
@@ -52,6 +53,8 @@ public class DatePanel extends FormComponentPanel<Date> implements ComponentWrap
 
   protected Boolean required;
 
+  private boolean autosubmit;
+
   /**
    * @param id
    * @param label Only for displaying the field's name on validation messages.
@@ -75,6 +78,7 @@ public class DatePanel extends FormComponentPanel<Date> implements ComponentWrap
     final MyDateConverter dateConverter = new MyDateConverter(settings.targetType, "M-");
     dateField = new DateTextField("dateField", new PropertyModel<Date>(this, "date"), dateConverter);
     dateField.add(AttributeModifier.replace("size", "10"));
+    dateField.setOutputMarkupId(true);
     add(dateField);
     if (settings.required == true) {
       this.required = true;
@@ -82,6 +86,16 @@ public class DatePanel extends FormComponentPanel<Date> implements ComponentWrap
     if (settings.tabIndex != null) {
       dateField.add(AttributeModifier.replace("tabindex", String.valueOf(settings.tabIndex)));
     }
+  }
+
+  /**
+   * @see org.apache.wicket.Component#renderHead(org.apache.wicket.markup.html.IHeaderResponse)
+   */
+  @Override
+  public void renderHead(final IHeaderResponse response)
+  {
+    super.renderHead(response);
+    DatePickerUtils.renderHead(response, getLocale(), dateField.getMarkupId(), autosubmit);
   }
 
   /**
@@ -98,6 +112,17 @@ public class DatePanel extends FormComponentPanel<Date> implements ComponentWrap
   public DatePanel setFocus()
   {
     dateField.add(WicketUtils.setFocus());
+    return this;
+  }
+
+  /**
+   * If true then the parent form of this field will be submitted (no Ajax submit!).
+   * @param autosubmit the autosubmit to set
+   * @return this for chaining.
+   */
+  public DatePanel setAutosubmit(final boolean autosubmit)
+  {
+    this.autosubmit = autosubmit;
     return this;
   }
 
@@ -170,7 +195,6 @@ public class DatePanel extends FormComponentPanel<Date> implements ComponentWrap
   @Override
   public String getComponentOutputId()
   {
-    dateField.setOutputMarkupId(true);
     return dateField.getMarkupId();
   }
 }
