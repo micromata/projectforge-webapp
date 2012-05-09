@@ -170,20 +170,20 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
           break;
         }
         final int dayOfMonth = day.getDayOfMonth();
+        final int dayOfYear = day.getDayOfYear();
         final long duration = durationsPerDayOfMonth[dayOfMonth];
         final boolean firstDayOfWeek = day.getDayOfWeek() == PFUserContext.getJodaFirstDayOfWeek();
-        if (firstDayOfWeek == false && (duration == 0 || (month != null && month != day.getMonthOfYear()))) {
+        if (firstDayOfWeek == false && duration == 0) {
           day = day.plusDays(1);
           continue;
         }
         final Event event = new Event().setAllDay(true);
-        final String id = "s-" + (dayOfMonth);
+        final String id = "s-" + (dayOfYear);
         event.setId(id);
         event.setStart(day);
         final String durationString = formatDuration(duration, false);
         if (firstDayOfWeek == true) {
           // Show week of year at top of first day of week.
-          final int dayOfYear = day.getDayOfYear();
           long weekDuration = 0;
           for (short i = 0; i < 7; i++) {
             weekDuration += durationsPerDayOfYear[dayOfYear + i];
@@ -303,6 +303,9 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
 
   private void addDurationOfDayOfYear(final int dayOfYear, final long duration)
   {
+    if (dayOfYear == 6) {
+      log.info("Hurzel");
+    }
     durationsPerDayOfYear[dayOfYear] += duration;
   }
 
