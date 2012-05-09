@@ -24,7 +24,8 @@
 package org.projectforge.web.wicket.components;
 
 import org.apache.wicket.AttributeModifier;
-import org.apache.wicket.markup.html.form.FormComponentPanel;
+import org.apache.wicket.markup.html.IHeaderResponse;
+import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.joda.time.DateMidnight;
 import org.projectforge.web.wicket.WicketUtils;
@@ -36,7 +37,7 @@ import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
-public class JodaDatePanel extends FormComponentPanel<DateMidnight> implements ComponentWrapperPanel
+public class JodaDatePanel extends Panel implements ComponentWrapperPanel
 {
   private static final long serialVersionUID = 3785639935585959803L;
 
@@ -49,7 +50,7 @@ public class JodaDatePanel extends FormComponentPanel<DateMidnight> implements C
    */
   public JodaDatePanel(final String id, final IModel<DateMidnight> model)
   {
-    super(id, model);
+    super(id);
     dateField = new JodaDateField("dateField", model);
     dateField.add(AttributeModifier.replace("size", "10"));
     dateField.setOutputMarkupId(true);
@@ -57,13 +58,21 @@ public class JodaDatePanel extends FormComponentPanel<DateMidnight> implements C
   }
 
   /**
-   * @see org.apache.wicket.markup.html.form.FormComponent#setLabel(org.apache.wicket.model.IModel)
+   * @see org.apache.wicket.Component#renderHead(org.apache.wicket.markup.html.IHeaderResponse)
    */
   @Override
+  public void renderHead(final IHeaderResponse response)
+  {
+    super.renderHead(response);
+    DatePickerUtils.renderHead(response, getLocale(), dateField.getMarkupId(), true);
+  }
+
+  /**
+   * @see org.apache.wicket.markup.html.form.FormComponent#setLabel(org.apache.wicket.model.IModel)
+   */
   public JodaDatePanel setLabel(final IModel<String> labelModel)
   {
     dateField.setLabel(labelModel);
-    super.setLabel(labelModel);
     return this;
   }
 
