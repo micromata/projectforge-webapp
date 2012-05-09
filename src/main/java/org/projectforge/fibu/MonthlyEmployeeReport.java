@@ -63,7 +63,7 @@ public class MonthlyEmployeeReport implements Serializable
   {
     private static final long serialVersionUID = -5379735557333691194L;
 
-    public Kost2Row(Kost2DO kost2)
+    public Kost2Row(final Kost2DO kost2)
     {
       this.kost2 = kost2;
     }
@@ -117,12 +117,12 @@ public class MonthlyEmployeeReport implements Serializable
       return kost2;
     }
 
-    private Kost2DO kost2;
+    private final Kost2DO kost2;
   }
 
-  private int year;
+  private final int year;
 
-  private int month;
+  private final int month;
 
   private Date fromDate;
 
@@ -142,9 +142,9 @@ public class MonthlyEmployeeReport implements Serializable
   private List<MonthlyEmployeeReportWeek> weeks;
 
   /** Days with time sheets. */
-  private Set<Integer> bookedDays = new HashSet<Integer>();
+  private final Set<Integer> bookedDays = new HashSet<Integer>();
 
-  private List<Integer> unbookedDays = new ArrayList<Integer>();
+  private final List<Integer> unbookedDays = new ArrayList<Integer>();
 
   /**
    * Key is kost2.id.
@@ -162,12 +162,12 @@ public class MonthlyEmployeeReport implements Serializable
   /** String is formatted Task path string for sorting. */
   private Map<String, TaskDO> taskEntries;
 
-  public static final String getFormattedDuration(long duration)
+  public static final String getFormattedDuration(final long duration)
   {
     if (duration == 0) {
       return "";
     }
-    BigDecimal hours = new BigDecimal(duration).divide(new BigDecimal(1000 * 60 * 60), 2, BigDecimal.ROUND_HALF_UP);
+    final BigDecimal hours = new BigDecimal(duration).divide(new BigDecimal(1000 * 60 * 60), 2, BigDecimal.ROUND_HALF_UP);
     return NumberHelper.formatFraction2(hours);
   }
 
@@ -176,7 +176,7 @@ public class MonthlyEmployeeReport implements Serializable
    * @param year
    * @param month
    */
-  public MonthlyEmployeeReport(int year, int month)
+  public MonthlyEmployeeReport(final int year, final int month)
   {
     this.year = year;
     this.month = month;
@@ -186,7 +186,7 @@ public class MonthlyEmployeeReport implements Serializable
    * Use only as fallback, if employee is not available.
    * @param user
    */
-  public void setUser(PFUserDO user)
+  public void setUser(final PFUserDO user)
   {
     this.user = user;
   }
@@ -195,7 +195,7 @@ public class MonthlyEmployeeReport implements Serializable
    * User will be set automatically from given employee.
    * @param employee
    */
-  public void setEmployee(EmployeeDO employee)
+  public void setEmployee(final EmployeeDO employee)
   {
     this.employee = employee;
     if (employee != null) {
@@ -208,30 +208,30 @@ public class MonthlyEmployeeReport implements Serializable
   {
     // Create the weeks:
     this.weeks = new ArrayList<MonthlyEmployeeReportWeek>();
-    DateHolder dh = new DateHolder();
+    final DateHolder dh = new DateHolder();
     dh.setDate(year, month, 1, 0, 0, 0);
     fromDate = dh.getDate();
-    DateHolder dh2 = new DateHolder(dh.getDate());
+    final DateHolder dh2 = new DateHolder(dh.getDate());
     dh2.setEndOfMonth();
     toDate = dh2.getDate();
     int i = 0;
     do {
-      MonthlyEmployeeReportWeek week = new MonthlyEmployeeReportWeek(dh.getDate());
+      final MonthlyEmployeeReportWeek week = new MonthlyEmployeeReportWeek(dh.getDate());
       weeks.add(week);
       dh.setEndOfWeek();
       dh.add(Calendar.DAY_OF_WEEK, +1);
       dh.setBeginOfWeek();
-      if (i++ > 5) {
-        throw new RuntimeException("Endlos loop protection: Please contact developer!");
+      if (i++ > 10) {
+        throw new RuntimeException("Endless loop protection: Please contact developer!");
       }
     } while (dh.getDate().before(toDate));
   }
 
-  public void addTimesheet(TimesheetDO sheet)
+  public void addTimesheet(final TimesheetDO sheet)
   {
     final DayHolder day = new DayHolder(sheet.getStartTime());
     bookedDays.add(day.getDayOfMonth());
-    for (MonthlyEmployeeReportWeek week : weeks) {
+    for (final MonthlyEmployeeReportWeek week : weeks) {
       if (week.matchWeek(sheet) == true) {
         week.addEntry(sheet);
         return;
@@ -247,9 +247,9 @@ public class MonthlyEmployeeReport implements Serializable
     taskEntries = new TreeMap<String, TaskDO>();
     kost2Durations = new HashMap<Integer, MonthlyEmployeeReportEntry>();
     taskDurations = new HashMap<Integer, MonthlyEmployeeReportEntry>();
-    for (MonthlyEmployeeReportWeek week : weeks) {
+    for (final MonthlyEmployeeReportWeek week : weeks) {
       if (MapUtils.isNotEmpty(week.getKost2Entries()) == true) {
-        for (MonthlyEmployeeReportEntry entry : week.getKost2Entries().values()) {
+        for (final MonthlyEmployeeReportEntry entry : week.getKost2Entries().values()) {
           Validate.notNull(entry.getKost2());
           kost2Rows.put(entry.getKost2().getShortDisplayName(), new Kost2Row(entry.getKost2()));
           MonthlyEmployeeReportEntry kost2Total = kost2Durations.get(entry.getKost2().getId());
@@ -265,7 +265,7 @@ public class MonthlyEmployeeReport implements Serializable
         }
       }
       if (MapUtils.isNotEmpty(week.getTaskEntries()) == true) {
-        for (MonthlyEmployeeReportEntry entry : week.getTaskEntries().values()) {
+        for (final MonthlyEmployeeReportEntry entry : week.getTaskEntries().values()) {
           Validate.notNull(entry.getTask());
           taskEntries.put(TaskFormatter.instance().getTaskPath(entry.getTask().getId(), true, OutputType.XML), entry.getTask());
           MonthlyEmployeeReportEntry taskTotal = taskDurations.get(entry.getTask().getId());
@@ -306,7 +306,7 @@ public class MonthlyEmployeeReport implements Serializable
   {
     final StringBuffer buf = new StringBuffer();
     boolean first = true;
-    for (Integer dayOfMonth : unbookedDays) {
+    for (final Integer dayOfMonth : unbookedDays) {
       if (first == true) {
         first = false;
       } else {
