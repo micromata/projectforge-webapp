@@ -95,7 +95,7 @@ public class CalendarFilter implements Serializable
   public void setStartDate(final DateMidnight startDate)
   {
     if (startDate != null) {
-      this.startDate = startDate.plusDays(1);
+      this.startDate = startDate;
     } else {
       this.startDate = new DateMidnight();
     }
