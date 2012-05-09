@@ -26,7 +26,6 @@ package org.projectforge.web.wicket;
 import java.text.MessageFormat;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.IHeaderResponse;
@@ -40,11 +39,8 @@ import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.AppVersion;
 import org.projectforge.Version;
-import org.projectforge.common.DateFormatType;
-import org.projectforge.common.DateFormats;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.I18nCore;
 import org.projectforge.web.UserAgentBrowser;
 import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.doc.DocumentationPage;
@@ -71,19 +67,6 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     final Label dummyLabel = new Label(wicketId);
     dummyLabel.setVisible(false);
     return dummyLabel;
-  }
-
-  public static void appendDatePickerInitJavaScript(final StringBuffer buf)
-  {
-    String dateFormat = DateFormats.getFormatString(DateFormatType.DATE);
-    if (StringUtils.isNotBlank(dateFormat) == true) {
-      dateFormat = dateFormat.toLowerCase().replace("yy", "y"); // Date format conversion for DatePicker of jquery ui.
-      buf.append(".datepicker({ dateFormat : '");
-      buf.append(dateFormat);
-      buf.append("', showButtonPanel: true });\n");
-    } else {
-      buf.append(".datepicker({ showButtonPanel: true });\n");
-    }
   }
 
   /**
@@ -121,22 +104,6 @@ public abstract class AbstractUnsecureBasePage extends WebPage
         return getWindowTitle();
       }
     }));
-    final StringBuffer buf = new StringBuffer();
-    buf.append("$(function() {\n");
-    final String loc = I18nCore.getDatePickerLocale(getLocale());
-    if (loc != null) {
-      buf.append("  $.datepicker.setDefaults($.datepicker.regional['").append(loc).append("']);\n");
-    }
-    buf.append("  $.datepicker.setDefaults({\n");
-    buf.append("    showAnim : 'fadeIn',\n");
-    // if (isGerman == true) {
-    // buf.append("    showWeek : true\n");
-    // }
-    buf.append("  });\n");
-    buf.append("     $('.datepicker')");
-    appendDatePickerInitJavaScript(buf);
-    buf.append("  });\n");
-    add(new Label("javaScriptLocalization", buf.toString()).setEscapeModelStrings(false));
 
     body = new WebMarkupContainer("body") {
       @Override
@@ -166,10 +133,6 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     super.renderHead(response);
     response.renderString(WicketUtils.getCssForFavicon(getUrl("/favicon.ico")));
     response.renderJavaScriptReference("scripts/projectforge.js");
-    final String datePickerLocalizationFile = I18nCore.getDatePickerLocalizationFile(getLocale());
-    if (datePickerLocalizationFile != null) {
-      response.renderJavaScriptReference(datePickerLocalizationFile);
-    }
   }
 
   @Override
