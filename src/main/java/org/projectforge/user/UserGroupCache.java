@@ -184,9 +184,30 @@ public class UserGroupCache extends AbstractCache
 
   public boolean isUserMemberOfGroup(final Integer userId, final Integer groupId)
   {
+    if (groupId == null) {
+      return false;
+    }
     checkRefresh();
     final Set<Integer> groupSet = getUserGroupIdMap().get(userId);
     return (groupSet != null) ? groupSet.contains(groupId) : false;
+  }
+
+  public boolean isUserMemberOfAtLeastOneGroup(final Integer userId, final Integer... groupIds)
+  {
+    if (groupIds == null) {
+      return false;
+    }
+    checkRefresh();
+    final Set<Integer> groupSet = getUserGroupIdMap().get(userId);
+    if (groupSet == null) {
+      return false;
+    }
+    for (final Integer groupId : groupIds) {
+      if (groupSet.contains(groupId) == true) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public boolean isUserMemberOfAdminGroup()
