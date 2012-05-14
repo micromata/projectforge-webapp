@@ -375,7 +375,29 @@ extends AbstractEditForm<O, P>
       final List<Component> ajaxUpdatePositionComponents = new ArrayList<Component>();
       final RechnungsPositionDO rechnungsPosition = (position instanceof RechnungsPositionDO) ? (RechnungsPositionDO) position : null;
       final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(positionsRepeater.newChildId(), DivType.GRID16,
-          DivType.ROUND_ALL);
+          DivType.ROUND_ALL) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#wantsOnStatusChangedNotification()
+         */
+        @Override
+        protected boolean wantsOnStatusChangedNotification()
+        {
+          return true;
+        }
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#onToggleStatusChanged(org.apache.wicket.ajax.AjaxRequestTarget, boolean)
+         */
+        @Override
+        protected void onToggleStatusChanged(final AjaxRequestTarget target, final boolean toggleClosed)
+        {
+          // TODO Kai from Johannes: handle persistence of open/closed events
+          if(toggleClosed) {
+            System.out.println("i am now closed");
+          } else {
+            System.out.println("i am now open");
+          }
+        }
+      };
       positionsPanel.getContainer().setOutputMarkupId(true);
       positionsRepeater.add(positionsPanel);
       final StringBuffer heading = new StringBuffer();

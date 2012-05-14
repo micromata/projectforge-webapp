@@ -26,10 +26,13 @@ package org.projectforge.web.wicket.flowlayout;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.behavior.Behavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.panel.Panel;
+
+import de.micromata.wicket.ajax.behavior.JavaScriptEventToggleBehavior;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -62,6 +65,25 @@ public class ToggleContainerPanel extends Panel
     }
     panel.add(toggleContainer = new WebMarkupContainer("toggleContainer"));
     panel.add(toggleLink = new WebMarkupContainer("toggleLink"));
+    if (wantsOnStatusChangedNotification()) {
+      toggleLink.add(new JavaScriptEventToggleBehavior() {
+        private static final long serialVersionUID = -3739318529449433236L;
+
+        @Override
+        protected void onToggleCall(final AjaxRequestTarget target, final boolean toggleStatus)
+        {
+          ToggleContainerPanel.this.onToggleStatusChanged(target, toggleStatus);
+        }
+        /**
+         * @see de.micromata.wicket.ajax.behavior.JavaScriptEventToggleBehavior#getJavaScriptConditionForNewState()
+         */
+        @Override
+        protected String getJavaScriptConditionForNewState()
+        {
+          return "\'+ ! $(this).hasClass(\"toggle_closed\")+\'"; // invert current closed class value to display the new state!
+        }
+      });
+    }
   }
 
   public ToggleContainerPanel setHeading(final String heading)
@@ -91,6 +113,26 @@ public class ToggleContainerPanel extends Panel
   public WebMarkupContainer getContainer()
   {
     return toggleContainer;
+  }
+
+  /**
+   * Returns whether the subclass wants to be notified on toggle status change
+   * 
+   * @return
+   */
+  protected boolean wantsOnStatusChangedNotification() {
+    return false;
+  }
+
+  /**
+   * Hook method when the toggle status of this {@link ToggleContainerPanel} was changed.
+   * 
+   * @param target
+   * @param toggleClosed this represents the <b>new</b> state of the toggle. <br/>
+   * true if toggle is closed, false otherwise.
+   */
+  protected void onToggleStatusChanged(final AjaxRequestTarget target, final boolean toggleClosed) {
+
   }
 
   /**
