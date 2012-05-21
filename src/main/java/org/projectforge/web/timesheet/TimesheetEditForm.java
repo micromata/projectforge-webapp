@@ -157,8 +157,8 @@ public class TimesheetEditForm extends AbstractEditForm<TimesheetDO, TimesheetEd
       @Override
       public FormComponent< ? >[] getDependentFormComponents()
       {
-        if (cost2ChoiceFieldset.isVisible() == true) {
-          return dependentFormComponentsWithoutCost2;
+        if (cost2ChoiceFieldset != null && cost2ChoiceFieldset.isVisible() == true) {
+          return dependentFormComponentsWithCost2;
         } else {
           return dependentFormComponentsWithoutCost2;
         }
