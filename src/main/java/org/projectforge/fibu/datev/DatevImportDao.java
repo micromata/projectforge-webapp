@@ -36,6 +36,7 @@ import org.projectforge.common.ImportStorage;
 import org.projectforge.common.ImportedElement;
 import org.projectforge.common.ImportedSheet;
 import org.projectforge.core.ActionLog;
+import org.projectforge.core.UserException;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KontoDao;
 import org.projectforge.fibu.KostFormatter;
@@ -47,6 +48,7 @@ import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.Kost2Dao;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
+import org.projectforge.xls.ExcelImportException;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -77,7 +79,7 @@ public class DatevImportDao extends HibernateDaoSupport
   static final String[] KONTO_DIFF_PROPERTIES = { "nummer", "bezeichnung"};
 
   static final String[] BUCHUNGSSATZ_DIFF_PROPERTIES = { "satznr", "betrag", "sh", "konto", "kost2", "menge", "beleg", "datum",
-      "gegenKonto", "text", "kost1", "comment"};
+    "gegenKonto", "text", "kost1", "comment"};
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DatevImportDao.class);
 
@@ -131,9 +133,9 @@ public class DatevImportDao extends HibernateDaoSupport
   {
     checkLoggeinUserRight(accessChecker);
     log.info("importKontenplan called");
-    ImportStorage<KontoDO> storage = new ImportStorage<KontoDO>(Type.KONTENPLAN);
+    final ImportStorage<KontoDO> storage = new ImportStorage<KontoDO>(Type.KONTENPLAN);
     storage.setFilename(filename);
-    KontenplanExcelImporter imp = new KontenplanExcelImporter();
+    final KontenplanExcelImporter imp = new KontenplanExcelImporter();
     imp.doImport(storage, is, actionLog);
     return storage;
   }
@@ -148,15 +150,19 @@ public class DatevImportDao extends HibernateDaoSupport
    */
   public ImportStorage<BuchungssatzDO> importBuchungsdaten(final InputStream is, final String filename, final ActionLog actionLog)
       throws Exception
-  {
+      {
     checkLoggeinUserRight(accessChecker);
     log.info("importBuchungsdaten called");
     final ImportStorage<BuchungssatzDO> storage = new ImportStorage<BuchungssatzDO>(Type.BUCHUNGSSAETZE);
     storage.setFilename(filename);
     final BuchungssatzExcelImporter imp = new BuchungssatzExcelImporter(storage, kontoDao, kost1Dao, kost2Dao, actionLog);
-    imp.doImport(is);
+    try {
+      imp.doImport(is);
+    } catch (final ExcelImportException ex) {
+      throw new UserException("common.import.excel.error", ex.getMessage(), ex.getRow(), ex.getColumnname());
+    }
     return storage;
-  }
+      }
 
   /**
    * Der ImportStorage wird verprobt, dass heißt ein Schreiben der importierten Werte in die Datenbank wird getestet. Ergebnis sind mögliche
@@ -166,11 +172,11 @@ public class DatevImportDao extends HibernateDaoSupport
    * @param name of sheet to reconcile.
    */
   @SuppressWarnings("unchecked")
-  public void reconcile(ImportStorage< ? > storage, String sheetName)
+  public void reconcile(final ImportStorage< ? > storage, final String sheetName)
   {
     checkLoggeinUserRight(accessChecker);
     Validate.notNull(storage.getSheets());
-    ImportedSheet< ? > sheet = (ImportedSheet< ? >) storage.getNamedSheet(sheetName);
+    final ImportedSheet< ? > sheet = storage.getNamedSheet(sheetName);
     Validate.notNull(sheet);
     if (storage.getId() == Type.KONTENPLAN) {
       reconcileKontenplan((ImportedSheet<KontoDO>) sheet);
@@ -182,11 +188,11 @@ public class DatevImportDao extends HibernateDaoSupport
 
   @SuppressWarnings("unchecked")
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
-  public void commit(ImportStorage< ? > storage, String sheetName)
+  public void commit(final ImportStorage< ? > storage, final String sheetName)
   {
     checkLoggeinUserRight(accessChecker);
     Validate.notNull(storage.getSheets());
-    ImportedSheet< ? > sheet = (ImportedSheet< ? >) storage.getNamedSheet(sheetName);
+    final ImportedSheet< ? > sheet = storage.getNamedSheet(sheetName);
     Validate.notNull(sheet);
     Validate.isTrue(sheet.getStatus() == ImportStatus.RECONCILED);
     int no = -1;
@@ -199,12 +205,12 @@ public class DatevImportDao extends HibernateDaoSupport
     sheet.setStatus(ImportStatus.IMPORTED);
   }
 
-  private void reconcileKontenplan(ImportedSheet<KontoDO> sheet)
+  private void reconcileKontenplan(final ImportedSheet<KontoDO> sheet)
   {
     log.info("Reconcile Kontenplan called");
-    for (ImportedElement<KontoDO> el : sheet.getElements()) {
-      KontoDO konto = el.getValue();
-      KontoDO dbKonto = kontoDao.getKonto(konto.getNummer());
+    for (final ImportedElement<KontoDO> el : sheet.getElements()) {
+      final KontoDO konto = el.getValue();
+      final KontoDO dbKonto = kontoDao.getKonto(konto.getNummer());
       if (dbKonto != null) {
         el.setOldValue(dbKonto);
       }
@@ -213,16 +219,16 @@ public class DatevImportDao extends HibernateDaoSupport
     sheet.calculateStatistics();
   }
 
-  private void reconcileBuchungsdaten(ImportedSheet<BuchungssatzDO> sheet)
+  private void reconcileBuchungsdaten(final ImportedSheet<BuchungssatzDO> sheet)
   {
     log.info("Reconcile Buchungsdaten called");
-    for (ImportedElement<BuchungssatzDO> el : sheet.getElements()) {
-      BuchungssatzDO satz = el.getValue();
+    for (final ImportedElement<BuchungssatzDO> el : sheet.getElements()) {
+      final BuchungssatzDO satz = el.getValue();
       if (el.isFaulty() == true) {
         String kost = (String) el.getErrorProperty("kost1");
         if (kost != null) {
-          int[] vals = KostFormatter.splitKost(kost);
-          Kost1DO kost1 = kost1Dao.getKost1(vals[0], vals[1], vals[2], vals[3]);
+          final int[] vals = KostFormatter.splitKost(kost);
+          final Kost1DO kost1 = kost1Dao.getKost1(vals[0], vals[1], vals[2], vals[3]);
           if (kost1 != null) {
             satz.setKost1(kost1);
             el.removeErrorProperty("kost1");
@@ -230,15 +236,15 @@ public class DatevImportDao extends HibernateDaoSupport
         }
         kost = (String) el.getErrorProperty("kost2");
         if (kost != null) {
-          int[] vals = KostFormatter.splitKost(kost);
-          Kost2DO kost2 = kost2Dao.getKost2(vals[0], vals[1], vals[2], vals[3]);
+          final int[] vals = KostFormatter.splitKost(kost);
+          final Kost2DO kost2 = kost2Dao.getKost2(vals[0], vals[1], vals[2], vals[3]);
           if (kost2 != null) {
             satz.setKost2(kost2);
             el.removeErrorProperty("kost2");
           }
         }
       }
-      BuchungssatzDO dbSatz = buchungssatzDao.getBuchungssatz(satz.getYear(), satz.getMonth(), satz.getSatznr());
+      final BuchungssatzDO dbSatz = buchungssatzDao.getBuchungssatz(satz.getYear(), satz.getMonth(), satz.getSatznr());
       if (dbSatz != null) {
         el.setOldValue(dbSatz);
       }
@@ -250,10 +256,10 @@ public class DatevImportDao extends HibernateDaoSupport
   private int commitKontenplan(final ImportedSheet<KontoDO> sheet)
   {
     log.info("Commit Kontenplan called");
-    Collection<KontoDO> col = new ArrayList<KontoDO>();
-    for (ImportedElement<KontoDO> el : sheet.getElements()) {
-      KontoDO konto = (KontoDO) el.getValue();
-      KontoDO dbKonto = kontoDao.getKonto(konto.getNummer());
+    final Collection<KontoDO> col = new ArrayList<KontoDO>();
+    for (final ImportedElement<KontoDO> el : sheet.getElements()) {
+      final KontoDO konto = el.getValue();
+      final KontoDO dbKonto = kontoDao.getKonto(konto.getNummer());
       if (dbKonto != null) {
         konto.setId(dbKonto.getId());
         if (el.isSelected() == true) {
@@ -279,7 +285,7 @@ public class DatevImportDao extends HibernateDaoSupport
   {
     log.info("Commit Buchungsdaten called");
     final Collection<BuchungssatzDO> col = new ArrayList<BuchungssatzDO>();
-    for (ImportedElement<BuchungssatzDO> el : sheet.getElements()) {
+    for (final ImportedElement<BuchungssatzDO> el : sheet.getElements()) {
       final BuchungssatzDO satz = el.getValue();
       final BuchungssatzDO dbSatz = buchungssatzDao.getBuchungssatz(satz.getYear(), satz.getMonth(), satz.getSatznr());
       boolean addSatz = false;
@@ -305,27 +311,27 @@ public class DatevImportDao extends HibernateDaoSupport
     return col.size();
   }
 
-  public void setAccessChecker(AccessChecker accessChecker)
+  public void setAccessChecker(final AccessChecker accessChecker)
   {
     this.accessChecker = accessChecker;
   }
 
-  public void setKontoDao(KontoDao kontoDao)
+  public void setKontoDao(final KontoDao kontoDao)
   {
     this.kontoDao = kontoDao;
   }
 
-  public void setKost1Dao(Kost1Dao kost1Dao)
+  public void setKost1Dao(final Kost1Dao kost1Dao)
   {
     this.kost1Dao = kost1Dao;
   }
 
-  public void setKost2Dao(Kost2Dao kost2Dao)
+  public void setKost2Dao(final Kost2Dao kost2Dao)
   {
     this.kost2Dao = kost2Dao;
   }
 
-  public void setBuchungssatzDao(BuchungssatzDao buchungssatzDao)
+  public void setBuchungssatzDao(final BuchungssatzDao buchungssatzDao)
   {
     this.buchungssatzDao = buchungssatzDao;
   }
