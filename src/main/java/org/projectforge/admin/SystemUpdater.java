@@ -62,7 +62,9 @@ public class SystemUpdater
       return;
     }
     for (final UpdateEntry updateEntry : updateEntries) {
-      getUpdateEntries().add(updateEntry);
+      if (updateEntry != null) {
+        getUpdateEntries().add(updateEntry);
+      }
     }
   }
 
