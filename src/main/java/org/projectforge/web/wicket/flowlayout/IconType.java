@@ -29,10 +29,12 @@ package org.projectforge.web.wicket.flowlayout;
  */
 public enum IconType
 {
-  ALERT("alert"), ARROW_REFRESH("arrowrefresh-1-e"), CIRCLE_MINUS("circle-minus"), CIRCLE_ARROW_EAST("circle-arrow-e"), CIRCLE_ARROW_WEST("circle-arrow-w"), CIRCLE_CLOSE(
-      "circle-close"), CIRCLE_PLUS("circle-plus"), CLIPBOARD("clipboard"), CLOCK("clock"), DOCUMENT("document"), FOLDER_OPEN("folder-open"), HELP(
-          "help"), JIRA_SUPPORT("star"), KEYBOARD("calculator"), MINUS_THICK("minusthick"), MODIFIED("alert"), PLUS_THICK("plusthick"), TRASH(
-              "trash");
+  ALERT("alert"), ARROW_REFRESH("arrowrefresh-1-e"), CIRCLE_MINUS("circle-minus"), CIRCLE_ARROW_EAST("circle-arrow-e"), CIRCLE_ARROW_WEST(
+      "circle-arrow-w"), CIRCLE_CLOSE("circle-close"), CIRCLE_PLUS("circle-plus"), CLIPBOARD("clipboard"), CLOCK("clock"), DOCUMENT(
+          "document"), FOLDER_OPEN("folder-open"), HELP("help"), JIRA_SUPPORT("star"), KEYBOARD("calculator"), MINUS_THICK("minusthick"), MODIFIED(
+              "alert"), PLUS_THICK("plusthick"), //
+              /** RSS feed symbol. */
+              SUBSCRIPTION("signal-diag"), TRASH("trash");
 
   private String cssIdentifier;
 
