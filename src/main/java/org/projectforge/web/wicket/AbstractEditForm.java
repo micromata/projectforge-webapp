@@ -87,7 +87,7 @@ AbstractSecuredForm<O, P>
   protected void init()
   {
     super.init();
-    addFeedbackPanel();
+    feedbackPanel = addFeedbackPanel();
     flowform = new RepeatingView("flowform");
     add(flowform);
     gridBuilder = newGridBuilder(flowform);
