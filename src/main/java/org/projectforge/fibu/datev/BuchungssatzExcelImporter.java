@@ -48,6 +48,7 @@ import org.projectforge.fibu.kost.Kost1DO;
 import org.projectforge.fibu.kost.Kost1Dao;
 import org.projectforge.fibu.kost.Kost2DO;
 import org.projectforge.fibu.kost.Kost2Dao;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.xls.ExcelImport;
 
 public class BuchungssatzExcelImporter
@@ -63,15 +64,15 @@ public class BuchungssatzExcelImporter
    */
   public static final short MAX_COLUMNS = 20;
 
-  private KontoDao kontoDao;
+  private final KontoDao kontoDao;
 
-  private Kost1Dao kost1Dao;
+  private final Kost1Dao kost1Dao;
 
-  private Kost2Dao kost2Dao;
+  private final Kost2Dao kost2Dao;
 
-  private ImportStorage<BuchungssatzDO> storage;
+  private final ImportStorage<BuchungssatzDO> storage;
 
-  private ActionLog actionLog;
+  private final ActionLog actionLog;
 
   public BuchungssatzExcelImporter(final ImportStorage<BuchungssatzDO> storage, final KontoDao kontoDao, final Kost1Dao kost1Dao,
       final Kost2Dao kost2Dao, final ActionLog actionLog)
@@ -102,7 +103,7 @@ public class BuchungssatzExcelImporter
     int m = -1;
     try {
       m = new Integer(name) - 1; // Achtung: month beginnt bei 01 - Januar, während Java mit 0 - Januar rechnet (also - 1).
-    } catch (NumberFormatException ex) {
+    } catch (final NumberFormatException ex) {
       // ignore
     }
     if (m >= 0 && m <= 11) {
@@ -115,9 +116,9 @@ public class BuchungssatzExcelImporter
     return importedSheet;
   }
 
-  private ImportedSheet<BuchungssatzDO> importBuchungssaetze(ExcelImport<BuchungssatzImportRow> imp, HSSFSheet sheet, int month)
-      throws Exception
-  {
+  private ImportedSheet<BuchungssatzDO> importBuchungssaetze(final ExcelImport<BuchungssatzImportRow> imp, final HSSFSheet sheet,
+      final int month) throws Exception
+      {
     final ImportedSheet<BuchungssatzDO> importedSheet = new ImportedSheet<BuchungssatzDO>();
     imp.setNameRowIndex(ROW_COLUMNNAMES);
     imp.setStartingRowIndex(ROW_COLUMNNAMES + 1);
@@ -157,7 +158,7 @@ public class BuchungssatzExcelImporter
       ImportedElement<BuchungssatzDO> element;
       try {
         element = convertBuchungssatz(rows[i]);
-      } catch (RuntimeException ex) {
+      } catch (final RuntimeException ex) {
         throw new RuntimeException("Im Blatt '" + sheet.getSheetName() + "', in Zeile " + (i + 2) + ": " + ex.getMessage(), ex);
       }
       if (element == null) {
@@ -193,45 +194,50 @@ public class BuchungssatzExcelImporter
     importedSheet.setProperty("year", year);
     importedSheet.setProperty("month", month);
     return importedSheet;
-  }
+      }
 
   /**
    * Dummerweise ist im DATEV-Export die Spalte SH zweimal vertreten. Da wir SH aber für Haben/Soll auswerten müssen, müssen die Spalten
    * unterschiedlich heißen. Die zweite Spalte wird hier in SH2 umbenannt, sofern vorhanden.
    * @param sheet
    */
-  private void rename2ndSH(HSSFSheet sheet)
+  private void rename2ndSH(final HSSFSheet sheet)
   {
-    final HSSFRow row = sheet.getRow(ROW_COLUMNNAMES);
-    if (row == null) {
-      return;
-    }
-    short numberOfSH = 0;
-    for (int col = 0; col < MAX_COLUMNS; col++) {
-      final HSSFCell cell = row.getCell(col);
-      if (cell == null) {
-        break;
+    try {
+      final HSSFRow row = sheet.getRow(ROW_COLUMNNAMES);
+      if (row == null) {
+        return;
       }
-      final String name = cell.getStringCellValue();
-      log.debug("Processing column '" + name + "'");
-      if ("SH".equals(cell.getStringCellValue()) == true) {
-        numberOfSH++;
-        if (numberOfSH == 2) {
-          log.debug("Renaming 2nd column 'SH' to 'SH2' (column no. " + col + ").");
-          cell.setCellValue("SH2");
+      short numberOfSH = 0;
+      for (int col = 0; col < MAX_COLUMNS; col++) {
+        final HSSFCell cell = row.getCell(col);
+        if (cell == null) {
+          break;
+        }
+        final String name = cell.getStringCellValue();
+        log.debug("Processing column '" + name + "'");
+        if ("SH".equals(cell.getStringCellValue()) == true) {
+          numberOfSH++;
+          if (numberOfSH == 2) {
+            log.debug("Renaming 2nd column 'SH' to 'SH2' (column no. " + col + ").");
+            cell.setCellValue("SH2");
+          }
         }
       }
+    } catch (final Exception ex) {
+      log.error(ex.getMessage(), ex);
+      throw new UserException(PFUserContext.getLocalizedString("finance.datev.import.error.titleRowMissed"));
     }
   }
 
-  private ImportedElement<BuchungssatzDO> convertBuchungssatz(BuchungssatzImportRow row) throws Exception
+  private ImportedElement<BuchungssatzDO> convertBuchungssatz(final BuchungssatzImportRow row) throws Exception
   {
     if (row.isEmpty() == true) {
       return null;
     }
     final ImportedElement<BuchungssatzDO> element = new ImportedElement<BuchungssatzDO>(storage.nextVal(), BuchungssatzDO.class,
         DatevImportDao.BUCHUNGSSATZ_DIFF_PROPERTIES);
-    BuchungssatzDO satz = new BuchungssatzDO();
+    final BuchungssatzDO satz = new BuchungssatzDO();
     element.setValue(satz);
     satz.setBeleg(row.beleg);
     satz.setBetrag(row.betrag);
@@ -254,14 +260,14 @@ public class BuchungssatzExcelImporter
       element.putErrorProperty("gegenkonto", row.gegenkonto);
     }
     int[] values = KostFormatter.splitKost(row.getKost1());
-    Kost1DO kost1 = kost1Dao.getKost1(values[0], values[1], values[2], values[3]);
+    final Kost1DO kost1 = kost1Dao.getKost1(values[0], values[1], values[2], values[3]);
     if (kost1 != null) {
       satz.setKost1(kost1);
     } else {
       element.putErrorProperty("kost1", KostFormatter.formatKost(row.kost1));
     }
     values = KostFormatter.splitKost(row.getKost2());
-    Kost2DO kost2 = kost2Dao.getKost2(values[0], values[1], values[2], values[3]);
+    final Kost2DO kost2 = kost2Dao.getKost2(values[0], values[1], values[2], values[3]);
     if (kost2 != null) {
       satz.setKost2(kost2);
     } else {
