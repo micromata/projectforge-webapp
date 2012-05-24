@@ -54,7 +54,7 @@ public class ExcelImport<T>
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ExcelImport.class);
 
   /** the workbook containing the values. */
-  private HSSFWorkbook work;
+  private final HSSFWorkbook work;
 
   /** a optional map for mapping column-names to property-names. */
   private Map<String, String> columnToPropertyMap;
@@ -76,7 +76,7 @@ public class ExcelImport<T>
    * @param xlsStream the stream of the Excel-document.
    * @throws IOException if the document is not readable
    */
-  public ExcelImport(InputStream xlsStream) throws IOException
+  public ExcelImport(final InputStream xlsStream) throws IOException
   {
     work = new HSSFWorkbook(xlsStream);
   }
@@ -95,7 +95,7 @@ public class ExcelImport<T>
    * 
    * @param columnToPropertyMap a Map from column-names (String) to property-names (String)
    */
-  public void setColumnMapping(Map<String, String> columnToPropertyMap)
+  public void setColumnMapping(final Map<String, String> columnToPropertyMap)
   {
     this.columnToPropertyMap = columnToPropertyMap;
   }
@@ -105,7 +105,7 @@ public class ExcelImport<T>
    * 
    * @param sheet the zero-based index
    */
-  public void setActiveSheet(int sheet)
+  public void setActiveSheet(final int sheet)
   {
     activeSheet = sheet;
   }
@@ -115,7 +115,7 @@ public class ExcelImport<T>
    * 
    * @param sheetName the name of the sheet
    */
-  public void setActiveSheet(String sheetName)
+  public void setActiveSheet(final String sheetName)
   {
     activeSheet = work.getSheetIndex(sheetName);
   }
@@ -125,7 +125,7 @@ public class ExcelImport<T>
    * 
    * @param columnNameRow the zero-based row index
    */
-  public void setNameRowIndex(int columnNameRow)
+  public void setNameRowIndex(final int columnNameRow)
   {
     this.columnNameRow = columnNameRow;
   }
@@ -135,7 +135,7 @@ public class ExcelImport<T>
    * 
    * @param startAtRow the zero-based row index
    */
-  public void setStartingRowIndex(int startAtRow)
+  public void setStartingRowIndex(final int startAtRow)
   {
     this.startAtRow = startAtRow;
   }
@@ -145,7 +145,7 @@ public class ExcelImport<T>
    * 
    * @param clazz the class of the target-objects for the values of the rows.
    */
-  public void setRowClass(Class<T> clazz)
+  public void setRowClass(final Class<T> clazz)
   {
     this.clazzFactory = new SimpleClassFactory<T>(clazz);
   }
@@ -155,7 +155,7 @@ public class ExcelImport<T>
    * 
    * @param clazzFactory the factory
    */
-  public void setRowClassFactory(ClassFactory<T> clazzFactory)
+  public void setRowClassFactory(final ClassFactory<T> clazzFactory)
   {
     this.clazzFactory = clazzFactory;
   }
@@ -166,14 +166,14 @@ public class ExcelImport<T>
    */
   public List<String> getColumnNames()
   {
-    HSSFSheet sheet = work.getSheetAt(activeSheet);
-    HSSFRow columnNames = sheet.getRow(columnNameRow);
-    List<String> list = new ArrayList<String>();
+    final HSSFSheet sheet = work.getSheetAt(activeSheet);
+    final HSSFRow columnNames = sheet.getRow(columnNameRow);
+    final List<String> list = new ArrayList<String>();
     for (int column = 0; column < columnNames.getPhysicalNumberOfCells(); column++) {
       if (columnNames.getCell(column) == null) {
         continue;
       }
-      String columnName = columnNames.getCell(column).getStringCellValue();
+      final String columnName = columnNames.getCell(column).getStringCellValue();
       if (columnName != null) {
         list.add(columnName.trim());
       }
@@ -188,15 +188,15 @@ public class ExcelImport<T>
    * @return an array with the object values.
    */
   @SuppressWarnings("unchecked")
-  public T[] convertToRows(Class<T> clazz)
+  public T[] convertToRows(final Class<T> clazz)
   {
     if (clazzFactory == null) {
       setRowClass(clazz);
     }
-    HSSFSheet sheet = work.getSheetAt(activeSheet);
-    int numberOfRows = sheet.getLastRowNum();
-    List<T> list = new ArrayList<T>(numberOfRows);
-    HSSFRow columnNames = sheet.getRow(columnNameRow);
+    final HSSFSheet sheet = work.getSheetAt(activeSheet);
+    final int numberOfRows = sheet.getLastRowNum();
+    final List<T> list = new ArrayList<T>(numberOfRows);
+    final HSSFRow columnNames = sheet.getRow(columnNameRow);
     for (int i = startAtRow; i <= numberOfRows; i++) {
       try {
         T line;
@@ -215,11 +215,11 @@ public class ExcelImport<T>
               + i);
         }
         list.add(line);
-      } catch (InstantiationException ex) {
+      } catch (final InstantiationException ex) {
         throw new IllegalArgumentException("Can't create bean " + ex.toString() + " in sheet='" + sheet.getSheetName() + "', row=" + i);
-      } catch (IllegalAccessException ex) {
+      } catch (final IllegalAccessException ex) {
         throw new IllegalArgumentException("Getter is not visible " + ex.toString() + " in sheet='" + sheet.getSheetName() + "', row=" + i);
-      } catch (InvocationTargetException ex) {
+      } catch (final InvocationTargetException ex) {
         log.error(ex.getMessage(), ex);
         throw new IllegalArgumentException("Getter threw an exception "
             + ex.toString()
@@ -227,7 +227,7 @@ public class ExcelImport<T>
             + sheet.getSheetName()
             + "', row="
             + i);
-      } catch (NoSuchMethodException ex) {
+      } catch (final NoSuchMethodException ex) {
         throw new IllegalArgumentException("Getter is not existant " + ex.toString() + " in sheet='" + sheet.getSheetName() + "', row=" + i);
       }
     }
@@ -246,14 +246,14 @@ public class ExcelImport<T>
    * @throws InvocationTargetException if the object creation fails with an exception or the setter threw an exception.
    * @throws NoSuchMethodException if the setter for the property name is not existant.
    */
-  private T convertToBean(HSSFRow row, HSSFRow columnNames, int rowNum) throws InstantiationException, IllegalAccessException,
-      InvocationTargetException, NoSuchMethodException
+  private T convertToBean(final HSSFRow row, final HSSFRow columnNames, final int rowNum) throws InstantiationException, IllegalAccessException,
+  InvocationTargetException, NoSuchMethodException
   {
     if (row == null) {
       log.debug("created no bean for row#" + rowNum);
       return null;
     }
-    T o = clazzFactory.newInstance(row);
+    final T o = clazzFactory.newInstance(row);
     if (columnNames == null) {
       return null;
     }
@@ -267,25 +267,27 @@ public class ExcelImport<T>
       }
       String propName = columnName;
       if (columnToPropertyMap != null) {
-        String mapName = (String) columnToPropertyMap.get(columnName);
+        final String mapName = columnToPropertyMap.get(columnName);
         if (mapName != null) {
           propName = mapName.trim();
         }
       }
       try {
-        Class< ? > destClazz = PropertyUtils.getPropertyType(o, propName);
+        final Class< ? > destClazz = PropertyUtils.getPropertyType(o, propName);
         if (propName == null || destClazz == null) {
           log.debug("Skipping column " + columnName);
           continue;
         }
-        Object value = toNativeType(row.getCell(column), destClazz);
+        final Object value = toNativeType(row.getCell(column), destClazz);
         log.debug("Setting property=" + propName + " to " + value + " class=" + ClassUtils.getShortClassName(value, "null"));
         PropertyUtils.setProperty(o, propName, value);
-      } catch (ConversionException e) {
-        log.debug(e);
-        throw new ExcelImportException("Falscherdatentyp beim Excelimport", new Integer(row.getRowNum()), columnName);
+      } catch (final ConversionException e) {
+        log.warn(e);
+        throw new ExcelImportException("Falscher Datentyp beim Excelimport", new Integer(row.getRowNum()), columnName);
+      } catch (final Exception e) {
+        log.warn(e);
+        throw new ExcelImportException("Falscher Datentyp beim Excelimport", new Integer(row.getRowNum()), columnName);
       }
-
     }
     if (log.isDebugEnabled() == true) {
       log.debug("created bean " + o + " for row#" + rowNum);
@@ -300,7 +302,7 @@ public class ExcelImport<T>
    * @param destClazz the target class
    * @return a String, Boolean, Date or BigDecimal
    */
-  private Object toNativeType(HSSFCell cell, Class< ? > destClazz)
+  private Object toNativeType(final HSSFCell cell, final Class< ? > destClazz)
   {
     if (cell == null) {
       return null;
