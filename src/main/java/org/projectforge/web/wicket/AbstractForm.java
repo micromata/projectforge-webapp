@@ -84,7 +84,7 @@ public abstract class AbstractForm<F, P extends AbstractUnsecureBasePage> extend
       @Override
       public boolean isVisible()
       {
-        return hasError();
+        return hasError() == true || (getPage() != null && getPage().hasErrorMessage() == true);
       }
     };
     feedbackPanel.setOutputMarkupId(true);
