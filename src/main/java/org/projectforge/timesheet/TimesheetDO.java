@@ -192,6 +192,7 @@ public class TimesheetDO extends DefaultBaseDO implements Comparable<TimesheetDO
 
   /**
    * The time zone of this time sheet in format "Europe/Berlin" etc.
+   * Not yet used!
    * @see java.util.TimeZone#getAvailableIDs()
    */
   @Column(name = "time_zone", length = 100)
