@@ -100,20 +100,28 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String description;
 
+  /** -&gt; Gantt */
+  @Deprecated
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private Integer progress;
 
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private Integer maxHours;
 
+  /** -&gt; Gantt */
+  @Deprecated
   @Field(index = Index.UN_TOKENIZED)
   @DateBridge(resolution = Resolution.DAY)
   private Date startDate;
 
+  /** -&gt; Gantt */
+  @Deprecated
   @Field(index = Index.UN_TOKENIZED)
   @DateBridge(resolution = Resolution.DAY)
   private Date endDate;
 
+  /** -&gt; Gantt */
+  @Deprecated
   private BigDecimal duration;
 
   @Field(index = Index.UN_TOKENIZED)
@@ -134,20 +142,28 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
 
   private boolean protectionOfPrivacy;
 
-  private transient Date toDate;
-
   @Deprecated
   private Integer oldKost2Id;
 
+  /** -&gt; Gantt */
+  @Deprecated
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String workpackageCode;
 
+  /** -&gt; Gantt */
+  @Deprecated
   private Integer ganttPredecessorOffset;
 
+  /** -&gt; Gantt */
+  @Deprecated
   private GanttRelationType ganttRelationType;
 
+  /** -&gt; Gantt */
+  @Deprecated
   private GanttObjectType ganttObjectType;
 
+  /** -&gt; Gantt */
+  @Deprecated
   private TaskDO ganttPredecessor;
 
   @Column(name = "description", length = DESCRIPTION_LENGTH)
@@ -174,12 +190,16 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
     return this;
   }
 
+  /** -&gt; Gantt */
+  @Deprecated
   @Column
   public Integer getProgress()
   {
     return progress;
   }
 
+  /** -&gt; Gantt */
+  @Deprecated
   public TaskDO setProgress(final Integer progress)
   {
     this.progress = progress;
@@ -442,7 +462,8 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
   }
 
   /**
-   * If set then normal user are not allowed to select (read) the time sheets of other users of this task and all sub tasks. This is important e. g. for hiding the days of illness of an employee.
+   * If set then normal user are not allowed to select (read) the time sheets of other users of this task and all sub tasks. This is
+   * important e. g. for hiding the days of illness of an employee.
    * @return True if the flag is set.
    */
   @Column(name = "protectionOfPrivacy", nullable = false, columnDefinition = "BOOLEAN DEFAULT 'false'")
@@ -464,6 +485,8 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
   /**
    * @see org.projectforge.gantt.GanttTask#getStartDate()
    */
+  /** -&gt; Gantt */
+  @Deprecated
   @Column(name = "start_date")
   public Date getStartDate()
   {
@@ -479,12 +502,16 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
   /**
    * @see org.projectforge.gantt.GanttTask#getEndDate()
    */
+  /** -&gt; Gantt */
+  @Deprecated
   @Column(name = "end_date")
   public Date getEndDate()
   {
     return endDate;
   }
 
+  /** -&gt; Gantt */
+  @Deprecated
   public TaskDO setEndDate(final Date endDate)
   {
     this.endDate = endDate;
@@ -495,30 +522,39 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
    * Duration in days.
    * @see org.projectforge.gantt.GanttTask#getDuration()
    */
+  /** -&gt; Gantt */
+  @Deprecated
   @Column(name = "duration", scale = 2, precision = 10)
   public BigDecimal getDuration()
   {
     return duration;
   }
 
+  /** -&gt; Gantt */
+  @Deprecated
   public TaskDO setDuration(final BigDecimal duration)
   {
     this.duration = duration;
     return this;
   }
 
+  /** -&gt; Gantt */
   @Column(name = "workpackage_code", length = 100)
+  @Deprecated
   public String getWorkpackageCode()
   {
     return workpackageCode;
   }
 
+  @Deprecated
   public TaskDO setWorkpackageCode(final String workpackageCode)
   {
     this.workpackageCode = workpackageCode;
     return this;
   }
 
+  /** -&gt; Gantt */
+  @Deprecated
   @Enumerated(EnumType.STRING)
   @Column(name = "gantt_type", length = 10)
   public GanttObjectType getGanttObjectType()
@@ -526,12 +562,16 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
     return ganttObjectType;
   }
 
+  /** -&gt; Gantt */
+  @Deprecated
   public TaskDO setGanttObjectType(final GanttObjectType ganttObjectType)
   {
     this.ganttObjectType = ganttObjectType;
     return this;
   }
 
+  /** -&gt; Gantt */
+  @Deprecated
   @Enumerated(EnumType.STRING)
   @Column(name = "gantt_rel_type", length = 15)
   public GanttRelationType getGanttRelationType()
@@ -539,6 +579,8 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
     return ganttRelationType;
   }
 
+  /** -&gt; Gantt */
+  @Deprecated
   public TaskDO setGanttRelationType(final GanttRelationType ganttRelationType)
   {
     this.ganttRelationType = ganttRelationType;
@@ -548,12 +590,16 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
   /**
    * In days.
    */
+  /** -&gt; Gantt */
+  @Deprecated
   @Column(name = "gantt_predecessor_offset")
   public Integer getGanttPredecessorOffset()
   {
     return ganttPredecessorOffset;
   }
 
+  /** -&gt; Gantt */
+  @Deprecated
   public TaskDO setGanttPredecessorOffset(final Integer ganttPredecessorOffset)
   {
     this.ganttPredecessorOffset = ganttPredecessorOffset;
@@ -564,6 +610,8 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
    * Please note: if you use TaskTree as cache then note, that the depend-on-task can be out-dated! Get the id of the depend-on-task and get
    * the every-time up-to-date task from the task tree by this id.
    */
+  /** -&gt; Gantt */
+  @Deprecated
   @ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE}, targetEntity = TaskDO.class)
   @JoinColumn(name = "gantt_predecessor_fk")
   public TaskDO getGanttPredecessor()
@@ -571,12 +619,16 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
     return ganttPredecessor;
   }
 
+  /** -&gt; Gantt */
+  @Deprecated
   public TaskDO setGanttPredecessor(final TaskDO ganttPredecessor)
   {
     this.ganttPredecessor = ganttPredecessor;
     return this;
   }
 
+  /** -&gt; Gantt */
+  @Deprecated
   @Transient
   public Integer getGanttPredecessorId()
   {
@@ -666,9 +718,6 @@ public class TaskDO extends DefaultBaseDO implements ShortDisplayNameCapable, Cl
     if (this.responsibleUser != null) {
       clone.responsibleUser = new PFUserDO();
       clone.responsibleUser.setId(getResponsibleUserId());
-    }
-    if (this.toDate != null) {
-      clone.toDate = (Date) this.toDate.clone();
     }
     return clone;
   }
