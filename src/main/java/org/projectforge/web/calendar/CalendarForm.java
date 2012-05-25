@@ -25,15 +25,20 @@ package org.projectforge.web.calendar;
 
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateMidnight;
 import org.projectforge.access.AccessChecker;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WicketUtils;
@@ -46,6 +51,7 @@ import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.GridBuilder;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
+import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
 public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
@@ -57,6 +63,9 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
+
+  @SpringBean(name = "userDao")
+  private UserDao userDao;
 
   private CalendarFilter filter;
 
@@ -134,10 +143,22 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     firstHourDropDownChoice.setRequired(true);
     WicketUtils.addTooltip(firstHourDropDownChoice, getString("calendar.option.firstHour.tooltip"));
     fs.add(firstHourDropDownChoice);
-    final IconButtonPanel refreshButtonPanel = new IconButtonPanel(fs.newChildId(), IconType.ARROW_REFRESH, getString("refresh"))
-    .setLight();
-    fs.add(refreshButtonPanel);
-    setDefaultButton(refreshButtonPanel.getButton());
+    {
+      final IconButtonPanel refreshButtonPanel = new IconButtonPanel(fs.newChildId(), IconType.ARROW_REFRESH, getString("refresh"))
+      .setLight();
+      fs.add(refreshButtonPanel);
+      setDefaultButton(refreshButtonPanel.getButton());
+    }
+    if (WebConfiguration.isDevelopmentMode() == true) {
+      final PFUserDO user = PFUserContext.getUser();
+      final String authenticationKey = userDao.getAuthenticationToken(user.getId());
+      final String contextPath = WebApplication.get().getServletContext().getContextPath();
+      final String iCalTarget = contextPath + "/DEVELOPMENT_MODE/NOT_YET_IMPLEMENTED/export/ical?timesheetUser=" + user.getUsername() + "&token=" + authenticationKey;
+      final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
+      final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fs.newChildId(), IconType.SUBSCRIPTION,
+          getString("timesheet.iCalExport"), iCalExportLink).setLight();
+      fs.add(exportICalButtonPanel);
+    }
     gridBuilder.newColumnPanel(DivType.COL_25);
     fs = gridBuilder.newFieldset(getString("timesheet.duration")).setNoLabelFor();
     final DivTextPanel durationPanel = new DivTextPanel(fs.newChildId(), new Label(DivTextPanel.WICKET_ID, new Model<String>() {
@@ -149,18 +170,6 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     }));
     durationLabel = durationPanel.getLabel4Ajax();
     fs.add(durationPanel);
-    // final PFUserDO user = PFUserContext.getUser();
-    //
-    // if (WebConfiguration.isDevelopmentMode() == true && StringUtils.isNotBlank(user.getStayLoggedInKey())) {
-    // final String contextPath = WebApplication.get().getServletContext().getContextPath();
-    // final String iCalTarget = contextPath + "/export/ical?user=" + user.getUsername() + "&key=" + user.getStayLoggedInKey();
-    // final ExternalLink exportCalendar = new ExternalLink("exportCalendar", iCalTarget);
-    // exportCalendar.add(new TooltipImage("exportCalendarImage", getResponse(), WebConstants.IMAGE_CALENDAR,
-    // getString("tooltip.exportCalendar")));
-    // // add(exportCalendar);
-    // } else {
-    // // add(new ExternalLink("exportCalendar", "invisible").setVisible(false));
-    // }
   }
 
   private boolean isOtherUsersAllowed()
