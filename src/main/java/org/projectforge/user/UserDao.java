@@ -61,6 +61,10 @@ public class UserDao extends BaseDao<PFUserDO>
 
   private static final String MESSAGE_KEY_OLD_PASSWORD_WRONG = "user.changePassword.error.oldPasswordWrong";
 
+  private static final short AUTHENTICATION_TOKEN_LENGTH = 20;
+
+  private static final short STAY_LOGGED_IN_KEY_LENGTH = 20;
+
   public static final String MESSAGE_KEY_PASSWORD_QUALITY_CHECK = "user.changePassword.error.passwordQualityCheck";
 
   public UserDao()
@@ -368,7 +372,39 @@ public class UserDao extends BaseDao<PFUserDO>
 
   private String createStayLoggedInKey()
   {
-    return NumberHelper.getSecureRandomUrlSaveString(20);
+    return NumberHelper.getSecureRandomUrlSaveString(STAY_LOGGED_IN_KEY_LENGTH);
+  }
+
+  /**
+   * Returns the user's authentication token if exists (must be not blank with a size >= 10). If not, a new token key will be generated.
+   * @param userId
+   * @return
+   */
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+  public String getAuthenticationToken(final Integer userId)
+  {
+    final PFUserDO user = internalGetById(userId);
+    if (StringUtils.isBlank(user.getAuthenticationToken()) || user.getAuthenticationToken().trim().length() < 10) {
+      user.setAuthenticationToken(createAuthenticationToken());
+      log.info("Authentication token renewed for user: " + userId + " - " + user.getUsername());
+    }
+    return user.getAuthenticationToken();
+  }
+
+  /**
+   * Renews the user's authentication token (random string sequence).
+   */
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+  public void renewAuthenticationToken(final Integer userId)
+  {
+    final PFUserDO user = internalGetById(userId);
+    user.setAuthenticationToken(createAuthenticationToken());
+    log.info("Authentication token renewed for user: " + userId + " - " + user.getUsername());
+  }
+
+  private String createAuthenticationToken()
+  {
+    return NumberHelper.getSecureRandomUrlSaveString(AUTHENTICATION_TOKEN_LENGTH);
   }
 
   /**
@@ -421,11 +457,11 @@ public class UserDao extends BaseDao<PFUserDO>
     Validate.isTrue(user.getId().equals(contextUser.getId()) == true);
     final PFUserDO dbUser = getHibernateTemplate().load(clazz, user.getId(), LockMode.PESSIMISTIC_WRITE);
     if (copyValues(user, dbUser, "deleted", "password", "lastLogin", "loginFailures", "orgUnit", "role", "username", "stayLoggedInKey",
-        "rights") == true) {
+        "authenticationToken", "rights") == true) {
       dbUser.setLastUpdate();
       log.info("Object updated: " + dbUser.toString());
       copyValues(user, contextUser, "deleted", "password", "lastLogin", "loginFailures", "orgUnit", "role", "username", "stayLoggedInKey",
-          "rights");
+          "authenticationToken", "rights");
     } else {
       log.info("No modifications detected (no update needed): " + dbUser.toString());
     }

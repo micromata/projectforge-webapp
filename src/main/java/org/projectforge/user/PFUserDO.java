@@ -104,6 +104,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private String stayLoggedInKey;
 
+  private String authenticationToken;
+
   private Timestamp lastLogin;
 
   private int loginFailures;
@@ -336,7 +338,10 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
       @Override
       protected boolean accept(final java.lang.reflect.Field f)
       {
-        return super.accept(f) && !"password".equals(f.getName()) && !"stayLoggedInKey".equals(f.getName());
+        return super.accept(f)
+            && !"password".equals(f.getName())
+            && !"stayLoggedInKey".equals(f.getName())
+            && !"authenticationToken".equals(f.getName());
       }
     }).toString();
   }
@@ -508,6 +513,27 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public void setStayLoggedInKey(final String stayLoggedInKey)
   {
     this.stayLoggedInKey = stayLoggedInKey;
+  }
+
+  /**
+   * The authentication token is usable for download links of the user (without further login). This is used e. g. for ics download links of
+   * the team calendars.
+   * @return the authenticationToken
+   */
+  @Column(name = "authentication_token", length = 100)
+  public String getAuthenticationToken()
+  {
+    return authenticationToken;
+  }
+
+  /**
+   * @param authenticationToken the authenticationToken to set
+   * @return this for chaining.
+   */
+  public PFUserDO setAuthenticationToken(final String authenticationToken)
+  {
+    this.authenticationToken = authenticationToken;
+    return this;
   }
 
   /**

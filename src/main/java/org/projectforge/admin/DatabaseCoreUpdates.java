@@ -52,6 +52,30 @@ public class DatabaseCoreUpdates
   {
     final List<UpdateEntry> list = new ArrayList<UpdateEntry>();
     // /////////////////////////////////////////////////////////////////
+    // 4.2
+    // /////////////////////////////////////////////////////////////////
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.2", "2012-05-10", "Adds t_pf_user.authenticationToken.") {
+      final Table userTable = new Table(PFUserDO.class);
+      @Override
+      public UpdatePreCheckStatus runPreCheck()
+      {
+        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        return dao.doesTableAttributesExist(userTable, "authenticationToken") == true //
+            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+      }
+
+      @Override
+      public UpdateRunningStatus runUpdate()
+      {
+        final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
+        if (dao.doesTableAttributesExist(userTable, "authenticationToken") == false) {
+          dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "authenticationToken"));
+        }
+        return UpdateRunningStatus.DONE;
+      }
+    });
+
+    // /////////////////////////////////////////////////////////////////
     // 4.1
     // /////////////////////////////////////////////////////////////////
     list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.1", "2012-04-21", "Adds t_pf_user.first_day_of_week and t_pf_user.hr_planning.") {
