@@ -282,6 +282,6 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     i18nKeyMap.put("cancel", getString("contextMenu.cancel"));
     final PackageTextTemplate jsTemplate = new PackageTextTemplate(AbstractUnsecureBasePage.class, "ContextMenu.js.template");
     final String javaScript = jsTemplate.asString(i18nKeyMap);
-    response.renderJavaScript(javaScript, "jsContextMenu");
+    response.renderOnDomReadyJavaScript(javaScript);
   }
 }
