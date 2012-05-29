@@ -24,6 +24,8 @@
 package org.projectforge.web.wicket;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.wicket.AttributeModifier;
@@ -37,6 +39,7 @@ import org.apache.wicket.markup.html.link.AbstractLink;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.http.handler.RedirectRequestHandler;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.util.template.PackageTextTemplate;
 import org.projectforge.AppVersion;
 import org.projectforge.Version;
 import org.projectforge.user.PFUserContext;
@@ -133,6 +136,7 @@ public abstract class AbstractUnsecureBasePage extends WebPage
     super.renderHead(response);
     response.renderString(WicketUtils.getCssForFavicon(getUrl("/favicon.ico")));
     response.renderJavaScriptReference("scripts/projectforge.js");
+    initializeContextMenu(response);
   }
 
   @Override
@@ -268,5 +272,16 @@ public abstract class AbstractUnsecureBasePage extends WebPage
       return getString(key);
     }
     return MessageFormat.format(getString(key), params);
+  }
+
+  private void initializeContextMenu(final IHeaderResponse response) {
+
+    // context menu
+    final Map<String, String> i18nKeyMap = new HashMap<String, String>();
+    i18nKeyMap.put("newTab", getString("contextMenu.newTab"));
+    i18nKeyMap.put("cancel", getString("contextMenu.cancel"));
+    final PackageTextTemplate jsTemplate = new PackageTextTemplate(AbstractUnsecureBasePage.class, "ContextMenu.js.template");
+    final String javaScript = jsTemplate.asString(i18nKeyMap);
+    response.renderJavaScript(javaScript, "jsContextMenu");
   }
 }

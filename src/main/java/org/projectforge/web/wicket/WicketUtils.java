@@ -567,6 +567,8 @@ public class WicketUtils
   public static void addRowClick(final Component row)
   {
     row.add(AttributeModifier.replace("onclick", "javascript:rowClick(this);"));
+    // add marker css class for contextMenu javaScript
+    row.add(new AttributeAppender("class", Model.of("withContextMenu"), " "));
   }
 
   /**
