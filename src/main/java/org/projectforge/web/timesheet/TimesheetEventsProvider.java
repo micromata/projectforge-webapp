@@ -73,7 +73,7 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
   // duration by day of month.
   private final long[] durationsPerDayOfMonth = new long[32];
 
-  private final long[] durationsPerDayOfYear = new long[370];
+  private final long[] durationsPerDayOfYear = new long[380];
 
   /**
    * @param parent For i18n.
