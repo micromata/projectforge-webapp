@@ -54,6 +54,7 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
   protected void init()
   {
     super.init();
+    gridBuilder.newColumnsPanel();
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("task")).setNoLabelFor();
       final TaskSelectPanel taskSelectPanel = new TaskSelectPanel(fs.newChildId(), new Model<TaskDO>() {
