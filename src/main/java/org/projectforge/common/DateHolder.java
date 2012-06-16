@@ -433,7 +433,15 @@ public class DateHolder implements Serializable, Cloneable, Comparable<DateHolde
    */
   public DateHolder setEndOfWeek()
   {
-    calendar.set(Calendar.DAY_OF_WEEK, getFirstDayOfWeek() + 6);
+    final int firstDayOfWeek = getFirstDayOfWeek();
+    short endlessLoopDetection = 0;
+    do {
+      calendar.add(Calendar.DAY_OF_YEAR, 1);
+      if (++endlessLoopDetection > 10) {
+        throw new RuntimeException("Endless loop protection. Please contact developer!");
+      }
+    } while (calendar.get(Calendar.DAY_OF_WEEK) != firstDayOfWeek);
+    calendar.add(Calendar.DAY_OF_YEAR, -1); // Get one day before first day of next week.
     setEndOfDay();
     return this;
   }
