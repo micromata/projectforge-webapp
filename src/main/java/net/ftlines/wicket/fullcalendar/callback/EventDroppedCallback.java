@@ -29,9 +29,13 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
   @Override
   protected String configureCallbackScript(final String script, final String urlTail)
   {
-    return script.replace(urlTail, "&eventId='+event.id+'&sourceId='+event.source.data."
-        + EventSource.Const.UUID
-        + "+'&dayDelta='+dayDelta+'&minuteDelta='+minuteDelta+'&allDay='+allDay+'");
+    final String preScript = "console.log(originalEvent); var triggerAjaxEvent = function (which) { ";
+    final String postScript = "}; $.contextMenu.create([ { 'Move' : function(menuItem,menu) { triggerAjaxEvent('Move'); } }, $.contextMenu.separator, {'Copy' : function(menuItem,menu) { triggerAjaxEvent('Copy'); } } ], {theme:'gloss'}).show( this, originalEvent );";
+    return preScript
+        + script.replace(urlTail, "&eventId='+event.id+'&sourceId='+event.source.data."
+            + EventSource.Const.UUID
+            + "+'&dayDelta='+dayDelta+'&minuteDelta='+minuteDelta+'&allDay='+allDay+'&which='+which+'")
+            + postScript;
   }
 
   public IModel<String> getHandlerScript()
@@ -40,7 +44,7 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
       @Override
       public String getObject()
       {
-        return "function(event, dayDelta, minuteDelta, allDay, revertFunc) { " + getCallbackScript() + "}";
+        return "function(event, dayDelta, minuteDelta, allDay, revertFunc, originalEvent) { " + getCallbackScript() + "}";
       }
     };
   }

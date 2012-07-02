@@ -21,37 +21,37 @@ import org.apache.wicket.ajax.AjaxRequestTarget;
 
 abstract class AbstractAjaxCallbackWithClientsideRevert extends AbstractAjaxCallback
 {
-	private String uuid = "u" + UUID.randomUUID().toString().replace("-", "");
+  private final String uuid = "u" + UUID.randomUUID().toString().replace("-", "");
 
-	protected abstract String getRevertScript();
+  protected abstract String getRevertScript();
 
-	protected abstract boolean onEvent(AjaxRequestTarget target);
-
-
-	private String getRevertScriptBlock()
-	{
-		return "{" + getRevertScript() + ";}";
-	}
+  protected abstract boolean onEvent(AjaxRequestTarget target);
 
 
-	@Override
-	protected final void respond(AjaxRequestTarget target)
-	{
-		boolean result = onEvent(target);
-		target.prependJavaScript(String.format("$.data(document, '%s', %s);", uuid, String.valueOf(result)));
-	}
+  private String getRevertScriptBlock()
+  {
+    return getRevertScript();
+  }
 
-	@Override
-	protected final CharSequence getFailureScript()
-	{
-		return getRevertScriptBlock();
-	}
 
-	@Override
-	protected final CharSequence getSuccessScript()
-	{
-		return String.format("if (false===$.data(document, '%s')) %s $.removeData(document, '%s');", uuid,
-			getRevertScriptBlock(), uuid);
-	}
+  @Override
+  protected final void respond(final AjaxRequestTarget target)
+  {
+    final boolean result = onEvent(target);
+    target.prependJavaScript(String.format("$.data(document, '%s', %s);", uuid, String.valueOf(result)));
+  }
+
+  @Override
+  protected final CharSequence getFailureScript()
+  {
+    return getRevertScriptBlock();
+  }
+
+  @Override
+  protected final CharSequence getSuccessScript()
+  {
+    return String.format("if (false===$.data(document, '%s')) %s $.removeData(document, '%s');", uuid,
+        getRevertScriptBlock(), uuid);
+  }
 
 }
