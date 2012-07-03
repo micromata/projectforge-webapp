@@ -21,26 +21,16 @@
  * @version 1.1
  * @history 1.1 2010-01-25 Fixed a problem with 1.4 which caused undesired show/hide animations
  * @history 1.0 2008-10-20 Initial Release
- * @todo slideUp doesn't work in IE - because of iframe?
  * @todo Hide all other menus when contextmenu is shown?
  * @todo More themes
  * @todo Nested context menus
  */
 ;(function($){
 	$.contextMenu = {
-		shadow:true,
-		shadowOffset:0,
-		shadowOffsetX:5,
-		shadowOffsetY:5,
-		shadowWidthAdjust:-3,
-		shadowHeightAdjust:-3,
-		shadowOpacity:.2,
-		shadowClass:'context-menu-shadow',
-		shadowColor:'black',
 
 		offsetX:0,
 		offsetY:0,
-		appendTo:'body',
+		appendTo:'#nav_top',
 		direction:'down',
 		constrainToScreen:true,
 				
@@ -64,10 +54,7 @@
 		separator:'context-menu-separator', // A specific key to identify a separator
 		target:null, // The target of the context click, to be populated when triggered
 		menu:null, // The jQuery object containing the HTML object that is the menu itself
-		shadowObj:null, // Shadow object
-		bgiframe:null, // The iframe object for IE6
 		shown:false, // Currently being shown?
-		useIframe:/*@cc_on @*//*@if (@_win32) true, @else @*/false,/*@end @*/ // This is a better check than looking at userAgent!
 		
 		// Create the menu instance
 		create: function(menu,opts) {
@@ -89,49 +76,36 @@
 				cmenu.menu.css({display:'none'});
 				$(cmenu.appendTo).append(cmenu.menu);
 			}
-			
-			// Create the shadow object if shadow is enabled
-			if (cmenu.shadow) {
-				cmenu.createShadow(cmenu); // Extracted to method for extensibility
-				if (cmenu.shadowOffset) { cmenu.shadowOffsetX = cmenu.shadowOffsetY = cmenu.shadowOffset; }
-			}
+
 			$('body').bind('contextmenu',function(){cmenu.hide();}); // If right-clicked somewhere else in the document, hide this menu
 			return cmenu;
 		},
-		
-		// Create an iframe object to go behind the menu
-		createIframe: function() {
-		    return $('<iframe frameborder="0" tabindex="-1" src="javascript:false" style="display:block;position:absolute;z-index:-1;filter:Alpha(Opacity=0);"/>');
-		},
-		
+
 		// Accept an Array representing a menu structure and turn it into HTML
 		createMenu: function(menu,cmenu) {
 			var className = cmenu.className;
 			$.each(cmenu.theme.split(","),function(i,n){className+=' '+cmenu.themePrefix+n});
-			var $t = $('<table cellspacing=0 cellpadding=0></table>').mousedown(function(){cmenu.hide(); return false;}); // We wrap a table around it so width can be flexible
-			var $tr = $('<tr></tr>');
-			var $td = $('<td></td>');
-			var $div = $('<div class="'+className+'"></div>');
-			
+			var $container	= $('<ul class="dropdown"/>').mousedown(function(){cmenu.hide(); return false;}); // We wrap a table around it so width can be flexible
+
 			// Each menu item is specified as either:
 			//     title:function
 			// or  title: { property:value ... }
 			for (var i=0; i<menu.length; i++) {
 				var m = menu[i];
 				if (m==$.contextMenu.separator) {
-					$div.append(cmenu.createSeparator());
+//					$container.append(cmenu.createSeparator());
 				}
 				else {
 					for (var opt in menu[i]) {
-						$div.append(cmenu.createMenuItem(opt,menu[i][opt])); // Extracted to method for extensibility
+						$container.append(cmenu.createMenuItem(opt,menu[i][opt])); // Extracted to method for extensibility
 					}
 				}
 			}
-			if ( cmenu.useIframe ) {
-				$td.append(cmenu.createIframe());
-			}
-			$t.append($tr.append($td.append($div)))
-			return $t;
+			var $wrapper = $('<ul class="contextmenu"/>');
+			var $innerWrapper = $('<li class="has_dropdown"></li>');
+			$wrapper.append($innerWrapper);
+			$innerWrapper.append($container);
+			return $wrapper;
 		},
 		
 		// Create an individual menu item
@@ -148,20 +122,23 @@
 				title:'',
 				hoverItem:cmenu.hoverItem,
 				hoverItemOut:cmenu.hoverItemOut
-			},obj);
+			}, obj);
 			// If an icon is specified, hard-code the background-image style. Themes that don't show images should take this into account in their CSS
 			var iconStyle = (o.icon)?'background-image:url('+o.icon+');':'';
-			var $div = $('<div class="'+cmenu.itemClassName+' '+o.className+((o.disabled)?' '+cmenu.disabledItemClassName:'')+'" title="'+o.title+'"></div>')
+			var $element = $('<li title="'+o.title+'"/>')
 							// If the item is disabled, don't do anything when it is clicked
 							.mousedown(function (e) { e.preventDefault(); return false; })
-							.click(function (e) { if(cmenu.isItemDisabled(this)){return false;}else{return o.onclick.call(cmenu.target,this,cmenu,e)} })
+							.click(function (e) {
+								if (cmenu.isItemDisabled(this)) {return false;}
+								else {return o.onclick.call(cmenu.target,this,cmenu,e)}
+							})
 							// Change the class of the item when hovered over
 							.hover( function () { o.hoverItem.call(this,(cmenu.isItemDisabled(this))?cmenu.disabledItemHoverClassName:o.hoverClassName); }
 								  , function () { o.hoverItemOut.call(this,(cmenu.isItemDisabled(this))?cmenu.disabledItemHoverClassName:o.hoverClassName); }
 							);
-			var $idiv = $('<div class="'+cmenu.innerDivClassName+'" style="'+iconStyle+'">'+label+'</div>');
-			$div.append($idiv);
-			return $div;
+			var $inner = $('<a href="#" style="'+iconStyle+'"><span>'+label+'</span></a>').click(function (e) {e.preventDefault();});
+			$element.append($inner);
+			return $element;
 		},
 		
 		// Create a separator row
@@ -175,25 +152,6 @@
 		// Functions to fire on hover. Extracted to methods for extensibility
 		hoverItem: function(c) { $(this).addClass(c); },
 		hoverItemOut: function(c) { $(this).removeClass(c); },
-		
-		// Create the shadow object
-		createShadow: function(cmenu) {
-			cmenu.shadowObj = $('<div class="'+cmenu.shadowClass+'"></div>').css( {display:'none',position:"absolute", zIndex:9998, opacity:cmenu.shadowOpacity, backgroundColor:cmenu.shadowColor } );
-			$(cmenu.appendTo).append(cmenu.shadowObj);
-		},
-		
-		// Display the shadow object, given the position of the menu itself
-		showShadow: function(x,y,e) {
-			var cmenu = this;
-			if (cmenu.shadow) {
-				cmenu.shadowObj.css( {
-					width:(cmenu.menu.width()+cmenu.shadowWidthAdjust)+"px", 
-					height:(cmenu.menu.height()+cmenu.shadowHeightAdjust)+"px", 
-					top:(y+cmenu.shadowOffsetY)+"px", 
-					left:(x+cmenu.shadowOffsetX)+"px"
-				}).addClass(cmenu.shadowClass)[cmenu.showTransition](cmenu.showSpeed);
-			}
-		},
 		
 		// A hook to call before the menu is shown, in case special processing needs to be done.
 		// Return false to cancel the default show operation
@@ -212,15 +170,11 @@
 					$(cmenu.appendTo).append(cmenu.menu);
 				}
 				var $c = cmenu.menu;
-				x+=cmenu.offsetX; y+=cmenu.offsetY;
+				x += cmenu.offsetX;
+				y += cmenu.offsetY;
 				var pos = cmenu.getPosition(x,y,cmenu,e); // Extracted to method for extensibility
-				cmenu.showShadow(pos.x,pos.y,e);
-				// Resize the iframe if needed
-				if (cmenu.useIframe) {
-					$c.find('iframe').css({width:$c.width()+cmenu.shadowOffsetX+cmenu.shadowWidthAdjust,height:$c.height()+cmenu.shadowOffsetY+cmenu.shadowHeightAdjust});
-				}
-				$c.css( {top:pos.y+"px", left:pos.x+"px", position:"absolute",zIndex:9999} )[cmenu.showTransition](cmenu.showSpeed,((cmenu.showCallback)?function(){cmenu.showCallback.call(cmenu);}:null));
-				cmenu.shown=true;
+				$c.css( {top:pos.y-90+"px", left:pos.x-60+"px", position:"absolute",zIndex:9999} )[cmenu.showTransition](cmenu.showSpeed,((cmenu.showCallback)?function(){cmenu.showCallback.call(cmenu);}:null));
+				cmenu.shown = true;
 				$(document).one('mousedown', function () { cmenu.hide(); }); // Handle a single click to the document to hide the menu
 			}
 		},
@@ -248,9 +202,7 @@
 		hide: function() {
 			var cmenu=this;
 			if (cmenu.shown) {
-				if (cmenu.iframe) { $(cmenu.iframe).hide(); }
 				if (cmenu.menu) { cmenu.menu[cmenu.hideTransition](cmenu.hideSpeed,((cmenu.hideCallback)?function(){cmenu.hideCallback.call(cmenu);}:null)); }
-				if (cmenu.shadow) { cmenu.shadowObj[cmenu.hideTransition](cmenu.hideSpeed); }
 			}
 			cmenu.shown = false;
 		}
