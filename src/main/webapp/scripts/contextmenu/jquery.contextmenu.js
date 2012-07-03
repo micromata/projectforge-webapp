@@ -28,8 +28,8 @@
 ;(function($){
 	$.contextMenu = {
 
-		offsetX:0,
-		offsetY:0,
+		offsetX:-40,
+		offsetY:-60,
 		appendTo:'#nav_top',
 		direction:'down',
 		constrainToScreen:true,
@@ -173,16 +173,21 @@
 				x += cmenu.offsetX;
 				y += cmenu.offsetY;
 				var pos = cmenu.getPosition(x,y,cmenu,e); // Extracted to method for extensibility
-				$c.css( {top:pos.y-90+"px", left:pos.x-60+"px", position:"absolute",zIndex:9999} )[cmenu.showTransition](cmenu.showSpeed,((cmenu.showCallback)?function(){cmenu.showCallback.call(cmenu);}:null));
+				$c.css( {top:pos.y+"px", left:pos.x+"px", position:"absolute",zIndex:9999} )[cmenu.showTransition](cmenu.showSpeed,((cmenu.showCallback)?function(){cmenu.showCallback.call(cmenu);}:null));
 				cmenu.shown = true;
-				$(document).one('mousedown', function () { cmenu.hide(); }); // Handle a single click to the document to hide the menu
+				$(document).bind('mousedown.contextmenu keydown.contextmenu', function (e) {
+					if (!e.keyCode || e.keyCode == 27) { // 27 == Escape
+						cmenu.hide();
+						$(this).unbind('mousedown.contextmenu keydown.contextmenu');
+					}
+				});
 			}
 		},
 		
 		// Find the position where the menu should appear, given an x,y of the click event
 		getPosition: function(clickX,clickY,cmenu,e) {
-			var x = clickX+cmenu.offsetX;
-			var y = clickY+cmenu.offsetY
+			var x = clickX + cmenu.offsetX;
+			var y = clickY + cmenu.offsetY
 			var h = $(cmenu.menu).height();
 			var w = $(cmenu.menu).width();
 			var dir = cmenu.direction;
@@ -191,18 +196,18 @@
 				var wh = $w.height();
 				var ww = $w.width();
 				if (dir=="down" && (y+h-$w.scrollTop() > wh)) { dir = "up"; }
-				var maxRight = x+w-$w.scrollLeft();
+				var maxRight = x + w - $w.scrollLeft();
 				if (maxRight > ww) { x -= (maxRight-ww); }
 			}
-			if (dir=="up") { y -= h; }
+			if (dir == "up") { y -= h; }
 			return {'x':x,'y':y};
 		},
 		
 		// Hide the menu, of course
 		hide: function() {
-			var cmenu=this;
-			if (cmenu.shown) {
-				if (cmenu.menu) { cmenu.menu[cmenu.hideTransition](cmenu.hideSpeed,((cmenu.hideCallback)?function(){cmenu.hideCallback.call(cmenu);}:null)); }
+			var cmenu = this;
+			if (cmenu.shown && cmenu.menu && typeof cmenu.hideCallback === "function") {
+				cmenu.hideCallback.call(cmenu);
 			}
 			cmenu.shown = false;
 		}
