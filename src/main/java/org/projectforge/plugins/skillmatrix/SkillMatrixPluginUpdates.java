@@ -29,11 +29,10 @@ import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.Table;
-import org.projectforge.plugins.todo.ToDoPlugin;
 
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
- * release of this to-do plugin.
+ * release of this skillmatrix plugin.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class SkillMatrixPluginUpdates
@@ -43,7 +42,7 @@ public class SkillMatrixPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(ToDoPlugin.ID, "1.0.0", "2011-05-27", "Adds tables T_PLUGIN_SKILL and T_PLUGIN_SKILL_RATING.") {
+    return new UpdateEntryImpl(SkillMatrixPlugin.ID, "1.0.0", "2011-05-27", "Adds tables T_PLUGIN_SKILL and T_PLUGIN_SKILL_RATING.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
