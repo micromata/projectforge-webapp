@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans>
-  <!-- Will be configured after config.xml was read: -->
-  <bean id="ldapContextSource" class="org.springframework.ldap.core.support.LdapContextSource">
-    <!-- Please note: this url will never be used, please configure it in config.xml. -->
-    <property name="url" value="ldap://localhost:389" />
-  </bean>
-  <bean id="ldapTemplate" class="org.springframework.ldap.core.LdapTemplate">
-    <constructor-arg ref="ldapContextSource" />
-  </bean>
+  <bean id="ldapHelper" class="org.projectforge.ldap.LdapHelper" singleton="true" />
 </beans>
