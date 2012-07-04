@@ -33,7 +33,6 @@ import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
-import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
@@ -89,63 +88,16 @@ public class PersonDao
    */
   public void delete(final Person person)
   {
-    final DirContext ctx = null;// createAuthenticatedContext();
-    final String dn = buildDn(person);
-    try {
-      ctx.unbind(dn);
-    } catch (final NamingException e) {
-      throw new RuntimeException(e);
-    } finally {
-      if (ctx != null) {
-        try {
-          ctx.close();
-        } catch (final Exception e) {
-          // Never mind this.
-        }
+    new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        final String dn = buildDn(person);
+        log.info("Delete person: " + dn);
+        ctx.unbind(dn);
+        return null;
       }
-    }
-  }
-
-  /*
-   * @see PersonDao#getAllPersonNames()
-   */
-  public List<String> getAllPersonNames()
-  {
-    final DirContext ctx = null;// createAuthenticatedContext();
-
-    final LinkedList<String> list = new LinkedList<String>();
-    NamingEnumeration< ? > results = null;
-    try {
-      final SearchControls controls = new SearchControls();
-      controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-      results = ctx.search("", "(objectclass=person)", controls);
-
-      while (results.hasMore()) {
-        final SearchResult searchResult = (SearchResult) results.next();
-        final Attributes attributes = searchResult.getAttributes();
-        final Attribute attr = attributes.get("cn");
-        final String cn = (String) attr.get();
-        list.add(cn);
-      }
-    } catch (final NamingException e) {
-      throw new RuntimeException(e);
-    } finally {
-      if (results != null) {
-        try {
-          results.close();
-        } catch (final Exception e) {
-          // Never mind this.
-        }
-      }
-      if (ctx != null) {
-        try {
-          ctx.close();
-        } catch (final Exception e) {
-          // Never mind this.
-        }
-      }
-    }
-    return list;
+    }.excecute();
   }
 
   /*
@@ -179,25 +131,15 @@ public class PersonDao
    */
   public Person findByPrimaryKey(final String company, final String fullname)
   {
-
-    final DirContext ctx = null;// createAuthenticatedContext();
-    final String dn = buildDn(company, fullname);
-    try {
-      final Attributes attributes = ctx.getAttributes(dn);
-      return mapToPerson(dn, attributes);
-    } catch (final NameNotFoundException e) {
-      throw new RuntimeException("Did not find entry with primary key '" + dn + "'", e);
-    } catch (final NamingException e) {
-      throw new RuntimeException(e);
-    } finally {
-      if (ctx != null) {
-        try {
-          ctx.close();
-        } catch (final Exception e) {
-          // Never mind this.
-        }
+    return (Person) new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        final String dn = buildDn(company, fullname);
+        final Attributes attributes = ctx.getAttributes(dn);
+        return mapToPerson(dn, attributes);
       }
-    }
+    }.excecute();
   }
 
   private String buildDn(final Person person)
