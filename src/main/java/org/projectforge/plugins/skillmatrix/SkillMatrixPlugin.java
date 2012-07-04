@@ -25,7 +25,6 @@ package org.projectforge.plugins.skillmatrix;
 
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
-import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
@@ -41,7 +40,7 @@ public class SkillMatrixPlugin extends AbstractPlugin
 
   static UserPrefArea USER_PREF_AREA;
 
-  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { SkillDO.class};
+  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { SkillDO.class };
 
   /**
    * This dao should be defined in pluginContext.xml (as resources) for proper initialization.
@@ -62,16 +61,18 @@ public class SkillMatrixPlugin extends AbstractPlugin
   {
     // DatabaseUpdateDao is needed by the updater:
     SkillMatrixPluginUpdates.dao = databaseUpdateDao;
-    final RegistryEntry entry = new RegistryEntry(ID, SkillDao.class, skillDao, "plugins.skillMatrix");
-    register(entry);
+    register(ID, SkillDao.class, skillDao, "plugins.skillmatrix");
 
     // Register the web part:
-    //registerWeb(ID, ToDoListPage.class, ToDoEditPage.class);
+    registerWeb(ID, SkillMatrixListPage.class, SkillMatrixEditPage.class);
 
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-    // registerMenuItem(new ToDoMenuItemDef(parentMenu, ID, 5, "plugins.todo.menu", ToDoListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ID, 5, "plugins.skillmatrix.menu", SkillMatrixListPage.class));
     // .setMobileMenu(ToDoMobileListPage.class, 10));
+
+    // Define the access management:
+    registerRight(new SkillMatrixRight());
 
     // All the i18n stuff:
     addResourceBundle(RESOURCE_BUNDLE_NAME);
