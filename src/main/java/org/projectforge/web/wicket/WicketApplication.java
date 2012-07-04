@@ -60,7 +60,6 @@ import org.projectforge.core.ProjectForgeException;
 import org.projectforge.core.SystemInfoCache;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.HibernateUtils;
-import org.projectforge.ldap.LdapSetup;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.user.PFUserContext;
@@ -73,7 +72,6 @@ import org.projectforge.web.registry.WebRegistry;
 import org.projectforge.web.wicket.converter.MyDateConverter;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
@@ -119,9 +117,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
 
   @SpringBean(name = "daoRegistry")
   private DaoRegistry daoRegistry;
-
-  @SpringBean(name = "ldapContextSource")
-  private LdapContextSource ldapContextSource;
 
   @SpringBean(name = "systemUpdater")
   private SystemUpdater systemUpdater;
@@ -180,14 +175,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   public void setDaoRegistry(final DaoRegistry daoRegistry)
   {
     this.daoRegistry = daoRegistry;
-  }
-
-  /**
-   * @param ldapContextSource the ldapContextSource to set
-   */
-  public void setLdapContextSource(final LdapContextSource ldapContextSource)
-  {
-    this.ldapContextSource = ldapContextSource;
   }
 
   public void setSystemUpdater(final SystemUpdater systemUpdater)
@@ -380,7 +367,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     }
     PFUserContext.setUser(null);
     UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
-    LdapSetup.getInstance().init(ldapContextSource);
   }
 
   @Override
