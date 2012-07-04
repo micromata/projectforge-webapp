@@ -31,6 +31,7 @@ import org.projectforge.admin.SystemUpdater;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.plugins.banking.BankingPlugin;
 import org.projectforge.plugins.memo.MemoPlugin;
+import org.projectforge.plugins.skillmatrix.SkillMatrixPlugin;
 import org.projectforge.plugins.todo.ToDoPlugin;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -45,7 +46,7 @@ public class PluginsRegistry
   /**
    * Defines some built-in plugins.
    */
-  private final AbstractPlugin[] builtinPlugins = new AbstractPlugin[] { new ToDoPlugin(), new MemoPlugin(), new BankingPlugin()};
+  private final AbstractPlugin[] builtinPlugins = new AbstractPlugin[] { new ToDoPlugin(), new MemoPlugin(), new BankingPlugin(), new SkillMatrixPlugin()};
 
   private static PluginsRegistry instance;
 
