@@ -28,7 +28,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 
-
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
@@ -42,62 +41,78 @@ public class Person
 
   private String country;
 
-  private String company;
+  private String ou;
 
-  public String getDescription() {
+  public String getDescription()
+  {
     return description;
   }
 
-  public void setDescription(final String description) {
+  public Person setDescription(final String description)
+  {
     this.description = description;
+    return this;
   }
 
-  public String getFullName() {
+  public String getFullName()
+  {
     return fullName;
   }
 
-  public void setFullName(final String fullName) {
+  public Person setFullName(final String fullName)
+  {
     this.fullName = fullName;
+    return this;
   }
 
-  public String getLastName() {
+  public String getLastName()
+  {
     return lastName;
   }
 
-  public void setLastName(final String lastName) {
+  public Person setLastName(final String lastName)
+  {
     this.lastName = lastName;
+    return this;
   }
 
-  public String getCompany() {
-    return company;
+  public String getOu()
+  {
+    return ou;
   }
 
-  public void setCompany(final String company) {
-    this.company = company;
+  public Person setOu(final String ou)
+  {
+    this.ou = ou;
+    return this;
   }
 
-  public String getCountry() {
+  public String getCountry()
+  {
     return country;
   }
 
-  public void setCountry(final String country) {
+  public Person setCountry(final String country)
+  {
     this.country = country;
+    return this;
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    return EqualsBuilder.reflectionEquals(
-        this, obj);
+  public boolean equals(final Object obj)
+  {
+    return EqualsBuilder.reflectionEquals(this, obj);
   }
 
   @Override
-  public int hashCode() {
-    return HashCodeBuilder
-        .reflectionHashCode(this);
+  public int hashCode()
+  {
+    return HashCodeBuilder.reflectionHashCode(this);
   }
 
   @Override
-  public String toString() {
-    return ToStringBuilder.reflectionToString(
-        this, ToStringStyle.MULTI_LINE_STYLE);
-  }}
+  public String toString()
+  {
+    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
+  }
+}

@@ -23,11 +23,9 @@
 
 package org.projectforge.ldap;
 
-import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.naming.Context;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -36,11 +34,10 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.apache.commons.lang.StringUtils;
+import org.projectforge.common.StringHelper;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -49,35 +46,24 @@ public class PersonDao
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PersonDao.class);
 
-  private String userName;
-
-  private String password;
-
-  private String url;
-
-  private String base;
+  LdapConnector ldapConnector;
 
   /*
    * @see PersonDao#create(Person)
    */
   public void create(final Person person)
   {
-    final DirContext ctx = createAuthenticatedContext();
-    final String dn = buildDn(person);
-    try {
-      final Attributes attrs = getAttributesToBind(person);
-      ctx.bind(dn, null, attrs);
-    } catch (final NamingException e) {
-      throw new RuntimeException(e);
-    } finally {
-      if (ctx != null) {
-        try {
-          ctx.close();
-        } catch (final Exception e) {
-          // Never mind this.
-        }
+    new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        final String dn = buildDn(person);
+        log.info("Create person: " + dn);
+        final Attributes attrs = getAttributesToBind(person);
+        ctx.bind(dn, null, attrs);
+        return null;
       }
-    }
+    }.excecute();
   }
 
   /*
@@ -85,22 +71,17 @@ public class PersonDao
    */
   public void update(final Person person)
   {
-    final DirContext ctx = createAuthenticatedContext();
-    final String dn = buildDn(person);
-    try {
-      ctx.rebind(dn, null, getAttributesToBind(person));
-    } catch (final NamingException e) {
-
-      throw new RuntimeException(e);
-    } finally {
-      if (ctx != null) {
-        try {
-          ctx.close();
-        } catch (final Exception e) {
-          // Never mind this.
-        }
+    new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        final String dn = buildDn(person);
+        log.info("Update person: " + dn);
+        final Attributes attrs = getAttributesToBind(person);
+        ctx.rebind(dn, null, attrs);
+        return null;
       }
-    }
+    }.excecute();
   }
 
   /*
@@ -108,7 +89,7 @@ public class PersonDao
    */
   public void delete(final Person person)
   {
-    final DirContext ctx = createAuthenticatedContext();
+    final DirContext ctx = null;// createAuthenticatedContext();
     final String dn = buildDn(person);
     try {
       ctx.unbind(dn);
@@ -130,7 +111,7 @@ public class PersonDao
    */
   public List<String> getAllPersonNames()
   {
-    final DirContext ctx = createAnonymousContext();
+    final DirContext ctx = null;// createAuthenticatedContext();
 
     final LinkedList<String> list = new LinkedList<String>();
     NamingEnumeration< ? > results = null;
@@ -170,52 +151,37 @@ public class PersonDao
   /*
    * @see PersonDao#findAll()
    */
+  @SuppressWarnings("unchecked")
   public List<Person> findAll()
   {
-    final DirContext ctx = createAnonymousContext();
-
-    final LinkedList<Person> list = new LinkedList<Person>();
-    NamingEnumeration< ? > results = null;
-    try {
-      final SearchControls controls = new SearchControls();
-      controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-      results = ctx.search("", "(objectclass=person)", controls);
-
-      while (results.hasMore()) {
-        final SearchResult searchResult = (SearchResult) results.next();
-        final String dn = searchResult.getName();
-        final Attributes attributes = searchResult.getAttributes();
-        list.add(mapToPerson(dn, attributes));
-      }
-    } catch (final NamingException e) {
-      throw new RuntimeException(e);
-    } finally {
-      if (results != null) {
-        try {
-          results.close();
-        } catch (final Exception e) {
-          // Never mind this.
+    return (List<Person>) new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        final LinkedList<Person> list = new LinkedList<Person>();
+        NamingEnumeration< ? > results = null;
+        final SearchControls controls = new SearchControls();
+        controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        results = ctx.search("", "(objectclass=person)", controls);
+        while (results.hasMore()) {
+          final SearchResult searchResult = (SearchResult) results.next();
+          final String dn = searchResult.getName();
+          final Attributes attributes = searchResult.getAttributes();
+          list.add(mapToPerson(dn, attributes));
         }
+        return list;
       }
-      if (ctx != null) {
-        try {
-          ctx.close();
-        } catch (final Exception e) {
-          // Never mind this.
-        }
-      }
-    }
-    return list;
+    }.excecute();
   }
 
   /*
    * @see PersonDao#findByPrimaryKey(java.lang.String, java.lang.String, java.lang.String)
    */
-  public Person findByPrimaryKey(final String country, final String company, final String fullname)
+  public Person findByPrimaryKey(final String company, final String fullname)
   {
 
-    final DirContext ctx = createAnonymousContext();
-    final String dn = buildDn(country, company, fullname);
+    final DirContext ctx = null;// createAuthenticatedContext();
+    final String dn = buildDn(company, fullname);
     try {
       final Attributes attributes = ctx.getAttributes(dn);
       return mapToPerson(dn, attributes);
@@ -236,52 +202,27 @@ public class PersonDao
 
   private String buildDn(final Person person)
   {
-    return buildDn(person.getCountry(), person.getCompany(), person.getFullName());
+    return buildDn(person.getOu(), person.getFullName());
   }
 
-  private String buildDn(final String country, final String company, final String fullname)
+  private String buildDn(final String ou, final String fullname)
   {
     final StringBuffer sb = new StringBuffer();
     sb.append("cn=");
     sb.append(fullname);
-    sb.append(", ");
-    sb.append("ou=");
-    sb.append(company);
-    sb.append(", ");
-    sb.append("c=");
-    sb.append(country);
+    final int pos = ou != null ? ou.indexOf(',') : -1;
+    if (pos < 0) {
+      sb.append(", ou=");
+      sb.append(ou);
+    } else {
+      final String[] strs = StringHelper.splitAndTrim(ou, ",");
+      for (final String str : strs) {
+        sb.append(", ou=");
+        sb.append(str);
+      }
+    }
     final String dn = sb.toString();
     return dn;
-  }
-
-  private DirContext createContext(final Hashtable<String, String> env)
-  {
-    env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    final String tempUrl = createUrl();
-    env.put(Context.PROVIDER_URL, tempUrl);
-    DirContext ctx;
-    try {
-      ctx = new InitialDirContext(env);
-    } catch (final NamingException e) {
-      throw new RuntimeException(e);
-    }
-    return ctx;
-  }
-
-  private DirContext createAnonymousContext()
-  {
-    final Hashtable<String, String> hashtable = new Hashtable<String, String>();
-    final Hashtable<String, String> env = hashtable;
-    return createContext(env);
-  }
-
-  private DirContext createAuthenticatedContext()
-  {
-    final Hashtable<String, String> env = new Hashtable<String, String>();
-    env.put(Context.SECURITY_AUTHENTICATION, "simple");
-    env.put(Context.SECURITY_PRINCIPAL, userName);
-    env.put(Context.SECURITY_CREDENTIALS, password);
-    return createContext(env);
   }
 
   private Attributes getAttributesToBind(final Person person)
@@ -300,92 +241,24 @@ public class PersonDao
   private Person mapToPerson(final String dn, final Attributes attributes) throws NamingException
   {
     final Person person = new Person();
-    person.setFullName((String) attributes.get("cn").get());
-    person.setLastName((String) attributes.get("sn").get());
-    person.setDescription((String) attributes.get("description").get());
-
-    // Remove any trailing spaces after comma
-    final String cleanedDn = dn.replaceAll(", *", ",");
-
-    final String countryMarker = ",c=";
-    final int countryIndex = cleanedDn.lastIndexOf(countryMarker);
-
-    final String companyMarker = ",ou=";
-    final int companyIndex = cleanedDn.lastIndexOf(companyMarker);
-
-    final String country = cleanedDn.substring(countryIndex + countryMarker.length());
-    person.setCountry(country);
-    final String company = cleanedDn.substring(companyIndex + companyMarker.length(), countryIndex);
-    person.setCompany(company);
+    person.setFullName(getAttribute(attributes, "cn"));
+    person.setLastName(getAttribute(attributes, "sn"));
+    person.setDescription(getAttribute(attributes, "description"));
+    person.setOu(getAttribute(attributes, "ou"));
     return person;
   }
 
-  private String createUrl()
+  private String getAttribute(final Attributes attributes, final String attrId) throws NamingException
   {
-    String tempUrl = url;
-    if (!tempUrl.endsWith("/")) {
-      tempUrl += "/";
+    final Attribute attr = attributes.get(attrId);
+    if (attr == null) {
+      return null;
     }
-    if (StringUtils.isNotEmpty(base)) {
-      tempUrl += base;
-    }
-    return tempUrl;
+    return (String) attr.get();
   }
 
-  public void setUrl(final String url)
+  public void setLdapConnector(final LdapConnector ldapConnector)
   {
-    this.url = url;
+    this.ldapConnector = ldapConnector;
   }
-
-  public void setBase(final String base)
-  {
-    this.base = base;
-  }
-
-  public void setPassword(final String credentials)
-  {
-    this.password = credentials;
-  }
-
-  public void setUserDn(final String principal)
-  {
-    this.userName = principal;
-  }
-
-  // public boolean authenticate(final String userDn, final String credentials)
-  // {
-  // final LdapContextSource contextSource = new LdapContextSource();
-  // contextSource.setUrl("ldap://localhost:389");
-  // contextSource.setBase("dc=example,dc=com");
-  // DirContext ctx = null;
-  // try {
-  // ctx = contextSource.getContext(userDn, credentials);
-  // return true;
-  // } catch (final Exception e) {
-  // // Context creation failed - authentication did not succeed
-  // log.error("LDAP login failed for user: " + userDn, e);
-  // return false;
-  // } finally {
-  // // It is imperative that the created DirContext instance is always closed
-  // LdapUtils.closeContext(ctx);
-  // }
-  // }
-  //
-  // private String getDnForUser(final String uid)
-  // {
-  // final Filter f = new EqualsFilter("uid", uid);
-  // final List result = ldapTemplate.search(DistinguishedName.EMPTY_PATH, f.toString(), new AbstractContextMapper() {
-  // @Override
-  // protected Object doMapFromContext(final DirContextOperations ctx)
-  // {
-  // return ctx.getNameInNamespace();
-  // }
-  // });
-  //
-  // if (result.size() != 1) {
-  // throw new RuntimeException("User not found or not unique");
-  // }
-  //
-  // return (String) result.get(0);
-  // }
 }

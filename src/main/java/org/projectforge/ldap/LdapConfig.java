@@ -23,6 +23,8 @@
 
 package org.projectforge.ldap;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * Bean used by ConfigXML (config.xml).
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -44,11 +46,28 @@ public class LdapConfig
    */
   private String base;
 
-  private String password;
+  private String adminUser;
+
+  private String adminPassword;
+
+  private String authentication = "simple";
 
   public String getUrl()
   {
     return url;
+  }
+
+  /**
+   * @return url/base or url if base is not given.
+   */
+  public String getCompleteUrl() {
+    if (StringUtils.isBlank(this.base) == true) {
+      return url;
+    }
+    if (url.endsWith("/") == true) {
+      return url + this.base;
+    }
+    return url + "/" + this.base;
   }
 
   public LdapConfig setUrl(final String url)
@@ -79,14 +98,47 @@ public class LdapConfig
     return this;
   }
 
-  public String getPassword()
+  public String getAdminUser()
   {
-    return password;
+    return adminUser;
   }
 
-  public LdapConfig setPassword(final String password)
+  public LdapConfig setAdminUser(final String adminUser)
   {
-    this.password = password;
+    this.adminUser = adminUser;
+    return this;
+  }
+
+  public String getAdminPassword()
+  {
+    return adminPassword;
+  }
+
+  public LdapConfig setAdminPassword(final String password)
+  {
+    this.adminPassword = password;
+    return this;
+  }
+
+  /**
+   * The authentication, can be a list of algorithms.<br/>
+   * "none" - means anonymous<br/>
+   * "simple" - user/password authentication without any encryption.
+   * "DIGEST-MD5 CRAM-MD5" - space separated list of supported algorithms.
+   * @return the authentication
+   */
+  public String getAuthentication()
+  {
+    return authentication;
+  }
+
+  /**
+   * @param authentication the authentication to set
+   * @return this for chaining.
+   */
+  public LdapConfig setAuthentication(final String authentication)
+  {
+    this.authentication = authentication;
     return this;
   }
 }
