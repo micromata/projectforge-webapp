@@ -61,6 +61,8 @@ public class SkillRatingDO extends DefaultBaseDO
 
   private Integer sinceYear;
 
+  private SkillRating skillRating;
+
   private String certificates;
 
   private String trainingCourses;
@@ -145,6 +147,64 @@ public class SkillRatingDO extends DefaultBaseDO
   public SkillRatingDO setComment(final String comment)
   {
     this.comment = comment;
+    return this;
+  }
+
+  public Integer getSinceYear()
+  {
+    return sinceYear;
+  }
+
+  /**
+   * @return this for chaining.
+   */
+  public SkillRatingDO setSinceYear(final Integer sinceYear)
+  {
+    this.sinceYear = sinceYear;
+    return this;
+  }
+
+  @Column(length = Constants.LENGTH_SUBJECT)
+  public String getCertificates()
+  {
+    return certificates;
+  }
+
+  /**
+   * @return this for chaining.
+   */
+  public SkillRatingDO setCertificates(final String certificates)
+  {
+    this.certificates = certificates;
+    return this;
+  }
+
+  @Column(length = Constants.LENGTH_SUBJECT)
+  public String getTrainingCourses()
+  {
+    return trainingCourses;
+  }
+
+  /**
+   * @return this for chaining.
+   */
+  public SkillRatingDO setTrainingCourses(final String trainingCourses)
+  {
+    this.trainingCourses = trainingCourses;
+    return this;
+  }
+
+  public SkillRating getSkillRating()
+  {
+    return skillRating;
+  }
+
+  /**
+   * @return this for chaining.
+   */
+  public SkillRatingDO setSkillRating(final SkillRating skillRating)
+  {
+    this.skillRating = skillRating;
     return this;
   }
 }
