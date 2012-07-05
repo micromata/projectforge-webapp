@@ -37,11 +37,11 @@ public enum SkillRating implements I18nEnum
   private String key;
 
   /**
-   * @return The full i18n key including the i18n prefix "plugins.todo.type.".
+   * @return The full i18n key including the i18n prefix "plugins.skillmatrix.skillrating.rating.".
    */
   public String getI18nKey()
   {
-    return "plugins.skillmatrix.rating." + key;
+    return "plugins.skillmatrix.skillrating.rating." + key;
   }
 
   /**
