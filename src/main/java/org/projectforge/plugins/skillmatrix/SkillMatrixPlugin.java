@@ -40,12 +40,14 @@ public class SkillMatrixPlugin extends AbstractPlugin
 
   static UserPrefArea USER_PREF_AREA;
 
-  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { SkillDO.class };
+  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { SkillDO.class, SkillRatingDO.class };
 
   /**
    * This dao should be defined in pluginContext.xml (as resources) for proper initialization.
    */
   private SkillDao skillDao;
+
+  private SkillRatingDao skillRatingDao;
 
   @Override
   public Class< ? >[] getPersistentEntities()
@@ -62,17 +64,21 @@ public class SkillMatrixPlugin extends AbstractPlugin
     // DatabaseUpdateDao is needed by the updater:
     SkillMatrixPluginUpdates.dao = databaseUpdateDao;
     register(ID, SkillDao.class, skillDao, "plugins.skillmatrix");
+    register(ID, SkillRatingDao.class, skillRatingDao, "plugins.skillmatrix");
 
     // Register the web part:
-    registerWeb(ID, SkillMatrixListPage.class, SkillMatrixEditPage.class);
+    registerWeb(ID, SkillRatingListPage.class, SkillRatingEditPage.class);
+    registerWeb(ID, SkillListPage.class, SkillEditPage.class);
 
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-    registerMenuItem(new MenuItemDef(parentMenu, ID, 5, "plugins.skillmatrix.menu", SkillMatrixListPage.class));
+    //registerMenuItem(new MenuItemDef(parentMenu, ID, 5, "plugins.skillmatrix.menu", SkillRatingListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ID, 5, "plugins.skillmatrix.menu", SkillListPage.class));
     // .setMobileMenu(ToDoMobileListPage.class, 10));
 
     // Define the access management:
-    registerRight(new SkillMatrixRight());
+    registerRight(new SkillRight());
+    registerRight(new SkillRatingRight());
 
     // All the i18n stuff:
     addResourceBundle(RESOURCE_BUNDLE_NAME);
@@ -85,6 +91,11 @@ public class SkillMatrixPlugin extends AbstractPlugin
   public void setSkillDao(final SkillDao skillDao)
   {
     this.skillDao = skillDao;
+  }
+
+  public void setSkillRatingDao(final SkillRatingDao skillRatingDao)
+  {
+    this.skillRatingDao = skillRatingDao;
   }
 
   /**
