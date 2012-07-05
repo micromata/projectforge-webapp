@@ -89,8 +89,12 @@ public class TestConnection
     final PersonDao dao = new PersonDao();
     dao.ldapConnector = ldapConnector;
     final List<Person> list = dao.findAll();
-    dao.create(new Person().setFullName("Hurzel Meier").setLastName("Meier").setOu("kunden,users")
-        .setDescription("Test entry from ProjectForge dev system."));
+    final Person person = new Person().setUid("42").setCommonName("h.meier").setSurname("Meier").setGivenName("Horst").setOrganisationalUnitName("kunden,users")
+        .setDescription("Test entry from ProjectForge dev system.");
+    dao.create(person);
+    person.setSurname("Changed");
+    dao.update(person);
+    dao.delete(person);
   }
 
   private LdapConfig readConfig()

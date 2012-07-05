@@ -23,184 +23,73 @@
 
 package org.projectforge.ldap;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.naming.NameNotFoundException;
-import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
-
-import org.projectforge.common.StringHelper;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class PersonDao
+public class PersonDao extends LdapDao<Person>
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PersonDao.class);
-
-  LdapConnector ldapConnector;
-
-  /*
-   * @see PersonDao#create(Person)
+  /**
+   * @see org.projectforge.ldap.LdapDao#getObjectClass()
    */
-  public void create(final Person person)
+  @Override
+  protected String getObjectClass()
   {
-    new LdapTemplate(ldapConnector) {
-      @Override
-      protected Object call() throws NameNotFoundException, Exception
-      {
-        final String dn = buildDn(person);
-        log.info("Create person: " + dn);
-        final Attributes attrs = getAttributesToBind(person);
-        ctx.bind(dn, null, attrs);
-        return null;
-      }
-    }.excecute();
+    return "person";
   }
 
-  /*
-   * @see PersonDao#update(Person)
+  /**
+   * @see org.projectforge.ldap.LdapDao#buildDn(java.lang.Object)
    */
-  public void update(final Person person)
+  @Override
+  protected String buildDn(final Person person)
   {
-    new LdapTemplate(ldapConnector) {
-      @Override
-      protected Object call() throws NameNotFoundException, Exception
-      {
-        final String dn = buildDn(person);
-        log.info("Update person: " + dn);
-        final Attributes attrs = getAttributesToBind(person);
-        ctx.rebind(dn, null, attrs);
-        return null;
-      }
-    }.excecute();
-  }
-
-  /*
-   * @see PersonDao#delete(Person)
-   */
-  public void delete(final Person person)
-  {
-    new LdapTemplate(ldapConnector) {
-      @Override
-      protected Object call() throws NameNotFoundException, Exception
-      {
-        final String dn = buildDn(person);
-        log.info("Delete person: " + dn);
-        ctx.unbind(dn);
-        return null;
-      }
-    }.excecute();
-  }
-
-  /*
-   * @see PersonDao#findAll()
-   */
-  @SuppressWarnings("unchecked")
-  public List<Person> findAll()
-  {
-    return (List<Person>) new LdapTemplate(ldapConnector) {
-      @Override
-      protected Object call() throws NameNotFoundException, Exception
-      {
-        final LinkedList<Person> list = new LinkedList<Person>();
-        NamingEnumeration< ? > results = null;
-        final SearchControls controls = new SearchControls();
-        controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        results = ctx.search("", "(objectclass=person)", controls);
-        while (results.hasMore()) {
-          final SearchResult searchResult = (SearchResult) results.next();
-          final String dn = searchResult.getName();
-          final Attributes attributes = searchResult.getAttributes();
-          list.add(mapToPerson(dn, attributes));
-        }
-        return list;
-      }
-    }.excecute();
-  }
-
-  /*
-   * @see PersonDao#findByPrimaryKey(java.lang.String, java.lang.String, java.lang.String)
-   */
-  public Person findByPrimaryKey(final String company, final String fullname)
-  {
-    return (Person) new LdapTemplate(ldapConnector) {
-      @Override
-      protected Object call() throws NameNotFoundException, Exception
-      {
-        final String dn = buildDn(company, fullname);
-        final Attributes attributes = ctx.getAttributes(dn);
-        return mapToPerson(dn, attributes);
-      }
-    }.excecute();
-  }
-
-  private String buildDn(final Person person)
-  {
-    return buildDn(person.getOu(), person.getFullName());
-  }
-
-  private String buildDn(final String ou, final String fullname)
-  {
-    final StringBuffer sb = new StringBuffer();
-    sb.append("cn=");
-    sb.append(fullname);
-    final int pos = ou != null ? ou.indexOf(',') : -1;
-    if (pos < 0) {
-      sb.append(", ou=");
-      sb.append(ou);
-    } else {
-      final String[] strs = StringHelper.splitAndTrim(ou, ",");
-      for (final String str : strs) {
-        sb.append(", ou=");
-        sb.append(str);
-      }
+    final StringBuffer buf = new StringBuffer();
+    buf.append("cn=").append(person.getCommonName());
+    final String ou = LdapUtils.buildAttribute("ou", person.getOrganisationalUnitName());
+    if (ou != null) {
+      buf.append(", ").append(ou);
     }
-    final String dn = sb.toString();
-    return dn;
+    return buf.toString();
   }
 
-  private Attributes getAttributesToBind(final Person person)
+  /**
+   * @see org.projectforge.ldap.LdapDao#getAttributesToBind(java.lang.Object)
+   */
+  @Override
+  protected Attributes getAttributesToBind(final Person person)
   {
     final Attributes attrs = new BasicAttributes();
     final BasicAttribute ocattr = new BasicAttribute("objectclass");
     ocattr.add("top");
     ocattr.add("person");
+    ocattr.add("inetOrgPerson");
+    //ocattr.add("OrganisationalPerson");
     attrs.put(ocattr);
-    attrs.put("cn", person.getFullName());
-    attrs.put("sn", person.getLastName());
-    attrs.put("description", person.getDescription());
+    LdapUtils.putAttribute(attrs, "cn", person.getCommonName());
+    LdapUtils.putAttribute(attrs, "sn", person.getSurname());
+    LdapUtils.putAttribute(attrs, "givenName", person.getGivenName());
+    LdapUtils.putAttribute(attrs, "uid", person.getUid());
+    LdapUtils.putAttribute(attrs, "mail", person.getMail());
+    LdapUtils.putAttribute(attrs, "description", person.getDescription());
     return attrs;
   }
 
-  private Person mapToPerson(final String dn, final Attributes attributes) throws NamingException
+  /**
+   * @see org.projectforge.ldap.LdapDao#mapToObject(java.lang.String, javax.naming.directory.Attributes)
+   */
+  @Override
+  protected Person mapToObject(final String dn, final Attributes attributes) throws NamingException
   {
     final Person person = new Person();
-    person.setFullName(getAttribute(attributes, "cn"));
-    person.setLastName(getAttribute(attributes, "sn"));
-    person.setDescription(getAttribute(attributes, "description"));
-    person.setOu(getAttribute(attributes, "ou"));
+    person.setCommonName(LdapUtils.getAttribute(attributes, "cn"));
+    person.setSurname(LdapUtils.getAttribute(attributes, "sn"));
+    person.setDescription(LdapUtils.getAttribute(attributes, "description"));
+    person.setOrganisationalUnitName(LdapUtils.getAttribute(attributes, "ou"));
     return person;
-  }
-
-  private String getAttribute(final Attributes attributes, final String attrId) throws NamingException
-  {
-    final Attribute attr = attributes.get(attrId);
-    if (attr == null) {
-      return null;
-    }
-    return (String) attr.get();
-  }
-
-  public void setLdapConnector(final LdapConnector ldapConnector)
-  {
-    this.ldapConnector = ldapConnector;
   }
 }

@@ -33,15 +33,37 @@ import org.apache.commons.lang.builder.ToStringStyle;
  */
 public class Person
 {
-  private String fullName;
+  private String commonName;
 
-  private String lastName;
+  private String surname;
+
+  private String givenName;
 
   private String description;
 
-  private String country;
+  private String organisationalUnitName;
 
-  private String ou;
+  private String mail;
+
+  private String uid;
+
+  /**
+   * @return the uid
+   */
+  public String getUid()
+  {
+    return uid;
+  }
+
+  /**
+   * @param uid the uid to set
+   * @return this for chaining.
+   */
+  public Person setUid(final String uid)
+  {
+    this.uid = uid;
+    return this;
+  }
 
   public String getDescription()
   {
@@ -54,47 +76,73 @@ public class Person
     return this;
   }
 
-  public String getFullName()
+  public String getCommonName()
   {
-    return fullName;
+    return commonName;
   }
 
-  public Person setFullName(final String fullName)
+  public Person setCommonName(final String commonName)
   {
-    this.fullName = fullName;
+    this.commonName = commonName;
     return this;
   }
 
-  public String getLastName()
+  public String getSurname()
   {
-    return lastName;
+    return surname;
   }
 
-  public Person setLastName(final String lastName)
+  public Person setSurname(final String surname)
   {
-    this.lastName = lastName;
+    this.surname = surname;
     return this;
   }
 
-  public String getOu()
+  /**
+   * @return the givenName
+   */
+  public String getGivenName()
   {
-    return ou;
+    return givenName;
   }
 
-  public Person setOu(final String ou)
+  /**
+   * @param givenName the givenName to set
+   * @return this for chaining.
+   */
+  public Person setGivenName(final String givenName)
   {
-    this.ou = ou;
+    this.givenName = givenName;
     return this;
   }
 
-  public String getCountry()
+
+  public String getOrganisationalUnitName()
   {
-    return country;
+    return organisationalUnitName;
   }
 
-  public Person setCountry(final String country)
+  public Person setOrganisationalUnitName(final String organisationalUnitName)
   {
-    this.country = country;
+    this.organisationalUnitName = organisationalUnitName;
+    return this;
+  }
+
+  /**
+   * @return the mail
+   */
+  public String getMail()
+  {
+    return mail;
+  }
+
+  /**
+   * @param mail the mail to set
+   * @return this for chaining.
+   */
+  public Person setMail(final String mail)
+  {
+    this.mail = mail;
     return this;
   }
 
