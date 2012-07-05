@@ -39,7 +39,6 @@ import org.hibernate.search.annotations.Store;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.core.UserPrefParameter;
 import org.projectforge.database.Constants;
-import org.projectforge.user.PFUserDO;
 
 /**
  * A skill usable for a skill matrix. Skills are build
@@ -53,24 +52,16 @@ public class SkillDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 6102127905651011282L;
 
-  // TODO split this DO into two DOs: one for skills (SkillDO) and one for user-skill relation (UserSkillDO)
-  @IndexedEmbedded
-  private PFUserDO owner;
-
-  @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String skill;
-
-  // TODO change to SkillRating
-  @Field(index = Index.TOKENIZED, store = Store.NO)
-  private String experience;
-
-  // TODO Field for skillname/title. Should this be renamed?
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String title;
 
   // Null if this skill is a top level skill.
   @IndexedEmbedded(depth = 1)
   private SkillDO parent;
+
+  @UserPrefParameter(i18nKey = "description", multiline = true)
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String description;
 
   @UserPrefParameter(i18nKey = "comment", multiline = true)
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -151,37 +142,18 @@ public class SkillDO extends DefaultBaseDO
     return this;
   }
 
-  @Column(length = Constants.LENGTH_TITLE)
-  public String getExperience()
+  public String getDescription()
   {
-    return experience;
+    return description;
   }
 
-  public void setExperience(final String experience)
+  /**
+   * @return this for chaining.
+   */
+  public SkillDO setDescription(final String description)
   {
-    this.experience = experience;
+    this.description = description;
+    return this;
   }
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "owner_fk")
-  public PFUserDO getOwner()
-  {
-    return owner;
-  }
-
-  public void setOwner(final PFUserDO owner)
-  {
-    this.owner = owner;
-  }
-
-  @Column(length = Constants.LENGTH_TITLE)
-  public String getSkill()
-  {
-    return skill;
-  }
-
-  public void setSkill(final String skill)
-  {
-    this.skill = skill;
-  }
 }
