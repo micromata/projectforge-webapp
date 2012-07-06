@@ -32,6 +32,7 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.address.AddressDO;
 import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.xml.stream.AliasMap;
 import org.projectforge.xml.stream.XmlObjectReader;
@@ -86,15 +87,23 @@ public class TestConnection
     // }
     // }.excecute();
 
-    final PersonDao dao = new PersonDao();
-    dao.ldapConnector = ldapConnector;
-    final List<Person> list = dao.findAll();
-    final Person person = new Person().setUid("42").setCommonName("h.meier").setSurname("Meier").setGivenName("Horst").setOrganisationalUnitName("kunden,users")
-        .setDescription("Test entry from ProjectForge dev system.");
-    dao.create(person);
+    final LdapPersonDao pdao = new LdapPersonDao();
+    pdao.ldapConnector = ldapConnector;
+    final List<LdapPerson> list = pdao.findAll();
+    final LdapPerson person = new LdapPerson().setUid("42").setCommonName("h.meier").setSurname("Meier").setGivenName("Horst")
+        .setOrganisationalUnitName("kunden,users").setDescription("Test entry from ProjectForge dev system.");
+    pdao.create(person);
     person.setSurname("Changed");
-    dao.update(person);
-    dao.delete(person);
+    pdao.update(person);
+    pdao.delete(person);
+
+    final LdapAddressDao adao = new LdapAddressDao();
+    adao.ldapConnector = ldapConnector;
+    final AddressDO adr = new AddressDO().setFirstName("Kai").setName("Reinhard").setOrganization("Micromata GmbH")
+        .setEmail("k.reinhard@micromata.de").setPrivateEmail("k.reinhard@me.com").setBusinessPhone("+49 561 316793-0")
+        .setMobilePhone("+49 170 1891142").setPrivatePhone("+49 561 00000");
+    adr.setId(2);
+    adao.create(adr);
   }
 
   private LdapConfig readConfig()

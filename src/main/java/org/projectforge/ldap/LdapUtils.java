@@ -45,21 +45,26 @@ public class LdapUtils
     return (String) attr.get();
   }
 
-  public static void putAttribute(final Attributes attributes, final String attrId, final String attrValue)
+  public static Attribute putAttribute(final Attributes attributes, final String attrId, final String attrValue)
   {
+    final Attribute attr = attributes.get(attrId);
     if (attrValue == null) {
-      return;
+      return attr;
     }
-    attributes.put(attrId, attrValue);
+    if (attr == null) {
+      return attributes.put(attrId, attrValue);
+    }
+    attr.add(attrValue);
+    return attr;
   }
 
   /**
-   * separator
+   * "customers,users" -> "ou=customers,ou=users".
    * @param attrId
    * @param value
    * @return
    */
-  public static String buildAttribute(final String attrId, final String value)
+  public static String splitMultipleAttribute(final String attrId, final String value)
   {
     if (value == null) {
       return null;

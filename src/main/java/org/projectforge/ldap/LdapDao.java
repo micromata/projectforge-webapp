@@ -23,8 +23,10 @@
 
 package org.projectforge.ldap;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
@@ -57,6 +59,21 @@ public abstract class LdapDao<T>
         return null;
       }
     }.excecute();
+  }
+
+  /**
+   * Calls {@link #create(Object)} if the object isn't part of the given set, otherwise {@link #update(Object)}.
+   * @param setOfAllLdapObjects List generated before via {@link #getSetOfAllObjects()}.
+   * @param obj
+   */
+  public void createOrUpdate(final Set<String> setOfAllLdapObjects, final T obj)
+  {
+    final String dn = buildDn(obj);
+    if (setOfAllLdapObjects.contains(dn) == true) {
+      update(obj);
+    } else {
+      create(obj);
+    }
   }
 
   public void update(final T obj)
@@ -109,6 +126,19 @@ public abstract class LdapDao<T>
         return list;
       }
     }.excecute();
+  }
+
+  /**
+   * Set of all objects (the string is built from the method {@link #buildDn(Object)}).
+   */
+  public Set<String> getSetOfAllObjects()
+  {
+    final List<T> all = findAll();
+    final Set<String> set = new HashSet<String>();
+    for (final T obj : all) {
+      set.add(buildDn(obj));
+    }
+    return set;
   }
 
   protected abstract String buildDn(final T obj);

@@ -26,15 +26,9 @@ package org.projectforge.ldap;
 import java.util.Hashtable;
 
 import javax.naming.Context;
-import javax.naming.NameNotFoundException;
-import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
-import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
-import javax.naming.directory.SearchControls;
-import javax.naming.directory.SearchResult;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.core.ConfigXml;
@@ -88,50 +82,50 @@ public class LdapConnector implements ConfigurationListener
     }
   }
 
-  public Person searchPerson(final String username)
-  {
-    final DirContext ctx = createContext();
-    NamingEnumeration<SearchResult> results = null;
-    try {
-      final SearchControls controls = new SearchControls();
-      controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-
-      // results = ctx.search("", "(objectclass=person)", controls);
-      results = ctx.search("", "(&(objectClass=person)(uid=" + username + "))", controls);
-      if (results.hasMore() == true) {
-        final SearchResult searchResult = results.next();
-        if (results.hasMore() == true) {
-          throw new RuntimeException("Multiple users found for search string '" + username + "'.");
-        }
-        final Attributes attributes = searchResult.getAttributes();
-        final Attribute attr = attributes.get("cn");
-        final String cn = (String) attr.get();
-        log.info(cn);
-      }
-      return null;
-    } catch (final NameNotFoundException e) {
-      // The base context was not found.
-      // Just clean up and exit.
-      return null;
-    } catch (final NamingException e) {
-      throw new RuntimeException(e);
-    } finally {
-      if (results != null) {
-        try {
-          results.close();
-        } catch (final Exception e) {
-          // Never mind this.
-        }
-      }
-      if (ctx != null) {
-        try {
-          ctx.close();
-        } catch (final Exception e) {
-          // Never mind this.
-        }
-      }
-    }
-  }
+  // public LdapPerson searchPerson(final String username)
+  // {
+  // final DirContext ctx = createContext();
+  // NamingEnumeration<SearchResult> results = null;
+  // try {
+  // final SearchControls controls = new SearchControls();
+  // controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+  //
+  // // results = ctx.search("", "(objectclass=person)", controls);
+  // results = ctx.search("", "(&(objectClass=person)(uid=" + username + "))", controls);
+  // if (results.hasMore() == true) {
+  // final SearchResult searchResult = results.next();
+  // if (results.hasMore() == true) {
+  // throw new RuntimeException("Multiple users found for search string '" + username + "'.");
+  // }
+  // final Attributes attributes = searchResult.getAttributes();
+  // final Attribute attr = attributes.get("cn");
+  // final String cn = (String) attr.get();
+  // log.info(cn);
+  // }
+  // return null;
+  // } catch (final NameNotFoundException e) {
+  // // The base context was not found.
+  // // Just clean up and exit.
+  // return null;
+  // } catch (final NamingException e) {
+  // throw new RuntimeException(e);
+  // } finally {
+  // if (results != null) {
+  // try {
+  // results.close();
+  // } catch (final Exception e) {
+  // // Never mind this.
+  // }
+  // }
+  // if (ctx != null) {
+  // try {
+  // ctx.close();
+  // } catch (final Exception e) {
+  // // Never mind this.
+  // }
+  // }
+  // }
+  // }
 
   /**
    * Used by test class.
