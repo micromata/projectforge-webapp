@@ -19,7 +19,7 @@ import org.projectforge.user.UserRightValue;
  * @author Billy Duong (duong.billy@yahoo.de)
  *
  */
-public class SkillRatingRight extends UserRightAccessCheck<SkillRatingDO>
+public class SkillRatingRight extends UserRightAccessCheck<Object>
 {
   private static final long serialVersionUID = 197678676075684591L;
 
@@ -31,11 +31,10 @@ public class SkillRatingRight extends UserRightAccessCheck<SkillRatingDO>
   public SkillRatingRight()
   {
     super(SkillRatingDao.USER_RIGHT_ID, UserRightCategory.PLUGINS, UserRightValue.TRUE);
-    System.out.println(SkillRatingDao.USER_RIGHT_ID.toString());
   }
 
   @Override
-  public boolean hasAccess(final PFUserDO user, final SkillRatingDO obj, final SkillRatingDO oldObj, final OperationType operationType)
+  public boolean hasAccess(final PFUserDO user, final Object obj, final Object oldObj, final OperationType operationType)
   {
     // TODO rewrite hasAccess method
     return true;
