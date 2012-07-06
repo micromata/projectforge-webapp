@@ -72,12 +72,14 @@ public class SkillMatrixPlugin extends AbstractPlugin
 
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-    //registerMenuItem(new MenuItemDef(parentMenu, ID, 5, "plugins.skillmatrix.menu", SkillRatingListPage.class));
-    registerMenuItem(new MenuItemDef(parentMenu, ID, 5, "plugins.skillmatrix.menu", SkillListPage.class));
+
+    registerMenuItem(new MenuItemDef(parentMenu, ID, 5, "plugins.skillmatrix.menu", SkillRatingListPage.class));
+    //registerMenuItem(new MenuItemDef(parentMenu, ID, 5, "plugins.skillmatrix.menu", SkillListPage.class));
+
     // .setMobileMenu(ToDoMobileListPage.class, 10));
 
     // Define the access management:
-    registerRight(new SkillRight());
+    //registerRight(new SkillRight());
     registerRight(new SkillRatingRight());
 
     // All the i18n stuff:
