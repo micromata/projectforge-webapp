@@ -31,7 +31,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class Person
+public class LdapPerson
 {
   private String commonName;
 
@@ -59,7 +59,7 @@ public class Person
    * @param uid the uid to set
    * @return this for chaining.
    */
-  public Person setUid(final String uid)
+  public LdapPerson setUid(final String uid)
   {
     this.uid = uid;
     return this;
@@ -70,7 +70,7 @@ public class Person
     return description;
   }
 
-  public Person setDescription(final String description)
+  public LdapPerson setDescription(final String description)
   {
     this.description = description;
     return this;
@@ -81,7 +81,7 @@ public class Person
     return commonName;
   }
 
-  public Person setCommonName(final String commonName)
+  public LdapPerson setCommonName(final String commonName)
   {
     this.commonName = commonName;
     return this;
@@ -92,7 +92,7 @@ public class Person
     return surname;
   }
 
-  public Person setSurname(final String surname)
+  public LdapPerson setSurname(final String surname)
   {
     this.surname = surname;
     return this;
@@ -110,7 +110,7 @@ public class Person
    * @param givenName the givenName to set
    * @return this for chaining.
    */
-  public Person setGivenName(final String givenName)
+  public LdapPerson setGivenName(final String givenName)
   {
     this.givenName = givenName;
     return this;
@@ -122,7 +122,7 @@ public class Person
     return organisationalUnitName;
   }
 
-  public Person setOrganisationalUnitName(final String organisationalUnitName)
+  public LdapPerson setOrganisationalUnitName(final String organisationalUnitName)
   {
     this.organisationalUnitName = organisationalUnitName;
     return this;
@@ -140,7 +140,7 @@ public class Person
    * @param mail the mail to set
    * @return this for chaining.
    */
-  public Person setMail(final String mail)
+  public LdapPerson setMail(final String mail)
   {
     this.mail = mail;
     return this;

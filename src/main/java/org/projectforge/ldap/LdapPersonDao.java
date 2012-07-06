@@ -31,7 +31,7 @@ import javax.naming.directory.BasicAttributes;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class PersonDao extends LdapDao<Person>
+public class LdapPersonDao extends LdapDao<LdapPerson>
 {
   /**
    * @see org.projectforge.ldap.LdapDao#getObjectClass()
@@ -46,11 +46,11 @@ public class PersonDao extends LdapDao<Person>
    * @see org.projectforge.ldap.LdapDao#buildDn(java.lang.Object)
    */
   @Override
-  protected String buildDn(final Person person)
+  protected String buildDn(final LdapPerson person)
   {
     final StringBuffer buf = new StringBuffer();
     buf.append("cn=").append(person.getCommonName());
-    final String ou = LdapUtils.buildAttribute("ou", person.getOrganisationalUnitName());
+    final String ou = LdapUtils.splitMultipleAttribute("ou", person.getOrganisationalUnitName());
     if (ou != null) {
       buf.append(", ").append(ou);
     }
@@ -61,14 +61,14 @@ public class PersonDao extends LdapDao<Person>
    * @see org.projectforge.ldap.LdapDao#getAttributesToBind(java.lang.Object)
    */
   @Override
-  protected Attributes getAttributesToBind(final Person person)
+  protected Attributes getAttributesToBind(final LdapPerson person)
   {
     final Attributes attrs = new BasicAttributes();
     final BasicAttribute ocattr = new BasicAttribute("objectclass");
     ocattr.add("top");
     ocattr.add("person");
     ocattr.add("inetOrgPerson");
-    //ocattr.add("OrganisationalPerson");
+    //ocattr.add("organisationalPerson");
     attrs.put(ocattr);
     LdapUtils.putAttribute(attrs, "cn", person.getCommonName());
     LdapUtils.putAttribute(attrs, "sn", person.getSurname());
@@ -83,9 +83,9 @@ public class PersonDao extends LdapDao<Person>
    * @see org.projectforge.ldap.LdapDao#mapToObject(java.lang.String, javax.naming.directory.Attributes)
    */
   @Override
-  protected Person mapToObject(final String dn, final Attributes attributes) throws NamingException
+  protected LdapPerson mapToObject(final String dn, final Attributes attributes) throws NamingException
   {
-    final Person person = new Person();
+    final LdapPerson person = new LdapPerson();
     person.setCommonName(LdapUtils.getAttribute(attributes, "cn"));
     person.setSurname(LdapUtils.getAttribute(attributes, "sn"));
     person.setDescription(LdapUtils.getAttribute(attributes, "description"));
