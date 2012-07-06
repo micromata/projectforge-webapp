@@ -144,7 +144,7 @@ public class AddressDao extends BaseDao<AddressDO>
           return personalAddressDao.getMyAddresses();
         }
         // First proceed contact status:
-        // Use filter only for non deleted books:
+        // Use filter only for non deleted entries:
         if (myFilter.isActive() == true
             || myFilter.isNonActive() == true
             || myFilter.isUninteresting() == true
