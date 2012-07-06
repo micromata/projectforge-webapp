@@ -22,12 +22,14 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
+import org.projectforge.web.wicket.ListSelectActionPanel;
 
 /**
  * @author Billy Duong (duong.billy@yahoo.de)
@@ -53,6 +55,7 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
   /**
    * @see org.projectforge.web.wicket.IListPageColumnsCreator#createColumns(org.apache.wicket.markup.html.WebPage, boolean)
    */
+  @SuppressWarnings("serial")
   @Override
   public List<IColumn<SkillDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
@@ -69,6 +72,20 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
         }
       }
     };
+
+    columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString("created")), getSortable("created", sortable),
+        "created", cellItemListener) {
+      @SuppressWarnings({ "unchecked", "rawtypes"})
+      @Override
+      public void populateItem(final Item item, final String componentId, final IModel rowModel)
+      {
+        final SkillDO skill = (SkillDO) rowModel.getObject();
+        item.add(new ListSelectActionPanel(componentId, rowModel, SkillEditPage.class, skill.getId(), returnToPage, DateTimeFormatter
+            .instance().getFormattedDateTime(skill.getCreated())));
+        addRowClick(item);
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
 
     // modified
     columns.add(new CellItemListenerPropertyColumn<SkillDO>(getString("modified"), getSortable("lastUpdate", sortable), "lastUpdate",
