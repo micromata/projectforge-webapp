@@ -219,9 +219,10 @@ public class AddressDO extends DefaultBaseDO
     return businessPhone;
   }
 
-  public void setBusinessPhone(final String businessPhone)
+  public AddressDO setBusinessPhone(final String businessPhone)
   {
     this.businessPhone = businessPhone;
+    return this;
   }
 
   @Column(name = "mobile_phone", length = 255)
@@ -230,9 +231,10 @@ public class AddressDO extends DefaultBaseDO
     return mobilePhone;
   }
 
-  public void setMobilePhone(final String mobilePhone)
+  public AddressDO setMobilePhone(final String mobilePhone)
   {
     this.mobilePhone = mobilePhone;
+    return this;
   }
 
   @Column(length = 255)
@@ -385,9 +387,10 @@ public class AddressDO extends DefaultBaseDO
     return email;
   }
 
-  public void setEmail(final String email)
+  public AddressDO setEmail(final String email)
   {
     this.email = email;
+    return this;
   }
 
   @Column(length = 255)
@@ -493,9 +496,10 @@ public class AddressDO extends DefaultBaseDO
     return organization;
   }
 
-  public void setOrganization(final String organization)
+  public AddressDO setOrganization(final String organization)
   {
     this.organization = organization;
+    return this;
   }
 
   @Column(length = 255)
@@ -526,9 +530,10 @@ public class AddressDO extends DefaultBaseDO
     return privatePhone;
   }
 
-  public void setPrivatePhone(final String privatePhone)
+  public AddressDO setPrivatePhone(final String privatePhone)
   {
     this.privatePhone = privatePhone;
+    return this;
   }
 
   @Column(name = "private_mobile_phone", length = 255)
@@ -603,9 +608,10 @@ public class AddressDO extends DefaultBaseDO
     return privateEmail;
   }
 
-  public void setPrivateEmail(final String email)
+  public AddressDO setPrivateEmail(final String email)
   {
     this.privateEmail = email;
+    return this;
   }
 
   @Column(name = "public_key", length = 7000)
