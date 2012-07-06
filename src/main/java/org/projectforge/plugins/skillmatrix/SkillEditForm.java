@@ -17,7 +17,6 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
@@ -58,12 +57,13 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       fs.add(new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "title")));
     }
     {
+      // TODO Should only show title of the DO, title -> DO Map? title -> primary/unique key?
       // Parent
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skill.parent"));
       final List<SkillDO> list = skillDao.getList(new BaseSearchFilter());
-      final LabelValueChoiceRenderer<SkillDO> ratingChoiceRenderer = new LabelValueChoiceRenderer<SkillDO>(list);
+      //      final LabelValueChoiceRenderer<SkillDO> ratingChoiceRenderer = new LabelValueChoiceRenderer<SkillDO>(list);
       final DropDownChoice<SkillDO> dropDownChoice = new DropDownChoice<SkillDO>(fs.getDropDownChoiceId(), new PropertyModel<SkillDO>(data,
-          "parent"), ratingChoiceRenderer.getValues(), ratingChoiceRenderer);
+          "parent"), list);
       dropDownChoice.setNullValid(true);
       fs.add(dropDownChoice);
     }
