@@ -12,10 +12,12 @@ package org.projectforge.plugins.skillmatrix;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
@@ -32,6 +34,9 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
   private static final long serialVersionUID = -4997909992117525036L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SkillRatingEditForm.class);
+
+  @SpringBean(name = "skillDao")
+  private SkillDao skillDao;
 
   /**
    * @param parentPage
@@ -58,21 +63,29 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
     {
       // Skill
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skillrating.skill"));
-      fs.add(new PFAutoCompleteMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "skill")) {
-        private static final long serialVersionUID = 7398144813346052567L;
-
-        @Override
-        protected List<String> getChoices(final String input)
-        {
-          return getBaseDao().getAutocompletion("skill", input);
-        }
-      });
+      final List<SkillDO> list = skillDao.getList(new BaseSearchFilter());
+      // final LabelValueChoiceRenderer<SkillDO> ratingChoiceRenderer = new LabelValueChoiceRenderer<SkillDO>(list);
+      final DropDownChoice<SkillDO> dropDownChoice = new DropDownChoice<SkillDO>(fs.getDropDownChoiceId(), new PropertyModel<SkillDO>(data,
+          "skill"), list);
+      dropDownChoice.setNullValid(false);
+      fs.add(dropDownChoice);
+      // final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skillrating.skill"));
+      // fs.add(new PFAutoCompleteMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "skill")) {
+      // private static final long serialVersionUID = 7398144813346052567L;
+      //
+      // @Override
+      // protected List<String> getChoices(final String input)
+      // {
+      // return getBaseDao().getAutocompletion("skill", input);
+      // }
+      // });
     }
     {
       // SkillRating
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skillrating.rating"));
-      final LabelValueChoiceRenderer<SkillRating> ratingChoiceRenderer = new LabelValueChoiceRenderer<SkillRating>(this, SkillRating.values());
-      fs.addDropDownChoice(new PropertyModel<SkillRating>(data,"skillRating"), ratingChoiceRenderer.getValues(), ratingChoiceRenderer);
+      final LabelValueChoiceRenderer<SkillRating> ratingChoiceRenderer = new LabelValueChoiceRenderer<SkillRating>(this,
+          SkillRating.values());
+      fs.addDropDownChoice(new PropertyModel<SkillRating>(data, "skillRating"), ratingChoiceRenderer.getValues(), ratingChoiceRenderer);
     }
     {
       // Since year
