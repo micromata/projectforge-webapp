@@ -77,9 +77,10 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
     return uptodate;
   }
 
-  public void setUptodate(boolean uptodate)
+  public AddressFilter setUptodate(final boolean uptodate)
   {
     this.uptodate = uptodate;
+    return this;
   }
 
   public boolean isOutdated()
@@ -87,9 +88,10 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
     return outdated;
   }
 
-  public void setOutdated(boolean outdated)
+  public AddressFilter setOutdated(final boolean outdated)
   {
     this.outdated = outdated;
+    return this;
   }
 
   public boolean isLeaved()
@@ -97,9 +99,10 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
     return leaved;
   }
 
-  public void setLeaved(boolean leaved)
+  public AddressFilter setLeaved(final boolean leaved)
   {
     this.leaved = leaved;
+    return this;
   }
 
   public boolean isActive()
@@ -107,9 +110,10 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
     return active;
   }
 
-  public void setActive(boolean active)
+  public AddressFilter setActive(final boolean active)
   {
     this.active = active;
+    return this;
   }
 
   public boolean isNonActive()
@@ -117,9 +121,10 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
     return nonActive;
   }
 
-  public void setNonActive(boolean nonActive)
+  public AddressFilter setNonActive(final boolean nonActive)
   {
     this.nonActive = nonActive;
+    return this;
   }
 
   public boolean isUninteresting()
@@ -127,7 +132,7 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
     return uninteresting;
   }
 
-  public void setUninteresting(boolean uninteresting)
+  public void setUninteresting(final boolean uninteresting)
   {
     this.uninteresting = uninteresting;
   }
@@ -137,7 +142,7 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
     return personaIngrata;
   }
 
-  public void setPersonaIngrata(boolean personaIngrata)
+  public void setPersonaIngrata(final boolean personaIngrata)
   {
     this.personaIngrata = personaIngrata;
   }
@@ -147,9 +152,10 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
     return departed;
   }
 
-  public void setDeparted(boolean departed)
+  public AddressFilter setDeparted(final boolean departed)
   {
     this.departed = departed;
+    return this;
   }
 
   /**
@@ -200,7 +206,7 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
     return listType;
   }
 
-  public void setListType(String listType)
+  public void setListType(final String listType)
   {
     this.listType = listType;
   }
@@ -212,7 +218,7 @@ public class AddressFilter extends BaseSearchFilter implements Serializable
   }
 
   @Override
-  public void setDeleted(boolean deleted)
+  public void setDeleted(final boolean deleted)
   {
     super.setDeleted(deleted);
     listType = "deleted";
