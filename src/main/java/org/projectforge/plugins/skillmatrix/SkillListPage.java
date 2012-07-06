@@ -76,6 +76,7 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
     // Title
     columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString("plugins.skillmatrix.skill.title")), getSortable(
         "title", sortable), "title", cellItemListener));
+    // TODO Should only show title of the DO, title -> DO Map? title -> primary/unique key?
     // Parent
     columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString("plugins.skillmatrix.skill.parent")), getSortable(
         "parent", sortable), "parent", cellItemListener));
@@ -86,8 +87,8 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
     columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString("plugins.skillmatrix.skill.comment")), getSortable(
         "comment", sortable), "comment", cellItemListener));
     // Rateable
-    // columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString("plugins.skillmatrix.skill.rateable")),
-    // getSortable("rateable", sortable), "rateable", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString("plugins.skillmatrix.skill.rateable")),
+        getSortable("rateable", sortable), "rateable", cellItemListener));
 
     return columns;
   }
