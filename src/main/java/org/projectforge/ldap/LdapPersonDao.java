@@ -39,6 +39,7 @@ import org.apache.commons.lang.StringUtils;
 public class LdapPersonDao extends LdapDao<LdapPerson>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapPersonDao.class);
+
   /**
    * @see org.projectforge.ldap.LdapDao#getObjectClass()
    */
@@ -64,6 +65,11 @@ public class LdapPersonDao extends LdapDao<LdapPerson>
     final ModificationItem[] modificationItems = new ModificationItem[1];
     modificationItems[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userPassword", userPassword));
     modify(person, modificationItems);
+  }
+
+  public boolean authenticate(final String username, final String userPassword)
+  {
+    return false;
   }
 
   /**
@@ -129,31 +135,14 @@ public class LdapPersonDao extends LdapDao<LdapPerson>
   }
 
   /**
-   * @see org.projectforge.ldap.LdapDao#buildDn(java.lang.Object)
-   */
-  @Override
-  protected String buildDn(final LdapPerson person)
-  {
-    final StringBuffer buf = new StringBuffer();
-    buf.append("cn=").append(person.getCommonName());
-    final String ou = LdapUtils.splitMultipleAttribute("ou", person.getOrganisationalUnitName());
-    if (ou != null) {
-      buf.append(", ").append(ou);
-    }
-    return buf.toString();
-  }
-
-  /**
    * @see org.projectforge.ldap.LdapDao#mapToObject(java.lang.String, javax.naming.directory.Attributes)
    */
   @Override
-  protected LdapPerson mapToObject(final String dn, final Attributes attributes) throws NamingException
+  protected LdapPerson mapToObject(final Attributes attributes) throws NamingException
   {
     final LdapPerson person = new LdapPerson();
-    person.setCommonName(LdapUtils.getAttribute(attributes, "cn"));
     person.setSurname(LdapUtils.getAttribute(attributes, "sn"));
     person.setDescription(LdapUtils.getAttribute(attributes, "description"));
-    person.setOrganisationalUnitName(LdapUtils.getAttribute(attributes, "ou"));
     return person;
   }
 }

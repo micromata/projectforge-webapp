@@ -43,6 +43,8 @@ import org.projectforge.xml.stream.XmlObjectReader;
  */
 public class TestConnection
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TestConnection.class);
+
   private static final String CONFIG_FILE = System.getProperty("user.home") + "/ProjectForge/testldapConfig.xml";
 
   public static void main(final String[] args) throws Exception
@@ -90,21 +92,27 @@ public class TestConnection
     final LdapPersonDao pdao = new LdapPersonDao();
     pdao.ldapConnector = ldapConnector;
     final List<LdapPerson> list = pdao.findAll();
-    final LdapPerson person = new LdapPerson().setUid("42").setCommonName("h.meier").setSurname("Meier").setGivenName("Horst")
-        .setOrganisationalUnitName("kunden,users").setDescription("Test entry from ProjectForge dev system.");
-    pdao.create(person, "password");
+    log.info("Found " + list.size() + " person entries.");
+    final LdapPerson person = new LdapPerson().setUid("42").setSurname("Meier").setGivenName("Horst")
+        .setDescription("Test entry from ProjectForge dev system.").setMail("h.meier@mail.com");
+    person.setCommonName("h.meier").setOrganizationalUnit("kunden", "users");
+    pdao.createOrUpdate(person, "password");
     person.setSurname("Changed");
     pdao.update(person);
     pdao.changePassword(person, "hurzel");
-    pdao.delete(person);
+    // pdao.delete(person);
 
     final LdapAddressDao adao = new LdapAddressDao();
     adao.ldapConnector = ldapConnector;
     final AddressDO adr = new AddressDO().setFirstName("Kai").setName("Reinhard").setOrganization("Micromata GmbH")
         .setEmail("k.reinhard@micromata.de").setPrivateEmail("k.reinhard@me.com").setBusinessPhone("+49 561 316793-0")
         .setMobilePhone("+49 170 1891142").setPrivatePhone("+49 561 00000");
+    LdapAddress ldapAddress = new LdapAddress(adr);
+    ldapAddress.setOrganizationalUnit("contacts");
     adr.setId(2);
-    // adao.create(adr);
+    adao.createOrUpdate(ldapAddress);
+    ldapAddress = adao.findByUid("2", "contacts");
+    log.info("Found address with id=2: " + ldapAddress);
   }
 
   private LdapConfig readConfig()

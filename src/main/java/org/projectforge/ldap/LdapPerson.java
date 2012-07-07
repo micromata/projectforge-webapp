@@ -31,21 +31,33 @@ import org.apache.commons.lang.builder.ToStringStyle;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class LdapPerson
+public class LdapPerson extends LdapObject
 {
-  private String commonName;
-
-  private String surname;
-
-  private String givenName;
+  private String surname, givenName;
 
   private String description;
-
-  private String organisationalUnitName;
 
   private String mail;
 
   private String uid;
+
+  /**
+   * @return the sn
+   */
+  public String getSurname()
+  {
+    return surname;
+  }
+
+  /**
+   * @param surname the sn to set
+   * @return this for chaining.
+   */
+  public LdapPerson setSurname(final String surname)
+  {
+    this.surname = surname;
+    return this;
+  }
 
   /**
    * @return the uid
@@ -76,28 +88,6 @@ public class LdapPerson
     return this;
   }
 
-  public String getCommonName()
-  {
-    return commonName;
-  }
-
-  public LdapPerson setCommonName(final String commonName)
-  {
-    this.commonName = commonName;
-    return this;
-  }
-
-  public String getSurname()
-  {
-    return surname;
-  }
-
-  public LdapPerson setSurname(final String surname)
-  {
-    this.surname = surname;
-    return this;
-  }
-
   /**
    * @return the givenName
    */
@@ -116,17 +106,6 @@ public class LdapPerson
     return this;
   }
 
-
-  public String getOrganisationalUnitName()
-  {
-    return organisationalUnitName;
-  }
-
-  public LdapPerson setOrganisationalUnitName(final String organisationalUnitName)
-  {
-    this.organisationalUnitName = organisationalUnitName;
-    return this;
-  }
 
   /**
    * @return the mail

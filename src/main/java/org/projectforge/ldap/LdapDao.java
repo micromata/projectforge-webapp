@@ -37,10 +37,12 @@ import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public abstract class LdapDao<T>
+public abstract class LdapDao<T extends LdapObject>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapDao.class);
 
@@ -70,17 +72,28 @@ public abstract class LdapDao<T>
   }
 
   /**
+   * Please do not use this method for bulk updates, use {@link #createOrUpdate(Set, Object, Object...)} instead! Calls
+   * {@link #getSetOfAllObjects()} before creation or update.
+   * @param obj
+   * @see #createOrUpdate(Set, Object, Object...)
+   */
+  public void createOrUpdate(final T obj, final Object... args)
+  {
+    createOrUpdate(getSetOfAllObjects(), obj, args);
+  }
+
+  /**
    * Calls {@link #create(Object)} if the object isn't part of the given set, otherwise {@link #update(Object)}.
    * @param setOfAllLdapObjects List generated before via {@link #getSetOfAllObjects()}.
    * @param obj
    */
-  public void createOrUpdate(final Set<String> setOfAllLdapObjects, final T obj)
+  public void createOrUpdate(final Set<String> setOfAllLdapObjects, final T obj, final Object... args)
   {
     final String dn = buildDn(obj);
     if (setOfAllLdapObjects.contains(dn) == true) {
-      update(obj);
+      update(obj, args);
     } else {
-      create(obj);
+      create(obj, args);
     }
   }
 
@@ -131,7 +144,7 @@ public abstract class LdapDao<T>
       protected Object call() throws NameNotFoundException, Exception
       {
         final String dn = buildDn(obj);
-        log.info("Delete " + getObjectClass() + ": " + getLogInfo(obj));
+        log.info("Delete " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
         ctx.unbind(dn);
         return null;
       }
@@ -139,7 +152,7 @@ public abstract class LdapDao<T>
   }
 
   @SuppressWarnings("unchecked")
-  public List<T> findAll()
+  public List<T> findAll(final String... organizationalUnit)
   {
     return (List<T>) new LdapTemplate(ldapConnector) {
       @Override
@@ -149,14 +162,41 @@ public abstract class LdapDao<T>
         NamingEnumeration< ? > results = null;
         final SearchControls controls = new SearchControls();
         controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        results = ctx.search("", "(objectclass=" + getObjectClass() + ")", controls);
+        final String path = LdapUtils.getOu(organizationalUnit);
+        results = ctx.search(path, "(objectclass=" + getObjectClass() + ")", controls);
         while (results.hasMore()) {
           final SearchResult searchResult = (SearchResult) results.next();
           final String dn = searchResult.getName();
           final Attributes attributes = searchResult.getAttributes();
-          list.add(mapToObject(dn, attributes));
+          list.add(mapToObject(dn, path, attributes));
         }
         return list;
+      }
+    }.excecute();
+  }
+
+  @SuppressWarnings("unchecked")
+  public T findByUid(final String uid, final String... organizationalUnit)
+  {
+    return (T) new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        NamingEnumeration< ? > results = null;
+        final SearchControls controls = new SearchControls();
+        controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        final String path = LdapUtils.getOu(organizationalUnit);
+        results = ctx.search(path, "(&(objectClass=" + getObjectClass() + ")(uid=" + uid + "))", controls);
+        if (results.hasMore() == false) {
+          return null;
+        }
+        final SearchResult searchResult = (SearchResult) results.next();
+        if (results.hasMore() == false) {
+          log.error("Oups, found entries with multiple uids: " + getObjectClass() + "." + uid);
+        }
+        final String dn = searchResult.getName();
+        final Attributes attributes = searchResult.getAttributes();
+        return mapToObject(dn, path, attributes);
       }
     }.excecute();
   }
@@ -169,16 +209,48 @@ public abstract class LdapDao<T>
     final List<T> all = findAll();
     final Set<String> set = new HashSet<String>();
     for (final T obj : all) {
-      set.add(buildDn(obj));
+      if (log.isDebugEnabled() == true) {
+        log.debug("Adding: " + obj.getDn());
+      }
+      set.add(obj.getDn());
     }
     return set;
   }
 
-  protected abstract String buildDn(final T obj);
+  protected String buildDn(final T obj)
+  {
+    final StringBuffer buf = new StringBuffer();
+    buf.append("cn=").append(obj.getCommonName());
+    if (obj.getOrganizationalUnit() != null) {
+      buf.append(',');
+    }
+    LdapUtils.buildOu(buf, obj.getOrganizationalUnit());
+    obj.setDn(buf.toString());
+    return obj.getDn();
+  }
 
   protected abstract Attributes getAttributesToBind(final T obj);
 
-  protected abstract T mapToObject(final String dn, final Attributes attributes) throws NamingException;
+  protected T mapToObject(final String dn, final String path, final Attributes attributes) throws NamingException
+  {
+    final T obj = mapToObject(attributes);
+    if (StringUtils.isNotBlank(path) == true) {
+      obj.setDn(dn + "," + path);
+    } else {
+      obj.setDn(dn);
+    }
+    obj.setCommonName(LdapUtils.getAttribute(attributes, "cn"));
+    return obj;
+  }
+
+  /**
+   * 
+   * @param dn
+   * @param attributes
+   * @return
+   * @throws NamingException
+   */
+  protected abstract T mapToObject(final Attributes attributes) throws NamingException;
 
   public void setLdapConnector(final LdapConnector ldapConnector)
   {

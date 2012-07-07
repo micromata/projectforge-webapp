@@ -36,6 +36,32 @@ public class LdapUtils
 {
   private static final String ATTRIBUTE_SEPARATOR_CHAR = ",";
 
+  public static String getOu(final String... organizationalUnit)
+  {
+    if (organizationalUnit == null) {
+      return "";
+    }
+    final StringBuffer buf = new StringBuffer();
+    buildOu(buf, organizationalUnit);
+    return buf.toString();
+  }
+
+  public static void buildOu(final StringBuffer buf, final String... organizationalUnit)
+  {
+    if (organizationalUnit == null) {
+      return;
+    }
+    boolean first = true;
+    for (final String ou : organizationalUnit) {
+      if (first == true) {
+        first = false;
+      } else {
+        buf.append(',');
+      }
+      buf.append("ou=").append(ou);
+    }
+  }
+
   public static String getAttribute(final Attributes attributes, final String attrId) throws NamingException
   {
     final Attribute attr = attributes.get(attrId);

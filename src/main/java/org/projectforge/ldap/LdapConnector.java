@@ -82,51 +82,6 @@ public class LdapConnector implements ConfigurationListener
     }
   }
 
-  // public LdapPerson searchPerson(final String username)
-  // {
-  // final DirContext ctx = createContext();
-  // NamingEnumeration<SearchResult> results = null;
-  // try {
-  // final SearchControls controls = new SearchControls();
-  // controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-  //
-  // // results = ctx.search("", "(objectclass=person)", controls);
-  // results = ctx.search("", "(&(objectClass=person)(uid=" + username + "))", controls);
-  // if (results.hasMore() == true) {
-  // final SearchResult searchResult = results.next();
-  // if (results.hasMore() == true) {
-  // throw new RuntimeException("Multiple users found for search string '" + username + "'.");
-  // }
-  // final Attributes attributes = searchResult.getAttributes();
-  // final Attribute attr = attributes.get("cn");
-  // final String cn = (String) attr.get();
-  // log.info(cn);
-  // }
-  // return null;
-  // } catch (final NameNotFoundException e) {
-  // // The base context was not found.
-  // // Just clean up and exit.
-  // return null;
-  // } catch (final NamingException e) {
-  // throw new RuntimeException(e);
-  // } finally {
-  // if (results != null) {
-  // try {
-  // results.close();
-  // } catch (final Exception e) {
-  // // Never mind this.
-  // }
-  // }
-  // if (ctx != null) {
-  // try {
-  // ctx.close();
-  // } catch (final Exception e) {
-  // // Never mind this.
-  // }
-  // }
-  // }
-  // }
-
   /**
    * Used by test class.
    * @param ldapConfig

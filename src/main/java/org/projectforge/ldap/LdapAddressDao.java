@@ -28,15 +28,10 @@ import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.math.NumberUtils;
-import org.projectforge.address.AddressDO;
-import org.projectforge.common.StringHelper;
-
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class LdapAddressDao extends LdapDao<AddressDO>
+public class LdapAddressDao extends LdapDao<LdapAddress>
 {
   /**
    * @see org.projectforge.ldap.LdapDao#getObjectClass()
@@ -44,33 +39,14 @@ public class LdapAddressDao extends LdapDao<AddressDO>
   @Override
   protected String getObjectClass()
   {
-    return "contact";
-  }
-
-  /**
-   * @see org.projectforge.ldap.LdapDao#buildDn(java.lang.Object)
-   */
-  @Override
-  protected String buildDn(final AddressDO address)
-  {
-    final StringBuffer buf = new StringBuffer();
-    buf.append("cn=");
-    boolean first = true;
-    if (StringUtils.isNotBlank(address.getFirstName()) == true) {
-      first = StringHelper.append(buf, first, address.getFirstName(), " ");
-    }
-    if (StringUtils.isNotBlank(address.getName()) == true) {
-      first = StringHelper.append(buf, first, address.getName(), " ");
-    }
-    buf.append(", ou=").append("contacts");
-    return buf.toString();
+    return "person";
   }
 
   /**
    * @see org.projectforge.ldap.LdapDao#getAttributesToBind(java.lang.Object)
    */
   @Override
-  protected Attributes getAttributesToBind(final AddressDO address)
+  protected Attributes getAttributesToBind(final LdapAddress address)
   {
     final Attributes attrs = new BasicAttributes();
     final BasicAttribute ocattr = new BasicAttribute("objectclass");
@@ -79,9 +55,9 @@ public class LdapAddressDao extends LdapDao<AddressDO>
     ocattr.add("inetOrgPerson");
     // ocattr.add("organisationalPerson");
     attrs.put(ocattr);
-    LdapUtils.putAttribute(attrs, "sn", address.getName());
-    LdapUtils.putAttribute(attrs, "givenName", address.getFirstName());
-    LdapUtils.putAttribute(attrs, "uid", String.valueOf(address.getId()));
+    LdapUtils.putAttribute(attrs, "sn", address.getSurname());
+    LdapUtils.putAttribute(attrs, "givenName", address.getGivenName());
+    LdapUtils.putAttribute(attrs, "uid", address.getUid());
     LdapUtils.putAttribute(attrs, "o", address.getOrganization());
     LdapUtils.putAttribute(attrs, "mail", address.getEmail());
     LdapUtils.putAttribute(attrs, "mail", address.getPrivateEmail());
@@ -97,12 +73,11 @@ public class LdapAddressDao extends LdapDao<AddressDO>
    * @see org.projectforge.ldap.LdapDao#mapToObject(java.lang.String, javax.naming.directory.Attributes)
    */
   @Override
-  protected AddressDO mapToObject(final String dn, final Attributes attributes) throws NamingException
+  protected LdapAddress mapToObject(final Attributes attributes) throws NamingException
   {
-    final AddressDO person = new AddressDO();
-    person.setId(NumberUtils.createInteger(LdapUtils.getAttribute(attributes, "cn")));
-    person.setName(LdapUtils.getAttribute(attributes, "sn"));
-    person.setFirstName(LdapUtils.getAttribute(attributes, "givenName"));
-    return person;
+    final LdapAddress address = new LdapAddress();
+    address.setSurname(LdapUtils.getAttribute(attributes, "sn"));
+    address.setGivenName(LdapUtils.getAttribute(attributes, "givenName"));
+    return address;
   }
 }
