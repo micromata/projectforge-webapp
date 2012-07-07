@@ -50,13 +50,13 @@ public class LdapUtils
     return buf.toString();
   }
 
-  public static void buildOu(final StringBuffer buf, final String... organizationalUnit)
+  public static void buildOu(final StringBuffer buf, final String... organizationalUnits)
   {
-    if (organizationalUnit == null) {
+    if (organizationalUnits == null) {
       return;
     }
     boolean first = true;
-    for (final String ou : organizationalUnit) {
+    for (final String ou : organizationalUnits) {
       if (first == true) {
         first = false;
       } else {

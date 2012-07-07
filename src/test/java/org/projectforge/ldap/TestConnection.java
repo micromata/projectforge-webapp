@@ -64,37 +64,41 @@ public class TestConnection
     // final Attributes attrs = ctx.getAttributes(cfg.getUrl(), new String[] { "supportedSASLMechanisms"});
     //
 
+    final LdapOrganizationalUnitDao odao = new LdapOrganizationalUnitDao();
+    odao.ldapConnector = ldapConnector;
+    odao.create("pf-test", "Test organizational unit for testing ProjectForge.", "users");
+
     final LdapUserDao pdao = new LdapUserDao();
     pdao.ldapConnector = ldapConnector;
     final List<LdapUser> list = pdao.findAll();
     log.info("Found " + list.size() + " person entries.");
     final LdapUser person = new LdapUser().setUid("42").setSurname("Meier").setGivenName("Horst")
         .setDescription("Test entry from ProjectForge dev system.").setMail("h.meier@mail.com");
-    person.setCommonName("h.meier").setOrganizationalUnit("kunden", "users");
+    person.setCommonName("h.meier").setOrganizationalUnit("pf-test", "users");
     pdao.createOrUpdate(person, "password");
     person.setSurname("Changed");
     pdao.update(person);
     pdao.changePassword(person, "hurzel");
     // pdao.delete(person);
 
-    final LdapContactDao adao = new LdapContactDao();
+    final LdapPersonDao adao = new LdapPersonDao();
     adao.ldapConnector = ldapConnector;
     final AddressDO adr = new AddressDO().setFirstName("Kai").setName("Reinhard").setOrganization("Micromata GmbH")
         .setEmail("k.reinhard@micromata.de").setPrivateEmail("k.reinhard@me.com").setBusinessPhone("+49 561 316793-0")
         .setMobilePhone("+49 170 1891142").setPrivatePhone("+49 561 00000");
     adr.setId(2);
-    LdapContact ldapAddress = new LdapContact(adr);
+    LdapPerson ldapAddress = new LdapPerson(adr);
     ldapAddress.setOrganizationalUnit("contacts");
     adao.createOrUpdate(ldapAddress);
-    ldapAddress = adao.findByUid(LdapContact.UID_PREFIX + "2", "contacts");
-    log.info("Found address with id=" + LdapContact.UID_PREFIX + "2: " + ldapAddress);
+    ldapAddress = adao.findByUid(LdapPerson.UID_PREFIX + "2", "contacts");
+    log.info("Found address with id=" + LdapPerson.UID_PREFIX + "2: " + ldapAddress);
 
     final LdapGroupDao gdao = new LdapGroupDao();
     gdao.ldapConnector = ldapConnector;
     final LdapGroup group = new LdapGroup().setDescription("Test by ProjectForge");
     group.setCommonName("ProjectForge-test").setOrganizationalUnit("groups");
-    //    group.addMember(ldapAddress);
-    //    group.addMember(person);
+    group.addMember(ldapAddress);
+    group.addMember(person);
     gdao.createOrUpdate(group);
   }
 
