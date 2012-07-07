@@ -59,6 +59,7 @@ public abstract class LdapDao<T extends LdapObject>
         final String dn = buildDn(obj);
         log.info("Create " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
         final Attributes attrs = getAttributesToBind(obj);
+        LdapUtils.putAttribute(attrs, "cn", obj.getCommonName());
         onBeforeBind(dn, attrs, args);
         ctx.bind(dn, null, attrs);
         return null;
@@ -106,6 +107,7 @@ public abstract class LdapDao<T extends LdapObject>
         final String dn = buildDn(obj);
         log.info("Update " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
         final Attributes attrs = getAttributesToBind(obj);
+        LdapUtils.putAttribute(attrs, "cn", obj.getCommonName());
         onBeforeRebind(dn, attrs, objs);
         ctx.rebind(dn, DirContext.ADD_ATTRIBUTE, attrs);
         return null;

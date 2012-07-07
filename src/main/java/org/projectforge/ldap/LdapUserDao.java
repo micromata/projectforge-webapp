@@ -100,13 +100,12 @@ public class LdapUserDao extends LdapDao<LdapUser>
    */
   private ModificationItem[] getModificationItems(final LdapUser person)
   {
-    final ModificationItem[] modificationItems = new ModificationItem[6];
-    modificationItems[0] = createModificationItem("cn", person.getCommonName());
-    modificationItems[1] = createModificationItem("sn", person.getSurname());
-    modificationItems[2] = createModificationItem("givenName", person.getGivenName());
-    modificationItems[3] = createModificationItem("uid", person.getUid());
-    modificationItems[4] = createModificationItem("mail", person.getMail());
-    modificationItems[5] = createModificationItem("description", person.getDescription());
+    final ModificationItem[] modificationItems = new ModificationItem[5];
+    modificationItems[0] = createModificationItem("sn", person.getSurname());
+    modificationItems[1] = createModificationItem("givenName", person.getGivenName());
+    modificationItems[2] = createModificationItem("uid", person.getUid());
+    modificationItems[3] = createModificationItem("mail", person.getMail());
+    modificationItems[4] = createModificationItem("description", person.getDescription());
     return modificationItems;
   }
 

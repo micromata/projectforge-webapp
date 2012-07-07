@@ -23,10 +23,6 @@
 
 package org.projectforge.ldap;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
 import org.projectforge.address.AddressDO;
 
 /**
@@ -165,23 +161,5 @@ public class LdapContact extends LdapObject
   public String getPrivateEmail()
   {
     return address.getPrivateEmail();
-  }
-
-  @Override
-  public boolean equals(final Object obj)
-  {
-    return EqualsBuilder.reflectionEquals(this, obj);
-  }
-
-  @Override
-  public int hashCode()
-  {
-    return HashCodeBuilder.reflectionHashCode(this);
-  }
-
-  @Override
-  public String toString()
-  {
-    return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
   }
 }
