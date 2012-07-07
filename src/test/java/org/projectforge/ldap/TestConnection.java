@@ -64,11 +64,11 @@ public class TestConnection
     // final Attributes attrs = ctx.getAttributes(cfg.getUrl(), new String[] { "supportedSASLMechanisms"});
     //
 
-    final LdapPersonDao pdao = new LdapPersonDao();
+    final LdapUserDao pdao = new LdapUserDao();
     pdao.ldapConnector = ldapConnector;
-    final List<LdapPerson> list = pdao.findAll();
+    final List<LdapUser> list = pdao.findAll();
     log.info("Found " + list.size() + " person entries.");
-    final LdapPerson person = new LdapPerson().setUid("42").setSurname("Meier").setGivenName("Horst")
+    final LdapUser person = new LdapUser().setUid("42").setSurname("Meier").setGivenName("Horst")
         .setDescription("Test entry from ProjectForge dev system.").setMail("h.meier@mail.com");
     person.setCommonName("h.meier").setOrganizationalUnit("kunden", "users");
     pdao.createOrUpdate(person, "password");
@@ -77,16 +77,16 @@ public class TestConnection
     pdao.changePassword(person, "hurzel");
     // pdao.delete(person);
 
-    final LdapAddressDao adao = new LdapAddressDao();
+    final LdapContactDao adao = new LdapContactDao();
     adao.ldapConnector = ldapConnector;
     final AddressDO adr = new AddressDO().setFirstName("Kai").setName("Reinhard").setOrganization("Micromata GmbH")
         .setEmail("k.reinhard@micromata.de").setPrivateEmail("k.reinhard@me.com").setBusinessPhone("+49 561 316793-0")
         .setMobilePhone("+49 170 1891142").setPrivatePhone("+49 561 00000");
-    LdapAddress ldapAddress = new LdapAddress(adr);
-    ldapAddress.setOrganizationalUnit("contacts");
     adr.setId(2);
+    LdapContact ldapAddress = new LdapContact(adr);
+    ldapAddress.setOrganizationalUnit("contacts");
     adao.createOrUpdate(ldapAddress);
-    ldapAddress = adao.findByUid("2", "contacts");
+    ldapAddress = adao.findByUid(LdapContact.UID_PREFIX +"2", "contacts");
     log.info("Found address with id=2: " + ldapAddress);
   }
 

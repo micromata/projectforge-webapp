@@ -191,11 +191,11 @@ public abstract class LdapDao<T extends LdapObject>
           return null;
         }
         final SearchResult searchResult = (SearchResult) results.next();
-        if (results.hasMore() == false) {
-          log.error("Oups, found entries with multiple uids: " + getObjectClass() + "." + uid);
-        }
         final String dn = searchResult.getName();
         final Attributes attributes = searchResult.getAttributes();
+        if (results.hasMore() == true) {
+          log.error("Oups, found entries with multiple uids: " + getObjectClass() + "." + uid);
+        }
         return mapToObject(dn, searchBase, attributes);
       }
     }.excecute();

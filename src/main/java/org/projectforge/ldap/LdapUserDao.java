@@ -36,9 +36,9 @@ import org.apache.commons.lang.StringUtils;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class LdapPersonDao extends LdapDao<LdapPerson>
+public class LdapUserDao extends LdapDao<LdapUser>
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapPersonDao.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapUserDao.class);
 
   /**
    * @see org.projectforge.ldap.LdapDao#getObjectClass()
@@ -54,12 +54,12 @@ public class LdapPersonDao extends LdapDao<LdapPerson>
    * @see org.projectforge.ldap.LdapDao#update(java.lang.Object, java.lang.Object[])
    */
   @Override
-  public void update(final LdapPerson person, final Object... objs)
+  public void update(final LdapUser person, final Object... objs)
   {
     modify(person, getModificationItems(person));
   }
 
-  public void changePassword(final LdapPerson person, final String userPassword)
+  public void changePassword(final LdapUser person, final String userPassword)
   {
     log.info("Change password for " + getObjectClass() + ": " + buildDn(person));
     final ModificationItem[] modificationItems = new ModificationItem[1];
@@ -76,7 +76,7 @@ public class LdapPersonDao extends LdapDao<LdapPerson>
    * @see org.projectforge.ldap.LdapDao#getAttributesToBind(java.lang.Object)
    */
   @Override
-  protected Attributes getAttributesToBind(final LdapPerson person)
+  protected Attributes getAttributesToBind(final LdapUser person)
   {
     final Attributes attrs = new BasicAttributes();
     final BasicAttribute ocattr = new BasicAttribute("objectclass");
@@ -98,7 +98,7 @@ public class LdapPersonDao extends LdapDao<LdapPerson>
    * @param person
    * @return
    */
-  private ModificationItem[] getModificationItems(final LdapPerson person)
+  private ModificationItem[] getModificationItems(final LdapUser person)
   {
     final ModificationItem[] modificationItems = new ModificationItem[6];
     modificationItems[0] = createModificationItem("cn", person.getCommonName());
@@ -138,9 +138,9 @@ public class LdapPersonDao extends LdapDao<LdapPerson>
    * @see org.projectforge.ldap.LdapDao#mapToObject(java.lang.String, javax.naming.directory.Attributes)
    */
   @Override
-  protected LdapPerson mapToObject(final Attributes attributes) throws NamingException
+  protected LdapUser mapToObject(final Attributes attributes) throws NamingException
   {
-    final LdapPerson person = new LdapPerson();
+    final LdapUser person = new LdapUser();
     person.setSurname(LdapUtils.getAttribute(attributes, "sn"));
     person.setDescription(LdapUtils.getAttribute(attributes, "description"));
     return person;

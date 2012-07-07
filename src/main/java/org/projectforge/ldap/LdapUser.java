@@ -27,62 +27,35 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.apache.commons.lang.math.NumberUtils;
-import org.projectforge.address.AddressDO;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class LdapAddress extends LdapObject
+public class LdapUser extends LdapObject
 {
-  private final AddressDO address;
+  private String surname, givenName;
 
-  private String[] mail;
+  private String description;
 
-  public LdapAddress()
-  {
-    address = new AddressDO();
-  }
+  private String mail;
 
-  public LdapAddress(final AddressDO address)
-  {
-    this.address = address;
-    updateCommonName();
-  }
-
-  private void updateCommonName()
-  {
-    String cn;
-    if (getGivenName() != null) {
-      if (getSurname() != null) {
-        cn = getGivenName() + " " + getSurname();
-      } else {
-        cn = getGivenName();
-      }
-    } else {
-      cn = getSurname();
-    }
-    setCommonName(cn);
-  }
+  private String uid;
 
   /**
    * @return the sn
-   * @see AddressDO#getName()
    */
   public String getSurname()
   {
-    return address.getName();
+    return surname;
   }
 
   /**
    * @param surname the sn to set
    * @return this for chaining.
-   * @see AddressDO#setName(String)
    */
-  public LdapAddress setSurname(final String surname)
+  public LdapUser setSurname(final String surname)
   {
-    address.setName(surname);
-    updateCommonName();
+    this.surname = surname;
     return this;
   }
 
@@ -91,16 +64,27 @@ public class LdapAddress extends LdapObject
    */
   public String getUid()
   {
-    return String.valueOf(address.getId());
+    return uid;
   }
 
   /**
    * @param uid the uid to set
    * @return this for chaining.
    */
-  public LdapAddress setUid(final String uid)
+  public LdapUser setUid(final String uid)
   {
-    address.setId(NumberUtils.createInteger(uid));
+    this.uid = uid;
+    return this;
+  }
+
+  public String getDescription()
+  {
+    return description;
+  }
+
+  public LdapUser setDescription(final String description)
+  {
+    this.description = description;
     return this;
   }
 
@@ -109,24 +93,24 @@ public class LdapAddress extends LdapObject
    */
   public String getGivenName()
   {
-    return address.getFirstName();
+    return givenName;
   }
 
   /**
    * @param givenName the givenName to set
    * @return this for chaining.
    */
-  public LdapAddress setGivenName(final String givenName)
+  public LdapUser setGivenName(final String givenName)
   {
-    address.setFirstName(givenName);
-    updateCommonName();
+    this.givenName = givenName;
     return this;
   }
+
 
   /**
    * @return the mail
    */
-  public String[] getMail()
+  public String getMail()
   {
     return mail;
   }
@@ -135,45 +119,10 @@ public class LdapAddress extends LdapObject
    * @param mail the mail to set
    * @return this for chaining.
    */
-  public LdapAddress setMail(final String... mail)
+  public LdapUser setMail(final String mail)
   {
     this.mail = mail;
     return this;
-  }
-
-  public String getBusinessPhone()
-  {
-    return address.getBusinessPhone();
-  }
-
-  public String getMobilePhone()
-  {
-    return address.getMobilePhone();
-  }
-
-  public String getEmail()
-  {
-    return address.getEmail();
-  }
-
-  public String getOrganization()
-  {
-    return address.getOrganization();
-  }
-
-  public String getPrivatePhone()
-  {
-    return address.getPrivatePhone();
-  }
-
-  public String getPrivateMobilePhone()
-  {
-    return address.getPrivateMobilePhone();
-  }
-
-  public String getPrivateEmail()
-  {
-    return address.getPrivateEmail();
   }
 
   @Override

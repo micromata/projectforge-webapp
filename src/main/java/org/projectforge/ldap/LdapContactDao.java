@@ -31,7 +31,7 @@ import javax.naming.directory.BasicAttributes;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class LdapAddressDao extends LdapDao<LdapAddress>
+public class LdapContactDao extends LdapDao<LdapContact>
 {
   /**
    * @see org.projectforge.ldap.LdapDao#getObjectClass()
@@ -46,7 +46,7 @@ public class LdapAddressDao extends LdapDao<LdapAddress>
    * @see org.projectforge.ldap.LdapDao#getAttributesToBind(java.lang.Object)
    */
   @Override
-  protected Attributes getAttributesToBind(final LdapAddress address)
+  protected Attributes getAttributesToBind(final LdapContact address)
   {
     final Attributes attrs = new BasicAttributes();
     final BasicAttribute ocattr = new BasicAttribute("objectclass");
@@ -73,9 +73,9 @@ public class LdapAddressDao extends LdapDao<LdapAddress>
    * @see org.projectforge.ldap.LdapDao#mapToObject(java.lang.String, javax.naming.directory.Attributes)
    */
   @Override
-  protected LdapAddress mapToObject(final Attributes attributes) throws NamingException
+  protected LdapContact mapToObject(final Attributes attributes) throws NamingException
   {
-    final LdapAddress address = new LdapAddress();
+    final LdapContact address = new LdapContact();
     address.setSurname(LdapUtils.getAttribute(attributes, "sn"));
     address.setGivenName(LdapUtils.getAttribute(attributes, "givenName"));
     return address;
