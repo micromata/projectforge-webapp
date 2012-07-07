@@ -31,7 +31,7 @@ import javax.naming.directory.BasicAttributes;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class LdapContactDao extends LdapDao<LdapContact>
+public class LdapPersonDao extends LdapDao<LdapPerson>
 {
   /**
    * @see org.projectforge.ldap.LdapDao#getObjectClass()
@@ -46,12 +46,12 @@ public class LdapContactDao extends LdapDao<LdapContact>
    * @see org.projectforge.ldap.LdapDao#getAttributesToBind(java.lang.Object)
    */
   @Override
-  protected Attributes getAttributesToBind(final LdapContact address)
+  protected Attributes getAttributesToBind(final LdapPerson address)
   {
     final Attributes attrs = new BasicAttributes();
     final BasicAttribute ocattr = new BasicAttribute("objectclass");
     ocattr.add("top");
-    ocattr.add("person");
+    ocattr.add(getObjectClass());
     ocattr.add("inetOrgPerson");
     // ocattr.add("organisationalPerson");
     attrs.put(ocattr);
@@ -73,9 +73,9 @@ public class LdapContactDao extends LdapDao<LdapContact>
    * @see org.projectforge.ldap.LdapDao#mapToObject(java.lang.String, javax.naming.directory.Attributes)
    */
   @Override
-  protected LdapContact mapToObject(final Attributes attributes) throws NamingException
+  protected LdapPerson mapToObject(final Attributes attributes) throws NamingException
   {
-    final LdapContact address = new LdapContact();
+    final LdapPerson address = new LdapPerson();
     address.setSurname(LdapUtils.getAttribute(attributes, "sn"));
     address.setGivenName(LdapUtils.getAttribute(attributes, "givenName"));
     return address;

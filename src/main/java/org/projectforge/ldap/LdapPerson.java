@@ -28,7 +28,7 @@ import org.projectforge.address.AddressDO;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class LdapContact extends LdapObject
+public class LdapPerson extends LdapObject
 {
   public static final String UID_PREFIX = "pf-address-";
 
@@ -36,12 +36,12 @@ public class LdapContact extends LdapObject
 
   private String[] mail;
 
-  public LdapContact()
+  public LdapPerson()
   {
     address = new AddressDO();
   }
 
-  public LdapContact(final AddressDO address)
+  public LdapPerson(final AddressDO address)
   {
     this.address = address;
     updateCommonName();
@@ -76,7 +76,7 @@ public class LdapContact extends LdapObject
    * @return this for chaining.
    * @see AddressDO#setName(String)
    */
-  public LdapContact setSurname(final String surname)
+  public LdapPerson setSurname(final String surname)
   {
     address.setName(surname);
     updateCommonName();
@@ -103,7 +103,7 @@ public class LdapContact extends LdapObject
    * @param givenName the givenName to set
    * @return this for chaining.
    */
-  public LdapContact setGivenName(final String givenName)
+  public LdapPerson setGivenName(final String givenName)
   {
     address.setFirstName(givenName);
     updateCommonName();
@@ -122,7 +122,7 @@ public class LdapContact extends LdapObject
    * @param mail the mail to set
    * @return this for chaining.
    */
-  public LdapContact setMail(final String... mail)
+  public LdapPerson setMail(final String... mail)
   {
     this.mail = mail;
     return this;
