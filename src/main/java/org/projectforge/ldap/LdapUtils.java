@@ -27,6 +27,7 @@ import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 
+import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.StringHelper;
 
 /**
@@ -34,6 +35,8 @@ import org.projectforge.common.StringHelper;
  */
 public class LdapUtils
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapUtils.class);;
+
   private static final String ATTRIBUTE_SEPARATOR_CHAR = ",";
 
   public static String getOu(final String... organizationalUnit)
@@ -59,6 +62,24 @@ public class LdapUtils
         buf.append(',');
       }
       buf.append("ou=").append(ou);
+    }
+  }
+
+  public static String[] getOrganizationalUnit(final String dn)
+  {
+    if (dn == null || dn.indexOf("ou=") < 0) {
+      return null;
+    }
+    log.warn("getOrganizationalUnit(String) not yet implemented.");
+    return null;
+  }
+
+  public static String[] getOrganizationalUnit(final String dn, final String ou)
+  {
+    if (StringUtils.isNotBlank(ou) == true) {
+      return getOrganizationalUnit(dn + "," + ou);
+    } else {
+      return getOrganizationalUnit(dn);
     }
   }
 

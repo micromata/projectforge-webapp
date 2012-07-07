@@ -231,14 +231,15 @@ public abstract class LdapDao<T extends LdapObject>
 
   protected abstract Attributes getAttributesToBind(final T obj);
 
-  protected T mapToObject(final String dn, final String path, final Attributes attributes) throws NamingException
+  protected T mapToObject(final String dn, final String ou, final Attributes attributes) throws NamingException
   {
     final T obj = mapToObject(attributes);
-    if (StringUtils.isNotBlank(path) == true) {
-      obj.setDn(dn + "," + path);
+    if (StringUtils.isNotBlank(ou) == true) {
+      obj.setDn(dn + "," + ou);
     } else {
       obj.setDn(dn);
     }
+    obj.setOrganizationalUnit(LdapUtils.getOrganizationalUnit(dn, ou));
     obj.setCommonName(LdapUtils.getAttribute(attributes, "cn"));
     return obj;
   }
