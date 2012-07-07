@@ -23,6 +23,9 @@
 
 package org.projectforge.ldap;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
@@ -35,8 +38,6 @@ import org.projectforge.common.StringHelper;
  */
 public class LdapUtils
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapUtils.class);;
-
   private static final String ATTRIBUTE_SEPARATOR_CHAR = ",";
 
   public static String getOu(final String... organizationalUnit)
@@ -70,8 +71,19 @@ public class LdapUtils
     if (dn == null || dn.indexOf("ou=") < 0) {
       return null;
     }
-    log.warn("getOrganizationalUnit(String) not yet implemented.");
-    return null;
+    final String[] entries = StringUtils.split(dn, ",");
+    final List<String> list = new ArrayList<String>();
+    for (String entry : entries) {
+      if (entry == null) {
+        continue;
+      }
+      entry = entry.trim();
+      if (entry.startsWith("ou=") == false || entry.length() < 4) {
+        continue;
+      }
+      list.add(entry.substring(3));
+    }
+    return list.toArray(new String[list.size()]);
   }
 
   public static String[] getOrganizationalUnit(final String dn, final String ouBase)
