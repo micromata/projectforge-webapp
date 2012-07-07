@@ -41,6 +41,12 @@ public class LdapGroup extends LdapObject
     return this;
   }
 
+  public LdapGroup addMember(final LdapObject member)
+  {
+    members.add(member.getDn());
+    return this;
+  }
+
   /**
    * @return the members
    */

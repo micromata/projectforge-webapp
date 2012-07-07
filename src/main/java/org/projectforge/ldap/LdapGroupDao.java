@@ -39,7 +39,7 @@ public class LdapGroupDao extends LdapDao<LdapGroup>
   @Override
   protected String getObjectClass()
   {
-    return "person";
+    return "groupOfUniqueNames";
   }
 
   /**

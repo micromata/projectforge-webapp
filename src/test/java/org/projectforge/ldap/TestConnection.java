@@ -86,8 +86,16 @@ public class TestConnection
     LdapContact ldapAddress = new LdapContact(adr);
     ldapAddress.setOrganizationalUnit("contacts");
     adao.createOrUpdate(ldapAddress);
-    ldapAddress = adao.findByUid(LdapContact.UID_PREFIX +"2", "contacts");
-    log.info("Found address with id=2: " + ldapAddress);
+    ldapAddress = adao.findByUid(LdapContact.UID_PREFIX + "2", "contacts");
+    log.info("Found address with id=" + LdapContact.UID_PREFIX + "2: " + ldapAddress);
+
+    final LdapGroupDao gdao = new LdapGroupDao();
+    gdao.ldapConnector = ldapConnector;
+    final LdapGroup group = new LdapGroup().setDescription("Test by ProjectForge");
+    group.setCommonName("ProjectForge-test").setOrganizationalUnit("groups");
+    //    group.addMember(ldapAddress);
+    //    group.addMember(person);
+    gdao.createOrUpdate(group);
   }
 
   private LdapConfig readConfig()
