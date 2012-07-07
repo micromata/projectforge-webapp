@@ -24,9 +24,11 @@
 package org.projectforge.ldap;
 
 import javax.naming.NameNotFoundException;
+import javax.naming.NamingEnumeration;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.SearchControls;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -39,7 +41,7 @@ public class LdapOrganizationalUnitDao
 
   LdapConnector ldapConnector;
 
-  public void create(final String ou, final String description, final String... organizationalUnits)
+  public void createIfNotExist(final String ou, final String description, final String... organizationalUnits)
   {
     new LdapTemplate(ldapConnector) {
       @Override
@@ -52,6 +54,16 @@ public class LdapOrganizationalUnitDao
         }
         LdapUtils.buildOu(buf, organizationalUnits);
         final String path = buf.toString();
+
+        NamingEnumeration< ? > results = null;
+        final SearchControls controls = new SearchControls();
+        controls.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+        final String searchBase = LdapUtils.getOu(organizationalUnits);
+        results = ctx.search(searchBase, "(&(objectClass=" + OBJECT_CLASS + ")(ou=" + ou + "))", controls);
+        if (results.hasMore() == true) {
+          log.info(OBJECT_CLASS + " does already exist (OK): " + path);
+          return null;
+        }
         log.info("Create " + OBJECT_CLASS + ": " + path);
         final Attributes attrs = new BasicAttributes();
         final BasicAttribute ocattr = new BasicAttribute("objectclass");

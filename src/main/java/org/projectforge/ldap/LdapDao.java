@@ -178,7 +178,7 @@ public abstract class LdapDao<T extends LdapObject>
   }
 
   @SuppressWarnings("unchecked")
-  public T findByUid(final String uid, final String... organizationalUnit)
+  public T findByUid(final String uid, final String... organizationalUnits)
   {
     return (T) new LdapTemplate(ldapConnector) {
       @Override
@@ -187,7 +187,7 @@ public abstract class LdapDao<T extends LdapObject>
         NamingEnumeration< ? > results = null;
         final SearchControls controls = new SearchControls();
         controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        final String searchBase = LdapUtils.getOu(organizationalUnit);
+        final String searchBase = LdapUtils.getOu(organizationalUnits);
         results = ctx.search(searchBase, "(&(objectClass=" + getObjectClass() + ")(uid=" + uid + "))", controls);
         if (results.hasMore() == false) {
           return null;

@@ -66,7 +66,7 @@ public class TestConnection
 
     final LdapOrganizationalUnitDao odao = new LdapOrganizationalUnitDao();
     odao.ldapConnector = ldapConnector;
-    odao.create("pf-test", "Test organizational unit for testing ProjectForge.", "users");
+    odao.createIfNotExist("pf-test", "Test organizational unit for testing ProjectForge.", "users");
 
     final LdapUserDao pdao = new LdapUserDao();
     pdao.ldapConnector = ldapConnector;
