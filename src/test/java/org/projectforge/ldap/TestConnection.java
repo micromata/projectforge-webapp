@@ -92,9 +92,10 @@ public class TestConnection
     final List<LdapPerson> list = pdao.findAll();
     final LdapPerson person = new LdapPerson().setUid("42").setCommonName("h.meier").setSurname("Meier").setGivenName("Horst")
         .setOrganisationalUnitName("kunden,users").setDescription("Test entry from ProjectForge dev system.");
-    pdao.create(person);
+    pdao.create(person, "password");
     person.setSurname("Changed");
     pdao.update(person);
+    pdao.changePassword(person, "hurzel");
     pdao.delete(person);
 
     final LdapAddressDao adao = new LdapAddressDao();
@@ -103,7 +104,7 @@ public class TestConnection
         .setEmail("k.reinhard@micromata.de").setPrivateEmail("k.reinhard@me.com").setBusinessPhone("+49 561 316793-0")
         .setMobilePhone("+49 170 1891142").setPrivatePhone("+49 561 00000");
     adr.setId(2);
-    adao.create(adr);
+    // adao.create(adr);
   }
 
   private LdapConfig readConfig()

@@ -32,6 +32,8 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
@@ -46,19 +48,25 @@ public abstract class LdapDao<T>
 
   protected abstract String getObjectClass();
 
-  public void create(final T obj)
+  public void create(final T obj, final Object... args)
   {
     new LdapTemplate(ldapConnector) {
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
         final String dn = buildDn(obj);
-        log.info("Create " + getObjectClass() + ": " + dn);
+        log.info("Create " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
         final Attributes attrs = getAttributesToBind(obj);
+        onBeforeBind(dn, attrs, args);
         ctx.bind(dn, null, attrs);
         return null;
       }
     }.excecute();
+  }
+
+  protected void onBeforeBind(final String dn, final Attributes attrs, final Object... args)
+  {
+    // Do nothing at default.
   }
 
   /**
@@ -76,19 +84,44 @@ public abstract class LdapDao<T>
     }
   }
 
-  public void update(final T obj)
+  public void update(final T obj, final Object... objs)
   {
     new LdapTemplate(ldapConnector) {
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
         final String dn = buildDn(obj);
-        log.info("Update " + getObjectClass() + ": " + dn);
+        log.info("Update " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
         final Attributes attrs = getAttributesToBind(obj);
-        ctx.rebind(dn, null, attrs);
+        onBeforeRebind(dn, attrs, objs);
+        ctx.rebind(dn, DirContext.ADD_ATTRIBUTE, attrs);
         return null;
       }
     }.excecute();
+  }
+
+  public void modify(final T obj, final ModificationItem... modificationItems)
+  {
+    new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        final String dn = buildDn(obj);
+        log.info("Modify attributes of " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
+        ctx.modifyAttributes(dn, modificationItems);
+        return null;
+      }
+    }.excecute();
+  }
+
+  protected String getLogInfo(final T obj)
+  {
+    return String.valueOf(obj);
+  }
+
+  protected void onBeforeRebind(final String dn, final Attributes attrs, final Object... objs)
+  {
+    // Do nothing at default;
   }
 
   public void delete(final T obj)
@@ -98,7 +131,7 @@ public abstract class LdapDao<T>
       protected Object call() throws NameNotFoundException, Exception
       {
         final String dn = buildDn(obj);
-        log.info("Delete " + getObjectClass() + ": " + dn);
+        log.info("Delete " + getObjectClass() + ": " + getLogInfo(obj));
         ctx.unbind(dn);
         return null;
       }
