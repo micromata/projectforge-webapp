@@ -81,6 +81,7 @@ public class TestConnection
     pdao.changePassword(person, "hurzel");
     // pdao.delete(person);
 
+    odao.createIfNotExist("pf-test", "Test organizational unit for testing ProjectForge.", "contacts");
     final LdapPersonDao adao = new LdapPersonDao();
     adao.ldapConnector = ldapConnector;
     final AddressDO adr = new AddressDO().setFirstName("Kai").setName("Reinhard").setOrganization("Micromata GmbH")
@@ -88,15 +89,16 @@ public class TestConnection
         .setMobilePhone("+49 170 1891142").setPrivatePhone("+49 561 00000");
     adr.setId(2);
     LdapPerson ldapAddress = new LdapPerson(adr);
-    ldapAddress.setOrganizationalUnit("contacts");
+    ldapAddress.setOrganizationalUnit("pf-test", "contacts");
     adao.createOrUpdate(ldapAddress);
-    ldapAddress = adao.findByUid(LdapPerson.UID_PREFIX + "2", "contacts");
+    ldapAddress = adao.findByUid(LdapPerson.UID_PREFIX + "2", "pf-test", "contacts");
     log.info("Found address with id=" + LdapPerson.UID_PREFIX + "2: " + ldapAddress);
 
+    odao.createIfNotExist("pf-test", "Test organizational unit for testing ProjectForge.", "groups");
     final LdapGroupDao gdao = new LdapGroupDao();
     gdao.ldapConnector = ldapConnector;
     final LdapGroup group = new LdapGroup().setDescription("Test by ProjectForge");
-    group.setCommonName("ProjectForge-test").setOrganizationalUnit("groups");
+    group.setCommonName("ProjectForge-test").setOrganizationalUnit("pf-test", "groups");
     group.addMember(ldapAddress);
     group.addMember(person);
     gdao.createOrUpdate(group);
