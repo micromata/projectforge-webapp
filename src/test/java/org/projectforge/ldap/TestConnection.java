@@ -63,31 +63,6 @@ public class TestConnection
     // // Read supportedSASLMechanisms from root DSE
     // final Attributes attrs = ctx.getAttributes(cfg.getUrl(), new String[] { "supportedSASLMechanisms"});
     //
-    // final String SEARCH_BASE = "ou=users";
-    // final Object obj = ctx.lookup(SEARCH_BASE);
-    //
-    // final String accountName = "kai";
-    // final List list = new ArrayList();
-    //
-    // final String searchFilter = "(&(objectClass=person)(uid=" + accountName + "))";
-    //
-    // // System.out.println(searchFilter);
-    //
-    // final SearchControls searchControls = new SearchControls();
-    // final String[] resultAttributes = { "sn", "givenName", "uid"};
-    // searchControls.setReturningAttributes(resultAttributes);
-    // searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    //
-    // results = ctx.search(SEARCH_BASE, searchFilter, searchControls);
-    //
-    // while (results.hasMoreElements()) {
-    // final SearchResult searchResult = results.nextElement();
-    // list.add(searchResult.toString());
-    // System.out.println(searchResult.toString());
-    // }
-    // return null;
-    // }
-    // }.excecute();
 
     final LdapPersonDao pdao = new LdapPersonDao();
     pdao.ldapConnector = ldapConnector;

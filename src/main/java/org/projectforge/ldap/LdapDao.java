@@ -162,13 +162,13 @@ public abstract class LdapDao<T extends LdapObject>
         NamingEnumeration< ? > results = null;
         final SearchControls controls = new SearchControls();
         controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        final String path = LdapUtils.getOu(organizationalUnit);
-        results = ctx.search(path, "(objectclass=" + getObjectClass() + ")", controls);
+        final String searchBase = LdapUtils.getOu(organizationalUnit);
+        results = ctx.search(searchBase, "(objectclass=" + getObjectClass() + ")", controls);
         while (results.hasMore()) {
           final SearchResult searchResult = (SearchResult) results.next();
           final String dn = searchResult.getName();
           final Attributes attributes = searchResult.getAttributes();
-          list.add(mapToObject(dn, path, attributes));
+          list.add(mapToObject(dn, searchBase, attributes));
         }
         return list;
       }
@@ -185,8 +185,8 @@ public abstract class LdapDao<T extends LdapObject>
         NamingEnumeration< ? > results = null;
         final SearchControls controls = new SearchControls();
         controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        final String path = LdapUtils.getOu(organizationalUnit);
-        results = ctx.search(path, "(&(objectClass=" + getObjectClass() + ")(uid=" + uid + "))", controls);
+        final String searchBase = LdapUtils.getOu(organizationalUnit);
+        results = ctx.search(searchBase, "(&(objectClass=" + getObjectClass() + ")(uid=" + uid + "))", controls);
         if (results.hasMore() == false) {
           return null;
         }
@@ -196,7 +196,7 @@ public abstract class LdapDao<T extends LdapObject>
         }
         final String dn = searchResult.getName();
         final Attributes attributes = searchResult.getAttributes();
-        return mapToObject(dn, path, attributes);
+        return mapToObject(dn, searchBase, attributes);
       }
     }.excecute();
   }
@@ -231,15 +231,15 @@ public abstract class LdapDao<T extends LdapObject>
 
   protected abstract Attributes getAttributesToBind(final T obj);
 
-  protected T mapToObject(final String dn, final String ou, final Attributes attributes) throws NamingException
+  protected T mapToObject(final String dn, final String searchBase, final Attributes attributes) throws NamingException
   {
     final T obj = mapToObject(attributes);
-    if (StringUtils.isNotBlank(ou) == true) {
-      obj.setDn(dn + "," + ou);
+    if (StringUtils.isNotBlank(searchBase) == true) {
+      obj.setDn(dn + "," + searchBase);
     } else {
       obj.setDn(dn);
     }
-    obj.setOrganizationalUnit(LdapUtils.getOrganizationalUnit(dn, ou));
+    obj.setOrganizationalUnit(LdapUtils.getOrganizationalUnit(dn, searchBase));
     obj.setCommonName(LdapUtils.getAttribute(attributes, "cn"));
     return obj;
   }

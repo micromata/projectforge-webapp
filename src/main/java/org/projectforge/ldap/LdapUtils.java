@@ -74,10 +74,10 @@ public class LdapUtils
     return null;
   }
 
-  public static String[] getOrganizationalUnit(final String dn, final String ou)
+  public static String[] getOrganizationalUnit(final String dn, final String ouBase)
   {
-    if (StringUtils.isNotBlank(ou) == true) {
-      return getOrganizationalUnit(dn + "," + ou);
+    if (StringUtils.isNotBlank(ouBase) == true) {
+      return getOrganizationalUnit(dn + "," + ouBase);
     } else {
       return getOrganizationalUnit(dn);
     }
