@@ -23,16 +23,20 @@
 
 package org.projectforge.ldap;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
-import javax.naming.directory.BasicAttribute;
-import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.ModificationItem;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class LdapGroupDao extends LdapDao<LdapGroup>
 {
+  private static final String[] ADDITIONAL_OBJECT_CLASSES = { "groupOfUniqueNames"};
+
   /**
    * @see org.projectforge.ldap.LdapDao#getObjectClass()
    */
@@ -43,23 +47,31 @@ public class LdapGroupDao extends LdapDao<LdapGroup>
   }
 
   /**
-   * @see org.projectforge.ldap.LdapDao#getAttributesToBind(java.lang.Object)
+   * @see org.projectforge.ldap.LdapDao#getAdditionalObjectClasses()
    */
   @Override
-  protected Attributes getAttributesToBind(final LdapGroup group)
+  protected String[] getAdditionalObjectClasses()
   {
-    final Attributes attrs = new BasicAttributes();
-    final BasicAttribute ocattr = new BasicAttribute("objectclass");
-    ocattr.add("top");
-    ocattr.add("groupOfUniqueNames");
-    attrs.put(ocattr);
-    LdapUtils.putAttribute(attrs, "description", group.getDescription());
+    return ADDITIONAL_OBJECT_CLASSES;
+  }
+
+  /**
+   * Used for bind and update.
+   * @param person
+   * @return
+   * @see org.projectforge.ldap.LdapDao#getModificationItems(org.projectforge.ldap.LdapObject)
+   */
+  @Override
+  protected ModificationItem[] getModificationItems(final LdapGroup group)
+  {
+    final List<ModificationItem> list = new ArrayList<ModificationItem>();
+    createAndAddModificationItems(list, "description", group.getDescription());
     if (group.getMembers() != null) {
       for (final String member : group.getMembers()) {
-        LdapUtils.putAttribute(attrs, "uniqueMember", member);
+        createAndAddModificationItems(list, "uniqueMember", member);
       }
     }
-    return attrs;
+    return list.toArray(new ModificationItem[list.size()]);
   }
 
   /**

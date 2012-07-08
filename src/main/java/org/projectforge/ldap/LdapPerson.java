@@ -23,29 +23,15 @@
 
 package org.projectforge.ldap;
 
-import org.projectforge.address.AddressDO;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class LdapPerson extends LdapObject
 {
-  public static final String UID_PREFIX = "pf-address-";
+  private String uid, surname, givenName, organization, telephoneNumber, homePhoneNumber, description;
 
-  private final AddressDO address;
-
-  private String[] mail;
-
-  public LdapPerson()
-  {
-    address = new AddressDO();
-  }
-
-  public LdapPerson(final AddressDO address)
-  {
-    this.address = address;
-    updateCommonName();
-  }
+  private String[] mail, mobilePhoneNumber;
 
   private void updateCommonName()
   {
@@ -64,21 +50,19 @@ public class LdapPerson extends LdapObject
 
   /**
    * @return the sn
-   * @see AddressDO#getName()
    */
   public String getSurname()
   {
-    return address.getName();
+    return surname;
   }
 
   /**
    * @param surname the sn to set
    * @return this for chaining.
-   * @see AddressDO#setName(String)
    */
   public LdapPerson setSurname(final String surname)
   {
-    address.setName(surname);
+    this.surname = surname;
     updateCommonName();
     return this;
   }
@@ -88,7 +72,17 @@ public class LdapPerson extends LdapObject
    */
   public String getUid()
   {
-    return UID_PREFIX + String.valueOf(address.getId());
+    return this.uid;
+  }
+
+  /**
+   * @param uid the uid to set
+   * @return this for chaining.
+   */
+  public LdapPerson setUid(final String uid)
+  {
+    this.uid = uid;
+    return this;
   }
 
   /**
@@ -96,7 +90,7 @@ public class LdapPerson extends LdapObject
    */
   public String getGivenName()
   {
-    return address.getFirstName();
+    return this.givenName;
   }
 
   /**
@@ -105,7 +99,7 @@ public class LdapPerson extends LdapObject
    */
   public LdapPerson setGivenName(final String givenName)
   {
-    address.setFirstName(givenName);
+    this.givenName = givenName;
     updateCommonName();
     return this;
   }
@@ -128,38 +122,77 @@ public class LdapPerson extends LdapObject
     return this;
   }
 
-  public String getBusinessPhone()
+  public String getTelephoneNumber()
   {
-    return address.getBusinessPhone();
+    return this.telephoneNumber;
   }
 
-  public String getMobilePhone()
+  /**
+   * @param telephoneNumber the businessPhone to set
+   * @return this for chaining.
+   */
+  public LdapPerson setTelephoneNumber(final String telephoneNumber)
   {
-    return address.getMobilePhone();
+    this.telephoneNumber = telephoneNumber;
+    return this;
   }
 
-  public String getEmail()
+  public String[] getMobilePhoneNumber()
   {
-    return address.getEmail();
+    return this.mobilePhoneNumber;
+  }
+
+  /**
+   * @param mobilePhoneNumber the mobilePhone to set
+   * @return this for chaining.
+   */
+  public LdapPerson setMobilePhoneNumber(final String... mobilePhoneNumbers)
+  {
+    this.mobilePhoneNumber = mobilePhoneNumbers;
+    return this;
   }
 
   public String getOrganization()
   {
-    return address.getOrganization();
+    return this.organization;
   }
 
-  public String getPrivatePhone()
+  /**
+   * @param organization the organization to set
+   * @return this for chaining.
+   */
+  public LdapPerson setOrganization(final String organization)
   {
-    return address.getPrivatePhone();
+    this.organization = organization;
+    return this;
   }
 
-  public String getPrivateMobilePhone()
+  public String getHomePhoneNumber()
   {
-    return address.getPrivateMobilePhone();
+    return this.homePhoneNumber;
   }
 
-  public String getPrivateEmail()
+  /**
+   * @param homePhoneNumber the privatePhone to set
+   * @return this for chaining.
+   */
+  public LdapPerson setHomePhoneNumber(final String homePhoneNumber)
   {
-    return address.getPrivateEmail();
+    this.homePhoneNumber = homePhoneNumber;
+    return this;
+  }
+
+  public String getDescription() {
+    return this.description;
+  }
+
+  /**
+   * @param description the description to set
+   * @return this for chaining.
+   */
+  public LdapPerson setDescription(final String description)
+  {
+    this.description = description;
+    return this;
   }
 }

@@ -23,16 +23,20 @@
 
 package org.projectforge.ldap;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
-import javax.naming.directory.BasicAttribute;
-import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.ModificationItem;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class LdapPersonDao extends LdapDao<LdapPerson>
 {
+  private static final String[] ADDITIONAL_OBJECT_CLASSES = { "inetOrgPerson"};
+
   /**
    * @see org.projectforge.ldap.LdapDao#getObjectClass()
    */
@@ -42,31 +46,10 @@ public class LdapPersonDao extends LdapDao<LdapPerson>
     return "person";
   }
 
-  /**
-   * @see org.projectforge.ldap.LdapDao#getAttributesToBind(java.lang.Object)
-   */
   @Override
-  protected Attributes getAttributesToBind(final LdapPerson address)
+  protected String[] getAdditionalObjectClasses()
   {
-    final Attributes attrs = new BasicAttributes();
-    final BasicAttribute ocattr = new BasicAttribute("objectclass");
-    ocattr.add("top");
-    ocattr.add(getObjectClass());
-    ocattr.add("inetOrgPerson");
-    // ocattr.add("organisationalPerson");
-    attrs.put(ocattr);
-    LdapUtils.putAttribute(attrs, "sn", address.getSurname());
-    LdapUtils.putAttribute(attrs, "givenName", address.getGivenName());
-    LdapUtils.putAttribute(attrs, "uid", address.getUid());
-    LdapUtils.putAttribute(attrs, "o", address.getOrganization());
-    LdapUtils.putAttribute(attrs, "mail", address.getEmail());
-    LdapUtils.putAttribute(attrs, "mail", address.getPrivateEmail());
-    LdapUtils.putAttribute(attrs, "telephoneNumber", address.getBusinessPhone());
-    LdapUtils.putAttribute(attrs, "mobile", address.getMobilePhone());
-    LdapUtils.putAttribute(attrs, "homePhone", address.getPrivatePhone());
-    LdapUtils.putAttribute(attrs, "mobile", address.getMobilePhone());
-    LdapUtils.putAttribute(attrs, "mobile", address.getPrivateMobilePhone());
-    return attrs;
+    return ADDITIONAL_OBJECT_CLASSES;
   }
 
   /**
@@ -78,6 +61,35 @@ public class LdapPersonDao extends LdapDao<LdapPerson>
     final LdapPerson address = new LdapPerson();
     address.setSurname(LdapUtils.getAttribute(attributes, "sn"));
     address.setGivenName(LdapUtils.getAttribute(attributes, "givenName"));
+    address.setUid(LdapUtils.getAttribute(attributes, "uid"));
+    address.setOrganization(LdapUtils.getAttribute(attributes, "o"));
+    address.setMail(LdapUtils.getAttributes(attributes, "mail"));
+    address.setDescription(LdapUtils.getAttribute(attributes, "description"));
+    address.setTelephoneNumber(LdapUtils.getAttribute(attributes, "telephoneNumber"));
+    address.setMobilePhoneNumber(LdapUtils.getAttributes(attributes, "mobile"));
+    address.setHomePhoneNumber(LdapUtils.getAttribute(attributes, "homePhone"));
     return address;
+  }
+
+  /**
+   * Used for bind and update.
+   * @param person
+   * @return
+   * @see org.projectforge.ldap.LdapDao#getModificationItems(org.projectforge.ldap.LdapObject)
+   */
+  @Override
+  protected ModificationItem[] getModificationItems(final LdapPerson person)
+  {
+    final List<ModificationItem> list = new ArrayList<ModificationItem>();
+    createAndAddModificationItems(list, "sn", person.getSurname());
+    createAndAddModificationItems(list, "givenName", person.getGivenName());
+    createAndAddModificationItems(list, "uid", person.getUid());
+    createAndAddModificationItems(list, "o", person.getOrganization());
+    createAndAddModificationItems(list, "mail", person.getMail());
+    createAndAddModificationItems(list, "description", person.getDescription());
+    createAndAddModificationItems(list, "telephoneNumber", person.getTelephoneNumber());
+    createAndAddModificationItems(list, "mobile", person.getMobilePhoneNumber());
+    createAndAddModificationItems(list, "homePhone", person.getHomePhoneNumber());
+    return list.toArray(new ModificationItem[list.size()]);
   }
 }

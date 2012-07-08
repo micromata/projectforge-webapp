@@ -24,14 +24,10 @@
 package org.projectforge.ldap;
 
 import javax.naming.NamingException;
-import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
-import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
-
-import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -50,13 +46,12 @@ public class LdapUserDao extends LdapDao<LdapUser>
   }
 
   /**
-   * Uses modify instead of original update because otherwise any set password would be deleted.
-   * @see org.projectforge.ldap.LdapDao#update(java.lang.Object, java.lang.Object[])
+   * @see org.projectforge.ldap.LdapDao#getAdditionalObjectClasses()
    */
   @Override
-  public void update(final LdapUser person, final Object... objs)
+  protected String[] getAdditionalObjectClasses()
   {
-    modify(person, getModificationItems(person));
+    return new String[] { "inetOrgPerson"};
   }
 
   public void changePassword(final LdapUser person, final String userPassword)
@@ -73,32 +68,12 @@ public class LdapUserDao extends LdapDao<LdapUser>
   }
 
   /**
-   * @see org.projectforge.ldap.LdapDao#getAttributesToBind(java.lang.Object)
-   */
-  @Override
-  protected Attributes getAttributesToBind(final LdapUser person)
-  {
-    final Attributes attrs = new BasicAttributes();
-    final BasicAttribute ocattr = new BasicAttribute("objectclass");
-    ocattr.add("top");
-    ocattr.add("person");
-    ocattr.add("inetOrgPerson");
-    // ocattr.add("organisationalPerson");
-    attrs.put(ocattr);
-    final ModificationItem[] modificationItems = getModificationItems(person);
-    for (final ModificationItem modItem : modificationItems) {
-      final Attribute attr = modItem.getAttribute();
-      attrs.put(attr);
-    }
-    return attrs;
-  }
-
-  /**
    * Used for bind and update.
    * @param person
    * @return
    */
-  private ModificationItem[] getModificationItems(final LdapUser person)
+  @Override
+  protected ModificationItem[] getModificationItems(final LdapUser person)
   {
     final ModificationItem[] modificationItems = new ModificationItem[5];
     modificationItems[0] = createModificationItem("sn", person.getSurname());
@@ -107,11 +82,6 @@ public class LdapUserDao extends LdapDao<LdapUser>
     modificationItems[3] = createModificationItem("mail", person.getMail());
     modificationItems[4] = createModificationItem("description", person.getDescription());
     return modificationItems;
-  }
-
-  private ModificationItem createModificationItem(final String attrId, final String attrValue)
-  {
-    return new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute(attrId, StringUtils.defaultString(attrValue)));
   }
 
   /**

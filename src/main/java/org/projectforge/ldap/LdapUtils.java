@@ -26,6 +26,7 @@ package org.projectforge.ldap;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
@@ -102,6 +103,24 @@ public class LdapUtils
       return null;
     }
     return (String) attr.get();
+  }
+
+  public static String[] getAttributes(final Attributes attributes, final String attrId) throws NamingException
+  {
+    final Attribute attr = attributes.get(attrId);
+    if (attr == null) {
+      return null;
+    }
+    final NamingEnumeration< ? > enumeration = attr.getAll();
+    final List<String> list = new ArrayList<String>();
+    while (enumeration.hasMore() == true) {
+      final Object attrValue = enumeration.next();
+      if (attrValue == null) {
+        list.add(null);
+      }
+      list.add(String.valueOf(attrValue));
+    }
+    return list.toArray(new String[list.size()]);
   }
 
   public static Attribute putAttribute(final Attributes attributes, final String attrId, final String attrValue)

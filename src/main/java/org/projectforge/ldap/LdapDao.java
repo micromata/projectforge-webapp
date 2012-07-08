@@ -31,7 +31,10 @@ import java.util.Set;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
 import javax.naming.directory.SearchControls;
@@ -50,6 +53,8 @@ public abstract class LdapDao<T extends LdapObject>
 
   protected abstract String getObjectClass();
 
+  protected abstract String[] getAdditionalObjectClasses();
+
   public void create(final T obj, final Object... args)
   {
     new LdapTemplate(ldapConnector) {
@@ -58,7 +63,22 @@ public abstract class LdapDao<T extends LdapObject>
       {
         final String dn = buildDn(obj);
         log.info("Create " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
-        final Attributes attrs = getAttributesToBind(obj);
+        final Attributes attrs = new BasicAttributes();
+        final BasicAttribute ocattr = new BasicAttribute("objectclass");
+        ocattr.add("top");
+        ocattr.add(getObjectClass());
+        final String[] additionalObjectClasses = getAdditionalObjectClasses();
+        if (additionalObjectClasses != null) {
+          for (final String additionalObjectClass : additionalObjectClasses) {
+            ocattr.add(additionalObjectClass);
+          }
+        }
+        attrs.put(ocattr);
+        final ModificationItem[] modificationItems = getModificationItems(obj);
+        for (final ModificationItem modItem : modificationItems) {
+          final Attribute attr = modItem.getAttribute();
+          LdapUtils.putAttribute(attrs, attr.getID(), (String) attr.get());
+        }
         LdapUtils.putAttribute(attrs, "cn", obj.getCommonName());
         onBeforeBind(dn, attrs, args);
         ctx.bind(dn, null, attrs);
@@ -100,19 +120,60 @@ public abstract class LdapDao<T extends LdapObject>
 
   public void update(final T obj, final Object... objs)
   {
-    new LdapTemplate(ldapConnector) {
-      @Override
-      protected Object call() throws NameNotFoundException, Exception
-      {
-        final String dn = buildDn(obj);
-        log.info("Update " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
-        final Attributes attrs = getAttributesToBind(obj);
-        LdapUtils.putAttribute(attrs, "cn", obj.getCommonName());
-        onBeforeRebind(dn, attrs, objs);
-        ctx.rebind(dn, DirContext.ADD_ATTRIBUTE, attrs);
-        return null;
+    modify(obj, getModificationItems(obj));
+  }
+
+  protected abstract ModificationItem[] getModificationItems(final T obj);
+
+  /**
+   * Helper method.
+   * @param attrId
+   * @param attrValue
+   * @return
+   */
+  protected ModificationItem createModificationItem(final String attrId, final String attrValue)
+  {
+    return createModificationItem(DirContext.REPLACE_ATTRIBUTE, attrId, attrValue);
+  }
+
+  /**
+   * Helper method.
+   * @param {@link DirContext#REPLACE_ATTRIBUTE}, {@link DirContext#ADD_ATTRIBUTE} or {@link DirContext#REMOVE_ATTRIBUTE}.
+   * @param attrId
+   * @param attrValue
+   * @return
+   */
+  protected ModificationItem createModificationItem(final int mode, final String attrId, final String attrValue)
+  {
+    return new ModificationItem(mode, new BasicAttribute(attrId, attrValue));
+  }
+
+  /**
+   * Helper method for appending modification item(s) to a given list. At least one entry will be added if no attrValue is given.
+   * @param list
+   * @param attrId
+   * @param attrValues If null then a null-value will be assumed. If more than one string is given, multiple modification items will be
+   *          added.
+   * @return
+   */
+  protected void createAndAddModificationItems(final List<ModificationItem> list, final String attrId, final String... attrValues)
+  {
+    if (attrValues == null) {
+      list.add(createModificationItem(attrId, null));
+      return;
+    }
+    boolean added = false;
+    for (final String attrValue : attrValues) {
+      if (StringUtils.isEmpty(attrValue) == true && added == true) {
+        continue;
       }
-    }.excecute();
+      if (added == false) {
+        list.add(createModificationItem(DirContext.REPLACE_ATTRIBUTE, attrId, attrValue));
+        added = true;
+      } else {
+        list.add(createModificationItem(DirContext.ADD_ATTRIBUTE, attrId, attrValue));
+      }
+    }
   }
 
   public void modify(final T obj, final ModificationItem... modificationItems)
@@ -230,8 +291,6 @@ public abstract class LdapDao<T extends LdapObject>
     obj.setDn(buf.toString());
     return obj.getDn();
   }
-
-  protected abstract Attributes getAttributesToBind(final T obj);
 
   protected T mapToObject(final String dn, final String searchBase, final Attributes attributes) throws NamingException
   {
