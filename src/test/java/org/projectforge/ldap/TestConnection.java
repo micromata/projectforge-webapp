@@ -70,13 +70,14 @@ public class TestConnection
 
     final LdapUserDao pdao = new LdapUserDao();
     pdao.ldapConnector = ldapConnector;
-    final List<LdapUser> list = pdao.findAll();
+    final List<LdapPerson> list = pdao.findAll("pf-test", "users");
     log.info("Found " + list.size() + " person entries.");
-    final LdapUser person = new LdapUser().setUid("42").setSurname("Meier").setGivenName("Horst")
+    final LdapPerson person = new LdapPerson().setUid("42").setSurname("Meier").setGivenName("Horst")
         .setDescription("Test entry from ProjectForge dev system.").setMail("h.meier@mail.com");
-    person.setCommonName("h.meier").setOrganizationalUnit("pf-test", "users");
+    person.setOrganizationalUnit("pf-test", "users");
     pdao.createOrUpdate(person, "password");
-    person.setSurname("Changed");
+    //person.setSurname("Changed");
+    person.setMail("h.meier@micromata.de");
     pdao.update(person);
     pdao.changePassword(person, "hurzel");
     // pdao.delete(person);

@@ -23,7 +23,6 @@
 
 package org.projectforge.ldap;
 
-import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.DirContext;
@@ -32,29 +31,11 @@ import javax.naming.directory.ModificationItem;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class LdapUserDao extends LdapDao<LdapUser>
+public class LdapUserDao extends LdapPersonDao
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapUserDao.class);
 
-  /**
-   * @see org.projectforge.ldap.LdapDao#getObjectClass()
-   */
-  @Override
-  protected String getObjectClass()
-  {
-    return "person";
-  }
-
-  /**
-   * @see org.projectforge.ldap.LdapDao#getAdditionalObjectClasses()
-   */
-  @Override
-  protected String[] getAdditionalObjectClasses()
-  {
-    return new String[] { "inetOrgPerson"};
-  }
-
-  public void changePassword(final LdapUser person, final String userPassword)
+  public void changePassword(final LdapPerson person, final String userPassword)
   {
     log.info("Change password for " + getObjectClass() + ": " + buildDn(person));
     final ModificationItem[] modificationItems = new ModificationItem[1];
@@ -68,23 +49,6 @@ public class LdapUserDao extends LdapDao<LdapUser>
   }
 
   /**
-   * Used for bind and update.
-   * @param person
-   * @return
-   */
-  @Override
-  protected ModificationItem[] getModificationItems(final LdapUser person)
-  {
-    final ModificationItem[] modificationItems = new ModificationItem[5];
-    modificationItems[0] = createModificationItem("sn", person.getSurname());
-    modificationItems[1] = createModificationItem("givenName", person.getGivenName());
-    modificationItems[2] = createModificationItem("uid", person.getUid());
-    modificationItems[3] = createModificationItem("mail", person.getMail());
-    modificationItems[4] = createModificationItem("description", person.getDescription());
-    return modificationItems;
-  }
-
-  /**
    * @see org.projectforge.ldap.LdapDao#onBeforeBind(java.lang.String, javax.naming.directory.Attributes, java.lang.Object[])
    */
   @Override
@@ -93,25 +57,5 @@ public class LdapUserDao extends LdapDao<LdapUser>
     if (args != null && args.length == 1 && args[0] instanceof String) {
       attrs.put("userPassword", args[0]);
     }
-  }
-
-  /**
-   * @see org.projectforge.ldap.LdapDao#onBeforeRebind(java.lang.String, javax.naming.directory.Attributes, java.lang.Object[])
-   */
-  @Override
-  protected void onBeforeRebind(final String dn, final Attributes attrs, final Object... objs)
-  {
-  }
-
-  /**
-   * @see org.projectforge.ldap.LdapDao#mapToObject(java.lang.String, javax.naming.directory.Attributes)
-   */
-  @Override
-  protected LdapUser mapToObject(final Attributes attributes) throws NamingException
-  {
-    final LdapUser person = new LdapUser();
-    person.setSurname(LdapUtils.getAttribute(attributes, "sn"));
-    person.setDescription(LdapUtils.getAttribute(attributes, "description"));
-    return person;
   }
 }
