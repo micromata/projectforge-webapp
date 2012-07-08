@@ -88,11 +88,11 @@ public class TestConnection
         .setEmail("k.reinhard@micromata.de").setPrivateEmail("k.reinhard@me.com").setBusinessPhone("+49 561 316793-0")
         .setMobilePhone("+49 170 1891142").setPrivatePhone("+49 561 00000");
     adr.setId(2);
-    LdapPerson ldapAddress = new LdapPerson(adr);
+    LdapPerson ldapAddress = AddressDOConverter.convert(adr);
     ldapAddress.setOrganizationalUnit("pf-test", "contacts");
     adao.createOrUpdate(ldapAddress);
-    ldapAddress = adao.findByUid(LdapPerson.UID_PREFIX + "2", "pf-test", "contacts");
-    log.info("Found address with id=" + LdapPerson.UID_PREFIX + "2: " + ldapAddress);
+    ldapAddress = adao.findByUid(AddressDOConverter.UID_PREFIX + "2", "pf-test", "contacts");
+    log.info("Found address with id=" + AddressDOConverter.UID_PREFIX + "2: " + ldapAddress);
 
     odao.createIfNotExist("pf-test", "Test organizational unit for testing ProjectForge.", "groups");
     final LdapGroupDao gdao = new LdapGroupDao();
