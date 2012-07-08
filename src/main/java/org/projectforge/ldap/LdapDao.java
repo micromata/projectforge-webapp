@@ -301,7 +301,7 @@ public abstract class LdapDao<T extends LdapObject>
       obj.setDn(dn);
     }
     obj.setOrganizationalUnit(LdapUtils.getOrganizationalUnit(dn, searchBase));
-    obj.setCommonName(LdapUtils.getAttribute(attributes, "cn"));
+    obj.setCommonName(LdapUtils.getAttributeStringValue(attributes, "cn"));
     return obj;
   }
 

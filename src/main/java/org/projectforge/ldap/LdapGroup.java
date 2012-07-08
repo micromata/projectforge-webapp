@@ -31,7 +31,9 @@ import java.util.Set;
  */
 public class LdapGroup extends LdapObject
 {
-  private String description;
+  private Integer gidNumber;
+
+  private String description, organization;
 
   private final Set<String> members = new HashSet<String>();
 
@@ -53,6 +55,42 @@ public class LdapGroup extends LdapObject
   public Set<String> getMembers()
   {
     return members;
+  }
+
+  /**
+   * @return the gidNumber
+   */
+  public Integer getGidNumber()
+  {
+    return gidNumber;
+  }
+
+  /**
+   * @param gidNumber the gidNumber to set
+   * @return this for chaining.
+   */
+  public LdapGroup setGidNumber(final Integer gidNumber)
+  {
+    this.gidNumber = gidNumber;
+    return this;
+  }
+
+  /**
+   * @return the organization
+   */
+  public String getOrganization()
+  {
+    return organization;
+  }
+
+  /**
+   * @param organization the organization to set
+   * @return this for chaining.
+   */
+  public LdapGroup setOrganization(final String organization)
+  {
+    this.organization = organization;
+    return this;
   }
 
   public String getDescription()

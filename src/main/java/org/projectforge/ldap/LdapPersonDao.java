@@ -59,15 +59,15 @@ public class LdapPersonDao extends LdapDao<LdapPerson>
   protected LdapPerson mapToObject(final Attributes attributes) throws NamingException
   {
     final LdapPerson address = new LdapPerson();
-    address.setSurname(LdapUtils.getAttribute(attributes, "sn"));
-    address.setGivenName(LdapUtils.getAttribute(attributes, "givenName"));
-    address.setUid(LdapUtils.getAttribute(attributes, "uid"));
-    address.setOrganization(LdapUtils.getAttribute(attributes, "o"));
-    address.setMail(LdapUtils.getAttributes(attributes, "mail"));
-    address.setDescription(LdapUtils.getAttribute(attributes, "description"));
-    address.setTelephoneNumber(LdapUtils.getAttribute(attributes, "telephoneNumber"));
-    address.setMobilePhoneNumber(LdapUtils.getAttributes(attributes, "mobile"));
-    address.setHomePhoneNumber(LdapUtils.getAttribute(attributes, "homePhone"));
+    address.setSurname(LdapUtils.getAttributeStringValue(attributes, "sn"));
+    address.setGivenName(LdapUtils.getAttributeStringValue(attributes, "givenName"));
+    address.setUid(LdapUtils.getAttributeStringValue(attributes, "uid"));
+    address.setOrganization(LdapUtils.getAttributeStringValue(attributes, "o"));
+    address.setMail(LdapUtils.getAttributeStringValues(attributes, "mail"));
+    address.setDescription(LdapUtils.getAttributeStringValue(attributes, "description"));
+    address.setTelephoneNumber(LdapUtils.getAttributeStringValue(attributes, "telephoneNumber"));
+    address.setMobilePhoneNumber(LdapUtils.getAttributeStringValues(attributes, "mobile"));
+    address.setHomePhoneNumber(LdapUtils.getAttributeStringValue(attributes, "homePhone"));
     return address;
   }
 

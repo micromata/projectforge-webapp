@@ -96,7 +96,7 @@ public class LdapUtils
     }
   }
 
-  public static String getAttribute(final Attributes attributes, final String attrId) throws NamingException
+  public static String getAttributeStringValue(final Attributes attributes, final String attrId) throws NamingException
   {
     final Attribute attr = attributes.get(attrId);
     if (attr == null) {
@@ -105,7 +105,7 @@ public class LdapUtils
     return (String) attr.get();
   }
 
-  public static String[] getAttributes(final Attributes attributes, final String attrId) throws NamingException
+  public static String[] getAttributeStringValues(final Attributes attributes, final String attrId) throws NamingException
   {
     final Attribute attr = attributes.get(attrId);
     if (attr == null) {
@@ -121,6 +121,15 @@ public class LdapUtils
       list.add(String.valueOf(attrValue));
     }
     return list.toArray(new String[list.size()]);
+  }
+
+  public static Integer getAttributeIntegerValue(final Attributes attributes, final String attrId) throws NamingException
+  {
+    final Attribute attr = attributes.get(attrId);
+    if (attr == null) {
+      return null;
+    }
+    return (Integer) attr.get();
   }
 
   public static Attribute putAttribute(final Attributes attributes, final String attrId, final String attrValue)

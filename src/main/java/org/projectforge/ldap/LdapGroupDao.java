@@ -35,7 +35,7 @@ import javax.naming.directory.ModificationItem;
  */
 public class LdapGroupDao extends LdapDao<LdapGroup>
 {
-  private static final String[] ADDITIONAL_OBJECT_CLASSES = { "groupOfUniqueNames"};
+  private static final String[] ADDITIONAL_OBJECT_CLASSES = { "posixGroup"};// null;//{ "groupOfNames"};
 
   /**
    * @see org.projectforge.ldap.LdapDao#getObjectClass()
@@ -65,6 +65,8 @@ public class LdapGroupDao extends LdapDao<LdapGroup>
   protected ModificationItem[] getModificationItems(final LdapGroup group)
   {
     final List<ModificationItem> list = new ArrayList<ModificationItem>();
+    createAndAddModificationItems(list, "gidNumber", group.getGidNumber().toString());
+    createAndAddModificationItems(list, "o", group.getOrganization());
     createAndAddModificationItems(list, "description", group.getDescription());
     if (group.getMembers() != null) {
       for (final String member : group.getMembers()) {
@@ -81,7 +83,8 @@ public class LdapGroupDao extends LdapDao<LdapGroup>
   protected LdapGroup mapToObject(final Attributes attributes) throws NamingException
   {
     final LdapGroup group = new LdapGroup();
-    group.setDescription(LdapUtils.getAttribute(attributes, "description"));
+    group.setDescription(LdapUtils.getAttributeStringValue(attributes, "description"));
+    group.setOrganization(LdapUtils.getAttributeStringValue(attributes, "o"));
     return group;
   }
 }

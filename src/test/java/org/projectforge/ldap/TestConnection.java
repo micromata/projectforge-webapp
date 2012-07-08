@@ -101,7 +101,7 @@ public class TestConnection
     odao.createIfNotExist("pf-test", "Test organizational unit for testing ProjectForge.", "groups");
     final LdapGroupDao gdao = new LdapGroupDao();
     gdao.ldapConnector = ldapConnector;
-    final LdapGroup group = new LdapGroup().setDescription("Test by ProjectForge");
+    final LdapGroup group = new LdapGroup().setGidNumber(42).setDescription("Test by ProjectForge").setOrganization("www.projectforge.org");
     group.setCommonName("ProjectForge-test").setOrganizationalUnit("pf-test", "groups");
     group.addMember(contact);
     group.addMember(user);
