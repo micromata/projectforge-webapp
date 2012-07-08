@@ -494,11 +494,13 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   /**
    * @param email The email to set.
+   * @return this for chaining.
    */
-  public void setEmail(final String email)
+  public PFUserDO setEmail(final String email)
   {
     Validate.isTrue(email == null || email.length() <= 255, email);
     this.email = email;
+    return this;
   }
 
   /**
@@ -606,11 +608,13 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   /**
    * @param description The description to set.
+   * @return this for chaining.
    */
-  public void setDescription(final String description)
+  public PFUserDO setDescription(final String description)
   {
     Validate.isTrue(description == null || description.length() <= 255, description);
     this.description = description;
+    return this;
   }
 
   /**
