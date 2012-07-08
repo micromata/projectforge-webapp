@@ -53,22 +53,31 @@ public class LdapPersonDao extends LdapDao<LdapPerson>
   }
 
   /**
+   * @see org.projectforge.ldap.LdapDao#getIdAttrId()
+   */
+  @Override
+  public String getIdAttrId()
+  {
+    return "uid";
+  }
+
+  /**
    * @see org.projectforge.ldap.LdapDao#mapToObject(java.lang.String, javax.naming.directory.Attributes)
    */
   @Override
   protected LdapPerson mapToObject(final Attributes attributes) throws NamingException
   {
-    final LdapPerson address = new LdapPerson();
-    address.setSurname(LdapUtils.getAttributeStringValue(attributes, "sn"));
-    address.setGivenName(LdapUtils.getAttributeStringValue(attributes, "givenName"));
-    address.setUid(LdapUtils.getAttributeStringValue(attributes, "uid"));
-    address.setOrganization(LdapUtils.getAttributeStringValue(attributes, "o"));
-    address.setMail(LdapUtils.getAttributeStringValues(attributes, "mail"));
-    address.setDescription(LdapUtils.getAttributeStringValue(attributes, "description"));
-    address.setTelephoneNumber(LdapUtils.getAttributeStringValue(attributes, "telephoneNumber"));
-    address.setMobilePhoneNumber(LdapUtils.getAttributeStringValues(attributes, "mobile"));
-    address.setHomePhoneNumber(LdapUtils.getAttributeStringValue(attributes, "homePhone"));
-    return address;
+    final LdapPerson person = new LdapPerson();
+    person.setSurname(LdapUtils.getAttributeStringValue(attributes, "sn"));
+    person.setGivenName(LdapUtils.getAttributeStringValue(attributes, "givenName"));
+    person.setUid(LdapUtils.getAttributeStringValue(attributes, "uid"));
+    person.setOrganization(LdapUtils.getAttributeStringValue(attributes, "o"));
+    person.setMail(LdapUtils.getAttributeStringValues(attributes, "mail"));
+    person.setDescription(LdapUtils.getAttributeStringValue(attributes, "description"));
+    person.setTelephoneNumber(LdapUtils.getAttributeStringValue(attributes, "telephoneNumber"));
+    person.setMobilePhoneNumber(LdapUtils.getAttributeStringValues(attributes, "mobile"));
+    person.setHomePhoneNumber(LdapUtils.getAttributeStringValue(attributes, "homePhone"));
+    return person;
   }
 
   /**

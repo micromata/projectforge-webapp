@@ -23,15 +23,23 @@
 
 package org.projectforge.ldap;
 
-
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class LdapPerson extends LdapObject
+public class LdapPerson extends LdapObject<String>
 {
   private String uid, surname, givenName, organization, telephoneNumber, homePhoneNumber, description;
 
   private String[] mail, mobilePhoneNumber;
+
+  /**
+   * @see org.projectforge.ldap.LdapObject#getId()
+   */
+  @Override
+  public String getId()
+  {
+    return uid;
+  }
 
   private void updateCommonName()
   {
@@ -182,7 +190,8 @@ public class LdapPerson extends LdapObject
     return this;
   }
 
-  public String getDescription() {
+  public String getDescription()
+  {
     return this.description;
   }
 

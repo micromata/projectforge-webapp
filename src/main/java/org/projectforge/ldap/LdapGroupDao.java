@@ -56,6 +56,15 @@ public class LdapGroupDao extends LdapDao<LdapGroup>
   }
 
   /**
+   * @see org.projectforge.ldap.LdapDao#getIdAttrId()
+   */
+  @Override
+  public String getIdAttrId()
+  {
+    return "gidNumber";
+  }
+
+  /**
    * Used for bind and update.
    * @param person
    * @return

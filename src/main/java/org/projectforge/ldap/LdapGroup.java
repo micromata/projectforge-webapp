@@ -29,7 +29,7 @@ import java.util.Set;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class LdapGroup extends LdapObject
+public class LdapGroup extends LdapObject<Integer>
 {
   private Integer gidNumber;
 
@@ -37,13 +37,22 @@ public class LdapGroup extends LdapObject
 
   private final Set<String> members = new HashSet<String>();
 
+  /**
+   * @see org.projectforge.ldap.LdapObject#getId()
+   */
+  @Override
+  public Integer getId()
+  {
+    return this.gidNumber;
+  }
+
   public LdapGroup addMember(final String dn)
   {
     members.add(dn);
     return this;
   }
 
-  public LdapGroup addMember(final LdapObject member)
+  public LdapGroup addMember(final LdapObject<?> member)
   {
     members.add(member.getDn());
     return this;

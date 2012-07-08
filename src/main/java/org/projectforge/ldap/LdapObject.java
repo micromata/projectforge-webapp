@@ -23,6 +23,8 @@
 
 package org.projectforge.ldap;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -31,11 +33,13 @@ import org.apache.commons.lang.builder.ToStringStyle;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public abstract class LdapObject
+public abstract class LdapObject<I extends Serializable>
 {
   private String dn, commonName;
 
   private String[] organizationalUnit;
+
+  public abstract I getId();
 
   /**
    * @return the cn
@@ -50,7 +54,7 @@ public abstract class LdapObject
    * @param commonName the cn to set
    * @return this for chaining.
    */
-  public LdapObject setCommonName(final String commonName)
+  public LdapObject<I> setCommonName(final String commonName)
   {
     this.commonName = commonName;
     return this;

@@ -79,7 +79,7 @@ public class TestConnection
     final LdapPerson user = PFUserDOConverter.convert(pfUser);
     user.setOrganizationalUnit("pf-test", "users");
     pdao.createOrUpdate(user, "password");
-    // person.setSurname("Changed");
+    user.setSurname("Changed");
     user.setMail("h.meier@micromata.de");
     pdao.update(user);
     pdao.changePassword(user, "hurzel");
@@ -95,7 +95,7 @@ public class TestConnection
     LdapPerson contact = AddressDOConverter.convert(pfAddress);
     contact.setOrganizationalUnit("pf-test", "contacts");
     adao.createOrUpdate(contact);
-    contact = adao.findByUid(AddressDOConverter.UID_PREFIX + "2", "pf-test", "contacts");
+    contact = adao.findById(AddressDOConverter.UID_PREFIX + "2", "pf-test", "contacts");
     log.info("Found address with id=" + AddressDOConverter.UID_PREFIX + "2: " + contact);
 
     odao.createIfNotExist("pf-test", "Test organizational unit for testing ProjectForge.", "groups");

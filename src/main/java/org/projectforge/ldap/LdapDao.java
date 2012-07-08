@@ -45,7 +45,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public abstract class LdapDao<T extends LdapObject>
+public abstract class LdapDao<T extends LdapObject<?>>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapDao.class);
 
@@ -54,6 +54,8 @@ public abstract class LdapDao<T extends LdapObject>
   protected abstract String getObjectClass();
 
   protected abstract String[] getAdditionalObjectClasses();
+
+  public abstract String getIdAttrId();
 
   public void create(final T obj, final Object... args)
   {
@@ -176,15 +178,25 @@ public abstract class LdapDao<T extends LdapObject>
     }
   }
 
-  public void modify(final T obj, final ModificationItem... modificationItems)
+  public void modify(final T obj, final ModificationItem[] modificationItems)
   {
     new LdapTemplate(ldapConnector) {
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
-        final String dn = buildDn(obj);
+        final Object id = obj.getId();
+        // The dn is may-be changed, so find the original dn by id:
+        final T origObject = findById(id, obj.getOrganizationalUnit());
+        if (origObject == null) {
+          throw new RuntimeException("Object with id " + id + " not found in search base '" + obj.getOrganizationalUnit() + "'. Can't modify the object: " + obj);
+        }
+        final String dn = origObject.getDn();
         log.info("Modify attributes of " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
         ctx.modifyAttributes(dn, modificationItems);
+        if (StringUtils.equals(dn, obj.getDn()) == false) {
+          log.info("DN of object is changed from '" + dn + "' to '" + obj.getDn());
+          ctx.rename(dn, obj.getDn());
+        }
         return null;
       }
     }.excecute();
@@ -239,7 +251,7 @@ public abstract class LdapDao<T extends LdapObject>
   }
 
   @SuppressWarnings("unchecked")
-  public T findByUid(final String uid, final String... organizationalUnits)
+  public T findById(final Object id, final String... organizationalUnits)
   {
     return (T) new LdapTemplate(ldapConnector) {
       @Override
@@ -249,7 +261,7 @@ public abstract class LdapDao<T extends LdapObject>
         final SearchControls controls = new SearchControls();
         controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
         final String searchBase = LdapUtils.getOu(organizationalUnits);
-        results = ctx.search(searchBase, "(&(objectClass=" + getObjectClass() + ")(uid=" + uid + "))", controls);
+        results = ctx.search(searchBase, "(&(objectClass=" + getObjectClass() + ")(" + getIdAttrId() + "=" + id + "))", controls);
         if (results.hasMore() == false) {
           return null;
         }
@@ -257,7 +269,7 @@ public abstract class LdapDao<T extends LdapObject>
         final String dn = searchResult.getName();
         final Attributes attributes = searchResult.getAttributes();
         if (results.hasMore() == true) {
-          log.error("Oups, found entries with multiple uids: " + getObjectClass() + "." + uid);
+          log.error("Oups, found entries with multiple id's: " + getObjectClass() + "." + id);
         }
         return mapToObject(dn, searchBase, attributes);
       }
