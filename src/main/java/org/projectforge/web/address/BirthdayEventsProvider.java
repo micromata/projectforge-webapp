@@ -128,7 +128,7 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
       event.setTitle(buf.toString());
       if (birthdayAddress.isFavorite() == true) {
         event.setTextColor("#227722");
-        event.setBackgroundColor("#BBEEBB");
+        event.setBackgroundColor("#007918");
       }
       events.put(id, event);
     }
