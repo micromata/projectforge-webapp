@@ -51,34 +51,7 @@ public abstract class LdapTemplate
   public Object excecute()
   {
     ctx = ldapConnector.createContext();
-    results = null;
-    try {
-      return call();
-    } catch (final NameNotFoundException e) {
-      // The base context was not found.
-      // Just clean up and exit.
-      log.error(e.getMessage(), e);
-      return null;
-    } catch (final Exception e) {
-      throw new RuntimeException(e);
-    } finally {
-      if (results != null) {
-        try {
-          results.close();
-        } catch (final Exception e) {
-          log.error(e.getMessage(), e);
-          // Never mind this.
-        }
-      }
-      if (ctx != null) {
-        try {
-          ctx.close();
-        } catch (final Exception e) {
-          log.error(e.getMessage(), e);
-          // Never mind this.
-        }
-      }
-    }
+    return internalExcecute();
   }
 
   public Object excecute(final String username, final String password)
@@ -89,6 +62,10 @@ public abstract class LdapTemplate
       log.error("While trying to connect LDAP initally: " + ex.getMessage(), ex);
       throw new RuntimeException(ex);
     }
+    return internalExcecute();
+  }
+
+  private Object internalExcecute() {
     results = null;
     try {
       return call();
