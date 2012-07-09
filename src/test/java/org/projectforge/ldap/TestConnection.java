@@ -69,20 +69,26 @@ public class TestConnection
     odao.ldapConnector = ldapConnector;
     odao.createIfNotExist("pf-test", "Test organizational unit for testing ProjectForge.", "users");
 
-    final LdapUserDao pdao = new LdapUserDao();
-    pdao.ldapConnector = ldapConnector;
-    final List<LdapPerson> list = pdao.findAll("pf-test", "users");
+    final LdapUserDao udao = new LdapUserDao();
+    udao.ldapConnector = ldapConnector;
+    final List<LdapPerson> list = udao.findAll("pf-test", "users");
     log.info("Found " + list.size() + " person entries.");
     final PFUserDO pfUser = new PFUserDO().setLastname("Meier").setFirstname("Horst")
         .setDescription("Test entry from ProjectForge dev system.").setEmail("h.meier@mail.com");
     pfUser.setId(42);
     final LdapPerson user = PFUserDOConverter.convert(pfUser);
     user.setOrganizationalUnit("pf-test", "users");
-    pdao.createOrUpdate(user, "password");
+    udao.createOrUpdate(user);
+    udao.changePassword(user, null, "test");
+    udao.authenticate("pf-42", "test", "pf-test", "users");
+    udao.changePassword(user, null, "hurzel");
+    udao.authenticate("pf-42", "test", "pf-test", "users");
+    udao.authenticate("pf-42", "hurzel", "pf-test", "users");
     user.setSurname("Changed");
     user.setMail("h.meier@micromata.de");
-    pdao.update(user);
-    pdao.changePassword(user, "hurzel");
+    udao.update(user);
+    user.setSurname("Meier");
+    udao.update(user);
     // pdao.delete(person);
 
     odao.createIfNotExist("pf-test", "Test organizational unit for testing ProjectForge.", "contacts");

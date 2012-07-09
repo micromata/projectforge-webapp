@@ -25,6 +25,7 @@ package org.projectforge.ldap;
 
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchResult;
 
@@ -50,6 +51,44 @@ public abstract class LdapTemplate
   public Object excecute()
   {
     ctx = ldapConnector.createContext();
+    results = null;
+    try {
+      return call();
+    } catch (final NameNotFoundException e) {
+      // The base context was not found.
+      // Just clean up and exit.
+      log.error(e.getMessage(), e);
+      return null;
+    } catch (final Exception e) {
+      throw new RuntimeException(e);
+    } finally {
+      if (results != null) {
+        try {
+          results.close();
+        } catch (final Exception e) {
+          log.error(e.getMessage(), e);
+          // Never mind this.
+        }
+      }
+      if (ctx != null) {
+        try {
+          ctx.close();
+        } catch (final Exception e) {
+          log.error(e.getMessage(), e);
+          // Never mind this.
+        }
+      }
+    }
+  }
+
+  public Object excecute(final String username, final String password)
+  {
+    try {
+      ctx = ldapConnector.createContext(username, password);
+    } catch (final NamingException ex) {
+      log.error("While trying to connect LDAP initally: " + ex.getMessage(), ex);
+      throw new RuntimeException(ex);
+    }
     results = null;
     try {
       return call();

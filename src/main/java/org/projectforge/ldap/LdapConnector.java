@@ -51,7 +51,7 @@ public class LdapConnector implements ConfigurationListener
     ConfigXml.getInstance().register(this);
   }
 
-  public DirContext createContext()
+  private Hashtable<String, String> createEnv(final String user, final String password)
   {
     // Set up the environment for creating the initial context
     final Hashtable<String, String> env = new Hashtable<String, String>();
@@ -60,9 +60,9 @@ public class LdapConnector implements ConfigurationListener
     final String authentication = ldapConfig.getAuthentication();
     if (StringUtils.isNotBlank(authentication) == true) {
       env.put(Context.SECURITY_AUTHENTICATION, ldapConfig.getAuthentication());
-      if ("none".equals(authentication) == false) {
-        env.put(Context.SECURITY_PRINCIPAL, ldapConfig.getAdminUser());
-        env.put(Context.SECURITY_CREDENTIALS, ldapConfig.getAdminPassword());
+      if ("none".equals(authentication) == false || user != null || password != null) {
+        env.put(Context.SECURITY_PRINCIPAL, user);
+        env.put(Context.SECURITY_CREDENTIALS, password);
       }
     }
     log.info("Trying to connect the LDAP server: url=["
@@ -70,9 +70,25 @@ public class LdapConnector implements ConfigurationListener
         + "], authentication=["
         + ldapConfig.getAuthentication()
         + "], principal=["
-        + ldapConfig.getAdminUser()
+        + user
         + "]");
-    // Create the initial context
+    return env;
+  }
+
+  public String getBase()
+  {
+    return ldapConfig.getBase();
+  }
+
+  public DirContext createContext()
+  {
+    final Hashtable<String, String> env;
+    final String authentication = ldapConfig.getAuthentication();
+    if ("none".equals(authentication) == false) {
+      env = createEnv(ldapConfig.getAdminUser(), ldapConfig.getAdminPassword());
+    } else {
+      env = createEnv(null, null);
+    }
     try {
       final DirContext ctx = new InitialDirContext(env);
       return ctx;
@@ -80,6 +96,13 @@ public class LdapConnector implements ConfigurationListener
       log.error("While trying to connect LDAP initally: " + ex.getMessage(), ex);
       throw new RuntimeException(ex);
     }
+  }
+
+  public DirContext createContext(final String username, final String password) throws NamingException
+  {
+    final Hashtable<String, String> env = createEnv(username, password);
+    final DirContext ctx = new InitialDirContext(env);
+    return ctx;
   }
 
   /**
