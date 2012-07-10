@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.Validate;
+import org.apache.log4j.Logger;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.AbstractCache;
 import org.projectforge.task.TaskNode;
@@ -43,7 +44,7 @@ public class SkillTree extends AbstractCache implements Serializable
 {
   private static final long serialVersionUID = 8331566269626909676L;
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SkillTree.class);
+  private static final Logger log = Logger.getLogger(SkillTree.class);
 
   private static final List<SkillNode> EMPTY_LIST = new ArrayList<SkillNode>();
 
@@ -131,6 +132,20 @@ public class SkillTree extends AbstractCache implements Serializable
     }
     checkRefresh();
     return skillMap.get(id);
+  }
+
+  //TODO proofread this function
+  public SkillDO getSkill(final String title) {
+    if(title == null) {
+      return null;
+    }
+    checkRefresh();
+    for(final SkillNode skill : skillMap.values()) {
+      if(title.equals(skill.getSkill().getTitle())) {
+        return skill.getSkill();
+      }
+    }
+    return null;
   }
 
   public SkillDO getSkillById(final Integer id)
