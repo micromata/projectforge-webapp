@@ -10,13 +10,16 @@
 package org.projectforge.plugins.skillmatrix;
 
 import java.util.List;
+import java.util.Locale;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.web.wicket.AbstractEditForm;
+import org.projectforge.web.wicket.autocompletion.PFAutoCompleteTextField;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
@@ -31,10 +34,13 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
 {
   private static final long serialVersionUID = 7795854215943696332L;
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SkillEditForm.class);
+  private static final Logger log = Logger.getLogger(SkillEditForm.class);
 
   @SpringBean(name = "skillDao")
-  SkillDao skillDao;
+  private SkillDao skillDao;
+
+  @SpringBean(name = "skillTree")
+  private SkillTree skillTree;
 
   /**
    * @param parentPage
@@ -46,6 +52,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
   }
 
   @Override
+  @SuppressWarnings("serial")
   public void init()
   {
     super.init();
@@ -57,16 +64,76 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       fs.add(new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "title")));
     }
     {
-      // TODO Should only show title of the DO, title -> DO Map? title -> primary/unique key?
-      // Parent
+      // Parent, look at UserSelectPanel for fine tuning
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skill.parent"));
-      final List<SkillDO> list = skillDao.getList(new BaseSearchFilter());
-      //      final LabelValueChoiceRenderer<SkillDO> ratingChoiceRenderer = new LabelValueChoiceRenderer<SkillDO>(list);
-      final DropDownChoice<SkillDO> dropDownChoice = new DropDownChoice<SkillDO>(fs.getDropDownChoiceId(), new PropertyModel<SkillDO>(data,
-          "parent"), list);
-      dropDownChoice.setNullValid(true);
-      fs.add(dropDownChoice);
+      final PFAutoCompleteTextField<SkillDO> autoCompleteTextField = new PFAutoCompleteTextField<SkillDO>(fs.getTextFieldId(),
+          new PropertyModel<SkillDO>(data, "parent")) {
+        @Override
+        protected List<SkillDO> getChoices(final String input)
+        {
+          final BaseSearchFilter filter = new BaseSearchFilter();
+          // Add more searchfields? -> e.g. parent.title
+          filter.setSearchFields("title");
+          filter.setSearchString(input);
+          final List<SkillDO> list = skillDao.getList(filter);
+          return list;
+        }
+
+        @Override
+        protected String formatLabel(final SkillDO skill)
+        {
+          if (skill == null) {
+            return "";
+          }
+          return skill.getTitle();
+        }
+
+        @Override
+        protected String formatValue(final SkillDO skill)
+        {
+          if (skill == null) {
+            return "";
+          }
+          return skill.getTitle();
+        }
+
+        @SuppressWarnings({ "unchecked", "rawtypes"})
+        @Override
+        public <C> IConverter<C> getConverter(final Class<C> type)
+        {
+          return new IConverter() {
+            @Override
+            public Object convertToObject(final String value, final Locale locale)
+            {
+              if (StringUtils.isEmpty(value) == true) {
+                getModel().setObject(null);
+                return null;
+              }
+              final SkillDO skill = skillTree.getSkill(value);
+              if (skill == null) {
+                error(getString("plugins.skillmatrix.error.skillNotFound"));
+              }
+              getModel().setObject(skill);
+              return skill;
+            }
+
+            @Override
+            public String convertToString(final Object value, final Locale locale)
+            {
+              if (value == null) {
+                return "";
+              }
+              final SkillDO skill = (SkillDO) value;
+              return skill.getTitle();
+            }
+          };
+        }
+
+      };
+      autoCompleteTextField.withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400);
+      fs.add(autoCompleteTextField);
     }
+
     {
       // Descritption
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skill.description"));
@@ -84,7 +151,6 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
       checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(data, "rateable"),
           getString("plugins.skillmatrix.skill.rateable")));
     }
-
   }
 
   /**
