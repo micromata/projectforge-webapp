@@ -36,174 +36,174 @@ import org.apache.wicket.util.template.TextTemplate;
 
 public class FullCalendar extends AbstractFullCalendar
 {
-	private static final TextTemplate EVENTS = new PackageTextTemplate(FullCalendar.class, "FullCalendar.events.tpl");
+  private static final TextTemplate EVENTS = new PackageTextTemplate(FullCalendar.class, "FullCalendar.events.tpl");
 
-	private final Config config;
-	private EventDroppedCallback eventDropped;
-	private EventResizedCallback eventResized;
-	private GetEventsCallback getEvents;
-	private DateRangeSelectedCallback dateRangeSelected;
-	private EventClickedCallback eventClicked;
-	private ViewDisplayCallback viewDisplay;
+  private final Config config;
+  private EventDroppedCallback eventDropped;
+  private EventResizedCallback eventResized;
+  private GetEventsCallback getEvents;
+  private DateRangeSelectedCallback dateRangeSelected;
+  private EventClickedCallback eventClicked;
+  private ViewDisplayCallback viewDisplay;
 
-	public FullCalendar(String id, Config config)
-	{
-		super(id);
-		this.config = config;
-		setVersioned(false);
-	}
+  public FullCalendar(final String id, final Config config)
+  {
+    super(id);
+    this.config = config;
+    setVersioned(false);
+  }
 
-	public Config getConfig()
-	{
-		return config;
-	}
+  public Config getConfig()
+  {
+    return config;
+  }
 
-	public EventManager getEventManager()
-	{
-		return new EventManager(this);
-	}
+  public EventManager getEventManager()
+  {
+    return new EventManager(this);
+  }
 
-	@Override
-	protected void onInitialize()
-	{
-		super.onInitialize();
-		for (EventSource source : config.getEventSources())
-		{
-			String uuid = UUID.randomUUID().toString().replaceAll("[^A-Za-z0-9]", "");
-			source.setUuid(uuid);
-		}
-		setupCallbacks();
-	}
+  @Override
+  protected void onInitialize()
+  {
+    super.onInitialize();
+    for (final EventSource source : config.getEventSources())
+    {
+      final String uuid = UUID.randomUUID().toString().replaceAll("[^A-Za-z0-9]", "");
+      source.setUuid(uuid);
+    }
+    setupCallbacks();
+  }
 
-	private void setupCallbacks()
-	{
-		if (getEvents != null)
-			return;
+  private void setupCallbacks()
+  {
+    if (getEvents != null)
+      return;
 
-		getEvents = new GetEventsCallback();
-		add(getEvents);
-		for (final EventSource source : config.getEventSources())
-		{
-			source.setEventsModel(new AbstractReadOnlyModel<String>() {
-				@Override
-				public String getObject() {
-					return EVENTS.asString(new MicroMap("url", getEvents.getUrl(source)));
-				}
-			});
-		}
+    getEvents = new GetEventsCallback();
+    add(getEvents);
+    for (final EventSource source : config.getEventSources())
+    {
+      source.setEventsModel(new AbstractReadOnlyModel<String>() {
+        @Override
+        public String getObject() {
+          return EVENTS.asString(new MicroMap("url", getEvents.getUrl(source)));
+        }
+      });
+    }
 
-		if (Strings.isEmpty(config.getEventClick()))
-		{
-			add(eventClicked = new EventClickedCallback()
-			{
-				@Override
-				protected void onClicked(ClickedEvent event, CalendarResponse response)
-				{
-					onEventClicked(event, response);
-				}
-			});
-			config.setEventClickModel(eventClicked.getHandlerScript());
-		}
+    if (Strings.isEmpty(config.getEventClick()))
+    {
+      add(eventClicked = new EventClickedCallback()
+      {
+        @Override
+        protected void onClicked(final ClickedEvent event, final CalendarResponse response)
+        {
+          onEventClicked(event, response);
+        }
+      });
+      config.setEventClickModel(eventClicked.getHandlerScript());
+    }
 
-		if (Strings.isEmpty(config.getSelect()))
-		{
-			add(dateRangeSelected = new DateRangeSelectedCallback(config.isIgnoreTimezone())
-			{
-				@Override
-				protected void onSelect(SelectedRange range, CalendarResponse response)
-				{
-					FullCalendar.this.onDateRangeSelected(range, response);
-				}
-			});
-			config.setSelectModel(dateRangeSelected.getHandlerScript());
-		}
+    if (Strings.isEmpty(config.getSelect()))
+    {
+      add(dateRangeSelected = new DateRangeSelectedCallback(config.isIgnoreTimezone())
+      {
+        @Override
+        protected void onSelect(final SelectedRange range, final CalendarResponse response)
+        {
+          FullCalendar.this.onDateRangeSelected(range, response);
+        }
+      });
+      config.setSelectModel(dateRangeSelected.getHandlerScript());
+    }
 
-		if (Strings.isEmpty(config.getEventDrop()))
-		{
-			add(eventDropped = new EventDroppedCallback()
-			{
+    if (Strings.isEmpty(config.getEventDrop()))
+    {
+      add(eventDropped = new EventDroppedCallback()
+      {
 
-				@Override
-				protected boolean onEventDropped(DroppedEvent event, CalendarResponse response)
-				{
-					return FullCalendar.this.onEventDropped(event, response);
-				}
-			});
-			config.setEventDropModel(eventDropped.getHandlerScript());
-		}
+        @Override
+        protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response)
+        {
+          return FullCalendar.this.onEventDropped(event, response);
+        }
+      });
+      config.setEventDropModel(eventDropped.getHandlerScript());
+    }
 
-		if (Strings.isEmpty(config.getEventResize()))
-		{
-			add(eventResized = new EventResizedCallback()
-			{
+    if (Strings.isEmpty(config.getEventResize()))
+    {
+      add(eventResized = new EventResizedCallback()
+      {
 
-				@Override
-				protected boolean onEventResized(ResizedEvent event, CalendarResponse response)
-				{
-					return FullCalendar.this.onEventResized(event, response);
-				}
+        @Override
+        protected boolean onEventResized(final ResizedEvent event, final CalendarResponse response)
+        {
+          return FullCalendar.this.onEventResized(event, response);
+        }
 
-			});
+      });
 
-			config.setEventResizeModel(eventResized.getHandlerScript());
-		}
+      config.setEventResizeModel(eventResized.getHandlerScript());
+    }
 
-		if (Strings.isEmpty(config.getViewDisplay()))
-		{
-			add(viewDisplay = new ViewDisplayCallback()
-			{
-				@Override
-				protected void onViewDisplayed(View view, CalendarResponse response)
-				{
-					FullCalendar.this.onViewDisplayed(view, response);
-				}
-			});
-			config.setViewDisplayModel(viewDisplay.getHandlerScript());
-		}
+    if (Strings.isEmpty(config.getViewDisplay()))
+    {
+      add(viewDisplay = new ViewDisplayCallback()
+      {
+        @Override
+        protected void onViewDisplayed(final View view, final CalendarResponse response)
+        {
+          FullCalendar.this.onViewDisplayed(view, response);
+        }
+      });
+      config.setViewDisplayModel(viewDisplay.getHandlerScript());
+    }
 
-		getPage().dirty();
-	}
+    getPage().dirty();
+  }
 
 
-	@Override
-	public void renderHead(IHeaderResponse response)
-	{
-		super.renderHead(response);
+  @Override
+  public void renderHead(final IHeaderResponse response)
+  {
+    super.renderHead(response);
 
-		String configuration = "$(\"#" + getMarkupId() + "\").fullCalendarExt(";
-		configuration += Json.toJson(config);
-		configuration += ");";
+    String configuration = "$(\"#" + getMarkupId() + "\").fullCalendarExt(";
+    configuration += Json.toJson(config);
+    configuration += ");";
 
-		response.renderOnDomReadyJavaScript(configuration);
-	}
+    response.renderOnDomReadyJavaScript(configuration);
+  }
 
-	protected boolean onEventDropped(DroppedEvent event, CalendarResponse response)
-	{
-		return false;
-	}
+  protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response)
+  {
+    return false;
+  }
 
-	protected boolean onEventResized(ResizedEvent event, CalendarResponse response)
-	{
-		return false;
-	}
+  protected boolean onEventResized(final ResizedEvent event, final CalendarResponse response)
+  {
+    return false;
+  }
 
-	protected void onDateRangeSelected(SelectedRange range, CalendarResponse response)
-	{
+  protected void onDateRangeSelected(final SelectedRange range, final CalendarResponse response)
+  {
 
-	}
+  }
 
-	protected void onEventClicked(ClickedEvent event, CalendarResponse response)
-	{
+  protected void onEventClicked(final ClickedEvent event, final CalendarResponse response)
+  {
 
-	}
+  }
 
-	protected void onViewDisplayed(View view, CalendarResponse response)
-	{
+  protected void onViewDisplayed(final View view, final CalendarResponse response)
+  {
 
-	}
+  }
 
-	public AjaxConcurrency getAjaxConcurrency()
-	{
-		return AjaxConcurrency.QUEUE;
-	}
+  public AjaxConcurrency getAjaxConcurrency()
+  {
+    return AjaxConcurrency.QUEUE;
+  }
 }
