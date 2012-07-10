@@ -38,7 +38,6 @@ import org.projectforge.web.wicket.ListSelectActionPanel;
 @ListPage(editPage = SkillEditPage.class)
 public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, SkillDO> implements IListPageColumnsCreator<SkillDO>
 {
-
   private static final long serialVersionUID = 3262800972072452074L;
 
   @SpringBean(name = "skillDao")
@@ -93,10 +92,9 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
     // Title
     columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString("plugins.skillmatrix.skill.title")), getSortable(
         "title", sortable), "title", cellItemListener));
-    // TODO Should only show title of the DO, title -> DO Map? title -> primary/unique key?
-    // Parent
+    // Parent -> Title
     columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString("plugins.skillmatrix.skill.parent")), getSortable(
-        "parent", sortable), "parent", cellItemListener));
+        "parent.title", sortable), "parent.title", cellItemListener));
     // Description
     columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString("plugins.skillmatrix.skill.description")),
         getSortable("description", sortable), "description", cellItemListener));
