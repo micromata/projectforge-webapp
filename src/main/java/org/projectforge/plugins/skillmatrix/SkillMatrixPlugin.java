@@ -34,9 +34,8 @@ import org.projectforge.web.MenuItemDefId;
  */
 public class SkillMatrixPlugin extends AbstractPlugin
 {
-  public static final String ID = "skillMatrix";
-  // TODO Field ID2 needs a better name
-  public static final String ID2 = "skill";
+  public static final String ID_SKILL_RATING = "skillRating";
+  public static final String ID_SKILL = "skill";
 
   public static final String RESOURCE_BUNDLE_NAME = SkillMatrixPlugin.class.getPackage().getName() + ".SkillMatrixI18nResources";
 
@@ -65,20 +64,20 @@ public class SkillMatrixPlugin extends AbstractPlugin
   {
     // DatabaseUpdateDao is needed by the updater:
     SkillMatrixPluginUpdates.dao = databaseUpdateDao;
-    register(ID, SkillRatingDao.class, skillRatingDao, "plugins.skillmatrix");
-    register(ID2, SkillDao.class, skillDao, "plugins.skillmatrix");
+    register(ID_SKILL_RATING, SkillRatingDao.class, skillRatingDao, "plugins.skillmatrix");
+    register(ID_SKILL, SkillDao.class, skillDao, "plugins.skillmatrix");
 
     // Register the web part:
-    registerWeb(ID, SkillRatingListPage.class, SkillRatingEditPage.class);
-    registerWeb(ID2, SkillListPage.class, SkillEditPage.class);
+    registerWeb(ID_SKILL_RATING, SkillRatingListPage.class, SkillRatingEditPage.class);
+    registerWeb(ID_SKILL, SkillListPage.class, SkillEditPage.class);
 
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
 
-    registerMenuItem(new MenuItemDef(parentMenu, ID, 5, "plugins.skillmatrix.skillrating.menu", SkillRatingListPage.class));
-    registerMenuItem(new MenuItemDef(parentMenu, ID2, 5, "plugins.skillmatrix.skill.menu", SkillListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL_RATING, 5, "plugins.skillmatrix.skillrating.menu", SkillRatingListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ID_SKILL, 5, "plugins.skillmatrix.skill.menu", SkillListPage.class));
 
-    // .setMobileMenu(ToDoMobileListPage.class, 10));
+    // .setMobileMenu(SkillRatingMobileListPage.class, 10));
 
     // Define the access management:
     registerRight(new SkillRight());
