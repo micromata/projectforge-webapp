@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
+import org.apache.log4j.Logger;
 import org.projectforge.core.UserException;
 
 /**
@@ -36,7 +37,7 @@ import org.projectforge.core.UserException;
  */
 public class SkillNode implements Serializable
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SkillNode.class);
+  private static final Logger log = Logger.getLogger(SkillNode.class);
 
   private static final long serialVersionUID = 8016231590126097371L;
 

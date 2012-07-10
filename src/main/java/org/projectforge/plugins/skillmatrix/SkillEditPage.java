@@ -22,7 +22,7 @@ public class SkillEditPage extends AbstractEditPage<SkillDO, SkillEditForm, Skil
 {
   private static final long serialVersionUID = 4317454400876214258L;
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SkillEditPage.class);
+  private static final Logger log = Logger.getLogger(SkillEditPage.class);
 
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;

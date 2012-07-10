@@ -21,7 +21,7 @@ public class SkillListForm extends AbstractListForm<BaseSearchFilter, SkillListP
 {
   private static final long serialVersionUID = 5333752125044497290L;
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SkillListForm.class);
+  private static final Logger log = Logger.getLogger(SkillListForm.class);
 
   /**
    * @param parentPage

@@ -22,7 +22,7 @@ public class SkillRatingEditPage extends AbstractEditPage<SkillRatingDO, SkillRa
 {
   private static final long serialVersionUID = 1403978551875901644L;
 
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SkillRatingEditPage.class);
+  private static final Logger log = Logger.getLogger(SkillRatingEditPage.class);
 
   @SpringBean(name = "skillRatingDao")
   private SkillRatingDao skillRatingDao;
