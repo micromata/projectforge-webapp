@@ -42,7 +42,7 @@ public class SkillMatrixPluginUpdates
   @SuppressWarnings("serial")
   public static UpdateEntry getInitializationUpdateEntry()
   {
-    return new UpdateEntryImpl(SkillMatrixPlugin.ID, "1.0.0", "2011-05-27", "Adds tables T_PLUGIN_SKILL and T_PLUGIN_SKILL_RATING.") {
+    return new UpdateEntryImpl(SkillMatrixPlugin.ID_SKILL_RATING, "1.0.0", "2011-05-27", "Adds tables T_PLUGIN_SKILL and T_PLUGIN_SKILL_RATING.") {
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
