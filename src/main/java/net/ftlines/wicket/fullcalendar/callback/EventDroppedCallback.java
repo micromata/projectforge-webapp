@@ -24,29 +24,38 @@ import org.apache.wicket.request.Request;
 
 public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClientsideRevert implements CallbackWithHandler
 {
+  private static final long serialVersionUID = 9220878749378414280L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EventDroppedCallback.class);
+
+  private static final String CALLBACK_PRE_SCRIPT = "var triggerAjaxEvent = function (which) { ";
+
+  private static final String CALLBACK_POST_SCRIPT = "}; $.contextMenu.create("
+      + "["
+      + "{ '${calendar.dd.move.save}' : function(menuItem,menu) { triggerAjaxEvent('MoveSave'); } },"
+      + "{'${calendar.dd.copy.save}' : function(menuItem,menu) { triggerAjaxEvent('CopySave'); } },"
+      + "$.contextMenu.separator,"
+      + "{'${calendar.dd.move.edit}' : function(menuItem,menu) { triggerAjaxEvent('MoveEdit'); } },"
+      + "{'${calendar.dd.copy.edit}' : function(menuItem,menu) { triggerAjaxEvent('CopyEdit'); } }"
+      + "],"
+      + "{hideCallback: function () {this.menu.remove(); revertFunc();} }"
+      + ").show(this, originalEvent);";
 
   @Override
   protected String configureCallbackScript(final String script, final String urlTail)
   {
-    final String preScript = "var triggerAjaxEvent = function (which) { ";
-    final String postScript = "}; $.contextMenu.create(" +
-        "[" +
-        "{ 'Move' : function(menuItem,menu) { triggerAjaxEvent('Move'); } }," +
-        "{'Copy' : function(menuItem,menu) { triggerAjaxEvent('Copy'); } }" +
-        "]," +
-        "{hideCallback: function () {this.menu.remove(); revertFunc();} }" +
-        ").show(this, originalEvent);";
-    return preScript
+    return CALLBACK_PRE_SCRIPT
         + script.replace(urlTail, "&eventId='+event.id+'&sourceId='+event.source.data."
             + EventSource.Const.UUID
             + "+'&dayDelta='+dayDelta+'&minuteDelta='+minuteDelta+'&allDay='+allDay+'&which='+which+'")
-            + postScript;
+            + CALLBACK_POST_SCRIPT;
   }
 
   public IModel<String> getHandlerScript()
   {
     return new AbstractReadOnlyModel<String>() {
+      private static final long serialVersionUID = -3975663195244168222L;
+
       @Override
       public String getObject()
       {
