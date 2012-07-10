@@ -53,20 +53,25 @@ public class SkillRatingDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 3049488664076249000L;
 
-  @IndexedEmbedded(depth = 1)
+  @IndexedEmbedded
   private PFUserDO user;
 
-  @IndexedEmbedded(depth = 1)
+  @IndexedEmbedded
   private SkillDO skill;
 
+  @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private Integer sinceYear;
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   private SkillRating skillRating;
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String certificates;
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String trainingCourses;
 
+  @UserPrefParameter(i18nKey = "description", multiline = true)
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String description;
 
