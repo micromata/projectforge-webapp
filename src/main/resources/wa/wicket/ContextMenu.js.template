@@ -12,5 +12,5 @@ $(function() {
 	var menu1 = [ {'${newTab}': function(menuItem,menu) { newTabFunction(this) } },
 	              $.contextMenu.separator,
 	              {'${cancel}': function(menuItem,menu) { /* nothing to do here */ } } ];
-	$('.withContextMenu').contextMenu(menu1, {theme:'gloss'}); 
+	$('.withContextMenu').contextMenu(menu1); 
 });
