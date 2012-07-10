@@ -24,66 +24,66 @@ import org.apache.wicket.request.Request;
 
 public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClientsideRevert implements CallbackWithHandler
 {
-	private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EventDroppedCallback.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(EventDroppedCallback.class);
 
-	@Override
-	protected String configureCallbackScript(final String script, final String urlTail)
-	{
-		final String preScript = "var triggerAjaxEvent = function (which) { ";
-		final String postScript = "}; $.contextMenu.create(" +
-				"[" +
-				"{ 'Move' : function(menuItem,menu) { triggerAjaxEvent('Move'); } }," +
-				"{'Copy' : function(menuItem,menu) { triggerAjaxEvent('Copy'); } }" +
-				"]," +
-				"{hideCallback: function () {this.menu.remove(); revertFunc();} }" +
-				").show(this, originalEvent);";
-		return preScript
-				+ script.replace(urlTail, "&eventId='+event.id+'&sourceId='+event.source.data."
-						+ EventSource.Const.UUID
-						+ "+'&dayDelta='+dayDelta+'&minuteDelta='+minuteDelta+'&allDay='+allDay+'&which='+which+'")
-						+ postScript;
-	}
+  @Override
+  protected String configureCallbackScript(final String script, final String urlTail)
+  {
+    final String preScript = "var triggerAjaxEvent = function (which) { ";
+    final String postScript = "}; $.contextMenu.create(" +
+        "[" +
+        "{ 'Move' : function(menuItem,menu) { triggerAjaxEvent('Move'); } }," +
+        "{'Copy' : function(menuItem,menu) { triggerAjaxEvent('Copy'); } }" +
+        "]," +
+        "{hideCallback: function () {this.menu.remove(); revertFunc();} }" +
+        ").show(this, originalEvent);";
+    return preScript
+        + script.replace(urlTail, "&eventId='+event.id+'&sourceId='+event.source.data."
+            + EventSource.Const.UUID
+            + "+'&dayDelta='+dayDelta+'&minuteDelta='+minuteDelta+'&allDay='+allDay+'&which='+which+'")
+            + postScript;
+  }
 
-	public IModel<String> getHandlerScript()
-	{
-		return new AbstractReadOnlyModel<String>() {
-			@Override
-			public String getObject()
-			{
-				return "function(event, dayDelta, minuteDelta, allDay, revertFunc, originalEvent) { " + getCallbackScript() + "}";
-			}
-		};
-	}
+  public IModel<String> getHandlerScript()
+  {
+    return new AbstractReadOnlyModel<String>() {
+      @Override
+      public String getObject()
+      {
+        return "function(event, dayDelta, minuteDelta, allDay, revertFunc, originalEvent) { " + getCallbackScript() + "}";
+      }
+    };
+  }
 
-	@Override
-	protected boolean onEvent(final AjaxRequestTarget target)
-	{
-		try {
-			final Request r = getCalendar().getRequest();
-			final String eventId = r.getRequestParameters().getParameterValue("eventId").toString();
-			final String sourceId = r.getRequestParameters().getParameterValue("sourceId").toString();
+  @Override
+  protected boolean onEvent(final AjaxRequestTarget target)
+  {
+    try {
+      final Request r = getCalendar().getRequest();
+      final String eventId = r.getRequestParameters().getParameterValue("eventId").toString();
+      final String sourceId = r.getRequestParameters().getParameterValue("sourceId").toString();
 
-			final EventSource source = getCalendar().getEventManager().getEventSource(sourceId);
-			final Event event = source.getEventProvider().getEventForId(eventId);
+      final EventSource source = getCalendar().getEventManager().getEventSource(sourceId);
+      final Event event = source.getEventProvider().getEventForId(eventId);
 
-			final int dayDelta = r.getRequestParameters().getParameterValue("dayDelta").toInt();
-			final int minuteDelta = r.getRequestParameters().getParameterValue("minuteDelta").toInt();
-			final boolean allDay = r.getRequestParameters().getParameterValue("allDay").toBoolean();
+      final int dayDelta = r.getRequestParameters().getParameterValue("dayDelta").toInt();
+      final int minuteDelta = r.getRequestParameters().getParameterValue("minuteDelta").toInt();
+      final boolean allDay = r.getRequestParameters().getParameterValue("allDay").toBoolean();
 
-			return onEventDropped(new DroppedEvent(source, event, dayDelta, minuteDelta, allDay), new CalendarResponse(getCalendar(), target));
-		} catch (final EventSourceNotFoundException ex) {
-			// Happens normally after session time out. Do nothing.
-			log.info("Exception after session time out? " + ex.getMessage());
-			return false;
-		}
-	}
+      return onEventDropped(new DroppedEvent(source, event, dayDelta, minuteDelta, allDay), new CalendarResponse(getCalendar(), target));
+    } catch (final EventSourceNotFoundException ex) {
+      // Happens normally after session time out. Do nothing.
+      log.info("Exception after session time out? " + ex.getMessage());
+      return false;
+    }
+  }
 
-	protected abstract boolean onEventDropped(DroppedEvent event, CalendarResponse response);
+  protected abstract boolean onEventDropped(DroppedEvent event, CalendarResponse response);
 
-	@Override
-	protected String getRevertScript()
-	{
-		return "revertFunc();";
-	}
+  @Override
+  protected String getRevertScript()
+  {
+    return "revertFunc();";
+  }
 
 }
