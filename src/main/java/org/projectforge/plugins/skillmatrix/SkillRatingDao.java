@@ -18,12 +18,9 @@ import org.projectforge.user.UserRightId;
  */
 public class SkillRatingDao extends BaseDao<SkillRatingDO>
 {
-  // TODO fix USER_RIGHT_ID
   public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_SKILL_MATRIX_SKILL_RATING", "plugin20", "plugins.skillmatrix.skillrating");
 
   static final String I18N_KEY_ERROR_CYCLIC_REFERENCE = "plugins.skillmatrix.error.cyclicReference";
-
-  // private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SkillDao.class);
 
   public SkillRatingDao(){
     super(SkillRatingDO.class);
