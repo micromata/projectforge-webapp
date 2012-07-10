@@ -199,7 +199,7 @@ public class AppVersion
 			</echo>
 			<echo>Creating file ${version-base-dir}/version.xml ...</echo>
 			<echo file="${version-base-dir}/version.xml" append="false"><![CDATA[<?xml version="1.0" encoding="UTF-8" ?>
-  <property name="appId" value="${version-app-id}"/>
+	<property name="appId" value="${version-app-id}"/>
 	<property name="appTitle" value="${version-app-title}"/>
 	<property name="version" value="${VERSION}"/>
 	<property name="version.date" value="${VERSION_DATE}"/>
