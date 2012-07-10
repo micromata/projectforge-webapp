@@ -93,7 +93,7 @@
 			for (var i=0; i<menu.length; i++) {
 				var m = menu[i];
 				if (m==$.contextMenu.separator) {
-//					$container.append(cmenu.createSeparator());
+					$container.append(cmenu.createSeparator());
 				}
 				else {
 					for (var opt in menu[i]) {
@@ -143,7 +143,7 @@
 		
 		// Create a separator row
 		createSeparator: function() {
-			return $('<div class="'+this.separatorClassName+'"></div>');
+			return $('<li class="'+this.separatorClassName+'"></li>');
 		},
 		
 		// Determine if an individual item is currently disabled. This is called each time the item is hovered or clicked because the disabled status may change at any time
@@ -204,15 +204,28 @@
 		},
 		
 		// Hide the menu, of course
-		hide: function() {
-			var cmenu = this;
-			if (cmenu.shown && cmenu.menu && typeof cmenu.hideCallback === "function") {
-				cmenu.hideCallback.call(cmenu);
-			}
-			cmenu.shown = false;
-		}
+		 hide: function() {
+	            var cmenu = this;
+	            if (cmenu.shown) {
+	                if (cmenu.iframe) {
+	                    $(cmenu.iframe).hide();
+	                }
+	                if (cmenu.menu) {
+	                	cmenu.menu[cmenu.hideTransition](cmenu.hideSpeed, ( typeof cmenu.hideCallback === 'function'
+	                		? function () { return cmenu.hideCallback.call(cmenu); }
+                			: null
+                			)
+	                	);
+	                	cmenu.hideCallback.call(cmenu);
+	                }
+	                if (cmenu.shadow) {
+	                    cmenu.shadowObj[cmenu.hideTransition](cmenu.hideSpeed);
+	                }
+	            }
+	            cmenu.shown = false;
+	        }
 	};
-	
+
 	// This actually adds the .contextMenu() function to the jQuery namespace
 	$.fn.contextMenu = function(menu,options) {
 		var cmenu = $.contextMenu.create(menu,options);

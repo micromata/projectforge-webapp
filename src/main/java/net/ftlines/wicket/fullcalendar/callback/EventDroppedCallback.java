@@ -38,7 +38,7 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
       + "{'${calendar.dd.move.edit}' : function(menuItem,menu) { triggerAjaxEvent('MoveEdit'); } },"
       + "{'${calendar.dd.copy.edit}' : function(menuItem,menu) { triggerAjaxEvent('CopyEdit'); } }"
       + "],"
-      + "{hideCallback: function () {this.menu.remove(); revertFunc();} }"
+      + "{hideCallback: function () {this.menu.remove(); revertFunc(); console.log(revertFunc);} }"
       + ").show(this, originalEvent);";
 
   @Override
