@@ -18,8 +18,8 @@ import java.util.Map;
 
 import net.ftlines.wicket.fullcalendar.selector.EventSourceSelector;
 
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonRawValue;
 
@@ -192,12 +192,7 @@ public class EventSource implements Serializable
 
 	void setEvents(final String events)
 	{
-		this.eventsModel = new AbstractReadOnlyModel<String>() {
-			@Override
-			public String getObject() {
-				return events;
-			}
-		};
+		this.eventsModel = Model.of(events);
 	}
 
 	@JsonIgnore

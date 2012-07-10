@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonRawValue;
@@ -93,12 +93,7 @@ public class Config implements Serializable
 
 	public void setEventResize(final String eventResize)
 	{
-		this.eventResizeModel = new AbstractReadOnlyModel<String>() {
-		    @Override
-		    public String getObject() {
-		        return eventResize;
-		    }
-        };
+		this.eventResizeModel = Model.of(eventResize);
 	}
 
 	@JsonIgnore
@@ -139,12 +134,7 @@ public class Config implements Serializable
 
 	public void setEventDrop(final String eventDrop)
 	{
-		this.eventDropModel = new AbstractReadOnlyModel<String>() {
-		    @Override
-		    public String getObject() {
-		        return eventDrop;
-		    }
-        };
+		this.eventDropModel = Model.of(eventDrop);
 	}
 
 	@JsonIgnore
@@ -184,12 +174,7 @@ public class Config implements Serializable
 
 	public void setSelect(final String select)
 	{
-        this.selectModel = new AbstractReadOnlyModel<String>() {
-            @Override
-            public String getObject() {
-                return select;
-            }
-        };
+        this.selectModel = Model.of(select);
 	}
 
 	@JsonIgnore
@@ -209,12 +194,7 @@ public class Config implements Serializable
 
 	public void setEventClick(final String eventClick)
 	{
-		this.eventClickModel = new AbstractReadOnlyModel<String>() {
-		    @Override
-		    public String getObject() {
-		        return eventClick;
-		    }
-        };
+		this.eventClickModel = Model.of(eventClick);
 	}
 
 	@JsonIgnore
@@ -243,13 +223,7 @@ public class Config implements Serializable
 	 */
 	public void setDefaultView(final String defaultView)
 	{
-		this.defaultViewModel = new AbstractReadOnlyModel<String>() {
-
-		    @Override
-		    public String getObject() {
-		        return defaultView;
-		    }
-        };
+		this.defaultViewModel = Model.of(defaultViewModel);
 	}
 
 	@JsonIgnore
@@ -357,12 +331,7 @@ public class Config implements Serializable
 
 	public void setEventRender(final String eventRenderer)
 	{
-		this.eventRenderModel = new AbstractReadOnlyModel<String>() {
-		    @Override
-		    public String getObject() {
-		        return eventRenderer;
-		    }
-        };
+		this.eventRenderModel = Model.of(eventRenderer);
 	}
 
 	@JsonIgnore
@@ -402,12 +371,7 @@ public class Config implements Serializable
 
 	public void setViewDisplay(final String viewDisplay)
 	{
-		this.viewDisplayModel = new AbstractReadOnlyModel<String>() {
-		    @Override
-		    public String getObject() {
-		        return viewDisplay;
-		    }
-        };
+		this.viewDisplayModel = Model.of(viewDisplayModel);
 	}
 
 	@JsonIgnore
