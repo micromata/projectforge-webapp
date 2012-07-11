@@ -72,7 +72,6 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
         protected List<SkillDO> getChoices(final String input)
         {
           final BaseSearchFilter filter = new BaseSearchFilter();
-          // Add more searchfields? -> e.g. parent.title
           filter.setSearchFields("title");
           filter.setSearchString(input);
           final List<SkillDO> list = skillDao.getList(filter);
