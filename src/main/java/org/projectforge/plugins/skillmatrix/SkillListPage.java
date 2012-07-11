@@ -43,9 +43,6 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
 
-  // @SpringBean(name = "userFormatter")
-  // private UserFormatter userFormatter;
-
   public SkillListPage(final PageParameters parameters)
   {
     super(parameters, "plugins.skillmatrix");
@@ -72,6 +69,7 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
       }
     };
 
+    // Created
     columns.add(new CellItemListenerPropertyColumn<SkillDO>(new Model<String>(getString("created")), getSortable("created", sortable),
         "created", cellItemListener) {
       @SuppressWarnings({ "unchecked", "rawtypes"})
@@ -85,8 +83,7 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-
-    // modified
+    // Modified
     columns.add(new CellItemListenerPropertyColumn<SkillDO>(getString("modified"), getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
     // Title
@@ -116,9 +113,6 @@ public class SkillListPage extends AbstractListPage<SkillListForm, SkillDao, Ski
   {
     dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
-    // final BookmarkablePageLink<SkillEditPage> addSkillLink = new BookmarkablePageLink<SkillEditPage>("link", SkillEditPage.class);
-    // final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addSkillLink, getString("templates"));
-    // addContentMenuEntry(menuEntry);
   }
 
   /**
