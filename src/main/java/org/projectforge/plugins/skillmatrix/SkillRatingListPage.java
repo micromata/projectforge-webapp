@@ -75,6 +75,7 @@ IListPageColumnsCreator<SkillRatingDO>
       }
     };
 
+    // Created
     columns.add(new CellItemListenerPropertyColumn<SkillRatingDO>(new Model<String>(getString("created")), getSortable("created", sortable),
         "created", cellItemListener) {
       @SuppressWarnings({ "unchecked", "rawtypes"})
@@ -88,8 +89,7 @@ IListPageColumnsCreator<SkillRatingDO>
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-
-    // modified
+    // Modified
     columns.add(new CellItemListenerPropertyColumn<SkillRatingDO>(getString("modified"), getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
     // User
