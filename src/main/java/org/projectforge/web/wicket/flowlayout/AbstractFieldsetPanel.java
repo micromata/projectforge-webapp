@@ -369,4 +369,13 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   {
     return storeObject;
   }
+
+  /**
+   * @return the fieldset
+   */
+  public WebMarkupContainer getFieldset()
+  {
+    return fieldset;
+  }
+
 }
