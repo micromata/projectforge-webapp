@@ -37,6 +37,8 @@ public class SkillDao extends BaseDao<SkillDO>
 
   static final String I18N_KEY_ERROR_CYCLIC_REFERENCE = "plugins.skillmatrix.error.cyclicReference";
 
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "parent.title" };
+
   // private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SkillDao.class);
 
   public SkillDao()
@@ -51,4 +53,12 @@ public class SkillDao extends BaseDao<SkillDO>
     return new SkillDO();
   }
 
+  /**
+   * @see org.projectforge.core.BaseDao#getAdditionalSearchFields()
+   */
+  @Override
+  protected String[] getAdditionalSearchFields()
+  {
+    return ADDITIONAL_SEARCH_FIELDS;
+  }
 }
