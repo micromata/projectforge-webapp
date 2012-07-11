@@ -41,7 +41,7 @@ import org.projectforge.core.UserPrefParameter;
 import org.projectforge.database.Constants;
 
 /**
- * A skill usable for a skill matrix. Skills are build
+ * A skill usable for a skill-matrix.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
