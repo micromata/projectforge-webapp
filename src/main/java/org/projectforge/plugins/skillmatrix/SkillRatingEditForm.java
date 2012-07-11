@@ -47,6 +47,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
   @SpringBean(name = "skillTree")
   private SkillTree skillTree;
 
+  // For AjaxRequest in skill and skill rating
   private FieldsetPanel fs;
 
   /**
@@ -155,6 +156,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
       fs.add(autoCompleteTextField);
     }
     {
+      // Skill rating
       fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skillrating.rating"));
       fs.getFieldset().setOutputMarkupId(true);
       final LabelValueChoiceRenderer<SkillRating> ratingChoiceRenderer = new LabelValueChoiceRenderer<SkillRating>(this,
