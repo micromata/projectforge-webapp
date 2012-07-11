@@ -134,7 +134,6 @@ public class SkillTree extends AbstractCache implements Serializable
     return skillMap.get(id);
   }
 
-  //TODO proofread this function
   public SkillDO getSkill(final String title) {
     if(title == null) {
       return null;
