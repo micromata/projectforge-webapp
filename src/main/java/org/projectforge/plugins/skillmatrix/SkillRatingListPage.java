@@ -12,6 +12,7 @@ package org.projectforge.plugins.skillmatrix;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulator;
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
@@ -22,6 +23,7 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.user.UserFormatter;
 import org.projectforge.web.user.UserPropertyColumn;
@@ -85,7 +87,10 @@ IListPageColumnsCreator<SkillRatingDO>
         final SkillRatingDO skillRating = (SkillRatingDO) rowModel.getObject();
         item.add(new ListSelectActionPanel(componentId, rowModel, SkillRatingEditPage.class, skillRating.getId(), returnToPage, DateTimeFormatter
             .instance().getFormattedDateTime(skillRating.getCreated())));
-        addRowClick(item);
+        // Only the owner can click / edit his entries
+        if(ObjectUtils.equals(PFUserContext.getUserId(), skillRating.getUserId())) {
+          addRowClick(item);
+        }
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
