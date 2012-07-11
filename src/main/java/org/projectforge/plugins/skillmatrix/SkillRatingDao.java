@@ -22,6 +22,8 @@ public class SkillRatingDao extends BaseDao<SkillRatingDO>
 
   static final String I18N_KEY_ERROR_CYCLIC_REFERENCE = "plugins.skillmatrix.error.cyclicReference";
 
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "skill.title" };
+
   public SkillRatingDao(){
     super(SkillRatingDO.class);
     userRightId = USER_RIGHT_ID;
@@ -31,6 +33,15 @@ public class SkillRatingDao extends BaseDao<SkillRatingDO>
   public SkillRatingDO newInstance()
   {
     return new SkillRatingDO();
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#getAdditionalSearchFields()
+   */
+  @Override
+  protected String[] getAdditionalSearchFields()
+  {
+    return ADDITIONAL_SEARCH_FIELDS;
   }
 
 }
