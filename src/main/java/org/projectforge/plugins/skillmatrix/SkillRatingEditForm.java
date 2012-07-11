@@ -14,6 +14,8 @@ import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
@@ -44,6 +46,8 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
 
   @SpringBean(name = "skillTree")
   private SkillTree skillTree;
+
+  private FieldsetPanel fs;
 
   /**
    * @param parentPage
@@ -77,7 +81,6 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
         protected List<SkillDO> getChoices(final String input)
         {
           final BaseSearchFilter filter = new BaseSearchFilter();
-          // Add more searchfields? -> e.g. parent.title
           filter.setSearchFields("title");
           filter.setSearchString(input);
           final List<SkillDO> list = skillDao.getList(filter);
@@ -119,6 +122,10 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
                 error(getString("plugins.skillmatrix.error.skillNotFound"));
               }
               getModel().setObject(skill);
+              final AjaxRequestTarget target = AjaxRequestTarget.get();
+              if(target != null) {
+                target.add(SkillRatingEditForm.this.fs.getFieldset());
+              }
               return skill;
             }
 
@@ -137,16 +144,33 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
       };
       autoCompleteTextField.withLabelValue(true).withMatchContains(true).withMinChars(2).withAutoSubmit(false).withWidth(400)
       .setRequired(true);
+      autoCompleteTextField.add(new AjaxFormComponentUpdatingBehavior("onChange") {
+
+        @Override
+        protected void onUpdate(final AjaxRequestTarget target)
+        {
+          // AjaxRequestTarget needs this.
+        }
+      });
       fs.add(autoCompleteTextField);
     }
     {
-      // SkillRating
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skillrating.rating"));
+      fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skillrating.rating"));
+      fs.getFieldset().setOutputMarkupId(true);
       final LabelValueChoiceRenderer<SkillRating> ratingChoiceRenderer = new LabelValueChoiceRenderer<SkillRating>(this,
           SkillRating.values());
       final DropDownChoicePanel<SkillRating> skillChoice = new DropDownChoicePanel<SkillRating>(fs.newChildId(),
-          new PropertyModel<SkillRating>(data, "skillRating"), ratingChoiceRenderer.getValues(), ratingChoiceRenderer);
-      skillChoice.setRequired(true);
+          new PropertyModel<SkillRating>(data, "skillRating"), ratingChoiceRenderer.getValues(), ratingChoiceRenderer) {
+        @Override
+        public boolean isVisible()
+        {
+          if (data == null || data.getSkill() == null || !data.getSkill().isRateable()) {
+            return false;
+          } else {
+            return true;
+          }
+        }
+      };
       fs.add(skillChoice);
     }
     {
