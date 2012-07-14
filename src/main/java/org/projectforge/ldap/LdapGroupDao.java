@@ -33,7 +33,7 @@ import javax.naming.directory.ModificationItem;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class LdapGroupDao extends LdapDao<LdapGroup>
+public class LdapGroupDao extends LdapDao<Integer, LdapGroup>
 {
   private static final String[] ADDITIONAL_OBJECT_CLASSES = { "posixGroup"};// null;//{ "groupOfNames"};
 
@@ -62,6 +62,15 @@ public class LdapGroupDao extends LdapDao<LdapGroup>
   public String getIdAttrId()
   {
     return "gidNumber";
+  }
+
+  /**
+   * @see org.projectforge.ldap.LdapDao#getId(org.projectforge.ldap.LdapObject)
+   */
+  @Override
+  public Integer getId(final LdapGroup obj)
+  {
+    return obj.getGidNumber();
   }
 
   /**

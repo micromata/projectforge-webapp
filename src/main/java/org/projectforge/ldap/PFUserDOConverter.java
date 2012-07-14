@@ -32,15 +32,16 @@ import org.projectforge.user.PFUserDO;
  */
 public class PFUserDOConverter
 {
-  public static final String UID_PREFIX = "pf-";
+  public static final String ID_PREFIX = "pf-id-";
 
   public static PFUserDO convert(final LdapPerson person) {
     final PFUserDO user = new PFUserDO();
     user.setLastname(person.getSurname());
     user.setFirstname(person.getGivenName());
-    final String uid = person.getUid();
-    if (uid != null && uid.startsWith(UID_PREFIX) == true && uid.length() > UID_PREFIX.length()) {
-      final String id = uid.substring(UID_PREFIX.length());
+    user.setUsername(person.getUid());
+    final String employeeNumber = person.getEmployeeNumber();
+    if (employeeNumber != null && employeeNumber.startsWith(ID_PREFIX) == true && employeeNumber.length() > ID_PREFIX.length()) {
+      final String id = employeeNumber.substring(ID_PREFIX.length());
       user.setId(NumberHelper.parseInteger(id));
     }
     user.setOrganization(person.getOrganization());
@@ -62,8 +63,9 @@ public class PFUserDOConverter
     final LdapPerson person = new LdapPerson();
     person.setSurname(user.getLastname());
     person.setGivenName(user.getFirstname());
+    person.setUid(user.getUsername());
     if (user.getId() != null) {
-      person.setUid(UID_PREFIX + user.getId());
+      person.setEmployeeNumber(ID_PREFIX + user.getId());
     }
     person.setOrganization(user.getOrganization());
     person.setDescription(user.getDescription());

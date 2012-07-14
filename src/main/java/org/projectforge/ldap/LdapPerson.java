@@ -28,7 +28,7 @@ package org.projectforge.ldap;
  */
 public class LdapPerson extends LdapObject<String>
 {
-  private String uid, surname, givenName, organization, telephoneNumber, homePhoneNumber, description;
+  private String uid, surname, givenName, organization, telephoneNumber, homePhoneNumber, description, employeeNumber;
 
   private String[] mail, mobilePhoneNumber;
 
@@ -76,7 +76,9 @@ public class LdapPerson extends LdapObject<String>
   }
 
   /**
+   * The user name (login name). This is not the pk (id) of the entity.
    * @return the uid
+   * @see #getEmployeeNumber()
    */
   public String getUid()
   {
@@ -84,12 +86,32 @@ public class LdapPerson extends LdapObject<String>
   }
 
   /**
-   * @param uid the uid to set
+   * @param uid the user name (login name) to set
    * @return this for chaining.
+   * @see #setEmployeeNumber(String)
    */
   public LdapPerson setUid(final String uid)
   {
     this.uid = uid;
+    return this;
+  }
+
+  /**
+   * The unique id of the entity.
+   * @return the employeeNumber
+   */
+  public String getEmployeeNumber()
+  {
+    return employeeNumber;
+  }
+
+  /**
+   * @param employeeNumber the employeeNumber to set
+   * @return this for chaining.
+   */
+  public LdapPerson setEmployeeNumber(final String employeeNumber)
+  {
+    this.employeeNumber = employeeNumber;
     return this;
   }
 

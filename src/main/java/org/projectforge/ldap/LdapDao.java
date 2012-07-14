@@ -23,6 +23,7 @@
 
 package org.projectforge.ldap;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,7 +46,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public abstract class LdapDao<T extends LdapObject<?>>
+public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapDao.class);
 
@@ -56,6 +57,8 @@ public abstract class LdapDao<T extends LdapObject<?>>
   protected abstract String[] getAdditionalObjectClasses();
 
   public abstract String getIdAttrId();
+
+  public abstract I getId(T obj);
 
   public void create(final T obj, final Object... args)
   {
@@ -184,11 +187,16 @@ public abstract class LdapDao<T extends LdapObject<?>>
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
-        final Object id = obj.getId();
+        final Object id = getId(obj);
         // The dn is may-be changed, so find the original dn by id:
         final T origObject = findById(id, obj.getOrganizationalUnit());
         if (origObject == null) {
-          throw new RuntimeException("Object with id " + id + " not found in search base '" + obj.getOrganizationalUnit() + "'. Can't modify the object: " + obj);
+          throw new RuntimeException("Object with id "
+              + id
+              + " not found in search base '"
+              + obj.getOrganizationalUnit()
+              + "'. Can't modify the object: "
+              + obj);
         }
         final String dn = origObject.getDn();
         log.info("Modify attributes of " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));

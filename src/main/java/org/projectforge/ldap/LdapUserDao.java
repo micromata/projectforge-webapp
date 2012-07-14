@@ -36,6 +36,25 @@ public class LdapUserDao extends LdapPersonDao
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapUserDao.class);
 
+
+  /**
+   * @see org.projectforge.ldap.LdapPersonDao#getIdAttrId()
+   */
+  @Override
+  public String getIdAttrId()
+  {
+    return "employeeNumber";
+  }
+
+  /**
+   * @see org.projectforge.ldap.LdapPersonDao#getId(org.projectforge.ldap.LdapPerson)
+   */
+  @Override
+  public String getId(final LdapPerson obj)
+  {
+    return obj.getEmployeeNumber();
+  }
+
   public void changePassword(final LdapPerson person, final String oldPassword, final String newPassword)
   {
     log.info("Change password for " + getObjectClass() + ": " + buildDn(person));

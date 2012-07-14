@@ -33,7 +33,7 @@ import javax.naming.directory.ModificationItem;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class LdapPersonDao extends LdapDao<LdapPerson>
+public class LdapPersonDao extends LdapDao<String, LdapPerson>
 {
   private static final String[] ADDITIONAL_OBJECT_CLASSES = { "inetOrgPerson"};
 
@@ -62,6 +62,15 @@ public class LdapPersonDao extends LdapDao<LdapPerson>
   }
 
   /**
+   * @see org.projectforge.ldap.LdapDao#getId(org.projectforge.ldap.LdapObject)
+   */
+  @Override
+  public String getId(final LdapPerson obj)
+  {
+    return obj.getUid();
+  }
+
+  /**
    * @see org.projectforge.ldap.LdapDao#mapToObject(java.lang.String, javax.naming.directory.Attributes)
    */
   @Override
@@ -71,6 +80,7 @@ public class LdapPersonDao extends LdapDao<LdapPerson>
     person.setSurname(LdapUtils.getAttributeStringValue(attributes, "sn"));
     person.setGivenName(LdapUtils.getAttributeStringValue(attributes, "givenName"));
     person.setUid(LdapUtils.getAttributeStringValue(attributes, "uid"));
+    person.setEmployeeNumber(LdapUtils.getAttributeStringValue(attributes, "employeeNumber"));
     person.setOrganization(LdapUtils.getAttributeStringValue(attributes, "o"));
     person.setMail(LdapUtils.getAttributeStringValues(attributes, "mail"));
     person.setDescription(LdapUtils.getAttributeStringValue(attributes, "description"));
@@ -93,6 +103,7 @@ public class LdapPersonDao extends LdapDao<LdapPerson>
     createAndAddModificationItems(list, "sn", person.getSurname());
     createAndAddModificationItems(list, "givenName", person.getGivenName());
     createAndAddModificationItems(list, "uid", person.getUid());
+    createAndAddModificationItems(list, "employeeNumber", person.getEmployeeNumber());
     createAndAddModificationItems(list, "o", person.getOrganization());
     createAndAddModificationItems(list, "mail", person.getMail());
     createAndAddModificationItems(list, "description", person.getDescription());
