@@ -149,9 +149,10 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return organization;
   }
 
-  public void setOrganization(final String organization)
+  public PFUserDO setOrganization(final String organization)
   {
     this.organization = organization;
+    return this;
   }
 
   /**
