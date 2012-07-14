@@ -73,17 +73,17 @@ public class TestConnection
     udao.ldapConnector = ldapConnector;
     final List<LdapPerson> list = udao.findAll("pf-test", "users");
     log.info("Found " + list.size() + " person entries.");
-    final PFUserDO pfUser = new PFUserDO().setLastname("Meier").setFirstname("Horst")
+    final PFUserDO pfUser = new PFUserDO().setLastname("Meier").setFirstname("Horst").setUsername("h.meier")
         .setDescription("Test entry from ProjectForge dev system.").setEmail("h.meier@mail.com");
     pfUser.setId(42);
     final LdapPerson user = PFUserDOConverter.convert(pfUser);
     user.setOrganizationalUnit("pf-test", "users");
     udao.createOrUpdate(user);
     udao.changePassword(user, null, "test");
-    udao.authenticate("pf-42", "test", "pf-test", "users");
+    udao.authenticate("h.meier", "test", "pf-test", "users");
     udao.changePassword(user, null, "hurzel");
-    udao.authenticate("pf-42", "test", "pf-test", "users");
-    udao.authenticate("pf-42", "hurzel", "pf-test", "users");
+    udao.authenticate("h.meier", "test", "pf-test", "users");
+    udao.authenticate("h.meier", "hurzel", "pf-test", "users");
     user.setSurname("Changed");
     user.setMail("h.meier@micromata.de");
     udao.update(user);
