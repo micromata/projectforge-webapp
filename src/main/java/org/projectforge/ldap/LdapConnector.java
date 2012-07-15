@@ -56,7 +56,7 @@ public class LdapConnector implements ConfigurationListener
     // Set up the environment for creating the initial context
     final Hashtable<String, String> env = new Hashtable<String, String>();
     env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-    env.put(Context.PROVIDER_URL, ldapConfig.getCompleteUrl());
+    env.put(Context.PROVIDER_URL, ldapConfig.getCompleteServerUrl());
     final String authentication = ldapConfig.getAuthentication();
     if (StringUtils.isNotBlank(authentication) == true) {
       env.put(Context.SECURITY_AUTHENTICATION, ldapConfig.getAuthentication());
@@ -66,7 +66,7 @@ public class LdapConnector implements ConfigurationListener
       }
     }
     log.info("Trying to connect the LDAP server: url=["
-        + ldapConfig.getCompleteUrl()
+        + ldapConfig.getCompleteServerUrl()
         + "], authentication=["
         + ldapConfig.getAuthentication()
         + "], principal=["
@@ -77,7 +77,7 @@ public class LdapConnector implements ConfigurationListener
 
   public String getBase()
   {
-    return ldapConfig.getBase();
+    return ldapConfig.getBaseDN();
   }
 
   public DirContext createContext()
@@ -85,7 +85,7 @@ public class LdapConnector implements ConfigurationListener
     final Hashtable<String, String> env;
     final String authentication = ldapConfig.getAuthentication();
     if ("none".equals(authentication) == false) {
-      env = createEnv(ldapConfig.getAdminUser(), ldapConfig.getAdminPassword());
+      env = createEnv(ldapConfig.getManagerUser(), ldapConfig.getManagerPassword());
     } else {
       env = createEnv(null, null);
     }

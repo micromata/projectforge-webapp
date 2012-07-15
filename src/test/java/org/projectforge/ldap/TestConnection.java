@@ -44,6 +44,10 @@ import org.projectforge.xml.stream.XmlObjectReader;
  */
 public class TestConnection
 {
+  // ToDo: username als nur durch Admins änderbar konfigurierbar
+  // Config für LDAP nur read only/schreibbar
+  // Password im LDAP neu setzen (alle über Zwangs-Login schicken).
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TestConnection.class);
 
   private static final String CONFIG_FILE = System.getProperty("user.home") + "/ProjectForge/testldapConfig.xml";

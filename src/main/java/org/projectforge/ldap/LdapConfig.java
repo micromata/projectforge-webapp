@@ -31,100 +31,162 @@ import org.apache.commons.lang.StringUtils;
  */
 public class LdapConfig
 {
-  /**
-   * ldap://localhost:389
-   */
-  private String url;
+  private String server;
 
-  /**
-   * uid=admin,ou=system
-   */
-  private String userDn;
+  private Integer port;
 
-  /**
-   * dc=jayway,dc=se
-   */
-  private String base;
+  private String userBase, userBaseFilter, groupBase;
 
-  private String adminUser;
+  private String baseDN;
 
-  private String adminPassword;
+  private String managerUser;
+
+  private String managerPassword;
 
   private String authentication = "simple";
 
-  public String getUrl()
+  /**
+   * e.g. ldap.acme.com
+   */
+  public String getServer()
   {
-    return url;
+    return server;
   }
 
   /**
-   * @return url/base or url if base is not given.
+   * @return ldap://{server}/{base or url if base is not given.
    */
-  public String getCompleteUrl() {
-    if (StringUtils.isBlank(this.base) == true) {
-      return url;
+  public String getCompleteServerUrl()
+  {
+    final StringBuffer buf = new StringBuffer();
+    buf.append("ldap://").append(this.server);
+    if (port != null) {
+      buf.append(':').append(port);
     }
-    if (url.endsWith("/") == true) {
-      return url + this.base;
+    if (StringUtils.isBlank(this.baseDN) == false) {
+      buf.append('/').append(this.baseDN);
     }
-    return url + "/" + this.base;
+    return buf.toString();
   }
 
-  public LdapConfig setUrl(final String url)
+  public LdapConfig setServer(final String server)
   {
-    this.url = url;
+    this.server = server;
     return this;
   }
 
-  public String getUserDn()
+  /**
+   * Optional.
+   * @return the port if given.
+   */
+  public Integer getPort()
   {
-    return userDn;
+    return port;
   }
 
-  public LdapConfig setUserDn(final String userDn)
+  /**
+   * @param port the port to set
+   * @return this for chaining.
+   */
+  public LdapConfig setPort(final Integer port)
   {
-    this.userDn = userDn;
+    this.port = port;
     return this;
   }
 
-  public String getBase()
+  /**
+   * e. g. ou=users
+   */
+  public String getUserBase()
   {
-    return base;
+    return userBase;
   }
 
-  public LdapConfig setBase(final String base)
+  public LdapConfig setUserBase(final String userBase)
   {
-    this.base = base;
+    this.userBase = userBase;
     return this;
   }
 
-  public String getAdminUser()
+  /**
+   * Filter to search the user to login, e. g. "uid={0}". '{0}' is replaced by the login name (user name).
+   * @return the userBaseFilter
+   */
+  public String getUserBaseFilter()
   {
-    return adminUser;
+    return userBaseFilter;
   }
 
-  public LdapConfig setAdminUser(final String adminUser)
+  /**
+   * @param userBaseFilter the userBaseFilter to set
+   * @return this for chaining.
+   */
+  public LdapConfig setUserBaseFilter(final String userBaseFilter)
   {
-    this.adminUser = adminUser;
+    this.userBaseFilter = userBaseFilter;
     return this;
   }
 
-  public String getAdminPassword()
+  /**
+   * e. g. ou=groups
+   * @return the groupBase
+   */
+  public String getGroupBase()
   {
-    return adminPassword;
+    return groupBase;
   }
 
-  public LdapConfig setAdminPassword(final String password)
+  /**
+   * @param groupBase the groupBase to set
+   * @return this for chaining.
+   */
+  public LdapConfig setGroupBase(final String groupBase)
   {
-    this.adminPassword = password;
+    this.groupBase = groupBase;
+    return this;
+  }
+
+  /**
+   * e. g. dc=acme,dc=com
+   * @return
+   */
+  public String getBaseDN()
+  {
+    return baseDN;
+  }
+
+  public LdapConfig setBaseDN(final String baseDN)
+  {
+    this.baseDN = baseDN;
+    return this;
+  }
+
+  public String getManagerUser()
+  {
+    return managerUser;
+  }
+
+  public LdapConfig setManagerUser(final String managerUser)
+  {
+    this.managerUser = managerUser;
+    return this;
+  }
+
+  public String getManagerPassword()
+  {
+    return managerPassword;
+  }
+
+  public LdapConfig setManagerPassword(final String password)
+  {
+    this.managerPassword = password;
     return this;
   }
 
   /**
    * The authentication, can be a list of algorithms.<br/>
    * "none" - means anonymous<br/>
-   * "simple" - user/password authentication without any encryption.
-   * "DIGEST-MD5 CRAM-MD5" - space separated list of supported algorithms.
+   * "simple" - user/password authentication without any encryption. "DIGEST-MD5 CRAM-MD5" - space separated list of supported algorithms.
    * @return the authentication
    */
   public String getAuthentication()
