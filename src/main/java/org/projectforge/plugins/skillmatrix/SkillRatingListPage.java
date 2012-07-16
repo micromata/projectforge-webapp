@@ -98,7 +98,7 @@ IListPageColumnsCreator<SkillRatingDO>
     columns.add(new CellItemListenerPropertyColumn<SkillRatingDO>(getString("modified"), getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
     // User
-    columns.add(new UserPropertyColumn<SkillRatingDO>(getString("plugins.skillmatrix.skillrating.user"), getSortable("user", sortable),
+    columns.add(new UserPropertyColumn<SkillRatingDO>(getString("plugins.skillmatrix.skillrating.user"), getSortable("userId", sortable),
         "user", cellItemListener).withUserFormatter(userFormatter));
     // Skill -> Title
     columns.add(new CellItemListenerPropertyColumn<SkillRatingDO>(getString("plugins.skillmatrix.skillrating.skill"), getSortable(
