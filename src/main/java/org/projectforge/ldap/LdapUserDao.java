@@ -23,9 +23,14 @@
 
 package org.projectforge.ldap;
 
+import javax.naming.NameNotFoundException;
+import javax.naming.NamingEnumeration;
+import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.ModificationItem;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -36,6 +41,13 @@ public class LdapUserDao extends LdapPersonDao
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapUserDao.class);
 
+  private static final String[] ADDITIONAL_OBJECT_CLASSES = { "inetOrgPerson", "shadowAccount"};
+
+  @Override
+  protected String[] getAdditionalObjectClasses()
+  {
+    return ADDITIONAL_OBJECT_CLASSES;
+  }
 
   /**
    * @see org.projectforge.ldap.LdapPersonDao#getIdAttrId()
@@ -55,13 +67,20 @@ public class LdapUserDao extends LdapPersonDao
     return obj.getEmployeeNumber();
   }
 
-  public void changePassword(final LdapPerson person, final String oldPassword, final String newPassword)
+  public void deactivateUser(final LdapPerson user)
   {
-    log.info("Change password for " + getObjectClass() + ": " + buildDn(person));
+    final ModificationItem[] modificationItems = new ModificationItem[1];
+    modificationItems[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("shadowExpire", "0"));
+    modify(user, modificationItems);
+  }
+
+  public void changePassword(final LdapPerson user, final String oldPassword, final String newPassword)
+  {
+    log.info("Change password for " + getObjectClass() + ": " + buildDn(user));
     final ModificationItem[] modificationItems;
     // Replace the "unicdodePwd" attribute with a new value
     // Password must be both Unicode and a quoted string
-    //    try {
+    // try {
     // final String oldQuotedPassword = "\"" + oldPassword + "\"";
     // final byte[] oldUnicodePassword = oldQuotedPassword.getBytes("UTF-16LE");
     // final String newQuotedPassword = "\"" + newPassword + "\"";
@@ -79,12 +98,38 @@ public class LdapUserDao extends LdapPersonDao
     // throw new RuntimeException(ex);
     // }
     // Perform the update
-    modify(person, modificationItems);
+    modify(user, modificationItems);
   }
+
+  public LdapPerson findByUsername(final Object username, final String... organizationalUnits)
+  {
+    return (LdapPerson) new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        NamingEnumeration< ? > results = null;
+        final SearchControls controls = new SearchControls();
+        controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+        final String searchBase = LdapUtils.getOu(organizationalUnits);
+        results = ctx.search(searchBase, "(&(objectClass=" + getObjectClass() + ")(uid=" + username + "))", controls);
+        if (results.hasMore() == false) {
+          return null;
+        }
+        final SearchResult searchResult = (SearchResult) results.next();
+        final String dn = searchResult.getName();
+        final Attributes attributes = searchResult.getAttributes();
+        if (results.hasMore() == true) {
+          log.error("Oups, found entries with multiple id's: " + getObjectClass() + "." + username);
+        }
+        return mapToObject(dn, searchBase, attributes);
+      }
+    }.excecute();
+  }
+
 
   public boolean authenticate(final String username, final String userPassword, final String... organizationalUnits)
   {
-    final LdapPerson user = findById(username, organizationalUnits);
+    final LdapPerson user = findByUsername(username, organizationalUnits);
     if (user == null || StringUtils.equals(username, user.getId()) == false) {
       log.info("User with id '" + username + "' not found.");
       return false;
