@@ -82,11 +82,16 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
       {
         final PFAutoCompleteTextField<SkillDO> skillTextField = (PFAutoCompleteTextField<SkillDO>) dependentFormComponents[0];
         final DropDownChoice<SkillRating> skillRatingDropDown = (DropDownChoice<SkillRating>) dependentFormComponents[1];
-        if (skillTextField.getConvertedInput().isRateable() == true || skillRatingDropDown.getConvertedInput() == null) {
+        if (skillTextField.getConvertedInput().isRateable() == true && skillRatingDropDown.getConvertedInput() == null) {
           error(getString("plugins.skillmatrix.error.rateableSkillWithNullRating"));
-        } else if (skillTextField.getConvertedInput().isRateable() == false || skillRatingDropDown.getConvertedInput() != null) {
+        } else if (skillTextField.getConvertedInput().isRateable() == false && skillRatingDropDown.getConvertedInput() != null) {
           error(getString("plugins.skillmatrix.error.unrateableSkillWithRating"));
         }
+
+        // final BaseSearchFilter filter = new BaseSearchFilter();
+        // filter.setSearchFields("title");
+        // //filter.setSearchString();
+        // final List<SkillDO> list = skillDao.getList(filter);
       }
 
     });
@@ -98,6 +103,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
       final DivTextPanel username = new DivTextPanel(fs.newChildId(), data.getUser().getUsername());
       username.setStrong();
       fs.add(username);
+      //dependentFormComponents[0] = username;
     }
     {
       // Skill, look at UserSelectPanel for fine tuning ( getConverter() )
