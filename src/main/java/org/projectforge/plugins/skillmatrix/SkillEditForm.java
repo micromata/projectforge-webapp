@@ -14,6 +14,9 @@ import java.util.Locale;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
@@ -39,6 +42,8 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
 
+  private final FormComponent< ? >[] dependentFormComponents = new FormComponent[1];
+
   /**
    * @param parentPage
    * @param data
@@ -53,12 +58,34 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
   public void init()
   {
     super.init();
+
+    add(new IFormValidator() {
+
+      @Override
+      public FormComponent< ? >[] getDependentFormComponents()
+      {
+        return dependentFormComponents;
+      }
+
+      @Override
+      public void validate(final Form< ? > form)
+      {
+        final RequiredMaxLengthTextField skillTextField = (RequiredMaxLengthTextField) dependentFormComponents[0];
+        final SkillTree skillTree = skillDao.getSkillTree();
+        if(skillTree.getSkill(skillTextField.getConvertedInput()) != null) {
+          error(getString("plugins.skillmatrix.error.skillExistsAlready"));
+        }
+      }
+    });
+
     gridBuilder.newGrid16();
 
     {
       // Title of skill
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skill.title"));
-      fs.add(new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "title")));
+      final RequiredMaxLengthTextField skillTextField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "title"));
+      fs.add(skillTextField);
+      dependentFormComponents[0] = skillTextField;
     }
     {
       // Parent, look at UserSelectPanel for fine tuning
