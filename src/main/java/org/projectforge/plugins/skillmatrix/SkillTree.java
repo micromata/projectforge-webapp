@@ -31,7 +31,6 @@ import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 import org.apache.log4j.Logger;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.AbstractCache;
 import org.projectforge.task.TaskNode;
 
@@ -48,16 +47,13 @@ public class SkillTree extends AbstractCache implements Serializable
 
   private static final List<SkillNode> EMPTY_LIST = new ArrayList<SkillNode>();
 
-
-  @SpringBean(name = "skillDao")
-  private transient SkillDao skillDao;
+  private final SkillDao skillDao;
 
   /** For faster searching of entries. */
   private Map<Integer, SkillNode> skillMap;
 
   /** The root node of all skills. The only node with parent null. */
   private SkillNode root = null;
-
 
   public SkillNode getRootTaskNode()
   {
@@ -185,11 +181,7 @@ public class SkillTree extends AbstractCache implements Serializable
     return node;
   }
 
-  public SkillTree()
-  {
-  }
-
-  public void setSkillDao(final SkillDao skillDao)
+  public SkillTree(final SkillDao skillDao)
   {
     this.skillDao = skillDao;
   }

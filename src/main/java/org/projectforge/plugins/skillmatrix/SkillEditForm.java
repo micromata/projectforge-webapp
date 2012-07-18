@@ -39,9 +39,6 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
 
-  @SpringBean(name = "skillTree")
-  private SkillTree skillTree;
-
   /**
    * @param parentPage
    * @param data
@@ -108,7 +105,7 @@ public class SkillEditForm extends AbstractEditForm<SkillDO, SkillEditPage>
                 getModel().setObject(null);
                 return null;
               }
-              final SkillDO skill = skillTree.getSkill(value);
+              final SkillDO skill = skillDao.getSkillTree().getSkill(value);
               if (skill == null) {
                 error(getString("plugins.skillmatrix.error.skillNotFound"));
               }

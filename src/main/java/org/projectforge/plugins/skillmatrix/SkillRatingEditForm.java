@@ -44,9 +44,6 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
 
-  @SpringBean(name = "skillTree")
-  private SkillTree skillTree;
-
   // For AjaxRequest in skill and skill rating
   private FieldsetPanel fs;
 
@@ -118,7 +115,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
                 getModel().setObject(null);
                 return null;
               }
-              final SkillDO skill = skillTree.getSkill(value);
+              final SkillDO skill = skillDao.getSkillTree().getSkill(value);
               if (skill == null) {
                 error(getString("plugins.skillmatrix.error.skillNotFound"));
               }

@@ -39,6 +39,8 @@ public class SkillDao extends BaseDao<SkillDO>
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "parent.title" };
 
+  private final SkillTree skillTree = new SkillTree(this);
+
   // private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(SkillDao.class);
 
   public SkillDao()
@@ -51,6 +53,16 @@ public class SkillDao extends BaseDao<SkillDO>
   public SkillDO newInstance()
   {
     return new SkillDO();
+  }
+
+  @Override
+  protected void afterSaveOrModify(final SkillDO obj)
+  {
+    skillTree.setExpired();
+  }
+
+  public SkillTree getSkillTree() {
+    return skillTree;
   }
 
   /**
