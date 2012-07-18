@@ -77,6 +77,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
         return dependentFormComponents;
       }
 
+      @SuppressWarnings("unchecked")
       @Override
       public void validate(final Form< ? > form)
       {
