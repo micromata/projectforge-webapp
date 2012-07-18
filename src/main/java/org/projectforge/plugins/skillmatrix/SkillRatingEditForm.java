@@ -16,6 +16,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.FormComponent;
+import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
@@ -47,6 +51,8 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
   // For AjaxRequest in skill and skill rating
   private FieldsetPanel fs;
 
+  private final FormComponent< ? >[] dependentFormComponents = new FormComponent[2];
+
   /**
    * @param parentPage
    * @param data
@@ -62,6 +68,29 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
   protected void init()
   {
     super.init();
+
+    add(new IFormValidator() {
+
+      @Override
+      public FormComponent< ? >[] getDependentFormComponents()
+      {
+        return dependentFormComponents;
+      }
+
+      @Override
+      public void validate(final Form< ? > form)
+      {
+        final PFAutoCompleteTextField<SkillDO> skillTextField = (PFAutoCompleteTextField<SkillDO>) dependentFormComponents[0];
+        final DropDownChoice<SkillRating> skillRatingDropDown = (DropDownChoice<SkillRating>) dependentFormComponents[1];
+        if (skillTextField.getConvertedInput().isRateable() == true || skillRatingDropDown.getConvertedInput() == null) {
+          error(getString("plugins.skillmatrix.error.rateableSkillWithNullRating"));
+        } else if (skillTextField.getConvertedInput().isRateable() == false || skillRatingDropDown.getConvertedInput() != null) {
+          error(getString("plugins.skillmatrix.error.unrateableSkillWithRating"));
+        }
+      }
+
+    });
+
     gridBuilder.newGrid16();
     {
       // User
@@ -121,7 +150,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
               }
               getModel().setObject(skill);
               final AjaxRequestTarget target = AjaxRequestTarget.get();
-              if(target != null) {
+              if (target != null) {
                 target.add(SkillRatingEditForm.this.fs.getFieldset());
               }
               return skill;
@@ -151,6 +180,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
         }
       });
       fs.add(autoCompleteTextField);
+      dependentFormComponents[0] = autoCompleteTextField;
     }
     {
       // Skill rating
@@ -171,6 +201,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
         }
       };
       fs.add(skillChoice);
+      dependentFormComponents[1] = skillChoice.getDropDownChoice();
     }
     {
       // Since year
