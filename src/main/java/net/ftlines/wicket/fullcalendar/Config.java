@@ -225,7 +225,7 @@ public class Config implements Serializable
    */
   public void setDefaultView(final String defaultView)
   {
-    this.defaultViewModel = Model.of(defaultViewModel);
+    this.defaultViewModel = Model.of(defaultView);
   }
 
   @JsonIgnore
@@ -373,7 +373,7 @@ public class Config implements Serializable
 
   public void setViewDisplay(final String viewDisplay)
   {
-    this.viewDisplayModel = Model.of(viewDisplayModel);
+    this.viewDisplayModel = Model.of(viewDisplay);
   }
 
   @JsonIgnore
