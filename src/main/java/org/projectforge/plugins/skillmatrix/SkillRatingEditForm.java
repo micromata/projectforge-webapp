@@ -48,6 +48,9 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
   @SpringBean(name = "skillDao")
   private SkillDao skillDao;
 
+  @SpringBean(name = "skillRatingDao")
+  private SkillRatingDao skillRatingDao;
+
   // For AjaxRequest in skill and skill rating
   private FieldsetPanel fs;
 
@@ -89,10 +92,17 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
           error(getString("plugins.skillmatrix.error.unrateableSkillWithRating"));
         }
 
-        // final BaseSearchFilter filter = new BaseSearchFilter();
-        // filter.setSearchFields("title");
-        // //filter.setSearchString();
-        // final List<SkillDO> list = skillDao.getList(filter);
+        final BaseSearchFilter filter = new BaseSearchFilter();
+        filter.setSearchFields("user.username");
+        filter.setSearchString(data.getUser().getUsername());
+        final List<SkillRatingDO> list = skillRatingDao.getList(filter);
+        for (final SkillRatingDO skillRatingDO : list) {
+          if(skillRatingDO.getSkill().getTitle() == skillTextField.getConvertedInput().getTitle()) {
+            error(getString("plugins.skillmatrix.error.skillRatingExistsAlready"));
+            // TODO jump out of loop, count multiple entries, or just leave it the way it is?
+            break;
+          }
+        }
       }
 
     });
@@ -104,7 +114,6 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
       final DivTextPanel username = new DivTextPanel(fs.newChildId(), data.getUser().getUsername());
       username.setStrong();
       fs.add(username);
-      //dependentFormComponents[0] = username;
     }
     {
       // Skill, look at UserSelectPanel for fine tuning ( getConverter() )
