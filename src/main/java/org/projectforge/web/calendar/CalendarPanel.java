@@ -28,6 +28,7 @@ import java.sql.Timestamp;
 import net.ftlines.wicket.fullcalendar.CalendarResponse;
 import net.ftlines.wicket.fullcalendar.Event;
 import net.ftlines.wicket.fullcalendar.EventSource;
+import net.ftlines.wicket.fullcalendar.callback.CalendarDropMode;
 import net.ftlines.wicket.fullcalendar.callback.ClickedEvent;
 import net.ftlines.wicket.fullcalendar.callback.DroppedEvent;
 import net.ftlines.wicket.fullcalendar.callback.ResizedEvent;
@@ -36,8 +37,10 @@ import net.ftlines.wicket.fullcalendar.callback.View;
 
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.string.StringValue;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.projectforge.access.AccessChecker;
@@ -136,6 +139,16 @@ public class CalendarPanel extends Panel
       @Override
       protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response)
       {
+        // default mode is move and edit
+        CalendarDropMode dropMode = CalendarDropMode.MOVE_EDIT;
+        final StringValue parameterValue = RequestCycle.get().getRequest().getQueryParameters().getParameterValue("which");
+        if (parameterValue != null) {
+          try {
+            dropMode = CalendarDropMode.fromAjaxTarget(parameterValue.toString());
+          } catch (final Exception ex) {
+            log.warn("Unable to get calendar drop mode for given value, using default mode. Given mode: " + parameterValue.toString());
+          }
+        }
         if (log.isDebugEnabled() == true) {
           log.debug("Event drop. eventId: "
               + event.getEvent().getId()
@@ -150,7 +163,7 @@ public class CalendarPanel extends Panel
           log.debug("Original start time: " + event.getEvent().getStart() + ", original end time: " + event.getEvent().getEnd());
           log.debug("New start time: " + event.getNewStartTime() + ", new end time: " + event.getNewEndTime());
         }
-        modifyEvent(event.getEvent(), event.getNewStartTime(), event.getNewEndTime());
+        modifyEvent(event.getEvent(), event.getNewStartTime(), event.getNewEndTime(), dropMode);
         return false;
       }
 
@@ -167,7 +180,7 @@ public class CalendarPanel extends Panel
               + " minuteDelta: "
               + event.getMinutesDelta());
         }
-        modifyEvent(event.getEvent(), null, event.getNewEndTime());
+        modifyEvent(event.getEvent(), null, event.getNewEndTime(), CalendarDropMode.MOVE_EDIT);
         return false;
       }
 
@@ -216,7 +229,8 @@ public class CalendarPanel extends Panel
         if (currentDatePanel != null) {
           currentDatePanel.getDateField().modelChanged();
           response.getTarget().add(currentDatePanel.getDateField());
-          response.getTarget().appendJavaScript(DatePickerUtils.getDatePickerInitJavaScript(currentDatePanel.getDateField().getMarkupId(), true));
+          response.getTarget().appendJavaScript(
+              DatePickerUtils.getDatePickerInitJavaScript(currentDatePanel.getDateField().getMarkupId(), true));
         }
         response.getTarget().add(((CalendarPage) getPage()).form.durationLabel);
       }
@@ -263,7 +277,7 @@ public class CalendarPanel extends Panel
     config.add(eventSource);
   }
 
-  private void modifyEvent(final Event event, final DateTime newStartTime, final DateTime newEndTime)
+  private void modifyEvent(final Event event, final DateTime newStartTime, final DateTime newEndTime, final CalendarDropMode dropMode)
   {
     final String eventId = event.getId();
     if (eventId != null && eventId.startsWith("ts-") == true) {
@@ -288,17 +302,43 @@ public class CalendarPanel extends Panel
         // User has no update access, therefore ignore this request...
         return;
       }
-      final PageParameters parameters = new PageParameters();
-      parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
-      if (newStartTime != null) {
-        parameters.add(TimesheetEditPage.PARAMETER_KEY_NEW_START_DATE, DateHelper.getDateTimeAsMillis(newStartTime));
+
+      // update start and end time
+      dbTimesheet.setStartTime(new Timestamp(newStartTime.getMillis()));
+      dbTimesheet.setStopTime(new Timestamp(newEndTime.getMillis()));
+
+      // clone timesheet if mode is copy_*
+      if (CalendarDropMode.COPY_EDIT.equals(dropMode) || CalendarDropMode.COPY_SAVE.equals(dropMode)) {
+        dbTimesheet.setId(null);
+        dbTimesheet.setDeleted(false);
+        timesheetDao.setUser(dbTimesheet, loggedInUser.getId());
+
+        // and save the new time sheet -> correct time is set already
+        timesheetDao.save(dbTimesheet);
       }
-      if (newEndTime != null) {
-        parameters.add(TimesheetEditPage.PARAMETER_KEY_NEW_END_DATE, DateHelper.getDateTimeAsMillis(newEndTime));
+
+      if (dropMode == null || CalendarDropMode.MOVE_EDIT.equals(dropMode) || CalendarDropMode.COPY_EDIT.equals(dropMode)) {
+        // first: "normal edit mode"
+        // TODO use modal dialogs
+        final PageParameters parameters = new PageParameters();
+        parameters.add(AbstractEditPage.PARAMETER_KEY_ID, dbTimesheet.getId());
+        if (newStartTime != null) {
+          parameters.add(TimesheetEditPage.PARAMETER_KEY_NEW_START_DATE, DateHelper.getDateTimeAsMillis(newStartTime));
+        }
+        if (newEndTime != null) {
+          parameters.add(TimesheetEditPage.PARAMETER_KEY_NEW_END_DATE, DateHelper.getDateTimeAsMillis(newEndTime));
+        }
+        final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
+        timesheetEditPage.setReturnToPage((WebPage) getPage());
+        setResponsePage(timesheetEditPage);
+      } else if (CalendarDropMode.MOVE_SAVE.equals(dropMode) || CalendarDropMode.COPY_SAVE.equals(dropMode)) {
+        // second mode: "quick save mode"
+        if(CalendarDropMode.MOVE_SAVE.equals(dropMode)) {
+          // we need update only in "move" mode, in "copy" mode it was saved a few lines above
+          timesheetDao.update(dbTimesheet);
+        }
+        setResponsePage(getPage()); // TODO not needed if we can close the context menu programatically through ajax target
       }
-      final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
-      timesheetEditPage.setReturnToPage((WebPage) getPage());
-      setResponsePage(timesheetEditPage);
     }
   }
 

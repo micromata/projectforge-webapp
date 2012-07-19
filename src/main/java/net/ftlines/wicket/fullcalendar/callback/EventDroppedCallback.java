@@ -31,18 +31,18 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
 
   private static final String CALLBACK_PRE_SCRIPT = "var triggerAjaxEvent = function (which) { ";
 
-  private static final String MOVE_SAVE = "calendar.dd.move.save";
-  private static final String COPY_SAVE = "calendar.dd.copy.save";
-  private static final String MOVE_EDIT = "calendar.dd.move.edit";
-  private static final String COPY_EDIT = "calendar.dd.copy.edit";
+  private static final String MOVE_SAVE = CalendarDropMode.MOVE_SAVE.getI18nKey();
+  private static final String MOVE_EDIT = CalendarDropMode.MOVE_EDIT.getI18nKey();
+  private static final String COPY_SAVE = CalendarDropMode.COPY_SAVE.getI18nKey();
+  private static final String COPY_EDIT = CalendarDropMode.COPY_EDIT.getI18nKey();
 
   private static final String CALLBACK_POST_SCRIPT = "}; $.contextMenu.create("
       + "["
-      + "{ '" + MOVE_SAVE + "' : function(menuItem,menu) { triggerAjaxEvent('MoveSave'); } },"
-      + "{ '" + COPY_SAVE + "' : function(menuItem,menu) { triggerAjaxEvent('CopySave'); } },"
+      + "{ '" + MOVE_SAVE + "' : function(menuItem,menu) { triggerAjaxEvent('" + CalendarDropMode.MOVE_SAVE.getAjaxTarget() + "'); } },"
+      + "{ '" + COPY_SAVE + "' : function(menuItem,menu) { triggerAjaxEvent('" + CalendarDropMode.COPY_SAVE.getAjaxTarget() + "'); } },"
       + "$.contextMenu.separator,"
-      + "{ '" + MOVE_EDIT + "' : function(menuItem,menu) { triggerAjaxEvent('MoveEdit'); } },"
-      + "{ '" + COPY_EDIT + "' : function(menuItem,menu) { triggerAjaxEvent('CopyEdit'); } }"
+      + "{ '" + MOVE_EDIT + "' : function(menuItem,menu) { triggerAjaxEvent('" + CalendarDropMode.MOVE_EDIT.getAjaxTarget() + "'); } },"
+      + "{ '" + COPY_EDIT + "' : function(menuItem,menu) { triggerAjaxEvent('" + CalendarDropMode.COPY_EDIT.getAjaxTarget() + "'); } }"
       + "],"
       + "{hideCallback: function () {this.menu.remove(); revertFunc(); console.log(revertFunc);} }"
       + ").show(this, originalEvent);";
