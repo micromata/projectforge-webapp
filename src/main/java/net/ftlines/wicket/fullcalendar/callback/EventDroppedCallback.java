@@ -17,6 +17,7 @@ import net.ftlines.wicket.fullcalendar.Event;
 import net.ftlines.wicket.fullcalendar.EventSource;
 import net.ftlines.wicket.fullcalendar.EventSourceNotFoundException;
 
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.AbstractReadOnlyModel;
 import org.apache.wicket.model.IModel;
@@ -30,13 +31,18 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
 
   private static final String CALLBACK_PRE_SCRIPT = "var triggerAjaxEvent = function (which) { ";
 
+  private static final String MOVE_SAVE = "calendar.dd.move.save";
+  private static final String COPY_SAVE = "calendar.dd.copy.save";
+  private static final String MOVE_EDIT = "calendar.dd.move.edit";
+  private static final String COPY_EDIT = "calendar.dd.copy.edit";
+
   private static final String CALLBACK_POST_SCRIPT = "}; $.contextMenu.create("
       + "["
-      + "{ '${calendar.dd.move.save}' : function(menuItem,menu) { triggerAjaxEvent('MoveSave'); } },"
-      + "{'${calendar.dd.copy.save}' : function(menuItem,menu) { triggerAjaxEvent('CopySave'); } },"
+      + "{ '" + MOVE_SAVE + "' : function(menuItem,menu) { triggerAjaxEvent('MoveSave'); } },"
+      + "{ '" + COPY_SAVE + "' : function(menuItem,menu) { triggerAjaxEvent('CopySave'); } },"
       + "$.contextMenu.separator,"
-      + "{'${calendar.dd.move.edit}' : function(menuItem,menu) { triggerAjaxEvent('MoveEdit'); } },"
-      + "{'${calendar.dd.copy.edit}' : function(menuItem,menu) { triggerAjaxEvent('CopyEdit'); } }"
+      + "{ '" + MOVE_EDIT + "' : function(menuItem,menu) { triggerAjaxEvent('MoveEdit'); } },"
+      + "{ '" + COPY_EDIT + "' : function(menuItem,menu) { triggerAjaxEvent('CopyEdit'); } }"
       + "],"
       + "{hideCallback: function () {this.menu.remove(); revertFunc(); console.log(revertFunc);} }"
       + ").show(this, originalEvent);";
@@ -44,11 +50,27 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
   @Override
   protected String configureCallbackScript(final String script, final String urlTail)
   {
+
     return CALLBACK_PRE_SCRIPT
         + script.replace(urlTail, "&eventId='+event.id+'&sourceId='+event.source.data."
             + EventSource.Const.UUID
             + "+'&dayDelta='+dayDelta+'&minuteDelta='+minuteDelta+'&allDay='+allDay+'&which='+which+'")
-            + CALLBACK_POST_SCRIPT;
+            + i18nCallbackScript(CALLBACK_POST_SCRIPT);
+  }
+
+  /**
+   * @param callbackPostScript
+   * @return
+   */
+  private String i18nCallbackScript(final String callbackPostScript)
+  {
+    String result = callbackPostScript;
+    final Component component = getComponent();
+    result = result.replace(MOVE_SAVE, component.getString(MOVE_SAVE));
+    result = result.replace(MOVE_EDIT, component.getString(MOVE_EDIT));
+    result = result.replace(COPY_SAVE, component.getString(COPY_SAVE));
+    result = result.replace(COPY_EDIT, component.getString(COPY_EDIT));
+    return result;
   }
 
   public IModel<String> getHandlerScript()
