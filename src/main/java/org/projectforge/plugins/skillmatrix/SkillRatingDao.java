@@ -69,7 +69,6 @@ public class SkillRatingDao extends BaseDao<SkillRatingDO>
       final Object[] values = SkillRating.getRequiredExperienceValues(myFilter.getSkillRating());
       queryFilter.add(Restrictions.in("skillRating", values));
     }
-    // TODO isn't this bad programming style?? (no super. because of method overloading, but isn't visible at first sight)
     return getList(queryFilter);
   }
 
