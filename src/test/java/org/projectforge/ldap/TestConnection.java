@@ -86,14 +86,24 @@ public class TestConnection
     udao.changePassword(user, null, "test");
     udao.authenticate("h.meier", "test", "pf-test", "users");
     udao.changePassword(user, null, "hurzel");
-    udao.authenticate("h.meier", "test", "pf-test", "users");
-    udao.authenticate("h.meier", "hurzel", "pf-test", "users");
+    if (udao.authenticate("h.meier", "test", "pf-test", "users") == true) {
+      throw new RuntimeException("Login is possible but it shouldn't!");
+    }
     user.setSurname("Changed");
     user.setMail("h.meier@micromata.de");
     udao.update(user);
     user.setSurname("Meier");
     udao.update(user);
-    // pdao.delete(person);
+    if (udao.authenticate("h.meier", "hurzel", "pf-test", "users") == false) {
+      throw new RuntimeException("Login should be possible");
+    }
+    udao.deactivateUser(user);
+    if (udao.authenticate("h.meier", "hurzel", "pf-test", "users") == true) {
+      throw new RuntimeException("Login is possible but it shouldn't!");
+    }
+    if (udao.authenticate("h.meier", "", "pf-test", "users") == true) {
+      throw new RuntimeException("Login is possible with empty password but it shouldn't!");
+    }
 
     odao.createIfNotExist("pf-test", "Test organizational unit for testing ProjectForge.", "contacts");
     final LdapPersonDao adao = new LdapPersonDao();

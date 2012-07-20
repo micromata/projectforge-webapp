@@ -24,7 +24,6 @@
 package org.projectforge.ldap;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -113,10 +112,9 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
    * @param setOfAllLdapObjects List generated before via {@link #getSetOfAllObjects()}.
    * @param obj
    */
-  public void createOrUpdate(final Set<String> setOfAllLdapObjects, final T obj, final Object... args)
+  public void createOrUpdate(final SetOfAllLdapObjects setOfAllLdapObjects, final T obj, final Object... args)
   {
-    final String dn = buildDn(obj);
-    if (setOfAllLdapObjects.contains(dn) == true) {
+    if (setOfAllLdapObjects.contains(obj, buildDn(obj)) == true) {
       update(obj, args);
     } else {
       create(obj, args);
@@ -287,15 +285,15 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
   /**
    * Set of all objects (the string is built from the method {@link #buildDn(Object)}).
    */
-  public Set<String> getSetOfAllObjects()
+  public SetOfAllLdapObjects getSetOfAllObjects()
   {
+    final SetOfAllLdapObjects set = new SetOfAllLdapObjects();
     final List<T> all = findAll();
-    final Set<String> set = new HashSet<String>();
     for (final T obj : all) {
       if (log.isDebugEnabled() == true) {
         log.debug("Adding: " + obj.getDn());
       }
-      set.add(obj.getDn());
+      set.add(obj);
     }
     return set;
   }

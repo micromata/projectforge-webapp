@@ -41,13 +41,7 @@ public class LdapUserDao extends LdapPersonDao
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapUserDao.class);
 
-  private static final String[] ADDITIONAL_OBJECT_CLASSES = { "inetOrgPerson", "shadowAccount"};
-
-  @Override
-  protected String[] getAdditionalObjectClasses()
-  {
-    return ADDITIONAL_OBJECT_CLASSES;
-  }
+  private static final String DEACTIVATED_SUFFIX = " (deactivated)";
 
   /**
    * @see org.projectforge.ldap.LdapPersonDao#getIdAttrId()
@@ -69,8 +63,13 @@ public class LdapUserDao extends LdapPersonDao
 
   public void deactivateUser(final LdapPerson user)
   {
-    final ModificationItem[] modificationItems = new ModificationItem[1];
-    modificationItems[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("shadowExpire", "0"));
+    log.info("Deactivate user: " + buildDn(user));
+    final ModificationItem[] modificationItems = new ModificationItem[3];
+    modificationItems[0] = new ModificationItem(DirContext.REMOVE_ATTRIBUTE, new BasicAttribute("userPassword"));
+    user.setSurname(StringUtils.defaultString(user.getSurname()) + DEACTIVATED_SUFFIX);
+    modificationItems[1] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("sn", user.getSurname()));
+    modificationItems[2] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("mail", "deactivated@devnull.com"));
+    buildDn(user);
     modify(user, modificationItems);
   }
 
@@ -125,7 +124,6 @@ public class LdapUserDao extends LdapPersonDao
       }
     }.excecute();
   }
-
 
   public boolean authenticate(final String username, final String userPassword, final String... organizationalUnits)
   {

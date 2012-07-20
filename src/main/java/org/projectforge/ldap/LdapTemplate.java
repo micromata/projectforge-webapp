@@ -39,6 +39,10 @@ public abstract class LdapTemplate
 
   private final LdapConnector ldapConnector;
 
+  private static int openConnections = 0;
+
+  //private static int openResults = 0;
+
   protected NamingEnumeration<SearchResult> results;
 
   protected DirContext ctx;
@@ -51,6 +55,9 @@ public abstract class LdapTemplate
   public Object excecute()
   {
     ctx = ldapConnector.createContext();
+    if (ctx != null) {
+      ++openConnections;
+    }
     return internalExcecute();
   }
 
@@ -65,7 +72,8 @@ public abstract class LdapTemplate
     return internalExcecute();
   }
 
-  private Object internalExcecute() {
+  private Object internalExcecute()
+  {
     results = null;
     try {
       return call();
@@ -87,7 +95,9 @@ public abstract class LdapTemplate
       }
       if (ctx != null) {
         try {
+          log.info("Closing LDAP connection (" + openConnections + " connections opened).");
           ctx.close();
+          --openConnections;
         } catch (final Exception e) {
           log.error(e.getMessage(), e);
           // Never mind this.
