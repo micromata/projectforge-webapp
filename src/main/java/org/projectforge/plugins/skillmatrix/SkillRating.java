@@ -67,7 +67,7 @@ public enum SkillRating implements I18nEnum
   /**
    * 
    * @param rating
-   * @return Returns a search string, that returns all ratings equal or higher than the input rating.
+   * @return Returns a array of ratings, that are equal or higher than the param rating.
    */
   public static Object[] getRequiredExperienceValues(final SkillRating rating)
   {
