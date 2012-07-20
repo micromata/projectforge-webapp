@@ -111,7 +111,7 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
     gridBuilder.newGrid16();
     {
       // User
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skillrating.user"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.skillrating.user")).setNoLabelFor();
       final DivTextPanel username = new DivTextPanel(fs.newChildId(), data.getUser().getUsername());
       username.setStrong();
       fs.add(username);
