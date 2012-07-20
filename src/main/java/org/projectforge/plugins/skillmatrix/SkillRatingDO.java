@@ -25,6 +25,8 @@ package org.projectforge.plugins.skillmatrix;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -62,6 +64,7 @@ public class SkillRatingDO extends DefaultBaseDO
   @Field(index = Index.UN_TOKENIZED, store = Store.NO)
   private Integer sinceYear;
 
+  @Enumerated(EnumType.STRING)
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private SkillRating skillRating;
 
