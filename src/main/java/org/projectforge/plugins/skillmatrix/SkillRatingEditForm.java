@@ -97,9 +97,10 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
         filter.setSearchString(data.getUser().getUsername());
         final List<SkillRatingDO> list = skillRatingDao.getList(filter);
         for (final SkillRatingDO skillRatingDO : list) {
-          if(skillRatingDO.getSkill().getTitle() == skillTextField.getConvertedInput().getTitle()) {
+          final boolean sameSkill = skillRatingDO.getSkill().getTitle() == skillTextField.getConvertedInput().getTitle();
+          final boolean sameSkillRating = skillRatingDO.getCreated().equals(data.getCreated());
+          if(sameSkill && sameSkillRating == false) {
             error(getString("plugins.skillmatrix.error.skillRatingExistsAlready"));
-            // TODO jump out of loop, count multiple entries, or just leave it the way it is?
             break;
           }
         }
