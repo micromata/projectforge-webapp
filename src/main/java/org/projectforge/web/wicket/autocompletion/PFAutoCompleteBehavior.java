@@ -60,8 +60,6 @@ public abstract class PFAutoCompleteBehavior<T> extends AbstractDefaultAjaxBehav
   {
     super.renderHead(component, response);
     response.renderJavaScriptReference("scripts/jquery.wicket-autocomplete.js");
-    // private static final ResourceReference AUTOCOMPLETE_JS = new JavascriptResourceReference(PFAutoCompleteBehavior.class,
-    // "jquery.wicket-autocomplete.js");
     renderAutocompleteHead(response);
   }
 
