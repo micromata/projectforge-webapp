@@ -9,22 +9,29 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import java.util.List;
+
+import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.QueryFilter;
 import org.projectforge.user.UserRightId;
 
 /**
  * @author Billy Duong (duong.billy@yahoo.de)
- *
+ * 
  */
 public class SkillRatingDao extends BaseDao<SkillRatingDO>
 {
-  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_SKILL_MATRIX_SKILL_RATING", "plugin20", "plugins.skillmatrix.skillrating");
+  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_SKILL_MATRIX_SKILL_RATING", "plugin20",
+      "plugins.skillmatrix.skillrating");
 
   static final String I18N_KEY_ERROR_CYCLIC_REFERENCE = "plugins.skillmatrix.error.cyclicReference";
 
-  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "skill.title" };
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "skill.title"};
 
-  public SkillRatingDao(){
+  public SkillRatingDao()
+  {
     super(SkillRatingDO.class);
     userRightId = USER_RIGHT_ID;
   }
@@ -42,6 +49,28 @@ public class SkillRatingDao extends BaseDao<SkillRatingDO>
   protected String[] getAdditionalSearchFields()
   {
     return ADDITIONAL_SEARCH_FIELDS;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#getList(org.projectforge.core.BaseSearchFilter)
+   */
+  @Override
+  public List<SkillRatingDO> getList(final BaseSearchFilter filter)
+  {
+    final SkillRatingFilter myFilter;
+    if (filter instanceof SkillRatingFilter) {
+      myFilter = (SkillRatingFilter) filter;
+    } else {
+      myFilter = new SkillRatingFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
+
+    if (myFilter.getSkillRating() != null) {
+      final Object[] values = SkillRating.getRequiredExperienceValues(myFilter.getSkillRating());
+      queryFilter.add(Restrictions.in("skillRating", values));
+    }
+    // TODO isn't this bad programming style?? (no super. because of method overloading, but isn't visible at first sight)
+    return getList(queryFilter);
   }
 
 }

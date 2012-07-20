@@ -10,14 +10,18 @@
 package org.projectforge.plugins.skillmatrix;
 
 import org.apache.log4j.Logger;
-import org.projectforge.core.BaseSearchFilter;
+import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
+import org.projectforge.web.wicket.flowlayout.DivType;
+import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
+import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
  * @author Billy Duong (duong.billy@yahoo.de)
  * 
  */
-public class SkillRatingListForm extends AbstractListForm<BaseSearchFilter, SkillRatingListPage>
+public class SkillRatingListForm extends AbstractListForm<SkillRatingFilter, SkillRatingListPage>
 {
   private static final long serialVersionUID = 5333752125044497290L;
 
@@ -31,13 +35,35 @@ public class SkillRatingListForm extends AbstractListForm<BaseSearchFilter, Skil
     super(parentPage);
   }
 
+  @Override
+  protected void init() {
+    super.init();
+    {
+      // Required experience
+      gridBuilder.newColumnPanel(DivType.COL_60);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.skillmatrix.search.reqiuredExperience")).setNoLabelFor();
+      fs.getFieldset().setOutputMarkupId(true);
+      final LabelValueChoiceRenderer<SkillRating> ratingChoiceRenderer = new LabelValueChoiceRenderer<SkillRating>(this,
+          SkillRating.values());
+      final DropDownChoicePanel<SkillRating> skillChoice = new DropDownChoicePanel<SkillRating>(fs.newChildId(),
+          new PropertyModel<SkillRating>(getSearchFilter(), "skillRating"), ratingChoiceRenderer.getValues(), ratingChoiceRenderer);
+      skillChoice.setNullValid(true);
+      fs.add(skillChoice);
+    }
+    {
+      // DropDownChoice page size
+      gridBuilder.newColumnPanel(DivType.COL_40);
+      addPageSizeFieldset();
+    }
+  }
+
   /**
    * @see org.projectforge.web.wicket.AbstractListForm#newSearchFilterInstance()
    */
   @Override
-  protected BaseSearchFilter newSearchFilterInstance()
+  protected SkillRatingFilter newSearchFilterInstance()
   {
-    return new BaseSearchFilter();
+    return new SkillRatingFilter();
   }
 
   /**

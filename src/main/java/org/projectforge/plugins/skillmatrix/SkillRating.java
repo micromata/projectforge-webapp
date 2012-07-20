@@ -23,6 +23,9 @@
 
 package org.projectforge.plugins.skillmatrix;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.projectforge.core.I18nEnum;
 
 /**
@@ -32,9 +35,11 @@ import org.projectforge.core.I18nEnum;
  */
 public enum SkillRating implements I18nEnum
 {
-  UNKNOWN("unknown"), ZERO("zero"), LOW("low"), MIDDLE("middle"), HIGH("high"), EXPERT("expert");
+  UNKNOWN("unknown", 1), ZERO("zero", 2), LOW("low", 3), MIDDLE("middle", 4), HIGH("high", 5), EXPERT("expert", 6);
 
   private String key;
+
+  private int ordering;
 
   /**
    * @return The full i18n key including the i18n prefix "plugins.skillmatrix.skillrating.rating.".
@@ -53,8 +58,36 @@ public enum SkillRating implements I18nEnum
     return key;
   }
 
-  private SkillRating(final String key)
+  private SkillRating(final String key, final int ordering)
   {
     this.key = key;
+    this.ordering = ordering;
   }
+
+  /**
+   * 
+   * @param rating
+   * @return Returns a search string, that returns all ratings equal or higher than the input rating.
+   */
+  public static Object[] getRequiredExperienceValues(final SkillRating rating)
+  {
+    final Collection<SkillRating> values = new ArrayList<SkillRating>(5);
+    // The missing breaks are intentionally: this way the key of the case itself and all the cases higher are added.
+    switch (rating) {
+      case UNKNOWN:
+        values.add(UNKNOWN);
+      case ZERO:
+        values.add(ZERO);
+      case LOW:
+        values.add(LOW);
+      case MIDDLE:
+        values.add(MIDDLE);
+      case HIGH:
+        values.add(HIGH);
+      case EXPERT:
+        values.add(EXPERT);
+    }
+    return values.toArray();
+  }
+
 }
