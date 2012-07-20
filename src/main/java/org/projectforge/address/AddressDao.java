@@ -341,74 +341,86 @@ public class AddressDao extends BaseDao<AddressDO>
         // Entry is not marks as vCard-Entry.
         continue;
       }
-      final AddressDO a = entry.getAddress();
-      pw.println("BEGIN:VCARD");
-      pw.println("VERSION:3.0");
-      pw.print("N:");
-      out(pw, a.getName());
-      pw.print(';');
-      out(pw, a.getFirstName());
-      pw.print(";;");
-      out(pw, a.getTitle());
-      pw.println(";");
-      print(pw, "FN:", getFullName(a));
-      if (isGiven(a.getOrganization()) == true || isGiven(a.getDivision()) == true) {
-        pw.print("ORG:");
-        out(pw, a.getOrganization());
-        pw.print(';');
-        if (isGiven(a.getDivision()) == true) {
-          out(pw, a.getDivision());
-        }
-        pw.println();
-      }
-      print(pw, "TITLE:", a.getPositionText());
-      print(pw, "EMAIL;type=INTERNET;type=WORK;type=pref:", a.getEmail());
-      print(pw, "EMAIL;type=INTERNET;type=HOME;type=pref:", a.getPrivateEmail());
-      print(pw, "TEL;type=WORK;type=pref:", a.getBusinessPhone());
-      print(pw, "TEL;TYPE=CELL:", a.getMobilePhone());
-      print(pw, "TEL;type=WORK;type=FAX:", a.getFax());
-      print(pw, "TEL;TYPE=HOME:", a.getPrivatePhone());
-      print(pw, "TEL;TYPE=HOME;type=CELL:", a.getPrivateMobilePhone());
-
-      if (isGiven(a.getAddressText()) == true || isGiven(a.getCity()) == true || isGiven(a.getZipCode()) == true) {
-        pw.print("ADR;TYPE=WORK:;;");
-        out(pw, a.getAddressText());
-        pw.print(';');
-        out(pw, a.getCity());
-        pw.print(";;");
-        out(pw, a.getZipCode());
-        pw.print(';');
-        out(pw, a.getCountry());
-        pw.println();
-      }
-      if (isGiven(a.getPrivateAddressText()) == true || isGiven(a.getPrivateCity()) == true || isGiven(a.getPrivateZipCode()) == true) {
-        pw.print("ADR;TYPE=HOME:;;");
-        out(pw, a.getPrivateAddressText());
-        pw.print(';');
-        out(pw, a.getPrivateCity());
-        pw.print(";;");
-        out(pw, a.getPrivateZipCode());
-        pw.print(";");
-        pw.println();
-      }
-      print(pw, "URL;type=pref:", a.getWebsite());
-      if (a.getBirthday() != null) {
-        print(pw, "BDAY;value=date:", V_CARD_DATE_FORMAT.format(a.getBirthday()));
-      }
-      if (isGiven(a.getComment()) == true) {
-        print(pw, "NOTE:", a.getComment() + "\\nCLASS: WORK");
-      } else {
-        print(pw, "NOTE:", "CLASS: WORK");
-      }
-      // pw.println("TZ:+00:00");
-      pw.println("CATEGORIES:ProjectForge");
-      pw.print("UID:U");
-      pw.println(a.getId());
-      pw.println("END:VCARD");
-      pw.println();
-      // Unused: a.getState();
+      final AddressDO addressDO = entry.getAddress();
+      exportVCard(pw, addressDO);
     }
     pw.flush();
+  }
+
+  /**
+   * Exports a single vcard for the given addressDO
+   * @param pw
+   * @param addressDO
+   * @return
+   */
+  public void exportVCard(final PrintWriter pw, final AddressDO addressDO)
+  {
+    log.info("Exporting vCard for addressDo : " + addressDO != null ? addressDO.getId() : null);
+    pw.println("BEGIN:VCARD");
+    pw.println("VERSION:3.0");
+    pw.print("N:");
+    out(pw, addressDO.getName());
+    pw.print(';');
+    out(pw, addressDO.getFirstName());
+    pw.print(";;");
+    out(pw, addressDO.getTitle());
+    pw.println(";");
+    print(pw, "FN:", getFullName(addressDO));
+    if (isGiven(addressDO.getOrganization()) == true || isGiven(addressDO.getDivision()) == true) {
+      pw.print("ORG:");
+      out(pw, addressDO.getOrganization());
+      pw.print(';');
+      if (isGiven(addressDO.getDivision()) == true) {
+        out(pw, addressDO.getDivision());
+      }
+      pw.println();
+    }
+    print(pw, "TITLE:", addressDO.getPositionText());
+    print(pw, "EMAIL;type=INTERNET;type=WORK;type=pref:", addressDO.getEmail());
+    print(pw, "EMAIL;type=INTERNET;type=HOME;type=pref:", addressDO.getPrivateEmail());
+    print(pw, "TEL;type=WORK;type=pref:", addressDO.getBusinessPhone());
+    print(pw, "TEL;TYPE=CELL:", addressDO.getMobilePhone());
+    print(pw, "TEL;type=WORK;type=FAX:", addressDO.getFax());
+    print(pw, "TEL;TYPE=HOME:", addressDO.getPrivatePhone());
+    print(pw, "TEL;TYPE=HOME;type=CELL:", addressDO.getPrivateMobilePhone());
+
+    if (isGiven(addressDO.getAddressText()) == true || isGiven(addressDO.getCity()) == true || isGiven(addressDO.getZipCode()) == true) {
+      pw.print("ADR;TYPE=WORK:;;");
+      out(pw, addressDO.getAddressText());
+      pw.print(';');
+      out(pw, addressDO.getCity());
+      pw.print(";;");
+      out(pw, addressDO.getZipCode());
+      pw.print(';');
+      out(pw, addressDO.getCountry());
+      pw.println();
+    }
+    if (isGiven(addressDO.getPrivateAddressText()) == true || isGiven(addressDO.getPrivateCity()) == true || isGiven(addressDO.getPrivateZipCode()) == true) {
+      pw.print("ADR;TYPE=HOME:;;");
+      out(pw, addressDO.getPrivateAddressText());
+      pw.print(';');
+      out(pw, addressDO.getPrivateCity());
+      pw.print(";;");
+      out(pw, addressDO.getPrivateZipCode());
+      pw.print(";");
+      pw.println();
+    }
+    print(pw, "URL;type=pref:", addressDO.getWebsite());
+    if (addressDO.getBirthday() != null) {
+      print(pw, "BDAY;value=date:", V_CARD_DATE_FORMAT.format(addressDO.getBirthday()));
+    }
+    if (isGiven(addressDO.getComment()) == true) {
+      print(pw, "NOTE:", addressDO.getComment() + "\\nCLASS: WORK");
+    } else {
+      print(pw, "NOTE:", "CLASS: WORK");
+    }
+    // pw.println("TZ:+00:00");
+    pw.println("CATEGORIES:ProjectForge");
+    pw.print("UID:U");
+    pw.println(addressDO.getId());
+    pw.println("END:VCARD");
+    pw.println();
+    // Unused: addressDO.getState();
   }
 
   /**

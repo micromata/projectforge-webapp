@@ -23,6 +23,10 @@
 
 package org.projectforge.web.address;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Date;
+
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -31,9 +35,11 @@ import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.address.PersonalAddressDO;
 import org.projectforge.address.PersonalAddressDao;
+import org.projectforge.common.DateHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractSecuredBasePage;
+import org.projectforge.web.wicket.DownloadUtils;
 import org.projectforge.web.wicket.EditPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
@@ -68,6 +74,22 @@ public class AddressEditPage extends AbstractEditPage<AddressDO, AddressEditForm
         };
       }, getString("printView"));
       addContentMenuEntry(menu);
+
+      final ContentMenuEntryPanel singleIcalExport = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
+        @Override
+        public void onClick()
+        {
+          final AddressDO address = form.getData();
+          final String filename = "ProjectForge-" + address.getFullName() + "_" + DateHelper.getDateAsFilenameSuffix(new Date()) + ".vcf";
+          final StringWriter writer = new StringWriter();
+          addressDao.exportVCard(new PrintWriter(writer), address);
+          DownloadUtils.setUTF8CharacterEncoding(getResponse());
+          DownloadUtils.setDownloadTarget(writer.toString().getBytes(), filename);
+        };
+      }, getString("address.book.vCardSingleExport"));
+      addContentMenuEntry(singleIcalExport);
+
+
       if (ConfigXml.getInstance().isTelephoneSystemUrlConfigured() == true) {
         menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), new Link<Void>(ContentMenuEntryPanel.LINK_ID) {
           @Override
