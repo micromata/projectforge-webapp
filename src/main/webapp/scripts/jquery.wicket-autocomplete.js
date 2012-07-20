@@ -248,7 +248,7 @@ jQuery.autocomplete = function(input, options) {
 		input.lastSelected = v;
 		prev = v;
 		$results.html("");
-		$input.val(v);
+		$input.val(v).change();
 		hideResultsNow();
 		if (options.onItemSelect) setTimeout(function() { options.onItemSelect(li) }, 1);
 	};
