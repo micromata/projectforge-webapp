@@ -92,14 +92,15 @@ public class SkillRatingEditForm extends AbstractEditForm<SkillRatingDO, SkillRa
           error(getString("plugins.skillmatrix.error.unrateableSkillWithRating"));
         }
 
-        final BaseSearchFilter filter = new BaseSearchFilter();
+        final SkillRatingFilter filter = new SkillRatingFilter();
         filter.setSearchFields("user.username");
         filter.setSearchString(data.getUser().getUsername());
         final List<SkillRatingDO> list = skillRatingDao.getList(filter);
         for (final SkillRatingDO skillRatingDO : list) {
+          final boolean isDeleted = skillRatingDO.getSkill().isDeleted();
           final boolean sameSkill = skillRatingDO.getSkill().getTitle() == skillTextField.getConvertedInput().getTitle();
           final boolean sameSkillRating = skillRatingDO.getCreated().equals(data.getCreated());
-          if(sameSkill && sameSkillRating == false) {
+          if(isDeleted == false && sameSkill && sameSkillRating == false) {
             error(getString("plugins.skillmatrix.error.skillRatingExistsAlready"));
             break;
           }
