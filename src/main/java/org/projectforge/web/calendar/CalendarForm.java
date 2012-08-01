@@ -97,7 +97,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       fs.add(userSelectPanel);
       userSelectPanel.init().withAutoSubmit(true).setLabel(new Model<String>(getString("user")));
     }
-    currentDatePanel = new JodaDatePanel(fs.newChildId(), new PropertyModel<DateMidnight>(filter, "startDate"));
+    currentDatePanel = new JodaDatePanel(fs.newChildId(), new PropertyModel<DateMidnight>(filter, "startDate")).setAutosubmit(true);
     currentDatePanel.getDateField().setOutputMarkupId(true);
     fs.add(currentDatePanel);
     final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
