@@ -59,12 +59,12 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
 
   private GroupDao groupDao;
 
-  public void setTaskTree(TaskTree taskTree)
+  public void setTaskTree(final TaskTree taskTree)
   {
     this.taskTree = taskTree;
   }
 
-  public void setTaskDao(TaskDao taskDao)
+  public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
   }
@@ -75,7 +75,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
     this.supportAfterUpdate = true;
   }
 
-  public void setGroupDao(GroupDao groupDao)
+  public void setGroupDao(final GroupDao groupDao)
   {
     this.groupDao = groupDao;
   }
@@ -85,9 +85,9 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
    * @param taskId If null, then task will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setTask(final GroupTaskAccessDO access, Integer taskId)
+  public void setTask(final GroupTaskAccessDO access, final Integer taskId)
   {
-    TaskDO task = taskDao.getOrLoad(taskId);
+    final TaskDO task = taskDao.getOrLoad(taskId);
     access.setTask(task);
   }
 
@@ -96,9 +96,9 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
    * @param groupId If null, then group will be set to null;
    * @see BaseDao#getOrLoad(Integer)
    */
-  public void setGroup(final GroupTaskAccessDO access, Integer groupId)
+  public void setGroup(final GroupTaskAccessDO access, final Integer groupId)
   {
-    GroupDO group = groupDao.getOrLoad(groupId);
+    final GroupDO group = groupDao.getOrLoad(groupId);
     access.setGroup(group);
   }
 
@@ -131,8 +131,8 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
     Validate.notNull(task.getId());
     Validate.notNull(group);
     Validate.notNull(group.getId());
-    final List<GroupTaskAccessDO> list = (List<GroupTaskAccessDO>) getHibernateTemplate().find(
-        "from GroupTaskAccessDO a where a.task.id = ? and a.group.id = ?", new Object[] { task.getId(), group.getId()});
+    final List<GroupTaskAccessDO> list = getHibernateTemplate().find("from GroupTaskAccessDO a where a.task.id = ? and a.group.id = ?",
+        new Object[] { task.getId(), group.getId()});
     if (list != null && list.size() == 1) {
       final GroupTaskAccessDO access = list.get(0);
       checkLoggedInUserSelectAccess(access);
@@ -155,10 +155,10 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
       List<Integer> descendants = null;
       List<Integer> ancestors = null;
       final TaskNode node = taskTree.getTaskNodeById(myFilter.getTaskId());
-      if (myFilter.isRecursive() == true) {
+      if (myFilter.isIncludeDescendentTasks() == true) {
         descendants = node.getDescendantIds();
       }
-      if (myFilter.isInherit() == true) {
+      if (myFilter.isInherit() == true || myFilter.isIncludeAncestorTasks() == true) {
         ancestors = node.getAncestorIds();
       }
       if (descendants != null || ancestors != null) {
@@ -180,7 +180,30 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
       group.setId(myFilter.getGroupId());
       queryFilter.add(Restrictions.eq("group", group));
     }
-    final List<GroupTaskAccessDO> list = getList(queryFilter);
+    final List<GroupTaskAccessDO> qlist = getList(queryFilter);
+    List<GroupTaskAccessDO> list;
+    if (myFilter.getTaskId() != null && myFilter.isInherit() == true && myFilter.isIncludeAncestorTasks() == false) {
+      // Now we have to remove all inherited entries of ancestor nodes which are not declared as recursive.
+      list = new ArrayList<GroupTaskAccessDO>();
+      final TaskNode taskNode = taskTree.getTaskNodeById(myFilter.getTaskId());
+      if (taskNode == null) { // Paranoia
+        list = qlist;
+      } else {
+        for (final GroupTaskAccessDO access : qlist) {
+          if (access.isRecursive() == false) {
+            final TaskNode accessNode = taskTree.getTaskNodeById(access.getTaskId());
+            // && myFilter.getTaskId().equals(access.getTaskId()) == false) {
+            if (accessNode.isParentOf(taskNode) == true) {
+              // This entry is not recursive and inherited, therefore this entry will be ignored.
+              continue;
+            }
+          }
+          list.add(access);
+        }
+      }
+    } else {
+      list = qlist;
+    }
     if (myFilter.getUserId() != null) {
       final List<GroupTaskAccessDO> result = new ArrayList<GroupTaskAccessDO>();
       for (final GroupTaskAccessDO access : list) {
@@ -307,8 +330,8 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
       } else {
         bufNew.append(";");
       }
-      bufNew.append(entry.getAccessType()).append("={").append(entry.getAccessSelect()).append(",").append(entry.getAccessInsert()).append(
-          ",").append(entry.getAccessUpdate()).append(",").append(entry.getAccessDelete()).append("}");
+      bufNew.append(entry.getAccessType()).append("={").append(entry.getAccessSelect()).append(",").append(entry.getAccessInsert())
+      .append(",").append(entry.getAccessUpdate()).append(",").append(entry.getAccessDelete()).append("}");
       if (dbEntry != null) {
         if (firstOld == true) {
           firstOld = false;
@@ -316,7 +339,7 @@ public class AccessDao extends BaseDao<GroupTaskAccessDO>
           bufOld.append(";");
         }
         bufOld.append(dbEntry.getAccessType()).append("={").append(dbEntry.getAccessSelect()).append(",").append(dbEntry.getAccessInsert())
-            .append(",").append(dbEntry.getAccessUpdate()).append(",").append(dbEntry.getAccessDelete()).append("}");
+        .append(",").append(dbEntry.getAccessUpdate()).append(",").append(dbEntry.getAccessDelete()).append("}");
       }
     }
     if (firstNew == false || firstOld == false) {

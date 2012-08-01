@@ -38,7 +38,7 @@ public class AccessFilter extends BaseSearchFilter implements Serializable
 
   private Integer taskId, groupId, userId;
 
-  private boolean recursive, inherit;
+  private boolean includeAncestorTasks, includeDescendentTasks, inherit;
 
   public AccessFilter()
   {
@@ -58,24 +58,42 @@ public class AccessFilter extends BaseSearchFilter implements Serializable
    * @param taskId
    * @return this for chaining.
    */
-  public AccessFilter setTaskId(Integer taskId)
+  public AccessFilter setTaskId(final Integer taskId)
   {
     this.taskId = taskId;
     return this;
   }
 
-  public boolean isRecursive()
+  public boolean isIncludeAncestorTasks()
   {
-    return recursive;
+    return includeAncestorTasks;
   }
 
   /**
-   * @param recursive
+   * @param includeAncestorTasks
    * @return this for chaining.
    */
-  public AccessFilter setRecursive(boolean recursive)
+  public AccessFilter setIncludeAncestorTasks(final boolean includeAncestorTasks)
   {
-    this.recursive = recursive;
+    this.includeAncestorTasks = includeAncestorTasks;
+    return this;
+  }
+
+  /**
+   * @return the includeDescendentTasks
+   */
+  public boolean isIncludeDescendentTasks()
+  {
+    return includeDescendentTasks;
+  }
+
+  /**
+   * @param includeDescendentTasks the includeDescendentTasks to set
+   * @return this for chaining.
+   */
+  public AccessFilter setIncludeDescendentTasks(final boolean includeDescendentTasks)
+  {
+    this.includeDescendentTasks = includeDescendentTasks;
     return this;
   }
 
@@ -88,7 +106,7 @@ public class AccessFilter extends BaseSearchFilter implements Serializable
    * @param inherit
    * @return this for chaining.
    */
-  public AccessFilter setInherit(boolean inherit)
+  public AccessFilter setInherit(final boolean inherit)
   {
     this.inherit = inherit;
     return this;
@@ -103,7 +121,7 @@ public class AccessFilter extends BaseSearchFilter implements Serializable
    * @param groupId
    * @return this for chaining.
    */
-  public AccessFilter setGroupId(Integer groupId)
+  public AccessFilter setGroupId(final Integer groupId)
   {
     this.groupId = groupId;
     return this;
@@ -121,7 +139,7 @@ public class AccessFilter extends BaseSearchFilter implements Serializable
    * @param userId
    * @return this for chaining.
    */
-  public AccessFilter setUserId(Integer userId)
+  public AccessFilter setUserId(final Integer userId)
   {
     this.userId = userId;
     return this;

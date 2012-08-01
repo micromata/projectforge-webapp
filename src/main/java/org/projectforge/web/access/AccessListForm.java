@@ -137,8 +137,11 @@ public class AccessListForm extends AbstractListForm<AccessFilter, AccessListPag
           new PropertyModel<Boolean>(getSearchFilter(), "inherit"), getString("inherit")).setTooltip(
               getString("access.tooltip.filter.inherit")));
       checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-          new PropertyModel<Boolean>(getSearchFilter(), "recursive"), getString("recursive")).setTooltip(
-              getString("access.tooltip.filter.recursive")));
+          new PropertyModel<Boolean>(getSearchFilter(), "includeAncestorTasks"), getString("access.filter.includeAncestorTasks")).setTooltip(
+              getString("access.tooltip.filter.includeAncestorTasks")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
+          new PropertyModel<Boolean>(getSearchFilter(), "includeDescendentTasks"), getString("access.filter.includeDescendentTasks")).setTooltip(
+              getString("access.tooltip.filter.includeDescendentTasks")));
       checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
     }
     gridBuilder.newColumnPanel(DivType.COL_50);
