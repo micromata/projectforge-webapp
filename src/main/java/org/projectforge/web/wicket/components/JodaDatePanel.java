@@ -32,8 +32,7 @@ import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.flowlayout.ComponentWrapperPanel;
 
 /**
- * Panel for date selection. Works for java.util.Date and java.sql.Date. For java.sql.Date don't forget to call the constructor with
- * targetType java.sql.Date.
+ * Panel for date selection.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -42,6 +41,8 @@ public class JodaDatePanel extends Panel implements ComponentWrapperPanel
   private static final long serialVersionUID = 3785639935585959803L;
 
   protected JodaDateField dateField;
+
+  protected boolean autosubmit;
 
   /**
    * @param id
@@ -64,7 +65,7 @@ public class JodaDatePanel extends Panel implements ComponentWrapperPanel
   public void renderHead(final IHeaderResponse response)
   {
     super.renderHead(response);
-    DatePickerUtils.renderHead(response, getLocale(), dateField.getMarkupId(), true);
+    DatePickerUtils.renderHead(response, getLocale(), dateField.getMarkupId(), autosubmit);
   }
 
   /**
@@ -82,6 +83,15 @@ public class JodaDatePanel extends Panel implements ComponentWrapperPanel
     return this;
   }
 
+  /**
+   * @param autosubmit the autosubmit to set
+   * @return this for chaining.
+   */
+  public JodaDatePanel setAutosubmit(final boolean autosubmit)
+  {
+    this.autosubmit = autosubmit;
+    return this;
+  }
 
   public JodaDateField getDateField()
   {
@@ -97,3 +107,4 @@ public class JodaDatePanel extends Panel implements ComponentWrapperPanel
     return dateField.getMarkupId();
   }
 }
+

@@ -31,8 +31,6 @@ import org.joda.time.DateMidnight;
 import org.projectforge.web.wicket.converter.JodaDateConverter;
 
 /**
- * Text field contains a ajax autocompletion text field for choosing and displaying a time zone. The time zones of all users will be shown
- * as favorite list.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -45,6 +43,7 @@ public class JodaDateField extends TextField<DateMidnight> implements ITextForma
   public JodaDateField(final String id, final IModel<DateMidnight> model)
   {
     super(id, model);
+    setType(DateMidnight.class);
   }
 
   /**
@@ -69,3 +68,4 @@ public class JodaDateField extends TextField<DateMidnight> implements ITextForma
     return converter.getPattern();
   }
 }
+
