@@ -233,7 +233,7 @@
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>CalendarFeed</servlet-name>
-    <url-pattern>/export/ical</url-pattern>
+    <url-pattern>/export/ical.ical</url-pattern>
   </servlet-mapping>
 
   <session-config>

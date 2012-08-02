@@ -49,6 +49,7 @@ import net.fortuna.ical4j.model.property.Version;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
+import org.joda.time.DateTimeZone;
 import org.projectforge.registry.Registry;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
@@ -58,12 +59,11 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 
 /**
- * Feed Servlet, which generates a 'text/calendar' output of the last four mounts.
- * Currenty relevant informations are date, start- and stop time and last but not
- * least the location of an event.
+ * Feed Servlet, which generates a 'text/calendar' output of the last four mounts. Currenty relevant informations are date, start- and stop
+ * time and last but not least the location of an event.
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
 public class CalendarFeed extends HttpServlet
 {
@@ -77,12 +77,12 @@ public class CalendarFeed extends HttpServlet
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException
   {
-    if (StringUtils.isBlank(req.getParameter("user")) || StringUtils.isBlank(req.getParameter("key"))) {
+    if (StringUtils.isBlank(req.getParameter("timesheetUser")) || StringUtils.isBlank(req.getParameter("token"))) {
       resp.sendError(HttpStatus.SC_BAD_REQUEST);
       return;
     }
 
-    final Calendar calendar = createCal(req.getParameter("user"), req.getParameter("key"));
+    final Calendar calendar = createCal(req.getParameter("timesheetUser"), req.getParameter("token"));
 
     if (calendar == null) {
       resp.sendError(HttpStatus.SC_BAD_REQUEST);
@@ -99,8 +99,7 @@ public class CalendarFeed extends HttpServlet
   }
 
   /**
-   * creates a calendar for the user, identified by his name and logged-in
-   * cookie key.
+   * creates a calendar for the user, identified by his name and logged-in cookie key.
    * 
    * @param userName
    * @param userKey
@@ -144,8 +143,9 @@ public class CalendarFeed extends HttpServlet
   {
     final List<VEvent> events = new ArrayList<VEvent>();
     final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-    final TimeZone timezone = registry.getTimeZone(user.getTimeZone());
-    final java.util.Calendar cal = java.util.Calendar.getInstance(timezone);
+    final DateTimeZone timeZonee = DateTimeZone.forID(user.getTimeZone());
+    final TimeZone timezone = registry.getTimeZone(timeZonee.getID());
+    final java.util.Calendar cal = java.util.Calendar.getInstance(timeZonee.toTimeZone());
 
     // initializes timesheet filter
     final TimesheetFilter filter = new TimesheetFilter();
@@ -202,9 +202,8 @@ public class CalendarFeed extends HttpServlet
   }
 
   /**
-   * sets the calendar to a special date. Used to calculate the year offset of an negative
-   * time period. When the time period is set to 4 month and the current month is at the begin
-   * of a year, the year-number must be decremented by one
+   * sets the calendar to a special date. Used to calculate the year offset of an negative time period. When the time period is set to 4
+   * month and the current month is at the begin of a year, the year-number must be decremented by one
    * 
    * @param cal
    * @param year
