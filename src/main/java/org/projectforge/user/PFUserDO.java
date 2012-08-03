@@ -523,8 +523,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * the team calendars.
    * @return the authenticationToken
    */
-  //@Column(name = "authentication_token", length = 100)
-  @Transient
+  @Column(name = "authentication_token", length = 100)
   public String getAuthenticationToken()
   {
     return authenticationToken;

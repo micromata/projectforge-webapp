@@ -99,17 +99,17 @@ public class CalendarFeed extends HttpServlet
   }
 
   /**
-   * creates a calendar for the user, identified by his name and logged-in cookie key.
+   * creates a calendar for the user, identified by his name and authentication key.
    * 
    * @param userName
    * @param userKey
    * @return a calendar, null if authentication fails
    */
-  public Calendar createCal(final String userName, final String userKey)
+  public Calendar createCal(final String userName, final String authKey)
   {
     final UserDao userDao = (UserDao) Registry.instance().getDao(UserDao.class);
     final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
-    user = userDao.getUserByStayLoggedInKey(userName, userKey);
+    user = userDao.getUserByAuthenticationToken(userName, authKey);
 
     if (user == null) {
       return null;

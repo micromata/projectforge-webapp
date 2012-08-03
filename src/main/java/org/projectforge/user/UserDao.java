@@ -376,6 +376,23 @@ public class UserDao extends BaseDao<PFUserDO>
   }
 
   /**
+   * Get authentication key by user. ; )
+   * 
+   * @param userName
+   * @param authKey
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public PFUserDO getUserByAuthenticationToken(final String userName, final String authKey){
+    final List<PFUserDO> list = getHibernateTemplate().find("from PFUserDO u where u.username = ? and u.authenticationToken = ?",
+        new Object[] {userName, authKey});
+    if (list != null && list.isEmpty() == false && list.get(0) != null) {
+      return list.get(0);
+    }
+    return null;
+  }
+
+  /**
    * Returns the user's authentication token if exists (must be not blank with a size >= 10). If not, a new token key will be generated.
    * @param userId
    * @return
