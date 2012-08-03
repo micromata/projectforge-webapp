@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
+import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Application;
@@ -62,6 +63,8 @@ import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.HibernateUtils;
 import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
+import org.projectforge.user.Login;
+import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserXmlPreferencesCache;
@@ -117,6 +120,12 @@ public class WicketApplication extends WebApplication implements WicketApplicati
 
   @SpringBean(name = "daoRegistry")
   private DaoRegistry daoRegistry;
+
+  /**
+   * Only needed if the data-base needs an update first (may-be the PFUserDO can't be read because of unmatching tables).
+   */
+  @SpringBean(name = "dataSource")
+  private DataSource dataSource;
 
   @SpringBean(name = "systemUpdater")
   private SystemUpdater systemUpdater;
@@ -367,6 +376,10 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     }
     PFUserContext.setUser(null);
     UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
+    final LoginDefaultHandler loginHandler = new LoginDefaultHandler();
+    loginHandler.setDataSource(dataSource);
+    loginHandler.setUserDao(userDao);
+    Login.getInstance().setLoginHandler(loginHandler);
   }
 
   @Override

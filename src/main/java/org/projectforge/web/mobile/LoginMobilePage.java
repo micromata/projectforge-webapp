@@ -23,8 +23,6 @@
 
 package org.projectforge.web.mobile;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.markup.html.basic.Label;
@@ -56,12 +54,6 @@ public class LoginMobilePage extends AbstractMobilePage
   @SpringBean(name = "userXmlPreferencesCache")
   protected UserXmlPreferencesCache userXmlPreferencesCache;
 
-  /**
-   * Only needed if the data-base needs an update first (may-be the PFUserDO can't be read because of unmatching tables).
-   */
-  @SpringBean(name = "dataSource")
-  private DataSource dataSource;
-
   private final LoginMobileForm form;
 
   @Override
@@ -90,10 +82,10 @@ public class LoginMobilePage extends AbstractMobilePage
     form = new LoginMobileForm(this);
     pageContainer.add(form);
     form.init();
-    pageContainer. add(new FeedbackPanel("feedback").setOutputMarkupId(true));
+    pageContainer.add(new FeedbackPanel("feedback").setOutputMarkupId(true));
     final String messageOfTheDay = configuration.getStringValue(ConfigurationParam.MESSAGE_OF_THE_DAY);
     if (StringUtils.isBlank(messageOfTheDay) == true) {
-      pageContainer. add(new Label("messageOfTheDay", "[invisible]").setVisible(false));
+      pageContainer.add(new Label("messageOfTheDay", "[invisible]").setVisible(false));
     } else {
       pageContainer.add(new Label("messageOfTheDay", messageOfTheDay).setEscapeModelStrings(false));
     }
@@ -105,13 +97,13 @@ public class LoginMobilePage extends AbstractMobilePage
         setResponsePage(LoginPage.class, LoginPage.forceNonMobile());
       }
     };
-    pageContainer. add(goButton);
+    pageContainer.add(goButton);
   }
 
   protected void checkLogin()
   {
-    LoginPage.internalCheckLogin(this, userDao, dataSource, form.getUsername(), form.getPassword(), form.isStayLoggedIn(), WicketUtils
-        .getDefaultMobilePage());
+    LoginPage.internalCheckLogin(this, userDao, form.getUsername(), form.getPassword(), form.isStayLoggedIn(),
+        WicketUtils.getDefaultMobilePage());
   }
 
   /**

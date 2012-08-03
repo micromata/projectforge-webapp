@@ -23,17 +23,15 @@
 
 package org.projectforge.web.admin;
 
-import javax.sql.DataSource;
-
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
 import org.projectforge.admin.SystemUpdater;
 import org.projectforge.admin.UpdateEntry;
+import org.projectforge.user.Login;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.ProjectForgeGroup;
-import org.projectforge.web.LoginPage;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 
 public class SystemUpdatePage extends AbstractSecuredPage
@@ -42,9 +40,6 @@ public class SystemUpdatePage extends AbstractSecuredPage
 
   @SpringBean(name = "systemUpdater")
   protected SystemUpdater systemUpdater;
-
-  @SpringBean(name = "dataSource")
-  protected DataSource dataSource;
 
   private final SystemUpdateForm form;
 
@@ -74,7 +69,7 @@ public class SystemUpdatePage extends AbstractSecuredPage
 
   private void checkAdminUser()
   {
-    if (LoginPage.isAdminUser(PFUserContext.getUser(), dataSource) == false) {
+    if (Login.getInstance().isAdminUser(PFUserContext.getUser()) == false) {
       throw new AccessException(AccessChecker.I18N_KEY_VIOLATION_USER_NOT_MEMBER_OF, ProjectForgeGroup.ADMIN_GROUP.getKey());
     }
   }

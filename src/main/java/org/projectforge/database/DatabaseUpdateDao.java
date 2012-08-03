@@ -34,10 +34,10 @@ import org.projectforge.access.AccessChecker;
 import org.projectforge.access.AccessException;
 import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseDO;
+import org.projectforge.user.Login;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
-import org.projectforge.web.LoginPage;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -84,7 +84,7 @@ public class DatabaseUpdateDao
       // No access check for the system admin pseudo user.
       return;
     }
-    if (LoginPage.isAdminUser(PFUserContext.getUser(), dataSource) == false) {
+    if (Login.getInstance().isAdminUser(PFUserContext.getUser()) == false) {
       throw new AccessException(AccessChecker.I18N_KEY_VIOLATION_USER_NOT_MEMBER_OF, ProjectForgeGroup.ADMIN_GROUP.getKey());
     }
     accessChecker.checkDemoUser();
@@ -288,7 +288,7 @@ public class DatabaseUpdateDao
     }
   }
 
- public boolean addTableAttributes(final String table, final TableAttribute... attributes)
+  public boolean addTableAttributes(final String table, final TableAttribute... attributes)
   {
     final StringBuffer buf = new StringBuffer();
     buildAddTableAttributesStatement(buf, table, attributes);
@@ -344,10 +344,10 @@ public class DatabaseUpdateDao
     // For user / time period search:
     createIndex("idx_timesheet_user_time", "t_timesheet", "user_id, start_time");
     try {
-      ResultSet reference = dataSource.getConnection().getMetaData().getCrossReference(null, null, null, null, null, null);
+      final ResultSet reference = dataSource.getConnection().getMetaData().getCrossReference(null, null, null, null, null, null);
       while (reference.next()) {
-        String fkTable = reference.getString("FKTABLE_NAME");
-        String fkCol = reference.getString("FKCOLUMN_NAME");
+        final String fkTable = reference.getString("FKTABLE_NAME");
+        final String fkCol = reference.getString("FKCOLUMN_NAME");
         if (fkTable.startsWith("t_") == true) {
           // Table of ProjectForge
           if (createIndex("idx_fk_" + fkTable + "_" + fkCol, fkTable, fkCol) == true) {
@@ -355,7 +355,7 @@ public class DatabaseUpdateDao
           }
         }
       }
-    } catch (SQLException ex) {
+    } catch (final SQLException ex) {
       log.error(ex.getMessage(), ex);
     }
     return counter;
@@ -400,7 +400,7 @@ public class DatabaseUpdateDao
       String sql = " from t_history_property_delta where old_value like 'org.projectforge.%' or new_value like 'org.projectforge.%'";
       jdbc.query("select id, old_value, new_value, property_type" + sql, new ResultSetExtractor() {
         @Override
-        public Object extractData(ResultSet rs) throws SQLException, DataAccessException
+        public Object extractData(final ResultSet rs) throws SQLException, DataAccessException
         {
           while (rs.next() == true) {
             final int id = rs.getInt("ID");
@@ -458,7 +458,7 @@ public class DatabaseUpdateDao
       sql = " from t_history_property_delta where property_type like '%_$$_javassist_%'";
       jdbc.query("select id, property_type" + sql, new ResultSetExtractor() {
         @Override
-        public Object extractData(ResultSet rs) throws SQLException, DataAccessException
+        public Object extractData(final ResultSet rs) throws SQLException, DataAccessException
         {
           while (rs.next() == true) {
             final int id = rs.getInt("ID");
@@ -589,12 +589,12 @@ public class DatabaseUpdateDao
     return jdbc.queryForInt(jdbcQuery);
   }
 
-  public void setAccessChecker(AccessChecker accessChecker)
+  public void setAccessChecker(final AccessChecker accessChecker)
   {
     this.accessChecker = accessChecker;
   }
 
-  public void setDataSource(DataSource dataSource)
+  public void setDataSource(final DataSource dataSource)
   {
     this.dataSource = dataSource;
   }
