@@ -25,6 +25,8 @@ package org.projectforge.web.wicket;
 
 import java.util.MissingResourceException;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.lang.ClassUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
@@ -38,6 +40,7 @@ import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.tester.WicketTester;
@@ -45,6 +48,8 @@ import org.apache.wicket.util.visit.IVisit;
 import org.apache.wicket.util.visit.IVisitor;
 import org.junit.Before;
 import org.projectforge.test.TestBase;
+import org.projectforge.user.Login;
+import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuBuilder;
@@ -62,13 +67,21 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class WicketPageTestBase extends TestBase
 {
   protected static final String KEY_LOGINPAGE_BUTTON_LOGIN = "loginButton:button";
+
   protected WicketTester tester;
 
   protected MenuBuilder menuBuilder;
 
   private UserXmlPreferencesCache userXmlPreferencesCache;
 
-  private class WicketTestApplication extends WebApplication implements WicketApplicationInterface {
+  /**
+   * Only needed if the data-base needs an update first (may-be the PFUserDO can't be read because of unmatching tables).
+   */
+  @SpringBean(name = "dataSource")
+  private DataSource dataSource;
+
+  private class WicketTestApplication extends WebApplication implements WicketApplicationInterface
+  {
     @Override
     protected void init()
     {
@@ -80,6 +93,11 @@ public class WicketPageTestBase extends TestBase
       final ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
       beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
       UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
+
+      final LoginDefaultHandler loginHandler = new LoginDefaultHandler();
+      loginHandler.setDataSource(dataSource);
+      loginHandler.setUserDao(userDao);
+      Login.getInstance().setLoginHandler(loginHandler);
     }
 
     @Override
@@ -239,6 +257,14 @@ public class WicketPageTestBase extends TestBase
     LoginPage.logout((MySession) tester.getSession(), tester.getRequest(), tester.getResponse(), userXmlPreferencesCache, menuBuilder);
     tester.startPage(LoginPage.class);
     tester.assertRenderedPage(LoginPage.class);
+  }
+
+  /**
+   * @param dataSource the dataSource to set
+   */
+  public void setDataSource(final DataSource dataSource)
+  {
+    this.dataSource = dataSource;
   }
 
   public void setUserXmlPreferencesCache(final UserXmlPreferencesCache userXmlPreferencesCache)
