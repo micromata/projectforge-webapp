@@ -189,6 +189,10 @@
     <servlet-name>CalendarFeed</servlet-name>
     <servlet-class>org.projectforge.web.calendar.CalendarFeed</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>PhoneLookUpServlet</servlet-name>
+    <servlet-class>org.projectforge.web.address.PhoneLookUpServlet</servlet-class>
+  </servlet>
 
   <servlet-mapping>
     <servlet-name>jersey</servlet-name>
@@ -234,6 +238,11 @@
   <servlet-mapping>
     <servlet-name>CalendarFeed</servlet-name>
     <url-pattern>/export/ical.ical</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>PhoneLookUpServlet</servlet-name>
+    <url-pattern>/wa/phone/*</url-pattern>
   </servlet-mapping>
 
   <session-config>
