@@ -311,8 +311,10 @@ public class InitTestDB
     .addRight(new UserRightDO(UserRightId.PM_HR_PLANNING, UserRightValue.READWRITE)); //
     user.setPassword(userDao.encryptPassword(TestBase.TEST_FULL_ACCESS_USER_PASSWORD));
     addUser(user);
-    addUser(TestBase.TEST_USER);
+    addUser(TestBase.TEST_USER, TestBase.TEST_USER_PASSWORD);
     addUser(TestBase.TEST_USER2);
+    user = addUser(TestBase.TEST_DELETED_USER, TestBase.TEST_DELETED_USER_PASSWORD);
+    userDao.internalMarkAsDeleted(user);
     addUser("user1");
     addUser("user2");
     addUser("user3");
