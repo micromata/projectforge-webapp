@@ -237,6 +237,10 @@ public class UserDao extends BaseDao<PFUserDO>
       user.setLoginFailures(0);
       user.setMinorChange(true); // Avoid re-indexing of all dependent objects.
       internalUpdate(user);
+      if (user.isDeleted() == true) {
+        log.warn("Deleted user tried to login: " + user);
+        return null;
+      }
       final PFUserDO contextUser = new PFUserDO();
       contextUser.copyValuesFrom(user);
       contextUser.setLoginFailures(loginFailures); // Restore loginFailures for current user session.
@@ -269,10 +273,15 @@ public class UserDao extends BaseDao<PFUserDO>
   {
     final List<PFUserDO> list = getHibernateTemplate().find("from PFUserDO u where u.username = ? and u.stayLoggedInKey = ?",
         new Object[] { username, stayLoggedInKey});
+    PFUserDO user = null;
     if (list != null && list.isEmpty() == false && list.get(0) != null) {
-      return list.get(0);
+      user = list.get(0);
     }
-    return null;
+    if (user != null && user.isDeleted() == true) {
+      log.warn("Deleted user tried to login (via stay-logged-in): " + user);
+      return null;
+    }
+    return user;
   }
 
   /**
@@ -383,13 +392,19 @@ public class UserDao extends BaseDao<PFUserDO>
    * @return
    */
   @SuppressWarnings("unchecked")
-  public PFUserDO getUserByAuthenticationToken(final String userName, final String authKey){
+  public PFUserDO getUserByAuthenticationToken(final String userName, final String authKey)
+  {
     final List<PFUserDO> list = getHibernateTemplate().find("from PFUserDO u where u.username = ? and u.authenticationToken = ?",
-        new Object[] {userName, authKey});
+        new Object[] { userName, authKey});
+    PFUserDO user = null;
     if (list != null && list.isEmpty() == false && list.get(0) != null) {
-      return list.get(0);
+      user = list.get(0);
     }
-    return null;
+    if (user != null && user.isDeleted() == true) {
+      log.warn("Deleted user tried to login (via authentication token): " + user);
+      return null;
+    }
+    return user;
   }
 
   /**
