@@ -90,7 +90,13 @@ public class TestBase
 
   public static final String TEST_USER = "testUser";
 
+  public static final String TEST_USER_PASSWORD = "testUser42";
+
   public static final String TEST_USER2 = "testUser2";
+
+  public static final String TEST_DELETED_USER = "deletedTestUser";
+
+  public static final String TEST_DELETED_USER_PASSWORD = "deletedTestUser42";
 
   public static final String TEST_PROJECT_MANAGER_USER = "testProjectManager";
 
