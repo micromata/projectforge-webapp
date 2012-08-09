@@ -237,7 +237,7 @@
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>CalendarFeed</servlet-name>
-    <url-pattern>/export/ical.ical</url-pattern>
+    <url-pattern>/export/ProjectForge.ics</url-pattern>
   </servlet-mapping>
   
   <servlet-mapping>
