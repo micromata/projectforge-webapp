@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -122,8 +123,9 @@ public class CalendarFeed extends HttpServlet
 
     // creating a new calendar
     final Calendar calendar = new Calendar();
+    final Locale locale = PFUserContext.getLocale();
     calendar.getProperties().add(
-        new ProdId("-//" + user.getDisplayUsername() + "//ProjectForge//" + user.getLocale().toString().toUpperCase()));
+        new ProdId("-//" + user.getDisplayUsername() + "//ProjectForge//" + locale.toString().toUpperCase()));
     calendar.getProperties().add(Version.VERSION_2_0);
     calendar.getProperties().add(CalScale.GREGORIAN);
 
