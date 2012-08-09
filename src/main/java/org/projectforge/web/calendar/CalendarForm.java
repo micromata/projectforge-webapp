@@ -153,7 +153,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       final PFUserDO user = PFUserContext.getUser();
       final String authenticationKey = userDao.getAuthenticationToken(user.getId());
       final String contextPath = WebApplication.get().getServletContext().getContextPath();
-      final String iCalTarget = contextPath + "/export/ical.ical?timesheetUser=" + user.getUsername() + "&token=" + authenticationKey;
+      final String iCalTarget = contextPath + "/export/ProjectForge.ics?timesheetUser=" + user.getUsername() + "&token=" + authenticationKey;
       final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
       final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fs.newChildId(), IconType.SUBSCRIPTION,
           getString("timesheet.iCalExport"), iCalExportLink).setLight();
