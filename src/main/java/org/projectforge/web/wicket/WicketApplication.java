@@ -304,6 +304,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     final ConfigurableListableBeanFactory beanFactory = webApplicationContext.getBeanFactory();
     beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
     final LocalSessionFactoryBean localSessionFactoryBean = (LocalSessionFactoryBean) beanFactory.getBean("&sessionFactory");
+    dataSource = (DataSource) beanFactory.getBean("dataSource");
     // if ("true".equals(System.getProperty(SYSTEM_PROPERTY_HSQLDB_18_UPDATE)) == true) {
     // try {
     // log.info("Send SHUTDOWN COMPACT to upgrade data-base version:");
