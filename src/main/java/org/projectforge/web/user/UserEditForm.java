@@ -54,6 +54,7 @@ import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRight;
@@ -167,7 +168,12 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       @Override
       public String getObject()
       {
-        return userDao.getAuthenticationToken(user.getId());
+        if (PFUserContext.getUserId().equals(user.getId()) == true) {
+          return userDao.getAuthenticationToken(user.getId());
+        } else {
+          // Administrators shouldn't see the token.
+          return "*****";
+        }
       }
     }));
     fs.addHelpIcon(gridBuilder.getString("user.authenticationToken.tooltip"));
@@ -355,6 +361,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     createLastName(gridBuilder, data);
     createOrganization(gridBuilder, data);
     createEMail(gridBuilder, data);
+    createAuthenticationToken(gridBuilder, data, (UserDao) getBaseDao(), this);
     createJIRAUsername(gridBuilder, data);
 
     if (adminAccess == true) {
