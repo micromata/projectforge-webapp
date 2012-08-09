@@ -30,6 +30,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.projectforge.test.TestBase;
 import org.projectforge.web.address.AddressListPage;
+import org.projectforge.web.admin.SystemUpdatePage;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketPageTestBase;
@@ -69,5 +70,27 @@ public class LoginPageTest extends WicketPageTestBase
     } catch (final WicketRuntimeException ex) {
       // Everything fine.
     }
+  }
+
+  @Test
+  public void testInternalCheckLogin()
+  {
+    login(TestBase.TEST_USER, TestBase.TEST_USER_PASSWORD);
+    logout();
+    login(TestBase.TEST_DELETED_USER, TestBase.TEST_DELETED_USER_PASSWORD, false);
+    tester.assertRenderedPage(LoginPage.class);
+
+    // Update required
+    UserFilter.setUpdateRequiredFirst(true);
+    login(TestBase.TEST_USER, TestBase.TEST_USER_PASSWORD, false);
+    tester.assertRenderedPage(LoginPage.class);
+    login(TestBase.TEST_DELETED_USER, TestBase.TEST_DELETED_USER_PASSWORD, false);
+    tester.assertRenderedPage(LoginPage.class);
+    login(TestBase.TEST_ADMIN_USER, TestBase.TEST_ADMIN_USER_PASSWORD, false);
+    tester.assertRenderedPage(SystemUpdatePage.class);
+    logout();
+    UserFilter.setUpdateRequiredFirst(false);
+    login(TestBase.TEST_USER, TestBase.TEST_USER_PASSWORD);
+    logout();
   }
 }
