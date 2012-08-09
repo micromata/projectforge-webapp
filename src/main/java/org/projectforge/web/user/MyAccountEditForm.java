@@ -62,6 +62,7 @@ public class MyAccountEditForm extends AbstractEditForm<PFUserDO, MyAccountEditP
     UserEditForm.createLastName(gridBuilder, data);
     UserEditForm.createOrganization(gridBuilder, data);
     UserEditForm.createEMail(gridBuilder, data);
+    UserEditForm.createAuthenticationToken(gridBuilder, data, (UserDao) getBaseDao(), this);
     UserEditForm.createJIRAUsername(gridBuilder, data);
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.assignedGroups")).setNoLabelFor();
     fs.add(new DivTextPanel(fs.newChildId(), userGroupCache.getGroupnames(data.getId())));

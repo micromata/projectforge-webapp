@@ -157,6 +157,33 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(user, "email")));
   }
 
+  @SuppressWarnings("serial")
+  public static void createAuthenticationToken(final GridBuilder gridBuilder, final PFUserDO user, final UserDao userDao,
+      final Form< ? > form)
+  {
+    // Authentication token
+    final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("user.authenticationToken"), true).setNoLabelFor();
+    fs.add(new DivTextPanel(fs.newChildId(), new Model<String>() {
+      @Override
+      public String getObject()
+      {
+        return userDao.getAuthenticationToken(user.getId());
+      }
+    }));
+    fs.addHelpIcon(gridBuilder.getString("user.authenticationToken.tooltip"));
+    final Button button = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("renewAuthenticationKey")) {
+      @Override
+      public final void onSubmit()
+      {
+        userDao.renewAuthenticationToken(user.getId());
+        form.error(getString("user.authenticationToken.renew.successful"));
+      }
+    };
+    button.add(WicketUtils.javaScriptConfirmDialogOnClick(form.getString("user.authenticationToken.renew.securityQuestion")));
+    fs.add(new SingleButtonPanel(fs.newChildId(), button, gridBuilder.getString("user.authenticationToken.renew"), SingleButtonPanel.RED));
+    WicketUtils.addTooltip(button, gridBuilder.getString("user.authenticationToken.renew.tooltip"));
+  }
+
   public static void createJIRAUsername(final GridBuilder gridBuilder, final PFUserDO user)
   {
     // JIRA user name
