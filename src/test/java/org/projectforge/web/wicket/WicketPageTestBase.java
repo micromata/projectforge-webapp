@@ -145,6 +145,17 @@ public class WicketPageTestBase extends TestBase
    */
   public void login(final String username, final String password)
   {
+    login(username, password, true);
+  }
+
+  /**
+   * Logs the user in, if not already logged-in. If an user is already logged in then nothing is done. Therefore you must log-out an user
+   * before any new login.
+   * @param username
+   * @param password not encrypted.
+   */
+  public void login(final String username, final String password, final boolean checkDefaultPage)
+  {
     // start and render the test page
     tester.startPage(LoginPage.class);
     if (ClassUtils.isAssignable(tester.getLastRenderedPage().getClass(), WicketApplication.DEFAULT_PAGE) == true) {
@@ -157,7 +168,9 @@ public class WicketPageTestBase extends TestBase
     form.setValue("username", username);
     form.setValue("password", password);
     form.submit(KEY_LOGINPAGE_BUTTON_LOGIN);
-    tester.assertRenderedPage(WicketApplication.DEFAULT_PAGE);
+    if (checkDefaultPage == true) {
+      tester.assertRenderedPage(WicketApplication.DEFAULT_PAGE);
+    }
   }
 
   public void loginTestAdmin()
