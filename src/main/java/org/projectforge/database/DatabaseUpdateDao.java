@@ -392,7 +392,7 @@ public class DatabaseUpdateDao
    */
   public int internalFixDBHistoryEntries()
   {
-    log.info("Fix all wrong history entries.");
+    log.info("Fix all broken history entries (if exist).");
     final int counter[] = new int[1];
     counter[0] = 0;
     final JdbcTemplate jdbc = new JdbcTemplate(dataSource);
