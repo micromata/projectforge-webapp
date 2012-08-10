@@ -23,6 +23,8 @@
 
 package org.projectforge.registry;
 
+import javax.sql.DataSource;
+
 import org.projectforge.access.AccessDao;
 import org.projectforge.address.AddressDao;
 import org.projectforge.book.BookDao;
@@ -157,6 +159,8 @@ public class DaoRegistry
 
   private ContractDao contractDao;
 
+  private DataSource dataSource;
+
   private EingangsrechnungDao eingangsrechnungDao;
 
   private EmployeeDao employeeDao;
@@ -260,7 +264,7 @@ public class DaoRegistry
     register(SCRIPT, ScriptDao.class, scriptDao, "scripting").setSearchable(false);
     register(USER_PREF, UserPrefDao.class, userPrefDao).setSearchable(false);
     register(USER_RIGHT, UserRightDao.class, userRightDao).setSearchable(false);
-
+    Registry.instance().setDataSource(dataSource);
     instance = this;
   }
 
@@ -328,6 +332,11 @@ public class DaoRegistry
   public void setContractDao(final ContractDao contractDao)
   {
     this.contractDao = contractDao;
+  }
+
+  public void setDataSource(final DataSource dataSource)
+  {
+    this.dataSource = dataSource;
   }
 
   public void setEmployeeDao(final EmployeeDao employeeDao)

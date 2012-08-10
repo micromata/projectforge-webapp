@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.lang.Validate;
 import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
@@ -59,6 +61,8 @@ public class Registry
   private UserGroupCache userGroupCache;
 
   private KontoCache kontoCache;
+
+  private DataSource dataSource;
 
   public static Registry instance()
   {
@@ -141,7 +145,7 @@ public class Registry
     return entry != null ? entry.getDao() : null;
   }
 
-  public void setTaskTree(final TaskTree taskTree)
+  void setTaskTree(final TaskTree taskTree)
   {
     this.taskTree = taskTree;
   }
@@ -156,26 +160,29 @@ public class Registry
     return userGroupCache;
   }
 
-  public void setUserGroupCache(final UserGroupCache userGroupCache)
+  void setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
   }
 
-  /**
-   * @return the kontoCache
-   */
   public KontoCache getKontoCache()
   {
     return kontoCache;
   }
 
-  /**
-   * @param kontoCache the kontoCache to set
-   * @return this for chaining.
-   */
-  public void setKontoCache(final KontoCache kontoCache)
+  void setKontoCache(final KontoCache kontoCache)
   {
     this.kontoCache = kontoCache;
+  }
+
+  public DataSource getDataSource()
+  {
+    return dataSource;
+  }
+
+  void setDataSource(final DataSource dataSource)
+  {
+    this.dataSource = dataSource;
   }
 
   private Registry()
