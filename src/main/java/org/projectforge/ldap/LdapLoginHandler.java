@@ -54,6 +54,9 @@ public class LdapLoginHandler implements LoginHandler
   public void initialize()
   {
     this.ldapConfig = ConfigXml.getInstance().getLdapConfig();
+    if (ldapConfig == null || ldapConfig.getServer() == null) {
+      log.warn("No LDAP configured in config.xml, so any login won't be possible!");
+    }
     ldapConnector = new LdapConnector(ldapConfig);
     ldapUserDao = new LdapUserDao();
     ldapUserDao.ldapConnector = ldapConnector;

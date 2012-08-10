@@ -66,6 +66,7 @@ import org.projectforge.ldap.LdapConfig;
 import org.projectforge.mail.MailAccountConfig;
 import org.projectforge.mail.SendMailConfig;
 import org.projectforge.orga.ContractType;
+import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.web.MenuEntryConfig;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.xml.stream.AliasMap;
@@ -178,6 +179,8 @@ public class ConfigXml
   private AccountingConfig accountingConfig;
 
   private LdapConfig ldapConfig;
+
+  private String loginHandlerClass;
 
   /**
    * Separated list of main classes (separated by white chars and or ',').
@@ -978,6 +981,15 @@ public class ConfigXml
   public String getCronExpressionMebPollingJob()
   {
     return cronExpressionMebPollingJob;
+  }
+
+  /**
+   * If given then this login handler will be used instead of {@link LoginDefaultHandler}. For ldap please use e. g. org.projectforge.ldap.LdapLoginHandler.
+   * @return the loginHandlerClass
+   */
+  public String getLoginHandlerClass()
+  {
+    return loginHandlerClass;
   }
 
   /**

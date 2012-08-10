@@ -51,6 +51,7 @@ import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.lang.Bytes;
 import org.projectforge.AppVersion;
 import org.projectforge.admin.SystemUpdater;
+import org.projectforge.common.BeanHelper;
 import org.projectforge.common.ExceptionHelper;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
@@ -64,6 +65,7 @@ import org.projectforge.plugins.core.PluginsRegistry;
 import org.projectforge.registry.DaoRegistry;
 import org.projectforge.user.Login;
 import org.projectforge.user.LoginDefaultHandler;
+import org.projectforge.user.LoginHandler;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserXmlPreferencesCache;
@@ -369,9 +371,18 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     }
     PFUserContext.setUser(null);
     UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
-    final LoginDefaultHandler loginHandler = new LoginDefaultHandler();
-    loginHandler.initialize();
-    Login.getInstance().setLoginHandler(loginHandler);
+    LoginHandler loginHandler;
+    if (StringUtils.isNotBlank(configXml.getLoginHandlerClass()) == true) {
+      loginHandler = (LoginHandler) BeanHelper.newInstance(configXml.getLoginHandlerClass());
+    } else {
+      loginHandler = new LoginDefaultHandler();
+    }
+    if (loginHandler == null) {
+      log.error("Can't load login handler '" + configXml.getLoginHandlerClass() + "'. No login will be possible!");
+    } else {
+      loginHandler.initialize();
+      Login.getInstance().setLoginHandler(loginHandler);
+    }
   }
 
   @Override
