@@ -61,7 +61,7 @@ public class LdapLoginHandler implements LoginHandler
     ldapUserDao = new LdapUserDao();
     ldapUserDao.ldapConnector = ldapConnector;
     final Registry registry = Registry.instance();
-    userDao = (UserDao)registry.getDao(UserDao.class);
+    userDao = (UserDao) registry.getDao(UserDao.class);
     accessChecker = UserRights.getAccessChecker();
   }
 
@@ -72,9 +72,10 @@ public class LdapLoginHandler implements LoginHandler
   public LoginResult checkLogin(final String username, final String password)
   {
     final LoginResult loginResult = new LoginResult();
-    final String organizationalUnits = ldapConfig.getGroupBase();
+    // final String organizationalUnits = ldapConfig.getGroupBase();
+    final String[] organizationalUnits = { "pf-test", "users"};
     final boolean authenticated = ldapUserDao.authenticate(username, password, organizationalUnits);
-    if (authenticated != false) {
+    if (authenticated == false) {
       log.info("User login failed: " + username);
       return loginResult.setLoginResultStatus(LoginResultStatus.FAILED);
     }
@@ -84,7 +85,8 @@ public class LdapLoginHandler implements LoginHandler
       final LdapPerson ldapUser = ldapUserDao.findByUsername(username, organizationalUnits);
       user = PFUserDOConverter.convert(ldapUser);
       user.setId(null); // Force new id.
-      userDao.save(user);
+      user.setPassword(userDao.encryptPassword(password));
+      userDao.internalSave(user);
     }
     if (user.isDeleted() == true) {
       log.info("User has no system access (is deleted): " + user.getDisplayUsername());
