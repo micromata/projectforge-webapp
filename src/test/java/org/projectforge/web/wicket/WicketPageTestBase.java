@@ -25,8 +25,6 @@ package org.projectforge.web.wicket;
 
 import java.util.MissingResourceException;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.lang.ClassUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.MarkupContainer;
@@ -40,7 +38,6 @@ import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.Request;
 import org.apache.wicket.request.Response;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
 import org.apache.wicket.util.tester.FormTester;
 import org.apache.wicket.util.tester.WicketTester;
@@ -74,12 +71,6 @@ public class WicketPageTestBase extends TestBase
 
   private UserXmlPreferencesCache userXmlPreferencesCache;
 
-  /**
-   * Only needed if the data-base needs an update first (may-be the PFUserDO can't be read because of unmatching tables).
-   */
-  @SpringBean(name = "dataSource")
-  private DataSource dataSource;
-
   private class WicketTestApplication extends WebApplication implements WicketApplicationInterface
   {
     @Override
@@ -95,8 +86,7 @@ public class WicketPageTestBase extends TestBase
       UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
 
       final LoginDefaultHandler loginHandler = new LoginDefaultHandler();
-      loginHandler.setDataSource(dataSource);
-      loginHandler.setUserDao(userDao);
+      loginHandler.initialize();
       Login.getInstance().setLoginHandler(loginHandler);
     }
 
@@ -270,14 +260,6 @@ public class WicketPageTestBase extends TestBase
     LoginPage.logout((MySession) tester.getSession(), tester.getRequest(), tester.getResponse(), userXmlPreferencesCache, menuBuilder);
     tester.startPage(LoginPage.class);
     tester.assertRenderedPage(LoginPage.class);
-  }
-
-  /**
-   * @param dataSource the dataSource to set
-   */
-  public void setDataSource(final DataSource dataSource)
-  {
-    this.dataSource = dataSource;
   }
 
   public void setUserXmlPreferencesCache(final UserXmlPreferencesCache userXmlPreferencesCache)
