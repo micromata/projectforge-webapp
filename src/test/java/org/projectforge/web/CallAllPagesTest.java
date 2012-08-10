@@ -31,7 +31,6 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.junit.AfterClass;
 import org.junit.Test;
 import org.projectforge.core.SystemInfoCache;
-import org.projectforge.registry.DaoRegistry;
 import org.projectforge.registry.Registry;
 import org.projectforge.test.TestBase;
 import org.projectforge.test.TestConfiguration;
@@ -85,8 +84,6 @@ public class CallAllPagesTest extends WicketPageTestBase
     log.info("Test all web pages with resolution '" + browserScreenWidthType + "'.");
     login(TestBase.TEST_FULL_ACCESS_USER, TestBase.TEST_FULL_ACCESS_USER_PASSWORD);
     ((MySession) Session.get()).setBrowserScreenWidthType(browserScreenWidthType);
-    final DaoRegistry daoRegistry = TestConfiguration.getConfiguration().getBean("daoRegistry", DaoRegistry.class);
-    daoRegistry.init();
     final SystemInfoCache systemInfoCache = TestConfiguration.getConfiguration().getBean("systemInfoCache", SystemInfoCache.class);
     SystemInfoCache.internalInitialize(systemInfoCache);
     final Map<String, Class< ? extends WebPage>> pages = WebRegistry.instance().getMountPages();
