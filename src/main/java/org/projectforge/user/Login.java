@@ -64,6 +64,6 @@ public class Login
   public void setLoginHandler(final LoginHandler loginHandler)
   {
     this.loginHandler = loginHandler;
-    log.info("LoginHandler " + loginHandler.getClass().getName() + " registerd.");
+    log.info("LoginHandler " + loginHandler.getClass().getName() + " registered.");
   }
 }
