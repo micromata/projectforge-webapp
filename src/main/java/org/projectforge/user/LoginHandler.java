@@ -23,6 +23,7 @@
 
 package org.projectforge.user;
 
+
 /**
  * Different implementations of login handling are supported.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -30,6 +31,11 @@ package org.projectforge.user;
  */
 public interface LoginHandler
 {
+  /**
+   * A login handler will be initialized by ProjectForge during start-up.
+   */
+  public void initialize();
+
   public LoginResult checkLogin(final String username, final String password);
 
   public boolean isAdminUser(final PFUserDO user);

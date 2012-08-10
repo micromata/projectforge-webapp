@@ -24,11 +24,14 @@
 package org.projectforge.ldap;
 
 import org.projectforge.access.AccessChecker;
+import org.projectforge.core.ConfigXml;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.LoginHandler;
 import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
+import org.projectforge.user.UserRights;
 
 public class LdapLoginHandler implements LoginHandler
 {
@@ -38,19 +41,25 @@ public class LdapLoginHandler implements LoginHandler
 
   private AccessChecker accessChecker;
 
-  private final LdapConnector ldapConnector;
+  private LdapConnector ldapConnector;
 
-  private final LdapUserDao ldapUserDao;
+  private LdapUserDao ldapUserDao;
 
-  private final LdapConfig ldapConfig;
+  private LdapConfig ldapConfig;
 
-  public LdapLoginHandler(final LdapConfig ldapConfig)
+  /**
+   * @see org.projectforge.user.LoginHandler#initialize()
+   */
+  @Override
+  public void initialize()
   {
-    this.ldapConfig = ldapConfig;
+    this.ldapConfig = ConfigXml.getInstance().getLdapConfig();
     ldapConnector = new LdapConnector(ldapConfig);
     ldapUserDao = new LdapUserDao();
     ldapUserDao.ldapConnector = ldapConnector;
-
+    final Registry registry = Registry.instance();
+    userDao = (UserDao)registry.getDao(UserDao.class);
+    accessChecker = UserRights.getAccessChecker();
   }
 
   /**
@@ -60,15 +69,19 @@ public class LdapLoginHandler implements LoginHandler
   public LoginResult checkLogin(final String username, final String password)
   {
     final LoginResult loginResult = new LoginResult();
-    final boolean authenticated = ldapUserDao.authenticate(username, password, ldapConfig.getGroupBase());
+    final String organizationalUnits = ldapConfig.getGroupBase();
+    final boolean authenticated = ldapUserDao.authenticate(username, password, organizationalUnits);
     if (authenticated != false) {
       log.info("User login failed: " + username);
       return loginResult.setLoginResultStatus(LoginResultStatus.FAILED);
     }
-    final PFUserDO user = userDao.getInternalByName(username);
+    PFUserDO user = userDao.getInternalByName(username);
     if (user == null) {
-      log.error("User login failed, can't found user '" + username + "' in ProjectForge's data base.");
-      return loginResult.setLoginResultStatus(LoginResultStatus.FAILED);
+      log.info("LDAP user '" + username + "' doesn't yet exist in ProjectForge's data base. Creating new user...");
+      final LdapPerson ldapUser = ldapUserDao.findByUsername(username, organizationalUnits);
+      user = PFUserDOConverter.convert(ldapUser);
+      user.setId(null); // Force new id.
+      userDao.save(user);
     }
     if (user.isDeleted() == true) {
       log.info("User has no system access (is deleted): " + user.getDisplayUsername());
@@ -82,23 +95,4 @@ public class LdapLoginHandler implements LoginHandler
   {
     return accessChecker.isUserMemberOfAdminGroup(user);
   }
-
-  /**
-   * @param accessChecker the accessChecker to set
-   * @return this for chaining.
-   */
-  public void setAccessChecker(final AccessChecker accessChecker)
-  {
-    this.accessChecker = accessChecker;
-  }
-
-  /**
-   * @param userDao the userDao to set
-   * @return this for chaining.
-   */
-  public void setUserDao(final UserDao userDao)
-  {
-    this.userDao = userDao;
-  }
-
 }

@@ -28,6 +28,7 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import org.projectforge.registry.Registry;
 import org.projectforge.web.UserFilter;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -43,6 +44,17 @@ public class LoginDefaultHandler implements LoginHandler
    * Only needed if the data-base needs an update first (may-be the PFUserDO can't be read because of unmatching tables).
    */
   private DataSource dataSource;
+
+  /**
+   * @see org.projectforge.user.LoginHandler#initialize(org.projectforge.registry.Registry)
+   */
+  @Override
+  public void initialize()
+  {
+    final Registry registry = Registry.instance();
+    userDao = (UserDao) registry.getDao(UserDao.class);
+    dataSource = registry.getDataSource();
+  }
 
   /**
    * @see org.projectforge.user.LoginHandler#checkLogin(java.lang.String, java.lang.String, boolean)
@@ -117,23 +129,5 @@ public class LoginDefaultHandler implements LoginHandler
       return false;
     }
     return true;
-  }
-
-  /**
-   * @param userDao the userDao to set
-   * @return this for chaining.
-   */
-  public void setUserDao(final UserDao userDao)
-  {
-    this.userDao = userDao;
-  }
-
-  /**
-   * @param dataSource the dataSource to set
-   * @return this for chaining.
-   */
-  public void setDataSource(final DataSource dataSource)
-  {
-    this.dataSource = dataSource;
   }
 }
