@@ -133,7 +133,7 @@ AbstractSecuredPage implements ISelectCallerPage
   {
     if (massUpdate == true) {
       final Item< ? > row = (cellItem.findParent(Item.class));
-      row.add(AttributeModifier.replace("onmousedown", "javascript:rowCheckboxClick(this);"));
+      row.add(AttributeModifier.replace("onmousedown", "javascript:rowCheckboxClick(this, event);"));
     } else {
       addRowClick(cellItem);
     }

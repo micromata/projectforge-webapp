@@ -19,23 +19,14 @@ function rowClick(row) {
 	suppressRowClick = 'false';
 }
 
-
-function rowCheckboxClick(row) {
-	window.document.onmouseup = function(e) 
-	{
-	if(!e) e = window.event;
-	var t = e.target || e.srcElement;
-		if(t.type =="checkbox"){ /* disables tableRowClickFunction if you are over the checkbox */
-		} 
-		else{
-	
-			cb = $(row).find("input[type='checkbox']");
-			cb.attr('checked', !cb.is(':checked'));
-		}
+function rowCheckboxClick(row, event) {
+	if(!event) event = window.event; // For ie.
+	var t = event.target || event.srcElement;
+	if(t.type != "checkbox") { /* disables tableRowClickFunction if you are over the checkbox */
+		cb = $(row).find("input[type='checkbox']");
+		cb.attr('checked', !cb.is(':checked'));
 	}
 }
-
-
 
 function suppressNextRowClick() {
 	suppressRowClick = 'true';
@@ -109,6 +100,4 @@ function mcancelclosetime() {
 // close layer when click-out
 document.onclick = mclose;
 // End: Functionality for DropDownMenu
-
-
 
