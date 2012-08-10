@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
-import javax.sql.DataSource;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Application;
@@ -120,12 +119,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
 
   @SpringBean(name = "daoRegistry")
   private DaoRegistry daoRegistry;
-
-  /**
-   * Only needed if the data-base needs an update first (may-be the PFUserDO can't be read because of unmatching tables).
-   */
-  @SpringBean(name = "dataSource")
-  private DataSource dataSource;
 
   @SpringBean(name = "systemUpdater")
   private SystemUpdater systemUpdater;
@@ -304,7 +297,6 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     final ConfigurableListableBeanFactory beanFactory = webApplicationContext.getBeanFactory();
     beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
     final LocalSessionFactoryBean localSessionFactoryBean = (LocalSessionFactoryBean) beanFactory.getBean("&sessionFactory");
-    dataSource = (DataSource) beanFactory.getBean("dataSource");
     // if ("true".equals(System.getProperty(SYSTEM_PROPERTY_HSQLDB_18_UPDATE)) == true) {
     // try {
     // log.info("Send SHUTDOWN COMPACT to upgrade data-base version:");
@@ -378,8 +370,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     PFUserContext.setUser(null);
     UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
     final LoginDefaultHandler loginHandler = new LoginDefaultHandler();
-    loginHandler.setDataSource(dataSource);
-    loginHandler.setUserDao(userDao);
+    loginHandler.initialize();
     Login.getInstance().setLoginHandler(loginHandler);
   }
 
