@@ -850,8 +850,7 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
             }
           }
           if (success == false) {
-            log
-            .info("Mass update not possible for time sheet (destination task have multiple kost2 entries and no correspondent kost2 art): "
+            log.info("Mass update not possible for time sheet (destination task have multiple kost2 entries and no correspondent kost2 art): "
                 + entry);
             return false;
           }
@@ -860,6 +859,9 @@ public class TimesheetDao extends BaseDao<TimesheetDO>
     }
     if (master.getTaskId() != null) {
       setTask(entry, master.getTaskId());
+    }
+    if (master.getKost2Id() != null) {
+      setKost2(entry, master.getKost2Id());
     }
     if (StringUtils.isNotBlank(master.getLocation()) == true) {
       entry.setLocation(master.getLocation());
