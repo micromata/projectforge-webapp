@@ -46,7 +46,7 @@ public class LoginResult
    * @param user the user to set
    * @return this for chaining.
    */
-  LoginResult setUser(final PFUserDO user)
+  public LoginResult setUser(final PFUserDO user)
   {
     this.user = user;
     return this;
@@ -64,7 +64,7 @@ public class LoginResult
    * @param loginResultStatus the loginResultStatus to set
    * @return this for chaining.
    */
-  LoginResult setLoginResultStatus(final LoginResultStatus loginResultStatus)
+  public LoginResult setLoginResultStatus(final LoginResultStatus loginResultStatus)
   {
     this.loginResultStatus = loginResultStatus;
     return this;
