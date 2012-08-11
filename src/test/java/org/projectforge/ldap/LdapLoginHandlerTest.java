@@ -40,30 +40,31 @@ public class LdapLoginHandlerTest extends TestBase
     final LdapUserDao ldapUserDao = mock(LdapUserDao.class);
     when(ldapUserDao.authenticate("kai", "successful", (String[]) null)).thenReturn(true);
     when(ldapUserDao.authenticate("kai", "fail", (String[]) null)).thenReturn(false);
-    when(ldapUserDao.findByUsername("kai")).thenReturn(
+    when(ldapUserDao.findByUsername("kai", (String[]) null)).thenReturn(
         new LdapPerson().setUid("kai").setDescription("Developer").setGivenName("Kai").setMail("k.reinhard@acme.com")
         .setOrganization("Micromata").setSurname("Reinhard"));
     final LdapLoginHandler loginHandler = new LdapLoginHandler();
     loginHandler.ldapUserDao = ldapUserDao;
     loginHandler.ldapConfig = new LdapConfig();
+    loginHandler.userDao = userDao;
     Assert.assertEquals(LoginResultStatus.FAILED, loginHandler.checkLogin("kai", "fail").getLoginResultStatus());
 
     Assert.assertFalse("User shouldn't be available yet in the data-base.",
         userDao.doesUsernameAlreadyExist(new PFUserDO().setUsername("kai")));
-    // Assert.assertEquals(LoginResultStatus.SUCCESS, loginHandler.checkLogin("kai", "successful").getLoginResultStatus());
-    // Assert.assertTrue("User should be created in data-base as a new user (in ldap).",
-    // userDao.doesUsernameAlreadyExist(new PFUserDO().setUsername("kai")));
-    // final PFUserDO user = userDao.getInternalByName("kai");
-    // Assert.assertEquals("kai", user.getUsername());
-    // Assert.assertEquals(userDao.encryptPassword("successful"), user.getPassword());
-    // Assert.assertEquals("Kai", user.getFirstname());
-    // Assert.assertEquals("Reinhard", user.getLastname());
-    // Assert.assertEquals("Micromata", user.getOrganization());
-    // Assert.assertEquals("k.reinhard@acme.com", user.getEmail());
-    // Assert.assertEquals("Developer", user.getDescription());
-    //
-    // userDao.internalMarkAsDeleted(user);
-    // Assert.assertEquals("User is deleted in data-base. Login not possible.", LoginResultStatus.LOGIN_EXPIRED,
-    // loginHandler.checkLogin("kai", "successful").getLoginResultStatus());
+    Assert.assertEquals(LoginResultStatus.SUCCESS, loginHandler.checkLogin("kai", "successful").getLoginResultStatus());
+    Assert.assertTrue("User should be created in data-base as a new user (in ldap).",
+        userDao.doesUsernameAlreadyExist(new PFUserDO().setUsername("kai")));
+    final PFUserDO user = userDao.getInternalByName("kai");
+    Assert.assertEquals("kai", user.getUsername());
+    Assert.assertEquals(userDao.encryptPassword("successful"), user.getPassword());
+    Assert.assertEquals("Kai", user.getFirstname());
+    Assert.assertEquals("Reinhard", user.getLastname());
+    Assert.assertEquals("Micromata", user.getOrganization());
+    Assert.assertEquals("k.reinhard@acme.com", user.getEmail());
+    Assert.assertEquals("Developer", user.getDescription());
+
+    userDao.internalMarkAsDeleted(user);
+    Assert.assertEquals("User is deleted in data-base. Login not possible.", LoginResultStatus.LOGIN_EXPIRED,
+        loginHandler.checkLogin("kai", "successful").getLoginResultStatus());
   }
 }

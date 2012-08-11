@@ -37,9 +37,9 @@ public class LdapLoginHandler implements LoginHandler
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapLoginHandler.class);
 
-  private UserDao userDao;
+  UserDao userDao;
 
-  private AccessChecker accessChecker;
+  AccessChecker accessChecker;
 
   private LdapConnector ldapConnector;
 
