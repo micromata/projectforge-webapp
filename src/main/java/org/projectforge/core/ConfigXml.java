@@ -125,6 +125,8 @@ public class ConfigXml
 
   private String receiveSmsKey;
 
+  private String phoneLookupKey;
+
   private MailAccountConfig mebMailAccount = new MailAccountConfig();
 
   private String currencySymbol;
@@ -217,6 +219,7 @@ public class ConfigXml
     telephoneSystemOperatorPanelUrl = null;
     smsUrl = null;
     receiveSmsKey = null;
+    phoneLookupKey = null;
     mebMailAccount = new MailAccountConfig();
     currencySymbol = "€";
     defaultLocale = Locale.ENGLISH;
@@ -685,6 +688,16 @@ public class ConfigXml
   public String getReceiveSmsKey()
   {
     return receiveSmsKey;
+  }
+
+  /**
+   * The reverse phone lookup service verifies the key given as parameter to the servlet call against this
+   * key. The key should be an alpha numeric random value with at least 6 characters for security reasons.
+   * @return the receivePhoneLookupKey
+   */
+  public String getPhoneLookupKey()
+  {
+    return phoneLookupKey;
   }
 
   /**

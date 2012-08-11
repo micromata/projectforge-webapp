@@ -23,6 +23,7 @@ import org.apache.commons.lang.StringUtils;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.ConfigXml;
 import org.projectforge.registry.Registry;
 
 /**
@@ -35,12 +36,26 @@ import org.projectforge.registry.Registry;
 public class PhoneLookUpServlet extends HttpServlet
 {
   private static final long serialVersionUID = 8042634752943344080L;
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PhoneLookUpServlet.class);
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException
   {
     if (StringUtils.isBlank(req.getParameter("nr")) || StringUtils.containsOnly(req.getParameter("nr"), "+1234567890 -/") == false) {
       resp.sendError(HttpStatus.SC_BAD_REQUEST);
+      return;
+    }
+
+    final String key = req.getParameter("key");
+    final String expectedKey = ConfigXml.getInstance().getPhoneLookupKey();
+    if (StringUtils.isBlank(expectedKey) == true) {
+      log.warn("Servlet call for receiving phonelookups ignored because phoneLookupKey is not given in config.xml file.");
+      resp.sendError(HttpStatus.SC_BAD_REQUEST);
+      return;
+    }
+    if (expectedKey.equals(key) == false) {
+      log.warn("Servlet call for phonelookups ignored because phoneLookupKey does not match given key: " + key);
+      resp.sendError(HttpStatus.SC_FORBIDDEN);
       return;
     }
 
