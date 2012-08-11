@@ -32,6 +32,17 @@ import org.junit.Test;
 public class LdapUtilsTest
 {
   @Test
+  public void getOu()
+  {
+    assertEquals("", LdapUtils.getOu());
+    assertEquals("", LdapUtils.getOu(new String[0]));
+    assertEquals("ou=users", LdapUtils.getOu("ou=users"));
+    assertEquals("ou=users", LdapUtils.getOu("users"));
+    assertEquals("ou=users,ou=pf", LdapUtils.getOu("ou=users,ou=pf"));
+    assertEquals("ou=users,ou=pf", LdapUtils.getOu("users", "pf"));
+  }
+
+  @Test
   public void organizationalUnit()
   {
     assertNull(LdapUtils.getOrganizationalUnit(null));

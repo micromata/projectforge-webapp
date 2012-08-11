@@ -46,6 +46,10 @@ public class LdapUtils
     if (organizationalUnit == null) {
       return "";
     }
+    if (organizationalUnit.length == 1 && organizationalUnit[0].startsWith("ou=") == true) {
+      // organizationalUnit is already in the form ou=...,ou=.... Nothing to be done.
+      return organizationalUnit[0];
+    }
     final StringBuffer buf = new StringBuffer();
     buildOu(buf, organizationalUnit);
     return buf.toString();

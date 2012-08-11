@@ -130,4 +130,18 @@ public class LoginDefaultHandler implements LoginHandler
     }
     return true;
   }
+
+  /**
+   * @see org.projectforge.user.LoginHandler#checkStayLogin(org.projectforge.user.PFUserDO)
+   */
+  @Override
+  public boolean checkStayLogin(final PFUserDO user)
+  {
+    final PFUserDO dbUser = userDao.getUserGroupCache().getUser(user.getId());
+    if (dbUser != null && dbUser.isDeleted() == false) {
+      return true;
+    }
+    log.warn("User is deleted, stay-logged-in denied for the given user: " + user);
+    return false;
+  }
 }

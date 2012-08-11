@@ -36,7 +36,25 @@ public interface LoginHandler
    */
   public void initialize();
 
+  /**
+   * @param username
+   * @param password
+   * @return {@link LoginResultStatus#SUCCESS} only and only if the login credentials were accepted.
+   */
   public LoginResult checkLogin(final String username, final String password);
 
+  /**
+   * The simplest implementation is: UserRights.getAccessChecker().isUserMemberOfAdminGroup(user). The default login handler has an own
+   * implementation to check an user if the data-base was changed and the Hibernate objects may not be valid (plain jdbc is used then).
+   * @param user
+   * @return true if the user is an admin user of ProjectForge, otherwise false.
+   */
   public boolean isAdminUser(final PFUserDO user);
+
+  /**
+   * ProjectForge has checked the cookie of the user successfully. The login handler should deny the request if the user e. g. is deleted.
+   * @param user
+   * @return true if the stay logged in process should be accepted, otherwise false (the user has to be redirected to the login page).
+   */
+  public boolean checkStayLogin(PFUserDO user);
 }

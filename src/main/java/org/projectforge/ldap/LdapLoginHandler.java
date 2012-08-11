@@ -43,9 +43,9 @@ public class LdapLoginHandler implements LoginHandler
 
   private LdapConnector ldapConnector;
 
-  private LdapUserDao ldapUserDao;
+  LdapUserDao ldapUserDao;
 
-  private LdapConfig ldapConfig;
+  LdapConfig ldapConfig;
 
   /**
    * @see org.projectforge.user.LoginHandler#initialize()
@@ -72,8 +72,7 @@ public class LdapLoginHandler implements LoginHandler
   public LoginResult checkLogin(final String username, final String password)
   {
     final LoginResult loginResult = new LoginResult();
-    // final String organizationalUnits = ldapConfig.getGroupBase();
-    final String[] organizationalUnits = { "pf-test", "users"};
+    final String organizationalUnits = ldapConfig.getGroupBase();
     final boolean authenticated = ldapUserDao.authenticate(username, password, organizationalUnits);
     if (authenticated == false) {
       log.info("User login failed: " + username);
@@ -94,6 +93,20 @@ public class LdapLoginHandler implements LoginHandler
     } else {
       return loginResult.setLoginResultStatus(LoginResultStatus.SUCCESS).setUser(user);
     }
+  }
+
+  /**
+   * @see org.projectforge.user.LoginHandler#checkStayLogin(org.projectforge.user.PFUserDO)
+   */
+  @Override
+  public boolean checkStayLogin(final PFUserDO user)
+  {
+    final PFUserDO dbUser = userDao.getUserGroupCache().getUser(user.getId());
+    if (dbUser != null && dbUser.isDeleted() == false) {
+      return true;
+    }
+    log.warn("User is deleted, stay-logged-in denied for the given user: " + user);
+    return false;
   }
 
   public boolean isAdminUser(final PFUserDO user)

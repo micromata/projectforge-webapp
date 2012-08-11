@@ -41,21 +41,49 @@ public class Login
 
   private LoginHandler loginHandler;
 
+  /**
+   * @see LoginHandler#checkLogin(String, String)
+   */
   public LoginResult checkLogin(final String username, final String password)
   {
     if (loginHandler == null) {
       log.warn("No login possible because no login handler is defined yet.");
       return new LoginResult().setLoginResultStatus(LoginResultStatus.FAILED);
     }
+    if (username == null || password == null) {
+      return new LoginResult().setLoginResultStatus(LoginResultStatus.FAILED);
+    }
     return loginHandler.checkLogin(username, password);
   }
 
-  public boolean isAdminUser(final PFUserDO user) {
+  /**
+   * @see LoginHandler#isAdminUser(PFUserDO)
+   */
+  public boolean isAdminUser(final PFUserDO user)
+  {
     if (loginHandler == null) {
       log.warn("No login handler is defined yet, so can't check either user is admin user or not.");
       return false;
     }
+    if (user == null) {
+      return false;
+    }
     return loginHandler.isAdminUser(user);
+  }
+
+  /**
+   * @see LoginHandler#checkStayLogin(PFUserDO)
+   */
+  public boolean checkStayLogin(final PFUserDO user)
+  {
+    if (loginHandler == null) {
+      log.warn("No login handler is defined yet, so can't accept the stay-logged-in request.");
+      return false;
+    }
+    if (user == null) {
+      return false;
+    }
+    return loginHandler.checkStayLogin(user);
   }
 
   /**
