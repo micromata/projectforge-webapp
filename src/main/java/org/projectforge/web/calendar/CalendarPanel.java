@@ -271,9 +271,10 @@ public class CalendarPanel extends Panel
         accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP) == false);
     eventSource.setEventsProvider(birthdayEventsProvider);
     eventSource.setEditable(false);
-    eventSource.setBackgroundColor("#06790E");
-    eventSource.setBorderColor("#06790E");
-    eventSource.setTextColor("#FFFFFF");
+    // The default color of birthdays (not favorites), should be gray, see BirthdayEventsProvider for colors of birthdays of favorites.
+    eventSource.setBackgroundColor("#EEEEEE");
+    eventSource.setColor("#EEEEEE");
+    eventSource.setTextColor("#222222");
     config.add(eventSource);
   }
 

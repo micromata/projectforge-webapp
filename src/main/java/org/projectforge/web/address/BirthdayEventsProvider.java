@@ -127,8 +127,10 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
       }
       event.setTitle(buf.toString());
       if (birthdayAddress.isFavorite() == true) {
-        event.setTextColor("#227722");
-        event.setBackgroundColor("#007918");
+        // Colors of events of birthdays of favorites (for default color see CalendarPanel):
+        event.setBackgroundColor("#06790E");
+        event.setBorderColor("#06790E");
+        event.setTextColor("#FFFFFF");
       }
       events.put(id, event);
     }
