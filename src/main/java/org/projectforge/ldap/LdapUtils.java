@@ -67,7 +67,10 @@ public class LdapUtils
       } else {
         buf.append(',');
       }
-      buf.append("ou=").append(ou);
+      if (ou.startsWith("ou=") == false) {
+        buf.append("ou=");
+      }
+      buf.append(ou);
     }
   }
 

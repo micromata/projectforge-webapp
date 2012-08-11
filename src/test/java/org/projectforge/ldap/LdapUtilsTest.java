@@ -40,6 +40,9 @@ public class LdapUtilsTest
     assertEquals("ou=users", LdapUtils.getOu("users"));
     assertEquals("ou=users,ou=pf", LdapUtils.getOu("ou=users,ou=pf"));
     assertEquals("ou=users,ou=pf", LdapUtils.getOu("users", "pf"));
+    assertEquals("ou=users,ou=pf", LdapUtils.getOu("ou=users", "pf"));
+    assertEquals("ou=users,ou=pf", LdapUtils.getOu("ou=users", "ou=pf"));
+    assertEquals("ou=users,ou=pf", LdapUtils.getOu("users", "ou=pf"));
   }
 
   @Test
