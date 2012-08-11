@@ -44,6 +44,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.MDC;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
+import org.projectforge.user.Login;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
@@ -129,6 +130,12 @@ public class UserFilter implements Filter
     return null;
   }
 
+  /**
+   * Adds or refresh the given cookie.
+   * @param request
+   * @param response
+   * @param stayLoggedInCookie
+   */
   public static void addStayLoggedInCookie(final HttpServletRequest request, final HttpServletResponse response,
       final Cookie stayLoggedInCookie)
   {
@@ -312,6 +319,10 @@ public class UserFilter implements Filter
       }
       if (values[2] == null || values[2].equals(user.getStayLoggedInKey()) == false) {
         log.warn("Invalid cookie found (stay-logged-in key, maybe renewed and/or user password changed): " + value);
+        return null;
+      }
+      if (Login.getInstance().checkStayLogin(user) == false) {
+        log.warn("Stay-logged-in wasn't accepted by the login handler.");
         return null;
       }
       addStayLoggedInCookie(request, response, stayLoggedInCookie);
