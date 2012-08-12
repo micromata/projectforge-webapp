@@ -44,11 +44,7 @@ import org.apache.wicket.util.tester.WicketTester;
 import org.apache.wicket.util.visit.IVisit;
 import org.apache.wicket.util.visit.IVisitor;
 import org.junit.Before;
-import org.projectforge.registry.DaoRegistry;
 import org.projectforge.test.TestBase;
-import org.projectforge.test.TestConfiguration;
-import org.projectforge.user.Login;
-import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.LoginPage;
 import org.projectforge.web.MenuBuilder;
@@ -86,9 +82,6 @@ public class WicketPageTestBase extends TestBase
       final ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
       beanFactory.autowireBeanProperties(this, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
       UserXmlPreferencesCache.setInternalInstance(userXmlPreferencesCache);
-      final LoginDefaultHandler loginHandler = new LoginDefaultHandler();
-      loginHandler.initialize();
-      Login.getInstance().setLoginHandler(loginHandler);
     }
 
     @Override
@@ -125,8 +118,6 @@ public class WicketPageTestBase extends TestBase
   @Before
   public void setUpWicketApplication()
   {
-    final DaoRegistry daoRegistry = TestConfiguration.getConfiguration().getBean("daoRegistry", DaoRegistry.class);
-    daoRegistry.init();
     tester = new WicketTester(new WicketTestApplication());
   }
 

@@ -45,8 +45,11 @@ import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.SimpleHistoryEntry;
+import org.projectforge.registry.DaoRegistry;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
+import org.projectforge.user.Login;
+import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
@@ -160,6 +163,11 @@ public class TestBase
     if (createTestData == true) {
       initTestDB.initDatabase();
     }
+    final DaoRegistry daoRegistry = TestConfiguration.getConfiguration().getBean("daoRegistry", DaoRegistry.class);
+    daoRegistry.init();
+    final LoginDefaultHandler loginHandler = new LoginDefaultHandler();
+    loginHandler.initialize();
+    Login.getInstance().setLoginHandler(loginHandler);
   }
 
   public static InitTestDB getInitTestDB()
