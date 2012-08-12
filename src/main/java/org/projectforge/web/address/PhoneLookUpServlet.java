@@ -16,7 +16,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Path;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
@@ -30,11 +29,12 @@ import org.projectforge.registry.Registry;
 
 /**
  * Assign a phone number to a full name and organization using ProjectForge address database.
+ * <br/>
+ * This servlet may be used by e. g. Asterix scripts for displaying incoming phone callers.
  * 
  * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
  * 
  */
-@Path("/phonelookup")
 public class PhoneLookUpServlet extends HttpServlet
 {
   private static final long serialVersionUID = 8042634752943344080L;
