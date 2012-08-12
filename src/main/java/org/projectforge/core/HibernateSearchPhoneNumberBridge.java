@@ -24,8 +24,8 @@
 package org.projectforge.core;
 
 import org.hibernate.search.bridge.StringBridge;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.common.StringHelper;
-
 
 /**
  * StringBridge for hibernate search to search in phone numbers (reduce phone number fields to digits without white spaces and non digits).
@@ -34,8 +34,12 @@ import org.projectforge.common.StringHelper;
  */
 public class HibernateSearchPhoneNumberBridge implements StringBridge
 {
-  public String objectToString(Object object)
+  public String objectToString(final Object object)
   {
-    return String.valueOf(object) + '|' + StringHelper.removeNonDigits((String) object);
+    if (object == null || object instanceof String == false) {
+      return "";
+    }
+    final String number = (String) object;
+    return number + '|' + StringHelper.removeNonDigits(number) + '|' + NumberHelper.extractPhonenumber(number);
   }
 }
