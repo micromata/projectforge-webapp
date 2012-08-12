@@ -33,6 +33,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
+import org.projectforge.core.Configuration;
+import org.projectforge.core.ConfigurationParam;
 import org.projectforge.user.PFUserContext;
 
 /**
@@ -335,6 +337,17 @@ public class NumberHelper
     final Locale locale = PFUserContext.getLocale();
     final NumberFormat format = getNumberFraction2Format(locale);
     return format.format(value);
+  }
+
+  /**
+   * Uses the default country phone prefix from the configuration.
+   * @see #extractPhonenumber(String, String)
+   */
+  public static String extractPhonenumber(final String str)
+  {
+    final String defaultCountryPhonePrefix = Configuration.getInstance().getStringValue(ConfigurationParam.DEFAULT_COUNTRY_PHONE_PREFIX);
+
+    return extractPhonenumber(str, defaultCountryPhonePrefix);
   }
 
   /**
