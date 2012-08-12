@@ -15,10 +15,8 @@ package net.ftlines.wicket.fullcalendar.callback;
  */
 public enum CalendarDropMode
 {
-  MOVE_SAVE("calendar.dd.move.save", "MoveSave"),
-  MOVE_EDIT("calendar.dd.move.edit", "MoveEdit"),
-  COPY_SAVE("calendar.dd.copy.save", "CopySave"),
-  COPY_EDIT("calendar.dd.copy.edit", "CopyEdit");
+  MOVE_SAVE("calendar.dd.move.save", "MoveSave"), MOVE_EDIT("calendar.dd.move.edit", "MoveEdit"), COPY_SAVE("calendar.dd.copy.save",
+      "CopySave"), COPY_EDIT("calendar.dd.copy.edit", "CopyEdit"), CANCEL("cancel", "Cancel");
 
   private String i18nKey;
 

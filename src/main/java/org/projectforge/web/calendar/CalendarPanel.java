@@ -339,6 +339,9 @@ public class CalendarPanel extends Panel
           timesheetDao.update(dbTimesheet);
         }
         setResponsePage(getPage()); // TODO not needed if we can close the context menu programatically through ajax target
+      } else {
+        // CANCEL
+        setResponsePage(getPage()); // TODO not needed if we can close the context menu programatically through ajax target
       }
     }
   }

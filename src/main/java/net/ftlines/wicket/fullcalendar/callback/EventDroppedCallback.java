@@ -35,6 +35,7 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
   private static final String MOVE_EDIT = CalendarDropMode.MOVE_EDIT.getI18nKey();
   private static final String COPY_SAVE = CalendarDropMode.COPY_SAVE.getI18nKey();
   private static final String COPY_EDIT = CalendarDropMode.COPY_EDIT.getI18nKey();
+  private static final String CANCEL = CalendarDropMode.CANCEL.getI18nKey();
 
   private static final String CALLBACK_POST_SCRIPT = "}; $.contextMenu.create("
       + "["
@@ -42,7 +43,9 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
       + "{ '" + COPY_SAVE + "' : function(menuItem,menu) { triggerAjaxEvent('" + CalendarDropMode.COPY_SAVE.getAjaxTarget() + "'); } },"
       + "$.contextMenu.separator,"
       + "{ '" + MOVE_EDIT + "' : function(menuItem,menu) { triggerAjaxEvent('" + CalendarDropMode.MOVE_EDIT.getAjaxTarget() + "'); } },"
-      + "{ '" + COPY_EDIT + "' : function(menuItem,menu) { triggerAjaxEvent('" + CalendarDropMode.COPY_EDIT.getAjaxTarget() + "'); } }"
+      + "{ '" + COPY_EDIT + "' : function(menuItem,menu) { triggerAjaxEvent('" + CalendarDropMode.COPY_EDIT.getAjaxTarget() + "'); } },"
+      + "$.contextMenu.separator,"
+      + "{ '" + CANCEL + "' : function(menuItem,menu) { triggerAjaxEvent('" + CalendarDropMode.CANCEL.getAjaxTarget() + "'); } }"
       + "],"
       + "{hideCallback: function () {this.menu.remove(); revertFunc(); console.log(revertFunc);} }"
       + ").show(this, originalEvent);";
@@ -70,6 +73,7 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
     result = result.replace(MOVE_EDIT, component.getString(MOVE_EDIT));
     result = result.replace(COPY_SAVE, component.getString(COPY_SAVE));
     result = result.replace(COPY_EDIT, component.getString(COPY_EDIT));
+    result = result.replace(CANCEL, component.getString(CANCEL));
     return result;
   }
 
