@@ -392,9 +392,9 @@ extends AbstractEditForm<O, P>
         {
           // TODO Kai from Johannes: handle persistence of open/closed events
           if(toggleClosed) {
-            System.out.println("i am now closed");
+            //System.out.println("i am now closed");
           } else {
-            System.out.println("i am now open");
+            //System.out.println("i am now open");
           }
         }
       };
