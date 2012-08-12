@@ -22,8 +22,10 @@ import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.core.QueryFilter;
 import org.projectforge.registry.Registry;
 
 /**
@@ -62,54 +64,44 @@ public class PhoneLookUpServlet extends HttpServlet
       return;
     }
 
-    final String searchNumber = cleanNumber(number.trim());
+    final String searchNumber = NumberHelper.extractPhonenumber(number);
     final AddressDao addressDao = (AddressDao) Registry.instance().getDao(AddressDao.class);
 
     final BaseSearchFilter alf = new BaseSearchFilter();
-    alf.setSearchString(searchNumber);
+    alf.setSearchString("*" + searchNumber);
+    final QueryFilter queryFilter = new QueryFilter(alf);
 
-    final List<AddressDO> list = addressDao.getList(alf);
+    final StringBuffer buf = new StringBuffer();
+    final List<AddressDO> list = addressDao.internalGetList(queryFilter);
     if (list.size() >= 1) {
       AddressDO result = list.get(0);
       if (list.size() > 1) {
+        // More than one result, therefore find the newest one:
+        buf.append("+"); // Mark that more than one entry does exist.
         for (final AddressDO matchingUser : list) {
-          if (matchingUser.getLastUpdate().after(result.getLastUpdate())) {
+          if (matchingUser.getLastUpdate().after(result.getLastUpdate()) == true) {
             result = matchingUser;
           }
         }
       }
-
       resp.setContentType("text/plain");
-      if (result.getOrganization() != null && result.getFullName() != null) {
-        resp.getOutputStream().print(result.getFullName() + "; " + result.getOrganization());
-      } else {
-        if (result.getOrganization() == null)
-          resp.getOutputStream().print(result.getFullName());
-        if (result.getFullName() == null)
-          resp.getOutputStream().print(result.getOrganization());
+      final String fullname = result.getFullName();
+      boolean first = true;
+      if (StringUtils.isNotBlank(fullname) == true) {
+        buf.append(fullname);
+        first = false;
       }
+      final String organization = result.getOrganization();
+      if (StringUtils.isNotBlank(organization) == true) {
+        if (first == false) {
+          buf.append("; ");
+        }
+        buf.append(organization);
+      }
+      resp.getOutputStream().print(buf.toString());
     } else {
       /* mit Thomas abgesprochen. */
       resp.getOutputStream().print(0);
     }
-  }
-
-  /**
-   * Delete '0' (zero), '+' or ' '
-   * 
-   * @param number
-   * @return
-   */
-  private String cleanNumber(String number)
-  {
-    if (number.startsWith("+") || number.startsWith("0")) {
-      while (number.length() > 0) {
-        if (number.charAt(0) == '0' || number.charAt(0) == '+' || number.charAt(0) == ' ')
-          number = number.substring(1);
-        else break;
-      }
-    }
-    System.out.println(number);
-    return number;
   }
 }
