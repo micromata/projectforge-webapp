@@ -33,9 +33,14 @@ import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRights;
 
-public class LdapLoginHandler implements LoginHandler
+/**
+ * This LDAP login handler acts as a LDAP slave, meaning, that LDAP will be accessed in read-only mode.
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ *
+ */
+public class LdapSlaveLoginHandler implements LoginHandler
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapLoginHandler.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapSlaveLoginHandler.class);
 
   UserDao userDao;
 

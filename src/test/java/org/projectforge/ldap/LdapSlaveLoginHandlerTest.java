@@ -32,10 +32,10 @@ import org.projectforge.test.TestBase;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
 
-public class LdapLoginHandlerTest extends TestBase
+public class LdapSlaveLoginHandlerTest extends TestBase
 {
   @Test
-  public void login()
+  public void loginInSlaveMode()
   {
     final String userBase = "ou=users";
     final LdapUserDao ldapUserDao = mock(LdapUserDao.class);
@@ -44,7 +44,7 @@ public class LdapLoginHandlerTest extends TestBase
     when(ldapUserDao.findByUsername("kai", userBase)).thenReturn(
         new LdapPerson().setUid("kai").setDescription("Developer").setGivenName("Kai").setMail("k.reinhard@acme.com")
         .setOrganization("Micromata").setSurname("Reinhard"));
-    final LdapLoginHandler loginHandler = new LdapLoginHandler();
+    final LdapSlaveLoginHandler loginHandler = new LdapSlaveLoginHandler();
     loginHandler.ldapUserDao = ldapUserDao;
     loginHandler.ldapConfig = new LdapConfig().setUserBase(userBase);
     loginHandler.userDao = userDao;
