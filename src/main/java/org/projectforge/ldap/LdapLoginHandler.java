@@ -72,7 +72,7 @@ public class LdapLoginHandler implements LoginHandler
   public LoginResult checkLogin(final String username, final String password)
   {
     final LoginResult loginResult = new LoginResult();
-    final String organizationalUnits = ldapConfig.getGroupBase();
+    final String organizationalUnits = ldapConfig.getUserBase();
     final boolean authenticated = ldapUserDao.authenticate(username, password, organizationalUnits);
     if (authenticated == false) {
       log.info("User login failed: " + username);

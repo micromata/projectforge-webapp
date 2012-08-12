@@ -37,15 +37,16 @@ public class LdapLoginHandlerTest extends TestBase
   @Test
   public void login()
   {
+    final String userBase = "ou=users";
     final LdapUserDao ldapUserDao = mock(LdapUserDao.class);
-    when(ldapUserDao.authenticate("kai", "successful", (String[]) null)).thenReturn(true);
-    when(ldapUserDao.authenticate("kai", "fail", (String[]) null)).thenReturn(false);
-    when(ldapUserDao.findByUsername("kai", (String[]) null)).thenReturn(
+    when(ldapUserDao.authenticate("kai", "successful", userBase)).thenReturn(true);
+    when(ldapUserDao.authenticate("kai", "fail", userBase)).thenReturn(false);
+    when(ldapUserDao.findByUsername("kai", userBase)).thenReturn(
         new LdapPerson().setUid("kai").setDescription("Developer").setGivenName("Kai").setMail("k.reinhard@acme.com")
         .setOrganization("Micromata").setSurname("Reinhard"));
     final LdapLoginHandler loginHandler = new LdapLoginHandler();
     loginHandler.ldapUserDao = ldapUserDao;
-    loginHandler.ldapConfig = new LdapConfig();
+    loginHandler.ldapConfig = new LdapConfig().setUserBase(userBase);
     loginHandler.userDao = userDao;
     Assert.assertEquals(LoginResultStatus.FAILED, loginHandler.checkLogin("kai", "fail").getLoginResultStatus());
 
