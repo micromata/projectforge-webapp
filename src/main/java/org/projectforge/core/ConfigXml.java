@@ -478,7 +478,11 @@ public class ConfigXml
             copyDeclaredFields(buf.toString(), srcFieldValue.getClass(), srcFieldValue, destFieldValue, ignoreFields);
           } else {
             field.set(dest, srcFieldValue);
-            log.info(StringUtils.defaultString(prefix) + field.getName() + " = " + srcFieldValue);
+            if (StringHelper.isIn(field.getName(), "receiveSmsKey", "phoneLookupKey") == true) {
+              log.info(StringUtils.defaultString(prefix) + field.getName() + " = ****");
+            } else {
+              log.info(StringUtils.defaultString(prefix) + field.getName() + " = " + srcFieldValue);
+            }
           }
         } catch (final IllegalAccessException ex) {
           throw new InternalError("Unexpected IllegalAccessException: " + ex.getMessage());
@@ -691,8 +695,8 @@ public class ConfigXml
   }
 
   /**
-   * The reverse phone lookup service verifies the key given as parameter to the servlet call against this
-   * key. The key should be an alpha numeric random value with at least 6 characters for security reasons.
+   * The reverse phone lookup service verifies the key given as parameter to the servlet call against this key. The key should be an alpha
+   * numeric random value with at least 6 characters for security reasons.
    * @return the receivePhoneLookupKey
    */
   public String getPhoneLookupKey()
@@ -997,7 +1001,8 @@ public class ConfigXml
   }
 
   /**
-   * If given then this login handler will be used instead of {@link LoginDefaultHandler}. For ldap please use e. g. org.projectforge.ldap.LdapLoginHandler.
+   * If given then this login handler will be used instead of {@link LoginDefaultHandler}. For ldap please use e. g.
+   * org.projectforge.ldap.LdapLoginHandler.
    * @return the loginHandlerClass
    */
   public String getLoginHandlerClass()
