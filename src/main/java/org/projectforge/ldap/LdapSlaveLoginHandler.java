@@ -23,52 +23,18 @@
 
 package org.projectforge.ldap;
 
-import org.projectforge.access.AccessChecker;
-import org.projectforge.core.ConfigXml;
-import org.projectforge.registry.Registry;
-import org.projectforge.user.LoginHandler;
 import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserDao;
-import org.projectforge.user.UserRights;
 
 /**
  * This LDAP login handler acts as a LDAP slave, meaning, that LDAP will be accessed in read-only mode.
  * @author Kai Reinhard (k.reinhard@micromata.de)
- *
+ * 
  */
-public class LdapSlaveLoginHandler implements LoginHandler
+public class LdapSlaveLoginHandler extends LdapLoginHandler
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapSlaveLoginHandler.class);
-
-  UserDao userDao;
-
-  AccessChecker accessChecker;
-
-  private LdapConnector ldapConnector;
-
-  LdapUserDao ldapUserDao;
-
-  LdapConfig ldapConfig;
-
-  /**
-   * @see org.projectforge.user.LoginHandler#initialize()
-   */
-  @Override
-  public void initialize()
-  {
-    this.ldapConfig = ConfigXml.getInstance().getLdapConfig();
-    if (ldapConfig == null || ldapConfig.getServer() == null) {
-      log.warn("No LDAP configured in config.xml, so any login won't be possible!");
-    }
-    ldapConnector = new LdapConnector(ldapConfig);
-    ldapUserDao = new LdapUserDao();
-    ldapUserDao.ldapConnector = ldapConnector;
-    final Registry registry = Registry.instance();
-    userDao = (UserDao) registry.getDao(UserDao.class);
-    accessChecker = UserRights.getAccessChecker();
-  }
 
   /**
    * @see org.projectforge.user.LoginHandler#checkLogin(java.lang.String, java.lang.String, boolean)
@@ -76,6 +42,7 @@ public class LdapSlaveLoginHandler implements LoginHandler
   @Override
   public LoginResult checkLogin(final String username, final String password)
   {
+    // TODO: Groups
     final LoginResult loginResult = new LoginResult();
     final String organizationalUnits = ldapConfig.getUserBase();
     final boolean authenticated = ldapUserDao.authenticate(username, password, organizationalUnits);
@@ -98,24 +65,5 @@ public class LdapSlaveLoginHandler implements LoginHandler
     } else {
       return loginResult.setLoginResultStatus(LoginResultStatus.SUCCESS).setUser(user);
     }
-  }
-
-  /**
-   * @see org.projectforge.user.LoginHandler#checkStayLogin(org.projectforge.user.PFUserDO)
-   */
-  @Override
-  public boolean checkStayLogin(final PFUserDO user)
-  {
-    final PFUserDO dbUser = userDao.getUserGroupCache().getUser(user.getId());
-    if (dbUser != null && dbUser.isDeleted() == false) {
-      return true;
-    }
-    log.warn("User is deleted, stay-logged-in denied for the given user: " + user);
-    return false;
-  }
-
-  public boolean isAdminUser(final PFUserDO user)
-  {
-    return accessChecker.isUserMemberOfAdminGroup(user);
   }
 }
