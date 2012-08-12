@@ -242,7 +242,7 @@
   
   <servlet-mapping>
     <servlet-name>PhoneLookUpServlet</servlet-name>
-    <url-pattern>/wa/phone/*</url-pattern>
+    <url-pattern>/phoneLookup</url-pattern>
   </servlet-mapping>
 
   <session-config>
