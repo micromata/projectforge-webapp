@@ -36,12 +36,15 @@ import org.projectforge.registry.Registry;
 public class PhoneLookUpServlet extends HttpServlet
 {
   private static final long serialVersionUID = 8042634752943344080L;
+
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(PhoneLookUpServlet.class);
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException
   {
-    if (StringUtils.isBlank(req.getParameter("nr")) || StringUtils.containsOnly(req.getParameter("nr"), "+1234567890 -/") == false) {
+    final String number = req.getParameter("nr");
+    if (StringUtils.isBlank(number) == true || StringUtils.containsOnly(number, "+1234567890 -/") == false) {
+      log.warn("Bad request, request parameter nr not given or contains invalid characters (only +0123456789 -/ are allowed): " + number);
       resp.sendError(HttpStatus.SC_BAD_REQUEST);
       return;
     }
@@ -59,7 +62,7 @@ public class PhoneLookUpServlet extends HttpServlet
       return;
     }
 
-    final String searchNumber = cleanNumber(req.getParameter("nr").trim());
+    final String searchNumber = cleanNumber(number.trim());
     final AddressDao addressDao = (AddressDao) Registry.instance().getDao(AddressDao.class);
 
     final BaseSearchFilter alf = new BaseSearchFilter();
@@ -77,7 +80,7 @@ public class PhoneLookUpServlet extends HttpServlet
       }
 
       resp.setContentType("text/plain");
-      if (result.getOrganization() != null && result.getFullName() != null){
+      if (result.getOrganization() != null && result.getFullName() != null) {
         resp.getOutputStream().print(result.getFullName() + "; " + result.getOrganization());
       } else {
         if (result.getOrganization() == null)
@@ -99,12 +102,11 @@ public class PhoneLookUpServlet extends HttpServlet
    */
   private String cleanNumber(String number)
   {
-    if (number.startsWith("+") || number.startsWith("0")){
-      while(number.length() > 0){
+    if (number.startsWith("+") || number.startsWith("0")) {
+      while (number.length() > 0) {
         if (number.charAt(0) == '0' || number.charAt(0) == '+' || number.charAt(0) == ' ')
           number = number.substring(1);
-        else
-          break;
+        else break;
       }
     }
     System.out.println(number);
