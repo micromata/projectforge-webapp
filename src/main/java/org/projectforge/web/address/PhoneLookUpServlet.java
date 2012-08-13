@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.projectforge.address.AddressDO;
 import org.projectforge.address.AddressDao;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.common.StringHelper;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.QueryFilter;
@@ -86,18 +87,8 @@ public class PhoneLookUpServlet extends HttpServlet
       }
       resp.setContentType("text/plain");
       final String fullname = result.getFullName();
-      boolean first = true;
-      if (StringUtils.isNotBlank(fullname) == true) {
-        buf.append(fullname);
-        first = false;
-      }
       final String organization = result.getOrganization();
-      if (StringUtils.isNotBlank(organization) == true) {
-        if (first == false) {
-          buf.append("; ");
-        }
-        buf.append(organization);
-      }
+      StringHelper.listToString(buf, "; ", fullname, organization);
       resp.getOutputStream().print(buf.toString());
     } else {
       /* mit Thomas abgesprochen. */
