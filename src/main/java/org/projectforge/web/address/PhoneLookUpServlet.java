@@ -68,11 +68,12 @@ public class PhoneLookUpServlet extends HttpServlet
     final String searchNumber = NumberHelper.extractPhonenumber(number);
     final AddressDao addressDao = (AddressDao) Registry.instance().getDao(AddressDao.class);
 
-    final BaseSearchFilter alf = new BaseSearchFilter();
-    alf.setSearchString("*" + searchNumber);
-    final QueryFilter queryFilter = new QueryFilter(alf);
+    final BaseSearchFilter filter = new BaseSearchFilter();
+    filter.setSearchString("*" + searchNumber);
+    final QueryFilter queryFilter = new QueryFilter(filter);
 
     final StringBuffer buf = new StringBuffer();
+    // Use internal get list method for avoiding access checking (no user is logged-in):
     final List<AddressDO> list = addressDao.internalGetList(queryFilter);
     if (list.size() >= 1) {
       AddressDO result = list.get(0);
