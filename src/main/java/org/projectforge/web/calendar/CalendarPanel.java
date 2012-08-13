@@ -163,7 +163,7 @@ public class CalendarPanel extends Panel
           log.debug("Original start time: " + event.getEvent().getStart() + ", original end time: " + event.getEvent().getEnd());
           log.debug("New start time: " + event.getNewStartTime() + ", new end time: " + event.getNewEndTime());
         }
-        modifyEvent(event.getEvent(), event.getNewStartTime(), event.getNewEndTime(), dropMode);
+        modifyEvent(event.getEvent(), event.getNewStartTime(), event.getNewEndTime(), dropMode, response);
         return false;
       }
 
@@ -180,7 +180,7 @@ public class CalendarPanel extends Panel
               + " minuteDelta: "
               + event.getMinutesDelta());
         }
-        modifyEvent(event.getEvent(), null, event.getNewEndTime(), CalendarDropMode.MOVE_EDIT);
+        modifyEvent(event.getEvent(), null, event.getNewEndTime(), CalendarDropMode.MOVE_EDIT, response);
         return false;
       }
 
@@ -278,7 +278,7 @@ public class CalendarPanel extends Panel
     config.add(eventSource);
   }
 
-  private void modifyEvent(final Event event, final DateTime newStartTime, final DateTime newEndTime, final CalendarDropMode dropMode)
+  private void modifyEvent(final Event event, final DateTime newStartTime, final DateTime newEndTime, final CalendarDropMode dropMode, final CalendarResponse response)
   {
     final String eventId = event.getId();
     if (eventId != null && eventId.startsWith("ts-") == true) {
@@ -342,10 +342,10 @@ public class CalendarPanel extends Panel
           // we need update only in "move" mode, in "copy" mode it was saved a few lines above
           timesheetDao.update(dbTimesheet);
         }
-        setResponsePage(getPage()); // TODO not needed if we can close the context menu programatically through ajax target
+        setResponsePage(getPage());
       } else {
-        // CANCEL
-        setResponsePage(getPage()); // TODO not needed if we can close the context menu programatically through ajax target
+        // CANCEL -> should be handled through javascript now
+        setResponsePage(getPage());
       }
     }
   }
