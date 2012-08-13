@@ -45,9 +45,9 @@ public abstract class EventDroppedCallback extends AbstractAjaxCallbackWithClien
       + "{ '" + MOVE_EDIT + "' : function(menuItem,menu) { triggerAjaxEvent('" + CalendarDropMode.MOVE_EDIT.getAjaxTarget() + "'); } },"
       + "{ '" + COPY_EDIT + "' : function(menuItem,menu) { triggerAjaxEvent('" + CalendarDropMode.COPY_EDIT.getAjaxTarget() + "'); } },"
       + "$.contextMenu.separator,"
-      + "{ '" + CANCEL + "' : function(menuItem,menu) { triggerAjaxEvent('" + CalendarDropMode.CANCEL.getAjaxTarget() + "'); } }"
+      + "{ '" + CANCEL + "' : function(menuItem,menu) { menu.hide(); } }"
       + "],"
-      + "{hideCallback: function () {this.menu.remove(); revertFunc(); console.log(revertFunc);} }"
+      + "{hideCallback: function () {this.menu.remove(); revertFunc(); } }"
       + ").show(this, originalEvent);";
 
   @Override
