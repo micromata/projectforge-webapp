@@ -158,12 +158,22 @@ public class StringHelper
    */
   public static String listToString(final String delimiter, final String... strings)
   {
+    final StringBuffer buf = new StringBuffer();
+    return listToString(buf, delimiter, strings);
+  }
+
+  /**
+   * @param delimiter
+   * @param strings
+   * @see #listToString(List, String, boolean)
+   */
+  public static String listToString(final StringBuffer buf, final String delimiter, final String... strings)
+  {
     if (strings == null) {
       return null;
     } else if (strings.length == 0) {
       return "";
     }
-    final StringBuffer buf = new StringBuffer();
     boolean first = true;
     for (final String s : strings) {
       if (s == null || s.length() == 0) {
