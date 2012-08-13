@@ -305,8 +305,12 @@ public class CalendarPanel extends Panel
       }
 
       // update start and end time
-      dbTimesheet.setStartTime(new Timestamp(newStartTime.getMillis()));
-      dbTimesheet.setStopTime(new Timestamp(newEndTime.getMillis()));
+      if(newStartTime != null) {
+        dbTimesheet.setStartTime(new Timestamp(newStartTime.getMillis()));
+      }
+      if(newEndTime != null) {
+        dbTimesheet.setStopTime(new Timestamp(newEndTime.getMillis()));
+      }
 
       // clone timesheet if mode is copy_*
       if (CalendarDropMode.COPY_EDIT.equals(dropMode) || CalendarDropMode.COPY_SAVE.equals(dropMode)) {
