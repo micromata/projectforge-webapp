@@ -66,7 +66,7 @@ public abstract class MySortableDataProvider<O> extends SortableDataProvider<O>
     if (list == null) {
       return null;
     }
-    if ("NOSORT".equals(sp.getProperty()) == false) {
+    if (sp != null && "NOSORT".equals(sp.getProperty()) == false) {
       final Comparator<O> comp = getComparator(sp.getProperty(), sp.isAscending());
       Collections.sort(list, comp);
     }
