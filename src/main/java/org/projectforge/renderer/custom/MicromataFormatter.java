@@ -91,7 +91,8 @@ public class MicromataFormatter extends Formatter
       } else {
         row.addCell(new CellHolder(userFormatter.getFormattedUser(timesheet.getUser())));
       }
-      row.addCell(new CellHolder(taskFormatter.getTaskPath(timesheet.getTaskId(), taskId, true, OutputType.PLAIN)));
+      final String taskPath = taskFormatter.getTaskPath(timesheet.getTaskId(), taskId, true, OutputType.PLAIN);
+      row.addCell(new CellHolder(htmlHelper.formatXSLFOText(taskPath, true)));
       row.addCell(new CellHolder(dateTimeFormatter.getFormattedTimePeriod(timesheet.getTimePeriod(), RenderType.FOP, true)));
       row.addCell(new CellHolder(dateTimeFormatter.getFormattedDuration(timesheet.getTimePeriod())));
       row.addCell(new CellHolder(htmlHelper.formatXSLFOText(timesheet.getDescription(), true)));
