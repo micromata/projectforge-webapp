@@ -244,7 +244,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
   {
     personalAddressMap = personalAddressDao.getPersonalAddressByAddressId();
     final List<IColumn<AddressDO>> columns = createColumns(this, true);
-    dataTable = createDataTable(columns, null, SortOrder.ASCENDING);
+    dataTable = createDataTable(columns, "name", SortOrder.ASCENDING);
     form.add(dataTable);
 
     if (messagingSupported == true) {
