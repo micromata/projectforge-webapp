@@ -48,8 +48,8 @@ public class TeamCalPluginUpdates
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
-        final Table calendarTable = new Table(CalendarDO.class);
-        final Table eventTable = new Table(EventDO.class);
+        final Table calendarTable = new Table(TeamCalDO.class);
+        final Table eventTable = new Table(TeamEventDO.class);
         // Does the data-base table already exist?
         return dao.doesExist(calendarTable) == true && dao.doesExist(eventTable) == true ? UpdatePreCheckStatus.ALREADY_UPDATED
             : UpdatePreCheckStatus.OK;
@@ -58,8 +58,8 @@ public class TeamCalPluginUpdates
       @Override
       public UpdateRunningStatus runUpdate()
       {
-        final Table calendarTable = new Table(CalendarDO.class);
-        final Table eventTable = new Table(EventDO.class);
+        final Table calendarTable = new Table(TeamCalDO.class);
+        final Table eventTable = new Table(TeamEventDO.class);
         // Create initial data-base table:
         if (dao.doesExist(calendarTable) == false) {
           calendarTable.addDefaultBaseDOAttributes().addAttributes("owner", "fullAccessGroup", "readOnlyAccessGroup", "minimalAccessGroup",

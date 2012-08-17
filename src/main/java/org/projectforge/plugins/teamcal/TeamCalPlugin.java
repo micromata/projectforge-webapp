@@ -41,12 +41,12 @@ public class TeamCalPlugin extends AbstractPlugin
 
   static UserPrefArea USER_PREF_AREA;
 
-  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { CalendarDO.class, EventDO.class};
+  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { TeamCalDO.class, TeamEventDO.class};
 
   /**
    * This dao should be defined in pluginContext.xml (as resources) for proper initialization.
    */
-  private CalendarDao calendarDao;
+  private TeamCalDao calendarDao;
 
   @Override
   public Class< ? >[] getPersistentEntities()
@@ -62,20 +62,20 @@ public class TeamCalPlugin extends AbstractPlugin
   {
     // DatabaseUpdateDao is needed by the updater:
     TeamCalPluginUpdates.dao = databaseUpdateDao;
-    final RegistryEntry entry = new RegistryEntry(ID, CalendarDao.class, calendarDao, "plugins.teamcal");
+    final RegistryEntry entry = new RegistryEntry(ID, TeamCalDao.class, calendarDao, "plugins.teamcal");
     // The CalendarDao is automatically available by the scripting engine!
     register(entry);
 
     // Register the web part:
-    //registerWeb(ID, CalendarListPage.class, CalendarEditPage.class);
+    //registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
 
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-    //registerMenuItem(new MenuItemDef(parentMenu, ID, 10, "plugins.teamcal.menu", CalendarListPage.class));
+    //registerMenuItem(new MenuItemDef(parentMenu, ID, 10, "plugins.teamcal.menu", TeamCalListPage.class));
     // .setMobileMenu(ToDoMobileListPage.class, 10));
 
     // Define the access management:
-    registerRight(new CalendarRight());
+    registerRight(new TeamCalRight());
 
     // All the i18n stuff:
     addResourceBundle(RESOURCE_BUNDLE_NAME);
@@ -85,7 +85,7 @@ public class TeamCalPlugin extends AbstractPlugin
    * @param calendarDao the calendarDao to set
    * @return this for chaining.
    */
-  public void setCalendarDao(final CalendarDao calendarDao)
+  public void setCalendarDao(final TeamCalDao calendarDao)
   {
     this.calendarDao = calendarDao;
   }
