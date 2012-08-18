@@ -26,6 +26,7 @@ package org.projectforge.ldap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.projectforge.user.PFUserDO;
 
@@ -63,5 +64,43 @@ public class PFUserDOConverterTest
     assertNull(person.getId());
     assertNull(person.getUid());
     assertNull(person.getEmployeeNumber());
+  }
+
+  @Test
+  public void copy()
+  {
+    final PFUserDO src = createUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    PFUserDO dest = createUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    Assert.assertFalse(PFUserDOConverter.copyUserFields(src, dest));
+    assertUser(src, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    assertUser(dest, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    dest = new PFUserDO();
+    Assert.assertTrue(PFUserDOConverter.copyUserFields(src, dest));
+    assertUser(src, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    assertUser(dest, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    Assert.assertTrue(PFUserDOConverter.copyUserFields(src, createUser("", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer")));
+    Assert.assertTrue(PFUserDOConverter.copyUserFields(src, createUser("kai", "", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer")));
+    Assert.assertTrue(PFUserDOConverter.copyUserFields(src, createUser("kai", "Kai", "", "k.reinhard@acme.com", "Micromata", "Developer")));
+    Assert.assertTrue(PFUserDOConverter.copyUserFields(src, createUser("kai", "Kai", "Reinhard", "", "Micromata", "Developer")));
+    Assert.assertTrue(PFUserDOConverter.copyUserFields(src, createUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "", "Developer")));
+    Assert.assertTrue(PFUserDOConverter.copyUserFields(src, createUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "")));
+  }
+
+  private PFUserDO createUser(final String username, final String firstname, final String lastname, final String email,
+      final String organization, final String description)
+  {
+    return new PFUserDO().setUsername(username).setFirstname(firstname).setLastname(lastname).setEmail(email).setOrganization(organization)
+        .setDescription(description);
+  }
+
+  private void assertUser(final PFUserDO user, final String username, final String firstname, final String lastname, final String email,
+      final String organization, final String description)
+  {
+    Assert.assertEquals(username, user.getUsername());
+    Assert.assertEquals(firstname, user.getFirstname());
+    Assert.assertEquals(lastname, user.getLastname());
+    Assert.assertEquals(email, user.getEmail());
+    Assert.assertEquals(organization, user.getOrganization());
+    Assert.assertEquals(description, user.getDescription());
   }
 }

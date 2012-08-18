@@ -34,7 +34,8 @@ public class PFUserDOConverter
 {
   public static final String ID_PREFIX = "pf-id-";
 
-  public static PFUserDO convert(final LdapPerson person) {
+  public static PFUserDO convert(final LdapPerson person)
+  {
     final PFUserDO user = new PFUserDO();
     user.setLastname(person.getSurname());
     user.setFirstname(person.getGivenName());
@@ -71,5 +72,41 @@ public class PFUserDOConverter
     person.setDescription(user.getDescription());
     person.setMail(user.getEmail());
     return person;
+  }
+
+  /**
+   * Copies the fields shared with ldap.
+   * @param src
+   * @param dest
+   * @return true if any modification is detected, otherwise false.
+   */
+  public static boolean copyUserFields(final PFUserDO src, final PFUserDO dest)
+  {
+    boolean modified = false;
+    if (StringUtils.equals(src.getUsername(), dest.getUsername()) == false) {
+      modified = true;
+    }
+    dest.setUsername(src.getUsername());
+    if (modified == false && StringUtils.equals(src.getFirstname(), dest.getFirstname()) == false) {
+      modified = true;
+    }
+    dest.setFirstname(src.getFirstname());
+    if (modified == false && StringUtils.equals(src.getLastname(), dest.getLastname()) == false) {
+      modified = true;
+    }
+    dest.setLastname(src.getLastname());
+    if (modified == false && StringUtils.equals(src.getEmail(), dest.getEmail()) == false) {
+      modified = true;
+    }
+    dest.setEmail(src.getEmail());
+    if (modified == false && StringUtils.equals(src.getDescription(), dest.getDescription()) == false) {
+      modified = true;
+    }
+    dest.setDescription(src.getDescription());
+    if (modified == false && StringUtils.equals(src.getOrganization(), dest.getOrganization()) == false) {
+      modified = true;
+    }
+    dest.setOrganization(src.getOrganization());
+    return modified;
   }
 }
