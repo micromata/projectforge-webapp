@@ -36,6 +36,7 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.fibu.KontoCache;
 import org.projectforge.task.TaskTree;
 import org.projectforge.user.UserGroupCache;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
  * Registry for dao's. Here you can register additional daos and plugins (extensions of ProjectForge).
@@ -63,6 +64,8 @@ public class Registry
   private KontoCache kontoCache;
 
   private DataSource dataSource;
+
+  private HibernateTemplate hibernateTemplate;
 
   public static Registry instance()
   {
@@ -183,6 +186,19 @@ public class Registry
   void setDataSource(final DataSource dataSource)
   {
     this.dataSource = dataSource;
+  }
+
+  /**
+   * @return the hibernateTemplate
+   */
+  public HibernateTemplate getHibernateTemplate()
+  {
+    return hibernateTemplate;
+  }
+
+  void setHibernateTemplate(final HibernateTemplate hibernateTemplate)
+  {
+    this.hibernateTemplate = hibernateTemplate;
   }
 
   private Registry()

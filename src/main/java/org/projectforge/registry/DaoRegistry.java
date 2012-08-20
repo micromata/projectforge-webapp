@@ -63,6 +63,7 @@ import org.projectforge.user.GroupDao;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserPrefDao;
 import org.projectforge.user.UserRightDao;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 
 /**
  * Helper object which stores all dao objects and put them into the registry. <br/>
@@ -171,6 +172,8 @@ public class DaoRegistry
 
   private GroupDao groupDao;
 
+  private HibernateTemplate hibernateTemplate;
+
   private HRPlanningDao hrPlanningDao;
 
   private KontoDao kontoDao;
@@ -265,6 +268,7 @@ public class DaoRegistry
     register(USER_PREF, UserPrefDao.class, userPrefDao).setSearchable(false);
     register(USER_RIGHT, UserRightDao.class, userRightDao).setSearchable(false);
     Registry.instance().setDataSource(dataSource);
+    Registry.instance().setHibernateTemplate(hibernateTemplate);
     instance = this;
   }
 
@@ -362,6 +366,11 @@ public class DaoRegistry
   public void setGroupDao(final GroupDao groupDao)
   {
     this.groupDao = groupDao;
+  }
+
+  public void setHibernateTemplate(final HibernateTemplate hibernateTemplate)
+  {
+    this.hibernateTemplate = hibernateTemplate;
   }
 
   public void setHRPlanningDao(final HRPlanningDao hrPlanningDao)
