@@ -54,17 +54,16 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
       log.info("User login failed: " + username);
       return loginResult.setLoginResultStatus(LoginResultStatus.FAILED);
     }
+    final LdapPerson ldapUser = ldapUserDao.findByUsername(username, organizationalUnits);
     PFUserDO user = userDao.getInternalByName(username);
     if (user == null) {
       log.info("LDAP user '" + username + "' doesn't yet exist in ProjectForge's data base. Creating new user...");
-      final LdapPerson ldapUser = ldapUserDao.findByUsername(username, organizationalUnits);
       user = PFUserDOConverter.convert(ldapUser);
       user.setId(null); // Force new id.
       user.setPassword(userDao.encryptPassword(password));
       userDao.internalSave(user);
     } else {
-      final PFUserDO ldapUser = loginResult.getUser();
-      PFUserDOConverter.copyUserFields(ldapUser, user);
+      PFUserDOConverter.copyUserFields(PFUserDOConverter.convert(ldapUser), user);
       userDao.internalUpdate(user);
       if (user.isDeleted() == true) {
         log.info("User has no system access (is deleted): " + user.getDisplayUsername());
