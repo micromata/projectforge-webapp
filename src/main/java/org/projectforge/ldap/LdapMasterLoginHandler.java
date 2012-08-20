@@ -23,6 +23,10 @@
 
 package org.projectforge.ldap;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.projectforge.user.GroupDO;
 import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
@@ -70,4 +74,38 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
     }
   }
 
+  /**
+   * Updates also any modified group of ProjectForge's data-base in LDAP.
+   * @see org.projectforge.user.LoginHandler#getAllGroups()
+   */
+  @Override
+  public List<GroupDO> getAllGroups()
+  {
+    final String organizationalUnits = ldapConfig.getGroupBase();
+    final List<LdapGroup> ldapGroups = ldapGroupDao.findAll(organizationalUnits);
+    final List<GroupDO> groups = new ArrayList<GroupDO>(ldapGroups.size());
+    for (final LdapGroup ldapGroup : ldapGroups) {
+      groups.add(GroupDOConverter.convert(ldapGroup));
+    }
+    return groups;
+  }
+
+  /**
+   * Updates also any modified user of ProjectForge's data-base in LDAP. New users will be created and ProjectForge users which are not
+   * available in LDAP will be created.
+   * @see org.projectforge.user.LoginHandler#getAllUsers()
+   */
+  @Override
+  public List<PFUserDO> getAllUsers()
+  {
+    final String organizationalUnits = ldapConfig.getUserBase();
+    final List<LdapPerson> ldapUsers = ldapUserDao.findAll(organizationalUnits);
+    final List<PFUserDO> users = new ArrayList<PFUserDO>(ldapUsers.size());
+    for (final LdapPerson ldapUser : ldapUsers) {
+      users.add(PFUserDOConverter.convert(ldapUser));
+    }
+    final List<PFUserDO> dbUsers = userDao.internalLoadAll();
+    // TODO: synchronize
+    return users;
+  }
 }
