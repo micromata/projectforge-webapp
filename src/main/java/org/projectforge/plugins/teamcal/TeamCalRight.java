@@ -24,7 +24,6 @@
 package org.projectforge.plugins.teamcal;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.projectforge.plugins.todo.ToDoDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
@@ -43,7 +42,7 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
 
   public TeamCalRight()
   {
-    super(ToDoDao.USER_RIGHT_ID, UserRightCategory.PLUGINS, UserRightValue.TRUE);
+    super(TeamCalDao.USER_RIGHT_ID, UserRightCategory.PLUGINS, UserRightValue.TRUE);
   }
 
   /**

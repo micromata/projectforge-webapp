@@ -24,6 +24,10 @@
 package org.projectforge.plugins.teamcal;
 
 import org.projectforge.core.BaseDao;
+import org.projectforge.user.GroupDO;
+import org.projectforge.user.GroupDao;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
 
 /**
@@ -34,64 +38,64 @@ import org.projectforge.user.UserRightId;
 public class TeamEventDao extends BaseDao<TeamEventDO>
 {
   public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_CALENDAR", "plugin16", "plugins.teamcalendar.event");;
-  //
-  //  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "owner.username", "owner.firstname", "owner.lastname",
-  //    "fullAccessGroup.name", "readOnlyAccessGroup.name", "minimalAccessGroup.name"};
-  //
-  //  private GroupDao groupDao;
-  //
-  //  private UserDao userDao;
-  //
+
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "owner.username", "owner.firstname", "owner.lastname",
+    "fullAccessGroup.name", "readOnlyAccessGroup.name", "minimalAccessGroup.name"};
+
+  private GroupDao groupDao;
+
+  private UserDao userDao;
+
   public TeamEventDao()
   {
     super(TeamEventDO.class);
     userRightId = USER_RIGHT_ID;
   }
 
-  //
-  //  @Override
-  //  protected String[] getAdditionalSearchFields()
-  //  {
-  //    return ADDITIONAL_SEARCH_FIELDS;
-  //  }
-  //
-  //  public void setOwner(final CalendarDO calendar, final Integer userId)
-  //  {
-  //    final PFUserDO user = userDao.getOrLoad(userId);
-  //    calendar.setOwner(user);
-  //  }
-  //
-  //  public void setFullAccessGroup(final CalendarDO calendar, final Integer groupId)
-  //  {
-  //    final GroupDO group = groupDao.getOrLoad(groupId);
-  //    calendar.setFullAccessGroup(group);
-  //  }
-  //
-  //  public void setReadOnlyAccessGroup(final CalendarDO calendar, final Integer groupId)
-  //  {
-  //    final GroupDO group = groupDao.getOrLoad(groupId);
-  //    calendar.setReadOnlyAccessGroup(group);
-  //  }
-  //
-  //  public void setMinimalAccessGroup(final CalendarDO calendar, final Integer groupId)
-  //  {
-  //    final GroupDO group = groupDao.getOrLoad(groupId);
-  //    calendar.setMinimalAccessGroup(group);
-  //  }
-  //
+
+  @Override
+  protected String[] getAdditionalSearchFields()
+  {
+    return ADDITIONAL_SEARCH_FIELDS;
+  }
+
+  public void setOwner(final TeamCalDO calendar, final Integer userId)
+  {
+    final PFUserDO user = userDao.getOrLoad(userId);
+    calendar.setOwner(user);
+  }
+
+  public void setFullAccessGroup(final TeamCalDO calendar, final Integer groupId)
+  {
+    final GroupDO group = groupDao.getOrLoad(groupId);
+    calendar.setFullAccessGroup(group);
+  }
+
+  public void setReadOnlyAccessGroup(final TeamCalDO calendar, final Integer groupId)
+  {
+    final GroupDO group = groupDao.getOrLoad(groupId);
+    calendar.setReadOnlyAccessGroup(group);
+  }
+
+  public void setMinimalAccessGroup(final TeamCalDO calendar, final Integer groupId)
+  {
+    final GroupDO group = groupDao.getOrLoad(groupId);
+    calendar.setMinimalAccessGroup(group);
+  }
+
   @Override
   public TeamEventDO newInstance()
   {
     return new TeamEventDO();
   }
-  //
-  //  public void setGroupDao(final GroupDao groupDao)
-  //  {
-  //    this.groupDao = groupDao;
-  //  }
-  //
-  //  public void setUserDao(final UserDao userDao)
-  //  {
-  //    this.userDao = userDao;
-  //  }
+
+  public void setGroupDao(final GroupDao groupDao)
+  {
+    this.groupDao = groupDao;
+  }
+
+  public void setUserDao(final UserDao userDao)
+  {
+    this.userDao = userDao;
+  }
 }

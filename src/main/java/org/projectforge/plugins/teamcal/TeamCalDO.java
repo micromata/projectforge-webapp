@@ -52,7 +52,7 @@ public class TeamCalDO extends DefaultBaseDO
 {
   private static final long serialVersionUID = 2869432134443084605L;
 
-  // @UserPrefParameter(i18nKey = "plugins.todo.subject")
+  //  @UserPrefParameter(i18nKey = "plugins.teamcal.subject")
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String title;
 

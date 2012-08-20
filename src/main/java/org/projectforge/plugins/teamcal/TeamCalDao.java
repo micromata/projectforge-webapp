@@ -37,10 +37,10 @@ import org.projectforge.user.UserRightId;
  */
 public class TeamCalDao extends BaseDao<TeamCalDO>
 {
-  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_CALENDAR", "plugin15", "plugins.teamcalendar.calendar");;
+  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_CALENDAR", "plugin15", "plugins.teamcal.calendar");;
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "owner.username", "owner.firstname", "owner.lastname",
-    "fullAccessGroup.name", "readOnlyAccessGroup.name", "minimalAccessGroup.name"};
+      "fullAccessGroup.name", "readOnlyAccessGroup.name", "minimalAccessGroup.name"};
 
   private GroupDao groupDao;
 

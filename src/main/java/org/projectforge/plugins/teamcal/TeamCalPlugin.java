@@ -32,21 +32,22 @@ import org.projectforge.web.MenuItemDefId;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
  */
 public class TeamCalPlugin extends AbstractPlugin
 {
-  public static final String ID = "teamCalendars";
+  public static final String ID = "teamCal";
 
   public static final String RESOURCE_BUNDLE_NAME = TeamCalPlugin.class.getPackage().getName() + ".TeamCalI18nResources";
 
   static UserPrefArea USER_PREF_AREA;
 
-  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { TeamCalDO.class, TeamEventDO.class};
+  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { TeamCalDO.class};
 
   /**
    * This dao should be defined in pluginContext.xml (as resources) for proper initialization.
    */
-  private TeamCalDao calendarDao;
+  private TeamCalDao teamCalDao;
 
   @Override
   public Class< ? >[] getPersistentEntities()
@@ -62,16 +63,16 @@ public class TeamCalPlugin extends AbstractPlugin
   {
     // DatabaseUpdateDao is needed by the updater:
     TeamCalPluginUpdates.dao = databaseUpdateDao;
-    final RegistryEntry entry = new RegistryEntry(ID, TeamCalDao.class, calendarDao, "plugins.teamcal");
+    final RegistryEntry entry = new RegistryEntry(ID, TeamCalDao.class, teamCalDao, "plugins.teamcal");
     // The CalendarDao is automatically available by the scripting engine!
     register(entry);
 
     // Register the web part:
-    //registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
+    registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
 
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-    //registerMenuItem(new MenuItemDef(parentMenu, ID, 10, "plugins.teamcal.menu", TeamCalListPage.class));
+    //    registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.teamcal.menu", TeamCalListPage.class));
     // .setMobileMenu(ToDoMobileListPage.class, 10));
 
     // Define the access management:
@@ -79,15 +80,18 @@ public class TeamCalPlugin extends AbstractPlugin
 
     // All the i18n stuff:
     addResourceBundle(RESOURCE_BUNDLE_NAME);
+
+    // Register favorite entries (the user can modify these templates/favorites via 'own settings'):
+    USER_PREF_AREA = registerUserPrefArea("TEAMCAL_FAVORITE", TeamCalDO.class, "teamcal.favorite");
   }
 
   /**
-   * @param calendarDao the calendarDao to set
+   * @param teamCalDao the calendarDao to set
    * @return this for chaining.
    */
-  public void setCalendarDao(final TeamCalDao calendarDao)
+  public void setTeamCalDao(final TeamCalDao teamCalDao)
   {
-    this.calendarDao = calendarDao;
+    this.teamCalDao = teamCalDao;
   }
 
   /**
