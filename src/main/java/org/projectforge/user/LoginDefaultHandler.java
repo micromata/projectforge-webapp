@@ -161,7 +161,7 @@ public class LoginDefaultHandler implements LoginHandler
     try {
       return hibernateTemplate.find("from GroupDO t left outer join fetch t.assignedUsers");
     } catch (final Exception ex) {
-      log.fatal("******* Exception while getting groups from data-base (only OK for migration from older versions): " + ex.getMessage());
+      log.fatal("******* Exception while getting groups from data-base (OK only in case of migration from older versions): " + ex.getMessage());
       return new ArrayList<GroupDO>();
     }
   }
@@ -176,7 +176,7 @@ public class LoginDefaultHandler implements LoginHandler
     try {
       return hibernateTemplate.find("from PFUserDO t");
     } catch (final Exception ex) {
-      log.fatal("******* Exception while getting users from data-base (only OK for migration from older versions): " + ex.getMessage());
+      log.fatal("******* Exception while getting users from data-base (OK only in case of migration from older versions): " + ex.getMessage());
       return new ArrayList<PFUserDO>();
     }
   }
