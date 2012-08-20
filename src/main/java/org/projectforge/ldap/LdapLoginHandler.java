@@ -26,6 +26,7 @@ package org.projectforge.ldap;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.registry.Registry;
+import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.user.LoginHandler;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
@@ -47,6 +48,8 @@ public abstract class LdapLoginHandler implements LoginHandler
 
   LdapConfig ldapConfig;
 
+  protected LoginDefaultHandler loginDefaultHandler;
+
   /**
    * @see org.projectforge.user.LoginHandler#initialize()
    */
@@ -65,20 +68,18 @@ public abstract class LdapLoginHandler implements LoginHandler
     final Registry registry = Registry.instance();
     userDao = (UserDao) registry.getDao(UserDao.class);
     accessChecker = UserRights.getAccessChecker();
+    loginDefaultHandler = new LoginDefaultHandler();
+    loginDefaultHandler.initialize();
   }
 
   /**
+   * Calls {@link LoginDefaultHandler#checkStayLogin(PFUserDO)}.
    * @see org.projectforge.user.LoginHandler#checkStayLogin(org.projectforge.user.PFUserDO)
    */
   @Override
   public boolean checkStayLogin(final PFUserDO user)
   {
-    final PFUserDO dbUser = userDao.getUserGroupCache().getUser(user.getId());
-    if (dbUser != null && dbUser.isDeleted() == false) {
-      return true;
-    }
-    log.warn("User is deleted, stay-logged-in denied for the given user: " + user);
-    return false;
+    return loginDefaultHandler.checkStayLogin(user);
   }
 
   public boolean isAdminUser(final PFUserDO user)

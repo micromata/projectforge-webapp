@@ -28,12 +28,11 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.projectforge.test.TestBase;
 import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
 
-public class LdapSlaveLoginHandlerTest extends TestBase
+public class LdapSlaveLoginHandlerTest extends LdapLoginHandlerTestBase
 {
   @Test
   public void loginInSlaveMode()
@@ -66,14 +65,5 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     userDao.internalMarkAsDeleted(user);
     Assert.assertEquals("User is deleted in data-base. Login not possible.", LoginResultStatus.LOGIN_EXPIRED,
         loginHandler.checkLogin("kai", "successful").getLoginResultStatus());
-  }
-
-  private void assertUser(final PFUserDO user, final String username, final String firstname, final String lastname, final String email, final String organization, final String description) {
-    Assert.assertEquals(username, user.getUsername());
-    Assert.assertEquals(firstname, user.getFirstname());
-    Assert.assertEquals(lastname, user.getLastname());
-    Assert.assertEquals(organization, user.getOrganization());
-    Assert.assertEquals(email, user.getEmail());
-    Assert.assertEquals(description, user.getDescription());
   }
 }
