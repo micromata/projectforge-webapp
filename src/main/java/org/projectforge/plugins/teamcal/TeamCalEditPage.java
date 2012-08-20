@@ -11,17 +11,14 @@ package org.projectforge.plugins.teamcal;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
-import org.projectforge.core.AbstractBaseDO;
-import org.projectforge.core.BaseDao;
 import org.projectforge.web.fibu.ISelectCallerPage;
-import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.AbstractEditPage;
 
 /**
  * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
  *
  */
-public class TeamCalEditPage extends AbstractEditPage implements ISelectCallerPage
+public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm, TeamCalDao> implements ISelectCallerPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalEditPage.class);
 
@@ -39,16 +36,6 @@ public class TeamCalEditPage extends AbstractEditPage implements ISelectCallerPa
    * 
    */
   private static final long serialVersionUID = -3352981782657771662L;
-
-  /**
-   * @see org.projectforge.web.wicket.AbstractEditPage#newEditForm(org.projectforge.web.wicket.AbstractEditPage, org.projectforge.core.AbstractBaseDO)
-   */
-  @Override
-  protected AbstractEditForm newEditForm(final AbstractEditPage parentPage, final AbstractBaseDO data)
-  {
-    // TODO Auto-generated method stub
-    return null;
-  }
 
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Object)
@@ -81,7 +68,7 @@ public class TeamCalEditPage extends AbstractEditPage implements ISelectCallerPa
    * @see org.projectforge.web.wicket.AbstractEditPage#getBaseDao()
    */
   @Override
-  protected BaseDao getBaseDao()
+  protected TeamCalDao getBaseDao()
   {
     // TODO Auto-generated method stub
     return null;
@@ -95,5 +82,15 @@ public class TeamCalEditPage extends AbstractEditPage implements ISelectCallerPa
   {
     // TODO Auto-generated method stub
     return log;
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#newEditForm(org.projectforge.web.wicket.AbstractEditPage, org.projectforge.core.AbstractBaseDO)
+   */
+  @Override
+  protected TeamCalEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final TeamCalDO data)
+  {
+    // TODO Auto-generated method stub
+    return new TeamCalEditForm(this, data);
   }
 }
