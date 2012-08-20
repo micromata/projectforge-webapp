@@ -23,6 +23,8 @@
 
 package org.projectforge.user;
 
+import java.util.List;
+
 
 /**
  * Different implementations of login handling are supported.
@@ -57,4 +59,14 @@ public interface LoginHandler
    * @return true if the stay logged in process should be accepted, otherwise false (the user has to be redirected to the login page).
    */
   public boolean checkStayLogin(PFUserDO user);
+
+  /**
+   * @return All defined groups (also deleted groups).
+   */
+  public List<GroupDO> getAllGroups();
+
+  /**
+   * @return All defined users (also deleted users).
+   */
+  public List<PFUserDO> getAllUsers();
 }

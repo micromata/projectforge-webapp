@@ -23,6 +23,10 @@
 
 package org.projectforge.ldap;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.projectforge.user.GroupDO;
 import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
@@ -58,12 +62,51 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
       user.setId(null); // Force new id.
       user.setPassword(userDao.encryptPassword(password));
       userDao.internalSave(user);
-    }
-    if (user.isDeleted() == true) {
-      log.info("User has no system access (is deleted): " + user.getDisplayUsername());
-      return loginResult.setLoginResultStatus(LoginResultStatus.LOGIN_EXPIRED);
     } else {
-      return loginResult.setLoginResultStatus(LoginResultStatus.SUCCESS).setUser(user);
+      final PFUserDO ldapUser = loginResult.getUser();
+      PFUserDOConverter.copyUserFields(ldapUser, user);
+      userDao.internalUpdate(user);
+      if (user.isDeleted() == true) {
+        log.info("User has no system access (is deleted): " + user.getDisplayUsername());
+        return loginResult.setLoginResultStatus(LoginResultStatus.LOGIN_EXPIRED);
+      }
     }
+    loginResult.setUser(user);
+    return loginResult.setLoginResultStatus(LoginResultStatus.SUCCESS).setUser(user);
+  }
+
+  /**
+   * Updates also any (in LDAP) modified group in ProjectForge's data-base.
+   * @see org.projectforge.user.LoginHandler#getAllGroups()
+   */
+  @Override
+  public List<GroupDO> getAllGroups()
+  {
+    final String organizationalUnits = ldapConfig.getGroupBase();
+    final List<LdapGroup> ldapGroups = ldapGroupDao.findAll(organizationalUnits);
+    final List<GroupDO> groups = new ArrayList<GroupDO>(ldapGroups.size());
+    for (final LdapGroup ldapGroup : ldapGroups) {
+      groups.add(GroupDOConverter.convert(ldapGroup));
+    }
+    return groups;
+  }
+
+  /**
+   * Updates also any (in LDAP) modified user in ProjectForge's data-base. New users will be created and ProjectForge users which are not
+   * available in ProjectForge's data-base will be created.
+   * @see org.projectforge.user.LoginHandler#getAllUsers()
+   */
+  @Override
+  public List<PFUserDO> getAllUsers()
+  {
+    final String organizationalUnits = ldapConfig.getUserBase();
+    final List<LdapPerson> ldapUsers = ldapUserDao.findAll(organizationalUnits);
+    final List<PFUserDO> users = new ArrayList<PFUserDO>(ldapUsers.size());
+    for (final LdapPerson ldapUser : ldapUsers) {
+      users.add(PFUserDOConverter.convert(ldapUser));
+    }
+    final List<PFUserDO> dbUsers = userDao.internalLoadAll();
+    // TODO: synchronize
+    return users;
   }
 }

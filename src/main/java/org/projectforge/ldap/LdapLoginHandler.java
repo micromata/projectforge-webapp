@@ -41,6 +41,8 @@ public abstract class LdapLoginHandler implements LoginHandler
 
   LdapConnector ldapConnector;
 
+  LdapGroupDao ldapGroupDao;
+
   LdapUserDao ldapUserDao;
 
   LdapConfig ldapConfig;
@@ -56,6 +58,8 @@ public abstract class LdapLoginHandler implements LoginHandler
       log.warn("No LDAP configured in config.xml, so any login won't be possible!");
     }
     ldapConnector = new LdapConnector(ldapConfig);
+    ldapGroupDao = new LdapGroupDao();
+    ldapGroupDao.ldapConnector = ldapConnector;
     ldapUserDao = new LdapUserDao();
     ldapUserDao.ldapConnector = ldapConnector;
     final Registry registry = Registry.instance();

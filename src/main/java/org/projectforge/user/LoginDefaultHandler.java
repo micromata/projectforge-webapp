@@ -25,6 +25,8 @@ package org.projectforge.user;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -33,6 +35,7 @@ import org.projectforge.web.UserFilter;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 
 public class LoginDefaultHandler implements LoginHandler
 {
@@ -45,6 +48,8 @@ public class LoginDefaultHandler implements LoginHandler
    */
   private DataSource dataSource;
 
+  private HibernateTemplate hibernateTemplate;
+
   /**
    * @see org.projectforge.user.LoginHandler#initialize(org.projectforge.registry.Registry)
    */
@@ -54,6 +59,7 @@ public class LoginDefaultHandler implements LoginHandler
     final Registry registry = Registry.instance();
     userDao = (UserDao) registry.getDao(UserDao.class);
     dataSource = registry.getDataSource();
+    hibernateTemplate = registry.getHibernateTemplate();
   }
 
   /**
@@ -143,5 +149,35 @@ public class LoginDefaultHandler implements LoginHandler
     }
     log.warn("User is deleted, stay-logged-in denied for the given user: " + user);
     return false;
+  }
+
+  /**
+   * @see org.projectforge.user.LoginHandler#getAllGroups()
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<GroupDO> getAllGroups()
+  {
+    try {
+      return hibernateTemplate.find("from GroupDO t left outer join fetch t.assignedUsers");
+    } catch (final Exception ex) {
+      log.fatal("******* Exception while getting groups from data-base (only OK for migration from older versions): " + ex.getMessage());
+      return new ArrayList<GroupDO>();
+    }
+  }
+
+  /**
+   * @see org.projectforge.user.LoginHandler#getAllUsers()
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  public List<PFUserDO> getAllUsers()
+  {
+    try {
+      return hibernateTemplate.find("from PFUserDO t");
+    } catch (final Exception ex) {
+      log.fatal("******* Exception while getting users from data-base (only OK for migration from older versions): " + ex.getMessage());
+      return new ArrayList<PFUserDO>();
+    }
   }
 }

@@ -23,6 +23,9 @@
 
 package org.projectforge.user;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -84,6 +87,30 @@ public class Login
       return false;
     }
     return loginHandler.checkStayLogin(user);
+  }
+
+  /**
+   * @see LoginHandler#getAllUsers()
+   */
+  public List<PFUserDO> getAllUsers()
+  {
+    if (loginHandler == null) {
+      log.warn("No login handler is defined yet, so can't get all users.");
+      return new ArrayList<PFUserDO>();
+    }
+    return loginHandler.getAllUsers();
+  }
+
+  /**
+   * @see LoginHandler#getAllGroups()
+   */
+  public List<GroupDO> getAllGroups()
+  {
+    if (loginHandler == null) {
+      log.warn("No login handler is defined yet, so can't get all groups.");
+      return new ArrayList<GroupDO>();
+    }
+    return loginHandler.getAllGroups();
   }
 
   /**
