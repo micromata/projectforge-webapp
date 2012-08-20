@@ -55,24 +55,30 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   /**
    * @see org.projectforge.web.wicket.IListPageColumnsCreator#createColumns(org.apache.wicket.markup.html.WebPage, boolean)
    */
+  // TODO replace names with i18n
   @Override
   public List<IColumn<TeamCalDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<TeamCalDO>> columns = new ArrayList<IColumn<TeamCalDO>>();
-    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(new Model<String>(getString("created")), getSortable("created", sortable),
-        "created") {
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>("Titel", getSortable("title", sortable), "title",
+        null));
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>("Beschreibung", getSortable("description", sortable), "description",
+        null));
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(new Model<String>("Ersteller"), getSortable("owner", sortable),
+        "owner") {
       private static final long serialVersionUID = 6752182079455440972L;
 
-      @SuppressWarnings({ "unchecked", "rawtypes"})
+      @SuppressWarnings({"rawtypes"})
       @Override
       public void populateItem(final Item item, final String componentId, final IModel rowModel)
       {
         final TeamCalDO calendar = (TeamCalDO) rowModel.getObject();
-        item.add(new Label(componentId, calendar.getOwner().getFirstname()));
+        item.add(new Label(componentId, calendar.getOwner().getUsername()));
         addRowClick(item);
-        cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>("GEÄNDERT", getSortable("lastUpdate", sortable), "lastUpdate",
+        null));
     return columns;
   }
 
