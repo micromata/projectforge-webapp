@@ -438,7 +438,7 @@ public class UserGroupCache extends AbstractCache
   }
 
   /**
-   * This method will be called by CacheHelper and is synchronized via getData();
+   * This method will be called by CacheHelper and is synchronized.
    */
   @SuppressWarnings("unchecked")
   @Override
@@ -448,23 +448,11 @@ public class UserGroupCache extends AbstractCache
     // This method must not be synchronized because it works with a new copy of maps.
     final Map<Integer, PFUserDO> uMap = new HashMap<Integer, PFUserDO>();
     // Could not autowire UserDao because of cyclic reference with AccessChecker.
-    List<PFUserDO> users;
-    try {
-      users = hibernateTemplate.find("from PFUserDO t");
-    } catch (final Exception ex) {
-      log.fatal("******* Exception while getting users from data-base (only OK for migration from older versions): " + ex.getMessage());
-      users = new ArrayList<PFUserDO>();
-    }
+    final List<PFUserDO> users = Login.getInstance().getAllUsers();
     for (final PFUserDO user : users) {
       uMap.put(user.getId(), user);
     }
-    List<GroupDO> groups;
-    try {
-      groups = hibernateTemplate.find("from GroupDO t left outer join fetch t.assignedUsers");
-    } catch (final Exception ex) {
-      log.fatal("******* Exception while getting groups from data-base (only OK for migration from older versions): " + ex.getMessage());
-      groups = new ArrayList<GroupDO>();
-    }
+    final List<GroupDO> groups = Login.getInstance().getAllGroups();
     final Map<Integer, GroupDO> gMap = new HashMap<Integer, GroupDO>();
     final Map<Integer, Set<Integer>> ugIdMap = new HashMap<Integer, Set<Integer>>();
     final Set<Integer> nAdminUsers = new HashSet<Integer>();
