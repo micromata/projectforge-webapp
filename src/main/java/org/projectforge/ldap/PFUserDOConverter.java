@@ -24,6 +24,7 @@
 package org.projectforge.ldap;
 
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.common.BeanHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.user.PFUserDO;
 
@@ -66,12 +67,17 @@ public class PFUserDOConverter
     person.setGivenName(user.getFirstname());
     person.setUid(user.getUsername());
     if (user.getId() != null) {
-      person.setEmployeeNumber(ID_PREFIX + user.getId());
+      person.setEmployeeNumber(buildEmployeeNumber(user));
     }
     person.setOrganization(user.getOrganization());
     person.setDescription(user.getDescription());
     person.setMail(user.getEmail());
     return person;
+  }
+
+  public static String buildEmployeeNumber(final PFUserDO user)
+  {
+    return ID_PREFIX + user.getId();
   }
 
   /**
@@ -82,31 +88,19 @@ public class PFUserDOConverter
    */
   public static boolean copyUserFields(final PFUserDO src, final PFUserDO dest)
   {
-    boolean modified = false;
-    if (StringUtils.equals(src.getUsername(), dest.getUsername()) == false) {
-      modified = true;
-    }
-    dest.setUsername(src.getUsername());
-    if (modified == false && StringUtils.equals(src.getFirstname(), dest.getFirstname()) == false) {
-      modified = true;
-    }
-    dest.setFirstname(src.getFirstname());
-    if (modified == false && StringUtils.equals(src.getLastname(), dest.getLastname()) == false) {
-      modified = true;
-    }
-    dest.setLastname(src.getLastname());
-    if (modified == false && StringUtils.equals(src.getEmail(), dest.getEmail()) == false) {
-      modified = true;
-    }
-    dest.setEmail(src.getEmail());
-    if (modified == false && StringUtils.equals(src.getDescription(), dest.getDescription()) == false) {
-      modified = true;
-    }
-    dest.setDescription(src.getDescription());
-    if (modified == false && StringUtils.equals(src.getOrganization(), dest.getOrganization()) == false) {
-      modified = true;
-    }
-    dest.setOrganization(src.getOrganization());
+    final boolean modified = BeanHelper.copyProperties(src, dest, "username", "firstname", "lastname", "email", "description", "organization");
+    return modified;
+  }
+
+  /**
+   * Copies the fields.
+   * @param src
+   * @param dest
+   * @return true if any modification is detected, otherwise false.
+   */
+  public static boolean copyUserFields(final LdapPerson src, final LdapPerson dest)
+  {
+    final boolean modified = BeanHelper.copyProperties(src, dest, "uid", "givenName", "surname", "mail", "description", "organization");
     return modified;
   }
 }
