@@ -24,6 +24,7 @@
 package org.projectforge.ldap;
 
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.common.ReflectionToString;
 
 /**
  * Bean used by ConfigXML (config.xml).
@@ -202,5 +203,14 @@ public class LdapConfig
   {
     this.authentication = authentication;
     return this;
+  }
+
+  /**
+   * @see ReflectionToString#asString(Object)
+   */
+  @Override
+  public String toString()
+  {
+    return ReflectionToString.asString(this);
   }
 }

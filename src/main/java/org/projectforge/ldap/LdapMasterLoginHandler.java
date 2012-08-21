@@ -23,9 +23,9 @@
 
 package org.projectforge.ldap;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
@@ -33,7 +33,7 @@ import org.projectforge.user.PFUserDO;
 
 /**
  * This LDAP login handler has read-write access to the LDAP server and acts as master of the user and group data. All changes of
- * ProjectForge's users and groups will be written through. Any change of the LDAP server will be ignored and my be overwritten by
+ * ProjectForge's users and groups will be written through. Any change of the LDAP server will be ignored and may be overwritten by
  * ProjectForge. <br/>
  * Use this login handler if you want to configure your LDAP users and LDAP groups via ProjectForge.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -49,63 +49,64 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
   @Override
   public LoginResult checkLogin(final String username, final String password)
   {
-    // TODO: tbd.
-    final LoginResult loginResult = new LoginResult();
+    final LoginResult loginResult = loginDefaultHandler.checkLogin(username, password);
+    if (loginResult.getLoginResultStatus() != LoginResultStatus.SUCCESS) {
+      return loginResult;
+    }
+    // User is now logged-in successfully.
     final String organizationalUnits = ldapConfig.getUserBase();
     final boolean authenticated = ldapUserDao.authenticate(username, password, organizationalUnits);
     if (authenticated == false) {
-      log.info("User login failed: " + username);
-      return loginResult.setLoginResultStatus(LoginResultStatus.FAILED);
+      log.info("User's credentials in LDAP not up-to-date: " + username + ". Updating LDAP entry...");
+      final PFUserDO user = loginResult.getUser();
+      final LdapPerson ldapUser = PFUserDOConverter.convert(user);
+      ldapUserDao.createOrUpdate(ldapUser);
+      ldapUserDao.changePassword(ldapUser, null, user.getPassword());
     }
-    PFUserDO user = userDao.getInternalByName(username);
-    if (user == null) {
-      log.info("LDAP user '" + username + "' doesn't yet exist in ProjectForge's data base. Creating new user...");
-      final LdapPerson ldapUser = ldapUserDao.findByUsername(username, organizationalUnits);
-      user = PFUserDOConverter.convert(ldapUser);
-      user.setId(null); // Force new id.
-      user.setPassword(userDao.encryptPassword(password));
-      userDao.internalSave(user);
-    }
-    if (user.isDeleted() == true) {
-      log.info("User has no system access (is deleted): " + user.getDisplayUsername());
-      return loginResult.setLoginResultStatus(LoginResultStatus.LOGIN_EXPIRED);
-    } else {
-      return loginResult.setLoginResultStatus(LoginResultStatus.SUCCESS).setUser(user);
-    }
+    return loginResult;
   }
 
   /**
-   * Updates also any modified group of ProjectForge's data-base in LDAP.
    * @see org.projectforge.user.LoginHandler#getAllGroups()
    */
   @Override
   public List<GroupDO> getAllGroups()
   {
-    final String organizationalUnits = ldapConfig.getGroupBase();
-    final List<LdapGroup> ldapGroups = ldapGroupDao.findAll(organizationalUnits);
-    final List<GroupDO> groups = new ArrayList<GroupDO>(ldapGroups.size());
-    for (final LdapGroup ldapGroup : ldapGroups) {
-      groups.add(GroupDOConverter.convert(ldapGroup));
-    }
+    final List<GroupDO> groups = loginDefaultHandler.getAllGroups();
     return groups;
   }
 
   /**
-   * Updates also any modified user of ProjectForge's data-base in LDAP. New users will be created and ProjectForge users which are not
-   * available in LDAP will be created.
    * @see org.projectforge.user.LoginHandler#getAllUsers()
    */
   @Override
   public List<PFUserDO> getAllUsers()
   {
-    final String organizationalUnits = ldapConfig.getUserBase();
-    final List<LdapPerson> ldapUsers = ldapUserDao.findAll(organizationalUnits);
-    final List<PFUserDO> users = new ArrayList<PFUserDO>(ldapUsers.size());
-    for (final LdapPerson ldapUser : ldapUsers) {
-      users.add(PFUserDOConverter.convert(ldapUser));
+    final List<PFUserDO> users = loginDefaultHandler.getAllUsers();
+    final List<LdapPerson> ldapUsers = getAllLdapUsers();
+    for (final PFUserDO user : users) {
+      final LdapPerson updatedLdapUser = PFUserDOConverter.convert(user);
+      final LdapPerson ldapUser = getLdapUser(ldapUsers, user);
+      if (ldapUser == null) {
+        ldapUserDao.create(updatedLdapUser);
+      } else {
+        final boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
+        if (modified == true) {
+          ldapUserDao.createOrUpdate(updatedLdapUser);
+        }
+      }
     }
-    final List<PFUserDO> dbUsers = userDao.internalLoadAll();
-    // TODO: synchronize
     return users;
+  }
+
+  private LdapPerson getLdapUser(final List<LdapPerson> ldapUsers, final PFUserDO user)
+  {
+    for (final LdapPerson ldapUser : ldapUsers) {
+      if (StringUtils.equals(ldapUser.getUid(), user.getUsername()) == true
+          || StringUtils.equals(ldapUser.getEmployeeNumber(), PFUserDOConverter.buildEmployeeNumber(user)) == true) {
+        return ldapUser;
+      }
+    }
+    return null;
   }
 }

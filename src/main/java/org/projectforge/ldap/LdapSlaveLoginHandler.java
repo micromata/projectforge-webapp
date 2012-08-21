@@ -81,8 +81,7 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
   @Override
   public List<GroupDO> getAllGroups()
   {
-    final String organizationalUnits = ldapConfig.getGroupBase();
-    final List<LdapGroup> ldapGroups = ldapGroupDao.findAll(organizationalUnits);
+    final List<LdapGroup> ldapGroups = getAllLdapGroups();
     final List<GroupDO> groups = new ArrayList<GroupDO>(ldapGroups.size());
     for (final LdapGroup ldapGroup : ldapGroups) {
       groups.add(GroupDOConverter.convert(ldapGroup));
@@ -98,8 +97,7 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
   @Override
   public List<PFUserDO> getAllUsers()
   {
-    final String organizationalUnits = ldapConfig.getUserBase();
-    final List<LdapPerson> ldapUsers = ldapUserDao.findAll(organizationalUnits);
+    final List<LdapPerson> ldapUsers = getAllLdapUsers();
     final List<PFUserDO> users = new ArrayList<PFUserDO>(ldapUsers.size());
     for (final LdapPerson ldapUser : ldapUsers) {
       users.add(PFUserDOConverter.convert(ldapUser));

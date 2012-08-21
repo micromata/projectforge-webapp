@@ -23,6 +23,8 @@
 
 package org.projectforge.ldap;
 
+import java.util.List;
+
 import org.projectforge.access.AccessChecker;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.registry.Registry;
@@ -85,5 +87,19 @@ public abstract class LdapLoginHandler implements LoginHandler
   public boolean isAdminUser(final PFUserDO user)
   {
     return accessChecker.isUserMemberOfAdminGroup(user);
+  }
+
+  protected List<LdapPerson> getAllLdapUsers()
+  {
+    final String organizationalUnits = ldapConfig.getUserBase();
+    final List<LdapPerson> ldapUsers = ldapUserDao.findAll(organizationalUnits);
+    return ldapUsers;
+  }
+
+  protected List<LdapGroup> getAllLdapGroups()
+  {
+    final String organizationalUnits = ldapConfig.getGroupBase();
+    final List<LdapGroup> ldapGroups = ldapGroupDao.findAll(organizationalUnits);
+    return ldapGroups;
   }
 }

@@ -46,7 +46,7 @@ public class LdapUtils
     if (organizationalUnit == null) {
       return "";
     }
-    if (organizationalUnit.length == 1 && organizationalUnit[0].startsWith("ou=") == true) {
+    if (organizationalUnit.length == 1 && organizationalUnit[0] != null && organizationalUnit[0].startsWith("ou=") == true) {
       // organizationalUnit is already in the form ou=...,ou=.... Nothing to be done.
       return organizationalUnit[0];
     }
@@ -62,6 +62,9 @@ public class LdapUtils
     }
     boolean first = true;
     for (final String ou : organizationalUnits) {
+      if (ou == null) {
+        continue;
+      }
       if (first == true) {
         first = false;
       } else {
