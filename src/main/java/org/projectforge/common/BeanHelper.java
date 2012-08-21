@@ -35,6 +35,7 @@ import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -464,5 +465,26 @@ public class BeanHelper
           + ex, ex);
     }
     return null;
+  }
+
+  /**
+   * Copies all properties from src object to dest object.
+   * @param src
+   * @param dest
+   * @param properties
+   * @return true if any property is different between src and dest object.
+   */
+  public static boolean copyProperties(final Object src, final Object dest, final String... properties)
+  {
+    boolean modified = false;
+    for (final String property : properties) {
+      final Object srcValue = BeanHelper.getProperty(src, property);
+      final Object destValue = BeanHelper.getProperty(dest, property);
+      if (ObjectUtils.equals(srcValue, destValue) == false) {
+        BeanHelper.setProperty(dest, property, srcValue);
+        modified = true;
+      }
+    }
+    return modified;
   }
 }
