@@ -30,10 +30,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
@@ -201,11 +203,13 @@ public class BeanHelper
     return null;
   }
 
-  private static void logInstantiationException(final Exception ex, final Class<?> clazz) {
+  private static void logInstantiationException(final Exception ex, final Class< ? > clazz)
+  {
     logInstantiationException(ex, clazz.getName());
   }
 
-  private static void logInstantiationException(final Exception ex, final String className) {
+  private static void logInstantiationException(final Exception ex, final String className)
+  {
     if (TEST_MODE == false) {
       log.error("Can't create instance of '" + className + "': " + ex.getMessage(), ex);
     } else {
@@ -474,15 +478,32 @@ public class BeanHelper
    * @param properties
    * @return true if any property is different between src and dest object.
    */
+  @SuppressWarnings("unchecked")
   public static boolean copyProperties(final Object src, final Object dest, final String... properties)
   {
     boolean modified = false;
     for (final String property : properties) {
       final Object srcValue = BeanHelper.getProperty(src, property);
       final Object destValue = BeanHelper.getProperty(dest, property);
-      if (ObjectUtils.equals(srcValue, destValue) == false) {
-        BeanHelper.setProperty(dest, property, srcValue);
-        modified = true;
+      if (srcValue != null && srcValue instanceof Collection) {
+        final Collection<Object> srcColl = (Collection<Object>) srcValue;
+        final Collection<Object> destColl = (Collection<Object>) destValue;
+        if (ListUtils.isEqualList(srcColl, destColl) == false) {
+          modified = true;
+          BeanHelper.setProperty(dest, property, srcValue);
+        }
+      } else if (srcValue != null && srcValue.getClass().isArray() == true) {
+        final Object[] srcArr = (Object[]) srcValue;
+        final Object[] destArr = (Object[]) destValue;
+        if (Arrays.equals(srcArr, destArr) == false) {
+          modified = true;
+          BeanHelper.setProperty(dest, property, srcValue);
+        }
+      } else {
+        if (ObjectUtils.equals(srcValue, destValue) == false) {
+          BeanHelper.setProperty(dest, property, srcValue);
+          modified = true;
+        }
       }
     }
     return modified;
