@@ -42,6 +42,7 @@ import org.apache.wicket.markup.html.IHeaderResponse;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.SubmitLink;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.markup.html.link.Link;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.markup.repeater.RepeatingView;
@@ -256,6 +257,16 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
         };
       }, getString("address.tooltip.writeSMS"));
       addContentMenuEntry(menuEntry);
+    }
+    {
+      // final Import vcards
+      final BookmarkablePageLink<AddressImportPage> importVCardsLink = new BookmarkablePageLink<AddressImportPage>(ContentMenuEntryPanel.LINK_ID,
+          AddressImportPage.class);
+
+      // TODO i18n
+      final ContentMenuEntryPanel importVCardsButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), importVCardsLink,
+          getString("address.book.vCardImport")).setTooltip(getString("address.book.vCardImport.tooltip"));
+      //      addContentMenuEntry(importVCardsButton);
     }
     {
       // Export vcards
