@@ -18,10 +18,10 @@ import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListenerPropertyColumn;
 import org.projectforge.web.wicket.DetachableDOModel;
@@ -60,11 +60,11 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   public List<IColumn<TeamCalDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<TeamCalDO>> columns = new ArrayList<IColumn<TeamCalDO>>();
-    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>("Titel", getSortable("title", sortable), "title",
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("title"), getSortable("title", sortable), "title",
         null));
-    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>("Beschreibung", getSortable("description", sortable), "description",
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("description"), getSortable("description", sortable), "description",
         null));
-    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(new Model<String>("Ersteller"), getSortable("owner", sortable),
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("user"), getSortable("owner", sortable),
         "owner") {
       private static final long serialVersionUID = 6752182079455440972L;
 
@@ -77,7 +77,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
         addRowClick(item);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>("GEÄNDERT", getSortable("lastUpdate", sortable), "lastUpdate",
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("lastUpdate"), getSortable("lastUpdate", sortable), "lastUpdate",
         null));
     return columns;
   }
@@ -117,6 +117,22 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   {
     dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
+
+    // Add additional menu buttons here!
+    //    final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", TeamCalPlugin.USER_PREF_AREA);
+    // TODO add options
+    //    final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, "Abonnement");
+    //    addContentMenuEntry(menuEntry);
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractListPage#redirectToEditPage(org.apache.wicket.request.mapper.parameter.PageParameters)
+   */
+  @Override
+  protected AbstractEditPage< ? , ? , ? > redirectToEditPage(final PageParameters params)
+  {
+    setResponsePage(new TeamCalEditPage(getPageParameters()));
+    return null;
   }
 
 }

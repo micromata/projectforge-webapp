@@ -10,32 +10,36 @@
 package org.projectforge.plugins.teamcal;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.EditPage;
 
 /**
  * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
  *
  */
+@EditPage(defaultReturnPage = TeamCalListPage.class)
 public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm, TeamCalDao> implements ISelectCallerPage
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalEditPage.class);
+
+  private static final long serialVersionUID = -3352981782657771662L;
+
+  @SpringBean(name = "teamCalDao")
+  private TeamCalDao teamCalDao;
 
   /**
    * @param parameters
    * @param i18nPrefix
    */
-  public TeamCalEditPage(final PageParameters parameters, final String i18nPrefix)
+  public TeamCalEditPage(final PageParameters parameters)
   {
-    super(parameters, i18nPrefix);
-    // TODO Auto-generated constructor stub
+    super(parameters, Model.of("Ändern").getObject());
+    init();
   }
-
-  /**
-   * 
-   */
-  private static final long serialVersionUID = -3352981782657771662L;
 
   /**
    * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Object)
@@ -70,8 +74,7 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
   @Override
   protected TeamCalDao getBaseDao()
   {
-    // TODO Auto-generated method stub
-    return null;
+    return teamCalDao;
   }
 
   /**
@@ -80,7 +83,6 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
   @Override
   protected Logger getLogger()
   {
-    // TODO Auto-generated method stub
     return log;
   }
 
@@ -90,7 +92,6 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
   @Override
   protected TeamCalEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final TeamCalDO data)
   {
-    // TODO Auto-generated method stub
     return new TeamCalEditForm(this, data);
   }
 }
