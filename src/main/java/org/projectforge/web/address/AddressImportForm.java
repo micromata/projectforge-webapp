@@ -39,8 +39,7 @@ import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.web.wicket.AbstractEditForm;
-import org.projectforge.web.wicket.AbstractEditPage;
-import org.projectforge.web.wicket.ListPage;
+import org.projectforge.web.wicket.EditPage;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.FileUploadPanel;
@@ -50,7 +49,6 @@ import org.projectforge.web.wicket.flowlayout.FileUploadPanel;
  * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
  * 
  */
-@ListPage(editPage = AddressEditPage.class)
 public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImportPage>
 {
   private static final long serialVersionUID = -1691614676645602272L;
@@ -135,11 +133,33 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
 
         ////// SAVING
         if (list.size() == 0){
-          getBaseDao().save(data);
           final PageParameters params = new PageParameters();
-          params.add(AbstractEditPage.PARAMETER_KEY_ID, data.getId());
-          final AddressEditPage addressEditPage = new AddressEditPage(params);
-          addressEditPage.newEditForm(parentPage, data);
+
+          // inner class to set the right return page.
+          @SuppressWarnings("serial")
+          @EditPage(defaultReturnPage = AddressListPage.class)
+          class MyEditPage extends AddressEditPage {
+
+            /**
+             * @param parameters
+             */
+            public MyEditPage(final PageParameters parameters)
+            {
+              super(parameters);
+            }
+
+            /**
+             * @see org.projectforge.web.wicket.AbstractEditPage#init(org.projectforge.core.AbstractBaseDO)
+             */
+            @Override
+            protected void init(final AddressDO data)
+            {
+              super.init(AddressImportForm.this.getData());
+            }
+          }
+
+          final AddressEditPage addressEditPage = new MyEditPage(params);
+          addressEditPage.newEditForm(parentPage, getData());
           setResponsePage(addressEditPage);
         } else {
           //          AddressListPage alp = new AddressListPage(parameters)
