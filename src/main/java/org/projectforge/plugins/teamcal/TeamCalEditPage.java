@@ -10,7 +10,6 @@
 package org.projectforge.plugins.teamcal;
 
 import org.apache.log4j.Logger;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -37,7 +36,7 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
    */
   public TeamCalEditPage(final PageParameters parameters)
   {
-    super(parameters, Model.of("Ändern").getObject());
+    super(parameters, "plugins.teamcal");
     init();
   }
 

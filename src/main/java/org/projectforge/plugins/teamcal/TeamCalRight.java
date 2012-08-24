@@ -120,7 +120,12 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   @Override
   public boolean hasHistoryAccess(final PFUserDO user, final TeamCalDO obj)
   {
-    return hasUpdateAccess(user, obj, null);
+    // TODO remove hack
+    //    System.out.println("obj: " + obj);
+    if (obj != null)
+      return hasUpdateAccess(user, obj, null);
+    else
+      return true;
   }
 
   private boolean isOwner(final PFUserDO user, final TeamCalDO cal)

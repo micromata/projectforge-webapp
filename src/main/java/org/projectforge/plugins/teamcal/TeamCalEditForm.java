@@ -55,33 +55,30 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   {
     super.init();
 
-    if (isNew() == true){
+    gridBuilder.newGrid16();
 
-      gridBuilder.newGrid16();
-
-      // set title
-      {
-        final FieldsetPanel fs = gridBuilder.newFieldset("Titel");
-        final RequiredMaxLengthTextField title = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
-            "title"));
-        if (isNew() == true) {
-          title.add(WicketUtils.setFocus());
-        }
-        fs.add(title);
+    // set title
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset("Titel");
+      final RequiredMaxLengthTextField title = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
+          "title"));
+      if (isNew() == true) {
+        title.add(WicketUtils.setFocus());
       }
+      fs.add(title);
+    }
 
-      // set description
-      {
-        final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
-        fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
-      }
+    // set description
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
+      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
+    }
 
-      // set owner
-      {
-        data.setOwner(getUser());
-        final FieldsetPanel fs = gridBuilder.newFieldset(Model.of("Ersteller").getObject());
-        fs.add(new Label(fs.newChildId(), getUser().getUsername() + ""));
-      }
+    // set owner
+    {
+      data.setOwner(getUser());
+      final FieldsetPanel fs = gridBuilder.newFieldset(Model.of("Ersteller").getObject());
+      fs.add(new Label(fs.newChildId(), getUser().getUsername() + ""));
     }
   }
 
