@@ -56,7 +56,7 @@ public class TeamCalDO extends DefaultBaseDO
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String title;
 
-  @IndexedEmbedded
+  @IndexedEmbedded(depth = 1)
   private PFUserDO owner;
 
   @IndexedEmbedded(depth = 1)
@@ -175,6 +175,8 @@ public class TeamCalDO extends DefaultBaseDO
    * (perhaps including the location).
    * @return the minimalAccessGroup
    */
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "minimal_access_group_id", nullable = true)
   public GroupDO getMinimalAccessGroup()
   {
     return minimalAccessGroup;
