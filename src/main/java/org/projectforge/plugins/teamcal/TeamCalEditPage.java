@@ -18,7 +18,7 @@ import org.projectforge.web.wicket.EditPage;
 
 /**
  * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
- *
+ * 
  */
 @EditPage(defaultReturnPage = TeamCalListPage.class)
 public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm, TeamCalDao> implements ISelectCallerPage
@@ -41,21 +41,38 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
   }
 
   /**
+   * required to find the component which called the request.
+   * components are marked with ids.
+   * 
    * @see org.projectforge.web.fibu.ISelectCallerPage#select(java.lang.String, java.lang.Object)
    */
   @Override
   public void select(final String property, final Object selectedValue)
   {
-    // TODO Auto-generated method stub
+    if ("fullAccessGroupId".equals(property) == true) {
+      teamCalDao.setFullAccessGroup(getData(), (Integer) selectedValue);
+    } else if ("readOnlyAccessGroupId".equals(property)) {
+      teamCalDao.setReadOnlyAccessGroup(getData(), (Integer) selectedValue);
+    } else if ("minimalAccessGroupId".equals(property)) {
+      teamCalDao.setMinimalAccessGroup(getData(), (Integer) selectedValue);
+    }
   }
 
   /**
+   * @see #select
+   * 
    * @see org.projectforge.web.fibu.ISelectCallerPage#unselect(java.lang.String)
    */
   @Override
   public void unselect(final String property)
   {
-    // TODO Auto-generated method stub
+    if ("fullAccessGroupId".equals(property)) {
+      getData().setFullAccessGroup(null);
+    } else if ("readOnlyAccessGroupId".equals(property)) {
+      getData().setReadOnlyAccessGroup(null);
+    } else if ("minimalAccessGroupId".equals(property)) {
+      getData().setMinimalAccessGroup(null);
+    }
   }
 
   /**
@@ -86,7 +103,8 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
   }
 
   /**
-   * @see org.projectforge.web.wicket.AbstractEditPage#newEditForm(org.projectforge.web.wicket.AbstractEditPage, org.projectforge.core.AbstractBaseDO)
+   * @see org.projectforge.web.wicket.AbstractEditPage#newEditForm(org.projectforge.web.wicket.AbstractEditPage,
+   *      org.projectforge.core.AbstractBaseDO)
    */
   @Override
   protected TeamCalEditForm newEditForm(final AbstractEditPage< ? , ? , ? > parentPage, final TeamCalDO data)
