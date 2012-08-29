@@ -124,12 +124,28 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
         data.setContactStatus(ContactStatus.ACTIVE);
         data.setForm(FormOfAddress.UNKNOWN);
 
-        ///// CHECK FOR DOUBLE ENTRIES
+        ///// CHECK FOR EXISTING ENTRIES
         final BaseSearchFilter af = new BaseSearchFilter();
         af.setSearchString(data.getName() + " " + data.getFirstName());
         final AddressDao dao = (AddressDao) getBaseDao();
         final QueryFilter queryFilter = new QueryFilter(af);
         final List<AddressDO> list = dao.internalGetList(queryFilter);
+
+        ////// CHECK IF THERE IS SOMETHING MORE TO ADD
+        if (data.getAddressText() == null || data.getAddressText() == "") {
+          setOtherPropertiesToWork(li);
+          if (!ih.getItemList().isEmpty() && data.getAddressText() == null || data.getAddressText() == "") {
+            setOtherPropertiesToWork(ih.getItemList());
+          }
+        } else if (data.getPrivateAddressText() == null|| data.getPrivateAddressText() == "") {
+          setOtherPropertiesToPrivate(li);
+          if (!ih.getItemList().isEmpty() && data.getPostalAddressText() == null || data.getPostalAddressText() == "")
+            setOtherPropertiesToPrivate(ih.getItemList());
+        } else {
+          setPostalProperties(li);
+          if (!ih.getItemList().isEmpty() && data.getPostalAddressText() == null || data.getPostalAddressText() == "")
+            setPostalProperties(ih.getItemList());
+        }
 
         ////// SAVING
         if (list.size() == 0){
@@ -196,8 +212,83 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
           setHomeData(property);
         else if (param.getValue().equals("WORK"))
           setWorkData(property);
-        else if (param.getValue().equals("OTHER"))
-          setOtherData(property);
+        //        else if (param.getValue().equals("OTHER"))
+        //          setOtherData(property);
+      }
+    }
+  }
+
+  private void setPostalProperties(final List<Property> li) {
+    for (final Property property : li){
+      final List<Parameter> lii = property.getParameters(Id.TYPE);
+      for (final Parameter param : lii) {
+        if (param.getValue().equals("OTHER")) {
+          //////SET WORK ADDRESS
+          if (property.getId().toString().equals("ADR")){
+            final String str[] = StringUtils.split(property.getValue(), ';');
+            final int size = str.length;
+            if (size >= 1)
+              data.setPostalAddressText(str[0]);
+            if (size >= 2)
+              data.setPostalCity(str[1]);
+            if (size >= 3)
+              data.setPostalZipCode(str[2]);
+            if (size >= 4)
+              data.setPostalCountry(str[3]);
+            if (size >= 5)
+              data.setPostalState(str[4]);
+          }
+        }
+      }
+    }
+  }
+
+  private void setOtherPropertiesToWork(final List<Property> li) {
+    for (final Property property : li){
+      final List<Parameter> lii = property.getParameters(Id.TYPE);
+      for (final Parameter param : lii) {
+        if (param.getValue().equals("OTHER")) {
+          //////SET WORK ADDRESS
+          if (property.getId().toString().equals("ADR")){
+            final String str[] = StringUtils.split(property.getValue(), ';');
+            final int size = str.length;
+            if (size >= 1)
+              data.setAddressText(str[0]);
+            if (size >= 2)
+              data.setCity(str[1]);
+            if (size >= 3)
+              data.setZipCode(str[2]);
+            if (size >= 4)
+              data.setCountry(str[3]);
+            if (size >= 5)
+              data.setState(str[4]);
+          }
+        }
+      }
+    }
+  }
+
+  private void setOtherPropertiesToPrivate(final List<Property> li) {
+    for (final Property property : li){
+      final List<Parameter> lii = property.getParameters(Id.TYPE);
+      for (final Parameter param : lii) {
+        if (param.getValue().equals("OTHER")) {
+          ////// SET HOME ADDRESS
+          if (property.getId().toString().equals("ADR")){
+            final String str[] = StringUtils.split(property.getValue(), ';');
+            final int size = str.length;
+            if (size >= 1)
+              data.setPrivateAddressText(str[0]);
+            if (size >= 2)
+              data.setPrivateCity(str[1]);
+            if (size >= 3)
+              data.setPrivateZipCode(str[2]);
+            if (size >= 4)
+              data.setPrivateCountry(str[3]);
+            if (size >= 5)
+              data.setPrivateState(str[4]);
+          }
+        }
       }
     }
   }
@@ -342,9 +433,5 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
     ////// SET WORK URL
     if (property.getId().toString().equals("URL"))
       data.setWebsite(property.getValue());
-  }
-
-  private void setOtherData(final Property property){
-    //    System.out.println("OTHER " + property.getId() + " " + property.getValue());
   }
 }
