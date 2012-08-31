@@ -10,6 +10,8 @@
 package org.projectforge.plugins.teamcal;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
@@ -17,11 +19,14 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.user.GroupDO;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -44,6 +49,9 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   @SpringBean(name = "teamCalDao")
   private TeamCalDao teamCalDao;
 
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
+
   /**
    * 
    */
@@ -60,46 +68,60 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   /**
    * @see org.projectforge.web.wicket.IListPageColumnsCreator#createColumns(org.apache.wicket.markup.html.WebPage, boolean)
    */
-  // TODO replace names with i18n
   @SuppressWarnings("serial")
   @Override
   public List<IColumn<TeamCalDO>> createColumns(final WebPage returnToPage, final boolean sortable)
   {
     final List<IColumn<TeamCalDO>> columns = new ArrayList<IColumn<TeamCalDO>>();
+
     final CellItemListener<TeamCalDO> cellItemListener = new CellItemListener<TeamCalDO>() {
       public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)
       {
-        final TeamCalDO teamCalDO = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(teamCalDO.getId(), teamCalDO.isDeleted());
+        final TeamCalDO teamCal = rowModel.getObject();
+        final StringBuffer cssStyle = getCssStyle(teamCal.getId(), teamCal.isDeleted());
         if (cssStyle.length() > 0) {
           item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
 
-    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("title"), getSortable("title", sortable), "title",
-        cellItemListener)
-        {
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("plugins.teamcal.title"), getSortable("title", sortable), "title", cellItemListener) {
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item, java.lang.String, org.apache.wicket.model.IModel)
+       */
       @Override
       public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)
       {
-        final TeamCalDO teamcal = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(teamcal.getId(), teamcal.isDeleted());
-        if (cssStyle.length() > 0)
+        final TeamCalDO teamCal = rowModel.getObject();
+        final StringBuffer cssStyle = getCssStyle(teamCal.getId(), teamCal.isDeleted());
+        if (cssStyle.length() > 0) {
           item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
-        item.add(new ListSelectActionPanel(componentId, rowModel, TeamCalEditPage.class, teamcal.getId(), returnToPage, teamcal.getTitle()));
+        }
+        item.add(new ListSelectActionPanel(componentId, rowModel, TeamCalEditPage.class, teamCal.getId(), returnToPage, teamCal.getTitle()));
         addRowClick(item);
       }
-        }
-        );
+    });
 
-    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("description"), getSortable("description", sortable), "description",
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("plugins.teamcal.description"), getSortable("description", sortable),
+        "description", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("plugins.teamcal.owner"), getSortable("owner", sortable), "owner.username",
         cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("user"), getSortable("owner", sortable),
-        "owner.username", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("lastUpdate"), getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
     return columns;
+  }
+
+  private boolean visibilityCheck(final GroupDO group) {
+    if (group != null) {
+      final Collection<Integer> groups = userGroupCache.getUserGroups(getUser());
+      final Iterator<Integer> it = groups.iterator();
+      while (it.hasNext()){
+        final int id = it.next();
+        if (id == 0 || group.getId() == id)
+          return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -126,7 +148,15 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   @Override
   protected IModel<TeamCalDO> getModel(final TeamCalDO object)
   {
-    return new DetachableDOModel<TeamCalDO, TeamCalDao>(object, getBaseDao());
+    final DetachableDOModel<TeamCalDO, TeamCalDao> det = new DetachableDOModel<TeamCalDO, TeamCalDao>(object, getBaseDao());
+    TeamCalDO teamcal = det.getObject();
+    if (visibilityCheck(teamcal.getFullAccessGroup()) == true || visibilityCheck(teamcal.getReadOnlyAccessGroup()) == true)
+      return det;
+    if (visibilityCheck(teamcal.getMinimalAccessGroup()) == true) {
+      teamcal = new TeamCalDO().setMinimalAccessGroup(object.getMinimalAccessGroup());
+      det.setObject(teamcal);
+    }
+    return det;
   }
 
   /**
@@ -135,8 +165,12 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
-    form.add(dataTable);
+    if (userGroupCache.getUserGroups(getUser()) == null) {
+//      form.add(new Label(getNewContentMenuChildId(), "Keine Einträge gefunden"));
+    } else {
+      dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
+      form.add(dataTable);
+    }
 
     // Add additional menu buttons here!
     //    final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", TeamCalPlugin.USER_PREF_AREA);

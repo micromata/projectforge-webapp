@@ -117,6 +117,12 @@ public class TeamCalGroupCache extends AbstractCache
     log.info("Initializing of TeamCalGroupCache done.");
   }
 
+  /**
+   * Returns list of assigned groups of delivered teamcal.
+   * 
+   * @param teamcal
+   * @return list of assigned groups
+   */
   public List<Integer> getAssignedGroups(final TeamCalDO teamcal) {
     final List<Integer> assigned = new ArrayList<Integer>();
     if (teamcal.getId() != null) {

@@ -9,13 +9,16 @@
 
 package org.projectforge.plugins.teamcal;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.basic.Label;
-import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
@@ -44,6 +47,11 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   @SuppressWarnings("unused")
   private String templateName; // Used by Wicket
 
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
+
+  private boolean access = false;
+
   /**
    * @param parentPage
    * @param data
@@ -63,61 +71,92 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
     gridBuilder.newGrid8();
 
+    if (accessCheck(data.getFullAccessGroup())) {
+      access = true;
+    }
+
     // set title
     {
-      // TODO i18nKey!
-      final FieldsetPanel fs = gridBuilder.newFieldset("Titel");
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.title"));
       final RequiredMaxLengthTextField title = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
           "title"));
       if (isNew() == true) {
         title.add(WicketUtils.setFocus());
       }
       fs.add(title);
+      if (access == false)
+        title.setEnabled(false);
     }
 
     // set description
     {
-      // TODO i18nKey!
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
-      fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"))).setAutogrow();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.description"));
+      final MaxLengthTextArea descr = new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "description"));
+      fs.add(descr).setAutogrow();
+      if (access == false)
+        descr.setEnabled(false);
     }
 
     // set owner
     {
-      // TODO i18nKey!
       data.setOwner(getUser());
-      final FieldsetPanel fs = gridBuilder.newFieldset(Model.of("Ersteller").getObject());
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.owner"));
       fs.add(new Label(fs.newChildId(), getUser().getUsername() + ""));
     }
 
     // set access groups
-    gridBuilder.newGrid8();
+    gridBuilder.newGrid8(getString("plugins.teamcal.access.title"));
     {
+      //      final FieldsetPanel fsAccess = gridBuilder.newFieldset(getString("plugins.teamcal.access.title"), true);
+
       // set full access group chooser
-      final FieldsetPanel fsFullAccess = gridBuilder.newFieldset(Model.of("AccessGroup").getObject(), true);
+      final FieldsetPanel fsFullAccess = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), true);
       final PropertyModel<GroupDO> model = new PropertyModel<GroupDO>(data, "fullAccessGroup");
       final GroupSelectPanel fullAccess = new GroupSelectPanel(fsFullAccess.newChildId(), model,
           parentPage, "fullAccessGroupId");
       fsFullAccess.add(fullAccess);
       fsFullAccess.setLabelFor(fullAccess);
       fullAccess.init();
-      
+      if (access == false)
+        fullAccess.setEnabled(false);
+      //      fsAccess.add(fsFullAccess);
+
       // set read-only access chooser
-      final FieldsetPanel fsReadOnly = gridBuilder.newFieldset(Model.of("ReadOnlyGroup").getObject(), true);
+      final FieldsetPanel fsReadOnly = gridBuilder.newFieldset(getString("plugins.teamcal.readOnlyAccess"), true);
       final GroupSelectPanel readOnly = new GroupSelectPanel(fsReadOnly.newChildId(), new PropertyModel<GroupDO>(data, "readOnlyAccessGroup"),
           parentPage, "readOnlyAccessGroupId");
       fsReadOnly.add(readOnly);
       fsReadOnly.setLabelFor(readOnly);
       readOnly.init();
-      
+      if (access == false)
+        readOnly.setEnabled(false);
+      //      fsAccess.add(fsReadOnly);
+
       // set minimal access chooser
-      final FieldsetPanel fsMinimal = gridBuilder.newFieldset(Model.of("MinimalAccessGroup").getObject(), true);
+      final FieldsetPanel fsMinimal = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess"), true);
       final GroupSelectPanel minimalAccess = new GroupSelectPanel(fsMinimal.newChildId(), new PropertyModel<GroupDO>(data, "minimalAccessGroup"),
           parentPage, "minimalAccessGroupId");
       fsMinimal.add(minimalAccess);
       fsMinimal.setLabelFor(minimalAccess);
+      fsMinimal.addHelpIcon(getString("plugins.teamcal.minimalAccess.hint"));
       minimalAccess.init();
+      if (access == false)
+        minimalAccess.setEnabled(false);
+      //      fsAccess.add(fsMinimal);
     }
+  }
+
+  private boolean accessCheck(final GroupDO group) {
+    if (group != null) {
+      final Collection<Integer> groups = userGroupCache.getUserGroups(getUser());
+      final Iterator<Integer> it = groups.iterator();
+      while (it.hasNext()){
+        final int id = it.next();
+        if (id == 0 || group.getId() == id)
+          return true;
+      }
+    }
+    return false;
   }
 
   /**
