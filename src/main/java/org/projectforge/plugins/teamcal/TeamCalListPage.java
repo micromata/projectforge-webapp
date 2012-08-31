@@ -19,7 +19,6 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
-import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -153,7 +152,10 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
     if (visibilityCheck(teamcal.getFullAccessGroup()) == true || visibilityCheck(teamcal.getReadOnlyAccessGroup()) == true)
       return det;
     if (visibilityCheck(teamcal.getMinimalAccessGroup()) == true) {
-      teamcal = new TeamCalDO().setMinimalAccessGroup(object.getMinimalAccessGroup());
+      teamcal = new TeamCalDO();
+      teamcal.setId(object.getId());
+      teamcal.setMinimalAccessGroup(object.getMinimalAccessGroup());
+      teamcal.setOwner(object.getOwner());
       det.setObject(teamcal);
     }
     return det;
@@ -165,12 +167,8 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   @Override
   protected void init()
   {
-    if (userGroupCache.getUserGroups(getUser()) == null) {
-//      form.add(new Label(getNewContentMenuChildId(), "Keine Einträge gefunden"));
-    } else {
-      dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
-      form.add(dataTable);
-    }
+    dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
+    form.add(dataTable);
 
     // Add additional menu buttons here!
     //    final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", TeamCalPlugin.USER_PREF_AREA);

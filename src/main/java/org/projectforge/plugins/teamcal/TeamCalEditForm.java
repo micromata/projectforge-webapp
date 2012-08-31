@@ -71,8 +71,25 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
     gridBuilder.newGrid8();
 
-    if (accessCheck(data.getFullAccessGroup())) {
+    // checking visibility rights
+    if (isNew() == true || data.getOwner() == null && data.getMinimalAccessGroup() == null) {
       access = true;
+    } else {
+      if (accessCheck(data.getFullAccessGroup()) == true)
+        access = true;
+      else
+        if (accessCheck(data.getReadOnlyAccessGroup()) == true)
+          access = false;
+        else
+          if (accessCheck(data.getMinimalAccessGroup()) == true) {
+            final TeamCalDO newTeamCalDO = new TeamCalDO();
+            newTeamCalDO.setId(data.getId());
+            newTeamCalDO.setMinimalAccessGroup(data.getMinimalAccessGroup());
+            newTeamCalDO.setOwner(data.getOwner());
+            data = newTeamCalDO;
+            access = false;
+          } else
+            access = false;
     }
 
     // set title
@@ -99,9 +116,10 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
     // set owner
     {
-      data.setOwner(getUser());
+      if (data.getOwner() == null)
+        data.setOwner(getUser());
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.owner"));
-      fs.add(new Label(fs.newChildId(), getUser().getUsername() + ""));
+      fs.add(new Label(fs.newChildId(), data.getOwner().getUsername() + ""));
     }
 
     // set access groups
