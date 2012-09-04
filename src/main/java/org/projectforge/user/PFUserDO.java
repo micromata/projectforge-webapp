@@ -135,7 +135,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private Set<UserRightDO> rights = new HashSet<UserRightDO>();
 
-  private boolean hrPlanning;
+  private boolean hrPlanning = true;
 
   @Transient
   public String getShortDisplayName()
@@ -665,10 +665,12 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   /**
    * @param password The password to set.
+   * @return this for chaining.
    */
-  public void setPassword(final String password)
+  public PFUserDO setPassword(final String password)
   {
     this.password = password;
+    return this;
   }
 
   /**
