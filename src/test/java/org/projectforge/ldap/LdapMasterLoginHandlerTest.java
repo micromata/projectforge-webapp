@@ -61,8 +61,8 @@ public class LdapMasterLoginHandlerTest extends TestBase
     //Assert.assertEquals("successful", createdLdapUser.get());
   }
 
-  @Test
-  public void loginAndUpdateLdapUser()
-  {
-  }
+  //  @Test
+  //  public void loginAndUpdateLdapUser()
+  //  {
+  //  }
 }
