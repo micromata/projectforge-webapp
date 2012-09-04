@@ -30,6 +30,8 @@ public class LdapPerson extends LdapObject<String>
 {
   private String uid, surname, givenName, organization, telephoneNumber, homePhoneNumber, description, employeeNumber;
 
+  private boolean deleted;
+
   private String[] mail, mobilePhoneNumber;
 
   /**
@@ -224,6 +226,24 @@ public class LdapPerson extends LdapObject<String>
   public LdapPerson setDescription(final String description)
   {
     this.description = description;
+    return this;
+  }
+
+  /**
+   * @return the deleted
+   */
+  public boolean isDeleted()
+  {
+    return deleted;
+  }
+
+  /**
+   * @param deleted the deleted to set
+   * @return this for chaining.
+   */
+  public LdapPerson setDeleted(final boolean deleted)
+  {
+    this.deleted = deleted;
     return this;
   }
 }

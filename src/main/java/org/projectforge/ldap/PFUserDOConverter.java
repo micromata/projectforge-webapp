@@ -57,6 +57,9 @@ public class PFUserDOConverter
         }
       }
     }
+    if (person.isDeleted() == true || LdapUserDao.isDeactivated(person) == true) {
+      user.setDeleted(true);
+    }
     return user;
   }
 
@@ -72,6 +75,7 @@ public class PFUserDOConverter
     person.setOrganization(user.getOrganization());
     person.setDescription(user.getDescription());
     person.setMail(user.getEmail());
+    person.setDeleted(user.isDeleted());
     return person;
   }
 

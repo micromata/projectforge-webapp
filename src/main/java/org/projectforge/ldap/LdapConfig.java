@@ -211,6 +211,6 @@ public class LdapConfig
   @Override
   public String toString()
   {
-    return ReflectionToString.asString(this);
+    return ReflectionToString.toStringExclude(this, "managerPassword");
   }
 }

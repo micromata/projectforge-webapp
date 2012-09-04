@@ -43,6 +43,20 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapMasterLoginHandler.class);
 
+  private String deactivatedOu;
+
+  /**
+   * @see org.projectforge.ldap.LdapLoginHandler#initialize()
+   */
+  @Override
+  public void initialize()
+  {
+    super.initialize();
+    // ldapOrganizationalUnitDao.createIfNotExist(ldapConfig.getUserBase(), "ProjectForge's user base.");
+    // deactivatedOu = LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, ldapConfig.getUserBase());
+    // ldapOrganizationalUnitDao.createIfNotExist(deactivatedOu, "ProjectForge's user base for deactivated users.");
+  }
+
   /**
    * @see org.projectforge.user.LoginHandler#checkLogin(java.lang.String, java.lang.String, boolean)
    */
@@ -60,6 +74,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
       log.info("User's credentials in LDAP not up-to-date: " + username + ". Updating LDAP entry...");
       final PFUserDO user = loginResult.getUser();
       final LdapPerson ldapUser = PFUserDOConverter.convert(user);
+      ldapUser.setOrganizationalUnit(organizationalUnits);
       ldapUserDao.createOrUpdate(ldapUser);
       ldapUserDao.changePassword(ldapUser, null, user.getPassword());
     }
@@ -85,15 +100,20 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
     final List<PFUserDO> users = loginDefaultHandler.getAllUsers();
     final List<LdapPerson> ldapUsers = getAllLdapUsers();
     for (final PFUserDO user : users) {
-      final LdapPerson updatedLdapUser = PFUserDOConverter.convert(user);
-      final LdapPerson ldapUser = getLdapUser(ldapUsers, user);
-      if (ldapUser == null) {
-        ldapUserDao.create(updatedLdapUser);
-      } else {
-        final boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
-        if (modified == true) {
-          ldapUserDao.createOrUpdate(updatedLdapUser);
+      try {
+        final LdapPerson updatedLdapUser = PFUserDOConverter.convert(user);
+        updatedLdapUser.setOrganizationalUnit(ldapConfig.getUserBase());
+        final LdapPerson ldapUser = getLdapUser(ldapUsers, user);
+        if (ldapUser == null) {
+          ldapUserDao.create(updatedLdapUser);
+        } else {
+          final boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
+          if (modified == true) {
+            ldapUserDao.createOrUpdate(updatedLdapUser);
+          }
         }
+      } catch (final Exception ex) {
+        log.error("Error while proceeding user '" + user.getUsername() + "'. Continuing with next user.", ex);
       }
     }
     return users;

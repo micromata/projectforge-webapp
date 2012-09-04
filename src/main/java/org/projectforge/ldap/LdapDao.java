@@ -41,6 +41,7 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.common.StringHelper;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -192,7 +193,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
           throw new RuntimeException("Object with id "
               + id
               + " not found in search base '"
-              + obj.getOrganizationalUnit()
+              + StringHelper.listToString(",", obj.getOrganizationalUnit())
               + "'. Can't modify the object: "
               + obj);
         }
@@ -202,6 +203,34 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
         if (StringUtils.equals(dn, obj.getDn()) == false) {
           log.info("DN of object is changed from '" + dn + "' to '" + obj.getDn());
           ctx.rename(dn, obj.getDn());
+        }
+        return null;
+      }
+    }.excecute();
+  }
+
+  public void move(final T obj, final String... newOrganizationalUnits)
+  {
+    new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        final Object id = getId(obj);
+        // The dn is may-be changed, so find the original dn by id:
+        final T origObject = findById(id, obj.getOrganizationalUnit());
+        if (origObject == null) {
+          throw new RuntimeException("Object with id "
+              + id
+              + " not found in search base '"
+              + StringHelper.listToString(",", obj.getOrganizationalUnit())
+              + "'. Can't modify the object: "
+              + obj);
+        }
+        final String ou = LdapUtils.getOu(newOrganizationalUnits);
+        final String origOu = LdapUtils.getOu(origObject.getOrganizationalUnit());
+        if (StringUtils.equals(origOu, ou) == false) {
+          log.info("Move object with id '" + obj.getId() + "' from changed from '" + origOu + "' to '" + ou);
+          ctx.rename("cn=" + obj.getCommonName() + "," + origOu, "cn=" + obj.getCommonName() + "," + ou);
         }
         return null;
       }

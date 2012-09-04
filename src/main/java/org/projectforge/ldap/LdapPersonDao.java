@@ -30,6 +30,8 @@ import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.ModificationItem;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
@@ -106,7 +108,7 @@ public class LdapPersonDao extends LdapDao<String, LdapPerson>
     createAndAddModificationItems(list, "employeeNumber", person.getEmployeeNumber());
     createAndAddModificationItems(list, "o", person.getOrganization());
     createAndAddModificationItems(list, "mail", person.getMail());
-    createAndAddModificationItems(list, "description", person.getDescription());
+    createAndAddModificationItems(list, "description", StringUtils.isEmpty(person.getDescription()) == true ? "-" : person.getDescription());
     createAndAddModificationItems(list, "telephoneNumber", person.getTelephoneNumber());
     createAndAddModificationItems(list, "mobile", person.getMobilePhoneNumber());
     createAndAddModificationItems(list, "homePhone", person.getHomePhoneNumber());

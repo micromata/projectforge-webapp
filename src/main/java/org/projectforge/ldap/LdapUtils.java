@@ -41,28 +41,42 @@ public class LdapUtils
 {
   private static final String ATTRIBUTE_SEPARATOR_CHAR = ",";
 
-  public static String getOu(final String... organizationalUnit)
+  public static String getOu(final String... organizationalUnits)
   {
-    if (organizationalUnit == null) {
+    if (organizationalUnits == null) {
       return "";
     }
-    if (organizationalUnit.length == 1 && organizationalUnit[0] != null && organizationalUnit[0].startsWith("ou=") == true) {
+    if (organizationalUnits.length == 1 && organizationalUnits[0] != null && organizationalUnits[0].startsWith("ou=") == true) {
       // organizationalUnit is already in the form ou=...,ou=.... Nothing to be done.
-      return organizationalUnit[0];
+      return organizationalUnits[0];
     }
     final StringBuffer buf = new StringBuffer();
-    buildOu(buf, organizationalUnit);
+    buildOu(buf, null, organizationalUnits);
     return buf.toString();
   }
 
-  public static void buildOu(final StringBuffer buf, final String... organizationalUnits)
+  public static String getOu(final String ou, final String[] organizationalUnits)
   {
-    if (organizationalUnits == null) {
+    final StringBuffer buf = new StringBuffer();
+    buildOu(buf, ou, organizationalUnits);
+    return buf.toString();
+  }
+
+  public static void buildOu(final StringBuffer buf, final String ou, final String[] organizationalUnits)
+  {
+    if (ou == null && organizationalUnits == null) {
       return;
     }
     boolean first = true;
-    for (final String ou : organizationalUnits) {
-      if (ou == null) {
+    if (ou != null) {
+      first = false;
+      if (ou.startsWith("ou=") == false) {
+        buf.append("ou=");
+      }
+      buf.append(ou);
+    }
+    for (final String unit : organizationalUnits) {
+      if (unit == null) {
         continue;
       }
       if (first == true) {
@@ -70,6 +84,28 @@ public class LdapUtils
       } else {
         buf.append(',');
       }
+      if (unit.startsWith("ou=") == false) {
+        buf.append("ou=");
+      }
+      buf.append(unit);
+    }
+  }
+
+  public static void buildOu(final StringBuffer buf, final String... organizationalUnits)
+  {
+    buildOu(buf, null, organizationalUnits);
+  }
+
+  public static void appendOu(final StringBuffer buf, final String... organizationalUnits)
+  {
+    if (organizationalUnits == null) {
+      return;
+    }
+    for (final String ou : organizationalUnits) {
+      if (ou == null) {
+        continue;
+      }
+      buf.append(',');
       if (ou.startsWith("ou=") == false) {
         buf.append("ou=");
       }

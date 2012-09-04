@@ -50,6 +50,8 @@ public abstract class LdapLoginHandler implements LoginHandler
 
   LdapConfig ldapConfig;
 
+  LdapOrganizationalUnitDao ldapOrganizationalUnitDao;
+
   protected LoginDefaultHandler loginDefaultHandler;
 
   /**
@@ -67,6 +69,8 @@ public abstract class LdapLoginHandler implements LoginHandler
     ldapGroupDao.ldapConnector = ldapConnector;
     ldapUserDao = new LdapUserDao();
     ldapUserDao.ldapConnector = ldapConnector;
+    ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
+    ldapOrganizationalUnitDao.ldapConnector = ldapConnector;
     final Registry registry = Registry.instance();
     userDao = (UserDao) registry.getDao(UserDao.class);
     accessChecker = UserRights.getAccessChecker();
@@ -86,7 +90,7 @@ public abstract class LdapLoginHandler implements LoginHandler
 
   public boolean isAdminUser(final PFUserDO user)
   {
-    return accessChecker.isUserMemberOfAdminGroup(user);
+    return loginDefaultHandler.isAdminUser(user);
   }
 
   protected List<LdapPerson> getAllLdapUsers()

@@ -25,9 +25,11 @@ package org.projectforge.ldap;
 
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.DirContext;
 import javax.naming.directory.SearchControls;
 
 /**
@@ -41,26 +43,25 @@ public class LdapOrganizationalUnitDao
 
   LdapConnector ldapConnector;
 
+  public boolean doesExist(final String ou, final String... organizationalUnits)
+  {
+    return (Boolean) new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        return doesExist(ctx, ou, organizationalUnits);
+      }
+    }.excecute();
+  }
+
   public void createIfNotExist(final String ou, final String description, final String... organizationalUnits)
   {
     new LdapTemplate(ldapConnector) {
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
-        final StringBuffer buf = new StringBuffer();
-        buf.append("ou=").append(ou);
-        if (organizationalUnits != null) {
-          buf.append(',');
-        }
-        LdapUtils.buildOu(buf, organizationalUnits);
-        final String path = buf.toString();
-
-        NamingEnumeration< ? > results = null;
-        final SearchControls controls = new SearchControls();
-        controls.setSearchScope(SearchControls.ONELEVEL_SCOPE);
-        final String searchBase = LdapUtils.getOu(organizationalUnits);
-        results = ctx.search(searchBase, "(&(objectClass=" + OBJECT_CLASS + ")(ou=" + ou + "))", controls);
-        if (results.hasMore() == true) {
+        final String path = LdapUtils.getOu(ou, organizationalUnits);
+        if (doesExist(ctx, ou, organizationalUnits) == true) {
           log.info(OBJECT_CLASS + " does already exist (OK): " + path);
           return null;
         }
@@ -76,6 +77,34 @@ public class LdapOrganizationalUnitDao
         return null;
       }
     }.excecute();
+  }
+
+  public void deleteIfExists(final String ou, final String... organizationalUnits)
+  {
+    new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        final String path = LdapUtils.getOu(ou, organizationalUnits);
+        if (doesExist(ctx, ou, organizationalUnits) == false) {
+          log.info(OBJECT_CLASS + " doesn't exist and can't delete it (OK): " + path);
+          return null;
+        }
+        log.info("Delete " + OBJECT_CLASS + ": " + path);
+        ctx.unbind(path);
+        return null;
+      }
+    }.excecute();
+  }
+
+  private boolean doesExist(final DirContext ctx, final String ou, final String... organizationalUnits) throws NamingException
+  {
+    NamingEnumeration< ? > results = null;
+    final SearchControls controls = new SearchControls();
+    controls.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+    final String searchBase = LdapUtils.getOu(organizationalUnits);
+    results = ctx.search(searchBase, "(&(objectClass=" + OBJECT_CLASS + ")(ou=" + ou + "))", controls);
+    return results.hasMore() == true;
   }
 
   public void setLdapConnector(final LdapConnector ldapConnector)
