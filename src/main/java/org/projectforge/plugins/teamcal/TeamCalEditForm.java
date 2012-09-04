@@ -17,7 +17,6 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.GroupDO;
-import org.projectforge.user.GroupDao;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
@@ -37,12 +36,6 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalEditForm.class);
 
   private static final long serialVersionUID = 1379614008604844519L;
-
-  @SpringBean(name = "teamCalDao")
-  private TeamCalDao teamCalDao;
-
-  @SpringBean(name = "groupDao")
-  private GroupDao groupDao;
 
   @SuppressWarnings("unused")
   private String templateName; // Used by Wicket
@@ -75,7 +68,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
     if (isNew() == true || data.getOwner() == null && data.getMinimalAccessGroup() == null) {
       access = true;
     } else {
-      if (accessCheck(data.getFullAccessGroup()) == true)
+      if (new TeamCalRight().hasUpdateAccess(getUser(), data, data) == true)
         access = true;
       else
         if (accessCheck(data.getReadOnlyAccessGroup()) == true)
@@ -118,7 +111,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
     {
       if (data.getOwner() == null)
         data.setOwner(getUser());
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.owner"));
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.owner")).setLabelFor(this);
       fs.add(new Label(fs.newChildId(), data.getOwner().getUsername() + ""));
     }
 
