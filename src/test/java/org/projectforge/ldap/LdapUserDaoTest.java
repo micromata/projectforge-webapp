@@ -46,21 +46,25 @@ public class LdapUserDaoTest extends LdapRealTestBase
     ldapUserDao = new LdapUserDao();
     ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
     ldapUserDao.ldapConnector = ldapOrganizationalUnitDao.ldapConnector = ldapConnector;
-    ldapOrganizationalUnitDao.createIfNotExist(PATH, "Test area for tests of ProjectForge.");
-    ldapOrganizationalUnitDao.createIfNotExist("deactivated", "for deactivated objects.", PATH);
+    if (ldapConfig != null) {
+      ldapOrganizationalUnitDao.createIfNotExist(PATH, "Test area for tests of ProjectForge.");
+      ldapOrganizationalUnitDao.createIfNotExist("deactivated", "for deactivated objects.", PATH);
+    }
   }
 
   @After
   public void tearDown()
   {
-    ldapOrganizationalUnitDao.deleteIfExists("deactivated", PATH);
-    ldapOrganizationalUnitDao.deleteIfExists(PATH);
+    if (ldapConfig != null) {
+      ldapOrganizationalUnitDao.deleteIfExists("deactivated", PATH);
+      ldapOrganizationalUnitDao.deleteIfExists(PATH);
+    }
   }
 
   @Test
   public void createAuthenticateAndDeleteUser()
   {
-    if (cfg == null) {
+    if (ldapConfig == null) {
       log.info("No LDAP server configured for tests. Skipping test.");
       return;
     }
@@ -88,7 +92,7 @@ public class LdapUserDaoTest extends LdapRealTestBase
   @Test
   public void activateAndDeactivateUser()
   {
-    if (cfg == null) {
+    if (ldapConfig == null) {
       log.info("No LDAP server configured for tests. Skipping test.");
       return;
     }

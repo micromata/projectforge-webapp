@@ -36,16 +36,16 @@ public class LdapRealTestBase
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapRealTestBase.class);
 
-  private static final String CONFIG_FILE = System.getProperty("user.home") + "/ProjectForge/testldapConfig.xml";
+  private static final String CONFIG_FILE = System.getProperty("user.home") + "/ProjectForge/testladpConfig.xml";
 
-  LdapConfig cfg;
+  LdapConfig ldapConfig;
 
   LdapConnector ldapConnector;
 
   protected void setup()
   {
-    cfg = readConfig();
-    ldapConnector = new LdapConnector(cfg);
+    ldapConfig = readConfig();
+    ldapConnector = new LdapConnector(ldapConfig);
   }
 
   static LdapConfig readConfig()

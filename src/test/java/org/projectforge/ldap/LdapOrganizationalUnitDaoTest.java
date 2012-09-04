@@ -46,7 +46,7 @@ public class LdapOrganizationalUnitDaoTest extends LdapRealTestBase
   @Test
   public void deleteAndCreateOu()
   {
-    if (cfg == null) {
+    if (ldapConfig == null) {
       log.info("No LDAP server configured for tests. Skipping test.");
       return;
     }
