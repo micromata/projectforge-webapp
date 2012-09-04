@@ -26,17 +26,10 @@
  */
 package org.projectforge.ldap;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
 import org.projectforge.address.AddressDO;
-import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.xml.stream.AliasMap;
-import org.projectforge.xml.stream.XmlObjectReader;
 
 /**
  * @author kai
@@ -50,8 +43,6 @@ public class TestConnection
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TestConnection.class);
 
-  private static final String CONFIG_FILE = System.getProperty("user.home") + "/ProjectForge/testldapConfig.xml";
-
   public static void main(final String[] args) throws Exception
   {
     new TestConnection().run();
@@ -59,7 +50,7 @@ public class TestConnection
 
   private void run() throws Exception
   {
-    final LdapConfig cfg = readConfig();
+    final LdapConfig cfg = LdapRealTestBase.readConfig();
     final LdapConnector ldapConnector = new LdapConnector(cfg);
     // new LdapTemplate(ldapConnector) {
     // @Override
@@ -126,39 +117,5 @@ public class TestConnection
     group.addMember(contact);
     group.addMember(user);
     gdao.createOrUpdate(group);
-  }
-
-  private LdapConfig readConfig()
-  {
-    final File configFile = new File(CONFIG_FILE);
-    if (configFile.canRead() == false) {
-      throw new IllegalArgumentException("Cannot read from config file: '" + CONFIG_FILE + "'.");
-    }
-    final XmlObjectReader reader = new XmlObjectReader();
-    final AliasMap aliasMap = new AliasMap();
-    aliasMap.put(LdapConfig.class, "ldapConfig");
-    reader.setAliasMap(aliasMap);
-    // reader.initialize(ConfigXml.class);
-    AccountingConfig.registerXmlObjects(reader, aliasMap);
-    String xml = null;
-    try {
-      xml = FileUtils.readFileToString(configFile, "UTF-8");
-    } catch (final IOException ex) {
-      ex.printStackTrace(System.err);
-      throw new IllegalArgumentException("Cannot read config file '" + CONFIG_FILE + "' properly : " + ex.getMessage(), ex);
-    }
-    if (xml == null) {
-      throw new IllegalArgumentException("Cannot read from config file: '" + CONFIG_FILE + "'.");
-    }
-    try {
-      final LdapConfig cfg = (LdapConfig) reader.read(xml);
-      final String warnings = reader.getWarnings();
-      if (StringUtils.isNotBlank(warnings) == true) {
-        System.err.println(warnings);
-      }
-      return cfg;
-    } catch (final Throwable ex) {
-      throw new IllegalArgumentException("Cannot read config file '" + CONFIG_FILE + "' properly : " + ex.getMessage(), ex);
-    }
   }
 }

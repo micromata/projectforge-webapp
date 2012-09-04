@@ -28,11 +28,12 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.projectforge.test.TestBase;
 import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
 
-public class LdapSlaveLoginHandlerTest extends LdapLoginHandlerTestBase
+public class LdapSlaveLoginHandlerTest extends TestBase
 {
   @Test
   public void loginInSlaveMode()
@@ -55,11 +56,11 @@ public class LdapSlaveLoginHandlerTest extends LdapLoginHandlerTestBase
         userDao.doesUsernameAlreadyExist(new PFUserDO().setUsername("kai")));
     loginResult =loginHandler.checkLogin("kai", "successful");
     Assert.assertEquals(LoginResultStatus.SUCCESS, loginResult.getLoginResultStatus());
-    assertUser(loginResult.getUser(), "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    LdapTestUtils.assertUser(loginResult.getUser(), "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
     Assert.assertTrue("User should be created in data-base as a new user (in ldap).",
         userDao.doesUsernameAlreadyExist(new PFUserDO().setUsername("kai")));
     final PFUserDO user = userDao.getInternalByName("kai");
-    assertUser(user, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    LdapTestUtils.assertUser(user, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
     Assert.assertEquals(userDao.encryptPassword("successful"), user.getPassword());
 
     userDao.internalMarkAsDeleted(user);
