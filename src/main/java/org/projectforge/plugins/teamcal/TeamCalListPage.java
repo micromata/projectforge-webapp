@@ -26,7 +26,6 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.UserGroupCache;
-import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -57,11 +56,6 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   public TeamCalListPage(final PageParameters parameters)
   {
     super(parameters, "plugins.teamcal");
-  }
-
-  TeamCalListPage(final String id, final ISelectCallerPage caller, final String selectProperty, final TeamCalListPage parentPage)
-  {
-    super(caller, id, selectProperty);
   }
 
   /**

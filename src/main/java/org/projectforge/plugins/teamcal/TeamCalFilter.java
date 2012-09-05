@@ -21,17 +21,28 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
 {
   private static final long serialVersionUID = 7410573665085873058L;
 
-  private boolean myCalendars, mySubscribedCalendars, availableCalendars, allMyCalendars, allCalendars;
+  private boolean own, mySubscribedCalendars, availableCalendars, allMyCalendars, allCalendars;
 
-  //  private Integer taskId;
+  private Integer ownerId;
 
   public TeamCalFilter(){
-    // seems to do nothing...
   }
 
   public TeamCalFilter(final BaseSearchFilter filter)
   {
     super(filter);
+  }
+
+  /**
+   * @return the userId
+   */
+  public Integer getOwnerId()
+  {
+    return ownerId;
+  }
+
+  public void setOwnerId(final Integer ownerId) {
+    this.ownerId = ownerId;
   }
 
   /**
@@ -86,23 +97,6 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
   }
 
   /**
-   * @return the myCalendars
-   */
-  public boolean isMyCalendars()
-  {
-    return myCalendars;
-  }
-
-  /**
-   * @param myCalendars the myCalendars to set
-   * @return this for chaining.
-   */
-  public void setMyCalendars(final boolean myCalendars)
-  {
-    this.myCalendars = myCalendars;
-  }
-
-  /**
    * @return the allMyCalendars
    */
   public boolean isAllMyCalendars()
@@ -118,4 +112,22 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
   {
     this.allMyCalendars = allMyCalendars;
   }
+
+  /**
+   * @return the own
+   */
+  public boolean isOwn()
+  {
+    return own;
+  }
+
+  /**
+   * @param own the own to set
+   * @return this for chaining.
+   */
+  public void setOwn(final boolean own)
+  {
+    this.own = own;
+  }
+
 }

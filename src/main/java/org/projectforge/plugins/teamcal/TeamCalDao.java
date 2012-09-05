@@ -23,12 +23,19 @@
 
 package org.projectforge.plugins.teamcal;
 
+import java.util.List;
+
+import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.QueryFilter;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 
@@ -40,7 +47,7 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_CALENDAR", "plugin15", "plugins.teamcal.calendar");;
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "owner.username", "owner.firstname", "owner.lastname",
-      "fullAccessGroup.name", "readOnlyAccessGroup.name", "minimalAccessGroup.name"};
+    "fullAccessGroup.name", "readOnlyAccessGroup.name", "minimalAccessGroup.name"};
 
   private GroupDao groupDao;
 
@@ -96,5 +103,32 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   public void setUserDao(final UserDao userDao)
   {
     this.userDao = userDao;
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#getList(org.projectforge.core.BaseSearchFilter)
+   */
+  @Override
+  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+  public List<TeamCalDO> getList(final BaseSearchFilter filter)
+  {
+    final TeamCalFilter teamFilter;
+    if (filter instanceof TeamCalFilter) {
+      teamFilter = (TeamCalFilter) filter;
+    } else {
+      teamFilter = new TeamCalFilter(filter);
+      teamFilter.setOwn(true);
+    }
+
+    final QueryFilter queryFilter = new QueryFilter(teamFilter);
+
+    if (teamFilter.isOwn() == false) {
+      return getList(queryFilter);
+    } else {
+      final PFUserDO user = new PFUserDO();
+      user.setId(teamFilter.getOwnerId());
+      queryFilter.add(Restrictions.eq("owner", user));
+      return getList(queryFilter);
+    }
   }
 }
