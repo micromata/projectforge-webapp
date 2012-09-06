@@ -109,8 +109,8 @@ public class LoginDefaultHandler implements LoginHandler
     }
     if (user != null) {
       log.info("User with valid username/password: " + username + "/" + encryptedPassword);
-      if (user.isDeleted() == true) {
-        log.info("User has no system access (is deleted): " + user.getDisplayUsername());
+      if (user.hasSystemAccess() == false) {
+        log.info("User has no system access (is deleted/deactivated): " + user.getDisplayUsername());
         return loginResult.setLoginResultStatus(LoginResultStatus.LOGIN_EXPIRED);
       } else {
         return loginResult.setLoginResultStatus(LoginResultStatus.SUCCESS).setUser(user);
@@ -144,10 +144,10 @@ public class LoginDefaultHandler implements LoginHandler
   public boolean checkStayLogin(final PFUserDO user)
   {
     final PFUserDO dbUser = userDao.getUserGroupCache().getUser(user.getId());
-    if (dbUser != null && dbUser.isDeleted() == false) {
+    if (dbUser != null && dbUser.hasSystemAccess() == true) {
       return true;
     }
-    log.warn("User is deleted, stay-logged-in denied for the given user: " + user);
+    log.warn("User is deleted/deactivated, stay-logged-in denied for the given user: " + user);
     return false;
   }
 
