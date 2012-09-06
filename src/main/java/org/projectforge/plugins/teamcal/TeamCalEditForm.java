@@ -23,6 +23,8 @@ import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
+import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
+import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
@@ -155,6 +157,42 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
         minimalAccess.setEnabled(false);
       //      fsAccess.add(fsMinimal);
     }
+
+    // ABO CHECK
+    {
+      final FieldsetPanel fs = gridBuilder.newFieldset("ABO").setLabelFor(this);//getString("plugins.teamcal.abo"));
+      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
+
+      @SuppressWarnings("serial")
+      final CheckBoxPanel abo = new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(this, "abo"), "ABO", true) {
+
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged()
+         */
+        @Override
+        protected void onSelectionChanged(final Boolean newSelection)
+        {
+          if (Boolean.TRUE.equals(newSelection) == true) {
+            data.getAboUsers().add(getUser());
+          } else {
+            data.getAboUsers().remove(data);
+          }
+        }
+      };
+      ;
+      checkBoxPanel.add(abo);
+
+
+    }
+  }
+
+  /**
+   * @see org.apache.wicket.markup.html.form.Form#onSubmit()
+   */
+  @Override
+  protected void onSubmit()
+  {
+    super.onSubmit();
   }
 
   private boolean accessCheck(final GroupDO group) {
@@ -282,5 +320,4 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   {
     return log;
   }
-
 }
