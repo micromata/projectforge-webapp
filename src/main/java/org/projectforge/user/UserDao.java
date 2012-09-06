@@ -174,7 +174,7 @@ public class UserDao extends BaseDao<PFUserDO>
   }
 
   /**
-   * @return false, if no admin user and the context user is not at minimum in one groups assigned to the given user or false. Also deleted
+   * @return false, if no admin user and the context user is not at minimum in one groups assigned to the given user or false. Also deleted and deactivated
    *         users are only visible for admin users.
    * @see org.projectforge.core.BaseDao#hasSelectAccess(org.projectforge.core.BaseDO, boolean)
    * @see AccessChecker#areUsersInSameGroup(PFUserDO, PFUserDO)
@@ -184,7 +184,7 @@ public class UserDao extends BaseDao<PFUserDO>
   {
     boolean result = accessChecker.isUserMemberOfAdminGroup(user)
         || accessChecker.isUserMemberOfGroup(user, ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
-    if (result == false && obj.isDeleted() == false) {
+    if (result == false && obj.hasSystemAccess() == true) {
       result = accessChecker.areUsersInSameGroup(user, obj);
     }
     if (throwException == true && result == false) {
@@ -237,8 +237,8 @@ public class UserDao extends BaseDao<PFUserDO>
       user.setLoginFailures(0);
       user.setMinorChange(true); // Avoid re-indexing of all dependent objects.
       internalUpdate(user);
-      if (user.isDeleted() == true) {
-        log.warn("Deleted user tried to login: " + user);
+      if (user.hasSystemAccess() == false) {
+        log.warn("Deleted/deactivated user tried to login: " + user);
         return null;
       }
       final PFUserDO contextUser = new PFUserDO();
@@ -277,8 +277,8 @@ public class UserDao extends BaseDao<PFUserDO>
     if (list != null && list.isEmpty() == false && list.get(0) != null) {
       user = list.get(0);
     }
-    if (user != null && user.isDeleted() == true) {
-      log.warn("Deleted user tried to login (via stay-logged-in): " + user);
+    if (user != null && user.hasSystemAccess() == false) {
+      log.warn("Deleted/deactivated user tried to login (via stay-logged-in): " + user);
       return null;
     }
     return user;
@@ -400,7 +400,7 @@ public class UserDao extends BaseDao<PFUserDO>
     if (list != null && list.isEmpty() == false && list.get(0) != null) {
       user = list.get(0);
     }
-    if (user != null && user.isDeleted() == true) {
+    if (user != null && user.hasSystemAccess() == false) {
       log.warn("Deleted user tried to login (via authentication token): " + user);
       return null;
     }

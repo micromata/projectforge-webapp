@@ -90,6 +90,10 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private String password;
 
+  private boolean localUser;
+
+  private boolean deactivated;
+
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String firstname;
 
@@ -752,6 +756,53 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   {
     this.hrPlanning = hrPlanning;
     return this;
+  }
+
+  /**
+   * @return the localUser
+   */
+  @Column(name = "local_user", nullable = false)
+  public boolean isLocalUser()
+  {
+    return localUser;
+  }
+
+  /**
+   * @param localUser the localUser to set
+   * @return this for chaining.
+   */
+  public PFUserDO setLocalUser(final boolean localUser)
+  {
+    this.localUser = localUser;
+    return this;
+  }
+
+  /**
+   * A deactivated user has no more system access.
+   * @return the deactivated
+   */
+  @Column(nullable = false)
+  public boolean isDeactivated()
+  {
+    return deactivated;
+  }
+
+  /**
+   * @param deactivated the deactivated to set
+   * @return this for chaining.
+   */
+  public PFUserDO setDeactivated(final boolean deactivated)
+  {
+    this.deactivated = deactivated;
+    return this;
+  }
+
+  /**
+   * @return true only and only if the user isn't either deleted nor deactivated, otherwise false.
+   */
+  @Transient
+  public boolean hasSystemAccess() {
+    return isDeleted() == false && isDeactivated() == false;
   }
 
   @Transient
