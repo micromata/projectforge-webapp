@@ -39,6 +39,7 @@ import org.projectforge.fibu.KundeDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.task.TaskDO;
+import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 
@@ -54,14 +55,16 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 4.2
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.2", "2012-08-09", "Adds t_pf_user.authenticationToken.") {
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.2", "2012-08-09", "Adds t_pf_user.authenticationToken|local_user|deactivated, t_group.local_group.") {
       final Table userTable = new Table(PFUserDO.class);
+      final Table groupTable = new Table(GroupDO.class);
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
-        return dao.doesTableAttributesExist(userTable, "authenticationToken") == true //
+        return dao.doesTableAttributesExist(userTable, "authenticationToken", "localUser", "deactivated") == true //
+            && dao.doesTableAttributesExist(groupTable, "localGroup") == true
             ? UpdatePreCheckStatus.ALREADY_UPDATED
                 : UpdatePreCheckStatus.OK;
       }
@@ -72,6 +75,15 @@ public class DatabaseCoreUpdates
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         if (dao.doesTableAttributesExist(userTable, "authenticationToken") == false) {
           dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "authenticationToken"));
+        }
+        if (dao.doesTableAttributesExist(userTable, "localUser") == false) {
+          dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "localUser").setDefaultValue("false"));
+        }
+        if (dao.doesTableAttributesExist(userTable, "deactivated") == false) {
+          dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "deactivated").setDefaultValue("false"));
+        }
+        if (dao.doesTableAttributesExist(groupTable, "localGroup") == false) {
+          dao.addTableAttributes(groupTable, new TableAttribute(GroupDO.class, "localGroup").setDefaultValue("false"));
         }
         return UpdateRunningStatus.DONE;
       }
