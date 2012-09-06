@@ -481,6 +481,20 @@ public class BeanHelper
   @SuppressWarnings("unchecked")
   public static boolean copyProperties(final Object src, final Object dest, final String... properties)
   {
+    return copyProperties(src, dest, false, properties);
+  }
+
+  /**
+   * Copies all properties from src object to dest object.
+   * @param src
+   * @param dest
+   * @param whitespaceEqualsNull If true than a String modification from null to "" and vice versa will be ignored.
+   * @param properties
+   * @return true if any property is different between src and dest object.
+   */
+  @SuppressWarnings("unchecked")
+  public static boolean copyProperties(final Object src, final Object dest, final boolean whitespaceEqualsNull, final String... properties)
+  {
     boolean modified = false;
     for (final String property : properties) {
       final Object srcValue = BeanHelper.getProperty(src, property);
@@ -501,8 +515,16 @@ public class BeanHelper
         }
       } else {
         if (ObjectUtils.equals(srcValue, destValue) == false) {
-          BeanHelper.setProperty(dest, property, srcValue);
-          modified = true;
+          if (whitespaceEqualsNull == true && (srcValue instanceof String || destValue instanceof String)) {
+            if (StringUtils.isEmpty((String)srcValue) == false || StringUtils.isEmpty((String)destValue) == false) {
+              // Do not copy this property if srcValue and destValue are empty ("" or null):
+              BeanHelper.setProperty(dest, property, srcValue);
+              modified = true;
+            }
+          } else {
+            BeanHelper.setProperty(dest, property, srcValue);
+            modified = true;
+          }
         }
       }
     }
