@@ -70,6 +70,8 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String name;
 
+  private boolean localGroup;
+
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String organization;
 
@@ -154,6 +156,26 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public void setName(final String name)
   {
     this.name = name;
+  }
+
+  /**
+   * A local group will not be published or shared with any external user management system (such as LDAP).
+   * @return the localGroup
+   */
+  @Column(name = "local_group", nullable = false)
+  public boolean isLocalGroup()
+  {
+    return localGroup;
+  }
+
+  /**
+   * @param localGroup the localGroup to set
+   * @return this for chaining.
+   */
+  public GroupDO setLocalGroup(final boolean localGroup)
+  {
+    this.localGroup = localGroup;
+    return this;
   }
 
   @Column(length = 100)
