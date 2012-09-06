@@ -30,7 +30,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.projectforge.test.TestBase;
-import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
 
@@ -41,13 +40,12 @@ public class LdapMasterLoginHandlerTest extends TestBase
   {
     final String userBase = "ou=users";
     final LdapUserDao ldapUserDao = mock(LdapUserDao.class);
-    final LoginResult loginResult;
-
     final LdapMasterLoginHandler loginHandler = new LdapMasterLoginHandler();
     loginHandler.ldapConfig = new LdapConfig().setUserBase(userBase);
     loginHandler.userDao = userDao;
-    loginHandler.initialize();
     loginHandler.ldapUserDao = ldapUserDao;
+    loginHandler.ldapOrganizationalUnitDao = mock(LdapOrganizationalUnitDao.class);
+    loginHandler.initialize();
 
     userDao.internalSave(new PFUserDO().setUsername("kai").setPassword(userDao.encryptPassword("successful")).setFirstname("Kai").setLastname("Reinhard"));
     Assert.assertEquals(LoginResultStatus.SUCCESS, loginHandler.checkLogin("kai", "successful").getLoginResultStatus());

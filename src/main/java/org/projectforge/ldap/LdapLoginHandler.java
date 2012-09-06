@@ -65,18 +65,27 @@ public abstract class LdapLoginHandler implements LoginHandler
   @Override
   public void initialize()
   {
-    this.ldapConfig = ConfigXml.getInstance().getLdapConfig();
-    if (ldapConfig == null || ldapConfig.getServer() == null) {
-      log.warn("No LDAP configured in config.xml, so any login will be impossible!");
+    if (ldapConfig == null) {
+      // May-be already set by test class.
+      this.ldapConfig = ConfigXml.getInstance().getLdapConfig();
+      if (ldapConfig == null || ldapConfig.getServer() == null) {
+        log.warn("No LDAP configured in config.xml, so any login will be impossible!");
+      }
     }
     userBase = ldapConfig.getUserBase();
     ldapConnector = new LdapConnector(ldapConfig);
     ldapGroupDao = new LdapGroupDao();
     ldapGroupDao.ldapConnector = ldapConnector;
-    ldapUserDao = new LdapUserDao();
-    ldapUserDao.ldapConnector = ldapConnector;
-    ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
-    ldapOrganizationalUnitDao.ldapConnector = ldapConnector;
+    if (ldapUserDao == null) {
+      // May-be already set by test class.
+      ldapUserDao = new LdapUserDao();
+      ldapUserDao.ldapConnector = ldapConnector;
+    }
+    if (ldapOrganizationalUnitDao == null) {
+      // May-be already set by test class.
+      ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
+      ldapOrganizationalUnitDao.ldapConnector = ldapConnector;
+    }
     final Registry registry = Registry.instance();
     userDao = (UserDao) registry.getDao(UserDao.class);
     accessChecker = UserRights.getAccessChecker();
