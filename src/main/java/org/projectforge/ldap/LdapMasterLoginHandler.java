@@ -25,6 +25,8 @@ package org.projectforge.ldap;
 
 import java.util.List;
 
+import javax.naming.NameNotFoundException;
+
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.LoginResult;
@@ -43,8 +45,6 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapMasterLoginHandler.class);
 
-  private String deactivatedOu;
-
   /**
    * @see org.projectforge.ldap.LdapLoginHandler#initialize()
    */
@@ -52,9 +52,8 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
   public void initialize()
   {
     super.initialize();
-    // ldapOrganizationalUnitDao.createIfNotExist(ldapConfig.getUserBase(), "ProjectForge's user base.");
-    // deactivatedOu = LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, ldapConfig.getUserBase());
-    // ldapOrganizationalUnitDao.createIfNotExist(deactivatedOu, "ProjectForge's user base for deactivated users.");
+    ldapOrganizationalUnitDao.createIfNotExist(userBase, "ProjectForge's user base.");
+    ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.DEACTIVATED_SUB_CONTEXT, "ProjectForge's user base for deactivated users.", userBase);
   }
 
   /**
@@ -68,13 +67,12 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
       return loginResult;
     }
     // User is now logged-in successfully.
-    final String organizationalUnits = ldapConfig.getUserBase();
-    final boolean authenticated = ldapUserDao.authenticate(username, password, organizationalUnits);
+    final boolean authenticated = ldapUserDao.authenticate(username, password, userBase);
     if (authenticated == false) {
       log.info("User's credentials in LDAP not up-to-date: " + username + ". Updating LDAP entry...");
       final PFUserDO user = loginResult.getUser();
       final LdapPerson ldapUser = PFUserDOConverter.convert(user);
-      ldapUser.setOrganizationalUnit(organizationalUnits);
+      ldapUser.setOrganizationalUnit(userBase);
       ldapUserDao.createOrUpdate(ldapUser);
       ldapUserDao.changePassword(ldapUser, null, user.getPassword());
     }
@@ -98,24 +96,42 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
   public List<PFUserDO> getAllUsers()
   {
     final List<PFUserDO> users = loginDefaultHandler.getAllUsers();
-    final List<LdapPerson> ldapUsers = getAllLdapUsers();
-    for (final PFUserDO user : users) {
-      try {
-        final LdapPerson updatedLdapUser = PFUserDOConverter.convert(user);
-        updatedLdapUser.setOrganizationalUnit(ldapConfig.getUserBase());
-        final LdapPerson ldapUser = getLdapUser(ldapUsers, user);
-        if (ldapUser == null) {
-          ldapUserDao.create(updatedLdapUser);
-        } else {
-          final boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
-          if (modified == true) {
-            ldapUserDao.createOrUpdate(updatedLdapUser);
+    new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        // First, get set of all ldap entries:
+        final List<LdapPerson> ldapUsers = getAllLdapUsers(ctx);
+        final SetOfAllLdapObjects setOfAllLdapObjects = ldapUserDao.getSetOfAllObjects();
+        for (final PFUserDO user : users) {
+          try {
+            final LdapPerson updatedLdapUser = PFUserDOConverter.convert(user);
+            updatedLdapUser.setOrganizationalUnit(userBase);
+            final LdapPerson ldapUser = getLdapUser(ldapUsers, user);
+            if (ldapUser == null) {
+              if (user.isDeleted() == false) {
+                // Do not add deleted users.
+                ldapUserDao.create(ctx, updatedLdapUser);
+                ldapUserDao.updateActivatedStatus(ctx, updatedLdapUser);
+              }
+            } else {
+              if (user.isDeleted() == true) {
+                ldapUserDao.delete(ctx, updatedLdapUser);
+              } else {
+                final boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
+                if (modified == true) {
+                  ldapUserDao.createOrUpdate(ctx, setOfAllLdapObjects, updatedLdapUser);
+                  ldapUserDao.updateActivatedStatus(ctx, updatedLdapUser);
+                }
+              }
+            }
+          } catch (final Exception ex) {
+            log.error("Error while proceeding user '" + user.getUsername() + "'. Continuing with next user.", ex);
           }
         }
-      } catch (final Exception ex) {
-        log.error("Error while proceeding user '" + user.getUsername() + "'. Continuing with next user.", ex);
+        return null;
       }
-    }
+    }.excecute();
     return users;
   }
 

@@ -65,8 +65,8 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
     } else {
       PFUserDOConverter.copyUserFields(PFUserDOConverter.convert(ldapUser), user);
       userDao.internalUpdate(user);
-      if (user.isDeleted() == true) {
-        log.info("User has no system access (is deleted): " + user.getDisplayUsername());
+      if (user.hasSystemAccess() == false) {
+        log.info("User has no system access (is deleted/deactivated): " + user.getDisplayUsername());
         return loginResult.setLoginResultStatus(LoginResultStatus.LOGIN_EXPIRED);
       }
     }
@@ -102,7 +102,7 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
     for (final LdapPerson ldapUser : ldapUsers) {
       users.add(PFUserDOConverter.convert(ldapUser));
     }
-    final List<PFUserDO> dbUsers = userDao.internalLoadAll();
+    //final List<PFUserDO> dbUsers = userDao.internalLoadAll();
     // TODO: synchronize
     return users;
   }

@@ -25,6 +25,9 @@ package org.projectforge.ldap;
 
 import java.util.List;
 
+import javax.naming.NamingException;
+import javax.naming.directory.DirContext;
+
 import org.projectforge.access.AccessChecker;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.registry.Registry;
@@ -54,6 +57,8 @@ public abstract class LdapLoginHandler implements LoginHandler
 
   protected LoginDefaultHandler loginDefaultHandler;
 
+  protected String userBase;
+
   /**
    * @see org.projectforge.user.LoginHandler#initialize()
    */
@@ -62,8 +67,9 @@ public abstract class LdapLoginHandler implements LoginHandler
   {
     this.ldapConfig = ConfigXml.getInstance().getLdapConfig();
     if (ldapConfig == null || ldapConfig.getServer() == null) {
-      log.warn("No LDAP configured in config.xml, so any login won't be possible!");
+      log.warn("No LDAP configured in config.xml, so any login will be impossible!");
     }
+    userBase = ldapConfig.getUserBase();
     ldapConnector = new LdapConnector(ldapConfig);
     ldapGroupDao = new LdapGroupDao();
     ldapGroupDao.ldapConnector = ldapConnector;
@@ -97,6 +103,13 @@ public abstract class LdapLoginHandler implements LoginHandler
   {
     final String organizationalUnits = ldapConfig.getUserBase();
     final List<LdapPerson> ldapUsers = ldapUserDao.findAll(organizationalUnits);
+    return ldapUsers;
+  }
+
+  protected List<LdapPerson> getAllLdapUsers(final DirContext ctx) throws NamingException
+  {
+    final String organizationalUnits = ldapConfig.getUserBase();
+    final List<LdapPerson> ldapUsers = ldapUserDao.findAll(ctx, organizationalUnits);
     return ldapUsers;
   }
 

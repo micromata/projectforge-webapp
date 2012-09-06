@@ -57,8 +57,11 @@ public class PFUserDOConverter
         }
       }
     }
-    if (person.isDeleted() == true || LdapUserDao.isDeactivated(person) == true) {
+    if (person.isDeleted() == true) {
       user.setDeleted(true);
+    }
+    if (person.isDeactivated() == true || LdapUserDao.isDeactivated(person) == true) {
+      user.setDeactivated(true);
     }
     return user;
   }
@@ -92,7 +95,8 @@ public class PFUserDOConverter
    */
   public static boolean copyUserFields(final PFUserDO src, final PFUserDO dest)
   {
-    final boolean modified = BeanHelper.copyProperties(src, dest, "username", "firstname", "lastname", "email", "description", "organization");
+    final boolean modified = BeanHelper.copyProperties(src, dest, true, "username", "firstname", "lastname", "email", "description",
+        "organization");
     return modified;
   }
 
@@ -104,7 +108,8 @@ public class PFUserDOConverter
    */
   public static boolean copyUserFields(final LdapPerson src, final LdapPerson dest)
   {
-    final boolean modified = BeanHelper.copyProperties(src, dest, "uid", "givenName", "surname", "mail", "description", "organization");
+    final boolean modified = BeanHelper.copyProperties(src, dest, true, "uid", "givenName", "surname", "mail", "description",
+        "organization");
     return modified;
   }
 }

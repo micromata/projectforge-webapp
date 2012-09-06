@@ -103,7 +103,7 @@ public class LdapOrganizationalUnitDao
     final SearchControls controls = new SearchControls();
     controls.setSearchScope(SearchControls.ONELEVEL_SCOPE);
     final String searchBase = LdapUtils.getOu(organizationalUnits);
-    results = ctx.search(searchBase, "(&(objectClass=" + OBJECT_CLASS + ")(ou=" + ou + "))", controls);
+    results = ctx.search(searchBase, "(&(objectClass=" + OBJECT_CLASS + ")(" + LdapUtils.getOu(ou) + "))", controls);
     return results.hasMore() == true;
   }
 

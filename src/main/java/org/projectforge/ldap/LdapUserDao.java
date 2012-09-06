@@ -25,6 +25,7 @@ package org.projectforge.ldap;
 
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.BasicAttribute;
 import javax.naming.directory.DirContext;
@@ -49,7 +50,9 @@ public class LdapUserDao extends LdapPersonDao
 
   public static boolean isDeactivated(final LdapPerson user)
   {
-    return user.isDeleted() || user.getOrganizationalUnit() != null && LdapUtils.getOu(user.getOrganizationalUnit()).contains(DEACTIVATED_SUB_CONTEXT) == true;
+    return user.isDeactivated()
+        || user.getOrganizationalUnit() != null
+        && LdapUtils.getOu(user.getOrganizationalUnit()).contains(DEACTIVATED_SUB_CONTEXT) == true;
   }
 
   /**
@@ -72,6 +75,18 @@ public class LdapUserDao extends LdapPersonDao
 
   public void deactivateUser(final LdapPerson user)
   {
+    new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        deactivateUser(ctx, user);
+        return null;
+      }
+    }.excecute();
+  }
+
+  public void deactivateUser(final DirContext ctx, final LdapPerson user) throws NamingException
+  {
     log.info("Deactivate user: " + buildDn(user));
     final ModificationItem[] modificationItems;
     short i = 0;
@@ -79,9 +94,9 @@ public class LdapUserDao extends LdapPersonDao
     modificationItems[i++] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userPassword", null));
     modificationItems[i++] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("mail", "deactivated@devnull.com"));
     buildDn(user);
-    modify(user, modificationItems);
+    modify(ctx, user, modificationItems);
     // Move user to the sub-context "deactivated".
-    move(user, LdapUtils.getOu(DEACTIVATED_SUB_CONTEXT, user.getOrganizationalUnit()));
+    move(ctx, user, LdapUtils.getOu(DEACTIVATED_SUB_CONTEXT, user.getOrganizationalUnit()));
   }
 
   /**
@@ -90,6 +105,18 @@ public class LdapUserDao extends LdapPersonDao
    * @param user
    */
   public void reactivateUser(final LdapPerson user)
+  {
+    new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        deactivateUser(ctx, user);
+        return null;
+      }
+    }.excecute();
+  }
+
+  public void reactivateUser(final DirContext ctx,  final LdapPerson user) throws NamingException
   {
     log.info("Reactivate deactivated user: " + buildDn(user));
     final String ou = LdapUtils.getOu(user.getOrganizationalUnit());
@@ -103,7 +130,27 @@ public class LdapUserDao extends LdapPersonDao
     } else {
       newPath = ou.substring(DEACTIVATED_SUB_CONTEXT2.length());
     }
-    move(user, newPath);
+    move(ctx, user, newPath);
+  }
+
+  void updateActivatedStatus(final DirContext ctx, final LdapPerson user) throws NamingException
+  {
+    final String ou = LdapUtils.getOu(user.getOrganizationalUnit());
+    if (user.isDeactivated() == true) {
+      if (ou.startsWith(DEACTIVATED_SUB_CONTEXT2) == true) {
+        // User is already stored in deactivated context. Nothing to be done.
+        return;
+      } else {
+        deactivateUser(ctx, user);
+      }
+    } else {
+      if (ou.startsWith(DEACTIVATED_SUB_CONTEXT2) == false) {
+        // User isn't stored in deactivated context. Nothing to be done.
+        return;
+      } else {
+        reactivateUser(ctx, user);
+      }
+    }
   }
 
   /**

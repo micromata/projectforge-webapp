@@ -66,30 +66,35 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
-        final String dn = buildDn(obj);
-        log.info("Create " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
-        final Attributes attrs = new BasicAttributes();
-        final BasicAttribute ocattr = new BasicAttribute("objectclass");
-        ocattr.add("top");
-        ocattr.add(getObjectClass());
-        final String[] additionalObjectClasses = getAdditionalObjectClasses();
-        if (additionalObjectClasses != null) {
-          for (final String additionalObjectClass : additionalObjectClasses) {
-            ocattr.add(additionalObjectClass);
-          }
-        }
-        attrs.put(ocattr);
-        final ModificationItem[] modificationItems = getModificationItems(obj);
-        for (final ModificationItem modItem : modificationItems) {
-          final Attribute attr = modItem.getAttribute();
-          LdapUtils.putAttribute(attrs, attr.getID(), (String) attr.get());
-        }
-        LdapUtils.putAttribute(attrs, "cn", obj.getCommonName());
-        onBeforeBind(dn, attrs, args);
-        ctx.bind(dn, null, attrs);
+        create(ctx, obj, args);
         return null;
       }
     }.excecute();
+  }
+
+  public void create(final DirContext ctx, final T obj, final Object... args) throws NamingException
+  {
+    final String dn = buildDn(obj);
+    log.info("Create " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
+    final Attributes attrs = new BasicAttributes();
+    final BasicAttribute ocattr = new BasicAttribute("objectclass");
+    ocattr.add("top");
+    ocattr.add(getObjectClass());
+    final String[] additionalObjectClasses = getAdditionalObjectClasses();
+    if (additionalObjectClasses != null) {
+      for (final String additionalObjectClass : additionalObjectClasses) {
+        ocattr.add(additionalObjectClass);
+      }
+    }
+    attrs.put(ocattr);
+    final ModificationItem[] modificationItems = getModificationItems(obj);
+    for (final ModificationItem modItem : modificationItems) {
+      final Attribute attr = modItem.getAttribute();
+      LdapUtils.putAttribute(attrs, attr.getID(), (String) attr.get());
+    }
+    LdapUtils.putAttribute(attrs, "cn", obj.getCommonName());
+    onBeforeBind(dn, attrs, args);
+    ctx.bind(dn, null, attrs);
   }
 
   protected void onBeforeBind(final String dn, final Attributes attrs, final Object... args)
@@ -109,6 +114,18 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
   }
 
   /**
+   * Please do not use this method for bulk updates, use {@link #createOrUpdate(Set, Object, Object...)} instead! Calls
+   * {@link #getSetOfAllObjects()} before creation or update.
+   * @param obj
+   * @throws NamingException
+   * @see #createOrUpdate(Set, Object, Object...)
+   */
+  public void createOrUpdate(final DirContext ctx, final T obj, final Object... args) throws NamingException
+  {
+    createOrUpdate(ctx, getSetOfAllObjects(ctx), obj, args);
+  }
+
+  /**
    * Calls {@link #create(Object)} if the object isn't part of the given set, otherwise {@link #update(Object)}.
    * @param setOfAllLdapObjects List generated before via {@link #getSetOfAllObjects()}.
    * @param obj
@@ -122,9 +139,30 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     }
   }
 
+  /**
+   * Calls {@link #create(Object)} if the object isn't part of the given set, otherwise {@link #update(Object)}.
+   * @param setOfAllLdapObjects List generated before via {@link #getSetOfAllObjects()}.
+   * @param obj
+   * @throws NamingException
+   */
+  public void createOrUpdate(final DirContext ctx, final SetOfAllLdapObjects setOfAllLdapObjects, final T obj, final Object... args)
+      throws NamingException
+      {
+    if (setOfAllLdapObjects.contains(obj, buildDn(obj)) == true) {
+      update(ctx, obj, args);
+    } else {
+      create(ctx, obj, args);
+    }
+      }
+
   public void update(final T obj, final Object... objs)
   {
     modify(obj, getModificationItems(obj));
+  }
+
+  public void update(final DirContext ctx, final T obj, final Object... objs) throws NamingException
+  {
+    modify(ctx, obj, getModificationItems(obj));
   }
 
   protected abstract ModificationItem[] getModificationItems(final T obj);
@@ -171,11 +209,12 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
       if (StringUtils.isEmpty(attrValue) == true && added == true) {
         continue;
       }
+      final String val = StringUtils.isEmpty(attrValue) == true ? null : attrValue;
       if (added == false) {
-        list.add(createModificationItem(DirContext.REPLACE_ATTRIBUTE, attrId, attrValue));
+        list.add(createModificationItem(DirContext.REPLACE_ATTRIBUTE, attrId, val));
         added = true;
       } else {
-        list.add(createModificationItem(DirContext.ADD_ATTRIBUTE, attrId, attrValue));
+        list.add(createModificationItem(DirContext.ADD_ATTRIBUTE, attrId, val));
       }
     }
   }
@@ -186,27 +225,32 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
-        final Object id = getId(obj);
-        // The dn is may-be changed, so find the original dn by id:
-        final T origObject = findById(id, obj.getOrganizationalUnit());
-        if (origObject == null) {
-          throw new RuntimeException("Object with id "
-              + id
-              + " not found in search base '"
-              + StringHelper.listToString(",", obj.getOrganizationalUnit())
-              + "'. Can't modify the object: "
-              + obj);
-        }
-        final String dn = origObject.getDn();
-        log.info("Modify attributes of " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
-        ctx.modifyAttributes(dn, modificationItems);
-        if (StringUtils.equals(dn, obj.getDn()) == false) {
-          log.info("DN of object is changed from '" + dn + "' to '" + obj.getDn());
-          ctx.rename(dn, obj.getDn());
-        }
+        modify(ctx, obj, modificationItems);
         return null;
       }
     }.excecute();
+  }
+
+  public void modify(final DirContext ctx, final T obj, final ModificationItem[] modificationItems) throws NamingException
+  {
+    final Object id = getId(obj);
+    // The dn is may-be changed, so find the original dn by id:
+    final T origObject = findById(ctx, id, obj.getOrganizationalUnit());
+    if (origObject == null) {
+      throw new RuntimeException("Object with id "
+          + id
+          + " not found in search base '"
+          + StringHelper.listToString(",", obj.getOrganizationalUnit())
+          + "'. Can't modify the object: "
+          + obj);
+    }
+    final String dn = origObject.getDn();
+    log.info("Modify attributes of " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
+    ctx.modifyAttributes(dn, modificationItems);
+    if (StringUtils.equals(dn, obj.getDn()) == false) {
+      log.info("DN of object is changed from '" + dn + "' to '" + obj.getDn());
+      ctx.rename(dn, obj.getDn());
+    }
   }
 
   public void move(final T obj, final String... newOrganizationalUnits)
@@ -215,26 +259,31 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
-        final Object id = getId(obj);
-        // The dn is may-be changed, so find the original dn by id:
-        final T origObject = findById(id, obj.getOrganizationalUnit());
-        if (origObject == null) {
-          throw new RuntimeException("Object with id "
-              + id
-              + " not found in search base '"
-              + StringHelper.listToString(",", obj.getOrganizationalUnit())
-              + "'. Can't modify the object: "
-              + obj);
-        }
-        final String ou = LdapUtils.getOu(newOrganizationalUnits);
-        final String origOu = LdapUtils.getOu(origObject.getOrganizationalUnit());
-        if (StringUtils.equals(origOu, ou) == false) {
-          log.info("Move object with id '" + obj.getId() + "' from changed from '" + origOu + "' to '" + ou);
-          ctx.rename("cn=" + obj.getCommonName() + "," + origOu, "cn=" + obj.getCommonName() + "," + ou);
-        }
+        move(ctx, obj, newOrganizationalUnits);
         return null;
       }
     }.excecute();
+  }
+
+  public void move(final DirContext ctx, final T obj, final String... newOrganizationalUnits) throws NamingException
+  {
+    final Object id = getId(obj);
+    // The dn is may-be changed, so find the original dn by id:
+    final T origObject = findById(id, obj.getOrganizationalUnit());
+    if (origObject == null) {
+      throw new RuntimeException("Object with id "
+          + id
+          + " not found in search base '"
+          + StringHelper.listToString(",", obj.getOrganizationalUnit())
+          + "'. Can't modify the object: "
+          + obj);
+    }
+    final String ou = LdapUtils.getOu(newOrganizationalUnits);
+    final String origOu = LdapUtils.getOu(origObject.getOrganizationalUnit());
+    if (StringUtils.equals(origOu, ou) == false) {
+      log.info("Move object with id '" + obj.getId() + "' from changed from '" + origOu + "' to '" + ou);
+      ctx.rename("cn=" + obj.getCommonName() + "," + origOu, "cn=" + obj.getCommonName() + "," + ou);
+    }
   }
 
   protected String getLogInfo(final T obj)
@@ -253,36 +302,46 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
-        final String dn = buildDn(obj);
-        log.info("Delete " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
-        ctx.unbind(dn);
+        delete(ctx, obj);
         return null;
       }
     }.excecute();
   }
 
+  public void delete(final DirContext ctx, final T obj) throws NamingException
+  {
+    final String dn = buildDn(obj);
+    log.info("Delete " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
+    ctx.unbind(dn);
+  }
+
   @SuppressWarnings("unchecked")
-  public List<T> findAll(final String... organizationalUnit)
+  public List<T> findAll(final String... organizationalUnits)
   {
     return (List<T>) new LdapTemplate(ldapConnector) {
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
-        final LinkedList<T> list = new LinkedList<T>();
-        NamingEnumeration< ? > results = null;
-        final SearchControls controls = new SearchControls();
-        controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        final String searchBase = LdapUtils.getOu(organizationalUnit);
-        results = ctx.search(searchBase, "(objectclass=" + getObjectClass() + ")", controls);
-        while (results.hasMore()) {
-          final SearchResult searchResult = (SearchResult) results.next();
-          final String dn = searchResult.getName();
-          final Attributes attributes = searchResult.getAttributes();
-          list.add(mapToObject(dn, searchBase, attributes));
-        }
-        return list;
+        return findAll(ctx, organizationalUnits);
       }
     }.excecute();
+  }
+
+  public List<T> findAll(final DirContext ctx, final String... organizationalUnits) throws NamingException
+  {
+    final LinkedList<T> list = new LinkedList<T>();
+    NamingEnumeration< ? > results = null;
+    final SearchControls controls = new SearchControls();
+    controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+    final String searchBase = LdapUtils.getOu(organizationalUnits);
+    results = ctx.search(searchBase, "(objectclass=" + getObjectClass() + ")", controls);
+    while (results.hasMore()) {
+      final SearchResult searchResult = (SearchResult) results.next();
+      final String dn = searchResult.getName();
+      final Attributes attributes = searchResult.getAttributes();
+      list.add(mapToObject(dn, searchBase, attributes));
+    }
+    return list;
   }
 
   @SuppressWarnings("unchecked")
@@ -292,23 +351,28 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
-        NamingEnumeration< ? > results = null;
-        final SearchControls controls = new SearchControls();
-        controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        final String searchBase = LdapUtils.getOu(organizationalUnits);
-        results = ctx.search(searchBase, "(&(objectClass=" + getObjectClass() + ")(" + getIdAttrId() + "=" + id + "))", controls);
-        if (results.hasMore() == false) {
-          return null;
-        }
-        final SearchResult searchResult = (SearchResult) results.next();
-        final String dn = searchResult.getName();
-        final Attributes attributes = searchResult.getAttributes();
-        if (results.hasMore() == true) {
-          log.error("Oups, found entries with multiple id's: " + getObjectClass() + "." + id);
-        }
-        return mapToObject(dn, searchBase, attributes);
+        return findById(ctx, id, organizationalUnits);
       }
     }.excecute();
+  }
+
+  public T findById(final DirContext ctx, final Object id, final String... organizationalUnits) throws NamingException
+  {
+    NamingEnumeration< ? > results = null;
+    final SearchControls controls = new SearchControls();
+    controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+    final String searchBase = LdapUtils.getOu(organizationalUnits);
+    results = ctx.search(searchBase, "(&(objectClass=" + getObjectClass() + ")(" + getIdAttrId() + "=" + id + "))", controls);
+    if (results.hasMore() == false) {
+      return null;
+    }
+    final SearchResult searchResult = (SearchResult) results.next();
+    final String dn = searchResult.getName();
+    final Attributes attributes = searchResult.getAttributes();
+    if (results.hasMore() == true) {
+      log.error("Oups, found entries with multiple id's: " + getObjectClass() + "." + id);
+    }
+    return mapToObject(dn, searchBase, attributes);
   }
 
   /**
@@ -318,6 +382,23 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
   {
     final SetOfAllLdapObjects set = new SetOfAllLdapObjects();
     final List<T> all = findAll();
+    for (final T obj : all) {
+      if (log.isDebugEnabled() == true) {
+        log.debug("Adding: " + obj.getDn());
+      }
+      set.add(obj);
+    }
+    return set;
+  }
+
+  /**
+   * Set of all objects (the string is built from the method {@link #buildDn(Object)}).
+   * @throws NamingException
+   */
+  public SetOfAllLdapObjects getSetOfAllObjects(final DirContext ctx, final String... organizationalUnits) throws NamingException
+  {
+    final SetOfAllLdapObjects set = new SetOfAllLdapObjects();
+    final List<T> all = findAll(ctx, organizationalUnits);
     for (final T obj : all) {
       if (log.isDebugEnabled() == true) {
         log.debug("Adding: " + obj.getDn());
