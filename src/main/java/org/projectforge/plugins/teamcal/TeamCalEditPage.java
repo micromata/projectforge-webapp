@@ -9,9 +9,13 @@
 
 package org.projectforge.plugins.teamcal;
 
+import net.ftlines.wicket.fullcalendar.EventSource;
+
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.web.calendar.MyFullCalendar;
+import org.projectforge.web.calendar.MyFullCalendarConfig;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
@@ -38,6 +42,28 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
   {
     super(parameters, "plugins.teamcal");
     init();
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#init()
+   */
+  @Override
+  protected void init()
+  {
+    super.init();
+    final MyFullCalendarConfig config = new MyFullCalendarConfig(this);
+    config.setSelectable(true);
+    config.setSelectHelper(true);
+    config.setLoading("function(bool) { if (bool) $(\"#loading\").show(); else $(\"#loading\").hide(); }");
+    config.setAllDaySlot(true);
+    final MyFullCalendar myCalendar = new MyFullCalendar("calendar", config);
+    getForm().add(myCalendar);
+    myCalendar.setMarkupId("calendar");
+    final EventSource eventSource = new EventSource();
+    final TeamCalEventProvider eventProvider = new TeamCalEventProvider(this, teamCalDao);
+    eventSource.setEventsProvider(eventProvider);
+    eventSource.setEditable(true);
+    config.add(eventSource);
   }
 
   /**

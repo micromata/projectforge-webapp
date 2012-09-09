@@ -47,6 +47,9 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
   private boolean access = false;
 
+  @SuppressWarnings("unused")
+  private boolean abo;
+
   /**
    * @param parentPage
    * @param data
