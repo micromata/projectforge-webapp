@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.teamcal;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -79,6 +80,7 @@ public class TeamCalDO extends DefaultBaseDO
   private String description;
 
   public TeamCalDO(){
+    this.aboUsers = new HashSet<PFUserDO>();
   }
 
   @Column(length = Constants.LENGTH_TITLE)
