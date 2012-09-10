@@ -23,8 +23,6 @@ import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
-import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
-import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
@@ -46,9 +44,6 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   private UserGroupCache userGroupCache;
 
   private boolean access = false;
-
-  @SuppressWarnings("unused")
-  private boolean abo;
 
   /**
    * @param parentPage
@@ -121,10 +116,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
     }
 
     // set access groups
-    gridBuilder.newGrid8(getString("plugins.teamcal.access.title"));
+    gridBuilder.newGrid8();
     {
-      //      final FieldsetPanel fsAccess = gridBuilder.newFieldset(getString("plugins.teamcal.access.title"), true);
-
       // set full access group chooser
       final FieldsetPanel fsFullAccess = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), true);
       final PropertyModel<GroupDO> model = new PropertyModel<GroupDO>(data, "fullAccessGroup");
@@ -135,7 +128,6 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       fullAccess.init();
       if (access == false)
         fullAccess.setEnabled(false);
-      //      fsAccess.add(fsFullAccess);
 
       // set read-only access chooser
       final FieldsetPanel fsReadOnly = gridBuilder.newFieldset(getString("plugins.teamcal.readOnlyAccess"), true);
@@ -146,7 +138,6 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       readOnly.init();
       if (access == false)
         readOnly.setEnabled(false);
-      //      fsAccess.add(fsReadOnly);
 
       // set minimal access chooser
       final FieldsetPanel fsMinimal = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess"), true);
@@ -158,44 +149,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       minimalAccess.init();
       if (access == false)
         minimalAccess.setEnabled(false);
-      //      fsAccess.add(fsMinimal);
     }
-
-    // ABO CHECK
-    {
-      final FieldsetPanel fs = gridBuilder.newFieldset("ABO").setLabelFor(this);//getString("plugins.teamcal.abo"));
-      final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-
-      @SuppressWarnings("serial")
-      final CheckBoxPanel abo = new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(this, "abo"), "ABO", true) {
-
-        /**
-         * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged()
-         */
-        @Override
-        protected void onSelectionChanged(final Boolean newSelection)
-        {
-          if (Boolean.TRUE.equals(newSelection) == true) {
-            data.getAboUsers().add(getUser());
-          } else {
-            data.getAboUsers().remove(data);
-          }
-        }
-      };
-      ;
-      checkBoxPanel.add(abo);
-
-
-    }
-  }
-
-  /**
-   * @see org.apache.wicket.markup.html.form.Form#onSubmit()
-   */
-  @Override
-  protected void onSubmit()
-  {
-    super.onSubmit();
   }
 
   private boolean accessCheck(final GroupDO group) {

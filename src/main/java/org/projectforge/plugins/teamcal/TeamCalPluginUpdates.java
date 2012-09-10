@@ -29,7 +29,6 @@ import org.projectforge.admin.UpdatePreCheckStatus;
 import org.projectforge.admin.UpdateRunningStatus;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.Table;
-import org.projectforge.plugins.todo.ToDoPlugin;
 
 /**
  * Contains the initial data-base set-up script and later all update scripts if any data-base schema updates are required by any later
@@ -60,15 +59,15 @@ public class TeamCalPluginUpdates
       {
         final Table calendarTable = new Table(TeamCalDO.class);
         final Table eventTable = new Table(TeamEventDO.class);
-        // Create initial data-base table:
+        //         Create initial data-base table:
         if (dao.doesExist(calendarTable) == false) {
           calendarTable.addDefaultBaseDOAttributes().addAttributes("owner", "fullAccessGroup", "readOnlyAccessGroup", "minimalAccessGroup",
               "description");
           dao.createTable(calendarTable);
         }
         if (dao.doesExist(eventTable) == false) {
-          calendarTable.addDefaultBaseDOAttributes().addAttributes("owner", "fullAccessGroup", "readOnlyAccessGroup", "minimalAccessGroup",
-              "description");
+          eventTable.addDefaultBaseDOAttributes().addAttributes("subject", "location", "calendar", "startDate", "endDate",
+              "note", "attendees", "recurrenceInterval", "recurrenceAmount", "recurrenceEndDate");
           dao.createTable(eventTable);
         }
         dao.createMissingIndices();

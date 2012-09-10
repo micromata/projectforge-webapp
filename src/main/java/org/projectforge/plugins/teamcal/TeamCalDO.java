@@ -23,16 +23,10 @@
 
 package org.projectforge.plugins.teamcal;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -74,13 +68,10 @@ public class TeamCalDO extends DefaultBaseDO
   @IndexedEmbedded(depth = 1)
   private GroupDO minimalAccessGroup;
 
-  private Set<PFUserDO> aboUsers;
-
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String description;
 
   public TeamCalDO(){
-    this.aboUsers = new HashSet<PFUserDO>();
   }
 
   @Column(length = Constants.LENGTH_TITLE)
@@ -137,6 +128,11 @@ public class TeamCalDO extends DefaultBaseDO
   public GroupDO getFullAccessGroup()
   {
     return fullAccessGroup;
+  }
+
+  @Transient
+  public void setNewTeamCalsubscription(final PFUserDO user, final TeamCalDO teamcal) {
+
   }
 
   /**
@@ -223,18 +219,5 @@ public class TeamCalDO extends DefaultBaseDO
   {
     this.description = description;
     return this;
-  }
-
-  @ManyToMany(targetEntity = org.projectforge.user.PFUserDO.class, cascade = { CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
-  @JoinTable(name = "T_PLUGIN_TEAMCAL_USER", joinColumns = @JoinColumn(name = "TEAMCAL_ID"), inverseJoinColumns = @JoinColumn(name = "USER_ID"))
-  public Set<PFUserDO> getAboUsers()
-  {
-    return aboUsers;
-  }
-
-  public Set<PFUserDO> setAboUsers(final Set<PFUserDO> aboUsers)
-  {
-    this.aboUsers = aboUsers;
-    return this.aboUsers;
   }
 }
