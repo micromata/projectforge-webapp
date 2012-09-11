@@ -21,7 +21,9 @@
         <Set name="password">
           <SystemProperty name="jettyEnv.jdbcPassword" />
         </Set>
-        <Set name="maxActive">100</Set>
+        <Set name="maxActive">
+          <SystemProperty name="jettyEnv.jdbcMaxActive" />
+        </Set>
       </New>
     </Arg>
   </New>

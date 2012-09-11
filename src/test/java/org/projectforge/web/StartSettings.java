@@ -57,6 +57,8 @@ public class StartSettings
 
   private boolean usingCookies = true;
 
+  private Integer jdbcMaxActive;
+
   private static final String DEFAULT_JDBC_URL_HSQL_DB = "database/ProjectForgeDB";
 
   private static final String DEFAULT_JDBC_URL_POSTGRESQL = "jdbc:postgresql://localhost:5432/projectforge";
@@ -242,6 +244,25 @@ public class StartSettings
   public StartSettings setStripWicketTags(final boolean stripWicketTags)
   {
     this.stripWicketTags = stripWicketTags;
+    return this;
+  }
+
+  /**
+   * Max active data base connections to configure.
+   * @return the jdbcMaxActive
+   */
+  public Integer getJdbcMaxActive()
+  {
+    return jdbcMaxActive;
+  }
+
+  /**
+   * @param jdbcMaxActive the jdbcMaxActive to set
+   * @return this for chaining.
+   */
+  public StartSettings setJdbcMaxActive(final Integer jdbcMaxActive)
+  {
+    this.jdbcMaxActive = jdbcMaxActive;
     return this;
   }
 }

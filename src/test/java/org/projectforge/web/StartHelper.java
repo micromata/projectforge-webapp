@@ -55,7 +55,8 @@ public class StartHelper
     setProperty("hibernate.schemaUpdate", settings.isSchemaUpdate());
     setProperty("jetty.home", settings.getBaseDir());
     setProperty("jettyEnv.jdbcUser", settings.getJdbcUser());
-    setProperty("jettyEnv.jdbcPassword", settings.getJdbcPassword());
+    setProperty("jettyEnv.jdbcPassword", settings.getJdbcPassword(), false);
+    setProperty("jettyEnv.jdbcMaxActive", settings.getJdbcMaxActive() != null ? settings.getJdbcMaxActive() : 200);
 
     final Server server = new Server();
     final SocketConnector connector = new SocketConnector();
@@ -134,18 +135,36 @@ public class StartHelper
     }
   }
 
+  /**
+   * @param key
+   * @param value
+   */
   private static void setProperty(final String key, final String value)
   {
-    log.info(key + "=" + value);
+    setProperty(key, value, true);
+  }
+
+  /**
+   * @param key
+   * @param value
+   * @param logValue If true (default) then the property value will be logged, otherwise "****" is logged.
+   */
+  private static void setProperty(final String key, final String value, final boolean logValue)
+  {
+    if (logValue == true) {
+      log.info(key + "=" + value);
+    } else {
+      log.info(key + "=*****");
+    }
     System.setProperty(key, value);
   }
 
   private static void setProperty(final String key, final Object value)
   {
     if (value == null) {
-      System.setProperty(key, null);
+      setProperty(key, (String)null);
     } else {
-      System.setProperty(key, String.valueOf(value));
+      setProperty(key, String.valueOf(value));
     }
   }
 
