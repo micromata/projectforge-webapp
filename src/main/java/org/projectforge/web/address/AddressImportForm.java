@@ -12,6 +12,7 @@ package org.projectforge.web.address;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,7 +44,6 @@ import org.projectforge.web.wicket.EditPage;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.FileUploadPanel;
-
 
 /**
  * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
@@ -77,9 +77,10 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
   {
     super.onInitialize();
     gridBuilder.newGrid16().newColumnsPanel().newColumnPanel(DivType.COL_50);
-    final FieldsetPanel newFieldset = gridBuilder.newFieldset("File upload");
-    newFieldset.add(new FileUploadPanel(newFieldset.newChildId(), new FileUploadField(FileUploadPanel.WICKET_ID,
-        new PropertyModel<List<FileUpload>>(this, "uploads"))));
+    final FieldsetPanel newFieldset = gridBuilder.newFieldset(getString("address.book.vCardImport.fileUploadPanel"));
+
+    final FileUploadField uploadField = new FileUploadField(FileUploadPanel.WICKET_ID, new PropertyModel<List<FileUpload>>(this, "uploads"));
+    newFieldset.add(new FileUploadPanel(newFieldset.newChildId(), uploadField));
   }
 
   /**
@@ -91,105 +92,109 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
     return log;
   }
 
+  @SuppressWarnings("serial")
   public void create()
   {
-    if(uploads.size() > 0) {
+    if (uploads != null) {
       final FileUpload upload = uploads.get(0);
-      try {
-        final File file = upload.writeToTempFile();
+      if (upload.getClientFileName().endsWith(".vcf") == false) {
+        feedbackPanel.error(getString("address.book.vCardImport.wrongFileType"));
+      } else {
+        try {
+          final File file = upload.writeToTempFile();
 
-        final FileInputStream fis = new FileInputStream(file);
-        final VCardBuilder builder = new VCardBuilder(fis);
-        final VCard card = builder.build();
+          final FileInputStream fis = new FileInputStream(file);
+          final VCardBuilder builder = new VCardBuilder(fis);
+          final VCard card = builder.build();
 
-        ////// SET BASE DATA
-        setName(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.N));
-        setOrganization(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.ORG));
-        setBirth(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.BDAY));
-        setNote(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.NOTE));
+          // //// SET BASE DATA
+          setName(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.N));
+          setOrganization(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.ORG));
+          setBirth(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.BDAY));
+          setNote(card.getProperty(net.fortuna.ical4j.vcard.Property.Id.NOTE));
 
-        ////// SET ADDITIONAL DATA
-        final List<Property> li = card.getProperties();
-        setProperties(li);
+          // //// SET ADDITIONAL DATA
+          final List<Property> li = card.getProperties();
+          setProperties(li);
 
-        // handle item entries
-        final VCardItemElementHandler ih = new VCardItemElementHandler(new FileInputStream(file));
-        if (!ih.getItemList().isEmpty())
-          setProperties(ih.getItemList());
+          // handle item entries
+          final VCardItemElementHandler ih = new VCardItemElementHandler(new FileInputStream(file));
+          if (!ih.getItemList().isEmpty())
+            setProperties(ih.getItemList());
 
-        data.setAddressStatus(AddressStatus.UPTODATE);
-        data.setDeleted(false);
-        data.setLastUpdate(DateTime.now().toDate());
-        data.setCreated(DateTime.now().toDate());
-        data.setContactStatus(ContactStatus.ACTIVE);
-        data.setForm(FormOfAddress.UNKNOWN);
+          data.setAddressStatus(AddressStatus.UPTODATE);
+          data.setDeleted(false);
+          data.setLastUpdate(DateTime.now().toDate());
+          data.setCreated(DateTime.now().toDate());
+          data.setContactStatus(ContactStatus.ACTIVE);
+          data.setForm(FormOfAddress.UNKNOWN);
 
-        ///// CHECK FOR EXISTING ENTRIES
-        final BaseSearchFilter af = new BaseSearchFilter();
-        af.setSearchString(data.getName() + " " + data.getFirstName());
-        final AddressDao dao = (AddressDao) getBaseDao();
-        final QueryFilter queryFilter = new QueryFilter(af);
-        final List<AddressDO> list = dao.internalGetList(queryFilter);
-
-        ////// CHECK IF THERE IS SOMETHING MORE TO ADD
-        if (data.getAddressText() == null || data.getAddressText() == "") {
-          setOtherPropertiesToWork(li);
-          if (!ih.getItemList().isEmpty() && data.getAddressText() == null || data.getAddressText() == "") {
-            setOtherPropertiesToWork(ih.getItemList());
-          }
-        } else if (data.getPrivateAddressText() == null|| data.getPrivateAddressText() == "") {
-          setOtherPropertiesToPrivate(li);
-          if (!ih.getItemList().isEmpty() && data.getPostalAddressText() == null || data.getPostalAddressText() == "")
-            setOtherPropertiesToPrivate(ih.getItemList());
-        } else {
-          setPostalProperties(li);
-          if (!ih.getItemList().isEmpty() && data.getPostalAddressText() == null || data.getPostalAddressText() == "")
-            setPostalProperties(ih.getItemList());
-        }
-
-        ////// SAVING
-        if (list.size() == 0){
-          final PageParameters params = new PageParameters();
-
-          // inner class to set the right return page.
-          @SuppressWarnings("serial")
-          @EditPage(defaultReturnPage = AddressListPage.class)
-          class MyEditPage extends AddressEditPage {
-
-            /**
-             * @param parameters
-             */
-            public MyEditPage(final PageParameters parameters)
-            {
-              super(parameters);
+          // //// CHECK IF THERE IS SOMETHING MORE TO ADD
+          if (data.getAddressText() == null || data.getAddressText() == "") {
+            setOtherPropertiesToWork(li);
+            if (!ih.getItemList().isEmpty() && data.getAddressText() == null || data.getAddressText() == "") {
+              setOtherPropertiesToWork(ih.getItemList());
             }
-
-            /**
-             * @see org.projectforge.web.wicket.AbstractEditPage#init(org.projectforge.core.AbstractBaseDO)
-             */
-            @Override
-            protected void init(final AddressDO data)
-            {
-              super.init(AddressImportForm.this.getData());
-            }
+          } else if (data.getPrivateAddressText() == null || data.getPrivateAddressText() == "") {
+            setOtherPropertiesToPrivate(li);
+            if (!ih.getItemList().isEmpty() && data.getPostalAddressText() == null || data.getPostalAddressText() == "")
+              setOtherPropertiesToPrivate(ih.getItemList());
+          } else {
+            setPostalProperties(li);
+            if (!ih.getItemList().isEmpty() && data.getPostalAddressText() == null || data.getPostalAddressText() == "")
+              setPostalProperties(ih.getItemList());
           }
 
-          final AddressEditPage addressEditPage = new MyEditPage(params);
-          addressEditPage.newEditForm(parentPage, getData());
-          setResponsePage(addressEditPage);
-        } else {
-          //          AddressListPage alp = new AddressListPage(parameters)
-          //          setResponsePage(new addressli)
-          System.out.println("EINTRAG SCHON VORHANDEN");
+          // /// CHECK FOR EXISTING ENTRIES
+          final BaseSearchFilter af = new BaseSearchFilter();
+          af.setSearchString(data.getName() + " " + data.getFirstName() + " ");
+          final AddressDao dao = (AddressDao) getBaseDao();
+          final QueryFilter queryFilter = new QueryFilter(af);
+          final List<AddressDO> list = dao.internalGetList(queryFilter);
+
+          // //// SAVING
+          /*
+           * if list is > 0 there are entries with the same name.
+           */
+          if (list.size() == 0) {
+            final PageParameters params = new PageParameters();
+
+            // inner class to set the right return page.
+            @EditPage(defaultReturnPage = AddressListPage.class)
+            class MyEditPage extends AddressEditPage
+            {
+
+              /**
+               * @param parameters
+               */
+              public MyEditPage(final PageParameters parameters)
+              {
+                super(parameters);
+              }
+
+              /**
+               * @see org.projectforge.web.wicket.AbstractEditPage#init(org.projectforge.core.AbstractBaseDO)
+               */
+              @Override
+              protected void init(final AddressDO data)
+              {
+                super.init(AddressImportForm.this.getData());
+              }
+            }
+            final AddressEditPage addressEditPage = new MyEditPage(params);
+            addressEditPage.newEditForm(parentPage, getData());
+            setResponsePage(addressEditPage);
+          } else {
+            feedbackPanel.error(getString("address.book.vCardImport.existingEntry"));
+          }
+        } catch (final IOException ex) {
+          log.fatal("Exception encountered " + ex, ex);
+        } catch (final ParserException ex) {
+          log.fatal("Exception encountered " + ex, ex);
         }
-
-
-      } catch (final IOException ex) {
-        log.fatal("Exception encountered " + ex, ex);
-      } catch (final ParserException ex) {
-        log.fatal("Exception encountered " + ex, ex);
       }
-    }
+    } else
+      feedbackPanel.error(getString("address.book.vCardImport.noFile"));
   }
 
   /**
@@ -205,26 +210,25 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
    */
   private void setProperties(final List<Property> li)
   {
-    for (final Property property : li){
+    for (final Property property : li) {
       final List<Parameter> lii = property.getParameters(Id.TYPE);
-      for (final Parameter param : lii){
+      for (final Parameter param : lii) {
         if (param.getValue().equals("HOME"))
           setHomeData(property);
         else if (param.getValue().equals("WORK"))
           setWorkData(property);
-        //        else if (param.getValue().equals("OTHER"))
-        //          setOtherData(property);
       }
     }
   }
 
-  private void setPostalProperties(final List<Property> li) {
-    for (final Property property : li){
+  private void setPostalProperties(final List<Property> li)
+  {
+    for (final Property property : li) {
       final List<Parameter> lii = property.getParameters(Id.TYPE);
       for (final Parameter param : lii) {
         if (param.getValue().equals("OTHER")) {
-          //////SET WORK ADDRESS
-          if (property.getId().toString().equals("ADR")){
+          // ////SET WORK ADDRESS
+          if (property.getId().toString().equals("ADR")) {
             final String str[] = StringUtils.split(property.getValue(), ';');
             final int size = str.length;
             if (size >= 1)
@@ -243,13 +247,14 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
     }
   }
 
-  private void setOtherPropertiesToWork(final List<Property> li) {
-    for (final Property property : li){
+  private void setOtherPropertiesToWork(final List<Property> li)
+  {
+    for (final Property property : li) {
       final List<Parameter> lii = property.getParameters(Id.TYPE);
       for (final Parameter param : lii) {
         if (param.getValue().equals("OTHER")) {
-          //////SET WORK ADDRESS
-          if (property.getId().toString().equals("ADR")){
+          // ////SET WORK ADDRESS
+          if (property.getId().toString().equals("ADR")) {
             final String str[] = StringUtils.split(property.getValue(), ';');
             final int size = str.length;
             if (size >= 1)
@@ -268,23 +273,29 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
     }
   }
 
-  private void setOtherPropertiesToPrivate(final List<Property> li) {
-    for (final Property property : li){
+  private void setOtherPropertiesToPrivate(final List<Property> li)
+  {
+    for (final Property property : li) {
       final List<Parameter> lii = property.getParameters(Id.TYPE);
       for (final Parameter param : lii) {
         if (param.getValue().equals("OTHER")) {
-          ////// SET HOME ADDRESS
-          if (property.getId().toString().equals("ADR")){
+          // //// SET HOME ADDRESS
+          if (property.getId().toString().equals("ADR")) {
             final String str[] = StringUtils.split(property.getValue(), ';');
             final int size = str.length;
+            // street
             if (size >= 1)
               data.setPrivateAddressText(str[0]);
+            // city
             if (size >= 2)
               data.setPrivateCity(str[1]);
+            // zip code
             if (size >= 3)
               data.setPrivateZipCode(str[2]);
+            // country
             if (size >= 4)
               data.setPrivateCountry(str[3]);
+            // state
             if (size >= 5)
               data.setPrivateState(str[4]);
           }
@@ -298,13 +309,12 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
    */
   private void setBirth(final Property property)
   {
-    // TODO date fix
-    //    System.out.println(DateTime.parse(property.getValue()));
-    //    data.setBirthday(new Date(DateTime.parse(property.getValue()).getMillis()));
-    //    System.out.println(data.getBirthday());
+    if (property != null)
+      data.setBirthday(new Date(DateTime.parse(property.getValue()).getMillis()));
   }
 
-  private void setName(final Property property){
+  private void setName(final Property property)
+  {
     final String str[] = StringUtils.split(property.getValue(), ';');
     data.setName(str[0]);
     data.setFirstName(str[1]);
@@ -312,7 +322,8 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
       data.setTitle(str[2]);
   }
 
-  private void setOrganization(final Property property){
+  private void setOrganization(final Property property)
+  {
     final String org = StringUtils.substringBefore(property.getValue(), ";");
     data.setOrganization(org);
     final String division = StringUtils.substringAfter(property.getValue(), ";");
@@ -324,33 +335,44 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
    * 
    * @param property
    */
-  private void setHomeData(final Property property){
+  private void setHomeData(final Property property)
+  {
     boolean telCheck = true; // to seperate phone and mobil number
-    ////// SET HOME EMAIL
+    // //// SET HOME EMAIL
     if (property.getId().toString().equals("EMAIL"))
       data.setPrivateEmail(property.getValue());
 
-    ////// SET HOME PHONE
-    if (property.getId().toString().equals("TEL")){
+    // //// SET HOME PHONE
+    if (property.getId().toString().equals("TEL")) {
       final List<Parameter> list = property.getParameters();
-      for (final Parameter p : list){
-        if (p.getValue().toString().equals("VOICE")){
+      for (final Parameter p : list) {
+        if (p.getValue().toString().equals("VOICE")) {
           final String tel = getTel(property.getValue());
 
           // phone number first, mobil number second
           if (telCheck) {
             data.setPrivatePhone(tel);
             telCheck = false;
-          } else
+            break;
+          } else {
             data.setPrivateMobilePhone(tel);
+            break;
+          }
+        }
+        if (data.getPrivatePhone() == null && property.toString().contains("FAX") == false) {
+          data.setPrivatePhone(getTel(property.getValue()));
+        } else {
+          if (data.getPrivateMobilePhone() == null && property.toString().contains("FAX") == false) {
+            data.setPrivateMobilePhone(getTel(property.getValue()));
+          }
         }
       }
     }
 
-    ////// SET FAX -> no private fax
+    // //// SET FAX -> no private fax
 
-    ////// SET HOME ADDRESS
-    if (property.getId().toString().equals("ADR")){
+    // //// SET HOME ADDRESS
+    if (property.getId().toString().equals("ADR")) {
       final String str[] = StringUtils.split(property.getValue(), ';');
       final int size = str.length;
       if (size >= 1)
@@ -365,9 +387,7 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
         data.setPrivateState(str[4]);
     }
 
-    ////// SET HOME URL
-    //    if (property.getId().toString().equals("URL"))
-    //      data.setWebsite(property.getValue());
+    // //// SET HOME URL -> no space for home url
   }
 
   /**
@@ -376,7 +396,7 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
    */
   private String getTel(String tel)
   {
-    if (tel.startsWith("0")){
+    if (tel.startsWith("0")) {
       tel = "+49 " + tel.substring(1);
     } else {
       if (!tel.startsWith("+"))
@@ -385,37 +405,47 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
     return tel;
   }
 
-  private void setWorkData(final Property property){
+  private void setWorkData(final Property property)
+  {
     boolean telCheck = true; // to seperate phone and mobil number
 
-    ////// SET WORK PHONE
-    if (property.getId().toString().equals("TEL")){
+    // //// SET WORK PHONE
+    if (property.getId().toString().equals("TEL")) {
       final List<Parameter> list = property.getParameters();
-      for (final Parameter p : list){
-        if (p.getValue().toString().equals("VOICE")){
+      for (final Parameter p : list) {
+        if (p.getValue().toString().equals("VOICE")) {
           final String tel = getTel(property.getValue());
 
           // phone number first, mobil number second
           if (telCheck) {
             data.setBusinessPhone(tel);
             telCheck = false;
-          } else
+            break;
+          } else {
             data.setMobilePhone(tel);
+            break;
+          }
         }
-        ////// SET WORK FAX
-        if (p.getValue().toString().equals("FAX")){
+        // //// SET WORK FAX
+        if (p.getValue().toString().equals("FAX")) {
           data.setFax(getTel(property.getValue()));
+        }
+        if (data.getBusinessPhone() == null && property.toString().contains("FAX") == false) {
+          data.setBusinessPhone(getTel(property.getValue()));
+        } else {
+          if (data.getMobilePhone() == null && property.toString().contains("FAX") == false) {
+            data.setMobilePhone(getTel(property.getValue()));
+          }
         }
       }
     }
 
-    ////// SET WORK EMAIL
+    // //// SET WORK EMAIL
     if (property.getId().toString().equals("EMAIL"))
       data.setEmail(property.getValue());
 
-
-    ////// SET WORK ADDRESS
-    if (property.getId().toString().equals("ADR")){
+    // //// SET WORK ADDRESS
+    if (property.getId().toString().equals("ADR")) {
       final String str[] = StringUtils.split(property.getValue(), ';');
       final int size = str.length;
       if (size >= 1)
@@ -430,7 +460,7 @@ public class AddressImportForm extends AbstractEditForm<AddressDO, AddressImport
         data.setState(str[4]);
     }
 
-    ////// SET WORK URL
+    // //// SET WORK URL
     if (property.getId().toString().equals("URL"))
       data.setWebsite(property.getValue());
   }

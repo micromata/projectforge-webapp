@@ -266,7 +266,7 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
       // TODO i18n
       final ContentMenuEntryPanel importVCardsButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), importVCardsLink,
           getString("address.book.vCardImport")).setTooltip(getString("address.book.vCardImport.tooltip"));
-      //      addContentMenuEntry(importVCardsButton);
+      addContentMenuEntry(importVCardsButton);
     }
     {
       // Export vcards
