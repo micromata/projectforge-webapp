@@ -101,3 +101,36 @@ function mcancelclosetime() {
 document.onclick = mclose;
 // End: Functionality for DropDownMenu
 
+function openDialog(element) {
+	$('#' + element).dialog({
+		'resizable': false,
+		'draggable': false
+		}).dialog('open');
+}
+
+function bindDialogCallback(element, script) {
+	$('#' + element).bind('dialogclose', function(event, ui) {
+		script();
+	});
+}
+
+$(function() {
+	$(".dialog_content").live("dialogopen", function(event, ui) {
+		disableScroll();
+	});
+	$(".dialog_content").live("dialogclose", function(event, ui) {
+		enableScroll();
+	});
+})
+
+function disableScroll() {
+    var before = $(document).width();
+    $("html").css("overflow", "hidden");
+    var after = $(document).width();
+    $("body").css("padding-right", after-before);
+}
+
+function enableScroll() {
+    $("html").css("overflow", "auto");
+    $("body").css("padding-right", 0);
+}

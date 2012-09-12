@@ -461,3 +461,7 @@ td.fc-sun,td.fc-sat,td.fc-holiday {
 .fc .fc-event {
 	text-shadow: none;
 }
+
+.dialog_content .section {
+  min-height: 75px;
+} 
