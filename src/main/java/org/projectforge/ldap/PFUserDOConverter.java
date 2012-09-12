@@ -79,6 +79,7 @@ public class PFUserDOConverter
     person.setDescription(user.getDescription());
     person.setMail(user.getEmail());
     person.setDeleted(user.isDeleted());
+    person.setDeactivated(user.isDeactivated());
     return person;
   }
 

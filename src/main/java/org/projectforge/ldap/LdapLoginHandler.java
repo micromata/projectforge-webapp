@@ -128,4 +128,14 @@ public abstract class LdapLoginHandler implements LoginHandler
     final List<LdapGroup> ldapGroups = ldapGroupDao.findAll(organizationalUnits);
     return ldapGroups;
   }
+
+  /**
+   * @return true (ldap as an external user management system is supported).
+   * @see org.projectforge.user.LoginHandler#hasExternalUsermanagementSystem()
+   */
+  @Override
+  public boolean hasExternalUsermanagementSystem()
+  {
+    return true;
+  }
 }

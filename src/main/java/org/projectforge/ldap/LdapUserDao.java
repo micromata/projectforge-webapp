@@ -73,6 +73,17 @@ public class LdapUserDao extends LdapPersonDao
     return obj.getEmployeeNumber();
   }
 
+  /**
+   * @see org.projectforge.ldap.LdapPersonDao#mapToObject(String, javax.naming.directory.Attributes)
+   */
+  @Override
+  protected LdapPerson mapToObject(final String dn, final Attributes attributes) throws NamingException
+  {
+    final LdapPerson person = super.mapToObject(dn, attributes);
+    //    person.setOrganization(LdapUtils.getAttributeStringValue(attributes, "o"));
+    return person;
+  }
+
   public void deactivateUser(final LdapPerson user)
   {
     new LdapTemplate(ldapConnector) {
@@ -87,13 +98,13 @@ public class LdapUserDao extends LdapPersonDao
 
   public void deactivateUser(final DirContext ctx, final LdapPerson user) throws NamingException
   {
-    log.info("Deactivate user: " + buildDn(user));
+    log.info("Deactivate user: " + buildDn(null, user));
     final ModificationItem[] modificationItems;
     short i = 0;
     modificationItems = new ModificationItem[2];
     modificationItems[i++] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userPassword", null));
     modificationItems[i++] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("mail", "deactivated@devnull.com"));
-    buildDn(user);
+    buildDn(null, user);
     modify(ctx, user, modificationItems);
     // Move user to the sub-context "deactivated".
     move(ctx, user, LdapUtils.getOu(DEACTIVATED_SUB_CONTEXT, user.getOrganizationalUnit()));
@@ -110,18 +121,18 @@ public class LdapUserDao extends LdapPersonDao
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
-        deactivateUser(ctx, user);
+        reactivateUser(ctx, user);
         return null;
       }
     }.excecute();
   }
 
-  public void reactivateUser(final DirContext ctx,  final LdapPerson user) throws NamingException
+  public void reactivateUser(final DirContext ctx, final LdapPerson user) throws NamingException
   {
-    log.info("Reactivate deactivated user: " + buildDn(user));
+    log.info("Reactivate deactivated user: " + buildDn(null, user));
     final String ou = LdapUtils.getOu(user.getOrganizationalUnit());
     if (ou.startsWith(DEACTIVATED_SUB_CONTEXT2) == false) {
-      log.info("Object isn't in a deactivated sub-context, nothing will be done: " + buildDn(user));
+      log.info("Object isn't in a deactivated sub-context, nothing will be done: " + buildDn(null, user));
       return;
     }
     String newPath;
@@ -154,20 +165,41 @@ public class LdapUserDao extends LdapPersonDao
   }
 
   /**
-   * @see org.projectforge.ldap.LdapDao#create(org.projectforge.ldap.LdapObject, java.lang.Object[])
+   * Calls super method and {@link #deactivateUser(DirContext, LdapPerson)} if the given person is deactivated. If the given person is
+   * deleted, nothing will be done.
+   * @see org.projectforge.ldap.LdapDao#create(javax.naming.directory.DirContext, org.projectforge.ldap.LdapObject, java.lang.Object[])
    */
   @Override
-  public void create(final LdapPerson obj, final Object... args)
+  public void create(final DirContext ctx, final String ouBase, final LdapPerson user, final Object... args) throws NamingException
   {
-    super.create(obj, args);
-    if (obj.isDeleted() == true) {
-      deactivateUser(obj);
+    if (user.isDeleted() == true) {
+      log.info("Given LDAP user is deleted, so the user will not be created in the LDAP system (nothing will be done).");
+      return;
     }
+    super.create(ctx,ouBase, user, args);
+    if (user.isDeactivated() == true) {
+      deactivateUser(ctx, user);
+    }
+  }
+
+  /**
+   * @see org.projectforge.ldap.LdapDao#update(javax.naming.directory.DirContext, org.projectforge.ldap.LdapObject, java.lang.Object[])
+   */
+  @Override
+  public void update(final DirContext ctx, final String ouBase, final LdapPerson user, final Object... objs) throws NamingException
+  {
+    if (user.isDeleted() == true) {
+      log.info("Given LDAP user is deleted, so the user will be removed from the LDAP system.");
+      delete(ctx, user);
+      return;
+    }
+    super.update(ctx, ouBase, user, objs);
+    updateActivatedStatus(ctx, user);
   }
 
   public void changePassword(final LdapPerson user, final String oldPassword, final String newPassword)
   {
-    log.info("Change password for " + getObjectClass() + ": " + buildDn(user));
+    log.info("Change password for " + getObjectClass() + ": " + buildDn(null, user));
     final ModificationItem[] modificationItems;
     // Replace the "unicdodePwd" attribute with a new value
     // Password must be both Unicode and a quoted string

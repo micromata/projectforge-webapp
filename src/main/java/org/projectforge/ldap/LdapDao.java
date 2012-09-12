@@ -60,21 +60,29 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
 
   public abstract I getId(T obj);
 
-  public void create(final T obj, final Object... args)
+  public void create(final String ouBase, final T obj, final Object... args)
   {
     new LdapTemplate(ldapConnector) {
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
-        create(ctx, obj, args);
+        create(ctx, ouBase, obj, args);
         return null;
       }
     }.excecute();
   }
 
-  public void create(final DirContext ctx, final T obj, final Object... args) throws NamingException
+  /**
+   * @param ctx
+   * @param ouBase If organizational units are given by the given obj then this parameter will be ignored, otherwise this is the ou where
+   *          the new object will be inserted.
+   * @param obj
+   * @param args
+   * @throws NamingException
+   */
+  public void create(final DirContext ctx, final String ouBase, final T obj, final Object... args) throws NamingException
   {
-    final String dn = buildDn(obj);
+    final String dn = buildDn(ouBase, obj);
     log.info("Create " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
     final Attributes attrs = new BasicAttributes();
     final BasicAttribute ocattr = new BasicAttribute("objectclass");
@@ -108,9 +116,9 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
    * @param obj
    * @see #createOrUpdate(Set, Object, Object...)
    */
-  public void createOrUpdate(final T obj, final Object... args)
+  public void createOrUpdate(final String ouBase, final T obj, final Object... args)
   {
-    createOrUpdate(getSetOfAllObjects(), obj, args);
+    createOrUpdate(getSetOfAllObjects(ouBase), ouBase, obj, args);
   }
 
   /**
@@ -120,9 +128,9 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
    * @throws NamingException
    * @see #createOrUpdate(Set, Object, Object...)
    */
-  public void createOrUpdate(final DirContext ctx, final T obj, final Object... args) throws NamingException
+  public void createOrUpdate(final DirContext ctx, final String ouBase, final T obj, final Object... args) throws NamingException
   {
-    createOrUpdate(ctx, getSetOfAllObjects(ctx), obj, args);
+    createOrUpdate(ctx, getSetOfAllObjects(ctx, ouBase), ouBase, obj, args);
   }
 
   /**
@@ -130,12 +138,12 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
    * @param setOfAllLdapObjects List generated before via {@link #getSetOfAllObjects()}.
    * @param obj
    */
-  public void createOrUpdate(final SetOfAllLdapObjects setOfAllLdapObjects, final T obj, final Object... args)
+  public void createOrUpdate(final SetOfAllLdapObjects setOfAllLdapObjects, final String ouBase, final T obj, final Object... args)
   {
-    if (setOfAllLdapObjects.contains(obj, buildDn(obj)) == true) {
-      update(obj, args);
+    if (setOfAllLdapObjects.contains(obj, buildDn(ouBase, obj)) == true) {
+      update(ouBase, obj, args);
     } else {
-      create(obj, args);
+      create(ouBase, obj, args);
     }
   }
 
@@ -145,22 +153,29 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
    * @param obj
    * @throws NamingException
    */
-  public void createOrUpdate(final DirContext ctx, final SetOfAllLdapObjects setOfAllLdapObjects, final T obj, final Object... args)
-      throws NamingException
+  public void createOrUpdate(final DirContext ctx, final SetOfAllLdapObjects setOfAllLdapObjects, final String ouBase, final T obj,
+      final Object... args) throws NamingException
       {
-    if (setOfAllLdapObjects.contains(obj, buildDn(obj)) == true) {
-      update(ctx, obj, args);
+    if (setOfAllLdapObjects.contains(obj, buildDn(ouBase, obj)) == true) {
+      update(ctx, ouBase, obj, args);
     } else {
-      create(ctx, obj, args);
+      create(ctx, ouBase, obj, args);
     }
       }
 
-  public void update(final T obj, final Object... objs)
+  public void update(final String ouBase, final T obj, final Object... objs)
   {
-    modify(obj, getModificationItems(obj));
+    new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        update(ctx, ouBase, obj, objs);
+        return null;
+      }
+    }.excecute();
   }
 
-  public void update(final DirContext ctx, final T obj, final Object... objs) throws NamingException
+  public void update(final DirContext ctx, final String ouBase, final T obj, final Object... objs) throws NamingException
   {
     modify(ctx, obj, getModificationItems(obj));
   }
@@ -253,19 +268,19 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     }
   }
 
-  public void move(final T obj, final String... newOrganizationalUnits)
+  public void move(final T obj, final String newOrganizationalUnit)
   {
     new LdapTemplate(ldapConnector) {
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
-        move(ctx, obj, newOrganizationalUnits);
+        move(ctx, obj, newOrganizationalUnit);
         return null;
       }
     }.excecute();
   }
 
-  public void move(final DirContext ctx, final T obj, final String... newOrganizationalUnits) throws NamingException
+  public void move(final DirContext ctx, final T obj, final String newOrganizationalUnit) throws NamingException
   {
     final Object id = getId(obj);
     // The dn is may-be changed, so find the original dn by id:
@@ -278,7 +293,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
           + "'. Can't modify the object: "
           + obj);
     }
-    final String ou = LdapUtils.getOu(newOrganizationalUnits);
+    final String ou = LdapUtils.getOu(newOrganizationalUnit);
     final String origOu = LdapUtils.getOu(origObject.getOrganizationalUnit());
     if (StringUtils.equals(origOu, ou) == false) {
       log.info("Move object with id '" + obj.getId() + "' from changed from '" + origOu + "' to '" + ou);
@@ -310,30 +325,30 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
 
   public void delete(final DirContext ctx, final T obj) throws NamingException
   {
-    final String dn = buildDn(obj);
+    final String dn = buildDn(null, obj);
     log.info("Delete " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
     ctx.unbind(dn);
   }
 
   @SuppressWarnings("unchecked")
-  public List<T> findAll(final String... organizationalUnits)
+  public List<T> findAll(final String organizationalUnit)
   {
     return (List<T>) new LdapTemplate(ldapConnector) {
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
-        return findAll(ctx, organizationalUnits);
+        return findAll(ctx, organizationalUnit);
       }
     }.excecute();
   }
 
-  public List<T> findAll(final DirContext ctx, final String... organizationalUnits) throws NamingException
+  public List<T> findAll(final DirContext ctx, final String organizationalUnit) throws NamingException
   {
     final LinkedList<T> list = new LinkedList<T>();
     NamingEnumeration< ? > results = null;
     final SearchControls controls = new SearchControls();
     controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    final String searchBase = LdapUtils.getOu(organizationalUnits);
+    final String searchBase = LdapUtils.getOu(organizationalUnit);
     results = ctx.search(searchBase, "(objectclass=" + getObjectClass() + ")", controls);
     while (results.hasMore()) {
       final SearchResult searchResult = (SearchResult) results.next();
@@ -378,10 +393,10 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
   /**
    * Set of all objects (the string is built from the method {@link #buildDn(Object)}).
    */
-  public SetOfAllLdapObjects getSetOfAllObjects()
+  public SetOfAllLdapObjects getSetOfAllObjects(final String organizationalUnit)
   {
     final SetOfAllLdapObjects set = new SetOfAllLdapObjects();
-    final List<T> all = findAll();
+    final List<T> all = findAll(organizationalUnit);
     for (final T obj : all) {
       if (log.isDebugEnabled() == true) {
         log.debug("Adding: " + obj.getDn());
@@ -395,10 +410,10 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
    * Set of all objects (the string is built from the method {@link #buildDn(Object)}).
    * @throws NamingException
    */
-  public SetOfAllLdapObjects getSetOfAllObjects(final DirContext ctx, final String... organizationalUnits) throws NamingException
+  public SetOfAllLdapObjects getSetOfAllObjects(final DirContext ctx, final String organizationalUnit) throws NamingException
   {
     final SetOfAllLdapObjects set = new SetOfAllLdapObjects();
-    final List<T> all = findAll(ctx, organizationalUnits);
+    final List<T> all = findAll(ctx, organizationalUnit);
     for (final T obj : all) {
       if (log.isDebugEnabled() == true) {
         log.debug("Adding: " + obj.getDn());
@@ -408,27 +423,37 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     return set;
   }
 
-  protected String buildDn(final T obj)
+  /**
+   * @param ouBase If {@link T#getOrganizationalUnit()} is not given, ouBase is used for building dn, otherwise ouBase is ignored.
+   * @param obj
+   * @return
+   */
+  protected String buildDn(final String ouBase, final T obj)
   {
     final StringBuffer buf = new StringBuffer();
     buf.append("cn=").append(obj.getCommonName());
     if (obj.getOrganizationalUnit() != null) {
       buf.append(',');
+      LdapUtils.buildOu(buf, obj.getOrganizationalUnit());
+    } else if (ouBase != null) {
+      buf.append(',');
+      LdapUtils.buildOu(buf, ouBase);
     }
-    LdapUtils.buildOu(buf, obj.getOrganizationalUnit());
     obj.setDn(buf.toString());
     return obj.getDn();
   }
 
-  protected T mapToObject(final String dn, final String searchBase, final Attributes attributes) throws NamingException
+  protected T mapToObject(final String dn, final String ouBase, final Attributes attributes) throws NamingException
   {
-    final T obj = mapToObject(attributes);
-    if (StringUtils.isNotBlank(searchBase) == true) {
-      obj.setDn(dn + "," + searchBase);
+    String fullDn;
+    if (StringUtils.isNotBlank(ouBase) == true) {
+      fullDn = dn + "," + ouBase;
     } else {
-      obj.setDn(dn);
+      fullDn = dn;
     }
-    obj.setOrganizationalUnit(LdapUtils.getOrganizationalUnit(dn, searchBase));
+    final T obj = mapToObject(fullDn, attributes);
+    obj.setDn(fullDn);
+    obj.setOrganizationalUnit(LdapUtils.getOrganizationalUnit(dn, ouBase));
     obj.setCommonName(LdapUtils.getAttributeStringValue(attributes, "cn"));
     return obj;
   }
@@ -440,7 +465,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
    * @return
    * @throws NamingException
    */
-  protected abstract T mapToObject(final Attributes attributes) throws NamingException;
+  protected abstract T mapToObject(final String dn, final Attributes attributes) throws NamingException;
 
   public void setLdapConnector(final LdapConnector ldapConnector)
   {

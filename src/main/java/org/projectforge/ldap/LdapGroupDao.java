@@ -98,7 +98,7 @@ public class LdapGroupDao extends LdapDao<Integer, LdapGroup>
    * @see org.projectforge.ldap.LdapDao#mapToObject(java.lang.String, javax.naming.directory.Attributes)
    */
   @Override
-  protected LdapGroup mapToObject(final Attributes attributes) throws NamingException
+  protected LdapGroup mapToObject(final String dn, final Attributes attributes) throws NamingException
   {
     final LdapGroup group = new LdapGroup();
     group.setDescription(LdapUtils.getAttributeStringValue(attributes, "description"));

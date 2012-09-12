@@ -53,7 +53,8 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
   {
     super.initialize();
     ldapOrganizationalUnitDao.createIfNotExist(userBase, "ProjectForge's user base.");
-    ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.DEACTIVATED_SUB_CONTEXT, "ProjectForge's user base for deactivated users.", userBase);
+    ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.DEACTIVATED_SUB_CONTEXT, "ProjectForge's user base for deactivated users.",
+        userBase);
   }
 
   /**
@@ -73,7 +74,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
       final PFUserDO user = loginResult.getUser();
       final LdapPerson ldapUser = PFUserDOConverter.convert(user);
       ldapUser.setOrganizationalUnit(userBase);
-      ldapUserDao.createOrUpdate(ldapUser);
+      ldapUserDao.createOrUpdate(userBase, ldapUser);
       ldapUserDao.changePassword(ldapUser, null, user.getPassword());
     }
     return loginResult;
@@ -96,43 +97,58 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
   public List<PFUserDO> getAllUsers()
   {
     final List<PFUserDO> users = loginDefaultHandler.getAllUsers();
-    new LdapTemplate(ldapConnector) {
+    new Thread() {
       @Override
-      protected Object call() throws NameNotFoundException, Exception
+      public void run()
       {
-        // First, get set of all ldap entries:
-        final List<LdapPerson> ldapUsers = getAllLdapUsers(ctx);
-        final SetOfAllLdapObjects setOfAllLdapObjects = ldapUserDao.getSetOfAllObjects();
-        for (final PFUserDO user : users) {
-          try {
-            final LdapPerson updatedLdapUser = PFUserDOConverter.convert(user);
-            updatedLdapUser.setOrganizationalUnit(userBase);
-            final LdapPerson ldapUser = getLdapUser(ldapUsers, user);
-            if (ldapUser == null) {
-              if (user.isDeleted() == false) {
-                // Do not add deleted users.
-                ldapUserDao.create(ctx, updatedLdapUser);
-                ldapUserDao.updateActivatedStatus(ctx, updatedLdapUser);
-              }
-            } else {
-              if (user.isDeleted() == true) {
-                ldapUserDao.delete(ctx, updatedLdapUser);
-              } else {
-                final boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
-                if (modified == true) {
-                  ldapUserDao.createOrUpdate(ctx, setOfAllLdapObjects, updatedLdapUser);
+        updateLdap(users);
+      }
+    }.start();
+    return users;
+  }
+
+  private void updateLdap(final List<PFUserDO> users)
+  {
+    synchronized (this) {
+      new LdapTemplate(ldapConnector) {
+        @Override
+        protected Object call() throws NameNotFoundException, Exception
+        {
+          log.info("Updating LDAP...");
+          // First, get set of all ldap entries:
+          final List<LdapPerson> ldapUsers = getAllLdapUsers(ctx);
+          final SetOfAllLdapObjects setOfAllLdapObjects = ldapUserDao.getSetOfAllObjects(userBase);
+          for (final PFUserDO user : users) {
+            try {
+              final LdapPerson updatedLdapUser = PFUserDOConverter.convert(user);
+              updatedLdapUser.setOrganizationalUnit(userBase);
+              final LdapPerson ldapUser = getLdapUser(ldapUsers, user);
+              if (ldapUser == null) {
+                if (user.isDeleted() == false) {
+                  // Do not add deleted users.
+                  ldapUserDao.create(ctx, userBase, updatedLdapUser);
                   ldapUserDao.updateActivatedStatus(ctx, updatedLdapUser);
                 }
+              } else {
+                if (user.isDeleted() == true) {
+                  ldapUserDao.delete(ctx, updatedLdapUser);
+                } else {
+                  final boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
+                  if (modified == true) {
+                    ldapUserDao.createOrUpdate(ctx, setOfAllLdapObjects, userBase, updatedLdapUser);
+                    ldapUserDao.updateActivatedStatus(ctx, updatedLdapUser);
+                  }
+                }
               }
+            } catch (final Exception ex) {
+              log.error("Error while proceeding user '" + user.getUsername() + "'. Continuing with next user.", ex);
             }
-          } catch (final Exception ex) {
-            log.error("Error while proceeding user '" + user.getUsername() + "'. Continuing with next user.", ex);
           }
+          log.info("LDAP update done.");
+          return null;
         }
-        return null;
-      }
-    }.excecute();
-    return users;
+      }.excecute();
+    }
   }
 
   private LdapPerson getLdapUser(final List<LdapPerson> ldapUsers, final PFUserDO user)

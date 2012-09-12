@@ -74,7 +74,7 @@ public class LdapPersonDao extends LdapDao<String, LdapPerson>
    * @see org.projectforge.ldap.LdapDao#mapToObject(java.lang.String, javax.naming.directory.Attributes)
    */
   @Override
-  protected LdapPerson mapToObject(final Attributes attributes) throws NamingException
+  protected LdapPerson mapToObject(final String dn, final Attributes attributes) throws NamingException
   {
     final LdapPerson person = new LdapPerson();
     person.setSurname(LdapUtils.getAttributeStringValue(attributes, "sn"));
