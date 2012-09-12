@@ -25,7 +25,6 @@ package org.projectforge.user;
 
 import java.util.List;
 
-
 /**
  * Different implementations of login handling are supported.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -69,4 +68,10 @@ public interface LoginHandler
    * @return All defined users (also deleted users).
    */
   public List<PFUserDO> getAllUsers();
+
+  /**
+   * @return true, if the login handler supports an external user management system. This flag is used by {User|Group}EditForm for
+   *         displaying/hiding field localUser|loclaGroup.
+   */
+  public boolean hasExternalUsermanagementSystem();
 }

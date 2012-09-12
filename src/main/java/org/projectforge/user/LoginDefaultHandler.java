@@ -180,4 +180,15 @@ public class LoginDefaultHandler implements LoginHandler
       return new ArrayList<PFUserDO>();
     }
   }
+
+  /**
+   * This login handler doesn't support an external user management system.
+   * @return false.
+   * @see org.projectforge.user.LoginHandler#hasExternalUsermanagementSystem()
+   */
+  @Override
+  public boolean hasExternalUsermanagementSystem()
+  {
+    return false;
+  }
 }

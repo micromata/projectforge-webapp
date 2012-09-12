@@ -121,4 +121,12 @@ public class Login
     this.loginHandler = loginHandler;
     log.info("LoginHandler " + loginHandler.getClass().getName() + " registered.");
   }
+
+  public boolean hasExternalUsermanagementSystem() {
+    if (loginHandler == null) {
+      log.warn("No login handler is defined yet, assuming that no external user management system is supported.");
+      return false;
+    }
+    return loginHandler.hasExternalUsermanagementSystem();
+  }
 }
