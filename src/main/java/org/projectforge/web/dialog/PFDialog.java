@@ -21,6 +21,10 @@ import de.micromata.wicket.ajax.AjaxCallback;
 import de.micromata.wicket.ajax.MDefaultAjaxBehavior;
 
 /**
+ * Base component for the ProjectForge modal dialogs.<br/>
+ * This dialog is modal, not resizable/draggable and has auto size and position.<br/>
+ * 
+ * 
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * 
  */
@@ -42,7 +46,9 @@ public abstract class PFDialog extends Panel
   private MDefaultAjaxBehavior onCloseBehavior;
 
   /**
-   * @param id
+   * 
+   * @param id the wicket:id
+   * @param titleModel the model of the dialog title
    */
   public PFDialog(final String id, final IModel<String> titleModel)
   {
@@ -82,6 +88,9 @@ public abstract class PFDialog extends Panel
 
       private static final long serialVersionUID = -3696760085641009801L;
 
+      /**
+       * @see org.apache.wicket.ajax.AbstractDefaultAjaxBehavior#respond(org.apache.wicket.ajax.AjaxRequestTarget)
+       */
       @Override
       protected void respond(final AjaxRequestTarget target)
       {
@@ -93,6 +102,11 @@ public abstract class PFDialog extends Panel
     add(this.onCloseBehavior);
   }
 
+  /**
+   * Opens the dialog
+   * 
+   * @param target
+   */
   public void open(final AjaxRequestTarget target)
   {
     target.appendJavaScript("$('#" + dialogContainer.getMarkupId() + "').unbind('dialogclose')");
@@ -103,6 +117,11 @@ public abstract class PFDialog extends Panel
     target.appendJavaScript("openDialog('" + dialogContainer.getMarkupId() + "');");
   }
 
+  /**
+   * Closes the dialog
+   * 
+   * @param target
+   */
   public void close(final AjaxRequestTarget target)
   {
     target.appendJavaScript("$('#" + dialogContainer.getMarkupId() + "').dialog('close');");
@@ -124,6 +143,8 @@ public abstract class PFDialog extends Panel
   }
 
   /**
+   * Sets the callback which is executed when dialog was closed
+   * 
    * @param onCloseCallback the onCloseCallback to set
    * @return this for chaining.
    */
@@ -133,18 +154,20 @@ public abstract class PFDialog extends Panel
     return this;
   }
 
+  /**
+   * @see org.apache.wicket.Component#onBeforeRender()
+   */
   @Override
-  public void onBeforeRender()
+  protected void onBeforeRender()
   {
     super.onBeforeRender();
     actionButtons.render();
-    if (this.onCloseCallback != null) {
-      // this.dialog.setCloseEvent(JsScopeUiEvent.quickScope(this.onCloseBehavior.getCallbackScript()));
-    }
   }
 
   /**
-   * @param string
+   * Hook method which should represent the content of the dialog
+   * 
+   * @param wicketId
    * @return
    */
   protected abstract Component getDialogContent(String wicketId);
