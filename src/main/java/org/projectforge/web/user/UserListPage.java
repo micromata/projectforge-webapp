@@ -44,6 +44,7 @@ import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightDO;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
+import org.projectforge.web.HtmlHelper;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -57,6 +58,9 @@ import org.projectforge.web.wicket.ListSelectActionPanel;
 public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUserDO> implements IListPageColumnsCreator<PFUserDO>
 {
   private static final long serialVersionUID = 4408701323868106520L;
+
+  @SpringBean(name = "htmlHelper")
+  private HtmlHelper htmlHelper;
 
   @SpringBean(name = "userDao")
   private UserDao userDao;
@@ -81,7 +85,7 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
       public void populateItem(final Item<ICellPopulator<PFUserDO>> item, final String componentId, final IModel<PFUserDO> rowModel)
       {
         final PFUserDO user = rowModel.getObject();
-        final StringBuffer cssStyle = getCssStyle(user.getId(), user.isDeleted());
+        final StringBuffer cssStyle = getCssStyle(user.getId(), user.hasSystemAccess() == false);
         if (cssStyle.length() > 0) {
           item.add( AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
@@ -104,6 +108,24 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
         } else {
           item.add(new Label(componentId, user.getUsername()));
         }
+        cellItemListener.populateItem(item, componentId, rowModel);
+      }
+    });
+    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(new Model<String>(getString("user.activated")), getSortable(
+        "deactivated", sortable), "deactivated", cellItemListener) {
+      @Override
+      public void populateItem(final Item<ICellPopulator<PFUserDO>> item, final String componentId, final IModel<PFUserDO> rowModel)
+      {
+        final PFUserDO user = rowModel.getObject();
+        final StringBuffer buf = new StringBuffer();
+        if (user.isDeactivated() == false) {
+          htmlHelper.appendImageTag(getResponse(), buf, "/images/accept.png", null);
+        } else {
+          htmlHelper.appendImageTag(getResponse(), buf, "/images/deny.png", null);
+        }
+        final Label label = new Label(componentId, buf.toString());
+        label.setEscapeModelStrings(false);
+        item.add(label);
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
