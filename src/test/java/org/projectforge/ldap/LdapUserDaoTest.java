@@ -27,6 +27,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.projectforge.user.PFUserDO;
 
 public class LdapUserDaoTest extends LdapRealTestBase
 {
@@ -73,11 +74,12 @@ public class LdapUserDaoTest extends LdapRealTestBase
         .setHomePhoneNumber("0123").setMail("kr@acme.com").setMobilePhoneNumber("4567").setOrganization("ProjectForge")
         .setTelephoneNumber("890").setEmployeeNumber("42");
     user.setOrganizationalUnit(PATH);
-    ldapUserDao.createOrUpdate(user);
+    ldapUserDao.createOrUpdate(PATH, user);
     final LdapPerson user2 = ldapUserDao.findByUsername(uid, PATH);
     Assert.assertNotNull(user2);
     LdapTestUtils.assertUser(user2, user.getUid(), user.getGivenName(), user.getSurname(), user.getMail(), user.getOrganization(),
         user.getDescription());
+    Assert.assertEquals(LdapUtils.getOu(PATH), LdapUtils.getOu(user2.getOrganizationalUnit()));
 
     Assert.assertFalse(ldapUserDao.authenticate(uid, "", PATH));
     // Change password
@@ -99,7 +101,7 @@ public class LdapUserDaoTest extends LdapRealTestBase
     final String uid = "test-user-43";
     final LdapPerson user = new LdapPerson().setUid(uid).setGivenName("Kai").setSurname("ProjectForge Test").setEmployeeNumber("43");
     user.setOrganizationalUnit(PATH);
-    ldapUserDao.createOrUpdate(user);
+    ldapUserDao.createOrUpdate(PATH, user);
     ldapUserDao.changePassword(user, null, "hurzel");
     Assert.assertTrue(ldapUserDao.authenticate(uid, "hurzel", PATH));
     ldapUserDao.deactivateUser(user);
@@ -110,8 +112,36 @@ public class LdapUserDaoTest extends LdapRealTestBase
 
     // Reactivate user:
     ldapUserDao.reactivateUser(user2);
+    Assert.assertFalse(ldapUserDao.authenticate(uid, "hurzel", PATH));
     // Delete user
     ldapUserDao.delete(user);
+    Assert.assertNull(ldapUserDao.findByUsername(uid, PATH));
+  }
+
+  @Test
+  public void updateUser()
+  {
+    if (ldapConfig == null) {
+      log.info("No LDAP server configured for tests. Skipping test.");
+      return;
+    }
+    final String uid = "test-user-44";
+    final PFUserDO user = new PFUserDO().setUsername(uid).setLastname("Reinhard").setFirstname("Kai").setOrganization("Micromata GmbH")
+        .setEmail("k.reinhard@acme.com").setDeactivated(true);
+    user.setId(44);
+    final LdapPerson ldapUser = PFUserDOConverter.convert(user);
+    ldapUser.setOrganizationalUnit(PATH);
+    ldapUserDao.createOrUpdate(PATH, ldapUser);
+    LdapPerson ldapUser2 = ldapUserDao.findByUsername(uid, PATH);
+    Assert.assertNotNull(ldapUser2);
+    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, PATH), LdapUtils.getOu(ldapUser2.getOrganizationalUnit()));
+    Assert.assertTrue(ldapUser.isDeactivated());
+    ldapUser2.setDeactivated(false);
+    ldapUserDao.update(PATH, ldapUser2);
+    ldapUser2 = ldapUserDao.findByUsername(uid, PATH);
+    Assert.assertEquals(LdapUtils.getOu(PATH), LdapUtils.getOu(ldapUser2.getOrganizationalUnit()));
+    // Delete user
+    ldapUserDao.delete(ldapUser);
     Assert.assertNull(ldapUserDao.findByUsername(uid, PATH));
   }
 }

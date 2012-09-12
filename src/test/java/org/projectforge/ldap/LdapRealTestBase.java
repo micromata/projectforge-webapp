@@ -36,7 +36,7 @@ public class LdapRealTestBase
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapRealTestBase.class);
 
-  private static final String CONFIG_FILE = System.getProperty("user.home") + "/ProjectForge/testladpConfig.xml";
+  private static final String CONFIG_FILE = System.getProperty("user.home") + "/ProjectForge/testldapConfig.xml";
 
   LdapConfig ldapConfig;
 
@@ -54,6 +54,7 @@ public class LdapRealTestBase
     if (configFile.canRead() == false) {
       return null;
     }
+    log.info("Reading LDAP configuration file for test cases: " + configFile.getPath());
     final XmlObjectReader reader = new XmlObjectReader();
     final AliasMap aliasMap = new AliasMap();
     aliasMap.put(LdapConfig.class, "ldapConfig");

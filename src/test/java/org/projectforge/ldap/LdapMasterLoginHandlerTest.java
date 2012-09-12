@@ -51,7 +51,7 @@ public class LdapMasterLoginHandlerTest extends TestBase
     Assert.assertEquals(LoginResultStatus.SUCCESS, loginHandler.checkLogin("kai", "successful").getLoginResultStatus());
 
     final ArgumentCaptor<LdapPerson> argumentCaptor = ArgumentCaptor.forClass(LdapPerson.class);
-    verify(ldapUserDao).createOrUpdate(argumentCaptor.capture());
+    verify(ldapUserDao).createOrUpdate(userBase, argumentCaptor.capture());
     final LdapPerson createdLdapUser = argumentCaptor.getValue();
     Assert.assertEquals("kai", createdLdapUser.getUid());
     Assert.assertEquals("Kai", createdLdapUser.getGivenName());

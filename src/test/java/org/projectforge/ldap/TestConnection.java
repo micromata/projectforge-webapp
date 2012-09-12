@@ -66,14 +66,15 @@ public class TestConnection
 
     final LdapUserDao udao = new LdapUserDao();
     udao.ldapConnector = ldapConnector;
-    final List<LdapPerson> list = udao.findAll("pf-test", "users");
+    final String ouBase = "ou=pf-test,ou=users";
+    final List<LdapPerson> list = udao.findAll(ouBase);
     log.info("Found " + list.size() + " person entries.");
     final PFUserDO pfUser = new PFUserDO().setLastname("Meier").setFirstname("Horst").setUsername("h.meier")
         .setDescription("Test entry from ProjectForge dev system.").setEmail("h.meier@mail.com");
     pfUser.setId(42);
     final LdapPerson user = PFUserDOConverter.convert(pfUser);
     user.setOrganizationalUnit("pf-test", "users");
-    udao.createOrUpdate(user);
+    udao.createOrUpdate(ouBase, user);
     udao.changePassword(user, null, "test");
     udao.authenticate("h.meier", "test", "pf-test", "users");
     udao.changePassword(user, null, "hurzel");
@@ -82,9 +83,9 @@ public class TestConnection
     }
     user.setSurname("Changed");
     user.setMail("h.meier@micromata.de");
-    udao.update(user);
+    udao.update(ouBase, user);
     user.setSurname("Meier");
-    udao.update(user);
+    udao.update(ouBase, user);
     if (udao.authenticate("h.meier", "hurzel", "pf-test", "users") == false) {
       throw new RuntimeException("Login should be possible");
     }
@@ -105,7 +106,7 @@ public class TestConnection
     pfAddress.setId(2);
     LdapPerson contact = AddressDOConverter.convert(pfAddress);
     contact.setOrganizationalUnit("pf-test", "contacts");
-    adao.createOrUpdate(contact);
+    adao.createOrUpdate(ouBase, contact);
     contact = adao.findById(AddressDOConverter.UID_PREFIX + "2", "pf-test", "contacts");
     log.info("Found address with id=" + AddressDOConverter.UID_PREFIX + "2: " + contact);
 
@@ -116,6 +117,6 @@ public class TestConnection
     group.setCommonName("ProjectForge-test").setOrganizationalUnit("pf-test", "groups");
     group.addMember(contact);
     group.addMember(user);
-    gdao.createOrUpdate(group);
+    gdao.createOrUpdate(ouBase, group);
   }
 }
