@@ -54,6 +54,7 @@ import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
+import org.projectforge.user.Login;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
@@ -363,8 +364,15 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     createEMail(gridBuilder, data);
     createAuthenticationToken(gridBuilder, data, (UserDao) getBaseDao(), this);
     createJIRAUsername(gridBuilder, data);
-
     if (adminAccess == true) {
+      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.hrPlanningEnabled"), "hrPlanning", new PropertyModel<Boolean>(data,
+          "hrPlanning"), getString("user.hrPlanningEnabled.tooltip"));
+      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.deactivated"), "deactivated", new PropertyModel<Boolean>(data,
+          "deactivated"), getString("user.deactivated.tooltip"));
+      if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
+        WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.localUser"), "localUser", new PropertyModel<Boolean>(data,
+            "localUser"), getString("user.localUser.tooltip"));
+      }
       addPassswordFields();
     }
 
