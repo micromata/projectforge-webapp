@@ -11,10 +11,14 @@ package org.projectforge.web.dialog;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.Model;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
 
 import de.micromata.wicket.ajax.AjaxCallback;
@@ -70,7 +74,7 @@ public abstract class PFDialog extends Panel
     add(dialogContainer);
     dialogContainer.add(getDialogContent("dialogContent"));
 
-    final WebMarkupContainer bottomContainer = new WebMarkupContainer("bottomContainer") {
+    final Form<String> buttonForm = new Form<String>("buttonForm", Model.of("")) {
       private static final long serialVersionUID = 4536735016945915848L;
 
       /**
@@ -82,8 +86,8 @@ public abstract class PFDialog extends Panel
         return actionButtons.getList() != null && actionButtons.getList().size() > 0;
       }
     };
-    dialogContainer.add(bottomContainer);
-    bottomContainer.add(actionButtons.getRepeatingView());
+    dialogContainer.add(buttonForm);
+    buttonForm.add(actionButtons.getRepeatingView());
     this.onCloseBehavior = new MDefaultAjaxBehavior() {
 
       private static final long serialVersionUID = -3696760085641009801L;
@@ -127,19 +131,40 @@ public abstract class PFDialog extends Panel
     target.appendJavaScript("$('#" + dialogContainer.getMarkupId() + "').dialog('close');");
   }
 
-  public void addActionButton(final Component entry)
+  public PFDialog appendNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
   {
-    this.actionButtons.add(entry);
+    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, classnames);
+    this.actionButtons.add(result);
+    return this;
   }
 
-  public void prependActionButton(final Component entry)
+  public PFDialog prependNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
   {
-    this.actionButtons.add(0, entry);
+    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, classnames);
+    this.actionButtons.add(0, result);
+    return this;
   }
 
-  public String getNewActionButtonChildId()
+  private SingleButtonPanel addNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
   {
-    return this.actionButtons.newChildId();
+    final AjaxButton button = new AjaxButton("button") {
+      private static final long serialVersionUID = -5306532706450731336L;
+
+      @Override
+      protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+      {
+        ajaxCallback.callback(target);
+      }
+
+      @Override
+      protected void onError(final AjaxRequestTarget target, final Form< ? > form)
+      {
+        // we have no form, therefore we have no error method
+      }
+    };
+    final SingleButtonPanel buttonPanel = new SingleButtonPanel(this.actionButtons.newChildId(), button, label, classnames);
+    buttonPanel.add(button);
+    return buttonPanel;
   }
 
   /**
