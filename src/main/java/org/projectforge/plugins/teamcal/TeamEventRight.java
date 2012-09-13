@@ -24,9 +24,7 @@
 package org.projectforge.plugins.teamcal;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
-import org.projectforge.plugins.todo.ToDoDO;
 import org.projectforge.plugins.todo.ToDoDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightAccessCheck;
@@ -40,7 +38,7 @@ import org.projectforge.user.UserRights;
  * @author Kai Reinhard (k.reinhard@me.de)
  * 
  */
-public class TeamEventRight extends UserRightAccessCheck<ToDoDO>
+public class TeamEventRight extends UserRightAccessCheck<TeamEventDO>
 {
   private static final long serialVersionUID = -2928342166476350773L;
 
@@ -65,7 +63,7 @@ public class TeamEventRight extends UserRightAccessCheck<ToDoDO>
    * @see org.projectforge.user.UserRightAccessCheck#hasSelectAccess(org.projectforge.user.PFUserDO, java.lang.Object)
    */
   @Override
-  public boolean hasSelectAccess(final PFUserDO user, final ToDoDO obj)
+  public boolean hasSelectAccess(final PFUserDO user, final TeamEventDO obj)
   {
     return hasAccess(user, obj, OperationType.SELECT);
   }
@@ -87,7 +85,7 @@ public class TeamEventRight extends UserRightAccessCheck<ToDoDO>
    * @see org.projectforge.user.UserRightAccessCheck#hasInsertAccess(org.projectforge.user.PFUserDO, java.lang.Object)
    */
   @Override
-  public boolean hasInsertAccess(final PFUserDO user, final ToDoDO obj)
+  public boolean hasInsertAccess(final PFUserDO user, final TeamEventDO obj)
   {
     return hasAccess(user, obj, OperationType.INSERT);
   }
@@ -98,31 +96,31 @@ public class TeamEventRight extends UserRightAccessCheck<ToDoDO>
    * @see org.projectforge.user.UserRightAccessCheck#hasDeleteAccess(org.projectforge.user.PFUserDO, java.lang.Object)
    */
   @Override
-  public boolean hasDeleteAccess(final PFUserDO user, final ToDoDO obj)
+  public boolean hasDeleteAccess(final PFUserDO user, final TeamEventDO obj)
   {
     return hasAccess(user, obj, OperationType.DELETE);
   }
 
   @Override
-  public boolean hasAccess(final PFUserDO user, final ToDoDO obj, final ToDoDO oldObj, final OperationType operationType)
+  public boolean hasAccess(final PFUserDO user, final TeamEventDO obj, final TeamEventDO oldObj, final OperationType operationType)
   {
     return hasAccess(user, obj, operationType) == true || hasAccess(user, oldObj, operationType) == true;
   }
 
-  private boolean hasAccess(final PFUserDO user, final ToDoDO toDo, final OperationType operationType)
+  private boolean hasAccess(final PFUserDO user, final TeamEventDO event, final OperationType operationType)
   {
-    if (toDo == null) {
+    if (event == null) {
       return true;
     }
-    if (ObjectUtils.equals(user.getId(), toDo.getAssigneeId()) == true || ObjectUtils.equals(user.getId(), toDo.getReporterId()) == true) {
+    if (ObjectUtils.equals(user.getId(), event.getCalendar().getOwnerId()) == true) {
       return true;
     }
-    if (toDo.getGroup() != null && UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), toDo.getGroupId()) == true) {
+    if(UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getFullAccessGroupId()) == true
+        || UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getReadOnlyAccessGroupId()) == true
+        || UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getMinimalAccessGroupId()) == true) {
       return true;
     }
-    if (toDo.getTaskId() != null) {
-      return UserRights.getAccessChecker().hasPermission(user, toDo.getTaskId(), AccessType.TASKS, operationType, false);
-    } else {
+    else {
       return false;
     }
   }

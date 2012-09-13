@@ -106,6 +106,15 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   }
 
   /**
+   * Get list of teamCals where user has full access.
+   */
+  public List<TeamCalDO> getFullAccessTeamCals(final PFUserDO user, final GroupDO group) {
+    final QueryFilter queryFilter = new QueryFilter();
+    queryFilter.add(Restrictions.or(Restrictions.eq("owner", user), Restrictions.eq("fullAccessGroup", group)));
+    return getList(queryFilter);
+  }
+
+  /**
    * @see org.projectforge.core.BaseDao#getList(org.projectforge.core.BaseSearchFilter)
    */
   @Override

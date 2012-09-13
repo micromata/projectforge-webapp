@@ -9,11 +9,15 @@
 
 package org.projectforge.plugins.teamcal;
 
+import net.ftlines.wicket.fullcalendar.CalendarResponse;
 import net.ftlines.wicket.fullcalendar.EventSource;
+import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.common.DateHelper;
 import org.projectforge.web.calendar.MyFullCalendar;
 import org.projectforge.web.calendar.MyFullCalendarConfig;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -56,7 +60,27 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
     config.setSelectHelper(true);
     config.setLoading("function(bool) { if (bool) $(\"#loading\").show(); else $(\"#loading\").hide(); }");
     config.setAllDaySlot(true);
-    final MyFullCalendar myCalendar = new MyFullCalendar("calendar", config);
+    config.setDefaultView("agendaWeek");
+    @SuppressWarnings("serial")
+    final MyFullCalendar myCalendar = new MyFullCalendar("calendar", config){
+      @Override
+      protected void onDateRangeSelected(final SelectedRange range, final CalendarResponse response)
+      {
+        if (log.isDebugEnabled() == true) {
+          log.debug("Selected region: " + range.getStart() + " - " + range.getEnd() + " / allDay: " + range.isAllDay());
+        }
+        final PageParameters parameters = new PageParameters();
+        parameters.add(TeamEventEditPage.PARAMETER_KEY_START_DATE_IN_MILLIS, DateHelper.getDateTimeAsMillis(range.getStart()));
+        parameters.add(TeamEventEditPage.PARAMETER_KEY_END_DATE_IN_MILLIS, DateHelper.getDateTimeAsMillis(range.getEnd()));
+        //        parameters.add(TeamEventEditPage.PARAMETER_KEY_TEAMCALID, );
+        if (getUser() != null) {
+          parameters.add(TeamEventEditPage.PARAMETER_KEY_OWNER, getUserId());
+        }
+        final TeamEventEditPage teamEventEditPage = new TeamEventEditPage(parameters);
+        teamEventEditPage.setReturnToPage((WebPage) getPage());
+        setResponsePage(teamEventEditPage);
+      }
+    };
     getForm().add(myCalendar);
     myCalendar.setMarkupId("calendar");
     final EventSource eventSource = new EventSource();
