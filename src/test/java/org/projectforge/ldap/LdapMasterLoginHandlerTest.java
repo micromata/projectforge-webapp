@@ -29,6 +29,7 @@ import static org.mockito.Mockito.verify;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.projectforge.test.TestBase;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
@@ -51,7 +52,7 @@ public class LdapMasterLoginHandlerTest extends TestBase
     Assert.assertEquals(LoginResultStatus.SUCCESS, loginHandler.checkLogin("kai", "successful").getLoginResultStatus());
 
     final ArgumentCaptor<LdapPerson> argumentCaptor = ArgumentCaptor.forClass(LdapPerson.class);
-    verify(ldapUserDao).createOrUpdate(userBase, argumentCaptor.capture());
+    verify(ldapUserDao).createOrUpdate(Mockito.anyString(), argumentCaptor.capture());
     final LdapPerson createdLdapUser = argumentCaptor.getValue();
     Assert.assertEquals("kai", createdLdapUser.getUid());
     Assert.assertEquals("Kai", createdLdapUser.getGivenName());
