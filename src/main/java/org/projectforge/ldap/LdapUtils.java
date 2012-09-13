@@ -142,6 +142,15 @@ public class LdapUtils
     }
   }
 
+  public static Object getAttributeValue(final Attributes attributes, final String attrId) throws NamingException
+  {
+    final Attribute attr = attributes.get(attrId);
+    if (attr == null) {
+      return null;
+    }
+    return attr.get();
+  }
+
   public static String getAttributeStringValue(final Attributes attributes, final String attrId) throws NamingException
   {
     final Attribute attr = attributes.get(attrId);

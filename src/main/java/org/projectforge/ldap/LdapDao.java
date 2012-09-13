@@ -262,7 +262,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     final String dn = origObject.getDn();
     log.info("Modify attributes of " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
     ctx.modifyAttributes(dn, modificationItems);
-    if (StringUtils.equals(dn, obj.getDn()) == false) {
+    if (obj.getDn() != null && StringUtils.equals(dn, obj.getDn()) == false) {
       log.info("DN of object is changed from '" + dn + "' to '" + obj.getDn());
       ctx.rename(dn, obj.getDn());
     }
@@ -296,7 +296,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     final String ou = LdapUtils.getOu(newOrganizationalUnit);
     final String origOu = LdapUtils.getOu(origObject.getOrganizationalUnit());
     if (StringUtils.equals(origOu, ou) == false) {
-      log.info("Move object with id '" + obj.getId() + "' from changed from '" + origOu + "' to '" + ou);
+      log.info("Move object with id '" + obj.getId() + "' from '" + origOu + "' to '" + ou);
       ctx.rename("cn=" + obj.getCommonName() + "," + origOu, "cn=" + obj.getCommonName() + "," + ou);
     }
   }

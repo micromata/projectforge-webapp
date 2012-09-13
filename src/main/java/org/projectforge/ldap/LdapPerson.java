@@ -30,7 +30,7 @@ public class LdapPerson extends LdapObject<String>
 {
   private String uid, surname, givenName, organization, telephoneNumber, homePhoneNumber, description, employeeNumber;
 
-  private boolean deleted, deactivated;
+  private boolean deleted, deactivated, passwordGiven;
 
   private String[] mail, mobilePhoneNumber;
 
@@ -262,6 +262,24 @@ public class LdapPerson extends LdapObject<String>
   public LdapPerson setDeactivated(final boolean deactivated)
   {
     this.deactivated = deactivated;
+    return this;
+  }
+
+  /**
+   * @return the passwordGiven
+   */
+  public boolean isPasswordGiven()
+  {
+    return passwordGiven;
+  }
+
+  /**
+   * @param passwordGiven the passwordGiven to set
+   * @return this for chaining.
+   */
+  public LdapPerson setPasswordGiven(final boolean passwordGiven)
+  {
+    this.passwordGiven = passwordGiven;
     return this;
   }
 }

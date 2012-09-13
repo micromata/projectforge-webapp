@@ -48,6 +48,8 @@ public class LdapUserDao extends LdapPersonDao
 
   private static final String DEACTIVATED_SUB_CONTEXT3 = DEACTIVATED_SUB_CONTEXT2 + ",";
 
+  static final String DEACTIVATED_MAIL = "deactivated@devnull.com";
+
   public static boolean isDeactivated(final LdapPerson user)
   {
     return user.isDeactivated()
@@ -80,7 +82,13 @@ public class LdapUserDao extends LdapPersonDao
   protected LdapPerson mapToObject(final String dn, final Attributes attributes) throws NamingException
   {
     final LdapPerson person = super.mapToObject(dn, attributes);
-    //    person.setOrganization(LdapUtils.getAttributeStringValue(attributes, "o"));
+    if (dn != null && dn.contains(DEACTIVATED_SUB_CONTEXT2) == true) {
+      person.setDeactivated(true);
+    }
+    final Object userPassword = LdapUtils.getAttributeValue(attributes, "userPassword");
+    if (userPassword != null) {
+      person.setPasswordGiven(true);
+    }
     return person;
   }
 
@@ -103,11 +111,14 @@ public class LdapUserDao extends LdapPersonDao
     short i = 0;
     modificationItems = new ModificationItem[2];
     modificationItems[i++] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userPassword", null));
-    modificationItems[i++] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("mail", "deactivated@devnull.com"));
+    modificationItems[i++] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("mail", DEACTIVATED_MAIL));
     buildDn(null, user);
     modify(ctx, user, modificationItems);
-    // Move user to the sub-context "deactivated".
-    move(ctx, user, LdapUtils.getOu(DEACTIVATED_SUB_CONTEXT, user.getOrganizationalUnit()));
+    final String ou = LdapUtils.getOu(user.getOrganizationalUnit());
+    if (ou.startsWith(DEACTIVATED_SUB_CONTEXT2) == false) {
+      // Move user to the sub-context "deactivated".
+      move(ctx, user, LdapUtils.getOu(DEACTIVATED_SUB_CONTEXT, user.getOrganizationalUnit()));
+    }
   }
 
   /**
@@ -176,7 +187,7 @@ public class LdapUserDao extends LdapPersonDao
       log.info("Given LDAP user is deleted, so the user will not be created in the LDAP system (nothing will be done).");
       return;
     }
-    super.create(ctx,ouBase, user, args);
+    super.create(ctx, ouBase, user, args);
     if (user.isDeactivated() == true) {
       deactivateUser(ctx, user);
     }

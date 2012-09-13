@@ -117,26 +117,30 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
           log.info("Updating LDAP...");
           // First, get set of all ldap entries:
           final List<LdapPerson> ldapUsers = getAllLdapUsers(ctx);
-          final SetOfAllLdapObjects setOfAllLdapObjects = ldapUserDao.getSetOfAllObjects(userBase);
           for (final PFUserDO user : users) {
             try {
               final LdapPerson updatedLdapUser = PFUserDOConverter.convert(user);
-              updatedLdapUser.setOrganizationalUnit(userBase);
               final LdapPerson ldapUser = getLdapUser(ldapUsers, user);
               if (ldapUser == null) {
+                updatedLdapUser.setOrganizationalUnit(userBase);
                 if (user.isDeleted() == false) {
                   // Do not add deleted users.
                   ldapUserDao.create(ctx, userBase, updatedLdapUser);
-                  ldapUserDao.updateActivatedStatus(ctx, updatedLdapUser);
                 }
               } else {
+                // Need to set organizational unit for detecting the change of deactivated flag. The updateLdapUser needs the organizational
+                // unit of the original ldap object:
+                updatedLdapUser.setOrganizationalUnit(ldapUser.getOrganizationalUnit());
                 if (user.isDeleted() == true) {
                   ldapUserDao.delete(ctx, updatedLdapUser);
                 } else {
                   final boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
                   if (modified == true) {
-                    ldapUserDao.createOrUpdate(ctx, setOfAllLdapObjects, userBase, updatedLdapUser);
-                    ldapUserDao.updateActivatedStatus(ctx, updatedLdapUser);
+                    ldapUserDao.update(ctx, userBase, updatedLdapUser);
+                  }
+                  if (updatedLdapUser.isDeactivated() && ldapUser.isPasswordGiven() == true) {
+                    log.warn("User password for deactivated user is set: " + ldapUser);
+                    ldapUserDao.deactivateUser(ctx, updatedLdapUser);
                   }
                 }
               }
