@@ -57,7 +57,7 @@ public abstract class LdapLoginHandler implements LoginHandler
 
   protected LoginDefaultHandler loginDefaultHandler;
 
-  protected String userBase;
+  protected String userBase, groupBase;
 
   /**
    * @see org.projectforge.user.LoginHandler#initialize()
@@ -73,6 +73,7 @@ public abstract class LdapLoginHandler implements LoginHandler
       }
     }
     userBase = ldapConfig.getUserBase();
+    groupBase = ldapConfig.getGroupBase();
     ldapConnector = new LdapConnector(ldapConfig);
     ldapGroupDao = new LdapGroupDao();
     ldapGroupDao.ldapConnector = ldapConnector;
@@ -126,6 +127,13 @@ public abstract class LdapLoginHandler implements LoginHandler
   {
     final String organizationalUnits = ldapConfig.getGroupBase();
     final List<LdapGroup> ldapGroups = ldapGroupDao.findAll(organizationalUnits);
+    return ldapGroups;
+  }
+
+  protected List<LdapGroup> getAllLdapGroups(final DirContext ctx) throws NamingException
+  {
+    final String organizationalUnits = ldapConfig.getGroupBase();
+    final List<LdapGroup> ldapGroups = ldapGroupDao.findAll(ctx, organizationalUnits);
     return ldapGroups;
   }
 

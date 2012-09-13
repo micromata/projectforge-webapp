@@ -23,6 +23,7 @@
 
 package org.projectforge.ldap;
 
+import org.projectforge.common.BeanHelper;
 import org.projectforge.user.GroupDO;
 
 /**
@@ -32,7 +33,8 @@ public class GroupDOConverter
 {
   public static final String UID_PREFIX = "pf-address-";
 
-  public static GroupDO convert(final LdapGroup group) {
+  public static GroupDO convert(final LdapGroup group)
+  {
     final GroupDO pfGroup = new GroupDO();
     pfGroup.setId(group.getGidNumber());
     pfGroup.setName(group.getCommonName());
@@ -49,5 +51,29 @@ public class GroupDOConverter
     group.setOrganization(pfGroup.getOrganization());
     group.setDescription(pfGroup.getDescription());
     return group;
+  }
+
+  /**
+   * Copies the fields shared with ldap.
+   * @param src
+   * @param dest
+   * @return true if any modification is detected, otherwise false.
+   */
+  public static boolean copyUserFields(final GroupDO src, final GroupDO dest)
+  {
+    final boolean modified = BeanHelper.copyProperties(src, dest, true, "name", "organization", "description");
+    return modified;
+  }
+
+  /**
+   * Copies the fields.
+   * @param src
+   * @param dest
+   * @return true if any modification is detected, otherwise false.
+   */
+  public static boolean copyUserFields(final LdapGroup src, final LdapGroup dest)
+  {
+    final boolean modified = BeanHelper.copyProperties(src, dest, true, "description", "organization");
+    return modified;
   }
 }

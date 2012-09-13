@@ -152,6 +152,7 @@ public class LoginDefaultHandler implements LoginHandler
   }
 
   /**
+   * The assigned users are fetched.
    * @see org.projectforge.user.LoginHandler#getAllGroups()
    */
   @SuppressWarnings("unchecked")
@@ -179,6 +180,15 @@ public class LoginDefaultHandler implements LoginHandler
       log.fatal("******* Exception while getting users from data-base (OK only in case of migration from older versions): " + ex.getMessage());
       return new ArrayList<PFUserDO>();
     }
+  }
+
+  /**
+   * Do nothing.
+   * @see org.projectforge.user.LoginHandler#afterUserGroupCacheRefresh(java.util.List, java.util.List)
+   */
+  @Override
+  public void afterUserGroupCacheRefresh(final List<PFUserDO> users, final List<GroupDO> groups)
+  {
   }
 
   /**

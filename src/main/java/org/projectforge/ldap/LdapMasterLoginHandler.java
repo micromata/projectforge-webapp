@@ -28,6 +28,7 @@ import java.util.List;
 import javax.naming.NameNotFoundException;
 
 import org.apache.commons.lang.StringUtils;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
@@ -75,7 +76,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
       final LdapPerson ldapUser = PFUserDOConverter.convert(user);
       ldapUser.setOrganizationalUnit(userBase);
       ldapUserDao.createOrUpdate(userBase, ldapUser);
-      ldapUserDao.changePassword(ldapUser, null, user.getPassword());
+      ldapUserDao.changePassword(ldapUser, null, password);
     }
     return loginResult;
   }
@@ -97,17 +98,26 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
   public List<PFUserDO> getAllUsers()
   {
     final List<PFUserDO> users = loginDefaultHandler.getAllUsers();
+    return users;
+  }
+
+  /**
+   * Refreshes the LDAP.
+   * @see org.projectforge.user.LoginHandler#afterUserGroupCacheRefresh(java.util.List, java.util.List)
+   */
+  @Override
+  public void afterUserGroupCacheRefresh(final List<PFUserDO> users, final List<GroupDO> groups)
+  {
     new Thread() {
       @Override
       public void run()
       {
-        updateLdap(users);
+        updateLdap(users, groups);
       }
     }.start();
-    return users;
   }
 
-  private void updateLdap(final List<PFUserDO> users)
+  private void updateLdap(final List<PFUserDO> users, final List<GroupDO> groups)
   {
     synchronized (this) {
       new LdapTemplate(ldapConnector) {
@@ -123,15 +133,16 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
               final LdapPerson ldapUser = getLdapUser(ldapUsers, user);
               if (ldapUser == null) {
                 updatedLdapUser.setOrganizationalUnit(userBase);
-                if (user.isDeleted() == false) {
-                  // Do not add deleted users.
+                if (user.isDeleted() == false && user.isLocalUser() == false) {
+                  // Do not add deleted or local users.
                   ldapUserDao.create(ctx, userBase, updatedLdapUser);
                 }
               } else {
                 // Need to set organizational unit for detecting the change of deactivated flag. The updateLdapUser needs the organizational
                 // unit of the original ldap object:
                 updatedLdapUser.setOrganizationalUnit(ldapUser.getOrganizationalUnit());
-                if (user.isDeleted() == true) {
+                if (user.isDeleted() == true || user.isLocalUser() == true) {
+                  // Deleted and local users shouldn't be synchronized with LDAP:
                   ldapUserDao.delete(ctx, updatedLdapUser);
                 } else {
                   final boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
@@ -148,6 +159,34 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
               log.error("Error while proceeding user '" + user.getUsername() + "'. Continuing with next user.", ex);
             }
           }
+          // Now get all groups:
+          final List<LdapGroup> ldapGroups = getAllLdapGroups(ctx);
+          for (final GroupDO group : groups) {
+            try {
+              final LdapGroup updatedLdapGroup = GroupDOConverter.convert(group);
+              final LdapGroup ldapGroup = getLdapGroup(ldapGroups, group);
+              if (ldapGroup == null) {
+                updatedLdapGroup.setOrganizationalUnit(groupBase);
+                if (group.isDeleted() == false && group.isLocalGroup() == false) {
+                  // Do not add deleted or local groups.
+                  ldapGroupDao.create(ctx, groupBase, updatedLdapGroup);
+                }
+              } else {
+                if (group.isDeleted() == true || group.isLocalGroup() == true) {
+                  // Deleted and local users shouldn't be synchronized with LDAP:
+                  ldapGroupDao.delete(ctx, updatedLdapGroup);
+                } else {
+                  final boolean modified = GroupDOConverter.copyUserFields(updatedLdapGroup, ldapGroup);
+                  if (modified == true) {
+                    ldapGroupDao.update(ctx, groupBase, updatedLdapGroup);
+                  }
+                }
+              }
+
+            } catch (final Exception ex) {
+              log.error("Error while proceeding group '" + group.getName() + "'. Continuing with next group.", ex);
+            }
+          }
           log.info("LDAP update done.");
           return null;
         }
@@ -161,6 +200,16 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
       if (StringUtils.equals(ldapUser.getUid(), user.getUsername()) == true
           || StringUtils.equals(ldapUser.getEmployeeNumber(), PFUserDOConverter.buildEmployeeNumber(user)) == true) {
         return ldapUser;
+      }
+    }
+    return null;
+  }
+
+  private LdapGroup getLdapGroup(final List<LdapGroup> ldapGroups, final GroupDO group)
+  {
+    for (final LdapGroup ldapGroup : ldapGroups) {
+      if (NumberHelper.isEqual(ldapGroup.getGidNumber(), group.getId()) == true) {
+        return ldapGroup;
       }
     }
     return null;

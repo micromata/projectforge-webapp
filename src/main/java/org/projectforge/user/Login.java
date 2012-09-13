@@ -113,6 +113,15 @@ public class Login
     return loginHandler.getAllGroups();
   }
 
+  public void afterUserGroupCacheRefresh(final List<PFUserDO> users, final List<GroupDO> groups)
+  {
+    if (loginHandler == null) {
+      log.warn("No login handler is defined yet, so can't get all groups.");
+      return;
+    }
+    loginHandler.afterUserGroupCacheRefresh(users, groups);
+  }
+
   /**
    * @param loginHandler the loginHandler to set
    */
@@ -122,7 +131,8 @@ public class Login
     log.info("LoginHandler " + loginHandler.getClass().getName() + " registered.");
   }
 
-  public boolean hasExternalUsermanagementSystem() {
+  public boolean hasExternalUsermanagementSystem()
+  {
     if (loginHandler == null) {
       log.warn("No login handler is defined yet, assuming that no external user management system is supported.");
       return false;

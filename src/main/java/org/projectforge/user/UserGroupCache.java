@@ -535,6 +535,7 @@ public class UserGroupCache extends AbstractCache
     }
     this.rightMap = rMap;
     log.info("Initializing of UserGroupCache done.");
+    Login.getInstance().afterUserGroupCacheRefresh(users, groups);
   }
 
   private static Set<Integer> ensureAndGetUserGroupIdMap(final Map<Integer, Set<Integer>> ugIdMap, final Integer userId)

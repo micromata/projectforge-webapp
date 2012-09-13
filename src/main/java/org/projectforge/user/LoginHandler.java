@@ -70,6 +70,13 @@ public interface LoginHandler
   public List<PFUserDO> getAllUsers();
 
   /**
+   * Will be called directly after updating the user group cache. The assigned users of the groups should be fetched.
+   * @param users
+   * @param groups
+   */
+  public void afterUserGroupCacheRefresh(List<PFUserDO> users, List<GroupDO> groups);
+
+  /**
    * @return true, if the login handler supports an external user management system. This flag is used by {User|Group}EditForm for
    *         displaying/hiding field localUser|loclaGroup.
    */

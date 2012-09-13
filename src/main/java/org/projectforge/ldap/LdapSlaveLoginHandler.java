@@ -106,4 +106,13 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
     // TODO: synchronize
     return users;
   }
+
+  /**
+   * Does nothing.
+   * @see org.projectforge.user.LoginHandler#afterUserGroupCacheRefresh(java.util.List, java.util.List)
+   */
+  @Override
+  public void afterUserGroupCacheRefresh(final List<PFUserDO> users, final List<GroupDO> groups)
+  {
+  }
 }
