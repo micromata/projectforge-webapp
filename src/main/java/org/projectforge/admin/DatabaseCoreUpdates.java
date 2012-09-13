@@ -64,7 +64,7 @@ public class DatabaseCoreUpdates
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         return dao.doesTableAttributesExist(userTable, "authenticationToken", "localUser", "deactivated") == true //
-            && dao.doesTableAttributesExist(groupTable, "localGroup") == true
+            && dao.doesTableAttributesExist(groupTable, "localGroup", "nestedGroupsAllowed", "nestedGroupIds") == true
             ? UpdatePreCheckStatus.ALREADY_UPDATED
                 : UpdatePreCheckStatus.OK;
       }
@@ -84,6 +84,12 @@ public class DatabaseCoreUpdates
         }
         if (dao.doesTableAttributesExist(groupTable, "localGroup") == false) {
           dao.addTableAttributes(groupTable, new TableAttribute(GroupDO.class, "localGroup").setDefaultValue("false"));
+        }
+        if (dao.doesTableAttributesExist(groupTable, "nestedGroupsAllowed") == false) {
+          dao.addTableAttributes(groupTable, new TableAttribute(GroupDO.class, "nestedGroupsAllowed").setDefaultValue("true"));
+        }
+        if (dao.doesTableAttributesExist(groupTable, "nestedGroupIds") == false) {
+          dao.addTableAttributes(groupTable, new TableAttribute(GroupDO.class, "nestedGroupIds"));
         }
         return UpdateRunningStatus.DONE;
       }

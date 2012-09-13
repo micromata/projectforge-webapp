@@ -72,6 +72,10 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private boolean localGroup;
 
+  private boolean nestedGroupsAllowed = true;
+
+  private String nestedGroupIds;
+
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String organization;
 
@@ -175,6 +179,46 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public GroupDO setLocalGroup(final boolean localGroup)
   {
     this.localGroup = localGroup;
+    return this;
+  }
+
+  /**
+   * Default is true.
+   * @return the nestedGroupsAllowed
+   */
+  @Column(name = "nested_groups_allowed", nullable = false)
+  public boolean isNestedGroupsAllowed()
+  {
+    return nestedGroupsAllowed;
+  }
+
+  /**
+   * @param nestedGroupsAllowed the nestedGroupsAllowed to set
+   * @return this for chaining.
+   */
+  public GroupDO setNestedGroupsAllowed(final boolean nestedGroupsAllowed)
+  {
+    this.nestedGroupsAllowed = nestedGroupsAllowed;
+    return this;
+  }
+
+  /**
+   * Comma separated id's of nested groups.
+   * @return the nestedGroups
+   */
+  @Column(name = "nested_group_ids", length = 1000)
+  public String getNestedGroupIds()
+  {
+    return nestedGroupIds;
+  }
+
+  /**
+   * @param nestedGroupIds the nestedGroups to set
+   * @return this for chaining.
+   */
+  public GroupDO setNestedGroupIds(final String nestedGroupIds)
+  {
+    this.nestedGroupIds = nestedGroupIds;
     return this;
   }
 
