@@ -72,10 +72,7 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
         final PageParameters parameters = new PageParameters();
         parameters.add(TeamEventEditPage.PARAMETER_KEY_START_DATE_IN_MILLIS, DateHelper.getDateTimeAsMillis(range.getStart()));
         parameters.add(TeamEventEditPage.PARAMETER_KEY_END_DATE_IN_MILLIS, DateHelper.getDateTimeAsMillis(range.getEnd()));
-        //        parameters.add(TeamEventEditPage.PARAMETER_KEY_TEAMCALID, );
-        if (getUser() != null) {
-          parameters.add(TeamEventEditPage.PARAMETER_KEY_OWNER, getUserId());
-        }
+        parameters.add(TeamEventEditPage.PARAMETER_KEY_TEAMCALID, getData().getId());
         final TeamEventEditPage teamEventEditPage = new TeamEventEditPage(parameters);
         teamEventEditPage.setReturnToPage((WebPage) getPage());
         setResponsePage(teamEventEditPage);

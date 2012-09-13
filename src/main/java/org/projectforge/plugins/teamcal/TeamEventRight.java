@@ -25,7 +25,6 @@ package org.projectforge.plugins.teamcal;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.projectforge.access.OperationType;
-import org.projectforge.plugins.todo.ToDoDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
@@ -40,11 +39,11 @@ import org.projectforge.user.UserRights;
  */
 public class TeamEventRight extends UserRightAccessCheck<TeamEventDO>
 {
-  private static final long serialVersionUID = -2928342166476350773L;
+  private static final long serialVersionUID = 4076952301071024285L;
 
   public TeamEventRight()
   {
-    super(ToDoDao.USER_RIGHT_ID, UserRightCategory.PLUGINS, UserRightValue.TRUE);
+    super(TeamEventDao.USER_RIGHT_ID, UserRightCategory.PLUGINS, UserRightValue.TRUE);
   }
 
   /**
@@ -120,8 +119,7 @@ public class TeamEventRight extends UserRightAccessCheck<TeamEventDO>
         || UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getMinimalAccessGroupId()) == true) {
       return true;
     }
-    else {
-      return false;
-    }
+    // TODO return to false
+    return true;
   }
 }

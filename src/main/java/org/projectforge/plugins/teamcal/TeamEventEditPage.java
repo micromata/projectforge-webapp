@@ -25,6 +25,8 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
 {
   private static final long serialVersionUID = 1221484611148024273L;
 
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventEditPage.class);
+
   /**
    * Key for preset the start date.
    */
@@ -46,15 +48,8 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   public static final String PARAMETER_KEY_NEW_END_DATE = "newEndDate";
 
   /**
-   * Key for owner id.
+   * Key for calendar.
    */
-  public static final String PARAMETER_KEY_OWNER = "ownerId";
-
-  /**
-   * Key for note.
-   */
-  public static final String PARAMETER_KEY_NOTE = "note";
-
   public static final String PARAMETER_KEY_TEAMCALID = "teamCalId";
 
   @SpringBean(name = "teamEventDao")
@@ -78,10 +73,6 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   {
     //    if (isNew() == true) {
     final PageParameters parameters = getPageParameters();
-    //    final Integer teamCalId = WicketUtils.getAsInteger(parameters, PARAMETER_KEY_TASK_ID);
-    //    if (teamCalId != null) {
-    //      getBaseDao().setTask(getData(), teamCalId);
-    //    }
     final Long startDateInMillis = WicketUtils.getAsLong(parameters, PARAMETER_KEY_START_DATE_IN_MILLIS);
     final Long stopTimeInMillis = WicketUtils.getAsLong(parameters, PARAMETER_KEY_END_DATE_IN_MILLIS);
     if (startDateInMillis != null) {
@@ -96,20 +87,9 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
         getData().setStartDate(new Date(startDateInMillis)); // Default is time sheet with zero duration.
       }
     }
-    final String note = WicketUtils.getAsString(parameters, PARAMETER_KEY_NOTE);
-    if (note != null) {
-      getData().setNote(note);
-    }
     final String teamCalId = WicketUtils.getAsString(parameters, PARAMETER_KEY_TEAMCALID);
     if (teamCalId != null) {
-      getData().setCalendar(teamCalDao.getById(teamCalId));
-    }
-    final int userId = WicketUtils.getAsInt(parameters, PARAMETER_KEY_OWNER, -1);
-    if (userId != -1) {
-      if (getData().getCalendar() == null) {
-        getData().setCalendar(new TeamCalDO());
-      }
-      teamEventDao.setOwner(getData().getCalendar(), userId);
+      getData().setCalendar(teamCalDao.getById(Integer.valueOf(teamCalId))); // TODO trycatch
     }
   }
 
@@ -119,12 +99,14 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   @Override
   protected void create()
   {
+    super.create();
     //    final TeamEventDO tdo = getData();
     //    getBaseDao().save(tdo);
     //    final TeamCalEditForm tCForm = new TeamCalEditForm(new TeamCalEditPage(new PageParameters()), getData().getCalendar());
-    final TeamCalEditPage page = new TeamCalEditPage(new PageParameters());
-    page.newEditForm(this, getData().getCalendar());
-    setResponsePage(page);
+    //    final TeamCalEditPage page = new TeamCalEditPage(new PageParameters());
+    //    page.newEditForm(page, getData().getCalendar());
+    //    tCForm.setParent(page);
+    //    setResponsePage(tCForm.getPage());
   }
 
   /**
@@ -151,8 +133,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   @Override
   protected Logger getLogger()
   {
-    // TODO Auto-generated method stub
-    return null;
+    return log;
   }
 
   /**

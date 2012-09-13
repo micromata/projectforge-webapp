@@ -55,7 +55,6 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
 
   /**
    * @param mySubscribedCalendars the mySubscribedCalendars to set
-   * @return this for chaining.
    */
   public void setMySubscribedCalendars(final boolean mySubscribedCalendars)
   {
@@ -72,7 +71,6 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
 
   /**
    * @param availableCalendars the availableCalendars to set
-   * @return this for chaining.
    */
   public void setAvailableCalendars(final boolean availableCalendars)
   {
@@ -89,7 +87,6 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
 
   /**
    * @param allCalendars the allCalendars to set
-   * @return this for chaining.
    */
   public void setAllCalendars(final boolean allCalendars)
   {
@@ -106,7 +103,6 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
 
   /**
    * @param allMyCalendars the allMyCalendars to set
-   * @return this for chaining.
    */
   public void setAllMyCalendars(final boolean allMyCalendars)
   {
@@ -123,7 +119,6 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
 
   /**
    * @param own the own to set
-   * @return this for chaining.
    */
   public void setOwn(final boolean own)
   {

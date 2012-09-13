@@ -42,12 +42,14 @@ public class TeamCalPlugin extends AbstractPlugin
 
   static UserPrefArea USER_PREF_AREA;
 
-  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { TeamCalDO.class};
+  private static final Class< ? >[] PERSISTENT_ENTITIES = new Class< ? >[] { TeamCalDO.class, TeamEventDO.class};
 
   /**
    * This dao should be defined in pluginContext.xml (as resources) for proper initialization.
    */
   private TeamCalDao teamCalDao;
+
+  private TeamEventDao teamEventDao;
 
   @Override
   public Class< ? >[] getPersistentEntities()
@@ -64,25 +66,32 @@ public class TeamCalPlugin extends AbstractPlugin
     // DatabaseUpdateDao is needed by the updater:
     TeamCalPluginUpdates.dao = databaseUpdateDao;
     final RegistryEntry entry = new RegistryEntry(ID, TeamCalDao.class, teamCalDao, "plugins.teamcal");
+    final RegistryEntry eventEntry = new RegistryEntry("teamEvent", TeamEventDao.class, teamEventDao, "plugins.teamcal");
+
     // The CalendarDao is automatically available by the scripting engine!
     register(entry);
+    register(eventEntry);
 
     // Register the web part:
     registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
+    registerWeb("teamEvent", TeamEventEditPage.class, TeamEventEditPage.class);
 
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-    //    registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.teamcal.menu", TeamCalListPage.class));
+    //    registerMenuItem(new MenuItemDef(parentMenu, ID, 5, "plugins.teamcal.menu", TeamCalListPage.class));
+
     // .setMobileMenu(ToDoMobileListPage.class, 10));
 
     // Define the access management:
     registerRight(new TeamCalRight());
+    registerRight(new TeamEventRight());
 
     // All the i18n stuff:
     addResourceBundle(RESOURCE_BUNDLE_NAME);
 
     // Register favorite entries (the user can modify these templates/favorites via 'own settings'):
     USER_PREF_AREA = registerUserPrefArea("TEAMCAL_FAVORITE", TeamCalDO.class, "teamcal.favorite");
+    //    USER_PREF_AREA = registerUserPrefArea("TEAMCAL_FAVORITE", TeamEventDO.class, "teamcal.favorite");
   }
 
   /**
@@ -92,6 +101,11 @@ public class TeamCalPlugin extends AbstractPlugin
   public void setTeamCalDao(final TeamCalDao teamCalDao)
   {
     this.teamCalDao = teamCalDao;
+  }
+
+  public void setTeamEventDao(final TeamEventDao teamEventDao)
+  {
+    this.teamEventDao = teamEventDao;
   }
 
   /**

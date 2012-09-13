@@ -23,28 +23,24 @@
 
 package org.projectforge.plugins.teamcal;
 
+import org.apache.log4j.Logger;
 import org.projectforge.core.BaseDao;
-import org.projectforge.user.GroupDO;
-import org.projectforge.user.GroupDao;
-import org.projectforge.user.PFUserDO;
-import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
 
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
  * 
  */
 public class TeamEventDao extends BaseDao<TeamEventDO>
 {
-  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_CALENDAR", "plugin16", "plugins.teamcalendar.event");;
+  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_CALENDAR_EVENT", "plugin20", "plugins.teamcalendar.event");
 
-  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "owner.username", "owner.firstname", "owner.lastname",
-    "fullAccessGroup.name", "readOnlyAccessGroup.name", "minimalAccessGroup.name"};
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventDao.class);
 
-  private GroupDao groupDao;
-
-  private UserDao userDao;
+  private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "subject", "location", "calendar.id", "calendar.title",
+    "note", "attendees"};
 
   public TeamEventDao()
   {
@@ -52,35 +48,10 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     userRightId = USER_RIGHT_ID;
   }
 
-
   @Override
   protected String[] getAdditionalSearchFields()
   {
     return ADDITIONAL_SEARCH_FIELDS;
-  }
-
-  public void setOwner(final TeamCalDO calendar, final Integer userId)
-  {
-    final PFUserDO user = userDao.getOrLoad(userId);
-    calendar.setOwner(user);
-  }
-
-  public void setFullAccessGroup(final TeamCalDO calendar, final Integer groupId)
-  {
-    final GroupDO group = groupDao.getOrLoad(groupId);
-    calendar.setFullAccessGroup(group);
-  }
-
-  public void setReadOnlyAccessGroup(final TeamCalDO calendar, final Integer groupId)
-  {
-    final GroupDO group = groupDao.getOrLoad(groupId);
-    calendar.setReadOnlyAccessGroup(group);
-  }
-
-  public void setMinimalAccessGroup(final TeamCalDO calendar, final Integer groupId)
-  {
-    final GroupDO group = groupDao.getOrLoad(groupId);
-    calendar.setMinimalAccessGroup(group);
   }
 
   @Override
@@ -89,13 +60,12 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     return new TeamEventDO();
   }
 
-  public void setGroupDao(final GroupDao groupDao)
+  /**
+   * @return the log
+   */
+  public Logger getLog()
   {
-    this.groupDao = groupDao;
+    return log;
   }
 
-  public void setUserDao(final UserDao userDao)
-  {
-    this.userDao = userDao;
-  }
 }

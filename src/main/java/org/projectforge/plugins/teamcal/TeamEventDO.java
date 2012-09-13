@@ -65,7 +65,7 @@ public class TeamEventDO extends DefaultBaseDO
 
   private Date endDate;
 
-  @IndexedEmbedded
+  @IndexedEmbedded(depth = 1)
   private TeamCalDO calendar;
 
   private RecurrenceInterval recurrenceInterval;
@@ -77,10 +77,14 @@ public class TeamEventDO extends DefaultBaseDO
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String note;
 
-  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String attendees;
 
-  @Column(length = Constants.LENGTH_TITLE)
+  public TeamEventDO()
+  {
+
+  }
+
+  @Column(length = Constants.LENGTH_SUBJECT)
   public String getSubject()
   {
     return subject;
