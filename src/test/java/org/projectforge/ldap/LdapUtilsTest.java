@@ -34,10 +34,10 @@ public class LdapUtilsTest
   @Test
   public void escapeUserGroupNames()
   {
-    assertNull(LdapUtils.escapeUserGroupNames(null));
-    assertEquals("", LdapUtils.escapeUserGroupNames(""));
-    assertEquals("\\,", LdapUtils.escapeUserGroupNames(","));
-    assertEquals("\\,\\=\\+\\<\\>\\#\\;\\\\\\\"", LdapUtils.escapeUserGroupNames(",=+<>#;\\\""));
+    assertNull(LdapUtils.escapeCommonName(null));
+    assertEquals("", LdapUtils.escapeCommonName(""));
+    assertEquals("\\,", LdapUtils.escapeCommonName(","));
+    assertEquals("\\,\\=\\+\\<\\>\\#\\;\\\\\\\"", LdapUtils.escapeCommonName(",=+<>#;\\\""));
   }
 
   @Test

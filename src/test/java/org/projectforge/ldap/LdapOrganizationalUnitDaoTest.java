@@ -40,7 +40,7 @@ public class LdapOrganizationalUnitDaoTest extends LdapRealTestBase
   {
     super.setup();
     ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
-    ldapOrganizationalUnitDao.ldapConnector = ldapConnector;
+    ldapOrganizationalUnitDao.setLdapConnector(ldapConnector);
   }
 
   @Test

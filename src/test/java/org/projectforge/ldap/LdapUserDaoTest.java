@@ -46,7 +46,8 @@ public class LdapUserDaoTest extends LdapRealTestBase
     super.setup();
     ldapUserDao = new LdapUserDao();
     ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
-    ldapUserDao.ldapConnector = ldapOrganizationalUnitDao.ldapConnector = ldapConnector;
+    ldapUserDao.setLdapConnector(ldapConnector);
+    ldapOrganizationalUnitDao.setLdapConnector(ldapConnector);
     if (ldapConfig != null) {
       ldapOrganizationalUnitDao.createIfNotExist(PATH, "Test area for tests of ProjectForge.");
       ldapOrganizationalUnitDao.createIfNotExist("deactivated", "for deactivated objects.", PATH);
