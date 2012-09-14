@@ -164,6 +164,15 @@ public class UserDao extends BaseDao<PFUserDO>
   }
 
   /**
+   * @see org.projectforge.core.BaseDao#afterDelete(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void afterDelete(final PFUserDO obj)
+  {
+    userGroupCache.setExpired();
+  }
+
+  /**
    * @see org.projectforge.core.BaseDao#hasAccess(Object, OperationType)
    */
   @Override

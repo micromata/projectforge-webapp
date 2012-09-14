@@ -269,7 +269,15 @@ public class GroupDao extends BaseDao<GroupDO>
   @Override
   protected void afterSaveOrModify(final GroupDO group)
   {
-    super.afterSaveOrModify(group);
+    userGroupCache.setExpired();
+  }
+
+  /**
+   * @see org.projectforge.core.BaseDao#afterDelete(org.projectforge.core.ExtendedBaseDO)
+   */
+  @Override
+  protected void afterDelete(final GroupDO obj)
+  {
     userGroupCache.setExpired();
   }
 
