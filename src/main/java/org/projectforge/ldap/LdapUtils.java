@@ -41,6 +41,28 @@ public class LdapUtils
 {
   private static final String ATTRIBUTE_SEPARATOR_CHAR = ",";
 
+  /**
+   * Escapes the following characters: , (comma), = (equals), + (plus), < (less than), > (greater than), # (number sign), ; (semicolon), \
+   * (backslash), and " (quotation mark).
+   * @param name
+   * @return null if name is null otherwise the string name with escaped special characters.
+   */
+  public static String escapeUserGroupNames(final String name)
+  {
+    if (name == null) {
+      return null;
+    }
+    final StringBuffer buf = new StringBuffer(name.length() + 5);
+    for (int i = 0; i < name.length(); i++) {
+      final char ch = name.charAt(i);
+      if (",=+<>#;\\\"".indexOf(ch) >= 0) {
+        buf.append("\\");
+      }
+      buf.append(ch);
+    }
+    return buf.toString();
+  }
+
   public static String getOu(final String... organizationalUnits)
   {
     if (organizationalUnits == null) {
