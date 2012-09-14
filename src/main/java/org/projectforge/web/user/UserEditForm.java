@@ -367,8 +367,19 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     if (adminAccess == true) {
       WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.hrPlanningEnabled"), "hrPlanning", new PropertyModel<Boolean>(data,
           "hrPlanning"), getString("user.hrPlanningEnabled.tooltip"));
-      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.deactivated"), "deactivated", new PropertyModel<Boolean>(data,
-          "deactivated"), getString("user.deactivated.tooltip"));
+      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.activated"), "activated", new Model<Boolean>() {
+        @Override
+        public Boolean getObject()
+        {
+          return data.isDeactivated() == false;
+        };
+
+        @Override
+        public void setObject(final Boolean activated)
+        {
+          data.setDeactivated(!activated);
+        };
+      }, getString("user.activated.tooltip"));
       if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
         WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.localUser"), "localUser", new PropertyModel<Boolean>(data,
             "localUser"), getString("user.localUser.tooltip"));
