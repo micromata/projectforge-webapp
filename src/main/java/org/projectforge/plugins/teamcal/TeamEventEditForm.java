@@ -22,6 +22,7 @@ import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
 import org.projectforge.web.wicket.components.DateTimePanel;
 import org.projectforge.web.wicket.components.DateTimePanelSettings;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
@@ -42,11 +43,11 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventEditForm.class);
 
-  @SuppressWarnings("unused")
-  private String templateName; // Used by Wicket
-
   @SpringBean(name = "teamCalDao")
   private TeamCalDao teamCalDao;
+
+  @SpringBean(name = "teamEventDao")
+  private TeamEventDao teamEventDao;
 
   @SuppressWarnings("unused")
   private int stopHourOfDay, stopMinute;
@@ -73,42 +74,43 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     gridBuilder.newGrid16();
     parentPage.preInit();
 
-    setTeamCalPicker(gridBuilder.newFieldset("TeamCal", true));
+    setTeamCalPicker(gridBuilder.newFieldset(getString("plugins.teamevent.teamCal"), true));
 
     {
-      final FieldsetPanel set = gridBuilder.newFieldset("Subject");
+      final FieldsetPanel set = gridBuilder.newFieldset(getString("plugins.teamevent.subject"));
       final MaxLengthTextField subjectField = new MaxLengthTextField(set.getTextFieldId(), new PropertyModel<String>(data, "subject"));
       subjectField.setRequired(true);
       set.add(subjectField);
     }
     {
-      final FieldsetPanel set = gridBuilder.newFieldset("Note");
+      final FieldsetPanel set = gridBuilder.newFieldset(getString("plugins.teamevent.note"));
       final MaxLengthTextArea noteField = new MaxLengthTextArea(set.getTextAreaId(), new PropertyModel<String>(data, "note"));
       set.add(noteField);
     }
 
-    setPeriodPanel(gridBuilder.newFieldset("Period", true));
+    setPeriodPanel(gridBuilder.newFieldset(getString("plugins.teamevent.duration"), true));
 
     // TODO to be continued
-    //    {
-    //      final FieldsetPanel set = gridBuilder.newFieldset("Location");
-    //      @SuppressWarnings("serial")
-    //      final PFAutoCompleteMaxLengthTextField locationTextField = new PFAutoCompleteMaxLengthTextField(set.getTextFieldId(), new PropertyModel<String>(data, "allDay")){
-    //
-    //        @Override
-    //        protected List<String> getChoices(final String input)
-    //        {
-    //          return new ArrayList<String>();
-    //        }
-    //
-    //      };
-    //      set.add(locationTextField);
-    //    }
+    {
+      final FieldsetPanel set = gridBuilder.newFieldset(getString("plugins.teamevent.location"));
+      @SuppressWarnings("serial")
+      final PFAutoCompleteMaxLengthTextField locationTextField = new PFAutoCompleteMaxLengthTextField(set.getTextFieldId(),
+          new PropertyModel<String>(data, "location")){
+
+        @Override
+        protected List<String> getChoices(final String input)
+        {
+          return teamEventDao.getAutocompletion("location", input);
+        }
+
+      };
+      set.add(locationTextField);
+    }
 
     {
-      final FieldsetPanel set = gridBuilder.newFieldset("AllDay", true);
+      final FieldsetPanel set = gridBuilder.newFieldset("", true);
       final DivPanel checkBoxPanel = set.addNewCheckBoxDiv();
-      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(data, "allDay"), "lala")); // TODO lala
+      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(data, "allDay"), getString("plugins.teamevent.allDay")));
       set.add(checkBoxPanel);
     }
   }

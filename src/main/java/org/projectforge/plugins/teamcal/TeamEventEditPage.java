@@ -64,7 +64,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
    */
   public TeamEventEditPage(final PageParameters parameters)
   {
-    super(parameters, "TeamEventEdit");
+    super(parameters, "plugins.teamevent");
     super.init();
   }
 
