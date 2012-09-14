@@ -30,6 +30,8 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.PredicateUtils;
 import org.projectforge.registry.Registry;
 import org.projectforge.web.UserFilter;
 import org.springframework.dao.DataAccessException;
@@ -160,9 +162,14 @@ public class LoginDefaultHandler implements LoginHandler
   public List<GroupDO> getAllGroups()
   {
     try {
-      return hibernateTemplate.find("from GroupDO t left outer join fetch t.assignedUsers");
+      List<GroupDO> list = hibernateTemplate.find("from GroupDO t left outer join fetch t.assignedUsers");
+      if (list != null) {
+        list = (List<GroupDO>)selectUnique(list);
+      }
+      return list;
     } catch (final Exception ex) {
-      log.fatal("******* Exception while getting groups from data-base (OK only in case of migration from older versions): " + ex.getMessage());
+      log.fatal("******* Exception while getting groups from data-base (OK only in case of migration from older versions): "
+          + ex.getMessage());
       return new ArrayList<GroupDO>();
     }
   }
@@ -177,7 +184,8 @@ public class LoginDefaultHandler implements LoginHandler
     try {
       return hibernateTemplate.find("from PFUserDO t");
     } catch (final Exception ex) {
-      log.fatal("******* Exception while getting users from data-base (OK only in case of migration from older versions): " + ex.getMessage());
+      log.fatal("******* Exception while getting users from data-base (OK only in case of migration from older versions): "
+          + ex.getMessage());
       return new ArrayList<PFUserDO>();
     }
   }
@@ -189,6 +197,12 @@ public class LoginDefaultHandler implements LoginHandler
   @Override
   public void afterUserGroupCacheRefresh(final List<PFUserDO> users, final List<GroupDO> groups)
   {
+  }
+
+  protected List<?> selectUnique(final List<?> list)
+  {
+    final List<?> result = (List<?>) CollectionUtils.select(list, PredicateUtils.uniquePredicate());
+    return result;
   }
 
   /**
