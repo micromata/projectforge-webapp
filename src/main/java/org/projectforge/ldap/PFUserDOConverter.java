@@ -35,17 +35,23 @@ public class PFUserDOConverter
 {
   public static final String ID_PREFIX = "pf-id-";
 
+  public static Integer getId(final LdapPerson person)
+  {
+    final String employeeNumber = person.getEmployeeNumber();
+    if (employeeNumber != null && employeeNumber.startsWith(ID_PREFIX) == true && employeeNumber.length() > ID_PREFIX.length()) {
+      final String id = employeeNumber.substring(ID_PREFIX.length());
+      return NumberHelper.parseInteger(id);
+    }
+    return null;
+  }
+
   public static PFUserDO convert(final LdapPerson person)
   {
     final PFUserDO user = new PFUserDO();
     user.setLastname(person.getSurname());
     user.setFirstname(person.getGivenName());
     user.setUsername(person.getUid());
-    final String employeeNumber = person.getEmployeeNumber();
-    if (employeeNumber != null && employeeNumber.startsWith(ID_PREFIX) == true && employeeNumber.length() > ID_PREFIX.length()) {
-      final String id = employeeNumber.substring(ID_PREFIX.length());
-      user.setId(NumberHelper.parseInteger(id));
-    }
+    user.setId(getId(person));
     user.setOrganization(person.getOrganization());
     user.setDescription(person.getDescription());
     final String[] mails = person.getMail();

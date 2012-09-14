@@ -122,4 +122,12 @@ public class LdapConnector implements ConfigurationListener
   {
     this.ldapConfig = ConfigXml.getInstance().getLdapConfig();
   }
+
+  /**
+   * @return the ldapConfig
+   */
+  LdapConfig getLdapConfig()
+  {
+    return ldapConfig;
+  }
 }

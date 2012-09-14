@@ -50,7 +50,9 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapDao.class);
 
-  LdapConnector ldapConnector;
+  protected LdapConnector ldapConnector;
+
+  protected LdapConfig ldapConfig;
 
   protected abstract String getObjectClass();
 
@@ -100,7 +102,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
       final Attribute attr = modItem.getAttribute();
       LdapUtils.putAttribute(attrs, attr.getID(), (String) attr.get());
     }
-    LdapUtils.putAttribute(attrs, "cn", obj.getCommonName());
+    LdapUtils.putAttribute(attrs, "cn", LdapUtils.escapeCommonName(obj.getCommonName()));
     onBeforeBind(dn, attrs, args);
     ctx.bind(dn, null, attrs);
   }
@@ -234,6 +236,35 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     }
   }
 
+  /**
+   * Helper method for appending modification item(s) to a given list. At least one entry will be added if no attrValue is given.
+   * @param list
+   * @param attrId
+   * @param attrValues If null then a null-value will be assumed. If more than one string is given, multiple modification items will be
+   *          added.
+   * @return
+   */
+  protected void createAndAddModificationItems(final List<ModificationItem> list, final String attrId, final Set<String> attrValues)
+  {
+    if (attrValues == null) {
+      list.add(createModificationItem(attrId, null));
+      return;
+    }
+    boolean added = false;
+    for (final String attrValue : attrValues) {
+      if (StringUtils.isEmpty(attrValue) == true && added == true) {
+        continue;
+      }
+      final String val = StringUtils.isEmpty(attrValue) == true ? null : attrValue;
+      if (added == false) {
+        list.add(createModificationItem(DirContext.REPLACE_ATTRIBUTE, attrId, val));
+        added = true;
+      } else {
+        list.add(createModificationItem(DirContext.ADD_ATTRIBUTE, attrId, val));
+      }
+    }
+  }
+
   public void modify(final T obj, final ModificationItem[] modificationItems)
   {
     new LdapTemplate(ldapConnector) {
@@ -297,7 +328,8 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     final String origOu = LdapUtils.getOu(origObject.getOrganizationalUnit());
     if (StringUtils.equals(origOu, ou) == false) {
       log.info("Move object with id '" + obj.getId() + "' from '" + origOu + "' to '" + ou);
-      ctx.rename("cn=" + obj.getCommonName() + "," + origOu, "cn=" + obj.getCommonName() + "," + ou);
+      ctx.rename("cn=" + LdapUtils.escapeCommonName(obj.getCommonName()) + "," + origOu,
+          "cn=" + LdapUtils.escapeCommonName(obj.getCommonName()) + "," + ou);
     }
   }
 
@@ -431,7 +463,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
   protected String buildDn(final String ouBase, final T obj)
   {
     final StringBuffer buf = new StringBuffer();
-    buf.append("cn=").append(obj.getCommonName());
+    buf.append("cn=").append(LdapUtils.escapeCommonName(obj.getCommonName()));
     if (obj.getOrganizationalUnit() != null) {
       buf.append(',');
       LdapUtils.buildOu(buf, obj.getOrganizationalUnit());
@@ -470,5 +502,6 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
   public void setLdapConnector(final LdapConnector ldapConnector)
   {
     this.ldapConnector = ldapConnector;
+    this.ldapConfig = ldapConnector.getLdapConfig();
   }
 }

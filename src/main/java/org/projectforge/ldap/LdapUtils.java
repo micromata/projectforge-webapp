@@ -47,7 +47,7 @@ public class LdapUtils
    * @param name
    * @return null if name is null otherwise the string name with escaped special characters.
    */
-  public static String escapeUserGroupNames(final String name)
+  public static String escapeCommonName(final String name)
   {
     if (name == null) {
       return null;

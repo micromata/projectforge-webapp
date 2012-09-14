@@ -23,14 +23,20 @@
 
 package org.projectforge.ldap;
 
+import java.util.Map;
+
+import org.apache.commons.collections.SetUtils;
 import org.projectforge.common.BeanHelper;
 import org.projectforge.user.GroupDO;
+import org.projectforge.user.PFUserDO;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class GroupDOConverter
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GroupDOConverter.class);
+
   public static final String UID_PREFIX = "pf-address-";
 
   public static GroupDO convert(final LdapGroup group)
@@ -43,14 +49,28 @@ public class GroupDOConverter
     return pfGroup;
   }
 
-  public static LdapGroup convert(final GroupDO pfGroup)
+  public static LdapGroup convert(final GroupDO pfGroup, final String baseDN, final Map<Integer, LdapPerson> ldapUserMap)
   {
-    final LdapGroup group = new LdapGroup();
-    group.setGidNumber(pfGroup.getId());
-    group.setCommonName(pfGroup.getName());
-    group.setOrganization(pfGroup.getOrganization());
-    group.setDescription(pfGroup.getDescription());
-    return group;
+    final LdapGroup ldapGroup = new LdapGroup();
+    ldapGroup.setGidNumber(pfGroup.getId());
+    ldapGroup.setCommonName(pfGroup.getName());
+    ldapGroup.setOrganization(pfGroup.getOrganization());
+    ldapGroup.setDescription(pfGroup.getDescription());
+    if (pfGroup.getAssignedUsers() != null) {
+      for (final PFUserDO user : pfGroup.getAssignedUsers()) {
+        final LdapPerson ldapUser = ldapUserMap.get(user.getId());
+        if (ldapUser != null) {
+          ldapGroup.addMember(ldapUser, baseDN);
+        } else {
+          log.info("LDAP user with id '"
+              + user.getId()
+              + "' not found in given ldapUserMap. User will be ignored in group '"
+              + pfGroup.getName()
+              + "' (user is may-be deleted).");
+        }
+      }
+    }
+    return ldapGroup;
   }
 
   /**
@@ -59,7 +79,7 @@ public class GroupDOConverter
    * @param dest
    * @return true if any modification is detected, otherwise false.
    */
-  public static boolean copyUserFields(final GroupDO src, final GroupDO dest)
+  public static boolean copyGroupFields(final GroupDO src, final GroupDO dest)
   {
     final boolean modified = BeanHelper.copyProperties(src, dest, true, "name", "organization", "description");
     return modified;
@@ -71,9 +91,15 @@ public class GroupDOConverter
    * @param dest
    * @return true if any modification is detected, otherwise false.
    */
-  public static boolean copyUserFields(final LdapGroup src, final LdapGroup dest)
+  public static boolean copyGroupFields(final LdapGroup src, final LdapGroup dest)
   {
-    final boolean modified = BeanHelper.copyProperties(src, dest, true, "description", "organization");
+    boolean modified = BeanHelper.copyProperties(src, dest, true, "description", "organization");
+    // Checks if the sets aren't equal:
+    if (SetUtils.isEqualSet(src.getMembers(), dest.getMembers()) == false) {
+      modified = true;
+      dest.clearMembers();
+      dest.addAllMembers(src.getMembers());
+    }
     return modified;
   }
 }

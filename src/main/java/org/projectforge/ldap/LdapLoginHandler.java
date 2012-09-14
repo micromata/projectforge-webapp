@@ -57,7 +57,7 @@ public abstract class LdapLoginHandler implements LoginHandler
 
   protected LoginDefaultHandler loginDefaultHandler;
 
-  protected String userBase, groupBase;
+  protected String baseDN, userBase, groupBase;
 
   /**
    * @see org.projectforge.user.LoginHandler#initialize()
@@ -72,20 +72,21 @@ public abstract class LdapLoginHandler implements LoginHandler
         log.warn("No LDAP configured in config.xml, so any login will be impossible!");
       }
     }
+    baseDN = ldapConfig.getBaseDN();
     userBase = ldapConfig.getUserBase();
     groupBase = ldapConfig.getGroupBase();
     ldapConnector = new LdapConnector(ldapConfig);
     ldapGroupDao = new LdapGroupDao();
-    ldapGroupDao.ldapConnector = ldapConnector;
+    ldapGroupDao.setLdapConnector(ldapConnector);
     if (ldapUserDao == null) {
       // May-be already set by test class.
       ldapUserDao = new LdapUserDao();
-      ldapUserDao.ldapConnector = ldapConnector;
+      ldapUserDao.setLdapConnector(ldapConnector);
     }
     if (ldapOrganizationalUnitDao == null) {
       // May-be already set by test class.
       ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
-      ldapOrganizationalUnitDao.ldapConnector = ldapConnector;
+      ldapOrganizationalUnitDao.setLdapConnector(ldapConnector);
     }
     final Registry registry = Registry.instance();
     userDao = (UserDao) registry.getDao(UserDao.class);

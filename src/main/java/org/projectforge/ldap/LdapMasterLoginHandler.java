@@ -23,7 +23,12 @@
 
 package org.projectforge.ldap;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.naming.NameNotFoundException;
 
@@ -56,6 +61,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
     ldapOrganizationalUnitDao.createIfNotExist(userBase, "ProjectForge's user base.");
     ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.DEACTIVATED_SUB_CONTEXT, "ProjectForge's user base for deactivated users.",
         userBase);
+    ldapOrganizationalUnitDao.createIfNotExist(groupBase, "ProjectForge's group base.");
   }
 
   /**
@@ -127,6 +133,8 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
           log.info("Updating LDAP...");
           // First, get set of all ldap entries:
           final List<LdapPerson> ldapUsers = getAllLdapUsers(ctx);
+          final List<LdapPerson> updatedLdapUsers = new ArrayList<LdapPerson>();
+          int error = 0, unmodified = 0, created = 0, updated = 0, deleted = 0;
           for (final PFUserDO user : users) {
             try {
               final LdapPerson updatedLdapUser = PFUserDOConverter.convert(user);
@@ -136,6 +144,8 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
                 if (user.isDeleted() == false && user.isLocalUser() == false) {
                   // Do not add deleted or local users.
                   ldapUserDao.create(ctx, userBase, updatedLdapUser);
+                  updatedLdapUsers.add(updatedLdapUser);
+                  created++;
                 }
               } else {
                 // Need to set organizational unit for detecting the change of deactivated flag. The updateLdapUser needs the organizational
@@ -144,54 +154,133 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
                 if (user.isDeleted() == true || user.isLocalUser() == true) {
                   // Deleted and local users shouldn't be synchronized with LDAP:
                   ldapUserDao.delete(ctx, updatedLdapUser);
+                  deleted++;
                 } else {
                   final boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
                   if (modified == true) {
                     ldapUserDao.update(ctx, userBase, updatedLdapUser);
+                    updated++;
+                  } else {
+                    unmodified++;
                   }
                   if (updatedLdapUser.isDeactivated() && ldapUser.isPasswordGiven() == true) {
                     log.warn("User password for deactivated user is set: " + ldapUser);
                     ldapUserDao.deactivateUser(ctx, updatedLdapUser);
                   }
+                  updatedLdapUsers.add(updatedLdapUser);
                 }
               }
             } catch (final Exception ex) {
               log.error("Error while proceeding user '" + user.getUsername() + "'. Continuing with next user.", ex);
+              error++;
             }
           }
+          log.info("Update of LDAP users: "
+              + (error > 0 ? "*** " + error + " errors ***, " : "")
+              + unmodified
+              + " unmodified, "
+              + created
+              + " created, "
+              + updated
+              + " updated, "
+              + deleted
+              + " deleted.");
           // Now get all groups:
           final List<LdapGroup> ldapGroups = getAllLdapGroups(ctx);
+          final Map<Integer, LdapPerson> ldapUserMap = getUserMap(ldapUsers);
+          error = unmodified = created = updated = deleted = 0;
           for (final GroupDO group : groups) {
             try {
-              final LdapGroup updatedLdapGroup = GroupDOConverter.convert(group);
+              final LdapGroup updatedLdapGroup = GroupDOConverter.convert(group, baseDN, ldapUserMap);
               final LdapGroup ldapGroup = getLdapGroup(ldapGroups, group);
               if (ldapGroup == null) {
                 updatedLdapGroup.setOrganizationalUnit(groupBase);
                 if (group.isDeleted() == false && group.isLocalGroup() == false) {
                   // Do not add deleted or local groups.
+                  setMembers(updatedLdapGroup, group.getAssignedUsers(), ldapUserMap);
                   ldapGroupDao.create(ctx, groupBase, updatedLdapGroup);
+                  created++;
                 }
               } else {
+                updatedLdapGroup.setOrganizationalUnit(ldapGroup.getOrganizationalUnit());
                 if (group.isDeleted() == true || group.isLocalGroup() == true) {
                   // Deleted and local users shouldn't be synchronized with LDAP:
                   ldapGroupDao.delete(ctx, updatedLdapGroup);
+                  deleted++;
                 } else {
-                  final boolean modified = GroupDOConverter.copyUserFields(updatedLdapGroup, ldapGroup);
+                  final boolean modified = GroupDOConverter.copyGroupFields(updatedLdapGroup, ldapGroup);
                   if (modified == true) {
+                    setMembers(updatedLdapGroup, group.getAssignedUsers(), ldapUserMap);
                     ldapGroupDao.update(ctx, groupBase, updatedLdapGroup);
+                    updated++;
+                  } else {
+                    unmodified++;
                   }
                 }
               }
-
             } catch (final Exception ex) {
               log.error("Error while proceeding group '" + group.getName() + "'. Continuing with next group.", ex);
+              error++;
             }
           }
+          log.info("Update of LDAP groups: "
+              + (error > 0 ? "*** " + error + " errors ***, " : "")
+              + unmodified
+              + " unmodified, "
+              + created
+              + " created, "
+              + updated
+              + " updated, "
+              + deleted
+              + " deleted.");
           log.info("LDAP update done.");
           return null;
         }
       }.excecute();
     }
+  }
+
+  /**
+   * @param updatedLdapGroup
+   * @param assignedUsers
+   * @param ldapUserMap
+   */
+  private void setMembers(final LdapGroup updatedLdapGroup, final Set<PFUserDO> assignedUsers, final Map<Integer, LdapPerson> ldapUserMap)
+  {
+    updatedLdapGroup.clearMembers();
+    if (assignedUsers == null) {
+      // No user to assign.
+      return;
+    }
+    for (final PFUserDO assignedUser : assignedUsers) {
+      final LdapPerson ldapUser = ldapUserMap.get(assignedUser.getId());
+      if (ldapUser == null) {
+        log.info("Can't assign ldap user to group: "
+            + updatedLdapGroup.getCommonName()
+            + "! Ldap user with id '"
+            + assignedUser.getId()
+            + "' not found, Skipping (deleted?) user.");
+      } else {
+        updatedLdapGroup.addMember(ldapUser, baseDN);
+      }
+    }
+  }
+
+  private Map<Integer, LdapPerson> getUserMap(final Collection<LdapPerson> users)
+  {
+    final Map<Integer, LdapPerson> map = new HashMap<Integer, LdapPerson>();
+    if (users == null) {
+      return map;
+    }
+    for (final LdapPerson user : users) {
+      final Integer id = PFUserDOConverter.getId(user);
+      if (id != null) {
+        map.put(id, user);
+      } else {
+        log.warn("Given ldap user has no id (employee number), ignoring user for group assignments: " + user);
+      }
+    }
+    return map;
   }
 
   private LdapPerson getLdapUser(final List<LdapPerson> ldapUsers, final PFUserDO user)

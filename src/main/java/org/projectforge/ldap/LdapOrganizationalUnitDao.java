@@ -41,7 +41,7 @@ public class LdapOrganizationalUnitDao
 
   private static final String OBJECT_CLASS = "organizationalUnit";
 
-  LdapConnector ldapConnector;
+  private LdapConnector ldapConnector;
 
   public boolean doesExist(final String ou, final String... organizationalUnits)
   {

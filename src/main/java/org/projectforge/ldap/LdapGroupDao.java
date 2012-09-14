@@ -30,6 +30,8 @@ import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.ModificationItem;
 
+import org.projectforge.common.NumberHelper;
+
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
@@ -87,9 +89,7 @@ public class LdapGroupDao extends LdapDao<Integer, LdapGroup>
     createAndAddModificationItems(list, "o", group.getOrganization());
     createAndAddModificationItems(list, "description", group.getDescription());
     if (group.getMembers() != null) {
-      for (final String member : group.getMembers()) {
-        createAndAddModificationItems(list, "uniqueMember", member);
-      }
+      createAndAddModificationItems(list, "uniqueMember", group.getMembers());
     }
     return list.toArray(new ModificationItem[list.size()]);
   }
@@ -101,8 +101,17 @@ public class LdapGroupDao extends LdapDao<Integer, LdapGroup>
   protected LdapGroup mapToObject(final String dn, final Attributes attributes) throws NamingException
   {
     final LdapGroup group = new LdapGroup();
+    final String gidNumberString = LdapUtils.getAttributeStringValue(attributes, "gidNumber");
+    final Integer gidNumber = NumberHelper.parseInteger(gidNumberString);
+    group.setGidNumber(gidNumber);
     group.setDescription(LdapUtils.getAttributeStringValue(attributes, "description"));
     group.setOrganization(LdapUtils.getAttributeStringValue(attributes, "o"));
+    final String[] members = LdapUtils.getAttributeStringValues(attributes, "uniqueMember");
+    if (members != null) {
+      for (final String member : members) {
+        group.addMember(member, ldapConfig.getBaseDN());
+      }
+    }
     return group;
   }
 }

@@ -46,16 +46,15 @@ public class LdapGroup extends LdapObject<Integer>
     return this.gidNumber;
   }
 
-  public LdapGroup addMember(final String dn)
+  public LdapGroup addMember(final String dn, final String baseDN)
   {
-    members.add(dn);
+    members.add(dn + "," + baseDN);
     return this;
   }
 
-  public LdapGroup addMember(final LdapObject<?> member)
+  public LdapGroup addMember(final LdapObject< ? > member, final String baseDN)
   {
-    members.add(member.getDn());
-    return this;
+    return addMember(member.getDn(), baseDN);
   }
 
   /**
@@ -64,6 +63,16 @@ public class LdapGroup extends LdapObject<Integer>
   public Set<String> getMembers()
   {
     return members;
+  }
+
+  public void clearMembers()
+  {
+    members.clear();
+  }
+
+  public void addAllMembers(final Set<String> members)
+  {
+    members.addAll(members);
   }
 
   /**
