@@ -120,7 +120,7 @@ public class TeamEventDO extends DefaultBaseDO
   }
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "reporter_fk")
+  @JoinColumn(name = "calendar_fk")
   /**
    * @return the calendar
    */

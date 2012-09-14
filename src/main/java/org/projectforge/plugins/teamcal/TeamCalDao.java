@@ -23,6 +23,8 @@
 
 package org.projectforge.plugins.teamcal;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.hibernate.criterion.Restrictions;
@@ -44,7 +46,13 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public class TeamCalDao extends BaseDao<TeamCalDO>
 {
-  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_CALENDAR", "plugin15", "plugins.teamcal.calendar");;
+  public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_CALENDAR", "plugin15", "plugins.teamcal.calendar");
+
+  public static final String FULL_ACCESS_GROUP = "fullAccessGroup";
+
+  public static final String READ_ONLY_ACCESS_GROUP = "readonlyAccessGroup";
+
+  public static final String MINIMAL_ACCESS_GROUP = "minimalAccessGroup";
 
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "owner.username", "owner.firstname", "owner.lastname",
     "fullAccessGroup.name", "readOnlyAccessGroup.name", "minimalAccessGroup.name"};
@@ -106,12 +114,33 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   }
 
   /**
-   * Get list of teamCals where user has full access.
+   * Get list of teamCals where user is owner and has access.
+   * <p>
+   * access groups:<br />
+   * FULL_ACCESS_GROUP<br />
+   * READ_ONLY_ACCESS_GROUP<br />
+   * MINIMAL_ACCESS_GROUP
+   * </p>
+   * 
+   * @param user - where user is owner
+   * @param accessGroup - where user has given access. if accessGroup == null, only get groups, where user is owner
    */
-  public List<TeamCalDO> getFullAccessTeamCals(final PFUserDO user) {
+  public List<TeamCalDO> getTeamCalsByAccess(final PFUserDO user, final String accessGroup) {
     final QueryFilter queryFilter = new QueryFilter();
-    // TODO more groups
-    queryFilter.add(Restrictions.eq("owner", user));
+
+    if (accessGroup != null && user != null) {
+      final Collection<Integer> groups = userGroupCache.getUserGroups(user);
+      final Iterator<Integer> it = groups.iterator();
+      // get teamCals where user has access
+      while (it.hasNext()) {
+        queryFilter.add(Restrictions.or(Restrictions.eq("owner", user), Restrictions.eq(accessGroup, userGroupCache.getGroup(it.next()))));
+      }
+    } else {
+      // get teamCals where user is owner
+      queryFilter.add(Restrictions.eq("owner", user));
+    }
+    if (user == null)
+      return null;
     return getList(queryFilter);
   }
 

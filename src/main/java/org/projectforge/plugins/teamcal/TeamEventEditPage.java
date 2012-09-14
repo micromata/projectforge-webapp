@@ -100,13 +100,10 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   protected void create()
   {
     super.create();
-    //    final TeamEventDO tdo = getData();
-    //    getBaseDao().save(tdo);
-    //    final TeamCalEditForm tCForm = new TeamCalEditForm(new TeamCalEditPage(new PageParameters()), getData().getCalendar());
-    //    final TeamCalEditPage page = new TeamCalEditPage(new PageParameters());
-    //    page.newEditForm(page, getData().getCalendar());
-    //    tCForm.setParent(page);
-    //    setResponsePage(tCForm.getPage());
+    final PageParameters params = new PageParameters();
+    params.add("id", getData().getCalendar().getId());
+    final TeamCalEditPage page = new TeamCalEditPage(params);
+    setResponsePage(page);
   }
 
   /**

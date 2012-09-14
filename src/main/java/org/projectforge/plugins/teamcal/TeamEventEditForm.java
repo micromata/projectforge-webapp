@@ -89,10 +89,20 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
     setPeriodPanel(gridBuilder.newFieldset("Period", true));
 
+    // TODO to be continued
     //    {
-    //      final FieldsetPanel set = gridBuilder.newFieldset("AllDay");
-    //      final MaxLengthTextArea noteField = new MaxLengthTextArea(set.getTextAreaId(), new PropertyModel<String>(data, "allDay"));
-    //      set.add(noteField);
+    //      final FieldsetPanel set = gridBuilder.newFieldset("Location");
+    //      @SuppressWarnings("serial")
+    //      final PFAutoCompleteMaxLengthTextField locationTextField = new PFAutoCompleteMaxLengthTextField(set.getTextFieldId(), new PropertyModel<String>(data, "allDay")){
+    //
+    //        @Override
+    //        protected List<String> getChoices(final String input)
+    //        {
+    //          return new ArrayList<String>();
+    //        }
+    //
+    //      };
+    //      set.add(locationTextField);
     //    }
 
     {
@@ -108,8 +118,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
    */
   private void setTeamCalPicker(final FieldsetPanel newFieldset)
   {
-    // TODO Nullpointer
-    final List<TeamCalDO> list = teamCalDao.getFullAccessTeamCals(getUser());
+    final List<TeamCalDO> list = teamCalDao.getTeamCalsByAccess(getUser(), TeamCalDao.FULL_ACCESS_GROUP);
     final DropDownChoice<TeamCalDO> teamCalDrop = new DropDownChoice<TeamCalDO>(newFieldset.getDropDownChoiceId(),
         new PropertyModel<TeamCalDO>(data, "calendar"), list, getLabeledList(list));
     teamCalDrop.setRequired(true);
