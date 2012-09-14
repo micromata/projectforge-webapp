@@ -266,7 +266,10 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
               + "' not found, skipping user.");
         }
       } else {
-        updatedLdapGroup.addMember(ldapUser, baseDN);
+        if (assignedUser.isDeactivated() == false && assignedUser.isDeleted() == false) {
+          // Do not add deleted or deactivated users.
+          updatedLdapGroup.addMember(ldapUser, baseDN);
+        }
       }
     }
   }

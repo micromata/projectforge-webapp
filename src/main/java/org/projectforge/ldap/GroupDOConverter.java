@@ -59,6 +59,10 @@ public class GroupDOConverter
     ldapGroup.setDescription(pfGroup.getDescription());
     if (pfGroup.getAssignedUsers() != null) {
       for (final PFUserDO user : pfGroup.getAssignedUsers()) {
+        if (user.isDeactivated() == true || user.isDeleted() == true) {
+          // Do not add deleted or deactivated users.
+          continue;
+        }
         final LdapPerson ldapUser = ldapUserMap.get(user.getId());
         if (ldapUser != null) {
           ldapGroup.addMember(ldapUser, baseDN);
