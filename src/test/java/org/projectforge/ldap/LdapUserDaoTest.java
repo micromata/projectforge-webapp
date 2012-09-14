@@ -115,7 +115,7 @@ public class LdapUserDaoTest extends LdapRealTestBase
     ldapUserDao.reactivateUser(user2);
     Assert.assertFalse(ldapUserDao.authenticate(uid, "hurzel", PATH));
     // Delete user
-    ldapUserDao.delete(user);
+    ldapUserDao.delete(user2);
     Assert.assertNull(ldapUserDao.findByUsername(uid, PATH));
   }
 
@@ -142,7 +142,7 @@ public class LdapUserDaoTest extends LdapRealTestBase
     ldapUser2 = ldapUserDao.findByUsername(uid, PATH);
     Assert.assertEquals(LdapUtils.getOu(PATH), LdapUtils.getOu(ldapUser2.getOrganizationalUnit()));
     // Delete user
-    ldapUserDao.delete(ldapUser);
+    ldapUserDao.delete(ldapUser2);
     Assert.assertNull(ldapUserDao.findByUsername(uid, PATH));
   }
 }

@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.SetUtils;
 import org.projectforge.common.BeanHelper;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
 
@@ -62,11 +63,14 @@ public class GroupDOConverter
         if (ldapUser != null) {
           ldapGroup.addMember(ldapUser, baseDN);
         } else {
-          log.info("LDAP user with id '"
-              + user.getId()
-              + "' not found in given ldapUserMap. User will be ignored in group '"
-              + pfGroup.getName()
-              + "' (user is may-be deleted).");
+          final PFUserDO cacheUser = Registry.instance().getUserGroupCache().getUser(user.getId());
+          if (cacheUser == null || cacheUser.isDeleted() == false) {
+            log.warn("LDAP user with id '"
+                + user.getId()
+                + "' not found in given ldapUserMap. User will be ignored in group '"
+                + pfGroup.getName()
+                + "'.");
+          }
         }
       }
     }

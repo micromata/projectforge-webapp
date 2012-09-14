@@ -24,7 +24,6 @@
 package org.projectforge.ldap;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
@@ -69,19 +68,10 @@ public class LdapUtilsTest
     assertNull(LdapUtils.getOrganizationalUnit("cn=hurzel"));
     assertNull(LdapUtils.getOrganizationalUnit("cn=hurzel", null));
     assertNull(LdapUtils.getOrganizationalUnit("cn=hurzel", ""));
-    assertStringArray(LdapUtils.getOrganizationalUnit("cn=hurzel,ou=users", ""), "users");
-    assertStringArray(LdapUtils.getOrganizationalUnit("cn=hurzel", "ou=users"), "users");
-    assertStringArray(LdapUtils.getOrganizationalUnit("cn=hurzel,ou=intern,ou=users", ""), "intern", "users");
-    assertStringArray(LdapUtils.getOrganizationalUnit("cn=hurzel,ou=intern", "ou=users"), "intern", "users");
-    assertStringArray(LdapUtils.getOrganizationalUnit("cn=hurzel", "ou=intern,ou=users"), "intern", "users");
-  }
-
-  private void assertStringArray(final String[] array, final String... expected)
-  {
-    assertNotNull(array);
-    assertEquals(expected.length, array.length);
-    for (int i = 0; i < expected.length; i++) {
-      assertEquals(expected[i], array[i]);
-    }
+    assertEquals("ou=users", LdapUtils.getOrganizationalUnit("cn=hurzel,ou=users", ""));
+    assertEquals("ou=users", LdapUtils.getOrganizationalUnit("cn=hurzel", "ou=users"));
+    assertEquals("ou=intern,ou=users", LdapUtils.getOrganizationalUnit("cn=hurzel,ou=intern,ou=users", ""));
+    assertEquals("ou=intern,ou=users", LdapUtils.getOrganizationalUnit("cn=hurzel,ou=intern", "ou=users"));
+    assertEquals("ou=intern,ou=users", LdapUtils.getOrganizationalUnit("cn=hurzel", "ou=intern,ou=users"));
   }
 }

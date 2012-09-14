@@ -34,6 +34,7 @@ import javax.naming.NameNotFoundException;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.registry.Registry;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
@@ -170,6 +171,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
                   updatedLdapUsers.add(updatedLdapUser);
                 }
               }
+              ldapUserDao.buildDn(userBase, updatedLdapUser);
             } catch (final Exception ex) {
               log.error("Error while proceeding user '" + user.getUsername() + "'. Continuing with next user.", ex);
               error++;
@@ -187,7 +189,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
               + " deleted.");
           // Now get all groups:
           final List<LdapGroup> ldapGroups = getAllLdapGroups(ctx);
-          final Map<Integer, LdapPerson> ldapUserMap = getUserMap(ldapUsers);
+          final Map<Integer, LdapPerson> ldapUserMap = getUserMap(updatedLdapUsers);
           error = unmodified = created = updated = deleted = 0;
           for (final GroupDO group : groups) {
             try {
@@ -255,11 +257,14 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
     for (final PFUserDO assignedUser : assignedUsers) {
       final LdapPerson ldapUser = ldapUserMap.get(assignedUser.getId());
       if (ldapUser == null) {
-        log.info("Can't assign ldap user to group: "
-            + updatedLdapGroup.getCommonName()
-            + "! Ldap user with id '"
-            + assignedUser.getId()
-            + "' not found, Skipping (deleted?) user.");
+        final PFUserDO cachedUser = Registry.instance().getUserGroupCache().getUser(assignedUser.getId());
+        if (cachedUser == null || cachedUser.isDeleted() == false) {
+          log.warn("Can't assign ldap user to group: "
+              + updatedLdapGroup.getCommonName()
+              + "! Ldap user with id '"
+              + assignedUser.getId()
+              + "' not found, skipping user.");
+        }
       } else {
         updatedLdapGroup.addMember(ldapUser, baseDN);
       }

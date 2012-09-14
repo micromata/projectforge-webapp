@@ -114,10 +114,12 @@ public class LdapUserDao extends LdapPersonDao
     modificationItems[i++] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("mail", DEACTIVATED_MAIL));
     buildDn(null, user);
     modify(ctx, user, modificationItems);
-    final String ou = LdapUtils.getOu(user.getOrganizationalUnit());
+    final String ou = user.getOrganizationalUnit();
     if (ou.startsWith(DEACTIVATED_SUB_CONTEXT2) == false) {
       // Move user to the sub-context "deactivated".
-      move(ctx, user, LdapUtils.getOu(DEACTIVATED_SUB_CONTEXT, user.getOrganizationalUnit()));
+      final String newOu = LdapUtils.getOu(DEACTIVATED_SUB_CONTEXT, user.getOrganizationalUnit());
+      move(ctx, user, newOu);
+      user.setOrganizationalUnit(newOu);
     }
   }
 
@@ -153,6 +155,7 @@ public class LdapUserDao extends LdapPersonDao
       newPath = ou.substring(DEACTIVATED_SUB_CONTEXT2.length());
     }
     move(ctx, user, newPath);
+    user.setOrganizationalUnit(newPath);
   }
 
   void updateActivatedStatus(final DirContext ctx, final LdapPerson user) throws NamingException

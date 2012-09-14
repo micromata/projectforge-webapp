@@ -37,7 +37,7 @@ public abstract class LdapObject<I extends Serializable>
 {
   private String dn, commonName;
 
-  private String[] organizationalUnit;
+  private String organizationalUnit;
 
   public abstract I getId();
 
@@ -80,7 +80,7 @@ public abstract class LdapObject<I extends Serializable>
   /**
    * @return the organizationalUnit
    */
-  public String[] getOrganizationalUnit()
+  public String getOrganizationalUnit()
   {
     return organizationalUnit;
   }
@@ -89,7 +89,7 @@ public abstract class LdapObject<I extends Serializable>
    * @param organizationalUnit the organizationalUnit to set
    * @return this for chaining.
    */
-  public void setOrganizationalUnit(final String... organizationalUnit)
+  public void setOrganizationalUnit(final String organizationalUnit)
   {
     this.organizationalUnit = organizationalUnit;
   }

@@ -135,13 +135,14 @@ public class LdapUtils
     }
   }
 
-  public static String[] getOrganizationalUnit(final String dn)
+  public static String getOrganizationalUnit(final String dn)
   {
     if (dn == null || dn.indexOf("ou=") < 0) {
       return null;
     }
     final String[] entries = StringUtils.split(dn, ",");
-    final List<String> list = new ArrayList<String>();
+    final StringBuffer buf = new StringBuffer();
+    boolean first = true;
     for (String entry : entries) {
       if (entry == null) {
         continue;
@@ -150,12 +151,17 @@ public class LdapUtils
       if (entry.startsWith("ou=") == false || entry.length() < 4) {
         continue;
       }
-      list.add(entry.substring(3));
+      if (first == true) {
+        first = false;
+      } else {
+        buf.append(",");
+      }
+      buf.append(entry);
     }
-    return list.toArray(new String[list.size()]);
+    return buf.toString();
   }
 
-  public static String[] getOrganizationalUnit(final String dn, final String ouBase)
+  public static String getOrganizationalUnit(final String dn, final String ouBase)
   {
     if (StringUtils.isNotBlank(ouBase) == true) {
       return getOrganizationalUnit(dn + "," + ouBase);
