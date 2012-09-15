@@ -322,11 +322,11 @@ public class UserFilter implements Filter
         return null;
       }
       if (Login.getInstance().checkStayLogin(user) == false) {
-        log.warn("Stay-logged-in wasn't accepted by the login handler.");
+        log.warn("Stay-logged-in wasn't accepted by the login handler: " + user.getUserDisplayname());
         return null;
       }
       addStayLoggedInCookie(request, response, stayLoggedInCookie);
-      log.info("User successfully logged in using stay-logged-in method: " + user.getDisplayUsername());
+      log.info("User successfully logged in using stay-logged-in method: " + user.getUserDisplayname());
       return user;
     }
     return null;
