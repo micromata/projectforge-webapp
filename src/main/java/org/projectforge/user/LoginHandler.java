@@ -57,7 +57,7 @@ public interface LoginHandler
    * @param user
    * @return true if the stay logged in process should be accepted, otherwise false (the user has to be redirected to the login page).
    */
-  public boolean checkStayLogin(PFUserDO user);
+  public boolean checkStayLoggedIn(PFUserDO user);
 
   /**
    * @return All defined groups (also deleted groups).

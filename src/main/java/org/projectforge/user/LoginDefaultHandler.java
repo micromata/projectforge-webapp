@@ -140,10 +140,10 @@ public class LoginDefaultHandler implements LoginHandler
   }
 
   /**
-   * @see org.projectforge.user.LoginHandler#checkStayLogin(org.projectforge.user.PFUserDO)
+   * @see org.projectforge.user.LoginHandler#checkStayLoggedIn(org.projectforge.user.PFUserDO)
    */
   @Override
-  public boolean checkStayLogin(final PFUserDO user)
+  public boolean checkStayLoggedIn(final PFUserDO user)
   {
     final PFUserDO dbUser = userDao.getUserGroupCache().getUser(user.getId());
     if (dbUser != null && dbUser.hasSystemAccess() == true) {

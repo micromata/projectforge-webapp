@@ -96,13 +96,13 @@ public abstract class LdapLoginHandler implements LoginHandler
   }
 
   /**
-   * Calls {@link LoginDefaultHandler#checkStayLogin(PFUserDO)}.
-   * @see org.projectforge.user.LoginHandler#checkStayLogin(org.projectforge.user.PFUserDO)
+   * Calls {@link LoginDefaultHandler#checkStayLoggedIn(PFUserDO)}.
+   * @see org.projectforge.user.LoginHandler#checkStayLoggedIn(org.projectforge.user.PFUserDO)
    */
   @Override
-  public boolean checkStayLogin(final PFUserDO user)
+  public boolean checkStayLoggedIn(final PFUserDO user)
   {
-    return loginDefaultHandler.checkStayLogin(user);
+    return loginDefaultHandler.checkStayLoggedIn(user);
   }
 
   public boolean isAdminUser(final PFUserDO user)

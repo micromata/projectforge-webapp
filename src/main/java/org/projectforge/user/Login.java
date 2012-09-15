@@ -75,9 +75,9 @@ public class Login
   }
 
   /**
-   * @see LoginHandler#checkStayLogin(PFUserDO)
+   * @see LoginHandler#checkStayLoggedIn(PFUserDO)
    */
-  public boolean checkStayLogin(final PFUserDO user)
+  public boolean checkStayLoggedIn(final PFUserDO user)
   {
     if (loginHandler == null) {
       log.warn("No login handler is defined yet, so can't accept the stay-logged-in request.");
@@ -86,7 +86,7 @@ public class Login
     if (user == null) {
       return false;
     }
-    return loginHandler.checkStayLogin(user);
+    return loginHandler.checkStayLoggedIn(user);
   }
 
   /**

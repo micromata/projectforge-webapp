@@ -43,6 +43,7 @@ import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
 
 /**
+ * TODO: check changepassword, nested groups, restricted users.<br/>
  * This LDAP login handler has read-write access to the LDAP server and acts as master of the user and group data. All changes of
  * ProjectForge's users and groups will be written through. Any change of the LDAP server will be ignored and may be overwritten by
  * ProjectForge. <br/>
@@ -271,13 +272,13 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
   }
 
   /**
-   * Calls {@link LoginDefaultHandler#checkStayLogin(PFUserDO)}.
-   * @see org.projectforge.user.LoginHandler#checkStayLogin(org.projectforge.user.PFUserDO)
+   * Calls {@link LoginDefaultHandler#checkStayLoggedIn(PFUserDO)}.
+   * @see org.projectforge.user.LoginHandler#checkStayLoggedIn(org.projectforge.user.PFUserDO)
    */
   @Override
-  public boolean checkStayLogin(final PFUserDO user)
+  public boolean checkStayLoggedIn(final PFUserDO user)
   {
-    final boolean result = loginDefaultHandler.checkStayLogin(user);
+    final boolean result = loginDefaultHandler.checkStayLoggedIn(user);
     if (result == true && usersWithoutLdapPasswords.contains(user.getId()) == true) {
       log.info("User's stay-logged-in mechanism is temporarily disabled until the user re-logins via LoginForm to update his LDAP password (which isn't yet available): " + user.getUserDisplayname());
       return false;

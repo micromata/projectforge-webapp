@@ -321,7 +321,7 @@ public class UserFilter implements Filter
         log.warn("Invalid cookie found (stay-logged-in key, maybe renewed and/or user password changed): " + value);
         return null;
       }
-      if (Login.getInstance().checkStayLogin(user) == false) {
+      if (Login.getInstance().checkStayLoggedIn(user) == false) {
         log.warn("Stay-logged-in wasn't accepted by the login handler: " + user.getUserDisplayname());
         return null;
       }
