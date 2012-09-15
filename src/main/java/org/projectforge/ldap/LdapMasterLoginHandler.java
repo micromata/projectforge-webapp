@@ -26,6 +26,7 @@ package org.projectforge.ldap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.GroupDO;
+import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
@@ -44,13 +46,26 @@ import org.projectforge.user.PFUserDO;
  * This LDAP login handler has read-write access to the LDAP server and acts as master of the user and group data. All changes of
  * ProjectForge's users and groups will be written through. Any change of the LDAP server will be ignored and may be overwritten by
  * ProjectForge. <br/>
- * Use this login handler if you want to configure your LDAP users and LDAP groups via ProjectForge.
+ * Use this login handler if you want to configure your LDAP users and LDAP groups via ProjectForge.<br/>
+ * <h1>Passwords</h1> After each successful login-in at ProjectForge (via LoginForm) ProjectForges tries to authenticate the user with the
+ * given username/password credentials at LDAP. If the LDAP authentication fails ProjectForge changes the password with the actual password
+ * of the user (given in the LoginForm). <h1>Deactivated users</h1> Deactivated users will be moved to an sub userbase called "deactivated".
+ * The e-mail will be invalidated and the password will be deleted. Deleted and deactivated users are removed from any LDAP group. After
+ * reactivating the user, the password has to be reset if the user logins the next time via LoginForm. <h1>Deleted Users</h1> Deleted users
+ * will not be synchronized and removed in LDAP if exist. <h1>Stay-logged-in</h1> The stay-logged-in mechanism will be ignored if the LDAP
+ * password of the user isn't set (is null). Any existing LDAP password doesn't interrupt the normal stay-logged-in mechanism.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
 public class LdapMasterLoginHandler extends LdapLoginHandler
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapMasterLoginHandler.class);
+
+  /**
+   * For users of this list, the stay-logged-in mechanism interrupts, the user has to re-login via LoginForm to update the correct password
+   * in the LDAP system.
+   */
+  private Set<Integer> usersWithoutLdapPasswords = new HashSet<Integer>();
 
   /**
    * @see org.projectforge.ldap.LdapLoginHandler#initialize()
@@ -136,6 +151,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
           final List<LdapPerson> ldapUsers = getAllLdapUsers(ctx);
           final List<LdapPerson> updatedLdapUsers = new ArrayList<LdapPerson>();
           int error = 0, unmodified = 0, created = 0, updated = 0, deleted = 0;
+          final Set<Integer> shadowUsersWithoutLdapPasswords = new HashSet<Integer>();
           for (final PFUserDO user : users) {
             try {
               final LdapPerson updatedLdapUser = PFUserDOConverter.convert(user);
@@ -146,6 +162,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
                   // Do not add deleted or local users.
                   ldapUserDao.create(ctx, userBase, updatedLdapUser);
                   updatedLdapUsers.add(updatedLdapUser);
+                  shadowUsersWithoutLdapPasswords.add(user.getId()); // User can't be valid for created users.
                   created++;
                 }
               } else {
@@ -155,6 +172,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
                 if (user.isDeleted() == true || user.isLocalUser() == true) {
                   // Deleted and local users shouldn't be synchronized with LDAP:
                   ldapUserDao.delete(ctx, updatedLdapUser);
+                  shadowUsersWithoutLdapPasswords.add(user.getId()); // Paranoia code, stay-logged-in shouldn't work with deleted users.
                   deleted++;
                 } else {
                   final boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
@@ -164,9 +182,17 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
                   } else {
                     unmodified++;
                   }
-                  if (updatedLdapUser.isDeactivated() && ldapUser.isPasswordGiven() == true) {
-                    log.warn("User password for deactivated user is set: " + ldapUser);
-                    ldapUserDao.deactivateUser(ctx, updatedLdapUser);
+                  if (ldapUser.isPasswordGiven() == true) {
+                    if (updatedLdapUser.isDeactivated()) {
+                      log.warn("User password for deactivated user is set: " + ldapUser);
+                      ldapUserDao.deactivateUser(ctx, updatedLdapUser);
+                      shadowUsersWithoutLdapPasswords.add(user.getId()); // Paranoia code, stay-logged-in shouldn't work with deleted or
+                      // deactivated users.
+                    } else {
+                      shadowUsersWithoutLdapPasswords.remove(user.getId()); // Remove if exists because password is given.
+                    }
+                  } else {
+                    shadowUsersWithoutLdapPasswords.add(user.getId()); // Password isn't given for the current user.
                   }
                   updatedLdapUsers.add(updatedLdapUser);
                 }
@@ -177,6 +203,8 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
               error++;
             }
           }
+          usersWithoutLdapPasswords = shadowUsersWithoutLdapPasswords;
+          log.info("" + shadowUsersWithoutLdapPasswords.size() + " users without password in the LDAP system (login required for these users for updating the LDAP password).");
           log.info("Update of LDAP users: "
               + (error > 0 ? "*** " + error + " errors ***, " : "")
               + unmodified
@@ -243,6 +271,21 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
   }
 
   /**
+   * Calls {@link LoginDefaultHandler#checkStayLogin(PFUserDO)}.
+   * @see org.projectforge.user.LoginHandler#checkStayLogin(org.projectforge.user.PFUserDO)
+   */
+  @Override
+  public boolean checkStayLogin(final PFUserDO user)
+  {
+    final boolean result = loginDefaultHandler.checkStayLogin(user);
+    if (result == true && usersWithoutLdapPasswords.contains(user.getId()) == true) {
+      log.info("User's stay-logged-in mechanism is temporarily disabled until the user re-logins via LoginForm to update his LDAP password (which isn't yet available): " + user.getUserDisplayname());
+      return false;
+    }
+    return result;
+  }
+
+  /**
    * @param updatedLdapGroup
    * @param assignedUsers
    * @param ldapUserMap
@@ -266,7 +309,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
               + "' not found, skipping user.");
         }
       } else {
-        if (assignedUser.isDeactivated() == false && assignedUser.isDeleted() == false) {
+        if (assignedUser.hasSystemAccess() == false) {
           // Do not add deleted or deactivated users.
           updatedLdapGroup.addMember(ldapUser, baseDN);
         }
