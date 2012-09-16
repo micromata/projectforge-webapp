@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.SetUtils;
 import org.projectforge.common.BeanHelper;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
@@ -38,12 +39,22 @@ public class GroupDOConverter
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GroupDOConverter.class);
 
-  public static final String UID_PREFIX = "pf-address-";
+  static final String ID_PREFIX = "pf-id-";
+
+  public static Integer getId(final LdapGroup group)
+  {
+    final String businessCategory = group.getBusinessCategory();
+    if (businessCategory != null && businessCategory.startsWith(ID_PREFIX) == true && businessCategory.length() > ID_PREFIX.length()) {
+      final String id = businessCategory.substring(ID_PREFIX.length());
+      return NumberHelper.parseInteger(id);
+    }
+    return null;
+  }
 
   public static GroupDO convert(final LdapGroup group)
   {
     final GroupDO pfGroup = new GroupDO();
-    pfGroup.setId(group.getGidNumber());
+    pfGroup.setId(getId(group));
     pfGroup.setName(group.getCommonName());
     pfGroup.setOrganization(group.getOrganization());
     pfGroup.setDescription(group.getDescription());
@@ -53,7 +64,9 @@ public class GroupDOConverter
   public static LdapGroup convert(final GroupDO pfGroup, final String baseDN, final Map<Integer, LdapPerson> ldapUserMap)
   {
     final LdapGroup ldapGroup = new LdapGroup();
-    ldapGroup.setGidNumber(pfGroup.getId());
+    if (pfGroup.getId() != null) {
+      ldapGroup.setBusinessCategory(buildBusinessCategory(pfGroup));
+    }
     ldapGroup.setCommonName(pfGroup.getName());
     ldapGroup.setOrganization(pfGroup.getOrganization());
     ldapGroup.setDescription(pfGroup.getDescription());
@@ -79,6 +92,12 @@ public class GroupDOConverter
       }
     }
     return ldapGroup;
+  }
+
+
+  public static String buildBusinessCategory(final GroupDO group)
+  {
+    return ID_PREFIX + group.getId();
   }
 
   /**

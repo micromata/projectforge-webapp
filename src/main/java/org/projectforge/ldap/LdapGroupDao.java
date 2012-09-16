@@ -30,14 +30,16 @@ import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.ModificationItem;
 
-import org.projectforge.common.NumberHelper;
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class LdapGroupDao extends LdapDao<Integer, LdapGroup>
+public class LdapGroupDao extends LdapDao<String, LdapGroup>
 {
-  private static final String[] ADDITIONAL_OBJECT_CLASSES = { "posixGroup"};// null;//{ "groupOfNames"};
+  private static final String[] ADDITIONAL_OBJECT_CLASSES = null;//{ "posixGroup"};// null;//{ "groupOfNames"};
+
+  private static final String NONE_UNIQUE_MEMBER_ID = "cn=none";
 
   /**
    * @see org.projectforge.ldap.LdapDao#getObjectClass()
@@ -63,16 +65,16 @@ public class LdapGroupDao extends LdapDao<Integer, LdapGroup>
   @Override
   public String getIdAttrId()
   {
-    return "gidNumber";
+    return "businessCategory";
   }
 
   /**
    * @see org.projectforge.ldap.LdapDao#getId(org.projectforge.ldap.LdapObject)
    */
   @Override
-  public Integer getId(final LdapGroup obj)
+  public String getId(final LdapGroup obj)
   {
-    return obj.getGidNumber();
+    return obj.getBusinessCategory();
   }
 
   /**
@@ -85,11 +87,13 @@ public class LdapGroupDao extends LdapDao<Integer, LdapGroup>
   protected ModificationItem[] getModificationItems(final LdapGroup group)
   {
     final List<ModificationItem> list = new ArrayList<ModificationItem>();
-    createAndAddModificationItems(list, "gidNumber", group.getGidNumber().toString());
+    createAndAddModificationItems(list, "businessCategory", group.getBusinessCategory());
     createAndAddModificationItems(list, "o", group.getOrganization());
     createAndAddModificationItems(list, "description", group.getDescription());
-    if (group.getMembers() != null) {
+    if (CollectionUtils.isNotEmpty(group.getMembers()) == true) {
       createAndAddModificationItems(list, "uniqueMember", group.getMembers());
+    } else {
+      createAndAddModificationItems(list, "uniqueMember", NONE_UNIQUE_MEMBER_ID);
     }
     return list.toArray(new ModificationItem[list.size()]);
   }
@@ -101,9 +105,7 @@ public class LdapGroupDao extends LdapDao<Integer, LdapGroup>
   protected LdapGroup mapToObject(final String dn, final Attributes attributes) throws NamingException
   {
     final LdapGroup group = new LdapGroup();
-    final String gidNumberString = LdapUtils.getAttributeStringValue(attributes, "gidNumber");
-    final Integer gidNumber = NumberHelper.parseInteger(gidNumberString);
-    group.setGidNumber(gidNumber);
+    group.setBusinessCategory(LdapUtils.getAttributeStringValue(attributes, "businessCategory"));
     group.setDescription(LdapUtils.getAttributeStringValue(attributes, "description"));
     group.setOrganization(LdapUtils.getAttributeStringValue(attributes, "o"));
     final String[] members = LdapUtils.getAttributeStringValues(attributes, "uniqueMember");

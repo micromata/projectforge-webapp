@@ -105,6 +105,15 @@ public abstract class LdapLoginHandler implements LoginHandler
     return loginDefaultHandler.checkStayLoggedIn(user);
   }
 
+  /**
+   * Does nothing at default.
+   * @see org.projectforge.user.LoginHandler#passwordChanged(org.projectforge.user.PFUserDO, java.lang.String)
+   */
+  @Override
+  public void passwordChanged(final PFUserDO user, final String newPassword)
+  {
+  }
+
   public boolean isAdminUser(final PFUserDO user)
   {
     return loginDefaultHandler.isAdminUser(user);

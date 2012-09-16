@@ -34,7 +34,6 @@ import java.util.Set;
 import javax.naming.NameNotFoundException;
 
 import org.apache.commons.lang.StringUtils;
-import org.projectforge.common.NumberHelper;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.LoginDefaultHandler;
@@ -54,7 +53,10 @@ import org.projectforge.user.PFUserDO;
  * The e-mail will be invalidated and the password will be deleted. Deleted and deactivated users are removed from any LDAP group. After
  * reactivating the user, the password has to be reset if the user logins the next time via LoginForm. <h1>Deleted Users</h1> Deleted users
  * will not be synchronized and removed in LDAP if exist. <h1>Stay-logged-in</h1> The stay-logged-in mechanism will be ignored if the LDAP
- * password of the user isn't set (is null). Any existing LDAP password doesn't interrupt the normal stay-logged-in mechanism.
+ * password of the user isn't set (is null). Any existing LDAP password doesn't interrupt the normal stay-logged-in mechanism. <h1>New users
+ * </h1> New users (created with ProjectForge's UserEditPage) will be created first without password in the LDAP system directly. Such users
+ * need to log-in first at ProjectForge, otherwise their LDAP passwords aren't set (no log-in at any other system connecting to the LDAP is
+ * possible until the first log-in at ProjectForge).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -205,7 +207,9 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
             }
           }
           usersWithoutLdapPasswords = shadowUsersWithoutLdapPasswords;
-          log.info("" + shadowUsersWithoutLdapPasswords.size() + " users without password in the LDAP system (login required for these users for updating the LDAP password).");
+          log.info(""
+              + shadowUsersWithoutLdapPasswords.size()
+              + " users without password in the LDAP system (login required for these users for updating the LDAP password).");
           log.info("Update of LDAP users: "
               + (error > 0 ? "*** " + error + " errors ***, " : "")
               + unmodified
@@ -280,10 +284,21 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
   {
     final boolean result = loginDefaultHandler.checkStayLoggedIn(user);
     if (result == true && usersWithoutLdapPasswords.contains(user.getId()) == true) {
-      log.info("User's stay-logged-in mechanism is temporarily disabled until the user re-logins via LoginForm to update his LDAP password (which isn't yet available): " + user.getUserDisplayname());
+      log.info("User's stay-logged-in mechanism is temporarily disabled until the user re-logins via LoginForm to update his LDAP password (which isn't yet available): "
+          + user.getUserDisplayname());
       return false;
     }
     return result;
+  }
+
+  /**
+   * @see org.projectforge.user.LoginHandler#passwordChanged(org.projectforge.user.PFUserDO, java.lang.String)
+   */
+  @Override
+  public void passwordChanged(final PFUserDO user, final String newPassword)
+  {
+    final LdapPerson ldapUser = PFUserDOConverter.convert(user);
+    ldapUserDao.changePassword(ldapUser, null, newPassword);
   }
 
   /**
@@ -310,7 +325,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
               + "' not found, skipping user.");
         }
       } else {
-        if (assignedUser.hasSystemAccess() == false) {
+        if (assignedUser.hasSystemAccess() == true) {
           // Do not add deleted or deactivated users.
           updatedLdapGroup.addMember(ldapUser, baseDN);
         }
@@ -349,7 +364,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
   private LdapGroup getLdapGroup(final List<LdapGroup> ldapGroups, final GroupDO group)
   {
     for (final LdapGroup ldapGroup : ldapGroups) {
-      if (NumberHelper.isEqual(ldapGroup.getGidNumber(), group.getId()) == true) {
+      if (StringUtils.equals(ldapGroup.getBusinessCategory(), GroupDOConverter.buildBusinessCategory(group)) == true) {
         return ldapGroup;
       }
     }

@@ -88,8 +88,8 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     log.info("Create " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
     final Attributes attrs = new BasicAttributes();
     final BasicAttribute ocattr = new BasicAttribute("objectclass");
-    ocattr.add("top");
     ocattr.add(getObjectClass());
+    ocattr.add("top");
     final String[] additionalObjectClasses = getAdditionalObjectClasses();
     if (additionalObjectClasses != null) {
       for (final String additionalObjectClass : additionalObjectClasses) {
@@ -456,6 +456,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
   }
 
   /**
+   * Sets dn of object and organizationalUnit if not already given.
    * @param ouBase If {@link T#getOrganizationalUnit()} is not given, ouBase is used for building dn, otherwise ouBase is ignored.
    * @param obj
    * @return
@@ -470,6 +471,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     } else if (ouBase != null) {
       buf.append(',');
       LdapUtils.buildOu(buf, ouBase);
+      obj.setOrganizationalUnit(ouBase);
     }
     obj.setDn(buf.toString());
     return obj.getDn();

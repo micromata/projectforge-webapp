@@ -33,7 +33,7 @@ import org.projectforge.user.PFUserDO;
  */
 public class PFUserDOConverter
 {
-  public static final String ID_PREFIX = "pf-id-";
+  static final String ID_PREFIX = "pf-id-";
 
   public static Integer getId(final LdapPerson person)
   {

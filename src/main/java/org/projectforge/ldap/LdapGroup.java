@@ -29,11 +29,9 @@ import java.util.Set;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class LdapGroup extends LdapObject<Integer>
+public class LdapGroup extends LdapObject<String>
 {
-  private Integer gidNumber;
-
-  private String description, organization;
+  private String description, organization, businessCategory;
 
   private final Set<String> members = new HashSet<String>();
 
@@ -41,9 +39,9 @@ public class LdapGroup extends LdapObject<Integer>
    * @see org.projectforge.ldap.LdapObject#getId()
    */
   @Override
-  public Integer getId()
+  public String getId()
   {
-    return this.gidNumber;
+    return getCommonName();
   }
 
   public LdapGroup addMember(final String dn, final String baseDN)
@@ -80,20 +78,21 @@ public class LdapGroup extends LdapObject<Integer>
   }
 
   /**
-   * @return the gidNumber
+   * Field businessCategory is used for storing ProjectForge's group id (in LDAP master mode).
+   * @return the id.
    */
-  public Integer getGidNumber()
+  public String getBusinessCategory()
   {
-    return gidNumber;
+    return businessCategory;
   }
 
   /**
-   * @param gidNumber the gidNumber to set
+   * @param businessCategory the businessCategory to set
    * @return this for chaining.
    */
-  public LdapGroup setGidNumber(final Integer gidNumber)
+  public LdapGroup setBusinessCategory(final String businessCategory)
   {
-    this.gidNumber = gidNumber;
+    this.businessCategory = businessCategory;
     return this;
   }
 
