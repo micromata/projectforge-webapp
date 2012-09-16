@@ -81,4 +81,11 @@ public interface LoginHandler
    *         displaying/hiding field localUser|loclaGroup.
    */
   public boolean hasExternalUsermanagementSystem();
+
+  /**
+   * Will be called while changing the user's password. The access and password quality is already checked.
+   * @param user
+   * @param newPassword
+   */
+  public void passwordChanged(PFUserDO user, String newPassword);
 }

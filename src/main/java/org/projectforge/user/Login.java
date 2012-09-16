@@ -89,6 +89,17 @@ public class Login
     return loginHandler.checkStayLoggedIn(user);
   }
 
+  public void passwordChanged(final PFUserDO user, final String newPassword) {
+    if (loginHandler == null) {
+      log.warn("No login handler is defined yet, so can't accept the stay-logged-in request.");
+      return;
+    }
+    if (user == null) {
+      return;
+    }
+    loginHandler.passwordChanged(user, newPassword);
+  }
+
   /**
    * @see LoginHandler#getAllUsers()
    */

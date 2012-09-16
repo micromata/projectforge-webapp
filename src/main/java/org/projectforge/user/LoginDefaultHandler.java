@@ -215,4 +215,14 @@ public class LoginDefaultHandler implements LoginHandler
   {
     return false;
   }
+
+  /**
+   * Do nothing.
+   * @see org.projectforge.user.LoginHandler#passwordChanged(org.projectforge.user.PFUserDO, java.lang.String)
+   */
+  @Override
+  public void passwordChanged(final PFUserDO user, final String newPassword)
+  {
+    // Do nothing.
+  }
 }
