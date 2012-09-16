@@ -45,6 +45,7 @@ import org.apache.wicket.request.cycle.AbstractRequestCycleListener;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.handler.PageProvider;
 import org.apache.wicket.request.handler.RenderPageRequestHandler;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
@@ -79,6 +80,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.orm.hibernate3.LocalSessionFactoryBean;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 import org.springframework.web.context.support.XmlWebApplicationContext;
+
+import com.vaynberg.wicket.select2.ApplicationSettings;
 
 /**
  * Application object for your web application. If you want to run this application without deploying, run the Start class.
@@ -293,6 +296,20 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     getComponentInstantiationListeners().add(new SpringComponentInjector(this));
     getApplicationSettings().setInternalErrorPage(ErrorPage.class);
     // getRequestCycleSettings().setGatherExtendedBrowserInfo(true); // For getting browser width and height.
+
+    // Select2:
+    final ApplicationSettings select2Settings = ApplicationSettings.get();
+    select2Settings.setIncludeJquery(false);
+    select2Settings.setJavaScriptReference(new PackageResourceReference(ApplicationSettings.class, "select2/select2.js"));
+    select2Settings.setJavaScriptMinifiedReference(new PackageResourceReference(ApplicationSettings.class, "select2/select2.min.js"));
+    if (isDevelopmentSystem() == true) {
+      select2Settings.setMouseWheelReference(new PackageResourceReference(ApplicationSettings.class,
+          "jquery/mousewheel/jquery.mousewheel.js"));
+    } else {
+      select2Settings.setMouseWheelReference(new PackageResourceReference(ApplicationSettings.class,
+          "jquery/mousewheel/jquery.mousewheel.min.js"));
+    }
+    select2Settings.setCssReference(new PackageResourceReference(ApplicationSettings.class, "select2/select2.css"));
 
     final XmlWebApplicationContext webApplicationContext = (XmlWebApplicationContext) WebApplicationContextUtils
         .getWebApplicationContext(getServletContext());
