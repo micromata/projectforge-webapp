@@ -220,6 +220,11 @@
       <artifactId>jersey-grizzly2</artifactId>
       <version>1.11</version>
     </dependency>
+    <dependency>
+      <groupId>com.vaynberg.wicket.select2</groupId>
+      <artifactId>wicket-select2</artifactId>
+      <version>1.0</version>
+    </dependency>
     <dependency> <!-- Version check: 2010-08-28 -->
       <groupId>commons-beanutils</groupId>
       <artifactId>commons-beanutils</artifactId>
@@ -586,15 +591,15 @@
       <version>1.0.3</version>
     </dependency>
     <dependency>
-        <groupId>org.mnode.ical4j</groupId>
-        <artifactId>ical4j-vcard</artifactId>
-        <version>0.9.5</version>
+      <groupId>org.mnode.ical4j</groupId>
+      <artifactId>ical4j-vcard</artifactId>
+      <version>0.9.5</version>
     </dependency>
     <dependency>
-    <groupId>backport-util-concurrent</groupId>
-    <artifactId>backport-util-concurrent</artifactId>
-    <version>3.1</version>
-</dependency>
+      <groupId>backport-util-concurrent</groupId>
+      <artifactId>backport-util-concurrent</artifactId>
+      <version>3.1</version>
+    </dependency>
 
     <!-- JETTY DEPENDENCIES FOR TESTING -->
     <dependency>
@@ -641,7 +646,7 @@
           <artifactId>maven-site-plugin</artifactId>
           <version>3.0</version>
         </plugin>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
