@@ -85,6 +85,7 @@ public class LdapUserDaoTest extends LdapRealTestBase
     Assert.assertFalse(ldapUserDao.authenticate(uid, "", PATH));
     // Change password
     ldapUserDao.changePassword(user, null, "hurzel");
+    Assert.assertEquals(PATH, ldapUserDao.findByUsername(uid, PATH).getOrganizationalUnit());
     Assert.assertTrue(ldapUserDao.authenticate(uid, "hurzel", PATH));
 
     // Delete user

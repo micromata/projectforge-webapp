@@ -293,10 +293,11 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     final String dn = origObject.getDn();
     log.info("Modify attributes of " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
     ctx.modifyAttributes(dn, modificationItems);
-    if (obj.getDn() != null && StringUtils.equals(dn, obj.getDn()) == false) {
-      log.info("DN of object is changed from '" + dn + "' to '" + obj.getDn());
-      ctx.rename(dn, obj.getDn());
-    }
+    // Don't move object.
+    // if (obj.getDn() != null && StringUtils.equals(dn, obj.getDn()) == false) {
+    // log.info("DN of object is changed from '" + dn + "' to '" + obj.getDn());
+    // ctx.rename(dn, obj.getDn());
+    // }
   }
 
   public void move(final T obj, final String newOrganizationalUnit)
