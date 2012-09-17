@@ -101,8 +101,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
   protected UserRightsEditData rightsData;
 
-  @SuppressWarnings("unused")
-  private String password;
+  String password;
 
   @SuppressWarnings("unused")
   private String passwordRepeat;
