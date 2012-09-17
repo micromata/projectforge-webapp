@@ -337,7 +337,7 @@ public class UserDao extends BaseDao<PFUserDO>
    * @return Error message key if any check failed or null, if successfully changed.
    */
   @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
-  public String changePassword(PFUserDO user, String oldPassword, String newPassword)
+  public String changePassword(PFUserDO user, final String oldPassword, final String newPassword)
   {
     Validate.notNull(user);
     Validate.notNull(oldPassword);
@@ -349,13 +349,13 @@ public class UserDao extends BaseDao<PFUserDO>
     accessChecker.checkDemoUser();
     final String encryptedOldPassword = encryptPassword(oldPassword);
     final String encryptedNewPassword = encryptPassword(newPassword);
-    oldPassword = newPassword = "";
     user = getUser(user.getUsername(), encryptedOldPassword);
     if (user == null) {
       return MESSAGE_KEY_OLD_PASSWORD_WRONG;
     }
     user.setPassword(encryptedNewPassword);
     user.setStayLoggedInKey(createStayLoggedInKey());
+    Login.getInstance().passwordChanged(user, newPassword);
     log.info("Password changed and stay-logged-key renewed for user: " + user.getId() + " - " + user.getUsername());
     return null;
   }
