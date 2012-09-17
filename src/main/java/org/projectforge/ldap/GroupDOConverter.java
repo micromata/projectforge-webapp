@@ -94,7 +94,6 @@ public class GroupDOConverter
     return ldapGroup;
   }
 
-
   public static String buildBusinessCategory(final GroupDO group)
   {
     return ID_PREFIX + group.getId();
@@ -123,9 +122,12 @@ public class GroupDOConverter
     boolean modified = BeanHelper.copyProperties(src, dest, true, "description", "organization");
     // Checks if the sets aren't equal:
     if (SetUtils.isEqualSet(src.getMembers(), dest.getMembers()) == false) {
-      modified = true;
-      dest.clearMembers();
-      dest.addAllMembers(src.getMembers());
+      if (LdapGroupDao.hasMembers(src) == true || LdapGroupDao.hasMembers(dest) == true) {
+        // If both, src and dest have no members, then do nothing, otherwise:
+        modified = true;
+        dest.clearMembers();
+        dest.addAllMembers(src.getMembers());
+      }
     }
     return modified;
   }

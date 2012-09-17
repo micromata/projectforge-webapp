@@ -37,9 +37,25 @@ import org.apache.commons.collections.CollectionUtils;
  */
 public class LdapGroupDao extends LdapDao<String, LdapGroup>
 {
-  private static final String[] ADDITIONAL_OBJECT_CLASSES = null;//{ "posixGroup"};// null;//{ "groupOfNames"};
+  private static final String[] ADDITIONAL_OBJECT_CLASSES = null;// { "posixGroup"};// null;//{ "groupOfNames"};
 
   private static final String NONE_UNIQUE_MEMBER_ID = "cn=none";
+
+  /**
+   * Since member of groups can't be null, "cn=none" if the group has no real members.
+   * @param group
+   * @return
+   */
+  public static boolean hasMembers(final LdapGroup group)
+  {
+    if (group.getMembers() == null || group.getMembers().size() == 0) {
+      return false;
+    }
+    if (group.getMembers().size() > 1) {
+      return true;
+    }
+    return group.getMembers().iterator().next().startsWith(NONE_UNIQUE_MEMBER_ID) == false;
+  }
 
   /**
    * @see org.projectforge.ldap.LdapDao#getObjectClass()
