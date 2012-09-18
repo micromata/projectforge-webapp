@@ -23,8 +23,16 @@
 
 package org.projectforge.plugins.teamcal;
 
+import java.util.List;
+
+import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import org.projectforge.common.DateHolder;
 import org.projectforge.core.BaseDao;
+import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.core.QueryFilter;
 import org.projectforge.user.UserRightId;
 
 /**
@@ -52,6 +60,68 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   protected String[] getAdditionalSearchFields()
   {
     return ADDITIONAL_SEARCH_FIELDS;
+  }
+
+  public List<TeamEventDO> getEventList(final BaseSearchFilter filter) //throws AccessException
+  {
+    final TeamEventFilter myFilter;
+    if (filter instanceof TeamEventFilter) {
+      myFilter = (TeamEventFilter) filter;
+    } else {
+      myFilter = new TeamEventFilter();
+    }
+    if (myFilter.getEndDate() != null) {
+      final DateHolder date = new DateHolder(myFilter.getEndDate());
+      date.setEndOfDay();
+      myFilter.setEndDate(date.getDate());
+    }
+    final QueryFilter queryFilter = buildQueryFilter(myFilter);
+    final List<TeamEventDO> result = getList(queryFilter);
+    if (result == null) {
+      return null;
+    }
+    // Check time period overlaps:
+    //    for (final TeamEventDO entry : result) {
+    //      Validate.notNull(entry.getCalendarId());
+    //      final Set<Integer> overlapSet = getTimesheetsWithTimeoverlap(entry.getCalendarId());
+    //      if (overlapSet.contains(entry.getId()) == true) {
+    //        log.info("Overlap of time sheet decteced: " + entry);
+    //        entry.setMarked(true);
+    //      }
+    //    }
+    //    if (myFilter.isMarked() == true) {
+    //      // Show only time sheets with time period violation (overlap):
+    //      final List<TeamEventDO> list = result;
+    //      result = new ArrayList<TeamEventDO>();
+    //      for (final TeamEventDO entry : list) {
+    //        if (entry.isMarked() == true) {
+    //          result.add(entry);
+    //        }
+    //      }
+    //    }
+    return result;
+  }
+
+  public QueryFilter buildQueryFilter(final TeamEventFilter filter)
+  {
+    final QueryFilter queryFilter = new QueryFilter(filter);
+    if (filter.getTeamCalId() != null) {
+      final TeamCalDO teamCal = new TeamCalDO();
+      teamCal.setId(filter.getTeamCalId());
+      queryFilter.add(Restrictions.eq("calendar", teamCal));
+    }
+    if (filter.getStartDate() != null && filter.getEndDate() != null) {
+      queryFilter.add(Restrictions.between("startDate", filter.getStartDate(), filter.getEndDate()));
+    } else if (filter.getStartDate() != null) {
+      queryFilter.add(Restrictions.ge("startDate", filter.getStartDate()));
+    } else if (filter.getEndDate() != null) {
+      queryFilter.add(Restrictions.le("startDate", filter.getEndDate()));
+    }
+    queryFilter.addOrder(Order.desc("startDate"));
+    if (log.isDebugEnabled() == true) {
+      log.debug(ToStringBuilder.reflectionToString(filter));
+    }
+    return queryFilter;
   }
 
   @Override

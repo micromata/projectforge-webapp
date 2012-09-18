@@ -90,7 +90,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
     setPeriodPanel(gridBuilder.newFieldset(getString("plugins.teamevent.duration"), true));
 
-    // TODO to be continued
     {
       final FieldsetPanel set = gridBuilder.newFieldset(getString("plugins.teamevent.location"));
       @SuppressWarnings("serial")
@@ -118,11 +117,27 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   /**
    * @param newFieldset
    */
+  @SuppressWarnings("serial")
   private void setTeamCalPicker(final FieldsetPanel newFieldset)
   {
     final List<TeamCalDO> list = teamCalDao.getTeamCalsByAccess(getUser(), TeamCalDao.FULL_ACCESS_GROUP);
+    final PropertyModel<TeamCalDO> selectModel = new PropertyModel<TeamCalDO>(data, "calendar");
     final DropDownChoice<TeamCalDO> teamCalDrop = new DropDownChoice<TeamCalDO>(newFieldset.getDropDownChoiceId(),
-        new PropertyModel<TeamCalDO>(data, "calendar"), list, getLabeledList(list));
+        selectModel, list, getLabeledList(list)){
+      /**
+       * @see org.apache.wicket.markup.html.form.AbstractSingleSelectChoice#isSelected(java.lang.Object, int, java.lang.String)
+       */
+      @Override
+      protected boolean isSelected(final TeamCalDO object, final int index, final String selected)
+      {
+        final boolean check = super.isSelected(object, index, selected);
+        if (object.equals(data.getCalendar()))
+          return true;
+        else
+          return check;
+      }
+    };
+    teamCalDrop.setNullValid(false);
     teamCalDrop.setRequired(true);
     newFieldset.add(teamCalDrop);
   }

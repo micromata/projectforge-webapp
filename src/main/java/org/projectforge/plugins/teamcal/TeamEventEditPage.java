@@ -9,7 +9,7 @@
 
 package org.projectforge.plugins.teamcal;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -76,15 +76,15 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     final Long startDateInMillis = WicketUtils.getAsLong(parameters, PARAMETER_KEY_START_DATE_IN_MILLIS);
     final Long stopTimeInMillis = WicketUtils.getAsLong(parameters, PARAMETER_KEY_END_DATE_IN_MILLIS);
     if (startDateInMillis != null) {
-      getData().setStartDate(new Date(startDateInMillis));
+      getData().setStartDate(new Timestamp(startDateInMillis));
       if (stopTimeInMillis == null) {
-        getData().setEndDate(new Date(stopTimeInMillis)); // Default is time sheet with zero duration.
+        getData().setEndDate(new Timestamp(stopTimeInMillis)); // Default is time sheet with zero duration.
       }
     }
     if (stopTimeInMillis != null) {
-      getData().setEndDate(new Date(stopTimeInMillis));
+      getData().setEndDate(new Timestamp(stopTimeInMillis));
       if (startDateInMillis == null) {
-        getData().setStartDate(new Date(startDateInMillis)); // Default is time sheet with zero duration.
+        getData().setStartDate(new Timestamp(startDateInMillis)); // Default is time sheet with zero duration.
       }
     }
     final String teamCalId = WicketUtils.getAsString(parameters, PARAMETER_KEY_TEAMCALID);
@@ -112,7 +112,10 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   @Override
   protected void cancel()
   {
-    setResponsePage(TeamCalListPage.class);
+    final PageParameters params = new PageParameters();
+    params.add("id", getData().getCalendar().getId());
+    final TeamCalEditPage page = new TeamCalEditPage(params);
+    setResponsePage(page);
   }
 
   /**

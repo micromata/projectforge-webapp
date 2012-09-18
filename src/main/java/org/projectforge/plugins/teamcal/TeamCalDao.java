@@ -136,8 +136,11 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
         queryFilter.add(Restrictions.or(Restrictions.eq("owner", user), Restrictions.eq(accessGroup, userGroupCache.getGroup(it.next()))));
       }
     } else {
-      // get teamCals where user is owner
-      queryFilter.add(Restrictions.eq("owner", user));
+      if (user != null) {
+        // get teamCals where user is owner
+        queryFilter.add(Restrictions.eq("owner", user));
+      } else
+        return null;
     }
     return getList(queryFilter);
   }

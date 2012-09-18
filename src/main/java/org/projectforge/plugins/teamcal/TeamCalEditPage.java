@@ -11,18 +11,27 @@ package org.projectforge.plugins.teamcal;
 
 import net.ftlines.wicket.fullcalendar.CalendarResponse;
 import net.ftlines.wicket.fullcalendar.EventSource;
+import net.ftlines.wicket.fullcalendar.callback.CalendarDropMode;
+import net.ftlines.wicket.fullcalendar.callback.ClickedEvent;
+import net.ftlines.wicket.fullcalendar.callback.DroppedEvent;
+import net.ftlines.wicket.fullcalendar.callback.ResizedEvent;
 import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
+import net.ftlines.wicket.fullcalendar.callback.View;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.apache.wicket.util.string.StringValue;
 import org.projectforge.common.DateHelper;
+import org.projectforge.common.NumberHelper;
 import org.projectforge.web.calendar.MyFullCalendar;
 import org.projectforge.web.calendar.MyFullCalendarConfig;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.EditPage;
+import org.projectforge.web.wicket.components.DatePickerUtils;
 
 /**
  * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
@@ -35,8 +44,13 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
 
   private static final long serialVersionUID = -3352981782657771662L;
 
+  private TeamCalEventProvider eventProvider;
+
   @SpringBean(name = "teamCalDao")
   private TeamCalDao teamCalDao;
+
+  @SpringBean(name = "teamEventDao")
+  private TeamEventDao teamEventDao;
 
   /**
    * @param parameters
@@ -56,7 +70,10 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
   {
     super.init();
     final MyFullCalendarConfig config = new MyFullCalendarConfig(this);
-    config.setSelectable(true);
+    if (teamCalDao.hasUpdateAccess(getUser(), getData(), null, false))
+      config.setSelectable(true);
+    else
+      config.setSelectable(false);
     config.setSelectHelper(true);
     config.setLoading("function(bool) { if (bool) $(\"#loading\").show(); else $(\"#loading\").hide(); }");
     config.setAllDaySlot(true);
@@ -77,11 +94,102 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
         teamEventEditPage.setReturnToPage((WebPage) getPage());
         setResponsePage(teamEventEditPage);
       }
+
+      /**
+       * Event was moved, a new start time was chosen.
+       * @see net.ftlines.wicket.fullcalendar.FullCalendar#onEventDropped(net.ftlines.wicket.fullcalendar.callback.DroppedEvent,
+       *      net.ftlines.wicket.fullcalendar.CalendarResponse)
+       */
+      @Override
+      protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response)
+      {
+        // default mode is move and edit
+        CalendarDropMode dropMode = CalendarDropMode.MOVE_EDIT;
+        final StringValue parameterValue = RequestCycle.get().getRequest().getQueryParameters().getParameterValue("which");
+        if (parameterValue != null) {
+          try {
+            dropMode = CalendarDropMode.fromAjaxTarget(parameterValue.toString());
+          } catch (final Exception ex) {
+            log.warn("Unable to get calendar drop mode for given value, using default mode. Given mode: " + parameterValue.toString());
+          }
+        }
+        if (log.isDebugEnabled() == true) {
+          log.debug("Event drop. eventId: "
+              + event.getEvent().getId()
+              + " sourceId: "
+              + event.getSource().getUuid()
+              + " dayDelta: "
+              + event.getDaysDelta()
+              + " minuteDelta: "
+              + event.getMinutesDelta()
+              + " allDay: "
+              + event.isAllDay());
+          log.debug("Original start time: " + event.getEvent().getStart() + ", original end time: " + event.getEvent().getEnd());
+          log.debug("New start time: " + event.getNewStartTime() + ", new end time: " + event.getNewEndTime());
+        }
+        //        modifyEvent(event.getEvent(), event.getNewStartTime(), event.getNewEndTime(), dropMode, response);
+        return false;
+      }
+
+      @Override
+      protected boolean onEventResized(final ResizedEvent event, final CalendarResponse response)
+      {
+        if (log.isDebugEnabled() == true) {
+          log.debug("Event resized. eventId: "
+              + event.getEvent().getId()
+              + " sourceId: "
+              + event.getSource().getUuid()
+              + " dayDelta: "
+              + event.getDaysDelta()
+              + " minuteDelta: "
+              + event.getMinutesDelta());
+        }
+        //        modifyEvent(event.getEvent(), null, event.getNewEndTime(), CalendarDropMode.MOVE_EDIT, response);
+        return false;
+      }
+
+      @Override
+      protected void onEventClicked(final ClickedEvent event, final CalendarResponse response)
+      {
+        if (log.isDebugEnabled() == true) {
+          log.debug("Event clicked. eventId: " + event.getEvent().getId() + ", sourceId: " + event.getSource().getUuid());
+        }
+        final String eventId = event.getEvent().getId();
+        // User clicked on an event, show the event:
+        final Integer id = NumberHelper.parseInteger(eventId);
+        final PageParameters parameters = new PageParameters();
+        parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
+        final TeamEventEditPage teamEventEditPage = new TeamEventEditPage(parameters);
+        teamEventEditPage.setReturnToPage((WebPage) getPage());
+        setResponsePage(teamEventEditPage);
+        return;
+      }
+
+      @Override
+      protected void onViewDisplayed(final View view, final CalendarResponse response)
+      {
+        if (log.isDebugEnabled() == true) {
+          log.debug("View displayed. viewType: " + view.getType().name() + ", start: " + view.getStart() + ", end: " + view.getEnd());
+        }
+        response.refetchEvents();
+        //        setStartDate(view.getStart());
+        //        filter.setViewType(view.getType());
+        // Need calling getEvents for getting correct duration label, it's not predictable what will be called first: onViewDisplayed or
+        // getEvents.
+        eventProvider.getEvents(view.getVisibleStart().toDateTime(), view.getVisibleEnd().toDateTime());
+        if (form.getDatePanel() != null) {
+          form.getDatePanel().getDateField().modelChanged();
+          response.getTarget().add(form.getDatePanel().getDateField());
+          response.getTarget().appendJavaScript(
+              DatePickerUtils.getDatePickerInitJavaScript(form.getDatePanel().getDateField().getMarkupId(), true));
+        }
+        //        response.getTarget().add(((CalendarPage) getPage()).form.durationLabel);
+      }
     };
     getForm().add(myCalendar);
     myCalendar.setMarkupId("calendar");
     final EventSource eventSource = new EventSource();
-    final TeamCalEventProvider eventProvider = new TeamCalEventProvider(this, teamCalDao);
+    eventProvider = new TeamCalEventProvider(this, teamCalDao, teamEventDao, getData().getId());
     eventSource.setEventsProvider(eventProvider);
     eventSource.setEditable(true);
     config.add(eventSource);

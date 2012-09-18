@@ -24,6 +24,7 @@
 package org.projectforge.plugins.teamcal;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,11 +34,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.search.annotations.DateBridge;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Index;
 import org.hibernate.search.annotations.Indexed;
 import org.hibernate.search.annotations.IndexedEmbedded;
+import org.hibernate.search.annotations.Resolution;
 import org.hibernate.search.annotations.Store;
+import org.projectforge.calendar.TimePeriod;
 import org.projectforge.common.RecurrenceInterval;
 import org.projectforge.core.DefaultBaseDO;
 import org.projectforge.database.Constants;
@@ -61,9 +65,13 @@ public class TeamEventDO extends DefaultBaseDO
 
   private boolean allDay;
 
-  private Date startDate;
+  @Field(index = Index.UN_TOKENIZED)
+  @DateBridge(resolution = Resolution.MINUTE)
+  private Timestamp startDate;
 
-  private Date endDate;
+  @Field(index = Index.UN_TOKENIZED)
+  @DateBridge(resolution = Resolution.MINUTE)
+  private Timestamp endDate;
 
   @IndexedEmbedded(depth = 1)
   private TeamCalDO calendar;
@@ -168,7 +176,7 @@ public class TeamEventDO extends DefaultBaseDO
    * @return the startDate
    */
   @Column(name = "start_date")
-  public Date getStartDate()
+  public Timestamp getStartDate()
   {
     return startDate;
   }
@@ -177,7 +185,7 @@ public class TeamEventDO extends DefaultBaseDO
    * @param startDate the startDate to set
    * @return this for chaining.
    */
-  public TeamEventDO setStartDate(final Date startDate)
+  public TeamEventDO setStartDate(final Timestamp startDate)
   {
     this.startDate = startDate;
     return this;
@@ -187,7 +195,7 @@ public class TeamEventDO extends DefaultBaseDO
    * @return the endDate
    */
   @Column(name = "end_date")
-  public Date getEndDate()
+  public Timestamp getEndDate()
   {
     return endDate;
   }
@@ -196,7 +204,7 @@ public class TeamEventDO extends DefaultBaseDO
    * @param endDate the endDate to set
    * @return this for chaining.
    */
-  public TeamEventDO setEndDate(final Date endDate)
+  public TeamEventDO setEndDate(final Timestamp endDate)
   {
     this.endDate = endDate;
     return this;
@@ -296,4 +304,107 @@ public class TeamEventDO extends DefaultBaseDO
     this.recurrenceEndDate = recurrenceEndDate;
     return this;
   }
+
+  @Transient
+  public TimePeriod getTimePeriod()
+  {
+    return new TimePeriod(startDate, endDate, true);
+  }
+
+  /**
+   * @return Duration in millis if startTime and stopTime is given and stopTime is after startTime, otherwise 0.
+   */
+  @Transient
+  public long getDuration()
+  {
+    return getTimePeriod().getDuration();
+  }
+
+  /**
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode()
+  {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (allDay ? 1231 : 1237);
+    result = prime * result + ((attendees == null) ? 0 : attendees.hashCode());
+    result = prime * result + ((calendar == null) ? 0 : calendar.hashCode());
+    result = prime * result + ((endDate == null) ? 0 : endDate.hashCode());
+    result = prime * result + ((location == null) ? 0 : location.hashCode());
+    result = prime * result + ((note == null) ? 0 : note.hashCode());
+    result = prime * result + ((recurrenceAmount == null) ? 0 : recurrenceAmount.hashCode());
+    result = prime * result + ((recurrenceEndDate == null) ? 0 : recurrenceEndDate.hashCode());
+    result = prime * result + ((recurrenceInterval == null) ? 0 : recurrenceInterval.hashCode());
+    result = prime * result + ((startDate == null) ? 0 : startDate.hashCode());
+    result = prime * result + ((subject == null) ? 0 : subject.hashCode());
+    return result;
+  }
+
+  /**
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(final Object obj)
+  {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    final TeamEventDO other = (TeamEventDO) obj;
+    if (allDay != other.allDay)
+      return false;
+    if (attendees == null) {
+      if (other.attendees != null)
+        return false;
+    } else if (!attendees.equals(other.attendees))
+      return false;
+    if (calendar == null) {
+      if (other.calendar != null)
+        return false;
+    } else if (!calendar.equals(other.calendar))
+      return false;
+    if (endDate == null) {
+      if (other.endDate != null)
+        return false;
+    } else if (!endDate.equals(other.endDate))
+      return false;
+    if (location == null) {
+      if (other.location != null)
+        return false;
+    } else if (!location.equals(other.location))
+      return false;
+    if (note == null) {
+      if (other.note != null)
+        return false;
+    } else if (!note.equals(other.note))
+      return false;
+    if (recurrenceAmount == null) {
+      if (other.recurrenceAmount != null)
+        return false;
+    } else if (!recurrenceAmount.equals(other.recurrenceAmount))
+      return false;
+    if (recurrenceEndDate == null) {
+      if (other.recurrenceEndDate != null)
+        return false;
+    } else if (!recurrenceEndDate.equals(other.recurrenceEndDate))
+      return false;
+    if (recurrenceInterval != other.recurrenceInterval)
+      return false;
+    if (startDate == null) {
+      if (other.startDate != null)
+        return false;
+    } else if (!startDate.equals(other.startDate))
+      return false;
+    if (subject == null) {
+      if (other.subject != null)
+        return false;
+    } else if (!subject.equals(other.subject))
+      return false;
+    return true;
+  }
+
 }

@@ -21,6 +21,7 @@ import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.JodaDatePanel;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -44,6 +45,8 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   private UserGroupCache userGroupCache;
 
   private boolean access = false;
+
+  private JodaDatePanel datePanel;
 
   /**
    * @param parentPage
@@ -276,5 +279,22 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   protected Logger getLogger()
   {
     return log;
+  }
+
+  /**
+   * @return the datePanel
+   */
+  public JodaDatePanel getDatePanel()
+  {
+    return datePanel;
+  }
+
+  /**
+   * @param datePanel the datePanel to set
+   * @return this for chaining.
+   */
+  public void setDatePanel(final JodaDatePanel datePanel)
+  {
+    this.datePanel = datePanel;
   }
 }
