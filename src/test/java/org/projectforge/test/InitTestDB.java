@@ -52,6 +52,7 @@ import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
@@ -233,7 +234,8 @@ public class InitTestDB
     return this.taskMap.get(taskName);
   }
 
-  public TimesheetDO addTimesheet(final PFUserDO user, final TaskDO task, final Timestamp startTime, final Timestamp stopTime, final String description)
+  public TimesheetDO addTimesheet(final PFUserDO user, final TaskDO task, final Timestamp startTime, final Timestamp stopTime,
+      final String description)
   {
     final TimesheetDO timesheet = new TimesheetDO();
     timesheet.setDescription(description);
@@ -268,12 +270,17 @@ public class InitTestDB
 
   void initDatabase()
   {
+    final PFUserDO origUser = PFUserContext.getUser();
+    final PFUserDO initUser = new PFUserDO().setUsername("Init-database-pseudo-user");
+    initUser.setId(-1);
+    PFUserContext.setUser(initUser);
     initConfiguration();
     initUsers();
     initGroups();
     initTaskTree();
     initAccess();
     initKost2Arts();
+    PFUserContext.setUser(origUser);
   }
 
   private void initConfiguration()
@@ -390,8 +397,8 @@ public class InitTestDB
     return access;
   }
 
-  public GroupTaskAccessDO createGroupTaskAccess(final GroupDO group, final TaskDO task, final AccessType accessType, final boolean accessSelect,
-      final boolean accessInsert, final boolean accessUpdate, final boolean accessDelete)
+  public GroupTaskAccessDO createGroupTaskAccess(final GroupDO group, final TaskDO task, final AccessType accessType,
+      final boolean accessSelect, final boolean accessInsert, final boolean accessUpdate, final boolean accessDelete)
   {
     final GroupTaskAccessDO access = createGroupTaskAccess(group, task);
     final AccessEntryDO entry = access.ensureAndGetAccessEntry(accessType);
@@ -431,8 +438,8 @@ public class InitTestDB
     setAllAccessEntries(access, true, false, true, false);
   }
 
-  private void setAllAccessEntries(final GroupTaskAccessDO access, final boolean selectAccess, final boolean insertAccess, final boolean updateAccess,
-      final boolean deleteAccess)
+  private void setAllAccessEntries(final GroupTaskAccessDO access, final boolean selectAccess, final boolean insertAccess,
+      final boolean updateAccess, final boolean deleteAccess)
   {
     AccessEntryDO entry = access.ensureAndGetAccessEntry(AccessType.TASK_ACCESS_MANAGEMENT);
     entry.setAccess(selectAccess, insertAccess, updateAccess, deleteAccess);
