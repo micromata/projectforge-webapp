@@ -99,7 +99,7 @@ public class PersonalAddressDao extends HibernateDaoSupport
     if (owner == null || owner.getId().equals(obj.getOwnerId()) == false) {
       throw new AccessException("address.accessException.userIsNotOwnerOfPersonalAddress");
     }
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
   }
 
   private Serializable internalSave(PersonalAddressDO obj)

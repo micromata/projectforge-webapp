@@ -54,7 +54,7 @@ public class AccessChecker
 
   private UserGroupCache userGroupCache;
 
-  private UserRights userRights = UserRights.initialize(this);
+  private final UserRights userRights = UserRights.initialize(this);
 
   /**
    * Tests for every group the user is assigned to, if the given permission is given.
@@ -78,7 +78,7 @@ public class AccessChecker
       // A user group "Admin" has always access.
       return true;
     }
-    TaskNode node = taskTree.getTaskNodeById(taskId);
+    final TaskNode node = taskTree.getTaskNodeById(taskId);
     if (node == null) {
       log.error("Task with " + taskId + " not found.");
       if (throwException == true) {
@@ -86,7 +86,7 @@ public class AccessChecker
       }
       return false;
     }
-    Collection<Integer> groupIds = userGroupCache.getUserGroups(user);
+    final Collection<Integer> groupIds = userGroupCache.getUserGroups(user);
     if (groupIds == null) {
       // No groups are assigned to this user.
       if (throwException == true) {
@@ -94,7 +94,7 @@ public class AccessChecker
       }
       return false;
     }
-    for (Integer groupId : groupIds) {
+    for (final Integer groupId : groupIds) {
       if (node.hasPermission(groupId, accessType, operationType) == true) {
         return true;
       }
@@ -105,7 +105,7 @@ public class AccessChecker
     return false;
   }
 
-  public void setTaskTree(TaskTree taskTree)
+  public void setTaskTree(final TaskTree taskTree)
   {
     this.taskTree = taskTree;
   }
@@ -115,7 +115,7 @@ public class AccessChecker
     return taskTree;
   }
 
-  public void setUserGroupCache(UserGroupCache userGroupCache)
+  public void setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
   }
@@ -159,7 +159,7 @@ public class AccessChecker
    * @return
    * @see org.projectforge.user.UserGroupCache#isUserMemberOfAdminGroup(java.lang.Integer)
    */
-  public boolean isLoggedInUserMemberOfAdminGroup(boolean throwException)
+  public boolean isLoggedInUserMemberOfAdminGroup(final boolean throwException)
   {
     return isLoggedInUserMemberOfGroup(throwException, ProjectForgeGroup.ADMIN_GROUP);
   }
@@ -200,7 +200,7 @@ public class AccessChecker
    * @param groups
    * @see #isUserMemberOfGroup(boolean, ProjectForgeGroup...)
    */
-  public boolean isLoggedInUserMemberOfGroup(ProjectForgeGroup... groups)
+  public boolean isLoggedInUserMemberOfGroup(final ProjectForgeGroup... groups)
   {
     return isLoggedInUserMemberOfGroup(false, groups);
   }
@@ -212,7 +212,7 @@ public class AccessChecker
    * @param groups
    * @see #isUserMemberOfGroup(PFUserDO, ProjectForgeGroup...)
    */
-  public boolean isLoggedInUserMemberOfGroup(boolean throwException, ProjectForgeGroup... groups)
+  public boolean isLoggedInUserMemberOfGroup(final boolean throwException, final ProjectForgeGroup... groups)
   {
     return isUserMemberOfGroup(PFUserContext.getUser(), throwException, groups);
   }
@@ -243,16 +243,16 @@ public class AccessChecker
     }
   }
 
-  private AccessException getLoggedInUserNotMemberOfException(ProjectForgeGroup... groups)
+  private AccessException getLoggedInUserNotMemberOfException(final ProjectForgeGroup... groups)
   {
-    StringBuffer buf = new StringBuffer();
+    final StringBuffer buf = new StringBuffer();
     for (int i = 0; i < groups.length; i++) {
       if (i > 0) {
         buf.append(", ");
       }
       buf.append(groups[i].toString());
     }
-    String str = buf.toString();
+    final String str = buf.toString();
     log.error(I18N_KEY_VIOLATION_USER_NOT_MEMBER_OF + ": " + str);
     return new AccessException(I18N_KEY_VIOLATION_USER_NOT_MEMBER_OF, str);
   }
@@ -262,7 +262,7 @@ public class AccessChecker
    * @param user
    * @param groups
    */
-  public boolean isUserMemberOfGroup(PFUserDO user, ProjectForgeGroup... groups)
+  public boolean isUserMemberOfGroup(final PFUserDO user, final ProjectForgeGroup... groups)
   {
     return userGroupCache.isUserMemberOfGroup(user, groups);
   }
@@ -335,7 +335,7 @@ public class AccessChecker
    * @param operationType
    * @param throwException
    */
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes"})
   public boolean hasAccess(final PFUserDO user, final UserRightId rightId, final Object obj, final Object oldObj,
       final OperationType operationType, final boolean throwException)
   {
@@ -562,7 +562,7 @@ public class AccessChecker
    * @param throwException
    * @see #hasRight(UserRightId, boolean, UserRightValue...)
    */
-  public boolean hasLoggedInUserReadAccess(final UserRightId rightId, boolean throwException)
+  public boolean hasLoggedInUserReadAccess(final UserRightId rightId, final boolean throwException)
   {
     return hasReadAccess(PFUserContext.getUser(), rightId, throwException);
   }
@@ -572,7 +572,7 @@ public class AccessChecker
    * @param throwException
    * @see #hasRight(UserRightId, boolean, UserRightValue...)
    */
-  public boolean hasReadAccess(final PFUserDO user, final UserRightId rightId, boolean throwException)
+  public boolean hasReadAccess(final PFUserDO user, final UserRightId rightId, final boolean throwException)
   {
     return hasRight(user, rightId, throwException, UserRightValue.READONLY, UserRightValue.READWRITE);
   }
@@ -593,7 +593,7 @@ public class AccessChecker
    * @param throwException
    * @see #hasRight(UserRightId, boolean, UserRightValue...)
    */
-  public boolean hasLoggedInUserWriteAccess(final UserRightId rightId, boolean throwException)
+  public boolean hasLoggedInUserWriteAccess(final UserRightId rightId, final boolean throwException)
   {
     return hasLoggedInUserRight(rightId, throwException, UserRightValue.READWRITE);
   }
@@ -614,7 +614,7 @@ public class AccessChecker
     return hasHistoryAccess(PFUserContext.getUser(), rightId, obj, throwException);
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({ "unchecked", "rawtypes"})
   public boolean hasHistoryAccess(final PFUserDO user, final UserRightId rightId, final Object obj, final boolean throwException)
   {
     final UserRight right = userRights.getRight(rightId);
@@ -702,12 +702,71 @@ public class AccessChecker
     return true;
   }
 
+  public boolean isRestrictedUser()
+  {
+    final PFUserDO user = PFUserContext.getUser();
+    if (user == null) {
+      return true;
+    }
+    return isRestrictedUser(user);
+  }
+
+  public boolean isRestrictedUser(final Integer userId)
+  {
+    final PFUserDO user = userGroupCache.getUser(userId);
+    return isDemoUser(user);
+  }
+
+  public boolean isRestrictedUser(final PFUserDO user)
+  {
+    if (user == null) {
+      return false;
+    }
+    return user.isRestrictedUser();
+  }
+
   /**
    * Throws an exception if the current logged-in user is a demo user.
    */
-  public void checkDemoUser()
+  public void checkRestrictedUser()
+  {
+    if (isRestrictedUser() == true) {
+      throw new AccessException("access.exception.demoUserHasNoAccess");
+    }
+  }
+
+  public boolean isRestrictedOrDemoUser()
+  {
+    final PFUserDO user = PFUserContext.getUser();
+    if (user == null) {
+      return false;
+    }
+    return isRestrictedOrDemoUser(user);
+  }
+
+  public boolean isRestrictedOrDemoUser(final Integer userId)
+  {
+    final PFUserDO user = userGroupCache.getUser(userId);
+    return isRestrictedOrDemoUser(user);
+  }
+
+  public boolean isRestrictedOrDemoUser(final PFUserDO user)
+  {
+    if (user == null) {
+      return false;
+    }
+    return isRestrictedUser(user) || isDemoUser(user);
+  }
+
+  /**
+   * Throws an exception if the current logged-in user is a demo user.
+   */
+  public void checkRestrictedOrDemoUser()
   {
     if (isDemoUser() == true) {
+      throw new AccessException("access.exception.demoUserHasNoAccess");
+    }
+    if (isRestrictedUser() == true) {
       throw new AccessException("access.exception.demoUserHasNoAccess");
     }
   }

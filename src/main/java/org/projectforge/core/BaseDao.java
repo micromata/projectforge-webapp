@@ -361,6 +361,9 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<O> internalGetList(final QueryFilter filter) throws AccessException
   {
+    if (accessChecker.isRestrictedUser() == true) {
+      return null;
+    }
     final BaseSearchFilter searchFilter = filter.getFilter();
     filter.clearErrorMessage();
     if (searchFilter.isIgnoreDeleted() == false) {
@@ -541,6 +544,9 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
   public O getById(final Serializable id) throws AccessException
   {
+    if (accessChecker.isRestrictedUser() == true) {
+      return null;
+    }
     checkLoggedInUserSelectAccess();
     final O obj = internalGetById(id);
     if (obj == null) {
@@ -569,6 +575,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public HistoryEntry[] getHistoryEntries(final O obj)
   {
+    accessChecker.checkRestrictedUser();
     checkLoggedInUserHistoryAccess(obj);
     return internalGetHistoryEntries(obj);
   }
@@ -576,6 +583,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public HistoryEntry[] internalGetHistoryEntries(final BaseDO< ? > obj)
   {
+    accessChecker.checkRestrictedUser();
     final HistoryAdapter ad = new HistoryAdapter();
     ad.setSessionFactory(getHibernateTemplate().getSessionFactory());
     return ad.getHistoryEntries(obj);
@@ -608,6 +616,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
 
   public List<DisplayHistoryEntry> internalGetDisplayHistoryEntries(final BaseDO< ? > obj)
   {
+    accessChecker.checkRestrictedUser();
     final List<DisplayHistoryEntry> result = getHibernateTemplate().execute(new HibernateCallback<List<DisplayHistoryEntry>>() {
       public List<DisplayHistoryEntry> doInHibernate(final Session session) throws HibernateException, SQLException
       {
@@ -649,7 +658,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
 
   /**
    * Gets the history entries of the object in flat format.<br/>
-   * Please note: No check access will be done! Please check the access before while getting the object.
+   * Please note: No check access will be done! Please check the access before getting the object.
    * @param id The id of the object.
    * @return
    */
@@ -840,7 +849,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   public Serializable internalSave(final O obj)
   {
     Validate.notNull(obj);
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
     obj.setCreated();
     obj.setLastUpdate();
     onSave(obj);
@@ -947,7 +956,9 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   public boolean internalUpdate(final O obj, final boolean checkAccess)
   {
     onSaveOrModify(obj);
-    accessChecker.checkDemoUser();
+    if (checkAccess == true) {
+      accessChecker.checkRestrictedOrDemoUser();
+    }
     final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     if (checkAccess == true) {
       checkLoggedInUserUpdateAccess(obj, dbObj);
@@ -1040,7 +1051,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       log.error("Object is not historizable. Therefore marking as deleted is not supported. Please use delete instead.");
       throw new InternalErrorException();
     }
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
     onDelete(obj);
     final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     onSaveOrModify(obj);
@@ -1074,7 +1085,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       log.error(msg);
       throw new RuntimeException(msg);
     }
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
     onDelete(obj);
     final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     checkLoggedInUserDeleteAccess(obj, dbObj);
@@ -1104,7 +1115,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
   public void internalUndelete(final O obj)
   {
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
     final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     onSaveOrModify(obj);
     copyValues(obj, dbObj, "deleted"); // If user has made additional changes.
@@ -1121,7 +1132,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   }
 
   /**
-   * Checks the basic select access right. Overload this method if you class supports this right.
+   * Checks the basic select access right. Overload this method if your class supports this right.
    * @return
    */
   protected final void checkLoggedInUserSelectAccess() throws AccessException
@@ -1429,7 +1440,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   protected void createHistoryEntry(final Object entity, final Number id, final String property, final Class< ? > valueClass,
       final Object oldValue, final Object newValue)
   {
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
     final PFUserDO contextUser = PFUserContext.getUser();
     final String userPk = contextUser != null ? contextUser.getId().toString() : null;
     if (userPk == null) {

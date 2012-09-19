@@ -55,7 +55,7 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 4.2
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.2", "2012-08-09", "Adds t_pf_user.authenticationToken|local_user|deactivated, t_group.local_group.") {
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.2", "2012-08-09", "Adds t_pf_user.authenticationToken|local_user|restricted_user|deactivated, t_group.local_group.") {
       final Table userTable = new Table(PFUserDO.class);
       final Table groupTable = new Table(GroupDO.class);
 
@@ -63,7 +63,7 @@ public class DatabaseCoreUpdates
       public UpdatePreCheckStatus runPreCheck()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
-        return dao.doesTableAttributesExist(userTable, "authenticationToken", "localUser", "deactivated") == true //
+        return dao.doesTableAttributesExist(userTable, "authenticationToken", "localUser", "restrictedUser", "deactivated") == true //
             && dao.doesTableAttributesExist(groupTable, "localGroup", "nestedGroupsAllowed", "nestedGroupIds") == true
             ? UpdatePreCheckStatus.ALREADY_UPDATED
                 : UpdatePreCheckStatus.OK;
@@ -78,6 +78,9 @@ public class DatabaseCoreUpdates
         }
         if (dao.doesTableAttributesExist(userTable, "localUser") == false) {
           dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "localUser").setDefaultValue("false"));
+        }
+        if (dao.doesTableAttributesExist(userTable, "restrictedUser") == false) {
+          dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "restrictedUser").setDefaultValue("false"));
         }
         if (dao.doesTableAttributesExist(userTable, "deactivated") == false) {
           dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "deactivated").setDefaultValue("false"));

@@ -87,7 +87,7 @@ public class DatabaseUpdateDao
     if (Login.getInstance().isAdminUser(PFUserContext.getUser()) == false) {
       throw new AccessException(AccessChecker.I18N_KEY_VIOLATION_USER_NOT_MEMBER_OF, ProjectForgeGroup.ADMIN_GROUP.getKey());
     }
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
   }
 
   public boolean doesTableExist(final String table)
