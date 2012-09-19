@@ -187,7 +187,7 @@ public class DatevImportPage extends AbstractStandardFormPage
   private void checkAccess()
   {
     accessChecker.checkLoggedInUserRight(UserRightId.FIBU_DATEV_IMPORT, UserRightValue.TRUE);
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
   }
 
   @Override

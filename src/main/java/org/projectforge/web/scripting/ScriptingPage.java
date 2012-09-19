@@ -163,7 +163,7 @@ public class ScriptingPage extends AbstractStandardFormPage
   protected void execute()
   {
     accessChecker.checkIsLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
     imageResultContainer.setVisible(false);
     ReportGeneratorList reportGeneratorList = new ReportGeneratorList();
     initScriptVariables();
@@ -195,7 +195,7 @@ public class ScriptingPage extends AbstractStandardFormPage
   protected void upload()
   {
     accessChecker.checkIsLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
     log.info("upload");
     final FileUpload fileUpload = form.fileUploadField.getFileUpload();
     if (fileUpload != null) {

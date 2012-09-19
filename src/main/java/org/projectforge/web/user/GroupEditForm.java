@@ -38,6 +38,7 @@ import org.apache.wicket.validation.validator.AbstractValidator;
 import org.projectforge.common.KeyValueBean;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
+import org.projectforge.user.Login;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.common.TwoListHelper;
@@ -117,6 +118,10 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
       // Description
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("description"));
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(getData(), "description")));
+    }
+    if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
+      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("group.localGroup"), "localGroup", new PropertyModel<Boolean>(data,
+          "localGroup"), getString("group.localGroup.tooltip"));
     }
     gridBuilder.newGrid8();
     {

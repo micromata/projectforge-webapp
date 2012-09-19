@@ -123,7 +123,7 @@ public class ReportObjectivesPage extends AbstractStandardFormPage
   private void checkAccess()
   {
     accessChecker.isLoggedInUserMemberOfGroup(ProjectForgeGroup.FINANCE_GROUP, ProjectForgeGroup.CONTROLLING_GROUP);
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
   }
 
   @Override

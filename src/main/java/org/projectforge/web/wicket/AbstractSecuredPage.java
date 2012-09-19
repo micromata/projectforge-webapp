@@ -42,6 +42,7 @@ import org.projectforge.web.core.MenuSuffixLabel;
 import org.projectforge.web.core.NavSidePanel;
 import org.projectforge.web.core.NavTopPanel;
 import org.projectforge.web.fibu.ISelectCallerPage;
+import org.projectforge.web.user.ChangePasswordPage;
 import org.projectforge.web.user.MyAccountEditPage;
 import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 import org.projectforge.web.wicket.flowlayout.MyComponentsRepeater;
@@ -81,7 +82,6 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     final NavSidePanel menuPanel = new NavSidePanel("mainMenu");
     body.add(menuPanel);
     menuPanel.init();
-    @SuppressWarnings("serial")
     final Label sideMenuSuffixLabel = new MenuSuffixLabel("totalMenuCounter", new Model<Integer>() {
       @Override
       public Integer getObject()
@@ -105,9 +105,14 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     body.add(favoriteMenuPanel);
     favoriteMenuPanel.init(this);
     // body.add(new Label("username", getUser().getFullname()));
-    final BookmarkablePageLink<Void> myAccountLink = new BookmarkablePageLink<Void>("myAccountLink", MyAccountEditPage.class);
-    body.add(myAccountLink);
-    @SuppressWarnings("serial")
+    if (accessChecker.isRestrictedUser() == true) {
+      // Show ChangePaswordPage as my account for restricted users.
+      final BookmarkablePageLink<Void> changePasswordLink = new BookmarkablePageLink<Void>("myAccountLink", ChangePasswordPage.class);
+      body.add(changePasswordLink);
+    } else {
+      final BookmarkablePageLink<Void> myAccountLink = new BookmarkablePageLink<Void>("myAccountLink", MyAccountEditPage.class);
+      body.add(myAccountLink);
+    }
     final Link<String> logoutLink = new Link<String>("logoutLink") {
       @Override
       public void onClick()
@@ -119,7 +124,8 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     body.add(logoutLink);
     contentMenuContainer = new WebMarkupContainer("contentMenu") {
       @Override
-      public boolean isVisible() {
+      public boolean isVisible()
+      {
         return contentMenu.hasEntries() == true || contentRightMenu.hasEntries() == true;
       };
     };
@@ -128,7 +134,8 @@ public abstract class AbstractSecuredPage extends AbstractSecuredBasePage
     contentMenuContainer.add(contentMenu.getRepeatingView());
     contentRightMenuContainer = new WebMarkupContainer("contentRightMenu") {
       @Override
-      public boolean isVisible() {
+      public boolean isVisible()
+      {
         return contentMenu.hasEntries() == true || contentRightMenu.hasEntries() == true;
       };
     };

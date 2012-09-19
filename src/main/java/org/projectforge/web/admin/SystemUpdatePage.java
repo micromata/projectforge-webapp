@@ -55,7 +55,7 @@ public class SystemUpdatePage extends AbstractSecuredPage
   protected void update(final UpdateEntry updateEntry)
   {
     checkAdminUser();
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
     systemUpdater.update(updateEntry);
     refresh();
   }

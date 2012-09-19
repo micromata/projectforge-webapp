@@ -386,7 +386,7 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   protected void createMissingDatabaseIndices()
   {
     log.info("Administration: create missing data base indices.");
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
     final int counter = databaseUpdateDao.createMissingIndices();
     setResponsePage(new MessagePage("administration.missingDatabaseIndicesCreated", String.valueOf(counter)));
   }
@@ -398,7 +398,7 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   protected void fixDBHistoryEntries()
   {
     log.info("Administration: fix data base history entries.");
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
     final int counter = databaseUpdateDao.fixDBHistoryEntries();
     setResponsePage(new MessagePage("system.admin.button.fixDBHistoryEntries.result", String.valueOf(counter)));
   }
@@ -406,13 +406,13 @@ public class AdminPage extends AbstractSecuredPage implements ISelectCallerPage
   private void checkAccess()
   {
     accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
   }
 
   public void createTestBooks()
   {
     accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
     final TaskDO task = taskTree.getTaskById(Configuration.getInstance().getTaskIdValue(ConfigurationParam.DEFAULT_TASK_ID_4_BOOKS));
     final List<BookDO> list = new ArrayList<BookDO>();
     int number = 1;

@@ -382,6 +382,8 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
         WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.localUser"), "localUser", new PropertyModel<Boolean>(data,
             "localUser"), getString("user.localUser.tooltip"));
+        WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.restrictedUser"), "restrictedUser", new PropertyModel<Boolean>(data,
+            "restrictedUser"), getString("user.restrictedUser.tooltip"));
       }
       addPassswordFields();
     }

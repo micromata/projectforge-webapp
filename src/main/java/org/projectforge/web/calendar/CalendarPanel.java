@@ -120,6 +120,9 @@ public class CalendarPanel extends Panel
         if (log.isDebugEnabled() == true) {
           log.debug("Selected region: " + range.getStart() + " - " + range.getEnd() + " / allDay: " + range.isAllDay());
         }
+        if (accessChecker.isRestrictedUser() == true) {
+          return;
+        }
         final PageParameters parameters = new PageParameters();
         parameters.add(TimesheetEditPage.PARAMETER_KEY_START_DATE_IN_MILLIS, DateHelper.getDateTimeAsMillis(range.getStart()));
         parameters.add(TimesheetEditPage.PARAMETER_KEY_STOP_DATE_IN_MILLIS, DateHelper.getDateTimeAsMillis(range.getEnd()));

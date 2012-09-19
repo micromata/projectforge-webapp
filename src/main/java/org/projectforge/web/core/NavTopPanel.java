@@ -54,6 +54,7 @@ import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
+ * Displays the favorite menu.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
 public class NavTopPanel extends NavAbstractPanel

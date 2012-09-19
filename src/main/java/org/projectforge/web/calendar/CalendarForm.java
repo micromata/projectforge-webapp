@@ -149,7 +149,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       fs.add(refreshButtonPanel);
       setDefaultButton(refreshButtonPanel.getButton());
     }
-    if (WebConfiguration.isDevelopmentMode() == true) {
+    if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
       final PFUserDO user = PFUserContext.getUser();
       final String authenticationKey = userDao.getAuthenticationToken(user.getId());
       final String contextPath = WebApplication.get().getServletContext().getContextPath();
