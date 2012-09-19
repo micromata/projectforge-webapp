@@ -101,30 +101,32 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     currentDatePanel.getDateField().setOutputMarkupId(true);
     fs.add(currentDatePanel);
     final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-    if (isOtherUsersAllowed() == false) {
-      showTimesheets = filter.getUserId() != null;
-      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(this, "showTimesheets"),
-          getString("calendar.option.timesheeets"), true) {
-        /**
-         * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged()
-         */
-        @Override
-        protected void onSelectionChanged(final Boolean newSelection)
-        {
-          if (Boolean.TRUE.equals(newSelection) == true) {
-            filter.setUserId(getUserId());
-          } else {
-            filter.setUserId(null);
+    if (accessChecker.isRestrictedUser(getUser()) == false) {
+      if (isOtherUsersAllowed() == false) {
+        showTimesheets = filter.getUserId() != null;
+        checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(this, "showTimesheets"),
+            getString("calendar.option.timesheeets"), true) {
+          /**
+           * @see org.projectforge.web.wicket.flowlayout.CheckBoxPanel#onSelectionChanged()
+           */
+          @Override
+          protected void onSelectionChanged(final Boolean newSelection)
+          {
+            if (Boolean.TRUE.equals(newSelection) == true) {
+              filter.setUserId(getUserId());
+            } else {
+              filter.setUserId(null);
+            }
           }
-        }
-      });
+        });
+      }
+      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showPlanning"),
+          getString("calendar.option.planning"), true).setTooltip(getString("calendar.option.planning.tooltip")));
+      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showBirthdays"),
+          getString("calendar.option.birthdays"), true));
+      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showStatistics"),
+          getString("calendar.option.statistics"), true).setTooltip(getString("calendar.option.statistics.tooltip")));
     }
-    checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showPlanning"),
-        getString("calendar.option.planning"), true).setTooltip(getString("calendar.option.planning.tooltip")));
-    checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showBirthdays"),
-        getString("calendar.option.birthdays"), true));
-    checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showStatistics"),
-        getString("calendar.option.statistics"), true).setTooltip(getString("calendar.option.statistics.tooltip")));
     checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "slot30"),
         getString("calendar.option.slot30"), true).setTooltip(getString("calendar.option.slot30.tooltip")));
     final DropDownChoice<Integer> firstHourDropDownChoice = new DropDownChoice<Integer>(fs.getDropDownChoiceId(),
@@ -153,7 +155,11 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       final PFUserDO user = PFUserContext.getUser();
       final String authenticationKey = userDao.getAuthenticationToken(user.getId());
       final String contextPath = WebApplication.get().getServletContext().getContextPath();
-      final String iCalTarget = contextPath + "/export/ProjectForge.ics?timesheetUser=" + user.getUsername() + "&token=" + authenticationKey;
+      final String iCalTarget = contextPath
+          + "/export/ProjectForge.ics?timesheetUser="
+          + user.getUsername()
+          + "&token="
+          + authenticationKey;
       final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
       final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fs.newChildId(), IconType.SUBSCRIPTION,
           getString("timesheet.iCalExport"), iCalExportLink).setLight();
