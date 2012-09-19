@@ -245,7 +245,7 @@ public class UserDao extends BaseDao<PFUserDO>
       user.setLastLogin(new Timestamp(new Date().getTime()));
       user.setLoginFailures(0);
       user.setMinorChange(true); // Avoid re-indexing of all dependent objects.
-      internalUpdate(user);
+      internalUpdate(user, false);
       if (user.hasSystemAccess() == false) {
         log.warn("Deleted/deactivated user tried to login: " + user);
         return null;
@@ -346,7 +346,7 @@ public class UserDao extends BaseDao<PFUserDO>
     if (errorMsgKey != null) {
       return errorMsgKey;
     }
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
     final String encryptedOldPassword = encryptPassword(oldPassword);
     final String encryptedNewPassword = encryptPassword(newPassword);
     user = getUser(user.getUsername(), encryptedOldPassword);
@@ -493,7 +493,7 @@ public class UserDao extends BaseDao<PFUserDO>
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
   public void updateMyAccount(final PFUserDO user)
   {
-    accessChecker.checkDemoUser();
+    accessChecker.checkRestrictedOrDemoUser();
     final PFUserDO contextUser = PFUserContext.getUser();
     Validate.isTrue(user.getId().equals(contextUser.getId()) == true);
     final PFUserDO dbUser = getHibernateTemplate().load(clazz, user.getId(), LockMode.PESSIMISTIC_WRITE);

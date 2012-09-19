@@ -199,17 +199,23 @@ public class FavoritesMenu implements Serializable
         addFavoriteMenuEntry(adminMenu, registry.get(MenuItemDefId.GROUP_LIST));
         addFavoriteMenuEntry(adminMenu, registry.get(MenuItemDefId.SYSTEM));
       }
-      final MenuEntry projectManagementMenu = new MenuEntry().setName(PFUserContext.getLocalizedString(MenuItemDefId.PROJECT_MANAGEMENT
-          .getI18nKey()));
-      menuEntries.add(projectManagementMenu);
-      addFavoriteMenuEntry(projectManagementMenu, registry.get(MenuItemDefId.MONTHLY_EMPLOYEE_REPORT));
-      addFavoriteMenuEntry(projectManagementMenu, registry.get(MenuItemDefId.TIMESHEET_LIST));
-      addFavoriteMenuEntry(registry.get(MenuItemDefId.TASK_TREE));
-      addFavoriteMenuEntry(registry.get(MenuItemDefId.CALENDAR));
-      addFavoriteMenuEntry(registry.get(MenuItemDefId.ADDRESS_LIST));
-      addFavoriteMenuEntry(registry.get(MenuItemDefId.BOOK_LIST));
-      addFavoriteMenuEntry(registry.get(MenuItemDefId.PHONE_CALL));
-      addFavoriteMenuEntry(registry.get(ToDoPlugin.ID));
+      if (accessChecker.isRestrictedUser() == true) {
+        // Restricted users see only the change password menu entry (as favorite).
+        addFavoriteMenuEntry(registry.get(MenuItemDefId.CALENDAR));
+        addFavoriteMenuEntry(registry.get(MenuItemDefId.CHANGE_PASSWORD));
+      } else {
+        final MenuEntry projectManagementMenu = new MenuEntry().setName(PFUserContext.getLocalizedString(MenuItemDefId.PROJECT_MANAGEMENT
+            .getI18nKey()));
+        menuEntries.add(projectManagementMenu);
+        addFavoriteMenuEntry(projectManagementMenu, registry.get(MenuItemDefId.MONTHLY_EMPLOYEE_REPORT));
+        addFavoriteMenuEntry(projectManagementMenu, registry.get(MenuItemDefId.TIMESHEET_LIST));
+        addFavoriteMenuEntry(registry.get(MenuItemDefId.TASK_TREE));
+        addFavoriteMenuEntry(registry.get(MenuItemDefId.CALENDAR));
+        addFavoriteMenuEntry(registry.get(MenuItemDefId.ADDRESS_LIST));
+        addFavoriteMenuEntry(registry.get(MenuItemDefId.BOOK_LIST));
+        addFavoriteMenuEntry(registry.get(MenuItemDefId.PHONE_CALL));
+        addFavoriteMenuEntry(registry.get(ToDoPlugin.ID));
+      }
     }
   }
 

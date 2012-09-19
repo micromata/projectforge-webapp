@@ -71,7 +71,7 @@ public class ToDoEditPage extends AbstractEditPage<ToDoDO, ToDoEditForm, ToDoDao
   protected void onAfterRender()
   {
     super.onAfterRender();
-    if (accessChecker.isDemoUser() == true) {
+    if (accessChecker.isRestrictedOrDemoUser() == true) {
       // Do nothing.
       return;
     }

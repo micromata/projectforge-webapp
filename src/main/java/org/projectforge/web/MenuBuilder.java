@@ -29,6 +29,11 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.user.PFUserDO;
 
+/**
+ * Build of the user's personal menu (depending on the access rights of the user).
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ *
+ */
 public class MenuBuilder implements Serializable
 {
   private static final long serialVersionUID = -924049082728488113L;

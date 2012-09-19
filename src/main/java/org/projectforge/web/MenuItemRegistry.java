@@ -231,19 +231,19 @@ public class MenuItemRegistry
   private static void initialize(final MenuItemRegistry reg)
   {
     // Super menus
-    final MenuItemDef common = reg.register(null, MenuItemDefId.COMMON, 10);
+    final MenuItemDef common = reg.register(null, MenuItemDefId.COMMON, 10).setVisibleForRestrictedUsers(true);
     final MenuItemDef pm = reg.register(null, MenuItemDefId.PROJECT_MANAGEMENT, 20);
     final ProjectForgeGroup[] fibuGroups = new ProjectForgeGroup[] { FINANCE_GROUP, ORGA_TEAM, CONTROLLING_GROUP};
     final MenuItemDef fibu = reg.register(null, MenuItemDefId.FIBU, 30, fibuGroups);
     final MenuItemDef cost = reg.register(null, MenuItemDefId.COST, 40, FINANCE_GROUP, ORGA_TEAM, CONTROLLING_GROUP);
     final MenuItemDef reporting = reg.register(null, MenuItemDefId.REPORTING, 50, FINANCE_GROUP, CONTROLLING_GROUP);
     final MenuItemDef orga = reg.register(null, MenuItemDefId.ORGA, 60, FINANCE_GROUP, CONTROLLING_GROUP, ORGA_TEAM);
-    final MenuItemDef admin = reg.register(null, MenuItemDefId.ADMINISTRATION, 70);
+    final MenuItemDef admin = reg.register(null, MenuItemDefId.ADMINISTRATION, 70).setVisibleForRestrictedUsers(true);
     final MenuItemDef misc = reg.register(null, MenuItemDefId.MISC, 100);
 
     // Menu entries
     // COMMON
-    reg.register(common, MenuItemDefId.CALENDAR, 10, CalendarPage.class); // Visible for all.
+    reg.register(common, MenuItemDefId.CALENDAR, 10, CalendarPage.class).setVisibleForRestrictedUsers(true); // Visible for all.
     reg.register(common, MenuItemDefId.BOOK_LIST, 30, BookListPage.class); // Visible for all.
     reg.register(common, MenuItemDefId.ADDRESS_LIST, 40, AddressListPage.class).setMobileMenu(AddressMobileListPage.class, 100); // Visible for all.
     reg.register(common, MenuItemDefId.PHONE_CALL, 50, PhoneCallPage.class);
@@ -336,7 +336,7 @@ public class MenuItemRegistry
     // ADMINISTRATION
     reg.register(admin, MenuItemDefId.MY_ACCOUNT, 10, MyAccountEditPage.class);
     reg.register(admin, MenuItemDefId.MY_PREFERENCES, 20, UserPrefListPage.class);
-    reg.register(admin, MenuItemDefId.CHANGE_PASSWORD, 30, ChangePasswordPage.class); // Visible for all.
+    reg.register(admin, MenuItemDefId.CHANGE_PASSWORD, 30, ChangePasswordPage.class).setVisibleForRestrictedUsers(true); // Visible for all.
     reg.register(admin, MenuItemDefId.USER_LIST, 40, UserListPage.class);
     reg.register(admin, MenuItemDefId.GROUP_LIST, 50, GroupListPage.class); // Visible for all.
     reg.register(admin, MenuItemDefId.ACCESS_LIST, 60, AccessListPage.class); // Visible for all.
@@ -349,7 +349,6 @@ public class MenuItemRegistry
     // invisible at default (because it's only functioning with valid ssl certificate).
     reg.register(misc, MenuItemDefId.IMAGE_CROPPER, 100, ImageCropperPage.class, new String[] { ImageCropperPage.PARAM_SHOW_UPLOAD_BUTTON,
       "false", ImageCropperPage.PARAM_ENABLE_WHITEBOARD_FILTER, "true"}, false);
-    // Not yet finished:
     reg.register(misc, MenuItemDefId.DOCUMENTATION, 200, DocumentationPage.class);
     reg.refresh();
   }

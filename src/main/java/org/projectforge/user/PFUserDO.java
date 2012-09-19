@@ -92,6 +92,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private boolean localUser;
 
+  private boolean restrictedUser;
+
   private boolean deactivated;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -759,6 +761,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   }
 
   /**
+   * A local user will not be synchronized with any external user management system.
    * @return the localUser
    */
   @Column(name = "local_user", nullable = false)
@@ -774,6 +777,28 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public PFUserDO setLocalUser(final boolean localUser)
   {
     this.localUser = localUser;
+    return this;
+  }
+
+  /**
+   * A restricted user has only the ability to log-in and to change his password. This is useful if ProjectForge runs in master mode for
+   * managing an external LDAP system. Then this user is a LDAP user but has no other functionality than change password in the ProjectForge
+   * system itself.
+   * @return the restrictedUser
+   */
+  @Column(name = "restricted_user", nullable = false)
+  public boolean isRestrictedUser()
+  {
+    return restrictedUser;
+  }
+
+  /**
+   * @param restrictedUser the restrictedUser to set
+   * @return this for chaining.
+   */
+  public PFUserDO setRestrictedUser(final boolean restrictedUser)
+  {
+    this.restrictedUser = restrictedUser;
     return this;
   }
 
@@ -801,7 +826,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
    * @return true only and only if the user isn't either deleted nor deactivated, otherwise false.
    */
   @Transient
-  public boolean hasSystemAccess() {
+  public boolean hasSystemAccess()
+  {
     return isDeleted() == false && isDeactivated() == false;
   }
 

@@ -75,6 +75,8 @@ public class MenuItemDef implements Serializable
 
   private boolean desktopMenuSupport = true;
 
+  private boolean visibleForRestrictedUsers;
+
   /**
    * Overwrite this if you need special access checking.
    * @param context
@@ -101,10 +103,34 @@ public class MenuItemDef implements Serializable
   }
 
   /**
+   * Most menus aren't visibly for restrictedUsers.
+   * @return the visibleByRestrictedUsers
+   */
+  public boolean isVisibleForRestrictedUsers()
+  {
+    return visibleForRestrictedUsers;
+  }
+
+  /**
+   * @param visibleForRestrictedUsers the visibleByRestrictedUsers to set
+   * @return this for chaining.
+   */
+  public MenuItemDef setVisibleForRestrictedUsers(final boolean visibleForRestrictedUsers)
+  {
+    this.visibleForRestrictedUsers = visibleForRestrictedUsers;
+    return this;
+  }
+
+  /**
+   * Creates a menu entry if the user has access to.
    * @return null if not visible otherwise the created MenuEntry.
    */
   protected MenuEntry createMenuEntry(final Menu menu, final MenuBuilderContext context)
   {
+    if (visibleForRestrictedUsers == false && context.getLoggedInUser().isRestrictedUser() == true) {
+      // Restricted users have not access to.
+      return null;
+    }
     if (context.isMobileMenu() == true && mobileMenuSupport == false) {
       // this menu item doesn't support the mobile menu.
       return null;
