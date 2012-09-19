@@ -297,8 +297,10 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
   @Override
   public void passwordChanged(final PFUserDO user, final String newPassword)
   {
-    final LdapPerson ldapUser = PFUserDOConverter.convert(user);
-    ldapUserDao.changePassword(ldapUser, null, newPassword);
+    final LdapPerson ldapUser = ldapUserDao.findById(user.getId());
+    if (ldapUser != null) {
+      ldapUserDao.changePassword(ldapUser, null, newPassword);
+    }
   }
 
   /**
