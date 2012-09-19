@@ -39,6 +39,7 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.projectforge.access.AccessChecker;
+import org.projectforge.user.UserRights;
 import org.projectforge.user.UserXmlPreferencesCache;
 import org.projectforge.web.CustomizeMenuPage;
 import org.projectforge.web.FavoritesMenu;
@@ -103,8 +104,15 @@ public class NavTopPanel extends NavAbstractPanel
     } else {
       add(new WebMarkupContainer("goMobile").setVisible(false));
     }
-    add(new BookmarkablePageLink<Void>("customizeMenuLink", CustomizeMenuPage.class));
-    add(new BookmarkablePageLink<Void>("layoutSettingsMenuLink", LayoutSettingsPage.class));
+    final BookmarkablePageLink<Void> customizeMenuLink = new BookmarkablePageLink<Void>("customizeMenuLink", CustomizeMenuPage.class);
+    final BookmarkablePageLink<Void> layoutSettingsMenuLink = new BookmarkablePageLink<Void>("layoutSettingsMenuLink", LayoutSettingsPage.class);
+    if (UserRights.getAccessChecker().isRestrictedUser() == true) {
+      // Not visibible for restricted users:
+      customizeMenuLink.setVisible(false);
+      layoutSettingsMenuLink.setVisible(false);
+    }
+    add(customizeMenuLink);
+    add(layoutSettingsMenuLink);
     add(new BookmarkablePageLink<Void>("feedbackLink", FeedbackPage.class));
     {
       @SuppressWarnings("serial")
