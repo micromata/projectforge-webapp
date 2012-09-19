@@ -231,7 +231,7 @@ public class MenuItemRegistry
   private static void initialize(final MenuItemRegistry reg)
   {
     // Super menus
-    final MenuItemDef common = reg.register(null, MenuItemDefId.COMMON, 10).setVisibleForRestrictedUsers(true);
+    final MenuItemDef common = reg.register(null, MenuItemDefId.COMMON, 10);
     final MenuItemDef pm = reg.register(null, MenuItemDefId.PROJECT_MANAGEMENT, 20);
     final ProjectForgeGroup[] fibuGroups = new ProjectForgeGroup[] { FINANCE_GROUP, ORGA_TEAM, CONTROLLING_GROUP};
     final MenuItemDef fibu = reg.register(null, MenuItemDefId.FIBU, 30, fibuGroups);
@@ -243,7 +243,7 @@ public class MenuItemRegistry
 
     // Menu entries
     // COMMON
-    reg.register(common, MenuItemDefId.CALENDAR, 10, CalendarPage.class).setVisibleForRestrictedUsers(true); // Visible for all.
+    reg.register(common, MenuItemDefId.CALENDAR, 10, CalendarPage.class); // Visible for all.
     reg.register(common, MenuItemDefId.BOOK_LIST, 30, BookListPage.class); // Visible for all.
     reg.register(common, MenuItemDefId.ADDRESS_LIST, 40, AddressListPage.class).setMobileMenu(AddressMobileListPage.class, 100); // Visible for all.
     reg.register(common, MenuItemDefId.PHONE_CALL, 50, PhoneCallPage.class);
