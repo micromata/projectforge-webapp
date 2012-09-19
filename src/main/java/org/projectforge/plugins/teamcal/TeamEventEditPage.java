@@ -71,25 +71,35 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   @SuppressWarnings("null")
   void preInit()
   {
-    //    if (isNew() == true) {
-    final PageParameters parameters = getPageParameters();
-    final Long startDateInMillis = WicketUtils.getAsLong(parameters, PARAMETER_KEY_START_DATE_IN_MILLIS);
-    final Long stopTimeInMillis = WicketUtils.getAsLong(parameters, PARAMETER_KEY_END_DATE_IN_MILLIS);
-    if (startDateInMillis != null) {
-      getData().setStartDate(new Timestamp(startDateInMillis));
-      if (stopTimeInMillis == null) {
-        getData().setEndDate(new Timestamp(stopTimeInMillis)); // Default is time sheet with zero duration.
+    if (isNew() == true) {
+      final PageParameters parameters = getPageParameters();
+      final Long startDateInMillis = WicketUtils.getAsLong(parameters, PARAMETER_KEY_START_DATE_IN_MILLIS);
+      final Long stopTimeInMillis = WicketUtils.getAsLong(parameters, PARAMETER_KEY_END_DATE_IN_MILLIS);
+      final String teamCalId = WicketUtils.getAsString(parameters, PARAMETER_KEY_TEAMCALID);
+      if (startDateInMillis != null) {
+        getData().setStartDate(new Timestamp(startDateInMillis));
+        if (stopTimeInMillis == null) {
+          getData().setEndDate(new Timestamp(stopTimeInMillis)); // Default is time sheet with zero duration.
+        }
       }
-    }
-    if (stopTimeInMillis != null) {
-      getData().setEndDate(new Timestamp(stopTimeInMillis));
-      if (startDateInMillis == null) {
-        getData().setStartDate(new Timestamp(startDateInMillis)); // Default is time sheet with zero duration.
+      if (stopTimeInMillis != null) {
+        getData().setEndDate(new Timestamp(stopTimeInMillis));
+        if (startDateInMillis == null) {
+          getData().setStartDate(new Timestamp(startDateInMillis)); // Default is time sheet with zero duration.
+        }
       }
-    }
-    final String teamCalId = WicketUtils.getAsString(parameters, PARAMETER_KEY_TEAMCALID);
-    if (teamCalId != null) {
-      getData().setCalendar(teamCalDao.getById(Integer.valueOf(teamCalId))); // TODO trycatch
+      if (teamCalId != null) {
+        getData().setCalendar(teamCalDao.getById(Integer.valueOf(teamCalId))); // TODO trycatch
+      }
+    } else {
+      final Long newStartTimeInMillis = WicketUtils.getAsLong(getPageParameters(), PARAMETER_KEY_START_DATE_IN_MILLIS);
+      final Long newStopTimeInMillis = WicketUtils.getAsLong(getPageParameters(), PARAMETER_KEY_END_DATE_IN_MILLIS);
+      if (newStartTimeInMillis != null) {
+        getData().setStartDate(new Timestamp(newStartTimeInMillis));
+      }
+      if (newStopTimeInMillis != null) {
+        getData().setEndDate(new Timestamp(newStopTimeInMillis));
+      }
     }
   }
 

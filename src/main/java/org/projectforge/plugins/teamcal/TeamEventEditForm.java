@@ -9,17 +9,22 @@
 
 package org.projectforge.plugins.teamcal;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.validation.IFormValidator;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
+import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
@@ -53,6 +58,12 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   private int stopHourOfDay, stopMinute;
 
   private boolean allDay;
+
+  private DateTimePanel startDateTimePanel;
+
+  private DropDownChoice<Integer> stopHourOfDayDropDownChoice;
+
+  private DropDownChoice<Integer> stopMinuteDropDownChoice;
 
   /**
    * @param parentPage
@@ -131,7 +142,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       protected boolean isSelected(final TeamCalDO object, final int index, final String selected)
       {
         final boolean check = super.isSelected(object, index, selected);
-        if (object.equals(data.getCalendar()))
+        final TeamCalDO team = data.getCalendar();
+        if (ObjectUtils.equals(object.getId(), team.getId()))
           return true;
         else
           return check;
@@ -145,9 +157,37 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   /**
    * @param newFieldset
    */
+  @SuppressWarnings("serial")
   private void setPeriodPanel(final FieldsetPanel newFieldset)
   {
-    final DateTimePanel startDateTimePanel = new DateTimePanel(newFieldset.newChildId(), new PropertyModel<Date>(data, "startDate"),
+    add(new IFormValidator() {
+
+      public org.apache.wicket.markup.html.form.FormComponent<?>[] getDependentFormComponents() {
+        return null;};
+
+        @Override
+        public void validate(final Form< ? > form)
+        {
+          final DateHolder startDate = new DateHolder(startDateTimePanel.getConvertedInput());
+          final DateHolder stopDate = new DateHolder(startDate.getTimestamp());
+          stopDate.setHourOfDay(stopHourOfDayDropDownChoice.getConvertedInput());
+          stopDate.setMinute(stopMinuteDropDownChoice.getConvertedInput());
+          if (stopDate.getTimeOfDay() < startDate.getTimeOfDay()) { // Stop time is
+            // before start time. Assuming next day for stop time:
+            stopDate.add(Calendar.DAY_OF_MONTH, 1);
+          }
+          final TeamEventDO e = data;
+          data.setStartDate(startDate.getTimestamp());
+          data.setEndDate(stopDate.getTimestamp());
+          if (data.getDuration() < 60000) {
+            // Duration is less than 60 seconds.
+            stopMinuteDropDownChoice.error(getString("timesheet.error.zeroDuration"));
+          } else if (data.getDuration() > TimesheetDao.MAXIMUM_DURATION) {
+            stopMinuteDropDownChoice.error(getString("timesheet.error.maximumDurationExceeded"));
+          }
+        }
+    });
+    startDateTimePanel = new DateTimePanel(newFieldset.newChildId(), new PropertyModel<Date>(data, "startDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
         .withRequired(true), DatePrecision.MINUTE_15);
     newFieldset.add(startDateTimePanel);
@@ -172,13 +212,13 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     });
     newFieldset.add(new DivTextPanel(newFieldset.newChildId(), getString("until")));
     // Stop time
-    final DropDownChoice<Integer> stopHourOfDayDropDownChoice = new DropDownChoice<Integer>(newFieldset.getDropDownChoiceId(),
+    stopHourOfDayDropDownChoice = new DropDownChoice<Integer>(newFieldset.getDropDownChoiceId(),
         new PropertyModel<Integer>(this, "stopHourOfDay"), DateTimePanel.getHourOfDayRenderer().getValues(),
         DateTimePanel.getHourOfDayRenderer());
     stopHourOfDayDropDownChoice.setNullValid(false);
     stopHourOfDayDropDownChoice.setRequired(true);
     newFieldset.add(stopHourOfDayDropDownChoice);
-    final DropDownChoice<Integer> stopMinuteDropDownChoice = new DropDownChoice<Integer>(newFieldset.getDropDownChoiceId(),
+    stopMinuteDropDownChoice = new DropDownChoice<Integer>(newFieldset.getDropDownChoiceId(),
         new PropertyModel<Integer>(this, "stopMinute"), DateTimePanel.getMinutesRenderer(DatePrecision.MINUTE_15).getValues(),
         DateTimePanel.getMinutesRenderer(DatePrecision.MINUTE_15));
     stopMinuteDropDownChoice.setNullValid(false);

@@ -9,7 +9,10 @@
 
 package org.projectforge.plugins.teamcal;
 
+import java.sql.Timestamp;
+
 import net.ftlines.wicket.fullcalendar.CalendarResponse;
+import net.ftlines.wicket.fullcalendar.Event;
 import net.ftlines.wicket.fullcalendar.EventSource;
 import net.ftlines.wicket.fullcalendar.callback.CalendarDropMode;
 import net.ftlines.wicket.fullcalendar.callback.ClickedEvent;
@@ -24,12 +27,15 @@ import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.string.StringValue;
+import org.joda.time.DateTime;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.web.calendar.MyFullCalendar;
 import org.projectforge.web.calendar.MyFullCalendarConfig;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.wicket.AbstractEditPage;
+import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.EditPage;
 import org.projectforge.web.wicket.components.DatePickerUtils;
 
@@ -127,7 +133,7 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
           log.debug("Original start time: " + event.getEvent().getStart() + ", original end time: " + event.getEvent().getEnd());
           log.debug("New start time: " + event.getNewStartTime() + ", new end time: " + event.getNewEndTime());
         }
-        //        modifyEvent(event.getEvent(), event.getNewStartTime(), event.getNewEndTime(), dropMode, response);
+        modifyEvent(event.getEvent(), event.getNewStartTime(), event.getNewEndTime(), dropMode, response);
         return false;
       }
 
@@ -144,7 +150,7 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
               + " minuteDelta: "
               + event.getMinutesDelta());
         }
-        //        modifyEvent(event.getEvent(), null, event.getNewEndTime(), CalendarDropMode.MOVE_EDIT, response);
+        modifyEvent(event.getEvent(), null, event.getNewEndTime(), CalendarDropMode.MOVE_EDIT, response);
         return false;
       }
 
@@ -159,6 +165,7 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
         final Integer id = NumberHelper.parseInteger(eventId);
         final PageParameters parameters = new PageParameters();
         parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
+        parameters.add(TeamEventEditPage.PARAMETER_KEY_TEAMCALID, getData().getId());
         final TeamEventEditPage teamEventEditPage = new TeamEventEditPage(parameters);
         teamEventEditPage.setReturnToPage((WebPage) getPage());
         setResponsePage(teamEventEditPage);
@@ -237,6 +244,69 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
   public void cancelSelection(final String property)
   {
     // TODO Auto-generated method stub
+  }
+
+  private void modifyEvent(final Event event, final DateTime newStartDate, final DateTime newEndDate, final CalendarDropMode dropMode, final CalendarResponse response)
+  {
+    final Integer id = NumberHelper.parseInteger(event.getId());
+    final TeamEventDO dbTeamEvent = teamEventDao.internalGetById(id);
+    if (dbTeamEvent == null) {
+      return;
+    }
+    final Long newStartTimeMillis = newStartDate != null ? DateHelper.getDateTimeAsMillis(newStartDate) : null;
+    final Long newEndTimeMillis = newEndDate != null ? DateHelper.getDateTimeAsMillis(newEndDate) : null;
+    final PFUserDO loggedInUser = ((AbstractSecuredBasePage) getPage()).getUser();
+    if (teamEventDao.hasUpdateAccess(loggedInUser, dbTeamEvent, dbTeamEvent, false) == false) {
+      // User has no update access, therefore ignore this request...
+      return;
+    }
+
+    // update start and end time
+    if(newStartDate != null) {
+      dbTeamEvent.setStartDate(new Timestamp(newStartTimeMillis));
+    }
+    if(newEndDate != null) {
+      dbTeamEvent.setEndDate(new Timestamp(newEndTimeMillis));
+    }
+
+    // clone event if mode is copy_*
+    if (CalendarDropMode.COPY_EDIT.equals(dropMode) || CalendarDropMode.COPY_SAVE.equals(dropMode)) {
+      dbTeamEvent.setId(null);
+      dbTeamEvent.setDeleted(false);
+      dbTeamEvent.setCalendar(getData());
+
+      // and save the new event -> correct time is set already
+      teamEventDao.save(dbTeamEvent);
+    }
+
+    if (dropMode == null || CalendarDropMode.MOVE_EDIT.equals(dropMode) || CalendarDropMode.COPY_EDIT.equals(dropMode)) {
+      // first: "normal edit mode"
+      // TODO use modal dialogs
+      final PageParameters parameters = new PageParameters();
+      // Add event Id
+      parameters.add(AbstractEditPage.PARAMETER_KEY_ID, dbTeamEvent.getId());
+      // Add teamCal id
+      parameters.add(TeamEventEditPage.PARAMETER_KEY_TEAMCALID, dbTeamEvent.getCalendar().getId());
+      if (newStartDate != null) {
+        parameters.add(TeamEventEditPage.PARAMETER_KEY_START_DATE_IN_MILLIS, newStartTimeMillis);
+      }
+      if (newEndDate != null) {
+        parameters.add(TeamEventEditPage.PARAMETER_KEY_END_DATE_IN_MILLIS, newEndTimeMillis);
+      }
+      final TeamEventEditPage teamEventEditPage = new TeamEventEditPage(parameters);
+      teamEventEditPage.setReturnToPage((WebPage) getPage());
+      setResponsePage(teamEventEditPage);
+    } else if (CalendarDropMode.MOVE_SAVE.equals(dropMode) || CalendarDropMode.COPY_SAVE.equals(dropMode)) {
+      // second mode: "quick save mode"
+      if(CalendarDropMode.MOVE_SAVE.equals(dropMode)) {
+        // we need update only in "move" mode, in "copy" mode it was saved a few lines above
+        teamEventDao.update(dbTeamEvent);
+      }
+      setResponsePage(getPage());
+    } else {
+      // CANCEL -> should be handled through javascript now
+      setResponsePage(getPage());
+    }
   }
 
   /**
