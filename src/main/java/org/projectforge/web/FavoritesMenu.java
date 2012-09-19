@@ -201,7 +201,6 @@ public class FavoritesMenu implements Serializable
       }
       if (accessChecker.isRestrictedUser() == true) {
         // Restricted users see only the change password menu entry (as favorite).
-        addFavoriteMenuEntry(registry.get(MenuItemDefId.CALENDAR));
         addFavoriteMenuEntry(registry.get(MenuItemDefId.CHANGE_PASSWORD));
       } else {
         final MenuEntry projectManagementMenu = new MenuEntry().setName(PFUserContext.getLocalizedString(MenuItemDefId.PROJECT_MANAGEMENT
