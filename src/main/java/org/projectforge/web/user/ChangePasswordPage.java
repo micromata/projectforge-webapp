@@ -49,6 +49,15 @@ public class ChangePasswordPage extends AbstractSecuredPage
     form.init();
   }
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractSecuredBasePage#isAccess4restrictedUsersAllowed()
+   */
+  @Override
+  public boolean isAccess4restrictedUsersAllowed()
+  {
+    return true;
+  }
+
   protected void cancel()
   {
     setResponsePage(new MessagePage("message.cancelAction", getString("user.changePassword.title")));

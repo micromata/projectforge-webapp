@@ -24,6 +24,7 @@
 package org.projectforge.web.wicket;
 
 import org.apache.wicket.MetaDataKey;
+import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.AccessChecker;
@@ -31,6 +32,7 @@ import org.projectforge.core.MessageParam;
 import org.projectforge.core.UserException;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserXmlPreferencesCache;
+import org.projectforge.web.user.ChangePasswordPage;
 
 /**
  * All pages with required login should be derived from this page.
@@ -55,6 +57,9 @@ public abstract class AbstractSecuredBasePage extends AbstractUnsecureBasePage
   public AbstractSecuredBasePage(final PageParameters parameters)
   {
     super(parameters);
+    if (isAccess4restrictedUsersAllowed() == false && (getUser() == null || getUser().isRestrictedUser() == true)) {
+      throw new RestartResponseException(ChangePasswordPage.class);
+    }
   }
 
   /**
@@ -226,5 +231,14 @@ public abstract class AbstractSecuredBasePage extends AbstractUnsecureBasePage
   public String translateParams(final UserException ex)
   {
     return translateParams(ex.getI18nKey(), ex.getMsgParams(), ex.getParams());
+  }
+
+  /**
+   * Default is false, therefore the access of this page is not allowed for restricted users by default.
+   * @return the access4restrictedUsersAllowed
+   */
+  public boolean isAccess4restrictedUsersAllowed()
+  {
+    return false;
   }
 }

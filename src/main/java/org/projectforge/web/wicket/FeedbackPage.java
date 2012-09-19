@@ -44,6 +44,15 @@ public class FeedbackPage extends AbstractStandardFormPage
 
   private final FeedbackForm form;
 
+  /**
+   * @see org.projectforge.web.wicket.AbstractSecuredBasePage#isAccess4restrictedUsersAllowed()
+   */
+  @Override
+  public boolean isAccess4restrictedUsersAllowed()
+  {
+    return true;
+  }
+
   public FeedbackPage(final PageParameters parameters)
   {
     super(null);
