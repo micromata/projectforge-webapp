@@ -9,9 +9,6 @@
 
 package org.projectforge.plugins.teamcal;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.model.PropertyModel;
@@ -37,9 +34,6 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalEditForm.class);
 
   private static final long serialVersionUID = 1379614008604844519L;
-
-  @SuppressWarnings("unused")
-  private String templateName; // Used by Wicket
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
@@ -68,16 +62,17 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
     gridBuilder.newGrid8();
 
     // checking visibility rights
-    if (isNew() == true || data.getOwner() == null && data.getMinimalAccessGroup() == null) {
+    final TeamCalRight right = new TeamCalRight();
+    if (isNew() == true || data.getOwner() == null) {
       access = true;
     } else {
-      if (new TeamCalRight().hasUpdateAccess(getUser(), data, data) == true)
+      if (right.hasUpdateAccess(getUser(), data, data) == true)
         access = true;
       else
-        if (accessCheck(data.getReadOnlyAccessGroup()) == true)
+        if (right.hasAccessGroup(data.getReadOnlyAccessGroup(), userGroupCache, getUser()) == true)
           access = false;
         else
-          if (accessCheck(data.getMinimalAccessGroup()) == true) {
+          if (right.hasAccessGroup(data.getMinimalAccessGroup(), userGroupCache, getUser()) == true) {
             final TeamCalDO newTeamCalDO = new TeamCalDO();
             newTeamCalDO.setId(data.getId());
             newTeamCalDO.setMinimalAccessGroup(data.getMinimalAccessGroup());
@@ -153,19 +148,6 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       if (access == false)
         minimalAccess.setEnabled(false);
     }
-  }
-
-  private boolean accessCheck(final GroupDO group) {
-    if (group != null) {
-      final Collection<Integer> groups = userGroupCache.getUserGroups(getUser());
-      final Iterator<Integer> it = groups.iterator();
-      while (it.hasNext()){
-        final int id = it.next();
-        if (id == 0 || group.getId() == id)
-          return true;
-      }
-    }
-    return false;
   }
 
   /**

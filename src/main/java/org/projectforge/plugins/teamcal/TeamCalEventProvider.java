@@ -20,6 +20,8 @@ import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.projectforge.common.DateHelper;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 
 /**
@@ -33,16 +35,12 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalEventProvider.class);
 
-  //  private final TeamCalDao teamCalDao;
+  private UserGroupCache userGroupCache;
 
   @SpringBean(name = "teamEventDao")
   private final TeamEventDao teamEventDao;
 
-  //  private long totalDuration;
-
   private Integer month;
-
-  //  private DateTime firstDayOfMonth;
 
   private int days;
 
@@ -73,13 +71,6 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
   @Override
   protected void buildEvents(final DateTime start, final DateTime end)
   {
-    //    final Event event = new Event();
-    //    event.setStart(start);
-    //    event.setEnd(end);
-    //    event.setAllDay(true);
-    //    event.setTitle("Hallo");
-    //    events.put(""+System.currentTimeMillis(), event);
-    //    totalDuration = 0;
     for (int i = 0; i < durationsPerDayOfMonth.length; i++) {
       durationsPerDayOfMonth[i] = 0;
     }
@@ -109,14 +100,17 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         final DateTime startDate = new DateTime(teamEvent.getStartDate(), PFUserContext.getDateTimeZone());
         final DateTime endDate = new DateTime(teamEvent.getEndDate(), PFUserContext.getDateTimeZone());
         if (endDate.isBefore(start) == true || startDate.isAfter(end) == true) {
-          // Time sheet doesn't match time period start - end.
+          // Event doesn't match time period start - end.
           continue;
         }
         final long duration = teamEvent.getDuration();
         final Event event = new Event();
         event.setId("" + teamEvent.getId());
         event.setStart(startDate);
-        event.setEnd(endDate);
+        if (teamEvent.isAllDay())
+          event.setAllDay(true);
+        else
+          event.setEnd(endDate);
         final String title = teamEvent.getSubject();
         if (longFormat == true) {
           // Week or day view:
@@ -127,7 +121,22 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
             hour = "0" + dt.getHourOfDay();
           if (dt.getMinuteOfHour() < 10)
             minute = "0" + dt.getMinuteOfHour();
-          event.setTitle(title + "\nNote: " + teamEvent.getNote() + "\nDauer: " + hour + ":" + minute);
+
+          final TeamCalRight right = new TeamCalRight();
+          final PFUserDO user = PFUserContext.getUser();
+          if (right.isOwner(user, teamEvent.getCalendar()) == true
+              || right.hasAccessGroup(teamEvent.getCalendar().getFullAccessGroup(), userGroupCache, user) == true) {
+            event.setTitle(title + "\nNote: " + teamEvent.getNote() + "\nDauer: " + hour + ":" + minute);
+          } else {
+            if (right.hasAccessGroup(teamEvent.getCalendar().getReadOnlyAccessGroup(), userGroupCache, user) == true) {
+              event.setTitle(title + "\nNote: " + teamEvent.getNote() + "\nDauer: " + hour + ":" + minute);
+              event.setEditable(false);
+            } else {
+              // for minimal access
+              event.setTitle("");
+              event.setEditable(false);
+            }
+          }
           //getToolTip(teamEvent) + "\n" + formatDuration(duration, false));
         } else {
           // Month view:
@@ -147,6 +156,10 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
       }
     }
     //    setStatistics(start, end);
+  }
+
+  public void setUserGroupCache(final UserGroupCache userGroupCache) {
+    this.userGroupCache = userGroupCache;
   }
 
   /**

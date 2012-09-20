@@ -52,6 +52,8 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
 
   private TeamCalEventProvider eventProvider;
 
+  private TeamCalRight right;
+
   @SpringBean(name = "teamCalDao")
   private TeamCalDao teamCalDao;
 
@@ -75,6 +77,8 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
   protected void init()
   {
     super.init();
+    right = new TeamCalRight();
+
     final MyFullCalendarConfig config = new MyFullCalendarConfig(this);
     if (teamCalDao.hasUpdateAccess(getUser(), getData(), null, false))
       config.setSelectable(true);
@@ -89,6 +93,10 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
       @Override
       protected void onDateRangeSelected(final SelectedRange range, final CalendarResponse response)
       {
+        if (right.isOwner(getUser(), getData()) == false)
+          if(right.hasAccessGroup(getData().getMinimalAccessGroup(), userGroupCache, getUser()) == true)
+            return;
+
         if (log.isDebugEnabled() == true) {
           log.debug("Selected region: " + range.getStart() + " - " + range.getEnd() + " / allDay: " + range.isAllDay());
         }
@@ -109,6 +117,10 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
       @Override
       protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response)
       {
+        if (right.isOwner(getUser(), getData()) == false)
+          if(right.hasAccessGroup(getData().getMinimalAccessGroup(), userGroupCache, getUser()) == true)
+            return false;
+
         // default mode is move and edit
         CalendarDropMode dropMode = CalendarDropMode.MOVE_EDIT;
         final StringValue parameterValue = RequestCycle.get().getRequest().getQueryParameters().getParameterValue("which");
@@ -140,6 +152,10 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
       @Override
       protected boolean onEventResized(final ResizedEvent event, final CalendarResponse response)
       {
+        if (right.isOwner(getUser(), getData()) == false)
+          if(right.hasAccessGroup(getData().getMinimalAccessGroup(), userGroupCache, getUser()) == true)
+            return false;
+
         if (log.isDebugEnabled() == true) {
           log.debug("Event resized. eventId: "
               + event.getEvent().getId()
@@ -157,6 +173,10 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
       @Override
       protected void onEventClicked(final ClickedEvent event, final CalendarResponse response)
       {
+        if (right.isOwner(getUser(), getData()) == false)
+          if(right.hasAccessGroup(getData().getMinimalAccessGroup(), userGroupCache, getUser()) == true)
+            return;
+
         if (log.isDebugEnabled() == true) {
           log.debug("Event clicked. eventId: " + event.getEvent().getId() + ", sourceId: " + event.getSource().getUuid());
         }
@@ -175,6 +195,10 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
       @Override
       protected void onViewDisplayed(final View view, final CalendarResponse response)
       {
+        if (right.isOwner(getUser(), getData()) == false)
+          if(right.hasAccessGroup(getData().getMinimalAccessGroup(), userGroupCache, getUser()) == true)
+            return;
+
         if (log.isDebugEnabled() == true) {
           log.debug("View displayed. viewType: " + view.getType().name() + ", start: " + view.getStart() + ", end: " + view.getEnd());
         }
@@ -183,23 +207,31 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
         //        filter.setViewType(view.getType());
         // Need calling getEvents for getting correct duration label, it's not predictable what will be called first: onViewDisplayed or
         // getEvents.
-        eventProvider.getEvents(view.getVisibleStart().toDateTime(), view.getVisibleEnd().toDateTime());
+        if (isNew() == false) {
+          eventProvider.getEvents(view.getVisibleStart().toDateTime(), view.getVisibleEnd().toDateTime());
+        }
         if (form.getDatePanel() != null) {
           form.getDatePanel().getDateField().modelChanged();
           response.getTarget().add(form.getDatePanel().getDateField());
           response.getTarget().appendJavaScript(
               DatePickerUtils.getDatePickerInitJavaScript(form.getDatePanel().getDateField().getMarkupId(), true));
         }
-        //        response.getTarget().add(((CalendarPage) getPage()).form.durationLabel);
       }
     };
+
     getForm().add(myCalendar);
     myCalendar.setMarkupId("calendar");
     final EventSource eventSource = new EventSource();
-    eventProvider = new TeamCalEventProvider(this, teamCalDao, teamEventDao, getData().getId());
-    eventSource.setEventsProvider(eventProvider);
-    eventSource.setEditable(true);
-    config.add(eventSource);
+    if (isNew() == false) {
+      eventProvider = new TeamCalEventProvider(this, teamCalDao, teamEventDao, getData().getId());
+      eventProvider.setUserGroupCache(userGroupCache);
+      eventSource.setEventsProvider(eventProvider);
+      eventSource.setEditable(true);
+      config.add(eventSource);
+    }
+    else
+      myCalendar.setVisible(false);
+
   }
 
   /**
@@ -258,6 +290,8 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
     final PFUserDO loggedInUser = ((AbstractSecuredBasePage) getPage()).getUser();
     if (teamEventDao.hasUpdateAccess(loggedInUser, dbTeamEvent, dbTeamEvent, false) == false) {
       // User has no update access, therefore ignore this request...
+      event.setEditable(false);
+      event.setTitle("");
       return;
     }
 

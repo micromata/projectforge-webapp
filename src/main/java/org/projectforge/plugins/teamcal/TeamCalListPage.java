@@ -10,8 +10,6 @@
 package org.projectforge.plugins.teamcal;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.wicket.AttributeModifier;
@@ -24,7 +22,6 @@ import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.projectforge.user.GroupDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -50,12 +47,15 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
+  private final TeamCalRight right;
+
   /**
    * 
    */
   public TeamCalListPage(final PageParameters parameters)
   {
     super(parameters, "plugins.teamcal");
+    right = new TeamCalRight();
   }
 
   /**
@@ -104,19 +104,6 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
     return columns;
   }
 
-  private boolean visibilityCheck(final GroupDO group) {
-    if (group != null) {
-      final Collection<Integer> groups = userGroupCache.getUserGroups(getUser());
-      final Iterator<Integer> it = groups.iterator();
-      while (it.hasNext()){
-        final int id = it.next();
-        if (id == 0 || group.getId() == id)
-          return true;
-      }
-    }
-    return false;
-  }
-
   /**
    * @see org.projectforge.web.wicket.AbstractListPage#getBaseDao()
    */
@@ -143,9 +130,11 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   {
     final DetachableDOModel<TeamCalDO, TeamCalDao> det = new DetachableDOModel<TeamCalDO, TeamCalDao>(object, getBaseDao());
     TeamCalDO teamcal = det.getObject();
-    if (visibilityCheck(teamcal.getFullAccessGroup()) == true || visibilityCheck(teamcal.getReadOnlyAccessGroup()) == true)
+    if (right.isOwner(getUser(), object)
+        ||right.hasAccessGroup(teamcal.getFullAccessGroup(), userGroupCache, getUser()) == true
+        || right.hasAccessGroup(teamcal.getReadOnlyAccessGroup(), userGroupCache, getUser()) == true)
       return det;
-    if (visibilityCheck(teamcal.getMinimalAccessGroup()) == true) {
+    if (right.hasAccessGroup(teamcal.getMinimalAccessGroup(), userGroupCache, getUser()) == true) {
       teamcal = new TeamCalDO();
       teamcal.setId(object.getId());
       teamcal.setMinimalAccessGroup(object.getMinimalAccessGroup());

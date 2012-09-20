@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.projectforge</groupId>
   <artifactId>ProjectForge</artifactId>
@@ -169,6 +170,10 @@
       <name>Java.net Repository for Maven</name>
       <url>http://download.java.net/maven/2/</url>
       <layout>default</layout>
+    </repository>
+    <repository>
+      <id>googlecode</id>
+      <url>http://jqwicket.googlecode.com/svn/m2-repo/releases/</url>
     </repository>
   </repositories>
   <properties>
@@ -471,14 +476,16 @@
       <version>3.6</version>
       <type>jar</type>
     </dependency>
-    <!-- dependency> <groupId>org.apache.poi</groupId> <artifactId>poi-ooxml</artifactId> <version>3.5-beta4</version> </dependency -->
+    <!-- dependency> <groupId>org.apache.poi</groupId> <artifactId>poi-ooxml</artifactId> 
+      <version>3.5-beta4</version> </dependency -->
     <dependency> <!-- Version check: 2010-08-28 -->
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
       <version>1.7.4</version>
       <scope>compile</scope>
     </dependency>
-    <!-- dependency> <groupId>org.codehaus.groovy.maven.runtime</groupId> <artifactId>gmaven-runtime-1.0</artifactId> <version>1.0-rc-4</version> </dependency -->
+    <!-- dependency> <groupId>org.codehaus.groovy.maven.runtime</groupId> 
+      <artifactId>gmaven-runtime-1.0</artifactId> <version>1.0-rc-4</version> </dependency -->
     <dependency> <!-- Version check: 2010-08-28 -->
       <!-- see: http://repository.jboss.org/nexus/content/groups/public/org/hibernate/hibernate-core/ -->
       <groupId>org.hibernate</groupId>
@@ -600,6 +607,11 @@
       <artifactId>backport-util-concurrent</artifactId>
       <version>3.1</version>
     </dependency>
+    <dependency>
+      <groupId>com.google.code.jqwicket</groupId>
+      <artifactId>jqwicket</artifactId>
+      <version>0.8</version>
+    </dependency>
 
     <!-- JETTY DEPENDENCIES FOR TESTING -->
     <dependency>
@@ -646,7 +658,8 @@
           <artifactId>maven-site-plugin</artifactId>
           <version>3.0</version>
         </plugin>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
+        <!--This plugin's configuration is used to store Eclipse m2e settings 
+          only. It has no influence on the Maven build itself. -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
@@ -682,7 +695,8 @@
           <webApp>${directory}/${project.build.finalName}.war</webApp>
           <webXml>target/${project.artifactId}-${project.version}/WEB-INF/web.xml</webXml>
           <connectors>
-            <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
+            <connector
+              implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
               <port>8181</port>
               <maxIdleTime>3600000</maxIdleTime>
             </connector>
@@ -743,7 +757,8 @@
                   <classpath refid="maven.compile.classpath" />
                 </taskdef>
                 <mkdir dir="${project.build.outputDirectory}" />
-                <groovyc destdir="${project.build.outputDirectory}" srcdir="${basedir}/src/main/groovy/" listfiles="true">
+                <groovyc destdir="${project.build.outputDirectory}"
+                  srcdir="${basedir}/src/main/groovy/" listfiles="true">
                   <classpath refid="maven.compile.classpath" />
                 </groovyc>
               </tasks>
@@ -752,10 +767,12 @@
               <goal>run</goal>
             </goals>
           </execution>
-          <!-- execution> <id>test-compile</id> <phase>test-compile</phase> <configuration> <tasks> <taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc"> 
-            <classpath refid="maven.compile.classpath" /> </taskdef> <mkdir dir="${project.build.testOutputDirectory}" /> <groovyc destdir="${project.build.testOutputDirectory}" 
-            srcdir="${basedir}/src/test/groovy/" listfiles="true"> <classpath refid="maven.test.classpath" /> </groovyc> </tasks> </configuration> <goals> <goal>run</goal> 
-            </goals> </execution -->
+          <!-- execution> <id>test-compile</id> <phase>test-compile</phase> 
+            <configuration> <tasks> <taskdef name="groovyc" classname="org.codehaus.groovy.ant.Groovyc"> 
+            <classpath refid="maven.compile.classpath" /> </taskdef> <mkdir dir="${project.build.testOutputDirectory}" 
+            /> <groovyc destdir="${project.build.testOutputDirectory}" srcdir="${basedir}/src/test/groovy/" 
+            listfiles="true"> <classpath refid="maven.test.classpath" /> </groovyc> </tasks> 
+            </configuration> <goals> <goal>run</goal> </goals> </execution -->
         </executions>
       </plugin>
       <plugin> <!-- >>>>>>>>>>> -->

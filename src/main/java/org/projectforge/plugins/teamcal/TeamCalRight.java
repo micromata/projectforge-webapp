@@ -23,8 +23,14 @@
 
 package org.projectforge.plugins.teamcal;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import org.apache.commons.lang.ObjectUtils;
+import org.projectforge.access.OperationType;
+import org.projectforge.user.GroupDO;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRightAccessCheck;
 import org.projectforge.user.UserRightCategory;
 import org.projectforge.user.UserRightValue;
@@ -114,6 +120,49 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
     return false;
   }
 
+  public boolean hasAccessGroup(final GroupDO group, final UserGroupCache userGroupCache, final PFUserDO user) {
+    if (group != null) {
+      final Collection<Integer> groups = userGroupCache.getUserGroups(user);
+      final Iterator<Integer> it = groups.iterator();
+      while (it.hasNext()){
+        final int id = it.next();
+        if (id == 0 || group.getId() == id)
+          return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * If user is not reporter or assignee and task is given the access to task is assumed, meaning if the user has the right to delete the
+   * tasks he is allowed to delete to-do's to.
+   * @see org.projectforge.user.UserRightAccessCheck#hasDeleteAccess(org.projectforge.user.PFUserDO, java.lang.Object)
+   */
+  @Override
+  public boolean hasDeleteAccess(final PFUserDO user, final TeamCalDO obj)
+  {
+    return hasAccess(user, obj, OperationType.DELETE);
+  }
+
+  private boolean hasAccess(final PFUserDO user, final TeamCalDO teamCal, final OperationType operationType)
+  {
+    if (teamCal == null) {
+      return true;
+    }
+    if (ObjectUtils.equals(user.getId(), teamCal.getOwnerId()) == true) {
+      return true;
+    }
+    if(UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), teamCal.getFullAccessGroupId()) == true) {
+      return true;
+    }
+    if ((UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), teamCal.getReadOnlyAccessGroupId()) == true
+        || UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), teamCal.getMinimalAccessGroupId()) == true)
+        && operationType.equals(OperationType.DELETE))
+      return false;
+    else
+      return true;
+  }
+
   /**
    * @see org.projectforge.user.UserRightAccessCheck#hasHistoryAccess(org.projectforge.user.PFUserDO, java.lang.Object)
    */
@@ -121,14 +170,13 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
   public boolean hasHistoryAccess(final PFUserDO user, final TeamCalDO obj)
   {
     // TODO remove hack
-    //    System.out.println("obj: " + obj);
     if (obj != null)
       return hasUpdateAccess(user, obj, null);
     else
       return true;
   }
 
-  private boolean isOwner(final PFUserDO user, final TeamCalDO cal)
+  public boolean isOwner(final PFUserDO user, final TeamCalDO cal)
   {
     return ObjectUtils.equals(user.getId(), cal.getOwnerId()) == true;
   }

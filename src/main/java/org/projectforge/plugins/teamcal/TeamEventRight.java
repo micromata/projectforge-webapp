@@ -106,6 +106,41 @@ public class TeamEventRight extends UserRightAccessCheck<TeamEventDO>
     return hasAccess(user, obj, operationType) == true || hasAccess(user, oldObj, operationType) == true;
   }
 
+  /**
+   * @see org.projectforge.user.UserRightAccessCheck#hasUpdateAccess(org.projectforge.user.PFUserDO, java.lang.Object, java.lang.Object)
+   */
+  @Override
+  public boolean hasUpdateAccess(final PFUserDO user, final TeamEventDO obj, final TeamEventDO oldObj)
+  {
+    if (ObjectUtils.equals(user.getId(), obj.getCalendar().getOwnerId()) == true) {
+      // User has full access to it's own calendars.
+      return true;
+    }
+    if (isMemberOfAtLeastOneGroup(user, obj.getCalendar().getFullAccessGroupId()) == true) {
+      // User is member of at least one group.
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * @see org.projectforge.user.UserRightAccessCheck#hasHistoryAccess(org.projectforge.user.PFUserDO, java.lang.Object)
+   */
+  @Override
+  public boolean hasHistoryAccess(final PFUserDO user, final TeamEventDO obj)
+  {
+    // TODO remove hack
+    if (obj != null)
+      return hasUpdateAccess(user, obj, null);
+    else
+      return true;
+  }
+
+  private boolean isMemberOfAtLeastOneGroup(final PFUserDO user, final Integer... groupIds)
+  {
+    return UserRights.getUserGroupCache().isUserMemberOfAtLeastOneGroup(user.getId(), groupIds);
+  }
+
   private boolean hasAccess(final PFUserDO user, final TeamEventDO event, final OperationType operationType)
   {
     if (event == null) {
@@ -114,12 +149,14 @@ public class TeamEventRight extends UserRightAccessCheck<TeamEventDO>
     if (ObjectUtils.equals(user.getId(), event.getCalendar().getOwnerId()) == true) {
       return true;
     }
-    if(UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getFullAccessGroupId()) == true
-        || UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getReadOnlyAccessGroupId()) == true
-        || UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getMinimalAccessGroupId()) == true) {
+    if(UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getFullAccessGroupId()) == true) {
       return true;
     }
-    // TODO return to false
-    return true;
+    if ((UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getReadOnlyAccessGroupId()) == true
+        || UserRights.getUserGroupCache().isUserMemberOfGroup(user.getId(), event.getCalendar().getMinimalAccessGroupId()) == true)
+        && operationType.equals(OperationType.DELETE))
+      return false;
+    else
+      return true;
   }
 }
