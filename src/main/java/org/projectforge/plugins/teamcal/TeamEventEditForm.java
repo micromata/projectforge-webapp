@@ -18,6 +18,7 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.joda.time.DateTime;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
@@ -211,6 +212,12 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         .withRequired(true), DatePrecision.MINUTE_15);
     dateFieldSet.add(endDateTimePanel);
     dateFieldToolTip(endDateTimePanel);
+
+    final DateTime start = new DateTime(startDateTimePanel.getDate());
+    final DateTime end = new DateTime(endDateTimePanel.getDate());
+
+    if (start.getDayOfMonth() < end.getDayOfMonth())
+      data.setAllDay(true);
 
     if (access == false)
       dateFieldSet.setEnabled(false);
