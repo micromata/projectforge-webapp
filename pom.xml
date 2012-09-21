@@ -171,10 +171,6 @@
       <url>http://download.java.net/maven/2/</url>
       <layout>default</layout>
     </repository>
-    <repository>
-      <id>googlecode</id>
-      <url>http://jqwicket.googlecode.com/svn/m2-repo/releases/</url>
-    </repository>
   </repositories>
   <properties>
     <!-- wtpversion>1.5</wtpversion -->
@@ -606,11 +602,6 @@
       <groupId>backport-util-concurrent</groupId>
       <artifactId>backport-util-concurrent</artifactId>
       <version>3.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.code.jqwicket</groupId>
-      <artifactId>jqwicket</artifactId>
-      <version>0.8</version>
     </dependency>
 
     <!-- JETTY DEPENDENCIES FOR TESTING -->

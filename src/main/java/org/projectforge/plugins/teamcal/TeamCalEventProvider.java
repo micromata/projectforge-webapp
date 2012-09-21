@@ -18,7 +18,6 @@ import org.apache.wicket.Component;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
-import org.projectforge.common.DateHelper;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
@@ -44,11 +43,6 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
   private int days;
 
-  // duration by day of month.
-  private final long[] durationsPerDayOfMonth = new long[32];
-
-  private final long[] durationsPerDayOfYear = new long[380];
-
   private final TeamEventFilter eventFilter;
 
   private final Integer teamCalId;
@@ -71,12 +65,6 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
   @Override
   protected void buildEvents(final DateTime start, final DateTime end)
   {
-    for (int i = 0; i < durationsPerDayOfMonth.length; i++) {
-      durationsPerDayOfMonth[i] = 0;
-    }
-    for (int i = 0; i < durationsPerDayOfYear.length; i++) {
-      durationsPerDayOfYear[i] = 0;
-    }
     eventFilter.setTeamCalId(teamCalId);
     eventFilter.setStartDate(start.toDate());
     eventFilter.setEndDate(end.toDate());
@@ -107,10 +95,9 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         final Event event = new Event();
         event.setId("" + teamEvent.getId());
         event.setStart(startDate);
+        event.setEnd(endDate);
         if (teamEvent.isAllDay())
           event.setAllDay(true);
-        else
-          event.setEnd(endDate);
         final String title = teamEvent.getSubject();
         if (longFormat == true) {
           // Week or day view:
@@ -124,12 +111,17 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
           final TeamCalRight right = new TeamCalRight();
           final PFUserDO user = PFUserContext.getUser();
+          String durationString = "";
           if (right.isOwner(user, teamEvent.getCalendar()) == true
               || right.hasAccessGroup(teamEvent.getCalendar().getFullAccessGroup(), userGroupCache, user) == true) {
-            event.setTitle(title + "\nNote: " + teamEvent.getNote() + "\nDauer: " + hour + ":" + minute);
+            if (event.isAllDay() == false)
+              durationString = "\n"+ getString("plugins.teamevent.duration") + ": " + hour + ":" + minute;
+            event.setTitle(getString("plugins.teamevent.subject") + ": " + title + "\n"+ getString("plugins.teamevent.note") + ": " + teamEvent.getNote() + durationString);
           } else {
             if (right.hasAccessGroup(teamEvent.getCalendar().getReadOnlyAccessGroup(), userGroupCache, user) == true) {
-              event.setTitle(title + "\nNote: " + teamEvent.getNote() + "\nDauer: " + hour + ":" + minute);
+              if (event.isAllDay() == false)
+                durationString = "\n"+ getString("plugins.teamevent.duration") + ": " + hour + ":" + minute;
+              event.setTitle(getString("plugins.teamevent.subject") + ": " + title + "\n"+ getString("plugins.teamevent.note") + ": " + teamEvent.getNote() + durationString);
               event.setEditable(false);
             } else {
               // for minimal access
@@ -137,7 +129,6 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
               event.setEditable(false);
             }
           }
-          //getToolTip(teamEvent) + "\n" + formatDuration(duration, false));
         } else {
           // Month view:
           event.setTitle(title);
@@ -147,15 +138,8 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           event.setTextColor("#222222").setBackgroundColor("#ACD9E8").setColor("#ACD9E8");
         }
         events.put(teamEvent.getId() + "", event);
-        if (month == null || startDate.getMonthOfYear() == month) {
-          //          totalDuration += duration;
-          addDurationOfDay(startDate.getDayOfMonth(), duration);
-        }
-        final int dayOfYear = startDate.getDayOfYear();
-        addDurationOfDayOfYear(dayOfYear, duration);
       }
     }
-    //    setStatistics(start, end);
   }
 
   public void setUserGroupCache(final UserGroupCache userGroupCache) {
@@ -163,84 +147,10 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
   }
 
   /**
-   * @param start
+   * @return the log
    */
-  private void setStatistics(final DateTime start, final DateTime end)
+  public static org.apache.log4j.Logger getLog()
   {
-    // Show statistics: duration of every day is shown as all day event.
-    DateTime day = start;
-    int paranoiaCounter = 0;
-    do {
-      if (++paranoiaCounter > 1000) {
-        log.error("Paranoia counter exceeded! Dear developer, please have a look at the implementation of buildEvents.");
-        break;
-      }
-      final int dayOfMonth = day.getDayOfMonth();
-      final int dayOfYear = day.getDayOfYear();
-      final long duration = durationsPerDayOfMonth[dayOfMonth];
-      final boolean firstDayOfWeek = day.getDayOfWeek() == PFUserContext.getJodaFirstDayOfWeek();
-      if (firstDayOfWeek == false && duration == 0) {
-        day = day.plusDays(1);
-        continue;
-      }
-      final Event event = new Event().setAllDay(true);
-      final String id = "s-" + (dayOfYear);
-      event.setId(id);
-      event.setStart(day);
-      final String durationString = null; //formatDuration(duration, false);
-      if (firstDayOfWeek == true) {
-        // Show week of year at top of first day of week.
-        long weekDuration = 0;
-        for (short i = 0; i < 7; i++) {
-          weekDuration += durationsPerDayOfYear[dayOfYear + i];
-        }
-        final StringBuffer buf = new StringBuffer();
-        buf.append(getString("calendar.weekOfYearShortLabel")).append(DateHelper.getWeekOfYear(day));
-        if (days > 1 && weekDuration > 0) {
-          // Show total sum of durations over all time sheets of current week (only in week and month view).
-          //                      buf.append(": ").append(formatDuration(weekDuration, false));
-        }
-        if (duration > 0) {
-          buf.append(", ").append(durationString);
-        }
-        event.setTitle(buf.toString());
-      } else {
-        event.setTitle(durationString);
-      }
-      event.setTextColor("#666666").setBackgroundColor("#F9F9F9").setColor("#F9F9F9");
-      event.setEditable(false);
-      events.put(id, event);
-      day = day.plusDays(1);
-    }
-    while (day.isAfter(end) == false);
+    return log;
   }
-
-  private void addDurationOfDay(final int dayOfMonth, final long duration)
-  {
-    durationsPerDayOfMonth[dayOfMonth] += duration;
-  }
-
-  /**
-   * @param dayOfMonth
-   * @see DateTime#getDayOfMonth()
-   */
-  public long getDurationOfDay(final int dayOfMonth)
-  {
-    return durationsPerDayOfMonth[dayOfMonth];
-  }
-
-  private void addDurationOfDayOfYear(final int dayOfYear, final long duration)
-  {
-    durationsPerDayOfYear[dayOfYear] += duration;
-  }
-
-  /**
-   * @param weekOfYear
-   * @see DateTime#getDayOfMonth()
-   */
-  public long getDurationOfWeekOfYear(final int weekOfYear)
-  {
-    return durationsPerDayOfMonth[weekOfYear];
-  }
-
 }
