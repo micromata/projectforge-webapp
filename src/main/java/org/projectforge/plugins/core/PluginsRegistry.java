@@ -30,7 +30,6 @@ import org.apache.wicket.settings.IResourceSettings;
 import org.projectforge.admin.SystemUpdater;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.plugins.memo.MemoPlugin;
-import org.projectforge.plugins.teamcal.TeamCalPlugin;
 import org.projectforge.plugins.todo.ToDoPlugin;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -45,7 +44,7 @@ public class PluginsRegistry
   /**
    * Defines some built-in plugins.
    */
-  private final AbstractPlugin[] builtinPlugins = new AbstractPlugin[] { new TeamCalPlugin(), new ToDoPlugin(), new MemoPlugin()};
+  private final AbstractPlugin[] builtinPlugins = new AbstractPlugin[] { new ToDoPlugin(), new MemoPlugin()};
 
   private static PluginsRegistry instance;
 
