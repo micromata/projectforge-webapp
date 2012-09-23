@@ -36,7 +36,7 @@ import org.projectforge.timesheet.TimesheetDO;
  * User preferences are supported by different areas. These areas are defined inside this enum.
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class UserPrefArea implements Serializable
+public class UserPrefArea implements Serializable, Comparable<UserPrefArea>
 {
   private static final long serialVersionUID = -6594785391128587090L;
 
@@ -123,5 +123,14 @@ public class UserPrefArea implements Serializable
   public String toString()
   {
     return String.valueOf(id);
+  }
+
+  /**
+   * @see java.lang.Comparable#compareTo(java.lang.Object)
+   */
+  @Override
+  public int compareTo(final UserPrefArea arg0)
+  {
+    return id.compareTo(arg0.id);
   }
 }

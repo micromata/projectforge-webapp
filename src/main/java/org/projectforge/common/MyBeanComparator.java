@@ -25,39 +25,60 @@ package org.projectforge.common;
 
 import java.util.Comparator;
 
+import org.apache.commons.lang.ClassUtils;
+
 public class MyBeanComparator<T> implements Comparator<T>
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(MyBeanComparator.class);
+
   private String property;
 
   private boolean asc;
 
-  public MyBeanComparator(String property)
+  public MyBeanComparator(final String property)
   {
     this(property, true);
 
   }
 
-  public MyBeanComparator(String property, boolean asc)
+  public MyBeanComparator(final String property, final boolean asc)
   {
     this.property = property;
     this.asc = asc;
   }
 
-  @SuppressWarnings("unchecked")
-  public int compare(T o1, T o2)
+  @SuppressWarnings({ "unchecked", "rawtypes"})
+  public int compare(final T o1, final T o2)
   {
-    Object value1 = BeanHelper.getNestedProperty(o1, property);
-    Object value2 = BeanHelper.getNestedProperty(o2, property);
-    if (value1 == null) {
-      if (value2 == null)
-        return 0;
-      else return (asc == true) ? -1 : 1;
+    try {
+      final Object value1 = BeanHelper.getNestedProperty(o1, property);
+      final Object value2 = BeanHelper.getNestedProperty(o2, property);
+      if (value1 == null) {
+        if (value2 == null)
+          return 0;
+        else return (asc == true) ? -1 : 1;
+      }
+      if (value2 == null) {
+        return (asc == true) ? 1 : -1;
+      }
+      if (ClassUtils.isAssignable(value2.getClass(), value1.getClass()) == true) {
+        if (asc == true) {
+          return ((Comparable) value1).compareTo(value2);
+        } else {
+          return -((Comparable) value1).compareTo(value2);
+        }
+      } else {
+        final String sval1 = String.valueOf(value1);
+        final String sval2 = String.valueOf(value2);
+        if (asc == true) {
+          return sval1.compareTo(sval2);
+        } else {
+          return -sval1.compareTo(sval2);
+        }
+      }
+    } catch (final Exception ex) {
+      log.error("Exception while comparing values of property '" + property + "': " + ex.getMessage());
+      return 0;
     }
-    if (value2 == null) {
-      return (asc == true) ? 1 : -1;
-    }
-    if (asc == true)
-      return ((Comparable) value1).compareTo(value2);
-    else return -((Comparable) value1).compareTo(value2);
   }
 }
