@@ -31,6 +31,7 @@ import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.IChoiceRenderer;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
+import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * Panel containing only one drop down choice box. <br/>
@@ -146,5 +147,16 @@ public class DropDownChoicePanel<T> extends Panel implements ComponentWrapperPan
     }
     this.dropDownChoice = dropDownChoice;
     add(dropDownChoice);
+  }
+
+  /**
+   * Sets tool-tip for the label.
+   * @param tooltip
+   * @return this for chaining.
+   */
+  public DropDownChoicePanel<T> setTooltip(final String tooltip)
+  {
+    WicketUtils.addTooltip(dropDownChoice, tooltip);
+    return this;
   }
 }
