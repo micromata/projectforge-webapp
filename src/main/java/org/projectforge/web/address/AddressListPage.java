@@ -58,6 +58,7 @@ import org.projectforge.address.PersonalAddressDao;
 import org.projectforge.address.PhoneType;
 import org.projectforge.common.DateHelper;
 import org.projectforge.core.ConfigXml;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
@@ -258,10 +259,11 @@ public class AddressListPage extends AbstractListPage<AddressListForm, AddressDa
       }, getString("address.tooltip.writeSMS"));
       addContentMenuEntry(menuEntry);
     }
+    if (WebConfiguration.isDevelopmentMode() == true)
     {
       // final Import vcards
-      final BookmarkablePageLink<AddressImportPage> importVCardsLink = new BookmarkablePageLink<AddressImportPage>(ContentMenuEntryPanel.LINK_ID,
-          AddressImportPage.class);
+      final BookmarkablePageLink<AddressImportPage> importVCardsLink = new BookmarkablePageLink<AddressImportPage>(
+          ContentMenuEntryPanel.LINK_ID, AddressImportPage.class);
 
       // TODO i18n
       final ContentMenuEntryPanel importVCardsButton = new ContentMenuEntryPanel(getNewContentMenuChildId(), importVCardsLink,
