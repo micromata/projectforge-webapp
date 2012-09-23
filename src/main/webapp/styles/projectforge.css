@@ -463,5 +463,10 @@ td.fc-sun,td.fc-sat,td.fc-holiday {
 }
 
 .dialog_content .section {
-  min-height: 75px;
-} 
+	min-height: 75px;
+}
+
+h2.box_head .subtitle {
+	font-weight: normal;
+	font-size: .9em;
+}

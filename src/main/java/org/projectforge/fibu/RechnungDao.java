@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.hibernate.FetchMode;
 import org.hibernate.criterion.Order;
@@ -52,9 +53,10 @@ import org.projectforge.core.UserException;
 import org.projectforge.database.SQLHelper;
 import org.projectforge.fibu.kost.KostZuweisungDO;
 import org.projectforge.user.UserRightId;
+import org.projectforge.xml.stream.XmlObjectReader;
+import org.projectforge.xml.stream.XmlObjectWriter;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 
 @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
 public class RechnungDao extends BaseDao<RechnungDO>
@@ -79,14 +81,35 @@ public class RechnungDao extends BaseDao<RechnungDO>
 
   private RechnungCache rechnungCache;
 
-  public static BigDecimal getNettoSumme(final Collection<RechnungsPositionVO> col) {
+  public static BigDecimal getNettoSumme(final Collection<RechnungsPositionVO> col)
+  {
     BigDecimal nettoSumme = BigDecimal.ZERO;
     if (col != null && col.size() > 0) {
-      for (final RechnungsPositionVO pos: col) {
+      for (final RechnungsPositionVO pos : col) {
         nettoSumme = nettoSumme.add(pos.getNettoSumme());
       }
     }
     return nettoSumme;
+  }
+
+  static void readUiStatusFromXml(final AbstractRechnungDO< ? > rechnung)
+  {
+    final XmlObjectReader reader = new XmlObjectReader();
+    reader.initialize(RechnungUIStatus.class);
+    final String styleAsXml = rechnung.getUiStatusAsXml();
+    final RechnungUIStatus status;
+    if (StringUtils.isEmpty(styleAsXml) == true) {
+      status = new RechnungUIStatus();
+    } else {
+      status = (RechnungUIStatus) reader.read(styleAsXml);
+    }
+    rechnung.setUiStatus(status);
+  }
+
+  static void writeUiStatusToXml(final AbstractRechnungDO< ? > rechnung)
+  {
+    final String uiStatusAsXml = XmlObjectWriter.writeAsXml(rechnung.getUiStatus());
+    rechnung.setUiStatusAsXml(uiStatusAsXml);
   }
 
   public void setKundeDao(final KundeDao kundeDao)
@@ -220,6 +243,13 @@ public class RechnungDao extends BaseDao<RechnungDO>
         break;
       }
     }
+    writeUiStatusToXml(obj);
+  }
+
+  @Override
+  protected void afterLoad(final RechnungDO obj)
+  {
+    readUiStatusFromXml(obj);
   }
 
   @Override
@@ -249,7 +279,8 @@ public class RechnungDao extends BaseDao<RechnungDO>
    */
   @Transactional(readOnly = true, propagation = Propagation.REQUIRES_NEW)
   @Override
-  public RechnungDO getById(final Serializable id) throws AccessException {
+  public RechnungDO getById(final Serializable id) throws AccessException
+  {
     final RechnungDO rechnung = super.getById(id);
     for (final RechnungsPositionDO pos : rechnung.getPositionen()) {
       final List<KostZuweisungDO> list = pos.getKostZuweisungen();

@@ -30,9 +30,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.Component;
+import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
@@ -43,6 +45,7 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.common.StringHelper;
 import org.projectforge.core.CurrencyFormatter;
 import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.AuftragsPositionDO;
@@ -234,19 +237,21 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
           DatePanelSettings.get().withTargetType(java.sql.Date.class));
       fs.add(beauftragungsDatumPanel);
     }
-    positionsRepeater = new RepeatingView(flowform.newChildId());
-    flowform.add(positionsRepeater);
-    gridBuilder.newGrid16();
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
     {
       // comment
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "bemerkung"))).setAutogrow();
     }
+    gridBuilder.newColumnPanel(DivType.COL_50);
     {
       // status comment
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("fibu.auftrag.statusBeschreibung"));
       fs.add(new MaxLengthTextArea(TextAreaPanel.WICKET_ID, new PropertyModel<String>(data, "statusBeschreibung"))).setAutogrow();
     }
+    positionsRepeater = new RepeatingView(flowform.newChildId());
+    flowform.add(positionsRepeater);
+    gridBuilder.newGrid16();
     {
       // email
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("email"), true);
@@ -274,12 +279,48 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
     for (final AuftragsPositionDO position : data.getPositionen()) {
       final boolean abgeschlossenUndNichtFakturiert = position.isAbgeschlossenUndNichtVollstaendigFakturiert();
       final ToggleContainerPanel positionsPanel = new ToggleContainerPanel(positionsRepeater.newChildId(), DivType.GRID16,
-          DivType.ROUND_ALL);
+          DivType.ROUND_ALL) {
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#wantsOnStatusChangedNotification()
+         */
+        @Override
+        protected boolean wantsOnStatusChangedNotification()
+        {
+          return true;
+        }
+
+        /**
+         * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#onToggleStatusChanged(org.apache.wicket.ajax.AjaxRequestTarget,
+         *      boolean)
+         */
+        @Override
+        protected void onToggleStatusChanged(final AjaxRequestTarget target, final boolean toggleClosed)
+        {
+          if (toggleClosed == true) {
+            data.getUiStatus().closePosition(position.getNumber());
+          } else {
+            data.getUiStatus().openPosition(position.getNumber());
+          }
+        }
+      };
       positionsPanel.getContainer().setOutputMarkupId(true);
       positionsRepeater.add(positionsPanel);
       final StringBuffer heading = new StringBuffer();
       heading.append(escapeHtml(getString("fibu.auftrag.position.short"))).append(" #").append(position.getNumber());
+      if (NumberHelper.isNotZero(position.getNettoSumme()) == true || StringHelper.isNotBlank(position.getTitel()) == true) {
+        heading.append(": ").append("<span class=\"subtitle\">");
+        if (NumberHelper.isNotZero(position.getNettoSumme()) == true) {
+          heading.append(CurrencyFormatter.format(position.getNettoSumme()));
+        }
+        if (StringHelper.isNotBlank(position.getTitel()) == true) {
+          heading.append(" ").append(StringUtils.abbreviate(position.getTitel(), 80));
+        }
+        heading.append("<span>");
+      }
       positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_ID, heading.toString()));
+      if (data.getUiStatus().isClosed(position.getNumber()) == true) {
+        positionsPanel.setClosed();
+      }
       content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
       positionsPanel.add(content);
       content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));

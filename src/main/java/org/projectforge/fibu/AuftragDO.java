@@ -73,7 +73,7 @@ public class AuftragDO extends DefaultBaseDO
 
   /** Dies sind die alten Auftragsnummern oder Kundenreferenzen. */
   @Fields( { @Field(index = Index.TOKENIZED, name = "referenz_tokenized", store = Store.NO),
-      @Field(index = Index.UN_TOKENIZED, store = Store.NO)})
+    @Field(index = Index.UN_TOKENIZED, store = Store.NO)})
   private String referenz;
 
   @PFPersistancyBehavior(autoUpdateCollectionEntries = true)
@@ -117,6 +117,10 @@ public class AuftragDO extends DefaultBaseDO
   private Date beauftragungsDatum;
 
   private BigDecimal fakturiertSum = null;
+
+  protected String uiStatusAsXml;
+
+  protected AuftragUIStatus uiStatus;
 
   /**
    * Datum der Angebotslegung.
@@ -535,6 +539,49 @@ public class AuftragDO extends DefaultBaseDO
   public AuftragDO setFakturiertSum(final BigDecimal fakturiertSum)
   {
     this.fakturiertSum = fakturiertSum;
+    return this;
+  }
+
+  /**
+   * The user interface status of an order. The {@link AuftragUIStatus} is stored as XML.
+   * @return the XML representation of the uiStatus.
+   * @see AuftragUIStatus
+   */
+  @Column(name = "ui_status_as_xml", length = 10000)
+  public String getUiStatusAsXml()
+  {
+    return uiStatusAsXml;
+  }
+
+  /**
+   * @param uiStatus the uiStatus to set
+   * @return this for chaining.
+   */
+  public AuftragDO setUiStatusAsXml(final String uiStatus)
+  {
+    this.uiStatusAsXml = uiStatus;
+    return this;
+  }
+
+  /**
+   * @return the rechungUiStatus
+   */
+  @Transient
+  public AuftragUIStatus getUiStatus()
+  {
+    if (uiStatus == null) {
+      uiStatus = new AuftragUIStatus();
+    }
+    return uiStatus;
+  }
+
+  /**
+   * @param rechungUiStatus the rechungUiStatus to set
+   * @return this for chaining.
+   */
+  public AuftragDO setUiStatus(final AuftragUIStatus uiStatus)
+  {
+    this.uiStatus = uiStatus;
     return this;
   }
 }

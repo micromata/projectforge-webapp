@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
@@ -50,6 +51,7 @@ import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.util.convert.IConverter;
 import org.projectforge.calendar.DayHolder;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.common.StringHelper;
 import org.projectforge.core.Configuration;
 import org.projectforge.core.ConfigurationParam;
 import org.projectforge.core.CurrencyFormatter;
@@ -384,17 +386,18 @@ extends AbstractEditForm<O, P>
         {
           return true;
         }
+
         /**
-         * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#onToggleStatusChanged(org.apache.wicket.ajax.AjaxRequestTarget, boolean)
+         * @see org.projectforge.web.wicket.flowlayout.ToggleContainerPanel#onToggleStatusChanged(org.apache.wicket.ajax.AjaxRequestTarget,
+         *      boolean)
          */
         @Override
         protected void onToggleStatusChanged(final AjaxRequestTarget target, final boolean toggleClosed)
         {
-          // TODO Kai from Johannes: handle persistence of open/closed events
-          if(toggleClosed) {
-            //System.out.println("i am now closed");
+          if (toggleClosed == true) {
+            data.getUiStatus().closePosition(position.getNumber());
           } else {
-            //System.out.println("i am now open");
+            data.getUiStatus().openPosition(position.getNumber());
           }
         }
       };
@@ -402,7 +405,20 @@ extends AbstractEditForm<O, P>
       positionsRepeater.add(positionsPanel);
       final StringBuffer heading = new StringBuffer();
       heading.append(escapeHtml(getString("fibu.auftrag.position.short"))).append(" #").append(position.getNumber());
+      if (NumberHelper.isNotZero(position.getNetSum()) == true || StringHelper.isNotBlank(position.getText()) == true) {
+        heading.append(": ").append("<span class=\"subtitle\">");
+        if (NumberHelper.isNotZero(position.getNetSum()) == true) {
+          heading.append(CurrencyFormatter.format(position.getNetSum()));
+        }
+        if (StringHelper.isNotBlank(position.getText()) == true) {
+          heading.append(" ").append(StringUtils.abbreviate(position.getText(), 80));
+        }
+        heading.append("<span>");
+      }
       positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_ID, heading.toString()));
+      if (data.getUiStatus().isClosed(position.getNumber()) == true) {
+        positionsPanel.setClosed();
+      }
       content = new DivPanel(ToggleContainerPanel.CONTENT_ID);
       positionsPanel.add(content);
       content.add(columns = new DivPanel(content.newChildId(), DivType.BLOCK));

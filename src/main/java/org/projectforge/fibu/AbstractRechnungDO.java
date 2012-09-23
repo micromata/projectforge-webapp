@@ -81,6 +81,10 @@ public abstract class AbstractRechnungDO<T extends AbstractRechnungsPositionDO> 
   @IndexedEmbedded(depth = 2)
   protected List<T> positionen = null;
 
+  protected String uiStatusAsXml;
+
+  protected RechnungUIStatus uiStatus;
+
   @Override
   public void recalculate()
   {
@@ -334,5 +338,48 @@ public abstract class AbstractRechnungDO<T extends AbstractRechnungsPositionDO> 
       }
     }
     return false;
+  }
+
+  /**
+   * The user interface status of an invoice. The {@link RechnungUIStatus} is stored as XML.
+   * @return the XML representation of the uiStatus.
+   * @see RechnungUIStatus
+   */
+  @Column(name = "ui_status_as_xml", length = 10000)
+  public String getUiStatusAsXml()
+  {
+    return uiStatusAsXml;
+  }
+
+  /**
+   * @param uiStatus the uiStatus to set
+   * @return this for chaining.
+   */
+  public AbstractRechnungDO<T> setUiStatusAsXml(final String uiStatus)
+  {
+    this.uiStatusAsXml = uiStatus;
+    return this;
+  }
+
+  /**
+   * @return the rechungUiStatus
+   */
+  @Transient
+  public RechnungUIStatus getUiStatus()
+  {
+    if (uiStatus == null) {
+      uiStatus = new RechnungUIStatus();
+    }
+    return uiStatus;
+  }
+
+  /**
+   * @param rechungUiStatus the rechungUiStatus to set
+   * @return this for chaining.
+   */
+  public AbstractRechnungDO<T> setUiStatus(final RechnungUIStatus uiStatus)
+  {
+    this.uiStatus = uiStatus;
+    return this;
   }
 }

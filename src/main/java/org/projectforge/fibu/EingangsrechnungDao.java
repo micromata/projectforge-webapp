@@ -122,6 +122,13 @@ public class EingangsrechnungDao extends BaseDao<EingangsrechnungDO>
         break;
       }
     }
+    RechnungDao.writeUiStatusToXml(obj);
+  }
+
+  @Override
+  protected void afterLoad(final EingangsrechnungDO obj)
+  {
+    RechnungDao.readUiStatusFromXml(obj);
   }
 
   @Override

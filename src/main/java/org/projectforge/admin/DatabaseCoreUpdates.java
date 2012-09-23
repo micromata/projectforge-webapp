@@ -33,9 +33,11 @@ import org.projectforge.database.DatabaseUpdateDO;
 import org.projectforge.database.DatabaseUpdateDao;
 import org.projectforge.database.Table;
 import org.projectforge.database.TableAttribute;
+import org.projectforge.fibu.AuftragDO;
 import org.projectforge.fibu.EingangsrechnungDO;
 import org.projectforge.fibu.KontoDO;
 import org.projectforge.fibu.KundeDO;
+import org.projectforge.fibu.RechnungDO;
 import org.projectforge.registry.Registry;
 import org.projectforge.scripting.ScriptDO;
 import org.projectforge.task.TaskDO;
@@ -55,18 +57,31 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 4.2
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.2", "2012-08-09", "Adds t_pf_user.authenticationToken|local_user|restricted_user|deactivated, t_group.local_group.") {
+    list.add(new UpdateEntryImpl(
+        CORE_REGION_ID,
+        "4.2",
+        "2012-08-09",
+        "Adds t_pf_user.authenticationToken|local_user|restricted_user|deactivated, t_group.local_group, t_fibu_rechnung|eingangsrechnung|auftrag(=incoming and outgoing invoice|order).ui_status_as_xml") {
       final Table userTable = new Table(PFUserDO.class);
+
       final Table groupTable = new Table(GroupDO.class);
+
+      final Table outgoingInvoiceTable = new Table(RechnungDO.class);
+
+      final Table incomingInvoiceTable = new Table(EingangsrechnungDO.class);
+
+      final Table orderTable = new Table(AuftragDO.class);
 
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         return dao.doesTableAttributesExist(userTable, "authenticationToken", "localUser", "restrictedUser", "deactivated") == true //
-            && dao.doesTableAttributesExist(groupTable, "localGroup", "nestedGroupsAllowed", "nestedGroupIds") == true
-            ? UpdatePreCheckStatus.ALREADY_UPDATED
-                : UpdatePreCheckStatus.OK;
+            && dao.doesTableAttributesExist(groupTable, "localGroup", "nestedGroupsAllowed", "nestedGroupIds") == true //
+            && dao.doesTableAttributesExist(outgoingInvoiceTable, "uiStatusAsXml") == true //
+            && dao.doesTableAttributesExist(incomingInvoiceTable, "uiStatusAsXml") == true //
+            && dao.doesTableAttributesExist(orderTable, "uiStatusAsXml") == true //
+            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
       }
 
       @Override
@@ -94,6 +109,15 @@ public class DatabaseCoreUpdates
         if (dao.doesTableAttributesExist(groupTable, "nestedGroupIds") == false) {
           dao.addTableAttributes(groupTable, new TableAttribute(GroupDO.class, "nestedGroupIds"));
         }
+        if (dao.doesTableAttributesExist(outgoingInvoiceTable, "uiStatusAsXml") == false) {
+          dao.addTableAttributes(outgoingInvoiceTable, new TableAttribute(RechnungDO.class, "uiStatusAsXml"));
+        }
+        if (dao.doesTableAttributesExist(incomingInvoiceTable, "uiStatusAsXml") == false) {
+          dao.addTableAttributes(incomingInvoiceTable, new TableAttribute(EingangsrechnungDO.class, "uiStatusAsXml"));
+        }
+        if (dao.doesTableAttributesExist(orderTable, "uiStatusAsXml") == false) {
+          dao.addTableAttributes(orderTable, new TableAttribute(AuftragDO.class, "uiStatusAsXml"));
+        }
         return UpdateRunningStatus.DONE;
       }
     });
@@ -103,12 +127,14 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.1", "2012-04-21", "Adds t_pf_user.first_day_of_week and t_pf_user.hr_planning.") {
       final Table userTable = new Table(PFUserDO.class);
+
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         return dao.doesTableAttributesExist(userTable, "firstDayOfWeek", "hrPlanning") == true //
-            ? UpdatePreCheckStatus.ALREADY_UPDATED : UpdatePreCheckStatus.OK;
+            ? UpdatePreCheckStatus.ALREADY_UPDATED
+                : UpdatePreCheckStatus.OK;
       }
 
       @Override
@@ -128,9 +154,12 @@ public class DatabaseCoreUpdates
     // /////////////////////////////////////////////////////////////////
     // 4.0
     // /////////////////////////////////////////////////////////////////
-    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.0", "2012-04-18", "Adds 6th parameter to t_script and payment_type to t_fibu_eingangsrechnung.") {
+    list.add(new UpdateEntryImpl(CORE_REGION_ID, "4.0", "2012-04-18",
+        "Adds 6th parameter to t_script and payment_type to t_fibu_eingangsrechnung.") {
       final Table scriptTable = new Table(ScriptDO.class);
+
       final Table eingangsrechnungTable = new Table(EingangsrechnungDO.class);
+
       @Override
       public UpdatePreCheckStatus runPreCheck()
       {
