@@ -73,8 +73,8 @@ public class XmlHelper
     try {
       final Document document = DocumentHelper.parseText(str);
       return document.getRootElement();
-    } catch (DocumentException ex) {
-      log.error("Exception encountered " + ex, ex);
+    } catch (final DocumentException ex) {
+      log.error("Exception encountered " + ex.getMessage());
     }
     return null;
   }
@@ -101,7 +101,7 @@ public class XmlHelper
       writer.write(el);
       result = out.toString();
       writer.close();
-    } catch (IOException ex) {
+    } catch (final IOException ex) {
       log.error(ex.getMessage(), ex);
     }
     return result;
@@ -113,7 +113,7 @@ public class XmlHelper
     final Transformer transformer;
     try {
       transformer = tranFactory.newTransformer();
-    } catch (TransformerConfigurationException ex) {
+    } catch (final TransformerConfigurationException ex) {
       log.error("Exception encountered while transcoding org.w3c.dom.Document to a string: " + ex.getMessage(), ex);
       throw new InternalErrorException("Exception encountered while transcoding org.w3c.dom.Document to a string: " + ex.getMessage());
     }
@@ -126,14 +126,14 @@ public class XmlHelper
     final Result dest = new StreamResult(bout);
     try {
       transformer.transform(src, dest);
-    } catch (TransformerException ex) {
+    } catch (final TransformerException ex) {
       log.error("Exception encountered while transcoding org.w3c.dom.Document to a string: " + ex.getMessage(), ex);
       throw new InternalErrorException("Exception encountered while transcoding org.w3c.dom.Document to a string: " + ex.getMessage());
     }
     final String result;
     try {
       result = new String(bout.toByteArray(), "UTF-8");
-    } catch (UnsupportedEncodingException ex) {
+    } catch (final UnsupportedEncodingException ex) {
       log.error("Exception encountered while transcoding org.w3c.dom.Document to a string: " + ex.getMessage(), ex);
       throw new InternalErrorException("Exception encountered while transcoding org.w3c.dom.Document to a string: " + ex.getMessage());
     }

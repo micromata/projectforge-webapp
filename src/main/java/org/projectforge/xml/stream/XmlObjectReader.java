@@ -259,7 +259,7 @@ public class XmlObjectReader
           clazz = mappingClass;
         }
       } catch (final ClassNotFoundException ex) {
-        log.error("Class '" + elelementName + "' not found: " + ex.getMessage(), ex);
+        log.error("Class '" + elelementName + "' not found: " + ex.getMessage());
       }
     }
     return clazz;
