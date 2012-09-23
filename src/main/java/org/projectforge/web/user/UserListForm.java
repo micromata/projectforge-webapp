@@ -57,7 +57,7 @@ public class UserListForm extends AbstractListForm<PFUserFilter, UserListPage>
         final DropDownChoice<Boolean> deactivatedChoice = new DropDownChoice<Boolean>(fs.getDropDownChoiceId(), new PropertyModel<Boolean>(
             getSearchFilter(), "deactivatedUser"), deactivatedRenderer.getValues(), deactivatedRenderer);
         deactivatedChoice.setNullValid(true);
-        fs.add(deactivatedChoice, true);
+        fs.add(deactivatedChoice, true).setTooltip(getString("user.deactivated"));
       }
       if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
         {
@@ -68,7 +68,7 @@ public class UserListForm extends AbstractListForm<PFUserFilter, UserListPage>
           final DropDownChoice<Boolean> restrictedChoice = new DropDownChoice<Boolean>(fs.getDropDownChoiceId(),
               new PropertyModel<Boolean>(getSearchFilter(), "restrictedUser"), restrictedRenderer.getValues(), restrictedRenderer);
           restrictedChoice.setNullValid(true);
-          fs.add(restrictedChoice, true);
+          fs.add(restrictedChoice, true).setTooltip(getString("user.restrictedUser"));
         }
         {
           // DropDownChoice localUser
@@ -78,7 +78,7 @@ public class UserListForm extends AbstractListForm<PFUserFilter, UserListPage>
           final DropDownChoice<Boolean> localUserChoice = new DropDownChoice<Boolean>(fs.getDropDownChoiceId(),
               new PropertyModel<Boolean>(getSearchFilter(), "localUser"), localUserRenderer.getValues(), localUserRenderer);
           localUserChoice.setNullValid(true);
-          fs.add(localUserChoice, true);
+          fs.add(localUserChoice, true).setTooltip(getString("user.localUser"));
         }
       }
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();

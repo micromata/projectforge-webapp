@@ -57,7 +57,7 @@ public class GroupListForm extends AbstractListForm<GroupFilter, GroupListPage>
           final DropDownChoice<Boolean> localGroupChoice = new DropDownChoice<Boolean>(fs.getDropDownChoiceId(),
               new PropertyModel<Boolean>(getSearchFilter(), "localGroup"), localGroupRenderer.getValues(), localGroupRenderer);
           localGroupChoice.setNullValid(true);
-          fs.add(localGroupChoice, true);
+          fs.add(localGroupChoice, true).setTooltip(getString("group.localGroup"));
         }
       }
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
