@@ -87,7 +87,26 @@ public class UserDao extends BaseDao<PFUserDO>
   @Override
   public List<PFUserDO> getList(final BaseSearchFilter filter)
   {
-    final QueryFilter queryFilter = new QueryFilter(filter);
+    final PFUserFilter myFilter;
+    if (filter instanceof PFUserFilter) {
+      myFilter = (PFUserFilter) filter;
+    } else {
+      myFilter = new PFUserFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
+    if (myFilter.getDeactivatedUser() != null) {
+      queryFilter.add(Restrictions.eq("deactivated", myFilter.getDeactivatedUser()));
+    }
+    if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
+      // Check hasExternalUsermngmntSystem because otherwise the filter is may-be preset for an user and the user can't change the filter
+      // (because the fields aren't visible).
+      if (myFilter.getRestrictedUser() != null) {
+        queryFilter.add(Restrictions.eq("restrictedUser", myFilter.getRestrictedUser()));
+      }
+      if (myFilter.getLocalUser() != null) {
+        queryFilter.add(Restrictions.eq("localUser", myFilter.getLocalUser()));
+      }
+    }
     queryFilter.addOrder(Order.asc("username"));
     return getList(queryFilter);
   }
@@ -183,8 +202,8 @@ public class UserDao extends BaseDao<PFUserDO>
   }
 
   /**
-   * @return false, if no admin user and the context user is not at minimum in one groups assigned to the given user or false. Also deleted and deactivated
-   *         users are only visible for admin users.
+   * @return false, if no admin user and the context user is not at minimum in one groups assigned to the given user or false. Also deleted
+   *         and deactivated users are only visible for admin users.
    * @see org.projectforge.core.BaseDao#hasSelectAccess(org.projectforge.core.BaseDO, boolean)
    * @see AccessChecker#areUsersInSameGroup(PFUserDO, PFUserDO)
    */

@@ -24,14 +24,17 @@
 package org.projectforge.web.user;
 
 import org.apache.log4j.Logger;
-import org.projectforge.core.BaseSearchFilter;
+import org.apache.wicket.markup.html.form.DropDownChoice;
+import org.apache.wicket.model.PropertyModel;
+import org.projectforge.user.Login;
+import org.projectforge.user.PFUserFilter;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
-
-public class UserListForm extends AbstractListForm<BaseSearchFilter, UserListPage>
+public class UserListForm extends AbstractListForm<PFUserFilter, UserListPage>
 {
   private static final long serialVersionUID = 7625173316784007696L;
 
@@ -44,7 +47,40 @@ public class UserListForm extends AbstractListForm<BaseSearchFilter, UserListPag
     gridBuilder.newColumnsPanel();
     {
       gridBuilder.newColumnPanel(DivType.COL_60);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
+
+      {
+        // DropDownChoice deactivated
+        final LabelValueChoiceRenderer<Boolean> deactivatedRenderer = new LabelValueChoiceRenderer<Boolean>();
+        deactivatedRenderer.addValue(false, getString("user.activated"));
+        deactivatedRenderer.addValue(true, getString("user.deactivated"));
+        final DropDownChoice<Boolean> deactivatedChoice = new DropDownChoice<Boolean>(fs.getDropDownChoiceId(), new PropertyModel<Boolean>(
+            getSearchFilter(), "deactivatedUser"), deactivatedRenderer.getValues(), deactivatedRenderer);
+        deactivatedChoice.setNullValid(true);
+        fs.add(deactivatedChoice, true);
+      }
+      if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
+        {
+          // DropDownChoice restricted
+          final LabelValueChoiceRenderer<Boolean> restrictedRenderer = new LabelValueChoiceRenderer<Boolean>();
+          restrictedRenderer.addValue(false, getString("user.restricted.not"));
+          restrictedRenderer.addValue(true, getString("user.restricted"));
+          final DropDownChoice<Boolean> restrictedChoice = new DropDownChoice<Boolean>(fs.getDropDownChoiceId(),
+              new PropertyModel<Boolean>(getSearchFilter(), "restrictedUser"), restrictedRenderer.getValues(), restrictedRenderer);
+          restrictedChoice.setNullValid(true);
+          fs.add(restrictedChoice, true);
+        }
+        {
+          // DropDownChoice localUser
+          final LabelValueChoiceRenderer<Boolean> localUserRenderer = new LabelValueChoiceRenderer<Boolean>();
+          localUserRenderer.addValue(false, getString("user.localUser.not"));
+          localUserRenderer.addValue(true, getString("user.localUser"));
+          final DropDownChoice<Boolean> localUserChoice = new DropDownChoice<Boolean>(fs.getDropDownChoiceId(),
+              new PropertyModel<Boolean>(getSearchFilter(), "localUser"), localUserRenderer.getValues(), localUserRenderer);
+          localUserChoice.setNullValid(true);
+          fs.add(localUserChoice, true);
+        }
+      }
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
     }
@@ -61,9 +97,9 @@ public class UserListForm extends AbstractListForm<BaseSearchFilter, UserListPag
   }
 
   @Override
-  protected BaseSearchFilter newSearchFilterInstance()
+  protected PFUserFilter newSearchFilterInstance()
   {
-    return new BaseSearchFilter();
+    return new PFUserFilter();
   }
 
   @Override

@@ -35,6 +35,7 @@ import org.apache.commons.lang.Validate;
 import org.hibernate.FetchMode;
 import org.hibernate.LockMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.projectforge.access.AccessException;
 import org.projectforge.access.AccessType;
 import org.projectforge.access.OperationType;
@@ -79,7 +80,20 @@ public class GroupDao extends BaseDao<GroupDO>
   @Override
   public List<GroupDO> getList(final BaseSearchFilter filter)
   {
-    final QueryFilter queryFilter = new QueryFilter(filter);
+    final GroupFilter myFilter;
+    if (filter instanceof GroupFilter) {
+      myFilter = (GroupFilter) filter;
+    } else {
+      myFilter = new GroupFilter(filter);
+    }
+    final QueryFilter queryFilter = new QueryFilter(myFilter);
+    if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
+      // Check hasExternalUsermngmntSystem because otherwise the filter is may-be preset for an user and the user can't change the filter
+      // (because the fields aren't visible).
+      if (myFilter.getLocalGroup() != null) {
+        queryFilter.add(Restrictions.eq("localGroup", myFilter.getLocalGroup()));
+      }
+    }
     queryFilter.addOrder(Order.asc("name"));
     queryFilter.setFetchMode("assignedUsers", FetchMode.JOIN);
     return getList(queryFilter);
@@ -198,8 +212,9 @@ public class GroupDao extends BaseDao<GroupDO>
    * @throws AccessException
    */
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
-  public void assignGroups(final PFUserDO user, final Set<Integer> groupIdsToAssign, final Set<Integer> groupIdsToUnassign) throws AccessException
-  {
+  public void assignGroups(final PFUserDO user, final Set<Integer> groupIdsToAssign, final Set<Integer> groupIdsToUnassign)
+      throws AccessException
+      {
     getHibernateTemplate().refresh(user, LockMode.READ);
     final List<GroupDO> assignedGroups = new ArrayList<GroupDO>();
     if (groupIdsToAssign != null) {
@@ -238,7 +253,7 @@ public class GroupDao extends BaseDao<GroupDO>
     getSession().flush();
     createHistoryEntry(user, unassignedGroups, assignedGroups);
     userGroupCache.setExpired();
-  }
+      }
 
   private void createHistoryEntry(final PFUserDO user, Collection<GroupDO> unassignedList, Collection<GroupDO> assignedList)
   {

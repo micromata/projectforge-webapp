@@ -24,15 +24,17 @@
 package org.projectforge.web.user;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.PropertyModel;
-import org.projectforge.core.BaseSearchFilter;
+import org.projectforge.user.GroupFilter;
+import org.projectforge.user.Login;
 import org.projectforge.web.wicket.AbstractListForm;
+import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
-
-public class GroupListForm extends AbstractListForm<BaseSearchFilter, GroupListPage>
+public class GroupListForm extends AbstractListForm<GroupFilter, GroupListPage>
 {
   private static final long serialVersionUID = -1577132974803866434L;
 
@@ -45,10 +47,22 @@ public class GroupListForm extends AbstractListForm<BaseSearchFilter, GroupListP
     gridBuilder.newColumnsPanel();
     {
       gridBuilder.newColumnPanel(DivType.COL_60);
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options")).setNoLabelFor();
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
+      if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
+        {
+          // DropDownChoice localGroup
+          final LabelValueChoiceRenderer<Boolean> localGroupRenderer = new LabelValueChoiceRenderer<Boolean>();
+          localGroupRenderer.addValue(false, getString("group.localGroup.not"));
+          localGroupRenderer.addValue(true, getString("group.localGroup"));
+          final DropDownChoice<Boolean> localGroupChoice = new DropDownChoice<Boolean>(fs.getDropDownChoiceId(),
+              new PropertyModel<Boolean>(getSearchFilter(), "localGroup"), localGroupRenderer.getValues(), localGroupRenderer);
+          localGroupChoice.setNullValid(true);
+          fs.add(localGroupChoice, true);
+        }
+      }
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
-      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(getSearchFilter(), "deleted"),
-          getString("onlyDeleted")));
+      checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
+          new PropertyModel<Boolean>(getSearchFilter(), "deleted"), getString("onlyDeleted")));
     }
     {
       // DropDownChoice page size
@@ -63,9 +77,9 @@ public class GroupListForm extends AbstractListForm<BaseSearchFilter, GroupListP
   }
 
   @Override
-  protected BaseSearchFilter newSearchFilterInstance()
+  protected GroupFilter newSearchFilterInstance()
   {
-    return new BaseSearchFilter();
+    return new GroupFilter();
   }
 
   @Override
