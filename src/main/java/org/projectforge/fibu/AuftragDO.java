@@ -122,6 +122,10 @@ public class AuftragDO extends DefaultBaseDO
 
   protected AuftragUIStatus uiStatus;
 
+  static {
+    invalidHistorizableProperties.add("uiStatusAsXml");
+  }
+
   /**
    * Datum der Angebotslegung.
    * @return

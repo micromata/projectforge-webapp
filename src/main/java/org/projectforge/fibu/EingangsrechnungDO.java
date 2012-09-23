@@ -69,6 +69,10 @@ public class EingangsrechnungDO extends AbstractRechnungDO<EingangsrechnungsPosi
 
   private PaymentType paymentType;
 
+  static {
+    invalidHistorizableProperties.add("uiStatusAsXml");
+  }
+
   @Column(length = 255)
   public String getKreditor()
   {

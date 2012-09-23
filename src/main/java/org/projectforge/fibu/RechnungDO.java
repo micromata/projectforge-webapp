@@ -76,6 +76,10 @@ public class RechnungDO extends AbstractRechnungDO<RechnungsPositionDO> implemen
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private RechnungTyp typ;
 
+  static {
+    invalidHistorizableProperties.add("uiStatusAsXml");
+  }
+
   /**
    * Rechnungsempfänger. Dieser Kunde kann vom Kunden, der mit dem Projekt verbunden ist abweichen.
    */
@@ -212,7 +216,7 @@ public class RechnungDO extends AbstractRechnungDO<RechnungsPositionDO> implemen
     }
     return set;
   }
-  
+
   /**
    * @see KundeFormatter#formatKundeAsString(KundeDO, String)
    */
@@ -222,9 +226,9 @@ public class RechnungDO extends AbstractRechnungDO<RechnungsPositionDO> implemen
     return KundeFormatter.formatKundeAsString(this.kunde, this.kundeText);
   }
 
-  public int compareTo(RechnungDO o)
+  public int compareTo(final RechnungDO o)
   {
-    int r = this.datum.compareTo(o.datum);
+    final int r = this.datum.compareTo(o.datum);
     if (r != 0) {
       return -r;
     }
