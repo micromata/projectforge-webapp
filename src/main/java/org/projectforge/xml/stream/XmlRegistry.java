@@ -41,6 +41,7 @@ import org.projectforge.xml.stream.converter.IConverter;
 import org.projectforge.xml.stream.converter.IntConverter;
 import org.projectforge.xml.stream.converter.LocaleConverter;
 import org.projectforge.xml.stream.converter.LongConverter;
+import org.projectforge.xml.stream.converter.ShortConverter;
 import org.projectforge.xml.stream.converter.StringConverter;
 import org.projectforge.xml.stream.converter.TimeZoneConverter;
 import org.projectforge.xml.stream.converter.VersionConverter;
@@ -97,6 +98,8 @@ public class XmlRegistry
     internalRegisterTypeAsAttribute(int.class);
     internalRegisterTypeAsAttribute(Long.class);
     internalRegisterTypeAsAttribute(long.class);
+    internalRegisterTypeAsAttribute(Short.class);
+    internalRegisterTypeAsAttribute(short.class);
     internalRegisterTypeAsAttribute(TimeZone.class);
     internalRegisterTypeAsAttribute(Locale.class);
     internalRegisterTypeAsAttribute(Version.class);
@@ -110,6 +113,8 @@ public class XmlRegistry
     internalRegisterAlias(int.class, "int");
     internalRegisterAlias(Long.class, "long");
     internalRegisterAlias(long.class, "long");
+    internalRegisterAlias(Short.class, "short");
+    internalRegisterAlias(short.class, "short");
     internalRegisterAlias(TimeZone.class, "timeZone");
     internalRegisterAlias(Locale.class, "locale");
     internalRegisterAlias(Version.class, "version");
@@ -126,6 +131,9 @@ public class XmlRegistry
     conv = new LongConverter();
     internalRegisterConverter(Long.class, conv);
     internalRegisterConverter(long.class, conv);
+    conv = new ShortConverter();
+    internalRegisterConverter(Short.class, conv);
+    internalRegisterConverter(short.class, conv);
 
     internalRegisterConverter(BigDecimal.class, new BigDecimalConverter());
     internalRegisterConverter(Date.class, new DateConverter());
@@ -135,7 +143,7 @@ public class XmlRegistry
     internalRegisterConverter(Version.class, new VersionConverter());
   }
 
-  public IConverter< ? > getConverter(Class< ? > clazz)
+  public IConverter< ? > getConverter(final Class< ? > clazz)
   {
     if (converterRegistry != null) {
       final IConverter< ? > converter = converterRegistry.get(clazz);
