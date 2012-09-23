@@ -81,6 +81,16 @@ public class UserListForm extends AbstractListForm<PFUserFilter, UserListPage>
           fs.add(localUserChoice, true).setTooltip(getString("user.localUser"));
         }
       }
+      {
+        // DropDownChoice hrPlanning
+        final LabelValueChoiceRenderer<Boolean> hrPlanningRenderer = new LabelValueChoiceRenderer<Boolean>();
+        hrPlanningRenderer.addValue(false, getString("user.hrPlanningEnabled.not"));
+        hrPlanningRenderer.addValue(true, getString("user.hrPlanningEnabled"));
+        final DropDownChoice<Boolean> hrPlanningChoice = new DropDownChoice<Boolean>(fs.getDropDownChoiceId(), new PropertyModel<Boolean>(
+            getSearchFilter(), "hrPlanning"), hrPlanningRenderer.getValues(), hrPlanningRenderer);
+        hrPlanningChoice.setNullValid(true);
+        fs.add(hrPlanningChoice, true).setTooltip(getString("user.hrPlanningEnabled"));
+      }
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.add(createOnlyDeletedCheckBoxPanel(checkBoxPanel.newChildId()));
     }

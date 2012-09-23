@@ -107,6 +107,9 @@ public class UserDao extends BaseDao<PFUserDO>
         queryFilter.add(Restrictions.eq("localUser", myFilter.getLocalUser()));
       }
     }
+    if (myFilter.getHrPlanning() != null) {
+      queryFilter.add(Restrictions.eq("hrPlanning", myFilter.getHrPlanning()));
+    }
     queryFilter.addOrder(Order.asc("username"));
     return getList(queryFilter);
   }
