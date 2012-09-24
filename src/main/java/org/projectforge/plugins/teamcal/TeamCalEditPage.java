@@ -203,8 +203,6 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
           log.debug("View displayed. viewType: " + view.getType().name() + ", start: " + view.getStart() + ", end: " + view.getEnd());
         }
         response.refetchEvents();
-        //        setStartDate(view.getStart());
-        //        filter.setViewType(view.getType());
         // Need calling getEvents for getting correct duration label, it's not predictable what will be called first: onViewDisplayed or
         // getEvents.
         if (isNew() == false) {

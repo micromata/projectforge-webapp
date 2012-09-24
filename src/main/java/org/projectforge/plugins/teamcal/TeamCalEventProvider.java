@@ -45,18 +45,15 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
   private final TeamEventFilter eventFilter;
 
-  private final Integer teamCalId;
-
   /**
    * @param parent component for i18n
    */
   public TeamCalEventProvider(final Component parent, final TeamCalDao teamCalDao, final TeamEventDao teamEventDao, final Integer teamCalId)
   {
     super(parent);
-    //    this.teamCalDao = teamCalDao;
-    this.teamCalId = teamCalId;
     this.teamEventDao = teamEventDao;
     eventFilter = new TeamEventFilter();
+    eventFilter.setTeamCalId(teamCalId);
   }
 
   /**
@@ -65,9 +62,6 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
   @Override
   protected void buildEvents(final DateTime start, final DateTime end)
   {
-    eventFilter.setTeamCalId(teamCalId);
-    eventFilter.setStartDate(start.toDate());
-    eventFilter.setEndDate(end.toDate());
     final List<TeamEventDO> teamEvents = teamEventDao.getEventList(eventFilter);
     boolean longFormat = false;
     days = Days.daysBetween(start, end).getDays();
@@ -75,13 +69,13 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
       // Week or day view:
       longFormat = true;
       month = null;
-      //      firstDayOfMonth = null;
+      // firstDayOfMonth = null;
     } else {
       // Month view:
       final DateTime currentMonth = new DateTime(start.plusDays(10), PFUserContext.getDateTimeZone()); // Now we're definitely in the right
       // month.
       month = currentMonth.getMonthOfYear();
-      //      firstDayOfMonth = currentMonth.withDayOfMonth(1);
+      // firstDayOfMonth = currentMonth.withDayOfMonth(1);
     }
     if (CollectionUtils.isNotEmpty(teamEvents) == true) {
       for (final TeamEventDO teamEvent : teamEvents) {
@@ -94,16 +88,22 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         final long duration = teamEvent.getDuration();
         final Event event = new Event();
         event.setId("" + teamEvent.getId());
+
+        if (teamEvent.isAllDay()) {
+          event.setAllDay(true);
+        }
+
+        if (endDate.getMinuteOfDay() == 0)
+          endDate.plusMinutes(15);
+
         event.setStart(startDate);
         event.setEnd(endDate);
-        if (teamEvent.isAllDay())
-          event.setAllDay(true);
         final String title = teamEvent.getSubject();
         if (longFormat == true) {
           // Week or day view:
           final DateTime dt = new DateTime(duration);
-          String hour = dt.getHourOfDay()+"";
-          String minute = dt.getMinuteOfHour()+"";
+          String hour = dt.getHourOfDay() + "";
+          String minute = dt.getMinuteOfHour() + "";
           if (dt.getHourOfDay() < 10)
             hour = "0" + dt.getHourOfDay();
           if (dt.getMinuteOfHour() < 10)
@@ -115,13 +115,27 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           if (right.isOwner(user, teamEvent.getCalendar()) == true
               || right.hasAccessGroup(teamEvent.getCalendar().getFullAccessGroup(), userGroupCache, user) == true) {
             if (event.isAllDay() == false)
-              durationString = "\n"+ getString("plugins.teamevent.duration") + ": " + hour + ":" + minute;
-            event.setTitle(getString("plugins.teamevent.subject") + ": " + title + "\n"+ getString("plugins.teamevent.note") + ": " + teamEvent.getNote() + durationString);
+              durationString = "\n" + getString("plugins.teamevent.duration") + ": " + hour + ":" + minute;
+            event.setTitle(getString("plugins.teamevent.subject")
+                + ": "
+                + title
+                + "\n"
+                + getString("plugins.teamevent.note")
+                + ": "
+                + teamEvent.getNote()
+                + durationString);
           } else {
             if (right.hasAccessGroup(teamEvent.getCalendar().getReadOnlyAccessGroup(), userGroupCache, user) == true) {
               if (event.isAllDay() == false)
-                durationString = "\n"+ getString("plugins.teamevent.duration") + ": " + hour + ":" + minute;
-              event.setTitle(getString("plugins.teamevent.subject") + ": " + title + "\n"+ getString("plugins.teamevent.note") + ": " + teamEvent.getNote() + durationString);
+                durationString = "\n" + getString("plugins.teamevent.duration") + ": " + hour + ":" + minute;
+              event.setTitle(getString("plugins.teamevent.subject")
+                  + ": "
+                  + title
+                  + "\n"
+                  + getString("plugins.teamevent.note")
+                  + ": "
+                  + teamEvent.getNote()
+                  + durationString);
               event.setEditable(false);
             } else {
               // for minimal access
@@ -142,7 +156,8 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
     }
   }
 
-  public void setUserGroupCache(final UserGroupCache userGroupCache) {
+  public void setUserGroupCache(final UserGroupCache userGroupCache)
+  {
     this.userGroupCache = userGroupCache;
   }
 
