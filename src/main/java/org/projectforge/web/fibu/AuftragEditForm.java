@@ -307,16 +307,23 @@ public class AuftragEditForm extends AbstractEditForm<AuftragDO, AuftragEditPage
       positionsRepeater.add(positionsPanel);
       final StringBuffer heading = new StringBuffer();
       heading.append(escapeHtml(getString("fibu.auftrag.position.short"))).append(" #").append(position.getNumber());
-      if (NumberHelper.isNotZero(position.getNettoSumme()) == true || StringHelper.isNotBlank(position.getTitel()) == true) {
-        heading.append(": ").append("<span class=\"subtitle\">");
-        if (NumberHelper.isNotZero(position.getNettoSumme()) == true) {
-          heading.append(CurrencyFormatter.format(position.getNettoSumme()));
-        }
-        if (StringHelper.isNotBlank(position.getTitel()) == true) {
-          heading.append(" ").append(StringUtils.abbreviate(position.getTitel(), 80));
-        }
-        heading.append("<span>");
+      heading.append(": ").append("<span class=\"subtitle\"");
+      if (position.isAbgeschlossenUndNichtVollstaendigFakturiert()) {
+        // finished but not fully invoiced:
+        heading.append(" style=\"color: #FF0000\"");
       }
+      heading.append(">");
+      heading.append(CurrencyFormatter.format(position.getNettoSumme()));
+      if (position.getStatus() != null) {
+        heading.append(", ").append(getString(position.getStatus().getI18nKey()));
+      }
+      if (position.isVollstaendigFakturiert() == false) {
+        heading.append(" (").append(getString("fibu.fakturiert.not")).append(")");
+      }
+      if (StringHelper.isNotBlank(position.getTitel()) == true) {
+        heading.append(": ").append(StringUtils.abbreviate(position.getTitel(), 80));
+      }
+      heading.append("<span>");
       positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_ID, heading.toString()));
       if (data.getUiStatus().isClosed(position.getNumber()) == true) {
         positionsPanel.setClosed();

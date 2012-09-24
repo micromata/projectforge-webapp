@@ -405,16 +405,12 @@ extends AbstractEditForm<O, P>
       positionsRepeater.add(positionsPanel);
       final StringBuffer heading = new StringBuffer();
       heading.append(escapeHtml(getString("fibu.auftrag.position.short"))).append(" #").append(position.getNumber());
-      if (NumberHelper.isNotZero(position.getNetSum()) == true || StringHelper.isNotBlank(position.getText()) == true) {
-        heading.append(": ").append("<span class=\"subtitle\">");
-        if (NumberHelper.isNotZero(position.getNetSum()) == true) {
-          heading.append(CurrencyFormatter.format(position.getNetSum()));
-        }
-        if (StringHelper.isNotBlank(position.getText()) == true) {
-          heading.append(" ").append(StringUtils.abbreviate(position.getText(), 80));
-        }
-        heading.append("<span>");
+      heading.append(": ").append("<span class=\"subtitle\">");
+      heading.append(CurrencyFormatter.format(position.getNetSum()));
+      if (StringHelper.isNotBlank(position.getText()) == true) {
+        heading.append(" ").append(StringUtils.abbreviate(position.getText(), 80));
       }
+      heading.append("<span>");
       positionsPanel.setHeading(new HtmlCodePanel(ToggleContainerPanel.HEADING_ID, heading.toString()));
       if (data.getUiStatus().isClosed(position.getNumber()) == true) {
         positionsPanel.setClosed();
