@@ -109,11 +109,15 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   @Override
   protected void create()
   {
-    super.create();
-    final PageParameters params = new PageParameters();
-    params.add("id", getData().getCalendar().getId());
-    final TeamCalEditPage page = new TeamCalEditPage(params);
-    setResponsePage(page);
+    if (getData().getStartDate().after(getData().getEndDate())) {
+      error(getString("plugins.teamevent.duration.error"));
+    } else {
+      super.create();
+      final PageParameters params = new PageParameters();
+      params.add("id", getData().getCalendar().getId());
+      final TeamCalEditPage page = new TeamCalEditPage(params);
+      setResponsePage(page);
+    }
   }
 
   /**
