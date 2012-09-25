@@ -78,6 +78,8 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
       // firstDayOfMonth = currentMonth.withDayOfMonth(1);
     }
     if (CollectionUtils.isNotEmpty(teamEvents) == true) {
+      final TeamCalRight right = new TeamCalRight();
+      final PFUserDO user = PFUserContext.getUser();
       for (final TeamEventDO teamEvent : teamEvents) {
         final DateTime startDate = new DateTime(teamEvent.getStartDate(), PFUserContext.getDateTimeZone());
         final DateTime endDate = new DateTime(teamEvent.getEndDate(), PFUserContext.getDateTimeZone());
@@ -85,7 +87,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           // Event doesn't match time period start - end.
           continue;
         }
-        final long duration = teamEvent.getDuration();
+
         final Event event = new Event();
         event.setId("" + teamEvent.getId());
 
@@ -98,10 +100,11 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
         event.setStart(startDate);
         event.setEnd(endDate);
+
         final String title = teamEvent.getSubject();
         if (longFormat == true) {
           // Week or day view:
-          final DateTime dt = new DateTime(duration);
+          final DateTime dt = new DateTime(teamEvent.getDuration());
           String hour = dt.getHourOfDay() + "";
           String minute = dt.getMinuteOfHour() + "";
           if (dt.getHourOfDay() < 10)
@@ -109,8 +112,6 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           if (dt.getMinuteOfHour() < 10)
             minute = "0" + dt.getMinuteOfHour();
 
-          final TeamCalRight right = new TeamCalRight();
-          final PFUserDO user = PFUserContext.getUser();
           String durationString = "";
           if (right.isOwner(user, teamEvent.getCalendar()) == true
               || right.hasAccessGroup(teamEvent.getCalendar().getFullAccessGroup(), userGroupCache, user) == true) {
@@ -145,11 +146,17 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           }
         } else {
           // Month view:
-          event.setTitle(title);
+          if (right.isOwner(user, teamEvent.getCalendar()) == true
+              || right.hasAccessGroup(teamEvent.getCalendar().getFullAccessGroup(), userGroupCache, user) == true
+              || right.hasAccessGroup(teamEvent.getCalendar().getReadOnlyAccessGroup(), userGroupCache, user) == true){
+            event.setTitle(title);
+          } else {
+            event.setTitle("");
+          }
         }
         if (month != null && startDate.getMonthOfYear() != month && endDate.getMonthOfYear() != month) {
           // Display team events of other month as grey blue:
-          event.setTextColor("#222222").setBackgroundColor("#ACD9E8").setColor("#ACD9E8");
+          event.setTextColor("#222222").setBackgroundColor("#ffffff").setColor("#ACD9E8");
         }
         events.put(teamEvent.getId() + "", event);
       }

@@ -14,11 +14,11 @@ import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.joda.time.DateTime;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
@@ -33,7 +33,6 @@ import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.CheckBoxPanel;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
-import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
@@ -82,6 +81,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     super.init();
 
     gridBuilder.newGrid16();
+    gridBuilder.getPanel().setOutputMarkupId(true);
     parentPage.preInit();
 
     final TeamCalDO teamCal = data.getCalendar();
@@ -127,7 +127,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     }
 
     // add date panel
-    initDatePanel(gridBuilder.newFieldset(getString("plugins.teamevent.duration"), true));
+    initDatePanel();//gridBuilder.newFieldset(getString("plugins.teamevent.duration"), true));
 
     {
       final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamevent.location"));
@@ -148,15 +148,15 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     }
 
     {
-      final FieldsetPanel fieldSet = gridBuilder.newFieldset("", true);
-      final DivPanel checkBoxPanel = fieldSet.addNewCheckBoxDiv();
-      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(data, "allDay"), getString("plugins.teamevent.allDay")));
-      fieldSet.add(checkBoxPanel);
+      final FieldsetPanel fieldSet = gridBuilder.newFieldset(" ", true);
+      final DivPanel divPanel = fieldSet.addNewCheckBoxDiv();
+      final CheckBoxPanel checkBox = new CheckBoxPanel(divPanel.newChildId(), new PropertyModel<Boolean>(data, "allDay"), getString("plugins.teamevent.allDay"));
+      divPanel.add(checkBox);
+      fieldSet.add(divPanel);
 
       if (access == false)
         fieldSet.setEnabled(false);
     }
-
   }
 
   /**
@@ -167,29 +167,33 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   @SuppressWarnings("serial")
   private void initTeamCalPicker(final FieldsetPanel fieldSet)
   {
-    final List<TeamCalDO> list = teamCalDao.getTeamCalsByAccess(getUser(), TeamCalDao.FULL_ACCESS_GROUP);
-    final PropertyModel<TeamCalDO> selectModel = new PropertyModel<TeamCalDO>(data, "calendar");
-    final DropDownChoice<TeamCalDO> teamCalDrop = new DropDownChoice<TeamCalDO>(fieldSet.getDropDownChoiceId(),
-        selectModel, list, getLabeledList(list)){
-      /**
-       * @see org.apache.wicket.markup.html.form.AbstractSingleSelectChoice#isSelected(java.lang.Object, int, java.lang.String)
-       */
-      @Override
-      protected boolean isSelected(final TeamCalDO object, final int index, final String selected)
-      {
-        final boolean check = super.isSelected(object, index, selected);
-        final TeamCalDO team = data.getCalendar();
-        if (ObjectUtils.equals(object.getId(), team.getId()))
-          return true;
-        else
-          return check;
-      }
-    };
-    teamCalDrop.setNullValid(false);
-    teamCalDrop.setRequired(true);
-    fieldSet.add(teamCalDrop);
-    if (access == false)
-      fieldSet.setEnabled(false);
+
+    if (access == false) {
+      final Label teamCalTitle = new Label(fieldSet.newChildId(), new PropertyModel<String>(data, "calendar.getTitle()"));
+      fieldSet.add(teamCalTitle);
+    } else {
+      final List<TeamCalDO> list = teamCalDao.getTeamCalsByAccess(getUser(), TeamCalDao.FULL_ACCESS_GROUP);
+      final PropertyModel<TeamCalDO> selectModel = new PropertyModel<TeamCalDO>(data, "calendar");
+      final DropDownChoice<TeamCalDO> teamCalDrop = new DropDownChoice<TeamCalDO>(fieldSet.getDropDownChoiceId(),
+          selectModel, list, getLabeledList(list)){
+        /**
+         * @see org.apache.wicket.markup.html.form.AbstractSingleSelectChoice#isSelected(java.lang.Object, int, java.lang.String)
+         */
+        @Override
+        protected boolean isSelected(final TeamCalDO object, final int index, final String selected)
+        {
+          final boolean check = super.isSelected(object, index, selected);
+          final TeamCalDO team = data.getCalendar();
+          if (ObjectUtils.equals(object.getId(), team.getId()))
+            return true;
+          else
+            return check;
+        }
+      };
+      teamCalDrop.setNullValid(false);
+      teamCalDrop.setRequired(true);
+      fieldSet.add(teamCalDrop);
+    }
   }
 
   /**
@@ -197,30 +201,28 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
    * 
    * @param dateFieldSet
    */
-  private void initDatePanel(final FieldsetPanel dateFieldSet)
+  private void initDatePanel()
   {
-    startDateTimePanel = new DateTimePanel(dateFieldSet.newChildId(), new PropertyModel<Date>(data, "startDate"),
+    // start date
+    final FieldsetPanel startDateField = gridBuilder.newFieldset(getString("plugins.teamevent.beginDate"), true);
+    startDateTimePanel = new DateTimePanel(startDateField.newChildId(), new PropertyModel<Date>(data, "startDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
         .withRequired(true), DatePrecision.MINUTE_15);
-    dateFieldSet.add(startDateTimePanel);
+    startDateField.add(startDateTimePanel);
     dateFieldToolTip(startDateTimePanel);
-    dateFieldSet.add(new DivTextPanel(dateFieldSet.newChildId(), getString("until")));
 
-    // Stop time
-    endDateTimePanel = new DateTimePanel(dateFieldSet.newChildId(), new PropertyModel<Date>(data, "endDate"),
+    // stop date
+    final FieldsetPanel endDateField = gridBuilder.newFieldset(getString("plugins.teamevent.endDate"), true);
+    endDateTimePanel = new DateTimePanel(endDateField.newChildId(), new PropertyModel<Date>(data, "endDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
         .withRequired(true), DatePrecision.MINUTE_15);
-    dateFieldSet.add(endDateTimePanel);
+    endDateField.add(endDateTimePanel);
     dateFieldToolTip(endDateTimePanel);
 
-    final DateTime start = new DateTime(startDateTimePanel.getDate());
-    final DateTime end = new DateTime(endDateTimePanel.getDate());
-
-    if (start.getDayOfMonth() < end.getDayOfMonth())
-      data.setAllDay(true);
-
-    if (access == false)
-      dateFieldSet.setEnabled(false);
+    if (access == false) {
+      endDateField.setEnabled(false);
+      startDateField.setEnabled(false);
+    }
   }
 
   /**
