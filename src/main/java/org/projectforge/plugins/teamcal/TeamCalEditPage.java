@@ -273,9 +273,24 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
   @Override
   public void cancelSelection(final String property)
   {
-    // TODO Auto-generated method stub
   }
 
+  /**
+   * Modify options.<br />
+   * Handle edit events like:
+   * <ul>
+   * <li>COPY_EDIT</li>
+   * <li>COPY_SAVE</li>
+   * <li>MOVE_EDIT</li>
+   * <li>MOVE_SAVE</li>
+   * </ul>
+   * 
+   * @param event
+   * @param newStartDate
+   * @param newEndDate
+   * @param dropMode
+   * @param response
+   */
   private void modifyEvent(final Event event, final DateTime newStartDate, final DateTime newEndDate, final CalendarDropMode dropMode, final CalendarResponse response)
   {
     final Integer id = NumberHelper.parseInteger(event.getId());
@@ -293,7 +308,7 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
       return;
     }
 
-    // update start and end time
+    // update start and end date
     if(newStartDate != null) {
       dbTeamEvent.setStartDate(new Timestamp(newStartTimeMillis));
     }
@@ -315,13 +330,15 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
       // first: "normal edit mode"
       // TODO use modal dialogs
       final PageParameters parameters = new PageParameters();
-      // Add event Id
+      // add event Id
       parameters.add(AbstractEditPage.PARAMETER_KEY_ID, dbTeamEvent.getId());
-      // Add teamCal id
+      // add teamCal id
       parameters.add(TeamEventEditPage.PARAMETER_KEY_TEAMCALID, dbTeamEvent.getCalendar().getId());
+      // add start date
       if (newStartDate != null) {
         parameters.add(TeamEventEditPage.PARAMETER_KEY_START_DATE_IN_MILLIS, newStartTimeMillis);
       }
+      // add end date
       if (newEndDate != null) {
         parameters.add(TeamEventEditPage.PARAMETER_KEY_END_DATE_IN_MILLIS, newEndTimeMillis);
       }

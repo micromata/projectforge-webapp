@@ -19,6 +19,7 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.joda.time.DateTime;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DateHolder;
 import org.projectforge.common.DatePrecision;
@@ -36,6 +37,8 @@ import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
+ * form to edit team events.
+ * 
  * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
  *
  */
@@ -79,12 +82,13 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   protected void init()
   {
     super.init();
-
-    gridBuilder.newGrid16();
-    gridBuilder.getPanel().setOutputMarkupId(true);
     parentPage.preInit();
 
+    gridBuilder.newGrid16();
+
     final TeamCalDO teamCal = data.getCalendar();
+
+    // setting access view
     final TeamCalRight right = new TeamCalRight();
     if (isNew() == true || teamCal.getOwner() == null) {
       access = true;
@@ -110,6 +114,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     initTeamCalPicker(gridBuilder.newFieldset(getString("plugins.teamevent.teamCal"), true));
 
     {
+      // SUBJECT
       final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamevent.subject"));
       final MaxLengthTextField subjectField = new MaxLengthTextField(fieldSet.getTextFieldId(), new PropertyModel<String>(data, "subject"));
       subjectField.setRequired(true);
@@ -119,6 +124,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     }
 
     {
+      // NOTE
       final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamevent.note"));
       final MaxLengthTextArea noteField = new MaxLengthTextArea(fieldSet.getTextAreaId(), new PropertyModel<String>(data, "note"));
       fieldSet.add(noteField);
@@ -130,6 +136,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     initDatePanel();//gridBuilder.newFieldset(getString("plugins.teamevent.duration"), true));
 
     {
+      // LOCATION
       final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamevent.location"));
       @SuppressWarnings("serial")
       final PFAutoCompleteMaxLengthTextField locationTextField = new PFAutoCompleteMaxLengthTextField(fieldSet.getTextFieldId(),
@@ -148,19 +155,20 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     }
 
     {
-      final FieldsetPanel fieldSet = gridBuilder.newFieldset(" ", true);
+      // ALL DAY CHECKBOX
+      final FieldsetPanel fieldSet = gridBuilder.newFieldset("", true).setNoLabelFor();
       final DivPanel divPanel = fieldSet.addNewCheckBoxDiv();
       final CheckBoxPanel checkBox = new CheckBoxPanel(divPanel.newChildId(), new PropertyModel<Boolean>(data, "allDay"), getString("plugins.teamevent.allDay"));
       divPanel.add(checkBox);
       fieldSet.add(divPanel);
-
       if (access == false)
         fieldSet.setEnabled(false);
     }
   }
 
   /**
-   * dropdown with teamcals.
+   * if has access: create drop down with teamCals
+   * else create label
    * 
    * @param fieldSet
    */
@@ -222,6 +230,18 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     if (access == false) {
       endDateField.setEnabled(false);
       startDateField.setEnabled(false);
+    }
+    final DateTime endDate = new DateTime(endDateTimePanel.getDate());
+    final DateTime startDate = new DateTime(startDateTimePanel.getDate());
+    if (endDate.getDayOfYear() != startDate.getDayOfYear()) {
+      if (endDate.getMillisOfDay() == 0
+          && startDate.getMillisOfDay() == 0){
+        data.setAllDay(true);
+      }
+    } else {
+      if (endDate.getMillisOfDay() == startDate.getMillisOfDay()){
+        data.setAllDay(true);
+      }
     }
   }
 

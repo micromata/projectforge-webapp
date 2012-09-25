@@ -15,7 +15,6 @@ import net.ftlines.wicket.fullcalendar.Event;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.wicket.Component;
-import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.projectforge.user.PFUserContext;
@@ -25,6 +24,7 @@ import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
+ * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
  * 
  */
 public class TeamCalEventProvider extends MyFullCalendarEventsProvider
@@ -36,7 +36,6 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
   private UserGroupCache userGroupCache;
 
-  @SpringBean(name = "teamEventDao")
   private final TeamEventDao teamEventDao;
 
   private Integer month;
@@ -95,15 +94,29 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           event.setAllDay(true);
         }
 
-        if (endDate.getMinuteOfDay() == 0)
-          endDate.plusMinutes(15);
+        /*
+         * necessary, because if more days are selected the calendar
+         * sets end time and start time to 00:00
+         * thus the calendar does not select the last day.
+         * for example: selected two days, but only one day would be shown.
+         */
+        if (endDate.getDayOfYear() != startDate.getDayOfYear()) {
+          if (endDate.getMillisOfDay() == 0
+              && startDate.getMillisOfDay() == 0){
+            event.setAllDay(true);
+          }
+        } else {
+          if (endDate.getMillisOfDay() == startDate.getMillisOfDay()){
+            event.setAllDay(true);
+          }
+        }
 
         event.setStart(startDate);
         event.setEnd(endDate);
 
         final String title = teamEvent.getSubject();
+        String durationString = "";
         if (longFormat == true) {
-          // Week or day view:
           final DateTime dt = new DateTime(teamEvent.getDuration());
           String hour = dt.getHourOfDay() + "";
           String minute = dt.getMinuteOfHour() + "";
@@ -112,7 +125,6 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           if (dt.getMinuteOfHour() < 10)
             minute = "0" + dt.getMinuteOfHour();
 
-          String durationString = "";
           if (right.isOwner(user, teamEvent.getCalendar()) == true
               || right.hasAccessGroup(teamEvent.getCalendar().getFullAccessGroup(), userGroupCache, user) == true) {
             if (event.isAllDay() == false)
@@ -123,7 +135,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
                 + "\n"
                 + getString("plugins.teamevent.note")
                 + ": "
-                + teamEvent.getNote()
+                + (teamEvent.getNote() == null ? "" : teamEvent.getNote())
                 + durationString);
           } else {
             if (right.hasAccessGroup(teamEvent.getCalendar().getReadOnlyAccessGroup(), userGroupCache, user) == true) {
@@ -135,7 +147,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
                   + "\n"
                   + getString("plugins.teamevent.note")
                   + ": "
-                  + teamEvent.getNote()
+                  + (teamEvent.getNote() == null ? "" : teamEvent.getNote())
                   + durationString);
               event.setEditable(false);
             } else {
@@ -156,7 +168,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
         }
         if (month != null && startDate.getMonthOfYear() != month && endDate.getMonthOfYear() != month) {
           // Display team events of other month as grey blue:
-          event.setTextColor("#222222").setBackgroundColor("#ffffff").setColor("#ACD9E8");
+          event.setTextColor("#222222").setBackgroundColor("#ACD9E8").setColor("#ACD9E8");
         }
         events.put(teamEvent.getId() + "", event);
       }

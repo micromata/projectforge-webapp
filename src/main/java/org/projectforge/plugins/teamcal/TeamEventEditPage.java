@@ -68,8 +68,12 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
     super.init();
   }
 
+  /**
+   * pre-init calendar with page parameters.
+   * Sets start and end date and teamCal id, if necessary.
+   */
   @SuppressWarnings("null")
-  void preInit()
+  public void preInit()
   {
     if (isNew() == true) {
       final PageParameters parameters = getPageParameters();
@@ -79,17 +83,17 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       if (startDateInMillis != null) {
         getData().setStartDate(new Timestamp(startDateInMillis));
         if (stopTimeInMillis == null) {
-          getData().setEndDate(new Timestamp(stopTimeInMillis)); // Default is time sheet with zero duration.
+          getData().setEndDate(new Timestamp(stopTimeInMillis));
         }
       }
       if (stopTimeInMillis != null) {
         getData().setEndDate(new Timestamp(stopTimeInMillis));
         if (startDateInMillis == null) {
-          getData().setStartDate(new Timestamp(startDateInMillis)); // Default is time sheet with zero duration.
+          getData().setStartDate(new Timestamp(startDateInMillis));
         }
       }
       if (teamCalId != null) {
-        getData().setCalendar(teamCalDao.getById(Integer.valueOf(teamCalId))); // TODO trycatch
+        getData().setCalendar(teamCalDao.getById(Integer.valueOf(teamCalId)));
       }
     } else {
       final Long newStartTimeInMillis = WicketUtils.getAsLong(getPageParameters(), PARAMETER_KEY_START_DATE_IN_MILLIS);
@@ -100,6 +104,23 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       if (newStopTimeInMillis != null) {
         getData().setEndDate(new Timestamp(newStopTimeInMillis));
       }
+    }
+  }
+
+  /**
+   * @see org.projectforge.web.wicket.AbstractEditPage#update()
+   */
+  @Override
+  protected void update()
+  {
+    if (getData().getStartDate().after(getData().getEndDate())) {
+      error(getString("plugins.teamevent.duration.error"));
+    } else {
+      super.update();
+      final PageParameters params = new PageParameters();
+      params.add("id", getData().getCalendar().getId());
+      final TeamCalEditPage page = new TeamCalEditPage(params);
+      setResponsePage(page);
     }
   }
 
