@@ -37,7 +37,10 @@ import org.projectforge.common.KeyValueBean;
  * The elements stored in the first list will named as assigned values and the elements of the second will be called unassigned values.<br>
  * Finally, after the user has made his decisions (multiple assigning and/or multiple unassigning), this class will return the elements to
  * (un)assign by comparing with the original assigned values.
+ * <br/>
+ * Please use Select2 and AssignListHelper instead.
  */
+@Deprecated
 public class TwoListHelper<K, V extends Comparable<V>> implements Serializable
 {
   private static final long serialVersionUID = 3522022033150328877L;
@@ -46,7 +49,7 @@ public class TwoListHelper<K, V extends Comparable<V>> implements Serializable
 
   private List<KeyValueBean<K, V>> unassignedItems;
 
-  private List<KeyValueBean<K, V>> originalAssignedList;
+  private final List<KeyValueBean<K, V>> originalAssignedList;
 
   /**
    * Initializes the lists.
@@ -58,7 +61,7 @@ public class TwoListHelper<K, V extends Comparable<V>> implements Serializable
     this.assignedItems = new ArrayList<KeyValueBean<K, V>>();
     this.originalAssignedList = new ArrayList<KeyValueBean<K, V>>();
     this.unassignedItems = new ArrayList<KeyValueBean<K, V>>();
-    for (KeyValueBean<K, V> entry : fullList) {
+    for (final KeyValueBean<K, V> entry : fullList) {
       if (assignedKeys != null && assignedKeys.contains(entry.getKey()) == true) {
         this.assignedItems.add(entry);
         this.originalAssignedList.add(entry);
@@ -74,7 +77,7 @@ public class TwoListHelper<K, V extends Comparable<V>> implements Serializable
     return this.assignedItems;
   }
 
-  public void setAssignedItems(List<KeyValueBean<K, V>> assignedList)
+  public void setAssignedItems(final List<KeyValueBean<K, V>> assignedList)
   {
     this.assignedItems = assignedList;
   }
@@ -94,7 +97,7 @@ public class TwoListHelper<K, V extends Comparable<V>> implements Serializable
     return unassignedItems;
   }
 
-  public void setUnassignedItems(List<KeyValueBean<K, V>> unassignedList)
+  public void setUnassignedItems(final List<KeyValueBean<K, V>> unassignedList)
   {
     this.unassignedItems = unassignedList;
   }
@@ -104,8 +107,8 @@ public class TwoListHelper<K, V extends Comparable<V>> implements Serializable
    */
   public List<K> getValuesToAssign()
   {
-    List<K> result = new ArrayList<K>();
-    for (KeyValueBean<K, V> entry : this.assignedItems) {
+    final List<K> result = new ArrayList<K>();
+    for (final KeyValueBean<K, V> entry : this.assignedItems) {
       if (this.originalAssignedList.contains(entry) == false) {
         result.add(entry.getKey());
       }
@@ -118,8 +121,8 @@ public class TwoListHelper<K, V extends Comparable<V>> implements Serializable
    */
   public List<K> getValuesToUnassign()
   {
-    List<K> result = new ArrayList<K>();
-    for (KeyValueBean<K, V> entry : this.originalAssignedList) {
+    final List<K> result = new ArrayList<K>();
+    for (final KeyValueBean<K, V> entry : this.originalAssignedList) {
       if (this.assignedItems.contains(entry) == false) {
         result.add(entry.getKey());
       }
@@ -130,14 +133,14 @@ public class TwoListHelper<K, V extends Comparable<V>> implements Serializable
   /**
    * Assigns the given values from the unassigned list to the assigned list.
    */
-  public void assignItems(List<K> list)
+  public void assignItems(final List<K> list)
   {
     if (list == null || list.size() == 0) {
       return;
     }
-    Iterator<KeyValueBean<K, V>> iterator = unassignedItems.iterator();
+    final Iterator<KeyValueBean<K, V>> iterator = unassignedItems.iterator();
     while (iterator.hasNext()) {
-      KeyValueBean<K, V> entry = iterator.next();
+      final KeyValueBean<K, V> entry = iterator.next();
       if (list.contains(entry.getKey()) == true) {
         iterator.remove();
         assignedItems.add(entry);
@@ -148,14 +151,14 @@ public class TwoListHelper<K, V extends Comparable<V>> implements Serializable
   /**
    * Unassign some values from the assigned list to the unassigned list.
    */
-  public void unassignItems(List<K> list)
+  public void unassignItems(final List<K> list)
   {
     if (list == null || list.size() == 0) {
       return;
     }
-    Iterator<KeyValueBean<K, V>> iterator = assignedItems.iterator();
+    final Iterator<KeyValueBean<K, V>> iterator = assignedItems.iterator();
     while (iterator.hasNext()) {
-      KeyValueBean<K, V> entry = iterator.next();
+      final KeyValueBean<K, V> entry = iterator.next();
       if (list.contains(entry.getKey()) == true) {
         iterator.remove();
         unassignedItems.add(entry);
@@ -166,9 +169,10 @@ public class TwoListHelper<K, V extends Comparable<V>> implements Serializable
   /**
    * Return a string representation of this object.
    */
+  @Override
   public String toString()
   {
-    StringBuffer sb = new StringBuffer("TwoListHelper[assignedList=");
+    final StringBuffer sb = new StringBuffer("TwoListHelper[assignedList=");
     append(sb, assignedItems);
     sb.append(", unassignedList=");
     append(sb, unassignedItems);
@@ -179,18 +183,18 @@ public class TwoListHelper<K, V extends Comparable<V>> implements Serializable
   /** Only for internal use junit inside test cases. */
   public String getTestString()
   {
-    StringBuffer sb = new StringBuffer();
+    final StringBuffer sb = new StringBuffer();
     append(sb, assignedItems);
     sb.append(":");
     append(sb, unassignedItems);
     return sb.toString();
   }
 
-  private void append(StringBuffer sb, List<KeyValueBean<K, V>> list)
+  private void append(final StringBuffer sb, final List<KeyValueBean<K, V>> list)
   {
     sb.append("[");
     boolean first = true;
-    for (KeyValueBean<K, V> entry : list) {
+    for (final KeyValueBean<K, V> entry : list) {
       if (first == true)
         first = false;
       else sb.append(", ");
@@ -209,7 +213,7 @@ public class TwoListHelper<K, V extends Comparable<V>> implements Serializable
    * The user has selected the assign button, so the selected items will be assigned within this method.
    * 
    */
-  public void assign(List<K> selectedItemsToAssign)
+  public void assign(final List<K> selectedItemsToAssign)
   {
     assignItems(selectedItemsToAssign);
     sortLists();
@@ -219,7 +223,7 @@ public class TwoListHelper<K, V extends Comparable<V>> implements Serializable
    * The user has selected the unassign button, so the selected items will be unassigned within this method.
    * 
    */
-  public void unassign(List<K> selectedItemsToUnassign)
+  public void unassign(final List<K> selectedItemsToUnassign)
   {
     unassignItems(selectedItemsToUnassign);
     sortLists();
