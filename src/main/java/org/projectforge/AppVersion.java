@@ -17,13 +17,13 @@ public class AppVersion
 
   public static final String APP_TITLE = "ProjectForge 2012";
 
-  public static final Version VERSION = new Version("4.1.4.3");
+  public static final Version VERSION = new Version("4.1.4.4");
 
   public static final String NUMBER = VERSION.toString();
 
-  public static final String RELEASE_DATE = "2012-09-22";
+  public static final String RELEASE_DATE = "2012-09-24";
 
-  public static final String RELEASE_TIMESTAMP = "2012-09-22 12:26";
+  public static final String RELEASE_TIMESTAMP = "2012-09-24 09:13";
 }
 
 			
