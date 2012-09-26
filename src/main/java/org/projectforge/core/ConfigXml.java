@@ -189,8 +189,6 @@ public class ConfigXml
    */
   String pluginMainClasses;
 
-  private transient SSLSocketFactory projectforgesSSLSocketFactory;
-
   private transient SSLSocketFactory usersSSLSocketFactory;
 
   @XmlField(alias = "sendMail")
@@ -393,19 +391,16 @@ public class ConfigXml
 
   private void setupKeyStores()
   {
-    try {
-      final String filename = "keystore";
-      final ClassLoader classLoader = this.getClass().getClassLoader();
-      final InputStream is = classLoader.getResourceAsStream(filename);
-      projectforgesSSLSocketFactory = createSSLSocketFactory(is, "changeit");
-      log.info("Keystore successfully read from class path: " + filename);
-    } catch (final Throwable ex) {
-      log.error("Could not initialize key store. Therefore the update pages of www.projectforge.org are not available (see error message below)!");
-      log.error(ex.getMessage(), ex);
-    }
     if (getKeystoreFile() != null) {
       try {
-        final File keystoreFile = new File(applicationHomeDir, getKeystoreFile());
+        File keystoreFile = new File(getKeystoreFile());
+        if (keystoreFile.canRead() == false) {
+          keystoreFile = new File(applicationHomeDir, getKeystoreFile());
+        }
+        if (keystoreFile.canRead() == false) {
+          log.error("Can't read keystore file: " + getKeystoreFile());
+          return;
+        }
         final InputStream is = new FileInputStream(keystoreFile);
         usersSSLSocketFactory = createSSLSocketFactory(is, this.keystorePassphrase);
         log.info("Keystore successfully read from file: " + keystoreFile.getAbsolutePath());
@@ -941,11 +936,6 @@ public class ConfigXml
   public List<ContractType> getContractTypes()
   {
     return contractTypes;
-  }
-
-  public SSLSocketFactory getProjectForgesSSLSocketFactory()
-  {
-    return projectforgesSSLSocketFactory;
   }
 
   public SSLSocketFactory getUsersSSLSocketFactory()
