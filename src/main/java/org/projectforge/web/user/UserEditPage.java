@@ -23,9 +23,7 @@
 
 package org.projectforge.web.user;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -49,11 +47,11 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UserEditPage.class);
 
-  @SpringBean(name = "userDao")
-  private UserDao userDao;
-
   @SpringBean(name = "groupDao")
   private GroupDao groupDao;
+
+  @SpringBean(name = "userDao")
+  private UserDao userDao;
 
   @SpringBean(name = "userRightDao")
   private UserRightDao userRightDao;
@@ -103,15 +101,7 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
   @Override
   public AbstractSecuredBasePage afterSaveOrUpdate()
   {
-    final Set<Integer> assignedGroupIds = new HashSet<Integer>();
-    for (final Integer groupId : form.groups.getValuesToAssign()) {
-      assignedGroupIds.add(groupId);
-    }
-    final Set<Integer> unassignedGroupIds = new HashSet<Integer>();
-    for (final Integer groupId : form.groups.getValuesToUnassign()) {
-      unassignedGroupIds.add(groupId);
-    }
-    groupDao.assignGroups(getData(), assignedGroupIds, unassignedGroupIds);
+    groupDao.assignGroups(getData(), form.assignListHelper.getItemsToAssign(), form.assignListHelper.getItemsToUnassign());
 
     if (form.rightsData != null) {
       final List<UserRightVO> list = form.rightsData.getRights();

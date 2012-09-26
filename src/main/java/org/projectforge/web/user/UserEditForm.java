@@ -24,7 +24,6 @@
 package org.projectforge.web.user;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -37,9 +36,7 @@ import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.ListMultipleChoice;
 import org.apache.wicket.markup.html.form.PasswordTextField;
-import org.apache.wicket.markup.html.form.SubmitLink;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -47,24 +44,23 @@ import org.apache.wicket.validation.IValidatable;
 import org.apache.wicket.validation.ValidationError;
 import org.apache.wicket.validation.validator.AbstractValidator;
 import org.projectforge.access.AccessChecker;
-import org.projectforge.common.KeyValueBean;
 import org.projectforge.common.StringHelper;
 import org.projectforge.common.TimeNotation;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
 import org.projectforge.user.GroupDO;
-import org.projectforge.user.GroupDao;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.user.UserRight;
 import org.projectforge.user.UserRightDao;
 import org.projectforge.user.UserRightVO;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.web.I18nCore;
 import org.projectforge.web.calendar.DateTimeFormatter;
-import org.projectforge.web.common.TwoListHelper;
+import org.projectforge.web.common.AssignListHelper;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
@@ -78,9 +74,9 @@ import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.GridBuilder;
-import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
-import org.projectforge.web.wicket.flowlayout.IconType;
 import org.projectforge.web.wicket.flowlayout.RadioGroupPanel;
+
+import com.vaynberg.wicket.select2.Select2MultiChoice;
 
 public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 {
@@ -96,8 +92,8 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
   @SpringBean(name = "userRightDao")
   private UserRightDao userRightDao;
 
-  @SpringBean(name = "groupDao")
-  private GroupDao groupDao;
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
 
   protected UserRightsEditData rightsData;
 
@@ -108,17 +104,9 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
   private String encryptedPassword;
 
-  TwoListHelper<Integer, String> groups;
-
-  private final List<Integer> valuesToAssign = new ArrayList<Integer>();
-
-  private final List<Integer> valuesToUnassign = new ArrayList<Integer>();
-
-  private ListMultipleChoice<Integer> valuesToAssignChoice;
-
-  private ListMultipleChoice<Integer> valuesToUnassignChoice;
-
   boolean invalidateAllStayLoggedInSessions;
+
+  AssignListHelper<GroupDO> assignListHelper;
 
   public UserEditForm(final UserEditPage parentPage, final PFUserDO data)
   {
@@ -538,79 +526,23 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     }
   }
 
-  @SuppressWarnings("serial")
   private void addAssignedGroups(final boolean adminAccess)
   {
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.assignedGroups"), true).setLabelSide(false);
-    final List<KeyValueBean<Integer, String>> fullList = new ArrayList<KeyValueBean<Integer, String>>();
-    final List<GroupDO> result = groupDao.getList(groupDao.getDefaultFilter());
-    for (final GroupDO group : result) {
-      fullList.add(new KeyValueBean<Integer, String>(group.getId(), group.getName()));
-    }
-    final List<Integer> assignedGroups = new ArrayList<Integer>();
     final Collection<Integer> set = ((UserDao) getBaseDao()).getAssignedGroups(data);
+    final GroupsProvider groupsProvider = new GroupsProvider();
+    assignListHelper = new AssignListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(groupsProvider.getSortedGroups());
     if (set != null) {
       for (final Integer groupId : set) {
-        assignedGroups.add(groupId);
+        final GroupDO group = userGroupCache.getGroup(groupId);
+        if (group != null) {
+          assignListHelper.addOriginalAssignedItem(group).assignItem(group);
+        }
       }
     }
-    this.groups = new TwoListHelper<Integer, String>(fullList, assignedGroups);
-    if (parentPage.tutorialGroupsToAdd != null) {
-      groups.assign(parentPage.tutorialGroupsToAdd);
-    }
-    this.groups.sortLists();
-    valuesToUnassignChoice = new ListMultipleChoice<Integer>(fs.getListChoiceId());
-    valuesToUnassignChoice.setModel(new PropertyModel<Collection<Integer>>(this, "valuesToUnassign"));
-    WicketUtils.setHeight(valuesToUnassignChoice, 50);
-    WicketUtils.setPercentSize(valuesToUnassignChoice, 45);
-    fs.add(valuesToUnassignChoice);
-    if (adminAccess == true) {
-      fs.add(new IconLinkPanel(fs.newChildId(), IconType.CIRCLE_ARROW_WEST, getString("tooltip.assign"), new SubmitLink(
-          IconLinkPanel.LINK_ID) {
-        @Override
-        public void onSubmit()
-        {
-          accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
-          groups.assign(valuesToAssign);
-          valuesToAssign.clear();
-          refreshGroupLists();
-        };
-      }));
-      fs.add(new IconLinkPanel(fs.newChildId(), IconType.CIRCLE_ARROW_EAST, getString("tooltip.unassign"), new SubmitLink(
-          IconLinkPanel.LINK_ID) {
-        @Override
-        public void onSubmit()
-        {
-          accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
-          groups.unassign(valuesToUnassign);
-          valuesToUnassign.clear();
-          refreshGroupLists();
-        };
-      }));
-      valuesToAssignChoice = new ListMultipleChoice<Integer>(fs.getListChoiceId());
-      valuesToAssignChoice.setModel(new PropertyModel<Collection<Integer>>(this, "valuesToAssign"));
-      WicketUtils.setHeight(valuesToAssignChoice, 50);
-      WicketUtils.setPercentSize(valuesToAssignChoice, 45);
-      fs.add(valuesToAssignChoice);
-      fs.setNowrap();
-    }
-    refreshGroupLists();
-  }
-
-  private void refreshGroupLists()
-  {
-    final LabelValueChoiceRenderer<Integer> valuesToAssignChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-    for (final KeyValueBean<Integer, String> group : this.groups.getUnassignedItems()) {
-      valuesToAssignChoiceRenderer.addValue(group.getKey(), group.getValue());
-    }
-    valuesToAssignChoice.setChoiceRenderer(valuesToAssignChoiceRenderer);
-    valuesToAssignChoice.setChoices(valuesToAssignChoiceRenderer.getValues());
-    final LabelValueChoiceRenderer<Integer> valuesToUnassignChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-    for (final KeyValueBean<Integer, String> group : this.groups.getAssignedItems()) {
-      valuesToUnassignChoiceRenderer.addValue(group.getKey(), group.getValue());
-    }
-    valuesToUnassignChoice.setChoiceRenderer(valuesToUnassignChoiceRenderer);
-    valuesToUnassignChoice.setChoices(valuesToUnassignChoiceRenderer.getValues());
+    final Select2MultiChoice<GroupDO> groups = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
+        new PropertyModel<Collection<GroupDO>>(this.assignListHelper, "assignedItems"), groupsProvider);
+    fs.add(groups);
   }
 
   String getEncryptedPassword()
