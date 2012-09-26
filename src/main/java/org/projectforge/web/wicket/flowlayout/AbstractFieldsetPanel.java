@@ -43,6 +43,8 @@ import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.WebConstants;
 import org.projectforge.web.wicket.WicketUtils;
 
+import com.vaynberg.wicket.select2.Select2MultiChoice;
+
 /**
  * Represents a entry of a group panel. This can be a label, text field or other form components.
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -302,6 +304,20 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
   public String getDropDownChoiceId()
   {
     return DropDownChoicePanel.WICKET_ID;
+  }
+
+  public <C> Select2MultiChoicePanel<C> add(final Select2MultiChoice<C> select2MultiChoice) {
+    final Select2MultiChoicePanel<C> select2MultiChoicePanel = new Select2MultiChoicePanel<C>(newChildId(), select2MultiChoice);
+    add(select2MultiChoicePanel);
+    return select2MultiChoicePanel;
+  }
+
+  /**
+   * @return The Wicket id of the embedded text fiel of {@link DropDownChoicePanel}.
+   */
+  public String getSelect2MultiChoiceId()
+  {
+    return Select2MultiChoicePanel.WICKET_ID;
   }
 
   public abstract String newChildId();
