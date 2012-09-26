@@ -344,6 +344,9 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   public List<O> getList(final QueryFilter filter) throws AccessException
   {
     checkLoggedInUserSelectAccess();
+    if (accessChecker.isRestrictedUser() == true) {
+      return null;
+    }
     List<O> list = internalGetList(filter);
     if (list == null || list.size() == 0) {
       return list;
@@ -361,9 +364,6 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   public List<O> internalGetList(final QueryFilter filter) throws AccessException
   {
-    if (accessChecker.isRestrictedUser() == true) {
-      return null;
-    }
     final BaseSearchFilter searchFilter = filter.getFilter();
     filter.clearErrorMessage();
     if (searchFilter.isIgnoreDeleted() == false) {
