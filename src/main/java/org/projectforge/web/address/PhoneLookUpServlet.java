@@ -75,7 +75,7 @@ public class PhoneLookUpServlet extends HttpServlet
     final StringBuffer buf = new StringBuffer();
     // Use internal get list method for avoiding access checking (no user is logged-in):
     final List<AddressDO> list = addressDao.internalGetList(queryFilter);
-    if (list.size() >= 1) {
+    if (list != null && list.size() >= 1) {
       AddressDO result = list.get(0);
       if (list.size() > 1) {
         // More than one result, therefore find the newest one:
