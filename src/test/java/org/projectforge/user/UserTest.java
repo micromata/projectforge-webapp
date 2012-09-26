@@ -155,6 +155,7 @@ public class UserTest extends TestBase
     assertNull("Password OK.", userDao.checkPasswordQuality("  5 g "));
   }
 
+  @SuppressWarnings({ "unchecked", "rawtypes"})
   @Test
   public void history()
   {
@@ -197,12 +198,12 @@ public class UserTest extends TestBase
       {
         // (Un)assigning groups:
         final PFUserDO user = userDao.internalGetById(getUserId("UserTest.historyUser1a"));
-        final Set<Integer> groupIdsToAssign = new HashSet<Integer>();
-        groupIdsToAssign.add(getGroupId("UserTest.historyGroup2"));
-        groupIdsToAssign.add(getGroupId("UserTest.historyGroup3"));
-        final Set<Integer> groupIdsToUnassign = new HashSet<Integer>();
-        groupIdsToUnassign.add(getGroupId("UserTest.historyGroup1"));
-        groupDao.assignGroups(user, groupIdsToAssign, groupIdsToUnassign);
+        final Set<GroupDO> groupsToAssign = new HashSet<GroupDO>();
+        groupsToAssign.add(getGroup("UserTest.historyGroup2"));
+        groupsToAssign.add(getGroup("UserTest.historyGroup3"));
+        final Set<GroupDO> groupsToUnassign = new HashSet<GroupDO>();
+        groupsToUnassign.add(getGroup("UserTest.historyGroup1"));
+        groupDao.assignGroups(user, groupsToAssign, groupsToUnassign);
         return null;
       }
     });

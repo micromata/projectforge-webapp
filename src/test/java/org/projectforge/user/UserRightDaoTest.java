@@ -40,12 +40,12 @@ public class UserRightDaoTest extends TestBase
 
   private UserRightDao userRightDao;
 
-  public void setGroupDao(GroupDao groupDao)
+  public void setGroupDao(final GroupDao groupDao)
   {
     this.groupDao = groupDao;
   }
 
-  public void setUserRightDao(UserRightDao userRightDao)
+  public void setUserRightDao(final UserRightDao userRightDao)
   {
     this.userRightDao = userRightDao;
   }
@@ -55,9 +55,9 @@ public class UserRightDaoTest extends TestBase
   {
     logon(ADMIN);
     final PFUserDO user = initTestDB.addUser("testUserRightDaoTest");
-    final Set<Integer> groupIdsToAssign = new HashSet<Integer>();
-    groupIdsToAssign.add(getGroup(FINANCE_GROUP).getId());
-    groupDao.assignGroups(user, groupIdsToAssign, null);
+    final Set<GroupDO> groupsToAssign = new HashSet<GroupDO>();
+    groupsToAssign.add(getGroup(FINANCE_GROUP));
+    groupDao.assignGroups(user, groupsToAssign, null);
     List<UserRightVO> list = userRightDao.getUserRights(user);
     UserRightVO right1 = null;
     UserRightVO right2 = null;
