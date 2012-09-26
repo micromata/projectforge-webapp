@@ -25,9 +25,11 @@ package org.projectforge.web.common;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * This class is an helper class for supporting the implementation of gui lists. The user can select and unselect entries. This will be
@@ -39,18 +41,24 @@ public class AssignListHelper<T> implements Serializable
 {
   private static final long serialVersionUID = 3522022033150328877L;
 
-  private SortedSet<T> assignedItems;
+  private Collection<T> assignedItems;
 
-  private final Collection<T> originalAssignedList;
+  private Collection<T> originalAssignedList;
 
-  private final Collection<T> fullList;
+  private Collection<T> fullList;
+
+  private Comparator<T> comparator;
+
+  public AssignListHelper()
+  {
+  }
 
   /**
    * Initializes the lists.
    * @param fullList List of all elements available for (un)assigning.
    * @param assignedKeys List of already assigned elements (by key) or null if no elements assigned.
    */
-  public AssignListHelper(final SortedSet<T> fullList, final SortedSet<T> assignedItems)
+  public AssignListHelper(final Set<T> fullList, final SortedSet<T> assignedItems)
   {
     this.fullList = fullList;
     this.assignedItems = assignedItems;
@@ -58,16 +66,85 @@ public class AssignListHelper<T> implements Serializable
   }
 
   /**
+   * @param fullList the fullList to set
+   * @return this for chaining.
+   */
+  public AssignListHelper<T> setFullList(final Collection<T> fullList)
+  {
+    this.fullList = fullList;
+    return this;
+  }
+
+  /**
+   * @param originalAssignedList the originalAssignedList to set
+   * @return this for chaining.
+   */
+  public AssignListHelper<T> setOriginalAssignedList(final Collection<T> originalAssignedList)
+  {
+    this.originalAssignedList = originalAssignedList;
+    return this;
+  }
+
+  /**
+   * Only for use in construction phase.
+   * @param item
+   * @return
+   */
+  public AssignListHelper<T> addOriginalAssignedItem(final T item)
+  {
+    if (this.originalAssignedList == null) {
+      if (comparator != null) {
+        this.originalAssignedList = new TreeSet<T>(comparator);
+      } else {
+        this.originalAssignedList = new TreeSet<T>();
+      }
+    }
+    this.originalAssignedList.add(item);
+    return this;
+  }
+
+  /**
+   * @param comparator the comparator to set
+   * @return this for chaining.
+   */
+  public AssignListHelper<T> setComparator(final Comparator<T> comparator)
+  {
+    this.comparator = comparator;
+    return this;
+  }
+
+  /**
+   * @return the comparator
+   */
+  public Comparator<T> getComparator()
+  {
+    return comparator;
+  }
+
+  /**
    * @return the assignedItems
    */
-  public SortedSet<T> getAssignedItems()
+  public Collection<T> getAssignedItems()
   {
     return assignedItems;
   }
 
-  public AssignListHelper<T> setAssignedItems(final SortedSet<T> assignedItems)
+  public AssignListHelper<T> setAssignedItems(final Collection<T> assignedItems)
   {
     this.assignedItems = assignedItems;
+    return this;
+  }
+
+  public AssignListHelper<T> assignItem(final T item)
+  {
+    if (this.assignedItems == null) {
+      if (comparator != null) {
+        this.assignedItems = new TreeSet<T>(comparator);
+      } else {
+        this.assignedItems = new TreeSet<T>();
+      }
+    }
+    this.assignedItems.add(item);
     return this;
   }
 
