@@ -27,8 +27,8 @@ import java.util.Hashtable;
 
 import javax.naming.Context;
 import javax.naming.NamingException;
-import javax.naming.directory.DirContext;
-import javax.naming.directory.InitialDirContext;
+import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.LdapContext;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.core.ConfigXml;
@@ -80,7 +80,7 @@ public class LdapConnector implements ConfigurationListener
     return ldapConfig.getBaseDN();
   }
 
-  public DirContext createContext()
+  public LdapContext createContext()
   {
     final Hashtable<String, String> env;
     final String authentication = ldapConfig.getAuthentication();
@@ -90,7 +90,7 @@ public class LdapConnector implements ConfigurationListener
       env = createEnv(null, null);
     }
     try {
-      final DirContext ctx = new InitialDirContext(env);
+      final LdapContext ctx = new InitialLdapContext(env, null);
       return ctx;
     } catch (final NamingException ex) {
       log.error("While trying to connect LDAP initally: " + ex.getMessage(), ex);
@@ -98,10 +98,10 @@ public class LdapConnector implements ConfigurationListener
     }
   }
 
-  public DirContext createContext(final String username, final String password) throws NamingException
+  public LdapContext createContext(final String username, final String password) throws NamingException
   {
     final Hashtable<String, String> env = createEnv(username, password);
-    final DirContext ctx = new InitialDirContext(env);
+    final LdapContext ctx = new InitialLdapContext(env, null);
     return ctx;
   }
 
