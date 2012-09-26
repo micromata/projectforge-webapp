@@ -207,46 +207,46 @@ public class GroupDao extends BaseDao<GroupDO>
   /**
    * Assigns groups to and unassigns groups from given user.
    * @param user
-   * @param groupIdsToAssign Groups to assign (nullable).
-   * @param groupIdsToUnassign Groups to unassign (nullable).
+   * @param groupsToAssign Groups to assign (nullable).
+   * @param groupsToUnassign Groups to unassign (nullable).
    * @throws AccessException
    */
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
-  public void assignGroups(final PFUserDO user, final Set<Integer> groupIdsToAssign, final Set<Integer> groupIdsToUnassign)
+  public void assignGroups(final PFUserDO user, final Set<GroupDO> groupsToAssign, final Set<GroupDO> groupsToUnassign)
       throws AccessException
       {
     getHibernateTemplate().refresh(user, LockMode.READ);
     final List<GroupDO> assignedGroups = new ArrayList<GroupDO>();
-    if (groupIdsToAssign != null) {
-      for (final Integer groupId : groupIdsToAssign) {
-        final GroupDO group = getHibernateTemplate().get(clazz, groupId, LockMode.PESSIMISTIC_WRITE);
-        Set<PFUserDO> assignedUsers = group.getAssignedUsers();
+    if (groupsToAssign != null) {
+      for (final GroupDO group : groupsToAssign) {
+        final GroupDO dbGroup = getHibernateTemplate().get(clazz, group.getId(), LockMode.PESSIMISTIC_WRITE);
+        Set<PFUserDO> assignedUsers = dbGroup.getAssignedUsers();
         if (assignedUsers == null) {
           assignedUsers = new HashSet<PFUserDO>();
-          group.setAssignedUsers(assignedUsers);
+          dbGroup.setAssignedUsers(assignedUsers);
         }
         if (assignedUsers.contains(user) == false) {
-          log.info("Assigning user '" + user.getUsername() + "' to group '" + group.getName() + "'.");
+          log.info("Assigning user '" + user.getUsername() + "' to group '" + dbGroup.getName() + "'.");
           assignedUsers.add(user);
-          assignedGroups.add(group);
-          group.setLastUpdate(); // Needed, otherwise GroupDO is not detected for hibernate history!
+          assignedGroups.add(dbGroup);
+          dbGroup.setLastUpdate(); // Needed, otherwise GroupDO is not detected for hibernate history!
         } else {
-          log.info("User '" + user.getUsername() + "' already assigned to group '" + group.getName() + "'.");
+          log.info("User '" + user.getUsername() + "' already assigned to group '" + dbGroup.getName() + "'.");
         }
       }
     }
     final List<GroupDO> unassignedGroups = new ArrayList<GroupDO>();
-    if (groupIdsToUnassign != null) {
-      for (final Integer groupId : groupIdsToUnassign) {
-        final GroupDO group = getHibernateTemplate().get(clazz, groupId, LockMode.PESSIMISTIC_WRITE);
-        final Set<PFUserDO> assignedUsers = group.getAssignedUsers();
+    if (groupsToUnassign != null) {
+      for (final GroupDO group : groupsToUnassign) {
+        final GroupDO dbGroup = getHibernateTemplate().get(clazz, group.getId(), LockMode.PESSIMISTIC_WRITE);
+        final Set<PFUserDO> assignedUsers = dbGroup.getAssignedUsers();
         if (assignedUsers != null && assignedUsers.contains(user) == true) {
-          log.info("Unassigning user '" + user.getUsername() + "' from group '" + group.getName() + "'.");
+          log.info("Unassigning user '" + user.getUsername() + "' from group '" + dbGroup.getName() + "'.");
           assignedUsers.remove(user);
-          unassignedGroups.add(group);
-          group.setLastUpdate(); // Needed, otherwise GroupDO is not detected for hibernate history!
+          unassignedGroups.add(dbGroup);
+          dbGroup.setLastUpdate(); // Needed, otherwise GroupDO is not detected for hibernate history!
         } else {
-          log.info("User '" + user.getUsername() + "' is not assigned to group '" + group.getName() + "' (can't unassign).");
+          log.info("User '" + user.getUsername() + "' is not assigned to group '" + dbGroup.getName() + "' (can't unassign).");
         }
       }
     }
