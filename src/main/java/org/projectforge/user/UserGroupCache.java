@@ -129,12 +129,21 @@ public class UserGroupCache extends AbstractCache
   }
 
   /**
-   * @return sll users (also deleted users).
+   * @return all users (also deleted users).
    */
   public Collection<PFUserDO> getAllUsers()
   {
     // checkRefresh(); Done by getUserMap().
     return getUserMap().values();
+  }
+
+  /**
+   * @return all groups (also deleted groups).
+   */
+  public Collection<GroupDO> getAllGroups()
+  {
+    // checkRefresh(); Done by getGMap().
+    return getGroupMap().values();
   }
 
   /**
