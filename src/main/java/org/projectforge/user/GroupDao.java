@@ -125,28 +125,28 @@ public class GroupDao extends BaseDao<GroupDO>
   /**
    * Please note: Any existing assigned user in group object is ignored!
    * @param group
-   * @param assignedUserIds Full list of all users which have to assigned to this group.
+   * @param assignedUsers Full list of all users which have to assigned to this group.
    * @return
    */
-  public void setAssignedUsers(final GroupDO group, final Set<Integer> assignedUserIds) throws AccessException
+  public void setAssignedUsers(final GroupDO group, final Collection<PFUserDO> assignedUsers) throws AccessException
   {
-    final Set<PFUserDO> assignedUsers = group.getAssignedUsers();
-    if (assignedUsers != null) {
-      final Iterator<PFUserDO> it = assignedUsers.iterator();
+    final Set<PFUserDO> origAssignedUsers = group.getAssignedUsers();
+    if (origAssignedUsers != null) {
+      final Iterator<PFUserDO> it = origAssignedUsers.iterator();
       while (it.hasNext() == true) {
         final PFUserDO user = it.next();
-        if (assignedUserIds.contains(user.getId()) == false) {
+        if (assignedUsers.contains(user) == false) {
           it.remove();
         }
       }
     }
-    for (final Integer id : assignedUserIds) {
-      final PFUserDO user = userDao.internalGetById(id);
-      if (user == null) {
-        throw new RuntimeException("User '" + id + "' not found. Could not add this unknown user to new group: " + group.getName());
+    for (final PFUserDO user : assignedUsers) {
+      final PFUserDO dbUser = userDao.internalGetById(user.getId());
+      if (dbUser == null) {
+        throw new RuntimeException("User '" + user.getId() + "' not found. Could not add this unknown user to new group: " + group.getName());
       }
-      if (assignedUsers == null || assignedUsers.contains(user) == false) {
-        group.addUser(user);
+      if (origAssignedUsers == null || origAssignedUsers.contains(dbUser) == false) {
+        group.addUser(dbUser);
       }
     }
   }

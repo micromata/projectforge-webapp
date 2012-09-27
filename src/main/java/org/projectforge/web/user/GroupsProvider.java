@@ -107,7 +107,7 @@ public class GroupsProvider extends TextChoiceProvider<GroupDO>
         hasMore = true;
         break;
       }
-      if (group.getName().toLowerCase().contains(term)) {
+      if (group.getName().toLowerCase().contains(term) == true) {
         matched++;
         if (matched > offset) {
           result.add(group);

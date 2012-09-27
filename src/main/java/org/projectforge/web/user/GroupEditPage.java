@@ -23,9 +23,6 @@
 
 package org.projectforge.web.user;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -75,11 +72,7 @@ public class GroupEditPage extends AbstractEditPage<GroupDO, GroupEditForm, Grou
   @Override
   public AbstractSecuredBasePage onSaveOrUpdate()
   {
-    final Set<Integer> assignedUserIds = new HashSet<Integer>();
-    for (final Integer userId : form.users.getAssignedValues()) {
-      assignedUserIds.add(userId);
-    }
-    groupDao.setAssignedUsers(getData(), assignedUserIds);
+    groupDao.setAssignedUsers(getData(), form.assignUsersListHelper.getAssignedItems());
     return super.onSaveOrUpdate();
   }
 
