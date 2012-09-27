@@ -157,9 +157,14 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
     return name;
   }
 
-  public void setName(final String name)
+  /**
+   * @param name
+   * @return this for chaining.
+   */
+  public GroupDO setName(final String name)
   {
     this.name = name;
+    return this;
   }
 
   /**
