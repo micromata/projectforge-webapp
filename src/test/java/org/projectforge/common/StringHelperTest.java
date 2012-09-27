@@ -218,6 +218,8 @@ public class StringHelperTest
   {
     compareIntArray(new int[] { 1, 111, 5, 11}, StringHelper.splitToInts("1.111.05.11", "."));
     compareIntArray(new int[] { 1, 0, 5, 11}, StringHelper.splitToInts("1.null.05.11", "."));
+    compareIntArray(new int[] { 1, 111, 5, 11}, StringHelper.splitToInts("1, 111,05,11", ",", false));
+    compareIntArray(new int[] { 1, 5, 11}, StringHelper.splitToInts("1,null,05, ,,11", ",", false));
   }
 
   @Test

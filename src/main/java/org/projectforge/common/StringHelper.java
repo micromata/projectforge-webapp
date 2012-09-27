@@ -24,6 +24,7 @@
 package org.projectforge.common;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -129,7 +130,6 @@ public class StringHelper
     }
     return false;
   }
-
 
   /**
    * For example ["Micromata", "IT-Services", "Computer"] -> "Computer, IT-Services, Micromata".
@@ -497,6 +497,34 @@ public class StringHelper
       final String token = tokenizer.nextToken();
       final Integer value = NumberHelper.parseInteger(token);
       result[i++] = value != null ? value : 0;
+    }
+    return result;
+  }
+
+  /**
+   * @param str
+   * @param delim
+   * @param ignoreEmptyItems If true then "1, ,2" returns [1,0,2], otherwise [1,2] is returned.
+   * @return
+   */
+  public static int[] splitToInts(final String str, final String delim, final boolean ignoreEmptyItems)
+  {
+    if (ignoreEmptyItems == true) {
+      return splitToInts(str, delim);
+    }
+    final StringTokenizer tokenizer = new StringTokenizer(str, delim);
+    final List<Integer> list = new ArrayList<Integer>(tokenizer.countTokens());
+    while (tokenizer.hasMoreTokens() == true) {
+      final String token = tokenizer.nextToken();
+      final Integer value = NumberHelper.parseInteger(token);
+      if (value != null) {
+        list.add(value);
+      }
+    }
+    final int[] result = new int[list.size()];
+    int i = 0;
+    for (final Integer number : list) {
+      result[i++] = number;
     }
     return result;
   }
