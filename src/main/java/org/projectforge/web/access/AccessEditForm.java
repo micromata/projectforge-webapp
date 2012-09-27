@@ -30,7 +30,6 @@ import org.apache.wicket.model.PropertyModel;
 import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.user.GroupDO;
-import org.projectforge.web.common.TwoListHelper;
 import org.projectforge.web.task.TaskSelectPanel;
 import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
@@ -45,8 +44,6 @@ public class AccessEditForm extends AbstractEditForm<GroupTaskAccessDO, AccessEd
   private static final long serialVersionUID = 1949792988059857771L;
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(AccessEditForm.class);
-
-  TwoListHelper<Integer, String> users;
 
   public AccessEditForm(final AccessEditPage parentPage, final GroupTaskAccessDO data)
   {
