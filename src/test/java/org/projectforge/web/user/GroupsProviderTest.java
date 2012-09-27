@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.UserGroupCache;
+import org.springframework.util.CollectionUtils;
 
 public class GroupsProviderTest
 {
@@ -83,6 +84,10 @@ public class GroupsProviderTest
 
   private void assertGroupSet(final SortedSet<GroupDO> actualGroupSet, final int... expectedIds)
   {
+    if (expectedIds == null || expectedIds.length == 0) {
+      Assert.assertTrue(CollectionUtils.isEmpty(actualGroupSet));
+      return;
+    }
     Assert.assertEquals(expectedIds.length, actualGroupSet.size());
     final Set<Integer> actualIdSet = new HashSet<Integer>();
     for (final GroupDO actualGroup : actualGroupSet) {
