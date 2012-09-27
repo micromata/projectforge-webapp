@@ -37,7 +37,7 @@ import java.util.TreeSet;
  * Finally, after the user has made his decisions (multiple assigning and/or multiple unassigning), this class will return the elements to
  * (un)assign by comparing with the original assigned values.
  */
-public class AssignListHelper<T> implements Serializable
+public class MultiChoiceListHelper<T> implements Serializable
 {
   private static final long serialVersionUID = 3522022033150328877L;
 
@@ -49,7 +49,7 @@ public class AssignListHelper<T> implements Serializable
 
   private Comparator<T> comparator;
 
-  public AssignListHelper()
+  public MultiChoiceListHelper()
   {
   }
 
@@ -58,7 +58,7 @@ public class AssignListHelper<T> implements Serializable
    * @param fullList List of all elements available for (un)assigning.
    * @param assignedKeys List of already assigned elements (by key) or null if no elements assigned.
    */
-  public AssignListHelper(final Set<T> fullList, final SortedSet<T> assignedItems)
+  public MultiChoiceListHelper(final Set<T> fullList, final SortedSet<T> assignedItems)
   {
     this.fullList = fullList;
     this.assignedItems = assignedItems;
@@ -69,7 +69,7 @@ public class AssignListHelper<T> implements Serializable
    * @param fullList the fullList to set
    * @return this for chaining.
    */
-  public AssignListHelper<T> setFullList(final Collection<T> fullList)
+  public MultiChoiceListHelper<T> setFullList(final Collection<T> fullList)
   {
     this.fullList = fullList;
     return this;
@@ -79,7 +79,7 @@ public class AssignListHelper<T> implements Serializable
    * @param originalAssignedList the originalAssignedList to set
    * @return this for chaining.
    */
-  public AssignListHelper<T> setOriginalAssignedList(final Collection<T> originalAssignedList)
+  public MultiChoiceListHelper<T> setOriginalAssignedList(final Collection<T> originalAssignedList)
   {
     this.originalAssignedList = originalAssignedList;
     return this;
@@ -90,7 +90,7 @@ public class AssignListHelper<T> implements Serializable
    * @param item
    * @return
    */
-  public AssignListHelper<T> addOriginalAssignedItem(final T item)
+  public MultiChoiceListHelper<T> addOriginalAssignedItem(final T item)
   {
     if (this.originalAssignedList == null) {
       if (comparator != null) {
@@ -107,7 +107,7 @@ public class AssignListHelper<T> implements Serializable
    * @param comparator the comparator to set
    * @return this for chaining.
    */
-  public AssignListHelper<T> setComparator(final Comparator<T> comparator)
+  public MultiChoiceListHelper<T> setComparator(final Comparator<T> comparator)
   {
     this.comparator = comparator;
     return this;
@@ -129,13 +129,13 @@ public class AssignListHelper<T> implements Serializable
     return assignedItems;
   }
 
-  public AssignListHelper<T> setAssignedItems(final Collection<T> assignedItems)
+  public MultiChoiceListHelper<T> setAssignedItems(final Collection<T> assignedItems)
   {
     this.assignedItems = assignedItems;
     return this;
   }
 
-  public AssignListHelper<T> assignItem(final T item)
+  public MultiChoiceListHelper<T> assignItem(final T item)
   {
     if (this.assignedItems == null) {
       if (comparator != null) {

@@ -36,7 +36,7 @@ import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.common.AssignListHelper;
+import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
@@ -57,7 +57,7 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
   @SpringBean(name = "groupDao")
   private GroupDao groupDao;
 
-  AssignListHelper<PFUserDO> assignUsersListHelper;
+  MultiChoiceListHelper<PFUserDO> assignUsersListHelper, nestedGroupsListHelper;
 
   public GroupEditForm(final GroupEditPage parentPage, final GroupDO data)
   {
@@ -108,11 +108,11 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
     }
     gridBuilder.newGrid8();
     {
-      // User lists
+      // Assigned users
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("group.assignedUsers"), true).setLabelSide(false);
       final Set<PFUserDO> assignedUsers = getData().getAssignedUsers();
       final UsersProvider usersProvider = new UsersProvider();
-      assignUsersListHelper = new AssignListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
+      assignUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
           usersProvider.getSortedUsers());
       if (assignedUsers != null) {
         for (final PFUserDO user : assignedUsers) {
@@ -122,6 +122,22 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
       final Select2MultiChoice<PFUserDO> users = new Select2MultiChoice<PFUserDO>(fs.getSelect2MultiChoiceId(),
           new PropertyModel<Collection<PFUserDO>>(this.assignUsersListHelper, "assignedItems"), usersProvider);
       fs.add(users);
+    }
+    {
+      // Nested groups
+      //      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group.assignedUsers"), true).setLabelSide(false);
+      //      final Set<PFUserDO> assignedUsers = getData().getAssignedUsers();
+      //      final UsersProvider usersProvider = new UsersProvider();
+      //      assignUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
+      //          usersProvider.getSortedUsers());
+      //      if (assignedUsers != null) {
+      //        for (final PFUserDO user : assignedUsers) {
+      //          assignUsersListHelper.addOriginalAssignedItem(user).assignItem(user);
+      //        }
+      //      }
+      //      final Select2MultiChoice<PFUserDO> users = new Select2MultiChoice<PFUserDO>(fs.getSelect2MultiChoiceId(),
+      //          new PropertyModel<Collection<PFUserDO>>(this.assignUsersListHelper, "assignedItems"), usersProvider);
+      //      fs.add(users);
     }
   }
 

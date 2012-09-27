@@ -60,7 +60,7 @@ import org.projectforge.user.UserRightVO;
 import org.projectforge.user.UserRightValue;
 import org.projectforge.web.I18nCore;
 import org.projectforge.web.calendar.DateTimeFormatter;
-import org.projectforge.web.common.AssignListHelper;
+import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
@@ -106,7 +106,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
   boolean invalidateAllStayLoggedInSessions;
 
-  AssignListHelper<GroupDO> assignListHelper;
+  MultiChoiceListHelper<GroupDO> assignListHelper;
 
   public UserEditForm(final UserEditPage parentPage, final PFUserDO data)
   {
@@ -531,7 +531,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.assignedGroups"), true).setLabelSide(false);
     final Collection<Integer> set = ((UserDao) getBaseDao()).getAssignedGroups(data);
     final GroupsProvider groupsProvider = new GroupsProvider();
-    assignListHelper = new AssignListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(groupsProvider.getSortedGroups());
+    assignListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(groupsProvider.getSortedGroups());
     if (set != null) {
       for (final Integer groupId : set) {
         final GroupDO group = userGroupCache.getGroup(groupId);
