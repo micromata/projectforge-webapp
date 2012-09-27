@@ -57,7 +57,9 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
   @SpringBean(name = "groupDao")
   private GroupDao groupDao;
 
-  MultiChoiceListHelper<PFUserDO> assignUsersListHelper, nestedGroupsListHelper;
+  MultiChoiceListHelper<PFUserDO> assignUsersListHelper;
+
+  MultiChoiceListHelper<GroupDO> nestedGroupsListHelper;
 
   public GroupEditForm(final GroupEditPage parentPage, final GroupDO data)
   {
@@ -124,20 +126,24 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
       fs.add(users);
     }
     {
+      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("group.nestedGroupsAllowed.tooltip"), "nestedGroupsAllowed", new PropertyModel<Boolean>(data,
+          "nestedGroupsAllowed"), getString("group.nestedGroupsAllowed.tooltip"));
+    }
+    {
       // Nested groups
-      //      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group.assignedUsers"), true).setLabelSide(false);
-      //      final Set<PFUserDO> assignedUsers = getData().getAssignedUsers();
-      //      final UsersProvider usersProvider = new UsersProvider();
-      //      assignUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
-      //          usersProvider.getSortedUsers());
-      //      if (assignedUsers != null) {
-      //        for (final PFUserDO user : assignedUsers) {
-      //          assignUsersListHelper.addOriginalAssignedItem(user).assignItem(user);
-      //        }
-      //      }
-      //      final Select2MultiChoice<PFUserDO> users = new Select2MultiChoice<PFUserDO>(fs.getSelect2MultiChoiceId(),
-      //          new PropertyModel<Collection<PFUserDO>>(this.assignUsersListHelper, "assignedItems"), usersProvider);
-      //      fs.add(users);
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group.nestedGroups"), true).setLabelSide(false);
+      final GroupsProvider groupsProvider = new GroupsProvider();
+      final Collection<GroupDO> nestedGroups = groupDao.getSortedNestedGroups(getData());
+      nestedGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
+          groupsProvider.getSortedGroups());
+      if (nestedGroups != null) {
+        for (final GroupDO group : nestedGroups) {
+          nestedGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
+        }
+      }
+      final Select2MultiChoice<GroupDO> users = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
+          new PropertyModel<Collection<GroupDO>>(this.nestedGroupsListHelper, "assignedItems"), groupsProvider);
+      fs.add(users);
     }
   }
 

@@ -30,7 +30,9 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.common.StringHelper;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.UserGroupCache;
@@ -40,13 +42,50 @@ import com.vaynberg.wicket.select2.TextChoiceProvider;
 
 public class GroupsProvider extends TextChoiceProvider<GroupDO>
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(GroupsProvider.class);
+
   private static final long serialVersionUID = 6228672635966093252L;
 
-  private transient UserGroupCache userGroupCache;
+  transient UserGroupCache userGroupCache;
 
   private int pageSize = 20;
 
   private final GroupsComparator groupsComparator = new GroupsComparator();
+
+  /**
+   * 
+   * @param groupIds
+   * @return
+   */
+  public SortedSet<GroupDO> getSortedGroups(final String groupIds)
+  {
+    if (StringUtils.isEmpty(groupIds) == true) {
+      return null;
+    }
+    final SortedSet<GroupDO> sortedGroups = new TreeSet<GroupDO>(groupsComparator);
+    final int[] ids = StringHelper.splitToInts(groupIds, ",", false);
+    for (final int id : ids) {
+      final GroupDO group = getUserGroupCache().getGroup(id);
+      if (group != null) {
+        sortedGroups.add(group);
+      } else {
+        log.warn("Group with id '" + id + "' not found in UserGroupCache. groupIds string was: " + groupIds);
+      }
+    }
+    return sortedGroups;
+  }
+
+  public String getGroupIds(final Collection<GroupDO> groups)
+  {
+    final StringBuffer buf = new StringBuffer();
+    boolean first = true;
+    for (final GroupDO group : groups) {
+      if (group.getId() != null) {
+        first = StringHelper.append(buf, first, String.valueOf(group.getId()), ",");
+      }
+    }
+    return buf.toString();
+  }
 
   public SortedSet<GroupDO> getSortedGroups()
   {
