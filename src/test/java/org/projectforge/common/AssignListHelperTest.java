@@ -29,7 +29,7 @@ import java.util.TreeSet;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.projectforge.web.common.AssignListHelper;
+import org.projectforge.web.common.MultiChoiceListHelper;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -40,7 +40,7 @@ public class AssignListHelperTest
   @Test
   public void execute()
   {
-    AssignListHelper<String> assignList = new AssignListHelper<String>(create("1", "2", "3", "4"), null);
+    MultiChoiceListHelper<String> assignList = new MultiChoiceListHelper<String>(create("1", "2", "3", "4"), null);
     assertSet(create(), assignList.getItemsToAssign());
     assertSet(create(), assignList.getItemsToUnassign());
     assignList.setAssignedItems(create("1"));
@@ -50,7 +50,7 @@ public class AssignListHelperTest
     assertSet(create("1", "4"), assignList.getItemsToAssign());
     assertSet(create(), assignList.getItemsToUnassign());
 
-    assignList = new AssignListHelper<String>(create("1", "2", "3", "4", "5"), create("1", "3", "5"));
+    assignList = new MultiChoiceListHelper<String>(create("1", "2", "3", "4", "5"), create("1", "3", "5"));
     assertSet(create(), assignList.getItemsToAssign());
     assertSet(create(), assignList.getItemsToUnassign());
     assignList.setAssignedItems(create("1", "2"));
