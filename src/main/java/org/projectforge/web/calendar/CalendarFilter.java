@@ -24,11 +24,13 @@
 package org.projectforge.web.calendar;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 
 import net.ftlines.wicket.fullcalendar.ViewType;
 
 import org.joda.time.DateMidnight;
+import org.projectforge.plugins.teamcal.TeamCalDO;
 import org.projectforge.user.PFUserContext;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -73,6 +75,9 @@ public class CalendarFilter implements Serializable
 
   @XStreamAsAttribute
   private ViewType viewType;
+
+  @XStreamAsAttribute
+  private Collection<TeamCalDO> assignedItems;
 
   public CalendarFilter()
   {
@@ -225,5 +230,18 @@ public class CalendarFilter implements Serializable
   public void setCurrent(final Date current)
   {
     this.current = current;
+  }
+
+  /**
+   * @param assignedItems
+   */
+  public void setAssignedtItems(final Collection<TeamCalDO> assignedItems)
+  {
+    this.assignedItems = assignedItems;
+  }
+
+  public Collection<TeamCalDO> getAssignedtItems()
+  {
+    return assignedItems;
   }
 }

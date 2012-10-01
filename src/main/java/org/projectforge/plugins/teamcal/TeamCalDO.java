@@ -43,6 +43,7 @@ import org.projectforge.user.PFUserDO;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
 @Entity
@@ -156,7 +157,7 @@ public class TeamCalDO extends DefaultBaseDO
    * @return the readOnlyAccessGroup
    */
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "readonly_access_group_id", nullable = true)
+  @JoinColumn(name = "readOnly_access_group_id", nullable = true)
   public GroupDO getReadOnlyAccessGroup()
   {
     return readOnlyAccessGroup;
@@ -183,7 +184,7 @@ public class TeamCalDO extends DefaultBaseDO
    * (perhaps including the location).
    * @return the minimalAccessGroup
    */
-  @ManyToOne(fetch = FetchType.LAZY)
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "minimal_access_group_id", nullable = true)
   public GroupDO getMinimalAccessGroup()
   {
@@ -229,12 +230,7 @@ public class TeamCalDO extends DefaultBaseDO
   {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((description == null) ? 0 : description.hashCode());
-    result = prime * result + ((fullAccessGroup == null) ? 0 : fullAccessGroup.hashCode());
-    result = prime * result + ((minimalAccessGroup == null) ? 0 : minimalAccessGroup.hashCode());
-    result = prime * result + ((owner == null) ? 0 : owner.hashCode());
-    result = prime * result + ((readOnlyAccessGroup == null) ? 0 : readOnlyAccessGroup.hashCode());
-    result = prime * result + ((title == null) ? 0 : title.hashCode());
+    result = prime * result + this.getId();
     return result;
   }
 
@@ -244,6 +240,7 @@ public class TeamCalDO extends DefaultBaseDO
   @Override
   public boolean equals(final Object obj)
   {
+    final int id = this.getId();
     if (this == obj)
       return true;
     if (obj == null)
@@ -251,37 +248,8 @@ public class TeamCalDO extends DefaultBaseDO
     if (getClass() != obj.getClass())
       return false;
     final TeamCalDO other = (TeamCalDO) obj;
-    if (title == null) {
-      if (other.title != null)
-        return false;
-    } else if (!title.equals(other.title))
+    if (id != other.getId())
       return false;
-    if (description == null) {
-      if (other.description != null)
-        return false;
-    } else if (!description.equals(other.description))
-      return false;
-    if (fullAccessGroup == null) {
-      if (other.fullAccessGroup != null)
-        return false;
-    } else if (!fullAccessGroup.equals(other.fullAccessGroup))
-      return false;
-    if (minimalAccessGroup == null) {
-      if (other.minimalAccessGroup != null)
-        return false;
-    } else if (!minimalAccessGroup.equals(other.minimalAccessGroup))
-      return false;
-    if (owner == null) {
-      if (other.owner != null)
-        return false;
-    } else if (!owner.equals(other.owner))
-      return false;
-    if (readOnlyAccessGroup == null) {
-      if (other.readOnlyAccessGroup != null)
-        return false;
-    } else if (!readOnlyAccessGroup.equals(other.readOnlyAccessGroup))
-      return false;
-
     return true;
   }
 

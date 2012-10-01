@@ -14,11 +14,12 @@ import java.sql.Timestamp;
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
- * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  *
  */
 public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEditForm, TeamEventDao>
@@ -119,8 +120,18 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       super.update();
       final PageParameters params = new PageParameters();
       params.add("id", getData().getCalendar().getId());
-      final TeamCalEditPage page = new TeamCalEditPage(params);
+      final CalendarPage page = new CalendarPage(params);
       setResponsePage(page);
+    }
+  }
+
+  @Override
+  public void setResponsePage()
+  {
+    super.setResponsePage();
+    if (returnToPage instanceof CalendarPage) {
+      // Display the date of this time sheet in the CalendarPage (usefull if the time sheet was moved).
+      ((CalendarPage) returnToPage).setStartDate(getData().getStartDate());
     }
   }
 
@@ -136,7 +147,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       super.create();
       final PageParameters params = new PageParameters();
       params.add("id", getData().getCalendar().getId());
-      final TeamCalEditPage page = new TeamCalEditPage(params);
+      final CalendarPage page = new CalendarPage(params);
       setResponsePage(page);
     }
   }
@@ -149,7 +160,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   {
     final PageParameters params = new PageParameters();
     params.add("id", getData().getCalendar().getId());
-    final TeamCalEditPage page = new TeamCalEditPage(params);
+    final CalendarPage page = new CalendarPage(params);
     setResponsePage(page);
   }
 

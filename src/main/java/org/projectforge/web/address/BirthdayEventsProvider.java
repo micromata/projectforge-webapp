@@ -57,6 +57,11 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
   private final CalendarFilter filter;
 
   /**
+   * the name of the event class.
+   */
+  public static final String EVENT_CLASS_NAME = "birth";
+
+  /**
    * @param parent For i18n.
    * @param addressDao
    * @param dataProtection If true (default) then no ages will be shown, only the names.
@@ -110,7 +115,8 @@ public class BirthdayEventsProvider extends MyFullCalendarEventsProvider
         }
       }
       final Event event = new Event().setAllDay(true);
-      final String id = "b-" + address.getId();
+      event.setClassName(EVENT_CLASS_NAME);
+      final String id = "" + address.getId();
       event.setId(id);
       event.setStart(date);
       final StringBuffer buf = new StringBuffer();

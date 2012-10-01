@@ -23,6 +23,7 @@
 
 package org.projectforge.plugins.teamcal;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -33,11 +34,13 @@ import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.user.UserRightId;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
- * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
 public class TeamEventDao extends BaseDao<TeamEventDO>
@@ -61,37 +64,58 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     return ADDITIONAL_SEARCH_FIELDS;
   }
 
-  public List<TeamEventDO> getEventList(final BaseSearchFilter filter) //throws AccessException
+  /**
+   * @see org.projectforge.core.BaseDao#getList(org.projectforge.core.BaseSearchFilter)
+   */
+  @Override
+  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+  public List<TeamEventDO> getList(final BaseSearchFilter filter)
   {
-    final TeamEventFilter myFilter;
+    final TeamEventFilter teamEventFilter;
     if (filter instanceof TeamEventFilter) {
-      myFilter = (TeamEventFilter) filter;
+      teamEventFilter = (TeamEventFilter) filter;
     } else {
-      myFilter = new TeamEventFilter();
+      teamEventFilter = new TeamEventFilter(filter);
     }
-    final QueryFilter queryFilter = buildQueryFilter(myFilter);
-    final List<TeamEventDO> result = getList(queryFilter);
-    if (result == null) {
+
+    if (teamEventFilter.getTeamCals().isEmpty())
       return null;
-    }
-    return result;
+
+    final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
+    final List<TeamEventDO> list = super.getList(qFilter);
+    return list;
   }
 
   public QueryFilter buildQueryFilter(final TeamEventFilter filter)
   {
     final QueryFilter queryFilter = new QueryFilter(filter);
-    if (filter.getTeamCalId() != null) {
+    final Collection<TeamCalDO> cals = filter.getTeamCals();
+    if (cals != null) {
       final TeamCalDO teamCal = new TeamCalDO();
       teamCal.setId(filter.getTeamCalId());
       queryFilter.add(Restrictions.eq("calendar", teamCal));
     }
+    // limit events to load to chosen date view.
     if (filter.getStartDate() != null && filter.getEndDate() != null) {
-      queryFilter.add(Restrictions.between("startDate", filter.getStartDate(), filter.getEndDate()));
-    } else if (filter.getStartDate() != null) {
-      queryFilter.add(Restrictions.ge("startDate", filter.getStartDate()));
-    } else if (filter.getEndDate() != null) {
-      queryFilter.add(Restrictions.le("startDate", filter.getEndDate()));
-    }
+      queryFilter.add(
+          Restrictions.or(
+              (Restrictions.or(
+                  Restrictions.between("startDate", filter.getStartDate(), filter.getEndDate()),
+                  Restrictions.between("endDate", filter.getStartDate(), filter.getEndDate()))
+                  ),
+                  // get events whose duration overlap with chosen duration.
+                  (Restrictions.and(
+                      Restrictions.le("startDate", filter.getStartDate()),
+                      Restrictions.ge("endDate", filter.getEndDate()))
+                      ))
+          );
+    } else
+      if (filter.getStartDate() != null) {
+        queryFilter.add(Restrictions.ge("startDate", filter.getStartDate()));
+      } else
+        if (filter.getEndDate() != null) {
+          queryFilter.add(Restrictions.le("startDate", filter.getEndDate()));
+        }
     queryFilter.addOrder(Order.desc("startDate"));
     if (log.isDebugEnabled() == true) {
       log.debug(ToStringBuilder.reflectionToString(filter));

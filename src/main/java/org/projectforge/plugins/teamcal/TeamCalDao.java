@@ -29,19 +29,17 @@ import java.util.List;
 
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.BaseDao;
-import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
 public class TeamCalDao extends BaseDao<TeamCalDO>
@@ -50,7 +48,7 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
 
   public static final String FULL_ACCESS_GROUP = "fullAccessGroup";
 
-  public static final String READ_ONLY_ACCESS_GROUP = "readonlyAccessGroup";
+  public static final String READONLY_ACCESS_GROUP = "readOnlyAccessGroup";
 
   public static final String MINIMAL_ACCESS_GROUP = "minimalAccessGroup";
 
@@ -118,23 +116,33 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
    * <p>
    * access groups:<br />
    * FULL_ACCESS_GROUP<br />
-   * READ_ONLY_ACCESS_GROUP<br />
+   * READONLY_ACCESS_GROUP<br />
    * MINIMAL_ACCESS_GROUP
    * </p>
    * 
    * @param user - where user is owner
    * @param accessGroup - where user has given access. if accessGroup == null, only get groups, where user is owner
    */
-  public List<TeamCalDO> getTeamCalsByAccess(final PFUserDO user, final String accessGroup) {
+  public List<TeamCalDO> getTeamCalsByAccess(final PFUserDO user, final String... accessGroup) {
     final QueryFilter queryFilter = new QueryFilter();
 
     if (accessGroup != null && user != null) {
       final Collection<Integer> groups = userGroupCache.getUserGroups(user);
       final Iterator<Integer> it = groups.iterator();
+
       // get teamCals where user has access
+      queryFilter.add(Restrictions.disjunction());
+      String query = "FROM TeamCalDO WHERE owner = " + user.getId();
       while (it.hasNext()) {
-        queryFilter.add(Restrictions.or(Restrictions.eq("owner", user), Restrictions.eq(accessGroup, userGroupCache.getGroup(it.next()))));
+        final GroupDO g = userGroupCache.getGroup(it.next());
+        for (int i = 0; i < accessGroup.length; i++) {
+          query = query + " OR " + accessGroup[i] + " = " + g.getId();
+        }
       }
+      query = query + "";
+      @SuppressWarnings("unchecked")
+      final List<TeamCalDO> results = getHibernateTemplate().find(query);
+      return results;
     } else {
       if (user != null) {
         // get teamCals where user is owner
@@ -145,30 +153,30 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
     return getList(queryFilter);
   }
 
-  /**
-   * @see org.projectforge.core.BaseDao#getList(org.projectforge.core.BaseSearchFilter)
-   */
-  @Override
-  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  public List<TeamCalDO> getList(final BaseSearchFilter filter)
-  {
-    final TeamCalFilter teamFilter;
-    if (filter instanceof TeamCalFilter) {
-      teamFilter = (TeamCalFilter) filter;
-    } else {
-      teamFilter = new TeamCalFilter(filter);
-      teamFilter.setOwn(true);
-    }
-
-    final QueryFilter queryFilter = new QueryFilter(teamFilter);
-
-    if (teamFilter.isOwn() == false) {
-      return getList(queryFilter);
-    } else {
-      final PFUserDO user = new PFUserDO();
-      user.setId(teamFilter.getOwnerId());
-      queryFilter.add(Restrictions.eq("owner", user));
-      return getList(queryFilter);
-    }
-  }
+  //  /**
+  //   * @see org.projectforge.core.BaseDao#getList(org.projectforge.core.BaseSearchFilter)
+  //   */
+  //  @Override
+  //  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
+  //  public List<TeamCalDO> getList(final BaseSearchFilter filter)
+  //  {
+  //    final TeamCalFilter teamFilter;
+  //    if (filter instanceof TeamCalFilter) {
+  //      teamFilter = (TeamCalFilter) filter;
+  //    } else {
+  //      teamFilter = new TeamCalFilter(filter);
+  //      teamFilter.setOwn(true);
+  //    }
+  //
+  //    final QueryFilter queryFilter = new QueryFilter(teamFilter);
+  //
+  //    if (teamFilter.isOwn() == false) {
+  //      return getList(queryFilter);
+  //    } else {
+  //      final PFUserDO user = new PFUserDO();
+  //      user.setId(teamFilter.getOwnerId());
+  //      queryFilter.add(Restrictions.eq("owner", user));
+  //      return getList(queryFilter);
+  //    }
+  //  }
 }

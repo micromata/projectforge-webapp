@@ -48,10 +48,16 @@ import org.projectforge.address.AddressDao;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.humanresources.HRPlanningDao;
+import org.projectforge.plugins.teamcal.TeamCalEventProvider;
+import org.projectforge.plugins.teamcal.TeamEventDao;
+import org.projectforge.plugins.teamcal.TeamEventEditPage;
+import org.projectforge.plugins.teamcal.TeamEventRight;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
+import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.address.AddressViewPage;
 import org.projectforge.web.address.BirthdayEventsProvider;
 import org.projectforge.web.humanresources.HRPlanningEventsProvider;
@@ -80,6 +86,12 @@ public class CalendarPanel extends Panel
   @SpringBean(name = "timesheetDao")
   private TimesheetDao timesheetDao;
 
+  @SpringBean(name = "teamEventDao")
+  private TeamEventDao teamEventDao;
+
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
+
   private MyFullCalendar calendar;
 
   private BirthdayEventsProvider birthdayEventsProvider;
@@ -90,23 +102,29 @@ public class CalendarPanel extends Panel
 
   private TimesheetEventsProvider timesheetEventsProvider;
 
+  private TeamCalEventProvider eventProvider;
+
   private CalendarFilter filter;
 
   private boolean refresh;
 
   private final JodaDatePanel currentDatePanel;
 
-  public CalendarPanel(final String id, final JodaDatePanel currentDatePanel)
+  //  private TeamCalDO teamCal;
+
+  private MyFullCalendarConfig config;
+
+  public CalendarPanel(final String id, final JodaDatePanel datePanel)
   {
     super(id);
-    this.currentDatePanel = currentDatePanel;
+    this.currentDatePanel = datePanel;
   }
 
   @SuppressWarnings("serial")
   void init(final CalendarFilter filter)
   {
     this.filter = filter;
-    final MyFullCalendarConfig config = new MyFullCalendarConfig(this);
+    config = new MyFullCalendarConfig(this);
     config.setSelectable(true);
     config.setSelectHelper(true);
     config.setLoading("function(bool) { if (bool) $(\"#loading\").show(); else $(\"#loading\").hide(); }");
@@ -129,6 +147,7 @@ public class CalendarPanel extends Panel
         if (filter.getUserId() != null) {
           parameters.add(TimesheetEditPage.PARAMETER_KEY_USER, filter.getUserId());
         }
+
         final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
         timesheetEditPage.setReturnToPage((WebPage) getPage());
         setResponsePage(timesheetEditPage);
@@ -155,6 +174,8 @@ public class CalendarPanel extends Panel
         if (log.isDebugEnabled() == true) {
           log.debug("Event drop. eventId: "
               + event.getEvent().getId()
+              + " eventClass"
+              + event.getEvent().getClassName()
               + " sourceId: "
               + event.getSource().getUuid()
               + " dayDelta: "
@@ -176,6 +197,8 @@ public class CalendarPanel extends Panel
         if (log.isDebugEnabled() == true) {
           log.debug("Event resized. eventId: "
               + event.getEvent().getId()
+              + " eventClass"
+              + event.getEvent().getClassName()
               + " sourceId: "
               + event.getSource().getUuid()
               + " dayDelta: "
@@ -191,12 +214,16 @@ public class CalendarPanel extends Panel
       protected void onEventClicked(final ClickedEvent event, final CalendarResponse response)
       {
         if (log.isDebugEnabled() == true) {
-          log.debug("Event clicked. eventId: " + event.getEvent().getId() + ", sourceId: " + event.getSource().getUuid());
+          log.debug("Event clicked. eventId: "
+              + event.getEvent().getId()
+              + " eventClass"
+              + event.getEvent().getClassName()
+              + ", sourceId: " + event.getSource().getUuid());
         }
-        final String eventId = event.getEvent().getId();
-        if (eventId != null && eventId.startsWith("ts-") == true) {
+        final String eventId = event.getEvent().getClassName();
+        if (eventId != null && eventId.equals(TimesheetEventsProvider.EVENT_CLASS_NAME) == true) {
           // User clicked on a time sheet, show the time sheet:
-          final Integer id = NumberHelper.parseInteger(eventId.substring(3));
+          final Integer id = NumberHelper.parseInteger(event.getEvent().getId());
           final PageParameters parameters = new PageParameters();
           parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
           final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
@@ -204,15 +231,27 @@ public class CalendarPanel extends Panel
           setResponsePage(timesheetEditPage);
           return;
         }
-        if (eventId != null && eventId.startsWith("b-") == true) {
+        if (eventId != null && eventId.equals(BirthdayEventsProvider.EVENT_CLASS_NAME) == true) {
           // User clicked on birthday, show the address:
-          final Integer id = NumberHelper.parseInteger(eventId.substring(2));
+          final Integer id = NumberHelper.parseInteger(event.getEvent().getId());
           final PageParameters parameters = new PageParameters();
           parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
           final AddressViewPage addressViewPage = new AddressViewPage(parameters);
           setResponsePage(addressViewPage);
           addressViewPage.setReturnToPage((WebPage) getPage());
           return;
+        }
+        if (eventId != null && eventId.equals(TeamCalEventProvider.EVENT_CLASS_NAME) == true) {
+          // User clicked on teamEvent
+          final Integer id = NumberHelper.parseInteger(event.getEvent().getId());
+          if (new TeamEventRight().hasUpdateAccess(PFUserContext.getUser(), teamEventDao.getById(id), null)) {
+            final PageParameters parameters = new PageParameters();
+            parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
+            final TeamEventEditPage teamEventPage = new TeamEventEditPage(parameters);
+            setResponsePage(teamEventPage);
+            teamEventPage.setReturnToPage((WebPage) getPage());
+            return;
+          }
         }
         response.refetchEvents();
       }
@@ -226,9 +265,13 @@ public class CalendarPanel extends Panel
         response.refetchEvents();
         setStartDate(view.getStart());
         filter.setViewType(view.getType());
+
         // Need calling getEvents for getting correct duration label, it's not predictable what will be called first: onViewDisplayed or
         // getEvents.
         timesheetEventsProvider.getEvents(view.getVisibleStart().toDateTime(), view.getVisibleEnd().toDateTime());
+        if (((CalendarPage) getPage()).form.getMultipleTeamCalList().getAssignedItems() == null)
+          eventProvider.getEvents(view.getVisibleStart().toDateTime(), view.getVisibleEnd().toDateTime());
+
         if (currentDatePanel != null) {
           currentDatePanel.getDateField().modelChanged();
           response.getTarget().add(currentDatePanel.getDateField());
@@ -277,6 +320,15 @@ public class CalendarPanel extends Panel
     // The default color of birthdays (not favorites), should be gray, see BirthdayEventsProvider for colors of birthdays of favorites.
     eventSource.setBackgroundColor("#EEEEEE");
     eventSource.setColor("#EEEEEE");
+    eventSource.setTextColor("#222222");
+    config.add(eventSource);
+
+    // TESTING TEAMCAL
+    eventSource = new EventSource();
+    eventProvider = new TeamCalEventProvider(this, teamEventDao, userGroupCache, filter);
+    eventSource.setEventsProvider(eventProvider);
+    eventSource.setBackgroundColor("#1AA118");
+    eventSource.setColor("#000000");
     eventSource.setTextColor("#222222");
     config.add(eventSource);
   }
@@ -374,7 +426,7 @@ public class CalendarPanel extends Panel
       timesheetEventsProvider.forceReload();
       birthdayEventsProvider.forceReload();
       hrPlanningEventsProvider.forceReload();
-      setConfig();
+      eventProvider.forceReload();
     }
   }
 

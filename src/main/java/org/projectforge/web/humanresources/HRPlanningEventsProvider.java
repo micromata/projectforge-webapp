@@ -56,6 +56,11 @@ public class HRPlanningEventsProvider extends MyFullCalendarEventsProvider
   private final CalendarFilter calendarFilter;
 
   /**
+   * the name of the event class.
+   */
+  public static final String EVENT_CLASS_NAME = "hrPlanning";
+
+  /**
    * @param parent For i18n.
    * @param hrPlanningDao
    * @see Component#getString(String)
@@ -112,7 +117,8 @@ public class HRPlanningEventsProvider extends MyFullCalendarEventsProvider
       log.debug("Date: " + start + ", hours=" + hours + ", duration: " + durationDays);
     }
     final Event event = new Event().setAllDay(true);
-    final String id = "p-" + entry.getId() + "-" + suffix;
+    event.setClassName(EVENT_CLASS_NAME);
+    final String id = "" + entry.getId() + "-" + suffix;
     event.setId(id);
     event.setStart(start);
     if (durationDays > 0) {

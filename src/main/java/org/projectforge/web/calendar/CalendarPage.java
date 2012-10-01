@@ -64,6 +64,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     form.setFilter(filter);
     form.init();
     calendarPanel = new CalendarPanel("cal", form.currentDatePanel);
+    calendarPanel.setOutputMarkupId(true);
     form.add(calendarPanel);
     calendarPanel.init(getFilter());
     if (pageParameters != null) {

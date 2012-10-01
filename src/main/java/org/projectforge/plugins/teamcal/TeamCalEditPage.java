@@ -10,6 +10,7 @@
 package org.projectforge.plugins.teamcal;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 
 import net.ftlines.wicket.fullcalendar.CalendarResponse;
 import net.ftlines.wicket.fullcalendar.Event;
@@ -31,6 +32,8 @@ import org.joda.time.DateTime;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.MyFullCalendar;
 import org.projectforge.web.calendar.MyFullCalendarConfig;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -40,7 +43,7 @@ import org.projectforge.web.wicket.EditPage;
 import org.projectforge.web.wicket.components.DatePickerUtils;
 
 /**
- * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
 @EditPage(defaultReturnPage = TeamCalListPage.class)
@@ -59,6 +62,9 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
 
   @SpringBean(name = "teamEventDao")
   private TeamEventDao teamEventDao;
+
+  @SpringBean(name = "userGroupCache")
+  private UserGroupCache userGroupCache;
 
   /**
    * @param parameters
@@ -221,7 +227,13 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
     myCalendar.setMarkupId("calendar");
     final EventSource eventSource = new EventSource();
     if (isNew() == false) {
-      eventProvider = new TeamCalEventProvider(this, teamCalDao, teamEventDao, getData().getId());
+      final CalendarFilter calFilter = new CalendarFilter();
+      // TODO assignedItem should be a stored list.
+      final HashSet<TeamCalDO> assignedItems = new HashSet<TeamCalDO>();
+      assignedItems.add(getData());
+      calFilter.setAssignedtItems(assignedItems);
+      //      eventFilter.setStartDate(DateTime.now().toDate());
+      eventProvider = new TeamCalEventProvider(this, teamEventDao,userGroupCache, calFilter);
       eventProvider.setUserGroupCache(userGroupCache);
       eventSource.setEventsProvider(eventProvider);
       eventSource.setEditable(true);

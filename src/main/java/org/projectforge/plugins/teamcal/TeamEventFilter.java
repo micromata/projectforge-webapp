@@ -10,13 +10,14 @@
 package org.projectforge.plugins.teamcal;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.user.PFUserDO;
 
 /**
- * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  *
  */
 public class TeamEventFilter extends BaseSearchFilter implements Serializable
@@ -26,6 +27,8 @@ public class TeamEventFilter extends BaseSearchFilter implements Serializable
   private PFUserDO user;
 
   private Integer teamCalId;
+
+  private Collection<TeamCalDO> teamCals;
 
   private Date startDate;
 
@@ -107,6 +110,22 @@ public class TeamEventFilter extends BaseSearchFilter implements Serializable
   public void setTeamCalId(final Integer teamCalId)
   {
     this.teamCalId = teamCalId;
+  }
+
+  /**
+   * @return the teamCals
+   */
+  public Collection<TeamCalDO> getTeamCals()
+  {
+    return teamCals;
+  }
+
+  /**
+   * @param teamCals the teamCals to set
+   */
+  public void setTeamCals(final Collection<TeamCalDO> teamCals)
+  {
+    this.teamCals = teamCals;
   }
 
 
