@@ -70,7 +70,7 @@ import com.vaynberg.wicket.select2.Select2MultiChoice;
 /**
  * 
  * @author M. Lauterbach (m.lauterbach@micromata.de)
- *
+ * 
  */
 public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 {
@@ -200,35 +200,44 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     durationLabel = durationPanel.getLabel4Ajax();
     fs.add(durationPanel);
 
-    final List<TeamCalDO> list = teamCalDao.getTeamCalsByAccess(getUser(),
-        TeamCalDao.FULL_ACCESS_GROUP, TeamCalDao.READONLY_ACCESS_GROUP, TeamCalDao.MINIMAL_ACCESS_GROUP);
-    gridBuilder.newColumnPanel(DivType.COL_75);
-    final FieldsetPanel listFieldSet = gridBuilder.newFieldset(getString("plugins.teamevent.teamCal"), true);
-    multipleTeamCalList = new MultiChoiceListHelper<TeamCalDO>()
-        .setComparator(new IdComparator()).setFullList(list);
-    //    schon ausgewählte teamcals -> aus teamcaldao z.b. full_access_groups
-    //    if (assignedTeamCals != null) {
-    //      for (final TeamCalDO cals : assignedTeamCals) {
-    //        multipleTeamCalList.addOriginalAssignedItem(cals).assignItem(cals);
-    //      }
-    //    }
-    final TeamCalChoiceProvider teamProvider = new TeamCalChoiceProvider();
-    final Select2MultiChoice<TeamCalDO> teamCalChoice = new Select2MultiChoice<TeamCalDO>(fs.getSelect2MultiChoiceId(),
-        new PropertyModel<Collection<TeamCalDO>>(this.multipleTeamCalList, "assignedItems"), teamProvider);
-    teamCalChoice.add(new AjaxFormComponentUpdatingBehavior("onChange") {
+    if (showTeamCalAddons()) {
+      final List<TeamCalDO> list = teamCalDao.getTeamCalsByAccess(getUser(), TeamCalDao.FULL_ACCESS_GROUP,
+          TeamCalDao.READONLY_ACCESS_GROUP, TeamCalDao.MINIMAL_ACCESS_GROUP);
+      gridBuilder.newColumnPanel(DivType.COL_75);
+      final FieldsetPanel listFieldSet = gridBuilder.newFieldset(getString("plugins.teamevent.teamCal"), true);
+      multipleTeamCalList = new MultiChoiceListHelper<TeamCalDO>().setComparator(new IdComparator()).setFullList(list);
+      // schon ausgewählte teamcals -> aus teamcaldao z.b. full_access_groups
+      // if (assignedTeamCals != null) {
+      // for (final TeamCalDO cals : assignedTeamCals) {
+      // multipleTeamCalList.addOriginalAssignedItem(cals).assignItem(cals);
+      // }
+      // }
+      final TeamCalChoiceProvider teamProvider = new TeamCalChoiceProvider();
+      final Select2MultiChoice<TeamCalDO> teamCalChoice = new Select2MultiChoice<TeamCalDO>(fs.getSelect2MultiChoiceId(),
+          new PropertyModel<Collection<TeamCalDO>>(this.multipleTeamCalList, "assignedItems"), teamProvider);
+      teamCalChoice.add(new AjaxFormComponentUpdatingBehavior("onChange") {
 
-      @Override
-      protected void onUpdate(final AjaxRequestTarget target)
-      {
-        if (multipleTeamCalList.getAssignedItems().isEmpty() == false) {
-          filter.setAssignedtItems(multipleTeamCalList.getAssignedItems());
-          setResponsePage(CalendarForm.this.getParentPage());
+        @Override
+        protected void onUpdate(final AjaxRequestTarget target)
+        {
+          if (multipleTeamCalList.getAssignedItems().isEmpty() == false) {
+            filter.setAssignedtItems(multipleTeamCalList.getAssignedItems());
+            setResponsePage(CalendarForm.this.getParentPage());
+          }
         }
-      }
-    });
-    //    listFieldSet.add(teamCalChoice);
-    listFieldSet.setVisible(false);
+      });
+      // listFieldSet.add(teamCalChoice);
+      listFieldSet.setVisible(false);
+    }
 
+  }
+
+  /**
+   * TODO currently hide teamcal features
+   * @return
+   */
+  private boolean showTeamCalAddons() {
+    return false;
   }
 
   private boolean isOtherUsersAllowed()
@@ -271,9 +280,10 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
    * compare ids
    * 
    * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
-   *
+   * 
    */
-  private class IdComparator implements Comparator<TeamCalDO>, Serializable{
+  private class IdComparator implements Comparator<TeamCalDO>, Serializable
+  {
 
     private static final long serialVersionUID = 5501418454944208820L;
 

@@ -110,7 +110,7 @@ public class CalendarPanel extends Panel
 
   private final JodaDatePanel currentDatePanel;
 
-  //  private TeamCalDO teamCal;
+  // private TeamCalDO teamCal;
 
   private MyFullCalendarConfig config;
 
@@ -218,7 +218,8 @@ public class CalendarPanel extends Panel
               + event.getEvent().getId()
               + " eventClass"
               + event.getEvent().getClassName()
-              + ", sourceId: " + event.getSource().getUuid());
+              + ", sourceId: "
+              + event.getSource().getUuid());
         }
         final String eventId = event.getEvent().getClassName();
         if (eventId != null && eventId.equals(TimesheetEventsProvider.EVENT_CLASS_NAME) == true) {
@@ -269,7 +270,8 @@ public class CalendarPanel extends Panel
         // Need calling getEvents for getting correct duration label, it's not predictable what will be called first: onViewDisplayed or
         // getEvents.
         timesheetEventsProvider.getEvents(view.getVisibleStart().toDateTime(), view.getVisibleEnd().toDateTime());
-        if (((CalendarPage) getPage()).form.getMultipleTeamCalList().getAssignedItems() == null)
+        final CalendarForm tempForm = ((CalendarPage) getPage()).form;
+        if (tempForm != null && tempForm.getMultipleTeamCalList() != null && tempForm.getMultipleTeamCalList().getAssignedItems() == null)
           eventProvider.getEvents(view.getVisibleStart().toDateTime(), view.getVisibleEnd().toDateTime());
 
         if (currentDatePanel != null) {
@@ -333,7 +335,8 @@ public class CalendarPanel extends Panel
     config.add(eventSource);
   }
 
-  private void modifyEvent(final Event event, final DateTime newStartTime, final DateTime newEndTime, final CalendarDropMode dropMode, final CalendarResponse response)
+  private void modifyEvent(final Event event, final DateTime newStartTime, final DateTime newEndTime, final CalendarDropMode dropMode,
+      final CalendarResponse response)
   {
     final String eventId = event.getId();
     if (eventId != null && eventId.startsWith("ts-") == true) {
@@ -360,10 +363,10 @@ public class CalendarPanel extends Panel
       }
 
       // update start and end time
-      if(newStartTime != null) {
+      if (newStartTime != null) {
         dbTimesheet.setStartTime(new Timestamp(newStartTime.getMillis()));
       }
-      if(newEndTime != null) {
+      if (newEndTime != null) {
         dbTimesheet.setStopTime(new Timestamp(newEndTime.getMillis()));
       }
 
@@ -393,7 +396,7 @@ public class CalendarPanel extends Panel
         setResponsePage(timesheetEditPage);
       } else if (CalendarDropMode.MOVE_SAVE.equals(dropMode) || CalendarDropMode.COPY_SAVE.equals(dropMode)) {
         // second mode: "quick save mode"
-        if(CalendarDropMode.MOVE_SAVE.equals(dropMode)) {
+        if (CalendarDropMode.MOVE_SAVE.equals(dropMode)) {
           // we need update only in "move" mode, in "copy" mode it was saved a few lines above
           timesheetDao.update(dbTimesheet);
         }

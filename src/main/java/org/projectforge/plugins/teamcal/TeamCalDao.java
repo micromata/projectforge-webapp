@@ -35,6 +35,8 @@ import org.projectforge.user.GroupDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightId;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 
@@ -42,6 +44,7 @@ import org.projectforge.user.UserRightId;
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
+@Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
 public class TeamCalDao extends BaseDao<TeamCalDO>
 {
   public static final UserRightId USER_RIGHT_ID = new UserRightId("PLUGIN_CALENDAR", "plugin15", "plugins.teamcal.calendar");
