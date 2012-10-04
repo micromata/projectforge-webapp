@@ -76,6 +76,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 {
   private static final long serialVersionUID = -145923669780937370L;
 
+  private static final String TEAMCAL_KEY = "CalendarPage.calendarFilter";
+
   @SpringBean(name = "accessChecker")
   private AccessChecker accessChecker;
 
@@ -99,7 +101,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 
   protected Label durationLabel;
 
-  MultiChoiceListHelper<TeamCalDO> multipleTeamCalList;
+  private MultiChoiceListHelper<TeamCalDO> multipleTeamCalList;
 
   @SuppressWarnings("serial")
   @Override
@@ -204,9 +206,16 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       final List<TeamCalDO> list = teamCalDao.getTeamCalsByAccess(getUser(), TeamCalDao.FULL_ACCESS_GROUP,
           TeamCalDao.READONLY_ACCESS_GROUP, TeamCalDao.MINIMAL_ACCESS_GROUP);
       gridBuilder.newColumnPanel(DivType.COL_75);
+
+      // get users last filter settings
+      multipleTeamCalList = ((MultiChoiceListHelper<TeamCalDO>) parentPage.getUserPrefEntry(TEAMCAL_KEY));
+      if (multipleTeamCalList == null) {
+        multipleTeamCalList = new MultiChoiceListHelper<TeamCalDO>().setComparator(new IdComparator()).setFullList(list);
+        parentPage.putUserPrefEntry(TEAMCAL_KEY, multipleTeamCalList, true);
+      }
+
       final FieldsetPanel listFieldSet = gridBuilder.newFieldset(getString("plugins.teamevent.teamCal"), true);
-      multipleTeamCalList = new MultiChoiceListHelper<TeamCalDO>().setComparator(new IdComparator()).setFullList(list);
-      // schon ausgewählte teamcals -> aus teamcaldao z.b. full_access_groups
+      // TODO schon ausgewählte teamcals -> aus teamcaldao z.b. full_access_groups
       // if (assignedTeamCals != null) {
       // for (final TeamCalDO cals : assignedTeamCals) {
       // multipleTeamCalList.addOriginalAssignedItem(cals).assignItem(cals);
@@ -226,8 +235,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
           }
         }
       });
-      // listFieldSet.add(teamCalChoice);
-      listFieldSet.setVisible(false);
+      listFieldSet.add(teamCalChoice);
+      //      listFieldSet.setVisible(false);
     }
 
   }
@@ -237,7 +246,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
    * @return
    */
   private boolean showTeamCalAddons() {
-    return false;
+    return true;
   }
 
   private boolean isOtherUsersAllowed()

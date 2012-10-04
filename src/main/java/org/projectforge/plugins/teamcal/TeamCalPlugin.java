@@ -32,7 +32,7 @@ import org.projectforge.web.MenuItemDefId;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
- * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  */
 public class TeamCalPlugin extends AbstractPlugin
 {
@@ -78,7 +78,6 @@ public class TeamCalPlugin extends AbstractPlugin
 
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-
     registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.teamcal.menu", TeamCalListPage.class));
 
     // .setMobileMenu(ToDoMobileListPage.class, 10));
@@ -92,7 +91,6 @@ public class TeamCalPlugin extends AbstractPlugin
 
     // Register favorite entries (the user can modify these templates/favorites via 'own settings'):
     USER_PREF_AREA = registerUserPrefArea("TEAMCAL_FAVORITE", TeamCalDO.class, "teamcal.favorite");
-    //    USER_PREF_AREA = registerUserPrefArea("TEAMCAL_FAVORITE", TeamEventDO.class, "teamcal.favorite");
   }
 
   /**

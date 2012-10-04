@@ -227,12 +227,11 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
     myCalendar.setMarkupId("calendar");
     final EventSource eventSource = new EventSource();
     if (isNew() == false) {
+      // init calendar
       final CalendarFilter calFilter = new CalendarFilter();
-      // TODO assignedItem should be a stored list.
       final HashSet<TeamCalDO> assignedItems = new HashSet<TeamCalDO>();
       assignedItems.add(getData());
       calFilter.setAssignedtItems(assignedItems);
-      //      eventFilter.setStartDate(DateTime.now().toDate());
       eventProvider = new TeamCalEventProvider(this, teamEventDao,userGroupCache, calFilter);
       eventProvider.setUserGroupCache(userGroupCache);
       eventSource.setEventsProvider(eventProvider);
