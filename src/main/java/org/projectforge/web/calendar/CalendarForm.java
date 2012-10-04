@@ -246,7 +246,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
    * @return
    */
   private boolean showTeamCalAddons() {
-    return true;
+    return false;
   }
 
   private boolean isOtherUsersAllowed()
