@@ -484,4 +484,13 @@ h2.box_head .subtitle {
 .select2-container{
   overflow:hidden;
   height:auto!important;
+  border-right: 1px solid #AAA;
+}
+
+.select2-container-active {
+  border-right: 1px solid #5897fb ;
+}
+
+.select2-input {
+  height: 24px!important;
 }
