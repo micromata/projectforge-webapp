@@ -50,11 +50,18 @@ public class LdapUserDao extends LdapPersonDao
 
   static final String DEACTIVATED_MAIL = "deactivated@devnull.com";
 
+  private boolean useUidInDn = false;
+
   public static boolean isDeactivated(final LdapPerson user)
   {
     return user.isDeactivated()
         || user.getOrganizationalUnit() != null
         && LdapUtils.getOu(user.getOrganizationalUnit()).contains(DEACTIVATED_SUB_CONTEXT) == true;
+  }
+
+  public LdapUserDao()
+  {
+    useUidInDn = true;
   }
 
   /**
@@ -278,6 +285,19 @@ public class LdapUserDao extends LdapPersonDao
     } catch (final Exception ex) {
       log.error("User '" + username + "' (" + dn + ") with invalid credentials.");
       return false;
+    }
+  }
+
+  /**
+   * @see org.projectforge.ldap.LdapDao#buildDnIdentifier(org.projectforge.ldap.LdapObject)
+   */
+  @Override
+  protected String buildDnIdentifier(final LdapPerson obj)
+  {
+    if (useUidInDn == true) {
+      return "uid=" + obj.getUid();
+    } else {
+      return "cn=" + LdapUtils.escapeCommonName(obj.getCommonName());
     }
   }
 }

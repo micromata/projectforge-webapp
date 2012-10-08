@@ -329,8 +329,8 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     final String origOu = LdapUtils.getOu(origObject.getOrganizationalUnit());
     if (StringUtils.equals(origOu, ou) == false) {
       log.info("Move object with id '" + obj.getId() + "' from '" + origOu + "' to '" + ou);
-      ctx.rename("cn=" + LdapUtils.escapeCommonName(obj.getCommonName()) + "," + origOu,
-          "cn=" + LdapUtils.escapeCommonName(obj.getCommonName()) + "," + ou);
+      final String dnIdentifier = buildDnIdentifier(obj);
+      ctx.rename(dnIdentifier + "," + origOu, dnIdentifier + "," + ou);
     }
   }
 
@@ -457,6 +457,16 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
   }
 
   /**
+   * At default the identifier in dn is cn (cn=xxx,ou=yyy,ou=zzz). But for users the dn is may-be (uid=xxx,ou=yyy,ou=zzz).
+   * @param obj
+   * @return
+   */
+  protected String buildDnIdentifier(final T obj)
+  {
+    return "cn=" + LdapUtils.escapeCommonName(obj.getCommonName());
+  }
+
+  /**
    * Sets dn of object and organizationalUnit if not already given.
    * @param ouBase If {@link T#getOrganizationalUnit()} is not given, ouBase is used for building dn, otherwise ouBase is ignored.
    * @param obj
@@ -465,7 +475,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
   protected String buildDn(final String ouBase, final T obj)
   {
     final StringBuffer buf = new StringBuffer();
-    buf.append("cn=").append(LdapUtils.escapeCommonName(obj.getCommonName()));
+    buf.append(buildDnIdentifier(obj));
     if (obj.getOrganizationalUnit() != null) {
       buf.append(',');
       LdapUtils.buildOu(buf, obj.getOrganizationalUnit());
