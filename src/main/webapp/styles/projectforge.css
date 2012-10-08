@@ -471,8 +471,17 @@ h2.box_head .subtitle {
 	font-size: .9em;
 }
 /**
- * adaption of adminica for select
+ * adaption of adminica for select2
  */
 .select2-container ul li a {
   padding-top: 0px;
+}
+.select2-choices{
+  overflow:hidden!important;
+  float:left;
+  width:100%!important;
+}
+.select2-container{
+  overflow:hidden;
+  height:auto!important;
 }
