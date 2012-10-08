@@ -37,7 +37,7 @@ public class TeamCalendarPage extends AbstractSecuredPage implements ISelectCall
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalendarPage.class);
 
-  private static final String USERPREF_KEY = "CalendarPage.userPrefs";
+  private static final String USERPREF_KEY = "TeamCalendarPage.userPrefs";
 
   protected TeamCalendarForm form;
 
