@@ -23,13 +23,6 @@
 
 package org.projectforge.web.calendar;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-
-import org.apache.wicket.ajax.AjaxRequestTarget;
-import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.link.ExternalLink;
@@ -40,16 +33,12 @@ import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateMidnight;
 import org.projectforge.access.AccessChecker;
-import org.projectforge.plugins.teamcal.TeamCalChoiceProvider;
-import org.projectforge.plugins.teamcal.TeamCalDO;
-import org.projectforge.plugins.teamcal.TeamCalDao;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.WebConfiguration;
-import org.projectforge.web.common.MultiChoiceListHelper;
 import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractForm;
 import org.projectforge.web.wicket.WicketUtils;
@@ -65,18 +54,9 @@ import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
-import com.vaynberg.wicket.select2.Select2MultiChoice;
-
-/**
- * 
- * @author M. Lauterbach (m.lauterbach@micromata.de)
- * 
- */
 public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
 {
   private static final long serialVersionUID = -145923669780937370L;
-
-  private static final String TEAMCAL_KEY = "CalendarPage.calendarFilter";
 
   @SpringBean(name = "accessChecker")
   private AccessChecker accessChecker;
@@ -87,9 +67,6 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
-  @SpringBean(name = "teamCalDao")
-  private TeamCalDao teamCalDao;
-
   private CalendarFilter filter;
 
   private GridBuilder gridBuilder;
@@ -97,11 +74,9 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   @SuppressWarnings("unused")
   private boolean showTimesheets;
 
-  protected JodaDatePanel currentDatePanel;
+  JodaDatePanel currentDatePanel;
 
-  protected Label durationLabel;
-
-  private MultiChoiceListHelper<TeamCalDO> multipleTeamCalList;
+  Label durationLabel;
 
   @SuppressWarnings("serial")
   @Override
@@ -201,52 +176,6 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     }));
     durationLabel = durationPanel.getLabel4Ajax();
     fs.add(durationPanel);
-
-    if (showTeamCalAddons()) {
-      final List<TeamCalDO> list = teamCalDao.getTeamCalsByAccess(getUser(), TeamCalDao.FULL_ACCESS_GROUP,
-          TeamCalDao.READONLY_ACCESS_GROUP, TeamCalDao.MINIMAL_ACCESS_GROUP);
-      gridBuilder.newColumnPanel(DivType.COL_75);
-
-      // get users last filter settings
-      multipleTeamCalList = ((MultiChoiceListHelper<TeamCalDO>) parentPage.getUserPrefEntry(TEAMCAL_KEY));
-      if (multipleTeamCalList == null) {
-        multipleTeamCalList = new MultiChoiceListHelper<TeamCalDO>().setComparator(new IdComparator()).setFullList(list);
-        parentPage.putUserPrefEntry(TEAMCAL_KEY, multipleTeamCalList, true);
-      }
-
-      final FieldsetPanel listFieldSet = gridBuilder.newFieldset(getString("plugins.teamevent.teamCal"), true);
-      // TODO schon ausgewählte teamcals -> aus teamcaldao z.b. full_access_groups
-      // if (assignedTeamCals != null) {
-      // for (final TeamCalDO cals : assignedTeamCals) {
-      // multipleTeamCalList.addOriginalAssignedItem(cals).assignItem(cals);
-      // }
-      // }
-      final TeamCalChoiceProvider teamProvider = new TeamCalChoiceProvider();
-      final Select2MultiChoice<TeamCalDO> teamCalChoice = new Select2MultiChoice<TeamCalDO>(fs.getSelect2MultiChoiceId(),
-          new PropertyModel<Collection<TeamCalDO>>(this.multipleTeamCalList, "assignedItems"), teamProvider);
-      teamCalChoice.add(new AjaxFormComponentUpdatingBehavior("onChange") {
-
-        @Override
-        protected void onUpdate(final AjaxRequestTarget target)
-        {
-          if (multipleTeamCalList.getAssignedItems().isEmpty() == false) {
-            filter.setAssignedtItems(multipleTeamCalList.getAssignedItems());
-            setResponsePage(CalendarForm.this.getParentPage());
-          }
-        }
-      });
-      listFieldSet.add(teamCalChoice);
-      //      listFieldSet.setVisible(false);
-    }
-
-  }
-
-  /**
-   * TODO currently hide teamcal features
-   * @return
-   */
-  private boolean showTeamCalAddons() {
-    return false;
   }
 
   private boolean isOtherUsersAllowed()
@@ -283,47 +212,5 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     } else {
       filter.setUserId(user.getId());
     }
-  }
-
-  /**
-   * compare ids
-   * 
-   * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
-   * 
-   */
-  private class IdComparator implements Comparator<TeamCalDO>, Serializable
-  {
-
-    private static final long serialVersionUID = 5501418454944208820L;
-
-    /**
-     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
-     */
-    @Override
-    public int compare(final TeamCalDO arg0, final TeamCalDO arg1)
-    {
-      final Integer n1 = arg0.getId() != null ? arg0.getId() : 0;
-
-      final Integer n2 = arg1.getId() != null ? arg1.getId() : 0;
-
-      return n1.compareTo(n2);
-    }
-  }
-
-  /**
-   * @return the multipleTeamCalList
-   */
-  public MultiChoiceListHelper<TeamCalDO> getMultipleTeamCalList()
-  {
-    return multipleTeamCalList;
-  }
-
-  /**
-   * @param multipleTeamCalList the multipleTeamCalList to set
-   * @return this for chaining.
-   */
-  public void setMultipleTeamCalList(final MultiChoiceListHelper<TeamCalDO> multipleTeamCalList)
-  {
-    this.multipleTeamCalList = multipleTeamCalList;
   }
 }
