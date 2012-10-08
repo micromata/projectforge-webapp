@@ -126,7 +126,7 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
       fs.add(users);
     }
     {
-      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("group.nestedGroupsAllowed.tooltip"), "nestedGroupsAllowed", new PropertyModel<Boolean>(data,
+      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("group.nestedGroupsAllowed"), "nestedGroupsAllowed", new PropertyModel<Boolean>(data,
           "nestedGroupsAllowed"), getString("group.nestedGroupsAllowed.tooltip"));
     }
     {
