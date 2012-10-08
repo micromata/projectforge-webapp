@@ -33,7 +33,6 @@ import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
-import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.MyFullCalendar;
 import org.projectforge.web.calendar.MyFullCalendarConfig;
 import org.projectforge.web.fibu.ISelectCallerPage;
@@ -228,7 +227,7 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
     final EventSource eventSource = new EventSource();
     if (isNew() == false) {
       // init calendar
-      final CalendarFilter calFilter = new CalendarFilter();
+      final TeamCalendarFilter calFilter = new TeamCalendarFilter();
       final HashSet<TeamCalDO> assignedItems = new HashSet<TeamCalDO>();
       assignedItems.add(getData());
       calFilter.setAssignedtItems(assignedItems);

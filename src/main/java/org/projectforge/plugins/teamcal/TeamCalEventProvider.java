@@ -23,7 +23,6 @@ import org.joda.time.Days;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
-import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.MyFullCalendarEventsProvider;
 
 /**
@@ -46,7 +45,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
   private int days;
 
-  private final CalendarFilter filter;
+  private final TeamCalendarFilter filter;
 
   /**
    * the name of the event class.
@@ -56,7 +55,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
   /**
    * @param parent component for i18n
    */
-  public TeamCalEventProvider(final Component parent, final TeamEventDao teamEventDao, final UserGroupCache userGroupCache, final CalendarFilter filter)
+  public TeamCalEventProvider(final Component parent, final TeamEventDao teamEventDao, final UserGroupCache userGroupCache, final TeamCalendarFilter filter)
   {
     super(parent);
     this.filter = filter;
