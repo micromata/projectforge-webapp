@@ -470,3 +470,9 @@ h2.box_head .subtitle {
 	font-weight: normal;
 	font-size: .9em;
 }
+/**
+ * adaption of adminica for select
+ */
+.select2-container ul li a {
+  padding-top: 0px;
+}
