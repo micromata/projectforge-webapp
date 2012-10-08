@@ -62,7 +62,7 @@ public class TeamCalPluginUpdates
         //         Create initial data-base table:
         if (dao.doesExist(calendarTable) == false) {
           calendarTable.addDefaultBaseDOAttributes().addAttributes("owner", "fullAccessGroup", "readOnlyAccessGroup", "minimalAccessGroup",
-              "description");
+              "description", "title");
           dao.createTable(calendarTable);
         }
         if (dao.doesExist(eventTable) == false) {
