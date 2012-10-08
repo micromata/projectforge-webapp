@@ -83,7 +83,8 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
       return null;
 
     final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
-    final List<TeamEventDO> list = super.getList(qFilter);
+
+    final List<TeamEventDO> list = getList(qFilter);
     return list;
   }
 

@@ -155,31 +155,4 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
     }
     return getList(queryFilter);
   }
-
-  //  /**
-  //   * @see org.projectforge.core.BaseDao#getList(org.projectforge.core.BaseSearchFilter)
-  //   */
-  //  @Override
-  //  @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
-  //  public List<TeamCalDO> getList(final BaseSearchFilter filter)
-  //  {
-  //    final TeamCalFilter teamFilter;
-  //    if (filter instanceof TeamCalFilter) {
-  //      teamFilter = (TeamCalFilter) filter;
-  //    } else {
-  //      teamFilter = new TeamCalFilter(filter);
-  //      teamFilter.setOwn(true);
-  //    }
-  //
-  //    final QueryFilter queryFilter = new QueryFilter(teamFilter);
-  //
-  //    if (teamFilter.isOwn() == false) {
-  //      return getList(queryFilter);
-  //    } else {
-  //      final PFUserDO user = new PFUserDO();
-  //      user.setId(teamFilter.getOwnerId());
-  //      queryFilter.add(Restrictions.eq("owner", user));
-  //      return getList(queryFilter);
-  //    }
-  //  }
 }

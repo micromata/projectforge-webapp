@@ -84,6 +84,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
     eventFilter.setTeamCals(filter.getAssignedtItems());
     eventFilter.setStartDate(start.toDate());
     eventFilter.setEndDate(end.toDate());
+    eventFilter.setUser(PFUserContext.getUser());
 
     final List<List<TeamEventDO>> eventLists = new ArrayList<List<TeamEventDO>>();
     if (filter.getAssignedtItems() != null) {

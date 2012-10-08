@@ -20,7 +20,7 @@ import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 
 /**
- * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  *
  */
 public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalListPage>
@@ -52,7 +52,6 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
     super.init();
     gridBuilder.newColumnsPanel();
     gridBuilder.newColumnPanel(DivType.COL_66);
-    // TODO add i18nKeys
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
       final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), new Model<PFUserDO>() {
@@ -95,18 +94,6 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
 
     checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
         new PropertyModel<Boolean>(getSearchFilter(), "own"), "Meine Kalender"));
-
-    //    checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-    //        new PropertyModel<Boolean>(getSearchFilter(), "mySubscribedCalendars"), "Meine Abos"));
-    //
-    //    checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-    //        new PropertyModel<Boolean>(getSearchFilter(), "availableCalendars"), "verfügbare Kalender"));
-    //
-    //    checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-    //        new PropertyModel<Boolean>(getSearchFilter(), "allMyCalendars"), "alle meine Kalender"));
-    //
-    //    checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
-    //        new PropertyModel<Boolean>(getSearchFilter(), "allCalendars"), "alle Kalender"));
   }
 
   /**

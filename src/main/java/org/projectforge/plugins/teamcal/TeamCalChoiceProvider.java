@@ -13,8 +13,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.wicket.injection.Injector;
+import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
-import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserContext;
 
 import com.vaynberg.wicket.select2.Response;
@@ -33,7 +34,13 @@ public class TeamCalChoiceProvider extends TextChoiceProvider<TeamCalDO>
 
   private static int RESULT_PAGE_SIZE = 20;
 
-  private transient TeamCalDao teamCalDao;
+  @SpringBean
+  private TeamCalDao teamCalDao;
+
+  public TeamCalChoiceProvider()
+  {
+    Injector.get().inject(this);
+  }
 
   /**
    * @see com.vaynberg.wicket.select2.TextChoiceProvider#getDisplayText(java.lang.Object)
@@ -111,8 +118,6 @@ public class TeamCalChoiceProvider extends TextChoiceProvider<TeamCalDO>
   }
 
   private TeamCalDao getTeamCalDao() {
-    if (teamCalDao == null)
-      teamCalDao = (TeamCalDao) Registry.instance().getDao(TeamCalDao.class);
     return teamCalDao;
   }
 

@@ -33,7 +33,7 @@ import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
 
 /**
- * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
 @ListPage(editPage = TeamCalEditPage.class)

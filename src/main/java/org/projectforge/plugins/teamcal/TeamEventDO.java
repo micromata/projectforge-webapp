@@ -48,6 +48,7 @@ import org.projectforge.database.Constants;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  * 
  */
 @Entity
