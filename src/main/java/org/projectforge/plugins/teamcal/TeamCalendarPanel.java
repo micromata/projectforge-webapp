@@ -210,20 +210,22 @@ public class TeamCalendarPanel extends Panel
       }
 
       @Override
-      protected void onEventClicked(final ClickedEvent event, final CalendarResponse response)
+      protected void onEventClicked(final ClickedEvent clickedEvent, final CalendarResponse response)
       {
+        final Event event = clickedEvent.getEvent();
+        final String eventId = event != null ? event.getId() : null;
+        final String eventClassName = event != null ? event.getClassName() : null;
         if (log.isDebugEnabled() == true) {
           log.debug("Event clicked. eventId: "
-              + event.getEvent().getId()
+              + eventId
               + " eventClass"
-              + event.getEvent().getClassName()
+              + event.getClassName()
               + ", sourceId: "
-              + event.getSource().getUuid());
+              + clickedEvent.getSource().getUuid());
         }
-        final String eventId = event.getEvent().getClassName();
-        if (eventId != null && eventId.equals(TimesheetEventsProvider.EVENT_CLASS_NAME) == true) {
+        if (eventId != null && TimesheetEventsProvider.EVENT_CLASS_NAME.equals(eventClassName) == true) {
           // User clicked on a time sheet, show the time sheet:
-          final Integer id = NumberHelper.parseInteger(event.getEvent().getId());
+          final Integer id = NumberHelper.parseInteger(eventId);
           final PageParameters parameters = new PageParameters();
           parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
           final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
@@ -231,9 +233,9 @@ public class TeamCalendarPanel extends Panel
           setResponsePage(timesheetEditPage);
           return;
         }
-        if (eventId != null && eventId.equals(BirthdayEventsProvider.EVENT_CLASS_NAME) == true) {
+        if (eventId != null && BirthdayEventsProvider.EVENT_CLASS_NAME.equals(eventClassName) == true) {
           // User clicked on birthday, show the address:
-          final Integer id = NumberHelper.parseInteger(event.getEvent().getId());
+          final Integer id = NumberHelper.parseInteger(eventId);
           final PageParameters parameters = new PageParameters();
           parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
           final AddressViewPage addressViewPage = new AddressViewPage(parameters);
@@ -241,9 +243,9 @@ public class TeamCalendarPanel extends Panel
           addressViewPage.setReturnToPage((WebPage) getPage());
           return;
         }
-        if (eventId != null && eventId.equals(TeamCalEventProvider.EVENT_CLASS_NAME) == true) {
+        if (eventId != null && TeamCalEventProvider.EVENT_CLASS_NAME.equals(eventClassName) == true) {
           // User clicked on teamEvent
-          final Integer id = NumberHelper.parseInteger(event.getEvent().getId());
+          final Integer id = NumberHelper.parseInteger(eventId);
           if (new TeamEventRight().hasUpdateAccess(PFUserContext.getUser(), teamEventDao.getById(id), null)) {
             final PageParameters parameters = new PageParameters();
             parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
@@ -337,10 +339,11 @@ public class TeamCalendarPanel extends Panel
   private void modifyEvent(final Event event, final DateTime newStartTime, final DateTime newEndTime, final CalendarDropMode dropMode,
       final CalendarResponse response)
   {
-    final String eventId = event.getId();
-    if (eventId != null && eventId.startsWith("ts-") == true) {
+    final String eventId = event != null ? event.getId() : null;
+    final String eventClassName = event != null ? event.getClassName() : null;
+    if (eventId != null && TimesheetEventsProvider.EVENT_CLASS_NAME.equals(eventClassName) == true) {
       // User clicked on a time sheet, show the time sheet:
-      final Integer id = NumberHelper.parseInteger(eventId.substring(3));
+      final Integer id = NumberHelper.parseInteger(eventId);
       final TimesheetDO dbTimesheet = timesheetDao.internalGetById(id);
       if (dbTimesheet == null) {
         return;

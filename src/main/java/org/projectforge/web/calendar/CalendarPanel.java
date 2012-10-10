@@ -155,6 +155,8 @@ public class CalendarPanel extends Panel
         if (log.isDebugEnabled() == true) {
           log.debug("Event drop. eventId: "
               + event.getEvent().getId()
+              + " eventClass"
+              + event.getEvent().getClassName()
               + " sourceId: "
               + event.getSource().getUuid()
               + " dayDelta: "
@@ -176,6 +178,8 @@ public class CalendarPanel extends Panel
         if (log.isDebugEnabled() == true) {
           log.debug("Event resized. eventId: "
               + event.getEvent().getId()
+              + " eventClass"
+              + event.getEvent().getClassName()
               + " sourceId: "
               + event.getSource().getUuid()
               + " dayDelta: "
@@ -188,15 +192,22 @@ public class CalendarPanel extends Panel
       }
 
       @Override
-      protected void onEventClicked(final ClickedEvent event, final CalendarResponse response)
+      protected void onEventClicked(final ClickedEvent clickedEvent, final CalendarResponse response)
       {
+        final Event event = clickedEvent.getEvent();
+        final String eventId = event != null ? event.getId() : null;
+        final String eventClassName = event != null ? event.getClassName() : null;
         if (log.isDebugEnabled() == true) {
-          log.debug("Event clicked. eventId: " + event.getEvent().getId() + ", sourceId: " + event.getSource().getUuid());
+          log.debug("Event clicked. eventId: "
+              + eventId
+              + " eventClass"
+              + event.getClassName()
+              + ", sourceId: "
+              + clickedEvent.getSource().getUuid());
         }
-        final String eventId = event.getEvent().getId();
-        if (eventId != null && eventId.startsWith("ts-") == true) {
+        if (eventId != null && TimesheetEventsProvider.EVENT_CLASS_NAME.equals(eventClassName) == true) {
           // User clicked on a time sheet, show the time sheet:
-          final Integer id = NumberHelper.parseInteger(eventId.substring(3));
+          final Integer id = NumberHelper.parseInteger(eventId);
           final PageParameters parameters = new PageParameters();
           parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
           final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
@@ -204,9 +215,9 @@ public class CalendarPanel extends Panel
           setResponsePage(timesheetEditPage);
           return;
         }
-        if (eventId != null && eventId.startsWith("b-") == true) {
+        if (eventId != null && BirthdayEventsProvider.EVENT_CLASS_NAME.equals(eventClassName) == true) {
           // User clicked on birthday, show the address:
-          final Integer id = NumberHelper.parseInteger(eventId.substring(2));
+          final Integer id = NumberHelper.parseInteger(eventId);
           final PageParameters parameters = new PageParameters();
           parameters.add(AbstractEditPage.PARAMETER_KEY_ID, id);
           final AddressViewPage addressViewPage = new AddressViewPage(parameters);
@@ -281,12 +292,14 @@ public class CalendarPanel extends Panel
     config.add(eventSource);
   }
 
-  private void modifyEvent(final Event event, final DateTime newStartTime, final DateTime newEndTime, final CalendarDropMode dropMode, final CalendarResponse response)
+  private void modifyEvent(final Event event, final DateTime newStartTime, final DateTime newEndTime, final CalendarDropMode dropMode,
+      final CalendarResponse response)
   {
-    final String eventId = event.getId();
-    if (eventId != null && eventId.startsWith("ts-") == true) {
+    final String eventId = event != null ? event.getId() : null;
+    final String eventClassName = event != null ? event.getClassName() : null;
+    if (eventId != null && TimesheetEventsProvider.EVENT_CLASS_NAME.equals(eventClassName) == true) {
       // User clicked on a time sheet, show the time sheet:
-      final Integer id = NumberHelper.parseInteger(eventId.substring(3));
+      final Integer id = NumberHelper.parseInteger(eventId);
       final TimesheetDO dbTimesheet = timesheetDao.internalGetById(id);
       if (dbTimesheet == null) {
         return;
@@ -308,10 +321,10 @@ public class CalendarPanel extends Panel
       }
 
       // update start and end time
-      if(newStartTime != null) {
+      if (newStartTime != null) {
         dbTimesheet.setStartTime(new Timestamp(newStartTime.getMillis()));
       }
-      if(newEndTime != null) {
+      if (newEndTime != null) {
         dbTimesheet.setStopTime(new Timestamp(newEndTime.getMillis()));
       }
 
@@ -341,7 +354,7 @@ public class CalendarPanel extends Panel
         setResponsePage(timesheetEditPage);
       } else if (CalendarDropMode.MOVE_SAVE.equals(dropMode) || CalendarDropMode.COPY_SAVE.equals(dropMode)) {
         // second mode: "quick save mode"
-        if(CalendarDropMode.MOVE_SAVE.equals(dropMode)) {
+        if (CalendarDropMode.MOVE_SAVE.equals(dropMode)) {
           // we need update only in "move" mode, in "copy" mode it was saved a few lines above
           timesheetDao.update(dbTimesheet);
         }
