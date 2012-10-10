@@ -118,8 +118,24 @@ public class PFUserDOConverter
    */
   public static boolean copyUserFields(final LdapPerson src, final LdapPerson dest)
   {
+    setMailNullArray(src);
+    setMailNullArray(dest);
     final boolean modified = BeanHelper.copyProperties(src, dest, true, "uid", "givenName", "surname", "mail", "description",
         "organization", "deactivated");
     return modified;
+  }
+
+  static void setMailNullArray(final LdapPerson person)
+  {
+    if (person.getMail() == null) {
+      return;
+    }
+    for (final String mail : person.getMail()) {
+      if (mail != null) {
+        return;
+      }
+    }
+    // All array entries are null, therefore set the mail value itself to null:
+    person.setMail((String[])null);
   }
 }

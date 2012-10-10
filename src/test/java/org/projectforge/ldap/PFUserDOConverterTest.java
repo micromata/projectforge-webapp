@@ -128,6 +128,19 @@ public class PFUserDOConverterTest
     Assert.assertTrue(PFUserDOConverter.copyUserFields(src, createLdapUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "")));
   }
 
+  @Test
+  public void setNullMailArray() {
+    final LdapPerson person = new LdapPerson();
+    PFUserDOConverter.setMailNullArray(person);
+    Assert.assertNull(person.getMail());
+    person.setMail(new String[1]);
+    PFUserDOConverter.setMailNullArray(person);
+    Assert.assertNull(person.getMail());
+    person.setMail(new String[2]);
+    person.getMail()[1] = "Hurzel";
+    Assert.assertEquals(person.getMail()[1], "Hurzel");
+  }
+
   private LdapPerson createLdapUser(final String username, final String firstname, final String lastname, final String email,
       final String organization, final String description)
   {
