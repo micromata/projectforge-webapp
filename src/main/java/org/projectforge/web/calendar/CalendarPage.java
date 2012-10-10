@@ -39,7 +39,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
 
   private static final String USERPREF_KEY = "CalendarPage.userPrefs";
 
-  protected CalendarForm form;
+  private CalendarForm form;
 
   protected CalendarPanel calendarPanel;
 
@@ -54,18 +54,12 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
 
   public void init()
   {
-    form = new CalendarForm(this);
+    form = initCalendarForm(this);
     body.add(form);
-    CalendarFilter filter = (CalendarFilter) getUserPrefEntry(USERPREF_KEY);
-    if (filter == null) {
-      filter = new CalendarFilter();
-      putUserPrefEntry(USERPREF_KEY, filter, true);
-    }
+    final CalendarFilter filter = initCalendarFilter();
     form.setFilter(filter);
     form.init();
-    calendarPanel = new CalendarPanel("cal", form.currentDatePanel);
-    form.add(calendarPanel);
-    calendarPanel.init(getFilter());
+    calendarPanel = initCalenderPanel();
     if (pageParameters != null) {
       if (pageParameters.get("showTimesheets").isNull() == false) {
         form.getFilter().setUserId(getUserId());
@@ -74,6 +68,41 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
         form.getFilter().setShowBirthdays(true);
       }
     }
+  }
+
+  /**
+   * @param calendarPage
+   * @return
+   */
+  protected CalendarForm initCalendarForm(final CalendarPage calendarPage)
+  {
+    return new CalendarForm(this);
+  }
+
+  /**
+   * @return
+   */
+  protected CalendarPanel initCalenderPanel()
+  {
+    final CalendarPanel result = new CalendarPanel("cal", form.getCurrentDatePanel());
+    result.setOutputMarkupId(true);
+    form.add(result);
+    result.init(getFilter());
+    return result;
+  }
+
+  /**
+   * 
+   * @return
+   */
+  protected CalendarFilter initCalendarFilter()
+  {
+    CalendarFilter filter = (CalendarFilter) getUserPrefEntry(USERPREF_KEY);
+    if (filter == null) {
+      filter = new CalendarFilter();
+      putUserPrefEntry(USERPREF_KEY, filter, true);
+    }
+    return filter;
   }
 
   /**
@@ -92,7 +121,7 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
     return getString("calendar.title");
   }
 
-  CalendarFilter getFilter()
+  protected CalendarFilter getFilter()
   {
     return form.getFilter();
   }
@@ -127,5 +156,13 @@ public class CalendarPage extends AbstractSecuredPage implements ISelectCallerPa
   {
     form.getFilter().setStartDate(new DateMidnight(startDate, PFUserContext.getDateTimeZone()));
     return this;
+  }
+
+  /**
+   * @return the form
+   */
+  public CalendarForm getForm()
+  {
+    return form;
   }
 }

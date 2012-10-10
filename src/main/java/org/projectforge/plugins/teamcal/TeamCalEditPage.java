@@ -23,6 +23,7 @@ import net.ftlines.wicket.fullcalendar.callback.SelectedRange;
 import net.ftlines.wicket.fullcalendar.callback.View;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -31,6 +32,7 @@ import org.apache.wicket.util.string.StringValue;
 import org.joda.time.DateTime;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
 import org.projectforge.web.calendar.MyFullCalendar;
@@ -84,13 +86,16 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
     super.init();
     right = new TeamCalRight();
 
+    final WebMarkupContainer loadingContainer = new WebMarkupContainer("loading");
+    loadingContainer.setOutputMarkupId(true);
+    getForm().add(loadingContainer);
     final MyFullCalendarConfig config = new MyFullCalendarConfig(this);
     if (teamCalDao.hasUpdateAccess(getUser(), getData(), null, false))
       config.setSelectable(true);
     else
       config.setSelectable(false);
     config.setSelectHelper(true);
-    config.setLoading("function(bool) { if (bool) $(\"#loading\").show(); else $(\"#loading\").hide(); }");
+    config.setLoading("function(bool) { if (bool) $(\"#" + loadingContainer.getMarkupId() + "\").show(); else $(\"#loading\").hide(); }");
     config.setAllDaySlot(true);
     config.setDefaultView("agendaWeek");
     @SuppressWarnings("serial")
@@ -225,21 +230,23 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
     getForm().add(myCalendar);
     myCalendar.setMarkupId("calendar");
     final EventSource eventSource = new EventSource();
+
     if (isNew() == false) {
       // init calendar
-      final TeamCalendarFilter calFilter = new TeamCalendarFilter();
+      // use a fresh filter for this initialisation
+      final TeamCalCalendarFilter calFilter = new TeamCalCalendarFilter();
       final HashSet<TeamCalDO> assignedItems = new HashSet<TeamCalDO>();
       assignedItems.add(getData());
       calFilter.setAssignedtItems(assignedItems);
-      eventProvider = new TeamCalEventProvider(this, teamEventDao,userGroupCache, calFilter);
+      eventProvider = new TeamCalEventProvider(this, teamEventDao, userGroupCache, calFilter);
       eventProvider.setUserGroupCache(userGroupCache);
       eventSource.setEventsProvider(eventProvider);
       eventSource.setEditable(true);
       config.add(eventSource);
-    }
-    else
+    } else {
+      loadingContainer.setVisible(false);
       myCalendar.setVisible(false);
-
+    }
   }
 
   /**

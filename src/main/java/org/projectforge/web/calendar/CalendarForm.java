@@ -74,9 +74,9 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   @SuppressWarnings("unused")
   private boolean showTimesheets;
 
-  JodaDatePanel currentDatePanel;
+  private JodaDatePanel currentDatePanel;
 
-  Label durationLabel;
+  private Label durationLabel;
 
   @SuppressWarnings("serial")
   @Override
@@ -103,7 +103,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
     if (accessChecker.isRestrictedUser(getUser()) == false) {
       if (isOtherUsersAllowed() == false) {
-        showTimesheets = filter.getUserId() != null;
+        showTimesheets = getFilter().getUserId() != null;
         checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(this, "showTimesheets"),
             getString("calendar.option.timesheeets"), true) {
           /**
@@ -113,9 +113,9 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
           protected void onSelectionChanged(final Boolean newSelection)
           {
             if (Boolean.TRUE.equals(newSelection) == true) {
-              filter.setUserId(getUserId());
+              getFilter().setUserId(getUserId());
             } else {
-              filter.setUserId(null);
+              getFilter().setUserId(null);
             }
           }
         });
@@ -176,6 +176,17 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     }));
     durationLabel = durationPanel.getLabel4Ajax();
     fs.add(durationPanel);
+    onAfterInit(gridBuilder, fs);
+  }
+
+  /**
+   * Hook method where child implementations could place their logic
+   * @param gridBuilder
+   * 
+   * @param fs
+   */
+  protected void onAfterInit(final GridBuilder gridBuilder, final FieldsetPanel fs) {
+    // by default nothing happens here
   }
 
   private boolean isOtherUsersAllowed()
@@ -194,23 +205,40 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     return filter;
   }
 
-  void setFilter(final CalendarFilter filter)
+  protected void setFilter(final CalendarFilter filter)
   {
     this.filter = filter;
   }
 
   public PFUserDO getTimesheetsUser()
   {
-    final Integer userId = filter.getUserId();
+    final Integer userId = getFilter().getUserId();
     return userId != null ? userGroupCache.getUser(userId) : null;
   }
 
   public void setTimesheetsUser(final PFUserDO user)
   {
     if (user == null) {
-      filter.setUserId(null);
+      getFilter().setUserId(null);
     } else {
-      filter.setUserId(user.getId());
+      getFilter().setUserId(user.getId());
     }
   }
+
+  /**
+   * @return the currentDatePanel
+   */
+  public JodaDatePanel getCurrentDatePanel()
+  {
+    return currentDatePanel;
+  }
+
+  /**
+   * @return the durationLabel
+   */
+  public Label getDurationLabel()
+  {
+    return durationLabel;
+  }
+
 }

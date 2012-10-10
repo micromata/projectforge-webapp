@@ -157,7 +157,7 @@ public class TeamCalDO extends DefaultBaseDO
    * @return the readOnlyAccessGroup
    */
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "readonly_access_group_id", nullable = true)
+  @JoinColumn(name = "readOnly_access_group_id", nullable = true)
   public GroupDO getReadOnlyAccessGroup()
   {
     return readOnlyAccessGroup;

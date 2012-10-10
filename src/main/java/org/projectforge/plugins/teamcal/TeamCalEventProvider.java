@@ -20,6 +20,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.wicket.Component;
 import org.joda.time.DateTime;
 import org.joda.time.Days;
+import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
@@ -45,7 +46,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
   private int days;
 
-  private final TeamCalendarFilter filter;
+  private final TeamCalCalendarFilter filter;
 
   /**
    * the name of the event class.
@@ -55,7 +56,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
   /**
    * @param parent component for i18n
    */
-  public TeamCalEventProvider(final Component parent, final TeamEventDao teamEventDao, final UserGroupCache userGroupCache, final TeamCalendarFilter filter)
+  public TeamCalEventProvider(final Component parent, final TeamEventDao teamEventDao, final UserGroupCache userGroupCache, final TeamCalCalendarFilter filter)
   {
     super(parent);
     this.filter = filter;

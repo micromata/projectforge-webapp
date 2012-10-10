@@ -25,6 +25,7 @@ package org.projectforge.plugins.teamcal;
 
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
+import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
@@ -76,9 +77,10 @@ public class TeamCalPlugin extends AbstractPlugin
     registerWeb(ID, TeamCalListPage.class, TeamCalEditPage.class);
     registerWeb("teamEvent", TeamEventEditPage.class, TeamEventEditPage.class);
 
+    addMountPage("teamCalendar", TeamCalCalendarPage.class);
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
-    registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.teamcal.menu", TeamCalendarPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.teamcal.menu", TeamCalCalendarPage.class));
     registerMenuItem(new MenuItemDef(parentMenu, ID, 8, "plugins.teamcal.title.list", TeamCalListPage.class));
 
     // .setMobileMenu(ToDoMobileListPage.class, 10));

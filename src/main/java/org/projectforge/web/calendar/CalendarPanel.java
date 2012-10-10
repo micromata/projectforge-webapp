@@ -27,6 +27,7 @@ import java.sql.Timestamp;
 
 import net.ftlines.wicket.fullcalendar.CalendarResponse;
 import net.ftlines.wicket.fullcalendar.Event;
+import net.ftlines.wicket.fullcalendar.EventProvider;
 import net.ftlines.wicket.fullcalendar.EventSource;
 import net.ftlines.wicket.fullcalendar.callback.CalendarDropMode;
 import net.ftlines.wicket.fullcalendar.callback.ClickedEvent;
@@ -103,7 +104,7 @@ public class CalendarPanel extends Panel
   }
 
   @SuppressWarnings("serial")
-  void init(final CalendarFilter filter)
+  public void init(final CalendarFilter filter)
   {
     this.filter = filter;
     final MyFullCalendarConfig config = new MyFullCalendarConfig(this);
@@ -225,6 +226,7 @@ public class CalendarPanel extends Panel
           addressViewPage.setReturnToPage((WebPage) getPage());
           return;
         }
+        onEventClickedHook(clickedEvent, response, event, eventId, eventClassName);
         response.refetchEvents();
       }
 
@@ -240,13 +242,14 @@ public class CalendarPanel extends Panel
         // Need calling getEvents for getting correct duration label, it's not predictable what will be called first: onViewDisplayed or
         // getEvents.
         timesheetEventsProvider.getEvents(view.getVisibleStart().toDateTime(), view.getVisibleEnd().toDateTime());
+        onCallGetEventsHook(view, response);
         if (currentDatePanel != null) {
           currentDatePanel.getDateField().modelChanged();
           response.getTarget().add(currentDatePanel.getDateField());
           response.getTarget().appendJavaScript(
               DatePickerUtils.getDatePickerInitJavaScript(currentDatePanel.getDateField().getMarkupId(), true));
         }
-        response.getTarget().add(((CalendarPage) getPage()).form.durationLabel);
+        response.getTarget().add(((CalendarPage) getPage()).getForm().getDurationLabel());
       }
     };
     calendar.setMarkupId("calendar");
@@ -290,6 +293,64 @@ public class CalendarPanel extends Panel
     eventSource.setColor("#EEEEEE");
     eventSource.setTextColor("#222222");
     config.add(eventSource);
+    onRegisterEventSourceHook(config, filter);
+  }
+
+  /**
+   * @param config
+   */
+  protected void onRegisterEventSourceHook(final MyFullCalendarConfig config, final CalendarFilter filter)
+  {
+    // by default nothing happens here
+  }
+
+  /**
+   * Hook method for overwriting children, which is called, when an event should be modifies which could not be handled through this page.<br/>
+   * This could occur, when {@link Event} belongs to an {@link EventProvider} of a child implementation.
+   * 
+   * @param event
+   * @param newStartTime
+   * @param newEndTime
+   * @param dropMode
+   * @param response
+   */
+  protected void onModifyEventHook(final Event event, final DateTime newStartTime, final DateTime newEndTime, final CalendarDropMode dropMode,
+      final CalendarResponse response) {
+    // by default nothing happens here
+  }
+
+  /**
+   * Hook method for overwriting children, which is called, when the {@link EventProvider} should be refreshed.<br/>
+   * Please call forceReload on your provider.
+   */
+  protected void onRefreshEventProvider() {
+    // by default nothing happens here
+  }
+
+  /**
+   * Hook method for overwriting children, which is called, when the pre initialization of the calendars are made.<br/>
+   * Please call getEvents on you {@link EventProvider}.
+   * @param response
+   * @param view
+   * 
+   */
+  protected void onCallGetEventsHook(final View view, final CalendarResponse response)
+  {
+    // by default nothing happens here
+  }
+
+  /**
+   * Hook method for overwriting children, which is called, when something in the calendar was clicked
+   * 
+   * @param clickedEvent
+   * @param response
+   * @param event
+   * @param eventId
+   * @param eventClassName
+   */
+  protected void onEventClickedHook(final ClickedEvent clickedEvent, final CalendarResponse response, final Event event, final String eventId, final String eventClassName)
+  {
+    // by default nothing happens here
   }
 
   private void modifyEvent(final Event event, final DateTime newStartTime, final DateTime newEndTime, final CalendarDropMode dropMode,
@@ -363,6 +424,8 @@ public class CalendarPanel extends Panel
         // CANCEL -> should be handled through javascript now
         setResponsePage(getPage());
       }
+    } else {
+      onModifyEventHook(event, newStartTime, newEndTime, dropMode, response);
     }
   }
 
@@ -388,6 +451,7 @@ public class CalendarPanel extends Panel
       birthdayEventsProvider.forceReload();
       hrPlanningEventsProvider.forceReload();
       setConfig();
+      onRefreshEventProvider();
     }
   }
 
