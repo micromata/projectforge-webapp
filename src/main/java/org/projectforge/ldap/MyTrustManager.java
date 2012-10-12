@@ -136,10 +136,13 @@ public class MyTrustManager implements X509TrustManager
 
   public void checkServerTrusted(final X509Certificate[] chain, final String authType) throws CertificateException
   {
-    final X509Certificate cert = chain[0];
     if (certificate != null) {
       try {
-        cert.verify(certificate.getPublicKey());
+        chain[0].verify(certificate.getPublicKey());
+        for (final X509Certificate cert : chain) {
+          // Verifing by public key
+          cert.checkValidity();
+        }
       } catch (final InvalidKeyException ex) {
         throw new CertificateException(ex);
       } catch (final NoSuchAlgorithmException ex) {
