@@ -118,10 +118,6 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       error(getString("plugins.teamevent.duration.error"));
     } else {
       super.update();
-      final PageParameters params = new PageParameters();
-      params.add("id", getData().getCalendar().getId());
-      final CalendarPage page = new CalendarPage(params);
-      setResponsePage(page);
     }
   }
 
@@ -145,24 +141,9 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
       error(getString("plugins.teamevent.duration.error"));
     } else {
       super.create();
-      final PageParameters params = new PageParameters();
-      params.add("id", getData().getCalendar().getId());
-      final CalendarPage page = new CalendarPage(params);
-      setResponsePage(page);
     }
   }
 
-  /**
-   * @see org.projectforge.web.wicket.AbstractEditPage#cancel()
-   */
-  @Override
-  protected void cancel()
-  {
-    final PageParameters params = new PageParameters();
-    params.add("id", getData().getCalendar().getId());
-    final CalendarPage page = new CalendarPage(params);
-    setResponsePage(page);
-  }
 
   /**
    * @see org.projectforge.web.wicket.AbstractEditPage#getBaseDao()
