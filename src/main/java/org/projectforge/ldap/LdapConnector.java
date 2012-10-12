@@ -67,7 +67,9 @@ public class LdapConnector implements ConfigurationListener
         env.put(Context.SECURITY_CREDENTIALS, password);
       }
     }
-    env.put("java.naming.ldap.factory.socket", "org.projectforge.ldap.MySSLSocketFactory");
+    if (ldapConfig != null && StringUtils.isNotBlank(ldapConfig.getSslCertificateFile()) == true) {
+      env.put("java.naming.ldap.factory.socket", "org.projectforge.ldap.MySSLSocketFactory");
+    }
     log.info("Trying to connect the LDAP server: url=["
         + ldapConfig.getCompleteServerUrl()
         + "], authentication=["
