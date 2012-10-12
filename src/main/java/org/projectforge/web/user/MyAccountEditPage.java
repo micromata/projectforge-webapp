@@ -26,6 +26,7 @@ package org.projectforge.web.user;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.link.BookmarkablePageLink;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.user.PFUserContext;
@@ -37,6 +38,7 @@ import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.MessagePage;
 import org.projectforge.web.wicket.MySession;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.components.ContentMenuEntryPanel;
 
 public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditForm, UserDao>
 {
@@ -50,6 +52,10 @@ public class MyAccountEditPage extends AbstractEditPage<PFUserDO, MyAccountEditF
   public MyAccountEditPage(final PageParameters parameters)
   {
     super(parameters, "user.myAccount");
+    final BookmarkablePageLink<Void> showChangePasswordLink = new BookmarkablePageLink<Void>("link", ChangePasswordPage.class);
+    final ContentMenuEntryPanel menu = new ContentMenuEntryPanel(getNewContentMenuChildId(), showChangePasswordLink,
+        getString("menu.changePassword"));
+    addContentMenuEntry(menu);
     final PFUserDO loggedInUser = userDao.internalGetById(PFUserContext.getUserId());
     super.init(loggedInUser);
     this.showHistory = false;
