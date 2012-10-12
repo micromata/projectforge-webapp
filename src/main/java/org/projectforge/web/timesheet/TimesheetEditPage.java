@@ -118,6 +118,12 @@ public class TimesheetEditPage extends AbstractEditPage<TimesheetDO, TimesheetEd
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
+  public TimesheetEditPage(final TimesheetDO timesheet)
+  {
+    super(new PageParameters(), "timesheet");
+    init(timesheet);
+  }
+
   public TimesheetEditPage(final PageParameters parameters)
   {
     super(parameters, "timesheet");
