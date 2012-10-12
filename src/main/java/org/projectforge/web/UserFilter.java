@@ -284,13 +284,6 @@ public class UserFilter implements Filter
       // occurring
       // if you use ProjectForge on localhost with http and https (e. g. for testing). You have to delete this cookie normally in your
       // browser.
-      final String msg = "Unsecure JSESSIONID cookie found for a secure request. The user should remove this cookie manually, "
-          + "if this message is displayed at the next user's request again and stay-logged-in doesn't work properly for this user.";
-      if (WebConfiguration.isDevelopmentMode() == true) {
-        log.info("*** " + msg);
-      } else {
-        log.info(msg);
-      }
       final Cookie cookie = new Cookie("JSESSIONID", "to be deleted");
       cookie.setMaxAge(0);
       cookie.setPath(sessionIdCookie.getPath()); // Doesn't work for Safari: getPath() returns always null!
