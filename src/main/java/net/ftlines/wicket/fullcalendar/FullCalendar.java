@@ -36,19 +36,34 @@ import org.apache.wicket.util.template.TextTemplate;
 
 public class FullCalendar extends AbstractFullCalendar
 {
-  private static final TextTemplate EVENTS = new PackageTextTemplate(FullCalendar.class, "FullCalendar.events.tpl");
+  private static final long serialVersionUID = -2207479400626754495L;
+
+  /**
+   * Field can't be static final because otherwise a severe Exception is thrown on the server's startup due to loading sessions from persistent
+   * storage.
+   */
+  private static TextTemplate EVENTS;
 
   private final Config config;
+
   private EventDroppedCallback eventDropped;
+
   private EventResizedCallback eventResized;
+
   private GetEventsCallback getEvents;
+
   private DateRangeSelectedCallback dateRangeSelected;
+
   private EventClickedCallback eventClicked;
+
   private ViewDisplayCallback viewDisplay;
 
   public FullCalendar(final String id, final Config config)
   {
     super(id);
+    if (EVENTS == null) {
+      EVENTS = new PackageTextTemplate(FullCalendar.class, "FullCalendar.events.tpl");
+    }
     this.config = config;
     setVersioned(false);
   }
@@ -67,14 +82,14 @@ public class FullCalendar extends AbstractFullCalendar
   protected void onInitialize()
   {
     super.onInitialize();
-    for (final EventSource source : config.getEventSources())
-    {
+    for (final EventSource source : config.getEventSources()) {
       final String uuid = UUID.randomUUID().toString().replaceAll("[^A-Za-z0-9]", "");
       source.setUuid(uuid);
     }
     setupCallbacks();
   }
 
+  @SuppressWarnings("serial")
   private void setupCallbacks()
   {
     if (getEvents != null)
@@ -82,20 +97,18 @@ public class FullCalendar extends AbstractFullCalendar
 
     getEvents = new GetEventsCallback();
     add(getEvents);
-    for (final EventSource source : config.getEventSources())
-    {
+    for (final EventSource source : config.getEventSources()) {
       source.setEventsModel(new AbstractReadOnlyModel<String>() {
         @Override
-        public String getObject() {
-          return EVENTS.asString(new MicroMap("url", getEvents.getUrl(source)));
+        public String getObject()
+        {
+          return EVENTS.asString(new MicroMap<String, String>("url", getEvents.getUrl(source)));
         }
       });
     }
 
-    if (Strings.isEmpty(config.getEventClick()))
-    {
-      add(eventClicked = new EventClickedCallback()
-      {
+    if (Strings.isEmpty(config.getEventClick()) == true) {
+      add(eventClicked = new EventClickedCallback() {
         @Override
         protected void onClicked(final ClickedEvent event, final CalendarResponse response)
         {
@@ -105,10 +118,8 @@ public class FullCalendar extends AbstractFullCalendar
       config.setEventClickModel(eventClicked.getHandlerScript());
     }
 
-    if (Strings.isEmpty(config.getSelect()))
-    {
-      add(dateRangeSelected = new DateRangeSelectedCallback(config.isIgnoreTimezone())
-      {
+    if (Strings.isEmpty(config.getSelect()) == true) {
+      add(dateRangeSelected = new DateRangeSelectedCallback(config.isIgnoreTimezone()) {
         @Override
         protected void onSelect(final SelectedRange range, final CalendarResponse response)
         {
@@ -118,10 +129,8 @@ public class FullCalendar extends AbstractFullCalendar
       config.setSelectModel(dateRangeSelected.getHandlerScript());
     }
 
-    if (Strings.isEmpty(config.getEventDrop()))
-    {
-      add(eventDropped = new EventDroppedCallback()
-      {
+    if (Strings.isEmpty(config.getEventDrop()) == true) {
+      add(eventDropped = new EventDroppedCallback() {
 
         @Override
         protected boolean onEventDropped(final DroppedEvent event, final CalendarResponse response)
@@ -132,10 +141,8 @@ public class FullCalendar extends AbstractFullCalendar
       config.setEventDropModel(eventDropped.getHandlerScript());
     }
 
-    if (Strings.isEmpty(config.getEventResize()))
-    {
-      add(eventResized = new EventResizedCallback()
-      {
+    if (Strings.isEmpty(config.getEventResize()) == true) {
+      add(eventResized = new EventResizedCallback() {
 
         @Override
         protected boolean onEventResized(final ResizedEvent event, final CalendarResponse response)
@@ -148,10 +155,8 @@ public class FullCalendar extends AbstractFullCalendar
       config.setEventResizeModel(eventResized.getHandlerScript());
     }
 
-    if (Strings.isEmpty(config.getViewDisplay()))
-    {
-      add(viewDisplay = new ViewDisplayCallback()
-      {
+    if (Strings.isEmpty(config.getViewDisplay()) == true) {
+      add(viewDisplay = new ViewDisplayCallback() {
         @Override
         protected void onViewDisplayed(final View view, final CalendarResponse response)
         {
@@ -163,7 +168,6 @@ public class FullCalendar extends AbstractFullCalendar
 
     getPage().dirty();
   }
-
 
   @Override
   public void renderHead(final IHeaderResponse response)
