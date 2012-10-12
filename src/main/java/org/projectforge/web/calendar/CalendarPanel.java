@@ -51,6 +51,7 @@ import org.projectforge.common.NumberHelper;
 import org.projectforge.humanresources.HRPlanningDao;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
+import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.web.address.AddressViewPage;
@@ -59,7 +60,6 @@ import org.projectforge.web.humanresources.HRPlanningEventsProvider;
 import org.projectforge.web.timesheet.TimesheetEditPage;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
 import org.projectforge.web.wicket.AbstractEditPage;
-import org.projectforge.web.wicket.AbstractSecuredBasePage;
 import org.projectforge.web.wicket.components.DatePickerUtils;
 import org.projectforge.web.wicket.components.JodaDatePanel;
 
@@ -124,13 +124,12 @@ public class CalendarPanel extends Panel
         if (accessChecker.isRestrictedUser() == true) {
           return;
         }
-        final PageParameters parameters = new PageParameters();
-        parameters.add(TimesheetEditPage.PARAMETER_KEY_START_DATE_IN_MILLIS, DateHelper.getDateTimeAsMillis(range.getStart()));
-        parameters.add(TimesheetEditPage.PARAMETER_KEY_STOP_DATE_IN_MILLIS, DateHelper.getDateTimeAsMillis(range.getEnd()));
+        final TimesheetDO timesheet = new TimesheetDO().setStartDate(DateHelper.getDateTimeAsMillis(range.getStart()))//
+            .setStopTime(DateHelper.getDateTimeAsMillis(range.getEnd()));
         if (filter.getUserId() != null) {
-          parameters.add(TimesheetEditPage.PARAMETER_KEY_USER, filter.getUserId());
+          timesheetDao.setUser(timesheet, filter.getUserId());
         }
-        final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
+        final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(timesheet);
         timesheetEditPage.setReturnToPage((WebPage) getPage());
         setResponsePage(timesheetEditPage);
       }
@@ -314,8 +313,9 @@ public class CalendarPanel extends Panel
    * @param dropMode
    * @param response
    */
-  protected void onModifyEventHook(final Event event, final DateTime newStartTime, final DateTime newEndTime, final CalendarDropMode dropMode,
-      final CalendarResponse response) {
+  protected void onModifyEventHook(final Event event, final DateTime newStartTime, final DateTime newEndTime,
+      final CalendarDropMode dropMode, final CalendarResponse response)
+  {
     // by default nothing happens here
   }
 
@@ -323,7 +323,8 @@ public class CalendarPanel extends Panel
    * Hook method for overwriting children, which is called, when the {@link EventProvider} should be refreshed.<br/>
    * Please call forceReload on your provider.
    */
-  protected void onRefreshEventProvider() {
+  protected void onRefreshEventProvider()
+  {
     // by default nothing happens here
   }
 
@@ -348,7 +349,8 @@ public class CalendarPanel extends Panel
    * @param eventId
    * @param eventClassName
    */
-  protected void onEventClickedHook(final ClickedEvent clickedEvent, final CalendarResponse response, final Event event, final String eventId, final String eventClassName)
+  protected void onEventClickedHook(final ClickedEvent clickedEvent, final CalendarResponse response, final Event event,
+      final String eventId, final String eventClassName)
   {
     // by default nothing happens here
   }
@@ -375,51 +377,34 @@ public class CalendarPanel extends Panel
       if (newEndTimeMillis != null) {
         timesheet.setStopTime(new Timestamp(newEndTimeMillis));
       }
-      final PFUserDO loggedInUser = ((AbstractSecuredBasePage) getPage()).getUser();
-      if (timesheetDao.hasUpdateAccess(loggedInUser, timesheet, dbTimesheet, false) == false) {
-        // User has no update access, therefore ignore this request...
+      final PFUserDO loggedInUser = PFUserContext.getUser();
+      if (CalendarDropMode.MOVE_SAVE.equals(dropMode) == true || CalendarDropMode.MOVE_EDIT.equals(dropMode) == true) {
+        if (timesheetDao.hasUpdateAccess(loggedInUser, timesheet, dbTimesheet, false) == false) {
+          // User has no update access, therefore ignore this request...
+          return;
+        }
+        if (CalendarDropMode.MOVE_SAVE.equals(dropMode) == true) {
+          timesheetDao.update(timesheet);
+          setResponsePage(getPage());
+        } else {
+          setResponsePage(new TimesheetEditPage(timesheet).setReturnToPage((WebPage)getPage()));
+        }
         return;
       }
-
-      // update start and end time
-      if (newStartTime != null) {
-        dbTimesheet.setStartTime(new Timestamp(newStartTime.getMillis()));
-      }
-      if (newEndTime != null) {
-        dbTimesheet.setStopTime(new Timestamp(newEndTime.getMillis()));
-      }
-
-      // clone timesheet if mode is copy_*
-      if (CalendarDropMode.COPY_EDIT.equals(dropMode) || CalendarDropMode.COPY_SAVE.equals(dropMode)) {
-        dbTimesheet.setId(null);
-        dbTimesheet.setDeleted(false);
-        timesheetDao.setUser(dbTimesheet, loggedInUser.getId());
-
-        // and save the new time sheet -> correct time is set already
-        timesheetDao.save(dbTimesheet);
-      }
-
-      if (dropMode == null || CalendarDropMode.MOVE_EDIT.equals(dropMode) || CalendarDropMode.COPY_EDIT.equals(dropMode)) {
-        // first: "normal edit mode"
-        // TODO use modal dialogs
-        final PageParameters parameters = new PageParameters();
-        parameters.add(AbstractEditPage.PARAMETER_KEY_ID, dbTimesheet.getId());
-        if (newStartTime != null) {
-          parameters.add(TimesheetEditPage.PARAMETER_KEY_NEW_START_DATE, DateHelper.getDateTimeAsMillis(newStartTime));
+      // Copy this time sheet:
+      timesheet.setId(null);
+      timesheet.setDeleted(false);
+      timesheetDao.setUser(timesheet, loggedInUser.getId()); // Copy for own user.
+      if (CalendarDropMode.COPY_SAVE.equals(dropMode) == true) {
+        if (timesheetDao.hasInsertAccess(loggedInUser, timesheet, false) == false) {
+          // User has no insert access, therefore ignore this request...
+          return;
         }
-        if (newEndTime != null) {
-          parameters.add(TimesheetEditPage.PARAMETER_KEY_NEW_END_DATE, DateHelper.getDateTimeAsMillis(newEndTime));
-        }
-        final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(parameters);
-        timesheetEditPage.setReturnToPage((WebPage) getPage());
-        setResponsePage(timesheetEditPage);
-      } else if (CalendarDropMode.MOVE_SAVE.equals(dropMode) || CalendarDropMode.COPY_SAVE.equals(dropMode)) {
-        // second mode: "quick save mode"
-        if (CalendarDropMode.MOVE_SAVE.equals(dropMode)) {
-          // we need update only in "move" mode, in "copy" mode it was saved a few lines above
-          timesheetDao.update(dbTimesheet);
-        }
+        timesheetDao.save(timesheet);
         setResponsePage(getPage());
+        return;
+      } else if (CalendarDropMode.COPY_EDIT.equals(dropMode) == true) {
+        setResponsePage(new TimesheetEditPage(timesheet).setReturnToPage((WebPage)getPage()));
       } else {
         // CANCEL -> should be handled through javascript now
         setResponsePage(getPage());
