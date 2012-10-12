@@ -95,7 +95,7 @@ public class TeamCalEditPage extends AbstractEditPage<TeamCalDO, TeamCalEditForm
     else
       config.setSelectable(false);
     config.setSelectHelper(true);
-    config.setLoading("function(bool) { if (bool) $(\"#" + loadingContainer.getMarkupId() + "\").show(); else $(\"#loading\").hide(); }");
+    config.setLoading("function(bool) { if (bool) $(\"#" + loadingContainer.getMarkupId() + "\").show(); else $(\"#" + loadingContainer.getMarkupId() + "\").hide(); }");
     config.setAllDaySlot(true);
     config.setDefaultView("agendaWeek");
     @SuppressWarnings("serial")
