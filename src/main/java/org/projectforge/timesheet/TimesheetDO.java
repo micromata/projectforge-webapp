@@ -287,6 +287,14 @@ public class TimesheetDO extends DefaultBaseDO implements Comparable<TimesheetDO
   }
 
   @Transient
+  public TimesheetDO setStopTime(final long millis)
+  {
+    setStopTime(new Timestamp(millis));
+    return this;
+  }
+
+
+  @Transient
   public TimePeriod getTimePeriod()
   {
     return new TimePeriod(startTime, stopTime, marked);
