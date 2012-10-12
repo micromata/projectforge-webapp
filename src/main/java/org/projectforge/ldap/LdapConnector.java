@@ -115,6 +115,10 @@ public class LdapConnector implements ConfigurationListener
   LdapConnector(final LdapConfig ldapConfig)
   {
     this.ldapConfig = ldapConfig;
+    if (this.ldapConfig != null && StringUtils.isNotBlank(this.ldapConfig.getSslCertificateFile()) == true) {
+      // Try to load SSL certificate.
+      MyTrustManager.getInstance().addCertificate("ldap", new File(this.ldapConfig.getSslCertificateFile()));
+    }
   }
 
   /**

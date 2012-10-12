@@ -45,10 +45,15 @@ public class MySSLSocketFactory
 {
   private final SSLSocketFactory sf;
 
+  private static MySSLSocketFactory defaultInstance;
+
   public static MySSLSocketFactory getDefault() throws NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException,
   KeyManagementException, CertificateException, IOException
   {
-    return new MySSLSocketFactory();
+    if (defaultInstance == null) {
+      defaultInstance = new MySSLSocketFactory();
+    }
+    return defaultInstance;
   }
 
   public MySSLSocketFactory() throws NoSuchAlgorithmException, NoSuchProviderException, KeyStoreException, KeyManagementException,
