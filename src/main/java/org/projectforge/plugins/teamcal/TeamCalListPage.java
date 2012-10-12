@@ -49,6 +49,8 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
 
   private final TeamCalRight right;
 
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalListPage.class);
+
   /**
    * 
    */
@@ -102,6 +104,35 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
     columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("lastUpdate"), getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
     return columns;
+  }
+
+  protected TeamCalFilter getFilter()
+  {
+    return form.getFilter();
+  }
+
+  @Override
+  public void select(final String property, final Object selectedValue)
+  {
+    if ("ownerId".equals(property) == true) {
+      final Integer id = (Integer) selectedValue;
+      getFilter().setOwnerId(id);
+      refresh();
+    } else {
+      super.select(property, selectedValue);
+      log.error("Property '" + property + "' not supported for selection.");
+    }
+  }
+
+  @Override
+  public void unselect(final String property)
+  {
+    if ("ownerId".equals(property) == true) {
+      getFilter().setOwnerId(null);
+      refresh();
+    } else {
+      log.error("Property '" + property + "' not supported for selection.");
+    }
   }
 
   /**

@@ -14,14 +14,14 @@ import java.io.Serializable;
 import org.projectforge.core.BaseSearchFilter;
 
 /**
- * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  *
  */
 public class TeamCalFilter extends BaseSearchFilter implements Serializable
 {
   private static final long serialVersionUID = 7410573665085873058L;
 
-  private boolean own, mySubscribedCalendars, availableCalendars, allMyCalendars, allCalendars;
+  private boolean own, fullAccess, readOnlyAccess, minimalAccess;
 
   private Integer ownerId;
 
@@ -46,70 +46,6 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
   }
 
   /**
-   * @return the mySubscribedCalendars
-   */
-  public boolean isMySubscribedCalendars()
-  {
-    return mySubscribedCalendars;
-  }
-
-  /**
-   * @param mySubscribedCalendars the mySubscribedCalendars to set
-   */
-  public void setMySubscribedCalendars(final boolean mySubscribedCalendars)
-  {
-    this.mySubscribedCalendars = mySubscribedCalendars;
-  }
-
-  /**
-   * @return the availableCalendars
-   */
-  public boolean isAvailableCalendars()
-  {
-    return availableCalendars;
-  }
-
-  /**
-   * @param availableCalendars the availableCalendars to set
-   */
-  public void setAvailableCalendars(final boolean availableCalendars)
-  {
-    this.availableCalendars = availableCalendars;
-  }
-
-  /**
-   * @return the allCalendars
-   */
-  public boolean isAllCalendars()
-  {
-    return allCalendars;
-  }
-
-  /**
-   * @param allCalendars the allCalendars to set
-   */
-  public void setAllCalendars(final boolean allCalendars)
-  {
-    this.allCalendars = allCalendars;
-  }
-
-  /**
-   * @return the allMyCalendars
-   */
-  public boolean isAllMyCalendars()
-  {
-    return allMyCalendars;
-  }
-
-  /**
-   * @param allMyCalendars the allMyCalendars to set
-   */
-  public void setAllMyCalendars(final boolean allMyCalendars)
-  {
-    this.allMyCalendars = allMyCalendars;
-  }
-
-  /**
    * @return the own
    */
   public boolean isOwn()
@@ -123,6 +59,57 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
   public void setOwn(final boolean own)
   {
     this.own = own;
+  }
+
+  /**
+   * @return the readOnlyAccess
+   */
+  public boolean isReadOnlyAccess()
+  {
+    return readOnlyAccess;
+  }
+
+  /**
+   * @param readOnlyAccess the readOnlyAccess to set
+   * @return this for chaining.
+   */
+  public void setReadOnlyAccess(final boolean readOnlyAccess)
+  {
+    this.readOnlyAccess = readOnlyAccess;
+  }
+
+  /**
+   * @return the minimalAccess
+   */
+  public boolean isMinimalAccess()
+  {
+    return minimalAccess;
+  }
+
+  /**
+   * @param minimalAccess the minimalAccess to set
+   * @return this for chaining.
+   */
+  public void setMinimalAccess(final boolean minimalAccess)
+  {
+    this.minimalAccess = minimalAccess;
+  }
+
+  /**
+   * @return the fullAccess
+   */
+  public boolean isFullAccess()
+  {
+    return fullAccess;
+  }
+
+  /**
+   * @param fullAccess the fullAccess to set
+   * @return this for chaining.
+   */
+  public void setFullAccess(final boolean fullAccess)
+  {
+    this.fullAccess = fullAccess;
   }
 
 }
