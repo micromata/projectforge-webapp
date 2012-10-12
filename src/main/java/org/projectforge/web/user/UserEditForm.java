@@ -401,6 +401,19 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
   {
     // Password
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("password"), getString("passwordRepeat"), true);
+    final PasswordTextField passwordField = new PasswordTextField(fs.getTextFieldId(), new PropertyModel<String>(this, "password")) {
+      @Override
+      protected void onComponentTag(final ComponentTag tag)
+      {
+        super.onComponentTag(tag);
+        if (encryptedPassword == null) {
+          tag.put("value", "");
+        } else if (StringUtils.isEmpty(getConvertedInput()) == false) {
+          tag.put("value", MAGIC_PASSWORD);
+        }
+      }
+    };
+    passwordField.setResetPassword(false).setRequired(isNew());
     final PasswordTextField passwordRepeatField = new PasswordTextField(fs.getTextFieldId(), new PropertyModel<String>(this,
         "passwordRepeat")) {
       @Override
@@ -415,18 +428,6 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
       }
     };
     passwordRepeatField.setResetPassword(false).setRequired(false);
-    final PasswordTextField passwordField = new PasswordTextField(fs.getTextFieldId(), new PropertyModel<String>(this, "password")) {
-      @Override
-      protected void onComponentTag(final ComponentTag tag)
-      {
-        super.onComponentTag(tag);
-        if (encryptedPassword == null) {
-          tag.put("value", "");
-        } else if (StringUtils.isEmpty(getConvertedInput()) == false) {
-          tag.put("value", MAGIC_PASSWORD);
-        }
-      }
-    };
     passwordRepeatField.add(new AbstractValidator<String>() {
       @Override
       protected void onValidate(final IValidatable<String> validatable)
@@ -452,8 +453,17 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
           }
         }
       }
+
+      /**
+       * @see org.apache.wicket.validation.validator.AbstractValidator#validateOnNullValue()
+       */
+      @Override
+      public boolean validateOnNullValue()
+      {
+        // Should be validated (e. g. if password field is given but password repeat field not).
+        return true;
+      }
     });
-    passwordField.setResetPassword(false).setRequired(isNew());
     WicketUtils.setPercentSize(passwordField, 50);
     WicketUtils.setPercentSize(passwordRepeatField, 50);
     fs.add(passwordField);
