@@ -23,6 +23,7 @@
 
 package org.projectforge.ldap;
 
+import java.io.File;
 import java.util.Hashtable;
 
 import javax.naming.Context;
@@ -49,6 +50,7 @@ public class LdapConnector implements ConfigurationListener
   public LdapConnector()
   {
     ConfigXml.getInstance().register(this);
+    afterRead();
   }
 
   private Hashtable<String, String> createEnv(final String user, final String password)
@@ -65,6 +67,7 @@ public class LdapConnector implements ConfigurationListener
         env.put(Context.SECURITY_CREDENTIALS, password);
       }
     }
+    env.put("java.naming.ldap.factory.socket", "org.projectforge.ldap.MySSLSocketFactory");
     log.info("Trying to connect the LDAP server: url=["
         + ldapConfig.getCompleteServerUrl()
         + "], authentication=["
@@ -121,6 +124,10 @@ public class LdapConnector implements ConfigurationListener
   public void afterRead()
   {
     this.ldapConfig = ConfigXml.getInstance().getLdapConfig();
+    if (this.ldapConfig != null && StringUtils.isNotBlank(this.ldapConfig.getSslCertificateFile()) == true) {
+      // Try to load SSL certificate.
+      MyTrustManager.getInstance().addCertificate("ldap", new File(this.ldapConfig.getSslCertificateFile()));
+    }
   }
 
   /**

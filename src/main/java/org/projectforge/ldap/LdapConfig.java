@@ -46,6 +46,8 @@ public class LdapConfig
 
   private String authentication = "simple";
 
+  private String sslCertificateFile;
+
   /**
    * e.g. ldap.acme.com
    */
@@ -202,6 +204,33 @@ public class LdapConfig
   public LdapConfig setAuthentication(final String authentication)
   {
     this.authentication = authentication;
+    return this;
+  }
+
+  /**
+   * For SSL connections (ldaps://....) a SSL certificate file should be given if not accepted by the Java virtual machine.
+   * The content of the file should be:
+   * <pre>
+   * -----BEGIN CERTIFICATE-----
+   * MIICDTCCAXagAwIBAgIET6zxaTANBgkqhkiG9w0BAQUFADBLMScwJQYDVQQKEx5P
+   * ...
+   * 50W9Fw7dyf/6tDwEbi2SX8cIcu5wqLmzTrGYrwlNfI7WzCQYB8Udm2uBpka31nQQ
+   * 2A==
+   * -----END CERTIFICATE-----
+   * @return the sslCertificateFile
+   */
+  public String getSslCertificateFile()
+  {
+    return sslCertificateFile;
+  }
+
+  /**
+   * @param sslCertificate the sslCertificate to set
+   * @return this for chaining.
+   */
+  public LdapConfig setSslCertificateFile(final String sslCertificateFile)
+  {
+    this.sslCertificateFile = sslCertificateFile;
     return this;
   }
 
