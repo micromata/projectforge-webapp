@@ -121,7 +121,35 @@ $(function() {
 	$(".dialog_content").live("dialogclose", function(event, ui) {
 		enableScroll();
 	});
+	
+	initColorPicker();
 })
+function initColorPicker() {
+	$(".pf_colorPreview").live("click", function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+		$(this).siblings(".pf_colorContainer").slideDown(300);
+		var ref = $(this);
+		$("body").click(function() {
+			$(ref).siblings(".pf_colorContainer").slideUp(300, function() {
+				$("body").unbind("click");
+			});
+		});
+	});
+	$(".pf_colorContainer").click(function(e) {
+		e.preventDefault();
+		e.stopPropagation();
+	});
+	$(".pf_colorContainer span").click(function(e) {
+		var color = $(this).attr("style").substring(18,27);
+		var input = $(this).parent().siblings(".pf_colorForm").find("input");
+		$(input).val(color);
+		$(input).change();
+		$(this).parent().slideUp(300, function() {
+			$("body").unbind("click");
+		});
+	});
+}
 
 function disableScroll() {
     var before = $(document).width();

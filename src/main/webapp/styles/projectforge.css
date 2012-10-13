@@ -494,3 +494,30 @@ h2.box_head .subtitle {
 .select2-input {
   height: 24px!important;
 }
+
+/**
+ * Color picker styles
+ */
+.pf_colorForm {
+	display: none;
+}
+
+.pf_colorContainer {
+	width: 132px;
+	height: 88px;
+	border: 1px solid black;
+	display: none;
+	z-index: 10000;
+}
+.pf_colorPreview {
+	width: 24px;
+	height: 24px;
+	border: 1px solid black;
+	cursor: pointer;
+}
+.pf_colorContainer span {
+	height: 18px;
+	width: 18px;
+	margin: 2px;
+	cursor: pointer;
+}
