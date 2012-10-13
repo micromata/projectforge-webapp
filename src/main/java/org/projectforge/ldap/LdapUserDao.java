@@ -102,8 +102,14 @@ public class LdapUserDao extends LdapPersonDao
   protected LdapPerson mapToObject(final String dn, final Attributes attributes) throws NamingException
   {
     final LdapPerson person = super.mapToObject(dn, attributes);
-    if (dn != null && dn.contains(DEACTIVATED_SUB_CONTEXT2) == true) {
-      person.setDeactivated(true);
+    if (dn != null) {
+      if (dn.contains(DEACTIVATED_SUB_CONTEXT2) == true) {
+        person.setDeactivated(true);
+      }
+      if (dn.contains(RESTRICTED_USER_SUB_CONTEXT2) == true) {
+        person.setRestrictedUser(true);
+      }
+
     }
     final Object userPassword = LdapUtils.getAttributeValue(attributes, "userPassword");
     if (userPassword != null) {
@@ -137,7 +143,7 @@ public class LdapUserDao extends LdapPersonDao
     final String ou = user.getOrganizationalUnit();
     if (ou.startsWith(DEACTIVATED_SUB_CONTEXT2) == false) {
       // Move user to the sub-context "deactivated".
-      final String newOu = LdapUtils.getOu(DEACTIVATED_SUB_CONTEXT, user.getOrganizationalUnit());
+      final String newOu = LdapUtils.getOu(DEACTIVATED_SUB_CONTEXT, ldapConfig.getUserBase());
       move(ctx, user, newOu);
       user.setOrganizationalUnit(newOu);
     }
@@ -201,6 +207,10 @@ public class LdapUserDao extends LdapPersonDao
   void updateRestrictedUserStatus(final DirContext ctx, final LdapPerson user) throws NamingException
   {
     final String ou = LdapUtils.getOu(user.getOrganizationalUnit());
+    if (user.isDeactivated() == true) {
+      // User is deactivated, thus the restricted-user-status is ignored.
+      return;
+    }
     if (user.isRestrictedUser() == true) {
       if (ou.startsWith(RESTRICTED_USER_SUB_CONTEXT2) == true) {
         // User is already stored in restricted context. Nothing to be done.
@@ -229,10 +239,17 @@ public class LdapUserDao extends LdapPersonDao
   private void setUserAsRestrictedUser(final DirContext ctx, final LdapPerson user) throws NamingException
   {
     log.info("Move user to restricted sub context: " + buildDn(null, user));
-    // Move user to the sub-context "deactivated".
-    final String newOu = LdapUtils.getOu(RESTRICTED_USER_SUB_CONTEXT, user.getOrganizationalUnit());
-    move(ctx, user, newOu);
-    user.setOrganizationalUnit(newOu);
+    if (user.isDeactivated() == true) {
+      log.info("User is deactivated, thus the restricted-user-status is ignored: " + buildDn(null, user));
+      return;
+    }
+    final String ou = user.getOrganizationalUnit();
+    if (ou.startsWith(RESTRICTED_USER_SUB_CONTEXT2) == false) {
+      // Move user to the sub-context "restricted".
+      final String newOu = LdapUtils.getOu(RESTRICTED_USER_SUB_CONTEXT, user.getOrganizationalUnit());
+      move(ctx, user, newOu);
+      user.setOrganizationalUnit(newOu);
+    }
   }
 
   /**
@@ -250,8 +267,8 @@ public class LdapUserDao extends LdapPersonDao
     super.create(ctx, ouBase, user, args);
     if (user.isDeactivated() == true) {
       deactivateUser(ctx, user);
-    }
-    if (user.isRestrictedUser() == true) {
+    } else if (user.isRestrictedUser() == true) {
+      // Deactivated users shouldn't be moved to restricted ou sub context.
       setUserAsRestrictedUser(ctx, user);
     }
   }

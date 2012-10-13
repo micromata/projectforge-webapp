@@ -33,11 +33,19 @@ public class LdapUserDaoTest extends LdapRealTestBase
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapUserDaoTest.class);
 
-  private static final String PATH = "ou=projectforge-test";
-
   LdapUserDao ldapUserDao;
 
   LdapOrganizationalUnitDao ldapOrganizationalUnitDao;
+
+  private String path;
+
+  private String getPath()
+  {
+    if (path == null) {
+      path = LdapUtils.getOrganizationalUnit(ldapConfig.getUserBase());
+    }
+    return path;
+  }
 
   @Override
   @Before
@@ -49,9 +57,9 @@ public class LdapUserDaoTest extends LdapRealTestBase
     ldapUserDao.setLdapConnector(ldapConnector);
     ldapOrganizationalUnitDao.setLdapConnector(ldapConnector);
     if (ldapConfig != null) {
-      ldapOrganizationalUnitDao.createIfNotExist(PATH, "Test area for tests of ProjectForge.");
-      ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.DEACTIVATED_SUB_CONTEXT, "for deactivated users.", PATH);
-      ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, "for restricted users.", PATH);
+      ldapOrganizationalUnitDao.createIfNotExist(getPath(), "Test area for tests of ProjectForge.");
+      ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.DEACTIVATED_SUB_CONTEXT, "for deactivated users.", getPath());
+      ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, "for restricted users.", getPath());
     }
   }
 
@@ -59,9 +67,9 @@ public class LdapUserDaoTest extends LdapRealTestBase
   public void tearDown()
   {
     if (ldapConfig != null) {
-      ldapOrganizationalUnitDao.deleteIfExists(LdapUserDao.DEACTIVATED_SUB_CONTEXT, PATH);
-      ldapOrganizationalUnitDao.deleteIfExists(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, PATH);
-      ldapOrganizationalUnitDao.deleteIfExists(PATH);
+      ldapOrganizationalUnitDao.deleteIfExists(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getPath());
+      ldapOrganizationalUnitDao.deleteIfExists(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, getPath());
+      ldapOrganizationalUnitDao.deleteIfExists(getPath());
     }
   }
 
@@ -76,23 +84,23 @@ public class LdapUserDaoTest extends LdapRealTestBase
     final LdapPerson user = new LdapPerson().setUid(uid).setGivenName("Kai").setSurname("ProjectForge Test").setDescription("description")
         .setHomePhoneNumber("0123").setMail("kr@acme.com").setMobilePhoneNumber("4567").setOrganization("ProjectForge")
         .setTelephoneNumber("890").setEmployeeNumber("42");
-    user.setOrganizationalUnit(PATH);
-    ldapUserDao.createOrUpdate(PATH, user);
-    final LdapPerson user2 = ldapUserDao.findByUsername(uid, PATH);
+    user.setOrganizationalUnit(getPath());
+    ldapUserDao.createOrUpdate(getPath(), user);
+    final LdapPerson user2 = ldapUserDao.findByUsername(uid, getPath());
     Assert.assertNotNull(user2);
     LdapTestUtils.assertUser(user2, user.getUid(), user.getGivenName(), user.getSurname(), user.getMail(), user.getOrganization(),
         user.getDescription());
-    Assert.assertEquals(LdapUtils.getOu(PATH), LdapUtils.getOu(user2.getOrganizationalUnit()));
+    Assert.assertEquals(LdapUtils.getOu(getPath()), LdapUtils.getOu(user2.getOrganizationalUnit()));
 
-    Assert.assertFalse(ldapUserDao.authenticate(uid, "", PATH));
+    Assert.assertFalse(ldapUserDao.authenticate(uid, "", getPath()));
     // Change password
     ldapUserDao.changePassword(user, null, "hurzel");
-    Assert.assertEquals(PATH, ldapUserDao.findByUsername(uid, PATH).getOrganizationalUnit());
-    Assert.assertTrue(ldapUserDao.authenticate(uid, "hurzel", PATH));
+    Assert.assertEquals(getPath(), ldapUserDao.findByUsername(uid, getPath()).getOrganizationalUnit());
+    Assert.assertTrue(ldapUserDao.authenticate(uid, "hurzel", getPath()));
 
     // Delete user
     ldapUserDao.delete(user);
-    Assert.assertNull(ldapUserDao.findByUsername(uid, PATH));
+    Assert.assertNull(ldapUserDao.findByUsername(uid, getPath()));
   }
 
   @Test
@@ -104,22 +112,22 @@ public class LdapUserDaoTest extends LdapRealTestBase
     }
     final String uid = "test-user-43";
     final LdapPerson user = new LdapPerson().setUid(uid).setGivenName("Kai").setSurname("ProjectForge Test").setEmployeeNumber("43");
-    user.setOrganizationalUnit(PATH);
-    ldapUserDao.createOrUpdate(PATH, user);
+    user.setOrganizationalUnit(getPath());
+    ldapUserDao.createOrUpdate(getPath(), user);
     ldapUserDao.changePassword(user, null, "hurzel");
-    Assert.assertTrue(ldapUserDao.authenticate(uid, "hurzel", PATH));
+    Assert.assertTrue(ldapUserDao.authenticate(uid, "hurzel", getPath()));
     ldapUserDao.deactivateUser(user);
-    Assert.assertFalse(ldapUserDao.authenticate(uid, "hurzel", PATH));
-    final LdapPerson user2 = ldapUserDao.findByUsername(uid, PATH);
+    Assert.assertFalse(ldapUserDao.authenticate(uid, "hurzel", getPath()));
+    final LdapPerson user2 = ldapUserDao.findByUsername(uid, getPath());
     Assert.assertNotNull(user2);
-    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, PATH), LdapUtils.getOu(user2.getOrganizationalUnit()));
+    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getPath()), LdapUtils.getOu(user2.getOrganizationalUnit()));
 
     // Reactivate user:
     ldapUserDao.reactivateUser(user2);
-    Assert.assertFalse(ldapUserDao.authenticate(uid, "hurzel", PATH));
+    Assert.assertFalse(ldapUserDao.authenticate(uid, "hurzel", getPath()));
     // Delete user
     ldapUserDao.delete(user2);
-    Assert.assertNull(ldapUserDao.findByUsername(uid, PATH));
+    Assert.assertNull(ldapUserDao.findByUsername(uid, getPath()));
   }
 
   @Test
@@ -135,26 +143,28 @@ public class LdapUserDaoTest extends LdapRealTestBase
     user.setId(44);
     // Test creation of deactivated user:
     final LdapPerson ldapUser = PFUserDOConverter.convert(user);
-    ldapUser.setOrganizationalUnit(PATH);
-    ldapUserDao.createOrUpdate(PATH, ldapUser);
-    LdapPerson ldapUser2 = ldapUserDao.findByUsername(uid, PATH);
+    ldapUser.setOrganizationalUnit(getPath());
+    ldapUserDao.createOrUpdate(getPath(), ldapUser);
+    LdapPerson ldapUser2 = ldapUserDao.findByUsername(uid, getPath());
     Assert.assertNotNull(ldapUser2);
-    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, PATH), LdapUtils.getOu(ldapUser2.getOrganizationalUnit()));
+    Assert
+    .assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getPath()), LdapUtils.getOu(ldapUser2.getOrganizationalUnit()));
     Assert.assertTrue(ldapUser.isDeactivated());
     // Test update from deactivated to activated:
     ldapUser2.setDeactivated(false);
-    ldapUserDao.update(PATH, ldapUser2);
-    ldapUser2 = ldapUserDao.findByUsername(uid, PATH);
-    Assert.assertEquals(LdapUtils.getOu(PATH), LdapUtils.getOu(ldapUser2.getOrganizationalUnit()));
+    ldapUserDao.update(getPath(), ldapUser2);
+    ldapUser2 = ldapUserDao.findByUsername(uid, getPath());
+    Assert.assertEquals(LdapUtils.getOu(getPath()), LdapUtils.getOu(ldapUser2.getOrganizationalUnit()));
     // Test update from activated to deactivated:
     ldapUser2.setDeactivated(true);
-    ldapUserDao.update(PATH, ldapUser2);
-    ldapUser2 = ldapUserDao.findByUsername(uid, PATH);
-    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, PATH), LdapUtils.getOu(ldapUser2.getOrganizationalUnit()));
+    ldapUserDao.update(getPath(), ldapUser2);
+    ldapUser2 = ldapUserDao.findByUsername(uid, getPath());
+    Assert
+    .assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getPath()), LdapUtils.getOu(ldapUser2.getOrganizationalUnit()));
     Assert.assertTrue(ldapUser.isDeactivated());
     // Delete user
     ldapUserDao.delete(ldapUser2);
-    Assert.assertNull(ldapUserDao.findByUsername(uid, PATH));
+    Assert.assertNull(ldapUserDao.findByUsername(uid, getPath()));
   }
 
   @Test
@@ -169,26 +179,59 @@ public class LdapUserDaoTest extends LdapRealTestBase
         .setEmail("k.reinhard@acme.com").setRestrictedUser(true);
     user.setId(45);
     // Test creation of restricted users:
-    final LdapPerson ldapUser = PFUserDOConverter.convert(user);
-    ldapUser.setOrganizationalUnit(PATH);
-    ldapUserDao.createOrUpdate(PATH, ldapUser);
-    LdapPerson ldapUser2 = ldapUserDao.findByUsername(uid, PATH);
-    Assert.assertNotNull(ldapUser2);
-    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, PATH), LdapUtils.getOu(ldapUser2.getOrganizationalUnit()));
+    final LdapPerson initialLdapUser = PFUserDOConverter.convert(user);
+    initialLdapUser.setOrganizationalUnit(getPath());
+    ldapUserDao.createOrUpdate(getPath(), initialLdapUser);
+    LdapPerson ldapUser = ldapUserDao.findByUsername(uid, getPath());
+    Assert.assertNotNull(ldapUser);
+    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, getPath()),
+        LdapUtils.getOu(ldapUser.getOrganizationalUnit()));
     Assert.assertTrue(ldapUser.isRestrictedUser());
     // Test update from restricted user to normal user:
-    ldapUser2.setRestrictedUser(false);
-    ldapUserDao.update(PATH, ldapUser2);
-    ldapUser2 = ldapUserDao.findByUsername(uid, PATH);
-    Assert.assertEquals(LdapUtils.getOu(PATH), LdapUtils.getOu(ldapUser2.getOrganizationalUnit()));
+    ldapUser.setRestrictedUser(false);
+    ldapUserDao.update(getPath(), ldapUser);
+    ldapUser = ldapUserDao.findByUsername(uid, getPath());
+    Assert.assertEquals(LdapUtils.getOu(getPath()), LdapUtils.getOu(ldapUser.getOrganizationalUnit()));
     // Test update from normal user to restricted user:
-    ldapUser2.setRestrictedUser(true);
-    ldapUserDao.update(PATH, ldapUser2);
-    ldapUser2 = ldapUserDao.findByUsername(uid, PATH);
-    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, PATH), LdapUtils.getOu(ldapUser2.getOrganizationalUnit()));
+    ldapUser.setRestrictedUser(true);
+    ldapUserDao.update(getPath(), ldapUser);
+    ldapUser = ldapUserDao.findByUsername(uid, getPath());
+    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, getPath()),
+        LdapUtils.getOu(ldapUser.getOrganizationalUnit()));
     Assert.assertTrue(ldapUser.isRestrictedUser());
+
+    // Test deactivated users (restricted context should be ignored):
+    ldapUser.setDeactivated(true);
+    ldapUserDao.update(getPath(), ldapUser);
+    ldapUser = ldapUserDao.findByUsername(uid, getPath());
+    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getPath()),
+        LdapUtils.getOu(ldapUser.getOrganizationalUnit()));
+    Assert.assertTrue(ldapUser.isDeactivated());
+    Assert.assertFalse(ldapUser.isRestrictedUser());
+
     // Delete user
-    ldapUserDao.delete(ldapUser2);
-    Assert.assertNull(ldapUserDao.findByUsername(uid, PATH));
+    ldapUserDao.delete(ldapUser);
+    Assert.assertNull(ldapUserDao.findByUsername(uid, getPath()));
+
+    // Create restricted and deactivated user. Restriction should be ignored:
+    ldapUser = PFUserDOConverter.convert(user);
+    ldapUser.setDeactivated(true);
+    ldapUser.setOrganizationalUnit(getPath());
+    ldapUserDao.createOrUpdate(getPath(), ldapUser);
+    ldapUser = ldapUserDao.findByUsername(uid, getPath());
+    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getPath()),
+        LdapUtils.getOu(ldapUser.getOrganizationalUnit()));
+    Assert.assertTrue(ldapUser.isDeactivated());
+    Assert.assertFalse(ldapUser.isRestrictedUser());
+
+    ldapUser.setDeactivated(false).setRestrictedUser(true);
+    ldapUserDao.createOrUpdate(getPath(), ldapUser);
+    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, getPath()),
+        LdapUtils.getOu(ldapUser.getOrganizationalUnit()));
+    Assert.assertTrue(ldapUser.isRestrictedUser());
+
+    // Delete user
+    ldapUserDao.delete(ldapUser);
+    Assert.assertNull(ldapUserDao.findByUsername(uid, getPath()));
   }
 }

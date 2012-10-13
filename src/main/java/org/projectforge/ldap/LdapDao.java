@@ -325,7 +325,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
           + "'. Can't modify the object: "
           + obj);
     }
-    final String ou = LdapUtils.getOu(newOrganizationalUnit);
+    final String ou = LdapUtils.getOrganizationalUnit(newOrganizationalUnit);
     final String origOu = LdapUtils.getOu(origObject.getOrganizationalUnit());
     if (StringUtils.equals(origOu, ou) == false) {
       log.info("Move object with id '" + obj.getId() + "' from '" + origOu + "' to '" + ou);
