@@ -42,7 +42,7 @@ import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
 
 /**
- * TODO: check changepassword, nested groups, restricted users.<br/>
+ * TODO: nested groups.<br/>
  * This LDAP login handler has read-write access to the LDAP server and acts as master of the user and group data. All changes of
  * ProjectForge's users and groups will be written through. Any change of the LDAP server will be ignored and may be overwritten by
  * ProjectForge. <br/>
@@ -79,6 +79,8 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
     super.initialize();
     ldapOrganizationalUnitDao.createIfNotExist(userBase, "ProjectForge's user base.");
     ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.DEACTIVATED_SUB_CONTEXT, "ProjectForge's user base for deactivated users.",
+        userBase);
+    ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, "ProjectForge's user base for restricted users.",
         userBase);
     ldapOrganizationalUnitDao.createIfNotExist(groupBase, "ProjectForge's group base.");
   }

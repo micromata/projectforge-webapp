@@ -50,6 +50,12 @@ public class LdapUserDao extends LdapPersonDao
 
   static final String DEACTIVATED_MAIL = "deactivated@devnull.com";
 
+  public static final String RESTRICTED_USER_SUB_CONTEXT = "restricted";
+
+  private static final String RESTRICTED_USER_SUB_CONTEXT2 = "ou=" + RESTRICTED_USER_SUB_CONTEXT;
+
+  private static final String RESTRICTED_USER_SUB_CONTEXT3 = RESTRICTED_USER_SUB_CONTEXT2 + ",";
+
   private boolean useUidInDn = false;
 
   public static boolean isDeactivated(final LdapPerson user)
@@ -57,6 +63,13 @@ public class LdapUserDao extends LdapPersonDao
     return user.isDeactivated()
         || user.getOrganizationalUnit() != null
         && LdapUtils.getOu(user.getOrganizationalUnit()).contains(DEACTIVATED_SUB_CONTEXT) == true;
+  }
+
+  public static boolean isRestrictedUser(final LdapPerson user)
+  {
+    return user.isRestrictedUser()
+        || user.getOrganizationalUnit() != null
+        && LdapUtils.getOu(user.getOrganizationalUnit()).contains(RESTRICTED_USER_SUB_CONTEXT) == true;
   }
 
   public LdapUserDao()
@@ -185,6 +198,43 @@ public class LdapUserDao extends LdapPersonDao
     }
   }
 
+  void updateRestrictedUserStatus(final DirContext ctx, final LdapPerson user) throws NamingException
+  {
+    final String ou = LdapUtils.getOu(user.getOrganizationalUnit());
+    if (user.isRestrictedUser() == true) {
+      if (ou.startsWith(RESTRICTED_USER_SUB_CONTEXT2) == true) {
+        // User is already stored in restricted context. Nothing to be done.
+        return;
+      } else {
+        setUserAsRestrictedUser(ctx, user);
+      }
+    } else {
+      if (ou.startsWith(RESTRICTED_USER_SUB_CONTEXT2) == false) {
+        // User isn't stored in restricted context. Nothing to be done.
+        return;
+      } else {
+        log.info("Move user from restricted sub context: " + buildDn(null, user));
+        String newPath;
+        if (ou.startsWith(RESTRICTED_USER_SUB_CONTEXT3) == true) {
+          newPath = ou.substring(RESTRICTED_USER_SUB_CONTEXT3.length());
+        } else {
+          newPath = ou.substring(RESTRICTED_USER_SUB_CONTEXT2.length());
+        }
+        move(ctx, user, newPath);
+        user.setOrganizationalUnit(newPath);
+      }
+    }
+  }
+
+  private void setUserAsRestrictedUser(final DirContext ctx, final LdapPerson user) throws NamingException
+  {
+    log.info("Move user to restricted sub context: " + buildDn(null, user));
+    // Move user to the sub-context "deactivated".
+    final String newOu = LdapUtils.getOu(RESTRICTED_USER_SUB_CONTEXT, user.getOrganizationalUnit());
+    move(ctx, user, newOu);
+    user.setOrganizationalUnit(newOu);
+  }
+
   /**
    * Calls super method and {@link #deactivateUser(DirContext, LdapPerson)} if the given person is deactivated. If the given person is
    * deleted, nothing will be done.
@@ -201,6 +251,9 @@ public class LdapUserDao extends LdapPersonDao
     if (user.isDeactivated() == true) {
       deactivateUser(ctx, user);
     }
+    if (user.isRestrictedUser() == true) {
+      setUserAsRestrictedUser(ctx, user);
+    }
   }
 
   /**
@@ -216,6 +269,7 @@ public class LdapUserDao extends LdapPersonDao
     }
     super.update(ctx, ouBase, user, objs);
     updateActivatedStatus(ctx, user);
+    updateRestrictedUserStatus(ctx, user);
   }
 
   public void changePassword(final LdapPerson user, final String oldPassword, final String newPassword)

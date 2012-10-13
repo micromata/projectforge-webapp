@@ -69,6 +69,9 @@ public class PFUserDOConverter
     if (person.isDeactivated() == true || LdapUserDao.isDeactivated(person) == true) {
       user.setDeactivated(true);
     }
+    if (person.isRestrictedUser() == true || LdapUserDao.isRestrictedUser(person) == true) {
+      user.setRestrictedUser(true);
+    }
     return user;
   }
 
@@ -89,6 +92,7 @@ public class PFUserDOConverter
     if (user.isDeactivated() == true) {
       person.setMail(LdapUserDao.DEACTIVATED_MAIL);
     }
+    person.setRestrictedUser(user.isRestrictedUser());
     return person;
   }
 
@@ -106,7 +110,7 @@ public class PFUserDOConverter
   public static boolean copyUserFields(final PFUserDO src, final PFUserDO dest)
   {
     final boolean modified = BeanHelper.copyProperties(src, dest, true, "username", "firstname", "lastname", "email", "description",
-        "organization", "deactivated");
+        "organization", "deactivated", "restrictedUser");
     return modified;
   }
 
@@ -121,7 +125,7 @@ public class PFUserDOConverter
     setMailNullArray(src);
     setMailNullArray(dest);
     final boolean modified = BeanHelper.copyProperties(src, dest, true, "uid", "givenName", "surname", "mail", "description",
-        "organization", "deactivated");
+        "organization", "deactivated", "restricted");
     return modified;
   }
 

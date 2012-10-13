@@ -30,7 +30,7 @@ public class LdapPerson extends LdapObject<String>
 {
   private String uid, surname, givenName, organization, telephoneNumber, homePhoneNumber, description, employeeNumber;
 
-  private boolean deleted, deactivated, passwordGiven;
+  private boolean deleted, deactivated, restrictedUser, passwordGiven;
 
   private String[] mail, mobilePhoneNumber;
 
@@ -248,6 +248,8 @@ public class LdapPerson extends LdapObject<String>
   }
 
   /**
+   * Only used in master mode: deactivated users have no password and are moved to a sub ou. Thus no login is possible for deactivated
+   * users.
    * @return the deactivated
    */
   public boolean isDeactivated()
@@ -262,6 +264,26 @@ public class LdapPerson extends LdapObject<String>
   public LdapPerson setDeactivated(final boolean deactivated)
   {
     this.deactivated = deactivated;
+    return this;
+  }
+
+  /**
+   * Only used in master mode: restricted users have restricted access in ProjectForge and are moved to a sub ou. Thus the login is possible for restricted
+   * users but they're only able to change their passwords, nothing else.
+   * @return the restrictedUser
+   */
+  public boolean isRestrictedUser()
+  {
+    return restrictedUser;
+  }
+
+  /**
+   * @param restrictedUser the restrictedUser to set
+   * @return this for chaining.
+   */
+  public LdapPerson setRestrictedUser(final boolean restrictedUser)
+  {
+    this.restrictedUser = restrictedUser;
     return this;
   }
 
