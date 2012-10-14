@@ -13,12 +13,15 @@ import org.apache.wicket.AttributeModifier;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.HiddenField;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
-import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.util.collections.MicroMap;
+import org.apache.wicket.util.template.JavaScriptTemplate;
+import org.apache.wicket.util.template.PackageTextTemplate;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
@@ -30,16 +33,12 @@ public class ColorPickerPanel extends Panel
 
   private String selectedColor;
 
-  public static final String[] COLORS = { "#A8735B", "#CA6D62", "#EF4013", "#F25B33", "#F87824", "#FAAF26", "#5DD689", "#3AA75C",
-    "#87D117", "#B8DC56", "#FBEA71", "#F8D24D", "#A6E0E8", "#A6E0E8", "#A2C5EA", "#4C84EE", "#989BFF", "#B599FF", "#C2C2C2", "#C9BDBF",
-    "#C9A6AC", "#EF92B4", "#C674EE", "#9F79E9"};
-
   /**
    * @param id
    */
   public ColorPickerPanel(final String id)
   {
-    this(id, COLORS[0]);
+    this(id, "#FAAF26");
   }
 
   /**
@@ -78,7 +77,7 @@ public class ColorPickerPanel extends Panel
 
     final Form<Void> colorForm = new Form<Void>("colorForm");
     add(colorForm);
-    final HiddenField<String> colorField = new HiddenField<String>("color", new PropertyModel<String>(this, "selectedColor"));
+    final TextField<String> colorField = new TextField<String>("color", new PropertyModel<String>(this, "selectedColor"));
     colorField.add(new AjaxFormComponentUpdatingBehavior("onChange") {
       private static final long serialVersionUID = 1L;
 
@@ -93,19 +92,17 @@ public class ColorPickerPanel extends Panel
       }
     });
     colorForm.add(colorField);
-    final RepeatingView repeater = new RepeatingView("colorRepeater");
-    add(repeater);
-    for (final String color : COLORS) {
-      final WebMarkupContainer colorSpan = new WebMarkupContainer(repeater.newChildId());
-      repeater.add(colorSpan);
-      colorSpan.add(new AttributeModifier("style", Model.of("background-color: " + color)));
-    }
+    // colorpicker js
+    final JavaScriptTemplate jsTemplate = new JavaScriptTemplate(new PackageTextTemplate(ColorPickerPanel.class, "ColorPicker.js.template"));
+    final String javaScript = jsTemplate.asString(new MicroMap<String, String>("markupId", colorField.getMarkupId()));
+    add(new Label("template", javaScript).setEscapeModelStrings(false));
   }
+
 
   /**
    * Hook method
    * 
-   * @param selectedColor2
+   * @param selectedColor
    */
   protected void onColorUpdate(final String selectedColor)
   {

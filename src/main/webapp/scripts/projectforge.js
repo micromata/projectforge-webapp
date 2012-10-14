@@ -120,29 +120,8 @@ $(function() {
 	initColorPicker();
 })
 function initColorPicker() {
-	$(".pf_colorPreview").live("click", function(e) {
-		e.preventDefault();
-		e.stopPropagation();
-		$(this).siblings(".pf_colorContainer").slideDown(300);
-		var ref = $(this);
-		$("body").click(function() {
-			$(ref).siblings(".pf_colorContainer").slideUp(300, function() {
-				$("body").unbind("click");
-			});
-		});
-	});
-	$(".pf_colorContainer").live("click", function(e) {
-		e.preventDefault();
-		e.stopPropagation();
-	});
-	$(".pf_colorContainer .pf_color").live("click", function(e) {
-		var color = $(this).attr("style").substring(18,27);
-		var input = $(this).parent().siblings(".pf_colorForm").find("input");
-		$(input).val(color);
-		$(input).change();
-		$(this).parent().slideUp(300, function() {
-			$("body").unbind("click");
-		});
+	$('.pf_colorPreview').live('click', function() {
+		$(this).siblings('.pf_colorForm').find('.pf_colorPickerField').click();
 	});
 }
 

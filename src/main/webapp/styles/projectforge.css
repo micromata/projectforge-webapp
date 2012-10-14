@@ -498,18 +498,9 @@ h2.box_head .subtitle {
 /**
  * Color picker styles
  */
-.pf_colorForm {
-	display: none;
-}
-
-.pf_colorContainer {
-	width: 132px;
-	height: 88px;
-	border: 1px solid black;
-	display: none;
-	z-index: 10000;
-	position: absolute;
-	background-color: white;
+.colorpicker,
+.colorpicker div {
+	z-index:2000;
 }
 .pf_colorPreview {
 	width: 24px;
@@ -517,10 +508,15 @@ h2.box_head .subtitle {
 	border: 1px solid black;
 	cursor: pointer;
 }
-.pf_colorContainer div.pf_color {
-	height: 18px;
-	width: 18px;
-	margin: 2px;
-	cursor: pointer;
+
+.pf_colorPickerField {
+	width: 1px;
+	border: none;
+	padding: 0;
+	margin: 0;
+	position: relative;
 	float: left;
+	color: black;
+	background-color: black;
+	z-index: 1;
 }
