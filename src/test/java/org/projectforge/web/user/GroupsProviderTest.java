@@ -26,7 +26,6 @@ package org.projectforge.web.user;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import junit.framework.Assert;
@@ -82,7 +81,7 @@ public class GroupsProviderTest
     return col;
   }
 
-  private void assertGroupSet(final SortedSet<GroupDO> actualGroupSet, final int... expectedIds)
+  private void assertGroupSet(final Collection<GroupDO> actualGroupSet, final int... expectedIds)
   {
     if (expectedIds == null || expectedIds.length == 0) {
       Assert.assertTrue(CollectionUtils.isEmpty(actualGroupSet));
