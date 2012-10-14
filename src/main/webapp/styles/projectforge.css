@@ -504,9 +504,12 @@ h2.box_head .subtitle {
 
 .pf_colorContainer {
 	width: 132px;
+	height: 88px;
 	border: 1px solid black;
 	display: none;
 	z-index: 10000;
+	position: absolute;
+	background-color: white;
 }
 .pf_colorPreview {
 	width: 24px;
@@ -514,9 +517,10 @@ h2.box_head .subtitle {
 	border: 1px solid black;
 	cursor: pointer;
 }
-.pf_colorContainer span {
+.pf_colorContainer div.pf_color {
 	height: 18px;
 	width: 18px;
 	margin: 2px;
 	cursor: pointer;
+	float: left;
 }
