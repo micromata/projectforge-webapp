@@ -519,4 +519,6 @@ h2.box_head .subtitle {
 	color: black;
 	background-color: black;
 	z-index: 1;
+	opacity: 0;
+	filter: alpha(opacity=0);
 }
