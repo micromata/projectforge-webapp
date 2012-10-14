@@ -26,8 +26,6 @@ package org.projectforge.web.user;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.lang.StringUtils;
@@ -52,17 +50,19 @@ public class GroupsProvider extends TextChoiceProvider<GroupDO>
 
   private final GroupsComparator groupsComparator = new GroupsComparator();
 
+  private Collection<GroupDO> sortedGroups;
+
   /**
    * 
    * @param groupIds
    * @return
    */
-  public SortedSet<GroupDO> getSortedGroups(final String groupIds)
+  public Collection<GroupDO> getSortedGroups(final String groupIds)
   {
     if (StringUtils.isEmpty(groupIds) == true) {
       return null;
     }
-    final SortedSet<GroupDO> sortedGroups = new TreeSet<GroupDO>(groupsComparator);
+    sortedGroups = new TreeSet<GroupDO>(groupsComparator);
     final int[] ids = StringHelper.splitToInts(groupIds, ",", false);
     for (final int id : ids) {
       final GroupDO group = getUserGroupCache().getGroup(id);
@@ -87,13 +87,15 @@ public class GroupsProvider extends TextChoiceProvider<GroupDO>
     return buf.toString();
   }
 
-  public SortedSet<GroupDO> getSortedGroups()
+  public Collection<GroupDO> getSortedGroups()
   {
-    final Collection<GroupDO> allGroups = getUserGroupCache().getAllGroups();
-    final SortedSet<GroupDO> sortedGroups = new TreeSet<GroupDO>(groupsComparator);
-    for (final GroupDO group : allGroups) {
-      if (group.isDeleted() == false) {
-        sortedGroups.add(group);
+    if (sortedGroups == null) {
+      final Collection<GroupDO> allGroups = getUserGroupCache().getAllGroups();
+      sortedGroups = new TreeSet<GroupDO>(groupsComparator);
+      for (final GroupDO group : allGroups) {
+        if (group.isDeleted() == false) {
+          sortedGroups.add(group);
+        }
       }
     }
     return sortedGroups;
@@ -133,7 +135,7 @@ public class GroupsProvider extends TextChoiceProvider<GroupDO>
   @Override
   public void query(String term, final int page, final Response<GroupDO> response)
   {
-    final Set<GroupDO> sortedGroups = getSortedGroups();
+    final Collection<GroupDO> sortedGroups = getSortedGroups();
     final List<GroupDO> result = new ArrayList<GroupDO>();
     term = term.toLowerCase();
 

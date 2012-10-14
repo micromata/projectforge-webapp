@@ -26,8 +26,6 @@ package org.projectforge.web.user;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.projectforge.common.NumberHelper;
@@ -48,16 +46,20 @@ public class UsersProvider extends TextChoiceProvider<PFUserDO>
 
   private final UsersComparator usersComparator = new UsersComparator();
 
-  public SortedSet<PFUserDO> getSortedUsers()
+  private Collection<PFUserDO> sortedUsers;
+
+  public Collection<PFUserDO> getSortedUsers()
   {
-    final Collection<PFUserDO> allusers = getUserGroupCache().getAllUsers();
-    final SortedSet<PFUserDO> sortedusers = new TreeSet<PFUserDO>(usersComparator);
-    for (final PFUserDO user : allusers) {
-      if (user.isDeleted() == false) {
-        sortedusers.add(user);
+    if (sortedUsers == null) {
+      sortedUsers = new TreeSet<PFUserDO>(usersComparator);
+      final Collection<PFUserDO> allusers = getUserGroupCache().getAllUsers();
+      for (final PFUserDO user : allusers) {
+        if (user.isDeleted() == false && user.isDeactivated() == false) {
+          sortedUsers.add(user);
+        }
       }
     }
-    return sortedusers;
+    return sortedUsers;
   }
 
   /**
@@ -94,7 +96,7 @@ public class UsersProvider extends TextChoiceProvider<PFUserDO>
   @Override
   public void query(String term, final int page, final Response<PFUserDO> response)
   {
-    final Set<PFUserDO> sortedUsers = getSortedUsers();
+    final Collection<PFUserDO> sortedUsers = getSortedUsers();
     final List<PFUserDO> result = new ArrayList<PFUserDO>();
     term = term.toLowerCase();
 
