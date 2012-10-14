@@ -113,7 +113,7 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
       // Assigned users
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("group.assignedUsers"), true).setLabelSide(false);
       final Set<PFUserDO> assignedUsers = getData().getAssignedUsers();
-      final UsersProvider usersProvider = new UsersProvider();
+      final UsersProvider usersProvider = new UsersProvider().setPageSize(100);
       assignUsersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
           usersProvider.getSortedUsers());
       if (assignedUsers != null) {
