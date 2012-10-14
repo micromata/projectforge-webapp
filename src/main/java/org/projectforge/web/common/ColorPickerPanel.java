@@ -30,16 +30,26 @@ public class ColorPickerPanel extends Panel
 
   private String selectedColor;
 
-  private static final String[] COLORS = { "#A8735B", "#CA6D62", "#EF4013", "#F25B33", "#F87824", "#FAAF26", "#5DD689", "#3AA75C",
+  public static final String[] COLORS = { "#A8735B", "#CA6D62", "#EF4013", "#F25B33", "#F87824", "#FAAF26", "#5DD689", "#3AA75C",
     "#87D117", "#B8DC56", "#FBEA71", "#F8D24D", "#A6E0E8", "#A6E0E8", "#A2C5EA", "#4C84EE", "#989BFF", "#B599FF", "#C2C2C2", "#C9BDBF",
-    "#C9A6AC", "#EF92B4", "#C674EE", "#9F79E9",};
+    "#C9A6AC", "#EF92B4", "#C674EE", "#9F79E9"};
 
   /**
    * @param id
    */
   public ColorPickerPanel(final String id)
   {
+    this(id, COLORS[0]);
+  }
+
+  /**
+   * @param string
+   * @param color
+   */
+  public ColorPickerPanel(final String id, final String color)
+  {
     super(id);
+    this.selectedColor = color;
   }
 
   /**
@@ -49,7 +59,6 @@ public class ColorPickerPanel extends Panel
   protected void onInitialize()
   {
     super.onInitialize();
-    selectedColor = COLORS[0];
     final WebMarkupContainer preview = new WebMarkupContainer("preview") {
       private static final long serialVersionUID = 1L;
 
@@ -79,6 +88,7 @@ public class ColorPickerPanel extends Panel
       @Override
       protected void onUpdate(final AjaxRequestTarget target)
       {
+        onColorUpdate(selectedColor);
         target.add(preview);
       }
     });
@@ -90,6 +100,34 @@ public class ColorPickerPanel extends Panel
       repeater.add(colorSpan);
       colorSpan.add(new AttributeModifier("style", Model.of("background-color: " + color)));
     }
+  }
+
+  /**
+   * Hook method
+   * 
+   * @param selectedColor2
+   */
+  protected void onColorUpdate(final String selectedColor)
+  {
+
+  }
+
+  /**
+   * @return the selectedColor
+   */
+  public String getSelectedColor()
+  {
+    return selectedColor;
+  }
+
+  /**
+   * @param selectedColor the selectedColor to set
+   * @return this for chaining.
+   */
+  public ColorPickerPanel setSelectedColor(final String selectedColor)
+  {
+    this.selectedColor = selectedColor;
+    return this;
   }
 
 }

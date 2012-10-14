@@ -113,12 +113,13 @@ public abstract class PFDialog extends Panel
    */
   public void open(final AjaxRequestTarget target)
   {
-    target.appendJavaScript("$('#" + dialogContainer.getMarkupId() + "').unbind('dialogclose')");
+    String jsFunction = "";
     if (this.onCloseCallback != null) {
-      final String jsFunction = "function() { " + onCloseBehavior.getCallbackScript() + "}";
-      target.appendJavaScript("bindDialogCallback('" + dialogContainer.getMarkupId() + "', " + jsFunction + " );");
+      jsFunction = "function() { wicketAjaxGet('" + onCloseBehavior.getCallbackUrl() + "'); }";
+    } else {
+      jsFunction = "function() {}";
     }
-    target.appendJavaScript("openDialog('" + dialogContainer.getMarkupId() + "');");
+    target.appendJavaScript("openDialog('" + dialogContainer.getMarkupId() + "', " + jsFunction + ");");
   }
 
   /**

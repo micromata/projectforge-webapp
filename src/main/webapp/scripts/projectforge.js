@@ -101,17 +101,12 @@ function mcancelclosetime() {
 document.onclick = mclose;
 // End: Functionality for DropDownMenu
 
-function openDialog(element) {
+function openDialog(element, closeScript) {
 	$('#' + element).dialog({
 		'resizable': false,
-		'draggable': false
+		'draggable': false,
+		close: closeScript
 		}).dialog('open');
-}
-
-function bindDialogCallback(element, script) {
-	$('#' + element).bind('dialogclose', function(event, ui) {
-		script();
-	});
 }
 
 $(function() {
@@ -136,11 +131,11 @@ function initColorPicker() {
 			});
 		});
 	});
-	$(".pf_colorContainer").click(function(e) {
+	$(".pf_colorContainer").live("click", function(e) {
 		e.preventDefault();
 		e.stopPropagation();
 	});
-	$(".pf_colorContainer span").click(function(e) {
+	$(".pf_colorContainer .pf_color").live("click", function(e) {
 		var color = $(this).attr("style").substring(18,27);
 		var input = $(this).parent().siblings(".pf_colorForm").find("input");
 		$(input).val(color);
