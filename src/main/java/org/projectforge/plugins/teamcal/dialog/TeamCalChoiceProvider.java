@@ -7,7 +7,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////
 
-package org.projectforge.plugins.teamcal;
+package org.projectforge.plugins.teamcal.dialog;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,6 +16,8 @@ import java.util.List;
 import org.apache.wicket.injection.Injector;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.user.PFUserContext;
 
 import com.vaynberg.wicket.select2.Response;

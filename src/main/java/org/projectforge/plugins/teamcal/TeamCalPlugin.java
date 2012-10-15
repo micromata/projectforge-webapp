@@ -25,6 +25,15 @@ package org.projectforge.plugins.teamcal;
 
 import org.projectforge.admin.UpdateEntry;
 import org.projectforge.plugins.core.AbstractPlugin;
+import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.admin.TeamCalDao;
+import org.projectforge.plugins.teamcal.admin.TeamCalEditPage;
+import org.projectforge.plugins.teamcal.admin.TeamCalListPage;
+import org.projectforge.plugins.teamcal.admin.TeamCalRight;
+import org.projectforge.plugins.teamcal.event.TeamEventDO;
+import org.projectforge.plugins.teamcal.event.TeamEventDao;
+import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
+import org.projectforge.plugins.teamcal.event.TeamEventRight;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.UserPrefArea;

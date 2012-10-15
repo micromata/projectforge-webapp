@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
-import org.projectforge.plugins.teamcal.TeamCalDO;
-import org.projectforge.plugins.teamcal.TeamCalDao;
+import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.web.calendar.CalendarFilter;
 
 /**
