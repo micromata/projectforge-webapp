@@ -9,14 +9,11 @@
 
 package org.projectforge.plugins.teamcal;
 
-import java.sql.Timestamp;
-
 import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.AbstractEditPage;
-import org.projectforge.web.wicket.WicketUtils;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -28,40 +25,11 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamEventEditPage.class);
 
-  /**
-   * Key for preset the start date.
-   */
-  public static final String PARAMETER_KEY_START_DATE_IN_MILLIS = "startMillis";
-
-  /**
-   * Key for preset the stop date.
-   */
-  public static final String PARAMETER_KEY_END_DATE_IN_MILLIS = "endMillis";
-
-  /**
-   * Key for moving start date.
-   */
-  public static final String PARAMETER_KEY_NEW_START_DATE = "newStartDate";
-
-  /**
-   * Key for moving start date.
-   */
-  public static final String PARAMETER_KEY_NEW_END_DATE = "newEndDate";
-
-  /**
-   * Key for calendar.
-   */
-  public static final String PARAMETER_KEY_TEAMCALID = "teamCalId";
-
   @SpringBean(name = "teamEventDao")
   private TeamEventDao teamEventDao;
 
-  @SpringBean(name = "teamCalDao")
-  private TeamCalDao teamCalDao;
-
   /**
    * @param parameters
-   * @param i18nPrefix
    */
   public TeamEventEditPage(final PageParameters parameters)
   {
@@ -70,42 +38,12 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   }
 
   /**
-   * pre-init calendar with page parameters.
-   * Sets start and end date and teamCal id, if necessary.
+   * @param parameters
    */
-  @SuppressWarnings("null")
-  public void preInit()
+  public TeamEventEditPage(final PageParameters parameters, final TeamEventDO event)
   {
-    if (isNew() == true) {
-      final PageParameters parameters = getPageParameters();
-      final Long startDateInMillis = WicketUtils.getAsLong(parameters, PARAMETER_KEY_START_DATE_IN_MILLIS);
-      final Long stopTimeInMillis = WicketUtils.getAsLong(parameters, PARAMETER_KEY_END_DATE_IN_MILLIS);
-      final String teamCalId = WicketUtils.getAsString(parameters, PARAMETER_KEY_TEAMCALID);
-      if (startDateInMillis != null) {
-        getData().setStartDate(new Timestamp(startDateInMillis));
-        if (stopTimeInMillis == null) {
-          getData().setEndDate(new Timestamp(stopTimeInMillis));
-        }
-      }
-      if (stopTimeInMillis != null) {
-        getData().setEndDate(new Timestamp(stopTimeInMillis));
-        if (startDateInMillis == null) {
-          getData().setStartDate(new Timestamp(startDateInMillis));
-        }
-      }
-      if (teamCalId != null) {
-        getData().setCalendar(teamCalDao.getById(Integer.valueOf(teamCalId)));
-      }
-    } else {
-      final Long newStartTimeInMillis = WicketUtils.getAsLong(getPageParameters(), PARAMETER_KEY_START_DATE_IN_MILLIS);
-      final Long newStopTimeInMillis = WicketUtils.getAsLong(getPageParameters(), PARAMETER_KEY_END_DATE_IN_MILLIS);
-      if (newStartTimeInMillis != null) {
-        getData().setStartDate(new Timestamp(newStartTimeInMillis));
-      }
-      if (newStopTimeInMillis != null) {
-        getData().setEndDate(new Timestamp(newStopTimeInMillis));
-      }
-    }
+    super(parameters, "plugins.teamevent");
+    super.init(event);
   }
 
   /**

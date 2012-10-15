@@ -118,20 +118,24 @@ public class CalendarPanel extends Panel
       @Override
       protected void onDateRangeSelected(final SelectedRange range, final CalendarResponse response)
       {
-        if (log.isDebugEnabled() == true) {
-          log.debug("Selected region: " + range.getStart() + " - " + range.getEnd() + " / allDay: " + range.isAllDay());
+        if (TimesheetEventsProvider.EVENT_CLASS_NAME.equals(filter.getSelectedCalendar())) {
+          if (log.isDebugEnabled() == true) {
+            log.debug("Selected region: " + range.getStart() + " - " + range.getEnd() + " / allDay: " + range.isAllDay());
+          }
+          if (accessChecker.isRestrictedUser() == true) {
+            return;
+          }
+          final TimesheetDO timesheet = new TimesheetDO().setStartDate(DateHelper.getDateTimeAsMillis(range.getStart()))//
+              .setStopTime(DateHelper.getDateTimeAsMillis(range.getEnd()));
+          if (filter.getUserId() != null) {
+            timesheetDao.setUser(timesheet, filter.getUserId());
+          }
+          final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(timesheet);
+          timesheetEditPage.setReturnToPage((WebPage) getPage());
+          setResponsePage(timesheetEditPage);
+        } else {
+          onDateRangeSelectedHook(filter.getSelectedCalendar(), range, response);
         }
-        if (accessChecker.isRestrictedUser() == true) {
-          return;
-        }
-        final TimesheetDO timesheet = new TimesheetDO().setStartDate(DateHelper.getDateTimeAsMillis(range.getStart()))//
-            .setStopTime(DateHelper.getDateTimeAsMillis(range.getEnd()));
-        if (filter.getUserId() != null) {
-          timesheetDao.setUser(timesheet, filter.getUserId());
-        }
-        final TimesheetEditPage timesheetEditPage = new TimesheetEditPage(timesheet);
-        timesheetEditPage.setReturnToPage((WebPage) getPage());
-        setResponsePage(timesheetEditPage);
       }
 
       /**
@@ -296,7 +300,22 @@ public class CalendarPanel extends Panel
   }
 
   /**
+   * Hook method for overwriting children, which is called, when an date range event occurs which can not be handled through this page.
+   * 
+   * @param selectedCalendar
+   * @param range
+   * @param response
+   */
+  protected void onDateRangeSelectedHook(final String selectedCalendar, final SelectedRange range, final CalendarResponse response)
+  {
+    // by default nothing happens here
+  }
+
+  /**
+   * Hook method for overwriting children, which is called, when an event source should be registered
+   * 
    * @param config
+   * @param filter
    */
   protected void onRegisterEventSourceHook(final MyFullCalendarConfig config, final CalendarFilter filter)
   {

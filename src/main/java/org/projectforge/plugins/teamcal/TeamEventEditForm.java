@@ -82,7 +82,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   protected void init()
   {
     super.init();
-    parentPage.preInit();
 
     gridBuilder.newGrid16();
 

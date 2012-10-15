@@ -151,6 +151,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       fs.add(refreshButtonPanel);
       setDefaultButton(refreshButtonPanel.getButton());
     }
+    addControlButtons(fs);
     if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
       final PFUserDO user = PFUserContext.getUser();
       final String authenticationKey = userDao.getAuthenticationToken(user.getId());
@@ -176,16 +177,25 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     }));
     durationLabel = durationPanel.getLabel4Ajax();
     fs.add(durationPanel);
-    onAfterInit(gridBuilder, fs);
+    onAfterInit(gridBuilder);
+  }
+
+  /**
+   * Hook method where child implementations could add buttons
+   * 
+   * @param fs
+   */
+  protected void addControlButtons(final FieldsetPanel fs)
+  {
+    // by default nothing happens here
   }
 
   /**
    * Hook method where child implementations could place their logic
-   * @param gridBuilder
    * 
-   * @param fs
+   * @param gridBuilder
    */
-  protected void onAfterInit(final GridBuilder gridBuilder, final FieldsetPanel fs) {
+  protected void onAfterInit(final GridBuilder gridBuilder) {
     // by default nothing happens here
   }
 

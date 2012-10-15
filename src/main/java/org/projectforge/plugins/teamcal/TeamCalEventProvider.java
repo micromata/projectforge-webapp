@@ -11,7 +11,6 @@ package org.projectforge.plugins.teamcal;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import net.ftlines.wicket.fullcalendar.Event;
@@ -53,15 +52,22 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
    */
   public static final String EVENT_CLASS_NAME = "teamEvent";
 
+  private final TeamCalDao teamCalDao;
+
+  private final TeamEventRight eventRight;
+
   /**
    * @param parent component for i18n
    */
-  public TeamCalEventProvider(final Component parent, final TeamEventDao teamEventDao, final UserGroupCache userGroupCache, final TeamCalCalendarFilter filter)
+  public TeamCalEventProvider(final Component parent, final TeamCalDao teamCalDao, final TeamEventDao teamEventDao,
+      final UserGroupCache userGroupCache, final TeamCalCalendarFilter filter)
   {
     super(parent);
+    this.teamCalDao = teamCalDao;
     this.filter = filter;
     this.teamEventDao = teamEventDao;
     this.userGroupCache = userGroupCache;
+    this.eventRight = new TeamEventRight();
   }
 
   /**
@@ -81,16 +87,16 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
   protected void buildEvents(final DateTime start, final DateTime end)
   {
     final TeamEventFilter eventFilter = new TeamEventFilter();
-    eventFilter.setTeamCals(filter.getAssignedtItems());
+    final List<TeamCalDO> selectedCalendars = filter.calcAssignedtItems(teamCalDao);
+    eventFilter.setTeamCals(selectedCalendars);
     eventFilter.setStartDate(start.toDate());
     eventFilter.setEndDate(end.toDate());
     eventFilter.setUser(PFUserContext.getUser());
 
     final List<List<TeamEventDO>> eventLists = new ArrayList<List<TeamEventDO>>();
-    if (filter.getAssignedtItems() != null) {
-      final Iterator<TeamCalDO> it = filter.getAssignedtItems().iterator();
-      while (it.hasNext()) {
-        eventFilter.setTeamCalId(it.next().getId());
+    if (selectedCalendars != null) {
+      for (final TeamCalDO calendar : selectedCalendars) {
+        eventFilter.setTeamCalId(calendar.getId());
         eventLists.add(teamEventDao.getList(eventFilter));
       }
     }
@@ -109,10 +115,10 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
       month = currentMonth.getMonthOfYear();
       // firstDayOfMonth = currentMonth.withDayOfMonth(1);
     }
+    final TeamCalRight right = new TeamCalRight();
+    final PFUserDO user = PFUserContext.getUser();
     if (CollectionUtils.isNotEmpty(eventLists) == true) {
       for (final List<TeamEventDO> teamEvents : eventLists) {
-        final TeamCalRight right = new TeamCalRight();
-        final PFUserDO user = PFUserContext.getUser();
         for (final TeamEventDO teamEvent : teamEvents) {
           final DateTime startDate = new DateTime(teamEvent.getStartDate(), PFUserContext.getDateTimeZone());
           final DateTime endDate = new DateTime(teamEvent.getEndDate(), PFUserContext.getDateTimeZone());
@@ -124,24 +130,28 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           final Event event = new Event();
           event.setClassName(EVENT_CLASS_NAME);
           event.setId("" + teamEvent.getId());
+          event.setColor(filter.getColor(teamEvent.getCalendarId()));
+
+          if (eventRight.hasUpdateAccess(PFUserContext.getUser(), teamEvent, null)) {
+            event.setEditable(true);
+          } else {
+            event.setEditable(false);
+          }
 
           if (teamEvent.isAllDay()) {
             event.setAllDay(true);
           }
 
           /*
-           * necessary, because if more days are selected the calendar
-           * sets end time and start time to 00:00
-           * thus the calendar does not select the last day.
-           * for example: selected two days, but only one day would be shown.
+           * necessary, because if more days are selected the calendar sets end time and start time to 00:00 thus the calendar does not
+           * select the last day. for example: selected two days, but only one day would be shown.
            */
           if (endDate.getDayOfYear() != startDate.getDayOfYear()) {
-            if (endDate.getMillisOfDay() == 0
-                && startDate.getMillisOfDay() == 0){
+            if (endDate.getMillisOfDay() == 0 && startDate.getMillisOfDay() == 0) {
               event.setAllDay(true);
             }
           } else {
-            if (endDate.getMillisOfDay() == startDate.getMillisOfDay()){
+            if (endDate.getMillisOfDay() == startDate.getMillisOfDay()) {
               event.setAllDay(true);
             }
           }
@@ -195,25 +205,16 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
             // Month view:
             if (right.isOwner(user, teamEvent.getCalendar()) == true
                 || right.hasAccessGroup(teamEvent.getCalendar().getFullAccessGroup(), userGroupCache, user) == true
-                || right.hasAccessGroup(teamEvent.getCalendar().getReadOnlyAccessGroup(), userGroupCache, user) == true){
+                || right.hasAccessGroup(teamEvent.getCalendar().getReadOnlyAccessGroup(), userGroupCache, user) == true) {
               event.setTitle(title);
             } else {
               event.setTitle("");
             }
           }
-          if (month != null && startDate.getMonthOfYear() != month && endDate.getMonthOfYear() != month) {
-            // Display team events of other month as grey blue:
-            event.setTextColor("#222222").setBackgroundColor("#ACD9E8").setColor("#ACD9E8");
-          }
           events.put(teamEvent.getId() + "", event);
         }
       }
     }
-  }
-
-  public void forceReload(final Collection<TeamCalDO> assignedItems) {
-    filter.setAssignedtItems(assignedItems);
-    super.forceReload();
   }
 
   public void setUserGroupCache(final UserGroupCache userGroupCache)
@@ -228,4 +229,25 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
   {
     return log;
   }
+
+  /**
+   * @param selectedCalendar
+   * @return
+   */
+  public static TeamCalDO getTeamCalForEncodedId(final TeamCalDao teamCalDao, String selectedCalendar)
+  {
+    if (selectedCalendar == null) {
+      return null;
+    }
+    if (selectedCalendar.contains("-")) {
+      selectedCalendar = selectedCalendar.substring(selectedCalendar.indexOf("-") + 1);
+    }
+    try {
+      return teamCalDao.getById(Integer.valueOf(selectedCalendar));
+    } catch (final NumberFormatException ex) {
+      log.warn("Unable to get teamCalDao for id " + selectedCalendar);
+    }
+    return null;
+  }
+
 }

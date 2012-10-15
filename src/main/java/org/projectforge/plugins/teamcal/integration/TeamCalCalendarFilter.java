@@ -10,11 +10,16 @@
 package org.projectforge.plugins.teamcal.integration;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.projectforge.plugins.teamcal.TeamCalDO;
+import org.projectforge.plugins.teamcal.TeamCalDao;
 import org.projectforge.web.calendar.CalendarFilter;
-
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
@@ -25,20 +30,84 @@ public class TeamCalCalendarFilter extends CalendarFilter
 {
   private static final long serialVersionUID = -8318037558891653348L;
 
-  @XStreamAsAttribute
-  private Collection<TeamCalDO> assignedItems;
+  private static final String DEFAULT_COLOR = "#FAAF26";
+  private Map<Integer, String> calendarMap;
 
   /**
-   * @param assignedItems
+   * 
    */
-  public void setAssignedtItems(final Collection<TeamCalDO> assignedItems)
+  public TeamCalCalendarFilter()
   {
-    this.assignedItems = assignedItems;
+    super();
+    this.calendarMap = new HashMap<Integer, String>();
   }
 
-  public Collection<TeamCalDO> getAssignedtItems()
+  public Set<Integer> getCalendarPk()
   {
-    return assignedItems;
+    testSerializedMap();
+    return calendarMap.keySet();
   }
 
+  /**
+   * 
+   */
+  private void testSerializedMap()
+  {
+    if (calendarMap == null) {
+      calendarMap = new HashMap<Integer, String>();
+    }
+  }
+
+  public void addCalendarPk(final Integer pk)
+  {
+    // default color
+    updateCalendarColor(pk, DEFAULT_COLOR);
+  }
+
+  public void updateCalendarColor(final Integer pk, final String color)
+  {
+    if (StringUtils.isNotBlank(color)) {
+      testSerializedMap();
+      calendarMap.put(pk, color);
+    }
+  }
+
+  public void removeCalendarPk(final Integer pk)
+  {
+    testSerializedMap();
+    if (calendarMap.containsKey(pk)) {
+      calendarMap.remove(pk);
+    }
+  }
+
+  public String getColor(final Integer pk)
+  {
+    testSerializedMap();
+    final String result = calendarMap.get(pk);
+    if(StringUtils.isBlank(result)) {
+      return DEFAULT_COLOR;
+    }
+    return result;
+  }
+
+  /**
+   * @return
+   */
+  public List<TeamCalDO> calcAssignedtItems(final TeamCalDao dao)
+  {
+    final List<TeamCalDO> result = new LinkedList<TeamCalDO>();
+    for (final Integer calendarId : getCalendarPk()) {
+      result.add(dao.getById(calendarId));
+    }
+    return result;
+  }
+
+  public void resetFilter(final Collection<TeamCalDO> newCollection)
+  {
+    testSerializedMap();
+    calendarMap.clear();
+    for (final TeamCalDO calendar : newCollection) {
+      addCalendarPk(calendar.getId());
+    }
+  }
 }

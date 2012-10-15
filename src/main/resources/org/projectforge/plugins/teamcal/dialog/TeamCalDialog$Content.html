@@ -1,0 +1,22 @@
+<wicket:panel xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
+  <div class="pf_teamCalDialog">
+    <h3><wicket:message key="plugins.teamcal.selectCalendar" /></h3>
+    <input type="hidden" wicket:id="choices" style="width: 100%;"/>
+    <br/><br/><h3><wicket:message key="plugins.teamcal.selectColor" /></h3>
+    <div wicket:id="repeaterContainer">
+      <div wicket:id="repeater" style="clear: both; margin: 10px 0px;">
+        <div style="float: left; margin-right: 10px;" wicket:id="colorPicker"></div>
+        <span style="height: 26px; vertical-align: middle; line-height: 24px;" wicket:id="name"></span>
+      </div>
+    </div>
+    <br/><h3><wicket:message key="plugins.teamcal.selectDefaultCalendar" /></h3>
+    <form wicket:id="defaultForm">
+      <select wicket:id="defaultSelect">
+        <wicket:container wicket:id="options">
+          <option wicket:id="option">Option Label</option>
+        </wicket:container>
+      </select>
+    </form>
+    
+  </div>
+</wicket:panel>

@@ -50,38 +50,18 @@ public class IconButtonPanel extends Panel
     this(id, type, (String) null);
   }
 
-  @SuppressWarnings("serial")
   public IconButtonPanel(final String id, final IconType type, final String tooltip)
   {
     super(id);
-    button = new Button("button") {
-      /**
-       * @see org.apache.wicket.markup.html.form.Button#onSubmit()
-       */
-      @Override
-      public void onSubmit()
-      {
-        IconButtonPanel.this.onSubmit();
-      }
-    };
+    button = createButton("button");
     add(button);
     init(type, tooltip);
   }
 
-  @SuppressWarnings("serial")
   public IconButtonPanel(final String id, final IconType type, final Model<String> tooltip)
   {
     super(id);
-    button = new Button("button") {
-      /**
-       * @see org.apache.wicket.markup.html.form.Button#onSubmit()
-       */
-      @Override
-      public void onSubmit()
-      {
-        IconButtonPanel.this.onSubmit();
-      }
-    };
+    button = createButton("button");
     add(button);
     init(type, null);
     if (tooltip != null) {
@@ -155,4 +135,25 @@ public class IconButtonPanel extends Panel
       WicketUtils.addTooltip(button, tooltip);
     }
   }
+
+  /**
+   * @param string
+   * @return
+   */
+  protected Button createButton(final String string)
+  {
+    return new Button("button") {
+      private static final long serialVersionUID = 1L;
+
+      /**
+       * @see org.apache.wicket.markup.html.form.Button#onSubmit()
+       */
+      @Override
+      public void onSubmit()
+      {
+        IconButtonPanel.this.onSubmit();
+      }
+    };
+  }
+
 }

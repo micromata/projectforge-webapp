@@ -30,6 +30,7 @@ import net.ftlines.wicket.fullcalendar.ViewType;
 
 import org.joda.time.DateMidnight;
 import org.projectforge.user.PFUserContext;
+import org.projectforge.web.timesheet.TimesheetEventsProvider;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
@@ -44,6 +45,9 @@ public class CalendarFilter implements Serializable
 
   @XStreamAsAttribute
   private DateMidnight startDate;
+
+  @XStreamAsAttribute
+  private String selectedCalendar;
 
   /**
    * Was used by old calendar.
@@ -78,6 +82,7 @@ public class CalendarFilter implements Serializable
   {
     startDate = new DateMidnight();
     userId = PFUserContext.getUserId();
+    selectedCalendar = TimesheetEventsProvider.EVENT_CLASS_NAME;
   }
 
   /**
@@ -226,4 +231,22 @@ public class CalendarFilter implements Serializable
   {
     this.current = current;
   }
+
+  /**
+   * @return the selectedCalendar
+   */
+  public String getSelectedCalendar()
+  {
+    return selectedCalendar;
+  }
+
+  /**
+   * @param selectedCalendar the selectedCalendar to set
+   * @return this for chaining.
+   */
+  public void setSelectedCalendar(final String selectedCalendar)
+  {
+    this.selectedCalendar = selectedCalendar;
+  }
+
 }

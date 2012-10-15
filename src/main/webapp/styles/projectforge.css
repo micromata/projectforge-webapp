@@ -522,3 +522,7 @@ h2.box_head .subtitle {
 	opacity: 0;
 	filter: alpha(opacity=0);
 }
+
+.pf_teamCalDialog {
+	width: 100%;
+}

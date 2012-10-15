@@ -14,7 +14,6 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
-import org.projectforge.web.user.UserSelectPanel;
 import org.projectforge.web.wicket.AbstractListForm;
 import org.projectforge.web.wicket.flowlayout.DivPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
@@ -30,16 +29,8 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
 
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(TeamCalListForm.class);
 
-  private TeamCalFilter filter;
-
   public TeamCalListForm(final TeamCalListPage parentPage){
     super(parentPage);
-    filter = newSearchFilterInstance();
-    final boolean access = false;
-    filter.setOwnerId(getUserId());
-    filter.setFullAccess(access);
-    filter.setReadOnlyAccess(access);
-    filter.setMinimalAccess(access);
   }
 
   /**
@@ -64,30 +55,6 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
       fs.setOutputMarkupId(true);
-      final Model<PFUserDO> model = new Model<PFUserDO>() {
-        @Override
-        public PFUserDO getObject()
-        {
-          //          if (getSearchFilter().getOwnerId() == null)
-          //            getSearchFilter().setOwnerId(PFUserContext.getUserId());
-          return userGroupCache.getUser(getSearchFilter().getOwnerId());
-        }
-
-        @Override
-        public void setObject(final PFUserDO object)
-        {
-          if (object == null) {
-            getSearchFilter().setOwnerId(PFUserContext.getUserId());
-          } else {
-            getSearchFilter().setOwnerId(object.getId());
-          }
-          parentPage.refresh();
-        }
-      };
-      final UserSelectPanel userSelectPanel = new UserSelectPanel(fs.newChildId(), model, parentPage, "ownerId");
-      fs.add(userSelectPanel);
-      userSelectPanel.setDefaultFormProcessing(false);
-      userSelectPanel.init().withAutoSubmit(true);
 
       final DivPanel checkBoxPanel = fs.addNewCheckBoxDiv();
       checkBoxPanel.add(createAutoRefreshCheckBoxPanel(checkBoxPanel.newChildId(),
@@ -120,13 +87,5 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
   public TeamCalFilter getFilter()
   {
     return getSearchFilter();
-  }
-
-  /**
-   * @param filter the filter to set
-   */
-  public void setFilter(final TeamCalFilter filter)
-  {
-    this.filter = filter;
   }
 }

@@ -81,7 +81,7 @@ public class TeamCalPlugin extends AbstractPlugin
     // Register the menu entry as sub menu entry of the misc menu:
     final MenuItemDef parentMenu = getMenuItemDef(MenuItemDefId.MISC);
     registerMenuItem(new MenuItemDef(parentMenu, ID, 7, "plugins.teamcal.menu", TeamCalCalendarPage.class));
-    registerMenuItem(new MenuItemDef(parentMenu, ID, 8, "plugins.teamcal.title.list", TeamCalListPage.class));
+    registerMenuItem(new MenuItemDef(parentMenu, ID + "List", 8, "plugins.teamcal.title.list", TeamCalListPage.class));
 
     // .setMobileMenu(ToDoMobileListPage.class, 10));
 
