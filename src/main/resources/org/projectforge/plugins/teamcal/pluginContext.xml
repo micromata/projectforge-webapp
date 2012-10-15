@@ -2,6 +2,6 @@
 <!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
 <beans default-lazy-init="false" default-autowire="byType">
   <!-- Daos (automatically initialized as singletons.) -->
-  <bean id="teamCalDao" class="org.projectforge.plugins.teamcal.TeamCalDao" />
-  <bean id="teamEventDao" class="org.projectforge.plugins.teamcal.TeamEventDao" />
+  <bean id="teamCalDao" class="org.projectforge.plugins.teamcal.admin.TeamCalDao" />
+  <bean id="teamEventDao" class="org.projectforge.plugins.teamcal.event.TeamEventDao" />
 </beans>
