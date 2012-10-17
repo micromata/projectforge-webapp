@@ -33,6 +33,7 @@ import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateMidnight;
 import org.projectforge.access.AccessChecker;
+import org.projectforge.core.Configuration;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
@@ -122,8 +123,10 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       }
       checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showPlanning"),
           getString("calendar.option.planning"), true).setTooltip(getString("calendar.option.planning.tooltip")));
-      checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showBirthdays"),
-          getString("calendar.option.birthdays"), true));
+      if (Configuration.getInstance().isAddressManagementConfigured() == true) {
+        checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showBirthdays"),
+            getString("calendar.option.birthdays"), true));
+      }
       checkBoxPanel.add(new CheckBoxPanel(checkBoxPanel.newChildId(), new PropertyModel<Boolean>(filter, "showStatistics"),
           getString("calendar.option.statistics"), true).setTooltip(getString("calendar.option.statistics.tooltip")));
     }
@@ -195,7 +198,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
    * 
    * @param gridBuilder
    */
-  protected void onAfterInit(final GridBuilder gridBuilder) {
+  protected void onAfterInit(final GridBuilder gridBuilder)
+  {
     // by default nothing happens here
   }
 
