@@ -175,9 +175,8 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
           log.error("Paranoia counter exceeded! Dear developer, please have a look at the implementation of buildEvents.");
           break;
         }
-        final int dayOfMonth = day.getDayOfMonth();
         final int dayOfYear = day.getDayOfYear();
-        final long duration = durationsPerDayOfMonth[dayOfMonth];
+        final long duration = durationsPerDayOfYear[dayOfYear];
         final boolean firstDayOfWeek = day.getDayOfWeek() == PFUserContext.getJodaFirstDayOfWeek();
         if (firstDayOfWeek == false && duration == 0) {
           day = day.plusDays(1);
@@ -298,26 +297,8 @@ public class TimesheetEventsProvider extends MyFullCalendarEventsProvider
     durationsPerDayOfMonth[dayOfMonth] += duration;
   }
 
-  /**
-   * @param dayOfMonth
-   * @see DateTime#getDayOfMonth()
-   */
-  public long getDurationOfDay(final int dayOfMonth)
-  {
-    return durationsPerDayOfMonth[dayOfMonth];
-  }
-
   private void addDurationOfDayOfYear(final int dayOfYear, final long duration)
   {
     durationsPerDayOfYear[dayOfYear] += duration;
-  }
-
-  /**
-   * @param weekOfYear
-   * @see DateTime#getDayOfMonth()
-   */
-  public long getDurationOfWeekOfYear(final int weekOfYear)
-  {
-    return durationsPerDayOfMonth[weekOfYear];
   }
 }
