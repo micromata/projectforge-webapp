@@ -72,6 +72,7 @@ public class ConfigXmlTest
       + "  </holidays>\n"
       + "  <databaseDirectory>database</databaseDirectory>\n"
       + "  <loggingDirectory>logs</loggingDirectory>\n"
+      + "  <fontsDirectory>resources/fonts</fontsDirectory>\n"
       + "  <workingDirectory>work</workingDirectory>\n"
       + "  <tempDirectory>tmp</tempDirectory>\n"
       + "  <accountingConfig/>\n"
