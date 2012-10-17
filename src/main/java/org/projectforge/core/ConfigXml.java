@@ -154,6 +154,8 @@ public class ConfigXml
 
   private String loggingDirectory;
 
+  private String fontsDirectory;
+
   private String workingDirectory;
 
   private String tempDirectory;
@@ -229,6 +231,7 @@ public class ConfigXml
     databaseDirectory = "database";
     loggingDirectory = "logs";
     workingDirectory = "work";
+    fontsDirectory = "resources" + File.separator + "fonts";
     tempDirectory = "tmp";
     servletContextPath = null;
     domain = null;
@@ -302,6 +305,8 @@ public class ConfigXml
       ensureDir(new File(loggingDirectory));
       this.workingDirectory = FileHelper.getAbsolutePath(applicationHomeDir, this.workingDirectory);
       ensureDir(new File(workingDirectory));
+      this.fontsDirectory = FileHelper.getAbsolutePath(applicationHomeDir, this.fontsDirectory);
+      ensureDir(new File(fontsDirectory));
       this.tempDirectory = FileHelper.getAbsolutePath(applicationHomeDir, this.tempDirectory);
       ensureDir(new File(tempDirectory));
     }
@@ -847,6 +852,24 @@ public class ConfigXml
   public void setWorkingDirectory(final String workingDirectory)
   {
     this.workingDirectory = workingDirectory;
+  }
+
+  /**
+   * Default value: "resources/fonts".
+   * @return the fontsDirectory
+   */
+  public String getFontsDirectory()
+  {
+    return fontsDirectory;
+  }
+
+  /**
+   * @param fontsDirectory the fontsDirectory to set
+   * @return this for chaining.
+   */
+  public void setFontsDirectory(final String fontsDirectory)
+  {
+    this.fontsDirectory = fontsDirectory;
   }
 
   /**
