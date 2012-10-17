@@ -45,6 +45,7 @@ import org.apache.wicket.request.cycle.AbstractRequestCycleListener;
 import org.apache.wicket.request.cycle.RequestCycle;
 import org.apache.wicket.request.handler.PageProvider;
 import org.apache.wicket.request.handler.RenderPageRequestHandler;
+import org.apache.wicket.request.resource.PackageResourceReference;
 import org.apache.wicket.resource.loader.BundleStringResourceLoader;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.apache.wicket.spring.injection.annot.SpringComponentInjector;
@@ -299,6 +300,8 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     // Select2:
     final ApplicationSettings select2Settings = ApplicationSettings.get();
     select2Settings.setIncludeJquery(false);
+    select2Settings.setJavaScriptReference(new PackageResourceReference(WicketApplication.class, "select2/select2.js"));
+    select2Settings.setJavaScriptMinifiedReference(new PackageResourceReference(WicketApplication.class, "select2/select2.js"));
 
     final XmlWebApplicationContext webApplicationContext = (XmlWebApplicationContext) WebApplicationContextUtils
         .getWebApplicationContext(getServletContext());

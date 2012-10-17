@@ -540,7 +540,7 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
   {
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.assignedGroups"), true).setLabelSide(false);
     final Collection<Integer> set = ((UserDao) getBaseDao()).getAssignedGroups(data);
-    final GroupsProvider groupsProvider = new GroupsProvider().setPageSize(200);
+    final GroupsProvider groupsProvider = new GroupsProvider();
     assignListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(groupsProvider.getSortedGroups());
     if (set != null) {
       for (final Integer groupId : set) {
