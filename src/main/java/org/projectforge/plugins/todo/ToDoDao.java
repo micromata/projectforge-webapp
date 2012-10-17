@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -206,10 +207,18 @@ public class ToDoDao extends BaseDao<ToDoDO>
           + toDo);
       return;
     }
+    final Locale locale = recipient.getLocale();
     final Mail msg = new Mail();
     msg.setTo(recipient);
-    final String subject = I18nHelper.getLocalizedString(recipient.getLocale(), "plugins.todo.todo") + ": " + toDo.getSubject();
-    msg.setProjectForgeSubject(subject);
+    final StringBuffer subject = new StringBuffer();
+    final ToDoStatus status = toDo.getStatus();
+    if (status != null && status != ToDoStatus.OPENED) {
+      subject.append("[").append(I18nHelper.getLocalizedString(locale, "plugins.todo.status")).append(": ")
+      .append(I18nHelper.getLocalizedString(locale, status.getI18nKey())).append("] ");
+    }
+    subject.append(I18nHelper.getLocalizedString(locale, "plugins.todo.todo")).append(": ");
+    subject.append(toDo.getSubject());
+    msg.setProjectForgeSubject(subject.toString());
     final String content = sendMail.renderGroovyTemplate(msg, "mail/todoChangeNotification.html", data, recipient);
     msg.setContent(content);
     msg.setContentType(Mail.CONTENTTYPE_HTML);
