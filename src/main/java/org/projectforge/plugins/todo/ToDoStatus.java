@@ -53,7 +53,17 @@ public enum ToDoStatus implements I18nEnum
     return key;
   }
 
-  private ToDoStatus(String key)
+  public boolean isIn(final ToDoStatus... status)
+  {
+    for (final ToDoStatus st : status) {
+      if (this == st) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private ToDoStatus(final String key)
   {
     this.key = key;
   }
