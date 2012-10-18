@@ -118,7 +118,8 @@ public class CalendarPanel extends Panel
       @Override
       protected void onDateRangeSelected(final SelectedRange range, final CalendarResponse response)
       {
-        if (TimesheetEventsProvider.EVENT_CLASS_NAME.equals(filter.getSelectedCalendar())) {
+        final String selectedCalendar = filter.getSelectedCalendar();
+        if (selectedCalendar == null || TimesheetEventsProvider.EVENT_CLASS_NAME.equals(selectedCalendar) == true) {
           if (log.isDebugEnabled() == true) {
             log.debug("Selected region: " + range.getStart() + " - " + range.getEnd() + " / allDay: " + range.isAllDay());
           }
