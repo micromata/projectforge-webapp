@@ -11,11 +11,17 @@ package org.projectforge.plugins.teamcal.admin;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.access.AccessChecker;
 import org.projectforge.user.GroupDO;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.user.GroupSelectPanel;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
@@ -23,6 +29,8 @@ import org.projectforge.web.wicket.components.JodaDatePanel;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
+import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * Creates a top form-panel to add filter functions or other options.
@@ -42,7 +50,12 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   @SpringBean(name = "userDao")
   private UserDao userDao;
 
+  @SpringBean(name = "accessChecker")
+  protected AccessChecker accessChecker;
+
   private boolean access = false;
+
+  private String iCalTarget;
 
   private JodaDatePanel datePanel;
 
@@ -151,133 +164,36 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       minimalAccess.init();
       if (access == false)
         minimalAccess.setEnabled(false);
-    }
 
-    //    { comming soon
-    //      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.teamcal.icsKey"), true);
-    //      final AccessChecker accessChecker = new AccessChecker();
-    //      if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
-    //        final PFUserDO user = PFUserContext.getUser();
-    //        final String authenticationKey = userDao.getAuthenticationToken(user.getId());
-    //        final String contextPath = WebApplication.get().getServletContext().getContextPath();
-    //        final String iCalTarget = contextPath
-    //            + "/export/ProjectForge.ics?teamCalOwner="
-    //            + user.getUsername()
-    //            + "&token="
-    //            + authenticationKey;
-    //        final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
-    //        final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fs.newChildId(), IconType.SUBSCRIPTION,
-    //            getString("timesheet.iCalExport"), iCalExportLink).setLight();
-    //        final Label exportICalLabel = new Label(fs.newChildId(), Model.of(iCalTarget));
-    //        fs.add(exportICalButtonPanel);
-    //        fs.add(exportICalLabel);
-    //      }
-    //    }
+      if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
+        final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.subscribe"), true).setNoLabelFor();
+        initICalTarget();
+        final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
+        final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fsSubscribe.newChildId(), IconType.SUBSCRIPTION,
+            getString("plugins.teamcal.subscribe"), iCalExportLink).setLight();
+        fsSubscribe.add(exportICalButtonPanel);
+      }
+    }
   }
 
   /**
-   * to be continued.
-   * multiple group selection.
+   * 
    */
-  /**
-  @SuppressWarnings("serial")
-  private void addAssignedGroups(final boolean adminAccess)
+  public void initICalTarget()
   {
-    final FieldsetPanel fs = gridBuilder.newFieldset("FullAccessGroup", true).setLabelSide(false);
-    final List<KeyValueBean<Integer, String>> fullList = new ArrayList<KeyValueBean<Integer, String>>();
-
-    // list of all available groups
-    final List<GroupDO> result = Login.getInstance().getAllGroups();
-    GroupDO buffer = null; // check for double entries.
-    for (final GroupDO group : result) {
-      if (buffer == null) {
-        fullList.add(new KeyValueBean<Integer, String>(group.getId(), group.getName()));
-        buffer = group;
-      } else
-        // don't add if group already added.
-        if (group.getId() != buffer.getId()) {
-          fullList.add(new KeyValueBean<Integer, String>(group.getId(), group.getName()));
-          buffer = group;
-        }
-    }
-
-    // relation teamcal to group
-    final TeamCalAccessDO teamCalAccess = new TeamCalAccessDO();
-    final Set<GroupDO> assignedGroups = teamCalAccess.getFullAccessGroups();
-    final List<Integer> assignedGroupList = new ArrayList<Integer>();
-    if (assignedGroups != null)
-      for (final GroupDO g : assignedGroups)
-        assignedGroupList.add(g.getId());
-
-    groups = new TwoListHelper<Integer, String>(fullList, assignedGroupList);
-    groups.sortLists();
-
-    valuesToUnassignChoice = new ListMultipleChoice<Integer>(fs.getListChoiceId());
-    valuesToUnassignChoice.setModel(new PropertyModel<Collection<Integer>>(this, "valuesToUnassign"));
-    // set row height - unassigned items
-    WicketUtils.setHeight(valuesToUnassignChoice, ROW_HEIGHT);
-    WicketUtils.setPercentSize(valuesToUnassignChoice, ROW_HEIGHT_PERCENT);
-    fs.add(valuesToUnassignChoice);
-
-    valuesToAssignChoice = new ListMultipleChoice<Integer>(fs.getListChoiceId());
-    valuesToAssignChoice.setModel(new PropertyModel<Collection<Integer>>(this, "valuesToAssign"));
-    // set row height - assigned items
-    WicketUtils.setHeight(valuesToAssignChoice, ROW_HEIGHT);
-    WicketUtils.setPercentSize(valuesToAssignChoice, ROW_HEIGHT_PERCENT);
-    fs.add(valuesToAssignChoice);
-
-    //    fs.add(valuesToAssignChoice);
-    if (adminAccess == true) {
-
-      // ASSIGN
-      valuesToAssign = new ArrayList<Integer>();
-      fs.add(new IconLinkPanel(fs.newChildId(), IconType.CIRCLE_ARROW_WEST, getString("tooltip.assign"), new SubmitLink(
-          IconLinkPanel.LINK_ID) {
-        @Override
-        public void onSubmit()
-        {
-          //          accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
-          groups.assign(valuesToAssign);
-          valuesToAssign.clear();
-          refreshGroupLists();
-        };
-      }));
-
-      // UNASSIGN
-      valuesToUnassign = new ArrayList<Integer>();
-      fs.add(new IconLinkPanel(fs.newChildId(), IconType.CIRCLE_ARROW_EAST, getString("tooltip.unassign"), new SubmitLink(
-          IconLinkPanel.LINK_ID) {
-        @Override
-        public void onSubmit()
-        {
-          //          accessChecker.checkIsLoggedInUserMemberOfAdminGroup();
-          groups.unassign(valuesToUnassign);
-          valuesToUnassign.clear();
-          refreshGroupLists();
-        };
-      }));
-
-      fs.setNowrap();
-    }
-    refreshGroupLists();
+    final PFUserDO user = PFUserContext.getUser();
+    final String authenticationKey = userDao.getAuthenticationToken(user.getId());
+    final String contextPath = WebApplication.get().getServletContext().getContextPath();
+    iCalTarget = contextPath
+        + "/export/ProjectForge.ics?timesheetUser="
+        + user.getUsername()
+        + "&token="
+        + authenticationKey
+        + "&teamCals="
+        + this.getData().getId()
+        + "&timesheetRequired="
+        + false;
   }
-
-  private void refreshGroupLists()
-  {
-    final LabelValueChoiceRenderer<Integer> valuesToAssignChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-    for (final KeyValueBean<Integer, String> group : this.groups.getUnassignedItems()) {
-      valuesToAssignChoiceRenderer.addValue(group.getKey(), group.getValue());
-    }
-    valuesToAssignChoice.setChoiceRenderer(valuesToAssignChoiceRenderer);
-    valuesToAssignChoice.setChoices(valuesToAssignChoiceRenderer.getValues());
-
-    final LabelValueChoiceRenderer<Integer> valuesToUnassignChoiceRenderer = new LabelValueChoiceRenderer<Integer>();
-    for (final KeyValueBean<Integer, String> group : this.groups.getAssignedItems()) {
-      valuesToUnassignChoiceRenderer.addValue(group.getKey(), group.getValue());
-    }
-    valuesToUnassignChoice.setChoiceRenderer(valuesToUnassignChoiceRenderer);
-    valuesToUnassignChoice.setChoices(valuesToUnassignChoiceRenderer.getValues());
-  }*/
 
   /**
    * @see org.projectforge.web.wicket.AbstractEditForm#getLogger()

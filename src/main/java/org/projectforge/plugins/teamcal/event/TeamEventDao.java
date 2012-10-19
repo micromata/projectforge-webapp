@@ -126,6 +126,14 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     return queryFilter;
   }
 
+  public List<TeamEventDO> getUnlimitedList(final TeamEventFilter filter) {
+    final QueryFilter queryFilter = new QueryFilter();
+    final TeamCalDO teamCal = new TeamCalDO();
+    teamCal.setId(filter.getTeamCalId());
+    queryFilter.add(Restrictions.and(Restrictions.eq("calendar", teamCal), Restrictions.eq("deleted", filter.isDeleted())));
+    return super.getList(queryFilter);
+  }
+
   @Override
   public TeamEventDO newInstance()
   {

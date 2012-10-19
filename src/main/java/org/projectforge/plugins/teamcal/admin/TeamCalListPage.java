@@ -111,29 +111,29 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
     return form.getFilter();
   }
 
-  //  @Override
-  //  public void select(final String property, final Object selectedValue)
-  //  {
-  //    if ("ownerId".equals(property) == true) {
-  //      final Integer id = (Integer) selectedValue;
-  //      getFilter().setOwnerId(id);
-  //      refresh();
-  //    } else {
-  //      super.select(property, selectedValue);
-  //      log.error("Property '" + property + "' not supported for selection.");
-  //    }
-  //  }
-  //
-  //  @Override
-  //  public void unselect(final String property)
-  //  {
-  //    if ("ownerId".equals(property) == true) {
-  //      getFilter().setOwnerId(null);
-  //      refresh();
-  //    } else {
-  //      log.error("Property '" + property + "' not supported for selection.");
-  //    }
-  //  }
+  @Override
+  public void select(final String property, final Object selectedValue)
+  {
+    if ("ownerId".equals(property) == true) {
+      final Integer id = (Integer) selectedValue;
+      getFilter().setOwnerId(id);
+      refresh();
+    } else {
+      super.select(property, selectedValue);
+      log.error("Property '" + property + "' not supported for selection.");
+    }
+  }
+
+  @Override
+  public void unselect(final String property)
+  {
+    if ("ownerId".equals(property) == true) {
+      getFilter().setOwnerId(null);
+      refresh();
+    } else {
+      log.error("Property '" + property + "' not supported for selection.");
+    }
+  }
 
   /**
    * @see org.projectforge.web.wicket.AbstractListPage#getBaseDao()
@@ -183,12 +183,6 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
   {
     dataTable = createDataTable(createColumns(this, true), "lastUpdate", SortOrder.DESCENDING);
     form.add(dataTable);
-
-    // Add additional menu buttons here!
-    //    final BookmarkablePageLink<Void> addTemplatesLink = UserPrefListPage.createLink("link", TeamCalPlugin.USER_PREF_AREA);
-    // TODO add options
-    //    final ContentMenuEntryPanel menuEntry = new ContentMenuEntryPanel(getNewContentMenuChildId(), addTemplatesLink, "Abonnement");
-    //    addContentMenuEntry(menuEntry);
   }
 
   /**
