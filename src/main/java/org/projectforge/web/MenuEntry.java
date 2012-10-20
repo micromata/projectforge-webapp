@@ -35,7 +35,7 @@ import org.apache.wicket.model.IModel;
 import org.projectforge.web.wicket.WicketUtils;
 
 /**
- * Represents a single menu entry.
+ * Represents a single menu entry (of the user's individual menu).
  */
 public class MenuEntry implements Serializable, Comparable<MenuEntry>
 {
