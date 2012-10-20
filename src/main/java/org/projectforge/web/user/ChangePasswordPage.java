@@ -24,8 +24,10 @@
 package org.projectforge.web.user;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.wicket.RestartResponseException;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.user.Login;
 import org.projectforge.user.UserDao;
 import org.projectforge.web.wicket.AbstractSecuredPage;
 import org.projectforge.web.wicket.MessagePage;
@@ -44,6 +46,9 @@ public class ChangePasswordPage extends AbstractSecuredPage
   public ChangePasswordPage(final PageParameters parameters)
   {
     super(parameters);
+    if (Login.getInstance().isPasswordChangeSupported(getUser()) == false) {
+      throw new RestartResponseException(new MessagePage("user.changePassword.notSupported"));
+    }
     form = new ChangePasswordForm(this);
     body.add(form);
     form.init();
