@@ -306,6 +306,16 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
   }
 
   /**
+   * @return always true because the change of passwords is supported for every user.
+   * @see org.projectforge.user.LoginHandler#isPasswordChangeSupported(org.projectforge.user.PFUserDO)
+   */
+  @Override
+  public boolean isPasswordChangeSupported(final PFUserDO user)
+  {
+    return true;
+  }
+
+  /**
    * @param updatedLdapGroup
    * @param assignedUsers
    * @param ldapUserMap

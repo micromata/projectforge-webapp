@@ -91,13 +91,24 @@ public class Login
 
   public void passwordChanged(final PFUserDO user, final String newPassword) {
     if (loginHandler == null) {
-      log.warn("No login handler is defined yet, so can't accept the stay-logged-in request.");
+      log.warn("No login handler is defined yet, so can't handle password-changed request.");
       return;
     }
     if (user == null) {
       return;
     }
     loginHandler.passwordChanged(user, newPassword);
+  }
+
+  public boolean isPasswordChangeSupported(final PFUserDO user) {
+    if (loginHandler == null) {
+      log.warn("No login handler is defined yet, so can't check support of password-change functionality.");
+      return false;
+    }
+    if (user == null) {
+      return false;
+    }
+    return loginHandler.isPasswordChangeSupported(user);
   }
 
   /**

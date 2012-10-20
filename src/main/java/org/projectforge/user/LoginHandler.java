@@ -88,4 +88,12 @@ public interface LoginHandler
    * @param newPassword
    */
   public void passwordChanged(PFUserDO user, String newPassword);
+
+  /**
+   * If the functionality of changing passwords isn't supported for a given user then the password change functionality isn't visible for
+   * the user (no such menu item is displayed).
+   * @param user
+   * @return true if the functionality of changing password is supported by this login handler for the given user, otherwise false.
+   */
+  public boolean isPasswordChangeSupported(PFUserDO user);
 }

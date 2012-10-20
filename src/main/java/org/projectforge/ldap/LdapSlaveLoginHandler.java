@@ -108,6 +108,16 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
   }
 
   /**
+   * @see org.projectforge.user.LoginHandler#isPasswordChangeSupported(org.projectforge.user.PFUserDO)
+   * @return true for local users only, false for ldap users.
+   */
+  @Override
+  public boolean isPasswordChangeSupported(final PFUserDO user)
+  {
+    return user.isLocalUser();
+  }
+
+  /**
    * Does nothing.
    * @see org.projectforge.user.LoginHandler#afterUserGroupCacheRefresh(java.util.List, java.util.List)
    */

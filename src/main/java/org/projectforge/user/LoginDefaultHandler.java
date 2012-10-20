@@ -225,4 +225,14 @@ public class LoginDefaultHandler implements LoginHandler
   {
     // Do nothing.
   }
+
+  /**
+   * @see org.projectforge.user.LoginHandler#isPasswordChangeSupported(org.projectforge.user.PFUserDO)
+   * @return always true.
+   */
+  @Override
+  public boolean isPasswordChangeSupported(final PFUserDO user)
+  {
+    return true;
+  }
 }
