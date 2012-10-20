@@ -66,6 +66,10 @@ public class MenuBuilder implements Serializable
     final MenuBuilderContext context = new MenuBuilderContext(menu, accessChecker, user, mobileMenu);
     final MenuItemRegistry registry = MenuItemRegistry.instance();
     for (final MenuItemDef menuItemDef : registry.getMenuItemList()) {
+      if (menuItemDef.isVisible(context) == false) {
+        // Menu entry isn't visible for the user:
+        continue;
+      }
       final MenuEntry menuEntry = menuItemDef.createMenuEntry(menu, context);
       if (menuEntry == null) {
         continue;
