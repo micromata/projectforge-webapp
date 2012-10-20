@@ -49,6 +49,8 @@ import org.projectforge.humanresources.HRPlanningDao;
 import org.projectforge.orga.ContractDao;
 import org.projectforge.orga.PostausgangDao;
 import org.projectforge.orga.PosteingangDao;
+import org.projectforge.user.Login;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
 import org.projectforge.user.UserRightId;
 import org.projectforge.user.UserRightValue;
@@ -100,7 +102,9 @@ import org.projectforge.web.user.UserPrefListPage;
 
 /**
  * The menu is build from the menu items which are registered in this registry. The order of the menu entries is defined by the order number
- * of the menu item definitions.
+ * of the menu item definitions. <br/>
+ * This menu item registry is the central instance for handling the order and common visibility of menu items. It doesn't represent the
+ * individual user's menu (the individual user's menu is generated out of this registry).
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -245,7 +249,8 @@ public class MenuItemRegistry
     // COMMON
     reg.register(common, MenuItemDefId.CALENDAR, 10, CalendarPage.class); // Visible for all.
     reg.register(common, MenuItemDefId.BOOK_LIST, 30, BookListPage.class); // Visible for all.
-    reg.register(common, MenuItemDefId.ADDRESS_LIST, 40, AddressListPage.class).setMobileMenu(AddressMobileListPage.class, 100); // Visible for all.
+    reg.register(common, MenuItemDefId.ADDRESS_LIST, 40, AddressListPage.class).setMobileMenu(AddressMobileListPage.class, 100); // Visible
+    // for all.
     reg.register(common, MenuItemDefId.PHONE_CALL, 50, PhoneCallPage.class);
     final MenuItemDef meb = new MenuItemDef(common, MenuItemDefId.MEB.getId(), 50, MenuItemDefId.MEB.getI18nKey(), MebListPage.class) {
       @Override
@@ -336,7 +341,20 @@ public class MenuItemRegistry
     // ADMINISTRATION
     reg.register(admin, MenuItemDefId.MY_ACCOUNT, 10, MyAccountEditPage.class);
     reg.register(admin, MenuItemDefId.MY_PREFERENCES, 20, UserPrefListPage.class);
-    reg.register(admin, MenuItemDefId.CHANGE_PASSWORD, 30, ChangePasswordPage.class).setVisibleForRestrictedUsers(true); // Visible for all.
+    reg.register(new MenuItemDef(admin, MenuItemDefId.CHANGE_PASSWORD.getId(), 30, MenuItemDefId.CHANGE_PASSWORD.getI18nKey(),
+        ChangePasswordPage.class) {
+      /**
+       * @see org.projectforge.web.MenuItemDef#isVisible(org.projectforge.web.MenuBuilderContext)
+       */
+      @Override
+      protected boolean isVisible(final MenuBuilderContext context)
+      {
+        // The visibility of this menu entry is evaluated by the login handler implementation.
+        final PFUserDO user = context.getLoggedInUser();
+        return Login.getInstance().isPasswordChangeSupported(user);
+      }
+    });
+
     reg.register(admin, MenuItemDefId.USER_LIST, 40, UserListPage.class);
     reg.register(admin, MenuItemDefId.GROUP_LIST, 50, GroupListPage.class); // Visible for all.
     reg.register(admin, MenuItemDefId.ACCESS_LIST, 60, AccessListPage.class); // Visible for all.
