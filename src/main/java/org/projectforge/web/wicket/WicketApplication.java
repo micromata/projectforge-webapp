@@ -23,6 +23,7 @@
 
 package org.projectforge.web.wicket;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
@@ -274,6 +275,12 @@ public class WicketApplication extends WebApplication implements WicketApplicati
         }
         if (isDevelopmentSystem() == true) {
           log.error(ex.getMessage(), ex);
+          if (rootCause instanceof SQLException) {
+            SQLException next = (SQLException)rootCause;
+            while ((next = next.getNextException()) != null) {
+              log.error(next.getMessage(), next);
+            }
+          }
           return super.onException(cycle, ex);
         } else {
           // Show always this error page in production mode:
