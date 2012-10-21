@@ -28,7 +28,7 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class LdapOrganizationalUnitDaoTest extends LdapRealTestHelper
+public class LdapOrganizationalUnitDaoTest
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapOrganizationalUnitDaoTest.class);
 
@@ -36,21 +36,18 @@ public class LdapOrganizationalUnitDaoTest extends LdapRealTestHelper
 
   private LdapRealTestHelper ldapRealTestHelper;
 
-  private LdapConfig ldapConfig;
-
   @Before
   public void setup()
   {
     ldapRealTestHelper = new LdapRealTestHelper();
-    ldapConfig = ldapRealTestHelper.ldapConfig;
     ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
-    ldapOrganizationalUnitDao.setLdapConnector(ldapConnector);
+    ldapOrganizationalUnitDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
   }
 
   @Test
   public void deleteAndCreateOu()
   {
-    if (ldapConfig == null) {
+    if (ldapRealTestHelper.isAvailable() == false) {
       log.info("No LDAP server configured for tests. Skipping test.");
       return;
     }

@@ -39,14 +39,12 @@ public class LdapUserDaoTest
 
   private LdapRealTestHelper ldapRealTestHelper;
 
-  private LdapConfig ldapConfig;
-
   private String path;
 
   private String getPath()
   {
     if (path == null) {
-      path = LdapUtils.getOrganizationalUnit(ldapConfig.getUserBase());
+      path = LdapUtils.getOrganizationalUnit(ldapRealTestHelper.ldapConfig.getUserBase());
     }
     return path;
   }
@@ -55,12 +53,11 @@ public class LdapUserDaoTest
   public void setup()
   {
     ldapRealTestHelper = new LdapRealTestHelper();
-    ldapConfig = ldapRealTestHelper.ldapConfig;
     ldapUserDao = new LdapUserDao();
     ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
     ldapUserDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
     ldapOrganizationalUnitDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
-    if (ldapConfig != null) {
+    if (ldapRealTestHelper.isAvailable() == true) {
       ldapOrganizationalUnitDao.createIfNotExist(getPath(), "Test area for tests of ProjectForge.");
       ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.DEACTIVATED_SUB_CONTEXT, "for deactivated users.", getPath());
       ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, "for restricted users.", getPath());
@@ -70,7 +67,7 @@ public class LdapUserDaoTest
   @After
   public void tearDown()
   {
-    if (ldapConfig != null) {
+    if (ldapRealTestHelper.isAvailable() == true) {
       ldapOrganizationalUnitDao.deleteIfExists(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getPath());
       ldapOrganizationalUnitDao.deleteIfExists(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, getPath());
       ldapOrganizationalUnitDao.deleteIfExists(getPath());
@@ -80,7 +77,7 @@ public class LdapUserDaoTest
   @Test
   public void createAuthenticateAndDeleteUser()
   {
-    if (ldapConfig == null) {
+    if (ldapRealTestHelper.isAvailable() == false) {
       log.info("No LDAP server configured for tests. Skipping test.");
       return;
     }
@@ -112,7 +109,7 @@ public class LdapUserDaoTest
   @Test
   public void activateAndDeactivateUser()
   {
-    if (ldapConfig == null) {
+    if (ldapRealTestHelper.isAvailable() == false) {
       log.info("No LDAP server configured for tests. Skipping test.");
       return;
     }
@@ -140,7 +137,7 @@ public class LdapUserDaoTest
   @Test
   public void updateUser()
   {
-    if (ldapConfig == null) {
+    if (ldapRealTestHelper.isAvailable() == false) {
       log.info("No LDAP server configured for tests. Skipping test.");
       return;
     }
@@ -177,7 +174,7 @@ public class LdapUserDaoTest
   @Test
   public void restrictedUsers()
   {
-    if (ldapConfig == null) {
+    if (ldapRealTestHelper.isAvailable() == false) {
       log.info("No LDAP server configured for tests. Skipping test.");
       return;
     }
