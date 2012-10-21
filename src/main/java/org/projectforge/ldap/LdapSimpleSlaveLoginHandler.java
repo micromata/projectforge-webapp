@@ -71,11 +71,12 @@ public class LdapSimpleSlaveLoginHandler extends LdapLoginHandler
       log.info("User login failed: " + username);
       return loginResult.setLoginResultStatus(LoginResultStatus.FAILED);
     }
+    log.info("LDAP authentication was successful for: " + username);
     if (user == null) {
       log.info("LDAP user '" + username + "' doesn't yet exist in ProjectForge's data base. Creating new user...");
       user = new PFUserDO();
       user.setId(null); // Force new id.
-      user.setUsername(username);
+      user.setUsername(username).setNoPassword();
       userDao.internalSave(user);
     }
     loginResult.setUser(user);
