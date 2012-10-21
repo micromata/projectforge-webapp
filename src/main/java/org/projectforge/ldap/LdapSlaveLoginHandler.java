@@ -77,13 +77,25 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
   public void initialize()
   {
     super.initialize();
-    if (StringUtils.isBlank(ldapConfig.getManagerUser()) == false) {
+    if (StringUtils.isBlank(ldapConfig.getManagerUser()) == true) {
       mode = Mode.SIMPLE;
     } else if (StringUtils.isNotBlank(ldapConfig.getGroupBase()) == true) {
-      mode = Mode.USER_GROUPS;
+      mode = Mode.USERS;// Mode.USER_GROUPS;
       log.warn("Groups aren't yet supported by this LDAP handler.");
     } else {
-      mode = Mode.USERS;
+      mode = Mode.SIMPLE;// Mode.USERS;
+      log.warn("Only simple mode is yet implemented by this LDAP handler.");
+    }
+    switch (mode) {
+      case SIMPLE:
+        log.info("LDAP slave login handler works in mode 'simple'.");
+        break;
+      case USERS:
+        log.info("LDAP slave login handler works in mode 'users'.");
+        break;
+      case USER_GROUPS:
+        log.info("LDAP slave login handler works in mode 'user_groups'.");
+        break;
     }
   }
 
@@ -97,7 +109,6 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
   @Override
   public LoginResult checkLogin(final String username, final String password)
   {
-    // TODO: Groups
     PFUserDO user = userDao.getInternalByName(username);
     if (user != null && user.isLocalUser() == true) {
       return loginDefaultHandler.checkLogin(username, password);
@@ -129,6 +140,9 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
       }
     }
     loginResult.setUser(user);
+    if (mode == Mode.USER_GROUPS) {
+      // TODO: Groups: Get groups of user.
+    }
     return loginResult.setLoginResultStatus(LoginResultStatus.SUCCESS).setUser(user);
   }
 
@@ -157,6 +171,9 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
   @Override
   public List<PFUserDO> getAllUsers()
   {
+    if (mode == Mode.SIMPLE) {
+      return loginDefaultHandler.getAllUsers();
+    }
     final List<LdapPerson> ldapUsers = getAllLdapUsers();
     final List<PFUserDO> users = new ArrayList<PFUserDO>(ldapUsers.size());
     for (final LdapPerson ldapUser : ldapUsers) {
