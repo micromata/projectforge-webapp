@@ -28,17 +28,21 @@ import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class LdapOrganizationalUnitDaoTest extends LdapRealTestBase
+public class LdapOrganizationalUnitDaoTest extends LdapRealTestHelper
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapOrganizationalUnitDaoTest.class);
 
-  LdapOrganizationalUnitDao ldapOrganizationalUnitDao;
+  private LdapOrganizationalUnitDao ldapOrganizationalUnitDao;
 
-  @Override
+  private LdapRealTestHelper ldapRealTestHelper;
+
+  private LdapConfig ldapConfig;
+
   @Before
   public void setup()
   {
-    super.setup();
+    ldapRealTestHelper = new LdapRealTestHelper();
+    ldapConfig = ldapRealTestHelper.ldapConfig;
     ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
     ldapOrganizationalUnitDao.setLdapConnector(ldapConnector);
   }

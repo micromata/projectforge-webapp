@@ -32,9 +32,9 @@ import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.xml.stream.AliasMap;
 import org.projectforge.xml.stream.XmlObjectReader;
 
-public class LdapRealTestBase
+public class LdapRealTestHelper
 {
-  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapRealTestBase.class);
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapRealTestHelper.class);
 
   private static final String CONFIG_FILE = System.getProperty("user.home") + "/ProjectForge/testldapConfig.xml";
 
@@ -42,13 +42,13 @@ public class LdapRealTestBase
 
   LdapConnector ldapConnector;
 
-  protected void setup()
+  LdapRealTestHelper()
   {
     ldapConfig = readConfig();
     ldapConnector = new LdapConnector(ldapConfig);
   }
 
-  static LdapConfig readConfig()
+  private LdapConfig readConfig()
   {
     final File configFile = new File(CONFIG_FILE);
     if (configFile.canRead() == false) {

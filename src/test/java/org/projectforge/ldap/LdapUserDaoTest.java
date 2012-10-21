@@ -29,13 +29,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.projectforge.user.PFUserDO;
 
-public class LdapUserDaoTest extends LdapRealTestBase
+public class LdapUserDaoTest
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapUserDaoTest.class);
 
-  LdapUserDao ldapUserDao;
+  private LdapUserDao ldapUserDao;
 
-  LdapOrganizationalUnitDao ldapOrganizationalUnitDao;
+  private LdapOrganizationalUnitDao ldapOrganizationalUnitDao;
+
+  private LdapRealTestHelper ldapRealTestHelper;
+
+  private LdapConfig ldapConfig;
 
   private String path;
 
@@ -47,15 +51,15 @@ public class LdapUserDaoTest extends LdapRealTestBase
     return path;
   }
 
-  @Override
   @Before
   public void setup()
   {
-    super.setup();
+    ldapRealTestHelper = new LdapRealTestHelper();
+    ldapConfig = ldapRealTestHelper.ldapConfig;
     ldapUserDao = new LdapUserDao();
     ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
-    ldapUserDao.setLdapConnector(ldapConnector);
-    ldapOrganizationalUnitDao.setLdapConnector(ldapConnector);
+    ldapUserDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
+    ldapOrganizationalUnitDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
     if (ldapConfig != null) {
       ldapOrganizationalUnitDao.createIfNotExist(getPath(), "Test area for tests of ProjectForge.");
       ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.DEACTIVATED_SUB_CONTEXT, "for deactivated users.", getPath());
@@ -207,8 +211,7 @@ public class LdapUserDaoTest extends LdapRealTestBase
     ldapUser.setDeactivated(true);
     ldapUserDao.update(getPath(), ldapUser);
     ldapUser = ldapUserDao.findByUsername(uid, getPath());
-    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getPath()),
-        LdapUtils.getOu(ldapUser.getOrganizationalUnit()));
+    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getPath()), LdapUtils.getOu(ldapUser.getOrganizationalUnit()));
     Assert.assertTrue(ldapUser.isDeactivated());
     Assert.assertFalse(ldapUser.isRestrictedUser());
 
@@ -222,8 +225,7 @@ public class LdapUserDaoTest extends LdapRealTestBase
     ldapUser.setOrganizationalUnit(getPath());
     ldapUserDao.createOrUpdate(getPath(), ldapUser);
     ldapUser = ldapUserDao.findByUsername(uid, getPath());
-    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getPath()),
-        LdapUtils.getOu(ldapUser.getOrganizationalUnit()));
+    Assert.assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getPath()), LdapUtils.getOu(ldapUser.getOrganizationalUnit()));
     Assert.assertTrue(ldapUser.isDeactivated());
     Assert.assertFalse(ldapUser.isRestrictedUser());
 
