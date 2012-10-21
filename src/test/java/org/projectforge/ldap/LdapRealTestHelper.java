@@ -32,6 +32,27 @@ import org.projectforge.fibu.kost.AccountingConfig;
 import org.projectforge.xml.stream.AliasMap;
 import org.projectforge.xml.stream.XmlObjectReader;
 
+/**
+ * Test helper class for do some tests with a real LDAP test system. The LDAP system settings have to be set in
+ * $USER.HOME/rojectForge/testldapConfig.xml:
+ * 
+ * <pre>
+ * &lt;?xml version="1.0" encoding="UTF-8" ?&gt;
+ * &lt;ldapConfig&gt;
+ *     &lt;server&gt;ldaps://192.168.76.177&lt;/server&gt;
+ *     &lt;port&gt;636&lt;/port&gt;
+ *     &lt;userBase&gt;ou=pf-test-users&lt;/userBase&gt;
+ *     &lt;baseDN&gt;dc=projectforge,dc=org&lt;/baseDN&gt;
+ *     &lt;authentication&gt;simple&lt;/authentication&gt;
+ *     &lt;managerUser&gt;cn=testuser&lt;/managerUser&gt;
+ *     &lt;managerPassword&gt;secret&lt;/managerPassword&gt;
+ *     &lt;sslCertificateFile&gt;/Users/kai/ProjectForge/testldap.cert&lt;/sslCertificateFile&gt;
+ * &lt;/ldapConfig&gt;
+ * </pre>
+ * 
+ * @author Kai Reinhard (k.reinhard@micromata.de)
+ * 
+ */
 public class LdapRealTestHelper
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapRealTestHelper.class);
@@ -46,6 +67,14 @@ public class LdapRealTestHelper
   {
     ldapConfig = readConfig();
     ldapConnector = new LdapConnector(ldapConfig);
+  }
+
+  /**
+   * @return true if the LDAP test system is available for tests, otherwise false.
+   */
+  boolean isAvailable()
+  {
+    return ldapConfig != null;
   }
 
   private LdapConfig readConfig()
