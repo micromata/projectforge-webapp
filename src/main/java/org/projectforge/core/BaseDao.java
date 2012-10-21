@@ -1041,6 +1041,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
     }
     final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     checkLoggedInUserDeleteAccess(obj, dbObj);
+    accessChecker.checkRestrictedOrDemoUser();
     internalMarkAsDeleted(obj);
   }
 
@@ -1051,7 +1052,6 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       log.error("Object is not historizable. Therefore marking as deleted is not supported. Please use delete instead.");
       throw new InternalErrorException();
     }
-    accessChecker.checkRestrictedOrDemoUser();
     onDelete(obj);
     final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     onSaveOrModify(obj);
