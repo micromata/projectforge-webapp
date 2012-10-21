@@ -24,6 +24,7 @@
 package org.projectforge.ldap;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -83,8 +84,7 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
       mode = Mode.USERS;// Mode.USER_GROUPS;
       log.warn("Groups aren't yet supported by this LDAP handler.");
     } else {
-      mode = Mode.SIMPLE;// Mode.USERS;
-      log.warn("Only simple mode is yet implemented by this LDAP handler.");
+      mode = Mode.USERS;
     }
     switch (mode) {
       case SIMPLE:
@@ -175,13 +175,52 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
       return loginDefaultHandler.getAllUsers();
     }
     final List<LdapPerson> ldapUsers = getAllLdapUsers();
+    final List<PFUserDO> dbUsers = userDao.internalLoadAll();
     final List<PFUserDO> users = new ArrayList<PFUserDO>(ldapUsers.size());
     for (final LdapPerson ldapUser : ldapUsers) {
-      users.add(PFUserDOConverter.convert(ldapUser));
+      final PFUserDO user = PFUserDOConverter.convert(ldapUser);
+      users.add(user);
+      final PFUserDO dbUser = getUser(dbUsers, user.getUsername());
+      if (dbUser != null) {
+        if (dbUser.isLocalUser() == true) {
+          // Ignore local users.
+          continue;
+        }
+        dbUser.copyValuesFrom(user);
+        if (dbUser.isDeleted() == true) {
+          userDao.internalUndelete(dbUser);
+        }
+        userDao.internalUpdate(dbUser);
+      } else {
+        // New user:
+        userDao.internalSave(user);
+      }
     }
-    // final List<PFUserDO> dbUsers = userDao.internalLoadAll();
-    // TODO: synchronize
+    for (final PFUserDO dbUser : dbUsers) {
+      if (dbUser.isLocalUser() == true) {
+        // Ignore local users.
+        continue;
+      }
+      final PFUserDO user = getUser(users, dbUser.getUsername());
+      if (user == null) {
+        // User isn't available in LDAP, therefore mark the db user as deleted.
+        userDao.internalMarkAsDeleted(user);
+      }
+    }
     return users;
+  }
+
+  private PFUserDO getUser(final Collection<PFUserDO> col, final String username)
+  {
+    if (col == null || username == null) {
+      return null;
+    }
+    for (final PFUserDO user : col) {
+      if (username.equals(user.getUsername()) == true) {
+        return user;
+      }
+    }
+    return null;
   }
 
   /**
