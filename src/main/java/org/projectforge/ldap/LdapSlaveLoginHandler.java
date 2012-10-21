@@ -26,13 +26,27 @@ package org.projectforge.ldap;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.projectforge.user.GroupDO;
+import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
 
 /**
- * This LDAP login handler acts as a LDAP slave, meaning, that LDAP will be accessed in read-only mode.
+ * This LDAP login handler acts as a LDAP slave, meaning, that LDAP will be accessed in read-only mode. There are 3 modes available: simple,
+ * users and user-groups. <h4>Simple mode</h4>
+ * <ul>
+ * <li>Simple means that only username and password is checked, all other user settings such as assigned groups and user name etc. are
+ * managed by ProjectForge.</li>
+ * <li>
+ * No ldap user is needed for accessing users or groups of LDAP, only the user's login-name and password is checked by trying to
+ * authenticate!</li>
+ * <li>If a user is deactivated in LDAP the user has the possibility to work with ProjectForge unlimited as long as he uses his
+ * stay-logged-in-method! (If not acceptable please use the {@link LdapSlaveLoginHandler} instead.)</li>
+ * <li>For local users any LDAP setting is ignored.</li>
+ * </ul>
+ * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
  */
@@ -40,13 +54,54 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapSlaveLoginHandler.class);
 
+  enum Mode
+  {
+    SIMPLE, USERS, USER_GROUPS
+  };
+
+  private Mode mode;
+
   /**
+   * Only for test cases.
+   * @param mode
+   */
+  void setMode(final Mode mode)
+  {
+    this.mode = mode;
+  }
+
+  /**
+   * @see org.projectforge.ldap.LdapLoginHandler#initialize()
+   */
+  @Override
+  public void initialize()
+  {
+    super.initialize();
+    if (StringUtils.isBlank(ldapConfig.getManagerUser()) == false) {
+      mode = Mode.SIMPLE;
+    } else if (StringUtils.isNotBlank(ldapConfig.getGroupBase()) == true) {
+      mode = Mode.USER_GROUPS;
+      log.warn("Groups aren't yet supported by this LDAP handler.");
+    } else {
+      mode = Mode.USERS;
+    }
+  }
+
+  /**
+   * Uses the standard implementation {@link LoginDefaultHandler#checkLogin(String, String)} for local users. For all other users a LDAP
+   * authentication is checked. If the LDAP authentication fails then {@link LoginResultStatus#FAILED} is returned. If successful then
+   * {@link LoginResultStatus#SUCCESS} is returned with the user settings of ProjectForge database. If the user doesn't yet exist in
+   * ProjectForge's data-base, it will be created after and then returned.
    * @see org.projectforge.user.LoginHandler#checkLogin(java.lang.String, java.lang.String, boolean)
    */
   @Override
   public LoginResult checkLogin(final String username, final String password)
   {
     // TODO: Groups
+    PFUserDO user = userDao.getInternalByName(username);
+    if (user != null && user.isLocalUser() == true) {
+      return loginDefaultHandler.checkLogin(username, password);
+    }
     final LoginResult loginResult = new LoginResult();
     final String organizationalUnits = ldapConfig.getUserBase();
     final LdapPerson ldapUser = ldapUserDao.authenticate(username, password, organizationalUnits);
@@ -54,14 +109,18 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
       log.info("User login failed: " + username);
       return loginResult.setLoginResultStatus(LoginResultStatus.FAILED);
     }
-    PFUserDO user = userDao.getInternalByName(username);
+    log.info("LDAP authentication was successful for: " + username);
     if (user == null) {
       log.info("LDAP user '" + username + "' doesn't yet exist in ProjectForge's data base. Creating new user...");
       user = PFUserDOConverter.convert(ldapUser);
       user.setId(null); // Force new id.
-      user.setPassword(userDao.encryptPassword(password));
+      if (mode == Mode.SIMPLE) {
+        user.setNoPassword();
+      } else {
+        user.setPassword(userDao.encryptPassword(password));
+      }
       userDao.internalSave(user);
-    } else {
+    } else if (mode != Mode.SIMPLE) {
       PFUserDOConverter.copyUserFields(PFUserDOConverter.convert(ldapUser), user);
       userDao.internalUpdate(user);
       if (user.hasSystemAccess() == false) {
@@ -74,8 +133,8 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
   }
 
   /**
-   * Currently return all ProjectForge groups (done by loginDefaultHandler).
-   * Planned: Updates also any (in LDAP) modified group in ProjectForge's data-base.
+   * Currently return all ProjectForge groups (done by loginDefaultHandler). Not yet implemented: Updates also any (in LDAP) modified group
+   * in ProjectForge's data-base.
    * @see org.projectforge.user.LoginHandler#getAllGroups()
    */
   @Override
@@ -103,7 +162,7 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
     for (final LdapPerson ldapUser : ldapUsers) {
       users.add(PFUserDOConverter.convert(ldapUser));
     }
-    //final List<PFUserDO> dbUsers = userDao.internalLoadAll();
+    // final List<PFUserDO> dbUsers = userDao.internalLoadAll();
     // TODO: synchronize
     return users;
   }
