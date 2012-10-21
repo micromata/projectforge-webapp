@@ -96,11 +96,11 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
       return loginResult;
     }
     // User is now logged-in successfully.
-    final boolean authenticated = ldapUserDao.authenticate(username, password, userBase);
-    if (authenticated == false) {
+    LdapPerson ldapUser = ldapUserDao.authenticate(username, password, userBase);
+    if (ldapUser == null) {
       log.info("User's credentials in LDAP not up-to-date: " + username + ". Updating LDAP entry...");
       final PFUserDO user = loginResult.getUser();
-      final LdapPerson ldapUser = PFUserDOConverter.convert(user);
+      ldapUser = PFUserDOConverter.convert(user);
       ldapUser.setOrganizationalUnit(userBase);
       ldapUserDao.createOrUpdate(userBase, ldapUser);
       ldapUserDao.changePassword(ldapUser, null, password);

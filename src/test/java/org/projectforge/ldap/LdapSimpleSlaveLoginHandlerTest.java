@@ -42,8 +42,8 @@ public class LdapSimpleSlaveLoginHandlerTest extends TestBase
     final String userBase = "ou=pf-mock-test-users";
     final String testUsername = "slaveLdap";
     final LdapUserDao ldapUserDao = mock(LdapUserDao.class);
-    when(ldapUserDao.authenticate(Mockito.anyString(), Mockito.eq("successful"), Mockito.eq(userBase))).thenReturn(true);
-    when(ldapUserDao.authenticate(Mockito.anyString(), Mockito.eq("fail"), Mockito.eq(userBase))).thenReturn(false);
+    when(ldapUserDao.authenticate(Mockito.anyString(), Mockito.eq("successful"), Mockito.eq(userBase))).thenReturn(new LdapPerson());
+    when(ldapUserDao.authenticate(Mockito.anyString(), Mockito.eq("fail"), Mockito.eq(userBase))).thenReturn(null);
     final LdapSimpleSlaveLoginHandler loginHandler = new LdapSimpleSlaveLoginHandler();
     loginHandler.ldapConfig = new LdapConfig().setUserBase(userBase);
     loginHandler.userDao = userDao;

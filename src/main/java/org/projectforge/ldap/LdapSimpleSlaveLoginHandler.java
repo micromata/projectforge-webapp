@@ -66,8 +66,8 @@ public class LdapSimpleSlaveLoginHandler extends LdapLoginHandler
     }
     final LoginResult loginResult = new LoginResult();
     final String organizationalUnits = ldapConfig.getUserBase();
-    final boolean authenticated = ldapUserDao.authenticate(username, password, organizationalUnits);
-    if (authenticated == false) {
+    final LdapPerson ldapUser = ldapUserDao.authenticate(username, password, organizationalUnits);
+    if (ldapUser == null) {
       log.info("User login failed: " + username);
       return loginResult.setLoginResultStatus(LoginResultStatus.FAILED);
     }

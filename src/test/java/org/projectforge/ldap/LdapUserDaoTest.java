@@ -92,11 +92,13 @@ public class LdapUserDaoTest extends LdapRealTestBase
         user.getDescription());
     Assert.assertEquals(LdapUtils.getOu(getPath()), LdapUtils.getOu(user2.getOrganizationalUnit()));
 
-    Assert.assertFalse(ldapUserDao.authenticate(uid, "", getPath()));
+    Assert.assertNull(ldapUserDao.authenticate(uid, "", getPath()));
     // Change password
     ldapUserDao.changePassword(user, null, "hurzel");
     Assert.assertEquals(getPath(), ldapUserDao.findByUsername(uid, getPath()).getOrganizationalUnit());
-    Assert.assertTrue(ldapUserDao.authenticate(uid, "hurzel", getPath()));
+    final LdapPerson ldapUser = ldapUserDao.authenticate(uid, "hurzel", getPath());
+    Assert.assertNotNull(ldapUser);
+    Assert.assertEquals(user.getUid(), ldapUser.getUid());
 
     // Delete user
     ldapUserDao.delete(user);
@@ -115,16 +117,17 @@ public class LdapUserDaoTest extends LdapRealTestBase
     user.setOrganizationalUnit(getPath());
     ldapUserDao.createOrUpdate(getPath(), user);
     ldapUserDao.changePassword(user, null, "hurzel");
-    Assert.assertTrue(ldapUserDao.authenticate(uid, "hurzel", getPath()));
+    final LdapPerson ldapUser = ldapUserDao.authenticate(uid, "hurzel", getPath());
+    Assert.assertNotNull(ldapUser);
     ldapUserDao.deactivateUser(user);
-    Assert.assertFalse(ldapUserDao.authenticate(uid, "hurzel", getPath()));
+    Assert.assertNull(ldapUserDao.authenticate(uid, "hurzel", getPath()));
     final LdapPerson user2 = ldapUserDao.findByUsername(uid, getPath());
     Assert.assertNotNull(user2);
     Assert.assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getPath()), LdapUtils.getOu(user2.getOrganizationalUnit()));
 
     // Reactivate user:
     ldapUserDao.reactivateUser(user2);
-    Assert.assertFalse(ldapUserDao.authenticate(uid, "hurzel", getPath()));
+    Assert.assertNull(ldapUserDao.authenticate(uid, "hurzel", getPath()));
     // Delete user
     ldapUserDao.delete(user2);
     Assert.assertNull(ldapUserDao.findByUsername(uid, getPath()));

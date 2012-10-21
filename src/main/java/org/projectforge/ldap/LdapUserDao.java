@@ -341,14 +341,15 @@ public class LdapUserDao extends LdapPersonDao
     }.excecute();
   }
 
-  public boolean authenticate(final String username, final String userPassword, final String... organizationalUnits)
+  public LdapPerson authenticate(final String username, final String userPassword, final String... organizationalUnits)
   {
     String dn;
+    LdapPerson user = null;
     if (StringUtils.isNotBlank(ldapConfig.getManagerUser()) == true && StringUtils.isNotBlank(ldapConfig.getManagerPassword()) == true) {
-      final LdapPerson user = findByUsername(username, organizationalUnits);
+      user = findByUsername(username, organizationalUnits);
       if (user == null || StringUtils.equals(username, user.getId()) == false) {
         log.info("User with id '" + username + "' not found.");
-        return false;
+        return null;
       }
       dn = user.getDn() + "," + ldapConnector.getBase();
     } else {
@@ -357,10 +358,11 @@ public class LdapUserDao extends LdapPersonDao
     try {
       ldapConnector.createContext(dn, userPassword);
       log.info("User '" + username + "' (" + dn + ") successfully authenticated.");
-      return true;
+      user = new LdapPerson().setUid(username);
+      return user;
     } catch (final Exception ex) {
       log.error("User '" + username + "' (" + dn + ") with invalid credentials.");
-      return false;
+      return null;
     }
   }
 

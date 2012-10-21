@@ -49,12 +49,11 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
     // TODO: Groups
     final LoginResult loginResult = new LoginResult();
     final String organizationalUnits = ldapConfig.getUserBase();
-    final boolean authenticated = ldapUserDao.authenticate(username, password, organizationalUnits);
-    if (authenticated == false) {
+    final LdapPerson ldapUser = ldapUserDao.authenticate(username, password, organizationalUnits);
+    if (ldapUser == null) {
       log.info("User login failed: " + username);
       return loginResult.setLoginResultStatus(LoginResultStatus.FAILED);
     }
-    final LdapPerson ldapUser = ldapUserDao.findByUsername(username, organizationalUnits);
     PFUserDO user = userDao.getInternalByName(username);
     if (user == null) {
       log.info("LDAP user '" + username + "' doesn't yet exist in ProjectForge's data base. Creating new user...");
@@ -75,18 +74,20 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
   }
 
   /**
-   * Updates also any (in LDAP) modified group in ProjectForge's data-base.
+   * Currently return all ProjectForge groups (done by loginDefaultHandler).
+   * Planned: Updates also any (in LDAP) modified group in ProjectForge's data-base.
    * @see org.projectforge.user.LoginHandler#getAllGroups()
    */
   @Override
   public List<GroupDO> getAllGroups()
   {
-    final List<LdapGroup> ldapGroups = getAllLdapGroups();
-    final List<GroupDO> groups = new ArrayList<GroupDO>(ldapGroups.size());
-    for (final LdapGroup ldapGroup : ldapGroups) {
-      groups.add(GroupDOConverter.convert(ldapGroup));
-    }
-    return groups;
+    return loginDefaultHandler.getAllGroups();
+    // final List<LdapGroup> ldapGroups = getAllLdapGroups();
+    // final List<GroupDO> groups = new ArrayList<GroupDO>(ldapGroups.size());
+    // for (final LdapGroup ldapGroup : ldapGroups) {
+    // groups.add(GroupDOConverter.convert(ldapGroup));
+    // }
+    // return groups;
   }
 
   /**

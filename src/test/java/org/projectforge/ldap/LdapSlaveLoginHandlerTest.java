@@ -41,11 +41,11 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     final String userBase = "ou=pf-mock-test-users";
     final LdapUserDao ldapUserDao = mock(LdapUserDao.class);
     LoginResult loginResult;
-    when(ldapUserDao.authenticate("kai", "successful", userBase)).thenReturn(true);
-    when(ldapUserDao.authenticate("kai", "fail", userBase)).thenReturn(false);
-    when(ldapUserDao.findByUsername("kai", userBase)).thenReturn(
-        new LdapPerson().setUid("kai").setDescription("Developer").setGivenName("Kai").setMail("k.reinhard@acme.com")
-        .setOrganization("Micromata").setSurname("Reinhard"));
+    final LdapPerson kai = new LdapPerson().setUid("kai").setDescription("Developer").setGivenName("Kai").setMail("k.reinhard@acme.com")
+        .setOrganization("Micromata").setSurname("Reinhard");
+    when(ldapUserDao.authenticate("kai", "successful", userBase)).thenReturn(kai);
+    when(ldapUserDao.authenticate("kai", "fail", userBase)).thenReturn(null);
+    when(ldapUserDao.findByUsername("kai", userBase)).thenReturn(kai);
     final LdapSlaveLoginHandler loginHandler = new LdapSlaveLoginHandler();
     loginHandler.ldapUserDao = ldapUserDao;
     loginHandler.ldapConfig = new LdapConfig().setUserBase(userBase);
@@ -54,7 +54,7 @@ public class LdapSlaveLoginHandlerTest extends TestBase
 
     Assert.assertFalse("User shouldn't be available yet in the data-base.",
         userDao.doesUsernameAlreadyExist(new PFUserDO().setUsername("kai")));
-    loginResult =loginHandler.checkLogin("kai", "successful");
+    loginResult = loginHandler.checkLogin("kai", "successful");
     Assert.assertEquals(LoginResultStatus.SUCCESS, loginResult.getLoginResultStatus());
     LdapTestUtils.assertUser(loginResult.getUser(), "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
     Assert.assertTrue("User should be created in data-base as a new user (in ldap).",
