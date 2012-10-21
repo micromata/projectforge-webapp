@@ -26,23 +26,61 @@ package org.projectforge.ldap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.projectforge.test.TestBase;
+import org.projectforge.user.LoginHandler;
 import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
 
 public class LdapSlaveLoginHandlerTest extends TestBase
 {
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapSlaveLoginHandlerTest.class);
+
+  private LdapUserDao ldapUserDao;
+
+  private LdapOrganizationalUnitDao ldapOrganizationalUnitDao;
+
+  private LdapRealTestHelper ldapRealTestHelper;
+
+  private String getUserPath()
+  {
+    return ldapRealTestHelper.getUserPath();
+  }
+
+  @Before
+  public void setup()
+  {
+    ldapRealTestHelper = new LdapRealTestHelper();
+    ldapUserDao = new LdapUserDao();
+    ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
+    ldapUserDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
+    ldapOrganizationalUnitDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
+    if (ldapRealTestHelper.isAvailable() == true) {
+      ldapOrganizationalUnitDao.createIfNotExist(getUserPath(), "Test area for tests of ProjectForge.");
+    }
+  }
+
+  @After
+  public void tearDown()
+  {
+    if (ldapRealTestHelper.isAvailable() == true) {
+      ldapOrganizationalUnitDao.deleteIfExists(getUserPath());
+    }
+  }
+
   @Test
-  public void testSimpleMode()
+  public void testMockedSimpleMode()
   {
     final String userBase = "ou=pf-mock-test-users";
-    final String testUsername = "slaveLdap";
-    final LdapUserDao ldapUserDao = mock(LdapUserDao.class);
-    when(ldapUserDao.authenticate(Mockito.eq(testUsername), Mockito.eq("successful"), Mockito.eq(userBase))).thenReturn(new LdapPerson().setUid(testUsername));
+    final String testUsername = "mockedLdapSlaveTestuser";
+    ldapUserDao = mock(LdapUserDao.class);
+    when(ldapUserDao.authenticate(Mockito.eq(testUsername), Mockito.eq("successful"), Mockito.eq(userBase))).thenReturn(
+        new LdapPerson().setUid(testUsername));
     when(ldapUserDao.authenticate(Mockito.anyString(), Mockito.eq("fail"), Mockito.eq(userBase))).thenReturn(null);
     final LdapSlaveLoginHandler loginHandler = new LdapSlaveLoginHandler();
     loginHandler.ldapConfig = new LdapConfig().setUserBase(userBase);
@@ -51,12 +89,42 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     loginHandler.ldapOrganizationalUnitDao = mock(LdapOrganizationalUnitDao.class);
     loginHandler.initialize();
     loginHandler.setMode(LdapSlaveLoginHandler.Mode.SIMPLE);
+    testSimpleMode(loginHandler, testUsername);
+  }
+
+  @Test
+  public void testSimpleMode()
+  {
+    if (ldapRealTestHelper.isAvailable() == false) {
+      log.info("No LDAP server configured for tests. Skipping test.");
+      return;
+    }
+    final LdapSlaveLoginHandler loginHandler = new LdapSlaveLoginHandler();
+    loginHandler.ldapConfig = ldapRealTestHelper.ldapConfig;
+    loginHandler.userDao = userDao;
+    loginHandler.ldapUserDao = ldapUserDao;
+    loginHandler.ldapOrganizationalUnitDao = ldapOrganizationalUnitDao;
+    loginHandler.initialize();
+    loginHandler.setMode(LdapSlaveLoginHandler.Mode.SIMPLE);
+    final String testUsername = "ldapSlaveTestuser";
+    final LdapPerson ldapUser = new LdapPerson().setUid(testUsername).setGivenName("Kai").setSurname("Reinhard").setEmployeeNumber("42");
+    final String userBase = ldapRealTestHelper.ldapConfig.getUserBase();
+    ldapUser.setOrganizationalUnit(userBase);
+    ldapUserDao.create(userBase, ldapUser);
+    ldapUserDao.changePassword(ldapUser, null, "successful");
+    testSimpleMode(loginHandler, testUsername);
+    ldapUserDao.delete(ldapUser);
+  }
+
+  private void testSimpleMode(final LoginHandler loginHandler, final String testUsername)
+  {
     logon(TEST_ADMIN_USER);
     Assert.assertNull("If failed, a previous test run didn't cleared the data-base.", userDao.getUserGroupCache().getUser(testUsername));
 
     // Check failed login:
     LoginResult result = loginHandler.checkLogin(testUsername, "fail");
-    Assert.assertEquals("User login failed against LDAP therefore login should be failed.", LoginResultStatus.FAILED, result.getLoginResultStatus());
+    Assert.assertEquals("User login failed against LDAP therefore login should be failed.", LoginResultStatus.FAILED,
+        result.getLoginResultStatus());
 
     // Check successful login for new ProjectForge users:
     result = loginHandler.checkLogin(testUsername, "successful");
@@ -80,18 +148,20 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     user.setLocalUser(true);
     userDao.internalUpdate(user);
     result = loginHandler.checkLogin(testUsername, "successful");
-    Assert.assertEquals("User is a local user, thus the LDAP authentication should be ignored.", LoginResultStatus.FAILED, result.getLoginResultStatus());
+    Assert.assertEquals("User is a local user, thus the LDAP authentication should be ignored.", LoginResultStatus.FAILED,
+        result.getLoginResultStatus());
 
     user.setPassword(userDao.encryptPassword("test"));
     userDao.internalUpdate(user);
     result = loginHandler.checkLogin(testUsername, "test");
-    Assert.assertEquals("User is a local user, thus authentication should be done by the login default handler.", LoginResultStatus.SUCCESS, result.getLoginResultStatus());
+    Assert.assertEquals("User is a local user, thus authentication should be done by the login default handler.",
+        LoginResultStatus.SUCCESS, result.getLoginResultStatus());
     user = result.getUser();
     Assert.assertEquals(testUsername, user.getUsername());
   }
 
   @Test
-  public void loginInSlaveMode()
+  public void loginInMockedSlaveMode()
   {
     final String userBase = "ou=pf-mock-test-users";
     final LdapUserDao ldapUserDao = mock(LdapUserDao.class);

@@ -39,14 +39,9 @@ public class LdapUserDaoTest
 
   private LdapRealTestHelper ldapRealTestHelper;
 
-  private String path;
-
   private String getPath()
   {
-    if (path == null) {
-      path = LdapUtils.getOrganizationalUnit(ldapRealTestHelper.ldapConfig.getUserBase());
-    }
-    return path;
+    return ldapRealTestHelper.getUserPath();
   }
 
   @Before

@@ -63,6 +63,16 @@ public class LdapRealTestHelper
 
   LdapConnector ldapConnector;
 
+  private String userPath;
+
+  String getUserPath()
+  {
+    if (userPath == null) {
+      userPath = LdapUtils.getOrganizationalUnit(ldapConfig.getUserBase());
+    }
+    return userPath;
+  }
+
   LdapRealTestHelper()
   {
     ldapConfig = readConfig();
