@@ -39,7 +39,7 @@ public class LdapMasterLoginHandlerTest extends TestBase
   @Test
   public void loginAndCreateLdapUser()
   {
-    final String userBase = "ou=users";
+    final String userBase = "ou=pf-mock-test-users";
     final LdapUserDao ldapUserDao = mock(LdapUserDao.class);
     final LdapMasterLoginHandler loginHandler = new LdapMasterLoginHandler();
     loginHandler.ldapConfig = new LdapConfig().setUserBase(userBase);
@@ -47,8 +47,9 @@ public class LdapMasterLoginHandlerTest extends TestBase
     loginHandler.ldapUserDao = ldapUserDao;
     loginHandler.ldapOrganizationalUnitDao = mock(LdapOrganizationalUnitDao.class);
     loginHandler.initialize();
-
-    userDao.internalSave(new PFUserDO().setUsername("kai").setPassword(userDao.encryptPassword("successful")).setFirstname("Kai").setLastname("Reinhard"));
+    logon(TEST_ADMIN_USER);
+    userDao.internalSave(new PFUserDO().setUsername("kai").setPassword(userDao.encryptPassword("successful")).setFirstname("Kai")
+        .setLastname("Reinhard"));
     Assert.assertEquals(LoginResultStatus.SUCCESS, loginHandler.checkLogin("kai", "successful").getLoginResultStatus());
 
     final ArgumentCaptor<LdapPerson> argumentCaptor = ArgumentCaptor.forClass(LdapPerson.class);
@@ -57,11 +58,11 @@ public class LdapMasterLoginHandlerTest extends TestBase
     Assert.assertEquals("kai", createdLdapUser.getUid());
     Assert.assertEquals("Kai", createdLdapUser.getGivenName());
     Assert.assertEquals("Reinhard", createdLdapUser.getSurname());
-    //Assert.assertEquals("successful", createdLdapUser.get());
+    // Assert.assertEquals("successful", createdLdapUser.get());
   }
 
-  //  @Test
-  //  public void loginAndUpdateLdapUser()
-  //  {
-  //  }
+  // @Test
+  // public void loginAndUpdateLdapUser()
+  // {
+  // }
 }

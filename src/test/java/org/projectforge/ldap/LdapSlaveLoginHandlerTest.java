@@ -38,7 +38,7 @@ public class LdapSlaveLoginHandlerTest extends TestBase
   @Test
   public void loginInSlaveMode()
   {
-    final String userBase = "ou=users";
+    final String userBase = "ou=pf-mock-test-users";
     final LdapUserDao ldapUserDao = mock(LdapUserDao.class);
     LoginResult loginResult;
     when(ldapUserDao.authenticate("kai", "successful", userBase)).thenReturn(true);
