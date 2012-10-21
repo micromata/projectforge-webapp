@@ -343,12 +343,17 @@ public class LdapUserDao extends LdapPersonDao
 
   public boolean authenticate(final String username, final String userPassword, final String... organizationalUnits)
   {
-    final LdapPerson user = findByUsername(username, organizationalUnits);
-    if (user == null || StringUtils.equals(username, user.getId()) == false) {
-      log.info("User with id '" + username + "' not found.");
-      return false;
+    String dn;
+    if (StringUtils.isNotBlank(ldapConfig.getManagerUser()) == true && StringUtils.isNotBlank(ldapConfig.getManagerPassword()) == true) {
+      final LdapPerson user = findByUsername(username, organizationalUnits);
+      if (user == null || StringUtils.equals(username, user.getId()) == false) {
+        log.info("User with id '" + username + "' not found.");
+        return false;
+      }
+      dn = user.getDn() + "," + ldapConnector.getBase();
+    } else {
+      dn = "uid=" + username + "," + LdapUtils.getOu(LdapUtils.getOu(organizationalUnits)) + "," + ldapConnector.getBase();
     }
-    final String dn = user.getDn() + "," + ldapConnector.getBase();
     try {
       ldapConnector.createContext(dn, userPassword);
       log.info("User '" + username + "' (" + dn + ") successfully authenticated.");
