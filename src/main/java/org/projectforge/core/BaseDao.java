@@ -753,6 +753,7 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       Validate.isTrue(obj.getId() == null);
     }
     checkLoggedInUserInsertAccess(obj);
+    accessChecker.checkRestrictedOrDemoUser();
     return internalSave(obj);
   }
 
@@ -849,7 +850,6 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
   public Serializable internalSave(final O obj)
   {
     Validate.notNull(obj);
-    accessChecker.checkRestrictedOrDemoUser();
     obj.setCreated();
     obj.setLastUpdate();
     onSave(obj);
