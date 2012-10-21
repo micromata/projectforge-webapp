@@ -74,6 +74,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private static final long serialVersionUID = 6680346054753032534L;
 
+  private static final String NOPASSWORD = "--- none ---";
+
   static {
     invalidHistorizableProperties.add("loginFailures");
     invalidHistorizableProperties.add("lastLogin");
@@ -402,7 +404,9 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
    */
   protected void checkAndFixPassword()
   {
-    if (StringUtils.isNotEmpty(getPassword()) && getPassword().startsWith("SHA{") == false) {
+    if (StringUtils.isNotEmpty(getPassword()) == true
+        && getPassword().startsWith("SHA{") == false
+        && getPassword().equals(NOPASSWORD) == false) {
       setPassword(null);
       log.error("Password for user '" + getUsername() + "' is not given SHA encrypted. Ignoring it.");
     }
@@ -676,6 +680,16 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public PFUserDO setPassword(final String password)
   {
     this.password = password;
+    return this;
+  }
+
+  /**
+   * @param password The password to set.
+   * @return this for chaining.
+   */
+  public PFUserDO setNoPassword()
+  {
+    this.password = NOPASSWORD;
     return this;
   }
 
