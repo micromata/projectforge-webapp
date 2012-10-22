@@ -1109,13 +1109,13 @@ public abstract class BaseDao<O extends ExtendedBaseDO< ? extends Serializable>>
       throw new RuntimeException(msg);
     }
     checkLoggedInUserInsertAccess(obj);
+    accessChecker.checkRestrictedOrDemoUser();
     internalUndelete(obj);
   }
 
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, isolation = Isolation.REPEATABLE_READ)
   public void internalUndelete(final O obj)
   {
-    accessChecker.checkRestrictedOrDemoUser();
     final O dbObj = getHibernateTemplate().load(clazz, obj.getId(), LockMode.PESSIMISTIC_WRITE);
     onSaveOrModify(obj);
     copyValues(obj, dbObj, "deleted"); // If user has made additional changes.
