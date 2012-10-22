@@ -167,7 +167,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
       if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
         final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.subscribe"), true).setNoLabelFor();
-        initICalTarget();
+        createICalTarget();
         final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
         final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fsSubscribe.newChildId(), IconType.SUBSCRIPTION,
             getString("plugins.teamcal.subscribe"), iCalExportLink).setLight();
@@ -177,9 +177,9 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   }
 
   /**
-   * 
+   * create ics export url
    */
-  public void initICalTarget()
+  private void createICalTarget()
   {
     final PFUserDO user = PFUserContext.getUser();
     final String authenticationKey = userDao.getAuthenticationToken(user.getId());

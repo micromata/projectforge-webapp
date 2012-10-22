@@ -17,12 +17,18 @@ import org.apache.wicket.extensions.markup.html.repeater.data.grid.ICellPopulato
 import org.apache.wicket.extensions.markup.html.repeater.data.sort.SortOrder;
 import org.apache.wicket.extensions.markup.html.repeater.data.table.IColumn;
 import org.apache.wicket.markup.html.WebPage;
+import org.apache.wicket.markup.html.link.ExternalLink;
 import org.apache.wicket.markup.repeater.Item;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
+import org.apache.wicket.protocol.http.WebApplication;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
+import org.projectforge.user.UserDao;
 import org.projectforge.user.UserGroupCache;
+import org.projectforge.web.WebConfiguration;
 import org.projectforge.web.wicket.AbstractEditPage;
 import org.projectforge.web.wicket.AbstractListPage;
 import org.projectforge.web.wicket.CellItemListener;
@@ -31,6 +37,8 @@ import org.projectforge.web.wicket.DetachableDOModel;
 import org.projectforge.web.wicket.IListPageColumnsCreator;
 import org.projectforge.web.wicket.ListPage;
 import org.projectforge.web.wicket.ListSelectActionPanel;
+import org.projectforge.web.wicket.flowlayout.IconLinkPanel;
+import org.projectforge.web.wicket.flowlayout.IconType;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -46,6 +54,11 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
 
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
+
+  @SpringBean(name = "userDao")
+  private UserDao userDao;
+
+  private String iCalTarget;
 
   private final TeamCalRight right;
 
@@ -103,7 +116,46 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
         cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("lastUpdate"), getSortable("lastUpdate", sortable), "lastUpdate",
         cellItemListener));
+    // ics export buttons
+    columns.add(new CellItemListenerPropertyColumn<TeamCalDO>(getString("plugins.teamcal.subscribe.column"), getSortable("", sortable), "pk",
+        cellItemListener) {
+      /**
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item, java.lang.String, org.apache.wicket.model.IModel)
+       */
+      @Override
+      public void populateItem(final Item<ICellPopulator<TeamCalDO>> item, final String componentId, final IModel<TeamCalDO> rowModel)
+      {
+        if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
+          final TeamCalDO teamCal = rowModel.getObject();
+          createICalTarget(teamCal.getId());
+          final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
+          final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(componentId, IconType.SUBSCRIPTION,
+              getString("plugins.teamcal.subscribe"), iCalExportLink).setLight();
+          item.add(exportICalButtonPanel);
+          final StringBuffer cssStyle = getCssStyle(teamCal.getId(), teamCal.isDeleted());
+          if (cssStyle.length() > 0) {
+            item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+          }
+        }
+      }
+    });
     return columns;
+  }
+
+  public void createICalTarget(final Integer id)
+  {
+    final PFUserDO user = PFUserContext.getUser();
+    final String authenticationKey = userDao.getAuthenticationToken(user.getId());
+    final String contextPath = WebApplication.get().getServletContext().getContextPath();
+    iCalTarget = contextPath
+        + "/export/ProjectForge.ics?timesheetUser="
+        + user.getUsername()
+        + "&token="
+        + authenticationKey
+        + "&teamCals="
+        + id
+        + "&timesheetRequired="
+        + false;
   }
 
   protected TeamCalFilter getFilter()

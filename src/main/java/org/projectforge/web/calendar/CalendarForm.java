@@ -34,6 +34,7 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateMidnight;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.core.Configuration;
+import org.projectforge.plugins.teamcal.integration.TeamCalCalendarForm;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
@@ -78,6 +79,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   private JodaDatePanel currentDatePanel;
 
   private Label durationLabel;
+
+  private String iCalTarget;
 
   @SuppressWarnings("serial")
   @Override
@@ -159,14 +162,20 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
       final PFUserDO user = PFUserContext.getUser();
       final String authenticationKey = userDao.getAuthenticationToken(user.getId());
       final String contextPath = WebApplication.get().getServletContext().getContextPath();
-      final String iCalTarget = contextPath
+      iCalTarget = contextPath
           + "/export/ProjectForge.ics?timesheetUser="
           + user.getUsername()
           + "&token="
-          + authenticationKey;
+          + authenticationKey
+          + additionalInformation();
       final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
+      String i18nKey = "timesheet.iCalExport";
+      // TeamCalCalendarPage loads time sheets And team calendar.
+      if (this instanceof TeamCalCalendarForm)
+        i18nKey = "plugins.teamcal.subscribe.teamcalendar";
       final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fs.newChildId(), IconType.SUBSCRIPTION,
-          getString("timesheet.iCalExport"), iCalExportLink).setLight();
+          getString(i18nKey), iCalExportLink).setLight();
+
       fs.add(exportICalButtonPanel);
     }
     gridBuilder.newColumnPanel(DivType.COL_25);
@@ -181,6 +190,16 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     durationLabel = durationPanel.getLabel4Ajax();
     fs.add(durationPanel);
     onAfterInit(gridBuilder);
+  }
+
+  /**
+   * add additional information to ics export url.
+   * 
+   * @return
+   */
+  protected String additionalInformation()
+  {
+    return "";
   }
 
   /**

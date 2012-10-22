@@ -104,4 +104,21 @@ public class TeamCalCalendarForm extends CalendarForm
   {
     return filter.getCalendarPk();
   }
+
+  /**
+   * add information to ics export url
+   */
+  @Override
+  protected String additionalInformation()
+  {
+    String calendarIds = "";
+    for (final Integer id : getSelectedCalendars())
+      calendarIds = calendarIds + id + ";";
+
+    final String additionals = "&teamCals="
+        + calendarIds
+        + "&timesheetRequired="
+        + true;
+    return additionals;
+  }
 }

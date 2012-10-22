@@ -134,7 +134,10 @@ public class CalendarFeed extends HttpServlet
     if (timesheetRequired == null)
       this.timesheetRequired = true;
     else
-      this.timesheetRequired = Boolean.getBoolean(timesheetRequired);
+      if (timesheetRequired.equals("true") == true)
+        this.timesheetRequired = true;
+      else
+        this.timesheetRequired = false;
 
     PFUserContext.setUser(user);
 
@@ -186,7 +189,7 @@ public class CalendarFeed extends HttpServlet
 
     filter.setStartTime(cal.getTime());
 
-    if (isTimesheetRequired()) {
+    if (timesheetRequired == true) {
       final TimesheetDao timesheetDao = (TimesheetDao) Registry.instance().getDao(TimesheetDao.class);
       final List<TimesheetDO> timesheetList = timesheetDao.getList(filter);
 
@@ -273,7 +276,7 @@ public class CalendarFeed extends HttpServlet
    */
   public boolean isTimesheetRequired()
   {
-    return timesheetRequired;
+    return this.timesheetRequired;
   }
 
   /**
