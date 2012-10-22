@@ -187,7 +187,7 @@ public class InitDatabaseDao extends HibernateDaoSupport
     group.setName(projectForgeGroup.toString());
     group.setDescription(description);
     group.setAssignedUsers(users);
-    group.setNestedGroupsAllowed(false);
+    //group.setNestedGroupsAllowed(false);
     group.setLocalGroup(true); // Do not synchronize group with external user management system by default.
     groupDao.internalSave(group);
   }
