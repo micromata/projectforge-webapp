@@ -73,7 +73,7 @@ public class GroupEditPage extends AbstractEditPage<GroupDO, GroupEditForm, Grou
   public AbstractSecuredBasePage onSaveOrUpdate()
   {
     groupDao.setAssignedUsers(getData(), form.assignUsersListHelper.getAssignedItems());
-    groupDao.setNestedGroups(getData(), form.nestedGroupsListHelper.getAssignedItems());
+    //groupDao.setNestedGroups(getData(), form.nestedGroupsListHelper.getAssignedItems());
     return super.onSaveOrUpdate();
   }
 

@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.hibernate.FetchMode;
 import org.hibernate.LockMode;
@@ -43,7 +42,6 @@ import org.projectforge.access.OperationType;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
-import org.projectforge.web.user.GroupsProvider;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,7 +60,7 @@ public class GroupDao extends BaseDao<GroupDO>
 
   private UserDao userDao;
 
-  private final GroupsProvider groupsProvider = new GroupsProvider();
+  //private final GroupsProvider groupsProvider = new GroupsProvider();
 
   public void setUserDao(final UserDao userDao)
   {
@@ -158,31 +156,31 @@ public class GroupDao extends BaseDao<GroupDO>
     }
   }
 
-  /**
-   * Please note: Only the string group.nestedGroups will be modified (but not be saved)!
-   * @param group
-   * @param nestedGroups Full list of all nested groups which have to assigned to this group.
-   * @return
-   */
-  public void setNestedGroups(final GroupDO group, final Collection<GroupDO> nestedGroups)
-  {
-    if (group.isNestedGroupsAllowed() == false && CollectionUtils.isNotEmpty(nestedGroups) == true) {
-      log.warn("Couldn't set nested groups because given group doesn't allow nested groups: " + group);
-      group.setNestedGroupIds(null);
-      return;
-    }
-    group.setNestedGroupIds(groupsProvider.getGroupIds(nestedGroups));
-  }
-
-  public Collection<GroupDO> getSortedNestedGroups(final GroupDO group)
-  {
-    if (group.isNestedGroupsAllowed() == false && StringUtils.isNotEmpty(group.getNestedGroupIds()) == true) {
-      log.warn("Ignore nested groups because given group doesn't allow nested groups: " + group);
-      group.setNestedGroupIds(null);
-      return null;
-    }
-    return groupsProvider.getSortedGroups(group.getNestedGroupIds());
-  }
+  //  /**
+  //   * Please note: Only the string group.nestedGroups will be modified (but not be saved)!
+  //   * @param group
+  //   * @param nestedGroups Full list of all nested groups which have to assigned to this group.
+  //   * @return
+  //   */
+  //  public void setNestedGroups(final GroupDO group, final Collection<GroupDO> nestedGroups)
+  //  {
+  //    if (group.isNestedGroupsAllowed() == false && CollectionUtils.isNotEmpty(nestedGroups) == true) {
+  //      log.warn("Couldn't set nested groups because given group doesn't allow nested groups: " + group);
+  //      group.setNestedGroupIds(null);
+  //      return;
+  //    }
+  //    group.setNestedGroupIds(groupsProvider.getGroupIds(nestedGroups));
+  //  }
+  //
+  //  public Collection<GroupDO> getSortedNestedGroups(final GroupDO group)
+  //  {
+  //    if (group.isNestedGroupsAllowed() == false && StringUtils.isNotEmpty(group.getNestedGroupIds()) == true) {
+  //      log.warn("Ignore nested groups because given group doesn't allow nested groups: " + group);
+  //      group.setNestedGroupIds(null);
+  //      return null;
+  //    }
+  //    return groupsProvider.getSortedGroups(group.getNestedGroupIds());
+  //  }
 
   /**
    * Creates for every user an history entry if the user is part of this new group.

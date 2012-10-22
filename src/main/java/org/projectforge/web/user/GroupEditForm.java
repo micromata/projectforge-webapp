@@ -59,7 +59,7 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
 
   MultiChoiceListHelper<PFUserDO> assignUsersListHelper;
 
-  MultiChoiceListHelper<GroupDO> nestedGroupsListHelper;
+  //MultiChoiceListHelper<GroupDO> nestedGroupsListHelper;
 
   public GroupEditForm(final GroupEditPage parentPage, final GroupDO data)
   {
@@ -125,26 +125,27 @@ public class GroupEditForm extends AbstractEditForm<GroupDO, GroupEditPage>
           new PropertyModel<Collection<PFUserDO>>(this.assignUsersListHelper, "assignedItems"), usersProvider);
       fs.add(users);
     }
-    {
-      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("group.nestedGroupsAllowed"), "nestedGroupsAllowed", new PropertyModel<Boolean>(data,
-          "nestedGroupsAllowed"), getString("group.nestedGroupsAllowed.tooltip"));
-    }
-    {
-      // Nested groups
-      final FieldsetPanel fs = gridBuilder.newFieldset(getString("group.nestedGroups"), true).setLabelSide(false);
-      final GroupsProvider groupsProvider = new GroupsProvider();
-      final Collection<GroupDO> nestedGroups = groupDao.getSortedNestedGroups(getData());
-      nestedGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
-          groupsProvider.getSortedGroups());
-      if (nestedGroups != null) {
-        for (final GroupDO group : nestedGroups) {
-          nestedGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
-        }
-      }
-      final Select2MultiChoice<GroupDO> users = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
-          new PropertyModel<Collection<GroupDO>>(this.nestedGroupsListHelper, "assignedItems"), groupsProvider);
-      fs.add(users);
-    }
+    // {
+    // WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("group.nestedGroupsAllowed"), "nestedGroupsAllowed", new
+    // PropertyModel<Boolean>(data,
+    // "nestedGroupsAllowed"), getString("group.nestedGroupsAllowed.tooltip"));
+    // }
+    // {
+    // // Nested groups
+    // final FieldsetPanel fs = gridBuilder.newFieldset(getString("group.nestedGroups"), true).setLabelSide(false);
+    // final GroupsProvider groupsProvider = new GroupsProvider();
+    // final Collection<GroupDO> nestedGroups = groupDao.getSortedNestedGroups(getData());
+    // nestedGroupsListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
+    // groupsProvider.getSortedGroups());
+    // if (nestedGroups != null) {
+    // for (final GroupDO group : nestedGroups) {
+    // nestedGroupsListHelper.addOriginalAssignedItem(group).assignItem(group);
+    // }
+    // }
+    // final Select2MultiChoice<GroupDO> users = new Select2MultiChoice<GroupDO>(fs.getSelect2MultiChoiceId(),
+    // new PropertyModel<Collection<GroupDO>>(this.nestedGroupsListHelper, "assignedItems"), groupsProvider);
+    // fs.add(users);
+    // }
   }
 
   @Override
