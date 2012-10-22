@@ -55,17 +55,17 @@ public abstract class AbstractCache
     this.expireTime = expireTime;
   }
 
-  public void setExpireTimeInMinutes(long expireTime)
+  public void setExpireTimeInMinutes(final long expireTime)
   {
     this.expireTime = expireTime * TICKS_PER_MINUTE;
   }
 
-  public void setExpireTimeInSeconds(long expireTime)
+  public void setExpireTimeInSeconds(final long expireTime)
   {
     this.expireTime = expireTime * TICKS_PER_SECOND;
   }
 
-  public void setExpireTimeInHours(long expireTime)
+  public void setExpireTimeInHours(final long expireTime)
   {
     this.expireTime = expireTime * TICKS_PER_HOUR;
   }
@@ -102,7 +102,7 @@ public abstract class AbstractCache
         this.timeOfLastRefresh = System.currentTimeMillis();
         try {
           this.refresh();
-        } catch (Throwable ex) {
+        } catch (final Throwable ex) {
           log.error(ex.getMessage(), ex);
         }
         this.isExpired = false;
@@ -110,6 +110,14 @@ public abstract class AbstractCache
         refreshInProgress = false;
       }
     }
+  }
+
+  /**
+   * @return true if currently a cache refresh is running, otherwise false.
+   */
+  public boolean isRefreshInProgress()
+  {
+    return refreshInProgress;
   }
 
   /**
