@@ -236,19 +236,10 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     Assert.assertEquals(LoginResultStatus.SUCCESS, result.getLoginResultStatus());
     Assert.assertNotNull("User should be returned.", result.getUser());
     synchronizeLdapUsers(loginHandler);
-    while (true) {
-      try {
-        Thread.sleep(200);
-      } catch (final InterruptedException ex) {
-      }
-      if (userDao.getUserGroupCache().isRefreshInProgress() == false) {
-        break;
-      }
-    }
-    PFUserDO user = userDao.getInternalByName(testUsername1);
-    result = loginHandler.checkLogin(testUsername1, "successful");
+    PFUserDO user = userDao.authenticateUser(testUsername1, userDao.encryptPassword("successful"));
     Assert.assertNotNull("User should be created by login handler.", user);
     Assert.assertEquals(testUsername1, user.getUsername());
+    result = loginHandler.checkLogin(testUsername1, "successful");
     Assert.assertEquals(result.getUser().getId(), user.getId());
     user = userDao.getInternalByName(testUsername2);
     result = loginHandler.checkLogin(testUsername2, "successful");
@@ -267,21 +258,18 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     Assert.assertFalse("User isn't available in LDAP, therefore should be deleted.", user.isDeleted());
 
     // Check that LDAP is ignored for local users:
-    user.setLocalUser(true);
+    user.setLocalUser(true).setPassword(userDao.encryptPassword("test"));
     userDao.internalUpdate(user);
     result = loginHandler.checkLogin(testUsername2, "successful");
     Assert.assertEquals("User is a local user, thus the LDAP authentication should be ignored.", LoginResultStatus.FAILED,
         result.getLoginResultStatus());
-
-    // Delete user2
-    ldapUserDao.delete(ldapUser2);
-    user.setPassword(userDao.encryptPassword("test"));
-    synchronizeLdapUsers(loginHandler);
-    Assert.assertFalse("User isn't available in LDAP but is a local user, therefore shouldn't be deleted.", user.isDeleted());
-    Assert.assertTrue("User isn't available in LDAP but is a local user.", user.isLocalUser());
+    result = loginHandler.checkLogin(testUsername2, "test");
+    Assert.assertEquals("User is a local user, thus the data-base authentication should be used.", LoginResultStatus.SUCCESS,
+        result.getLoginResultStatus());
 
     // Delete all users
     ldapUserDao.delete(ldapUser1);
+    ldapUserDao.delete(ldapUser2);
   }
 
   private void synchronizeLdapUsers(final LdapSlaveLoginHandler loginHandler)

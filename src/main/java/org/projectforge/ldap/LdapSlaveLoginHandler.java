@@ -66,6 +66,8 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
 
   private boolean refreshInProgress;
 
+  private final boolean storePasswords = true;
+
   /**
    * Only for test cases.
    * @param mode
@@ -129,7 +131,7 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
       log.info("LDAP user '" + username + "' doesn't yet exist in ProjectForge's data base. Creating new user...");
       user = PFUserDOConverter.convert(ldapUser);
       user.setId(null); // Force new id.
-      if (mode == Mode.SIMPLE) {
+      if (mode == Mode.SIMPLE || storePasswords == false) {
         user.setNoPassword();
       } else {
         user.setPassword(userDao.encryptPassword(password));
@@ -137,6 +139,9 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
       userDao.internalSave(user);
     } else if (mode != Mode.SIMPLE) {
       PFUserDOConverter.copyUserFields(PFUserDOConverter.convert(ldapUser), user);
+      if (storePasswords == true) {
+        user.setPassword(userDao.encryptPassword(password));
+      }
       userDao.internalUpdate(user);
       if (user.hasSystemAccess() == false) {
         log.info("User has no system access (is deleted/deactivated): " + user.getDisplayUsername());
