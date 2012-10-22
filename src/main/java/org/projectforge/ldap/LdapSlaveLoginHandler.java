@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.naming.NameNotFoundException;
+
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.LoginDefaultHandler;
@@ -61,6 +63,8 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
   };
 
   private Mode mode;
+
+  private boolean refreshInProgress;
 
   /**
    * Only for test cases.
@@ -154,13 +158,8 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
   @Override
   public List<GroupDO> getAllGroups()
   {
-    return loginDefaultHandler.getAllGroups();
-    // final List<LdapGroup> ldapGroups = getAllLdapGroups();
-    // final List<GroupDO> groups = new ArrayList<GroupDO>(ldapGroups.size());
-    // for (final LdapGroup ldapGroup : ldapGroups) {
-    // groups.add(GroupDOConverter.convert(ldapGroup));
-    // }
-    // return groups;
+    final List<GroupDO> groups = loginDefaultHandler.getAllGroups();
+    return groups;
   }
 
   /**
@@ -171,42 +170,7 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
   @Override
   public List<PFUserDO> getAllUsers()
   {
-    if (mode == Mode.SIMPLE) {
-      return loginDefaultHandler.getAllUsers();
-    }
-    final List<LdapPerson> ldapUsers = getAllLdapUsers();
-    final List<PFUserDO> dbUsers = userDao.internalLoadAll();
-    final List<PFUserDO> users = new ArrayList<PFUserDO>(ldapUsers.size());
-    for (final LdapPerson ldapUser : ldapUsers) {
-      final PFUserDO user = PFUserDOConverter.convert(ldapUser);
-      users.add(user);
-      final PFUserDO dbUser = getUser(dbUsers, user.getUsername());
-      if (dbUser != null) {
-        if (dbUser.isLocalUser() == true) {
-          // Ignore local users.
-          continue;
-        }
-        dbUser.copyValuesFrom(user);
-        if (dbUser.isDeleted() == true) {
-          userDao.internalUndelete(dbUser);
-        }
-        userDao.internalUpdate(dbUser);
-      } else {
-        // New user:
-        userDao.internalSave(user);
-      }
-    }
-    for (final PFUserDO dbUser : dbUsers) {
-      if (dbUser.isLocalUser() == true) {
-        // Ignore local users.
-        continue;
-      }
-      final PFUserDO user = getUser(users, dbUser.getUsername());
-      if (user == null) {
-        // User isn't available in LDAP, therefore mark the db user as deleted.
-        userDao.internalMarkAsDeleted(user);
-      }
-    }
+    final List<PFUserDO> users = loginDefaultHandler.getAllUsers();
     return users;
   }
 
@@ -234,11 +198,125 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
   }
 
   /**
-   * Does nothing.
+   * Refreshes the LDAP.
    * @see org.projectforge.user.LoginHandler#afterUserGroupCacheRefresh(java.util.List, java.util.List)
    */
   @Override
   public void afterUserGroupCacheRefresh(final List<PFUserDO> users, final List<GroupDO> groups)
   {
+    if (mode == Mode.SIMPLE) {
+      return;
+    }
+    new Thread() {
+      @Override
+      public void run()
+      {
+        try {
+          refreshInProgress = true;
+          updateLdap(users, groups);
+        } finally {
+          refreshInProgress = false;
+        }
+      }
+    }.start();
+  }
+
+  /**
+   * @return true if currently a cache refresh is running, otherwise false.
+   */
+  public boolean isRefreshInProgress()
+  {
+    return refreshInProgress;
+  }
+
+  private void updateLdap(final List<PFUserDO> users, final List<GroupDO> groups)
+  {
+    synchronized (this) {
+      new LdapTemplate(ldapConnector) {
+        @Override
+        protected Object call() throws NameNotFoundException, Exception
+        {
+          log.info("Updating LDAP...");
+          final List<LdapPerson> ldapUsers = getAllLdapUsers(ctx);
+          final List<PFUserDO> dbUsers = userDao.internalLoadAll();
+          final List<PFUserDO> users = new ArrayList<PFUserDO>(ldapUsers.size());
+          int error = 0, unmodified = 0, created = 0, updated = 0, deleted = 0, undeleted = 0, ignoredLocalUsers = 0, localUsers = 0;
+          for (final LdapPerson ldapUser : ldapUsers) {
+            try {
+              final PFUserDO user = PFUserDOConverter.convert(ldapUser);
+              users.add(user);
+              final PFUserDO dbUser = getUser(dbUsers, user.getUsername());
+              if (dbUser != null) {
+                if (dbUser.isLocalUser() == true) {
+                  // Ignore local users.
+                  log.warn("Please note: the user '"
+                      + dbUser.getUsername()
+                      + "' is declared as local user. LDAP settings of the same LDAP user are ignored!");
+                  ++ignoredLocalUsers;
+                  continue;
+                }
+                PFUserDOConverter.copyUserFields(user, dbUser);
+                if (dbUser.isDeleted() == true) {
+                  userDao.internalUndelete(dbUser);
+                  ++undeleted;
+                }
+                final boolean modified = userDao.internalUpdate(dbUser);
+                if (modified == true) {
+                  ++updated;
+                } else {
+                  ++unmodified;
+                }
+              } else {
+                // New user:
+                userDao.internalSave(user);
+                ++created;
+              }
+            } catch (final Exception ex) {
+              log.error("Error while proceeding LDAP user '" + ldapUser.getUid() + "'. Continuing with next user.", ex);
+              error++;
+            }
+          }
+          for (final PFUserDO dbUser : dbUsers) {
+            try {
+              if (dbUser.isLocalUser() == true) {
+                // Ignore local users.
+                ++localUsers;
+                continue;
+              }
+              final PFUserDO user = getUser(users, dbUser.getUsername());
+              if (user == null) {
+                if (dbUser.isDeleted() == false) {
+                  // User isn't available in LDAP, therefore mark the db user as deleted.
+                  userDao.internalMarkAsDeleted(dbUser);
+                  ++deleted;
+                } else {
+                  ++unmodified;
+                }
+              }
+            } catch (final Exception ex) {
+              log.error("Error while proceeding data-base user '" + dbUser.getUsername() + "'. Continuing with next user.", ex);
+              error++;
+            }
+          }
+          log.info("Update of LDAP users: "
+              + (error > 0 ? "*** " + error + " errors ***, " : "")
+              + unmodified
+              + " unmodified, "
+              + created
+              + " created, "
+              + updated
+              + " updated, "
+              + deleted
+              + " deleted, "
+              + undeleted
+              + " undeleted, "
+              + ignoredLocalUsers
+              + " ignored ldap users (local users), "
+              + localUsers
+              + " local users.");
+          return null;
+        }
+      }.excecute();
+    }
   }
 }
