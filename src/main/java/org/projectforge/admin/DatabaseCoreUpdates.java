@@ -77,7 +77,7 @@ public class DatabaseCoreUpdates
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
         return dao.doesTableAttributesExist(userTable, "authenticationToken", "localUser", "restrictedUser", "deactivated") == true //
-            && dao.doesTableAttributesExist(groupTable, "localGroup", "nestedGroupsAllowed", "nestedGroupIds") == true //
+            && dao.doesTableAttributesExist(groupTable, "localGroup") == true //, "nestedGroupsAllowed", "nestedGroupIds") == true //
             && dao.doesTableAttributesExist(outgoingInvoiceTable, "uiStatusAsXml") == true //
             && dao.doesTableAttributesExist(incomingInvoiceTable, "uiStatusAsXml") == true //
             && dao.doesTableAttributesExist(orderTable, "uiStatusAsXml") == true //
@@ -103,12 +103,12 @@ public class DatabaseCoreUpdates
         if (dao.doesTableAttributesExist(groupTable, "localGroup") == false) {
           dao.addTableAttributes(groupTable, new TableAttribute(GroupDO.class, "localGroup").setDefaultValue("false"));
         }
-        if (dao.doesTableAttributesExist(groupTable, "nestedGroupsAllowed") == false) {
-          dao.addTableAttributes(groupTable, new TableAttribute(GroupDO.class, "nestedGroupsAllowed").setDefaultValue("true"));
-        }
-        if (dao.doesTableAttributesExist(groupTable, "nestedGroupIds") == false) {
-          dao.addTableAttributes(groupTable, new TableAttribute(GroupDO.class, "nestedGroupIds"));
-        }
+        // if (dao.doesTableAttributesExist(groupTable, "nestedGroupsAllowed") == false) {
+        // dao.addTableAttributes(groupTable, new TableAttribute(GroupDO.class, "nestedGroupsAllowed").setDefaultValue("true"));
+        // }
+        // if (dao.doesTableAttributesExist(groupTable, "nestedGroupIds") == false) {
+        // dao.addTableAttributes(groupTable, new TableAttribute(GroupDO.class, "nestedGroupIds"));
+        // }
         if (dao.doesTableAttributesExist(outgoingInvoiceTable, "uiStatusAsXml") == false) {
           dao.addTableAttributes(outgoingInvoiceTable, new TableAttribute(RechnungDO.class, "uiStatusAsXml"));
         }
