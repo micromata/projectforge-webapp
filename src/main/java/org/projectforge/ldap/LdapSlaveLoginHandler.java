@@ -38,7 +38,7 @@ import org.projectforge.user.PFUserDO;
 
 /**
  * This LDAP login handler acts as a LDAP slave, meaning, that LDAP will be accessed in read-only mode. There are 3 modes available: simple,
- * users and user-groups. <h4>Simple mode</h4>
+ * users and users-groups. <h4>Simple mode</h4> The simple mode is assumed if no ldap managerUser is given in the config.xml.
  * <ul>
  * <li>Simple means that only username and password is checked, all other user settings such as assigned groups and user name etc. are
  * managed by ProjectForge.</li>
@@ -49,6 +49,19 @@ import org.projectforge.user.PFUserDO;
  * stay-logged-in-method! (If not acceptable please use the {@link LdapSlaveLoginHandler} instead.)</li>
  * <li>For local users any LDAP setting is ignored.</li>
  * </ul>
+ * <h4>Normal users mode</h4> The normal user mode is assumed if a ldap managerUser is given in the config.xml.
+ * <ul>
+ * <li>Normal means that username and password is checked and all other user settings such as user name etc. are read by a given ldap
+ * manager user.</li>
+ * <li>
+ * No ldap user is needed for accessing users or groups of LDAP, only the user's login-name and password is checked by trying to
+ * authenticate!</li>
+ * <li>If a user is deleted in LDAP the user will be marked as deleted also in ProjectForge's data-base. Any login after synchronizing isn't
+ * allowed (the stay-logged-in-feature fails also for deleted users).</li>
+ * <li>For local users any LDAP setting is ignored.</li>
+ * <li>All known ldap person fields of the users are synchronized (given name, surname, e-mail etc.).</li>
+ * </ul>
+ * <h4>Users-groups mode</h4> Not yet supported. No groups will be synchronized.
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
  * 
