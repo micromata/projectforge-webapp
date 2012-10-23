@@ -130,6 +130,7 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public void setAssignedUsers(final Set<PFUserDO> assignedUsers)
   {
     this.assignedUsers = assignedUsers;
+    this.usernames = null;
   }
 
   public void addUser(final PFUserDO user)
@@ -138,6 +139,7 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
       this.assignedUsers = new HashSet<PFUserDO>();
     }
     this.assignedUsers.add(user);
+    this.usernames = null;
   }
 
   @Column(length = 1000)
