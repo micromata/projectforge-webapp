@@ -38,6 +38,7 @@ import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
+import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
@@ -72,7 +73,7 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
     {
       // Organization
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("organization"));
-      final RequiredMaxLengthTextField organization = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
+      final MaxLengthTextField organization = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
           "organization"));
       organization.add(WicketUtils.setFocus());
       fs.add(organization);
@@ -90,13 +91,13 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
     {
       // UpdateFromVersion
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.updateFromVersion"), true);
-      fs.add(new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "updateFromVersion")));
+      fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "updateFromVersion")));
       fs.addHelpIcon(getString("plugins.licensemanagement.updateFromVersion.tooltip"));
     }
     {
       // Device
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.device"), true);
-      fs.add(new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "device")));
+      fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "device")));
       fs.addHelpIcon(getString("plugins.licensemanagement.device.tooltip"));
     }
     {
