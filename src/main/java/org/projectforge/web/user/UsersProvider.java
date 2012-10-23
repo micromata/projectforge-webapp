@@ -28,7 +28,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.NumberHelper;
+import org.projectforge.common.StringHelper;
 import org.projectforge.registry.Registry;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
@@ -39,6 +41,8 @@ import com.vaynberg.wicket.select2.TextChoiceProvider;
 public class UsersProvider extends TextChoiceProvider<PFUserDO>
 {
   private static final long serialVersionUID = 6228672635966093252L;
+
+  private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(UsersProvider.class);
 
   private transient UserGroupCache userGroupCache;
 
@@ -60,6 +64,41 @@ public class UsersProvider extends TextChoiceProvider<PFUserDO>
       }
     }
     return sortedUsers;
+  }
+
+  /**
+   * 
+   * @param userIds
+   * @return
+   */
+  public Collection<PFUserDO> getSortedUsers(final String userIds)
+  {
+    if (StringUtils.isEmpty(userIds) == true) {
+      return null;
+    }
+    sortedUsers = new TreeSet<PFUserDO>(usersComparator);
+    final int[] ids = StringHelper.splitToInts(userIds, ",", false);
+    for (final int id : ids) {
+      final PFUserDO user = getUserGroupCache().getUser(id);
+      if (user != null) {
+        sortedUsers.add(user);
+      } else {
+        log.warn("Group with id '" + id + "' not found in UserGroupCache. groupIds string was: " + userIds);
+      }
+    }
+    return sortedUsers;
+  }
+
+  public String getUserIds(final Collection<PFUserDO> users)
+  {
+    final StringBuffer buf = new StringBuffer();
+    boolean first = true;
+    for (final PFUserDO user : users) {
+      if (user.getId() != null) {
+        first = StringHelper.append(buf, first, String.valueOf(user.getId()), ",");
+      }
+    }
+    return buf.toString();
   }
 
   /**
