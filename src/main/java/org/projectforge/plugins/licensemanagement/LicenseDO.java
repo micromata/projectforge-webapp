@@ -84,6 +84,9 @@ public class LicenseDO extends DefaultBaseDO
   private LicenseStatus status;
 
   @DateBridge(resolution = Resolution.DAY)
+  private Date validSince;
+
+  @DateBridge(resolution = Resolution.DAY)
   private Date validUntil;
 
   @Transient
@@ -277,7 +280,29 @@ public class LicenseDO extends DefaultBaseDO
   }
 
   /**
-   * @return the validUntilDate
+   * @return the validSince date
+   */
+  @Column(name = "valid_since")
+  /**
+   * @return the validSince
+   */
+  public Date getValidSince()
+  {
+    return validSince;
+  }
+
+  /**
+   * @param validSince the validSince to set
+   * @return this for chaining.
+   */
+  public LicenseDO setValidSince(final Date validSince)
+  {
+    this.validSince = validSince;
+    return this;
+  }
+
+  /**
+   * @return the validUntil date
    */
   @Column(name = "valid_until")
   public Date getValidUntil()

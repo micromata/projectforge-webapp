@@ -25,6 +25,7 @@ package org.projectforge.plugins.licensemanagement;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.model.PropertyModel;
@@ -35,6 +36,7 @@ import org.projectforge.web.user.UsersComparator;
 import org.projectforge.web.user.UsersProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
 import org.projectforge.web.wicket.WicketUtils;
+import org.projectforge.web.wicket.autocompletion.PFAutoCompleteMaxLengthTextField;
 import org.projectforge.web.wicket.components.DatePanel;
 import org.projectforge.web.wicket.components.DatePanelSettings;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
@@ -42,6 +44,7 @@ import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
+import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.InputPanel;
 
@@ -65,6 +68,7 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
     super(parentPage, data);
   }
 
+  @SuppressWarnings("serial")
   @Override
   protected void init()
   {
@@ -73,20 +77,41 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
     {
       // Organization
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("organization"));
-      final MaxLengthTextField organization = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
-          "organization"));
-      organization.add(WicketUtils.setFocus());
-      fs.add(organization);
+      final PFAutoCompleteMaxLengthTextField organizationField = new PFAutoCompleteMaxLengthTextField(InputPanel.WICKET_ID,
+          new PropertyModel<String>(data, "organization")) {
+        @Override
+        protected List<String> getChoices(final String input)
+        {
+          return getBaseDao().getAutocompletion("organization", input);
+        }
+      };
+      organizationField.withMatchContains(true).withMinChars(2).withFocus(true);
+      WicketUtils.setStrong(organizationField);
+      fs.add(organizationField);
     }
     {
       // Product
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.product"));
-      fs.add(new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "product")));
+      final PFAutoCompleteMaxLengthTextField productField = new PFAutoCompleteMaxLengthTextField(InputPanel.WICKET_ID,
+          new PropertyModel<String>(data, "product")) {
+        @Override
+        protected List<String> getChoices(final String input)
+        {
+          return getBaseDao().getAutocompletion("product", input);
+        }
+      };
+      productField.withMatchContains(true).withMinChars(2);
+      productField.setRequired(true);
+      WicketUtils.setStrong(productField);
+      fs.add(productField);
     }
     {
       // Version
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.version"));
-      fs.add(new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "version")));
+      final RequiredMaxLengthTextField versionField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
+          "version"));
+      WicketUtils.setStrong(versionField);
+      fs.add(versionField);
     }
     {
       // UpdateFromVersion
@@ -114,7 +139,7 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
       final UsersProvider usersProvider = new UsersProvider();
       assignOwnersListHelper = new MultiChoiceListHelper<PFUserDO>().setComparator(new UsersComparator()).setFullList(
           usersProvider.getSortedUsers());
-      final Collection<PFUserDO> owners = ((LicenseDao)getBaseDao()).getSortedOwners(data);
+      final Collection<PFUserDO> owners = ((LicenseDao) getBaseDao()).getSortedOwners(data);
       if (owners != null) {
         for (final PFUserDO owner : owners) {
           assignOwnersListHelper.addOriginalAssignedItem(owner).assignItem(owner);
@@ -124,17 +149,27 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
           new PropertyModel<Collection<PFUserDO>>(this.assignOwnersListHelper, "assignedItems"), usersProvider);
       fs.add(ownersChoice);
     }
+    gridBuilder.newColumnsPanel().newColumnPanel(DivType.COL_50);
+    {
+      // Valid since
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.validSince"));
+      final DatePanel validSinceDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "validSince"), DatePanelSettings
+          .get().withTargetType(java.sql.Date.class).withSelectProperty("validSince"));
+      fs.add(validSinceDatePanel);
+    }
+    gridBuilder.newColumnPanel(DivType.COL_40);
     {
       // Valid until
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.validUntil"));
-      final DatePanel validUntilDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "validUntil"), DatePanelSettings.get()
-          .withTargetType(java.sql.Date.class).withSelectProperty("validUntil"));
+      final DatePanel validUntilDatePanel = new DatePanel(fs.newChildId(), new PropertyModel<Date>(data, "validUntil"), DatePanelSettings
+          .get().withTargetType(java.sql.Date.class).withSelectProperty("validUntil"));
       fs.add(validUntilDatePanel);
     }
+    gridBuilder.newColumnsPanel();
     {
       // Text key
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.key"), true);
-      final LicenseManagementRight right = (LicenseManagementRight)UserRights.instance().getRight(LicenseDao.USER_RIGHT_ID);
+      final LicenseManagementRight right = (LicenseManagementRight) UserRights.instance().getRight(LicenseDao.USER_RIGHT_ID);
       if (right.isLicenseKeyVisible(getUser(), data) == true) {
         fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "key"))).setAutogrow();
       } else {

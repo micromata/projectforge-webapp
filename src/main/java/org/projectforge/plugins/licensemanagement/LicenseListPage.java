@@ -111,6 +111,8 @@ public class LicenseListPage extends AbstractListPage<LicenseListForm, LicenseDa
         cellItemListener.populateItem(cellItem, componentId, rowModel);
       }
     });
+    columns.add(new CellItemListenerPropertyColumn<LicenseDO>(new Model<String>(getString("plugins.licensemanagement.device")), getSortable(
+        "device", sortable), "device", cellItemListener));
     columns.add(new CellItemListenerPropertyColumn<LicenseDO>(new Model<String>(getString("comment")),
         getSortable("comment", sortable), "comment", cellItemListener) {
       @Override
