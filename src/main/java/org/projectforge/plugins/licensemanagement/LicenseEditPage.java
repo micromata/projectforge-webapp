@@ -50,6 +50,18 @@ public class LicenseEditPage extends AbstractEditPage<LicenseDO, LicenseEditForm
     init();
   }
 
+  /**
+   * Sets the id of the current time sheet to null and the user to the logged in user and returns to the input page. This results in adding
+   * a new time sheet. (Does not clone TimesheetEditAction!)
+   */
+  protected void cloneLicense()
+  {
+    final LicenseDO license = getData();
+    license.setId(null);
+    license.setDeleted(false);
+  }
+
+
   @Override
   protected LicenseDao getBaseDao()
   {

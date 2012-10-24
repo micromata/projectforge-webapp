@@ -130,7 +130,7 @@ public class LicenseListPage extends AbstractListPage<LicenseListForm, LicenseDa
   @Override
   protected void init()
   {
-    dataTable = createDataTable(createColumns(this, true), "sortString", SortOrder.ASCENDING);
+    dataTable = createDataTable(createColumns(this, true), "orderString", SortOrder.ASCENDING);
     form.add(dataTable);
   }
 

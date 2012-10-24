@@ -28,6 +28,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
@@ -43,6 +45,7 @@ import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
 import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
+import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.flowlayout.DivTextPanel;
 import org.projectforge.web.wicket.flowlayout.DivType;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
@@ -181,6 +184,28 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
       // Text comment
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "comment"))).setAutogrow();
+    }
+    if (isNew() == false) {
+      // Clone button for existing and not deleted invoices:
+      final Button cloneButton = new Button(SingleButtonPanel.WICKET_ID, new Model<String>("clone")) {
+        @Override
+        public final void onSubmit()
+        {
+          parentPage.cloneLicense();
+        }
+      };
+      cloneButton.setDefaultFormProcessing(false);
+      final SingleButtonPanel cloneButtonPanel = new SingleButtonPanel(actionButtons.newChildId(), cloneButton, getString("clone")) {
+        /**
+         * @see org.apache.wicket.Component#isVisible()
+         */
+        @Override
+        public boolean isVisible()
+        {
+          return isNew() == false;
+        }
+      };
+      actionButtons.add(2, cloneButtonPanel);
     }
   }
 
