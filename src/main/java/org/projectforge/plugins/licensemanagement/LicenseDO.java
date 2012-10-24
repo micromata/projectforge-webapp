@@ -70,6 +70,7 @@ public class LicenseDO extends DefaultBaseDO
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String licenseHolder;
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String key;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
