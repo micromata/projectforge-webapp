@@ -29,11 +29,13 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRights;
 import org.projectforge.web.common.MultiChoiceListHelper;
+import org.projectforge.web.upload.PFUploadField;
 import org.projectforge.web.user.UsersComparator;
 import org.projectforge.web.user.UsersProvider;
 import org.projectforge.web.wicket.AbstractEditForm;
@@ -65,6 +67,8 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LicenseEditForm.class);
 
   MultiChoiceListHelper<PFUserDO> assignOwnersListHelper;
+
+  private PFUploadField pfUploadField;
 
   public LicenseEditForm(final LicenseEditPage parentPage, final LicenseDO data)
   {
@@ -186,6 +190,14 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
       }
     }
     {
+      final FieldsetPanel fs = gridBuilder.newFieldset(gridBuilder.getString("license.upload.title"));
+      fs.setVisible(false); // TODO Kai: remove this
+      pfUploadField = new PFUploadField(fs.newChildId());
+      // pfUploadField.setFileName(fileName); TODO Kai: set reasonable filename from DO object
+      fs.add(pfUploadField);
+      fs.setLabelFor(pfUploadField.getLabel());
+    }
+    {
       // Text comment
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("comment"));
       fs.add(new MaxLengthTextArea(fs.getTextAreaId(), new PropertyModel<String>(data, "comment"))).setAutogrow();
@@ -212,6 +224,10 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
       };
       actionButtons.add(2, cloneButtonPanel);
     }
+  }
+
+  public FileUpload getFileUpload() {
+    return pfUploadField.getFileUpload();
   }
 
   @Override

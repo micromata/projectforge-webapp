@@ -118,7 +118,27 @@ $(function() {
 	});
 	
 	initColorPicker();
-})
+	initFileUpload();
+	
+	if(typeof(Wicket) != "undefined") {
+		Wicket.Ajax.registerPostCallHandler(function() {
+			// handle after AJAX actions
+			initFileUpload();
+		});
+	}
+});
+
+function initFileUpload() {
+	var $uploadProxy = $('.pf_uploadField button[name="fileUploadProxy"], .pf_uploadField .label');
+	$uploadProxy.unbind('click').click(function (e) {
+		$(this).siblings('input[type="file"]').click();
+		e.preventDefault();
+	}).siblings('input[type="file"]').change(function (e) {
+		$(this).siblings('.label').val(/([^\\\/]+)$/.exec(this.value)[1]); // Extract the filename
+		$(this).siblings('.label').change();
+	});
+}
+
 function initColorPicker() {
 	$('.pf_colorPreview').live('click', function() {
 		$(this).siblings('.pf_colorForm').find('.pf_colorPickerField').click();
@@ -126,13 +146,13 @@ function initColorPicker() {
 }
 
 function disableScroll() {
-    var before = $(document).width();
-    $("html").css("overflow", "hidden");
-    var after = $(document).width();
-    $("body").css("padding-right", after-before);
+	var before = $(document).width();
+	$("html").css("overflow", "hidden");
+	var after = $(document).width();
+	$("body").css("padding-right", after-before);
 }
 
 function enableScroll() {
-    $("html").css("overflow", "auto");
-    $("body").css("padding-right", 0);
+	$("html").css("overflow", "auto");
+	$("body").css("padding-right", 0);
 }
