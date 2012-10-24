@@ -109,7 +109,7 @@ public abstract class AbstractFieldsetPanel<T extends AbstractFieldsetPanel< ? >
     if (component instanceof ComponentWrapperPanel) {
       this.label.add(AttributeModifier.replace("for", ((ComponentWrapperPanel) component).getComponentOutputId()));
     } else {
-      this.label.add(AttributeModifier.replace("for", component.getOutputMarkupId()));
+      this.label.add(AttributeModifier.replace("for", component.getMarkupId()));
     }
     labelFor = true;
     return getThis();
