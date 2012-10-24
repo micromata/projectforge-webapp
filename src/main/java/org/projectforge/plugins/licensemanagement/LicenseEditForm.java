@@ -170,6 +170,11 @@ public class LicenseEditForm extends AbstractEditForm<LicenseDO, LicenseEditPage
     }
     gridBuilder.newColumnsPanel();
     {
+      // License holder
+      final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.licenseHolder"), true);
+      fs.add(new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "licenseHolder")));
+    }
+    {
       // Text key
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("plugins.licensemanagement.key"), true);
       final LicenseManagementRight right = (LicenseManagementRight) UserRights.instance().getRight(LicenseDao.USER_RIGHT_ID);

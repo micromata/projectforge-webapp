@@ -67,6 +67,9 @@ public class LicenseDO extends DefaultBaseDO
   @Field(index = Index.TOKENIZED, store = Store.NO)
   private String updateFromVersion;
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
+  private String licenseHolder;
+
   private String key;
 
   @Field(index = Index.TOKENIZED, store = Store.NO)
@@ -168,6 +171,25 @@ public class LicenseDO extends DefaultBaseDO
   public LicenseDO setUpdateFromVersion(final String updateFromVersion)
   {
     this.updateFromVersion = updateFromVersion;
+    return this;
+  }
+
+  /**
+   * @return the licenseHolder
+   */
+  @Column(length = 10000, name = "license_holder")
+  public String getLicenseHolder()
+  {
+    return licenseHolder;
+  }
+
+  /**
+   * @param licenseHolder the licenseHolder to set
+   * @return this for chaining.
+   */
+  public LicenseDO setLicenseHolder(final String licenseHolder)
+  {
+    this.licenseHolder = licenseHolder;
     return this;
   }
 

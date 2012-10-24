@@ -56,8 +56,8 @@ public class LicenseManagementPluginUpdates
       {
         // Create initial data-base table:
         final Table table = new Table(LicenseDO.class) //
-        .addDefaultBaseDOAttributes().addAttributes("organization", "product", "version", "updateFromVersion", "key", "numberOfLicenses", "ownerIds",
-            "device", "comment", "status", "validSince", "validUntil");
+        .addDefaultBaseDOAttributes().addAttributes("organization", "product", "version", "updateFromVersion", "licenseHolder", "key",
+            "numberOfLicenses", "ownerIds", "device", "comment", "status", "validSince", "validUntil");
         dao.createTable(table);
         dao.createMissingIndices();
         return UpdateRunningStatus.DONE;
