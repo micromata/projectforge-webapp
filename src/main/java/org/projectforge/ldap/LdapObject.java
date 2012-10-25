@@ -35,7 +35,9 @@ import org.apache.commons.lang.builder.ToStringStyle;
  */
 public abstract class LdapObject<I extends Serializable>
 {
-  private String dn, commonName;
+  private String dn;
+
+  protected String commonName;
 
   private String organizationalUnit;
 
@@ -56,7 +58,12 @@ public abstract class LdapObject<I extends Serializable>
    */
   public LdapObject<I> setCommonName(final String commonName)
   {
-    this.commonName = commonName;
+    if (commonName.indexOf('\\') >= 0) {
+      // Remove escape characters
+      this.commonName = commonName.replace("\\", "");
+    } else {
+      this.commonName = commonName;
+    }
     return this;
   }
 
