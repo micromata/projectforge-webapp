@@ -381,7 +381,6 @@ public class LdapUserDao extends LdapPersonDao
     super.createAndAddModificationItems(list, attrId, attrValues);
   }
 
-
   /**
    * @see org.projectforge.ldap.LdapPersonDao#addModificationItems(java.util.List, org.projectforge.ldap.LdapPerson)
    */
@@ -402,5 +401,20 @@ public class LdapUserDao extends LdapPersonDao
     } else {
       return "cn=" + LdapUtils.escapeCommonName(obj.getCommonName());
     }
+  }
+
+  /**
+   * @see org.projectforge.ldap.LdapDao#buildId(java.lang.Object)
+   */
+  @Override
+  protected String buildId(final Object id)
+  {
+    if (id == null) {
+      return null;
+    }
+    if (id instanceof String && ((String) id).startsWith(PFUserDOConverter.ID_PREFIX) == true) {
+      return String.valueOf(id);
+    }
+    return PFUserDOConverter.ID_PREFIX + id;
   }
 }
