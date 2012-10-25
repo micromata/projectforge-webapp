@@ -115,7 +115,7 @@ public class PFUserDOConverter
   }
 
   /**
-   * Copies the fields.
+   * Copies the fields. The field commonName is also copied because the dn is built from the uid, ou and dc. The cn isn't part of the dn.
    * @param src
    * @param dest
    * @return true if any modification is detected, otherwise false.
@@ -124,7 +124,7 @@ public class PFUserDOConverter
   {
     setMailNullArray(src);
     setMailNullArray(dest);
-    final boolean modified = BeanHelper.copyProperties(src, dest, true, "uid", "givenName", "surname", "mail", "description",
+    final boolean modified = BeanHelper.copyProperties(src, dest, true, "commonName", "uid", "givenName", "surname", "mail", "description",
         "organization", "deactivated", "restrictedUser");
     return modified;
   }
@@ -140,6 +140,6 @@ public class PFUserDOConverter
       }
     }
     // All array entries are null, therefore set the mail value itself to null:
-    person.setMail((String[])null);
+    person.setMail((String[]) null);
   }
 }
