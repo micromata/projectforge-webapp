@@ -23,6 +23,8 @@
 
 package org.projectforge.ldap;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
@@ -43,26 +45,39 @@ public class LdapPerson extends LdapObject<String>
     return uid;
   }
 
-  private void updateCommonName()
+  /**
+   * PLEASE NOTE: If the common name isn't set yet, the common name is built of given name and surname. If both isn't given its built of
+   * uid.
+   * @see org.projectforge.ldap.LdapObject#getCommonName()
+   */
+  @Override
+  public String getCommonName()
   {
-    String cn;
-    if (getGivenName() != null) {
-      if (getSurname() != null) {
-        cn = getGivenName() + " " + getSurname();
+    if (StringUtils.isBlank(commonName) == true) {
+      if (StringUtils.isBlank(getGivenName()) == false) {
+        if (StringUtils.isBlank(getSurname()) == false) {
+          commonName = getGivenName() + " " + getSurname();
+        } else {
+          commonName = getGivenName();
+        }
+      } else if (StringUtils.isBlank(getSurname()) == false) {
+        commonName = getSurname();
       } else {
-        cn = getGivenName();
+        commonName = uid;
       }
-    } else {
-      cn = getSurname();
     }
-    setCommonName(cn);
+    return commonName;
   }
 
   /**
+   * If no surname is given then "-" is returned (otherwise the LDAP's schema may be violated).
    * @return the sn
    */
   public String getSurname()
   {
+    if (surname == null) {
+      return "-";
+    }
     return surname;
   }
 
@@ -73,7 +88,7 @@ public class LdapPerson extends LdapObject<String>
   public LdapPerson setSurname(final String surname)
   {
     this.surname = surname;
-    updateCommonName();
+    this.commonName = null;
     return this;
   }
 
@@ -95,6 +110,7 @@ public class LdapPerson extends LdapObject<String>
   public LdapPerson setUid(final String uid)
   {
     this.uid = uid;
+    this.commonName = null;
     return this;
   }
 
@@ -132,7 +148,7 @@ public class LdapPerson extends LdapObject<String>
   public LdapPerson setGivenName(final String givenName)
   {
     this.givenName = givenName;
-    updateCommonName();
+    this.commonName = null;
     return this;
   }
 
@@ -268,8 +284,8 @@ public class LdapPerson extends LdapObject<String>
   }
 
   /**
-   * Only used in master mode: restricted users have restricted access in ProjectForge and are moved to a sub ou. Thus the login is possible for restricted
-   * users but they're only able to change their passwords, nothing else.
+   * Only used in master mode: restricted users have restricted access in ProjectForge and are moved to a sub ou. Thus the login is possible
+   * for restricted users but they're only able to change their passwords, nothing else.
    * @return the restrictedUser
    */
   public boolean isRestrictedUser()
