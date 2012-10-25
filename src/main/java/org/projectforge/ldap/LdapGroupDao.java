@@ -132,4 +132,19 @@ public class LdapGroupDao extends LdapDao<String, LdapGroup>
     }
     return group;
   }
+
+  /**
+   * @see org.projectforge.ldap.LdapDao#buildId(java.lang.Object)
+   */
+  @Override
+  protected String buildId(final Object id)
+  {
+    if (id == null) {
+      return null;
+    }
+    if (id instanceof String && ((String) id).startsWith(GroupDOConverter.ID_PREFIX) == true) {
+      return String.valueOf(id);
+    }
+    return GroupDOConverter.ID_PREFIX + id;
+  }
 }
