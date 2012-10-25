@@ -26,6 +26,7 @@ package org.projectforge.user;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -195,7 +196,7 @@ public class LoginDefaultHandler implements LoginHandler
    * @see org.projectforge.user.LoginHandler#afterUserGroupCacheRefresh(java.util.List, java.util.List)
    */
   @Override
-  public void afterUserGroupCacheRefresh(final List<PFUserDO> users, final List<GroupDO> groups)
+  public void afterUserGroupCacheRefresh(final Collection<PFUserDO> users, final Collection<GroupDO> groups)
   {
   }
 
