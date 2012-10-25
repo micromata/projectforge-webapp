@@ -157,13 +157,13 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
    */
   public void createOrUpdate(final DirContext ctx, final SetOfAllLdapObjects setOfAllLdapObjects, final String ouBase, final T obj,
       final Object... args) throws NamingException
-      {
+  {
     if (setOfAllLdapObjects.contains(obj, buildDn(ouBase, obj)) == true) {
       update(ctx, ouBase, obj, args);
     } else {
       create(ctx, ouBase, obj, args);
     }
-      }
+  }
 
   public void update(final String ouBase, final T obj, final Object... objs)
   {
@@ -434,7 +434,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     final SearchControls controls = new SearchControls();
     controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
     final String searchBase = LdapUtils.getOu(organizationalUnits);
-    results = ctx.search(searchBase, "(&(objectClass=" + getObjectClass() + ")(" + getIdAttrId() + "=" + id + "))", controls);
+    results = ctx.search(searchBase, "(&(objectClass=" + getObjectClass() + ")(" + getIdAttrId() + "=" + buildId(id) + "))", controls);
     if (results.hasMore() == false) {
       return null;
     }
@@ -445,6 +445,16 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
       log.error("Oups, found entries with multiple id's: " + getObjectClass() + "." + id);
     }
     return mapToObject(dn, searchBase, attributes);
+  }
+
+  /**
+   * The given id is modified if the id in id-attr is stored e. g. with a prefix. See implementation of {@link LdapUserDao#buildId(Object)}
+   * as an example.
+   * @param id
+   */
+  protected String buildId(final Object id)
+  {
+    return String.valueOf(id);
   }
 
   /**
