@@ -334,9 +334,11 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     }
   }
 
-  public void rename(final DirContext ctx, final T obj, final String oldCN, final String newCN) throws NamingException
+  public void rename(final DirContext ctx, final T obj, final T oldObj) throws NamingException
   {
-    if (StringUtils.equals(oldCN, newCN) == true) {
+    final String newDnIdentifier = buildDnIdentifier(obj);
+    final String oldDnIdentifier = buildDnIdentifier(oldObj);
+    if (StringUtils.equals(newDnIdentifier, oldDnIdentifier) == true) {
       // Nothing to rename.
       return;
     }
@@ -352,8 +354,8 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
           + obj);
     }
     final String ou = LdapUtils.getOu(origObject.getOrganizationalUnit());
-    log.info("Rename object with id '" + obj.getId() + "' from '" + oldCN + "' to '" + newCN);
-    ctx.rename(buildDnIdentifier(oldCN) + "," + ou, buildDnIdentifier(newCN) + "," + ou);
+    log.info("Rename object with id '" + obj.getId() + "' from '" + oldDnIdentifier + "' to '" + newDnIdentifier);
+    ctx.rename(oldDnIdentifier + "," + ou, newDnIdentifier + "," + ou);
   }
 
   protected String getLogInfo(final T obj)
@@ -485,11 +487,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
    */
   protected String buildDnIdentifier(final T obj)
   {
-    return buildDnIdentifier(obj.getCommonName());
-  }
-
-  protected String buildDnIdentifier(final String commonName) {
-    return "cn=" + LdapUtils.escapeCommonName(commonName);
+    return "cn=" + LdapUtils.escapeCommonName(obj.getCommonName());
   }
 
   /**
