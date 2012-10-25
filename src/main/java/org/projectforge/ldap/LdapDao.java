@@ -322,7 +322,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
           + id
           + " not found in search base '"
           + StringHelper.listToString(",", obj.getOrganizationalUnit())
-          + "'. Can't modify the object: "
+          + "'. Can't move the object: "
           + obj);
     }
     final String ou = LdapUtils.getOrganizationalUnit(newOrganizationalUnit);
@@ -332,6 +332,28 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
       final String dnIdentifier = buildDnIdentifier(obj);
       ctx.rename(dnIdentifier + "," + origOu, dnIdentifier + "," + ou);
     }
+  }
+
+  public void rename(final DirContext ctx, final T obj, final String oldCN, final String newCN) throws NamingException
+  {
+    if (StringUtils.equals(oldCN, newCN) == true) {
+      // Nothing to rename.
+      return;
+    }
+    final Object id = getId(obj);
+    // The dn is may-be changed, so find the original dn by id:
+    final T origObject = findById(id, obj.getOrganizationalUnit());
+    if (origObject == null) {
+      throw new RuntimeException("Object with id "
+          + id
+          + " not found in search base '"
+          + StringHelper.listToString(",", obj.getOrganizationalUnit())
+          + "'. Can't rename the object: "
+          + obj);
+    }
+    final String ou = LdapUtils.getOu(origObject.getOrganizationalUnit());
+    log.info("Rename object with id '" + obj.getId() + "' from '" + oldCN + "' to '" + newCN);
+    ctx.rename(buildDnIdentifier(oldCN) + "," + ou, buildDnIdentifier(newCN) + "," + ou);
   }
 
   protected String getLogInfo(final T obj)
@@ -463,7 +485,11 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
    */
   protected String buildDnIdentifier(final T obj)
   {
-    return "cn=" + LdapUtils.escapeCommonName(obj.getCommonName());
+    return buildDnIdentifier(obj.getCommonName());
+  }
+
+  protected String buildDnIdentifier(final String commonName) {
+    return "cn=" + LdapUtils.escapeCommonName(commonName);
   }
 
   /**
