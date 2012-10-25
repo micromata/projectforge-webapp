@@ -23,6 +23,8 @@
 
 package org.projectforge.ldap;
 
+import java.util.List;
+
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -364,6 +366,29 @@ public class LdapUserDao extends LdapPersonDao
       log.error("User '" + username + "' (" + dn + ") with invalid credentials.");
       return null;
     }
+  }
+
+  /**
+   * @see org.projectforge.ldap.LdapDao#createAndAddModificationItems(java.util.List, java.lang.String, java.lang.String[])
+   */
+  @Override
+  protected void createAndAddModificationItems(final List<ModificationItem> list, final String attrId, final String... attrValues)
+  {
+    if ("uid".equals(attrId) == true) {
+      // Don't change uid because it's part of the dn.
+      return;
+    }
+    super.createAndAddModificationItems(list, attrId, attrValues);
+  }
+
+
+  /**
+   * @see org.projectforge.ldap.LdapPersonDao#addModificationItems(java.util.List, org.projectforge.ldap.LdapPerson)
+   */
+  @Override
+  protected void addModificationItems(final List<ModificationItem> list, final LdapPerson person)
+  {
+    createAndAddModificationItems(list, "cn", person.getCommonName());
   }
 
   /**

@@ -100,6 +100,7 @@ public class LdapPersonDao extends LdapDao<String, LdapPerson>
   protected ModificationItem[] getModificationItems(final LdapPerson person)
   {
     final List<ModificationItem> list = new ArrayList<ModificationItem>();
+    addModificationItems(list, person);
     createAndAddModificationItems(list, "sn", person.getSurname());
     createAndAddModificationItems(list, "givenName", person.getGivenName());
     createAndAddModificationItems(list, "uid", person.getUid());
@@ -111,5 +112,13 @@ public class LdapPersonDao extends LdapDao<String, LdapPerson>
     createAndAddModificationItems(list, "mobile", person.getMobilePhoneNumber());
     createAndAddModificationItems(list, "homePhone", person.getHomePhoneNumber());
     return list.toArray(new ModificationItem[list.size()]);
+  }
+
+  /**
+   * Overridden by LdapUserDao. Does nothing at default.
+   * @param list
+   * @param person
+   */
+  protected void addModificationItems(final List<ModificationItem> list, final LdapPerson person) {
   }
 }
