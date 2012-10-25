@@ -155,7 +155,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
           // First, get set of all ldap entries:
           final List<LdapPerson> ldapUsers = getAllLdapUsers(ctx);
           final List<LdapPerson> updatedLdapUsers = new ArrayList<LdapPerson>();
-          int error = 0, unmodified = 0, created = 0, updated = 0, deleted = 0;
+          int error = 0, unmodified = 0, created = 0, updated = 0, deleted = 0, renamed = 0;
           final Set<Integer> shadowUsersWithoutLdapPasswords = new HashSet<Integer>();
           for (final PFUserDO user : users) {
             try {
@@ -186,6 +186,11 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
                     updated++;
                   } else {
                     unmodified++;
+                  }
+                  if (StringUtils.equals(updatedLdapUser.getUid(), ldapUser.getUid()) == false) {
+                    // uid (dn) changed.
+                    ldapUserDao.rename(ctx, updatedLdapUser, ldapUser);
+                    renamed++;
                   }
                   if (ldapUser.isPasswordGiven() == true) {
                     if (updatedLdapUser.isDeactivated()) {
@@ -220,12 +225,14 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
               + " created, "
               + updated
               + " updated, "
+              + renamed
+              + " renamed, "
               + deleted
               + " deleted.");
           // Now get all groups:
           final List<LdapGroup> ldapGroups = getAllLdapGroups(ctx);
           final Map<Integer, LdapPerson> ldapUserMap = getUserMap(updatedLdapUsers);
-          error = unmodified = created = updated = deleted = 0;
+          error = unmodified = created = updated = renamed = deleted = 0;
           for (final GroupDO group : groups) {
             try {
               final LdapGroup updatedLdapGroup = GroupDOConverter.convert(group, baseDN, ldapUserMap);
@@ -253,6 +260,11 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
                   } else {
                     unmodified++;
                   }
+                  if (StringUtils.equals(updatedLdapGroup.getCommonName(), ldapGroup.getCommonName()) == false) {
+                    // CommonName (cn) and therefor dn changed.
+                    ldapGroupDao.rename(ctx, updatedLdapGroup, ldapGroup);
+                    renamed++;
+                  }
                 }
               }
             } catch (final Exception ex) {
@@ -268,6 +280,8 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
               + " created, "
               + updated
               + " updated, "
+              + renamed
+              + " renamed, "
               + deleted
               + " deleted.");
           log.info("LDAP update done.");
