@@ -117,9 +117,9 @@ public class PFUserDOConverterTest
     dest = new LdapPerson();
     Assert.assertTrue(PFUserDOConverter.copyUserFields(src, dest));
     assertUser(src, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
-    assertUser(dest, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    assertUser(dest, null, "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
     Assert.assertTrue(PFUserDOConverter.copyUserFields(src,
-        createLdapUser("", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer")));
+        createLdapUser("kai", "", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer")));
     Assert.assertTrue(PFUserDOConverter.copyUserFields(src,
         createLdapUser("kai", "", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer")));
     Assert.assertTrue(PFUserDOConverter.copyUserFields(src, createLdapUser("kai", "Kai", "", "k.reinhard@acme.com", "Micromata", "Developer")));
