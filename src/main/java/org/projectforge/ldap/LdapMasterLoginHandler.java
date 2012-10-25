@@ -70,6 +70,8 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
    */
   private Set<Integer> usersWithoutLdapPasswords = new HashSet<Integer>();
 
+  private boolean refreshInProgress;
+
   /**
    * @see org.projectforge.ldap.LdapLoginHandler#initialize()
    */
@@ -133,162 +135,175 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
    * @see org.projectforge.user.LoginHandler#afterUserGroupCacheRefresh(java.util.List, java.util.List)
    */
   @Override
-  public void afterUserGroupCacheRefresh(final List<PFUserDO> users, final List<GroupDO> groups)
+  public void afterUserGroupCacheRefresh(final Collection<PFUserDO> users, final Collection<GroupDO> groups)
   {
     new Thread() {
       @Override
       public void run()
       {
-        updateLdap(users, groups);
+        synchronized (this) {
+          try {
+            refreshInProgress = true;
+            updateLdap(users, groups);
+          } finally {
+            refreshInProgress = false;
+          }
+        }
       }
     }.start();
   }
 
-  private void updateLdap(final List<PFUserDO> users, final List<GroupDO> groups)
+  /**
+   * @return true if currently a cache refresh is running, otherwise false.
+   */
+  public boolean isRefreshInProgress()
   {
-    synchronized (this) {
-      new LdapTemplate(ldapConnector) {
-        @Override
-        protected Object call() throws NameNotFoundException, Exception
-        {
-          log.info("Updating LDAP...");
-          // First, get set of all ldap entries:
-          final List<LdapPerson> ldapUsers = getAllLdapUsers(ctx);
-          final List<LdapPerson> updatedLdapUsers = new ArrayList<LdapPerson>();
-          int error = 0, unmodified = 0, created = 0, updated = 0, deleted = 0, renamed = 0;
-          final Set<Integer> shadowUsersWithoutLdapPasswords = new HashSet<Integer>();
-          for (final PFUserDO user : users) {
-            try {
-              final LdapPerson updatedLdapUser = PFUserDOConverter.convert(user);
-              final LdapPerson ldapUser = getLdapUser(ldapUsers, user);
-              if (ldapUser == null) {
-                updatedLdapUser.setOrganizationalUnit(userBase);
-                if (user.isDeleted() == false && user.isLocalUser() == false) {
-                  // Do not add deleted or local users.
-                  ldapUserDao.create(ctx, userBase, updatedLdapUser);
-                  updatedLdapUsers.add(updatedLdapUser);
-                  shadowUsersWithoutLdapPasswords.add(user.getId()); // User can't be valid for created users.
-                  created++;
-                }
-              } else {
-                // Need to set organizational unit for detecting the change of deactivated flag. The updateLdapUser needs the organizational
-                // unit of the original ldap object:
-                updatedLdapUser.setOrganizationalUnit(ldapUser.getOrganizationalUnit());
-                if (user.isDeleted() == true || user.isLocalUser() == true) {
-                  // Deleted and local users shouldn't be synchronized with LDAP:
-                  ldapUserDao.delete(ctx, updatedLdapUser);
-                  shadowUsersWithoutLdapPasswords.add(user.getId()); // Paranoia code, stay-logged-in shouldn't work with deleted users.
-                  deleted++;
-                } else {
-                  final boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
-                  if (modified == true) {
-                    ldapUserDao.update(ctx, userBase, updatedLdapUser);
-                    updated++;
-                  } else {
-                    unmodified++;
-                  }
-                  if (StringUtils.equals(updatedLdapUser.getUid(), ldapUser.getUid()) == false) {
-                    // uid (dn) changed.
-                    ldapUserDao.rename(ctx, updatedLdapUser, ldapUser);
-                    renamed++;
-                  }
-                  if (ldapUser.isPasswordGiven() == true) {
-                    if (updatedLdapUser.isDeactivated()) {
-                      log.warn("User password for deactivated user is set: " + ldapUser);
-                      ldapUserDao.deactivateUser(ctx, updatedLdapUser);
-                      shadowUsersWithoutLdapPasswords.add(user.getId()); // Paranoia code, stay-logged-in shouldn't work with deleted or
-                      // deactivated users.
-                    } else {
-                      shadowUsersWithoutLdapPasswords.remove(user.getId()); // Remove if exists because password is given.
-                    }
-                  } else {
-                    shadowUsersWithoutLdapPasswords.add(user.getId()); // Password isn't given for the current user.
-                  }
-                  updatedLdapUsers.add(updatedLdapUser);
-                }
+    return refreshInProgress;
+  }
+
+  private void updateLdap(final Collection<PFUserDO> users, final Collection<GroupDO> groups)
+  {
+    new LdapTemplate(ldapConnector) {
+      @Override
+      protected Object call() throws NameNotFoundException, Exception
+      {
+        log.info("Updating LDAP...");
+        // First, get set of all ldap entries:
+        final List<LdapPerson> ldapUsers = getAllLdapUsers(ctx);
+        final List<LdapPerson> updatedLdapUsers = new ArrayList<LdapPerson>();
+        int error = 0, unmodified = 0, created = 0, updated = 0, deleted = 0, renamed = 0;
+        final Set<Integer> shadowUsersWithoutLdapPasswords = new HashSet<Integer>();
+        for (final PFUserDO user : users) {
+          try {
+            final LdapPerson updatedLdapUser = PFUserDOConverter.convert(user);
+            final LdapPerson ldapUser = getLdapUser(ldapUsers, user);
+            if (ldapUser == null) {
+              updatedLdapUser.setOrganizationalUnit(userBase);
+              if (user.isDeleted() == false && user.isLocalUser() == false) {
+                // Do not add deleted or local users.
+                ldapUserDao.create(ctx, userBase, updatedLdapUser);
+                updatedLdapUsers.add(updatedLdapUser);
+                shadowUsersWithoutLdapPasswords.add(user.getId()); // User can't be valid for created users.
+                created++;
               }
-              ldapUserDao.buildDn(userBase, updatedLdapUser);
-            } catch (final Exception ex) {
-              log.error("Error while proceeding user '" + user.getUsername() + "'. Continuing with next user.", ex);
-              error++;
-            }
-          }
-          usersWithoutLdapPasswords = shadowUsersWithoutLdapPasswords;
-          log.info(""
-              + shadowUsersWithoutLdapPasswords.size()
-              + " users without password in the LDAP system (login required for these users for updating the LDAP password).");
-          log.info("Update of LDAP users: "
-              + (error > 0 ? "*** " + error + " errors ***, " : "")
-              + unmodified
-              + " unmodified, "
-              + created
-              + " created, "
-              + updated
-              + " updated, "
-              + renamed
-              + " renamed, "
-              + deleted
-              + " deleted.");
-          // Now get all groups:
-          final List<LdapGroup> ldapGroups = getAllLdapGroups(ctx);
-          final Map<Integer, LdapPerson> ldapUserMap = getUserMap(updatedLdapUsers);
-          error = unmodified = created = updated = renamed = deleted = 0;
-          for (final GroupDO group : groups) {
-            try {
-              final LdapGroup updatedLdapGroup = GroupDOConverter.convert(group, baseDN, ldapUserMap);
-              final LdapGroup ldapGroup = getLdapGroup(ldapGroups, group);
-              if (ldapGroup == null) {
-                updatedLdapGroup.setOrganizationalUnit(groupBase);
-                if (group.isDeleted() == false && group.isLocalGroup() == false) {
-                  // Do not add deleted or local groups.
-                  setMembers(updatedLdapGroup, group.getAssignedUsers(), ldapUserMap);
-                  ldapGroupDao.create(ctx, groupBase, updatedLdapGroup);
-                  created++;
-                }
+            } else {
+              // Need to set organizational unit for detecting the change of deactivated flag. The updateLdapUser needs the organizational
+              // unit of the original ldap object:
+              updatedLdapUser.setOrganizationalUnit(ldapUser.getOrganizationalUnit());
+              if (user.isDeleted() == true || user.isLocalUser() == true) {
+                // Deleted and local users shouldn't be synchronized with LDAP:
+                ldapUserDao.delete(ctx, updatedLdapUser);
+                shadowUsersWithoutLdapPasswords.add(user.getId()); // Paranoia code, stay-logged-in shouldn't work with deleted users.
+                deleted++;
               } else {
-                updatedLdapGroup.setOrganizationalUnit(ldapGroup.getOrganizationalUnit());
-                if (group.isDeleted() == true || group.isLocalGroup() == true) {
-                  // Deleted and local users shouldn't be synchronized with LDAP:
-                  ldapGroupDao.delete(ctx, updatedLdapGroup);
-                  deleted++;
+                final boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
+                if (modified == true) {
+                  ldapUserDao.update(ctx, userBase, updatedLdapUser);
+                  updated++;
                 } else {
-                  final boolean modified = GroupDOConverter.copyGroupFields(updatedLdapGroup, ldapGroup);
-                  if (modified == true) {
-                    setMembers(updatedLdapGroup, group.getAssignedUsers(), ldapUserMap);
-                    ldapGroupDao.update(ctx, groupBase, updatedLdapGroup);
-                    updated++;
-                  } else {
-                    unmodified++;
-                  }
-                  if (StringUtils.equals(updatedLdapGroup.getCommonName(), ldapGroup.getCommonName()) == false) {
-                    // CommonName (cn) and therefor dn changed.
-                    ldapGroupDao.rename(ctx, updatedLdapGroup, ldapGroup);
-                    renamed++;
-                  }
+                  unmodified++;
                 }
+                if (StringUtils.equals(updatedLdapUser.getUid(), ldapUser.getUid()) == false) {
+                  // uid (dn) changed.
+                  ldapUserDao.rename(ctx, updatedLdapUser, ldapUser);
+                  renamed++;
+                }
+                if (ldapUser.isPasswordGiven() == true) {
+                  if (updatedLdapUser.isDeactivated()) {
+                    log.warn("User password for deactivated user is set: " + ldapUser);
+                    ldapUserDao.deactivateUser(ctx, updatedLdapUser);
+                    shadowUsersWithoutLdapPasswords.add(user.getId()); // Paranoia code, stay-logged-in shouldn't work with deleted or
+                    // deactivated users.
+                  } else {
+                    shadowUsersWithoutLdapPasswords.remove(user.getId()); // Remove if exists because password is given.
+                  }
+                } else {
+                  shadowUsersWithoutLdapPasswords.add(user.getId()); // Password isn't given for the current user.
+                }
+                updatedLdapUsers.add(updatedLdapUser);
               }
-            } catch (final Exception ex) {
-              log.error("Error while proceeding group '" + group.getName() + "'. Continuing with next group.", ex);
-              error++;
             }
+            ldapUserDao.buildDn(userBase, updatedLdapUser);
+          } catch (final Exception ex) {
+            log.error("Error while proceeding user '" + user.getUsername() + "'. Continuing with next user.", ex);
+            error++;
           }
-          log.info("Update of LDAP groups: "
-              + (error > 0 ? "*** " + error + " errors ***, " : "")
-              + unmodified
-              + " unmodified, "
-              + created
-              + " created, "
-              + updated
-              + " updated, "
-              + renamed
-              + " renamed, "
-              + deleted
-              + " deleted.");
-          log.info("LDAP update done.");
-          return null;
         }
-      }.excecute();
-    }
+        usersWithoutLdapPasswords = shadowUsersWithoutLdapPasswords;
+        log.info(""
+            + shadowUsersWithoutLdapPasswords.size()
+            + " users without password in the LDAP system (login required for these users for updating the LDAP password).");
+        log.info("Update of LDAP users: "
+            + (error > 0 ? "*** " + error + " errors ***, " : "")
+            + unmodified
+            + " unmodified, "
+            + created
+            + " created, "
+            + updated
+            + " updated, "
+            + renamed
+            + " renamed, "
+            + deleted
+            + " deleted.");
+        // Now get all groups:
+        final List<LdapGroup> ldapGroups = getAllLdapGroups(ctx);
+        final Map<Integer, LdapPerson> ldapUserMap = getUserMap(updatedLdapUsers);
+        error = unmodified = created = updated = renamed = deleted = 0;
+        for (final GroupDO group : groups) {
+          try {
+            final LdapGroup updatedLdapGroup = GroupDOConverter.convert(group, baseDN, ldapUserMap);
+            final LdapGroup ldapGroup = getLdapGroup(ldapGroups, group);
+            if (ldapGroup == null) {
+              updatedLdapGroup.setOrganizationalUnit(groupBase);
+              if (group.isDeleted() == false && group.isLocalGroup() == false) {
+                // Do not add deleted or local groups.
+                setMembers(updatedLdapGroup, group.getAssignedUsers(), ldapUserMap);
+                ldapGroupDao.create(ctx, groupBase, updatedLdapGroup);
+                created++;
+              }
+            } else {
+              updatedLdapGroup.setOrganizationalUnit(ldapGroup.getOrganizationalUnit());
+              if (group.isDeleted() == true || group.isLocalGroup() == true) {
+                // Deleted and local users shouldn't be synchronized with LDAP:
+                ldapGroupDao.delete(ctx, updatedLdapGroup);
+                deleted++;
+              } else {
+                final boolean modified = GroupDOConverter.copyGroupFields(updatedLdapGroup, ldapGroup);
+                if (modified == true) {
+                  setMembers(updatedLdapGroup, group.getAssignedUsers(), ldapUserMap);
+                  ldapGroupDao.update(ctx, groupBase, updatedLdapGroup);
+                  updated++;
+                } else {
+                  unmodified++;
+                }
+                if (StringUtils.equals(updatedLdapGroup.getCommonName(), ldapGroup.getCommonName()) == false) {
+                  // CommonName (cn) and therefor dn changed.
+                  ldapGroupDao.rename(ctx, updatedLdapGroup, ldapGroup);
+                  renamed++;
+                }
+              }
+            }
+          } catch (final Exception ex) {
+            log.error("Error while proceeding group '" + group.getName() + "'. Continuing with next group.", ex);
+            error++;
+          }
+        }
+        log.info("Update of LDAP groups: "
+            + (error > 0 ? "*** " + error + " errors ***, " : "")
+            + unmodified
+            + " unmodified, "
+            + created
+            + " created, "
+            + updated
+            + " updated, "
+            + renamed
+            + " renamed, "
+            + deleted
+            + " deleted.");
+        log.info("LDAP update done.");
+        return null;
+      }
+    }.excecute();
   }
 
   /**
