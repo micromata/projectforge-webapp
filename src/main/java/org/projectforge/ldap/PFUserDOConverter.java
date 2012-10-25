@@ -124,7 +124,7 @@ public class PFUserDOConverter
   {
     setMailNullArray(src);
     setMailNullArray(dest);
-    final boolean modified = BeanHelper.copyProperties(src, dest, true, "commonName", "uid", "givenName", "surname", "mail", "description",
+    final boolean modified = BeanHelper.copyProperties(src, dest, true, "commonName", "givenName", "surname", "mail", "description",
         "organization", "deactivated", "restrictedUser");
     return modified;
   }
