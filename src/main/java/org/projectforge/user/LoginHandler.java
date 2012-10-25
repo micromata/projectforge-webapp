@@ -23,6 +23,7 @@
 
 package org.projectforge.user;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -74,7 +75,7 @@ public interface LoginHandler
    * @param users
    * @param groups
    */
-  public void afterUserGroupCacheRefresh(List<PFUserDO> users, List<GroupDO> groups);
+  public void afterUserGroupCacheRefresh(Collection<PFUserDO> users, Collection<GroupDO> groups);
 
   /**
    * @return true, if the login handler supports an external user management system. This flag is used by {User|Group}EditForm for
