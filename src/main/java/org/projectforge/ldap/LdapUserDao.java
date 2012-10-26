@@ -145,10 +145,16 @@ public class LdapUserDao extends LdapPersonDao
     final String ou = user.getOrganizationalUnit();
     if (ou.startsWith(DEACTIVATED_SUB_CONTEXT2) == false) {
       // Move user to the sub-context "deactivated".
-      final String newOu = LdapUtils.getOu(DEACTIVATED_SUB_CONTEXT, ldapConfig.getUserBase());
+      final String newOu = LdapUtils.getOu(DEACTIVATED_SUB_CONTEXT, getOuBase());
       move(ctx, user, newOu);
       user.setOrganizationalUnit(newOu);
     }
+  }
+
+  @Override
+  public String getOuBase()
+  {
+    return ldapConfig.getUserBase();
   }
 
   /**
@@ -327,7 +333,7 @@ public class LdapUserDao extends LdapPersonDao
         NamingEnumeration< ? > results = null;
         final SearchControls controls = new SearchControls();
         controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        final String searchBase = LdapUtils.getOu(organizationalUnits);
+        final String searchBase = getSearchBase(organizationalUnits);
         results = ctx.search(searchBase, "(&(objectClass=" + getObjectClass() + ")(uid=" + username + "))", controls);
         if (results.hasMore() == false) {
           return null;
@@ -347,15 +353,16 @@ public class LdapUserDao extends LdapPersonDao
   {
     String dn;
     LdapPerson user = null;
+    final String searchBase = getSearchBase(organizationalUnits);
     if (StringUtils.isNotBlank(ldapConfig.getManagerUser()) == true && StringUtils.isNotBlank(ldapConfig.getManagerPassword()) == true) {
-      user = findByUsername(username, organizationalUnits);
+      user = findByUsername(username, searchBase);
       if (user == null || StringUtils.equals(username, user.getId()) == false) {
         log.info("User with id '" + username + "' not found.");
         return null;
       }
       dn = user.getDn() + "," + ldapConnector.getBase();
     } else {
-      dn = "uid=" + username + "," + LdapUtils.getOu(LdapUtils.getOu(organizationalUnits)) + "," + ldapConnector.getBase();
+      dn = "uid=" + username + "," + searchBase + "," + ldapConnector.getBase();
     }
     try {
       ldapConnector.createContext(dn, userPassword);
