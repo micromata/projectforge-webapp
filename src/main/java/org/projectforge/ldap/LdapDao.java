@@ -42,6 +42,7 @@ import javax.naming.directory.SearchResult;
 
 import org.apache.commons.lang.StringUtils;
 import org.projectforge.common.StringHelper;
+import org.projectforge.core.Configuration;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -157,13 +158,13 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
    */
   public void createOrUpdate(final DirContext ctx, final SetOfAllLdapObjects setOfAllLdapObjects, final String ouBase, final T obj,
       final Object... args) throws NamingException
-  {
+      {
     if (setOfAllLdapObjects.contains(obj, buildDn(ouBase, obj)) == true) {
       update(ctx, ouBase, obj, args);
     } else {
       create(ctx, ouBase, obj, args);
     }
-  }
+      }
 
   public void update(final String ouBase, final T obj, final Object... objs)
   {
@@ -405,7 +406,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     NamingEnumeration< ? > results = null;
     final SearchControls controls = new SearchControls();
     controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    final String searchBase = LdapUtils.getOu(organizationalUnit);
+    final String searchBase = getSearchBase(organizationalUnit);
     results = ctx.search(searchBase, "(objectclass=" + getObjectClass() + ")", controls);
     while (results.hasMore()) {
       final SearchResult searchResult = (SearchResult) results.next();
@@ -433,7 +434,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     NamingEnumeration< ? > results = null;
     final SearchControls controls = new SearchControls();
     controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    final String searchBase = LdapUtils.getOu(organizationalUnits);
+    final String searchBase = getSearchBase(organizationalUnits);
     results = ctx.search(searchBase, "(&(objectClass=" + getObjectClass() + ")(" + getIdAttrId() + "=" + buildId(id) + "))", controls);
     if (results.hasMore() == false) {
       return null;
@@ -545,6 +546,28 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
    * @throws NamingException
    */
   protected abstract T mapToObject(final String dn, final Attributes attributes) throws NamingException;
+
+  /**
+   * Used by {@link #findById(DirContext, Object, String...)} etc. for setting search-base if not given.
+   * @return
+   */
+  protected abstract String getOuBase();
+
+  protected String getSearchBase(final String... organizationalUnits)
+  {
+    String searchBase = LdapUtils.getOu(organizationalUnits);
+    if (StringUtils.isBlank(searchBase) == true) {
+      searchBase = getOuBase();
+      if (StringUtils.isBlank(searchBase) == true) {
+        if (Configuration.isDevelopmentMode() == true) {
+          throw new RuntimeException("No ou given!");
+        } else {
+          log.warn("Oups, no search-base (ou) given. Searching in whole LDAP tree!");
+        }
+      }
+    }
+    return searchBase;
+  }
 
   public void setLdapConnector(final LdapConnector ldapConnector)
   {
