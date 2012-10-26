@@ -111,11 +111,8 @@ public class TeamCalCalendarFilter extends CalendarFilter
     }
   }
 
-  public Map<Integer, String> getCalendarMap() {
-    return this.calendarMap;
-  }
-
-  public void setCalendarMap(final Map<Integer, String> map) {
-    this.calendarMap = map;
+  public void updateTeamCalendarFilter(final TeamCalCalendarFilter updatedFilter) {
+    this.calendarMap = updatedFilter.calendarMap;
+    this.setSelectedCalendar(updatedFilter.getSelectedCalendar());
   }
 }

@@ -55,8 +55,6 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
 
   private boolean access = false;
 
-  private String iCalTarget;
-
   private JodaDatePanel datePanel;
 
   /**
@@ -170,8 +168,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
     }
     if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
       final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.subscribe"), true).setNoLabelFor();
-      createICalTarget();
-      final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
+      final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, createICalTarget());
       final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fsSubscribe.newChildId(), IconType.SUBSCRIPTION,
           getString("plugins.teamcal.subscribe"), iCalExportLink).setLight();
       fsSubscribe.add(exportICalButtonPanel);
@@ -181,12 +178,12 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
   /**
    * create ics export url
    */
-  private void createICalTarget()
+  private String createICalTarget()
   {
     final PFUserDO user = PFUserContext.getUser();
     final String authenticationKey = userDao.getAuthenticationToken(user.getId());
     final String contextPath = WebApplication.get().getServletContext().getContextPath();
-    iCalTarget = contextPath
+    final String iCalTarget = contextPath
         + "/export/ProjectForge.ics?timesheetUser="
         + user.getUsername()
         + "&token="
@@ -195,6 +192,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
         + this.getData().getId()
         + "&timesheetRequired="
         + false;
+    return iCalTarget;
   }
 
   /**

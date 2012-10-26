@@ -65,17 +65,17 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
     {
       final List<VEvent> events = new LinkedList<VEvent>();
       if (teamCalIds != null) {
+        final TeamEventDao teamEventDao = (TeamEventDao) Registry.instance().getDao(TeamEventDao.class);
+        final TeamEventFilter eventFilter = new TeamEventFilter();
+        eventFilter.setUser(user);
+        eventFilter.setDeleted(false);
+        eventFilter.setEndDate(cal.getTime());
         for (int i = 0; i < teamCalIds.length; i++) {
-          final TeamEventDao teamEventDao = (TeamEventDao) Registry.instance().getDao(TeamEventDao.class);
-          final TeamEventFilter eventFilter = new TeamEventFilter();
-          eventFilter.setUser(user);
-          eventFilter.setDeleted(false);
-          eventFilter.setEndDate(cal.getTime());
           final Integer id = Integer.valueOf(teamCalIds[i]);
           eventFilter.setTeamCalId(id);
 
           final List<TeamEventDO> teamEvents = teamEventDao.getUnlimitedList(eventFilter);
-          if (teamEvents != null) {
+          if (teamEvents != null && teamEvents.size() > 0) {
             for (final TeamEventDO teamEvent : teamEvents) {
               final Date date = new Date(teamEvent.getStartDate().getTime());
               final VEvent vEvent;
@@ -90,10 +90,14 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
                 // requires plus 1 because one day will be omitted by calendar.
                 final net.fortuna.ical4j.model.Date fortunaEndDate = new net.fortuna.ical4j.model.Date(jodaTime.plusDays(1).getMillis());
                 dtEnd.setDate(fortunaEndDate);
+                String calendarName = "";
+                if (teamEvents.size() > 1) {
+                  calendarName = " ("
+                      + teamEvent.getCalendar().getTitle()
+                      + ")";
+                }
                 vEvent = new VEvent(fortunaStartDate, fortunaEndDate, teamEvent.getSubject()
-                    + " ("
-                    + teamEvent.getCalendar().getTitle()
-                    + ")");
+                    + calendarName);
                 vEvent.getProperties().add(new Uid(fortunaStartDate.toString()));
               } else {
                 cal.setTime(date);

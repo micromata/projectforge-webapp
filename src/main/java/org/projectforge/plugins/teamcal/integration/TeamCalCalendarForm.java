@@ -25,8 +25,6 @@ import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
 
-import de.micromata.wicket.ajax.AjaxCallback;
-
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -53,17 +51,6 @@ public class TeamCalCalendarForm extends CalendarForm
   protected void addControlButtons(final FieldsetPanel fs)
   {
     final TeamCalDialog dialog = new TeamCalDialog(fs.newChildId(), new ResourceModel("plugins.teamcal.title.list"), filter);
-    dialog.setOnCloseCallback(new AjaxCallback() {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      public void callback(final AjaxRequestTarget target)
-      {
-        // TODO do not use response page, just update the calendar
-        setResponsePage(getPage().getClass(), getPage().getPageParameters());
-      }
-
-    });
     fs.add(dialog);
     final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(fs.newChildId(), IconType.CALENDAR,
         getString("plugins.teamcal.title.list")) {

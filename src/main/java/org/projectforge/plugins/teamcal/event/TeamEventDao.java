@@ -23,12 +23,14 @@
 
 package org.projectforge.plugins.teamcal.event;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
+import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.joda.time.DateTime;
@@ -148,8 +150,14 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     final QueryFilter queryFilter = new QueryFilter();
     final TeamCalDO teamCal = new TeamCalDO();
     teamCal.setId(filter.getTeamCalId());
-    queryFilter.add(Restrictions.and(Restrictions.ge("startDate", eventDateLimit), Restrictions.and(Restrictions.eq("calendar", teamCal), Restrictions.eq("deleted", filter.isDeleted()))));
+    final Conjunction con = Restrictions.conjunction();
+    con.add(Restrictions.ge("startDate", eventDateLimit));
+    con.add(Restrictions.eq("calendar", teamCal));
+    con.add(Restrictions.eq("deleted", filter.isDeleted()));
+    queryFilter.add(con);
     final List<TeamEventDO> list = super.getList(queryFilter);
+    if (list == null || list.size() == 0)
+      return new ArrayList<TeamEventDO>();
 
     return hideByAccess(list);
   }
@@ -163,6 +171,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
         // do nothing
       } else
         if (right.hasAccessGroup(teamEvent.getCalendar().getMinimalAccessGroup(), userGroupCache, user) == true) {
+          teamEvent.setSubject("");
           teamEvent.setAttendees("");
           teamEvent.setLocation("");
           teamEvent.setNote("");
