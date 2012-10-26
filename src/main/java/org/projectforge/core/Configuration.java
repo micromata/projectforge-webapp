@@ -55,7 +55,7 @@ public class Configuration extends AbstractCache
 
   private Map<ConfigurationParam, Object> configurationParamMap;
 
-  private boolean testMode;
+  private boolean testMode, developmentMode;
 
   public void setBeanFactory(final ConfigurableListableBeanFactory beanFactory)
   {
@@ -77,6 +77,7 @@ public class Configuration extends AbstractCache
     if (instance == null) {
       new Configuration();
       instance.testMode = true;
+      instance.developmentMode = true;
       instance.configurationParamMap = new HashMap<ConfigurationParam, Object>();
     }
   }
@@ -92,6 +93,19 @@ public class Configuration extends AbstractCache
   public static boolean isInitialized()
   {
     return instance != null;
+  }
+
+  public static boolean isDevelopmentMode()
+  {
+    if (instance == null) {
+      return false;
+    }
+    return instance.developmentMode;
+  }
+
+  public void internalSetDevelopmentMode(final boolean developmentMode)
+  {
+    this.developmentMode = developmentMode;
   }
 
   public Configuration()
@@ -260,8 +274,8 @@ public class Configuration extends AbstractCache
     try {
       list = configurationDao.internalLoadAll();
     } catch (final Exception ex) {
-      log.fatal(
-          "******* Exception while getting configuration parameters from data-base (only OK for migration from older versions): " + ex.getMessage());
+      log.fatal("******* Exception while getting configuration parameters from data-base (only OK for migration from older versions): "
+          + ex.getMessage());
       list = new ArrayList<ConfigurationDO>();
     }
     for (final ConfigurationParam param : ConfigurationParam.values()) {

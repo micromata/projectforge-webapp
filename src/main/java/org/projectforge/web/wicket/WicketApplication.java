@@ -418,6 +418,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
     if (developmentMode == null) {
       final String value = getServletContext().getInitParameter("development");
       developmentMode = "true".equals(value);
+      Configuration.getInstance().internalSetDevelopmentMode(true);
     }
     return developmentMode;
   }
