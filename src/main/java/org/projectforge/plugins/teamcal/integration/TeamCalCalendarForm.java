@@ -13,7 +13,10 @@ import java.util.Set;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.model.ResourceModel;
+import org.apache.wicket.protocol.http.WebApplication;
 import org.projectforge.plugins.teamcal.dialog.TeamCalDialog;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
@@ -87,6 +90,24 @@ public class TeamCalCalendarForm extends CalendarForm
   protected String setIcsImportButtonTooltip()
   {
     return "plugins.teamcal.subscribe.teamcalendar";
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.CalendarForm#setICalTarget()
+   */
+  @Override
+  protected String setICalTarget()
+  {
+    final PFUserDO user = PFUserContext.getUser();
+    final String authenticationKey = userDao.getAuthenticationToken(user.getId());
+    final String contextPath = WebApplication.get().getServletContext().getContextPath();
+    final String iCalTarget = contextPath
+        + "/export/ProjectForge.ics?timesheetUser="
+        + user.getUsername()
+        + "&token="
+        + authenticationKey
+        + additionalInformation();
+    return iCalTarget;
   }
 
   @Override

@@ -24,16 +24,21 @@
 package org.projectforge.plugins.teamcal.event;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.joda.time.DateTime;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.BaseSearchFilter;
 import org.projectforge.core.QueryFilter;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
+import org.projectforge.plugins.teamcal.admin.TeamCalRight;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserRightId;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,10 +59,13 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
   private static final String[] ADDITIONAL_SEARCH_FIELDS = new String[] { "subject", "location", "calendar.id", "calendar.title",
     "note", "attendees"};
 
+  private final TeamCalRight right;
+
   public TeamEventDao()
   {
     super(TeamEventDO.class);
     userRightId = USER_RIGHT_ID;
+    right = new TeamCalRight();
   }
 
   @Override
@@ -86,7 +94,7 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     final QueryFilter qFilter = buildQueryFilter(teamEventFilter);
 
     final List<TeamEventDO> list = getList(qFilter);
-    return list;
+    return hideByAccess(list);
   }
 
   public QueryFilter buildQueryFilter(final TeamEventFilter filter)
@@ -126,12 +134,42 @@ public class TeamEventDao extends BaseDao<TeamEventDO>
     return queryFilter;
   }
 
+  /**
+   * get events not older than one year.
+   * 
+   * @param filter
+   * @return
+   */
   public List<TeamEventDO> getUnlimitedList(final TeamEventFilter filter) {
+    // limit loading results
+    final DateTime now = DateTime.now();
+    final Date eventDateLimit = now.minusYears(1).toDate();
+
     final QueryFilter queryFilter = new QueryFilter();
     final TeamCalDO teamCal = new TeamCalDO();
     teamCal.setId(filter.getTeamCalId());
-    queryFilter.add(Restrictions.and(Restrictions.eq("calendar", teamCal), Restrictions.eq("deleted", filter.isDeleted())));
-    return super.getList(queryFilter);
+    queryFilter.add(Restrictions.and(Restrictions.ge("startDate", eventDateLimit), Restrictions.and(Restrictions.eq("calendar", teamCal), Restrictions.eq("deleted", filter.isDeleted()))));
+    final List<TeamEventDO> list = super.getList(queryFilter);
+
+    return hideByAccess(list);
+  }
+
+  private List<TeamEventDO> hideByAccess(final List<TeamEventDO> list) {
+    final PFUserDO user = PFUserContext.getUser();
+    for (final TeamEventDO teamEvent : list) {
+      if (right.isOwner(user, teamEvent.getCalendar()) == true
+          || right.hasAccessGroup(teamEvent.getCalendar().getFullAccessGroup(), userGroupCache, user) == true
+          || right.hasAccessGroup(teamEvent.getCalendar().getReadOnlyAccessGroup(), userGroupCache, user) == true) {
+        // do nothing
+      } else
+        if (right.hasAccessGroup(teamEvent.getCalendar().getMinimalAccessGroup(), userGroupCache, user) == true) {
+          teamEvent.setAttendees("");
+          teamEvent.setLocation("");
+          teamEvent.setNote("");
+        } else
+          list.remove(teamEvent);
+    }
+    return list;
   }
 
   @Override

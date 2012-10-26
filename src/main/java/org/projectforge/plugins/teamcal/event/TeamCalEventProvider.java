@@ -44,8 +44,6 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
 
   private final TeamEventDao teamEventDao;
 
-  private Integer month;
-
   private int days;
 
   private final TeamCalCalendarFilter filter;
@@ -109,15 +107,8 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
     if (days < 10) {
       // Week or day view:
       longFormat = true;
-      month = null;
-      // firstDayOfMonth = null;
-    } else {
-      // Month view:
-      final DateTime currentMonth = new DateTime(start.plusDays(10), PFUserContext.getDateTimeZone()); // Now we're definitely in the right
-      // month.
-      month = currentMonth.getMonthOfYear();
-      // firstDayOfMonth = currentMonth.withDayOfMonth(1);
     }
+
     final TeamCalRight right = new TeamCalRight();
     final PFUserDO user = PFUserContext.getUser();
     if (CollectionUtils.isNotEmpty(eventLists) == true) {
@@ -173,45 +164,27 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
             if (dt.getMinuteOfHour() < 10)
               minute = "0" + dt.getMinuteOfHour();
 
-            if (right.isOwner(user, teamEvent.getCalendar()) == true
-                || right.hasAccessGroup(teamEvent.getCalendar().getFullAccessGroup(), userGroupCache, user) == true) {
-              if (event.isAllDay() == false)
-                durationString = "\n" + getString("plugins.teamevent.duration") + ": " + hour + ":" + minute;
+            if (event.isAllDay() == false)
+              durationString = "\n" + getString("plugins.teamevent.duration") + ": " + hour + ":" + minute;
+            event.setTitle(getString("plugins.teamevent.subject")
+                + ": "
+                + title
+                + "\n"
+                + getString("plugins.teamevent.note")
+                + ": "
+                + (teamEvent.getNote() == null ? "" : teamEvent.getNote())
+                + durationString);
+            if (right.hasAccessGroup(teamEvent.getCalendar().getMinimalAccessGroup(), userGroupCache, user) == true) {
+              // for minimal access
               event.setTitle(getString("plugins.teamevent.subject")
                   + ": "
-                  + title
-                  + "\n"
-                  + getString("plugins.teamevent.note")
-                  + ": "
-                  + (teamEvent.getNote() == null ? "" : teamEvent.getNote())
-                  + durationString);
-            } else {
-              if (right.hasAccessGroup(teamEvent.getCalendar().getReadOnlyAccessGroup(), userGroupCache, user) == true) {
-                if (event.isAllDay() == false)
-                  durationString = "\n" + getString("plugins.teamevent.duration") + ": " + hour + ":" + minute;
-                event.setTitle(getString("plugins.teamevent.subject")
-                    + ": "
-                    + title
-                    + "\n"
-                    + getString("plugins.teamevent.note")
-                    + ": "
-                    + (teamEvent.getNote() == null ? "" : teamEvent.getNote())
-                    + durationString);
-                event.setEditable(false);
-              } else {
-                // for minimal access
-                event.setTitle("");
-                event.setEditable(false);
-              }
+                  + title);
+              event.setEditable(false);
             }
           } else {
-            // Month view:
-            if (right.isOwner(user, teamEvent.getCalendar()) == true
-                || right.hasAccessGroup(teamEvent.getCalendar().getFullAccessGroup(), userGroupCache, user) == true
-                || right.hasAccessGroup(teamEvent.getCalendar().getReadOnlyAccessGroup(), userGroupCache, user) == true) {
-              event.setTitle(title);
-            } else {
-              event.setTitle("");
+            event.setTitle(title);
+            if (right.hasAccessGroup(teamEvent.getCalendar().getMinimalAccessGroup(), userGroupCache, user) == true) {
+              event.setEditable(false);
             }
           }
           events.put(teamEvent.getId() + "", event);

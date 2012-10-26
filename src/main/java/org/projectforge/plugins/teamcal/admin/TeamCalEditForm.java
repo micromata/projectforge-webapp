@@ -94,6 +94,7 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
             newTeamCalDO.setId(data.getId());
             newTeamCalDO.setMinimalAccessGroup(data.getMinimalAccessGroup());
             newTeamCalDO.setOwner(data.getOwner());
+            newTeamCalDO.setTitle(data.getTitle());
             data = newTeamCalDO;
             access = false;
           } else
@@ -130,49 +131,50 @@ public class TeamCalEditForm extends AbstractEditForm<TeamCalDO, TeamCalEditPage
       fs.add(new Label(fs.newChildId(), data.getOwner().getUsername() + ""));
     }
 
-    // set access groups
     gridBuilder.newGrid8();
-    {
-      // set full access group chooser
-      final FieldsetPanel fsFullAccess = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), true);
-      final PropertyModel<GroupDO> model = new PropertyModel<GroupDO>(data, "fullAccessGroup");
-      final GroupSelectPanel fullAccess = new GroupSelectPanel(fsFullAccess.newChildId(), model,
-          parentPage, "fullAccessGroupId");
-      fsFullAccess.add(fullAccess);
-      fsFullAccess.setLabelFor(fullAccess);
-      fullAccess.init();
-      if (access == false)
-        fullAccess.setEnabled(false);
+    if (access == true) {
+      // set access groups
+      {
+        // set full access group chooser
+        final FieldsetPanel fsFullAccess = gridBuilder.newFieldset(getString("plugins.teamcal.fullAccess"), true);
+        final PropertyModel<GroupDO> model = new PropertyModel<GroupDO>(data, "fullAccessGroup");
+        final GroupSelectPanel fullAccess = new GroupSelectPanel(fsFullAccess.newChildId(), model,
+            parentPage, "fullAccessGroupId");
+        fsFullAccess.add(fullAccess);
+        fsFullAccess.setLabelFor(fullAccess);
+        fullAccess.init();
+        if (access == false)
+          fullAccess.setEnabled(false);
 
-      // set read-only access chooser
-      final FieldsetPanel fsReadOnly = gridBuilder.newFieldset(getString("plugins.teamcal.readOnlyAccess"), true);
-      final GroupSelectPanel readOnly = new GroupSelectPanel(fsReadOnly.newChildId(), new PropertyModel<GroupDO>(data, "readOnlyAccessGroup"),
-          parentPage, "readOnlyAccessGroupId");
-      fsReadOnly.add(readOnly);
-      fsReadOnly.setLabelFor(readOnly);
-      readOnly.init();
-      if (access == false)
-        readOnly.setEnabled(false);
+        // set read-only access chooser
+        final FieldsetPanel fsReadOnly = gridBuilder.newFieldset(getString("plugins.teamcal.readOnlyAccess"), true);
+        final GroupSelectPanel readOnly = new GroupSelectPanel(fsReadOnly.newChildId(), new PropertyModel<GroupDO>(data, "readOnlyAccessGroup"),
+            parentPage, "readOnlyAccessGroupId");
+        fsReadOnly.add(readOnly);
+        fsReadOnly.setLabelFor(readOnly);
+        readOnly.init();
+        if (access == false)
+          readOnly.setEnabled(false);
 
-      // set minimal access chooser
-      final FieldsetPanel fsMinimal = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess"), true);
-      final GroupSelectPanel minimalAccess = new GroupSelectPanel(fsMinimal.newChildId(), new PropertyModel<GroupDO>(data, "minimalAccessGroup"),
-          parentPage, "minimalAccessGroupId");
-      fsMinimal.add(minimalAccess);
-      fsMinimal.setLabelFor(minimalAccess);
-      fsMinimal.addHelpIcon(getString("plugins.teamcal.minimalAccess.hint"));
-      minimalAccess.init();
-      if (access == false)
-        minimalAccess.setEnabled(false);
-
-      if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
-        final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.subscribe"), true).setNoLabelFor();
-        createICalTarget();
-        final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
-        final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fsSubscribe.newChildId(), IconType.SUBSCRIPTION,
-            getString("plugins.teamcal.subscribe"), iCalExportLink).setLight();
-        fsSubscribe.add(exportICalButtonPanel);
+        // set minimal access chooser
+        final FieldsetPanel fsMinimal = gridBuilder.newFieldset(getString("plugins.teamcal.minimalAccess"), true);
+        final GroupSelectPanel minimalAccess = new GroupSelectPanel(fsMinimal.newChildId(), new PropertyModel<GroupDO>(data, "minimalAccessGroup"),
+            parentPage, "minimalAccessGroupId");
+        fsMinimal.add(minimalAccess);
+        fsMinimal.setLabelFor(minimalAccess);
+        fsMinimal.addHelpIcon(getString("plugins.teamcal.minimalAccess.hint"));
+        minimalAccess.init();
+        if (access == false)
+          minimalAccess.setEnabled(false);
       }
+    }
+    if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
+      final FieldsetPanel fsSubscribe = gridBuilder.newFieldset(getString("plugins.teamcal.subscribe"), true).setNoLabelFor();
+      createICalTarget();
+      final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
+      final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fsSubscribe.newChildId(), IconType.SUBSCRIPTION,
+          getString("plugins.teamcal.subscribe"), iCalExportLink).setLight();
+      fsSubscribe.add(exportICalButtonPanel);
     }
   }
 

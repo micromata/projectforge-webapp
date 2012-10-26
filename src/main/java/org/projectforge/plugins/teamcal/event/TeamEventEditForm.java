@@ -9,11 +9,13 @@
 
 package org.projectforge.plugins.teamcal.event;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
+import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.Model;
@@ -67,6 +69,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
 
   private DateTimePanel endDateTimePanel;
 
+  private final List<Component> timeComponents;
+
   private boolean access;
 
   /**
@@ -76,6 +80,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   public TeamEventEditForm(final TeamEventEditPage parentPage, final TeamEventDO data)
   {
     super(parentPage, data);
+    timeComponents = new ArrayList<Component>();
   }
 
   /**
@@ -134,9 +139,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         fieldSet.setEnabled(false);
     }
 
-    // add date panel
-    initDatePanel();//gridBuilder.newFieldset(getString("plugins.teamevent.duration"), true));
-
     {
       // LOCATION
       final FieldsetPanel fieldSet = gridBuilder.newFieldset(getString("plugins.teamevent.location"));
@@ -156,9 +158,23 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         fieldSet.setEnabled(false);
     }
 
+    // add date panel
+    initDatePanel();
+
     {
       // ALL DAY CHECKBOX
       final FieldsetPanel fieldSet = gridBuilder.newFieldset("", true).setNoLabelFor();
+      //      fieldSet.add(new AjaxFormComponentUpdatingBehavior("onChange") {
+      //
+      //        @Override
+      //        protected void onUpdate(final AjaxRequestTarget target)
+      //        {
+      //          for (final Component c : timeComponents)
+      //            c.setVisible(!data.isAllDay());
+      //          AjaxRequestTarget.get().add(startDateTimePanel);
+      //          AjaxRequestTarget.get().add(endDateTimePanel);
+      //        }
+      //      });
       final DivPanel divPanel = fieldSet.addNewCheckBoxDiv();
       final CheckBoxPanel checkBox = new CheckBoxPanel(divPanel.newChildId(), new PropertyModel<Boolean>(data, "allDay"), getString("plugins.teamevent.allDay"));
       divPanel.add(checkBox);
@@ -218,6 +234,15 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     startDateTimePanel = new DateTimePanel(startDateField.newChildId(), new PropertyModel<Date>(data, "startDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
         .withRequired(true), DatePrecision.MINUTE_15);
+//    startDateTimePanel.setOutputMarkupId(true);
+//    final Iterator<Component> startDateDropdown = startDateTimePanel.iterator();
+//    int i = 0;
+//    while (startDateDropdown.hasNext()) {
+//      final Component comp = startDateDropdown.next();
+//      i++;
+//      if (comp instanceof DropDownChoice<?>)
+//        timeComponents.add(comp);
+//    }
     startDateField.add(startDateTimePanel);
     dateFieldToolTip(startDateTimePanel);
 
@@ -226,6 +251,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     endDateTimePanel = new DateTimePanel(endDateField.newChildId(), new PropertyModel<Date>(data, "endDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
         .withRequired(true), DatePrecision.MINUTE_15);
+    endDateTimePanel.setOutputMarkupId(true);
     endDateField.add(endDateTimePanel);
     dateFieldToolTip(endDateTimePanel);
 

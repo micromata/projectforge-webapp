@@ -243,6 +243,28 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
   }
 
   /**
+   * hide information
+   * 
+   * @param list
+   * @return
+   */
+  private List<TeamCalDO> hideByAccess(final List<TeamCalDO> list) {
+    final PFUserDO user = PFUserContext.getUser();
+    for (final TeamCalDO teamCal : list) {
+      if (right.isOwner(user, teamCal) == true
+          || right.hasAccessGroup(teamCal.getFullAccessGroup(), userGroupCache, user) == true
+          || right.hasAccessGroup(teamCal.getReadOnlyAccessGroup(), userGroupCache, user) == true) {
+        // do nothing
+      } else
+        if (right.hasAccessGroup(teamCal.getMinimalAccessGroup(), userGroupCache, user) == true) {
+          teamCal.setDescription("");
+        } else
+          list.remove(teamCal);
+    }
+    return list;
+  }
+
+  /**
    * filter by access where current user has access.
    * 
    * @param list
@@ -255,7 +277,7 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
       if (right.hasSelectAccess(user, teamcal) == true)
         grantedList.add(teamcal);
     }
-    return grantedList;
+    return hideByAccess(grantedList);
   }
 
   /**

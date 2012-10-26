@@ -110,4 +110,12 @@ public class TeamCalCalendarFilter extends CalendarFilter
       addCalendarPk(calendar.getId());
     }
   }
+
+  public Map<Integer, String> getCalendarMap() {
+    return this.calendarMap;
+  }
+
+  public void setCalendarMap(final Map<Integer, String> map) {
+    this.calendarMap = map;
+  }
 }

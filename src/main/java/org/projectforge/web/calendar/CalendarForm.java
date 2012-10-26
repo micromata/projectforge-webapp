@@ -66,7 +66,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   private UserGroupCache userGroupCache;
 
   @SpringBean(name = "userDao")
-  private UserDao userDao;
+  protected UserDao userDao;
 
   private CalendarFilter filter;
 
@@ -78,8 +78,6 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
   private JodaDatePanel currentDatePanel;
 
   private Label durationLabel;
-
-  private String iCalTarget;
 
   @SuppressWarnings("serial")
   @Override
@@ -158,16 +156,7 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     }
     addControlButtons(fs);
     if (accessChecker.isRestrictedUser() == false && WebConfiguration.isDevelopmentMode() == true) {
-      final PFUserDO user = PFUserContext.getUser();
-      final String authenticationKey = userDao.getAuthenticationToken(user.getId());
-      final String contextPath = WebApplication.get().getServletContext().getContextPath();
-      iCalTarget = contextPath
-          + "/export/ProjectForge.ics?timesheetUser="
-          + user.getUsername()
-          + "&token="
-          + authenticationKey
-          + additionalInformation();
-      final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
+      final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, setICalTarget());
       final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fs.newChildId(), IconType.SUBSCRIPTION,
           getString(setIcsImportButtonTooltip()), iCalExportLink).setLight();
 
@@ -185,6 +174,24 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     durationLabel = durationPanel.getLabel4Ajax();
     fs.add(durationPanel);
     onAfterInit(gridBuilder);
+  }
+
+  /**
+   * @param contextPath
+   * @return
+   */
+  protected String setICalTarget()
+  {
+    final PFUserDO user = PFUserContext.getUser();
+    final String authenticationKey = userDao.getAuthenticationToken(user.getId());
+    final String contextPath = WebApplication.get().getServletContext().getContextPath();
+    final String iCalTarget = contextPath
+        + "/export/ProjectForge.ics?timesheetUser="
+        + user.getUsername()
+        + "&token="
+        + authenticationKey
+        + additionalInformation();
+    return iCalTarget;
   }
 
   /**

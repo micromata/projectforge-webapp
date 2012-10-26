@@ -222,6 +222,7 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
       teamcal.setId(object.getId());
       teamcal.setMinimalAccessGroup(object.getMinimalAccessGroup());
       teamcal.setOwner(object.getOwner());
+      teamcal.setTitle(object.getTitle());
       det.setObject(teamcal);
     }
     return det;
