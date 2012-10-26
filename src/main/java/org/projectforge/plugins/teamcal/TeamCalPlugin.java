@@ -34,11 +34,13 @@ import org.projectforge.plugins.teamcal.event.TeamEventDO;
 import org.projectforge.plugins.teamcal.event.TeamEventDao;
 import org.projectforge.plugins.teamcal.event.TeamEventEditPage;
 import org.projectforge.plugins.teamcal.event.TeamEventRight;
+import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFeedHook;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarPage;
 import org.projectforge.registry.RegistryEntry;
 import org.projectforge.user.UserPrefArea;
 import org.projectforge.web.MenuItemDef;
 import org.projectforge.web.MenuItemDefId;
+import org.projectforge.web.calendar.CalendarFeed;
 
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -103,6 +105,7 @@ public class TeamCalPlugin extends AbstractPlugin
 
     // Register favorite entries (the user can modify these templates/favorites via 'own settings'):
     USER_PREF_AREA = registerUserPrefArea("TEAMCAL_FAVORITE", TeamCalDO.class, "teamcal.favorite");
+    CalendarFeed.registerFeedHook(new TeamCalCalendarFeedHook());
   }
 
   /**

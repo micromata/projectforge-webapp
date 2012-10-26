@@ -26,6 +26,7 @@ package org.projectforge.web.calendar;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -43,10 +44,7 @@ import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
 import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.CalScale;
-import net.fortuna.ical4j.model.property.DtEnd;
-import net.fortuna.ical4j.model.property.DtStart;
 import net.fortuna.ical4j.model.property.Location;
-import net.fortuna.ical4j.model.property.Name;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Uid;
 import net.fortuna.ical4j.model.property.Version;
@@ -54,9 +52,6 @@ import net.fortuna.ical4j.model.property.Version;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTimeZone;
-import org.projectforge.plugins.teamcal.event.TeamEventDO;
-import org.projectforge.plugins.teamcal.event.TeamEventDao;
-import org.projectforge.plugins.teamcal.event.TeamEventFilter;
 import org.projectforge.registry.Registry;
 import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
@@ -64,6 +59,7 @@ import org.projectforge.timesheet.TimesheetFilter;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
+
 
 /**
  * Feed Servlet, which generates a 'text/calendar' output of the last four mounts. Currenty relevant informations are date, start- and stop
@@ -83,7 +79,7 @@ public class CalendarFeed extends HttpServlet
 
   private boolean timesheetRequired;
 
-  private String[] teamCalIds;
+  private static final List<CalendarFeedHook> feedHooks = new LinkedList<CalendarFeedHook>();
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException
@@ -93,8 +89,7 @@ public class CalendarFeed extends HttpServlet
       return;
     }
 
-    final Calendar calendar = createCal(req.getParameter("timesheetUser"), req.getParameter("token"),
-        req.getParameter("teamCals"), req.getParameter("timesheetRequired"));
+    final Calendar calendar = createCal(req, req.getParameter("timesheetUser"), req.getParameter("token"), req.getParameter("timesheetRequired"));
 
     if (calendar == null) {
       resp.sendError(HttpStatus.SC_BAD_REQUEST);
@@ -112,12 +107,13 @@ public class CalendarFeed extends HttpServlet
 
   /**
    * creates a calendar for the user, identified by his name and authentication key.
+   * @param req
    * 
    * @param userName
    * @param userKey
    * @return a calendar, null if authentication fails
    */
-  public Calendar createCal(final String userName, final String authKey, final String teamCals, final String timesheetRequired)
+  public Calendar createCal(final HttpServletRequest req, final String userName, final String authKey, final String timesheetRequired)
   {
     final UserDao userDao = (UserDao) Registry.instance().getDao(UserDao.class);
     final TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
@@ -127,8 +123,8 @@ public class CalendarFeed extends HttpServlet
       return null;
     }
 
-    if (teamCals != null) {
-      teamCalIds = StringUtils.split(teamCals, ";");
+    for(final CalendarFeedHook hook: feedHooks) {
+      hook.onInit(req);
     }
 
     if (timesheetRequired == null)
@@ -205,7 +201,7 @@ public class CalendarFeed extends HttpServlet
         final DateTime stopTime = getCalTime(timezone, cal);
 
         final VEvent vEvent;
-        if (teamCalIds != null) {
+        if (feedHooks.size() > 0) {
           vEvent = new VEvent(startTime, stopTime, timesheet.getShortDescription() + " (timesheet)");
         }
         else {
@@ -218,58 +214,13 @@ public class CalendarFeed extends HttpServlet
       }
     }
 
-    if (teamCalIds != null) {
-      for (int i = 0; i < teamCalIds.length; i++) {
-        final TeamEventDao teamEventDao = (TeamEventDao) Registry.instance().getDao(TeamEventDao.class);
-        final TeamEventFilter eventFilter = new TeamEventFilter();
-        eventFilter.setUser(user);
-        eventFilter.setDeleted(false);
-        eventFilter.setEndDate(cal.getTime());
-        final Integer id = Integer.valueOf(teamCalIds[i]);
-        eventFilter.setTeamCalId(id);
-
-        final List<TeamEventDO> teamEvents = teamEventDao.getUnlimitedList(eventFilter);
-        if (teamEvents != null) {
-          for (final TeamEventDO teamEvent : teamEvents) {
-            final Date date = new Date(teamEvent.getStartDate().getTime());
-            final VEvent vEvent;
-            if (teamEvent.isAllDay() == true) {
-              final DtStart dtStart = new DtStart(timezone);
-              final net.fortuna.ical4j.model.Date fortunaStartDate = new net.fortuna.ical4j.model.Date(date);
-              dtStart.setDate(fortunaStartDate);
-
-              final DtEnd dtEnd = new DtEnd(timezone);
-              final org.joda.time.DateTime jodaTime = new org.joda.time.DateTime(teamEvent.getEndDate().getTime());
-
-              // requires plus 1 because one day will be omitted by calendar.
-              final net.fortuna.ical4j.model.Date fortunaEndDate = new net.fortuna.ical4j.model.Date(jodaTime.plusDays(1).getMillis());
-              dtEnd.setDate(fortunaEndDate);
-              vEvent = new VEvent(fortunaStartDate, fortunaEndDate, teamEvent.getSubject() + " (" + teamEvent.getCalendar().getTitle() + ")");
-              vEvent.getProperties().add(new Uid(fortunaStartDate.toString()));
-            } else {
-              cal.setTime(date);
-              final DateTime startTime = getCalTime(timezone, cal);
-
-              date.setTime(teamEvent.getEndDate().getTime());
-              cal.setTime(date);
-              final DateTime stopTime = getCalTime(timezone, cal);
-              vEvent = new VEvent(startTime, stopTime, teamEvent.getSubject() + " (" + teamEvent.getCalendar().getTitle() + ")");
-              vEvent.getProperties().add(new Uid(startTime.toString()));
-            }
-
-            // TODO Sichtbarkeit
-            vEvent.getProperties().add(new Location(teamEvent.getLocation()));
-            vEvent.getProperties().add(new Name(teamEvent.getCalendar().getTitle()));
-            //            vEvent.getProperties().add(new Note(teamEvent.getNote()));
-
-            events.add(vEvent);
-          }
-        }
-      }
+    for(final CalendarFeedHook hook: feedHooks) {
+      events.addAll(hook.getEvents(user, timezone, cal));
     }
 
     return events;
   }
+
 
   /**
    * @return
@@ -305,6 +256,11 @@ public class CalendarFeed extends HttpServlet
     cal.clear();
     cal.set(java.util.Calendar.YEAR, year);
     cal.set(java.util.Calendar.MONTH, mounth);
+  }
+
+
+  public static void registerFeedHook(final CalendarFeedHook hook) {
+    feedHooks.add(hook);
   }
 
 }
