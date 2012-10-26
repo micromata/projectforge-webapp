@@ -147,4 +147,13 @@ public class LdapGroupDao extends LdapDao<String, LdapGroup>
     }
     return GroupDOConverter.ID_PREFIX + id;
   }
+
+  /**
+   * @see org.projectforge.ldap.LdapDao#getOuBase()
+   */
+  @Override
+  protected String getOuBase()
+  {
+    return ldapConfig.getGroupBase();
+  }
 }
