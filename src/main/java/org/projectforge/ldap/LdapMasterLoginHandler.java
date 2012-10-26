@@ -329,8 +329,16 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
   public void passwordChanged(final PFUserDO user, final String newPassword)
   {
     final LdapPerson ldapUser = ldapUserDao.findById(user.getId());
+    if (user.isDeleted() == true || user.isLocalUser() == true) {
+      // Don't change passwords of such users.
+      return;
+    }
     if (ldapUser != null) {
       ldapUserDao.changePassword(ldapUser, null, newPassword);
+      final LdapPerson person = ldapUserDao.authenticate(user.getUsername(), newPassword);
+      log.info("Password changed successfully for : " + person);
+    } else {
+      log.error("Can't change LDAP password for user '" + user.getUsername() + "'! Not such user found in LDAP!.");
     }
   }
 
