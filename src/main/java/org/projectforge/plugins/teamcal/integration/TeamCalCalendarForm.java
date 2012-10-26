@@ -59,6 +59,7 @@ public class TeamCalCalendarForm extends CalendarForm
         // TODO do not use response page, just update the calendar
         setResponsePage(getPage().getClass(), getPage().getPageParameters());
       }
+
     });
     fs.add(dialog);
     final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(fs.newChildId(), IconType.CALENDAR,
@@ -77,6 +78,15 @@ public class TeamCalCalendarForm extends CalendarForm
     calendarButtonPanel.setLight();
     fs.add(calendarButtonPanel);
     setDefaultButton(calendarButtonPanel.getButton());
+  }
+
+  /**
+   * @see org.projectforge.web.calendar.CalendarForm#setIcsImportButtonTooltip(java.lang.String)
+   */
+  @Override
+  protected String setIcsImportButtonTooltip()
+  {
+    return "plugins.teamcal.subscribe.teamcalendar";
   }
 
   @Override

@@ -34,7 +34,6 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.joda.time.DateMidnight;
 import org.projectforge.access.AccessChecker;
 import org.projectforge.core.Configuration;
-import org.projectforge.plugins.teamcal.integration.TeamCalCalendarForm;
 import org.projectforge.user.PFUserContext;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.ProjectForgeGroup;
@@ -169,12 +168,8 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
           + authenticationKey
           + additionalInformation();
       final ExternalLink iCalExportLink = new ExternalLink(IconLinkPanel.LINK_ID, iCalTarget);
-      String i18nKey = "timesheet.iCalExport";
-      // TeamCalCalendarPage loads time sheets And team calendar.
-      if (this instanceof TeamCalCalendarForm)
-        i18nKey = "plugins.teamcal.subscribe.teamcalendar";
       final IconLinkPanel exportICalButtonPanel = new IconLinkPanel(fs.newChildId(), IconType.SUBSCRIPTION,
-          getString(i18nKey), iCalExportLink).setLight();
+          getString(setIcsImportButtonTooltip()), iCalExportLink).setLight();
 
       fs.add(exportICalButtonPanel);
     }
@@ -190,6 +185,16 @@ public class CalendarForm extends AbstractForm<CalendarFilter, CalendarPage>
     durationLabel = durationPanel.getLabel4Ajax();
     fs.add(durationPanel);
     onAfterInit(gridBuilder);
+  }
+
+  /**
+   * If it is necessary to change the tool tip.
+   * 
+   * @param i18nKey
+   * @return
+   */
+  protected String setIcsImportButtonTooltip() {
+    return "timesheet.iCalExport";
   }
 
   /**
