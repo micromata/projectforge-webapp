@@ -121,4 +121,13 @@ public class LdapPersonDao extends LdapDao<String, LdapPerson>
    */
   protected void addModificationItems(final List<ModificationItem> list, final LdapPerson person) {
   }
+
+  /**
+   * @see org.projectforge.ldap.LdapDao#getOuBase()
+   */
+  @Override
+  protected String getOuBase()
+  {
+    throw new UnsupportedOperationException("No support of contacts (person) yet implemented (only users are supported by LdapUserDao yet). No ou-base available.");
+  }
 }
