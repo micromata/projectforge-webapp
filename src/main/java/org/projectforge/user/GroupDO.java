@@ -88,7 +88,7 @@ public class GroupDO extends DefaultBaseDO implements ShortDisplayNameCapable
   @IndexedEmbedded(depth = 1)
   private Set<PFUserDO> assignedUsers;
 
-  @ManyToMany(targetEntity = org.projectforge.user.PFUserDO.class, cascade = { CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
+  @ManyToMany(targetEntity = org.projectforge.user.PFUserDO.class, cascade = { CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.EAGER)
   @JoinTable(name = "T_GROUP_USER", joinColumns = @JoinColumn(name = "GROUP_ID"), inverseJoinColumns = @JoinColumn(name = "USER_ID"))
   public Set<PFUserDO> getAssignedUsers()
   {

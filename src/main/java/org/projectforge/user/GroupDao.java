@@ -32,7 +32,6 @@ import java.util.Set;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.Validate;
-import org.hibernate.FetchMode;
 import org.hibernate.LockMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -97,7 +96,6 @@ public class GroupDao extends BaseDao<GroupDO>
       }
     }
     queryFilter.addOrder(Order.asc("name"));
-    queryFilter.setFetchMode("assignedUsers", FetchMode.JOIN);
     return getList(queryFilter);
   }
 
@@ -308,7 +306,7 @@ public class GroupDao extends BaseDao<GroupDO>
   @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
   List<GroupDO> loadAll()
   {
-    final List<GroupDO> list = getHibernateTemplate().find("from GroupDO t join fetch t.assignedUsers");
+    final List<GroupDO> list = getHibernateTemplate().find("from GroupDO t join");
     return list;
   }
 
