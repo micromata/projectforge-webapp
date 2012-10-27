@@ -141,7 +141,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
       @Override
       public void run()
       {
-        synchronized (this) {
+        synchronized (LdapMasterLoginHandler.this) {
           try {
             refreshInProgress = true;
             updateLdap(users, groups);

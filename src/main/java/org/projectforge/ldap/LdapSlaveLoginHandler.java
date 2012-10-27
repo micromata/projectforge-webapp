@@ -229,7 +229,7 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
       @Override
       public void run()
       {
-        synchronized (this) {
+        synchronized (LdapSlaveLoginHandler.this) {
           try {
             refreshInProgress = true;
             updateLdap(users, groups);
