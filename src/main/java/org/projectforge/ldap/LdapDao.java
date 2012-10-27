@@ -435,7 +435,8 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     final SearchControls controls = new SearchControls();
     controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
     final String searchBase = getSearchBase(organizationalUnits);
-    results = ctx.search(searchBase, "(&(objectClass=" + getObjectClass() + ")(" + getIdAttrId() + "=" + buildId(id) + "))", controls);
+    final String args = "(&(objectClass=" + getObjectClass() + ")(" + getIdAttrId() + "=" + buildId(id) + "))";
+    results = ctx.search(searchBase, args, controls);
     if (results.hasMore() == false) {
       return null;
     }
