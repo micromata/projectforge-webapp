@@ -79,7 +79,7 @@ public class LdapUserDaoTest
     final String uid = "test-user-42";
     final LdapPerson user = new LdapPerson().setUid(uid).setGivenName("Kai").setSurname("ProjectForge Test").setDescription("description")
         .setHomePhoneNumber("0123").setMail("kr@acme.com").setMobilePhoneNumber("4567").setOrganization("ProjectForge")
-        .setTelephoneNumber("890").setEmployeeNumber(PFUserDOConverter.ID_PREFIX + "42");
+        .setTelephoneNumber("890").setEmployeeNumber("42");
     user.setOrganizationalUnit(getPath());
     ldapUserDao.createOrUpdate(getPath(), user);
     final LdapPerson user2 = ldapUserDao.findByUsername(uid, getPath());
@@ -109,7 +109,7 @@ public class LdapUserDaoTest
       return;
     }
     final String uid = "test-user-43";
-    final LdapPerson user = new LdapPerson().setUid(uid).setGivenName("Kai").setSurname("ProjectForge Test").setEmployeeNumber(PFUserDOConverter.ID_PREFIX + "43");
+    final LdapPerson user = new LdapPerson().setUid(uid).setGivenName("Kai").setSurname("ProjectForge Test").setEmployeeNumber("43");
     user.setOrganizationalUnit(getPath());
     ldapUserDao.createOrUpdate(getPath(), user);
     ldapUserDao.changePassword(user, null, "hurzel");
