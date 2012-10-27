@@ -28,16 +28,20 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.PredicateUtils;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.projectforge.registry.Registry;
 import org.projectforge.web.UserFilter;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.orm.hibernate3.HibernateCallback;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 
 public class LoginDefaultHandler implements LoginHandler
@@ -163,14 +167,31 @@ public class LoginDefaultHandler implements LoginHandler
   public List<GroupDO> getAllGroups()
   {
     try {
-      List<GroupDO> list = hibernateTemplate.find("from GroupDO t left outer join fetch t.assignedUsers");
-      if (list != null) {
-        list = (List<GroupDO>)selectUnique(list);
-      }
+      final List<GroupDO> list = hibernateTemplate.executeFind(new HibernateCallback<List<GroupDO>>() {
+        public List<GroupDO> doInHibernate(final Session session) throws HibernateException, SQLException
+        {
+          List<GroupDO> list = session.createQuery("from GroupDO t left outer join fetch t.assignedUsers").list();
+          if (list != null) {
+            list = (List<GroupDO>) selectUnique(list);
+            // Work-around: Some times LazyInitializationException occurs due to assignedUsers, force fetching (don't know why):
+            for (final GroupDO group : list) {
+              // Force fetching:
+              final Set<PFUserDO> users = group.getAssignedUsers();
+              if (users != null) {
+                for (final PFUserDO user : users) {
+                  user.getId();
+                }
+              }
+            }
+          }
+          return list;
+        }
+      });
       return list;
     } catch (final Exception ex) {
-      log.fatal("******* Exception while getting groups from data-base (OK only in case of migration from older versions): "
-          + ex.getMessage());
+      log.fatal(
+          "******* Exception while getting groups from data-base (OK only in case of migration from older versions): " + ex.getMessage(),
+          ex);
       return new ArrayList<GroupDO>();
     }
   }
@@ -200,9 +221,9 @@ public class LoginDefaultHandler implements LoginHandler
   {
   }
 
-  protected List<?> selectUnique(final List<?> list)
+  protected List< ? > selectUnique(final List< ? > list)
   {
-    final List<?> result = (List<?>) CollectionUtils.select(list, PredicateUtils.uniquePredicate());
+    final List< ? > result = (List< ? >) CollectionUtils.select(list, PredicateUtils.uniquePredicate());
     return result;
   }
 
