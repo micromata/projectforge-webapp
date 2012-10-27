@@ -124,12 +124,17 @@ public class LdapPerson extends LdapObject<String>
   }
 
   /**
+   * If the given employeeNumber doesn't start with {@link PFUserDOConverter#ID_PREFIX} then the prefix will be prepended automatically.
    * @param employeeNumber the employeeNumber to set
    * @return this for chaining.
    */
   public LdapPerson setEmployeeNumber(final String employeeNumber)
   {
-    this.employeeNumber = employeeNumber;
+    if (employeeNumber != null && employeeNumber.startsWith(PFUserDOConverter.ID_PREFIX) == false) {
+      this.employeeNumber = PFUserDOConverter.ID_PREFIX + employeeNumber;
+    } else {
+      this.employeeNumber = employeeNumber;
+    }
     return this;
   }
 
