@@ -124,4 +124,9 @@ public class CheckBoxPanel extends Panel
   {
     return checkBox;
   }
+
+  public CheckBoxPanel setSelected(final boolean selected) {
+    checkBox.setDefaultModelObject(selected);
+    return this;
+  }
 }
