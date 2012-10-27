@@ -129,36 +129,67 @@ public class LdapMasterLoginHandlerTest extends TestBase
     }
     logon(TEST_ADMIN_USER);
     final LdapMasterLoginHandler loginHandler = createLoginHandler();
+    // Create users and group.
     final Integer userId1 = createUser("ldapMaster1", "test123", "firstname1", "lastname1");
     final Integer userId2 = createUser("ldapMaster2", "test123", "firstname2", "lastname2");
     final Integer userId3 = createUser("ldapMaster3", "test123", "firstname3", "lastname3");
+    final Integer userId4 = createUser("ldapMaster4", "test123", "firstname4", "lastname4");
     final Integer groupId1 = createGroup("ldapMasterGroup1", "This is a stupid description.");
-    final GroupDO group1 = groupDao.internalGetById(groupId1);
+    GroupDO group = groupDao.internalGetById(groupId1);
     synchronizeLdapUsers(loginHandler);
     LdapGroup ldapGroup = ldapGroupDao.findById(groupId1);
     Assert.assertTrue(isMembersEmpty(ldapGroup));
-    group1.setAssignedUsers(new HashSet<PFUserDO>());
-    group1.addUser(userDao.getUserGroupCache().getUser(userId1));
-    group1.addUser(userDao.getUserGroupCache().getUser(userId2));
-    groupDao.internalUpdate(group1);
+
+    // Assign users to group
+    group.setAssignedUsers(new HashSet<PFUserDO>());
+    group.addUser(userDao.getUserGroupCache().getUser(userId1));
+    group.addUser(userDao.getUserGroupCache().getUser(userId2));
+    group.addUser(userDao.getUserGroupCache().getUser(userId3));
+    groupDao.internalUpdate(group);
     synchronizeLdapUsers(loginHandler);
     ldapGroup = ldapGroupDao.findById(groupId1);
-    assertMembers(ldapGroup, "ldapMaster1", "ldapMaster2");
+    assertMembers(ldapGroup, "ldapMaster1", "ldapMaster2", "ldapMaster3");
     Assert.assertFalse(isMembersEmpty(ldapGroup));
     LdapPerson ldapUser = ldapUserDao.findById(userId1, getPath());
     Assert.assertEquals("ldapMaster1", ldapUser.getUid());
-    ldapUser = ldapUserDao.findById(userId2);
-    ldapUser = ldapUserDao.findById(userId3);
+
+    // Renaming one user, deleting one user and assigning third user
+    userDao.internalMarkAsDeleted(userDao.getById(userId2));
+    final PFUserDO user3 = userDao.getById(userId3);
+    user3.setUsername("ldapMasterRenamed3");
+    userDao.internalUpdate(user3);
+    group = userDao.getUserGroupCache().getGroup(groupId1);
+    group.addUser(userDao.getById(userId4));
+    groupDao.internalUpdate(group);
+    synchronizeLdapUsers(loginHandler);
+    ldapGroup = ldapGroupDao.findById(groupId1);
+    assertMembers(ldapGroup, "ldapMaster1", "ldapMasterRenamed3", "ldapMaster4");
+
+    // Renaming group
+    group = groupDao.getById(groupId1);
+    group.setName("ldapMasterGroupRenamed1");
+    groupDao.internalUpdate(group);
+    synchronizeLdapUsers(loginHandler);
+    ldapGroup = ldapGroupDao.findById(groupId1);
+    assertMembers(ldapGroup, "ldapMaster1", "ldapMasterRenamed3", "ldapMaster4");
+    Assert.assertEquals("ldapMasterGroupRenamed1", ldapGroup.getCommonName());
+    // TODO: change password
+
+    // Delete all groups
     final Collection<GroupDO> groups = userDao.getUserGroupCache().getAllGroups();
-    for (final GroupDO group : groups) {
-      groupDao.internalMarkAsDeleted(group);
+    for (final GroupDO g : groups) {
+      groupDao.internalMarkAsDeleted(g);
     }
     synchronizeLdapUsers(loginHandler);
+    Assert.assertEquals("LDAP groups must be empty (all groups are deleted in the PF data-base).", 0,
+        ldapGroupDao.findAll(ldapRealTestHelper.ldapConfig.getGroupBase()).size());
     final Collection<PFUserDO> users = userDao.getUserGroupCache().getAllUsers();
     for (final PFUserDO user : users) {
       userDao.internalMarkAsDeleted(user);
     }
     synchronizeLdapUsers(loginHandler);
+    Assert.assertEquals("LDAP users must be empty (all user are deleted in the PF data-base).", 0,
+        ldapUserDao.findAll(ldapRealTestHelper.ldapConfig.getGroupBase()).size());
     ldapUser = ldapUserDao.findById(userId1, getPath());
     Assert.assertNull(ldapUser);
   }
