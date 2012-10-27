@@ -63,7 +63,27 @@ public class LdapRealTestHelper
 
   LdapConnector ldapConnector;
 
-  private String userPath;
+  private String userPath, groupPath;
+
+  public void setup(final LdapOrganizationalUnitDao ldapOrganizationalUnitDao)
+  {
+    if (isAvailable() == true) {
+      ldapOrganizationalUnitDao.createIfNotExist(getUserPath(), "Test area for tests of ProjectForge.");
+      ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.DEACTIVATED_SUB_CONTEXT, "for deactivated users.", getUserPath());
+      ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, "for restricted users.", getUserPath());
+      ldapOrganizationalUnitDao.createIfNotExist(getGroupPath(), "Test area for tests of ProjectForge.");
+    }
+  }
+
+  public void tearDown(final LdapOrganizationalUnitDao ldapOrganizationalUnitDao)
+  {
+    if (isAvailable() == true) {
+      ldapOrganizationalUnitDao.deleteIfExists(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getUserPath());
+      ldapOrganizationalUnitDao.deleteIfExists(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, getUserPath());
+      ldapOrganizationalUnitDao.deleteIfExists(getUserPath());
+      ldapOrganizationalUnitDao.deleteIfExists(getGroupPath());
+    }
+  }
 
   String getUserPath()
   {
@@ -71,6 +91,14 @@ public class LdapRealTestHelper
       userPath = LdapUtils.getOrganizationalUnit(ldapConfig.getUserBase());
     }
     return userPath;
+  }
+
+  String getGroupPath()
+  {
+    if (groupPath == null) {
+      groupPath = LdapUtils.getOrganizationalUnit(ldapConfig.getGroupBase());
+    }
+    return groupPath;
   }
 
   LdapRealTestHelper()

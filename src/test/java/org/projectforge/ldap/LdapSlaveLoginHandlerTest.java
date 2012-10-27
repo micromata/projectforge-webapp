@@ -48,11 +48,6 @@ public class LdapSlaveLoginHandlerTest extends TestBase
 
   private LdapRealTestHelper ldapRealTestHelper;
 
-  private String getUserPath()
-  {
-    return ldapRealTestHelper.getUserPath();
-  }
-
   @Before
   public void setup()
   {
@@ -61,17 +56,13 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
     ldapUserDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
     ldapOrganizationalUnitDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
-    if (ldapRealTestHelper.isAvailable() == true) {
-      ldapOrganizationalUnitDao.createIfNotExist(getUserPath(), "Test area for tests of ProjectForge.");
-    }
+    ldapRealTestHelper.setup(ldapOrganizationalUnitDao);
   }
 
   @After
   public void tearDown()
   {
-    if (ldapRealTestHelper.isAvailable() == true) {
-      ldapOrganizationalUnitDao.deleteIfExists(getUserPath());
-    }
+    ldapRealTestHelper.tearDown(ldapOrganizationalUnitDao);
   }
 
   @Test

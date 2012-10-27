@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +40,7 @@ import org.projectforge.test.TestBase;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.Login;
+import org.projectforge.user.LoginResult;
 import org.projectforge.user.LoginResultStatus;
 import org.projectforge.user.PFUserDO;
 import org.springframework.util.CollectionUtils;
@@ -87,11 +89,13 @@ public class LdapMasterLoginHandlerTest extends TestBase
     ldapUserDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
     ldapGroupDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
     ldapOrganizationalUnitDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
-    if (ldapRealTestHelper.isAvailable() == true) {
-      ldapOrganizationalUnitDao.createIfNotExist(getPath(), "Test area for tests of ProjectForge.");
-      ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.DEACTIVATED_SUB_CONTEXT, "for deactivated users.", getPath());
-      ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, "for restricted users.", getPath());
-    }
+    ldapRealTestHelper.setup(ldapOrganizationalUnitDao);
+  }
+
+  @After
+  public void tearDown()
+  {
+    ldapRealTestHelper.tearDown(ldapOrganizationalUnitDao);
   }
 
   @Test
@@ -173,7 +177,14 @@ public class LdapMasterLoginHandlerTest extends TestBase
     ldapGroup = ldapGroupDao.findById(groupId1);
     assertMembers(ldapGroup, "ldapMaster1", "ldapMasterRenamed3", "ldapMaster4");
     Assert.assertEquals("ldapMasterGroupRenamed1", ldapGroup.getCommonName());
-    // TODO: change password
+
+    // Change password
+    final PFUserDO user1 = userDao.getById(userId1);
+    final LoginResult loginResult = Login.getInstance().checkLogin(user1.getUsername(), "test123");
+    Assert.assertEquals(LoginResultStatus.SUCCESS, loginResult.getLoginResultStatus());
+    Assert.assertNotNull(ldapUserDao.authenticate(user1.getUsername(), "test123"));
+    Login.getInstance().passwordChanged(user1, "newpassword");
+    Assert.assertNotNull(ldapUserDao.authenticate(user1.getUsername(), "newpassword"));
 
     // Delete all groups
     final Collection<GroupDO> groups = userDao.getUserGroupCache().getAllGroups();
