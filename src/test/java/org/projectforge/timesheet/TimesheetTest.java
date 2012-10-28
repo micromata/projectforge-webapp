@@ -58,17 +58,17 @@ public class TimesheetTest extends TestBase
 
   DateHolder date = new DateHolder(new Date(), DatePrecision.MINUTE_15, Locale.GERMAN);
 
-  public void setTimesheetDao(TimesheetDao timesheetDao)
+  public void setTimesheetDao(final TimesheetDao timesheetDao)
   {
     this.timesheetDao = timesheetDao;
   }
 
-  public void setTaskDao(TaskDao taskDao)
+  public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
   }
 
-  public void setTxTemplate(TransactionTemplate txTemplate)
+  public void setTxTemplate(final TransactionTemplate txTemplate)
   {
     this.txTemplate = txTemplate;
   }
@@ -78,25 +78,25 @@ public class TimesheetTest extends TestBase
   {
     final Serializable[] id = new Serializable[1];
     txTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status)
+      public Object doInTransaction(final TransactionStatus status)
       {
         getInitTestDB().addTask("ts-hasSelectAccess-task", "root");
         getInitTestDB().addUser("ts-hasSelectAccess-user");
-        TimesheetDO ts = new TimesheetDO();
-        long current = System.currentTimeMillis();
+        final TimesheetDO ts = new TimesheetDO();
+        final long current = System.currentTimeMillis();
         ts.setTask(initTestDB.getTask("ts-hasSelectAccess-task")).setUser(getUser("ts-hasSelectAccess-user")).setLocation("Office")
-            .setDescription("A lot of stuff done and more.").setStartTime(new Timestamp(current)).setStopTime(
-                new Timestamp(current + 60 * 60 * 1000));
+        .setDescription("A lot of stuff done and more.").setStartTime(new Timestamp(current)).setStopTime(
+            new Timestamp(current + 2 * 60 * 60 * 1000));
         id[0] = timesheetDao.internalSave(ts);
         timesheetDao.internalSave(ts);
         return null;
       }
     });
     txTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status)
+      public Object doInTransaction(final TransactionStatus status)
       {
         logon(getUser("ts-hasSelectAccess-user"));
-        TimesheetDO ts = timesheetDao.getById(id[0]); // Has no access, but is owner of this timesheet
+        final TimesheetDO ts = timesheetDao.getById(id[0]); // Has no access, but is owner of this timesheet
         assertEquals("Field should be hidden", TimesheetDao.HIDDEN_FIELD_MARKER, ts.getShortDescription());
         assertEquals("Field should be hidden", TimesheetDao.HIDDEN_FIELD_MARKER, ts.getDescription());
         assertEquals("Field should be hidden", TimesheetDao.HIDDEN_FIELD_MARKER, ts.getLocation());
@@ -104,9 +104,9 @@ public class TimesheetTest extends TestBase
       }
     });
     txTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status)
+      public Object doInTransaction(final TransactionStatus status)
       {
-        TimesheetDO ts = timesheetDao.internalGetById(id[0]);
+        final TimesheetDO ts = timesheetDao.internalGetById(id[0]);
         assertEquals("Field should not be overwritten", "A lot of stuff done and more.", ts.getShortDescription());
         assertEquals("Field should not be overwritten", "A lot of stuff done and more.", ts.getDescription());
         assertEquals("Field should not be overwritten", "Office", ts.getLocation());
@@ -120,27 +120,27 @@ public class TimesheetTest extends TestBase
   {
     getInitTestDB().addTask("saveAndModify-task", "root");
     getInitTestDB().addUser("saveAndModify-user");
-    TimesheetDO ts1 = new TimesheetDO();
-    long current = System.currentTimeMillis();
-    ts1.setStartTime(new Timestamp(current)).setStopTime(new Timestamp(current + 60 * 60 * 1000));
+    final TimesheetDO ts1 = new TimesheetDO();
+    final long current = System.currentTimeMillis();
+    ts1.setStartTime(new Timestamp(current)).setStopTime(new Timestamp(current + 2 * 60 * 60 * 1000));
     try {
       timesheetDao.internalSave(ts1);
       fail("timesheet without task and/or user should not be possible.");
-    } catch (Exception ex) {
+    } catch (final Exception ex) {
     }
     ts1.setTask(getTask("saveAndModify-task"));
     try {
       timesheetDao.internalSave(ts1);
       fail("timesheet without user should not be possible.");
-    } catch (Exception ex) {
+    } catch (final Exception ex) {
     }
     ts1.setTask(null).setUser(getUser("saveAndModify-user"));
     try {
       timesheetDao.internalSave(ts1);
       fail("timesheet without task and/or user should not be possible.");
-    } catch (Exception ex) {
+    } catch (final Exception ex) {
     }
-    ts1.setTask(getTask("saveAndModify-task")).setStartTime(new Timestamp(current)).setStopTime(new Timestamp(current + 60 * 60 * 1000));
+    ts1.setTask(getTask("saveAndModify-task")).setStartTime(new Timestamp(current)).setStopTime(new Timestamp(current + 2 * 60 * 60 * 1000));
     timesheetDao.internalSave(ts1);
     // ToDo: Check onSaveOrUpdate: kost2Id vs. task!
   }
@@ -156,19 +156,19 @@ public class TimesheetTest extends TestBase
     Serializable id = timesheetDao.save(ts1);
     ts1 = timesheetDao.internalGetById(id);
 
-    TimesheetDO ts2 = new TimesheetDO().setTask(getTask("timesheet")).setUser(getUser("timesheet-user"));
+    final TimesheetDO ts2 = new TimesheetDO().setTask(getTask("timesheet")).setUser(getUser("timesheet-user"));
     setTimeperiod(ts2, 21, 15, 59, 21, 18, 0); // 11/21 from 15:45 to 18:00
     try {
       timesheetDao.save(ts2); // Overlap with ts1!
       fail();
-    } catch (UserException ex) {
+    } catch (final UserException ex) {
       assertEquals("timesheet.error.timeperiodOverlapDetection", ex.getI18nKey());
     }
     setTimeperiod(ts2, 21, 7, 0, 21, 8, 15); // 11/21 from 07:00 to 08:15
     try {
       timesheetDao.save(ts2); // Overlap with ts1!
       fail();
-    } catch (UserException ex) {
+    } catch (final UserException ex) {
       assertEquals("timesheet.error.timeperiodOverlapDetection", ex.getI18nKey());
     }
     setTimeperiod(ts2, 21, 16, 0, 21, 18, 0); // 11/21 from 16:00 to 18:00
@@ -179,13 +179,13 @@ public class TimesheetTest extends TestBase
     try {
       timesheetDao.save(ts3); // Overlap with ts1!
       fail();
-    } catch (UserException ex) {
+    } catch (final UserException ex) {
       assertEquals("timesheet.error.timeperiodOverlapDetection", ex.getI18nKey());
     }
     txTemplate.execute(new TransactionCallback() {
-      public Object doInTransaction(TransactionStatus status)
+      public Object doInTransaction(final TransactionStatus status)
       {
-        TimesheetDO t = timesheetDao.internalGetById(id2);
+        final TimesheetDO t = timesheetDao.internalGetById(id2);
         timesheetDao.markAsDeleted(t); // Delete conflicting time sheet
         return null;
       }
@@ -195,7 +195,7 @@ public class TimesheetTest extends TestBase
     try {
       timesheetDao.undelete(ts2); // Overlap with ts1!
       fail();
-    } catch (UserException ex) {
+    } catch (final UserException ex) {
       assertEquals("timesheet.error.timeperiodOverlapDetection", ex.getI18nKey());
     }
   }
@@ -223,25 +223,25 @@ public class TimesheetTest extends TestBase
     try {
       timesheetDao.save(sheet);
       fail("AccessException caused by time sheet violation expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       // OK
     }
     setTimeperiod(sheet, 2008, Calendar.OCTOBER, 31, 23, 45, 31, 0, 15); // 10/30 from 23:45 to 00:15
     try {
       timesheetDao.save(sheet);
       fail("AccessException caused by time sheet violation expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       // OK
     }
     setTimeperiod(sheet, 2008, Calendar.NOVEMBER, 1, 0, 0, 1, 2, 15); // 11/01 from 00:00 to 02:15
-    Serializable id = timesheetDao.save(sheet);
+    final Serializable id = timesheetDao.save(sheet);
     sheet = timesheetDao.getById(id);
     date.setDate(2008, Calendar.OCTOBER, 31, 23, 45, 0);
     sheet.setStartTime(date.getTimestamp());
     try {
       timesheetDao.update(sheet);
       fail("AccessException caused by time sheet violation expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       // OK
     }
     task = getTask("tpt.2");
@@ -255,14 +255,14 @@ public class TimesheetTest extends TestBase
     try {
       timesheetDao.update(sheet);
       fail("AccessException caused by time sheet violation expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       // OK
     }
     sheet = timesheetDao.getById(id);
     try {
       timesheetDao.markAsDeleted(sheet);
       fail("AccessException caused by time sheet violation expected.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       // OK
     }
   }
@@ -287,25 +287,25 @@ public class TimesheetTest extends TestBase
     try {
       timesheetDao.save(sheet);
       fail("Exception expected: Task should not be bookable because parent task is closed.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       // OK
     }
     sheet.setTask(getTask("dB.1"));
     try {
       timesheetDao.save(sheet);
       fail("Exception expected: Task should not be bookable because parent task is closed.");
-    } catch (AccessException ex) {
+    } catch (final AccessException ex) {
       // OK
     }
   }
 
-  private void setTimeperiod(TimesheetDO timesheet, int fromDay, int fromHour, int fromMinute, int toDay, int toHour, int toMinute)
+  private void setTimeperiod(final TimesheetDO timesheet, final int fromDay, final int fromHour, final int fromMinute, final int toDay, final int toHour, final int toMinute)
   {
     setTimeperiod(timesheet, 1970, Calendar.NOVEMBER, fromDay, fromHour, fromMinute, toDay, toHour, toMinute);
   }
 
-  private void setTimeperiod(TimesheetDO timesheet, int year, int month, int fromDay, int fromHour, int fromMinute, int toDay, int toHour,
-      int toMinute)
+  private void setTimeperiod(final TimesheetDO timesheet, final int year, final int month, final int fromDay, final int fromHour, final int fromMinute, final int toDay, final int toHour,
+      final int toMinute)
   {
     date.setDate(year, month, fromDay, fromHour, fromMinute, 0);
     timesheet.setStartTime(date.getTimestamp());

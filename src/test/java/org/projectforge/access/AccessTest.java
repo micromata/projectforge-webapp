@@ -34,10 +34,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;
-import org.projectforge.access.AccessDao;
-import org.projectforge.access.AccessEntryDO;
-import org.projectforge.access.AccessType;
-import org.projectforge.access.GroupTaskAccessDO;
 import org.projectforge.task.TaskDO;
 import org.projectforge.task.TaskDao;
 import org.projectforge.test.TestBase;
@@ -45,7 +41,6 @@ import org.projectforge.timesheet.TimesheetDO;
 import org.projectforge.timesheet.TimesheetDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserGroupCache;
-
 
 public class AccessTest extends TestBase
 {
@@ -59,22 +54,22 @@ public class AccessTest extends TestBase
 
   private UserGroupCache userGroupCache;
 
-  public void setAccessDao(AccessDao accessDao)
+  public void setAccessDao(final AccessDao accessDao)
   {
     this.accessDao = accessDao;
   }
 
-  public void setTaskDao(TaskDao taskDao)
+  public void setTaskDao(final TaskDao taskDao)
   {
     this.taskDao = taskDao;
   }
 
-  public void setTimesheetDao(TimesheetDao timesheetDao)
+  public void setTimesheetDao(final TimesheetDao timesheetDao)
   {
     this.timesheetDao = timesheetDao;
   }
 
-  public void setUserGroupCache(UserGroupCache userGroupCache)
+  public void setUserGroupCache(final UserGroupCache userGroupCache)
   {
     this.userGroupCache = userGroupCache;
   }
@@ -83,17 +78,17 @@ public class AccessTest extends TestBase
   public void testAccessDO()
   {
     logon(TEST_ADMIN_USER);
-    List<GroupTaskAccessDO> list = accessDao.internalLoadAll();
-    for (GroupTaskAccessDO access : list) {
+    final List<GroupTaskAccessDO> list = accessDao.internalLoadAll();
+    for (final GroupTaskAccessDO access : list) {
       log.info(access);
     }
     getInitTestDB().addTask("accesstest", "root");
     GroupTaskAccessDO groupTaskAccess = new GroupTaskAccessDO();
     accessDao.setTask(groupTaskAccess, getTask("accesstest").getId());
     groupTaskAccess.setGroup(getGroup(TEST_GROUP));
-    AccessEntryDO taskEntry = groupTaskAccess.ensureAndGetAccessEntry(AccessType.TASKS);
+    final AccessEntryDO taskEntry = groupTaskAccess.ensureAndGetAccessEntry(AccessType.TASKS);
     taskEntry.setAccess(true, true, true, true);
-    AccessEntryDO timesheetEntry = groupTaskAccess.ensureAndGetAccessEntry(AccessType.TIMESHEETS);
+    final AccessEntryDO timesheetEntry = groupTaskAccess.ensureAndGetAccessEntry(AccessType.TIMESHEETS);
     timesheetEntry.setAccess(false, false, false, false);
     final Serializable id = accessDao.save(groupTaskAccess);
     groupTaskAccess = accessDao.getById(id);
@@ -113,7 +108,7 @@ public class AccessTest extends TestBase
   public void checkTaskMoves()
   {
     // First check initialization:
-    PFUserDO user1 = getUser("user1");
+    final PFUserDO user1 = getUser("user1");
     assertTrue("user1 should be member of group1", userGroupCache.isUserMemberOfGroup(user1.getId(), getGroup("group1").getId()));
     assertFalse("user1 should not be member of group3", userGroupCache.isUserMemberOfGroup(user1.getId(), getGroup("group3").getId()));
     initTestDB.addTask("checkTaskMoves", "root");
@@ -141,15 +136,15 @@ public class AccessTest extends TestBase
     timesheet.setUser(getUser("user1"));
     timesheet.setLocation("Office");
     timesheet.setDescription("A lot of stuff done and more.");
-    long current = System.currentTimeMillis();
+    final long current = System.currentTimeMillis();
     timesheet.setStartTime(new Timestamp(current));
-    timesheet.setStopTime(new Timestamp(current + 60 * 60 *1000));
-    Serializable id = timesheetDao.internalSave(timesheet);
+    timesheet.setStopTime(new Timestamp(current + 2 * 60 * 60 * 1000));
+    final Serializable id = timesheetDao.internalSave(timesheet);
 
     logon(user1); // user1 is in group1, but not in group3
     timesheet = timesheetDao.getById(id); // OK, because is selectable for group1
     // Move task ctm.child to cTm.2 with no access to user1:
-    TaskDO childTask = getTask("cTm.child");
+    final TaskDO childTask = getTask("cTm.child");
     childTask.setParentTask(getTask("cTm.2"));
     taskDao.internalUpdate(childTask);
     // try {
@@ -164,7 +159,8 @@ public class AccessTest extends TestBase
     // }
   }
 
-  private void checkAccessEntry(AccessEntryDO entry, boolean accessSelect, boolean accessInsert, boolean accessUpdate, boolean accessDelete)
+  private void checkAccessEntry(final AccessEntryDO entry, final boolean accessSelect, final boolean accessInsert,
+      final boolean accessUpdate, final boolean accessDelete)
   {
     assertNotNull(entry);
     assertEquals(accessSelect, entry.getAccessSelect());
