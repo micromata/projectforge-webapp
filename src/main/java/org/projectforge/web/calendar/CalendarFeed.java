@@ -97,7 +97,7 @@ public class CalendarFeed extends HttpServlet
     }
 
     resp.setContentType("text/calendar");
-    final CalendarOutputter output = new CalendarOutputter();
+    final CalendarOutputter output = new CalendarOutputter(false);
     try {
       output.output(calendar, resp.getOutputStream());
     } catch (final ValidationException ex) {
@@ -147,6 +147,9 @@ public class CalendarFeed extends HttpServlet
         new ProdId("-//" + user.getDisplayUsername() + "//ProjectForge//" + locale.toString().toUpperCase()));
     calendar.getProperties().add(Version.VERSION_2_0);
     calendar.getProperties().add(CalScale.GREGORIAN);
+
+    // setup event is needed for empty calendars
+    calendar.getComponents().add(new VEvent(new net.fortuna.ical4j.model.Date(0), "SETUP EVENT"));
 
     // adding events
     for (final VEvent event : getEvents()) {

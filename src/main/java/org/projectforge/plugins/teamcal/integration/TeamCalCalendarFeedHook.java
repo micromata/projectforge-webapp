@@ -91,7 +91,7 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
                 final net.fortuna.ical4j.model.Date fortunaEndDate = new net.fortuna.ical4j.model.Date(jodaTime.plusDays(1).getMillis());
                 dtEnd.setDate(fortunaEndDate);
                 String calendarName = "";
-                if (teamEvents.size() > 1) {
+                if (teamCalIds.length > 1) {
                   calendarName = " ("
                       + teamEvent.getCalendar().getTitle()
                       + ")";
@@ -106,18 +106,23 @@ public class TeamCalCalendarFeedHook implements CalendarFeedHook
                 date.setTime(teamEvent.getEndDate().getTime());
                 cal.setTime(date);
                 final DateTime stopTime = getCalTime(timezone, cal);
-                vEvent = new VEvent(startTime, stopTime, teamEvent.getSubject() + " (" + teamEvent.getCalendar().getTitle() + ")");
+                String calendarName = "";
+                if (teamCalIds.length > 1) {
+                  calendarName = " ("
+                      + teamEvent.getCalendar().getTitle()
+                      + ")";
+                }
+                vEvent = new VEvent(startTime, stopTime, teamEvent.getSubject() + calendarName);
                 vEvent.getProperties().add(new Uid(startTime.toString()));
               }
 
-              // TODO Sichtbarkeit
               vEvent.getProperties().add(new Location(teamEvent.getLocation()));
               vEvent.getProperties().add(new Name(teamEvent.getCalendar().getTitle()));
-              // vEvent.getProperties().add(new Note(teamEvent.getNote()));
 
               events.add(vEvent);
             }
           }
+
         }
       }
       return events;

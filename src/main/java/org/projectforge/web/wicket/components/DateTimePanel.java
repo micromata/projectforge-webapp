@@ -332,4 +332,21 @@ public class DateTimePanel extends FormComponentPanel<Date> implements Component
   {
     return datePanel.getComponentOutputId();
   }
+
+  /**
+   * @return the minuteDropDownChoice
+   */
+  public DropDownChoice<Integer> getMinuteDropDownChoice()
+  {
+    return minuteDropDownChoice;
+  }
+
+  /**
+   * @return the hourOfDayDropDownChoice
+   */
+  public DropDownChoice<Integer> getHourOfDayDropDownChoice()
+  {
+    return hourOfDayDropDownChoice;
+  }
+
 }
