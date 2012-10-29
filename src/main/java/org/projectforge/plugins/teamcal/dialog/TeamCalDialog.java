@@ -84,6 +84,36 @@ public class TeamCalDialog extends PFDialog
   }
 
   /**
+   * @see org.projectforge.web.dialog.PFDialog#open(org.apache.wicket.ajax.AjaxRequestTarget)
+   */
+  @Override
+  public void open(final AjaxRequestTarget target)
+  {
+    newFilter.updateTeamCalendarFilter(currentFilter);
+    // this assignment is wanted to prevent auto save "final" action
+    if (StringUtils.isBlank(newFilter.getSelectedCalendar())
+        || TimesheetEventsProvider.EVENT_CLASS_NAME.equals(newFilter.getSelectedCalendar())) {
+      selectedDefaultCalendar = timeSheetCalendar;
+    } else {
+      // get teamCal
+      selectedDefaultCalendar = TeamCalEventProvider.getTeamCalForEncodedId(teamCalDao, newFilter.getSelectedCalendar());
+      if (selectedDefaultCalendar == null) {
+        selectedDefaultCalendar = timeSheetCalendar;
+      }
+    }
+    super.open(target);
+  }
+
+  /**
+   * @see org.projectforge.web.dialog.PFDialog#isRefreshedOnOpen()
+   */
+  @Override
+  protected boolean isRefreshedOnOpen()
+  {
+    return true;
+  }
+
+  /**
    * @see org.projectforge.web.dialog.PFDialog#onInitialize()
    */
   @Override
@@ -92,16 +122,6 @@ public class TeamCalDialog extends PFDialog
     super.onInitialize();
     timeSheetCalendar.setTitle(getString("plugins.teamcal.timeSheetCalendar"));
     timeSheetCalendar.setId(TIMESHEET_CALENDAR_ID);
-    // this assignment is wanted to prevent auto save "final" action
-    if(StringUtils.isBlank(newFilter.getSelectedCalendar()) || TimesheetEventsProvider.EVENT_CLASS_NAME.equals(newFilter.getSelectedCalendar())) {
-      selectedDefaultCalendar = timeSheetCalendar;
-    } else {
-      // get teamCal
-      selectedDefaultCalendar = TeamCalEventProvider.getTeamCalForEncodedId(teamCalDao, newFilter.getSelectedCalendar());
-      if(selectedDefaultCalendar == null) {
-        selectedDefaultCalendar = timeSheetCalendar;
-      }
-    }
 
     // confirm
     appendNewAjaxActionButton(new AjaxCallback() {
@@ -138,11 +158,12 @@ public class TeamCalDialog extends PFDialog
 
   /**
    * Inner class to represent the actual dialog content
-   *
+   * 
    */
   private class Content extends Panel
   {
     private static final long serialVersionUID = -135497846745050310L;
+
     private Select<TeamCalDO> select;
 
     /**
@@ -226,7 +247,6 @@ public class TeamCalDialog extends PFDialog
       });
       add(teamCalChoice);
 
-
       final IOptionRenderer<TeamCalDO> renderer = new IOptionRenderer<TeamCalDO>() {
         private static final long serialVersionUID = 4233157357375064338L;
 
@@ -267,9 +287,9 @@ public class TeamCalDialog extends PFDialog
         protected void onModelChanged()
         {
           super.onModelChanged();
-          if(timeSheetCalendar.equals(selectedDefaultCalendar) || selectedDefaultCalendar == null) {
+          if (timeSheetCalendar.equals(selectedDefaultCalendar) || selectedDefaultCalendar == null) {
             newFilter.setSelectedCalendar(TimesheetEventsProvider.EVENT_CLASS_NAME);
-          }else{
+          } else {
             newFilter.setSelectedCalendar(TeamCalEventProvider.EVENT_CLASS_NAME + "-" + selectedDefaultCalendar.getId());
           }
         }

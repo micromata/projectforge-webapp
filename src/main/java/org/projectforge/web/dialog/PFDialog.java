@@ -15,6 +15,7 @@ import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.behavior.AttributeAppender;
 import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.panel.EmptyPanel;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
@@ -35,6 +36,8 @@ import de.micromata.wicket.ajax.MDefaultAjaxBehavior;
 public abstract class PFDialog extends Panel
 {
   private static final long serialVersionUID = -2542957111789393810L;
+
+  private static final String WID_CONTENT = "dialogContent";
 
   private WebMarkupContainer dialogContainer;
 
@@ -72,8 +75,11 @@ public abstract class PFDialog extends Panel
     dialogContainer.setOutputMarkupId(true);
     dialogContainer.add(new AttributeAppender("title", titleModel));
     add(dialogContainer);
-    dialogContainer.add(getDialogContent("dialogContent"));
-
+    if(isRefreshedOnOpen() == true) {
+      dialogContainer.add(new EmptyPanel(WID_CONTENT));
+    } else {
+      dialogContainer.add(getDialogContent(WID_CONTENT));
+    }
     final Form<String> buttonForm = new Form<String>("buttonForm", Model.of("")) {
       private static final long serialVersionUID = 4536735016945915848L;
 
@@ -113,6 +119,10 @@ public abstract class PFDialog extends Panel
    */
   public void open(final AjaxRequestTarget target)
   {
+    if (isRefreshedOnOpen() == true) {
+      this.dialogContainer.replace(getDialogContent(WID_CONTENT));
+      target.add(this.dialogContainer);
+    }
     String jsFunction = "";
     if (this.onCloseCallback != null) {
       jsFunction = "function() { wicketAjaxGet('" + onCloseBehavior.getCallbackUrl() + "'); }";
@@ -120,6 +130,16 @@ public abstract class PFDialog extends Panel
       jsFunction = "function() {}";
     }
     target.appendJavaScript("openDialog('" + dialogContainer.getMarkupId() + "', " + jsFunction + ");");
+  }
+
+  /**
+   * Indicated if the dialog should be refreshed each open(..) call.
+   * 
+   * @return
+   */
+  protected boolean isRefreshedOnOpen()
+  {
+    return false;
   }
 
   /**

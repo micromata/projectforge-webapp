@@ -112,7 +112,10 @@ public class TeamCalCalendarFilter extends CalendarFilter
   }
 
   public void updateTeamCalendarFilter(final TeamCalCalendarFilter updatedFilter) {
-    this.calendarMap = updatedFilter.calendarMap;
+    this.calendarMap = new HashMap<Integer, String>();
+    for (final Integer key : updatedFilter.calendarMap.keySet()) {
+      this.calendarMap.put(key, updatedFilter.calendarMap.get(key));
+    }
     this.setSelectedCalendar(updatedFilter.getSelectedCalendar());
   }
 }
