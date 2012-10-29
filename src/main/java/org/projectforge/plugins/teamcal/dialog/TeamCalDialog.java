@@ -123,18 +123,6 @@ public class TeamCalDialog extends PFDialog
     timeSheetCalendar.setTitle(getString("plugins.teamcal.timeSheetCalendar"));
     timeSheetCalendar.setId(TIMESHEET_CALENDAR_ID);
 
-    // confirm
-    appendNewAjaxActionButton(new AjaxCallback() {
-      private static final long serialVersionUID = -8741086877308855477L;
-
-      @Override
-      public void callback(final AjaxRequestTarget target)
-      {
-        currentFilter.updateTeamCalendarFilter(newFilter);
-        setResponsePage(getPage().getClass(), getPage().getPageParameters());
-      }
-    }, "Ok", SingleButtonPanel.DEFAULT_SUBMIT);
-
     // close button
     appendNewAjaxActionButton(new AjaxCallback() {
       private static final long serialVersionUID = -8154276568761839693L;
@@ -145,6 +133,18 @@ public class TeamCalDialog extends PFDialog
         TeamCalDialog.this.close(target);
       }
     }, getString("cancel"), SingleButtonPanel.CANCEL);
+
+    // confirm
+    appendNewAjaxActionButton(new AjaxCallback() {
+      private static final long serialVersionUID = -8741086877308855477L;
+
+      @Override
+      public void callback(final AjaxRequestTarget target)
+      {
+        currentFilter.updateTeamCalendarFilter(newFilter);
+        setResponsePage(getPage().getClass(), getPage().getPageParameters());
+      }
+    }, getString("change"), SingleButtonPanel.DEFAULT_SUBMIT);
   }
 
   /**

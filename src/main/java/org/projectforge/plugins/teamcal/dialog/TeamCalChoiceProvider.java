@@ -69,7 +69,8 @@ public class TeamCalChoiceProvider extends TextChoiceProvider<TeamCalDO>
   public void query(String term, final int page, final Response<TeamCalDO> response)
   {
     // add all access groups
-    final List<TeamCalDO> fullAccessTeamCals = getTeamCalDao().getTeamCalsByAccess(PFUserContext.getUser(),
+    final boolean ownTeamCals = true;
+    final List<TeamCalDO> fullAccessTeamCals = getTeamCalDao().getTeamCalsByAccess(PFUserContext.getUser(), ownTeamCals,
         TeamCalDao.FULL_ACCESS_GROUP, TeamCalDao.READONLY_ACCESS_GROUP, TeamCalDao.MINIMAL_ACCESS_GROUP);
     final List<TeamCalDO> result = new ArrayList<TeamCalDO>();
     term = term.toLowerCase();

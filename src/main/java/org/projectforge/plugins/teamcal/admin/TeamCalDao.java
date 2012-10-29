@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 import org.projectforge.core.BaseDao;
@@ -138,55 +137,26 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
    * @param user - where user is owner
    * @param accessGroup - where user has given access. if accessGroup == null, only get groups, where user is owner
    */
-  public List<TeamCalDO> getTeamCalsByAccess(final PFUserDO user, final String... accessGroup) {
+  public List<TeamCalDO> getTeamCalsByAccess(final PFUserDO user, final boolean own, final String... accessGroup) {
     final QueryFilter queryFilter = new QueryFilter();
 
     if (accessGroup != null && user != null) {
       final Collection<Integer> groupIdsRequestedUser = userGroupCache.getUserGroups(user);
-      final Iterator<Integer> itRequested = groupIdsRequestedUser.iterator();
-
-      // get teamCals where user has access
-      String query = "FROM TeamCalDO WHERE owner = " + user.getId();
-
-      while (itRequested.hasNext()) {
-        final GroupDO g = userGroupCache.getGroup(itRequested.next());
-        if (g != null)
-          for (int i = 0; i < accessGroup.length; i++) {
-            if (accessGroup[i] != null)
-              query = query + " OR " + accessGroup[i] + " = " + g.getId();
-          }
-      }
-      @SuppressWarnings("unchecked")
-      final List<TeamCalDO> results = getHibernateTemplate().find(query);
-      return getListFilteredByAccess(results);
-    } else {
-      if (user != null) {
-        // get teamCals where user is owner
-        queryFilter.add(Restrictions.eq("owner", user));
-        return getListFilteredByAccess(getList(queryFilter));
-      } else
-        return new ArrayList<TeamCalDO>();
-    }
-  }
-
-  private List<TeamCalDO> getFilteredList(final PFUserDO user, final String... accessGroup) {
-    final QueryFilter queryFilter = new QueryFilter();
-
-    if (accessGroup != null && user != null) {
-      final Collection<Integer> groupIdsRequestedUser = userGroupCache.getUserGroups(user);
-      final Iterator<Integer> itRequested = groupIdsRequestedUser.iterator();
+      final Iterator<Integer> iteratorRequestedGroups = groupIdsRequestedUser.iterator();
 
       // get teamCals where current user has access
       queryFilter.add(Restrictions.disjunction());
       final Disjunction disjunction = Restrictions.disjunction();
-      //      for (final Integer id : grantedGroupIds) {
-      while (itRequested.hasNext()) {
-        final GroupDO g = userGroupCache.getGroup(itRequested.next());
+      while (iteratorRequestedGroups.hasNext()) {
+        final GroupDO g = userGroupCache.getGroup(iteratorRequestedGroups.next());
         if (g != null)
           for (int i = 0; i < accessGroup.length; i++) {
             if (accessGroup[i] != null)
               disjunction.add(Restrictions.eq(accessGroup[i], g));
           }
+      }
+      if (own == true) {
+        disjunction.add(Restrictions.eq("owner", user));
       }
       queryFilter.add(disjunction);
     } else {
@@ -213,32 +183,21 @@ public class TeamCalDao extends BaseDao<TeamCalDO>
     else {
       final PFUserDO user = userGroupCache.getUser(tFilter.getOwnerId());
       final String accessGroups[] = new String[ACCESS_GROUP_COUNT];
-      boolean filteredList = false;
+      boolean ownTeamCals = false;
       if (tFilter.isFullAccess() == true) {
         accessGroups[0] = FULL_ACCESS_GROUP;
-        filteredList = true;
       }
       if (tFilter.isReadOnlyAccess() == true) {
         accessGroups[1] = READONLY_ACCESS_GROUP;
-        filteredList = true;
       }
       if (tFilter.isMinimalAccess() == true) {
         accessGroups[2] = MINIMAL_ACCESS_GROUP;
-        filteredList = true;
+      }
+      if (tFilter.isOwn() == true) {
+        ownTeamCals = true;
       }
 
-      if (ObjectUtils.equals(user.getId(), PFUserContext.getUserId()) == true) {
-        if (filteredList == true)
-          return getFilteredList(user, accessGroups);
-        else
-          return getTeamCalsByAccess(user, accessGroups);
-      }
-      else {
-        if (filteredList == true)
-          return getFilteredList(user, accessGroups);
-        else
-          return getTeamCalsByAccess(user, accessGroups);
-      }
+      return getTeamCalsByAccess(user, ownTeamCals, accessGroups);
     }
   }
 

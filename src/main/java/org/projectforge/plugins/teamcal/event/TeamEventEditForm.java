@@ -9,13 +9,11 @@
 
 package org.projectforge.plugins.teamcal.event;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.log4j.Logger;
-import org.apache.wicket.Component;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.Model;
@@ -44,7 +42,7 @@ import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 /**
  * form to edit team events.
  * 
- * @author Maximilian Lauterbach (m.lauterbach@micromata.de)
+ * @author M. Lauterbach (m.lauterbach@micromata.de)
  *
  */
 public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEditPage>
@@ -62,14 +60,11 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   @SpringBean(name = "userGroupCache")
   private UserGroupCache userGroupCache;
 
-  @SuppressWarnings("unused")
-  private int stopHourOfDay, stopMinute;
-
   private DateTimePanel startDateTimePanel;
 
   private DateTimePanel endDateTimePanel;
 
-  private final List<Component> timeComponents;
+  private boolean dateDropChoiceVisibel;
 
   private boolean access;
 
@@ -80,7 +75,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   public TeamEventEditForm(final TeamEventEditPage parentPage, final TeamEventDO data)
   {
     super(parentPage, data);
-    timeComponents = new ArrayList<Component>();
   }
 
   /**
@@ -91,7 +85,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   {
     super.init();
 
-    gridBuilder.newGrid16();
+    gridBuilder.newGrid8();
 
     final TeamCalDO teamCal = data.getCalendar();
 
@@ -158,30 +152,58 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
         fieldSet.setEnabled(false);
     }
 
+    gridBuilder.newGrid8();
     // add date panel
     initDatePanel();
 
     {
       // ALL DAY CHECKBOX
       final FieldsetPanel fieldSet = gridBuilder.newFieldset("", true).setNoLabelFor();
-      //      fieldSet.add(new AjaxFormComponentUpdatingBehavior("onChange") {
-      //
-      //        @Override
-      //        protected void onUpdate(final AjaxRequestTarget target)
-      //        {
-      //          for (final Component c : timeComponents)
-      //            c.setVisible(!data.isAllDay());
-      //          AjaxRequestTarget.get().add(startDateTimePanel);
-      //          AjaxRequestTarget.get().add(endDateTimePanel);
-      //        }
-      //      });
       final DivPanel divPanel = fieldSet.addNewCheckBoxDiv();
       final CheckBoxPanel checkBox = new CheckBoxPanel(divPanel.newChildId(), new PropertyModel<Boolean>(data, "allDay"), getString("plugins.teamevent.allDay"));
+      setDateDropChoiceVisibel(data.isAllDay());
+      //      checkBox.getCheckBox().add(new AjaxEventBehavior("onClick") {
+      //        private static final long serialVersionUID = 6785152560916965494L;
+      //
+      //        @Override
+      //        protected void onEvent(final AjaxRequestTarget target)
+      //        {
+      //          if (getDateDropChoiceVisibel() == true)
+      //            setDateDropChoiceVisibel(true);
+      //          else
+      //            setDateDropChoiceVisibel(false);
+      //
+      //          final Iterator<Component> startDateIterator = startDateTimePanel.iterator();
+      //          while (startDateIterator.hasNext()) {
+      //            final Component comp = startDateIterator.next();
+      //            if (comp instanceof DropDownChoice<?>) {
+      //              comp.setVisible(getDateDropChoiceVisibel());
+      //            }
+      //          }
+      //          final Iterator<Component> endDateIterator = endDateTimePanel.iterator();
+      //          while (endDateIterator.hasNext()) {
+      //            final Component comp = endDateIterator.next();
+      //            if (comp instanceof DropDownChoice<?>) {
+      //              comp.setVisible(getDateDropChoiceVisibel());
+      //            }
+      //          }
+      //          target.add(startDateTimePanel);
+      //          target.add(endDateTimePanel);
+      //        }
+      //      });
       divPanel.add(checkBox);
       fieldSet.add(divPanel);
       if (access == false)
         fieldSet.setEnabled(false);
     }
+  }
+
+  private void setDateDropChoiceVisibel(final boolean visible) {
+    this.dateDropChoiceVisibel = visible;
+  }
+
+  private boolean getDateDropChoiceVisibel() {
+    return dateDropChoiceVisibel;
   }
 
   /**
@@ -198,7 +220,8 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
       final Label teamCalTitle = new Label(fieldSet.newChildId(), new PropertyModel<String>(data, "calendar.getTitle()"));
       fieldSet.add(teamCalTitle);
     } else {
-      final List<TeamCalDO> list = teamCalDao.getTeamCalsByAccess(getUser(), TeamCalDao.FULL_ACCESS_GROUP);
+      final boolean ownTeamCals = true;
+      final List<TeamCalDO> list = teamCalDao.getTeamCalsByAccess(getUser(), ownTeamCals, TeamCalDao.FULL_ACCESS_GROUP);
       final PropertyModel<TeamCalDO> selectModel = new PropertyModel<TeamCalDO>(data, "calendar");
       final DropDownChoice<TeamCalDO> teamCalDrop = new DropDownChoice<TeamCalDO>(fieldSet.getDropDownChoiceId(),
           selectModel, list, getLabeledList(list)){
@@ -234,15 +257,7 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     startDateTimePanel = new DateTimePanel(startDateField.newChildId(), new PropertyModel<Date>(data, "startDate"),
         (DateTimePanelSettings) DateTimePanelSettings.get().withSelectStartStopTime(true).withTargetType(java.sql.Timestamp.class)
         .withRequired(true), DatePrecision.MINUTE_15);
-//    startDateTimePanel.setOutputMarkupId(true);
-//    final Iterator<Component> startDateDropdown = startDateTimePanel.iterator();
-//    int i = 0;
-//    while (startDateDropdown.hasNext()) {
-//      final Component comp = startDateDropdown.next();
-//      i++;
-//      if (comp instanceof DropDownChoice<?>)
-//        timeComponents.add(comp);
-//    }
+    startDateTimePanel.setOutputMarkupId(true);
     startDateField.add(startDateTimePanel);
     dateFieldToolTip(startDateTimePanel);
 
@@ -254,6 +269,23 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     endDateTimePanel.setOutputMarkupId(true);
     endDateField.add(endDateTimePanel);
     dateFieldToolTip(endDateTimePanel);
+
+    //    final Iterator<Component> startDateIterator = startDateTimePanel.iterator();
+    //    while (startDateIterator.hasNext()) {
+    //      final Component comp = startDateIterator.next();
+    //      if (comp instanceof DropDownChoice<?>) {
+    //        //        comp.setOutputMarkupId(true);
+    //        comp.setVisible(!data.isAllDay());
+    //      }
+    //    }
+    //    final Iterator<Component> endDateIterator = endDateTimePanel.iterator();
+    //    while (endDateIterator.hasNext()) {
+    //      final Component comp = endDateIterator.next();
+    //      if (comp instanceof DropDownChoice<?>) {
+    //        //        comp.setOutputMarkupId(true);
+    //        comp.setVisible(!data.isAllDay());
+    //      }
+    //    }
 
     if (access == false) {
       endDateField.setEnabled(false);
@@ -312,8 +344,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
   {
     super.onBeforeRender();
     final DateHolder stopDateHolder = new DateHolder(data.getEndDate(), DatePrecision.MINUTE_15);
-    stopHourOfDay = stopDateHolder.getHourOfDay();
-    stopMinute = stopDateHolder.getMinute();
   }
 
   /**

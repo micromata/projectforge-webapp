@@ -48,7 +48,7 @@ public class TeamCalListForm extends AbstractListForm<TeamCalFilter, TeamCalList
     super.init();
     gridBuilder.newColumnsPanel();
     gridBuilder.newColumnPanel(DivType.COL_66);
-    getSearchFilter().setOwnerId(getUserId());
+    //        getSearchFilter().setOwnerId(getUserId());
     {
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("label.options"), true).setNoLabelFor();
       fs.setOutputMarkupId(true);

@@ -26,19 +26,13 @@ public class TeamCalFilter extends BaseSearchFilter implements Serializable
   private Integer ownerId;
 
   public TeamCalFilter(){
-    own = true;
-    fullAccess = true;
-    readOnlyAccess = true;
-    minimalAccess = true;
+    own = fullAccess = readOnlyAccess = minimalAccess = true;
   }
 
   public TeamCalFilter(final BaseSearchFilter filter)
   {
     super(filter);
-    own = true;
-    fullAccess = true;
-    readOnlyAccess = true;
-    minimalAccess = true;
+    own = fullAccess = readOnlyAccess = minimalAccess = true;
   }
 
   /**

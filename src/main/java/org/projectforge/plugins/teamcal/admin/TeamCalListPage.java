@@ -142,6 +142,11 @@ public class TeamCalListPage extends AbstractListPage<TeamCalListForm, TeamCalDa
     return columns;
   }
 
+  /**
+   * creates an URL for ics export.
+   * 
+   * @param id
+   */
   public void createICalTarget(final Integer id)
   {
     final PFUserDO user = PFUserContext.getUser();
