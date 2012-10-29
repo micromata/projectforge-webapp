@@ -3,7 +3,7 @@
   <groupId>org.projectforge</groupId>
   <artifactId>ProjectForge</artifactId>
   <packaging>war</packaging>
-  <version>4.1.4.11</version>
+  <version>4.1.4.13</version>
   <name>ProjectForge</name>
   <description>
     ProjectForge is a multi user web application for collaborative team work. Organize time sheets, tasks, addresses, books etc. with project teams.
@@ -471,11 +471,7 @@
       <version>4.7</version> <!-- 4.8.2, but no maven repository found. -->
       <scope>test</scope>
     </dependency>
-    <dependency> <!-- Version check: 2010-12-10 -->
-      <groupId>net.sf.ehcache</groupId>
-      <artifactId>ehcache-core</artifactId>
-      <version>2.4.7</version>
-    </dependency>
+
     <dependency> <!-- Version check: 2010-08-28 -->
       <groupId>org.apache.poi</groupId>
       <artifactId>poi</artifactId>
@@ -494,7 +490,17 @@
       <!-- see: http://repository.jboss.org/nexus/content/groups/public/org/hibernate/hibernate-core/ -->
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
-      <version>3.6.9.Final</version>
+      <version>3.6.10.Final</version>
+    </dependency>
+    <!-- dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-ehcache</artifactId>
+      <version>4.1.7.Final</version>
+    </dependency-->
+    <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-core</artifactId>
+      <version>2.4.7</version>
     </dependency>
     <dependency> <!-- Version check: 2010-08-28 -->
       <!-- see: http://repository.jboss.org/nexus/content/groups/public/org/hibernate/hibernate-search/ -->
@@ -624,7 +630,7 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>jackrabbit-core</artifactId>
-      <version>2.4.3</version>
+      <version>2.5.2</version>
       <exclusions>
         <exclusion>
           <groupId>org.apache.lucene</groupId>
