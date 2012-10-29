@@ -179,12 +179,13 @@ public class RechnungEditForm extends AbstractRechnungEditForm<RechnungDO, Rechn
     final TextField<BigDecimal> zahlBetragField = (TextField<BigDecimal>) dependentFormComponents[3];
     final BigDecimal zahlBetrag = zahlBetragField.getConvertedInput();
     final Integer projektId = getData().getProjektId();
-    final String kundeText = getData().getKundeText();
+    final Integer kundeId = getData().getKundeId();
+    final String kundeText = customerSelectPanel.getKundeTextField().getConvertedInput();
     final boolean zahlBetragExists = (zahlBetrag != null && zahlBetrag.compareTo(BigDecimal.ZERO) != 0);
     if (status == RechnungStatus.BEZAHLT && zahlBetragExists == false) {
       addError("fibu.rechnung.error.statusBezahltErfordertZahlBetrag");
     }
-    if (projektId == null && StringUtils.isBlank(kundeText) == true) {
+    if (projektId == null && StringUtils.isBlank(kundeText) == true && kundeId == null) {
       addError("fibu.rechnung.error.kundeTextOderProjektRequired");
     }
   }
