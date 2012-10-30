@@ -26,6 +26,7 @@ package org.projectforge.web.calendar;
 import net.ftlines.wicket.fullcalendar.Event;
 
 import org.apache.wicket.Component;
+import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 import org.projectforge.calendar.DayHolder;
 
@@ -55,7 +56,7 @@ public class HolidayEventsProvider extends MyFullCalendarEventsProvider
   @Override
   protected void buildEvents(final DateTime start, final DateTime end)
   {
-    DateTime day = start;
+    DateMidnight day = new DateMidnight(start);
     int idCounter = 0;
     int paranoiaCounter = 0;
     do {
@@ -83,7 +84,7 @@ public class HolidayEventsProvider extends MyFullCalendarEventsProvider
       final Event event = new Event().setAllDay(true);
       final String id = "h-" + (++idCounter);
       event.setId(id);
-      event.setStart(day);
+      event.setStart(day.toDateTime());
       String title;
       final String holidayInfo = dh.getHolidayInfo();
       if (holidayInfo != null && holidayInfo.startsWith("calendar.holiday.") == true) {
