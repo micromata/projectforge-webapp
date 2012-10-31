@@ -256,4 +256,31 @@ public class LdapUtils
     }
     return buf.toString();
   }
+
+  public static List<String> getMissedObjectClasses(final String[] expectedObjectClasses, final String expectedMainObjectClass,
+      final String[] objectClasses)
+      {
+    List<String> list = null;
+    if (expectedMainObjectClass != null && (objectClasses == null || StringHelper.isIn(expectedMainObjectClass, objectClasses) == false)) {
+      list = addEntry(list, expectedMainObjectClass);
+    }
+    if (expectedObjectClasses != null) {
+      for (final String objectClass : expectedObjectClasses) {
+        // objectClasses of users doesn't match the expected ones.
+        if (objectClasses == null || StringHelper.isIn(objectClass, objectClasses) == false) {
+          list = addEntry(list, objectClass);
+        }
+      }
+    }
+    return list;
+      }
+
+  private static List<String> addEntry(List<String> list, final String entry)
+  {
+    if (list == null) {
+      list = new ArrayList<String>();
+    }
+    list.add(entry);
+    return list;
+  }
 }

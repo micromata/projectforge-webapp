@@ -26,6 +26,9 @@ package org.projectforge.ldap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import java.util.List;
+
+import org.junit.Assert;
 import org.junit.Test;
 
 public class LdapUtilsTest
@@ -73,5 +76,39 @@ public class LdapUtilsTest
     assertEquals("ou=intern,ou=users", LdapUtils.getOrganizationalUnit("cn=hurzel,ou=intern,ou=users", ""));
     assertEquals("ou=intern,ou=users", LdapUtils.getOrganizationalUnit("cn=hurzel,ou=intern", "ou=users"));
     assertEquals("ou=intern,ou=users", LdapUtils.getOrganizationalUnit("cn=hurzel", "ou=intern,ou=users"));
+  }
+
+  @Test
+  public void getMissedObjectClasses()
+  {
+    assertList(LdapUtils.getMissedObjectClasses(null, null, new String[] { "class"}), (String[]) null);
+    assertList(LdapUtils.getMissedObjectClasses(null, "person", new String[] { "class"}), "person");
+    assertList(LdapUtils.getMissedObjectClasses(new String[] { "inetOrgPerson"}, "person", new String[] { "class"}), "person",
+        "inetOrgPerson");
+    assertList(LdapUtils.getMissedObjectClasses(new String[] { "inetOrgPerson", "posixAccount"}, "person", new String[] { "class"}),
+        "person", "inetOrgPerson", "posixAccount");
+    assertList(LdapUtils.getMissedObjectClasses(new String[] { "inetOrgPerson", "posixAccount"}, null, new String[] { "class"}),
+        "inetOrgPerson", "posixAccount");
+    assertList(LdapUtils.getMissedObjectClasses(new String[] { "inetOrgPerson", "posixAccount"}, "person", null), "person",
+        "inetOrgPerson", "posixAccount");
+
+    assertList(LdapUtils.getMissedObjectClasses(new String[] { "inetOrgPerson", "posixAccount"}, "person", new String[] { "person"}),
+        "inetOrgPerson", "posixAccount");
+    assertList(
+        LdapUtils.getMissedObjectClasses(new String[] { "inetOrgPerson", "posixAccount"}, "person", new String[] { "person",
+        "inetOrgPerson"}), "posixAccount");
+  }
+
+  private void assertList(final List<String> list, final String... expected)
+  {
+    if (expected == null) {
+      Assert.assertNull(list);
+      return;
+    }
+    Assert.assertNotNull(list);
+    Assert.assertEquals(expected.length, list.size());
+    for (int i = 0; i < expected.length; i++) {
+      Assert.assertEquals(expected[i], list.get(i));
+    }
   }
 }
