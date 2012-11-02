@@ -26,6 +26,8 @@ package org.projectforge.user;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.projectforge.web.UserFilter;
+
 /**
  * 
  * @author Kai Reinhard (k.reinhard@micromata.de)
@@ -89,7 +91,8 @@ public class Login
     return loginHandler.checkStayLoggedIn(user);
   }
 
-  public void passwordChanged(final PFUserDO user, final String newPassword) {
+  public void passwordChanged(final PFUserDO user, final String newPassword)
+  {
     if (loginHandler == null) {
       log.warn("No login handler is defined yet, so can't handle password-changed request.");
       return;
@@ -100,7 +103,8 @@ public class Login
     loginHandler.passwordChanged(user, newPassword);
   }
 
-  public boolean isPasswordChangeSupported(final PFUserDO user) {
+  public boolean isPasswordChangeSupported(final PFUserDO user)
+  {
     if (loginHandler == null) {
       log.warn("No login handler is defined yet, so can't check support of password-change functionality.");
       return false;
@@ -137,6 +141,10 @@ public class Login
 
   public void afterUserGroupCacheRefresh(final List<PFUserDO> users, final List<GroupDO> groups)
   {
+    if (UserFilter.isUpdateRequiredFirst() == true) {
+      // Don't run e. g. LDAP synchronization because user and groups may not be available!
+      return;
+    }
     if (loginHandler == null) {
       log.warn("No login handler is defined yet, so can't get all groups.");
       return;
