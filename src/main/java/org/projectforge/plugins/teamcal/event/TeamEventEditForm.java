@@ -21,7 +21,6 @@ import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
-import org.joda.time.DateTime;
 import org.projectforge.common.DateHelper;
 import org.projectforge.common.DatePrecision;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
@@ -256,17 +255,6 @@ public class TeamEventEditForm extends AbstractEditForm<TeamEventDO, TeamEventEd
     if (access == false) {
       endDateField.setEnabled(false);
       startDateField.setEnabled(false);
-    }
-    final DateTime endDate = new DateTime(endDateTimePanel.getDate());
-    final DateTime startDate = new DateTime(startDateTimePanel.getDate());
-    if (endDate.getDayOfYear() != startDate.getDayOfYear()) {
-      if (endDate.getMillisOfDay() == 0 && startDate.getMillisOfDay() == 0) {
-        data.setAllDay(true);
-      }
-    } else {
-      if (endDate.getMillisOfDay() == startDate.getMillisOfDay()) {
-        data.setAllDay(true);
-      }
     }
   }
 

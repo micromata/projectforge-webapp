@@ -140,15 +140,15 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
            * necessary, because if more days are selected the calendar sets end time and start time to 00:00 thus the calendar does not
            * select the last day. for example: selected two days, but only one day would be shown.
            */
-          if (endDate.getDayOfYear() != startDate.getDayOfYear()) {
-            if (endDate.getMillisOfDay() == 0 && startDate.getMillisOfDay() == 0) {
-              event.setAllDay(true);
-            }
-          } else {
-            if (endDate.getMillisOfDay() == startDate.getMillisOfDay()) {
-              event.setAllDay(true);
-            }
-          }
+          //          if (endDate.getDayOfYear() != startDate.getDayOfYear()) {
+          //            if (endDate.getMillisOfDay() == 0 && startDate.getMillisOfDay() == 0) {
+          //            event.setAllDay(true);
+          //          }
+          //          } else {
+          //            if (endDate.getMillisOfDay() == startDate.getMillisOfDay()) {
+          //            event.setAllDay(true);
+          //        }
+          //          }
 
           event.setStart(startDate);
           event.setEnd(endDate);

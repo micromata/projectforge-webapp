@@ -52,11 +52,25 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   @Override
   protected void update()
   {
-    if (getData().getStartDate().after(getData().getEndDate())) {
+    if (getData().getStartDate().after(getData().getEndDate()) || isZeroDuration() == false) {
       error(getString("plugins.teamevent.duration.error"));
     } else {
       super.update();
     }
+  }
+
+  /**
+   * false, if there is no duration and all day is not selected.
+   * 
+   * @return
+   */
+  private boolean isZeroDuration() {
+    final long startDate = getData().getStartDate().getTime();
+    final long endDate = getData().getEndDate().getTime();
+    if (startDate == endDate && getData().isAllDay() == false)
+      return false;
+    else
+      return true;
   }
 
   @Override
@@ -75,7 +89,7 @@ public class TeamEventEditPage extends AbstractEditPage<TeamEventDO, TeamEventEd
   @Override
   protected void create()
   {
-    if (getData().getStartDate().after(getData().getEndDate())) {
+    if (getData().getStartDate().after(getData().getEndDate()) || isZeroDuration() == false) {
       error(getString("plugins.teamevent.duration.error"));
     } else {
       super.create();
