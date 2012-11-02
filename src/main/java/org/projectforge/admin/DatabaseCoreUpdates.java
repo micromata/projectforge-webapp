@@ -61,7 +61,7 @@ public class DatabaseCoreUpdates
         CORE_REGION_ID,
         "4.2",
         "2012-08-09",
-        "Adds t_pf_user.authenticationToken|local_user|restricted_user|deactivated, t_group.local_group, t_fibu_rechnung|eingangsrechnung|auftrag(=incoming and outgoing invoice|order).ui_status_as_xml") {
+        "Adds t_pf_user.authenticationToken|local_user|restricted_user|deactivated|ldap_values, t_group.local_group, t_fibu_rechnung|eingangsrechnung|auftrag(=incoming and outgoing invoice|order).ui_status_as_xml") {
       final Table userTable = new Table(PFUserDO.class);
 
       final Table groupTable = new Table(GroupDO.class);
@@ -76,7 +76,7 @@ public class DatabaseCoreUpdates
       public UpdatePreCheckStatus runPreCheck()
       {
         final DatabaseUpdateDao dao = SystemUpdater.instance().databaseUpdateDao;
-        return dao.doesTableAttributesExist(userTable, "authenticationToken", "localUser", "restrictedUser", "deactivated") == true //
+        return dao.doesTableAttributesExist(userTable, "authenticationToken", "localUser", "restrictedUser", "deactivated", "ldapValues") == true //
             && dao.doesTableAttributesExist(groupTable, "localGroup") == true //, "nestedGroupsAllowed", "nestedGroupIds") == true //
             && dao.doesTableAttributesExist(outgoingInvoiceTable, "uiStatusAsXml") == true //
             && dao.doesTableAttributesExist(incomingInvoiceTable, "uiStatusAsXml") == true //
@@ -99,6 +99,9 @@ public class DatabaseCoreUpdates
         }
         if (dao.doesTableAttributesExist(userTable, "deactivated") == false) {
           dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "deactivated").setDefaultValue("false"));
+        }
+        if (dao.doesTableAttributesExist(userTable, "ldapValues") == false) {
+          dao.addTableAttributes(userTable, new TableAttribute(PFUserDO.class, "ldapValues"));
         }
         if (dao.doesTableAttributesExist(groupTable, "localGroup") == false) {
           dao.addTableAttributes(groupTable, new TableAttribute(GroupDO.class, "localGroup").setDefaultValue("false"));

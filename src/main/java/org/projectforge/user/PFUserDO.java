@@ -145,6 +145,8 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private boolean hrPlanning = true;
 
+  private String ldapValues;
+
   @Transient
   public String getShortDisplayName()
   {
@@ -833,6 +835,27 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
   public PFUserDO setDeactivated(final boolean deactivated)
   {
     this.deactivated = deactivated;
+    return this;
+  }
+
+  /**
+   * LDAP values as key-value-pairs, e. g. gidNumber=1000,uidNumber=1001,homeDirectory="/home/kai",shell="/bin/bash". For handling of string values see {@link org.apache.commons.csv.writer.CSVWriter}.
+   * This field is handled by the ldap package and has no further effect in ProjectForge's core package.
+   * @return the ldapValues
+   */
+  @Column(name = "ldap_values", length = 4000)
+  public String getLdapValues()
+  {
+    return ldapValues;
+  }
+
+  /**
+   * @param ldapValues the ldapValues to set
+   * @return this for chaining.
+   */
+  public PFUserDO setLdapValues(final String ldapValues)
+  {
+    this.ldapValues = ldapValues;
     return this;
   }
 
