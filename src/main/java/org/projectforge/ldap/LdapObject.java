@@ -25,6 +25,7 @@ package org.projectforge.ldap;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -40,6 +41,8 @@ public abstract class LdapObject<I extends Serializable>
   protected String commonName;
 
   private String organizationalUnit;
+
+  private String[] objectClasses;
 
   public abstract I getId();
 
@@ -99,6 +102,32 @@ public abstract class LdapObject<I extends Serializable>
   public void setOrganizationalUnit(final String organizationalUnit)
   {
     this.organizationalUnit = organizationalUnit;
+  }
+
+  /**
+   * @return the objectClasses
+   */
+  public String[] getObjectClasses()
+  {
+    return objectClasses;
+  }
+
+  /**
+   * @param objectClasses the objectClasses to set
+   * @return this for chaining.
+   */
+  public void setObjectClasses(final String[] objectClasses)
+  {
+    this.objectClasses = objectClasses;
+  }
+
+  public void addObjectClass(final String objectClass)
+  {
+    if (this.objectClasses == null) {
+      this.objectClasses = new String[] { objectClass};
+    } else {
+      this.objectClasses = (String[])ArrayUtils.add(this.objectClasses, objectClass);
+    }
   }
 
   @Override

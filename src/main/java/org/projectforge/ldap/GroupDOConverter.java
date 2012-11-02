@@ -61,7 +61,7 @@ public class GroupDOConverter
     return pfGroup;
   }
 
-  public static LdapGroup convert(final GroupDO pfGroup, final String baseDN, final Map<Integer, LdapPerson> ldapUserMap)
+  public static LdapGroup convert(final GroupDO pfGroup, final String baseDN, final Map<Integer, LdapUser> ldapUserMap)
   {
     final LdapGroup ldapGroup = new LdapGroup();
     if (pfGroup.getId() != null) {
@@ -76,7 +76,7 @@ public class GroupDOConverter
           // Do not add deleted or deactivated users.
           continue;
         }
-        final LdapPerson ldapUser = ldapUserMap.get(user.getId());
+        final LdapUser ldapUser = ldapUserMap.get(user.getId());
         if (ldapUser != null) {
           ldapGroup.addMember(ldapUser, baseDN);
         } else {

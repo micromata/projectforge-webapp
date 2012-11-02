@@ -59,7 +59,7 @@ import org.projectforge.user.PFUserDO;
  * <li>If a user is deleted in LDAP the user will be marked as deleted also in ProjectForge's data-base. Any login after synchronizing isn't
  * allowed (the stay-logged-in-feature fails also for deleted users).</li>
  * <li>For local users any LDAP setting is ignored.</li>
- * <li>All known ldap person fields of the users are synchronized (given name, surname, e-mail etc.).</li>
+ * <li>All known ldap user fields of the users are synchronized (given name, surname, e-mail etc.).</li>
  * </ul>
  * <h4>Users-groups mode</h4> Not yet supported. No groups will be synchronized.
  * 
@@ -134,7 +134,7 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
     }
     final LoginResult loginResult = new LoginResult();
     final String organizationalUnits = ldapConfig.getUserBase();
-    final LdapPerson ldapUser = ldapUserDao.authenticate(username, password, organizationalUnits);
+    final LdapUser ldapUser = ldapUserDao.authenticate(username, password, organizationalUnits);
     if (ldapUser == null) {
       log.info("User login failed: " + username);
       return loginResult.setLoginResultStatus(LoginResultStatus.FAILED);
@@ -256,11 +256,11 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
       protected Object call() throws NameNotFoundException, Exception
       {
         log.info("Updating LDAP...");
-        final List<LdapPerson> ldapUsers = getAllLdapUsers(ctx);
+        final List<LdapUser> ldapUsers = getAllLdapUsers(ctx);
         final List<PFUserDO> dbUsers = userDao.internalLoadAll();
         final List<PFUserDO> users = new ArrayList<PFUserDO>(ldapUsers.size());
         int error = 0, unmodified = 0, created = 0, updated = 0, deleted = 0, undeleted = 0, ignoredLocalUsers = 0, localUsers = 0;
-        for (final LdapPerson ldapUser : ldapUsers) {
+        for (final LdapUser ldapUser : ldapUsers) {
           try {
             final PFUserDO user = PFUserDOConverter.convert(ldapUser);
             users.add(user);

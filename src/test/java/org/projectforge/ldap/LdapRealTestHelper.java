@@ -63,19 +63,40 @@ public class LdapRealTestHelper
 
   LdapConnector ldapConnector;
 
+  LdapUserDao ldapUserDao;
+
+  LdapPersonDao ldapPersonDao;
+
+  LdapGroupDao ldapGroupDao;
+
+  LdapOrganizationalUnitDao ldapOrganizationalUnitDao;
+
   private String userPath, groupPath;
 
-  public void setup(final LdapOrganizationalUnitDao ldapOrganizationalUnitDao)
+  public LdapRealTestHelper setup()
   {
     if (isAvailable() == true) {
-      ldapOrganizationalUnitDao.createIfNotExist(getUserPath(), "Test area for tests of ProjectForge.");
-      ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.DEACTIVATED_SUB_CONTEXT, "for deactivated users.", getUserPath());
-      ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, "for restricted users.", getUserPath());
-      ldapOrganizationalUnitDao.createIfNotExist(getGroupPath(), "Test area for tests of ProjectForge.");
+      if (ldapOrganizationalUnitDao == null) {
+        ldapPersonDao = new LdapPersonDao();
+        ldapPersonDao.setLdapConnector(ldapConnector);
+        ldapUserDao = new LdapUserDao();
+        ldapUserDao.setLdapConnector(ldapConnector);
+        ldapUserDao.setLdapPersonDao(ldapPersonDao);
+        ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
+        ldapOrganizationalUnitDao.setLdapConnector(ldapConnector);
+        ldapGroupDao = new LdapGroupDao();
+        ldapGroupDao.setLdapConnector(ldapConnector);
+
+        ldapOrganizationalUnitDao.createIfNotExist(getUserPath(), "Test area for tests of ProjectForge.");
+        ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.DEACTIVATED_SUB_CONTEXT, "for deactivated users.", getUserPath());
+        ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, "for restricted users.", getUserPath());
+        ldapOrganizationalUnitDao.createIfNotExist(getGroupPath(), "Test area for tests of ProjectForge.");
+      }
     }
+    return this;
   }
 
-  public void tearDown(final LdapOrganizationalUnitDao ldapOrganizationalUnitDao)
+  public void tearDown()
   {
     if (isAvailable() == true) {
       ldapOrganizationalUnitDao.deleteIfExists(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getUserPath());

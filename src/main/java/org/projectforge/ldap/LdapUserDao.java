@@ -23,6 +23,7 @@
 
 package org.projectforge.ldap;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.naming.NameNotFoundException;
@@ -40,7 +41,7 @@ import org.apache.commons.lang.StringUtils;
 /**
  * @author Kai Reinhard (k.reinhard@micromata.de)
  */
-public class LdapUserDao extends LdapPersonDao
+public class LdapUserDao extends LdapDao<String, LdapUser>
 {
   private static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(LdapUserDao.class);
 
@@ -60,14 +61,18 @@ public class LdapUserDao extends LdapPersonDao
 
   private boolean useUidInDn = false;
 
-  public static boolean isDeactivated(final LdapPerson user)
+  private LdapPersonDao ldapPersonDao;
+
+  public static final String OBJECT_CLASS_POSIX_ACCOUNT = "posixAccount";
+
+  public static boolean isDeactivated(final LdapUser user)
   {
     return user.isDeactivated()
         || user.getOrganizationalUnit() != null
         && LdapUtils.getOu(user.getOrganizationalUnit()).contains(DEACTIVATED_SUB_CONTEXT) == true;
   }
 
-  public static boolean isRestrictedUser(final LdapPerson user)
+  public static boolean isRestrictedUser(final LdapUser user)
   {
     return user.isRestrictedUser()
         || user.getOrganizationalUnit() != null
@@ -80,7 +85,25 @@ public class LdapUserDao extends LdapPersonDao
   }
 
   /**
-   * @see org.projectforge.ldap.LdapPersonDao#getIdAttrId()
+   * @see org.projectforge.ldap.LdapDao#getObjectClass()
+   */
+  @Override
+  protected String getObjectClass()
+  {
+    return ldapPersonDao.getObjectClass();
+  }
+
+  /**
+   * @see org.projectforge.ldap.LdapDao#getAdditionalObjectClasses()
+   */
+  @Override
+  protected String[] getAdditionalObjectClasses()
+  {
+    return ldapPersonDao.getAdditionalObjectClasses();
+  }
+
+  /**
+   * @see org.projectforge.ldap.LdapDao#getIdAttrId()
    */
   @Override
   public String getIdAttrId()
@@ -89,38 +112,39 @@ public class LdapUserDao extends LdapPersonDao
   }
 
   /**
-   * @see org.projectforge.ldap.LdapPersonDao#getId(org.projectforge.ldap.LdapPerson)
+   * @see org.projectforge.ldap.LdapDao#getId(org.projectforge.ldap.LdapUser)
    */
   @Override
-  public String getId(final LdapPerson obj)
+  public String getId(final LdapUser obj)
   {
     return obj.getEmployeeNumber();
   }
 
   /**
-   * @see org.projectforge.ldap.LdapPersonDao#mapToObject(String, javax.naming.directory.Attributes)
+   * @see org.projectforge.ldap.LdapDao#mapToObject(java.lang.String, javax.naming.directory.Attributes)
    */
   @Override
-  protected LdapPerson mapToObject(final String dn, final Attributes attributes) throws NamingException
+  protected LdapUser mapToObject(final String dn, final Attributes attributes) throws NamingException
   {
-    final LdapPerson person = super.mapToObject(dn, attributes);
+    final LdapUser user = new LdapUser();
+    ldapPersonDao.mapToObject(dn, user, attributes);
     if (dn != null) {
       if (dn.contains(DEACTIVATED_SUB_CONTEXT2) == true) {
-        person.setDeactivated(true);
+        user.setDeactivated(true);
       }
       if (dn.contains(RESTRICTED_USER_SUB_CONTEXT2) == true) {
-        person.setRestrictedUser(true);
+        user.setRestrictedUser(true);
       }
 
     }
     final Object userPassword = LdapUtils.getAttributeValue(attributes, "userPassword");
     if (userPassword != null) {
-      person.setPasswordGiven(true);
+      user.setPasswordGiven(true);
     }
-    return person;
+    return user;
   }
 
-  public void deactivateUser(final LdapPerson user)
+  public void deactivateUser(final LdapUser user)
   {
     new LdapTemplate(ldapConnector) {
       @Override
@@ -132,14 +156,12 @@ public class LdapUserDao extends LdapPersonDao
     }.excecute();
   }
 
-  public void deactivateUser(final DirContext ctx, final LdapPerson user) throws NamingException
+  public void deactivateUser(final DirContext ctx, final LdapUser user) throws NamingException
   {
     log.info("Deactivate user: " + buildDn(null, user));
-    final ModificationItem[] modificationItems;
-    short i = 0;
-    modificationItems = new ModificationItem[2];
-    modificationItems[i++] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userPassword", null));
-    modificationItems[i++] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("mail", DEACTIVATED_MAIL));
+    final List<ModificationItem> modificationItems = new ArrayList<ModificationItem>();
+    modificationItems.add(new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userPassword", null)));
+    modificationItems.add(new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("mail", DEACTIVATED_MAIL)));
     buildDn(null, user);
     modify(ctx, user, modificationItems);
     final String ou = user.getOrganizationalUnit();
@@ -162,7 +184,7 @@ public class LdapUserDao extends LdapPersonDao
    * nothing will be done.
    * @param user
    */
-  public void reactivateUser(final LdapPerson user)
+  public void reactivateUser(final LdapUser user)
   {
     new LdapTemplate(ldapConnector) {
       @Override
@@ -174,7 +196,7 @@ public class LdapUserDao extends LdapPersonDao
     }.excecute();
   }
 
-  public void reactivateUser(final DirContext ctx, final LdapPerson user) throws NamingException
+  public void reactivateUser(final DirContext ctx, final LdapUser user) throws NamingException
   {
     log.info("Reactivate deactivated user: " + buildDn(null, user));
     final String ou = LdapUtils.getOu(user.getOrganizationalUnit());
@@ -192,7 +214,7 @@ public class LdapUserDao extends LdapPersonDao
     user.setOrganizationalUnit(newPath);
   }
 
-  void updateActivatedStatus(final DirContext ctx, final LdapPerson user) throws NamingException
+  void updateActivatedStatus(final DirContext ctx, final LdapUser user) throws NamingException
   {
     final String ou = LdapUtils.getOu(user.getOrganizationalUnit());
     if (user.isDeactivated() == true) {
@@ -212,7 +234,7 @@ public class LdapUserDao extends LdapPersonDao
     }
   }
 
-  void updateRestrictedUserStatus(final DirContext ctx, final LdapPerson user) throws NamingException
+  void updateRestrictedUserStatus(final DirContext ctx, final LdapUser user) throws NamingException
   {
     final String ou = LdapUtils.getOu(user.getOrganizationalUnit());
     if (user.isDeactivated() == true) {
@@ -244,7 +266,7 @@ public class LdapUserDao extends LdapPersonDao
     }
   }
 
-  private void setUserAsRestrictedUser(final DirContext ctx, final LdapPerson user) throws NamingException
+  private void setUserAsRestrictedUser(final DirContext ctx, final LdapUser user) throws NamingException
   {
     log.info("Move user to restricted sub context: " + buildDn(null, user));
     if (user.isDeactivated() == true) {
@@ -261,12 +283,12 @@ public class LdapUserDao extends LdapPersonDao
   }
 
   /**
-   * Calls super method and {@link #deactivateUser(DirContext, LdapPerson)} if the given person is deactivated. If the given person is
-   * deleted, nothing will be done.
+   * Calls super method and {@link #deactivateUser(DirContext, LdapUser)} if the given user is deactivated. If the given user is deleted,
+   * nothing will be done.
    * @see org.projectforge.ldap.LdapDao#create(javax.naming.directory.DirContext, org.projectforge.ldap.LdapObject, java.lang.Object[])
    */
   @Override
-  public void create(final DirContext ctx, final String ouBase, final LdapPerson user, final Object... args) throws NamingException
+  public void create(final DirContext ctx, final String ouBase, final LdapUser user, final Object... args) throws NamingException
   {
     if (user.isDeleted() == true) {
       log.info("Given LDAP user is deleted, so the user will not be created in the LDAP system (nothing will be done).");
@@ -285,7 +307,7 @@ public class LdapUserDao extends LdapPersonDao
    * @see org.projectforge.ldap.LdapDao#update(javax.naming.directory.DirContext, org.projectforge.ldap.LdapObject, java.lang.Object[])
    */
   @Override
-  public void update(final DirContext ctx, final String ouBase, final LdapPerson user, final Object... objs) throws NamingException
+  public void update(final DirContext ctx, final String ouBase, final LdapUser user, final Object... objs) throws NamingException
   {
     if (user.isDeleted() == true) {
       log.info("Given LDAP user is deleted, so the user will be removed from the LDAP system.");
@@ -297,10 +319,10 @@ public class LdapUserDao extends LdapPersonDao
     updateRestrictedUserStatus(ctx, user);
   }
 
-  public void changePassword(final LdapPerson user, final String oldPassword, final String newPassword)
+  public void changePassword(final LdapUser user, final String oldPassword, final String newPassword)
   {
     log.info("Change password for " + getObjectClass() + ": " + buildDn(null, user));
-    final ModificationItem[] modificationItems;
+    final List<ModificationItem> modificationItems = new ArrayList<ModificationItem>();
     // Replace the "unicdodePwd" attribute with a new value
     // Password must be both Unicode and a quoted string
     // try {
@@ -309,12 +331,10 @@ public class LdapUserDao extends LdapPersonDao
     // final String newQuotedPassword = "\"" + newPassword + "\"";
     // final byte[] newUnicodePassword = newQuotedPassword.getBytes("UTF-16LE");
     if (oldPassword != null) {
-      modificationItems = new ModificationItem[2];
-      modificationItems[0] = new ModificationItem(DirContext.REMOVE_ATTRIBUTE, new BasicAttribute("userPassword", oldPassword));
-      modificationItems[1] = new ModificationItem(DirContext.ADD_ATTRIBUTE, new BasicAttribute("userPassword", newPassword));
+      modificationItems.add(new ModificationItem(DirContext.REMOVE_ATTRIBUTE, new BasicAttribute("userPassword", oldPassword)));
+      modificationItems.add(new ModificationItem(DirContext.ADD_ATTRIBUTE, new BasicAttribute("userPassword", newPassword)));
     } else {
-      modificationItems = new ModificationItem[1];
-      modificationItems[0] = new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userPassword", newPassword));
+      modificationItems.add(new ModificationItem(DirContext.REPLACE_ATTRIBUTE, new BasicAttribute("userPassword", newPassword)));
     }
     // } catch (final UnsupportedEncodingException ex) {
     // log.error("While encoding passwords with UTF-16LE: " + ex.getMessage(), ex);
@@ -324,9 +344,9 @@ public class LdapUserDao extends LdapPersonDao
     modify(user, modificationItems);
   }
 
-  public LdapPerson findByUsername(final Object username, final String... organizationalUnits)
+  public LdapUser findByUsername(final Object username, final String... organizationalUnits)
   {
-    return (LdapPerson) new LdapTemplate(ldapConnector) {
+    return (LdapUser) new LdapTemplate(ldapConnector) {
       @Override
       protected Object call() throws NameNotFoundException, Exception
       {
@@ -349,10 +369,10 @@ public class LdapUserDao extends LdapPersonDao
     }.excecute();
   }
 
-  public LdapPerson authenticate(final String username, final String userPassword, final String... organizationalUnits)
+  public LdapUser authenticate(final String username, final String userPassword, final String... organizationalUnits)
   {
     String dn;
-    LdapPerson user = null;
+    LdapUser user = null;
     final String searchBase = getSearchBase(organizationalUnits);
     if (StringUtils.isNotBlank(ldapConfig.getManagerUser()) == true && StringUtils.isNotBlank(ldapConfig.getManagerPassword()) == true) {
       user = findByUsername(username, searchBase);
@@ -367,7 +387,7 @@ public class LdapUserDao extends LdapPersonDao
     try {
       ldapConnector.createContext(dn, userPassword);
       log.info("User '" + username + "' (" + dn + ") successfully authenticated.");
-      user = new LdapPerson().setUid(username);
+      user = (LdapUser) new LdapUser().setUid(username);
       return user;
     } catch (final Exception ex) {
       log.error("User '" + username + "' (" + dn + ") with invalid credentials.");
@@ -389,19 +409,21 @@ public class LdapUserDao extends LdapPersonDao
   }
 
   /**
-   * @see org.projectforge.ldap.LdapPersonDao#addModificationItems(java.util.List, org.projectforge.ldap.LdapPerson)
+   * @see org.projectforge.ldap.LdapPDao#getModificationItems(java.util.List, org.projectforge.ldap.LdapUser)
    */
   @Override
-  protected void addModificationItems(final List<ModificationItem> list, final LdapPerson person)
+  protected List<ModificationItem> getModificationItems(List<ModificationItem> list, final LdapUser user)
   {
-    createAndAddModificationItems(list, "cn", person.getCommonName());
+    list = ldapPersonDao.getModificationItems(list, user);
+    createAndAddModificationItems(list, "cn", user.getCommonName());
+    return list;
   }
 
   /**
    * @see org.projectforge.ldap.LdapDao#buildDnIdentifier(org.projectforge.ldap.LdapObject)
    */
   @Override
-  protected String buildDnIdentifier(final LdapPerson obj)
+  protected String buildDnIdentifier(final LdapUser obj)
   {
     if (useUidInDn == true) {
       return "uid=" + obj.getUid();
@@ -423,5 +445,13 @@ public class LdapUserDao extends LdapPersonDao
       return String.valueOf(id);
     }
     return PFUserDOConverter.ID_PREFIX + id;
+  }
+
+  /**
+   * @param ldapPersonDao the ldapPersonDao to set
+   */
+  public void setLdapPersonDao(final LdapPersonDao ldapPersonDao)
+  {
+    this.ldapPersonDao = ldapPersonDao;
   }
 }

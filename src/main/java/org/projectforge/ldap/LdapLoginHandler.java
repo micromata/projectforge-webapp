@@ -82,6 +82,7 @@ public abstract class LdapLoginHandler implements LoginHandler
       // May-be already set by test class.
       ldapUserDao = new LdapUserDao();
       ldapUserDao.setLdapConnector(ldapConnector);
+      ldapUserDao.setLdapPersonDao((LdapPersonDao)new LdapPersonDao().setLdapConnector(ldapConnector));
     }
     if (ldapOrganizationalUnitDao == null) {
       // May-be already set by test class.
@@ -119,17 +120,17 @@ public abstract class LdapLoginHandler implements LoginHandler
     return loginDefaultHandler.isAdminUser(user);
   }
 
-  protected List<LdapPerson> getAllLdapUsers()
+  protected List<LdapUser> getAllLdapUsers()
   {
     final String organizationalUnits = ldapConfig.getUserBase();
-    final List<LdapPerson> ldapUsers = ldapUserDao.findAll(organizationalUnits);
+    final List<LdapUser> ldapUsers = ldapUserDao.findAll(organizationalUnits);
     return ldapUsers;
   }
 
-  protected List<LdapPerson> getAllLdapUsers(final DirContext ctx) throws NamingException
+  protected List<LdapUser> getAllLdapUsers(final DirContext ctx) throws NamingException
   {
     final String organizationalUnits = ldapConfig.getUserBase();
-    final List<LdapPerson> ldapUsers = ldapUserDao.findAll(ctx, organizationalUnits);
+    final List<LdapUser> ldapUsers = ldapUserDao.findAll(ctx, organizationalUnits);
     return ldapUsers;
   }
 

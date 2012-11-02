@@ -35,9 +35,9 @@ public class PFUserDOConverter
 {
   static final String ID_PREFIX = "pf-id-";
 
-  public static Integer getId(final LdapPerson person)
+  public static Integer getId(final LdapUser user)
   {
-    final String employeeNumber = person.getEmployeeNumber();
+    final String employeeNumber = user.getEmployeeNumber();
     if (employeeNumber != null && employeeNumber.startsWith(ID_PREFIX) == true && employeeNumber.length() > ID_PREFIX.length()) {
       final String id = employeeNumber.substring(ID_PREFIX.length());
       return NumberHelper.parseInteger(id);
@@ -45,16 +45,16 @@ public class PFUserDOConverter
     return null;
   }
 
-  public static PFUserDO convert(final LdapPerson person)
+  public static PFUserDO convert(final LdapUser ldapUser)
   {
     final PFUserDO user = new PFUserDO();
-    user.setLastname(person.getSurname());
-    user.setFirstname(person.getGivenName());
-    user.setUsername(person.getUid());
-    user.setId(getId(person));
-    user.setOrganization(person.getOrganization());
-    user.setDescription(person.getDescription());
-    final String[] mails = person.getMail();
+    user.setLastname(ldapUser.getSurname());
+    user.setFirstname(ldapUser.getGivenName());
+    user.setUsername(ldapUser.getUid());
+    user.setId(getId(ldapUser));
+    user.setOrganization(ldapUser.getOrganization());
+    user.setDescription(ldapUser.getDescription());
+    final String[] mails = ldapUser.getMail();
     if (mails != null) {
       for (final String mail : mails) {
         if (StringUtils.isNotEmpty(mail) == true) {
@@ -63,37 +63,37 @@ public class PFUserDOConverter
         }
       }
     }
-    if (person.isDeleted() == true) {
+    if (ldapUser.isDeleted() == true) {
       user.setDeleted(true);
     }
-    if (person.isDeactivated() == true || LdapUserDao.isDeactivated(person) == true) {
+    if (ldapUser.isDeactivated() == true || LdapUserDao.isDeactivated(ldapUser) == true) {
       user.setDeactivated(true);
     }
-    if (person.isRestrictedUser() == true || LdapUserDao.isRestrictedUser(person) == true) {
+    if (ldapUser.isRestrictedUser() == true || LdapUserDao.isRestrictedUser(ldapUser) == true) {
       user.setRestrictedUser(true);
     }
     return user;
   }
 
-  public static LdapPerson convert(final PFUserDO user)
+  public static LdapUser convert(final PFUserDO user)
   {
-    final LdapPerson person = new LdapPerson();
-    person.setSurname(user.getLastname());
-    person.setGivenName(user.getFirstname());
-    person.setUid(user.getUsername());
+    final LdapUser ldapUser = new LdapUser();
+    ldapUser.setSurname(user.getLastname());
+    ldapUser.setGivenName(user.getFirstname());
+    ldapUser.setUid(user.getUsername());
     if (user.getId() != null) {
-      person.setEmployeeNumber(buildEmployeeNumber(user));
+      ldapUser.setEmployeeNumber(buildEmployeeNumber(user));
     }
-    person.setOrganization(user.getOrganization());
-    person.setDescription(user.getDescription());
-    person.setMail(user.getEmail());
-    person.setDeleted(user.isDeleted());
-    person.setDeactivated(user.isDeactivated());
+    ldapUser.setOrganization(user.getOrganization());
+    ldapUser.setDescription(user.getDescription());
+    ldapUser.setMail(user.getEmail());
+    ldapUser.setDeleted(user.isDeleted());
+    ldapUser.setDeactivated(user.isDeactivated());
     if (user.isDeactivated() == true) {
-      person.setMail(LdapUserDao.DEACTIVATED_MAIL);
+      ldapUser.setMail(LdapUserDao.DEACTIVATED_MAIL);
     }
-    person.setRestrictedUser(user.isRestrictedUser());
-    return person;
+    ldapUser.setRestrictedUser(user.isRestrictedUser());
+    return ldapUser;
   }
 
   public static String buildEmployeeNumber(final PFUserDO user)
@@ -120,7 +120,7 @@ public class PFUserDOConverter
    * @param dest
    * @return true if any modification is detected, otherwise false.
    */
-  public static boolean copyUserFields(final LdapPerson src, final LdapPerson dest)
+  public static boolean copyUserFields(final LdapUser src, final LdapUser dest)
   {
     setMailNullArray(src);
     setMailNullArray(dest);
@@ -129,17 +129,17 @@ public class PFUserDOConverter
     return modified;
   }
 
-  static void setMailNullArray(final LdapPerson person)
+  static void setMailNullArray(final LdapUser ldapUser)
   {
-    if (person.getMail() == null) {
+    if (ldapUser.getMail() == null) {
       return;
     }
-    for (final String mail : person.getMail()) {
+    for (final String mail : ldapUser.getMail()) {
       if (mail != null) {
         return;
       }
     }
     // All array entries are null, therefore set the mail value itself to null:
-    person.setMail((String[]) null);
+    ldapUser.setMail((String[]) null);
   }
 }

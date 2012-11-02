@@ -23,7 +23,6 @@
 
 package org.projectforge.ldap;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.naming.NamingException;
@@ -37,7 +36,7 @@ import org.apache.commons.collections.CollectionUtils;
  */
 public class LdapGroupDao extends LdapDao<String, LdapGroup>
 {
-  private static final String[] ADDITIONAL_OBJECT_CLASSES = null;// { "posixGroup"};// null;//{ "groupOfNames"};
+  private static final String[] ADDITIONAL_OBJECT_CLASSES = { "top"};// { "posixGroup"};// null;//{ "groupOfNames"};
 
   private static final String NONE_UNIQUE_MEMBER_ID = "cn=none";
 
@@ -100,9 +99,9 @@ public class LdapGroupDao extends LdapDao<String, LdapGroup>
    * @see org.projectforge.ldap.LdapDao#getModificationItems(org.projectforge.ldap.LdapObject)
    */
   @Override
-  protected ModificationItem[] getModificationItems(final LdapGroup group)
+  protected List<ModificationItem> getModificationItems(List<ModificationItem> list, final LdapGroup group)
   {
-    final List<ModificationItem> list = new ArrayList<ModificationItem>();
+    list = super.getModificationItems(list, group);
     createAndAddModificationItems(list, "businessCategory", group.getBusinessCategory());
     createAndAddModificationItems(list, "o", group.getOrganization());
     createAndAddModificationItems(list, "description", group.getDescription());
@@ -111,7 +110,7 @@ public class LdapGroupDao extends LdapDao<String, LdapGroup>
     } else {
       createAndAddModificationItems(list, "uniqueMember", NONE_UNIQUE_MEMBER_ID);
     }
-    return list.toArray(new ModificationItem[list.size()]);
+    return list;
   }
 
   /**

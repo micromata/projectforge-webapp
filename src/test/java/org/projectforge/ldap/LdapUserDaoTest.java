@@ -47,26 +47,15 @@ public class LdapUserDaoTest
   @Before
   public void setup()
   {
-    ldapRealTestHelper = new LdapRealTestHelper();
-    ldapUserDao = new LdapUserDao();
-    ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
-    ldapUserDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
-    ldapOrganizationalUnitDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
-    if (ldapRealTestHelper.isAvailable() == true) {
-      ldapOrganizationalUnitDao.createIfNotExist(getPath(), "Test area for tests of ProjectForge.");
-      ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.DEACTIVATED_SUB_CONTEXT, "for deactivated users.", getPath());
-      ldapOrganizationalUnitDao.createIfNotExist(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, "for restricted users.", getPath());
-    }
+    ldapRealTestHelper = new LdapRealTestHelper().setup();
+    ldapUserDao = ldapRealTestHelper.ldapUserDao;
+    ldapOrganizationalUnitDao = ldapRealTestHelper.ldapOrganizationalUnitDao;
   }
 
   @After
   public void tearDown()
   {
-    if (ldapRealTestHelper.isAvailable() == true) {
-      ldapOrganizationalUnitDao.deleteIfExists(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getPath());
-      ldapOrganizationalUnitDao.deleteIfExists(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, getPath());
-      ldapOrganizationalUnitDao.deleteIfExists(getPath());
-    }
+    ldapRealTestHelper.tearDown();
   }
 
   @Test
@@ -77,12 +66,12 @@ public class LdapUserDaoTest
       return;
     }
     final String uid = "test-user-42";
-    final LdapPerson user = new LdapPerson().setUid(uid).setGivenName("Kai").setSurname("ProjectForge Test").setDescription("description")
+    final LdapUser user = (LdapUser)new LdapUser().setUid(uid).setGivenName("Kai").setSurname("ProjectForge Test").setDescription("description")
         .setHomePhoneNumber("0123").setMail("kr@acme.com").setMobilePhoneNumber("4567").setOrganization("ProjectForge")
         .setTelephoneNumber("890").setEmployeeNumber("42");
     user.setOrganizationalUnit(getPath());
     ldapUserDao.createOrUpdate(getPath(), user);
-    final LdapPerson user2 = ldapUserDao.findByUsername(uid, getPath());
+    final LdapUser user2 = ldapUserDao.findByUsername(uid, getPath());
     Assert.assertNotNull(user2);
     LdapTestUtils.assertUser(user2, user.getUid(), user.getGivenName(), user.getSurname(), user.getMail(), user.getOrganization(),
         user.getDescription());
@@ -92,7 +81,7 @@ public class LdapUserDaoTest
     // Change password
     ldapUserDao.changePassword(user, null, "hurzel");
     Assert.assertEquals(getPath(), ldapUserDao.findByUsername(uid, getPath()).getOrganizationalUnit());
-    final LdapPerson ldapUser = ldapUserDao.authenticate(uid, "hurzel", getPath());
+    final LdapUser ldapUser = ldapUserDao.authenticate(uid, "hurzel", getPath());
     Assert.assertNotNull(ldapUser);
     Assert.assertEquals(user.getUid(), ldapUser.getUid());
 
@@ -109,15 +98,15 @@ public class LdapUserDaoTest
       return;
     }
     final String uid = "test-user-43";
-    final LdapPerson user = new LdapPerson().setUid(uid).setGivenName("Kai").setSurname("ProjectForge Test").setEmployeeNumber("43");
+    final LdapUser user = (LdapUser)new LdapUser().setUid(uid).setGivenName("Kai").setSurname("ProjectForge Test").setEmployeeNumber("43");
     user.setOrganizationalUnit(getPath());
     ldapUserDao.createOrUpdate(getPath(), user);
     ldapUserDao.changePassword(user, null, "hurzel");
-    final LdapPerson ldapUser = ldapUserDao.authenticate(uid, "hurzel", getPath());
+    final LdapUser ldapUser = ldapUserDao.authenticate(uid, "hurzel", getPath());
     Assert.assertNotNull(ldapUser);
     ldapUserDao.deactivateUser(user);
     Assert.assertNull(ldapUserDao.authenticate(uid, "hurzel", getPath()));
-    final LdapPerson user2 = ldapUserDao.findByUsername(uid, getPath());
+    final LdapUser user2 = ldapUserDao.findByUsername(uid, getPath());
     Assert.assertNotNull(user2);
     Assert.assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getPath()), LdapUtils.getOu(user2.getOrganizationalUnit()));
 
@@ -141,10 +130,10 @@ public class LdapUserDaoTest
         .setEmail("k.reinhard@acme.com").setDeactivated(true);
     user.setId(44);
     // Test creation of deactivated user:
-    final LdapPerson ldapUser = PFUserDOConverter.convert(user);
+    final LdapUser ldapUser = PFUserDOConverter.convert(user);
     ldapUser.setOrganizationalUnit(getPath());
     ldapUserDao.createOrUpdate(getPath(), ldapUser);
-    LdapPerson ldapUser2 = ldapUserDao.findByUsername(uid, getPath());
+    LdapUser ldapUser2 = ldapUserDao.findByUsername(uid, getPath());
     Assert.assertNotNull(ldapUser2);
     Assert
     .assertEquals(LdapUtils.getOu(LdapUserDao.DEACTIVATED_SUB_CONTEXT, getPath()), LdapUtils.getOu(ldapUser2.getOrganizationalUnit()));
@@ -178,10 +167,10 @@ public class LdapUserDaoTest
         .setEmail("k.reinhard@acme.com").setRestrictedUser(true);
     user.setId(45);
     // Test creation of restricted users:
-    final LdapPerson initialLdapUser = PFUserDOConverter.convert(user);
+    final LdapUser initialLdapUser = PFUserDOConverter.convert(user);
     initialLdapUser.setOrganizationalUnit(getPath());
     ldapUserDao.createOrUpdate(getPath(), initialLdapUser);
-    LdapPerson ldapUser = ldapUserDao.findByUsername(uid, getPath());
+    LdapUser ldapUser = ldapUserDao.findByUsername(uid, getPath());
     Assert.assertNotNull(ldapUser);
     Assert.assertEquals(LdapUtils.getOu(LdapUserDao.RESTRICTED_USER_SUB_CONTEXT, getPath()),
         LdapUtils.getOu(ldapUser.getOrganizationalUnit()));
@@ -229,6 +218,31 @@ public class LdapUserDaoTest
 
     // Delete user
     ldapUserDao.delete(ldapUser);
+    Assert.assertNull(ldapUserDao.findByUsername(uid, getPath()));
+  }
+
+
+  @Test
+  public void posixAccountUsers()
+  {
+    if (ldapRealTestHelper.isAvailable() == false) {
+      log.info("No LDAP server configured for tests. Skipping test.");
+      return;
+    }
+    final String uid = "test-user-46";
+    final PFUserDO user = new PFUserDO().setUsername(uid).setLastname("Reinhard").setFirstname("Kai").setOrganization("Micromata GmbH")
+        .setEmail("k.reinhard@acme.com");
+    user.setId(46);
+    final LdapUser initialLdapUser = PFUserDOConverter.convert(user);
+    initialLdapUser.setOrganizationalUnit(getPath());
+    initialLdapUser.setPosixAccountUidNumber(1042).setPosixAccountGidNumber(1000).setPosixAccountHomeDirectoriy("/home/kai").setPosixAccountShell("/bin/bash");
+    ldapUserDao.createOrUpdate(getPath(), initialLdapUser);
+
+    final LdapUser ldapUser = ldapUserDao.findByUsername(uid, getPath());
+    Assert.assertNotNull(ldapUser);
+
+    // Delete user
+    ldapUserDao.delete(initialLdapUser);
     Assert.assertNull(ldapUserDao.findByUsername(uid, getPath()));
   }
 }

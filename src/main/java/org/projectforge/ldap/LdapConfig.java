@@ -48,6 +48,8 @@ public class LdapConfig
 
   private String sslCertificateFile;
 
+  private LdapPosixAccountsConfig posixAccountsConfig;
+
   /**
    * e.g. ldap.acme.com
    */
@@ -208,8 +210,9 @@ public class LdapConfig
   }
 
   /**
-   * For SSL connections (ldaps://....) a SSL certificate file should be given if not accepted by the Java virtual machine.
-   * The content of the file should be:
+   * For SSL connections (ldaps://....) a SSL certificate file should be given if not accepted by the Java virtual machine. The content of
+   * the file should be:
+   * 
    * <pre>
    * -----BEGIN CERTIFICATE-----
    * MIICDTCCAXagAwIBAgIET6zxaTANBgkqhkiG9w0BAQUFADBLMScwJQYDVQQKEx5P
@@ -232,6 +235,14 @@ public class LdapConfig
   {
     this.sslCertificateFile = sslCertificateFile;
     return this;
+  }
+
+  /**
+   * @return the posixAccountsConfig
+   */
+  public LdapPosixAccountsConfig getPosixAccountsConfig()
+  {
+    return posixAccountsConfig;
   }
 
   /**

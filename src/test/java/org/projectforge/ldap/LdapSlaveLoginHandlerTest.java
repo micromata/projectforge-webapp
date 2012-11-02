@@ -44,25 +44,19 @@ public class LdapSlaveLoginHandlerTest extends TestBase
 
   private LdapUserDao ldapUserDao;
 
-  private LdapOrganizationalUnitDao ldapOrganizationalUnitDao;
-
   private LdapRealTestHelper ldapRealTestHelper;
 
   @Before
   public void setup()
   {
-    ldapRealTestHelper = new LdapRealTestHelper();
-    ldapUserDao = new LdapUserDao();
-    ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
-    ldapUserDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
-    ldapOrganizationalUnitDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
-    ldapRealTestHelper.setup(ldapOrganizationalUnitDao);
+    ldapRealTestHelper = new LdapRealTestHelper().setup();
+    ldapUserDao = ldapRealTestHelper.ldapUserDao;
   }
 
   @After
   public void tearDown()
   {
-    ldapRealTestHelper.tearDown(ldapOrganizationalUnitDao);
+    ldapRealTestHelper.tearDown();
   }
 
   @Test
@@ -71,8 +65,8 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     final String userBase = "ou=pf-mock-test-users";
     final String testUsername = "mockedLdapSlaveTestuser";
     ldapUserDao = mock(LdapUserDao.class);
-    when(ldapUserDao.authenticate(Mockito.eq(testUsername), Mockito.eq("successful"), Mockito.eq(userBase))).thenReturn(
-        new LdapPerson().setUid(testUsername));
+    when(ldapUserDao.authenticate(Mockito.eq(testUsername), Mockito.eq("successful"), Mockito.eq(userBase))).thenReturn((LdapUser)
+        new LdapUser().setUid(testUsername));
     when(ldapUserDao.authenticate(Mockito.anyString(), Mockito.eq("fail"), Mockito.eq(userBase))).thenReturn(null);
     final LdapSlaveLoginHandler loginHandler = new LdapSlaveLoginHandler();
     loginHandler.ldapConfig = new LdapConfig().setUserBase(userBase);
@@ -94,7 +88,7 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     final LdapSlaveLoginHandler loginHandler = createLoginHandler();
     loginHandler.setMode(LdapSlaveLoginHandler.Mode.SIMPLE);
     final String testUsername = "ldapSlaveTestuser";
-    final LdapPerson ldapUser = new LdapPerson().setUid(testUsername).setGivenName("Kai").setSurname("Reinhard").setEmployeeNumber("42");
+    final LdapUser ldapUser = (LdapUser)new LdapUser().setUid(testUsername).setGivenName("Kai").setSurname("Reinhard").setEmployeeNumber("42");
     createLdapUser(ldapUser, "successful");
     testSimpleMode(loginHandler, testUsername);
     ldapUserDao.delete(ldapUser);
@@ -106,13 +100,13 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     loginHandler.ldapConfig = ldapRealTestHelper.ldapConfig;
     loginHandler.userDao = userDao;
     loginHandler.ldapUserDao = ldapUserDao;
-    loginHandler.ldapOrganizationalUnitDao = ldapOrganizationalUnitDao;
+    loginHandler.ldapOrganizationalUnitDao = ldapRealTestHelper.ldapOrganizationalUnitDao;
     loginHandler.initialize();
     Login.getInstance().setLoginHandler(loginHandler);
     return loginHandler;
   }
 
-  private void createLdapUser(final LdapPerson ldapUser, final String password)
+  private void createLdapUser(final LdapUser ldapUser, final String password)
   {
     final String userBase = ldapRealTestHelper.ldapConfig.getUserBase();
     ldapUser.setOrganizationalUnit(userBase);
@@ -170,7 +164,7 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     final String userBase = "ou=pf-mock-test-users";
     final LdapUserDao ldapUserDao = mock(LdapUserDao.class);
     LoginResult loginResult;
-    final LdapPerson kai = new LdapPerson().setUid("kai").setDescription("Developer").setGivenName("Kai").setMail("k.reinhard@acme.com")
+    final LdapUser kai = (LdapUser)new LdapUser().setUid("kai").setDescription("Developer").setGivenName("Kai").setMail("k.reinhard@acme.com")
         .setOrganization("Micromata").setSurname("Reinhard");
     when(ldapUserDao.authenticate("kai", "successful", userBase)).thenReturn(kai);
     when(ldapUserDao.authenticate("kai", "fail", userBase)).thenReturn(null);
@@ -208,9 +202,9 @@ public class LdapSlaveLoginHandlerTest extends TestBase
     loginHandler.setMode(LdapSlaveLoginHandler.Mode.USERS);
     final String testUsername1 = "ldapSlaveTestuserUserMode1";
     final String testUsername2 = "ldapSlaveTestuserUserMode2";
-    final LdapPerson ldapUser1 = new LdapPerson().setUid(testUsername1).setGivenName("Kai").setSurname("Reinhard").setEmployeeNumber("100");
+    final LdapUser ldapUser1 = (LdapUser)new LdapUser().setUid(testUsername1).setGivenName("Kai").setSurname("Reinhard").setEmployeeNumber("100");
     createLdapUser(ldapUser1, "successful");
-    final LdapPerson ldapUser2 = new LdapPerson().setUid(testUsername2).setGivenName("Kai").setSurname("Reinhard").setEmployeeNumber("101");
+    final LdapUser ldapUser2 = (LdapUser)new LdapUser().setUid(testUsername2).setGivenName("Kai").setSurname("Reinhard").setEmployeeNumber("101");
     createLdapUser(ldapUser2, "successful");
 
     logon(TEST_ADMIN_USER);

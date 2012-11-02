@@ -98,7 +98,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
       return loginResult;
     }
     // User is now logged-in successfully.
-    LdapPerson ldapUser = ldapUserDao.authenticate(username, password, userBase);
+    LdapUser ldapUser = ldapUserDao.authenticate(username, password, userBase);
     if (ldapUser == null) {
       log.info("User's credentials in LDAP not up-to-date: " + username + ". Updating LDAP entry...");
       final PFUserDO user = loginResult.getUser();
@@ -169,20 +169,22 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
       {
         log.info("Updating LDAP...");
         // First, get set of all ldap entries:
-        final List<LdapPerson> ldapUsers = getAllLdapUsers(ctx);
-        final List<LdapPerson> updatedLdapUsers = new ArrayList<LdapPerson>();
+        final List<LdapUser> ldapUsers = getAllLdapUsers(ctx);
+        final List<LdapUser> updatedLdapUsers = new ArrayList<LdapUser>();
         int error = 0, unmodified = 0, created = 0, updated = 0, deleted = 0, renamed = 0;
         final Set<Integer> shadowUsersWithoutLdapPasswords = new HashSet<Integer>();
         for (final PFUserDO user : users) {
           try {
-            final LdapPerson updatedLdapUser = PFUserDOConverter.convert(user);
-            final LdapPerson ldapUser = getLdapUser(ldapUsers, user);
+            final LdapUser updatedLdapUser = PFUserDOConverter.convert(user);
+            final LdapUser ldapUser = getLdapUser(ldapUsers, user);
             if (ldapUser == null) {
               updatedLdapUser.setOrganizationalUnit(userBase);
               if (user.isDeleted() == false && user.isLocalUser() == false) {
                 // Do not add deleted or local users.
+                // TODO: if (ldapConfig.isSupportPosixAccounts() == true &&) {
+                // updatedLdapUser.addObjectClass(LdapUserDao.OBJECT_CLASS_POSIX_ACCOUNT);
+                // }
                 ldapUserDao.create(ctx, userBase, updatedLdapUser);
-                updatedLdapUsers.add(updatedLdapUser);
                 shadowUsersWithoutLdapPasswords.add(user.getId()); // User can't be valid for created users.
                 created++;
               }
@@ -196,17 +198,25 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
                 shadowUsersWithoutLdapPasswords.add(user.getId()); // Paranoia code, stay-logged-in shouldn't work with deleted users.
                 deleted++;
               } else {
-                final boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
-                if (modified == true) {
-                  ldapUserDao.update(ctx, userBase, updatedLdapUser);
-                  updated++;
-                } else {
-                  unmodified++;
-                }
+                boolean modified = PFUserDOConverter.copyUserFields(updatedLdapUser, ldapUser);
                 if (StringUtils.equals(updatedLdapUser.getUid(), ldapUser.getUid()) == false) {
                   // uid (dn) changed.
                   ldapUserDao.rename(ctx, updatedLdapUser, ldapUser);
                   renamed++;
+                }
+                if (modified == false) {
+                  final List<String> missedObjectClasses = LdapUtils.getMissedObjectClasses(ldapUserDao.getAdditionalObjectClasses(),
+                      ldapUserDao.getObjectClass(), ldapUser.getObjectClasses());
+                  if (missedObjectClasses != null) {
+                    modified = true;
+                  }
+                }
+                if (modified == true) {
+                  updatedLdapUser.setObjectClasses(ldapUser.getObjectClasses());
+                  ldapUserDao.update(ctx, userBase, updatedLdapUser);
+                  updated++;
+                } else {
+                  unmodified++;
                 }
                 if (ldapUser.isPasswordGiven() == true) {
                   if (updatedLdapUser.isDeactivated()) {
@@ -220,10 +230,10 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
                 } else {
                   shadowUsersWithoutLdapPasswords.add(user.getId()); // Password isn't given for the current user.
                 }
-                updatedLdapUsers.add(updatedLdapUser);
               }
             }
             ldapUserDao.buildDn(userBase, updatedLdapUser);
+            updatedLdapUsers.add(updatedLdapUser);
           } catch (final Exception ex) {
             log.error("Error while proceeding user '" + user.getUsername() + "'. Continuing with next user.", ex);
             error++;
@@ -247,7 +257,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
             + " deleted.");
         // Now get all groups:
         final List<LdapGroup> ldapGroups = getAllLdapGroups(ctx);
-        final Map<Integer, LdapPerson> ldapUserMap = getUserMap(updatedLdapUsers);
+        final Map<Integer, LdapUser> ldapUserMap = getUserMap(updatedLdapUsers);
         error = unmodified = created = updated = renamed = deleted = 0;
         for (final GroupDO group : groups) {
           try {
@@ -270,6 +280,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
               } else {
                 final boolean modified = GroupDOConverter.copyGroupFields(updatedLdapGroup, ldapGroup);
                 if (modified == true) {
+                  updatedLdapGroup.setObjectClasses(ldapGroup.getObjectClasses());
                   setMembers(updatedLdapGroup, group.getAssignedUsers(), ldapUserMap);
                   ldapGroupDao.update(ctx, groupBase, updatedLdapGroup);
                   updated++;
@@ -328,15 +339,15 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
   @Override
   public void passwordChanged(final PFUserDO user, final String newPassword)
   {
-    final LdapPerson ldapUser = ldapUserDao.findById(user.getId());
+    final LdapUser ldapUser = ldapUserDao.findById(user.getId());
     if (user.isDeleted() == true || user.isLocalUser() == true) {
       // Don't change passwords of such users.
       return;
     }
     if (ldapUser != null) {
       ldapUserDao.changePassword(ldapUser, null, newPassword);
-      final LdapPerson person = ldapUserDao.authenticate(user.getUsername(), newPassword);
-      log.info("Password changed successfully for : " + person);
+      final LdapUser authenticatedUser = ldapUserDao.authenticate(user.getUsername(), newPassword);
+      log.info("Password changed successfully for : " + authenticatedUser);
     } else {
       log.error("Can't change LDAP password for user '" + user.getUsername() + "'! Not such user found in LDAP!.");
     }
@@ -357,7 +368,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
    * @param assignedUsers
    * @param ldapUserMap
    */
-  private void setMembers(final LdapGroup updatedLdapGroup, final Set<PFUserDO> assignedUsers, final Map<Integer, LdapPerson> ldapUserMap)
+  private void setMembers(final LdapGroup updatedLdapGroup, final Set<PFUserDO> assignedUsers, final Map<Integer, LdapUser> ldapUserMap)
   {
     updatedLdapGroup.clearMembers();
     if (assignedUsers == null) {
@@ -365,7 +376,7 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
       return;
     }
     for (final PFUserDO assignedUser : assignedUsers) {
-      final LdapPerson ldapUser = ldapUserMap.get(assignedUser.getId());
+      final LdapUser ldapUser = ldapUserMap.get(assignedUser.getId());
       if (ldapUser == null) {
         final PFUserDO cachedUser = Registry.instance().getUserGroupCache().getUser(assignedUser.getId());
         if (cachedUser == null || cachedUser.isDeleted() == false) {
@@ -384,13 +395,13 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
     }
   }
 
-  private Map<Integer, LdapPerson> getUserMap(final Collection<LdapPerson> users)
+  private Map<Integer, LdapUser> getUserMap(final Collection<LdapUser> users)
   {
-    final Map<Integer, LdapPerson> map = new HashMap<Integer, LdapPerson>();
+    final Map<Integer, LdapUser> map = new HashMap<Integer, LdapUser>();
     if (users == null) {
       return map;
     }
-    for (final LdapPerson user : users) {
+    for (final LdapUser user : users) {
       final Integer id = PFUserDOConverter.getId(user);
       if (id != null) {
         map.put(id, user);
@@ -401,9 +412,9 @@ public class LdapMasterLoginHandler extends LdapLoginHandler
     return map;
   }
 
-  private LdapPerson getLdapUser(final List<LdapPerson> ldapUsers, final PFUserDO user)
+  private LdapUser getLdapUser(final List<LdapUser> ldapUsers, final PFUserDO user)
   {
-    for (final LdapPerson ldapUser : ldapUsers) {
+    for (final LdapUser ldapUser : ldapUsers) {
       if (StringUtils.equals(ldapUser.getUid(), user.getUsername()) == true
           || StringUtils.equals(ldapUser.getEmployeeNumber(), PFUserDOConverter.buildEmployeeNumber(user)) == true) {
         return ldapUser;

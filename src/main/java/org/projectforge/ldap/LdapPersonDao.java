@@ -23,7 +23,6 @@
 
 package org.projectforge.ldap;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.naming.NamingException;
@@ -35,7 +34,7 @@ import javax.naming.directory.ModificationItem;
  */
 public class LdapPersonDao extends LdapDao<String, LdapPerson>
 {
-  private static final String[] ADDITIONAL_OBJECT_CLASSES = { "inetOrgPerson"};
+  private static final String[] ADDITIONAL_OBJECT_CLASSES = { "top", "inetOrgPerson"};
 
   /**
    * @see org.projectforge.ldap.LdapDao#getObjectClass()
@@ -77,6 +76,12 @@ public class LdapPersonDao extends LdapDao<String, LdapPerson>
   protected LdapPerson mapToObject(final String dn, final Attributes attributes) throws NamingException
   {
     final LdapPerson person = new LdapPerson();
+    mapToObject(dn, person, attributes);
+    return person;
+  }
+
+  protected void mapToObject(final String dn, final LdapPerson person, final Attributes attributes) throws NamingException
+  {
     person.setSurname(LdapUtils.getAttributeStringValue(attributes, "sn"));
     person.setGivenName(LdapUtils.getAttributeStringValue(attributes, "givenName"));
     person.setUid(LdapUtils.getAttributeStringValue(attributes, "uid"));
@@ -87,7 +92,6 @@ public class LdapPersonDao extends LdapDao<String, LdapPerson>
     person.setTelephoneNumber(LdapUtils.getAttributeStringValue(attributes, "telephoneNumber"));
     person.setMobilePhoneNumber(LdapUtils.getAttributeStringValues(attributes, "mobile"));
     person.setHomePhoneNumber(LdapUtils.getAttributeStringValue(attributes, "homePhone"));
-    return person;
   }
 
   /**
@@ -97,10 +101,9 @@ public class LdapPersonDao extends LdapDao<String, LdapPerson>
    * @see org.projectforge.ldap.LdapDao#getModificationItems(org.projectforge.ldap.LdapObject)
    */
   @Override
-  protected ModificationItem[] getModificationItems(final LdapPerson person)
+  protected List<ModificationItem> getModificationItems(List<ModificationItem> list, final LdapPerson person)
   {
-    final List<ModificationItem> list = new ArrayList<ModificationItem>();
-    addModificationItems(list, person);
+    list = super.getModificationItems(list, person);
     createAndAddModificationItems(list, "sn", person.getSurname());
     createAndAddModificationItems(list, "givenName", person.getGivenName());
     createAndAddModificationItems(list, "uid", person.getUid());
@@ -111,15 +114,7 @@ public class LdapPersonDao extends LdapDao<String, LdapPerson>
     createAndAddModificationItems(list, "telephoneNumber", person.getTelephoneNumber());
     createAndAddModificationItems(list, "mobile", person.getMobilePhoneNumber());
     createAndAddModificationItems(list, "homePhone", person.getHomePhoneNumber());
-    return list.toArray(new ModificationItem[list.size()]);
-  }
-
-  /**
-   * Overridden by LdapUserDao. Does nothing at default.
-   * @param list
-   * @param person
-   */
-  protected void addModificationItems(final List<ModificationItem> list, final LdapPerson person) {
+    return list;
   }
 
   /**
@@ -128,6 +123,7 @@ public class LdapPersonDao extends LdapDao<String, LdapPerson>
   @Override
   protected String getOuBase()
   {
-    throw new UnsupportedOperationException("No support of contacts (person) yet implemented (only users are supported by LdapUserDao yet). No ou-base available.");
+    throw new UnsupportedOperationException(
+        "No support of contacts (person) yet implemented (only users are supported by LdapUserDao yet). No ou-base available.");
   }
 }

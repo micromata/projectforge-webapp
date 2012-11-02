@@ -257,15 +257,15 @@ public class LdapUtils
     return buf.toString();
   }
 
-  public static List<String> getMissedObjectClasses(final String[] expectedObjectClasses, final String expectedMainObjectClass,
+  public static List<String> getMissedObjectClasses(final String[] expectedAdditionalObjectClasses, final String expectedObjectClass,
       final String[] objectClasses)
       {
     List<String> list = null;
-    if (expectedMainObjectClass != null && (objectClasses == null || StringHelper.isIn(expectedMainObjectClass, objectClasses) == false)) {
-      list = addEntry(list, expectedMainObjectClass);
+    if (expectedObjectClass != null && (objectClasses == null || StringHelper.isIn(expectedObjectClass, objectClasses) == false)) {
+      list = addEntry(list, expectedObjectClass);
     }
-    if (expectedObjectClasses != null) {
-      for (final String objectClass : expectedObjectClasses) {
+    if (expectedAdditionalObjectClasses != null) {
+      for (final String objectClass : expectedAdditionalObjectClasses) {
         // objectClasses of users doesn't match the expected ones.
         if (objectClasses == null || StringHelper.isIn(objectClass, objectClasses) == false) {
           list = addEntry(list, objectClass);

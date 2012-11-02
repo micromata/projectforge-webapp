@@ -24,6 +24,7 @@
 package org.projectforge.ldap;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -88,17 +89,14 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     final String dn = buildDn(ouBase, obj);
     log.info("Create " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
     final Attributes attrs = new BasicAttributes();
-    final BasicAttribute ocattr = new BasicAttribute("objectclass");
-    ocattr.add(getObjectClass());
-    ocattr.add("top");
+    final List<ModificationItem> modificationItems = getModificationItems(new ArrayList<ModificationItem>(), obj);
+    modificationItems.add(createModificationItem(DirContext.ADD_ATTRIBUTE, "objectClass", getObjectClass()));
     final String[] additionalObjectClasses = getAdditionalObjectClasses();
     if (additionalObjectClasses != null) {
-      for (final String additionalObjectClass : additionalObjectClasses) {
-        ocattr.add(additionalObjectClass);
+      for (final String objectClass : additionalObjectClasses) {
+        modificationItems.add(createModificationItem(DirContext.ADD_ATTRIBUTE, "objectClass", objectClass));
       }
     }
-    attrs.put(ocattr);
-    final ModificationItem[] modificationItems = getModificationItems(obj);
     for (final ModificationItem modItem : modificationItems) {
       final Attribute attr = modItem.getAttribute();
       LdapUtils.putAttribute(attrs, attr.getID(), (String) attr.get());
@@ -180,10 +178,32 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
 
   public void update(final DirContext ctx, final String ouBase, final T obj, final Object... objs) throws NamingException
   {
-    modify(ctx, obj, getModificationItems(obj));
+    modify(ctx, obj, getModificationItems(new ArrayList<ModificationItem>(), obj));
   }
 
-  protected abstract ModificationItem[] getModificationItems(final T obj);
+  protected List<ModificationItem> getModificationItems(final List<ModificationItem> list, final T obj)
+  {
+    // if (createNewObject == true || obj.getObjectClasses() != null) {
+    // // Don't manipulate object classes while updating objects and if objectClass of object to update isn't given.
+    // // Create objectClasses which aren't yet present in given object.
+    // final List<String> missedObjectClasses = LdapUtils.getMissedObjectClasses(getAdditionalObjectClasses(), getObjectClass(),
+    // obj.getObjectClasses());
+    // addMissedObjectClasses(list, missedObjectClasses);
+    // // Create objectClasses which are present in given object but not declared by this dao.
+    // // missedObjectClasses = LdapUtils.getMissedObjectClasses(obj.getObjectClasses(), null, getAdditionalObjectClasses());
+    // // addMissedObjectClasses(list, missedObjectClasses);
+    // }
+    return list;
+  }
+
+  // private void addMissedObjectClasses(final List<ModificationItem> list, final List<String> missedObjectClasses)
+  // {
+  // if (CollectionUtils.isNotEmpty(missedObjectClasses) == true) {
+  // for (final String missedObjectClass : missedObjectClasses) {
+  // list.add(createModificationItem(DirContext.ADD_ATTRIBUTE, "objectClass", missedObjectClass));
+  // }
+  // }
+  // }
 
   /**
    * Helper method.
@@ -266,7 +286,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     }
   }
 
-  public void modify(final T obj, final ModificationItem[] modificationItems)
+  public void modify(final T obj, final List<ModificationItem> modificationItems)
   {
     new LdapTemplate(ldapConnector) {
       @Override
@@ -278,7 +298,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     }.excecute();
   }
 
-  public void modify(final DirContext ctx, final T obj, final ModificationItem[] modificationItems) throws NamingException
+  public void modify(final DirContext ctx, final T obj, final List<ModificationItem> modificationItems) throws NamingException
   {
     final Object id = getId(obj);
     // The dn is may-be changed, so find the original dn by id:
@@ -293,7 +313,8 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     }
     final String dn = origObject.getDn();
     log.info("Modify attributes of " + getObjectClass() + ": " + dn + ": " + getLogInfo(obj));
-    ctx.modifyAttributes(dn, modificationItems);
+    final ModificationItem[] items = modificationItems.toArray(new ModificationItem[modificationItems.size()]);
+    ctx.modifyAttributes(dn, items);
     // Don't move object.
     // if (obj.getDn() != null && StringUtils.equals(dn, obj.getDn()) == false) {
     // log.info("DN of object is changed from '" + dn + "' to '" + obj.getDn());
@@ -536,6 +557,7 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     obj.setDn(fullDn);
     obj.setOrganizationalUnit(LdapUtils.getOrganizationalUnit(dn, ouBase));
     obj.setCommonName(LdapUtils.getAttributeStringValue(attributes, "cn"));
+    obj.setObjectClasses(LdapUtils.getAttributeStringValues(attributes, "objectClass"));
     return obj;
   }
 
@@ -570,9 +592,10 @@ public abstract class LdapDao<I extends Serializable, T extends LdapObject<I>>
     return searchBase;
   }
 
-  public void setLdapConnector(final LdapConnector ldapConnector)
+  public LdapDao<I, T> setLdapConnector(final LdapConnector ldapConnector)
   {
     this.ldapConnector = ldapConnector;
     this.ldapConfig = ldapConnector.getLdapConfig();
+    return this;
   }
 }

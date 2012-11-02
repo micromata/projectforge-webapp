@@ -70,8 +70,6 @@ public class LdapMasterLoginHandlerTest extends TestBase
 
   private LdapUserDao ldapUserDao;
 
-  private LdapOrganizationalUnitDao ldapOrganizationalUnitDao;
-
   private LdapRealTestHelper ldapRealTestHelper;
 
   private String getPath()
@@ -82,20 +80,15 @@ public class LdapMasterLoginHandlerTest extends TestBase
   @Before
   public void setup()
   {
-    ldapRealTestHelper = new LdapRealTestHelper();
-    ldapUserDao = new LdapUserDao();
-    ldapGroupDao = new LdapGroupDao();
-    ldapOrganizationalUnitDao = new LdapOrganizationalUnitDao();
-    ldapUserDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
-    ldapGroupDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
-    ldapOrganizationalUnitDao.setLdapConnector(ldapRealTestHelper.ldapConnector);
-    ldapRealTestHelper.setup(ldapOrganizationalUnitDao);
+    ldapRealTestHelper = new LdapRealTestHelper().setup();
+    ldapUserDao = ldapRealTestHelper.ldapUserDao;
+    ldapGroupDao = ldapRealTestHelper.ldapGroupDao;
   }
 
   @After
   public void tearDown()
   {
-    ldapRealTestHelper.tearDown(ldapOrganizationalUnitDao);
+    ldapRealTestHelper.tearDown();
   }
 
   @Test
@@ -115,9 +108,9 @@ public class LdapMasterLoginHandlerTest extends TestBase
         .setLastname("Reinhard"));
     Assert.assertEquals(LoginResultStatus.SUCCESS, loginHandler.checkLogin("kai", "successful").getLoginResultStatus());
 
-    final ArgumentCaptor<LdapPerson> argumentCaptor = ArgumentCaptor.forClass(LdapPerson.class);
+    final ArgumentCaptor<LdapUser> argumentCaptor = ArgumentCaptor.forClass(LdapUser.class);
     verify(ldapUserDao).createOrUpdate(Mockito.anyString(), argumentCaptor.capture());
-    final LdapPerson createdLdapUser = argumentCaptor.getValue();
+    final LdapUser createdLdapUser = argumentCaptor.getValue();
     Assert.assertEquals("kai", createdLdapUser.getUid());
     Assert.assertEquals("Kai", createdLdapUser.getGivenName());
     Assert.assertEquals("Reinhard", createdLdapUser.getSurname());
@@ -154,12 +147,12 @@ public class LdapMasterLoginHandlerTest extends TestBase
     ldapGroup = ldapGroupDao.findById(groupId1);
     assertMembers(ldapGroup, "ldapMaster1", "ldapMaster2", "ldapMaster3");
     Assert.assertFalse(isMembersEmpty(ldapGroup));
-    LdapPerson ldapUser = ldapUserDao.findById(userId1, getPath());
+    LdapUser ldapUser = ldapUserDao.findById(userId1, getPath());
     Assert.assertEquals("ldapMaster1", ldapUser.getUid());
 
     // Renaming one user, deleting one user and assigning third user
     userDao.internalMarkAsDeleted(userDao.getById(userId2));
-    final PFUserDO user3 = userDao.getById(userId3);
+    PFUserDO user3 = userDao.getById(userId3);
     user3.setUsername("ldapMasterRenamed3");
     userDao.internalUpdate(user3);
     group = userDao.getUserGroupCache().getGroup(groupId1);
@@ -169,13 +162,25 @@ public class LdapMasterLoginHandlerTest extends TestBase
     ldapGroup = ldapGroupDao.findById(groupId1);
     assertMembers(ldapGroup, "ldapMaster1", "ldapMasterRenamed3", "ldapMaster4");
 
+    // Renaming one user and mark him as restricted
+    user3 = userDao.getById(userId3);
+    user3.setUsername("ldapMaster3");
+    user3.setRestrictedUser(true);
+    userDao.internalUpdate(user3);
+    synchronizeLdapUsers(loginHandler);
+    ldapUser = ldapUserDao.findById(userId3, getPath());
+    Assert.assertEquals("ldapMaster3", ldapUser.getUid());
+    Assert.assertTrue( ldapUser.getOrganizationalUnit().contains("ou=restricted"));
+    ldapGroup = ldapGroupDao.findById(groupId1);
+    assertMembers(ldapGroup, "ldapMaster1", "ldapMaster3,ou=restricted", "ldapMaster4");
+
     // Renaming group
     group = groupDao.getById(groupId1);
     group.setName("ldapMasterGroupRenamed1");
     groupDao.internalUpdate(group);
     synchronizeLdapUsers(loginHandler);
     ldapGroup = ldapGroupDao.findById(groupId1);
-    assertMembers(ldapGroup, "ldapMaster1", "ldapMasterRenamed3", "ldapMaster4");
+    assertMembers(ldapGroup, "ldapMaster1", "ldapMaster3,ou=restricted", "ldapMaster4");
     Assert.assertEquals("ldapMasterGroupRenamed1", ldapGroup.getCommonName());
 
     // Change password
@@ -249,7 +254,7 @@ public class LdapMasterLoginHandlerTest extends TestBase
     loginHandler.ldapConfig = ldapRealTestHelper.ldapConfig;
     loginHandler.userDao = userDao;
     loginHandler.ldapUserDao = ldapUserDao;
-    loginHandler.ldapOrganizationalUnitDao = ldapOrganizationalUnitDao;
+    loginHandler.ldapOrganizationalUnitDao = ldapRealTestHelper.ldapOrganizationalUnitDao;
     loginHandler.initialize();
     Login.getInstance().setLoginHandler(loginHandler);
     return loginHandler;

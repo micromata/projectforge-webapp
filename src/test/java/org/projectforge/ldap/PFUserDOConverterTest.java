@@ -38,19 +38,19 @@ public class PFUserDOConverterTest
     PFUserDO user = new PFUserDO().setUsername("k.reinhard").setFirstname("Kai").setLastname("Reinhard")
         .setEmail("k.reinhard@micromata.de").setDescription("Developer").setOrganization("Micromata GmbH");
     user.setId(42);
-    LdapPerson person = PFUserDOConverter.convert(user);
-    assertEquals("k.reinhard", person.getUid());
-    assertEquals("k.reinhard", person.getId());
-    assertEquals(PFUserDOConverter.ID_PREFIX + "42", person.getEmployeeNumber());
-    assertEquals("Kai Reinhard", person.getCommonName());
-    assertEquals("Developer", person.getDescription());
-    assertEquals("Kai", person.getGivenName());
-    assertEquals("Reinhard", person.getSurname());
-    assertEquals("Micromata GmbH", person.getOrganization());
-    assertEquals(1, person.getMail().length);
-    assertEquals("k.reinhard@micromata.de", person.getMail()[0]);
+    LdapUser ldapUser = PFUserDOConverter.convert(user);
+    assertEquals("k.reinhard", ldapUser.getUid());
+    assertEquals("k.reinhard", ldapUser.getId());
+    assertEquals(PFUserDOConverter.ID_PREFIX + "42", ldapUser.getEmployeeNumber());
+    assertEquals("Kai Reinhard", ldapUser.getCommonName());
+    assertEquals("Developer", ldapUser.getDescription());
+    assertEquals("Kai", ldapUser.getGivenName());
+    assertEquals("Reinhard", ldapUser.getSurname());
+    assertEquals("Micromata GmbH", ldapUser.getOrganization());
+    assertEquals(1, ldapUser.getMail().length);
+    assertEquals("k.reinhard@micromata.de", ldapUser.getMail()[0]);
 
-    user = PFUserDOConverter.convert(person);
+    user = PFUserDOConverter.convert(ldapUser);
     assertEquals("k.reinhard", user.getUsername());
     assertEquals(new Integer(42), user.getId());
     assertEquals("Developer", user.getDescription());
@@ -60,10 +60,10 @@ public class PFUserDOConverterTest
     assertEquals("k.reinhard@micromata.de", user.getEmail());
 
     user = new PFUserDO();
-    person = PFUserDOConverter.convert(user);
-    assertNull(person.getId());
-    assertNull(person.getUid());
-    assertNull(person.getEmployeeNumber());
+    ldapUser = PFUserDOConverter.convert(user);
+    assertNull(ldapUser.getId());
+    assertNull(ldapUser.getUid());
+    assertNull(ldapUser.getEmployeeNumber());
   }
 
   @Test
@@ -107,14 +107,14 @@ public class PFUserDOConverterTest
   }
 
   @Test
-  public void copyLdapPerson()
+  public void copyLdapUser()
   {
-    final LdapPerson src = createLdapUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
-    LdapPerson dest = createLdapUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    final LdapUser src = createLdapUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
+    LdapUser dest = createLdapUser("kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
     Assert.assertFalse(PFUserDOConverter.copyUserFields(src, dest));
     assertUser(src, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
     assertUser(dest, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
-    dest = new LdapPerson();
+    dest = new LdapUser();
     Assert.assertTrue(PFUserDOConverter.copyUserFields(src, dest));
     assertUser(src, "kai", "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
     assertUser(dest, null, "Kai", "Reinhard", "k.reinhard@acme.com", "Micromata", "Developer");
@@ -130,25 +130,25 @@ public class PFUserDOConverterTest
 
   @Test
   public void setNullMailArray() {
-    final LdapPerson person = new LdapPerson();
-    PFUserDOConverter.setMailNullArray(person);
-    Assert.assertNull(person.getMail());
-    person.setMail(new String[1]);
-    PFUserDOConverter.setMailNullArray(person);
-    Assert.assertNull(person.getMail());
-    person.setMail(new String[2]);
-    person.getMail()[1] = "Hurzel";
-    Assert.assertEquals(person.getMail()[1], "Hurzel");
+    final LdapUser ldapUser = new LdapUser();
+    PFUserDOConverter.setMailNullArray(ldapUser);
+    Assert.assertNull(ldapUser.getMail());
+    ldapUser.setMail(new String[1]);
+    PFUserDOConverter.setMailNullArray(ldapUser);
+    Assert.assertNull(ldapUser.getMail());
+    ldapUser.setMail(new String[2]);
+    ldapUser.getMail()[1] = "Hurzel";
+    Assert.assertEquals(ldapUser.getMail()[1], "Hurzel");
   }
 
-  private LdapPerson createLdapUser(final String username, final String firstname, final String lastname, final String email,
+  private LdapUser createLdapUser(final String username, final String firstname, final String lastname, final String email,
       final String organization, final String description)
   {
-    return new LdapPerson().setUid(username).setGivenName(firstname).setSurname(lastname).setMail(email).setOrganization(organization)
+    return (LdapUser)new LdapUser().setUid(username).setGivenName(firstname).setSurname(lastname).setMail(email).setOrganization(organization)
         .setDescription(description);
   }
 
-  private void assertUser(final LdapPerson user, final String username, final String firstname, final String lastname, final String email,
+  private void assertUser(final LdapUser user, final String username, final String firstname, final String lastname, final String email,
       final String organization, final String description)
   {
     Assert.assertEquals(username, user.getUid());

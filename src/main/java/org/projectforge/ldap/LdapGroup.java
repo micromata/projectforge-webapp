@@ -72,9 +72,9 @@ public class LdapGroup extends LdapObject<String>
     members.clear();
   }
 
-  public void addAllMembers(final Set<String> members)
+  public void addAllMembers(final Set<String> newMembers)
   {
-    members.addAll(members);
+    this.members.addAll(newMembers);
   }
 
   /**
