@@ -88,7 +88,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
   protected void buildEvents(final DateTime start, final DateTime end)
   {
     final TeamEventFilter eventFilter = new TeamEventFilter();
-    final List<TeamCalDO> selectedCalendars = filter.calcAssignedtItems(teamCalDao);
+    final List<TeamCalDO> selectedCalendars = filter.calcAssignedtItems(teamCalDao, filter.getCurrentCollection());
     eventFilter.setTeamCals(selectedCalendars);
     eventFilter.setStartDate(start.toDate());
     eventFilter.setEndDate(end.toDate());
@@ -124,7 +124,7 @@ public class TeamCalEventProvider extends MyFullCalendarEventsProvider
           final Event event = new Event();
           event.setClassName(EVENT_CLASS_NAME);
           event.setId("" + teamEvent.getId());
-          event.setColor(filter.getColor(teamEvent.getCalendarId()));
+          event.setColor(filter.getColor(teamEvent.getCalendarId(), filter.getCurrentCollection()));
 
           if (eventRight.hasUpdateAccess(PFUserContext.getUser(), teamEvent, null)) {
             event.setEditable(true);

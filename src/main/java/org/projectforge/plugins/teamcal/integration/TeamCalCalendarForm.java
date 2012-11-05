@@ -120,7 +120,7 @@ public class TeamCalCalendarForm extends CalendarForm
    */
   public Set<Integer> getSelectedCalendars()
   {
-    return filter.getCalendarPk();
+    return filter.getCalendarPk(filter.getCurrentCollection());
   }
 
   /**

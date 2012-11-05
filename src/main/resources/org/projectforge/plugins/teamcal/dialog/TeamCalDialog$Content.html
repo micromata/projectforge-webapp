@@ -1,6 +1,11 @@
 <wicket:panel xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd">
   <div class="pf_teamCalDialog">
     <h3><wicket:message key="plugins.teamcal.selectCalendar" /></h3>
+    <div class="teamCalCollection">
+    <span wicket:id="collectionList"></span>
+    <span wicket:id="addCollection"></span>
+    </div>
+    <h3><wicket:message key="plugins.teamcal.selectCalendar" /></h3>
     <input type="hidden" wicket:id="choices" style="width: 100%;"/>
     <br/><br/><h3><wicket:message key="plugins.teamcal.selectColor" /></h3>
     <div wicket:id="repeaterContainer">

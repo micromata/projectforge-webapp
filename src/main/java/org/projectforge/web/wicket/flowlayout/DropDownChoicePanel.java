@@ -67,6 +67,20 @@ public class DropDownChoicePanel<T> extends Panel implements ComponentWrapperPan
    * @param renderer
    * @param submitOnChange
    */
+  public DropDownChoicePanel(final String id, final IModel<T> model, final IModel<List<T>> values, final IChoiceRenderer<T> renderer,
+      final boolean submitOnChange)
+  {
+    this(id,  new DropDownChoice<T>(WICKET_ID, model, values, renderer), submitOnChange);
+  }
+
+  /**
+   * @param id
+   * @param label see {@link FormComponent#setLabel(IModel)}
+   * @param model
+   * @param values
+   * @param renderer
+   * @param submitOnChange
+   */
   public DropDownChoicePanel(final String id, final IModel<T> model, final List< ? extends T> values, final IChoiceRenderer<T> renderer,
       final boolean submitOnChange)
   {
