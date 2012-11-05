@@ -21,6 +21,8 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.web.calendar.CalendarFilter;
 
+import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
+
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -36,6 +38,9 @@ public class TeamCalCalendarFilter extends CalendarFilter
 
   private TeamCalCalendarCollection currentCollection;
 
+  @XStreamAsAttribute
+  private final Integer firstHour = 8;
+
   /**
    * 
    */
@@ -45,9 +50,9 @@ public class TeamCalCalendarFilter extends CalendarFilter
     teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
 
     // TODO mock Code
-    final TeamCalCalendarCollection mock = new TeamCalCalendarCollection("meineCollection", new HashMap<Integer, String>());
-    teamCalCalendarCollection.add(mock);
-    currentCollection = mock;
+    //    final TeamCalCalendarCollection mock = new TeamCalCalendarCollection("meineCollection", new HashMap<Integer, String>());
+    //    teamCalCalendarCollection.add(mock);
+    //    currentCollection = mock;
   }
 
   public Set<Integer> getCalendarPk(TeamCalCalendarCollection collection)
@@ -150,4 +155,14 @@ public class TeamCalCalendarFilter extends CalendarFilter
   {
     return teamCalCalendarCollection;
   }
+
+  /**
+   * @see org.projectforge.web.calendar.CalendarFilter#getFirstHour()
+   */
+  @Override
+  public Integer getFirstHour()
+  {
+    return super.getFirstHour();
+  }
+
 }

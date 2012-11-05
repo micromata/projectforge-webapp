@@ -155,6 +155,7 @@ public class TeamCalDialog extends PFDialog
       @Override
       public void callback(final AjaxRequestTarget target)
       {
+        newFilter.setCurrentCollection(currentCollection);
         currentFilter.updateTeamCalendarFilter(newFilter);
         setResponsePage(getPage().getClass(), getPage().getPageParameters());
       }
@@ -197,7 +198,6 @@ public class TeamCalDialog extends PFDialog
     protected void onInitialize()
     {
       super.onInitialize();
-      setOutputMarkupId(true);
       final RepeatingView calendarRepeater = new RepeatingView("repeater");
 
       final WebMarkupContainer repeaterContainer = new WebMarkupContainer("repeaterContainer") {
@@ -267,9 +267,8 @@ public class TeamCalDialog extends PFDialog
         {
           selectedCalendars.clear();
           selectedCalendars.addAll(newFilter.calcAssignedtItems(teamCalDao, currentCollection));
-          target.add(repeaterContainer);
-          target.add(select);
-          target.add(teamCalChoice);
+          //          newFilter.setCurrentCollection(currentCollection);
+          addToTarget(target, repeaterContainer, select, teamCalChoice);
         }
       });
 
@@ -291,10 +290,8 @@ public class TeamCalDialog extends PFDialog
           currentCollection = addedCollection;
           selectedCalendars.clear();
           selectedCalendars.addAll(newFilter.calcAssignedtItems(teamCalDao, currentCollection));
-          target.add(collectionChoice.getDropDownChoice());
-          target.add(repeaterContainer);
-          target.add(select);
-          target.add(teamCalChoice);
+          //          newFilter.setCurrentCollection(currentCollection);
+          addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
         }
       };
       addCollectionButton.setLight();
@@ -329,8 +326,7 @@ public class TeamCalDialog extends PFDialog
             }
           }
           // because onBeforeRender is overwritten, just add the components
-          target.add(repeaterContainer);
-          target.add(select);
+          addToTarget(target, repeaterContainer, select);
         }
       });
       add(teamCalChoice);
@@ -396,6 +392,11 @@ public class TeamCalDialog extends PFDialog
       defaultForm.add(select);
     }
 
+    private void addToTarget(final AjaxRequestTarget target, final Component... components) {
+      for (int i = 0; i < components.length; i++) {
+        target.add(components[i]);
+      }
+    }
   }
 
 }
