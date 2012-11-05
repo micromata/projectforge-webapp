@@ -21,8 +21,6 @@ import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
 import org.projectforge.web.calendar.CalendarFilter;
 
-import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
-
 /**
  * @author Johannes Unterstein (j.unterstein@micromata.de)
  * @author M. Lauterbach (m.lauterbach@micromata.de)
@@ -38,9 +36,6 @@ public class TeamCalCalendarFilter extends CalendarFilter
 
   private TeamCalCalendarCollection currentCollection;
 
-  @XStreamAsAttribute
-  private final Integer firstHour = 8;
-
   /**
    * 
    */
@@ -48,6 +43,7 @@ public class TeamCalCalendarFilter extends CalendarFilter
   {
     super();
     teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
+//    setFirstHour(8);
 
     // TODO mock Code
     //    final TeamCalCalendarCollection mock = new TeamCalCalendarCollection("meineCollection", new HashMap<Integer, String>());
@@ -120,6 +116,7 @@ public class TeamCalCalendarFilter extends CalendarFilter
   }
 
   public void updateTeamCalendarFilter(final TeamCalCalendarFilter updatedFilter) {
+    setSelectedCalendar(updatedFilter.getSelectedCalendar());
     this.currentCollection = (TeamCalCalendarCollection) SerializationHelper.clone(updatedFilter.currentCollection);
     this.teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
     for (final TeamCalCalendarCollection collection : updatedFilter.teamCalCalendarCollection) {
@@ -154,15 +151,6 @@ public class TeamCalCalendarFilter extends CalendarFilter
   public List<TeamCalCalendarCollection> getTeamCalCalendarCollection()
   {
     return teamCalCalendarCollection;
-  }
-
-  /**
-   * @see org.projectforge.web.calendar.CalendarFilter#getFirstHour()
-   */
-  @Override
-  public Integer getFirstHour()
-  {
-    return super.getFirstHour();
   }
 
 }

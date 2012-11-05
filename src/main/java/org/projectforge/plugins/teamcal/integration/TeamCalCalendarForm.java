@@ -9,9 +9,14 @@
 
 package org.projectforge.plugins.teamcal.integration;
 
+import java.util.List;
 import java.util.Set;
 
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
+import org.apache.wicket.markup.html.form.IChoiceRenderer;
+import org.apache.wicket.model.IModel;
+import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.protocol.http.WebApplication;
 import org.projectforge.plugins.teamcal.dialog.TeamCalDialog;
@@ -21,6 +26,7 @@ import org.projectforge.web.calendar.CalendarFilter;
 import org.projectforge.web.calendar.CalendarForm;
 import org.projectforge.web.calendar.CalendarPage;
 import org.projectforge.web.wicket.flowlayout.AjaxIconButtonPanel;
+import org.projectforge.web.wicket.flowlayout.DropDownChoicePanel;
 import org.projectforge.web.wicket.flowlayout.FieldsetPanel;
 import org.projectforge.web.wicket.flowlayout.IconButtonPanel;
 import org.projectforge.web.wicket.flowlayout.IconType;
@@ -68,6 +74,44 @@ public class TeamCalCalendarForm extends CalendarForm
     calendarButtonPanel.setLight();
     fs.add(calendarButtonPanel);
     setDefaultButton(calendarButtonPanel.getButton());
+
+    if (filter.getCurrentCollection() != null){
+      final IChoiceRenderer<TeamCalCalendarCollection> teamCalCollectionRenderer = new IChoiceRenderer<TeamCalCalendarCollection>() {
+        private static final long serialVersionUID = 4804134958242438331L;
+
+        @Override
+        public String getIdValue(final TeamCalCalendarCollection object, final int index)
+        {
+          return object.getTeamCalCalendarColletionName();
+        }
+
+        @Override
+        public Object getDisplayValue(final TeamCalCalendarCollection object)
+        {
+          return object.getTeamCalCalendarColletionName();
+        }
+      };
+
+      final IModel<List<TeamCalCalendarCollection>> choicesModel = new PropertyModel<List<TeamCalCalendarCollection>>(filter, "teamCalCalendarCollection");
+      final IModel<TeamCalCalendarCollection> currentModel = new PropertyModel<TeamCalCalendarCollection>(filter, "currentCollection");
+      final DropDownChoicePanel<TeamCalCalendarCollection> collectionChoice = new DropDownChoicePanel<TeamCalCalendarCollection>(
+          "collectionList", currentModel, choicesModel, teamCalCollectionRenderer, false);
+      fs.add(collectionChoice);
+      collectionChoice.getDropDownChoice().setOutputMarkupId(true);
+
+      collectionChoice.getDropDownChoice().add(new AjaxFormComponentUpdatingBehavior("onChange") {
+        private static final long serialVersionUID = 8999698636114154230L;
+
+        /**
+         * @see org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior#onUpdate(org.apache.wicket.ajax.AjaxRequestTarget)
+         */
+        @Override
+        protected void onUpdate(final AjaxRequestTarget target)
+        {
+          setResponsePage(getParentPage());
+        }
+      });
+    }
   }
 
   /**

@@ -87,8 +87,10 @@ public class TeamCalDialog extends PFDialog
   public TeamCalDialog(final String id, final IModel<String> titleModel, final TeamCalCalendarFilter filter)
   {
     super(id, titleModel);
-    if (StringUtils.isEmpty(filter.getCurrentCollection().getTeamCalCalendarColletionName())) {
-      filter.getCurrentCollection().setTeamCalCalendarCollectionName("collection" + DateTime.now());
+    if (filter.getCurrentCollection() != null) {
+      if (StringUtils.isEmpty(filter.getCurrentCollection().getTeamCalCalendarColletionName())) {
+        filter.getCurrentCollection().setTeamCalCalendarCollectionName("collection" + DateTime.now());
+      }
     }
     this.currentFilter = filter;
     this.newFilter = (TeamCalCalendarFilter) SerializationHelper.clone(filter);
@@ -104,6 +106,8 @@ public class TeamCalDialog extends PFDialog
   public void open(final AjaxRequestTarget target)
   {
     newFilter.updateTeamCalendarFilter(currentFilter);
+    if (this.currentCollection == null)
+      this.currentCollection = newFilter.getCurrentCollection();
     // this assignment is wanted to prevent auto save "final" action
     if (StringUtils.isBlank(newFilter.getSelectedCalendar())
         || TimesheetEventsProvider.EVENT_CLASS_NAME.equals(newFilter.getSelectedCalendar())) {
@@ -290,7 +294,6 @@ public class TeamCalDialog extends PFDialog
           currentCollection = addedCollection;
           selectedCalendars.clear();
           selectedCalendars.addAll(newFilter.calcAssignedtItems(teamCalDao, currentCollection));
-          //          newFilter.setCurrentCollection(currentCollection);
           addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
         }
       };
@@ -346,6 +349,7 @@ public class TeamCalDialog extends PFDialog
           return Model.of(value);
         }
       };
+
       final Form<Void> defaultForm = new Form<Void>("defaultForm");
       add(defaultForm);
       select = new Select<TeamCalDO>("defaultSelect", new PropertyModel<TeamCalDO>(TeamCalDialog.this, "selectedDefaultCalendar")) {
