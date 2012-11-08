@@ -105,6 +105,9 @@ function openDialog(element, closeScript) {
 	$('#' + element).dialog({
 		'resizable': false,
 		'draggable': false,
+		'width': 'auto',
+		'height': 'auto',
+		'position': 'center',
 		close: closeScript
 		}).dialog('open');
 }
