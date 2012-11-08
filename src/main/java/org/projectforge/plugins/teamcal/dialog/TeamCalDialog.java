@@ -32,6 +32,7 @@ import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.ResourceModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.util.SerializationHelper;
 import org.joda.time.DateTime;
@@ -187,6 +188,8 @@ public class TeamCalDialog extends PFDialog
 
     private Select2MultiChoice<TeamCalDO> teamCalChoice;
 
+    private TeamCalNameDialog nameDialog;
+
     /**
      * @param id
      */
@@ -287,14 +290,14 @@ public class TeamCalDialog extends PFDialog
         protected void onSubmit(final AjaxRequestTarget target)
         {
           final TeamCalCalendarCollection addedCollection = new TeamCalCalendarCollection();
+          addedCollection.setTeamCalCalendarCollectionName("");
           addedCollection.setCalendarMap(new HashMap<Integer, String>());
-          // TODO use correct names
-          addedCollection.setTeamCalCalendarCollectionName("collection-" + DateTime.now());
           newFilter.getTeamCalCalendarCollection().add(addedCollection);
           currentCollection = addedCollection;
           selectedCalendars.clear();
           selectedCalendars.addAll(newFilter.calcAssignedtItems(teamCalDao, currentCollection));
           addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
+          nameDialog.open(target);
         }
       };
       addCollectionButton.setLight();
@@ -394,11 +397,24 @@ public class TeamCalDialog extends PFDialog
       add(select);
       select.setOutputMarkupId(true);
       defaultForm.add(select);
+
+      nameDialog = new TeamCalNameDialog("nameDialog", new ResourceModel("plugins.teamcal.title.list")) {
+        private static final long serialVersionUID = 95566184649574010L;
+
+        @Override
+        protected void onOk(final AjaxRequestTarget target, final String name)
+        {
+          nameDialog.close(target);
+          currentCollection.setTeamCalCalendarCollectionName(name);
+          addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
+        }
+      };
+      add(nameDialog);
     }
 
     private void addToTarget(final AjaxRequestTarget target, final Component... components) {
-      for (int i = 0; i < components.length; i++) {
-        target.add(components[i]);
+      for (final Component c: components) {
+        target.add(c);
       }
     }
   }

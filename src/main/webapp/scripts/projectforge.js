@@ -108,6 +108,7 @@ function openDialog(element, closeScript) {
 		'width': 'auto',
 		'height': 'auto',
 		'position': 'center',
+		'modal': true,
 		close: closeScript
 		}).dialog('open');
 }

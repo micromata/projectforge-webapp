@@ -75,7 +75,7 @@ public abstract class PFDialog extends Panel
     dialogContainer.setOutputMarkupId(true);
     dialogContainer.add(new AttributeAppender("title", titleModel));
     add(dialogContainer);
-    if(isRefreshedOnOpen() == true) {
+    if (isRefreshedOnOpen() == true) {
       dialogContainer.add(new EmptyPanel(WID_CONTENT));
     } else {
       dialogContainer.add(getDialogContent(WID_CONTENT));
@@ -152,23 +152,40 @@ public abstract class PFDialog extends Panel
     target.appendJavaScript("$('#" + dialogContainer.getMarkupId() + "').dialog('close');");
   }
 
+  public PFDialog appendNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final Form< ? > form,
+      final String... classnames)
+  {
+    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, form, classnames);
+    this.actionButtons.add(result);
+    return this;
+  }
+
+  public PFDialog prependNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final Form< ? > form,
+      final String... classnames)
+  {
+    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, form, classnames);
+    this.actionButtons.add(0, result);
+    return this;
+  }
+
   public PFDialog appendNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
   {
-    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, classnames);
+    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, null, classnames);
     this.actionButtons.add(result);
     return this;
   }
 
   public PFDialog prependNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
   {
-    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, classnames);
+    final SingleButtonPanel result = addNewAjaxActionButton(ajaxCallback, label, null, classnames);
     this.actionButtons.add(0, result);
     return this;
   }
 
-  private SingleButtonPanel addNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final String... classnames)
+  private SingleButtonPanel addNewAjaxActionButton(final AjaxCallback ajaxCallback, final String label, final Form< ? > form,
+      final String... classnames)
   {
-    final AjaxButton button = new AjaxButton("button") {
+    final AjaxButton button = new AjaxButton("button", form) {
       private static final long serialVersionUID = -5306532706450731336L;
 
       @Override
