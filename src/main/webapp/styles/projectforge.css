@@ -523,8 +523,11 @@ h2.box_head .subtitle {
 	filter: alpha(opacity=0);
 }
 
-.pf_teamCalDialog .teamCalCollection {
+.pf_teamCalDialog {
   width: 400px;
+}
+
+.pf_teamCalDialog .teamCalCollection {
   height: 37px;
 }
 .pf_teamCalDialog .teamCalCollection .left {
