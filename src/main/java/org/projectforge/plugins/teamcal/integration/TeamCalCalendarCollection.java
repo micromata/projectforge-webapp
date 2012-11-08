@@ -12,6 +12,8 @@ package org.projectforge.plugins.teamcal.integration;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
  *
@@ -86,7 +88,7 @@ public class TeamCalCalendarCollection implements Serializable
     if (calendarMap == null) {
       if (other.calendarMap != null)
         return false;
-    } else if (!calendarMap.equals(other.calendarMap))
+    } else if (equalHashMap(calendarMap, other.calendarMap) == false)
       return false;
     if (teamCalCalendarCollectionName == null) {
       if (other.teamCalCalendarCollectionName != null)
@@ -96,4 +98,23 @@ public class TeamCalCalendarCollection implements Serializable
     return true;
   }
 
+  private boolean equalHashMap(final Map<Integer, String> first, final Map<Integer, String> second)
+  {
+    if(first == null && second == null) {
+      return true;
+    }
+    // only one of them is null -> false
+    if(first == null || second == null) {
+      return false;
+    }
+    for(final Integer key : first.keySet()) {
+      if(second.get(key) == null) {
+        return false;
+      }
+      if(StringUtils.equals(first.get(key), second.get(key)) == false) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
