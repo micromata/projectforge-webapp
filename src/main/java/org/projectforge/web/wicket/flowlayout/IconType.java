@@ -34,7 +34,7 @@ public enum IconType
           "document"), FOLDER_OPEN("folder-open"), HELP("help"), JIRA_SUPPORT("star"), KEYBOARD("calculator"), MINUS_THICK("minusthick"), MODIFIED(
               "alert"), PLUS_THICK("plusthick"), //
               /** RSS feed symbol. */
-              SUBSCRIPTION("signal-diag"), TRASH("trash"), CALENDAR("calendar");
+              SUBSCRIPTION("signal-diag"), TRASH("trash"), CALENDAR("calendar"), WRENCH("wrench");
 
   private String cssIdentifier;
 

@@ -15,7 +15,6 @@ import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
-import org.apache.wicket.model.PropertyModel;
 import org.projectforge.web.dialog.PFDialog;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 
@@ -29,16 +28,19 @@ public abstract class TeamCalNameDialog extends PFDialog
 {
   private static final long serialVersionUID = 8687197318833240410L;
 
-  private Content content;
+  private final IModel<String> nameModel;
+
+  private Form<Void> form;
 
   /**
    * @param id
    * @param titleModel
    * @param filter
    */
-  public TeamCalNameDialog(final String id, final IModel<String> titleModel)
+  public TeamCalNameDialog(final String id, final IModel<String> titleModel, final IModel<String> nameModel)
   {
     super(id, titleModel);
+    this.nameModel = nameModel;
   }
 
   /**
@@ -54,17 +56,26 @@ public abstract class TeamCalNameDialog extends PFDialog
       @Override
       public void callback(final AjaxRequestTarget target)
       {
-        onOk(target, content.name);
+        onOk(target);
       }
     };
-    appendNewAjaxActionButton(okCallback, getString("save"), content.form, SingleButtonPanel.DEFAULT_SUBMIT);
+    appendNewAjaxActionButton(okCallback, getString("save"), form, SingleButtonPanel.DEFAULT_SUBMIT);
   }
 
   /**
    * @param target
-   * @param name
    */
-  protected abstract void onOk(AjaxRequestTarget target, String name);
+  protected abstract void onOk(AjaxRequestTarget target);
+
+  /**
+   * @see org.projectforge.web.dialog.PFDialog#open(org.apache.wicket.ajax.AjaxRequestTarget)
+   */
+  @Override
+  public void open(final AjaxRequestTarget target)
+  {
+    target.add(form);
+    super.open(target);
+  }
 
   /**
    * @see org.projectforge.web.dialog.PFDialog#getDialogContent(java.lang.String)
@@ -72,8 +83,7 @@ public abstract class TeamCalNameDialog extends PFDialog
   @Override
   protected Component getDialogContent(final String wicketId)
   {
-    content = new Content(wicketId);
-    return content;
+    return new Content(wicketId);
   }
 
   /**
@@ -83,10 +93,6 @@ public abstract class TeamCalNameDialog extends PFDialog
   private class Content extends Panel
   {
     private static final long serialVersionUID = -135497846745050310L;
-
-    private Form<Void> form;
-
-    private String name;
 
     /**
      * @param id
@@ -104,8 +110,11 @@ public abstract class TeamCalNameDialog extends PFDialog
     {
       super.onInitialize();
       form = new Form<Void>("form");
+      form.setOutputMarkupId(true);
       add(form);
-      form.add(new TextField<String>("name", new PropertyModel<String>(this, "name")));
+      form.add(new TextField<String>("name", nameModel));
     }
+
   }
+
 }

@@ -43,12 +43,6 @@ public class TeamCalCalendarFilter extends CalendarFilter
   {
     super();
     teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
-//    setFirstHour(8);
-
-    // TODO mock Code
-    //    final TeamCalCalendarCollection mock = new TeamCalCalendarCollection("meineCollection", new HashMap<Integer, String>());
-    //    teamCalCalendarCollection.add(mock);
-    //    currentCollection = mock;
   }
 
   public Set<Integer> getCalendarPk(TeamCalCalendarCollection collection)
@@ -115,9 +109,16 @@ public class TeamCalCalendarFilter extends CalendarFilter
     return result;
   }
 
-  public void updateTeamCalendarFilter(final TeamCalCalendarFilter updatedFilter) {
+  public void updateTeamCalendarFilter(final TeamCalCalendarFilter updatedFilter)
+  {
     setSelectedCalendar(updatedFilter.getSelectedCalendar());
-    this.currentCollection = (TeamCalCalendarCollection) SerializationHelper.clone(updatedFilter.currentCollection);
+    if (updatedFilter.getCurrentCollection() != null) {
+      if (this.currentCollection == null) {
+        this.currentCollection = new TeamCalCalendarCollection();
+      }
+      this.currentCollection.setCalendarMap(new HashMap<Integer, String>(updatedFilter.currentCollection.getCalendarMap()));
+      this.currentCollection.setTeamCalCalendarCollectionName(updatedFilter.getCurrentCollection().getTeamCalCalendarColletionName());
+    }
     this.teamCalCalendarCollection = new ArrayList<TeamCalCalendarCollection>();
     for (final TeamCalCalendarCollection collection : updatedFilter.teamCalCalendarCollection) {
       this.teamCalCalendarCollection.add((TeamCalCalendarCollection) SerializationHelper.clone(collection));
