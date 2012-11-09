@@ -68,6 +68,8 @@ public class TeamCalDialog extends PFDialog
 
   private final TeamCalCalendarFilter oldFilter;
 
+  private DropDownChoicePanel<TeamCalCalendarCollection> collectionChoice;
+
   // Adaption (fake) to display "Time Sheets" as selection option
   private final TeamCalDO timeSheetCalendar;
 
@@ -247,9 +249,10 @@ public class TeamCalDialog extends PFDialog
         }
       };
 
+      // TEAMCALCALENDARCOLLECTION DROPDOWN
       final IModel<List<TeamCalCalendarCollection>> choicesModel = new PropertyModel<List<TeamCalCalendarCollection>>(newFilter, "teamCalCalendarCollection");
       final IModel<TeamCalCalendarCollection> currentModel = new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection");
-      final DropDownChoicePanel<TeamCalCalendarCollection> collectionChoice = new DropDownChoicePanel<TeamCalCalendarCollection>(
+      collectionChoice = new DropDownChoicePanel<TeamCalCalendarCollection>(
           "collectionList", currentModel, choicesModel, teamCalCollectionRenderer, false);
       add(collectionChoice);
       collectionChoice.getDropDownChoice().setOutputMarkupId(true);
@@ -269,6 +272,7 @@ public class TeamCalDialog extends PFDialog
         }
       });
 
+      // ADD BUTTON FOR TCCC
       final IconButtonPanel addCollectionButton = new AjaxIconButtonPanel("addCollection", IconType.PLUS_THICK,
           getString("plugins.teamcal.title.list")) {
         private static final long serialVersionUID = -8572571785540159369L;
@@ -303,6 +307,7 @@ public class TeamCalDialog extends PFDialog
       addCollectionButton.setLight();
       add(addCollectionButton);
 
+      // EDIT BUTTON FOR TCCC
       final IconButtonPanel editCollectionButton = new AjaxIconButtonPanel("editCollection", IconType.WRENCH,
           getString("plugins.teamcal.title.list")) {
         private static final long serialVersionUID = -8572571785540159369L;
@@ -320,7 +325,9 @@ public class TeamCalDialog extends PFDialog
             @Override
             public void callback(final AjaxRequestTarget target)
             {
+              newFilter.getTeamCalCalendarCollection().remove(newFilter.getCurrentCollection());
               newFilter.getCurrentCollection().setTeamCalCalendarCollectionName(currentName);
+              newFilter.getTeamCalCalendarCollection().add(newFilter.getCurrentCollection());
               addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
             }
           };
@@ -335,6 +342,7 @@ public class TeamCalDialog extends PFDialog
       selectedCalendars.clear();
       selectedCalendars.addAll(newFilter.calcAssignedtItems(teamCalDao, newFilter.getCurrentCollection()));
 
+      // TEAMCAL CHOICE FIELD
       final TeamCalChoiceProvider teamProvider = new TeamCalChoiceProvider();
       teamCalChoice = new Select2MultiChoice<TeamCalDO>("choices",
           new PropertyModel<Collection<TeamCalDO>>(TeamCalDialog.this, "selectedCalendars"), teamProvider);
@@ -382,6 +390,7 @@ public class TeamCalDialog extends PFDialog
         }
       };
 
+      // TEAMCAL DROPDOWN
       final Form<Void> defaultForm = new Form<Void>("defaultForm");
       add(defaultForm);
       select = new Select<TeamCalDO>("defaultSelect", new PropertyModel<TeamCalDO>(TeamCalDialog.this, "selectedDefaultCalendar")) {
@@ -427,7 +436,7 @@ public class TeamCalDialog extends PFDialog
       select.setOutputMarkupId(true);
       defaultForm.add(select);
 
-      nameDialog = new TeamCalNameDialog("nameDialog", new ResourceModel("plugins.teamcal.title.list"), new PropertyModel<String>(Content.this, "currentName")) {
+      nameDialog = new TeamCalNameDialog("nameDialog", new ResourceModel("plugins.teamcal.title.list"), new PropertyModel<String>(Content.this, "currentName")){
         private static final long serialVersionUID = 95566184649574010L;
 
         @Override
@@ -435,6 +444,7 @@ public class TeamCalDialog extends PFDialog
         {
           nameDialog.close(target);
           currentAjaxCallback.callback(target);
+          collectionChoice.getDropDownChoice().setChoices(newFilter.getTeamCalCalendarCollection());
         }
       };
       add(nameDialog);
