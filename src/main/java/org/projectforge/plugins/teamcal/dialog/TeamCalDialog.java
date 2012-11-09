@@ -9,9 +9,11 @@
 
 package org.projectforge.plugins.teamcal.dialog;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -36,9 +38,12 @@ import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.hibernate.util.SerializationHelper;
 import org.projectforge.plugins.teamcal.admin.TeamCalDO;
 import org.projectforge.plugins.teamcal.admin.TeamCalDao;
+import org.projectforge.plugins.teamcal.admin.TeamCalRight;
 import org.projectforge.plugins.teamcal.event.TeamCalEventProvider;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarCollection;
 import org.projectforge.plugins.teamcal.integration.TeamCalCalendarFilter;
+import org.projectforge.user.PFUserContext;
+import org.projectforge.user.PFUserDO;
 import org.projectforge.web.common.ColorPickerPanel;
 import org.projectforge.web.dialog.PFDialog;
 import org.projectforge.web.timesheet.TimesheetEventsProvider;
@@ -274,7 +279,7 @@ public class TeamCalDialog extends PFDialog
 
       // ADD BUTTON FOR TCCC
       final IconButtonPanel addCollectionButton = new AjaxIconButtonPanel("addCollection", IconType.PLUS_THICK,
-          getString("plugins.teamcal.title.list")) {
+          getString("add")) {
         private static final long serialVersionUID = -8572571785540159369L;
 
         /**
@@ -309,7 +314,7 @@ public class TeamCalDialog extends PFDialog
 
       // EDIT BUTTON FOR TCCC
       final IconButtonPanel editCollectionButton = new AjaxIconButtonPanel("editCollection", IconType.WRENCH,
-          getString("plugins.teamcal.title.list")) {
+          getString("edit")) {
         private static final long serialVersionUID = -8572571785540159369L;
 
         /**
@@ -369,7 +374,7 @@ public class TeamCalDialog extends PFDialog
             }
           }
           // because onBeforeRender is overwritten, just add the components
-          addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);;
+          addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
         }
       });
       add(teamCalChoice);
@@ -404,8 +409,26 @@ public class TeamCalDialog extends PFDialog
         {
           super.onBeforeRender();
           final List<TeamCalDO> result = newFilter.calcAssignedtItems(teamCalDao, newFilter.getCurrentCollection());
-          result.add(0, timeSheetCalendar);
-          final SelectOptions<TeamCalDO> options = new SelectOptions<TeamCalDO>("options", result, renderer);
+          final TeamCalRight teamCalRight = new TeamCalRight();
+          final PFUserDO user = PFUserContext.getUser();
+          final List<TeamCalDO> filteredList = new ArrayList<TeamCalDO>();
+          filteredList.add(0, timeSheetCalendar);
+          if (result != null) {
+            final Iterator<TeamCalDO> it = result.iterator();
+            while (it.hasNext()) {
+              final TeamCalDO teamCal = it.next();
+              if (teamCalRight.isOwner(user, teamCal) == true) {
+                filteredList.add(teamCal);
+              } else {
+                if (teamCal.getFullAccessGroup() != null) {
+                  if (teamCalRight.isMemberOfAtLeastOneGroup(user, teamCal.getFullAccessGroupId()) == true) {
+                    filteredList.add(teamCal);
+                  }
+                }
+              }
+            }
+          }
+          final SelectOptions<TeamCalDO> options = new SelectOptions<TeamCalDO>("options", filteredList, renderer);
           select.addOrReplace(options);
         }
 
@@ -446,6 +469,7 @@ public class TeamCalDialog extends PFDialog
           currentAjaxCallback.callback(target);
           collectionChoice.getDropDownChoice().setChoices(newFilter.getTeamCalCalendarCollection());
           collectionChoice.getDropDownChoice().setDefaultModel(new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection"));
+          addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
         }
       };
       add(nameDialog);

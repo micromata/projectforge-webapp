@@ -10,7 +10,7 @@
 package org.projectforge.plugins.teamcal.integration;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -24,17 +24,17 @@ public class TeamCalCalendarCollection implements Serializable
 
   private String teamCalCalendarCollectionName;
 
-  private Map<Integer, String> calendarMap;
+  private HashMap<Integer, String> calendarMap;
 
   public TeamCalCalendarCollection() {
 
   }
 
-  public void setCalendarMap(final Map<Integer, String> calendarMap) {
-    this.calendarMap = calendarMap;
+  public void setCalendarMap(final HashMap<Integer, String> calendarMap) {
+    this.calendarMap =  calendarMap;
   }
 
-  public Map<Integer, String> getCalendarMap() {
+  public HashMap<Integer, String> getCalendarMap() {
     return calendarMap;
   }
 
@@ -93,7 +93,7 @@ public class TeamCalCalendarCollection implements Serializable
     return true;
   }
 
-  private boolean equalHashMap(final Map<Integer, String> first, final Map<Integer, String> second)
+  private boolean equalHashMap(final HashMap<Integer, String> first, final HashMap<Integer, String> second)
   {
     if(first == null && second == null) {
       return true;

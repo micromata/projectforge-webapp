@@ -59,7 +59,7 @@ public class TeamCalCalendarForm extends CalendarForm
     final TeamCalDialog dialog = new TeamCalDialog(fs.newChildId(), new ResourceModel("plugins.teamcal.title.list"), filter);
     fs.add(dialog);
     final IconButtonPanel calendarButtonPanel = new AjaxIconButtonPanel(fs.newChildId(), IconType.CALENDAR,
-        getString("plugins.teamcal.title.list")) {
+        getString("plugins.teamcal.calendar.edit")) {
       private static final long serialVersionUID = -8572571785540159369L;
 
       /**

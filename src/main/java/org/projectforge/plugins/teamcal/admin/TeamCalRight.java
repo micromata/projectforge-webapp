@@ -181,7 +181,7 @@ public class TeamCalRight extends UserRightAccessCheck<TeamCalDO>
     return ObjectUtils.equals(user.getId(), cal.getOwnerId()) == true;
   }
 
-  private boolean isMemberOfAtLeastOneGroup(final PFUserDO user, final Integer... groupIds)
+  public boolean isMemberOfAtLeastOneGroup(final PFUserDO user, final Integer... groupIds)
   {
     return UserRights.getUserGroupCache().isUserMemberOfAtLeastOneGroup(user.getId(), groupIds);
   }
