@@ -445,6 +445,7 @@ public class TeamCalDialog extends PFDialog
           nameDialog.close(target);
           currentAjaxCallback.callback(target);
           collectionChoice.getDropDownChoice().setChoices(newFilter.getTeamCalCalendarCollection());
+          collectionChoice.getDropDownChoice().setDefaultModel(new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection"));
         }
       };
       add(nameDialog);
