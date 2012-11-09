@@ -265,7 +265,7 @@ public class TeamCalDialog extends PFDialog
         {
           selectedCalendars.clear();
           selectedCalendars.addAll(newFilter.calcAssignedtItems(teamCalDao, newFilter.getCurrentCollection()));
-          addToTarget(target, repeaterContainer, select, teamCalChoice);
+          addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
         }
       });
 
@@ -361,7 +361,7 @@ public class TeamCalDialog extends PFDialog
             }
           }
           // because onBeforeRender is overwritten, just add the components
-          addToTarget(target, repeaterContainer, select);
+          addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);;
         }
       });
       add(teamCalChoice);
