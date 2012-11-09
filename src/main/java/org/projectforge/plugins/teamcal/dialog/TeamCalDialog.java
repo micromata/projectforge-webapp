@@ -247,8 +247,8 @@ public class TeamCalDialog extends PFDialog
         }
       };
 
-      final IModel<List<TeamCalCalendarCollection>> choicesModel = new PropertyModel<List<TeamCalCalendarCollection>>(this, "teamCalCalendarCollection");
-      final IModel<TeamCalCalendarCollection> currentModel = new PropertyModel<TeamCalCalendarCollection>(this, "currentCollection");
+      final IModel<List<TeamCalCalendarCollection>> choicesModel = new PropertyModel<List<TeamCalCalendarCollection>>(newFilter, "teamCalCalendarCollection");
+      final IModel<TeamCalCalendarCollection> currentModel = new PropertyModel<TeamCalCalendarCollection>(newFilter, "currentCollection");
       final DropDownChoicePanel<TeamCalCalendarCollection> collectionChoice = new DropDownChoicePanel<TeamCalCalendarCollection>(
           "collectionList", currentModel, choicesModel, teamCalCollectionRenderer, false);
       add(collectionChoice);
@@ -438,18 +438,6 @@ public class TeamCalDialog extends PFDialog
         }
       };
       add(nameDialog);
-    }
-
-    // used by wicket
-    @SuppressWarnings("unused")
-    public List<TeamCalCalendarCollection> getTeamCalCalendarCollection() {
-      return newFilter.getTeamCalCalendarCollection();
-    }
-
-    // used by wicket
-    @SuppressWarnings("unused")
-    public TeamCalCalendarCollection getCurrentCollection() {
-      return newFilter.getCurrentCollection();
     }
 
     private void addToTarget(final AjaxRequestTarget target, final Component... components) {
