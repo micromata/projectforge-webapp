@@ -442,13 +442,13 @@ public class TeamCalDialog extends PFDialog
 
     // used by wicket
     @SuppressWarnings("unused")
-    private List<TeamCalCalendarCollection> getTeamCalCalendarCollection() {
+    public List<TeamCalCalendarCollection> getTeamCalCalendarCollection() {
       return newFilter.getTeamCalCalendarCollection();
     }
 
     // used by wicket
     @SuppressWarnings("unused")
-    private TeamCalCalendarCollection getCurrentCollection() {
+    public TeamCalCalendarCollection getCurrentCollection() {
       return newFilter.getCurrentCollection();
     }
 
