@@ -10,12 +10,13 @@
 package org.projectforge.plugins.teamcal.integration;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author M. Lauterbach (m.lauterbach@micromata.de)
- * 
+ *
  */
 public class TeamCalCalendarCollection implements Serializable
 {
@@ -25,59 +26,32 @@ public class TeamCalCalendarCollection implements Serializable
 
   private Map<Integer, String> calendarMap;
 
-  private long creationTime;
+  public TeamCalCalendarCollection() {
 
-  public TeamCalCalendarCollection()
-  {
-    calendarMap = new HashMap<Integer, String>();
-    creationTime = System.currentTimeMillis();
   }
 
-  public void setCalendarMap(final Map<Integer, String> calendarMap)
-  {
+  public void setCalendarMap(final Map<Integer, String> calendarMap) {
     this.calendarMap = calendarMap;
   }
 
-  public Map<Integer, String> getCalendarMap()
-  {
+  public Map<Integer, String> getCalendarMap() {
     return calendarMap;
   }
 
-  public void setTeamCalCalendarCollectionName(final String name)
-  {
+  public void setTeamCalCalendarCollectionName(final String name) {
     this.teamCalCalendarCollectionName = name;
   }
 
-  public String getTeamCalCalendarColletionName()
-  {
+  public String getTeamCalCalendarColletionName() {
     return teamCalCalendarCollectionName;
   }
 
-  public void addNewCalendar(final Integer calendarPk, final String colorCode)
-  {
+  public void addNewCalendar(final Integer calendarPk, final String colorCode) {
     calendarMap.put(calendarPk, colorCode);
   }
 
-  public void removeCalendar(final Integer calendarPk)
-  {
+  public void removeCalendar(final Integer calendarPk) {
     calendarMap.remove(calendarPk);
-  }
-
-  /**
-   * @return the creationTime
-   */
-  public long getCreationTime()
-  {
-    return creationTime;
-  }
-
-  /**
-   * @param creationTime the creationTime to set
-   * @return this for chaining.
-   */
-  public void setCreationTime(final long creationTime)
-  {
-    this.creationTime = creationTime;
   }
 
   /**
@@ -88,7 +62,8 @@ public class TeamCalCalendarCollection implements Serializable
   {
     final int prime = 31;
     int result = 1;
-    result = prime * result + (int) (creationTime ^ (creationTime >>> 32));
+    result = prime * result + ((calendarMap == null) ? 0 : calendarMap.hashCode());
+    result = prime * result + ((teamCalCalendarCollectionName == null) ? 0 : teamCalCalendarCollectionName.hashCode());
     return result;
   }
 
@@ -105,9 +80,36 @@ public class TeamCalCalendarCollection implements Serializable
     if (getClass() != obj.getClass())
       return false;
     final TeamCalCalendarCollection other = (TeamCalCalendarCollection) obj;
-    if (creationTime != other.creationTime)
+    if (calendarMap == null) {
+      if (other.calendarMap != null)
+        return false;
+    } else if (equalHashMap(calendarMap, other.calendarMap) == false)
+      return false;
+    if (teamCalCalendarCollectionName == null) {
+      if (other.teamCalCalendarCollectionName != null)
+        return false;
+    } else if (!teamCalCalendarCollectionName.equals(other.teamCalCalendarCollectionName))
       return false;
     return true;
   }
 
+  private boolean equalHashMap(final Map<Integer, String> first, final Map<Integer, String> second)
+  {
+    if(first == null && second == null) {
+      return true;
+    }
+    // only one of them is null -> false
+    if(first == null || second == null) {
+      return false;
+    }
+    for(final Integer key : first.keySet()) {
+      if(second.get(key) == null) {
+        return false;
+      }
+      if(StringUtils.equals(first.get(key), second.get(key)) == false) {
+        return false;
+      }
+    }
+    return true;
+  }
 }

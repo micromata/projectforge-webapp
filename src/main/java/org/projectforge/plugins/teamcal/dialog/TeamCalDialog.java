@@ -292,7 +292,7 @@ public class TeamCalDialog extends PFDialog
               newFilter.getTeamCalCalendarCollection().add(addedCollection);
               newFilter.setCurrentCollection(addedCollection);
               selectedCalendars.clear();
-              selectedCalendars.addAll(newFilter.calcAssignedtItems(teamCalDao, newFilter.getCurrentCollection()));
+              selectedCalendars.addAll(newFilter.calcAssignedtItems(teamCalDao, addedCollection));
               addToTarget(target, collectionChoice.getDropDownChoice(), repeaterContainer, select, teamCalChoice);
             }
           };

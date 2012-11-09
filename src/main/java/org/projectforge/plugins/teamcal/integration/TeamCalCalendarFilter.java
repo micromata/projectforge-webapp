@@ -115,7 +115,6 @@ public class TeamCalCalendarFilter extends CalendarFilter
     if (updatedFilter.getCurrentCollection() != null) {
       if (this.currentCollection == null) {
         this.currentCollection = new TeamCalCalendarCollection();
-        this.currentCollection.setCreationTime(updatedFilter.getCurrentCollection().getCreationTime());
       }
       this.currentCollection.setCalendarMap(new HashMap<Integer, String>(updatedFilter.currentCollection.getCalendarMap()));
       this.currentCollection.setTeamCalCalendarCollectionName(updatedFilter.getCurrentCollection().getTeamCalCalendarColletionName());
