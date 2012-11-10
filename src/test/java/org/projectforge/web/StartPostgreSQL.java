@@ -50,6 +50,7 @@ public class StartPostgreSQL
     final StartSettings settings = new StartSettings(HibernateDialect.PostgreSQL, BASE_DIR);
     settings.setJdbcUser(JDBC_USER);
     settings.setSchemaUpdate(SCHEMA_UPDATE);
+    settings.setLaunchBrowserAfterStartup(true);
     StartHelper.start(settings);
   }
 }

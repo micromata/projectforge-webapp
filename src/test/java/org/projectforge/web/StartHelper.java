@@ -23,7 +23,11 @@
 
 package org.projectforge.web;
 
+import java.awt.Desktop;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.bio.SocketConnector;
@@ -125,6 +129,9 @@ public class StartHelper
       configuration.configure(server);
       System.out.println(">>> STARTING EMBEDDED JETTY SERVER, PRESS ANY KEY TO STOP");
       server.start();
+      if (settings.isLaunchBrowserAfterStartup() == true) {
+        launchBrowser(connector);
+      }
       System.in.read();
       System.out.println(">>> STOPPING EMBEDDED JETTY SERVER");
       server.stop();
@@ -132,6 +139,23 @@ public class StartHelper
     } catch (final Exception e) {
       e.printStackTrace();
       System.exit(1);
+    }
+  }
+
+  private static void launchBrowser(final SocketConnector connector)
+  {
+    Desktop desktop = null;
+    if (Desktop.isDesktopSupported()) {
+      desktop = Desktop.getDesktop();
+    }
+    if (desktop != null) {
+      try {
+        desktop.browse(new URI("http://localhost:" + connector.getPort() + "/ProjectForge/"));
+      } catch (final IOException e) {
+        log.error("Can't launch browser: " + e.getMessage(), e);
+      } catch (final URISyntaxException e) {
+        log.error("Can't launch browser: " + e.getMessage(), e);
+      }
     }
   }
 
@@ -162,7 +186,7 @@ public class StartHelper
   private static void setProperty(final String key, final Object value)
   {
     if (value == null) {
-      setProperty(key, (String)null);
+      setProperty(key, (String) null);
     } else {
       setProperty(key, String.valueOf(value));
     }

@@ -54,6 +54,7 @@ public class MyStartPostgreSQL
     settings.setSchemaUpdate(SCHEMA_UPDATE);
     //settings.setUsingCookies(false);
     settings.setDevelopment(DEVELOPMENT_MODE);
+    settings.setLaunchBrowserAfterStartup(true);
     StartHelper.start(settings);
   }
 }

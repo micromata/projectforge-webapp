@@ -59,6 +59,8 @@ public class StartSettings
 
   private Integer jdbcMaxActive;
 
+  private boolean launchBrowserAfterStartup = true;
+
   private static final String DEFAULT_JDBC_URL_HSQL_DB = "database/ProjectForgeDB";
 
   private static final String DEFAULT_JDBC_URL_POSTGRESQL = "jdbc:postgresql://localhost:5432/projectforge";
@@ -263,6 +265,26 @@ public class StartSettings
   public StartSettings setJdbcMaxActive(final Integer jdbcMaxActive)
   {
     this.jdbcMaxActive = jdbcMaxActive;
+    return this;
+  }
+
+  /**
+   * Should the browser be started with ProjectForge automatically after start-up?
+   * @return the launchBrowserAfterStartup
+   */
+  public boolean isLaunchBrowserAfterStartup()
+  {
+    return launchBrowserAfterStartup;
+  }
+
+  /**
+   * Should the browser be started with ProjectForge automatically after start-up?
+   * @param launchBrowserAfterStartup the launchBrowserAfterStartup to set
+   * @return this for chaining.
+   */
+  public StartSettings setLaunchBrowserAfterStartup(final boolean launchBrowserAfterStartup)
+  {
+    this.launchBrowserAfterStartup = launchBrowserAfterStartup;
     return this;
   }
 }

@@ -45,6 +45,7 @@ public class Start
   {
     final StartSettings settings = new StartSettings(HibernateDialect.HSQL, BASE_DIR);
     settings.setSchemaUpdate(SCHEMA_UPDATE);
+    settings.setLaunchBrowserAfterStartup(true);
     StartHelper.start(settings);
   }
 }
