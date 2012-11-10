@@ -69,6 +69,7 @@ import org.projectforge.orga.ContractType;
 import org.projectforge.user.LoginDefaultHandler;
 import org.projectforge.web.MenuEntryConfig;
 import org.projectforge.web.MenuItemDef;
+import org.projectforge.web.WebConfig;
 import org.projectforge.xml.stream.AliasMap;
 import org.projectforge.xml.stream.XmlField;
 import org.projectforge.xml.stream.XmlHelper;
@@ -178,6 +179,8 @@ public class ConfigXml
 
   private MenuEntryConfig menuConfig;
 
+  private WebConfig webConfig;
+
   private boolean portletMode;
 
   private AccountingConfig accountingConfig;
@@ -242,6 +245,7 @@ public class ConfigXml
     cronExpressionNightlyJob = null;
     cronExpressionMebPollingJob = null;
     menuConfig = null;
+    webConfig = null;
     sendMailConfiguration = new SendMailConfig();
     accountingConfig = new AccountingConfig();
     accountingConfig.reset();
@@ -1040,6 +1044,15 @@ public class ConfigXml
   public MenuEntryConfig getMenuConfig()
   {
     return menuConfig;
+  }
+
+  /**
+   * @return the webConfig
+   * @see WebConfig
+   */
+  public WebConfig getWebConfig()
+  {
+    return webConfig;
   }
 
   /**

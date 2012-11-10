@@ -87,7 +87,7 @@ public class WicketPageTestBase extends TestBase
     @Override
     public Class< ? extends Page> getHomePage()
     {
-      return WicketApplication.DEFAULT_PAGE;
+      return WicketUtils.getDefaultPage();
     }
 
     @Override
@@ -142,7 +142,7 @@ public class WicketPageTestBase extends TestBase
   {
     // start and render the test page
     tester.startPage(LoginPage.class);
-    if (ClassUtils.isAssignable(tester.getLastRenderedPage().getClass(), WicketApplication.DEFAULT_PAGE) == true) {
+    if (ClassUtils.isAssignable(tester.getLastRenderedPage().getClass(), WicketUtils.getDefaultPage()) == true) {
       // Already logged-in.
       return;
     }
@@ -153,7 +153,7 @@ public class WicketPageTestBase extends TestBase
     form.setValue("password", password);
     form.submit(KEY_LOGINPAGE_BUTTON_LOGIN);
     if (checkDefaultPage == true) {
-      tester.assertRenderedPage(WicketApplication.DEFAULT_PAGE);
+      tester.assertRenderedPage(WicketUtils.getDefaultPage());
     }
   }
 

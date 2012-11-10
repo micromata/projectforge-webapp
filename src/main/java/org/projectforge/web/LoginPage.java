@@ -54,7 +54,6 @@ import org.projectforge.web.core.LogoServlet;
 import org.projectforge.web.mobile.LoginMobilePage;
 import org.projectforge.web.wicket.AbstractUnsecureBasePage;
 import org.projectforge.web.wicket.MySession;
-import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketUtils;
 
 public class LoginPage extends AbstractUnsecureBasePage
@@ -160,7 +159,7 @@ public class LoginPage extends AbstractUnsecureBasePage
     final PFUserDO sessionUser = UserFilter.getUser(WicketUtils.getHttpServletRequest(getRequest()));
     // Sometimes the wicket session user is given but the http session user is lost (re-login required).
     if (wicketSessionUser != null && sessionUser != null && wicketSessionUser.getId() == sessionUser.getId()) {
-      throw new RestartResponseException(WicketApplication.DEFAULT_PAGE);
+      throw new RestartResponseException(WicketUtils.getDefaultPage());
     }
     if (initDatabaseDao.isEmpty() == true) {
       log.info("Data-base is empty: redirect to SetupPage...");

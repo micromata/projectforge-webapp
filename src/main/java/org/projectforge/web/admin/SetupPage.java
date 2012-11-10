@@ -49,7 +49,6 @@ import org.projectforge.web.UserFilter;
 import org.projectforge.web.wicket.AbstractUnsecureBasePage;
 import org.projectforge.web.wicket.MessagePage;
 import org.projectforge.web.wicket.MySession;
-import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketUtils;
 
 public class SetupPage extends AbstractUnsecureBasePage
@@ -212,7 +211,7 @@ public class SetupPage extends AbstractUnsecureBasePage
     if (initDatabaseDao.isEmpty() == false) {
       log.error("Couldn't call set-up page, because the data-base isn't empty!");
       ((MySession) getSession()).logout();
-      throw new RestartResponseException(WicketApplication.DEFAULT_PAGE);
+      throw new RestartResponseException(WicketUtils.getDefaultPage());
     }
   }
 

@@ -32,8 +32,8 @@ import org.projectforge.test.TestBase;
 import org.projectforge.web.address.AddressListPage;
 import org.projectforge.web.admin.SystemUpdatePage;
 import org.projectforge.web.calendar.CalendarPage;
-import org.projectforge.web.wicket.WicketApplication;
 import org.projectforge.web.wicket.WicketPageTestBase;
+import org.projectforge.web.wicket.WicketUtils;
 
 public class LoginPageTest extends WicketPageTestBase
 {
@@ -61,7 +61,7 @@ public class LoginPageTest extends WicketPageTestBase
     tester.assertRenderedPage(AddressListPage.class);
 
     loginTestAdmin(); // login should be ignored.
-    tester.assertRenderedPage(WicketApplication.DEFAULT_PAGE);
+    tester.assertRenderedPage(WicketUtils.getDefaultPage());
 
     logout();
     try {

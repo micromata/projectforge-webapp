@@ -67,7 +67,7 @@ import org.projectforge.core.BaseDO;
 import org.projectforge.core.BaseDao;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.web.URLHelper;
-import org.projectforge.web.calendar.CalendarPage;
+import org.projectforge.web.WebConfig;
 import org.projectforge.web.calendar.DateTimeFormatter;
 import org.projectforge.web.fibu.ISelectCallerPage;
 import org.projectforge.web.mobile.AbstractSecuredMobilePage;
@@ -329,21 +329,22 @@ public class WicketUtils
   }
 
   /**
-   * @return Default page of ProjectForge. Currently CalendarPage is the default page (e. g. to redirect after login if no forward url is
-   *         specified).
+   * @return Default page of ProjectForge. Currently {@link WicketApplication#DEFAULT_PAGE} is the default page (e. g. to redirect after
+   *         login if no forward url is specified).
    */
   public static String getDefaultPageUrl()
   {
-    return getBookmarkablePageUrl(CalendarPage.class);
+    return getBookmarkablePageUrl(getDefaultPage());
   }
 
   /**
-   * @return Default page of ProjectForge. Currently CalendarPage is the default page (e. g. to redirect after cancel if no other return
-   *         page is specified).
+   * @return Default page of ProjectForge. Currently {@link WicketApplication#DEFAULT_PAGE} is the default page (e. g. to redirect after
+   *         cancel if no other return page is specified).
    */
   public static Class< ? extends WebPage> getDefaultPage()
   {
-    return CalendarPage.class;
+    final WebConfig webConfig = ConfigXml.getInstance().getWebConfig();
+    return webConfig != null ? webConfig.getDefaultPage() : WicketApplication.DEFAULT_PAGE;
   }
 
   /**

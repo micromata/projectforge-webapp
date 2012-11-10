@@ -98,7 +98,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
 
   public static final String RESOURCE_BUNDLE_NAME = "I18nResources";
 
-  public static final Class< ? extends WebPage> DEFAULT_PAGE = CalendarPage.class;
+  static final Class< ? extends WebPage> DEFAULT_PAGE = CalendarPage.class;
 
   private static Boolean developmentMode;
 
@@ -143,6 +143,15 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   public static Boolean internalIsDevelopmentMode()
   {
     return developmentMode;
+  }
+
+  /**
+   * Please don't use this method, use {@link WicketUtils#getDefaultPage()} instead.
+   * @return
+   */
+  public static Class< ? extends WebPage> internalGetDefaultPage()
+  {
+    return DEFAULT_PAGE;
   }
 
   public static String getBookmarkableMountPath(final Class< ? extends Page> pageClass)
@@ -276,7 +285,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
         if (isDevelopmentSystem() == true) {
           log.error(ex.getMessage(), ex);
           if (rootCause instanceof SQLException) {
-            SQLException next = (SQLException)rootCause;
+            SQLException next = (SQLException) rootCause;
             while ((next = next.getNextException()) != null) {
               log.error(next.getMessage(), next);
             }
@@ -443,7 +452,7 @@ public class WicketApplication extends WebApplication implements WicketApplicati
   @Override
   public Class< ? extends WebPage> getHomePage()
   {
-    return DEFAULT_PAGE;
+    return WicketUtils.getDefaultPage();
   }
 
   @Override
