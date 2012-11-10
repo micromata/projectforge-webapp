@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.projectforge.core.Translation;
 import org.projectforge.xml.stream.XmlField;
 import org.projectforge.xml.stream.XmlObject;
@@ -82,7 +83,7 @@ public class MenuEntryConfig
     return label;
   }
 
-  MenuEntryConfig setLabel(String label)
+  MenuEntryConfig setLabel(final String label)
   {
     this.label = label;
     return this;
@@ -139,6 +140,15 @@ public class MenuEntryConfig
     return visible;
   }
 
+  /**
+   * Needed but not used, otherwise code reformatter transforms member visible to final member.
+   * @param visible the visible to set
+   */
+  void setVisible(final boolean visible)
+  {
+    this.visible = visible;
+  }
+
   public List<MenuEntryConfig> getChildren()
   {
     return children;
@@ -164,7 +174,7 @@ public class MenuEntryConfig
     return null;
   }
 
-  public void setParent(MenuEntryConfig parent)
+  public void setParent(final MenuEntryConfig parent)
   {
     this.parent = parent;
   }
@@ -216,5 +226,15 @@ public class MenuEntryConfig
   MenuEntryConfig addTranslation(final String locale, final String translation)
   {
     return addTranslation(new Locale(locale), translation);
+  }
+
+  /**
+   * @see ReflectionToStringBuilder
+   */
+  @Override
+  public String toString()
+  {
+    final ReflectionToStringBuilder tos = new ReflectionToStringBuilder(this);
+    return tos.toString();
   }
 }
