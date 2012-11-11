@@ -145,6 +145,7 @@ public class PFUserDO extends DefaultBaseDO implements ShortDisplayNameCapable
 
   private boolean hrPlanning = true;
 
+  @Field(index = Index.TOKENIZED, store = Store.NO)
   private String ldapValues;
 
   @Transient
