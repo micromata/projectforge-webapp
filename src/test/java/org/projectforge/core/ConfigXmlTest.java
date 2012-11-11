@@ -76,7 +76,7 @@ public class ConfigXmlTest
       + "  <workingDirectory>work</workingDirectory>\n"
       + "  <tempDirectory>tmp</tempDirectory>\n"
       + "  <accountingConfig/>\n"
-      + "  <ldapConfig>\n"
+      + "  <ldapConfig storePasswords='true'>\n"
       + "    <authentication>simple</authentication>\n"
       + "  </ldapConfig>\n"
       + "  <sendMail port='25'>\n"
