@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.core.Configuration;
+import org.projectforge.ldap.PFUserDOConverter;
 import org.projectforge.user.GroupDao;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserDO;
@@ -95,6 +96,10 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
       getData().setPassword(form.getEncryptedPassword());
     }
     getData().setPersonalPhoneIdentifiers(userDao.getNormalizedPersonalPhoneIdentifiers(getData()));
+    if (form.ldapUserValues.isPosixAccountValuesEmpty() == false) {
+      final String xml = PFUserDOConverter.getLdapValuesAsXml(form.ldapUserValues);
+      getData().setLdapValues(xml);
+    }
     return super.onSaveOrUpdate();
   }
 
@@ -107,7 +112,7 @@ public class UserEditPage extends AbstractEditPage<PFUserDO, UserEditForm, UserD
       final List<UserRightVO> list = form.rightsData.getRights();
       userRightDao.updateUserRights(getData(), list);
     }
-    if (StringUtils.isNotEmpty(getData().getPassword()) == true) {
+    if (StringUtils.isNotEmpty(form.getEncryptedPassword()) == true) {
       Login.getInstance().passwordChanged(getData(), form.password);
     }
     return super.afterSaveOrUpdate();

@@ -32,11 +32,14 @@ import java.util.TimeZone;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
+import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.markup.ComponentTag;
 import org.apache.wicket.markup.html.form.Button;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.PasswordTextField;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.spring.injection.annot.SpringBean;
@@ -48,6 +51,10 @@ import org.projectforge.common.StringHelper;
 import org.projectforge.common.TimeNotation;
 import org.projectforge.core.ConfigXml;
 import org.projectforge.core.Configuration;
+import org.projectforge.ldap.LdapPosixAccountsUtils;
+import org.projectforge.ldap.LdapUserDao;
+import org.projectforge.ldap.LdapUserValues;
+import org.projectforge.ldap.PFUserDOConverter;
 import org.projectforge.user.GroupDO;
 import org.projectforge.user.Login;
 import org.projectforge.user.PFUserContext;
@@ -66,6 +73,7 @@ import org.projectforge.web.wicket.WicketUtils;
 import org.projectforge.web.wicket.components.LabelValueChoiceRenderer;
 import org.projectforge.web.wicket.components.MaxLengthTextArea;
 import org.projectforge.web.wicket.components.MaxLengthTextField;
+import org.projectforge.web.wicket.components.MinMaxNumberField;
 import org.projectforge.web.wicket.components.RequiredMaxLengthTextField;
 import org.projectforge.web.wicket.components.SingleButtonPanel;
 import org.projectforge.web.wicket.components.TimeZoneField;
@@ -107,6 +115,10 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
   boolean invalidateAllStayLoggedInSessions;
 
   MultiChoiceListHelper<GroupDO> assignListHelper;
+
+  LdapUserValues ldapUserValues;
+
+  TextField< ? > usernameTextField, uidNumberField, gidNumberField, homeDirectoryField, loginShellField;
 
   public UserEditForm(final UserEditPage parentPage, final PFUserDO data)
   {
@@ -320,17 +332,20 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
   protected void init()
   {
     super.init();
+    ldapUserValues = PFUserDOConverter.readLdapUserValues(data.getLdapValues());
+    if (ldapUserValues == null) {
+      ldapUserValues = new LdapUserValues();
+    }
     final boolean adminAccess = accessChecker.isLoggedInUserMemberOfAdminGroup();
     gridBuilder.newGrid8();
     {
       // User
       final FieldsetPanel fs = gridBuilder.newFieldset(getString("user"));
       if (adminAccess == true) {
-        final RequiredMaxLengthTextField username = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data,
-            "username"));
-        WicketUtils.setStrong(username);
-        fs.add(username);
-        username.add(new AbstractValidator<String>() {
+        usernameTextField = new RequiredMaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(data, "username"));
+        WicketUtils.setStrong(usernameTextField);
+        fs.add(usernameTextField);
+        usernameTextField.add(new AbstractValidator<String>() {
 
           @Override
           protected void onValidate(final IValidatable<String> validatable)
@@ -367,12 +382,6 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
           data.setDeactivated(!activated);
         };
       }, getString("user.activated.tooltip"));
-      if (Login.getInstance().hasExternalUsermanagementSystem() == true) {
-        WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.localUser"), "localUser", new PropertyModel<Boolean>(data,
-            "localUser"), getString("user.localUser.tooltip"));
-        WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.restrictedUser"), "restrictedUser", new PropertyModel<Boolean>(data,
-            "restrictedUser"), getString("user.restrictedUser.tooltip"));
-      }
       addPassswordFields();
     }
 
@@ -388,6 +397,76 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
 
     gridBuilder.newGrid16(true);
     addAssignedGroups(adminAccess);
+    if (adminAccess == true && Login.getInstance().hasExternalUsermanagementSystem() == true) {
+      gridBuilder.newGrid16(true);
+      gridBuilder.newFormHeading(getString("ldap"));
+      gridBuilder.newColumnsPanel();
+      gridBuilder.newColumnPanel(DivType.COL_50);
+      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.localUser"), "localUser",
+          new PropertyModel<Boolean>(data, "localUser"), getString("user.localUser.tooltip"));
+      if (LdapUserDao.isPosixAccountsConfigured() == true) {
+        {
+          final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.uidNumber"), getString("ldap.posixAccount"), true);
+          uidNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(ldapUserValues, "uidNumber"), 1,
+              65535);
+          WicketUtils.setSize(uidNumberField, 6);
+          fs.add(uidNumberField);
+          if (ldapUserValues.isPosixAccountValuesEmpty() == true) {
+            final AjaxButton createButton = new AjaxButton(SingleButtonPanel.WICKET_ID, this) {
+              @Override
+              protected void onSubmit(final AjaxRequestTarget target, final Form< ? > form)
+              {
+                data.setUsername(usernameTextField.getRawInput());
+                LdapPosixAccountsUtils.setDefaultValues(ldapUserValues, data);
+                uidNumberField.setEnabled(true);
+                gidNumberField.setEnabled(true);
+                homeDirectoryField.setEnabled(true);
+                loginShellField.setEnabled(true);
+                this.setVisible(false);
+                target.add(this, uidNumberField, gidNumberField, homeDirectoryField, loginShellField);
+              }
+
+              @Override
+              protected void onError(final AjaxRequestTarget target, final Form< ? > form)
+              {
+                target.add(UserEditForm.this.feedbackPanel);
+              }
+            };
+            createButton.setDefaultFormProcessing(false);
+            fs.add(new SingleButtonPanel(fs.newChildId(), createButton, gridBuilder.getString("create"), SingleButtonPanel.GREY));
+            WicketUtils.addTooltip(createButton, gridBuilder.getString("ldap.posixAccount.createDefault.tooltip"));
+          }
+        }
+        {
+          final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.gidNumber"), getString("ldap.posixAccount"));
+          gidNumberField = new MinMaxNumberField<Integer>(fs.getTextFieldId(), new PropertyModel<Integer>(ldapUserValues, "gidNumber"), 1,
+              65535);
+          WicketUtils.setSize(gidNumberField, 6);
+          fs.add(gidNumberField);
+        }
+      }
+      gridBuilder.newColumnPanel(DivType.COL_50);
+      WicketUtils.addYesNoRadioFieldset(gridBuilder, getString("user.restrictedUser"), "restrictedUser", new PropertyModel<Boolean>(data,
+          "restrictedUser"), getString("user.restrictedUser.tooltip"));
+      if (LdapUserDao.isPosixAccountsConfigured() == true) {
+        {
+          final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.homeDirectory"), getString("ldap.posixAccount"));
+          homeDirectoryField = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(ldapUserValues, "homeDirectory"));
+          fs.add(homeDirectoryField);
+        }
+        {
+          final FieldsetPanel fs = gridBuilder.newFieldset(getString("ldap.loginShell"), getString("ldap.posixAccount"));
+          loginShellField = new MaxLengthTextField(fs.getTextFieldId(), new PropertyModel<String>(ldapUserValues, "loginShell"));
+          fs.add(loginShellField);
+        }
+        if (ldapUserValues.isPosixAccountValuesEmpty() == true) {
+          uidNumberField.setEnabled(false);
+          gidNumberField.setEnabled(false);
+          homeDirectoryField.setEnabled(false);
+          loginShellField.setEnabled(false);
+        }
+      }
+    }
     if (adminAccess == true) {
       addRights();
     }
@@ -541,7 +620,8 @@ public class UserEditForm extends AbstractEditForm<PFUserDO, UserEditPage>
     final FieldsetPanel fs = gridBuilder.newFieldset(getString("user.assignedGroups"), true).setLabelSide(false);
     final Collection<Integer> set = ((UserDao) getBaseDao()).getAssignedGroups(data);
     final GroupsProvider groupsProvider = new GroupsProvider();
-    assignListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(groupsProvider.getSortedGroups());
+    assignListHelper = new MultiChoiceListHelper<GroupDO>().setComparator(new GroupsComparator()).setFullList(
+        groupsProvider.getSortedGroups());
     if (set != null) {
       for (final Integer groupId : set) {
         final GroupDO group = userGroupCache.getGroup(groupId);

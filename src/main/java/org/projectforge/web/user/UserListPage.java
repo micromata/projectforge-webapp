@@ -39,6 +39,7 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 import org.apache.wicket.spring.injection.annot.SpringBean;
 import org.projectforge.access.OperationType;
+import org.projectforge.ldap.LdapUserDao;
 import org.projectforge.user.PFUserDO;
 import org.projectforge.user.UserDao;
 import org.projectforge.user.UserRightDO;
@@ -87,13 +88,15 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
         final PFUserDO user = rowModel.getObject();
         final StringBuffer cssStyle = getCssStyle(user.getId(), user.hasSystemAccess() == false);
         if (cssStyle.length() > 0) {
-          item.add( AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
+          item.add(AttributeModifier.append("style", new Model<String>(cssStyle.toString())));
         }
       }
     };
-    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("user.username"), getSortable("username", sortable), "username", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("user.username"), getSortable("username", sortable), "username",
+        cellItemListener) {
       /**
-       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item, java.lang.String, org.apache.wicket.model.IModel)
+       * @see org.projectforge.web.wicket.CellItemListenerPropertyColumn#populateItem(org.apache.wicket.markup.repeater.Item,
+       *      java.lang.String, org.apache.wicket.model.IModel)
        */
       @Override
       public void populateItem(final Item<ICellPopulator<PFUserDO>> item, final String componentId, final IModel<PFUserDO> rowModel)
@@ -111,8 +114,8 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(new Model<String>(getString("user.activated")), getSortable(
-        "deactivated", sortable), "deactivated", cellItemListener) {
+    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(new Model<String>(getString("user.activated")), getSortable("deactivated",
+        sortable), "deactivated", cellItemListener) {
       @Override
       public void populateItem(final Item<ICellPopulator<PFUserDO>> item, final String componentId, final IModel<PFUserDO> rowModel)
       {
@@ -129,11 +132,14 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
         cellItemListener.populateItem(item, componentId, rowModel);
       }
     });
-    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("name"), getSortable("lastname", sortable), "lastname", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("firstName"), getSortable("firstname", sortable), "firstname", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("user.personalPhoneIdentifiers"), getSortable("personalPhoneIdentifiers", sortable),
-        "personalPhoneIdentifiers", cellItemListener));
-    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("description"), getSortable("description", sortable), "description", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("name"), getSortable("lastname", sortable), "lastname",
+        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("firstName"), getSortable("firstname", sortable), "firstname",
+        cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("user.personalPhoneIdentifiers"), getSortable(
+        "personalPhoneIdentifiers", sortable), "personalPhoneIdentifiers", cellItemListener));
+    columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("description"), getSortable("description", sortable), "description",
+        cellItemListener));
     if (updateAccess == true) {
       // Show these columns only for admin users:
       columns.add(new AbstractColumn<PFUserDO>(new Model<String>(getString("user.assignedGroups"))) {
@@ -178,6 +184,10 @@ public class UserListPage extends AbstractListPage<UserListForm, UserDao, PFUser
           cellItemListener.populateItem(cellItem, componentId, rowModel);
         }
       });
+
+      if (LdapUserDao.isPosixAccountsConfigured() == true) {
+        columns.add(new CellItemListenerPropertyColumn<PFUserDO>(getString("user.ldapValues"), "ldapValues", "ldapValues", cellItemListener));
+      }
     }
     return columns;
   }
