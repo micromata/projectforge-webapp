@@ -79,8 +79,6 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
 
   private boolean refreshInProgress;
 
-  private final boolean storePasswords = true;
-
   /**
    * Only for test cases.
    * @param mode
@@ -140,11 +138,12 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
       return loginResult.setLoginResultStatus(LoginResultStatus.FAILED);
     }
     log.info("LDAP authentication was successful for: " + username);
+    user = userDao.getInternalByName(username); // Get again (may-be the user does no exist since last call of getInternalByName(String).
     if (user == null) {
       log.info("LDAP user '" + username + "' doesn't yet exist in ProjectForge's data base. Creating new user...");
       user = PFUserDOConverter.convert(ldapUser);
       user.setId(null); // Force new id.
-      if (mode == Mode.SIMPLE || storePasswords == false) {
+      if (mode == Mode.SIMPLE || ldapConfig.isStorePasswords() == false) {
         user.setNoPassword();
       } else {
         user.setPassword(userDao.encryptPassword(password));
@@ -152,7 +151,7 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
       userDao.internalSave(user);
     } else if (mode != Mode.SIMPLE) {
       PFUserDOConverter.copyUserFields(PFUserDOConverter.convert(ldapUser), user);
-      if (storePasswords == true) {
+      if (ldapConfig.isStorePasswords() == true) {
         user.setPassword(userDao.encryptPassword(password));
       }
       userDao.internalUpdate(user);
@@ -264,7 +263,11 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
           try {
             final PFUserDO user = PFUserDOConverter.convert(ldapUser);
             users.add(user);
-            final PFUserDO dbUser = getUser(dbUsers, user.getUsername());
+            PFUserDO dbUser = getUser(dbUsers, user.getUsername());
+            if (dbUser == null) {
+              // Double check if added between internalLoadAll() and here:
+              dbUser = userDao.getInternalByName(user.getUsername());
+            }
             if (dbUser != null) {
               if (dbUser.isLocalUser() == true) {
                 // Ignore local users.
@@ -287,6 +290,7 @@ public class LdapSlaveLoginHandler extends LdapLoginHandler
               }
             } else {
               // New user:
+              user.setId(null);
               userDao.internalSave(user);
               ++created;
             }
