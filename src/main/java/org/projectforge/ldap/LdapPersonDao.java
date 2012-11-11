@@ -101,9 +101,8 @@ public class LdapPersonDao extends LdapDao<String, LdapPerson>
    * @see org.projectforge.ldap.LdapDao#getModificationItems(org.projectforge.ldap.LdapObject)
    */
   @Override
-  protected List<ModificationItem> getModificationItems(List<ModificationItem> list, final LdapPerson person)
+  protected List<ModificationItem> getModificationItems(final List<ModificationItem> list, final LdapPerson person)
   {
-    list = super.getModificationItems(list, person);
     createAndAddModificationItems(list, "sn", person.getSurname());
     createAndAddModificationItems(list, "givenName", person.getGivenName());
     createAndAddModificationItems(list, "uid", person.getUid());
