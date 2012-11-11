@@ -317,7 +317,7 @@ public class UserDao extends BaseDao<PFUserDO>
 
   /**
    * Does an user with the given username already exists? Works also for existing users (if username was modified).
-   * @param username
+   * @param user
    * @return
    */
   @SuppressWarnings("unchecked")
@@ -353,7 +353,7 @@ public class UserDao extends BaseDao<PFUserDO>
   /**
    * Changes the user's password. Checks the password quality and the correct authentication for the old password before. Also the
    * stay-logged-in-key will be renewed, so any existing stay-logged-in cookie will be invalid.
-   * @param username
+   * @param user
    * @param oldPassword
    * @param newPassword
    * @return Error message key if any check failed or null, if successfully changed.
